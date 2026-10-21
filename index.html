@@ -625,7 +625,7 @@ window.COUVERTURES = {
    ===================================================================== */
 const LIVRES = [
   { titre:"Plomberie et chauffage", auteur:"Jérémy Raymond", categorie:"Entretien général d'immeubles", niveau:"DEP 5211 · Compétence 10",
-    pages:161, annee:2026, nouveau:false, couverture:"", couleurs:["#1e88e5","#0b2f6b"], lien:"", fichier:"plomberie-chauffage", competence:"10",
+    pages:190, annee:2026, nouveau:false, couverture:"", couleurs:["#1e88e5","#0b2f6b"], lien:"", fichier:"plomberie-chauffage", competence:"10",
     description:"Entretien des systèmes de plomberie et de chauffage (75 h) : tuyauterie, raccords, drainage, chauffe-eau, brûleur et pompes. Théorie, activités, quiz et ateliers." },
 
   { titre:"Dispositifs électriques et électroniques", auteur:"Jérémy Raymond", categorie:"Plomberie et chauffage", niveau:"DEP 5333 · Compétence 9",
@@ -826,9 +826,10 @@ const REP_SEL = ".reponse,.answer,.solution,.correction,[data-reponse],[data-ans
 function repDriverPart(doc){
   if (!doc.querySelector(REP_SEL)) return {};
   const st = doc.createElement("style");
-  st.textContent = "body:not(.h-rep) :is(" + REP_SEL + "){visibility:hidden!important}";
+  /* cachées au départ, puis forcées visibles avec ✓ (même si le livre les cache lui-même en attendant la bibliothèque) */
+  st.textContent = "body:not(.h-rep) :is(" + REP_SEL + "){visibility:hidden!important}body.h-rep :is(" + REP_SEL + "){visibility:visible!important}";
   doc.documentElement.appendChild(st);
-  return { answers:() => doc.body.classList.toggle("h-rep"),
+  return { ansSimple:true, answers:() => doc.body.classList.toggle("h-rep"),
     ansInfo:() => ({ dis:!doc.querySelector(REP_SEL), mode:doc.body.classList.contains("h-rep") ? 2 : 0, s:0, t:0 }) };
 }
 /* Chapitres d'un livre sans sommaire : les titres (h1, h2) placés dans une page, une diapo ou une section */
@@ -1444,7 +1445,7 @@ function poll(){
       if (bt.dataset.k !== key){
         bt.dataset.k = key; bt.disabled = !e.ok; bt.classList.toggle("on", e.m > 0);
         bt.innerHTML = e.m === 1 ? '<span class="ansn">' + e.s + "/" + e.t + "</span>" : ICO_CHECK;
-        bt.title = !e.ok ? "Pas de réponses sur ces pages" : e.m === 0 ? "Réponses : pas à pas (R)" : e.m === 1 ? "Réponses : toutes (R)" : "Cacher les réponses (R)";
+        bt.title = !e.ok ? "Pas de réponses sur ces pages" : e.m === 0 ? (RD.drv.ansSimple ? "Afficher les réponses (R)" : "Réponses : pas à pas (R)") : e.m === 1 ? "Réponses : toutes (R)" : "Cacher les réponses (R)";
         bt.setAttribute("aria-label", bt.title);
       }
     }
@@ -2318,7 +2319,7 @@ function answers(){
   const sans = d => { try { return d.ansInfo ? d.ansInfo() : null; } catch(e){ return null; } };
   const inf = ds.map(sans).filter(i => i && !i.dis);
   if (!inf.length){ if (!ds[0].ansInfo) ds.forEach(d => { try { d.answers(); } catch(e){} }); return; }
-  const cible = (Math.max(...inf.map(i => i.mode)) + 1) % 3;
+  const cible = ds.every(d => d.ansSimple) ? (Math.max(...inf.map(i => i.mode)) > 0 ? 0 : 2) : (Math.max(...inf.map(i => i.mode)) + 1) % 3;
   ds.forEach(d => { for (let k = 0; k < 3; k++){ const i = sans(d); if (!i || i.dis || i.mode === cible) break; try { d.answers(); } catch(e){} } });
   setTimeout(poll, 80);
 }
