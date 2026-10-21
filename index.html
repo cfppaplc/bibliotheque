@@ -921,7 +921,14 @@ function buildDriver(win, doc){
     const fit = () => { const p = pages[cur]; p.style.transform = ""; const w = p.offsetWidth, h = p.offsetHeight; if (!w || !h) return;
       const s = Math.min(win.innerWidth / w, win.innerHeight / h);
       p.style.transform = `translate(${(win.innerWidth - w * s) / 2}px,${(win.innerHeight - h * s) / 2}px) scale(${s})`; };
-    const show = i => { cur = Math.max(0, Math.min(pages.length - 1, i)); pages.forEach(p => p.classList.remove("hcur")); pages[cur].classList.add("hcur"); fit(); };
+    /* « live » : classe que certains livres ajoutent eux-mêmes (un peu plus tard) pour lancer les animations de la page visible.
+       On la pose en même temps que la page s'affiche : sinon la page apparaît complète, disparaît, puis se rejoue (effet de page en double). */
+    /* Après le tour de page animé (double page), les pages arrivent déjà jouées dans les copies : on les montre sans rejouer leurs animations */
+    let calme = null;
+    const show = i => {
+      if (RD.calme && !calme){ calme = doc.createElement("style"); calme.textContent = "*,*::before,*::after{animation:none!important;transition:none!important}"; doc.documentElement.appendChild(calme); }
+      else if (!RD.calme && calme){ calme.remove(); calme = null; }
+      cur = Math.max(0, Math.min(pages.length - 1, i)); pages.forEach((p, k) => { if (k !== cur) p.classList.remove("hcur", "live"); }); pages[cur].classList.add("hcur", "live"); fit(); };
     win.addEventListener("resize", fit); show(0);
     const modules = () => { const out = [{ tag:"⌂", text:"Couverture", color:"", run:() => show(0) }];
       pages.forEach((p, i) => { const h = p.querySelector("h1,h2"), t = h ? h.textContent.replace(/\s+/g, " ").trim() : "";
@@ -1313,7 +1320,7 @@ function flipTurnAnime(dir){
   }
   RD.flip = true;
   const m1 = RD.m1, m2 = RD.m2, D = 320;
-  const go = (d, p) => { try { d.goto(p); } catch(e){} };
+  const go = (d, p) => { RD.calme = true; try { d.goto(p); } catch(e){} RD.calme = false; };   /* copies montrées déjà « jouées » */
   let flipper, lander, fo, lo, from, to;
   if (dir > 0){
     go(RD.drv3, m + 1); go(RD.drv4, m);
@@ -1331,8 +1338,9 @@ function flipTurnAnime(dir){
   inn.classList.add("flip"); inn.style.perspective = "2600px";
   flipper.style.transformOrigin = fo + "px 50%"; lander.style.transformOrigin = lo + "px 50%";
   const fin = () => {
-    RD.drv.goto(m);
-    setTimeout(() => { syncSecond(); }, 90);
+    RD.calme = true;
+    try { RD.drv.goto(m); } catch(e){}
+    setTimeout(() => { syncSecond(); RD.calme = false; }, 90);
     setTimeout(() => {
       [1, 2, 3, 4].forEach(i => { f[i].getAnimations().forEach(a => a.cancel()); f[i].style.transform = ""; f[i].style.zIndex = ""; f[i].style.transformOrigin = ""; });
       f[3].style.visibility = "hidden"; f[4].style.visibility = "hidden";
