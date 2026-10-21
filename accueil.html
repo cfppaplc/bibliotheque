@@ -1404,5 +1404,11 @@ document.addEventListener("visibilitychange", () => { if (document.visibilitySta
 renderStatic(); tick(); setInterval(tick, 1000);
 </script>
 
+<script>
+/* Mode hors ligne : les livres déjà ouverts restent sur l'ordinateur (voir sw.js) */
+if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) {
+  window.addEventListener("load", () => { navigator.serviceWorker.register("sw.js").catch(() => {}); });
+}
+</script>
 </body>
 </html>
