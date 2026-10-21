@@ -3,7 +3,7 @@
    - Les livres et les plans : copie gardée sur l'ordinateur, ouverte tout de suite; on vérifie en arrière-plan
      s'il existe une nouvelle version (sans retélécharger le livre s'il n'a pas changé). */
 const CACHE = "biblio-v1";
-const BASE = ["./", "index.html", "accueil.html", "recherche.json"];
+const BASE = ["./", "index.html", "accueil.html", "recherche.json", "nouveautes.json"];
 
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(BASE).catch(() => {})).then(() => self.skipWaiting()));
