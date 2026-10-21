@@ -2317,8 +2317,8 @@ function simFrame(t){
   Object.assign(ov.style, { left:S.left + "px", top:S.top + "px", width:S.width + "px", height:S.height + "px" }); ov.hidden = false;
   const g = ov.getContext("2d"), sx = r.width / ink.width; g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, w, h);
   g.setTransform(dpr * sx, 0, 0, dpr * sx, dpr * (r.left - S.left), dpr * (r.top - S.top));
-  const u = elecU(), esp = u * .5, ph = (t / 1000 * u * 1.4) % esp, R = Math.max(2.5, u * .1);
-  g.fillStyle = "#ffd43b"; g.strokeStyle = "#8a6d00"; g.lineWidth = Math.max(1, u * .03);
+  const u = elecU(), esp = u * .4, ph = (t / 1000 * u * 1.4) % esp, R = Math.max(1.6, u * .055);   /* petits points, un peu plus serrés */
+  g.fillStyle = "#ffd43b"; g.strokeStyle = "#8a6d00"; g.lineWidth = Math.max(.6, u * .015);
   SIM.flux.forEach(([a, b]) => { const L = Math.hypot(b[0] - a[0], b[1] - a[1]); if (!L) return;
     for (let d = ph; d < L; d += esp){ const x = a[0] + (b[0] - a[0]) * d / L, y = a[1] + (b[1] - a[1]) * d / L; g.beginPath(); g.arc(x, y, R, 0, 7); g.fill(); g.stroke(); } });
   g.strokeStyle = "#2b8a3e"; g.lineWidth = Math.max(2, u * .07); g.lineCap = "round";
