@@ -38,6 +38,16 @@
   main{position:relative;z-index:2;padding-top:10px;padding-bottom:60px}
   .row{margin:0 0 34px}
   .row h2{font-size:1.25rem;margin:0 4% 10px;font-weight:600}
+  .row-tog{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:8px;font:inherit;color:inherit;border-radius:6px;padding:2px 6px 2px 0}
+  .row-tog:hover .chev,.row-tog:focus-visible .chev{color:#fff}
+  .row-tog:focus-visible{outline:2px solid #fff;outline-offset:3px}
+  .row-tog .chev{color:#a9a9ae;transition:transform .25s ease}
+  .row-nb{font-size:.8rem;font-weight:400;color:#8c8c92;opacity:0;transition:opacity .2s}
+  .row.reduit .row-tog .chev{transform:rotate(-90deg)}
+  .row.reduit .row-nb{opacity:1}
+  .row.reductible .row-wrap{max-height:520px;transition:max-height .35s ease,opacity .3s ease}
+  .row.reduit .row-wrap{max-height:0;overflow:hidden;opacity:0;pointer-events:none}
+  .row.reduit{margin-bottom:14px}
   .row-wrap{position:relative}
   .scroller{display:flex;gap:10px;overflow-x:auto;scroll-behavior:smooth;padding:10px 4% 24px;scrollbar-width:none}
   .scroller::-webkit-scrollbar{display:none}
@@ -704,8 +714,24 @@ function bookCard(l){
   </div>`;
 }
 
+/* Rangées « Continuer » et « Nouveautés » : on peut les réduire (mémorisé dans le navigateur) */
+const RANGS_REDUCTIBLES = ["Continuer", "Nouveautés"];
+let rangsReduits = lireLS("rangsReduits", []);
 function rowHTML(titre, livres){
   if (!livres.length) return "";
+  if (RANGS_REDUCTIBLES.includes(titre)){
+    const red = rangsReduits.includes(titre);
+    return `<section class="row reductible${red ? " reduit" : ""}" data-rang="${esc(titre)}">
+    <h2 style="--cc:${palette(titre)[0]}"><button class="row-tog" type="button" aria-expanded="${!red}" title="${red ? "Afficher" : "Réduire"} cette rangée">
+      <svg class="chev" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+      <span>${esc(titre)}</span><small class="row-nb">${livres.length} livre${livres.length > 1 ? "s" : ""}</small></button></h2>
+    <div class="row-wrap">
+      <button class="arrow left" aria-label="Précédent">‹</button>
+      <div class="scroller">${livres.map(bookCard).join("")}</div>
+      <button class="arrow right" aria-label="Suivant">›</button>
+    </div>
+  </section>`;
+  }
   return `<section class="row">
     <h2 style="--cc:${palette(titre)[0]}">${esc(titre)}</h2>
     <div class="row-wrap">
@@ -3943,6 +3969,16 @@ initAdmin();
   const btn = $("planBtn"); if (btn) btn.addEventListener("click", ouvrir);
   window.__plans = { charger, fichier, outil, versPlan, state: () => ({ s, tx, ty, W, H, notes }) };
 })();
+</script>
+<script>
+/* Réduire / afficher les rangées « Continuer » et « Nouveautés » */
+document.addEventListener("click", e => {
+  const b = e.target.closest && e.target.closest(".row-tog"); if (!b) return;
+  const sec = b.closest(".row"), t = sec.dataset.rang, red = !sec.classList.contains("reduit");
+  sec.classList.toggle("reduit", red); b.setAttribute("aria-expanded", String(!red)); b.title = (red ? "Afficher" : "Réduire") + " cette rangée";
+  rangsReduits = red ? [...new Set([...rangsReduits, t])] : rangsReduits.filter(x => x !== t);
+  ecrireLS("rangsReduits", rangsReduits);
+});
 </script>
 
 </body></html>
