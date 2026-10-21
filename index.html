@@ -815,7 +815,7 @@ function render(){
   let html = "";
   if (!query && view === "all"){
     html += rowHTML("Continuer", list.filter(l => POS[l.fichier] && POS[l.fichier].n > 1).sort((a, b) => POS[b.fichier].t - POS[a.fichier].t));
-    html += rowHTML("Nouveautés", list.filter(l => l.nouveau));
+    /* « Nouveautés » retirée : les livres récents gardent leur étiquette et sont listés dans « Quoi de neuf » */
     if (favs.length) html += rowHTML("Ma liste", list.filter(isFav));
   }
   const cats = [...new Set(list.map(l => l.categorie))].sort((a, b) => nomProgramme(a).localeCompare(nomProgramme(b), "fr"));
