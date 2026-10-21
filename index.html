@@ -486,8 +486,8 @@
   .reader.pen-side .penbar,.reader.auto.calme.pen-side .penbar{left:auto;right:10px;bottom:auto;top:50%;transform:translateY(-50%);flex-direction:column;flex-wrap:wrap;align-content:flex-start;max-width:none;height:max-content;max-height:calc(100% - 150px);overflow:visible}
   .reader.pen-side .penbar .sep{width:26px;height:1px}
   .reader.pen-side.pen-fold .penbar{flex-wrap:nowrap}
-  .reader.pen-side #objBar{right:auto!important;left:10px;top:50%!important;transform:translateY(-50%)!important;flex-direction:column;flex-wrap:nowrap!important;max-height:calc(100% - 150px);overflow-y:auto}
-  #objBar.of>*:not(#objF){display:none!important}
+  /* la palette des objets se place où l'on veut (poignée en haut) */
+  #objBar.of>*:not(#objF):not(.tete){display:none!important}#objBar.sim>*:not(#objF):not(.tete):not(#objSim):not(.simAide){display:none!important}
   .wbboard{--u:34px;transition:background .3s ease}
   .wbboard[data-fond="quad"]{background-color:#fff}
   .wbboard[data-fond="lignes"]{background-color:#fffef9;background-image:linear-gradient(to bottom,transparent calc(100% - 1px),#aec3e3 calc(100% - 1px));background-size:100% calc(var(--u) * 1.25)}
@@ -1755,10 +1755,10 @@ const OBJETS = {
 /* ---- Schéma électrique en échelle : symboles posés sur le quadrillé ; les fils s'accrochent aux bornes et suivent le symbole ---- */
 const ELEC = {
   fil:        { n:"✎ Fil" },
-  rails:      { n:"Échelle L1 / L2", lb:"L1 / L2" },
+  rails:      { n:"Échelle L1 / L2", c:"Échelle L1/L2", lb:"L1 / L2" },
   contact:    { n:"Contact", nf:1, lb:"CR1" },
-  bobine:     { n:"Bobine (relais, contacteur)", lb:"CR1" },
-  surcharge:  { n:"Surcharge (OL)", lb:"OL" },
+  bobine:     { n:"Bobine (relais, contacteur)", c:"Bobine", lb:"CR1" },
+  surcharge:  { n:"Contact de surcharge (OL)", c:"Surcharge OL", lb:"OL" },
   bp:         { n:"Bouton-poussoir", nf:1, lb:"PB1" },
   inter:      { n:"Interrupteur", nf:1, lb:"S1" },
   thermostat: { n:"Thermostat", nf:1, lb:"TH" },
@@ -1777,7 +1777,7 @@ function surRails(s, G, x, y, m){ const [w, h] = s.sz || [8, 10], u = G.u, lx = 
 const modeElec = () => !!RD.wb && wbBg() === "quad";
 const elecU = () => 34 * RD.z * (window.devicePixelRatio || 1);
 function elecGeo(s, W, H){
-  const u = elecU(), ox = s.p[0][0] * W, oy = s.p[0][1] * H, o = s.k !== "rails" && !!s.o;
+  const u = s.__u || elecU(), ox = s.p[0][0] * W, oy = s.p[0][1] * H, o = s.k !== "rails" && !!s.o;
   const P = (x, y) => o ? [ox - y * u, oy + x * u] : [ox + x * u, oy + y * u];
   let lp, bx;
   if (s.k === "rails"){ const [w, h] = s.sz || [8, 10]; lp = []; for (let y = 1; y < h; y += 2) lp.push([0, y], [w, y]); bx = [-1.1, -1, w + .4, h + .2]; }
@@ -1789,6 +1789,7 @@ function elecGeo(s, W, H){
 }
 function dessinerElec(g, s, W, H, k, col){
   const G = elecGeo(s, W, H), u = G.u, d = ELEC[s.k] || {}, K = s.k, nf = K === "surcharge" || (d.nf && s.nf);
+  const SM = RD.sim && !s.__u ? SIM : null, ferme = SM ? SM.ferme.get(s) : undefined, actif = SM ? SM.charges.has(s) || SM.trOn.has(s) : false;   /* animation : état réel */
   const police = (f, gr) => (gr || 700) + " " + f + "px system-ui,'Segoe UI',Arial,sans-serif";
   g.save(); g.translate(G.ox, G.oy); if (G.o) g.rotate(Math.PI / 2);
   g.strokeStyle = col; g.fillStyle = col; g.lineCap = "round"; g.lineJoin = "round"; g.lineWidth = Math.max(1.5, 2.5 * k); g.setLineDash([]);
@@ -1804,24 +1805,30 @@ function dessinerElec(g, s, W, H, k, col){
   if (K === "contact" || K === "surcharge"){
     L(0, 0, .75, 0); L(1.25, 0, 2, 0); L(.75, -.38, .75, .38); L(1.25, -.38, 1.25, .38);
     if (nf) L(.55, .45, 1.45, -.45);
+    if (ferme){ g.save(); g.strokeStyle = "#2f9e44"; g.lineWidth = Math.max(2, 3.5 * k); L(.75, 0, 1.25, 0); g.restore(); }
     T(s.lb, 1, -.75, .36, "dessus");
   } else if (K === "bobine" || K === "lampe" || K === "moteur"){
-    const r = K === "moteur" ? .45 : .4; L(0, 0, 1 - r, 0); L(1 + r, 0, 2, 0); C(1, 0, r, false);
+    const r = K === "moteur" ? .45 : .4; L(0, 0, 1 - r, 0); L(1 + r, 0, 2, 0);
+    if (actif){ const lc = { R:"#ff6b6b", G:"#51cf66", V:"#51cf66", A:"#ffd43b", J:"#ffd43b", Y:"#ffd43b", B:"#4dabf7", W:"#fff9db" }[(s.lb || "").trim().toUpperCase()[0]] || "#ffd43b";
+      const fc = K === "lampe" ? lc : K === "moteur" ? "#b2f2bb" : "#ffc9c9"; g.save(); if (K === "lampe"){ g.shadowColor = lc; g.shadowBlur = u * .8; }
+      g.beginPath(); g.arc(u, 0, r * u, 0, Math.PI * 2); g.fillStyle = fc; g.fill(); g.restore(); g.beginPath(); g.arc(u, 0, r * u, 0, Math.PI * 2); g.stroke(); }
+    else C(1, 0, r, false);
     if (K === "lampe") for (let i = 0; i < 8; i++){ const a = i * Math.PI / 4 + Math.PI / 8; L(1 + Math.cos(a) * (r + .07), Math.sin(a) * (r + .07), 1 + Math.cos(a) * (r + .22), Math.sin(a) * (r + .22)); }
     T(s.lb, 1, .02, .34, null, r * 1.55);
   } else if (K === "solenoide"){
-    L(0, 0, .55, 0); L(1.45, 0, 2, 0); g.beginPath(); for (let i = 0; i < 3; i++) g.arc((.7 + i * .3) * u, 0, .15 * u, Math.PI, 0, false); g.stroke();
+    L(0, 0, .55, 0); L(1.45, 0, 2, 0); g.save(); if (actif){ g.strokeStyle = "#e03131"; g.lineWidth = Math.max(2, 3.5 * k); } g.beginPath(); for (let i = 0; i < 3; i++) g.arc((.7 + i * .3) * u, 0, .15 * u, Math.PI, 0, false); g.stroke(); g.restore();
     T(s.lb, 1, -.6, .34, "dessus");
   } else if (K === "fusible"){
-    L(0, 0, .5, 0); L(1.5, 0, 2, 0); g.beginPath(); g.rect(.5 * u, -.18 * u, u, .36 * u); g.stroke(); L(.5, 0, 1.5, 0);
+    L(0, 0, .5, 0); L(1.5, 0, 2, 0); g.beginPath(); g.rect(.5 * u, -.18 * u, u, .36 * u); g.stroke();
+    if (ferme === false){ L(.5, 0, .85, 0); L(1.15, 0, 1.5, 0); g.save(); g.strokeStyle = "#e03131"; L(.88, -.14, 1.12, .14); L(.88, .14, 1.12, -.14); g.restore(); } else L(.5, 0, 1.5, 0);
     T(s.lb, 1, -.6, .34, "dessus");
   } else if (K === "bp"){
     L(0, 0, .6, 0); L(1.4, 0, 2, 0); bornes();
-    const yb = nf ? .1 : -.3; L(.45, yb, 1.55, yb); L(1, yb, 1, -.62); L(.82, -.62, 1.18, -.62);
+    const yb = SM ? (ferme ? (nf ? .1 : .02) : -.3) : (nf ? .1 : -.3); if (ferme) g.strokeStyle = "#2f9e44"; L(.45, yb, 1.55, yb); g.strokeStyle = col; L(1, yb, 1, -.62); L(.82, -.62, 1.18, -.62);
     T(s.lb, 1, -.9, .34, "dessus");
   } else if (/^(inter|thermostat|pression|flotteur|fincourse)$/.test(K)){
     L(0, 0, .6, 0); L(1.4, 0, 2, 0); bornes();
-    const ye = nf ? .16 : -.42, mx = 1.02, my = ye * .5; L(.6, 0, 1.45, ye);
+    const ye = SM ? (ferme ? .03 : -.42) : (nf ? .16 : -.42), mx = 1.02, my = ye * .5; if (ferme) g.strokeStyle = "#2f9e44"; L(.6, 0, 1.45, ye); g.strokeStyle = col;
     if (K !== "inter"){
       g.save(); g.lineWidth = Math.max(1, 1.4 * k); g.setLineDash([.07 * u, .07 * u]); L(mx, my, mx, .44); g.restore();
       g.save(); g.lineWidth = Math.max(1.2, 2 * k);
@@ -1842,12 +1849,12 @@ function dessinerElec(g, s, W, H, k, col){
   } else if (K === "jonction"){
     C(0, 0, .13, true);
   } else if (K === "rails"){
-    const [w, h] = s.sz || [8, 10]; g.lineWidth = Math.max(2, 4 * k); L(0, 0, 0, h); L(w, 0, w, h);
+    const [w, h] = s.sz || [8, 10]; g.lineWidth = Math.max(2, 4 * k); if (SM) g.strokeStyle = "#e03131"; L(0, 0, 0, h); if (SM) g.strokeStyle = "#1c7ed6"; L(w, 0, w, h); g.strokeStyle = col;
     const lb = String(s.lb == null ? "L1 / L2" : s.lb).split("/"); T((lb[0] || "").trim(), 0, -.5, .4); T((lb[1] || "").trim(), w, -.5, .4);
     let n = 1; for (let y = 1; y < h; y += 2) T(String(n++), -.4, y, .3, "droite", 0, 600);
   }
   g.restore();
-  if (RD.obj){ const sel = typeof SELO !== "undefined" && SELO.s === s; g.save(); g.fillStyle = "#2a7bcf"; g.strokeStyle = "#2a7bcf"; g.lineWidth = Math.max(1.2, 1.6 * k);
+  if (RD.obj && !RD.sim && !s.__u){ const sel = typeof SELO !== "undefined" && SELO.s === s; g.save(); g.fillStyle = "#2a7bcf"; g.strokeStyle = "#2a7bcf"; g.lineWidth = Math.max(1.2, 1.6 * k);
     G.ports.forEach(q => { g.beginPath(); g.arc(q[0], q[1], Math.max(2.5, u * (sel ? .1 : .08)), 0, 7); if (sel) g.fill(); else { g.fillStyle = "rgba(42,123,207,.25)"; g.fill(); g.stroke(); } }); g.restore(); }
   return G;
 }
@@ -1999,6 +2006,7 @@ function drawStroke(g, s, W, H, k){
   g.lineCap = "round"; g.lineJoin = "round";
   let col = s.c; if (s.hl){ const h = (s.hc || "#fff200").slice(1); col = "rgba(" + parseInt(h.slice(0,2),16) + "," + parseInt(h.slice(2,4),16) + "," + parseInt(h.slice(4,6),16) + ",.4)"; }
   if (!s.hl && s.c === "#24282c" && wbSombre()) col = "#f4f1ea";          /* le « noir » devient craie sur un tableau foncé */
+  if (RD.sim && s.fil){ const pt = SIM.pot.get(s); col = pt === "h" ? "#e03131" : pt === "n" ? "#1c7ed6" : "#a3aab3"; }   /* animation : rouge = L1, bleu = L2 */
   g.strokeStyle = col; g.lineWidth = (s.hl ? s.w * 4 : s.w) * k;
   if (s.t === "objet"){ const G = dessinerObjet(g, s, W, H, k, "#3a424b"); if (typeof SELO !== "undefined" && SELO.s === s){ g.save(); g.setLineDash([8 * k, 6 * k]); g.strokeStyle = "#6aa9ff"; g.lineWidth = 2 * k; g.strokeRect(G.bbox[0] - 6, G.bbox[1] - 6, G.bbox[2] - G.bbox[0] + 12, G.bbox[3] - G.bbox[1] + 12); g.restore(); } return; }
   if (s.t === "texte"){
@@ -2238,12 +2246,113 @@ function appliquerTxt(maj){
   $("#rstage").addEventListener("scroll", () => majSelTxt(), { passive:true });
 })();
 
+
+/* ---- Animation du schéma en échelle : on calcule où passe le courant, de L1 vers L2 ----
+   Les fils et les rails relient des points de la grille ; un contact fermé relie ses deux bornes ; une charge (bobine, lampe,
+   moteur, solénoïde) est alimentée quand une borne touche L1 et l'autre L2. Une bobine alimentée change l'état de tous les
+   contacts qui portent le même repère (CR1, M…) : c'est ce qui fait fonctionner le contact de maintien. */
+const SIM = { act:new Set(), press:new Set(), bob:{}, ferme:new Map(), pot:new Map(), charges:new Set(), trOn:new Set(), flux:[], moteurs:[], court:false, key:"", raf:0, tenu:null };
+const SIM_SW = /^(contact|surcharge|bp|inter|thermostat|pression|flotteur|fincourse|fusible)$/, SIM_CH = /^(bobine|lampe|moteur|solenoide)$/, SIM_ACT = /^(bp|inter|thermostat|pression|flotteur|fincourse|surcharge|fusible)$/;
+function simCalc(){
+  const cv = $("#inkCanvas"), W = cv.width, Hc = cv.height, u = elecU(), arr = strokes();
+  const gk = p => Math.round(p[0] * W / u) + "," + Math.round(p[1] * Hc / u), gkPx = q => Math.round(q[0] / u) + "," + Math.round(q[1] / u);
+  const px = k => { const [x, y] = k.split("|")[0].split(",").map(Number); return [x * u, y * u]; };
+  const fils = arr.filter(o => o.t === "ligne" && o.fil), objs = arr.filter(o => o.t === "objet" && ELEC[o.k]);
+  const conn = new Set(), ports = new Map(), E = [], hotS = new Set(), neuS = new Set();
+  fils.forEach(f => f.p.forEach(p => conn.add(gk(p))));
+  objs.forEach(o => { const Pp = objGeo(o, W, Hc).ports.map(gkPx); ports.set(o, Pp); Pp.forEach(k => conn.add(k)); });
+  fils.forEach((f, idx) => { const [ax, ay] = gk(f.p[0]).split(",").map(Number), [bx, by] = gk(f.p[1]).split(",").map(Number);
+    if (ax !== bx && ay !== by){ E.push([ax + "," + ay, bx + "," + by]); return; }
+    const n = Math.max(Math.abs(bx - ax), Math.abs(by - ay)), sx = Math.sign(bx - ax), sy = Math.sign(by - ay); let prev = ax + "," + ay;
+    for (let i = 1; i <= n; i++){ const k0 = (ax + sx * i) + "," + (ay + sy * i), k = (i === n || conn.has(k0)) ? k0 : k0 + "|" + idx; E.push([prev, k]); prev = k; } });   /* deux fils qui se croisent sans point de jonction ne sont pas reliés */
+  objs.filter(o => o.k === "rails").forEach(o => { const [w, h] = o.sz || [8, 10], [x0, y0] = gk(o.p[0]).split(",").map(Number);
+    [[x0, hotS], [x0 + w, neuS]].forEach(([x, S]) => { for (let y = y0; y <= y0 + h; y++){ S.add(x + "," + y); if (y > y0) E.push([x + "," + (y - 1), x + "," + y]); } }); });
+  let bob = Object.assign({}, SIM.bob), ferme, charges, trOn, court, rac, HS, NS;
+  for (let it = 0; it < 16; it++){
+    ferme = new Map();
+    objs.forEach(o => { if (!SIM_SW.test(o.k)) return; const lb = (o.lb || "").trim().toUpperCase();
+      const act = o.k === "contact" ? !!bob[lb] : o.k === "bp" ? SIM.press.has(o) : SIM.act.has(o);
+      ferme.set(o, (o.k === "surcharge" || o.k === "fusible" || o.nf) ? !act : act); });
+    const par = new Map(), f = k => { while (par.has(k)){ const p = par.get(k); if (par.has(p)) par.set(k, par.get(p)); k = p; } return k; }, un = (a, b) => { a = f(a); b = f(b); if (a !== b) par.set(a, b); };
+    E.forEach(([a, b]) => un(a, b)); ferme.forEach((v, o) => { if (v){ const Pp = ports.get(o); un(Pp[0], Pp[1]); } });
+    HS = new Set([...hotS].map(f)); NS = new Set([...neuS].map(f)); trOn = new Set();
+    for (let r = 0; r < 3; r++) objs.forEach(o => { if (o.k !== "transfo") return; const Pp = ports.get(o), a = f(Pp[0]), b = f(Pp[1]);
+      if ((HS.has(a) && NS.has(b)) || (NS.has(a) && HS.has(b))){ trOn.add(o); HS.add(f(Pp[2])); NS.add(f(Pp[3])); } });
+    court = [...HS].some(r => NS.has(r)); charges = new Set();
+    if (court) trOn = new Set();
+    else objs.forEach(o => { if (!SIM_CH.test(o.k)) return; const Pp = ports.get(o), a = f(Pp[0]), b = f(Pp[1]); if ((HS.has(a) && NS.has(b)) || (NS.has(a) && HS.has(b))) charges.add(o); });
+    const nb = {}; charges.forEach(o => { if (o.k === "bobine" && o.lb) nb[o.lb.trim().toUpperCase()] = true; });
+    rac = f; const pareil = Object.keys(nb).sort().join() === Object.keys(bob).filter(k => bob[k]).sort().join(); bob = nb; if (pareil) break;
+  }
+  const pot = new Map(); fils.forEach(w => { const r = rac(gk(w.p[0])); pot.set(w, HS.has(r) ? "h" : NS.has(r) ? "n" : ""); });
+  /* trajet du courant (pour les points jaunes qui avancent) : de L1 jusqu'à chaque charge, puis de la charge jusqu'à L2 */
+  const adj = new Map(), aj = (a, b) => { if (!adj.has(a)) adj.set(a, []); adj.get(a).push(b); };
+  E.concat([...ferme].filter(([, v]) => v).map(([o]) => ports.get(o))).forEach(([a, b]) => { aj(a, b); aj(b, a); });
+  const chemin = (dep, buts) => { const vu = new Map([[dep, null]]), file = [dep];
+    while (file.length){ const k = file.shift(); if (buts.has(k)){ const ch = []; for (let x = k; x !== null; x = vu.get(x)) ch.push(x); return ch; }
+      (adj.get(k) || []).forEach(n => { if (!vu.has(n)){ vu.set(n, k); file.push(n); } }); } return null; };
+  const srcH = new Set(hotS), srcN = new Set(neuS); trOn.forEach(o => { const Pp = ports.get(o); srcH.add(Pp[2]); srcN.add(Pp[3]); });
+  const flux = [], vus = new Set(), seg = (a, b) => { const id = a + ">" + b; if (!vus.has(id)){ vus.add(id); flux.push([px(a), px(b)]); } };
+  [...charges, ...trOn].forEach(o => { const Pp = ports.get(o), [ph, pn] = HS.has(rac(Pp[0])) ? [Pp[0], Pp[1]] : [Pp[1], Pp[0]];
+    const c1 = chemin(ph, srcH); if (c1) for (let i = 0; i < c1.length - 1; i++) seg(c1[i + 1], c1[i]);
+    const c2 = chemin(pn, srcN); if (c2) for (let i = 0; i < c2.length - 1; i++) seg(c2[i], c2[i + 1]); });
+  Object.assign(SIM, { bob, ferme, charges, trOn, court, pot, flux, moteurs:[...charges].filter(o => o.k === "moteur").map(o => objGeo(o, W, Hc).P(1, 0)) });
+}
+function simAide(){
+  const z = document.querySelector("#objBar .simAide"); if (!z) return;
+  const noms = [...SIM.charges].map(o => (ELEC[o.k].c || ELEC[o.k].n).split(" (")[0].toLowerCase() + (o.lb ? " " + o.lb : ""));
+  z.innerHTML = (SIM.court ? '<div class="court">⚠ Court-circuit ! L1 rejoint L2 sans passer par une charge.</div>' : "")
+    + '<div>Clique un <b>bouton-poussoir</b> (garde-le enfoncé) ou un <b>interrupteur</b> pour l\'actionner.</div>'
+    + '<div style="margin-top:4px"><span style="color:#ff8787">■</span> sous tension (L1) &nbsp;<span style="color:#74c0fc">■</span> retour (L2)</div>'
+    + '<div style="margin-top:4px" class="' + (noms.length ? "on" : "") + '">' + (noms.length ? "En marche : " + noms.join(", ") : "Rien n'est alimenté.") + '</div>';
+}
+function simMaj(){ simCalc(); redrawInk(); simAide(); }
+function simOv(){ let ov = $("#simOv"); if (!ov){ ov = document.createElement("canvas"); ov.id = "simOv"; ov.style.cssText = "position:fixed;z-index:60;pointer-events:none"; $("#reader").appendChild(ov); } return ov; }
+function simFrame(t){
+  if (!RD.sim) return;
+  if (SIM.key !== inkKey()){ simStop(true); return; }
+  const ink = $("#inkCanvas"), ov = simOv(), S = $("#rstage").getBoundingClientRect(), r = ink.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
+  const w = Math.round(S.width * dpr), h = Math.round(S.height * dpr);
+  if (ov.width !== w || ov.height !== h){ ov.width = w; ov.height = h; }
+  Object.assign(ov.style, { left:S.left + "px", top:S.top + "px", width:S.width + "px", height:S.height + "px" }); ov.hidden = false;
+  const g = ov.getContext("2d"), sx = r.width / ink.width; g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, w, h);
+  g.setTransform(dpr * sx, 0, 0, dpr * sx, dpr * (r.left - S.left), dpr * (r.top - S.top));
+  const u = elecU(), esp = u * .5, ph = (t / 1000 * u * 1.4) % esp, R = Math.max(2.5, u * .1);
+  g.fillStyle = "#ffd43b"; g.strokeStyle = "#8a6d00"; g.lineWidth = Math.max(1, u * .03);
+  SIM.flux.forEach(([a, b]) => { const L = Math.hypot(b[0] - a[0], b[1] - a[1]); if (!L) return;
+    for (let d = ph; d < L; d += esp){ const x = a[0] + (b[0] - a[0]) * d / L, y = a[1] + (b[1] - a[1]) * d / L; g.beginPath(); g.arc(x, y, R, 0, 7); g.fill(); g.stroke(); } });
+  g.strokeStyle = "#2b8a3e"; g.lineWidth = Math.max(2, u * .07); g.lineCap = "round";
+  SIM.moteurs.forEach(([x, y]) => { const a0 = t / 1000 * 4; for (let i = 0; i < 2; i++){ g.beginPath(); g.arc(x, y, u * .62, a0 + i * Math.PI, a0 + i * Math.PI + 1.6); g.stroke(); } });
+  SIM.raf = requestAnimationFrame(simFrame);
+}
+function simStart(){
+  if (!modeElec()) return; RD.sim = true; SELO.s = null; SIM.act = new Set(); SIM.press = new Set(); SIM.bob = {}; SIM.key = inkKey();
+  simMaj(); majObjUI(); cancelAnimationFrame(SIM.raf); SIM.raf = requestAnimationFrame(simFrame);
+  aviser("Animation : clique un bouton-poussoir ou un interrupteur pour faire fonctionner le schéma.", 5000);
+}
+function simStop(silence){
+  if (!RD.sim) return; RD.sim = false; cancelAnimationFrame(SIM.raf); const ov = $("#simOv"); if (ov) ov.hidden = true;
+  SIM.flux = []; SIM.charges = new Set(); SIM.trOn = new Set(); redrawInk(); if (!silence) majObjUI();
+}
+(function(){
+  const c = $("#inkCanvas");
+  c.addEventListener("pointerdown", e => {
+    if (!RD.sim) return; e.preventDefault();
+    const r = c.getBoundingClientRect(), x = (e.clientX - r.left) * c.width / r.width, y = (e.clientY - r.top) * c.height / r.height, m = elecU() * .25;
+    const o = strokes().slice().reverse().find(s => { if (s.t !== "objet" || !SIM_ACT.test(s.k)) return false; const G = objGeo(s, c.width, c.height); return x > G.bbox[0] - m && x < G.bbox[2] + m && y > G.bbox[1] - m && y < G.bbox[3] + m; });
+    if (!o) return; c.setPointerCapture(e.pointerId);
+    if (o.k === "bp"){ SIM.press.add(o); SIM.tenu = o; } else if (SIM.act.has(o)) SIM.act.delete(o); else SIM.act.add(o);
+    simMaj();
+  });
+  ["pointerup", "pointercancel"].forEach(t => c.addEventListener(t, () => { if (SIM.tenu){ SIM.press.delete(SIM.tenu); SIM.tenu = null; if (RD.sim) simMaj(); } }));
+})();
 /* ---- Barre et souris des objets ---- */
 const SELO = { s:null };
 RD.objK = "plinthe"; RD.objO = 0;
 function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
   const el = modeElec(); RD.objK = el ? (RD.objKe || "fil") : (RD.objKi || "plinthe");
-  b.querySelectorAll(".grp").forEach(x => x.hidden = (x.dataset.g === "elec") !== el);
+  b.querySelectorAll(".grp").forEach(x => x.hidden = (x.dataset.g === "elec") !== el); b.querySelectorAll(".grpE").forEach(x => x.hidden = !el);
+  b.querySelector(".tit").textContent = el ? "Schéma électrique" : "Objets"; b.classList.toggle("sim", !!RD.sim); $("#objSim").textContent = RD.sim ? "■ Arrêter l'animation" : "▶ Animer le schéma";
   b.querySelectorAll("[data-k]").forEach(x => x.classList.toggle("on", x.dataset.k === RD.objK));
   const se = SELO.s && strokes().includes(SELO.s) && ELEC[SELO.s.k] ? SELO.s : null, de = ELEC[se ? se.k : RD.objK] || null, bn = b.querySelector("#objNF"), bl = b.querySelector("#objL");
   const nfV = se ? !!se.nf : !!RD.objNF; bn.style.display = el && de && de.nf ? "" : "none"; bn.textContent = nfV ? "Normalement fermé (NF)" : "Normalement ouvert (NO)"; bn.classList.toggle("on", nfV);
@@ -2254,12 +2363,34 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
   if (se && (se.k === "rails" || se.k === "jonction")) b.querySelector("#objR").style.display = "none"; }
 (function(){
   const bar = document.createElement("div"); bar.id = "objBar"; bar.hidden = true;
-  bar.style.cssText = "position:absolute;z-index:75;left:50%;top:64px;transform:translateX(-50%);display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:center;padding:8px 10px;border-radius:12px;background:rgba(14,14,15,.96);border:1px solid #2f2f33;color:#d4d4d8;font:600 .85rem system-ui,sans-serif";
-  bar.innerHTML = '<span class="grp" data-g="iso">' + Object.keys(OBJETS).map(k => '<button data-k="' + k + '">' + OBJETS[k].n + '</button>').join("") + '</span><span class="grp" data-g="elec">' + Object.keys(ELEC).map(k => '<button data-k="' + k + '">' + ELEC[k].n + '</button>').join("") + '<span class="aide">Pour relier : glisse d\'un <b>point bleu</b> à l\'autre</span></span><button id="objP" title="Espacement des tubes du serpentin"></button><button id="objNF" title="Normalement ouvert ou normalement fermé"></button><input id="objL" maxlength="10" placeholder="Repère" title="Repère du symbole (ex. CR1, M, PB2)" aria-label="Repère du symbole"><span style="width:1px;height:26px;background:#2f2f33"></span><button id="objR" title="Pivoter l\'objet sélectionné">⟳ Pivoter</button><button id="objD" title="Supprimer l\'objet sélectionné" aria-label="Supprimer">🗑</button><button id="objX">Terminé</button>';
+  bar.style.cssText = "position:absolute;z-index:75;left:12px;top:70px;display:flex;flex-direction:column;gap:6px;width:184px;max-height:calc(100% - 150px);overflow-y:auto;overflow-x:hidden;padding:8px;border-radius:12px;background:rgba(14,14,15,.96);border:1px solid #2f2f33;color:#d4d4d8;font:600 .8rem system-ui,sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.35)";
+  bar.innerHTML = '<div class="tete" title="Glisse ici pour déplacer la palette"><span class="poig">⠿</span><span class="tit">Objets</span></div>'
+    + '<div class="grp" data-g="iso">' + Object.keys(OBJETS).map(k => '<button data-k="' + k + '">' + OBJETS[k].n + '</button>').join("") + '</div>'
+    + '<div class="grp ico" data-g="elec">' + Object.keys(ELEC).map(k => '<button data-k="' + k + '" title="' + ELEC[k].n.replace(/^[✎•] /, "") + '"><canvas width="120" height="64"></canvas><span>' + (ELEC[k].c || ELEC[k].n.replace(/^[✎•] /, "")) + '</span></button>').join("") + '</div>'
+    + '<div class="aide grpE">Pour relier : glisse d\'un <b>point bleu</b> à l\'autre</div>'
+    + '<button id="objP" title="Espacement des tubes du serpentin"></button><button id="objNF" title="Normalement ouvert ou normalement fermé"></button><input id="objL" maxlength="10" placeholder="Repère" title="Repère du symbole (ex. CR1, M, PB2)" aria-label="Repère du symbole">'
+    + '<div class="rang"><button id="objR" title="Pivoter l\'objet sélectionné">⟳ Pivoter</button><button id="objD" title="Supprimer l\'objet sélectionné" aria-label="Supprimer">🗑</button></div>'
+    + '<button id="objSim" class="grpE" title="Faire fonctionner le schéma : le courant circule, les bobines, lampes et moteurs s\'activent">▶ Animer le schéma</button><div class="simAide"></div><button id="objX">Terminé</button>';
   const st = document.createElement("style");
-  st.textContent = '#objBar button{min-height:34px;padding:0 10px;border-radius:8px;border:1px solid #2f2f33;background:#18181a;color:#d4d4d8;cursor:pointer;font:inherit}#objBar button:hover{border-color:#6a6a70}#objBar button.on{background:#2a2a2d;border-color:#8a8a90;color:#fff}#objBar .grp{display:contents}#objBar .aide{color:#9fc6f5;font-size:13px;padding:0 6px}#objBar .aide b{color:#6aa9ff}#objBar .grp[hidden]{display:none}#objBar #objL{width:90px;min-height:34px;padding:0 8px;border-radius:8px;border:1px solid #2f2f33;background:#fff;color:#111;font:inherit;font-weight:700;text-transform:uppercase}';
+  st.textContent = '#objBar button{min-height:32px;padding:0 8px;border-radius:8px;border:1px solid #2f2f33;background:#18181a;color:#d4d4d8;cursor:pointer;font:inherit;text-align:left}#objBar button:hover{border-color:#6a6a70}#objBar button.on{background:#2a2a2d;border-color:#6aa9ff;color:#fff}'
+    + '#objBar .tete{display:flex;align-items:center;gap:6px;cursor:grab;user-select:none;touch-action:none;padding:2px 34px 4px 2px;color:#a1a1aa;font-size:.78rem;letter-spacing:.04em;text-transform:uppercase}#objBar .tete:active{cursor:grabbing}#objBar .poig{font-size:1.1rem;line-height:1}'
+    + '#objBar #objF{position:absolute;top:6px;right:6px;min-height:28px;width:28px;padding:0;display:flex;align-items:center;justify-content:center}#objBar.of{width:auto!important;padding-right:42px}'
+    + '#objBar .grp{display:flex;flex-direction:column;gap:4px}#objBar .grp[hidden],#objBar .grpE[hidden]{display:none!important}'
+    + '#objBar .grp.ico{display:grid;grid-template-columns:1fr 1fr;gap:4px}#objBar .ico button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:4px 2px;min-height:58px;text-align:center;background:#f4f6f9;border-color:#d5dbe3;color:#1f2329;font-size:.68rem;line-height:1.1}'
+    + '#objBar .ico button:hover{border-color:#6aa9ff}#objBar .ico button.on{background:#dbeafe;border-color:#2a7bcf;color:#0b3d75;box-shadow:inset 0 0 0 1px #2a7bcf}#objBar .ico canvas{width:60px;height:32px}'
+    + '#objBar .aide{color:#9fc6f5;font-size:.72rem;line-height:1.3;padding:2px}#objBar .aide b{color:#6aa9ff}#objBar .rang{display:flex;gap:4px}#objBar .rang button{flex:1;text-align:center}'
+    + '#objBar #objL{min-height:32px;padding:0 8px;border-radius:8px;border:1px solid #2f2f33;background:#fff;color:#111;font:inherit;font-weight:700;text-transform:uppercase}'
+    + '#objBar #objSim{background:#1f7a3f;border-color:#2f9e44;color:#fff;text-align:center}#objBar.sim #objSim{background:#a61e1e;border-color:#e03131}#objBar #objX{text-align:center}'
+    + '#objBar .simAide{display:none;font-size:.74rem;line-height:1.35;color:#d4d4d8;padding:2px}#objBar.sim .simAide{display:block}#objBar .simAide .court{color:#ff8787;font-weight:800}#objBar .simAide .on{color:#8ce99a}';
   document.head.appendChild(st); $("#reader").appendChild(bar);
   bar.addEventListener("pointerdown", e => e.stopPropagation());
+  bar.querySelectorAll(".ico button").forEach(b => { const k = b.dataset.k, cv = b.querySelector("canvas"), g = cv.getContext("2d"), W = cv.width, H = cv.height;
+    g.strokeStyle = "#24282c"; g.fillStyle = "#24282c"; g.lineWidth = 3; g.lineCap = "round";
+    if (k === "fil"){ g.beginPath(); g.moveTo(14, 44); g.lineTo(60, 44); g.lineTo(60, 20); g.lineTo(106, 20); g.stroke(); g.fillStyle = "#2a7bcf"; [[14, 44], [106, 20]].forEach(([x, y]) => { g.beginPath(); g.arc(x, y, 6, 0, 7); g.fill(); }); return; }
+    if (k === "rails"){ g.lineWidth = 4; g.beginPath(); g.moveTo(26, 8); g.lineTo(26, 60); g.moveTo(94, 8); g.lineTo(94, 60); g.stroke(); g.lineWidth = 2.5; g.beginPath(); [24, 44].forEach(y => { g.moveTo(26, y); g.lineTo(94, y); }); g.stroke(); return; }
+    if (k === "jonction"){ g.beginPath(); g.moveTo(20, 32); g.lineTo(100, 32); g.moveTo(60, 32); g.lineTo(60, 60); g.stroke(); g.beginPath(); g.arc(60, 32, 7, 0, 7); g.fill(); return; }
+    const U = k === "transfo" ? 17 : 34, w = k === "transfo" ? 4 : 2, y0 = k === "transfo" ? 18 : (k === "bp" ? 40 : 36);
+    dessinerElec(g, { t:"objet", k, p:[[(W - w * U) / 2 / W, y0 / H]], lb:{ bobine:"CR", moteur:"M" }[k] || "", nf:0, __u:U }, W, H, 1.2, "#24282c"); });
   bar.querySelectorAll("[data-k]").forEach(b => b.onclick = () => { if (ELEC[b.dataset.k]) RD.objKe = b.dataset.k; else RD.objKi = b.dataset.k; SELO.s = null; redrawInk(); majObjUI(); });
   $("#objNF").onclick = () => { const s = SELO.s && strokes().includes(SELO.s) && ELEC[SELO.s.k] ? SELO.s : null;
     if (s){ snapInk(); s.nf = s.nf ? 0 : 1; RD.objNF = s.nf; redrawInk(); } else RD.objNF = RD.objNF ? 0 : 1; majObjUI(); };
@@ -2277,6 +2408,15 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     redrawInk(); };
   $("#objD").onclick = () => { const s = SELO.s; if (!s) return; snapInk(); INKS[inkKey()] = strokes().filter(x => x !== s); SELO.s = null; redrawInk(); majObjUI(); };
   $("#objX").onclick = () => { RD.obj = false; refreshTools(); };
+  (function(){ const h = bar.querySelector(".tete"); let d = null;
+    const borner = (x, y) => { const R = $("#reader").getBoundingClientRect(); return [Math.max(4, Math.min(R.width - 60, x)), Math.max(4, Math.min(R.height - 40, y))]; };
+    const poser = (x, y) => { [x, y] = borner(x, y); bar.style.left = x + "px"; bar.style.top = y + "px"; };
+    try { const p = JSON.parse(localStorage.getItem("objPos") || "null"); if (p) requestAnimationFrame(() => poser(p[0], p[1])); } catch(e){}
+    h.addEventListener("pointerdown", e => { const R = $("#reader").getBoundingClientRect(), b = bar.getBoundingClientRect(); d = [e.clientX - b.left + R.left, e.clientY - b.top + R.top]; h.setPointerCapture(e.pointerId); e.preventDefault(); });
+    h.addEventListener("pointermove", e => { if (d) poser(e.clientX - d[0], e.clientY - d[1]); });
+    ["pointerup", "pointercancel"].forEach(t => h.addEventListener(t, () => { if (!d) return; d = null; try { localStorage.setItem("objPos", JSON.stringify([parseFloat(bar.style.left), parseFloat(bar.style.top)])); } catch(e){} }));
+  })();
+  $("#objSim").onclick = () => { if (RD.sim) simStop(); else simStart(); };
   const c = $("#inkCanvas"); let mv = null;
   const cur = e => { const r = c.getBoundingClientRect(); let x = e.clientX - r.left, y = e.clientY - r.top;
     if (modeElec()){ const u = 34 * RD.z * (r.width / (c.offsetWidth || r.width)); return { raw:[x / r.width, y / r.height], snap:[Math.round(x / u) * u / r.width, Math.round(y / u) * u / r.height] }; }
@@ -2311,11 +2451,17 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     segs.forEach(f => f.p.forEach(p => { if (fils.some(o => !segs.includes(o) && surFil(p, o))) pts.push(p); }));
     fils.filter(o => !segs.includes(o)).forEach(o => o.p.forEach(p => { if (segs.some(f => surFil(p, f))) pts.push(p); }));
     pts.forEach(p => { if (!arr.some(o => o.t === "objet" && o.k === "jonction" && longueur(o.p[0], p) < 3)) arr.push({ t:"objet", k:"jonction", o:0, c:"#24282c", p:[p.slice()], w:4 }); }); };
+  const bout = (p, f) => f.p.some(e => longueur(e, p) < 2);
+  const couperFils = o => { if (!ELEC[o.k] || /^(rails|jonction)$/.test(o.k)) return; const P = objGeo(o, c.width, c.height).ports.map(p => [p[0] / c.width, p[1] / c.height]), arr = strokes();
+    (o.k === "transfo" ? [[P[0], P[1]], [P[2], P[3]]] : [[P[0], P[1]]]).forEach(([A, B]) => arr.filter(f => f.t === "ligne" && f.fil).forEach(f => {
+      if (!((surFil(A, f) || bout(A, f)) && (surFil(B, f) || bout(B, f)))) return;
+      const [p0, p1] = f.p, [n0, n1] = longueur(p0, A) < longueur(p0, B) ? [A, B] : [B, A];
+      const morceaux = [[p0, n0], [n1, p1]].filter(([a, b]) => longueur(a, b) > 3).map(([a, b]) => nouveauFil(a, b)); arr.splice(arr.indexOf(f), 1, ...morceaux); })); };
   const touche = q => { const arr = strokes(); for (let i = arr.length - 1; i >= 0; i--){ const s = arr[i]; if (s.t !== "objet") continue; const G = objGeo(s, c.width, c.height), x = q[0] * c.width, y = q[1] * c.height;
     if (s.k === "rails"){ if (surRails(s, G, x, y, .1) && (RD.objK === "rails" || (y - G.oy) / G.u < .4)) return s; continue; }
     if (x >= G.bbox[0] - 4 && x <= G.bbox[2] + 4 && y >= G.bbox[1] - 4 && y <= G.bbox[3] + 4) return s; } return null; };
   c.addEventListener("pointerdown", e => {
-    if (!RD.obj || !RD.wb || RD.eraser) return;
+    if (!RD.obj || !RD.wb || RD.eraser || RD.sim) return;
     const q = cur(e), el = modeElec();
     if (el && RD.objK !== "jonction"){
       const b = borneProche(q.raw), h0 = b ? null : touche(q.raw);
@@ -2335,8 +2481,8 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     } else {
       snapInk(); const o = { t:"objet", k:RD.objK, o:RD.objO, c:/^hl/.test(RD.color) ? "#24282c" : RD.color, p:[q.snap], w:4 };
       if (el){ const de = ELEC[RD.objK]; if (de.lb) o.lb = RD.lbK[RD.objK] || de.lb; if (de.nf) o.nf = RD.objNF ? 1 : 0; }
-      strokes().push(o); SELO.s = o;
-      if (el && RD.objK !== "jonction"){ RD.objKe = "fil"; aviser(ELEC[o.k].n + " posé. Relie-le : glisse d'un point bleu à l'autre.", 4500); }
+      strokes().push(o); SELO.s = o; if (el) couperFils(o);
+      if (el && RD.objK !== "jonction"){ RD.objKe = "fil"; RD.objNF = 0; aviser(ELEC[o.k].n + " posé. Relie-le : glisse d'un point bleu à l'autre.", 4500); }
     }
     redrawInk(); majObjUI();
   });
@@ -2428,7 +2574,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     return [x / r.width, y / r.height];
   };
   c.addEventListener("pointerdown", e => {
-    if (!(RD.pen || RD.wb)) return;
+    if (!(RD.pen || RD.wb) || RD.sim) return;
     c.setPointerCapture(e.pointerId);
     if (RD.eraser){ cur = "erase"; eraseAt(pt(e)); return; }
     if (RD.text || RD.obj){ e.preventDefault(); return; }
@@ -2588,6 +2734,7 @@ function refreshTools(){
   const sw = document.querySelector('#penBar .sw[data-c="#24282c"]'); if (sw){ sw.style.setProperty("--c", wbSombre() ? "#f4f1ea" : "#24282c"); sw.setAttribute("aria-label", wbSombre() ? "Craie blanche" : "Noir"); }
   document.querySelectorAll("#penBar .sw").forEach(b => b.classList.toggle("on", !RD.eraser && b.dataset.c === RD.color)); if (RD.swx) RD.swx.classList.toggle("on", !RD.eraser && !document.querySelector("#penBar .sw.on"));
   if (RD.obj && !(RD.wb && (/^iso/.test(wbBg()) || wbBg() === "quad"))) RD.obj = false;
+  if (RD.sim && (!RD.obj || !modeElec())) simStop(true);
   $("#penO").classList.toggle("on", !!RD.obj);
   redrawInk(); if (!RD.text) SEL.s = null; if (!RD.obj) SELO.s = null; majBarTxt(); majSelTxt(); majObjUI();
 }
