@@ -633,7 +633,7 @@ const LIVRES = [
     description:"Installer, faire fonctionner et dépanner les commandes des systèmes de chauffage à air chaud, hydroniques et à la vapeur. 9 modules, de la sécurité à l'automate programmable." },
 
   { titre:"Protection incendie d'un bâtiment", auteur:"Jérémy Raymond", categorie:"Entretien général d'immeubles", niveau:"DEP Entretien général d'immeubles",
-    pages:91, annee:2026, nouveau:false, couverture:"", couleurs:["#E8590C","#5a1c00"], lien:"", fichier:"protection-incendie", competence:"12",
+    pages:104, annee:2026, nouveau:false, couverture:"", couleurs:["#E8590C","#5a1c00"], lien:"", fichier:"protection-incendie", competence:"12",
     description:"Livre d'apprentissage de 60 heures : chimie du feu, classes de feu et agents extincteurs, extincteurs portatifs et systèmes de protection du bâtiment. Activités et quiz à chaque module." },
   { titre:"Ventilation et climatisation", auteur:"Jérémy Raymond", categorie:"Entretien général d'immeubles", niveau:"DEP Entretien général d'immeubles", pages:145, annee:2026, nouveau:true, couverture:"", couleurs:["#00acc1","#05474f"], lien:"", fichier:"ventilation-climatisation-m11", competence:"11", description:"Livre d'apprentissage de 60 heures : sécurité et entretien, air et confort, systèmes de ventilation, composants, échangeurs d'air VRC/VRE, cycle frigorifique, thermopompes, régulation, climatisation centrale et entretien préventif. Activités, réponses pas à pas et animations." },
   { titre:"Administration d'un bâtiment et plan d'urgence", auteur:"Jérémy Raymond", categorie:"Entretien général d'immeubles", niveau:"DEP Entretien général d'immeubles",
@@ -885,7 +885,11 @@ function buildDriver(win, doc){
       modules:() => [...el("jump").options].map(o => { const m = /^Module\s+(\d+)\s*[—-]\s*(.*)$/.exec(o.textContent);
         return { tag:m ? m[1] : "•", text:m ? m[2] : o.textContent, color:"", run:() => { if (win.__incendie) win.__incendie.go(+o.value); } }; }),
       animOn:() => el("anim").getAttribute("aria-pressed") !== "false",
-      toggleAnim:() => click("anim"), answers:null
+      toggleAnim:() => click("anim"),
+      /* Corrigé intégré (.ans, affiché par body.answers) dans les versions récentes de ce livre */
+      ...(doc.querySelector(".ans") ? { ansSimple:true,
+        answers:() => { doc.body.classList.remove("stepans"); doc.body.classList.toggle("answers"); },
+        ansInfo:() => ({ dis:false, mode:doc.body.classList.contains("answers") ? 2 : 0, s:0, t:0 }) } : { answers:null })
     };
   }
   /* Livre inconnu avec sa propre barre : on retrouve ses boutons, on la masque et on la pilote */
