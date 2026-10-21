@@ -489,7 +489,7 @@
   .reader.pen-side #objBar{right:auto!important;left:10px;top:50%!important;transform:translateY(-50%)!important;flex-direction:column;flex-wrap:nowrap!important;max-height:calc(100% - 150px);overflow-y:auto}
   #objBar.of>*:not(#objF){display:none!important}
   .wbboard{--u:34px;transition:background .3s ease}
-  .wbboard[data-fond="quad"]{background-color:#fff;background-image:linear-gradient(#cfd8e6 1px,transparent 1px),linear-gradient(90deg,#cfd8e6 1px,transparent 1px);background-size:var(--u) var(--u)}
+  .wbboard[data-fond="quad"]{background-color:#fff}
   .wbboard[data-fond="lignes"]{background-color:#fffef9;background-image:linear-gradient(to bottom,transparent calc(100% - 1px),#aec3e3 calc(100% - 1px));background-size:100% calc(var(--u) * 1.25)}
   .wbboard[data-fond="lignes"]::before{content:"";position:absolute;top:0;bottom:0;left:calc(var(--u) * 2.4);width:2px;background:#e8a0a0}
   .wbboard[data-fond="iso"],.wbboard[data-fond="isopts"]{background-color:#fff;background-size:calc(var(--u) * 2.0785) calc(var(--u) * 1.2)}
@@ -604,7 +604,7 @@
   <div class="penbar" id="penBar" hidden role="toolbar" aria-label="Crayon">
     <button data-c="#e2483d" class="sw on" style="--c:#e2483d" aria-label="Rouge"></button><button data-c="#2a7bcf" class="sw" style="--c:#2a7bcf" aria-label="Bleu"></button><button data-c="#2f9e4f" class="sw" style="--c:#2f9e4f" aria-label="Vert"></button><button data-c="#24282c" class="sw" style="--c:#24282c" aria-label="Noir"></button><button data-c="hl:#fff200" class="sw hl" style="--c:#fff200" aria-label="Surligneur jaune fluo" title="Surligneur jaune fluo"></button><button data-c="hl:#39ff14" class="sw hl" style="--c:#39ff14" aria-label="Surligneur vert fluo" title="Surligneur vert fluo"></button><button data-c="hl:#ff9500" class="sw hl" style="--c:#ff9500" aria-label="Surligneur orange fluo" title="Surligneur orange fluo"></button>
     <span class="sep"></span>
-    <button id="penW" aria-label="Épaisseur du trait" title="Épaisseur"></button><button id="penS" aria-label="Forme" title="Forme : trait libre, ligne, flèche, rectangle, ellipse"></button><button id="penT" aria-label="Zone de texte" title="Zone de texte : dessine un rectangle, puis écris dedans"></button><button id="penO" class="wbonly" hidden aria-label="Objets du plan isométrique" title="Objets (plinthe, radiateur, chaudière…) pour le plan isométrique"></button><button id="penE" aria-label="Gomme" title="Gomme"></button><button id="penU" aria-label="Annuler" title="Annuler (Ctrl+Z)"></button><button id="penR" aria-label="Rétablir" title="Rétablir (Ctrl+Y)"></button><button id="penC" aria-label="Tout effacer" title="Tout effacer sur cette page"></button>
+    <button id="penW" aria-label="Épaisseur du trait" title="Épaisseur"></button><button id="penS" aria-label="Forme" title="Forme : trait libre, ligne, flèche, rectangle, ellipse"></button><button id="penT" aria-label="Zone de texte" title="Zone de texte : dessine un rectangle, puis écris dedans"></button><button id="penO" class="wbonly" hidden aria-label="Objets et symboles" title="Objets : plan isométrique (plinthe, radiateur…) ou schéma électrique en échelle (sur le quadrillé)"></button><button id="penE" aria-label="Gomme" title="Gomme"></button><button id="penU" aria-label="Annuler" title="Annuler (Ctrl+Z)"></button><button id="penR" aria-label="Rétablir" title="Rétablir (Ctrl+Y)"></button><button id="penC" aria-label="Tout effacer" title="Tout effacer sur cette page"></button>
     <span class="sep wbonly" hidden></span>
     <button id="wbF" class="wbonly" hidden aria-label="Fond du tableau" title="Fond : blanc, quadrillé, lignes, plan isométrique, tableau noir, tableau vert"></button><button id="wbZo" class="wbonly" hidden aria-label="Dézoomer" title="Dézoomer (plus de place)"></button><span id="wbZv" class="wbonly wblbl" hidden>100%</span><button id="wbZi" class="wbonly" hidden aria-label="Zoomer" title="Zoomer"></button><button id="wbHand" class="wbonly" hidden aria-label="Déplacer le tableau" title="Déplacer le tableau (ou clic molette / Espace + glisser)"></button><span class="sep wbonly" hidden></span><button id="wbP" class="wbonly" hidden aria-label="Tableau précédent" title="Tableau précédent (←)"></button><span id="wbLbl" class="wbonly wblbl" hidden>1 / 1</span><button id="wbN" class="wbonly" hidden aria-label="Tableau suivant" title="Tableau suivant (→)"></button><button id="wbPlus" class="wbonly" hidden aria-label="Nouveau tableau" title="Ajouter un tableau"></button><button id="wbS" class="wbonly" hidden aria-label="Enregistrer en image" title="Enregistrer le tableau en image (PNG)"></button>
     <span class="sep"></span>
@@ -1707,7 +1707,7 @@ const icn = n => '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" st
 const setIcn = (el, n) => { if (el && el.dataset.icn !== n){ el.dataset.icn = n; el.innerHTML = icn(n); } };
 const SHAPES = [null, "ligne", "fleche", "rect", "ellipse"], SHAPE_NOM = { "": "Trait libre", ligne:"Ligne droite", fleche:"Flèche", rect:"Rectangle", ellipse:"Ellipse" };
 /* ---- Tableau blanc : plusieurs tableaux par livre, fonds au choix ---- */
-const WBFONDS = [ { k:"blanc", n:"Fond blanc", dark:false }, { k:"quad", n:"Quadrillé", dark:false }, { k:"lignes", n:"Lignes", dark:false }, { k:"iso", n:"Plan isométrique (lignes)", dark:false }, { k:"isopts", n:"Plan isométrique (points)", dark:false },
+const WBFONDS = [ { k:"blanc", n:"Fond blanc", dark:false }, { k:"quad", n:"Quadrillé (schéma électrique en échelle)", dark:false }, { k:"lignes", n:"Lignes", dark:false }, { k:"iso", n:"Plan isométrique (lignes)", dark:false }, { k:"isopts", n:"Plan isométrique (points)", dark:false },
   { k:"noir", n:"Tableau noir", dark:true }, { k:"vert", n:"Tableau vert", dark:true } ];
 const WB = {};
 const wbEtat = () => WB[RD.book] || (WB[RD.book] = { n:1, count:1, bg:{} });
@@ -1752,7 +1752,106 @@ const OBJETS = {
   vannemot:  { n:"Vanne motorisée",    ports:[[0,0],[1,0]], fill:"#d9a3a3" },
   vase:      { n:"Vase d'expansion",   ports:[[0,0]],       fill:"#f3dcc2" }
 };
+/* ---- Schéma électrique en échelle : symboles posés sur le quadrillé ; les fils s'accrochent aux bornes et suivent le symbole ---- */
+const ELEC = {
+  fil:        { n:"✎ Fil" },
+  rails:      { n:"Échelle L1 / L2", lb:"L1 / L2" },
+  contact:    { n:"Contact", nf:1, lb:"CR1" },
+  bobine:     { n:"Bobine (relais, contacteur)", lb:"CR1" },
+  surcharge:  { n:"Surcharge (OL)", lb:"OL" },
+  bp:         { n:"Bouton-poussoir", nf:1, lb:"PB1" },
+  inter:      { n:"Interrupteur", nf:1, lb:"S1" },
+  thermostat: { n:"Thermostat", nf:1, lb:"TH" },
+  pression:   { n:"Pressostat", nf:1, lb:"PS" },
+  flotteur:   { n:"Flotteur", nf:1, lb:"FS" },
+  fincourse:  { n:"Fin de course", nf:1, lb:"LS" },
+  lampe:      { n:"Lampe témoin", lb:"R" },
+  solenoide:  { n:"Solénoïde", lb:"SOL" },
+  moteur:     { n:"Moteur", lb:"M" },
+  fusible:    { n:"Fusible", lb:"F1" },
+  transfo:    { n:"Transformateur", lb:"T1" },
+  jonction:   { n:"• Jonction" }
+};
+function surRails(s, G, x, y, m){ const [w, h] = s.sz || [8, 10], u = G.u, lx = (x - G.ox) / u, ly = (y - G.oy) / u;
+  return ly > -1 - m && ly < h + m && (Math.abs(lx) < .45 + m || Math.abs(lx - w) < .45 + m); }
+const modeElec = () => !!RD.wb && wbBg() === "quad";
+const elecU = () => 34 * RD.z * (window.devicePixelRatio || 1);
+function elecGeo(s, W, H){
+  const u = elecU(), ox = s.p[0][0] * W, oy = s.p[0][1] * H, o = s.k !== "rails" && !!s.o;
+  const P = (x, y) => o ? [ox - y * u, oy + x * u] : [ox + x * u, oy + y * u];
+  let lp, bx;
+  if (s.k === "rails"){ const [w, h] = s.sz || [8, 10]; lp = []; for (let y = 1; y < h; y += 2) lp.push([0, y], [w, y]); bx = [-1.1, -1, w + .4, h + .2]; }
+  else if (s.k === "jonction"){ lp = [[0, 0]]; bx = [-.3, -.3, .3, .3]; }
+  else if (s.k === "transfo"){ lp = [[0, 0], [4, 0], [0, 2], [4, 2]]; bx = [0, -1, 4, 2.6]; }
+  else { lp = [[0, 0], [2, 0]]; bx = [0, -1.1, 2, .8]; }
+  const c0 = P(bx[0], bx[1]), c1 = P(bx[2], bx[3]);
+  return { el:true, u, o, ox, oy, P, ports:lp.map(([x, y]) => P(x, y)), bbox:[Math.min(c0[0], c1[0]), Math.min(c0[1], c1[1]), Math.max(c0[0], c1[0]), Math.max(c0[1], c1[1])] };
+}
+function dessinerElec(g, s, W, H, k, col){
+  const G = elecGeo(s, W, H), u = G.u, d = ELEC[s.k] || {}, K = s.k, nf = K === "surcharge" || (d.nf && s.nf);
+  const police = (f, gr) => (gr || 700) + " " + f + "px system-ui,'Segoe UI',Arial,sans-serif";
+  g.save(); g.translate(G.ox, G.oy); if (G.o) g.rotate(Math.PI / 2);
+  g.strokeStyle = col; g.fillStyle = col; g.lineCap = "round"; g.lineJoin = "round"; g.lineWidth = Math.max(1.5, 2.5 * k); g.setLineDash([]);
+  const L = (...q) => { g.beginPath(); for (let i = 0; i < q.length; i += 2) i ? g.lineTo(q[i] * u, q[i + 1] * u) : g.moveTo(q[i] * u, q[i + 1] * u); g.stroke(); };
+  const C = (x, y, r, plein) => { g.beginPath(); g.arc(x * u, y * u, r * u, 0, Math.PI * 2); if (plein) g.fill(); else { g.save(); g.fillStyle = "#fff"; g.fill(); g.restore(); g.stroke(); } };
+  const T = (txt, x, y, sz, mode, maxW, gr) => { if (!txt) return; g.save(); g.translate(x * u, y * u); if (G.o) g.rotate(-Math.PI / 2);
+    let f = sz * u; g.font = police(f, gr);
+    if (maxW){ const m = g.measureText(txt).width; if (m > maxW * u){ f *= maxW * u / m; g.font = police(f, gr); } }
+    g.textAlign = mode === "droite" ? "right" : (G.o && mode === "dessus") ? "left" : "center"; g.textBaseline = "middle"; g.fillStyle = col;
+    g.fillText(txt, 0, 0); g.restore(); };
+  const bornes = () => { C(.6, 0, .07, true); C(1.4, 0, .07, true); };
+  if (!/^(rails|jonction|transfo)$/.test(K)){ g.save(); g.fillStyle = "#fff"; g.fillRect(.06 * u, -.1 * u, 1.88 * u, .2 * u); g.restore(); }   /* un fil tracé sous le symbole ne doit pas « fermer » un contact ouvert */
+  if (K === "contact" || K === "surcharge"){
+    L(0, 0, .75, 0); L(1.25, 0, 2, 0); L(.75, -.38, .75, .38); L(1.25, -.38, 1.25, .38);
+    if (nf) L(.55, .45, 1.45, -.45);
+    T(s.lb, 1, -.75, .36, "dessus");
+  } else if (K === "bobine" || K === "lampe" || K === "moteur"){
+    const r = K === "moteur" ? .45 : .4; L(0, 0, 1 - r, 0); L(1 + r, 0, 2, 0); C(1, 0, r, false);
+    if (K === "lampe") for (let i = 0; i < 8; i++){ const a = i * Math.PI / 4 + Math.PI / 8; L(1 + Math.cos(a) * (r + .07), Math.sin(a) * (r + .07), 1 + Math.cos(a) * (r + .22), Math.sin(a) * (r + .22)); }
+    T(s.lb, 1, .02, .34, null, r * 1.55);
+  } else if (K === "solenoide"){
+    L(0, 0, .55, 0); L(1.45, 0, 2, 0); g.beginPath(); for (let i = 0; i < 3; i++) g.arc((.7 + i * .3) * u, 0, .15 * u, Math.PI, 0, false); g.stroke();
+    T(s.lb, 1, -.6, .34, "dessus");
+  } else if (K === "fusible"){
+    L(0, 0, .5, 0); L(1.5, 0, 2, 0); g.beginPath(); g.rect(.5 * u, -.18 * u, u, .36 * u); g.stroke(); L(.5, 0, 1.5, 0);
+    T(s.lb, 1, -.6, .34, "dessus");
+  } else if (K === "bp"){
+    L(0, 0, .6, 0); L(1.4, 0, 2, 0); bornes();
+    const yb = nf ? .1 : -.3; L(.45, yb, 1.55, yb); L(1, yb, 1, -.62); L(.82, -.62, 1.18, -.62);
+    T(s.lb, 1, -.9, .34, "dessus");
+  } else if (/^(inter|thermostat|pression|flotteur|fincourse)$/.test(K)){
+    L(0, 0, .6, 0); L(1.4, 0, 2, 0); bornes();
+    const ye = nf ? .16 : -.42, mx = 1.02, my = ye * .5; L(.6, 0, 1.45, ye);
+    if (K !== "inter"){
+      g.save(); g.lineWidth = Math.max(1, 1.4 * k); g.setLineDash([.07 * u, .07 * u]); L(mx, my, mx, .44); g.restore();
+      g.save(); g.lineWidth = Math.max(1.2, 2 * k);
+      if (K === "thermostat") L(.8, .5, .89, .66, .98, .5, 1.07, .66, 1.16, .5, 1.24, .62);
+      else if (K === "pression"){ g.beginPath(); g.arc(mx * u, .64 * u, .2 * u, Math.PI, 0, false); g.closePath(); g.stroke(); }
+      else if (K === "flotteur") C(mx, .6, .15, false);
+      else { g.beginPath(); g.moveTo(.84 * u, .64 * u); g.lineTo(1.2 * u, .64 * u); g.lineTo(mx * u, .44 * u); g.closePath(); g.stroke(); }
+      g.restore();
+    }
+    T(s.lb, 1, -.8, .34, "dessus");
+  } else if (K === "transfo"){
+    L(0, 0, 1, 0); L(3, 0, 4, 0); L(0, 2, 1, 2); L(3, 2, 4, 2);
+    g.beginPath(); for (let i = 0; i < 4; i++) g.arc((1.25 + i * .5) * u, 0, .25 * u, Math.PI, 0, true); g.stroke();
+    g.beginPath(); for (let i = 0; i < 4; i++) g.arc((1.25 + i * .5) * u, 2 * u, .25 * u, Math.PI, 0, false); g.stroke();
+    L(1, .86, 3, .86); L(1, 1.14, 3, 1.14);
+    T("H1", .45, -.32, .27, null, 0, 600); T("H2", 3.55, -.32, .27, null, 0, 600); T("X1", .45, 2.32, .27, null, 0, 600); T("X2", 3.55, 2.32, .27, null, 0, 600);
+    T(s.lb, 2, -.62, .34);
+  } else if (K === "jonction"){
+    C(0, 0, .13, true);
+  } else if (K === "rails"){
+    const [w, h] = s.sz || [8, 10]; g.lineWidth = Math.max(2, 4 * k); L(0, 0, 0, h); L(w, 0, w, h);
+    const lb = String(s.lb == null ? "L1 / L2" : s.lb).split("/"); T((lb[0] || "").trim(), 0, -.5, .4); T((lb[1] || "").trim(), w, -.5, .4);
+    let n = 1; for (let y = 1; y < h; y += 2) T(String(n++), -.4, y, .3, "droite", 0, 600);
+  }
+  g.restore();
+  if (typeof SELO !== "undefined" && SELO.s === s){ g.fillStyle = "#2a7bcf"; G.ports.forEach(q => { g.beginPath(); g.arc(q[0], q[1], Math.max(2.5, u * .09), 0, 7); g.fill(); }); }
+  return G;
+}
 function objGeo(s, W, H){
+  if (ELEC[s.k]) return elecGeo(s, W, H);
   const dpr = window.devicePixelRatio || 1, a = (34 * RD.z) * 1.2 * dpr, d = a * .8660254, ox = s.p[0][0] * W, oy = s.p[0][1] * H, sw = s.o ? 1 : 0;
   /* pivoter = image en miroir gauche-droite : les mêmes faces restent visibles, donc l'objet est toujours complet */
   const P = (m, n, h) => [ox + (sw ? -(m + n) : (m + n)) * d, oy + (n - m) * a / 2 - (h || 0) * a];
@@ -1830,6 +1929,7 @@ function objGeo(s, W, H){
   return { a, d, P, shapes, ports, bbox:[Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)] };
 }
 function dessinerObjet(g, s, W, H, k, col){
+  if (ELEC[s.k]) return dessinerElec(g, s, W, H, k, col);
   const G = objGeo(s, W, H), P = G.P, a = G.a;
   g.lineJoin = "round"; g.lineCap = "round"; g.lineWidth = Math.max(1.2, 2 * k);
   const poly = (pts, fill) => { g.beginPath(); pts.forEach((q, i) => i ? g.lineTo(q[0], q[1]) : g.moveTo(q[0], q[1])); g.closePath(); g.fillStyle = fill; g.fill(); g.strokeStyle = col; g.stroke(); };
@@ -1926,7 +2026,11 @@ function drawStroke(g, s, W, H, k){
 function grilleIso(g, W, H, k){
   const a = 34 * k * 1.2, d = a * .8660254, sl = (a / 2) / d, dpr = window.devicePixelRatio || 1;
   g.save(); g.lineWidth = Math.max(1, dpr); g.strokeStyle = "#b4c6e0";
-  if (wbBg() === "lignes"){                                  /* feuille lignée : une ligne tous les 42,5 px, pour écrire dessus */
+  if (wbBg() === "quad"){                                    /* quadrillé : un carreau = une unité des symboles électriques */
+    const u = 34 * k; g.strokeStyle = "#cfd8e6"; g.beginPath();
+    for (let x = 0; x <= W; x += u){ const xx = Math.round(x) + .5; g.moveTo(xx, 0); g.lineTo(xx, H); }
+    for (let y = 0; y <= H; y += u){ const yy = Math.round(y) + .5; g.moveTo(0, yy); g.lineTo(W, yy); } g.stroke();
+  } else if (wbBg() === "lignes"){                                  /* feuille lignée : une ligne tous les 42,5 px, pour écrire dessus */
     const h = 34 * 1.25 * k; g.strokeStyle = "#aec3e3"; g.beginPath();
     for (let y = h; y < H + h; y += h){ g.moveTo(0, y); g.lineTo(W, y); } g.stroke();
   } else if (wbBg() === "iso"){
@@ -1946,7 +2050,7 @@ function redrawInk(){
   const c = $("#inkCanvas"), g = c.getContext("2d");
   g.clearRect(0, 0, c.width, c.height);
   const k = (window.devicePixelRatio || 1) * RD.z;
-  if (RD.wb && (/^iso/.test(wbBg()) || wbBg() === "lignes")) grilleIso(g, c.width, c.height, k);
+  if (RD.wb && (/^iso/.test(wbBg()) || wbBg() === "lignes" || wbBg() === "quad")) grilleIso(g, c.width, c.height, k);
   const tous = INKS[inkKey()] || [];                                       /* les objets cachent les traits qui passent derrière ; les textes restent par-dessus */
   [s => s.t !== "objet" && s.t !== "texte", s => s.t === "objet", s => s.t === "texte"].forEach(f => tous.filter(f).forEach(s => drawStroke(g, s, c.width, c.height, k)));
   if (typeof majSelTxt === "function") majSelTxt();
@@ -2002,6 +2106,7 @@ function eraseAt(p){
   if (!hits.size){      /* un objet n'est effacé que si rien d'autre n'est sous la gomme, et seulement en son centre */
     const px = p[0] * c.width, py = p[1] * c.height;
     for (let k = arr.length - 1; k >= 0; k--){ const s = arr[k]; if (s.t !== "objet") continue; const G = objGeo(s, c.width, c.height), m = Math.min(G.bbox[2] - G.bbox[0], G.bbox[3] - G.bbox[1]) * .15;
+      if (s.k === "rails"){ if (surRails(s, G, px, py, -.1)){ hits.add(s); break; } continue; }
       if (px > G.bbox[0] + m && px < G.bbox[2] - m && py > G.bbox[1] + m && py < G.bbox[3] - m){ hits.add(s); break; } }
   }
   if (!hits.size) return;
@@ -2136,49 +2241,80 @@ function appliquerTxt(maj){
 const SELO = { s:null };
 RD.objK = "plinthe"; RD.objO = 0;
 function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
+  const el = modeElec(); RD.objK = el ? (RD.objKe || "contact") : (RD.objKi || "plinthe");
+  b.querySelectorAll(".grp").forEach(x => x.hidden = (x.dataset.g === "elec") !== el);
   b.querySelectorAll("[data-k]").forEach(x => x.classList.toggle("on", x.dataset.k === RD.objK));
+  const se = SELO.s && strokes().includes(SELO.s) && ELEC[SELO.s.k] ? SELO.s : null, de = ELEC[se ? se.k : RD.objK] || null, bn = b.querySelector("#objNF"), bl = b.querySelector("#objL");
+  const nfV = se ? !!se.nf : !!RD.objNF; bn.style.display = el && de && de.nf ? "" : "none"; bn.textContent = nfV ? "Normalement fermé (NF)" : "Normalement ouvert (NO)"; bn.classList.toggle("on", nfV);
+  bl.style.display = se && de && de.lb ? "" : "none"; if (se && document.activeElement !== bl) bl.value = se.lb || "";
   const sel = SELO.s && strokes().includes(SELO.s), sp = sel && SELO.s.k === "serpentin" ? SELO.s : null, pasV = sp ? (sp.pas || .5) : (RD.pas || .5), bp = b.querySelector("#objP");
   bp.style.display = (sp || RD.objK === "serpentin") ? "" : "none"; bp.textContent = "Tubes : " + (pasV >= 1 ? "30 cm" : "15 cm");
-  ["objR", "objD"].forEach(id => b.querySelector("#" + id).style.display = sel ? "" : "none"); }
+  ["objR", "objD"].forEach(id => b.querySelector("#" + id).style.display = sel ? "" : "none");
+  if (se && (se.k === "rails" || se.k === "jonction")) b.querySelector("#objR").style.display = "none"; }
 (function(){
   const bar = document.createElement("div"); bar.id = "objBar"; bar.hidden = true;
   bar.style.cssText = "position:absolute;z-index:75;left:50%;top:64px;transform:translateX(-50%);display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:center;padding:8px 10px;border-radius:12px;background:rgba(14,14,15,.96);border:1px solid #2f2f33;color:#d4d4d8;font:600 .85rem system-ui,sans-serif";
-  bar.innerHTML = Object.keys(OBJETS).map(k => '<button data-k="' + k + '">' + OBJETS[k].n + '</button>').join("") + '<button id="objP" title="Espacement des tubes du serpentin"></button><span style="width:1px;height:26px;background:#2f2f33"></span><button id="objR" title="Pivoter l\'objet sélectionné">⟳ Pivoter</button><button id="objD" title="Supprimer l\'objet sélectionné" aria-label="Supprimer">🗑</button><button id="objX">Terminé</button>';
+  bar.innerHTML = '<span class="grp" data-g="iso">' + Object.keys(OBJETS).map(k => '<button data-k="' + k + '">' + OBJETS[k].n + '</button>').join("") + '</span><span class="grp" data-g="elec">' + Object.keys(ELEC).map(k => '<button data-k="' + k + '">' + ELEC[k].n + '</button>').join("") + '</span><button id="objP" title="Espacement des tubes du serpentin"></button><button id="objNF" title="Normalement ouvert ou normalement fermé"></button><input id="objL" maxlength="10" placeholder="Repère" title="Repère du symbole (ex. CR1, M, PB2)" aria-label="Repère du symbole"><span style="width:1px;height:26px;background:#2f2f33"></span><button id="objR" title="Pivoter l\'objet sélectionné">⟳ Pivoter</button><button id="objD" title="Supprimer l\'objet sélectionné" aria-label="Supprimer">🗑</button><button id="objX">Terminé</button>';
   const st = document.createElement("style");
-  st.textContent = '#objBar button{min-height:34px;padding:0 10px;border-radius:8px;border:1px solid #2f2f33;background:#18181a;color:#d4d4d8;cursor:pointer;font:inherit}#objBar button:hover{border-color:#6a6a70}#objBar button.on{background:#2a2a2d;border-color:#8a8a90;color:#fff}';
+  st.textContent = '#objBar button{min-height:34px;padding:0 10px;border-radius:8px;border:1px solid #2f2f33;background:#18181a;color:#d4d4d8;cursor:pointer;font:inherit}#objBar button:hover{border-color:#6a6a70}#objBar button.on{background:#2a2a2d;border-color:#8a8a90;color:#fff}#objBar .grp{display:contents}#objBar .grp[hidden]{display:none}#objBar #objL{width:90px;min-height:34px;padding:0 8px;border-radius:8px;border:1px solid #2f2f33;background:#fff;color:#111;font:inherit;font-weight:700;text-transform:uppercase}';
   document.head.appendChild(st); $("#reader").appendChild(bar);
   bar.addEventListener("pointerdown", e => e.stopPropagation());
-  bar.querySelectorAll("[data-k]").forEach(b => b.onclick = () => { RD.objK = b.dataset.k; SELO.s = null; redrawInk(); majObjUI(); });
+  bar.querySelectorAll("[data-k]").forEach(b => b.onclick = () => { if (ELEC[b.dataset.k]) RD.objKe = b.dataset.k; else RD.objKi = b.dataset.k; SELO.s = null; redrawInk(); majObjUI(); });
+  $("#objNF").onclick = () => { const s = SELO.s && strokes().includes(SELO.s) && ELEC[SELO.s.k] ? SELO.s : null;
+    if (s){ snapInk(); s.nf = s.nf ? 0 : 1; RD.objNF = s.nf; redrawInk(); } else RD.objNF = RD.objNF ? 0 : 1; majObjUI(); };
+  RD.lbK = {};
+  const bl = $("#objL"); let lbSnap = false;
+  bl.addEventListener("keydown", e => { e.stopPropagation(); if (e.key === "Enter" || e.key === "Escape") bl.blur(); });
+  bl.addEventListener("focus", () => { lbSnap = false; });
+  bl.addEventListener("input", () => { const s = SELO.s; if (!s || !ELEC[s.k]) return; if (!lbSnap){ snapInk(); lbSnap = true; }
+    s.lb = s.k === "rails" ? bl.value : bl.value.toUpperCase(); RD.lbK[s.k] = s.lb; redrawInk(); });
   $("#objP").onclick = () => { const sp = SELO.s && strokes().includes(SELO.s) && SELO.s.k === "serpentin" ? SELO.s : null, nv = ((sp ? sp.pas : RD.pas) || .5) >= 1 ? .5 : 1;
     if (sp){ snapInk(); sp.pas = nv; redrawInk(); } RD.pas = nv; majObjUI(); };
-  $("#objR").onclick = () => { const s = SELO.s; if (!s) return; snapInk(); s.o = s.o ? 0 : 1; RD.objO = s.o; redrawInk(); };
+  $("#objR").onclick = () => { const s = SELO.s; if (!s) return; snapInk(); const c = $("#inkCanvas"), W = c.width, H = c.height, av = objGeo(s, W, H).ports;
+    s.o = s.o ? 0 : 1; RD.objO = s.o; const ap = objGeo(s, W, H).ports;             /* les fils et tuyaux raccordés suivent la rotation */
+    strokes().forEach(t => { if (t.t !== "ligne" || !t.p) return; [0, 1].forEach(i => { const j = av.findIndex(q => Math.hypot(q[0] - t.p[i][0] * W, q[1] - t.p[i][1] * H) < 4); if (j >= 0) t.p[i] = [ap[j][0] / W, ap[j][1] / H]; }); });
+    redrawInk(); };
   $("#objD").onclick = () => { const s = SELO.s; if (!s) return; snapInk(); INKS[inkKey()] = strokes().filter(x => x !== s); SELO.s = null; redrawInk(); majObjUI(); };
   $("#objX").onclick = () => { RD.obj = false; refreshTools(); };
   const c = $("#inkCanvas"); let mv = null;
   const cur = e => { const r = c.getBoundingClientRect(); let x = e.clientX - r.left, y = e.clientY - r.top;
+    if (modeElec()){ const u = 34 * RD.z * (r.width / (c.offsetWidth || r.width)); return { raw:[x / r.width, y / r.height], snap:[Math.round(x / u) * u / r.width, Math.round(y / u) * u / r.height] }; }
     const k = r.width / (c.offsetWidth || r.width), a = (34 * RD.z) * 1.2 * k, d = a * .8660254, i0 = Math.round(x / d); let best = null;
     for (let i = i0 - 1; i <= i0 + 1; i++){ const yy = (Math.round(y / a - (i & 1 ? .5 : 0)) + (i & 1 ? .5 : 0)) * a, dd = Math.hypot(x - i * d, y - yy); if (!best || dd < best[0]) best = [dd, i * d, yy]; }
     return { raw:[(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height], snap:[best[1] / r.width, best[2] / r.height] }; };
+  const majZone = () => { const r = c.getBoundingClientRect(), q1 = mv.q1 || mv.q0;
+    if (!mv.box){ mv.box = document.createElement("div"); mv.box.style.cssText = "position:fixed;z-index:79;pointer-events:none;border-left:4px solid #24282c;border-right:4px solid #24282c;background:rgba(106,169,255,.10);outline:2px dashed #6aa9ff"; $("#reader").appendChild(mv.box); }
+    const x0 = r.left + Math.min(q1[0], mv.q0[0]) * r.width, y0 = r.top + Math.min(q1[1], mv.q0[1]) * r.height;
+    Object.assign(mv.box.style, { left:x0 + "px", top:y0 + "px", width:Math.abs(q1[0] - mv.q0[0]) * r.width + "px", height:Math.abs(q1[1] - mv.q0[1]) * r.height + "px" }); };
   const touche = q => { const arr = strokes(); for (let i = arr.length - 1; i >= 0; i--){ const s = arr[i]; if (s.t !== "objet") continue; const G = objGeo(s, c.width, c.height), x = q[0] * c.width, y = q[1] * c.height;
+    if (s.k === "rails"){ if (surRails(s, G, x, y, .1)) return s; continue; }
     if (x >= G.bbox[0] - 4 && x <= G.bbox[2] + 4 && y >= G.bbox[1] - 4 && y <= G.bbox[3] + 4) return s; } return null; };
   c.addEventListener("pointerdown", e => {
     if (!RD.obj || !RD.wb || RD.eraser) return;
-    const q = cur(e), hit = touche(q.raw);
+    const q = cur(e), el = modeElec();
+    if (el && RD.objK === "fil"){                                              /* fil : trait horizontal ou vertical, d'une borne à l'autre */
+      snapInk(); const f = { c:"#24282c", hl:false, hc:null, w:2.5, t:"ligne", fil:true, p:[q.snap, q.snap.slice()] }; strokes().push(f); mv = { fil:f, q0:q.snap }; SELO.s = null; redrawInk(); majObjUI(); return;
+    }
+    let hit = touche(q.raw);
+    if (el && RD.objK === "jonction" && hit && hit.k !== "jonction") hit = null;   /* un point de jonction se pose aussi sur la borne d'un symbole */
     if (hit){
       SELO.s = hit; RD.objO = hit.o || 0;
       const G = objGeo(hit, c.width, c.height), liens = [];                 /* extrémités de tuyaux posées sur un raccord */
       strokes().forEach(s => { if (s.t !== "ligne" || !s.p) return; [0, 1].forEach(i => { const px = s.p[i][0] * c.width, py = s.p[i][1] * c.height; if (G.ports.some(pt => Math.hypot(pt[0] - px, pt[1] - py) < 4)) liens.push([s, i]); }); });
       mv = { s:hit, q0:q.snap, p0:[hit.p[0][0], hit.p[0][1]], liens:liens.map(([s, i]) => [s, i, s.p[i][0], s.p[i][1]]), snap:false };
-    } else if (RD.objK === "serpentin"){
-      mv = { zone:true, q0:q.snap };                                                         /* zone à remplir : on glisse d'un coin à l'autre */
+    } else if (RD.objK === "serpentin" || (el && RD.objK === "rails")){
+      mv = { zone:true, q0:q.snap, el };                                                         /* zone à remplir : on glisse d'un coin à l'autre */
     } else {
       snapInk(); const o = { t:"objet", k:RD.objK, o:RD.objO, c:/^hl/.test(RD.color) ? "#24282c" : RD.color, p:[q.snap], w:4 };
+      if (el){ const de = ELEC[RD.objK]; if (de.lb) o.lb = RD.lbK[RD.objK] || de.lb; if (de.nf) o.nf = RD.objNF ? 1 : 0; }
       strokes().push(o); SELO.s = o;
     }
     redrawInk(); majObjUI();
   });
   c.addEventListener("pointermove", e => {
-    if (!mv) return; if (mv.zone){ mv.q1 = cur(e).snap; return; }
+    if (!mv) return; if (mv.zone){ mv.q1 = cur(e).snap; if (mv.el) majZone(); return; }
+    if (mv.fil){ const q = cur(e).snap, dx = Math.abs(q[0] - mv.q0[0]) * c.width, dy = Math.abs(q[1] - mv.q0[1]) * c.height;
+      mv.fil.p[1] = dx >= dy ? [q[0], mv.q0[1]] : [mv.q0[0], q[1]]; redrawInk(); return; }
     const q = cur(e), dx = q.snap[0] - mv.q0[0], dy = q.snap[1] - mv.q0[1];
     if (!mv.snap){ if (Math.hypot(dx * c.width, dy * c.height) < 4) return; snapInk(); mv.snap = true;
       mv.liens = mv.liens.map(([s, i, x, y]) => { const i2 = strokes().findIndex(t => t.t === "ligne" && t.p[i] && t.p[i][0] === x && t.p[i][1] === y); return [s, i, x, y]; }); }
@@ -2187,6 +2323,16 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     redrawInk();
   });
   ["pointerup", "pointercancel"].forEach(t => c.addEventListener(t, () => {
+    if (mv && mv.fil){ const f = mv.fil; if (Math.hypot((f.p[1][0] - f.p[0][0]) * c.width, (f.p[1][1] - f.p[0][1]) * c.height) < 3){ const arr = strokes(), i = arr.indexOf(f); if (i >= 0){ arr.splice(i, 1); (UNDO[inkKey()] || []).pop(); } } mv = null; redrawInk(); majObjUI(); return; }
+    if (mv && mv.zone && mv.el){
+      if (mv.box) mv.box.remove();
+      const r = c.getBoundingClientRect(), u = 34 * RD.z, q1 = mv.q1 || mv.q0;
+      let w = Math.round(Math.abs(q1[0] - mv.q0[0]) * r.width / u), h = Math.round(Math.abs(q1[1] - mv.q0[1]) * r.height / u);
+      const p0 = [Math.min(q1[0], mv.q0[0]), Math.min(q1[1], mv.q0[1])];
+      const petit = w < 3 || h < 2; if (petit){ w = 12; h = 11; }                              /* simple clic : échelle standard */
+      snapInk(); const o = { t:"objet", k:"rails", o:0, c:"#24282c", p:[petit ? mv.q0 : p0], w:4, sz:[w, h], lb:RD.lbK.rails || "L1 / L2" }; strokes().push(o); SELO.s = o;
+      mv = null; redrawInk(); majObjUI(); return;
+    }
     if (mv && mv.zone){
       const a = (34 * RD.z) * 1.2, d = a * .8660254, r = c.getBoundingClientRect(), q1 = mv.q1 || mv.q0;
       const dxp = (q1[0] - mv.q0[0]) * r.width, dyp = (q1[1] - mv.q0[1]) * r.height;
@@ -2237,6 +2383,8 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
       let best = null;
       for (let i = i0 - 1; i <= i0 + 1; i++){ const yy = (Math.round(y / a - (i & 1 ? .5 : 0)) + (i & 1 ? .5 : 0)) * a, dd = Math.hypot(x - i * d, y - yy); if (!best || dd < best[0]) best = [dd, i * d, yy]; }
       x = best[1]; y = best[2];
+    } else if (RD.wb && !RD.eraser && RD.shape && wbBg() === "quad"){       /* quadrillé : lignes et formes s'accrochent aux carreaux */
+      const u = 34 * RD.z * (r.width / (c.offsetWidth || r.width)); x = Math.round(x / u) * u; y = Math.round(y / u) * u;
     }
     return [x / r.width, y / r.height];
   };
@@ -2277,7 +2425,6 @@ async function wbEnregistrer(){
       else { g.fillStyle = "#7f97bd"; [[0,0],[tw/2,th/2],[tw,0],[0,th],[tw,th]].forEach(([dx,dy]) => { g.beginPath(); g.arc(x + dx, y + dy, Math.max(1.6, u * .06), 0, 7); g.fill(); }); }
     }
   }
-  if (f === "quad"){ g.strokeStyle = "#cfd8e6"; for (let x = 0; x < W; x += u){ g.beginPath(); g.moveTo(Math.round(x) + .5, 0); g.lineTo(Math.round(x) + .5, H); g.stroke(); } for (let y = 0; y < H; y += u){ g.beginPath(); g.moveTo(0, Math.round(y) + .5); g.lineTo(W, Math.round(y) + .5); g.stroke(); } }
   if (f === "lignes"){ g.strokeStyle = "#e8a0a0"; g.lineWidth = 2; g.beginPath(); g.moveTo(u * 2.4, 0); g.lineTo(u * 2.4, H); g.stroke(); }
   g.drawImage(c, 0, 0);
   const blob = await new Promise(res => out.toBlob(res, "image/png"));
@@ -2401,7 +2548,7 @@ function refreshTools(){
   setIcn($("#penS"), RD.shape || "libre"); $("#penS").classList.toggle("on", !!RD.shape && !RD.eraser); $("#penS").title = "Forme : " + SHAPE_NOM[RD.shape || ""] + " (clic pour changer)";
   const sw = document.querySelector('#penBar .sw[data-c="#24282c"]'); if (sw){ sw.style.setProperty("--c", wbSombre() ? "#f4f1ea" : "#24282c"); sw.setAttribute("aria-label", wbSombre() ? "Craie blanche" : "Noir"); }
   document.querySelectorAll("#penBar .sw").forEach(b => b.classList.toggle("on", !RD.eraser && b.dataset.c === RD.color)); if (RD.swx) RD.swx.classList.toggle("on", !RD.eraser && !document.querySelector("#penBar .sw.on"));
-  if (RD.obj && !(RD.wb && /^iso/.test(wbBg()))) RD.obj = false;
+  if (RD.obj && !(RD.wb && (/^iso/.test(wbBg()) || wbBg() === "quad"))) RD.obj = false;
   $("#penO").classList.toggle("on", !!RD.obj);
   redrawInk(); if (!RD.text) SEL.s = null; if (!RD.obj) SELO.s = null; majBarTxt(); majSelTxt(); majObjUI();
 }
@@ -2645,7 +2792,8 @@ majEpaisseur();
   }
 })();
 $("#penE").onclick = () => { RD.eraser = !RD.eraser; if (RD.eraser){ RD.text = false; RD.obj = false; } refreshTools(); };
-$("#penO").onclick = () => { if (!RD.obj && !(RD.wb && /^iso/.test(wbBg()))){ aviser("Choisis d'abord un plan isométrique (bouton Fond)."); return; } RD.obj = !RD.obj; if (RD.obj){ RD.text = false; RD.eraser = false; aviser("Choisis un objet, puis clique sur la grille. Clique un objet pour le déplacer : les tuyaux raccordés le suivent."); } refreshTools(); };
+$("#penO").onclick = () => { if (!RD.obj && !(RD.wb && (/^iso/.test(wbBg()) || wbBg() === "quad"))){ aviser("Choisis d'abord un fond (bouton Fond) : plan isométrique pour la plomberie, quadrillé pour un schéma électrique."); return; } RD.obj = !RD.obj; if (RD.obj){ RD.text = false; RD.eraser = false;
+  aviser(modeElec() ? "Schéma en échelle : glisse « Échelle L1 / L2 » pour tracer les rails, pose les symboles sur les échelons, puis relie-les avec « Fil »." : "Choisis un objet, puis clique sur la grille. Clique un objet pour le déplacer : les tuyaux raccordés le suivent."); } refreshTools(); };
 $("#penT").onclick = () => { RD.text = !RD.text; if (RD.text){ RD.eraser = false; RD.obj = false; } refreshTools(); if (RD.text) aviser("Dessine un rectangle, puis écris dedans. Entrée valide (Maj+Entrée = nouvelle ligne)."); };
 $("#wbZo").onclick = zout; $("#wbZi").onclick = zin; $("#penU").onclick = undoInk; $("#penR").onclick = redoInk;
 $("#penC").onclick = () => { if (!strokes().length) return; snapInk(); INKS[inkKey()] = []; redrawInk(); };
