@@ -1852,6 +1852,8 @@ function dessinerElec(g, s, W, H, k, col){
     const [w, h] = s.sz || [8, 10]; g.lineWidth = Math.max(2, 4 * k); if (SM) g.strokeStyle = "#e03131"; L(0, 0, 0, h); if (SM) g.strokeStyle = "#1c7ed6"; L(w, 0, w, h); g.strokeStyle = col;
     const lb = String(s.lb == null ? "L1 / L2" : s.lb).split("/"); T((lb[0] || "").trim(), 0, -.5, .4); T((lb[1] || "").trim(), w, -.5, .4);
     let n = 1; for (let y = 1; y < h; y += 2) T(String(n++), -.4, y, .3, "droite", 0, 600);
+    if (RD.obj && !RD.sim && !s.__u && typeof SELO !== "undefined" && SELO.s === s){ g.fillStyle = "#2a7bcf"; g.fillRect((w - .3) * u, (h - .3) * u, .6 * u, .6 * u);
+      g.strokeStyle = "#fff"; g.lineWidth = Math.max(1.5, 2 * k); L(w - .15, h + .15, w + .15, h - .15); L(w + .02, h - .15, w + .15, h - .15, w + .15, h - .02); L(w - .15, h + .02, w - .15, h + .15, w - .02, h + .15); }
   }
   g.restore();
   if (RD.obj && !RD.sim && !s.__u){ const sel = typeof SELO !== "undefined" && SELO.s === s; g.save(); g.fillStyle = "#2a7bcf"; g.strokeStyle = "#2a7bcf"; g.lineWidth = Math.max(1.2, 1.6 * k);
@@ -2360,7 +2362,8 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
   const sel = SELO.s && strokes().includes(SELO.s), sp = sel && SELO.s.k === "serpentin" ? SELO.s : null, pasV = sp ? (sp.pas || .5) : (RD.pas || .5), bp = b.querySelector("#objP");
   bp.style.display = (sp || RD.objK === "serpentin") ? "" : "none"; bp.textContent = "Tubes : " + (pasV >= 1 ? "30 cm" : "15 cm");
   ["objR", "objD"].forEach(id => b.querySelector("#" + id).style.display = sel ? "" : "none");
-  if (se && (se.k === "rails" || se.k === "jonction")) b.querySelector("#objR").style.display = "none"; }
+  if (se && (se.k === "rails" || se.k === "jonction")) b.querySelector("#objR").style.display = "none";
+  b.querySelector("#objTaille").style.display = se && se.k === "rails" ? "" : "none"; }
 (function(){
   const bar = document.createElement("div"); bar.id = "objBar"; bar.hidden = true;
   bar.style.cssText = "position:absolute;z-index:75;left:12px;top:70px;display:flex;flex-direction:column;gap:6px;width:184px;max-height:calc(100% - 150px);overflow-y:auto;overflow-x:hidden;padding:8px;border-radius:12px;background:rgba(14,14,15,.96);border:1px solid #2f2f33;color:#d4d4d8;font:600 .8rem system-ui,sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.35)";
@@ -2369,16 +2372,17 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     + '<div class="grp ico" data-g="elec">' + Object.keys(ELEC).map(k => '<button data-k="' + k + '" title="' + ELEC[k].n.replace(/^[✎•] /, "") + '"><canvas width="120" height="64"></canvas><span>' + (ELEC[k].c || ELEC[k].n.replace(/^[✎•] /, "")) + '</span></button>').join("") + '</div>'
     + '<div class="aide grpE">Pour relier : glisse d\'un <b>point bleu</b> à l\'autre</div>'
     + '<button id="objP" title="Espacement des tubes du serpentin"></button><button id="objNF" title="Normalement ouvert ou normalement fermé"></button><input id="objL" maxlength="10" placeholder="Repère" title="Repère du symbole (ex. CR1, M, PB2)" aria-label="Repère du symbole">'
+    + '<div class="taille" id="objTaille"><span>Largeur</span><button data-t="w-1" title="Rapprocher L2">−</button><button data-t="w1" title="Éloigner L2">+</button><span>Hauteur</span><button data-t="h-1" title="Raccourcir l\'échelle">−</button><button data-t="h1" title="Allonger l\'échelle">+</button><em>ou glisse le carré bleu en bas à droite</em></div>'
     + '<div class="rang"><button id="objR" title="Pivoter l\'objet sélectionné">⟳ Pivoter</button><button id="objD" title="Supprimer l\'objet sélectionné" aria-label="Supprimer">🗑</button></div>'
     + '<button id="objSim" class="grpE" title="Faire fonctionner le schéma : le courant circule, les bobines, lampes et moteurs s\'activent">▶ Animer le schéma</button><div class="simAide"></div><button id="objX">Terminé</button>';
   const st = document.createElement("style");
   st.textContent = '#objBar button{min-height:32px;padding:0 8px;border-radius:8px;border:1px solid #2f2f33;background:#18181a;color:#d4d4d8;cursor:pointer;font:inherit;text-align:left}#objBar button:hover{border-color:#6a6a70}#objBar button.on{background:#2a2a2d;border-color:#6aa9ff;color:#fff}'
-    + '#objBar .tete{display:flex;align-items:center;gap:6px;cursor:grab;user-select:none;touch-action:none;padding:2px 34px 4px 2px;color:#a1a1aa;font-size:.78rem;letter-spacing:.04em;text-transform:uppercase}#objBar .tete:active{cursor:grabbing}#objBar .poig{font-size:1.1rem;line-height:1}'
-    + '#objBar #objF{position:absolute;top:6px;right:6px;min-height:28px;width:28px;padding:0;display:flex;align-items:center;justify-content:center}#objBar.of{width:auto!important;padding-right:42px}'
+    + '#objBar .tete{display:flex;align-items:center;gap:6px;cursor:grab;user-select:none;touch-action:none;padding:2px 0 4px 2px;position:sticky;top:-8px;z-index:2;background:rgb(14,14,15);margin:-8px -8px 0;padding:8px 8px 6px;color:#a1a1aa;font-size:.78rem;letter-spacing:.04em;text-transform:uppercase}#objBar .tete:active{cursor:grabbing}#objBar .poig{font-size:1.1rem;line-height:1}'
+    + '#objBar #objF{margin-left:auto;flex:none;min-height:28px;width:28px;padding:0;display:flex;align-items:center;justify-content:center}#objBar.of{width:auto!important}#objBar.of .tit{display:none}'
     + '#objBar .grp{display:flex;flex-direction:column;gap:4px}#objBar .grp[hidden],#objBar .grpE[hidden]{display:none!important}'
-    + '#objBar .grp.ico{display:grid;grid-template-columns:1fr 1fr;gap:4px}#objBar .ico button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:4px 2px;min-height:58px;text-align:center;background:#f4f6f9;border-color:#d5dbe3;color:#1f2329;font-size:.68rem;line-height:1.1}'
+    + '#objBar .grp.ico{display:grid;grid-template-columns:1fr 1fr;gap:4px}#objBar .ico button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:4px 2px;min-height:50px;text-align:center;background:#f4f6f9;border-color:#d5dbe3;color:#1f2329;font-size:.68rem;line-height:1.1}'
     + '#objBar .ico button:hover{border-color:#6aa9ff}#objBar .ico button.on{background:#dbeafe;border-color:#2a7bcf;color:#0b3d75;box-shadow:inset 0 0 0 1px #2a7bcf}#objBar .ico canvas{width:60px;height:32px}'
-    + '#objBar .aide{color:#9fc6f5;font-size:.72rem;line-height:1.3;padding:2px}#objBar .aide b{color:#6aa9ff}#objBar .rang{display:flex;gap:4px}#objBar .rang button{flex:1;text-align:center}'
+    + '#objBar .aide{color:#9fc6f5;font-size:.72rem;line-height:1.3;padding:2px}#objBar .aide b{color:#6aa9ff}#objBar .rang{display:flex;gap:4px}#objBar .taille{display:grid;grid-template-columns:1fr 38px 38px;gap:4px;align-items:center;font-size:.74rem}#objBar .taille button{text-align:center;font-size:1.05rem;padding:0}#objBar .taille em{grid-column:1/-1;font-style:normal;font-size:.68rem;color:#9fc6f5}#objBar .rang button{flex:1;text-align:center}'
     + '#objBar #objL{min-height:32px;padding:0 8px;border-radius:8px;border:1px solid #2f2f33;background:#fff;color:#111;font:inherit;font-weight:700;text-transform:uppercase}'
     + '#objBar #objSim{background:#1f7a3f;border-color:#2f9e44;color:#fff;text-align:center}#objBar.sim #objSim{background:#a61e1e;border-color:#e03131}#objBar #objX{text-align:center}'
     + '#objBar .simAide{display:none;font-size:.74rem;line-height:1.35;color:#d4d4d8;padding:2px}#objBar.sim .simAide{display:block}#objBar .simAide .court{color:#ff8787;font-weight:800}#objBar .simAide .on{color:#8ce99a}';
@@ -2412,10 +2416,12 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     const borner = (x, y) => { const R = $("#reader").getBoundingClientRect(); return [Math.max(4, Math.min(R.width - 60, x)), Math.max(4, Math.min(R.height - 40, y))]; };
     const poser = (x, y) => { [x, y] = borner(x, y); bar.style.left = x + "px"; bar.style.top = y + "px"; };
     try { const p = JSON.parse(localStorage.getItem("objPos") || "null"); if (p) requestAnimationFrame(() => poser(p[0], p[1])); } catch(e){}
-    h.addEventListener("pointerdown", e => { const R = $("#reader").getBoundingClientRect(), b = bar.getBoundingClientRect(); d = [e.clientX - b.left + R.left, e.clientY - b.top + R.top]; h.setPointerCapture(e.pointerId); e.preventDefault(); });
+    h.addEventListener("pointerdown", e => { if (e.target.closest("button")) return; const R = $("#reader").getBoundingClientRect(), b = bar.getBoundingClientRect(); d = [e.clientX - b.left + R.left, e.clientY - b.top + R.top]; h.setPointerCapture(e.pointerId); e.preventDefault(); });
     h.addEventListener("pointermove", e => { if (d) poser(e.clientX - d[0], e.clientY - d[1]); });
     ["pointerup", "pointercancel"].forEach(t => h.addEventListener(t, () => { if (!d) return; d = null; try { localStorage.setItem("objPos", JSON.stringify([parseFloat(bar.style.left), parseFloat(bar.style.top)])); } catch(e){} }));
   })();
+  bar.querySelectorAll("#objTaille [data-t]").forEach(b => b.onclick = () => { const o = SELO.s; if (!o || o.k !== "rails") return; const t = b.dataset.t, d = +t.slice(1), [w, h] = o.sz || [8, 10];
+    snapInk(); redimEchelle(o, t[0] === "w" ? w + d : w, t[0] === "h" ? h + d * 2 : h); redrawInk(); });
   $("#objSim").onclick = () => { if (RD.sim) simStop(); else simStart(); };
   const c = $("#inkCanvas"); let mv = null;
   const cur = e => { const r = c.getBoundingClientRect(); let x = e.clientX - r.left, y = e.clientY - r.top;
@@ -2457,12 +2463,23 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
       if (!((surFil(A, f) || bout(A, f)) && (surFil(B, f) || bout(B, f)))) return;
       const [p0, p1] = f.p, [n0, n1] = longueur(p0, A) < longueur(p0, B) ? [A, B] : [B, A];
       const morceaux = [[p0, n0], [n1, p1]].filter(([a, b]) => longueur(a, b) > 3).map(([a, b]) => nouveauFil(a, b)); arr.splice(arr.indexOf(f), 1, ...morceaux); })); };
+  const redimEchelle = (o, w, h, fixes) => { const W = c.width, H = c.height, u = elecU(), [w0] = o.sz || [8, 10]; w = Math.max(3, w); h = Math.max(2, h);
+    const x2 = o.p[0][0] + w0 * u / W, nx = o.p[0][0] + w * u / W;
+    (fixes || strokes().filter(f => f.t === "ligne" && f.fil).flatMap(f => [0, 1].filter(i => Math.abs(f.p[i][0] - x2) * W < 2).map(i => [f, i]))).forEach(([f, i]) => { f.p[i][0] = nx; });
+    o.sz = [w, h]; };
   const touche = q => { const arr = strokes(); for (let i = arr.length - 1; i >= 0; i--){ const s = arr[i]; if (s.t !== "objet") continue; const G = objGeo(s, c.width, c.height), x = q[0] * c.width, y = q[1] * c.height;
     if (s.k === "rails"){ if (surRails(s, G, x, y, .1) && (RD.objK === "rails" || (y - G.oy) / G.u < .4)) return s; continue; }
     if (x >= G.bbox[0] - 4 && x <= G.bbox[2] + 4 && y >= G.bbox[1] - 4 && y <= G.bbox[3] + 4) return s; } return null; };
   c.addEventListener("pointerdown", e => {
     if (!RD.obj || !RD.wb || RD.eraser || RD.sim) return;
     const q = cur(e), el = modeElec();
+    if (el && SELO.s && SELO.s.k === "rails" && strokes().includes(SELO.s)){           /* poignée de l'échelle : on change sa largeur et sa hauteur */
+      const o = SELO.s, G = objGeo(o, c.width, c.height), [w, h] = o.sz || [8, 10], cx = G.ox + w * G.u, cy = G.oy + h * G.u;
+      if (Math.hypot(q.raw[0] * c.width - cx, q.raw[1] * c.height - cy) < G.u * .6){
+        snapInk(); const x2 = o.p[0][0] + w * G.u / c.width;
+        mv = { redim:o, w0:w, h0:h, q0:q.snap, fixes:strokes().filter(f => f.t === "ligne" && f.fil).flatMap(f => [0, 1].filter(i => Math.abs(f.p[i][0] - x2) * c.width < 2).map(i => [f, i])) };
+        redrawInk(); return; }
+    }
     if (el && RD.objK !== "jonction"){
       const b = borneProche(q.raw), h0 = b ? null : touche(q.raw);
       if (b || (RD.objK === "fil" && !h0)){                                    /* fil : on part d'une borne (ou d'un point de la grille avec l'outil Fil) */
@@ -2487,6 +2504,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     redrawInk(); majObjUI();
   });
   c.addEventListener("pointermove", e => {
+    if (mv && mv.redim){ const q = cur(e).snap, u = elecU(); redimEchelle(mv.redim, mv.w0 + Math.round((q[0] - mv.q0[0]) * c.width / u), mv.h0 + Math.round((q[1] - mv.q0[1]) * c.height / u), mv.fixes); redrawInk(); return; }
     if (!mv) return; if (mv.zone){ mv.q1 = cur(e).snap; if (mv.el) majZone(); return; }
     if (mv.fil){ const q = cur(e); mv.B = borneProche(q.raw, mv.segs) || q.snap;
       if (!mv.dir){ const ddx = Math.abs(q.raw[0] - mv.A[0]) * c.width, ddy = Math.abs(q.raw[1] - mv.A[1]) * c.height; if (Math.max(ddx, ddy) > elecU() * .35) mv.dir = ddy > ddx ? "v" : "h"; }
@@ -2973,7 +2991,7 @@ majEpaisseur();
   // même principe pour la barre des objets
   const ob = $("#objBar"); if (ob){
     const o = document.createElement("button"); o.id = "objF"; o.innerHTML = SV.fold; o.title = "Rétracter / rouvrir les objets";
-    ob.insertBefore(o, ob.firstChild);
+    const te = ob.querySelector(".tete"); if (te) te.appendChild(o); else ob.insertBefore(o, ob.firstChild);
     o.onclick = () => { ob.classList.toggle("of"); o.innerHTML = ob.classList.contains("of") ? SV.open.replace(/<path d="M4 20[^>]*>.*?<path d="M14.5[^>]*>/, '<path d="M12 3l8 4.5v9L12 21l-8-4.5v-9zM12 12l8-4.5M12 12v9M12 12L4 7.5"/>') : SV.fold; };
   }
 })();
