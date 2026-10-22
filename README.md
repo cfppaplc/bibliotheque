@@ -2,6 +2,9 @@
 
 Conçu par Jeremy, enseignant. Site : https://cfppaplc.github.io/bibliotheque/
 
+> Notes détaillées pour reprendre le code (architecture, règles de Jeremy, outils de test et de publication) : **`CLAUDE.md`**.
+> Scripts : dossier **`outils/`** (`bash outils/publier.sh "message" [livres…]`).
+
 - `index.html` : la bibliothèque (seule version à entretenir)
 - `livres/` : un fichier HTML par livre, téléchargé quand on l'ouvre puis gardé sur l'ordinateur (hors ligne)
 - `plans/` : les dossiers de plans d'exercice (PDF + image de secours)

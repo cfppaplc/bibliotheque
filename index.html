@@ -1,4 +1,9 @@
-<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="icon" type="image/png" sizes="32x32" href="img/icone-32.png"><link rel="icon" type="image/png" sizes="192x192" href="img/icone-192.png"><link rel="apple-touch-icon" href="img/icone-180.png"><meta name="theme-color" content="#141414">
+<!doctype html>
+<!-- Pavillon de l'Avenir — conçu par Jeremy, enseignant.
+     Bibliothèque : accueil, lecteur de livres (RD, buildDriver, HOSTCSS), tableau blanc et schémas électriques, plans, accueil de classe intégré.
+     Pour un assistant (Claude) qui reprend ce code : lire d'abord CLAUDE.md à la racine du dépôt (architecture, règles, outils).
+     À chaque changement : mettre à jour nouveautes.json (mini-formation + captures) et publier avec outils/publier.sh. -->
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="icon" type="image/png" sizes="32x32" href="img/icone-32.png"><link rel="icon" type="image/png" sizes="192x192" href="img/icone-192.png"><link rel="apple-touch-icon" href="img/icone-180.png"><meta name="theme-color" content="#141414">
 <meta name="description" content="Livres interactifs, plans et schémas pour la classe et l'atelier — Pavillon de l'Avenir, centre de formation professionnelle.">
 <meta property="og:type" content="website"><meta property="og:locale" content="fr_CA"><meta property="og:site_name" content="Pavillon de l'Avenir">
 <meta property="og:title" content="Bibliothèque — Tes livres de cours, prêts à projeter"><meta property="og:description" content="Livres interactifs, plans et schémas pour la classe et l'atelier. Conçu par Jeremy, enseignant au Pavillon de l'Avenir.">
@@ -761,6 +766,7 @@ window.COUVERTURES = {
    - couleurs   : (facultatif) deux couleurs ["#haut","#bas"] pour la couverture générée.
    - nouveau    : true pour l'afficher dans la rangée « Nouveautés ».
    ===================================================================== */
+/* Liste des livres. Ajouter un livre : voir CLAUDE.md (« Ajouter un livre ») — fichier dans livres/, entrée ici, couverture dans window.COUVERTURES, entrée « ajout » dans nouveautes.json. */
 const LIVRES = [
   { titre:"Plomberie et chauffage", auteur:"Jérémy Raymond", categorie:"Entretien général d'immeubles", niveau:"DEP 5211 · Compétence 10",
     pages:190, annee:2026, nouveau:false, couverture:"", couleurs:["#1e88e5","#0b2f6b"], lien:"", fichier:"plomberie-chauffage", competence:"10",
