@@ -382,6 +382,19 @@ header { grid-column: 1 / -1; display: flex; align-items: center; justify-conten
 .vid-x small { font-weight: 500; opacity: .55; margin-left: 4px; }
 .vid-cadre { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; }
 .vid-cadre iframe, .vid-cadre video { width: min(100%, calc((100vh - 60px) * 16 / 9)); aspect-ratio: 16 / 9; height: auto; border: 0; background: #000; }
+.vid.doc .vid-cadre { padding: 0 12px 12px; }
+.vid-pdf { width: 100% !important; height: 100% !important; aspect-ratio: auto !important; background: #fff !important; border-radius: 6px; }
+.vid-img { max-width: 100%; max-height: 100%; object-fit: contain; }
+.vid-autre { display: flex; flex-direction: column; align-items: center; gap: 14px; color: #f1f1f2; text-align: center; max-width: 560px; font: 16px "Segoe UI", Roboto, Arial, sans-serif; }
+.vid-autre .ico { font-size: 64px; opacity: .8; }
+.vid-autre b { font-size: 20px; word-break: break-word; }
+.vid-autre p { margin: 0; opacity: .75; line-height: 1.45; }
+.vid-dl { background: #fff; color: #111; text-decoration: none; font-weight: 700; border-radius: 10px; padding: 12px 22px; }
+.lk-fich { display: block; cursor: pointer; }
+.lk-fich-z { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 16px; border: 2px dashed var(--line); border-radius: 10px; text-align: center; color: var(--ink); }
+.lk-fich-z .ico { font-size: 26px; color: var(--water); }
+.lk-fich-z small { opacity: .7; }
+.lk-fich.sur .lk-fich-z, .lk-fich.ok .lk-fich-z { border-color: var(--water); border-style: solid; }
 .lk-vid { display: flex; gap: 12px; align-items: center; margin: 8px 0; }
 .lk-vid img { width: 128px; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 6px; background: #0002; flex: none; }
 .lk-vid b { display: block; line-height: 1.25; }
@@ -570,7 +583,7 @@ header { grid-column: 1 / -1; display: flex; align-items: center; justify-conten
       </details></div>
     <label class="exam-opt" for="f-exam"><input type="checkbox" id="f-exam"><span><b>Examen aujourd'hui</b> — pas de pause dans l'horaire<small>Revient tout seul à l'horaire normal demain.</small></span></label>
     <div class="field"><span class="step-q"><span class="num">4</span>Ouvrir quelque chose pendant une activité? <small class="opt">facultatif</small></span>
-      <small class="lk-aide">Choisis une page de livre, un schéma, un plan, une vidéo YouTube ou une minuterie pour une activité. En classe, un bouton « Ouvrir » apparaît quand l'activité commence.</small>
+      <small class="lk-aide">Choisis une page de livre, un schéma, un plan, un fichier (PDF, image…), une vidéo YouTube ou une minuterie pour une activité. En classe, un bouton « Ouvrir » apparaît quand l'activité commence.</small>
       <div class="lk-liste" id="f-liens"></div></div>
     <div class="sheet-actions">
       <button class="btn primary" type="submit">Afficher au tableau</button>
@@ -1537,6 +1550,7 @@ const ICO_P = {
   plan: '<rect x="4" y="4" width="16" height="16" rx="1.5"/><path d="M4 10h6V4M14 20v-6h6M10 14h4"/>',
   tableau: '<rect x="3.5" y="4.5" width="17" height="12" rx="1.5"/><path d="M9 21l3-4.5 3 4.5"/>',
   minuterie: '<circle cx="12" cy="13" r="7.5"/><path d="M12 9v4.5l3 1.5M9.5 3h5"/>',
+  fichier: '<path d="M14 3H7a1.5 1.5 0 0 0-1.5 1.5v15A1.5 1.5 0 0 0 7 21h10a1.5 1.5 0 0 0 1.5-1.5V7.5z"/><path d="M14 3v4.5h4.5M9 12.5h6M9 16h4"/>',
   video: '<rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M10 9.2v5.6l4.8-2.8z" fill="currentColor"/>',
   ouvrir: '<path d="M8 5l11 7-11 7z" fill="currentColor"/>'
 };
@@ -1564,7 +1578,45 @@ function lecteurVideo(c){
   else ov.querySelector(".vid-cadre").innerHTML = '<video src="' + String(c.url).replace(/"/g, "&quot;") + '" controls autoplay playsinline></video>';
   ov.hidden = false; setTimeout(() => ov.querySelector(".vid-x").focus(), 50);
 }
-function fermerVideo(){ const ov = $("vid"); if (!ov || ov.hidden) return false; ov.hidden = true; ov.querySelector(".vid-cadre").innerHTML = ""; return true; }
+function fermerVideo(){ const ov = $("vid"); if (!ov || ov.hidden) return false; ov.hidden = true; ov.querySelector(".vid-cadre").innerHTML = ""; ov.classList.remove("doc");
+  if (window.__urlFichier){ URL.revokeObjectURL(window.__urlFichier); window.__urlFichier = ""; } return true; }
+/* ---- Fichiers de l'enseignant (PDF, image, vidéo, PowerPoint…) gardés sur cet ordinateur (IndexedDB) ---- */
+const FDB = () => new Promise((ok, ko) => { const r = indexedDB.open("accueil-fichiers", 1); r.onupgradeneeded = () => r.result.createObjectStore("f"); r.onsuccess = () => ok(r.result); r.onerror = () => ko(r.error); });
+const fOp = (mode, fn) => FDB().then(db => new Promise((ok, ko) => { const t = db.transaction("f", mode), st = t.objectStore("f"); const r = fn(st); t.oncomplete = () => ok(r && r.result); t.onerror = () => ko(t.error); }));
+const fMettre = (id, v) => fOp("readwrite", st => st.put(v, id));
+const fLire = id => fOp("readonly", st => st.get(id));
+const fCles = () => fOp("readonly", st => st.getAllKeys());
+const fEnlever = id => fOp("readwrite", st => st.delete(id));
+const tailleTxt = n => n > 1048576 ? (n / 1048576).toFixed(1).replace(".", ",") + " Mo" : Math.max(1, Math.round(n / 1024)) + " Ko";
+function sorteFichier(nom, mime){
+  const x = (String(nom).split(".").pop() || "").toLowerCase();
+  if (mime === "application/pdf" || x === "pdf") return "pdf";
+  if (/^image\//.test(mime) || /^(png|jpe?g|gif|webp|svg|bmp)$/.test(x)) return "image";
+  if (/^video\//.test(mime) || /^(mp4|webm|mov|m4v|ogv)$/.test(x)) return "video";
+  if (/^audio\//.test(mime) || /^(mp3|wav|m4a|ogg)$/.test(x)) return "audio";
+  if (/^text\/plain/.test(mime) || x === "txt") return "texte";
+  return "autre";
+}
+/* Ménage : retire les fichiers qui ne sont plus liés à aucune activité */
+function menageFichiers(){ const garder = new Set(Object.values(cfg.liens || {}).filter(c => c && c.type === "fichier").map(c => c.id));
+  fCles().then(ks => (ks || []).forEach(k => { if (!garder.has(k)) fEnlever(k); })).catch(() => {}); }
+function ouvrirFichier(c){
+  fLire(c.id).then(f => {
+    if (!f || !f.blob){ alert("Ce fichier n'est plus sur cet ordinateur. Ajoute-le de nouveau dans « Préparer le cours »."); return; }
+    const sorte = sorteFichier(f.nom, f.blob.type), url = URL.createObjectURL(f.blob);
+    let ov = $("vid"); if (!ov){ lecteurVideo({ url:"", nom:"" }); fermerVideo(); ov = $("vid"); }
+    window.__urlFichier = url; ov.classList.add("doc");
+    ov.querySelector(".vid-t").textContent = f.nom;
+    const cadre = ov.querySelector(".vid-cadre"), dl = '<a class="vid-dl" href="' + url + '" download="' + f.nom.replace(/"/g, "") + '">Télécharger et ouvrir</a>';
+    if (sorte === "pdf" || sorte === "texte") cadre.innerHTML = '<iframe class="vid-pdf" src="' + url + '#view=FitH" title="' + f.nom.replace(/"/g, "") + '"></iframe>';
+    else if (sorte === "image") cadre.innerHTML = '<img class="vid-img" src="' + url + '" alt="">';
+    else if (sorte === "video") cadre.innerHTML = '<video src="' + url + '" controls autoplay playsinline></video>';
+    else if (sorte === "audio") cadre.innerHTML = '<div class="vid-autre">' + ico("fichier") + '<b></b><audio src="' + url + '" controls autoplay></audio></div>';
+    else cadre.innerHTML = '<div class="vid-autre">' + ico("fichier") + '<b></b><p>Ce type de fichier (' + ((f.nom.split(".").pop() || "").toUpperCase()) + ') ne s\'affiche pas dans le navigateur. Ouvre-le avec son programme (PowerPoint, Word, Excel…).</p>' + dl + '</div>';
+    const bb = cadre.querySelector(".vid-autre b"); if (bb) bb.textContent = f.nom;
+    ov.hidden = false; setTimeout(() => ov.querySelector(".vid-x").focus(), 50);
+  }).catch(() => alert("Impossible de lire ce fichier sur cet ordinateur."));
+}
 let LIENS_T = {}, CATAL = null;
 const cleLien = l => String(l || "").replace(/ \(suite\)$/, "").replace(/^\d+\s*(?:min)?\s*\|\s*/, "").trim().toLowerCase();
 const lienDe = label => (cfg.liens || {})[cleLien(label)] || null;
@@ -1575,6 +1627,7 @@ function nomLien(c){
   if (c.type === "plan") return "Plans · " + (c.nom || "Dossier " + c.n);
   if (c.type === "tableau") return "Tableau blanc" + (c.fond === "quad" ? " quadrillé" : c.fond === "iso" ? " isométrique" : "");
   if (c.type === "minuterie") return "Minuterie " + c.min + " min";
+  if (c.type === "fichier") return c.nom || "Fichier";
   if (c.type === "video") return "Vidéo" + (c.nom ? " · " + c.nom : "") + (c.start ? " (à " + dureeTxt(c.start) + ")" : "");
   return "";
 }
@@ -1584,6 +1637,7 @@ function majGo(b, c){ if (!b) return; if (!c){ b.hidden = true; b.onclick = null
 function ouvrirLien(c){
   if (!c) return;
   if (c.type === "minuterie"){ minuterie(c.min, c.nom); return; }
+  if (c.type === "fichier"){ ouvrirFichier(c); return; }
   if (c.type === "video"){ if (c.yt || /\.(mp4|webm|ogg)(\?|$)/i.test(c.url || "")) lecteurVideo(c); else window.open(c.url, "_blank", "noopener"); return; }
   if (window.parent !== window && CATAL){ try { window.parent.postMessage({ type:"accueil-ouvrir", contenu:c }, "*"); return; } catch(e){} }
   /* tableau de bord ouvert seul : on passe par la bibliothèque */
@@ -1623,6 +1677,7 @@ function choix(row, label){
     + '<button type="button" class="lk-tuile" data-t="plan"' + (enBiblio ? "" : " disabled") + '><b>' + ico("plan") + '</b>Plan technique</button>'
     + '<button type="button" class="lk-tuile" data-t="tableau"' + (enBiblio ? "" : " disabled") + '><b>' + ico("tableau") + '</b>Tableau blanc</button>'
     + '<button type="button" class="lk-tuile" data-t="minuterie"><b>' + ico("minuterie") + '</b>Minuterie</button>'
+    + '<button type="button" class="lk-tuile" data-t="fichier"><b>' + ico("fichier") + '</b>Fichier (PDF, image…)</button>'
     + '<button type="button" class="lk-tuile" data-t="video"><b>' + ico("video") + '</b>Vidéo YouTube</button></div>'
     + (enBiblio ? "" : '<p class="lk-note">Pour les livres, schémas et plans, ouvre ce tableau de bord depuis la bibliothèque.</p>')
     + '<div class="lk-form" hidden></div>';
@@ -1675,6 +1730,26 @@ function choix(row, label){
       ok.onclick = () => { if (choisi){ if (!choisi.nom) choisi.nom = label; fini(choisi); } };
       setTimeout(() => inp.focus(), 30);
     }
+    if (ty === "fichier"){
+      f.innerHTML = '<label class="lk-fich"><input type="file" data-fi hidden><span class="lk-fich-z">' + ico("fichier") + '<b>Choisir un fichier…</b><small>ou glisse-le ici · PDF, image, vidéo, PowerPoint, Word…</small></span></label>'
+        + '<small class="lk-aide" data-e>Le fichier est gardé sur cet ordinateur. Les PDF, images et vidéos s\'affichent en grand sur le tableau de bord.</small>'
+        + '<div class="lk-ok"><button type="button" class="prim" data-v disabled>Choisir</button>' + annuler + '</div>';
+      const fi = f.querySelector("[data-fi]"), zone = f.querySelector(".lk-fich"), ok = f.querySelector("[data-v]"), msg = f.querySelector("[data-e]"); let fich = null;
+      const prendre = file => { if (!file) return; fich = file; zone.querySelector("b").textContent = file.name; zone.querySelector("small").textContent = tailleTxt(file.size) + " · clique pour en choisir un autre"; zone.classList.add("ok");
+        const sorte = sorteFichier(file.name, file.type);
+        msg.textContent = sorte === "autre" ? "Ce type de fichier ne s'affiche pas dans le navigateur : un bouton « Télécharger et ouvrir » l'ouvrira avec son programme." : file.size > 300 * 1048576 ? "Gros fichier : il peut prendre de la place sur cet ordinateur." : "Prêt ✓";
+        ok.disabled = false; };
+      fi.onchange = () => prendre(fi.files[0]);
+      zone.addEventListener("dragover", e => { e.preventDefault(); zone.classList.add("sur"); });
+      zone.addEventListener("dragleave", () => zone.classList.remove("sur"));
+      zone.addEventListener("drop", e => { e.preventDefault(); zone.classList.remove("sur"); prendre(e.dataTransfer.files[0]); });
+      ok.onclick = () => { if (!fich) return; ok.disabled = true; ok.textContent = "Enregistrement…";
+        const id = "f" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+        fMettre(id, { nom: fich.name, blob: fich, date: Date.now() })
+          .then(() => fini({ type:"fichier", id, nom: fich.name, taille: fich.size }))
+          .catch(() => { ok.disabled = false; ok.textContent = "Choisir"; msg.textContent = "Impossible d'enregistrer ce fichier (espace plein ou navigation privée)."; }); };
+      setTimeout(() => fi.click(), 30);
+    }
     const x = f.querySelector("[data-x]"); if (x) x.onclick = () => z.remove();
   });
 }
@@ -1708,7 +1783,7 @@ $("f-comp").addEventListener("change", () => { $("f-module").hidden = $("f-comp"
 $("prepForm").addEventListener("submit", e => {
   e.preventDefault();
   ["comp", "module", "steps", "prog"].forEach(k => cfg[k] = $("f-" + k).value);
-  cfg.liens = JSON.parse(JSON.stringify(LIENS_T)); lastStepsKey = "";
+  cfg.liens = JSON.parse(JSON.stringify(LIENS_T)); lastStepsKey = ""; setTimeout(menageFichiers, 500);
   cfg.examen = $("f-exam").checked ? jourAuj() : "";
   save(); renderStatic(); tick(); $("prep").hidden = true;
 });
