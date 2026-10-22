@@ -97,7 +97,9 @@ header { grid-column: 1 / -1; display: flex; align-items: center; justify-conten
 .brand-text { font-family: var(--display); font-weight: 600; text-transform: uppercase; letter-spacing: .08em; font-size: calc(var(--u) * 24); color: var(--muted); }
 .brand-text strong { color: var(--ink); font-weight: 700; }
 .tools { position: fixed; z-index: 12; top: calc(14px + env(safe-area-inset-top, 0px)); right: max(16px, env(safe-area-inset-right, 0px)); display: flex; gap: 8px; transition: opacity .4s; }
-.tools.idle { opacity: 0; }
+.tools > * { transition: opacity .4s; }
+.tools.idle > :not(.livre) { opacity: 0; }
+.tools.idle > .livre { opacity: .7; }
 .btn { font: 600 15px var(--body); color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 8px 14px; cursor: pointer; }
 .btn:hover { border-color: var(--copper); }
 .btn:focus-visible, .reveal:focus-visible { outline: 3px solid var(--water); outline-offset: 2px; }
@@ -376,6 +378,11 @@ header { grid-column: 1 / -1; display: flex; align-items: center; justify-conten
 }
 .tools .btn { height: 40px; padding: 0 14px; border-radius: 8px; background: #1b1b1d; color: #e6e6e8; border: 1px solid #2f2f33; font: 600 14px "Segoe UI", Roboto, Helvetica, Arial, sans-serif; display: inline-flex; align-items: center; gap: 8px; transition: background .2s, border-color .2s; }
 .tools .btn:hover { background: #262629; border-color: #3a3a3f; }
+.tools .btn.livre { order: 9; background: #fff; border-color: #fff; color: #111; max-width: 34vw; animation: livreIn .35s cubic-bezier(.2,.8,.2,1); }
+.tools .btn.livre:hover { background: #e9e9ea; }
+.tools .btn.livre span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tools .btn.livre small { font-weight: 500; opacity: .65; margin-left: 2px; }
+@keyframes livreIn { from { opacity: 0; translate: 8px 0; } }
 .tools .btn.primary { background: #e50914; border-color: #e50914; color: #fff; }
 .tools .btn.primary:hover { background: #f6121d; }
 .tools .btn svg { flex: none; }
@@ -432,6 +439,7 @@ header { grid-column: 1 / -1; display: flex; align-items: center; justify-conten
       <div class="brand-text"><strong id="v-title">Pavillon de l'Avenir</strong> · <span id="v-group">DEP 5333</span></div>
     </div>
     <div class="tools" id="tools">
+      <button class="btn livre" id="b-livre" type="button" hidden title="Revenir au livre (L)"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6.5C10 5 7 4.6 4 5v13c3-.4 6 0 8 1.5 2-1.5 5-1.9 8-1.5V5c-3-.4-6 0-8 1.5zM12 6.5v13"/></svg><span id="b-livre-t">Revenir au livre</span></button>
       <button class="btn" id="b-biblio" type="button" hidden><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>Bibliothèque</button>
       <button class="btn" id="b-full" type="button"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>Plein écran</button>
       <button class="btn primary" id="b-comp" type="button"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4h6v3H9z"/><path d="M15 5h3a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h3M9 12h6M9 16h4"/></svg>Préparer le cours</button>
@@ -505,6 +513,8 @@ header { grid-column: 1 / -1; display: flex; align-items: center; justify-conten
     <dl class="keys">
       <dt>F</dt><dd>Plein écran</dd>
       <dt>R</dt><dd>Révéler ou cacher la réponse de la question</dd>
+      <dt>O</dt><dd>Ouvrir le contenu de l'activité en cours (livre, schéma, plan)</dd>
+      <dt>L</dt><dd>Revenir au livre resté ouvert (même page)</dd>
       <dt>+ / −</dt><dd>Grossir ou réduire le texte</dd>
       <dt>0</dt><dd>Taille automatique</dd>
       <dt>Clic</dt><dd>Sur la citation : en afficher une autre</dd>
@@ -1623,7 +1633,8 @@ function peDemanderParent() {
 function full() {
   const el = document.documentElement;
   if (document.fullscreenElement || document.webkitFullscreenElement) { (document.exitFullscreen || document.webkitExitFullscreen).call(document); return; }
-  if (peParent) { try { window.parent.postMessage({ type: "accueil-plein-ecran" }, "*"); } catch (e) {} return; }
+  /* dans la bibliothèque, c'est la page entière qui passe en plein écran : on le garde en ouvrant un livre */
+  if (peParent || window.EN_BIBLIO) { try { window.parent.postMessage({ type: "accueil-plein-ecran" }, "*"); } catch (e) {} return; }
   const req = el.requestFullscreen || el.webkitRequestFullscreen;
   const ok = (document.fullscreenEnabled || document.webkitFullscreenEnabled) && req;
   if (!ok) { peDemanderParent(); return; }
@@ -1639,8 +1650,21 @@ $("b-full").onclick = full;
 // (la bibliothèque se signale avec un message « accueil-biblio » ; ailleurs, le bouton reste caché)
 window.addEventListener("message", e => {
   if (e.source !== window.parent || !e.data || e.data.type !== "accueil-biblio") return;
-  const bb = $("b-biblio"); bb.hidden = false;
+  window.EN_BIBLIO = true; const bb = $("b-biblio"); bb.hidden = false;
   bb.onclick = () => { try { window.parent.postMessage({ type: "accueil-fermer" }, "*"); } catch (er) {} };
+});
+
+// Livre resté ouvert dans la bibliothèque : un clic pour y revenir (même page)
+function revenirLivre(){ try { window.parent.postMessage({ type: "accueil-revenir" }, "*"); } catch (e) {} }
+$("b-livre").onclick = revenirLivre;
+window.addEventListener("message", e => {
+  if (e.source !== window.parent || !e.data || e.data.type !== "accueil-livre") return;
+  const l = e.data.livre, b = $("b-livre");
+  b.hidden = !l;
+  if (l) { const t = $("b-livre-t"); t.textContent = l.wb ? "Revenir au tableau blanc" : "Revenir au livre";
+    if (!l.wb && l.page) { const sm = document.createElement("small"); sm.textContent = "· p. " + l.page; t.append(" ", sm); }
+    b.title = (l.wb ? "Revenir au tableau blanc" : "Revenir à « " + l.titre + " »" + (l.page ? ", page " + l.page : "")) + " (L)"; }
+  fitSoon && fitSoon();
 });
 
 document.addEventListener("keydown", e => {
@@ -1655,6 +1679,7 @@ document.addEventListener("keydown", e => {
     save(); fit();
   }
   if (e.key === "r" || e.key === "R") toggleAnswer();
+  if ((e.key === "l" || e.key === "L") && !$("b-livre").hidden) revenirLivre();
   if ((e.key === "o" || e.key === "O") && !$("v-go").hidden) $("v-go").click();   /* O = ouvrir le contenu de l'activité en cours */
 });
 

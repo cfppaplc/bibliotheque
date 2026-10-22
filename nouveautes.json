@@ -3,7 +3,7 @@
   "date": "2026-10-22",
   "type": "outil",
   "titre": "Accueil de classe",
-  "texte": "Tableau d'accueil animé pour le début de période : date, déroulement, timeline lisible du fond de la classe, arrière-plan lié à la compétence, et maintenant un contenu à ouvrir pour chaque activité (page de livre, schéma, plan, tableau blanc ou minuterie).",
+  "texte": "Tableau d'accueil animé pour le début de période : date, déroulement, timeline lisible du fond de la classe, arrière-plan lié à la compétence, un contenu à ouvrir pour chaque activité, et maintenant un passage en un clic entre le tableau de bord et le livre, sans quitter le plein écran.",
   "formation": [
    {
     "t": "Bouton « Accueil de classe » en haut de la bibliothèque pour l'ouvrir.",
@@ -17,15 +17,26 @@
     "t": "En classe, la carte MAINTENANT affiche « ▶ Ouvrir » quand l'activité commence (ou touche O). Tu peux aussi cliquer une case de la timeline qui porte une icône.",
     "img": "nouveautes/tdb-carte.jpg"
    },
-   "Le livre, le schéma ou le plan s'ouvre dans la bibliothèque; « ← Tableau de bord » te ramène à l'accueil de classe. La minuterie s'affiche en grand sur le tableau de bord.",
+   {
+    "t": "Le livre s'ouvre directement à la bonne page, en douceur, et le plein écran reste actif. En haut à gauche du livre (en bas à gauche quand les barres sont cachées), « Tableau de bord » (ou touche E) te ramène à l'accueil de classe : le livre reste ouvert derrière.",
+    "img": "nouveautes/tdb-livre.jpg"
+   },
+   {
+    "t": "Sur le tableau de bord, le bouton blanc « Revenir au livre · p. 64 » (en haut à droite, ou touche L) te remet exactement où tu étais dans le livre. Parfait pour aller à l'atelier et revenir.",
+    "img": "nouveautes/tdb-retour.jpg"
+   },
    "« Préparer le cours » : le panneau de l'enseignant, pour régler la période et le déroulement.",
-   "« Plein écran » pour la projection; « Bibliothèque » te ramène aux livres.",
+   "« Plein écran » une seule fois au début du cours : il reste actif entre le tableau de bord et les livres. « Bibliothèque » ferme tout et te ramène aux livres.",
    {
     "t": "L'arrière-plan change tout seul selon la compétence choisie dans « Préparer le cours » : robinetterie et appareils sanitaires, réseau d'évacuation, santé et sécurité, chantier, outils et entrepôt, entretien ménager, informatique, administration, protection incendie… Tu peux aussi en choisir un autre dans Plus → Réglages → Arrière-plan.",
     "img": "nouveautes/accueil-scenes.jpg"
    }
   ],
   "versions": [
+   {
+    "date": "2026-10-22",
+    "texte": "Passage fluide entre le tableau de bord et le livre : le plein écran reste actif, le livre reste ouvert derrière, boutons « Tableau de bord » (E) et « Revenir au livre » (L)."
+   },
    {
     "date": "2026-10-22",
     "texte": "Un contenu à ouvrir pour chaque activité du déroulement : page de livre, schéma, plan, tableau blanc ou minuterie."

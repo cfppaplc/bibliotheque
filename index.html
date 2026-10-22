@@ -518,6 +518,10 @@
   .timer{transition:top .38s var(--ease),opacity .32s ease,translate .32s var(--ease),scale .32s var(--ease),display .32s allow-discrete}
   .reader.auto.calme .resume{top:16px}
   .resume{transition:top .38s var(--ease),opacity .32s ease,translate .32s var(--ease),scale .32s var(--ease),display .32s allow-discrete}
+  .tdb-pill{position:absolute;left:max(14px,env(safe-area-inset-left,0px));bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:41;display:none;align-items:center;gap:7px;height:38px;padding:0 14px;border-radius:8px;border:1px solid #ffffff2a;background:rgba(20,20,22,.72);color:#f1f1f2;font:600 .9rem "Segoe UI",Roboto,Arial,sans-serif;cursor:pointer;opacity:.5;transition:opacity .2s;backdrop-filter:blur(8px)}
+  .tdb-pill:hover,.tdb-pill:focus-visible{opacity:1;outline:none}
+  .reader.tdb.auto.calme .tdb-pill{display:inline-flex}
+  #readerBack svg{vertical-align:-3px;margin-right:6px}
   .barres-handle{position:absolute;left:50%;bottom:calc(6px + env(safe-area-inset-bottom,0px));translate:-50% 0;z-index:35;width:60px;height:22px;border-radius:12px;border:1px solid #ffffff22;background:rgba(20,20,22,.6);color:#d4d4d8;display:none;align-items:center;justify-content:center;cursor:pointer;opacity:0;pointer-events:none;transition:opacity .35s ease .15s,background .2s}
   .reader.auto.calme .barres-handle{display:flex;opacity:.45;pointer-events:auto}
   .barres-handle:hover{opacity:1;background:rgba(40,40,44,.85)}
@@ -649,6 +653,7 @@
 
 <div class="reader" id="reader">
   <div class="reader-bar"><button id="readerBack">← Retour</button><span id="readerTitle"></span></div>
+  <button class="tdb-pill" id="tdbPill" type="button" title="Retour au tableau de bord (E)"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="4" width="17" height="12.5" rx="1.5"/><path d="M8 20h8M12 16.5V20"/></svg>Tableau de bord</button>
   <div class="rstage" id="rstage">
     <div class="rinner" id="rinner">
       <iframe id="readerFrame" title="Livre" allow="fullscreen" allowfullscreen></iframe>
@@ -674,7 +679,7 @@
     <span><kbd>K</kbd></span><span>Ajouter ou retirer un signet</span><span><kbd>A</kbd></span><span>Animations : pause ou reprise</span>
     <span><kbd>R</kbd></span><span>Réponses (livres qui en ont)</span><span><kbd>+</kbd><kbd>−</kbd><kbd>0</kbd></span><span>Zoom</span>
     <span><kbd>O</kbd></span><span>Pointeur laser (suit la souris)</span><span><kbd>N</kbd></span><span>Écran noir (cache le livre)</span>
-    <span><kbd>H</kbd></span><span>Afficher ou cacher les barres d'outils</span><span><kbd>D</kbd></span><span>Page simple ou double page</span><span><kbd>F</kbd></span><span>Plein écran</span>
+    <span><kbd>H</kbd></span><span>Afficher ou cacher les barres d'outils</span><span><kbd>D</kbd></span><span>Page simple ou double page</span><span><kbd>F</kbd></span><span>Plein écran</span><span><kbd>E</kbd></span><span>Tableau de bord (accueil de classe)</span>
     <span><kbd>Ctrl</kbd><kbd>Z</kbd></span><span>Annuler le dernier trait</span><span><kbd>Échap</kbd></span><span>Fermer un menu</span>
   </div><p class="help-note">Une télécommande de présentation (diapositive suivante ou précédente) tourne aussi les pages.</p></div></div>
   <div class="timer" id="timer" hidden>
@@ -3187,7 +3192,7 @@ function toggleTimer(){ const t = $("#timer"); t.hidden = !t.hidden; tmRender();
 function toggleFs(){
   try {
     if (document.fullscreenElement){ document.exitFullscreen(); return; }
-    $("#reader").requestFullscreen().catch(() => aviser("Plein écran indisponible ici. Essaie la touche F11."));
+    document.documentElement.requestFullscreen().catch(() => aviser("Plein écran indisponible ici. Essaie la touche F11."));
   } catch(e){ aviser("Plein écran indisponible ici. Essaie la touche F11."); }
 }
 /* ---- Table des matières uniforme pour tous les livres ----
@@ -3290,7 +3295,7 @@ function dessinerMenu(){
   }));
 }
 function closeMenu(garderAide){ $("#noir").hidden = true; $("#mmenu").hidden = true; if (garderAide !== true) $("#help").hidden = true; }
-function turn(dir){
+function turn(dir){ RD.bouge = true;
   if (RD.wb){ wbAller(dir); return; }
   if (!RD.drv) return;
   if (ansPas(dir)){ setTimeout(poll, 60); return; }
@@ -3326,7 +3331,7 @@ function ansEtat(){
   return { ok, m, s:st, t };
 }
 
-const HOSTKEYS = { p:togglePen, t:toggleTimer, l:toggleSpot, c:toggleCache, b:toggleWb, m:openMenu, f:toggleFs, h:basculerBarres, d:toggleDbl, o:toggleLaser, n:toggleNoir, k:toggleMark, "?":toggleHelp,
+const HOSTKEYS = { p:togglePen, t:toggleTimer, l:toggleSpot, c:toggleCache, b:toggleWb, m:openMenu, f:toggleFs, h:basculerBarres, d:toggleDbl, o:toggleLaser, n:toggleNoir, k:toggleMark, e:() => allerTableauDeBord(), "?":toggleHelp,
   "+":zin, "=":zin, "-":zout, "_":zout, "0":zreset, r:answers, a:toggleAnim, q:() => montrerQr(), z:() => {} };
 const verrou = () => !!(RD.wb || RD.text || RD.obj);     /* tableau blanc ou texte : aucun raccourci, sauf annuler / rétablir */
 function hostKey(e){
@@ -3512,22 +3517,32 @@ function lire(l){
 }
 function closeReader(){
   clearInterval(RD.poll); clearTimeout(BAR.t); clearTimeout(RD.attT);
-  try { if (document.fullscreenElement) document.exitFullscreen(); } catch(e){}
+  try { if (document.fullscreenElement && !document.body.classList.contains("classe") && !window.TDB_ACTIF) document.exitFullscreen(); } catch(e){}
   $("#reader").classList.remove("open");
   $("#resume").hidden = true; clearTimeout(RD.resT); $("#noir").hidden = true; if (RD.laser) toggleLaser();
   killExtras(); $("#readerFrame").srcdoc = ""; $("#readerFrame2").srcdoc = ""; $("#readerFrame2").hidden = true; $("#rinner").classList.remove("dbl"); RD.dbl = false; RD.single = false; RD.drv2 = null;
   RD.drv = null; RD.attached = false; RD.book = null; RD.armed = false;
   document.body.style.overflow = "";
   try { render(); } catch(e){}
-  if (window.RETOUR_ACCUEIL){ window.RETOUR_ACCUEIL = false; $("#readerBack").textContent = "← Retour"; try { window.ouvrirAccueil(); } catch(e){} }
 }
-$("#readerBack").onclick = closeReader;
+$("#readerBack").onclick = () => { if (window.TDB_ACTIF) allerTableauDeBord(); else closeReader(); };
+$("#tdbPill").onclick = () => allerTableauDeBord();
 /* l'enseignant tourne lui-même les pages : on arrête de forcer la page demandée */
 document.addEventListener("keydown", e => { if (/^(ArrowLeft|ArrowRight|PageUp|PageDown| )$/.test(e.key)) RD.bouge = true; }, true);
 ["#tbPrev", "#tbNext", "#tbPg", "#mmenu"].forEach(sel => { const el = document.querySelector(sel); if (el) el.addEventListener("pointerdown", () => { RD.bouge = true; }, true); });
 /* ---- Contenus ouverts depuis le tableau de bord (accueil de classe) ----
    livre + page · schéma (modèle ou « Mes schémas ») sur un tableau blanc · dossier de plans. En fermant, on revient au tableau de bord. */
 window.RETOUR_ACCUEIL = false;
+/* Session « tableau de bord » : le livre reste ouvert sous le tableau de bord, on passe de l'un à l'autre en un clic */
+window.TDB_ACTIF = false;
+const ICO_TDB = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="4" width="17" height="12.5" rx="1.5"/><path d="M8 20h8M12 16.5V20"/></svg>';
+function marquerTdb(on){
+  window.TDB_ACTIF = on; $("#reader").classList.toggle("tdb", on);
+  $("#readerBack").innerHTML = on ? ICO_TDB + "Tableau de bord" : "← Retour";
+  $("#readerBack").title = on ? "Retour au tableau de bord (E) — le livre reste ouvert" : "";
+}
+function allerTableauDeBord(){ marquerTdb(true); try { window.ouvrirAccueil(); } catch(e){} }
+function fermerLivreVraiment(){ const t = window.TDB_ACTIF; marquerTdb(false); window.TDB_ACTIF = t; closeReader(); window.TDB_ACTIF = t; }
 function ouvrirTableauBlanc(apres){
   const l = { fichier:"tableau-blanc", titre:"Tableau blanc" };
   ouvrirLivre(l, '<!doctype html><html><head><meta charset="utf-8"><title>Tableau blanc</title></head><body style="margin:0;background:#fff;height:100vh"></body></html>');
@@ -3538,14 +3553,14 @@ function ouvrirTableauBlanc(apres){
 function ouvrirContenu(c){
   if (!c) return;
   if (c.type === "livre"){ const l = LIVRES.find(x => x.fichier === c.f); if (!l){ aviser("Ce livre n'est plus dans la bibliothèque."); return; }
-    window.RETOUR_ACCUEIL = true; $("#readerBack").textContent = "← Tableau de bord"; if (c.page > 1) RD.allerA = c.page; lire(l); return; }
-  if (c.type === "schema"){ window.RETOUR_ACCUEIL = true;
-    ouvrirTableauBlanc(() => { $("#readerBack").textContent = "← Tableau de bord";
+    marquerTdb(true); if (c.page > 1) RD.allerA = c.page; lire(l); return; }
+  if (c.type === "schema"){ marquerTdb(true);
+    ouvrirTableauBlanc(() => { marquerTdb(true);
       if (c.modele){ const m = MODELES.find(x => x.id === c.modele); if (m) poserModele(m); }
       else if (c.sch){ const sc = lireSch().find(x => String(x.id) === String(c.sch)); if (sc) ouvrirSchema(sc); else aviser("Ce schéma n'est plus dans « Mes schémas »."); }
       else { wbEtat().bg[wbEtat().n] = "quad"; majFond(); RD.obj = true; refreshTools(); } });
     return; }
-  if (c.type === "tableau"){ window.RETOUR_ACCUEIL = true; ouvrirTableauBlanc(() => { $("#readerBack").textContent = "← Tableau de bord"; if (c.fond){ wbEtat().bg[wbEtat().n] = c.fond; majFond(); refreshTools(); } }); return; }
+  if (c.type === "tableau"){ marquerTdb(true); ouvrirTableauBlanc(() => { marquerTdb(true); if (c.fond){ wbEtat().bg[wbEtat().n] = c.fond; majFond(); refreshTools(); } }); return; }
   if (c.type === "plan"){ window.RETOUR_ACCUEIL = true; $("#planBtn").click(); setTimeout(() => { const b = document.querySelector('.pl-ex[data-ex="' + c.n + '"]'); if (b) b.click(); }, 250); }
 }
 /* retour au tableau de bord quand on ferme les plans */
@@ -4320,6 +4335,8 @@ initAdmin();
   .accueil-close{position:absolute;left:max(12px,env(safe-area-inset-left,0px));bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:2;background:rgba(20,20,22,.7);color:#f1f1f2;border:1px solid #ffffff30;border-radius:8px;padding:8px 14px;font:600 .9rem "Segoe UI",Roboto,Arial,sans-serif;cursor:pointer;opacity:.3;transition:opacity .2s}
   .accueil-close:hover,.accueil-close:focus-visible{opacity:1;outline:none}
   .accueil-close[hidden]{display:none!important}
+  .accueil-ov.attente::after{content:"";position:absolute;left:50%;bottom:28px;width:34px;height:34px;margin-left:-17px;border-radius:50%;border:3px solid #ffffff30;border-top-color:#fff;animation:tdbTourne .8s linear infinite;z-index:3}
+  @keyframes tdbTourne{to{transform:rotate(360deg)}}
 </style>
 <div class="accueil-ov" id="accueilOv" hidden role="dialog" aria-label="Accueil de classe">
   <iframe id="accueilFrame" title="Tableau d'accueil de l'atelier" allow="fullscreen" allowfullscreen></iframe>
@@ -4333,38 +4350,63 @@ initAdmin();
   function ouvrir() {
     if (!loaded) {
       fr.src = "accueil.html";   /* le tableau d'accueil est un fichier du site (une seule version à entretenir) */
-      fr.addEventListener("load", () => { try { fr.contentWindow.postMessage({ type: "accueil-biblio" }, "*"); } catch (e) {} });
+      fr.addEventListener("load", () => { try { fr.contentWindow.postMessage({ type: "accueil-biblio" }, "*"); } catch (e) {} signalerLivre(); });
       loaded = true;
     }
-    ov.hidden = false;
+    ov.classList.remove("attente"); ov.hidden = false;
+    signalerLivre();
     setTimeout(() => { try { fr.focus(); } catch (e) {} }, 50);
   }
-  function fermer() {
-    if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+  /* livre resté ouvert sous le tableau de bord → bouton « Revenir au livre » */
+  const livreOuvert = () => $("#reader").classList.contains("open");
+  function signalerLivre(){
+    let livre = null;
+    if (livreOuvert()){ const st = (() => { try { return RD.drv ? RD.drv.state() : null; } catch(e){ return null; } })();
+      livre = { titre: RD.wb ? "Tableau blanc" : $("#readerTitle").textContent, page: st && st.label ? String(st.label) : "", wb: !!RD.wb || RD.book === "tableau-blanc" }; }
+    try { fr.contentWindow.postMessage({ type: "accueil-livre", livre }, "*"); } catch (e) {}
+  }
+  /* on garde le plein écran tant qu'on reste en classe (tableau de bord ↔ livre) */
+  function fermer(versLivre) {
+    if (!versLivre && document.fullscreenElement && !document.body.classList.contains("classe")) document.exitFullscreen().catch(() => {});
     ov.hidden = true;
+    if (versLivre) setTimeout(() => { try { $("#readerFrame").focus(); } catch (e) {} }, 60);
+  }
+  /* ouvrir un contenu : le tableau de bord reste affiché jusqu'à ce que le livre soit prêt, puis fondu */
+  function ouvrirDepuisTdb(c){
+    const memeLivre = c.type === "livre" && livreOuvert() && RD.book === c.f && RD.drv;
+    if (memeLivre){ marquerTdb(true); if (c.page > 1){ try { RD.drv.goto(c.page); } catch(e){} } fermer(true); return; }
+    if (livreOuvert() && c.type !== "plan") fermerLivreVraiment();
+    if (c.type === "plan"){ ouvrirContenu(c); setTimeout(() => fermer(true), 450); return; }
+    ov.classList.add("attente");
+    ouvrirContenu(c);
+    const t0 = Date.now();
+    const t = setInterval(() => { let pret = false; try { pret = !!(RD.drv && RD.drv.state().tot > 0); } catch(e){}
+      if ((pret && Date.now() - t0 > 250) || Date.now() - t0 > 12000 || !livreOuvert() && Date.now() - t0 > 3000){ clearInterval(t);
+        setTimeout(() => { ov.classList.remove("attente"); fermer(true); }, pret ? 200 : 0); } }, 100);
   }
   // Le bouton « Plein écran » du tableau demande à la bibliothèque de passer l'accueil en plein écran
   const peEl = () => document.fullscreenElement || document.webkitFullscreenElement;
-  const peSignal = ok => { try { fr.contentWindow.postMessage({ type: "accueil-plein-ecran-etat", on: peEl() === ov, ok }, "*"); } catch (e) {} };
+  const peSignal = ok => { try { fr.contentWindow.postMessage({ type: "accueil-plein-ecran-etat", on: !!peEl(), ok }, "*"); } catch (e) {} };
   window.ouvrirAccueil = ouvrir;
   const catalogue = () => ({ type:"accueil-catalogue",
     livres:LIVRES.filter(l => l.fichier).map(l => ({ f:l.fichier, titre:l.titre, niveau:l.niveau || "", pages:l.pages || 0 })),
     modeles:MODELES.map(m => ({ id:m.id, nom:m.nom })), schemas:lireSch().map(x => ({ id:String(x.id), nom:x.nom })),
     dossiers:[[1, "Maison unifamiliale"], [2, "Duplex jumelé"], [3, "Bâtiment commercial"]] });
   window.addEventListener("message", e => {
-    if (e.source === fr.contentWindow && e.data && e.data.type === "accueil-fermer") { fermer(); return; }
+    if (e.source === fr.contentWindow && e.data && e.data.type === "accueil-fermer") { marquerTdb(false); if (livreOuvert()) closeReader(); fermer(); return; }
+    if (e.source === fr.contentWindow && e.data && e.data.type === "accueil-revenir") { if (livreOuvert()) fermer(true); return; }
     if (e.source === fr.contentWindow && e.data && e.data.type === "accueil-catalogue?") { try { fr.contentWindow.postMessage(catalogue(), "*"); } catch(er){} return; }
-    if (e.source === fr.contentWindow && e.data && e.data.type === "accueil-ouvrir") { fermer(); ouvrirContenu(e.data.contenu); return; }
+    if (e.source === fr.contentWindow && e.data && e.data.type === "accueil-ouvrir") { ouvrirDepuisTdb(e.data.contenu || {}); return; }
     if (e.source !== fr.contentWindow || !e.data || e.data.type !== "accueil-plein-ecran") return;
     if (peEl()) { (document.exitFullscreen || document.webkitExitFullscreen).call(document); return; }
-    const req = ov.requestFullscreen || ov.webkitRequestFullscreen;
+    const pe = document.documentElement, req = pe.requestFullscreen || pe.webkitRequestFullscreen;
     if (!req || !(document.fullscreenEnabled || document.webkitFullscreenEnabled)) { peSignal(false); return; }
-    try { const p = req.call(ov); if (p && p.catch) p.catch(() => peSignal(false)); } catch (err) { peSignal(false); }
+    try { const p = req.call(pe); if (p && p.catch) p.catch(() => peSignal(false)); } catch (err) { peSignal(false); }
   });
   document.addEventListener("fullscreenchange", () => peSignal(true)); document.addEventListener("webkitfullscreenchange", () => peSignal(true));
   document.getElementById("accueilBtn").addEventListener("click", ouvrir);
-  document.getElementById("accueilClose").addEventListener("click", fermer);
-  document.addEventListener("keydown", e => { if (e.key === "Escape" && !ov.hidden) fermer(); });
+  document.getElementById("accueilClose").addEventListener("click", () => fermer());
+  document.addEventListener("keydown", e => { if (e.key === "Escape" && !ov.hidden) fermer(livreOuvert()); });
 })();
 </script>
 
