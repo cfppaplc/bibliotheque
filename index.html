@@ -1832,7 +1832,7 @@ function dessinerElec(g, s, W, H, k, col){
     g.textAlign = mode === "droite" ? "right" : (G.o && mode === "dessus") ? "left" : "center"; g.textBaseline = "middle"; g.fillStyle = col;
     g.fillText(txt, 0, 0); g.restore(); };
   const bornes = () => { C(.6, 0, .07, true); C(1.4, 0, .07, true); };
-  if (!/^(rails|jonction|transfo|terre)$/.test(K)){ g.save(); g.fillStyle = "#fff"; ({ spdt:[0, 1], dpst:[0, 2], dpdt:[0, 1, 2, 3] }[polDe(s)] || [0]).forEach(y => g.fillRect(.06 * u, (y - .1) * u, 1.88 * u, .2 * u)); g.restore(); }   /* un fil tracé sous le symbole ne doit pas « fermer » un contact ouvert */
+  /* (les fils qui passent sous un symbole sont coupés entre ses bornes : voir nettoyerFils) */
   if (K === "contact" || K === "surcharge" || K === "contactT"){
     L(0, 0, .75, 0); L(1.25, 0, 2, 0); L(.75, -.38, .75, .38); L(1.25, -.38, 1.25, .38);
     if (nf) L(.55, .45, 1.45, -.45);
@@ -2330,7 +2330,7 @@ const SIM_SW = /^(contact|contactT|surcharge|bp|inter|thermostat|pression|flotte
 function simCalc(prof){
   const cv = $("#inkCanvas"), W = cv.width, Hc = cv.height, u = elecU(), arr = strokes(), now = performance.now();
   const gk = p => Math.round(p[0] * W / u) + "," + Math.round(p[1] * Hc / u), gkPx = q => Math.round(q[0] / u) + "," + Math.round(q[1] / u);
-  const px = k => { const [x, y] = k.split("|")[0].split(",").map(Number); return [x * u, y * u]; };
+  const px = k => k.split("|")[0].split(",").map(Number);                      /* en carreaux : converti en pixels à chaque image, donc juste même après un zoom */
   const norm = t => (t || "").trim().toUpperCase();
   const fils = arr.filter(o => o.t === "ligne" && o.fil), objs = arr.filter(o => o.t === "objet" && ELEC[o.k]);
   const conn = new Set(), ports = new Map(), E = [], hotS = new Set(), neuS = new Set();
@@ -2390,11 +2390,11 @@ function simCalc(prof){
   const flux = [], vus = new Set(), seg = (a, b) => { const id = a + ">" + b; if (!vus.has(id)){ vus.add(id); flux.push([px(a), px(b)]); } };
   [...R.alim, ...R.trOn].forEach(o => { const Pp = ports.get(o); let c1 = chemin(Pp[0], srcH, o), ph = Pp[0], pn = Pp[1]; if (!c1){ c1 = chemin(Pp[1], srcH, o); ph = Pp[1]; pn = Pp[0]; }
     if (c1) for (let i = 0; i < c1.length - 1; i++) seg(c1[i + 1], c1[i]);
-    if (o.k !== "transfo") seg(ph, pn);
+    if (/^(resistance|chauffant|del|solenoide)$/.test(o.k)) seg(ph, pn);          /* les points ne passent pas sur le repère des bobines et lampes */
     const c2 = chemin(pn, srcN, o); if (c2) for (let i = 0; i < c2.length - 1; i++) seg(c2[i], c2[i + 1]); });
-  const minut = [...trE].map(([lb, o]) => ({ c:objGeo(o, W, Hc).P(1, 0), f:SIM.tfini.has(lb) ? 1 : Math.min(1, (now - SIM.tdeb[lb]) / ((o.del || 3) * 1000)), lb, d:o.del || 3 }));
+  const minut = [...trE].map(([lb, o]) => ({ c:objGeo(o, W, Hc).P(1, 0).map(v => v / u), f:SIM.tfini.has(lb) ? 1 : Math.min(1, (now - SIM.tdeb[lb]) / ((o.del || 3) * 1000)), lb, d:o.del || 3 }));
   Object.assign(SIM, { bob, ferme:R.ferme, charges:R.alim, trOn:R.trOn, court:R.court, pot, flux, minut,
-    moteurs:[...R.alim].filter(o => o.k === "moteur").map(o => objGeo(o, W, Hc).P(1, 0)), sonneries:[...R.alim].filter(o => o.k === "sonnerie").map(o => objGeo(o, W, Hc).P(1, 0)) });
+    moteurs:[...R.alim].filter(o => o.k === "moteur").map(o => objGeo(o, W, Hc).P(1, 0).map(v => v / u)), sonneries:[...R.alim].filter(o => o.k === "sonnerie").map(o => objGeo(o, W, Hc).P(1, 0).map(v => v / u)) });
 }
 function simAide(){
   const z = document.querySelector("#objBar .simAide"); if (!z) return;
@@ -2417,18 +2417,18 @@ function simFrame(t){
   g.setTransform(dpr * sx, 0, 0, dpr * sx, dpr * (r.left - S.left), dpr * (r.top - S.top));
   const u = elecU(), esp = u * .4, ph = (t / 1000 * u * 1.4) % esp, R = Math.max(1.6, u * .055);   /* petits points, un peu plus serrés */
   g.fillStyle = "#ffd43b"; g.strokeStyle = "#8a6d00"; g.lineWidth = Math.max(.6, u * .015);
-  SIM.flux.forEach(([a, b]) => { const L = Math.hypot(b[0] - a[0], b[1] - a[1]); if (!L) return;
+  SIM.flux.forEach(([a0, b0]) => { const a = [a0[0] * u, a0[1] * u], b = [b0[0] * u, b0[1] * u], L = Math.hypot(b[0] - a[0], b[1] - a[1]); if (!L) return;
     for (let d = ph; d < L; d += esp){ const x = a[0] + (b[0] - a[0]) * d / L, y = a[1] + (b[1] - a[1]) * d / L; g.beginPath(); g.arc(x, y, R, 0, 7); g.fill(); g.stroke(); } });
   g.strokeStyle = "#2b8a3e"; g.lineWidth = Math.max(2, u * .07); g.lineCap = "round";
-  SIM.sonneries.forEach(([x, y]) => { g.save(); g.strokeStyle = "#f08c00"; g.lineWidth = Math.max(1.5, u * .05); const ph2 = (t / 300) % 1;
+  SIM.sonneries.forEach(([x0, y0]) => { const x = x0 * u, y = y0 * u; g.save(); g.strokeStyle = "#f08c00"; g.lineWidth = Math.max(1.5, u * .05); const ph2 = (t / 300) % 1;
     for (let i = 0; i < 2; i++){ const rr = u * (.55 + .25 * ((ph2 + i * .5) % 1)); g.globalAlpha = 1 - ((ph2 + i * .5) % 1); g.beginPath(); g.arc(x, y, rr, -2.4, -.75); g.stroke(); } g.restore(); });
   let attente = false;
   SIM.minut.forEach(m => { const f = SIM.tfini.has(m.lb) ? 1 : Math.min(1, (performance.now() - (SIM.tdeb[m.lb] || performance.now())) / (m.d * 1000)); if (f < 1) attente = true;
-    g.save(); g.lineWidth = Math.max(3, u * .1); g.strokeStyle = "rgba(42,123,207,.25)"; g.beginPath(); g.arc(m.c[0], m.c[1], u * .58, 0, 7); g.stroke();
-    g.strokeStyle = f >= 1 ? "#2f9e44" : "#2a7bcf"; g.beginPath(); g.arc(m.c[0], m.c[1], u * .58, -Math.PI / 2, -Math.PI / 2 + f * Math.PI * 2); g.stroke(); g.restore();
+    g.save(); g.lineWidth = Math.max(3, u * .1); g.strokeStyle = "rgba(42,123,207,.25)"; g.beginPath(); g.arc(m.c[0] * u, m.c[1] * u, u * .58, 0, 7); g.stroke();
+    g.strokeStyle = f >= 1 ? "#2f9e44" : "#2a7bcf"; g.beginPath(); g.arc(m.c[0] * u, m.c[1] * u, u * .58, -Math.PI / 2, -Math.PI / 2 + f * Math.PI * 2); g.stroke(); g.restore();
     if (f >= 1 && !SIM.tfini.has(m.lb)){ SIM.tfini.add(m.lb); setTimeout(simMaj, 0); } });
   if (attente && !(t % 4)) {}
-  SIM.moteurs.forEach(([x, y]) => { const a0 = t / 1000 * 4; for (let i = 0; i < 2; i++){ g.beginPath(); g.arc(x, y, u * .62, a0 + i * Math.PI, a0 + i * Math.PI + 1.6); g.stroke(); } });
+  SIM.moteurs.forEach(([x0, y0]) => { const x = x0 * u, y = y0 * u; const a0 = t / 1000 * 4; for (let i = 0; i < 2; i++){ g.beginPath(); g.arc(x, y, u * .62, a0 + i * Math.PI, a0 + i * Math.PI + 1.6); g.stroke(); } });
   SIM.raf = requestAnimationFrame(simFrame);
 }
 function simStart(){
@@ -2590,6 +2590,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     const x2 = o.p[0][0] + w0 * u / W, nx = o.p[0][0] + w * u / W;
     (fixes || strokes().filter(f => f.t === "ligne" && f.fil).flatMap(f => [0, 1].filter(i => Math.abs(f.p[i][0] - x2) * W < 2).map(i => [f, i]))).forEach(([f, i]) => { f.p[i][0] = nx; });
     o.sz = [w, h]; };
+  const nettoyerFils = () => strokes().filter(o => o.t === "objet" && ELEC[o.k]).forEach(couperFils);   /* après chaque fil ou déplacement */
   const touche = q => { const arr = strokes(); for (let i = arr.length - 1; i >= 0; i--){ const s = arr[i]; if (s.t !== "objet") continue; const G = objGeo(s, c.width, c.height), x = q[0] * c.width, y = q[1] * c.height;
     if (s.k === "rails"){ if (surRails(s, G, x, y, .1) && (RD.objK === "rails" || (y - G.oy) / G.u < .4)) return s; continue; }
     if (x >= G.bbox[0] - 4 && x <= G.bbox[2] + 4 && y >= G.bbox[1] - 4 && y <= G.bbox[3] + 4) return s; } return null; };
@@ -2640,7 +2641,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     redrawInk();
   });
   ["pointerup", "pointercancel"].forEach(t => c.addEventListener(t, () => {
-    if (mv && mv.fil){ if (mv.segs.length) jonctionsAuto(mv.segs); else (UNDO[inkKey()] || []).pop(); mv = null; redrawInk(); majObjUI(); return; }
+    if (mv && mv.fil){ if (mv.segs.length){ jonctionsAuto(mv.segs); nettoyerFils(); } else (UNDO[inkKey()] || []).pop(); mv = null; redrawInk(); majObjUI(); return; }
     if (mv && mv.s && mv.snap && ELEC[mv.s.k]){                                  /* symbole déplacé : ses fils restent droits (un coude s'ajoute au besoin) */
       const ux = elecU() / c.width, uy = elecU() / c.height;
       mv.liens.forEach(([f, i, x0, y0]) => { const M = f.p[i].slice(), F = f.p[1 - i]; if (Math.abs(M[0] - F[0]) * c.width <= 2 || Math.abs(M[1] - F[1]) * c.height <= 2) return;
@@ -2648,7 +2649,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
         if (horiz && Math.abs(M[0] - F[0]) > ux * 1.5){ const X = M[0] - Math.sign(M[0] - F[0]) * ux; f.p[i] = [X, F[1]]; strokes().push(nouveauFil([X, F[1]], [X, M[1]]), nouveauFil([X, M[1]], M)); }
         else if (!horiz && Math.abs(M[1] - F[1]) > uy * 1.5){ const Y = M[1] - Math.sign(M[1] - F[1]) * uy; f.p[i] = [F[0], Y]; strokes().push(nouveauFil([F[0], Y], [M[0], Y]), nouveauFil([M[0], Y], M)); }
         else { const K = horiz ? [F[0], M[1]] : [M[0], F[1]]; f.p[i] = K; strokes().push(nouveauFil(K, M)); } });
-      redrawInk();
+      nettoyerFils(); redrawInk();
     }
     if (mv && mv.zone && mv.el){
       if (mv.box) mv.box.remove();
