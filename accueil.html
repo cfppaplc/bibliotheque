@@ -348,7 +348,9 @@ header { grid-column: 1 / -1; display: flex; align-items: center; justify-conten
 .lk-choix { margin-top: 10px; }
 .lk-tuiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 6px; }
 .lk-tuile { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 6px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font: 600 13px var(--body); cursor: pointer; text-align: center; }
-.lk-tuile b { font-size: 24px; line-height: 1; }
+.lk-tuile b { font-size: 26px; line-height: 1; display: flex; color: var(--water); }
+.ico { flex: none; display: inline-block; vertical-align: -0.14em; }
+.lk-chip .ico { font-size: 17px; }
 .lk-tuile:hover, .lk-tuile:focus-visible { border-color: var(--water); outline: none; }
 .lk-tuile:disabled { opacity: .45; cursor: default; }
 .lk-form { display: grid; gap: 8px; margin-top: 8px; }
@@ -359,12 +361,14 @@ header { grid-column: 1 / -1; display: flex; align-items: center; justify-conten
 .lk-form .lk-ok button.prim { background: var(--water); border-color: var(--water); color: #fff; }
 .lk-note { color: var(--muted); font-size: 13px; }
 /* bouton « Ouvrir » sur la carte MAINTENANT / ENSUITE */
-.now-go { align-self: flex-start; display: inline-flex; align-items: center; gap: calc(var(--u) * 12); margin-top: calc(var(--u) * 8); font: 700 calc(var(--u) * 30) var(--display); letter-spacing: .02em; color: #fff; background: var(--water); border: 0; border-radius: calc(var(--u) * 12); padding: calc(var(--u) * 12) calc(var(--u) * 24); cursor: pointer; box-shadow: 0 6px 18px rgba(0,0,0,.25); max-width: 100%; }
+.now-go { align-self: flex-start; display: inline-flex; align-items: center; gap: calc(var(--u) * 12); margin-top: calc(var(--u) * 8); font: 700 calc(var(--u) * 30) var(--display); letter-spacing: .02em; color: #0F1418; background: var(--water); border: 0; border-radius: calc(var(--u) * 12); padding: calc(var(--u) * 12) calc(var(--u) * 24); cursor: pointer; box-shadow: 0 6px 18px rgba(0,0,0,.25); max-width: 100%; }
 .now-go span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .now-go:hover { filter: brightness(1.08); } .now-go[hidden] { display: none; }
 .now-go.petit { font-size: calc(var(--u) * 22); padding: calc(var(--u) * 8) calc(var(--u) * 16); background: color-mix(in srgb, var(--water) 70%, var(--surface)); }
 .step .lk-i { margin-left: .4em; font-size: .85em; }
-.seg .seg-lk { position: absolute; top: calc(var(--u) * 6); right: calc(var(--u) * 8); font-size: calc(var(--u) * 24); line-height: 1; filter: grayscale(.2); }
+.seg .seg-lk { position: absolute; top: calc(var(--u) * 6); right: calc(var(--u) * 8); font-size: calc(var(--u) * 26); line-height: 1; color: var(--water); display: flex; }
+.seg.now .seg-lk { color: var(--surface); }
+.step .lk-i { color: var(--water); }
 .seg.a-lien { cursor: pointer; } .seg.a-lien:hover { outline: 2px solid var(--water); outline-offset: 2px; }
 .step.a-lien { cursor: pointer; } .step.a-lien:hover .txt { text-decoration: underline; text-decoration-color: var(--water); }
 /* minuterie */
@@ -581,6 +585,7 @@ header { grid-column: 1 / -1; display: flex; align-items: center; justify-conten
     <div class="field"><label for="f-clock">Style d'horloge <span class="tip-i" tabindex="0" role="img" aria-label="Aide : choisis l'apparence de l'heure" data-tip="Numérique : grands chiffres. Aiguilles : horloge classique. Manomètre : l'heure lue sur un cadran de pression. Afficheur : chiffres lumineux de panneau de contrôle. Minimal : heures et minutes seulement.">?</span></label>
       <select id="f-clock"><option value="num">Numérique</option><option value="analog">À aiguilles</option><option value="mano">Manomètre</option><option value="led">Afficheur lumineux</option><option value="mini">Minimal (sans secondes)</option></select></div>
     <div class="field"><label for="f-theme">Couleurs <span class="tip-i" tabindex="0" role="img" aria-label="Aide : Sombre pour une classe tamisée, clair si la classe est très éclairée et que le projecteur pâlit l'image." data-tip="Sombre pour une classe tamisée, clair si la classe est très éclairée et que le projecteur pâlit l'image.">?</span></label><select id="f-theme"><option value="dark">Atelier sombre (acier)</option><option value="light">Clair (classe très éclairée)</option><option value="auto">Comme l'ordinateur</option></select></div>
+    <div class="field"><label for="f-couleurs">Ambiance <span class="tip-i" tabindex="0" role="img" aria-label="Aide : Les couleurs changent chaque jour de la semaine pour garder l'attention des élèves. Lundi ardoise, mardi forêt, mercredi prune, jeudi pétrole, vendredi cuivre." data-tip="Les couleurs changent chaque jour de la semaine pour garder l'attention des élèves. Lundi ardoise, mardi forêt, mercredi prune, jeudi pétrole, vendredi cuivre.">?</span></label><select id="f-couleurs"><option value="jour">Change chaque jour (recommandé)</option><option value="fixe">Toujours la même</option></select></div>
     <div class="field"><label for="f-bg">Arrière-plan <span class="tip-i" tabindex="0" role="img" aria-label="Aide : « Selon la compétence » change le fond tout seul selon la compétence choisie dans Préparer le cours." data-tip="« Selon la compétence » change le fond tout seul selon la compétence choisie dans Préparer le cours.">?</span></label><select id="f-bg"><option value="auto">Selon la compétence (automatique)</option><option value="tuyaux">Salle mécanique</option><option value="plan">Plan technique</option><option value="tole">Tôle d'acier</option><option value="beton">Béton de chantier</option><option value="soudure">Étincelles de soudure</option><option value="elec">Circuits électriques</option><option value="ventil">Conduits de ventilation</option><option value="flammes">Brûleur (flammes)</option><option value="gaz">Brûleur au gaz (flammes bleues)</option><option value="bois">Bois de menuiserie</option><option value="radiant">Plancher radiant</option><option value="sanitaire">Robinetterie et appareils sanitaires</option><option value="evacuation">Réseau d'évacuation</option><option value="securite">Santé et sécurité</option><option value="chantier">Chantier et métier</option><option value="communication">Communication</option><option value="atelier">Outils et entrepôt</option><option value="menage">Entretien ménager</option><option value="informatique">Informatique</option><option value="administration">Administration du bâtiment</option><option value="incendie">Protection incendie</option><option value="uni">Uni</option></select></div>
     <div class="field"><label for="f-msg">Message du jour <span class="tip-i" tabindex="0" role="img" aria-label="Aide : Une consigne courte sous la citation, par exemple « Apportez vos lunettes ». Laisse vide pour ne rien afficher." data-tip="Une consigne courte sous la citation, par exemple « Apportez vos lunettes ». Laisse vide pour ne rien afficher.">?</span></label><input id="f-msg" placeholder="Aucun message"></div>
     <details class="more" id="adv">
@@ -642,6 +647,7 @@ const DEFAULTS = {
   q: "Pourquoi ferme-t-on l'eau en amont avant de démonter un robinet?",
   a: "Pour couper la pression dans la section de tuyauterie et éviter l'inondation pendant le démontage.",
   theme: "dark",
+  couleurs: "jour",
   scale: "auto",
   clock: "num",
   bg: "auto",
@@ -774,8 +780,32 @@ function timeline(start, text) {
   return rows;
 }
 
+/* Couleurs du jour : une ambiance différente chaque jour de la semaine (les élèves remarquent le changement),
+   toujours sombre et contrastée pour le projecteur. Lundi = ardoise, mardi = forêt, mercredi = prune, jeudi = pétrole, vendredi = cuivre. */
+const AMBIANCES = [
+  { nom:"Graphite", bg:"#2A2B30", surface:"#36383F", line:"#50535C", steel:"#6B6F79", rivet:"#80848E", copper:"#EF5A60", water:"#7AA8FF", lc:"#D0303A", lw:"#2563C9" },
+  { nom:"Ardoise",  bg:"#262D36", surface:"#323B46", line:"#4A5562", steel:"#66727F", rivet:"#7A8692", copper:"#EF5A60", water:"#5EB0F0", lc:"#C52430", lw:"#1F6FC2" },
+  { nom:"Forêt",    bg:"#21302A", surface:"#2C3E37", line:"#44594F", steel:"#5E7569", rivet:"#74897E", copper:"#F2B33D", water:"#5FD3A0", lc:"#B7791F", lw:"#1E8A5A" },
+  { nom:"Prune",    bg:"#2C2637", surface:"#3A3247", line:"#544A68", steel:"#6E6384", rivet:"#837899", copper:"#FF8A5C", water:"#B49CFF", lc:"#D1542A", lw:"#6A4FD1" },
+  { nom:"Pétrole",  bg:"#1E2F35", surface:"#293E45", line:"#405A62", steel:"#5A747C", rivet:"#708990", copper:"#FFB454", water:"#4FD1E0", lc:"#B9741A", lw:"#0E8A99" },
+  { nom:"Cuivre",   bg:"#322920", surface:"#41352A", line:"#5E4C3B", steel:"#7A6655", rivet:"#8E7A69", copper:"#F07A3A", water:"#F2C14E", lc:"#C0561E", lw:"#A8790F" },
+  { nom:"Graphite", bg:"#2A2B30", surface:"#36383F", line:"#50535C", steel:"#6B6F79", rivet:"#80848E", copper:"#EF5A60", water:"#7AA8FF", lc:"#D0303A", lw:"#2563C9" }
+];
+const VARS_AMB = ["--bg", "--surface", "--line", "--steel", "--rivet", "--copper", "--water"];
+let jourCouleurs = "";
+function ambianceDuJour() { return AMBIANCES[new Date().getDay()]; }
+function couleursDuJour() {
+  const r = document.documentElement; jourCouleurs = jourAuj();
+  VARS_AMB.forEach(v => r.style.removeProperty(v));
+  if (cfg.couleurs === "fixe") return;
+  const a = ambianceDuJour();
+  const sombre = cfg.theme === "dark" || (cfg.theme !== "light" && matchMedia("(prefers-color-scheme: dark)").matches);
+  if (sombre) { r.style.setProperty("--bg", a.bg); r.style.setProperty("--surface", a.surface); r.style.setProperty("--line", a.line); r.style.setProperty("--steel", a.steel); r.style.setProperty("--rivet", a.rivet); r.style.setProperty("--copper", a.copper); r.style.setProperty("--water", a.water); }
+  else { r.style.setProperty("--copper", a.lc); r.style.setProperty("--water", a.lw); }
+}
 function applyTheme() {
   const r = document.documentElement;
+  setTimeout(couleursDuJour, 0);
   r.classList.toggle("force-light", cfg.theme === "light");
   r.classList.toggle("force-dark", cfg.theme === "dark");
 }
@@ -848,6 +878,7 @@ function renderStatic() {
 
 let lastStepsKey = "";
 function tick() {
+  if (jourCouleurs && jourCouleurs !== jourAuj()) couleursDuJour();
   const now = new Date();
   const h = now.getHours();
   $("v-h").textContent = pad(h); $("v-m").textContent = pad(now.getMinutes()); $("v-s").textContent = pad(now.getSeconds());
@@ -902,7 +933,7 @@ function tick() {
       d.lastChild.textContent = r.pause ? "" : fmt(r.start);
       d.title = fmt(r.start) + " · " + r.label;
       const lk2 = !r.pause && lienDe(r.label);
-      if (lk2){ const ic = document.createElement("span"); ic.className = "seg-lk"; ic.textContent = ICO_LIEN[lk2.type] || "▶"; d.append(ic); d.classList.add("a-lien"); d.title += " · clique pour ouvrir : " + nomLien(lk2); d.onclick = () => ouvrirLien(lk2); }
+      if (lk2){ const ic = document.createElement("span"); ic.className = "seg-lk"; ic.innerHTML = ico(lk2.type); d.append(ic); d.classList.add("a-lien"); d.title += " · clique pour ouvrir : " + nomLien(lk2); d.onclick = () => ouvrirLien(lk2); }
       tl.append(d);
     });
     rows.forEach((r, i) => {
@@ -915,7 +946,7 @@ function tick() {
       li.innerHTML = `<time>${fmt(r.start)}</time><span class="dot"></span><span class="txt"></span>`;
       li.querySelector(".txt").textContent = r.label;
       const lk = !r.pause && lienDe(r.label);
-      if (lk){ const ic = document.createElement("span"); ic.className = "lk-i"; ic.textContent = ICO_LIEN[lk.type] || "▶"; ic.title = "Ouvrir : " + nomLien(lk); li.querySelector(".txt").append(ic);
+      if (lk){ const ic = document.createElement("span"); ic.className = "lk-i"; ic.innerHTML = ico(lk.type); ic.title = "Ouvrir : " + nomLien(lk); li.querySelector(".txt").append(ic);
         li.classList.add("a-lien"); li.title = "Clique pour ouvrir : " + nomLien(lk); li.onclick = () => ouvrirLien(lk); }
       if (i === nowIdx) { const sp = document.createElement("span"); sp.className = "left"; sp.id = "v-left"; li.querySelector(".txt").append(sp); }
       list.append(li);
@@ -1393,7 +1424,7 @@ setTimeout(fit, 1500);
 
 // Réglages
 function openSettings() {
-  ["title", "group", "msg", "amStart", "pmStart", "goals", "word", "def", "q", "a", "theme", "scale", "bg", "clock"].forEach(k => $("f-" + k).value = cfg[k]);
+  ["title", "group", "msg", "amStart", "pmStart", "goals", "word", "def", "q", "a", "theme", "couleurs", "scale", "bg", "clock"].forEach(k => $("f-" + k).value = cfg[k]);
   $("f-ppe").innerHTML = Object.entries(PPE).map(([k, v]) => `<label><input type="checkbox" id="f-ppe-${k}" value="${k}" ${cfg.ppe.includes(k) ? "checked" : ""}> ${v.name}</label>`).join("");
   $("sheet").hidden = false; $("f-title").focus(); $("ai-why").hidden = true; $("ai-note").textContent = ""; preview();
 }
@@ -1499,7 +1530,18 @@ function fillComps(prog) {
 $("f-prog").addEventListener("change", () => { fillComps($("f-prog").value); $("f-module").hidden = true; });
 
 // ---------- Contenus liés aux activités : page de livre, schéma, plan, tableau blanc, minuterie ----------
-const ICO_LIEN = { livre:"📖", schema:"⚡", plan:"📐", tableau:"⬜", minuterie:"⏱", video:"🎬" };
+/* Icônes au trait, même style que la barre d'outils des livres */
+const ICO_P = {
+  livre: '<path d="M12 6.5C10 5 7 4.6 4 5v13c3-.4 6 0 8 1.5 2-1.5 5-1.9 8-1.5V5c-3-.4-6 0-8 1.5zM12 6.5v13"/>',
+  schema: '<path d="M13.5 3L5.5 13.5h6L10.5 21l8-10.5h-6z"/>',
+  plan: '<rect x="4" y="4" width="16" height="16" rx="1.5"/><path d="M4 10h6V4M14 20v-6h6M10 14h4"/>',
+  tableau: '<rect x="3.5" y="4.5" width="17" height="12" rx="1.5"/><path d="M9 21l3-4.5 3 4.5"/>',
+  minuterie: '<circle cx="12" cy="13" r="7.5"/><path d="M12 9v4.5l3 1.5M9.5 3h5"/>',
+  video: '<rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M10 9.2v5.6l4.8-2.8z" fill="currentColor"/>',
+  ouvrir: '<path d="M8 5l11 7-11 7z" fill="currentColor"/>'
+};
+const ico = t => '<svg class="ico" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (ICO_P[t] || ICO_P.ouvrir) + '</svg>';
+const ICO_LIEN = new Proxy({}, { get: (o, t) => ico(t) });
 /* Vidéo YouTube : on accepte toutes les formes de lien (youtu.be, watch?v=, shorts, embed, live) et le moment de départ (t=90, t=1m30s) */
 function ytInfo(url){
   const u = String(url || "").trim(); let m = u.match(/(?:youtu\.be\/|youtube(?:-nocookie)?\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|live\/|v\/))([\w-]{11})/i);
@@ -1537,7 +1579,7 @@ function nomLien(c){
   return "";
 }
 function majGo(b, c){ if (!b) return; if (!c){ b.hidden = true; b.onclick = null; return; }
-  const t = "▶ Ouvrir : " + nomLien(c); if (b.dataset.t !== t){ b.dataset.t = t; b.innerHTML = "<span></span>"; b.firstChild.textContent = t; b.title = t + " (touche O)"; }
+  const t = "Ouvrir : " + nomLien(c); if (b.dataset.t !== t){ b.dataset.t = t; b.innerHTML = ico(c.type) + "<span></span>"; b.lastChild.textContent = t; b.title = t + " (touche O)"; }
   b.hidden = false; b.onclick = () => ouvrirLien(c); }
 function ouvrirLien(c){
   if (!c) return;
@@ -1566,7 +1608,7 @@ function renderLiens(){
     row.innerHTML = '<div class="lk-top"><span class="lk-nom"></span></div>'; row.querySelector(".lk-nom").textContent = label;
     const top = row.querySelector(".lk-top");
     if (c){ const ch = document.createElement("span"); ch.className = "lk-chip"; ch.innerHTML = '<span></span><button type="button" aria-label="Retirer">✕</button>';
-      ch.firstChild.textContent = (ICO_LIEN[c.type] || "") + " " + nomLien(c); ch.lastChild.onclick = () => { delete LIENS_T[k]; renderLiens(); }; top.append(ch); }
+      ch.firstChild.textContent = nomLien(c); ch.insertAdjacentHTML("afterbegin", ico(c.type)); ch.lastChild.onclick = () => { delete LIENS_T[k]; renderLiens(); }; top.append(ch); }
     else { const b = document.createElement("button"); b.type = "button"; b.className = "lk-add"; b.textContent = "＋ Ajouter"; b.onclick = () => choix(row, label); top.append(b); }
     box.append(row);
   });
@@ -1576,12 +1618,12 @@ function choix(row, label){
   const k = cleLien(label), z = document.createElement("div"); z.className = "lk-choix";
   const enBiblio = !!CATAL;
   z.innerHTML = '<div class="lk-tuiles">'
-    + '<button type="button" class="lk-tuile" data-t="livre"' + (enBiblio ? "" : " disabled") + '><b>📖</b>Page d\'un livre</button>'
-    + '<button type="button" class="lk-tuile" data-t="schema"' + (enBiblio ? "" : " disabled") + '><b>⚡</b>Schéma électrique</button>'
-    + '<button type="button" class="lk-tuile" data-t="plan"' + (enBiblio ? "" : " disabled") + '><b>📐</b>Plan technique</button>'
-    + '<button type="button" class="lk-tuile" data-t="tableau"' + (enBiblio ? "" : " disabled") + '><b>⬜</b>Tableau blanc</button>'
-    + '<button type="button" class="lk-tuile" data-t="minuterie"><b>⏱</b>Minuterie</button>'
-    + '<button type="button" class="lk-tuile" data-t="video"><b>🎬</b>Vidéo YouTube</button></div>'
+    + '<button type="button" class="lk-tuile" data-t="livre"' + (enBiblio ? "" : " disabled") + '><b>' + ico("livre") + '</b>Page d\'un livre</button>'
+    + '<button type="button" class="lk-tuile" data-t="schema"' + (enBiblio ? "" : " disabled") + '><b>' + ico("schema") + '</b>Schéma électrique</button>'
+    + '<button type="button" class="lk-tuile" data-t="plan"' + (enBiblio ? "" : " disabled") + '><b>' + ico("plan") + '</b>Plan technique</button>'
+    + '<button type="button" class="lk-tuile" data-t="tableau"' + (enBiblio ? "" : " disabled") + '><b>' + ico("tableau") + '</b>Tableau blanc</button>'
+    + '<button type="button" class="lk-tuile" data-t="minuterie"><b>' + ico("minuterie") + '</b>Minuterie</button>'
+    + '<button type="button" class="lk-tuile" data-t="video"><b>' + ico("video") + '</b>Vidéo YouTube</button></div>'
     + (enBiblio ? "" : '<p class="lk-note">Pour les livres, schémas et plans, ouvre ce tableau de bord depuis la bibliothèque.</p>')
     + '<div class="lk-form" hidden></div>';
   row.append(z);
@@ -1617,7 +1659,7 @@ function choix(row, label){
     }
     if (ty === "video"){
       f.innerHTML = '<input type="url" data-u placeholder="Colle le lien de la vidéo (YouTube ou fichier .mp4)" autocomplete="off">'
-        + '<div class="lk-vid" hidden><img alt="" onerror="this.style.visibility='hidden'"><span><b data-n>Vidéo</b><small data-s></small></span></div>'
+        + '<div class="lk-vid" hidden><img alt="" onerror="this.style.visibility=\'hidden\'"><span><b data-n>Vidéo</b><small data-s></small></span></div>'
         + '<small class="lk-aide" data-e>Sur YouTube : bouton « Partager », puis « Copier ». Pour commencer à un moment précis, coche « Commencer à » avant de copier.</small>'
         + '<div class="lk-ok"><button type="button" class="prim" data-v disabled>Choisir</button>' + annuler + '</div>';
       const inp = f.querySelector("[data-u]"), ok = f.querySelector("[data-v]"), apv = f.querySelector(".lk-vid"), msg = f.querySelector("[data-e]");
@@ -1674,7 +1716,7 @@ $("b-cancel").onclick = () => $("sheet").hidden = true;
 $("b-reset").onclick = () => { cfg = { ...DEFAULTS }; openSettings(); };
 $("form").addEventListener("submit", e => {
   e.preventDefault();
-  ["title", "group", "msg", "amStart", "pmStart", "goals", "word", "def", "q", "a", "theme", "scale", "bg", "clock"].forEach(k => cfg[k] = $("f-" + k).value);
+  ["title", "group", "msg", "amStart", "pmStart", "goals", "word", "def", "q", "a", "theme", "couleurs", "scale", "bg", "clock"].forEach(k => cfg[k] = $("f-" + k).value);
   cfg.ppe = [...$("f-ppe").querySelectorAll("input:checked")].map(i => i.value);
   save(); renderStatic(); tick(); fitSoon(); $("sheet").hidden = true;
 });
