@@ -1,4 +1,4 @@
-<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2064%2064%27%3E%3Crect%20width=%2764%27%20height=%2764%27%20rx=%2714%27%20fill=%27%23141414%27/%3E%3Cpath%20d=%27M12%2018c8-3%2015-2%2020%203v27c-5-5-12-6-20-3z%27%20fill=%27%23e50914%27/%3E%3Cpath%20d=%27M52%2018c-8-3-15-2-20%203v27c5-5%2012-6%2020-3z%27%20fill=%27%23ffffff%27/%3E%3C/svg%3E"><title>Bibliothèque de l'école</title>
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2064%2064%27%3E%3Crect%20width=%2764%27%20height=%2764%27%20rx=%2714%27%20fill=%27%23141414%27/%3E%3Cpath%20d=%27M12%2018c8-3%2015-2%2020%203v27c-5-5-12-6-20-3z%27%20fill=%27%23e50914%27/%3E%3Cpath%20d=%27M52%2018c-8-3-15-2-20%203v27c5-5%2012-6%2020-3z%27%20fill=%27%23ffffff%27/%3E%3C/svg%3E"><title>Bibliothèque — Pavillon de l'Avenir</title>
 <style>
   #reader.laseron,#reader.laseron *{cursor:none!important}
   :root{
@@ -714,7 +714,7 @@
   <div class="panel" id="panel"></div>
 </div>
 
-<footer><img class="foot-logo" src="img/pavillon-avenir.png" alt="Pavillon de l'Avenir"><div><b>Conçu par Jeremy, enseignant</b> · Pavillon de l'Avenir, centre de formation professionnelle</div><div class="foot-s">Espace réservé aux enseignants · Livres animés conçus pour la projection en classe</div><button class="adm-btn" id="adminBtn" aria-label="Administration" title="Administration">⚙</button></footer>
+<footer><img class="foot-logo" src="img/pavillon-avenir.png" alt="Pavillon de l'Avenir"><div><b>Conçu par Jeremy, enseignant</b> · Pavillon de l'Avenir, centre de formation professionnelle</div><div class="foot-s">Espace réservé aux enseignants · Livres interactifs conçus pour la projection en classe</div><button class="adm-btn" id="adminBtn" aria-label="Administration" title="Administration">⚙</button></footer>
 
 <script>
 window.LIVRES_DATA = {};
@@ -941,8 +941,8 @@ function renderHero(){
   const h = $("#hero");
   h.style.cssText = "background:linear-gradient(120deg,#3a0b0b 0%,#141414 68%)";
   h.innerHTML = `<div class="hero-content">
-    <h1>Livres animés du Pavillon de l'Avenir</h1>
-    <p>Choisis un livre et projette-le au tableau. <span class="hero-tag">Réservé aux enseignants</span></p>
+    <h1>Tes livres de cours, prêts à projeter</h1>
+    <p>Livres interactifs, plans et schémas pour la classe et l'atelier. <span class="hero-tag">Réservé aux enseignants</span></p>
     <button class="hero-aide" id="heroAide" type="button">❔ Aide</button>
   </div>
   <div class="hero-stack">${vedettes().map(l => `<img src="${esc(couv(l))}" alt="">`).join("")}</div>`;
@@ -6128,7 +6128,7 @@ return {matrice:function(texte){var q=new QRCode(-1,L.M);q.addData(texte);q.make
 <div class="bv-ov" id="bienOv" hidden role="dialog" aria-label="Bienvenue"><div class="bien-box">
   <img class="bien-logo" src="img/pavillon-avenir.png" alt="Pavillon de l'Avenir">
   <h2>Bienvenue !</h2>
-  <p class="bien-sous">Les livres animés du Pavillon de l'Avenir, prêts à projeter en classe.</p>
+  <p class="bien-sous">Tes livres de cours, plans et schémas, prêts à projeter en classe.</p>
   <ol class="bien-et"><li><span>1</span><div><b>Choisis un livre</b>Clique sa couverture, puis « Lire ».</div></li>
     <li><span>2</span><div><b>Projette</b>La barre en bas de l'écran tourne les pages, écrit sur la page et montre les réponses.</div></li>
     <li><span>3</span><div><b>Besoin d'aide ?</b>Le lien « Aide », en haut, explique chaque bouton.</div></li></ol>

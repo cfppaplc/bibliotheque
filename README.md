@@ -1,4 +1,4 @@
-# Bibliothèque des livres animés — Pavillon de l'Avenir
+# Bibliothèque — Pavillon de l'Avenir
 
 Conçu par Jeremy, enseignant. Site : https://cfppaplc.github.io/bibliotheque/
 
