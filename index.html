@@ -245,7 +245,10 @@
   .panel-cover{width:150px;flex:none;border-radius:4px;box-shadow:0 10px 30px rgba(0,0,0,.6)}
   @media (max-width:640px){.panel-cover{width:105px}.panel-top.with-cover h2{font-size:1.25rem}}
   .hero-tag{display:inline-block;border:1px solid #ffffff55;color:#fff;font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 9px;border-radius:3px;margin-left:8px;vertical-align:middle;background:#00000055}
-  .hero p{margin-bottom:0!important}
+  .hero p{margin-bottom:14px!important}
+  .hero{min-height:300px!important;align-items:center!important}
+  .hero-stack{right:8%!important;top:calc(50% + 52px)!important}
+  .hero-stack img{height:230px!important;margin-left:-70px!important}
   .hero-aide{position:relative;z-index:2;border:1px solid #ffffff44;background:#ffffff14;color:#fff;border-radius:999px;padding:9px 16px;font:600 .92rem inherit;font-family:inherit;cursor:pointer}.hero-aide:hover{background:#ffffff26}
   .hero-stack{position:absolute;right:6%;top:calc(50% - 30px);transform:translateY(-50%);display:flex;align-items:center;z-index:1}
   .hero-stack img{height:min(40vh,330px);aspect-ratio:8.5/11;border-radius:4px;box-shadow:0 20px 50px rgba(0,0,0,.7);margin-left:-90px}
@@ -940,8 +943,9 @@ function renderHero(){
   h.innerHTML = `<div class="hero-content">
     <h1>Livres animés du Pavillon de l'Avenir</h1>
     <p>Choisis un livre et projette-le au tableau. <span class="hero-tag">Réservé aux enseignants</span></p>
+    <button class="hero-aide" id="heroAide" type="button">❔ Aide</button>
   </div>
-  <button class="hero-aide" id="heroAide" type="button">❔ Aide</button>`;
+  <div class="hero-stack">${vedettes().map(l => `<img src="${esc(couv(l))}" alt="">`).join("")}</div>`;
   $("#heroAide").onclick = () => ouvrirBienvenue();
 }
 
