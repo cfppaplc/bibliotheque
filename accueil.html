@@ -339,7 +339,25 @@ header { grid-column: 1 / -1; display: flex; align-items: center; justify-conten
 .lk-aide { display: block; color: var(--muted); font-size: 13px; line-height: 1.4; margin: 2px 0 8px; }
 .lk-liste { display: flex; flex-direction: column; gap: 8px; }
 .lk-row { border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; background: var(--bg); }
-.lk-top { display: flex; align-items: center; gap: 8px; }
+.lk-top { display: flex; align-items: flex-start; gap: 8px; }
+.lk-top .lk-nom { padding-top: 5px; }
+.lk-chips { margin-left: auto; display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; max-width: 64%; }
+.lk-chips .lk-chip { max-width: 100%; }
+.now-gos { display: flex; flex-wrap: wrap; gap: calc(var(--u) * 10); align-items: center; }
+.now-gos[hidden] { display: none; }
+.now-gos .now-go { margin-top: calc(var(--u) * 8); max-width: 100%; }
+.now-gos:has(.plus) .now-go { max-width: calc(50% - var(--u) * 6); flex: 0 1 auto; }
+.now-go.plus:not(.petit) { background: color-mix(in srgb, var(--water) 75%, var(--surface)); }
+.seg .seg-lk { gap: 2px; }
+.step .lk-i { cursor: pointer; }
+.lk-menu { position: fixed; z-index: 60; min-width: 260px; max-width: 420px; background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 12px; padding: 6px; box-shadow: 0 16px 40px rgba(0,0,0,.45); }
+.lk-menu[hidden] { display: none; }
+.lk-menu-t { font: 700 12px var(--body); text-transform: uppercase; letter-spacing: .08em; opacity: .6; padding: 6px 10px 4px; }
+.lk-menu button { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; background: none; border: 0; color: inherit; font: 600 17px var(--body); padding: 10px; border-radius: 8px; cursor: pointer; }
+.lk-menu button:hover, .lk-menu button:focus-visible { background: color-mix(in srgb, var(--water) 20%, transparent); outline: none; }
+.lk-menu button .ico { color: var(--water); font-size: 20px; }
+.lk-menu button span { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lk-menu kbd { font: 600 12px var(--body); opacity: .5; }
 .lk-nom { flex: 1; min-width: 0; font: 600 15px var(--body); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .lk-add { font: 600 14px var(--body); color: var(--water); background: none; border: 1px dashed var(--water); border-radius: 8px; padding: 6px 10px; cursor: pointer; white-space: nowrap; }
 .lk-chip { display: inline-flex; align-items: center; gap: 6px; max-width: 60%; font: 600 14px var(--body); color: var(--ink); background: color-mix(in srgb, var(--water) 18%, var(--surface)); border: 1px solid color-mix(in srgb, var(--water) 55%, transparent); border-radius: 999px; padding: 5px 6px 5px 12px; }
@@ -945,8 +963,8 @@ function tick() {
       d.firstChild.textContent = r.pause ? "" : cesure(r.label.replace(/ \(suite\)$/, "").split(/\s[:—–-]\s/)[0]);
       d.lastChild.textContent = r.pause ? "" : fmt(r.start);
       d.title = fmt(r.start) + " · " + r.label;
-      const lk2 = !r.pause && lienDe(r.label);
-      if (lk2){ const ic = document.createElement("span"); ic.className = "seg-lk"; ic.innerHTML = ico(lk2.type); d.append(ic); d.classList.add("a-lien"); d.title += " · clique pour ouvrir : " + nomLien(lk2); d.onclick = () => ouvrirLien(lk2); }
+      const lks2 = r.pause ? [] : liensDe(r.label);
+      if (lks2.length){ const ic = document.createElement("span"); ic.className = "seg-lk"; ic.innerHTML = lks2.map(c => ico(c.type)).join(""); d.append(ic); d.classList.add("a-lien"); d.title += " · clique pour ouvrir : " + lks2.map(nomLien).join(" ou "); d.onclick = e => ouvrirLiens(lks2, e); }
       tl.append(d);
     });
     rows.forEach((r, i) => {
@@ -958,9 +976,10 @@ function tick() {
       if (r.pause) li.classList.add("pause");
       li.innerHTML = `<time>${fmt(r.start)}</time><span class="dot"></span><span class="txt"></span>`;
       li.querySelector(".txt").textContent = r.label;
-      const lk = !r.pause && lienDe(r.label);
-      if (lk){ const ic = document.createElement("span"); ic.className = "lk-i"; ic.innerHTML = ico(lk.type); ic.title = "Ouvrir : " + nomLien(lk); li.querySelector(".txt").append(ic);
-        li.classList.add("a-lien"); li.title = "Clique pour ouvrir : " + nomLien(lk); li.onclick = () => ouvrirLien(lk); }
+      const lks = r.pause ? [] : liensDe(r.label);
+      if (lks.length){ lks.forEach(c => { const ic = document.createElement("span"); ic.className = "lk-i"; ic.innerHTML = ico(c.type); ic.title = "Ouvrir : " + nomLien(c);
+          ic.onclick = e => { e.stopPropagation(); ouvrirLien(c); }; li.querySelector(".txt").append(ic); });
+        li.classList.add("a-lien"); li.title = "Clique pour ouvrir : " + lks.map(nomLien).join(" ou "); li.onclick = e => ouvrirLiens(lks, e); }
       if (i === nowIdx) { const sp = document.createElement("span"); sp.className = "left"; sp.id = "v-left"; li.querySelector(".txt").append(sp); }
       list.append(li);
     });
@@ -996,7 +1015,7 @@ function tick() {
     /* bouton « Ouvrir » : contenu lié à l'activité en cours (et à la suivante) */
     const rA = cur && rows[nowIdx] && !rows[nowIdx].pause ? rows[nowIdx] : null;
     const rB = cur ? rows[nowIdx + 1] : (next && rows.length ? (rows.find(r => !/^Accueil/.test(r.label) && !r.pause) || rows[0]) : null);
-    majGo($("v-go"), rA && lienDe(rA.label)); majGo($("v-go2"), rB && !rB.pause && lienDe(rB.label));
+    majGo($("v-go"), rA ? liensDe(rA.label) : []); majGo($("v-go2"), rB && !rB.pause ? liensDe(rB.label) : []);
   }
   {
     const mk = $("v-tlmark");
@@ -1598,7 +1617,7 @@ function sorteFichier(nom, mime){
   return "autre";
 }
 /* Ménage : retire les fichiers qui ne sont plus liés à aucune activité */
-function menageFichiers(){ const garder = new Set(Object.values(cfg.liens || {}).filter(c => c && c.type === "fichier").map(c => c.id));
+function menageFichiers(){ const garder = new Set(Object.values(cfg.liens || {}).flatMap(liste).filter(c => c.type === "fichier").map(c => c.id));
   fCles().then(ks => (ks || []).forEach(k => { if (!garder.has(k)) fEnlever(k); })).catch(() => {}); }
 function ouvrirFichier(c){
   fLire(c.id).then(f => {
@@ -1619,7 +1638,24 @@ function ouvrirFichier(c){
 }
 let LIENS_T = {}, CATAL = null;
 const cleLien = l => String(l || "").replace(/ \(suite\)$/, "").replace(/^\d+\s*(?:min)?\s*\|\s*/, "").trim().toLowerCase();
-const lienDe = label => (cfg.liens || {})[cleLien(label)] || null;
+/* Une activité peut avoir plusieurs contenus (ex. une vidéo et une page du livre) : on garde une liste */
+const liste = v => !v ? [] : Array.isArray(v) ? v.filter(Boolean) : [v];
+const MAX_LIENS = 4;
+const liensDe = label => liste((cfg.liens || {})[cleLien(label)]);
+const lienDe = label => liensDe(label)[0] || null;
+/* petit menu pour choisir quand une activité a plusieurs contenus */
+function menuLiens(lks, x, y){
+  let m = $("lk-menu"); if (!m){ m = document.createElement("div"); m.id = "lk-menu"; m.className = "lk-menu"; document.body.append(m);
+    document.addEventListener("pointerdown", e => { if (!m.hidden && !m.contains(e.target)) m.hidden = true; }, true);
+    document.addEventListener("keydown", e => { if (e.key === "Escape") m.hidden = true; }, true); }
+  m.innerHTML = '<div class="lk-menu-t">Ouvrir</div>';
+  lks.forEach((c, i) => { const b = document.createElement("button"); b.type = "button"; b.innerHTML = ico(c.type) + "<span></span><kbd>" + (i + 1) + "</kbd>"; b.querySelector("span").textContent = nomLien(c);
+    b.onclick = () => { m.hidden = true; ouvrirLien(c); }; m.append(b); });
+  m.hidden = false; const r = m.getBoundingClientRect();
+  m.style.left = Math.max(8, Math.min(innerWidth - r.width - 8, x - r.width / 2)) + "px"; m.style.top = Math.max(8, Math.min(innerHeight - r.height - 8, y - r.height - 12)) + "px";
+  setTimeout(() => { const f = m.querySelector("button"); if (f) f.focus(); }, 20);
+}
+function ouvrirLiens(lks, e){ if (!lks.length) return; if (lks.length === 1) { ouvrirLien(lks[0]); return; } menuLiens(lks, e ? e.clientX : innerWidth / 2, e ? e.clientY : innerHeight / 2); }
 function nomLien(c){
   if (!c) return "";
   if (c.type === "livre") return (c.titre || "Livre") + (c.page > 1 ? " · page " + c.page : "");
@@ -1631,9 +1667,26 @@ function nomLien(c){
   if (c.type === "video") return "Vidéo" + (c.nom ? " · " + c.nom : "") + (c.start ? " (à " + dureeTxt(c.start) + ")" : "");
   return "";
 }
-function majGo(b, c){ if (!b) return; if (!c){ b.hidden = true; b.onclick = null; return; }
-  const t = "Ouvrir : " + nomLien(c); if (b.dataset.t !== t){ b.dataset.t = t; b.innerHTML = ico(c.type) + "<span></span>"; b.lastChild.textContent = t; b.title = t + " (touche O)"; }
-  b.hidden = false; b.onclick = () => ouvrirLien(c); }
+/* Boutons « Ouvrir » de la carte : un bouton par contenu (touche O pour le premier, 2 pour le deuxième…) */
+/* nom court pour les boutons côte à côte (l'icône dit déjà la sorte de contenu) */
+function nomCourt(c){
+  if (c.type === "livre") return "Livre" + (c.page > 1 ? " · p. " + c.page : "");
+  if (c.type === "video") return c.nom && c.nom.length < 28 ? c.nom : "Vidéo";
+  if (c.type === "tableau") return "Tableau blanc";
+  if (c.type === "plan") return "Plan";
+  return nomLien(c);
+}
+function majGo(b, lks){ if (!b) return; lks = liste(lks);
+  if (!b.parentNode.classList.contains("now-gos")){ const w = document.createElement("div"); w.className = "now-gos"; b.parentNode.insertBefore(w, b); w.append(b); }
+  const w = b.parentNode, cle = JSON.stringify(lks);
+  if (w.dataset.k === cle) return; w.dataset.k = cle;
+  w.querySelectorAll(".now-go.plus").forEach(x => x.remove());
+  if (!lks.length){ b.hidden = true; b.onclick = null; w.hidden = true; return; }
+  w.hidden = false;
+  const remplir = (btn, c, i) => { const t = lks.length > 1 ? nomCourt(c) : "Ouvrir : " + nomLien(c); btn.innerHTML = ico(c.type) + "<span></span>"; btn.lastChild.textContent = t; btn.title = "Ouvrir : " + nomLien(c) + (b.id === "v-go" ? " (touche " + (i ? i + 1 : "O") + ")" : ""); btn.hidden = false; btn.onclick = () => ouvrirLien(c); };
+  remplir(b, lks[0], 0);
+  lks.slice(1).forEach((c, i) => { const nb = document.createElement("button"); nb.type = "button"; nb.className = b.className + " plus"; remplir(nb, c, i + 1); w.append(nb); });
+}
 function ouvrirLien(c){
   if (!c) return;
   if (c.type === "minuterie"){ minuterie(c.min, c.nom); return; }
@@ -1658,12 +1711,13 @@ function renderLiens(){
   const acts = activitesPrep();
   if (!acts.length){ box.innerHTML = '<span class="lk-note">Écris d\'abord tes activités à l\'étape 3.</span>'; return; }
   acts.forEach(label => {
-    const k = cleLien(label), c = LIENS_T[k], row = document.createElement("div"); row.className = "lk-row";
-    row.innerHTML = '<div class="lk-top"><span class="lk-nom"></span></div>'; row.querySelector(".lk-nom").textContent = label;
-    const top = row.querySelector(".lk-top");
-    if (c){ const ch = document.createElement("span"); ch.className = "lk-chip"; ch.innerHTML = '<span></span><button type="button" aria-label="Retirer">✕</button>';
-      ch.firstChild.textContent = nomLien(c); ch.insertAdjacentHTML("afterbegin", ico(c.type)); ch.lastChild.onclick = () => { delete LIENS_T[k]; renderLiens(); }; top.append(ch); }
-    else { const b = document.createElement("button"); b.type = "button"; b.className = "lk-add"; b.textContent = "＋ Ajouter"; b.onclick = () => choix(row, label); top.append(b); }
+    const k = cleLien(label), lks = liste(LIENS_T[k]), row = document.createElement("div"); row.className = "lk-row";
+    row.innerHTML = '<div class="lk-top"><span class="lk-nom"></span><span class="lk-chips"></span></div>'; row.querySelector(".lk-nom").textContent = label;
+    const top = row.querySelector(".lk-chips");
+    lks.forEach((c, i) => { const ch = document.createElement("span"); ch.className = "lk-chip"; ch.innerHTML = '<span></span><button type="button" aria-label="Retirer">✕</button>';
+      ch.firstChild.textContent = nomLien(c); ch.insertAdjacentHTML("afterbegin", ico(c.type)); ch.title = nomLien(c);
+      ch.lastChild.onclick = () => { const n = liste(LIENS_T[k]).filter((_, j) => j !== i); if (n.length) LIENS_T[k] = n; else delete LIENS_T[k]; renderLiens(); }; top.append(ch); });
+    if (lks.length < MAX_LIENS){ const b = document.createElement("button"); b.type = "button"; b.className = "lk-add"; b.textContent = lks.length ? "＋ Un autre" : "＋ Ajouter"; b.onclick = () => choix(row, label); top.append(b); }
     box.append(row);
   });
 }
@@ -1682,7 +1736,7 @@ function choix(row, label){
     + (enBiblio ? "" : '<p class="lk-note">Pour les livres, schémas et plans, ouvre ce tableau de bord depuis la bibliothèque.</p>')
     + '<div class="lk-form" hidden></div>';
   row.append(z);
-  const f = z.querySelector(".lk-form"), fini = c => { LIENS_T[k] = c; renderLiens(); };
+  const f = z.querySelector(".lk-form"), fini = c => { LIENS_T[k] = [...liste(LIENS_T[k]), c]; renderLiens(); };
   const annuler = '<button type="button" data-x>Annuler</button>';
   z.querySelectorAll(".lk-tuile").forEach(t => t.onclick = () => {
     z.querySelectorAll(".lk-tuile").forEach(x => x.style.borderColor = x === t ? "var(--water)" : ""); f.hidden = false; const ty = t.dataset.t;
@@ -1871,7 +1925,8 @@ document.addEventListener("keydown", e => {
   }
   if (e.key === "r" || e.key === "R") toggleAnswer();
   if ((e.key === "l" || e.key === "L") && !$("b-livre").hidden) revenirLivre();
-  if ((e.key === "o" || e.key === "O") && !$("v-go").hidden) $("v-go").click();   /* O = ouvrir le contenu de l'activité en cours */
+  if ((e.key === "o" || e.key === "O") && !$("v-go").hidden) $("v-go").click();
+  if (/^[2-4]$/.test(e.key)) { const bs = [...$("v-go").parentNode.querySelectorAll(".now-go:not([hidden])")]; if (bs[+e.key - 1]) bs[+e.key - 1].click(); }   /* O = ouvrir le contenu de l'activité en cours */
 });
 
 // Boutons qui s'effacent quand la souris ne bouge pas
