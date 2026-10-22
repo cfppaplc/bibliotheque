@@ -99,6 +99,7 @@
   .qn-detail ol{margin:0 0 4px;padding-left:22px}.qn-detail li{margin:0 0 7px;line-height:1.45}
   .qn-hist{list-style:none;padding:0!important;margin:0}.qn-hist li{display:flex;gap:10px;color:#c8c8cc;font-size:.9rem}.qn-hist .d{flex:none;color:#8a8a90;min-width:118px}
   .qn-nv{font-size:.72rem;color:#a9a9ae;margin-left:6px}
+  .qn-img{display:block;max-width:100%;height:auto;margin:8px 0 4px;border-radius:8px;border:1px solid #2f2f33;box-shadow:0 4px 14px rgba(0,0,0,.4)}
   .qn-it p{margin:0;line-height:1.45}
   .qn-it p button{all:unset;cursor:pointer;color:#8fb8ff;font-weight:600;margin-left:6px}
   .qn-it p button:hover{text-decoration:underline}
@@ -5899,7 +5900,7 @@ return {matrice:function(texte){var q=new QRCode(-1,L.M);q.addData(texte);q.make
       const detail = form.length || hist.length;
       return `<div class="qn-it"><span class="qn-tag ${esc(n.type)}">${lab[n.type] || ""}</span><div class="qn-corps">${n.titre ? `<div class="qn-titre">${esc(n.titre)}${hist.length > 1 ? `<span class="qn-nv">${hist.length} mises à jour</span>` : ""}</div>` : ""}<p>${esc(n.texte)}${l ? ` <button type="button" data-ouvrir="${esc(l.fichier)}">Ouvrir le livre</button>` : ""}</p></div>`
         + (detail ? `<button type="button" class="qn-plus" aria-expanded="false" aria-controls="${id}" title="Mini-formation">+</button><div class="qn-detail" id="${id}" hidden>`
-          + (form.length ? `<h3>Mini-formation</h3><ol>${form.map(f => `<li>${esc(f)}</li>`).join("")}</ol>` : "")
+          + (form.length ? `<h3>Mini-formation</h3><ol>${form.map(f => typeof f === "string" ? `<li>${esc(f)}</li>` : `<li>${esc(f.t)}${f.img ? `<img class="qn-img" src="${esc(f.img)}" alt="" loading="lazy">` : ""}</li>`).join("")}</ol>` : "")
           + (hist.length ? `<h3 style="margin-top:12px">Historique</h3><ul class="qn-hist">${hist.map(v => `<li><span class="d">${esc(dateFr(v.date))}</span><span>${esc(v.texte)}</span></li>`).join("")}</ul>` : "") + `</div>` : "")
         + `</div>`; }).join("")).join("");
     $("#qnListe").querySelectorAll(".qn-plus").forEach(b => b.onclick = () => { const d = document.getElementById(b.getAttribute("aria-controls")), o = d.hidden; d.hidden = !o; b.setAttribute("aria-expanded", String(o)); b.textContent = o ? "−" : "+"; b.title = o ? "Masquer" : "Mini-formation"; });

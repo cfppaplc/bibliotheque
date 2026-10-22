@@ -5,12 +5,30 @@
   "titre": "Schéma électrique en échelle (tableau blanc)",
   "texte": "Dessine et anime des schémas en échelle sur le quadrillé : rails L1/L2, une trentaine de symboles rangés par catégories, fils aimantés aux bornes, et une animation où le courant circule de L1 vers L2.",
   "formation": [
-   "Ouvre le tableau blanc, puis bouton Fond jusqu'à « Quadrillé (schéma électrique en échelle) ».",
-   "Bouton Objets (le cube) : la palette « Schéma électrique » s'ouvre. Glisse la poignée ⠿ pour la déplacer, ⌄ pour la replier; touche le titre d'une catégorie pour l'ouvrir ou la fermer.",
-   "« Échelle L1/L2 » : glisse un rectangle pour tracer les rails. Pour changer sa taille plus tard : touche L1 ou L2, puis glisse le carré bleu en bas à droite (ou Largeur / Hauteur − +).",
-   "Choisis un symbole et touche un échelon. Quand il est sélectionné : case Repère (CR1, M, PB2…), NO / NF, type d'interrupteur (SPST, SPDT, DPST, DPDT) ou délai d'un relais temporisé.",
-   "Pour relier : glisse d'un point bleu à l'autre. Le fil fait un coude tout seul, et un point de jonction s'ajoute quand tu arrives au milieu d'un autre fil. Gomme pour effacer un fil, ↶ pour annuler.",
-   "▶ Animer le schéma : garde enfoncé un bouton-poussoir, clique un interrupteur pour l'actionner. Rouge = L1, bleu = L2, points jaunes = courant. Une bobine change tous les contacts qui portent son repère (contact de maintien)."
+   {
+    "t": "Ouvre le tableau blanc, puis bouton Fond jusqu'à « Quadrillé (schéma électrique en échelle) ».",
+    "img": "nouveautes/elec-fond.jpg"
+   },
+   {
+    "t": "Bouton Objets (le cube) : la palette « Schéma électrique » s'ouvre. Glisse la poignée ⠿ pour la déplacer, ⌄ pour la replier; touche le titre d'une catégorie pour l'ouvrir ou la fermer.",
+    "img": "nouveautes/elec-palette.jpg"
+   },
+   {
+    "t": "« Échelle L1/L2 » : glisse un rectangle pour tracer les rails. Pour changer sa taille plus tard : touche L1 ou L2, puis glisse le carré bleu en bas à droite (ou Largeur / Hauteur − +).",
+    "img": "nouveautes/elec-echelle.jpg"
+   },
+   {
+    "t": "Choisis un symbole et touche un échelon. Quand il est sélectionné : case Repère (CR1, M, PB2…), NO / NF, type d'interrupteur (SPST, SPDT, DPST, DPDT) ou délai d'un relais temporisé.",
+    "img": "nouveautes/elec-reglages.jpg"
+   },
+   {
+    "t": "Pour relier : glisse d'un point bleu à l'autre. Le fil fait un coude tout seul, et un point de jonction s'ajoute quand tu arrives au milieu d'un autre fil. Gomme pour effacer un fil, ↶ pour annuler.",
+    "img": "nouveautes/elec-relier.jpg"
+   },
+   {
+    "t": "▶ Animer le schéma : garde enfoncé un bouton-poussoir, clique un interrupteur pour l'actionner. Rouge = L1, bleu = L2, points jaunes = courant. Une bobine change tous les contacts qui portent son repère (contact de maintien).",
+    "img": "nouveautes/elec-animer.jpg"
+   }
   ],
   "versions": [
    {
@@ -45,10 +63,19 @@
   "titre": "Barre du crayon et du tableau blanc",
   "texte": "Une seule ligne d'outils, plus simple pour débuter. Rien n'a été retiré : les outils moins utilisés sont rangés dans deux menus.",
   "formation": [
-   "Rond de couleur : choisis la couleur, un surligneur ou l'épaisseur du trait. Le menu se ferme dès que tu choisis.",
-   "Sur la ligne : forme (trait libre, ligne, flèche, rectangle, ellipse), texte, objets, gomme, annuler, fond.",
+   {
+    "t": "Rond de couleur : choisis la couleur, un surligneur ou l'épaisseur du trait. Le menu se ferme dès que tu choisis.",
+    "img": "nouveautes/barre-couleur.jpg"
+   },
+   {
+    "t": "Sur la ligne : forme (trait libre, ligne, flèche, rectangle, ellipse), texte, objets, gomme, annuler, fond.",
+    "img": "nouveautes/barre.jpg"
+   },
    "Le bouton Objets n'apparaît que sur le quadrillé (schéma électrique) et le plan isométrique (plomberie).",
-   "⋯ Plus : rétablir, tout effacer, zoom, déplacer le tableau, tableau précédent / suivant / nouveau, enregistrer en PNG.",
+   {
+    "t": "⋯ Plus : rétablir, tout effacer, zoom, déplacer le tableau, tableau précédent / suivant / nouveau, enregistrer en PNG.",
+    "img": "nouveautes/barre-plus.jpg"
+   },
    "⌄ replie la barre en petit bouton; ▯ l'ancre sur le côté droit de l'écran."
   ],
   "versions": [
@@ -71,9 +98,18 @@
   "formation": [
    "Dans la bibliothèque, clique la couverture, puis « Lire » (ou « Ouvrir le livre » ci-dessus).",
    "Flèches ← → (ou les boutons en bas) pour tourner les pages; tape un numéro dans la case pour sauter à une page.",
-   "Touche M (ou le bouton ☰) : table des matières, avec une icône par type de section.",
-   "Bouton ✓ (touche R) : les réponses apparaissent une à la fois, pas à pas, sur la page affichée.",
-   "Bouton QR (touche Q) : les élèves scannent et le livre s'ouvre à la même page sur leur téléphone."
+   {
+    "t": "Touche M (ou le bouton ☰) : table des matières, avec une icône par type de section.",
+    "img": "nouveautes/livre-tdm.jpg"
+   },
+   {
+    "t": "Bouton ✓ (touche R) : les réponses apparaissent une à la fois, pas à pas, sur la page affichée.",
+    "img": "nouveautes/livre-barre.jpg"
+   },
+   {
+    "t": "Bouton QR (touche Q) : les élèves scannent et le livre s'ouvre à la même page sur leur téléphone.",
+    "img": "nouveautes/livre-qr.jpg"
+   }
   ]
  },
  {
@@ -85,9 +121,18 @@
   "formation": [
    "Dans la bibliothèque, clique la couverture, puis « Lire » (ou « Ouvrir le livre » ci-dessus).",
    "Flèches ← → (ou les boutons en bas) pour tourner les pages; tape un numéro dans la case pour sauter à une page.",
-   "Touche M (ou le bouton ☰) : table des matières, avec une icône par type de section.",
-   "Bouton ✓ (touche R) : les réponses apparaissent une à la fois, pas à pas, sur la page affichée.",
-   "Bouton QR (touche Q) : les élèves scannent et le livre s'ouvre à la même page sur leur téléphone.",
+   {
+    "t": "Touche M (ou le bouton ☰) : table des matières, avec une icône par type de section.",
+    "img": "nouveautes/livre-tdm.jpg"
+   },
+   {
+    "t": "Bouton ✓ (touche R) : les réponses apparaissent une à la fois, pas à pas, sur la page affichée.",
+    "img": "nouveautes/livre-barre.jpg"
+   },
+   {
+    "t": "Bouton QR (touche Q) : les élèves scannent et le livre s'ouvre à la même page sur leur téléphone.",
+    "img": "nouveautes/livre-qr.jpg"
+   },
    "Le formatif final est à la fin du livre : ouvre la table des matières (M) pour y aller directement."
   ]
  },
@@ -100,9 +145,18 @@
   "formation": [
    "Dans la bibliothèque, clique la couverture, puis « Lire » (ou « Ouvrir le livre » ci-dessus).",
    "Flèches ← → (ou les boutons en bas) pour tourner les pages; tape un numéro dans la case pour sauter à une page.",
-   "Touche M (ou le bouton ☰) : table des matières, avec une icône par type de section.",
-   "Bouton ✓ (touche R) : les réponses apparaissent une à la fois, pas à pas, sur la page affichée.",
-   "Bouton QR (touche Q) : les élèves scannent et le livre s'ouvre à la même page sur leur téléphone.",
+   {
+    "t": "Touche M (ou le bouton ☰) : table des matières, avec une icône par type de section.",
+    "img": "nouveautes/livre-tdm.jpg"
+   },
+   {
+    "t": "Bouton ✓ (touche R) : les réponses apparaissent une à la fois, pas à pas, sur la page affichée.",
+    "img": "nouveautes/livre-barre.jpg"
+   },
+   {
+    "t": "Bouton QR (touche Q) : les élèves scannent et le livre s'ouvre à la même page sur leur téléphone.",
+    "img": "nouveautes/livre-qr.jpg"
+   },
    "Pour trouver le simulateur de panneau d'alarme : tape « simulateur » dans la recherche de la bibliothèque."
   ]
  },
@@ -124,9 +178,18 @@
   "titre": "Recherche, filtre et code QR",
   "texte": "Recherche dans le texte de tous les livres, filtre par programme (DEP 5211 · DEP 5333) et code QR pour ouvrir le livre sur le téléphone des élèves.",
   "formation": [
-   "Tape un mot dans la barre de recherche : les pages des livres qui en parlent s'affichent; clique un résultat pour ouvrir le livre à cette page.",
-   "Boutons DEP 5211 et DEP 5333 en haut : seuls les livres de ce programme restent, classés par compétence.",
-   "Dans un livre, bouton QR (touche Q) : projette le code, les élèves le scannent et arrivent à la même page."
+   {
+    "t": "Tape un mot dans la barre de recherche : les pages des livres qui en parlent s'affichent; clique un résultat pour ouvrir le livre à cette page.",
+    "img": "nouveautes/recherche.jpg"
+   },
+   {
+    "t": "Boutons DEP 5211 et DEP 5333 en haut : seuls les livres de ce programme restent, classés par compétence.",
+    "img": "nouveautes/filtre.jpg"
+   },
+   {
+    "t": "Dans un livre, bouton QR (touche Q) : projette le code, les élèves le scannent et arrivent à la même page.",
+    "img": "nouveautes/livre-qr.jpg"
+   }
   ],
   "versions": [
    {
@@ -149,8 +212,14 @@
   "titre": "Table des matières et réponses pas à pas",
   "texte": "Même table des matières dans tous les livres, avec des icônes qui correspondent au type de section, et réponses pas à pas partout où le livre a un corrigé.",
   "formation": [
-   "Touche M (ou ☰) dans un livre : la table des matières s'ouvre; clique une section pour y aller.",
-   "Bouton ✓ (touche R) : chaque clic montre la réponse suivante de la page, pour corriger avec le groupe une question à la fois.",
+   {
+    "t": "Touche M (ou ☰) dans un livre : la table des matières s'ouvre; clique une section pour y aller.",
+    "img": "nouveautes/livre-tdm.jpg"
+   },
+   {
+    "t": "Bouton ✓ (touche R) : chaque clic montre la réponse suivante de la page, pour corriger avec le groupe une question à la fois.",
+    "img": "nouveautes/livre-barre.jpg"
+   },
    "Si le bouton ✓ est grisé, la page n'a pas de réponse."
   ]
  },
@@ -160,7 +229,10 @@
   "titre": "Plans techniques",
   "texte": "Visionneuse de plans pour le tableau interactif et trois dossiers d'exercice (maison, duplex, bâtiment commercial) de 11 feuilles chacun, avec coupe A-302.",
   "formation": [
-   "Bouton « Plans » en haut de la bibliothèque : choisis un dossier.",
+   {
+    "t": "Bouton « Plans » en haut de la bibliothèque : choisis un des trois dossiers d'exercice, ou ouvre ton propre plan (PDF ou image, tu peux aussi le glisser dans la fenêtre).",
+    "img": "nouveautes/plans.jpg"
+   },
    "Chaque dossier a 11 feuilles : plans, élévations, coupe longitudinale, coupe de mur type et légende des matériaux (A-302).",
    "Zoome et déplace la feuille au tableau, puis annote avec le crayon."
   ],
@@ -181,9 +253,12 @@
   "titre": "Accueil de classe",
   "texte": "Tableau d'accueil animé pour le début de période : date, période, déroulement et timeline lisible du fond de la classe.",
   "formation": [
-   "Bouton « Accueil de classe » en haut de la bibliothèque pour l'ouvrir.",
-   "Panneau de l'enseignant : règle la période et le déroulement.",
-   "Bouton plein écran pour la projection; le bouton Bibliothèque de la barre te ramène aux livres."
+   {
+    "t": "Bouton « Accueil de classe » en haut de la bibliothèque pour l'ouvrir.",
+    "img": "nouveautes/accueil.jpg"
+   },
+   "« Préparer le cours » : le panneau de l'enseignant, pour régler la période et le déroulement.",
+   "« Plein écran » pour la projection; « Bibliothèque » te ramène aux livres."
   ],
   "versions": [
    {
