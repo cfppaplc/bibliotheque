@@ -325,6 +325,51 @@ header { grid-column: 1 / -1; display: flex; align-items: center; justify-conten
   .editing [data-w] { animation: none; outline: 2px dashed var(--muted); outline-offset: 4px; }
   .bgfx .flow, .bgfx .gauge-needle, .bgfx .fan, .water::after, .step.now .dot, .bgx * { animation: none !important; }
 }
+
+/* ===== Contenus liés aux activités (livre, schéma, plan, minuterie) ===== */
+.opt { font: 500 13px var(--body); color: var(--muted); margin-left: 6px; }
+.lk-aide { display: block; color: var(--muted); font-size: 13px; line-height: 1.4; margin: 2px 0 8px; }
+.lk-liste { display: flex; flex-direction: column; gap: 8px; }
+.lk-row { border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; background: var(--bg); }
+.lk-top { display: flex; align-items: center; gap: 8px; }
+.lk-nom { flex: 1; min-width: 0; font: 600 15px var(--body); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lk-add { font: 600 14px var(--body); color: var(--water); background: none; border: 1px dashed var(--water); border-radius: 8px; padding: 6px 10px; cursor: pointer; white-space: nowrap; }
+.lk-chip { display: inline-flex; align-items: center; gap: 6px; max-width: 60%; font: 600 14px var(--body); color: var(--ink); background: color-mix(in srgb, var(--water) 18%, var(--surface)); border: 1px solid color-mix(in srgb, var(--water) 55%, transparent); border-radius: 999px; padding: 5px 6px 5px 12px; }
+.lk-chip span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lk-chip button { width: 24px; height: 24px; border-radius: 50%; border: 0; background: color-mix(in srgb, var(--ink) 15%, transparent); color: var(--ink); cursor: pointer; font-size: 14px; flex: none; }
+.lk-choix { margin-top: 10px; }
+.lk-tuiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 6px; }
+.lk-tuile { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 6px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font: 600 13px var(--body); cursor: pointer; text-align: center; }
+.lk-tuile b { font-size: 24px; line-height: 1; }
+.lk-tuile:hover, .lk-tuile:focus-visible { border-color: var(--water); outline: none; }
+.lk-tuile:disabled { opacity: .45; cursor: default; }
+.lk-form { display: grid; gap: 8px; margin-top: 8px; }
+.lk-form select, .lk-form input { font: 15px var(--body); color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; }
+.lk-form .lk-pg { display: flex; align-items: center; gap: 8px; } .lk-form .lk-pg input { width: 90px; }
+.lk-form .lk-ok { display: flex; gap: 6px; flex-wrap: wrap; }
+.lk-form .lk-ok button { font: 600 14px var(--body); border-radius: 8px; padding: 8px 12px; cursor: pointer; border: 1px solid var(--line); background: var(--surface); color: var(--ink); }
+.lk-form .lk-ok button.prim { background: var(--water); border-color: var(--water); color: #fff; }
+.lk-note { color: var(--muted); font-size: 13px; }
+/* bouton « Ouvrir » sur la carte MAINTENANT / ENSUITE */
+.now-go { align-self: flex-start; display: inline-flex; align-items: center; gap: calc(var(--u) * 12); margin-top: calc(var(--u) * 8); font: 700 calc(var(--u) * 30) var(--display); letter-spacing: .02em; color: #fff; background: var(--water); border: 0; border-radius: calc(var(--u) * 12); padding: calc(var(--u) * 12) calc(var(--u) * 24); cursor: pointer; box-shadow: 0 6px 18px rgba(0,0,0,.25); max-width: 100%; }
+.now-go span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.now-go:hover { filter: brightness(1.08); } .now-go[hidden] { display: none; }
+.now-go.petit { font-size: calc(var(--u) * 22); padding: calc(var(--u) * 8) calc(var(--u) * 16); background: color-mix(in srgb, var(--water) 70%, var(--surface)); }
+.step .lk-i { margin-left: .4em; font-size: .85em; }
+.seg .seg-lk { position: absolute; top: calc(var(--u) * 6); right: calc(var(--u) * 8); font-size: calc(var(--u) * 24); line-height: 1; filter: grayscale(.2); }
+.seg.a-lien { cursor: pointer; } .seg.a-lien:hover { outline: 2px solid var(--water); outline-offset: 2px; }
+.step.a-lien { cursor: pointer; } .step.a-lien:hover .txt { text-decoration: underline; text-decoration-color: var(--water); }
+/* minuterie */
+.minu { position: fixed; inset: 0; z-index: 40; display: flex; align-items: center; justify-content: center; background: color-mix(in srgb, var(--bg) 82%, transparent); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+.minu[hidden] { display: none; }
+.minu-c { background: var(--surface); border: 1px solid var(--line); border-radius: 24px; padding: calc(var(--u) * 40) calc(var(--u) * 60); text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,.4); }
+.minu-l { font: 700 calc(var(--u) * 34) var(--display); color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+.minu-t { font: 700 calc(var(--u) * 260) var(--display); font-variant-numeric: tabular-nums; line-height: 1; color: var(--ink); margin: calc(var(--u) * 10) 0 calc(var(--u) * 20); }
+.minu.fin .minu-t { color: var(--copper); animation: minuFin 1s steps(2) infinite; }
+@keyframes minuFin { 50% { opacity: .25; } }
+.minu-b { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+.minu-b button { font: 700 calc(var(--u) * 28) var(--display); border-radius: 12px; padding: calc(var(--u) * 10) calc(var(--u) * 24); border: 1px solid var(--line); background: var(--bg); color: var(--ink); cursor: pointer; }
+.minu-b button.prim { background: var(--water); border-color: var(--water); color: #fff; }
 /* ===== Commandes : même style que la barre d'outils des livres de la bibliothèque ===== */
 .tools, .menu, .comppick, .dock, .sheet, .bgpick {
   --surface: #181818; --bg: #111113; --ink: #f1f1f2; --muted: #a9a9ae; --line: #2f2f33; --copper: #e50914; --water: #8fb8ff; color-scheme: dark;
@@ -406,8 +451,8 @@ header { grid-column: 1 / -1; display: flex; align-items: center; justify-conten
 
   <aside class="side">
     <div class="panel now-card" data-w="maintenant">
-      <div class="now-blk"><span class="now-lbl">Maintenant</span><div class="now-txt" id="v-now">—</div><div class="now-time" id="v-nowt"></div></div>
-      <div class="now-blk nxt" id="v-nextblk"><span class="now-lbl">Ensuite</span><div class="next-txt" id="v-next"></div><div class="now-time" id="v-nextt"></div></div>
+      <div class="now-blk"><span class="now-lbl">Maintenant</span><div class="now-txt" id="v-now">—</div><div class="now-time" id="v-nowt"></div><button class="now-go" id="v-go" type="button" hidden></button></div>
+      <div class="now-blk nxt" id="v-nextblk"><span class="now-lbl">Ensuite</span><div class="next-txt" id="v-next"></div><div class="now-time" id="v-nextt"></div><button class="now-go petit" id="v-go2" type="button" hidden></button></div>
     </div>
     <div class="panel" data-w="deroulement">
       <h2 class="label">Déroulement de la période</h2>
@@ -490,6 +535,9 @@ header { grid-column: 1 / -1; display: flex; align-items: center; justify-conten
       <ul class="ai-why" id="ai-why" hidden></ul>
       <ol class="preview" id="f-preview" aria-label="Aperçu de l'horaire du matin"></ol>
       </details></div>
+    <div class="field"><span class="step-q"><span class="num">4</span>Ouvrir quelque chose pendant une activité? <small class="opt">facultatif</small></span>
+      <small class="lk-aide">Choisis une page de livre, un schéma, un plan ou une minuterie pour une activité. En classe, un bouton « Ouvrir » apparaît quand l'activité commence.</small>
+      <div class="lk-liste" id="f-liens"></div></div>
     <div class="sheet-actions">
       <button class="btn primary" type="submit">Afficher au tableau</button>
       <button class="btn" type="button" id="b-prep-cancel">Annuler</button>
@@ -817,6 +865,8 @@ function tick() {
       d.firstChild.textContent = r.pause ? "" : cesure(r.label.replace(/ \(suite\)$/, "").split(/\s[:—–-]\s/)[0]);
       d.lastChild.textContent = r.pause ? "" : fmt(r.start);
       d.title = fmt(r.start) + " · " + r.label;
+      const lk2 = !r.pause && lienDe(r.label);
+      if (lk2){ const ic = document.createElement("span"); ic.className = "seg-lk"; ic.textContent = ICO_LIEN[lk2.type] || "▶"; d.append(ic); d.classList.add("a-lien"); d.title += " · clique pour ouvrir : " + nomLien(lk2); d.onclick = () => ouvrirLien(lk2); }
       tl.append(d);
     });
     rows.forEach((r, i) => {
@@ -828,6 +878,9 @@ function tick() {
       if (r.pause) li.classList.add("pause");
       li.innerHTML = `<time>${fmt(r.start)}</time><span class="dot"></span><span class="txt"></span>`;
       li.querySelector(".txt").textContent = r.label;
+      const lk = !r.pause && lienDe(r.label);
+      if (lk){ const ic = document.createElement("span"); ic.className = "lk-i"; ic.textContent = ICO_LIEN[lk.type] || "▶"; ic.title = "Ouvrir : " + nomLien(lk); li.querySelector(".txt").append(ic);
+        li.classList.add("a-lien"); li.title = "Clique pour ouvrir : " + nomLien(lk); li.onclick = () => ouvrirLien(lk); }
       if (i === nowIdx) { const sp = document.createElement("span"); sp.className = "left"; sp.id = "v-left"; li.querySelector(".txt").append(sp); }
       list.append(li);
     });
@@ -860,6 +913,10 @@ function tick() {
       if (typeof fitSoon === "function") fitSoon();
     }
     $("v-nowt").textContent = nowSub; $("v-nextt").textContent = nextSub;
+    /* bouton « Ouvrir » : contenu lié à l'activité en cours (et à la suivante) */
+    const rA = cur && rows[nowIdx] && !rows[nowIdx].pause ? rows[nowIdx] : null;
+    const rB = cur ? rows[nowIdx + 1] : (next && rows.length ? (rows.find(r => !/^Accueil/.test(r.label) && !r.pause) || rows[0]) : null);
+    majGo($("v-go"), rA && lienDe(rA.label)); majGo($("v-go2"), rB && !rB.pause && lienDe(rB.label));
   }
   {
     const mk = $("v-tlmark");
@@ -1315,6 +1372,7 @@ function preview() {
   if (info.over || info.cut) { const w = document.createElement("li"); w.innerHTML = '<span class="warn">Les durées dépassent 3 h de cours : les derniers points ne tiennent pas.</span>'; w.style.display = "block"; $("f-preview").append(w); }
 }
 ["f-steps", "f-amStart"].forEach(id => $(id).addEventListener("input", preview));
+$("f-steps").addEventListener("input", () => { clearTimeout(window.__lkT); window.__lkT = setTimeout(renderLiens, 400); });
 
 // Flèches pour ajuster la durée de chaque activité (par bonds de 5 min)
 function renderDurs() {
@@ -1402,12 +1460,123 @@ function fillComps(prog) {
   const o = document.createElement("option"); o.value = "autre"; o.textContent = "Autre (écrire ci-dessous)"; sel.append(o);
 }
 $("f-prog").addEventListener("change", () => { fillComps($("f-prog").value); $("f-module").hidden = true; });
+
+// ---------- Contenus liés aux activités : page de livre, schéma, plan, tableau blanc, minuterie ----------
+const ICO_LIEN = { livre:"📖", schema:"⚡", plan:"📐", tableau:"⬜", minuterie:"⏱" };
+let LIENS_T = {}, CATAL = null;
+const cleLien = l => String(l || "").replace(/ \(suite\)$/, "").replace(/^\d+\s*(?:min)?\s*\|\s*/, "").trim().toLowerCase();
+const lienDe = label => (cfg.liens || {})[cleLien(label)] || null;
+function nomLien(c){
+  if (!c) return "";
+  if (c.type === "livre") return (c.titre || "Livre") + (c.page > 1 ? " · page " + c.page : "");
+  if (c.type === "schema") return c.nom || "Schéma";
+  if (c.type === "plan") return "Plans · " + (c.nom || "Dossier " + c.n);
+  if (c.type === "tableau") return "Tableau blanc" + (c.fond === "quad" ? " quadrillé" : c.fond === "iso" ? " isométrique" : "");
+  if (c.type === "minuterie") return "Minuterie " + c.min + " min";
+  return "";
+}
+function majGo(b, c){ if (!b) return; if (!c){ b.hidden = true; b.onclick = null; return; }
+  const t = "▶ Ouvrir : " + nomLien(c); if (b.dataset.t !== t){ b.dataset.t = t; b.innerHTML = "<span></span>"; b.firstChild.textContent = t; b.title = t + " (touche O)"; }
+  b.hidden = false; b.onclick = () => ouvrirLien(c); }
+function ouvrirLien(c){
+  if (!c) return;
+  if (c.type === "minuterie"){ minuterie(c.min, c.nom); return; }
+  if (window.parent !== window && CATAL){ try { window.parent.postMessage({ type:"accueil-ouvrir", contenu:c }, "*"); return; } catch(e){} }
+  /* tableau de bord ouvert seul : on passe par la bibliothèque */
+  if (c.type === "livre"){ location.href = "index.html?livre=" + encodeURIComponent(c.f) + (c.page > 1 ? "&page=" + c.page : ""); return; }
+  alert("Ouvre le tableau de bord depuis la bibliothèque (bouton « Accueil de classe ») pour ouvrir ce contenu.");
+}
+function demanderCatalogue(){ if (window.parent !== window){ try { window.parent.postMessage({ type:"accueil-catalogue?" }, "*"); } catch(e){} } }
+window.addEventListener("message", e => { if (e.source === window.parent && e.data && e.data.type === "accueil-catalogue"){ CATAL = e.data; if (!$("prep").hidden) renderLiens(); } });
+demanderCatalogue();
+function activitesPrep(){
+  const out = [];
+  $("f-steps").value.split("\n").forEach(l => { const t = l.trim(); if (!t) return; const m = t.match(/^(\d+)\s*(?:min)?\s*\|\s*(.+)$/), label = m ? m[2].trim() : t.replace(/^\|\s*/, "");
+    if (/^pause\b/i.test(label) || /^accueil\b|présences?\b/i.test(label)) return; if (!out.some(o => cleLien(o) === cleLien(label))) out.push(label); });
+  return out;
+}
+function renderLiens(){
+  const box = $("f-liens"); if (!box) return; box.innerHTML = "";
+  const acts = activitesPrep();
+  if (!acts.length){ box.innerHTML = '<span class="lk-note">Écris d\'abord tes activités à l\'étape 3.</span>'; return; }
+  acts.forEach(label => {
+    const k = cleLien(label), c = LIENS_T[k], row = document.createElement("div"); row.className = "lk-row";
+    row.innerHTML = '<div class="lk-top"><span class="lk-nom"></span></div>'; row.querySelector(".lk-nom").textContent = label;
+    const top = row.querySelector(".lk-top");
+    if (c){ const ch = document.createElement("span"); ch.className = "lk-chip"; ch.innerHTML = '<span></span><button type="button" aria-label="Retirer">✕</button>';
+      ch.firstChild.textContent = (ICO_LIEN[c.type] || "") + " " + nomLien(c); ch.lastChild.onclick = () => { delete LIENS_T[k]; renderLiens(); }; top.append(ch); }
+    else { const b = document.createElement("button"); b.type = "button"; b.className = "lk-add"; b.textContent = "＋ Ajouter"; b.onclick = () => choix(row, label); top.append(b); }
+    box.append(row);
+  });
+}
+function choix(row, label){
+  document.querySelectorAll(".lk-choix").forEach(x => x.remove());
+  const k = cleLien(label), z = document.createElement("div"); z.className = "lk-choix";
+  const enBiblio = !!CATAL;
+  z.innerHTML = '<div class="lk-tuiles">'
+    + '<button type="button" class="lk-tuile" data-t="livre"' + (enBiblio ? "" : " disabled") + '><b>📖</b>Page d\'un livre</button>'
+    + '<button type="button" class="lk-tuile" data-t="schema"' + (enBiblio ? "" : " disabled") + '><b>⚡</b>Schéma électrique</button>'
+    + '<button type="button" class="lk-tuile" data-t="plan"' + (enBiblio ? "" : " disabled") + '><b>📐</b>Plan technique</button>'
+    + '<button type="button" class="lk-tuile" data-t="tableau"' + (enBiblio ? "" : " disabled") + '><b>⬜</b>Tableau blanc</button>'
+    + '<button type="button" class="lk-tuile" data-t="minuterie"><b>⏱</b>Minuterie</button></div>'
+    + (enBiblio ? "" : '<p class="lk-note">Pour les livres, schémas et plans, ouvre ce tableau de bord depuis la bibliothèque.</p>')
+    + '<div class="lk-form" hidden></div>';
+  row.append(z);
+  const f = z.querySelector(".lk-form"), fini = c => { LIENS_T[k] = c; renderLiens(); };
+  const annuler = '<button type="button" data-x>Annuler</button>';
+  z.querySelectorAll(".lk-tuile").forEach(t => t.onclick = () => {
+    z.querySelectorAll(".lk-tuile").forEach(x => x.style.borderColor = x === t ? "var(--water)" : ""); f.hidden = false; const ty = t.dataset.t;
+    if (ty === "livre"){
+      f.innerHTML = '<select data-l>' + CATAL.livres.map(l => `<option value="${l.f}">${l.titre.replace(/</g, "&lt;")}${l.niveau ? " — " + l.niveau.replace(/</g, "&lt;") : ""}</option>`).join("") + '</select>'
+        + '<label class="lk-pg">Page <input type="number" min="1" value="1" data-p></label><div class="lk-ok"><button type="button" class="prim" data-v>Choisir</button>' + annuler + '</div>';
+      const sl = f.querySelector("[data-l]"), pi = f.querySelector("[data-p]"), maj = () => { const l = CATAL.livres.find(x => x.f === sl.value); pi.max = l && l.pages ? l.pages : ""; };
+      sl.onchange = maj; maj(); setTimeout(() => pi.select(), 30);
+      f.querySelector("[data-v]").onclick = () => { const l = CATAL.livres.find(x => x.f === sl.value); fini({ type:"livre", f:l.f, titre:l.titre, page:Math.max(1, parseInt(pi.value, 10) || 1) }); };
+    }
+    if (ty === "schema"){
+      f.innerHTML = '<select data-s><optgroup label="Modèles prêts à utiliser">' + CATAL.modeles.map(m => `<option value="m:${m.id}">${m.nom}</option>`).join("") + '</optgroup>'
+        + (CATAL.schemas.length ? '<optgroup label="Mes schémas">' + CATAL.schemas.map(m => `<option value="s:${m.id}">${m.nom.replace(/</g, "&lt;")}</option>`).join("") + '</optgroup>' : "")
+        + '<option value="v:">Un schéma vierge (quadrillé)</option></select><div class="lk-ok"><button type="button" class="prim" data-v>Choisir</button>' + annuler + '</div>';
+      f.querySelector("[data-v]").onclick = () => { const v = f.querySelector("[data-s]"), [t2, id] = v.value.split(":"), nom = v.options[v.selectedIndex].textContent;
+        fini(t2 === "m" ? { type:"schema", modele:id, nom } : t2 === "s" ? { type:"schema", sch:id, nom } : { type:"schema", nom:"Schéma vierge" }); };
+    }
+    if (ty === "plan"){
+      f.innerHTML = '<div class="lk-ok">' + CATAL.dossiers.map(([n, nom]) => `<button type="button" class="prim" data-n="${n}">${nom}</button>`).join("") + annuler + '</div>';
+      f.querySelectorAll("[data-n]").forEach(b => b.onclick = () => fini({ type:"plan", n:+b.dataset.n, nom:b.textContent }));
+    }
+    if (ty === "tableau"){
+      f.innerHTML = '<div class="lk-ok"><button type="button" class="prim" data-f="blanc">Blanc</button><button type="button" class="prim" data-f="quad">Quadrillé</button><button type="button" class="prim" data-f="iso">Isométrique</button><button type="button" class="prim" data-f="lignes">Lignes</button>' + annuler + '</div>';
+      f.querySelectorAll("[data-f]").forEach(b => b.onclick = () => fini({ type:"tableau", fond:b.dataset.f }));
+    }
+    if (ty === "minuterie"){
+      f.innerHTML = '<div class="lk-ok">' + [5, 10, 15, 20, 30, 45].map(m => `<button type="button" class="prim" data-m="${m}">${m} min</button>`).join("") + annuler + '</div>';
+      f.querySelectorAll("[data-m]").forEach(b => b.onclick = () => fini({ type:"minuterie", min:+b.dataset.m, nom:label }));
+    }
+    const x = f.querySelector("[data-x]"); if (x) x.onclick = () => z.remove();
+  });
+}
+// Minuterie plein écran (pour une activité chronométrée)
+let minuT = 0;
+function minuterie(min, nom){
+  let ov = $("minu");
+  if (!ov){ ov = document.createElement("div"); ov.id = "minu"; ov.className = "minu"; ov.hidden = true;
+    ov.innerHTML = '<div class="minu-c"><div class="minu-l"></div><div class="minu-t">00:00</div><div class="minu-b"><button type="button" data-a="p">Pause</button><button type="button" data-a="+">+ 1 min</button><button type="button" class="prim" data-a="x">Fermer</button></div></div>';
+    document.body.append(ov); }
+  let reste = min * 60, pause = false; clearInterval(minuT); ov.classList.remove("fin"); ov.querySelector(".minu-l").textContent = nom || "Minuterie";
+  const aff = () => { const m = Math.floor(reste / 60), s = reste % 60; ov.querySelector(".minu-t").textContent = String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0"); };
+  aff(); ov.hidden = false;
+  minuT = setInterval(() => { if (pause) return; if (reste > 0){ reste--; aff(); if (!reste){ ov.classList.add("fin"); try { const a = new AudioContext(), o = a.createOscillator(), g = a.createGain(); o.frequency.value = 880; o.connect(g); g.connect(a.destination); g.gain.setValueAtTime(.2, a.currentTime); o.start(); o.stop(a.currentTime + .6); } catch(e){} } } }, 1000);
+  ov.querySelector('[data-a="p"]').onclick = e => { pause = !pause; e.target.textContent = pause ? "Reprendre" : "Pause"; };
+  ov.querySelector('[data-a="+"]').onclick = () => { reste += 60; ov.classList.remove("fin"); aff(); };
+  ov.querySelector('[data-a="x"]').onclick = () => { clearInterval(minuT); ov.hidden = true; };
+}
 function openPrep() {
   const prog = (compInfo(cfg.comp) || [])[3] || cfg.prog || "5333";
   $("f-prog").value = prog; fillComps(prog);
   ["comp", "module", "steps", "amStart", "pmStart"].forEach(k => $("f-" + k).value = cfg[k]);
   $("f-module").hidden = $("f-comp").value !== "autre";
   $("prep").hidden = false; $("ai-why").hidden = true; $("ai-note").textContent = ""; preview(); $("f-comp").focus();
+  LIENS_T = JSON.parse(JSON.stringify(cfg.liens || {})); demanderCatalogue(); renderLiens();
 }
 $("b-prep-cancel").onclick = () => $("prep").hidden = true;
 $("prep").addEventListener("click", e => { if (e.target.id === "prep") $("prep").hidden = true; });
@@ -1415,6 +1584,7 @@ $("f-comp").addEventListener("change", () => { $("f-module").hidden = $("f-comp"
 $("prepForm").addEventListener("submit", e => {
   e.preventDefault();
   ["comp", "module", "steps", "prog"].forEach(k => cfg[k] = $("f-" + k).value);
+  cfg.liens = JSON.parse(JSON.stringify(LIENS_T)); lastStepsKey = "";
   save(); renderStatic(); tick(); $("prep").hidden = true;
 });
 $("b-cancel").onclick = () => $("sheet").hidden = true;
@@ -1485,6 +1655,7 @@ document.addEventListener("keydown", e => {
     save(); fit();
   }
   if (e.key === "r" || e.key === "R") toggleAnswer();
+  if ((e.key === "o" || e.key === "O") && !$("v-go").hidden) $("v-go").click();   /* O = ouvrir le contenu de l'activité en cours */
 });
 
 // Boutons qui s'effacent quand la souris ne bouge pas

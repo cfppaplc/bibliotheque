@@ -3519,8 +3519,35 @@ function closeReader(){
   RD.drv = null; RD.attached = false; RD.book = null; RD.armed = false;
   document.body.style.overflow = "";
   try { render(); } catch(e){}
+  if (window.RETOUR_ACCUEIL){ window.RETOUR_ACCUEIL = false; $("#readerBack").textContent = "← Retour"; try { window.ouvrirAccueil(); } catch(e){} }
 }
 $("#readerBack").onclick = closeReader;
+/* ---- Contenus ouverts depuis le tableau de bord (accueil de classe) ----
+   livre + page · schéma (modèle ou « Mes schémas ») sur un tableau blanc · dossier de plans. En fermant, on revient au tableau de bord. */
+window.RETOUR_ACCUEIL = false;
+function ouvrirTableauBlanc(apres){
+  const l = { fichier:"tableau-blanc", titre:"Tableau blanc" };
+  ouvrirLivre(l, '<!doctype html><html><head><meta charset="utf-8"><title>Tableau blanc</title></head><body style="margin:0;background:#fff;height:100vh"></body></html>');
+  let n = 0; const t = setInterval(() => { n++;
+    let pret = false; try { pret = !!(RD.drv && RD.drv.state().tot > 0); } catch(e){}
+    if (pret || n > 60){ clearInterval(t); if (!RD.wb) toggleWb(); if (apres) setTimeout(apres, 120); } }, 100);
+}
+function ouvrirContenu(c){
+  if (!c) return;
+  if (c.type === "livre"){ const l = LIVRES.find(x => x.fichier === c.f); if (!l){ aviser("Ce livre n'est plus dans la bibliothèque."); return; }
+    window.RETOUR_ACCUEIL = true; $("#readerBack").textContent = "← Tableau de bord"; if (c.page > 1) RD.allerA = c.page; lire(l); return; }
+  if (c.type === "schema"){ window.RETOUR_ACCUEIL = true;
+    ouvrirTableauBlanc(() => { $("#readerBack").textContent = "← Tableau de bord";
+      if (c.modele){ const m = MODELES.find(x => x.id === c.modele); if (m) poserModele(m); }
+      else if (c.sch){ const sc = lireSch().find(x => String(x.id) === String(c.sch)); if (sc) ouvrirSchema(sc); else aviser("Ce schéma n'est plus dans « Mes schémas »."); }
+      else { wbEtat().bg[wbEtat().n] = "quad"; majFond(); RD.obj = true; refreshTools(); } });
+    return; }
+  if (c.type === "tableau"){ window.RETOUR_ACCUEIL = true; ouvrirTableauBlanc(() => { $("#readerBack").textContent = "← Tableau de bord"; if (c.fond){ wbEtat().bg[wbEtat().n] = c.fond; majFond(); refreshTools(); } }); return; }
+  if (c.type === "plan"){ window.RETOUR_ACCUEIL = true; $("#planBtn").click(); setTimeout(() => { const b = document.querySelector('.pl-ex[data-ex="' + c.n + '"]'); if (b) b.click(); }, 250); }
+}
+/* retour au tableau de bord quand on ferme les plans */
+document.addEventListener("DOMContentLoaded", () => { const ov = document.getElementById("planOv"); if (!ov) return;
+  new MutationObserver(() => { if (ov.hidden && window.RETOUR_ACCUEIL){ window.RETOUR_ACCUEIL = false; try { window.ouvrirAccueil(); } catch(e){} } }).observe(ov, { attributes:true, attributeFilter:["hidden"] }); });
 function openModal(l){
   $("#panel").innerHTML = `
     <div class="panel-top ${couv(l) ? 'with-cover' : ''}" style="${couv(l) ? 'background:' + fond(l) : coverStyle(l) + ';background-size:cover'}">
@@ -4311,8 +4338,15 @@ initAdmin();
   // Le bouton « Plein écran » du tableau demande à la bibliothèque de passer l'accueil en plein écran
   const peEl = () => document.fullscreenElement || document.webkitFullscreenElement;
   const peSignal = ok => { try { fr.contentWindow.postMessage({ type: "accueil-plein-ecran-etat", on: peEl() === ov, ok }, "*"); } catch (e) {} };
+  window.ouvrirAccueil = ouvrir;
+  const catalogue = () => ({ type:"accueil-catalogue",
+    livres:LIVRES.filter(l => l.fichier).map(l => ({ f:l.fichier, titre:l.titre, niveau:l.niveau || "", pages:l.pages || 0 })),
+    modeles:MODELES.map(m => ({ id:m.id, nom:m.nom })), schemas:lireSch().map(x => ({ id:String(x.id), nom:x.nom })),
+    dossiers:[[1, "Maison unifamiliale"], [2, "Duplex jumelé"], [3, "Bâtiment commercial"]] });
   window.addEventListener("message", e => {
     if (e.source === fr.contentWindow && e.data && e.data.type === "accueil-fermer") { fermer(); return; }
+    if (e.source === fr.contentWindow && e.data && e.data.type === "accueil-catalogue?") { try { fr.contentWindow.postMessage(catalogue(), "*"); } catch(er){} return; }
+    if (e.source === fr.contentWindow && e.data && e.data.type === "accueil-ouvrir") { fermer(); ouvrirContenu(e.data.contenu); return; }
     if (e.source !== fr.contentWindow || !e.data || e.data.type !== "accueil-plein-ecran") return;
     if (peEl()) { (document.exitFullscreen || document.webkitExitFullscreen).call(document); return; }
     const req = ov.requestFullscreen || ov.webkitRequestFullscreen;
