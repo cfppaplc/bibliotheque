@@ -1,5 +1,37 @@
 [
  {
+  "date": "2026-10-22",
+  "type": "outil",
+  "titre": "Accueil de classe",
+  "texte": "Tableau d'accueil animé pour le début de période : date, période, déroulement, timeline lisible du fond de la classe et un arrière-plan qui illustre la compétence du jour.",
+  "formation": [
+   {
+    "t": "Bouton « Accueil de classe » en haut de la bibliothèque pour l'ouvrir.",
+    "img": "nouveautes/accueil.jpg"
+   },
+   "« Préparer le cours » : le panneau de l'enseignant, pour régler la période et le déroulement.",
+   "« Plein écran » pour la projection; « Bibliothèque » te ramène aux livres.",
+   {
+    "t": "L'arrière-plan change tout seul selon la compétence choisie dans « Préparer le cours » : robinetterie et appareils sanitaires, réseau d'évacuation, santé et sécurité, chantier, outils et entrepôt, entretien ménager, informatique, administration, protection incendie… Tu peux aussi en choisir un autre dans Plus → Réglages → Arrière-plan.",
+    "img": "nouveautes/accueil-scenes.jpg"
+   }
+  ],
+  "versions": [
+   {
+    "date": "2026-10-22",
+    "texte": "Dix nouveaux arrière-plans animés liés aux compétences (DEP 5211 et DEP 5333), mieux visibles autour des panneaux."
+   },
+   {
+    "date": "2026-10-21",
+    "texte": "Curseur de la timeline corrigé, timeline plus grosse, panneau de l'enseignant clair, plein écran réparé, bouton Bibliothèque déplacé."
+   },
+   {
+    "date": "2026-10-17",
+    "texte": "Accueil de classe pour le tableau interactif."
+   }
+  ]
+ },
+ {
   "date": "2026-10-21",
   "type": "ajout",
   "livre": "micro-ordinateur",
@@ -333,30 +365,6 @@
    {
     "date": "2026-10-17",
     "texte": "Visionneuse de plans pour le tableau interactif."
-   }
-  ]
- },
- {
-  "date": "2026-10-21",
-  "type": "outil",
-  "titre": "Accueil de classe",
-  "texte": "Tableau d'accueil animé pour le début de période : date, période, déroulement et timeline lisible du fond de la classe.",
-  "formation": [
-   {
-    "t": "Bouton « Accueil de classe » en haut de la bibliothèque pour l'ouvrir.",
-    "img": "nouveautes/accueil.jpg"
-   },
-   "« Préparer le cours » : le panneau de l'enseignant, pour régler la période et le déroulement.",
-   "« Plein écran » pour la projection; « Bibliothèque » te ramène aux livres."
-  ],
-  "versions": [
-   {
-    "date": "2026-10-21",
-    "texte": "Curseur de la timeline corrigé, timeline plus grosse, panneau de l'enseignant clair, plein écran réparé, bouton Bibliothèque déplacé."
-   },
-   {
-    "date": "2026-10-17",
-    "texte": "Accueil de classe pour le tableau interactif."
    }
   ]
  }
