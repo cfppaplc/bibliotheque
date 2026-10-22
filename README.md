@@ -21,3 +21,5 @@ Une entrée par **sujet** (pas une par mise à jour). Champs :
 - `versions` : historique `{ date, texte }`, du plus récent au plus ancien.
 
 Pour une nouvelle version d'un sujet existant : mettre à jour `date`, `texte` et `formation`, et ajouter une ligne en tête de `versions`.
+
+À chaque mise à jour : une mini-formation à jour, avec de petites captures d'écran (zone à toucher entourée en rouge) dans `nouveautes/` (JPEG, 640 px max). Une étape avec image s'écrit `{ "t": "texte", "img": "nouveautes/nom.jpg" }`. Le script `outils/captures_nouveautes.js` refait les captures.
