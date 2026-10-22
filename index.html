@@ -2389,9 +2389,9 @@ function simCalc(prof){
   const srcH = new Set(hotS), srcN = new Set(neuS); R.trOn.forEach(o => { const Pp = ports.get(o); srcH.add(Pp[2]); srcN.add(Pp[3]); });
   const flux = [], vus = new Set(), seg = (a, b) => { const id = a + ">" + b; if (!vus.has(id)){ vus.add(id); flux.push([px(a), px(b)]); } };
   [...R.alim, ...R.trOn].forEach(o => { const Pp = ports.get(o); let c1 = chemin(Pp[0], srcH, o), ph = Pp[0], pn = Pp[1]; if (!c1){ c1 = chemin(Pp[1], srcH, o); ph = Pp[1]; pn = Pp[0]; }
-    if (c1) for (let i = 0; i < c1.length - 1; i++) seg(c1[i + 1], c1[i]);
+    if (c1) for (let i = 0; i < c1.length - 1; i++) seg(c1[i], c1[i + 1]);          /* L1 (ou +) → charge */
     if (/^(resistance|chauffant|del|solenoide)$/.test(o.k)) seg(ph, pn);          /* les points ne passent pas sur le repère des bobines et lampes */
-    const c2 = chemin(pn, srcN, o); if (c2) for (let i = 0; i < c2.length - 1; i++) seg(c2[i], c2[i + 1]); });
+    const c2 = chemin(pn, srcN, o); if (c2) for (let i = c2.length - 1; i > 0; i--) seg(c2[i], c2[i - 1]); });   /* charge → L2 (ou −) */
   const minut = [...trE].map(([lb, o]) => ({ c:objGeo(o, W, Hc).P(1, 0).map(v => v / u), f:SIM.tfini.has(lb) ? 1 : Math.min(1, (now - SIM.tdeb[lb]) / ((o.del || 3) * 1000)), lb, d:o.del || 3 }));
   Object.assign(SIM, { bob, ferme:R.ferme, charges:R.alim, trOn:R.trOn, court:R.court, pot, flux, minut,
     moteurs:[...R.alim].filter(o => o.k === "moteur").map(o => objGeo(o, W, Hc).P(1, 0).map(v => v / u)), sonneries:[...R.alim].filter(o => o.k === "sonnerie").map(o => objGeo(o, W, Hc).P(1, 0).map(v => v / u)) });
@@ -2415,7 +2415,7 @@ function simFrame(t){
   Object.assign(ov.style, { left:S.left + "px", top:S.top + "px", width:S.width + "px", height:S.height + "px" }); ov.hidden = false;
   const g = ov.getContext("2d"), sx = r.width / ink.width; g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, w, h);
   g.setTransform(dpr * sx, 0, 0, dpr * sx, dpr * (r.left - S.left), dpr * (r.top - S.top));
-  const u = elecU(), esp = u * .4, ph = (t / 1000 * u * 1.4) % esp, R = Math.max(1.6, u * .055);   /* petits points, un peu plus serrés */
+  const u = elecU(), esp = u / 3, ph = (t / 1000 * u * 1.2) % esp, R = Math.max(1.6, u * .055);   /* petits points, un peu plus serrés */
   g.fillStyle = "#ffd43b"; g.strokeStyle = "#8a6d00"; g.lineWidth = Math.max(.6, u * .015);
   SIM.flux.forEach(([a0, b0]) => { const a = [a0[0] * u, a0[1] * u], b = [b0[0] * u, b0[1] * u], L = Math.hypot(b[0] - a[0], b[1] - a[1]); if (!L) return;
     for (let d = ph; d < L; d += esp){ const x = a[0] + (b[0] - a[0]) * d / L, y = a[1] + (b[1] - a[1]) * d / L; g.beginPath(); g.arc(x, y, R, 0, 7); g.fill(); g.stroke(); } });
