@@ -407,6 +407,7 @@ header { grid-column: 1 / -1; display: flex; align-items: center; justify-conten
 .vid-autre .ico { font-size: 64px; opacity: .8; }
 .vid-autre b { font-size: 20px; word-break: break-word; }
 .vid-autre p { margin: 0; opacity: .75; line-height: 1.45; }
+.vid-astuce { font-size: 14px; background: #ffffff14; border: 1px solid #ffffff22; border-radius: 10px; padding: 12px 14px; opacity: .9 !important; }
 .vid-dl { background: #fff; color: #111; text-decoration: none; font-weight: 700; border-radius: 10px; padding: 12px 22px; }
 .lk-fich { display: block; cursor: pointer; }
 .lk-fich-z { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 16px; border: 2px dashed var(--line); border-radius: 10px; text-align: center; color: var(--ink); }
@@ -1631,7 +1632,14 @@ function ouvrirFichier(c){
     else if (sorte === "image") cadre.innerHTML = '<img class="vid-img" src="' + url + '" alt="">';
     else if (sorte === "video") cadre.innerHTML = '<video src="' + url + '" controls autoplay playsinline></video>';
     else if (sorte === "audio") cadre.innerHTML = '<div class="vid-autre">' + ico("fichier") + '<b></b><audio src="' + url + '" controls autoplay></audio></div>';
-    else cadre.innerHTML = '<div class="vid-autre">' + ico("fichier") + '<b></b><p>Ce type de fichier (' + ((f.nom.split(".").pop() || "").toUpperCase()) + ') ne s\'affiche pas dans le navigateur. Ouvre-le avec son programme (PowerPoint, Word, Excel…).</p>' + dl + '</div>';
+    else {
+      /* PowerPoint, Word, Excel… : le navigateur ne sait pas les afficher. On lance tout de suite l'ouverture avec le programme de l'ordinateur. */
+      const prog = /^pptx?$|^pps/i.test(f.nom.split(".").pop()) ? "PowerPoint" : /^docx?$/i.test(f.nom.split(".").pop()) ? "Word" : /^xlsx?$/i.test(f.nom.split(".").pop()) ? "Excel" : "son programme";
+      cadre.innerHTML = '<div class="vid-autre">' + ico("fichier") + '<b></b><p>Ouverture dans ' + prog + '…</p>'
+        + '<p class="vid-astuce"><strong>Pour que ça s\'ouvre tout seul les prochaines fois :</strong> dans Chrome ou Edge, clique sur le fichier dans les téléchargements (en haut à droite) avec le bouton droit, puis « Toujours ouvrir les fichiers de ce type ».</p>'
+        + dl.replace("Télécharger et ouvrir", "Ouvrir de nouveau") + '</div>';
+      const a = cadre.querySelector(".vid-dl"); setTimeout(() => { try { a.click(); } catch (e) {} }, 60);
+    }
     const bb = cadre.querySelector(".vid-autre b"); if (bb) bb.textContent = f.nom;
     ov.hidden = false; setTimeout(() => ov.querySelector(".vid-x").focus(), 50);
   }).catch(() => alert("Impossible de lire ce fichier sur cet ordinateur."));
@@ -1791,7 +1799,9 @@ function choix(row, label){
       const fi = f.querySelector("[data-fi]"), zone = f.querySelector(".lk-fich"), ok = f.querySelector("[data-v]"), msg = f.querySelector("[data-e]"); let fich = null;
       const prendre = file => { if (!file) return; fich = file; zone.querySelector("b").textContent = file.name; zone.querySelector("small").textContent = tailleTxt(file.size) + " · clique pour en choisir un autre"; zone.classList.add("ok");
         const sorte = sorteFichier(file.name, file.type);
-        msg.textContent = sorte === "autre" ? "Ce type de fichier ne s'affiche pas dans le navigateur : un bouton « Télécharger et ouvrir » l'ouvrira avec son programme." : file.size > 300 * 1048576 ? "Gros fichier : il peut prendre de la place sur cet ordinateur." : "Prêt ✓";
+        const ext = (file.name.split(".").pop() || "").toLowerCase();
+        msg.textContent = /^pptx?$|^pps/.test(ext) ? "Astuce : pour l'afficher en grand directement ici, enregistre-le en PDF dans PowerPoint (Fichier → Exporter → PDF). Sinon, il s'ouvrira dans PowerPoint."
+          : sorte === "autre" ? "Ce fichier s'ouvrira avec son programme (Word, Excel…). Astuce : un PDF s'affiche directement en grand ici." : file.size > 300 * 1048576 ? "Gros fichier : il peut prendre de la place sur cet ordinateur." : "Prêt ✓";
         ok.disabled = false; };
       fi.onchange = () => prendre(fi.files[0]);
       zone.addEventListener("dragover", e => { e.preventDefault(); zone.classList.add("sur"); });
