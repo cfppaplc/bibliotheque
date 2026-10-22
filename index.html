@@ -1786,8 +1786,13 @@ function setZoom(z){
   RD.z = Math.max(zMin(), Math.min(zMax(), z)); sizeInner();
   st.scrollLeft = fx * inn.offsetWidth - st.clientWidth / 2; st.scrollTop = fy * inn.offsetHeight - st.clientHeight / 2;   /* on zoome vers le centre de ce qu'on regarde (avant : vers le coin en haut à gauche, ce qui donnait un effet de rognage) */
 }
-const ZL = () => [.5, .75, ...ZOOMS].filter(v => v >= zMin() && v <= zMax());
-function zin(){ setZoom(ZL().find(v => v > RD.z + .01) || zMax()); }
+/* en page simple, le premier cran du zoom est « pleine largeur » : la page remplit toute la largeur de l'écran */
+function zPleineLargeur(){ if (!RD.single || RD.wb) return 0; try { const st = $("#rstage"), f = $("#readerFrame"), m = measurePage(f);
+  const base = m ? (m.r - m.l) / RD.z : st.clientHeight * PAGE_RATIO, z = (st.clientWidth - 8) / base; return z > zMin() + .05 ? Math.min(z, zMax()) : 0; } catch(e){ return 0; } }
+const ZL = () => { const pl = zPleineLargeur(), t = [.5, .75, ...ZOOMS].filter(v => v >= zMin() && v <= zMax());
+  return pl ? [...t.filter(v => v <= zMin() + .001 || v > pl + .12), pl].sort((a, b) => a - b) : t; };
+function zin(){ const pl = zPleineLargeur(), z0 = RD.z, z = ZL().find(v => v > RD.z + .01) || zMax(); setZoom(z);
+  if (pl && Math.abs(z - pl) < .01 && z0 <= zMin() + .01) $("#rstage").scrollTop = 0; }   /* pleine largeur : on commence en haut de la page */
 function zout(){ setZoom(ZL().reverse().find(v => v < RD.z - .01) || zMin()); }
 function zreset(){ setZoom(1); }
 window.addEventListener("resize", () => { if ($("#reader").classList.contains("open")) sizeInner(); });
