@@ -2760,6 +2760,7 @@ function refreshTools(){
   $("#inkCanvas").classList.toggle("live", drawing);
   $("#penE").classList.toggle("on", RD.eraser); $("#penT").classList.toggle("on", !!RD.text && !RD.eraser);
   document.querySelectorAll(".wbonly").forEach(e => { e.hidden = !RD.wb; });
+  $("#penO").hidden = !(RD.wb && (/^iso/.test(wbBg()) || wbBg() === "quad"));   /* Objets : seulement sur le plan isométrique ou le quadrillé */
   if (RD.wb) majFond();
   setIcn($("#penS"), RD.shape || "libre"); $("#penS").classList.toggle("on", !!RD.shape && !RD.eraser); $("#penS").title = "Forme : " + SHAPE_NOM[RD.shape || ""] + " (clic pour changer)";
   const sw = document.querySelector('#penBar .sw[data-c="#24282c"]'); if (sw){ sw.style.setProperty("--c", wbSombre() ? "#f4f1ea" : "#24282c"); sw.setAttribute("aria-label", wbSombre() ? "Craie blanche" : "Noir"); }
