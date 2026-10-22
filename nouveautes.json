@@ -28,6 +28,30 @@
  {
   "date": "2026-10-22",
   "type": "outil",
+  "titre": "Lecture des livres : pages, table des matières et réponses",
+  "texte": "Même table des matières dans tous les livres, avec des icônes qui correspondent au type de section, et réponses pas à pas partout où le livre a un corrigé.",
+  "formation": [
+   "Tous les livres tournent leurs pages de la même façon : la nouvelle page apparaît en fondu doux, en montant légèrement. Rien à régler.",
+   {
+    "t": "Touche M (ou ☰) dans un livre : la table des matières s'ouvre; clique une section pour y aller.",
+    "img": "nouveautes/livre-tdm.jpg"
+   },
+   {
+    "t": "Bouton ✓ (touche R) : chaque clic montre la réponse suivante de la page, pour corriger avec le groupe une question à la fois.",
+    "img": "nouveautes/livre-barre.jpg"
+   },
+   "Si le bouton ✓ est grisé, la page n'a pas de réponse."
+  ],
+  "versions": [
+   {
+    "date": "2026-10-22",
+    "texte": "Même transition douce entre les pages dans tous les livres (fondu léger, comme Plomberie et chauffage)."
+   }
+  ]
+ },
+ {
+  "date": "2026-10-22",
+  "type": "outil",
   "titre": "Accueil de classe",
   "texte": "Tableau d'accueil animé pour le début de période : date, déroulement, timeline lisible du fond de la classe, arrière-plan lié à la compétence, un contenu à ouvrir pour chaque activité (livre, schéma, plan, vidéo YouTube, minuterie), passage fluide vers le livre et mode examen sans pause.",
   "formation": [
@@ -423,23 +447,6 @@
     "date": "2026-10-21",
     "texte": "Recherche dans le texte des livres."
    }
-  ]
- },
- {
-  "date": "2026-10-21",
-  "type": "outil",
-  "titre": "Table des matières et réponses pas à pas",
-  "texte": "Même table des matières dans tous les livres, avec des icônes qui correspondent au type de section, et réponses pas à pas partout où le livre a un corrigé.",
-  "formation": [
-   {
-    "t": "Touche M (ou ☰) dans un livre : la table des matières s'ouvre; clique une section pour y aller.",
-    "img": "nouveautes/livre-tdm.jpg"
-   },
-   {
-    "t": "Bouton ✓ (touche R) : chaque clic montre la réponse suivante de la page, pour corriger avec le groupe une question à la fois.",
-    "img": "nouveautes/livre-barre.jpg"
-   },
-   "Si le bouton ✓ est grisé, la page n'a pas de réponse."
   ]
  },
  {
