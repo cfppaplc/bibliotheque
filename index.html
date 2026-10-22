@@ -3522,6 +3522,9 @@ function closeReader(){
   if (window.RETOUR_ACCUEIL){ window.RETOUR_ACCUEIL = false; $("#readerBack").textContent = "← Retour"; try { window.ouvrirAccueil(); } catch(e){} }
 }
 $("#readerBack").onclick = closeReader;
+/* l'enseignant tourne lui-même les pages : on arrête de forcer la page demandée */
+document.addEventListener("keydown", e => { if (/^(ArrowLeft|ArrowRight|PageUp|PageDown| )$/.test(e.key)) RD.bouge = true; }, true);
+["#tbPrev", "#tbNext", "#tbPg", "#mmenu"].forEach(sel => { const el = document.querySelector(sel); if (el) el.addEventListener("pointerdown", () => { RD.bouge = true; }, true); });
 /* ---- Contenus ouverts depuis le tableau de bord (accueil de classe) ----
    livre + page · schéma (modèle ou « Mes schémas ») sur un tableau blanc · dossier de plans. En fermant, on revient au tableau de bord. */
 window.RETOUR_ACCUEIL = false;
@@ -4068,8 +4071,13 @@ function suivrePos(s){
 function offrirReprise(){
   RD.offered = true;
   /* ouvert depuis la recherche ou un code QR : on va directement à la page demandée */
-  if (RD.allerA){ const n = RD.allerA; RD.allerA = 0; RD.armed = true; $("#resume").hidden = true;
-    setTimeout(() => { try { RD.drv.goto(n); } catch(e){} setTimeout(() => { try { syncSecond(); poll(); } catch(e){} }, 300); }, 250); return; }
+  if (RD.allerA){ const n = RD.allerA; RD.allerA = 0; RD.armed = true; RD.bouge = false; $("#resume").hidden = true;
+    setTimeout(() => { try { RD.drv.goto(n); } catch(e){} setTimeout(() => { try { syncSecond(); poll(); } catch(e){} }, 300); }, 250);
+    /* sur un ordinateur lent, certains livres reviennent tout seuls à la dernière page lue : on revérifie quelques fois */
+    const livre = RD.book, sur = lbl => { const m = String(lbl || "").match(/\d+/g) || []; return m.some(x => +x === n); };
+    [900, 1800, 3000, 4500].forEach(ms => setTimeout(() => { try { if (RD.book !== livre || !RD.drv || RD.bouge) return;
+      if (!sur(RD.drv.state().label)){ RD.drv.goto(n); setTimeout(() => { try { syncSecond(); poll(); } catch(e){} }, 300); } } catch(e){} }, ms));
+    return; }
   const sv = POS[RD.book];
   if (sv && sv.n > 1 && (!sv.tot || sv.n < sv.tot)){
     $("#resumeTxt").textContent = "Reprendre à la page " + (sv.label || sv.n) + " ?";
