@@ -1767,24 +1767,37 @@ const OBJETS = {
 };
 /* ---- Schéma électrique en échelle : symboles posés sur le quadrillé ; les fils s'accrochent aux bornes et suivent le symbole ---- */
 const ELEC = {
-  fil:        { n:"✎ Fil" },
-  rails:      { n:"Échelle L1 / L2", c:"Échelle L1/L2", lb:"L1 / L2" },
-  contact:    { n:"Contact", nf:1, lb:"CR1" },
-  bobine:     { n:"Bobine (relais, contacteur)", c:"Bobine", lb:"CR1" },
-  surcharge:  { n:"Contact de surcharge (OL)", c:"Surcharge OL", lb:"OL" },
-  bp:         { n:"Bouton-poussoir", nf:1, lb:"PB1" },
-  inter:      { n:"Interrupteur", nf:1, lb:"S1" },
-  thermostat: { n:"Thermostat", nf:1, lb:"TH" },
-  pression:   { n:"Pressostat", nf:1, lb:"PS" },
-  flotteur:   { n:"Flotteur", nf:1, lb:"FS" },
-  fincourse:  { n:"Fin de course", nf:1, lb:"LS" },
-  lampe:      { n:"Lampe témoin", lb:"R" },
-  solenoide:  { n:"Solénoïde", lb:"SOL" },
-  moteur:     { n:"Moteur", lb:"M" },
-  fusible:    { n:"Fusible", lb:"F1" },
-  transfo:    { n:"Transformateur", lb:"T1" },
-  jonction:   { n:"• Jonction" }
+  fil:          { g:"base", n:"✎ Fil", c:"Fil" },
+  rails:        { g:"base", n:"Échelle L1 / L2", c:"Échelle L1/L2", lb:"L1 / L2" },
+  jonction:     { g:"base", n:"• Jonction", c:"Jonction" },
+  bp:           { g:"cmd",  n:"Bouton-poussoir", nf:1, lb:"PB1" },
+  inter:        { g:"cmd",  n:"Interrupteur (SPST, SPDT, DPST, DPDT)", c:"Interrupteur", nf:1, lb:"S1" },
+  thermostat:   { g:"cmd",  n:"Thermostat", nf:1, lb:"TH" },
+  pression:     { g:"cmd",  n:"Pressostat", nf:1, lb:"PS" },
+  flotteur:     { g:"cmd",  n:"Interrupteur à flotteur", c:"Flotteur", nf:1, lb:"FS" },
+  fincourse:    { g:"cmd",  n:"Interrupteur de fin de course", c:"Fin de course", nf:1, lb:"LS" },
+  bobine:       { g:"rel",  n:"Bobine (relais, contacteur)", c:"Bobine", lb:"CR1" },
+  contact:      { g:"rel",  n:"Contact de relais", c:"Contact", nf:1, lb:"CR1" },
+  bobineT:      { g:"rel",  n:"Relais temporisé (bobine)", c:"Relais temporisé", lb:"TR1" },
+  contactT:     { g:"rel",  n:"Contact temporisé (au travail)", c:"Contact temporisé", nf:1, lb:"TR1" },
+  surcharge:    { g:"rel",  n:"Contact de surcharge (OL)", c:"Surcharge OL", lb:"OL" },
+  lampe:        { g:"ch",   n:"Lampe témoin", lb:"R" },
+  moteur:       { g:"ch",   n:"Moteur", lb:"M" },
+  solenoide:    { g:"ch",   n:"Solénoïde (électrovanne)", c:"Solénoïde", lb:"SOL" },
+  sonnerie:     { g:"ch",   n:"Sonnerie / avertisseur", c:"Sonnerie", lb:"BZ" },
+  chauffant:    { g:"ch",   n:"Élément chauffant", c:"Élément chauffant", lb:"HTR" },
+  pile:         { g:"alim", n:"Pile / source c.c. (+ à gauche)", c:"Pile", lb:"B1" },
+  transfo:      { g:"alim", n:"Transformateur", lb:"T1" },
+  fusible:      { g:"alim", n:"Fusible", lb:"F1" },
+  terre:        { g:"alim", n:"Mise à la terre", c:"Terre" },
+  resistance:   { g:"comp", n:"Résistance", lb:"R1" },
+  condensateur: { g:"comp", n:"Condensateur", lb:"C1" },
+  diode:        { g:"comp", n:"Diode", lb:"D1" },
+  del:          { g:"comp", n:"DEL (diode électroluminescente)", c:"DEL", lb:"DEL1" }
 };
+const ELEC_CAT = [["base", "Tracer"], ["cmd", "Boutons et interrupteurs"], ["rel", "Relais et contacts"], ["ch", "Charges"], ["alim", "Alimentation et protection"], ["comp", "Composants"]];
+const POLES = { spst:"SPST — unipolaire, unidirectionnel", spdt:"SPDT — unipolaire, bidirectionnel", dpst:"DPST — bipolaire, unidirectionnel", dpdt:"DPDT — bipolaire, bidirectionnel" };
+const polDe = s => s.k === "inter" ? (s.pol || "spst") : "";
 function surRails(s, G, x, y, m){ const [w, h] = s.sz || [8, 10], u = G.u, lx = (x - G.ox) / u, ly = (y - G.oy) / u;
   return ly > -1 - m && ly < h + m && (Math.abs(lx) < .45 + m || Math.abs(lx - w) < .45 + m); }
 const modeElec = () => !!RD.wb && wbBg() === "quad";
@@ -1796,6 +1809,11 @@ function elecGeo(s, W, H){
   if (s.k === "rails"){ const [w, h] = s.sz || [8, 10]; lp = []; for (let y = 1; y < h; y += 2) lp.push([0, y], [w, y]); bx = [-1.1, -1, w + .4, h + .2]; }
   else if (s.k === "jonction"){ lp = [[0, 0]]; bx = [-.3, -.3, .3, .3]; }
   else if (s.k === "transfo"){ lp = [[0, 0], [4, 0], [0, 2], [4, 2]]; bx = [0, -1, 4, 2.6]; }
+  else if (s.k === "terre"){ lp = [[0, 0]]; bx = [-.45, -.15, .45, 1]; }
+  else if (polDe(s) === "spdt"){ lp = [[0, 0], [2, 0], [2, 1]]; bx = [0, -1.1, 2, 1.35]; }
+  else if (polDe(s) === "dpst"){ lp = [[0, 0], [2, 0], [0, 2], [2, 2]]; bx = [0, -1.1, 2, 2.4]; }
+  else if (polDe(s) === "dpdt"){ lp = [[0, 0], [2, 0], [2, 1], [0, 2], [2, 2], [2, 3]]; bx = [0, -1.1, 2, 3.35]; }
+  else if (s.k === "contactT"){ lp = [[0, 0], [2, 0]]; bx = [0, -1.3, 2, .8]; }
   else { lp = [[0, 0], [2, 0]]; bx = [0, -1.1, 2, .8]; }
   const c0 = P(bx[0], bx[1]), c1 = P(bx[2], bx[3]);
   return { el:true, u, o, ox, oy, P, ports:lp.map(([x, y]) => P(x, y)), bbox:[Math.min(c0[0], c1[0]), Math.min(c0[1], c1[1]), Math.max(c0[0], c1[0]), Math.max(c0[1], c1[1])] };
@@ -1814,13 +1832,15 @@ function dessinerElec(g, s, W, H, k, col){
     g.textAlign = mode === "droite" ? "right" : (G.o && mode === "dessus") ? "left" : "center"; g.textBaseline = "middle"; g.fillStyle = col;
     g.fillText(txt, 0, 0); g.restore(); };
   const bornes = () => { C(.6, 0, .07, true); C(1.4, 0, .07, true); };
-  if (!/^(rails|jonction|transfo)$/.test(K)){ g.save(); g.fillStyle = "#fff"; g.fillRect(.06 * u, -.1 * u, 1.88 * u, .2 * u); g.restore(); }   /* un fil tracé sous le symbole ne doit pas « fermer » un contact ouvert */
-  if (K === "contact" || K === "surcharge"){
+  if (!/^(rails|jonction|transfo|terre)$/.test(K)){ g.save(); g.fillStyle = "#fff"; ({ spdt:[0, 1], dpst:[0, 2], dpdt:[0, 1, 2, 3] }[polDe(s)] || [0]).forEach(y => g.fillRect(.06 * u, (y - .1) * u, 1.88 * u, .2 * u)); g.restore(); }   /* un fil tracé sous le symbole ne doit pas « fermer » un contact ouvert */
+  if (K === "contact" || K === "surcharge" || K === "contactT"){
     L(0, 0, .75, 0); L(1.25, 0, 2, 0); L(.75, -.38, .75, .38); L(1.25, -.38, 1.25, .38);
     if (nf) L(.55, .45, 1.45, -.45);
     if (ferme){ g.save(); g.strokeStyle = "#2f9e44"; g.lineWidth = Math.max(2, 3.5 * k); L(.75, 0, 1.25, 0); g.restore(); }
-    T(s.lb, 1, -.75, .36, "dessus");
-  } else if (K === "bobine" || K === "lampe" || K === "moteur"){
+    if (K === "contactT"){ g.save(); g.lineWidth = Math.max(1.2, 1.8 * k); L(1, -.38, 1, -.6); g.beginPath(); g.arc(u, -.82 * u, .26 * u, .15 * Math.PI, .85 * Math.PI, false); g.stroke(); g.restore();   /* parapluie : temporisé au travail */
+      T(s.lb, 1, -1.1, .34, "dessus"); }
+    else T(s.lb, 1, -.75, .36, "dessus");
+  } else if (K === "bobine" || K === "bobineT" || K === "lampe" || K === "moteur"){
     const r = K === "moteur" ? .45 : .4; L(0, 0, 1 - r, 0); L(1 + r, 0, 2, 0);
     if (actif){ const lc = { R:"#ff6b6b", G:"#51cf66", V:"#51cf66", A:"#ffd43b", J:"#ffd43b", Y:"#ffd43b", B:"#4dabf7", W:"#fff9db" }[(s.lb || "").trim().toUpperCase()[0]] || "#ffd43b";
       const fc = K === "lampe" ? lc : K === "moteur" ? "#b2f2bb" : "#ffc9c9"; g.save(); if (K === "lampe"){ g.shadowColor = lc; g.shadowBlur = u * .8; }
@@ -1828,6 +1848,7 @@ function dessinerElec(g, s, W, H, k, col){
     else C(1, 0, r, false);
     if (K === "lampe") for (let i = 0; i < 8; i++){ const a = i * Math.PI / 4 + Math.PI / 8; L(1 + Math.cos(a) * (r + .07), Math.sin(a) * (r + .07), 1 + Math.cos(a) * (r + .22), Math.sin(a) * (r + .22)); }
     T(s.lb, 1, .02, .34, null, r * 1.55);
+    if (K === "bobineT") T("⏱ " + (s.del || 3) + " s", 1, .66, .26, null, 0, 600);
   } else if (K === "solenoide"){
     L(0, 0, .55, 0); L(1.45, 0, 2, 0); g.save(); if (actif){ g.strokeStyle = "#e03131"; g.lineWidth = Math.max(2, 3.5 * k); } g.beginPath(); for (let i = 0; i < 3; i++) g.arc((.7 + i * .3) * u, 0, .15 * u, Math.PI, 0, false); g.stroke(); g.restore();
     T(s.lb, 1, -.6, .34, "dessus");
@@ -1839,6 +1860,16 @@ function dessinerElec(g, s, W, H, k, col){
     L(0, 0, .6, 0); L(1.4, 0, 2, 0); bornes();
     const yb = SM ? (ferme ? (nf ? .1 : .02) : -.3) : (nf ? .1 : -.3); if (ferme) g.strokeStyle = "#2f9e44"; L(.45, yb, 1.55, yb); g.strokeStyle = col; L(1, yb, 1, -.62); L(.82, -.62, 1.18, -.62);
     T(s.lb, 1, -.9, .34, "dessus");
+  } else if (K === "inter" && polDe(s) !== "spst"){
+    const pol = polDe(s), act = SM ? SM.act.has(s) : false, vert = c2 => { if (SM) g.strokeStyle = c2; };
+    const pole = y => { if (pol.endsWith("dt")){
+        L(0, y, .6, y); L(1.4, y, 2, y); L(1.4, y + 1, 2, y + 1); C(.6, y, .07, true); C(1.4, y, .07, true); C(1.4, y + 1, .07, true);
+        vert("#2f9e44"); const e = act ? [1.4, y + 1] : [1.4, y]; L(.6, y, e[0], e[1]); g.strokeStyle = col; return [1, (y + e[1]) / 2]; }
+      const cl = SM ? (nf ? !act : act) : nf, ye = cl ? y + .03 : y - .42;
+      L(0, y, .6, y); L(1.4, y, 2, y); C(.6, y, .07, true); C(1.4, y, .07, true); if (SM && cl) g.strokeStyle = "#2f9e44"; L(.6, y, 1.45, ye); g.strokeStyle = col; return [1.02, (y + ye) / 2]; };
+    const m1 = pole(0);
+    if (pol[0] === "d"){ const m2 = pole(2); g.save(); g.lineWidth = Math.max(1, 1.4 * k); g.setLineDash([.08 * u, .08 * u]); L(m1[0], m1[1], m2[0], m2[1]); g.restore(); }
+    T(s.lb, 1, -.8, .34, "dessus"); T(pol.toUpperCase(), 1.75, pol === "spdt" ? .55 : pol === "dpst" ? 1 : 1.55, .22, null, 0, 600);
   } else if (/^(inter|thermostat|pression|flotteur|fincourse)$/.test(K)){
     L(0, 0, .6, 0); L(1.4, 0, 2, 0); bornes();
     const ye = SM ? (ferme ? .03 : -.42) : (nf ? .16 : -.42), mx = 1.02, my = ye * .5; if (ferme) g.strokeStyle = "#2f9e44"; L(.6, 0, 1.45, ye); g.strokeStyle = col;
@@ -1859,6 +1890,34 @@ function dessinerElec(g, s, W, H, k, col){
     L(1, .86, 3, .86); L(1, 1.14, 3, 1.14);
     T("H1", .45, -.32, .27, null, 0, 600); T("H2", 3.55, -.32, .27, null, 0, 600); T("X1", .45, 2.32, .27, null, 0, 600); T("X2", 3.55, 2.32, .27, null, 0, 600);
     T(s.lb, 2, -.62, .34);
+  } else if (K === "resistance" || K === "chauffant"){
+    if (K === "chauffant"){ L(0, 0, .4, 0); L(1.6, 0, 2, 0); g.save(); g.beginPath(); g.rect(.4 * u, -.28 * u, 1.2 * u, .56 * u); g.fillStyle = actif ? "#ffa94d" : "#fff"; if (actif){ g.shadowColor = "#ff6b00"; g.shadowBlur = u * .6; } g.fill(); g.restore(); g.beginPath(); g.rect(.4 * u, -.28 * u, 1.2 * u, .56 * u); g.stroke(); }
+    else { L(0, 0, .45, 0); L(1.55, 0, 2, 0); }
+    const x0 = K === "chauffant" ? .5 : .45, x1 = K === "chauffant" ? 1.5 : 1.55, n = 6, a = K === "chauffant" ? .14 : .2, q = [x0, 0];
+    for (let i = 0; i < n; i++) q.push(x0 + (x1 - x0) * (i + .5) / n, i % 2 ? a : -a); q.push(x1, 0);
+    g.save(); if (actif && K === "resistance") g.strokeStyle = "#e8590c"; L(...q); g.restore();
+    T(s.lb, 1, -.6, .32, "dessus");
+  } else if (K === "condensateur"){
+    L(0, 0, .9, 0); L(1.1, 0, 2, 0); g.save(); g.lineWidth = Math.max(2, 3 * k); L(.9, -.36, .9, .36); L(1.1, -.36, 1.1, .36); g.restore();
+    T(s.lb, 1, -.65, .32, "dessus");
+  } else if (K === "diode" || K === "del"){
+    L(0, 0, .72, 0); L(1.28, 0, 2, 0);
+    g.beginPath(); g.moveTo(.72 * u, -.26 * u); g.lineTo(.72 * u, .26 * u); g.lineTo(1.22 * u, 0); g.closePath();
+    g.save(); g.fillStyle = K === "del" && actif ? "#ff4d4d" : "#fff"; if (K === "del" && actif){ g.shadowColor = "#ff2020"; g.shadowBlur = u * .7; } g.fill(); g.restore(); g.stroke();
+    L(1.24, -.28, 1.24, .28);
+    if (K === "del"){ g.save(); g.lineWidth = Math.max(1, 1.5 * k); if (actif) g.strokeStyle = "#e03131";
+      [[.95, -.32], [1.15, -.3]].forEach(([x, y]) => { L(x, y, x + .2, y - .22); L(x + .2, y - .22, x + .1, y - .2); L(x + .2, y - .22, x + .18, y - .12); }); g.restore(); }
+    T(s.lb, 1, K === "del" ? -.8 : -.6, .3, "dessus");
+  } else if (K === "pile"){
+    L(0, 0, .74, 0); L(1.26, 0, 2, 0); g.save();
+    [[.74, .4, 2.4], [.9, .2, 3.6], [1.1, .4, 2.4], [1.26, .2, 3.6]].forEach(([x, h, w]) => { g.lineWidth = Math.max(1.5, w * k); L(x, -h, x, h); }); g.restore();
+    T("+", .52, -.32, .3, null, 0, 800); T("−", 1.5, -.3, .3, null, 0, 800); T(s.lb, 1, -.68, .3, "dessus");
+  } else if (K === "sonnerie"){
+    L(0, 0, .6, 0); L(1.4, 0, 2, 0); g.beginPath(); g.moveTo(.6 * u, 0); g.arc(u, 0, .4 * u, Math.PI, 0, false); g.closePath();
+    g.save(); g.fillStyle = actif ? "#ffe066" : "#fff"; g.fill(); g.restore(); g.stroke(); L(.6, 0, 1.4, 0);
+    T(s.lb, 1, .32, .24, null, 0, 700);
+  } else if (K === "terre"){
+    L(0, 0, 0, .5); L(-.38, .5, .38, .5); L(-.25, .66, .25, .66); L(-.12, .82, .12, .82);
   } else if (K === "jonction"){
     C(0, 0, .13, true);
   } else if (K === "rails"){
@@ -2266,12 +2325,13 @@ function appliquerTxt(maj){
    Les fils et les rails relient des points de la grille ; un contact fermé relie ses deux bornes ; une charge (bobine, lampe,
    moteur, solénoïde) est alimentée quand une borne touche L1 et l'autre L2. Une bobine alimentée change l'état de tous les
    contacts qui portent le même repère (CR1, M…) : c'est ce qui fait fonctionner le contact de maintien. */
-const SIM = { act:new Set(), press:new Set(), bob:{}, ferme:new Map(), pot:new Map(), charges:new Set(), trOn:new Set(), flux:[], moteurs:[], court:false, key:"", raf:0, tenu:null };
-const SIM_SW = /^(contact|surcharge|bp|inter|thermostat|pression|flotteur|fincourse|fusible)$/, SIM_CH = /^(bobine|lampe|moteur|solenoide)$/, SIM_ACT = /^(bp|inter|thermostat|pression|flotteur|fincourse|surcharge|fusible)$/;
-function simCalc(){
-  const cv = $("#inkCanvas"), W = cv.width, Hc = cv.height, u = elecU(), arr = strokes();
+const SIM = { tdeb:{}, tfini:new Set(), minut:[], sonneries:[], act:new Set(), press:new Set(), bob:{}, ferme:new Map(), pot:new Map(), charges:new Set(), trOn:new Set(), flux:[], moteurs:[], court:false, key:"", raf:0, tenu:null };
+const SIM_SW = /^(contact|contactT|surcharge|bp|inter|thermostat|pression|flotteur|fincourse|fusible)$/, SIM_CH = /^(bobine|bobineT|lampe|moteur|solenoide|sonnerie|chauffant|resistance|del)$/, SIM_ACT = /^(bp|inter|thermostat|pression|flotteur|fincourse|surcharge|fusible)$/;
+function simCalc(prof){
+  const cv = $("#inkCanvas"), W = cv.width, Hc = cv.height, u = elecU(), arr = strokes(), now = performance.now();
   const gk = p => Math.round(p[0] * W / u) + "," + Math.round(p[1] * Hc / u), gkPx = q => Math.round(q[0] / u) + "," + Math.round(q[1] / u);
   const px = k => { const [x, y] = k.split("|")[0].split(",").map(Number); return [x * u, y * u]; };
+  const norm = t => (t || "").trim().toUpperCase();
   const fils = arr.filter(o => o.t === "ligne" && o.fil), objs = arr.filter(o => o.t === "objet" && ELEC[o.k]);
   const conn = new Set(), ports = new Map(), E = [], hotS = new Set(), neuS = new Set();
   fils.forEach(f => f.p.forEach(p => conn.add(gk(p))));
@@ -2282,36 +2342,59 @@ function simCalc(){
     for (let i = 1; i <= n; i++){ const k0 = (ax + sx * i) + "," + (ay + sy * i), k = (i === n || conn.has(k0)) ? k0 : k0 + "|" + idx; E.push([prev, k]); prev = k; } });   /* deux fils qui se croisent sans point de jonction ne sont pas reliés */
   objs.filter(o => o.k === "rails").forEach(o => { const [w, h] = o.sz || [8, 10], [x0, y0] = gk(o.p[0]).split(",").map(Number);
     [[x0, hotS], [x0 + w, neuS]].forEach(([x, S]) => { for (let y = y0; y <= y0 + h; y++){ S.add(x + "," + y); if (y > y0) E.push([x + "," + (y - 1), x + "," + y]); } }); });
-  let bob = Object.assign({}, SIM.bob), ferme, charges, trOn, court, rac, HS, NS;
+  objs.filter(o => o.k === "pile").forEach(o => { const Pp = ports.get(o); hotS.add(Pp[0]); neuS.add(Pp[1]); });   /* une pile est une source : + à gauche */
+  const uf = () => { const par = new Map(), f = k => { while (par.has(k)){ const p = par.get(k); if (par.has(p)) par.set(k, par.get(p)); k = p; } return k; };
+    return { f, un:(a, b) => { a = f(a); b = f(b); if (a !== b) par.set(a, b); } }; };
+  const chargesT = objs.filter(o => SIM_CH.test(o.k) || o.k === "transfo");
+  let bob = Object.assign({}, SIM.bob), R = null;
   for (let it = 0; it < 16; it++){
-    ferme = new Map();
-    objs.forEach(o => { if (!SIM_SW.test(o.k)) return; const lb = (o.lb || "").trim().toUpperCase();
-      const act = o.k === "contact" ? !!bob[lb] : o.k === "bp" ? SIM.press.has(o) : SIM.act.has(o);
-      ferme.set(o, (o.k === "surcharge" || o.k === "fusible" || o.nf) ? !act : act); });
-    const par = new Map(), f = k => { while (par.has(k)){ const p = par.get(k); if (par.has(p)) par.set(k, par.get(p)); k = p; } return k; }, un = (a, b) => { a = f(a); b = f(b); if (a !== b) par.set(a, b); };
-    E.forEach(([a, b]) => un(a, b)); ferme.forEach((v, o) => { if (v){ const Pp = ports.get(o); un(Pp[0], Pp[1]); } });
-    HS = new Set([...hotS].map(f)); NS = new Set([...neuS].map(f)); trOn = new Set();
-    for (let r = 0; r < 3; r++) objs.forEach(o => { if (o.k !== "transfo") return; const Pp = ports.get(o), a = f(Pp[0]), b = f(Pp[1]);
-      if ((HS.has(a) && NS.has(b)) || (NS.has(a) && HS.has(b))){ trOn.add(o); HS.add(f(Pp[2])); NS.add(f(Pp[3])); } });
-    court = [...HS].some(r => NS.has(r)); charges = new Set();
-    if (court) trOn = new Set();
-    else objs.forEach(o => { if (!SIM_CH.test(o.k)) return; const Pp = ports.get(o), a = f(Pp[0]), b = f(Pp[1]); if ((HS.has(a) && NS.has(b)) || (NS.has(a) && HS.has(b))) charges.add(o); });
-    const nb = {}; charges.forEach(o => { if (o.k === "bobine" && o.lb) nb[o.lb.trim().toUpperCase()] = true; });
-    rac = f; const pareil = Object.keys(nb).sort().join() === Object.keys(bob).filter(k => bob[k]).sort().join(); bob = nb; if (pareil) break;
+    const ferme = new Map(), paires = [];
+    objs.forEach(o => { const lb = norm(o.lb), Pp = ports.get(o);
+      if (o.k === "inter"){ const pol = polDe(o), act = SIM.act.has(o), cl = o.nf ? !act : act;
+        ferme.set(o, pol.endsWith("dt") ? act : cl);
+        ({ spst:cl ? [[0, 1]] : [], dpst:cl ? [[0, 1], [2, 3]] : [], spdt:act ? [[0, 2]] : [[0, 1]], dpdt:act ? [[0, 2], [3, 5]] : [[0, 1], [3, 4]] })[pol].forEach(([a, b]) => paires.push([Pp[a], Pp[b]])); return; }
+      if (o.k === "diode"){ paires.push([Pp[0], Pp[1]]); return; }
+      if (!SIM_SW.test(o.k)) return;
+      const act = o.k === "contact" ? !!bob[lb] : o.k === "contactT" ? SIM.tfini.has(lb) : o.k === "bp" ? SIM.press.has(o) : SIM.act.has(o);
+      const cl = (o.k === "surcharge" || o.k === "fusible" || o.nf) ? !act : act; ferme.set(o, cl); if (cl) paires.push([Pp[0], Pp[1]]); });
+    const U = uf(); E.forEach(([a, b]) => U.un(a, b)); paires.forEach(([a, b]) => U.un(a, b));
+    const HS = new Set([...hotS].map(U.f)), NS = new Set([...neuS].map(U.f)), court = [...HS].some(r => NS.has(r));
+    /* une charge fonctionne si, sans elle, une de ses bornes rejoint L1 (ou +) et l'autre L2 (ou −), au besoin à travers d'autres charges en série */
+    const alim = new Set(), trOn = new Set();
+    if (!court) for (let pass = 0; pass < 3; pass++){
+      chargesT.forEach(o => { const Pp = ports.get(o), a = U.f(Pp[0]), b = U.f(Pp[1]); if (a === b) return;
+        const V = uf(); chargesT.forEach(x => { if (x !== o){ const Q = ports.get(x); V.un(U.f(Q[0]), U.f(Q[1])); } });
+        const cH = new Set([...HS].map(V.f)), cN = new Set([...NS].map(V.f)), A = V.f(a), B = V.f(b);
+        if ((cH.has(A) && cN.has(B)) || (cN.has(A) && cH.has(B))) (o.k === "transfo" ? trOn : alim).add(o); });
+      let ajout = false; trOn.forEach(o => { const Pp = ports.get(o), x1 = U.f(Pp[2]); if (!HS.has(x1)){ HS.add(x1); NS.add(U.f(Pp[3])); ajout = true; } });
+      if (!ajout) break;
+    }
+    const nb = {}; alim.forEach(o => { if ((o.k === "bobine" || o.k === "bobineT") && o.lb) nb[norm(o.lb)] = true; });
+    R = { ferme, paires, U, HS, NS, court, alim, trOn };
+    const pareil = Object.keys(nb).sort().join() === Object.keys(bob).filter(k => bob[k]).sort().join(); bob = nb; if (pareil) break;
   }
-  const pot = new Map(); fils.forEach(w => { const r = rac(gk(w.p[0])); pot.set(w, HS.has(r) ? "h" : NS.has(r) ? "n" : ""); });
-  /* trajet du courant (pour les points jaunes qui avancent) : de L1 jusqu'à chaque charge, puis de la charge jusqu'à L2 */
-  const adj = new Map(), aj = (a, b) => { if (!adj.has(a)) adj.set(a, []); adj.get(a).push(b); };
-  E.concat([...ferme].filter(([, v]) => v).map(([o]) => ports.get(o))).forEach(([a, b]) => { aj(a, b); aj(b, a); });
-  const chemin = (dep, buts) => { const vu = new Map([[dep, null]]), file = [dep];
+  /* relais temporisés : le contact change après le délai, tant que la bobine reste alimentée */
+  const trE = new Map(); R.alim.forEach(o => { if (o.k === "bobineT") trE.set(norm(o.lb), o); });
+  trE.forEach((o, lb) => { if (!SIM.tdeb[lb]) SIM.tdeb[lb] = now; });
+  let refaire = false; Object.keys(SIM.tdeb).forEach(lb => { if (!trE.has(lb)){ delete SIM.tdeb[lb]; if (SIM.tfini.delete(lb)) refaire = true; } });
+  if (refaire && (prof || 0) < 3){ SIM.bob = bob; return simCalc((prof || 0) + 1); }
+  const { U, HS } = R, pot = new Map(); fils.forEach(w => { const r = U.f(gk(w.p[0])); pot.set(w, HS.has(r) ? "h" : R.NS.has(r) ? "n" : ""); });
+  /* trajet du courant (points jaunes) : de la source jusqu'à la charge, à travers la charge, puis jusqu'au retour */
+  const adj = new Map(), aj = (a, b, o) => { if (!adj.has(a)) adj.set(a, []); adj.get(a).push([b, o]); };
+  E.concat(R.paires).forEach(([a, b]) => { aj(a, b, null); aj(b, a, null); });
+  [...R.alim].forEach(o => { const Pp = ports.get(o); aj(Pp[0], Pp[1], o); aj(Pp[1], Pp[0], o); });
+  const chemin = (dep, buts, sauf) => { const vu = new Map([[dep, null]]), file = [dep];
     while (file.length){ const k = file.shift(); if (buts.has(k)){ const ch = []; for (let x = k; x !== null; x = vu.get(x)) ch.push(x); return ch; }
-      (adj.get(k) || []).forEach(n => { if (!vu.has(n)){ vu.set(n, k); file.push(n); } }); } return null; };
-  const srcH = new Set(hotS), srcN = new Set(neuS); trOn.forEach(o => { const Pp = ports.get(o); srcH.add(Pp[2]); srcN.add(Pp[3]); });
+      (adj.get(k) || []).forEach(([n, o]) => { if (o !== sauf && (!o || o !== sauf) && !vu.has(n)){ vu.set(n, k); file.push(n); } }); } return null; };
+  const srcH = new Set(hotS), srcN = new Set(neuS); R.trOn.forEach(o => { const Pp = ports.get(o); srcH.add(Pp[2]); srcN.add(Pp[3]); });
   const flux = [], vus = new Set(), seg = (a, b) => { const id = a + ">" + b; if (!vus.has(id)){ vus.add(id); flux.push([px(a), px(b)]); } };
-  [...charges, ...trOn].forEach(o => { const Pp = ports.get(o), [ph, pn] = HS.has(rac(Pp[0])) ? [Pp[0], Pp[1]] : [Pp[1], Pp[0]];
-    const c1 = chemin(ph, srcH); if (c1) for (let i = 0; i < c1.length - 1; i++) seg(c1[i + 1], c1[i]);
-    const c2 = chemin(pn, srcN); if (c2) for (let i = 0; i < c2.length - 1; i++) seg(c2[i], c2[i + 1]); });
-  Object.assign(SIM, { bob, ferme, charges, trOn, court, pot, flux, moteurs:[...charges].filter(o => o.k === "moteur").map(o => objGeo(o, W, Hc).P(1, 0)) });
+  [...R.alim, ...R.trOn].forEach(o => { const Pp = ports.get(o); let c1 = chemin(Pp[0], srcH, o), ph = Pp[0], pn = Pp[1]; if (!c1){ c1 = chemin(Pp[1], srcH, o); ph = Pp[1]; pn = Pp[0]; }
+    if (c1) for (let i = 0; i < c1.length - 1; i++) seg(c1[i + 1], c1[i]);
+    if (o.k !== "transfo") seg(ph, pn);
+    const c2 = chemin(pn, srcN, o); if (c2) for (let i = 0; i < c2.length - 1; i++) seg(c2[i], c2[i + 1]); });
+  const minut = [...trE].map(([lb, o]) => ({ c:objGeo(o, W, Hc).P(1, 0), f:SIM.tfini.has(lb) ? 1 : Math.min(1, (now - SIM.tdeb[lb]) / ((o.del || 3) * 1000)), lb, d:o.del || 3 }));
+  Object.assign(SIM, { bob, ferme:R.ferme, charges:R.alim, trOn:R.trOn, court:R.court, pot, flux, minut,
+    moteurs:[...R.alim].filter(o => o.k === "moteur").map(o => objGeo(o, W, Hc).P(1, 0)), sonneries:[...R.alim].filter(o => o.k === "sonnerie").map(o => objGeo(o, W, Hc).P(1, 0)) });
 }
 function simAide(){
   const z = document.querySelector("#objBar .simAide"); if (!z) return;
@@ -2337,11 +2420,19 @@ function simFrame(t){
   SIM.flux.forEach(([a, b]) => { const L = Math.hypot(b[0] - a[0], b[1] - a[1]); if (!L) return;
     for (let d = ph; d < L; d += esp){ const x = a[0] + (b[0] - a[0]) * d / L, y = a[1] + (b[1] - a[1]) * d / L; g.beginPath(); g.arc(x, y, R, 0, 7); g.fill(); g.stroke(); } });
   g.strokeStyle = "#2b8a3e"; g.lineWidth = Math.max(2, u * .07); g.lineCap = "round";
+  SIM.sonneries.forEach(([x, y]) => { g.save(); g.strokeStyle = "#f08c00"; g.lineWidth = Math.max(1.5, u * .05); const ph2 = (t / 300) % 1;
+    for (let i = 0; i < 2; i++){ const rr = u * (.55 + .25 * ((ph2 + i * .5) % 1)); g.globalAlpha = 1 - ((ph2 + i * .5) % 1); g.beginPath(); g.arc(x, y, rr, -2.4, -.75); g.stroke(); } g.restore(); });
+  let attente = false;
+  SIM.minut.forEach(m => { const f = SIM.tfini.has(m.lb) ? 1 : Math.min(1, (performance.now() - (SIM.tdeb[m.lb] || performance.now())) / (m.d * 1000)); if (f < 1) attente = true;
+    g.save(); g.lineWidth = Math.max(3, u * .1); g.strokeStyle = "rgba(42,123,207,.25)"; g.beginPath(); g.arc(m.c[0], m.c[1], u * .58, 0, 7); g.stroke();
+    g.strokeStyle = f >= 1 ? "#2f9e44" : "#2a7bcf"; g.beginPath(); g.arc(m.c[0], m.c[1], u * .58, -Math.PI / 2, -Math.PI / 2 + f * Math.PI * 2); g.stroke(); g.restore();
+    if (f >= 1 && !SIM.tfini.has(m.lb)){ SIM.tfini.add(m.lb); setTimeout(simMaj, 0); } });
+  if (attente && !(t % 4)) {}
   SIM.moteurs.forEach(([x, y]) => { const a0 = t / 1000 * 4; for (let i = 0; i < 2; i++){ g.beginPath(); g.arc(x, y, u * .62, a0 + i * Math.PI, a0 + i * Math.PI + 1.6); g.stroke(); } });
   SIM.raf = requestAnimationFrame(simFrame);
 }
 function simStart(){
-  if (!modeElec()) return; RD.sim = true; SELO.s = null; SIM.act = new Set(); SIM.press = new Set(); SIM.bob = {}; SIM.key = inkKey();
+  if (!modeElec()) return; RD.sim = true; SELO.s = null; SIM.act = new Set(); SIM.press = new Set(); SIM.bob = {}; SIM.tdeb = {}; SIM.tfini = new Set(); SIM.key = inkKey();
   simMaj(); majObjUI(); cancelAnimationFrame(SIM.raf); SIM.raf = requestAnimationFrame(simFrame);
   aviser("Animation : clique un bouton-poussoir ou un interrupteur pour faire fonctionner le schéma.", 5000);
 }
@@ -2371,7 +2462,11 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
   b.querySelectorAll("[data-k]").forEach(x => x.classList.toggle("on", x.dataset.k === RD.objK));
   const se = SELO.s && strokes().includes(SELO.s) && ELEC[SELO.s.k] ? SELO.s : null, de = ELEC[se ? se.k : RD.objK] || null, bn = b.querySelector("#objNF"), bl = b.querySelector("#objL");
   const nfV = se ? !!se.nf : !!RD.objNF; bn.style.display = el && de && de.nf ? "" : "none"; bn.textContent = nfV ? "Normalement fermé (NF)" : "Normalement ouvert (NO)"; bn.classList.toggle("on", nfV);
-  bl.style.display = se && de && de.lb ? "" : "none"; if (se && document.activeElement !== bl) bl.value = se.lb || "";
+  bl.style.display = se && de && de.lb ? "" : "none";
+  const kc = se ? se.k : RD.objK, polV = se ? polDe(se) : (RD.objPol || "spst"), bpol = b.querySelector("#objPol");
+  bpol.style.display = el && kc === "inter" ? "" : "none"; bpol.querySelectorAll("[data-pol]").forEach(x => x.classList.toggle("on", x.dataset.pol === polV));
+  if (kc === "inter" && /dt$/.test(polV)) bn.style.display = "none";
+  const bd = b.querySelector("#objDelW"); bd.style.display = se && se.k === "bobineT" ? "" : "none"; if (se && se.k === "bobineT" && document.activeElement !== b.querySelector("#objDel")) b.querySelector("#objDel").value = se.del || 3; if (se && document.activeElement !== bl) bl.value = se.lb || "";
   const sel = SELO.s && strokes().includes(SELO.s), sp = sel && SELO.s.k === "serpentin" ? SELO.s : null, pasV = sp ? (sp.pas || .5) : (RD.pas || .5), bp = b.querySelector("#objP");
   bp.style.display = (sp || RD.objK === "serpentin") ? "" : "none"; bp.textContent = "Tubes : " + (pasV >= 1 ? "30 cm" : "15 cm");
   ["objR", "objD"].forEach(id => b.querySelector("#" + id).style.display = sel ? "" : "none");
@@ -2382,9 +2477,10 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
   bar.style.cssText = "position:absolute;z-index:75;left:12px;top:70px;display:flex;flex-direction:column;gap:6px;width:184px;max-height:calc(100% - 150px);overflow-y:auto;overflow-x:hidden;padding:8px;border-radius:12px;background:rgba(14,14,15,.96);border:1px solid #2f2f33;color:#d4d4d8;font:600 .8rem system-ui,sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.35)";
   bar.innerHTML = '<div class="tete" title="Glisse ici pour déplacer la palette"><span class="poig">⠿</span><span class="tit">Objets</span></div>'
     + '<div class="grp" data-g="iso">' + Object.keys(OBJETS).map(k => '<button data-k="' + k + '">' + OBJETS[k].n + '</button>').join("") + '</div>'
-    + '<div class="grp ico" data-g="elec">' + Object.keys(ELEC).map(k => '<button data-k="' + k + '" title="' + ELEC[k].n.replace(/^[✎•] /, "") + '"><canvas width="120" height="64"></canvas><span>' + (ELEC[k].c || ELEC[k].n.replace(/^[✎•] /, "")) + '</span></button>').join("") + '</div>'
+    + '<div class="grp" data-g="elec">' + ELEC_CAT.map(([cg, cn]) => '<button class="cat" data-cat="' + cg + '">' + cn + '</button><div class="cgrid" data-cat="' + cg + '">'
+      + Object.keys(ELEC).filter(k => ELEC[k].g === cg).map(k => '<button data-k="' + k + '" title="' + ELEC[k].n.replace(/^[✎•] /, "") + '"><canvas width="120" height="64"></canvas><span>' + (ELEC[k].c || ELEC[k].n.replace(/^[✎•] /, "")) + '</span></button>').join("") + '</div>').join("") + '</div>'
     + '<div class="aide grpE">Pour relier : glisse d\'un <b>point bleu</b> à l\'autre</div>'
-    + '<button id="objP" title="Espacement des tubes du serpentin"></button><button id="objNF" title="Normalement ouvert ou normalement fermé"></button><input id="objL" maxlength="10" placeholder="Repère" title="Repère du symbole (ex. CR1, M, PB2)" aria-label="Repère du symbole">'
+    + '<button id="objP" title="Espacement des tubes du serpentin"></button><button id="objNF" title="Normalement ouvert ou normalement fermé"></button><div class="pol" id="objPol">' + Object.keys(POLES).map(p => '<button data-pol="' + p + '" title="' + POLES[p] + '">' + p.toUpperCase() + '</button>').join("") + '</div><label class="del" id="objDelW">Délai <input id="objDel" type="number" min="1" max="60" step="1" value="3"> s</label><input id="objL" maxlength="10" placeholder="Repère" title="Repère du symbole (ex. CR1, M, PB2)" aria-label="Repère du symbole">'
     + '<div class="taille" id="objTaille"><span>Largeur</span><button data-t="w-1" title="Rapprocher L2">−</button><button data-t="w1" title="Éloigner L2">+</button><span>Hauteur</span><button data-t="h-1" title="Raccourcir l\'échelle">−</button><button data-t="h1" title="Allonger l\'échelle">+</button><em>ou glisse le carré bleu en bas à droite</em></div>'
     + '<div class="rang"><button id="objR" title="Pivoter l\'objet sélectionné">⟳ Pivoter</button><button id="objD" title="Supprimer l\'objet sélectionné" aria-label="Supprimer">🗑</button></div>'
     + '<button id="objSim" class="grpE" title="Faire fonctionner le schéma : le courant circule, les bobines, lampes et moteurs s\'activent">▶ Animer le schéma</button><div class="simAide"></div><button id="objX">Terminé</button>';
@@ -2393,25 +2489,39 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     + '#objBar .tete{display:flex;align-items:center;gap:6px;cursor:grab;user-select:none;touch-action:none;padding:2px 0 4px 2px;position:sticky;top:-8px;z-index:2;background:rgb(14,14,15);margin:-8px -8px 0;padding:8px 8px 6px;color:#a1a1aa;font-size:.78rem;letter-spacing:.04em;text-transform:uppercase}#objBar .tete:active{cursor:grabbing}#objBar .poig{font-size:1.1rem;line-height:1}'
     + '#objBar #objF{margin-left:auto;flex:none;min-height:28px;width:28px;padding:0;display:flex;align-items:center;justify-content:center}#objBar.of{width:auto!important}#objBar.of .tit{display:none}'
     + '#objBar .grp{display:flex;flex-direction:column;gap:4px}#objBar .grp[hidden],#objBar .grpE[hidden]{display:none!important}'
-    + '#objBar .grp.ico{display:grid;grid-template-columns:1fr 1fr;gap:4px}#objBar .ico button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:4px 2px;min-height:50px;text-align:center;background:#f4f6f9;border-color:#d5dbe3;color:#1f2329;font-size:.68rem;line-height:1.1}'
-    + '#objBar .ico button:hover{border-color:#6aa9ff}#objBar .ico button.on{background:#dbeafe;border-color:#2a7bcf;color:#0b3d75;box-shadow:inset 0 0 0 1px #2a7bcf}#objBar .ico canvas{width:60px;height:32px}'
+    + '#objBar .cat{background:transparent!important;border:0!important;color:#a1a1aa!important;font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;min-height:26px!important;padding:0 2px!important;display:flex;align-items:center;gap:6px}#objBar .cat::before{content:"▾";font-size:.8rem;width:10px}#objBar .cat.ferme::before{content:"▸"}#objBar .cat:hover{color:#fff!important}'
+    + '#objBar .cgrid{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:4px}#objBar .cgrid[hidden]{display:none}#objBar .pol{display:grid;grid-template-columns:1fr 1fr;gap:4px}#objBar .pol button{text-align:center;font-size:.78rem}#objBar .del{display:flex;align-items:center;gap:6px;font-size:.78rem}#objBar .del input{width:56px;min-height:30px;border-radius:8px;border:1px solid #2f2f33;background:#fff;color:#111;font:inherit;font-weight:700;padding:0 6px}'
+    + '#objBar .cgrid button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:4px 2px;min-height:50px;text-align:center;background:#f4f6f9;border-color:#d5dbe3;color:#1f2329;font-size:.68rem;line-height:1.1}'
+    + '#objBar .cgrid button:hover{border-color:#6aa9ff}#objBar .cgrid button.on{background:#dbeafe;border-color:#2a7bcf;color:#0b3d75;box-shadow:inset 0 0 0 1px #2a7bcf}#objBar .cgrid canvas{width:60px;height:32px}'
     + '#objBar .aide{color:#9fc6f5;font-size:.72rem;line-height:1.3;padding:2px}#objBar .aide b{color:#6aa9ff}#objBar .rang{display:flex;gap:4px}#objBar .taille{display:grid;grid-template-columns:1fr 38px 38px;gap:4px;align-items:center;font-size:.74rem}#objBar .taille button{text-align:center;font-size:1.05rem;padding:0}#objBar .taille em{grid-column:1/-1;font-style:normal;font-size:.68rem;color:#9fc6f5}#objBar .rang button{flex:1;text-align:center}'
     + '#objBar #objL{min-height:32px;padding:0 8px;border-radius:8px;border:1px solid #2f2f33;background:#fff;color:#111;font:inherit;font-weight:700;text-transform:uppercase}'
     + '#objBar #objSim{background:#1f7a3f;border-color:#2f9e44;color:#fff;text-align:center}#objBar.sim #objSim{background:#a61e1e;border-color:#e03131}#objBar #objX{text-align:center}'
     + '#objBar .simAide{display:none;font-size:.74rem;line-height:1.35;color:#d4d4d8;padding:2px}#objBar.sim .simAide{display:block}#objBar .simAide .court{color:#ff8787;font-weight:800}#objBar .simAide .on{color:#8ce99a}';
   document.head.appendChild(st); $("#reader").appendChild(bar);
   bar.addEventListener("pointerdown", e => e.stopPropagation());
-  bar.querySelectorAll(".ico button").forEach(b => { const k = b.dataset.k, cv = b.querySelector("canvas"), g = cv.getContext("2d"), W = cv.width, H = cv.height;
+  /* catégories : on replie celles qu'on n'utilise pas (mémorisé) */
+  let cats = { base:1, cmd:1, rel:1 }; try { cats = JSON.parse(localStorage.getItem("objCats") || "null") || cats; } catch(e){}
+  const majCats = () => bar.querySelectorAll(".cat").forEach(h => { const o = !!cats[h.dataset.cat]; h.classList.toggle("ferme", !o); bar.querySelector('.cgrid[data-cat="' + h.dataset.cat + '"]').hidden = !o; });
+  bar.querySelectorAll(".cat").forEach(h => h.onclick = () => { cats[h.dataset.cat] = cats[h.dataset.cat] ? 0 : 1; try { localStorage.setItem("objCats", JSON.stringify(cats)); } catch(e){} majCats(); });
+  majCats();
+  bar.querySelectorAll(".cgrid button").forEach(b => { const k = b.dataset.k, cv = b.querySelector("canvas"), g = cv.getContext("2d"), W = cv.width, H = cv.height;
     g.strokeStyle = "#24282c"; g.fillStyle = "#24282c"; g.lineWidth = 3; g.lineCap = "round";
     if (k === "fil"){ g.beginPath(); g.moveTo(14, 44); g.lineTo(60, 44); g.lineTo(60, 20); g.lineTo(106, 20); g.stroke(); g.fillStyle = "#2a7bcf"; [[14, 44], [106, 20]].forEach(([x, y]) => { g.beginPath(); g.arc(x, y, 6, 0, 7); g.fill(); }); return; }
     if (k === "rails"){ g.lineWidth = 4; g.beginPath(); g.moveTo(26, 8); g.lineTo(26, 60); g.moveTo(94, 8); g.lineTo(94, 60); g.stroke(); g.lineWidth = 2.5; g.beginPath(); [24, 44].forEach(y => { g.moveTo(26, y); g.lineTo(94, y); }); g.stroke(); return; }
     if (k === "jonction"){ g.beginPath(); g.moveTo(20, 32); g.lineTo(100, 32); g.moveTo(60, 32); g.lineTo(60, 60); g.stroke(); g.beginPath(); g.arc(60, 32, 7, 0, 7); g.fill(); return; }
-    const U = k === "transfo" ? 17 : 34, w = k === "transfo" ? 4 : 2, y0 = k === "transfo" ? 18 : (k === "bp" ? 40 : 36);
+    if (k === "terre"){ dessinerElec(g, { t:"objet", k, p:[[.5, 14 / H]], lb:"", __u:40 }, W, H, 1.2, "#24282c"); return; }
+    const U = k === "transfo" ? 17 : 34, w = k === "transfo" ? 4 : 2, y0 = k === "transfo" ? 18 : (k === "bp" ? 40 : k === "contactT" ? 44 : 36);
     dessinerElec(g, { t:"objet", k, p:[[(W - w * U) / 2 / W, y0 / H]], lb:{ bobine:"CR", moteur:"M" }[k] || "", nf:0, __u:U }, W, H, 1.2, "#24282c"); });
   bar.querySelectorAll("[data-k]").forEach(b => b.onclick = () => { if (ELEC[b.dataset.k]) RD.objKe = b.dataset.k; else RD.objKi = b.dataset.k; SELO.s = null; redrawInk(); majObjUI(); });
   $("#objNF").onclick = () => { const s = SELO.s && strokes().includes(SELO.s) && ELEC[SELO.s.k] ? SELO.s : null;
     if (s){ snapInk(); s.nf = s.nf ? 0 : 1; RD.objNF = s.nf; redrawInk(); } else RD.objNF = RD.objNF ? 0 : 1; majObjUI(); };
   RD.lbK = {};
+  bar.querySelectorAll("#objPol [data-pol]").forEach(x => x.onclick = () => { const se = SELO.s && strokes().includes(SELO.s) && SELO.s.k === "inter" ? SELO.s : null;
+    if (se){ snapInk(); const c = $("#inkCanvas"), av = objGeo(se, c.width, c.height).ports; se.pol = x.dataset.pol; const ap = objGeo(se, c.width, c.height).ports;
+      strokes().forEach(t => { if (t.t !== "ligne" || !t.p) return; [0, 1].forEach(i => { const j = av.findIndex(q => Math.hypot(q[0] - t.p[i][0] * c.width, q[1] - t.p[i][1] * c.height) < 4); if (j >= 0 && ap[j]) t.p[i] = [ap[j][0] / c.width, ap[j][1] / c.height]; }); });
+      redrawInk(); } RD.objPol = x.dataset.pol; majObjUI(); });
+  const bdel = $("#objDel"); bdel.addEventListener("keydown", e => { e.stopPropagation(); if (e.key === "Enter") bdel.blur(); });
+  bdel.addEventListener("change", () => { const se = SELO.s; if (!se || se.k !== "bobineT") return; snapInk(); se.del = Math.max(1, Math.min(60, Math.round(+bdel.value || 3))); bdel.value = se.del; redrawInk(); });
   const bl = $("#objL"); let lbSnap = false;
   bl.addEventListener("keydown", e => { e.stopPropagation(); if (e.key === "Enter" || e.key === "Escape") bl.blur(); });
   bl.addEventListener("focus", () => { lbSnap = false; });
@@ -2471,8 +2581,8 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     fils.filter(o => !segs.includes(o)).forEach(o => o.p.forEach(p => { if (segs.some(f => surFil(p, f))) pts.push(p); }));
     pts.forEach(p => { if (!arr.some(o => o.t === "objet" && o.k === "jonction" && longueur(o.p[0], p) < 3)) arr.push({ t:"objet", k:"jonction", o:0, c:"#24282c", p:[p.slice()], w:4 }); }); };
   const bout = (p, f) => f.p.some(e => longueur(e, p) < 2);
-  const couperFils = o => { if (!ELEC[o.k] || /^(rails|jonction)$/.test(o.k)) return; const P = objGeo(o, c.width, c.height).ports.map(p => [p[0] / c.width, p[1] / c.height]), arr = strokes();
-    (o.k === "transfo" ? [[P[0], P[1]], [P[2], P[3]]] : [[P[0], P[1]]]).forEach(([A, B]) => arr.filter(f => f.t === "ligne" && f.fil).forEach(f => {
+  const couperFils = o => { if (!ELEC[o.k] || /^(rails|jonction|terre)$/.test(o.k)) return; const P = objGeo(o, c.width, c.height).ports.map(p => [p[0] / c.width, p[1] / c.height]), arr = strokes();
+    (o.k === "transfo" ? [[P[0], P[1]], [P[2], P[3]]] : ({ dpst:[[P[0], P[1]], [P[2], P[3]]], dpdt:[[P[0], P[1]], [P[3], P[4]]] }[polDe(o)] || [[P[0], P[1]]])).forEach(([A, B]) => arr.filter(f => f.t === "ligne" && f.fil).forEach(f => {
       if (!((surFil(A, f) || bout(A, f)) && (surFil(B, f) || bout(B, f)))) return;
       const [p0, p1] = f.p, [n0, n1] = longueur(p0, A) < longueur(p0, B) ? [A, B] : [B, A];
       const morceaux = [[p0, n0], [n1, p1]].filter(([a, b]) => longueur(a, b) > 3).map(([a, b]) => nouveauFil(a, b)); arr.splice(arr.indexOf(f), 1, ...morceaux); })); };
@@ -2510,7 +2620,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
       mv = { zone:true, q0:q.snap, el };                                                         /* zone à remplir : on glisse d'un coin à l'autre */
     } else {
       snapInk(); const o = { t:"objet", k:RD.objK, o:RD.objO, c:/^hl/.test(RD.color) ? "#24282c" : RD.color, p:[q.snap], w:4 };
-      if (el){ const de = ELEC[RD.objK]; if (de.lb) o.lb = RD.lbK[RD.objK] || de.lb; if (de.nf) o.nf = RD.objNF ? 1 : 0; }
+      if (el){ const de = ELEC[RD.objK]; if (de.lb) o.lb = RD.lbK[RD.objK] || de.lb; if (de.nf) o.nf = RD.objNF ? 1 : 0; if (RD.objK === "inter") o.pol = RD.objPol || "spst"; if (RD.objK === "bobineT") o.del = 3; }
       strokes().push(o); SELO.s = o; if (el) couperFils(o);
       if (el && RD.objK !== "jonction"){ RD.objKe = "fil"; RD.objNF = 0; aviser(ELEC[o.k].n + " posé. Relie-le : glisse d'un point bleu à l'autre.", 4500); }
     }
