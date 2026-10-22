@@ -1784,7 +1784,7 @@ function setZoom(z){
   const st = $("#rstage"), inn = $("#rinner"), ow = inn.offsetWidth || 1, oh = inn.offsetHeight || 1;
   const fx = (st.scrollLeft + st.clientWidth / 2) / ow, fy = (st.scrollTop + st.clientHeight / 2) / oh;
   RD.z = Math.max(zMin(), Math.min(zMax(), z)); sizeInner();
-  if (RD.wb){ st.scrollLeft = fx * inn.offsetWidth - st.clientWidth / 2; st.scrollTop = fy * inn.offsetHeight - st.clientHeight / 2; }
+  st.scrollLeft = fx * inn.offsetWidth - st.clientWidth / 2; st.scrollTop = fy * inn.offsetHeight - st.clientHeight / 2;   /* on zoome vers le centre de ce qu'on regarde (avant : vers le coin en haut à gauche, ce qui donnait un effet de rognage) */
 }
 const ZL = () => [.5, .75, ...ZOOMS].filter(v => v >= zMin() && v <= zMax());
 function zin(){ setZoom(ZL().find(v => v > RD.z + .01) || zMax()); }
