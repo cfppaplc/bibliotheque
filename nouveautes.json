@@ -3,17 +3,20 @@
   "date": "2026-10-21",
   "type": "outil",
   "titre": "Page d'accueil de la bibliothèque",
-  "texte": "Page d'accueil plus compacte : les livres sont visibles tout de suite, avec leur titre et leur compétence sous la couverture. Logo du Pavillon de l'Avenir et page « Bienvenue » pour les nouveaux utilisateurs.",
+  "texte": "Page d'accueil plus compacte : les livres sont visibles tout de suite, avec leur titre et leur compétence sous la couverture. Logo du Pavillon de l'Avenir, page Bienvenue toute simple à la première visite et page Aide qui explique chaque bouton de la barre.",
   "formation": [
    {
     "t": "Les livres sont en haut de la page, rangés par programme; le titre et la compétence sont écrits sous chaque couverture.",
     "img": "nouveautes/accueil-biblio.jpg"
    },
    {
-    "t": "« Aide » (dans le menu) ou « Comment ça marche » : la page Bienvenue présente les boutons de base de la barre d'outils du lecteur, numérotés de 1 à 10, et le menu « Plus d'outils ».",
+    "t": "« Aide » (dans le menu ou à droite du titre) : chaque bouton de la barre d'outils du lecteur, numéroté de 1 à 10, et le menu « Plus d'outils ».",
     "img": "nouveautes/bienvenue.jpg"
    },
-   "La page Bienvenue s'ouvre toute seule à la première visite; décoche « Ne plus afficher au démarrage » pour la revoir chaque fois."
+   {
+    "t": "À sa première visite, un collègue voit une page Bienvenue en trois étapes; « Voir l'aide » ouvre la page Aide.",
+    "img": "nouveautes/bienvenue-simple.jpg"
+   }
   ]
  },
  {

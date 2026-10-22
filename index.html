@@ -91,6 +91,12 @@
   .bv-box{background:#181818;border:1px solid #2f2f33;border-radius:14px;max-width:1080px;width:100%;padding:24px 26px;color:#f1f1f2;font-family:"Segoe UI",Roboto,Arial,sans-serif;box-shadow:0 20px 60px #000a}
   .bv-tete{display:flex;gap:18px;align-items:center;margin-bottom:18px}.bv-tete img{height:56px;background:#fff;border-radius:8px;padding:6px 10px}
   .bv-tete h2{margin:0 0 4px;font-size:1.6rem}.bv-tete p{margin:0;color:#a9a9ae}
+  .bien-box{background:#181818;border:1px solid #2f2f33;border-radius:16px;max-width:520px;width:100%;margin-top:6vh;padding:30px 32px;color:#f1f1f2;font-family:"Segoe UI",Roboto,Arial,sans-serif;text-align:center;box-shadow:0 20px 60px #000a}
+  .bien-logo{height:64px;background:#fff;border-radius:10px;padding:8px 12px}.bien-box h2{margin:18px 0 4px;font-size:2rem}.bien-sous{margin:0 0 22px;color:#a9a9ae}
+  .bien-et{list-style:none;padding:0;margin:0 0 24px;text-align:left;display:flex;flex-direction:column;gap:14px}.bien-et li{display:flex;gap:14px;align-items:flex-start}
+  .bien-et span{flex:none;width:34px;height:34px;border-radius:50%;background:#e50914;color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center}
+  .bien-et b{display:block;font-size:1.05rem;margin-bottom:2px}.bien-et div{color:#c8c8cc;line-height:1.4}
+  .bien-b{display:flex;justify-content:center;align-items:center;gap:8px}
   .bv-barre{display:block;width:100%;border-radius:10px;border:1px solid #2a2a2d}
   .bv-leg{list-style:none;padding:0;margin:16px 0 0;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px 18px}
   .bv-leg li{display:flex;gap:10px;align-items:flex-start}.bv-leg .n{flex:none;width:26px;height:26px;border-radius:50%;background:#ff2d55;color:#fff;font-weight:800;font-size:.85rem;display:flex;align-items:center;justify-content:center}
@@ -935,7 +941,7 @@ function renderHero(){
     <h1>Livres animés du Pavillon de l'Avenir</h1>
     <p>Choisis un livre et projette-le au tableau. <span class="hero-tag">Réservé aux enseignants</span></p>
   </div>
-  <button class="hero-aide" id="heroAide" type="button">❔ Comment ça marche</button>`;
+  <button class="hero-aide" id="heroAide" type="button">❔ Aide</button>`;
   $("#heroAide").onclick = () => ouvrirBienvenue();
 }
 
@@ -6115,8 +6121,17 @@ var QRCode=req('index'),L=req('QRErrorCorrectLevel');
 return {matrice:function(texte){var q=new QRCode(-1,L.M);q.addData(texte);q.make();return q.modules;}};})();
 </script>
 
-<div class="bv-ov" id="bvOv" hidden role="dialog" aria-label="Bienvenue"><div class="bv-box">
-  <div class="bv-tete"><img src="img/pavillon-avenir.png" alt=""><div><h2>Bienvenue : la barre d'outils</h2><p>Clique une couverture, puis « Lire ». Tout ce qu'il faut pour projeter est dans la barre en bas de l'écran.</p></div></div>
+<div class="bv-ov" id="bienOv" hidden role="dialog" aria-label="Bienvenue"><div class="bien-box">
+  <img class="bien-logo" src="img/pavillon-avenir.png" alt="Pavillon de l'Avenir">
+  <h2>Bienvenue !</h2>
+  <p class="bien-sous">Les livres animés du Pavillon de l'Avenir, prêts à projeter en classe.</p>
+  <ol class="bien-et"><li><span>1</span><div><b>Choisis un livre</b>Clique sa couverture, puis « Lire ».</div></li>
+    <li><span>2</span><div><b>Projette</b>La barre en bas de l'écran tourne les pages, écrit sur la page et montre les réponses.</div></li>
+    <li><span>3</span><div><b>Besoin d'aide ?</b>Le lien « Aide », en haut, explique chaque bouton.</div></li></ol>
+  <div class="bien-b"><button type="button" class="bv-lien" id="bienAide">Voir l'aide</button><button type="button" class="bv-ok" id="bienOk">C'est parti</button></div>
+</div></div>
+<div class="bv-ov" id="bvOv" hidden role="dialog" aria-label="Aide : la barre d'outils"><div class="bv-box">
+  <div class="bv-tete"><img src="img/pavillon-avenir.png" alt=""><div><h2>Aide : la barre d'outils</h2><p>Clique une couverture, puis « Lire ». Tout ce qu'il faut pour projeter est dans la barre en bas de l'écran.</p></div></div>
   <img class="bv-barre" src="nouveautes/bv-barre.jpg" alt="Barre d'outils du lecteur, boutons numérotés de 1 à 10">
   <ol class="bv-leg" id="bvLeg"></ol>
   <div class="bv-plus"><img src="nouveautes/bv-plus.jpg" alt="Menu Plus d'outils" loading="lazy"><div>
@@ -6124,8 +6139,8 @@ return {matrice:function(texte){var q=new QRCode(-1,L.M);q.addData(texte);q.make
     <ul><li><b>Minuterie</b> pour un travail chronométré.</li><li><b>Projecteur</b> et <b>Cache</b> pour attirer l'attention sur une partie de la page.</li>
     <li><b>Écran noir</b> pour ramener l'attention vers toi.</li><li><b>Code QR</b> : les élèves ouvrent le livre à la même page sur leur téléphone.</li>
     <li><b>✎ Organiser</b> : glisse un bouton entre la barre et ce menu pour garder tes outils préférés à portée de main.</li></ul></div></div>
-  <div class="bv-pied"><label><input type="checkbox" id="bvPlus" checked> Ne plus afficher au démarrage</label>
-    <div><button type="button" class="bv-lien" id="bvQn">Autres outils (schémas électriques, plans…) →</button><button type="button" id="bvOk" class="bv-ok">C'est parti</button></div></div>
+  <div class="bv-pied"><span></span>
+    <div><button type="button" class="bv-lien" id="bvQn">Autres outils (schémas électriques, plans…) →</button><button type="button" id="bvOk" class="bv-ok">Fermer</button></div></div>
 </div></div>
 <script>
 (function(){
@@ -6143,15 +6158,21 @@ return {matrice:function(texte){var q=new QRCode(-1,L.M);q.addData(texte);q.make
   ];
   document.getElementById("bvLeg").innerHTML = LEG.map(([t, d, k], i) => `<li><span class="n">${i + 1}</span><div><b>${t}</b>${k ? ` <kbd>${k}</kbd>` : ""}<p>${d}</p></div></li>`).join("");
   const ov = document.getElementById("bvOv");
-  const fermer = () => { ov.hidden = true; try { localStorage.setItem("bienvenueVu", document.getElementById("bvPlus").checked ? "1" : ""); } catch(e){} };
+  const fermer = () => { ov.hidden = true; };
   window.ouvrirBienvenue = () => { ov.hidden = false; ov.scrollTop = 0; };
   document.getElementById("bvOk").onclick = fermer;
   document.getElementById("bvQn").onclick = () => { fermer(); document.getElementById("quoiNeuf").click(); };
   ov.addEventListener("click", e => { if (e.target === ov) fermer(); });
   document.addEventListener("keydown", e => { if (e.key === "Escape" && !ov.hidden) fermer(); });
   document.getElementById("lienAide").addEventListener("click", e => { e.preventDefault(); ouvrirBienvenue(); });
+  /* première visite : une page de bienvenue toute simple */
+  const bi = document.getElementById("bienOv"), finBi = () => { bi.hidden = true; try { localStorage.setItem("bienvenueVu", "1"); } catch(e){} };
+  document.getElementById("bienOk").onclick = finBi;
+  document.getElementById("bienAide").onclick = () => { finBi(); ouvrirBienvenue(); };
+  bi.addEventListener("click", e => { if (e.target === bi) finBi(); });
+  document.addEventListener("keydown", e => { if (e.key === "Escape" && !bi.hidden) finBi(); });
   let vu = ""; try { vu = localStorage.getItem("bienvenueVu") || ""; } catch(e){}
-  if (!vu && !/[?&]livre=/.test(location.search)) setTimeout(() => { if (!document.querySelector(".reader.open")) ouvrirBienvenue(); }, 700);
+  if (!vu && !/[?&]livre=/.test(location.search)) setTimeout(() => { if (!document.querySelector(".reader.open")) bi.hidden = false; }, 700);
 })();
 </script>
 <div class="qn-ov" id="qnOv" hidden role="dialog" aria-label="Quoi de neuf"><div class="qn-box">
