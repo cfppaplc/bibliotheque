@@ -3,7 +3,7 @@
   "date": "2026-10-22",
   "type": "outil",
   "titre": "Accueil de classe",
-  "texte": "Tableau d'accueil animé pour le début de période : date, déroulement, timeline lisible du fond de la classe, arrière-plan lié à la compétence, un contenu à ouvrir pour chaque activité, et maintenant un passage en un clic entre le tableau de bord et le livre, sans quitter le plein écran.",
+  "texte": "Tableau d'accueil animé pour le début de période : date, déroulement, timeline lisible du fond de la classe, arrière-plan lié à la compétence, un contenu à ouvrir pour chaque activité (livre, schéma, plan, vidéo YouTube, minuterie), passage fluide vers le livre et mode examen sans pause.",
   "formation": [
    {
     "t": "Bouton « Accueil de classe » en haut de la bibliothèque pour l'ouvrir.",
@@ -25,6 +25,14 @@
     "t": "Sur le tableau de bord, le bouton blanc « Revenir au livre · p. 64 » (en haut à droite, ou touche L) te remet exactement où tu étais dans le livre. Parfait pour aller à l'atelier et revenir.",
     "img": "nouveautes/tdb-retour.jpg"
    },
+   {
+    "t": "Une vidéo pour une activité : « ＋ Ajouter » → « 🎬 Vidéo YouTube », puis colle le lien (bouton « Partager » de YouTube). Si le lien commence à un moment précis, la vidéo part de là. En classe, elle joue en grand sur le tableau de bord; « Fermer » ou Échap pour revenir.",
+    "img": "nouveautes/tdb-video.jpg"
+   },
+   {
+    "t": "Jour d'examen : dans « Préparer le cours », coche « Examen aujourd'hui ». Les pauses disparaissent de l'horaire (3 h 20 d'un bloc) et un badge EXAMEN s'affiche. Le lendemain, l'horaire normal revient tout seul.",
+    "img": "nouveautes/tdb-examen.jpg"
+   },
    "« Préparer le cours » : le panneau de l'enseignant, pour régler la période et le déroulement.",
    "« Plein écran » une seule fois au début du cours : il reste actif entre le tableau de bord et les livres. « Bibliothèque » ferme tout et te ramène aux livres.",
    {
@@ -33,6 +41,10 @@
    }
   ],
   "versions": [
+   {
+    "date": "2026-10-22",
+    "texte": "Vidéo YouTube à ouvrir pendant une activité, et case « Examen aujourd'hui » qui retire les pauses."
+   },
    {
     "date": "2026-10-22",
     "texte": "Mode sombre plus clair : gris ardoise au lieu de presque noir, plus lisible au projecteur."

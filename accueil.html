@@ -137,6 +137,12 @@ header { grid-column: 1 / -1; display: flex; align-items: center; justify-conten
 
 .period { background-color: var(--surface); background-image: radial-gradient(circle at 12px 12px, var(--rivet) 0 3px, transparent 3.5px), radial-gradient(circle at calc(100% - 12px) 12px, var(--rivet) 0 3px, transparent 3.5px), radial-gradient(circle at 12px calc(100% - 12px), var(--rivet) 0 3px, transparent 3.5px), radial-gradient(circle at calc(100% - 12px) calc(100% - 12px), var(--rivet) 0 3px, transparent 3.5px); border: 1px solid var(--line); border-top: 3px solid var(--copper); border-radius: 6px; padding: calc(var(--u) * 22); display: flex; flex-direction: column; gap: 12px; }
 .period-top { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.period-nw { display: flex; align-items: center; gap: calc(var(--u) * 16); flex-wrap: wrap; }
+.exam-badge { font: 700 calc(var(--u) * 22) var(--display); letter-spacing: .06em; text-transform: uppercase; color: #fff; background: var(--copper); border-radius: 6px; padding: calc(var(--u) * 4) calc(var(--u) * 12); }
+.exam-opt { display: flex; gap: 12px; align-items: flex-start; margin: 4px 0 18px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; cursor: pointer; line-height: 1.35; }
+.exam-opt input { width: 22px; height: 22px; margin: 1px 0 0; flex: none; accent-color: #e50914; cursor: pointer; }
+.exam-opt small { display: block; opacity: .7; margin-top: 2px; }
+.exam-opt:has(input:checked) { border-color: #e50914; background: color-mix(in srgb, #e50914 8%, transparent); }
 .period-name { font-family: var(--display); font-weight: 700; font-size: calc(var(--u) * 40); line-height: 1; text-transform: uppercase; letter-spacing: .03em; }
 .period-hours { font-family: var(--display); font-weight: 500; font-size: calc(var(--u) * 34); color: var(--muted); font-variant-numeric: tabular-nums; }
 .module { font-size: calc(var(--u) * 27); line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--muted); }
@@ -364,6 +370,19 @@ header { grid-column: 1 / -1; display: flex; align-items: center; justify-conten
 /* minuterie */
 .minu { position: fixed; inset: 0; z-index: 40; display: flex; align-items: center; justify-content: center; background: color-mix(in srgb, var(--bg) 82%, transparent); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
 .minu[hidden] { display: none; }
+.vid { position: fixed; inset: 0; z-index: 45; background: #000; display: flex; flex-direction: column; }
+.vid[hidden] { display: none; }
+.vid-top { display: flex; align-items: center; gap: 12px; padding: 10px 14px; color: #f1f1f2; font: 600 15px "Segoe UI", Roboto, Arial, sans-serif; }
+.vid-t { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; opacity: .85; }
+.vid-x { background: #fff; color: #111; border: 0; border-radius: 8px; height: 40px; padding: 0 16px; font: 700 15px "Segoe UI", Roboto, Arial, sans-serif; cursor: pointer; }
+.vid-x small { font-weight: 500; opacity: .55; margin-left: 4px; }
+.vid-cadre { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; }
+.vid-cadre iframe, .vid-cadre video { width: min(100%, calc((100vh - 60px) * 16 / 9)); aspect-ratio: 16 / 9; height: auto; border: 0; background: #000; }
+.lk-vid { display: flex; gap: 12px; align-items: center; margin: 8px 0; }
+.lk-vid img { width: 128px; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 6px; background: #0002; flex: none; }
+.lk-vid b { display: block; line-height: 1.25; }
+.lk-vid small { opacity: .7; }
+[data-u] { width: 100%; box-sizing: border-box; }
 .minu-c { background: var(--surface); border: 1px solid var(--line); border-radius: 24px; padding: calc(var(--u) * 40) calc(var(--u) * 60); text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,.4); }
 .minu-l { font: 700 calc(var(--u) * 34) var(--display); color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
 .minu-t { font: 700 calc(var(--u) * 260) var(--display); font-variant-numeric: tabular-nums; line-height: 1; color: var(--ink); margin: calc(var(--u) * 10) 0 calc(var(--u) * 20); }
@@ -489,7 +508,7 @@ header { grid-column: 1 / -1; display: flex; align-items: center; justify-conten
   <section class="course">
     <div class="period" data-w="periode">
       <div class="period-top">
-        <div class="period-name" id="v-pname">—</div>
+        <div class="period-nw"><div class="period-name" id="v-pname">—</div><span class="exam-badge" id="v-exam" hidden>Examen · sans pause</span></div>
         <div class="period-hours" id="v-phours"></div>
       </div>
       <div class="module" id="v-module"></div>
@@ -545,8 +564,9 @@ header { grid-column: 1 / -1; display: flex; align-items: center; justify-conten
       <ul class="ai-why" id="ai-why" hidden></ul>
       <ol class="preview" id="f-preview" aria-label="Aperçu de l'horaire du matin"></ol>
       </details></div>
+    <label class="exam-opt" for="f-exam"><input type="checkbox" id="f-exam"><span><b>Examen aujourd'hui</b> — pas de pause dans l'horaire<small>Revient tout seul à l'horaire normal demain.</small></span></label>
     <div class="field"><span class="step-q"><span class="num">4</span>Ouvrir quelque chose pendant une activité? <small class="opt">facultatif</small></span>
-      <small class="lk-aide">Choisis une page de livre, un schéma, un plan ou une minuterie pour une activité. En classe, un bouton « Ouvrir » apparaît quand l'activité commence.</small>
+      <small class="lk-aide">Choisis une page de livre, un schéma, un plan, une vidéo YouTube ou une minuterie pour une activité. En classe, un bouton « Ouvrir » apparaît quand l'activité commence.</small>
       <div class="lk-liste" id="f-liens"></div></div>
     <div class="sheet-actions">
       <button class="btn primary" type="submit">Afficher au tableau</button>
@@ -649,6 +669,11 @@ function dur(sec) {
 // Structure fixe d'une période : les pauses ne peuvent pas être retirées
 const BLOCKS = [["cours", 60], ["pause", 5], ["cours", 60], ["pause", 15], ["cours", 60]];
 const CLASS_MIN = 180, SPAN = 200;
+/* Examen : case à cocher dans « Préparer le cours ». Aucune pause dans l'horaire (3 h 20 d'un bloc); valable pour la journée seulement. */
+const jourAuj = () => new Date().toDateString();
+function examOn() { const c = document.getElementById("f-exam"); if (c && !document.getElementById("prep").hidden) return c.checked; return cfg.examen === jourAuj(); }
+const blocs = () => examOn() ? [["cours", SPAN]] : BLOCKS;
+const classMin = () => examOn() ? SPAN : CLASS_MIN;
 
 function periods() {
   return [["Matin", cfg.amStart], ["Après-midi", cfg.pmStart]].filter(p => /\d/.test(p[1] || ""))
@@ -674,6 +699,7 @@ function estimate(label) {
   return { d: 30, flex: false };
 }
 function points(text) {
+  const CLASS_MIN = classMin(), exam = examOn();
   const items = text.split("\n").map(l => l.trim()).filter(Boolean).map(l => {
     const m = l.match(/^(\d+)\s*(?:min)?\s*\|\s*(.+)$/);
     return m ? { d: +m[1], label: m[2].trim(), fixed: true } : { label: l.replace(/^\|\s*/, ""), fixed: false };
@@ -706,7 +732,7 @@ function points(text) {
   // Aligner une transition sur la pause quand elle tombe à 10 min ou moins (évite les petits bouts « suite »)
   for (let k = 0; k < list.length - 1; k++) {
     const L = list[k], R = list[k + 1];
-    if (L.fixed || R.fixed) continue;
+    if (L.fixed || R.fixed || exam) continue;
     for (const P of [60, 120]) {
       if (L.b !== P && Math.abs(L.b - P) <= 10 && P - L.a >= 5 && R.b - P >= 5) { L.b = P; R.a = P; break; }
     }
@@ -735,7 +761,7 @@ function cesure(txt) {
 }
 function timeline(start, text) {
   const pts = points(text).list; const rows = []; let real = start, cls = 0;
-  BLOCKS.forEach(([type, d]) => {
+  blocs().forEach(([type, d]) => {
     if (type === "pause") { rows.push({ label: "Pause de " + d + " min", pause: true, start: real, end: real + d }); }
     else if (!pts.length) { rows.push({ label: "Cours", start: real, end: real + d }); }
     else pts.forEach(p => {
@@ -841,12 +867,12 @@ function tick() {
     $("v-pname").textContent = "Aucune période"; $("v-phours").textContent = "";
     $("v-status").textContent = "Ajoute ton horaire dans les réglages."; $("v-water").style.width = "0%";
   } else {
-    $("v-pname").textContent = ref.name;
+    $("v-pname").textContent = ref.name; $("v-exam").hidden = !examOn();
     $("v-phours").textContent = fmt(ref.start) + " à " + fmt(ref.end);
     if (cur) {
       const pct = (nowMin - cur.start) / (cur.end - cur.start) * 100;
       $("v-water").style.width = pct.toFixed(2) + "%";
-      $("v-status").textContent = "Fin de la période dans " + dur((cur.end - nowMin) * 60);
+      $("v-status").textContent = (examOn() ? "Examen en cours · fin dans " : "Fin de la période dans ") + dur((cur.end - nowMin) * 60);
     } else if (next) {
       $("v-water").style.width = "0%";
       $("v-status").textContent = "Le cours commence dans " + dur((next.start - nowMin) * 60);
@@ -1379,9 +1405,10 @@ function preview() {
   const rows = timeline(start, text);
   [...$("f-preview").children].forEach((li, k) => { li.lastChild.textContent = rows[k].label; });
   renderDurs();
-  if (info.over || info.cut) { const w = document.createElement("li"); w.innerHTML = '<span class="warn">Les durées dépassent 3 h de cours : les derniers points ne tiennent pas.</span>'; w.style.display = "block"; $("f-preview").append(w); }
+  if (info.over || info.cut) { const w = document.createElement("li"); w.innerHTML = '<span class="warn">Les durées dépassent ' + (examOn() ? "3 h 20" : "3 h") + ' de cours : les derniers points ne tiennent pas.</span>'; w.style.display = "block"; $("f-preview").append(w); }
 }
 ["f-steps", "f-amStart"].forEach(id => $(id).addEventListener("input", preview));
+$("f-exam").addEventListener("change", () => { preview(); $("prep-more").open = true; });
 $("f-steps").addEventListener("input", () => { clearTimeout(window.__lkT); window.__lkT = setTimeout(renderLiens, 400); });
 
 // Flèches pour ajuster la durée de chaque activité (par bonds de 5 min)
@@ -1472,7 +1499,30 @@ function fillComps(prog) {
 $("f-prog").addEventListener("change", () => { fillComps($("f-prog").value); $("f-module").hidden = true; });
 
 // ---------- Contenus liés aux activités : page de livre, schéma, plan, tableau blanc, minuterie ----------
-const ICO_LIEN = { livre:"📖", schema:"⚡", plan:"📐", tableau:"⬜", minuterie:"⏱" };
+const ICO_LIEN = { livre:"📖", schema:"⚡", plan:"📐", tableau:"⬜", minuterie:"⏱", video:"🎬" };
+/* Vidéo YouTube : on accepte toutes les formes de lien (youtu.be, watch?v=, shorts, embed, live) et le moment de départ (t=90, t=1m30s) */
+function ytInfo(url){
+  const u = String(url || "").trim(); let m = u.match(/(?:youtu\.be\/|youtube(?:-nocookie)?\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|live\/|v\/))([\w-]{11})/i);
+  if (!m && /^[\w-]{11}$/.test(u)) m = [u, u]; if (!m) return null;
+  let start = 0; const t = u.match(/[?&#](?:t|start)=([\dhms]+)/i);
+  if (t){ const v = t[1]; if (/^\d+$/.test(v)) start = +v; else { const h = v.match(/(\d+)h/), mi = v.match(/(\d+)m/), se = v.match(/(\d+)s/); start = (h ? +h[1] * 3600 : 0) + (mi ? +mi[1] * 60 : 0) + (se ? +se[1] : 0); } }
+  return { id: m[1], start };
+}
+const ytImg = id => "https://i.ytimg.com/vi/" + id + "/mqdefault.jpg";
+function ytTitre(id){ return fetch("https://www.youtube.com/oembed?format=json&url=" + encodeURIComponent("https://www.youtube.com/watch?v=" + id)).then(r => r.ok ? r.json() : null).then(j => j && j.title || "").catch(() => ""); }
+const dureeTxt = s => s >= 60 ? Math.floor(s / 60) + " min " + String(s % 60).padStart(2, "0") : s + " s";
+// Lecteur vidéo plein écran, par-dessus le tableau de bord
+function lecteurVideo(c){
+  let ov = $("vid");
+  if (!ov){ ov = document.createElement("div"); ov.id = "vid"; ov.className = "vid"; ov.hidden = true;
+    ov.innerHTML = '<div class="vid-top"><span class="vid-t"></span><button type="button" class="vid-x">✕ Fermer <small>Échap</small></button></div><div class="vid-cadre"></div>';
+    document.body.append(ov); ov.querySelector(".vid-x").onclick = fermerVideo; }
+  ov.querySelector(".vid-t").textContent = c.nom || "Vidéo";
+  if (c.yt) ov.querySelector(".vid-cadre").innerHTML = '<iframe src="https://www.youtube-nocookie.com/embed/' + c.yt + '?autoplay=1&rel=0&modestbranding=1&playsinline=1' + (c.start ? "&start=" + c.start : "") + '" title="Vidéo" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>';
+  else ov.querySelector(".vid-cadre").innerHTML = '<video src="' + String(c.url).replace(/"/g, "&quot;") + '" controls autoplay playsinline></video>';
+  ov.hidden = false; setTimeout(() => ov.querySelector(".vid-x").focus(), 50);
+}
+function fermerVideo(){ const ov = $("vid"); if (!ov || ov.hidden) return false; ov.hidden = true; ov.querySelector(".vid-cadre").innerHTML = ""; return true; }
 let LIENS_T = {}, CATAL = null;
 const cleLien = l => String(l || "").replace(/ \(suite\)$/, "").replace(/^\d+\s*(?:min)?\s*\|\s*/, "").trim().toLowerCase();
 const lienDe = label => (cfg.liens || {})[cleLien(label)] || null;
@@ -1483,6 +1533,7 @@ function nomLien(c){
   if (c.type === "plan") return "Plans · " + (c.nom || "Dossier " + c.n);
   if (c.type === "tableau") return "Tableau blanc" + (c.fond === "quad" ? " quadrillé" : c.fond === "iso" ? " isométrique" : "");
   if (c.type === "minuterie") return "Minuterie " + c.min + " min";
+  if (c.type === "video") return "Vidéo" + (c.nom ? " · " + c.nom : "") + (c.start ? " (à " + dureeTxt(c.start) + ")" : "");
   return "";
 }
 function majGo(b, c){ if (!b) return; if (!c){ b.hidden = true; b.onclick = null; return; }
@@ -1491,6 +1542,7 @@ function majGo(b, c){ if (!b) return; if (!c){ b.hidden = true; b.onclick = null
 function ouvrirLien(c){
   if (!c) return;
   if (c.type === "minuterie"){ minuterie(c.min, c.nom); return; }
+  if (c.type === "video"){ if (c.yt || /\.(mp4|webm|ogg)(\?|$)/i.test(c.url || "")) lecteurVideo(c); else window.open(c.url, "_blank", "noopener"); return; }
   if (window.parent !== window && CATAL){ try { window.parent.postMessage({ type:"accueil-ouvrir", contenu:c }, "*"); return; } catch(e){} }
   /* tableau de bord ouvert seul : on passe par la bibliothèque */
   if (c.type === "livre"){ location.href = "index.html?livre=" + encodeURIComponent(c.f) + (c.page > 1 ? "&page=" + c.page : ""); return; }
@@ -1528,7 +1580,8 @@ function choix(row, label){
     + '<button type="button" class="lk-tuile" data-t="schema"' + (enBiblio ? "" : " disabled") + '><b>⚡</b>Schéma électrique</button>'
     + '<button type="button" class="lk-tuile" data-t="plan"' + (enBiblio ? "" : " disabled") + '><b>📐</b>Plan technique</button>'
     + '<button type="button" class="lk-tuile" data-t="tableau"' + (enBiblio ? "" : " disabled") + '><b>⬜</b>Tableau blanc</button>'
-    + '<button type="button" class="lk-tuile" data-t="minuterie"><b>⏱</b>Minuterie</button></div>'
+    + '<button type="button" class="lk-tuile" data-t="minuterie"><b>⏱</b>Minuterie</button>'
+    + '<button type="button" class="lk-tuile" data-t="video"><b>🎬</b>Vidéo YouTube</button></div>'
     + (enBiblio ? "" : '<p class="lk-note">Pour les livres, schémas et plans, ouvre ce tableau de bord depuis la bibliothèque.</p>')
     + '<div class="lk-form" hidden></div>';
   row.append(z);
@@ -1562,6 +1615,24 @@ function choix(row, label){
       f.innerHTML = '<div class="lk-ok">' + [5, 10, 15, 20, 30, 45].map(m => `<button type="button" class="prim" data-m="${m}">${m} min</button>`).join("") + annuler + '</div>';
       f.querySelectorAll("[data-m]").forEach(b => b.onclick = () => fini({ type:"minuterie", min:+b.dataset.m, nom:label }));
     }
+    if (ty === "video"){
+      f.innerHTML = '<input type="url" data-u placeholder="Colle le lien de la vidéo (YouTube ou fichier .mp4)" autocomplete="off">'
+        + '<div class="lk-vid" hidden><img alt="" onerror="this.style.visibility='hidden'"><span><b data-n>Vidéo</b><small data-s></small></span></div>'
+        + '<small class="lk-aide" data-e>Sur YouTube : bouton « Partager », puis « Copier ». Pour commencer à un moment précis, coche « Commencer à » avant de copier.</small>'
+        + '<div class="lk-ok"><button type="button" class="prim" data-v disabled>Choisir</button>' + annuler + '</div>';
+      const inp = f.querySelector("[data-u]"), ok = f.querySelector("[data-v]"), apv = f.querySelector(".lk-vid"), msg = f.querySelector("[data-e]");
+      let choisi = null, n = 0;
+      const lire = () => { const u = inp.value.trim(), y = ytInfo(u), k = ++n; choisi = null; ok.disabled = true; apv.hidden = true;
+        if (y){ choisi = { type:"video", yt:y.id, start:y.start, url:"https://youtu.be/" + y.id, nom:"" }; ok.disabled = false; apv.hidden = false;
+          apv.querySelector("img").src = ytImg(y.id); apv.querySelector("[data-n]").textContent = "Vidéo YouTube"; apv.querySelector("[data-s]").textContent = y.start ? "Commence à " + dureeTxt(y.start) : "Du début";
+          ytTitre(y.id).then(t => { if (k === n && t && choisi){ choisi.nom = t; apv.querySelector("[data-n]").textContent = t; } }); msg.textContent = "Vidéo trouvée ✓"; }
+        else if (/^https?:\/\/\S+$/i.test(u)){ choisi = { type:"video", url:u, nom:/\.(mp4|webm|ogg)(\?|$)/i.test(u) ? "Fichier vidéo" : "Lien web" }; ok.disabled = false; msg.textContent = /\.(mp4|webm|ogg)(\?|$)/i.test(u) ? "Fichier vidéo ✓" : "Ce n'est pas YouTube : le lien s'ouvrira dans un nouvel onglet."; }
+        else if (u) msg.textContent = "Ce lien ne ressemble pas à une vidéo. Copie-le depuis la barre d'adresse ou le bouton « Partager » de YouTube."; };
+      inp.addEventListener("input", lire); inp.addEventListener("paste", () => setTimeout(lire, 0));
+      inp.addEventListener("keydown", e => { if (e.key === "Enter"){ e.preventDefault(); if (!ok.disabled) ok.click(); } });
+      ok.onclick = () => { if (choisi){ if (!choisi.nom) choisi.nom = label; fini(choisi); } };
+      setTimeout(() => inp.focus(), 30);
+    }
     const x = f.querySelector("[data-x]"); if (x) x.onclick = () => z.remove();
   });
 }
@@ -1585,6 +1656,7 @@ function openPrep() {
   $("f-prog").value = prog; fillComps(prog);
   ["comp", "module", "steps", "amStart", "pmStart"].forEach(k => $("f-" + k).value = cfg[k]);
   $("f-module").hidden = $("f-comp").value !== "autre";
+  $("f-exam").checked = cfg.examen === jourAuj();
   $("prep").hidden = false; $("ai-why").hidden = true; $("ai-note").textContent = ""; preview(); $("f-comp").focus();
   LIENS_T = JSON.parse(JSON.stringify(cfg.liens || {})); demanderCatalogue(); renderLiens();
 }
@@ -1595,6 +1667,7 @@ $("prepForm").addEventListener("submit", e => {
   e.preventDefault();
   ["comp", "module", "steps", "prog"].forEach(k => cfg[k] = $("f-" + k).value);
   cfg.liens = JSON.parse(JSON.stringify(LIENS_T)); lastStepsKey = "";
+  cfg.examen = $("f-exam").checked ? jourAuj() : "";
   save(); renderStatic(); tick(); $("prep").hidden = true;
 });
 $("b-cancel").onclick = () => $("sheet").hidden = true;
@@ -1667,6 +1740,7 @@ window.addEventListener("message", e => {
   fitSoon && fitSoon();
 });
 
+document.addEventListener("keydown", e => { if (e.key === "Escape" && fermerVideo()) e.stopImmediatePropagation(); }, true);
 document.addEventListener("keydown", e => {
   if (!$("sheet").hidden || !$("prep").hidden || !$("keys").hidden || e.target.matches("input, textarea, select")) { if (e.key === "Escape") { $("sheet").hidden = true; $("prep").hidden = true; $("keys").hidden = true; } return; }
   if (e.key === "?") { $("keys").hidden = false; return; }
