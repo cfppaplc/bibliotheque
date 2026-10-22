@@ -1,17 +1,199 @@
 [
-  { "date": "2026-10-21", "type": "outil", "texte": "Schéma électrique : symboles rangés en catégories repliables; interrupteurs SPST, SPDT, DPST et DPDT; nouveaux symboles (résistance, condensateur, diode, DEL, pile, terre, sonnerie, élément chauffant, relais et contact temporisés). L'animation gère les charges en série, les piles et les délais des relais temporisés." },
-  { "date": "2026-10-21", "type": "outil", "texte": "Barre du crayon et du tableau blanc allégée : une seule ligne d'outils. Les couleurs et l'épaisseur sont sous le rond de couleur; rétablir, tout effacer, zoom, tableaux et enregistrement sont sous « ⋯ ». Aucune fonction retirée." },
-  { "date": "2026-10-21", "type": "outil", "texte": "Schéma en échelle : on peut l'animer ! Bouton « ▶ Animer le schéma » : on appuie sur les boutons-poussoirs et interrupteurs, le courant circule (points jaunes), les bobines changent leurs contacts (maintien), les lampes s'allument, les moteurs tournent, et un court-circuit est signalé. La palette des symboles est maintenant compacte, avec des icônes, et se déplace avec sa poignée." },
-  { "date": "2026-10-21", "type": "outil", "texte": "Tableau blanc : schémas électriques en échelle sur le quadrillé (bouton Objets) — rails L1/L2, contacts NO/NF, bobines, boutons-poussoirs, thermostat, pressostat, lampe témoin, solénoïde, transformateur… et des fils qui suivent les symboles." },
-  { "date": "2026-10-21", "type": "ajout", "livre": "administration-batiment", "texte": "Administration d'un bâtiment et plan d'urgence (compétence 16, 146 pages, 13 chapitres)." },
-  { "date": "2026-10-21", "type": "maj", "livre": "plomberie-chauffage", "texte": "Version officielle animée : 190 pages, 13 modules, formatif final et réponses pas à pas." },
-  { "date": "2026-10-21", "type": "maj", "livre": "protection-incendie", "texte": "Nouvelle version : 104 pages, corrigé intégré (bouton ✓) et simulateur de panneau d'alarme." },
-  { "date": "2026-10-21", "type": "outil", "texte": "La bibliothèque est en ligne et fonctionne aussi sans Internet : les livres déjà ouverts restent sur l'ordinateur." },
-  { "date": "2026-10-21", "type": "outil", "texte": "Recherche dans le texte des livres : tape un mot dans la barre de recherche pour trouver les pages qui en parlent." },
-  { "date": "2026-10-21", "type": "outil", "texte": "Code QR pour les élèves (touche Q dans le lecteur) : le livre s'ouvre à la même page sur leur téléphone." },
-  { "date": "2026-10-21", "type": "outil", "texte": "Filtre par programme (DEP 5211 · DEP 5333) et livres classés par compétence." },
-  { "date": "2026-10-21", "type": "outil", "texte": "Table des matières au même format dans tous les livres, et réponses pas à pas partout où le livre a un corrigé." },
-  { "date": "2026-10-21", "type": "outil", "texte": "Plans : trois dossiers de plans d'exercice (maison, duplex, bâtiment commercial), 11 feuilles chacun." },
-  { "date": "2026-10-21", "type": "outil", "texte": "Accueil de classe : curseur de la timeline corrigé, timeline plus grosse, panneau de l'enseignant clair, plein écran réparé." },
-  { "date": "2026-10-17", "type": "outil", "texte": "Accueil de classe et visionneuse de plans pour le tableau interactif." }
+ {
+  "date": "2026-10-21",
+  "type": "outil",
+  "titre": "Schéma électrique en échelle (tableau blanc)",
+  "texte": "Dessine et anime des schémas en échelle sur le quadrillé : rails L1/L2, une trentaine de symboles rangés par catégories, fils aimantés aux bornes, et une animation où le courant circule de L1 vers L2.",
+  "formation": [
+   "Ouvre le tableau blanc, puis bouton Fond jusqu'à « Quadrillé (schéma électrique en échelle) ».",
+   "Bouton Objets (le cube) : la palette « Schéma électrique » s'ouvre. Glisse la poignée ⠿ pour la déplacer, ⌄ pour la replier; touche le titre d'une catégorie pour l'ouvrir ou la fermer.",
+   "« Échelle L1/L2 » : glisse un rectangle pour tracer les rails. Pour changer sa taille plus tard : touche L1 ou L2, puis glisse le carré bleu en bas à droite (ou Largeur / Hauteur − +).",
+   "Choisis un symbole et touche un échelon. Quand il est sélectionné : case Repère (CR1, M, PB2…), NO / NF, type d'interrupteur (SPST, SPDT, DPST, DPDT) ou délai d'un relais temporisé.",
+   "Pour relier : glisse d'un point bleu à l'autre. Le fil fait un coude tout seul, et un point de jonction s'ajoute quand tu arrives au milieu d'un autre fil. Gomme pour effacer un fil, ↶ pour annuler.",
+   "▶ Animer le schéma : garde enfoncé un bouton-poussoir, clique un interrupteur pour l'actionner. Rouge = L1, bleu = L2, points jaunes = courant. Une bobine change tous les contacts qui portent son repère (contact de maintien)."
+  ],
+  "versions": [
+   {
+    "date": "2026-10-21",
+    "texte": "Le courant circule de L1 vers L2 et suit le tracé; animation juste après un zoom; les fils sous un symbole sont coupés entre ses bornes."
+   },
+   {
+    "date": "2026-10-21",
+    "texte": "Catégories repliables; interrupteurs SPST, SPDT, DPST, DPDT; résistance, condensateur, diode, DEL, pile, terre, sonnerie, élément chauffant, relais et contact temporisés; charges en série."
+   },
+   {
+    "date": "2026-10-21",
+    "texte": "Échelle redimensionnable après la pose; palette compacte avec icônes, déplaçable et repliable."
+   },
+   {
+    "date": "2026-10-21",
+    "texte": "Animation du schéma : courant, bobines, maintien, lampes, moteurs, court-circuit signalé."
+   },
+   {
+    "date": "2026-10-21",
+    "texte": "Fils aimantés aux bornes, coudes, jonctions automatiques; les fils restent droits quand on déplace un symbole."
+   },
+   {
+    "date": "2026-10-21",
+    "texte": "Première version : rails L1/L2, contacts NO/NF, bobines, boutons-poussoirs, thermostat, pressostat, lampe, solénoïde, transformateur."
+   }
+  ]
+ },
+ {
+  "date": "2026-10-21",
+  "type": "outil",
+  "titre": "Barre du crayon et du tableau blanc",
+  "texte": "Une seule ligne d'outils, plus simple pour débuter. Rien n'a été retiré : les outils moins utilisés sont rangés dans deux menus.",
+  "formation": [
+   "Rond de couleur : choisis la couleur, un surligneur ou l'épaisseur du trait. Le menu se ferme dès que tu choisis.",
+   "Sur la ligne : forme (trait libre, ligne, flèche, rectangle, ellipse), texte, objets, gomme, annuler, fond.",
+   "Le bouton Objets n'apparaît que sur le quadrillé (schéma électrique) et le plan isométrique (plomberie).",
+   "⋯ Plus : rétablir, tout effacer, zoom, déplacer le tableau, tableau précédent / suivant / nouveau, enregistrer en PNG.",
+   "⌄ replie la barre en petit bouton; ▯ l'ancre sur le côté droit de l'écran."
+  ],
+  "versions": [
+   {
+    "date": "2026-10-21",
+    "texte": "Le bouton Objets est caché sur les fonds où il ne sert pas."
+   },
+   {
+    "date": "2026-10-21",
+    "texte": "Barre allégée : menus « couleur » et « ⋯ Plus »."
+   }
+  ]
+ },
+ {
+  "date": "2026-10-21",
+  "type": "ajout",
+  "livre": "administration-batiment",
+  "titre": "Administration d'un bâtiment et plan d'urgence",
+  "texte": "Nouveau livre de la compétence 16 : 146 pages, 13 chapitres.",
+  "formation": [
+   "Dans la bibliothèque, clique la couverture, puis « Lire » (ou « Ouvrir le livre » ci-dessus).",
+   "Flèches ← → (ou les boutons en bas) pour tourner les pages; tape un numéro dans la case pour sauter à une page.",
+   "Touche M (ou le bouton ☰) : table des matières, avec une icône par type de section.",
+   "Bouton ✓ (touche R) : les réponses apparaissent une à la fois, pas à pas, sur la page affichée.",
+   "Bouton QR (touche Q) : les élèves scannent et le livre s'ouvre à la même page sur leur téléphone."
+  ]
+ },
+ {
+  "date": "2026-10-21",
+  "type": "maj",
+  "livre": "plomberie-chauffage",
+  "titre": "Plomberie et chauffage",
+  "texte": "Version officielle animée : 190 pages, 13 modules, formatif final et réponses pas à pas.",
+  "formation": [
+   "Dans la bibliothèque, clique la couverture, puis « Lire » (ou « Ouvrir le livre » ci-dessus).",
+   "Flèches ← → (ou les boutons en bas) pour tourner les pages; tape un numéro dans la case pour sauter à une page.",
+   "Touche M (ou le bouton ☰) : table des matières, avec une icône par type de section.",
+   "Bouton ✓ (touche R) : les réponses apparaissent une à la fois, pas à pas, sur la page affichée.",
+   "Bouton QR (touche Q) : les élèves scannent et le livre s'ouvre à la même page sur leur téléphone.",
+   "Le formatif final est à la fin du livre : ouvre la table des matières (M) pour y aller directement."
+  ]
+ },
+ {
+  "date": "2026-10-21",
+  "type": "maj",
+  "livre": "protection-incendie",
+  "titre": "Protection incendie",
+  "texte": "Nouvelle version : 104 pages, corrigé intégré (bouton ✓) et simulateur de panneau d'alarme.",
+  "formation": [
+   "Dans la bibliothèque, clique la couverture, puis « Lire » (ou « Ouvrir le livre » ci-dessus).",
+   "Flèches ← → (ou les boutons en bas) pour tourner les pages; tape un numéro dans la case pour sauter à une page.",
+   "Touche M (ou le bouton ☰) : table des matières, avec une icône par type de section.",
+   "Bouton ✓ (touche R) : les réponses apparaissent une à la fois, pas à pas, sur la page affichée.",
+   "Bouton QR (touche Q) : les élèves scannent et le livre s'ouvre à la même page sur leur téléphone.",
+   "Pour trouver le simulateur de panneau d'alarme : tape « simulateur » dans la recherche de la bibliothèque."
+  ]
+ },
+ {
+  "date": "2026-10-21",
+  "type": "outil",
+  "titre": "Bibliothèque en ligne et hors ligne",
+  "texte": "La bibliothèque est sur Internet (lien à partager avec les collègues) et fonctionne sans Internet pour les livres déjà ouverts.",
+  "formation": [
+   "Ouvre chaque livre une fois avec Internet : il est gardé sur cet ordinateur.",
+   "Sans Internet, la bibliothèque et les livres déjà ouverts s'ouvrent quand même; un message l'indique.",
+   "Quand Internet revient, les livres modifiés se mettent à jour tout seuls (sans retélécharger ceux qui n'ont pas changé).",
+   "Si une vieille version reste affichée : Ctrl+F5."
+  ]
+ },
+ {
+  "date": "2026-10-21",
+  "type": "outil",
+  "titre": "Recherche, filtre et code QR",
+  "texte": "Recherche dans le texte de tous les livres, filtre par programme (DEP 5211 · DEP 5333) et code QR pour ouvrir le livre sur le téléphone des élèves.",
+  "formation": [
+   "Tape un mot dans la barre de recherche : les pages des livres qui en parlent s'affichent; clique un résultat pour ouvrir le livre à cette page.",
+   "Boutons DEP 5211 et DEP 5333 en haut : seuls les livres de ce programme restent, classés par compétence.",
+   "Dans un livre, bouton QR (touche Q) : projette le code, les élèves le scannent et arrivent à la même page."
+  ],
+  "versions": [
+   {
+    "date": "2026-10-21",
+    "texte": "Code QR pour les élèves (touche Q)."
+   },
+   {
+    "date": "2026-10-21",
+    "texte": "Filtre par programme et livres classés par compétence."
+   },
+   {
+    "date": "2026-10-21",
+    "texte": "Recherche dans le texte des livres."
+   }
+  ]
+ },
+ {
+  "date": "2026-10-21",
+  "type": "outil",
+  "titre": "Table des matières et réponses pas à pas",
+  "texte": "Même table des matières dans tous les livres, avec des icônes qui correspondent au type de section, et réponses pas à pas partout où le livre a un corrigé.",
+  "formation": [
+   "Touche M (ou ☰) dans un livre : la table des matières s'ouvre; clique une section pour y aller.",
+   "Bouton ✓ (touche R) : chaque clic montre la réponse suivante de la page, pour corriger avec le groupe une question à la fois.",
+   "Si le bouton ✓ est grisé, la page n'a pas de réponse."
+  ]
+ },
+ {
+  "date": "2026-10-21",
+  "type": "outil",
+  "titre": "Plans techniques",
+  "texte": "Visionneuse de plans pour le tableau interactif et trois dossiers d'exercice (maison, duplex, bâtiment commercial) de 11 feuilles chacun, avec coupe A-302.",
+  "formation": [
+   "Bouton « Plans » en haut de la bibliothèque : choisis un dossier.",
+   "Chaque dossier a 11 feuilles : plans, élévations, coupe longitudinale, coupe de mur type et légende des matériaux (A-302).",
+   "Zoome et déplace la feuille au tableau, puis annote avec le crayon."
+  ],
+  "versions": [
+   {
+    "date": "2026-10-21",
+    "texte": "Trois dossiers de plans d'exercice, 11 feuilles chacun."
+   },
+   {
+    "date": "2026-10-17",
+    "texte": "Visionneuse de plans pour le tableau interactif."
+   }
+  ]
+ },
+ {
+  "date": "2026-10-21",
+  "type": "outil",
+  "titre": "Accueil de classe",
+  "texte": "Tableau d'accueil animé pour le début de période : date, période, déroulement et timeline lisible du fond de la classe.",
+  "formation": [
+   "Bouton « Accueil de classe » en haut de la bibliothèque pour l'ouvrir.",
+   "Panneau de l'enseignant : règle la période et le déroulement.",
+   "Bouton plein écran pour la projection; le bouton Bibliothèque de la barre te ramène aux livres."
+  ],
+  "versions": [
+   {
+    "date": "2026-10-21",
+    "texte": "Curseur de la timeline corrigé, timeline plus grosse, panneau de l'enseignant clair, plein écran réparé, bouton Bibliothèque déplacé."
+   },
+   {
+    "date": "2026-10-17",
+    "texte": "Accueil de classe pour le tableau interactif."
+   }
+  ]
+ }
 ]

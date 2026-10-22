@@ -91,9 +91,17 @@
   .qn-it{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-top:1px solid #2a2a2d}
   .qn-tag{flex:none;font-size:.7rem;font-weight:700;text-transform:uppercase;border-radius:4px;padding:3px 7px;margin-top:2px}
   .qn-tag.ajout{background:#e50914}.qn-tag.maj{background:#1f6fc2}.qn-tag.outil{background:#3a3a3f}
+  .qn-it{flex-wrap:wrap}.qn-corps{flex:1;min-width:0}.qn-corps p{margin:2px 0 0}.qn-titre{font-weight:700;font-size:1.02rem}
+  .qn-plus{flex:none;width:34px;height:34px;border-radius:50%;border:1px solid #3a3a3f;background:#232326;color:#fff;font-size:1.3rem;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center}
+  .qn-plus:hover{border-color:#8a8a90}.qn-plus[aria-expanded="true"]{background:#1f6fc2;border-color:#1f6fc2}
+  .qn-detail{flex-basis:100%;margin:6px 0 4px 0;padding:14px 16px;border-radius:10px;background:#111113;border:1px solid #2a2a2d}
+  .qn-detail[hidden]{display:none}.qn-detail h3{margin:0 0 8px;font-size:.8rem;text-transform:uppercase;letter-spacing:.06em;color:#a9a9ae}
+  .qn-detail ol{margin:0 0 4px;padding-left:22px}.qn-detail li{margin:0 0 7px;line-height:1.45}
+  .qn-hist{list-style:none;padding:0!important;margin:0}.qn-hist li{display:flex;gap:10px;color:#c8c8cc;font-size:.9rem}.qn-hist .d{flex:none;color:#8a8a90;min-width:118px}
+  .qn-nv{font-size:.72rem;color:#a9a9ae;margin-left:6px}
   .qn-it p{margin:0;line-height:1.45}
-  .qn-it button{all:unset;cursor:pointer;color:#8fb8ff;font-weight:600;margin-left:6px}
-  .qn-it button:hover{text-decoration:underline}
+  .qn-it p button{all:unset;cursor:pointer;color:#8fb8ff;font-weight:600;margin-left:6px}
+  .qn-it p button:hover{text-decoration:underline}
   .qn-fermer{margin-top:18px;font:600 .95rem "Segoe UI",Roboto,Arial,sans-serif;padding:9px 18px;border-radius:6px;background:#2a2a2a;border:1px solid #666;color:#fff;cursor:pointer}
   .badge{position:absolute;top:8px;left:8px;background:var(--accent);font-size:.65rem;font-weight:700;padding:3px 7px;border-radius:3px;text-transform:uppercase;z-index:2}
   .fav-mark{position:absolute;top:6px;right:8px;font-size:1.1rem;z-index:2;text-shadow:0 1px 4px #000}
@@ -5887,7 +5895,14 @@ return {matrice:function(texte){var q=new QRCode(-1,L.M);q.addData(texte);q.make
     const jours = [...new Set(NOUV.map(n => n.date))];
     $("#qnListe").innerHTML = jours.map(j => `<div class="qn-jour">${esc(dateFr(j))}</div>` + NOUV.filter(n => n.date === j).map((n, i) => {
       const l = n.livre && LIVRES.find(x => x.fichier === n.livre);
-      return `<div class="qn-it"><span class="qn-tag ${esc(n.type)}">${lab[n.type] || ""}</span><p>${esc(n.texte)}${l ? ` <button type="button" data-ouvrir="${esc(l.fichier)}">Ouvrir le livre</button>` : ""}</p></div>`; }).join("")).join("");
+      const id = "qnd" + j + "-" + i, form = Array.isArray(n.formation) ? n.formation : [], hist = Array.isArray(n.versions) ? n.versions : [];
+      const detail = form.length || hist.length;
+      return `<div class="qn-it"><span class="qn-tag ${esc(n.type)}">${lab[n.type] || ""}</span><div class="qn-corps">${n.titre ? `<div class="qn-titre">${esc(n.titre)}${hist.length > 1 ? `<span class="qn-nv">${hist.length} mises à jour</span>` : ""}</div>` : ""}<p>${esc(n.texte)}${l ? ` <button type="button" data-ouvrir="${esc(l.fichier)}">Ouvrir le livre</button>` : ""}</p></div>`
+        + (detail ? `<button type="button" class="qn-plus" aria-expanded="false" aria-controls="${id}" title="Mini-formation">+</button><div class="qn-detail" id="${id}" hidden>`
+          + (form.length ? `<h3>Mini-formation</h3><ol>${form.map(f => `<li>${esc(f)}</li>`).join("")}</ol>` : "")
+          + (hist.length ? `<h3 style="margin-top:12px">Historique</h3><ul class="qn-hist">${hist.map(v => `<li><span class="d">${esc(dateFr(v.date))}</span><span>${esc(v.texte)}</span></li>`).join("")}</ul>` : "") + `</div>` : "")
+        + `</div>`; }).join("")).join("");
+    $("#qnListe").querySelectorAll(".qn-plus").forEach(b => b.onclick = () => { const d = document.getElementById(b.getAttribute("aria-controls")), o = d.hidden; d.hidden = !o; b.setAttribute("aria-expanded", String(o)); b.textContent = o ? "−" : "+"; b.title = o ? "Masquer" : "Mini-formation"; });
     $("#qnListe").querySelectorAll("[data-ouvrir]").forEach(b => b.onclick = () => { const l = LIVRES.find(x => x.fichier === b.dataset.ouvrir); $("#qnOv").hidden = true; if (l) openModal(l); });
   }
   function ouvrir(e){ if (e) e.preventDefault(); dessiner(); $("#qnOv").hidden = false;
