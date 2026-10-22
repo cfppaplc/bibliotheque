@@ -837,11 +837,19 @@ function majRecente(l){ const e = NOUV.find(n => n.livre === l.fichier && (n.typ
 /* « Nouveau » pendant 30 jours : date de l'ajout dans Quoi de neuf, ou date d'ajout par l'administration */
 function estNouveau(l){ const e = NOUV.find(n => n.livre === l.fichier && n.type === "ajout"), t = e ? new Date(e.date + "T12:00:00").getTime() : (l.user ? (l.added || 0) : 0);
   return !!t && (Date.now() - t) < 30 * 864e5; }
+/* Livres déjà ouverts sur cet ordinateur : le badge « Nouveau » ou « Mis à jour » disparaît une fois le livre ouvert (ou après 30 jours) */
+const vuLe = l => { try { return (JSON.parse(localStorage.getItem("livresVus") || "{}"))[l.fichier || l.id] || 0; } catch(e){ return 0; } };
+function marquerVu(l){ if (!l || l.fichier === "tableau-blanc") return; try { const v = JSON.parse(localStorage.getItem("livresVus") || "{}"); v[l.fichier || l.id] = Date.now(); localStorage.setItem("livresVus", JSON.stringify(v)); } catch(e){} }
+function badgeLivre(l){
+  if (estNouveau(l) && !vuLe(l)) return "nouveau";
+  const m = majRecente(l); if (m && vuLe(l) < new Date(m.date + "T00:00:00").getTime()) return "maj";
+  return "";
+}
 function bookCard(l){
   const gen = !couv(l);
   return `<div class="item">
   <div class="book" data-f="${esc(l.fichier)}">
-    ${estNouveau(l) ? '<span class="badge">Nouveau</span>' : majRecente(l) ? '<span class="badge badge-maj">Mis à jour</span>' : ''}
+    ${badgeLivre(l) === "nouveau" ? '<span class="badge">Nouveau</span>' : badgeLivre(l) === "maj" ? '<span class="badge badge-maj">Mis à jour</span>' : ''}
     ${isFav(l) ? '<span class="fav-mark">★</span>' : ''}
     <div class="cover ${gen?'generated':''}" style="${coverStyle(l)}">
       ${gen ? `<div class="t">${esc(l.titre)}</div><div class="a">${esc(l.auteur)}</div>` : ''}
@@ -3485,7 +3493,7 @@ $("#penX").onclick = () => { const w = RD.wb; RD.pen = false; RD.eraser = false;
 function ouvrirLivre(l, brut){
   try {
     const html = injectHead(brut, HOSTCSS);
-    killExtras(); RD.html = html; $("#readerFrame2").hidden = true; $("#readerFrame2").srcdoc = ""; $("#rinner").classList.remove("dbl"); $("#tbDbl").classList.remove("on"); $("#spine").hidden = true; $("#readerFrame").style.left = $("#readerFrame").style.width = $("#readerFrame").style.clipPath = "";
+    killExtras(); RD.html = html; marquerVu(l); $("#readerFrame2").hidden = true; $("#readerFrame2").srcdoc = ""; $("#rinner").classList.remove("dbl"); $("#tbDbl").classList.remove("on"); $("#spine").hidden = true; $("#readerFrame").style.left = $("#readerFrame").style.width = $("#readerFrame").style.clipPath = "";
     RD.t0 = Date.now(); RD.retry = 0; RD.first = undefined; RD.armed = false; RD.offered = false; $("#resume").hidden = true; clearTimeout(RD.resT);
     Object.assign(RD, { single:false, dbl:false, drv2:null, book:l.fichier, drv:null, attached:false, z:1, pen:false, wb:false, spot:false, cache:false, eraser:false, label:"", tot:0 });
     $("#cache").style.top = "40%"; $("#tbTot").textContent = ""; $("#tbPg").value = "";
