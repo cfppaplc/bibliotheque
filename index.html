@@ -1104,6 +1104,11 @@ function buildDriver0(win, doc){
       if (to === (dir > 0 ? z : a)) return;
       gotoP(to);
     };
+    /* livres récents (Utiliser un micro-ordinateur) : en pas à pas, un clic sur la page montre la réponse suivante, comme dans les autres livres */
+    if (typeof win.ansState === "function" && typeof win.next === "function" && !win.__clicRep){ win.__clicRep = 1;
+      doc.addEventListener("click", e => { if (!doc.body.classList.contains("stepans")) return;
+        if (e.target.closest && e.target.closest("button,a,input,select,textarea,label,[onclick],#ui,#menu")) return;
+        if (win.next()) e.preventDefault(); }); }
     return {
       /* Sur une page sans réponses, le livre (en mode « pas à pas ») garde en mémoire les réponses de la page d'avant et
          avale des appuis sans tourner la page : on passe alors par « aller à la page » pour tourner. */
@@ -1118,7 +1123,7 @@ function buildDriver0(win, doc){
       animOn:() => !doc.body.classList.contains("still") && !doc.body.classList.contains("still0"),
       toggleAnim:() => click("ba"), answers:() => click("br"),
       /* État des réponses : 0 = cachées, 1 = pas à pas (compteur « 15/46 »), 2 = toutes affichées */
-      ansInfo:() => { const b = el("br"), bc = doc.body.classList, x = /^(\d+)\s*\/\s*(\d+)$/.exec(((b && b.textContent) || "").trim());
+      ansInfo:() => { const b = el("br"), bc = doc.body.classList, x = /(\d+)\s*\/\s*(\d+)/.exec(((b && b.textContent) || "").trim());   /* « 15/46 » ou « Réponses 15/46 » */
         return { dis:!b || b.disabled || b.classList.contains("dis"), mode:!bc.contains("answers") ? 0 : bc.contains("stepans") ? 1 : 2, s:x ? +x[1] : 0, t:x ? +x[2] : 0 }; }
     };
   }
