@@ -502,6 +502,21 @@
   .penbar #penCol .pcur.hl{border-radius:5px}
   .penbar #penCol.open,.penbar #penPlus.open{border-color:#6aa9ff}
   .reader.pen-side .penbar .ppop{left:auto;right:calc(100% + 10px);bottom:auto;top:0;transform:none}
+
+  .sch-ov{position:absolute;inset:0;z-index:300;background:rgba(0,0,0,.6);display:flex;align-items:flex-start;justify-content:center;padding:6vh 16px;overflow:auto}
+  .sch-ov[hidden]{display:none}
+  .sch-box{background:#18181a;color:#ececee;border:1px solid #2f2f33;border-radius:14px;width:100%;max-width:820px;padding:20px 22px;font:500 .95rem system-ui,"Segoe UI",sans-serif;box-shadow:0 20px 60px #000a}
+  .sch-tete{display:flex;align-items:center;justify-content:space-between}.sch-tete h2{margin:0;font-size:1.4rem}
+  .sch-box button{min-height:34px;padding:0 12px;border-radius:8px;border:1px solid #2f2f33;background:#232326;color:#ececee;cursor:pointer;font:inherit}
+  .sch-box button:hover{border-color:#6a6a70}.sch-box button.prim{background:#1f6fc2;border-color:#1f6fc2;color:#fff}.sch-box button.danger{background:#c0262d;border-color:#c0262d}
+  .sch-onglets{display:flex;gap:6px;margin:14px 0 10px}.sch-onglets button.on{background:#ececee;color:#111;border-color:#ececee}
+  .sch-aide{color:#a9a9ae;font-size:.85rem;margin:6px 0 12px}.sch-vide{color:#a9a9ae}
+  .sch-mod{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:8px}
+  .sch-box .sch-m{display:flex;flex-direction:column;align-items:flex-start;gap:4px;text-align:left;padding:12px 14px;min-height:96px}.sch-m span{color:#a9a9ae;font-size:.82rem;line-height:1.35}
+  .sch-gard{display:flex;gap:8px}.sch-gard input,.sch-in{flex:1;min-height:34px;border-radius:8px;border:1px solid #2f2f33;background:#fff;color:#111;font:inherit;padding:0 10px}
+  .sch-liste{display:flex;flex-direction:column;gap:8px}.sch-it{display:flex;gap:12px;align-items:center;padding:8px;border:1px solid #2a2a2d;border-radius:10px}
+  .sch-v canvas{display:block;width:180px;height:98px;border-radius:6px;border:1px solid #2f2f33}.sch-i{flex:1;display:flex;flex-direction:column;gap:4px}.sch-i small{color:#a9a9ae}.sch-b{display:flex;gap:6px;flex-wrap:wrap}
+  .sch-imp{margin-top:12px}
   .penbar .pf{flex:none}
   .reader.pen-fold .penbar>*:not(.pf){display:none!important}
   .reader.pen-fold .penbar{padding:6px 8px}
@@ -2089,7 +2104,11 @@ function drawStroke(g, s, W, H, k){
   g.lineCap = "round"; g.lineJoin = "round";
   let col = s.c; if (s.hl){ const h = (s.hc || "#fff200").slice(1); col = "rgba(" + parseInt(h.slice(0,2),16) + "," + parseInt(h.slice(2,4),16) + "," + parseInt(h.slice(4,6),16) + ",.4)"; }
   if (!s.hl && s.c === "#24282c" && wbSombre()) col = "#f4f1ea";          /* le « noir » devient craie sur un tableau foncé */
-  if (RD.sim && s.fil){ const pt = SIM.pot.get(s); col = pt === "h" ? "#e03131" : pt === "n" ? "#1c7ed6" : "#a3aab3"; }   /* animation : rouge = L1, bleu = L2 */
+  const coulPot = pt => pt === "h" ? "#e03131" : pt === "n" ? "#1c7ed6" : "#a3aab3";
+  if (RD.sim && s.fil){ const pt = SIM.pot.get(s);
+    if (Array.isArray(pt)){ const a = [s.p[0][0] * W, s.p[0][1] * H], b = [s.p[1][0] * W, s.p[1][1] * H], m = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+      g.lineCap = "round"; g.lineWidth = s.w * k; [[a, pt[0]], [b, pt[1]]].forEach(([e, v]) => { g.strokeStyle = coulPot(v); g.beginPath(); g.moveTo(e[0], e[1]); g.lineTo(m[0], m[1]); g.stroke(); }); return; }
+    col = coulPot(pt); }   /* animation : rouge = L1, bleu = L2 */
   g.strokeStyle = col; g.lineWidth = (s.hl ? s.w * 4 : s.w) * k;
   if (s.t === "objet"){ const G = dessinerObjet(g, s, W, H, k, "#3a424b"); if (typeof SELO !== "undefined" && SELO.s === s){ g.save(); g.setLineDash([8 * k, 6 * k]); g.strokeStyle = "#6aa9ff"; g.lineWidth = 2 * k; g.strokeRect(G.bbox[0] - 6, G.bbox[1] - 6, G.bbox[2] - G.bbox[0] + 12, G.bbox[3] - G.bbox[1] + 12); g.restore(); } return; }
   if (s.t === "texte"){
@@ -2139,6 +2158,7 @@ function grilleIso(g, W, H, k){
   g.restore();
 }
 function redrawInk(){
+  try { recalerWb(); } catch(e){}
   const c = $("#inkCanvas"), g = c.getContext("2d");
   g.clearRect(0, 0, c.width, c.height);
   const k = (window.devicePixelRatio || 1) * RD.z;
@@ -2146,6 +2166,7 @@ function redrawInk(){
   const tous = INKS[inkKey()] || [];                                       /* les objets cachent les traits qui passent derrière ; les textes restent par-dessus */
   [s => s.t !== "objet" && s.t !== "texte", s => s.t === "objet", s => s.t === "texte"].forEach(f => tous.filter(f).forEach(s => drawStroke(g, s, c.width, c.height, k)));
   if (typeof majSelTxt === "function") majSelTxt();
+  try { planifierSauvegarde(); } catch(e){}
 }
 function strokes(){ return INKS[inkKey()] || (INKS[inkKey()] = []); }
 const REDO = {}, UNDO = {};
@@ -2342,10 +2363,11 @@ function simCalc(prof){
   const px = k => k.split("|")[0].split(",").map(Number);                      /* en carreaux : converti en pixels à chaque image, donc juste même après un zoom */
   const norm = t => (t || "").trim().toUpperCase();
   const fils = arr.filter(o => o.t === "ligne" && o.fil), objs = arr.filter(o => o.t === "objet" && ELEC[o.k]);
+  const PN = SIM.panne && arr.includes(SIM.panne.cible) ? SIM.panne : null;             /* panne ajoutée par l'enseignant */
   const conn = new Set(), ports = new Map(), E = [], hotS = new Set(), neuS = new Set();
   fils.forEach(f => f.p.forEach(p => conn.add(gk(p))));
   objs.forEach(o => { const Pp = objGeo(o, W, Hc).ports.map(gkPx); ports.set(o, Pp); Pp.forEach(k => conn.add(k)); });
-  fils.forEach((f, idx) => { const [ax, ay] = gk(f.p[0]).split(",").map(Number), [bx, by] = gk(f.p[1]).split(",").map(Number);
+  fils.forEach((f, idx) => { if (PN && PN.type === "coupe" && PN.cible === f) return; const [ax, ay] = gk(f.p[0]).split(",").map(Number), [bx, by] = gk(f.p[1]).split(",").map(Number);
     if (ax !== bx && ay !== by){ E.push([ax + "," + ay, bx + "," + by]); return; }
     const n = Math.max(Math.abs(bx - ax), Math.abs(by - ay)), sx = Math.sign(bx - ax), sy = Math.sign(by - ay); let prev = ax + "," + ay;
     for (let i = 1; i <= n; i++){ const k0 = (ax + sx * i) + "," + (ay + sy * i), k = (i === n || conn.has(k0)) ? k0 : k0 + "|" + idx; E.push([prev, k]); prev = k; } });   /* deux fils qui se croisent sans point de jonction ne sont pas reliés */
@@ -2354,18 +2376,20 @@ function simCalc(prof){
   objs.filter(o => o.k === "pile").forEach(o => { const Pp = ports.get(o); hotS.add(Pp[0]); neuS.add(Pp[1]); });   /* une pile est une source : + à gauche */
   const uf = () => { const par = new Map(), f = k => { while (par.has(k)){ const p = par.get(k); if (par.has(p)) par.set(k, par.get(p)); k = p; } return k; };
     return { f, un:(a, b) => { a = f(a); b = f(b); if (a !== b) par.set(a, b); } }; };
-  const chargesT = objs.filter(o => SIM_CH.test(o.k) || o.k === "transfo");
+  const chargesT = objs.filter(o => (SIM_CH.test(o.k) || o.k === "transfo") && !(PN && PN.type === "ouvert" && PN.cible === o));
   let bob = Object.assign({}, SIM.bob), R = null;
   for (let it = 0; it < 16; it++){
     const ferme = new Map(), paires = [];
     objs.forEach(o => { const lb = norm(o.lb), Pp = ports.get(o);
       if (o.k === "inter"){ const pol = polDe(o), act = SIM.act.has(o), cl = o.nf ? !act : act;
         ferme.set(o, pol.endsWith("dt") ? act : cl);
+        if (PN && PN.cible === o) return;
         ({ spst:cl ? [[0, 1]] : [], dpst:cl ? [[0, 1], [2, 3]] : [], spdt:act ? [[0, 2]] : [[0, 1]], dpdt:act ? [[0, 2], [3, 5]] : [[0, 1], [3, 4]] })[pol].forEach(([a, b]) => paires.push([Pp[a], Pp[b]])); return; }
       if (o.k === "diode"){ paires.push([Pp[0], Pp[1]]); return; }
       if (!SIM_SW.test(o.k)) return;
       const act = o.k === "contact" ? !!bob[lb] : o.k === "contactT" ? SIM.tfini.has(lb) : o.k === "bp" ? SIM.press.has(o) : SIM.act.has(o);
-      const cl = (o.k === "surcharge" || o.k === "fusible" || o.nf) ? !act : act; ferme.set(o, cl); if (cl) paires.push([Pp[0], Pp[1]]); });
+      const cl = (o.k === "surcharge" || o.k === "fusible" || o.nf) ? !act : act, reel = PN && PN.cible === o ? PN.type === "colle" : cl;
+      ferme.set(o, cl); if (reel) paires.push([Pp[0], Pp[1]]); });   /* le dessin montre l'état normal : la panne se trouve en suivant les couleurs */
     const U = uf(); E.forEach(([a, b]) => U.un(a, b)); paires.forEach(([a, b]) => U.un(a, b));
     const HS = new Set([...hotS].map(U.f)), NS = new Set([...neuS].map(U.f)), court = [...HS].some(r => NS.has(r));
     /* une charge fonctionne si, sans elle, une de ses bornes rejoint L1 (ou +) et l'autre L2 (ou −), au besoin à travers d'autres charges en série */
@@ -2387,7 +2411,9 @@ function simCalc(prof){
   trE.forEach((o, lb) => { if (!SIM.tdeb[lb]) SIM.tdeb[lb] = now; });
   let refaire = false; Object.keys(SIM.tdeb).forEach(lb => { if (!trE.has(lb)){ delete SIM.tdeb[lb]; if (SIM.tfini.delete(lb)) refaire = true; } });
   if (refaire && (prof || 0) < 3){ SIM.bob = bob; return simCalc((prof || 0) + 1); }
-  const { U, HS } = R, pot = new Map(); fils.forEach(w => { const r = U.f(gk(w.p[0])); pot.set(w, HS.has(r) ? "h" : R.NS.has(r) ? "n" : ""); });
+  const { U, HS } = R, pot = new Map(), potK = k => { const r = U.f(k); return HS.has(r) ? "h" : R.NS.has(r) ? "n" : ""; };
+  fils.forEach(w => pot.set(w, potK(gk(w.p[0]))));
+  if (PN && PN.type === "coupe"){ const w = PN.cible; pot.set(w, [potK(gk(w.p[0])), potK(gk(w.p[1]))]); }   /* fil coupé : chaque moitié garde la tension de son côté */
   /* trajet du courant (points jaunes) : de la source jusqu'à la charge, à travers la charge, puis jusqu'au retour */
   const adj = new Map(), aj = (a, b, o) => { if (!adj.has(a)) adj.set(a, []); adj.get(a).push([b, o]); };
   E.concat(R.paires).forEach(([a, b]) => { aj(a, b, null); aj(b, a, null); });
@@ -2411,7 +2437,25 @@ function simAide(){
   z.innerHTML = (SIM.court ? '<div class="court">⚠ Court-circuit ! L1 rejoint L2 sans passer par une charge.</div>' : "")
     + '<div>Clique un <b>bouton-poussoir</b> (garde-le enfoncé) ou un <b>interrupteur</b> pour l\'actionner.</div>'
     + '<div style="margin-top:4px"><span style="color:#ff8787">■</span> sous tension (L1) &nbsp;<span style="color:#74c0fc">■</span> retour (L2)</div>'
-    + '<div style="margin-top:4px" class="' + (noms.length ? "on" : "") + '">' + (noms.length ? "En marche : " + noms.join(", ") : "Rien n'est alimenté.") + '</div>';
+    + '<div style="margin-top:4px" class="' + (noms.length ? "on" : "") + '">' + (noms.length ? "En marche : " + noms.join(", ") : "Rien n'est alimenté.") + '</div>'
+    + '<div class="panne"><div class="pt">🔧 Trouve la panne</div>'
+    + (SIM.choix ? '<div class="pc">Clique le fil ou le symbole à briser (reclique pour changer le type de panne).</div>' : '')
+    + (SIM.panne ? '<div class="pe">' + (SIM.panne.vu ? '⚠ ' + panneNom(SIM.panne) : 'Une panne est cachée dans le schéma.') + '</div>' : '')
+    + '<div class="pb"><button data-p="hasard" title="Une panne au hasard, cachée aux élèves">🎲 Au hasard</button><button data-p="choisir" class="' + (SIM.choix ? "on" : "") + '" title="Clique toi-même le fil ou le symbole à briser">🎯 Choisir</button>'
+    + (SIM.panne ? '<button data-p="voir">' + (SIM.panne.vu ? "🙈 Cacher" : "👁 Révéler") + '</button><button data-p="reparer">✔ Réparer</button>' : '') + '</div></div>';
+}
+function panneNom(pn){ const o = pn.cible, d = o.t === "objet" ? (ELEC[o.k].c || ELEC[o.k].n).split(" (")[0] + (o.lb ? " " + o.lb : "") : "";
+  if (pn.type === "coupe") return "Fil coupé";
+  if (pn.type === "colle") return d + " collé (reste fermé)";
+  return SIM_CH.test(o.k) ? d + " grillé (circuit ouvert)" : o.k === "fusible" ? d + " sauté" : d + " défectueux (ne ferme plus)"; }
+function panneTypes(o){ if (o.t === "ligne") return ["coupe"]; if (/^(contact|contactT|bp|thermostat|pression|flotteur|fincourse)$/.test(o.k) || (o.k === "inter" && polDe(o) !== "spdt" && polDe(o) !== "dpdt")) return /^(contact|contactT)$/.test(o.k) ? ["ouvert", "colle"] : ["ouvert"];
+  if (SIM_CH.test(o.k) || /^(fusible|surcharge|inter)$/.test(o.k)) return ["ouvert"]; return []; }
+function panneHasard(){
+  const arr = strokes(), cands = [];
+  arr.forEach(o => { if (o.t === "ligne" && o.fil){ if (SIM.pot.get(o)) cands.push([o, "coupe"]); } else if (o.t === "objet" && ELEC[o.k]) panneTypes(o).forEach(t => cands.push([o, t])); });
+  if (!cands.length){ aviser("Dessine d'abord un circuit complet."); return; }
+  const [cible, type] = cands[Math.floor(Math.random() * cands.length)]; SIM.panne = { cible, type, vu:false }; simMaj();
+  aviser("Une panne est cachée dans le schéma. À vous de la trouver !", 4000);
 }
 function simMaj(){ simCalc(); redrawInk(); simAide(); }
 function simOv(){ let ov = $("#simOv"); if (!ov){ ov = document.createElement("canvas"); ov.id = "simOv"; ov.style.cssText = "position:fixed;z-index:60;pointer-events:none"; $("#reader").appendChild(ov); } return ov; }
@@ -2437,11 +2481,16 @@ function simFrame(t){
     g.strokeStyle = f >= 1 ? "#2f9e44" : "#2a7bcf"; g.beginPath(); g.arc(m.c[0] * u, m.c[1] * u, u * .58, -Math.PI / 2, -Math.PI / 2 + f * Math.PI * 2); g.stroke(); g.restore();
     if (f >= 1 && !SIM.tfini.has(m.lb)){ SIM.tfini.add(m.lb); setTimeout(simMaj, 0); } });
   if (attente && !(t % 4)) {}
+  if (SIM.panne && (SIM.panne.vu || SIM.choix) && strokes().includes(SIM.panne.cible)){ const o = SIM.panne.cible, cv = $("#inkCanvas"); let cx, cy, rr;
+    if (o.t === "ligne"){ cx = (o.p[0][0] + o.p[1][0]) / 2 * cv.width; cy = (o.p[0][1] + o.p[1][1]) / 2 * cv.height; rr = u * .5; }
+    else { const G = objGeo(o, cv.width, cv.height); cx = (G.bbox[0] + G.bbox[2]) / 2; cy = (G.bbox[1] + G.bbox[3]) / 2; rr = Math.max(G.bbox[2] - G.bbox[0], G.bbox[3] - G.bbox[1]) * .62; }
+    g.save(); g.strokeStyle = "#e03131"; g.lineWidth = Math.max(2, u * .08); g.setLineDash([u * .2, u * .12]); g.lineDashOffset = -t / 40; g.beginPath(); g.arc(cx, cy, rr, 0, 7); g.stroke();
+    g.setLineDash([]); g.fillStyle = "#e03131"; g.font = "800 " + Math.round(u * .34) + "px system-ui,sans-serif"; g.textAlign = "center"; g.fillText(o.t === "ligne" ? "✂" : "⚠", cx, cy - rr - u * .12); g.restore(); }
   SIM.moteurs.forEach(([x0, y0]) => { const x = x0 * u, y = y0 * u; const a0 = t / 1000 * 4; for (let i = 0; i < 2; i++){ g.beginPath(); g.arc(x, y, u * .62, a0 + i * Math.PI, a0 + i * Math.PI + 1.6); g.stroke(); } });
   SIM.raf = requestAnimationFrame(simFrame);
 }
 function simStart(){
-  if (!modeElec()) return; RD.sim = true; SELO.s = null; SIM.act = new Set(); SIM.press = new Set(); SIM.bob = {}; SIM.tdeb = {}; SIM.tfini = new Set(); SIM.key = inkKey();
+  if (!modeElec()) return; RD.sim = true; SELO.s = null; SIM.act = new Set(); SIM.press = new Set(); SIM.bob = {}; SIM.tdeb = {}; SIM.tfini = new Set(); SIM.panne = null; SIM.choix = false; SIM.key = inkKey();
   simMaj(); majObjUI(); cancelAnimationFrame(SIM.raf); SIM.raf = requestAnimationFrame(simFrame);
   aviser("Animation : clique un bouton-poussoir ou un interrupteur pour faire fonctionner le schéma.", 5000);
 }
@@ -2451,8 +2500,23 @@ function simStop(silence){
 }
 (function(){
   const c = $("#inkCanvas");
+  document.addEventListener("click", e => { const b = e.target.closest && e.target.closest("#objBar .simAide [data-p]"); if (!b) return; const a = b.dataset.p;
+    if (a === "hasard"){ SIM.choix = false; panneHasard(); }
+    else if (a === "choisir"){ SIM.choix = !SIM.choix; simAide(); }
+    else if (a === "voir" && SIM.panne){ SIM.panne.vu = !SIM.panne.vu; simAide(); }
+    else if (a === "reparer"){ SIM.panne = null; SIM.choix = false; simMaj(); aviser("Circuit réparé."); } });
   c.addEventListener("pointerdown", e => {
-    if (!RD.sim) return; e.preventDefault();
+    if (!RD.sim || !SIM.choix) return; e.preventDefault(); e.stopImmediatePropagation();
+    const r = c.getBoundingClientRect(), x = (e.clientX - r.left) * c.width / r.width, y = (e.clientY - r.top) * c.height / r.height, u = elecU();
+    let cible = strokes().slice().reverse().find(s => { if (s.t !== "objet" || !ELEC[s.k] || !panneTypes(s).length) return false; const G = objGeo(s, c.width, c.height); return x > G.bbox[0] && x < G.bbox[2] && y > G.bbox[1] && y < G.bbox[3]; });
+    if (!cible) cible = strokes().find(f => { if (f.t !== "ligne" || !f.fil) return false; const ax = f.p[0][0] * c.width, ay = f.p[0][1] * c.height, bx = f.p[1][0] * c.width, by = f.p[1][1] * c.height, l2 = (bx - ax) ** 2 + (by - ay) ** 2;
+      const t = l2 ? Math.max(0, Math.min(1, ((x - ax) * (bx - ax) + (y - ay) * (by - ay)) / l2)) : 0; return Math.hypot(x - ax - t * (bx - ax), y - ay - t * (by - ay)) < u * .3; });
+    if (!cible){ aviser("Clique un fil ou un symbole."); return; }
+    const types = panneTypes(cible); let type = types[0];
+    if (SIM.panne && SIM.panne.cible === cible){ const i = types.indexOf(SIM.panne.type); if (i === types.length - 1){ SIM.panne = null; simMaj(); return; } type = types[i + 1]; }
+    SIM.panne = { cible, type, vu:false }; simMaj(); }, true);
+  c.addEventListener("pointerdown", e => {
+    if (!RD.sim || SIM.choix) return; e.preventDefault();
     const r = c.getBoundingClientRect(), x = (e.clientX - r.left) * c.width / r.width, y = (e.clientY - r.top) * c.height / r.height, m = elecU() * .25;
     const o = strokes().slice().reverse().find(s => { if (s.t !== "objet" || !SIM_ACT.test(s.k)) return false; const G = objGeo(s, c.width, c.height); return x > G.bbox[0] - m && x < G.bbox[2] + m && y > G.bbox[1] - m && y < G.bbox[3] + m; });
     if (!o) return; c.setPointerCapture(e.pointerId);
@@ -2461,6 +2525,144 @@ function simStop(silence){
   });
   ["pointerup", "pointercancel"].forEach(t => c.addEventListener(t, () => { if (SIM.tenu){ SIM.press.delete(SIM.tenu); SIM.tenu = null; if (RD.sim) simMaj(); } }));
 })();
+
+/* ---- Sauvegarde automatique des dessins et des tableaux (sur cet ordinateur) ----
+   Un tableau blanc garde la taille de la surface où il a été dessiné (REFS) : s'il est rouvert sur un écran d'une autre
+   taille, ses traits sont remis à la même échelle que la grille, sinon les fils ne tomberaient plus sur les bornes. */
+const REFS = {}, CLE_SAUVE = "tableauxSauves";
+const baseCanevas = () => { const c = $("#inkCanvas"), d = (window.devicePixelRatio || 1) * RD.z; return [c.width / d, c.height / d]; };
+function recalerWb(){
+  if (!RD.wb) return; const k = inkKey(), b = baseCanevas(), arr = INKS[k]; if (!b[0]) return;
+  if (!REFS[k]){ REFS[k] = b; return; }
+  const [rw, rh] = REFS[k]; if (Math.abs(rw - b[0]) < 1 && Math.abs(rh - b[1]) < 1) return;
+  const fx = rw / b[0], fy = rh / b[1];
+  (arr || []).forEach(s => { if (s.p) s.p = s.p.map(q => [q[0] * fx, q[1] * fy]); if (s.bw) s.bw *= fx; if (s.bb) s.bb = [s.bb[0] * fx, s.bb[1] * fy]; });
+  REFS[k] = b; UNDO[k] = []; REDO[k] = [];
+}
+const arrondir = v => typeof v === "number" ? Math.round(v * 1e5) / 1e5 : Array.isArray(v) ? v.map(arrondir) : v;
+const copieTraits = arr => (arr || []).map(s => { const o = {}; for (const k in s) if (k !== "cache") o[k] = (k === "p" || k === "bb" || k === "bw") ? arrondir(s[k]) : s[k]; return o; });
+let sauveT = 0, sauveAvis = false;
+function planifierSauvegarde(){ clearTimeout(sauveT); sauveT = setTimeout(sauverTableaux, 700); }
+function sauverTableaux(){
+  const inks = {}; for (const k in INKS) if (INKS[k] && INKS[k].length) inks[k] = copieTraits(INKS[k]);
+  try { localStorage.setItem(CLE_SAUVE, JSON.stringify({ v:1, inks, wb:WB, refs:REFS })); sauveAvis = false; }
+  catch(e){ if (!sauveAvis){ sauveAvis = true; aviser("Mémoire pleine : enregistre tes tableaux dans « Mes schémas » ou exporte-les.", 6000); } }
+}
+(function(){ try { const d = JSON.parse(localStorage.getItem(CLE_SAUVE) || "null"); if (!d) return;
+  Object.assign(INKS, d.inks || {}); Object.assign(WB, d.wb || {}); Object.assign(REFS, d.refs || {}); } catch(e){} })();
+window.addEventListener("pagehide", () => { try { sauverTableaux(); } catch(e){} });
+
+/* ---- Mes schémas et modèles ---- */
+const CLE_SCH = "mesSchemas";
+const lireSch = () => { try { return JSON.parse(localStorage.getItem(CLE_SCH) || "[]"); } catch(e){ return []; } };
+const ecrireSch = l => { try { localStorage.setItem(CLE_SCH, JSON.stringify(l)); return true; } catch(e){ aviser("Mémoire pleine : exporte un schéma puis supprime-le de la liste.", 6000); return false; } };
+/* modèles : coordonnées en carreaux ; [type, x, y, options] et fils [[x1, y1], [x2, y2]] */
+const MODELES = [
+  { id:"marche-arret", nom:"Marche-arrêt avec maintien", txt:"PB1 arrêt (NF), PB2 marche (NO), surcharge, bobine M et contact de maintien; lampes verte (en marche) et rouge (arrêté).",
+    sz:[18, 8], o:[["bp", 1, 1, { lb:"PB1", nf:1 }], ["bp", 4, 1, { lb:"PB2" }], ["surcharge", 10, 1], ["bobine", 14, 1, { lb:"M" }], ["contact", 4, 3, { lb:"M" }],
+      ["contact", 6, 5, { lb:"M" }], ["lampe", 14, 5, { lb:"G" }], ["contact", 6, 7, { lb:"M", nf:1 }], ["lampe", 14, 7, { lb:"R" }], ["jonction", 3, 1], ["jonction", 6, 1]],
+    f:[[[0,1],[1,1]], [[3,1],[4,1]], [[6,1],[10,1]], [[12,1],[14,1]], [[16,1],[18,1]], [[3,1],[3,3]], [[3,3],[4,3]], [[6,3],[6,1]],
+      [[0,5],[6,5]], [[8,5],[14,5]], [[16,5],[18,5]], [[0,7],[6,7]], [[8,7],[14,7]], [[16,7],[18,7]]] },
+  { id:"chauffage", nom:"Chauffage 24 V : thermostat, limite et brûleur", txt:"Le thermostat et l'aquastat de limite haute commandent le relais CR1, qui ouvre la soupape de gaz et démarre le circulateur.",
+    sz:[18, 6], lb:"R / C", o:[["thermostat", 2, 1, { lb:"TH" }], ["thermostat", 7, 1, { lb:"HL", nf:1 }], ["bobine", 14, 1, { lb:"CR1" }],
+      ["contact", 6, 3, { lb:"CR1" }], ["solenoide", 14, 3, { lb:"GV" }], ["contact", 6, 5, { lb:"CR1" }], ["moteur", 14, 5, { lb:"P" }]],
+    f:[[[0,1],[2,1]], [[4,1],[7,1]], [[9,1],[14,1]], [[16,1],[18,1]], [[0,3],[6,3]], [[8,3],[14,3]], [[16,3],[18,3]], [[0,5],[6,5]], [[8,5],[14,5]], [[16,5],[18,5]]] },
+  { id:"puisard", nom:"Pompe de puisard et alarme de niveau haut", txt:"Le flotteur FS1 démarre la pompe; si l'eau monte encore, FS2 fait sonner l'alarme. Fusible de protection sur la pompe.",
+    sz:[18, 4], o:[["fusible", 2, 1, { lb:"F1" }], ["flotteur", 7, 1, { lb:"FS1" }], ["moteur", 14, 1, { lb:"P" }], ["flotteur", 7, 3, { lb:"FS2" }], ["sonnerie", 14, 3, { lb:"BZ" }]],
+    f:[[[0,1],[2,1]], [[4,1],[7,1]], [[9,1],[14,1]], [[16,1],[18,1]], [[0,3],[7,3]], [[9,3],[14,3]], [[16,3],[18,3]]] },
+  { id:"temporise", nom:"Démarrage temporisé", txt:"S1 alimente le relais temporisé TR1 (5 s) : la lampe ambre s'éteint et le moteur démarre après le délai.",
+    sz:[18, 6], o:[["inter", 4, 1, { lb:"S1" }], ["bobineT", 14, 1, { lb:"TR1", del:5 }], ["contactT", 6, 3, { lb:"TR1" }], ["moteur", 14, 3, { lb:"M" }], ["contactT", 6, 5, { lb:"TR1", nf:1 }], ["lampe", 14, 5, { lb:"A" }]],
+    f:[[[0,1],[4,1]], [[6,1],[14,1]], [[16,1],[18,1]], [[0,3],[6,3]], [[8,3],[14,3]], [[16,3],[18,3]], [[0,5],[6,5]], [[8,5],[14,5]], [[16,5],[18,5]]] },
+  { id:"selecteur", nom:"Sélecteur deux positions (SPDT)", txt:"Un interrupteur SPDT allume la lampe rouge au repos, ou la lampe verte quand on le bascule.",
+    sz:[18, 4], o:[["inter", 4, 1, { lb:"S1", pol:"spdt" }], ["lampe", 14, 1, { lb:"R" }], ["lampe", 14, 3, { lb:"G" }]],
+    f:[[[0,1],[4,1]], [[6,1],[14,1]], [[16,1],[18,1]], [[6,2],[6,3]], [[6,3],[14,3]], [[16,3],[18,3]]] },
+  { id:"cc", nom:"Circuit c.c. : pile, résistance et DEL", txt:"Une pile, un interrupteur, une résistance qui limite le courant et une DEL, en série.",
+    o:[["pile", 0, 4, { lb:"B1" }], ["inter", 0, 1, { lb:"S1" }], ["resistance", 4, 1, { lb:"R1" }], ["del", 8, 1, { lb:"DEL1" }]],
+    f:[[[0,4],[0,1]], [[2,1],[4,1]], [[6,1],[8,1]], [[10,1],[10,4]], [[10,4],[2,4]]] }
+];
+function nouveauTableau(fond){ if (!RD.wb) toggleWb(); const st = wbEtat(); if (strokes().length){ st.count++; st.n = st.count; } st.bg[st.n] = fond || st.bg[st.n] || "blanc"; majFond(); redrawInk(); refreshTools(); }
+function poserModele(m){
+  nouveauTableau("quad");
+  const c = $("#inkCanvas"), r = c.getBoundingClientRect(), S = $("#rstage").getBoundingClientRect(), W = c.width, H = c.height, u = elecU(), f = r.width / W;
+  const ob = $("#objBar"), gauche = ob && !ob.hidden ? Math.max(S.left, ob.getBoundingClientRect().right + 40) : S.left + 120;   /* à droite de la palette */
+  const ox = Math.ceil((gauche - r.left) / f / u) + 1, oy = Math.ceil((S.top - r.top) / f / u) + 3;
+  const P = (x, y) => [(ox + x) * u / W, (oy + y) * u / H], arr = strokes();
+  if (m.sz) arr.push({ t:"objet", k:"rails", o:0, c:"#24282c", p:[P(0, 0)], w:4, sz:m.sz.slice(), lb:m.lb || "L1 / L2" });
+  m.o.forEach(([k, x, y, ex]) => arr.push(Object.assign({ t:"objet", k, o:0, c:"#24282c", p:[P(x, y)], w:4, lb:ELEC[k].lb || "", nf:0 }, ex ? JSON.parse(JSON.stringify(ex)) : {})));
+  m.f.forEach(([a, b]) => arr.push({ c:"#24282c", hl:false, hc:null, w:2.5, t:"ligne", fil:true, p:[P(...a), P(...b)] }));
+  REFS[inkKey()] = baseCanevas(); redrawInk();
+  if (!RD.obj){ RD.obj = true; RD.text = false; RD.eraser = false; refreshTools(); }
+  aviser("Modèle « " + m.nom + " » posé. Appuie sur ▶ Animer le schéma pour le faire fonctionner.", 5000);
+}
+function ouvrirSchema(sc){
+  nouveauTableau(sc.bg || "blanc"); const k = inkKey();
+  INKS[k] = JSON.parse(JSON.stringify(sc.strokes || [])); REFS[k] = sc.ref ? sc.ref.slice() : baseCanevas(); UNDO[k] = []; REDO[k] = [];
+  redrawInk(); aviser("« " + sc.nom + " » ouvert.");
+}
+function telecharger(nom, texte){ const blob = new Blob([texte], { type:"application/json" }), a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = nom;
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000); }
+const nomFichier = t => (t || "schema").normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/gi, "-").replace(/^-|-$/g, "").toLowerCase() || "schema";
+function ouvrirSchemas(){
+  let ov = $("#schOv");
+  if (!ov){
+    ov = document.createElement("div"); ov.id = "schOv"; ov.className = "sch-ov"; ov.hidden = true;
+    ov.innerHTML = '<div class="sch-box" role="dialog" aria-label="Mes schémas et modèles"><div class="sch-tete"><h2>Schémas</h2><button class="sch-x" data-a="fermer" aria-label="Fermer">✕</button></div>'
+      + '<div class="sch-onglets"><button data-o="modeles" class="on">Modèles prêts à utiliser</button><button data-o="miens">Mes schémas</button></div>'
+      + '<div class="sch-corps" data-o="modeles"></div><div class="sch-corps" data-o="miens" hidden></div></div>';
+    $("#reader").appendChild(ov);
+    ov.addEventListener("pointerdown", e => e.stopPropagation());
+    ov.addEventListener("keydown", e => e.stopPropagation());
+    ov.addEventListener("click", e => {
+      if (e.target === ov) { ov.hidden = true; return; }
+      const b = e.target.closest("button"); if (!b) return;
+      if (b.dataset.a === "fermer"){ ov.hidden = true; return; }
+      if (b.dataset.o){ ov.querySelectorAll(".sch-onglets button").forEach(x => x.classList.toggle("on", x === b)); ov.querySelectorAll(".sch-corps").forEach(x => x.hidden = x.dataset.o !== b.dataset.o); return; }
+      const l = lireSch(), i = +b.dataset.i;
+      if (b.dataset.a === "modele"){ ov.hidden = true; poserModele(MODELES[i]); }
+      else if (b.dataset.a === "garder"){ const inp = ov.querySelector("#schNom"), nom = inp.value.trim() || ("Tableau du " + new Date().toLocaleDateString("fr-CA"));
+        if (!RD.wb || !strokes().length){ aviser("Le tableau est vide."); return; }
+        l.unshift({ id:Date.now(), nom, date:new Date().toLocaleDateString("sv-SE"), bg:wbBg(), ref:REFS[inkKey()] || baseCanevas(), strokes:copieTraits(strokes()) });
+        if (ecrireSch(l)){ inp.value = ""; remplir(); aviser("« " + nom + " » enregistré dans Mes schémas."); } }
+      else if (b.dataset.a === "ouvrir"){ ov.hidden = true; ouvrirSchema(l[i]); }
+      else if (b.dataset.a === "exporter"){ const sc = l[i]; telecharger(nomFichier(sc.nom) + ".schema.json", JSON.stringify({ type:"schema-pavillon", v:1, nom:sc.nom, date:sc.date, bg:sc.bg, ref:sc.ref, strokes:sc.strokes })); }
+      else if (b.dataset.a === "renommer"){ const li = b.closest(".sch-it"), sp = li.querySelector(".sch-n"), inp = document.createElement("input"); inp.value = l[i].nom; inp.className = "sch-in"; sp.replaceWith(inp); inp.focus(); inp.select();
+        const fin = ok => { if (ok && inp.value.trim()){ l[i].nom = inp.value.trim(); ecrireSch(l); } remplir(); };
+        inp.addEventListener("keydown", e => { if (e.key === "Enter") fin(true); if (e.key === "Escape") fin(false); }); inp.addEventListener("blur", () => fin(true)); }
+      else if (b.dataset.a === "supprimer"){ if (b.dataset.ok){ l.splice(i, 1); ecrireSch(l); remplir(); } else { b.dataset.ok = "1"; b.textContent = "Confirmer ?"; b.classList.add("danger"); setTimeout(() => { if (b.isConnected){ delete b.dataset.ok; b.textContent = "Supprimer"; b.classList.remove("danger"); } }, 3000); } }
+      else if (b.dataset.a === "importer") ov.querySelector("#schFich").click();
+    });
+    ov.addEventListener("change", e => { if (e.target.id !== "schFich") return; const fs = [...e.target.files]; e.target.value = "";
+      Promise.all(fs.map(f => f.text().then(t => { try { const d = JSON.parse(t); if (d.type !== "schema-pavillon" || !Array.isArray(d.strokes)) return null; return { id:Date.now() + Math.random(), nom:d.nom || f.name, date:d.date || new Date().toLocaleDateString("sv-SE"), bg:d.bg, ref:d.ref, strokes:d.strokes }; } catch(err){ return null; } })))
+        .then(res => { const ok = res.filter(Boolean), l = lireSch(); ok.forEach(x => l.unshift(x)); if (ok.length && ecrireSch(l)) remplir(); aviser(ok.length ? ok.length + " schéma(s) importé(s)." : "Ce fichier n'est pas un schéma de la bibliothèque.", 4000); }); });
+  }
+  function apercu(sc){ /* petite vignette du tableau, avec les vrais symboles */
+    const cv = document.createElement("canvas"), W = 300, H = 164; cv.width = W; cv.height = H; const g = cv.getContext("2d"); g.fillStyle = "#fff"; g.fillRect(0, 0, W, H);
+    const ref = sc.ref || [1600, 900], css = q => [q[0] * ref[0], q[1] * ref[1]], pts = [];
+    (sc.strokes || []).forEach(s => { if (!s.p) return; s.p.forEach(q => pts.push(css(q))); if (s.t === "objet" && ELEC[s.k]){ const [x, y] = css(s.p[0]), w = s.k === "rails" ? (s.sz || [8])[0] * 34 : s.k === "transfo" ? 136 : 68; pts.push([x + w, y + (s.k === "rails" ? (s.sz || [8, 10])[1] * 34 : 40)], [x, y - 34]); } });
+    if (!pts.length) return cv;
+    const x0 = Math.min(...pts.map(q => q[0])), x1 = Math.max(...pts.map(q => q[0])), y0 = Math.min(...pts.map(q => q[1])), y1 = Math.max(...pts.map(q => q[1]));
+    const sc2 = Math.min((W - 16) / Math.max(1, x1 - x0), (H - 16) / Math.max(1, y1 - y0)), T = q => { const c = css(q); return [8 + (c[0] - x0) * sc2, 8 + (c[1] - y0) * sc2]; };
+    g.lineCap = "round"; g.lineJoin = "round";
+    (sc.strokes || []).forEach(s => { if (!s.p || s.t === "objet" || s.t === "texte") return; g.strokeStyle = s.fil ? "#24282c" : (s.c || "#24282c"); g.lineWidth = Math.max(1, (s.w || 2) * sc2 * .8);
+      g.beginPath(); const q = s.p.map(T); if (s.t === "rect"){ g.rect(q[0][0], q[0][1], q[q.length - 1][0] - q[0][0], q[q.length - 1][1] - q[0][1]); } else q.forEach((p, i) => i ? g.lineTo(p[0], p[1]) : g.moveTo(p[0], p[1])); g.stroke(); });
+    (sc.strokes || []).forEach(s => { if (s.t !== "objet") return; const p = T(s.p[0]);
+      if (ELEC[s.k]){ try { dessinerElec(g, Object.assign({}, s, { p:[[p[0] / W, p[1] / H]], __u:34 * sc2 }), W, H, Math.max(.35, sc2), "#24282c"); } catch(e){} }
+      else { g.fillStyle = "#2a7bcf"; g.fillRect(p[0] - 3, p[1] - 3, 6, 6); } });
+    return cv; }
+  function remplir(){
+    ov.querySelector('.sch-corps[data-o="modeles"]').innerHTML = '<p class="sch-aide">Choisis un circuit : il est posé sur un nouveau tableau quadrillé, prêt à animer.</p><div class="sch-mod">'
+      + MODELES.map((m, i) => '<button class="sch-m" data-a="modele" data-i="' + i + '"><b>' + esc(m.nom) + '</b><span>' + esc(m.txt) + '</span></button>').join("") + '</div>';
+    const l = lireSch(), z = ov.querySelector('.sch-corps[data-o="miens"]');
+    z.innerHTML = '<div class="sch-gard"><input id="schNom" placeholder="Nom du tableau affiché (ex. Démarreur moteur)" maxlength="60"><button data-a="garder" class="prim">Enregistrer ce tableau</button></div>'
+      + '<p class="sch-aide">Tes tableaux sont aussi gardés automatiquement sur cet ordinateur. Ici, tu leur donnes un nom pour les retrouver, et « Exporter » crée un fichier à apporter sur un autre ordinateur ou à donner à un collègue.</p>'
+      + '<div class="sch-liste">' + (l.length ? l.map((sc, i) => '<div class="sch-it"><div class="sch-v" data-v="' + i + '"></div><div class="sch-i"><span class="sch-n">' + esc(sc.nom) + '</span><small>' + esc(dateFr(sc.date)) + ' · ' + (sc.strokes || []).length + ' éléments</small>'
+        + '<div class="sch-b"><button data-a="ouvrir" data-i="' + i + '" class="prim">Ouvrir</button><button data-a="renommer" data-i="' + i + '">Renommer</button><button data-a="exporter" data-i="' + i + '">Exporter</button><button data-a="supprimer" data-i="' + i + '">Supprimer</button></div></div></div>').join("")
+        : '<p class="sch-vide">Aucun schéma enregistré pour l\'instant.</p>') + '</div>'
+      + '<div class="sch-imp"><button data-a="importer">Importer un fichier .schema.json</button><input type="file" id="schFich" accept=".json,application/json" multiple hidden></div>';
+    z.querySelectorAll(".sch-v").forEach(v => v.appendChild(apercu(l[+v.dataset.v])));
+  }
+  remplir(); ov.hidden = false;
+}
 /* ---- Barre et souris des objets ---- */
 const SELO = { s:null };
 RD.objK = "plinthe"; RD.objO = 0;
@@ -2486,7 +2688,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
   bar.style.cssText = "position:absolute;z-index:75;left:12px;top:70px;display:flex;flex-direction:column;gap:6px;width:184px;max-height:calc(100% - 150px);overflow-y:auto;overflow-x:hidden;padding:8px;border-radius:12px;background:rgba(14,14,15,.96);border:1px solid #2f2f33;color:#d4d4d8;font:600 .8rem system-ui,sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.35)";
   bar.innerHTML = '<div class="tete" title="Glisse ici pour déplacer la palette"><span class="poig">⠿</span><span class="tit">Objets</span></div>'
     + '<div class="grp" data-g="iso">' + Object.keys(OBJETS).map(k => '<button data-k="' + k + '">' + OBJETS[k].n + '</button>').join("") + '</div>'
-    + '<div class="grp" data-g="elec">' + ELEC_CAT.map(([cg, cn]) => '<button class="cat" data-cat="' + cg + '">' + cn + '</button><div class="cgrid" data-cat="' + cg + '">'
+    + '<div class="grp" data-g="elec"><button id="objSch" class="sch-btn" title="Circuits prêts à utiliser et tableaux enregistrés">📋 Modèles et mes schémas</button>' + ELEC_CAT.map(([cg, cn]) => '<button class="cat" data-cat="' + cg + '">' + cn + '</button><div class="cgrid" data-cat="' + cg + '">'
       + Object.keys(ELEC).filter(k => ELEC[k].g === cg).map(k => '<button data-k="' + k + '" title="' + ELEC[k].n.replace(/^[✎•] /, "") + '"><canvas width="120" height="64"></canvas><span>' + (ELEC[k].c || ELEC[k].n.replace(/^[✎•] /, "")) + '</span></button>').join("") + '</div>').join("") + '</div>'
     + '<div class="aide grpE">Pour relier : glisse d\'un <b>point bleu</b> à l\'autre</div>'
     + '<button id="objP" title="Espacement des tubes du serpentin"></button><button id="objNF" title="Normalement ouvert ou normalement fermé"></button><div class="pol" id="objPol">' + Object.keys(POLES).map(p => '<button data-pol="' + p + '" title="' + POLES[p] + '">' + p.toUpperCase() + '</button>').join("") + '</div><label class="del" id="objDelW">Délai <input id="objDel" type="number" min="1" max="60" step="1" value="3"> s</label><input id="objL" maxlength="10" placeholder="Repère" title="Repère du symbole (ex. CR1, M, PB2)" aria-label="Repère du symbole">'
@@ -2498,14 +2700,14 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     + '#objBar .tete{display:flex;align-items:center;gap:6px;cursor:grab;user-select:none;touch-action:none;padding:2px 0 4px 2px;position:sticky;top:-8px;z-index:2;background:rgb(14,14,15);margin:-8px -8px 0;padding:8px 8px 6px;color:#a1a1aa;font-size:.78rem;letter-spacing:.04em;text-transform:uppercase}#objBar .tete:active{cursor:grabbing}#objBar .poig{font-size:1.1rem;line-height:1}'
     + '#objBar #objF{margin-left:auto;flex:none;min-height:28px;width:28px;padding:0;display:flex;align-items:center;justify-content:center}#objBar.of{width:auto!important}#objBar.of .tit{display:none}'
     + '#objBar .grp{display:flex;flex-direction:column;gap:4px}#objBar .grp[hidden],#objBar .grpE[hidden]{display:none!important}'
-    + '#objBar .cat{background:transparent!important;border:0!important;color:#a1a1aa!important;font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;min-height:26px!important;padding:0 2px!important;display:flex;align-items:center;gap:6px}#objBar .cat::before{content:"▾";font-size:.8rem;width:10px}#objBar .cat.ferme::before{content:"▸"}#objBar .cat:hover{color:#fff!important}'
+    + '#objBar .sch-btn{text-align:center!important;background:#1f6fc2!important;border-color:#1f6fc2!important;color:#fff!important;margin-bottom:4px}#objBar .cat{background:transparent!important;border:0!important;color:#a1a1aa!important;font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;min-height:26px!important;padding:0 2px!important;display:flex;align-items:center;gap:6px}#objBar .cat::before{content:"▾";font-size:.8rem;width:10px}#objBar .cat.ferme::before{content:"▸"}#objBar .cat:hover{color:#fff!important}'
     + '#objBar .cgrid{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:4px}#objBar .cgrid[hidden]{display:none}#objBar .pol{display:grid;grid-template-columns:1fr 1fr;gap:4px}#objBar .pol button{text-align:center;font-size:.78rem}#objBar .del{display:flex;align-items:center;gap:6px;font-size:.78rem}#objBar .del input{width:56px;min-height:30px;border-radius:8px;border:1px solid #2f2f33;background:#fff;color:#111;font:inherit;font-weight:700;padding:0 6px}'
     + '#objBar .cgrid button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:4px 2px;min-height:50px;text-align:center;background:#f4f6f9;border-color:#d5dbe3;color:#1f2329;font-size:.68rem;line-height:1.1}'
     + '#objBar .cgrid button:hover{border-color:#6aa9ff}#objBar .cgrid button.on{background:#dbeafe;border-color:#2a7bcf;color:#0b3d75;box-shadow:inset 0 0 0 1px #2a7bcf}#objBar .cgrid canvas{width:60px;height:32px}'
     + '#objBar .aide{color:#9fc6f5;font-size:.72rem;line-height:1.3;padding:2px}#objBar .aide b{color:#6aa9ff}#objBar .rang{display:flex;gap:4px}#objBar .taille{display:grid;grid-template-columns:1fr 38px 38px;gap:4px;align-items:center;font-size:.74rem}#objBar .taille button{text-align:center;font-size:1.05rem;padding:0}#objBar .taille em{grid-column:1/-1;font-style:normal;font-size:.68rem;color:#9fc6f5}#objBar .rang button{flex:1;text-align:center}'
     + '#objBar #objL{min-height:32px;padding:0 8px;border-radius:8px;border:1px solid #2f2f33;background:#fff;color:#111;font:inherit;font-weight:700;text-transform:uppercase}'
     + '#objBar #objSim{background:#1f7a3f;border-color:#2f9e44;color:#fff;text-align:center}#objBar.sim #objSim{background:#a61e1e;border-color:#e03131}#objBar #objX{text-align:center}'
-    + '#objBar .simAide{display:none;font-size:.74rem;line-height:1.35;color:#d4d4d8;padding:2px}#objBar.sim .simAide{display:block}#objBar .simAide .court{color:#ff8787;font-weight:800}#objBar .simAide .on{color:#8ce99a}';
+    + '#objBar .simAide{display:none;font-size:.74rem;line-height:1.35;color:#d4d4d8;padding:2px}#objBar.sim .simAide{display:block}#objBar .simAide .court{color:#ff8787;font-weight:800}#objBar .panne{margin-top:10px;padding-top:8px;border-top:1px solid #2f2f33}#objBar .panne .pt{font-weight:800;color:#fff;margin-bottom:4px}#objBar .panne .pc{color:#ffd43b;margin-bottom:4px}#objBar .panne .pe{color:#ff8787;font-weight:700;margin-bottom:4px}#objBar .panne .pb{display:grid;grid-template-columns:1fr 1fr;gap:4px}#objBar .panne .pb button{text-align:center;font-size:.74rem;padding:0 4px}#objBar .simAide .on{color:#8ce99a}';
   document.head.appendChild(st); $("#reader").appendChild(bar);
   bar.addEventListener("pointerdown", e => e.stopPropagation());
   /* catégories : on replie celles qu'on n'utilise pas (mémorisé) */
@@ -2554,6 +2756,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
   })();
   bar.querySelectorAll("#objTaille [data-t]").forEach(b => b.onclick = () => { const o = SELO.s; if (!o || o.k !== "rails") return; const t = b.dataset.t, d = +t.slice(1), [w, h] = o.sz || [8, 10];
     snapInk(); redimEchelle(o, t[0] === "w" ? w + d : w, t[0] === "h" ? h + d * 2 : h); redrawInk(); });
+  $("#objSch").onclick = () => ouvrirSchemas();
   $("#objSim").onclick = () => { if (RD.sim) simStop(); else simStart(); };
   const c = $("#inkCanvas"); let mv = null;
   const cur = e => { const r = c.getBoundingClientRect(); let x = e.clientX - r.left, y = e.clientY - r.top;
@@ -3150,7 +3353,11 @@ majEpaisseur();
   pp.appendChild(rang("Modifier", [nomme("penR", "Rétablir"), nomme("penC", "Tout effacer")]));
   pp.appendChild(rang("Affichage", [X("wbZo"), X("wbZv"), X("wbZi"), nomme("wbHand", "Déplacer")], true));
   pp.appendChild(rang("Tableaux", [X("wbP"), X("wbLbl"), X("wbN"), nomme("wbPlus", "Nouveau")], true));
+  const bsch = document.createElement("button"); bsch.id = "wbSch"; bsch.dataset.lab = "Mes schémas et modèles"; bsch.title = "Enregistrer, rouvrir, exporter un tableau; circuits prêts à utiliser";
+  bsch.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h12l4 4v12H4z"/><path d="M8 4v5h7V4M8 20v-6h8v6"/></svg>';
+  bsch.onclick = () => { fermer(); ouvrirSchemas(); };
   pp.appendChild(rang("Image", [nomme("wbS", "Enregistrer en PNG")], true));
+  pp.appendChild(rang("Schémas", [bsch], true));
   /* ligne principale */
   bar.querySelectorAll(":scope > .sep").forEach(e => e.remove());
   const sep = () => { const e = document.createElement("span"); e.className = "sep"; return e; };

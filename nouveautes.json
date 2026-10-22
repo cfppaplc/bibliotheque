@@ -3,7 +3,7 @@
   "date": "2026-10-21",
   "type": "outil",
   "titre": "Schéma électrique en échelle (tableau blanc)",
-  "texte": "Dessine et anime des schémas en échelle sur le quadrillé : rails L1/L2, une trentaine de symboles rangés par catégories, fils aimantés aux bornes, et une animation où le courant circule de L1 vers L2.",
+  "texte": "Dessine et anime des schémas en échelle sur le quadrillé : une trentaine de symboles par catégories, fils aimantés aux bornes, animation du courant de L1 vers L2, six modèles prêts à utiliser et un mode « Trouve la panne ».",
   "formation": [
    {
     "t": "Ouvre le tableau blanc, puis bouton Fond jusqu'à « Quadrillé (schéma électrique en échelle) ».",
@@ -28,9 +28,29 @@
    {
     "t": "▶ Animer le schéma : garde enfoncé un bouton-poussoir, clique un interrupteur pour l'actionner. Rouge = L1, bleu = L2, points jaunes = courant. Une bobine change tous les contacts qui portent son repère (contact de maintien).",
     "img": "nouveautes/elec-animer.jpg"
+   },
+   {
+    "t": "📋 Modèles et mes schémas (en haut de la palette) : choisis un circuit prêt à utiliser (marche-arrêt avec maintien, chauffage 24 V, pompe de puisard, démarrage temporisé, sélecteur SPDT, circuit c.c.). Il est posé sur un nouveau tableau, prêt à animer.",
+    "img": "nouveautes/sch-modeles.jpg"
+   },
+   {
+    "t": "🔧 Trouve la panne (pendant l'animation) : « Au hasard » cache une panne dans le circuit (fil coupé, bobine grillée, contact bloqué ouvert ou collé, fusible sauté); « Choisir » te laisse cliquer toi-même le fil ou le symbole à briser (reclique pour changer de type).",
+    "img": "nouveautes/panne-panneau.jpg"
+   },
+   {
+    "t": "Les élèves suivent les couleurs : la tension (rouge) s'arrête là où est la panne. Le symbole garde son dessin normal, comme dans la vraie vie : il faut raisonner.",
+    "img": "nouveautes/panne-cachee.jpg"
+   },
+   {
+    "t": "« Révéler » entoure la panne en rouge; « Réparer » remet le circuit en état.",
+    "img": "nouveautes/panne-revelee.jpg"
    }
   ],
   "versions": [
+   {
+    "date": "2026-10-21",
+    "texte": "Six modèles prêts à utiliser et mode « Trouve la panne » (au hasard ou choisie par l'enseignant)."
+   },
    {
     "date": "2026-10-21",
     "texte": "Le courant circule de L1 vers L2 et suit le tracé; animation juste après un zoom; les fils sous un symbole sont coupés entre ses bornes."
@@ -55,6 +75,25 @@
     "date": "2026-10-21",
     "texte": "Première version : rails L1/L2, contacts NO/NF, bobines, boutons-poussoirs, thermostat, pressostat, lampe, solénoïde, transformateur."
    }
+  ]
+ },
+ {
+  "date": "2026-10-21",
+  "type": "outil",
+  "titre": "Tableaux gardés et Mes schémas",
+  "texte": "Les dessins du tableau blanc et les annotations des livres sont maintenant gardés automatiquement sur l'ordinateur. « Mes schémas » permet de nommer un tableau, de le rouvrir, de l'exporter en fichier et de l'importer ailleurs.",
+  "formation": [
+   "Rien à faire : chaque trait, symbole ou fil est gardé tout seul sur cet ordinateur (dans ce navigateur). Si la page se recharge ou si l'ordinateur redémarre, tes tableaux reviennent.",
+   {
+    "t": "Pour donner un nom à un tableau : ⋯ Plus → « Mes schémas et modèles » (ou le bouton 📋 de la palette électrique).",
+    "img": "nouveautes/sch-plus.jpg"
+   },
+   {
+    "t": "Onglet « Mes schémas » : écris un nom, puis « Enregistrer ce tableau ». Ensuite : Ouvrir (sur un nouveau tableau), Renommer, Exporter ou Supprimer.",
+    "img": "nouveautes/sch-miens.jpg"
+   },
+   "« Exporter » crée un fichier .schema.json : apporte-le sur un autre ordinateur ou donne-le à un collègue, qui le charge avec « Importer un fichier ».",
+   "Un tableau rouvert sur un écran d'une autre taille garde ses fils sur les bornes des symboles."
   ]
  },
  {
