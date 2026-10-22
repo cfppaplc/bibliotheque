@@ -480,6 +480,19 @@
   .penbar .wblbl{color:#a9a9ae;font-size:.85rem;min-width:3.2em;text-align:center;font-variant-numeric:tabular-nums}
   .penbar .sep.wbonly{margin:0 2px}
   /* menu du crayon : rétractable + ancré sur le côté */
+
+  /* barre du crayon simplifiée : l'essentiel sur une ligne, le reste dans « Couleur » et « Plus » */
+  .penbar .ppop{position:absolute;bottom:calc(100% + 10px);left:50%;transform:translateX(-50%);display:flex;flex-direction:column;gap:8px;padding:10px 12px;border-radius:12px;background:rgba(14,14,15,.97);border:1px solid #2f2f33;box-shadow:0 10px 30px rgba(0,0,0,.5);z-index:5;width:max-content;max-width:90vw}
+  .penbar .ppop[hidden]{display:none!important}
+  .penbar .prang{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+  .penbar .prang[hidden]{display:none!important}
+  .penbar .prang>.lab{font-size:.74rem;color:#a1a1aa;min-width:84px;letter-spacing:.02em}
+  .penbar .ppop button[data-lab]{gap:6px;padding:0 10px}
+  .penbar .ppop button[data-lab]::after{content:attr(data-lab);font-size:.82rem}
+  .penbar #penCol .pcur{display:block;width:22px;height:22px;border-radius:50%;background:var(--pc,#e2483d);border:2px solid #fff6}
+  .penbar #penCol .pcur.hl{border-radius:5px}
+  .penbar #penCol.open,.penbar #penPlus.open{border-color:#6aa9ff}
+  .reader.pen-side .penbar .ppop{left:auto;right:calc(100% + 10px);bottom:auto;top:0;transform:none}
   .penbar .pf{flex:none}
   .reader.pen-fold .penbar>*:not(.pf){display:none!important}
   .reader.pen-fold .penbar{padding:6px 8px}
@@ -2994,6 +3007,46 @@ majEpaisseur();
     const te = ob.querySelector(".tete"); if (te) te.appendChild(o); else ob.insertBefore(o, ob.firstChild);
     o.onclick = () => { ob.classList.toggle("of"); o.innerHTML = ob.classList.contains("of") ? SV.open.replace(/<path d="M4 20[^>]*>.*?<path d="M14.5[^>]*>/, '<path d="M12 3l8 4.5v9L12 21l-8-4.5v-9zM12 12l8-4.5M12 12v9M12 12L4 7.5"/>') : SV.fold; };
   }
+})();
+/* ---- Barre du crayon simplifiée pour les débutants : rien n'est retiré, les outils moins utilisés vont dans deux menus ---- */
+(function(){
+  const bar = $("#penBar"), X = id => $("#" + id);
+  const dots = '<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>';
+  const pop = id => { const p = document.createElement("div"); p.className = "ppop"; p.id = id; p.hidden = true; p.addEventListener("pointerdown", e => e.stopPropagation()); return p; };
+  const rang = (lab, els, wb) => { const r = document.createElement("div"); r.className = "prang" + (wb ? " wbonly" : ""); if (wb) r.hidden = !RD.wb;
+    r.innerHTML = '<span class="lab">' + lab + '</span>'; els.forEach(e => e && r.appendChild(e)); return r; };
+  const nomme = (id, lab) => { const b = X(id); if (b) b.dataset.lab = lab; return b; };
+  /* Couleur + épaisseur */
+  const bc = document.createElement("button"); bc.id = "penCol"; bc.title = "Couleur et épaisseur du trait"; bc.setAttribute("aria-label", "Couleur et épaisseur"); bc.innerHTML = '<span class="pcur"></span>';
+  const pc = pop("popCol");
+  pc.appendChild(rang("Couleur", [...bar.querySelectorAll(".sw")]));
+  pc.appendChild(rang("Surligneur", [...pc.querySelectorAll(".sw.hl")]));
+  if (RD.swx) pc.querySelector(".prang").appendChild(RD.swx);
+  pc.appendChild(rang("Épaisseur", [X("penW")]));
+  /* Plus */
+  const bp = document.createElement("button"); bp.id = "penPlus"; bp.title = "Plus d'outils : rétablir, tout effacer, zoom, tableaux, enregistrer"; bp.setAttribute("aria-label", "Plus d'outils"); bp.innerHTML = dots;
+  const pp = pop("popPlus");
+  pp.appendChild(rang("Modifier", [nomme("penR", "Rétablir"), nomme("penC", "Tout effacer")]));
+  pp.appendChild(rang("Affichage", [X("wbZo"), X("wbZv"), X("wbZi"), nomme("wbHand", "Déplacer")], true));
+  pp.appendChild(rang("Tableaux", [X("wbP"), X("wbLbl"), X("wbN"), nomme("wbPlus", "Nouveau")], true));
+  pp.appendChild(rang("Image", [nomme("wbS", "Enregistrer en PNG")], true));
+  /* ligne principale */
+  bar.querySelectorAll(":scope > .sep").forEach(e => e.remove());
+  const sep = () => { const e = document.createElement("span"); e.className = "sep"; return e; };
+  [sep(), bc, X("penS"), X("penT"), X("penO"), X("penE"), X("penU"), X("wbF"), bp, sep(), X("penX")].forEach(e => e && bar.appendChild(e));
+  bar.appendChild(pc); bar.appendChild(pp);
+  const fermer = () => { pc.hidden = pp.hidden = true; bc.classList.remove("open"); bp.classList.remove("open"); };
+  const basculer = (p, b) => { const ouvrir = p.hidden; fermer(); if (ouvrir){ p.hidden = false; b.classList.add("open"); } };
+  bc.onclick = () => basculer(pc, bc); bp.onclick = () => basculer(pp, bp);
+  pc.querySelectorAll(".sw").forEach(b => b.addEventListener("click", () => setTimeout(fermer, 120)));
+  document.addEventListener("pointerdown", e => { if (bar.contains(e.target) || (pc.hidden && pp.hidden)) return; fermer();
+    if (e.target.id === "inkCanvas"){ e.stopPropagation(); e.preventDefault(); } }, true);   /* le clic qui ferme un menu ne dessine pas de point */
+  document.addEventListener("keydown", e => { if (e.key === "Escape") fermer(); });
+  window.majCouleurCrayon = () => { const c = RD.color || "#e2483d", hl = /^hl:/.test(c), cur = bc.querySelector(".pcur");
+    const v = hl ? c.slice(3) : (RD.swx && RD.swx.classList.contains("on") ? RD.swx.value : (c === "#24282c" && wbSombre() ? "#f4f1ea" : c));
+    cur.style.setProperty("--pc", v); cur.classList.toggle("hl", hl); bc.classList.toggle("on", !RD.eraser && !RD.text && !RD.obj); };
+  const rt = refreshTools; refreshTools = function(){ rt.apply(this, arguments); try { majCouleurCrayon(); } catch(e){} };
+  majCouleurCrayon();
 })();
 $("#penE").onclick = () => { RD.eraser = !RD.eraser; if (RD.eraser){ RD.text = false; RD.obj = false; } refreshTools(); };
 $("#penO").onclick = () => { if (!RD.obj && !(RD.wb && (/^iso/.test(wbBg()) || wbBg() === "quad"))){ aviser("Choisis d'abord un fond (bouton Fond) : plan isométrique pour la plomberie, quadrillé pour un schéma électrique."); return; } RD.obj = !RD.obj; if (RD.obj){ RD.text = false; RD.eraser = false;
