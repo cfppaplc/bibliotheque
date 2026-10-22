@@ -1183,7 +1183,8 @@ function buildDriver0(win, doc){
     modules:() => [...doc.querySelectorAll("h1,h2")].filter(h => h.textContent.trim()).slice(0, 80).map((h, i) => ({
       tag:h.tagName === "H1" ? "■" : "•", text:h.textContent.replace(/\s+/g, " ").trim().slice(0, 90), color:"",
       run:() => h.scrollIntoView({ behavior:"smooth", block:"start" }) })),
-    noDbl:true       /* un document qui défile n'a pas de pages à mettre côte à côte */
+    noDbl:true,      /* un document qui défile n'a pas de pages à mettre côte à côte */
+    defile:true      /* … et la roulette sert à le faire défiler */
   }, pz, repDriverPart(doc));
 }
 
@@ -1443,6 +1444,8 @@ function brancherSouris(win){
   doc.addEventListener("mouseleave", () => { $("#laser").hidden = true; });
   win.addEventListener("wheel", e => {
     if (e.ctrlKey || e.metaKey || RD.wb){ e.preventDefault(); zoomSouris(e, win.frameElement); return; }
+    /* roulette seule = zoom, comme dans les livres qui ont leur propre zoom (ceux-là gèrent la roulette eux-mêmes : defaultPrevented) */
+    if (!e.defaultPrevented && !e.shiftKey && !outilActif() && RD.drv && !RD.drv.defile){ e.preventDefault(); zoomSouris(e, win.frameElement); return; }
     if (RD.z > 1 && !outilActif()){
       e.preventDefault();
       const h = e.shiftKey && !e.deltaX;
@@ -1462,6 +1465,7 @@ function brancherSouris(win){
   document.addEventListener("mouseup", () => { if (PAN.on){ PAN.on = false; majCurseur(); } });
   st.addEventListener("wheel", e => {
     if (e.ctrlKey || e.metaKey || RD.wb){ e.preventDefault(); zoomSouris(e, null); return; }
+    if (!e.shiftKey && !outilActif() && RD.drv && !RD.drv.defile){ e.preventDefault(); zoomSouris(e, null); return; }
     if (RD.z > 1 && !outilActif()){ e.preventDefault(); const h = e.shiftKey && !e.deltaX; defiler(h ? e.deltaY : e.deltaX, h ? 0 : e.deltaY); }
   }, { passive:false });
 })();
