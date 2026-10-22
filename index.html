@@ -91,12 +91,13 @@
   .bv-box{background:#181818;border:1px solid #2f2f33;border-radius:14px;max-width:1080px;width:100%;padding:24px 26px;color:#f1f1f2;font-family:"Segoe UI",Roboto,Arial,sans-serif;box-shadow:0 20px 60px #000a}
   .bv-tete{display:flex;gap:18px;align-items:center;margin-bottom:18px}.bv-tete img{height:56px;background:#fff;border-radius:8px;padding:6px 10px}
   .bv-tete h2{margin:0 0 4px;font-size:1.6rem}.bv-tete p{margin:0;color:#a9a9ae}
-  .bv-grille{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px}
-  .bv-c{background:#111113;border:1px solid #2a2a2d;border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:8px}
-  .bv-c img{width:100%;aspect-ratio:16/10;object-fit:cover;object-position:top left;border-radius:8px;background:#fff}
-  .bv-t{font-weight:800;display:flex;gap:8px;align-items:center}.bv-t span{flex:none;width:24px;height:24px;border-radius:50%;background:#e50914;color:#fff;font-size:.8rem;display:flex;align-items:center;justify-content:center}
-  .bv-c p{margin:0;color:#c8c8cc;font-size:.88rem;line-height:1.45;flex:1}
-  .bv-c button{all:unset;cursor:pointer;color:#8fb8ff;font-weight:600;font-size:.86rem}.bv-c button:hover{text-decoration:underline}
+  .bv-barre{display:block;width:100%;border-radius:10px;border:1px solid #2a2a2d}
+  .bv-leg{list-style:none;padding:0;margin:16px 0 0;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px 18px}
+  .bv-leg li{display:flex;gap:10px;align-items:flex-start}.bv-leg .n{flex:none;width:26px;height:26px;border-radius:50%;background:#ff2d55;color:#fff;font-weight:800;font-size:.85rem;display:flex;align-items:center;justify-content:center}
+  .bv-leg p{margin:2px 0 0;color:#c8c8cc;font-size:.88rem;line-height:1.4}.bv-leg kbd{font:700 .72rem ui-monospace,Consolas,monospace;background:#2a2a2d;border:1px solid #3a3a3f;border-radius:4px;padding:1px 6px;color:#e5e5e7;margin-left:4px}
+  .bv-plus{display:flex;gap:18px;align-items:flex-start;margin-top:20px;padding-top:18px;border-top:1px solid #2a2a2d;flex-wrap:wrap}.bv-plus img{width:340px;max-width:100%;border-radius:10px;border:1px solid #2a2a2d}
+  .bv-plus h3{margin:0 0 8px;font-size:1.05rem}.bv-plus ul{margin:0;padding-left:18px;color:#c8c8cc;font-size:.9rem;line-height:1.55}.bv-plus > div{flex:1;min-width:260px}
+  .bv-lien{all:unset;cursor:pointer;color:#8fb8ff;font-weight:600;margin-right:16px}.bv-lien:hover{text-decoration:underline}
   .bv-pied{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:18px;flex-wrap:wrap}.bv-pied label{color:#a9a9ae;font-size:.88rem;display:flex;gap:8px;align-items:center}
   .bv-ok{border:0;background:#e50914;color:#fff;border-radius:8px;padding:11px 22px;font:700 1rem inherit;font-family:inherit;cursor:pointer}
   .qn-ov{position:fixed;inset:0;z-index:560;background:rgba(0,0,0,.72);display:flex;align-items:flex-start;justify-content:center;padding:6vh 16px;overflow:auto}
@@ -6115,25 +6116,38 @@ return {matrice:function(texte){var q=new QRCode(-1,L.M);q.addData(texte);q.make
 </script>
 
 <div class="bv-ov" id="bvOv" hidden role="dialog" aria-label="Bienvenue"><div class="bv-box">
-  <div class="bv-tete"><img src="img/pavillon-avenir.png" alt=""><div><h2>Bienvenue dans la bibliothèque</h2><p>Les livres animés et les outils de projection du Pavillon de l'Avenir, en cinq points.</p></div></div>
-  <div class="bv-grille" id="bvGrille"></div>
-  <div class="bv-pied"><label><input type="checkbox" id="bvPlus" checked> Ne plus afficher au démarrage</label><button type="button" id="bvOk" class="bv-ok">C'est parti</button></div>
+  <div class="bv-tete"><img src="img/pavillon-avenir.png" alt=""><div><h2>Bienvenue : la barre d'outils</h2><p>Clique une couverture, puis « Lire ». Tout ce qu'il faut pour projeter est dans la barre en bas de l'écran.</p></div></div>
+  <img class="bv-barre" src="nouveautes/bv-barre.jpg" alt="Barre d'outils du lecteur, boutons numérotés de 1 à 10">
+  <ol class="bv-leg" id="bvLeg"></ol>
+  <div class="bv-plus"><img src="nouveautes/bv-plus.jpg" alt="Menu Plus d'outils" loading="lazy"><div>
+    <h3>10 · Plus d'outils</h3>
+    <ul><li><b>Minuterie</b> pour un travail chronométré.</li><li><b>Projecteur</b> et <b>Cache</b> pour attirer l'attention sur une partie de la page.</li>
+    <li><b>Écran noir</b> pour ramener l'attention vers toi.</li><li><b>Code QR</b> : les élèves ouvrent le livre à la même page sur leur téléphone.</li>
+    <li><b>✎ Organiser</b> : glisse un bouton entre la barre et ce menu pour garder tes outils préférés à portée de main.</li></ul></div></div>
+  <div class="bv-pied"><label><input type="checkbox" id="bvPlus" checked> Ne plus afficher au démarrage</label>
+    <div><button type="button" class="bv-lien" id="bvQn">Autres outils (schémas électriques, plans…) →</button><button type="button" id="bvOk" class="bv-ok">C'est parti</button></div></div>
 </div></div>
 <script>
 (function(){
-  const CARTES = [
-    { t:"Ouvrir un livre", img:"nouveautes/livre-tdm.jpg", d:"Clique une couverture, puis « Lire ». Flèches ← → pour tourner les pages, M pour la table des matières, ✓ pour montrer les réponses une à une.", qn:"Table des matières et réponses pas à pas" },
-    { t:"Projeter et annoter", img:"nouveautes/barre-couleur.jpg", d:"Le crayon écrit sur la page; le tableau blanc ouvre une page vierge, quadrillée ou isométrique. Tout est gardé sur l'ordinateur.", qn:"Barre du crayon et du tableau blanc" },
-    { t:"Schémas électriques animés", img:"nouveautes/elec-animer.jpg", d:"Sur le quadrillé, bouton Objets : symboles, fils et modèles prêts à utiliser. ▶ Animer fait circuler le courant; 🔧 cache une panne à trouver.", qn:"Schéma électrique en échelle (tableau blanc)" },
-    { t:"Plans et accueil de classe", img:"nouveautes/plans.jpg", d:"En haut : « Plans » pour projeter un plan technique, « Accueil de classe » pour le tableau du début de période.", qn:"Plans techniques" },
-    { t:"Partager avec les élèves", img:"nouveautes/livre-qr.jpg", d:"Le code QR ouvre le livre à la même page sur leur téléphone. La recherche trouve un mot dans tous les livres.", qn:"Recherche, filtre et code QR" }
+  const LEG = [
+    ["Pages", "Flèches ← → ou tape un numéro de page.", "← →"],
+    ["Crayon", "Écris et dessine sur la page; le rond de couleur change la couleur et l'épaisseur.", "P"],
+    ["Réponses", "Montre les réponses de la page une à la fois, pour corriger avec le groupe. Grisé si la page n'en a pas.", "R"],
+    ["Animations", "Met en pause ou relance les animations du livre.", "A"],
+    ["Zoom", "Agrandis la page pour le fond de la classe; 100 % pour revenir.", "+ −"],
+    ["Tableau blanc", "Une page vierge, quadrillée ou isométrique, pour expliquer, faire un schéma électrique ou un plan de tuyauterie.", "B"],
+    ["Table des matières", "Va directement à un module ou à une section.", "M"],
+    ["Double page", "Affiche deux pages côte à côte, comme un livre ouvert.", "D"],
+    ["Plein écran", "Cache tout sauf le livre pour la projection.", "F"],
+    ["Plus d'outils", "Minuterie, projecteur, cache, écran noir, code QR… (voir plus bas).", ""]
   ];
+  document.getElementById("bvLeg").innerHTML = LEG.map(([t, d, k], i) => `<li><span class="n">${i + 1}</span><div><b>${t}</b>${k ? ` <kbd>${k}</kbd>` : ""}<p>${d}</p></div></li>`).join("");
   const ov = document.getElementById("bvOv");
-  document.getElementById("bvGrille").innerHTML = CARTES.map((c, i) => `<div class="bv-c"><img src="${c.img}" alt="" loading="lazy"><div class="bv-t"><span>${i + 1}</span>${c.t}</div><p>${c.d}</p><button type="button" data-qn="${c.qn}">Voir la mini-formation →</button></div>`).join("");
   const fermer = () => { ov.hidden = true; try { localStorage.setItem("bienvenueVu", document.getElementById("bvPlus").checked ? "1" : ""); } catch(e){} };
-  window.ouvrirBienvenue = () => { ov.hidden = false; };
+  window.ouvrirBienvenue = () => { ov.hidden = false; ov.scrollTop = 0; };
   document.getElementById("bvOk").onclick = fermer;
-  ov.addEventListener("click", e => { if (e.target === ov) fermer(); const b = e.target.closest("[data-qn]"); if (b){ fermer(); window.ouvrirQn && ouvrirQn(b.dataset.qn); } });
+  document.getElementById("bvQn").onclick = () => { fermer(); document.getElementById("quoiNeuf").click(); };
+  ov.addEventListener("click", e => { if (e.target === ov) fermer(); });
   document.addEventListener("keydown", e => { if (e.key === "Escape" && !ov.hidden) fermer(); });
   document.getElementById("lienAide").addEventListener("click", e => { e.preventDefault(); ouvrirBienvenue(); });
   let vu = ""; try { vu = localStorage.getItem("bienvenueVu") || ""; } catch(e){}
