@@ -2311,7 +2311,7 @@ function drawStroke(g, s, W, H, k){
     col = coulPot(pt); }   /* animation : rouge = L1, bleu = L2 */
   g.strokeStyle = col; g.lineWidth = (s.hl ? s.w * 4 : s.w) * k;
   if (s.t === "objet"){ const colO = (!s.c || s.c === "#24282c") ? (wbSombre() ? "#f4f1ea" : "#3a424b") : s.c, G = dessinerObjet(g, s, W, H, k, colO);
-    if (s.lb && !ELEC[s.k]){ const [ex, ey, al] = posEtiquette(s.lp || "bas", G.bbox, k); etiquette(g, s.lb, ex, ey, k, colO, al); }   /* nom d'un objet isométrique (double-clic) */ if (typeof SELO !== "undefined" && SELO.s === s){ g.save(); g.setLineDash([8 * k, 6 * k]); g.strokeStyle = "#6aa9ff"; g.lineWidth = 2 * k; g.strokeRect(G.bbox[0] - 6, G.bbox[1] - 6, G.bbox[2] - G.bbox[0] + 12, G.bbox[3] - G.bbox[1] + 12); g.restore(); } return; }
+    if (s.lb && !ELEC[s.k]){ const [ex, ey, al] = posEtiquette(s.lp || "bas", G.bbox, k, s.tz); etiquette(g, s.lb, ex, ey, k, colO, al, s.tz); }   /* nom d'un objet isométrique (double-clic) */ if (typeof SELO !== "undefined" && SELO.s === s){ g.save(); g.setLineDash([8 * k, 6 * k]); g.strokeStyle = "#6aa9ff"; g.lineWidth = 2 * k; g.strokeRect(G.bbox[0] - 6, G.bbox[1] - 6, G.bbox[2] - G.bbox[0] + 12, G.bbox[3] - G.bbox[1] + 12); g.restore(); } return; }
   if (s.t === "texte"){
     if (s.cache) return;
     const fs = txFs(s) * k, lh = s.lig ? 34 * 1.25 * k : fs * 1.25; g.font = txFont(s, fs); g.fillStyle = s.hl ? "#24282c" : col; g.textBaseline = s.lig ? "alphabetic" : "top";
@@ -2330,9 +2330,9 @@ function drawStroke(g, s, W, H, k){
     else if (s.t === "ellipse"){ g.ellipse((x1 + x2) / 2, (y1 + y2) / 2, Math.max(1, Math.abs(x2 - x1) / 2), Math.max(1, Math.abs(y2 - y1) / 2), 0, 0, Math.PI * 2); }
     const habillage = () => {     /* cadre de sélection et étiquette (double-clic), pour toutes les formes */
       if (RD.obj && typeof SELO !== "undefined" && SELO.s === s) cadreForme(g, s, W, H, k);
-      if (s.lb && !VALEURS_FORME[s.t] && s.lp){ const [ex, ey, al] = posEtiquette(s.lp, cadrePx(s, W, H), k); etiquette(g, s.lb, ex, ey, k, col, al); }
+      if (s.lb && !VALEURS_FORME[s.t] && s.lp){ const [ex, ey, al] = posEtiquette(s.lp, cadrePx(s, W, H), k, s.tz); etiquette(g, s.lb, ex, ey, k, col, al, s.tz); }
       else if (s.lb && !VALEURS_FORME[s.t]){ const ligneT = /^(ligne|fleche|fleche2)$/.test(s.t), an = Math.atan2(y2 - y1, x2 - x1); let nx = Math.sin(an), ny = -Math.cos(an); if (ny > 0){ nx = -nx; ny = -ny; }   /* au-dessus d'une ligne, au centre d'une forme */
-        etiquette(g, s.lb, (x1 + x2) / 2 + (ligneT ? nx * 16 * k : 0), (y1 + y2) / 2 + (ligneT ? ny * 16 * k : 0), k, col); } };
+        etiquette(g, s.lb, (x1 + x2) / 2 + (ligneT ? nx * 16 * k * (s.tz || 1) : 0), (y1 + y2) / 2 + (ligneT ? ny * 16 * k * (s.tz || 1) : 0), k, col, "center", s.tz); } };
     if (FORMES[s.t] && !/^(ligne|fleche|rect|ellipse)$/.test(s.t)){ g.stroke(); dessinerForme(g, s, x1, y1, x2, y2, k, col); habillage(); return; }
     g.stroke(); if (FORMES[s.t]) habillage(); return;
   }
@@ -2370,12 +2370,12 @@ function dessinerForme(g, s, x1, y1, x2, y2, k, col){
     g.stroke(); if (s.lb || (RD.wb && /^(quad|iso|isopts)$/.test(wbBg()))){        /* valeur choisie (double-clic), sinon sur une grille : longueur en carreaux */
       const u = 34 * RD.z * (window.devicePixelRatio || 1), n = Math.hypot(x2 - x1, y2 - y1) / u;
       const r = Math.round(n * 10) / 10, txt = s.lb || ((String(r).replace(".", ",")) + " carr.");
-      g.save(); const sgL = s.d ? Math.sign(s.d) : 1; g.translate((x1 + x2) / 2 + nx * 19 * k * sgL, (y1 + y2) / 2 + ny * 19 * k * sgL);   /* texte du côté extérieur */ let a3 = an; if (a3 > Math.PI / 2 || a3 < -Math.PI / 2) a3 += Math.PI; g.rotate(a3);
-      g.fillStyle = col; g.font = "700 " + Math.round(13 * k) + "px system-ui, sans-serif"; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText(txt, 0, 0); g.restore(); }
+      g.save(); const sgL = s.d ? Math.sign(s.d) : 1, ec = 19 * k * Math.max(1, (s.tz || 1) * .85); g.translate((x1 + x2) / 2 + nx * ec * sgL, (y1 + y2) / 2 + ny * ec * sgL);   /* texte du côté extérieur */ let a3 = an; if (a3 > Math.PI / 2 || a3 < -Math.PI / 2) a3 += Math.PI; g.rotate(a3);
+      g.fillStyle = col; g.font = "700 " + Math.round(13 * k * (s.tz || 1)) + "px system-ui, sans-serif"; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText(txt, 0, 0); g.restore(); }
     return; }
   else if (t === "cercle"){ const r = Math.max(2, Math.hypot(x2 - x1, y2 - y1)); g.arc(x1, y1, r, 0, Math.PI * 2); g.moveTo(x1 - 6 * k, y1); g.lineTo(x1 + 6 * k, y1); g.moveTo(x1, y1 - 6 * k); g.lineTo(x1, y1 + 6 * k); g.stroke();
     g.save(); g.setLineDash([6 * k, 5 * k]); g.lineWidth = Math.max(1, lw * .6); g.beginPath(); g.moveTo(x1, y1); g.lineTo(x2, y2); g.stroke(); g.restore();
-    texte(s.lb || "r", (x1 + x2) / 2 - Math.sin(Math.atan2(y2 - y1, x2 - x1)) * 11 * k, (y1 + y2) / 2 + Math.cos(Math.atan2(y2 - y1, x2 - x1)) * 11 * k, 14 * k); return; }
+    texte(s.lb || "r", (x1 + x2) / 2 - Math.sin(Math.atan2(y2 - y1, x2 - x1)) * 11 * k, (y1 + y2) / 2 + Math.cos(Math.atan2(y2 - y1, x2 - x1)) * 11 * k * (s.tz || 1), 14 * k * (s.tz || 1)); return; }
   else if (t === "triangle") poly([[xa + w / 2, ya], [xb, yb], [xa, yb]]);
   else if (t === "triangleR"){ poly([[xa, ya], [xa, yb], [xb, yb]]); const q = Math.min(w, h) * .14; g.moveTo(xa + q, yb); g.lineTo(xa + q, yb - q); g.lineTo(xa, yb - q); }
   else if (t === "losange") poly([[xa + w / 2, ya], [xb, ya + h / 2], [xa + w / 2, yb], [xa, ya + h / 2]]);
@@ -2385,7 +2385,7 @@ function dessinerForme(g, s, x1, y1, x2, y2, k, col){
     g.moveTo(x1, y1); g.lineTo(x1 + R, y1); g.moveTo(x1, y1); g.lineTo(x2, y2); g.stroke();
     const a = Math.atan2(y2 - y1, x2 - x1), deg = Math.round(Math.abs(a) * 180 / Math.PI), r = Math.min(R * .32, 60 * k);
     g.beginPath(); g.arc(x1, y1, r, 0, a, a < 0); g.stroke();
-    texte(s.lb ? s.lb : deg + "°", x1 + Math.cos(a / 2) * (r + 18 * k), y1 + Math.sin(a / 2) * (r + 18 * k), 15 * k); return; }
+    texte(s.lb ? s.lb : deg + "°", x1 + Math.cos(a / 2) * (r + 18 * k), y1 + Math.sin(a / 2) * (r + 18 * k * (s.tz || 1)), 15 * k * (s.tz || 1)); return; }
   else if (t === "axes"){
     g.moveTo(xa, yb); g.lineTo(xb, yb); tete(xa, yb, xb, yb); g.moveTo(xa, yb); g.lineTo(xa, ya); tete(xa, yb, xa, ya);
     const n = 10, tk = 5 * k; for (let i = 1; i < n; i++){ g.moveTo(xa + w * i / n, yb - tk); g.lineTo(xa + w * i / n, yb + tk); g.moveTo(xa - tk, yb - h * i / n); g.lineTo(xa + tk, yb - h * i / n); }
@@ -2469,10 +2469,10 @@ function decouperIso(cur){
   return out.length ? out : null;
 }
 /* petit texte lisible (contour blanc) : étiquettes des formes et des objets */
-function etiquette(g, txt, x, y, k, col, al){ g.save(); g.font = "700 " + Math.round(15 * k) + "px system-ui, sans-serif"; g.textAlign = al || "center"; g.textBaseline = "middle";
-  g.lineJoin = "round"; g.lineWidth = 4 * k; g.strokeStyle = wbSombre() ? "rgba(0,0,0,.55)" : "rgba(255,255,255,.9)"; g.strokeText(txt, x, y); g.fillStyle = col; g.fillText(txt, x, y); g.restore(); }
+function etiquette(g, txt, x, y, k, col, al, tz){ tz = tz || 1; g.save(); g.font = "700 " + Math.round(15 * k * tz) + "px system-ui, sans-serif"; g.textAlign = al || "center"; g.textBaseline = "middle";
+  g.lineJoin = "round"; g.lineWidth = 4 * k * tz; g.strokeStyle = wbSombre() ? "rgba(0,0,0,.55)" : "rgba(255,255,255,.9)"; g.strokeText(txt, x, y); g.fillStyle = col; g.fillText(txt, x, y); g.restore(); }
 /* position du texte d'un élément (s.lp : haut, bas, gauche, droite, centre) autour de son cadre [x0, y0, x1, y1] */
-function posEtiquette(lp, bb, k){ const cx = (bb[0] + bb[2]) / 2, cy = (bb[1] + bb[3]) / 2, m = 14 * k;
+function posEtiquette(lp, bb, k, tz){ const cx = (bb[0] + bb[2]) / 2, cy = (bb[1] + bb[3]) / 2, m = 14 * k * (tz || 1);
   return lp === "haut" ? [cx, bb[1] - m, "center"] : lp === "bas" ? [cx, bb[3] + m, "center"] : lp === "gauche" ? [bb[0] - m * .6, cy, "right"] : lp === "droite" ? [bb[2] + m * .6, cy, "left"] : [cx, cy, "center"]; }
 function cadrePx(s, W, H){ const P = pointsTrait(s); let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9; P.forEach(([x, y]) => { x0 = Math.min(x0, x * W); x1 = Math.max(x1, x * W); y0 = Math.min(y0, y * H); y1 = Math.max(y1, y * H); }); return [x0, y0, x1, y1]; }
 /* forme sélectionnée (onglet Formes) : cadre pointillé bleu */
@@ -2516,7 +2516,9 @@ function modifierForme(s, cx, cy){
   box.style.cssText = "position:fixed;z-index:90;left:" + Math.max(8, Math.min(innerWidth - 300, cx - 140)) + "px;top:" + Math.max(8, Math.min(innerHeight - (s.t === "cote" ? 300 : 130), cy + 18)) + "px;width:280px;padding:10px;border-radius:12px;background:#0e0e0f;border:1px solid #6aa9ff;color:#e4e4e7;font:600 .8rem system-ui,sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.4)";
   const actuel = s.t === "angle" && !s.lb ? String(Math.round(Math.abs(Math.atan2(s.p[1][1] - s.p[0][1], (s.p[1][0] - s.p[0][0]) * ($("#inkCanvas").width / $("#inkCanvas").height))) * 180 / Math.PI)) : (s.lb || (s.t === "bulle" ? String(s.n || 1) : ""));
   box.innerHTML = '<div style="margin-bottom:6px;line-height:1.3">' + V.q + '</div><div style="display:flex;gap:6px"><input style="flex:1;min-width:0;min-height:38px;border-radius:8px;border:1px solid #2f2f33;padding:0 8px;font:700 1rem system-ui;color:#111;background:#fff" placeholder="' + V.ex + '"><button style="min-height:38px;padding:0 12px;border-radius:8px;border:0;background:#1f6fc2;color:#fff;font:700 .85rem system-ui;cursor:pointer">OK</button></div>';
+  if (s.t !== "bulle" && !(s.t === "objet" && ELEC[s.k])) tailleTexte(box, s);
   if (s.t === "cote" || (s.t !== "objet" && !VALEURS_FORME[s.t]) || (s.t === "objet" && !ELEC[s.k])) padCote(box, s);
+  glisserCase(box);
   $("#reader").appendChild(box); { const bh = box.offsetHeight, r0 = box.getBoundingClientRect(); if (r0.top + bh > innerHeight - 8) box.style.top = Math.max(8, innerHeight - bh - 8) + "px"; }   /* la case reste dans l'écran */
   const inp = box.querySelector("input"); inp.value = actuel; setTimeout(() => { inp.focus(); inp.select(); }, 30);
   box.addEventListener("pointerdown", e => e.stopPropagation());
@@ -2531,6 +2533,27 @@ function modifierForme(s, cx, cy){
     redrawInk(); try { majObjUI(); } catch(e){} };
   inp.addEventListener("keydown", e => { e.stopPropagation(); if (e.key === "Enter"){ e.preventDefault(); fin(true); } else if (e.key === "Escape"){ e.preventDefault(); fin(false); } });
   box.querySelector("button").onclick = () => fin(true); inp.addEventListener("blur", () => setTimeout(() => fin(true), 150)); }
+/* la case du double-clic se déplace en la glissant par sa barre du haut (pour voir l'objet dessous) */
+function glisserCase(box){
+  const bar = document.createElement("div"); bar.title = "Glisse pour déplacer la case";
+  bar.style.cssText = "display:flex;align-items:center;justify-content:center;height:18px;margin:-6px -4px 6px;cursor:grab;touch-action:none;color:#71717a;user-select:none";
+  bar.innerHTML = '<svg viewBox="0 0 24 8" width="40" height="10" aria-hidden="true"><g fill="currentColor"><circle cx="4" cy="2" r="1.6"/><circle cx="12" cy="2" r="1.6"/><circle cx="20" cy="2" r="1.6"/><circle cx="4" cy="6.5" r="1.6"/><circle cx="12" cy="6.5" r="1.6"/><circle cx="20" cy="6.5" r="1.6"/></g></svg>';
+  box.prepend(bar); let d = null;
+  bar.addEventListener("pointerdown", e => { e.preventDefault(); const r = box.getBoundingClientRect(); d = { dx:e.clientX - r.left, dy:e.clientY - r.top }; bar.setPointerCapture(e.pointerId); bar.style.cursor = "grabbing"; });
+  bar.addEventListener("pointermove", e => { if (!d) return; box.style.left = Math.max(0, Math.min(innerWidth - box.offsetWidth, e.clientX - d.dx)) + "px"; box.style.top = Math.max(0, Math.min(innerHeight - 40, e.clientY - d.dy)) + "px"; });
+  ["pointerup", "pointercancel"].forEach(t => bar.addEventListener(t, () => { d = null; bar.style.cursor = "grab"; }));
+  bar.addEventListener("mousedown", e => e.preventDefault()); }
+/* taille du texte (s.tz) : − / + */
+function tailleTexte(box, s){
+  const row = document.createElement("div"); row.style.cssText = "display:flex;align-items:center;gap:6px;margin-top:10px";
+  const bt = 'style="width:44px;min-height:38px;border-radius:9px;border:1px solid #3a3a40;border-bottom-width:4px;background:#1c1c1f;color:#e4e4e7;font:800 1rem system-ui;cursor:pointer"';
+  row.innerHTML = '<span style="flex:1">Taille du texte</span><button type="button" data-tz="-1" ' + bt + ' aria-label="Texte plus petit" title="Plus petit">A−</button><span data-v style="min-width:46px;text-align:center;font-weight:800"></span><button type="button" data-tz="1" ' + bt + ' aria-label="Texte plus gros" title="Plus gros">A+</button>';
+  box.appendChild(row);
+  const maj = () => { row.querySelector("[data-v]").textContent = Math.round((s.tz || 1) * 100) + " %"; };
+  row.addEventListener("pointerdown", e => e.preventDefault()); row.addEventListener("mousedown", e => e.preventDefault());   /* la case de texte garde le curseur */
+  row.querySelectorAll("[data-tz]").forEach(b => b.onclick = () => { const v = Math.max(.5, Math.min(4, Math.round(((s.tz || 1) + (+b.dataset.tz) * .25) * 100) / 100));
+    if (v === (s.tz || 1)) return; snapInk(); if (v === 1) delete s.tz; else s.tz = v; redrawInk(); maj(); });
+  maj(); }
 /* position de la cote par rapport à l'objet : la ligne de cote s'éloigne (s.d) du côté choisi; « centre » la remet sur l'objet */
 function padCote(box, s){
   const FL = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6"/></svg>';
