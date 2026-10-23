@@ -543,6 +543,7 @@
   .penbar button:disabled:hover{border-color:#2f2f33}
   .penbar .wblbl{color:#a9a9ae;font-size:.85rem;min-width:3.2em;text-align:center;font-variant-numeric:tabular-nums}
   .penbar .sep.wbonly{margin:0 2px}
+  #reader.wbon #tb, #reader.wbon #tbShow, #reader.wbon .tb-pill{display:none!important}
   /* menu du crayon : rétractable + ancré sur le côté */
 
   /* barre du crayon simplifiée : l'essentiel sur une ligne, le reste dans « Couleur » et « Plus » */
@@ -3594,6 +3595,7 @@ function refreshTools(){
   $("#inkCanvas").classList.toggle("live", drawing);
   $("#penE").classList.toggle("on", RD.eraser); $("#penT").classList.toggle("on", !!RD.text && !RD.eraser);
   document.querySelectorAll(".wbonly").forEach(e => { e.hidden = !RD.wb; });
+  $("#reader").classList.toggle("wbon", !!RD.wb);   /* tableau blanc : la barre du livre (pages, zoom…) est cachée */
   $("#penO").hidden = false;   /* Formes et objets : partout (formes sur les livres; objets isométriques et électriques sur le tableau blanc) */
   if (RD.wb) majFond();
   setIcn($("#penS"), RD.shape || "libre"); $("#penS").classList.toggle("on", !!RD.shape && !RD.eraser); $("#penS").title = "Forme : " + SHAPE_NOM[RD.shape || ""] + " (clic pour changer)";
@@ -3608,7 +3610,7 @@ function refreshTools(){
 function togglePen(){ RD.pen = !RD.pen; if (RD.pen) RD.spot = false; refreshTools(); }
 function toggleWb(){
   RD.wb = !RD.wb; if (RD.wb){ RD.spot = false; RD.crayonOff = true; RD.eraser = false; RD.text = false; RD.obj = false; RD.formeK = null; RD.objKi = null; RD.objKe = null; try { SELO.s = null; } catch(e){} setTimeout(() => { try { aviser("Aucun outil choisi : touche le crayon pour écrire, ou touche une forme pour la choisir.", 3500); } catch(e){} }, 400); }   /* chaque ouverture : aucun outil choisi */
-  const st = $("#rstage");
+  const st = $("#rstage"); $("#reader").classList.toggle("wbon", !!RD.wb);
   if (RD.wb){ RD.z = 1; sizeInner(); st.scrollLeft = (st.scrollWidth - st.clientWidth) / 2; st.scrollTop = (st.scrollHeight - st.clientHeight) / 2; }
   else { RD.z = Math.max(1, RD.z); sizeInner(); st.scrollLeft = 0; st.scrollTop = 0; }
   refreshTools();
