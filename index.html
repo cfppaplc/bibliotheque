@@ -4691,6 +4691,7 @@ initAdmin();
     <button class="pl-btn" id="plMoreBtn" type="button" aria-haspopup="true" aria-expanded="false">Plus ▾</button>
   </div>
   <div class="pl-menu" id="plMenu" hidden role="menu">
+    <button type="button" role="menuitem" id="plmAccueil">Tous les plans<small>Revenir à l'écran d'accueil des plans</small></button>
     <button type="button" role="menuitem" id="plmOpen">Ouvrir un autre plan</button>
     <button type="button" role="menuitem" id="plmCal">Mettre à l'échelle<small>Choisir l'échelle du plan (1:50…) ou tracer une cote connue</small></button>
     <button type="button" role="menuitem" id="plmRot">Tourner de 90°</button>
@@ -5068,6 +5069,7 @@ initAdmin();
 
   // ---------- Menu Plus ----------
   $("plMoreBtn").onclick = e => { e.stopPropagation(); const m = $("plMenu"); m.hidden = !m.hidden; $("plMoreBtn").setAttribute("aria-expanded", !m.hidden); };
+  $("plmAccueil").onclick = () => retourPlans();
   $("plmOpen").onclick = () => { $("plMenu").hidden = true; $("plFile").click(); };
   $("plmCal").onclick = () => { $("plMenu").hidden = true; ouvrirEchelle(); };
   $("plmRot").onclick = () => { $("plMenu").hidden = true; if (!plan) return; rot = (rot + 90) % 360; notes.rot = rot; saveNotes(); dessiner(); ajuster(); };
@@ -5121,12 +5123,21 @@ initAdmin();
   ov.addEventListener("dragover", e => { e.preventDefault(); ov.classList.add("over"); });
   ov.addEventListener("dragleave", () => ov.classList.remove("over"));
   ov.addEventListener("drop", e => { e.preventDefault(); ov.classList.remove("over"); fichier(e.dataTransfer.files[0]); });
-  $("plClose").onclick = fermer;
+  /* Bouton de gauche : avec un plan ouvert, il ramène à l'écran d'accueil des plans; sur l'accueil des plans, à la bibliothèque */
+  function retourPlans(){
+    if (plan){ clearTimeout(saveT); try { putNotes(noteKey(), JSON.parse(JSON.stringify(notes))); } catch(e){} }
+    plan = null; $("plMenu").hidden = true; showEmpty();
+  }
+  const majRetour = () => { const accueil = !$("plEmpty").hidden, b = $("plClose");
+    b.querySelector(".pl-lbl").textContent = accueil ? "Bibliothèque" : "Tous les plans";
+    b.setAttribute("aria-label", accueil ? "Retour à la bibliothèque" : "Retour à l'accueil des plans"); b.title = b.getAttribute("aria-label"); };
+  new MutationObserver(majRetour).observe($("plEmpty"), { attributes:true, attributeFilter:["hidden"] }); majRetour();
+  $("plClose").onclick = () => { if ($("plEmpty").hidden && plan) retourPlans(); else fermer(); };
   document.addEventListener("keydown", e => {
     if (ov.hidden) return;
     if (!$("plDlg").hidden) { if (e.key === "Escape") $("plCalNo").click(); return; }
     if (!$("plScaleDlg").hidden) { if (e.key === "Escape") $("plScaleDlg").hidden = true; return; }
-    if (e.key === "Escape") { if (!$("plMenu").hidden) $("plMenu").hidden = true; else fermer(); }
+    if (e.key === "Escape") { if (!$("plMenu").hidden) $("plMenu").hidden = true; else if ($("plEmpty").hidden && plan) retourPlans(); else fermer(); }
     else if (e.key === "+" || e.key === "=") $("plZi").click();
     else if (e.key === "-") $("plZo").click();
     else if (e.key === "0") ajuster();
