@@ -91,6 +91,7 @@
 - Période : `BLOCKS` (60 min, pause 5, 60, pause 15, 60), `points()`, `timeline()`. Case **« Examen aujourd'hui »** (`cfg.examen` = date du jour) : aucune pause.
 - **Contenus par activité** (« Préparer le cours », étape 4) : `cfg.liens[cléActivité]` = **liste** (ancien format : un seul objet; lire avec `liste()`/`liensDe()`).
   Types : `livre`, `schema`, `plan`, `tableau`, `minuterie`, `video` (YouTube, `ytInfo`), `fichier` (gardé dans IndexedDB `accueil-fichiers`). `web` (`urlWeb`, ouvert dans un nouvel onglet). Attention : `data-w` est déjà pris par les widgets, ne pas le réutiliser.
+  Double-clic sur un segment de timeline / une étape : `lierActivite(label)` ouvre `openPrep()` et `choix()` sur la bonne rangée; le simple clic passe par `clicSimple` (délai 280 ms).
   Les PDF/images/vidéos s'affichent dans le tableau; PowerPoint/Word/Excel sont téléchargés pour s'ouvrir dans leur programme.
 - **Ambiance du jour** : `AMBIANCES` (une palette par jour de semaine), `couleursDuJour()`; réglage `cfg.couleurs = "jour" | "fixe"`.
 - Icônes : style au trait uniquement (`ico(type)`, `ICO_P`), **pas d'émojis** (demande de Jeremy).

@@ -59,6 +59,8 @@ body { background-color: var(--bg); color: var(--ink); font-family: var(--body);
 .bgx .pegs{stroke-dasharray:2 14;stroke-width:5}
 @keyframes drip{0%{transform:translateY(0);opacity:0}12%{opacity:.9}75%{opacity:.9}100%{transform:translateY(70px);opacity:0}}
 @keyframes flam{from{transform:scaleY(.86)}to{transform:scaleY(1.08)}}
+#v-tl .seg, #v-steps .step, .step{-webkit-user-select:none;user-select:none}
+.lk-row.lk-vise{outline:3px solid var(--water,#4dabf7);outline-offset:3px;border-radius:8px;transition:outline-color .4s}
 @keyframes blink{0%,100%{opacity:.4}50%{opacity:.12}}
 @keyframes sway{from{transform:rotate(-4deg)}to{transform:rotate(4deg)}}
 @keyframes typ{0%,100%{opacity:.2}50%{opacity:.8}}
@@ -983,7 +985,8 @@ function tick() {
       d.lastChild.textContent = r.pause ? "" : fmt(r.start);
       d.title = fmt(r.start) + " · " + r.label;
       const lks2 = r.pause ? [] : liensDe(r.label);
-      if (lks2.length){ const ic = document.createElement("span"); ic.className = "seg-lk"; ic.innerHTML = lks2.map(c => ico(c.type)).join(""); d.append(ic); d.classList.add("a-lien"); d.title += " · clique pour ouvrir : " + lks2.map(nomLien).join(" ou "); d.onclick = e => ouvrirLiens(lks2, e); }
+      if (lks2.length){ const ic = document.createElement("span"); ic.className = "seg-lk"; ic.innerHTML = lks2.map(c => ico(c.type)).join(""); d.append(ic); d.classList.add("a-lien"); d.title += " · clique pour ouvrir : " + lks2.map(nomLien).join(" ou "); d.onclick = e => clicSimple(() => ouvrirLiens(lks2, e)); }
+      if (!r.pause){ d.title += " · double-clic : lier une action"; d.ondblclick = e => { e.preventDefault(); lierActivite(r.label); }; }
       tl.append(d);
     });
     rows.forEach((r, i) => {
@@ -998,7 +1001,8 @@ function tick() {
       const lks = r.pause ? [] : liensDe(r.label);
       if (lks.length){ lks.forEach(c => { const ic = document.createElement("span"); ic.className = "lk-i"; ic.innerHTML = ico(c.type); ic.title = "Ouvrir : " + nomLien(c);
           ic.onclick = e => { e.stopPropagation(); ouvrirLien(c); }; li.querySelector(".txt").append(ic); });
-        li.classList.add("a-lien"); li.title = "Clique pour ouvrir : " + lks.map(nomLien).join(" ou "); li.onclick = e => ouvrirLiens(lks, e); }
+        li.classList.add("a-lien"); li.title = "Clique pour ouvrir : " + lks.map(nomLien).join(" ou "); li.onclick = e => clicSimple(() => ouvrirLiens(lks, e)); }
+      if (!r.pause){ li.title = (li.title ? li.title + " · " : "") + "Double-clic : lier une action"; li.ondblclick = e => { e.preventDefault(); lierActivite(r.label); }; }
       if (i === nowIdx) { const sp = document.createElement("span"); sp.className = "left"; sp.id = "v-left"; li.querySelector(".txt").append(sp); }
       list.append(li);
     });
@@ -1870,6 +1874,18 @@ function minuterie(min, nom){
   ov.querySelector('[data-a="p"]').onclick = e => { pause = !pause; e.target.textContent = pause ? "Reprendre" : "Pause"; };
   ov.querySelector('[data-a="+"]').onclick = () => { reste += 60; ov.classList.remove("fin"); aff(); };
   ov.querySelector('[data-a="x"]').onclick = () => { clearInterval(minuT); ov.hidden = true; };
+}
+/* timeline : un clic ouvre le contenu lié, un double-clic ouvre « Préparer le cours » directement sur le choix d'action de cette activité */
+let clicT = 0;
+function clicSimple(f){ clearTimeout(clicT); clicT = setTimeout(f, 280); }
+function lierActivite(label){
+  clearTimeout(clicT); openPrep();
+  setTimeout(() => {
+    const k = cleLien(label), row = [...document.querySelectorAll("#f-liens .lk-row")].find(x => cleLien(x.querySelector(".lk-nom").textContent) === k);
+    if (!row) return;
+    row.scrollIntoView({ block:"center", behavior:"smooth" }); row.classList.add("lk-vise"); setTimeout(() => row.classList.remove("lk-vise"), 2200);
+    if (liste(LIENS_T[k]).length < MAX_LIENS) choix(row, row.querySelector(".lk-nom").textContent);
+  }, 120);
 }
 function openPrep() {
   const prog = (compInfo(cfg.comp) || [])[3] || cfg.prog || "5333";
