@@ -2326,7 +2326,7 @@ function drawStroke(g, s, W, H, k){
       }
     } else if (s.t === "rect"){ g.rect(Math.min(x1, x2), Math.min(y1, y2), Math.abs(x2 - x1), Math.abs(y2 - y1)); }
     else if (s.t === "ellipse"){ g.ellipse((x1 + x2) / 2, (y1 + y2) / 2, Math.max(1, Math.abs(x2 - x1) / 2), Math.max(1, Math.abs(y2 - y1) / 2), 0, 0, Math.PI * 2); }
-    else if (FORMES[s.t]){ g.stroke(); dessinerForme(g, s, x1, y1, x2, y2, k, col); return; }
+    else if (FORMES[s.t]){ g.stroke(); if (RD.obj && typeof SELO !== "undefined" && SELO.s === s) cadreForme(g, s, W, H, k); dessinerForme(g, s, x1, y1, x2, y2, k, col); return; }
     g.stroke(); return;
   }
   s.p.forEach((q, i) => { const x = q[0] * W, y = q[1] * H; if (i) g.lineTo(x, y); else g.moveTo(x, y); });
@@ -2456,6 +2456,18 @@ function decouperIso(cur){
   }
   return out.length ? out : null;
 }
+/* forme sélectionnée (onglet Formes) : cadre pointillé bleu */
+function cadreForme(g, s, W, H, k){ const P = pointsTrait(s); if (!P || !P.length) return;
+  let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9; P.forEach(([x, y]) => { x0 = Math.min(x0, x * W); x1 = Math.max(x1, x * W); y0 = Math.min(y0, y * H); y1 = Math.max(y1, y * H); });
+  const m = 10 * k; g.save(); g.setLineDash([8 * k, 6 * k]); g.strokeStyle = "#2a7bcf"; g.lineWidth = 2 * k; g.strokeRect(x0 - m, y0 - m, x1 - x0 + 2 * m, y1 - y0 + 2 * m); g.restore(); }
+/* forme sous le doigt (la plus récente d'abord) : près de son trait, ou n'importe où dans une petite forme */
+function formeSous(q){ const c = $("#inkCanvas"), W = c.width, H = c.height, tol = 14 * (window.devicePixelRatio || 1), arr = strokes();
+  for (let i = arr.length - 1; i >= 0; i--){ const s = arr[i]; if (!s.t || !FORMES[s.t] || !s.p || s.p.length < 2) continue;
+    const P = pointsTrait(s), x = q[0] * W, y = q[1] * H; let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+    for (let j = 0; j < P.length; j++){ const px = P[j][0] * W, py = P[j][1] * H; x0 = Math.min(x0, px); x1 = Math.max(x1, px); y0 = Math.min(y0, py); y1 = Math.max(y1, py);
+      if (j && distSeg([x, y], [P[j - 1][0] * W, P[j - 1][1] * H], [px, py], 1) < tol) return s; }
+    if (x1 - x0 < 90 * (window.devicePixelRatio || 1) && y1 - y0 < 90 * (window.devicePixelRatio || 1) && x > x0 - tol && x < x1 + tol && y > y0 - tol && y < y1 + tol) return s; }
+  return null; }
 /* points d'un trait (pour la gomme) : les formes sont échantillonnées sur leur contour */
 function pointsTrait(s){
   if (s.t === "objet"){ const c = $("#inkCanvas"), G = objGeo(s, c.width, c.height), out = []; for (let i = 0; i <= 6; i++) for (let j = 0; j <= 4; j++) out.push([(G.bbox[0] + (G.bbox[2] - G.bbox[0]) * i / 6) / c.width, (G.bbox[1] + (G.bbox[3] - G.bbox[1]) * j / 4) / c.height]); return out; }
@@ -2964,7 +2976,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
   const sel = SELO.s && strokes().includes(SELO.s), sp = sel && SELO.s.k === "serpentin" ? SELO.s : null, pasV = sp ? (sp.pas || .5) : (RD.pas || .5), bp = b.querySelector("#objP");
   bp.style.display = (sp || RD.objK === "serpentin") ? "" : "none"; bp.textContent = "Tubes : " + (pasV >= 1 ? "30 cm" : "15 cm");
   ["objR", "objD"].forEach(id => b.querySelector("#" + id).style.display = sel ? "" : "none");
-  if (se && (se.k === "rails" || se.k === "jonction")) b.querySelector("#objR").style.display = "none";
+  if ((se && (se.k === "rails" || se.k === "jonction")) || (sel && FORMES[SELO.s.t])) b.querySelector("#objR").style.display = "none";
   b.querySelector("#objTaille").style.display = se && se.k === "rails" ? "" : "none"; }
 (function(){
   const bar = document.createElement("div"); bar.id = "objBar"; bar.hidden = true;
@@ -2972,7 +2984,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
   bar.innerHTML = '<div class="tete" title="Glisse ici pour déplacer la palette"><span class="poig">⠿</span><span class="tit">Objets</span></div>'
     + '<div class="onglets" role="tablist"><button data-tab="formes" role="tab">Formes</button><button data-tab="iso" role="tab" title="Objets isométriques (plomberie, chauffage)">Iso</button><button data-tab="elec" role="tab">Électricité</button></div>'
     + '<div class="grp" data-g="formes"><div class="cgrid cform">' + Object.keys(FORMES).map(k => '<button data-f="' + k + '" title="' + FORMES[k].n + '"><canvas width="120" height="64"></canvas><span>' + FORMES[k].n + '</span></button>').join("") + '</div>'
-    + '<div class="aide">Choisis une forme, puis <b>glisse</b> sur le tableau. La couleur et l\'épaisseur sont celles du crayon.</div></div>'
+    + '<div class="aide">Choisis une forme, puis <b>glisse</b> sur le tableau. Pour <b>déplacer</b> une forme, glisse-la par son trait. Le bouton Supprimer l\'efface.</div></div>'
     + '<div class="grp" data-g="iso"><div class="cgrid ciso">' + Object.keys(OBJETS).map(k => '<button data-k="' + k + '" title="' + OBJETS[k].n + '"><canvas width="120" height="64"></canvas><span>' + OBJETS[k].n + '</span></button>').join("") + '</div>'
     + '<div class="aide">Clique sur la grille pour poser l\'objet. Les tuyaux raccordés le suivent.</div></div>'
     + '<div class="grp" data-g="elec"><button id="objSch" class="sch-btn" title="Circuits prêts à utiliser et tableaux enregistrés">📋 Modèles et mes schémas</button>' + ELEC_CAT.map(([cg, cn]) => '<button class="cat" data-cat="' + cg + '">' + cn + '</button><div class="cgrid" data-cat="' + cg + '">'
@@ -3241,6 +3253,9 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     if (RD.eraser){ cur = "erase"; eraseAt(pt(e)); return; }
     if (RD.text || (RD.obj && !RD.formeK)){ e.preventDefault(); return; }
     const q = pt(e);
+    if (RD.obj && RD.formeK){ const hit = formeSous((r => [(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height])(c.getBoundingClientRect()));
+      if (hit){ SELO.s = hit; cur = { bouge:hit, q0:q, p0:hit.p.map(v => v.slice()), snap:false }; redrawInk(); majObjUI(); return; }
+      if (SELO.s){ SELO.s = null; majObjUI(); } }
     cur = { c:/^hl/.test(RD.color) ? "#000" : RD.color, hl:/^hl/.test(RD.color), hc:/^hl:/.test(RD.color) ? RD.color.slice(3) : null, w:WIDTHS[RD.wIdx], p:[q] };
     const forme = RD.obj && RD.formeK ? RD.formeK : RD.shape;
     if (forme){ cur.t = forme; cur.p = [q, q]; if (forme === "bulle") cur.n = strokes().filter(x => x.t === "bulle").length + 1; }
@@ -3269,12 +3284,16 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
   c.addEventListener("pointermove", e => {
     if (!cur) return;
     if (cur === "erase"){ eraseAt(pt(e)); return; }
+    if (cur.bouge){ const q = pt(e), dx = q[0] - cur.q0[0], dy = q[1] - cur.q0[1];
+      if (!cur.snap){ if (Math.hypot(dx, dy) < .002) return; snapInk(); cur.snap = true; }
+      cur.bouge.p = cur.p0.map(v => [v[0] + dx, v[1] + dy]); if (!rafTrait) rafTrait = requestAnimationFrame(() => { rafTrait = 0; redrawInk(); }); return; }
     if (cur.t) cur.p[1] = pt(e);
     else { const evs = (e.getCoalescedEvents && e.getCoalescedEvents()) || []; (evs.length ? evs : [e]).forEach(ev => cur.p.push(pt(ev))); }   /* tous les points du crayon, même entre deux images */
     if (!rafTrait) rafTrait = requestAnimationFrame(dessinerEnCours);
   });
   ["pointerup", "pointercancel"].forEach(t => c.addEventListener(t, () => {
     if (rafTrait){ cancelAnimationFrame(rafTrait); rafTrait = 0; }
+    if (cur && cur.bouge){ cur = null; redrawInk(); return; }
     const finTrait = cur && cur !== "erase";
     RD.erSnap = false;
     if (cur && cur !== "erase" && cur.t && FORMES_CLIC[cur.t]){ const a = cur.p[0], b = cur.p[1]; if (Math.hypot(a[0] - b[0], a[1] - b[1]) < .004){ const d = FORMES_CLIC[cur.t]; cur.p[1] = cur.t === "bulle" || cur.t === "cercle" ? [a[0] + d, a[1]] : [a[0] + d, a[1] + d * 1.6]; } }
@@ -3599,6 +3618,7 @@ document.addEventListener("keydown", e => {
   if (!$("#reader").classList.contains("open")) return;
   const t = e.target, tag = t && t.tagName;
   if (enSaisie(t)) return;
+  if ((e.key === "Delete" || e.key === "Backspace") && RD.obj && SELO.s && SELO.s.t && FORMES[SELO.s.t] && strokes().includes(SELO.s)){ e.preventDefault(); $("#objD").click(); return; }   /* forme sélectionnée : touche Suppr */
   if (e.key === "Escape"){ if (!$("#mmenu").hidden || !$("#help").hidden || !$("#noir").hidden){ closeMenu(); e.stopImmediatePropagation(); } return; }
   if (verrou() && !((e.ctrlKey || e.metaKey) && /^[zy]$/i.test(e.key || ""))) return;
   if (e.key === "ArrowRight" || e.key === "PageDown" || (e.key === " " && tag !== "BUTTON")){ e.preventDefault(); turn(1); return; }
@@ -3729,7 +3749,7 @@ majEpaisseur();
 $("#penE").onclick = () => { RD.eraser = !RD.eraser; if (RD.eraser){ RD.text = false; RD.obj = false; } refreshTools(); };
 $("#penO").onclick = () => { RD.obj = !RD.obj; if (RD.obj){ RD.text = false; RD.eraser = false; RD.objTab = null; }
   refreshTools();
-  if (RD.obj) aviser(modeElec() ? "Schéma en échelle : 1) « Échelle L1 / L2 » et glisse pour tracer les rails. 2) Choisis un symbole et clique sur un échelon. 3) Pour relier : pars d'un point bleu et glisse jusqu'à l'autre point bleu." : RD.objTab === "iso" ? "Choisis un objet, puis clique sur la grille. Clique un objet pour le déplacer : les tuyaux raccordés le suivent." : "Choisis une forme, puis glisse sur le tableau. Onglets Isométrique et Électricité : objets de plomberie et symboles électriques.", modeElec() ? 10000 : 0); };
+  if (RD.obj) aviser(modeElec() ? "Schéma en échelle : 1) « Échelle L1 / L2 » et glisse pour tracer les rails. 2) Choisis un symbole et clique sur un échelon. 3) Pour relier : pars d'un point bleu et glisse jusqu'à l'autre point bleu." : RD.objTab === "iso" ? "Choisis un objet, puis clique sur la grille. Clique un objet pour le déplacer : les tuyaux raccordés le suivent." : "Choisis une forme, puis glisse sur le tableau. Pour déplacer une forme, glisse-la par son trait. Onglets Iso et Électricité : objets de plomberie et symboles électriques.", modeElec() ? 10000 : 0); };
 $("#penT").onclick = () => { RD.text = !RD.text; if (RD.text){ RD.eraser = false; RD.obj = false; } refreshTools(); if (RD.text) aviser("Dessine un rectangle, puis écris dedans. Entrée valide (Maj+Entrée = nouvelle ligne)."); };
 $("#wbZo").onclick = zout; $("#wbZi").onclick = zin; $("#penU").onclick = undoInk; $("#penR").onclick = redoInk;
 $("#penC").onclick = () => { if (!strokes().length) return; snapInk(); INKS[inkKey()] = []; redrawInk(); };
