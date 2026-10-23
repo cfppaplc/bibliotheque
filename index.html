@@ -550,6 +550,7 @@
   .penbar .ppop[hidden]{display:none!important}
   .penbar .prang{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
   .penbar .prang[hidden]{display:none!important}
+  .penbar .plarg{display:flex;align-items:center;gap:8px;flex:1;min-width:260px}.penbar .plarg input{flex:1;min-width:170px;height:34px;accent-color:#2a7bcf;cursor:pointer}.penbar .plarg b{min-width:22px;text-align:right;color:#e4e4e7}
   .penbar .prang>.lab{font-size:.74rem;color:#a1a1aa;min-width:84px;letter-spacing:.02em}
   .penbar .ppop button[data-lab]{gap:6px;padding:0 10px}
   .penbar .ppop button[data-lab]::after{content:attr(data-lab);font-size:.82rem}
@@ -3378,6 +3379,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     if (!(RD.pen || RD.wb) || RD.sim) return;
     c.setPointerCapture(e.pointerId);
     if (RD.eraser){ cur = "erase"; eraseAt(pt(e)); return; }
+    if (RD.crayonOff && !RD.text && !RD.obj){ e.preventDefault(); return; }               /* crayon désactivé : rien ne se dessine */
     if (RD.text || (RD.obj && RD.objTab !== "formes")){ e.preventDefault(); return; }
     const q = pt(e);
     if (RD.obj){ const brut = (r => [(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height])(c.getBoundingClientRect()), ip = poigneeSous(SELO.s, brut);
@@ -3391,7 +3393,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
         if (SELO.s){ SELO.s = null; redrawInk(); majObjUI(); } e.preventDefault(); return; }
       var choisir = hit || obj;     /* forme pas encore choisie : un simple clic la choisit, mais glisser trace une nouvelle forme (ex. une cote qui part du coin d'un rectangle) */
       var raz = !!SELO.s; if (SELO.s){ SELO.s = null; majObjUI(); } }
-    cur = { c:/^hl/.test(RD.color) ? "#000" : RD.color, hl:/^hl/.test(RD.color), hc:/^hl:/.test(RD.color) ? RD.color.slice(3) : null, w:WIDTHS[RD.wIdx], p:[q] };
+    cur = { c:/^hl/.test(RD.color) ? "#000" : RD.color, hl:/^hl/.test(RD.color), hc:/^hl:/.test(RD.color) ? RD.color.slice(3) : null, w:RD.wPx || WIDTHS[RD.wIdx], p:[q] };
     const forme = RD.obj && RD.formeK ? RD.formeK : RD.shape;
     if (forme){ cur.t = forme; cur.p = [q, q]; if (RD.obj && RD.formeK && choisir) cur.choisir = choisir; if (RD.obj && RD.formeK && raz && !choisir) cur.raz = true; if (forme === "bulle") cur.n = strokes().filter(x => x.t === "bulle").length + 1; }
     /* Trait en cours, rapide : on garde une image de tout le reste et, à chaque image, on redessine seulement le trait en cours par-dessus */
@@ -3811,14 +3813,14 @@ $("#tbPg").addEventListener("keydown", e => {
 (function(){
   const bar = $("#penBar"), ref = bar.querySelector(".sep");
   const x = document.createElement("input"); x.type = "color"; x.className = "swx"; x.value = "#ff00aa"; x.title = "Autre couleur"; x.setAttribute("aria-label", "Autre couleur");
-  x.oninput = () => { RD.color = x.value; RD.eraser = false; recolorerSel(); refreshTools(); x.classList.add("on"); };
+  x.oninput = () => { RD.color = x.value; RD.eraser = false; RD.crayonOff = false; recolorerSel(); refreshTools(); x.classList.add("on"); };
   bar.insertBefore(x, ref); RD.swx = x;
 })();
 function recolorerSel(){ const o = typeof SELO !== "undefined" && RD.obj && SELO.s && strokes().includes(SELO.s) ? SELO.s : null; if (!o || /^hl/.test(RD.color) || o.c === RD.color) return; snapInk(); o.c = RD.color; redrawInk(); }   /* l'objet ou la forme choisi prend la couleur du crayon */
-document.querySelectorAll("#penBar .sw").forEach(b => b.onclick = () => { RD.color = b.dataset.c; RD.eraser = false; recolorerSel(); refreshTools(); });
+document.querySelectorAll("#penBar .sw").forEach(b => b.onclick = () => { RD.color = b.dataset.c; RD.eraser = false; RD.crayonOff = false; recolorerSel(); refreshTools(); });
 $("#penW").onclick = () => { RD.wIdx = (RD.wIdx + 1) % WIDTHS.length; majEpaisseur(); };
 function majEpaisseur(){ const c = $("#penW circle"); if (c) c.setAttribute("r", 2.5 + RD.wIdx * 2.5); }
-$("#penS").onclick = () => { const i = SHAPES.indexOf(RD.shape || null); RD.shape = SHAPES[(i + 1) % SHAPES.length]; RD.eraser = false; RD.text = false; refreshTools(); };
+$("#penS").onclick = () => { const i = SHAPES.indexOf(RD.shape || null); RD.shape = SHAPES[(i + 1) % SHAPES.length]; RD.eraser = false; RD.text = false; RD.crayonOff = false; refreshTools(); };
 $("#wbF").onclick = wbFondSuivant; $("#wbP").onclick = () => wbAller(-1); $("#wbN").onclick = () => wbAller(1); $("#wbPlus").onclick = wbNouveau; $("#wbS").onclick = wbEnregistrer;
 [["penW","dot"],["wbHand","main"],["penE","eraser"],["penU","undo"],["penO","objet"],["wbZo","zmoins"],["wbZi","zplus"],["penT","texte"],["penR","redo"],["penC","trash"],["penX","close"],["wbF","fond"],["wbP","prev"],["wbN","next"],["wbPlus","plus"],["wbS","save"]].forEach(([id, n]) => setIcn($("#" + id), n));
 majEpaisseur();
@@ -3865,7 +3867,14 @@ majEpaisseur();
   pc.appendChild(rang("Couleur", [...bar.querySelectorAll(".sw")]));
   pc.appendChild(rang("Surligneur", [...pc.querySelectorAll(".sw.hl")]));
   if (RD.swx) pc.querySelector(".prang").appendChild(RD.swx);
-  pc.appendChild(rang("Épaisseur", [X("penW")]));
+  /* épaisseur : une glissière (1 à 40) avec un aperçu du trait */
+  try { RD.wPx = +localStorage.getItem("penLargeur") || 4; } catch(e){ RD.wPx = 4; }
+  const lg = document.createElement("div"); lg.className = "plarg";
+  lg.innerHTML = '<input type="range" min="1" max="40" step="1" aria-label="Épaisseur du trait"><svg viewBox="0 0 60 44" width="60" height="44" aria-hidden="true"><line x1="8" y1="22" x2="52" y2="22" stroke-linecap="round"/></svg><b></b>';
+  const lgI = lg.querySelector("input"), lgL = lg.querySelector("line"), lgB = lg.querySelector("b");
+  window.majLargeur = () => { const c = RD.color || "#e2483d"; lgI.value = RD.wPx; lgB.textContent = RD.wPx; lgL.setAttribute("stroke-width", Math.min(40, RD.wPx)); lgL.setAttribute("stroke", /^hl:/.test(c) ? c.slice(3) : c); };
+  lgI.addEventListener("input", () => { RD.wPx = +lgI.value; RD.crayonOff = false; try { localStorage.setItem("penLargeur", RD.wPx); } catch(e){} majLargeur(); refreshTools(); });
+  pc.appendChild(rang("Épaisseur", [lg])); majLargeur(); if (X("penW")) X("penW").remove();   /* l'ancien bouton à 3 grosseurs est remplacé par la glissière */
   /* Plus */
   const bp = document.createElement("button"); bp.id = "penPlus"; bp.title = "Plus d'outils : rétablir, tout effacer, zoom, tableaux, enregistrer"; bp.setAttribute("aria-label", "Plus d'outils"); bp.innerHTML = dots;
   const pp = pop("popPlus");
@@ -3886,14 +3895,18 @@ majEpaisseur();
   const basculer = (p, b) => { const ouvrir = p.hidden; fermer(); if (ouvrir){ p.hidden = false; b.classList.add("open"); } };
   /* toucher « Couleur » ramène toujours au crayon (quitte l'efface, le texte ou les objets) */
   bc.onclick = () => { const garde = RD.obj && (RD.formeK || (SELO.s && strokes().includes(SELO.s)));
-    if (RD.eraser || RD.text || (RD.obj && !garde)){ RD.eraser = false; RD.text = false; if (!garde) RD.obj = false; refreshTools(); } basculer(pc, bc); };   /* les formes gardent la palette : on change seulement leur couleur */ bp.onclick = () => basculer(pp, bp);
+    if (garde){ basculer(pc, bc); return; }                                                 /* un objet choisi : on change seulement sa couleur */
+    const actif = !RD.eraser && !RD.text && !RD.obj && !RD.crayonOff;
+    if (actif){ RD.crayonOff = true; fermer(); refreshTools(); return; }                     /* crayon actif : on le désactive */
+    RD.eraser = false; RD.text = false; RD.obj = false; RD.crayonOff = false; refreshTools(); fermer(); pc.hidden = false; bc.classList.add("open"); majLargeur(); };   /* on l'active et les couleurs s'ouvrent */   /* les formes gardent la palette : on change seulement leur couleur */ bp.onclick = () => basculer(pp, bp);
   pc.querySelectorAll(".sw").forEach(b => b.addEventListener("click", () => setTimeout(fermer, 120)));
   document.addEventListener("pointerdown", e => { if (bar.contains(e.target) || (pc.hidden && pp.hidden)) return; fermer();
     if (e.target.id === "inkCanvas"){ e.stopPropagation(); e.preventDefault(); } }, true);   /* le clic qui ferme un menu ne dessine pas de point */
   document.addEventListener("keydown", e => { if (e.key === "Escape") fermer(); });
   window.majCouleurCrayon = () => { const c = RD.color || "#e2483d", hl = /^hl:/.test(c), cur = bc.querySelector(".pcur");
     const v = hl ? c.slice(3) : (RD.swx && RD.swx.classList.contains("on") ? RD.swx.value : (c === "#24282c" && wbSombre() ? "#f4f1ea" : c));
-    cur.style.setProperty("--pc", v); cur.classList.toggle("hl", hl); bc.classList.toggle("on", !RD.eraser && !RD.text && !RD.obj); };
+    cur.style.setProperty("--pc", v); cur.classList.toggle("hl", hl); bc.classList.toggle("on", !RD.eraser && !RD.text && !RD.obj && !RD.crayonOff);
+    bc.title = RD.crayonOff ? "Crayon désactivé : touche pour écrire (couleur et épaisseur)" : "Crayon : touche pour le désactiver"; try { majLargeur(); } catch(e){} };
   const rt = refreshTools; refreshTools = function(){ rt.apply(this, arguments); try { majCouleurCrayon(); } catch(e){} };
   majCouleurCrayon();
 })();
