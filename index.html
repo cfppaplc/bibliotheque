@@ -2326,10 +2326,79 @@ function drawStroke(g, s, W, H, k){
       }
     } else if (s.t === "rect"){ g.rect(Math.min(x1, x2), Math.min(y1, y2), Math.abs(x2 - x1), Math.abs(y2 - y1)); }
     else if (s.t === "ellipse"){ g.ellipse((x1 + x2) / 2, (y1 + y2) / 2, Math.max(1, Math.abs(x2 - x1) / 2), Math.max(1, Math.abs(y2 - y1) / 2), 0, 0, Math.PI * 2); }
+    else if (FORMES[s.t]){ g.stroke(); dessinerForme(g, s, x1, y1, x2, y2, k, col); return; }
     g.stroke(); return;
   }
   s.p.forEach((q, i) => { const x = q[0] * W, y = q[1] * H; if (i) g.lineTo(x, y); else g.moveTo(x, y); });
   if (s.p.length === 1) g.lineTo(s.p[0][0] * W + .01, s.p[0][1] * H);
+  g.stroke();
+}
+/* ---- Formes pour l'enseignement (onglet « Formes » de la palette) : on les trace en glissant du point A au point B ---- */
+const FORMES = {
+  ligne:{ n:"Ligne" }, fleche:{ n:"Flèche" }, fleche2:{ n:"Double flèche" }, cote:{ n:"Cote (mesure)" },
+  rect:{ n:"Rectangle" }, ellipse:{ n:"Ellipse" }, cercle:{ n:"Cercle (rayon)" }, triangle:{ n:"Triangle" },
+  triangleR:{ n:"Triangle rectangle" }, losange:{ n:"Losange" }, hexagone:{ n:"Hexagone" }, angle:{ n:"Angle (degrés)" },
+  axes:{ n:"Axes x – y" }, cube:{ n:"Prisme (cube)" }, cylindre:{ n:"Cylindre" }, accolade:{ n:"Accolade" },
+  nuage:{ n:"Nuage de révision" }, bulle:{ n:"Bulle numérotée" }, crochet:{ n:"Crochet (bon)" }, croix:{ n:"Croix (erreur)" }
+};
+const FORMES_CLIC = { bulle:.009, crochet:.012, croix:.012, cercle:.025 };   /* un simple clic pose la forme à une taille par défaut */
+function dessinerForme(g, s, x1, y1, x2, y2, k, col){
+  const t = s.t, lw = g.lineWidth, L = Math.max(12 * k, lw * 3.5), xa = Math.min(x1, x2), xb = Math.max(x1, x2), ya = Math.min(y1, y2), yb = Math.max(y1, y2), w = xb - xa, h = yb - ya;
+  const tete = (fx, fy, tx, ty) => { const an = Math.atan2(ty - fy, tx - fx); g.moveTo(tx - L * Math.cos(an - .45), ty - L * Math.sin(an - .45)); g.lineTo(tx, ty); g.lineTo(tx - L * Math.cos(an + .45), ty - L * Math.sin(an + .45)); };
+  const poly = pts => { g.moveTo(pts[0][0], pts[0][1]); pts.slice(1).forEach(q => g.lineTo(q[0], q[1])); g.closePath(); };
+  const texte = (tx, x, y, taille, al) => { g.save(); g.fillStyle = col; g.font = "700 " + Math.round(taille) + "px system-ui, sans-serif"; g.textAlign = al || "center"; g.textBaseline = "middle"; g.fillText(tx, x, y); g.restore(); };
+  g.beginPath();
+  if (t === "fleche2"){ g.moveTo(x1, y1); g.lineTo(x2, y2); tete(x1, y1, x2, y2); tete(x2, y2, x1, y1); }
+  else if (t === "cote"){
+    const an = Math.atan2(y2 - y1, x2 - x1), nx = -Math.sin(an), ny = Math.cos(an), e = 9 * k, Lc = Math.max(8 * k, lw * 2.4);
+    g.moveTo(x1, y1); g.lineTo(x2, y2);
+    [[x1, y1], [x2, y2]].forEach(([x, y]) => { g.moveTo(x - nx * e * 1.4, y - ny * e * 1.4); g.lineTo(x + nx * e * 1.4, y + ny * e * 1.4); });
+    const tt = (fx, fy, tx, ty) => { const a2 = Math.atan2(ty - fy, tx - fx); g.moveTo(tx - Lc * Math.cos(a2 - .35), ty - Lc * Math.sin(a2 - .35)); g.lineTo(tx, ty); g.lineTo(tx - Lc * Math.cos(a2 + .35), ty - Lc * Math.sin(a2 + .35)); };
+    tt(x1, y1, x2, y2); tt(x2, y2, x1, y1);
+    g.stroke(); if (RD.wb && /^(quad|iso|isopts)$/.test(wbBg())){        /* sur une grille : longueur en carreaux */
+      const u = 34 * RD.z * (window.devicePixelRatio || 1), n = Math.hypot(x2 - x1, y2 - y1) / u;
+      const r = Math.round(n * 10) / 10, txt = (String(r).replace(".", ",")) + " carr.";
+      g.save(); g.translate((x1 + x2) / 2 + nx * 14 * k, (y1 + y2) / 2 + ny * 14 * k); let a3 = an; if (a3 > Math.PI / 2 || a3 < -Math.PI / 2) a3 += Math.PI; g.rotate(a3);
+      g.fillStyle = col; g.font = "700 " + Math.round(13 * k) + "px system-ui, sans-serif"; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText(txt, 0, 0); g.restore(); }
+    return; }
+  else if (t === "cercle"){ const r = Math.max(2, Math.hypot(x2 - x1, y2 - y1)); g.arc(x1, y1, r, 0, Math.PI * 2); g.moveTo(x1 - 6 * k, y1); g.lineTo(x1 + 6 * k, y1); g.moveTo(x1, y1 - 6 * k); g.lineTo(x1, y1 + 6 * k); g.stroke();
+    g.save(); g.setLineDash([6 * k, 5 * k]); g.lineWidth = Math.max(1, lw * .6); g.beginPath(); g.moveTo(x1, y1); g.lineTo(x2, y2); g.stroke(); g.restore();
+    texte("r", (x1 + x2) / 2 - Math.sin(Math.atan2(y2 - y1, x2 - x1)) * 11 * k, (y1 + y2) / 2 + Math.cos(Math.atan2(y2 - y1, x2 - x1)) * 11 * k, 14 * k); return; }
+  else if (t === "triangle") poly([[xa + w / 2, ya], [xb, yb], [xa, yb]]);
+  else if (t === "triangleR"){ poly([[xa, ya], [xa, yb], [xb, yb]]); const q = Math.min(w, h) * .14; g.moveTo(xa + q, yb); g.lineTo(xa + q, yb - q); g.lineTo(xa, yb - q); }
+  else if (t === "losange") poly([[xa + w / 2, ya], [xb, ya + h / 2], [xa + w / 2, yb], [xa, ya + h / 2]]);
+  else if (t === "hexagone"){ const pts = []; for (let i = 0; i < 6; i++){ const a = Math.PI / 3 * i; pts.push([xa + w / 2 + w / 2 * Math.cos(a), ya + h / 2 + h / 2 * Math.sin(a)]); } poly(pts); }
+  else if (t === "angle"){
+    const R = Math.hypot(x2 - x1, y2 - y1); if (R < 2) return;
+    g.moveTo(x1, y1); g.lineTo(x1 + R, y1); g.moveTo(x1, y1); g.lineTo(x2, y2); g.stroke();
+    const a = Math.atan2(y2 - y1, x2 - x1), deg = Math.round(Math.abs(a) * 180 / Math.PI), r = Math.min(R * .32, 60 * k);
+    g.beginPath(); g.arc(x1, y1, r, 0, a, a < 0); g.stroke();
+    texte(deg + "°", x1 + Math.cos(a / 2) * (r + 18 * k), y1 + Math.sin(a / 2) * (r + 18 * k), 15 * k); return; }
+  else if (t === "axes"){
+    g.moveTo(xa, yb); g.lineTo(xb, yb); tete(xa, yb, xb, yb); g.moveTo(xa, yb); g.lineTo(xa, ya); tete(xa, yb, xa, ya);
+    const n = 10, tk = 5 * k; for (let i = 1; i < n; i++){ g.moveTo(xa + w * i / n, yb - tk); g.lineTo(xa + w * i / n, yb + tk); g.moveTo(xa - tk, yb - h * i / n); g.lineTo(xa + tk, yb - h * i / n); }
+    g.stroke(); texte("x", xb + 12 * k, yb, 15 * k); texte("y", xa, ya - 13 * k, 15 * k); texte("0", xa - 10 * k, yb + 11 * k, 12 * k); return; }
+  else if (t === "cube"){ const d = Math.min(w, h) * .32, fw = w - d, fh = h - d;
+    g.rect(xa, ya + d, fw, fh); g.moveTo(xa, ya + d); g.lineTo(xa + d, ya); g.lineTo(xb, ya); g.lineTo(xb, ya + fh); g.lineTo(xa + fw, yb); g.moveTo(xa + fw, ya + d); g.lineTo(xb, ya); g.stroke();
+    g.save(); g.setLineDash([6 * k, 5 * k]); g.lineWidth = Math.max(1, lw * .6); g.beginPath(); g.moveTo(xa + d, ya); g.lineTo(xa + d, ya + fh); g.lineTo(xb, ya + fh); g.moveTo(xa + d, ya + fh); g.lineTo(xa, yb); g.stroke(); g.restore(); return; }
+  else if (t === "cylindre"){ const ry = Math.max(3, Math.min(h * .14, w * .3));
+    g.ellipse(xa + w / 2, ya + ry, w / 2, ry, 0, 0, Math.PI * 2); g.moveTo(xa, ya + ry); g.lineTo(xa, yb - ry); g.moveTo(xb, ya + ry); g.lineTo(xb, yb - ry);
+    g.moveTo(xb, yb - ry); g.ellipse(xa + w / 2, yb - ry, w / 2, ry, 0, 0, Math.PI); g.stroke();
+    g.save(); g.setLineDash([6 * k, 5 * k]); g.lineWidth = Math.max(1, lw * .6); g.beginPath(); g.ellipse(xa + w / 2, yb - ry, w / 2, ry, 0, Math.PI, Math.PI * 2); g.stroke(); g.restore(); return; }
+  else if (t === "accolade"){
+    if (h >= w){ const xm = xa + w / 2, ym = ya + h / 2, b = Math.max(w / 2, 6 * k);
+      g.moveTo(xm + b, ya); g.quadraticCurveTo(xm, ya, xm, ya + h * .1); g.lineTo(xm, ym - h * .08); g.quadraticCurveTo(xm, ym, xm - b, ym);
+      g.quadraticCurveTo(xm, ym, xm, ym + h * .08); g.lineTo(xm, yb - h * .1); g.quadraticCurveTo(xm, yb, xm + b, yb); }
+    else { const ym = ya + h / 2, xm = xa + w / 2, b = Math.max(h / 2, 6 * k);
+      g.moveTo(xa, ym + b); g.quadraticCurveTo(xa, ym, xa + w * .1, ym); g.lineTo(xm - w * .08, ym); g.quadraticCurveTo(xm, ym, xm, ym - b);
+      g.quadraticCurveTo(xm, ym, xm + w * .08, ym); g.lineTo(xb - w * .1, ym); g.quadraticCurveTo(xb, ym, xb, ym + b); } }
+  else if (t === "nuage"){
+    const r = Math.max(8 * k, Math.min(w, h) / 8), arcs = (ax, ay, bx, by) => { const Lg = Math.hypot(bx - ax, by - ay), n = Math.max(1, Math.round(Lg / (r * 1.6))), an = Math.atan2(by - ay, bx - ax);
+      for (let i = 0; i < n; i++){ const cx = ax + (bx - ax) * (i + .5) / n, cy = ay + (by - ay) * (i + .5) / n, rr = Lg / n / 2; g.moveTo(cx - Math.cos(an) * rr, cy - Math.sin(an) * rr); g.arc(cx, cy, rr, an + Math.PI, an, false); } };
+    arcs(xa, ya, xb, ya); arcs(xb, ya, xb, yb); arcs(xb, yb, xa, yb); arcs(xa, yb, xa, ya); }
+  else if (t === "bulle"){ const r = Math.max(10 * k, Math.hypot(x2 - x1, y2 - y1)); g.arc(x1, y1, r, 0, Math.PI * 2); g.stroke(); texte(String(s.n || 1), x1, y1 + r * .04, r * 1.05); return; }
+  else if (t === "crochet"){ g.save(); g.lineWidth = lw * 1.6; g.strokeStyle = s.c === col && !s.hl ? "#2f9e44" : col; g.beginPath(); g.moveTo(xa, ya + h * .55); g.lineTo(xa + w * .38, yb); g.lineTo(xb, ya); g.stroke(); g.restore(); return; }
+  else if (t === "croix"){ g.save(); g.lineWidth = lw * 1.6; g.strokeStyle = s.c === col && !s.hl ? "#e03131" : col; g.beginPath(); g.moveTo(xa, ya); g.lineTo(xb, yb); g.moveTo(xb, ya); g.lineTo(xa, yb); g.stroke(); g.restore(); return; }
   g.stroke();
 }
 /* La grille isométrique est dessinée ici, avec exactement les mêmes calculs que les objets et le crayon : plus aucun décalage après un zoom */
@@ -2394,7 +2463,11 @@ function pointsTrait(s){
   if (!s.t || s.p.length < 2) return s.p;
   const a = s.p[0], b = s.p[s.p.length - 1], out = [], N = 28;
   const seg = (u, v) => { for (let i = 0; i <= N; i++) out.push([u[0] + (v[0] - u[0]) * i / N, u[1] + (v[1] - u[1]) * i / N]); };
-  if (s.t === "ligne" || s.t === "fleche") seg(a, b);
+  if (s.t === "ligne" || s.t === "fleche" || s.t === "fleche2" || s.t === "cote") seg(a, b);
+  else if (s.t === "angle"){ seg(a, b); seg(a, [a[0] + Math.hypot(b[0] - a[0], b[1] - a[1]), a[1]]); }
+  else if (s.t === "cercle" || s.t === "bulle"){ const r = Math.hypot(b[0] - a[0], b[1] - a[1]); for (let i = 0; i < 72; i++){ const t = i / 72 * Math.PI * 2; out.push([a[0] + r * Math.cos(t), a[1] + r * Math.sin(t)]); } out.push(a); }
+  else if (FORMES[s.t] && s.t !== "ellipse"){ const x0 = Math.min(a[0], b[0]), x1 = Math.max(a[0], b[0]), y0 = Math.min(a[1], b[1]), y1 = Math.max(a[1], b[1]);
+    seg([x0, y0], [x1, y0]); seg([x1, y0], [x1, y1]); seg([x1, y1], [x0, y1]); seg([x0, y1], [x0, y0]); seg([x0, y0], [x1, y1]); }
   else if (s.t === "rect"){ const c1 = [a[0], a[1]], c2 = [b[0], a[1]], c3 = [b[0], b[1]], c4 = [a[0], b[1]]; seg(c1, c2); seg(c2, c3); seg(c3, c4); seg(c4, c1); }
   else { const cx = (a[0] + b[0]) / 2, cy = (a[1] + b[1]) / 2, rx = Math.abs(b[0] - a[0]) / 2, ry = Math.abs(b[1] - a[1]) / 2; for (let i = 0; i < 72; i++){ const t = i / 72 * Math.PI * 2; out.push([cx + rx * Math.cos(t), cy + ry * Math.sin(t)]); } }
   return out;
@@ -2869,9 +2942,17 @@ function ouvrirSchemas(){
 const SELO = { s:null };
 RD.objK = "plinthe"; RD.objO = 0;
 function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
-  const el = modeElec(); RD.objK = el ? (RD.objKe || "fil") : (RD.objKi || "plinthe");
-  b.querySelectorAll(".grp").forEach(x => x.hidden = (x.dataset.g === "elec") !== el); b.querySelectorAll(".grpE").forEach(x => x.hidden = !el);
-  b.querySelector(".tit").textContent = el ? "Schéma électrique" : "Objets"; b.classList.toggle("sim", !!RD.sim); $("#objSim").textContent = RD.sim ? "■ Arrêter l'animation" : "▶ Animer le schéma";
+  if (!RD.obj){ if (RD.formeK){ RD.formeK = null; } return; }
+  /* onglet : Formes, Isométrique (fond iso) ou Électricité (fond quadrillé) */
+  const isoBg = !!RD.wb && /^iso/.test(wbBg());
+  if (!RD.objTab || (RD.objTab === "iso" && !isoBg) || (RD.objTab === "elec" && !modeElec())) RD.objTab = modeElec() ? "elec" : isoBg ? "iso" : "formes";
+  if (RD.objTab === "formes" && !RD.formeK) RD.formeK = "fleche";
+  if (RD.objTab !== "formes") RD.formeK = null;
+  const tab = RD.objTab, el = tab === "elec"; RD.objK = el ? (RD.objKe || "fil") : (RD.objKi || "plinthe");
+  b.querySelectorAll("[data-tab]").forEach(x => { x.classList.toggle("on", x.dataset.tab === tab); x.disabled = x.dataset.tab !== "formes" && !RD.wb; x.setAttribute("aria-selected", x.dataset.tab === tab); });
+  b.querySelectorAll(".grp").forEach(x => x.hidden = x.dataset.g !== tab); b.querySelectorAll(".grpE").forEach(x => x.hidden = !el);
+  b.querySelectorAll("[data-f]").forEach(x => x.classList.toggle("on", x.dataset.f === RD.formeK));
+  b.querySelector(".tit").textContent = el ? "Schéma électrique" : tab === "iso" ? "Objets isométriques" : "Formes"; b.classList.toggle("sim", !!RD.sim); $("#objSim").textContent = RD.sim ? "■ Arrêter l'animation" : "▶ Animer le schéma";
   b.querySelectorAll("[data-k]").forEach(x => x.classList.toggle("on", x.dataset.k === RD.objK));
   const se = SELO.s && strokes().includes(SELO.s) && ELEC[SELO.s.k] ? SELO.s : null, de = ELEC[se ? se.k : RD.objK] || null, bn = b.querySelector("#objNF"), bl = b.querySelector("#objL");
   const nfV = se ? !!se.nf : !!RD.objNF; bn.style.display = el && de && de.nf ? "" : "none"; bn.textContent = nfV ? "Normalement fermé (NF)" : "Normalement ouvert (NO)"; bn.classList.toggle("on", nfV);
@@ -2889,7 +2970,11 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
   const bar = document.createElement("div"); bar.id = "objBar"; bar.hidden = true;
   bar.style.cssText = "position:absolute;z-index:75;left:12px;top:70px;display:flex;flex-direction:column;gap:6px;width:184px;max-height:calc(100% - 150px);overflow-y:auto;overflow-x:hidden;padding:8px;border-radius:12px;background:rgba(14,14,15,.96);border:1px solid #2f2f33;color:#d4d4d8;font:600 .8rem system-ui,sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.35)";
   bar.innerHTML = '<div class="tete" title="Glisse ici pour déplacer la palette"><span class="poig">⠿</span><span class="tit">Objets</span></div>'
-    + '<div class="grp" data-g="iso">' + Object.keys(OBJETS).map(k => '<button data-k="' + k + '">' + OBJETS[k].n + '</button>').join("") + '</div>'
+    + '<div class="onglets" role="tablist"><button data-tab="formes" role="tab">Formes</button><button data-tab="iso" role="tab" title="Objets isométriques (plomberie, chauffage)">Iso</button><button data-tab="elec" role="tab">Électricité</button></div>'
+    + '<div class="grp" data-g="formes"><div class="cgrid cform">' + Object.keys(FORMES).map(k => '<button data-f="' + k + '" title="' + FORMES[k].n + '"><canvas width="120" height="64"></canvas><span>' + FORMES[k].n + '</span></button>').join("") + '</div>'
+    + '<div class="aide">Choisis une forme, puis <b>glisse</b> sur le tableau. La couleur et l\'épaisseur sont celles du crayon.</div></div>'
+    + '<div class="grp" data-g="iso"><div class="cgrid ciso">' + Object.keys(OBJETS).map(k => '<button data-k="' + k + '" title="' + OBJETS[k].n + '"><canvas width="120" height="64"></canvas><span>' + OBJETS[k].n + '</span></button>').join("") + '</div>'
+    + '<div class="aide">Clique sur la grille pour poser l\'objet. Les tuyaux raccordés le suivent.</div></div>'
     + '<div class="grp" data-g="elec"><button id="objSch" class="sch-btn" title="Circuits prêts à utiliser et tableaux enregistrés">📋 Modèles et mes schémas</button>' + ELEC_CAT.map(([cg, cn]) => '<button class="cat" data-cat="' + cg + '">' + cn + '</button><div class="cgrid" data-cat="' + cg + '">'
       + Object.keys(ELEC).filter(k => ELEC[k].g === cg).map(k => '<button data-k="' + k + '" title="' + ELEC[k].n.replace(/^[✎•] /, "") + '"><canvas width="120" height="64"></canvas><span>' + (ELEC[k].c || ELEC[k].n.replace(/^[✎•] /, "")) + '</span></button>').join("") + '</div>').join("") + '</div>'
     + '<div class="aide grpE">Pour relier : glisse d\'un <b>point bleu</b> à l\'autre</div>'
@@ -2901,6 +2986,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
   st.textContent = '#objBar button{min-height:32px;padding:0 8px;border-radius:8px;border:1px solid #2f2f33;background:#18181a;color:#d4d4d8;cursor:pointer;font:inherit;text-align:left}#objBar button:hover{border-color:#6a6a70}#objBar button.on{background:#2a2a2d;border-color:#6aa9ff;color:#fff}'
     + '#objBar .tete{display:flex;align-items:center;gap:6px;cursor:grab;user-select:none;touch-action:none;padding:2px 0 4px 2px;position:sticky;top:-8px;z-index:2;background:rgb(14,14,15);margin:-8px -8px 0;padding:8px 8px 6px;color:#a1a1aa;font-size:.78rem;letter-spacing:.04em;text-transform:uppercase}#objBar .tete:active{cursor:grabbing}#objBar .poig{font-size:1.1rem;line-height:1}'
     + '#objBar #objF{margin-left:auto;flex:none;min-height:28px;width:28px;padding:0;display:flex;align-items:center;justify-content:center}#objBar.of{width:auto!important}#objBar.of .tit{display:none}'
+    + '#objBar .onglets{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;margin-bottom:4px}#objBar .onglets button{min-height:30px;padding:0 2px;text-align:center;font-size:.7rem;border-radius:7px}#objBar .onglets button.on{background:#1f6fc2;border-color:#1f6fc2;color:#fff}#objBar .onglets button[disabled]{opacity:.35;cursor:not-allowed}'
     + '#objBar .grp{display:flex;flex-direction:column;gap:4px}#objBar .grp[hidden],#objBar .grpE[hidden]{display:none!important}'
     + '#objBar .sch-btn{text-align:center!important;background:#1f6fc2!important;border-color:#1f6fc2!important;color:#fff!important;margin-bottom:4px}#objBar .cat{background:transparent!important;border:0!important;color:#a1a1aa!important;font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;min-height:26px!important;padding:0 2px!important;display:flex;align-items:center;gap:6px}#objBar .cat::before{content:"▾";font-size:.8rem;width:10px}#objBar .cat.ferme::before{content:"▸"}#objBar .cat:hover{color:#fff!important}'
     + '#objBar .cgrid{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:4px}#objBar .cgrid[hidden]{display:none}#objBar .pol{display:grid;grid-template-columns:1fr 1fr;gap:4px}#objBar .pol button{text-align:center;font-size:.78rem}#objBar .del{display:flex;align-items:center;gap:6px;font-size:.78rem}#objBar .del input{width:56px;min-height:30px;border-radius:8px;border:1px solid #2f2f33;background:#fff;color:#111;font:inherit;font-weight:700;padding:0 6px}'
@@ -2925,7 +3011,27 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     if (k === "terre"){ dessinerElec(g, { t:"objet", k, p:[[.5, 14 / H]], lb:"", __u:40 }, W, H, 1.2, "#24282c"); return; }
     const U = k === "transfo" ? 17 : 34, w = k === "transfo" ? 4 : 2, y0 = k === "transfo" ? 18 : (k === "bp" ? 40 : k === "contactT" ? 44 : 36);
     dessinerElec(g, { t:"objet", k, p:[[(W - w * U) / 2 / W, y0 / H]], lb:{ bobine:"CR", moteur:"M" }[k] || "", nf:0, __u:U }, W, H, 1.2, "#24282c"); });
-  bar.querySelectorAll("[data-k]").forEach(b => b.onclick = () => { if (ELEC[b.dataset.k]) RD.objKe = b.dataset.k; else RD.objKi = b.dataset.k; SELO.s = null; redrawInk(); majObjUI(); });
+  bar.querySelectorAll("[data-k]").forEach(b => b.onclick = () => { if (ELEC[b.dataset.k]) RD.objKe = b.dataset.k; else RD.objKi = b.dataset.k; RD.formeK = null; SELO.s = null; redrawInk(); majObjUI(); });
+  /* vignettes des formes (dessinées avec le vrai moteur) */
+  const P_FORME = { cercle:[[.5, .5], [.8, .5]], bulle:[[.5, .5], [.68, .5]], angle:[[.25, .8], [.75, .2]], fleche:[[.15, .7], [.85, .3]], fleche2:[[.15, .5], [.85, .5]], cote:[[.15, .55], [.85, .55]], ligne:[[.15, .75], [.85, .25]] };
+  bar.querySelectorAll("[data-f]").forEach(b => { const t = b.dataset.f, cv = b.querySelector("canvas"), g = cv.getContext("2d"), W = cv.width, H = cv.height, wb = RD.wb; RD.wb = false;
+    try { drawStroke(g, { t, c:"#24282c", hl:false, hc:null, w:2.2, n:1, p:P_FORME[t] || [[.3, .15], [.7, .85]] }, W, H, 1); } catch(e){} RD.wb = wb;
+    b.onclick = () => { RD.formeK = t; SELO.s = null; redrawInk(); majObjUI(); }; });
+  /* vignettes des objets isométriques : on dessine l'objet à petite échelle puis on le centre */
+  bar.querySelectorAll(".ciso [data-k]").forEach(b => { const k = b.dataset.k, cv = b.querySelector("canvas"), g = cv.getContext("2d"), W = cv.width, H = cv.height;
+    const z0 = RD.z, dpr = window.devicePixelRatio || 1;
+    try { RD.z = 9 / (34 * 1.2 * dpr); const s0 = { t:"objet", k, p:[[0, 0]] }, G = objGeo(s0, W, H), bw = G.bbox[2] - G.bbox[0], bh = G.bbox[3] - G.bbox[1];
+      const f = Math.min((W - 10) / Math.max(1, bw), (H - 8) / Math.max(1, bh)); RD.z *= Math.min(f, 3.5);
+      const G2 = objGeo(s0, W, H), s1 = { t:"objet", k, p:[[(W / 2 - (G2.bbox[0] + G2.bbox[2]) / 2) / W, (H / 2 - (G2.bbox[1] + G2.bbox[3]) / 2) / H]] };
+      dessinerObjet(g, s1, W, H, RD.z * dpr, "#3a424b"); } catch(e){} RD.z = z0; });
+  /* onglets : Formes partout; Isométrique et Électricité changent le fond du tableau au besoin */
+  bar.querySelectorAll("[data-tab]").forEach(b => b.onclick = () => { const t = b.dataset.tab;
+    if (t !== "formes" && !RD.wb){ aviser("Les objets isométriques et les symboles électriques se posent sur le tableau blanc (bouton Tableau blanc)."); return; }
+    RD.objTab = t; SELO.s = null;
+    if (t === "formes"){ RD.formeK = RD.formeK || "fleche"; }
+    else { RD.formeK = null; const voulu = t === "iso" ? /^iso/ : /^quad$/;
+      if (!voulu.test(wbBg())){ wbEtat().bg[wbEtat().n] = t === "iso" ? "iso" : "quad"; majFond(); aviser(t === "iso" ? "Fond : plan isométrique." : "Fond : quadrillé (schéma électrique en échelle)."); } }
+    redrawInk(); refreshTools(); });
   $("#objNF").onclick = () => { const s = SELO.s && strokes().includes(SELO.s) && ELEC[SELO.s.k] ? SELO.s : null;
     if (s){ snapInk(); s.nf = s.nf ? 0 : 1; RD.objNF = s.nf; redrawInk(); } else RD.objNF = RD.objNF ? 0 : 1; majObjUI(); };
   RD.lbK = {};
@@ -3009,7 +3115,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     if (s.k === "rails"){ if (surRails(s, G, x, y, .1) && (RD.objK === "rails" || (y - G.oy) / G.u < .4)) return s; continue; }
     if (x >= G.bbox[0] - 4 && x <= G.bbox[2] + 4 && y >= G.bbox[1] - 4 && y <= G.bbox[3] + 4) return s; } return null; };
   c.addEventListener("pointerdown", e => {
-    if (!RD.obj || !RD.wb || RD.eraser || RD.sim) return;
+    if (!RD.obj || !RD.wb || RD.eraser || RD.sim || RD.formeK) return;
     const q = cur(e), el = modeElec();
     if (el && SELO.s && SELO.s.k === "rails" && strokes().includes(SELO.s)){           /* poignée de l'échelle : on change sa largeur et sa hauteur */
       const o = SELO.s, G = objGeo(o, c.width, c.height), [w, h] = o.sz || [8, 10], cx = G.ox + w * G.u, cy = G.oy + h * G.u;
@@ -3133,10 +3239,11 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     if (!(RD.pen || RD.wb) || RD.sim) return;
     c.setPointerCapture(e.pointerId);
     if (RD.eraser){ cur = "erase"; eraseAt(pt(e)); return; }
-    if (RD.text || RD.obj){ e.preventDefault(); return; }
+    if (RD.text || (RD.obj && !RD.formeK)){ e.preventDefault(); return; }
     const q = pt(e);
     cur = { c:/^hl/.test(RD.color) ? "#000" : RD.color, hl:/^hl/.test(RD.color), hc:/^hl:/.test(RD.color) ? RD.color.slice(3) : null, w:WIDTHS[RD.wIdx], p:[q] };
-    if (RD.shape){ cur.t = RD.shape; cur.p = [q, q]; }
+    const forme = RD.obj && RD.formeK ? RD.formeK : RD.shape;
+    if (forme){ cur.t = forme; cur.p = [q, q]; if (forme === "bulle") cur.n = strokes().filter(x => x.t === "bulle").length + 1; }
     /* Trait en cours, rapide : on garde une image de tout le reste et, à chaque image, on redessine seulement le trait en cours par-dessus */
     snapInk(); redrawInk();
     if (cur.t || cur.hl){       /* forme ou surligneur : on garde une copie de tout le reste */
@@ -3170,6 +3277,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     if (rafTrait){ cancelAnimationFrame(rafTrait); rafTrait = 0; }
     const finTrait = cur && cur !== "erase";
     RD.erSnap = false;
+    if (cur && cur !== "erase" && cur.t && FORMES_CLIC[cur.t]){ const a = cur.p[0], b = cur.p[1]; if (Math.hypot(a[0] - b[0], a[1] - b[1]) < .004){ const d = FORMES_CLIC[cur.t]; cur.p[1] = cur.t === "bulle" || cur.t === "cercle" ? [a[0] + d, a[1]] : [a[0] + d, a[1] + d * 1.6]; } }
     if (cur && cur !== "erase" && cur.t){ const a = cur.p[0], b = cur.p[1]; if (Math.hypot(a[0] - b[0], a[1] - b[1]) < .004){ const arr = strokes(), i = arr.indexOf(cur); if (i >= 0){ arr.splice(i, 1); (UNDO[inkKey()] || []).pop(); } redrawInk(); } }
     if (cur && cur !== "erase" && RD.wb && /^iso/.test(wbBg())){ const seg = decouperIso(cur), arr = strokes(), k = arr.indexOf(cur); if (seg && k >= 0){ arr.splice(k, 1, ...seg); redrawInk(); } }
     cur = null; fond = null;
@@ -3309,12 +3417,13 @@ function refreshTools(){
   $("#inkCanvas").classList.toggle("live", drawing);
   $("#penE").classList.toggle("on", RD.eraser); $("#penT").classList.toggle("on", !!RD.text && !RD.eraser);
   document.querySelectorAll(".wbonly").forEach(e => { e.hidden = !RD.wb; });
-  $("#penO").hidden = !(RD.wb && (/^iso/.test(wbBg()) || wbBg() === "quad"));   /* Objets : seulement sur le plan isométrique ou le quadrillé */
+  $("#penO").hidden = false;   /* Formes et objets : partout (formes sur les livres; objets isométriques et électriques sur le tableau blanc) */
   if (RD.wb) majFond();
   setIcn($("#penS"), RD.shape || "libre"); $("#penS").classList.toggle("on", !!RD.shape && !RD.eraser); $("#penS").title = "Forme : " + SHAPE_NOM[RD.shape || ""] + " (clic pour changer)";
   const sw = document.querySelector('#penBar .sw[data-c="#24282c"]'); if (sw){ sw.style.setProperty("--c", wbSombre() ? "#f4f1ea" : "#24282c"); sw.setAttribute("aria-label", wbSombre() ? "Craie blanche" : "Noir"); }
   document.querySelectorAll("#penBar .sw").forEach(b => b.classList.toggle("on", !RD.eraser && b.dataset.c === RD.color)); if (RD.swx) RD.swx.classList.toggle("on", !RD.eraser && !document.querySelector("#penBar .sw.on"));
-  if (RD.obj && !(RD.wb && (/^iso/.test(wbBg()) || wbBg() === "quad"))) RD.obj = false;
+  if (RD.obj && !(RD.pen || RD.wb)) RD.obj = false;
+  if (RD.obj && RD.objTab && RD.objTab !== "formes" && !RD.wb) RD.objTab = "formes";
   if (RD.sim && (!RD.obj || !modeElec())) simStop(true);
   $("#penO").classList.toggle("on", !!RD.obj);
   redrawInk(); if (!RD.text) SEL.s = null; if (!RD.obj) SELO.s = null; majBarTxt(); majSelTxt(); majObjUI();
@@ -3606,7 +3715,7 @@ majEpaisseur();
   const fermer = () => { pc.hidden = pp.hidden = true; bc.classList.remove("open"); bp.classList.remove("open"); };
   const basculer = (p, b) => { const ouvrir = p.hidden; fermer(); if (ouvrir){ p.hidden = false; b.classList.add("open"); } };
   /* toucher « Couleur » ramène toujours au crayon (quitte l'efface, le texte ou les objets) */
-  bc.onclick = () => { if (RD.eraser || RD.text || RD.obj){ RD.eraser = false; RD.text = false; RD.obj = false; refreshTools(); } basculer(pc, bc); }; bp.onclick = () => basculer(pp, bp);
+  bc.onclick = () => { if (RD.eraser || RD.text || (RD.obj && !RD.formeK)){ RD.eraser = false; RD.text = false; if (!RD.formeK) RD.obj = false; refreshTools(); } basculer(pc, bc); };   /* les formes gardent la palette : on change seulement leur couleur */ bp.onclick = () => basculer(pp, bp);
   pc.querySelectorAll(".sw").forEach(b => b.addEventListener("click", () => setTimeout(fermer, 120)));
   document.addEventListener("pointerdown", e => { if (bar.contains(e.target) || (pc.hidden && pp.hidden)) return; fermer();
     if (e.target.id === "inkCanvas"){ e.stopPropagation(); e.preventDefault(); } }, true);   /* le clic qui ferme un menu ne dessine pas de point */
@@ -3618,8 +3727,9 @@ majEpaisseur();
   majCouleurCrayon();
 })();
 $("#penE").onclick = () => { RD.eraser = !RD.eraser; if (RD.eraser){ RD.text = false; RD.obj = false; } refreshTools(); };
-$("#penO").onclick = () => { if (!RD.obj && !(RD.wb && (/^iso/.test(wbBg()) || wbBg() === "quad"))){ aviser("Choisis d'abord un fond (bouton Fond) : plan isométrique pour la plomberie, quadrillé pour un schéma électrique."); return; } RD.obj = !RD.obj; if (RD.obj){ RD.text = false; RD.eraser = false;
-  aviser(modeElec() ? "Schéma en échelle : 1) « Échelle L1 / L2 » et glisse pour tracer les rails. 2) Choisis un symbole et clique sur un échelon. 3) Pour relier : pars d'un point bleu et glisse jusqu'à l'autre point bleu." : "Choisis un objet, puis clique sur la grille. Clique un objet pour le déplacer : les tuyaux raccordés le suivent.", modeElec() ? 10000 : 0); } refreshTools(); };
+$("#penO").onclick = () => { RD.obj = !RD.obj; if (RD.obj){ RD.text = false; RD.eraser = false; RD.objTab = null; }
+  refreshTools();
+  if (RD.obj) aviser(modeElec() ? "Schéma en échelle : 1) « Échelle L1 / L2 » et glisse pour tracer les rails. 2) Choisis un symbole et clique sur un échelon. 3) Pour relier : pars d'un point bleu et glisse jusqu'à l'autre point bleu." : RD.objTab === "iso" ? "Choisis un objet, puis clique sur la grille. Clique un objet pour le déplacer : les tuyaux raccordés le suivent." : "Choisis une forme, puis glisse sur le tableau. Onglets Isométrique et Électricité : objets de plomberie et symboles électriques.", modeElec() ? 10000 : 0); };
 $("#penT").onclick = () => { RD.text = !RD.text; if (RD.text){ RD.eraser = false; RD.obj = false; } refreshTools(); if (RD.text) aviser("Dessine un rectangle, puis écris dedans. Entrée valide (Maj+Entrée = nouvelle ligne)."); };
 $("#wbZo").onclick = zout; $("#wbZi").onclick = zin; $("#penU").onclick = undoInk; $("#penR").onclick = redoInk;
 $("#penC").onclick = () => { if (!strokes().length) return; snapInk(); INKS[inkKey()] = []; redrawInk(); };

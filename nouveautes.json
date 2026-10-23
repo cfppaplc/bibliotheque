@@ -3,7 +3,7 @@
   "date": "2026-10-23",
   "type": "outil",
   "titre": "Barre du crayon et du tableau blanc",
-  "texte": "Une seule ligne d'outils, plus simple pour débuter. Rien n'a été retiré : les outils moins utilisés sont rangés dans deux menus.",
+  "texte": "Une seule ligne d'outils, plus simple pour débuter. Nouveau : le bouton Objets a trois onglets — Formes (utiles en classe), Iso (plomberie) et Électricité (symboles).",
   "formation": [
    {
     "t": "Rond de couleur : choisis la couleur, un surligneur ou l'épaisseur du trait. Le menu se ferme dès que tu choisis.",
@@ -13,7 +13,18 @@
     "t": "Sur la ligne : forme (trait libre, ligne, flèche, rectangle, ellipse), texte, objets, gomme, annuler, fond.",
     "img": "nouveautes/barre.jpg"
    },
-   "Le bouton Objets n'apparaît que sur le quadrillé (schéma électrique) et le plan isométrique (plomberie).",
+   {
+    "t": "Bouton Objets (le cube), onglet Formes : flèche, cote de mesure, cercle avec rayon, triangles, angle en degrés, axes x–y, prisme, cylindre, accolade, nuage de révision, bulles numérotées, crochet et croix. Choisis une forme, puis glisse sur le tableau (un simple clic pose la forme à sa taille normale). Disponible partout, même sur une page de livre.",
+    "img": "nouveautes/objets-formes.jpg"
+   },
+   {
+    "t": "Onglet Iso : le catalogue de plomberie et chauffage (chaudière, pompe, vannes, collecteurs…). Le fond passe tout seul au plan isométrique.",
+    "img": "nouveautes/objets-iso.jpg"
+   },
+   {
+    "t": "Onglet Électricité : les symboles du schéma en échelle. Le fond passe tout seul au quadrillé. Iso et Électricité sont offerts sur le tableau blanc.",
+    "img": "nouveautes/objets-elec.jpg"
+   },
    {
     "t": "⋯ Plus : rétablir, tout effacer, zoom, déplacer le tableau, tableau précédent / suivant / nouveau, enregistrer en PNG.",
     "img": "nouveautes/barre-plus.jpg"
@@ -23,6 +34,10 @@
    "Le crayon réagit maintenant tout de suite : seul le trait en cours est redessiné pendant que tu écris, le reste du tableau ne bouge pas."
   ],
   "versions": [
+   {
+    "date": "2026-10-23",
+    "texte": "Objets en trois onglets : Formes (20 formes pour l'enseignement, dans tous les dessins), Iso et Électricité, chacun avec son catalogue illustré."
+   },
    {
     "date": "2026-10-23",
     "texte": "Crayon beaucoup plus rapide : le trait suit le stylet sans retard, même avec un tableau très rempli. Gomme plus fluide."
