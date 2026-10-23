@@ -151,7 +151,7 @@ header { grid-column: 1 / -1; display: flex; align-items: center; justify-conten
 .period-hours { font-family: var(--display); font-weight: 500; font-size: calc(var(--u) * 34); color: var(--muted); font-variant-numeric: tabular-nums; }
 .module { font-size: calc(var(--u) * 27); line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--muted); }
 .module b { color: var(--copper); }
-.status { font-family: var(--display); font-weight: 600; font-size: calc(var(--u) * 42); color: var(--water); font-variant-numeric: tabular-nums; }
+.status { font-family: var(--display); font-weight: 700; font-size: calc(var(--u) * 46); line-height: 1.1; margin: calc(var(--u) * 2) 0 calc(var(--u) * 6); color: var(--water); font-variant-numeric: tabular-nums; }
 
 /* Barre de progression en forme de tuyau */
 .tube { position: relative; height: calc(var(--u) * 36); display: flex; align-items: center; }
@@ -560,11 +560,11 @@ header { grid-column: 1 / -1; display: flex; align-items: center; justify-conten
         <div class="period-nw"><div class="period-name" id="v-pname">—</div><span class="exam-badge" id="v-exam" hidden>Examen · sans pause</span></div>
         <div class="period-hours" id="v-phours"></div>
       </div>
+      <div class="status" id="v-status"></div>
       <div class="module" id="v-module"></div>
       <div class="goals-wrap" data-w="objectifs"><span class="goals-lbl">Aujourd'hui, tu vas :</span><ul class="goals" id="v-goals"></ul></div>
       <div class="tube" aria-hidden="true"><div class="tube-in"><div class="water" id="v-water"></div></div></div>
       <div class="tl-wrap" aria-label="Aperçu de tout le cours"><div class="tl" id="v-tl"></div><div class="tl-mark" id="v-tlmark"></div></div>
-      <div class="status" id="v-status"></div>
     </div>
   </section>
 </div>
