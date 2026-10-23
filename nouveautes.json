@@ -3,11 +3,19 @@
   "date": "2026-10-23",
   "type": "outil",
   "titre": "Plans techniques",
-  "texte": "Visionneuse de plans pour le tableau interactif et trois dossiers d'exercice (maison, duplex, bâtiment commercial) de 11 feuilles chacun, avec coupe A-302.",
+  "texte": "Visionneuse de plans pour le tableau : zoom avec les doigts, crayon, mesure à l'échelle, et quatre dossiers de plans d'exercice, dont un centre commercial sur un terrain en pente (nivellement, drainage pluvial, profils).",
   "formation": [
    {
     "t": "Avec un plan ouvert, le bouton en haut à gauche devient « Tous les plans » (ou touche Échap) : il te ramène à l'écran d'accueil des plans. Sur l'accueil des plans, ce même bouton te ramène à la bibliothèque. Aussi dans « Plus ▾ » → « Tous les plans ».",
     "img": "nouveautes/plans-retour.jpg"
+   },
+   {
+    "t": "Dossier 4 · Centre commercial : 13 feuilles. En plus des plans habituels (architecture, structure, plomberie, électricité, ventilation), il contient le plan de nivellement et de drainage C-101 (courbes de niveau existantes et projetées, points cotés, pentes, puisards, bassin de rétention) et les profils de terrain C-102 (déblais, remblais, tableau des puisards et des conduites).",
+    "img": "nouveautes/plans-d4.jpg"
+   },
+   {
+    "t": "Sur C-101 : courbe grise pointillée = terrain existant, courbe brune = terrain projeté. Les lignes rouges A-A' et B-B' renvoient aux profils de la feuille C-102.",
+    "img": "nouveautes/plans-d4-c101.jpg"
    },
    {
     "t": "Bouton « Plans » en haut de la bibliothèque : choisis un des trois dossiers d'exercice, ou ouvre ton propre plan (PDF ou image, tu peux aussi le glisser dans la fenêtre).",
@@ -17,6 +25,10 @@
    "Zoome et déplace la feuille au tableau, puis annote avec le crayon."
   ],
   "versions": [
+   {
+    "date": "2026-10-23",
+    "texte": "Nouveau dossier 4 : centre commercial de 5 locaux sur un terrain en pente, avec plan de nivellement et de drainage (C-101) et profils de terrain (C-102). 13 feuilles."
+   },
    {
     "date": "2026-10-23",
     "texte": "Retour facile à l'accueil des plans : bouton « Tous les plans » en haut à gauche (ou Échap)."

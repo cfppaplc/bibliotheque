@@ -4543,7 +4543,7 @@ initAdmin();
   const catalogue = () => ({ type:"accueil-catalogue",
     livres:LIVRES.filter(l => l.fichier).map(l => ({ f:l.fichier, titre:l.titre, niveau:l.niveau || "", pages:l.pages || 0 })),
     modeles:MODELES.map(m => ({ id:m.id, nom:m.nom })), schemas:lireSch().map(x => ({ id:String(x.id), nom:x.nom })),
-    dossiers:[[1, "Maison unifamiliale"], [2, "Duplex jumelé"], [3, "Bâtiment commercial"]] });
+    dossiers:[[1, "Maison unifamiliale"], [2, "Duplex jumelé"], [3, "Bâtiment commercial"], [4, "Centre commercial"]] });
   window.addEventListener("message", e => {
     if (e.source === fr.contentWindow && e.data && e.data.type === "accueil-fermer") { marquerTdb(false); if (livreOuvert()) closeReader(); fermer(); return; }
     if (e.source === fr.contentWindow && e.data && e.data.type === "accueil-revenir") { if (livreOuvert()) fermer(true); return; }
@@ -4681,6 +4681,7 @@ initAdmin();
       <button class="pl-ex" data-ex="1" type="button">Maison unifamiliale<small>Dossier 1 · 11 feuilles · ossature de bois, air pulsé</small></button>
       <button class="pl-ex" data-ex="2" type="button">Duplex jumelé<small>Dossier 2 · 11 feuilles · dalle sur sol, plinthes</small></button>
       <button class="pl-ex" data-ex="3" type="button">Bâtiment commercial<small>Dossier 3 · 11 feuilles · acier, toit plat, unité de toit</small></button>
+      <button class="pl-ex" data-ex="4" type="button">Centre commercial<small>Dossier 4 · 13 feuilles · terrain en pente, nivellement, drainage, profils</small></button>
     </div>
     <div class="pl-recents" id="plRecents"></div>
   </div>
@@ -5101,7 +5102,7 @@ initAdmin();
   function hint(t) { const h = $("plHint"); h.textContent = t; h.hidden = false; clearTimeout(hintT); hintT = setTimeout(() => h.hidden = true, 4500); }
   $("plOpenBig").onclick = () => $("plFile").click();
   // Dossiers de plans d'exercice intégrés (PDF de 10 feuilles)
-  const DOSSIERS = { 1: "Maison unifamiliale", 2: "Duplex jumelé", 3: "Bâtiment commercial" };
+  const DOSSIERS = { 1: "Maison unifamiliale", 2: "Duplex jumelé", 3: "Bâtiment commercial", 4: "Centre commercial" };
   const b64blob = (id, type) => { const bin = atob(document.getElementById(id).textContent.trim()); return new Blob([Uint8Array.from(bin, ch => ch.charCodeAt(0))], { type }); };
   const fichierDossier = async (n, ext, type) => {
     if (document.getElementById("plDossier" + n + (ext === "png" ? "Img" : ""))) return b64blob("plDossier" + n + (ext === "png" ? "Img" : ""), type);

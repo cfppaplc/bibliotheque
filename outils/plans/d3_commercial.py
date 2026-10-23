@@ -1,0 +1,132 @@
+# -*- coding: utf-8 -*-
+from batiment import *
+
+W, D, t = 20000, 14000, 300
+S, N, O, E = t / 2, D - t / 2, t / 2, W - t / 2
+zm = 4300
+I0, IX, IY = 300, W - 300, D - 300     # faces intérieures
+
+murs = [(I0, 7400, IX, 7400, 125), (I0, 9000, IX, 9000, 125),
+        (13000, I0, 13000, 7400, 125), (16400, I0, 16400, 7400, 125)]
+for x in (6000, 8400, 10000, 13000, 16000):
+    murs.append((x, 9000, x, IY, 125))
+
+portes = [
+    dict(no="101", axe="h", at=S, s=4000, w=1830, genre="double", sens=-1, h=2135, mat="Aluminium et verre trempé", quinc="Barre panique + serrure à cylindre"),
+    dict(no="102", axe="h", at=N, s=2000, w=1830, genre="double", sens=1, h=2135, mat="Acier isolé", quinc="Barre panique (livraison)"),
+    dict(no="103", axe="v", at=E, s=7750, w=915, sens=1, pivot="a", h=2135, mat="Acier isolé", quinc="Barre panique (issue)"),
+    dict(no="104", axe="h", at=7400, s=9500, w=1830, genre="double", sens=1, quinc="Poussée-tirée"),
+    dict(no="105", axe="h", at=7400, s=14000, w=915, sens=-1, pivot="a", quinc="Bec-de-cane, serrure"),
+    dict(no="106", axe="h", at=7400, s=17300, w=915, sens=-1, pivot="a", quinc="Bec-de-cane"),
+    dict(no="107", axe="h", at=9000, s=3500, w=1830, genre="double", sens=1, mat="Acier", quinc="Serrure + arrêts"),
+    dict(no="108", axe="h", at=9000, s=6800, w=915, sens=1, pivot="a", mat="Acier", quinc="Serrure (accès restreint)"),
+    dict(no="109", axe="h", at=9000, s=8800, w=760, sens=1, pivot="a", mat="Acier", quinc="Serrure"),
+    dict(no="110", axe="h", at=9000, s=10500, w=915, sens=1, pivot="b", quinc="Poussée-tirée + ferme-porte"),
+    dict(no="111", axe="h", at=9000, s=13300, w=915, sens=1, pivot="a", quinc="Poussée-tirée + ferme-porte"),
+    dict(no="112", axe="h", at=9000, s=16800, w=915, sens=1, pivot="a", quinc="Bec-de-cane"),
+]
+fenetres = [
+    dict(type="A", axe="h", at=S, s=700, w=3000), dict(type="A", axe="h", at=S, s=7800, w=3000),
+    dict(type="B", axe="h", at=S, s=13900, w=1800), dict(type="B", axe="h", at=S, s=17200, w=1800),
+    dict(type="B", axe="v", at=E, s=2800, w=1800), dict(type="B", axe="v", at=E, s=10500, w=1800),
+    dict(type="B", axe="v", at=O, s=1800, w=1800), dict(type="B", axe="v", at=O, s=4800, w=1800),
+    dict(type="C", axe="v", at=O, s=10800, w=1200),
+    dict(type="C", axe="h", at=N, s=11000, w=1200), dict(type="C", axe="h", at=N, s=14000, w=1200), dict(type="B", axe="h", at=N, s=17200, w=1800),
+]
+locaux = [("101", "Aire de vente", I0, I0, 12937, 7337), ("102", "Bureau", 13062, I0, 16337, 7337),
+          ("103", "Salle de\nréunion", 16462, I0, IX, 7337), ("104", "Corridor", I0, 7462, IX, 8937),
+          ("105", "Entrepôt", I0, 9062, 5937, IY), ("106", "Salle\nmécanique", 6062, 9062, 8337, IY),
+          ("107", "Entretien", 8462, 9062, 9937, IY), ("108", "Toilettes\nhommes", 10062, 9062, 12937, IY),
+          ("109", "Toilettes\nfemmes", 13062, 9062, 15937, IY), ("110", "Salle des\nemployés", 16062, 9062, IX, IY)]
+app = [("wc", 10600, IY, 180), ("wc", 11500, IY, 180), ("uri", 12937, 11000, 90), ("uri", 12937, 11800, 90),
+       ("lav", 10062, 10600, 270), ("lav", 10062, 11400, 270),
+       ("wc", 13700, IY, 180), ("wc", 14600, IY, 180), ("wc", 15400, IY, 180), ("lav", 15937, 10300, 90), ("lav", 15937, 11100, 90),
+       ("vid", 9200, IY, 180), ("ce", 7300, IY, 180), ("dp", 7000, 10600, 0), ("evs", 17300, IY, 180), ("fon", 12200, 8937, 180)]
+
+commerce = Batiment(
+    dossier=dict(projet="BÂTIMENT COMMERCIAL\nDOSSIER 3", adresse="900, boulevard de l'Industrie\nVille fictive (Québec)", date="Octobre 2026", code="D3"),
+    nom_court="Commerce et bureaux",
+    description="Petit bâtiment commercial d'un étage : aire de vente, bureau, salle de réunion, entrepôt avec porte de livraison, toilettes publiques, local d'entretien et salle des employés. Structure d'acier (poteaux et poutrelles ajourées) sur grille d'axes, murs de blocs de béton revêtus de brique, toit plat avec parapet. Chauffage et climatisation par une unité de toit.",
+    W=W, D=D, t=t, murs_int=murs, portes=portes, fenetres=fenetres,
+    types_fen={"A": dict(h=2400, allege=300, ouv="Fixe (vitrine)", verre="Double, verre trempé"),
+               "B": dict(h=1500, allege=900, ouv="Battant, à manivelle"),
+               "C": dict(h=600, allege=1800, ouv="Auvent", verre="Double, givré")},
+    locaux=locaux, app=app,
+    decal_etiq={"104": (-3000, 0), "108": (400, 300), "106": (0, 300), "107": (0, 300), "110": (0, 300)},
+    decal_coin={"104": (-5500, 1300), "106": (0, -400), "107": (0, 600), "108": (0, -300)}, iso_court=True,
+    comptoirs=[(16062, 13100, 19000, IY, None), (1500, 1800, 3900, 2600, "caisse")],
+    cotes_interieures=[(I0, 13000, 5900, "h"), (13000, 16400, 5900, "h"), (I0, 7400, 1300, "v"), (7400, 9000, 1300, "v"), (9000, IY, 1300, "v")],
+    coupes=[(2500, -3800, "A", "e"), (2500, D + 3800, "A", "e")],
+    grille_xy=([0, 5000, 10000, 15000, 20000], [0, 7000, 14000]), grille_ext=2200, grille_ext_fond=1800, fond_gauche=46,
+    coupe_long=dict(y=4000, N=150, lettre="B"),
+    couches_mur=[("Brique d'argile 90", 90, "brique"), ("Vide d'air 25", 25, "vide"), ("Isolant rigide 75", 75, "isolant_rigide"),
+                 ("Bloc de béton 190, armé aux 800", 190, "bloc"), ("Fourrures d'acier 19", 19, "vide"), ("Gypse 12,7", 13, "gypse")],
+    Nplan=100, Nelev=150, Ncoupe=75, Nfond=150, fond_haut=40, lum_grille=3500,
+    notes_plan=["Toutes les cotes sont en millimètres.", "Axes de grille : lettres d'ouest en est, chiffres du sud au nord.",
+                "Carré plein : poteau d'acier HSS 152 × 152 (voir S-101).", "Plafond suspendu à 3 200 mm (sauf entrepôt et salle mécanique : structure apparente).",
+                "Toilettes : cloisons de cabinets en stratifié (non illustrées), un cabinet accessible dans chaque local."],
+    z_sol=0, z_plancher=150, z_murs=zm, z_plafond=3350, z_semelle=-1600, ep_plancher=150, t_fond=250,
+    toit="plat", parapet=1200, unite_toit=True, debord=0, revetement="brique",
+    niveaux=[("Sol", "± 0", 0), ("Dalle", "+ 150", 150), ("Plafond", "+ 3 350", 3350), ("Toit", "+ 4 900", zm + 600), ("Parapet", "+ 5 500", "faite")],
+    notes_elev=["Revêtement : brique d'argile, joints de 10 mm.", "Vitrines : aluminium à bris thermique, verre trempé.",
+                "Toit plat : membrane élastomère, pente vers les drains de toit.", "Unité de toit en retrait du parapet (peu visible du sol).",
+                "Hexagones : types de fenêtres, voir A-301."],
+    etiq_elev={"S": [("Brique d'argile", 0.3, 3800, 300, 2500), ("Parapet, solin métallique", 0.1, zm + 1100, 400, 1800)]}, elev_dx=6,
+    type_plancher="dalle", murs_coupe=[(7400, 125), (9000, 125), (7000, 200, zm)],
+    etiq_coupe=[("T1 (toit)", 2500, zm + 520, -4400, 0), ("Poutrelles ajourées", 1500, zm + 225, -3400, 0), ("Plafond suspendu", 2500, 3350, -4400, 0),
+                ("M1 (mur ext.)", 150, 1800, -1700, 0), ("D1 (dalle)", 2500, 100, -4400, 0), ("F1 (fondation)", 125, -800, -1700, 0),
+                ("Poteau HSS 152", 7000, 2000, -3800, 600)],
+    coupe_y=150, coupe_titre_x=236,
+    compositions=["T1 — Toit : membrane élastomère 2 plis, panneau de support, isolant rigide R-30 en pente, pare-vapeur, platelage d'acier 38, poutrelles ajourées à 1 800 c/c.",
+                  "M1 — Mur extérieur : brique 90, vide d'air 25, isolant rigide 75, bloc de béton 190 (armé aux 800), fourrures et gypse 12,7.",
+                  "M2 — Cloison : gypse 15,9 type X deux faces, montants d'acier 92 à 400 c/c, laine insonorisante.",
+                  "D1 — Dalle : béton 150, 32 MPa, treillis, polyéthylène, isolant rigide 50 en périphérie, pierre concassée 200.",
+                  "F1 — Fondation : mur antigel 250, 25 MPa, semelle 650 × 250, drain français."],
+    poteaux=[(5000, 7000, 1800, "Poteau HSS 152 × 152 sur semelle isolée 1 800 × 1 800 × 450"), (10000, 7000, 1800, ""), (15000, 7000, 1800, "")],
+    etiq_fond=[("DALLE SUR SOL 150 — voir D1", 10000, 3200)],
+    notes_struct=["Béton : semelles et murs 25 MPa, dalle 32 MPa, air entraîné 5 à 8 %.", "Semelles à 1 600 mm minimum sous le sol fini (gel).",
+                  "Capacité portante présumée : 150 kPa. Faire valider par un ingénieur.", "Ancrages des poteaux : 4 tiges Ø 19, plaque d'assise 300 × 300 × 19.",
+                  "Joints de sciage de la dalle : quadrillage d'environ 4,5 m, alignés sur les axes."],
+    plomb=dict(coll=[(6600, 12600), (19000, 12600)], sortie=[(6600, 12600), (6600, -1100)], chutes=[(11000, 12600), (14600, 12600)],
+               ef=[(8100, -1100), (8100, 12200), (19000, 12200)], ec=[(7500, 13050), (7500, 12350), (19000, 12350)],
+               ef_extra=[[(8100, 12200), (8100, 12950), (7100, 12950)]], compteur=(8100, 10000), lab_sens=1, h_plafond=3350, h_toit=5500,
+               etiq=[('Collecteur Ø 4" sous dalle · pente 1 %', 6450, 12550, DR, "d"), ('EF Ø 1"', 18500, 12000, EF, "c"),
+                     ("Vers l'égout municipal Ø 6\"", 6450, -1550, DR, "d"), ("Entrée d'eau Ø 1 1/2\"", 8250, -900, EF, "g")]),
+    titre_iso="SCHÉMA ISOMÉTRIQUE — DRAINAGE ET VENTILATION",
+    notes_plomb=["Drainage sous la dalle : PVC ou ABS, pente 1 % minimum pour Ø 4\".", "Eau : cuivre type L ou PEX, robinet d'arrêt sur chaque appareil.",
+                 "Chauffe-eau électrique 270 L, mélangeur thermostatique pour les lavabos publics.", "Dispositif antirefoulement à l'entrée d'eau (bâtiment commercial).",
+                 "Clapet antiretour sur le collecteur principal."],
+    sans_elec=[], detecteurs=["entrepôt", "corridor", "bureau"], dense_prises={"toilettes\nhommes": False, "toilettes\nfemmes": False, "entretien": False, "corridor": False},
+    panneaux=[(6062, 11700, 270, "Panneau 400 A\n120/208 V 3 ph", (7200, 10350))],
+    prises_speciales=[("UT-1 (toit)", (16450, 8250), "70 A 208 V 3 ph", -330), ("Chauffe-eau", (6800, 12800), "30 A 208 V", -380),
+                      ("Sèche-mains", (12300, 10200), "20 A 120 V", -380), ("Sèche-mains", (14700, 9750), "20 A 120 V"),
+                      ("Caisse", (2700, 1300), "20 A 120 V", -380), ("Aérotherme", (1500, 12600), "30 A 208 V", -380)],
+    notes_elec=["Entrée 400 A, 120/208 V, triphasée, 4 fils.", "Éclairage : luminaires DEL encastrés 600 × 1 200, éclairage de secours sur batterie.",
+                "Alarme incendie : voir devis (détecteurs illustrés à titre indicatif).", "Prises des toilettes et extérieures : protection DDFT."],
+    cvca=dict(type="toit",
+              gaines=[([(1200, 8200), (19000, 8200)], 600, "Conduit principal 600 × 400", (15000, 8130)), ([(6500, 8200), (6500, 1800)], 400, None)],
+              diffuseurs=[(3500, 2000, "120 L/s", True), (3500, 4800, "120 L/s", True), (9500, 2000, "120 L/s", True), (9500, 4800, "120 L/s", True),
+                          (14700, 3800, "60 L/s", True), (18000, 3800, "90 L/s", True), (3000, 11600, "60 L/s", True), (17800, 11900, "45 L/s", True)],
+              retours=[(11500, 4000, "Retour R-1"), (18000, 6400, "Retour R-2")],
+              equipements=[(8800, 7650, 11200, 8750, "UT-1 (AU TOIT)"), (12700, 10200, 13300, 10700, "VE-1"), (800, 12900, 2200, 13500, "AÉROTHERME")],
+              vrc=[([(12700, 10450), (11600, 10450)], "Extraction 50 L/s"), ([(13300, 10450), (14400, 10450)], "Extraction 50 L/s")]),
+    notes_cvca=["UT-1 : unité de toit 10 tonnes, climatisation et chauffage électrique 40 kW, apport d'air frais 350 L/s.",
+                "Conduits en acier galvanisé au-dessus du plafond suspendu, isolés en entretoit.",
+                "VE-1 : ventilateur d'extraction des toilettes au toit, 100 L/s.", "Aérotherme électrique 10 kW dans l'entrepôt."],
+    site=dict(N=250, echelle_txt="1:250", lot=(36000, 42000), pos=(8000, 21000), rue=1500, nom_rue="Boulevard de l'Industrie", lot_no="6 345 678",
+              pavages=[(2500, 1000, 33000, 19100, ""), (25000, 0, 31000, 1000, ""), (11500, 19100, 14500, 21000, "")],
+              cases=[(3500, 1500, 2600, 11), (3500, 13600, 2600, 11)],
+              services_x=[6600], cote_rel=0.97, elec=(8000 + 7000, 21000), pluvial=True,
+              arbres=[(2500, 30000, 2200), (33500, 32000, 2500), (18000, 38500, 2000), (1300, 12000, 1000)],
+              niveaux=[(300, 300, "102,10"), (35700, 300, "101,90"), (300, 41700, "102,70"), (35700, 41700, "102,60"), (18000, 21000 + 14000 + 900, "102,45")],
+              notes=["Implantation à confirmer par un arpenteur-géomètre.", "Marge avant minimale : 12 m (stationnement en façade). Allée de circulation : 6 600.",
+                     "22 cases dont 2 réservées aux personnes handicapées, près de l'entrée.", "Eaux pluviales du toit et du stationnement vers l'égout pluvial.",
+                     "Niveaux du terrain en mètres (altitude géodésique)."]),
+    donnees=[["Usage", "Commerce de détail et bureaux"], ["Étages", "1"], ["Superficie brute", f"{str(round(W * D / 1e6, 1)).replace('.', ',')} m²"],
+             ["Structure", "Acier, grille 5 000 × 7 000"], ["Murs", "Blocs de béton et brique"], ["Toiture", "Plate, membrane élastomère"],
+             ["CVCA", "Unité de toit 10 tonnes"], ["Lot", "36 000 × 42 000"]],
+)
+
+if __name__ == "__main__":
+    commerce.produire("sortie/Dossier-3-Batiment-commercial.pdf")
+    print("ok")

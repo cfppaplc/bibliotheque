@@ -95,6 +95,15 @@
   Mettre `localStorage.bienvenueVu = "1"` (`addInitScript`) sinon la fenêtre de bienvenue cache tout.
   Faux positifs connus dans un bac à sable sans Internet : pdf.js (cdnjs) et polices Google bloqués, PDF blanc en Chromium sans tête, YouTube bloqué.
 
+## Dossiers de plans d'exercice (`plans/dossier-N.pdf` + `.png`)
+- Générés en Python (ReportLab) par les scripts de `outils/plans/` : `dessin.py` (feuille, cartouche, primitives), `batiment.py`
+  (bâtiment paramétrique → feuilles A, S, P, E, M), `coupes.py`, `civil.py` (terrain numérique, courbes de niveau, réseau pluvial,
+  feuilles C-101 et C-102), et un fichier par dossier (`d1_maison.py` … `d4_centre.py`).
+- Produire : `cd outils/plans && python3 d4_centre.py` (adapter le chemin de sortie), puis copier le PDF dans `plans/dossier-4.pdf`
+  et la feuille A-101 en PNG 1700 × 1100 (`pdftoppm -r 100 -f 5 -l 5`) dans `plans/dossier-4.png` (secours si le PDF ne s'ouvre pas).
+- Feuilles supplémentaires : `batiment.feuilles_extra = [(numéro, titre, fonction)]`, insérées après A-100 et dans la liste de la page de garde.
+- Liste des dossiers dans `index.html` : boutons `.pl-ex[data-ex]`, `DOSSIERS`, et `dossiers` du catalogue envoyé au tableau de bord.
+
 ## Points ouverts / à savoir
 - « Communiquer en milieu de travail » (436-282) a été classé **Compétence 9** par déduction (Plomberie et chauffage = 10 = 436-295).
   À confirmer avec Jeremy : les numéros de compétence ne suivent pas l'ordre des codes (le livre C13 indique « Module 13 · 436-274 »),
