@@ -197,6 +197,20 @@ def feuille_nivellement(self, c):
             f.rect(xa, ya, xa + 2700, ya + 5500, .25, GRIS)
     for xa in (30200, 32900, 48500, 51200):
         f.texte(xa + 1350, 23700, "PMR", 4.6, True, col=HexColor("#1f6fc2"))
+    # bornes de recharge pour véhicules électriques (au bout des cases, rangée du haut)
+    VEc = HexColor("#0a8f5a")
+    for k in (2, 3, 4, 5, 13, 14):
+        xa = 6000 + k * 2700
+        f.rect(xa + 1000, 26250, xa + 1700, 26750, .5, VEc, fill=HexColor("#d4f1e3")); f.texte(xa + 1350, 25300, "VE", 4.4, True, col=VEc)
+    f.texte(13500, 27700, "Bornes de recharge VE (6)", 4.8, True, col=VEc)
+    f.texte(24500, 10300, "Îlots-noues\n(biorétention)", 4.6, True, col=VERT)
+    # supports à vélos et place publique devant les commerces
+    for k in range(6):
+        f.ligne(23600 + k * 450, 30200, 23600 + k * 450, 31200, .6, GRIS)
+    f.texte(26800, 30700, "Vélos (12)", 4.6, True, "g", GRIS)
+    for (bx, by) in ((41000, 30500), (49000, 30500)):
+        f.rect(bx - 900, by - 250, bx + 900, by + 250, .4, fill=HexColor("#c8925a"))
+    f.texte(45000, 30650, "Bancs", 4.4, False, col=GRIS)
     # existant : courbes pointillées grises
     niv_e = [101.25 + 0.25 * k for k in range(19)]
     for zn in niv_e:
@@ -231,6 +245,7 @@ def feuille_nivellement(self, c):
     f.texte(45000, 42500, "CENTRE COMMERCIAL", 8, True)
     f.texte(45000, 40200, f"PLANCHER FINI (PF) {v2(FFE)}", 7, True)
     f.texte(45000, 38300, "Sol fini au pied des murs : 103,75 minimum", 5.6)
+    f.texte(45000, 36500, "Toit blanc et panneaux solaires 120 kW", 5.2, False, col=GRIS)
     for (x, s) in ((30000, "Épicerie"), (38000, "Pharmacie"), (46000, "Restaurant"), (52500, "Boutique A"), (57500, "Boutique B")):
         f.texte(x + 1500, 33300, s, 5, col=GRIS)
     # murs de soutènement du quai

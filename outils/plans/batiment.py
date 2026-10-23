@@ -446,7 +446,7 @@ class Batiment:
         for k, ft in self.types_fen.items():
             nb = sum(1 for o in self.fenetres if o["type"] == k)
             larg = sorted({o["w"] for o in self.fenetres if o["type"] == k})
-            lignes.append([k, nb, " / ".join(fmt(w) for w in larg) + f" × {fmt(ft['h'])}", fmt(ft["allege"]), ft["ouv"], ft.get("verre", "Double, faible émissivité, argon")])
+            lignes.append([k, nb, (" / ".join(fmt(w) for w in larg) if len(larg) <= 3 else "Variable (voir A-201)") + f" × {fmt(ft['h'])}", fmt(ft["allege"]), ft["ouv"], ft.get("verre", "Double, faible émissivité, argon")])
         f.tableau(DRAW[0] + 186, yb, "NOMENCLATURE DES FENÊTRES", ["Type", "Qté", "Larg. × haut. (mm)", "Allège", "Ouverture", "Vitrage"], lignes, [12, 10, 36, 14, 30, 44])
         f.notes("COMPOSITIONS", self.compositions)
         c.showPage()

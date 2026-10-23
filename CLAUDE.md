@@ -97,7 +97,7 @@
 
 ## Dossiers de plans d'exercice (`plans/dossier-N.pdf` + `.png`)
 - Générés en Python (ReportLab) par les scripts de `outils/plans/` : `dessin.py` (feuille, cartouche, primitives), `batiment.py`
-  (bâtiment paramétrique → feuilles A, S, P, E, M), `coupes.py`, `civil.py` (terrain numérique, courbes de niveau, réseau pluvial,
+  (bâtiment paramétrique → feuilles A, S, P, E, M), `coupes.py`, `moderne.py` (façades contemporaines du dossier 4 : murs-rideaux, panneaux, volumes-signaux, marquises), `civil.py` (terrain numérique, courbes de niveau, réseau pluvial,
   feuilles C-101 et C-102), et un fichier par dossier (`d1_maison.py` … `d4_centre.py`).
 - Produire : `cd outils/plans && python3 d4_centre.py` (adapter le chemin de sortie), puis copier le PDF dans `plans/dossier-4.pdf`
   et la feuille A-101 en PNG 1700 × 1100 (`pdftoppm -r 100 -f 5 -l 5`) dans `plans/dossier-4.png` (secours si le PDF ne s'ouvre pas).

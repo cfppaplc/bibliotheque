@@ -2,6 +2,7 @@
 """Dossier 4 — Centre commercial (mail linéaire de 5 locaux) sur un terrain en pente.
 Feuilles du moteur (A, S, P, E, M) + feuilles civiles C-101 (nivellement et drainage) et C-102 (profils de terrain)."""
 from batiment import *
+from moderne import BatimentModerne, vitrines
 
 W, D, t = 40000, 18000, 300
 S, N, O, E = t / 2, D - t / 2, t / 2, W - t / 2
@@ -40,14 +41,11 @@ portes = [
     dict(no="120", axe="h", at=YC2, s=36000, w=1830, genre="double", sens=1, mat="Acier", quinc="Serrure + arrêts"),
     dict(no="121", axe="h", at=N, s=29000, w=915, sens=1, pivot="a", h=2135, mat="Acier isolé", quinc="Barre panique (issue)"),
 ]
-fenetres = [
-    dict(type="A", axe="h", at=S, s=900, w=3000), dict(type="A", axe="h", at=S, s=7000, w=3000), dict(type="A", axe="h", at=S, s=10300, w=3000),
-    dict(type="A", axe="h", at=S, s=14500, w=1800), dict(type="A", axe="h", at=S, s=18200, w=3000),
-    dict(type="A", axe="h", at=S, s=22500, w=1800), dict(type="A", axe="h", at=S, s=26200, w=3000),
-    dict(type="A", axe="h", at=S, s=32700, w=1800), dict(type="A", axe="h", at=S, s=37700, w=1800),
-    dict(type="B", axe="v", at=O, s=3000, w=1800), dict(type="B", axe="v", at=O, s=7000, w=1800),
-    dict(type="B", axe="v", at=E, s=3000, w=1800), dict(type="B", axe="v", at=E, s=7000, w=1800),
-    dict(type="C", axe="h", at=N, s=16000, w=1200), dict(type="C", axe="h", at=N, s=20000, w=1200), dict(type="C", axe="h", at=N, s=35500, w=1200),
+fenetres = vitrines(S, [(500, 13850), (14150, 21850), (22150, 29850), (30150, 34850), (35150, 39500)],
+                    [p for p in portes if p["axe"] == "h" and abs(p["at"] - S) < 1]) + [
+    dict(type="D", axe="v", at=O, s=5200, w=600), dict(type="D", axe="v", at=O, s=7100, w=600), dict(type="D", axe="v", at=O, s=9000, w=600),
+    dict(type="D", axe="v", at=E, s=5200, w=600), dict(type="D", axe="v", at=E, s=7100, w=600), dict(type="D", axe="v", at=E, s=9000, w=600),
+    dict(type="C", axe="h", at=N, s=14500, w=7000), dict(type="C", axe="h", at=N, s=33000, w=6000),
 ]
 locaux = [("101", "Épicerie", I0, I0, 13905, 10905), ("102", "Pharmacie", 14095, I0, 21905, 10905),
           ("103", "Restaurant", 22095, I0, 29905, 10905), ("104", "Boutique A", 30095, I0, 34905, 10905),
@@ -62,14 +60,14 @@ app = [("wc", 14700, IY, 180), ("wc", 15600, IY, 180), ("uri", 17937, 15600, 90)
        ("vid", 23000, IY, 180), ("ce", 9200, IY, 180), ("dp", 7500, 15200, 0), ("dp", 2600, 15600, 0),
        ("evd", 27800, 10905, 0), ("evs", 20000, 10905, 0), ("fon", 21000, 12937, 180)]
 
-centre = Batiment(
+centre = BatimentModerne(
     dossier=dict(projet="CENTRE COMMERCIAL\nDOSSIER 4", adresse="2 450, chemin de la Côte\nVille fictive (Québec)", date="Octobre 2026", code="D4"),
     nom_court="Centre commercial (5 locaux)",
-    description="Centre commercial d'un étage de cinq locaux (épicerie, pharmacie, restaurant et deux boutiques), construit sur un terrain en pente de plus de 3 m. Corridor de service à l'arrière, quai de réception, salles mécanique et électrique, toilettes communes, local des déchets. Structure d'acier sur grille 8 000 × 9 000, murs de blocs de béton revêtus de brique et de panneaux métalliques, toit plat. Le dossier comprend le nivellement du terrain, le drainage pluvial avec bassin de rétention et des profils de terrain.",
+    description="Centre commercial contemporain d'un étage : cinq locaux (épicerie, pharmacie, restaurant et deux boutiques) derrière une façade de murs-rideaux pleine hauteur, panneaux composites d'aluminium gris anthracite, volumes-signaux revêtus de lames façon bois, marquises d'acier en porte-à-faux et bandeau d'enseignes à DEL. Toit blanc avec panneaux solaires, bornes de recharge pour véhicules électriques, îlots-noues végétalisés et bassin de rétention. Terrain en pente de près de 4 m : le dossier comprend le nivellement, le drainage pluvial et des profils de terrain.",
     W=W, D=D, t=t, murs_int=murs, portes=portes, fenetres=fenetres,
-    types_fen={"A": dict(h=2700, allege=300, ouv="Fixe (vitrine)", verre="Double, verre trempé, faible émissivité"),
-               "B": dict(h=1500, allege=1200, ouv="Fixe", verre="Double"),
-               "C": dict(h=600, allege=2400, ouv="Auvent", verre="Double, givré")},
+    types_fen={"A": dict(h=3900, allege=0, ouv="Fixe — mur-rideau", verre="Triple, faible émissivité, verre trempé"),
+               "C": dict(h=900, allege=2700, ouv="Fixe — bandeau", verre="Double, givré"),
+               "D": dict(h=4200, allege=300, ouv="Fixe — verticale", verre="Triple, faible émissivité")},
     locaux=locaux, app=app,
     decal_etiq={"106": (-12000, 0), "110": (0, 500), "111": (0, 500), "108": (0, 500), "109": (0, 500), "112": (0, 500), "113": (0, 500)},
     decal_coin={"106": (-15000, 900)}, iso_court=True,
@@ -79,26 +77,35 @@ centre = Batiment(
     coupes=[(8000, -5200, "A", "e"), (8000, D + 5200, "A", "e")],
     grille_xy=([0, 8000, 16000, 24000, 32000, 40000], [0, 9000, 18000]), grille_ext=2600, grille_ext_fond=2200, fond_gauche=40,
     coupe_long=dict(y=6000, N=250, lettre="B"),
-    couches_mur=[("Panneau métallique 25", 25, "vide"), ("Fourrures 25", 25, "vide"), ("Isolant rigide 100", 100, "isolant_rigide"),
+    couches_mur=[("Panneau composite d'aluminium 4", 4, "vide"), ("Rails et vide d'air 40", 40, "vide"), ("Isolant semi-rigide 100", 100, "isolant_rigide"),
                  ("Bloc de béton 190, armé aux 800", 190, "bloc"), ("Fourrures d'acier 19", 19, "vide"), ("Gypse 15,9", 16, "gypse")],
-    Nplan=175, Nelev=250, Ncoupe=100, Nfond=200, fond_haut=40, lum_grille=4000,
+    Nplan=175, Nelev=200, Ncoupe=100, Nfond=200, fond_haut=40, lum_grille=4000,
     notes_plan=["Toutes les cotes sont en millimètres.", "Axes de grille : lettres d'ouest en est, chiffres du sud au nord.",
                 "Carré plein : poteau d'acier HSS 203 × 203 (voir S-101).", "Murs mitoyens entre locaux : blocs 190, coupe-feu 1 h, jusqu'au platelage.",
                 "Plafonds : suspendus à 3 600 dans les locaux, structure apparente à l'arrière.", "Le plancher fini est à l'altitude 103,90 (voir C-101)."],
     z_sol=0, z_plancher=150, z_murs=zm, z_plafond=3750, z_semelle=-1600, ep_plancher=150, t_fond=300,
-    toit="plat", parapet=1500, unite_toit=True, debord=0, revetement="brique",
-    niveaux=[("Sol", "± 0", 0), ("Dalle 103,90", "+ 150", 150), ("Plafond", "+ 3 750", 3750), ("Toit", "+ 5 800", zm + 600), ("Parapet", "+ 6 700", "faite")],
-    notes_elev=["Revêtement : brique d'argile (bas) et panneaux métalliques (haut).", "Vitrines : aluminium à bris thermique, verre trempé.",
-                "Auvents d'acier au-dessus des entrées (non illustrés).", "Enseignes des locataires sur le bandeau (hors contrat).",
-                "Le terrain descend vers le sud : voir les profils C-102."],
-    etiq_elev={"S": [("Vitrines type A", 0.25, 1800, 300, 2500), ("Parapet, solin métallique", 0.1, zm + 1300, 400, 1800)]}, elev_dx=6,
+    toit="plat", parapet=1500, unite_toit=True, debord=0, revetement="panneaux",
+    niveaux=[("Sol", "± 0", 0), ("Dalle 103,90", "+ 150", 150), ("Plafond", "+ 3 750", 3750), ("Toit", "+ 5 800", zm + 600), ("Parapet", "+ 6 700", "faite"), ("Volume-signal", "+ 8 800", 8800)],
+    notes_elev=["Murs-rideaux type A : aluminium à bris thermique, verre triple, pleine hauteur devant chaque local.",
+                "Panneaux composites d'aluminium gris anthracite, joints de 15 mm (grille 1 500 × 1 000).",
+                "Volumes-signaux de l'épicerie et du restaurant : lames d'aluminium fini bois, verticales.",
+                "Marquises d'acier en porte-à-faux de 2 400 au-dessus des entrées, soffite en bois.",
+                "Bandeau d'enseignes à DEL (enseignes des locataires hors contrat).",
+                "Toit blanc à indice de réflectance élevé; panneaux solaires de 120 kW en retrait du parapet."],
+    etiq_elev={"S": [("Mur-rideau (type A)", 0.04, 2500, 300, 5300), ("Volume-signal, lames façon bois", 0.16, 8300, 300, 1300), ("Marquise d'acier en porte-à-faux", 0.81, 4300, 300, 3300)]}, elev_dx=6,
+    volumes={"S": [(0, 3500, "panneau", 6700), (3500, 9500, "bois", 8800), (9500, 22000, "panneau", 6700), (22000, 30000, "bois", 7600), (30000, 40000, "panneau", 6700)],
+             "N": [(0, 40000, "panneau", 6700)],
+             "E": [(0, 4200, "verre", 6700), (4200, 18000, "panneau", 6700)],
+             "O": [(0, 13800, "panneau", 6700), (13800, 18000, "verre", 6700)]},
+    marquises={"S": [(3500, 8500), (15500, 19500), (23500, 27500), (30800, 33300), (35800, 38300)]},
+    enseignes={"S": [(1500, 3300, ""), (9700, 12500, "ÉPICERIE"), (15000, 21000, "PHARMACIE"), (23000, 29000, "RESTAURANT"), (30500, 34500, "BOUTIQUE A"), (35500, 39500, "BOUTIQUE B")]},
     type_plancher="dalle", murs_coupe=[(YC1, 190), (YC2, 125), (9000, 200, zm)],
     etiq_coupe=[("T1 (toit)", 4000, zm + 520, -5400, 0), ("Poutrelles ajourées", 2500, zm + 225, -4400, 0), ("Plafond suspendu", 4000, 3750, -5400, 0),
                 ("M1 (mur ext.)", 150, 1800, -2200, 0), ("D1 (dalle)", 4000, 100, -5400, 0), ("F1 (fondation)", 150, -800, -2200, 0),
                 ("Poteau HSS 203", 9000, 2400, -4400, 600)],
     coupe_y=150, coupe_titre_x=236,
-    compositions=["T1 — Toit : membrane élastomère 2 plis, panneau de support, isolant rigide R-30 en pente, pare-vapeur, platelage d'acier 38, poutrelles ajourées à 1 800 c/c.",
-                  "M1 — Mur extérieur : panneau métallique ou brique 90, vide d'air, isolant rigide 100, bloc de béton 190 armé, fourrures et gypse 15,9.",
+    compositions=["T1 — Toit : membrane blanche réfléchissante, panneau de support, isolant rigide R-30 en pente, pare-vapeur, platelage d'acier 38, poutrelles ajourées à 1 800 c/c. Panneaux solaires lestés.",
+                  "M1 — Mur extérieur : panneau composite d'aluminium 4 sur rails, vide d'air 40, isolant semi-rigide 100, pare-air, bloc de béton 190 armé, fourrures et gypse 15,9.",
                   "M2 — Mur mitoyen : bloc de béton 190, coupe-feu 1 h, jusqu'au platelage du toit.",
                   "M3 — Cloison : gypse 15,9 type X deux faces, montants d'acier 92 à 400 c/c.",
                   "D1 — Dalle : béton 150, 32 MPa, treillis, polyéthylène, isolant rigide 50 en périphérie, pierre concassée 200.",
@@ -147,7 +154,7 @@ centre = Batiment(
                      "Environ 60 cases dont 4 réservées aux personnes handicapées (PMR), près des entrées.", "Nivellement et drainage : voir C-101. Profils : voir C-102.",
                      "Niveaux du terrain en mètres (altitude géodésique)."]),
     donnees=[["Usage", "Commerce (groupe E), 5 locaux"], ["Étages", "1"], ["Superficie brute", f"{str(round(W * D / 1e6, 1)).replace('.', ',')} m²"],
-             ["Structure", "Acier, grille 8 000 × 9 000"], ["Murs", "Blocs de béton, brique et panneaux"], ["Toiture", "Plate, membrane élastomère"],
+             ["Structure", "Acier, grille 8 000 × 9 000"], ["Façades", "Murs-rideaux, panneaux d'aluminium, lames bois"], ["Toiture", "Plate, blanche, panneaux solaires 120 kW"],
              ["CVCA", "5 unités de toit"], ["Lot", "90 000 × 72 000 (6 480 m²)"], ["Dénivelé du terrain", "3,85 m (nord → sud)"],
              ["Plancher fini", "103,90"], ["Stationnement", "≈ 60 cases (4 PMR)"]],
 )
