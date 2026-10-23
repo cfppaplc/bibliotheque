@@ -2487,14 +2487,15 @@ function poigneeSous(s, q){ if (!s || !s.t || !FORMES[s.t] || !strokes().include
   if (s.t === "cote"){ const [mx, my] = milieuCote(s, W, H); if (Math.hypot(mx - q[0] * W, my - q[1] * H) < tol * 1.1) return 2; }
   for (let i = 1; i >= 0; i--){ if (i === 0 && (s.t === "bulle" || s.t === "cercle")) continue; if (Math.hypot((s.p[i][0] - q[0]) * W, (s.p[i][1] - q[1]) * H) < tol) return i; } return -1; }
 /* forme sous le doigt (la plus récente d'abord) : près de son trait, ou n'importe où dans une petite forme */
-function formeSous(q){ const c = $("#inkCanvas"), W = c.width, H = c.height, tol = 14 * (window.devicePixelRatio || 1), arr = strokes(); let dedans = null;
+function formeSous(q){ const c = $("#inkCanvas"), W = c.width, H = c.height, tol = 14 * (window.devicePixelRatio || 1), arr = strokes(); let dedans = null, pres = null;
   for (let i = arr.length - 1; i >= 0; i--){ const s = arr[i]; if (!s.t || !FORMES[s.t] || !s.p || s.p.length < 2) continue;
     const P = pointsTrait(s), x = q[0] * W, y = q[1] * H; let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
     for (let j = 0; j < P.length; j++){ const px = P[j][0] * W, py = P[j][1] * H; x0 = Math.min(x0, px); x1 = Math.max(x1, px); y0 = Math.min(y0, py); y1 = Math.max(y1, py);
-      if (j && distSeg([x, y], [P[j - 1][0] * W, P[j - 1][1] * H], [px, py], 1) < (s.t === "cote" ? tol * 2.4 : tol)) return s; }   /* cote : on peut toucher son texte */
+      if (j){ const dd = distSeg([x, y], [P[j - 1][0] * W, P[j - 1][1] * H], [px, py], 1), lim = s.t === "cote" ? tol * 2.4 : tol;   /* cote : on peut toucher son texte */
+        if (dd < lim){ const sc = dd / lim - (s.t === "cote" ? .6 : 0); if (!pres || sc < pres[1]) pres = [s, sc]; } } }   /* trait le plus proche; une cote passe avant le trait qu'elle mesure */
     const petite = x1 - x0 < 90 * (window.devicePixelRatio || 1) && y1 - y0 < 90 * (window.devicePixelRatio || 1), fermee = !/^(ligne|fleche|fleche2|cote|angle|axes|accolade)$/.test(s.t);
     if ((petite || fermee) && x > x0 - tol && x < x1 + tol && y > y0 - tol && y < y1 + tol){ const aire = (x1 - x0) * (y1 - y0); if (!dedans || aire < dedans[1]) dedans = [s, aire]; } }   /* l'intérieur compte aussi (la plus petite forme gagne) */
-  return dedans ? dedans[0] : null; }
+  return pres ? pres[0] : dedans ? dedans[0] : null; }
 /* double-clic sur une forme : choisir sa valeur (cote, angle, rayon, numéro de bulle) */
 const VALEURS_FORME = {
   cote:{ q:"Cote (ex. 1200 mm, 4'-6\")", ex:"1200 mm" },
