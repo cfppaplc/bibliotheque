@@ -1340,7 +1340,7 @@ function attach(){
   if (!RD.drv.ansInfo){ const bt = $("#tbAns"); bt.disabled = true; bt.classList.remove("on"); bt.innerHTML = ICO_CHECK; bt.title = "Ce livre n'a pas de réponses à afficher"; bt.setAttribute("aria-label", bt.title); }
   hookKeys(win);
   try { installAnim(win, doc); } catch(e){}
-  try { win.dispatchEvent(new Event("resize")); win.focus(); } catch(e){}
+  try { win.dispatchEvent(new Event("resize")); const ae = document.activeElement; if (!(ae && (/^(INPUT|TEXTAREA|SELECT)$/.test(ae.tagName) || ae.isContentEditable))) win.focus(); } catch(e){}   /* ne pas voler le focus d'une case où l'on écrit */
   poll();
   if (RD.dbl) setupSecond();
 }
@@ -1815,7 +1815,7 @@ $("#readerFrame").addEventListener("load", () => { if ($("#reader").classList.co
 
 function poll(){
   /* Un livre lent à démarrer (polices, scripts) : on réessaie de brancher la barre jusqu'à 8 fois */
-  if ($("#reader").classList.contains("open") && RD.t0 && (RD.retry || 0) < 8 && (!RD.drv || (RD.tot || 0) <= 1) && Date.now() - RD.t0 > 1800 * ((RD.retry || 0) + 1)){
+  if ($("#reader").classList.contains("open") && RD.t0 && RD.book !== "tableau-blanc" && (RD.retry || 0) < 8 && (!RD.drv || (RD.tot || 0) <= 1) && Date.now() - RD.t0 > 1800 * ((RD.retry || 0) + 1)){
     RD.retry = (RD.retry || 0) + 1; RD.attached = false; attach();
   }
   if (!RD.drv) return;
@@ -2310,7 +2310,8 @@ function drawStroke(g, s, W, H, k){
       g.lineCap = "round"; g.lineWidth = s.w * k; [[a, pt[0]], [b, pt[1]]].forEach(([e, v]) => { g.strokeStyle = coulPot(v); g.beginPath(); g.moveTo(e[0], e[1]); g.lineTo(m[0], m[1]); g.stroke(); }); return; }
     col = coulPot(pt); }   /* animation : rouge = L1, bleu = L2 */
   g.strokeStyle = col; g.lineWidth = (s.hl ? s.w * 4 : s.w) * k;
-  if (s.t === "objet"){ const G = dessinerObjet(g, s, W, H, k, "#3a424b"); if (typeof SELO !== "undefined" && SELO.s === s){ g.save(); g.setLineDash([8 * k, 6 * k]); g.strokeStyle = "#6aa9ff"; g.lineWidth = 2 * k; g.strokeRect(G.bbox[0] - 6, G.bbox[1] - 6, G.bbox[2] - G.bbox[0] + 12, G.bbox[3] - G.bbox[1] + 12); g.restore(); } return; }
+  if (s.t === "objet"){ const colO = (!s.c || s.c === "#24282c") ? (wbSombre() ? "#f4f1ea" : "#3a424b") : s.c, G = dessinerObjet(g, s, W, H, k, colO);
+    if (s.lb && !ELEC[s.k]) etiquette(g, s.lb, (G.bbox[0] + G.bbox[2]) / 2, G.bbox[3] + 12 * k, k, colO);   /* nom d'un objet isométrique (double-clic) */ if (typeof SELO !== "undefined" && SELO.s === s){ g.save(); g.setLineDash([8 * k, 6 * k]); g.strokeStyle = "#6aa9ff"; g.lineWidth = 2 * k; g.strokeRect(G.bbox[0] - 6, G.bbox[1] - 6, G.bbox[2] - G.bbox[0] + 12, G.bbox[3] - G.bbox[1] + 12); g.restore(); } return; }
   if (s.t === "texte"){
     if (s.cache) return;
     const fs = txFs(s) * k, lh = s.lig ? 34 * 1.25 * k : fs * 1.25; g.font = txFont(s, fs); g.fillStyle = s.hl ? "#24282c" : col; g.textBaseline = s.lig ? "alphabetic" : "top";
@@ -2327,8 +2328,12 @@ function drawStroke(g, s, W, H, k){
       }
     } else if (s.t === "rect"){ g.rect(Math.min(x1, x2), Math.min(y1, y2), Math.abs(x2 - x1), Math.abs(y2 - y1)); }
     else if (s.t === "ellipse"){ g.ellipse((x1 + x2) / 2, (y1 + y2) / 2, Math.max(1, Math.abs(x2 - x1) / 2), Math.max(1, Math.abs(y2 - y1) / 2), 0, 0, Math.PI * 2); }
-    else if (FORMES[s.t]){ g.stroke(); if (RD.obj && typeof SELO !== "undefined" && SELO.s === s) cadreForme(g, s, W, H, k); dessinerForme(g, s, x1, y1, x2, y2, k, col); return; }
-    g.stroke(); return;
+    const habillage = () => {     /* cadre de sélection et étiquette (double-clic), pour toutes les formes */
+      if (RD.obj && typeof SELO !== "undefined" && SELO.s === s) cadreForme(g, s, W, H, k);
+      if (s.lb && !VALEURS_FORME[s.t]){ const ligneT = /^(ligne|fleche|fleche2)$/.test(s.t), an = Math.atan2(y2 - y1, x2 - x1); let nx = Math.sin(an), ny = -Math.cos(an); if (ny > 0){ nx = -nx; ny = -ny; }   /* au-dessus d'une ligne, au centre d'une forme */
+        etiquette(g, s.lb, (x1 + x2) / 2 + (ligneT ? nx * 16 * k : 0), (y1 + y2) / 2 + (ligneT ? ny * 16 * k : 0), k, col); } };
+    if (FORMES[s.t] && !/^(ligne|fleche|rect|ellipse)$/.test(s.t)){ g.stroke(); dessinerForme(g, s, x1, y1, x2, y2, k, col); habillage(); return; }
+    g.stroke(); if (FORMES[s.t]) habillage(); return;
   }
   s.p.forEach((q, i) => { const x = q[0] * W, y = q[1] * H; if (i) g.lineTo(x, y); else g.moveTo(x, y); });
   if (s.p.length === 1) g.lineTo(s.p[0][0] * W + .01, s.p[0][1] * H);
@@ -2457,6 +2462,9 @@ function decouperIso(cur){
   }
   return out.length ? out : null;
 }
+/* petit texte lisible (contour blanc) : étiquettes des formes et des objets */
+function etiquette(g, txt, x, y, k, col){ g.save(); g.font = "700 " + Math.round(15 * k) + "px system-ui, sans-serif"; g.textAlign = "center"; g.textBaseline = "middle";
+  g.lineJoin = "round"; g.lineWidth = 4 * k; g.strokeStyle = wbSombre() ? "rgba(0,0,0,.55)" : "rgba(255,255,255,.9)"; g.strokeText(txt, x, y); g.fillStyle = col; g.fillText(txt, x, y); g.restore(); }
 /* forme sélectionnée (onglet Formes) : cadre pointillé bleu */
 function cadreForme(g, s, W, H, k){ const P = pointsTrait(s); if (!P || !P.length) return;
   let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9; P.forEach(([x, y]) => { x0 = Math.min(x0, x * W); x1 = Math.max(x1, x * W); y0 = Math.min(y0, y * H); y1 = Math.max(y1, y * H); });
@@ -2480,13 +2488,16 @@ const VALEURS_FORME = {
   angle:{ q:"Angle en degrés (1 à 180). La forme s'ajuste. Ajoute du texte pour une étiquette (ex. « 45° pente »).", ex:"45" },
   cercle:{ q:"Étiquette du rayon (ex. r = 50 mm)", ex:"r = 50 mm" },
   bulle:{ q:"Numéro ou lettre de la bulle", ex:"A" } };
-function modifierForme(s, cx, cy){ const V = VALEURS_FORME[s.t]; if (!V){ aviser("Double-clic : on peut changer la valeur d'une cote, d'un angle, d'un cercle ou d'une bulle."); return; }
+function modifierForme(s, cx, cy){
+  const V = s.t === "objet" ? (s.k === "jonction" ? null : ELEC[s.k] ? (s.k === "rails" ? { q:"Nom des rails (ex. L1 / L2, 120 V)", ex:"L1 / L2" } : { q:"Repère du symbole (ex. CR1, M, PB2)", ex:"CR1" }) : { q:"Nom de l'objet (ex. P-1, Chaudière 1)", ex:"P-1" })
+    : (VALEURS_FORME[s.t] || { q:"Étiquette affichée sur la forme (laisse vide pour l'enlever)", ex:"A" });
+  if (!V) return;
   const old = document.getElementById("formeVal"); if (old) old.remove();
   const box = document.createElement("div"); box.id = "formeVal";
   box.style.cssText = "position:fixed;z-index:90;left:" + Math.max(8, Math.min(innerWidth - 300, cx - 140)) + "px;top:" + Math.max(8, Math.min(innerHeight - 130, cy + 18)) + "px;width:280px;padding:10px;border-radius:12px;background:#0e0e0f;border:1px solid #6aa9ff;color:#e4e4e7;font:600 .8rem system-ui,sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.4)";
   const actuel = s.t === "angle" && !s.lb ? String(Math.round(Math.abs(Math.atan2(s.p[1][1] - s.p[0][1], (s.p[1][0] - s.p[0][0]) * ($("#inkCanvas").width / $("#inkCanvas").height))) * 180 / Math.PI)) : (s.lb || (s.t === "bulle" ? String(s.n || 1) : ""));
   box.innerHTML = '<div style="margin-bottom:6px;line-height:1.3">' + V.q + '</div><div style="display:flex;gap:6px"><input style="flex:1;min-width:0;min-height:38px;border-radius:8px;border:1px solid #2f2f33;padding:0 8px;font:700 1rem system-ui;color:#111;background:#fff" placeholder="' + V.ex + '"><button style="min-height:38px;padding:0 12px;border-radius:8px;border:0;background:#1f6fc2;color:#fff;font:700 .85rem system-ui;cursor:pointer">OK</button></div>';
-  $("#reader").appendChild(box); const inp = box.querySelector("input"); inp.value = actuel; setTimeout(() => { inp.focus(); inp.select(); }, 0);
+  $("#reader").appendChild(box); const inp = box.querySelector("input"); inp.value = actuel; setTimeout(() => { inp.focus(); inp.select(); }, 30);
   box.addEventListener("pointerdown", e => e.stopPropagation());
   let fini = false;
   const fin = ok => { if (fini) return; fini = true; box.remove(); if (!ok) return; const v = inp.value.trim(); snapInk();
@@ -2495,8 +2506,8 @@ function modifierForme(s, cx, cy){ const V = VALEURS_FORME[s.t]; if (!V){ aviser
         const d = Math.max(1, Math.min(180, parseFloat(m[1].replace(",", ".")))), ar = d * Math.PI / 180 * (haut ? -1 : 1);
         s.p[1] = [a[0] + Math.cos(ar) * R / W, a[1] + Math.sin(ar) * R / H]; delete s.lb; }
       else if (v) s.lb = v; else delete s.lb; }
-    else if (v) s.lb = v; else delete s.lb;
-    redrawInk(); };
+    else if (v) s.lb = s.t === "objet" && ELEC[s.k] ? v.slice(0, 14) : v; else delete s.lb;
+    redrawInk(); try { majObjUI(); } catch(e){} };
   inp.addEventListener("keydown", e => { e.stopPropagation(); if (e.key === "Enter"){ e.preventDefault(); fin(true); } else if (e.key === "Escape"){ e.preventDefault(); fin(false); } });
   box.querySelector("button").onclick = () => fin(true); inp.addEventListener("blur", () => setTimeout(() => fin(true), 150)); }
 /* points d'un trait (pour la gomme) : les formes sont échantillonnées sur leur contour */
@@ -3154,6 +3165,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     (fixes || strokes().filter(f => f.t === "ligne" && f.fil).flatMap(f => [0, 1].filter(i => Math.abs(f.p[i][0] - x2) * W < 2).map(i => [f, i]))).forEach(([f, i]) => { f.p[i][0] = nx; });
     o.sz = [w, h]; };
   const nettoyerFils = () => strokes().filter(o => o.t === "objet" && ELEC[o.k]).forEach(couperFils);   /* après chaque fil ou déplacement */
+  let dernierO = { s:null, t:0 };
   const touche = q => { const arr = strokes(); for (let i = arr.length - 1; i >= 0; i--){ const s = arr[i]; if (s.t !== "objet") continue; const G = objGeo(s, c.width, c.height), x = q[0] * c.width, y = q[1] * c.height;
     if (s.k === "rails"){ if (surRails(s, G, x, y, .1) && (RD.objK === "rails" || (y - G.oy) / G.u < .4)) return s; continue; }
     if (x >= G.bbox[0] - 4 && x <= G.bbox[2] + 4 && y >= G.bbox[1] - 4 && y <= G.bbox[3] + 4) return s; } return null; };
@@ -3175,6 +3187,8 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     }
     let hit = touche(q.raw);
     if (el && RD.objK === "jonction" && hit && hit.k !== "jonction") hit = null;   /* un point de jonction se pose aussi sur la borne d'un symbole */
+    if (hit && dernierO.s === hit && e.timeStamp - dernierO.t < 450){ dernierO = { s:null, t:0 }; SELO.s = hit; redrawInk(); majObjUI(); e.preventDefault(); modifierForme(hit, e.clientX, e.clientY); return; }   /* double-clic : renommer */
+    if (hit) dernierO = { s:hit, t:e.timeStamp };
     if (hit){
       SELO.s = hit; RD.objO = hit.o || 0;
       const G = objGeo(hit, c.width, c.height), liens = [];                 /* extrémités de tuyaux posées sur un raccord */
@@ -3220,7 +3234,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
       let w = Math.round(Math.abs(q1[0] - mv.q0[0]) * r.width / u), h = Math.round(Math.abs(q1[1] - mv.q0[1]) * r.height / u);
       const p0 = [Math.min(q1[0], mv.q0[0]), Math.min(q1[1], mv.q0[1])];
       const petit = w < 3 || h < 2; if (petit){ w = 12; h = 11; }                              /* simple clic : échelle standard */
-      snapInk(); const o = { t:"objet", k:"rails", o:0, c:"#24282c", p:[petit ? mv.q0 : p0], w:4, sz:[w, h], lb:RD.lbK.rails || "L1 / L2" }; strokes().push(o); SELO.s = o; RD.objKe = "fil";
+      snapInk(); const o = { t:"objet", k:"rails", o:0, c:/^hl/.test(RD.color) ? "#24282c" : RD.color, p:[petit ? mv.q0 : p0], w:4, sz:[w, h], lb:RD.lbK.rails || "L1 / L2" }; strokes().push(o); SELO.s = o; RD.objKe = "fil";
       mv = null; redrawInk(); majObjUI(); return;
     }
     if (mv && mv.zone){
@@ -3228,7 +3242,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
       const dxp = (q1[0] - mv.q0[0]) * r.width, dyp = (q1[1] - mv.q0[1]) * r.height;
       let dm = Math.round((dxp / d - 2 * dyp / a) / 2), dn = Math.round((dxp / d + 2 * dyp / a) / 2);
       dm = dm || (dn ? 4 : 4); dn = dn || 3;                                                      /* simple clic : zone standard */
-      snapInk(); const o = { t:"objet", k:"serpentin", o:0, c:"#24282c", p:[mv.q0], w:4, sz:[dm, dn], pas:RD.pas || .5 }; strokes().push(o); SELO.s = o; redrawInk();
+      snapInk(); const o = { t:"objet", k:"serpentin", o:0, c:/^hl/.test(RD.color) ? "#24282c" : RD.color, p:[mv.q0], w:4, sz:[dm, dn], pas:RD.pas || .5 }; strokes().push(o); SELO.s = o; redrawInk();
     }
     mv = null; majObjUI(); }));
 })();
@@ -3285,9 +3299,10 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     if (RD.text || (RD.obj && !RD.formeK)){ e.preventDefault(); return; }
     const q = pt(e);
     if (RD.obj && RD.formeK){ const brut = (r => [(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height])(c.getBoundingClientRect()), ip = poigneeSous(SELO.s, brut);
-      if (ip >= 0){ cur = { poignee:ip, s:SELO.s, snap:false }; return; }               /* agrandir / rapetisser par une poignée */
+      if (ip >= 0 && dernierF.s === SELO.s && e.timeStamp - dernierF.t < 450){ dernierF = { s:null, t:0 }; e.preventDefault(); modifierForme(SELO.s, e.clientX, e.clientY); return; }   /* double-clic sur une poignée = aussi renommer */
+      if (ip >= 0){ dernierF = { s:SELO.s, t:e.timeStamp }; cur = { poignee:ip, s:SELO.s, snap:false }; return; }               /* agrandir / rapetisser par une poignée */
       const hit = formeSous(brut);
-      if (hit && dernierF.s === hit && e.timeStamp - dernierF.t < 450){ dernierF = { s:null, t:0 }; SELO.s = hit; redrawInk(); majObjUI(); modifierForme(hit, e.clientX, e.clientY); return; }
+      if (hit && dernierF.s === hit && e.timeStamp - dernierF.t < 450){ dernierF = { s:null, t:0 }; SELO.s = hit; redrawInk(); majObjUI(); e.preventDefault(); modifierForme(hit, e.clientX, e.clientY); return; }
       if (hit) dernierF = { s:hit, t:e.timeStamp };
       if (hit){ SELO.s = hit; cur = { bouge:hit, q0:q, p0:hit.p.map(v => v.slice()), snap:false }; redrawInk(); majObjUI(); return; }
       if (SELO.s){ SELO.s = null; majObjUI(); } }
@@ -3698,10 +3713,11 @@ $("#tbPg").addEventListener("keydown", e => {
 (function(){
   const bar = $("#penBar"), ref = bar.querySelector(".sep");
   const x = document.createElement("input"); x.type = "color"; x.className = "swx"; x.value = "#ff00aa"; x.title = "Autre couleur"; x.setAttribute("aria-label", "Autre couleur");
-  x.oninput = () => { RD.color = x.value; RD.eraser = false; refreshTools(); x.classList.add("on"); };
+  x.oninput = () => { RD.color = x.value; RD.eraser = false; recolorerSel(); refreshTools(); x.classList.add("on"); };
   bar.insertBefore(x, ref); RD.swx = x;
 })();
-document.querySelectorAll("#penBar .sw").forEach(b => b.onclick = () => { RD.color = b.dataset.c; RD.eraser = false; refreshTools(); });
+function recolorerSel(){ const o = typeof SELO !== "undefined" && RD.obj && SELO.s && strokes().includes(SELO.s) ? SELO.s : null; if (!o || /^hl/.test(RD.color) || o.c === RD.color) return; snapInk(); o.c = RD.color; redrawInk(); }   /* l'objet ou la forme choisi prend la couleur du crayon */
+document.querySelectorAll("#penBar .sw").forEach(b => b.onclick = () => { RD.color = b.dataset.c; RD.eraser = false; recolorerSel(); refreshTools(); });
 $("#penW").onclick = () => { RD.wIdx = (RD.wIdx + 1) % WIDTHS.length; majEpaisseur(); };
 function majEpaisseur(){ const c = $("#penW circle"); if (c) c.setAttribute("r", 2.5 + RD.wIdx * 2.5); }
 $("#penS").onclick = () => { const i = SHAPES.indexOf(RD.shape || null); RD.shape = SHAPES[(i + 1) % SHAPES.length]; RD.eraser = false; RD.text = false; refreshTools(); };
@@ -3771,7 +3787,8 @@ majEpaisseur();
   const fermer = () => { pc.hidden = pp.hidden = true; bc.classList.remove("open"); bp.classList.remove("open"); };
   const basculer = (p, b) => { const ouvrir = p.hidden; fermer(); if (ouvrir){ p.hidden = false; b.classList.add("open"); } };
   /* toucher « Couleur » ramène toujours au crayon (quitte l'efface, le texte ou les objets) */
-  bc.onclick = () => { if (RD.eraser || RD.text || (RD.obj && !RD.formeK)){ RD.eraser = false; RD.text = false; if (!RD.formeK) RD.obj = false; refreshTools(); } basculer(pc, bc); };   /* les formes gardent la palette : on change seulement leur couleur */ bp.onclick = () => basculer(pp, bp);
+  bc.onclick = () => { const garde = RD.obj && (RD.formeK || (SELO.s && strokes().includes(SELO.s)));
+    if (RD.eraser || RD.text || (RD.obj && !garde)){ RD.eraser = false; RD.text = false; if (!garde) RD.obj = false; refreshTools(); } basculer(pc, bc); };   /* les formes gardent la palette : on change seulement leur couleur */ bp.onclick = () => basculer(pp, bp);
   pc.querySelectorAll(".sw").forEach(b => b.addEventListener("click", () => setTimeout(fermer, 120)));
   document.addEventListener("pointerdown", e => { if (bar.contains(e.target) || (pc.hidden && pp.hidden)) return; fermer();
     if (e.target.id === "inkCanvas"){ e.stopPropagation(); e.preventDefault(); } }, true);   /* le clic qui ferme un menu ne dessine pas de point */

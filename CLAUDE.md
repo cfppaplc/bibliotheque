@@ -59,6 +59,8 @@
   Formes : catalogue `FORMES` dessiné par `dessinerForme` (appelé depuis `drawStroke`), forme choisie dans `RD.formeK`, taille d'un simple clic `FORMES_CLIC`;
   déplacer : toucher une forme existante (`formeSous`, près du trait ou dans une petite forme) la sélectionne (`SELO.s`, cadre `cadreForme`) et la glisse; Suppr / `#objD` l'efface; poignées carrées aux points `s.p[0]`/`s.p[1]` (`poigneeSous`) pour redimensionner;
   double-clic = `modifierForme` (valeurs `VALEURS_FORME` gardées dans `s.lb`; pour l'angle, un nombre fait pivoter le 2e bras);
+  le même double-clic marche sur les objets iso (nom sous l'objet, `etiquette`) et électriques (repère `lb`), et sur toute forme (étiquette au centre). Les objets gardent `s.c` = couleur du crayon (`recolorerSel` quand on choisit une couleur avec un objet sélectionné).
+  Attention : `attach()` ne doit pas faire `win.focus()` pendant qu'une case est en saisie (le tableau blanc vide se rebranchait et volait le focus).
   offertes aussi sur les pages de livre. Iso (`OBJETS`) et Électricité (`ELEC`) : tableau blanc seulement; choisir l'onglet change le fond (iso / quadrillé).
 - **Tableau blanc / crayon** : traits normalisés dans `INKS[inkKey()]`, `REFS`, `recalerWb()`; pendant un trait, ne jamais appeler `redrawInk()` à chaque mouvement (trop lent) : trait libre dessiné par bouts (`dessinerEnCours`), formes et surligneur sur une copie `fond`, gomme via `redrawBientot()` (une fois par image); fonds blanc/quadrillé/iso/…;
   tableaux gardés (`tableauxSauves`), « Mes schémas » (`mesSchemas`, export `.schema.json` type `schema-pavillon`).
