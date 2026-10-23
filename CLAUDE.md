@@ -58,6 +58,7 @@
 - **Palette Objets** (`#objBar`, bouton cube `#penO`, visible partout) : trois onglets `RD.objTab` = `formes` | `iso` | `elec`.
   Formes : catalogue `FORMES` dessiné par `dessinerForme` (appelé depuis `drawStroke`), forme choisie dans `RD.formeK`, taille d'un simple clic `FORMES_CLIC`;
   déplacer : toucher une forme existante (`formeSous`, près du trait ou dans une petite forme) la sélectionne (`SELO.s`, cadre `cadreForme`) et la glisse; Suppr / `#objD` l'efface;
+  double-clic = `modifierForme` (valeurs `VALEURS_FORME` gardées dans `s.lb`; pour l'angle, un nombre fait pivoter le 2e bras);
   offertes aussi sur les pages de livre. Iso (`OBJETS`) et Électricité (`ELEC`) : tableau blanc seulement; choisir l'onglet change le fond (iso / quadrillé).
 - **Tableau blanc / crayon** : traits normalisés dans `INKS[inkKey()]`, `REFS`, `recalerWb()`; pendant un trait, ne jamais appeler `redrawInk()` à chaque mouvement (trop lent) : trait libre dessiné par bouts (`dessinerEnCours`), formes et surligneur sur une copie `fond`, gomme via `redrawBientot()` (une fois par image); fonds blanc/quadrillé/iso/…;
   tableaux gardés (`tableauxSauves`), « Mes schémas » (`mesSchemas`, export `.schema.json` type `schema-pavillon`).
