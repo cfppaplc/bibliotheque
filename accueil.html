@@ -422,7 +422,8 @@ header { grid-column: 1 / -1; display: flex; align-items: center; justify-conten
 .lk-vid img { width: 128px; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 6px; background: #0002; flex: none; }
 .lk-vid b { display: block; line-height: 1.25; }
 .lk-vid small { opacity: .7; }
-[data-u] { width: 100%; box-sizing: border-box; }
+[data-u], [data-wu], [data-wn] { width: 100%; box-sizing: border-box; }
+[data-wn] { margin-top: 6px; }
 .minu-c { background: var(--surface); border: 1px solid var(--line); border-radius: 24px; padding: calc(var(--u) * 40) calc(var(--u) * 60); text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,.4); }
 .minu-l { font: 700 calc(var(--u) * 34) var(--display); color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
 .minu-t { font: 700 calc(var(--u) * 260) var(--display); font-variant-numeric: tabular-nums; line-height: 1; color: var(--ink); margin: calc(var(--u) * 10) 0 calc(var(--u) * 20); }
@@ -614,7 +615,7 @@ header { grid-column: 1 / -1; display: flex; align-items: center; justify-conten
       </details></div>
     <label class="exam-opt" for="f-exam"><input type="checkbox" id="f-exam"><span><b>Examen aujourd'hui</b> — pas de pause dans l'horaire<small>Revient tout seul à l'horaire normal demain.</small></span></label>
     <div class="field"><span class="step-q"><span class="num">4</span>Ouvrir quelque chose pendant une activité? <small class="opt">facultatif</small></span>
-      <small class="lk-aide">Choisis une page de livre, un schéma, un plan, un fichier (PDF, image…), une vidéo YouTube ou une minuterie pour une activité. En classe, un bouton « Ouvrir » apparaît quand l'activité commence.</small>
+      <small class="lk-aide">Choisis une page de livre, un schéma, un plan, un fichier (PDF, image…), un lien web, une vidéo YouTube ou une minuterie pour une activité. En classe, un bouton « Ouvrir » apparaît quand l'activité commence.</small>
       <div class="lk-liste" id="f-liens"></div></div>
     <div class="sheet-actions">
       <button class="btn primary" type="submit">Afficher au tableau</button>
@@ -1582,6 +1583,7 @@ const ICO_P = {
   plan: '<rect x="4" y="4" width="16" height="16" rx="1.5"/><path d="M4 10h6V4M14 20v-6h6M10 14h4"/>',
   tableau: '<rect x="3.5" y="4.5" width="17" height="12" rx="1.5"/><path d="M9 21l3-4.5 3 4.5"/>',
   minuterie: '<circle cx="12" cy="13" r="7.5"/><path d="M12 9v4.5l3 1.5M9.5 3h5"/>',
+  web: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.6 3.9 5.6 3.9 9s-1.3 6.4-3.9 9c-2.6-2.6-3.9-5.6-3.9-9s1.3-6.4 3.9-9z"/>',
   fichier: '<path d="M14 3H7a1.5 1.5 0 0 0-1.5 1.5v15A1.5 1.5 0 0 0 7 21h10a1.5 1.5 0 0 0 1.5-1.5V7.5z"/><path d="M14 3v4.5h4.5M9 12.5h6M9 16h4"/>',
   video: '<rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M10 9.2v5.6l4.8-2.8z" fill="currentColor"/>',
   ouvrir: '<path d="M8 5l11 7-11 7z" fill="currentColor"/>'
@@ -1684,11 +1686,16 @@ function nomLien(c){
   if (c.type === "tableau") return "Tableau blanc" + (c.fond === "quad" ? " quadrillé" : c.fond === "iso" ? " isométrique" : "");
   if (c.type === "minuterie") return "Minuterie " + c.min + " min";
   if (c.type === "fichier") return c.nom || "Fichier";
+  if (c.type === "web") return c.nom || hoteWeb(c.url);
   if (c.type === "video") return "Vidéo" + (c.nom ? " · " + c.nom : "") + (c.start ? " (à " + dureeTxt(c.start) + ")" : "");
   return "";
 }
 /* Boutons « Ouvrir » de la carte : un bouton par contenu (touche O pour le premier, 2 pour le deuxième…) */
 /* nom court pour les boutons côte à côte (l'icône dit déjà la sorte de contenu) */
+/* Lien web : on garde l'adresse telle quelle (https:// ajouté au besoin) et on l'ouvre dans un nouvel onglet */
+const hoteWeb = u => { try { return new URL(u).hostname.replace(/^www\./, ""); } catch (e) { return "Lien web"; } };
+function urlWeb(u){ u = String(u || "").trim(); if (!u) return ""; if (!/^[a-z][a-z0-9+.-]*:/i.test(u)) u = "https://" + u;
+  try { const x = new URL(u); return /^https?:$/.test(x.protocol) && x.hostname.includes(".") ? x.href : ""; } catch (e) { return ""; } }
 function nomCourt(c){
   if (c.type === "livre") return "Livre" + (c.page > 1 ? " · p. " + c.page : "");
   if (c.type === "video") return c.nom && c.nom.length < 28 ? c.nom : "Vidéo";
@@ -1711,6 +1718,7 @@ function ouvrirLien(c){
   if (!c) return;
   if (c.type === "minuterie"){ minuterie(c.min, c.nom); return; }
   if (c.type === "fichier"){ ouvrirFichier(c); return; }
+  if (c.type === "web"){ const w = window.open(c.url, "_blank", "noopener"); if (!w) location.assign(c.url); return; }
   if (c.type === "video"){ if (c.yt || /\.(mp4|webm|ogg)(\?|$)/i.test(c.url || "")) lecteurVideo(c); else window.open(c.url, "_blank", "noopener"); return; }
   if (window.parent !== window && CATAL){ try { window.parent.postMessage({ type:"accueil-ouvrir", contenu:c }, "*"); return; } catch(e){} }
   /* tableau de bord ouvert seul : on passe par la bibliothèque */
@@ -1752,6 +1760,7 @@ function choix(row, label){
     + '<button type="button" class="lk-tuile" data-t="tableau"' + (enBiblio ? "" : " disabled") + '><b>' + ico("tableau") + '</b>Tableau blanc</button>'
     + '<button type="button" class="lk-tuile" data-t="minuterie"><b>' + ico("minuterie") + '</b>Minuterie</button>'
     + '<button type="button" class="lk-tuile" data-t="fichier"><b>' + ico("fichier") + '</b>Fichier (PDF, image…)</button>'
+    + '<button type="button" class="lk-tuile" data-t="web"><b>' + ico("web") + '</b>Lien web</button>'
     + '<button type="button" class="lk-tuile" data-t="video"><b>' + ico("video") + '</b>Vidéo YouTube</button></div>'
     + (enBiblio ? "" : '<p class="lk-note">Pour les livres, schémas et plans, ouvre ce tableau de bord depuis la bibliothèque.</p>')
     + '<div class="lk-form" hidden></div>';
@@ -1803,6 +1812,19 @@ function choix(row, label){
       inp.addEventListener("keydown", e => { if (e.key === "Enter"){ e.preventDefault(); if (!ok.disabled) ok.click(); } });
       ok.onclick = () => { if (choisi){ if (!choisi.nom) choisi.nom = label; fini(choisi); } };
       setTimeout(() => inp.focus(), 30);
+    }
+    if (ty === "web"){
+      f.innerHTML = '<input type="url" data-wu placeholder="Colle l\'adresse du site (ex. www.rbq.gouv.qc.ca)" autocomplete="off">'
+        + '<input type="text" data-wn placeholder="Nom à afficher (facultatif)" autocomplete="off" maxlength="60">'
+        + '<small class="lk-aide" data-e>Le site s\'ouvrira dans un nouvel onglet. Copie l\'adresse dans la barre du navigateur.</small>'
+        + '<div class="lk-ok"><button type="button" class="prim" data-v disabled>Choisir</button>' + annuler + '</div>';
+      const iu = f.querySelector("[data-wu]"), inn = f.querySelector("[data-wn]"), ok = f.querySelector("[data-v]"), msg = f.querySelector("[data-e]");
+      const maj = () => { const u = urlWeb(iu.value); ok.disabled = !u;
+        msg.textContent = !iu.value.trim() ? "Le site s'ouvrira dans un nouvel onglet. Copie l'adresse dans la barre du navigateur." : u ? "Site trouvé : " + hoteWeb(u) + " ✓" : "Cette adresse ne ressemble pas à un site web (ex. www.exemple.com)."; };
+      iu.addEventListener("input", maj); iu.addEventListener("paste", () => setTimeout(maj, 0));
+      [iu, inn].forEach(x => x.addEventListener("keydown", e => { if (e.key === "Enter"){ e.preventDefault(); if (!ok.disabled) ok.click(); } }));
+      ok.onclick = () => { const u = urlWeb(iu.value); if (u) fini({ type:"web", url:u, nom: inn.value.trim() || hoteWeb(u) }); };
+      setTimeout(() => iu.focus(), 30);
     }
     if (ty === "fichier"){
       f.innerHTML = '<label class="lk-fich"><input type="file" data-fi hidden><span class="lk-fich-z">' + ico("fichier") + '<b>Choisir un fichier…</b><small>ou glisse-le ici · PDF, image, vidéo, PowerPoint, Word…</small></span></label>'

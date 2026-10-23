@@ -2,6 +2,118 @@
  {
   "date": "2026-10-23",
   "type": "outil",
+  "titre": "Accueil de classe",
+  "texte": "Tableau d'accueil animé pour le début de période : date, déroulement, timeline lisible du fond de la classe, arrière-plan lié à la compétence, un contenu à ouvrir pour chaque activité (livre, schéma, plan, vidéo YouTube, minuterie), passage fluide vers le livre et mode examen sans pause.",
+  "formation": [
+   {
+    "t": "Bouton « Accueil de classe » en haut de la bibliothèque pour l'ouvrir.",
+    "img": "nouveautes/accueil.jpg"
+   },
+   {
+    "t": "« Préparer le cours », étape 4 : à côté d'une activité, « ＋ Ajouter », puis choisis une page de livre, un schéma électrique, un plan, un tableau blanc ou une minuterie.",
+    "img": "nouveautes/tdb-prep.jpg"
+   },
+   {
+    "t": "En classe, la carte MAINTENANT affiche « ▶ Ouvrir » quand l'activité commence (ou touche O). Tu peux aussi cliquer une case de la timeline qui porte une icône.",
+    "img": "nouveautes/tdb-carte.jpg"
+   },
+   {
+    "t": "Le livre s'ouvre directement à la bonne page, en douceur, et le plein écran reste actif. Dans n'importe quel livre, le bouton « Tableau de bord » en haut (ou en bas à gauche quand les barres sont cachées, ou la touche E) t'amène à l'accueil de classe : le livre reste ouvert derrière.",
+    "img": "nouveautes/tdb-livre.jpg"
+   },
+   {
+    "t": "Sur le tableau de bord, le bouton blanc « Revenir au livre · p. 64 » (en haut à droite, ou touche L) te remet exactement où tu étais dans le livre. Parfait pour aller à l'atelier et revenir.",
+    "img": "nouveautes/tdb-retour.jpg"
+   },
+   {
+    "t": "Une vidéo pour une activité : « ＋ Ajouter » → « 🎬 Vidéo YouTube », puis colle le lien (bouton « Partager » de YouTube). Si le lien commence à un moment précis, la vidéo part de là. En classe, elle joue en grand sur le tableau de bord; « Fermer » ou Échap pour revenir.",
+    "img": "nouveautes/tdb-video.jpg"
+   },
+   {
+    "t": "Un site web pour une activité : « ＋ Ajouter » → « Lien web », colle l'adresse (ex. www.rbq.gouv.qc.ca) et, si tu veux, un nom à afficher. En classe, le site s'ouvre dans un nouvel onglet.",
+    "img": "nouveautes/tdb-web.jpg"
+   },
+   {
+    "t": "Un fichier pour une activité : « ＋ Ajouter » → « Fichier (PDF, image…) », puis choisis-le ou glisse-le. En classe, les PDF, images et vidéos s'affichent en grand. Un PowerPoint, un Word ou un Excel s'ouvre tout de suite dans son programme (astuce : « Toujours ouvrir les fichiers de ce type » dans les téléchargements de Chrome ou Edge). Pour un PowerPoint en grand dans le tableau de bord, enregistre-le en PDF. Le fichier reste sur cet ordinateur.",
+    "img": "nouveautes/tdb-fichier.jpg"
+   },
+   {
+    "t": "Plusieurs contenus pour une même activité (ex. une vidéo et une page du livre) : après le premier, clique « ＋ Un autre ». En classe, la carte MAINTENANT affiche un bouton par contenu (touche O pour le premier, 2 pour le deuxième); un clic sur la case de la timeline te laisse choisir.",
+    "img": "nouveautes/tdb-deux.jpg"
+   },
+   {
+    "t": "Jour d'examen : dans « Préparer le cours », coche « Examen aujourd'hui ». Les pauses disparaissent de l'horaire (3 h 20 d'un bloc) et un badge EXAMEN s'affiche. Le lendemain, l'horaire normal revient tout seul.",
+    "img": "nouveautes/tdb-examen.jpg"
+   },
+   "« Préparer le cours » : le panneau de l'enseignant, pour régler la période et le déroulement.",
+   "« Plein écran » une seule fois au début du cours : il reste actif entre le tableau de bord et les livres. « Bibliothèque » ferme tout et te ramène aux livres.",
+   {
+    "t": "L'arrière-plan change tout seul selon la compétence choisie dans « Préparer le cours » : robinetterie et appareils sanitaires, réseau d'évacuation, santé et sécurité, chantier, outils et entrepôt, entretien ménager, informatique, administration, protection incendie… Tu peux aussi en choisir un autre dans Plus → Réglages → Arrière-plan.",
+    "img": "nouveautes/accueil-scenes.jpg"
+   },
+   {
+    "t": "Les couleurs changent chaque jour de la semaine (lundi ardoise, mardi forêt, mercredi prune, jeudi pétrole, vendredi cuivre) pour garder l'attention des élèves. Pour garder toujours les mêmes : Plus → Réglages → Ambiance.",
+    "img": "nouveautes/tdb-ambiances.jpg"
+   }
+  ],
+  "versions": [
+   {
+    "date": "2026-10-23",
+    "texte": "Nouveau contenu à ouvrir pendant une activité : un lien web."
+   },
+   {
+    "date": "2026-10-22",
+    "texte": "Bouton « Tableau de bord » dans tous les livres, même ceux ouverts depuis la bibliothèque."
+   },
+   {
+    "date": "2026-10-22",
+    "texte": "Les fichiers PowerPoint, Word et Excel s'ouvrent tout de suite dans leur programme, sans bouton à cliquer."
+   },
+   {
+    "date": "2026-10-22",
+    "texte": "Jusqu'à 4 contenus par activité (ex. vidéo + page du livre)."
+   },
+   {
+    "date": "2026-10-22",
+    "texte": "Ouvrir un fichier de ton ordinateur (PDF, image, vidéo, PowerPoint…) pendant une activité."
+   },
+   {
+    "date": "2026-10-22",
+    "texte": "Une ambiance de couleurs différente chaque jour, icônes au trait comme dans la bibliothèque, et correction d'une erreur qui empêchait le tableau de bord de démarrer."
+   },
+   {
+    "date": "2026-10-22",
+    "texte": "Vidéo YouTube à ouvrir pendant une activité, et case « Examen aujourd'hui » qui retire les pauses."
+   },
+   {
+    "date": "2026-10-22",
+    "texte": "Mode sombre plus clair : gris ardoise au lieu de presque noir, plus lisible au projecteur."
+   },
+   {
+    "date": "2026-10-22",
+    "texte": "Passage fluide entre le tableau de bord et le livre : le plein écran reste actif, le livre reste ouvert derrière, boutons « Tableau de bord » (E) et « Revenir au livre » (L)."
+   },
+   {
+    "date": "2026-10-22",
+    "texte": "Un contenu à ouvrir pour chaque activité du déroulement : page de livre, schéma, plan, tableau blanc ou minuterie."
+   },
+   {
+    "date": "2026-10-22",
+    "texte": "Dix nouveaux arrière-plans animés liés aux compétences (DEP 5211 et DEP 5333), mieux visibles autour des panneaux."
+   },
+   {
+    "date": "2026-10-21",
+    "texte": "Curseur de la timeline corrigé, timeline plus grosse, panneau de l'enseignant clair, plein écran réparé, bouton Bibliothèque déplacé."
+   },
+   {
+    "date": "2026-10-17",
+    "texte": "Accueil de classe pour le tableau interactif."
+   }
+  ]
+ },
+ {
+  "date": "2026-10-23",
+  "type": "outil",
   "titre": "Lecture des livres : pages, table des matières et réponses",
   "texte": "Même table des matières dans tous les livres, avec des icônes qui correspondent au type de section, et réponses pas à pas partout où le livre a un corrigé.",
   "formation": [
@@ -101,110 +213,6 @@
    {
     "date": "2026-10-22",
     "texte": "Ajout du cahier (version 15)."
-   }
-  ]
- },
- {
-  "date": "2026-10-22",
-  "type": "outil",
-  "titre": "Accueil de classe",
-  "texte": "Tableau d'accueil animé pour le début de période : date, déroulement, timeline lisible du fond de la classe, arrière-plan lié à la compétence, un contenu à ouvrir pour chaque activité (livre, schéma, plan, vidéo YouTube, minuterie), passage fluide vers le livre et mode examen sans pause.",
-  "formation": [
-   {
-    "t": "Bouton « Accueil de classe » en haut de la bibliothèque pour l'ouvrir.",
-    "img": "nouveautes/accueil.jpg"
-   },
-   {
-    "t": "« Préparer le cours », étape 4 : à côté d'une activité, « ＋ Ajouter », puis choisis une page de livre, un schéma électrique, un plan, un tableau blanc ou une minuterie.",
-    "img": "nouveautes/tdb-prep.jpg"
-   },
-   {
-    "t": "En classe, la carte MAINTENANT affiche « ▶ Ouvrir » quand l'activité commence (ou touche O). Tu peux aussi cliquer une case de la timeline qui porte une icône.",
-    "img": "nouveautes/tdb-carte.jpg"
-   },
-   {
-    "t": "Le livre s'ouvre directement à la bonne page, en douceur, et le plein écran reste actif. Dans n'importe quel livre, le bouton « Tableau de bord » en haut (ou en bas à gauche quand les barres sont cachées, ou la touche E) t'amène à l'accueil de classe : le livre reste ouvert derrière.",
-    "img": "nouveautes/tdb-livre.jpg"
-   },
-   {
-    "t": "Sur le tableau de bord, le bouton blanc « Revenir au livre · p. 64 » (en haut à droite, ou touche L) te remet exactement où tu étais dans le livre. Parfait pour aller à l'atelier et revenir.",
-    "img": "nouveautes/tdb-retour.jpg"
-   },
-   {
-    "t": "Une vidéo pour une activité : « ＋ Ajouter » → « 🎬 Vidéo YouTube », puis colle le lien (bouton « Partager » de YouTube). Si le lien commence à un moment précis, la vidéo part de là. En classe, elle joue en grand sur le tableau de bord; « Fermer » ou Échap pour revenir.",
-    "img": "nouveautes/tdb-video.jpg"
-   },
-   {
-    "t": "Un fichier pour une activité : « ＋ Ajouter » → « Fichier (PDF, image…) », puis choisis-le ou glisse-le. En classe, les PDF, images et vidéos s'affichent en grand. Un PowerPoint, un Word ou un Excel s'ouvre tout de suite dans son programme (astuce : « Toujours ouvrir les fichiers de ce type » dans les téléchargements de Chrome ou Edge). Pour un PowerPoint en grand dans le tableau de bord, enregistre-le en PDF. Le fichier reste sur cet ordinateur.",
-    "img": "nouveautes/tdb-fichier.jpg"
-   },
-   {
-    "t": "Plusieurs contenus pour une même activité (ex. une vidéo et une page du livre) : après le premier, clique « ＋ Un autre ». En classe, la carte MAINTENANT affiche un bouton par contenu (touche O pour le premier, 2 pour le deuxième); un clic sur la case de la timeline te laisse choisir.",
-    "img": "nouveautes/tdb-deux.jpg"
-   },
-   {
-    "t": "Jour d'examen : dans « Préparer le cours », coche « Examen aujourd'hui ». Les pauses disparaissent de l'horaire (3 h 20 d'un bloc) et un badge EXAMEN s'affiche. Le lendemain, l'horaire normal revient tout seul.",
-    "img": "nouveautes/tdb-examen.jpg"
-   },
-   "« Préparer le cours » : le panneau de l'enseignant, pour régler la période et le déroulement.",
-   "« Plein écran » une seule fois au début du cours : il reste actif entre le tableau de bord et les livres. « Bibliothèque » ferme tout et te ramène aux livres.",
-   {
-    "t": "L'arrière-plan change tout seul selon la compétence choisie dans « Préparer le cours » : robinetterie et appareils sanitaires, réseau d'évacuation, santé et sécurité, chantier, outils et entrepôt, entretien ménager, informatique, administration, protection incendie… Tu peux aussi en choisir un autre dans Plus → Réglages → Arrière-plan.",
-    "img": "nouveautes/accueil-scenes.jpg"
-   },
-   {
-    "t": "Les couleurs changent chaque jour de la semaine (lundi ardoise, mardi forêt, mercredi prune, jeudi pétrole, vendredi cuivre) pour garder l'attention des élèves. Pour garder toujours les mêmes : Plus → Réglages → Ambiance.",
-    "img": "nouveautes/tdb-ambiances.jpg"
-   }
-  ],
-  "versions": [
-   {
-    "date": "2026-10-22",
-    "texte": "Bouton « Tableau de bord » dans tous les livres, même ceux ouverts depuis la bibliothèque."
-   },
-   {
-    "date": "2026-10-22",
-    "texte": "Les fichiers PowerPoint, Word et Excel s'ouvrent tout de suite dans leur programme, sans bouton à cliquer."
-   },
-   {
-    "date": "2026-10-22",
-    "texte": "Jusqu'à 4 contenus par activité (ex. vidéo + page du livre)."
-   },
-   {
-    "date": "2026-10-22",
-    "texte": "Ouvrir un fichier de ton ordinateur (PDF, image, vidéo, PowerPoint…) pendant une activité."
-   },
-   {
-    "date": "2026-10-22",
-    "texte": "Une ambiance de couleurs différente chaque jour, icônes au trait comme dans la bibliothèque, et correction d'une erreur qui empêchait le tableau de bord de démarrer."
-   },
-   {
-    "date": "2026-10-22",
-    "texte": "Vidéo YouTube à ouvrir pendant une activité, et case « Examen aujourd'hui » qui retire les pauses."
-   },
-   {
-    "date": "2026-10-22",
-    "texte": "Mode sombre plus clair : gris ardoise au lieu de presque noir, plus lisible au projecteur."
-   },
-   {
-    "date": "2026-10-22",
-    "texte": "Passage fluide entre le tableau de bord et le livre : le plein écran reste actif, le livre reste ouvert derrière, boutons « Tableau de bord » (E) et « Revenir au livre » (L)."
-   },
-   {
-    "date": "2026-10-22",
-    "texte": "Un contenu à ouvrir pour chaque activité du déroulement : page de livre, schéma, plan, tableau blanc ou minuterie."
-   },
-   {
-    "date": "2026-10-22",
-    "texte": "Dix nouveaux arrière-plans animés liés aux compétences (DEP 5211 et DEP 5333), mieux visibles autour des panneaux."
-   },
-   {
-    "date": "2026-10-21",
-    "texte": "Curseur de la timeline corrigé, timeline plus grosse, panneau de l'enseignant clair, plein écran réparé, bouton Bibliothèque déplacé."
-   },
-   {
-    "date": "2026-10-17",
-    "texte": "Accueil de classe pour le tableau interactif."
    }
   ]
  },
