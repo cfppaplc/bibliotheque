@@ -92,6 +92,8 @@ html[data-bg="tole"] .bgfx { background-image:
   display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto;
   gap: calc(var(--u) * 24);
   padding-block: calc(var(--u) * 26);
+  /* marge de sécurité en bas : certains projecteurs coupent le bas de l'image */
+  padding-bottom: calc(var(--u) * 26 + 5vh);
   padding-left: max(calc(var(--u) * 56), env(safe-area-inset-left, 0px));
   padding-right: max(calc(var(--u) * 56), env(safe-area-inset-right, 0px)); }
 
