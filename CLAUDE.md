@@ -38,7 +38,8 @@
 
 ## index.html — repères
 - **`LIVRES`** (liste d'objets) : `titre, auteur, categorie, niveau ("DEP 5211 · Compétence 15"), pages, annee, nouveau,
-  couleurs, fichier, competence, description`. **`window.COUVERTURES`** : `{ fichier: "data:image/jpeg;base64,…" }`
+  couleurs, fichier, competence, description` et, au besoin, **`enConstruction:true`** (badge jaune « En construction » avec un cône,
+  prioritaire sur « Nouveau »; l'enlever quand Jeremy dit que le livre est fini). **`window.COUVERTURES`** : `{ fichier: "data:image/jpeg;base64,…" }`
   (capture de la 1re page du livre, 420 px de large, JPEG ~80).
 - **Ajouter un livre** : copier dans `livres/<nom>.html`, ajouter l'entrée `LIVRES` + la couverture, ajouter une entrée
   `type:"ajout", livre:"<nom>"` dans `nouveautes.json` (allume le badge « Nouveau » 30 jours), puis
@@ -46,9 +47,9 @@
 - **Lecteur** (`#reader`) : l'objet d'état est `RD`. Chaque livre est chargé en `srcdoc` d'un iframe; la bibliothèque
   masque la barre propre au livre (`HOSTCSS`) et fournit sa propre barre (`#tb`) identique pour tous.
   `buildDriver(win)` détecte le « moteur » du livre et retourne `{ state(), goto(n), modules(), … }` :
-  moteur A (`#ui #bp #pg #br`, pages `.page.vis`), moteur B (`#prev #count`), pages empilées (`#book>.page`, protection incendie),
+  moteur A (`#ui #bp #pg #br`, pages `.page.vis`), moteur B (`#prev #count`), pages empilées (`#book>.page`, protection incendie), pages affichées une à une par la bibliothèque (`.page.hcur`, livre C13),
   document qui défile (`defile:true`). `turn(±1)`, `setZoom`, `ZL`, `zPleineLargeur()`, mode simple/double page (`RD.single/RD.dbl`).
-- **`HOSTCSS`** : CSS injecté dans *tous* les livres. Contient la **transition de page commune** (`biblioPage` : fondu + `translate`,
+- **`HOSTCSS`** : CSS injecté dans *tous* les livres. Contient la **transition de page commune** (`biblioPage`, sur `.page.vis` et `.page.hcur` : fondu + `translate`,
   pas `transform`, pour ne pas casser la mise à l'échelle des livres). Changer ici = changer tous les livres.
 - Ouvrir à une page : `?livre=<fichier>&page=N` ou `RD.allerA = N` avant `lire(l)` (`offrirReprise` revérifie et
   s'arrête dès que l'enseignant tourne lui-même une page : `RD.bouge`).
@@ -87,7 +88,8 @@
 
 ## Points ouverts / à savoir
 - « Communiquer en milieu de travail » (436-282) a été classé **Compétence 9** par déduction (Plomberie et chauffage = 10 = 436-295).
-  À confirmer avec Jeremy.
+  À confirmer avec Jeremy : les numéros de compétence ne suivent pas l'ordre des codes (le livre C13 indique « Module 13 · 436-274 »),
+  donc ce 9 est douteux.
 - Le 22 octobre 2026, GitHub Pages a semblé arrêter de publier pendant un moment après des push réussis.
   Si le site en ligne ne change pas : onglet Actions → « pages build and deployment » → Re-run.
 - Idées proposées à Jeremy mais pas commencées : repenser le panneau administrateur (sauvegarde complète, vérifier un livre
