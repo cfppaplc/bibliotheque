@@ -57,7 +57,7 @@
   ouvert sur cet ordinateur (`localStorage.livresVus`).
 - **Palette Objets** (`#objBar`, bouton cube `#penO`, visible partout) : trois onglets `RD.objTab` = `formes` | `iso` | `elec`.
   Formes : catalogue `FORMES` dessiné par `dessinerForme` (appelé depuis `drawStroke`), forme choisie dans `RD.formeK`, taille d'un simple clic `FORMES_CLIC`;
-  déplacer : toucher une forme existante (`formeSous`, près du trait ou dans une petite forme) la sélectionne (`SELO.s`, cadre `cadreForme`) et la glisse; Suppr / `#objD` l'efface; poignées carrées aux points `s.p[0]`/`s.p[1]` (`poigneeSous`) pour redimensionner;
+  déplacer : toucher une forme existante (`formeSous`, près du trait ou dans une petite forme) la sélectionne (`SELO.s`, cadre `cadreForme`) et la glisse; Suppr / `#objD` l'efface; poignées carrées aux points `s.p[0]`/`s.p[1]` (`poigneeSous`) pour redimensionner; cote : décalage `s.d` (fraction de la hauteur), poignée 2 au milieu (`milieuCote`, `poigneeCote`), lignes de rappel. Une forme non choisie se choisit d'un clic (`cur.choisir`); glisser dessus trace une nouvelle forme.
   double-clic = `modifierForme` (valeurs `VALEURS_FORME` gardées dans `s.lb`; pour l'angle, un nombre fait pivoter le 2e bras);
   le même double-clic marche sur les objets iso (nom sous l'objet, `etiquette`) et électriques (repère `lb`), et sur toute forme (étiquette au centre). Les objets gardent `s.c` = couleur du crayon (`recolorerSel` quand on choisit une couleur avec un objet sélectionné).
   Attention : `attach()` ne doit pas faire `win.focus()` pendant qu'une case est en saisie (le tableau blanc vide se rebranchait et volait le focus).

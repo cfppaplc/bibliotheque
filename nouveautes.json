@@ -18,12 +18,16 @@
     "img": "nouveautes/objets-formes.jpg"
    },
    {
-    "t": "Pour déplacer une forme : glisse-la par son trait (une petite forme, n'importe où dessus). Elle s'entoure d'un cadre bleu. Touche Suppr ou bouton Supprimer pour l'effacer; Annuler la remet.",
+    "t": "Pour déplacer une forme : touche-la d'abord (cadre bleu), puis glisse-la. Glisser sur une forme pas encore choisie trace une nouvelle forme (pratique pour une cote qui part du coin d'un rectangle). Touche Suppr ou bouton Supprimer pour l'effacer; Annuler la remet.",
     "img": "nouveautes/formes-deplacer.jpg"
    },
    {
     "t": "Pour grandir ou rapetisser une forme déjà dessinée : touche-la, puis tire un des petits carrés blancs (coin, bout de flèche, rayon du cercle).",
     "img": "nouveautes/formes-poignees.jpg"
+   },
+   {
+    "t": "Cote : touche-la, puis tire le carré bleu avec les flèches pour l'éloigner de l'objet, d'un côté ou de l'autre. Des lignes de rappel la relient à l'objet, comme sur un plan.",
+    "img": "nouveautes/cote-decalee.jpg"
    },
    {
     "t": "Double-clic sur une forme pour choisir sa valeur : la cote (ex. 1200 mm), l'angle en degrés (la forme s'ajuste), l'étiquette du rayon d'un cercle, ou le numéro / la lettre d'une bulle. Laisse vide pour revenir à la valeur automatique.",
@@ -50,6 +54,10 @@
    "Le crayon réagit maintenant tout de suite : seul le trait en cours est redessiné pendant que tu écris, le reste du tableau ne bouge pas."
   ],
   "versions": [
+   {
+    "date": "2026-10-23",
+    "texte": "Cote : un carré à flèches pour la placer à côté de l'objet (lignes de rappel). Une forme se choisit d'un toucher avant de la glisser."
+   },
    {
     "date": "2026-10-23",
     "texte": "Double-clic pour nommer n'importe quelle forme, objet iso ou symbole électrique. Les objets suivent la couleur du crayon."

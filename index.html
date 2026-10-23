@@ -2356,6 +2356,11 @@ function dessinerForme(g, s, x1, y1, x2, y2, k, col){
   g.beginPath();
   if (t === "fleche2"){ g.moveTo(x1, y1); g.lineTo(x2, y2); tete(x1, y1, x2, y2); tete(x2, y2, x1, y1); }
   else if (t === "cote"){
+    { const an0 = Math.atan2(y2 - y1, x2 - x1), off = (s.d || 0) * (g.canvas ? g.canvas.height : 0), ox = -Math.sin(an0) * off, oy = Math.cos(an0) * off;
+      if (Math.abs(off) > 2){ const sg = Math.sign(off), ux = -Math.sin(an0) * sg, uy = Math.cos(an0) * sg, gap = 4 * k, dep = 8 * k;   /* lignes de rappel */
+        g.save(); g.lineWidth = Math.max(1, lw * .5); g.beginPath();
+        [[x1, y1], [x2, y2]].forEach(([x, y]) => { g.moveTo(x + ux * gap, y + uy * gap); g.lineTo(x + ox + ux * dep, y + oy + uy * dep); }); g.stroke(); g.restore(); g.beginPath(); }
+      x1 += ox; y1 += oy; x2 += ox; y2 += oy; }
     const an = Math.atan2(y2 - y1, x2 - x1), nx = -Math.sin(an), ny = Math.cos(an), e = 9 * k, Lc = Math.max(8 * k, lw * 2.4);
     g.moveTo(x1, y1); g.lineTo(x2, y2);
     [[x1, y1], [x2, y2]].forEach(([x, y]) => { g.moveTo(x - nx * e * 1.4, y - ny * e * 1.4); g.lineTo(x + nx * e * 1.4, y + ny * e * 1.4); });
@@ -2364,7 +2369,7 @@ function dessinerForme(g, s, x1, y1, x2, y2, k, col){
     g.stroke(); if (s.lb || (RD.wb && /^(quad|iso|isopts)$/.test(wbBg()))){        /* valeur choisie (double-clic), sinon sur une grille : longueur en carreaux */
       const u = 34 * RD.z * (window.devicePixelRatio || 1), n = Math.hypot(x2 - x1, y2 - y1) / u;
       const r = Math.round(n * 10) / 10, txt = s.lb || ((String(r).replace(".", ",")) + " carr.");
-      g.save(); g.translate((x1 + x2) / 2 + nx * 14 * k, (y1 + y2) / 2 + ny * 14 * k); let a3 = an; if (a3 > Math.PI / 2 || a3 < -Math.PI / 2) a3 += Math.PI; g.rotate(a3);
+      g.save(); const sgL = s.d ? Math.sign(s.d) : 1; g.translate((x1 + x2) / 2 + nx * 19 * k * sgL, (y1 + y2) / 2 + ny * 19 * k * sgL);   /* texte du côté extérieur */ let a3 = an; if (a3 > Math.PI / 2 || a3 < -Math.PI / 2) a3 += Math.PI; g.rotate(a3);
       g.fillStyle = col; g.font = "700 " + Math.round(13 * k) + "px system-ui, sans-serif"; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText(txt, 0, 0); g.restore(); }
     return; }
   else if (t === "cercle"){ const r = Math.max(2, Math.hypot(x2 - x1, y2 - y1)); g.arc(x1, y1, r, 0, Math.PI * 2); g.moveTo(x1 - 6 * k, y1); g.lineTo(x1 + 6 * k, y1); g.moveTo(x1, y1 - 6 * k); g.lineTo(x1, y1 + 6 * k); g.stroke();
@@ -2469,10 +2474,17 @@ function etiquette(g, txt, x, y, k, col){ g.save(); g.font = "700 " + Math.round
 function cadreForme(g, s, W, H, k){ const P = pointsTrait(s); if (!P || !P.length) return;
   let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9; P.forEach(([x, y]) => { x0 = Math.min(x0, x * W); x1 = Math.max(x1, x * W); y0 = Math.min(y0, y * H); y1 = Math.max(y1, y * H); });
   const m = 10 * k; g.save(); g.setLineDash([8 * k, 6 * k]); g.strokeStyle = "#2a7bcf"; g.lineWidth = 2 * k; g.strokeRect(x0 - m, y0 - m, x1 - x0 + 2 * m, y1 - y0 + 2 * m);
-  g.setLineDash([]); const hp = 7 * k; s.p.slice(0, 2).forEach(([x, y], i) => { if (i === 0 && (s.t === "bulle" || s.t === "cercle")) return; g.fillStyle = "#fff"; g.fillRect(x * W - hp, y * H - hp, 2 * hp, 2 * hp); g.strokeRect(x * W - hp, y * H - hp, 2 * hp, 2 * hp); });
+  g.setLineDash([]); if (s.t === "cote") poigneeCote(g, s, W, H, k); const hp = 7 * k; s.p.slice(0, 2).forEach(([x, y], i) => { if (i === 0 && (s.t === "bulle" || s.t === "cercle")) return; g.fillStyle = "#fff"; g.fillRect(x * W - hp, y * H - hp, 2 * hp, 2 * hp); g.strokeRect(x * W - hp, y * H - hp, 2 * hp, 2 * hp); });
   g.restore(); }
-/* poignée de la forme sélectionnée sous le doigt (0 = début, 1 = fin) */
+function milieuCote(s, W, H){ const a = s.p[0], b = s.p[1], an = Math.atan2((b[1] - a[1]) * H, (b[0] - a[0]) * W), off = (s.d || 0) * H;
+  return [(a[0] + b[0]) / 2 * W - Math.sin(an) * off, (a[1] + b[1]) / 2 * H + Math.cos(an) * off]; }
+function poigneeCote(g, s, W, H, k){ const [x, y] = milieuCote(s, W, H), r = 11 * k, f = 6.5 * k, t = 2.6 * k;
+  g.save(); g.setLineDash([]); g.fillStyle = "#2a7bcf"; g.strokeStyle = "#fff"; g.lineWidth = 1.5 * k; g.beginPath(); g.rect(x - r, y - r, 2 * r, 2 * r); g.fill(); g.stroke();
+  g.strokeStyle = "#fff"; g.lineWidth = 1.6 * k; g.lineCap = "round"; g.lineJoin = "round"; g.beginPath(); g.moveTo(x - f, y); g.lineTo(x + f, y); g.moveTo(x, y - f); g.lineTo(x, y + f);
+  [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(([dx, dy]) => { const px = x + dx * f, py = y + dy * f; g.moveTo(px - dx * t + dy * t, py - dy * t + dx * t); g.lineTo(px, py); g.lineTo(px - dx * t - dy * t, py - dy * t - dx * t); }); g.stroke(); g.restore(); }
+/* poignée de la forme sélectionnée sous le doigt (0 = début, 1 = fin, 2 = décalage de la cote) */
 function poigneeSous(s, q){ if (!s || !s.t || !FORMES[s.t] || !strokes().includes(s)) return -1; const c = $("#inkCanvas"), W = c.width, H = c.height, tol = 16 * (window.devicePixelRatio || 1);
+  if (s.t === "cote"){ const [mx, my] = milieuCote(s, W, H); if (Math.hypot(mx - q[0] * W, my - q[1] * H) < tol * 1.1) return 2; }
   for (let i = 1; i >= 0; i--){ if (i === 0 && (s.t === "bulle" || s.t === "cercle")) continue; if (Math.hypot((s.p[i][0] - q[0]) * W, (s.p[i][1] - q[1]) * H) < tol) return i; } return -1; }
 /* forme sous le doigt (la plus récente d'abord) : près de son trait, ou n'importe où dans une petite forme */
 function formeSous(q){ const c = $("#inkCanvas"), W = c.width, H = c.height, tol = 14 * (window.devicePixelRatio || 1), arr = strokes();
@@ -2510,6 +2522,9 @@ function modifierForme(s, cx, cy){
     redrawInk(); try { majObjUI(); } catch(e){} };
   inp.addEventListener("keydown", e => { e.stopPropagation(); if (e.key === "Enter"){ e.preventDefault(); fin(true); } else if (e.key === "Escape"){ e.preventDefault(); fin(false); } });
   box.querySelector("button").onclick = () => fin(true); inp.addEventListener("blur", () => setTimeout(() => fin(true), 150)); }
+/* objet (iso ou électrique) sous le doigt, le plus récent d'abord */
+function objetSous(q){ const c = $("#inkCanvas"), arr = strokes(), x = q[0] * c.width, y = q[1] * c.height;
+  for (let i = arr.length - 1; i >= 0; i--){ const s = arr[i]; if (s.t !== "objet" || s.k === "fil") continue; const G = objGeo(s, c.width, c.height); if (x >= G.bbox[0] - 4 && x <= G.bbox[2] + 4 && y >= G.bbox[1] - 4 && y <= G.bbox[3] + 4) return s; } return null; }
 /* points d'un trait (pour la gomme) : les formes sont échantillonnées sur leur contour */
 function pointsTrait(s){
   if (s.t === "objet"){ const c = $("#inkCanvas"), G = objGeo(s, c.width, c.height), out = []; for (let i = 0; i <= 6; i++) for (let j = 0; j <= 4; j++) out.push([(G.bbox[0] + (G.bbox[2] - G.bbox[0]) * i / 6) / c.width, (G.bbox[1] + (G.bbox[3] - G.bbox[1]) * j / 4) / c.height]); return out; }
@@ -2517,7 +2532,9 @@ function pointsTrait(s){
   if (!s.t || s.p.length < 2) return s.p;
   const a = s.p[0], b = s.p[s.p.length - 1], out = [], N = 28;
   const seg = (u, v) => { for (let i = 0; i <= N; i++) out.push([u[0] + (v[0] - u[0]) * i / N, u[1] + (v[1] - u[1]) * i / N]); };
-  if (s.t === "ligne" || s.t === "fleche" || s.t === "fleche2" || s.t === "cote") seg(a, b);
+  if (s.t === "cote"){ const cv = $("#inkCanvas"), W = cv.width || 1, H = cv.height || 1, an = Math.atan2((b[1] - a[1]) * H, (b[0] - a[0]) * W), off = (s.d || 0) * H, ox = -Math.sin(an) * off / W, oy = Math.cos(an) * off / H;
+    seg([a[0] + ox, a[1] + oy], [b[0] + ox, b[1] + oy]); if (s.d){ seg(a, [a[0] + ox, a[1] + oy]); seg(b, [b[0] + ox, b[1] + oy]); } }
+  else if (s.t === "ligne" || s.t === "fleche" || s.t === "fleche2") seg(a, b);
   else if (s.t === "angle"){ seg(a, b); seg(a, [a[0] + Math.hypot(b[0] - a[0], b[1] - a[1]), a[1]]); }
   else if (s.t === "cercle" || s.t === "bulle"){ const cv = $("#inkCanvas"), W = cv.width || 1, H = cv.height || 1, r = Math.hypot((b[0] - a[0]) * W, (b[1] - a[1]) * H); for (let i = 0; i < 72; i++){ const t = i / 72 * Math.PI * 2; out.push([a[0] + r * Math.cos(t) / W, a[1] + r * Math.sin(t) / H]); } out.push(a); }
   else if (FORMES[s.t] && s.t !== "ellipse"){ const x0 = Math.min(a[0], b[0]), x1 = Math.max(a[0], b[0]), y0 = Math.min(a[1], b[1]), y1 = Math.max(a[1], b[1]);
@@ -3026,7 +3043,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
   bar.innerHTML = '<div class="tete" title="Glisse ici pour déplacer la palette"><span class="poig">⠿</span><span class="tit">Objets</span></div>'
     + '<div class="onglets" role="tablist"><button data-tab="formes" role="tab">Formes</button><button data-tab="iso" role="tab" title="Objets isométriques (plomberie, chauffage)">Iso</button><button data-tab="elec" role="tab">Électricité</button></div>'
     + '<div class="grp" data-g="formes"><div class="cgrid cform">' + Object.keys(FORMES).map(k => '<button data-f="' + k + '" title="' + FORMES[k].n + '"><canvas width="120" height="64"></canvas><span>' + FORMES[k].n + '</span></button>').join("") + '</div>'
-    + '<div class="aide">Choisis une forme, puis <b>glisse</b> sur le tableau. Pour <b>déplacer</b> une forme, glisse-la par son trait; tire un <b>carré blanc</b> pour la grandir. <b>Double-clic</b> : choisir la cote, l\'angle, le rayon ou le numéro. Le bouton Supprimer l\'efface.</div></div>'
+    + '<div class="aide">Choisis une forme, puis <b>glisse</b> sur le tableau. Pour <b>déplacer</b> une forme, touche-la, puis glisse-la par son trait; tire un <b>carré blanc</b> pour la grandir (cote : le <b>carré bleu</b> l\'éloigne de l\'objet). <b>Double-clic</b> : choisir la cote, l\'angle, le rayon ou le numéro. Le bouton Supprimer l\'efface.</div></div>'
     + '<div class="grp" data-g="iso"><div class="cgrid ciso">' + Object.keys(OBJETS).map(k => '<button data-k="' + k + '" title="' + OBJETS[k].n + '"><canvas width="120" height="64"></canvas><span>' + OBJETS[k].n + '</span></button>').join("") + '</div>'
     + '<div class="aide">Clique sur la grille pour poser l\'objet. Les tuyaux raccordés le suivent.</div></div>'
     + '<div class="grp" data-g="elec"><button id="objSch" class="sch-btn" title="Circuits prêts à utiliser et tableaux enregistrés">📋 Modèles et mes schémas</button>' + ELEC_CAT.map(([cg, cn]) => '<button class="cat" data-cat="' + cg + '">' + cn + '</button><div class="cgrid" data-cat="' + cg + '">'
@@ -3187,8 +3204,8 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     }
     let hit = touche(q.raw);
     if (el && RD.objK === "jonction" && hit && hit.k !== "jonction") hit = null;   /* un point de jonction se pose aussi sur la borne d'un symbole */
-    if (hit && dernierO.s === hit && e.timeStamp - dernierO.t < 450){ dernierO = { s:null, t:0 }; SELO.s = hit; redrawInk(); majObjUI(); e.preventDefault(); modifierForme(hit, e.clientX, e.clientY); return; }   /* double-clic : renommer */
-    if (hit) dernierO = { s:hit, t:e.timeStamp };
+    if (hit && dernierO.s === hit && e.timeStamp - dernierO.t < 380 && Math.hypot(e.clientX - dernierO.x, e.clientY - dernierO.y) < 12){ dernierO = { s:null, t:0 }; SELO.s = hit; redrawInk(); majObjUI(); e.preventDefault(); modifierForme(hit, e.clientX, e.clientY); return; }   /* double-clic : renommer */
+    if (hit) dernierO = { s:hit, t:e.timeStamp, x:e.clientX, y:e.clientY };
     if (hit){
       SELO.s = hit; RD.objO = hit.o || 0;
       const G = objGeo(hit, c.width, c.height), liens = [];                 /* extrémités de tuyaux posées sur un raccord */
@@ -3299,16 +3316,17 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     if (RD.text || (RD.obj && !RD.formeK)){ e.preventDefault(); return; }
     const q = pt(e);
     if (RD.obj && RD.formeK){ const brut = (r => [(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height])(c.getBoundingClientRect()), ip = poigneeSous(SELO.s, brut);
-      if (ip >= 0 && dernierF.s === SELO.s && e.timeStamp - dernierF.t < 450){ dernierF = { s:null, t:0 }; e.preventDefault(); modifierForme(SELO.s, e.clientX, e.clientY); return; }   /* double-clic sur une poignée = aussi renommer */
-      if (ip >= 0){ dernierF = { s:SELO.s, t:e.timeStamp }; cur = { poignee:ip, s:SELO.s, snap:false }; return; }               /* agrandir / rapetisser par une poignée */
+      if (ip >= 0 && dernierF.s === SELO.s && e.timeStamp - dernierF.t < 380 && Math.hypot(e.clientX - dernierF.x, e.clientY - dernierF.y) < 12){ dernierF = { s:null, t:0 }; e.preventDefault(); modifierForme(SELO.s, e.clientX, e.clientY); return; }   /* double-clic sur une poignée = aussi renommer */
+      if (ip >= 0){ dernierF = { s:SELO.s, t:e.timeStamp, x:e.clientX, y:e.clientY }; cur = { poignee:ip, s:SELO.s, snap:false }; return; }               /* agrandir / rapetisser par une poignée */
       const hit = formeSous(brut);
-      if (hit && dernierF.s === hit && e.timeStamp - dernierF.t < 450){ dernierF = { s:null, t:0 }; SELO.s = hit; redrawInk(); majObjUI(); e.preventDefault(); modifierForme(hit, e.clientX, e.clientY); return; }
-      if (hit) dernierF = { s:hit, t:e.timeStamp };
-      if (hit){ SELO.s = hit; cur = { bouge:hit, q0:q, p0:hit.p.map(v => v.slice()), snap:false }; redrawInk(); majObjUI(); return; }
+      if (hit && dernierF.s === hit && e.timeStamp - dernierF.t < 380 && Math.hypot(e.clientX - dernierF.x, e.clientY - dernierF.y) < 12){ dernierF = { s:null, t:0 }; SELO.s = hit; redrawInk(); majObjUI(); e.preventDefault(); modifierForme(hit, e.clientX, e.clientY); return; }
+      if (hit) dernierF = { s:hit, t:e.timeStamp, x:e.clientX, y:e.clientY };
+      if (hit && hit === SELO.s){ cur = { bouge:hit, q0:q, p0:hit.p.map(v => v.slice()), snap:false }; return; }   /* forme déjà choisie : on la glisse */
+      var choisir = hit;     /* forme pas encore choisie : un simple clic la choisit, mais glisser trace une nouvelle forme (ex. une cote qui part du coin d'un rectangle) */
       if (SELO.s){ SELO.s = null; majObjUI(); } }
     cur = { c:/^hl/.test(RD.color) ? "#000" : RD.color, hl:/^hl/.test(RD.color), hc:/^hl:/.test(RD.color) ? RD.color.slice(3) : null, w:WIDTHS[RD.wIdx], p:[q] };
     const forme = RD.obj && RD.formeK ? RD.formeK : RD.shape;
-    if (forme){ cur.t = forme; cur.p = [q, q]; if (forme === "bulle") cur.n = strokes().filter(x => x.t === "bulle").length + 1; }
+    if (forme){ cur.t = forme; cur.p = [q, q]; if (RD.obj && RD.formeK && choisir) cur.choisir = choisir; if (forme === "bulle") cur.n = strokes().filter(x => x.t === "bulle").length + 1; }
     /* Trait en cours, rapide : on garde une image de tout le reste et, à chaque image, on redessine seulement le trait en cours par-dessus */
     snapInk(); redrawInk();
     if (cur.t || cur.hl){       /* forme ou surligneur : on garde une copie de tout le reste */
@@ -3334,6 +3352,9 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
   c.addEventListener("pointermove", e => {
     if (!cur) return;
     if (cur === "erase"){ eraseAt(pt(e)); return; }
+    if (cur.poignee === 2){ if (!cur.snap){ snapInk(); cur.snap = true; } const o = cur.s, W = c.width, H = c.height, r = c.getBoundingClientRect(), q = [(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height];
+      const a = o.p[0], b = o.p[1], an = Math.atan2((b[1] - a[1]) * H, (b[0] - a[0]) * W), d = (-(q[0] - (a[0] + b[0]) / 2) * W * Math.sin(an) + (q[1] - (a[1] + b[1]) / 2) * H * Math.cos(an));
+      o.d = Math.abs(d) < 6 ? 0 : d / H; if (!rafTrait) rafTrait = requestAnimationFrame(() => { rafTrait = 0; redrawInk(); }); return; }
     if (cur.poignee !== undefined){ if (!cur.snap){ snapInk(); cur.snap = true; } cur.s.p[cur.poignee] = pt(e); if (!rafTrait) rafTrait = requestAnimationFrame(() => { rafTrait = 0; redrawInk(); }); return; }
     if (cur.bouge){ const q = pt(e), dx = q[0] - cur.q0[0], dy = q[1] - cur.q0[1];
       if (!cur.snap){ if (Math.hypot(dx, dy) < .002) return; snapInk(); cur.snap = true; }
@@ -3345,6 +3366,9 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
   ["pointerup", "pointercancel"].forEach(t => c.addEventListener(t, () => {
     if (rafTrait){ cancelAnimationFrame(rafTrait); rafTrait = 0; }
     if (cur && (cur.bouge || cur.poignee !== undefined)){ cur = null; redrawInk(); return; }
+    if (cur && cur.choisir){ const a = cur.p[0], b = cur.p[1]; if (Math.hypot(a[0] - b[0], a[1] - b[1]) < .004){       /* simple clic sur une forme : on la choisit */
+      const arr = strokes(), i = arr.indexOf(cur); if (i >= 0){ arr.splice(i, 1); (UNDO[inkKey()] || []).pop(); } SELO.s = cur.choisir; cur = null; fond = null; redrawInk(); majObjUI(); return; }
+      delete cur.choisir; }
     const finTrait = cur && cur !== "erase";
     RD.erSnap = false;
     if (cur && cur !== "erase" && cur.t && FORMES_CLIC[cur.t]){ const a = cur.p[0], b = cur.p[1]; if (Math.hypot(a[0] - b[0], a[1] - b[1]) < .004){ const d = FORMES_CLIC[cur.t]; cur.p[1] = cur.t === "bulle" || cur.t === "cercle" ? [a[0] + d, a[1]] : [a[0] + d, a[1] + d * 1.6]; } }
@@ -3802,7 +3826,7 @@ majEpaisseur();
 $("#penE").onclick = () => { RD.eraser = !RD.eraser; if (RD.eraser){ RD.text = false; RD.obj = false; } refreshTools(); };
 $("#penO").onclick = () => { RD.obj = !RD.obj; if (RD.obj){ RD.text = false; RD.eraser = false; RD.objTab = null; }
   refreshTools();
-  if (RD.obj) aviser(modeElec() ? "Schéma en échelle : 1) « Échelle L1 / L2 » et glisse pour tracer les rails. 2) Choisis un symbole et clique sur un échelon. 3) Pour relier : pars d'un point bleu et glisse jusqu'à l'autre point bleu." : RD.objTab === "iso" ? "Choisis un objet, puis clique sur la grille. Clique un objet pour le déplacer : les tuyaux raccordés le suivent." : "Choisis une forme, puis glisse sur le tableau. Pour déplacer une forme, glisse-la par son trait. Onglets Iso et Électricité : objets de plomberie et symboles électriques.", modeElec() ? 10000 : 0); };
+  if (RD.obj) aviser(modeElec() ? "Schéma en échelle : 1) « Échelle L1 / L2 » et glisse pour tracer les rails. 2) Choisis un symbole et clique sur un échelon. 3) Pour relier : pars d'un point bleu et glisse jusqu'à l'autre point bleu." : RD.objTab === "iso" ? "Choisis un objet, puis clique sur la grille. Clique un objet pour le déplacer : les tuyaux raccordés le suivent." : "Choisis une forme, puis glisse sur le tableau. Pour déplacer une forme, touche-la, puis glisse-la. Onglets Iso et Électricité : objets de plomberie et symboles électriques.", modeElec() ? 10000 : 0); };
 $("#penT").onclick = () => { RD.text = !RD.text; if (RD.text){ RD.eraser = false; RD.obj = false; } refreshTools(); if (RD.text) aviser("Dessine un rectangle, puis écris dedans. Entrée valide (Maj+Entrée = nouvelle ligne)."); };
 $("#wbZo").onclick = zout; $("#wbZi").onclick = zin; $("#penU").onclick = undoInk; $("#penR").onclick = redoInk;
 $("#penC").onclick = () => { if (!strokes().length) return; snapInk(); INKS[inkKey()] = []; redrawInk(); };
