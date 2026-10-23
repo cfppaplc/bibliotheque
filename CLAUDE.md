@@ -55,7 +55,7 @@
   s'arrête dès que l'enseignant tourne lui-même une page : `RD.bouge`).
 - Badges « Nouveau » / « Mis à jour » : `estNouveau`, `majRecente`, `badgeLivre` — 30 jours, et disparaissent une fois le livre
   ouvert sur cet ordinateur (`localStorage.livresVus`).
-- **Tableau blanc / crayon** : traits normalisés dans `INKS[inkKey()]`, `REFS`, `recalerWb()`; fonds blanc/quadrillé/iso/…;
+- **Tableau blanc / crayon** : traits normalisés dans `INKS[inkKey()]`, `REFS`, `recalerWb()`; pendant un trait, ne jamais appeler `redrawInk()` à chaque mouvement (trop lent) : trait libre dessiné par bouts (`dessinerEnCours`), formes et surligneur sur une copie `fond`, gomme via `redrawBientot()` (une fois par image); fonds blanc/quadrillé/iso/…;
   tableaux gardés (`tableauxSauves`), « Mes schémas » (`mesSchemas`, export `.schema.json` type `schema-pavillon`).
 - **Schémas électriques en échelle** : catalogue `ELEC`/`ELEC_CAT`, `dessinerElec`, fils `{t:"ligne", fil:true}`,
   simulateur `SIM`/`simCalc` (courant animé L1→L2, relais temporisés, « Trouve la panne »), modèles `MODELES` (`poserModele`).
