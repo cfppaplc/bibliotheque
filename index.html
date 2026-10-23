@@ -2334,7 +2334,13 @@ function drawStroke(g, s, W, H, k){
     else if (s.t === "ellipse"){ g.ellipse((x1 + x2) / 2, (y1 + y2) / 2, Math.max(1, Math.abs(x2 - x1) / 2), Math.max(1, Math.abs(y2 - y1) / 2), 0, 0, Math.PI * 2); }
     const habillage = () => {     /* cadre de sélection et étiquette (double-clic), pour toutes les formes */
       if (RD.obj && typeof SELO !== "undefined" && SELO.s === s) cadreForme(g, s, W, H, k);
-      if (s.lb && !VALEURS_FORME[s.t] && s.lp){ const [ex, ey, al] = posEtiquette(s.lp, cadrePx(s, W, H), k, s.tz); etiquette(g, s.lb, ex, ey, k, col, al, s.tz); }
+      if (s.lb && s.lp && /^(ligne|fleche|fleche2)$/.test(s.t)){ const tz = s.tz || 1, m = 12 * k * tz, A = [x1, y1], B = [x2, y2];
+        if (s.lp === "gauche" || s.lp === "droite"){ const E = (s.lp === "droite") === (B[0] >= A[0]) ? B : A, O = E === B ? A : B, L = Math.hypot(E[0] - O[0], E[1] - O[1]) || 1, ux = (E[0] - O[0]) / L, uy = (E[1] - O[1]) / L;
+          const al = Math.abs(ux) < .35 ? "center" : ux > 0 ? "left" : "right";   /* au bout de la flèche, dans son prolongement */
+          etiquette(g, s.lb, E[0] + ux * m + (al === "center" ? 0 : 0), E[1] + uy * (al === "center" ? m * 1.4 : m * .6), k, col, al, tz); }
+        else { const mx = (x1 + x2) / 2, my = (y1 + y2) / 2, an = Math.atan2(y2 - y1, x2 - x1); let nx = Math.sin(an), ny = -Math.cos(an); if (ny > 0){ nx = -nx; ny = -ny; }
+          const sg = s.lp === "bas" ? -1 : s.lp === "centre" ? 0 : 1; etiquette(g, s.lb, mx + nx * 16 * k * tz * sg, my + ny * 16 * k * tz * sg, k, col, "center", tz); } }
+      else if (s.lb && !VALEURS_FORME[s.t] && s.lp){ const [ex, ey, al] = posEtiquette(s.lp, cadrePx(s, W, H), k, s.tz); etiquette(g, s.lb, ex, ey, k, col, al, s.tz); }
       else if (s.lb && !VALEURS_FORME[s.t]){ const ligneT = /^(ligne|fleche|fleche2)$/.test(s.t), an = Math.atan2(y2 - y1, x2 - x1); let nx = Math.sin(an), ny = -Math.cos(an); if (ny > 0){ nx = -nx; ny = -ny; }   /* au-dessus d'une ligne, au centre d'une forme */
         etiquette(g, s.lb, (x1 + x2) / 2 + (ligneT ? nx * 16 * k * (s.tz || 1) : 0), (y1 + y2) / 2 + (ligneT ? ny * 16 * k * (s.tz || 1) : 0), k, col, "center", s.tz); } };
     if (FORMES[s.t] && !/^(ligne|fleche|rect|ellipse)$/.test(s.t)){ g.stroke(); dessinerForme(g, s, x1, y1, x2, y2, k, col); habillage(); return; }
@@ -2494,13 +2500,14 @@ function poigneeCote(g, s, W, H, k){ const [x, y] = milieuCote(s, W, H), r = 11 
 /* poignée de la forme sélectionnée sous le doigt (0 = début, 1 = fin, 2 = décalage de la cote) */
 function poigneeSous(s, q){ if (!s || !s.t || !FORMES[s.t] || !strokes().includes(s)) return -1; const c = $("#inkCanvas"), W = c.width, H = c.height, tol = 16 * (window.devicePixelRatio || 1);
   if (s.t === "cote"){ const [mx, my] = milieuCote(s, W, H); if (Math.hypot(mx - q[0] * W, my - q[1] * H) < tol * 1.1) return 2; }
-  for (let i = 1; i >= 0; i--){ if (i === 0 && (s.t === "bulle" || s.t === "cercle")) continue; if (Math.hypot((s.p[i][0] - q[0]) * W, (s.p[i][1] - q[1]) * H) < tol) return i; } return -1; }
+  const lg = Math.hypot((s.p[1][0] - s.p[0][0]) * W, (s.p[1][1] - s.p[0][1]) * H), tp = /^(ligne|fleche|fleche2|cote)$/.test(s.t) ? Math.min(tol, lg * .22) : tol;   /* courte flèche : le milieu sert à la déplacer */
+  for (let i = 1; i >= 0; i--){ if (i === 0 && (s.t === "bulle" || s.t === "cercle")) continue; if (Math.hypot((s.p[i][0] - q[0]) * W, (s.p[i][1] - q[1]) * H) < tp) return i; } return -1; }
 /* forme sous le doigt (la plus récente d'abord) : près de son trait, ou n'importe où dans une petite forme */
 function formeSous(q){ const c = $("#inkCanvas"), W = c.width, H = c.height, tol = 14 * (window.devicePixelRatio || 1), arr = strokes(); let dedans = null, pres = null;
   for (let i = arr.length - 1; i >= 0; i--){ const s = arr[i]; if (!s.t || !FORMES[s.t] || !s.p || s.p.length < 2) continue;
     const P = pointsTrait(s), x = q[0] * W, y = q[1] * H; let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
     for (let j = 0; j < P.length; j++){ const px = P[j][0] * W, py = P[j][1] * H; x0 = Math.min(x0, px); x1 = Math.max(x1, px); y0 = Math.min(y0, py); y1 = Math.max(y1, py);
-      if (j){ const dd = distSeg([x, y], [P[j - 1][0] * W, P[j - 1][1] * H], [px, py], 1), lim = s.t === "cote" ? tol * 2.4 : tol;   /* cote : on peut toucher son texte */
+      if (j){ const dd = distSeg([x, y], [P[j - 1][0] * W, P[j - 1][1] * H], [px, py], 1), lim = s.t === "cote" ? tol * 2.4 : /^(ligne|fleche|fleche2)$/.test(s.t) ? tol * 1.6 : tol;   /* cote : on peut toucher son texte */
         if (dd < lim){ const sc = dd / lim - (s.t === "cote" ? .6 : 0); if (!pres || sc < pres[1]) pres = [s, sc]; } } }   /* trait le plus proche; une cote passe avant le trait qu'elle mesure */
     const petite = x1 - x0 < 90 * (window.devicePixelRatio || 1) && y1 - y0 < 90 * (window.devicePixelRatio || 1), fermee = !/^(ligne|fleche|fleche2|cote|angle|axes|accolade)$/.test(s.t);
     if ((petite || fermee) && x > x0 - tol && x < x1 + tol && y > y0 - tol && y < y1 + tol){ const aire = (x1 - x0) * (y1 - y0); if (!dedans || aire < dedans[1]) dedans = [s, aire]; } }   /* l'intérieur compte aussi (la plus petite forme gagne) */
