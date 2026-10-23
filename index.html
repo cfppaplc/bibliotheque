@@ -2459,7 +2459,12 @@ function decouperIso(cur){
 /* forme sélectionnée (onglet Formes) : cadre pointillé bleu */
 function cadreForme(g, s, W, H, k){ const P = pointsTrait(s); if (!P || !P.length) return;
   let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9; P.forEach(([x, y]) => { x0 = Math.min(x0, x * W); x1 = Math.max(x1, x * W); y0 = Math.min(y0, y * H); y1 = Math.max(y1, y * H); });
-  const m = 10 * k; g.save(); g.setLineDash([8 * k, 6 * k]); g.strokeStyle = "#2a7bcf"; g.lineWidth = 2 * k; g.strokeRect(x0 - m, y0 - m, x1 - x0 + 2 * m, y1 - y0 + 2 * m); g.restore(); }
+  const m = 10 * k; g.save(); g.setLineDash([8 * k, 6 * k]); g.strokeStyle = "#2a7bcf"; g.lineWidth = 2 * k; g.strokeRect(x0 - m, y0 - m, x1 - x0 + 2 * m, y1 - y0 + 2 * m);
+  g.setLineDash([]); const hp = 7 * k; s.p.slice(0, 2).forEach(([x, y], i) => { if (i === 0 && (s.t === "bulle" || s.t === "cercle")) return; g.fillStyle = "#fff"; g.fillRect(x * W - hp, y * H - hp, 2 * hp, 2 * hp); g.strokeRect(x * W - hp, y * H - hp, 2 * hp, 2 * hp); });
+  g.restore(); }
+/* poignée de la forme sélectionnée sous le doigt (0 = début, 1 = fin) */
+function poigneeSous(s, q){ if (!s || !s.t || !FORMES[s.t] || !strokes().includes(s)) return -1; const c = $("#inkCanvas"), W = c.width, H = c.height, tol = 16 * (window.devicePixelRatio || 1);
+  for (let i = 1; i >= 0; i--){ if (i === 0 && (s.t === "bulle" || s.t === "cercle")) continue; if (Math.hypot((s.p[i][0] - q[0]) * W, (s.p[i][1] - q[1]) * H) < tol) return i; } return -1; }
 /* forme sous le doigt (la plus récente d'abord) : près de son trait, ou n'importe où dans une petite forme */
 function formeSous(q){ const c = $("#inkCanvas"), W = c.width, H = c.height, tol = 14 * (window.devicePixelRatio || 1), arr = strokes();
   for (let i = arr.length - 1; i >= 0; i--){ const s = arr[i]; if (!s.t || !FORMES[s.t] || !s.p || s.p.length < 2) continue;
@@ -2502,7 +2507,7 @@ function pointsTrait(s){
   const seg = (u, v) => { for (let i = 0; i <= N; i++) out.push([u[0] + (v[0] - u[0]) * i / N, u[1] + (v[1] - u[1]) * i / N]); };
   if (s.t === "ligne" || s.t === "fleche" || s.t === "fleche2" || s.t === "cote") seg(a, b);
   else if (s.t === "angle"){ seg(a, b); seg(a, [a[0] + Math.hypot(b[0] - a[0], b[1] - a[1]), a[1]]); }
-  else if (s.t === "cercle" || s.t === "bulle"){ const r = Math.hypot(b[0] - a[0], b[1] - a[1]); for (let i = 0; i < 72; i++){ const t = i / 72 * Math.PI * 2; out.push([a[0] + r * Math.cos(t), a[1] + r * Math.sin(t)]); } out.push(a); }
+  else if (s.t === "cercle" || s.t === "bulle"){ const cv = $("#inkCanvas"), W = cv.width || 1, H = cv.height || 1, r = Math.hypot((b[0] - a[0]) * W, (b[1] - a[1]) * H); for (let i = 0; i < 72; i++){ const t = i / 72 * Math.PI * 2; out.push([a[0] + r * Math.cos(t) / W, a[1] + r * Math.sin(t) / H]); } out.push(a); }
   else if (FORMES[s.t] && s.t !== "ellipse"){ const x0 = Math.min(a[0], b[0]), x1 = Math.max(a[0], b[0]), y0 = Math.min(a[1], b[1]), y1 = Math.max(a[1], b[1]);
     seg([x0, y0], [x1, y0]); seg([x1, y0], [x1, y1]); seg([x1, y1], [x0, y1]); seg([x0, y1], [x0, y0]); seg([x0, y0], [x1, y1]); }
   else if (s.t === "rect"){ const c1 = [a[0], a[1]], c2 = [b[0], a[1]], c3 = [b[0], b[1]], c4 = [a[0], b[1]]; seg(c1, c2); seg(c2, c3); seg(c3, c4); seg(c4, c1); }
@@ -3009,7 +3014,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
   bar.innerHTML = '<div class="tete" title="Glisse ici pour déplacer la palette"><span class="poig">⠿</span><span class="tit">Objets</span></div>'
     + '<div class="onglets" role="tablist"><button data-tab="formes" role="tab">Formes</button><button data-tab="iso" role="tab" title="Objets isométriques (plomberie, chauffage)">Iso</button><button data-tab="elec" role="tab">Électricité</button></div>'
     + '<div class="grp" data-g="formes"><div class="cgrid cform">' + Object.keys(FORMES).map(k => '<button data-f="' + k + '" title="' + FORMES[k].n + '"><canvas width="120" height="64"></canvas><span>' + FORMES[k].n + '</span></button>').join("") + '</div>'
-    + '<div class="aide">Choisis une forme, puis <b>glisse</b> sur le tableau. Pour <b>déplacer</b> une forme, glisse-la par son trait. <b>Double-clic</b> : choisir la cote, l\'angle, le rayon ou le numéro. Le bouton Supprimer l\'efface.</div></div>'
+    + '<div class="aide">Choisis une forme, puis <b>glisse</b> sur le tableau. Pour <b>déplacer</b> une forme, glisse-la par son trait; tire un <b>carré blanc</b> pour la grandir. <b>Double-clic</b> : choisir la cote, l\'angle, le rayon ou le numéro. Le bouton Supprimer l\'efface.</div></div>'
     + '<div class="grp" data-g="iso"><div class="cgrid ciso">' + Object.keys(OBJETS).map(k => '<button data-k="' + k + '" title="' + OBJETS[k].n + '"><canvas width="120" height="64"></canvas><span>' + OBJETS[k].n + '</span></button>').join("") + '</div>'
     + '<div class="aide">Clique sur la grille pour poser l\'objet. Les tuyaux raccordés le suivent.</div></div>'
     + '<div class="grp" data-g="elec"><button id="objSch" class="sch-btn" title="Circuits prêts à utiliser et tableaux enregistrés">📋 Modèles et mes schémas</button>' + ELEC_CAT.map(([cg, cn]) => '<button class="cat" data-cat="' + cg + '">' + cn + '</button><div class="cgrid" data-cat="' + cg + '">'
@@ -3278,7 +3283,9 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     if (RD.eraser){ cur = "erase"; eraseAt(pt(e)); return; }
     if (RD.text || (RD.obj && !RD.formeK)){ e.preventDefault(); return; }
     const q = pt(e);
-    if (RD.obj && RD.formeK){ const hit = formeSous((r => [(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height])(c.getBoundingClientRect()));
+    if (RD.obj && RD.formeK){ const brut = (r => [(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height])(c.getBoundingClientRect()), ip = poigneeSous(SELO.s, brut);
+      if (ip >= 0){ cur = { poignee:ip, s:SELO.s, snap:false }; return; }               /* agrandir / rapetisser par une poignée */
+      const hit = formeSous(brut);
       if (hit && dernierF.s === hit && e.timeStamp - dernierF.t < 450){ dernierF = { s:null, t:0 }; SELO.s = hit; redrawInk(); majObjUI(); modifierForme(hit, e.clientX, e.clientY); return; }
       if (hit) dernierF = { s:hit, t:e.timeStamp };
       if (hit){ SELO.s = hit; cur = { bouge:hit, q0:q, p0:hit.p.map(v => v.slice()), snap:false }; redrawInk(); majObjUI(); return; }
@@ -3311,6 +3318,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
   c.addEventListener("pointermove", e => {
     if (!cur) return;
     if (cur === "erase"){ eraseAt(pt(e)); return; }
+    if (cur.poignee !== undefined){ if (!cur.snap){ snapInk(); cur.snap = true; } cur.s.p[cur.poignee] = pt(e); if (!rafTrait) rafTrait = requestAnimationFrame(() => { rafTrait = 0; redrawInk(); }); return; }
     if (cur.bouge){ const q = pt(e), dx = q[0] - cur.q0[0], dy = q[1] - cur.q0[1];
       if (!cur.snap){ if (Math.hypot(dx, dy) < .002) return; snapInk(); cur.snap = true; }
       cur.bouge.p = cur.p0.map(v => [v[0] + dx, v[1] + dy]); if (!rafTrait) rafTrait = requestAnimationFrame(() => { rafTrait = 0; redrawInk(); }); return; }
@@ -3320,7 +3328,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
   });
   ["pointerup", "pointercancel"].forEach(t => c.addEventListener(t, () => {
     if (rafTrait){ cancelAnimationFrame(rafTrait); rafTrait = 0; }
-    if (cur && cur.bouge){ cur = null; redrawInk(); return; }
+    if (cur && (cur.bouge || cur.poignee !== undefined)){ cur = null; redrawInk(); return; }
     const finTrait = cur && cur !== "erase";
     RD.erSnap = false;
     if (cur && cur !== "erase" && cur.t && FORMES_CLIC[cur.t]){ const a = cur.p[0], b = cur.p[1]; if (Math.hypot(a[0] - b[0], a[1] - b[1]) < .004){ const d = FORMES_CLIC[cur.t]; cur.p[1] = cur.t === "bulle" || cur.t === "cercle" ? [a[0] + d, a[1]] : [a[0] + d, a[1] + d * 1.6]; } }
