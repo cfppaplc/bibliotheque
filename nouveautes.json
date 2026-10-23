@@ -6,11 +6,11 @@
   "texte": "Une seule ligne d'outils, plus simple pour débuter. Nouveau : le bouton Objets a trois onglets — Formes (utiles en classe), Iso (plomberie) et Électricité (symboles).",
   "formation": [
    {
-    "t": "Le bouton crayon (sa pointe montre la couleur choisie) : touche-le pour l'activer (les couleurs et l'épaisseur s'ouvrent), touche-le encore pour le désactiver (le tableau ne dessine plus rien). L'épaisseur se règle avec une glissière, de 1 à 40.",
+    "t": "Le bouton crayon (sa pointe montre la couleur) : touche-le pour l'activer, le menu s'ouvre avec la couleur, le tracé (trait libre, ligne, flèche, rectangle, ellipse) et l'épaisseur (glissière de 1 à 40). Touche-le encore pour le désactiver.",
     "img": "nouveautes/barre-couleur.jpg"
    },
    {
-    "t": "Sur la ligne : forme (trait libre, ligne, flèche, rectangle, ellipse), texte, objets, gomme, annuler, fond.",
+    "t": "Sur la ligne : crayon, texte, objets, gomme, annuler, fond.",
     "img": "nouveautes/barre.jpg"
    },
    {
@@ -70,6 +70,10 @@
    "Le crayon réagit maintenant tout de suite : seul le trait en cours est redessiné pendant que tu écris, le reste du tableau ne bouge pas."
   ],
   "versions": [
+   {
+    "date": "2026-10-23",
+    "texte": "Le bouton Forme quitte la barre : le tracé (libre, ligne, flèche, rectangle, ellipse) se choisit dans le menu du crayon."
+   },
    {
     "date": "2026-10-23",
     "texte": "Le bouton couleur devient un symbole de crayon (pointe et trait dans la couleur choisie)."
