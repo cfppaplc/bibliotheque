@@ -2487,13 +2487,14 @@ function poigneeSous(s, q){ if (!s || !s.t || !FORMES[s.t] || !strokes().include
   if (s.t === "cote"){ const [mx, my] = milieuCote(s, W, H); if (Math.hypot(mx - q[0] * W, my - q[1] * H) < tol * 1.1) return 2; }
   for (let i = 1; i >= 0; i--){ if (i === 0 && (s.t === "bulle" || s.t === "cercle")) continue; if (Math.hypot((s.p[i][0] - q[0]) * W, (s.p[i][1] - q[1]) * H) < tol) return i; } return -1; }
 /* forme sous le doigt (la plus récente d'abord) : près de son trait, ou n'importe où dans une petite forme */
-function formeSous(q){ const c = $("#inkCanvas"), W = c.width, H = c.height, tol = 14 * (window.devicePixelRatio || 1), arr = strokes();
+function formeSous(q){ const c = $("#inkCanvas"), W = c.width, H = c.height, tol = 14 * (window.devicePixelRatio || 1), arr = strokes(); let dedans = null;
   for (let i = arr.length - 1; i >= 0; i--){ const s = arr[i]; if (!s.t || !FORMES[s.t] || !s.p || s.p.length < 2) continue;
     const P = pointsTrait(s), x = q[0] * W, y = q[1] * H; let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
     for (let j = 0; j < P.length; j++){ const px = P[j][0] * W, py = P[j][1] * H; x0 = Math.min(x0, px); x1 = Math.max(x1, px); y0 = Math.min(y0, py); y1 = Math.max(y1, py);
       if (j && distSeg([x, y], [P[j - 1][0] * W, P[j - 1][1] * H], [px, py], 1) < (s.t === "cote" ? tol * 2.4 : tol)) return s; }   /* cote : on peut toucher son texte */
-    if (x1 - x0 < 90 * (window.devicePixelRatio || 1) && y1 - y0 < 90 * (window.devicePixelRatio || 1) && x > x0 - tol && x < x1 + tol && y > y0 - tol && y < y1 + tol) return s; }
-  return null; }
+    const petite = x1 - x0 < 90 * (window.devicePixelRatio || 1) && y1 - y0 < 90 * (window.devicePixelRatio || 1), fermee = !/^(ligne|fleche|fleche2|cote|angle|axes|accolade)$/.test(s.t);
+    if ((petite || fermee) && x > x0 - tol && x < x1 + tol && y > y0 - tol && y < y1 + tol){ const aire = (x1 - x0) * (y1 - y0); if (!dedans || aire < dedans[1]) dedans = [s, aire]; } }   /* l'intérieur compte aussi (la plus petite forme gagne) */
+  return dedans ? dedans[0] : null; }
 /* double-clic sur une forme : choisir sa valeur (cote, angle, rayon, numéro de bulle) */
 const VALEURS_FORME = {
   cote:{ q:"Cote (ex. 1200 mm, 4'-6\")", ex:"1200 mm" },
@@ -2551,7 +2552,7 @@ function tapElement(o, e){ if (!o || !e) return; const t = performance.now(), d 
 function ongletPour(o){ return o.t !== "objet" ? "formes" : ELEC[o.k] ? "elec" : "iso"; }
 function choisirAutre(o){ const t = ongletPour(o), isoBg = !!RD.wb && /^iso/.test(wbBg());
   if ((t === "iso" && !isoBg) || (t === "elec" && !modeElec())){ aviser(t === "iso" ? "Cet objet isométrique se modifie sur le fond « plan isométrique » (bouton Fond)." : "Ce symbole électrique se modifie sur le fond quadrillé (bouton Fond).", 4500); return false; }
-  RD.objTab = t; RD.formeK = t === "formes" ? (RD.formeK || "fleche") : null; SELO.s = o; majObjUI(); redrawInk(); return true; }
+  if (RD.objTab !== t){ RD.formeK = null; RD.objKi = null; RD.objKe = null; } RD.objTab = t; SELO.s = o; majObjUI(); redrawInk(); return true; }
 /* objet (iso ou électrique) sous le doigt, le plus récent d'abord */
 function objetSous(q){ const c = $("#inkCanvas"), arr = strokes(), x = q[0] * c.width, y = q[1] * c.height;
   for (let i = arr.length - 1; i >= 0; i--){ const s = arr[i]; if (s.t !== "objet" || s.k === "fil") continue; const G = objGeo(s, c.width, c.height); if (x >= G.bbox[0] - 4 && x <= G.bbox[2] + 4 && y >= G.bbox[1] - 4 && y <= G.bbox[3] + 4) return s; } return null; }
@@ -2568,7 +2569,7 @@ function pointsTrait(s){
   else if (s.t === "angle"){ seg(a, b); seg(a, [a[0] + Math.hypot(b[0] - a[0], b[1] - a[1]), a[1]]); }
   else if (s.t === "cercle" || s.t === "bulle"){ const cv = $("#inkCanvas"), W = cv.width || 1, H = cv.height || 1, r = Math.hypot((b[0] - a[0]) * W, (b[1] - a[1]) * H); for (let i = 0; i < 72; i++){ const t = i / 72 * Math.PI * 2; out.push([a[0] + r * Math.cos(t) / W, a[1] + r * Math.sin(t) / H]); } out.push(a); }
   else if (FORMES[s.t] && s.t !== "ellipse"){ const x0 = Math.min(a[0], b[0]), x1 = Math.max(a[0], b[0]), y0 = Math.min(a[1], b[1]), y1 = Math.max(a[1], b[1]);
-    seg([x0, y0], [x1, y0]); seg([x1, y0], [x1, y1]); seg([x1, y1], [x0, y1]); seg([x0, y1], [x0, y0]); seg([x0, y0], [x1, y1]); }
+    seg([x0, y0], [x1, y0]); seg([x1, y0], [x1, y1]); seg([x1, y1], [x0, y1]); seg([x0, y1], [x0, y0]); }   /* contour seulement (une diagonale faisait choisir la mauvaise forme) */
   else if (s.t === "rect"){ const c1 = [a[0], a[1]], c2 = [b[0], a[1]], c3 = [b[0], b[1]], c4 = [a[0], b[1]]; seg(c1, c2); seg(c2, c3); seg(c3, c4); seg(c4, c1); }
   else { const cx = (a[0] + b[0]) / 2, cy = (a[1] + b[1]) / 2, rx = Math.abs(b[0] - a[0]) / 2, ry = Math.abs(b[1] - a[1]) / 2; for (let i = 0; i < 72; i++){ const t = i / 72 * Math.PI * 2; out.push([cx + rx * Math.cos(t), cy + ry * Math.sin(t)]); } }
   return out;
@@ -3047,9 +3048,8 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
   /* onglet : Formes, Isométrique (fond iso) ou Électricité (fond quadrillé) */
   const isoBg = !!RD.wb && /^iso/.test(wbBg());
   if (!RD.objTab || (RD.objTab === "iso" && !isoBg) || (RD.objTab === "elec" && !modeElec())) RD.objTab = modeElec() ? "elec" : isoBg ? "iso" : "formes";
-  if (RD.objTab === "formes" && !RD.formeK) RD.formeK = "fleche";
   if (RD.objTab !== "formes") RD.formeK = null;
-  const tab = RD.objTab, el = tab === "elec"; RD.objK = el ? (RD.objKe || "fil") : (RD.objKi || "plinthe");
+  const tab = RD.objTab, el = tab === "elec"; RD.objK = el ? (RD.objKe || null) : (RD.objKi || null);   /* aucun outil par défaut : on choisit, déplace et nomme */
   b.querySelectorAll("[data-tab]").forEach(x => { x.classList.toggle("on", x.dataset.tab === tab); x.disabled = x.dataset.tab !== "formes" && !RD.wb; x.setAttribute("aria-selected", x.dataset.tab === tab); });
   b.querySelectorAll(".grp").forEach(x => x.hidden = x.dataset.g !== tab); b.querySelectorAll(".grpE").forEach(x => x.hidden = !el);
   b.querySelectorAll("[data-f]").forEach(x => x.classList.toggle("on", x.dataset.f === RD.formeK));
@@ -3073,9 +3073,9 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
   bar.innerHTML = '<div class="tete" title="Glisse ici pour déplacer la palette"><span class="poig">⠿</span><span class="tit">Objets</span></div>'
     + '<div class="onglets" role="tablist"><button data-tab="formes" role="tab">Formes</button><button data-tab="iso" role="tab" title="Objets isométriques (plomberie, chauffage)">Iso</button><button data-tab="elec" role="tab">Électricité</button></div>'
     + '<div class="grp" data-g="formes"><div class="cgrid cform">' + Object.keys(FORMES).map(k => '<button data-f="' + k + '" title="' + FORMES[k].n + '"><canvas width="120" height="64"></canvas><span>' + FORMES[k].n + '</span></button>').join("") + '</div>'
-    + '<div class="aide">Choisis une forme, puis <b>glisse</b> sur le tableau. Pour <b>déplacer</b> une forme, touche-la, puis glisse-la par son trait; tire un <b>carré blanc</b> pour la grandir (cote : le <b>carré bleu</b> l\'éloigne de l\'objet). <b>Double-clic</b> : choisir la cote, l\'angle, le rayon ou le numéro. Le bouton Supprimer l\'efface.</div></div>'
+    + '<div class="aide"><b>Touche</b> une forme pour la choisir : glisse-la pour la déplacer, tire un <b>carré blanc</b> pour la grandir. <b>Double-clic</b> : écrire la cote, l\'angle ou un nom. Pour en <b>ajouter</b> : choisis une forme ci-dessous, puis glisse sur le tableau. <b>Clic à côté</b> : plus rien de choisi.</div></div>'
     + '<div class="grp" data-g="iso"><div class="cgrid ciso">' + Object.keys(OBJETS).map(k => '<button data-k="' + k + '" title="' + OBJETS[k].n + '"><canvas width="120" height="64"></canvas><span>' + OBJETS[k].n + '</span></button>').join("") + '</div>'
-    + '<div class="aide">Clique sur la grille pour poser l\'objet. Les tuyaux raccordés le suivent.</div></div>'
+    + '<div class="aide"><b>Touche</b> un objet pour le choisir et le déplacer (les tuyaux raccordés suivent), <b>double-clic</b> pour le nommer. Pour en <b>poser</b> un : choisis-le ci-dessous, puis clique sur la grille. <b>Clic à côté</b> : plus rien de choisi.</div></div>'
     + '<div class="grp" data-g="elec"><button id="objSch" class="sch-btn" title="Circuits prêts à utiliser et tableaux enregistrés">📋 Modèles et mes schémas</button>' + ELEC_CAT.map(([cg, cn]) => '<button class="cat" data-cat="' + cg + '">' + cn + '</button><div class="cgrid" data-cat="' + cg + '">'
       + Object.keys(ELEC).filter(k => ELEC[k].g === cg).map(k => '<button data-k="' + k + '" title="' + ELEC[k].n.replace(/^[✎•] /, "") + '"><canvas width="120" height="64"></canvas><span>' + (ELEC[k].c || ELEC[k].n.replace(/^[✎•] /, "")) + '</span></button>').join("") + '</div>').join("") + '</div>'
     + '<div class="aide grpE">Pour relier : glisse d\'un <b>point bleu</b> à l\'autre</div>'
@@ -3112,12 +3112,12 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     if (k === "terre"){ dessinerElec(g, { t:"objet", k, p:[[.5, 14 / H]], lb:"", __u:40 }, W, H, 1.2, "#24282c"); return; }
     const U = k === "transfo" ? 17 : 34, w = k === "transfo" ? 4 : 2, y0 = k === "transfo" ? 18 : (k === "bp" ? 40 : k === "contactT" ? 44 : 36);
     dessinerElec(g, { t:"objet", k, p:[[(W - w * U) / 2 / W, y0 / H]], lb:{ bobine:"CR", moteur:"M" }[k] || "", nf:0, __u:U }, W, H, 1.2, "#24282c"); });
-  bar.querySelectorAll("[data-k]").forEach(b => b.onclick = () => { if (ELEC[b.dataset.k]) RD.objKe = b.dataset.k; else RD.objKi = b.dataset.k; RD.formeK = null; SELO.s = null; redrawInk(); majObjUI(); });
+  bar.querySelectorAll("[data-k]").forEach(b => b.onclick = () => { const k = b.dataset.k, deja = RD.objK === k; if (ELEC[k]) RD.objKe = deja ? null : k; else RD.objKi = deja ? null : k; RD.formeK = null; SELO.s = null; redrawInk(); majObjUI(); });
   /* vignettes des formes (dessinées avec le vrai moteur) */
   const P_FORME = { cercle:[[.5, .5], [.8, .5]], bulle:[[.5, .5], [.68, .5]], angle:[[.25, .8], [.75, .2]], fleche:[[.15, .7], [.85, .3]], fleche2:[[.15, .5], [.85, .5]], cote:[[.15, .55], [.85, .55]], ligne:[[.15, .75], [.85, .25]] };
   bar.querySelectorAll("[data-f]").forEach(b => { const t = b.dataset.f, cv = b.querySelector("canvas"), g = cv.getContext("2d"), W = cv.width, H = cv.height, wb = RD.wb; RD.wb = false;
     try { drawStroke(g, { t, c:"#24282c", hl:false, hc:null, w:2.2, n:1, p:P_FORME[t] || [[.3, .15], [.7, .85]] }, W, H, 1); } catch(e){} RD.wb = wb;
-    b.onclick = () => { RD.formeK = t; SELO.s = null; redrawInk(); majObjUI(); }; });
+    b.onclick = () => { RD.formeK = RD.formeK === t ? null : t; SELO.s = null; redrawInk(); majObjUI(); }; });
   /* vignettes des objets isométriques : on dessine l'objet à petite échelle puis on le centre */
   bar.querySelectorAll(".ciso [data-k]").forEach(b => { const k = b.dataset.k, cv = b.querySelector("canvas"), g = cv.getContext("2d"), W = cv.width, H = cv.height;
     const z0 = RD.z, dpr = window.devicePixelRatio || 1;
@@ -3129,8 +3129,8 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
   bar.querySelectorAll("[data-tab]").forEach(b => b.onclick = () => { const t = b.dataset.tab;
     if (t !== "formes" && !RD.wb){ aviser("Les objets isométriques et les symboles électriques se posent sur le tableau blanc (bouton Tableau blanc)."); return; }
     RD.objTab = t; SELO.s = null;
-    if (t === "formes"){ RD.formeK = RD.formeK || "fleche"; }
-    else { RD.formeK = null; const voulu = t === "iso" ? /^iso/ : /^quad$/;
+    RD.formeK = null; RD.objKi = null; RD.objKe = null;
+    if (t !== "formes"){ const voulu = t === "iso" ? /^iso/ : /^quad$/;
       if (!voulu.test(wbBg())){ wbEtat().bg[wbEtat().n] = t === "iso" ? "iso" : "quad"; majFond(); aviser(t === "iso" ? "Fond : plan isométrique." : "Fond : quadrillé (schéma électrique en échelle)."); } }
     redrawInk(); refreshTools(); });
   $("#objNF").onclick = () => { const s = SELO.s && strokes().includes(SELO.s) && ELEC[SELO.s.k] ? SELO.s : null;
@@ -3216,10 +3216,10 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     if (s.k === "rails"){ if (surRails(s, G, x, y, .1) && (RD.objK === "rails" || (y - G.oy) / G.u < .4)) return s; continue; }
     if (x >= G.bbox[0] - 4 && x <= G.bbox[2] + 4 && y >= G.bbox[1] - 4 && y <= G.bbox[3] + 4) return s; } return null; };
   c.addEventListener("pointerdown", e => {
-    if (!RD.obj || !RD.wb || RD.eraser || RD.sim || RD.formeK) return;
+    if (!RD.obj || !RD.wb || RD.eraser || RD.sim || RD.objTab === "formes") return;
     const q = cur(e), el = modeElec();
-    { const o = touche(q.raw); if (o && ongletPour(o) !== RD.objTab){ if (choisirAutre(o)) tapElement(o, e); return; }
-      if (!o && !(el && borneProche(q.raw))){ const f = formeSous(q.raw); if (f){ if (choisirAutre(f)) tapElement(f, e); return; } } }
+    { const o = touche(q.raw); if (o && ongletPour(o) !== RD.objTab){ e.stopImmediatePropagation(); if (choisirAutre(o)) tapElement(o, e); return; }
+      if (!o && !(el && borneProche(q.raw))){ const f = formeSous(q.raw); if (f){ e.stopImmediatePropagation(); if (choisirAutre(f)) tapElement(f, e); return; } } }   /* le crayon ne doit pas recevoir ce même clic */
     if (el && SELO.s && SELO.s.k === "rails" && strokes().includes(SELO.s)){           /* poignée de l'échelle : on change sa largeur et sa hauteur */
       const o = SELO.s, G = objGeo(o, c.width, c.height), [w, h] = o.sz || [8, 10], cx = G.ox + w * G.u, cy = G.oy + h * G.u;
       if (Math.hypot(q.raw[0] * c.width - cx, q.raw[1] * c.height - cy) < G.u * .6){
@@ -3227,6 +3227,8 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
         mv = { redim:o, w0:w, h0:h, q0:q.snap, fixes:strokes().filter(f => f.t === "ligne" && f.fil).flatMap(f => [0, 1].filter(i => Math.abs(f.p[i][0] - x2) * c.width < 2).map(i => [f, i])) };
         redrawInk(); return; }
     }
+    if (!touche(q.raw) && !(el && borneProche(q.raw)) && (!RD.objK || (SELO.s && strokes().includes(SELO.s) && !/^(fil|rails|serpentin)$/.test(RD.objK)))){   /* clic à côté : rien de choisi, aucun outil */
+      const avait = !!(SELO.s || RD.objK); SELO.s = null; if (RD.objK){ RD.objKi = null; RD.objKe = null; } if (avait){ redrawInk(); majObjUI(); } return; }
     if (el && RD.objK !== "jonction"){
       const b = borneProche(q.raw), h0 = b ? null : touche(q.raw);
       if (b || (RD.objK === "fil" && !h0)){                                    /* fil : on part d'une borne (ou d'un point de la grille avec l'outil Fil) */
@@ -3241,7 +3243,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
       strokes().forEach(s => { if (s.t !== "ligne" || !s.p) return; [0, 1].forEach(i => { const px = s.p[i][0] * c.width, py = s.p[i][1] * c.height; if (G.ports.some(pt => Math.hypot(pt[0] - px, pt[1] - py) < 4)) liens.push([s, i]); }); });
       mv = { s:hit, q0:q.snap, p0:[hit.p[0][0], hit.p[0][1]], liens:liens.map(([s, i]) => [s, i, s.p[i][0], s.p[i][1]]), snap:false };
     } else if (RD.objK === "serpentin" || (el && RD.objK === "rails")){
-      mv = { zone:true, q0:q.snap, el };                                                         /* zone à remplir : on glisse d'un coin à l'autre */
+      mv = { zone:true, q0:q.snap, el, raz:!!(SELO.s && strokes().includes(SELO.s)) };                                                         /* zone à remplir : on glisse d'un coin à l'autre */
     } else {
       snapInk(); const o = { t:"objet", k:RD.objK, o:RD.objO, c:/^hl/.test(RD.color) ? "#24282c" : RD.color, p:[q.snap], w:4 };
       if (el){ const de = ELEC[RD.objK]; if (de.lb) o.lb = RD.lbK[RD.objK] || de.lb; if (de.nf) o.nf = RD.objNF ? 1 : 0; if (RD.objK === "inter") o.pol = RD.objPol || "spst"; if (RD.objK === "bobineT") o.del = 3; }
@@ -3265,7 +3267,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
   });
   ["pointerup", "pointercancel"].forEach(t => c.addEventListener(t, ev => {
     if (mv && mv.s && !mv.snap && ev.type === "pointerup") tapElement(mv.s, ev);      /* toucher sans bouger : compte pour le double-clic (renommer) */
-    if (mv && mv.fil){ if (mv.segs.length){ jonctionsAuto(mv.segs); nettoyerFils(); } else (UNDO[inkKey()] || []).pop(); mv = null; redrawInk(); majObjUI(); return; }
+    if (mv && mv.fil){ if (mv.segs.length){ jonctionsAuto(mv.segs); nettoyerFils(); } else { (UNDO[inkKey()] || []).pop(); if (!mv.B || mv.B === mv.A){ RD.objKe = null; SELO.s = null; } }   /* clic sans tracer : retour à aucun outil */ mv = null; redrawInk(); majObjUI(); return; }
     if (mv && mv.s && mv.snap && ELEC[mv.s.k]){                                  /* symbole déplacé : ses fils restent droits (un coude s'ajoute au besoin) */
       const ux = elecU() / c.width, uy = elecU() / c.height;
       mv.liens.forEach(([f, i, x0, y0]) => { const M = f.p[i].slice(), F = f.p[1 - i]; if (Math.abs(M[0] - F[0]) * c.width <= 2 || Math.abs(M[1] - F[1]) * c.height <= 2) return;
@@ -3275,6 +3277,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
         else { const K = horiz ? [F[0], M[1]] : [M[0], F[1]]; f.p[i] = K; strokes().push(nouveauFil(K, M)); } });
       nettoyerFils(); redrawInk();
     }
+    if (mv && mv.zone && mv.raz && (!mv.q1 || Math.hypot((mv.q1[0] - mv.q0[0]) * c.width, (mv.q1[1] - mv.q0[1]) * c.height) < 6)){ if (mv.box) mv.box.remove(); RD.objKi = null; RD.objKe = null; SELO.s = null; mv = null; redrawInk(); majObjUI(); return; }
     if (mv && mv.zone && mv.el){
       if (mv.box) mv.box.remove();
       const r = c.getBoundingClientRect(), u = 34 * RD.z, q1 = mv.q1 || mv.q0;
@@ -3343,17 +3346,22 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     if (!(RD.pen || RD.wb) || RD.sim) return;
     c.setPointerCapture(e.pointerId);
     if (RD.eraser){ cur = "erase"; eraseAt(pt(e)); return; }
-    if (RD.text || (RD.obj && !RD.formeK)){ e.preventDefault(); return; }
+    if (RD.text || (RD.obj && RD.objTab !== "formes")){ e.preventDefault(); return; }
     const q = pt(e);
-    if (RD.obj && RD.formeK){ const brut = (r => [(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height])(c.getBoundingClientRect()), ip = poigneeSous(SELO.s, brut);
+    if (RD.obj){ const brut = (r => [(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height])(c.getBoundingClientRect()), ip = poigneeSous(SELO.s, brut);
       if (ip >= 0){ cur = { poignee:ip, s:SELO.s, snap:false, x0:e.clientX, y0:e.clientY }; return; }               /* agrandir / rapetisser par une poignée */
       const hit = formeSous(brut);
       if (hit && hit === SELO.s){ cur = { bouge:hit, q0:q, p0:hit.p.map(v => v.slice()), snap:false, x0:e.clientX, y0:e.clientY }; return; }   /* forme déjà choisie : on la glisse */
-      var choisir = hit || (RD.wb ? objetSous(brut) : null);     /* forme pas encore choisie : un simple clic la choisit, mais glisser trace une nouvelle forme (ex. une cote qui part du coin d'un rectangle) */
-      if (SELO.s){ SELO.s = null; majObjUI(); } }
+      const obj = !hit && RD.wb ? objetSous(brut) : null;
+      if (!RD.formeK){           /* aucun outil : toucher = choisir (et glisser = déplacer); toucher à côté = rien de choisi */
+        if (hit){ SELO.s = hit; redrawInk(); majObjUI(); cur = { bouge:hit, q0:q, p0:hit.p.map(v => v.slice()), snap:false, x0:e.clientX, y0:e.clientY }; return; }
+        if (obj){ if (choisirAutre(obj)) tapElement(obj, e); return; }
+        if (SELO.s){ SELO.s = null; redrawInk(); majObjUI(); } e.preventDefault(); return; }
+      var choisir = hit || obj;     /* forme pas encore choisie : un simple clic la choisit, mais glisser trace une nouvelle forme (ex. une cote qui part du coin d'un rectangle) */
+      var raz = !!SELO.s; if (SELO.s){ SELO.s = null; majObjUI(); } }
     cur = { c:/^hl/.test(RD.color) ? "#000" : RD.color, hl:/^hl/.test(RD.color), hc:/^hl:/.test(RD.color) ? RD.color.slice(3) : null, w:WIDTHS[RD.wIdx], p:[q] };
     const forme = RD.obj && RD.formeK ? RD.formeK : RD.shape;
-    if (forme){ cur.t = forme; cur.p = [q, q]; if (RD.obj && RD.formeK && choisir) cur.choisir = choisir; if (forme === "bulle") cur.n = strokes().filter(x => x.t === "bulle").length + 1; }
+    if (forme){ cur.t = forme; cur.p = [q, q]; if (RD.obj && RD.formeK && choisir) cur.choisir = choisir; if (RD.obj && RD.formeK && raz && !choisir) cur.raz = true; if (forme === "bulle") cur.n = strokes().filter(x => x.t === "bulle").length + 1; }
     /* Trait en cours, rapide : on garde une image de tout le reste et, à chaque image, on redessine seulement le trait en cours par-dessus */
     snapInk(); redrawInk();
     if (cur.t || cur.hl){       /* forme ou surligneur : on garde une copie de tout le reste */
@@ -3399,11 +3407,15 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     if (cur && cur.choisir){ const a = cur.p[0], b = cur.p[1]; if (Math.hypot(a[0] - b[0], a[1] - b[1]) < .004){       /* simple clic sur une forme : on la choisit */
       const arr = strokes(), i = arr.indexOf(cur); if (i >= 0){ arr.splice(i, 1); (UNDO[inkKey()] || []).pop(); } const ch = cur.choisir; cur = null; fond = null; if (ch.t === "objet"){ redrawInk(); choisirAutre(ch); tapElement(ch, tap); return; } SELO.s = ch; redrawInk(); majObjUI(); tapElement(ch, tap); return; }
       delete cur.choisir; }
+    if (cur && cur.raz){ const a = cur.p[0], b = cur.p[1]; if (Math.hypot(a[0] - b[0], a[1] - b[1]) < .004){        /* clic à côté d'une forme choisie : retour à aucun outil */
+      const arr = strokes(), i = arr.indexOf(cur); if (i >= 0){ arr.splice(i, 1); (UNDO[inkKey()] || []).pop(); } cur = null; fond = null; RD.formeK = null; redrawInk(); majObjUI(); return; }
+      delete cur.raz; }
     const finTrait = cur && cur !== "erase";
     RD.erSnap = false;
     if (cur && cur !== "erase" && cur.t && FORMES_CLIC[cur.t]){ const a = cur.p[0], b = cur.p[1]; if (Math.hypot(a[0] - b[0], a[1] - b[1]) < .004){ const d = FORMES_CLIC[cur.t]; cur.p[1] = cur.t === "bulle" || cur.t === "cercle" ? [a[0] + d, a[1]] : [a[0] + d, a[1] + d * 1.6]; } }
     if (cur && cur !== "erase" && cur.t){ const a = cur.p[0], b = cur.p[1]; if (Math.hypot(a[0] - b[0], a[1] - b[1]) < .004){ const arr = strokes(), i = arr.indexOf(cur); if (i >= 0){ arr.splice(i, 1); (UNDO[inkKey()] || []).pop(); } redrawInk(); } }
     if (cur && cur !== "erase" && RD.wb && /^iso/.test(wbBg())){ const seg = decouperIso(cur), arr = strokes(), k = arr.indexOf(cur); if (seg && k >= 0){ arr.splice(k, 1, ...seg); redrawInk(); } }
+    if (cur && cur !== "erase" && cur.t && RD.obj && RD.formeK && strokes().includes(cur)){ SELO.s = cur; majObjUI(); }
     cur = null; fond = null;
     if (finTrait) redrawInk();          /* dessin complet une fois le trait terminé (et sauvegarde) */
   }));
@@ -3854,9 +3866,9 @@ majEpaisseur();
   majCouleurCrayon();
 })();
 $("#penE").onclick = () => { RD.eraser = !RD.eraser; if (RD.eraser){ RD.text = false; RD.obj = false; } refreshTools(); };
-$("#penO").onclick = () => { RD.obj = !RD.obj; if (RD.obj){ RD.text = false; RD.eraser = false; RD.objTab = null; }
+$("#penO").onclick = () => { RD.obj = !RD.obj; if (RD.obj){ RD.text = false; RD.eraser = false; RD.objTab = null; RD.formeK = null; RD.objKi = null; RD.objKe = null; SELO.s = null; }
   refreshTools();
-  if (RD.obj) aviser(modeElec() ? "Schéma en échelle : 1) « Échelle L1 / L2 » et glisse pour tracer les rails. 2) Choisis un symbole et clique sur un échelon. 3) Pour relier : pars d'un point bleu et glisse jusqu'à l'autre point bleu." : RD.objTab === "iso" ? "Choisis un objet, puis clique sur la grille. Clique un objet pour le déplacer : les tuyaux raccordés le suivent." : "Choisis une forme, puis glisse sur le tableau. Pour déplacer une forme, touche-la, puis glisse-la. Onglets Iso et Électricité : objets de plomberie et symboles électriques.", modeElec() ? 10000 : 0); };
+  if (RD.obj) aviser(modeElec() ? "Schéma en échelle : 1) « Échelle L1 / L2 » et glisse pour tracer les rails. 2) Choisis un symbole et clique sur un échelon. 3) Pour relier : pars d'un point bleu et glisse jusqu'à l'autre point bleu." : RD.objTab === "iso" ? "Touche un objet pour le choisir, double-clic pour le nommer. Pour en poser un : choisis-le dans la palette, puis clique sur la grille." : "Touche une forme pour la choisir, double-clic pour écrire sa valeur. Pour en ajouter : choisis une forme dans la palette, puis glisse. Clic à côté : plus rien de choisi.", modeElec() ? 10000 : 0); };
 $("#penT").onclick = () => { RD.text = !RD.text; if (RD.text){ RD.eraser = false; RD.obj = false; } refreshTools(); if (RD.text) aviser("Dessine un rectangle, puis écris dedans. Entrée valide (Maj+Entrée = nouvelle ligne)."); };
 $("#wbZo").onclick = zout; $("#wbZi").onclick = zin; $("#penU").onclick = undoInk; $("#penR").onclick = redoInk;
 $("#penC").onclick = () => { if (!strokes().length) return; snapInk(); INKS[inkKey()] = []; redrawInk(); };
