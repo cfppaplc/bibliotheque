@@ -48,7 +48,7 @@
   masque la barre propre au livre (`HOSTCSS`) et fournit sa propre barre (`#tb`) identique pour tous.
   `buildDriver(win)` détecte le « moteur » du livre et retourne `{ state(), goto(n), modules(), … }` :
   moteur A (`#ui #bp #pg #br`, pages `.page.vis`), moteur B (`#prev #count`), pages empilées (`#book>.page`, protection incendie), pages affichées une à une par la bibliothèque (`.page.hcur`, livre C13),
-  document qui défile (`defile:true`). `turn(±1)`, `setZoom`, `ZL`, `zPleineLargeur()`, mode simple/double page (`RD.single/RD.dbl`).
+  document qui défile (`defile:true`). Boutons ‹ › : `avanceRapide()` (tenu enfoncé = pages qui défilent de plus en plus vite). `turn(±1)`, `setZoom`, `ZL`, `zPleineLargeur()`, mode simple/double page (`RD.single/RD.dbl`).
 - **`HOSTCSS`** : CSS injecté dans *tous* les livres. Contient la **transition de page commune** (`biblioPage`, sur `.page.vis` et `.page.hcur` : fondu + `translate`,
   pas `transform`, pour ne pas casser la mise à l'échelle des livres). Changer ici = changer tous les livres.
 - Ouvrir à une page : `?livre=<fichier>&page=N` ou `RD.allerA = N` avant `lire(l)` (`offrirReprise` revérifie et

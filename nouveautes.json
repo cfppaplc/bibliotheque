@@ -1,6 +1,35 @@
 [
  {
   "date": "2026-10-23",
+  "type": "outil",
+  "titre": "Lecture des livres : pages, table des matières et réponses",
+  "texte": "Même table des matières dans tous les livres, avec des icônes qui correspondent au type de section, et réponses pas à pas partout où le livre a un corrigé.",
+  "formation": [
+   "Tous les livres tournent leurs pages de la même façon : la nouvelle page apparaît en fondu doux, en montant légèrement. Rien à régler.",
+   "Avance rapide : tiens le bouton › (ou ‹ pour reculer) enfoncé. Après une demi-seconde, les pages défilent de plus en plus vite; le bouton devient rouge. Relâche quand tu es rendu.",
+   {
+    "t": "Touche M (ou ☰) dans un livre : la table des matières s'ouvre; clique une section pour y aller.",
+    "img": "nouveautes/livre-tdm.jpg"
+   },
+   {
+    "t": "Bouton ✓ (touche R) : chaque clic montre la réponse suivante de la page, pour corriger avec le groupe une question à la fois.",
+    "img": "nouveautes/livre-barre.jpg"
+   },
+   "Si le bouton ✓ est grisé, la page n'a pas de réponse."
+  ],
+  "versions": [
+   {
+    "date": "2026-10-23",
+    "texte": "Avance et recul rapides : tiens le bouton › ou ‹ enfoncé."
+   },
+   {
+    "date": "2026-10-22",
+    "texte": "Même transition douce entre les pages dans tous les livres (fondu léger, comme Plomberie et chauffage)."
+   }
+  ]
+ },
+ {
+  "date": "2026-10-23",
   "type": "ajout",
   "livre": "materiel-electrique-c13",
   "titre": "Entretien de matériel électrique (en construction)",
@@ -72,30 +101,6 @@
    {
     "date": "2026-10-22",
     "texte": "Ajout du cahier (version 15)."
-   }
-  ]
- },
- {
-  "date": "2026-10-22",
-  "type": "outil",
-  "titre": "Lecture des livres : pages, table des matières et réponses",
-  "texte": "Même table des matières dans tous les livres, avec des icônes qui correspondent au type de section, et réponses pas à pas partout où le livre a un corrigé.",
-  "formation": [
-   "Tous les livres tournent leurs pages de la même façon : la nouvelle page apparaît en fondu doux, en montant légèrement. Rien à régler.",
-   {
-    "t": "Touche M (ou ☰) dans un livre : la table des matières s'ouvre; clique une section pour y aller.",
-    "img": "nouveautes/livre-tdm.jpg"
-   },
-   {
-    "t": "Bouton ✓ (touche R) : chaque clic montre la réponse suivante de la page, pour corriger avec le groupe une question à la fois.",
-    "img": "nouveautes/livre-barre.jpg"
-   },
-   "Si le bouton ✓ est grisé, la page n'a pas de réponse."
-  ],
-  "versions": [
-   {
-    "date": "2026-10-22",
-    "texte": "Même transition douce entre les pages dans tous les livres (fondu léger, comme Plomberie et chauffage)."
    }
   ]
  },

@@ -597,6 +597,8 @@
 
 
   /* ===================== Téléphone (≤ 640 px) ===================== */
+  #tbPrev,#tbNext{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;touch-action:manipulation}
+  #tbPrev.rapide,#tbNext.rapide{background:#e50914!important;color:#fff!important;border-color:#e50914!important}
   .tabbar,.plus-ov{display:none}
   @media (max-width:640px){
     .hbtns{display:none}
@@ -3471,6 +3473,18 @@ document.addEventListener("keydown", e => {
 /* ---- Boutons ---- */
 $("#tbPrev").onclick = () => turn(-1);
 $("#tbNext").onclick = () => turn(1);
+/* Bouton tenu enfoncé = avance (ou recul) rapide : après une demi-seconde, les pages défilent de plus en plus vite */
+function avanceRapide(btn, dir){
+  let rep = null, t0 = 0, tenu = false;
+  const stop = () => { clearTimeout(rep); rep = null; btn.classList.remove("rapide"); setTimeout(() => { tenu = false; }, 50); };
+  btn.addEventListener("pointerdown", e => { if (e.button > 0) return; tenu = false; t0 = Date.now(); clearTimeout(rep);
+    const pas = () => { tenu = true; btn.classList.add("rapide"); RD.bouge = true; turn(dir); const dt = Date.now() - t0; rep = setTimeout(pas, dt > 2500 ? 110 : dt > 1200 ? 160 : 230); };
+    rep = setTimeout(pas, 450); });
+  ["pointerup", "pointercancel", "pointerleave", "lostpointercapture"].forEach(ev => btn.addEventListener(ev, stop));
+  btn.addEventListener("click", e => { if (tenu){ e.stopImmediatePropagation(); e.preventDefault(); tenu = false; } }, true);   /* pas de page en plus au relâchement */
+  btn.addEventListener("contextmenu", e => e.preventDefault());
+}
+avanceRapide($("#tbPrev"), -1); avanceRapide($("#tbNext"), 1);
 $("#tbPen").onclick = togglePen;
 $("#tbAns").onclick = answers;
 $("#tbAnim").onclick = toggleAnim;
