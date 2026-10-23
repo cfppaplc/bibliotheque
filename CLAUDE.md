@@ -66,6 +66,15 @@
     bouton « Tableau de bord » (touche E) dans tous les livres, « Revenir au livre » (touche L) sur le tableau.
     Le plein écran est demandé sur `document.documentElement` (jamais sur l'iframe) pour rester actif entre les deux.
 
+## Téléphone (≤ 640 px)
+- CSS dans le bloc « Téléphone (≤ 640 px) » de `index.html` : `.hbtns` cachés, barre d'onglets `#tabbar` en bas
+  (Accueil, Ma liste, Quoi de neuf, Plus → feuille `#plusOv` qui clique les boutons existants `#lienAide`, `#planBtn`, `#accueilBtn`, `#grosBtn`).
+- Fiche du livre en feuille montante, gros bouton « Lire ». Quoi de neuf en pleine largeur.
+- Lecteur : disposition de barre propre au téléphone (`DEF_TEL`, sauvée dans `tbLayoutTel`), gestes dans `brancherSouris` :
+  balayer = `turn(±1)`, toucher au milieu = cacher/montrer les barres. La pastille « Tableau de bord » est cachée.
+- `accueil.html` : boutons du haut en icônes seulement, nom du programme caché.
+- Tester avec `devices['iPhone 13']` de Playwright (les gestes : `new w.Touch` + `TouchEvent` dans l'iframe du livre).
+
 ## accueil.html — repères
 - Réglages dans `localStorage["accueil-atelier-v4"]` → objet `cfg` (fusionné avec `DEFAULTS`).
 - `COMPS` : `[code, nom, fond, programme]` pour chaque compétence (ex. `"436-282"`). `SCENES` : arrière-plans SVG animés par compétence.

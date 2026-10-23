@@ -595,6 +595,56 @@
   .wbboard[data-fond="noir"]{background:radial-gradient(ellipse at 50% 40%,#2b3133,#1a1f21)}
   .wbboard[data-fond="vert"]{background:radial-gradient(ellipse at 50% 40%,#2e6b52,#1d4a38)}
 
+
+  /* ===================== Téléphone (≤ 640 px) ===================== */
+  .tabbar,.plus-ov{display:none}
+  @media (max-width:640px){
+    .hbtns{display:none}
+    header{padding-left:14px;padding-right:14px}
+    .hero{min-height:0;padding:84px 16px 18px}
+    .hero h1{font-size:1.7rem;line-height:1.15}
+    .hero p{font-size:.95rem}
+    #filtres{flex-wrap:nowrap;overflow-x:auto;margin:0 0 18px;padding:0 16px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+    #filtres::-webkit-scrollbar{display:none}
+    .fchip{flex:none;padding:9px 15px}
+    body{padding-bottom:calc(64px + env(safe-area-inset-bottom,0px))}
+    footer{padding-bottom:20px}
+    .tabbar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:90;background:rgba(14,14,16,.94);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid #26262a;padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px))}
+    .tabbar button{flex:1;position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:0;color:#9a9aa2;font:600 .7rem "Segoe UI",Roboto,Arial,sans-serif;padding:6px 2px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+    .tabbar button[hidden]{display:none}
+    .tabbar button.on{color:#fff}
+    .tabbar button.on svg{color:#e50914}
+    .tab-point{position:absolute;top:4px;left:calc(50% + 8px);width:9px;height:9px;border-radius:50%;background:#e50914;box-shadow:0 0 0 2px #0e0e10}
+    .tab-point[hidden]{display:none}
+    .plus-ov{display:flex;position:fixed;inset:0;z-index:95;background:rgba(0,0,0,.55);align-items:flex-end}
+    .plus-ov[hidden]{display:none}
+    .plus-sheet{width:100%;background:#1a1a1d;border-radius:18px 18px 0 0;padding:8px 14px calc(14px + env(safe-area-inset-bottom,0px));animation:plusMonte .25s cubic-bezier(.2,.8,.2,1)}
+    @keyframes plusMonte{from{translate:0 100%}}
+    .plus-poignee{width:42px;height:5px;border-radius:3px;background:#3a3a40;margin:4px auto 10px}
+    .plus-sheet button{display:flex;align-items:center;gap:14px;width:100%;background:none;border:0;border-radius:12px;color:#f1f1f2;font:600 1.02rem "Segoe UI",Roboto,Arial,sans-serif;padding:15px 12px;text-align:left;cursor:pointer}
+    .plus-sheet button:active{background:#26262b}
+    .plus-sheet button svg{color:#e50914;flex:none}
+    .plus-sheet .plus-x{justify-content:center;margin-top:6px;background:#26262b;color:#d4d4d8}
+    /* fiche d'un livre : feuille plein écran, gros bouton « Lire » en haut */
+    .modal{padding:0;align-items:flex-end}
+    .panel{max-height:92vh;border-radius:18px 18px 0 0}
+    .panel-body{display:flex;flex-direction:column;padding:8px 18px 24px}
+    .panel-body .meta{order:1}
+    .panel-body #mRead,.panel-body #mFav{order:2;width:100%;justify-content:center;margin:8px 0 0;padding:14px}
+    .panel-body p{order:3}
+    /* Quoi de neuf : l'étiquette au-dessus du titre, le texte prend toute la largeur */
+    .qn-ov{padding:0;align-items:stretch}
+    .qn-it{gap:6px}
+    .qn-corps{flex-basis:100%}
+    /* lecteur : barre du haut compacte */
+    .reader-bar{gap:8px;padding-left:10px;padding-right:10px}
+    .reader-bar button{padding:8px 11px;font-size:.85rem;white-space:nowrap}
+    #readerTdb{font-size:0;gap:0;padding:8px 10px}
+    #readerTdb svg{width:18px;height:18px}
+    .tdb-pill,.reader.auto.calme .tdb-pill{display:none}
+    .reader.tdb #readerBack{font-size:0}
+    .reader.tdb #readerBack svg{width:18px;height:18px;margin:0}
+  }
   /* ---------- Projecteur, grand écran et tableau blanc interactif (TBI) : tailles adaptées ---------- */
   @media (pointer:coarse){
     .tb button{min-width:48px;height:48px}.tb input{height:48px}
@@ -640,6 +690,23 @@
 </header>
 
 <section class="hero" id="hero"></section>
+<!-- Téléphone : barre d'onglets en bas de l'écran (cachée sur ordinateur et au tableau) -->
+<nav class="tabbar" id="tabbar" aria-label="Navigation">
+  <button type="button" data-tab="all" class="on"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5L12 4l8 6.5V20H4z"/><path d="M10 20v-5h4v5"/></svg><span>Accueil</span></button>
+  <button type="button" data-tab="fav" hidden><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4h10v16l-5-3.5L7 20z"/></svg><span>Ma liste</span></button>
+  <button type="button" data-tab="qn"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span>Quoi de neuf</span><i class="tab-point" hidden></i></button>
+  <button type="button" data-tab="plus"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.9"/><circle cx="12" cy="12" r="1.9"/><circle cx="19" cy="12" r="1.9"/></svg><span>Plus</span></button>
+</nav>
+<div class="plus-ov" id="plusOv" hidden>
+  <div class="plus-sheet" role="dialog" aria-label="Plus">
+    <div class="plus-poignee" aria-hidden="true"></div>
+    <button type="button" data-plus="aide"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.6M12 17.2v.1"/></svg>Aide</button>
+    <button type="button" data-plus="plans"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4L3 6.5v13.5l6-2.5 6 2.5 6-2.5V4l-6 2.5zM9 4v13.5M15 6.5V20"/></svg>Plans techniques</button>
+    <button type="button" data-plus="accueil"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="4" width="17" height="12.5" rx="1.5"/><path d="M8 20h8M12 16.5V20"/></svg>Accueil de classe</button>
+    <button type="button" data-plus="gros"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19l5-14 5 14M5.8 14h6.4M15 19l3-8 3 8M16 16.5h4"/></svg>Texte plus gros</button>
+    <button type="button" class="plus-x" data-plus="x">Fermer</button>
+  </div>
+</div>
 <main id="rows"></main>
 
 <button class="hbtn classe-out" id="classeOut">Quitter le mode classe</button>
@@ -1489,6 +1556,18 @@ function brancherSouris(win){
   /* les barres reviennent quand la souris touche le haut ou le bas de l'écran, ou qu'on touche le bas */
   win.addEventListener("mousemove", e => { if (e.clientY < 70 || e.clientY > win.innerHeight - 110) afficherBarres(); }, { passive:true });
   win.addEventListener("touchstart", e => { const t = e.touches && e.touches[0]; if (t && (t.clientY < 50 || t.clientY > win.innerHeight - 70)) afficherBarres(); }, { passive:true });
+  /* Balayer à gauche ou à droite = page suivante ou précédente; un toucher simple au milieu affiche ou cache les barres */
+  let bal = null;
+  win.addEventListener("touchstart", e => { bal = null; if (!e.touches || e.touches.length !== 1 || RD.pen || RD.wb || RD.text || RD.obj || RD.z > 1.01) return;
+    const t = e.touches[0]; bal = { x:t.clientX, y:t.clientY, t:Date.now(), cible:e.target }; }, { passive:true });
+  win.addEventListener("touchmove", e => { if (bal && e.touches && e.touches.length > 1) bal = null; }, { passive:true });
+  win.addEventListener("touchend", e => { if (!bal) return; const b = bal; bal = null; const t = e.changedTouches && e.changedTouches[0]; if (!t) return;
+    const dx = t.clientX - b.x, dy = t.clientY - b.y, dt = Date.now() - b.t;
+    let sel = ""; try { sel = String(win.getSelection() || ""); } catch(er){}
+    if (Math.abs(dx) > 55 && Math.abs(dx) > Math.abs(dy) * 1.6 && dt < 800 && !sel){ RD.bouge = true; turn(dx < 0 ? 1 : -1); return; }
+    const actif = b.cible && b.cible.closest && b.cible.closest("a,button,input,select,textarea,label,summary,[onclick],[role=button],[contenteditable]");
+    if (Math.abs(dx) < 10 && Math.abs(dy) < 10 && dt < 350 && !actif && matchMedia("(max-width:900px) and (pointer:coarse)").matches){
+      const y = t.clientY / win.innerHeight; if (y > .18 && y < .82){ const R = $("#reader"); if (R.classList.contains("calme")) afficherBarres(); else if (R.classList.contains("auto")) { R.classList.add("calme"); } } } }, { passive:true });
   const pannable = t => { try { const c = win.getComputedStyle(t).cursor; return c === "grab" || c === "auto" || c === "default" || c === "grabbing"; } catch(e){ return false; } };
   const fin = () => { if (!PAN.on) return; PAN.on = false; majCurseur(); };
   win.addEventListener("mousedown", e => {
@@ -1746,7 +1825,7 @@ function poll(){
     const inp = $("#tbPg"); if (document.activeElement !== inp) inp.value = s.label;
     const an = RD.drv.animOn() ? "p" : "l", ab = $("#tbAnim");
     majBoutonDbl();
-    if (ab.dataset.i !== an){ ab.dataset.i = an; ab.innerHTML = an === "p" ? ICO_PAUSE : ICO_PLAY; }
+    if (ab.dataset.i !== an){ ab.dataset.i = an; const lb = ab.querySelector(".tbl"); ab.innerHTML = an === "p" ? ICO_PAUSE : ICO_PLAY; if (lb) ab.appendChild(lb); }
     if (RD.drv.ansInfo){
       const e = ansEtat(), bt = $("#tbAns"), key = e.ok + "|" + e.m + "|" + e.s + "|" + e.t;
       if (bt.dataset.k !== key){
@@ -4311,6 +4390,28 @@ function imprimerPage(){
 $("#tbPrint").onclick = imprimerPage;
 $("#tbQr").onclick = () => montrerQr();
 window.__htmlImpression = htmlImpression;
+
+/* ---- Téléphone : barre d'onglets et feuille « Plus » (renvoient vers les boutons existants) ---- */
+(function(){
+  const bar = document.getElementById("tabbar"), ov = document.getElementById("plusOv"); if (!bar) return;
+  const onglet = t => bar.querySelectorAll("[data-tab]").forEach(b => b.classList.toggle("on", b.dataset.tab === t));
+  const vue = v => { const a = document.querySelector('nav a[data-view="' + v + '"]'); if (a) a.click(); window.scrollTo({ top:0, behavior:"smooth" }); onglet(v); };
+  bar.addEventListener("click", e => { const b = e.target.closest("[data-tab]"); if (!b) return;
+    const t = b.dataset.tab;
+    if (t === "all" || t === "fav") vue(t);
+    else if (t === "qn") { const q = document.getElementById("quoiNeuf"); if (q) q.click(); }
+    else if (t === "plus") ov.hidden = false; });
+  const fermer = () => { ov.hidden = true; };
+  ov.addEventListener("click", e => { if (e.target === ov) { fermer(); return; } const b = e.target.closest("[data-plus]"); if (!b) return; fermer();
+    const k = b.dataset.plus, clic = id => { const x = document.getElementById(id); if (x) x.click(); };
+    if (k === "aide") clic("lienAide"); else if (k === "plans") clic("planBtn"); else if (k === "accueil") clic("accueilBtn"); else if (k === "gros") clic("grosBtn"); });
+  /* « Ma liste » et le point rouge de « Quoi de neuf » suivent ceux de l'en-tête */
+  const sync = () => { const lf = document.querySelector('nav a[data-view="fav"]'), qp = document.getElementById("qnPoint");
+    bar.querySelector('[data-tab="fav"]').hidden = !lf || lf.hidden; bar.querySelector(".tab-point").hidden = !qp || qp.hidden;
+    const act = document.querySelector("nav a[data-view].active"); if (act) onglet(act.dataset.view); };
+  new MutationObserver(sync).observe(document.querySelector("header nav"), { attributes:true, subtree:true, attributeFilter:["hidden", "class"] });
+  sync();
+})();
 /* ---- Barre d'outils : menu déroulant « Plus d'outils » + boutons déplaçables ---- */
 (function(){
   const tb = $("#tb"), more = $("#tbMore"), pop = $("#tbPop"), grid = $("#tbGrid");
@@ -4319,20 +4420,23 @@ window.__htmlImpression = htmlImpression;
   MOV.forEach(id => $("#" + id).classList.add("mov"));
   const el = id => document.getElementById(id);
   const etiquette = b => { let l = b.querySelector(".tbl"); if (grid.contains(b)){ if (!l){ l = document.createElement("span"); l.className = "tbl"; b.appendChild(l); } l.textContent = b.getAttribute("aria-label") || b.title; } else if (l) l.remove(); };
-  const lire = () => { const L = lireLS("tbLayout", null); const ok = L && Array.isArray(L.bar) && Array.isArray(L.menu); return ok ? L : DEF; };
+  /* téléphone : une seule rangée (page précédente, numéro, page suivante, réponses, modules, plus) */
+  const TEL = matchMedia("(max-width:640px)").matches;
+  const DEF_TEL = { bar:["tbAns","tbMenu"], menu:["tbPen","tbQr","tbMark","tbAnim","tbZo","tbZv","tbZi","tbTimer","tbSpot","tbCache","tbWb","tbLaser","tbNoir","tbHelp","tbDbl","tbPin","tbPrint","tbFs"] };
+  const lire = () => { const L = lireLS(TEL ? "tbLayoutTel" : "tbLayout", null); const ok = L && Array.isArray(L.bar) && Array.isArray(L.menu); return ok ? L : TEL ? DEF_TEL : DEF; };
   const appliquer = L => {
     const vus = new Set(), place = (id, cont, avant) => { const b = el(id); if (!b || vus.has(id) || !MOV.includes(id)) return; vus.add(id); if (avant) cont.insertBefore(b, avant); else cont.appendChild(b); };
     L.bar.forEach(id => place(id, tb, more)); L.menu.forEach(id => place(id, grid));
     MOV.forEach(id => { if (!vus.has(id)) place(id, DEF.menu.includes(id) ? grid : tb, DEF.menu.includes(id) ? null : more); });
     MOV.forEach(id => etiquette(el(id)));
   };
-  const sauver = () => { try { localStorage.setItem("tbLayout", JSON.stringify({ bar:MOV.filter(id => el(id).parentNode === tb).sort((a, b) => (el(a).compareDocumentPosition(el(b)) & 4) ? -1 : 1), menu:[...grid.children].map(b => b.id) })); } catch(e){} };
+  const sauver = () => { try { localStorage.setItem(TEL ? "tbLayoutTel" : "tbLayout", JSON.stringify({ bar:MOV.filter(id => el(id).parentNode === tb).sort((a, b) => (el(a).compareDocumentPosition(el(b)) & 4) ? -1 : 1), menu:[...grid.children].map(b => b.id) })); } catch(e){} };
   appliquer(lire());
   const fermer = () => { if (tb.classList.contains("edit")) return; pop.classList.remove("open"); more.setAttribute("aria-expanded", "false"); more.classList.remove("on"); };
   const ouvrir = () => { pop.classList.add("open"); more.setAttribute("aria-expanded", "true"); more.classList.add("on"); };
   more.onclick = e => { e.stopPropagation(); if (pop.classList.contains("open")){ tb.classList.remove("edit"); fermer(); } else ouvrir(); };
   $("#tbOrg").onclick = () => { tb.classList.toggle("edit"); $("#tbOrg").textContent = tb.classList.contains("edit") ? "✔ Terminé" : "✎ Organiser"; if (!tb.classList.contains("edit")) sauver(); };
-  $("#tbRaz").onclick = () => { try { localStorage.removeItem("tbLayout"); } catch(e){} appliquer(DEF); };
+  $("#tbRaz").onclick = () => { try { localStorage.removeItem(TEL ? "tbLayoutTel" : "tbLayout"); } catch(e){} appliquer(TEL ? DEF_TEL : DEF); };
   /* un clic sur un outil du menu le referme (sauf en mode organiser) */
   grid.addEventListener("click", () => setTimeout(fermer, 0));
   document.addEventListener("pointerdown", e => { if (pop.classList.contains("open") && !tb.classList.contains("edit") && !pop.contains(e.target) && e.target !== more && !more.contains(e.target)) fermer(); }, true);
