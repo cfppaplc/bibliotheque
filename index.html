@@ -3578,7 +3578,8 @@ majEpaisseur();
   bar.appendChild(pc); bar.appendChild(pp);
   const fermer = () => { pc.hidden = pp.hidden = true; bc.classList.remove("open"); bp.classList.remove("open"); };
   const basculer = (p, b) => { const ouvrir = p.hidden; fermer(); if (ouvrir){ p.hidden = false; b.classList.add("open"); } };
-  bc.onclick = () => basculer(pc, bc); bp.onclick = () => basculer(pp, bp);
+  /* toucher « Couleur » ramène toujours au crayon (quitte l'efface, le texte ou les objets) */
+  bc.onclick = () => { if (RD.eraser || RD.text || RD.obj){ RD.eraser = false; RD.text = false; RD.obj = false; refreshTools(); } basculer(pc, bc); }; bp.onclick = () => basculer(pp, bp);
   pc.querySelectorAll(".sw").forEach(b => b.addEventListener("click", () => setTimeout(fermer, 120)));
   document.addEventListener("pointerdown", e => { if (bar.contains(e.target) || (pc.hidden && pp.hidden)) return; fermer();
     if (e.target.id === "inkCanvas"){ e.stopPropagation(); e.preventDefault(); } }, true);   /* le clic qui ferme un menu ne dessine pas de point */

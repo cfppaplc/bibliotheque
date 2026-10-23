@@ -2,6 +2,43 @@
  {
   "date": "2026-10-23",
   "type": "outil",
+  "titre": "Barre du crayon et du tableau blanc",
+  "texte": "Une seule ligne d'outils, plus simple pour débuter. Rien n'a été retiré : les outils moins utilisés sont rangés dans deux menus.",
+  "formation": [
+   {
+    "t": "Rond de couleur : choisis la couleur, un surligneur ou l'épaisseur du trait. Le menu se ferme dès que tu choisis.",
+    "img": "nouveautes/barre-couleur.jpg"
+   },
+   {
+    "t": "Sur la ligne : forme (trait libre, ligne, flèche, rectangle, ellipse), texte, objets, gomme, annuler, fond.",
+    "img": "nouveautes/barre.jpg"
+   },
+   "Le bouton Objets n'apparaît que sur le quadrillé (schéma électrique) et le plan isométrique (plomberie).",
+   {
+    "t": "⋯ Plus : rétablir, tout effacer, zoom, déplacer le tableau, tableau précédent / suivant / nouveau, enregistrer en PNG.",
+    "img": "nouveautes/barre-plus.jpg"
+   },
+   "⌄ replie la barre en petit bouton; ▯ l'ancre sur le côté droit de l'écran.",
+   "Pour revenir au crayon après l'efface, le texte ou les objets : touche simplement le bouton « Couleur » (le rond de couleur), ou choisis une couleur."
+  ],
+  "versions": [
+   {
+    "date": "2026-10-23",
+    "texte": "Après l'efface, toucher « Couleur » (ou une couleur) ramène toujours au crayon."
+   },
+   {
+    "date": "2026-10-21",
+    "texte": "Le bouton Objets est caché sur les fonds où il ne sert pas."
+   },
+   {
+    "date": "2026-10-21",
+    "texte": "Barre allégée : menus « couleur » et « ⋯ Plus »."
+   }
+  ]
+ },
+ {
+  "date": "2026-10-23",
+  "type": "outil",
   "titre": "Plans techniques",
   "texte": "Visionneuse de plans pour le tableau : zoom avec les doigts, crayon, mesure à l'échelle, et quatre dossiers de plans d'exercice, dont un centre commercial sur un terrain en pente (nivellement, drainage pluvial, profils).",
   "formation": [
@@ -430,38 +467,6 @@
    },
    "« Exporter » crée un fichier .schema.json : apporte-le sur un autre ordinateur ou donne-le à un collègue, qui le charge avec « Importer un fichier ».",
    "Un tableau rouvert sur un écran d'une autre taille garde ses fils sur les bornes des symboles."
-  ]
- },
- {
-  "date": "2026-10-21",
-  "type": "outil",
-  "titre": "Barre du crayon et du tableau blanc",
-  "texte": "Une seule ligne d'outils, plus simple pour débuter. Rien n'a été retiré : les outils moins utilisés sont rangés dans deux menus.",
-  "formation": [
-   {
-    "t": "Rond de couleur : choisis la couleur, un surligneur ou l'épaisseur du trait. Le menu se ferme dès que tu choisis.",
-    "img": "nouveautes/barre-couleur.jpg"
-   },
-   {
-    "t": "Sur la ligne : forme (trait libre, ligne, flèche, rectangle, ellipse), texte, objets, gomme, annuler, fond.",
-    "img": "nouveautes/barre.jpg"
-   },
-   "Le bouton Objets n'apparaît que sur le quadrillé (schéma électrique) et le plan isométrique (plomberie).",
-   {
-    "t": "⋯ Plus : rétablir, tout effacer, zoom, déplacer le tableau, tableau précédent / suivant / nouveau, enregistrer en PNG.",
-    "img": "nouveautes/barre-plus.jpg"
-   },
-   "⌄ replie la barre en petit bouton; ▯ l'ancre sur le côté droit de l'écran."
-  ],
-  "versions": [
-   {
-    "date": "2026-10-21",
-    "texte": "Le bouton Objets est caché sur les fonds où il ne sert pas."
-   },
-   {
-    "date": "2026-10-21",
-    "texte": "Barre allégée : menus « couleur » et « ⋯ Plus »."
-   }
   ]
  },
  {
