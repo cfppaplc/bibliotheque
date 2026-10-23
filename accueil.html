@@ -102,6 +102,7 @@ header { grid-column: 1 / -1; display: flex; align-items: center; justify-conten
 .brand-mark { width: calc(var(--u) * 92); height: calc(var(--u) * 92); object-fit: contain; flex: none; border-radius: 16px; background: #fff; padding: 4px; box-sizing: border-box; }
 .brand-text { font-family: var(--display); font-weight: 600; text-transform: uppercase; letter-spacing: .08em; font-size: calc(var(--u) * 24); color: var(--muted); }
 .brand-text strong { color: var(--ink); font-weight: 700; }
+.brand-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }   /* le nom du programme ne passe jamais sous les boutons */
 .tools { position: fixed; z-index: 12; top: calc(14px + env(safe-area-inset-top, 0px)); right: max(16px, env(safe-area-inset-right, 0px)); display: flex; gap: 8px; transition: opacity .4s; }
 .tools > * { transition: opacity .4s; }
 .tools.idle > :not(.livre) { opacity: 0; }
@@ -510,6 +511,7 @@ header { grid-column: 1 / -1; display: flex; align-items: center; justify-conten
     </div>
     <div class="tools" id="tools">
       <button class="btn livre" id="b-livre" type="button" hidden title="Revenir au livre (L)"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6.5C10 5 7 4.6 4 5v13c3-.4 6 0 8 1.5 2-1.5 5-1.9 8-1.5V5c-3-.4-6 0-8 1.5zM12 6.5v13"/></svg><span id="b-livre-t">Revenir au livre</span></button>
+      <button class="btn" id="b-wb" type="button" hidden title="Tableau blanc (B) : on revient ici avec « Tableau de bord »" aria-label="Tableau blanc"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3.5" width="18" height="12" rx="1.2"/><path d="M6.5 11.5c1.3-2.2 2.6-3 3.8-1.6s2.4 1 3.6-1.2 2.3-2 3.6-.7"/><path d="M12 15.5v2.5M7.5 21l4.5-3 4.5 3"/></svg><span class="wb-t">Tableau blanc</span></button>
       <button class="btn" id="b-biblio" type="button" title="Bibliothèque" aria-label="Bibliothèque" hidden><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>Bibliothèque</button>
       <button class="btn" id="b-full" type="button" title="Plein écran" aria-label="Plein écran"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>Plein écran</button>
       <button class="btn primary" id="b-comp" type="button" title="Préparer le cours" aria-label="Préparer le cours"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4h6v3H9z"/><path d="M15 5h3a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h3M9 12h6M9 16h4"/></svg>Préparer le cours</button>
@@ -585,6 +587,7 @@ header { grid-column: 1 / -1; display: flex; align-items: center; justify-conten
       <dt>R</dt><dd>Révéler ou cacher la réponse de la question</dd>
       <dt>O</dt><dd>Ouvrir le contenu de l'activité en cours (livre, schéma, plan)</dd>
       <dt>L</dt><dd>Revenir au livre resté ouvert (même page)</dd>
+      <dt>B</dt><dd>Ouvrir le tableau blanc</dd>
       <dt>+ / −</dt><dd>Grossir ou réduire le texte</dd>
       <dt>0</dt><dd>Taille automatique</dd>
       <dt>Clic</dt><dd>Sur la citation : en afficher une autre</dd>
@@ -1940,17 +1943,21 @@ $("b-full").onclick = full;
 // (la bibliothèque se signale avec un message « accueil-biblio » ; ailleurs, le bouton reste caché)
 window.addEventListener("message", e => {
   if (e.source !== window.parent || !e.data || e.data.type !== "accueil-biblio") return;
-  window.EN_BIBLIO = true; const bb = $("b-biblio"); bb.hidden = false;
+  window.EN_BIBLIO = true; const bb = $("b-biblio"); bb.hidden = false; $("b-wb").hidden = false;
   bb.onclick = () => { try { window.parent.postMessage({ type: "accueil-fermer" }, "*"); } catch (er) {} };
 });
 
 // Livre resté ouvert dans la bibliothèque : un clic pour y revenir (même page)
 function revenirLivre(){ try { window.parent.postMessage({ type: "accueil-revenir" }, "*"); } catch (e) {} }
 $("b-livre").onclick = revenirLivre;
+/* tableau blanc : s'ouvre dans la bibliothèque; son bouton « Tableau de bord » ramène ici, et « Revenir au tableau blanc » y retourne */
+function ouvrirTableauBlanc(){ if (!window.EN_BIBLIO) return; try { window.parent.postMessage({ type: "accueil-ouvrir", contenu: { type: "tableau" } }, "*"); } catch (e) {} }
+$("b-wb").onclick = ouvrirTableauBlanc;
+document.addEventListener("keydown", e => { if ((e.key === "b" || e.key === "B") && !e.ctrlKey && !e.metaKey && !e.altKey && !/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName || "") && !e.target.isContentEditable && !$("b-wb").hidden) ouvrirTableauBlanc(); });
 window.addEventListener("message", e => {
   if (e.source !== window.parent || !e.data || e.data.type !== "accueil-livre") return;
   const l = e.data.livre, b = $("b-livre");
-  b.hidden = !l;
+  b.hidden = !l; if (window.EN_BIBLIO) $("b-wb").hidden = !!(l && l.wb);   /* « Revenir au tableau blanc » remplace alors le bouton Tableau blanc */
   if (l) { const t = $("b-livre-t"); t.textContent = l.wb ? "Revenir au tableau blanc" : "Revenir au livre";
     if (!l.wb && l.page) { const sm = document.createElement("small"); sm.textContent = "· p. " + l.page; t.append(" ", sm); }
     b.title = (l.wb ? "Revenir au tableau blanc" : "Revenir à « " + l.titre + " »" + (l.page ? ", page " + l.page : "")) + " (L)"; }

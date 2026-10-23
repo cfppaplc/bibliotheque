@@ -71,6 +71,9 @@
     bouton « Tableau de bord » (touche E) dans tous les livres, « Revenir au livre » (touche L) sur le tableau.
     Le plein écran est demandé sur `document.documentElement` (jamais sur l'iframe) pour rester actif entre les deux.
 
+- **Accès rapide au tableau blanc** : `#wbBtn` dans l'en-tête (a remplacé « A+ »; `#grosBtn` reste caché, utilisé par le menu Plus du cellulaire) → `ouvrirTableauBlanc()`.
+  Sur `accueil.html` : `#b-wb` (touche B, visible seulement dans la bibliothèque) envoie `accueil-ouvrir {type:"tableau"}`; si le tableau blanc est déjà ouvert dessous, on y revient (`ouvrirDepuisTdb`), et `#b-wb` est caché au profit de « Revenir au tableau blanc ».
+
 ## Téléphone (≤ 640 px)
 - CSS dans le bloc « Téléphone (≤ 640 px) » de `index.html` : `.hbtns` cachés, barre d'onglets `#tabbar` en bas
   (Accueil, Ma liste, Quoi de neuf, Plus → feuille `#plusOv` qui clique les boutons existants `#lienAide`, `#planBtn`, `#accueilBtn`, `#grosBtn`).
