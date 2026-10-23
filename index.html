@@ -2491,7 +2491,7 @@ function formeSous(q){ const c = $("#inkCanvas"), W = c.width, H = c.height, tol
   for (let i = arr.length - 1; i >= 0; i--){ const s = arr[i]; if (!s.t || !FORMES[s.t] || !s.p || s.p.length < 2) continue;
     const P = pointsTrait(s), x = q[0] * W, y = q[1] * H; let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
     for (let j = 0; j < P.length; j++){ const px = P[j][0] * W, py = P[j][1] * H; x0 = Math.min(x0, px); x1 = Math.max(x1, px); y0 = Math.min(y0, py); y1 = Math.max(y1, py);
-      if (j && distSeg([x, y], [P[j - 1][0] * W, P[j - 1][1] * H], [px, py], 1) < tol) return s; }
+      if (j && distSeg([x, y], [P[j - 1][0] * W, P[j - 1][1] * H], [px, py], 1) < (s.t === "cote" ? tol * 2.4 : tol)) return s; }   /* cote : on peut toucher son texte */
     if (x1 - x0 < 90 * (window.devicePixelRatio || 1) && y1 - y0 < 90 * (window.devicePixelRatio || 1) && x > x0 - tol && x < x1 + tol && y > y0 - tol && y < y1 + tol) return s; }
   return null; }
 /* double-clic sur une forme : choisir sa valeur (cote, angle, rayon, numéro de bulle) */
@@ -2522,6 +2522,9 @@ function modifierForme(s, cx, cy){
     redrawInk(); try { majObjUI(); } catch(e){} };
   inp.addEventListener("keydown", e => { e.stopPropagation(); if (e.key === "Enter"){ e.preventDefault(); fin(true); } else if (e.key === "Escape"){ e.preventDefault(); fin(false); } });
   box.querySelector("button").onclick = () => fin(true); inp.addEventListener("blur", () => setTimeout(() => fin(true), 150)); }
+let dernierTap = null;
+function tapElement(o, e){ if (!o || !e) return; const t = performance.now(), d = dernierTap; dernierTap = { o, t, x:e.clientX, y:e.clientY };
+  if (d && d.o === o && t - d.t < 550 && Math.hypot(e.clientX - d.x, e.clientY - d.y) < 24 && strokes().includes(o)){ dernierTap = null; SELO.s = o; redrawInk(); majObjUI(); modifierForme(o, e.clientX, e.clientY); } }
 /* sélectionner un élément d'une autre catégorie : la palette passe à son onglet (Formes, Iso ou Électricité) */
 function ongletPour(o){ return o.t !== "objet" ? "formes" : ELEC[o.k] ? "elec" : "iso"; }
 function choisirAutre(o){ const t = ongletPour(o), isoBg = !!RD.wb && /^iso/.test(wbBg());
@@ -3187,15 +3190,14 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     (fixes || strokes().filter(f => f.t === "ligne" && f.fil).flatMap(f => [0, 1].filter(i => Math.abs(f.p[i][0] - x2) * W < 2).map(i => [f, i]))).forEach(([f, i]) => { f.p[i][0] = nx; });
     o.sz = [w, h]; };
   const nettoyerFils = () => strokes().filter(o => o.t === "objet" && ELEC[o.k]).forEach(couperFils);   /* après chaque fil ou déplacement */
-  let dernierO = { s:null, t:0 };
   const touche = q => { const arr = strokes(); for (let i = arr.length - 1; i >= 0; i--){ const s = arr[i]; if (s.t !== "objet") continue; const G = objGeo(s, c.width, c.height), x = q[0] * c.width, y = q[1] * c.height;
     if (s.k === "rails"){ if (surRails(s, G, x, y, .1) && (RD.objK === "rails" || (y - G.oy) / G.u < .4)) return s; continue; }
     if (x >= G.bbox[0] - 4 && x <= G.bbox[2] + 4 && y >= G.bbox[1] - 4 && y <= G.bbox[3] + 4) return s; } return null; };
   c.addEventListener("pointerdown", e => {
     if (!RD.obj || !RD.wb || RD.eraser || RD.sim || RD.formeK) return;
     const q = cur(e), el = modeElec();
-    { const o = touche(q.raw); if (o && ongletPour(o) !== RD.objTab){ choisirAutre(o); return; }
-      if (!o && !(el && borneProche(q.raw))){ const f = formeSous(q.raw); if (f){ choisirAutre(f); return; } } }
+    { const o = touche(q.raw); if (o && ongletPour(o) !== RD.objTab){ if (choisirAutre(o)) tapElement(o, e); return; }
+      if (!o && !(el && borneProche(q.raw))){ const f = formeSous(q.raw); if (f){ if (choisirAutre(f)) tapElement(f, e); return; } } }
     if (el && SELO.s && SELO.s.k === "rails" && strokes().includes(SELO.s)){           /* poignée de l'échelle : on change sa largeur et sa hauteur */
       const o = SELO.s, G = objGeo(o, c.width, c.height), [w, h] = o.sz || [8, 10], cx = G.ox + w * G.u, cy = G.oy + h * G.u;
       if (Math.hypot(q.raw[0] * c.width - cx, q.raw[1] * c.height - cy) < G.u * .6){
@@ -3211,8 +3213,6 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     }
     let hit = touche(q.raw);
     if (el && RD.objK === "jonction" && hit && hit.k !== "jonction") hit = null;   /* un point de jonction se pose aussi sur la borne d'un symbole */
-    if (hit && dernierO.s === hit && e.timeStamp - dernierO.t < 380 && Math.hypot(e.clientX - dernierO.x, e.clientY - dernierO.y) < 12){ dernierO = { s:null, t:0 }; SELO.s = hit; redrawInk(); majObjUI(); e.preventDefault(); modifierForme(hit, e.clientX, e.clientY); return; }   /* double-clic : renommer */
-    if (hit) dernierO = { s:hit, t:e.timeStamp, x:e.clientX, y:e.clientY };
     if (hit){
       SELO.s = hit; RD.objO = hit.o || 0;
       const G = objGeo(hit, c.width, c.height), liens = [];                 /* extrémités de tuyaux posées sur un raccord */
@@ -3241,7 +3241,8 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     mv.liens.forEach(([s, i, x, y]) => { s.p[i] = [x + dx, y + dy]; });
     redrawInk();
   });
-  ["pointerup", "pointercancel"].forEach(t => c.addEventListener(t, () => {
+  ["pointerup", "pointercancel"].forEach(t => c.addEventListener(t, ev => {
+    if (mv && mv.s && !mv.snap && ev.type === "pointerup") tapElement(mv.s, ev);      /* toucher sans bouger : compte pour le double-clic (renommer) */
     if (mv && mv.fil){ if (mv.segs.length){ jonctionsAuto(mv.segs); nettoyerFils(); } else (UNDO[inkKey()] || []).pop(); mv = null; redrawInk(); majObjUI(); return; }
     if (mv && mv.s && mv.snap && ELEC[mv.s.k]){                                  /* symbole déplacé : ses fils restent droits (un coude s'ajoute au besoin) */
       const ux = elecU() / c.width, uy = elecU() / c.height;
@@ -3323,12 +3324,9 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     if (RD.text || (RD.obj && !RD.formeK)){ e.preventDefault(); return; }
     const q = pt(e);
     if (RD.obj && RD.formeK){ const brut = (r => [(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height])(c.getBoundingClientRect()), ip = poigneeSous(SELO.s, brut);
-      if (ip >= 0 && dernierF.s === SELO.s && e.timeStamp - dernierF.t < 380 && Math.hypot(e.clientX - dernierF.x, e.clientY - dernierF.y) < 12){ dernierF = { s:null, t:0 }; e.preventDefault(); modifierForme(SELO.s, e.clientX, e.clientY); return; }   /* double-clic sur une poignée = aussi renommer */
-      if (ip >= 0){ dernierF = { s:SELO.s, t:e.timeStamp, x:e.clientX, y:e.clientY }; cur = { poignee:ip, s:SELO.s, snap:false }; return; }               /* agrandir / rapetisser par une poignée */
+      if (ip >= 0){ cur = { poignee:ip, s:SELO.s, snap:false, x0:e.clientX, y0:e.clientY }; return; }               /* agrandir / rapetisser par une poignée */
       const hit = formeSous(brut);
-      if (hit && dernierF.s === hit && e.timeStamp - dernierF.t < 380 && Math.hypot(e.clientX - dernierF.x, e.clientY - dernierF.y) < 12){ dernierF = { s:null, t:0 }; SELO.s = hit; redrawInk(); majObjUI(); e.preventDefault(); modifierForme(hit, e.clientX, e.clientY); return; }
-      if (hit) dernierF = { s:hit, t:e.timeStamp, x:e.clientX, y:e.clientY };
-      if (hit && hit === SELO.s){ cur = { bouge:hit, q0:q, p0:hit.p.map(v => v.slice()), snap:false }; return; }   /* forme déjà choisie : on la glisse */
+      if (hit && hit === SELO.s){ cur = { bouge:hit, q0:q, p0:hit.p.map(v => v.slice()), snap:false, x0:e.clientX, y0:e.clientY }; return; }   /* forme déjà choisie : on la glisse */
       var choisir = hit || (RD.wb ? objetSous(brut) : null);     /* forme pas encore choisie : un simple clic la choisit, mais glisser trace une nouvelle forme (ex. une cote qui part du coin d'un rectangle) */
       if (SELO.s){ SELO.s = null; majObjUI(); } }
     cur = { c:/^hl/.test(RD.color) ? "#000" : RD.color, hl:/^hl/.test(RD.color), hc:/^hl:/.test(RD.color) ? RD.color.slice(3) : null, w:WIDTHS[RD.wIdx], p:[q] };
@@ -3342,7 +3340,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     } else fond = null;
     deja = 0; strokes().push(cur); dessinerEnCours();
   });
-  let fond = null, rafTrait = 0, deja = 0, dernierF = { s:null, t:0 };
+  let fond = null, rafTrait = 0, deja = 0;
   const dessinerEnCours = () => { rafTrait = 0; if (!cur || cur === "erase") return;
     const g = c.getContext("2d"), k = (window.devicePixelRatio || 1) * RD.z, W = c.width, H = c.height;
     if (!fond){             /* trait libre opaque : on ajoute seulement les nouveaux bouts (aucun effacement de l'écran) */
@@ -3359,22 +3357,25 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
   c.addEventListener("pointermove", e => {
     if (!cur) return;
     if (cur === "erase"){ eraseAt(pt(e)); return; }
+    if (cur.poignee !== undefined && !cur.snap && Math.hypot(e.clientX - cur.x0, e.clientY - cur.y0) < 5) return;
     if (cur.poignee === 2){ if (!cur.snap){ snapInk(); cur.snap = true; } const o = cur.s, W = c.width, H = c.height, r = c.getBoundingClientRect(), q = [(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height];
       const a = o.p[0], b = o.p[1], an = Math.atan2((b[1] - a[1]) * H, (b[0] - a[0]) * W), d = (-(q[0] - (a[0] + b[0]) / 2) * W * Math.sin(an) + (q[1] - (a[1] + b[1]) / 2) * H * Math.cos(an));
       o.d = Math.abs(d) < 6 ? 0 : d / H; if (!rafTrait) rafTrait = requestAnimationFrame(() => { rafTrait = 0; redrawInk(); }); return; }
     if (cur.poignee !== undefined){ if (!cur.snap){ snapInk(); cur.snap = true; } cur.s.p[cur.poignee] = pt(e); if (!rafTrait) rafTrait = requestAnimationFrame(() => { rafTrait = 0; redrawInk(); }); return; }
     if (cur.bouge){ const q = pt(e), dx = q[0] - cur.q0[0], dy = q[1] - cur.q0[1];
-      if (!cur.snap){ if (Math.hypot(dx, dy) < .002) return; snapInk(); cur.snap = true; }
+      if (!cur.snap){ if (Math.hypot(e.clientX - cur.x0, e.clientY - cur.y0) < 5) return; snapInk(); cur.snap = true; }
       cur.bouge.p = cur.p0.map(v => [v[0] + dx, v[1] + dy]); if (!rafTrait) rafTrait = requestAnimationFrame(() => { rafTrait = 0; redrawInk(); }); return; }
     if (cur.t) cur.p[1] = pt(e);
     else { const evs = (e.getCoalescedEvents && e.getCoalescedEvents()) || []; (evs.length ? evs : [e]).forEach(ev => cur.p.push(pt(ev))); }   /* tous les points du crayon, même entre deux images */
     if (!rafTrait) rafTrait = requestAnimationFrame(dessinerEnCours);
   });
-  ["pointerup", "pointercancel"].forEach(t => c.addEventListener(t, () => {
+  ["pointerup", "pointercancel"].forEach(t => c.addEventListener(t, ev => {
     if (rafTrait){ cancelAnimationFrame(rafTrait); rafTrait = 0; }
+    const tap = ev.type === "pointerup" ? ev : null;
+    if (cur && (cur.bouge || cur.poignee !== undefined) && !cur.snap){ const o = cur.bouge || cur.s; cur = null; redrawInk(); tapElement(o, tap); return; }
     if (cur && (cur.bouge || cur.poignee !== undefined)){ cur = null; redrawInk(); return; }
     if (cur && cur.choisir){ const a = cur.p[0], b = cur.p[1]; if (Math.hypot(a[0] - b[0], a[1] - b[1]) < .004){       /* simple clic sur une forme : on la choisit */
-      const arr = strokes(), i = arr.indexOf(cur); if (i >= 0){ arr.splice(i, 1); (UNDO[inkKey()] || []).pop(); } const ch = cur.choisir; cur = null; fond = null; if (ch.t === "objet"){ redrawInk(); choisirAutre(ch); return; } SELO.s = ch; redrawInk(); majObjUI(); return; }
+      const arr = strokes(), i = arr.indexOf(cur); if (i >= 0){ arr.splice(i, 1); (UNDO[inkKey()] || []).pop(); } const ch = cur.choisir; cur = null; fond = null; if (ch.t === "objet"){ redrawInk(); choisirAutre(ch); tapElement(ch, tap); return; } SELO.s = ch; redrawInk(); majObjUI(); tapElement(ch, tap); return; }
       delete cur.choisir; }
     const finTrait = cur && cur !== "erase";
     RD.erSnap = false;
