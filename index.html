@@ -2334,7 +2334,7 @@ function drawStroke(g, s, W, H, k){
     else if (s.t === "ellipse"){ g.ellipse((x1 + x2) / 2, (y1 + y2) / 2, Math.max(1, Math.abs(x2 - x1) / 2), Math.max(1, Math.abs(y2 - y1) / 2), 0, 0, Math.PI * 2); }
     const habillage = () => {     /* cadre de sélection et étiquette (double-clic), pour toutes les formes */
       if (RD.obj && typeof SELO !== "undefined" && SELO.s === s) cadreForme(g, s, W, H, k);
-      if (s.lb && s.lp && /^(ligne|fleche|fleche2)$/.test(s.t)){ const tz = s.tz || 1, m = 12 * k * tz, A = [x1, y1], B = [x2, y2];
+      if (s.lb && s.lp && /^(ligne|fleche|fleche2)$/.test(s.t)){ const tz = s.tz || 1, m = 10 * k * tz + (s.w || 4) * k * .9, A = [x1, y1], B = [x2, y2];   /* l'écart suit l'épaisseur de la flèche */
         if (s.lp === "gauche" || s.lp === "droite"){ const E = (s.lp === "droite") === (B[0] >= A[0]) ? B : A, O = E === B ? A : B, L = Math.hypot(E[0] - O[0], E[1] - O[1]) || 1, ux = (E[0] - O[0]) / L, uy = (E[1] - O[1]) / L;
           const al = Math.abs(ux) < .35 ? "center" : ux > 0 ? "left" : "right";   /* au bout de la flèche, dans son prolongement */
           etiquette(g, s.lb, E[0] + ux * m + (al === "center" ? 0 : 0), E[1] + uy * (al === "center" ? m * 1.4 : m * .6), k, col, al, tz); }
