@@ -3381,7 +3381,12 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     if (!(RD.pen || RD.wb) || RD.sim) return;
     c.setPointerCapture(e.pointerId);
     if (RD.eraser){ cur = "erase"; eraseAt(pt(e)); return; }
-    if (RD.crayonOff && !RD.text && !RD.obj){ e.preventDefault(); return; }               /* crayon désactivé : rien ne se dessine */
+    if (RD.crayonOff && !RD.text && !RD.obj){ e.preventDefault();                          /* aucun outil : rien ne se dessine, mais toucher une forme ou un objet le choisit */
+      const r0 = c.getBoundingClientRect(), brut = [(e.clientX - r0.left) / r0.width, (e.clientY - r0.top) / r0.height], hit = formeSous(brut) || (RD.wb ? objetSous(brut) : null);
+      if (!hit) return;
+      RD.obj = true; RD.objTab = null; RD.formeK = null; RD.objKi = null; RD.objKe = null; refreshTools();
+      if (hit.t === "objet"){ if (choisirAutre(hit)) tapElement(hit, e); return; }
+      choisirAutre(hit); cur = { bouge:hit, q0:pt(e), p0:hit.p.map(v => v.slice()), snap:false, x0:e.clientX, y0:e.clientY }; return; }
     if (RD.text || (RD.obj && RD.objTab !== "formes")){ e.preventDefault(); return; }
     const q = pt(e);
     if (RD.obj){ const brut = (r => [(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height])(c.getBoundingClientRect()), ip = poigneeSous(SELO.s, brut);
@@ -3602,7 +3607,7 @@ function refreshTools(){
 }
 function togglePen(){ RD.pen = !RD.pen; if (RD.pen) RD.spot = false; refreshTools(); }
 function toggleWb(){
-  RD.wb = !RD.wb; if (RD.wb) RD.spot = false;
+  RD.wb = !RD.wb; if (RD.wb){ RD.spot = false; RD.crayonOff = true; RD.eraser = false; RD.text = false; RD.obj = false; RD.formeK = null; RD.objKi = null; RD.objKe = null; try { SELO.s = null; } catch(e){} setTimeout(() => { try { aviser("Aucun outil choisi : touche le crayon pour écrire, ou touche une forme pour la choisir.", 3500); } catch(e){} }, 400); }   /* chaque ouverture : aucun outil choisi */
   const st = $("#rstage");
   if (RD.wb){ RD.z = 1; sizeInner(); st.scrollLeft = (st.scrollWidth - st.clientWidth) / 2; st.scrollTop = (st.scrollHeight - st.clientHeight) / 2; }
   else { RD.z = Math.max(1, RD.z); sizeInner(); st.scrollLeft = 0; st.scrollTop = 0; }
