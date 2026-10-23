@@ -2311,7 +2311,7 @@ function drawStroke(g, s, W, H, k){
     col = coulPot(pt); }   /* animation : rouge = L1, bleu = L2 */
   g.strokeStyle = col; g.lineWidth = (s.hl ? s.w * 4 : s.w) * k;
   if (s.t === "objet"){ const colO = (!s.c || s.c === "#24282c") ? (wbSombre() ? "#f4f1ea" : "#3a424b") : s.c, G = dessinerObjet(g, s, W, H, k, colO);
-    if (s.lb && !ELEC[s.k]) etiquette(g, s.lb, (G.bbox[0] + G.bbox[2]) / 2, G.bbox[3] + 12 * k, k, colO);   /* nom d'un objet isométrique (double-clic) */ if (typeof SELO !== "undefined" && SELO.s === s){ g.save(); g.setLineDash([8 * k, 6 * k]); g.strokeStyle = "#6aa9ff"; g.lineWidth = 2 * k; g.strokeRect(G.bbox[0] - 6, G.bbox[1] - 6, G.bbox[2] - G.bbox[0] + 12, G.bbox[3] - G.bbox[1] + 12); g.restore(); } return; }
+    if (s.lb && !ELEC[s.k]){ const [ex, ey, al] = posEtiquette(s.lp || "bas", G.bbox, k); etiquette(g, s.lb, ex, ey, k, colO, al); }   /* nom d'un objet isométrique (double-clic) */ if (typeof SELO !== "undefined" && SELO.s === s){ g.save(); g.setLineDash([8 * k, 6 * k]); g.strokeStyle = "#6aa9ff"; g.lineWidth = 2 * k; g.strokeRect(G.bbox[0] - 6, G.bbox[1] - 6, G.bbox[2] - G.bbox[0] + 12, G.bbox[3] - G.bbox[1] + 12); g.restore(); } return; }
   if (s.t === "texte"){
     if (s.cache) return;
     const fs = txFs(s) * k, lh = s.lig ? 34 * 1.25 * k : fs * 1.25; g.font = txFont(s, fs); g.fillStyle = s.hl ? "#24282c" : col; g.textBaseline = s.lig ? "alphabetic" : "top";
@@ -2330,7 +2330,8 @@ function drawStroke(g, s, W, H, k){
     else if (s.t === "ellipse"){ g.ellipse((x1 + x2) / 2, (y1 + y2) / 2, Math.max(1, Math.abs(x2 - x1) / 2), Math.max(1, Math.abs(y2 - y1) / 2), 0, 0, Math.PI * 2); }
     const habillage = () => {     /* cadre de sélection et étiquette (double-clic), pour toutes les formes */
       if (RD.obj && typeof SELO !== "undefined" && SELO.s === s) cadreForme(g, s, W, H, k);
-      if (s.lb && !VALEURS_FORME[s.t]){ const ligneT = /^(ligne|fleche|fleche2)$/.test(s.t), an = Math.atan2(y2 - y1, x2 - x1); let nx = Math.sin(an), ny = -Math.cos(an); if (ny > 0){ nx = -nx; ny = -ny; }   /* au-dessus d'une ligne, au centre d'une forme */
+      if (s.lb && !VALEURS_FORME[s.t] && s.lp){ const [ex, ey, al] = posEtiquette(s.lp, cadrePx(s, W, H), k); etiquette(g, s.lb, ex, ey, k, col, al); }
+      else if (s.lb && !VALEURS_FORME[s.t]){ const ligneT = /^(ligne|fleche|fleche2)$/.test(s.t), an = Math.atan2(y2 - y1, x2 - x1); let nx = Math.sin(an), ny = -Math.cos(an); if (ny > 0){ nx = -nx; ny = -ny; }   /* au-dessus d'une ligne, au centre d'une forme */
         etiquette(g, s.lb, (x1 + x2) / 2 + (ligneT ? nx * 16 * k : 0), (y1 + y2) / 2 + (ligneT ? ny * 16 * k : 0), k, col); } };
     if (FORMES[s.t] && !/^(ligne|fleche|rect|ellipse)$/.test(s.t)){ g.stroke(); dessinerForme(g, s, x1, y1, x2, y2, k, col); habillage(); return; }
     g.stroke(); if (FORMES[s.t]) habillage(); return;
@@ -2468,8 +2469,12 @@ function decouperIso(cur){
   return out.length ? out : null;
 }
 /* petit texte lisible (contour blanc) : étiquettes des formes et des objets */
-function etiquette(g, txt, x, y, k, col){ g.save(); g.font = "700 " + Math.round(15 * k) + "px system-ui, sans-serif"; g.textAlign = "center"; g.textBaseline = "middle";
+function etiquette(g, txt, x, y, k, col, al){ g.save(); g.font = "700 " + Math.round(15 * k) + "px system-ui, sans-serif"; g.textAlign = al || "center"; g.textBaseline = "middle";
   g.lineJoin = "round"; g.lineWidth = 4 * k; g.strokeStyle = wbSombre() ? "rgba(0,0,0,.55)" : "rgba(255,255,255,.9)"; g.strokeText(txt, x, y); g.fillStyle = col; g.fillText(txt, x, y); g.restore(); }
+/* position du texte d'un élément (s.lp : haut, bas, gauche, droite, centre) autour de son cadre [x0, y0, x1, y1] */
+function posEtiquette(lp, bb, k){ const cx = (bb[0] + bb[2]) / 2, cy = (bb[1] + bb[3]) / 2, m = 14 * k;
+  return lp === "haut" ? [cx, bb[1] - m, "center"] : lp === "bas" ? [cx, bb[3] + m, "center"] : lp === "gauche" ? [bb[0] - m * .6, cy, "right"] : lp === "droite" ? [bb[2] + m * .6, cy, "left"] : [cx, cy, "center"]; }
+function cadrePx(s, W, H){ const P = pointsTrait(s); let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9; P.forEach(([x, y]) => { x0 = Math.min(x0, x * W); x1 = Math.max(x1, x * W); y0 = Math.min(y0, y * H); y1 = Math.max(y1, y * H); }); return [x0, y0, x1, y1]; }
 /* forme sélectionnée (onglet Formes) : cadre pointillé bleu */
 function cadreForme(g, s, W, H, k){ const P = pointsTrait(s); if (!P || !P.length) return;
   let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9; P.forEach(([x, y]) => { x0 = Math.min(x0, x * W); x1 = Math.max(x1, x * W); y0 = Math.min(y0, y * H); y1 = Math.max(y1, y * H); });
@@ -2511,8 +2516,9 @@ function modifierForme(s, cx, cy){
   box.style.cssText = "position:fixed;z-index:90;left:" + Math.max(8, Math.min(innerWidth - 300, cx - 140)) + "px;top:" + Math.max(8, Math.min(innerHeight - (s.t === "cote" ? 300 : 130), cy + 18)) + "px;width:280px;padding:10px;border-radius:12px;background:#0e0e0f;border:1px solid #6aa9ff;color:#e4e4e7;font:600 .8rem system-ui,sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.4)";
   const actuel = s.t === "angle" && !s.lb ? String(Math.round(Math.abs(Math.atan2(s.p[1][1] - s.p[0][1], (s.p[1][0] - s.p[0][0]) * ($("#inkCanvas").width / $("#inkCanvas").height))) * 180 / Math.PI)) : (s.lb || (s.t === "bulle" ? String(s.n || 1) : ""));
   box.innerHTML = '<div style="margin-bottom:6px;line-height:1.3">' + V.q + '</div><div style="display:flex;gap:6px"><input style="flex:1;min-width:0;min-height:38px;border-radius:8px;border:1px solid #2f2f33;padding:0 8px;font:700 1rem system-ui;color:#111;background:#fff" placeholder="' + V.ex + '"><button style="min-height:38px;padding:0 12px;border-radius:8px;border:0;background:#1f6fc2;color:#fff;font:700 .85rem system-ui;cursor:pointer">OK</button></div>';
-  if (s.t === "cote") padCote(box, s);
-  $("#reader").appendChild(box); const inp = box.querySelector("input"); inp.value = actuel; setTimeout(() => { inp.focus(); inp.select(); }, 30);
+  if (s.t === "cote" || (s.t !== "objet" && !VALEURS_FORME[s.t]) || (s.t === "objet" && !ELEC[s.k])) padCote(box, s);
+  $("#reader").appendChild(box); { const bh = box.offsetHeight, r0 = box.getBoundingClientRect(); if (r0.top + bh > innerHeight - 8) box.style.top = Math.max(8, innerHeight - bh - 8) + "px"; }   /* la case reste dans l'écran */
+  const inp = box.querySelector("input"); inp.value = actuel; setTimeout(() => { inp.focus(); inp.select(); }, 30);
   box.addEventListener("pointerdown", e => e.stopPropagation());
   let fini = false;
   const fin = ok => { if (fini) return; fini = true; box.remove(); if (!ok) return; const v = inp.value.trim(); snapInk();
@@ -2531,18 +2537,20 @@ function padCote(box, s){
   const CE = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7v10M20 7v10M4 12h16"/></svg>';
   const T = { haut:[0, -1, 0, "En haut de l'objet"], gauche:[-1, 0, -90, "À gauche de l'objet"], centre:[0, 0, 0, "Sur l'objet"], droite:[1, 0, 90, "À droite de l'objet"], bas:[0, 1, 180, "En bas de l'objet"] };
   const pad = document.createElement("div");
-  pad.innerHTML = '<div style="margin:10px 0 6px;line-height:1.3">Position de la cote</div><div class="cpad" style="display:grid;grid-template-columns:repeat(3,48px);grid-template-rows:repeat(3,42px);gap:5px;justify-content:center">'
+  const cote = s.t === "cote", defaut = s.t === "objet" ? "bas" : /^(ligne|fleche|fleche2|accolade)$/.test(s.t) ? "haut" : "centre";
+  pad.innerHTML = '<div style="margin:10px 0 6px;line-height:1.3">' + (cote ? "Position de la cote" : "Position du texte") + '</div><div class="cpad" style="display:grid;grid-template-columns:repeat(3,48px);grid-template-rows:repeat(3,42px);gap:5px;justify-content:center">'
     + ["", "haut", "", "gauche", "centre", "droite", "", "bas", ""].map(k => k ? '<button type="button" data-pos="' + k + '" title="' + T[k][3] + '" aria-label="' + T[k][3] + '" style="display:flex;align-items:center;justify-content:center;border-radius:9px;border:1px solid #3a3a40;border-bottom-width:4px;background:#1c1c1f;color:#e4e4e7;cursor:pointer;padding:0">'
       + (k === "centre" ? CE : '<span style="display:flex;transform:rotate(' + T[k][2] + 'deg)">' + FL + '</span>') + '</button>' : '<span></span>').join("") + '</div>';
   box.appendChild(pad);
-  const c = $("#inkCanvas"), W = c.width, H = c.height, a = s.p[0], b = s.p[1], an = Math.atan2((b[1] - a[1]) * H, (b[0] - a[0]) * W), nx = -Math.sin(an), ny = Math.cos(an);
+  const c = $("#inkCanvas"), W = c.width, H = c.height, a = s.p[0], b = s.p[1] || s.p[0], an = Math.atan2((b[1] - a[1]) * H, (b[0] - a[0]) * W), nx = -Math.sin(an), ny = Math.cos(an);   /* un objet n'a qu'un point */
   const pas = 34 * RD.z * (window.devicePixelRatio || 1) * 1.2;          /* distance par défaut : un peu plus d'un carreau */
   const maj = () => pad.querySelectorAll("[data-pos]").forEach(bt => { const [vx, vy] = T[bt.dataset.pos], dot = nx * vx + ny * vy, centre = bt.dataset.pos === "centre";
-    const possible = centre || Math.abs(dot) > .3, actif = centre ? !s.d : (possible && s.d && Math.sign(s.d) === Math.sign(dot));
+    const possible = !cote || centre || Math.abs(dot) > .3, actif = !cote ? (s.lp || defaut) === bt.dataset.pos : centre ? !s.d : (possible && s.d && Math.sign(s.d) === Math.sign(dot));
     bt.disabled = !possible; bt.style.opacity = possible ? "1" : ".25"; bt.style.cursor = possible ? "pointer" : "default";
     bt.style.background = actif ? "#1f6fc2" : "#1c1c1f"; bt.style.borderColor = actif ? "#6aa9ff" : "#3a3a40"; });
   pad.addEventListener("pointerdown", e => e.preventDefault()); pad.addEventListener("mousedown", e => e.preventDefault());   /* la case de texte garde le curseur */
   pad.querySelectorAll("[data-pos]").forEach(bt => bt.onclick = () => { if (bt.disabled) return; const [vx, vy] = T[bt.dataset.pos], dot = nx * vx + ny * vy;
+    if (!cote){ snapInk(); s.lp = bt.dataset.pos; if (!s.lb){ const i = box.querySelector("input"); if (i && i.value.trim()) s.lb = i.value.trim(); } redrawInk(); maj(); return; }   /* étiquette : où va le texte */
     snapInk(); if (bt.dataset.pos === "centre") s.d = 0; else { const mag = Math.abs((s.d || 0) * H) || pas; s.d = Math.sign(dot) * mag / H; }
     redrawInk(); maj(); });
   maj(); }
