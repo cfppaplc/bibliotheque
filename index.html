@@ -554,8 +554,9 @@
   .penbar .prang>.lab{font-size:.74rem;color:#a1a1aa;min-width:84px;letter-spacing:.02em}
   .penbar .ppop button[data-lab]{gap:6px;padding:0 10px}
   .penbar .ppop button[data-lab]::after{content:attr(data-lab);font-size:.82rem}
-  .penbar #penCol .pcur{display:block;width:22px;height:22px;border-radius:50%;background:var(--pc,#e2483d);border:2px solid #fff6}
-  .penbar #penCol .pcur.hl{border-radius:5px}
+  .penbar #penCol .pcur{display:flex;align-items:center;justify-content:center;width:24px;height:24px}
+  .penbar #penCol .pcur .pointe{fill:var(--pc,#e2483d)}.penbar #penCol .pcur .trait{stroke:var(--pc,#e2483d)}
+  .penbar #penCol .pcur.hl .trait{stroke-width:4;opacity:.8}
   .penbar #penCol.open,.penbar #penPlus.open{border-color:#6aa9ff}
   .reader.pen-side .penbar .ppop{left:auto;right:calc(100% + 10px);bottom:auto;top:0;transform:none}
 
@@ -3862,7 +3863,7 @@ majEpaisseur();
     r.innerHTML = '<span class="lab">' + lab + '</span>'; els.forEach(e => e && r.appendChild(e)); return r; };
   const nomme = (id, lab) => { const b = X(id); if (b) b.dataset.lab = lab; return b; };
   /* Couleur + épaisseur */
-  const bc = document.createElement("button"); bc.id = "penCol"; bc.title = "Couleur et épaisseur du trait"; bc.setAttribute("aria-label", "Couleur et épaisseur"); bc.innerHTML = '<span class="pcur"></span>';
+  const bc = document.createElement("button"); bc.id = "penCol"; bc.title = "Couleur et épaisseur du trait"; bc.setAttribute("aria-label", "Couleur et épaisseur"); bc.innerHTML = '<span class="pcur"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16.5 3.5l3 3L9 17l-4 1 1-4z"/><path d="M14.5 5.5l3 3"/><path class="pointe" stroke="none" d="M6 14l3 3-4 1z"/><path class="trait" stroke-width="2.6" d="M12 21h8"/></svg></span>';   /* symbole de crayon : la pointe et le trait ont la couleur choisie */
   const pc = pop("popCol");
   pc.appendChild(rang("Couleur", [...bar.querySelectorAll(".sw")]));
   pc.appendChild(rang("Surligneur", [...pc.querySelectorAll(".sw.hl")]));
