@@ -2522,6 +2522,11 @@ function modifierForme(s, cx, cy){
     redrawInk(); try { majObjUI(); } catch(e){} };
   inp.addEventListener("keydown", e => { e.stopPropagation(); if (e.key === "Enter"){ e.preventDefault(); fin(true); } else if (e.key === "Escape"){ e.preventDefault(); fin(false); } });
   box.querySelector("button").onclick = () => fin(true); inp.addEventListener("blur", () => setTimeout(() => fin(true), 150)); }
+/* sélectionner un élément d'une autre catégorie : la palette passe à son onglet (Formes, Iso ou Électricité) */
+function ongletPour(o){ return o.t !== "objet" ? "formes" : ELEC[o.k] ? "elec" : "iso"; }
+function choisirAutre(o){ const t = ongletPour(o), isoBg = !!RD.wb && /^iso/.test(wbBg());
+  if ((t === "iso" && !isoBg) || (t === "elec" && !modeElec())){ aviser(t === "iso" ? "Cet objet isométrique se modifie sur le fond « plan isométrique » (bouton Fond)." : "Ce symbole électrique se modifie sur le fond quadrillé (bouton Fond).", 4500); return false; }
+  RD.objTab = t; RD.formeK = t === "formes" ? (RD.formeK || "fleche") : null; SELO.s = o; majObjUI(); redrawInk(); return true; }
 /* objet (iso ou électrique) sous le doigt, le plus récent d'abord */
 function objetSous(q){ const c = $("#inkCanvas"), arr = strokes(), x = q[0] * c.width, y = q[1] * c.height;
   for (let i = arr.length - 1; i >= 0; i--){ const s = arr[i]; if (s.t !== "objet" || s.k === "fil") continue; const G = objGeo(s, c.width, c.height); if (x >= G.bbox[0] - 4 && x <= G.bbox[2] + 4 && y >= G.bbox[1] - 4 && y <= G.bbox[3] + 4) return s; } return null; }
@@ -3189,6 +3194,8 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
   c.addEventListener("pointerdown", e => {
     if (!RD.obj || !RD.wb || RD.eraser || RD.sim || RD.formeK) return;
     const q = cur(e), el = modeElec();
+    { const o = touche(q.raw); if (o && ongletPour(o) !== RD.objTab){ choisirAutre(o); return; }
+      if (!o && !(el && borneProche(q.raw))){ const f = formeSous(q.raw); if (f){ choisirAutre(f); return; } } }
     if (el && SELO.s && SELO.s.k === "rails" && strokes().includes(SELO.s)){           /* poignée de l'échelle : on change sa largeur et sa hauteur */
       const o = SELO.s, G = objGeo(o, c.width, c.height), [w, h] = o.sz || [8, 10], cx = G.ox + w * G.u, cy = G.oy + h * G.u;
       if (Math.hypot(q.raw[0] * c.width - cx, q.raw[1] * c.height - cy) < G.u * .6){
@@ -3322,7 +3329,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
       if (hit && dernierF.s === hit && e.timeStamp - dernierF.t < 380 && Math.hypot(e.clientX - dernierF.x, e.clientY - dernierF.y) < 12){ dernierF = { s:null, t:0 }; SELO.s = hit; redrawInk(); majObjUI(); e.preventDefault(); modifierForme(hit, e.clientX, e.clientY); return; }
       if (hit) dernierF = { s:hit, t:e.timeStamp, x:e.clientX, y:e.clientY };
       if (hit && hit === SELO.s){ cur = { bouge:hit, q0:q, p0:hit.p.map(v => v.slice()), snap:false }; return; }   /* forme déjà choisie : on la glisse */
-      var choisir = hit;     /* forme pas encore choisie : un simple clic la choisit, mais glisser trace une nouvelle forme (ex. une cote qui part du coin d'un rectangle) */
+      var choisir = hit || (RD.wb ? objetSous(brut) : null);     /* forme pas encore choisie : un simple clic la choisit, mais glisser trace une nouvelle forme (ex. une cote qui part du coin d'un rectangle) */
       if (SELO.s){ SELO.s = null; majObjUI(); } }
     cur = { c:/^hl/.test(RD.color) ? "#000" : RD.color, hl:/^hl/.test(RD.color), hc:/^hl:/.test(RD.color) ? RD.color.slice(3) : null, w:WIDTHS[RD.wIdx], p:[q] };
     const forme = RD.obj && RD.formeK ? RD.formeK : RD.shape;
@@ -3367,7 +3374,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     if (rafTrait){ cancelAnimationFrame(rafTrait); rafTrait = 0; }
     if (cur && (cur.bouge || cur.poignee !== undefined)){ cur = null; redrawInk(); return; }
     if (cur && cur.choisir){ const a = cur.p[0], b = cur.p[1]; if (Math.hypot(a[0] - b[0], a[1] - b[1]) < .004){       /* simple clic sur une forme : on la choisit */
-      const arr = strokes(), i = arr.indexOf(cur); if (i >= 0){ arr.splice(i, 1); (UNDO[inkKey()] || []).pop(); } SELO.s = cur.choisir; cur = null; fond = null; redrawInk(); majObjUI(); return; }
+      const arr = strokes(), i = arr.indexOf(cur); if (i >= 0){ arr.splice(i, 1); (UNDO[inkKey()] || []).pop(); } const ch = cur.choisir; cur = null; fond = null; if (ch.t === "objet"){ redrawInk(); choisirAutre(ch); return; } SELO.s = ch; redrawInk(); majObjUI(); return; }
       delete cur.choisir; }
     const finTrait = cur && cur !== "erase";
     RD.erSnap = false;
