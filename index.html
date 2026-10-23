@@ -3118,7 +3118,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     + '<div class="grp" data-g="formes"><div class="cgrid cform">' + Object.keys(FORMES).map(k => '<button data-f="' + k + '" title="' + FORMES[k].n + '"><canvas width="120" height="64"></canvas><span>' + FORMES[k].n + '</span></button>').join("") + '</div>'
     + '<div class="aide"><b>Touche</b> une forme pour la choisir : glisse-la pour la déplacer, tire un <b>carré blanc</b> pour la grandir. <b>Double-clic</b> : écrire la cote, l\'angle ou un nom. Pour en <b>ajouter</b> : choisis une forme ci-dessous, puis glisse sur le tableau. <b>Clic à côté</b> : plus rien de choisi.</div></div>'
     + '<div class="grp" data-g="iso"><div class="cgrid ciso">' + Object.keys(OBJETS).map(k => '<button data-k="' + k + '" title="' + OBJETS[k].n + '"><canvas width="120" height="64"></canvas><span>' + OBJETS[k].n + '</span></button>').join("") + '</div>'
-    + '<div class="aide"><b>Touche</b> un objet pour le choisir et le déplacer (les tuyaux raccordés suivent), <b>double-clic</b> pour le nommer. Pour en <b>poser</b> un : choisis-le ci-dessous, puis clique sur la grille. <b>Clic à côté</b> : plus rien de choisi.</div></div>'
+    + '<div class="aide"><b>Touche</b> un objet pour le choisir et le déplacer (les tuyaux raccordés suivent), <b>double-clic</b> pour le nommer. Pour en <b>poser</b> un : <b>glisse-le</b> sur le tableau (il se branche tout seul sur un tuyau tout près), ou touche-le puis clique sur la grille. <b>Clic à côté</b> : plus rien de choisi.</div></div>'
     + '<div class="grp" data-g="elec"><button id="objSch" class="sch-btn" title="Circuits prêts à utiliser et tableaux enregistrés">📋 Modèles et mes schémas</button>' + ELEC_CAT.map(([cg, cn]) => '<button class="cat" data-cat="' + cg + '">' + cn + '</button><div class="cgrid" data-cat="' + cg + '">'
       + Object.keys(ELEC).filter(k => ELEC[k].g === cg).map(k => '<button data-k="' + k + '" title="' + ELEC[k].n.replace(/^[✎•] /, "") + '"><canvas width="120" height="64"></canvas><span>' + (ELEC[k].c || ELEC[k].n.replace(/^[✎•] /, "")) + '</span></button>').join("") + '</div>').join("") + '</div>'
     + '<div class="aide grpE">Pour relier : glisse d\'un <b>point bleu</b> à l\'autre</div>'
@@ -3155,7 +3155,18 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     if (k === "terre"){ dessinerElec(g, { t:"objet", k, p:[[.5, 14 / H]], lb:"", __u:40 }, W, H, 1.2, "#24282c"); return; }
     const U = k === "transfo" ? 17 : 34, w = k === "transfo" ? 4 : 2, y0 = k === "transfo" ? 18 : (k === "bp" ? 40 : k === "contactT" ? 44 : 36);
     dessinerElec(g, { t:"objet", k, p:[[(W - w * U) / 2 / W, y0 / H]], lb:{ bobine:"CR", moteur:"M" }[k] || "", nf:0, __u:U }, W, H, 1.2, "#24282c"); });
-  bar.querySelectorAll("[data-k]").forEach(b => b.onclick = () => { const k = b.dataset.k, deja = RD.objK === k; if (ELEC[k]) RD.objKe = deja ? null : k; else RD.objKi = deja ? null : k; RD.formeK = null; SELO.s = null; redrawInk(); majObjUI(); });
+  bar.querySelectorAll("[data-k]").forEach(b => b.onclick = () => { if (b.dataset.glisse) return; const k = b.dataset.k, deja = RD.objK === k; if (ELEC[k]) RD.objKe = deja ? null : k; else RD.objKi = deja ? null : k; RD.formeK = null; SELO.s = null; redrawInk(); majObjUI(); });
+  /* glisser une vignette (objet iso ou symbole) jusqu'au tableau */
+  bar.querySelectorAll(".cgrid [data-k]").forEach(b => { const k = b.dataset.k; if (/^(fil|rails|jonction|serpentin)$/.test(k)) return;
+    b.style.touchAction = "pan-y"; let g0 = null, fant = null;
+    b.addEventListener("pointerdown", e => { g0 = { x:e.clientX, y:e.clientY, id:e.pointerId }; try { b.setPointerCapture(e.pointerId); } catch(er){} });
+    b.addEventListener("pointermove", e => { if (!g0) return;
+      if (!fant){ if (Math.hypot(e.clientX - g0.x, e.clientY - g0.y) < 10) return;
+        const cv = b.querySelector("canvas"); fant = document.createElement("div"); fant.style.cssText = "position:fixed;z-index:95;pointer-events:none;width:120px;height:64px;margin:-32px 0 0 -60px;border-radius:10px;background:rgba(255,255,255,.85);border:2px dashed #2a7bcf;box-shadow:0 8px 20px rgba(0,0,0,.3)";
+        const im = document.createElement("img"); im.src = cv.toDataURL(); im.style.cssText = "width:100%;height:100%"; fant.appendChild(im); document.body.appendChild(fant); }
+      fant.style.left = e.clientX + "px"; fant.style.top = e.clientY + "px"; });
+    const fin = e => { if (fant){ fant.remove(); fant = null; b.dataset.glisse = "1"; setTimeout(() => delete b.dataset.glisse, 300); if (e.type === "pointerup") deposerObjet(k, e.clientX, e.clientY); } g0 = null; };
+    b.addEventListener("pointerup", fin); b.addEventListener("pointercancel", fin); });
   /* vignettes des formes (dessinées avec le vrai moteur) */
   const P_FORME = { cercle:[[.5, .5], [.8, .5]], bulle:[[.5, .5], [.68, .5]], angle:[[.25, .8], [.75, .2]], fleche:[[.15, .7], [.85, .3]], fleche2:[[.15, .5], [.85, .5]], cote:[[.15, .55], [.85, .55]], ligne:[[.15, .75], [.85, .25]] };
   bar.querySelectorAll("[data-f]").forEach(b => { const t = b.dataset.f, cv = b.querySelector("canvas"), g = cv.getContext("2d"), W = cv.width, H = cv.height, wb = RD.wb; RD.wb = false;
@@ -3255,6 +3266,30 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     (fixes || strokes().filter(f => f.t === "ligne" && f.fil).flatMap(f => [0, 1].filter(i => Math.abs(f.p[i][0] - x2) * W < 2).map(i => [f, i]))).forEach(([f, i]) => { f.p[i][0] = nx; });
     o.sz = [w, h]; };
   const nettoyerFils = () => strokes().filter(o => o.t === "objet" && ELEC[o.k]).forEach(couperFils);   /* après chaque fil ou déplacement */
+  /* ---- Glisser un objet de la palette sur le tableau : il se branche tout seul sur un fil ou un tuyau tout près ----
+     On essaie les points de grille autour de l'endroit lâché (et les deux sens) et on garde celui où le plus de bornes tombent sur un fil (électricité)
+     ou sur un tuyau (isométrique). Le fil est ensuite coupé (couperFils); le bout de tuyau entre les deux raccords est enlevé (objet en ligne). */
+  const tuyaux = () => strokes().filter(f => f.t === "ligne" && !f.fil && f.p && f.p.length === 2);
+  const surTuyau = p => tuyaux().some(f => f.p.some(e => longueur(e, p) < 4));
+  const entreTuyaux = o => { const P = objGeo(o, c.width, c.height).ports.map(p => [p[0] / c.width, p[1] / c.height]); if (P.length !== 2 || !P.every(surTuyau)) return;
+    const [A, B] = P, W = c.width, H = c.height, dedans = e => distSeg([e[0] * W, e[1] * H], [A[0] * W, A[1] * H], [B[0] * W, B[1] * H], 1) < 2;
+    const arr = strokes(); tuyaux().filter(f => dedans(f.p[0]) && dedans(f.p[1])).forEach(f => arr.splice(arr.indexOf(f), 1)); };
+  window.deposerObjet = (k, cx, cy) => {
+    const el = !!ELEC[k], r = c.getBoundingClientRect(); if (cx < r.left || cx > r.right || cy < r.top || cy > r.bottom) return false;
+    if (el ? !modeElec() : !/^iso/.test(wbBg())){ aviser(el ? "Les symboles électriques se posent sur le fond quadrillé." : "Les objets isométriques se posent sur le fond « plan isométrique ».", 4000); return false; }
+    const o = { t:"objet", k, o:0, c:/^hl/.test(RD.color) ? "#24282c" : RD.color, p:[cur({ clientX:cx, clientY:cy }).snap], w:4 };
+    if (el){ const de = ELEC[k]; if (de.lb) o.lb = RD.lbK[k] || de.lb; if (de.nf) o.nf = 0; if (k === "inter") o.pol = RD.objPol || "spst"; if (k === "bobineT") o.del = 3; }
+    const fils = strokes().filter(f => f.t === "ligne" && f.fil);
+    const branche = p => el ? fils.some(f => surFil(p, f) || bout(p, f)) : surTuyau(p);
+    const pas = el ? elecU() * r.width / c.width : 34 * RD.z * 1.2 * (r.width / (c.offsetWidth || r.width)) * .55, vus = new Set(); let best = null;
+    for (let dx = -3; dx <= 3; dx++) for (let dy = -3; dy <= 3; dy++){ const q = cur({ clientX:cx + dx * pas, clientY:cy + dy * pas }).snap, cle = q.map(v => v.toFixed(5)).join(); if (vus.has(cle)) continue; vus.add(cle);
+      for (const ori of [0, 1]){ const t = { ...o, p:[q], o:ori }, P = objGeo(t, c.width, c.height).ports.map(pp => [pp[0] / c.width, pp[1] / c.height]), n = P.filter(branche).length;
+        if (!n) continue; const d = Math.hypot(dx, dy) + ori * .01, sc = n * 10 - d; if (!best || sc > best[0]) best = [sc, q, ori, n]; } }
+    if (best){ o.p = [best[1]]; o.o = best[2]; }
+    snapInk(); strokes().push(o); if (el) couperFils(o); else if (best) entreTuyaux(o);
+    RD.objKi = null; RD.objKe = null; SELO.s = o; redrawInk(); majObjUI();
+    aviser(best ? (el ? ELEC[k].n.replace(/^[✎•] /, "") : OBJETS[k].n) + " branché sur " + (el ? "le fil." : "le tuyau.") : "Posé. Glisse-le sur un " + (el ? "fil" : "tuyau") + " pour le brancher tout seul.", 3500);
+    return true; };
   const touche = q => { const arr = strokes(); for (let i = arr.length - 1; i >= 0; i--){ const s = arr[i]; if (s.t !== "objet") continue; const G = objGeo(s, c.width, c.height), x = q[0] * c.width, y = q[1] * c.height;
     if (s.k === "rails"){ if (surRails(s, G, x, y, .1) && (RD.objK === "rails" || (y - G.oy) / G.u < .4)) return s; continue; }
     if (x >= G.bbox[0] - 4 && x <= G.bbox[2] + 4 && y >= G.bbox[1] - 4 && y <= G.bbox[3] + 4) return s; } return null; };
