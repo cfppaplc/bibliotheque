@@ -198,6 +198,23 @@ class Batiment:
     def plan_base(self, f, etiquettes=True, pale=False):
         self.murs(f, poche=GRIS_C if pale else GRIS)
         self.ouvertures(f, etiquettes=etiquettes)
+        self.escaliers_plan(f, etiquettes)
+
+    def escaliers_plan(self, f, etiquettes=True):
+        """escaliers = [(x0, y0, x1, y1, nb_marches, sens 'n'|'s', texte, palier (x0, y0, x1, y1) ou None, vide)]"""
+        k = f.N / 50
+        for (x0, y0, x1, y1, n, sens, txt, palier, vide) in getattr(self, "escaliers", []):
+            if vide: f.rect(x0, y0, x1, y1, .4, GRIS, dash=[4, 2])
+            f.rect(x0, y0, x1, y1, .6)
+            for i in range(1, n): yy = y0 + (y1 - y0) * i / n; f.ligne(x0, yy, x1, yy, .35)
+            xm = (x0 + x1) / 2; a, b = (y0 + 250 * k, y1 - 250 * k) if sens == "n" else (y1 - 250 * k, y0 + 250 * k)
+            f.ligne(xm, a, xm, b, .5); f.cercle(xm, a, 45 * k, .5, fill=black)
+            d = 1 if sens == "n" else -1; f.poly([(xm - 120 * k, b - d * 220 * k), (xm, b), (xm + 120 * k, b - d * 220 * k)], .5)
+            if etiquettes and txt:
+                lt = len(txt) * 5.2 * .58 * 25.4 / 72 * f.N; ht_ = 5.2 * 1.5 * 25.4 / 72 * f.N   # fond blanc sous le texte
+                f.rect(xm - ht_ / 2, (y0 + y1) / 2 - lt / 2, xm + ht_ / 2, (y0 + y1) / 2 + lt / 2, 0, white, fill=white)
+                f.texte(xm, (y0 + y1) / 2, txt, 5.2, True, rot=90)
+            if palier: f.rect(*palier, .4)
 
     # =============================================================== FEUILLES
     def feuille_site(self, c):
@@ -259,7 +276,7 @@ class Batiment:
         c.showPage()
 
     def feuille_plan(self, c):
-        f = Feuille(c, self.dossier, "A-101", "PLAN DU REZ-DE-CHAUSSÉE", f"1:{self.Nplan}")
+        f = Feuille(c, self.dossier, getattr(self, "no_plan", "A-101"), getattr(self, "titre_plan", "PLAN DU REZ-DE-CHAUSSÉE"), f"1:{self.Nplan}")
         self._centrer(f, self.Nplan)
         if getattr(self, "grille_xy", None): f.grille(*self.grille_xy, 0, self.W, 0, self.D, ext=getattr(self, "grille_ext", 1600))
         self.plan_base(f)
@@ -280,7 +297,7 @@ class Batiment:
             self._repere_coupe(f, *cp)
         self._meubles(f)
         f.nord(DRAW[2] - 16, DRAW[3] - 18)
-        f.titre_vue(DRAW[0] + 4, DRAW[1] + 6, 1, "PLAN DU REZ-DE-CHAUSSÉE", f"1:{self.Nplan}")
+        f.titre_vue(DRAW[0] + 4, DRAW[1] + 6, 1, getattr(self, "titre_plan", "PLAN DU REZ-DE-CHAUSSÉE").replace("\n", " "), f"1:{self.Nplan}")
         f.barre_echelle(DRAW[0] + 120, DRAW[1] + 6, self.Nplan)
         f.notes("NOTES GÉNÉRALES", self.notes_plan)
         f.notes("LÉGENDE", ["Mur extérieur (poché foncé) : voir composition M1, feuille A-301",
@@ -608,15 +625,15 @@ class Batiment:
         return [p, (p[0], q[1]), q]
 
     def feuille_plomberie(self, c):
-        f = Feuille(c, self.dossier, "P-101", "PLAN DE PLOMBERIE\nREZ-DE-CHAUSSÉE", f"1:{self.Nplan}")
+        f = Feuille(c, self.dossier, getattr(self, "no_plomb", "P-101"), getattr(self, "titre_plomb", "PLAN DE PLOMBERIE\nREZ-DE-CHAUSSÉE"), f"1:{self.Nplan}")
         self._centrer(f, self.Nplan)
         self.plan_base(f, etiquettes=False, pale=True)
         self.pieces(f, aire=False, size=5.5, coin=True)
         nets = self.reseaux()
         for pl in nets:
             f.poly(pl["coll"], 2.6, DR, dash=[7, 3])
-            for (x, y) in pl["chutes"]: f.cercle(x, y, 110, .8, fill=DR)
-            f.poly(pl["sortie"], 2.6, DR, dash=[7, 3])
+            for (x, y) in pl.get("chutes", []): f.cercle(x, y, 110, .8, fill=DR)
+            if len(pl.get("sortie", [])) > 1: f.poly(pl["sortie"], 2.6, DR, dash=[7, 3])
         self.appareils(f)
         for (code, x, y, rot) in self.app:
             o = self.sortie(code, x, y, rot)
@@ -636,6 +653,7 @@ class Batiment:
             if a[5] not in ("—",) and code != "ce":
                 q, seg = self._projeter((px, py), pl["ec"]); f.poly(self._chemin((px, py), q, seg), 1.0, EC)
         for pl in nets:
+            if not pl.get("compteur"): continue
             mx, my = pl["compteur"]
             f.rect(mx - 180, my - 120, mx + 180, my + 120, .6, EF, fill=EF); f.texte(mx + 300 * pl.get("lab_sens", 1), my, "Entrée d'eau, robinet d'arrêt\net compteur", 5.6, True, "g" if pl.get("lab_sens", 1) > 0 else "d", EF)
         pl = self.plomb
@@ -724,7 +742,7 @@ class Batiment:
 
     # =============================================================== ÉLECTRICITÉ
     def feuille_electricite(self, c):
-        f = Feuille(c, self.dossier, "E-101", "PLAN D'ÉLECTRICITÉ", f"1:{self.Nplan}")
+        f = Feuille(c, self.dossier, getattr(self, "no_elec", "E-101"), getattr(self, "titre_elec", "PLAN D'ÉLECTRICITÉ"), f"1:{self.Nplan}")
         self._centrer(f, self.Nplan)
         self.plan_base(f, etiquettes=False, pale=True)
         self.appareils(f, GRIS_C)
@@ -771,7 +789,7 @@ class Batiment:
                 f.cercle(lx + ddx, ly - ddy, 170 * k, .6, ELEC, fill=white); f.texte(lx + ddx, ly - ddy, "DF", 4.8, True, col=ELEC)
             circuits.append((no_circ, f"Prises et éclairage — {nom}".replace("\n", " "), "15 A", "1 × 15 A")); no_circ += 1
         # panneau
-        pans = getattr(self, "panneaux", None) or [(*self.panneau, self.panneau_txt, getattr(self, "panneau_lab", None))]
+        pans = self.panneaux if hasattr(self, "panneaux") else [(*self.panneau, self.panneau_txt, getattr(self, "panneau_lab", None))]
         for (px, py, prot, ptxt, plab) in pans:
             T = lambda a, b: tuple(v + o for v, o in zip(rotp(a, b, prot), (px, py)))
             f.poly([T(-450, 0), T(450, 0), T(450, 180), T(-450, 180)], .8, ELEC, close=True, fill=ELEC)
@@ -847,7 +865,7 @@ class Batiment:
 
     # =============================================================== CVCA
     def feuille_cvca(self, c):
-        f = Feuille(c, self.dossier, "M-101", "PLAN DE CHAUFFAGE,\nVENTILATION ET CLIMATISATION", f"1:{self.Nplan}")
+        f = Feuille(c, self.dossier, getattr(self, "no_cvca", "M-101"), getattr(self, "titre_cvca", "PLAN DE CHAUFFAGE,\nVENTILATION ET CLIMATISATION"), f"1:{self.Nplan}")
         self._centrer(f, self.Nplan)
         self.plan_base(f, etiquettes=False, pale=True)
         self.appareils(f, GRIS_C)

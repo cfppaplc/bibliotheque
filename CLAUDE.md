@@ -119,6 +119,7 @@
 - Produire : `cd outils/plans && python3 d4_centre.py` (adapter le chemin de sortie), puis copier le PDF dans `plans/dossier-4.pdf`
   et la feuille A-101 en PNG 1700 × 1100 (`pdftoppm -r 100 -f 5 -l 5`) dans `plans/dossier-4.png` (secours si le PDF ne s'ouvre pas).
 - Feuilles supplémentaires : `batiment.feuilles_extra = [(numéro, titre, fonction)]`, insérées après A-100 et dans la liste de la page de garde.
+- **Maisons à étages** (`etages.py`, dossier 1 depuis le 23 oct. 2026) : `MaisonEtages(lv=[sous-sol, rdc, étage])`, chaque niveau est un `Batiment` (créé par `niveau(commun, …)`) avec `zf` (dessus du plancher), `hc`, `tremies`, `escaliers` et ses propres plans A/P/E/M (`no_plan`, `titre_plan`, …). `MaisonEtages` dessine élévations (`volumes`, `marquises`), coupes A/B (`_coupe_niv`, `volees`), coupe de mur (`_coupe_mur_etages`), isométrique 3 niveaux (`feuille_iso`), fondations du sous-sol. Le duplex (dossier 2) est encore l'ancien modèle de plain-pied : à refaire de la même façon (Jeremy l'a demandé).
 - Liste des dossiers dans `index.html` : boutons `.pl-ex[data-ex]`, `DOSSIERS`, et `dossiers` du catalogue envoyé au tableau de bord.
 
 ## Points ouverts / à savoir
