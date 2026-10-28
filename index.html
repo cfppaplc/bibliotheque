@@ -2740,7 +2740,7 @@ let dernierTap = null;
 function tapElement(o, e){ if (!o || !e) return; const t = performance.now(), d = dernierTap; dernierTap = { o, t, x:e.clientX, y:e.clientY };
   if (d && d.o === o && t - d.t < 550 && Math.hypot(e.clientX - d.x, e.clientY - d.y) < 24 && strokes().includes(o)){ dernierTap = null; SELO.s = o; redrawInk(); majObjUI(); modifierForme(o, e.clientX, e.clientY); } }
 /* sélectionner un élément d'une autre catégorie : la palette passe à son onglet (Formes, Iso ou Électricité) */
-function ongletPour(o){ return o.fil ? "elec" : o.t !== "objet" ? "formes" : ELEC[o.k] ? "elec" : "iso"; }
+function ongletPour(o){ return o.fil ? "elec" : FORMES[o.t] && FORMES[o.t].pl ? "plomb" : o.t !== "objet" ? "formes" : ELEC[o.k] ? "elec" : "iso"; }
 function choisirAutre(o){ const t = ongletPour(o), isoBg = !!RD.wb && /^iso/.test(wbBg());
   if ((t === "iso" && !isoBg) || (t === "elec" && !modeElec())){ aviser(t === "iso" ? "Cet objet isométrique se modifie sur le fond « plan isométrique » (bouton Fond)." : "Ce symbole électrique se modifie sur le fond quadrillé (bouton Fond).", 4500); return false; }
   if (RD.objTab !== t){ RD.formeK = null; RD.objKi = null; RD.objKe = null; } RD.objTab = t; SELO.s = o; majObjUI(); redrawInk(); return true; }
@@ -3248,12 +3248,12 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
   /* onglet : Formes, Isométrique (fond iso) ou Électricité (fond quadrillé) */
   const isoBg = !!RD.wb && /^iso/.test(wbBg());
   if (!RD.objTab || (RD.objTab === "iso" && !isoBg) || (RD.objTab === "elec" && !modeElec())) RD.objTab = modeElec() ? "elec" : isoBg ? "iso" : "formes";
-  if (RD.objTab !== "formes") RD.formeK = null;
+  if (RD.objTab !== "formes" && RD.objTab !== "plomb") RD.formeK = null;
   const tab = RD.objTab, el = tab === "elec"; RD.objK = el ? (RD.objKe || null) : (RD.objKi || null);   /* aucun outil par défaut : on choisit, déplace et nomme */
-  b.querySelectorAll("[data-tab]").forEach(x => { x.classList.toggle("on", x.dataset.tab === tab); x.disabled = x.dataset.tab !== "formes" && !RD.wb; x.setAttribute("aria-selected", x.dataset.tab === tab); });
+  b.querySelectorAll("[data-tab]").forEach(x => { x.classList.toggle("on", x.dataset.tab === tab); x.disabled = !/^(formes|plomb)$/.test(x.dataset.tab) && !RD.wb; x.setAttribute("aria-selected", x.dataset.tab === tab); });
   b.querySelectorAll(".grp").forEach(x => x.hidden = x.dataset.g !== tab); b.querySelectorAll(".grpE").forEach(x => x.hidden = !el);
   b.querySelectorAll("[data-f]").forEach(x => x.classList.toggle("on", x.dataset.f === RD.formeK));
-  b.querySelector(".tit").textContent = el ? "Schéma électrique" : tab === "iso" ? "Objets isométriques" : "Formes"; b.classList.toggle("sim", !!RD.sim); $("#objSim").textContent = RD.sim ? "■ Arrêter l'animation" : "▶ Animer le schéma";
+  b.querySelector(".tit").textContent = el ? "Schéma électrique" : tab === "iso" ? "Objets isométriques" : tab === "plomb" ? "Plomberie en coupe" : "Formes"; b.classList.toggle("sim", !!RD.sim); $("#objSim").textContent = RD.sim ? "■ Arrêter l'animation" : "▶ Animer le schéma";
   b.querySelectorAll("[data-k]").forEach(x => x.classList.toggle("on", x.dataset.k === RD.objK));
   b.querySelectorAll("[data-fc]").forEach(x => x.classList.toggle("on", x.dataset.fc === (RD.filCol || "#24282c")));
   const se = SELO.s && strokes().includes(SELO.s) && ELEC[SELO.s.k] ? SELO.s : null, de = ELEC[se ? se.k : RD.objK] || null, bn = b.querySelector("#objNF"), bl = b.querySelector("#objL");
@@ -3274,11 +3274,11 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
   const bar = document.createElement("div"); bar.id = "objBar"; bar.hidden = true;
   bar.style.cssText = "position:absolute;z-index:75;left:12px;top:70px;display:flex;flex-direction:column;gap:6px;width:184px;max-height:calc(100% - 150px);overflow-y:auto;overflow-x:hidden;padding:8px;border-radius:12px;background:rgba(14,14,15,.96);border:1px solid #2f2f33;color:#d4d4d8;font:600 .8rem system-ui,sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.35)";
   bar.innerHTML = '<div class="tete" title="Glisse ici pour déplacer la palette"><span class="poig">⠿</span><span class="tit">Objets</span></div>'
-    + '<div class="onglets" role="tablist"><button data-tab="formes" role="tab">Formes</button><button data-tab="iso" role="tab" title="Objets isométriques (plomberie, chauffage)">Iso</button><button data-tab="elec" role="tab">Électricité</button></div>'
+    + '<div class="onglets" role="tablist"><button data-tab="formes" role="tab">Formes</button><button data-tab="iso" role="tab" title="Objets isométriques (plomberie, chauffage)">Iso</button><button data-tab="elec" role="tab">Électricité</button><button data-tab="plomb" role="tab" title="Plomberie en coupe : maison, tuyaux EF/EC, drain, appareils">Plomberie</button></div>'
     + '<div class="grp" data-g="formes"><div class="cgrid cform">' + Object.keys(FORMES).filter(k => !FORMES[k].pl).map(k => '<button data-f="' + k + '" title="' + FORMES[k].n + '"><canvas width="120" height="64"></canvas><span>' + FORMES[k].n + '</span></button>').join("") + '</div>'
     + '<div class="aide"><b>Touche</b> une forme pour la choisir : glisse-la pour la déplacer, tire un <b>carré blanc</b> pour la grandir. <b>Double-clic</b> : écrire la cote, l\'angle ou un nom. Pour en <b>ajouter</b> : choisis une forme ci-dessous, puis glisse sur le tableau. <b>Clic à côté</b> : plus rien de choisi.</div>'
-    + '<details class="plomb"><summary>Plomberie (maison en coupe)</summary><div class="cgrid cform">' + Object.keys(FORMES).filter(k => FORMES[k].pl).map(k => '<button data-f="' + k + '" title="' + FORMES[k].n + '"><canvas width="120" height="64"></canvas><span>' + FORMES[k].n + '</span></button>').join("") + '</div>'
-    + '<div class="aide">1) <b>Maison en coupe</b> : touche-la puis clique sur le tableau. 2) <b>Tuyaux</b> (EF, EC, drain, évent, gaz) : glisse d\'un point à l\'autre; ils restent droits ou à 45° et s\'aimantent au bout d\'un autre tuyau. 3) <b>Appareils et raccords</b> : un clic les pose. <b>Double-clic</b> sur un tuyau : son diamètre (ex. 3/4 po).</div></details></div>'
+    + '</div><div class="grp" data-g="plomb"><div class="cgrid cform">' + Object.keys(FORMES).filter(k => FORMES[k].pl).map(k => '<button data-f="' + k + '" title="' + FORMES[k].n + '"><canvas width="120" height="64"></canvas><span>' + FORMES[k].n + '</span></button>').join("") + '</div>'
+    + '<div class="aide">1) <b>Maison en coupe</b> : touche-la puis clique sur le tableau. 2) <b>Tuyaux</b> (EF, EC, drain, évent, gaz) : glisse d\'un point à l\'autre; ils restent droits ou à 45° et s\'aimantent au bout d\'un autre tuyau. 3) <b>Appareils et raccords</b> : un clic les pose. <b>Double-clic</b> sur un tuyau : son diamètre (ex. 3/4 po).</div></div>'
     + '<div class="grp" data-g="iso"><div class="cgrid ciso">' + Object.keys(OBJETS).map(k => '<button data-k="' + k + '" title="' + OBJETS[k].n + '"><canvas width="120" height="64"></canvas><span>' + OBJETS[k].n + '</span></button>').join("") + '</div>'
     + '<div class="aide"><b>Touche</b> un objet pour le choisir et le déplacer (les tuyaux raccordés suivent), <b>double-clic</b> pour le nommer. Pour en <b>poser</b> un : <b>glisse-le</b> sur le tableau (il se branche tout seul sur un tuyau tout près), ou touche-le puis clique sur la grille. <b>Clic à côté</b> : plus rien de choisi.</div></div>'
     + '<div class="grp" data-g="elec"><button id="objSch" class="sch-btn" title="Circuits prêts à utiliser et tableaux enregistrés">📋 Modèles et mes schémas</button>' + ELEC_CAT.map(([cg, cn]) => '<button class="cat" data-cat="' + cg + '">' + cn + '</button><div class="cgrid" data-cat="' + cg + '">'
@@ -3295,7 +3295,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
   st.textContent = '#objBar button{min-height:32px;padding:0 8px;border-radius:8px;border:1px solid #2f2f33;background:#18181a;color:#d4d4d8;cursor:pointer;font:inherit;text-align:left}#objBar button:hover{border-color:#6a6a70}#objBar button.on{background:#2a2a2d;border-color:#6aa9ff;color:#fff}'
     + '#objBar .tete{display:flex;align-items:center;gap:6px;cursor:grab;user-select:none;touch-action:none;padding:2px 0 4px 2px;position:sticky;top:-8px;z-index:2;background:rgb(14,14,15);margin:-8px -8px 0;padding:8px 8px 6px;color:#a1a1aa;font-size:.78rem;letter-spacing:.04em;text-transform:uppercase}#objBar .tete:active{cursor:grabbing}#objBar .poig{font-size:1.1rem;line-height:1}'
     + '#objBar #objF{margin-left:auto;flex:none;min-height:28px;width:28px;padding:0;display:flex;align-items:center;justify-content:center}#objBar.of{width:auto!important}#objBar.of .tit{display:none}'
-    + '#objBar .onglets{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;margin-bottom:4px}#objBar .onglets button{min-height:30px;padding:0 2px;text-align:center;font-size:.7rem;border-radius:7px}#objBar .onglets button.on{background:#1f6fc2;border-color:#1f6fc2;color:#fff}#objBar .onglets button[disabled]{opacity:.35;cursor:not-allowed}'
+    + '#objBar .onglets{display:grid;grid-template-columns:repeat(2,1fr);gap:3px;margin-bottom:4px}#objBar .onglets button{min-height:30px;padding:0 2px;text-align:center;font-size:.7rem;border-radius:7px}#objBar .onglets button.on{background:#1f6fc2;border-color:#1f6fc2;color:#fff}#objBar .onglets button[disabled]{opacity:.35;cursor:not-allowed}'
     + '#objBar .grp{display:flex;flex-direction:column;gap:4px}#objBar .grp[hidden],#objBar .grpE[hidden]{display:none!important}'
     + '#objBar .sch-btn{text-align:center!important;background:#1f6fc2!important;border-color:#1f6fc2!important;color:#fff!important;margin-bottom:4px}#objBar .cat{background:transparent!important;border:0!important;color:#a1a1aa!important;font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;min-height:26px!important;padding:0 2px!important;display:flex;align-items:center;gap:6px}#objBar .cat::before{content:"▾";font-size:.8rem;width:10px}#objBar .cat.ferme::before{content:"▸"}#objBar .cat:hover{color:#fff!important}'
     + '#objBar .cgrid{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:4px}#objBar .cgrid[hidden]{display:none}#objBar .pol{display:grid;grid-template-columns:1fr 1fr;gap:4px}#objBar .pol button{text-align:center;font-size:.78rem}#objBar .del{display:flex;align-items:center;gap:6px;font-size:.78rem}#objBar .del input{width:56px;min-height:30px;border-radius:8px;border:1px solid #2f2f33;background:#fff;color:#111;font:inherit;font-weight:700;padding:0 6px}'
@@ -3360,10 +3360,10 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
       dessinerObjet(g, s1, W, H, RD.z * dpr, "#3a424b"); } catch(e){} RD.z = z0; });
   /* onglets : Formes partout; Isométrique et Électricité changent le fond du tableau au besoin */
   bar.querySelectorAll("[data-tab]").forEach(b => b.onclick = () => { const t = b.dataset.tab;
-    if (t !== "formes" && !RD.wb){ aviser("Les objets isométriques et les symboles électriques se posent sur le tableau blanc (bouton Tableau blanc)."); return; }
+    if (t !== "formes" && t !== "plomb" && !RD.wb){ aviser("Les objets isométriques et les symboles électriques se posent sur le tableau blanc (bouton Tableau blanc)."); return; }
     RD.objTab = t; SELO.s = null;
     RD.formeK = null; RD.objKi = null; RD.objKe = null;
-    if (t !== "formes"){ const voulu = t === "iso" ? /^iso/ : /^quad$/;
+    if (t !== "formes" && t !== "plomb"){ const voulu = t === "iso" ? /^iso/ : /^quad$/;
       if (!voulu.test(wbBg())){ wbEtat().bg[wbEtat().n] = t === "iso" ? "iso" : "quad"; majFond(); aviser(t === "iso" ? "Fond : plan isométrique." : "Fond : quadrillé (schéma électrique en échelle)."); } }
     redrawInk(); refreshTools(); });
   bar.querySelectorAll("[data-fc]").forEach(x => x.onclick = () => { RD.filCol = x.dataset.fc; RD.objKe = "fil"; RD.objKi = null; SELO.s = null; majObjUI(); redrawInk(); aviser("Fil " + x.title.toLowerCase() + " : glisse d'un point bleu à l'autre.", 2500); });
@@ -3515,7 +3515,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     if (s.k === "rails"){ if (surRails(s, G, x, y, .1) && (RD.objK === "rails" || (y - G.oy) / G.u < .4)) return s; continue; }
     if (x >= G.bbox[0] - 4 && x <= G.bbox[2] + 4 && y >= G.bbox[1] - 4 && y <= G.bbox[3] + 4) return s; } return null; };
   c.addEventListener("pointerdown", e => {
-    if (!RD.obj || !RD.wb || RD.eraser || RD.sim || RD.objTab === "formes") return;
+    if (!RD.obj || !RD.wb || RD.eraser || RD.sim || RD.objTab === "formes" || RD.objTab === "plomb") return;
     const q = cur(e), el = modeElec();
     { const o = touche(q.raw); if (o && ongletPour(o) !== RD.objTab){ e.stopImmediatePropagation(); if (choisirAutre(o)) tapElement(o, e); return; }
       if (!o && !(el && borneProche(q.raw))){ const f = formeSous(q.raw);
@@ -3656,7 +3656,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
       RD.obj = true; RD.objTab = null; RD.formeK = null; RD.objKi = null; RD.objKe = null; refreshTools();
       if (hit.t === "objet"){ if (choisirAutre(hit)) tapElement(hit, e); return; }
       choisirAutre(hit); cur = { bouge:hit, q0:pt(e), p0:hit.p.map(v => v.slice()), snap:false, x0:e.clientX, y0:e.clientY }; return; }
-    if (RD.text || (RD.obj && RD.objTab !== "formes")){ e.preventDefault(); return; }
+    if (RD.text || (RD.obj && RD.objTab !== "formes" && RD.objTab !== "plomb")){ e.preventDefault(); return; }
     const q = pt(e);
     if (RD.obj){ const brut = (r => [(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height])(c.getBoundingClientRect()), ip = poigneeSous(SELO.s, brut);
       if (ip >= 0 && !(RD.formeK && /^tuy/.test(RD.formeK))){ cur = { poignee:ip, s:SELO.s, snap:false, x0:e.clientX, y0:e.clientY }; return; }   /* outil tuyau : on part du bout pour un nouveau tuyau */               /* agrandir / rapetisser par une poignée */
@@ -3664,7 +3664,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
       if (hit && hit === SELO.s && !(RD.formeK && /^tuy/.test(RD.formeK) && /^tuy/.test(hit.t))){ cur = { bouge:hit, q0:q, p0:hit.p.map(v => v.slice()), snap:false, x0:e.clientX, y0:e.clientY }; return; }   /* forme déjà choisie : on la glisse */
       const obj = !hit && RD.wb ? objetSous(brut) : null;
       if (!RD.formeK){           /* aucun outil : toucher = choisir (et glisser = déplacer); toucher à côté = rien de choisi */
-        if (hit){ SELO.s = hit; redrawInk(); majObjUI(); cur = { bouge:hit, q0:q, p0:hit.p.map(v => v.slice()), snap:false, x0:e.clientX, y0:e.clientY }; return; }
+        if (hit){ SELO.s = hit; { const og = ongletPour(hit); if (og !== RD.objTab && /^(formes|plomb)$/.test(og)) RD.objTab = og; } redrawInk(); majObjUI(); cur = { bouge:hit, q0:q, p0:hit.p.map(v => v.slice()), snap:false, x0:e.clientX, y0:e.clientY }; return; }
         if (obj){ if (choisirAutre(obj)) tapElement(obj, e); return; }
         if (SELO.s){ SELO.s = null; redrawInk(); majObjUI(); } e.preventDefault(); return; }
       var choisir = hit || obj;     /* forme pas encore choisie : un simple clic la choisit, mais glisser trace une nouvelle forme (ex. une cote qui part du coin d'un rectangle) */
@@ -3926,7 +3926,7 @@ function refreshTools(){
   const sw = document.querySelector('#penBar .sw[data-c="#24282c"]'); if (sw){ sw.style.setProperty("--c", wbSombre() ? "#f4f1ea" : "#24282c"); sw.setAttribute("aria-label", wbSombre() ? "Craie blanche" : "Noir"); }
   document.querySelectorAll("#penBar .sw").forEach(b => b.classList.toggle("on", !RD.eraser && b.dataset.c === RD.color)); if (RD.swx) RD.swx.classList.toggle("on", !RD.eraser && !document.querySelector("#penBar .sw.on"));
   if (RD.obj && !(RD.pen || RD.wb)) RD.obj = false;
-  if (RD.obj && RD.objTab && RD.objTab !== "formes" && !RD.wb) RD.objTab = "formes";
+  if (RD.obj && RD.objTab && RD.objTab !== "formes" && RD.objTab !== "plomb" && !RD.wb) RD.objTab = "formes";
   if (RD.sim && (!RD.obj || !modeElec())) simStop(true);
   $("#penO").classList.toggle("on", !!RD.obj);
   redrawInk(); if (!RD.text) SEL.s = null; if (!RD.obj) SELO.s = null; majBarTxt(); majSelTxt(); majObjUI();
