@@ -4406,6 +4406,11 @@ majEpaisseur();
   [sep(), bc, X("penT"), X("penO"), X("penE"), X("penU"), X("wbF"), bfs, bp].forEach(e => e && bar.appendChild(e));
   { const x = $("#penX"); if (x) x.style.display = "none"; }   /* plus de ✕ dans la barre : on sort par « Retour » (tableau blanc) ou le bouton crayon du livre */
   bar.appendChild(pc); bar.appendChild(pp);
+  /* toucher un autre outil de la barre ferme le menu ouvert (« … » ou couleurs) */
+  bar.addEventListener("click", e => { const t = e.target; if (!t.closest) return;
+    if (!pp.hidden && !pp.contains(t) && !t.closest("#penPlus")){ pp.hidden = true; bp.classList.remove("open"); }
+    if (!pc.hidden && !pc.contains(t) && !t.closest("#penCol")){ pc.hidden = true; bc.classList.remove("open"); }
+    if (!pp.hidden && t.closest("#penC, #wbPlus, #wbS")) setTimeout(fermer, 60); }, true);   /* Tout effacer, Nouveau, Enregistrer : le menu se ferme; zoom et flèches de tableaux le gardent ouvert */
   const fermer = () => { pc.hidden = pp.hidden = true; bc.classList.remove("open"); bp.classList.remove("open"); };
   const basculer = (p, b) => { const ouvrir = p.hidden; fermer(); if (ouvrir){ p.hidden = false; b.classList.add("open"); } };
   /* toucher « Couleur » ramène toujours au crayon (quitte l'efface, le texte ou les objets) */
