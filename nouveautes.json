@@ -171,7 +171,7 @@
   "formation": [
    "Nouveau : la touche Suppr efface ce qui est choisi (forme, objet, symbole, texte). La gomme a sa glissière de taille. Le bouton plein écran est dans la barre du tableau blanc. Ta couleur personnalisée est retenue. Avec l'outil Fil, les symboles ne bougent plus par accident. En glissant un objet de la palette, tu le vois déjà à sa place.",
    {
-    "t": "Plan isométrique : quand un tuyau passe par-dessus un autre, une petite coupure ombrée montre lequel est devant (le dernier tracé passe par-dessus). Un tuyau qui se termine sur un autre (raccord) n'a pas de coupure.",
+    "t": "Plan isométrique : quand un tuyau passe par-dessus un autre, celui du dessous est interrompu de chaque côté (comme sur un plan) et celui du dessus passe avec une légère ombre. Le dernier tracé passe par-dessus. Un tuyau qui se termine sur un autre (raccord) n'est pas interrompu.",
     "img": "nouveautes/iso-croisement.jpg"
    },
    {
@@ -252,6 +252,10 @@
    "Le crayon réagit maintenant tout de suite : seul le trait en cours est redessiné pendant que tu écris, le reste du tableau ne bouge pas."
   ],
   "versions": [
+   {
+    "date": "2026-10-28",
+    "texte": "Iso : croisement plus naturel (tuyau du dessous interrompu, sans bande blanche)."
+   },
    {
     "date": "2026-10-28",
     "texte": "L'avis « Ton dessin est resté… » a un ✕ pour le fermer."
