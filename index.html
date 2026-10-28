@@ -2004,12 +2004,14 @@ const ELEC = {
   pression:     { g:"cmd",  n:"Pressostat", nf:1, lb:"PS" },
   flotteur:     { g:"cmd",  n:"Interrupteur à flotteur", c:"Flotteur", nf:1, lb:"FS" },
   fincourse:    { g:"cmd",  n:"Interrupteur de fin de course", c:"Fin de course", nf:1, lb:"LS" },
+  relais:       { g:"rel",  n:"Relais complet : bobine + contact NO + contact NF (même repère)", c:"Relais complet", lb:"CR1" },
   bobine:       { g:"rel",  n:"Bobine (relais, contacteur)", c:"Bobine", lb:"CR1" },
   contact:      { g:"rel",  n:"Contact de relais", c:"Contact", nf:1, lb:"CR1" },
   bobineT:      { g:"rel",  n:"Relais temporisé (bobine)", c:"Relais temporisé", lb:"TR1" },
   contactT:     { g:"rel",  n:"Contact temporisé (au travail)", c:"Contact temporisé", nf:1, lb:"TR1" },
   surcharge:    { g:"rel",  n:"Contact de surcharge (OL)", c:"Surcharge OL", lb:"OL" },
   lampe:        { g:"ch",   n:"Lampe témoin", lb:"R" },
+  ampoule:      { g:"ch",   n:"Ampoule (éclairage)", c:"Ampoule", lb:"L1" },
   moteur:       { g:"ch",   n:"Moteur", lb:"M" },
   solenoide:    { g:"ch",   n:"Solénoïde (électrovanne)", c:"Solénoïde", lb:"SOL" },
   sonnerie:     { g:"ch",   n:"Sonnerie / avertisseur", c:"Sonnerie", lb:"BZ" },
@@ -2036,7 +2038,7 @@ function elecGeo(s, W, H){
   let lp, bx;
   if (s.k === "rails"){ const [w, h] = s.sz || [8, 10]; lp = []; for (let y = 1; y < h; y += 2) lp.push([0, y], [w, y]); bx = [-1.1, -1, w + .4, h + .2]; }
   else if (s.k === "jonction"){ lp = [[0, 0]]; bx = [-.3, -.3, .3, .3]; }
-  else if (s.k === "transfo"){ lp = [[0, 0], [4, 0], [0, 2], [4, 2]]; bx = [0, -1, 4, 2.6]; }
+  else if (s.k === "transfo"){ lp = [[0, 0], [4, 0], [0, 2], [4, 2]]; bx = [0, -1.3, 4, 3]; }
   else if (s.k === "terre"){ lp = [[0, 0]]; bx = [-.45, -.15, .45, 1]; }
   else if (polDe(s) === "spdt"){ lp = [[0, 0], [2, 0], [2, 1]]; bx = [0, -1.1, 2, 1.35]; }
   else if (polDe(s) === "dpst"){ lp = [[0, 0], [2, 0], [0, 2], [2, 2]]; bx = [0, -1.1, 2, 2.4]; }
@@ -2046,6 +2048,10 @@ function elecGeo(s, W, H){
   const c0 = P(bx[0], bx[1]), c1 = P(bx[2], bx[3]);
   return { el:true, u, o, ox, oy, P, ports:lp.map(([x, y]) => P(x, y)), bbox:[Math.min(c0[0], c1[0]), Math.min(c0[1], c1[1]), Math.max(c0[0], c1[0]), Math.max(c0[1], c1[1])] };
 }
+/* numéros de bornes d'un contact : 1er contact du relais = 13-14 (NO) ou 11-12 (NF), 2e = 23-24 / 21-22, etc. */
+function numBornes(s){ if (!s.lb || !/^(contact|contactT)$/.test(s.k)) return null; const n = x => String(x || "").trim().toUpperCase();
+  let i = 0; for (const o of strokes()){ if (/^(contact|contactT)$/.test(o.k) && n(o.lb) === n(s.lb)){ i++; if (o === s) break; } }
+  i = Math.max(1, i); return s.nf ? [i + "1", i + "2"] : [i + "3", i + "4"]; }
 function dessinerElec(g, s, W, H, k, col){
   const G = elecGeo(s, W, H), u = G.u, d = ELEC[s.k] || {}, K = s.k, nf = K === "surcharge" || (d.nf && s.nf);
   const SM = RD.sim && !s.__u ? SIM : null, ferme = SM ? SM.ferme.get(s) : undefined, actif = SM ? SM.charges.has(s) || SM.trOn.has(s) : false;   /* animation : état réel */
@@ -2065,9 +2071,16 @@ function dessinerElec(g, s, W, H, k, col){
     L(0, 0, .75, 0); L(1.25, 0, 2, 0); L(.75, -.38, .75, .38); L(1.25, -.38, 1.25, .38);
     if (nf) L(.55, .45, 1.45, -.45);
     if (ferme){ g.save(); g.strokeStyle = "#2f9e44"; g.lineWidth = Math.max(2, 3.5 * k); L(.75, 0, 1.25, 0); g.restore(); }
+    if (!s.__u && K !== "surcharge"){ const nb = numBornes(s); if (nb){ T(nb[0], .3, .34, .2, null, 0, 600); T(nb[1], 1.7, .34, .2, null, 0, 600); } }   /* numéros de bornes : 13-14 (NO), 11-12 (NF) */
     if (K === "contactT"){ g.save(); g.lineWidth = Math.max(1.2, 1.8 * k); L(1, -.38, 1, -.6); g.beginPath(); g.arc(u, -.82 * u, .26 * u, .15 * Math.PI, .85 * Math.PI, false); g.stroke(); g.restore();   /* parapluie : temporisé au travail */
       T(s.lb, 1, -1.1, .34, "dessus"); }
     else T(s.lb, 1, -.75, .36, "dessus");
+  } else if (K === "ampoule"){
+    L(0, 0, .6, 0); L(1.4, 0, 2, 0);
+    if (actif){ g.save(); g.shadowColor = "#ffd43b"; g.shadowBlur = u * .9; g.beginPath(); g.arc(u, 0, .4 * u, 0, Math.PI * 2); g.fillStyle = "#fff3bf"; g.fill(); g.restore(); }
+    else C(1, 0, .4, false);
+    g.beginPath(); g.arc(u, 0, .4 * u, 0, Math.PI * 2); g.stroke(); const r7 = .4 * .7071; L(1 - r7, -r7, 1 + r7, r7); L(1 - r7, r7, 1 + r7, -r7);
+    T(s.lb, 1, -.68, .32, "dessus");
   } else if (K === "bobine" || K === "bobineT" || K === "lampe" || K === "moteur"){
     const r = K === "moteur" ? .45 : .4; L(0, 0, 1 - r, 0); L(1 + r, 0, 2, 0);
     if (actif){ const lc = { R:"#ff6b6b", G:"#51cf66", V:"#51cf66", A:"#ffd43b", J:"#ffd43b", Y:"#ffd43b", B:"#4dabf7", W:"#fff9db" }[(s.lb || "").trim().toUpperCase()[0]] || "#ffd43b";
@@ -2077,6 +2090,7 @@ function dessinerElec(g, s, W, H, k, col){
     if (K === "lampe") for (let i = 0; i < 8; i++){ const a = i * Math.PI / 4 + Math.PI / 8; L(1 + Math.cos(a) * (r + .07), Math.sin(a) * (r + .07), 1 + Math.cos(a) * (r + .22), Math.sin(a) * (r + .22)); }
     T(s.lb, 1, .02, .34, null, r * 1.55);
     if (K === "bobineT") T("⏱ " + (s.del || 3) + " s", 1, .66, .26, null, 0, 600);
+    if ((K === "bobine" || K === "bobineT") && !s.__u){ T("A1", .2, -.3, .2, null, 0, 600); T("A2", 1.8, -.3, .2, null, 0, 600); }   /* bornes de la bobine */
   } else if (K === "solenoide"){
     L(0, 0, .55, 0); L(1.45, 0, 2, 0); g.save(); if (actif){ g.strokeStyle = "#e03131"; g.lineWidth = Math.max(2, 3.5 * k); } g.beginPath(); for (let i = 0; i < 3; i++) g.arc((.7 + i * .3) * u, 0, .15 * u, Math.PI, 0, false); g.stroke(); g.restore();
     T(s.lb, 1, -.6, .34, "dessus");
@@ -2118,6 +2132,7 @@ function dessinerElec(g, s, W, H, k, col){
     L(1, .86, 3, .86); L(1, 1.14, 3, 1.14);
     T("H1", .45, -.32, .27, null, 0, 600); T("H2", 3.55, -.32, .27, null, 0, 600); T("X1", .45, 2.32, .27, null, 0, 600); T("X2", 3.55, 2.32, .27, null, 0, 600);
     T(s.lb, 2, -.62, .34);
+    if (s.vp) T("Primaire " + s.vp, 2, -1.05, .3, null, 0, 700); if (s.vs) T("Secondaire " + s.vs, 2, 2.7, .3, null, 0, 700);   /* tensions du transformateur */
   } else if (K === "resistance" || K === "chauffant"){
     if (K === "chauffant"){ L(0, 0, .4, 0); L(1.6, 0, 2, 0); g.save(); g.beginPath(); g.rect(.4 * u, -.28 * u, 1.2 * u, .56 * u); g.fillStyle = actif ? "#ffa94d" : "#fff"; if (actif){ g.shadowColor = "#ff6b00"; g.shadowBlur = u * .6; } g.fill(); g.restore(); g.beginPath(); g.rect(.4 * u, -.28 * u, 1.2 * u, .56 * u); g.stroke(); }
     else { L(0, 0, .45, 0); L(1.55, 0, 2, 0); }
@@ -2151,6 +2166,7 @@ function dessinerElec(g, s, W, H, k, col){
   } else if (K === "rails"){
     const [w, h] = s.sz || [8, 10]; g.lineWidth = Math.max(2, 4 * k); if (SM) g.strokeStyle = "#e03131"; L(0, 0, 0, h); if (SM) g.strokeStyle = "#1c7ed6"; L(w, 0, w, h); g.strokeStyle = col;
     const lb = String(s.lb == null ? "L1 / L2" : s.lb).split("/"); T((lb[0] || "").trim(), 0, -.5, .4); T((lb[1] || "").trim(), w, -.5, .4);
+    if (s.v) T(s.v, w / 2, -.5, .38, null, Math.max(2, w - 2));                     /* tension de l'échelle, au centre */
     let n = 1; for (let y = 1; y < h; y += 2) T(String(n++), -.4, y, .3, "droite", 0, 600);
     if (RD.obj && !RD.sim && !s.__u && typeof SELO !== "undefined" && SELO.s === s){ g.fillStyle = "#2a7bcf"; g.fillRect((w - .3) * u, (h - .3) * u, .6 * u, .6 * u);
       g.strokeStyle = "#fff"; g.lineWidth = Math.max(1.5, 2 * k); L(w - .15, h + .15, w + .15, h - .15); L(w + .02, h - .15, w + .15, h - .15, w + .15, h - .02); L(w - .15, h + .02, w - .15, h + .15, w - .02, h + .15); }
@@ -2528,6 +2544,10 @@ function modifierForme(s, cx, cy){
   box.style.cssText = "position:fixed;z-index:90;left:" + Math.max(8, Math.min(innerWidth - 300, cx - 140)) + "px;top:" + Math.max(8, Math.min(innerHeight - (s.t === "cote" ? 300 : 130), cy + 18)) + "px;width:280px;padding:10px;border-radius:12px;background:#0e0e0f;border:1px solid #6aa9ff;color:#e4e4e7;font:600 .8rem system-ui,sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.4)";
   const actuel = s.t === "angle" && !s.lb ? String(Math.round(Math.abs(Math.atan2(s.p[1][1] - s.p[0][1], (s.p[1][0] - s.p[0][0]) * ($("#inkCanvas").width / $("#inkCanvas").height))) * 180 / Math.PI)) : (s.lb || (s.t === "bulle" ? String(s.n || 1) : ""));
   box.innerHTML = '<div style="margin-bottom:6px;line-height:1.3">' + V.q + '</div><div style="display:flex;gap:6px"><input style="flex:1;min-width:0;min-height:38px;border-radius:8px;border:1px solid #2f2f33;padding:0 8px;font:700 1rem system-ui;color:#111;background:#fff" placeholder="' + V.ex + '"><button style="min-height:38px;padding:0 12px;border-radius:8px;border:0;background:#1f6fc2;color:#fff;font:700 .85rem system-ui;cursor:pointer">OK</button></div>';
+  const extras = s.t !== "objet" ? [] : s.k === "transfo" ? [["Tension au primaire (H1-H2)", "vp", "120 V"], ["Tension au secondaire (X1-X2)", "vs", "24 V"]] : s.k === "rails" ? [["Tension de l'échelle (au centre)", "v", "120 V c.a."]] : [];
+  extras.forEach(([lab, cle, ph]) => { const r = document.createElement("label"); r.style.cssText = "display:flex;flex-direction:column;gap:3px;margin-top:8px;line-height:1.3";
+    r.innerHTML = '<span>' + lab + '</span><input data-cle="' + cle + '" placeholder="' + ph + '" style="min-height:36px;border-radius:8px;border:1px solid #2f2f33;padding:0 8px;font:700 .95rem system-ui;color:#111;background:#fff">';
+    r.querySelector("input").value = s[cle] || ""; box.appendChild(r); });
   if (s.t !== "bulle" && !(s.t === "objet" && ELEC[s.k])) tailleTexte(box, s);
   if (s.t === "cote" || (s.t !== "objet" && !VALEURS_FORME[s.t]) || (s.t === "objet" && !ELEC[s.k])) padCote(box, s);
   glisserCase(box);
@@ -2542,9 +2562,13 @@ function modifierForme(s, cx, cy){
         s.p[1] = [a[0] + Math.cos(ar) * R / W, a[1] + Math.sin(ar) * R / H]; delete s.lb; }
       else if (v) s.lb = v; else delete s.lb; }
     else if (v) s.lb = s.t === "objet" && ELEC[s.k] ? v.slice(0, 14) : v; else delete s.lb;
+    box.querySelectorAll("[data-cle]").forEach(i => { const w = i.value.trim(); if (w) s[i.dataset.cle] = w; else delete s[i.dataset.cle]; });
     redrawInk(); try { majObjUI(); } catch(e){} };
   inp.addEventListener("keydown", e => { e.stopPropagation(); if (e.key === "Enter"){ e.preventDefault(); fin(true); } else if (e.key === "Escape"){ e.preventDefault(); fin(false); } });
-  box.querySelector("button").onclick = () => fin(true); inp.addEventListener("blur", () => setTimeout(() => fin(true), 150)); }
+  box.querySelector("button").onclick = () => fin(true);
+  const quitte = () => setTimeout(() => { if (!box.contains(document.activeElement)) fin(true); }, 150);   /* on peut passer d'une case à l'autre */
+  inp.addEventListener("blur", quitte);
+  box.querySelectorAll("[data-cle]").forEach(i => { i.addEventListener("blur", quitte); i.addEventListener("keydown", e => { e.stopPropagation(); if (e.key === "Enter"){ e.preventDefault(); fin(true); } else if (e.key === "Escape"){ e.preventDefault(); fin(false); } }); }); }
 /* la case du double-clic se déplace en la glissant par sa barre du haut (pour voir l'objet dessous) */
 function glisserCase(box){
   const bar = document.createElement("div"); bar.title = "Glisse pour déplacer la case";
@@ -2777,7 +2801,7 @@ function appliquerTxt(maj){
    moteur, solénoïde) est alimentée quand une borne touche L1 et l'autre L2. Une bobine alimentée change l'état de tous les
    contacts qui portent le même repère (CR1, M…) : c'est ce qui fait fonctionner le contact de maintien. */
 const SIM = { tdeb:{}, tfini:new Set(), minut:[], sonneries:[], act:new Set(), press:new Set(), bob:{}, ferme:new Map(), pot:new Map(), charges:new Set(), trOn:new Set(), flux:[], moteurs:[], court:false, key:"", raf:0, tenu:null };
-const SIM_SW = /^(contact|contactT|surcharge|bp|inter|thermostat|pression|flotteur|fincourse|fusible)$/, SIM_CH = /^(bobine|bobineT|lampe|moteur|solenoide|sonnerie|chauffant|resistance|del)$/, SIM_ACT = /^(bp|inter|thermostat|pression|flotteur|fincourse|surcharge|fusible)$/;
+const SIM_SW = /^(contact|contactT|surcharge|bp|inter|thermostat|pression|flotteur|fincourse|fusible)$/, SIM_CH = /^(bobine|bobineT|lampe|ampoule|moteur|solenoide|sonnerie|chauffant|resistance|del)$/, SIM_ACT = /^(bp|inter|thermostat|pression|flotteur|fincourse|surcharge|fusible)$/;
 function simCalc(prof){
   const cv = $("#inkCanvas"), W = cv.width, Hc = cv.height, u = elecU(), arr = strokes(), now = performance.now();
   const gk = p => Math.round(p[0] * W / u) + "," + Math.round(p[1] * Hc / u), gkPx = q => Math.round(q[0] / u) + "," + Math.round(q[1] / u);
@@ -3008,7 +3032,7 @@ function poserModele(m){
   const ob = $("#objBar"), gauche = ob && !ob.hidden ? Math.max(S.left, ob.getBoundingClientRect().right + 40) : S.left + 120;   /* à droite de la palette */
   const ox = Math.ceil((gauche - r.left) / f / u) + 1, oy = Math.ceil((S.top - r.top) / f / u) + 3;
   const P = (x, y) => [(ox + x) * u / W, (oy + y) * u / H], arr = strokes();
-  if (m.sz) arr.push({ t:"objet", k:"rails", o:0, c:"#24282c", p:[P(0, 0)], w:4, sz:m.sz.slice(), lb:m.lb || "L1 / L2" });
+  if (m.sz) arr.push({ t:"objet", k:"rails", o:0, c:"#24282c", p:[P(0, 0)], w:4, sz:m.sz.slice(), lb:m.lb || "L1 / L2", v:m.v || "120 V c.a." });
   m.o.forEach(([k, x, y, ex]) => arr.push(Object.assign({ t:"objet", k, o:0, c:"#24282c", p:[P(x, y)], w:4, lb:ELEC[k].lb || "", nf:0 }, ex ? JSON.parse(JSON.stringify(ex)) : {})));
   m.f.forEach(([a, b]) => arr.push({ c:"#24282c", hl:false, hc:null, w:2.5, t:"ligne", fil:true, p:[P(...a), P(...b)] }));
   REFS[inkKey()] = baseCanevas(); redrawInk();
@@ -3099,11 +3123,14 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
   b.querySelectorAll("[data-f]").forEach(x => x.classList.toggle("on", x.dataset.f === RD.formeK));
   b.querySelector(".tit").textContent = el ? "Schéma électrique" : tab === "iso" ? "Objets isométriques" : "Formes"; b.classList.toggle("sim", !!RD.sim); $("#objSim").textContent = RD.sim ? "■ Arrêter l'animation" : "▶ Animer le schéma";
   b.querySelectorAll("[data-k]").forEach(x => x.classList.toggle("on", x.dataset.k === RD.objK));
+  b.querySelectorAll("[data-fc]").forEach(x => x.classList.toggle("on", x.dataset.fc === (RD.filCol || "#24282c")));
   const se = SELO.s && strokes().includes(SELO.s) && ELEC[SELO.s.k] ? SELO.s : null, de = ELEC[se ? se.k : RD.objK] || null, bn = b.querySelector("#objNF"), bl = b.querySelector("#objL");
   const nfV = se ? !!se.nf : !!RD.objNF; bn.style.display = el && de && de.nf ? "" : "none"; bn.textContent = nfV ? "Normalement fermé (NF)" : "Normalement ouvert (NO)"; bn.classList.toggle("on", nfV);
   bl.style.display = se && de && de.lb ? "" : "none";
   const kc = se ? se.k : RD.objK, polV = se ? polDe(se) : (RD.objPol || "spst"), bpol = b.querySelector("#objPol");
   bpol.style.display = el && kc === "inter" ? "" : "none"; bpol.querySelectorAll("[data-pol]").forEach(x => x.classList.toggle("on", x.dataset.pol === polV));
+  bpol.querySelectorAll("[data-pp]").forEach(x => x.classList.toggle("on", polV[0] === x.dataset.pp)); bpol.querySelectorAll("[data-pt]").forEach(x => x.classList.toggle("on", polV.slice(2) === x.dataset.pt));
+  bpol.querySelector("[data-code]").textContent = "Symbole : " + POLES[polV];
   if (kc === "inter" && /dt$/.test(polV)) bn.style.display = "none";
   const bd = b.querySelector("#objDelW"); bd.style.display = se && se.k === "bobineT" ? "" : "none"; if (se && se.k === "bobineT" && document.activeElement !== b.querySelector("#objDel")) b.querySelector("#objDel").value = se.del || 3; if (se && document.activeElement !== bl) bl.value = se.lb || "";
   const sel = SELO.s && strokes().includes(SELO.s), sp = sel && SELO.s.k === "serpentin" ? SELO.s : null, pasV = sp ? (sp.pas || .5) : (RD.pas || .5), bp = b.querySelector("#objP");
@@ -3123,7 +3150,10 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     + '<div class="grp" data-g="elec"><button id="objSch" class="sch-btn" title="Circuits prêts à utiliser et tableaux enregistrés">📋 Modèles et mes schémas</button>' + ELEC_CAT.map(([cg, cn]) => '<button class="cat" data-cat="' + cg + '">' + cn + '</button><div class="cgrid" data-cat="' + cg + '">'
       + Object.keys(ELEC).filter(k => ELEC[k].g === cg).map(k => '<button data-k="' + k + '" title="' + ELEC[k].n.replace(/^[✎•] /, "") + '"><canvas width="120" height="64"></canvas><span>' + (ELEC[k].c || ELEC[k].n.replace(/^[✎•] /, "")) + '</span></button>').join("") + '</div>').join("") + '</div>'
     + '<div class="aide grpE">Pour relier : glisse d\'un <b>point bleu</b> à l\'autre</div>'
-    + '<button id="objP" title="Espacement des tubes du serpentin"></button><button id="objNF" title="Normalement ouvert ou normalement fermé"></button><div class="pol" id="objPol">' + Object.keys(POLES).map(p => '<button data-pol="' + p + '" title="' + POLES[p] + '">' + p.toUpperCase() + '</button>').join("") + '</div><label class="del" id="objDelW">Délai <input id="objDel" type="number" min="1" max="60" step="1" value="3"> s</label><input id="objL" maxlength="10" placeholder="Repère" title="Repère du symbole (ex. CR1, M, PB2)" aria-label="Repère du symbole">'
+    + '<div class="filcols grpE"><span>Couleur des nouveaux fils</span><div>' + [["#24282c", "Noir"], ["#e03131", "Rouge"], ["#1c7ed6", "Bleu"], ["#adb5bd", "Blanc (gris)"], ["#2f9e44", "Vert (terre)"], ["#f2c200", "Jaune"], ["#f08c00", "Orange"], ["#8b5a2b", "Brun"]].map(([c, n]) => '<button data-fc="' + c + '" title="' + n + '" aria-label="' + n + '" style="background:' + c + '"></button>').join("") + '</div></div>'
+    + '<button id="objP" title="Espacement des tubes du serpentin"></button><button id="objNF" title="Normalement ouvert ou normalement fermé"></button><div class="pol" id="objPol">' + Object.keys(POLES).map(p => '<button class="orig" data-pol="' + p + '" title="' + POLES[p] + '">' + p.toUpperCase() + '</button>').join("")
+    + '<span class="pl">Pôles (circuits coupés)</span><button data-pp="s" title="1 pôle (unipolaire)">1 pôle</button><button data-pp="d" title="2 pôles (bipolaire)">2 pôles</button>'
+    + '<span class="pl">Positions (directions)</span><button data-pt="st" title="1 position (unidirectionnel)">1 position</button><button data-pt="dt" title="2 positions (bidirectionnel)">2 positions</button><span class="pl" data-code></span></div><label class="del" id="objDelW">Délai <input id="objDel" type="number" min="1" max="60" step="1" value="3"> s</label><input id="objL" maxlength="10" placeholder="Repère" title="Repère du symbole (ex. CR1, M, PB2)" aria-label="Repère du symbole">'
     + '<div class="taille" id="objTaille"><span>Largeur</span><button data-t="w-1" title="Rapprocher L2">−</button><button data-t="w1" title="Éloigner L2">+</button><span>Hauteur</span><button data-t="h-1" title="Raccourcir l\'échelle">−</button><button data-t="h1" title="Allonger l\'échelle">+</button><em>ou glisse le carré bleu en bas à droite</em></div>'
     + '<div class="rang"><button id="objR" title="Pivoter l\'objet sélectionné">⟳ Pivoter</button><button id="objD" title="Supprimer l\'objet sélectionné" aria-label="Supprimer">🗑</button></div>'
     + '<button id="objSim" class="grpE" title="Faire fonctionner le schéma : le courant circule, les bobines, lampes et moteurs s\'activent">▶ Animer le schéma</button><div class="simAide"></div><button id="objX">Terminé</button>';
@@ -3138,6 +3168,8 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     + '#objBar .cgrid button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:4px 2px;min-height:50px;text-align:center;background:#f4f6f9;border-color:#d5dbe3;color:#1f2329;font-size:.68rem;line-height:1.1}'
     + '#objBar .cgrid button:hover{border-color:#6aa9ff}#objBar .cgrid button.on{background:#dbeafe;border-color:#2a7bcf;color:#0b3d75;box-shadow:inset 0 0 0 1px #2a7bcf}#objBar .cgrid canvas{width:60px;height:32px}'
     + '#objBar .aide{color:#9fc6f5;font-size:.72rem;line-height:1.3;padding:2px}#objBar .aide b{color:#6aa9ff}#objBar .rang{display:flex;gap:4px}#objBar .taille{display:grid;grid-template-columns:1fr 38px 38px;gap:4px;align-items:center;font-size:.74rem}#objBar .taille button{text-align:center;font-size:1.05rem;padding:0}#objBar .taille em{grid-column:1/-1;font-style:normal;font-size:.68rem;color:#9fc6f5}#objBar .rang button{flex:1;text-align:center}'
+    + '#objBar .filcols{display:flex;flex-direction:column;gap:4px;font-size:.72rem;color:#a1a1aa;padding:2px}#objBar .filcols div{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}#objBar .filcols button{min-height:26px!important;padding:0!important;border-radius:50%!important;border:2px solid #3a3a40!important}#objBar .filcols button.on{border-color:#6aa9ff!important;box-shadow:0 0 0 2px #6aa9ff}'
+    + '#objBar .pol .orig{display:none}#objBar .pol .pp{display:contents}#objBar .pol .pl{grid-column:1/-1;font-size:.7rem;color:#a1a1aa;margin-top:2px}'
     + '#objBar #objL{min-height:32px;padding:0 8px;border-radius:8px;border:1px solid #2f2f33;background:#fff;color:#111;font:inherit;font-weight:700;text-transform:uppercase}'
     + '#objBar #objSim{background:#1f7a3f;border-color:#2f9e44;color:#fff;text-align:center}#objBar.sim #objSim{background:#a61e1e;border-color:#e03131}#objBar #objX{text-align:center}'
     + '#objBar .simAide{display:none;font-size:.74rem;line-height:1.35;color:#d4d4d8;padding:2px}#objBar.sim .simAide{display:block}#objBar .simAide .court{color:#ff8787;font-weight:800}#objBar .panne{margin-top:10px;padding-top:8px;border-top:1px solid #2f2f33}#objBar .panne .pt{font-weight:800;color:#fff;margin-bottom:4px}#objBar .panne .pc{color:#ffd43b;margin-bottom:4px}#objBar .panne .pe{color:#ff8787;font-weight:700;margin-bottom:4px}#objBar .panne .pb{display:grid;grid-template-columns:1fr 1fr;gap:4px}#objBar .panne .pb button{text-align:center;font-size:.74rem;padding:0 4px}#objBar .simAide .on{color:#8ce99a}';
@@ -3155,6 +3187,8 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     if (k === "jonction"){ g.beginPath(); g.moveTo(20, 32); g.lineTo(100, 32); g.moveTo(60, 32); g.lineTo(60, 60); g.stroke(); g.beginPath(); g.arc(60, 32, 7, 0, 7); g.fill(); return; }
     if (k === "terre"){ dessinerElec(g, { t:"objet", k, p:[[.5, 14 / H]], lb:"", __u:40 }, W, H, 1.2, "#24282c"); return; }
     const U = k === "transfo" ? 17 : 34, w = k === "transfo" ? 4 : 2, y0 = k === "transfo" ? 18 : (k === "bp" ? 40 : k === "contactT" ? 44 : 36);
+    if (k === "relais"){ dessinerElec(g, { t:"objet", k:"bobine", p:[[(W - 2 * 30) / 2 / W, 20 / H]], lb:"CR", __u:30 }, W, H, 1.2, "#24282c");
+      dessinerElec(g, { t:"objet", k:"contact", p:[[(W - 2 * 22) / 2 / W, 50 / H]], lb:"", __u:22 }, W, H, 1, "#24282c"); return; }
     dessinerElec(g, { t:"objet", k, p:[[(W - w * U) / 2 / W, y0 / H]], lb:{ bobine:"CR", moteur:"M" }[k] || "", nf:0, __u:U }, W, H, 1.2, "#24282c"); });
   bar.querySelectorAll("[data-k]").forEach(b => b.onclick = () => { if (b.dataset.glisse) return; const k = b.dataset.k, deja = RD.objK === k; if (ELEC[k]) RD.objKe = deja ? null : k; else RD.objKi = deja ? null : k; RD.formeK = null; SELO.s = null; redrawInk(); majObjUI(); });
   /* glisser une vignette (objet iso ou symbole) jusqu'au tableau */
@@ -3189,9 +3223,12 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     if (t !== "formes"){ const voulu = t === "iso" ? /^iso/ : /^quad$/;
       if (!voulu.test(wbBg())){ wbEtat().bg[wbEtat().n] = t === "iso" ? "iso" : "quad"; majFond(); aviser(t === "iso" ? "Fond : plan isométrique." : "Fond : quadrillé (schéma électrique en échelle)."); } }
     redrawInk(); refreshTools(); });
+  bar.querySelectorAll("[data-fc]").forEach(x => x.onclick = () => { RD.filCol = x.dataset.fc; RD.objKe = "fil"; RD.objKi = null; SELO.s = null; majObjUI(); redrawInk(); aviser("Fil " + x.title.toLowerCase() + " : glisse d'un point bleu à l'autre.", 2500); });
   $("#objNF").onclick = () => { const s = SELO.s && strokes().includes(SELO.s) && ELEC[SELO.s.k] ? SELO.s : null;
     if (s){ snapInk(); s.nf = s.nf ? 0 : 1; RD.objNF = s.nf; redrawInk(); } else RD.objNF = RD.objNF ? 0 : 1; majObjUI(); };
   RD.lbK = {};
+  bar.querySelectorAll("#objPol [data-pp], #objPol [data-pt]").forEach(x => x.onclick = () => { const se = SELO.s && strokes().includes(SELO.s) && SELO.s.k === "inter" ? SELO.s : null, cur0 = se ? polDe(se) : (RD.objPol || "spst");
+    const pol = (x.dataset.pp || cur0[0]) + "p" + (x.dataset.pt || cur0.slice(2)); const bt = bar.querySelector('#objPol [data-pol="' + pol + '"]'); if (bt) bt.onclick(); });
   bar.querySelectorAll("#objPol [data-pol]").forEach(x => x.onclick = () => { const se = SELO.s && strokes().includes(SELO.s) && SELO.s.k === "inter" ? SELO.s : null;
     if (se){ snapInk(); const c = $("#inkCanvas"), av = objGeo(se, c.width, c.height).ports; se.pol = x.dataset.pol; const ap = objGeo(se, c.width, c.height).ports;
       strokes().forEach(t => { if (t.t !== "ligne" || !t.p) return; [0, 1].forEach(i => { const j = av.findIndex(q => Math.hypot(q[0] - t.p[i][0] * c.width, q[1] - t.p[i][1] * c.height) < 4); if (j >= 0 && ap[j]) t.p[i] = [ap[j][0] / c.width, ap[j][1] / c.height]; }); });
@@ -3240,7 +3277,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
       else if (s.t === "ligne" && s.fil && !(sauf && sauf.includes(s))) pts = s.p;
       pts.forEach(p => { const d = Math.hypot(p[0] * c.width - x, p[1] * c.height - y); if (d < lim && (!best || d < best[0])) best = [d, p]; }); });
     return best ? best[1].slice() : null; };
-  const nouveauFil = (a, b) => ({ c:"#24282c", hl:false, hc:null, w:2.5, t:"ligne", fil:true, p:[a.slice(), b.slice()] });
+  const nouveauFil = (a, b, c0) => ({ c:c0 || RD.filCol || "#24282c", hl:false, hc:null, w:2.5, t:"ligne", fil:true, p:[a.slice(), b.slice()] });
   const longueur = (a, b) => Math.hypot((b[0] - a[0]) * c.width, (b[1] - a[1]) * c.height);
   /* fil en cours : un trait droit, ou deux (un coude) quand les bornes ne sont pas alignées ; le premier mouvement choisit le sens du coude */
   const tracerFil = () => { const arr = strokes(); mv.segs.forEach(f => { const i = arr.indexOf(f); if (i >= 0) arr.splice(i, 1); }); mv.segs = [];
@@ -3267,7 +3304,34 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     const x2 = o.p[0][0] + w0 * u / W, nx = o.p[0][0] + w * u / W;
     (fixes || strokes().filter(f => f.t === "ligne" && f.fil).flatMap(f => [0, 1].filter(i => Math.abs(f.p[i][0] - x2) * W < 2).map(i => [f, i]))).forEach(([f, i]) => { f.p[i][0] = nx; });
     o.sz = [w, h]; };
-  const nettoyerFils = () => strokes().filter(o => o.t === "objet" && ELEC[o.k]).forEach(couperFils);   /* après chaque fil ou déplacement */
+  const nettoyerFils = () => { strokes().filter(o => o.t === "objet" && ELEC[o.k]).forEach(couperFils); nettoyerJonctions(); };   /* après chaque fil ou déplacement */
+  /* point de jonction inutile (moins de 3 branchements) : il s'efface */
+  const nettoyerJonctions = () => { const arr = strokes(), fils = arr.filter(f => f.t === "ligne" && f.fil);
+    arr.filter(o => o.t === "objet" && o.k === "jonction").forEach(o => { const p = o.p[0]; let n = 0;
+      fils.forEach(f => { if (bout(p, f)) n++; else if (surFil(p, f)) n += 2; });
+      arr.filter(x => x.t === "objet" && ELEC[x.k] && x.k !== "jonction" && x.k !== "rails").forEach(x => objGeo(x, c.width, c.height).ports.forEach(q => { if (longueur([q[0] / c.width, q[1] / c.height], p) < 3) n++; }));
+      if (n < 3){ const i = arr.indexOf(o); if (i >= 0) arr.splice(i, 1); } }); };
+  window.nettoyerJonctions = nettoyerJonctions;
+  /* repère proposé : CR1, CR2… pour les bobines; un contact reprend le repère de la bobine choisie (ou de la dernière posée) */
+  const etiqAuto = k => { const de = ELEC[k]; if (!de || !de.lb) return null; const arr = strokes(), norm = x => String(x || "").trim().toUpperCase();
+    if (k === "bobine" || k === "bobineT" || k === "relais"){ const pre = k === "bobineT" ? "TR" : "CR", re = new RegExp("^" + pre + "(\\d+)$"); let m = 0;
+      arr.forEach(o => { const r = re.exec(norm(o.lb)); if (r && /^(bobine|bobineT)$/.test(o.k)) m = Math.max(m, +r[1]); }); return pre + (m + 1); }
+    if (k === "contact" || k === "contactT"){ const kb = k === "contact" ? "bobine" : "bobineT";
+      if (SELO.s && SELO.s.k === kb && strokes().includes(SELO.s)) return SELO.s.lb;
+      for (let i = arr.length - 1; i >= 0; i--) if (arr[i].k === kb && arr[i].lb) return arr[i].lb; }
+    return RD.lbK[k] || de.lb; };
+  const completerObjet = o => { const de = ELEC[o.k]; if (!de) return; const lb = etiqAuto(o.k); if (lb) o.lb = lb;
+    if (o.k === "inter") o.pol = o.pol || RD.objPol || "spst"; if (o.k === "bobineT") o.del = 3; if (o.k === "transfo"){ o.vp = "120 V"; o.vs = "24 V"; } if (o.k === "rails" && o.v === undefined) o.v = "120 V c.a."; };
+  /* relais complet : la bobine, puis un contact NO et un contact NF du même repère, à gauche, deux échelons plus bas */
+  const poserRelais = (q, coul) => { const u = elecU(), lb = etiqAuto("relais"), arr = strokes(), dx = 6 * u / c.width, dy = 2 * u / c.height;
+    const b0 = { t:"objet", k:"bobine", o:0, c:coul, p:[q.slice()], w:4, lb }, c1 = { t:"objet", k:"contact", o:0, c:coul, p:[[q[0] - dx, q[1] + dy]], w:4, lb, nf:0 }, c2 = { t:"objet", k:"contact", o:0, c:coul, p:[[q[0] - dx, q[1] + 2 * dy]], w:4, lb, nf:1 };
+    arr.push(b0, c1, c2); [b0, c1, c2].forEach(couperFils); aviser("Relais " + lb + " : bobine A1-A2, contact NO 13-14 et contact NF 21-22. Déplace les contacts sur leurs échelons.", 6000); return b0; };
+  /* objet supprimé : les fils ou les tuyaux qui y arrivaient sont reliés entre eux */
+  window.reparerApresSuppression = o => { if (o.t !== "objet" || o.k === "rails" || o.k === "jonction") return; const W = c.width, H = c.height, P = objGeo(o, W, H).ports.map(q => [q[0] / W, q[1] / H]); if (P.length !== 2) return;
+    const arr = strokes(), el = !!ELEC[o.k], lie = q => arr.find(f => (el ? f.t === "ligne" && f.fil : !f.fil && !f.hl && (!f.t || f.t === "ligne")) && f.p && f.p.some(e => longueur(e, q) < 4));
+    const fa = lie(P[0]), fb = lie(P[1]); if (!fa || !fb) return;
+    if (el) arr.push(nouveauFil(P[0], P[1], fa.c));
+    else { const t = { c:fa.c, hl:false, hc:null, w:fa.w, t:"ligne", p:[P[0].slice(), P[1].slice()] }, seg = decouperIso(t); (seg || [t]).forEach(x => arr.push(x)); } };
   /* ---- Glisser un objet de la palette sur le tableau : il se branche tout seul sur un fil ou un tuyau tout près ----
      On essaie les points de grille autour de l'endroit lâché (et les deux sens) et on garde celui où le plus de bornes tombent sur un fil (électricité)
      ou sur un tuyau (isométrique). Le fil est ensuite coupé (couperFils); le bout de tuyau entre les deux raccords est enlevé (objet en ligne). */
@@ -3280,7 +3344,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     const el = !!ELEC[k], r = c.getBoundingClientRect(); if (cx < r.left || cx > r.right || cy < r.top || cy > r.bottom) return null;
     if (el ? !modeElec() : !/^iso/.test(wbBg())) return { mauvaisFond:true, el };
     const o = { t:"objet", k, o:0, c:/^hl/.test(RD.color) ? "#24282c" : RD.color, p:[cur({ clientX:cx, clientY:cy }).snap], w:4 };
-    if (el){ const de = ELEC[k]; if (de.lb) o.lb = RD.lbK[k] || de.lb; if (de.nf) o.nf = 0; if (k === "inter") o.pol = RD.objPol || "spst"; if (k === "bobineT") o.del = 3; }
+    if (el){ completerObjet(o); if (ELEC[k].nf) o.nf = 0; if (k === "relais") o.k = "bobine"; }
     const fils = strokes().filter(f => f.t === "ligne" && f.fil);
     const branche = p => el ? fils.some(f => surFil(p, f) || bout(p, f)) : surTuyau(p);
     const pas = el ? elecU() * r.width / c.width : 34 * RD.z * 1.2 * (r.width / (c.offsetWidth || r.width)) * .55, vus = new Set(); let best = null;
@@ -3294,9 +3358,10 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     window.APERCU = null; const pl = placer(k, cx, cy); if (!pl){ redrawInk(); return false; }
     if (pl.mauvaisFond){ aviser(pl.el ? "Les symboles électriques se posent sur le fond quadrillé." : "Les objets isométriques se posent sur le fond « plan isométrique ».", 4000); redrawInk(); return false; }
     const { o, best, el } = pl;
-    snapInk(); strokes().push(o); if (el) couperFils(o); else if (best) entreTuyaux(o);
-    RD.objKi = null; RD.objKe = null; SELO.s = o; redrawInk(); majObjUI();
-    aviser(best ? (el ? ELEC[k].n.replace(/^[✎•] /, "") : OBJETS[k].n) + " branché sur " + (el ? "le fil." : "le tuyau.") : "Posé. Glisse-le sur un " + (el ? "fil" : "tuyau") + " pour le brancher tout seul.", 3500);
+    snapInk(); let o2 = o;
+    if (k === "relais"){ o2 = poserRelais(o.p[0], o.c); } else { strokes().push(o); if (el) couperFils(o); else if (best) entreTuyaux(o); }
+    RD.objKi = null; RD.objKe = null; SELO.s = o2; redrawInk(); majObjUI();
+    if (k !== "relais") aviser(best ? (el ? ELEC[k].n.replace(/^[✎•] /, "") : OBJETS[k].n) + " branché sur " + (el ? "le fil." : "le tuyau.") : "Posé. Glisse-le sur un " + (el ? "fil" : "tuyau") + " pour le brancher tout seul.", 3500);
     return true; };
   const touche = q => { const arr = strokes(); for (let i = arr.length - 1; i >= 0; i--){ const s = arr[i]; if (s.t !== "objet") continue; const G = objGeo(s, c.width, c.height), x = q[0] * c.width, y = q[1] * c.height;
     if (s.k === "rails"){ if (surRails(s, G, x, y, .1) && (RD.objK === "rails" || (y - G.oy) / G.u < .4)) return s; continue; }
@@ -3331,10 +3396,12 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     } else if (RD.objK === "serpentin" || (el && RD.objK === "rails")){
       mv = { zone:true, q0:q.snap, el, raz:!!(SELO.s && strokes().includes(SELO.s)) };                                                         /* zone à remplir : on glisse d'un coin à l'autre */
     } else {
-      snapInk(); const o = { t:"objet", k:RD.objK, o:RD.objO, c:/^hl/.test(RD.color) ? "#24282c" : RD.color, p:[q.snap], w:4 };
-      if (el){ const de = ELEC[RD.objK]; if (de.lb) o.lb = RD.lbK[RD.objK] || de.lb; if (de.nf) o.nf = RD.objNF ? 1 : 0; if (RD.objK === "inter") o.pol = RD.objPol || "spst"; if (RD.objK === "bobineT") o.del = 3; }
+      snapInk(); const coul = /^hl/.test(RD.color) ? "#24282c" : RD.color;
+      if (el && RD.objK === "relais"){ SELO.s = poserRelais(q.snap, coul); RD.objKe = null; redrawInk(); majObjUI(); return; }
+      const o = { t:"objet", k:RD.objK, o:RD.objO, c:coul, p:[q.snap], w:4 };
+      if (el){ const de = ELEC[RD.objK]; completerObjet(o); if (de.nf) o.nf = RD.objNF ? 1 : 0; if ((o.k === "contact" || o.k === "contactT") && o.lb) aviser("Contact relié à la bobine " + o.lb + " (même repère).", 3000); }
       strokes().push(o); SELO.s = o; if (el) couperFils(o);
-      if (el && RD.objK !== "jonction"){ RD.objKe = "fil"; RD.objNF = 0; aviser(ELEC[o.k].n + " posé. Relie-le : glisse d'un point bleu à l'autre.", 4500); }
+      if (el && RD.objK !== "jonction"){ RD.objKe = "fil"; RD.objNF = 0; if (!/^(contact|contactT)$/.test(o.k)) aviser(ELEC[o.k].n + " posé. Relie-le : glisse d'un point bleu à l'autre.", 4500); }
     }
     redrawInk(); majObjUI();
   });
@@ -3370,7 +3437,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
       let w = Math.round(Math.abs(q1[0] - mv.q0[0]) * r.width / u), h = Math.round(Math.abs(q1[1] - mv.q0[1]) * r.height / u);
       const p0 = [Math.min(q1[0], mv.q0[0]), Math.min(q1[1], mv.q0[1])];
       const petit = w < 3 || h < 2; if (petit){ w = 12; h = 11; }                              /* simple clic : échelle standard */
-      snapInk(); const o = { t:"objet", k:"rails", o:0, c:/^hl/.test(RD.color) ? "#24282c" : RD.color, p:[petit ? mv.q0 : p0], w:4, sz:[w, h], lb:RD.lbK.rails || "L1 / L2" }; strokes().push(o); SELO.s = o; RD.objKe = "fil";
+      snapInk(); const o = { t:"objet", k:"rails", o:0, c:/^hl/.test(RD.color) ? "#24282c" : RD.color, p:[petit ? mv.q0 : p0], w:4, sz:[w, h], lb:RD.lbK.rails || "L1 / L2", v:"120 V c.a." }; strokes().push(o); SELO.s = o; RD.objKe = "fil";
       mv = null; redrawInk(); majObjUI(); return;
     }
     if (mv && mv.zone){
@@ -3880,7 +3947,7 @@ $("#tbPg").addEventListener("keydown", e => {
 })();
 function effacerChoix(){ const sel = (window.SELM && SELM.length ? SELM : [SELO.s]).filter(x => x && strokes().includes(x)); if (!sel.length) return;
   snapInk(); sel.forEach(o => { if (o.t === "objet" && typeof window.reparerApresSuppression === "function") window.reparerApresSuppression(o); });
-  INKS[inkKey()] = strokes().filter(x => !sel.includes(x)); SELO.s = null; window.SELM = []; redrawInk(); try { majObjUI(); } catch(er){} }
+  INKS[inkKey()] = strokes().filter(x => !sel.includes(x)); SELO.s = null; window.SELM = []; try { nettoyerJonctions(); } catch(er){} redrawInk(); try { majObjUI(); } catch(er){} }
 function recolorerSel(){ const o = typeof SELO !== "undefined" && RD.obj && SELO.s && strokes().includes(SELO.s) ? SELO.s : null; if (!o || /^hl/.test(RD.color) || o.c === RD.color) return; snapInk(); o.c = RD.color; redrawInk(); }   /* l'objet ou la forme choisi prend la couleur du crayon */
 document.querySelectorAll("#penBar .sw").forEach(b => b.onclick = () => { RD.color = b.dataset.c; RD.eraser = false; RD.crayonOff = false; recolorerSel(); refreshTools(); });
 $("#penW").onclick = () => { RD.wIdx = (RD.wIdx + 1) % WIDTHS.length; majEpaisseur(); };

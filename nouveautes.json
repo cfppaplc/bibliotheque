@@ -2,6 +2,93 @@
  {
   "date": "2026-10-28",
   "type": "outil",
+  "titre": "Schéma électrique en échelle (tableau blanc)",
+  "texte": "Dessine et anime des schémas en échelle sur le quadrillé. Nouveau : relais complet (bobine + contacts NO et NF déjà nommés), numéros de bornes, tensions du transformateur et de l'échelle, ampoule, couleurs de fils, choix des pôles et des positions de l'interrupteur.",
+  "formation": [
+   {
+    "t": "Nouveau : « Relais complet » pose la bobine CR1 (bornes A1-A2) avec un contact NO (13-14) et un contact NF (21-22) du même repère; déplace chaque contact sur son échelon. Une nouvelle bobine prend le repère suivant (CR2, CR3…) et un contact prend celui de la bobine choisie. Double-clic sur le transformateur : tensions au primaire et au secondaire. Double-clic sur l'échelle : tension écrite au centre.",
+    "img": "nouveautes/elec-relais.jpg"
+   },
+   "Nouveau aussi : l'ampoule (Charges), la couleur des nouveaux fils (bas de la palette), l'interrupteur se règle par « 1 ou 2 pôles » et « 1 ou 2 positions ». Un point de jonction qui ne relie plus rien s'efface, et si tu effaces un symbole entre deux fils, les fils se rejoignent.",
+   {
+    "t": "Ouvre le tableau blanc, puis bouton Fond jusqu'à « Quadrillé (schéma électrique en échelle) ».",
+    "img": "nouveautes/elec-fond.jpg"
+   },
+   {
+    "t": "Bouton Objets (le cube) : la palette « Schéma électrique » s'ouvre. Glisse la poignée ⠿ pour la déplacer, ⌄ pour la replier; touche le titre d'une catégorie pour l'ouvrir ou la fermer.",
+    "img": "nouveautes/elec-palette.jpg"
+   },
+   {
+    "t": "« Échelle L1/L2 » : glisse un rectangle pour tracer les rails. Pour changer sa taille plus tard : touche L1 ou L2, puis glisse le carré bleu en bas à droite (ou Largeur / Hauteur − +).",
+    "img": "nouveautes/elec-echelle.jpg"
+   },
+   {
+    "t": "Choisis un symbole et touche un échelon. Quand il est sélectionné : case Repère (CR1, M, PB2…), NO / NF, type d'interrupteur (SPST, SPDT, DPST, DPDT) ou délai d'un relais temporisé.",
+    "img": "nouveautes/elec-reglages.jpg"
+   },
+   {
+    "t": "Pour relier : glisse d'un point bleu à l'autre. Le fil fait un coude tout seul, et un point de jonction s'ajoute quand tu arrives au milieu d'un autre fil. Gomme pour effacer un fil, ↶ pour annuler.",
+    "img": "nouveautes/elec-relier.jpg"
+   },
+   {
+    "t": "▶ Animer le schéma : garde enfoncé un bouton-poussoir, clique un interrupteur pour l'actionner. Rouge = L1, bleu = L2, points jaunes = courant. Une bobine change tous les contacts qui portent son repère (contact de maintien).",
+    "img": "nouveautes/elec-animer.jpg"
+   },
+   {
+    "t": "📋 Modèles et mes schémas (en haut de la palette) : choisis un circuit prêt à utiliser (marche-arrêt avec maintien, chauffage 24 V, pompe de puisard, démarrage temporisé, sélecteur SPDT, circuit c.c.). Il est posé sur un nouveau tableau, prêt à animer.",
+    "img": "nouveautes/sch-modeles.jpg"
+   },
+   {
+    "t": "🔧 Trouve la panne (pendant l'animation) : « Au hasard » cache une panne dans le circuit (fil coupé, bobine grillée, contact bloqué ouvert ou collé, fusible sauté); « Choisir » te laisse cliquer toi-même le fil ou le symbole à briser (reclique pour changer de type).",
+    "img": "nouveautes/panne-panneau.jpg"
+   },
+   {
+    "t": "Les élèves suivent les couleurs : la tension (rouge) s'arrête là où est la panne. Le symbole garde son dessin normal, comme dans la vraie vie : il faut raisonner.",
+    "img": "nouveautes/panne-cachee.jpg"
+   },
+   {
+    "t": "« Révéler » entoure la panne en rouge; « Réparer » remet le circuit en état.",
+    "img": "nouveautes/panne-revelee.jpg"
+   }
+  ],
+  "versions": [
+   {
+    "date": "2026-10-28",
+    "texte": "Relais complet, numéros de bornes, repères automatiques, tensions, ampoule, couleurs de fils, pôles et positions, jonctions et fils réparés."
+   },
+   {
+    "date": "2026-10-21",
+    "texte": "Six modèles prêts à utiliser et mode « Trouve la panne » (au hasard ou choisie par l'enseignant)."
+   },
+   {
+    "date": "2026-10-21",
+    "texte": "Le courant circule de L1 vers L2 et suit le tracé; animation juste après un zoom; les fils sous un symbole sont coupés entre ses bornes."
+   },
+   {
+    "date": "2026-10-21",
+    "texte": "Catégories repliables; interrupteurs SPST, SPDT, DPST, DPDT; résistance, condensateur, diode, DEL, pile, terre, sonnerie, élément chauffant, relais et contact temporisés; charges en série."
+   },
+   {
+    "date": "2026-10-21",
+    "texte": "Échelle redimensionnable après la pose; palette compacte avec icônes, déplaçable et repliable."
+   },
+   {
+    "date": "2026-10-21",
+    "texte": "Animation du schéma : courant, bobines, maintien, lampes, moteurs, court-circuit signalé."
+   },
+   {
+    "date": "2026-10-21",
+    "texte": "Fils aimantés aux bornes, coudes, jonctions automatiques; les fils restent droits quand on déplace un symbole."
+   },
+   {
+    "date": "2026-10-21",
+    "texte": "Première version : rails L1/L2, contacts NO/NF, bobines, boutons-poussoirs, thermostat, pressostat, lampe, solénoïde, transformateur."
+   }
+  ]
+ },
+ {
+  "date": "2026-10-28",
+  "type": "outil",
   "titre": "Barre du crayon et du tableau blanc",
   "texte": "Une seule ligne d'outils, plus simple pour débuter. Nouveau : le bouton Objets a trois onglets — Formes (utiles en classe), Iso (plomberie) et Électricité (symboles).",
   "formation": [
@@ -543,84 +630,6 @@
    {
     "date": "2026-10-21",
     "texte": "Icône Pavillon de l'Avenir dans l'onglet, aperçu avec image quand on partage le lien, pastille « Nouveau » pendant 30 jours, « Ma liste » visible seulement quand elle contient un livre."
-   }
-  ]
- },
- {
-  "date": "2026-10-21",
-  "type": "outil",
-  "titre": "Schéma électrique en échelle (tableau blanc)",
-  "texte": "Dessine et anime des schémas en échelle sur le quadrillé : une trentaine de symboles par catégories, fils aimantés aux bornes, animation du courant de L1 vers L2, six modèles prêts à utiliser et un mode « Trouve la panne ».",
-  "formation": [
-   {
-    "t": "Ouvre le tableau blanc, puis bouton Fond jusqu'à « Quadrillé (schéma électrique en échelle) ».",
-    "img": "nouveautes/elec-fond.jpg"
-   },
-   {
-    "t": "Bouton Objets (le cube) : la palette « Schéma électrique » s'ouvre. Glisse la poignée ⠿ pour la déplacer, ⌄ pour la replier; touche le titre d'une catégorie pour l'ouvrir ou la fermer.",
-    "img": "nouveautes/elec-palette.jpg"
-   },
-   {
-    "t": "« Échelle L1/L2 » : glisse un rectangle pour tracer les rails. Pour changer sa taille plus tard : touche L1 ou L2, puis glisse le carré bleu en bas à droite (ou Largeur / Hauteur − +).",
-    "img": "nouveautes/elec-echelle.jpg"
-   },
-   {
-    "t": "Choisis un symbole et touche un échelon. Quand il est sélectionné : case Repère (CR1, M, PB2…), NO / NF, type d'interrupteur (SPST, SPDT, DPST, DPDT) ou délai d'un relais temporisé.",
-    "img": "nouveautes/elec-reglages.jpg"
-   },
-   {
-    "t": "Pour relier : glisse d'un point bleu à l'autre. Le fil fait un coude tout seul, et un point de jonction s'ajoute quand tu arrives au milieu d'un autre fil. Gomme pour effacer un fil, ↶ pour annuler.",
-    "img": "nouveautes/elec-relier.jpg"
-   },
-   {
-    "t": "▶ Animer le schéma : garde enfoncé un bouton-poussoir, clique un interrupteur pour l'actionner. Rouge = L1, bleu = L2, points jaunes = courant. Une bobine change tous les contacts qui portent son repère (contact de maintien).",
-    "img": "nouveautes/elec-animer.jpg"
-   },
-   {
-    "t": "📋 Modèles et mes schémas (en haut de la palette) : choisis un circuit prêt à utiliser (marche-arrêt avec maintien, chauffage 24 V, pompe de puisard, démarrage temporisé, sélecteur SPDT, circuit c.c.). Il est posé sur un nouveau tableau, prêt à animer.",
-    "img": "nouveautes/sch-modeles.jpg"
-   },
-   {
-    "t": "🔧 Trouve la panne (pendant l'animation) : « Au hasard » cache une panne dans le circuit (fil coupé, bobine grillée, contact bloqué ouvert ou collé, fusible sauté); « Choisir » te laisse cliquer toi-même le fil ou le symbole à briser (reclique pour changer de type).",
-    "img": "nouveautes/panne-panneau.jpg"
-   },
-   {
-    "t": "Les élèves suivent les couleurs : la tension (rouge) s'arrête là où est la panne. Le symbole garde son dessin normal, comme dans la vraie vie : il faut raisonner.",
-    "img": "nouveautes/panne-cachee.jpg"
-   },
-   {
-    "t": "« Révéler » entoure la panne en rouge; « Réparer » remet le circuit en état.",
-    "img": "nouveautes/panne-revelee.jpg"
-   }
-  ],
-  "versions": [
-   {
-    "date": "2026-10-21",
-    "texte": "Six modèles prêts à utiliser et mode « Trouve la panne » (au hasard ou choisie par l'enseignant)."
-   },
-   {
-    "date": "2026-10-21",
-    "texte": "Le courant circule de L1 vers L2 et suit le tracé; animation juste après un zoom; les fils sous un symbole sont coupés entre ses bornes."
-   },
-   {
-    "date": "2026-10-21",
-    "texte": "Catégories repliables; interrupteurs SPST, SPDT, DPST, DPDT; résistance, condensateur, diode, DEL, pile, terre, sonnerie, élément chauffant, relais et contact temporisés; charges en série."
-   },
-   {
-    "date": "2026-10-21",
-    "texte": "Échelle redimensionnable après la pose; palette compacte avec icônes, déplaçable et repliable."
-   },
-   {
-    "date": "2026-10-21",
-    "texte": "Animation du schéma : courant, bobines, maintien, lampes, moteurs, court-circuit signalé."
-   },
-   {
-    "date": "2026-10-21",
-    "texte": "Fils aimantés aux bornes, coudes, jonctions automatiques; les fils restent droits quand on déplace un symbole."
-   },
-   {
-    "date": "2026-10-21",
-    "texte": "Première version : rails L1/L2, contacts NO/NF, bobines, boutons-poussoirs, thermostat, pressostat, lampe, solénoïde, transformateur."
    }
   ]
  },
