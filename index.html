@@ -1596,6 +1596,10 @@ function brancherSouris(win){
   win.addEventListener("mouseup", fin); win.addEventListener("blur", fin);
   win.addEventListener("mousemove", e => { if (RD.laser && win.frameElement){ const r = win.frameElement.getBoundingClientRect(); const k = r.width / (win.innerWidth || r.width) || 1; placerLaser(r.left + e.clientX * k, r.top + e.clientY * k); } });
   doc.addEventListener("mouseleave", () => { $("#laser").hidden = true; });
+  /* page simple : le cadre est rogné à la page, donc le zoom propre au livre (C9, M11…) ne montrerait qu'une bande; la bibliothèque zoome elle-même */
+  win.addEventListener("wheel", e => {
+    if (!RD.single || RD.wb || outilActif() || e.shiftKey || (RD.drv && RD.drv.defile) || win.frameElement !== $("#readerFrame")) return;
+    e.preventDefault(); e.stopImmediatePropagation(); zoomSouris(e, win.frameElement); }, { capture:true, passive:false });
   win.addEventListener("wheel", e => {
     if (e.ctrlKey || e.metaKey || RD.wb){ e.preventDefault(); zoomSouris(e, win.frameElement); return; }
     /* roulette seule = zoom, comme dans les livres qui ont leur propre zoom (ceux-là gèrent la roulette eux-mêmes : defaultPrevented) */
