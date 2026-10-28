@@ -2,6 +2,29 @@
  {
   "date": "2026-10-28",
   "type": "outil",
+  "titre": "Plomberie en coupe (tableau blanc)",
+  "texte": "Nouvelle section « Plomberie » dans les Formes : une maison en coupe (étage, rez-de-chaussée, sous-sol), les tuyaux EF, EC, drain, évent et gaz, les collecteurs, le chauffe-eau, les raccords et les appareils.",
+  "formation": [
+   {
+    "t": "Bouton Objets (le cube), onglet Formes, puis ouvre « Plomberie (maison en coupe) » en bas de la palette.",
+    "img": "nouveautes/plomberie-palette.jpg"
+   },
+   {
+    "t": "Touche « Maison en coupe » puis clique sur le tableau. Choisis un tuyau et glisse d'un point à l'autre : il reste droit ou à 45° et s'aimante au bout d'un autre tuyau (pour continuer un trajet, repars du bout). Un clic pose un appareil, un raccord ou un collecteur.",
+    "img": "nouveautes/plomberie-coupe.jpg"
+   },
+   "Double-clic sur un tuyau : écris son diamètre (ex. 3/4 po). Comme les autres formes : glisse pour déplacer, carrés blancs pour la taille, Suppr pour effacer, + pour ajouter des cotes."
+  ],
+  "versions": [
+   {
+    "date": "2026-10-28",
+    "texte": "Maison en coupe, tuyaux EF/EC/drain/évent/gaz, collecteurs, chauffe-eau, raccords et appareils."
+   }
+  ]
+ },
+ {
+  "date": "2026-10-28",
+  "type": "outil",
   "titre": "Sélection multiple, copier et coller (tableau blanc)",
   "texte": "Choisis plusieurs éléments à la fois pour les déplacer, les recolorer, les effacer ou les copier. Ctrl + une vignette remplace l'objet choisi.",
   "formation": [
@@ -114,6 +137,10 @@
   "texte": "Une seule ligne d'outils, plus simple pour débuter. Nouveau : le bouton Objets a trois onglets — Formes (utiles en classe), Iso (plomberie) et Électricité (symboles).",
   "formation": [
    "Nouveau : la touche Suppr efface ce qui est choisi (forme, objet, symbole, texte). La gomme a sa glissière de taille. Le bouton plein écran est dans la barre du tableau blanc. Ta couleur personnalisée est retenue. Avec l'outil Fil, les symboles ne bougent plus par accident. En glissant un objet de la palette, tu le vois déjà à sa place.",
+   {
+    "t": "Plusieurs cotes sur une forme : double-clic sur la forme (ou sur une de ses cotes), puis « + Ajouter une cote » : la cote se place à l'extérieur du côté suivant. La case du double-clic se met maintenant à côté de l'objet, jamais dessus.",
+    "img": "nouveautes/cotes-plus.jpg"
+   },
    "À chaque ouverture du tableau blanc, aucun outil n'est choisi : touche une forme ou un objet pour le choisir (la palette Objets s'ouvre), ou touche le crayon pour écrire.",
    {
     "t": "Le bouton crayon (sa pointe montre la couleur) : touche-le pour l'activer, le menu s'ouvre avec la couleur, le tracé (trait libre, ligne, flèche, rectangle, ellipse) et l'épaisseur (glissière de 1 à 40). Touche-le encore pour le désactiver.",
@@ -184,6 +211,10 @@
    "Le crayon réagit maintenant tout de suite : seul le trait en cours est redessiné pendant que tu écris, le reste du tableau ne bouge pas."
   ],
   "versions": [
+   {
+    "date": "2026-10-28",
+    "texte": "Bouton + pour plusieurs cotes; la case du double-clic ne cache plus l'objet."
+   },
    {
     "date": "2026-10-28",
     "texte": "Suppr partout, taille de la gomme, plein écran, couleur perso retenue, outil Fil sans déplacement, aperçu pendant le glisser-déposer."
