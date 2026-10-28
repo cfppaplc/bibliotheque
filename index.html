@@ -1965,7 +1965,20 @@ const WB = {};
 const wbEtat = () => WB[RD.book] || (WB[RD.book] = { n:1, count:1, bg:{} });
 const wbBg = () => wbEtat().bg[wbEtat().n] || "blanc";
 const wbSombre = () => !!RD.wb && !!(WBFONDS.find(f => f.k === wbBg()) || {}).dark;
-const inkKey = () => RD.book + "|" + (RD.wb ? "wb" + wbEtat().n : RD.label + (RD.dbl ? "|d" : ""));
+const inkKey = () => RD.book + "|" + (RD.wb ? "wb" + wbEtat().n + (wbBg() === "blanc" ? "" : ":" + wbBg()) : RD.label + (RD.dbl ? "|d" : ""));   /* chaque fond a son propre dessin */
+/* après un changement de fond : le dessin reste sur l'ancien fond; un bouton permet de l'apporter */
+function apresFond(ancienne, nomAncien){
+  const nouv = inkKey(); if (ancienne === nouv) return;
+  let t = document.getElementById("fondToast"); const orig = t && t.dataset.cle; if (t) t.remove();
+  if (!(INKS[ancienne] || []).length && orig && orig !== nouv){ ancienne = orig; nomAncien = t.dataset.nom; }   /* on passe plusieurs fonds de suite : on garde le fond où est le dessin */
+  const av = INKS[ancienne] || []; if (!av.length || ancienne === nouv) return;
+  t = document.createElement("div"); t.id = "fondToast";
+  t.style.cssText = "position:fixed;left:50%;bottom:110px;transform:translateX(-50%);z-index:100000;display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;background:#0e0e0f;border:1px solid #3a3a40;color:#e4e4e7;font:600 .9rem system-ui;box-shadow:0 8px 24px rgba(0,0,0,.4);max-width:92vw";
+  t.innerHTML = '<span>Ton dessin est resté sur le fond « ' + nomAncien + ' ».</span><button type="button" style="min-height:40px;padding:0 12px;border-radius:9px;border:1px solid #6aa9ff;border-bottom-width:4px;background:#1f6fc2;color:#fff;font:800 .88rem system-ui;cursor:pointer">Apporter le dessin ici</button>';
+  t.dataset.cle = ancienne; t.dataset.nom = nomAncien; document.body.appendChild(t); const fin = setTimeout(() => t.remove(), 8000);
+  t.querySelector("button").onclick = () => { clearTimeout(fin); t.remove(); if (inkKey() !== nouv) return; snapInk(); INKS[nouv] = (INKS[nouv] || []).concat(INKS[ancienne] || []); INKS[ancienne] = []; SELO.s = null; window.SELM = []; redrawInk(); aviser("Dessin apporté sur ce fond.", 2500); };
+}
+const nomFond = k => ((WBFONDS.find(f => f.k === k) || {}).n || k).replace(/ \(.*\)$/, "");
 function majFond(){
   const b = $("#wbBoard"); b.dataset.fond = wbBg(); b.style.setProperty("--u", (34 * RD.z) + "px");
   const st = wbEtat(); $("#wbLbl").textContent = st.n + " / " + st.count;
@@ -1979,8 +1992,8 @@ function wbAller(dir){
 }
 function wbNouveau(){ const st = wbEtat(); st.count++; st.n = st.count; st.bg[st.n] = st.bg[st.n - 1] || "blanc"; majFond(); redrawInk(); refreshTools(); aviser("Tableau " + st.n + " ajouté."); }
 function wbFondSuivant(){
-  const st = wbEtat(), i = WBFONDS.findIndex(f => f.k === wbBg()), f = WBFONDS[(i + 1) % WBFONDS.length];
-  st.bg[st.n] = f.k; majFond(); redrawInk(); refreshTools(); aviser(f.n);
+  const st = wbEtat(), i = WBFONDS.findIndex(f => f.k === wbBg()), f = WBFONDS[(i + 1) % WBFONDS.length], av = inkKey(), avn = nomFond(wbBg());
+  st.bg[st.n] = f.k; SELO.s = null; window.SELM = []; majFond(); redrawInk(); refreshTools(); aviser(f.n); apresFond(av, avn);
 }
 /* ---- Objets du plan isométrique (plinthe, radiateur, chaudière…) : ils se placent sur la grille et les tuyaux s'y raccordent ---- */
 function enveloppe(pts){
@@ -3427,7 +3440,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     RD.objTab = t; SELO.s = null;
     RD.formeK = null; RD.objKi = null; RD.objKe = null;
     if (t !== "formes" && t !== "plomb"){ const voulu = t === "iso" ? /^iso/ : /^quad$/;
-      if (!voulu.test(wbBg())){ wbEtat().bg[wbEtat().n] = t === "iso" ? "iso" : "quad"; majFond(); aviser(t === "iso" ? "Fond : plan isométrique." : "Fond : quadrillé (schéma électrique en échelle)."); } }
+      if (!voulu.test(wbBg())){ const av = inkKey(), avn = nomFond(wbBg()); wbEtat().bg[wbEtat().n] = t === "iso" ? "iso" : "quad"; majFond(); setTimeout(() => apresFond(av, avn), 50); aviser(t === "iso" ? "Fond : plan isométrique." : "Fond : quadrillé (schéma électrique en échelle)."); } }
     redrawInk(); refreshTools(); });
   bar.querySelectorAll("[data-fc]").forEach(x => x.onclick = () => { RD.filCol = x.dataset.fc; RD.objKe = "fil"; RD.objKi = null; SELO.s = null; majObjUI(); redrawInk(); aviser("Fil " + x.title.toLowerCase() + " : glisse d'un point bleu à l'autre.", 2500); });
   $("#objNF").onclick = () => { const s = SELO.s && strokes().includes(SELO.s) && ELEC[SELO.s.k] ? SELO.s : null;
