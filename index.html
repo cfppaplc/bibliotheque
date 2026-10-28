@@ -3529,7 +3529,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     if (el && RD.objK !== "jonction"){
       const b = borneProche(q.raw), h0 = b ? null : touche(q.raw);
       if (b || RD.objK === "fil"){                                    /* fil : on part d'une borne (ou d'un point de la grille avec l'outil Fil) */
-        snapInk(); const A = b || q.snap; mv = { fil:true, A, B:A, segs:[], dir:null }; SELO.s = null; tracerFil(); redrawInk(); majObjUI(); return;
+        snapInk(); const A = b || q.snap; mv = { fil:true, A, B:A, segs:[], dir:null, surObjet:b ? null : touche(q.raw) }; SELO.s = null; tracerFil(); redrawInk(); majObjUI(); return;
       }
     }
     let hit = touche(q.raw);
@@ -3566,7 +3566,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
   });
   ["pointerup", "pointercancel"].forEach(t => c.addEventListener(t, ev => {
     if (mv && mv.s && !mv.snap && ev.type === "pointerup") tapElement(mv.s, ev);      /* toucher sans bouger : compte pour le double-clic (renommer) */
-    if (mv && mv.fil){ if (mv.segs.length){ jonctionsAuto(mv.segs); nettoyerFils(); } else { (UNDO[inkKey()] || []).pop(); if (!mv.B || mv.B === mv.A){ RD.objKe = null; SELO.s = null; if (mv.filSous && strokes().includes(mv.filSous)){ SELO.s = mv.filSous; tapElement(mv.filSous, ev); } } }   /* clic sans tracer : retour à aucun outil */ mv = null; redrawInk(); majObjUI(); return; }
+    if (mv && mv.fil){ if (mv.segs.length){ jonctionsAuto(mv.segs); nettoyerFils(); } else { (UNDO[inkKey()] || []).pop(); if (!mv.B || mv.B === mv.A){ RD.objKe = null; SELO.s = null; const ch = mv.surObjet || mv.filSous; if (ch && strokes().includes(ch)){ SELO.s = ch; RD.objO = ch.o || 0; tapElement(ch, ev); } } }   /* simple clic sur un symbole ou un fil, même avec l'outil Fil : on le choisit (double-clic = repère) */   /* clic sans tracer : retour à aucun outil */ mv = null; redrawInk(); majObjUI(); return; }
     if (mv && mv.s && mv.snap && ELEC[mv.s.k]){                                  /* symbole déplacé : ses fils restent droits (un coude s'ajoute au besoin) */
       const ux = elecU() / c.width, uy = elecU() / c.height;
       mv.liens.forEach(([f, i, x0, y0]) => { const M = f.p[i].slice(), F = f.p[1 - i]; if (Math.abs(M[0] - F[0]) * c.width <= 2 || Math.abs(M[1] - F[1]) * c.height <= 2) return;
@@ -3646,7 +3646,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     c.setPointerCapture(e.pointerId);
     if (RD.eraser){ cur = "erase"; eraseAt(pt(e)); return; }
     if (RD.crayonOff && !RD.text && !RD.obj){ e.preventDefault();                          /* aucun outil : rien ne se dessine, mais toucher une forme ou un objet le choisit */
-      const r0 = c.getBoundingClientRect(), brut = [(e.clientX - r0.left) / r0.width, (e.clientY - r0.top) / r0.height], hit = formeSous(brut) || (RD.wb ? objetSous(brut) : null);
+      const r0 = c.getBoundingClientRect(), brut = [(e.clientX - r0.left) / r0.width, (e.clientY - r0.top) / r0.height], hit = (RD.wb ? objetSous(brut) : null) || formeSous(brut);
       if (!hit) return;
       RD.obj = true; RD.objTab = null; RD.formeK = null; RD.objKi = null; RD.objKe = null; refreshTools();
       if (hit.t === "objet"){ if (choisirAutre(hit)) tapElement(hit, e); return; }
@@ -3741,11 +3741,14 @@ function aimanterTuyau(q, a, sauf){
   const c = $("#inkCanvas"); let mm = null, raf = 0, cadre = null;
   const actif = () => RD.wb && !RD.eraser && !RD.sim && !RD.text && (RD.obj || RD.crayonOff) && !RD.formeK && !RD.objK;
   const brut = e => { const r = c.getBoundingClientRect(); return [(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height]; };
-  const sous = q => formeSous(q) || objetSous(q);
+  const sous = q => objetSous(q) || formeSous(q);
   const stop = e => { e.stopImmediatePropagation(); e.preventDefault(); try { c.setPointerCapture(e.pointerId); } catch(er){} };
   c.addEventListener("pointerdown", e => {
-    if (!actif() || e.button > 0) return;
-    const q = brut(e), hit = sous(q), mod = e.ctrlKey || e.metaKey || e.shiftKey;
+    if (e.button > 0) return;
+    const mod = e.ctrlKey || e.metaKey || e.shiftKey;
+    if (mod && RD.wb && !RD.eraser && !RD.sim && !RD.text){ stop(e); mm = { cadre:true, q0:brut(e), x0:e.clientX, y0:e.clientY, mod:true, hit:sous(brut(e)) }; return; }   /* Ctrl : cadre à la Windows (ou Ctrl+clic sur un élément) */
+    if (!actif()) return;
+    const q = brut(e), hit = sous(q);
     if (mod && hit){ stop(e); if (!SELM.length && SELO.s && strokes().includes(SELO.s) && SELO.s !== hit) SELM = [SELO.s];
       SELM = SELM.includes(hit) ? SELM.filter(x => x !== hit) : SELM.concat([hit]); SELO.s = null; redrawInk(); try { majObjUI(); } catch(er){} return; }
     if (!mod && hit && SELM.length > 1 && SELM.includes(hit)){ stop(e); mm = { groupe:SELM.slice(), q0:q, p0:SELM.map(o => o.p.map(v => v.slice())), snap:false, x0:e.clientX, y0:e.clientY }; return; }
@@ -3755,10 +3758,10 @@ function aimanterTuyau(q, a, sauf){
   }, true);
   c.addEventListener("pointermove", e => {
     if (!mm) return; e.stopImmediatePropagation();
-    if (Math.hypot(e.clientX - mm.x0, e.clientY - mm.y0) < 5 && !mm.snap && !cadre) return;
+    if (Math.hypot(e.clientX - mm.x0, e.clientY - mm.y0) < (mm.mod ? 3 : 5) && !mm.snap && !cadre) return;
     if (mm.groupe){ const q = brut(e), dx = q[0] - mm.q0[0], dy = q[1] - mm.q0[1]; if (!mm.snap){ snapInk(); mm.snap = true; }
       mm.groupe.forEach((o, i) => { o.p = mm.p0[i].map(v => [v[0] + dx, v[1] + dy]); }); if (!raf) raf = requestAnimationFrame(() => { raf = 0; redrawInk(); }); return; }
-    if (!cadre){ cadre = document.createElement("div"); cadre.style.cssText = "position:fixed;z-index:60;border:2px dashed #2a7bcf;background:rgba(42,123,207,.08);pointer-events:none;border-radius:4px"; document.body.appendChild(cadre); }
+    if (!cadre){ cadre = document.createElement("div"); cadre.style.cssText = "position:fixed;z-index:100000;border:1px solid #0078d7;background:rgba(0,120,215,.22);pointer-events:none";   /* cadre de sélection comme dans Windows */ document.body.appendChild(cadre); }
     const x = Math.min(e.clientX, mm.x0), y = Math.min(e.clientY, mm.y0); Object.assign(cadre.style, { left:x + "px", top:y + "px", width:Math.abs(e.clientX - mm.x0) + "px", height:Math.abs(e.clientY - mm.y0) + "px" }); mm.x1 = e.clientX; mm.y1 = e.clientY;
   }, true);
   ["pointerup", "pointercancel"].forEach(t => c.addEventListener(t, e => {
@@ -3766,6 +3769,8 @@ function aimanterTuyau(q, a, sauf){
     if (m.groupe){ if (raf){ cancelAnimationFrame(raf); raf = 0; } try { if (m.groupe.some(o => o.t === "objet" && ELEC[o.k]) && window.nettoyerJonctions) nettoyerJonctions(); } catch(er){} redrawInk(); return; }
     if (cadre){ cadre.remove(); cadre = null; }
     if (m.x1 === undefined || t === "pointercancel"){                                                   /* simple clic dans le vide : plus rien de choisi */
+      if (m.mod && m.hit && t !== "pointercancel"){ const hit = m.hit; if (!SELM.length && SELO.s && strokes().includes(SELO.s) && SELO.s !== hit) SELM = [SELO.s];   /* Ctrl+clic : ajoute ou retire l'élément */
+        SELM = SELM.includes(hit) ? SELM.filter(x => x !== hit) : SELM.concat([hit]); SELO.s = null; redrawInk(); try { majObjUI(); } catch(er){} return; }
       if (!m.mod && (SELM.length || SELO.s)){ SELM = []; SELO.s = null; redrawInk(); try { majObjUI(); } catch(er){} } return; }
     const r = c.getBoundingClientRect(), sx = c.width / r.width, sy = c.height / r.height;
     const bx = [(Math.min(m.x0, m.x1) - r.left) * sx, (Math.min(m.y0, m.y1) - r.top) * sy, (Math.max(m.x0, m.x1) - r.left) * sx, (Math.max(m.y0, m.y1) - r.top) * sy];

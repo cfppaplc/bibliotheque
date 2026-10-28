@@ -29,7 +29,7 @@
   "texte": "Choisis plusieurs éléments à la fois pour les déplacer, les recolorer, les effacer ou les copier. Ctrl + une vignette remplace l'objet choisi.",
   "formation": [
    {
-    "t": "Sans outil choisi, glisse dans le vide : un cadre pointillé choisit tout ce qui est dedans. Ou garde Ctrl (ou Maj) enfoncé et clique les éléments un à un.",
+    "t": "Garde Ctrl enfoncé et glisse : un cadre bleu comme dans Windows choisit tout ce qui est dedans (ça marche même si un outil est choisi). Sans outil, glisser dans le vide fait le même cadre. Ctrl + clic ajoute ou retire un élément.",
     "img": "nouveautes/selection-multiple.jpg"
    },
    "Glisse un des éléments choisis : tout le groupe suit. Touche une couleur du crayon : tout le groupe change de couleur. Suppr efface le groupe.",
@@ -37,6 +37,10 @@
    "Remplacer : choisis un symbole (ou un objet iso, ou une forme), garde Ctrl enfoncé et touche une autre vignette de la palette. Il prend sa place : les fils, les tuyaux et les cotes restent où ils sont."
   ],
   "versions": [
+   {
+    "date": "2026-10-28",
+    "texte": "Cadre de sélection bleu visible (style Windows) avec Ctrl + glisser."
+   },
    {
     "date": "2026-10-28",
     "texte": "Sélection par cadre et Ctrl+clic, déplacer et recolorer un groupe, copier-coller, remplacer avec Ctrl + vignette."
@@ -55,6 +59,7 @@
    },
    "Nouveau aussi : l'ampoule (Charges), la couleur des nouveaux fils (bas de la palette), l'interrupteur se règle par « 1 ou 2 pôles » et « 1 ou 2 positions ». Un point de jonction qui ne relie plus rien s'efface, et si tu effaces un symbole entre deux fils, les fils se rejoignent.",
    "Corrigé : pars du milieu d'un fil et glisse pour tracer un nouveau fil, le point de jonction se fait tout seul (avant, l'appli choisissait le fil et passait à l'onglet Formes). Un simple clic sur un fil le choisit (Suppr pour l'effacer).",
+   "Corrigé : même quand l'outil Fil est allumé (il s'allume tout seul après avoir posé un symbole), un clic sur un symbole le choisit et un double-clic ouvre son repère. Un objet posé sur un fil ou un tuyau passe avant le fil.",
    {
     "t": "Ouvre le tableau blanc, puis bouton Fond jusqu'à « Quadrillé (schéma électrique en échelle) ».",
     "img": "nouveautes/elec-fond.jpg"
@@ -97,6 +102,10 @@
    }
   ],
   "versions": [
+   {
+    "date": "2026-10-28",
+    "texte": "Choisir un symbole est de nouveau facile, même avec l'outil Fil."
+   },
    {
     "date": "2026-10-28",
     "texte": "Un nouveau fil peut partir du milieu d'un fil existant (jonction automatique)."
