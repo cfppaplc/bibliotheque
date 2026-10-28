@@ -2647,7 +2647,7 @@ function redrawInk(){
   if (RD.wb && (/^iso/.test(wbBg()) || wbBg() === "lignes" || wbBg() === "quad")) grilleIso(g, c.width, c.height, k);
   const tous = INKS[inkKey()] || [];                                       /* les objets cachent les traits qui passent derrière ; les textes restent par-dessus */
   [s => s.t !== "objet" && s.t !== "texte", s => s.t === "objet", s => s.t === "texte"].forEach((f, i) => { tous.filter(f).forEach(s => drawStroke(g, s, c.width, c.height, k));
-    if (i === 0 && RD.wb && /^iso/.test(wbBg())) croisementsIso(g, tous, c.width, c.height, k); });
+    /* croisementsIso retiré à la demande de Jeremy (28 oct.) : trop de bogues */ });
   if (window.SELM && SELM.length){ g.save(); g.setLineDash([6 * k, 4 * k]); g.lineWidth = 1.6 * k; g.strokeStyle = "#2a7bcf";
     let T = null; SELM.forEach(o => { if (!strokes().includes(o)) return; const b = boiteDe(o, c.width, c.height); if (!b) return;
       T = T ? [Math.min(T[0], b[0]), Math.min(T[1], b[1]), Math.max(T[2], b[2]), Math.max(T[3], b[3])] : b.slice();
