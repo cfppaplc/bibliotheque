@@ -2607,7 +2607,13 @@ function redrawInk(){
   const tous = INKS[inkKey()] || [];                                       /* les objets cachent les traits qui passent derrière ; les textes restent par-dessus */
   [s => s.t !== "objet" && s.t !== "texte", s => s.t === "objet", s => s.t === "texte"].forEach(f => tous.filter(f).forEach(s => drawStroke(g, s, c.width, c.height, k)));
   if (window.SELM && SELM.length){ g.save(); g.setLineDash([6 * k, 4 * k]); g.lineWidth = 1.6 * k; g.strokeStyle = "#2a7bcf";
-    SELM.forEach(o => { if (!strokes().includes(o)) return; const b = boiteDe(o, c.width, c.height); if (b) g.strokeRect(b[0] - 5 * k, b[1] - 5 * k, b[2] - b[0] + 10 * k, b[3] - b[1] + 10 * k); }); g.restore(); }
+    let T = null; SELM.forEach(o => { if (!strokes().includes(o)) return; const b = boiteDe(o, c.width, c.height); if (!b) return;
+      T = T ? [Math.min(T[0], b[0]), Math.min(T[1], b[1]), Math.max(T[2], b[2]), Math.max(T[3], b[3])] : b.slice();
+      if (o.t === "objet" || (o.t && FORMES[o.t] && !/^(ligne|fleche|fleche2|tuy[A-Z]+)$/.test(o.t))){ g.strokeRect(b[0] - 5 * k, b[1] - 5 * k, b[2] - b[0] + 10 * k, b[3] - b[1] + 10 * k); return; }
+      g.save(); g.setLineDash([]); g.strokeStyle = "rgba(42,123,207,.35)"; g.lineCap = "round"; g.lineJoin = "round"; g.lineWidth = ((o.w || 3) + 9) * k; g.beginPath();   /* trait choisi : surligné en bleu */
+      o.p.forEach((q, i) => i ? g.lineTo(q[0] * c.width, q[1] * c.height) : g.moveTo(q[0] * c.width, q[1] * c.height)); g.stroke(); g.restore(); });
+    if (T && SELM.length > 1){ g.lineWidth = 1.4 * k; g.strokeRect(T[0] - 10 * k, T[1] - 10 * k, T[2] - T[0] + 20 * k, T[3] - T[1] + 20 * k); }   /* un seul cadre autour du groupe */
+    g.restore(); }
   if (window.APERCU){ g.save(); g.globalAlpha = .55; drawStroke(g, window.APERCU, c.width, c.height, k); g.restore(); }      /* aperçu pendant le glisser-déposer */
   if (typeof majSelTxt === "function") majSelTxt();
   try { if (!window.APERCU) planifierSauvegarde(); } catch(e){}
@@ -3822,6 +3828,9 @@ function aimanterTuyau(q, a, sauf){
     if (e.button > 0) return;
     const mod = e.ctrlKey || e.metaKey || e.shiftKey;
     if (mod && RD.wb && !RD.eraser && !RD.sim && !RD.text){ stop(e); mm = { cadre:true, q0:brut(e), x0:e.clientX, y0:e.clientY, mod:true, hit:sous(brut(e)) }; return; }   /* Ctrl : cadre à la Windows (ou Ctrl+clic sur un élément) */
+    if (SELM.length && RD.wb && !RD.eraser && !RD.sim && !RD.text){ const h0 = sous(brut(e));
+      if (SELM.length > 1 && h0 && SELM.includes(h0)){ stop(e); mm = { groupe:SELM.slice(), q0:brut(e), p0:SELM.map(o => o.p.map(v => v.slice())), snap:false, x0:e.clientX, y0:e.clientY }; return; }   /* le groupe se déplace, même avec un outil */
+      if (!actif()){ SELM = []; redrawInk(); } }                                                        /* tout autre clic : la sélection multiple s'efface */
     if (!actif()) return;
     const q = brut(e), hit = sous(q);
     if (mod && hit){ stop(e); if (!SELM.length && SELO.s && strokes().includes(SELO.s) && SELO.s !== hit) SELM = [SELO.s];

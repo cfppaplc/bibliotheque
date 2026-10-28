@@ -41,11 +41,16 @@
     "t": "Garde Ctrl enfoncé et glisse : un cadre bleu comme dans Windows choisit tout ce qui est dedans (ça marche même si un outil est choisi). Sans outil, glisser dans le vide fait le même cadre. Ctrl + clic ajoute ou retire un élément.",
     "img": "nouveautes/selection-multiple.jpg"
    },
+   "Les traits choisis sont surlignés en bleu, avec un seul cadre pointillé autour du groupe. Un clic ailleurs (même avec le crayon) enlève la sélection.",
    "Glisse un des éléments choisis : tout le groupe suit. Touche une couleur du crayon : tout le groupe change de couleur. Suppr efface le groupe.",
    "Ctrl+C copie, Ctrl+V colle une copie un peu décalée (chaque Ctrl+V la décale encore), Ctrl+X coupe, Ctrl+D duplique. Échap : plus rien de choisi.",
    "Remplacer : choisis un symbole (ou un objet iso, ou une forme), garde Ctrl enfoncé et touche une autre vignette de la palette. Il prend sa place : les fils, les tuyaux et les cotes restent où ils sont."
   ],
   "versions": [
+   {
+    "date": "2026-10-28",
+    "texte": "Corrigé : les carrés de sélection restaient affichés; traits surlignés et un seul cadre autour du groupe."
+   },
    {
     "date": "2026-10-28",
     "texte": "Cadre de sélection bleu visible (style Windows) avec Ctrl + glisser."
