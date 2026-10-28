@@ -2471,6 +2471,8 @@ function redrawInk(){
   if (RD.wb && (/^iso/.test(wbBg()) || wbBg() === "lignes" || wbBg() === "quad")) grilleIso(g, c.width, c.height, k);
   const tous = INKS[inkKey()] || [];                                       /* les objets cachent les traits qui passent derrière ; les textes restent par-dessus */
   [s => s.t !== "objet" && s.t !== "texte", s => s.t === "objet", s => s.t === "texte"].forEach(f => tous.filter(f).forEach(s => drawStroke(g, s, c.width, c.height, k)));
+  if (window.SELM && SELM.length){ g.save(); g.setLineDash([6 * k, 4 * k]); g.lineWidth = 1.6 * k; g.strokeStyle = "#2a7bcf";
+    SELM.forEach(o => { if (!strokes().includes(o)) return; const b = boiteDe(o, c.width, c.height); if (b) g.strokeRect(b[0] - 5 * k, b[1] - 5 * k, b[2] - b[0] + 10 * k, b[3] - b[1] + 10 * k); }); g.restore(); }
   if (window.APERCU){ g.save(); g.globalAlpha = .55; drawStroke(g, window.APERCU, c.width, c.height, k); g.restore(); }      /* aperçu pendant le glisser-déposer */
   if (typeof majSelTxt === "function") majSelTxt();
   try { if (!window.APERCU) planifierSauvegarde(); } catch(e){}
@@ -2622,6 +2624,15 @@ function choisirAutre(o){ const t = ongletPour(o), isoBg = !!RD.wb && /^iso/.tes
   if ((t === "iso" && !isoBg) || (t === "elec" && !modeElec())){ aviser(t === "iso" ? "Cet objet isométrique se modifie sur le fond « plan isométrique » (bouton Fond)." : "Ce symbole électrique se modifie sur le fond quadrillé (bouton Fond).", 4500); return false; }
   if (RD.objTab !== t){ RD.formeK = null; RD.objKi = null; RD.objKe = null; } RD.objTab = t; SELO.s = o; majObjUI(); redrawInk(); return true; }
 /* objet (iso ou électrique) sous le doigt, le plus récent d'abord */
+/* boîte d'un élément, en pixels du canevas (sélection multiple) */
+function boiteDe(s, W, H){
+  if (s.t === "objet") return objGeo(s, W, H).bbox;
+  if (!s.p || !s.p.length) return null;
+  const xs = s.p.map(q => q[0] * W), ys = s.p.map(q => q[1] * H);
+  if (s.t === "cercle" || s.t === "bulle"){ const r = Math.hypot(xs[1] - xs[0], ys[1] - ys[0]); return [xs[0] - r, ys[0] - r, xs[0] + r, ys[0] + r]; }
+  if (s.t === "texte"){ const k = (window.devicePixelRatio || 1) * RD.z; return [xs[0], ys[0], xs[0] + Math.max(40 * k, (s.bw || .1) * W), ys[0] + (s.fs || 28) * k * ((s.lig || [1]).length || 1) * 1.3]; }
+  return [Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)]; }
+window.SELM = [];
 function objetSous(q){ const c = $("#inkCanvas"), arr = strokes(), x = q[0] * c.width, y = q[1] * c.height;
   for (let i = arr.length - 1; i >= 0; i--){ const s = arr[i]; if (s.t !== "objet" || s.k === "fil") continue; const G = objGeo(s, c.width, c.height); if (x >= G.bbox[0] - 4 && x <= G.bbox[2] + 4 && y >= G.bbox[1] - 4 && y <= G.bbox[3] + 4) return s; } return null; }
 /* points d'un trait (pour la gomme) : les formes sont échantillonnées sur leur contour */
@@ -3190,7 +3201,9 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     if (k === "relais"){ dessinerElec(g, { t:"objet", k:"bobine", p:[[(W - 2 * 30) / 2 / W, 20 / H]], lb:"CR", __u:30 }, W, H, 1.2, "#24282c");
       dessinerElec(g, { t:"objet", k:"contact", p:[[(W - 2 * 22) / 2 / W, 50 / H]], lb:"", __u:22 }, W, H, 1, "#24282c"); return; }
     dessinerElec(g, { t:"objet", k, p:[[(W - w * U) / 2 / W, y0 / H]], lb:{ bobine:"CR", moteur:"M" }[k] || "", nf:0, __u:U }, W, H, 1.2, "#24282c"); });
-  bar.querySelectorAll("[data-k]").forEach(b => b.onclick = () => { if (b.dataset.glisse) return; const k = b.dataset.k, deja = RD.objK === k; if (ELEC[k]) RD.objKe = deja ? null : k; else RD.objKi = deja ? null : k; RD.formeK = null; SELO.s = null; redrawInk(); majObjUI(); });
+  bar.querySelectorAll("[data-k]").forEach(b => b.onclick = ev => { if (b.dataset.glisse) return;
+    if (ev && (ev.ctrlKey || ev.metaKey) && SELO.s && SELO.s.t === "objet" && strokes().includes(SELO.s) && !/^(fil|rails|jonction|serpentin|relais)$/.test(b.dataset.k) && SELO.s.k !== "rails" && SELO.s.k !== "serpentin"){ if (window.remplacerObjet(SELO.s, b.dataset.k)) return; }   /* Ctrl + vignette : remplace l'objet choisi */
+    const k = b.dataset.k, deja = RD.objK === k; if (ELEC[k]) RD.objKe = deja ? null : k; else RD.objKi = deja ? null : k; RD.formeK = null; SELO.s = null; redrawInk(); majObjUI(); });
   /* glisser une vignette (objet iso ou symbole) jusqu'au tableau */
   bar.querySelectorAll(".cgrid [data-k]").forEach(b => { const k = b.dataset.k; if (/^(fil|rails|jonction|serpentin)$/.test(k)) return;
     b.style.touchAction = "pan-y"; let g0 = null, fant = null;
@@ -3207,7 +3220,13 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
   const P_FORME = { cercle:[[.5, .5], [.8, .5]], bulle:[[.5, .5], [.68, .5]], angle:[[.25, .8], [.75, .2]], fleche:[[.15, .7], [.85, .3]], fleche2:[[.15, .5], [.85, .5]], cote:[[.15, .55], [.85, .55]], ligne:[[.15, .75], [.85, .25]] };
   bar.querySelectorAll("[data-f]").forEach(b => { const t = b.dataset.f, cv = b.querySelector("canvas"), g = cv.getContext("2d"), W = cv.width, H = cv.height, wb = RD.wb; RD.wb = false;
     try { drawStroke(g, { t, c:"#24282c", hl:false, hc:null, w:2.2, n:1, p:P_FORME[t] || [[.3, .15], [.7, .85]] }, W, H, 1); } catch(e){} RD.wb = wb;
-    b.onclick = () => { RD.formeK = RD.formeK === t ? null : t; SELO.s = null; redrawInk(); majObjUI(); }; });
+    b.onclick = ev => { const o = SELO.s;
+      if (ev && (ev.ctrlKey || ev.metaKey) && o && FORMES[o.t] && o.t !== t && strokes().includes(o)){                /* Ctrl + forme : la forme choisie change de type, même place et même taille */
+        snapInk(); const C = ["cercle", "bulle"], W = $("#inkCanvas").width, H = $("#inkCanvas").height, [a, z] = o.p;
+        if (C.includes(o.t) && !C.includes(t)){ const r = Math.hypot((z[0] - a[0]) * W, (z[1] - a[1]) * H); o.p = [[a[0] - r / W, a[1] - r / H], [a[0] + r / W, a[1] + r / H]]; }
+        else if (!C.includes(o.t) && C.includes(t)){ const m = [(a[0] + z[0]) / 2, (a[1] + z[1]) / 2], r = Math.max(Math.abs(z[0] - a[0]) * W, Math.abs(z[1] - a[1]) * H) / 2; o.p = [m, [m[0] + r / W, m[1]]]; }
+        o.t = t; if (t === "bulle" && !o.n) o.n = strokes().filter(x => x.t === "bulle").length; redrawInk(); majObjUI(); return; }
+      RD.formeK = RD.formeK === t ? null : t; SELO.s = null; redrawInk(); majObjUI(); }; });
   /* vignettes des objets isométriques : on dessine l'objet à petite échelle puis on le centre */
   bar.querySelectorAll(".ciso [data-k]").forEach(b => { const k = b.dataset.k, cv = b.querySelector("canvas"), g = cv.getContext("2d"), W = cv.width, H = cv.height;
     const z0 = RD.z, dpr = window.devicePixelRatio || 1;
@@ -3311,7 +3330,12 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
       fils.forEach(f => { if (bout(p, f)) n++; else if (surFil(p, f)) n += 2; });
       arr.filter(x => x.t === "objet" && ELEC[x.k] && x.k !== "jonction" && x.k !== "rails").forEach(x => objGeo(x, c.width, c.height).ports.forEach(q => { if (longueur([q[0] / c.width, q[1] / c.height], p) < 3) n++; }));
       if (n < 3){ const i = arr.indexOf(o); if (i >= 0) arr.splice(i, 1); } }); };
-  window.nettoyerJonctions = nettoyerJonctions;
+  window.nettoyerJonctions = nettoyerJonctions; window.borneProche = q => borneProche(q);
+  window.remplacerObjet = (o, k) => { const el = !!ELEC[k]; if (el !== !!ELEC[o.k] || o.k === k) return false;
+    snapInk(); const lb = ELEC[o.k] && o.lb === ELEC[o.k].lb ? null : o.lb; ["nf", "pol", "del", "vp", "vs"].forEach(x => delete o[x]); o.k = k;
+    if (el){ completerObjet(o); if (lb && ELEC[k].lb && !/^(bobine|bobineT|contact|contactT)$/.test(k)) o.lb = lb; couperFils(o); nettoyerFils(); }
+    else if (o.lb && !OBJETS[k]) delete o.lb;
+    SELO.s = o; redrawInk(); majObjUI(); aviser("Remplacé par : " + (el ? ELEC[k].c || ELEC[k].n : OBJETS[k].n) + ". Les fils, tuyaux et cotes restent en place.", 3500); return true; };
   /* repère proposé : CR1, CR2… pour les bobines; un contact reprend le repère de la bobine choisie (ou de la dernière posée) */
   const etiqAuto = k => { const de = ELEC[k]; if (!de || !de.lb) return null; const arr = strokes(), norm = x => String(x || "").trim().toUpperCase();
     if (k === "bobine" || k === "bobineT" || k === "relais"){ const pre = k === "bobineT" ? "TR" : "CR", re = new RegExp("^" + pre + "(\\d+)$"); let m = 0;
@@ -3578,6 +3602,46 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     cur = null; fond = null;
     if (finTrait) redrawInk();          /* dessin complet une fois le trait terminé (et sauvegarde) */
   }));
+})();
+/* Sélection multiple : Ctrl (ou Maj) + clic ajoute ou retire un élément; glisser dans le vide trace un cadre; glisser un élément du groupe déplace tout le groupe */
+(function(){
+  const c = $("#inkCanvas"); let mm = null, raf = 0, cadre = null;
+  const actif = () => RD.wb && !RD.eraser && !RD.sim && !RD.text && (RD.obj || RD.crayonOff) && !RD.formeK && !RD.objK;
+  const brut = e => { const r = c.getBoundingClientRect(); return [(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height]; };
+  const sous = q => formeSous(q) || objetSous(q);
+  const stop = e => { e.stopImmediatePropagation(); e.preventDefault(); try { c.setPointerCapture(e.pointerId); } catch(er){} };
+  c.addEventListener("pointerdown", e => {
+    if (!actif() || e.button > 0) return;
+    const q = brut(e), hit = sous(q), mod = e.ctrlKey || e.metaKey || e.shiftKey;
+    if (mod && hit){ stop(e); if (!SELM.length && SELO.s && strokes().includes(SELO.s) && SELO.s !== hit) SELM = [SELO.s];
+      SELM = SELM.includes(hit) ? SELM.filter(x => x !== hit) : SELM.concat([hit]); SELO.s = null; redrawInk(); try { majObjUI(); } catch(er){} return; }
+    if (!mod && hit && SELM.length > 1 && SELM.includes(hit)){ stop(e); mm = { groupe:SELM.slice(), q0:q, p0:SELM.map(o => o.p.map(v => v.slice())), snap:false, x0:e.clientX, y0:e.clientY }; return; }
+    if (hit){ if (SELM.length){ SELM = []; redrawInk(); } return; }                                   /* clic sur un élément : sélection simple (comme avant) */
+    if (modeElec() && window.borneProche && window.borneProche(q)) return;                              /* une borne : on trace un fil */
+    stop(e); mm = { cadre:true, q0:q, x0:e.clientX, y0:e.clientY, mod };
+  }, true);
+  c.addEventListener("pointermove", e => {
+    if (!mm) return; e.stopImmediatePropagation();
+    if (Math.hypot(e.clientX - mm.x0, e.clientY - mm.y0) < 5 && !mm.snap && !cadre) return;
+    if (mm.groupe){ const q = brut(e), dx = q[0] - mm.q0[0], dy = q[1] - mm.q0[1]; if (!mm.snap){ snapInk(); mm.snap = true; }
+      mm.groupe.forEach((o, i) => { o.p = mm.p0[i].map(v => [v[0] + dx, v[1] + dy]); }); if (!raf) raf = requestAnimationFrame(() => { raf = 0; redrawInk(); }); return; }
+    if (!cadre){ cadre = document.createElement("div"); cadre.style.cssText = "position:fixed;z-index:60;border:2px dashed #2a7bcf;background:rgba(42,123,207,.08);pointer-events:none;border-radius:4px"; document.body.appendChild(cadre); }
+    const x = Math.min(e.clientX, mm.x0), y = Math.min(e.clientY, mm.y0); Object.assign(cadre.style, { left:x + "px", top:y + "px", width:Math.abs(e.clientX - mm.x0) + "px", height:Math.abs(e.clientY - mm.y0) + "px" }); mm.x1 = e.clientX; mm.y1 = e.clientY;
+  }, true);
+  ["pointerup", "pointercancel"].forEach(t => c.addEventListener(t, e => {
+    if (!mm) return; e.stopImmediatePropagation(); const m = mm; mm = null;
+    if (m.groupe){ if (raf){ cancelAnimationFrame(raf); raf = 0; } try { if (m.groupe.some(o => o.t === "objet" && ELEC[o.k]) && window.nettoyerJonctions) nettoyerJonctions(); } catch(er){} redrawInk(); return; }
+    if (cadre){ cadre.remove(); cadre = null; }
+    if (m.x1 === undefined || t === "pointercancel"){                                                   /* simple clic dans le vide : plus rien de choisi */
+      if (!m.mod && (SELM.length || SELO.s)){ SELM = []; SELO.s = null; redrawInk(); try { majObjUI(); } catch(er){} } return; }
+    const r = c.getBoundingClientRect(), sx = c.width / r.width, sy = c.height / r.height;
+    const bx = [(Math.min(m.x0, m.x1) - r.left) * sx, (Math.min(m.y0, m.y1) - r.top) * sy, (Math.max(m.x0, m.x1) - r.left) * sx, (Math.max(m.y0, m.y1) - r.top) * sy];
+    const dedans = strokes().filter(o => { if (o === "erase" || o.k === "rails") return false; const b = boiteDe(o, c.width, c.height); return b && b[0] >= bx[0] && b[1] >= bx[1] && b[2] <= bx[2] && b[3] <= bx[3]; });
+    SELO.s = null; SELM = m.mod ? [...new Set(SELM.concat(dedans))] : dedans;
+    if (SELM.length === 1){ const o = SELM[0]; SELM = []; if (typeof choisirAutre === "function" && (o.t === "objet" || FORMES[o.t])) choisirAutre(o); else SELO.s = o; }
+    else if (SELM.length) aviser(SELM.length + " éléments choisis : glisse-les ensemble, choisis une couleur, Suppr pour effacer, Ctrl+C / Ctrl+V pour copier.", 4000);
+    redrawInk(); try { majObjUI(); } catch(er){}
+  }, true));
 })();
 /* Enregistrer le tableau en image : fond + traits */
 async function wbEnregistrer(){
@@ -3895,8 +3959,10 @@ document.addEventListener("keydown", e => {
   if (!$("#reader").classList.contains("open")) return;
   const t = e.target, tag = t && t.tagName;
   if (enSaisie(t)) return;
+  if ((e.ctrlKey || e.metaKey) && !e.altKey && (RD.pen || RD.wb) && /^[cvxd]$/i.test(e.key)){ if (copierColler(e.key.toLowerCase())){ e.preventDefault(); return; } }
+  if (e.key === "Escape" && SELM.length){ SELM = []; redrawInk(); }
   if ((e.key === "Delete" || e.key === "Backspace") && (RD.pen || RD.wb)){                 /* Suppr : efface ce qui est choisi, partout */
-    if (typeof SELO !== "undefined" && SELO.s && strokes().includes(SELO.s)){ e.preventDefault(); effacerChoix(); return; }
+    if ((SELM.length && SELM.some(x => strokes().includes(x))) || (typeof SELO !== "undefined" && SELO.s && strokes().includes(SELO.s))){ e.preventDefault(); effacerChoix(); return; }
     if (typeof SEL !== "undefined" && SEL.s && strokes().includes(SEL.s)){ e.preventDefault(); snapInk(); INKS[inkKey()] = strokes().filter(x => x !== SEL.s); SEL.s = null; redrawInk(); try { majBarTxt(); majSelTxt(); } catch(er){} return; } }   /* forme sélectionnée : touche Suppr */
   if (e.key === "Escape"){ if (!$("#mmenu").hidden || !$("#help").hidden || !$("#noir").hidden){ closeMenu(); e.stopImmediatePropagation(); } return; }
   if (verrou() && !((e.ctrlKey || e.metaKey) && /^[zy]$/i.test(e.key || ""))) return;
@@ -3945,10 +4011,23 @@ $("#tbPg").addEventListener("keydown", e => {
   x.oninput = () => { try { localStorage.setItem("penPerso", x.value); } catch(e){} RD.color = x.value; RD.eraser = false; RD.crayonOff = false; recolorerSel(); refreshTools(); x.classList.add("on"); };
   bar.insertBefore(x, ref); RD.swx = x;
 })();
+/* Ctrl+C copie ce qui est choisi, Ctrl+V colle une copie un peu décalée (sur la grille), Ctrl+X coupe, Ctrl+D duplique */
+function copierColler(t){
+  const choix = () => (SELM.length ? SELM : [SELO.s]).filter(x => x && strokes().includes(x));
+  if (t === "c" || t === "x" || t === "d"){ const L = choix(); if (!L.length) return false; window.PRESSE = { L:JSON.parse(JSON.stringify(L)), n:0 };
+    if (t === "x"){ effacerChoix(); aviser(L.length + " élément" + (L.length > 1 ? "s coupés" : " coupé") + " : Ctrl+V pour coller.", 2500); return true; }
+    if (t === "c"){ aviser(L.length + " élément" + (L.length > 1 ? "s copiés" : " copié") + " : Ctrl+V pour coller.", 2500); return true; } }
+  const P = window.PRESSE; if (!P || !P.L.length) return false; P.n++;
+  const c = $("#inkCanvas"), W = c.width, H = c.height, dpr = window.devicePixelRatio || 1;
+  let dx, dy; if (/^iso/.test(wbBg())){ const a = 34 * RD.z * 1.2 * dpr; dx = 2 * a * .8660254 / W; dy = 0; } else { const u = 34 * RD.z * dpr; dx = 2 * u / W; dy = 2 * u / H; }
+  snapInk(); const neufs = JSON.parse(JSON.stringify(P.L)).map(o => { o.p = o.p.map(q => [q[0] + dx * P.n, q[1] + dy * P.n]); return o; });
+  neufs.forEach(o => strokes().push(o)); SELO.s = null; SELM = neufs.length > 1 ? neufs : []; if (neufs.length === 1) SELO.s = neufs[0];
+  redrawInk(); try { majObjUI(); } catch(er){} return true; }
 function effacerChoix(){ const sel = (window.SELM && SELM.length ? SELM : [SELO.s]).filter(x => x && strokes().includes(x)); if (!sel.length) return;
   snapInk(); sel.forEach(o => { if (o.t === "objet" && typeof window.reparerApresSuppression === "function") window.reparerApresSuppression(o); });
   INKS[inkKey()] = strokes().filter(x => !sel.includes(x)); SELO.s = null; window.SELM = []; try { nettoyerJonctions(); } catch(er){} redrawInk(); try { majObjUI(); } catch(er){} }
-function recolorerSel(){ const o = typeof SELO !== "undefined" && RD.obj && SELO.s && strokes().includes(SELO.s) ? SELO.s : null; if (!o || /^hl/.test(RD.color) || o.c === RD.color) return; snapInk(); o.c = RD.color; redrawInk(); }   /* l'objet ou la forme choisi prend la couleur du crayon */
+function recolorerSel(){ const M = (window.SELM || []).filter(x => strokes().includes(x)); if (M.length && !/^hl/.test(RD.color)){ snapInk(); M.forEach(x => x.c = RD.color); redrawInk(); return; }
+  const o = typeof SELO !== "undefined" && RD.obj && SELO.s && strokes().includes(SELO.s) ? SELO.s : null; if (!o || /^hl/.test(RD.color) || o.c === RD.color) return; snapInk(); o.c = RD.color; redrawInk(); }   /* l'objet ou la forme choisi prend la couleur du crayon */
 document.querySelectorAll("#penBar .sw").forEach(b => b.onclick = () => { RD.color = b.dataset.c; RD.eraser = false; RD.crayonOff = false; recolorerSel(); refreshTools(); });
 $("#penW").onclick = () => { RD.wIdx = (RD.wIdx + 1) % WIDTHS.length; majEpaisseur(); };
 function majEpaisseur(){ const c = $("#penW circle"); if (c) c.setAttribute("r", 2.5 + RD.wIdx * 2.5); }

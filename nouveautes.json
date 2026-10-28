@@ -2,6 +2,27 @@
  {
   "date": "2026-10-28",
   "type": "outil",
+  "titre": "Sélection multiple, copier et coller (tableau blanc)",
+  "texte": "Choisis plusieurs éléments à la fois pour les déplacer, les recolorer, les effacer ou les copier. Ctrl + une vignette remplace l'objet choisi.",
+  "formation": [
+   {
+    "t": "Sans outil choisi, glisse dans le vide : un cadre pointillé choisit tout ce qui est dedans. Ou garde Ctrl (ou Maj) enfoncé et clique les éléments un à un.",
+    "img": "nouveautes/selection-multiple.jpg"
+   },
+   "Glisse un des éléments choisis : tout le groupe suit. Touche une couleur du crayon : tout le groupe change de couleur. Suppr efface le groupe.",
+   "Ctrl+C copie, Ctrl+V colle une copie un peu décalée (chaque Ctrl+V la décale encore), Ctrl+X coupe, Ctrl+D duplique. Échap : plus rien de choisi.",
+   "Remplacer : choisis un symbole (ou un objet iso, ou une forme), garde Ctrl enfoncé et touche une autre vignette de la palette. Il prend sa place : les fils, les tuyaux et les cotes restent où ils sont."
+  ],
+  "versions": [
+   {
+    "date": "2026-10-28",
+    "texte": "Sélection par cadre et Ctrl+clic, déplacer et recolorer un groupe, copier-coller, remplacer avec Ctrl + vignette."
+   }
+  ]
+ },
+ {
+  "date": "2026-10-28",
+  "type": "outil",
   "titre": "Schéma électrique en échelle (tableau blanc)",
   "texte": "Dessine et anime des schémas en échelle sur le quadrillé. Nouveau : relais complet (bobine + contacts NO et NF déjà nommés), numéros de bornes, tensions du transformateur et de l'échelle, ampoule, couleurs de fils, choix des pôles et des positions de l'interrupteur.",
   "formation": [
