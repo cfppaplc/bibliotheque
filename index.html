@@ -2724,7 +2724,7 @@ let dernierTap = null;
 function tapElement(o, e){ if (!o || !e) return; const t = performance.now(), d = dernierTap; dernierTap = { o, t, x:e.clientX, y:e.clientY };
   if (d && d.o === o && t - d.t < 550 && Math.hypot(e.clientX - d.x, e.clientY - d.y) < 24 && strokes().includes(o)){ dernierTap = null; SELO.s = o; redrawInk(); majObjUI(); modifierForme(o, e.clientX, e.clientY); } }
 /* sélectionner un élément d'une autre catégorie : la palette passe à son onglet (Formes, Iso ou Électricité) */
-function ongletPour(o){ return o.t !== "objet" ? "formes" : ELEC[o.k] ? "elec" : "iso"; }
+function ongletPour(o){ return o.fil ? "elec" : o.t !== "objet" ? "formes" : ELEC[o.k] ? "elec" : "iso"; }
 function choisirAutre(o){ const t = ongletPour(o), isoBg = !!RD.wb && /^iso/.test(wbBg());
   if ((t === "iso" && !isoBg) || (t === "elec" && !modeElec())){ aviser(t === "iso" ? "Cet objet isométrique se modifie sur le fond « plan isométrique » (bouton Fond)." : "Ce symbole électrique se modifie sur le fond quadrillé (bouton Fond).", 4500); return false; }
   if (RD.objTab !== t){ RD.formeK = null; RD.objKi = null; RD.objKe = null; } RD.objTab = t; SELO.s = o; majObjUI(); redrawInk(); return true; }
@@ -3502,7 +3502,10 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     if (!RD.obj || !RD.wb || RD.eraser || RD.sim || RD.objTab === "formes") return;
     const q = cur(e), el = modeElec();
     { const o = touche(q.raw); if (o && ongletPour(o) !== RD.objTab){ e.stopImmediatePropagation(); if (choisirAutre(o)) tapElement(o, e); return; }
-      if (!o && !(el && borneProche(q.raw))){ const f = formeSous(q.raw); if (f){ e.stopImmediatePropagation(); if (choisirAutre(f)) tapElement(f, e); return; } } }   /* le crayon ne doit pas recevoir ce même clic */
+      if (!o && !(el && borneProche(q.raw))){ const f = formeSous(q.raw);
+        if (f && el && f.fil && RD.objK !== "jonction"){ e.stopImmediatePropagation();          /* sur un fil : glisser = nouveau fil (avec jonction); simple clic = choisir le fil */
+          snapInk(); const A = q.snap; mv = { fil:true, A, B:A, segs:[], dir:null, filSous:f }; SELO.s = null; tracerFil(); redrawInk(); majObjUI(); return; }
+        if (f){ e.stopImmediatePropagation(); if (choisirAutre(f)) tapElement(f, e); return; } } }   /* le crayon ne doit pas recevoir ce même clic */
     if (el && SELO.s && SELO.s.k === "rails" && strokes().includes(SELO.s)){           /* poignée de l'échelle : on change sa largeur et sa hauteur */
       const o = SELO.s, G = objGeo(o, c.width, c.height), [w, h] = o.sz || [8, 10], cx = G.ox + w * G.u, cy = G.oy + h * G.u;
       if (Math.hypot(q.raw[0] * c.width - cx, q.raw[1] * c.height - cy) < G.u * .6){
@@ -3552,7 +3555,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
   });
   ["pointerup", "pointercancel"].forEach(t => c.addEventListener(t, ev => {
     if (mv && mv.s && !mv.snap && ev.type === "pointerup") tapElement(mv.s, ev);      /* toucher sans bouger : compte pour le double-clic (renommer) */
-    if (mv && mv.fil){ if (mv.segs.length){ jonctionsAuto(mv.segs); nettoyerFils(); } else { (UNDO[inkKey()] || []).pop(); if (!mv.B || mv.B === mv.A){ RD.objKe = null; SELO.s = null; } }   /* clic sans tracer : retour à aucun outil */ mv = null; redrawInk(); majObjUI(); return; }
+    if (mv && mv.fil){ if (mv.segs.length){ jonctionsAuto(mv.segs); nettoyerFils(); } else { (UNDO[inkKey()] || []).pop(); if (!mv.B || mv.B === mv.A){ RD.objKe = null; SELO.s = null; if (mv.filSous && strokes().includes(mv.filSous)){ SELO.s = mv.filSous; tapElement(mv.filSous, ev); } } }   /* clic sans tracer : retour à aucun outil */ mv = null; redrawInk(); majObjUI(); return; }
     if (mv && mv.s && mv.snap && ELEC[mv.s.k]){                                  /* symbole déplacé : ses fils restent droits (un coude s'ajoute au besoin) */
       const ux = elecU() / c.width, uy = elecU() / c.height;
       mv.liens.forEach(([f, i, x0, y0]) => { const M = f.p[i].slice(), F = f.p[1 - i]; if (Math.abs(M[0] - F[0]) * c.width <= 2 || Math.abs(M[1] - F[1]) * c.height <= 2) return;

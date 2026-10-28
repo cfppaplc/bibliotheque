@@ -54,6 +54,7 @@
     "img": "nouveautes/elec-relais.jpg"
    },
    "Nouveau aussi : l'ampoule (Charges), la couleur des nouveaux fils (bas de la palette), l'interrupteur se règle par « 1 ou 2 pôles » et « 1 ou 2 positions ». Un point de jonction qui ne relie plus rien s'efface, et si tu effaces un symbole entre deux fils, les fils se rejoignent.",
+   "Corrigé : pars du milieu d'un fil et glisse pour tracer un nouveau fil, le point de jonction se fait tout seul (avant, l'appli choisissait le fil et passait à l'onglet Formes). Un simple clic sur un fil le choisit (Suppr pour l'effacer).",
    {
     "t": "Ouvre le tableau blanc, puis bouton Fond jusqu'à « Quadrillé (schéma électrique en échelle) ».",
     "img": "nouveautes/elec-fond.jpg"
@@ -96,6 +97,10 @@
    }
   ],
   "versions": [
+   {
+    "date": "2026-10-28",
+    "texte": "Un nouveau fil peut partir du milieu d'un fil existant (jonction automatique)."
+   },
    {
     "date": "2026-10-28",
     "texte": "Relais complet, numéros de bornes, repères automatiques, tensions, ampoule, couleurs de fils, pôles et positions, jonctions et fils réparés."
