@@ -3703,28 +3703,38 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     if (mv && mv.s && !mv.snap && ev.type === "pointerup") tapElement(mv.s, ev);      /* toucher sans bouger : compte pour le double-clic (renommer) */
     if (mv && mv.fil){ if (mv.segs.length){ jonctionsAuto(mv.segs); nettoyerFils(); } else { (UNDO[inkKey()] || []).pop(); if (!mv.B || mv.B === mv.A){ RD.objKe = null; SELO.s = null; const ch = mv.surObjet || mv.filSous; if (ch && strokes().includes(ch)){ SELO.s = ch; RD.objO = ch.o || 0; tapElement(ch, ev); } } }   /* simple clic sur un symbole ou un fil, même avec l'outil Fil : on le choisit (double-clic = repère) */   /* clic sans tracer : retour à aucun outil */ mv = null; redrawInk(); majObjUI(); return; }
     if (mv && mv.s && mv.snap && !ELEC[mv.s.k] && /^iso/.test(wbBg())){                 /* objet iso déplacé : chaque tuyau branché est refait droit sur la grille iso */
-      const W = c.width, H = c.height, dpr = window.devicePixelRatio || 1, a = 34 * RD.z * 1.2 * dpr, d = a * .8660254, AX = [[d, a / 2], [-d, a / 2], [0, a]], arr = strokes();
-      const cr = (u, v) => u[0] * v[1] - u[1] * v[0], N = q => [q[0] / W, q[1] / H], P = q => [q[0] * W, q[1] * H], pres = (u, v) => Math.hypot(u[0] - v[0], u[1] - v[1]) < 2;
-      const axeDe = v => AX.slice().sort((p1, p2) => Math.abs(cr(p1, v)) / a - Math.abs(cr(p2, v)) / a)[0];
+      const W = c.width, H = c.height, dpr = window.devicePixelRatio || 1, a = 34 * RD.z * 1.2 * dpr, d = a * .8660254, arr = strokes();
+      const AX = [[d, a / 2], [-d, a / 2], [0, a]];
+      const cr = (u, v) => u[0] * v[1] - u[1] * v[0], dot = (u, v) => u[0] * v[0] + u[1] * v[1], N = q => [q[0] / W, q[1] / H], P = q => [q[0] * W, q[1] * H], pres = (u, v) => Math.hypot(u[0] - v[0], u[1] - v[1]) < 2;
+      const sens = v => { let best = null; AX.forEach(A => [1, -1].forEach(sg => { const D = [A[0] * sg, A[1] * sg], k = dot(D, v) / (a * Math.hypot(v[0], v[1]) || 1); if (!best || k > best.k) best = { D, k }; })); return best.D; };
+      const G = objGeo(mv.s, W, H), bx = G.bbox, ctr = [(bx[0] + bx[2]) / 2, (bx[1] + bx[3]) / 2];
+      const dansObjet = (u, v) => { for (let t = .15; t < .9; t += .15){ const x = u[0] + (v[0] - u[0]) * t, y = u[1] + (v[1] - u[1]) * t; if (x > bx[0] + 3 && x < bx[2] - 3 && y > bx[1] + 3 && y < bx[3] - 3) return true; } return false; };
       const tuyaux = () => arr.filter(x => x.t === "ligne" && !x.fil && x.p && x.p.length === 2);
       const poser = (u, v, modele) => { if (pres(u, v)) return; const n = { c:modele.c, hl:false, hc:null, w:modele.w, t:"ligne", p:[N(u), N(v)] }; (decouperIso(n) || [n]).forEach(x => arr.push(x)); };
-      mv.liens.forEach(([f, i, x0, y0]) => { if (!arr.includes(f)) return;
-        const M = P(f.p[i]); let F = P(f.p[1 - i]); const M0 = [x0 * W, y0 * H], v0 = [M0[0] - F[0], M0[1] - F[1]], L0 = Math.hypot(v0[0], v0[1]); if (L0 < 2) return;
-        const A = axeDe(v0), sg = Math.sign(A[0] * v0[0] + A[1] * v0[1]) || 1, dA = [A[0] * sg, A[1] * sg];          /* le tuyau arrivait au raccord dans ce sens */
-        const v = [M[0] - F[0], M[1] - F[1]]; if (Math.abs(cr(dA, v)) < 2 && dA[0] * v[0] + dA[1] * v[1] > 0) return;   /* glissé dans l'axe : le tuyau reste droit */
+      /* trajet de F à K : tout droit, ou deux bouts sur deux axes iso (le plus court, sans traverser l'objet, vertical préféré) */
+      const trajet = (F, K, arrivee) => { const v = [K[0] - F[0], K[1] - F[1]], L = Math.hypot(v[0], v[1]); if (L < 2) return { pts:[F, K], cout:0 };
+        const cands = [];
+        AX.forEach(A => { if (Math.abs(cr(A, v)) / (a * L) < .02) cands.push({ pts:[F, K], cout:L / a }); });
+        AX.forEach(A1 => AX.forEach(A2 => { if (A1 === A2) return; const den = cr(A1, A2); const t1 = cr(v, A2) / den, t2 = cr(A1, v) / den, E = [F[0] + A1[0] * t1, F[1] + A1[1] * t1];
+          let cout = Math.abs(t1) + Math.abs(t2) + .6;
+          const D2 = [K[0] - E[0], K[1] - E[1]]; if (arrivee && dot(D2, arrivee) < -.6 * Math.hypot(D2[0], D2[1]) * Math.hypot(arrivee[0], arrivee[1])) cout += 4;                 /* le 2e bout ne doit pas revenir en arrière vers le raccord */
+          if (dansObjet(F, E) || dansObjet(E, K)) cout += 20; cands.push({ pts:[F, E, K], cout }); }));
+        return cands.sort((x, y) => x.cout - y.cout)[0]; };
+      mv.liens.forEach(([f, i]) => { if (!arr.includes(f)) return;
+        const M = P(f.p[i]); let F = P(f.p[1 - i]);
+        const autres = G.ports.filter(q => !pres(q, M)), ref = autres.length === 1 ? autres[0] : ctr;          /* objet à 2 raccords : l'axe va d'un raccord à l'autre */
+        const out = sens([M[0] - ref[0], M[1] - ref[1]]), K = [M[0] + out[0], M[1] + out[1]];                /* le tuyau sort droit du raccord, vers l'extérieur de l'objet */
+        const v = [M[0] - F[0], M[1] - F[1]]; if (Math.abs(cr(out, v)) < 2) return;                          /* glissé dans l'axe du raccord : rien à refaire (le tuyau sous l'objet est enlevé plus bas) */
         arr.splice(arr.indexOf(f), 1);
-        const K = [M[0] - dA[0], M[1] - dA[1]];                                                          /* le dernier bout entre droit dans le raccord */
-        let fin = null;
-        for (let essai = 0; essai < 40; essai++){
-          const w = [K[0] - F[0], K[1] - F[1]]; let best = null;
-          AX.filter(B => B !== A).forEach(B => { const den = cr(dA, B); if (Math.abs(den) < 1e-6) return; const t = cr(w, B) / den, sB = cr(dA, w) / den; if (!best || Math.abs(sB) < Math.abs(best.s)) best = { t, s:sB, B }; });
-          if (best && best.t >= -.5){ fin = best; break; }
-          /* le coude tomberait en arrière : on raccourcit le tuyau d'un pas vers l'arrière */
-          const prec = tuyaux().find(x => x.p.some(q => pres(P(q), F)) && (() => { const o = P(x.p.find(q => !pres(P(q), F))); return Math.abs(cr(dA, [F[0] - o[0], F[1] - o[1]])) < 2 && dA[0] * (F[0] - o[0]) + dA[1] * (F[1] - o[1]) > 0; })());
-          if (!prec){ fin = best; break; } const o = P(prec.p.find(q => !pres(P(q), F))); arr.splice(arr.indexOf(prec), 1); F = o; }
-        if (!fin) return;
-        const P1 = [F[0] + dA[0] * Math.max(0, fin.t), F[1] + dA[1] * Math.max(0, fin.t)];
-        poser(F, P1, f); poser(P1, K, f); poser(K, M, f); });
+        let best = trajet(F, K, [-out[0], -out[1]]);
+        for (let essai = 0; essai < 30; essai++){                                                           /* si le 1er bout repart sur le tuyau précédent, on raccourcit ce tuyau */
+          const E = best.pts[1], prec = tuyaux().find(x => x.p.some(q => pres(P(q), F)));
+          if (!prec || best.pts.length < 2) break; const o = P(prec.p.find(q => !pres(P(q), F)) || prec.p[0]), back = [o[0] - F[0], o[1] - F[1]], go = [E[0] - F[0], E[1] - F[1]];
+          if (Math.hypot(...go) < 2 || Math.abs(cr(back, go)) > 2 || dot(back, go) <= 0) break;
+          arr.splice(arr.indexOf(prec), 1); F = o; best = trajet(F, K, [-out[0], -out[1]]); }
+        for (let j = 0; j + 1 < best.pts.length; j++) poser(best.pts[j], best.pts[j + 1], f);
+        poser(K, M, f); });
+      try { entreTuyaux(mv.s); } catch(er){}                                                              /* les bouts de tuyau restés sous l'objet disparaissent */
       redrawInk();
     }
     if (mv && mv.s && mv.snap && ELEC[mv.s.k]){                                  /* symbole déplacé : ses fils restent droits (un coude s'ajoute au besoin) */

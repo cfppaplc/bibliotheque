@@ -171,7 +171,7 @@
   "formation": [
    "Nouveau : la touche Suppr efface ce qui est choisi (forme, objet, symbole, texte). La gomme a sa glissière de taille. Le bouton plein écran est dans la barre du tableau blanc. Ta couleur personnalisée est retenue. Avec l'outil Fil, les symboles ne bougent plus par accident. En glissant un objet de la palette, tu le vois déjà à sa place.",
    {
-    "t": "Plan isométrique : quand tu déplaces un objet branché (vanne, radiateur…), chaque tuyau se refait droit sur la grille : il entre toujours droit dans le raccord, fait une déviation avec deux coudes à 90°, et le bout de tuyau inutile est enlevé. Glissé dans l'axe du tuyau, l'objet reste simplement sur une ligne droite.",
+    "t": "Plan isométrique : quand tu déplaces un objet branché (vanne, radiateur…), chaque tuyau se refait droit sur la grille : il sort droit du raccord dans l'axe de l'objet, prend le chemin le plus court avec des coudes à 90° sans passer à travers l'objet, et les bouts inutiles sont enlevés. Glissé le long de son tuyau, l'objet reste sur une ligne droite.",
     "img": "nouveautes/iso-deplacer.jpg"
    },
    "Gomme : sa fenêtre « Taille de la gomme » reste ouverte tant que la gomme est active (on peut changer la taille entre deux coups), et un cercle sous la souris montre exactement ce qui sera effacé.",
@@ -256,6 +256,10 @@
    "Le crayon réagit maintenant tout de suite : seul le trait en cours est redessiné pendant que tu écris, le reste du tableau ne bouge pas."
   ],
   "versions": [
+   {
+    "date": "2026-10-28",
+    "texte": "Iso : nouveau calcul des tuyaux quand on déplace un objet (sortie droite du raccord, plus court chemin à 90°, sans traverser l'objet)."
+   },
    {
     "date": "2026-10-28",
     "texte": "Iso : déplacement d'un objet peaufiné (entrée droite dans le raccord, déviation à deux coudes, pas de bout en trop)."
