@@ -2387,7 +2387,9 @@ function drawStroke(g, s, W, H, k){
     if (FORMES[s.t] && !/^(ligne|fleche|rect|ellipse)$/.test(s.t)){ g.stroke(); dessinerForme(g, s, x1, y1, x2, y2, k, col); habillage(); return; }
     g.stroke(); if (FORMES[s.t]) habillage(); return;
   }
-  s.p.forEach((q, i) => { const x = q[0] * W, y = q[1] * H; if (i) g.lineTo(x, y); else g.moveTo(x, y); });
+  { const P = s.p, n = P.length; g.moveTo(P[0][0] * W, P[0][1] * H);                     /* trait libre lissé : courbe qui passe par le milieu de chaque petit bout */
+    if (n < 3) P.slice(1).forEach(q => g.lineTo(q[0] * W, q[1] * H));
+    else { for (let i = 1; i < n - 1; i++){ const mx = (P[i][0] + P[i + 1][0]) / 2 * W, my = (P[i][1] + P[i + 1][1]) / 2 * H; g.quadraticCurveTo(P[i][0] * W, P[i][1] * H, mx, my); } g.lineTo(P[n - 1][0] * W, P[n - 1][1] * H); } }
   if (s.p.length === 1) g.lineTo(s.p[0][0] * W + .01, s.p[0][1] * H);
   g.stroke();
 }
@@ -3238,7 +3240,7 @@ const arrondir = v => typeof v === "number" ? Math.round(v * 1e5) / 1e5 : Array.
 const copieTraits = arr => (arr || []).map(s => { const o = {}; for (const k in s) if (k !== "cache") o[k] = (k === "p" || k === "bb" || k === "bw") ? arrondir(s[k]) : s[k]; return o; });
 let sauveT = 0, sauveAvis = false;
 function planifierSauvegarde(){ clearTimeout(sauveT); sauveT = setTimeout(sauverTableaux, 700); }
-function sauverTableaux(){
+function sauverTableaux(){ if (RD.enTrait){ planifierSauvegarde(); return; }   /* jamais pendant un trait : ça le faisait saccader */
   const inks = {}; for (const k in INKS) if (INKS[k] && INKS[k].length) inks[k] = copieTraits(INKS[k]);
   try { localStorage.setItem(CLE_SAUVE, JSON.stringify({ v:1, inks, wb:WB, refs:REFS })); sauveAvis = false; }
   catch(e){ if (!sauveAvis){ sauveAvis = true; aviser("Mémoire pleine : enregistre tes tableaux dans « Mes schémas » ou exporte-les.", 6000); } }
@@ -3761,8 +3763,9 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
 })();
 (function(){
   const c = $("#inkCanvas"); let cur = null;
+  let rc0 = null; const rectToile = () => rc0 || (requestAnimationFrame(() => { rc0 = null; }), rc0 = c.getBoundingClientRect());
   const pt = e => {
-    const r = c.getBoundingClientRect(); let x = e.clientX - r.left, y = e.clientY - r.top;
+    const r = rectToile(); let x = e.clientX - r.left, y = e.clientY - r.top;
     if (RD.wb && !RD.eraser && /^iso/.test(wbBg())){                      /* plan isométrique : le crayon s'accroche aux croisements de la grille */
       const k = r.width / (c.offsetWidth || r.width), a = (34 * RD.z) * 1.2 * k, d = a * .8660254, i0 = Math.round(x / d);
       let best = null;
@@ -3805,7 +3808,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
       fond = fond || document.createElement("canvas"); fond.width = c.width; fond.height = c.height;
       const gf = fond.getContext("2d"); gf.clearRect(0, 0, fond.width, fond.height); gf.drawImage(c, 0, 0);
     } else fond = null;
-    deja = 0; strokes().push(cur); dessinerEnCours();
+    deja = 0; strokes().push(cur); RD.enTrait = true; RD.aRecolorer = null; if (!RD.obj && SELO.s){ SELO.s = null; } dessinerEnCours();
   });
   let fond = null, rafTrait = 0, deja = 0;
   const dessinerEnCours = () => { rafTrait = 0; if (!cur || cur === "erase") return;
@@ -3814,8 +3817,9 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
       const P = cur.p; if (!P.length) return;
       g.save(); g.lineCap = "round"; g.lineJoin = "round"; g.lineWidth = cur.w * k;
       g.strokeStyle = (cur.c === "#24282c" && wbSombre()) ? "#f4f1ea" : cur.c;
-      g.beginPath(); const i0 = Math.max(0, deja - 1); g.moveTo(P[i0][0] * W, P[i0][1] * H);
-      for (let i = i0 + 1; i < P.length; i++) g.lineTo(P[i][0] * W, P[i][1] * H);
+      g.beginPath(); const M = i => [(P[i][0] + P[i + 1][0]) / 2 * W, (P[i][1] + P[i + 1][1]) / 2 * H];   /* même lissage que le dessin final */
+      if (P.length < 3) { g.moveTo(P[0][0] * W, P[0][1] * H); for (let i = 1; i < P.length; i++) g.lineTo(P[i][0] * W, P[i][1] * H); }
+      else { const i0 = Math.max(1, deja - 1); g.moveTo(...(i0 === 1 ? [P[0][0] * W, P[0][1] * H] : M(i0 - 1))); for (let i = i0; i < P.length - 1; i++){ const m = M(i); g.quadraticCurveTo(P[i][0] * W, P[i][1] * H, m[0], m[1]); } }
       if (P.length === 1) g.lineTo(P[0][0] * W + .01, P[0][1] * H);
       g.stroke(); g.restore(); deja = P.length; return;
     }
@@ -3836,7 +3840,8 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
       if (cur.liens) cur.liens.forEach(([o, i, e]) => { o.p[i] = [e[0] + dx, e[1] + dy]; });
       cur.bouge.p = cur.p0.map(v => [v[0] + dx, v[1] + dy]); if (!rafTrait) rafTrait = requestAnimationFrame(() => { rafTrait = 0; redrawInk(); }); return; }
     if (cur.t){ cur.p[1] = pt(e); if (/^tuy/.test(cur.t)) cur.p[1] = aimanterTuyau(cur.p[1], cur.p[0], cur); }
-    else { const evs = (e.getCoalescedEvents && e.getCoalescedEvents()) || []; (evs.length ? evs : [e]).forEach(ev => cur.p.push(pt(ev))); }   /* tous les points du crayon, même entre deux images */
+    else { const evs = (e.getCoalescedEvents && e.getCoalescedEvents()) || [], r = rectToile(), mn = 1.2 / Math.max(r.width, 1);
+      (evs.length ? evs : [e]).forEach(ev => { const q = pt(ev), d = cur.p[cur.p.length - 1]; if (!d || Math.abs(q[0] - d[0]) > mn || Math.abs(q[1] - d[1]) * r.height / r.width > mn) cur.p.push(q); }); }   /* points à moins de 1 px : ignorés */   /* tous les points du crayon, même entre deux images */
     if (!rafTrait) rafTrait = requestAnimationFrame(dessinerEnCours);
   });
   ["pointerup", "pointercancel"].forEach(t => c.addEventListener(t, ev => {
@@ -3850,7 +3855,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     if (cur && cur.raz){ const a = cur.p[0], b = cur.p[1]; if (Math.hypot(a[0] - b[0], a[1] - b[1]) < .004){        /* clic à côté d'une forme choisie : retour à aucun outil */
       const arr = strokes(), i = arr.indexOf(cur); if (i >= 0){ arr.splice(i, 1); (UNDO[inkKey()] || []).pop(); } cur = null; fond = null; RD.formeK = null; redrawInk(); majObjUI(); return; }
       delete cur.raz; }
-    const finTrait = cur && cur !== "erase";
+    const finTrait = cur && cur !== "erase"; RD.enTrait = false;
     RD.erSnap = false;
     if (cur && cur !== "erase" && cur.t && FORMES_TAILLE[cur.t]){ const a = cur.p[0], b = cur.p[1]; if (Math.hypot(a[0] - b[0], a[1] - b[1]) < .004){ const r = c.getBoundingClientRect(), [tw, th] = FORMES_TAILLE[cur.t], dx = tw * RD.z / r.width / 2, dy = th * RD.z / r.height / 2; cur.p = [[a[0] - dx, a[1] - dy], [a[0] + dx, a[1] + dy]];
       const mz = DIM_PL[cur.t] && strokes().find(o => o.t === "maison" && o !== cur && a[0] >= Math.min(o.p[0][0], o.p[1][0]) && a[0] <= Math.max(o.p[0][0], o.p[1][0]) && a[1] >= Math.min(o.p[0][1], o.p[1][1]) && a[1] <= Math.max(o.p[0][1], o.p[1][1]));
@@ -4313,7 +4318,7 @@ function effacerChoix(){ const sel = (window.SELM && SELM.length ? SELM : [SELO.
   snapInk(); sel.forEach(o => { if (o.t === "objet" && typeof window.reparerApresSuppression === "function") window.reparerApresSuppression(o); });
   INKS[inkKey()] = strokes().filter(x => !sel.includes(x)); SELO.s = null; window.SELM = []; try { nettoyerJonctions(); } catch(er){} redrawInk(); try { majObjUI(); } catch(er){} }
 function recolorerSel(){ const M = (window.SELM || []).filter(x => strokes().includes(x)); if (M.length && !/^hl/.test(RD.color)){ snapInk(); M.forEach(x => x.c = RD.color); redrawInk(); return; }
-  const o = typeof SELO !== "undefined" && RD.obj && SELO.s && strokes().includes(SELO.s) ? SELO.s : null; if (!o || /^hl/.test(RD.color) || o.c === RD.color) return; snapInk(); o.c = RD.color; redrawInk(); }   /* l'objet ou la forme choisi prend la couleur du crayon */
+  const o = typeof SELO !== "undefined" && SELO.s && strokes().includes(SELO.s) ? SELO.s : (RD.aRecolorer && strokes().includes(RD.aRecolorer) ? RD.aRecolorer : null); if (!o || /^hl/.test(RD.color) || o.c === RD.color) return; snapInk(); o.c = RD.color; redrawInk(); }   /* l'objet ou la forme choisi prend la couleur du crayon */
 document.querySelectorAll("#penBar .sw").forEach(b => b.onclick = () => { RD.color = b.dataset.c; RD.eraser = false; RD.crayonOff = false; recolorerSel(); refreshTools(); });
 $("#penW").onclick = () => { RD.wIdx = (RD.wIdx + 1) % WIDTHS.length; majEpaisseur(); };
 function majEpaisseur(){ const c = $("#penW circle"); if (c) c.setAttribute("r", 2.5 + RD.wIdx * 2.5); }
@@ -4400,8 +4405,7 @@ majEpaisseur();
   const fermer = () => { pc.hidden = pp.hidden = true; bc.classList.remove("open"); bp.classList.remove("open"); };
   const basculer = (p, b) => { const ouvrir = p.hidden; fermer(); if (ouvrir){ p.hidden = false; b.classList.add("open"); } };
   /* toucher « Couleur » ramène toujours au crayon (quitte l'efface, le texte ou les objets) */
-  bc.onclick = () => { const garde = RD.obj && (RD.formeK || (SELO.s && strokes().includes(SELO.s)));
-    if (garde){ basculer(pc, bc); return; }                                                 /* un objet choisi : on change seulement sa couleur */
+  bc.onclick = () => { RD.aRecolorer = SELO.s && strokes().includes(SELO.s) ? SELO.s : null;   /* l'objet choisi pourra prendre la couleur touchée */
     const actif = !RD.eraser && !RD.text && !RD.obj && !RD.crayonOff;
     if (actif){ RD.crayonOff = true; fermer(); refreshTools(); return; }                     /* crayon actif : on le désactive */
     RD.eraser = false; RD.text = false; RD.obj = false; RD.crayonOff = false; refreshTools(); fermer(); pc.hidden = false; bc.classList.add("open"); majLargeur(); };   /* on l'active et les couleurs s'ouvrent */   /* les formes gardent la palette : on change seulement leur couleur */ bp.onclick = () => basculer(pp, bp);

@@ -170,6 +170,7 @@
   "texte": "Une seule ligne d'outils, plus simple pour débuter. Nouveau : le bouton Objets a trois onglets — Formes (utiles en classe), Iso (plomberie) et Électricité (symboles).",
   "formation": [
    "Nouveau : la touche Suppr efface ce qui est choisi (forme, objet, symbole, texte). La gomme a sa glissière de taille. Le bouton plein écran est dans la barre du tableau blanc. Ta couleur personnalisée est retenue. Avec l'outil Fil, les symboles ne bougent plus par accident. En glissant un objet de la palette, tu le vois déjà à sa place.",
+   "Crayon plus fiable : un seul toucher l'active toujours, même si une forme ou un objet est choisi (la couleur touchée ensuite recolore cet objet, puis le crayon écrit dans cette couleur). Le trait est lissé et ne saccade plus quand on écrit plusieurs traits de suite.",
    {
     "t": "Chaque fond a maintenant son propre dessin : ce que tu dessines sur le tableau vert reste sur le tableau vert. En changeant de fond, si tu veux garder ton dessin, touche « Apporter le dessin ici ». Le ✕ ferme l'avis (le dessin reste sur l'autre fond).",
     "img": "nouveautes/fond-dessin.jpg"
@@ -248,6 +249,10 @@
    "Le crayon réagit maintenant tout de suite : seul le trait en cours est redessiné pendant que tu écris, le reste du tableau ne bouge pas."
   ],
   "versions": [
+   {
+    "date": "2026-10-28",
+    "texte": "Crayon : s'active en un seul toucher, trait lissé, plus de saccade entre les traits."
+   },
    {
     "date": "2026-10-28",
     "texte": "L'avis « Ton dessin est resté… » a un ✕ pour le fermer."
