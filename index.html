@@ -3020,10 +3020,17 @@ function simCalc(prof){
   const conn = new Set(), ports = new Map(), E = [], hotS = new Set(), neuS = new Set();
   fils.forEach(f => f.p.forEach(p => conn.add(gk(p))));
   objs.forEach(o => { const Pp = objGeo(o, W, Hc).ports.map(gkPx); ports.set(o, Pp); Pp.forEach(k => conn.add(k)); });
+  const sous = new Set();                                                                          /* pas de grille entre les bornes d'un symbole : seul le symbole relie ses bornes */
+  objs.forEach(o => { if (/^(rails|jonction|terre)$/.test(o.k)) return; const Pp = ports.get(o);
+    (o.k === "transfo" ? [[0, 1], [2, 3]] : ({ dpst:[[0, 1], [2, 3]], dpdt:[[0, 1], [3, 4]] }[o.k === "inter" ? polDe(o) : ""] || [[0, 1]])).forEach(([i, j]) => { if (!Pp[i] || !Pp[j]) return;
+      const [ax, ay] = Pp[i].split(",").map(Number), [bx, by] = Pp[j].split(",").map(Number); if (ax !== bx && ay !== by) return;
+      const n = Math.max(Math.abs(bx - ax), Math.abs(by - ay)), sx = Math.sign(bx - ax), sy = Math.sign(by - ay);
+      for (let t = 0; t < n; t++){ const a = (ax + sx * t) + "," + (ay + sy * t), b = (ax + sx * (t + 1)) + "," + (ay + sy * (t + 1)); sous.add(a + ">" + b); sous.add(b + ">" + a); } }); });
   fils.forEach((f, idx) => { if (PN && PN.type === "coupe" && PN.cible === f) return; const [ax, ay] = gk(f.p[0]).split(",").map(Number), [bx, by] = gk(f.p[1]).split(",").map(Number);
     if (ax !== bx && ay !== by){ E.push([ax + "," + ay, bx + "," + by]); return; }
     const n = Math.max(Math.abs(bx - ax), Math.abs(by - ay)), sx = Math.sign(bx - ax), sy = Math.sign(by - ay); let prev = ax + "," + ay;
-    for (let i = 1; i <= n; i++){ const k0 = (ax + sx * i) + "," + (ay + sy * i), k = (i === n || conn.has(k0)) ? k0 : k0 + "|" + idx; E.push([prev, k]); prev = k; } });   /* deux fils qui se croisent sans point de jonction ne sont pas reliés */
+    for (let i = 1; i <= n; i++){ const k0 = (ax + sx * i) + "," + (ay + sy * i), k = (i === n || conn.has(k0)) ? k0 : k0 + "|" + idx, p0 = prev.split("|")[0];
+      if (!sous.has(p0 + ">" + k0)) E.push([prev, k]); prev = k; } });   /* deux fils qui se croisent sans point de jonction ne sont pas reliés */
   objs.filter(o => o.k === "rails").forEach(o => { const [w, h] = o.sz || [8, 10], [x0, y0] = gk(o.p[0]).split(",").map(Number);
     [[x0, hotS], [x0 + w, neuS]].forEach(([x, S]) => { for (let y = y0; y <= y0 + h; y++){ S.add(x + "," + y); if (y > y0) E.push([x + "," + (y - 1), x + "," + y]); } }); });
   objs.filter(o => o.k === "pile").forEach(o => { const Pp = ports.get(o); hotS.add(Pp[0]); neuS.add(Pp[1]); });   /* une pile est une source : + à gauche */
@@ -3049,9 +3056,15 @@ function simCalc(prof){
     const alim = new Set(), trOn = new Set();
     if (!court) for (let pass = 0; pass < 3; pass++){
       chargesT.forEach(o => { const Pp = ports.get(o), a = U.f(Pp[0]), b = U.f(Pp[1]); if (a === b) return;
-        const V = uf(); chargesT.forEach(x => { if (x !== o){ const Q = ports.get(x); V.un(U.f(Q[0]), U.f(Q[1])); } });
-        const cH = new Set([...HS].map(V.f)), cN = new Set([...NS].map(V.f)), A = V.f(a), B = V.f(b);
-        if ((cH.has(A) && cN.has(B)) || (cN.has(A) && cH.has(B))) (o.k === "transfo" ? trOn : alim).add(o); });
+        /* chemin L1 → borne a et borne b → L2 à travers d'autres charges en série, sans repasser par le même point
+           (avant : toutes les autres charges étaient vues comme des fils, et un échelon voisin rempli de charges reliait L1 à L2) */
+        const adjL = new Map(), lien = (p, q) => { if (!adjL.has(p)) adjL.set(p, []); adjL.get(p).push(q); };
+        chargesT.forEach(x => { if (x === o) return; const Q = ports.get(x), p = U.f(Q[0]), q = U.f(Q[1]); if (p !== q){ lien(p, q); lien(q, p); } });
+        const bfs = (dep, buts, interdit) => { if (buts.has(dep)) return [dep]; const vu = new Map([[dep, null]]), fi = [dep];
+          while (fi.length){ const k0 = fi.shift(); for (const n of adjL.get(k0) || []){ if (vu.has(n) || interdit.has(n)) continue; vu.set(n, k0);
+            if (buts.has(n)){ const ch = []; for (let x = n; x !== null; x = vu.get(x)) ch.push(x); return ch; } fi.push(n); } } return null; };
+        const essai = (x, y) => { if (NS.has(x) || HS.has(y)) return false; const c1 = bfs(x, HS, new Set([y, ...NS])); if (!c1) return false; return !!bfs(y, NS, new Set([...c1, ...HS])); };
+        if (essai(a, b) || essai(b, a)) (o.k === "transfo" ? trOn : alim).add(o); });
       let ajout = false; trOn.forEach(o => { const Pp = ports.get(o), x1 = U.f(Pp[2]); if (!HS.has(x1)){ HS.add(x1); NS.add(U.f(Pp[3])); ajout = true; } });
       if (!ajout) break;
     }
@@ -3516,9 +3529,18 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
   const bout = (p, f) => f.p.some(e => longueur(e, p) < 2);
   const couperFils = o => { if (!ELEC[o.k] || /^(rails|jonction|terre)$/.test(o.k)) return; const P = objGeo(o, c.width, c.height).ports.map(p => [p[0] / c.width, p[1] / c.height]), arr = strokes();
     (o.k === "transfo" ? [[P[0], P[1]], [P[2], P[3]]] : ({ dpst:[[P[0], P[1]], [P[2], P[3]]], dpdt:[[P[0], P[1]], [P[3], P[4]]] }[polDe(o)] || [[P[0], P[1]]])).forEach(([A, B]) => arr.filter(f => f.t === "ligne" && f.fil).forEach(f => {
-      if (!((surFil(A, f) || bout(A, f)) && (surFil(B, f) || bout(B, f)))) return;
-      const [p0, p1] = f.p, [n0, n1] = longueur(p0, A) < longueur(p0, B) ? [A, B] : [B, A];
-      const morceaux = [[p0, n0], [n1, p1]].filter(([a, b]) => longueur(a, b) > 3).map(([a, b]) => nouveauFil(a, b)); arr.splice(arr.indexOf(f), 1, ...morceaux); })); };
+      let ax0; const W = c.width, H = c.height, hz = Math.abs(A[1] - B[1]) * H < 2, vt = Math.abs(A[0] - B[0]) * W < 2; if (!hz && !vt) return;
+      f.p.forEach((e, i) => { const dA = longueur(e, A), dB = longueur(e, B), L = longueur(A, B);           /* un fil qui arrive au milieu du symbole : on le branche sur la borne la plus proche */
+        if (dA > 2 && dB > 2 && Math.abs(dA + dB - L) < 2){ const o2 = f.p[1 - i], perp = hz ? Math.abs(o2[0] - e[0]) * W < 2 : Math.abs(o2[1] - e[1]) * H < 2;
+          if (perp){ const D2 = A[ax0 = hz ? 0 : 1] > B[ax0] ? A : B, q = Math.abs(dA - dB) < 2 ? D2 : dA < dB ? A : B, d = q.slice(), o0 = o2.slice();   /* à égalité : la borne vers L2 (à droite ou en bas) */
+            f.p[i] = d; f.p[1 - i] = hz ? [d[0], o0[1]] : [o0[0], d[1]]; arr.push(nouveauFil(f.p[1 - i], o0, f.c)); } } });   /* le fil se décale et un petit bout le rejoint à son autre bout */
+      const [p0, p1] = f.p, ax = hz ? 0 : 1, au = ax ? 0 : 1, D = ax ? H : W;                     /* ax : l'axe du symbole (x si horizontal) */
+      if (Math.abs(p0[au] - A[au]) * (ax ? W : H) > 2 || Math.abs(p1[au] - A[au]) * (ax ? W : H) > 2) return;   /* fil pas sur la même ligne */
+      const lo = Math.min(A[ax], B[ax]), hi = Math.max(A[ax], B[ax]), f0 = Math.min(p0[ax], p1[ax]), f1 = Math.max(p0[ax], p1[ax]);
+      if (f1 * D <= lo * D + 2 || f0 * D >= hi * D - 2) return;                                     /* ne passe pas sous le symbole */
+      const pt = v => { const q = A.slice(); q[ax] = v; return q; }, morceaux = [];
+      if ((lo - f0) * D > 3) morceaux.push(nouveauFil(pt(f0), pt(lo), f.c)); if ((f1 - hi) * D > 3) morceaux.push(nouveauFil(pt(hi), pt(f1), f.c));
+      arr.splice(arr.indexOf(f), 1, ...morceaux); })); };
   const redimEchelle = (o, w, h, fixes) => { const W = c.width, H = c.height, u = elecU(), [w0] = o.sz || [8, 10]; w = Math.max(3, w); h = Math.max(2, h);
     const x2 = o.p[0][0] + w0 * u / W, nx = o.p[0][0] + w * u / W;
     (fixes || strokes().filter(f => f.t === "ligne" && f.fil).flatMap(f => [0, 1].filter(i => Math.abs(f.p[i][0] - x2) * W < 2).map(i => [f, i]))).forEach(([f, i]) => { f.p[i][0] = nx; });

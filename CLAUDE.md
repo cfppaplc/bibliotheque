@@ -78,7 +78,7 @@
 - **Tableau blanc / crayon** : traits normalisés dans `INKS[inkKey()]`, `REFS`, `recalerWb()`; pendant un trait, ne jamais appeler `redrawInk()` à chaque mouvement (trop lent) : trait libre dessiné par bouts (`dessinerEnCours`), formes et surligneur sur une copie `fond`, gomme via `redrawBientot()` (une fois par image); fonds blanc/quadrillé/iso/…;
   tableaux gardés (`tableauxSauves`), « Mes schémas » (`mesSchemas`, export `.schema.json` type `schema-pavillon`).
 - **Schémas électriques en échelle** : catalogue `ELEC`/`ELEC_CAT`, `dessinerElec`, fils `{t:"ligne", fil:true}`,
-  simulateur `SIM`/`simCalc` (courant animé L1→L2, relais temporisés, « Trouve la panne »), modèles `MODELES` (`poserModele`).
+  simulateur `SIM`/`simCalc` (courant animé L1→L2, relais temporisés, « Trouve la panne »), — une charge est alimentée s'il existe un chemin L1 → borne et borne → L2 à travers d'autres charges, **sans repasser par le même point** (deux recherches disjointes; l'ancienne méthode « toutes les autres charges = fils » reliait L1 à L2 par un échelon voisin); les pas de grille entre les bornes d'un symbole (`sous`) ne comptent jamais comme fil; `couperFils` enlève tout bout de fil sous un symbole et rebranche sur une borne un fil qui arrive au milieu (à égalité : borne vers L2), modèles `MODELES` (`poserModele`).
 - **Accueil de classe intégré** : overlay `#accueilOv` + iframe `#accueilFrame` (`accueil.html`). Protocole `postMessage` :
   - tableau → bibliothèque : `accueil-fermer`, `accueil-plein-ecran`, `accueil-catalogue?`, `accueil-ouvrir {contenu}`, `accueil-revenir`
   - bibliothèque → tableau : `accueil-biblio`, `accueil-catalogue {livres, modeles, schemas, dossiers}`, `accueil-plein-ecran-etat`, `accueil-livre {titre, page}`
