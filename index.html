@@ -3663,7 +3663,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     if (el && RD.objK !== "jonction"){
       const b = borneProche(q.raw), h0 = b ? null : touche(q.raw);
       if (b || RD.objK === "fil"){                                    /* fil : on part d'une borne (ou d'un point de la grille avec l'outil Fil) */
-        snapInk(); const A = b || q.snap; mv = { fil:true, A, B:A, segs:[], dir:null, surObjet:b ? null : touche(q.raw) }; SELO.s = null; tracerFil(); redrawInk(); majObjUI(); return;
+        snapInk(); const A = b || q.snap; mv = { fil:true, A, B:A, segs:[], dir:null, surObjet:touche(q.raw) }; SELO.s = null; tracerFil(); redrawInk(); majObjUI(); return;
       }
     }
     let hit = touche(q.raw);
@@ -3731,12 +3731,13 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
 })();
 /* souris : cliquer un texte = le sélectionner et le déplacer ; double-clic = le modifier ; sinon dessiner une zone pour écrire */
 (function(){
-  const c = $("#inkCanvas"); let z = null, box = null, mv = null, dernier = { s:null, t:0 };
+  const c = $("#inkCanvas");
+  c.addEventListener("pointerdown", () => { if (!RD.text) document.querySelectorAll(".inktxt").forEach(t => t.blur()); }, true);   /* toucher le tableau avec un autre outil termine le texte */ let z = null, box = null, mv = null, dernier = { s:null, t:0 };
   const qOf = e => { const r = c.getBoundingClientRect(); return [(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height]; };
   c.addEventListener("pointerdown", e => {
     if (!(RD.pen || RD.wb) || !RD.text || RD.eraser) return;
     const q = qOf(e), hit = texteSous(q);
-    if (hit){
+    if (hit){ document.querySelectorAll(".inktxt").forEach(t => t.blur());   /* une case ouverte se termine : Suppr et Ctrl+Z reviennent au tableau */
       const dbl = dernier.s === hit && e.timeStamp - dernier.t < 400; dernier = { s:hit, t:e.timeStamp }; SEL.s = hit; majBarTxt(); majSelTxt();
       if (dbl){ modifierTexte(hit); return; }
       mv = { s:hit, q0:q, p0:[hit.p[0][0], hit.p[0][1]], snap:false }; return;
@@ -3782,7 +3783,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     if (RD.eraser){ cur = "erase"; eraseAt(pt(e)); return; }
     if (RD.crayonOff && !RD.text && !RD.obj){ e.preventDefault();                          /* aucun outil : rien ne se dessine, mais toucher une forme ou un objet le choisit */
       const r0 = c.getBoundingClientRect(), brut = [(e.clientX - r0.left) / r0.width, (e.clientY - r0.top) / r0.height], hit = (RD.wb ? objetSous(brut) : null) || formeSous(brut);
-      if (!hit) return;
+      if (!hit){ const tx = texteSous(brut); if (tx){ RD.text = true; RD.obj = false; refreshTools(); SEL.s = tx; majBarTxt(); majSelTxt(); redrawInk(); aviser("Texte choisi : glisse-le pour le déplacer, double-clic pour le modifier, Suppr pour l'effacer.", 3500); } return; }
       RD.obj = true; RD.objTab = null; RD.formeK = null; RD.objKi = null; RD.objKe = null; refreshTools();
       if (hit.t === "objet"){ if (choisirAutre(hit)) tapElement(hit, e); return; }
       choisirAutre(hit); cur = { bouge:hit, q0:pt(e), p0:hit.p.map(v => v.slice()), snap:false, x0:e.clientX, y0:e.clientY }; return; }
@@ -3796,6 +3797,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
       if (!RD.formeK){           /* aucun outil : toucher = choisir (et glisser = déplacer); toucher à côté = rien de choisi */
         if (hit){ SELO.s = hit; { const og = ongletPour(hit); if (og !== RD.objTab && /^(formes|plomb)$/.test(og)) RD.objTab = og; } redrawInk(); majObjUI(); cur = { bouge:hit, q0:q, p0:hit.p.map(v => v.slice()), snap:false, x0:e.clientX, y0:e.clientY }; return; }
         if (obj){ if (choisirAutre(obj)) tapElement(obj, e); return; }
+        { const tx = texteSous(brut); if (tx){ RD.text = true; RD.obj = false; refreshTools(); SEL.s = tx; majBarTxt(); majSelTxt(); redrawInk(); e.preventDefault(); return; } }   /* un texte : on passe à l'outil Texte, il est choisi */
         if (SELO.s){ SELO.s = null; redrawInk(); majObjUI(); } e.preventDefault(); return; }
       var choisir = hit || obj;     /* forme pas encore choisie : un simple clic la choisit, mais glisser trace une nouvelle forme (ex. une cote qui part du coin d'un rectangle) */
       var raz = !!SELO.s; if (SELO.s){ SELO.s = null; majObjUI(); } }
@@ -3907,6 +3909,7 @@ function aimanterTuyau(q, a, sauf){
     if (!mod && hit && SELM.length > 1 && SELM.includes(hit)){ stop(e); mm = { groupe:SELM.slice(), q0:q, p0:SELM.map(o => o.p.map(v => v.slice())), snap:false, x0:e.clientX, y0:e.clientY }; return; }
     if (hit){ if (SELM.length){ SELM = []; redrawInk(); } return; }                                   /* clic sur un élément : sélection simple (comme avant) */
     if (modeElec() && window.borneProche && window.borneProche(q)) return;                              /* une borne : on trace un fil */
+    if (texteSous(q)) return;                                                                            /* un texte : il se choisit (outil Texte) */
     stop(e); mm = { cadre:true, q0:q, x0:e.clientX, y0:e.clientY, mod };
   }, true);
   c.addEventListener("pointermove", e => {
@@ -4052,7 +4055,7 @@ $("#timerTime").title = "Double-clic pour changer le temps";
 $("#tmReset").onclick = () => { TM.run = false; clearInterval(TM.id); TM.left = TM.secs; tmRender(); };
 
 /* ---- État des outils ---- */
-function refreshTools(){
+function refreshTools(){ if (!RD.text) document.querySelectorAll(".inktxt").forEach(t => t.blur());   /* quitter l'outil Texte termine la case en cours */
   try { majCurseur(); } catch(e){}
   const drawing = RD.pen || RD.wb;
   $("#tbPen").classList.toggle("on", RD.pen);
