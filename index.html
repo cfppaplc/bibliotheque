@@ -2350,14 +2350,14 @@ function drawStroke(g, s, W, H, k){
     else if (s.t === "ellipse"){ g.ellipse((x1 + x2) / 2, (y1 + y2) / 2, Math.max(1, Math.abs(x2 - x1) / 2), Math.max(1, Math.abs(y2 - y1) / 2), 0, 0, Math.PI * 2); }
     const habillage = () => {     /* cadre de sélection et étiquette (double-clic), pour toutes les formes */
       if (RD.obj && typeof SELO !== "undefined" && SELO.s === s) cadreForme(g, s, W, H, k);
-      if (s.lb && s.lp && /^(ligne|fleche|fleche2)$/.test(s.t)){ const tz = s.tz || 1, m = 10 * k * tz + (s.w || 4) * k * .9, A = [x1, y1], B = [x2, y2];   /* l'écart suit l'épaisseur de la flèche */
+      if (s.lb && s.lp && /^(ligne|fleche|fleche2|tuy[A-Z]+)$/.test(s.t)){ const tz = s.tz || 1, m = 10 * k * tz + (s.w || 4) * k * .9, A = [x1, y1], B = [x2, y2];   /* l'écart suit l'épaisseur de la flèche */
         if (s.lp === "gauche" || s.lp === "droite"){ const E = (s.lp === "droite") === (B[0] >= A[0]) ? B : A, O = E === B ? A : B, L = Math.hypot(E[0] - O[0], E[1] - O[1]) || 1, ux = (E[0] - O[0]) / L, uy = (E[1] - O[1]) / L;
           const al = Math.abs(ux) < .35 ? "center" : ux > 0 ? "left" : "right";   /* au bout de la flèche, dans son prolongement */
           etiquette(g, s.lb, E[0] + ux * m + (al === "center" ? 0 : 0), E[1] + uy * (al === "center" ? m * 1.4 : m * .6), k, col, al, tz); }
         else { const mx = (x1 + x2) / 2, my = (y1 + y2) / 2, an = Math.atan2(y2 - y1, x2 - x1); let nx = Math.sin(an), ny = -Math.cos(an); if (ny > 0){ nx = -nx; ny = -ny; }
           const sg = s.lp === "bas" ? -1 : s.lp === "centre" ? 0 : 1; etiquette(g, s.lb, mx + nx * 16 * k * tz * sg, my + ny * 16 * k * tz * sg, k, col, "center", tz); } }
       else if (s.lb && !VALEURS_FORME[s.t] && s.lp){ const [ex, ey, al] = posEtiquette(s.lp, cadrePx(s, W, H), k, s.tz); etiquette(g, s.lb, ex, ey, k, col, al, s.tz); }
-      else if (s.lb && !VALEURS_FORME[s.t]){ const ligneT = /^(ligne|fleche|fleche2)$/.test(s.t), an = Math.atan2(y2 - y1, x2 - x1); let nx = Math.sin(an), ny = -Math.cos(an); if (ny > 0){ nx = -nx; ny = -ny; }   /* au-dessus d'une ligne, au centre d'une forme */
+      else if (s.lb && !VALEURS_FORME[s.t]){ const ligneT = /^(ligne|fleche|fleche2|tuy[A-Z]+)$/.test(s.t), an = Math.atan2(y2 - y1, x2 - x1); let nx = Math.sin(an), ny = -Math.cos(an); if (ny > 0){ nx = -nx; ny = -ny; }   /* au-dessus d'une ligne, au centre d'une forme */
         etiquette(g, s.lb, (x1 + x2) / 2 + (ligneT ? nx * 16 * k * (s.tz || 1) : 0), (y1 + y2) / 2 + (ligneT ? ny * 16 * k * (s.tz || 1) : 0), k, col, "center", s.tz); } };
     if (FORMES[s.t] && !/^(ligne|fleche|rect|ellipse)$/.test(s.t)){ g.stroke(); dessinerForme(g, s, x1, y1, x2, y2, k, col); habillage(); return; }
     g.stroke(); if (FORMES[s.t]) habillage(); return;
@@ -2372,8 +2372,71 @@ const FORMES = {
   rect:{ n:"Rectangle" }, ellipse:{ n:"Ellipse" }, cercle:{ n:"Cercle (rayon)" }, triangle:{ n:"Triangle" },
   triangleR:{ n:"Triangle rectangle" }, losange:{ n:"Losange" }, hexagone:{ n:"Hexagone" }, angle:{ n:"Angle (degrés)" },
   axes:{ n:"Axes x – y" }, cube:{ n:"Prisme (cube)" }, cylindre:{ n:"Cylindre" }, accolade:{ n:"Accolade" },
-  nuage:{ n:"Nuage de révision" }, bulle:{ n:"Bulle numérotée" }, crochet:{ n:"Crochet (bon)" }, croix:{ n:"Croix (erreur)" }
+  nuage:{ n:"Nuage de révision" }, bulle:{ n:"Bulle numérotée" }, crochet:{ n:"Crochet (bon)" }, croix:{ n:"Croix (erreur)" },
+  /* plomberie en coupe (pl:1 = section « Plomberie » de la palette) */
+  maison:{ n:"Maison en coupe", pl:1 }, tuyEF:{ n:"Eau froide (EF)", pl:1 }, tuyEC:{ n:"Eau chaude (EC)", pl:1 }, tuyDR:{ n:"Drain (renvoi)", pl:1 }, tuyEV:{ n:"Évent", pl:1 }, tuyGZ:{ n:"Gaz", pl:1 },
+  plCE:{ n:"Chauffe-eau", pl:1 }, plCF:{ n:"Collecteur EF", pl:1 }, plCC:{ n:"Collecteur EC", pl:1 }, plCompteur:{ n:"Compteur d'eau", pl:1 }, plVanne:{ n:"Robinet d'arrêt", pl:1 }, plClapet:{ n:"Clapet antiretour", pl:1 },
+  plTe:{ n:"Té", pl:1 }, plCoude:{ n:"Coude 90°", pl:1 }, plSiphon:{ n:"Siphon en P", pl:1 }, plAvaloir:{ n:"Avaloir de sol", pl:1 },
+  plLav:{ n:"Lavabo", pl:1 }, plWC:{ n:"Toilette", pl:1 }, plBain:{ n:"Baignoire", pl:1 }, plEvier:{ n:"Évier", pl:1 }, plLaveuse:{ n:"Laveuse", pl:1 }
 };
+/* taille d'un simple clic (px à 100 %), centrée sur le clic */
+const FORMES_TAILLE = { maison:[560, 420], plCE:[64, 120], plCF:[150, 56], plCC:[150, 56], plCompteur:[56, 40], plVanne:[56, 36], plClapet:[56, 36], plTe:[44, 36], plCoude:[40, 40], plSiphon:[60, 50], plAvaloir:[50, 34],
+  plLav:[80, 90], plWC:[84, 96], plBain:[190, 70], plEvier:[130, 90], plLaveuse:[84, 96] };
+const COUL_TUY = { tuyEF:"#1c7ed6", tuyEC:"#e03131", tuyDR:"#2f9e44", tuyEV:"#2f9e44", tuyGZ:"#d9a400" };
+/* dessin des éléments de plomberie, dans la boîte [xa, ya, xb, yb] */
+function dessinerPlomb(g, s, x1, y1, x2, y2, k, col){
+  const t = s.t, xa = Math.min(x1, x2), xb = Math.max(x1, x2), ya = Math.min(y1, y2), yb = Math.max(y1, y2), w = xb - xa, h = yb - ya, lw0 = g.lineWidth;
+  const tx = (txt, x, y, taille, c2, al) => { g.save(); g.fillStyle = c2 || col; g.font = "700 " + Math.round(taille) + "px system-ui, sans-serif"; g.textAlign = al || "center"; g.textBaseline = "middle"; g.fillText(txt, x, y); g.restore(); };
+  g.save(); g.lineCap = "round"; g.lineJoin = "round"; g.strokeStyle = col;
+  if (COUL_TUY[t]){
+    const cc = COUL_TUY[t]; g.strokeStyle = cc; g.lineWidth = Math.max(lw0, (t === "tuyDR" ? 7 : t === "tuyEV" ? 4 : 4.5) * k);
+    if (t === "tuyEV") g.setLineDash([10 * k, 7 * k]); if (t === "tuyGZ") g.setLineDash([16 * k, 5 * k, 3 * k, 5 * k]);
+    g.beginPath(); g.moveTo(x1, y1); g.lineTo(x2, y2); g.stroke(); g.setLineDash([]);
+    const L = Math.hypot(x2 - x1, y2 - y1);
+    if (!s.lb && L > 80 * k){ const an = Math.atan2(y2 - y1, x2 - x1); let nx = Math.sin(an), ny = -Math.cos(an); if (ny > 0){ nx = -nx; ny = -ny; }
+      tx({ tuyEF:"EF", tuyEC:"EC", tuyDR:"D", tuyEV:"É", tuyGZ:"G" }[t], (x1 + x2) / 2 + nx * 13 * k, (y1 + y2) / 2 + ny * 13 * k, 11 * k, cc); }
+    g.restore(); return; }
+  g.lineWidth = Math.max(1.4 * k, lw0 * .55);
+  const R = (x, y, ww, hh, f) => { g.beginPath(); g.rect(x, y, ww, hh); if (f){ g.save(); g.globalAlpha = f; g.fillStyle = col; g.fill(); g.restore(); } g.stroke(); };
+  const Ln = (...pts) => { g.beginPath(); g.moveTo(pts[0], pts[1]); for (let i = 2; i < pts.length; i += 2) g.lineTo(pts[i], pts[i + 1]); g.stroke(); };
+  const tuyau = (c2, ...pts) => { g.save(); g.strokeStyle = c2; g.lineWidth = Math.max(2.5 * k, lw0 * .8); Ln(...pts); g.restore(); };
+  const vanne = (x, y, r, vert) => { g.beginPath(); if (vert){ g.moveTo(x - r, y - r); g.lineTo(x + r, y + r); g.lineTo(x - r, y + r); g.lineTo(x + r, y - r); } else { g.moveTo(x - r, y - r); g.lineTo(x + r, y + r); g.lineTo(x + r, y - r); g.lineTo(x - r, y + r); } g.closePath(); g.save(); g.fillStyle = "#fff"; g.fill(); g.restore(); g.stroke(); };
+  const xm = xa + w / 2, ym = ya + h / 2;
+  if (t === "maison"){
+    const tw = Math.max(6 * k, w * .022), yEt = ya + h * .36, yRdc = ya + h * .64, ySol = ya + h * .7;
+    g.save(); g.globalAlpha = .1; g.fillStyle = "#8b5a2b"; g.fillRect(xa - w * .14, ySol, w * .14, yb - ySol); g.fillRect(xb, ySol, w * .14, yb - ySol); g.restore();   /* terrain */
+    Ln(xa - w * .14, ySol, xa, ySol); Ln(xb, ySol, xb + w * .14, ySol);
+    for (let x = xa - w * .13; x < xa - 4 * k; x += 12 * k) Ln(x, ySol + 3 * k, x + 7 * k, ySol + 10 * k);
+    for (let x = xb + 4 * k; x < xb + w * .13; x += 12 * k) Ln(x, ySol + 3 * k, x + 7 * k, ySol + 10 * k);
+    R(xa - tw, ya, w + 2 * tw, tw * 1.3, .15);                                     /* toit plat */
+    R(xa, ya + tw * 1.3, tw, yb - ya - tw * 1.3, .15); R(xb - tw, ya + tw * 1.3, tw, yb - ya - tw * 1.3, .15);   /* murs */
+    R(xa + tw, yEt, w - 2 * tw, tw * .8, .15); R(xa + tw, yRdc, w - 2 * tw, tw * .8, .15);   /* planchers */
+    R(xa - tw * 1.6, yb - tw, w + 3.2 * tw, tw, .15);                                /* dalle et semelles du sous-sol */
+    tx("Étage", xa + tw + 6 * k, ya + tw * 1.3 + 12 * k, 12 * k, null, "left"); tx("Rez-de-chaussée", xa + tw + 6 * k, yEt + tw + 12 * k, 12 * k, null, "left"); tx("Sous-sol", xa + tw + 6 * k, yRdc + tw + 12 * k, 12 * k, null, "left");
+    tx("Sol", xb + w * .07, ySol - 9 * k, 11 * k); g.restore(); return; }
+  if (t === "plCE"){ const r0 = Math.min(w * .2, 12 * k); g.beginPath(); g.roundRect ? g.roundRect(xa + w * .1, ya + h * .14, w * .8, h * .86, r0) : g.rect(xa + w * .1, ya + h * .14, w * .8, h * .86); g.stroke();
+    tuyau(COUL_TUY.tuyEF, xa + w * .3, ya + h * .14, xa + w * .3, ya); tuyau(COUL_TUY.tuyEC, xa + w * .7, ya + h * .14, xa + w * .7, ya); tx("CE", xm, ya + h * .5, Math.min(w * .32, 16 * k)); }
+  else if (t === "plCF" || t === "plCC"){ const cc = t === "plCF" ? COUL_TUY.tuyEF : COUL_TUY.tuyEC, yb0 = ya + h * .32;
+    g.save(); g.strokeStyle = cc; g.lineWidth = Math.max(5 * k, lw0); Ln(xa, yb0, xb - w * .04, yb0); g.restore();
+    [.25, .45, .65, .85].forEach(f => { tuyau(cc, xa + w * f, yb0, xa + w * f, yb); vanne(xa + w * f, ya + h * .68, Math.min(5 * k, w * .04), true); });
+    tx(t === "plCF" ? "EF" : "EC", xa + w * .08, ya + h * .08, 11 * k, cc); }
+  else if (t === "plCompteur"){ tuyau(COUL_TUY.tuyEF, xa, ym, xb, ym); g.beginPath(); g.arc(xm, ym, Math.min(w, h) * .38, 0, Math.PI * 2); g.save(); g.fillStyle = "#fff"; g.fill(); g.restore(); g.stroke(); tx("C", xm, ym, Math.min(w, h) * .4); }
+  else if (t === "plVanne"){ Ln(xa, ym + h * .15, xb, ym + h * .15); vanne(xm, ym + h * .15, Math.min(w * .2, h * .3)); Ln(xm, ym + h * .15, xm, ya + h * .08); Ln(xm - w * .18, ya + h * .08, xm + w * .18, ya + h * .08); }
+  else if (t === "plClapet"){ Ln(xa, ym, xb, ym); const r0 = Math.min(w * .2, h * .35); g.beginPath(); g.moveTo(xm - r0, ym - r0); g.lineTo(xm + r0, ym); g.lineTo(xm - r0, ym + r0); g.closePath(); g.save(); g.fillStyle = col; g.fill(); g.restore(); g.stroke(); Ln(xm + r0, ym - r0, xm + r0, ym + r0); }
+  else if (t === "plTe"){ g.lineWidth = Math.max(3 * k, lw0 * .8); Ln(xa, ya + h * .3, xb, ya + h * .3); Ln(xm, ya + h * .3, xm, yb); }
+  else if (t === "plCoude"){ g.lineWidth = Math.max(3 * k, lw0 * .8); g.beginPath(); g.moveTo(xa, ya + h * .3); g.arcTo(xm, ya + h * .3, xm, yb, Math.min(w, h) * .3); g.lineTo(xm, yb); g.stroke(); }
+  else if (t === "plSiphon"){ g.save(); g.strokeStyle = COUL_TUY.tuyDR; g.lineWidth = Math.max(4 * k, lw0); const r0 = w * .17, xg = xa + w * .22, xd = xg + 2 * r0, yu = ya + h * .62;
+    g.beginPath(); g.moveTo(xg, ya); g.lineTo(xg, yu); g.arc(xg + r0, yu, r0, Math.PI, 0, true); g.lineTo(xd, ya + h * .38); g.lineTo(xb, ya + h * .38); g.stroke(); g.restore(); }
+  else if (t === "plAvaloir"){ R(xa, ya, w, h * .35); for (let i = 1; i < 6; i++) Ln(xa + w * i / 6, ya, xa + w * i / 6, ya + h * .35); tuyau(COUL_TUY.tuyDR, xm, ya + h * .35, xm, yb); }
+  else if (t === "plLav"){ g.beginPath(); g.moveTo(xa, ya + h * .3); g.lineTo(xb, ya + h * .3); g.quadraticCurveTo(xb - w * .05, ya + h * .58, xm + w * .1, ya + h * .58); g.lineTo(xm - w * .1, ya + h * .58); g.quadraticCurveTo(xa + w * .05, ya + h * .58, xa, ya + h * .3); g.stroke();
+    R(xm - w * .1, ya + h * .58, w * .2, h * .42); Ln(xm + w * .22, ya + h * .3, xm + w * .22, ya + h * .08, xm + w * .02, ya + h * .08, xm + w * .02, ya + h * .16); }
+  else if (t === "plWC"){ R(xa + w * .58, ya, w * .42, h * .42); g.beginPath(); g.moveTo(xb, ya + h * .48); g.lineTo(xa, ya + h * .48); g.quadraticCurveTo(xa + w * .05, ya + h * .78, xa + w * .4, ya + h * .8); g.lineTo(xa + w * .38, yb); g.lineTo(xb - w * .05, yb); g.lineTo(xb - w * .05, ya + h * .48); g.stroke(); }
+  else if (t === "plBain"){ g.beginPath(); g.moveTo(xa, ya + h * .3); g.lineTo(xb, ya + h * .3); g.lineTo(xb - w * .04, yb); g.lineTo(xa + w * .04, yb); g.closePath(); g.stroke(); Ln(xa + w * .05, ya + h * .45, xb - w * .05, ya + h * .45);
+    Ln(xa + w * .06, ya + h * .3, xa + w * .06, ya + h * .05, xa + w * .14, ya + h * .05, xa + w * .14, ya + h * .14); }
+  else if (t === "plEvier"){ R(xa, ya + h * .3, w, h * .7); Ln(xa - w * .03, ya + h * .3, xb + w * .03, ya + h * .3); g.save(); g.setLineDash([5 * k, 4 * k]); R(xa + w * .25, ya + h * .3, w * .5, h * .28); g.restore();
+    Ln(xm + w * .08, ya + h * .3, xm + w * .08, ya + h * .04, xm - w * .06, ya + h * .04, xm - w * .06, ya + h * .12); Ln(xm, ya + h * .62, xm, yb); }
+  else if (t === "plLaveuse"){ R(xa, ya, w, h); Ln(xa, ya + h * .16, xb, ya + h * .16); g.beginPath(); g.arc(xm, ya + h * .58, Math.min(w, h) * .3, 0, Math.PI * 2); g.stroke(); g.beginPath(); g.arc(xa + w * .2, ya + h * .08, 2.5 * k, 0, Math.PI * 2); g.stroke(); }
+  g.restore(); }
 const FORMES_CLIC = { bulle:.009, crochet:.012, croix:.012, cercle:.025 };   /* un simple clic pose la forme à une taille par défaut */
 function dessinerForme(g, s, x1, y1, x2, y2, k, col){
   const t = s.t, lw = g.lineWidth, L = Math.max(12 * k, lw * 3.5), xa = Math.min(x1, x2), xb = Math.max(x1, x2), ya = Math.min(y1, y2), yb = Math.max(y1, y2), w = xb - xa, h = yb - ya;
@@ -2381,6 +2444,7 @@ function dessinerForme(g, s, x1, y1, x2, y2, k, col){
   const poly = pts => { g.moveTo(pts[0][0], pts[0][1]); pts.slice(1).forEach(q => g.lineTo(q[0], q[1])); g.closePath(); };
   const texte = (tx, x, y, taille, al) => { g.save(); g.fillStyle = col; g.font = "700 " + Math.round(taille) + "px system-ui, sans-serif"; g.textAlign = al || "center"; g.textBaseline = "middle"; g.fillText(tx, x, y); g.restore(); };
   g.beginPath();
+  if (FORMES[t] && FORMES[t].pl){ dessinerPlomb(g, s, x1, y1, x2, y2, k, col); return; }
   if (t === "fleche2"){ g.moveTo(x1, y1); g.lineTo(x2, y2); tete(x1, y1, x2, y2); tete(x2, y2, x1, y1); }
   else if (t === "cote"){
     { const an0 = Math.atan2(y2 - y1, x2 - x1), off = (s.d || 0) * (g.canvas ? g.canvas.height : 0), ox = -Math.sin(an0) * off, oy = Math.cos(an0) * off;
@@ -2519,16 +2583,16 @@ function poigneeCote(g, s, W, H, k){ const [x, y] = milieuCote(s, W, H), r = 11 
 /* poignée de la forme sélectionnée sous le doigt (0 = début, 1 = fin, 2 = décalage de la cote) */
 function poigneeSous(s, q){ if (!s || !s.t || !FORMES[s.t] || !strokes().includes(s)) return -1; const c = $("#inkCanvas"), W = c.width, H = c.height, tol = 16 * (window.devicePixelRatio || 1);
   if (s.t === "cote"){ const [mx, my] = milieuCote(s, W, H); if (Math.hypot(mx - q[0] * W, my - q[1] * H) < tol * 1.1) return 2; }
-  const lg = Math.hypot((s.p[1][0] - s.p[0][0]) * W, (s.p[1][1] - s.p[0][1]) * H), tp = /^(ligne|fleche|fleche2|cote)$/.test(s.t) ? Math.min(tol, lg * .22) : tol;   /* courte flèche : le milieu sert à la déplacer */
+  const lg = Math.hypot((s.p[1][0] - s.p[0][0]) * W, (s.p[1][1] - s.p[0][1]) * H), tp = /^(ligne|fleche|fleche2|cote|tuy[A-Z]+)$/.test(s.t) ? Math.min(tol, lg * .22) : tol;   /* courte flèche : le milieu sert à la déplacer */
   for (let i = 1; i >= 0; i--){ if (i === 0 && (s.t === "bulle" || s.t === "cercle")) continue; if (Math.hypot((s.p[i][0] - q[0]) * W, (s.p[i][1] - q[1]) * H) < tp) return i; } return -1; }
 /* forme sous le doigt (la plus récente d'abord) : près de son trait, ou n'importe où dans une petite forme */
 function formeSous(q){ const c = $("#inkCanvas"), W = c.width, H = c.height, tol = 14 * (window.devicePixelRatio || 1), arr = strokes(); let dedans = null, pres = null;
   for (let i = arr.length - 1; i >= 0; i--){ const s = arr[i]; if (!s.t || !FORMES[s.t] || !s.p || s.p.length < 2) continue;
     const P = pointsTrait(s), x = q[0] * W, y = q[1] * H; let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
     for (let j = 0; j < P.length; j++){ const px = P[j][0] * W, py = P[j][1] * H; x0 = Math.min(x0, px); x1 = Math.max(x1, px); y0 = Math.min(y0, py); y1 = Math.max(y1, py);
-      if (j){ const dd = distSeg([x, y], [P[j - 1][0] * W, P[j - 1][1] * H], [px, py], 1), lim = s.t === "cote" ? tol * 2.4 : /^(ligne|fleche|fleche2)$/.test(s.t) ? tol * 1.6 : tol;   /* cote : on peut toucher son texte */
+      if (j){ const dd = distSeg([x, y], [P[j - 1][0] * W, P[j - 1][1] * H], [px, py], 1), lim = s.t === "cote" ? tol * 2.4 : /^(ligne|fleche|fleche2|tuy[A-Z]+)$/.test(s.t) ? tol * 1.6 : tol;   /* cote : on peut toucher son texte */
         if (dd < lim){ const sc = dd / lim - (s.t === "cote" ? .6 : 0); if (!pres || sc < pres[1]) pres = [s, sc]; } } }   /* trait le plus proche; une cote passe avant le trait qu'elle mesure */
-    const petite = x1 - x0 < 90 * (window.devicePixelRatio || 1) && y1 - y0 < 90 * (window.devicePixelRatio || 1), fermee = !/^(ligne|fleche|fleche2|cote|angle|axes|accolade)$/.test(s.t);
+    const petite = x1 - x0 < 90 * (window.devicePixelRatio || 1) && y1 - y0 < 90 * (window.devicePixelRatio || 1), fermee = !/^(ligne|fleche|fleche2|cote|angle|axes|accolade|maison|tuy[A-Z]+)$/.test(s.t);
     if ((petite || fermee) && x > x0 - tol && x < x1 + tol && y > y0 - tol && y < y1 + tol){ const aire = (x1 - x0) * (y1 - y0); if (!dedans || aire < dedans[1]) dedans = [s, aire]; } }   /* l'intérieur compte aussi (la plus petite forme gagne) */
   return pres ? pres[0] : dedans ? dedans[0] : null; }
 /* double-clic sur une forme : choisir sa valeur (cote, angle, rayon, numéro de bulle) */
@@ -2539,7 +2603,7 @@ const VALEURS_FORME = {
   bulle:{ q:"Numéro ou lettre de la bulle", ex:"A" } };
 function modifierForme(s, cx, cy){
   const V = s.t === "objet" ? (s.k === "jonction" ? null : ELEC[s.k] ? (s.k === "rails" ? { q:"Nom des rails (ex. L1 / L2, 120 V)", ex:"L1 / L2" } : { q:"Repère du symbole (ex. CR1, M, PB2)", ex:"CR1" }) : { q:"Nom de l'objet (ex. P-1, Chaudière 1)", ex:"P-1" })
-    : (VALEURS_FORME[s.t] || { q:"Étiquette affichée sur la forme (laisse vide pour l'enlever)", ex:"A" });
+    : (VALEURS_FORME[s.t] || (/^tuy/.test(s.t) ? { q:"Diamètre du tuyau (ex. 3/4 po, 3 po ABS)", ex:"3/4 po" } : { q:"Étiquette affichée sur la forme (laisse vide pour l'enlever)", ex:"A" }));
   if (!V) return;
   const old = document.getElementById("formeVal"); if (old) old.remove();
   const box = document.createElement("div"); box.id = "formeVal";
@@ -2552,8 +2616,11 @@ function modifierForme(s, cx, cy){
     r.querySelector("input").value = s[cle] || ""; box.appendChild(r); });
   if (s.t !== "bulle" && !(s.t === "objet" && ELEC[s.k])) tailleTexte(box, s);
   if (s.t === "cote" || (s.t !== "objet" && !VALEURS_FORME[s.t]) || (s.t === "objet" && !ELEC[s.k])) padCote(box, s);
+  if (cotesPossibles(s)){ const bp = document.createElement("button"); bp.type = "button"; bp.dataset.plus = "1"; bp.textContent = s.t === "cote" ? "+ Cote sur un autre côté" : "+ Ajouter une cote";
+    bp.title = "Ajoute une cote sur le côté suivant de la forme"; bp.style.cssText = "width:100%;margin-top:10px;min-height:40px;border-radius:9px;border:1px solid #6aa9ff;border-bottom-width:4px;background:#1f6fc2;color:#fff;font:800 .9rem system-ui;cursor:pointer";
+    bp.addEventListener("mousedown", e => e.preventDefault()); box.appendChild(bp); }
   glisserCase(box);
-  $("#reader").appendChild(box); { const bh = box.offsetHeight, r0 = box.getBoundingClientRect(); if (r0.top + bh > innerHeight - 8) box.style.top = Math.max(8, innerHeight - bh - 8) + "px"; }   /* la case reste dans l'écran */
+  $("#reader").appendChild(box); placerCase(box, s, cx, cy);   /* la case se met à côté de l'objet, jamais dessus */
   const inp = box.querySelector("input"); inp.value = actuel; setTimeout(() => { inp.focus(); inp.select(); }, 30);
   box.addEventListener("pointerdown", e => e.stopPropagation());
   let fini = false;
@@ -2568,9 +2635,47 @@ function modifierForme(s, cx, cy){
     redrawInk(); try { majObjUI(); } catch(e){} };
   inp.addEventListener("keydown", e => { e.stopPropagation(); if (e.key === "Enter"){ e.preventDefault(); fin(true); } else if (e.key === "Escape"){ e.preventDefault(); fin(false); } });
   box.querySelector("button").onclick = () => fin(true);
+  { const bp = box.querySelector("[data-plus]"); if (bp) bp.onclick = () => { fin(true); ajouterCote(s); }; }
   const quitte = () => setTimeout(() => { if (!box.contains(document.activeElement)) fin(true); }, 150);   /* on peut passer d'une case à l'autre */
   inp.addEventListener("blur", quitte);
   box.querySelectorAll("[data-cle]").forEach(i => { i.addEventListener("blur", quitte); i.addEventListener("keydown", e => { e.stopPropagation(); if (e.key === "Enter"){ e.preventDefault(); fin(true); } else if (e.key === "Escape"){ e.preventDefault(); fin(false); } }); }); }
+/* case du double-clic : à droite de l'objet, sinon à gauche, en dessous ou au-dessus (toujours dans l'écran) */
+function placerCase(box, s, cx, cy){
+  const c = $("#inkCanvas"), r = c.getBoundingClientRect(), sx = r.width / c.width, sy = r.height / c.height, bw = box.offsetWidth, bh = box.offsetHeight, M = 8;
+  let b = null; try { b = s.t === "objet" ? objGeo(s, c.width, c.height).bbox : cadrePx(s, c.width, c.height); } catch(e){}
+  const dans = (x, y) => x >= M && y >= M && x + bw <= innerWidth - M && y + bh <= innerHeight - M, cx2 = x => Math.max(M, Math.min(innerWidth - bw - M, x)), cy2 = y => Math.max(M, Math.min(innerHeight - bh - M, y));
+  if (!b){ box.style.left = cx2(cx - bw / 2) + "px"; box.style.top = cy2(cy + 18) + "px"; return; }
+  const m = 30, o = [r.left + b[0] * sx - m, r.top + b[1] * sy - m, r.left + b[2] * sx + m, r.top + b[3] * sy + m];   /* marge : texte de la cote ou de l'étiquette */
+  const recouvre = (x, y) => Math.max(0, Math.min(x + bw, o[2]) - Math.max(x, o[0])) * Math.max(0, Math.min(y + bh, o[3]) - Math.max(y, o[1]));
+  const C = [[o[2] + 6, cy2((o[1] + o[3]) / 2 - bh / 2)], [o[0] - 6 - bw, cy2((o[1] + o[3]) / 2 - bh / 2)], [cx2((o[0] + o[2]) / 2 - bw / 2), o[3] + 6], [cx2((o[0] + o[2]) / 2 - bw / 2), o[1] - 6 - bh]];
+  let best = C.find(([x, y]) => dans(x, y) && !recouvre(x, y));
+  if (!best) best = C.map(([x, y]) => [cx2(x), cy2(y)]).sort((A, B) => recouvre(A[0], A[1]) - recouvre(B[0], B[1]))[0];
+  box.style.left = best[0] + "px"; box.style.top = best[1] + "px"; }
+/* sommets d'une forme (pour coter ses côtés) */
+function sommetsForme(s){ if (!s || !s.p || s.p.length < 2) return null; const [a, b] = s.p, x0 = Math.min(a[0], b[0]), x1 = Math.max(a[0], b[0]), y0 = Math.min(a[1], b[1]), y1 = Math.max(a[1], b[1]), xm = (x0 + x1) / 2, ym = (y0 + y1) / 2;
+  if (/^(ligne|fleche|fleche2|tuy[A-Z]+)$/.test(s.t)) return { P:[a, b], ferme:false };
+  if (s.t === "rect" || s.t === "maison" || s.t === "cube") return { P:[[x0, y0], [x1, y0], [x1, y1], [x0, y1]], ferme:true };
+  if (s.t === "triangle") return { P:[[xm, y0], [x1, y1], [x0, y1]], ferme:true };
+  if (s.t === "triangleR") return { P:[[x0, y0], [x0, y1], [x1, y1]], ferme:true };
+  if (s.t === "losange") return { P:[[xm, y0], [x1, ym], [xm, y1], [x0, ym]], ferme:true };
+  if (s.t === "hexagone"){ const P = []; for (let i = 0; i < 6; i++){ const an = Math.PI / 3 * i; P.push([xm + (x1 - x0) / 2 * Math.cos(an), ym + (y1 - y0) / 2 * Math.sin(an)]); } return { P, ferme:true }; }
+  return null; }
+const cotesPossibles = s => s.t === "cote" || !!sommetsForme(s);
+/* + : une cote sur le prochain côté qui n'en a pas (pour une cote : sur un autre côté de la même forme) */
+function ajouterCote(s){
+  const c = $("#inkCanvas"), W = c.width, H = c.height, pres = (u, v) => Math.hypot((u[0] - v[0]) * W, (u[1] - v[1]) * H) < 4;
+  const arcs = f => { const S = sommetsForme(f); if (!S) return []; const A = []; for (let i = 0; i < S.P.length - (S.ferme ? 0 : 1); i++) A.push([S.P[i], S.P[(i + 1) % S.P.length]]); return A; };
+  let f = s;
+  if (s.t === "cote") f = strokes().find(o => o !== s && o.t !== "cote" && arcs(o).some(([u, v]) => (pres(u, s.p[0]) && pres(v, s.p[1])) || (pres(v, s.p[0]) && pres(u, s.p[1]))));
+  if (!f){ aviser("Pour une autre cote, double-clique sur la forme elle-même.", 3500); return; }
+  const cotes = strokes().filter(o => o.t === "cote"), libre = arcs(f).find(([u, v]) => !cotes.some(o => (pres(u, o.p[0]) && pres(v, o.p[1])) || (pres(v, o.p[0]) && pres(u, o.p[1]))));
+  if (!libre){ aviser("Tous les côtés de cette forme ont déjà une cote.", 3000); return; }
+  const S = sommetsForme(f), Cx = S.P.reduce((t, q) => t + q[0], 0) / S.P.length * W, Cy = S.P.reduce((t, q) => t + q[1], 0) / S.P.length * H;
+  const [u, v] = libre, an = Math.atan2((v[1] - u[1]) * H, (v[0] - u[0]) * W), nx = -Math.sin(an), ny = Math.cos(an), mx = (u[0] + v[0]) / 2 * W, my = (u[1] + v[1]) / 2 * H;
+  const sg = S.ferme ? (Math.sign(nx * (mx - Cx) + ny * (my - Cy)) || 1) : (ny > 0 ? -1 : 1), ec = 30 * RD.z * (window.devicePixelRatio || 1);
+  snapInk(); const n = { t:"cote", c:f.c && !/^tuy|^maison/.test(f.t) ? f.c : "#24282c", hl:false, hc:null, w:2.5, p:[u.slice(), v.slice()], d:sg * ec / H };
+  strokes().push(n); SELO.s = n; redrawInk(); try { majObjUI(); } catch(e){}
+  const r = c.getBoundingClientRect(); modifierForme(n, r.left + mx * r.width / W, r.top + my * r.height / H); }
 /* la case du double-clic se déplace en la glissant par sa barre du haut (pour voir l'objet dessous) */
 function glisserCase(box){
   const bar = document.createElement("div"); bar.title = "Glisse pour déplacer la case";
@@ -2598,7 +2703,7 @@ function padCote(box, s){
   const CE = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7v10M20 7v10M4 12h16"/></svg>';
   const T = { haut:[0, -1, 0, "En haut de l'objet"], gauche:[-1, 0, -90, "À gauche de l'objet"], centre:[0, 0, 0, "Sur l'objet"], droite:[1, 0, 90, "À droite de l'objet"], bas:[0, 1, 180, "En bas de l'objet"] };
   const pad = document.createElement("div");
-  const cote = s.t === "cote", defaut = s.t === "objet" ? "bas" : /^(ligne|fleche|fleche2|accolade)$/.test(s.t) ? "haut" : "centre";
+  const cote = s.t === "cote", defaut = s.t === "objet" ? "bas" : /^(ligne|fleche|fleche2|accolade|tuy[A-Z]+)$/.test(s.t) ? "haut" : "centre";
   pad.innerHTML = '<div style="margin:10px 0 6px;line-height:1.3">' + (cote ? "Position de la cote" : "Position du texte") + '</div><div class="cpad" style="display:grid;grid-template-columns:repeat(3,48px);grid-template-rows:repeat(3,42px);gap:5px;justify-content:center">'
     + ["", "haut", "", "gauche", "centre", "droite", "", "bas", ""].map(k => k ? '<button type="button" data-pos="' + k + '" title="' + T[k][3] + '" aria-label="' + T[k][3] + '" style="display:flex;align-items:center;justify-content:center;border-radius:9px;border:1px solid #3a3a40;border-bottom-width:4px;background:#1c1c1f;color:#e4e4e7;cursor:pointer;padding:0">'
       + (k === "centre" ? CE : '<span style="display:flex;transform:rotate(' + T[k][2] + 'deg)">' + FL + '</span>') + '</button>' : '<span></span>').join("") + '</div>';
@@ -2644,7 +2749,7 @@ function pointsTrait(s){
   const seg = (u, v) => { for (let i = 0; i <= N; i++) out.push([u[0] + (v[0] - u[0]) * i / N, u[1] + (v[1] - u[1]) * i / N]); };
   if (s.t === "cote"){ const cv = $("#inkCanvas"), W = cv.width || 1, H = cv.height || 1, an = Math.atan2((b[1] - a[1]) * H, (b[0] - a[0]) * W), off = (s.d || 0) * H, ox = -Math.sin(an) * off / W, oy = Math.cos(an) * off / H;
     seg([a[0] + ox, a[1] + oy], [b[0] + ox, b[1] + oy]); if (s.d){ seg(a, [a[0] + ox, a[1] + oy]); seg(b, [b[0] + ox, b[1] + oy]); } }
-  else if (s.t === "ligne" || s.t === "fleche" || s.t === "fleche2") seg(a, b);
+  else if (s.t === "ligne" || s.t === "fleche" || s.t === "fleche2" || /^tuy/.test(s.t)) seg(a, b);
   else if (s.t === "angle"){ seg(a, b); seg(a, [a[0] + Math.hypot(b[0] - a[0], b[1] - a[1]), a[1]]); }
   else if (s.t === "cercle" || s.t === "bulle"){ const cv = $("#inkCanvas"), W = cv.width || 1, H = cv.height || 1, r = Math.hypot((b[0] - a[0]) * W, (b[1] - a[1]) * H); for (let i = 0; i < 72; i++){ const t = i / 72 * Math.PI * 2; out.push([a[0] + r * Math.cos(t) / W, a[1] + r * Math.sin(t) / H]); } out.push(a); }
   else if (FORMES[s.t] && s.t !== "ellipse"){ const x0 = Math.min(a[0], b[0]), x1 = Math.max(a[0], b[0]), y0 = Math.min(a[1], b[1]), y1 = Math.max(a[1], b[1]);
@@ -3154,8 +3259,10 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
   bar.style.cssText = "position:absolute;z-index:75;left:12px;top:70px;display:flex;flex-direction:column;gap:6px;width:184px;max-height:calc(100% - 150px);overflow-y:auto;overflow-x:hidden;padding:8px;border-radius:12px;background:rgba(14,14,15,.96);border:1px solid #2f2f33;color:#d4d4d8;font:600 .8rem system-ui,sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.35)";
   bar.innerHTML = '<div class="tete" title="Glisse ici pour déplacer la palette"><span class="poig">⠿</span><span class="tit">Objets</span></div>'
     + '<div class="onglets" role="tablist"><button data-tab="formes" role="tab">Formes</button><button data-tab="iso" role="tab" title="Objets isométriques (plomberie, chauffage)">Iso</button><button data-tab="elec" role="tab">Électricité</button></div>'
-    + '<div class="grp" data-g="formes"><div class="cgrid cform">' + Object.keys(FORMES).map(k => '<button data-f="' + k + '" title="' + FORMES[k].n + '"><canvas width="120" height="64"></canvas><span>' + FORMES[k].n + '</span></button>').join("") + '</div>'
-    + '<div class="aide"><b>Touche</b> une forme pour la choisir : glisse-la pour la déplacer, tire un <b>carré blanc</b> pour la grandir. <b>Double-clic</b> : écrire la cote, l\'angle ou un nom. Pour en <b>ajouter</b> : choisis une forme ci-dessous, puis glisse sur le tableau. <b>Clic à côté</b> : plus rien de choisi.</div></div>'
+    + '<div class="grp" data-g="formes"><div class="cgrid cform">' + Object.keys(FORMES).filter(k => !FORMES[k].pl).map(k => '<button data-f="' + k + '" title="' + FORMES[k].n + '"><canvas width="120" height="64"></canvas><span>' + FORMES[k].n + '</span></button>').join("") + '</div>'
+    + '<div class="aide"><b>Touche</b> une forme pour la choisir : glisse-la pour la déplacer, tire un <b>carré blanc</b> pour la grandir. <b>Double-clic</b> : écrire la cote, l\'angle ou un nom. Pour en <b>ajouter</b> : choisis une forme ci-dessous, puis glisse sur le tableau. <b>Clic à côté</b> : plus rien de choisi.</div>'
+    + '<details class="plomb"><summary>Plomberie (maison en coupe)</summary><div class="cgrid cform">' + Object.keys(FORMES).filter(k => FORMES[k].pl).map(k => '<button data-f="' + k + '" title="' + FORMES[k].n + '"><canvas width="120" height="64"></canvas><span>' + FORMES[k].n + '</span></button>').join("") + '</div>'
+    + '<div class="aide">1) <b>Maison en coupe</b> : touche-la puis clique sur le tableau. 2) <b>Tuyaux</b> (EF, EC, drain, évent, gaz) : glisse d\'un point à l\'autre; ils restent droits ou à 45° et s\'aimantent au bout d\'un autre tuyau. 3) <b>Appareils et raccords</b> : un clic les pose. <b>Double-clic</b> sur un tuyau : son diamètre (ex. 3/4 po).</div></details></div>'
     + '<div class="grp" data-g="iso"><div class="cgrid ciso">' + Object.keys(OBJETS).map(k => '<button data-k="' + k + '" title="' + OBJETS[k].n + '"><canvas width="120" height="64"></canvas><span>' + OBJETS[k].n + '</span></button>').join("") + '</div>'
     + '<div class="aide"><b>Touche</b> un objet pour le choisir et le déplacer (les tuyaux raccordés suivent), <b>double-clic</b> pour le nommer. Pour en <b>poser</b> un : <b>glisse-le</b> sur le tableau (il se branche tout seul sur un tuyau tout près), ou touche-le puis clique sur la grille. <b>Clic à côté</b> : plus rien de choisi.</div></div>'
     + '<div class="grp" data-g="elec"><button id="objSch" class="sch-btn" title="Circuits prêts à utiliser et tableaux enregistrés">📋 Modèles et mes schémas</button>' + ELEC_CAT.map(([cg, cn]) => '<button class="cat" data-cat="' + cg + '">' + cn + '</button><div class="cgrid" data-cat="' + cg + '">'
@@ -3181,6 +3288,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     + '#objBar .aide{color:#9fc6f5;font-size:.72rem;line-height:1.3;padding:2px}#objBar .aide b{color:#6aa9ff}#objBar .rang{display:flex;gap:4px}#objBar .taille{display:grid;grid-template-columns:1fr 38px 38px;gap:4px;align-items:center;font-size:.74rem}#objBar .taille button{text-align:center;font-size:1.05rem;padding:0}#objBar .taille em{grid-column:1/-1;font-style:normal;font-size:.68rem;color:#9fc6f5}#objBar .rang button{flex:1;text-align:center}'
     + '#objBar .filcols{display:flex;flex-direction:column;gap:4px;font-size:.72rem;color:#a1a1aa;padding:2px}#objBar .filcols div{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}#objBar .filcols button{min-height:26px!important;padding:0!important;border-radius:50%!important;border:2px solid #3a3a40!important}#objBar .filcols button.on{border-color:#6aa9ff!important;box-shadow:0 0 0 2px #6aa9ff}'
     + '#objBar .pol .orig{display:none}#objBar .pol .pp{display:contents}#objBar .pol .pl{grid-column:1/-1;font-size:.7rem;color:#a1a1aa;margin-top:2px}'
+    + '#objBar details.plomb{margin-top:6px;border-top:1px solid #2f2f33;padding-top:6px}#objBar details.plomb summary{cursor:pointer;font-size:.74rem;letter-spacing:.04em;text-transform:uppercase;color:#a1a1aa;padding:4px 2px;list-style:none}#objBar details.plomb summary::before{content:"▸ ";}#objBar details.plomb[open] summary::before{content:"▾ ";}'
     + '#objBar #objL{min-height:32px;padding:0 8px;border-radius:8px;border:1px solid #2f2f33;background:#fff;color:#111;font:inherit;font-weight:700;text-transform:uppercase}'
     + '#objBar #objSim{background:#1f7a3f;border-color:#2f9e44;color:#fff;text-align:center}#objBar.sim #objSim{background:#a61e1e;border-color:#e03131}#objBar #objX{text-align:center}'
     + '#objBar .simAide{display:none;font-size:.74rem;line-height:1.35;color:#d4d4d8;padding:2px}#objBar.sim .simAide{display:block}#objBar .simAide .court{color:#ff8787;font-weight:800}#objBar .panne{margin-top:10px;padding-top:8px;border-top:1px solid #2f2f33}#objBar .panne .pt{font-weight:800;color:#fff;margin-bottom:4px}#objBar .panne .pc{color:#ffd43b;margin-bottom:4px}#objBar .panne .pe{color:#ff8787;font-weight:700;margin-bottom:4px}#objBar .panne .pb{display:grid;grid-template-columns:1fr 1fr;gap:4px}#objBar .panne .pb button{text-align:center;font-size:.74rem;padding:0 4px}#objBar .simAide .on{color:#8ce99a}';
@@ -3217,7 +3325,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     const fin = e => { if (fant){ fant.remove(); fant = null; if (e.type !== "pointerup"){ window.APERCU = null; redrawInk(); } b.dataset.glisse = "1"; setTimeout(() => delete b.dataset.glisse, 300); if (e.type === "pointerup") deposerObjet(k, e.clientX, e.clientY); } g0 = null; };
     b.addEventListener("pointerup", fin); b.addEventListener("pointercancel", fin); });
   /* vignettes des formes (dessinées avec le vrai moteur) */
-  const P_FORME = { cercle:[[.5, .5], [.8, .5]], bulle:[[.5, .5], [.68, .5]], angle:[[.25, .8], [.75, .2]], fleche:[[.15, .7], [.85, .3]], fleche2:[[.15, .5], [.85, .5]], cote:[[.15, .55], [.85, .55]], ligne:[[.15, .75], [.85, .25]] };
+  const P_FORME = { maison:[[.1, .06], [.9, .94]], tuyEF:[[.12, .5], [.88, .5]], tuyEC:[[.12, .5], [.88, .5]], tuyDR:[[.12, .5], [.88, .5]], tuyEV:[[.12, .5], [.88, .5]], tuyGZ:[[.12, .5], [.88, .5]], plCF:[[.15, .2], [.85, .8]], plCC:[[.15, .2], [.85, .8]], plBain:[[.15, .25], [.85, .8]], plEvier:[[.25, .12], [.75, .9]], cercle:[[.5, .5], [.8, .5]], bulle:[[.5, .5], [.68, .5]], angle:[[.25, .8], [.75, .2]], fleche:[[.15, .7], [.85, .3]], fleche2:[[.15, .5], [.85, .5]], cote:[[.15, .55], [.85, .55]], ligne:[[.15, .75], [.85, .25]] };
   bar.querySelectorAll("[data-f]").forEach(b => { const t = b.dataset.f, cv = b.querySelector("canvas"), g = cv.getContext("2d"), W = cv.width, H = cv.height, wb = RD.wb; RD.wb = false;
     try { drawStroke(g, { t, c:"#24282c", hl:false, hc:null, w:2.2, n:1, p:P_FORME[t] || [[.3, .15], [.7, .85]] }, W, H, 1); } catch(e){} RD.wb = wb;
     b.onclick = ev => { const o = SELO.s;
@@ -3532,9 +3640,9 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     if (RD.text || (RD.obj && RD.objTab !== "formes")){ e.preventDefault(); return; }
     const q = pt(e);
     if (RD.obj){ const brut = (r => [(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height])(c.getBoundingClientRect()), ip = poigneeSous(SELO.s, brut);
-      if (ip >= 0){ cur = { poignee:ip, s:SELO.s, snap:false, x0:e.clientX, y0:e.clientY }; return; }               /* agrandir / rapetisser par une poignée */
+      if (ip >= 0 && !(RD.formeK && /^tuy/.test(RD.formeK))){ cur = { poignee:ip, s:SELO.s, snap:false, x0:e.clientX, y0:e.clientY }; return; }   /* outil tuyau : on part du bout pour un nouveau tuyau */               /* agrandir / rapetisser par une poignée */
       const hit = formeSous(brut);
-      if (hit && hit === SELO.s){ cur = { bouge:hit, q0:q, p0:hit.p.map(v => v.slice()), snap:false, x0:e.clientX, y0:e.clientY }; return; }   /* forme déjà choisie : on la glisse */
+      if (hit && hit === SELO.s && !(RD.formeK && /^tuy/.test(RD.formeK) && /^tuy/.test(hit.t))){ cur = { bouge:hit, q0:q, p0:hit.p.map(v => v.slice()), snap:false, x0:e.clientX, y0:e.clientY }; return; }   /* forme déjà choisie : on la glisse */
       const obj = !hit && RD.wb ? objetSous(brut) : null;
       if (!RD.formeK){           /* aucun outil : toucher = choisir (et glisser = déplacer); toucher à côté = rien de choisi */
         if (hit){ SELO.s = hit; redrawInk(); majObjUI(); cur = { bouge:hit, q0:q, p0:hit.p.map(v => v.slice()), snap:false, x0:e.clientX, y0:e.clientY }; return; }
@@ -3544,7 +3652,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
       var raz = !!SELO.s; if (SELO.s){ SELO.s = null; majObjUI(); } }
     cur = { c:/^hl/.test(RD.color) ? "#000" : RD.color, hl:/^hl/.test(RD.color), hc:/^hl:/.test(RD.color) ? RD.color.slice(3) : null, w:RD.wPx || WIDTHS[RD.wIdx], p:[q] };
     const forme = RD.obj && RD.formeK ? RD.formeK : RD.shape;
-    if (forme){ cur.t = forme; cur.p = [q, q]; if (RD.obj && RD.formeK && choisir) cur.choisir = choisir; if (RD.obj && RD.formeK && raz && !choisir) cur.raz = true; if (forme === "bulle") cur.n = strokes().filter(x => x.t === "bulle").length + 1; }
+    if (forme){ cur.t = forme; cur.p = [q, q]; if (/^tuy/.test(forme)){ const q0 = aimanterTuyau(q, null, null); cur.p = [q0, q0.slice()]; } if (RD.obj && RD.formeK && choisir) cur.choisir = choisir; if (RD.obj && RD.formeK && raz && !choisir) cur.raz = true; if (forme === "bulle") cur.n = strokes().filter(x => x.t === "bulle").length + 1; }
     /* Trait en cours, rapide : on garde une image de tout le reste et, à chaque image, on redessine seulement le trait en cours par-dessus */
     snapInk(); redrawInk();
     if (cur.t || cur.hl){       /* forme ou surligneur : on garde une copie de tout le reste */
@@ -3574,11 +3682,11 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     if (cur.poignee === 2){ if (!cur.snap){ snapInk(); cur.snap = true; } const o = cur.s, W = c.width, H = c.height, r = c.getBoundingClientRect(), q = [(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height];
       const a = o.p[0], b = o.p[1], an = Math.atan2((b[1] - a[1]) * H, (b[0] - a[0]) * W), d = (-(q[0] - (a[0] + b[0]) / 2) * W * Math.sin(an) + (q[1] - (a[1] + b[1]) / 2) * H * Math.cos(an));
       o.d = Math.abs(d) < 6 ? 0 : d / H; if (!rafTrait) rafTrait = requestAnimationFrame(() => { rafTrait = 0; redrawInk(); }); return; }
-    if (cur.poignee !== undefined){ if (!cur.snap){ snapInk(); cur.snap = true; } cur.s.p[cur.poignee] = pt(e); if (!rafTrait) rafTrait = requestAnimationFrame(() => { rafTrait = 0; redrawInk(); }); return; }
+    if (cur.poignee !== undefined){ if (!cur.snap){ snapInk(); cur.snap = true; } cur.s.p[cur.poignee] = /^tuy/.test(cur.s.t) ? aimanterTuyau(pt(e), cur.s.p[1 - cur.poignee], cur.s) : pt(e); if (!rafTrait) rafTrait = requestAnimationFrame(() => { rafTrait = 0; redrawInk(); }); return; }
     if (cur.bouge){ const q = pt(e), dx = q[0] - cur.q0[0], dy = q[1] - cur.q0[1];
       if (!cur.snap){ if (Math.hypot(e.clientX - cur.x0, e.clientY - cur.y0) < 5) return; snapInk(); cur.snap = true; }
       cur.bouge.p = cur.p0.map(v => [v[0] + dx, v[1] + dy]); if (!rafTrait) rafTrait = requestAnimationFrame(() => { rafTrait = 0; redrawInk(); }); return; }
-    if (cur.t) cur.p[1] = pt(e);
+    if (cur.t){ cur.p[1] = pt(e); if (/^tuy/.test(cur.t)) cur.p[1] = aimanterTuyau(cur.p[1], cur.p[0], cur); }
     else { const evs = (e.getCoalescedEvents && e.getCoalescedEvents()) || []; (evs.length ? evs : [e]).forEach(ev => cur.p.push(pt(ev))); }   /* tous les points du crayon, même entre deux images */
     if (!rafTrait) rafTrait = requestAnimationFrame(dessinerEnCours);
   });
@@ -3595,6 +3703,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
       delete cur.raz; }
     const finTrait = cur && cur !== "erase";
     RD.erSnap = false;
+    if (cur && cur !== "erase" && cur.t && FORMES_TAILLE[cur.t]){ const a = cur.p[0], b = cur.p[1]; if (Math.hypot(a[0] - b[0], a[1] - b[1]) < .004){ const r = c.getBoundingClientRect(), [tw, th] = FORMES_TAILLE[cur.t], dx = tw * RD.z / r.width / 2, dy = th * RD.z / r.height / 2; cur.p = [[a[0] - dx, a[1] - dy], [a[0] + dx, a[1] + dy]]; } }
     if (cur && cur !== "erase" && cur.t && FORMES_CLIC[cur.t]){ const a = cur.p[0], b = cur.p[1]; if (Math.hypot(a[0] - b[0], a[1] - b[1]) < .004){ const d = FORMES_CLIC[cur.t]; cur.p[1] = cur.t === "bulle" || cur.t === "cercle" ? [a[0] + d, a[1]] : [a[0] + d, a[1] + d * 1.6]; } }
     if (cur && cur !== "erase" && cur.t){ const a = cur.p[0], b = cur.p[1]; if (Math.hypot(a[0] - b[0], a[1] - b[1]) < .004){ const arr = strokes(), i = arr.indexOf(cur); if (i >= 0){ arr.splice(i, 1); (UNDO[inkKey()] || []).pop(); } redrawInk(); } }
     if (cur && cur !== "erase" && RD.wb && /^iso/.test(wbBg())){ const seg = decouperIso(cur), arr = strokes(), k = arr.indexOf(cur); if (seg && k >= 0){ arr.splice(k, 1, ...seg); redrawInk(); } }
@@ -3603,6 +3712,16 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     if (finTrait) redrawInk();          /* dessin complet une fois le trait terminé (et sauvegarde) */
   }));
 })();
+/* tuyau : on s'aimante au bout (ou sur le trajet) d'un autre tuyau; depuis un point de départ, le tuyau reste droit ou à 45° */
+function aimanterTuyau(q, a, sauf){
+  const c = $("#inkCanvas"), W = c.width, H = c.height, dpr = window.devicePixelRatio || 1, lim = 14 * dpr; let best = null;
+  if (a){ const dx = (q[0] - a[0]) * W, dy = (q[1] - a[1]) * H, L = Math.hypot(dx, dy), an = Math.round(Math.atan2(dy, dx) / (Math.PI / 4)) * Math.PI / 4; q = [a[0] + Math.cos(an) * L / W, a[1] + Math.sin(an) * L / H]; }
+  strokes().forEach(o => { if (o === sauf || !o.t || !/^tuy/.test(o.t)) return; o.p.forEach(e => { const d = Math.hypot((e[0] - q[0]) * W, (e[1] - q[1]) * H); if (d < lim && (!best || d < best[1])) best = [e.slice(), d]; }); });
+  if (best) return best[0];
+  if (!a) strokes().forEach(o => { if (o === sauf || !o.t || !/^tuy/.test(o.t)) return; const [A, B] = o.p, ax = A[0] * W, ay = A[1] * H, bx = B[0] * W, by = B[1] * H, L2 = (bx - ax) ** 2 + (by - ay) ** 2; if (!L2) return;
+    const u = Math.max(0, Math.min(1, ((q[0] * W - ax) * (bx - ax) + (q[1] * H - ay) * (by - ay)) / L2)), px = ax + u * (bx - ax), py = ay + u * (by - ay), d = Math.hypot(px - q[0] * W, py - q[1] * H);
+    if (d < lim && (!best || d < best[1])) best = [[px / W, py / H], d]; });
+  return best ? best[0] : q; }
 /* Sélection multiple : Ctrl (ou Maj) + clic ajoute ou retire un élément; glisser dans le vide trace un cadre; glisser un élément du groupe déplace tout le groupe */
 (function(){
   const c = $("#inkCanvas"); let mm = null, raf = 0, cadre = null;
