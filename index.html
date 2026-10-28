@@ -2611,6 +2611,31 @@ function grilleIso(g, W, H, k){
   }
   g.restore();
 }
+/* plan isométrique : quand un tuyau passe par-dessus un autre, petite coupure ombrée sous celui du dessus (le dernier tracé est par-dessus) */
+function croisementsIso(g, tous, W, H, k){
+  /* un tuyau tracé en une fois est coupé en petits bouts (même groupe g) : on refait le trajet complet */
+  const grp = new Map(), polys = [];
+  tous.forEach(s => { if (!s.p || s.p.length < 2 || s.hl || !(!s.t || s.t === "ligne" || /^tuy/.test(s.t))) return; const key = s.g || s;
+    if (!grp.has(key)){ const P = { s, pts:s.p.map(q => [q[0] * W, q[1] * H]) }; grp.set(key, P); polys.push(P); }
+    else { const P = grp.get(key), d = P.pts[P.pts.length - 1], a = [s.p[0][0] * W, s.p[0][1] * H]; if (Math.hypot(d[0] - a[0], d[1] - a[1]) > 1) P.pts.push(a); s.p.slice(1).forEach(q => P.pts.push([q[0] * W, q[1] * H])); } });
+  polys.forEach(P => { let acc = 0; P.cum = [0]; for (let i = 1; i < P.pts.length; i++){ acc += Math.hypot(P.pts[i][0] - P.pts[i - 1][0], P.pts[i][1] - P.pts[i - 1][1]); P.cum.push(acc); } P.len = acc; });
+  const marge = 6 * k;
+  for (let j = 1; j < polys.length; j++){ const A = polys[j];
+    for (let i = 0; i < j; i++){ const B = polys[i], vus = new Set();
+      for (let a = 0; a + 1 < A.pts.length; a++){ const [ax, ay] = A.pts[a], [bx, by] = A.pts[a + 1], dx = bx - ax, dy = by - ay, lj = Math.hypot(dx, dy); if (lj < 1) continue;
+        for (let b = 0; b + 1 < B.pts.length; b++){ const [cx, cy] = B.pts[b], [ex, ey] = B.pts[b + 1];
+          if (Math.max(cx, ex) < Math.min(ax, bx) - 1 || Math.min(cx, ex) > Math.max(ax, bx) + 1 || Math.max(cy, ey) < Math.min(ay, by) - 1 || Math.min(cy, ey) > Math.max(ay, by) + 1) continue;
+          const fx = ex - cx, fy = ey - cy, li = Math.hypot(fx, fy), den = dx * fy - dy * fx; if (li < 1 || Math.abs(den) < 1e-6 * lj * li) continue;
+          const t = ((cx - ax) * fy - (cy - ay) * fx) / den, u = ((cx - ax) * dy - (cy - ay) * dx) / den; if (t < -.001 || t > 1.001 || u < -.001 || u > 1.001) continue;
+          const sA = A.cum[a] + t * lj, sB = B.cum[b] + u * li;
+          if (sA < marge || A.len - sA < marge || sB < marge || B.len - sB < marge) continue;      /* un bout de tuyau qui arrive sur l'autre = un raccord, pas un croisement */
+          const px = ax + dx * t, py = ay + dy * t, cle = Math.round(px / 3) + "," + Math.round(py / 3); if (vus.has(cle)) continue; vus.add(cle);
+          const w = (A.s.w || 4) * k, R = Math.max(9 * k, w * 2.2);
+          const trajet = (s0, s1) => { const out = [], at = d => { let m = 1; while (m < A.cum.length - 1 && A.cum[m] < d) m++; const q0 = A.pts[m - 1], q1 = A.pts[m], f = (d - A.cum[m - 1]) / ((A.cum[m] - A.cum[m - 1]) || 1); return [q0[0] + (q1[0] - q0[0]) * f, q0[1] + (q1[1] - q0[1]) * f]; };
+            s0 = Math.max(0, s0); s1 = Math.min(A.len, s1); out.push(at(s0)); A.cum.forEach((cv, m) => { if (cv > s0 && cv < s1) out.push(A.pts[m]); }); out.push(at(s1)); return out; };   /* le tuyau du dessus suit son vrai trajet (coins compris) */
+          const tr = (pts) => { g.beginPath(); pts.forEach((q, m) => m ? g.lineTo(q[0], q[1]) : g.moveTo(q[0], q[1])); g.stroke(); };
+          g.save(); g.lineCap = "butt"; g.lineJoin = "round"; g.strokeStyle = "#ffffff"; g.shadowColor = "rgba(0,0,0,.4)"; g.shadowBlur = 4 * k; g.lineWidth = w + 7 * k; tr(trajet(sA - R, sA + R)); g.restore();   /* coupure blanche ombrée : celui du dessous passe en arrière */
+          g.save(); g.lineCap = "round"; g.lineJoin = "round"; g.strokeStyle = A.s.c || "#24282c"; g.lineWidth = w; tr(trajet(sA - R - 2 * k, sA + R + 2 * k)); g.restore(); } } } } }
 function redrawInk(){
   try { recalerWb(); } catch(e){}
   const c = $("#inkCanvas"), g = c.getContext("2d");
@@ -2618,7 +2643,8 @@ function redrawInk(){
   const k = (window.devicePixelRatio || 1) * RD.z;
   if (RD.wb && (/^iso/.test(wbBg()) || wbBg() === "lignes" || wbBg() === "quad")) grilleIso(g, c.width, c.height, k);
   const tous = INKS[inkKey()] || [];                                       /* les objets cachent les traits qui passent derrière ; les textes restent par-dessus */
-  [s => s.t !== "objet" && s.t !== "texte", s => s.t === "objet", s => s.t === "texte"].forEach(f => tous.filter(f).forEach(s => drawStroke(g, s, c.width, c.height, k)));
+  [s => s.t !== "objet" && s.t !== "texte", s => s.t === "objet", s => s.t === "texte"].forEach((f, i) => { tous.filter(f).forEach(s => drawStroke(g, s, c.width, c.height, k));
+    if (i === 0 && RD.wb && /^iso/.test(wbBg())) croisementsIso(g, tous, c.width, c.height, k); });
   if (window.SELM && SELM.length){ g.save(); g.setLineDash([6 * k, 4 * k]); g.lineWidth = 1.6 * k; g.strokeStyle = "#2a7bcf";
     let T = null; SELM.forEach(o => { if (!strokes().includes(o)) return; const b = boiteDe(o, c.width, c.height); if (!b) return;
       T = T ? [Math.min(T[0], b[0]), Math.min(T[1], b[1]), Math.max(T[2], b[2]), Math.max(T[3], b[3])] : b.slice();
