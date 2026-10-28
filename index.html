@@ -2984,7 +2984,8 @@ function ouvrirTexte(cx, cy, q, bw, bh, ex){
       redrawInk(); return; }
     if (ok && txt){ const s = { c:col, hl:false, w:4, t:"texte", lig, txt, p:[q, q], bw:bw / c.getBoundingClientRect().width, f:TX.f, fs:TX.fs, b:TX.b, i:TX.i };
       mesurerTexte(s); snapInk(key); (INKS[key] = INKS[key] || []).push(s); SEL.s = s; redrawInk(); } };
-  ta.onkeydown = e => { e.stopPropagation(); if (e.key === "Escape"){ e.preventDefault(); fin(false); } else if (e.key === "Enter" && !e.shiftKey && (!lig || e.ctrlKey || e.metaKey)){ e.preventDefault(); fin(true); } };
+  ta.onkeydown = e => { e.stopPropagation(); if (e.key === "Escape"){ e.preventDefault(); fin(false); } else if (e.key === "Enter" && (e.ctrlKey || e.metaKey)){ e.preventDefault(); fin(true); } };   /* Entrée = nouvelle ligne; Ctrl+Entrée ou toucher à côté = terminé */
+  if (!lig) ta.oninput = () => { if (ta.scrollHeight > ta.clientHeight){ ta.style.height = ta.scrollHeight + 4 + "px"; } };   /* la case grandit avec les lignes */
   if (lig) ta.oninput = () => { ta.style.height = "auto"; ta.style.height = Math.max(bh, Math.ceil(ta.scrollHeight / hL) * hL) + "px"; };   /* feuille lignée : Entrée passe à la ligne suivante, la zone grandit ; Ctrl+Entrée ou un clic ailleurs valide */
   ta.onblur = () => fin(true);
   $("#reader").appendChild(ta); setTimeout(() => { ta.focus(); }, 0);

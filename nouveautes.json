@@ -170,6 +170,7 @@
   "texte": "Une seule ligne d'outils, plus simple pour débuter. Nouveau : le bouton Objets a trois onglets — Formes (utiles en classe), Iso (plomberie) et Électricité (symboles).",
   "formation": [
    "Nouveau : la touche Suppr efface ce qui est choisi (forme, objet, symbole, texte). La gomme a sa glissière de taille. Le bouton plein écran est dans la barre du tableau blanc. Ta couleur personnalisée est retenue. Avec l'outil Fil, les symboles ne bougent plus par accident. En glissant un objet de la palette, tu le vois déjà à sa place.",
+   "Dans une case de texte, Entrée change de ligne (la case grandit). Pour terminer : touche à côté, change d'outil ou fais Ctrl+Entrée. Échap annule.",
    "Textes : touche un texte (même sans outil choisi) pour le choisir, glisse-le pour le déplacer, double-clic pour le modifier, Suppr pour l'effacer. Après avoir écrit un texte, Ctrl+Z, Suppr et les autres raccourcis marchent tout de suite.",
    "Crayon plus fiable : un seul toucher l'active toujours, même si une forme ou un objet est choisi (la couleur touchée ensuite recolore cet objet, puis le crayon écrit dans cette couleur). Le trait est lissé et ne saccade plus quand on écrit plusieurs traits de suite.",
    {
@@ -250,6 +251,10 @@
    "Le crayon réagit maintenant tout de suite : seul le trait en cours est redessiné pendant que tu écris, le reste du tableau ne bouge pas."
   ],
   "versions": [
+   {
+    "date": "2026-10-28",
+    "texte": "Texte : Entrée change de ligne."
+   },
    {
     "date": "2026-10-28",
     "texte": "Corrigé : le clavier restait pris dans la case de texte; un texte se choisit sans outil; le symbole « terre » se choisit d'un clic."
