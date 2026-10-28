@@ -4056,7 +4056,7 @@ $("#timerTime").title = "Double-clic pour changer le temps";
 $("#tmReset").onclick = () => { TM.run = false; clearInterval(TM.id); TM.left = TM.secs; tmRender(); };
 
 /* ---- État des outils ---- */
-function refreshTools(){ if (!RD.text) document.querySelectorAll(".inktxt").forEach(t => t.blur());   /* quitter l'outil Texte termine la case en cours */
+function refreshTools(){ try { if (window.majPopGomme) majPopGomme(); } catch(e){} { const t = $("#toast"); if (t && !t.hidden && /^Aucun outil choisi/.test(t.textContent) && (RD.eraser || RD.text || RD.obj || !RD.crayonOff)) t.hidden = true; }   /* l'avis « Aucun outil » disparaît dès qu'un outil est choisi */   /* fenêtre et cercle de la gomme suivent l'outil */ if (!RD.text) document.querySelectorAll(".inktxt").forEach(t => t.blur());   /* quitter l'outil Texte termine la case en cours */
   try { majCurseur(); } catch(e){}
   const drawing = RD.pen || RD.wb;
   $("#tbPen").classList.toggle("on", RD.pen);
@@ -4439,8 +4439,18 @@ $("#penE").onclick = () => { RD.eraser = !RD.eraser; if (RD.eraser){ RD.text = f
   const inp = pg.querySelector("input"), cer = pg.querySelector("circle"), val = pg.querySelector("b");
   const maj = () => { inp.value = RD.gommeT; cer.setAttribute("r", Math.min(20, 3 + RD.gommeT * 3)); val.textContent = "× " + String(RD.gommeT).replace(".", ","); };
   inp.addEventListener("input", () => { RD.gommeT = +inp.value; try { localStorage.setItem("gommeTaille", RD.gommeT); } catch(e){} maj(); });
-  window.majPopGomme = () => { pg.hidden = !RD.eraser; maj(); };
-  document.addEventListener("pointerdown", e => { if (!pg.hidden && !bar.contains(e.target)) pg.hidden = true; }, true);
+  window.majPopGomme = () => { pg.hidden = !RD.eraser; maj(); try { majGommeCur(); } catch(e){} };
+  /* la fenêtre reste ouverte tant que la gomme est active (avant : elle se fermait au premier coup de gomme) */
+  /* cercle sous la souris : la vraie taille de la gomme */
+  const cur = document.createElement("div"); cur.id = "gommeCur"; cur.hidden = true;
+  cur.style.cssText = "position:fixed;z-index:90;pointer-events:none;border-radius:50%;border:2px solid rgba(20,20,20,.75);box-shadow:0 0 0 1.5px rgba(255,255,255,.9),inset 0 0 0 1.5px rgba(255,255,255,.9);transform:translate(-50%,-50%)";
+  document.body.appendChild(cur); let dern = null;
+  const placer = (x, y) => { const c = $("#inkCanvas"), r = c.getBoundingClientRect(), d = Math.max(6, 2 * rayonGomme() * r.height); cur.style.width = cur.style.height = d + "px"; cur.style.left = x + "px"; cur.style.top = y + "px"; };
+  const c0 = $("#inkCanvas");
+  c0.addEventListener("pointermove", e => { dern = [e.clientX, e.clientY]; if (RD.eraser && (RD.pen || RD.wb)){ cur.hidden = false; placer(e.clientX, e.clientY); } else cur.hidden = true; });
+  c0.addEventListener("pointerleave", () => { cur.hidden = true; });
+  inp.addEventListener("input", () => { if (dern && RD.eraser){ cur.hidden = false; placer(dern[0], dern[1]); } });
+  window.majGommeCur = () => { if (!RD.eraser) cur.hidden = true; };
   maj();
 })();
 $("#penO").onclick = () => { RD.obj = !RD.obj; if (RD.obj){ RD.text = false; RD.eraser = false; RD.objTab = null; RD.formeK = null; RD.objKi = null; RD.objKe = null; SELO.s = null; }
