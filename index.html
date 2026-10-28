@@ -2459,6 +2459,9 @@ function dessinerForme(g, s, x1, y1, x2, y2, k, col){
   if (t === "fleche2"){ g.moveTo(x1, y1); g.lineTo(x2, y2); tete(x1, y1, x2, y2); tete(x2, y2, x1, y1); }
   else if (t === "cote"){
     { const an0 = Math.atan2(y2 - y1, x2 - x1), off = (s.d || 0) * (g.canvas ? g.canvas.height : 0), ox = -Math.sin(an0) * off, oy = Math.cos(an0) * off;
+      if (s.txt){ const tz = s.tz || 1; g.save(); g.fillStyle = col; g.font = "700 " + Math.round(16 * k * tz) + "px system-ui, sans-serif"; g.textAlign = "center"; g.textBaseline = "middle";   /* texte sur un côté (sans ligne de cote) */
+        const tx = s.lb || "?", tw = g.measureText(tx).width, th = 16 * k * tz, sg = Math.sign(off) || 1, ux = -Math.sin(an0) * sg, uy = Math.cos(an0) * sg, ext = Math.abs(ux) * tw / 2 + Math.abs(uy) * th / 2;   /* le texte ne touche jamais le côté */
+        g.fillText(tx, (x1 + x2) / 2 + ux * (Math.abs(off) + ext), (y1 + y2) / 2 + uy * (Math.abs(off) + ext)); g.restore(); return; }
       if (Math.abs(off) > 2){ const sg = Math.sign(off), ux = -Math.sin(an0) * sg, uy = Math.cos(an0) * sg, gap = 4 * k, dep = 8 * k;   /* lignes de rappel */
         g.save(); g.lineWidth = Math.max(1, lw * .5); g.beginPath();
         [[x1, y1], [x2, y2]].forEach(([x, y]) => { g.moveTo(x + ux * gap, y + uy * gap); g.lineTo(x + ox + ux * dep, y + oy + uy * dep); }); g.stroke(); g.restore(); g.beginPath(); }
@@ -2614,7 +2617,7 @@ const VALEURS_FORME = {
   bulle:{ q:"Numéro ou lettre de la bulle", ex:"A" } };
 function modifierForme(s, cx, cy){
   const V = s.t === "objet" ? (s.k === "jonction" ? null : ELEC[s.k] ? (s.k === "rails" ? { q:"Nom des rails (ex. L1 / L2, 120 V)", ex:"L1 / L2" } : { q:"Repère du symbole (ex. CR1, M, PB2)", ex:"CR1" }) : { q:"Nom de l'objet (ex. P-1, Chaudière 1)", ex:"P-1" })
-    : (VALEURS_FORME[s.t] || (/^tuy/.test(s.t) ? { q:"Diamètre du tuyau (ex. 3/4 po, 3 po ABS)", ex:"3/4 po" } : { q:"Étiquette affichée sur la forme (laisse vide pour l'enlever)", ex:"A" }));
+    : ((s.t === "cote" && s.txt ? { q:"Texte sur ce côté (ex. a, 3 m, hypoténuse)", ex:"a" } : VALEURS_FORME[s.t]) || (/^tuy/.test(s.t) ? { q:"Diamètre du tuyau (ex. 3/4 po, 3 po ABS)", ex:"3/4 po" } : { q:"Étiquette affichée sur la forme (laisse vide pour l'enlever)", ex:"A" }));
   if (!V) return;
   const old = document.getElementById("formeVal"); if (old) old.remove();
   const box = document.createElement("div"); box.id = "formeVal";
@@ -2627,9 +2630,10 @@ function modifierForme(s, cx, cy){
     r.querySelector("input").value = s[cle] || ""; box.appendChild(r); });
   if (s.t !== "bulle" && !(s.t === "objet" && ELEC[s.k])) tailleTexte(box, s);
   if (s.t === "cote" || (s.t !== "objet" && !VALEURS_FORME[s.t]) || (s.t === "objet" && !ELEC[s.k])) padCote(box, s);
-  if (cotesPossibles(s)){ const bp = document.createElement("button"); bp.type = "button"; bp.dataset.plus = "1"; bp.textContent = s.t === "cote" ? "+ Cote sur un autre côté" : "+ Ajouter une cote";
-    bp.title = "Ajoute une cote sur le côté suivant de la forme"; bp.style.cssText = "width:100%;margin-top:10px;min-height:40px;border-radius:9px;border:1px solid #6aa9ff;border-bottom-width:4px;background:#1f6fc2;color:#fff;font:800 .9rem system-ui;cursor:pointer";
-    bp.addEventListener("mousedown", e => e.preventDefault()); box.appendChild(bp); }
+  if (cotesPossibles(s)){ const rang = document.createElement("div"); rang.style.cssText = "display:flex;gap:6px;margin-top:10px";
+    const st = "flex:1;min-height:40px;border-radius:9px;border:1px solid #6aa9ff;border-bottom-width:4px;color:#fff;font:800 .85rem system-ui;cursor:pointer;padding:0 6px";
+    rang.innerHTML = '<button type="button" data-plus="txt" title="Ajoute un texte (a, b, c…) sur le côté suivant de la forme" style="' + st + ';background:#1f6fc2">+ Texte sur un côté</button><button type="button" data-plus="cote" title="Ajoute une ligne de cote sur le côté suivant" style="' + st + ';background:#2a2a30">+ Cote</button>';
+    rang.addEventListener("mousedown", e => e.preventDefault()); box.appendChild(rang); }
   glisserCase(box);
   $("#reader").appendChild(box); placerCase(box, s, cx, cy);   /* la case se met à côté de l'objet, jamais dessus */
   const inp = box.querySelector("input"); inp.value = actuel; setTimeout(() => { inp.focus(); inp.select(); }, 30);
@@ -2646,7 +2650,7 @@ function modifierForme(s, cx, cy){
     redrawInk(); try { majObjUI(); } catch(e){} };
   inp.addEventListener("keydown", e => { e.stopPropagation(); if (e.key === "Enter"){ e.preventDefault(); fin(true); } else if (e.key === "Escape"){ e.preventDefault(); fin(false); } });
   box.querySelector("button").onclick = () => fin(true);
-  { const bp = box.querySelector("[data-plus]"); if (bp) bp.onclick = () => { fin(true); ajouterCote(s); }; }
+  box.querySelectorAll("[data-plus]").forEach(bp => bp.onclick = () => { fin(true); ajouterCote(s, bp.dataset.plus === "txt"); });
   const quitte = () => setTimeout(() => { if (!box.contains(document.activeElement)) fin(true); }, 150);   /* on peut passer d'une case à l'autre */
   inp.addEventListener("blur", quitte);
   box.querySelectorAll("[data-cle]").forEach(i => { i.addEventListener("blur", quitte); i.addEventListener("keydown", e => { e.stopPropagation(); if (e.key === "Enter"){ e.preventDefault(); fin(true); } else if (e.key === "Escape"){ e.preventDefault(); fin(false); } }); }); }
@@ -2673,18 +2677,19 @@ function sommetsForme(s){ if (!s || !s.p || s.p.length < 2) return null; const [
   return null; }
 const cotesPossibles = s => s.t === "cote" || !!sommetsForme(s);
 /* + : une cote sur le prochain côté qui n'en a pas (pour une cote : sur un autre côté de la même forme) */
-function ajouterCote(s){
+function ajouterCote(s, txt){
   const c = $("#inkCanvas"), W = c.width, H = c.height, pres = (u, v) => Math.hypot((u[0] - v[0]) * W, (u[1] - v[1]) * H) < 4;
   const arcs = f => { const S = sommetsForme(f); if (!S) return []; const A = []; for (let i = 0; i < S.P.length - (S.ferme ? 0 : 1); i++) A.push([S.P[i], S.P[(i + 1) % S.P.length]]); return A; };
   let f = s;
   if (s.t === "cote") f = strokes().find(o => o !== s && o.t !== "cote" && arcs(o).some(([u, v]) => (pres(u, s.p[0]) && pres(v, s.p[1])) || (pres(v, s.p[0]) && pres(u, s.p[1]))));
   if (!f){ aviser("Pour une autre cote, double-clique sur la forme elle-même.", 3500); return; }
-  const cotes = strokes().filter(o => o.t === "cote"), libre = arcs(f).find(([u, v]) => !cotes.some(o => (pres(u, o.p[0]) && pres(v, o.p[1])) || (pres(v, o.p[0]) && pres(u, o.p[1]))));
-  if (!libre){ aviser("Tous les côtés de cette forme ont déjà une cote.", 3000); return; }
+  const cotes = strokes().filter(o => o.t === "cote" && !!o.txt === !!txt), libre = arcs(f).find(([u, v]) => !cotes.some(o => (pres(u, o.p[0]) && pres(v, o.p[1])) || (pres(v, o.p[0]) && pres(u, o.p[1]))));
+  if (!libre){ aviser(txt ? "Tous les côtés de cette forme ont déjà un texte." : "Tous les côtés de cette forme ont déjà une cote.", 3000); return; }
   const S = sommetsForme(f), Cx = S.P.reduce((t, q) => t + q[0], 0) / S.P.length * W, Cy = S.P.reduce((t, q) => t + q[1], 0) / S.P.length * H;
   const [u, v] = libre, an = Math.atan2((v[1] - u[1]) * H, (v[0] - u[0]) * W), nx = -Math.sin(an), ny = Math.cos(an), mx = (u[0] + v[0]) / 2 * W, my = (u[1] + v[1]) / 2 * H;
   const sg = S.ferme ? (Math.sign(nx * (mx - Cx) + ny * (my - Cy)) || 1) : (ny > 0 ? -1 : 1), ec = 30 * RD.z * (window.devicePixelRatio || 1);
-  snapInk(); const n = { t:"cote", c:f.c && !/^tuy|^maison/.test(f.t) ? f.c : "#24282c", hl:false, hc:null, w:2.5, p:[u.slice(), v.slice()], d:sg * ec / H };
+  snapInk(); const n = { t:"cote", c:f.c && !/^tuy|^maison/.test(f.t) ? f.c : "#24282c", hl:false, hc:null, w:2.5, p:[u.slice(), v.slice()], d:sg * (txt ? ec * .3 : ec) / H };
+  if (txt){ n.txt = 1; n.lb = "abcdefgh"[arcs(f).findIndex(([a2, b2]) => pres(a2, u) && pres(b2, v))] || "a"; }
   strokes().push(n); SELO.s = n; redrawInk(); try { majObjUI(); } catch(e){}
   const r = c.getBoundingClientRect(); modifierForme(n, r.left + mx * r.width / W, r.top + my * r.height / H); }
 /* la case du double-clic se déplace en la glissant par sa barre du haut (pour voir l'objet dessous) */

@@ -152,7 +152,7 @@
   "formation": [
    "Nouveau : la touche Suppr efface ce qui est choisi (forme, objet, symbole, texte). La gomme a sa glissière de taille. Le bouton plein écran est dans la barre du tableau blanc. Ta couleur personnalisée est retenue. Avec l'outil Fil, les symboles ne bougent plus par accident. En glissant un objet de la palette, tu le vois déjà à sa place.",
    {
-    "t": "Plusieurs cotes sur une forme : double-clic sur la forme (ou sur une de ses cotes), puis « + Ajouter une cote » : la cote se place à l'extérieur du côté suivant. La case du double-clic se met maintenant à côté de l'objet, jamais dessus.",
+    "t": "Texte sur les côtés d'une forme : double-clic sur la forme, puis « + Texte sur un côté » (a, b, c… sur chaque côté, toujours à l'extérieur; double-clic sur un texte pour l'écrire, A−/A+ pour sa taille, flèches pour le déplacer). « + Cote » ajoute plutôt une ligne de cote. La case du double-clic se met à côté de l'objet, jamais dessus.",
     "img": "nouveautes/cotes-plus.jpg"
    },
    "À chaque ouverture du tableau blanc, aucun outil n'est choisi : touche une forme ou un objet pour le choisir (la palette Objets s'ouvre), ou touche le crayon pour écrire.",
@@ -225,6 +225,10 @@
    "Le crayon réagit maintenant tout de suite : seul le trait en cours est redessiné pendant que tu écris, le reste du tableau ne bouge pas."
   ],
   "versions": [
+   {
+    "date": "2026-10-28",
+    "texte": "« + Texte sur un côté » : écrire a, b, hypoténuse… sur chaque côté d'une forme."
+   },
    {
     "date": "2026-10-28",
     "texte": "Bouton + pour plusieurs cotes; la case du double-clic ne cache plus l'objet."
