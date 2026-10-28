@@ -2391,11 +2391,79 @@ const FORMES = {
   plLav:{ n:"Lavabo", pl:1 }, plWC:{ n:"Toilette", pl:1 }, plBain:{ n:"Baignoire", pl:1 }, plEvier:{ n:"Évier", pl:1 }, plLaveuse:{ n:"Laveuse", pl:1 }
 };
 /* taille d'un simple clic (px à 100 %), centrée sur le clic */
-const FORMES_TAILLE = { maison:[560, 420], plCE:[64, 120], plCF:[150, 56], plCC:[150, 56], plCompteur:[56, 40], plVanne:[56, 36], plClapet:[56, 36], plTe:[44, 36], plCoude:[40, 40], plSiphon:[60, 50], plAvaloir:[50, 34],
+const FORMES_TAILLE = { maison:[960, 720], plCE:[64, 120], plCF:[150, 56], plCC:[150, 56], plCompteur:[56, 40], plVanne:[56, 36], plClapet:[56, 36], plTe:[44, 36], plCoude:[40, 40], plSiphon:[60, 50], plAvaloir:[50, 34],
   plLav:[80, 90], plWC:[84, 96], plBain:[190, 70], plEvier:[130, 90], plLaveuse:[84, 96] };
 const COUL_TUY = { tuyEF:"#1c7ed6", tuyEC:"#e03131", tuyDR:"#2f9e44", tuyEV:"#2f9e44", tuyGZ:"#d9a400" };
 /* dessin des éléments de plomberie, dans la boîte [xa, ya, xb, yb] */
-function dessinerPlomb(g, s, x1, y1, x2, y2, k, col){
+/* géométrie commune de la maison en coupe (dessin et raccords) */
+function geoMaison(xa, ya, w, h){ const tw = w * .03, yb = ya + h;
+  return { tw, roofT:ya, roofB:ya + h * .045, yEt:ya + h * .36, yRdc:ya + h * .64, ySol:ya + h * .70, slabT:yb - h * .035, fT:h * .025, yb,
+    eau:[xa + tw, ya + h * .70 + (h * .265) * .35], egout:[xa + w - tw, yb - h * .07], event:[xa + w * .72, ya + h * .045] }; }
+function dessinerMaison(g, xa, ya, w, h, k){
+  const G = geoMaison(xa, ya, w, h), xb = xa + w, yb = ya + h, { tw, fT } = G, L = "#4a4f55";
+  const R = (x, y, ww, hh, fill) => { g.beginPath(); g.rect(x, y, ww, hh); if (fill){ g.fillStyle = fill; g.fill(); } g.strokeStyle = L; g.lineWidth = Math.max(1, 1.2 * k); g.stroke(); };
+  const pts = (x, y, ww, hh, n, c2) => { g.fillStyle = c2; for (let i = 0; i < n; i++){ const fx = (Math.sin(i * 12.9898) * 43758.5453) % 1, fy = (Math.sin(i * 78.233) * 12345.678) % 1; g.fillRect(x + Math.abs(fx) * ww, y + Math.abs(fy) * hh, 1.6 * k, 1.6 * k); } };
+  const tx = (txt, x, y, taille, c2, al) => { g.save(); g.fillStyle = c2; g.font = "700 " + Math.round(taille) + "px system-ui, sans-serif"; g.textAlign = al || "center"; g.textBaseline = "middle"; g.fillText(txt, x, y); g.restore(); };
+  /* terrain : terre, gazon */
+  const ext = w * .16;
+  [[xa - ext, ext], [xb, ext]].forEach(([x, ww]) => { g.fillStyle = "rgba(176,132,84,.38)"; g.fillRect(x, G.ySol, ww, yb - G.ySol); pts(x, G.ySol + 4 * k, ww, yb - G.ySol - 6 * k, 60, "rgba(110,78,44,.55)"); });
+  g.save(); g.strokeStyle = "#3f9b45"; g.lineWidth = 3 * k; g.beginPath(); g.moveTo(xa - ext, G.ySol); g.lineTo(xa, G.ySol); g.moveTo(xb, G.ySol); g.lineTo(xb + ext, G.ySol); g.stroke();
+  for (let x = xa - ext + 3 * k; x < xa - 2 * k; x += 7 * k){ g.beginPath(); g.moveTo(x, G.ySol); g.lineTo(x + 2 * k, G.ySol - 5 * k); g.stroke(); }
+  for (let x = xb + 3 * k; x < xb + ext - 2 * k; x += 7 * k){ g.beginPath(); g.moveTo(x, G.ySol); g.lineTo(x + 2 * k, G.ySol - 5 * k); g.stroke(); } g.restore();
+  /* intérieur clair */
+  g.fillStyle = "rgba(255,252,245,.85)"; g.fillRect(xa + tw, G.roofB, w - 2 * tw, G.slabT - G.roofB);
+  /* fondation : semelles, dalle, murs de béton */
+  const beton = "#cfd2d6";
+  R(xa - tw, yb - h * .06, tw * 3, h * .06, beton); R(xb - tw * 2, yb - h * .06, tw * 3, h * .06, beton);
+  R(xa, G.slabT, w, yb - G.slabT, beton); pts(xa, G.slabT, w, yb - G.slabT, 80, "#8d939a");
+  R(xa, G.yRdc, tw, G.slabT - G.yRdc, beton); R(xb - tw, G.yRdc, tw, G.slabT - G.yRdc, beton);
+  pts(xa, G.yRdc, tw, G.slabT - G.yRdc, 25, "#8d939a"); pts(xb - tw, G.yRdc, tw, G.slabT - G.yRdc, 25, "#8d939a");
+  /* murs à ossature (isolant rose) */
+  [[xa], [xb - tw]].forEach(([x]) => { R(x, G.roofB, tw, G.yRdc - G.roofB, "#efdcbc");
+    g.save(); g.strokeStyle = "#e58fa6"; g.lineWidth = Math.max(1, 1.1 * k); g.beginPath(); const z = tw * .32;
+    for (let y = G.roofB + 2 * k, i = 0; y < G.yRdc - 2 * k; y += 5 * k, i++) g.lineTo(x + tw / 2 + (i % 2 ? z : -z), y); g.stroke(); g.restore(); });
+  /* planchers (solives) */
+  [G.yEt, G.yRdc].forEach(y => { R(xa + tw, y, w - 2 * tw, fT, "#ddb98a"); g.save(); g.strokeStyle = "rgba(120,80,40,.6)"; g.lineWidth = Math.max(1, k); g.beginPath();
+    for (let x = xa + tw + w * .03; x < xb - tw; x += w * .04){ g.moveTo(x, y + 1.5 * k); g.lineTo(x, y + fT - 1.5 * k); } g.stroke(); g.restore(); });
+  /* toit plat : isolant et membrane */
+  R(xa - tw * .6, G.roofT, w + tw * 1.2, G.roofB - G.roofT, "#a7b0ba"); g.save(); g.strokeStyle = "#2f3337"; g.lineWidth = 2.5 * k; g.beginPath(); g.moveTo(xa - tw * .6, G.roofT); g.lineTo(xb + tw * .6, G.roofT); g.stroke(); g.restore();
+  /* fenêtres */
+  const vitre = (x, y, hh) => { R(x, y, tw, hh, "#bfe3f7"); g.save(); g.strokeStyle = "#7fb6d6"; g.lineWidth = Math.max(1, k); g.beginPath(); g.moveTo(x + tw / 2, y + 2 * k); g.lineTo(x + tw / 2, y + hh - 2 * k); g.stroke(); g.restore(); };
+  [[G.roofB, G.yEt], [G.yEt + fT, G.yRdc]].forEach(([y0, y1]) => { const hh = (y1 - y0) * .38, y = y0 + (y1 - y0) * .28; vitre(xa, y, hh); vitre(xb - tw, y, hh); });
+  vitre(xa, G.yRdc + fT + 2 * k, G.ySol - G.yRdc - fT - 4 * k);
+  /* escaliers */
+  const esc = (x0, y0, x1, y1) => { const n = 9, dx = (x1 - x0) / n, dy = (y1 - y0) / n; g.save(); g.strokeStyle = "#8a8f96"; g.lineWidth = Math.max(1, 1.2 * k); g.beginPath(); g.moveTo(x0, y0);
+    for (let i = 0; i < n; i++){ g.lineTo(x0 + dx * i, y0 + dy * (i + 1)); g.lineTo(x0 + dx * (i + 1), y0 + dy * (i + 1)); } g.moveTo(x0, y0); g.lineTo(x1, y1); g.stroke(); g.restore(); };
+  esc(xa + w * .1, G.slabT, xa + w * .3, G.yRdc); esc(xa + w * .1, G.yRdc, xa + w * .3, G.yEt);
+  /* niveaux */
+  [["Étage", G.roofB], ["Rez-de-chaussée", G.yEt + fT], ["Sous-sol", G.yRdc + fT]].forEach(([n, y]) => tx(n, xb - tw - 8 * k, y + 13 * k, 12 * k, "#5b6168", "right"));
+  /* services : entrée d'eau (aqueduc), égout, évent sur le toit */
+  g.save(); g.lineCap = "round";
+  g.strokeStyle = COUL_TUY.tuyEF; g.lineWidth = 4.5 * k; g.beginPath(); g.moveTo(xa - ext * .85, G.eau[1]); g.lineTo(G.eau[0], G.eau[1]); g.stroke();
+  g.strokeStyle = COUL_TUY.tuyDR; g.lineWidth = 7 * k; g.beginPath(); g.moveTo(G.egout[0], G.egout[1]); g.lineTo(xb + ext * .85, G.egout[1]); g.stroke();
+  g.lineWidth = 4 * k; g.setLineDash([8 * k, 5 * k]); g.beginPath(); g.moveTo(G.event[0], G.roofT); g.lineTo(G.event[0], G.roofT - h * .05); g.stroke(); g.restore();
+  tx("Aqueduc", xa - ext * .5, G.eau[1] - 11 * k, 11 * k, COUL_TUY.tuyEF); tx("Égout", xb + ext * .5, G.egout[1] - 12 * k, 11 * k, COUL_TUY.tuyDR); tx("Évent", G.event[0] + 26 * k, G.roofT - h * .03, 10 * k, COUL_TUY.tuyDR);
+}
+/* raccords des appareils : [type, fx, fy] dans la boîte (EF, EC, DR = drain, EV = évent, * = tous) */
+const PORTS_PL = {
+  plCE:[["EF", .3, 0], ["EC", .7, 0]], plCF:[["EF", 0, .32], ["EF", .25, 1], ["EF", .45, 1], ["EF", .65, 1], ["EF", .85, 1]], plCC:[["EC", 0, .32], ["EC", .25, 1], ["EC", .45, 1], ["EC", .65, 1], ["EC", .85, 1]],
+  plCompteur:[["*", 0, .5], ["*", 1, .5]], plVanne:[["*", 0, .65], ["*", 1, .65]], plClapet:[["*", 0, .5], ["*", 1, .5]], plTe:[["*", 0, .3], ["*", 1, .3], ["*", .5, 1]], plCoude:[["*", 0, .3], ["*", .5, 1]],
+  plSiphon:[["DR", .22, 0], ["DR", 1, .38]], plAvaloir:[["DR", .5, 1]],
+  plLav:[["EF", .38, .66], ["EC", .62, .66], ["DR", .5, 1]], plWC:[["EF", 1, .3], ["DR", .6, 1]], plBain:[["EF", 0, .38], ["EC", 0, .55], ["DR", .14, 1]],
+  plEvier:[["EF", .3, 1], ["EC", .7, 1], ["DR", .5, 1]], plLaveuse:[["EF", .25, 0], ["EC", .45, 0], ["DR", .8, 0]], maison:[] };
+/* taille réelle (m) des appareils posés dans une maison en coupe; SOL_PL = posé sur le plancher */
+const DIM_PL = { plLav:[.55, .9], plWC:[.7, .8], plBain:[1.5, .6], plEvier:[.9, 1.15], plLaveuse:[.7, .95], plCE:[.56, 1.5], plCF:[.6, .3], plCC:[.6, .3], plCompteur:[.3, .2], plVanne:[.25, .18], plClapet:[.25, .18], plTe:[.2, .15], plCoude:[.18, .18], plSiphon:[.3, .28], plAvaloir:[.25, .17] };
+const SOL_PL = /^(plLav|plWC|plBain|plEvier|plLaveuse|plCE|plAvaloir)$/;
+function portsPlomb(s, W, H){ if (!PORTS_PL[s.t] || !s.p || s.p.length < 2) return [];
+  const xa = Math.min(s.p[0][0], s.p[1][0]) * W, xb = Math.max(s.p[0][0], s.p[1][0]) * W, ya = Math.min(s.p[0][1], s.p[1][1]) * H, yb = Math.max(s.p[0][1], s.p[1][1]) * H;
+  if (s.t === "maison"){ const G = geoMaison(xa, ya, xb - xa, yb - ya); return [{ ty:"EF", x:G.eau[0], y:G.eau[1] }, { ty:"DR", x:G.egout[0], y:G.egout[1] }, { ty:"EV", x:G.event[0], y:G.event[1] }]; }
+  return PORTS_PL[s.t].map(([ty, fx, fy]) => ({ ty, x:xa + (xb - xa) * fx, y:ya + (yb - ya) * fy })); }
+const portCompat = (pt, ty) => !ty || pt === "*" || pt === ty || (ty === "EV" && pt === "DR") || (ty === "DR" && pt === "EV");
+/* points de raccord visibles quand l'onglet Plomberie est ouvert */
+function dessinerPorts(g, s, k){ const c = $("#inkCanvas"), ty = RD.formeK && /^tuy/.test(RD.formeK) ? RD.formeK.slice(3) : null, CO = { EF:COUL_TUY.tuyEF, EC:COUL_TUY.tuyEC, DR:COUL_TUY.tuyDR, EV:COUL_TUY.tuyDR, "*":"#6b7280" };
+  portsPlomb(s, c.width, c.height).forEach(pt => { const ok = ty && portCompat(pt.ty, ty), r = (ok ? 6 : 4) * k; g.save(); g.beginPath(); g.arc(pt.x, pt.y, r, 0, Math.PI * 2); g.fillStyle = "#fff"; g.fill(); g.lineWidth = (ok ? 3 : 2) * k; g.strokeStyle = CO[pt.ty]; g.stroke(); g.restore(); }); }
+function dessinerPlomb(g, s, x1, y1, x2, y2, k, col){ dessinerPlomb0(g, s, x1, y1, x2, y2, k, col); if (RD.obj && RD.objTab === "plomb" && PORTS_PL[s.t] && g.canvas === $("#inkCanvas")) dessinerPorts(g, s, k); }
+function dessinerPlomb0(g, s, x1, y1, x2, y2, k, col){
   const t = s.t, xa = Math.min(x1, x2), xb = Math.max(x1, x2), ya = Math.min(y1, y2), yb = Math.max(y1, y2), w = xb - xa, h = yb - ya, lw0 = g.lineWidth;
   const tx = (txt, x, y, taille, c2, al) => { g.save(); g.fillStyle = c2 || col; g.font = "700 " + Math.round(taille) + "px system-ui, sans-serif"; g.textAlign = al || "center"; g.textBaseline = "middle"; g.fillText(txt, x, y); g.restore(); };
   g.save(); g.lineCap = "round"; g.lineJoin = "round"; g.strokeStyle = col;
@@ -2413,18 +2481,7 @@ function dessinerPlomb(g, s, x1, y1, x2, y2, k, col){
   const tuyau = (c2, ...pts) => { g.save(); g.strokeStyle = c2; g.lineWidth = Math.max(2.5 * k, lw0 * .8); Ln(...pts); g.restore(); };
   const vanne = (x, y, r, vert) => { g.beginPath(); if (vert){ g.moveTo(x - r, y - r); g.lineTo(x + r, y + r); g.lineTo(x - r, y + r); g.lineTo(x + r, y - r); } else { g.moveTo(x - r, y - r); g.lineTo(x + r, y + r); g.lineTo(x + r, y - r); g.lineTo(x - r, y + r); } g.closePath(); g.save(); g.fillStyle = "#fff"; g.fill(); g.restore(); g.stroke(); };
   const xm = xa + w / 2, ym = ya + h / 2;
-  if (t === "maison"){
-    const tw = Math.max(6 * k, w * .022), yEt = ya + h * .36, yRdc = ya + h * .64, ySol = ya + h * .7;
-    g.save(); g.globalAlpha = .1; g.fillStyle = "#8b5a2b"; g.fillRect(xa - w * .14, ySol, w * .14, yb - ySol); g.fillRect(xb, ySol, w * .14, yb - ySol); g.restore();   /* terrain */
-    Ln(xa - w * .14, ySol, xa, ySol); Ln(xb, ySol, xb + w * .14, ySol);
-    for (let x = xa - w * .13; x < xa - 4 * k; x += 12 * k) Ln(x, ySol + 3 * k, x + 7 * k, ySol + 10 * k);
-    for (let x = xb + 4 * k; x < xb + w * .13; x += 12 * k) Ln(x, ySol + 3 * k, x + 7 * k, ySol + 10 * k);
-    R(xa - tw, ya, w + 2 * tw, tw * 1.3, .15);                                     /* toit plat */
-    R(xa, ya + tw * 1.3, tw, yb - ya - tw * 1.3, .15); R(xb - tw, ya + tw * 1.3, tw, yb - ya - tw * 1.3, .15);   /* murs */
-    R(xa + tw, yEt, w - 2 * tw, tw * .8, .15); R(xa + tw, yRdc, w - 2 * tw, tw * .8, .15);   /* planchers */
-    R(xa - tw * 1.6, yb - tw, w + 3.2 * tw, tw, .15);                                /* dalle et semelles du sous-sol */
-    tx("Étage", xa + tw + 6 * k, ya + tw * 1.3 + 12 * k, 12 * k, null, "left"); tx("Rez-de-chaussée", xa + tw + 6 * k, yEt + tw + 12 * k, 12 * k, null, "left"); tx("Sous-sol", xa + tw + 6 * k, yRdc + tw + 12 * k, 12 * k, null, "left");
-    tx("Sol", xb + w * .07, ySol - 9 * k, 11 * k); g.restore(); return; }
+  if (t === "maison"){ dessinerMaison(g, xa, ya, w, h, k); g.restore(); return; }
   if (t === "plCE"){ const r0 = Math.min(w * .2, 12 * k); g.beginPath(); g.roundRect ? g.roundRect(xa + w * .1, ya + h * .14, w * .8, h * .86, r0) : g.rect(xa + w * .1, ya + h * .14, w * .8, h * .86); g.stroke();
     tuyau(COUL_TUY.tuyEF, xa + w * .3, ya + h * .14, xa + w * .3, ya); tuyau(COUL_TUY.tuyEC, xa + w * .7, ya + h * .14, xa + w * .7, ya); tx("CE", xm, ya + h * .5, Math.min(w * .32, 16 * k)); }
   else if (t === "plCF" || t === "plCC"){ const cc = t === "plCF" ? COUL_TUY.tuyEF : COUL_TUY.tuyEC, yb0 = ya + h * .32;
@@ -3671,7 +3728,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
       var raz = !!SELO.s; if (SELO.s){ SELO.s = null; majObjUI(); } }
     cur = { c:/^hl/.test(RD.color) ? "#000" : RD.color, hl:/^hl/.test(RD.color), hc:/^hl:/.test(RD.color) ? RD.color.slice(3) : null, w:RD.wPx || WIDTHS[RD.wIdx], p:[q] };
     const forme = RD.obj && RD.formeK ? RD.formeK : RD.shape;
-    if (forme){ cur.t = forme; cur.p = [q, q]; if (/^tuy/.test(forme)){ const q0 = aimanterTuyau(q, null, null); cur.p = [q0, q0.slice()]; } if (RD.obj && RD.formeK && choisir) cur.choisir = choisir; if (RD.obj && RD.formeK && raz && !choisir) cur.raz = true; if (forme === "bulle") cur.n = strokes().filter(x => x.t === "bulle").length + 1; }
+    if (forme){ cur.t = forme; cur.p = [q, q]; if (forme === "maison" || /^pl/.test(forme)) cur.c = "#3b4148";   /* maison et appareils : trait gris foncé */ if (/^tuy/.test(forme)){ const q0 = aimanterTuyau(q, null, null); cur.p = [q0, q0.slice()]; } if (RD.obj && RD.formeK && choisir) cur.choisir = choisir; if (RD.obj && RD.formeK && raz && !choisir) cur.raz = true; if (forme === "bulle") cur.n = strokes().filter(x => x.t === "bulle").length + 1; }
     /* Trait en cours, rapide : on garde une image de tout le reste et, à chaque image, on redessine seulement le trait en cours par-dessus */
     snapInk(); redrawInk();
     if (cur.t || cur.hl){       /* forme ou surligneur : on garde une copie de tout le reste */
@@ -3703,7 +3760,10 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
       o.d = Math.abs(d) < 6 ? 0 : d / H; if (!rafTrait) rafTrait = requestAnimationFrame(() => { rafTrait = 0; redrawInk(); }); return; }
     if (cur.poignee !== undefined){ if (!cur.snap){ snapInk(); cur.snap = true; } cur.s.p[cur.poignee] = /^tuy/.test(cur.s.t) ? aimanterTuyau(pt(e), cur.s.p[1 - cur.poignee], cur.s) : pt(e); if (!rafTrait) rafTrait = requestAnimationFrame(() => { rafTrait = 0; redrawInk(); }); return; }
     if (cur.bouge){ const q = pt(e), dx = q[0] - cur.q0[0], dy = q[1] - cur.q0[1];
-      if (!cur.snap){ if (Math.hypot(e.clientX - cur.x0, e.clientY - cur.y0) < 5) return; snapInk(); cur.snap = true; }
+      if (!cur.snap){ if (Math.hypot(e.clientX - cur.x0, e.clientY - cur.y0) < 5) return; snapInk(); cur.snap = true;
+        if (PORTS_PL[cur.bouge.t]){ const W = c.width, H = c.height, P = portsPlomb(cur.bouge, W, H); cur.liens = [];       /* tuyaux branchés : ils suivent l'appareil */
+          strokes().forEach(o => { if (!/^tuy/.test(o.t || "")) return; o.p.forEach((e, i) => { if (P.some(pt => Math.hypot(pt.x - e[0] * W, pt.y - e[1] * H) < 3)) cur.liens.push([o, i, e.slice()]); }); }); } }
+      if (cur.liens) cur.liens.forEach(([o, i, e]) => { o.p[i] = [e[0] + dx, e[1] + dy]; });
       cur.bouge.p = cur.p0.map(v => [v[0] + dx, v[1] + dy]); if (!rafTrait) rafTrait = requestAnimationFrame(() => { rafTrait = 0; redrawInk(); }); return; }
     if (cur.t){ cur.p[1] = pt(e); if (/^tuy/.test(cur.t)) cur.p[1] = aimanterTuyau(cur.p[1], cur.p[0], cur); }
     else { const evs = (e.getCoalescedEvents && e.getCoalescedEvents()) || []; (evs.length ? evs : [e]).forEach(ev => cur.p.push(pt(ev))); }   /* tous les points du crayon, même entre deux images */
@@ -3722,9 +3782,16 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
       delete cur.raz; }
     const finTrait = cur && cur !== "erase";
     RD.erSnap = false;
-    if (cur && cur !== "erase" && cur.t && FORMES_TAILLE[cur.t]){ const a = cur.p[0], b = cur.p[1]; if (Math.hypot(a[0] - b[0], a[1] - b[1]) < .004){ const r = c.getBoundingClientRect(), [tw, th] = FORMES_TAILLE[cur.t], dx = tw * RD.z / r.width / 2, dy = th * RD.z / r.height / 2; cur.p = [[a[0] - dx, a[1] - dy], [a[0] + dx, a[1] + dy]]; } }
+    if (cur && cur !== "erase" && cur.t && FORMES_TAILLE[cur.t]){ const a = cur.p[0], b = cur.p[1]; if (Math.hypot(a[0] - b[0], a[1] - b[1]) < .004){ const r = c.getBoundingClientRect(), [tw, th] = FORMES_TAILLE[cur.t], dx = tw * RD.z / r.width / 2, dy = th * RD.z / r.height / 2; cur.p = [[a[0] - dx, a[1] - dy], [a[0] + dx, a[1] + dy]];
+      const mz = DIM_PL[cur.t] && strokes().find(o => o.t === "maison" && o !== cur && a[0] >= Math.min(o.p[0][0], o.p[1][0]) && a[0] <= Math.max(o.p[0][0], o.p[1][0]) && a[1] >= Math.min(o.p[0][1], o.p[1][1]) && a[1] <= Math.max(o.p[0][1], o.p[1][1]));
+      if (mz){ const W = c.width, H = c.height, ya = Math.min(mz.p[0][1], mz.p[1][1]), hN = Math.abs(mz.p[1][1] - mz.p[0][1]), ppm = hN * H * .28 / 2.7, [dw, dh] = DIM_PL[cur.t], wN = dw * ppm / W, hh = dh * ppm / H;   /* à l'échelle de la maison */
+        if (SOL_PL.test(cur.t)){ const sols = [ya + hN * .36, ya + hN * .64, ya + hN * (1 - .035)], sol = sols.find(f => f >= a[1] - hh * .25) || sols[2], bas = cur.t === "plAvaloir" ? sol + hh * .65 : sol;   /* posé sur le plancher en dessous */
+          cur.p = [[a[0] - wN / 2, bas - hh], [a[0] + wN / 2, bas]]; }
+        else cur.p = [[a[0] - wN / 2, a[1] - hh / 2], [a[0] + wN / 2, a[1] + hh / 2]]; } } }
     if (cur && cur !== "erase" && cur.t && FORMES_CLIC[cur.t]){ const a = cur.p[0], b = cur.p[1]; if (Math.hypot(a[0] - b[0], a[1] - b[1]) < .004){ const d = FORMES_CLIC[cur.t]; cur.p[1] = cur.t === "bulle" || cur.t === "cercle" ? [a[0] + d, a[1]] : [a[0] + d, a[1] + d * 1.6]; } }
     if (cur && cur !== "erase" && cur.t){ const a = cur.p[0], b = cur.p[1]; if (Math.hypot(a[0] - b[0], a[1] - b[1]) < .004){ const arr = strokes(), i = arr.indexOf(cur); if (i >= 0){ arr.splice(i, 1); (UNDO[inkKey()] || []).pop(); } redrawInk(); } }
+    if (cur && cur !== "erase" && cur.t && /^tuy/.test(cur.t) && strokes().includes(cur)){ const [a, b] = cur.p, dx = (b[0] - a[0]) * c.width, dy = (b[1] - a[1]) * c.height, an = Math.abs(Math.atan2(dy, dx) * 180 / Math.PI) % 45;
+      if (Math.abs(dx) > 2 && Math.abs(dy) > 2 && Math.min(an, 45 - an) > .5){ const k2 = Math.abs(dx) >= Math.abs(dy) ? [b[0], a[1]] : [a[0], b[1]]; cur.p = [a, k2]; strokes().push(Object.assign({}, cur, { p:[k2.slice(), b.slice()] })); } }   /* branché en biais sur un raccord : un coude à 90° */
     if (cur && cur !== "erase" && RD.wb && /^iso/.test(wbBg())){ const seg = decouperIso(cur), arr = strokes(), k = arr.indexOf(cur); if (seg && k >= 0){ arr.splice(k, 1, ...seg); redrawInk(); } }
     if (cur && cur !== "erase" && cur.t && RD.obj && RD.formeK && strokes().includes(cur)){ SELO.s = cur; majObjUI(); }
     cur = null; fond = null;
@@ -3734,6 +3801,9 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
 /* tuyau : on s'aimante au bout (ou sur le trajet) d'un autre tuyau; depuis un point de départ, le tuyau reste droit ou à 45° */
 function aimanterTuyau(q, a, sauf){
   const c = $("#inkCanvas"), W = c.width, H = c.height, dpr = window.devicePixelRatio || 1, lim = 14 * dpr; let best = null;
+  { const ty = ((sauf && sauf.t) || RD.formeK || "").replace(/^tuy/, ""); let bp = null;          /* raccord d'un appareil ou de la maison : le tuyau s'y branche */
+    strokes().forEach(o => { if (!PORTS_PL[o.t]) return; portsPlomb(o, W, H).forEach(pt => { if (!portCompat(pt.ty, ty)) return; const d = Math.hypot(pt.x - q[0] * W, pt.y - q[1] * H); if (d < lim * 1.8 && (!bp || d < bp[1])) bp = [[pt.x / W, pt.y / H], d]; }); });
+    if (bp) return bp[0]; }
   if (a){ const dx = (q[0] - a[0]) * W, dy = (q[1] - a[1]) * H, L = Math.hypot(dx, dy), an = Math.round(Math.atan2(dy, dx) / (Math.PI / 4)) * Math.PI / 4; q = [a[0] + Math.cos(an) * L / W, a[1] + Math.sin(an) * L / H]; }
   strokes().forEach(o => { if (o === sauf || !o.t || !/^tuy/.test(o.t)) return; o.p.forEach(e => { const d = Math.hypot((e[0] - q[0]) * W, (e[1] - q[1]) * H); if (d < lim && (!best || d < best[1])) best = [e.slice(), d]; }); });
   if (best) return best[0];
