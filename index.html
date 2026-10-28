@@ -3702,6 +3702,22 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
   ["pointerup", "pointercancel"].forEach(t => c.addEventListener(t, ev => {
     if (mv && mv.s && !mv.snap && ev.type === "pointerup") tapElement(mv.s, ev);      /* toucher sans bouger : compte pour le double-clic (renommer) */
     if (mv && mv.fil){ if (mv.segs.length){ jonctionsAuto(mv.segs); nettoyerFils(); } else { (UNDO[inkKey()] || []).pop(); if (!mv.B || mv.B === mv.A){ RD.objKe = null; SELO.s = null; const ch = mv.surObjet || mv.filSous; if (ch && strokes().includes(ch)){ SELO.s = ch; RD.objO = ch.o || 0; tapElement(ch, ev); } } }   /* simple clic sur un symbole ou un fil, même avec l'outil Fil : on le choisit (double-clic = repère) */   /* clic sans tracer : retour à aucun outil */ mv = null; redrawInk(); majObjUI(); return; }
+    if (mv && mv.s && mv.snap && !ELEC[mv.s.k] && /^iso/.test(wbBg())){                 /* objet iso déplacé : chaque tuyau branché se refait droit, avec un coude à 90° sur la grille iso */
+      const W = c.width, H = c.height, dpr = window.devicePixelRatio || 1, a = 34 * RD.z * 1.2 * dpr, d = a * .8660254, AX = [[d, a / 2], [-d, a / 2], [0, a]], arr = strokes();
+      const cr = (u, v) => u[0] * v[1] - u[1] * v[0];
+      mv.liens.forEach(([f, i, x0, y0]) => { if (!arr.includes(f)) return;
+        const M = [f.p[i][0] * W, f.p[i][1] * H], F = [f.p[1 - i][0] * W, f.p[1 - i][1] * H], v = [M[0] - F[0], M[1] - F[1]], L = Math.hypot(v[0], v[1]); if (L < 2) return;
+        if (AX.some(A => Math.abs(cr(A, v)) / (Math.hypot(A[0], A[1]) * L) < .02)) return;              /* déjà droit sur un axe iso */
+        const v0 = [x0 * W - F[0], y0 * H - F[1]], A = AX.slice().sort((p1, p2) => Math.abs(cr(p1, v0)) / Math.hypot(p1[0], p1[1]) - Math.abs(cr(p2, v0)) / Math.hypot(p2[0], p2[1]))[0];   /* l'axe d'origine du tuyau */
+        let best = null; AX.filter(B => B !== A).forEach(B => { const den = cr(A, B); if (Math.abs(den) < 1e-6) return; const t = cr(v, B) / den, sB = cr(A, v) / den, cout = Math.abs(sB) * Math.hypot(B[0], B[1]);
+          if (!best || cout < best.cout) best = { t, B, cout }; });
+        if (!best) return; const K = [F[0] + A[0] * best.t, F[1] + A[1] * best.t];
+        f.p[i] = [K[0] / W, K[1] / H];                                                                  /* le tuyau garde son axe jusqu'au coude… */
+        const n = { c:f.c, hl:false, hc:null, w:f.w, t:"ligne", p:[[K[0] / W, K[1] / H], [M[0] / W, M[1] / H]] }, seg = decouperIso(n);   /* …puis repart droit jusqu'au raccord */
+        (seg || [n]).forEach(x => arr.push(x));
+        if (Math.hypot(K[0] - F[0], K[1] - F[1]) < 2){ const j = arr.indexOf(f); if (j >= 0) arr.splice(j, 1); } });
+      redrawInk();
+    }
     if (mv && mv.s && mv.snap && ELEC[mv.s.k]){                                  /* symbole déplacé : ses fils restent droits (un coude s'ajoute au besoin) */
       const ux = elecU() / c.width, uy = elecU() / c.height;
       mv.liens.forEach(([f, i, x0, y0]) => { const M = f.p[i].slice(), F = f.p[1 - i]; if (Math.abs(M[0] - F[0]) * c.width <= 2 || Math.abs(M[1] - F[1]) * c.height <= 2) return;
