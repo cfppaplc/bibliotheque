@@ -1,10 +1,11 @@
 [
  {
-  "date": "2026-10-23",
+  "date": "2026-10-28",
   "type": "outil",
   "titre": "Barre du crayon et du tableau blanc",
   "texte": "Une seule ligne d'outils, plus simple pour débuter. Nouveau : le bouton Objets a trois onglets — Formes (utiles en classe), Iso (plomberie) et Électricité (symboles).",
   "formation": [
+   "Nouveau : la touche Suppr efface ce qui est choisi (forme, objet, symbole, texte). La gomme a sa glissière de taille. Le bouton plein écran est dans la barre du tableau blanc. Ta couleur personnalisée est retenue. Avec l'outil Fil, les symboles ne bougent plus par accident. En glissant un objet de la palette, tu le vois déjà à sa place.",
    "À chaque ouverture du tableau blanc, aucun outil n'est choisi : touche une forme ou un objet pour le choisir (la palette Objets s'ouvre), ou touche le crayon pour écrire.",
    {
     "t": "Le bouton crayon (sa pointe montre la couleur) : touche-le pour l'activer, le menu s'ouvre avec la couleur, le tracé (trait libre, ligne, flèche, rectangle, ellipse) et l'épaisseur (glissière de 1 à 40). Touche-le encore pour le désactiver.",
@@ -75,6 +76,10 @@
    "Le crayon réagit maintenant tout de suite : seul le trait en cours est redessiné pendant que tu écris, le reste du tableau ne bouge pas."
   ],
   "versions": [
+   {
+    "date": "2026-10-28",
+    "texte": "Suppr partout, taille de la gomme, plein écran, couleur perso retenue, outil Fil sans déplacement, aperçu pendant le glisser-déposer."
+   },
    {
     "date": "2026-10-23",
     "texte": "Glisser-déposer des objets iso et des symboles électriques : ils se branchent tout seuls sur le fil ou le tuyau le plus proche."
