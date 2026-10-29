@@ -2289,6 +2289,8 @@ function objGeo(s, W, H){
   }
   else if (s.k === "vase"){ cyl(0, 0, .09, 0, .4, "#9aa7b5"); cyl(0, 0, .5, .35, 1.55, "#d4574f", 1); cyl(0, 0, .08, 1.55, 1.7, "#8f9cab"); }
   const LV = def.ports && def.ports.length ? Math.round(Math.max(...def.ports.map(q => q[0]))) : 1;   /* debout : les raccords restent sur la grille; vers le haut et vers le bas échangent les deux raccords */
+  { const cH = { vanne:.19, boisseau:.19, vannemot:.19, vanne3:.19, pompe:.185 }[s.k];   /* le bout de tuyau de l'objet est centré sur le raccord (avant, le raccord était sous le tuyau) */
+    if (cH) shapes.forEach(sh => ["h", "h0", "h1"].forEach(c => { if (typeof sh[c] === "number") sh[c] -= cH; })); }
   if (/^(vanne|boisseau|vannemot|vanne3)$/.test(s.k)){ const f = .68;                          /* vannes plus fines : même longueur (raccords sur la grille), section et volant réduits */
     shapes.forEach(sh => { ["n", "n0", "n1", "h", "h0", "h1", "R"].forEach(c => { if (typeof sh[c] === "number" && !(c[0] === "n" && Math.abs(sh[c]) > .9)) sh[c] *= f; });   /* une branche qui va jusqu'à un raccord garde sa longueur */
       if (sh.extra && sh.extra.fins){ const F = sh.extra.fins.slice(); F[3] *= f; F[4] *= f; sh.extra = Object.assign({}, sh.extra, { fins:F }); } }); }
