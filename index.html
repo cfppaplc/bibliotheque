@@ -2414,7 +2414,7 @@ function drawStroke(g, s, W, H, k){
     g.stroke(); if (FORMES[s.t]) habillage(); return;
   }
   { const P = s.p, n = P.length; g.moveTo(P[0][0] * W, P[0][1] * H);                     /* trait libre lissé : courbe qui passe par le milieu de chaque petit bout */
-    if (n < 3) P.slice(1).forEach(q => g.lineTo(q[0] * W, q[1] * H));
+    if (n < 3 || s.iso) P.slice(1).forEach(q => g.lineTo(q[0] * W, q[1] * H));
     else { for (let i = 1; i < n - 1; i++){ const mx = (P[i][0] + P[i + 1][0]) / 2 * W, my = (P[i][1] + P[i + 1][1]) / 2 * H; g.quadraticCurveTo(P[i][0] * W, P[i][1] * H, mx, my); } g.lineTo(P[n - 1][0] * W, P[n - 1][1] * H); } }
   if (s.p.length === 1) g.lineTo(s.p[0][0] * W + .01, s.p[0][1] * H);
   g.stroke();
@@ -3897,12 +3897,12 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
         if (SELO.s){ SELO.s = null; redrawInk(); majObjUI(); } e.preventDefault(); return; }
       var choisir = hit || obj;     /* forme pas encore choisie : un simple clic la choisit, mais glisser trace une nouvelle forme (ex. une cote qui part du coin d'un rectangle) */
       var raz = !!SELO.s; if (SELO.s){ SELO.s = null; majObjUI(); } }
-    cur = { c:/^hl/.test(RD.color) ? "#000" : RD.color, hl:/^hl/.test(RD.color), hc:/^hl:/.test(RD.color) ? RD.color.slice(3) : null, w:RD.wPx || WIDTHS[RD.wIdx], p:[q] };
+    cur = { c:/^hl/.test(RD.color) ? "#000" : RD.color, hl:/^hl/.test(RD.color), hc:/^hl:/.test(RD.color) ? RD.color.slice(3) : null, w:RD.wPx || WIDTHS[RD.wIdx], p:[q] }; if (RD.wb && /^iso/.test(wbBg())) cur.iso = 1;   /* plan iso : le trait suit la grille, coins nets (pas de lissage) */
     const forme = RD.obj && RD.formeK ? RD.formeK : RD.shape;
     if (forme){ cur.t = forme; cur.p = [q, q]; if (forme === "maison" || /^pl/.test(forme)) cur.c = "#3b4148";   /* maison et appareils : trait gris foncé */ if (/^tuy/.test(forme)){ const q0 = aimanterTuyau(q, null, null); cur.p = [q0, q0.slice()]; } if (RD.obj && RD.formeK && choisir) cur.choisir = choisir; if (RD.obj && RD.formeK && raz && !choisir) cur.raz = true; if (forme === "bulle") cur.n = strokes().filter(x => x.t === "bulle").length + 1; }
     /* Trait en cours, rapide : on garde une image de tout le reste et, à chaque image, on redessine seulement le trait en cours par-dessus */
     snapInk(); redrawInk();
-    if (cur.t || cur.hl){       /* forme ou surligneur : on garde une copie de tout le reste */
+    if (cur.t || cur.hl || cur.iso){       /* forme, surligneur ou trait iso : on garde une copie de tout le reste */
       fond = fond || document.createElement("canvas"); fond.width = c.width; fond.height = c.height;
       const gf = fond.getContext("2d"); gf.clearRect(0, 0, fond.width, fond.height); gf.drawImage(c, 0, 0);
     } else fond = null;
@@ -3916,13 +3916,33 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
       g.save(); g.lineCap = "round"; g.lineJoin = "round"; g.lineWidth = cur.w * k;
       g.strokeStyle = (cur.c === "#24282c" && wbSombre()) ? "#f4f1ea" : cur.c;
       g.beginPath(); const M = i => [(P[i][0] + P[i + 1][0]) / 2 * W, (P[i][1] + P[i + 1][1]) / 2 * H];   /* même lissage que le dessin final */
-      if (P.length < 3) { g.moveTo(P[0][0] * W, P[0][1] * H); for (let i = 1; i < P.length; i++) g.lineTo(P[i][0] * W, P[i][1] * H); }
+      if (P.length < 3 || cur.iso) { g.moveTo(P[0][0] * W, P[0][1] * H); for (let i = 1; i < P.length; i++) g.lineTo(P[i][0] * W, P[i][1] * H); }
       else { const i0 = Math.max(1, deja - 1); g.moveTo(...(i0 === 1 ? [P[0][0] * W, P[0][1] * H] : M(i0 - 1))); for (let i = i0; i < P.length - 1; i++){ const m = M(i); g.quadraticCurveTo(P[i][0] * W, P[i][1] * H, m[0], m[1]); } }
       if (P.length === 1) g.lineTo(P[0][0] * W + .01, P[0][1] * H);
       g.stroke(); g.restore(); deja = P.length; return;
     }
     if (fond.width !== W || fond.height !== H){ redrawInk(); return; }
     g.clearRect(0, 0, W, H); g.drawImage(fond, 0, 0); drawStroke(g, cur, W, H, k); };
+  /* crayon sur plan iso : le trait avance le long d'un axe de la grille et ne tourne (coin net) que lorsque la main quitte cette ligne */
+  const suivreIso = e => { const r = rectToile(), k = r.width / (c.offsetWidth || r.width), a = 34 * RD.z * 1.2 * k, d = a * .8660254, X = [e.clientX - r.left, e.clientY - r.top];
+    const AXES = [[d, a / 2], [-d, -a / 2], [-d, a / 2], [d, -a / 2], [0, a], [0, -a]];
+    if (!cur.coins) cur.coins = [[cur.p[0][0] * r.width, cur.p[0][1] * r.height]];
+    const choisirAxe = C => { const v = [X[0] - C[0], X[1] - C[1]]; if (Math.hypot(v[0], v[1]) < .55 * a) return null; let b = null; AXES.forEach(D => { const t = (v[0] * D[0] + v[1] * D[1]) / (a * a); if (!b || t > b[0]) b = [t, D]; }); return b[1]; };
+    let bout = null;
+    for (let tour = 0; tour < 4; tour++){
+      const C = cur.coins[cur.coins.length - 1]; if (!cur.axe) cur.axe = choisirAxe(C); const D = cur.axe; if (!D){ bout = C; break; }
+      const v = [X[0] - C[0], X[1] - C[1]], tr = (v[0] * D[0] + v[1] * D[1]) / (a * a), perp = Math.abs(v[0] * D[1] - v[1] * D[0]) / a, t = Math.max(0, Math.round(tr));
+      if (perp <= .6 * a && tr > -.5){ bout = [C[0] + t * D[0], C[1] + t * D[1]]; break; }
+      if (t >= 1) cur.coins.push([C[0] + t * D[0], C[1] + t * D[1]]);                       /* la main a quitté la ligne : coin net, puis nouvel axe */
+      cur.axe = null; }
+    if (!bout) bout = cur.coins[cur.coins.length - 1];
+    const P = cur.coins.concat([bout]).filter((q, i, v) => !i || Math.hypot(q[0] - v[i - 1][0], q[1] - v[i - 1][1]) > .5);
+    for (let i = 1; i + 2 < P.length; ){                                                     /* petit crochet d'un pas à un coin (main qui dépasse) : on prolonge les deux lignes jusqu'à leur croisement */
+      const A = P[i - 1], B = P[i], C2 = P[i + 1], E = P[i + 2], d1 = [B[0] - A[0], B[1] - A[1]], d3 = [E[0] - C2[0], E[1] - C2[1]], den = d1[0] * d3[1] - d1[1] * d3[0];
+      if (Math.hypot(C2[0] - B[0], C2[1] - B[1]) > 1.2 * a || Math.abs(den) < 1e-6){ i++; continue; }
+      const sA = ((C2[0] - A[0]) * d3[1] - (C2[1] - A[1]) * d3[0]) / den, Q = [A[0] + sA * d1[0], A[1] + sA * d1[1]];
+      if (sA > .01 && (E[0] - Q[0]) * d3[0] + (E[1] - Q[1]) * d3[1] > 1){ P.splice(i, 2, Q); } else i++; }
+    cur.p = P.map(q => [q[0] / r.width, q[1] / r.height]); };
   c.addEventListener("pointermove", e => {
     if (!cur) return;
     if (cur === "erase"){ eraseAt(pt(e)); return; }
@@ -3938,6 +3958,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
       if (cur.liens) cur.liens.forEach(([o, i, e]) => { o.p[i] = [e[0] + dx, e[1] + dy]; });
       cur.bouge.p = cur.p0.map(v => [v[0] + dx, v[1] + dy]); if (!rafTrait) rafTrait = requestAnimationFrame(() => { rafTrait = 0; redrawInk(); }); return; }
     if (cur.t){ cur.p[1] = pt(e); if (/^tuy/.test(cur.t)) cur.p[1] = aimanterTuyau(cur.p[1], cur.p[0], cur); }
+    else if (cur.iso && !cur.hl) suivreIso(e);
     else { const evs = (e.getCoalescedEvents && e.getCoalescedEvents()) || [], r = rectToile(), mn = 1.2 / Math.max(r.width, 1);
       (evs.length ? evs : [e]).forEach(ev => { const q = pt(ev), d = cur.p[cur.p.length - 1]; if (!d || Math.abs(q[0] - d[0]) > mn || Math.abs(q[1] - d[1]) * r.height / r.width > mn) cur.p.push(q); }); }   /* points à moins de 1 px : ignorés */   /* tous les points du crayon, même entre deux images */
     if (!rafTrait) rafTrait = requestAnimationFrame(dessinerEnCours);
