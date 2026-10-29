@@ -1534,6 +1534,11 @@ function hookKeys(win){
 }
 /* ---- Souris : glisser pour se déplacer, molette fluide, Ctrl + molette pour zoomer ---- */
 const PAN = { on:false, x:0, y:0, l:0, t:0, alvo:null, raf:0 };
+/* glisser la page zoomée, avec un petit jeu élastique au-delà des bords (la page revient en place au relâchement) */
+function panVers(sc, l, t){ const mx = sc.scrollWidth - sc.clientWidth, my = sc.scrollHeight - sc.clientHeight, cl = Math.max(0, Math.min(mx, l)), ct = Math.max(0, Math.min(my, t));
+  sc.scrollLeft = cl; sc.scrollTop = ct; const el = $("#rinner"), j = d => Math.sign(d) * Math.min(90, Math.abs(d) * .35), ox = j(cl - l), oy = j(ct - t);
+  el.style.transition = "none"; el.style.translate = (ox || oy) ? ox + "px " + oy + "px" : ""; }
+function panFin(){ const el = $("#rinner"); if (!el.style.translate) return; el.style.transition = "translate .35s cubic-bezier(.2,.8,.2,1)"; el.style.translate = ""; setTimeout(() => { if (!PAN.on) el.style.transition = ""; }, 400); }
 const outilActif = () => RD.pen || RD.wb;
 function defiler(dx, dy){
   const st = $("#rstage");
@@ -1591,7 +1596,7 @@ function brancherSouris(win){
     if (Math.abs(dx) < 10 && Math.abs(dy) < 10 && dt < 350 && !actif && matchMedia("(max-width:900px) and (pointer:coarse)").matches){
       const y = t.clientY / win.innerHeight; if (y > .18 && y < .82){ const R = $("#reader"); if (R.classList.contains("calme")) afficherBarres(); else if (R.classList.contains("auto")) { R.classList.add("calme"); } } } }, { passive:true });
   const pannable = t => { try { const c = win.getComputedStyle(t).cursor; return c === "grab" || c === "auto" || c === "default" || c === "grabbing"; } catch(e){ return false; } };
-  const fin = () => { if (!PAN.on) return; PAN.on = false; majCurseur(); };
+  const fin = () => { if (!PAN.on) return; PAN.on = false; panFin(); majCurseur(); };
   win.addEventListener("mousedown", e => {
     if (e.button === 1){ e.preventDefault(); e.stopImmediatePropagation(); if (RD.z <= 1.01) return; PAN.b = 4; PAN.on = true; PAN.alvo = null; PAN.x = e.screenX; PAN.y = e.screenY; PAN.l = st().scrollLeft; PAN.t = st().scrollTop; doc.documentElement.style.cursor = "grabbing"; return; }   /* roulette enfoncée : on glisse la page (pas le défilement automatique du navigateur) */
     if (e.button !== 0 || RD.z <= 1.01 || outilActif()) return;
@@ -1602,7 +1607,7 @@ function brancherSouris(win){
   win.addEventListener("mousemove", e => {
     if (!PAN.on) return;
     if (!(e.buttons & (PAN.b || 1))){ fin(); return; }
-    st().scrollLeft = PAN.l - (e.screenX - PAN.x); st().scrollTop = PAN.t - (e.screenY - PAN.y);
+    panVers(st(), PAN.l - (e.screenX - PAN.x), PAN.t - (e.screenY - PAN.y));
   });
   win.addEventListener("mouseup", fin); win.addEventListener("blur", fin);
   win.addEventListener("mousemove", e => { if (RD.laser && win.frameElement){ const r = win.frameElement.getBoundingClientRect(); const k = r.width / (win.innerWidth || r.width) || 1; placerLaser(r.left + e.clientX * k, r.top + e.clientY * k); } });
@@ -1631,9 +1636,9 @@ function brancherSouris(win){
     PAN.b = e.button === 1 ? 4 : 1; PAN.on = true; PAN.alvo = null; PAN.x = e.screenX; PAN.y = e.screenY; PAN.l = st.scrollLeft; PAN.t = st.scrollTop; e.preventDefault();
     st.style.cursor = "grabbing";
   });
-  document.addEventListener("mousemove", e => { if (!PAN.on) return; if (!(e.buttons & (PAN.b || 1))){ PAN.on = false; majCurseur(); return; }
-    st.scrollLeft = PAN.l - (e.screenX - PAN.x); st.scrollTop = PAN.t - (e.screenY - PAN.y); });
-  document.addEventListener("mouseup", () => { if (PAN.on){ PAN.on = false; majCurseur(); } });
+  document.addEventListener("mousemove", e => { if (!PAN.on) return; if (!(e.buttons & (PAN.b || 1))){ PAN.on = false; panFin(); majCurseur(); return; }
+    panVers(st, PAN.l - (e.screenX - PAN.x), PAN.t - (e.screenY - PAN.y)); });
+  document.addEventListener("mouseup", () => { if (PAN.on){ PAN.on = false; panFin(); majCurseur(); } });
   st.addEventListener("wheel", e => {
     if (e.ctrlKey || e.metaKey || RD.wb){ e.preventDefault(); zoomSouris(e, null); return; }
     if (!e.shiftKey && !outilActif() && RD.drv && !RD.drv.defile){ e.preventDefault(); zoomSouris(e, null); return; }
