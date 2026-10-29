@@ -7978,12 +7978,24 @@ window.ACCES = (function(){
   /* ---- demande d'inscription : la paire de clés est créée ici; seule la clé publique et la clé privée cadenassée partent ---- */
   const idDe = nom => sansAcc(nom).toLowerCase().replace(/[^a-z0-9]+/g, ".").replace(/^\.|\.$/g, "");
   const sansAcc = t => t.normalize("NFD").replace(/[̀-ͯ]/g, "");
-  async function demande(nom, mdp){
+  /* envoi automatique des demandes : service de courriel FormSubmit (adresse ou code secret fourni par FormSubmit). Vide = pas d'envoi, on montre le code à copier. */
+  const ENVOI_DEMANDES = "";
+  async function envoyerDemande(code, nom, prog){
+    if (!ENVOI_DEMANDES) throw new Error("envoi non configuré");
+    const lien = location.origin + location.pathname + "#accepter=" + code.replace(/^DEMANDE-/, "");
+    const r = await fetch("https://formsubmit.co/ajax/" + ENVOI_DEMANDES, { method:"POST", headers:{ "Content-Type":"application/json", Accept:"application/json" },
+      body:JSON.stringify({ _subject:"Bibliothèque : demande d'accès de " + nom, _captcha:"false", _template:"box", Enseignant:nom, Programmes:(prog || []).map(progNom).join(", ") || "—",
+        "Pour accepter":"Ouvre ce lien sur ton ordinateur (connecté comme admin), vérifie les livres, puis touche Publier : " + lien, Code:code }) });
+    const j = await r.json().catch(() => ({})); if (!r.ok || String(j.success) === "false") throw new Error(j.message || ("réponse " + r.status));
+  }
+  const PROGS = () => [...new Set(LIVRES.filter(l => l.fichier && l.categorie && !l.user).map(l => l.categorie))].sort();
+  const progNom = c => { try { return nomProgramme(c); } catch(e){ return c; } };
+  async function demande(nom, mdp, prog){
     const kp = await sub.generateKey({ name:"RSA-OAEP", modulusLength:2048, publicExponent:new Uint8Array([1, 0, 1]), hash:"SHA-256" }, true, ["encrypt", "decrypt", "wrapKey", "unwrapKey"]);
     const pub = await sub.exportKey("jwk", kp.publicKey), pk8 = await sub.exportKey("pkcs8", kp.privateKey);
     const s = crypto.getRandomValues(new Uint8Array(16)), i = crypto.getRandomValues(new Uint8Array(12));
     const c = await sub.encrypt({ name:"AES-GCM", iv:i }, await cleMdp(mdp, s), pk8);
-    const d = { t:"demande-acces", v:1, id:idDe(nom), nom:nom.trim(), pub:{ kty:pub.kty, n:pub.n, e:pub.e, alg:pub.alg }, priv:{ s:b64(s), i:b64(i), c:b64(c) }, date:new Date().toISOString().slice(0, 10) };
+    const d = { t:"demande-acces", v:1, id:idDe(nom), nom:nom.trim(), pub:{ kty:pub.kty, n:pub.n, e:pub.e, alg:pub.alg }, priv:{ s:b64(s), i:b64(i), c:b64(c) }, date:new Date().toISOString().slice(0, 10), prog:prog || [] };
     return "DEMANDE-" + btoa(unescape(encodeURIComponent(JSON.stringify(d))));
   }
   const lireDemande = code => { const t = (code || "").trim().replace(/^DEMANDE-/, "").replace(/\s+/g, ""); const d = JSON.parse(decodeURIComponent(escape(atob(t)))); if (d.t !== "demande-acces" || !d.pub || !d.priv) throw new Error("code invalide"); return d; };
@@ -8035,10 +8047,11 @@ window.ACCES = (function(){
     document.getElementById("acNon").onclick = fermer; document.getElementById("acDem").onclick = dlgDemande;
   }
   function dlgDemande(){
-    box().innerHTML = '<h2>Demander un accès</h2><p class="sous">Choisis ton mot de passe (au moins 10 caractères). Tu recevras un code à envoyer à Jeremy; dès qu\'il l\'accepte, tu pourras te connecter.</p>'
+    box().innerHTML = '<h2>Demander un accès</h2><p class="sous">Choisis ton mot de passe (au moins 10 caractères). ' + (ENVOI_DEMANDES ? 'Ta demande partira toute seule à Jeremy' : 'Tu recevras un code à envoyer à Jeremy') + '; dès qu\'il l\'accepte, tu pourras te connecter.</p>'
       + '<label for="dNom">Prénom et nom</label><input type="text" id="dNom" autocomplete="name">'
       + '<label for="dMdp">Mot de passe</label><input type="password" id="dMdp" autocomplete="new-password">'
       + '<label for="dMdp2">Mot de passe (encore)</label><input type="password" id="dMdp2" autocomplete="new-password">'
+      + '<label>Programme(s) que tu enseignes</label>' + PROGS().map(c => '<label style="display:flex;gap:8px;align-items:center;font-weight:500;margin:6px 0"><input type="checkbox" class="dProg" value="' + esc(c) + '" style="width:18px;height:18px;accent-color:#e50914"> ' + esc(progNom(c)) + '</label>').join("")
       + '<div class="acces-err" id="dErr" hidden></div>'
       + '<div class="acces-btns"><button id="dNon">Annuler</button><button class="prim" id="dOui">Créer ma demande</button></div>';
     ov().hidden = false; setTimeout(() => document.getElementById("dNom").focus(), 50);
@@ -8050,8 +8063,14 @@ window.ACCES = (function(){
       if (m1.length < 10) return err("Le mot de passe doit avoir au moins 10 caractères.");
       if (m1 !== m2) return err("Les deux mots de passe ne sont pas pareils.");
       if (DATA && DATA.comptes[idDe(nom)]) return err("Ce nom a déjà un compte. Connecte-toi plutôt.");
+      const prog = [...document.querySelectorAll(".dProg:checked")].map(x => x.value); if (!prog.length) return err("Coche au moins un programme.");
       const bt = document.getElementById("dOui"); bt.disabled = true; bt.textContent = "Création…";
-      try { const code = await demande(nom, m1);
+      try { const code = await demande(nom, m1, prog);
+        let envoye = false; try { bt.textContent = "Envoi à Jeremy…"; await envoyerDemande(code, nom, prog); envoye = true; } catch(e){}
+        if (envoye){ box().innerHTML = '<h2>Demande envoyée</h2><p class="sous">C\'est fait ! Jeremy a reçu ta demande. Dès qu\'il l\'accepte, touche « Se connecter » avec :</p>'
+            + '<p style="font-size:1.05rem;margin:6px 0 4px">Identifiant : <b>' + esc(idDe(nom)) + '</b></p><p class="sous">et ton mot de passe. Garde-le bien : personne ne peut le retrouver.</p>'
+            + '<div class="acces-btns"><button class="prim" id="dFin">Compris</button></div>';
+          document.getElementById("dFin").onclick = fermer; return; }
         box().innerHTML = '<h2>Demande prête</h2><p class="sous">Envoie ce code à Jeremy (courriel ou Teams). Ton identifiant sera <b>' + esc(idDe(nom)) + '</b>. Garde bien ton mot de passe : personne ne peut le retrouver.</p>'
           + '<textarea id="dCode" readonly>' + code + '</textarea><div class="acces-ok" id="dOk" hidden>Code copié.</div>'
           + '<div class="acces-btns"><button id="dFin">Fermer</button><button class="prim" id="dCopie">Copier le code</button></div>';
@@ -8070,9 +8089,11 @@ window.ACCES = (function(){
   }
   function dessinerGerer(msg){
     const D = BROUILLON, livres = Object.keys(D.livres), ids = Object.keys(D.comptes).sort((a, b) => D.comptes[a].nom.localeCompare(D.comptes[b].nom));
-    const tete = '<tr><th>Enseignant</th>' + livres.map(f => '<th class="liv">' + esc(titreDe(f)) + '</th>').join("") + '<th></th></tr>';
+    const progs = PROGS(), court = c => /plomberie/i.test(c) ? "Plomberie" : /entretien/i.test(c) ? "EGI" : c;
+    const tete = '<tr><th>Enseignant</th><th class="liv">Programmes<br>(tous leurs livres)</th>' + livres.map(f => '<th class="liv">' + esc(titreDe(f)) + '</th>').join("") + '<th></th></tr>';
     const lignes = ids.map(id => { const c = D.comptes[id];
       return '<tr><td><b>' + esc(c.nom) + '</b>' + (c.admin ? '<span class="acces-tag">admin</span>' : '') + '<br><small style="color:#8c8c92">' + esc(id) + '</small></td>'
+        + '<td>' + (c.admin ? '<small style="color:#8c8c92">tout</small>' : progs.map(pg => '<button class="abtn' + ((c.prog || []).includes(pg) ? ' prim' : '') + '" style="padding:4px 9px;font-size:.78rem;margin:2px" data-prog="' + esc(pg) + '" data-pid="' + esc(id) + '" title="' + esc(progNom(pg)) + '">' + esc(court(pg)) + '</button>').join("")) + '</td>'
         + livres.map(f => '<td><input type="checkbox" data-id="' + esc(id) + '" data-f="' + esc(f) + '"' + (D.livres[f].cles[id] ? " checked" : "") + (c.admin ? " disabled" : "") + '></td>').join("")
         + '<td>' + (c.admin ? "" : '<button class="abtn" data-retirer="' + esc(id) + '" title="Retirer ce compte">Retirer</button>') + '</td></tr>'; }).join("");
     let jeton = ""; try { jeton = localStorage.getItem("ghJeton") || ""; } catch(e){}
@@ -8089,13 +8110,18 @@ window.ACCES = (function(){
       try { if (cb.checked) BROUILLON.livres[f].cles[id] = await envelopper(f, BROUILLON.comptes[id].pub); else delete BROUILLON.livres[f].cles[id]; }
       catch(e){ cb.checked = !cb.checked; dessinerGerer({ err:e.message }); return; }
       cb.disabled = false; });
+    B.querySelectorAll("[data-prog]").forEach(b => b.onclick = async () => { const id = b.dataset.pid, pg = b.dataset.prog, c = BROUILLON.comptes[id];
+      c.prog = c.prog || []; const ajoute = !c.prog.includes(pg); c.prog = ajoute ? c.prog.concat(pg) : c.prog.filter(x => x !== pg);
+      try { await appliquerProgs(id, ajoute ? [pg] : [], ajoute ? [] : [pg]); dessinerGerer({ ok:c.nom + (ajoute ? " a maintenant tous les livres « " : " n'a plus les livres « ") + court(pg) + " »." }); }
+      catch(e){ dessinerGerer({ err:e.message }); } });
     B.querySelectorAll("[data-retirer]").forEach(b => b.onclick = () => { const id = b.dataset.retirer;
       if (!confirm("Retirer le compte de " + BROUILLON.comptes[id].nom + " ?")) return;
       delete BROUILLON.comptes[id]; for (const f in BROUILLON.livres) delete BROUILLON.livres[f].cles[id]; dessinerGerer(); });
     document.getElementById("gAjout").onclick = () => { try { const d = lireDemande(document.getElementById("gDem").value);
         if (BROUILLON.comptes[d.id] && !confirm(d.nom + " a déjà un compte. Le remplacer (nouveau mot de passe) ?")) return;
-        BROUILLON.comptes[d.id] = { nom:d.nom, pub:d.pub, priv:d.priv, admin:false }; for (const f in BROUILLON.livres) delete BROUILLON.livres[f].cles[d.id];
-        dessinerGerer({ ok:d.nom + " est ajouté. Coche ses livres, puis touche « Publier »." }); }
+        BROUILLON.comptes[d.id] = { nom:d.nom, pub:d.pub, priv:d.priv, admin:false, prog:d.prog || [] }; for (const f in BROUILLON.livres) delete BROUILLON.livres[f].cles[d.id];
+        appliquerProgs(d.id, d.prog || [], []).then(() => dessinerGerer({ ok:d.nom + " est ajouté" + ((d.prog || []).length ? " avec les livres de : " + d.prog.map(court).join(", ") : "") + ". Vérifie les cases, puis touche « Publier »." }))
+          .catch(e => dessinerGerer({ err:e.message })); }
       catch(e){ dessinerGerer({ err:"Ce code n'est pas une demande valide." }); } };
     document.getElementById("gNon").onclick = fermer;
     document.getElementById("gTel").onclick = () => { const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([JSON.stringify(BROUILLON, null, 1)], { type:"application/json" })); a.download = "comptes.json"; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 3000); };
@@ -8107,6 +8133,10 @@ window.ACCES = (function(){
         dessinerGerer({ ok:"Publié ! Les changements seront en ligne d'ici une minute ou deux." }); try { render(); } catch(e){} }
       catch(e){ dessinerGerer({ err:"Publication impossible : " + e.message }); } };
   }
+  async function appliquerProgs(id, ajouter, retirer){       /* donne / retire tous les livres protégés d'un programme */
+    for (const f in BROUILLON.livres){ const l = LIVRES.find(x => x.fichier === f); if (!l) continue;
+      if (ajouter.includes(l.categorie) && !BROUILLON.livres[f].cles[id]) BROUILLON.livres[f].cles[id] = await envelopper(f, BROUILLON.comptes[id].pub);
+      if (retirer.includes(l.categorie)) delete BROUILLON.livres[f].cles[id]; } }
   async function publierGitHub(jeton, donnees){
     const depot = "cfppaplc/bibliotheque", url = "https://api.github.com/repos/" + depot + "/contents/comptes.json", h = { Authorization:"Bearer " + jeton, Accept:"application/vnd.github+json" };
     const a = await fetch(url, { headers:h, cache:"no-store" }); if (a.status === 401) throw new Error("clé GitHub refusée"); const sha = a.ok ? (await a.json()).sha : undefined;
@@ -8116,7 +8146,14 @@ window.ACCES = (function(){
   }
 
   document.addEventListener("keydown", e => { if (e.key === "Escape" && !document.getElementById("accesOv").hidden) fermer(); });
-  setTimeout(() => { const b = document.getElementById("compteBtn"); if (b) b.onclick = menu; charger(); }, 0);
+  /* lien « Pour accepter » reçu par courriel : #accepter=<code> → panneau admin avec la demande déjà ajoutée */
+  async function accepterDepuisLien(){
+    const m = location.hash.match(/^#accepter=(.+)$/); if (!m) return; await pret;
+    const code = "DEMANDE-" + decodeURIComponent(m[1]); history.replaceState(null, "", location.pathname + location.search);
+    const go = () => { if (!SESSION || !SESSION.admin){ aviser("Ce lien est pour Jeremy (compte administrateur)."); return; } dlgGerer(); const t = document.getElementById("gDem"); if (t){ t.value = code; document.getElementById("gAjout").click(); } };
+    if (SESSION) go(); else dlgConnexion(go);
+  }
+  setTimeout(() => { const b = document.getElementById("compteBtn"); if (b) b.onclick = menu; charger(); accepterDepuisLien(); }, 0);
   return { pret, get estPret(){ return estPret; }, protege, permis, verrouille, ouvrir, recherche, connexion, deconnexion, demande, lireDemande, dlgConnexion, menu, get session(){ return SESSION; }, get data(){ return DATA; }, charger };
 })();
 </script>
