@@ -156,6 +156,7 @@
   .meta{display:flex;flex-wrap:wrap;gap:14px;color:var(--muted);font-size:.9rem;margin:8px 0 16px}
   .meta .green{color:#46d369;font-weight:700}
   .panel-body p{line-height:1.6;color:#ddd;margin-bottom:20px}
+  .panel-body p.m-version{margin:-12px 0 16px;color:#a1a1aa;font-size:.9rem}
   .btn-fav{background:transparent;border:2px solid #777;color:#fff}
   .btn-fav:hover{border-color:#fff}
 
@@ -857,7 +858,7 @@ const LIVRES = [
     description:"Entretien des systèmes de plomberie et de chauffage (75 h) : tuyauterie, raccords, drainage, chauffe-eau, brûleur et pompes. Théorie, activités, quiz et ateliers." },
 
   { titre:"Dispositifs électriques et électroniques", auteur:"Jérémy Raymond", categorie:"Plomberie et chauffage", niveau:"DEP 5333 · Compétence 9",
-    pages:324, annee:2026, nouveau:false, couverture:"", couleurs:["#F2A900","#6b4a00"], lien:"", fichier:"dispositifs-electriques-c9", competence:"9",
+    pages:324, annee:2026, nouveau:false, couverture:"", couleurs:["#F2A900","#6b4a00"], lien:"", fichier:"dispositifs-electriques-c9", version:"6", competence:"9",
     description:"Installer, faire fonctionner et dépanner les commandes des systèmes de chauffage à air chaud, hydroniques et à la vapeur. 9 modules, de la sécurité à l'automate programmable." },
 
   { titre:"Protection incendie d'un bâtiment", auteur:"Jérémy Raymond", categorie:"Entretien général d'immeubles", niveau:"DEP 5211 · Compétence 12",
@@ -865,7 +866,7 @@ const LIVRES = [
     description:"Livre d'apprentissage de 60 heures : chimie du feu, classes de feu et agents extincteurs, extincteurs portatifs et systèmes de protection du bâtiment. Activités et quiz à chaque module." },
   { titre:"Ventilation et climatisation", auteur:"Jérémy Raymond", categorie:"Entretien général d'immeubles", niveau:"DEP 5211 · Compétence 11", pages:145, annee:2026, nouveau:true, couverture:"", couleurs:["#00acc1","#05474f"], lien:"", fichier:"ventilation-climatisation-m11", competence:"11", description:"Livre d'apprentissage de 60 heures : sécurité et entretien, air et confort, systèmes de ventilation, composants, échangeurs d'air VRC/VRE, cycle frigorifique, thermopompes, régulation, climatisation centrale et entretien préventif. Activités, réponses pas à pas et animations." },
   { titre:"Administration d'un bâtiment et plan d'urgence", auteur:"Jérémy Raymond", categorie:"Entretien général d'immeubles", niveau:"DEP 5211 · Compétence 16",
-    pages:146, annee:2026, nouveau:true, couverture:"", couleurs:["#1565c0","#0d1b2a"], lien:"", fichier:"administration-batiment", competence:"16",
+    pages:146, annee:2026, nouveau:true, couverture:"", couleurs:["#1565c0","#0d1b2a"], lien:"", fichier:"administration-batiment", version:"2", competence:"16",
     description:"Cahier d'apprentissage en 13 chapitres : rôle administratif du préposé, le bail et le TAL, le loyer, l'entretien et les travaux, la copropriété, le budget et le plan d'urgence. Théorie, quiz et activités." },
   { titre:"Utiliser un micro-ordinateur", auteur:"Jérémy Raymond", categorie:"Entretien général d'immeubles", niveau:"DEP 5211 · Compétence 15",
     pages:137, annee:2026, nouveau:true, couverture:"", couleurs:["#E8592C","#26303b"], lien:"", fichier:"micro-ordinateur", competence:"15",
@@ -874,7 +875,7 @@ const LIVRES = [
     pages:176, annee:2026, nouveau:true, couverture:"", couleurs:["#8B6CFF","#211f33"], lien:"", fichier:"communiquer", competence:"9",
     description:"Cahier d'apprentissage de 30 heures (436-282) en 9 modules : le rôle du préposé, les bases de la communication, les occupants, le travail d'équipe, l'écrit professionnel, le téléphone et la radio, les situations difficiles, l'éthique et l'image professionnelle, et une évaluation formative. Jeux de rôle, documents de travail et situations tirées du terrain." },
   { titre:"Entretien de matériel électrique", auteur:"Jérémy Raymond", categorie:"Entretien général d'immeubles", niveau:"DEP 5211 · Compétence 13",
-    pages:166, annee:2026, nouveau:true, enConstruction:true, couverture:"", couleurs:["#C6F432","#18191c"], lien:"", fichier:"materiel-electrique-c13", competence:"13",
+    pages:166, annee:2026, nouveau:true, enConstruction:true, couverture:"", couleurs:["#C6F432","#18191c"], lien:"", fichier:"materiel-electrique-c13", version:"2", competence:"13",
     description:"Cahier d'apprentissage de 60 heures (436-274) en 10 modules : l'électricité du barrage à la maison, le rôle du préposé, se protéger, le multimètre, l'entretien préventif, l'éclairage, cordons et électroménagers, disjoncteurs, prises et interrupteurs, le rapport, et l'immeuble d'aujourd'hui. Version en construction." },
 ];
 /* ===================================================================== */
@@ -4809,6 +4810,10 @@ function ouvrirContenu(c){
 /* retour au tableau de bord quand on ferme les plans */
 document.addEventListener("DOMContentLoaded", () => { const ov = document.getElementById("planOv"); if (!ov) return;
   new MutationObserver(() => { if (ov.hidden && window.RETOUR_ACCUEIL){ window.RETOUR_ACCUEIL = false; try { window.ouvrirAccueil(); } catch(e){} } }).observe(ov, { attributes:true, attributeFilter:["hidden"] }); });
+/* version du livre (champ « version » de LIVRES) et date de la dernière mise à jour connue (Quoi de neuf) */
+function versionLivre(l){ const e = (typeof NOUV !== "undefined" ? NOUV : []).filter(n => n.livre === l.fichier && n.date).sort((a, b) => b.date.localeCompare(a.date))[0];
+  const v = l.version ? "Version " + l.version : "", d = e ? (e.type === "ajout" ? "ajouté le " : "mis à jour le ") + dateFr(e.date) : "";
+  return v && d ? v + " · " + d : v ? v : d ? d.charAt(0).toUpperCase() + d.slice(1) : ""; }
 function openModal(l){
   $("#panel").innerHTML = `
     <div class="panel-top ${couv(l) ? 'with-cover' : ''}" style="${couv(l) ? 'background:' + fond(l) : coverStyle(l) + ';background-size:cover'}">
@@ -4823,6 +4828,7 @@ function openModal(l){
         <span>${l.competence ? 'Compétence ' + esc(l.competence) : ''}</span><span>${esc(l.categorie)}</span><span>${l.niveau ? 'Niveau : ' + esc(l.niveau) : ''}</span>
       </div>
       <p><strong>Par ${esc(l.auteur)}</strong></p>
+      ${versionLivre(l) ? `<p class="m-version">${esc(versionLivre(l))}</p>` : ""}
       <p>${esc(l.description)}</p>
       <button class="btn btn-play" id="mRead">▶ Lire</button>
       <button class="btn btn-fav" id="mFav">${isFav(l) ? "✓ Dans ma liste" : "+ Ma liste"}</button>

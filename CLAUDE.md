@@ -41,7 +41,7 @@
 - **`LIVRES`** (liste d'objets) : `titre, auteur, categorie, niveau ("DEP 5211 · Compétence 15"), pages, annee, nouveau,
   couleurs, fichier, competence, description` et, au besoin, **`enConstruction:true`** (badge jaune « En construction » avec un cône,
   prioritaire sur « Nouveau »; l'enlever quand Jeremy dit que le livre est fini). **`window.COUVERTURES`** : `{ fichier: "data:image/jpeg;base64,…" }`
-  (capture de la 1re page du livre, 420 px de large, JPEG ~80).
+  (capture de la 1re page du livre, 420 px de large, JPEG ~80). Champ facultatif **`version`** (ex. `"6"`) : la fiche du livre affiche « Version 6 · mis à jour le … » (`versionLivre`, date tirée de `nouveautes.json`). À la mise à jour d'un livre : remplacer le fichier, ajuster `pages` et `version`, refaire la couverture, entrée `type:"maj"` dans `nouveautes.json`. Versions connues le 29 oct. : C9 = 6, administration = 2, C13 = 2 (les autres : demander à Jeremy).
 - **Ajouter un livre** : copier dans `livres/<nom>.html`, ajouter l'entrée `LIVRES` + la couverture, ajouter une entrée
   `type:"ajout", livre:"<nom>"` dans `nouveautes.json` (allume le badge « Nouveau » 30 jours), puis
   `bash outils/publier.sh "Nouveau livre : …" <nom>` (le vérificateur ouvre le livre, teste flèches, table des matières, réponses).
