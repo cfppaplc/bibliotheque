@@ -2750,7 +2750,7 @@ const VALEURS_FORME = {
   bulle:{ q:"Numéro ou lettre de la bulle", ex:"A" } };
 function modifierForme(s, cx, cy){
   const V = s.t === "objet" ? (s.k === "jonction" ? null : ELEC[s.k] ? (s.k === "rails" ? { q:"Nom des rails (ex. L1 / L2, 120 V)", ex:"L1 / L2" } : { q:"Repère du symbole (ex. CR1, M, PB2)", ex:"CR1" }) : { q:"Nom de l'objet (ex. P-1, Chaudière 1)", ex:"P-1" })
-    : ((s.t === "cote" && s.txt ? { q:"Texte sur ce côté (ex. a, 3 m, hypoténuse)", ex:"a" } : VALEURS_FORME[s.t]) || (/^tuy/.test(s.t) ? { q:"Diamètre du tuyau (ex. 3/4 po, 3 po ABS)", ex:"3/4 po" } : { q:"Étiquette affichée sur la forme (laisse vide pour l'enlever)", ex:"A" }));
+    : ((s.t === "cote" && s.txt ? { q:"Texte sur ce côté (ex. a, 3 m, hypoténuse)", ex:"a" } : VALEURS_FORME[s.t]) || (/^tuy/.test(s.t) ? { q:"Diamètre du tuyau (ex. 3/4 po, 3 po ABS)", ex:"3/4 po" } : { q:"Nom au centre (facultatif)", ex:"A" }));
   if (!V) return;
   const old = document.getElementById("formeVal"); if (old) old.remove();
   const box = document.createElement("div"); box.id = "formeVal";
@@ -2761,8 +2761,9 @@ function modifierForme(s, cx, cy){
   extras.forEach(([lab, cle, ph]) => { const r = document.createElement("label"); r.style.cssText = "display:flex;flex-direction:column;gap:3px;margin-top:8px;line-height:1.3";
     r.innerHTML = '<span>' + lab + '</span><input data-cle="' + cle + '" placeholder="' + ph + '" style="min-height:36px;border-radius:8px;border:1px solid #2f2f33;padding:0 8px;font:700 .95rem system-ui;color:#111;background:#fff">';
     r.querySelector("input").value = s[cle] || ""; box.appendChild(r); });
+  if (s.t !== "objet" && s.t !== "maison" && !/^tuy/.test(s.t) && !s.hl) couleurForme(box, s);
   if (s.t !== "bulle" && !(s.t === "objet" && ELEC[s.k])) tailleTexte(box, s);
-  if (s.t === "cote" || (s.t !== "objet" && !VALEURS_FORME[s.t]) || (s.t === "objet" && !ELEC[s.k])) padCote(box, s);
+  if (s.t === "cote" || (s.t !== "objet" && !VALEURS_FORME[s.t] && !cotesPossibles(s)) || (s.t === "objet" && !ELEC[s.k])) padCote(box, s);   /* forme qui accepte « + Texte sur un côté » : pas besoin du pavé de position */
   if (cotesPossibles(s)){ const rang = document.createElement("div"); rang.style.cssText = "display:flex;gap:6px;margin-top:10px";
     const st = "flex:1;min-height:40px;border-radius:9px;border:1px solid #6aa9ff;border-bottom-width:4px;color:#fff;font:800 .85rem system-ui;cursor:pointer;padding:0 6px";
     rang.innerHTML = '<button type="button" data-plus="txt" title="Ajoute un texte (a, b, c…) sur le côté que tu choisis" style="' + st + ';background:#1f6fc2">+ Texte sur un côté</button><button type="button" data-plus="cote" title="Ajoute une ligne de cote sur le côté que tu choisis" style="' + st + ';background:#2a2a30">+ Cote</button>';
@@ -2857,6 +2858,14 @@ function glisserCase(box){
   bar.addEventListener("pointermove", e => { if (!d) return; box.style.left = Math.max(0, Math.min(innerWidth - box.offsetWidth, e.clientX - d.dx)) + "px"; box.style.top = Math.max(0, Math.min(innerHeight - 40, e.clientY - d.dy)) + "px"; });
   ["pointerup", "pointercancel"].forEach(t => bar.addEventListener(t, () => { d = null; bar.style.cursor = "grab"; }));
   bar.addEventListener("mousedown", e => e.preventDefault()); }
+/* couleur de la forme, dans la case du double-clic */
+function couleurForme(box, s){
+  const row = document.createElement("div"); row.style.cssText = "display:flex;align-items:center;gap:6px;margin-top:10px;flex-wrap:wrap";
+  const C = [["#24282c", "Noir"], ["#e2483d", "Rouge"], ["#2a7bcf", "Bleu"], ["#2f9e4f", "Vert"], ["#f08c00", "Orange"], ["#8a8f98", "Gris"]];
+  row.innerHTML = '<span style="flex:1 0 100%;font-size:.85rem">Couleur</span>' + C.map(([c, n]) => '<button type="button" data-fcol="' + c + '" title="' + n + '" aria-label="' + n + '" style="width:32px;height:32px;flex:0 0 32px;border-radius:50%;border:3px solid ' + ((s.c || "#24282c") === c ? "#fff" : "#3a3a40") + ';background:' + (c === "#24282c" && wbSombre() ? "#f4f1ea" : c) + ';cursor:pointer;box-shadow:' + ((s.c || "#24282c") === c ? "0 0 0 2px #2a7bcf" : "none") + '"></button>').join("");
+  row.addEventListener("mousedown", e => e.preventDefault());
+  row.querySelectorAll("[data-fcol]").forEach(b => b.onclick = () => { snapInk(); s.c = b.dataset.fcol; row.querySelectorAll("[data-fcol]").forEach(x => { const on = x === b; x.style.borderColor = on ? "#fff" : "#3a3a40"; x.style.boxShadow = on ? "0 0 0 2px #2a7bcf" : "none"; }); redrawInk(); });
+  box.appendChild(row); }
 /* taille du texte (s.tz) : − / + */
 function tailleTexte(box, s){
   const row = document.createElement("div"); row.style.cssText = "display:flex;align-items:center;gap:6px;margin-top:10px";
