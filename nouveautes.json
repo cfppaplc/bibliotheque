@@ -63,6 +63,7 @@
         "img": "nouveautes/cote-cote.jpg"
       },
       "Flèche : double-clic, puis écris le texte où la flèche commence et où elle pointe (ex. « Eau froide » → « Robinet »).",
+      "Cote sur plusieurs lignes : choisis-les avec Ctrl + cadre (ou Ctrl + clic), puis double-clic sur l'une d'elles : une cote va d'un bout à l'autre de la sélection.",
       {
         "t": "Sur le plan isométrique, la cote suit les axes de la grille et donne la longueur en pas (ex. 6 carr.). Sur un tuyau dessiné au crayon, chaque tronçon droit se cote d'un coin à l'autre; sur un objet, d'un raccord à l'autre.",
         "img": "nouveautes/iso-cotes.jpg"
@@ -71,6 +72,10 @@
       "Cote : touche-la puis tire son carré bleu pour l'éloigner ou la changer de côté."
     ],
     "versions": [
+      {
+        "date": "2026-10-28",
+        "texte": "Double-clic sur plusieurs lignes choisies : une cote d'un bout à l'autre."
+      },
       {
         "date": "2026-10-28",
         "texte": "Effacer ou copier une forme ou un objet emporte ses cotes et ses textes."
@@ -82,10 +87,6 @@
       {
         "date": "2026-10-28",
         "texte": "Objets iso : le texte et la cote se placent sous l'objet (ou à côté s'il est debout), jamais par-dessus."
-      },
-      {
-        "date": "2026-10-28",
-        "texte": "Couleur et cotes aussi pour les tuyaux iso, les objets iso et les symboles électriques; cotes iso."
       }
     ]
   },

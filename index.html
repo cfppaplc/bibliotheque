@@ -4065,7 +4065,15 @@ function aimanterTuyau(q, a, sauf){
   return best ? best[0] : q; }
 /* Sélection multiple : Ctrl (ou Maj) + clic ajoute ou retire un élément; glisser dans le vide trace un cadre; glisser un élément du groupe déplace tout le groupe */
 (function(){
-  const c = $("#inkCanvas"); let mm = null, raf = 0, cadre = null;
+  const c = $("#inkCanvas"); let mm = null, raf = 0, cadre = null, tapG = null;
+  /* cote sur plusieurs lignes choisies : des deux bouts les plus éloignés */
+  const coteGroupe = (L, cx, cy) => { const W = c.width, H = c.height, lignes = L.filter(o => o.p && /^(ligne|fleche|fleche2|tuy[A-Z]+)$/.test(o.t || "")); if (lignes.length < 1) return false;
+    const P = []; lignes.forEach(o => o.p.slice(0, 2).forEach(q => P.push(q))); let A = null, B = null, dm = -1;
+    P.forEach(u => P.forEach(v => { const d = Math.hypot((u[0] - v[0]) * W, (u[1] - v[1]) * H); if (d > dm){ dm = d; A = u; B = v; } })); if (dm < 6) return false;
+    if (A[0] > B[0]){ const t = A; A = B; B = t; }
+    const an = Math.atan2((B[1] - A[1]) * H, (B[0] - A[0]) * W), sg = Math.cos(an) > 0 ? -1 : 1, ec = 30 * RD.z * (window.devicePixelRatio || 1), f = lignes[0];
+    snapInk(); const n = { t:"cote", c:f.c && !/^tuy/.test(f.t) ? f.c : "#24282c", hl:false, hc:null, w:2.5, p:[A.slice(), B.slice()], d:sg * ec / H }; if (/^iso/.test(wbBg())) n.iso = 1;
+    strokes().push(n); SELM = []; SELO.s = n; redrawInk(); try { majObjUI(); } catch(er){} modifierForme(n, cx, cy); return true; };
   const actif = () => RD.wb && !RD.eraser && !RD.sim && !RD.text && (RD.obj || RD.crayonOff) && !RD.formeK && !RD.objK;
   const brut = e => { const r = c.getBoundingClientRect(); return [(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height]; };
   const sous = q => objetSous(q) || formeSous(q);
@@ -4097,6 +4105,8 @@ function aimanterTuyau(q, a, sauf){
   }, true);
   ["pointerup", "pointercancel"].forEach(t => c.addEventListener(t, e => {
     if (!mm) return; e.stopImmediatePropagation(); const m = mm; mm = null;
+    if (m.groupe && !m.snap){ const now = Date.now(), dbl = tapG && now - tapG.t < 550 && Math.hypot(e.clientX - tapG.x, e.clientY - tapG.y) < 24; tapG = dbl ? null : { t:now, x:e.clientX, y:e.clientY };
+      if (dbl && coteGroupe(m.groupe, e.clientX, e.clientY)) return; }                                    /* double-clic sur un groupe de lignes : une cote d'un bout à l'autre */
     if (m.groupe){ if (raf){ cancelAnimationFrame(raf); raf = 0; } try { if (m.groupe.some(o => o.t === "objet" && ELEC[o.k]) && window.nettoyerJonctions) nettoyerJonctions(); } catch(er){} redrawInk(); return; }
     if (cadre){ cadre.remove(); cadre = null; }
     if (m.x1 === undefined || t === "pointercancel"){                                                   /* simple clic dans le vide : plus rien de choisi */
