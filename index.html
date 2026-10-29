@@ -586,7 +586,7 @@
   .reader.wbon.pen-side .penbar .sep{width:1px;height:26px}
   .reader.wbon.pen-side .penbar .ppop{left:50%;right:auto;top:auto;bottom:calc(100% + 10px);transform:translateX(-50%)}
   .reader.wbon #penSide{display:none!important}
-  body:has(.reader.wbon.open) .toast{bottom:calc(84px + env(safe-area-inset-bottom,0px))}   /* les messages passent au-dessus de la barre */
+  body:has(.reader.wbon.open) .toast{bottom:auto;top:calc(52px + env(safe-area-inset-top,0px))}   /* tableau blanc : les messages s'affichent en haut */
   .reader.pen-side.pen-fold .penbar{flex-wrap:nowrap}
   /* la palette des objets se place où l'on veut (poignée en haut) */
   #objBar.of>*:not(#objF):not(.tete){display:none!important}#objBar.sim>*:not(#objF):not(.tete):not(#objSim):not(.simAide){display:none!important}
@@ -1605,7 +1605,7 @@ function brancherSouris(win){
   doc.addEventListener("mouseleave", () => { $("#laser").hidden = true; });
   /* page simple : le cadre est rogné à la page, donc le zoom propre au livre (C9, M11…) ne montrerait qu'une bande; la bibliothèque zoome elle-même */
   win.addEventListener("wheel", e => {
-    if (!RD.single || RD.wb || outilActif() || e.shiftKey || (RD.drv && RD.drv.defile) || win.frameElement !== $("#readerFrame")) return;
+    if ((!RD.single && !win.__incendie) || RD.wb || outilActif() || e.shiftKey || (RD.drv && RD.drv.defile) || win.frameElement !== $("#readerFrame")) return;   /* protection incendie : toujours le zoom de la bibliothèque, comme les autres livres */
     e.preventDefault(); e.stopImmediatePropagation(); zoomSouris(e, win.frameElement); }, { capture:true, passive:false });
   win.addEventListener("wheel", e => {
     if (e.ctrlKey || e.metaKey || RD.wb){ e.preventDefault(); zoomSouris(e, win.frameElement); return; }
