@@ -3489,7 +3489,7 @@ function ouvrirSchemas(){
 }
 /* ---- Barre et souris des objets ---- */
 const SELO = { s:null };
-RD.objK = "plinthe"; RD.objO = 0;
+RD.objK = null; RD.objO = 0;   /* aucun outil au départ */
 function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
   if (!RD.obj){ if (RD.formeK){ RD.formeK = null; } return; }
   /* onglet : Formes, Isométrique (fond iso) ou Électricité (fond quadrillé) */
@@ -4111,7 +4111,7 @@ function aimanterTuyau(q, a, sauf){
     rang.querySelectorAll("[data-g]").forEach(bg => bg.onclick = () => { fermer(); poser(bg.dataset.g === "txt"); });
     glisserCase(box); $("#reader").appendChild(box); placerCase(box, { t:"ligne", p:[A, B] }, cx, cy); setTimeout(() => document.addEventListener("pointerdown", dehors, true), 0);
     return true; };
-  const actif = () => RD.wb && !RD.eraser && !RD.sim && !RD.text && (RD.obj || RD.crayonOff) && !RD.formeK && !RD.objK;
+  const actif = () => RD.wb && !RD.eraser && !RD.sim && !RD.text && (RD.obj ? !RD.formeK && !RD.objK : RD.crayonOff);   /* aucun outil : glisser dans le vide trace un cadre de sélection */
   const brut = e => { const r = c.getBoundingClientRect(); return [(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height]; };
   const sous = q => objetSous(q) || formeSous(q);
   const stop = e => { e.stopImmediatePropagation(); e.preventDefault(); try { c.setPointerCapture(e.pointerId); } catch(er){} };
