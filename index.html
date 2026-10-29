@@ -443,9 +443,10 @@
   .toast:not([hidden]){animation:toastIn .25s ease}
   @media (prefers-reduced-motion:reduce){
     html{scroll-behavior:auto}
-    *,*::before,*::after{animation:none!important;transition:none!important}
+    /* exception : crochet vert, bienvenue, cadenas, cloche et « Enregistré ! » jouent quand même (courts; sinon le crochet restait invisible
+       quand Windows a « Effets d'animation » désactivé, comme sur l'ordinateur de Jeremy) */
+    *:not(.acces-succes *):not(.acces-marque img):not(.cadenas.secoue):not(#compteBtn .cloche svg):not(.sch-gard .ok),*::before,*::after{animation:none!important;transition:none!important}
   }
-
   /* ---------- Finitions : progression, signets, mode classe ---------- */
   .row h2{border-left:4px solid var(--cc,#e50914);padding-left:10px}
   .prog{position:absolute;left:0;right:0;bottom:0;height:5px;background:rgba(255,255,255,.25);z-index:5}
@@ -3627,7 +3628,9 @@ function ouvrirSchemas(){
       else if (b.dataset.a === "garder"){ const inp = ov.querySelector("#schNom"), nom = inp.value.trim() || ("Tableau du " + new Date().toLocaleDateString("fr-CA"));
         if (!RD.wb || !strokes().length){ aviser("Le tableau est vide."); return; }
         l.unshift({ id:Date.now(), nom, date:new Date().toLocaleDateString("sv-SE"), bg:wbBg(), ref:REFS[inkKey()] || baseCanevas(), strokes:copieTraits(strokes()) });
-        if (ecrireSch(l)){ inp.value = ""; remplir(); aviser("« " + nom + " » enregistré dans Mes schémas."); } }
+        if (ecrireSch(l)){ inp.value = ""; remplir(); aviser("« " + nom + " » enregistré dans Mes schémas.");
+          const g = ov.querySelector('[data-a="garder"]'); if (g){ const t0 = g.innerHTML; g.classList.add("fait"); g.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path class="ok" d="M5 12.5l4.5 4.5L19 7.5"/></svg> Enregistré !';
+            setTimeout(() => { g.classList.remove("fait"); g.innerHTML = t0; }, 1800); } } }
       else if (b.dataset.a === "ouvrir"){ ov.hidden = true; ouvrirSchema(l[i]); }
       else if (b.dataset.a === "exporter"){ const sc = l[i]; telecharger(nomFichier(sc.nom) + ".schema.json", JSON.stringify({ type:"schema-pavillon", v:1, nom:sc.nom, date:sc.date, bg:sc.bg, ref:sc.ref, strokes:sc.strokes })); }
       else if (b.dataset.a === "renommer"){ const li = b.closest(".sch-it"), sp = li.querySelector(".sch-n"), inp = document.createElement("input"); inp.value = l[i].nom; inp.className = "sch-in"; sp.replaceWith(inp); inp.focus(); inp.select();
@@ -4913,7 +4916,10 @@ function lire(l){
   if (l.fichier && window.ACCES && location.protocol.startsWith("http")){                  /* livres protégés (chiffrés) : compte enseignant */
     if (!ACCES.estPret){ ACCES.pret.then(() => lire(l)); return; }
     if (ACCES.protege(l.fichier)){
-      if (!ACCES.permis(l.fichier)){ if (!ACCES.session) ACCES.dlgConnexion(() => lire(l)); else aviser("Ce livre ne t'est pas encore permis. Demande l'accès à Jeremy."); return; }
+      if (!ACCES.permis(l.fichier)){   /* le cadenas du livre bouge un peu, puis la connexion s'ouvre */
+        const cads = [...document.querySelectorAll('.book[data-f="' + l.fichier + '"] .cadenas')].filter(c => c.offsetParent);
+        cads.forEach(c => { c.classList.remove("secoue"); void c.offsetWidth; c.classList.add("secoue"); });
+        setTimeout(() => { if (!ACCES.session) ACCES.dlgConnexion(() => lire(l)); else aviser("Ce livre ne t'est pas encore permis. Demande l'accès à Jeremy."); }, cads.length ? 520 : 0); return; }
       chargement(l);
       ACCES.ouvrir(l).then(h => ouvrirLivre(l, h)).catch(err => { chargement(null); aviser("Impossible d'ouvrir ce livre : " + err.message + "."); });
       return; } }
@@ -7939,6 +7945,8 @@ window.addEventListener("online", () => { try { aviser("Internet est revenu."); 
   .acces-box label.acces-prog:hover{transform:translateY(-1px);border-color:#55555c}
   .acces-prog input{position:absolute;opacity:0;pointer-events:none}
   .acces-prog svg{width:28px;height:28px;color:#8c8c92;transition:color .2s}
+  .acces-prog .plogo{width:76px;height:76px;border-radius:12px;background:#fff;object-fit:contain;padding:3px;filter:grayscale(.55) opacity(.8);transition:filter .25s,transform .25s;box-shadow:0 4px 14px rgba(0,0,0,.35)}
+  .acces-prog:has(input:checked) .plogo{filter:none;transform:scale(1.06)}
   .acces-prog::after{content:"";position:absolute;top:7px;right:7px;width:16px;height:16px;border-radius:50%;border:1.5px solid #4a4a50;transition:all .2s}
   .acces-box label.acces-prog:has(input:checked){border-color:#e50914;background:rgba(229,9,20,.12);color:#fff}
   .acces-prog:has(input:checked) svg{color:#ff5a63}
@@ -7963,7 +7971,24 @@ window.addEventListener("online", () => { try { aviser("Internet est revenu."); 
   @keyframes halo{from{transform:scale(.8);opacity:1}to{transform:scale(1.9);opacity:0}}
   @keyframes conf{0%{opacity:1;transform:translate(-50%,-50%) rotate(0)}100%{opacity:0;transform:translate(calc(-50% + var(--x)),calc(-50% + var(--y))) rotate(var(--r))}}
   @keyframes monte{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-  @media (prefers-reduced-motion:reduce){.acces-succes *,.acces-marque img{animation-duration:.01s!important;animation-delay:0s!important}}
+  .acces-bienv .avatar{width:92px;height:92px;margin:6px auto 12px;position:relative}
+  .acces-bienv .avatar .ini{position:absolute;inset:0;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:800;color:#fff;background:var(--moi,#e50914);box-shadow:0 10px 30px rgba(0,0,0,.4);animation:remplir .45s cubic-bezier(.2,1.5,.4,1) both}
+  .acces-bienv .avatar .halo{position:absolute;inset:0;border-radius:50%;background:var(--moi,#e50914);opacity:.35;animation:halo 1s .3s ease-out both}
+  .acces-bienv .cad{position:absolute;right:-4px;bottom:-4px;width:34px;height:34px;border-radius:50%;background:#22c55e;color:#fff;display:flex;align-items:center;justify-content:center;border:3px solid #18181b;animation:remplir .35s .35s cubic-bezier(.2,1.5,.4,1) both}
+  .acces-bienv .cad svg{width:18px;height:18px}
+  .acces-bienv .cad .anse{transform-origin:16px 11px;animation:ouvre .45s .65s cubic-bezier(.3,1.6,.5,1) forwards}
+  .acces-bienv h2{animation-delay:.35s}.acces-bienv .sous{animation-delay:.5s}
+  @keyframes ouvre{to{transform:translateY(-2.5px) rotate(28deg)}}
+  .cadenas.secoue{animation:secoue .5s cubic-bezier(.36,.07,.19,.97) both;background:#e50914}
+  @keyframes secoue{10%,90%{transform:translateX(-1px) rotate(-4deg)}20%,80%{transform:translateX(2px) rotate(6deg)}30%,50%,70%{transform:translateX(-3px) rotate(-10deg)}40%,60%{transform:translateX(3px) rotate(10deg)}}
+  .sch-gard button.fait{background:#16a34a!important;border-color:#16a34a!important;color:#fff!important;display:inline-flex;align-items:center;gap:6px;justify-content:center}
+  .sch-gard button.fait .ok{stroke-dasharray:24;stroke-dashoffset:24;animation:trace .35s .05s ease-out forwards}
+  #compteBtn{position:relative}
+  #compteBtn .cloche{position:absolute;top:-7px;right:-9px;display:inline-flex;align-items:center;gap:1px;height:19px;padding:0 5px 0 3px;border-radius:999px;background:#f59e0b;color:#1a1a1a;border:2px solid #141414;font:800 .62rem system-ui;box-shadow:0 2px 6px rgba(0,0,0,.4)}
+  #compteBtn .cloche svg{width:12px;height:12px;transform-origin:50% 10%;animation:sonne 2.6s ease-in-out infinite}
+  body.clair #compteBtn .cloche{border-color:#fff}
+  @keyframes sonne{0%,58%,100%{transform:rotate(0)}62%{transform:rotate(18deg)}68%{transform:rotate(-16deg)}74%{transform:rotate(12deg)}80%{transform:rotate(-8deg)}86%{transform:rotate(4deg)}}
+  
   .prefs h3{margin:16px 0 6px;font-size:.78rem;color:#8c8c92;text-transform:uppercase;letter-spacing:.05em}
   .prefs .lig{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid #26262b;flex-wrap:wrap}
   .prefs .lig>span{font-size:.92rem;color:#e4e4e7}
@@ -8049,7 +8074,7 @@ window.ACCES = (function(){
   }
   let NB_DEM = 0;
   async function compterDemandes(){ if (!SESSION || !SESSION.admin) return; const v = await lireBoite(); NB_DEM = Object.keys(v || {}).filter(id => !DATA.comptes[id]).length;
-    const b = document.getElementById("compteBtn"); if (b && NB_DEM){ b.style.boxShadow = "0 0 0 2px #e50914"; b.title = NB_DEM + " demande(s) d'accès en attente"; } }
+    majBouton(); }
   const protege = f => !!(DATA && DATA.livres && DATA.livres[f]);
   const permis = f => !!(SESSION && protege(f) && DATA.livres[f].cles[SESSION.id]);
   const verrouille = f => protege(f) && !permis(f);
@@ -8149,12 +8174,14 @@ window.ACCES = (function(){
 
   /* ---------------- interface ---------------- */
   const ov = () => document.getElementById("accesOv"), box = () => document.getElementById("accesBox");
-  const fermer = () => { ov().hidden = true; box().classList.remove("large"); };
+  const fermer = () => { ov().hidden = true; box().classList.remove("large"); box().onclick = null; };
   const ICO_PERS = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 20c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>';
   window.ICO_CADENAS = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
   function majBouton(){
     const b = document.getElementById("compteBtn"); if (!b) return;
-    if (SESSION){ const ini = SESSION.nom.split(/\s+/).map(m => m[0] || "").join("").slice(0, 2).toUpperCase(); b.innerHTML = '<span class="ini">' + ini + '</span>'; b.title = "Connecté : " + SESSION.nom; }
+    if (SESSION){ const ini = SESSION.nom.split(/\s+/).map(m => m[0] || "").join("").slice(0, 2).toUpperCase(); b.innerHTML = '<span class="ini">' + ini + '</span>'; b.title = "Connecté : " + SESSION.nom;
+      let nd = 0; try { nd = SESSION.admin ? NB_DEM : 0; } catch(e){}
+      if (nd){ b.innerHTML += '<span class="cloche" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.5a1.4 1.4 0 0 1 1.4 1.4v.6a6 6 0 0 1 4.6 5.8v3.6l1.6 2.6a.8.8 0 0 1-.7 1.2H5.1a.8.8 0 0 1-.7-1.2L6 13.9v-3.6a6 6 0 0 1 4.6-5.8v-.6A1.4 1.4 0 0 1 12 2.5z"/><path d="M9.8 19.2h4.4a2.2 2.2 0 0 1-4.4 0z"/></svg><b>' + nd + '</b></span>'; b.title = nd + " demande" + (nd > 1 ? "s" : "") + " d'accès en attente"; } }
     else { b.innerHTML = ICO_PERS + '<span class="lbl"> Se connecter</span>'; b.title = "Se connecter (livres protégés)"; }
     b.setAttribute("aria-label", b.title);
     const t = document.getElementById("plusCompte"); if (t) t.textContent = SESSION ? "Mon compte (" + SESSION.nom + ")" : "Se connecter";
@@ -8173,6 +8200,7 @@ window.ACCES = (function(){
   document.addEventListener("pointerdown", e => { const m = document.getElementById("accesMenu"); if (m && !m.hidden && !m.contains(e.target) && !e.target.closest("#compteBtn")) m.hidden = true; });
 
   const marque = (titre, sous) => '<div class="acces-marque"><img src="img/pavillon-avenir.png" alt="Pavillon de l\'Avenir"><h2>' + titre + '</h2><p class="sous">' + sous + '</p></div>';
+  const LOGO_PROG = { "Entretien général d'immeubles":"img/prog-egi.jpg", "Plomberie et chauffage":"img/prog-plomberie.jpg" };
   const ICO_PROG = { "Entretien général d'immeubles":'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V8l7-5 7 5v13"/><path d="M9 21v-6h6v6M9 10h.01M15 10h.01"/></svg>',
     "Plomberie et chauffage":'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h6v4h6a4 4 0 0 1 4 4v2h-4v-2H10v2H4z"/><path d="M18 18.5c0 1-.8 1.8-1.8 1.8s-1.7-.8-1.7-1.8c0-1.2 1.7-3 1.7-3s1.8 1.8 1.8 3z"/></svg>' };
   function succes(titre, html){   /* écran « c'est envoyé » : crochet vert animé + confettis */
@@ -8182,6 +8210,15 @@ window.ACCES = (function(){
     return '<div class="acces-succes"><div class="crochet"><span class="halo"></span>' + conf + '<svg viewBox="0 0 100 100"><circle class="fond" cx="50" cy="50" r="45"/><circle class="cercle" cx="50" cy="50" r="45"/><path class="coche" d="M30 52l13 13 27-29"/></svg></div>'
       + '<h2>' + titre + '</h2>' + html + '<br><img class="mini" src="img/pavillon-avenir.png" alt=""></div>';
   }
+  function bienvenue(apres){   /* connexion réussie : pastille des initiales qui apparaît, cadenas qui s'ouvre, « Bonjour Prénom ! », puis fermeture toute seule */
+    const ini = SESSION.nom.split(/\s+/).map(m => m[0] || "").join("").slice(0, 2).toUpperCase(), n = protegesPermis();
+    box().innerHTML = '<div class="acces-succes acces-bienv"><div class="avatar"><span class="halo"></span><span class="ini">' + ini + '</span><span class="cad"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path class="anse" d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span></div>'
+      + '<h2>Bonjour ' + esc(SESSION.nom.split(/\s+/)[0]) + ' !</h2><p class="sous">' + (n ? n + ' livre' + (n > 1 ? 's' : '') + ' déverrouillé' + (n > 1 ? 's' : '') + ' pour toi.' : 'Tu es connecté.') + '</p></div>';
+    ov().hidden = false;
+    let fini = false; const fin = () => { if (fini) return; fini = true; fermer(); if (apres) apres(); };
+    setTimeout(fin, 1900); box().onclick = fin;
+  }
+  const protegesPermis = () => { try { return Object.keys(DATA.livres).filter(f => DATA.livres[f].cles[SESSION.id]).length; } catch(e){ return 0; } };
   function dlgConnexion(apres){
     box().innerHTML = marque('Se connecter', 'Les livres protégés s\'ouvrent avec ton compte enseignant. Ton mot de passe ne quitte jamais cet ordinateur.')
       + '<label for="acId">Identifiant</label><input type="text" id="acId" autocomplete="username" placeholder="prenom.nom">'
@@ -8191,7 +8228,7 @@ window.ACCES = (function(){
       + '<button class="acces-lien" id="acDem">Pas encore de compte ? Demander un accès</button><br><button class="acces-lien" id="acOubli" style="margin-top:8px">Mot de passe oublié ?</button>';
     ov().hidden = false; setTimeout(() => document.getElementById("acId")?.focus(), 50);
     const go = async () => { const bt = document.getElementById("acOui"), er = document.getElementById("acErr"); bt.disabled = true; bt.textContent = "Vérification…"; er.hidden = true;
-      try { await connexion(document.getElementById("acId").value, document.getElementById("acMdp").value); fermer(); aviser("Bienvenue, " + SESSION.nom + " !"); if (apres) apres(); }
+      try { await connexion(document.getElementById("acId").value, document.getElementById("acMdp").value); bienvenue(apres); compterDemandes().catch(() => {}); }
       catch(e){ er.textContent = e.message; er.hidden = false; bt.disabled = false; bt.textContent = "Se connecter"; } };
     document.getElementById("acOui").onclick = go; document.getElementById("acMdp").onkeydown = e => { if (e.key === "Enter") go(); };
     document.getElementById("acNon").onclick = fermer; document.getElementById("acDem").onclick = () => dlgDemande(false); document.getElementById("acOubli").onclick = () => dlgDemande(true);
@@ -8202,7 +8239,7 @@ window.ACCES = (function(){
       + '<label for="dNom">Prénom et nom</label><input type="text" id="dNom" autocomplete="name">'
       + '<label for="dMdp">Mot de passe</label><input type="password" id="dMdp" autocomplete="new-password">'
       + '<label for="dMdp2">Mot de passe (encore)</label><input type="password" id="dMdp2" autocomplete="new-password">'
-      + (oubli ? '' : '<label>Programme(s) que tu enseignes</label><div class="acces-progs">' + PROGS().map(c => '<label class="acces-prog"><input type="checkbox" class="dProg" value="' + esc(c) + '">' + (ICO_PROG[c] || '') + esc(progNom(c)) + '</label>').join("") + '</div>')
+      + (oubli ? '' : '<label>Programme(s) que tu enseignes</label><div class="acces-progs">' + PROGS().map(c => '<label class="acces-prog"><input type="checkbox" class="dProg" value="' + esc(c) + '">' + (LOGO_PROG[c] ? '<img class="plogo" src="' + LOGO_PROG[c] + '" alt="">' : (ICO_PROG[c] || '')) + esc(progNom(c)) + '</label>').join("") + '</div>')
       + '<div class="acces-err" id="dErr" hidden></div>'
       + '<div class="acces-btns"><button id="dNon">Annuler</button><button class="prim" id="dOui">' + (oubli ? 'Envoyer ma demande' : 'Créer ma demande') + '</button></div>';
     ov().hidden = false; setTimeout(() => document.getElementById("dNom")?.focus(), 50);
@@ -8306,7 +8343,9 @@ window.ACCES = (function(){
       try { localStorage.setItem("ghJeton", jt); } catch(e){}
       const bt = document.getElementById("gPub"); bt.disabled = true; bt.textContent = "Publication…";
       try { await publierGitHub(jt, BROUILLON); DATA = JSON.parse(JSON.stringify(BROUILLON)); try { localStorage.setItem("accesCopie", JSON.stringify(DATA)); } catch(e){}
-        dessinerGerer({ ok:"Publié ! Les changements seront en ligne d'ici une minute ou deux." }); try { render(); } catch(e){} }
+        box().classList.remove("large"); box().innerHTML = succes('Publié !', '<p class="sous">Les changements seront en ligne d\'ici une minute ou deux.</p><div class="acces-btns" style="justify-content:center"><button id="gRet">Retour aux accès</button><button class="prim" id="gFin2">Fermer</button></div>');
+        document.getElementById("gRet").onclick = () => { box().classList.add("large"); dessinerGerer(); }; document.getElementById("gFin2").onclick = fermer;
+        try { render(); } catch(e){} compterDemandes().catch(() => {}); }
       catch(e){ dessinerGerer({ err:"Publication impossible : " + e.message + (/401|403|Bad credentials|refusée/i.test(e.message) ? " — ta clé GitHub est peut-être expirée : touche « Changer » et colles-en une nouvelle." : "") }); } };
   }
   async function remplacerCompte(d){          /* nouveau compte, ou nouveau mot de passe d'un compte existant (ses livres sont gardés) */
