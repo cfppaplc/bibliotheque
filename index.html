@@ -63,6 +63,13 @@
   .logo-pav{display:inline-flex;align-items:center;background:#fff;border-radius:8px;padding:4px 8px;height:42px}.logo-pav img{height:34px;width:auto;display:block}
   .logo-t{border-left:1px solid #ffffff33;padding-left:12px}
   @media (max-width:700px){.logo-t{display:none}}
+  /* En-tête épuré (29 oct., option D choisie par Jeremy) : logo sans boîte blanche, « Bibliothèque » sobre en gris */
+  header .logo{gap:10px}
+  header .logo-pav{background:transparent;padding:0;box-shadow:none!important}
+  header .logo-pav img{height:30px;filter:brightness(0) invert(1)}
+  body.clair header .logo-pav img{filter:none;mix-blend-mode:multiply}
+  header .logo-t{text-transform:none;letter-spacing:.01em;font-weight:600;font-size:1.05rem;color:var(--muted);border-left:1px solid #ffffff26;padding-left:12px}
+  body.clair header .logo-t{border-left-color:#0000001f}
   nav{display:flex;gap:18px;font-size:.9rem}
   nav a{color:var(--text);text-decoration:none;opacity:.8;cursor:pointer}
   nav a:hover,nav a.active{opacity:1;font-weight:600}
