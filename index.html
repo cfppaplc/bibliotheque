@@ -2858,13 +2858,19 @@ function glisserCase(box){
   bar.addEventListener("pointermove", e => { if (!d) return; box.style.left = Math.max(0, Math.min(innerWidth - box.offsetWidth, e.clientX - d.dx)) + "px"; box.style.top = Math.max(0, Math.min(innerHeight - 40, e.clientY - d.dy)) + "px"; });
   ["pointerup", "pointercancel"].forEach(t => bar.addEventListener(t, () => { d = null; bar.style.cursor = "grab"; }));
   bar.addEventListener("mousedown", e => e.preventDefault()); }
+/* une forme et les cotes / textes posés sur ses côtés (à partir de la forme ou d'une de ses cotes) */
+function groupeCotes(s){ const c = $("#inkCanvas"), W = c.width, H = c.height, pres = (u, v) => Math.hypot((u[0] - v[0]) * W, (u[1] - v[1]) * H) < 4;
+  const arcs = f => { const S = sommetsForme(f); if (!S) return []; const A = []; for (let i = 0; i < S.P.length - (S.ferme ? 0 : 1); i++) A.push([S.P[i], S.P[(i + 1) % S.P.length]]); return A; };
+  const sur = (o, f) => arcs(f).some(([u, v]) => (pres(u, o.p[0]) && pres(v, o.p[1])) || (pres(v, o.p[0]) && pres(u, o.p[1])));
+  const tous = strokes(), f = s.t === "cote" ? tous.find(o => o !== s && o.t !== "cote" && o.p && sur(s, o)) : s;
+  if (!f) return []; return [f].concat(tous.filter(o => o.t === "cote" && o !== f && sur(o, f))).filter(o => o !== s); }
 /* couleur de la forme, dans la case du double-clic */
 function couleurForme(box, s){
   const row = document.createElement("div"); row.style.cssText = "display:flex;align-items:center;gap:6px;margin-top:10px;flex-wrap:wrap";
   const C = [["#24282c", "Noir"], ["#e2483d", "Rouge"], ["#2a7bcf", "Bleu"], ["#2f9e4f", "Vert"], ["#f08c00", "Orange"], ["#8a8f98", "Gris"]];
   row.innerHTML = '<span style="flex:1 0 100%;font-size:.85rem">Couleur</span>' + C.map(([c, n]) => '<button type="button" data-fcol="' + c + '" title="' + n + '" aria-label="' + n + '" style="width:32px;height:32px;flex:0 0 32px;border-radius:50%;border:3px solid ' + ((s.c || "#24282c") === c ? "#fff" : "#3a3a40") + ';background:' + (c === "#24282c" && wbSombre() ? "#f4f1ea" : c) + ';cursor:pointer;box-shadow:' + ((s.c || "#24282c") === c ? "0 0 0 2px #2a7bcf" : "none") + '"></button>').join("");
   row.addEventListener("mousedown", e => e.preventDefault());
-  row.querySelectorAll("[data-fcol]").forEach(b => b.onclick = () => { snapInk(); s.c = b.dataset.fcol; row.querySelectorAll("[data-fcol]").forEach(x => { const on = x === b; x.style.borderColor = on ? "#fff" : "#3a3a40"; x.style.boxShadow = on ? "0 0 0 2px #2a7bcf" : "none"; }); redrawInk(); });
+  row.querySelectorAll("[data-fcol]").forEach(b => b.onclick = () => { snapInk(); s.c = b.dataset.fcol; groupeCotes(s).forEach(o => o.c = s.c);   /* forme, ses cotes et ses textes : même couleur */ row.querySelectorAll("[data-fcol]").forEach(x => { const on = x === b; x.style.borderColor = on ? "#fff" : "#3a3a40"; x.style.boxShadow = on ? "0 0 0 2px #2a7bcf" : "none"; }); redrawInk(); });
   box.appendChild(row); }
 /* taille du texte (s.tz) : − / + */
 function tailleTexte(box, s){

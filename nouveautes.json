@@ -171,7 +171,7 @@
     "formation": [
       "Nouveau : la touche Suppr efface ce qui est choisi (forme, objet, symbole, texte). La gomme a sa glissière de taille. Le bouton plein écran est dans la barre du tableau blanc. Ta couleur personnalisée est retenue. Avec l'outil Fil, les symboles ne bougent plus par accident. En glissant un objet de la palette, tu le vois déjà à sa place.",
       {
-        "t": "Double-clic sur une forme : une case plus simple. Choisis sa couleur (noir, rouge, bleu, vert, orange, gris), la taille du texte, puis « + Texte sur un côté » ou « + Cote ». Le nom au centre est facultatif; le pavé de flèches est retiré pour les formes (il reste pour une cote).",
+        "t": "Double-clic sur une forme : une case plus simple. Choisis sa couleur (noir, rouge, bleu, vert, orange, gris) : ses cotes et ses textes prennent la même couleur (aussi si tu changes la couleur à partir d'une cote), la taille du texte, puis « + Texte sur un côté » ou « + Cote ». Le nom au centre est facultatif; le pavé de flèches est retiré pour les formes (il reste pour une cote).",
         "img": "nouveautes/forme-couleur.jpg"
       },
       {
@@ -272,6 +272,10 @@
       "Le crayon réagit maintenant tout de suite : seul le trait en cours est redessiné pendant que tu écris, le reste du tableau ne bouge pas."
     ],
     "versions": [
+      {
+        "date": "2026-10-28",
+        "texte": "Couleur d'une forme : ses cotes et ses textes changent de couleur avec elle."
+      },
       {
         "date": "2026-10-28",
         "texte": "Double-clic sur une forme : choix de la couleur; case allégée (pavé de flèches retiré, nom au centre facultatif)."
