@@ -2266,17 +2266,28 @@ function objGeo(s, W, H){
   }
   else if (s.k === "vase"){ cyl(0, 0, .09, 0, .4, "#9aa7b5"); cyl(0, 0, .5, .35, 1.55, "#d4574f", 1); cyl(0, 0, .08, 1.55, 1.7, "#8f9cab"); }
   const LV = def.ports && def.ports.length ? Math.round(Math.max(...def.ports.map(q => q[0]))) : 1;   /* debout : les raccords restent sur la grille; vers le haut et vers le bas échangent les deux raccords */
-  const RV = !s.v || !DEBOUT_OK.test(s.k) ? null : s.v > 0 ? (m, h) => [-h, m] : (m, h) => [h, LV - m];   /* objet debout : son axe devient vertical */
-  if (RV) shapes.forEach((sh, i) => {
-    if (sh.t === "box"){ const A = RV(sh.m0, sh.h0), B = RV(sh.m1, sh.h1), nb = Object.assign({}, sh, { m0:Math.min(A[0], B[0]), m1:Math.max(A[0], B[0]), h0:Math.min(A[1], B[1]), h1:Math.max(A[1], B[1]) });
-      if (sh.extra && sh.extra.fins){ const [f0, f1, st, y0, y1] = sh.extra.fins, segs = []; for (let m = f0; m <= f1 + .001; m += st){ const u = RV(sh.m0 + m, y0), v = RV(sh.m0 + m, y1); segs.push([[u[0], sh.n1, u[1]], [v[0], sh.n1, v[1]]]); } nb.extra = Object.assign({}, sh.extra, { fins:null, segs }); }
-      shapes[i] = nb; }
-    else if (sh.t === "cyl"){ const A = RV(sh.m, sh.h0), B = RV(sh.m, sh.h1); shapes[i] = { t:"cylm", m0:Math.min(A[0], B[0]), m1:Math.max(A[0], B[0]), n:sh.n, h:A[1], R:sh.R, fill:sh.fill, rings:sh.rings }; }
-    else if (sh.t === "cyln"){ const A = RV(sh.m, sh.h); shapes[i] = Object.assign({}, sh, { m:A[0], h:A[1] }); }
-    else if (sh.t === "sph"){ const A = RV(sh.m, sh.h); shapes[i] = Object.assign({}, sh, { m:A[0], h:A[1] }); } });
+  if (/^(vanne|boisseau|vannemot|vanne3)$/.test(s.k)){ const f = .68;                          /* vannes plus fines : même longueur (raccords sur la grille), section et volant réduits */
+    shapes.forEach(sh => { ["n", "n0", "n1", "h", "h0", "h1", "R"].forEach(c => { if (typeof sh[c] === "number" && !(c[0] === "n" && Math.abs(sh[c]) > .9)) sh[c] *= f; });   /* une branche qui va jusqu'à un raccord garde sa longueur */
+      if (sh.extra && sh.extra.fins){ const F = sh.extra.fins.slice(); F[3] *= f; F[4] *= f; sh.extra = Object.assign({}, sh.extra, { fins:F }); } }); }
+  /* objet debout : l'axe du tuyau devient vertical. Vers le haut : volant tourné vers la gauche; vers le bas : volant vers la droite (raccords échangés) */
+  const RV = !s.v || !DEBOUT_OK.test(s.k) ? null : s.v > 0 ? (m, n, h) => [-h, n, m] : (m, n, h) => [-n, h, LV - m];
+  if (RV){
+    const cylAxe = (A, B, R, fill, rings) => { const ax = [0, 1, 2].reduce((b, c) => Math.abs(B[c] - A[c]) > Math.abs(B[b] - A[b]) ? c : b, 0), lo = Math.min(A[ax], B[ax]), hi = Math.max(A[ax], B[ax]);
+      if (ax === 0) return { t:"cylm", m0:lo, m1:hi, n:A[1], h:A[2], R, fill, rings };
+      if (ax === 1) return { t:"cyln", m:A[0], h:A[2], R, n0:lo, n1:hi, fill };
+      return { t:"cyl", m:A[0], n:A[1], R, h0:lo, h1:hi, fill, rings }; };
+    shapes.forEach((sh, i) => {
+      if (sh.t === "box"){ const A = RV(sh.m0, sh.n0, sh.h0), B = RV(sh.m1, sh.n1, sh.h1), nb = Object.assign({}, sh, { m0:Math.min(A[0], B[0]), m1:Math.max(A[0], B[0]), n0:Math.min(A[1], B[1]), n1:Math.max(A[1], B[1]), h0:Math.min(A[2], B[2]), h1:Math.max(A[2], B[2]) });
+        if (sh.extra && sh.extra.fins){ const [f0, f1, st, y0, y1] = sh.extra.fins, segs = []; for (let m = f0; m <= f1 + .001; m += st) segs.push([RV(sh.m0 + m, sh.n1, y0), RV(sh.m0 + m, sh.n1, y1)]); nb.extra = Object.assign({}, sh.extra, { fins:null, segs }); }
+        shapes[i] = nb; }
+      else if (sh.t === "cyl") shapes[i] = cylAxe(RV(sh.m, sh.n, sh.h0), RV(sh.m, sh.n, sh.h1), sh.R, sh.fill, sh.rings);
+      else if (sh.t === "cyln") shapes[i] = cylAxe(RV(sh.m, sh.n0, sh.h), RV(sh.m, sh.n1, sh.h), sh.R, sh.fill);
+      else if (sh.t === "sph"){ const A = RV(sh.m, sh.n, sh.h); shapes[i] = Object.assign({}, sh, { m:A[0], n:A[1], h:A[2] }); } });
+    const prof = sh => sh.t === "box" ? -(sh.m0 + sh.m1) / 2 + (sh.n0 + sh.n1) / 2 + (sh.h0 + sh.h1) / 2 : sh.t === "cylm" ? -(sh.m0 + sh.m1) / 2 + sh.n + sh.h : sh.t === "cyln" ? -sh.m + (sh.n0 + sh.n1) / 2 + sh.h : sh.t === "cyl" ? -sh.m + sh.n + (sh.h0 + sh.h1) / 2 : -sh.m + sh.n + sh.h;
+    shapes.sort((x, y) => prof(x) - prof(y)); }                                                   /* on dessine du plus loin au plus proche */
   let lp = def.ports;
   if (s.k === "serpentin"){ const [dm, dn] = s.sz || [4, 3], lignes = Math.round(Math.abs(dn) / (s.pas || .5)) + 1; lp = [[0, 0], [lignes % 2 ? dm : 0, dn]]; }
-  const ports = lp.map(([m, n]) => { if (!RV) return P(m, n, 0); const A = RV(m, 0); return P(A[0], n, A[1]); });
+  const ports = lp.map(([m, n]) => { if (!RV) return P(m, n, 0); const A = RV(m, n, 0); return P(A[0], A[1], A[2]); });
   const pts = []; shapes.forEach(sh => {
     if (sh.t === "box") [[sh.m0, sh.n0], [sh.m1, sh.n0], [sh.m1, sh.n1], [sh.m0, sh.n1]].forEach(([m, n]) => { pts.push(P(m, n, sh.h0), P(m, n, sh.h1)); });
     else if (sh.t === "serp"){ pts.push(P(0, 0, 0), P(sh.dm, 0, 0), P(sh.dm, sh.dn, 0), P(0, sh.dn, 0)); }
@@ -3426,7 +3437,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
   const sel = SELO.s && strokes().includes(SELO.s), sp = sel && SELO.s.k === "serpentin" ? SELO.s : null, pasV = sp ? (sp.pas || .5) : (RD.pas || .5), bp = b.querySelector("#objP");
   bp.style.display = (sp || RD.objK === "serpentin") ? "" : "none"; bp.textContent = "Tubes : " + (pasV >= 1 ? "30 cm" : "15 cm");
   ["objR", "objD"].forEach(id => b.querySelector("#" + id).style.display = sel ? "" : "none");
-  { const bv = b.querySelector("#objV"); if (bv){ const o = sel ? SELO.s : null, ok = o && o.t === "objet" && DEBOUT_OK.test(o.k); bv.style.display = ok ? "" : "none"; if (ok) bv.textContent = !o.v ? "↕ Debout" : o.v > 0 ? "↕ Vers le bas" : "↕ Couché"; } }
+  { const bv = b.querySelector("#objV"); if (bv){ const o = sel ? SELO.s : null, ok = o && o.t === "objet" && DEBOUT_OK.test(o.k); bv.style.display = ok ? "" : "none"; if (ok) bv.textContent = !o.v ? "↕ Debout" : o.v > 0 ? "↕ Autre côté" : "↕ Couché"; } }
   if ((se && (se.k === "rails" || se.k === "jonction")) || (sel && FORMES[SELO.s.t])) b.querySelector("#objR").style.display = "none";
   b.querySelector("#objTaille").style.display = se && se.k === "rails" ? "" : "none"; }
 (function(){
@@ -3448,7 +3459,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     + '<span class="pl">Pôles (circuits coupés)</span><button data-pp="s" title="1 pôle (unipolaire)">1 pôle</button><button data-pp="d" title="2 pôles (bipolaire)">2 pôles</button>'
     + '<span class="pl">Positions (directions)</span><button data-pt="st" title="1 position (unidirectionnel)">1 position</button><button data-pt="dt" title="2 positions (bidirectionnel)">2 positions</button><span class="pl" data-code></span></div><label class="del" id="objDelW">Délai <input id="objDel" type="number" min="1" max="60" step="1" value="3"> s</label><input id="objL" maxlength="10" placeholder="Repère" title="Repère du symbole (ex. CR1, M, PB2)" aria-label="Repère du symbole">'
     + '<div class="taille" id="objTaille"><span>Largeur</span><button data-t="w-1" title="Rapprocher L2">−</button><button data-t="w1" title="Éloigner L2">+</button><span>Hauteur</span><button data-t="h-1" title="Raccourcir l\'échelle">−</button><button data-t="h1" title="Allonger l\'échelle">+</button><em>ou glisse le carré bleu en bas à droite</em></div>'
-    + '<div class="rang"><button id="objR" title="Pivoter l\'objet sélectionné">⟳ Pivoter</button><button id="objV" title="Mettre l\'objet debout : vers le haut, vers le bas, puis couché">↕ Debout</button><button id="objD" title="Supprimer l\'objet sélectionné" aria-label="Supprimer">🗑</button></div>'
+    + '<div class="rang"><button id="objR" title="Pivoter l\'objet sélectionné">⟳ Pivoter</button><button id="objV" title="Mettre l\'objet debout (volant à gauche, puis à droite), puis couché">↕ Debout</button><button id="objD" title="Supprimer l\'objet sélectionné" aria-label="Supprimer">🗑</button></div>'
     + '<button id="objSim" class="grpE" title="Faire fonctionner le schéma : le courant circule, les bobines, lampes et moteurs s\'activent">▶ Animer le schéma</button><div class="simAide"></div><button id="objX">Terminé</button>';
   const st = document.createElement("style");
   st.textContent = '#objBar button{min-height:32px;padding:0 8px;border-radius:8px;border:1px solid #2f2f33;background:#18181a;color:#d4d4d8;cursor:pointer;font:inherit;text-align:left}#objBar button:hover{border-color:#6a6a70}#objBar button.on{background:#2a2a2d;border-color:#6aa9ff;color:#fff}'
@@ -3556,7 +3567,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     aRefaire.forEach(l => { const [t, i] = l; let jb = libres[0], db = 1e9; libres.forEach(j => { const dd = Math.hypot(ap[j][0] - t.p[i][0] * W, ap[j][1] - t.p[i][1] * H); if (dd < db){ db = dd; jb = j; } });
       if (jb === undefined) return; libres.splice(libres.indexOf(jb), 1); t.p[i] = [ap[jb][0] / W, ap[jb][1] / H]; });
     if (aRefaire.length && window.redresserIso && /^iso/.test(wbBg())) redresserIso(s, aRefaire.map(l => l.slice(0, 4)));   /* les tuyaux se refont droits sur la grille */
-    redrawInk(); majObjUI(); aviser(!s.v ? "Objet couché." : s.v > 0 ? "Objet debout, tuyau vers le haut." : "Objet debout, tuyau vers le bas.", 2200); };
+    redrawInk(); majObjUI(); aviser(!s.v ? "Objet couché." : s.v > 0 ? "Objet debout, volant à gauche." : "Objet debout, volant à droite.", 2200); };
   $("#objD").onclick = () => effacerChoix();
   $("#objX").onclick = () => { RD.obj = false; refreshTools(); };
   (function(){ const h = bar.querySelector(".tete"); let d = null;
