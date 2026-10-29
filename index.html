@@ -2564,7 +2564,7 @@ function dessinerForme(g, s, x1, y1, x2, y2, k, col){
     { const an0 = Math.atan2(y2 - y1, x2 - x1), off = (s.d || 0) * (g.canvas ? g.canvas.height : 0), DC = dirCote(s, an0), ox = DC[0] * off, oy = DC[1] * off;
       if (s.txt){ const tz = s.tz || 1; g.save(); g.fillStyle = col; g.font = "700 " + Math.round(16 * k * tz) + "px system-ui, sans-serif"; g.textAlign = "center"; g.textBaseline = "middle";   /* texte sur un côté (sans ligne de cote) */
         const tx = s.lb || "?", tw = g.measureText(tx).width, th = 16 * k * tz, sg = Math.sign(off) || 1, ux = DC[0] * sg, uy = DC[1] * sg, ext = Math.abs(ux) * tw / 2 + Math.abs(uy) * th / 2;   /* le texte ne touche jamais le côté */
-        const ext2 = s.dt ? 0 : s.iso ? th * .75 + (tw > Math.hypot(x2 - x1, y2 - y1) * .9 ? th * 1.1 : 0) : ext, txx = (x1 + x2) / 2 + ux * (Math.abs(off) + ext2), txy = (y1 + y2) / 2 + uy * (Math.abs(off) + ext2); g.lineJoin = "round"; g.lineWidth = 4 * k * tz; g.strokeStyle = wbSombre() ? "rgba(0,0,0,.55)" : "rgba(255,255,255,.9)";
+        const ext2 = s.dt ? 0 : s.iso ? th * .7 : ext, txx = (x1 + x2) / 2 + ux * (Math.abs(off) + ext2), txy = (y1 + y2) / 2 + uy * (Math.abs(off) + ext2); g.lineJoin = "round"; g.lineWidth = 4 * k * tz; g.strokeStyle = wbSombre() ? "rgba(0,0,0,.55)" : "rgba(255,255,255,.9)";
         g.translate(txx, txy); if (s.iso){ let a3 = an0; if (a3 > Math.PI / 2 + .01) a3 -= Math.PI; if (a3 < -Math.PI / 2 + .01) a3 += Math.PI;   /* plan iso : le texte suit l'angle de la pièce (lettres droites, comme un dessin iso) */
           if (Math.abs(Math.cos(a3)) > .3) g.transform(Math.cos(a3), Math.sin(a3), 0, 1, 0, 0); else g.transform(0, -1, Math.cos(Math.PI / 6), -Math.sin(Math.PI / 6), 0, 0); }
         if (s.rot) g.rotate(s.rot * Math.PI / 180);   /* rotation choisie dans la case */
@@ -2736,7 +2736,7 @@ function dirCote(s, an){ const px = -Math.sin(an), py = Math.cos(an); if (!s.iso
   return b ? [b[0], b[1], b[2]] : [px, py, 1]; }
 function milieuCote(s, W, H){ const a = s.p[0], b = s.p[1], an = Math.atan2((b[1] - a[1]) * H, (b[0] - a[0]) * W), off = (s.d || 0) * H, [ux, uy] = dirCote(s, an);
   let e = 0; if (s.txt && !s.dt){ const k = (window.devicePixelRatio || 1) * RD.z, tz = s.tz || 1, th = 16 * k * tz, g = $("#inkCanvas").getContext("2d"); g.save(); g.font = "700 " + Math.round(th) + "px system-ui, sans-serif"; const tw = g.measureText(s.lb || "?").width; g.restore();   /* texte de côté : la poignée est au centre du texte */
-    const sg = Math.sign(off) || 1, L = Math.hypot((b[0] - a[0]) * W, (b[1] - a[1]) * H); e = sg * (s.iso ? th * .75 + (tw > L * .9 ? th * 1.1 : 0) : Math.abs(ux) * tw / 2 + Math.abs(uy) * th / 2); }
+    const sg = Math.sign(off) || 1, L = Math.hypot((b[0] - a[0]) * W, (b[1] - a[1]) * H); e = sg * (s.iso ? th * .7 : Math.abs(ux) * tw / 2 + Math.abs(uy) * th / 2); }
   return [(a[0] + b[0]) / 2 * W + ux * (off + e), (a[1] + b[1]) / 2 * H + uy * (off + e)]; }
 function poigneeCote(g, s, W, H, k){ const [x, y] = milieuCote(s, W, H), r = 11 * k, f = 6.5 * k, t = 2.6 * k;
   g.save(); g.setLineDash([]); g.fillStyle = "#2a7bcf"; g.strokeStyle = "#fff"; g.lineWidth = 1.5 * k; g.beginPath(); g.rect(x - r, y - r, 2 * r, 2 * r); g.fill(); g.stroke();
@@ -2831,7 +2831,7 @@ function cheminGroupe(s){ const c = $("#inkCanvas"), W = c.width, H = c.height, 
   const P = [ch[0].p[0]].concat(ch.map(x => x.p[1])), Q = [P[0]];
   for (let i = 1; i < P.length; i++){ const A = Q[Q.length - 1], B = P[i], C2 = P[i + 1]; if (C2){ const cr = ((B[0] - A[0]) * W) * ((C2[1] - B[1]) * H) - ((B[1] - A[1]) * H) * ((C2[0] - B[0]) * W); if (Math.abs(cr) < 1) continue; } Q.push(B); }
   return Q.map(q => q.slice()); }
-function sommetsForme(s){ if (s && s.t === "objet" && !ELEC[s.k] && s.p){ const c = $("#inkCanvas"), G = objGeo(s, c.width, c.height); return G.ports.length >= 2 ? { P:G.ports.map(q => [q[0] / c.width, q[1] / c.height]), ferme:false } : null; }   /* objet iso : cote d'un raccord à l'autre */
+function sommetsForme(s){ if (s && s.t === "objet" && !ELEC[s.k] && s.p){ const c = $("#inkCanvas"), G = objGeo(s, c.width, c.height); return { P:G.ports.map(q => [q[0] / c.width, q[1] / c.height]), ferme:false }; }   /* même un objet à un seul raccord (vase d'expansion) : ses arêtes servent de côtés */   /* objet iso : cote d'un raccord à l'autre */
   if (!s || !s.p || s.p.length < 2) return null; const [a, b] = s.p, x0 = Math.min(a[0], b[0]), x1 = Math.max(a[0], b[0]), y0 = Math.min(a[1], b[1]), y1 = Math.max(a[1], b[1]), xm = (x0 + x1) / 2, ym = (y0 + y1) / 2;
   if (s.t === "ligne" && s.g !== undefined){ const P = cheminGroupe(s); if (P) return { P, ferme:false }; }
   if (/^(ligne|fleche|fleche2|tuy[A-Z]+)$/.test(s.t)) return { P:[a, b], ferme:false };
@@ -2845,7 +2845,10 @@ const cotesPossibles = s => s.t === "cote" || !!sommetsForme(s);
 /* côtés qu'on peut coter ou nommer : ceux de la forme; pour un objet iso, aussi la longueur, la profondeur et la hauteur de son corps */
 function arcsForme(f){ const S = sommetsForme(f); if (!S) return []; let A = []; for (let i = 0; i < S.P.length - (S.ferme ? 0 : 1); i++) A.push([S.P[i], S.P[(i + 1) % S.P.length]]);
   if (f.t === "objet" && !ELEC[f.k]){ const ports = A; A = []; const c = $("#inkCanvas"), W = c.width, H = c.height, G = objGeo(f, W, H); let B = null;
-    G.shapes.forEach(sh => { if (sh.t !== "box") return; const v = (sh.m1 - sh.m0) * (sh.n1 - sh.n0) * (sh.h1 - sh.h0); if (!B || v > B[0]) B = [v, sh]; });
+    { const E = { m0:1e9, m1:-1e9, n0:1e9, n1:-1e9, h0:1e9, h1:-1e9 }, add = (m0, m1, n0, n1, h0, h1) => { E.m0 = Math.min(E.m0, m0); E.m1 = Math.max(E.m1, m1); E.n0 = Math.min(E.n0, n0); E.n1 = Math.max(E.n1, n1); E.h0 = Math.min(E.h0, h0); E.h1 = Math.max(E.h1, h1); };   /* enveloppe de tout l'objet (pompe, vannes : cylindres compris) */
+      G.shapes.forEach(sh => { if (sh.t === "box") add(sh.m0, sh.m1, sh.n0, sh.n1, sh.h0, sh.h1); else if (sh.t === "cyl") add(sh.m - sh.R, sh.m + sh.R, sh.n - sh.R, sh.n + sh.R, sh.h0, sh.h1); else if (sh.t === "cyln") add(sh.m - sh.R, sh.m + sh.R, sh.n0, sh.n1, sh.h - sh.R, sh.h + sh.R);
+        else if (sh.t === "cylm") add(sh.m0, sh.m1, sh.n - sh.R, sh.n + sh.R, sh.h - sh.R, sh.h + sh.R); else if (sh.t === "sph") add(sh.m - sh.R, sh.m + sh.R, sh.n - sh.R, sh.n + sh.R, sh.h - sh.R, sh.h + sh.R); });
+      if (E.m1 > E.m0) B = [0, E]; }
     if (B){ const b = B[1], N = q => [q[0] / W, q[1] / H], pres = (u, v) => Math.hypot((u[0] - v[0]) * W, (u[1] - v[1]) * H) < 6;
       [[[b.m0, b.n1, b.h0], [b.m1, b.n1, b.h0]], [[b.m0, b.n0, b.h0], [b.m0, b.n1, b.h0]], [[b.m0, b.n0, b.h0], [b.m0, b.n0, b.h1]], [[b.m0, b.n0, b.h1], [b.m1, b.n0, b.h1]], [[b.m1, b.n0, b.h1], [b.m1, b.n1, b.h1]]].forEach(([U, V]) => {   /* arêtes du contour : longueur, profondeur, hauteur, puis les deux arêtes du haut */
         const u = N(G.P(...U)), v = N(G.P(...V)); if (!pres(u, v)) A.push([u, v]); }); }
@@ -2870,7 +2873,7 @@ function ajouterCote(s, txt, choixIdx){
   const iso = RD.wb && /^iso/.test(wbBg()), [dx0, dy0] = iso ? dirCote({ iso:1 }, an) : [nx, ny];
   let sg = S.ferme ? (Math.sign(dx0 * (mx - Cx) + dy0 * (my - Cy)) || 1) : (ny > 0 ? -1 : 1), ec = 30 * RD.z * (window.devicePixelRatio || 1);
   if (f.t === "objet"){ const B = objGeo(f, W, H).bbox, bx = (B[0] + B[2]) / 2, by = (B[1] + B[3]) / 2; sg = Math.sign(dx0 * (mx - bx) + dy0 * (my - by)) || 1; }   /* objet : du côté opposé au corps de l'objet, pour ne pas le cacher */
-  snapInk(); const n = { t:"cote", c:f.c && !/^tuy|^maison/.test(f.t) ? f.c : "#24282c", hl:false, hc:null, w:2.5, p:[u.slice(), v.slice()], d:sg * (txt ? ec * (f.t === "objet" ? .5 : .3) : ec) / H };
+  snapInk(); const n = { t:"cote", c:f.c && !/^tuy|^maison/.test(f.t) ? f.c : "#24282c", hl:false, hc:null, w:2.5, p:[u.slice(), v.slice()], d:sg * (txt ? ec * .25 : ec) / H };
   if (RD.wb && /^iso/.test(wbBg())) n.iso = 1;   /* plan iso : lignes de rappel sur les axes de la grille */
   if (txt){ n.txt = 1; n.lb = "abcdefgh"[arcs(f).findIndex(([a2, b2]) => pres(a2, u) && pres(b2, v))] || "a"; }
   strokes().push(n); SELO.s = n; redrawInk(); try { majObjUI(); } catch(e){}
