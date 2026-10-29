@@ -2118,8 +2118,8 @@ function wbAller(dir){
 function wbSupprimer(){   /* supprime le tableau affiché : 1er toucher = « Sûr ? », 2e toucher (dans les 3 s) = supprimé; les tableaux suivants reculent d'un rang */
   const b = $("#wbMoins"), st = wbEtat();
   if (st.count <= 1){ aviser("Il reste un seul tableau. Pour le vider : « Tout effacer »."); return; }
-  if (!b.classList.contains("sur")){ b.classList.add("sur"); b.dataset.lab = "Sûr ? Touche encore"; clearTimeout(b._t); b._t = setTimeout(() => { b.classList.remove("sur"); b.dataset.lab = "Supprimer"; }, 3000); return; }
-  clearTimeout(b._t); b.classList.remove("sur"); b.dataset.lab = "Supprimer";
+  if (!b.classList.contains("sur")){ b.classList.add("sur"); clearTimeout(b._t); b._t = setTimeout(() => b.classList.remove("sur"), 3000); return; }
+  clearTimeout(b._t); b.classList.remove("sur");
   const L = RD.book + "|wb", n = st.n, re = new RegExp("^" + L.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "(\\d+)(:.*)?$");
   [INKS, UNDO, REDO, REFS].forEach(T => { const neuf = {};
     Object.keys(T).forEach(k => { const m = re.exec(k); if (!m) return; const i = +m[1], v = T[k]; delete T[k]; if (i === n) return; neuf[L + (i > n ? i - 1 : i) + (m[2] || "")] = v; });
@@ -4813,7 +4813,7 @@ majEpaisseur();
   const pp = pop("popPlus");
   pp.appendChild(rang("Modifier", [nomme("penR", "Rétablir"), nomme("penC", "Tout effacer")]));
   pp.appendChild(rang("Affichage", [X("wbZo"), X("wbZv"), X("wbZi"), nomme("wbHand", "Déplacer")], true));
-  pp.appendChild(rang("Tableaux", [X("wbP"), X("wbLbl"), X("wbN"), nomme("wbPlus", "Nouveau"), nomme("wbMoins", "Supprimer")], true));
+  pp.appendChild(rang("Tableaux", [X("wbP"), X("wbLbl"), X("wbN"), nomme("wbPlus", "Nouveau"), nomme("wbMoins", "Sûr ? Touche encore")], true));
   const bsch = document.createElement("button"); bsch.id = "wbSch"; bsch.dataset.lab = "Mes schémas et modèles"; bsch.title = "Enregistrer, rouvrir, exporter un tableau; circuits prêts à utiliser";
   bsch.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h12l4 4v12H4z"/><path d="M8 4v5h7V4M8 20v-6h8v6"/></svg>';
   bsch.onclick = () => { fermer(); ouvrirSchemas(); };
@@ -7921,6 +7921,10 @@ window.addEventListener("online", () => { try { aviser("Internet est revenu."); 
   .acces-grp{margin-top:8px}
   .acces-grp>.t{font-size:.72rem;color:#8c8c92;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
   #wbMoins.sur{background:#b91c1c !important;color:#fff !important;border-color:#b91c1c !important}
+  /* petite poubelle seule; le texte de confirmation s'ouvre en glissant au 1er toucher (comme la barre de recherche) */
+  .penbar .ppop #wbMoins{gap:0;transition:background .2s,gap .25s}
+  .penbar .ppop #wbMoins::after{display:inline-block;max-width:0;opacity:0;overflow:hidden;white-space:nowrap;vertical-align:middle;transition:max-width .3s cubic-bezier(.2,.8,.2,1),opacity .2s,margin .3s;margin-left:0}
+  .penbar .ppop #wbMoins.sur::after{max-width:170px;opacity:1;margin-left:6px}
   .prefs h3{margin:16px 0 6px;font-size:.78rem;color:#8c8c92;text-transform:uppercase;letter-spacing:.05em}
   .prefs .lig{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid #26262b;flex-wrap:wrap}
   .prefs .lig>span{font-size:.92rem;color:#e4e4e7}
