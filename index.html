@@ -573,6 +573,10 @@
   .sch-onglets{display:flex;gap:6px;margin:14px 0 10px}.sch-onglets button.on{background:#ececee;color:#111;border-color:#ececee}
   .sch-aide{color:#a9a9ae;font-size:.85rem;margin:6px 0 12px}.sch-vide{color:#a9a9ae}
   .sch-mod{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:8px}
+  .sch-cat{border:1px solid #2f2f33;border-radius:10px;margin:0 0 10px;padding:0 12px;background:#141416}.sch-cat[open]{padding-bottom:12px}
+  .sch-cat summary{cursor:pointer;list-style:none;padding:14px 4px;font-weight:700;display:flex;align-items:center;gap:8px;min-height:24px}.sch-cat summary::-webkit-details-marker{display:none}
+  .sch-cat summary::before{content:"";width:8px;height:8px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(-45deg);transition:transform .2s;flex:0 0 auto}
+  .sch-cat[open] summary::before{transform:rotate(45deg)}.sch-cat summary span{color:#a1a1aa;font-weight:500}
   .sch-box .sch-m{display:flex;flex-direction:column;align-items:flex-start;gap:4px;text-align:left;padding:12px 14px;min-height:96px}.sch-m span{color:#a9a9ae;font-size:.82rem;line-height:1.35}
   .sch-gard{display:flex;gap:8px}.sch-gard input,.sch-in{flex:1;min-height:34px;border-radius:8px;border:1px solid #2f2f33;background:#fff;color:#111;font:inherit;padding:0 10px}
   .sch-liste{display:flex;flex-direction:column;gap:8px}.sch-it{display:flex;gap:12px;align-items:center;padding:8px;border:1px solid #2a2a2d;border-radius:10px}
@@ -3433,6 +3437,30 @@ const MODELES = [
     f:[[[0,4],[0,1]], [[2,1],[4,1]], [[6,1],[8,1]], [[10,1],[10,4]], [[10,4],[2,4]]] }
 ];
 function nouveauTableau(fond){ if (!RD.wb) toggleWb(); const st = wbEtat(); if (strokes().length){ st.count++; st.n = st.count; } st.bg[st.n] = fond || st.bg[st.n] || "blanc"; majFond(); redrawInk(); refreshTools(); }
+/* Modèles du plan isométrique : objets [clé, m, n, miroir, debout] et tuyaux [couleur, [[m, n, h], …]] en pas de la grille iso */
+const ROUGE_ISO = "#e03131", BLEU_ISO = "#1c7ed6";
+const MODELES_ISO = [
+  { id:"iso-pompe", nom:"Pompe avec vannes d'isolement", txt:"Une conduite avec une vanne de chaque côté de la pompe circulatrice, pour la sortir sans vider le système.",
+    o:[["vanne", 2, 0], ["pompe", 5, 0], ["vanne", 8, 0]],
+    t:[[ROUGE_ISO, [[0, 0, 0], [2, 0, 0]]], [ROUGE_ISO, [[3, 0, 0], [5, 0, 0]]], [ROUGE_ISO, [[6, 0, 0], [8, 0, 0]]], [ROUGE_ISO, [[9, 0, 0], [11, 0, 0]]]] },
+  { id:"iso-radiateur", nom:"Radiateur avec vannes", txt:"Départ (rouge) avec une vanne, radiateur, retour (bleu) avec une vanne à boisseau.",
+    o:[["vanne", 1, 0], ["radiateur", 3, 0], ["boisseau", 6, 0]],
+    t:[[ROUGE_ISO, [[-1, 0, 0], [1, 0, 0]]], [ROUGE_ISO, [[2, 0, 0], [3, 0, 0]]], [BLEU_ISO, [[5, 0, 0], [6, 0, 0]]], [BLEU_ISO, [[7, 0, 0], [9, 0, 0]]]] },
+  { id:"iso-boucle", nom:"Boucle de chauffage avec plinthes", txt:"Chaudière, pompe sur le départ, deux plinthes chauffantes, vanne et vase d'expansion sur le retour.",
+    o:[["chaudiere", 0, 0], ["pompe", -2, 1], ["plinthe", -4, 8, 1], ["plinthe", -3, 10], ["vanne", 1, 4, 1], ["vase", 1, 6]],
+    t:[[ROUGE_ISO, [[0, 1, 0], [-1, 1, 0]]], [ROUGE_ISO, [[-2, 1, 0], [-4, 1, 0], [-4, 5, 0]]], [ROUGE_ISO, [[-4, 8, 0], [-4, 10, 0], [-3, 10, 0]]],
+       [BLEU_ISO, [[0, 10, 0], [1, 10, 0], [1, 4, 0]]], [BLEU_ISO, [[1, 3, 0], [1, 2, 0]]]] }
+];
+function poserModeleIso(m){
+  nouveauTableau("iso");
+  const c = $("#inkCanvas"), r = c.getBoundingClientRect(), S = $("#rstage").getBoundingClientRect(), W = c.width, H = c.height, k = W / r.width, a = 34 * RD.z * 1.2 * k, d = a * .8660254;
+  const cx = ((S.left + S.width * .55) - r.left) * k, cy = ((S.top + S.height * .42) - r.top) * k, i0 = Math.round(cx / d), j0 = Math.round(cy / a - (i0 & 1) * .5);   /* origine sur un point de la grille, vers le centre de l'écran */
+  const x0 = i0 * d, y0 = (j0 + (i0 & 1) * .5) * a, G = (mm, nn, hh) => [(x0 + (mm + nn) * d) / W, (y0 + (nn - mm) * a / 2 - (hh || 0) * a) / H], arr = strokes();
+  m.t.forEach(([col, pts]) => { for (let i = 0; i + 1 < pts.length; i++){ const n = { c:col, hl:false, hc:null, w:4, t:"ligne", p:[G(...pts[i]), G(...pts[i + 1])] }; (decouperIso(n) || [n]).forEach(x => arr.push(x)); } });
+  m.o.forEach(([kk, mm, nn, mir, deb]) => { const o = { t:"objet", k:kk, o:mir ? 1 : 0, c:"#24282c", p:[G(mm, nn, 0)], w:4 }; if (deb) o.v = deb; arr.push(o); });
+  REFS[inkKey()] = baseCanevas(); redrawInk();
+  aviser("Modèle « " + m.nom + " » posé. Touche un objet pour le déplacer, double-clic pour ajouter un texte ou une cote.", 5000);
+}
 function poserModele(m){
   nouveauTableau("quad");
   const c = $("#inkCanvas"), r = c.getBoundingClientRect(), S = $("#rstage").getBoundingClientRect(), W = c.width, H = c.height, u = elecU(), f = r.width / W;
@@ -3471,6 +3499,7 @@ function ouvrirSchemas(){
       if (b.dataset.o){ ov.querySelectorAll(".sch-onglets button").forEach(x => x.classList.toggle("on", x === b)); ov.querySelectorAll(".sch-corps").forEach(x => x.hidden = x.dataset.o !== b.dataset.o); return; }
       const l = lireSch(), i = +b.dataset.i;
       if (b.dataset.a === "modele"){ ov.hidden = true; poserModele(MODELES[i]); }
+      else if (b.dataset.a === "modeleIso"){ ov.hidden = true; poserModeleIso(MODELES_ISO[i]); }
       else if (b.dataset.a === "garder"){ const inp = ov.querySelector("#schNom"), nom = inp.value.trim() || ("Tableau du " + new Date().toLocaleDateString("fr-CA"));
         if (!RD.wb || !strokes().length){ aviser("Le tableau est vide."); return; }
         l.unshift({ id:Date.now(), nom, date:new Date().toLocaleDateString("sv-SE"), bg:wbBg(), ref:REFS[inkKey()] || baseCanevas(), strokes:copieTraits(strokes()) });
@@ -3502,8 +3531,10 @@ function ouvrirSchemas(){
       else { g.fillStyle = "#2a7bcf"; g.fillRect(p[0] - 3, p[1] - 3, 6, 6); } });
     return cv; }
   function remplir(){
-    ov.querySelector('.sch-corps[data-o="modeles"]').innerHTML = '<p class="sch-aide">Choisis un circuit : il est posé sur un nouveau tableau quadrillé, prêt à animer.</p><div class="sch-mod">'
-      + MODELES.map((m, i) => '<button class="sch-m" data-a="modele" data-i="' + i + '"><b>' + esc(m.nom) + '</b><span>' + esc(m.txt) + '</span></button>').join("") + '</div>';
+    const cats = [["Électricité : schémas en échelle (prêts à animer)", MODELES.map((m, i) => '<button class="sch-m" data-a="modele" data-i="' + i + '"><b>' + esc(m.nom) + '</b><span>' + esc(m.txt) + '</span></button>')],
+      ["Plan isométrique : chauffage et plomberie", MODELES_ISO.map((m, i) => '<button class="sch-m" data-a="modeleIso" data-i="' + i + '"><b>' + esc(m.nom) + '</b><span>' + esc(m.txt) + '</span></button>')]];
+    ov.querySelector('.sch-corps[data-o="modeles"]').innerHTML = '<p class="sch-aide">Ouvre une catégorie, puis choisis un modèle : il est posé sur un nouveau tableau.</p>'   /* catégories repliées au départ */
+      + cats.map(([t, l]) => '<details class="sch-cat"><summary>' + esc(t) + ' <span>(' + l.length + ')</span></summary><div class="sch-mod">' + l.join("") + '</div></details>').join("");
     const l = lireSch(), z = ov.querySelector('.sch-corps[data-o="miens"]');
     z.innerHTML = '<div class="sch-gard"><input id="schNom" placeholder="Nom du tableau affiché (ex. Démarreur moteur)" maxlength="60"><button data-a="garder" class="prim">Enregistrer ce tableau</button></div>'
       + '<p class="sch-aide">Tes tableaux sont aussi gardés automatiquement sur cet ordinateur. Ici, tu leur donnes un nom pour les retrouver, et « Exporter » crée un fichier à apporter sur un autre ordinateur ou à donner à un collègue.</p>'
