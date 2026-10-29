@@ -3950,6 +3950,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     if (mv && mv.redim){ const q = cur(e).snap, u = elecU(); redimEchelle(mv.redim, mv.w0 + Math.round((q[0] - mv.q0[0]) * c.width / u), mv.h0 + Math.round((q[1] - mv.q0[1]) * c.height / u), mv.fixes); redrawInk(); return; }
     if (!mv) return; if (mv.zone){ mv.q1 = cur(e).snap; if (mv.el) majZone(); return; }
     if (mv.fil){ const q = cur(e); mv.B = borneProche(q.raw, mv.segs) || q.snap;
+      if (mv.dir && longueur(q.raw, mv.A) < elecU() * .3) mv.dir = null;   /* revenu au point de départ (sans lâcher) : le coude se choisit à nouveau */
       if (!mv.dir){ const ddx = Math.abs(q.raw[0] - mv.A[0]) * c.width, ddy = Math.abs(q.raw[1] - mv.A[1]) * c.height; if (Math.max(ddx, ddy) > elecU() * .35) mv.dir = ddy > ddx ? "v" : "h"; }
       tracerFil(); redrawInk(); return; }
     const q = cur(e), dx = q.snap[0] - mv.q0[0], dy = q.snap[1] - mv.q0[1];
@@ -4098,8 +4099,12 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     if (!cur.coins) cur.coins = [[cur.p[0][0] * r.width, cur.p[0][1] * r.height]];
     const choisirAxe = C => { const v = [X[0] - C[0], X[1] - C[1]]; if (Math.hypot(v[0], v[1]) < .55 * a) return null; let b = null; AXES.forEach(D => { const t = (v[0] * D[0] + v[1] * D[1]) / (a * a); if (!b || t > b[0]) b = [t, D]; }); return b[1]; };
     let bout = null;
-    for (let tour = 0; tour < 4; tour++){
-      const C = cur.coins[cur.coins.length - 1]; if (!cur.axe) cur.axe = choisirAxe(C); const D = cur.axe; if (!D){ bout = C; break; }
+    for (let tour = 0; tour < 12; tour++){
+      const C = cur.coins[cur.coins.length - 1];
+      if (cur.coins.length >= 2){ const Pv = cur.coins[cur.coins.length - 2], S = [C[0] - Pv[0], C[1] - Pv[1]], L = Math.hypot(S[0], S[1]);   /* la main revient sur le bout précédent (sans lâcher) : on efface le coin et on recule sur ce bout */
+        if (L > .5){ const u = [S[0] / L, S[1] / L], v = [X[0] - Pv[0], X[1] - Pv[1]], pr = v[0] * u[0] + v[1] * u[1], pp = Math.abs(v[0] * u[1] - v[1] * u[0]);
+          if (pp <= .6 * a && pr < L - .5 * a){ cur.coins.pop(); cur.axe = [u[0] * a, u[1] * a]; continue; } } }
+      if (!cur.axe) cur.axe = choisirAxe(C); const D = cur.axe; if (!D){ bout = C; break; }
       const v = [X[0] - C[0], X[1] - C[1]], tr = (v[0] * D[0] + v[1] * D[1]) / (a * a), perp = Math.abs(v[0] * D[1] - v[1] * D[0]) / a, t = Math.max(0, Math.round(tr));
       if (perp <= .6 * a && tr > -.5){ bout = [C[0] + t * D[0], C[1] + t * D[1]]; break; }
       if (t >= 1) cur.coins.push([C[0] + t * D[0], C[1] + t * D[1]]);                       /* la main a quitté la ligne : coin net, puis nouvel axe */
