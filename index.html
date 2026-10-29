@@ -4672,8 +4672,8 @@ majEpaisseur();
     if (actif){ RD.crayonOff = true; fermer(); refreshTools(); return; }                     /* crayon actif : on le désactive */
     RD.eraser = false; RD.text = false; RD.obj = false; RD.crayonOff = false; refreshTools(); fermer(); pc.hidden = false; bc.classList.add("open"); majLargeur(); };   /* on l'active et les couleurs s'ouvrent */   /* les formes gardent la palette : on change seulement leur couleur */ bp.onclick = () => basculer(pp, bp);
   pc.querySelectorAll(".sw").forEach(b => b.addEventListener("click", () => setTimeout(fermer, 120)));
-  document.addEventListener("pointerdown", e => { if (bar.contains(e.target) || (pc.hidden && pp.hidden)) return; fermer();
-    if (e.target.id === "inkCanvas"){ e.stopPropagation(); e.preventDefault(); } }, true);   /* le clic qui ferme un menu ne dessine pas de point */
+  document.addEventListener("pointerdown", e => { if (bar.contains(e.target) || (pc.hidden && pp.hidden)) return; const couleurs = !pc.hidden && pp.hidden; fermer();
+    if (e.target.id === "inkCanvas" && !(couleurs && !RD.crayonOff)){ e.stopPropagation(); e.preventDefault(); } }, true);   /* fermer le menu ⋯ ne dessine pas de point; mais crayon actif + couleurs ouvertes : le premier trait se dessine tout de suite */
   document.addEventListener("keydown", e => { if (e.key === "Escape") fermer(); });
   window.majCouleurCrayon = () => { const c = RD.color || "#e2483d", hl = /^hl:/.test(c), cur = bc.querySelector(".pcur");
     const v = hl ? c.slice(3) : (RD.swx && RD.swx.classList.contains("on") ? RD.swx.value : (c === "#24282c" && wbSombre() ? "#f4f1ea" : c));
