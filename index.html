@@ -591,6 +591,14 @@
   .reader.wbon .penbar,.reader.wbon.pen-side .penbar,.reader.auto.calme.wbon .penbar{left:50%;right:auto;top:auto;bottom:calc(12px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);flex-direction:row;max-width:94vw;max-height:none;height:auto;flex-wrap:wrap}
   .reader.wbon.pen-side .penbar .sep{width:1px;height:26px}
   .reader.wbon.pen-side .penbar .ppop{left:50%;right:auto;top:auto;bottom:calc(100% + 10px);transform:translateX(-50%)}
+  /* Tableau blanc : menu du crayon plus compact (demande de Jeremy, 29 oct.) — tout à 80 %, moins d'espace vide */
+  .reader.wbon .penbar #popCol{zoom:.8;padding:8px 10px;gap:4px}
+  .reader.wbon .penbar #popCol .prang{gap:5px}
+  .reader.wbon .penbar #popCol .prang>.lab{min-width:66px}
+  .reader.wbon .penbar #popCol .plarg{min-width:0;gap:6px}
+  .reader.wbon .penbar #popCol .plarg input{min-width:120px;height:28px}
+  .reader.wbon .penbar #popCol .plarg svg{width:40px}
+  .reader.wbon .penbar #popCol .plarg b{min-width:1.6em}
   .reader.wbon #penSide{display:none!important}
   body:has(.reader.wbon.open) .toast{bottom:auto;top:calc(52px + env(safe-area-inset-top,0px))}   /* tableau blanc : les messages s'affichent en haut */
   .reader.pen-side.pen-fold .penbar{flex-wrap:nowrap}
