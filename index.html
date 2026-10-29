@@ -4094,28 +4094,34 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     if (fond.width !== W || fond.height !== H){ redrawInk(); return; }
     g.clearRect(0, 0, W, H); g.drawImage(fond, 0, 0); drawStroke(g, cur, W, H, k); };
   /* crayon sur plan iso : le trait avance le long d'un axe de la grille et ne tourne (coin net) que lorsque la main quitte cette ligne */
-  const suivreIso = e => { const r = rectToile(), k = r.width / (c.offsetWidth || r.width), a = 34 * RD.z * 1.2 * k, d = a * .8660254, X = [e.clientX - r.left, e.clientY - r.top];
+  const suivreIso = e => { const r = rectToile(), k = r.width / (c.offsetWidth || r.width), a = 34 * RD.z * 1.2 * k, d = a * .8660254, X0 = [e.clientX - r.left, e.clientY - r.top];
+    const X = cur.lisse = cur.lisse ? [cur.lisse[0] * .55 + X0[0] * .45, cur.lisse[1] * .55 + X0[1] * .45] : X0;   /* main lissée : un tremblement ne fait pas tourner la ligne */
     const AXES = [[d, a / 2], [-d, -a / 2], [-d, a / 2], [d, -a / 2], [0, a], [0, -a]];
     if (!cur.coins) cur.coins = [[cur.p[0][0] * r.width, cur.p[0][1] * r.height]];
-    const choisirAxe = C => { const v = [X[0] - C[0], X[1] - C[1]]; if (Math.hypot(v[0], v[1]) < .55 * a) return null; let b = null; AXES.forEach(D => { const t = (v[0] * D[0] + v[1] * D[1]) / (a * a); if (!b || t > b[0]) b = [t, D]; }); return b[1]; };
+    if (!cur.hist) cur.hist = []; cur.hist.push(X); if (cur.hist.length > 60) cur.hist.shift();
+    const elan = () => { for (let i = cur.hist.length - 2; i >= 0; i--){ const H0 = cur.hist[i]; if (Math.hypot(X[0] - H0[0], X[1] - H0[1]) >= 1.3 * a) return [X[0] - H0[0], X[1] - H0[1]]; } return null; };   /* direction réelle de la main sur le dernier pas */
+    const choisirAxe = C => { const Q = cur.quitte || C, v = [X[0] - Q[0], X[1] - Q[1]]; if (Math.hypot(v[0], v[1]) < (cur.quitte ? .7 : .9) * a) return null;   /* la nouvelle direction = le chemin de la main depuis l'endroit où elle a quitté la ligne */   /* nouvelle direction : choisie seulement quand la main s'est assez éloignée du coin */ let b = null; AXES.forEach(D => { const t = (v[0] * D[0] + v[1] * D[1]) / (a * a); if (!b || t > b[0]) b = [t, D]; }); return b[1]; };
     let bout = null;
     for (let tour = 0; tour < 12; tour++){
       const C = cur.coins[cur.coins.length - 1];
       if (cur.coins.length >= 2){ const Pv = cur.coins[cur.coins.length - 2], S = [C[0] - Pv[0], C[1] - Pv[1]], L = Math.hypot(S[0], S[1]);   /* la main revient sur le bout précédent (sans lâcher) : on efface le coin et on recule sur ce bout */
         if (L > .5){ const u = [S[0] / L, S[1] / L], v = [X[0] - Pv[0], X[1] - Pv[1]], pr = v[0] * u[0] + v[1] * u[1], pp = Math.abs(v[0] * u[1] - v[1] * u[0]);
-          if (pp <= .6 * a && pr < L - .5 * a){ cur.coins.pop(); cur.axe = [u[0] * a, u[1] * a]; continue; } } }
-      if (!cur.axe) cur.axe = choisirAxe(C); const D = cur.axe; if (!D){ bout = C; break; }
+          if (pp <= .6 * a && pr < L - .5 * a){ cur.coins.pop(); cur.axe = [u[0] * a, u[1] * a]; cur.trOn = cur.trMax = undefined; cur.quitte = null; continue; } } }
+      if (!cur.axe){ const D2 = choisirAxe(C);
+        if (D2 && cur.quitte && cur.coins.length >= 2){ const Pv = cur.coins[cur.coins.length - 2], S = [C[0] - Pv[0], C[1] - Pv[1]], L = Math.hypot(S[0], S[1]), u = [S[0] / L * a, S[1] / L * a], den = u[0] * D2[1] - u[1] * D2[0];
+          if (L > .5 && Math.abs(den) > 1e-6){ const sI = ((X0[0] - Pv[0]) * D2[1] - (X0[1] - Pv[1]) * D2[0]) / den, n = Math.round(sI);   /* coin = croisement de l'ancienne ligne et du chemin de la main (pas trop loin quand on tourne en avançant) */
+            if (n >= 1 && Math.abs(n - L / a) <= 1.05) cur.coins[cur.coins.length - 1] = [Pv[0] + n * u[0], Pv[1] + n * u[1]]; } }
+        cur.axe = D2; if (!D2){ bout = C; break; } cur.quitte = null; continue; }
+      const D = cur.axe; if (!D){ bout = C; break; }
       const v = [X[0] - C[0], X[1] - C[1]], tr = (v[0] * D[0] + v[1] * D[1]) / (a * a), perp = Math.abs(v[0] * D[1] - v[1] * D[0]) / a, t = Math.max(0, Math.round(tr));
-      if (perp <= .6 * a && tr > -.5){ bout = [C[0] + t * D[0], C[1] + t * D[1]]; break; }
-      if (t >= 1) cur.coins.push([C[0] + t * D[0], C[1] + t * D[1]]);                       /* la main a quitté la ligne : coin net, puis nouvel axe */
-      cur.axe = null; }
+      if (perp <= .6 * a && tr > -.5){ cur.trOn = tr; cur.trMax = cur.trMax === undefined || tr < cur.trMax - .9 ? tr : Math.max(cur.trMax, tr);   /* bout atteint (remis à jour si on recule vraiment d'un pas) */ bout = [C[0] + t * D[0], C[1] + t * D[1]]; break; }
+      if (tr > -.5){ const M = elan(); if (!M || Math.abs(M[0] * D[1] - M[1] * D[0]) / Math.hypot(M[0], M[1]) / a < .42 && M[0] * D[0] + M[1] * D[1] > 0){ bout = [C[0] + t * D[0], C[1] + t * D[1]]; break; } }   /* la main dérive mais va encore dans le même sens : pas de coin (on garde la ligne voulue) */
+      const tc = Math.max(0, Math.round(cur.trMax !== undefined ? cur.trMax : tr));          /* coin au bout atteint sur la ligne (la main recule un peu en tournant) */
+      if (tc >= 1) cur.coins.push([C[0] + tc * D[0], C[1] + tc * D[1]]);                    /* la main a quitté la ligne : coin net, puis nouvel axe */
+      cur.axe = null; cur.trOn = cur.trMax = undefined; cur.quitte = X.slice(); }
     if (!bout) bout = cur.coins[cur.coins.length - 1];
     const P = cur.coins.concat([bout]).filter((q, i, v) => !i || Math.hypot(q[0] - v[i - 1][0], q[1] - v[i - 1][1]) > .5);
-    for (let i = 1; i + 2 < P.length; ){                                                     /* petit crochet d'un pas à un coin (main qui dépasse) : on prolonge les deux lignes jusqu'à leur croisement */
-      const A = P[i - 1], B = P[i], C2 = P[i + 1], E = P[i + 2], d1 = [B[0] - A[0], B[1] - A[1]], d3 = [E[0] - C2[0], E[1] - C2[1]], den = d1[0] * d3[1] - d1[1] * d3[0];
-      if (Math.hypot(C2[0] - B[0], C2[1] - B[1]) > 1.2 * a || Math.abs(den) < 1e-6){ i++; continue; }
-      const sA = ((C2[0] - A[0]) * d3[1] - (C2[1] - A[1]) * d3[0]) / den, Q = [A[0] + sA * d1[0], A[1] + sA * d1[1]];
-      if (sA > .01 && (E[0] - Q[0]) * d3[0] + (E[1] - Q[1]) * d3[1] > 1){ P.splice(i, 2, Q); } else i++; }
+    /* (29 oct., demande de Jeremy) plus de « crochet » redressé : on garde exactement le chemin tracé */
     cur.p = P.map(q => [q[0] / r.width, q[1] / r.height]); };
   c.addEventListener("pointermove", e => {
     if (!cur) return;
