@@ -7916,6 +7916,22 @@ window.ACCES = (function(){
   const b64 = buf => { const u = new Uint8Array(buf); let s = ""; for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000)); return btoa(s); };
   const unb64 = s => { const b = atob(s), u = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return u; };
   const ITER = 250000;
+  const b64u = u => b64(u).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  const unb64u = t => unb64(t.replace(/-/g, "+").replace(/_/g, "/") + "===".slice((t.length + 3) % 4));
+  const EC = { name:"ECDH", namedCurve:"P-256" };
+  /* clé d'un livre pour un compte « EC » (comptes créés depuis le 29 oct. au soir, code de demande court) : ECDH éphémère + AES-GCM */
+  async function cleEC(prive, pubBrute){ const bits = await sub.deriveBits({ name:"ECDH", public:await sub.importKey("raw", pubBrute, EC, false, []) }, prive, 256);
+    return sub.importKey("raw", await sub.digest("SHA-256", bits), "AES-GCM", false, ["encrypt", "decrypt"]); }
+  async function envelopperPour(brut, pubJwk){
+    if (pubJwk.kty === "EC"){ const eph = await sub.generateKey(EC, true, ["deriveBits"]), pubC = await sub.importKey("jwk", { kty:"EC", crv:"P-256", x:pubJwk.x, y:pubJwk.y, ext:true }, EC, true, []);
+      const raw = new Uint8Array(await sub.exportKey("raw", pubC)), k = await cleEC(eph.privateKey, raw), iv = crypto.getRandomValues(new Uint8Array(12));
+      const c = new Uint8Array(await sub.encrypt({ name:"AES-GCM", iv }, k, brut)), e = new Uint8Array(await sub.exportKey("raw", eph.publicKey));
+      const out = new Uint8Array(65 + 12 + c.length); out.set(e); out.set(iv, 65); out.set(c, 77); return "E" + b64(out); }
+    const pk = await sub.importKey("jwk", Object.assign({}, pubJwk, { alg:"RSA-OAEP-256", ext:true }), { name:"RSA-OAEP", hash:"SHA-256" }, false, ["encrypt"]);
+    return b64(await sub.encrypt({ name:"RSA-OAEP" }, pk, brut)); }
+  async function ouvrirEnveloppe(env){          /* clé brute d'un livre, avec la clé privée de la session (RSA ou EC) */
+    if (env[0] === "E"){ const u = unb64(env.slice(1)), k = await cleEC(SESSION.priv, u.subarray(0, 65)); return sub.decrypt({ name:"AES-GCM", iv:u.subarray(65, 77) }, k, u.subarray(77)); }
+    return sub.decrypt({ name:"RSA-OAEP" }, SESSION.priv, unb64(env)); }
   let DATA = null, SESSION = null;            /* SESSION = { id, nom, admin, priv:CryptoKey } */
   const CLES = {};                            /* fichier -> CryptoKey AES (déverrouillées) */
 
@@ -7944,7 +7960,7 @@ window.ACCES = (function(){
     if (CLES[f]) return CLES[f];
     if (!SESSION) throw new Error("connexion requise");
     const env = DATA.livres[f] && DATA.livres[f].cles[SESSION.id]; if (!env) throw new Error("ce livre ne t'est pas permis");
-    const brut = await sub.decrypt({ name:"RSA-OAEP" }, SESSION.priv, unb64(env));
+    const brut = await ouvrirEnveloppe(env);
     return CLES[f] = await sub.importKey("raw", brut, "AES-GCM", false, ["decrypt"]);
   }
   async function dechiffrer(url, f){
@@ -7966,7 +7982,8 @@ window.ACCES = (function(){
     let pk8;
     try { pk8 = await sub.decrypt({ name:"AES-GCM", iv:unb64(c.priv.i) }, await cleMdp(mdp, unb64(c.priv.s)), unb64(c.priv.c)); }
     catch(e){ throw new Error("Mot de passe incorrect."); }
-    const priv = await sub.importKey("pkcs8", pk8, { name:"RSA-OAEP", hash:"SHA-256" }, false, ["decrypt", "unwrapKey"]);
+    const priv = c.pub.kty === "EC" ? await sub.importKey("jwk", { kty:"EC", crv:"P-256", x:c.pub.x, y:c.pub.y, d:b64u(new Uint8Array(pk8)), ext:false }, EC, false, ["deriveBits"])
+      : await sub.importKey("pkcs8", pk8, { name:"RSA-OAEP", hash:"SHA-256" }, false, ["decrypt", "unwrapKey"]);
     SESSION = { id, nom:c.nom, admin:!!c.admin, priv };
     await idbSet("session", { id, priv });
     for (const k in CLES) delete CLES[k];
@@ -7990,22 +8007,29 @@ window.ACCES = (function(){
   }
   const PROGS = () => [...new Set(LIVRES.filter(l => l.fichier && l.categorie && !l.user).map(l => l.categorie))].sort();
   const progNom = c => { try { return nomProgramme(c); } catch(e){ return c; } };
+  /* code de demande COURT : clé EC P-256; binaire = version(1) | programmes(1, bits) | clé publique(65) | sel(16) | iv(12) | clé privée chiffrée(48) | nom (UTF-8) */
+  const PROG_BITS = ["Entretien général d'immeubles", "Plomberie et chauffage"];
   async function demande(nom, mdp, prog){
-    const kp = await sub.generateKey({ name:"RSA-OAEP", modulusLength:2048, publicExponent:new Uint8Array([1, 0, 1]), hash:"SHA-256" }, true, ["encrypt", "decrypt", "wrapKey", "unwrapKey"]);
-    const pub = await sub.exportKey("jwk", kp.publicKey), pk8 = await sub.exportKey("pkcs8", kp.privateKey);
+    const kp = await sub.generateKey(EC, true, ["deriveBits"]), jwk = await sub.exportKey("jwk", kp.privateKey), pub = new Uint8Array(await sub.exportKey("raw", kp.publicKey));
     const s = crypto.getRandomValues(new Uint8Array(16)), i = crypto.getRandomValues(new Uint8Array(12));
-    const c = await sub.encrypt({ name:"AES-GCM", iv:i }, await cleMdp(mdp, s), pk8);
-    const d = { t:"demande-acces", v:1, id:idDe(nom), nom:nom.trim(), pub:{ kty:pub.kty, n:pub.n, e:pub.e, alg:pub.alg }, priv:{ s:b64(s), i:b64(i), c:b64(c) }, date:new Date().toISOString().slice(0, 10), prog:prog || [] };
-    return "DEMANDE-" + btoa(unescape(encodeURIComponent(JSON.stringify(d))));
+    const c = new Uint8Array(await sub.encrypt({ name:"AES-GCM", iv:i }, await cleMdp(mdp, s), unb64u(jwk.d)));
+    const n = enc.encode(nom.trim()), bits = PROG_BITS.reduce((m, p, k) => (prog || []).includes(p) ? m | (1 << k) : m, 0);
+    const u = new Uint8Array(2 + 65 + 16 + 12 + c.length + n.length); let o = 0; u[o++] = 2; u[o++] = bits;
+    [pub, s, i, c, n].forEach(x => { u.set(x, o); o += x.length; });
+    return "DEMANDE-" + b64u(u);
   }
-  const lireDemande = code => { const t = (code || "").trim().replace(/^DEMANDE-/, "").replace(/\s+/g, ""); const d = JSON.parse(decodeURIComponent(escape(atob(t)))); if (d.t !== "demande-acces" || !d.pub || !d.priv) throw new Error("code invalide"); return d; };
+  function lireDemande(code){
+    const t = (code || "").trim().replace(/^DEMANDE-/, "").replace(/\s+/g, "");
+    if (t.startsWith("eyJ")){ const d = JSON.parse(decodeURIComponent(escape(atob(t)))); if (d.t !== "demande-acces" || !d.pub || !d.priv) throw new Error("code invalide"); return d; }   /* ancien format (RSA) */
+    const u = unb64u(t); if (u[0] !== 2 || u.length < 2 + 65 + 16 + 12 + 48 + 2) throw new Error("code invalide");
+    let o = 2; const pub = u.subarray(o, o += 65), s = u.subarray(o, o += 16), i = u.subarray(o, o += 12), c = u.subarray(o, o += 48), nom = dec.decode(u.subarray(o));
+    return { id:idDe(nom), nom, prog:PROG_BITS.filter((p, k) => u[1] & (1 << k)), pub:{ kty:"EC", crv:"P-256", x:b64u(pub.subarray(1, 33)), y:b64u(pub.subarray(33, 65)) }, priv:{ s:b64(s), i:b64(i), c:b64(c) } };
+  }
 
   /* ---- administration : donner / retirer un livre (la clé du livre est ouverte avec la clé de l'admin, puis enveloppée pour l'enseignant) ---- */
   async function envelopper(f, pubJwk){
     const env = DATA.livres[f].cles[SESSION.id]; if (!env) throw new Error("tu n'as pas la clé de « " + f + " »");
-    const brut = await sub.decrypt({ name:"RSA-OAEP" }, SESSION.priv, unb64(env));
-    const pk = await sub.importKey("jwk", Object.assign({}, pubJwk, { alg:"RSA-OAEP-256", ext:true }), { name:"RSA-OAEP", hash:"SHA-256" }, false, ["encrypt"]);
-    return b64(await sub.encrypt({ name:"RSA-OAEP" }, pk, brut));
+    return envelopperPour(new Uint8Array(await ouvrirEnveloppe(env)), pubJwk);
   }
 
   /* ---------------- interface ---------------- */
