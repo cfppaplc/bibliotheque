@@ -8034,11 +8034,15 @@ window.ACCES = (function(){
     let vues = {}; try { vues = JSON.parse(localStorage.getItem("demandesVues") || "{}"); } catch(e){}
     try { const r = await fetch(BOITE + "/json?poll=1&since=12h", { cache:"no-store" });
       if (r.ok) (await r.text()).split("\n").filter(Boolean).forEach(l => { try { const m = JSON.parse(l); if (m.event !== "message" || !/^DEMANDE-/.test(m.message || "")) return;
+        if (IGN().includes(m.message.trim())) return;   /* demande déjà ignorée sur cet ordinateur (même code renvoyé) */
         const d = lireDemande(m.message); if (!vues[d.id] || vues[d.id].t < m.time) vues[d.id] = { code:m.message, t:m.time }; } catch(e){} }); } catch(e){}
     try { localStorage.setItem("demandesVues", JSON.stringify(vues)); } catch(e){}
     return vues;
   }
-  const oublierDemande = id => { try { const v = JSON.parse(localStorage.getItem("demandesVues") || "{}"); delete v[id]; localStorage.setItem("demandesVues", JSON.stringify(v)); } catch(e){} };
+  const IGN = () => { try { return JSON.parse(localStorage.getItem("demandesIgnorees") || "[]"); } catch(e){ return []; } };
+  const oublierDemande = (id, ignorer) => { try { const v = JSON.parse(localStorage.getItem("demandesVues") || "{}");
+    if (ignorer && v[id]) localStorage.setItem("demandesIgnorees", JSON.stringify([...IGN(), v[id].code.trim()].slice(-200)));   /* « Ignorer » : ne plus jamais la montrer (une nouvelle demande de cette personne, elle, apparaîtra) */
+    delete v[id]; localStorage.setItem("demandesVues", JSON.stringify(v)); } catch(e){} };
   const PROGS = () => [...new Set(LIVRES.filter(l => l.fichier && l.categorie && !l.user).map(l => l.categorie))].sort();
   const progNom = c => { try { return nomProgramme(c); } catch(e){ return c; } };
   /* code de demande COURT : clé EC P-256; binaire = version(1) | programmes(1, bits) | clé publique(65) | sel(16) | iv(12) | clé privée chiffrée(48) | nom (UTF-8) */
@@ -8168,10 +8172,12 @@ window.ACCES = (function(){
       + (livres.length ? '<div class="acces-fiches">' + lignes + '</div>' : '<p class="sous">Aucun livre protégé pour l\'instant.</p>')
       + '<div class="acces-sec"><h3>Demandes reçues</h3><div id="gBoite"><p class="sous">Recherche des demandes…</p></div>'
       + '<details style="margin-top:8px"><summary style="cursor:pointer;color:#a9a9ae;font-size:.88rem">Coller un code reçu autrement (Teams, courriel)</summary><textarea id="gDem" placeholder="Colle ici le code DEMANDE-… reçu de l\'enseignant"></textarea><div class="acces-btns" style="justify-content:flex-start"><button class="abtn" id="gAjout">Ajouter cet enseignant</button></div></details></div>'
-      + '<div class="acces-sec"><h3>Publication</h3><p class="sous" style="margin-bottom:6px">Pour publier d\'ici, colle une fois ta clé GitHub (gardée seulement sur cet ordinateur). Sinon, télécharge le fichier et envoie-le à Claude.</p>'
-      + '<input type="password" id="gJeton" placeholder="Clé GitHub (github_pat_…)" value="' + esc(jeton) + '"></div>'
+      + (jeton   /* clé déjà enregistrée : on ne la montre plus, seulement un petit lien « Changer » */
+        ? '<p class="sous" style="margin-top:14px;font-size:.8rem">Clé GitHub enregistrée sur cet ordinateur · <a href="#" id="gChg" style="color:#a9a9ae">Changer</a></p><div id="gJetZone" hidden><input type="password" id="gJeton" placeholder="Nouvelle clé GitHub (github_pat_…)" value="' + esc(jeton) + '"></div>'
+        : '<div class="acces-sec"><h3>Publication</h3><p class="sous" style="margin-bottom:6px">Pour publier d\'ici, colle une fois ta clé GitHub (gardée seulement sur cet ordinateur). Sinon, télécharge le fichier et envoie-le à Claude.</p>'
+          + '<input type="password" id="gJeton" placeholder="Clé GitHub (github_pat_…)" value=""></div>')
       + '<div class="acces-err" id="gErr"' + (msg && msg.err ? "" : " hidden") + '>' + (msg && msg.err ? esc(msg.err) : "") + '</div><div class="acces-ok" id="gOk"' + (msg && msg.ok ? "" : " hidden") + '>' + (msg && msg.ok ? esc(msg.ok) : "") + '</div>'
-      + '<div class="acces-btns"><button id="gNon">Fermer</button><button id="gTel">Télécharger comptes.json</button><button class="prim" id="gPub">Publier</button></div>';
+      + '<div class="acces-btns"><button id="gNon">Fermer</button>' + (jeton ? '' : '<button id="gTel">Télécharger comptes.json</button>') + '<button class="prim" id="gPub">Publier</button></div>';
     const B = box();
     B.querySelectorAll("details[data-fiche]").forEach(d => d.ontoggle = () => { d.open ? OUVERTS.add(d.dataset.fiche) : OUVERTS.delete(d.dataset.fiche); });
     B.querySelectorAll("input[type=checkbox][data-f]").forEach(cb => cb.onchange = async () => {
@@ -8202,16 +8208,17 @@ window.ACCES = (function(){
       zone.innerHTML = att.length ? att.map(d => '<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #2a2a2f"><div style="flex:1"><b>' + esc(d.nom) + '</b> <small style="color:#8c8c92">' + esc(d.id) + '</small><br><small style="color:#a9a9ae">' + (BROUILLON.comptes[d.id] ? '<b style="color:#ffb020">Nouveau mot de passe</b>' : (d.prog || []).map(court).join(", ")) + ' · ' + new Date(d.t * 1000).toLocaleString("fr-CA", { day:"numeric", month:"short", hour:"2-digit", minute:"2-digit" }) + '</small></div>'
         + '<button class="abtn prim" data-acc="' + esc(d.id) + '">Accepter</button><button class="abtn" data-ign="' + esc(d.id) + '">Ignorer</button></div>').join("") : '<p class="sous" style="margin:0">Aucune demande en attente.</p>';
       zone.querySelectorAll("[data-acc]").forEach(bt => bt.onclick = () => { const d = att.find(x => x.id === bt.dataset.acc); document.getElementById("gDem").value = d.code; document.getElementById("gAjout").click(); });
-      zone.querySelectorAll("[data-ign]").forEach(bt => bt.onclick = () => { oublierDemande(bt.dataset.ign); dessinerGerer({ ok:"Demande ignorée." }); }); });
+      zone.querySelectorAll("[data-ign]").forEach(bt => bt.onclick = () => { oublierDemande(bt.dataset.ign, true); compterDemandes && compterDemandes().catch(()=>{}); dessinerGerer({ ok:"Demande ignorée." }); }); });
     document.getElementById("gNon").onclick = fermer;
-    document.getElementById("gTel").onclick = () => { const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([JSON.stringify(BROUILLON, null, 1)], { type:"application/json" })); a.download = "comptes.json"; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 3000); };
+    const gT = document.getElementById("gTel"); if (gT) gT.onclick = () => { const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([JSON.stringify(BROUILLON, null, 1)], { type:"application/json" })); a.download = "comptes.json"; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 3000); };
+    const chg = document.getElementById("gChg"); if (chg) chg.onclick = e => { e.preventDefault(); const z = document.getElementById("gJetZone"); z.hidden = false; const i = document.getElementById("gJeton"); i.value = ""; i.focus(); chg.parentNode.hidden = true; };
     document.getElementById("gPub").onclick = async () => {
-      const jt = document.getElementById("gJeton").value.trim(); if (!jt) return dessinerGerer({ err:"Colle d'abord ta clé GitHub (ou utilise « Télécharger comptes.json »)." });
+      let jt = document.getElementById("gJeton").value.trim(); if (!jt) jt = jeton; if (!jt) return dessinerGerer({ err:"Colle d'abord ta clé GitHub (ou utilise « Télécharger comptes.json »)." });
       try { localStorage.setItem("ghJeton", jt); } catch(e){}
       const bt = document.getElementById("gPub"); bt.disabled = true; bt.textContent = "Publication…";
       try { await publierGitHub(jt, BROUILLON); DATA = JSON.parse(JSON.stringify(BROUILLON)); try { localStorage.setItem("accesCopie", JSON.stringify(DATA)); } catch(e){}
         dessinerGerer({ ok:"Publié ! Les changements seront en ligne d'ici une minute ou deux." }); try { render(); } catch(e){} }
-      catch(e){ dessinerGerer({ err:"Publication impossible : " + e.message }); } };
+      catch(e){ dessinerGerer({ err:"Publication impossible : " + e.message + (/401|403|Bad credentials|refusée/i.test(e.message) ? " — ta clé GitHub est peut-être expirée : touche « Changer » et colles-en une nouvelle." : "") }); } };
   }
   async function remplacerCompte(d){          /* nouveau compte, ou nouveau mot de passe d'un compte existant (ses livres sont gardés) */
     const anc = BROUILLON.comptes[d.id], avait = anc ? Object.keys(BROUILLON.livres).filter(f => BROUILLON.livres[f].cles[d.id]) : [];
