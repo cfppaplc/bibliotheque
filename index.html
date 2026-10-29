@@ -4095,8 +4095,22 @@ function aimanterTuyau(q, a, sauf){
     P.forEach(u => P.forEach(v => { const d = Math.hypot((u[0] - v[0]) * W, (u[1] - v[1]) * H); if (d > dm){ dm = d; A = u; B = v; } })); if (dm < 6) return false;
     if (A[0] > B[0]){ const t = A; A = B; B = t; }
     const an = Math.atan2((B[1] - A[1]) * H, (B[0] - A[0]) * W), sg = Math.cos(an) > 0 ? -1 : 1, ec = 30 * RD.z * (window.devicePixelRatio || 1), f = lignes[0];
-    snapInk(); const n = { t:"cote", c:f.c && !/^tuy/.test(f.t) ? f.c : "#24282c", hl:false, hc:null, w:2.5, p:[A.slice(), B.slice()], d:sg * ec / H }; if (/^iso/.test(wbBg())) n.iso = 1;
-    strokes().push(n); SELM = []; SELO.s = n; redrawInk(); try { majObjUI(); } catch(er){} modifierForme(n, cx, cy); return true; };
+    const poser = txt => { snapInk(); const n = { t:"cote", c:f.c && !/^tuy/.test(f.t) ? f.c : "#24282c", hl:false, hc:null, w:2.5, p:[A.slice(), B.slice()], d:sg * (txt ? ec * .3 : ec) / H }; if (/^iso/.test(wbBg())) n.iso = 1; if (txt){ n.txt = 1; n.lb = "a"; }
+      strokes().push(n); SELM = []; SELO.s = n; redrawInk(); try { majObjUI(); } catch(er){} modifierForme(n, cx, cy); };
+    /* rien d'automatique : une petite case offre la couleur, un texte ou une cote sur ce tronçon */
+    const old = document.getElementById("formeVal"); if (old) old.remove();
+    const box = document.createElement("div"); box.id = "formeVal"; box.style.cssText = "position:fixed;z-index:90;left:0;top:0;width:280px;padding:10px;border-radius:12px;background:#0e0e0f;border:1px solid #6aa9ff;color:#e4e4e7;font:600 .8rem system-ui,sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.4)";
+    const st = "flex:1;min-height:40px;border-radius:9px;border:1px solid #6aa9ff;border-bottom-width:4px;color:#fff;font:800 .85rem system-ui;cursor:pointer;padding:0 6px";
+    box.innerHTML = '<div style="line-height:1.3">' + L.length + ' éléments choisis</div>';
+    const C = [["#24282c", "Noir"], ["#e2483d", "Rouge"], ["#2a7bcf", "Bleu"], ["#2f9e4f", "Vert"], ["#f08c00", "Orange"], ["#8a8f98", "Gris"]], row = document.createElement("div");
+    row.style.cssText = "display:flex;align-items:center;gap:6px;margin-top:10px;flex-wrap:wrap"; row.innerHTML = '<span style="flex:1 0 100%;font-size:.85rem">Couleur</span>' + C.map(([c2, nm]) => '<button type="button" data-gcol="' + c2 + '" title="' + nm + '" style="width:32px;height:32px;flex:0 0 32px;border-radius:50%;border:3px solid #3a3a40;background:' + (c2 === "#24282c" && wbSombre() ? "#f4f1ea" : c2) + ';cursor:pointer"></button>').join("");
+    let snapC = false; row.querySelectorAll("[data-gcol]").forEach(bc => bc.onclick = () => { if (!snapC){ snapInk(); snapC = true; } L.forEach(o => { if (!/^tuy/.test(o.t || "")) o.c = bc.dataset.gcol; }); redrawInk(); }); box.appendChild(row);
+    const rang = document.createElement("div"); rang.style.cssText = "display:flex;gap:6px;margin-top:10px";
+    rang.innerHTML = '<button type="button" data-g="txt" style="' + st + ';background:#1f6fc2">+ Texte sur ce tronçon</button><button type="button" data-g="cote" style="' + st + ';background:#2a2a30">+ Cote</button>'; box.appendChild(rang);
+    const fermer = () => { box.remove(); document.removeEventListener("pointerdown", dehors, true); }, dehors = ev => { if (!box.contains(ev.target)) fermer(); };
+    rang.querySelectorAll("[data-g]").forEach(bg => bg.onclick = () => { fermer(); poser(bg.dataset.g === "txt"); });
+    glisserCase(box); $("#reader").appendChild(box); placerCase(box, { t:"ligne", p:[A, B] }, cx, cy); setTimeout(() => document.addEventListener("pointerdown", dehors, true), 0);
+    return true; };
   const actif = () => RD.wb && !RD.eraser && !RD.sim && !RD.text && (RD.obj || RD.crayonOff) && !RD.formeK && !RD.objK;
   const brut = e => { const r = c.getBoundingClientRect(); return [(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height]; };
   const sous = q => objetSous(q) || formeSous(q);

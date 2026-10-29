@@ -67,7 +67,7 @@
         "img": "nouveautes/cote-cote.jpg"
       },
       "Flèche : double-clic, puis écris le texte où la flèche commence et où elle pointe (ex. « Eau froide » → « Robinet »).",
-      "Cote sur plusieurs lignes : choisis-les avec Ctrl + cadre (ou Ctrl + clic), puis double-clic sur l'une d'elles : une cote va d'un bout à l'autre de la sélection.",
+      "Plusieurs bouts de tuyau : choisis-les avec Ctrl + cadre, puis double-clic sur l'un d'eux. Une case offre la couleur, « + Texte sur ce tronçon » ou « + Cote » d'un bout à l'autre.",
       {
         "t": "Sur le plan isométrique, la cote suit les axes de la grille et donne la longueur en pas (ex. 6 carr.). Sur un tuyau dessiné au crayon, chaque tronçon droit se cote d'un coin à l'autre; sur un objet, d'un raccord à l'autre.",
         "img": "nouveautes/iso-cotes.jpg"
@@ -76,6 +76,10 @@
       "Touche une cote ou un texte de côté, puis tire son carré bleu pour le placer où tu veux, même collé à la forme. Double-clic : ⟲ / ⟳ font pivoter le texte, « Auto » le remet droit."
     ],
     "versions": [
+      {
+        "date": "2026-10-28",
+        "texte": "Double-clic sur plusieurs lignes choisies : une case (couleur, texte, cote) au lieu d'une cote ajoutée toute seule."
+      },
       {
         "date": "2026-10-28",
         "texte": "Texte de côté : son carré bleu est au centre du texte et peut l'amener tout près de la forme."
@@ -87,10 +91,6 @@
       {
         "date": "2026-10-28",
         "texte": "Objets iso : la case « Nom » est retirée (les textes sur un côté la remplacent)."
-      },
-      {
-        "date": "2026-10-28",
-        "texte": "Double-clic sur plusieurs lignes choisies : une cote d'un bout à l'autre. En iso, le texte d'un côté suit l'angle de la pièce."
       }
     ]
   },
