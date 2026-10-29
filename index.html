@@ -1511,6 +1511,7 @@ function hookKeys(win){
   if (win.__hote) return; win.__hote = true;
   win.addEventListener("keydown", e => {
     if (enSaisie(e.target)) return;   /* l'élève ou l'enseignant écrit dans le livre : aucun raccourci */
+    if (toucheTableau(e)){ e.preventDefault(); e.stopImmediatePropagation(); return; }
     if (verrou() && e.key !== "Escape" && !((e.ctrlKey || e.metaKey) && /^[zy]$/i.test(e.key || ""))){ e.preventDefault(); e.stopImmediatePropagation(); return; }
     if (RD.drv && !(e.ctrlKey || e.metaKey || e.altKey)){
       /* Les flèches passent toujours par la bibliothèque : même résultat que les boutons, en simple ou en double page */
@@ -3514,7 +3515,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
   const bd = b.querySelector("#objDelW"); bd.style.display = se && se.k === "bobineT" ? "" : "none"; if (se && se.k === "bobineT" && document.activeElement !== b.querySelector("#objDel")) b.querySelector("#objDel").value = se.del || 3; if (se && document.activeElement !== bl) bl.value = se.lb || "";
   const sel = SELO.s && strokes().includes(SELO.s), sp = sel && SELO.s.k === "serpentin" ? SELO.s : null, pasV = sp ? (sp.pas || .5) : (RD.pas || .5), bp = b.querySelector("#objP");
   bp.style.display = (sp || RD.objK === "serpentin") ? "" : "none"; bp.textContent = "Tubes : " + (pasV >= 1 ? "30 cm" : "15 cm");
-  ["objR", "objD"].forEach(id => b.querySelector("#" + id).style.display = sel ? "" : "none");
+  ["objR", "objD"].forEach(id => b.querySelector("#" + id).style.display = sel || (id === "objD" && (window.SELM || []).some(x => strokes().includes(x))) ? "" : "none");   /* Supprimer aussi pour un groupe */
   { const bv = b.querySelector("#objV"); if (bv){ const o = sel ? SELO.s : null, ok = o && o.t === "objet" && DEBOUT_OK.test(o.k); bv.style.display = ok ? "" : "none"; if (ok) bv.textContent = !o.v ? "↕ Debout" : o.v > 0 ? "↕ Autre côté" : "↕ Couché"; } }
   if ((se && (se.k === "rails" || se.k === "jonction")) || (sel && FORMES[SELO.s.t])) b.querySelector("#objR").style.display = "none";
   b.querySelector("#objTaille").style.display = se && se.k === "rails" ? "" : "none"; }
@@ -4457,6 +4458,14 @@ function ansEtat(){
   return { ok, m, s:st, t };
 }
 
+/* Suppr, Ctrl+C/V/X/D, Échap sur le tableau : aussi quand le clavier est dans le cadre du livre (tableau blanc vide) */
+function toucheTableau(e){
+  if ((e.ctrlKey || e.metaKey) && !e.altKey && (RD.pen || RD.wb) && /^[cvxd]$/i.test(e.key || "")){ if (copierColler(e.key.toLowerCase())) return true; }
+  if (e.key === "Escape" && SELM.length){ SELM = []; redrawInk(); }
+  if ((e.key === "Delete" || e.key === "Backspace") && (RD.pen || RD.wb)){                 /* Suppr : efface ce qui est choisi, partout */
+    if ((SELM.length && SELM.some(x => strokes().includes(x))) || (typeof SELO !== "undefined" && SELO.s && strokes().includes(SELO.s))){ effacerChoix(); return true; }
+    if (typeof SEL !== "undefined" && SEL.s && strokes().includes(SEL.s)){ snapInk(); INKS[inkKey()] = strokes().filter(x => x !== SEL.s); SEL.s = null; redrawInk(); try { majBarTxt(); majSelTxt(); } catch(er){} return true; } }
+  return false; }
 const HOSTKEYS = { p:togglePen, t:toggleTimer, l:toggleSpot, c:toggleCache, b:toggleWb, m:openMenu, f:toggleFs, h:basculerBarres, d:toggleDbl, o:toggleLaser, n:toggleNoir, k:toggleMark, e:() => allerTableauDeBord(), "?":toggleHelp,
   "+":zin, "=":zin, "-":zout, "_":zout, "0":zreset, r:answers, a:toggleAnim, q:() => montrerQr(), z:() => {} };
 const verrou = () => !!(RD.wb || RD.text || RD.obj);     /* tableau blanc ou texte : aucun raccourci, sauf annuler / rétablir */
@@ -4475,11 +4484,7 @@ document.addEventListener("keydown", e => {
   if (!$("#reader").classList.contains("open")) return;
   const t = e.target, tag = t && t.tagName;
   if (enSaisie(t)) return;
-  if ((e.ctrlKey || e.metaKey) && !e.altKey && (RD.pen || RD.wb) && /^[cvxd]$/i.test(e.key)){ if (copierColler(e.key.toLowerCase())){ e.preventDefault(); return; } }
-  if (e.key === "Escape" && SELM.length){ SELM = []; redrawInk(); }
-  if ((e.key === "Delete" || e.key === "Backspace") && (RD.pen || RD.wb)){                 /* Suppr : efface ce qui est choisi, partout */
-    if ((SELM.length && SELM.some(x => strokes().includes(x))) || (typeof SELO !== "undefined" && SELO.s && strokes().includes(SELO.s))){ e.preventDefault(); effacerChoix(); return; }
-    if (typeof SEL !== "undefined" && SEL.s && strokes().includes(SEL.s)){ e.preventDefault(); snapInk(); INKS[inkKey()] = strokes().filter(x => x !== SEL.s); SEL.s = null; redrawInk(); try { majBarTxt(); majSelTxt(); } catch(er){} return; } }   /* forme sélectionnée : touche Suppr */
+  if (toucheTableau(e)){ e.preventDefault(); return; }
   if (e.key === "Escape"){ if (!$("#mmenu").hidden || !$("#help").hidden || !$("#noir").hidden){ closeMenu(); e.stopImmediatePropagation(); } return; }
   if (verrou() && !((e.ctrlKey || e.metaKey) && /^[zy]$/i.test(e.key || ""))) return;
   if (e.key === "ArrowRight" || e.key === "PageDown" || (e.key === " " && tag !== "BUTTON")){ e.preventDefault(); turn(1); return; }
