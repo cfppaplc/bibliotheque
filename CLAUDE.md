@@ -57,6 +57,7 @@
 - **Impression / PDF des livres : retiré le 29 oct. à la demande de Jeremy** (« ça fait le fou, ça change du texte »). Bouton, `telechargerPdf`, `imprimerLivre` et dossier `pdf/` enlevés. Ne pas remettre sans qu'il le demande. L'outil `outils/pdf_livres.js` reste, inutilisé (si un jour : contrôler avec `pypdfium2`, pas seulement `pdftoppm`).
 - Ouvrir à une page : `?livre=<fichier>&page=N` ou `RD.allerA = N` avant `lire(l)` (`offrirReprise` revérifie et
   s'arrête dès que l'enseignant tourne lui-même une page : `RD.bouge`).
+- Avis « Reprendre à la page N ? » (`#resume`, `offrirReprise`) : petite pastille depuis le 29 oct. (bloc CSS après `#resumeYes:active`), barre de 15 s fine en bas.
 - Badges « Nouveau » / « Mis à jour » : `estNouveau`, `majRecente`, `badgeLivre` — 30 jours, et disparaissent une fois le livre
   ouvert sur cet ordinateur (`localStorage.livresVus`).
 - **Palette Objets** (`#objBar`, bouton cube `#penO`, visible partout) : quatre onglets `RD.objTab` = `formes` | `iso` | `elec` | `plomb` (Plomberie : mêmes mécanismes que Formes, n'importe quel fond; partout où on teste « formes », tester aussi « plomb »).
