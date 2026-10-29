@@ -68,6 +68,7 @@ self.addEventListener("fetch", e => {
   if (req.method !== "GET") return;
   const u = new URL(req.url);
   if (u.origin === self.location.origin) {
+    if (/\/pdf\//.test(u.pathname)) return;   /* PDF d'impression : jamais gardés en copie (trop gros), toujours du réseau */
     if (estFichierLourd(u)) e.respondWith(copieDabord(req, e));
     else e.respondWith(reseauDabord(req));
   } else if (estExterne(u)) {
