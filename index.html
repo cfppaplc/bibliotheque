@@ -2004,6 +2004,7 @@ function enveloppe(pts){
 }
 /* collecteur : départ (haut, rouge) en n=0, retour (bas, bleu) en n=1 ; ports = [départ principal, retour principal, N départs de boucle, N retours de boucle] */
 const manP = N => [[-1,0],[-1,1], ...Array.from({length:N}, (_, i) => [i+1, 0]), ...Array.from({length:N}, (_, i) => [i+1, 1])];
+const DEBOUT_OK = /^(plinthe|radiateur|pompe|vanne|boisseau|vannemot|vanne3)$/;   /* objets qu'on peut mettre debout (tuyau vertical) */
 const OBJETS = {
   plinthe:   { n:"Plinthe chauffante", ports:[[0,0],[3,0]], fill:"#d9dee5" },
   radiateur: { n:"Radiateur",          ports:[[0,0],[2,0]], fill:"#e8ecf1" },
@@ -2264,14 +2265,24 @@ function objGeo(s, W, H){
     box(0, -.07, .3, .07, .08, .3, "#aab4c0");                                                    /* tuyau proche */
   }
   else if (s.k === "vase"){ cyl(0, 0, .09, 0, .4, "#9aa7b5"); cyl(0, 0, .5, .35, 1.55, "#d4574f", 1); cyl(0, 0, .08, 1.55, 1.7, "#8f9cab"); }
+  const LV = def.ports && def.ports.length ? Math.round(Math.max(...def.ports.map(q => q[0]))) : 1;   /* debout : les raccords restent sur la grille; vers le haut et vers le bas échangent les deux raccords */
+  const RV = !s.v || !DEBOUT_OK.test(s.k) ? null : s.v > 0 ? (m, h) => [-h, m] : (m, h) => [h, LV - m];   /* objet debout : son axe devient vertical */
+  if (RV) shapes.forEach((sh, i) => {
+    if (sh.t === "box"){ const A = RV(sh.m0, sh.h0), B = RV(sh.m1, sh.h1), nb = Object.assign({}, sh, { m0:Math.min(A[0], B[0]), m1:Math.max(A[0], B[0]), h0:Math.min(A[1], B[1]), h1:Math.max(A[1], B[1]) });
+      if (sh.extra && sh.extra.fins){ const [f0, f1, st, y0, y1] = sh.extra.fins, segs = []; for (let m = f0; m <= f1 + .001; m += st){ const u = RV(sh.m0 + m, y0), v = RV(sh.m0 + m, y1); segs.push([[u[0], sh.n1, u[1]], [v[0], sh.n1, v[1]]]); } nb.extra = Object.assign({}, sh.extra, { fins:null, segs }); }
+      shapes[i] = nb; }
+    else if (sh.t === "cyl"){ const A = RV(sh.m, sh.h0), B = RV(sh.m, sh.h1); shapes[i] = { t:"cylm", m0:Math.min(A[0], B[0]), m1:Math.max(A[0], B[0]), n:sh.n, h:A[1], R:sh.R, fill:sh.fill, rings:sh.rings }; }
+    else if (sh.t === "cyln"){ const A = RV(sh.m, sh.h); shapes[i] = Object.assign({}, sh, { m:A[0], h:A[1] }); }
+    else if (sh.t === "sph"){ const A = RV(sh.m, sh.h); shapes[i] = Object.assign({}, sh, { m:A[0], h:A[1] }); } });
   let lp = def.ports;
   if (s.k === "serpentin"){ const [dm, dn] = s.sz || [4, 3], lignes = Math.round(Math.abs(dn) / (s.pas || .5)) + 1; lp = [[0, 0], [lignes % 2 ? dm : 0, dn]]; }
-  const ports = lp.map(([m, n]) => P(m, n, 0));
+  const ports = lp.map(([m, n]) => { if (!RV) return P(m, n, 0); const A = RV(m, 0); return P(A[0], n, A[1]); });
   const pts = []; shapes.forEach(sh => {
     if (sh.t === "box") [[sh.m0, sh.n0], [sh.m1, sh.n0], [sh.m1, sh.n1], [sh.m0, sh.n1]].forEach(([m, n]) => { pts.push(P(m, n, sh.h0), P(m, n, sh.h1)); });
     else if (sh.t === "serp"){ pts.push(P(0, 0, 0), P(sh.dm, 0, 0), P(sh.dm, sh.dn, 0), P(0, sh.dn, 0)); }
     else if (sh.t === "sph"){ const c = P(sh.m, sh.n, sh.h); pts.push([c[0] - sh.R * a, c[1] - sh.R * a], [c[0] + sh.R * a, c[1] + sh.R * a]); }
     else if (sh.t === "cyln"){ for (let i = 0; i < 24; i++){ const th = i / 24 * Math.PI * 2; pts.push(P(sh.m + sh.R * Math.cos(th), sh.n0, sh.h + sh.R * Math.sin(th)), P(sh.m + sh.R * Math.cos(th), sh.n1, sh.h + sh.R * Math.sin(th))); } }
+    else if (sh.t === "cylm"){ [sh.m0, sh.m1].forEach(m => { pts.push(P(m, sh.n - sh.R, sh.h - sh.R), P(m, sh.n + sh.R, sh.h + sh.R), P(m, sh.n - sh.R, sh.h + sh.R), P(m, sh.n + sh.R, sh.h - sh.R)); }); }
     else if (sh.t === "cyl"){ const c = P(sh.m, sh.n, 0); pts.push([c[0] - sh.R * a * 1.22, c[1] - sh.h1 * a - sh.R * a * .71], [c[0] + sh.R * a * 1.22, c[1] + sh.R * a * .71]); }
     else { pts.push(P(0, 0, .5), P(1, 0, -.5), P(.5, 0, 1.2)); }
   });
@@ -2291,6 +2302,7 @@ function dessinerObjet(g, s, W, H, k, col){
       poly([P(m0, n0, h0), P(m0, n1, h0), P(m0, n1, h1), P(m0, n0, h1)], ombre(sh.fill, .86));
       poly([P(m0, n1, h0), P(m1, n1, h0), P(m1, n1, h1), P(m0, n1, h1)], ombre(sh.fill, .72));
       poly([P(m0, n0, h1), P(m1, n0, h1), P(m1, n1, h1), P(m0, n1, h1)], sh.fill);
+      if (sh.extra && sh.extra.segs){ g.lineWidth = Math.max(1, 1.2 * k); g.beginPath(); sh.extra.segs.forEach(([u, v]) => { const A = P(...u), B = P(...v); g.moveTo(A[0], A[1]); g.lineTo(B[0], B[1]); }); g.stroke(); g.lineWidth = Math.max(1.2, 2 * k); }
       if (sh.extra && sh.extra.fins){ const [f0, f1, st, y0, y1] = sh.extra.fins; g.lineWidth = Math.max(1, 1.2 * k); g.beginPath();
         for (let m = f0; m <= f1 + .001; m += st){ const A = P(m0 + m, n1, y0), B = P(m0 + m, n1, y1); g.moveTo(A[0], A[1]); g.lineTo(B[0], B[1]); } g.stroke(); g.lineWidth = Math.max(1.2, 2 * k); }
       if (sh.extra && sh.extra.chaud){
@@ -2316,6 +2328,9 @@ function dessinerObjet(g, s, W, H, k, col){
       poly(enveloppe(cap(sh.n0).concat(cap(sh.n1))), ombre(sh.fill, .78)); poly(cap(sh.n1), sh.fill);
       const c = P(sh.m, sh.n1, sh.h); g.beginPath(); g.arc(c[0], c[1], a * .09, 0, 7); g.fillStyle = ombre(sh.fill, .7); g.fill(); g.stroke();
       g.beginPath(); cap(sh.n1).forEach((q, i) => { const r = .62, x = c[0] + (q[0] - c[0]) * r, y = c[1] + (q[1] - c[1]) * r; i ? g.lineTo(x, y) : g.moveTo(x, y); }); g.closePath(); g.lineWidth = Math.max(1, 1.2 * k); g.stroke(); g.lineWidth = Math.max(1.2, 2 * k);
+    } else if (sh.t === "cylm"){                                           /* cylindre couché (objet debout) : on voit le bout côté m0 */
+      const cap = m => Array.from({ length:40 }, (_, i) => { const th = i / 40 * Math.PI * 2; return P(m, sh.n + sh.R * Math.cos(th), sh.h + sh.R * Math.sin(th)); });
+      poly(enveloppe(cap(sh.m0).concat(cap(sh.m1))), ombre(sh.fill, .8)); poly(cap(sh.m0), sh.fill);
     } else if (sh.t === "cyl"){
       const c0 = P(sh.m, sh.n, sh.h0), c1 = P(sh.m, sh.n, sh.h1), rx = sh.R * a * 1.22, ry = sh.R * a * .71;
       g.beginPath(); g.moveTo(c0[0] - rx, c0[1]); g.ellipse(c0[0], c0[1], rx, ry, 0, Math.PI, 0, true); g.lineTo(c1[0] + rx, c1[1]); g.ellipse(c1[0], c1[1], rx, ry, 0, 0, Math.PI, false); g.closePath(); g.fillStyle = ombre(sh.fill, .8); g.fill(); g.strokeStyle = col; g.stroke();
@@ -2739,7 +2754,7 @@ function modifierForme(s, cx, cy){
   if (s.t === "cote" || (s.t !== "objet" && !VALEURS_FORME[s.t]) || (s.t === "objet" && !ELEC[s.k])) padCote(box, s);
   if (cotesPossibles(s)){ const rang = document.createElement("div"); rang.style.cssText = "display:flex;gap:6px;margin-top:10px";
     const st = "flex:1;min-height:40px;border-radius:9px;border:1px solid #6aa9ff;border-bottom-width:4px;color:#fff;font:800 .85rem system-ui;cursor:pointer;padding:0 6px";
-    rang.innerHTML = '<button type="button" data-plus="txt" title="Ajoute un texte (a, b, c…) sur le côté suivant de la forme" style="' + st + ';background:#1f6fc2">+ Texte sur un côté</button><button type="button" data-plus="cote" title="Ajoute une ligne de cote sur le côté suivant" style="' + st + ';background:#2a2a30">+ Cote</button>';
+    rang.innerHTML = '<button type="button" data-plus="txt" title="Ajoute un texte (a, b, c…) sur le côté que tu choisis" style="' + st + ';background:#1f6fc2">+ Texte sur un côté</button><button type="button" data-plus="cote" title="Ajoute une ligne de cote sur le côté que tu choisis" style="' + st + ';background:#2a2a30">+ Cote</button>';
     rang.addEventListener("mousedown", e => e.preventDefault()); box.appendChild(rang); }
   glisserCase(box);
   $("#reader").appendChild(box); placerCase(box, s, cx, cy);   /* la case se met à côté de l'objet, jamais dessus */
@@ -2784,14 +2799,17 @@ function sommetsForme(s){ if (!s || !s.p || s.p.length < 2) return null; const [
   return null; }
 const cotesPossibles = s => s.t === "cote" || !!sommetsForme(s);
 /* + : une cote sur le prochain côté qui n'en a pas (pour une cote : sur un autre côté de la même forme) */
-function ajouterCote(s, txt){
+function ajouterCote(s, txt, choixIdx){
   const c = $("#inkCanvas"), W = c.width, H = c.height, pres = (u, v) => Math.hypot((u[0] - v[0]) * W, (u[1] - v[1]) * H) < 4;
   const arcs = f => { const S = sommetsForme(f); if (!S) return []; const A = []; for (let i = 0; i < S.P.length - (S.ferme ? 0 : 1); i++) A.push([S.P[i], S.P[(i + 1) % S.P.length]]); return A; };
   let f = s;
   if (s.t === "cote") f = strokes().find(o => o !== s && o.t !== "cote" && arcs(o).some(([u, v]) => (pres(u, s.p[0]) && pres(v, s.p[1])) || (pres(v, s.p[0]) && pres(u, s.p[1]))));
   if (!f){ aviser("Pour une autre cote, double-clique sur la forme elle-même.", 3500); return; }
-  const cotes = strokes().filter(o => o.t === "cote" && !!o.txt === !!txt), libre = arcs(f).find(([u, v]) => !cotes.some(o => (pres(u, o.p[0]) && pres(v, o.p[1])) || (pres(v, o.p[0]) && pres(u, o.p[1]))));
-  if (!libre){ aviser(txt ? "Tous les côtés de cette forme ont déjà un texte." : "Tous les côtés de cette forme ont déjà une cote.", 3000); return; }
+  const cotes = strokes().filter(o => o.t === "cote" && !!o.txt === !!txt), occupe = ([u, v]) => cotes.some(o => (pres(u, o.p[0]) && pres(v, o.p[1])) || (pres(v, o.p[0]) && pres(u, o.p[1])));
+  const tous = arcs(f), libres = tous.map((A, i) => i).filter(i => !occupe(tous[i]));
+  if (!libres.length){ aviser(txt ? "Tous les côtés de cette forme ont déjà un texte." : "Tous les côtés de cette forme ont déjà une cote.", 3000); return; }
+  if (choixIdx === undefined){ choisirCote(f, tous, libres, txt, i => ajouterCote(f, txt, i)); return; }   /* l'enseignant touche le côté voulu */
+  const libre = tous[choixIdx];
   const S = sommetsForme(f), Cx = S.P.reduce((t, q) => t + q[0], 0) / S.P.length * W, Cy = S.P.reduce((t, q) => t + q[1], 0) / S.P.length * H;
   const [u, v] = libre, an = Math.atan2((v[1] - u[1]) * H, (v[0] - u[0]) * W), nx = -Math.sin(an), ny = Math.cos(an), mx = (u[0] + v[0]) / 2 * W, my = (u[1] + v[1]) / 2 * H;
   const sg = S.ferme ? (Math.sign(nx * (mx - Cx) + ny * (my - Cy)) || 1) : (ny > 0 ? -1 : 1), ec = 30 * RD.z * (window.devicePixelRatio || 1);
@@ -2799,6 +2817,25 @@ function ajouterCote(s, txt){
   if (txt){ n.txt = 1; n.lb = "abcdefgh"[arcs(f).findIndex(([a2, b2]) => pres(a2, u) && pres(b2, v))] || "a"; }
   strokes().push(n); SELO.s = n; redrawInk(); try { majObjUI(); } catch(e){}
   const r = c.getBoundingClientRect(); modifierForme(n, r.left + mx * r.width / W, r.top + my * r.height / H); }
+/* choisir le côté : chaque côté libre est surligné avec un gros bouton +; toucher ailleurs ou Échap = annuler */
+function choisirCote(f, tous, libres, txt, ok){
+  const c = $("#inkCanvas"), r = c.getBoundingClientRect(), X = q => [r.left + q[0] * r.width, r.top + q[1] * r.height];
+  const S = sommetsForme(f), C = X([S.P.reduce((t, q) => t + q[0], 0) / S.P.length, S.P.reduce((t, q) => t + q[1], 0) / S.P.length]);
+  document.querySelectorAll(".choixCote").forEach(e => e.remove());
+  const ov = document.createElementNS("http://www.w3.org/2000/svg", "svg"); ov.setAttribute("class", "choixCote");
+  ov.style.cssText = "position:fixed;inset:0;width:100vw;height:100vh;z-index:100001;cursor:default";
+  let h = '<rect x="0" y="0" width="100%" height="100%" fill="rgba(0,0,0,.08)"/>';
+  libres.forEach(i => { const [u, v] = tous[i].map(X), mx = (u[0] + v[0]) / 2, my = (u[1] + v[1]) / 2, L = Math.hypot(v[0] - u[0], v[1] - u[1]) || 1;
+    let nx = -(v[1] - u[1]) / L, ny = (v[0] - u[0]) / L; if (S.ferme ? nx * (mx - C[0]) + ny * (my - C[1]) < 0 : ny > 0){ nx = -nx; ny = -ny; }
+    const bx = mx + nx * 30, by = my + ny * 30;
+    h += '<g data-i="' + i + '" style="cursor:pointer"><line x1="' + u[0] + '" y1="' + u[1] + '" x2="' + v[0] + '" y2="' + v[1] + '" stroke="#1f6fc2" stroke-opacity=".55" stroke-width="16" stroke-linecap="round"/>' +
+      '<line x1="' + u[0] + '" y1="' + u[1] + '" x2="' + v[0] + '" y2="' + v[1] + '" stroke="transparent" stroke-width="40"/>' +
+      '<circle cx="' + bx + '" cy="' + by + '" r="22" fill="#1f6fc2" stroke="#fff" stroke-width="3"/><path d="M' + (bx - 9) + ' ' + by + 'h18M' + bx + ' ' + (by - 9) + 'v18" stroke="#fff" stroke-width="3.5" stroke-linecap="round"/></g>'; });
+  ov.innerHTML = h; document.body.appendChild(ov);
+  aviser(txt ? "Touche le côté où mettre le texte." : "Touche le côté à coter.", 4000);
+  const fin = () => { ov.remove(); removeEventListener("keydown", esc, true); }, esc = e => { if (e.key === "Escape"){ e.preventDefault(); e.stopPropagation(); fin(); } };
+  addEventListener("keydown", esc, true);
+  ov.addEventListener("pointerdown", e => { e.preventDefault(); e.stopPropagation(); const g = e.target.closest("g[data-i]"); fin(); if (g) ok(+g.dataset.i); }); }
 /* la case du double-clic se déplace en la glissant par sa barre du haut (pour voir l'objet dessous) */
 function glisserCase(box){
   const bar = document.createElement("div"); bar.title = "Glisse pour déplacer la case";
@@ -3389,6 +3426,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
   const sel = SELO.s && strokes().includes(SELO.s), sp = sel && SELO.s.k === "serpentin" ? SELO.s : null, pasV = sp ? (sp.pas || .5) : (RD.pas || .5), bp = b.querySelector("#objP");
   bp.style.display = (sp || RD.objK === "serpentin") ? "" : "none"; bp.textContent = "Tubes : " + (pasV >= 1 ? "30 cm" : "15 cm");
   ["objR", "objD"].forEach(id => b.querySelector("#" + id).style.display = sel ? "" : "none");
+  { const bv = b.querySelector("#objV"); if (bv){ const o = sel ? SELO.s : null, ok = o && o.t === "objet" && DEBOUT_OK.test(o.k); bv.style.display = ok ? "" : "none"; if (ok) bv.textContent = !o.v ? "↕ Debout" : o.v > 0 ? "↕ Vers le bas" : "↕ Couché"; } }
   if ((se && (se.k === "rails" || se.k === "jonction")) || (sel && FORMES[SELO.s.t])) b.querySelector("#objR").style.display = "none";
   b.querySelector("#objTaille").style.display = se && se.k === "rails" ? "" : "none"; }
 (function(){
@@ -3410,7 +3448,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     + '<span class="pl">Pôles (circuits coupés)</span><button data-pp="s" title="1 pôle (unipolaire)">1 pôle</button><button data-pp="d" title="2 pôles (bipolaire)">2 pôles</button>'
     + '<span class="pl">Positions (directions)</span><button data-pt="st" title="1 position (unidirectionnel)">1 position</button><button data-pt="dt" title="2 positions (bidirectionnel)">2 positions</button><span class="pl" data-code></span></div><label class="del" id="objDelW">Délai <input id="objDel" type="number" min="1" max="60" step="1" value="3"> s</label><input id="objL" maxlength="10" placeholder="Repère" title="Repère du symbole (ex. CR1, M, PB2)" aria-label="Repère du symbole">'
     + '<div class="taille" id="objTaille"><span>Largeur</span><button data-t="w-1" title="Rapprocher L2">−</button><button data-t="w1" title="Éloigner L2">+</button><span>Hauteur</span><button data-t="h-1" title="Raccourcir l\'échelle">−</button><button data-t="h1" title="Allonger l\'échelle">+</button><em>ou glisse le carré bleu en bas à droite</em></div>'
-    + '<div class="rang"><button id="objR" title="Pivoter l\'objet sélectionné">⟳ Pivoter</button><button id="objD" title="Supprimer l\'objet sélectionné" aria-label="Supprimer">🗑</button></div>'
+    + '<div class="rang"><button id="objR" title="Pivoter l\'objet sélectionné">⟳ Pivoter</button><button id="objV" title="Mettre l\'objet debout : vers le haut, vers le bas, puis couché">↕ Debout</button><button id="objD" title="Supprimer l\'objet sélectionné" aria-label="Supprimer">🗑</button></div>'
     + '<button id="objSim" class="grpE" title="Faire fonctionner le schéma : le courant circule, les bobines, lampes et moteurs s\'activent">▶ Animer le schéma</button><div class="simAide"></div><button id="objX">Terminé</button>';
   const st = document.createElement("style");
   st.textContent = '#objBar button{min-height:32px;padding:0 8px;border-radius:8px;border:1px solid #2f2f33;background:#18181a;color:#d4d4d8;cursor:pointer;font:inherit;text-align:left}#objBar button:hover{border-color:#6a6a70}#objBar button.on{background:#2a2a2d;border-color:#6aa9ff;color:#fff}'
@@ -3510,6 +3548,15 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     s.o = s.o ? 0 : 1; RD.objO = s.o; const ap = objGeo(s, W, H).ports;             /* les fils et tuyaux raccordés suivent la rotation */
     strokes().forEach(t => { if (t.t !== "ligne" || !t.p) return; [0, 1].forEach(i => { const j = av.findIndex(q => Math.hypot(q[0] - t.p[i][0] * W, q[1] - t.p[i][1] * H) < 4); if (j >= 0) t.p[i] = [ap[j][0] / W, ap[j][1] / H]; }); });
     redrawInk(); };
+  $("#objV").onclick = () => { const s = SELO.s; if (!s || s.t !== "objet" || !DEBOUT_OK.test(s.k)) return; snapInk(); const c = $("#inkCanvas"), W = c.width, H = c.height, av = objGeo(s, W, H).ports;
+    const liens = []; strokes().forEach(t => { if (t.t !== "ligne" || !t.p) return; [0, 1].forEach(i => { const j = av.findIndex(q => Math.hypot(q[0] - t.p[i][0] * W, q[1] - t.p[i][1] * H) < 4); if (j >= 0) liens.push([t, i, t.p[i][0], t.p[i][1], j]); }); });
+    s.v = !s.v ? 1 : s.v > 0 ? -1 : 0; const ap = objGeo(s, W, H).ports;
+    const libres = ap.map((q, j) => j).filter(j => !liens.some(([t, i]) => Math.hypot(ap[j][0] - t.p[i][0] * W, ap[j][1] - t.p[i][1] * H) < 4));
+    const aRefaire = liens.filter(([t, i]) => !ap.some(q => Math.hypot(q[0] - t.p[i][0] * W, q[1] - t.p[i][1] * H) < 4));   /* bas ↔ haut : les raccords s'échangent, rien à refaire */
+    aRefaire.forEach(l => { const [t, i] = l; let jb = libres[0], db = 1e9; libres.forEach(j => { const dd = Math.hypot(ap[j][0] - t.p[i][0] * W, ap[j][1] - t.p[i][1] * H); if (dd < db){ db = dd; jb = j; } });
+      if (jb === undefined) return; libres.splice(libres.indexOf(jb), 1); t.p[i] = [ap[jb][0] / W, ap[jb][1] / H]; });
+    if (aRefaire.length && window.redresserIso && /^iso/.test(wbBg())) redresserIso(s, aRefaire.map(l => l.slice(0, 4)));   /* les tuyaux se refont droits sur la grille */
+    redrawInk(); majObjUI(); aviser(!s.v ? "Objet couché." : s.v > 0 ? "Objet debout, tuyau vers le haut." : "Objet debout, tuyau vers le bas.", 2200); };
   $("#objD").onclick = () => effacerChoix();
   $("#objX").onclick = () => { RD.obj = false; refreshTools(); };
   (function(){ const h = bar.querySelector(".tete"); let d = null;
@@ -3627,9 +3674,9 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     const branche = p => el ? fils.some(f => surFil(p, f) || bout(p, f)) : surTuyau(p);
     const pas = el ? elecU() * r.width / c.width : 34 * RD.z * 1.2 * (r.width / (c.offsetWidth || r.width)) * .55, vus = new Set(); let best = null;
     for (let dx = -3; dx <= 3; dx++) for (let dy = -3; dy <= 3; dy++){ const q = cur({ clientX:cx + dx * pas, clientY:cy + dy * pas }).snap, cle = q.map(v => v.toFixed(5)).join(); if (vus.has(cle)) continue; vus.add(cle);
-      for (const ori of [0, 1]){ const t = { ...o, p:[q], o:ori }, P = objGeo(t, c.width, c.height).ports.map(pp => [pp[0] / c.width, pp[1] / c.height]), n = P.filter(branche).length;
-        if (!n) continue; const d = Math.hypot(dx, dy) + ori * .01, sc = n * 10 - d; if (!best || sc > best[0]) best = [sc, q, ori, n]; } }
-    if (best){ o.p = [best[1]]; o.o = best[2]; }
+      for (const ori of [0, 1]) for (const vv of (!el && DEBOUT_OK.test(k) ? [0, 1] : [0])){ const t = { ...o, p:[q], o:ori, v:vv }, P = objGeo(t, c.width, c.height).ports.map(pp => [pp[0] / c.width, pp[1] / c.height]), n = P.filter(branche).length;   /* sur un tuyau vertical, l'objet se pose debout */
+        if (!n) continue; const d = Math.hypot(dx, dy) + ori * .01 + vv * .02, sc = n * 10 - d; if (!best || sc > best[0]) best = [sc, q, ori, n, vv]; } }
+    if (best){ o.p = [best[1]]; o.o = best[2]; if (best[4]) o.v = best[4]; }
     return { o, best, el }; };
   window.apercuObjet = (k, cx, cy) => { const pl = k ? placer(k, cx, cy) : null; window.APERCU = pl && pl.o ? pl.o : null; redrawInk(); return !!window.APERCU; };
   window.deposerObjet = (k, cx, cy) => {
@@ -3644,6 +3691,42 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
   const touche = q => { const arr = strokes(); for (let i = arr.length - 1; i >= 0; i--){ const s = arr[i]; if (s.t !== "objet") continue; const G = objGeo(s, c.width, c.height), x = q[0] * c.width, y = q[1] * c.height;
     if (s.k === "rails"){ if (surRails(s, G, x, y, .1) && (RD.objK === "rails" || (y - G.oy) / G.u < .4)) return s; continue; }
     if (x >= G.bbox[0] - 4 && x <= G.bbox[2] + 4 && y >= G.bbox[1] - 4 && y <= G.bbox[3] + 4) return s; } return null; };
+  /* objet iso déplacé ou mis debout : chaque tuyau branché (liens = [tuyau, bout, x0, y0]) est refait droit sur la grille iso */
+  const redresserIso = window.redresserIso = (obj, liensIso) => {
+      const W = c.width, H = c.height, dpr = window.devicePixelRatio || 1, a = 34 * RD.z * 1.2 * dpr, d = a * .8660254, arr = strokes();
+      const AX = [[d, a / 2], [-d, a / 2], [0, a]];
+      const cr = (u, v) => u[0] * v[1] - u[1] * v[0], dot = (u, v) => u[0] * v[0] + u[1] * v[1], N = q => [q[0] / W, q[1] / H], P = q => [q[0] * W, q[1] * H], pres = (u, v) => Math.hypot(u[0] - v[0], u[1] - v[1]) < 2;
+      const sens = v => { let best = null; AX.forEach(A => [1, -1].forEach(sg => { const D = [A[0] * sg, A[1] * sg], k = dot(D, v) / (a * Math.hypot(v[0], v[1]) || 1); if (!best || k > best.k) best = { D, k }; })); return best.D; };
+      const G = objGeo(obj, W, H), bx = G.bbox, ctr = [(bx[0] + bx[2]) / 2, (bx[1] + bx[3]) / 2];
+      const dansObjet = (u, v) => { for (let t = .15; t < .9; t += .15){ const x = u[0] + (v[0] - u[0]) * t, y = u[1] + (v[1] - u[1]) * t; if (x > bx[0] + 3 && x < bx[2] - 3 && y > bx[1] + 3 && y < bx[3] - 3) return true; } return false; };
+      const tuyaux = () => arr.filter(x => x.t === "ligne" && !x.fil && x.p && x.p.length === 2);
+      const poser = (u, v, modele) => { if (pres(u, v)) return; const n = { c:modele.c, hl:false, hc:null, w:modele.w, t:"ligne", p:[N(u), N(v)] }; (decouperIso(n) || [n]).forEach(x => arr.push(x)); };
+      /* trajet de F à K : tout droit, ou deux bouts sur deux axes iso (le plus court, sans traverser l'objet, vertical préféré) */
+      const trajet = (F, K, arrivee) => { const v = [K[0] - F[0], K[1] - F[1]], L = Math.hypot(v[0], v[1]); if (L < 2) return { pts:[F, K], cout:0 };
+        const cands = [];
+        AX.forEach(A => { if (Math.abs(cr(A, v)) / (a * L) < .02) cands.push({ pts:[F, K], cout:L / a }); });
+        AX.forEach(A1 => AX.forEach(A2 => { if (A1 === A2) return; const den = cr(A1, A2); const t1 = cr(v, A2) / den, t2 = cr(A1, v) / den, E = [F[0] + A1[0] * t1, F[1] + A1[1] * t1];
+          let cout = Math.abs(t1) + Math.abs(t2) + .6;
+          const D2 = [K[0] - E[0], K[1] - E[1]]; if (arrivee && dot(D2, arrivee) < -.6 * Math.hypot(D2[0], D2[1]) * Math.hypot(arrivee[0], arrivee[1])) cout += 4;                 /* le 2e bout ne doit pas revenir en arrière vers le raccord */
+          if (dansObjet(F, E) || dansObjet(E, K)) cout += 20; cands.push({ pts:[F, E, K], cout }); }));
+        return cands.sort((x, y) => x.cout - y.cout)[0]; };
+      liensIso.forEach(([f, i]) => { if (!arr.includes(f)) return;
+        const M = P(f.p[i]); let F = P(f.p[1 - i]);
+        const autres = G.ports.filter(q => !pres(q, M)), ref = autres.length === 1 ? autres[0] : ctr;          /* objet à 2 raccords : l'axe va d'un raccord à l'autre */
+        const out = sens([M[0] - ref[0], M[1] - ref[1]]), K = [M[0] + out[0], M[1] + out[1]];                /* le tuyau sort droit du raccord, vers l'extérieur de l'objet */
+        const v = [M[0] - F[0], M[1] - F[1]]; if (Math.abs(cr(out, v)) < 2) return;                          /* glissé dans l'axe du raccord : rien à refaire (le tuyau sous l'objet est enlevé plus bas) */
+        arr.splice(arr.indexOf(f), 1);
+        let best = trajet(F, K, [-out[0], -out[1]]);
+        for (let essai = 0; essai < 30; essai++){                                                           /* si le 1er bout repart sur le tuyau précédent, on raccourcit ce tuyau */
+          const E = best.pts[1], prec = tuyaux().find(x => x.p.some(q => pres(P(q), F)));
+          if (!prec || best.pts.length < 2) break; const o = P(prec.p.find(q => !pres(P(q), F)) || prec.p[0]), back = [o[0] - F[0], o[1] - F[1]], go = [E[0] - F[0], E[1] - F[1]];
+          if (Math.hypot(...go) < 2 || Math.abs(cr(back, go)) > 2 || dot(back, go) <= 0) break;
+          arr.splice(arr.indexOf(prec), 1); F = o; best = trajet(F, K, [-out[0], -out[1]]); }
+        for (let j = 0; j + 1 < best.pts.length; j++) poser(best.pts[j], best.pts[j + 1], f);
+        poser(K, M, f); });
+      try { entreTuyaux(obj); } catch(er){}                                                              /* les bouts de tuyau restés sous l'objet disparaissent */
+      redrawInk();
+    };
   c.addEventListener("pointerdown", e => {
     if (!RD.obj || !RD.wb || RD.eraser || RD.sim || RD.objTab === "formes" || RD.objTab === "plomb") return;
     const q = cur(e), el = modeElec();
@@ -3702,41 +3785,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
   ["pointerup", "pointercancel"].forEach(t => c.addEventListener(t, ev => {
     if (mv && mv.s && !mv.snap && ev.type === "pointerup") tapElement(mv.s, ev);      /* toucher sans bouger : compte pour le double-clic (renommer) */
     if (mv && mv.fil){ if (mv.segs.length){ jonctionsAuto(mv.segs); nettoyerFils(); } else { (UNDO[inkKey()] || []).pop(); if (!mv.B || mv.B === mv.A){ RD.objKe = null; SELO.s = null; const ch = mv.surObjet || mv.filSous; if (ch && strokes().includes(ch)){ SELO.s = ch; RD.objO = ch.o || 0; tapElement(ch, ev); } } }   /* simple clic sur un symbole ou un fil, même avec l'outil Fil : on le choisit (double-clic = repère) */   /* clic sans tracer : retour à aucun outil */ mv = null; redrawInk(); majObjUI(); return; }
-    if (mv && mv.s && mv.snap && !ELEC[mv.s.k] && /^iso/.test(wbBg())){                 /* objet iso déplacé : chaque tuyau branché est refait droit sur la grille iso */
-      const W = c.width, H = c.height, dpr = window.devicePixelRatio || 1, a = 34 * RD.z * 1.2 * dpr, d = a * .8660254, arr = strokes();
-      const AX = [[d, a / 2], [-d, a / 2], [0, a]];
-      const cr = (u, v) => u[0] * v[1] - u[1] * v[0], dot = (u, v) => u[0] * v[0] + u[1] * v[1], N = q => [q[0] / W, q[1] / H], P = q => [q[0] * W, q[1] * H], pres = (u, v) => Math.hypot(u[0] - v[0], u[1] - v[1]) < 2;
-      const sens = v => { let best = null; AX.forEach(A => [1, -1].forEach(sg => { const D = [A[0] * sg, A[1] * sg], k = dot(D, v) / (a * Math.hypot(v[0], v[1]) || 1); if (!best || k > best.k) best = { D, k }; })); return best.D; };
-      const G = objGeo(mv.s, W, H), bx = G.bbox, ctr = [(bx[0] + bx[2]) / 2, (bx[1] + bx[3]) / 2];
-      const dansObjet = (u, v) => { for (let t = .15; t < .9; t += .15){ const x = u[0] + (v[0] - u[0]) * t, y = u[1] + (v[1] - u[1]) * t; if (x > bx[0] + 3 && x < bx[2] - 3 && y > bx[1] + 3 && y < bx[3] - 3) return true; } return false; };
-      const tuyaux = () => arr.filter(x => x.t === "ligne" && !x.fil && x.p && x.p.length === 2);
-      const poser = (u, v, modele) => { if (pres(u, v)) return; const n = { c:modele.c, hl:false, hc:null, w:modele.w, t:"ligne", p:[N(u), N(v)] }; (decouperIso(n) || [n]).forEach(x => arr.push(x)); };
-      /* trajet de F à K : tout droit, ou deux bouts sur deux axes iso (le plus court, sans traverser l'objet, vertical préféré) */
-      const trajet = (F, K, arrivee) => { const v = [K[0] - F[0], K[1] - F[1]], L = Math.hypot(v[0], v[1]); if (L < 2) return { pts:[F, K], cout:0 };
-        const cands = [];
-        AX.forEach(A => { if (Math.abs(cr(A, v)) / (a * L) < .02) cands.push({ pts:[F, K], cout:L / a }); });
-        AX.forEach(A1 => AX.forEach(A2 => { if (A1 === A2) return; const den = cr(A1, A2); const t1 = cr(v, A2) / den, t2 = cr(A1, v) / den, E = [F[0] + A1[0] * t1, F[1] + A1[1] * t1];
-          let cout = Math.abs(t1) + Math.abs(t2) + .6;
-          const D2 = [K[0] - E[0], K[1] - E[1]]; if (arrivee && dot(D2, arrivee) < -.6 * Math.hypot(D2[0], D2[1]) * Math.hypot(arrivee[0], arrivee[1])) cout += 4;                 /* le 2e bout ne doit pas revenir en arrière vers le raccord */
-          if (dansObjet(F, E) || dansObjet(E, K)) cout += 20; cands.push({ pts:[F, E, K], cout }); }));
-        return cands.sort((x, y) => x.cout - y.cout)[0]; };
-      mv.liens.forEach(([f, i]) => { if (!arr.includes(f)) return;
-        const M = P(f.p[i]); let F = P(f.p[1 - i]);
-        const autres = G.ports.filter(q => !pres(q, M)), ref = autres.length === 1 ? autres[0] : ctr;          /* objet à 2 raccords : l'axe va d'un raccord à l'autre */
-        const out = sens([M[0] - ref[0], M[1] - ref[1]]), K = [M[0] + out[0], M[1] + out[1]];                /* le tuyau sort droit du raccord, vers l'extérieur de l'objet */
-        const v = [M[0] - F[0], M[1] - F[1]]; if (Math.abs(cr(out, v)) < 2) return;                          /* glissé dans l'axe du raccord : rien à refaire (le tuyau sous l'objet est enlevé plus bas) */
-        arr.splice(arr.indexOf(f), 1);
-        let best = trajet(F, K, [-out[0], -out[1]]);
-        for (let essai = 0; essai < 30; essai++){                                                           /* si le 1er bout repart sur le tuyau précédent, on raccourcit ce tuyau */
-          const E = best.pts[1], prec = tuyaux().find(x => x.p.some(q => pres(P(q), F)));
-          if (!prec || best.pts.length < 2) break; const o = P(prec.p.find(q => !pres(P(q), F)) || prec.p[0]), back = [o[0] - F[0], o[1] - F[1]], go = [E[0] - F[0], E[1] - F[1]];
-          if (Math.hypot(...go) < 2 || Math.abs(cr(back, go)) > 2 || dot(back, go) <= 0) break;
-          arr.splice(arr.indexOf(prec), 1); F = o; best = trajet(F, K, [-out[0], -out[1]]); }
-        for (let j = 0; j + 1 < best.pts.length; j++) poser(best.pts[j], best.pts[j + 1], f);
-        poser(K, M, f); });
-      try { entreTuyaux(mv.s); } catch(er){}                                                              /* les bouts de tuyau restés sous l'objet disparaissent */
-      redrawInk();
-    }
+    if (mv && mv.s && mv.snap && !ELEC[mv.s.k] && /^iso/.test(wbBg())) redresserIso(mv.s, mv.liens);
     if (mv && mv.s && mv.snap && ELEC[mv.s.k]){                                  /* symbole déplacé : ses fils restent droits (un coude s'ajoute au besoin) */
       const ux = elecU() / c.width, uy = elecU() / c.height;
       mv.liens.forEach(([f, i, x0, y0]) => { const M = f.p[i].slice(), F = f.p[1 - i]; if (Math.abs(M[0] - F[0]) * c.width <= 2 || Math.abs(M[1] - F[1]) * c.height <= 2) return;

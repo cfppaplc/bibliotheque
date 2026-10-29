@@ -1,930 +1,942 @@
 [
- {
-  "date": "2026-10-28",
-  "type": "outil",
-  "titre": "Plomberie en coupe (tableau blanc)",
-  "texte": "Nouvel onglet « Plomberie » dans la palette Objets : une maison en coupe (étage, rez-de-chaussée, sous-sol), les tuyaux EF, EC, drain, évent et gaz, les collecteurs, le chauffe-eau, les raccords et les appareils.",
-  "formation": [
-   {
-    "t": "Bouton Objets (le cube), puis l'onglet Plomberie en haut de la palette (à côté de Formes, Iso et Électricité).",
-    "img": "nouveautes/plomberie-palette.jpg"
-   },
-   {
-    "t": "Touche « Maison en coupe » puis clique : une grande coupe s'affiche (fondation, dalle, murs isolés, planchers, fenêtres, escaliers, terrain), avec l'arrivée d'eau (aqueduc), la sortie d'égout et l'évent du toit. Un appareil cliqué dans la maison se met à l'échelle et se pose tout seul sur le plancher de l'étage.",
-    "img": "nouveautes/plomberie-coupe.jpg"
-   },
-   "Dans l'onglet Plomberie, chaque appareil montre ses points de raccord (bleu = EF, rouge = EC, vert = drain). Trace un tuyau près d'un point : il s'y branche exactement (un coude se fait au besoin). Déplace un appareil : les tuyaux branchés suivent.",
-   "Double-clic sur un tuyau : écris son diamètre (ex. 3/4 po). Comme les autres formes : glisse pour déplacer, carrés blancs pour la taille, Suppr pour effacer, + pour ajouter des cotes."
-  ],
-  "versions": [
-   {
+  {
     "date": "2026-10-28",
-    "texte": "Maison en coupe détaillée, appareils à l'échelle posés sur le plancher, tuyaux branchés aux bons raccords."
-   },
-   {
+    "type": "outil",
+    "titre": "Plomberie en coupe (tableau blanc)",
+    "texte": "Nouvel onglet « Plomberie » dans la palette Objets : une maison en coupe (étage, rez-de-chaussée, sous-sol), les tuyaux EF, EC, drain, évent et gaz, les collecteurs, le chauffe-eau, les raccords et les appareils.",
+    "formation": [
+      {
+        "t": "Bouton Objets (le cube), puis l'onglet Plomberie en haut de la palette (à côté de Formes, Iso et Électricité).",
+        "img": "nouveautes/plomberie-palette.jpg"
+      },
+      {
+        "t": "Touche « Maison en coupe » puis clique : une grande coupe s'affiche (fondation, dalle, murs isolés, planchers, fenêtres, escaliers, terrain), avec l'arrivée d'eau (aqueduc), la sortie d'égout et l'évent du toit. Un appareil cliqué dans la maison se met à l'échelle et se pose tout seul sur le plancher de l'étage.",
+        "img": "nouveautes/plomberie-coupe.jpg"
+      },
+      "Dans l'onglet Plomberie, chaque appareil montre ses points de raccord (bleu = EF, rouge = EC, vert = drain). Trace un tuyau près d'un point : il s'y branche exactement (un coude se fait au besoin). Déplace un appareil : les tuyaux branchés suivent.",
+      "Double-clic sur un tuyau : écris son diamètre (ex. 3/4 po). Comme les autres formes : glisse pour déplacer, carrés blancs pour la taille, Suppr pour effacer, + pour ajouter des cotes."
+    ],
+    "versions": [
+      {
+        "date": "2026-10-28",
+        "texte": "Maison en coupe détaillée, appareils à l'échelle posés sur le plancher, tuyaux branchés aux bons raccords."
+      },
+      {
+        "date": "2026-10-28",
+        "texte": "La plomberie a son propre onglet en haut de la palette."
+      },
+      {
+        "date": "2026-10-28",
+        "texte": "Maison en coupe, tuyaux EF/EC/drain/évent/gaz, collecteurs, chauffe-eau, raccords et appareils."
+      }
+    ]
+  },
+  {
     "date": "2026-10-28",
-    "texte": "La plomberie a son propre onglet en haut de la palette."
-   },
-   {
+    "type": "outil",
+    "titre": "Sélection multiple, copier et coller (tableau blanc)",
+    "texte": "Choisis plusieurs éléments à la fois pour les déplacer, les recolorer, les effacer ou les copier. Ctrl + une vignette remplace l'objet choisi.",
+    "formation": [
+      {
+        "t": "Garde Ctrl enfoncé et glisse : un cadre bleu comme dans Windows choisit tout ce qui est dedans (ça marche même si un outil est choisi). Sans outil, glisser dans le vide fait le même cadre. Ctrl + clic ajoute ou retire un élément.",
+        "img": "nouveautes/selection-multiple.jpg"
+      },
+      "Les traits choisis sont surlignés en bleu, avec un seul cadre pointillé autour du groupe. Un clic ailleurs (même avec le crayon) enlève la sélection.",
+      "Glisse un des éléments choisis : tout le groupe suit. Touche une couleur du crayon : tout le groupe change de couleur. Suppr efface le groupe.",
+      "Ctrl+C copie, Ctrl+V colle une copie un peu décalée (chaque Ctrl+V la décale encore), Ctrl+X coupe, Ctrl+D duplique. Échap : plus rien de choisi.",
+      "Remplacer : choisis un symbole (ou un objet iso, ou une forme), garde Ctrl enfoncé et touche une autre vignette de la palette. Il prend sa place : les fils, les tuyaux et les cotes restent où ils sont."
+    ],
+    "versions": [
+      {
+        "date": "2026-10-28",
+        "texte": "Corrigé : les carrés de sélection restaient affichés; traits surlignés et un seul cadre autour du groupe."
+      },
+      {
+        "date": "2026-10-28",
+        "texte": "Cadre de sélection bleu visible (style Windows) avec Ctrl + glisser."
+      },
+      {
+        "date": "2026-10-28",
+        "texte": "Sélection par cadre et Ctrl+clic, déplacer et recolorer un groupe, copier-coller, remplacer avec Ctrl + vignette."
+      }
+    ]
+  },
+  {
     "date": "2026-10-28",
-    "texte": "Maison en coupe, tuyaux EF/EC/drain/évent/gaz, collecteurs, chauffe-eau, raccords et appareils."
-   }
-  ]
- },
- {
-  "date": "2026-10-28",
-  "type": "outil",
-  "titre": "Sélection multiple, copier et coller (tableau blanc)",
-  "texte": "Choisis plusieurs éléments à la fois pour les déplacer, les recolorer, les effacer ou les copier. Ctrl + une vignette remplace l'objet choisi.",
-  "formation": [
-   {
-    "t": "Garde Ctrl enfoncé et glisse : un cadre bleu comme dans Windows choisit tout ce qui est dedans (ça marche même si un outil est choisi). Sans outil, glisser dans le vide fait le même cadre. Ctrl + clic ajoute ou retire un élément.",
-    "img": "nouveautes/selection-multiple.jpg"
-   },
-   "Les traits choisis sont surlignés en bleu, avec un seul cadre pointillé autour du groupe. Un clic ailleurs (même avec le crayon) enlève la sélection.",
-   "Glisse un des éléments choisis : tout le groupe suit. Touche une couleur du crayon : tout le groupe change de couleur. Suppr efface le groupe.",
-   "Ctrl+C copie, Ctrl+V colle une copie un peu décalée (chaque Ctrl+V la décale encore), Ctrl+X coupe, Ctrl+D duplique. Échap : plus rien de choisi.",
-   "Remplacer : choisis un symbole (ou un objet iso, ou une forme), garde Ctrl enfoncé et touche une autre vignette de la palette. Il prend sa place : les fils, les tuyaux et les cotes restent où ils sont."
-  ],
-  "versions": [
-   {
+    "type": "outil",
+    "titre": "Schéma électrique en échelle (tableau blanc)",
+    "texte": "Dessine et anime des schémas en échelle sur le quadrillé. Nouveau : relais complet (bobine + contacts NO et NF déjà nommés), numéros de bornes, tensions du transformateur et de l'échelle, ampoule, couleurs de fils, choix des pôles et des positions de l'interrupteur.",
+    "formation": [
+      {
+        "t": "Nouveau : « Relais complet » pose la bobine CR1 (bornes A1-A2) avec un contact NO (13-14) et un contact NF (21-22) du même repère; déplace chaque contact sur son échelon. Une nouvelle bobine prend le repère suivant (CR2, CR3…) et un contact prend celui de la bobine choisie. Double-clic sur le transformateur : tensions au primaire et au secondaire. Double-clic sur l'échelle : tension écrite au centre.",
+        "img": "nouveautes/elec-relais.jpg"
+      },
+      "Nouveau aussi : l'ampoule (Charges), la couleur des nouveaux fils (bas de la palette), l'interrupteur se règle par « 1 ou 2 pôles » et « 1 ou 2 positions ». Un point de jonction qui ne relie plus rien s'efface, et si tu effaces un symbole entre deux fils, les fils se rejoignent.",
+      "Corrigé (animation) : une lampe ne s'allume plus quand l'interrupteur de son échelon est ouvert, même s'il y a un autre échelon rempli de charges (résistance, lampe, transformateur). Un fil caché sous un symbole ne le court-circuite plus, et un fil qui arrive au milieu d'un symbole se branche sur sa borne.",
+      "Corrigé : pars du milieu d'un fil et glisse pour tracer un nouveau fil, le point de jonction se fait tout seul (avant, l'appli choisissait le fil et passait à l'onglet Formes). Un simple clic sur un fil le choisit (Suppr pour l'effacer).",
+      "Corrigé : même quand l'outil Fil est allumé (il s'allume tout seul après avoir posé un symbole), un clic sur un symbole le choisit et un double-clic ouvre son repère. Un objet posé sur un fil ou un tuyau passe avant le fil.",
+      {
+        "t": "Ouvre le tableau blanc, puis bouton Fond jusqu'à « Quadrillé (schéma électrique en échelle) ».",
+        "img": "nouveautes/elec-fond.jpg"
+      },
+      {
+        "t": "Bouton Objets (le cube) : la palette « Schéma électrique » s'ouvre. Glisse la poignée ⠿ pour la déplacer, ⌄ pour la replier; touche le titre d'une catégorie pour l'ouvrir ou la fermer.",
+        "img": "nouveautes/elec-palette.jpg"
+      },
+      {
+        "t": "« Échelle L1/L2 » : glisse un rectangle pour tracer les rails. Pour changer sa taille plus tard : touche L1 ou L2, puis glisse le carré bleu en bas à droite (ou Largeur / Hauteur − +).",
+        "img": "nouveautes/elec-echelle.jpg"
+      },
+      {
+        "t": "Choisis un symbole et touche un échelon. Quand il est sélectionné : case Repère (CR1, M, PB2…), NO / NF, type d'interrupteur (SPST, SPDT, DPST, DPDT) ou délai d'un relais temporisé.",
+        "img": "nouveautes/elec-reglages.jpg"
+      },
+      {
+        "t": "Pour relier : glisse d'un point bleu à l'autre. Le fil fait un coude tout seul, et un point de jonction s'ajoute quand tu arrives au milieu d'un autre fil. Gomme pour effacer un fil, ↶ pour annuler.",
+        "img": "nouveautes/elec-relier.jpg"
+      },
+      {
+        "t": "▶ Animer le schéma : garde enfoncé un bouton-poussoir, clique un interrupteur pour l'actionner. Rouge = L1, bleu = L2, points jaunes = courant. Une bobine change tous les contacts qui portent son repère (contact de maintien).",
+        "img": "nouveautes/elec-animer.jpg"
+      },
+      {
+        "t": "📋 Modèles et mes schémas (en haut de la palette) : choisis un circuit prêt à utiliser (marche-arrêt avec maintien, chauffage 24 V, pompe de puisard, démarrage temporisé, sélecteur SPDT, circuit c.c.). Il est posé sur un nouveau tableau, prêt à animer.",
+        "img": "nouveautes/sch-modeles.jpg"
+      },
+      {
+        "t": "🔧 Trouve la panne (pendant l'animation) : « Au hasard » cache une panne dans le circuit (fil coupé, bobine grillée, contact bloqué ouvert ou collé, fusible sauté); « Choisir » te laisse cliquer toi-même le fil ou le symbole à briser (reclique pour changer de type).",
+        "img": "nouveautes/panne-panneau.jpg"
+      },
+      {
+        "t": "Les élèves suivent les couleurs : la tension (rouge) s'arrête là où est la panne. Le symbole garde son dessin normal, comme dans la vraie vie : il faut raisonner.",
+        "img": "nouveautes/panne-cachee.jpg"
+      },
+      {
+        "t": "« Révéler » entoure la panne en rouge; « Réparer » remet le circuit en état.",
+        "img": "nouveautes/panne-revelee.jpg"
+      }
+    ],
+    "versions": [
+      {
+        "date": "2026-10-28",
+        "texte": "Animation corrigée : les lampes ne s'allument plus à travers un interrupteur ouvert."
+      },
+      {
+        "date": "2026-10-28",
+        "texte": "Choisir un symbole est de nouveau facile, même avec l'outil Fil."
+      },
+      {
+        "date": "2026-10-28",
+        "texte": "Un nouveau fil peut partir du milieu d'un fil existant (jonction automatique)."
+      },
+      {
+        "date": "2026-10-28",
+        "texte": "Relais complet, numéros de bornes, repères automatiques, tensions, ampoule, couleurs de fils, pôles et positions, jonctions et fils réparés."
+      },
+      {
+        "date": "2026-10-21",
+        "texte": "Six modèles prêts à utiliser et mode « Trouve la panne » (au hasard ou choisie par l'enseignant)."
+      },
+      {
+        "date": "2026-10-21",
+        "texte": "Le courant circule de L1 vers L2 et suit le tracé; animation juste après un zoom; les fils sous un symbole sont coupés entre ses bornes."
+      },
+      {
+        "date": "2026-10-21",
+        "texte": "Catégories repliables; interrupteurs SPST, SPDT, DPST, DPDT; résistance, condensateur, diode, DEL, pile, terre, sonnerie, élément chauffant, relais et contact temporisés; charges en série."
+      },
+      {
+        "date": "2026-10-21",
+        "texte": "Échelle redimensionnable après la pose; palette compacte avec icônes, déplaçable et repliable."
+      },
+      {
+        "date": "2026-10-21",
+        "texte": "Animation du schéma : courant, bobines, maintien, lampes, moteurs, court-circuit signalé."
+      },
+      {
+        "date": "2026-10-21",
+        "texte": "Fils aimantés aux bornes, coudes, jonctions automatiques; les fils restent droits quand on déplace un symbole."
+      },
+      {
+        "date": "2026-10-21",
+        "texte": "Première version : rails L1/L2, contacts NO/NF, bobines, boutons-poussoirs, thermostat, pressostat, lampe, solénoïde, transformateur."
+      }
+    ]
+  },
+  {
     "date": "2026-10-28",
-    "texte": "Corrigé : les carrés de sélection restaient affichés; traits surlignés et un seul cadre autour du groupe."
-   },
-   {
+    "type": "outil",
+    "titre": "Barre du crayon et du tableau blanc",
+    "texte": "Une seule ligne d'outils, plus simple pour débuter. Nouveau : les objets iso se mettent debout (tuyau vertical), et tu choisis le côté où ajouter un texte ou une cote.",
+    "formation": [
+      "Nouveau : la touche Suppr efface ce qui est choisi (forme, objet, symbole, texte). La gomme a sa glissière de taille. Le bouton plein écran est dans la barre du tableau blanc. Ta couleur personnalisée est retenue. Avec l'outil Fil, les symboles ne bougent plus par accident. En glissant un objet de la palette, tu le vois déjà à sa place.",
+      {
+        "t": "Plan isométrique : choisis un objet (vanne, radiateur, pompe…) et touche « ↕ Debout » à côté de Pivoter : il se met debout, tuyau vers le haut, puis vers le bas, puis couché à nouveau. Les tuyaux branchés suivent et restent droits. Glissé sur un tuyau vertical, l'objet se met debout tout seul.",
+        "img": "nouveautes/iso-debout.jpg"
+      },
+      {
+        "t": "« + Texte sur un côté » et « + Cote » : les côtés libres de la forme s'allument avec un gros +. Touche le côté voulu. Toucher ailleurs ou Échap annule.",
+        "img": "nouveautes/cote-cote.jpg"
+      },
+      {
+        "t": "Plan isométrique : quand tu déplaces un objet branché (vanne, radiateur…), chaque tuyau se refait droit sur la grille : il sort droit du raccord dans l'axe de l'objet, prend le chemin le plus court avec des coudes à 90° sans passer à travers l'objet, et les bouts inutiles sont enlevés. Glissé le long de son tuyau, l'objet reste sur une ligne droite.",
+        "img": "nouveautes/iso-deplacer.jpg"
+      },
+      "Gomme : sa fenêtre « Taille de la gomme » reste ouverte tant que la gomme est active (on peut changer la taille entre deux coups), et un cercle sous la souris montre exactement ce qui sera effacé.",
+      "Dans une case de texte, Entrée change de ligne (la case grandit). Pour terminer : touche à côté, change d'outil ou fais Ctrl+Entrée. Échap annule.",
+      "Textes : touche un texte (même sans outil choisi) pour le choisir, glisse-le pour le déplacer, double-clic pour le modifier, Suppr pour l'effacer. Après avoir écrit un texte, Ctrl+Z, Suppr et les autres raccourcis marchent tout de suite.",
+      "Crayon plus fiable : un seul toucher l'active toujours, même si une forme ou un objet est choisi (la couleur touchée ensuite recolore cet objet, puis le crayon écrit dans cette couleur). Le trait est lissé et ne saccade plus quand on écrit plusieurs traits de suite.",
+      {
+        "t": "Chaque fond a maintenant son propre dessin : ce que tu dessines sur le tableau vert reste sur le tableau vert. En changeant de fond, si tu veux garder ton dessin, touche « Apporter le dessin ici ». Le ✕ ferme l'avis (le dessin reste sur l'autre fond).",
+        "img": "nouveautes/fond-dessin.jpg"
+      },
+      {
+        "t": "Texte sur les côtés d'une forme : double-clic sur la forme, puis « + Texte sur un côté » (a, b, c… sur chaque côté, toujours à l'extérieur; double-clic sur un texte pour l'écrire, A−/A+ pour sa taille, flèches pour le déplacer). « + Cote » ajoute plutôt une ligne de cote. La case du double-clic se met à côté de l'objet, jamais dessus.",
+        "img": "nouveautes/cotes-plus.jpg"
+      },
+      "À chaque ouverture du tableau blanc, aucun outil n'est choisi : touche une forme ou un objet pour le choisir (la palette Objets s'ouvre), ou touche le crayon pour écrire.",
+      {
+        "t": "Le bouton crayon (sa pointe montre la couleur) : touche-le pour l'activer, le menu s'ouvre avec la couleur, le tracé (trait libre, ligne, flèche, rectangle, ellipse) et l'épaisseur (glissière de 1 à 40). Touche-le encore pour le désactiver.",
+        "img": "nouveautes/barre-couleur.jpg"
+      },
+      {
+        "t": "Sur la ligne : crayon, texte, objets, gomme, annuler, fond.",
+        "img": "nouveautes/barre.jpg"
+      },
+      {
+        "t": "Quand la palette Objets s'ouvre, aucun outil n'est choisi. Un clic sur une forme ou un objet (sur son trait ou en plein centre) le choisit; glisse-le pour le déplacer; double-clic pour le nommer ou écrire la cote. Pour ajouter, choisis un outil dans la palette. Un clic à côté : plus rien de choisi et retour à aucun outil.",
+        "img": "nouveautes/objets-choisir.jpg"
+      },
+      {
+        "t": "Bouton Objets (le cube), onglet Formes : flèche, cote de mesure, cercle avec rayon, triangles, angle en degrés, axes x–y, prisme, cylindre, accolade, nuage de révision, bulles numérotées, crochet et croix. Choisis une forme, puis glisse sur le tableau (un simple clic pose la forme à sa taille normale). Disponible partout, même sur une page de livre.",
+        "img": "nouveautes/objets-formes.jpg"
+      },
+      {
+        "t": "Pour déplacer une forme : touche-la d'abord (cadre bleu), puis glisse-la. Glisser sur une forme pas encore choisie trace une nouvelle forme (pratique pour une cote qui part du coin d'un rectangle). Touche Suppr ou bouton Supprimer pour l'effacer; Annuler la remet.",
+        "img": "nouveautes/formes-deplacer.jpg"
+      },
+      {
+        "t": "Pour grandir ou rapetisser une forme déjà dessinée : touche-la, puis tire un des petits carrés blancs (coin, bout de flèche, rayon du cercle).",
+        "img": "nouveautes/formes-poignees.jpg"
+      },
+      {
+        "t": "Cote : touche-la, puis tire le carré bleu avec les flèches pour l'éloigner de l'objet, d'un côté ou de l'autre. Des lignes de rappel la relient à l'objet, comme sur un plan.",
+        "img": "nouveautes/cote-decalee.jpg"
+      },
+      {
+        "t": "Double-clic sur une cote : écris la mesure, puis choisis sa position avec les 5 touches (comme les flèches du clavier) : en haut, en bas, à gauche, à droite, ou au centre sur l'objet. Les flèches qui ne s'appliquent pas sont grisées (une cote couchée va en haut ou en bas).",
+        "img": "nouveautes/cote-position.jpg"
+      },
+      {
+        "t": "Même chose pour l'étiquette d'une forme ou le nom d'un objet isométrique : double-clic, écris le texte, puis choisis où il va (en haut, en bas, à gauche, à droite ou au centre) avec les 5 touches.",
+        "img": "nouveautes/etiquette-position.jpg"
+      },
+      {
+        "t": "Dans la case du double-clic : A− / A+ change la taille du texte (étiquette, nom, cote, angle). Glisse la barre à points du haut pour déplacer la case et voir l'objet dessous.",
+        "img": "nouveautes/etiquette-taille.jpg"
+      },
+      {
+        "t": "Double-clic sur une forme pour choisir sa valeur : la cote (ex. 1200 mm), l'angle en degrés (la forme s'ajuste), l'étiquette du rayon d'un cercle, ou le numéro / la lettre d'une bulle. Laisse vide pour revenir à la valeur automatique.",
+        "img": "nouveautes/formes-valeur.jpg"
+      },
+      {
+        "t": "Le double-clic marche aussi sur toutes les formes (une étiquette, ex. « Local 101 »), les objets isométriques (un nom, ex. « Chaudière 1 ») et les symboles électriques (le repère, ex. CR7). Les objets prennent la couleur du crayon; touche un objet puis une couleur pour le recolorer.",
+        "img": "nouveautes/objets-noms.jpg"
+      },
+      {
+        "t": "Onglet Iso : le catalogue de plomberie et chauffage (chaudière, pompe, vannes, collecteurs…). Le fond passe tout seul au plan isométrique.",
+        "img": "nouveautes/objets-iso.jpg"
+      },
+      {
+        "t": "Onglet Électricité : les symboles du schéma en échelle. Le fond passe tout seul au quadrillé. Iso et Électricité sont offerts sur le tableau blanc.",
+        "img": "nouveautes/objets-elec.jpg"
+      },
+      {
+        "t": "Glisse une vignette (objet iso ou symbole électrique) de la palette jusqu'au tableau. Lâchée près d'un fil ou d'un tuyau, elle s'y branche toute seule : le fil est coupé et relié aux bornes, la vanne ou la pompe se place dans le tuyau, dans le bon sens.",
+        "img": "nouveautes/glisser-brancher.jpg"
+      },
+      "Peu importe l'onglet ouvert, touche une forme, un objet iso ou un symbole électrique : il est choisi et la palette passe toute seule au bon onglet.",
+      {
+        "t": "⋯ Plus : rétablir, tout effacer, zoom, déplacer le tableau, tableau précédent / suivant / nouveau, enregistrer en PNG.",
+        "img": "nouveautes/barre-plus.jpg"
+      },
+      "⌄ replie la barre en petit bouton; ▯ l'ancre sur le côté droit de l'écran.",
+      "Le crayon réagit maintenant tout de suite : seul le trait en cours est redessiné pendant que tu écris, le reste du tableau ne bouge pas."
+    ],
+    "versions": [
+      {
+        "date": "2026-10-28",
+        "texte": "Iso : bouton « ↕ Debout » (vers le haut, vers le bas, couché), pose debout automatique sur un tuyau vertical. Cotes et textes : on choisit le côté."
+      },
+      {
+        "date": "2026-10-28",
+        "texte": "Iso : nouveau calcul des tuyaux quand on déplace un objet (sortie droite du raccord, plus court chemin à 90°, sans traverser l'objet)."
+      },
+      {
+        "date": "2026-10-28",
+        "texte": "Iso : déplacement d'un objet peaufiné (entrée droite dans le raccord, déviation à deux coudes, pas de bout en trop)."
+      },
+      {
+        "date": "2026-10-28",
+        "texte": "Iso : un objet déplacé garde ses tuyaux droits (coudes à 90°)."
+      },
+      {
+        "date": "2026-10-28",
+        "texte": "Gomme : la glissière de taille ne tremble plus quand on la déplace."
+      },
+      {
+        "date": "2026-10-28",
+        "texte": "Gomme : la taille se change sans fermer la fenêtre; cercle de la taille réelle sous la souris."
+      },
+      {
+        "date": "2026-10-28",
+        "texte": "Le menu « … » (et celui des couleurs) se ferme dès qu'on touche un autre outil, ou après Tout effacer, Nouveau ou Enregistrer."
+      },
+      {
+        "date": "2026-10-28",
+        "texte": "Texte : Entrée change de ligne."
+      },
+      {
+        "date": "2026-10-28",
+        "texte": "Corrigé : le clavier restait pris dans la case de texte; un texte se choisit sans outil; le symbole « terre » se choisit d'un clic."
+      },
+      {
+        "date": "2026-10-28",
+        "texte": "Crayon : s'active en un seul toucher, trait lissé, plus de saccade entre les traits."
+      },
+      {
+        "date": "2026-10-28",
+        "texte": "L'avis « Ton dessin est resté… » a un ✕ pour le fermer."
+      },
+      {
+        "date": "2026-10-28",
+        "texte": "Le ✕ est retiré de la barre d'outils (on sort par « Retour »); l'avis « Apporter le dessin ici » s'affiche au-dessus de la barre."
+      },
+      {
+        "date": "2026-10-28",
+        "texte": "Un dessin par fond (blanc, quadrillé, iso, noir, vert…), avec un bouton pour apporter le dessin sur le nouveau fond."
+      },
+      {
+        "date": "2026-10-28",
+        "texte": "« + Texte sur un côté » : écrire a, b, hypoténuse… sur chaque côté d'une forme."
+      },
+      {
+        "date": "2026-10-28",
+        "texte": "Bouton + pour plusieurs cotes; la case du double-clic ne cache plus l'objet."
+      },
+      {
+        "date": "2026-10-28",
+        "texte": "Suppr partout, taille de la gomme, plein écran, couleur perso retenue, outil Fil sans déplacement, aperçu pendant le glisser-déposer."
+      },
+      {
+        "date": "2026-10-23",
+        "texte": "Glisser-déposer des objets iso et des symboles électriques : ils se branchent tout seuls sur le fil ou le tuyau le plus proche."
+      },
+      {
+        "date": "2026-10-23",
+        "texte": "Flèches et lignes plus faciles à attraper; leur texte à gauche ou à droite se met au bout de la flèche."
+      },
+      {
+        "date": "2026-10-23",
+        "texte": "La barre du livre (pages, zoom) est cachée sur le tableau blanc; le ✕ de la barre du crayon ferme le tableau blanc."
+      },
+      {
+        "date": "2026-10-23",
+        "texte": "Tableau blanc : aucun outil choisi à l'ouverture; toucher une forme ou un objet le choisit tout de suite."
+      },
+      {
+        "date": "2026-10-23",
+        "texte": "Le bouton Forme quitte la barre : le tracé (libre, ligne, flèche, rectangle, ellipse) se choisit dans le menu du crayon."
+      },
+      {
+        "date": "2026-10-23",
+        "texte": "Le bouton couleur devient un symbole de crayon (pointe et trait dans la couleur choisie)."
+      },
+      {
+        "date": "2026-10-23",
+        "texte": "Le crayon s'active et se désactive (rond de couleur); épaisseur réglable avec une glissière de 1 à 40."
+      },
+      {
+        "date": "2026-10-23",
+        "texte": "Taille du texte des étiquettes et des cotes (A− / A+), et case du double-clic qu'on peut déplacer."
+      },
+      {
+        "date": "2026-10-23",
+        "texte": "Étiquettes : 5 touches pour placer le texte en haut, en bas, à gauche, à droite ou au centre de l'objet."
+      },
+      {
+        "date": "2026-10-23",
+        "texte": "Une cote posée sur le bord d'une forme se choisit en priorité : son double-clic montre bien les 5 touches de position."
+      },
+      {
+        "date": "2026-10-23",
+        "texte": "Aucun outil choisi au départ : un clic choisit, un double-clic nomme, un clic à côté désélectionne. Le centre des formes compte aussi."
+      },
+      {
+        "date": "2026-10-23",
+        "texte": "Cote : 5 touches pour la placer en haut, en bas, à gauche, à droite ou au centre."
+      },
+      {
+        "date": "2026-10-23",
+        "texte": "Double-clic plus fiable : plus de temps entre les deux clics (au doigt aussi), et on peut toucher le texte d'une cote."
+      },
+      {
+        "date": "2026-10-23",
+        "texte": "On peut choisir une forme ou un objet de n'importe quelle catégorie, sans changer d'onglet."
+      },
+      {
+        "date": "2026-10-23",
+        "texte": "Cote : un carré à flèches pour la placer à côté de l'objet (lignes de rappel). Une forme se choisit d'un toucher avant de la glisser."
+      },
+      {
+        "date": "2026-10-23",
+        "texte": "Double-clic pour nommer n'importe quelle forme, objet iso ou symbole électrique. Les objets suivent la couleur du crayon."
+      },
+      {
+        "date": "2026-10-23",
+        "texte": "Les formes se redimensionnent après coup : tire un petit carré blanc."
+      },
+      {
+        "date": "2026-10-23",
+        "texte": "Double-clic sur une cote, un angle, un cercle ou une bulle : choisis sa valeur."
+      },
+      {
+        "date": "2026-10-23",
+        "texte": "Les formes se déplacent : glisse-les par leur trait. Touche Suppr pour effacer la forme choisie."
+      },
+      {
+        "date": "2026-10-23",
+        "texte": "Objets en trois onglets : Formes (20 formes pour l'enseignement, dans tous les dessins), Iso et Électricité, chacun avec son catalogue illustré."
+      },
+      {
+        "date": "2026-10-23",
+        "texte": "Crayon beaucoup plus rapide : le trait suit le stylet sans retard, même avec un tableau très rempli. Gomme plus fluide."
+      },
+      {
+        "date": "2026-10-23",
+        "texte": "Après l'efface, toucher « Couleur » (ou une couleur) ramène toujours au crayon."
+      },
+      {
+        "date": "2026-10-21",
+        "texte": "Le bouton Objets est caché sur les fonds où il ne sert pas."
+      },
+      {
+        "date": "2026-10-21",
+        "texte": "Barre allégée : menus « couleur » et « ⋯ Plus »."
+      }
+    ]
+  },
+  {
+    "date": "2026-10-23",
+    "type": "outil",
+    "titre": "Plans techniques",
+    "texte": "Visionneuse de plans pour le tableau : zoom avec les doigts, crayon, mesure à l'échelle, et quatre dossiers de plans d'exercice, dont un centre commercial sur un terrain en pente (nivellement, drainage pluvial, profils).",
+    "formation": [
+      {
+        "t": "Dossier 1 refait : maison contemporaine carrée à toit plat, deux étages et sous-sol (19 feuilles). Un plan, une plomberie, une électricité et un chauffage par niveau, un escalier dans les coupes, un schéma isométrique sur trois niveaux.",
+        "img": "nouveautes/plans-maison-moderne.jpg"
+      },
+      {
+        "t": "Avec un plan ouvert, le bouton en haut à gauche devient « Tous les plans » (ou touche Échap) : il te ramène à l'écran d'accueil des plans. Sur l'accueil des plans, ce même bouton te ramène à la bibliothèque. Aussi dans « Plus ▾ » → « Tous les plans ».",
+        "img": "nouveautes/plans-retour.jpg"
+      },
+      {
+        "t": "Dossier 4 · Centre commercial : 13 feuilles. En plus des plans habituels (architecture, structure, plomberie, électricité, ventilation), il contient le plan de nivellement et de drainage C-101 (courbes de niveau existantes et projetées, points cotés, pentes, puisards, bassin de rétention) et les profils de terrain C-102 (déblais, remblais, tableau des puisards et des conduites).",
+        "img": "nouveautes/plans-d4.jpg"
+      },
+      {
+        "t": "Le centre commercial du dossier 4 est contemporain : façade sud en murs-rideaux pleine hauteur (type A), panneaux composites d'aluminium anthracite, volumes-signaux en lames façon bois, marquises d'acier en porte-à-faux et bandeau d'enseignes (feuille A-201).",
+        "img": "nouveautes/plans-d4-facade.jpg"
+      },
+      {
+        "t": "Sur C-101 : courbe grise pointillée = terrain existant, courbe brune = terrain projeté. Les lignes rouges A-A' et B-B' renvoient aux profils de la feuille C-102.",
+        "img": "nouveautes/plans-d4-c101.jpg"
+      },
+      {
+        "t": "Bouton « Plans » en haut de la bibliothèque : choisis un des trois dossiers d'exercice, ou ouvre ton propre plan (PDF ou image, tu peux aussi le glisser dans la fenêtre).",
+        "img": "nouveautes/plans.jpg"
+      },
+      "Chaque dossier a 11 feuilles : plans, élévations, coupe longitudinale, coupe de mur type et légende des matériaux (A-302).",
+      "Zoome et déplace la feuille au tableau, puis annote avec le crayon."
+    ],
+    "versions": [
+      {
+        "date": "2026-10-23",
+        "texte": "Dossier 1 : nouvelle maison moderne, 2 étages et sous-sol, 19 feuilles."
+      },
+      {
+        "date": "2026-10-23",
+        "texte": "Dossier 4 modernisé : murs-rideaux, panneaux d'aluminium, volumes-signaux façon bois, marquises, toit solaire, bornes de recharge et îlots-noues."
+      },
+      {
+        "date": "2026-10-23",
+        "texte": "Nouveau dossier 4 : centre commercial de 5 locaux sur un terrain en pente, avec plan de nivellement et de drainage (C-101) et profils de terrain (C-102). 13 feuilles."
+      },
+      {
+        "date": "2026-10-23",
+        "texte": "Retour facile à l'accueil des plans : bouton « Tous les plans » en haut à gauche (ou Échap)."
+      },
+      {
+        "date": "2026-10-21",
+        "texte": "Trois dossiers de plans d'exercice, 11 feuilles chacun."
+      },
+      {
+        "date": "2026-10-17",
+        "texte": "Visionneuse de plans pour le tableau interactif."
+      }
+    ]
+  },
+  {
+    "date": "2026-10-23",
+    "type": "outil",
+    "titre": "Accueil de classe",
+    "texte": "Tableau d'accueil animé pour le début de période : date, déroulement, timeline lisible du fond de la classe, arrière-plan lié à la compétence, un contenu à ouvrir pour chaque activité (livre, schéma, plan, vidéo YouTube, minuterie), passage fluide vers le livre et mode examen sans pause.",
+    "formation": [
+      {
+        "t": "Bouton « Tableau blanc » (touche B) sur le tableau de bord. Pour revenir au tableau de bord : bouton « Tableau de bord ». Ensuite, « Revenir au tableau blanc » retrouve tes dessins.",
+        "img": "nouveautes/tdb-tableau-blanc.jpg"
+      },
+      {
+        "t": "Double-clic sur une partie de la timeline (ou une étape de la liste) : « Préparer le cours » s'ouvre directement sur cette activité pour lui lier une action (livre, schéma, plan, tableau blanc, minuterie, fichier, lien web, vidéo). Un simple clic ouvre ce qui est déjà lié.",
+        "img": "nouveautes/tdb-dblclic-timeline.jpg"
+      },
+      {
+        "t": "Bouton « Accueil de classe » en haut de la bibliothèque pour l'ouvrir.",
+        "img": "nouveautes/accueil.jpg"
+      },
+      {
+        "t": "« Préparer le cours », étape 4 : à côté d'une activité, « ＋ Ajouter », puis choisis une page de livre, un schéma électrique, un plan, un tableau blanc ou une minuterie.",
+        "img": "nouveautes/tdb-prep.jpg"
+      },
+      {
+        "t": "En classe, la carte MAINTENANT affiche « ▶ Ouvrir » quand l'activité commence (ou touche O). Tu peux aussi cliquer une case de la timeline qui porte une icône.",
+        "img": "nouveautes/tdb-carte.jpg"
+      },
+      {
+        "t": "Le livre s'ouvre directement à la bonne page, en douceur, et le plein écran reste actif. Dans n'importe quel livre, le bouton « Tableau de bord » en haut (ou en bas à gauche quand les barres sont cachées, ou la touche E) t'amène à l'accueil de classe : le livre reste ouvert derrière.",
+        "img": "nouveautes/tdb-livre.jpg"
+      },
+      {
+        "t": "Sur le tableau de bord, le bouton blanc « Revenir au livre · p. 64 » (en haut à droite, ou touche L) te remet exactement où tu étais dans le livre. Parfait pour aller à l'atelier et revenir.",
+        "img": "nouveautes/tdb-retour.jpg"
+      },
+      {
+        "t": "Une vidéo pour une activité : « ＋ Ajouter » → « 🎬 Vidéo YouTube », puis colle le lien (bouton « Partager » de YouTube). Si le lien commence à un moment précis, la vidéo part de là. En classe, elle joue en grand sur le tableau de bord; « Fermer » ou Échap pour revenir.",
+        "img": "nouveautes/tdb-video.jpg"
+      },
+      {
+        "t": "Un site web pour une activité : « ＋ Ajouter » → « Lien web », colle l'adresse (ex. www.rbq.gouv.qc.ca) et, si tu veux, un nom à afficher. En classe, le site s'ouvre dans un nouvel onglet.",
+        "img": "nouveautes/tdb-web.jpg"
+      },
+      {
+        "t": "Un fichier pour une activité : « ＋ Ajouter » → « Fichier (PDF, image…) », puis choisis-le ou glisse-le. En classe, les PDF, images et vidéos s'affichent en grand. Un PowerPoint, un Word ou un Excel s'ouvre tout de suite dans son programme (astuce : « Toujours ouvrir les fichiers de ce type » dans les téléchargements de Chrome ou Edge). Pour un PowerPoint en grand dans le tableau de bord, enregistre-le en PDF. Le fichier reste sur cet ordinateur.",
+        "img": "nouveautes/tdb-fichier.jpg"
+      },
+      {
+        "t": "Plusieurs contenus pour une même activité (ex. une vidéo et une page du livre) : après le premier, clique « ＋ Un autre ». En classe, la carte MAINTENANT affiche un bouton par contenu (touche O pour le premier, 2 pour le deuxième); un clic sur la case de la timeline te laisse choisir.",
+        "img": "nouveautes/tdb-deux.jpg"
+      },
+      {
+        "t": "Jour d'examen : dans « Préparer le cours », coche « Examen aujourd'hui ». Les pauses disparaissent de l'horaire (3 h 20 d'un bloc) et un badge EXAMEN s'affiche. Le lendemain, l'horaire normal revient tout seul.",
+        "img": "nouveautes/tdb-examen.jpg"
+      },
+      "« Préparer le cours » : le panneau de l'enseignant, pour régler la période et le déroulement.",
+      "« Plein écran » une seule fois au début du cours : il reste actif entre le tableau de bord et les livres. « Bibliothèque » ferme tout et te ramène aux livres.",
+      {
+        "t": "L'arrière-plan change tout seul selon la compétence choisie dans « Préparer le cours » : robinetterie et appareils sanitaires, réseau d'évacuation, santé et sécurité, chantier, outils et entrepôt, entretien ménager, informatique, administration, protection incendie… Tu peux aussi en choisir un autre dans Plus → Réglages → Arrière-plan.",
+        "img": "nouveautes/accueil-scenes.jpg"
+      },
+      {
+        "t": "Les couleurs changent chaque jour de la semaine (lundi ardoise, mardi forêt, mercredi prune, jeudi pétrole, vendredi cuivre) pour garder l'attention des élèves. Pour garder toujours les mêmes : Plus → Réglages → Ambiance.",
+        "img": "nouveautes/tdb-ambiances.jpg"
+      },
+      {
+        "t": "Le temps avant la prochaine pause (ou la fin de la période) s'affiche en gros juste sous MATIN ou APRÈS-MIDI, bien visible du fond de la classe.",
+        "img": "nouveautes/tdb-pause.jpg"
+      }
+    ],
+    "versions": [
+      {
+        "date": "2026-10-23",
+        "texte": "Double-clic sur la timeline pour lier une action à une activité."
+      },
+      {
+        "date": "2026-10-23",
+        "texte": "Bouton Tableau blanc sur le tableau de bord, et retour au tableau blanc ensuite."
+      },
+      {
+        "date": "2026-10-23",
+        "texte": "Marge de sécurité en bas de l'écran : l'encadré du bas est remonté, pour les projecteurs qui coupent le bas de l'image."
+      },
+      {
+        "date": "2026-10-23",
+        "texte": "« Prochaine pause dans… » monte juste sous le nom de la période, en plus gros."
+      },
+      {
+        "date": "2026-10-23",
+        "texte": "Nouveau contenu à ouvrir pendant une activité : un lien web."
+      },
+      {
+        "date": "2026-10-22",
+        "texte": "Bouton « Tableau de bord » dans tous les livres, même ceux ouverts depuis la bibliothèque."
+      },
+      {
+        "date": "2026-10-22",
+        "texte": "Les fichiers PowerPoint, Word et Excel s'ouvrent tout de suite dans leur programme, sans bouton à cliquer."
+      },
+      {
+        "date": "2026-10-22",
+        "texte": "Jusqu'à 4 contenus par activité (ex. vidéo + page du livre)."
+      },
+      {
+        "date": "2026-10-22",
+        "texte": "Ouvrir un fichier de ton ordinateur (PDF, image, vidéo, PowerPoint…) pendant une activité."
+      },
+      {
+        "date": "2026-10-22",
+        "texte": "Une ambiance de couleurs différente chaque jour, icônes au trait comme dans la bibliothèque, et correction d'une erreur qui empêchait le tableau de bord de démarrer."
+      },
+      {
+        "date": "2026-10-22",
+        "texte": "Vidéo YouTube à ouvrir pendant une activité, et case « Examen aujourd'hui » qui retire les pauses."
+      },
+      {
+        "date": "2026-10-22",
+        "texte": "Mode sombre plus clair : gris ardoise au lieu de presque noir, plus lisible au projecteur."
+      },
+      {
+        "date": "2026-10-22",
+        "texte": "Passage fluide entre le tableau de bord et le livre : le plein écran reste actif, le livre reste ouvert derrière, boutons « Tableau de bord » (E) et « Revenir au livre » (L)."
+      },
+      {
+        "date": "2026-10-22",
+        "texte": "Un contenu à ouvrir pour chaque activité du déroulement : page de livre, schéma, plan, tableau blanc ou minuterie."
+      },
+      {
+        "date": "2026-10-22",
+        "texte": "Dix nouveaux arrière-plans animés liés aux compétences (DEP 5211 et DEP 5333), mieux visibles autour des panneaux."
+      },
+      {
+        "date": "2026-10-21",
+        "texte": "Curseur de la timeline corrigé, timeline plus grosse, panneau de l'enseignant clair, plein écran réparé, bouton Bibliothèque déplacé."
+      },
+      {
+        "date": "2026-10-17",
+        "texte": "Accueil de classe pour le tableau interactif."
+      }
+    ]
+  },
+  {
     "date": "2026-10-28",
-    "texte": "Cadre de sélection bleu visible (style Windows) avec Ctrl + glisser."
-   },
-   {
-    "date": "2026-10-28",
-    "texte": "Sélection par cadre et Ctrl+clic, déplacer et recolorer un groupe, copier-coller, remplacer avec Ctrl + vignette."
-   }
-  ]
- },
- {
-  "date": "2026-10-28",
-  "type": "outil",
-  "titre": "Schéma électrique en échelle (tableau blanc)",
-  "texte": "Dessine et anime des schémas en échelle sur le quadrillé. Nouveau : relais complet (bobine + contacts NO et NF déjà nommés), numéros de bornes, tensions du transformateur et de l'échelle, ampoule, couleurs de fils, choix des pôles et des positions de l'interrupteur.",
-  "formation": [
-   {
-    "t": "Nouveau : « Relais complet » pose la bobine CR1 (bornes A1-A2) avec un contact NO (13-14) et un contact NF (21-22) du même repère; déplace chaque contact sur son échelon. Une nouvelle bobine prend le repère suivant (CR2, CR3…) et un contact prend celui de la bobine choisie. Double-clic sur le transformateur : tensions au primaire et au secondaire. Double-clic sur l'échelle : tension écrite au centre.",
-    "img": "nouveautes/elec-relais.jpg"
-   },
-   "Nouveau aussi : l'ampoule (Charges), la couleur des nouveaux fils (bas de la palette), l'interrupteur se règle par « 1 ou 2 pôles » et « 1 ou 2 positions ». Un point de jonction qui ne relie plus rien s'efface, et si tu effaces un symbole entre deux fils, les fils se rejoignent.",
-   "Corrigé (animation) : une lampe ne s'allume plus quand l'interrupteur de son échelon est ouvert, même s'il y a un autre échelon rempli de charges (résistance, lampe, transformateur). Un fil caché sous un symbole ne le court-circuite plus, et un fil qui arrive au milieu d'un symbole se branche sur sa borne.",
-   "Corrigé : pars du milieu d'un fil et glisse pour tracer un nouveau fil, le point de jonction se fait tout seul (avant, l'appli choisissait le fil et passait à l'onglet Formes). Un simple clic sur un fil le choisit (Suppr pour l'effacer).",
-   "Corrigé : même quand l'outil Fil est allumé (il s'allume tout seul après avoir posé un symbole), un clic sur un symbole le choisit et un double-clic ouvre son repère. Un objet posé sur un fil ou un tuyau passe avant le fil.",
-   {
-    "t": "Ouvre le tableau blanc, puis bouton Fond jusqu'à « Quadrillé (schéma électrique en échelle) ».",
-    "img": "nouveautes/elec-fond.jpg"
-   },
-   {
-    "t": "Bouton Objets (le cube) : la palette « Schéma électrique » s'ouvre. Glisse la poignée ⠿ pour la déplacer, ⌄ pour la replier; touche le titre d'une catégorie pour l'ouvrir ou la fermer.",
-    "img": "nouveautes/elec-palette.jpg"
-   },
-   {
-    "t": "« Échelle L1/L2 » : glisse un rectangle pour tracer les rails. Pour changer sa taille plus tard : touche L1 ou L2, puis glisse le carré bleu en bas à droite (ou Largeur / Hauteur − +).",
-    "img": "nouveautes/elec-echelle.jpg"
-   },
-   {
-    "t": "Choisis un symbole et touche un échelon. Quand il est sélectionné : case Repère (CR1, M, PB2…), NO / NF, type d'interrupteur (SPST, SPDT, DPST, DPDT) ou délai d'un relais temporisé.",
-    "img": "nouveautes/elec-reglages.jpg"
-   },
-   {
-    "t": "Pour relier : glisse d'un point bleu à l'autre. Le fil fait un coude tout seul, et un point de jonction s'ajoute quand tu arrives au milieu d'un autre fil. Gomme pour effacer un fil, ↶ pour annuler.",
-    "img": "nouveautes/elec-relier.jpg"
-   },
-   {
-    "t": "▶ Animer le schéma : garde enfoncé un bouton-poussoir, clique un interrupteur pour l'actionner. Rouge = L1, bleu = L2, points jaunes = courant. Une bobine change tous les contacts qui portent son repère (contact de maintien).",
-    "img": "nouveautes/elec-animer.jpg"
-   },
-   {
-    "t": "📋 Modèles et mes schémas (en haut de la palette) : choisis un circuit prêt à utiliser (marche-arrêt avec maintien, chauffage 24 V, pompe de puisard, démarrage temporisé, sélecteur SPDT, circuit c.c.). Il est posé sur un nouveau tableau, prêt à animer.",
-    "img": "nouveautes/sch-modeles.jpg"
-   },
-   {
-    "t": "🔧 Trouve la panne (pendant l'animation) : « Au hasard » cache une panne dans le circuit (fil coupé, bobine grillée, contact bloqué ouvert ou collé, fusible sauté); « Choisir » te laisse cliquer toi-même le fil ou le symbole à briser (reclique pour changer de type).",
-    "img": "nouveautes/panne-panneau.jpg"
-   },
-   {
-    "t": "Les élèves suivent les couleurs : la tension (rouge) s'arrête là où est la panne. Le symbole garde son dessin normal, comme dans la vraie vie : il faut raisonner.",
-    "img": "nouveautes/panne-cachee.jpg"
-   },
-   {
-    "t": "« Révéler » entoure la panne en rouge; « Réparer » remet le circuit en état.",
-    "img": "nouveautes/panne-revelee.jpg"
-   }
-  ],
-  "versions": [
-   {
-    "date": "2026-10-28",
-    "texte": "Animation corrigée : les lampes ne s'allument plus à travers un interrupteur ouvert."
-   },
-   {
-    "date": "2026-10-28",
-    "texte": "Choisir un symbole est de nouveau facile, même avec l'outil Fil."
-   },
-   {
-    "date": "2026-10-28",
-    "texte": "Un nouveau fil peut partir du milieu d'un fil existant (jonction automatique)."
-   },
-   {
-    "date": "2026-10-28",
-    "texte": "Relais complet, numéros de bornes, repères automatiques, tensions, ampoule, couleurs de fils, pôles et positions, jonctions et fils réparés."
-   },
-   {
-    "date": "2026-10-21",
-    "texte": "Six modèles prêts à utiliser et mode « Trouve la panne » (au hasard ou choisie par l'enseignant)."
-   },
-   {
-    "date": "2026-10-21",
-    "texte": "Le courant circule de L1 vers L2 et suit le tracé; animation juste après un zoom; les fils sous un symbole sont coupés entre ses bornes."
-   },
-   {
-    "date": "2026-10-21",
-    "texte": "Catégories repliables; interrupteurs SPST, SPDT, DPST, DPDT; résistance, condensateur, diode, DEL, pile, terre, sonnerie, élément chauffant, relais et contact temporisés; charges en série."
-   },
-   {
-    "date": "2026-10-21",
-    "texte": "Échelle redimensionnable après la pose; palette compacte avec icônes, déplaçable et repliable."
-   },
-   {
-    "date": "2026-10-21",
-    "texte": "Animation du schéma : courant, bobines, maintien, lampes, moteurs, court-circuit signalé."
-   },
-   {
-    "date": "2026-10-21",
-    "texte": "Fils aimantés aux bornes, coudes, jonctions automatiques; les fils restent droits quand on déplace un symbole."
-   },
-   {
-    "date": "2026-10-21",
-    "texte": "Première version : rails L1/L2, contacts NO/NF, bobines, boutons-poussoirs, thermostat, pressostat, lampe, solénoïde, transformateur."
-   }
-  ]
- },
- {
-  "date": "2026-10-28",
-  "type": "outil",
-  "titre": "Barre du crayon et du tableau blanc",
-  "texte": "Une seule ligne d'outils, plus simple pour débuter. Nouveau : le bouton Objets a trois onglets — Formes (utiles en classe), Iso (plomberie) et Électricité (symboles).",
-  "formation": [
-   "Nouveau : la touche Suppr efface ce qui est choisi (forme, objet, symbole, texte). La gomme a sa glissière de taille. Le bouton plein écran est dans la barre du tableau blanc. Ta couleur personnalisée est retenue. Avec l'outil Fil, les symboles ne bougent plus par accident. En glissant un objet de la palette, tu le vois déjà à sa place.",
-   {
-    "t": "Plan isométrique : quand tu déplaces un objet branché (vanne, radiateur…), chaque tuyau se refait droit sur la grille : il sort droit du raccord dans l'axe de l'objet, prend le chemin le plus court avec des coudes à 90° sans passer à travers l'objet, et les bouts inutiles sont enlevés. Glissé le long de son tuyau, l'objet reste sur une ligne droite.",
-    "img": "nouveautes/iso-deplacer.jpg"
-   },
-   "Gomme : sa fenêtre « Taille de la gomme » reste ouverte tant que la gomme est active (on peut changer la taille entre deux coups), et un cercle sous la souris montre exactement ce qui sera effacé.",
-   "Dans une case de texte, Entrée change de ligne (la case grandit). Pour terminer : touche à côté, change d'outil ou fais Ctrl+Entrée. Échap annule.",
-   "Textes : touche un texte (même sans outil choisi) pour le choisir, glisse-le pour le déplacer, double-clic pour le modifier, Suppr pour l'effacer. Après avoir écrit un texte, Ctrl+Z, Suppr et les autres raccourcis marchent tout de suite.",
-   "Crayon plus fiable : un seul toucher l'active toujours, même si une forme ou un objet est choisi (la couleur touchée ensuite recolore cet objet, puis le crayon écrit dans cette couleur). Le trait est lissé et ne saccade plus quand on écrit plusieurs traits de suite.",
-   {
-    "t": "Chaque fond a maintenant son propre dessin : ce que tu dessines sur le tableau vert reste sur le tableau vert. En changeant de fond, si tu veux garder ton dessin, touche « Apporter le dessin ici ». Le ✕ ferme l'avis (le dessin reste sur l'autre fond).",
-    "img": "nouveautes/fond-dessin.jpg"
-   },
-   {
-    "t": "Texte sur les côtés d'une forme : double-clic sur la forme, puis « + Texte sur un côté » (a, b, c… sur chaque côté, toujours à l'extérieur; double-clic sur un texte pour l'écrire, A−/A+ pour sa taille, flèches pour le déplacer). « + Cote » ajoute plutôt une ligne de cote. La case du double-clic se met à côté de l'objet, jamais dessus.",
-    "img": "nouveautes/cotes-plus.jpg"
-   },
-   "À chaque ouverture du tableau blanc, aucun outil n'est choisi : touche une forme ou un objet pour le choisir (la palette Objets s'ouvre), ou touche le crayon pour écrire.",
-   {
-    "t": "Le bouton crayon (sa pointe montre la couleur) : touche-le pour l'activer, le menu s'ouvre avec la couleur, le tracé (trait libre, ligne, flèche, rectangle, ellipse) et l'épaisseur (glissière de 1 à 40). Touche-le encore pour le désactiver.",
-    "img": "nouveautes/barre-couleur.jpg"
-   },
-   {
-    "t": "Sur la ligne : crayon, texte, objets, gomme, annuler, fond.",
-    "img": "nouveautes/barre.jpg"
-   },
-   {
-    "t": "Quand la palette Objets s'ouvre, aucun outil n'est choisi. Un clic sur une forme ou un objet (sur son trait ou en plein centre) le choisit; glisse-le pour le déplacer; double-clic pour le nommer ou écrire la cote. Pour ajouter, choisis un outil dans la palette. Un clic à côté : plus rien de choisi et retour à aucun outil.",
-    "img": "nouveautes/objets-choisir.jpg"
-   },
-   {
-    "t": "Bouton Objets (le cube), onglet Formes : flèche, cote de mesure, cercle avec rayon, triangles, angle en degrés, axes x–y, prisme, cylindre, accolade, nuage de révision, bulles numérotées, crochet et croix. Choisis une forme, puis glisse sur le tableau (un simple clic pose la forme à sa taille normale). Disponible partout, même sur une page de livre.",
-    "img": "nouveautes/objets-formes.jpg"
-   },
-   {
-    "t": "Pour déplacer une forme : touche-la d'abord (cadre bleu), puis glisse-la. Glisser sur une forme pas encore choisie trace une nouvelle forme (pratique pour une cote qui part du coin d'un rectangle). Touche Suppr ou bouton Supprimer pour l'effacer; Annuler la remet.",
-    "img": "nouveautes/formes-deplacer.jpg"
-   },
-   {
-    "t": "Pour grandir ou rapetisser une forme déjà dessinée : touche-la, puis tire un des petits carrés blancs (coin, bout de flèche, rayon du cercle).",
-    "img": "nouveautes/formes-poignees.jpg"
-   },
-   {
-    "t": "Cote : touche-la, puis tire le carré bleu avec les flèches pour l'éloigner de l'objet, d'un côté ou de l'autre. Des lignes de rappel la relient à l'objet, comme sur un plan.",
-    "img": "nouveautes/cote-decalee.jpg"
-   },
-   {
-    "t": "Double-clic sur une cote : écris la mesure, puis choisis sa position avec les 5 touches (comme les flèches du clavier) : en haut, en bas, à gauche, à droite, ou au centre sur l'objet. Les flèches qui ne s'appliquent pas sont grisées (une cote couchée va en haut ou en bas).",
-    "img": "nouveautes/cote-position.jpg"
-   },
-   {
-    "t": "Même chose pour l'étiquette d'une forme ou le nom d'un objet isométrique : double-clic, écris le texte, puis choisis où il va (en haut, en bas, à gauche, à droite ou au centre) avec les 5 touches.",
-    "img": "nouveautes/etiquette-position.jpg"
-   },
-   {
-    "t": "Dans la case du double-clic : A− / A+ change la taille du texte (étiquette, nom, cote, angle). Glisse la barre à points du haut pour déplacer la case et voir l'objet dessous.",
-    "img": "nouveautes/etiquette-taille.jpg"
-   },
-   {
-    "t": "Double-clic sur une forme pour choisir sa valeur : la cote (ex. 1200 mm), l'angle en degrés (la forme s'ajuste), l'étiquette du rayon d'un cercle, ou le numéro / la lettre d'une bulle. Laisse vide pour revenir à la valeur automatique.",
-    "img": "nouveautes/formes-valeur.jpg"
-   },
-   {
-    "t": "Le double-clic marche aussi sur toutes les formes (une étiquette, ex. « Local 101 »), les objets isométriques (un nom, ex. « Chaudière 1 ») et les symboles électriques (le repère, ex. CR7). Les objets prennent la couleur du crayon; touche un objet puis une couleur pour le recolorer.",
-    "img": "nouveautes/objets-noms.jpg"
-   },
-   {
-    "t": "Onglet Iso : le catalogue de plomberie et chauffage (chaudière, pompe, vannes, collecteurs…). Le fond passe tout seul au plan isométrique.",
-    "img": "nouveautes/objets-iso.jpg"
-   },
-   {
-    "t": "Onglet Électricité : les symboles du schéma en échelle. Le fond passe tout seul au quadrillé. Iso et Électricité sont offerts sur le tableau blanc.",
-    "img": "nouveautes/objets-elec.jpg"
-   },
-   {
-    "t": "Glisse une vignette (objet iso ou symbole électrique) de la palette jusqu'au tableau. Lâchée près d'un fil ou d'un tuyau, elle s'y branche toute seule : le fil est coupé et relié aux bornes, la vanne ou la pompe se place dans le tuyau, dans le bon sens.",
-    "img": "nouveautes/glisser-brancher.jpg"
-   },
-   "Peu importe l'onglet ouvert, touche une forme, un objet iso ou un symbole électrique : il est choisi et la palette passe toute seule au bon onglet.",
-   {
-    "t": "⋯ Plus : rétablir, tout effacer, zoom, déplacer le tableau, tableau précédent / suivant / nouveau, enregistrer en PNG.",
-    "img": "nouveautes/barre-plus.jpg"
-   },
-   "⌄ replie la barre en petit bouton; ▯ l'ancre sur le côté droit de l'écran.",
-   "Le crayon réagit maintenant tout de suite : seul le trait en cours est redessiné pendant que tu écris, le reste du tableau ne bouge pas."
-  ],
-  "versions": [
-   {
-    "date": "2026-10-28",
-    "texte": "Iso : nouveau calcul des tuyaux quand on déplace un objet (sortie droite du raccord, plus court chemin à 90°, sans traverser l'objet)."
-   },
-   {
-    "date": "2026-10-28",
-    "texte": "Iso : déplacement d'un objet peaufiné (entrée droite dans le raccord, déviation à deux coudes, pas de bout en trop)."
-   },
-   {
-    "date": "2026-10-28",
-    "texte": "Iso : un objet déplacé garde ses tuyaux droits (coudes à 90°)."
-   },
-   {
-    "date": "2026-10-28",
-    "texte": "Gomme : la glissière de taille ne tremble plus quand on la déplace."
-   },
-   {
-    "date": "2026-10-28",
-    "texte": "Gomme : la taille se change sans fermer la fenêtre; cercle de la taille réelle sous la souris."
-   },
-   {
-    "date": "2026-10-28",
-    "texte": "Le menu « … » (et celui des couleurs) se ferme dès qu'on touche un autre outil, ou après Tout effacer, Nouveau ou Enregistrer."
-   },
-   {
-    "date": "2026-10-28",
-    "texte": "Texte : Entrée change de ligne."
-   },
-   {
-    "date": "2026-10-28",
-    "texte": "Corrigé : le clavier restait pris dans la case de texte; un texte se choisit sans outil; le symbole « terre » se choisit d'un clic."
-   },
-   {
-    "date": "2026-10-28",
-    "texte": "Crayon : s'active en un seul toucher, trait lissé, plus de saccade entre les traits."
-   },
-   {
-    "date": "2026-10-28",
-    "texte": "L'avis « Ton dessin est resté… » a un ✕ pour le fermer."
-   },
-   {
-    "date": "2026-10-28",
-    "texte": "Le ✕ est retiré de la barre d'outils (on sort par « Retour »); l'avis « Apporter le dessin ici » s'affiche au-dessus de la barre."
-   },
-   {
-    "date": "2026-10-28",
-    "texte": "Un dessin par fond (blanc, quadrillé, iso, noir, vert…), avec un bouton pour apporter le dessin sur le nouveau fond."
-   },
-   {
-    "date": "2026-10-28",
-    "texte": "« + Texte sur un côté » : écrire a, b, hypoténuse… sur chaque côté d'une forme."
-   },
-   {
-    "date": "2026-10-28",
-    "texte": "Bouton + pour plusieurs cotes; la case du double-clic ne cache plus l'objet."
-   },
-   {
-    "date": "2026-10-28",
-    "texte": "Suppr partout, taille de la gomme, plein écran, couleur perso retenue, outil Fil sans déplacement, aperçu pendant le glisser-déposer."
-   },
-   {
+    "type": "outil",
+    "titre": "Lecture des livres : pages, table des matières et réponses",
+    "texte": "Même table des matières dans tous les livres, avec des icônes qui correspondent au type de section, et réponses pas à pas partout où le livre a un corrigé.",
+    "formation": [
+      "Zoom plus doux : la roulette zoome sous la souris, sans saccades. Une fois zoomé, glisse n'importe où sur la page (même sur le texte) pour te déplacer, et tu peux amener un bord ou un coin de la page jusqu'au milieu de l'écran. En page simple, le zoom marche maintenant dans tous les livres (C9, M11, plomberie… zoomaient seulement une bande).",
+      "Tous les livres tournent leurs pages de la même façon : la nouvelle page apparaît en fondu doux, en montant légèrement. Rien à régler.",
+      "Avance rapide : tiens le bouton › (ou ‹ pour reculer) enfoncé. Après une demi-seconde, les pages défilent de plus en plus vite; le bouton devient rouge. Relâche quand tu es rendu.",
+      {
+        "t": "Touche M (ou ☰) dans un livre : la table des matières s'ouvre; clique une section pour y aller.",
+        "img": "nouveautes/livre-tdm.jpg"
+      },
+      {
+        "t": "Bouton ✓ (touche R) : chaque clic montre la réponse suivante de la page, pour corriger avec le groupe une question à la fois.",
+        "img": "nouveautes/livre-barre.jpg"
+      },
+      "Si le bouton ✓ est grisé, la page n'a pas de réponse."
+    ],
+    "versions": [
+      {
+        "date": "2026-10-28",
+        "texte": "Page simple : le zoom à la roulette marche dans tous les livres."
+      },
+      {
+        "date": "2026-10-28",
+        "texte": "Zoom à la roulette plus fluide; on se déplace en glissant partout et on peut dépasser les bords de la page."
+      },
+      {
+        "date": "2026-10-23",
+        "texte": "Avance et recul rapides : tiens le bouton › ou ‹ enfoncé."
+      },
+      {
+        "date": "2026-10-22",
+        "texte": "Même transition douce entre les pages dans tous les livres (fondu léger, comme Plomberie et chauffage)."
+      }
+    ]
+  },
+  {
     "date": "2026-10-23",
-    "texte": "Glisser-déposer des objets iso et des symboles électriques : ils se branchent tout seuls sur le fil ou le tuyau le plus proche."
-   },
-   {
+    "type": "ajout",
+    "livre": "materiel-electrique-c13",
+    "titre": "Entretien de matériel électrique (en construction)",
+    "texte": "Nouveau cahier du DEP 5211 (compétence 13, 436-274, 60 heures) : 166 pages, 10 modules, de l'électricité du barrage à la maison jusqu'aux disjoncteurs, prises et interrupteurs. Version de travail : le livre porte le badge « En construction ».",
+    "formation": [
+      {
+        "t": "Le badge jaune « En construction » sur la couverture veut dire que le livre n'est pas encore la version finale : il peut changer.",
+        "img": "nouveautes/livre-c13-badge.jpg"
+      },
+      {
+        "t": "Il se lit comme les autres livres : flèches ← →, table des matières (touche M), réponses pas à pas (touche R), code QR (touche Q).",
+        "img": "nouveautes/livre-c13.jpg"
+      }
+    ],
+    "versions": [
+      {
+        "date": "2026-10-23",
+        "texte": "Ajout du cahier, version en construction."
+      }
+    ]
+  },
+  {
     "date": "2026-10-23",
-    "texte": "Flèches et lignes plus faciles à attraper; leur texte à gauche ou à droite se met au bout de la flèche."
-   },
-   {
-    "date": "2026-10-23",
-    "texte": "La barre du livre (pages, zoom) est cachée sur le tableau blanc; le ✕ de la barre du crayon ferme le tableau blanc."
-   },
-   {
-    "date": "2026-10-23",
-    "texte": "Tableau blanc : aucun outil choisi à l'ouverture; toucher une forme ou un objet le choisit tout de suite."
-   },
-   {
-    "date": "2026-10-23",
-    "texte": "Le bouton Forme quitte la barre : le tracé (libre, ligne, flèche, rectangle, ellipse) se choisit dans le menu du crayon."
-   },
-   {
-    "date": "2026-10-23",
-    "texte": "Le bouton couleur devient un symbole de crayon (pointe et trait dans la couleur choisie)."
-   },
-   {
-    "date": "2026-10-23",
-    "texte": "Le crayon s'active et se désactive (rond de couleur); épaisseur réglable avec une glissière de 1 à 40."
-   },
-   {
-    "date": "2026-10-23",
-    "texte": "Taille du texte des étiquettes et des cotes (A− / A+), et case du double-clic qu'on peut déplacer."
-   },
-   {
-    "date": "2026-10-23",
-    "texte": "Étiquettes : 5 touches pour placer le texte en haut, en bas, à gauche, à droite ou au centre de l'objet."
-   },
-   {
-    "date": "2026-10-23",
-    "texte": "Une cote posée sur le bord d'une forme se choisit en priorité : son double-clic montre bien les 5 touches de position."
-   },
-   {
-    "date": "2026-10-23",
-    "texte": "Aucun outil choisi au départ : un clic choisit, un double-clic nomme, un clic à côté désélectionne. Le centre des formes compte aussi."
-   },
-   {
-    "date": "2026-10-23",
-    "texte": "Cote : 5 touches pour la placer en haut, en bas, à gauche, à droite ou au centre."
-   },
-   {
-    "date": "2026-10-23",
-    "texte": "Double-clic plus fiable : plus de temps entre les deux clics (au doigt aussi), et on peut toucher le texte d'une cote."
-   },
-   {
-    "date": "2026-10-23",
-    "texte": "On peut choisir une forme ou un objet de n'importe quelle catégorie, sans changer d'onglet."
-   },
-   {
-    "date": "2026-10-23",
-    "texte": "Cote : un carré à flèches pour la placer à côté de l'objet (lignes de rappel). Une forme se choisit d'un toucher avant de la glisser."
-   },
-   {
-    "date": "2026-10-23",
-    "texte": "Double-clic pour nommer n'importe quelle forme, objet iso ou symbole électrique. Les objets suivent la couleur du crayon."
-   },
-   {
-    "date": "2026-10-23",
-    "texte": "Les formes se redimensionnent après coup : tire un petit carré blanc."
-   },
-   {
-    "date": "2026-10-23",
-    "texte": "Double-clic sur une cote, un angle, un cercle ou une bulle : choisis sa valeur."
-   },
-   {
-    "date": "2026-10-23",
-    "texte": "Les formes se déplacent : glisse-les par leur trait. Touche Suppr pour effacer la forme choisie."
-   },
-   {
-    "date": "2026-10-23",
-    "texte": "Objets en trois onglets : Formes (20 formes pour l'enseignement, dans tous les dessins), Iso et Électricité, chacun avec son catalogue illustré."
-   },
-   {
-    "date": "2026-10-23",
-    "texte": "Crayon beaucoup plus rapide : le trait suit le stylet sans retard, même avec un tableau très rempli. Gomme plus fluide."
-   },
-   {
-    "date": "2026-10-23",
-    "texte": "Après l'efface, toucher « Couleur » (ou une couleur) ramène toujours au crayon."
-   },
-   {
-    "date": "2026-10-21",
-    "texte": "Le bouton Objets est caché sur les fonds où il ne sert pas."
-   },
-   {
-    "date": "2026-10-21",
-    "texte": "Barre allégée : menus « couleur » et « ⋯ Plus »."
-   }
-  ]
- },
- {
-  "date": "2026-10-23",
-  "type": "outil",
-  "titre": "Plans techniques",
-  "texte": "Visionneuse de plans pour le tableau : zoom avec les doigts, crayon, mesure à l'échelle, et quatre dossiers de plans d'exercice, dont un centre commercial sur un terrain en pente (nivellement, drainage pluvial, profils).",
-  "formation": [
-   {
-    "t": "Dossier 1 refait : maison contemporaine carrée à toit plat, deux étages et sous-sol (19 feuilles). Un plan, une plomberie, une électricité et un chauffage par niveau, un escalier dans les coupes, un schéma isométrique sur trois niveaux.",
-    "img": "nouveautes/plans-maison-moderne.jpg"
-   },
-   {
-    "t": "Avec un plan ouvert, le bouton en haut à gauche devient « Tous les plans » (ou touche Échap) : il te ramène à l'écran d'accueil des plans. Sur l'accueil des plans, ce même bouton te ramène à la bibliothèque. Aussi dans « Plus ▾ » → « Tous les plans ».",
-    "img": "nouveautes/plans-retour.jpg"
-   },
-   {
-    "t": "Dossier 4 · Centre commercial : 13 feuilles. En plus des plans habituels (architecture, structure, plomberie, électricité, ventilation), il contient le plan de nivellement et de drainage C-101 (courbes de niveau existantes et projetées, points cotés, pentes, puisards, bassin de rétention) et les profils de terrain C-102 (déblais, remblais, tableau des puisards et des conduites).",
-    "img": "nouveautes/plans-d4.jpg"
-   },
-   {
-    "t": "Le centre commercial du dossier 4 est contemporain : façade sud en murs-rideaux pleine hauteur (type A), panneaux composites d'aluminium anthracite, volumes-signaux en lames façon bois, marquises d'acier en porte-à-faux et bandeau d'enseignes (feuille A-201).",
-    "img": "nouveautes/plans-d4-facade.jpg"
-   },
-   {
-    "t": "Sur C-101 : courbe grise pointillée = terrain existant, courbe brune = terrain projeté. Les lignes rouges A-A' et B-B' renvoient aux profils de la feuille C-102.",
-    "img": "nouveautes/plans-d4-c101.jpg"
-   },
-   {
-    "t": "Bouton « Plans » en haut de la bibliothèque : choisis un des trois dossiers d'exercice, ou ouvre ton propre plan (PDF ou image, tu peux aussi le glisser dans la fenêtre).",
-    "img": "nouveautes/plans.jpg"
-   },
-   "Chaque dossier a 11 feuilles : plans, élévations, coupe longitudinale, coupe de mur type et légende des matériaux (A-302).",
-   "Zoome et déplace la feuille au tableau, puis annote avec le crayon."
-  ],
-  "versions": [
-   {
-    "date": "2026-10-23",
-    "texte": "Dossier 1 : nouvelle maison moderne, 2 étages et sous-sol, 19 feuilles."
-   },
-   {
-    "date": "2026-10-23",
-    "texte": "Dossier 4 modernisé : murs-rideaux, panneaux d'aluminium, volumes-signaux façon bois, marquises, toit solaire, bornes de recharge et îlots-noues."
-   },
-   {
-    "date": "2026-10-23",
-    "texte": "Nouveau dossier 4 : centre commercial de 5 locaux sur un terrain en pente, avec plan de nivellement et de drainage (C-101) et profils de terrain (C-102). 13 feuilles."
-   },
-   {
-    "date": "2026-10-23",
-    "texte": "Retour facile à l'accueil des plans : bouton « Tous les plans » en haut à gauche (ou Échap)."
-   },
-   {
-    "date": "2026-10-21",
-    "texte": "Trois dossiers de plans d'exercice, 11 feuilles chacun."
-   },
-   {
-    "date": "2026-10-17",
-    "texte": "Visionneuse de plans pour le tableau interactif."
-   }
-  ]
- },
- {
-  "date": "2026-10-23",
-  "type": "outil",
-  "titre": "Accueil de classe",
-  "texte": "Tableau d'accueil animé pour le début de période : date, déroulement, timeline lisible du fond de la classe, arrière-plan lié à la compétence, un contenu à ouvrir pour chaque activité (livre, schéma, plan, vidéo YouTube, minuterie), passage fluide vers le livre et mode examen sans pause.",
-  "formation": [
-   {
-    "t": "Bouton « Tableau blanc » (touche B) sur le tableau de bord. Pour revenir au tableau de bord : bouton « Tableau de bord ». Ensuite, « Revenir au tableau blanc » retrouve tes dessins.",
-    "img": "nouveautes/tdb-tableau-blanc.jpg"
-   },
-   {
-    "t": "Double-clic sur une partie de la timeline (ou une étape de la liste) : « Préparer le cours » s'ouvre directement sur cette activité pour lui lier une action (livre, schéma, plan, tableau blanc, minuterie, fichier, lien web, vidéo). Un simple clic ouvre ce qui est déjà lié.",
-    "img": "nouveautes/tdb-dblclic-timeline.jpg"
-   },
-   {
-    "t": "Bouton « Accueil de classe » en haut de la bibliothèque pour l'ouvrir.",
-    "img": "nouveautes/accueil.jpg"
-   },
-   {
-    "t": "« Préparer le cours », étape 4 : à côté d'une activité, « ＋ Ajouter », puis choisis une page de livre, un schéma électrique, un plan, un tableau blanc ou une minuterie.",
-    "img": "nouveautes/tdb-prep.jpg"
-   },
-   {
-    "t": "En classe, la carte MAINTENANT affiche « ▶ Ouvrir » quand l'activité commence (ou touche O). Tu peux aussi cliquer une case de la timeline qui porte une icône.",
-    "img": "nouveautes/tdb-carte.jpg"
-   },
-   {
-    "t": "Le livre s'ouvre directement à la bonne page, en douceur, et le plein écran reste actif. Dans n'importe quel livre, le bouton « Tableau de bord » en haut (ou en bas à gauche quand les barres sont cachées, ou la touche E) t'amène à l'accueil de classe : le livre reste ouvert derrière.",
-    "img": "nouveautes/tdb-livre.jpg"
-   },
-   {
-    "t": "Sur le tableau de bord, le bouton blanc « Revenir au livre · p. 64 » (en haut à droite, ou touche L) te remet exactement où tu étais dans le livre. Parfait pour aller à l'atelier et revenir.",
-    "img": "nouveautes/tdb-retour.jpg"
-   },
-   {
-    "t": "Une vidéo pour une activité : « ＋ Ajouter » → « 🎬 Vidéo YouTube », puis colle le lien (bouton « Partager » de YouTube). Si le lien commence à un moment précis, la vidéo part de là. En classe, elle joue en grand sur le tableau de bord; « Fermer » ou Échap pour revenir.",
-    "img": "nouveautes/tdb-video.jpg"
-   },
-   {
-    "t": "Un site web pour une activité : « ＋ Ajouter » → « Lien web », colle l'adresse (ex. www.rbq.gouv.qc.ca) et, si tu veux, un nom à afficher. En classe, le site s'ouvre dans un nouvel onglet.",
-    "img": "nouveautes/tdb-web.jpg"
-   },
-   {
-    "t": "Un fichier pour une activité : « ＋ Ajouter » → « Fichier (PDF, image…) », puis choisis-le ou glisse-le. En classe, les PDF, images et vidéos s'affichent en grand. Un PowerPoint, un Word ou un Excel s'ouvre tout de suite dans son programme (astuce : « Toujours ouvrir les fichiers de ce type » dans les téléchargements de Chrome ou Edge). Pour un PowerPoint en grand dans le tableau de bord, enregistre-le en PDF. Le fichier reste sur cet ordinateur.",
-    "img": "nouveautes/tdb-fichier.jpg"
-   },
-   {
-    "t": "Plusieurs contenus pour une même activité (ex. une vidéo et une page du livre) : après le premier, clique « ＋ Un autre ». En classe, la carte MAINTENANT affiche un bouton par contenu (touche O pour le premier, 2 pour le deuxième); un clic sur la case de la timeline te laisse choisir.",
-    "img": "nouveautes/tdb-deux.jpg"
-   },
-   {
-    "t": "Jour d'examen : dans « Préparer le cours », coche « Examen aujourd'hui ». Les pauses disparaissent de l'horaire (3 h 20 d'un bloc) et un badge EXAMEN s'affiche. Le lendemain, l'horaire normal revient tout seul.",
-    "img": "nouveautes/tdb-examen.jpg"
-   },
-   "« Préparer le cours » : le panneau de l'enseignant, pour régler la période et le déroulement.",
-   "« Plein écran » une seule fois au début du cours : il reste actif entre le tableau de bord et les livres. « Bibliothèque » ferme tout et te ramène aux livres.",
-   {
-    "t": "L'arrière-plan change tout seul selon la compétence choisie dans « Préparer le cours » : robinetterie et appareils sanitaires, réseau d'évacuation, santé et sécurité, chantier, outils et entrepôt, entretien ménager, informatique, administration, protection incendie… Tu peux aussi en choisir un autre dans Plus → Réglages → Arrière-plan.",
-    "img": "nouveautes/accueil-scenes.jpg"
-   },
-   {
-    "t": "Les couleurs changent chaque jour de la semaine (lundi ardoise, mardi forêt, mercredi prune, jeudi pétrole, vendredi cuivre) pour garder l'attention des élèves. Pour garder toujours les mêmes : Plus → Réglages → Ambiance.",
-    "img": "nouveautes/tdb-ambiances.jpg"
-   },
-   {
-    "t": "Le temps avant la prochaine pause (ou la fin de la période) s'affiche en gros juste sous MATIN ou APRÈS-MIDI, bien visible du fond de la classe.",
-    "img": "nouveautes/tdb-pause.jpg"
-   }
-  ],
-  "versions": [
-   {
-    "date": "2026-10-23",
-    "texte": "Double-clic sur la timeline pour lier une action à une activité."
-   },
-   {
-    "date": "2026-10-23",
-    "texte": "Bouton Tableau blanc sur le tableau de bord, et retour au tableau blanc ensuite."
-   },
-   {
-    "date": "2026-10-23",
-    "texte": "Marge de sécurité en bas de l'écran : l'encadré du bas est remonté, pour les projecteurs qui coupent le bas de l'image."
-   },
-   {
-    "date": "2026-10-23",
-    "texte": "« Prochaine pause dans… » monte juste sous le nom de la période, en plus gros."
-   },
-   {
-    "date": "2026-10-23",
-    "texte": "Nouveau contenu à ouvrir pendant une activité : un lien web."
-   },
-   {
+    "type": "outil",
+    "titre": "Version cellulaire",
+    "texte": "La bibliothèque s'adapte au téléphone : barre d'onglets en bas, fiche de livre avec un gros bouton « Lire », lecteur simplifié et pages qui se tournent en balayant.",
+    "formation": [
+      {
+        "t": "En bas de l'écran : Accueil, Ma liste, Quoi de neuf et Plus (Aide, Plans techniques, Accueil de classe, Texte plus gros). La recherche reste en haut.",
+        "img": "nouveautes/tel-accueil.jpg"
+      },
+      {
+        "t": "Touche une couverture : la fiche monte du bas, avec « Lire » en gros.",
+        "img": "nouveautes/tel-fiche.jpg"
+      },
+      {
+        "t": "Dans un livre : balaie vers la gauche ou la droite pour tourner la page. Touche le milieu de la page pour cacher ou montrer les barres. En bas : page précédente, numéro, page suivante, réponses, modules; le reste est dans « ⋯ ».",
+        "img": "nouveautes/tel-livre.jpg"
+      },
+      "Sur ordinateur et au tableau, rien ne change."
+    ],
+    "versions": [
+      {
+        "date": "2026-10-23",
+        "texte": "Première version cellulaire."
+      }
+    ]
+  },
+  {
     "date": "2026-10-22",
-    "texte": "Bouton « Tableau de bord » dans tous les livres, même ceux ouverts depuis la bibliothèque."
-   },
-   {
-    "date": "2026-10-22",
-    "texte": "Les fichiers PowerPoint, Word et Excel s'ouvrent tout de suite dans leur programme, sans bouton à cliquer."
-   },
-   {
-    "date": "2026-10-22",
-    "texte": "Jusqu'à 4 contenus par activité (ex. vidéo + page du livre)."
-   },
-   {
-    "date": "2026-10-22",
-    "texte": "Ouvrir un fichier de ton ordinateur (PDF, image, vidéo, PowerPoint…) pendant une activité."
-   },
-   {
-    "date": "2026-10-22",
-    "texte": "Une ambiance de couleurs différente chaque jour, icônes au trait comme dans la bibliothèque, et correction d'une erreur qui empêchait le tableau de bord de démarrer."
-   },
-   {
-    "date": "2026-10-22",
-    "texte": "Vidéo YouTube à ouvrir pendant une activité, et case « Examen aujourd'hui » qui retire les pauses."
-   },
-   {
-    "date": "2026-10-22",
-    "texte": "Mode sombre plus clair : gris ardoise au lieu de presque noir, plus lisible au projecteur."
-   },
-   {
-    "date": "2026-10-22",
-    "texte": "Passage fluide entre le tableau de bord et le livre : le plein écran reste actif, le livre reste ouvert derrière, boutons « Tableau de bord » (E) et « Revenir au livre » (L)."
-   },
-   {
-    "date": "2026-10-22",
-    "texte": "Un contenu à ouvrir pour chaque activité du déroulement : page de livre, schéma, plan, tableau blanc ou minuterie."
-   },
-   {
-    "date": "2026-10-22",
-    "texte": "Dix nouveaux arrière-plans animés liés aux compétences (DEP 5211 et DEP 5333), mieux visibles autour des panneaux."
-   },
-   {
+    "type": "ajout",
+    "livre": "communiquer",
+    "titre": "Communiquer en milieu de travail",
+    "texte": "Nouveau cahier d'apprentissage du DEP 5211 (compétence 436-282, 30 heures) : 176 pages, 9 modules, du rôle du préposé jusqu'aux situations difficiles et à l'éthique, avec jeux de rôle, documents de travail, cartes de mise en situation et jeux de communication en annexe.",
+    "formation": [
+      "Dans la bibliothèque, clique la couverture, puis « Lire » (ou « Ouvrir le livre » ci-dessus).",
+      {
+        "t": "Flèches ← → (ou les boutons en bas) pour tourner les pages; tape un numéro dans la case pour sauter à une page. Bouton ✓ (touche R) : les réponses apparaissent pas à pas.",
+        "img": "nouveautes/livre-communiquer.jpg"
+      },
+      {
+        "t": "Touche M (ou le bouton ☰) : les 9 modules et les annexes (lexique, modèles de documents, cartes, Loup-Garou, Naufragés!, plan dicté, chaîne de transmission).",
+        "img": "nouveautes/livre-communiquer-tdm.jpg"
+      },
+      "Bouton QR (touche Q) : les élèves scannent et le livre s'ouvre à la même page sur leur téléphone.",
+      "Dans l'accueil de classe, « Préparer le cours » → étape 4 : choisis une page de ce livre pour une activité."
+    ],
+    "versions": [
+      {
+        "date": "2026-10-22",
+        "texte": "Ajout du cahier (version 15)."
+      }
+    ]
+  },
+  {
     "date": "2026-10-21",
-    "texte": "Curseur de la timeline corrigé, timeline plus grosse, panneau de l'enseignant clair, plein écran réparé, bouton Bibliothèque déplacé."
-   },
-   {
-    "date": "2026-10-17",
-    "texte": "Accueil de classe pour le tableau interactif."
-   }
-  ]
- },
- {
-  "date": "2026-10-28",
-  "type": "outil",
-  "titre": "Lecture des livres : pages, table des matières et réponses",
-  "texte": "Même table des matières dans tous les livres, avec des icônes qui correspondent au type de section, et réponses pas à pas partout où le livre a un corrigé.",
-  "formation": [
-   "Zoom plus doux : la roulette zoome sous la souris, sans saccades. Une fois zoomé, glisse n'importe où sur la page (même sur le texte) pour te déplacer, et tu peux amener un bord ou un coin de la page jusqu'au milieu de l'écran. En page simple, le zoom marche maintenant dans tous les livres (C9, M11, plomberie… zoomaient seulement une bande).",
-   "Tous les livres tournent leurs pages de la même façon : la nouvelle page apparaît en fondu doux, en montant légèrement. Rien à régler.",
-   "Avance rapide : tiens le bouton › (ou ‹ pour reculer) enfoncé. Après une demi-seconde, les pages défilent de plus en plus vite; le bouton devient rouge. Relâche quand tu es rendu.",
-   {
-    "t": "Touche M (ou ☰) dans un livre : la table des matières s'ouvre; clique une section pour y aller.",
-    "img": "nouveautes/livre-tdm.jpg"
-   },
-   {
-    "t": "Bouton ✓ (touche R) : chaque clic montre la réponse suivante de la page, pour corriger avec le groupe une question à la fois.",
-    "img": "nouveautes/livre-barre.jpg"
-   },
-   "Si le bouton ✓ est grisé, la page n'a pas de réponse."
-  ],
-  "versions": [
-   {
-    "date": "2026-10-28",
-    "texte": "Page simple : le zoom à la roulette marche dans tous les livres."
-   },
-   {
-    "date": "2026-10-28",
-    "texte": "Zoom à la roulette plus fluide; on se déplace en glissant partout et on peut dépasser les bords de la page."
-   },
-   {
+    "type": "ajout",
+    "livre": "micro-ordinateur",
+    "titre": "Utiliser un micro-ordinateur",
+    "texte": "Nouveau cahier d'apprentissage du DEP 5211 (compétence 15, module 436-333, 45 heures) : 137 pages, 9 modules, du portable et de Windows 11 jusqu'à la gestion de l'entretien (GMAO) et l'intelligence artificielle, avec le fil conducteur « Une semaine à l'immeuble Les Érables ».",
+    "formation": [
+      "Dans la bibliothèque, clique la couverture, puis « Lire » (ou « Ouvrir le livre » ci-dessus).",
+      "Flèches ← → (ou les boutons en bas) pour tourner les pages; tape un numéro dans la case pour sauter à une page.",
+      {
+        "t": "Touche M (ou le bouton ☰) : table des matières, avec une icône par type de section.",
+        "img": "nouveautes/livre-tdm.jpg"
+      },
+      {
+        "t": "Bouton ✓ (touche R) : les réponses apparaissent une à la fois, pas à pas, sur la page affichée.",
+        "img": "nouveautes/livre-barre.jpg"
+      },
+      {
+        "t": "Bouton QR (touche Q) : les élèves scannent et le livre s'ouvre à la même page sur leur téléphone.",
+        "img": "nouveautes/livre-qr.jpg"
+      }
+    ]
+  },
+  {
     "date": "2026-10-23",
-    "texte": "Avance et recul rapides : tiens le bouton › ou ‹ enfoncé."
-   },
-   {
-    "date": "2026-10-22",
-    "texte": "Même transition douce entre les pages dans tous les livres (fondu léger, comme Plomberie et chauffage)."
-   }
-  ]
- },
- {
-  "date": "2026-10-23",
-  "type": "ajout",
-  "livre": "materiel-electrique-c13",
-  "titre": "Entretien de matériel électrique (en construction)",
-  "texte": "Nouveau cahier du DEP 5211 (compétence 13, 436-274, 60 heures) : 166 pages, 10 modules, de l'électricité du barrage à la maison jusqu'aux disjoncteurs, prises et interrupteurs. Version de travail : le livre porte le badge « En construction ».",
-  "formation": [
-   {
-    "t": "Le badge jaune « En construction » sur la couverture veut dire que le livre n'est pas encore la version finale : il peut changer.",
-    "img": "nouveautes/livre-c13-badge.jpg"
-   },
-   {
-    "t": "Il se lit comme les autres livres : flèches ← →, table des matières (touche M), réponses pas à pas (touche R), code QR (touche Q).",
-    "img": "nouveautes/livre-c13.jpg"
-   }
-  ],
-  "versions": [
-   {
-    "date": "2026-10-23",
-    "texte": "Ajout du cahier, version en construction."
-   }
-  ]
- },
- {
-  "date": "2026-10-23",
-  "type": "outil",
-  "titre": "Version cellulaire",
-  "texte": "La bibliothèque s'adapte au téléphone : barre d'onglets en bas, fiche de livre avec un gros bouton « Lire », lecteur simplifié et pages qui se tournent en balayant.",
-  "formation": [
-   {
-    "t": "En bas de l'écran : Accueil, Ma liste, Quoi de neuf et Plus (Aide, Plans techniques, Accueil de classe, Texte plus gros). La recherche reste en haut.",
-    "img": "nouveautes/tel-accueil.jpg"
-   },
-   {
-    "t": "Touche une couverture : la fiche monte du bas, avec « Lire » en gros.",
-    "img": "nouveautes/tel-fiche.jpg"
-   },
-   {
-    "t": "Dans un livre : balaie vers la gauche ou la droite pour tourner la page. Touche le milieu de la page pour cacher ou montrer les barres. En bas : page précédente, numéro, page suivante, réponses, modules; le reste est dans « ⋯ ».",
-    "img": "nouveautes/tel-livre.jpg"
-   },
-   "Sur ordinateur et au tableau, rien ne change."
-  ],
-  "versions": [
-   {
-    "date": "2026-10-23",
-    "texte": "Première version cellulaire."
-   }
-  ]
- },
- {
-  "date": "2026-10-22",
-  "type": "ajout",
-  "livre": "communiquer",
-  "titre": "Communiquer en milieu de travail",
-  "texte": "Nouveau cahier d'apprentissage du DEP 5211 (compétence 436-282, 30 heures) : 176 pages, 9 modules, du rôle du préposé jusqu'aux situations difficiles et à l'éthique, avec jeux de rôle, documents de travail, cartes de mise en situation et jeux de communication en annexe.",
-  "formation": [
-   "Dans la bibliothèque, clique la couverture, puis « Lire » (ou « Ouvrir le livre » ci-dessus).",
-   {
-    "t": "Flèches ← → (ou les boutons en bas) pour tourner les pages; tape un numéro dans la case pour sauter à une page. Bouton ✓ (touche R) : les réponses apparaissent pas à pas.",
-    "img": "nouveautes/livre-communiquer.jpg"
-   },
-   {
-    "t": "Touche M (ou le bouton ☰) : les 9 modules et les annexes (lexique, modèles de documents, cartes, Loup-Garou, Naufragés!, plan dicté, chaîne de transmission).",
-    "img": "nouveautes/livre-communiquer-tdm.jpg"
-   },
-   "Bouton QR (touche Q) : les élèves scannent et le livre s'ouvre à la même page sur leur téléphone.",
-   "Dans l'accueil de classe, « Préparer le cours » → étape 4 : choisis une page de ce livre pour une activité."
-  ],
-  "versions": [
-   {
-    "date": "2026-10-22",
-    "texte": "Ajout du cahier (version 15)."
-   }
-  ]
- },
- {
-  "date": "2026-10-21",
-  "type": "ajout",
-  "livre": "micro-ordinateur",
-  "titre": "Utiliser un micro-ordinateur",
-  "texte": "Nouveau cahier d'apprentissage du DEP 5211 (compétence 15, module 436-333, 45 heures) : 137 pages, 9 modules, du portable et de Windows 11 jusqu'à la gestion de l'entretien (GMAO) et l'intelligence artificielle, avec le fil conducteur « Une semaine à l'immeuble Les Érables ».",
-  "formation": [
-   "Dans la bibliothèque, clique la couverture, puis « Lire » (ou « Ouvrir le livre » ci-dessus).",
-   "Flèches ← → (ou les boutons en bas) pour tourner les pages; tape un numéro dans la case pour sauter à une page.",
-   {
-    "t": "Touche M (ou le bouton ☰) : table des matières, avec une icône par type de section.",
-    "img": "nouveautes/livre-tdm.jpg"
-   },
-   {
-    "t": "Bouton ✓ (touche R) : les réponses apparaissent une à la fois, pas à pas, sur la page affichée.",
-    "img": "nouveautes/livre-barre.jpg"
-   },
-   {
-    "t": "Bouton QR (touche Q) : les élèves scannent et le livre s'ouvre à la même page sur leur téléphone.",
-    "img": "nouveautes/livre-qr.jpg"
-   }
-  ]
- },
- {
-  "date": "2026-10-23",
-  "type": "outil",
-  "titre": "Page d'accueil de la bibliothèque",
-  "texte": "Page d'accueil plus compacte : les livres sont visibles tout de suite, avec leur titre et leur compétence sous la couverture. Logo du Pavillon de l'Avenir, page Bienvenue toute simple à la première visite et page Aide qui explique chaque bouton de la barre.",
-  "formation": [
-   {
-    "t": "Nouveau bouton « Tableau blanc » en haut (à la place de A+) : un tableau blanc s'ouvre tout de suite. Sur cellulaire, il est dans « Plus ».",
-    "img": "nouveautes/bouton-tableau-blanc.jpg"
-   },
-   {
-    "t": "Les livres sont en haut de la page, rangés par programme; le titre et la compétence sont écrits sous chaque couverture.",
-    "img": "nouveautes/accueil-biblio.jpg"
-   },
-   {
-    "t": "« Aide » (dans le menu ou à droite du titre) : chaque bouton de la barre d'outils du lecteur, numéroté de 1 à 10, et le menu « Plus d'outils ».",
-    "img": "nouveautes/bienvenue.jpg"
-   },
-   {
-    "t": "À sa première visite, un collègue voit une page Bienvenue en trois étapes; « Voir l'aide » ouvre la page Aide.",
-    "img": "nouveautes/bienvenue-simple.jpg"
-   },
-   "Pour partager : copie le lien de la bibliothèque dans Teams ou un courriel; une vignette avec le logo et les livres s'affiche automatiquement.",
-   "Badges « Nouveau » et « Mis à jour » : ils restent 30 jours, mais disparaissent dès que tu ouvres le livre sur cet ordinateur. Si le livre est mis à jour plus tard, « Mis à jour » revient jusqu'à ta prochaine ouverture."
-  ],
-  "versions": [
-   {
-    "date": "2026-10-23",
-    "texte": "Accès rapide au tableau blanc (remplace A+). Nouvelle icône de tableau blanc, plus facile à reconnaître."
-   },
-   {
-    "date": "2026-10-22",
-    "texte": "Les badges « Nouveau » et « Mis à jour » disparaissent dès que tu as ouvert le livre (ou après 30 jours)."
-   },
-   {
+    "type": "outil",
+    "titre": "Page d'accueil de la bibliothèque",
+    "texte": "Page d'accueil plus compacte : les livres sont visibles tout de suite, avec leur titre et leur compétence sous la couverture. Logo du Pavillon de l'Avenir, page Bienvenue toute simple à la première visite et page Aide qui explique chaque bouton de la barre.",
+    "formation": [
+      {
+        "t": "Nouveau bouton « Tableau blanc » en haut (à la place de A+) : un tableau blanc s'ouvre tout de suite. Sur cellulaire, il est dans « Plus ».",
+        "img": "nouveautes/bouton-tableau-blanc.jpg"
+      },
+      {
+        "t": "Les livres sont en haut de la page, rangés par programme; le titre et la compétence sont écrits sous chaque couverture.",
+        "img": "nouveautes/accueil-biblio.jpg"
+      },
+      {
+        "t": "« Aide » (dans le menu ou à droite du titre) : chaque bouton de la barre d'outils du lecteur, numéroté de 1 à 10, et le menu « Plus d'outils ».",
+        "img": "nouveautes/bienvenue.jpg"
+      },
+      {
+        "t": "À sa première visite, un collègue voit une page Bienvenue en trois étapes; « Voir l'aide » ouvre la page Aide.",
+        "img": "nouveautes/bienvenue-simple.jpg"
+      },
+      "Pour partager : copie le lien de la bibliothèque dans Teams ou un courriel; une vignette avec le logo et les livres s'affiche automatiquement.",
+      "Badges « Nouveau » et « Mis à jour » : ils restent 30 jours, mais disparaissent dès que tu ouvres le livre sur cet ordinateur. Si le livre est mis à jour plus tard, « Mis à jour » revient jusqu'à ta prochaine ouverture."
+    ],
+    "versions": [
+      {
+        "date": "2026-10-23",
+        "texte": "Accès rapide au tableau blanc (remplace A+). Nouvelle icône de tableau blanc, plus facile à reconnaître."
+      },
+      {
+        "date": "2026-10-22",
+        "texte": "Les badges « Nouveau » et « Mis à jour » disparaissent dès que tu as ouvert le livre (ou après 30 jours)."
+      },
+      {
+        "date": "2026-10-21",
+        "texte": "Icône Pavillon de l'Avenir dans l'onglet, aperçu avec image quand on partage le lien, pastille « Nouveau » pendant 30 jours, « Ma liste » visible seulement quand elle contient un livre."
+      }
+    ]
+  },
+  {
     "date": "2026-10-21",
-    "texte": "Icône Pavillon de l'Avenir dans l'onglet, aperçu avec image quand on partage le lien, pastille « Nouveau » pendant 30 jours, « Ma liste » visible seulement quand elle contient un livre."
-   }
-  ]
- },
- {
-  "date": "2026-10-21",
-  "type": "outil",
-  "titre": "Tableaux gardés et Mes schémas",
-  "texte": "Les dessins du tableau blanc et les annotations des livres sont maintenant gardés automatiquement sur l'ordinateur. « Mes schémas » permet de nommer un tableau, de le rouvrir, de l'exporter en fichier et de l'importer ailleurs.",
-  "formation": [
-   "Rien à faire : chaque trait, symbole ou fil est gardé tout seul sur cet ordinateur (dans ce navigateur). Si la page se recharge ou si l'ordinateur redémarre, tes tableaux reviennent.",
-   {
-    "t": "Pour donner un nom à un tableau : ⋯ Plus → « Mes schémas et modèles » (ou le bouton 📋 de la palette électrique).",
-    "img": "nouveautes/sch-plus.jpg"
-   },
-   {
-    "t": "Onglet « Mes schémas » : écris un nom, puis « Enregistrer ce tableau ». Ensuite : Ouvrir (sur un nouveau tableau), Renommer, Exporter ou Supprimer.",
-    "img": "nouveautes/sch-miens.jpg"
-   },
-   "« Exporter » crée un fichier .schema.json : apporte-le sur un autre ordinateur ou donne-le à un collègue, qui le charge avec « Importer un fichier ».",
-   "Un tableau rouvert sur un écran d'une autre taille garde ses fils sur les bornes des symboles."
-  ]
- },
- {
-  "date": "2026-10-21",
-  "type": "ajout",
-  "livre": "administration-batiment",
-  "titre": "Administration d'un bâtiment et plan d'urgence",
-  "texte": "Nouveau livre de la compétence 16 : 146 pages, 13 chapitres.",
-  "formation": [
-   "Dans la bibliothèque, clique la couverture, puis « Lire » (ou « Ouvrir le livre » ci-dessus).",
-   "Flèches ← → (ou les boutons en bas) pour tourner les pages; tape un numéro dans la case pour sauter à une page.",
-   {
-    "t": "Touche M (ou le bouton ☰) : table des matières, avec une icône par type de section.",
-    "img": "nouveautes/livre-tdm.jpg"
-   },
-   {
-    "t": "Bouton ✓ (touche R) : les réponses apparaissent une à la fois, pas à pas, sur la page affichée.",
-    "img": "nouveautes/livre-barre.jpg"
-   },
-   {
-    "t": "Bouton QR (touche Q) : les élèves scannent et le livre s'ouvre à la même page sur leur téléphone.",
-    "img": "nouveautes/livre-qr.jpg"
-   }
-  ]
- },
- {
-  "date": "2026-10-21",
-  "type": "maj",
-  "livre": "plomberie-chauffage",
-  "titre": "Plomberie et chauffage",
-  "texte": "Version officielle animée : 190 pages, 13 modules, formatif final et réponses pas à pas.",
-  "formation": [
-   "Dans la bibliothèque, clique la couverture, puis « Lire » (ou « Ouvrir le livre » ci-dessus).",
-   "Flèches ← → (ou les boutons en bas) pour tourner les pages; tape un numéro dans la case pour sauter à une page.",
-   {
-    "t": "Touche M (ou le bouton ☰) : table des matières, avec une icône par type de section.",
-    "img": "nouveautes/livre-tdm.jpg"
-   },
-   {
-    "t": "Bouton ✓ (touche R) : les réponses apparaissent une à la fois, pas à pas, sur la page affichée.",
-    "img": "nouveautes/livre-barre.jpg"
-   },
-   {
-    "t": "Bouton QR (touche Q) : les élèves scannent et le livre s'ouvre à la même page sur leur téléphone.",
-    "img": "nouveautes/livre-qr.jpg"
-   },
-   "Le formatif final est à la fin du livre : ouvre la table des matières (M) pour y aller directement."
-  ]
- },
- {
-  "date": "2026-10-21",
-  "type": "maj",
-  "livre": "protection-incendie",
-  "titre": "Protection incendie",
-  "texte": "Nouvelle version : 104 pages, corrigé intégré (bouton ✓) et simulateur de panneau d'alarme.",
-  "formation": [
-   "Dans la bibliothèque, clique la couverture, puis « Lire » (ou « Ouvrir le livre » ci-dessus).",
-   "Flèches ← → (ou les boutons en bas) pour tourner les pages; tape un numéro dans la case pour sauter à une page.",
-   {
-    "t": "Touche M (ou le bouton ☰) : table des matières, avec une icône par type de section.",
-    "img": "nouveautes/livre-tdm.jpg"
-   },
-   {
-    "t": "Bouton ✓ (touche R) : les réponses apparaissent une à la fois, pas à pas, sur la page affichée.",
-    "img": "nouveautes/livre-barre.jpg"
-   },
-   {
-    "t": "Bouton QR (touche Q) : les élèves scannent et le livre s'ouvre à la même page sur leur téléphone.",
-    "img": "nouveautes/livre-qr.jpg"
-   },
-   "Pour trouver le simulateur de panneau d'alarme : tape « simulateur » dans la recherche de la bibliothèque."
-  ]
- },
- {
-  "date": "2026-10-21",
-  "type": "outil",
-  "titre": "Bibliothèque en ligne et hors ligne",
-  "texte": "La bibliothèque est sur Internet (lien à partager avec les collègues) et fonctionne sans Internet pour les livres déjà ouverts.",
-  "formation": [
-   "Ouvre chaque livre une fois avec Internet : il est gardé sur cet ordinateur.",
-   "Sans Internet, la bibliothèque et les livres déjà ouverts s'ouvrent quand même; un message l'indique.",
-   "Quand Internet revient, les livres modifiés se mettent à jour tout seuls (sans retélécharger ceux qui n'ont pas changé).",
-   "Si une vieille version reste affichée : Ctrl+F5."
-  ]
- },
- {
-  "date": "2026-10-21",
-  "type": "outil",
-  "titre": "Recherche, filtre et code QR",
-  "texte": "Recherche dans le texte de tous les livres, filtre par programme (DEP 5211 · DEP 5333) et code QR pour ouvrir le livre sur le téléphone des élèves.",
-  "formation": [
-   {
-    "t": "Tape un mot dans la barre de recherche : les pages des livres qui en parlent s'affichent; clique un résultat pour ouvrir le livre à cette page.",
-    "img": "nouveautes/recherche.jpg"
-   },
-   {
-    "t": "Boutons DEP 5211 et DEP 5333 en haut : seuls les livres de ce programme restent, classés par compétence.",
-    "img": "nouveautes/filtre.jpg"
-   },
-   {
-    "t": "Dans un livre, bouton QR (touche Q) : projette le code, les élèves le scannent et arrivent à la même page.",
-    "img": "nouveautes/livre-qr.jpg"
-   }
-  ],
-  "versions": [
-   {
+    "type": "outil",
+    "titre": "Tableaux gardés et Mes schémas",
+    "texte": "Les dessins du tableau blanc et les annotations des livres sont maintenant gardés automatiquement sur l'ordinateur. « Mes schémas » permet de nommer un tableau, de le rouvrir, de l'exporter en fichier et de l'importer ailleurs.",
+    "formation": [
+      "Rien à faire : chaque trait, symbole ou fil est gardé tout seul sur cet ordinateur (dans ce navigateur). Si la page se recharge ou si l'ordinateur redémarre, tes tableaux reviennent.",
+      {
+        "t": "Pour donner un nom à un tableau : ⋯ Plus → « Mes schémas et modèles » (ou le bouton 📋 de la palette électrique).",
+        "img": "nouveautes/sch-plus.jpg"
+      },
+      {
+        "t": "Onglet « Mes schémas » : écris un nom, puis « Enregistrer ce tableau ». Ensuite : Ouvrir (sur un nouveau tableau), Renommer, Exporter ou Supprimer.",
+        "img": "nouveautes/sch-miens.jpg"
+      },
+      "« Exporter » crée un fichier .schema.json : apporte-le sur un autre ordinateur ou donne-le à un collègue, qui le charge avec « Importer un fichier ».",
+      "Un tableau rouvert sur un écran d'une autre taille garde ses fils sur les bornes des symboles."
+    ]
+  },
+  {
     "date": "2026-10-21",
-    "texte": "Code QR pour les élèves (touche Q)."
-   },
-   {
+    "type": "ajout",
+    "livre": "administration-batiment",
+    "titre": "Administration d'un bâtiment et plan d'urgence",
+    "texte": "Nouveau livre de la compétence 16 : 146 pages, 13 chapitres.",
+    "formation": [
+      "Dans la bibliothèque, clique la couverture, puis « Lire » (ou « Ouvrir le livre » ci-dessus).",
+      "Flèches ← → (ou les boutons en bas) pour tourner les pages; tape un numéro dans la case pour sauter à une page.",
+      {
+        "t": "Touche M (ou le bouton ☰) : table des matières, avec une icône par type de section.",
+        "img": "nouveautes/livre-tdm.jpg"
+      },
+      {
+        "t": "Bouton ✓ (touche R) : les réponses apparaissent une à la fois, pas à pas, sur la page affichée.",
+        "img": "nouveautes/livre-barre.jpg"
+      },
+      {
+        "t": "Bouton QR (touche Q) : les élèves scannent et le livre s'ouvre à la même page sur leur téléphone.",
+        "img": "nouveautes/livre-qr.jpg"
+      }
+    ]
+  },
+  {
     "date": "2026-10-21",
-    "texte": "Filtre par programme et livres classés par compétence."
-   },
-   {
+    "type": "maj",
+    "livre": "plomberie-chauffage",
+    "titre": "Plomberie et chauffage",
+    "texte": "Version officielle animée : 190 pages, 13 modules, formatif final et réponses pas à pas.",
+    "formation": [
+      "Dans la bibliothèque, clique la couverture, puis « Lire » (ou « Ouvrir le livre » ci-dessus).",
+      "Flèches ← → (ou les boutons en bas) pour tourner les pages; tape un numéro dans la case pour sauter à une page.",
+      {
+        "t": "Touche M (ou le bouton ☰) : table des matières, avec une icône par type de section.",
+        "img": "nouveautes/livre-tdm.jpg"
+      },
+      {
+        "t": "Bouton ✓ (touche R) : les réponses apparaissent une à la fois, pas à pas, sur la page affichée.",
+        "img": "nouveautes/livre-barre.jpg"
+      },
+      {
+        "t": "Bouton QR (touche Q) : les élèves scannent et le livre s'ouvre à la même page sur leur téléphone.",
+        "img": "nouveautes/livre-qr.jpg"
+      },
+      "Le formatif final est à la fin du livre : ouvre la table des matières (M) pour y aller directement."
+    ]
+  },
+  {
     "date": "2026-10-21",
-    "texte": "Recherche dans le texte des livres."
-   }
-  ]
- }
+    "type": "maj",
+    "livre": "protection-incendie",
+    "titre": "Protection incendie",
+    "texte": "Nouvelle version : 104 pages, corrigé intégré (bouton ✓) et simulateur de panneau d'alarme.",
+    "formation": [
+      "Dans la bibliothèque, clique la couverture, puis « Lire » (ou « Ouvrir le livre » ci-dessus).",
+      "Flèches ← → (ou les boutons en bas) pour tourner les pages; tape un numéro dans la case pour sauter à une page.",
+      {
+        "t": "Touche M (ou le bouton ☰) : table des matières, avec une icône par type de section.",
+        "img": "nouveautes/livre-tdm.jpg"
+      },
+      {
+        "t": "Bouton ✓ (touche R) : les réponses apparaissent une à la fois, pas à pas, sur la page affichée.",
+        "img": "nouveautes/livre-barre.jpg"
+      },
+      {
+        "t": "Bouton QR (touche Q) : les élèves scannent et le livre s'ouvre à la même page sur leur téléphone.",
+        "img": "nouveautes/livre-qr.jpg"
+      },
+      "Pour trouver le simulateur de panneau d'alarme : tape « simulateur » dans la recherche de la bibliothèque."
+    ]
+  },
+  {
+    "date": "2026-10-21",
+    "type": "outil",
+    "titre": "Bibliothèque en ligne et hors ligne",
+    "texte": "La bibliothèque est sur Internet (lien à partager avec les collègues) et fonctionne sans Internet pour les livres déjà ouverts.",
+    "formation": [
+      "Ouvre chaque livre une fois avec Internet : il est gardé sur cet ordinateur.",
+      "Sans Internet, la bibliothèque et les livres déjà ouverts s'ouvrent quand même; un message l'indique.",
+      "Quand Internet revient, les livres modifiés se mettent à jour tout seuls (sans retélécharger ceux qui n'ont pas changé).",
+      "Si une vieille version reste affichée : Ctrl+F5."
+    ]
+  },
+  {
+    "date": "2026-10-21",
+    "type": "outil",
+    "titre": "Recherche, filtre et code QR",
+    "texte": "Recherche dans le texte de tous les livres, filtre par programme (DEP 5211 · DEP 5333) et code QR pour ouvrir le livre sur le téléphone des élèves.",
+    "formation": [
+      {
+        "t": "Tape un mot dans la barre de recherche : les pages des livres qui en parlent s'affichent; clique un résultat pour ouvrir le livre à cette page.",
+        "img": "nouveautes/recherche.jpg"
+      },
+      {
+        "t": "Boutons DEP 5211 et DEP 5333 en haut : seuls les livres de ce programme restent, classés par compétence.",
+        "img": "nouveautes/filtre.jpg"
+      },
+      {
+        "t": "Dans un livre, bouton QR (touche Q) : projette le code, les élèves le scannent et arrivent à la même page.",
+        "img": "nouveautes/livre-qr.jpg"
+      }
+    ],
+    "versions": [
+      {
+        "date": "2026-10-21",
+        "texte": "Code QR pour les élèves (touche Q)."
+      },
+      {
+        "date": "2026-10-21",
+        "texte": "Filtre par programme et livres classés par compétence."
+      },
+      {
+        "date": "2026-10-21",
+        "texte": "Recherche dans le texte des livres."
+      }
+    ]
+  }
 ]
