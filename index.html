@@ -2898,11 +2898,11 @@ function ajouterCote(s, txt, choixIdx){
   const libre = tous[choixIdx];
   const S = sommetsForme(f), Cx = S.P.reduce((t, q) => t + q[0], 0) / S.P.length * W, Cy = S.P.reduce((t, q) => t + q[1], 0) / S.P.length * H;
   const [u, v] = libre, an = Math.atan2((v[1] - u[1]) * H, (v[0] - u[0]) * W), nx = -Math.sin(an), ny = Math.cos(an), mx = (u[0] + v[0]) / 2 * W, my = (u[1] + v[1]) / 2 * H;
-  const iso = RD.wb && /^iso/.test(wbBg()), [dx0, dy0] = iso ? dirCote({ iso:1 }, an) : [nx, ny];
+  const iso = RD.wb && /^iso/.test(wbBg()) && (f.t === "objet" || (f.t === "ligne" && f.g !== undefined)), [dx0, dy0] = iso ? dirCote({ iso:1 }, an) : [nx, ny];
   let sg = S.ferme ? (Math.sign(dx0 * (mx - Cx) + dy0 * (my - Cy)) || 1) : (ny > 0 ? -1 : 1), ec = 30 * RD.z * (window.devicePixelRatio || 1);
   if (f.t === "objet"){ const B = objGeo(f, W, H).bbox, bx = (B[0] + B[2]) / 2, by = (B[1] + B[3]) / 2; sg = Math.sign(dx0 * (mx - bx) + dy0 * (my - by)) || 1; }   /* objet : du côté opposé au corps de l'objet, pour ne pas le cacher */
   snapInk(); const n = { t:"cote", c:f.c && !/^tuy|^maison/.test(f.t) ? f.c : "#24282c", hl:false, hc:null, w:2.5, p:[u.slice(), v.slice()], d:sg * (txt ? ec * .25 : ec) / H };
-  if (RD.wb && /^iso/.test(wbBg())) n.iso = 1;   /* plan iso : lignes de rappel sur les axes de la grille */
+  if (RD.wb && /^iso/.test(wbBg()) && (f.t === "objet" || (f.t === "ligne" && f.g !== undefined))) n.iso = 1;   /* objet iso ou tuyau iso : le texte suit l'angle de la pièce; une forme (rectangle, triangle…) garde son texte à plat */
   if (txt){ n.txt = 1; n.lb = "abcdefgh"[arcs(f).findIndex(([a2, b2]) => pres(a2, u) && pres(b2, v))] || "a"; }
   strokes().push(n); SELO.s = n; redrawInk(); try { majObjUI(); } catch(e){}
   const r = c.getBoundingClientRect(); modifierForme(n, r.left + mx * r.width / W, r.top + my * r.height / H); }
