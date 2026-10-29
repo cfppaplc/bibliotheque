@@ -581,6 +581,12 @@
   .reader.pen-fold .penbar{padding:6px 8px}
   .reader.pen-side .penbar,.reader.auto.calme.pen-side .penbar{left:auto;right:10px;bottom:auto;top:50%;transform:translateY(-50%);flex-direction:column;flex-wrap:wrap;align-content:flex-start;max-width:none;height:max-content;max-height:calc(100% - 150px);overflow:visible}
   .reader.pen-side .penbar .sep{width:26px;height:1px}
+  /* tableau blanc : la barre reste toujours en bas de l'écran (pas d'ancrage sur le côté) */
+  .reader.wbon .penbar,.reader.wbon.pen-side .penbar,.reader.auto.calme.wbon .penbar{left:50%;right:auto;top:auto;bottom:calc(12px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);flex-direction:row;max-width:94vw;max-height:none;height:auto;flex-wrap:wrap}
+  .reader.wbon.pen-side .penbar .sep{width:1px;height:26px}
+  .reader.wbon.pen-side .penbar .ppop{left:50%;right:auto;top:auto;bottom:calc(100% + 10px);transform:translateX(-50%)}
+  .reader.wbon #penSide{display:none!important}
+  body:has(.reader.wbon.open) .toast{bottom:calc(84px + env(safe-area-inset-bottom,0px))}   /* les messages passent au-dessus de la barre */
   .reader.pen-side.pen-fold .penbar{flex-wrap:nowrap}
   /* la palette des objets se place où l'on veut (poignée en haut) */
   #objBar.of>*:not(#objF):not(.tete){display:none!important}#objBar.sim>*:not(#objF):not(.tete):not(#objSim):not(.simAide){display:none!important}
