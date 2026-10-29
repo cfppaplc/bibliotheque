@@ -7989,6 +7989,9 @@ window.addEventListener("online", () => { try { aviser("Internet est revenu."); 
   body.clair #compteBtn .cloche{border-color:#fff}
   @keyframes sonne{0%,58%,100%{transform:rotate(0)}62%{transform:rotate(18deg)}68%{transform:rotate(-16deg)}74%{transform:rotate(12deg)}80%{transform:rotate(-8deg)}86%{transform:rotate(4deg)}}
   
+  /* outils réservés aux profs connectés (demande de Jeremy, 29 oct.) */
+  body:not(.connecte) #planBtn,body:not(.connecte) #accueilBtn,body:not(.connecte) #wbBtn,
+  body:not(.connecte) #plusOv [data-plus="plans"],body:not(.connecte) #plusOv [data-plus="accueil"],body:not(.connecte) #plusOv [data-plus="wb"]{display:none!important}
   /* accueil 10 % plus petit sur ordinateur (demande de Jeremy, 29 oct.); livres, tableau blanc et cellulaire inchangés */
   @media (min-width:641px){header,#hero,#filtres,main#rows,footer{zoom:.9}}
   .prefs h3{margin:16px 0 6px;font-size:.78rem;color:#8c8c92;text-transform:uppercase;letter-spacing:.05em}
@@ -8187,6 +8190,7 @@ window.ACCES = (function(){
     else { b.innerHTML = ICO_PERS + '<span class="lbl"> Se connecter</span>'; b.title = "Se connecter (livres protégés)"; }
     b.setAttribute("aria-label", b.title);
     const t = document.getElementById("plusCompte"); if (t) t.textContent = SESSION ? "Mon compte (" + SESSION.nom + ")" : "Se connecter";
+    document.body.classList.toggle("connecte", !!SESSION);   /* Plans, Accueil de classe, Tableau blanc : seulement une fois connecté */
     try { window.appliquerPrefs && window.appliquerPrefs(); } catch(e){}
   }
   function menu(){
@@ -8435,6 +8439,9 @@ window.ACCES = (function(){
   }
   window.dlgPrefs = () => { const ov = document.getElementById("accesOv"), B = document.getElementById("accesBox"); B.classList.remove("large"); ov.hidden = false; contenu(B); };
   if (window.ACCES && ACCES.pret) ACCES.pret.then(() => window.appliquerPrefs()).catch(() => {});
+  /* filet de sécurité : si un de ces boutons est touché sans être connecté, on ouvre la connexion, puis l'outil */
+  document.addEventListener("click", e => { const b = e.target.closest && e.target.closest('#planBtn, #accueilBtn, #wbBtn'); if (!b || (window.ACCES && ACCES.session)) return;
+    e.preventDefault(); e.stopImmediatePropagation(); if (window.ACCES) ACCES.dlgConnexion(() => b.click()); }, true);
 })();
 </script>
 
