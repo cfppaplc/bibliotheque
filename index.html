@@ -2400,6 +2400,9 @@ function drawStroke(g, s, W, H, k){
     } else if (s.t === "rect"){ g.rect(Math.min(x1, x2), Math.min(y1, y2), Math.abs(x2 - x1), Math.abs(y2 - y1)); }
     else if (s.t === "ellipse"){ g.ellipse((x1 + x2) / 2, (y1 + y2) / 2, Math.max(1, Math.abs(x2 - x1) / 2), Math.max(1, Math.abs(y2 - y1) / 2), 0, 0, Math.PI * 2); }
     const habillage = () => {     /* cadre de sélection et étiquette (double-clic), pour toutes les formes */
+      if ((s.lbA || s.lbB) && /^(fleche|fleche2|ligne)$/.test(s.t)){ const L = Math.hypot(x2 - x1, y2 - y1) || 1, ux = (x2 - x1) / L, uy = (y2 - y1) / L, tzz = s.tz || 1, m = 12 * k * tzz;   /* texte au départ et à la pointe */
+        const bout = (txt, x, y, sg) => { const dx = ux * sg, dy = uy * sg; if (Math.abs(dx) >= Math.abs(dy) * .6) etiquette(g, txt, x + dx * m * .6, y + dy * m * .6, k, col, dx > 0 ? "left" : "right", tzz); else etiquette(g, txt, x + dx * m * 1.3, y + dy * m * 1.3, k, col, "center", tzz); };
+        if (s.lbA) bout(s.lbA, x1, y1, -1); if (s.lbB) bout(s.lbB, x2, y2, 1); }
       if (RD.obj && typeof SELO !== "undefined" && SELO.s === s) cadreForme(g, s, W, H, k);
       if (s.lb && s.lp && /^(ligne|fleche|fleche2|tuy[A-Z]+)$/.test(s.t)){ const tz = s.tz || 1, m = 10 * k * tz + (s.w || 4) * k * .9, A = [x1, y1], B = [x2, y2];   /* l'écart suit l'épaisseur de la flèche */
         if (s.lp === "gauche" || s.lp === "droite"){ const E = (s.lp === "droite") === (B[0] >= A[0]) ? B : A, O = E === B ? A : B, L = Math.hypot(E[0] - O[0], E[1] - O[1]) || 1, ux = (E[0] - O[0]) / L, uy = (E[1] - O[1]) / L;
@@ -2560,7 +2563,7 @@ function dessinerForme(g, s, x1, y1, x2, y2, k, col){
     { const an0 = Math.atan2(y2 - y1, x2 - x1), off = (s.d || 0) * (g.canvas ? g.canvas.height : 0), DC = dirCote(s, an0), ox = DC[0] * off, oy = DC[1] * off;
       if (s.txt){ const tz = s.tz || 1; g.save(); g.fillStyle = col; g.font = "700 " + Math.round(16 * k * tz) + "px system-ui, sans-serif"; g.textAlign = "center"; g.textBaseline = "middle";   /* texte sur un côté (sans ligne de cote) */
         const tx = s.lb || "?", tw = g.measureText(tx).width, th = 16 * k * tz, sg = Math.sign(off) || 1, ux = DC[0] * sg, uy = DC[1] * sg, ext = Math.abs(ux) * tw / 2 + Math.abs(uy) * th / 2;   /* le texte ne touche jamais le côté */
-        g.fillText(tx, (x1 + x2) / 2 + ux * (Math.abs(off) + ext), (y1 + y2) / 2 + uy * (Math.abs(off) + ext)); g.restore(); return; }
+        const txx = (x1 + x2) / 2 + ux * (Math.abs(off) + ext), txy = (y1 + y2) / 2 + uy * (Math.abs(off) + ext); g.lineJoin = "round"; g.lineWidth = 4 * k * tz; g.strokeStyle = wbSombre() ? "rgba(0,0,0,.55)" : "rgba(255,255,255,.9)"; g.strokeText(tx, txx, txy); g.fillText(tx, txx, txy); g.restore(); return; }
       if (Math.abs(off) > 2){ const sg = Math.sign(off), ux = DC[0] * sg, uy = DC[1] * sg, gap = 4 * k, dep = 8 * k;   /* lignes de rappel */
         g.save(); g.lineWidth = Math.max(1, lw * .5); g.beginPath();
         [[x1, y1], [x2, y2]].forEach(([x, y]) => { g.moveTo(x + ux * gap, y + uy * gap); g.lineTo(x + ox + ux * dep, y + oy + uy * dep); }); g.stroke(); g.restore(); g.beginPath(); }
@@ -2674,7 +2677,7 @@ function redrawInk(){
   const k = (window.devicePixelRatio || 1) * RD.z;
   if (RD.wb && (/^iso/.test(wbBg()) || wbBg() === "lignes" || wbBg() === "quad")) grilleIso(g, c.width, c.height, k);
   const tous = INKS[inkKey()] || [];                                       /* les objets cachent les traits qui passent derrière ; les textes restent par-dessus */
-  [s => s.t !== "objet" && s.t !== "texte", s => s.t === "objet", s => s.t === "texte"].forEach((f, i) => { tous.filter(f).forEach(s => drawStroke(g, s, c.width, c.height, k));
+  [s => s.t !== "objet" && s.t !== "texte" && s.t !== "cote", s => s.t === "objet", s => s.t === "cote", s => s.t === "texte"].forEach((f, i) => { tous.filter(f).forEach(s => drawStroke(g, s, c.width, c.height, k));
     /* croisementsIso retiré à la demande de Jeremy (28 oct.) : trop de bogues */ });
   if (window.SELM && SELM.length){ g.save(); g.setLineDash([6 * k, 4 * k]); g.lineWidth = 1.6 * k; g.strokeStyle = "#2a7bcf";
     let T = null; SELM.forEach(o => { if (!strokes().includes(o)) return; const b = boiteDe(o, c.width, c.height); if (!b) return;
@@ -2755,23 +2758,24 @@ const VALEURS_FORME = {
   bulle:{ q:"Numéro ou lettre de la bulle", ex:"A" } };
 function modifierForme(s, cx, cy){
   const V = s.t === "objet" ? (s.k === "jonction" ? null : ELEC[s.k] ? (s.k === "rails" ? { q:"Nom des rails (ex. L1 / L2, 120 V)", ex:"L1 / L2" } : { q:"Repère du symbole (ex. CR1, M, PB2)", ex:"CR1" }) : { q:"Nom de l'objet (ex. P-1, Chaudière 1)", ex:"P-1" })
-    : ((s.t === "cote" && s.txt ? { q:"Texte sur ce côté (ex. a, 3 m, hypoténuse)", ex:"a" } : VALEURS_FORME[s.t]) || (/^tuy/.test(s.t) ? { q:"Diamètre du tuyau (ex. 3/4 po, 3 po ABS)", ex:"3/4 po" } : { q:"Nom au centre (facultatif)", ex:"A" }));
+    : ((s.t === "cote" && s.txt ? { q:"Texte sur ce côté (ex. a, 3 m, hypoténuse)", ex:"a" } : VALEURS_FORME[s.t]) || (/^tuy/.test(s.t) ? { q:"Diamètre du tuyau (ex. 3/4 po, 3 po ABS)", ex:"3/4 po" } : (/^(fleche|fleche2|ligne)$/.test(s.t) ? { q:"Texte au milieu (facultatif)", ex:"" } : { q:"Nom au centre (facultatif)", ex:"A" })));
   if (!V) return;
   const old = document.getElementById("formeVal"); if (old) old.remove();
   const box = document.createElement("div"); box.id = "formeVal";
   box.style.cssText = "position:fixed;z-index:90;left:" + Math.max(8, Math.min(innerWidth - 300, cx - 140)) + "px;top:" + Math.max(8, Math.min(innerHeight - (s.t === "cote" ? 300 : 130), cy + 18)) + "px;width:280px;padding:10px;border-radius:12px;background:#0e0e0f;border:1px solid #6aa9ff;color:#e4e4e7;font:600 .8rem system-ui,sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.4)";
   const actuel = s.t === "angle" && !s.lb ? String(Math.round(Math.abs(Math.atan2(s.p[1][1] - s.p[0][1], (s.p[1][0] - s.p[0][0]) * ($("#inkCanvas").width / $("#inkCanvas").height))) * 180 / Math.PI)) : (s.lb || (s.t === "bulle" ? String(s.n || 1) : ""));
   box.innerHTML = '<div style="margin-bottom:6px;line-height:1.3">' + V.q + '</div><div style="display:flex;gap:6px"><input style="flex:1;min-width:0;min-height:38px;border-radius:8px;border:1px solid #2f2f33;padding:0 8px;font:700 1rem system-ui;color:#111;background:#fff" placeholder="' + V.ex + '"><button style="min-height:38px;padding:0 12px;border-radius:8px;border:0;background:#1f6fc2;color:#fff;font:700 .85rem system-ui;cursor:pointer">OK</button></div>';
-  const extras = s.t !== "objet" ? [] : s.k === "transfo" ? [["Tension au primaire (H1-H2)", "vp", "120 V"], ["Tension au secondaire (X1-X2)", "vs", "24 V"]] : s.k === "rails" ? [["Tension de l'échelle (au centre)", "v", "120 V c.a."]] : [];
+  const extras = /^(fleche|fleche2|ligne)$/.test(s.t) && s.g === undefined ? [["Texte où la flèche commence", "lbA", "ex. Eau froide"], [s.t === "ligne" ? "Texte au bout" : "Texte où la flèche pointe", "lbB", "ex. Robinet"]] : s.t !== "objet" ? [] : s.k === "transfo" ? [["Tension au primaire (H1-H2)", "vp", "120 V"], ["Tension au secondaire (X1-X2)", "vs", "24 V"]] : s.k === "rails" ? [["Tension de l'échelle (au centre)", "v", "120 V c.a."]] : [];
   extras.forEach(([lab, cle, ph]) => { const r = document.createElement("label"); r.style.cssText = "display:flex;flex-direction:column;gap:3px;margin-top:8px;line-height:1.3";
     r.innerHTML = '<span>' + lab + '</span><input data-cle="' + cle + '" placeholder="' + ph + '" style="min-height:36px;border-radius:8px;border:1px solid #2f2f33;padding:0 8px;font:700 .95rem system-ui;color:#111;background:#fff">';
     r.querySelector("input").value = s[cle] || ""; box.appendChild(r); });
   if (s.k !== "jonction" && s.t !== "maison" && !/^tuy/.test(s.t) && !s.hl) couleurForme(box, s);
   if (s.t !== "bulle" && !(s.t === "objet" && ELEC[s.k])) tailleTexte(box, s);
-  if (s.t === "cote" || (s.t !== "objet" && !VALEURS_FORME[s.t] && !cotesPossibles(s)) || (s.t === "objet" && !ELEC[s.k])) padCote(box, s);   /* forme qui accepte « + Texte sur un côté » : pas besoin du pavé de position */
+  /* pavé de position (flèches) retiré à la demande de Jeremy : la cote se décale avec sa poignée bleue */   /* forme qui accepte « + Texte sur un côté » : pas besoin du pavé de position */
   if (cotesPossibles(s)){ const rang = document.createElement("div"); rang.style.cssText = "display:flex;gap:6px;margin-top:10px";
     const st = "flex:1;min-height:40px;border-radius:9px;border:1px solid #6aa9ff;border-bottom-width:4px;color:#fff;font:800 .85rem system-ui;cursor:pointer;padding:0 6px";
-    rang.innerHTML = '<button type="button" data-plus="txt" title="Ajoute un texte (a, b, c…) sur le côté que tu choisis" style="' + st + ';background:#1f6fc2">+ Texte sur un côté</button><button type="button" data-plus="cote" title="Ajoute une ligne de cote sur le côté que tu choisis" style="' + st + ';background:#2a2a30">+ Cote</button>';
+    const flecheSeule = /^(fleche|fleche2|ligne)$/.test(s.t) && s.g === undefined;   /* flèche : textes au départ / à la pointe plus haut, pas besoin de « + Texte sur un côté » */
+    rang.innerHTML = (flecheSeule ? '' : '<button type="button" data-plus="txt" title="Ajoute un texte (a, b, c…) sur le côté que tu choisis" style="' + st + ';background:#1f6fc2">+ Texte sur un côté</button>') + '<button type="button" data-plus="cote" title="Ajoute une ligne de cote sur le côté que tu choisis" style="' + st + ';background:#2a2a30">+ Cote</button>';
     rang.addEventListener("mousedown", e => e.preventDefault()); box.appendChild(rang); }
   glisserCase(box);
   $("#reader").appendChild(box); placerCase(box, s, cx, cy);   /* la case se met à côté de l'objet, jamais dessus */
@@ -2797,6 +2801,7 @@ function modifierForme(s, cx, cy){
 function placerCase(box, s, cx, cy){
   const c = $("#inkCanvas"), r = c.getBoundingClientRect(), sx = r.width / c.width, sy = r.height / c.height, bw = box.offsetWidth, bh = box.offsetHeight, M = 8;
   let b = null; try { b = s.t === "objet" ? objGeo(s, c.width, c.height).bbox : cadrePx(s, c.width, c.height); } catch(e){}
+  if (b && s.t === "cote") try { const f = groupeCotes(s)[0]; if (f){ const bf = f.t === "objet" ? objGeo(f, c.width, c.height).bbox : cadrePx(f, c.width, c.height); b = [Math.min(b[0], bf[0]), Math.min(b[1], bf[1]), Math.max(b[2], bf[2]), Math.max(b[3], bf[3])]; } } catch(e){}   /* la case ne cache ni la cote ni sa forme */
   const dans = (x, y) => x >= M && y >= M && x + bw <= innerWidth - M && y + bh <= innerHeight - M, cx2 = x => Math.max(M, Math.min(innerWidth - bw - M, x)), cy2 = y => Math.max(M, Math.min(innerHeight - bh - M, y));
   if (!b){ box.style.left = cx2(cx - bw / 2) + "px"; box.style.top = cy2(cy + 18) + "px"; return; }
   const m = 30, o = [r.left + b[0] * sx - m, r.top + b[1] * sy - m, r.left + b[2] * sx + m, r.top + b[3] * sy + m];   /* marge : texte de la cote ou de l'étiquette */
@@ -2825,10 +2830,21 @@ function sommetsForme(s){ if (s && s.t === "objet" && !ELEC[s.k] && s.p){ const 
   if (s.t === "hexagone"){ const P = []; for (let i = 0; i < 6; i++){ const an = Math.PI / 3 * i; P.push([xm + (x1 - x0) / 2 * Math.cos(an), ym + (y1 - y0) / 2 * Math.sin(an)]); } return { P, ferme:true }; }
   return null; }
 const cotesPossibles = s => s.t === "cote" || !!sommetsForme(s);
+/* côtés qu'on peut coter ou nommer : ceux de la forme; pour un objet iso, aussi la longueur, la profondeur et la hauteur de son corps */
+function arcsForme(f){ const S = sommetsForme(f); if (!S) return []; let A = []; for (let i = 0; i < S.P.length - (S.ferme ? 0 : 1); i++) A.push([S.P[i], S.P[(i + 1) % S.P.length]]);
+  if (f.t === "objet" && !ELEC[f.k]){ const ports = A; A = []; const c = $("#inkCanvas"), W = c.width, H = c.height, G = objGeo(f, W, H); let B = null;
+    G.shapes.forEach(sh => { if (sh.t !== "box") return; const v = (sh.m1 - sh.m0) * (sh.n1 - sh.n0) * (sh.h1 - sh.h0); if (!B || v > B[0]) B = [v, sh]; });
+    if (B){ const b = B[1], N = q => [q[0] / W, q[1] / H], pres = (u, v) => Math.hypot((u[0] - v[0]) * W, (u[1] - v[1]) * H) < 6;
+      [[[b.m0, b.n1, b.h0], [b.m1, b.n1, b.h0]], [[b.m0, b.n0, b.h0], [b.m0, b.n1, b.h0]], [[b.m0, b.n0, b.h0], [b.m0, b.n0, b.h1]]].forEach(([U, V]) => {   /* arêtes du contour : longueur, profondeur, hauteur */
+        const u = N(G.P(...U)), v = N(G.P(...V)); if (!pres(u, v)) A.push([u, v]); }); }
+    const proche = ([u, v]) => A.some(([a, b2]) => { const d1 = [(v[0] - u[0]) * W, (v[1] - u[1]) * H], d2 = [(b2[0] - a[0]) * W, (b2[1] - a[1]) * H], L1 = Math.hypot(...d1), L2 = Math.hypot(...d2);   /* raccord à raccord : gardé s'il n'est pas presque sur une arête */
+      if (Math.abs(d1[0] * d2[1] - d1[1] * d2[0]) > .1 * L1 * L2) return false; const m = [((u[0] + v[0]) / 2 - a[0]) * W, ((u[1] + v[1]) / 2 - a[1]) * H]; return Math.abs(m[0] * d2[1] - m[1] * d2[0]) / (L2 || 1) < 18 * (window.devicePixelRatio || 1); });
+    A = ports.filter(q => !proche(q)).concat(A); }
+  return A; }
 /* + : une cote sur le prochain côté qui n'en a pas (pour une cote : sur un autre côté de la même forme) */
 function ajouterCote(s, txt, choixIdx){
   const c = $("#inkCanvas"), W = c.width, H = c.height, pres = (u, v) => Math.hypot((u[0] - v[0]) * W, (u[1] - v[1]) * H) < 4;
-  const arcs = f => { const S = sommetsForme(f); if (!S) return []; const A = []; for (let i = 0; i < S.P.length - (S.ferme ? 0 : 1); i++) A.push([S.P[i], S.P[(i + 1) % S.P.length]]); return A; };
+  const arcs = arcsForme;
   let f = s;
   if (s.t === "cote") f = strokes().find(o => o !== s && o.t !== "cote" && arcs(o).some(([u, v]) => (pres(u, s.p[0]) && pres(v, s.p[1])) || (pres(v, s.p[0]) && pres(u, s.p[1]))));
   if (!f){ aviser("Pour une autre cote, double-clique sur la forme elle-même.", 3500); return; }
@@ -2842,7 +2858,7 @@ function ajouterCote(s, txt, choixIdx){
   const iso = RD.wb && /^iso/.test(wbBg()), [dx0, dy0] = iso ? dirCote({ iso:1 }, an) : [nx, ny];
   let sg = S.ferme ? (Math.sign(dx0 * (mx - Cx) + dy0 * (my - Cy)) || 1) : (ny > 0 ? -1 : 1), ec = 30 * RD.z * (window.devicePixelRatio || 1);
   if (f.t === "objet"){ const B = objGeo(f, W, H).bbox, bx = (B[0] + B[2]) / 2, by = (B[1] + B[3]) / 2; sg = Math.sign(dx0 * (mx - bx) + dy0 * (my - by)) || 1; }   /* objet : du côté opposé au corps de l'objet, pour ne pas le cacher */
-  snapInk(); const n = { t:"cote", c:f.c && !/^tuy|^maison/.test(f.t) ? f.c : "#24282c", hl:false, hc:null, w:2.5, p:[u.slice(), v.slice()], d:sg * (txt ? ec * .3 : ec) / H };
+  snapInk(); const n = { t:"cote", c:f.c && !/^tuy|^maison/.test(f.t) ? f.c : "#24282c", hl:false, hc:null, w:2.5, p:[u.slice(), v.slice()], d:sg * (txt ? ec * (f.t === "objet" ? .5 : .3) : ec) / H };
   if (RD.wb && /^iso/.test(wbBg())) n.iso = 1;   /* plan iso : lignes de rappel sur les axes de la grille */
   if (txt){ n.txt = 1; n.lb = "abcdefgh"[arcs(f).findIndex(([a2, b2]) => pres(a2, u) && pres(b2, v))] || "a"; }
   strokes().push(n); SELO.s = n; redrawInk(); try { majObjUI(); } catch(e){}
@@ -2850,13 +2866,14 @@ function ajouterCote(s, txt, choixIdx){
 /* choisir le côté : chaque côté libre est surligné avec un gros bouton +; toucher ailleurs ou Échap = annuler */
 function choisirCote(f, tous, libres, txt, ok){
   const c = $("#inkCanvas"), r = c.getBoundingClientRect(), X = q => [r.left + q[0] * r.width, r.top + q[1] * r.height];
-  const S = sommetsForme(f), C = X([S.P.reduce((t, q) => t + q[0], 0) / S.P.length, S.P.reduce((t, q) => t + q[1], 0) / S.P.length]);
+  const S = sommetsForme(f); let C = X([S.P.reduce((t, q) => t + q[0], 0) / S.P.length, S.P.reduce((t, q) => t + q[1], 0) / S.P.length]);
+  const obj = f.t === "objet"; if (obj){ const B = objGeo(f, c.width, c.height).bbox; C = X([(B[0] + B[2]) / 2 / c.width, (B[1] + B[3]) / 2 / c.height]); }
   document.querySelectorAll(".choixCote").forEach(e => e.remove());
   const ov = document.createElementNS("http://www.w3.org/2000/svg", "svg"); ov.setAttribute("class", "choixCote");
   ov.style.cssText = "position:fixed;inset:0;width:100vw;height:100vh;z-index:100001;cursor:default";
   let h = '<rect x="0" y="0" width="100%" height="100%" fill="rgba(0,0,0,.08)"/>';
   libres.forEach(i => { const [u, v] = tous[i].map(X), mx = (u[0] + v[0]) / 2, my = (u[1] + v[1]) / 2, L = Math.hypot(v[0] - u[0], v[1] - u[1]) || 1;
-    let nx = -(v[1] - u[1]) / L, ny = (v[0] - u[0]) / L; if (S.ferme ? nx * (mx - C[0]) + ny * (my - C[1]) < 0 : ny > 0){ nx = -nx; ny = -ny; }
+    let nx = -(v[1] - u[1]) / L, ny = (v[0] - u[0]) / L; if (S.ferme || obj ? nx * (mx - C[0]) + ny * (my - C[1]) < 0 : ny > 0){ nx = -nx; ny = -ny; }
     const bx = mx + nx * 30, by = my + ny * 30;
     h += '<g data-i="' + i + '" style="cursor:pointer"><line x1="' + u[0] + '" y1="' + u[1] + '" x2="' + v[0] + '" y2="' + v[1] + '" stroke="#1f6fc2" stroke-opacity=".55" stroke-width="16" stroke-linecap="round"/>' +
       '<line x1="' + u[0] + '" y1="' + u[1] + '" x2="' + v[0] + '" y2="' + v[1] + '" stroke="transparent" stroke-width="40"/>' +
@@ -2878,17 +2895,17 @@ function glisserCase(box){
   bar.addEventListener("mousedown", e => e.preventDefault()); }
 /* une forme et les cotes / textes posés sur ses côtés (à partir de la forme ou d'une de ses cotes) */
 function groupeCotes(s){ const c = $("#inkCanvas"), W = c.width, H = c.height, pres = (u, v) => Math.hypot((u[0] - v[0]) * W, (u[1] - v[1]) * H) < 4;
-  const arcs = f => { const S = sommetsForme(f); if (!S) return []; const A = []; for (let i = 0; i < S.P.length - (S.ferme ? 0 : 1); i++) A.push([S.P[i], S.P[(i + 1) % S.P.length]]); return A; };
+  const arcs = arcsForme;
   const sur = (o, f) => arcs(f).some(([u, v]) => (pres(u, o.p[0]) && pres(v, o.p[1])) || (pres(v, o.p[0]) && pres(u, o.p[1])));
   const tous = strokes(), f = s.t === "cote" ? tous.find(o => o !== s && o.t !== "cote" && o.p && sur(s, o)) : s;
   if (!f) return []; return [f].concat(tous.filter(o => o.t === "cote" && o !== f && sur(o, f))).filter(o => o !== s); }
 /* cotes et textes posés sur les côtés d'une forme : on retient le côté (et le sens) pour qu'ils suivent quand la forme bouge ou change de taille */
 function liensCotes(f){ if (!f || f.t === "cote" || !sommetsForme(f)) return null; const c = $("#inkCanvas"), W = c.width, H = c.height, pres = (u, v) => Math.hypot((u[0] - v[0]) * W, (u[1] - v[1]) * H) < 4;
-  const S = sommetsForme(f), n = S.P.length - (S.ferme ? 0 : 1), L = [];
-  strokes().forEach(o => { if (o.t !== "cote" || !o.p) return; for (let i = 0; i < n; i++){ const u = S.P[i], v = S.P[(i + 1) % S.P.length];
+  const A = arcsForme(f), n = A.length, L = [];
+  strokes().forEach(o => { if (o.t !== "cote" || !o.p) return; for (let i = 0; i < n; i++){ const [u, v] = A[i];
     if (pres(u, o.p[0]) && pres(v, o.p[1])){ L.push([o, i, false]); return; } if (pres(v, o.p[0]) && pres(u, o.p[1])){ L.push([o, i, true]); return; } } });
   return L.length ? L : null; }
-function suivreCotes(L, f){ const S = sommetsForme(f); if (!S || !L) return; L.forEach(([o, i, rev]) => { const u = S.P[i], v = S.P[(i + 1) % S.P.length]; if (!u || !v) return; o.p = rev ? [v.slice(), u.slice()] : [u.slice(), v.slice()]; }); }
+function suivreCotes(L, f){ const A = arcsForme(f); if (!A.length || !L) return; L.forEach(([o, i, rev]) => { if (!A[i]) return; const [u, v] = A[i]; o.p = rev ? [v.slice(), u.slice()] : [u.slice(), v.slice()]; }); }
 /* couleur de la forme, dans la case du double-clic */
 function couleurForme(box, s){
   const row = document.createElement("div"); row.style.cssText = "display:flex;align-items:center;gap:6px;margin-top:10px;flex-wrap:wrap";
@@ -2915,7 +2932,7 @@ function padCote(box, s){
   const T = { haut:[0, -1, 0, "En haut de l'objet"], gauche:[-1, 0, -90, "À gauche de l'objet"], centre:[0, 0, 0, "Sur l'objet"], droite:[1, 0, 90, "À droite de l'objet"], bas:[0, 1, 180, "En bas de l'objet"] };
   const pad = document.createElement("div");
   const cote = s.t === "cote", defaut = s.t === "objet" ? "bas" : /^(ligne|fleche|fleche2|accolade|tuy[A-Z]+)$/.test(s.t) ? "haut" : "centre";
-  pad.innerHTML = '<div style="margin:10px 0 6px;line-height:1.3">' + (cote ? "Position de la cote" : "Position du texte") + '</div><div class="cpad" style="display:grid;grid-template-columns:repeat(3,48px);grid-template-rows:repeat(3,42px);gap:5px;justify-content:center">'
+  pad.innerHTML = '<div style="margin:10px 0 6px;line-height:1.3">' + (cote && !s.txt ? "Position de la cote" : "Position du texte") + '</div><div class="cpad" style="display:grid;grid-template-columns:repeat(3,48px);grid-template-rows:repeat(3,42px);gap:5px;justify-content:center">'
     + ["", "haut", "", "gauche", "centre", "droite", "", "bas", ""].map(k => k ? '<button type="button" data-pos="' + k + '" title="' + T[k][3] + '" aria-label="' + T[k][3] + '" style="display:flex;align-items:center;justify-content:center;border-radius:9px;border:1px solid #3a3a40;border-bottom-width:4px;background:#1c1c1f;color:#e4e4e7;cursor:pointer;padding:0">'
       + (k === "centre" ? CE : '<span style="display:flex;transform:rotate(' + T[k][2] + 'deg)">' + FL + '</span>') + '</button>' : '<span></span>').join("") + '</div>';
   box.appendChild(pad);

@@ -62,17 +62,19 @@
         "t": "Après « + Texte sur un côté » ou « + Cote », les côtés libres s'allument : touche celui que tu veux.",
         "img": "nouveautes/cote-cote.jpg"
       },
+      "Flèche : double-clic, puis écris le texte où la flèche commence et où elle pointe (ex. « Eau froide » → « Robinet »).",
       {
         "t": "Sur le plan isométrique, la cote suit les axes de la grille et donne la longueur en pas (ex. 6 carr.). Sur un tuyau dessiné au crayon, chaque tronçon droit se cote d'un coin à l'autre; sur un objet, d'un raccord à l'autre.",
         "img": "nouveautes/iso-cotes.jpg"
       },
       "Les cotes et les textes prennent la couleur de la forme et la suivent quand tu la déplaces ou l'agrandis.",
-      {
-        "t": "Double-clic sur une cote : écris la mesure et choisis de quel côté elle va. Tire son carré bleu pour l'éloigner.",
-        "img": "nouveautes/cote-position.jpg"
-      }
+      "Cote : touche-la puis tire son carré bleu pour l'éloigner ou la changer de côté."
     ],
     "versions": [
+      {
+        "date": "2026-10-28",
+        "texte": "Flèches : texte au départ et à la pointe. Objets iso : textes et cotes sur la longueur, la profondeur et la hauteur, par-dessus l'objet. Pavé de flèches retiré."
+      },
       {
         "date": "2026-10-28",
         "texte": "Objets iso : le texte et la cote se placent sous l'objet (ou à côté s'il est debout), jamais par-dessus."
