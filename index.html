@@ -1456,7 +1456,7 @@ function attach(){
   /* Le bouton ✓ est toujours là (barre identique partout) ; grisé si le livre n'a pas de réponses */
   $("#tbAns").hidden = false; $("#tbAns").dataset.k = "";
   if (!RD.drv.ansInfo){ const bt = $("#tbAns"); bt.disabled = true; bt.classList.remove("on"); bt.innerHTML = ICO_CHECK; bt.title = "Ce livre n'a pas de réponses à afficher"; bt.setAttribute("aria-label", bt.title); }
-  hookKeys(win);
+  hookKeys(win); try { verrouEleve(win, doc); } catch(e){}
   try { installAnim(win, doc); } catch(e){}
   try { win.dispatchEvent(new Event("resize")); const ae = document.activeElement; if (!(ae && (/^(INPUT|TEXTAREA|SELECT)$/.test(ae.tagName) || ae.isContentEditable))) win.focus(); } catch(e){}   /* ne pas voler le focus d'une case où l'on écrit */
   poll();
@@ -1760,7 +1760,7 @@ function setupSecond(){
   try {
     const win = f2.contentWindow, doc = f2.contentDocument;
     if (!doc || !doc.body) return;
-    RD.drv2 = buildDriver(win, doc); hookKeys(win);
+    RD.drv2 = buildDriver(win, doc); hookKeys(win); try { verrouEleve(win, doc); } catch(e){}
     try { installAnim(win, doc); } catch(e){}
     try { win.dispatchEvent(new Event("resize")); } catch(e){}
     syncSecond(); setTimeout(layoutDbl, 400);
@@ -2526,7 +2526,7 @@ function drawStroke(g, s, W, H, k){
     if (s.lb && !ELEC[s.k]){ const [ex, ey, al] = posEtiquette(s.lp || "bas", G.bbox, k, s.tz); etiquette(g, s.lb, ex, ey, k, colO, al, s.tz); }   /* nom d'un objet isométrique (double-clic) */ if (typeof SELO !== "undefined" && SELO.s === s){ g.save(); g.setLineDash([8 * k, 6 * k]); g.strokeStyle = "#6aa9ff"; g.lineWidth = 2 * k; g.strokeRect(G.bbox[0] - 6, G.bbox[1] - 6, G.bbox[2] - G.bbox[0] + 12, G.bbox[3] - G.bbox[1] + 12); g.restore(); } return; }
   if (s.t === "texte"){
     if (s.cache) return;
-    const fs = txFs(s) * k, lh = s.lig ? 34 * 1.25 * k : fs * 1.25; g.font = txFont(s, fs); g.fillStyle = s.hl ? "#24282c" : col; g.textBaseline = s.lig ? "alphabetic" : "top";
+    const fs = txFs(s) * k, lh = s.lig ? (s.lh ? s.lh * H : 34 * 1.25 * k) : fs * 1.25; g.font = txFont(s, fs); g.fillStyle = s.hl ? "#24282c" : col; g.textBaseline = s.lig ? "alphabetic" : "top";
     habiller(g, s.txt, s.bw ? s.bw * W : 1e9).forEach((ln, i) => g.fillText(ln, s.p[0][0] * W, s.p[0][1] * H + (s.lig ? (i + 1) * lh - 3 * k : i * lh))); return;
   }
   g.beginPath();
@@ -3227,7 +3227,7 @@ function redrawBientot(){ if (!rafInk) rafInk = requestAnimationFrame(() => { ra
 const TX = { f:TXFONTS[0][1], fs:32, b:true, i:false }, SEL = { s:null };
 function mesurerTexte(s){
   const c = $("#inkCanvas"), g = c.getContext("2d"), k = (window.devicePixelRatio || 1) * RD.z, f = txFs(s) * k;
-  g.font = txFont(s, f); const lg = habiller(g, s.txt, s.bw * c.width); s.bb = [s.bw, lg.length * (s.lig ? 34 * 1.25 * k : f * 1.25) / c.height];
+  g.font = txFont(s, f); const lg = habiller(g, s.txt, s.bw * c.width); s.bb = [s.bw, lg.length * (s.lig ? (s.lh ? s.lh * c.height : 34 * 1.25 * k) : f * 1.25) / c.height];
 }
 function rectTexte(s){ const c = $("#inkCanvas"), r = c.getBoundingClientRect(); mesurerTexte(s);
   return { x:r.left + s.p[0][0] * r.width, y:r.top + s.p[0][1] * r.height, w:s.bw * r.width, h:Math.max(24, s.bb[1] * r.height) }; }
@@ -3236,12 +3236,12 @@ function texteSous(q){
     if (q[0] >= s.p[0][0] - .004 && q[0] <= s.p[0][0] + s.bw + .004 && q[1] >= s.p[0][1] - .004 && q[1] <= s.p[0][1] + s.bb[1] + .004) return s; }
   return null;
 }
-function ouvrirTexte(cx, cy, q, bw, bh, ex){
+function ouvrirTexte(cx, cy, q, bw, bh, ex, lv){   /* lv = ligne d'un livre { hL, fs } : la case s'aligne sur la ligne de réponse */
   document.querySelectorAll(".inktxt").forEach(t => t.blur());
-  const c = $("#inkCanvas"), key = inkKey(), P = ex || { f:TX.f, fs:TX.fs, b:TX.b, i:TX.i };
+  const c = $("#inkCanvas"), key = inkKey(), P = ex || (lv ? { f:TX.f, fs:lv.fs / RD.z, b:false, i:false } : { f:TX.f, fs:TX.fs, b:TX.b, i:TX.i });
   const col = ex ? ex.c : (/^hl/.test(RD.color) ? "#24282c" : RD.color), fsCss = txFs(P) * RD.z;
-  const lig = ex ? !!ex.lig : !!(RD.wb && wbBg() === "lignes"), hL = 34 * 1.25 * RD.z;        /* feuille lignée : le texte s'écrit sur les lignes */
-  if (lig && !ex){ const r = c.getBoundingClientRect(), top = Math.round((cy - r.top) / hL) * hL; cy = r.top + top; q = [q[0], top / r.height]; bh = Math.max(2 * hL, Math.round(bh / hL) * hL); }
+  const lig = ex ? !!ex.lig : (lv ? true : !!(RD.wb && wbBg() === "lignes")), hL = lv ? lv.hL : (ex && ex.lh ? ex.lh * c.getBoundingClientRect().height : 34 * 1.25 * RD.z);        /* feuille lignée : le texte s'écrit sur les lignes */
+  if (lig && !ex && !lv){ const r = c.getBoundingClientRect(), top = Math.round((cy - r.top) / hL) * hL; cy = r.top + top; q = [q[0], top / r.height]; bh = Math.max(2 * hL, Math.round(bh / hL) * hL); }
   const ta = document.createElement("textarea"); ta.className = "inktxt"; ta.spellcheck = false; ta.placeholder = "Écrire…"; if (ex){ ta.value = ex.txt; ex.cache = true; redrawInk(); }
   ta.style.cssText = "position:fixed;z-index:80;box-sizing:border-box;left:" + cx + "px;top:" + cy + "px;width:" + bw + "px;height:" + bh + "px;margin:0;padding:0;border:0;outline:2px dashed #6aa9ff;outline-offset:0;background:rgba(255,255,255,.08);resize:none;overflow:auto;white-space:pre-wrap;line-height:1.25;color:" + (col === "#24282c" && wbSombre() ? "#f4f1ea" : col);
   ta.style.font = txFont(P, fsCss).replace(/^((italic )?\d+ )/, "$1") ; ta.style.lineHeight = "1.25";
@@ -3252,13 +3252,43 @@ function ouvrirTexte(cx, cy, q, bw, bh, ex){
     if (ex){ ex.cache = false;
       if (ok && txt !== ex.txt){ snapInk(key); if (!txt){ INKS[key] = INKS[key].filter(x => x !== ex); SEL.s = null; } else { ex.txt = txt; mesurerTexte(ex); } }
       redrawInk(); return; }
-    if (ok && txt){ const s = { c:col, hl:false, w:4, t:"texte", lig, txt, p:[q, q], bw:bw / c.getBoundingClientRect().width, f:TX.f, fs:TX.fs, b:TX.b, i:TX.i };
+    if (ok && txt){ const s = { c:col, hl:false, w:4, t:"texte", lig, txt, p:[q, q], bw:bw / c.getBoundingClientRect().width, f:P.f, fs:P.fs, b:P.b, i:P.i };
+      if (lv) s.lh = hL / c.getBoundingClientRect().height;
       mesurerTexte(s); snapInk(key); (INKS[key] = INKS[key] || []).push(s); SEL.s = s; redrawInk(); } };
   ta.onkeydown = e => { e.stopPropagation(); if (e.key === "Escape"){ e.preventDefault(); fin(false); } else if (e.key === "Enter" && (e.ctrlKey || e.metaKey)){ e.preventDefault(); fin(true); } };   /* Entrée = nouvelle ligne; Ctrl+Entrée ou toucher à côté = terminé */
   if (!lig) ta.oninput = () => { if (ta.scrollHeight > ta.clientHeight){ ta.style.height = ta.scrollHeight + 4 + "px"; } };   /* la case grandit avec les lignes */
   if (lig) ta.oninput = () => { ta.style.height = "auto"; ta.style.height = Math.max(bh, Math.ceil(ta.scrollHeight / hL) * hL) + "px"; };   /* feuille lignée : Entrée passe à la ligne suivante, la zone grandit ; Ctrl+Entrée ou un clic ailleurs valide */
   ta.onblur = () => fin(true);
   $("#reader").appendChild(ta); setTimeout(() => { ta.focus(); }, 0);
+}
+/* Ligne de réponse d'un livre sous le doigt (x, y de l'écran) : bordure du bas (ligne, case à remplir) ou lignes répétées en fond.
+   Rend { x, y (la ligne), w, hL (interligne), fs } en pixels de l'écran, ou null. Marche pour tous les livres, sans connaître leurs classes. */
+function ligneDuLivre(X, Y){
+  for (const id of ["#readerFrame", "#readerFrame2"]){
+    const f = $(id); if (!f || f.hidden) continue; const fr = f.getBoundingClientRect(); if (X < fr.left || X > fr.right || Y < fr.top || Y > fr.bottom) continue;
+    let win, doc; try { win = f.contentWindow; doc = f.contentDocument; } catch(e){ continue; } if (!doc || !doc.body) continue;
+    const s = fr.width / (win.innerWidth || fr.width), bx = (X - fr.left) / s, by = (Y - fr.top) / s;
+    const sous = doc.elementsFromPoint(bx, by), boite = (sous.find(e => e.matches && e.matches(".page,.slide,.diapo,section,[data-page]")) || doc.body);
+    const C = []; let n = 0;
+    for (const e of boite.querySelectorAll("*")){ if (++n > 4000) break;
+      const r = e.getBoundingClientRect(); if (r.width < 24 || r.right < bx - 4 || r.left > bx + 4 || r.bottom < by - 40 || r.top > by + 48) continue;
+      const cs = win.getComputedStyle(e); if (cs.visibility === "hidden" || cs.display === "none" || +cs.opacity === 0) continue;
+      const sc = e.offsetWidth ? r.width / e.offsetWidth : 1, bb = parseFloat(cs.borderBottomWidth) || 0;
+      if (bb >= .5 && cs.borderBottomStyle !== "none" && r.height <= 70 * sc){
+        let sp = 0; const nx = e.nextElementSibling; if (nx && nx.className === e.className){ const r2 = nx.getBoundingClientRect(); sp = r2.bottom - r.bottom; if (sp < 12 * sc || sp > 70 * sc) sp = 0; }
+        C.push({ y:r.bottom - bb * sc / 2, l:r.left, r:r.right, sp, sc }); }
+      const bg = cs.backgroundImage || "";
+      if (/linear-gradient/.test(bg) && r.height >= 16 * sc && by >= r.top - 4 && by <= r.bottom + 4){
+        const bs = (cs.backgroundSize || "").split(" "); let P = bs[1] && /px$/.test(bs[1]) ? parseFloat(bs[1]) : Math.max(0, ...[...bg.matchAll(/([\d.]+)px/g)].map(m => +m[1]));
+        if (P >= 10 && P <= 80){ const Pv = P * sc, k = Math.max(1, Math.ceil((by - r.top) / Pv - .1)), y = Math.min(r.top + k * Pv, r.top + Math.floor(r.height / Pv + .01) * Pv);
+          C.push({ y, l:r.left, r:r.right, sp:Pv, sc }); } } }
+    let best = null, bd = 1e9;
+    C.forEach(c => { const d = c.y - by, cout = d >= -10 ? d + 10 : 40 - d; if (Math.abs(d) <= 40 && cout < bd){ bd = cout; best = c; } });
+    if (!best) return null;
+    const sc = best.sc || 1, fsB = Math.max(11 * sc, Math.min(30 * sc, (best.sp || 26 * sc) * .62)), hL = best.sp || fsB * 1.6;
+    return { x:fr.left + best.l * s + 2, y:fr.top + best.y * s, w:Math.max(60, (best.r - best.l) * s - 4), hL:hL * s, fs:fsB * s };
+  }
+  return null;
 }
 function modifierTexte(s){ const r = rectTexte(s); ouvrirTexte(r.x, r.y, s.p[0], r.w, r.h, s); }
 /* barre d'options du texte + cadre de sélection */
@@ -4121,6 +4151,8 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     if (mv){ mv = null; return; }
     if (!z) return; const r = c.getBoundingClientRect(); box.remove(); box = null;
     let x = Math.min(z.x, z.x2), y = Math.min(z.y, z.y2), w = Math.abs(z.x2 - z.x), h = Math.abs(z.y2 - z.y); z = null;
+    if (!RD.wb && w < 40 && h < 30){ const L = ligneDuLivre(x + w / 2, y + h / 2);   /* livre : toucher une ligne de réponse = la case s'aligne dessus */
+      if (L){ ouvrirTexte(L.x, L.y - L.hL, [(L.x - r.left) / r.width, (L.y - L.hL - r.top) / r.height], L.w, L.hL, null, L); return; } }
     if (w < 40) w = 260; if (h < 30) h = 90;                                /* simple clic : zone par défaut */
     let q = [(x - r.left) / r.width, (y - r.top) / r.height];
     if (/^iso/.test(wbBg()) && RD.wb){ const k = r.width / (c.offsetWidth || r.width), a = (34 * RD.z) * 1.2 * k, d = a * .8660254, sx = Math.round((x - r.left) / d), sy = Math.round((y - r.top) / a - (sx & 1 ? .5 : 0)) + (sx & 1 ? .5 : 0); q = [sx * d / r.width, sy * a / r.height]; x = r.left + sx * d; y = r.top + sy * a; }
@@ -4631,7 +4663,16 @@ function turn(dir){ RD.bouge = true;
 function toggleAnim(){ if (RD.drv){ RD.drv.toggleAnim(); if (RD.dbl && RD.drv2){ try { RD.drv2.toggleAnim(); } catch(e){} } setTimeout(poll, 100); } }
 /* Réponses : cachées → pas à pas → toutes → cachées, identique sur les deux pages en double page */
 function pagesDrv(){ return [RD.drv].concat(RD.dbl && RD.drv2 ? [RD.drv2] : []).filter(d => d && d.answers); }
+const estEleve = () => !!(window.ACCES && ACCES.eleve);
+/* élèves : les réponses du livre restent cachées (rien ne peut les afficher) */
+function verrouEleve(win, doc){
+  if (!estEleve() || doc.__eleve) return; doc.__eleve = true;
+  const CL = ["answers", "stepans", "h-rep", "h-pas"], net = () => CL.forEach(c => doc.body.classList.contains(c) && doc.body.classList.remove(c)); net();
+  new win.MutationObserver(net).observe(doc.body, { attributes:true, attributeFilter:["class"] });
+  win.addEventListener("keydown", e => { if (/^r$/i.test(e.key || "") && !enSaisie(e.target)){ e.preventDefault(); e.stopImmediatePropagation(); } }, true);
+}
 function answers(){
+  if (estEleve()) return;
   const ds = pagesDrv(); if (!ds.length) return;
   const sans = d => { try { return d.ansInfo ? d.ansInfo() : null; } catch(e){ return null; } };
   const inf = ds.map(sans).filter(i => i && !i.dis);
@@ -4673,7 +4714,9 @@ function hostKey(e){
     if ((e.ctrlKey || e.metaKey) && (e.key === "y" || e.key === "Y")){ redoInk(); return true; }
     return false;
   }
-  const f = HOSTKEYS[(e.key || "").toLowerCase()];
+  const k0 = (e.key || "").toLowerCase();
+  if (estEleve() && "rbetlconkq".includes(k0) && k0) return true;   /* élèves : pas de réponses, tableau blanc, tableau de bord ni outils de présentation */
+  const f = HOSTKEYS[k0];
   if (!f) return false;
   f(); return true;
 }
@@ -7989,6 +8032,11 @@ window.addEventListener("online", () => { try { aviser("Internet est revenu."); 
   body.clair #compteBtn .cloche{border-color:#fff}
   @keyframes sonne{0%,58%,100%{transform:rotate(0)}62%{transform:rotate(18deg)}68%{transform:rotate(-16deg)}74%{transform:rotate(12deg)}80%{transform:rotate(-8deg)}86%{transform:rotate(4deg)}}
   
+  /* mode élève (compte de groupe) : seulement lire, crayon, texte, gomme, annuler */
+  body.eleve #planBtn,body.eleve #accueilBtn,body.eleve #wbBtn,body.eleve #quoiNeuf,body.eleve #adminBtn,body.eleve .hero-tag,
+  body.eleve #plusOv [data-plus="plans"],body.eleve #plusOv [data-plus="accueil"],body.eleve #plusOv [data-plus="wb"],
+  body.eleve #tbAns,body.eleve #tbWb,body.eleve #tbTimer,body.eleve #tbSpot,body.eleve #tbCache,body.eleve #tbLaser,body.eleve #tbNoir,body.eleve #tbMark,body.eleve #tbPin,body.eleve #tbPrint,body.eleve #tbQr,
+  body.eleve #tdbPill,body.eleve #readerTdb,body.eleve #tbMore,body.eleve #tbHelp,body.eleve #penO,body.eleve #wbSch,body.eleve #objSch{display:none!important}
   /* outils réservés aux profs connectés (demande de Jeremy, 29 oct.) */
   body:not(.connecte) #planBtn,body:not(.connecte) #accueilBtn,body:not(.connecte) #wbBtn,
   body:not(.connecte) #plusOv [data-plus="plans"],body:not(.connecte) #plusOv [data-plus="accueil"],body:not(.connecte) #plusOv [data-plus="wb"]{display:none!important}
@@ -8073,7 +8121,7 @@ window.ACCES = (function(){
     try { const r = await fetch("comptes.json", { cache:"no-cache" }); DATA = r.ok ? await r.json() : null; } catch(e){ DATA = null; }
     if (!DATA) try { DATA = JSON.parse(localStorage.getItem("accesCopie") || "null"); } catch(e){}          /* hors ligne : dernière copie */
     else try { localStorage.setItem("accesCopie", JSON.stringify(DATA)); } catch(e){}
-    try { const s = await idbGet("session"); if (s && DATA && DATA.comptes[s.id]) SESSION = Object.assign(s, { nom:DATA.comptes[s.id].nom, admin:!!DATA.comptes[s.id].admin }); } catch(e){}
+    try { const s = await idbGet("session"); if (s && DATA && DATA.comptes[s.id]) SESSION = Object.assign(s, { nom:DATA.comptes[s.id].nom, admin:!!DATA.comptes[s.id].admin, eleve:!!DATA.comptes[s.id].eleve }); } catch(e){}
     estPret = true; finPret(); majBouton(); try { render(); } catch(e){}
     relancerDemande(); compterDemandes();
   }
@@ -8112,7 +8160,7 @@ window.ACCES = (function(){
     catch(e){ throw new Error("Mot de passe incorrect."); }
     const priv = c.pub.kty === "EC" ? await sub.importKey("jwk", { kty:"EC", crv:"P-256", x:c.pub.x, y:c.pub.y, d:b64u(new Uint8Array(pk8)), ext:false }, EC, false, ["deriveBits"])
       : await sub.importKey("pkcs8", pk8, { name:"RSA-OAEP", hash:"SHA-256" }, false, ["decrypt", "unwrapKey"]);
-    SESSION = { id, nom:c.nom, admin:!!c.admin, priv };
+    SESSION = { id, nom:c.nom, admin:!!c.admin, eleve:!!c.eleve, priv };
     await idbSet("session", { id, priv });
     for (const k in CLES) delete CLES[k];
     try { INDEX_TEXTE = null; } catch(e){}
@@ -8190,7 +8238,8 @@ window.ACCES = (function(){
     else { b.innerHTML = ICO_PERS + '<span class="lbl"> Se connecter</span>'; b.title = "Se connecter (livres protégés)"; }
     b.setAttribute("aria-label", b.title);
     const t = document.getElementById("plusCompte"); if (t) t.textContent = SESSION ? "Mon compte (" + SESSION.nom + ")" : "Se connecter";
-    document.body.classList.toggle("connecte", !!SESSION);   /* Plans, Accueil de classe, Tableau blanc : seulement une fois connecté */
+    document.body.classList.toggle("connecte", !!SESSION);
+    document.body.classList.toggle("eleve", !!(SESSION && SESSION.eleve));   /* compte de groupe d'élèves : lecture, crayon et texte seulement */   /* Plans, Accueil de classe, Tableau blanc : seulement une fois connecté */
     try { window.appliquerPrefs && window.appliquerPrefs(); } catch(e){}
   }
   function menu(){
@@ -8219,7 +8268,7 @@ window.ACCES = (function(){
   function bienvenue(apres){   /* connexion réussie : pastille des initiales qui apparaît, cadenas qui s'ouvre, « Bonjour Prénom ! », puis fermeture toute seule */
     const ini = SESSION.nom.split(/\s+/).map(m => m[0] || "").join("").slice(0, 2).toUpperCase(), n = protegesPermis();
     box().innerHTML = '<div class="acces-succes acces-bienv"><div class="avatar"><span class="halo"></span><span class="ini">' + ini + '</span><span class="cad"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path class="anse" d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span></div>'
-      + '<h2>Bonjour ' + esc(SESSION.nom.split(/\s+/)[0]) + ' !</h2><p class="sous">' + (n ? n + ' livre' + (n > 1 ? 's' : '') + ' déverrouillé' + (n > 1 ? 's' : '') + ' pour toi.' : 'Tu es connecté.') + '</p></div>';
+      + '<h2>Bonjour' + (SESSION.eleve ? ', ' + esc(SESSION.nom) : ' ' + esc(SESSION.nom.split(/\s+/)[0])) + ' !</h2><p class="sous">' + (n ? n + ' livre' + (n > 1 ? 's' : '') + ' déverrouillé' + (n > 1 ? 's' : '') + ' pour toi.' : 'Tu es connecté.') + '</p></div>';
     ov().hidden = false;
     let fini = false; const fin = () => { if (fini) return; fini = true; fermer(); if (apres) apres(); };
     setTimeout(fin, 1900); box().onclick = fin;
@@ -8293,7 +8342,7 @@ window.ACCES = (function(){
     const grps = Object.keys(parProg).sort();
     const lignes = ids.map(id => { const c = D.comptes[id], n = livres.filter(f => D.livres[f].cles[id]).length;
       if (c.admin) return '<div class="acces-fiche"><div class="fh"><div class="qui"><b>' + esc(c.nom) + '</b><span class="acces-tag">admin</span><br><small>' + esc(id) + '</small></div><span class="cpt">Tous les livres</span></div></div>';
-      return '<div class="acces-fiche"><div class="fh"><div class="qui"><b>' + esc(c.nom) + '</b><br><small>' + esc(id) + '</small></div>'
+      return '<div class="acces-fiche"><div class="fh"><div class="qui"><b>' + esc(c.nom) + '</b>' + (c.eleve ? '<span class="acces-tag" style="background:#15803d">élèves</span>' : '') + '<br><small>' + esc(id) + '</small></div>'
         + progs.map(pg => '<button class="abtn' + ((c.prog || []).includes(pg) ? ' prim' : '') + '" data-prog="' + esc(pg) + '" data-pid="' + esc(id) + '" title="Donner ou retirer tous les livres : ' + esc(progNom(pg)) + '">' + esc(court(pg)) + '</button>').join("")
         + '<button class="abtn" data-mdp="' + esc(id) + '" title="Donner un nouveau mot de passe à cet enseignant">Mot de passe</button><button class="abtn" data-retirer="' + esc(id) + '" title="Retirer ce compte">Retirer</button></div>'
         + '<details' + (OUVERTS.has(id) ? ' open' : '') + ' data-fiche="' + esc(id) + '"><summary>Livres permis : ' + n + ' sur ' + total + '</summary>'
@@ -8302,6 +8351,12 @@ window.ACCES = (function(){
     let jeton = ""; try { jeton = localStorage.getItem("ghJeton") || ""; } catch(e){}
     box().innerHTML = '<h2>Accès des enseignants</h2><p class="sous">Touche « Livres permis » pour cocher les livres d\'un enseignant, ou ses programmes pour tout lui donner d\'un coup. Les changements partent en ligne quand tu touches « Publier ».</p>'
       + (livres.length ? '<div class="acces-fiches">' + lignes + '</div>' : '<p class="sous">Aucun livre protégé pour l\'instant.</p>')
+      + '<div class="acces-sec"><h3>Groupes d\'élèves</h3><p class="sous">Un compte partagé par un groupe (ex. sur les iPad de la classe) : les livres cochés en lecture, crayon et texte, <b>sans les réponses</b> ni les outils du prof.</p>'
+      + '<details id="gGrp"' + (OUVERTS.has("#grp") ? ' open' : '') + ' style="margin-top:6px"><summary style="cursor:pointer;color:#a9a9ae;font-size:.88rem">+ Créer un groupe</summary>'
+      + '<label for="grNom">Nom du groupe</label><input type="text" id="grNom" placeholder="ex. EGI Groupe A">'
+      + '<label for="grMdp">Mot de passe à donner aux élèves (au moins 6 caractères)</label><input type="text" id="grMdp" autocomplete="off" placeholder="ex. pavillon2026">'
+      + '<label>Livres du programme</label><div class="acces-chips">' + progs.map(pg => '<label class="acces-chip"><input type="checkbox" class="grProg" value="' + esc(pg) + '"><span>' + esc(progNom(pg)) + '</span></label>').join("") + '</div>'
+      + '<div class="acces-btns" style="justify-content:flex-start"><button class="abtn prim" id="grOui">Créer le groupe</button></div></details></div>'
       + '<div class="acces-sec"><h3>Demandes reçues</h3><div id="gBoite"><p class="sous">Recherche des demandes…</p></div>'
       + '<details style="margin-top:8px"><summary style="cursor:pointer;color:#a9a9ae;font-size:.88rem">Coller un code reçu autrement (Teams, courriel)</summary><textarea id="gDem" placeholder="Colle ici le code DEMANDE-… reçu de l\'enseignant"></textarea><div class="acces-btns" style="justify-content:flex-start"><button class="abtn" id="gAjout">Ajouter cet enseignant</button></div></details></div>'
       + (jeton   /* clé déjà enregistrée : on ne la montre plus, seulement un petit lien « Changer » */
@@ -8311,6 +8366,16 @@ window.ACCES = (function(){
       + '<div class="acces-err" id="gErr"' + (msg && msg.err ? "" : " hidden") + '>' + (msg && msg.err ? esc(msg.err) : "") + '</div><div class="acces-ok" id="gOk"' + (msg && msg.ok ? "" : " hidden") + '>' + (msg && msg.ok ? esc(msg.ok) : "") + '</div>'
       + '<div class="acces-btns"><button id="gNon">Fermer</button>' + (jeton ? '' : '<button id="gTel">Télécharger comptes.json</button>') + '<button class="prim" id="gPub">Publier</button></div>';
     const B = box();
+    const gG = document.getElementById("gGrp"); if (gG) gG.ontoggle = () => { gG.open ? OUVERTS.add("#grp") : OUVERTS.delete("#grp"); };
+    const grO = document.getElementById("grOui"); if (grO) grO.onclick = async () => {
+      const nom = document.getElementById("grNom").value.trim(), m = document.getElementById("grMdp").value.trim(), pr = [...B.querySelectorAll(".grProg:checked")].map(x => x.value);
+      if (nom.length < 3) return dessinerGerer({ err:"Donne un nom au groupe (ex. EGI Groupe A)." });
+      if (m.length < 6) return dessinerGerer({ err:"Le mot de passe du groupe doit avoir au moins 6 caractères." });
+      if (BROUILLON.comptes[idDe(nom)]) return dessinerGerer({ err:"Ce nom est déjà pris. Choisis-en un autre." });
+      grO.disabled = true; grO.textContent = "Création…";
+      try { const d = lireDemande(await demande(nom, m, pr)); d.eleve = true; await remplacerCompte(d); OUVERTS.delete("#grp");
+        dessinerGerer({ ok:"Groupe « " + nom + " » créé. Les élèves se connectent avec l'identifiant " + d.id + " et le mot de passe " + m + ". Touche « Publier »." }); }
+      catch(e){ dessinerGerer({ err:e.message }); } };
     B.querySelectorAll("details[data-fiche]").forEach(d => d.ontoggle = () => { d.open ? OUVERTS.add(d.dataset.fiche) : OUVERTS.delete(d.dataset.fiche); });
     B.querySelectorAll("input[type=checkbox][data-f]").forEach(cb => cb.onchange = async () => {
       const f = cb.dataset.f, id = cb.dataset.id; cb.disabled = true;
@@ -8357,6 +8422,7 @@ window.ACCES = (function(){
   async function remplacerCompte(d){          /* nouveau compte, ou nouveau mot de passe d'un compte existant (ses livres sont gardés) */
     const anc = BROUILLON.comptes[d.id], avait = anc ? Object.keys(BROUILLON.livres).filter(f => BROUILLON.livres[f].cles[d.id]) : [];
     BROUILLON.comptes[d.id] = { nom:anc ? anc.nom : d.nom, pub:d.pub, priv:d.priv, admin:anc ? !!anc.admin : false, prog:anc ? (anc.prog || []) : (d.prog || []) };
+    if (anc ? anc.eleve : d.eleve) BROUILLON.comptes[d.id].eleve = true;
     for (const f in BROUILLON.livres) delete BROUILLON.livres[f].cles[d.id];
     for (const f of avait) BROUILLON.livres[f].cles[d.id] = await envelopper(f, d.pub);
     if (!anc) await appliquerProgs(d.id, d.prog || [], []);
@@ -8383,7 +8449,7 @@ window.ACCES = (function(){
     if (SESSION) go(); else dlgConnexion(go);
   }
   setTimeout(() => { const b = document.getElementById("compteBtn"); if (b) b.onclick = menu; charger(); accepterDepuisLien(); }, 0);
-  return { pret, get estPret(){ return estPret; }, protege, permis, verrouille, ouvrir, recherche, connexion, deconnexion, demande, lireDemande, dlgConnexion, menu, get session(){ return SESSION; }, get data(){ return DATA; }, charger };
+  return { pret, get estPret(){ return estPret; }, protege, permis, verrouille, ouvrir, recherche, connexion, deconnexion, demande, lireDemande, dlgConnexion, menu, get session(){ return SESSION; }, get eleve(){ return !!(SESSION && SESSION.eleve); }, get data(){ return DATA; }, charger };
 })();
 </script>
 
@@ -8399,7 +8465,7 @@ window.ACCES = (function(){
   const FONDS = [["blanc","Blanc"],["quad","Quadrillé"],["iso","Iso"],["noir","Noir"],["vert","Vert"]];
   const PROG = [["","Tous"],["Entretien général d'immeubles","EGI"],["Plomberie et chauffage","Plomberie"]];
   window.titreAccueil = () => { const S = window.ACCES && ACCES.session; if (!S || lirePrefs().bonjour === false) return "";
-    return "Bonjour " + S.nom.split(/\s+/)[0] + " !"; };
+    return S.eleve ? "Bonjour, " + S.nom + " !" : "Bonjour " + S.nom.split(/\s+/)[0] + " !"; };
   let dejaProg = "";
   window.appliquerPrefs = () => {
     const P = lirePrefs(), r = document.documentElement;
@@ -8428,9 +8494,9 @@ window.ACCES = (function(){
       + '<h3>Bibliothèque</h3>'
       + '<div class="lig"><span>Livres affichés au départ</span>' + seg("prog", PROG, P.prog === undefined ? "" : P.prog) + '</div>'
       + '<div class="lig"><span>Reprendre où j\'étais</span>' + seg("reprise", [["demander","Demander"],["toujours","Toujours"],["jamais","Jamais"]], P.reprise || "demander") + '</div>'
-      + '<h3>Tableau blanc</h3>'
+      + (ACCES.eleve ? '' : '<h3>Tableau blanc</h3>'
       + '<div class="lig"><span>Fond au départ</span>' + seg("fond", FONDS, P.fond || "blanc") + '</div>'
-      + '<div class="lig"><span>Couleur du crayon</span>' + ronds("crayon", CRAYONS, P.crayon || "#e2483d") + '</div>'
+      + '<div class="lig"><span>Couleur du crayon</span>' + ronds("crayon", CRAYONS, P.crayon || "#e2483d") + '</div>')
       + '<div class="acces-btns" style="justify-content:space-between;align-items:center;margin-top:16px"><button type="button" class="raz" id="pRaz">Remettre comme au départ</button><button class="prim" id="pFin">Terminé</button></div></div>';
     B.querySelectorAll("[data-k]").forEach(b => b.onclick = () => { const k = b.dataset.k, v = b.dataset.v;
       ecrire(k, k === "bonjour" ? (v === "oui" ? null : false) : v); });
