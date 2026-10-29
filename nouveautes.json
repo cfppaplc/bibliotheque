@@ -14,7 +14,7 @@
         "img": "nouveautes/barre-couleur.jpg"
       },
       "Sans outil choisi : touche une forme, un objet ou un texte pour le choisir, glisse-le pour le déplacer, double-clic pour le modifier, Suppr pour l'effacer.",
-      "Texte : Entrée change de ligne; touche à côté (ou Ctrl+Entrée) pour terminer, Échap annule.",
+      "Texte : touche le tableau et écris (Entrée = nouvelle ligne). Toucher dans le vide termine le texte et range l'outil Texte. Échap annule.",
       "Gomme : la fenêtre de taille reste ouverte et un cercle montre ce qui sera effacé.",
       {
         "t": "Plusieurs à la fois : Ctrl + glisser fait un cadre. Le groupe se déplace, change de couleur ou s'efface ensemble. Ctrl+C / Ctrl+V / Ctrl+D pour copier, coller, dupliquer.",
@@ -30,6 +30,10 @@
       }
     ],
     "versions": [
+      {
+        "date": "2026-10-28",
+        "texte": "Outil Texte : toucher dans le vide après avoir écrit range l'outil (plus de case vide qui s'ouvre)."
+      },
       {
         "date": "2026-10-28",
         "texte": "Crayon plus fluide, gomme avec cercle, Entrée dans les textes, sélection multiple, un dessin par fond."

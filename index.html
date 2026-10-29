@@ -3903,6 +3903,9 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
       if (dbl){ modifierTexte(hit); return; }
       mv = { s:hit, q0:q, p0:[hit.p[0][0], hit.p[0][1]], snap:false }; return;
     }
+    const ouverte = document.querySelector(".inktxt");
+    if (ouverte || (SEL.s && SEL.s.t === "texte")){ e.stopImmediatePropagation(); e.preventDefault();   /* texte terminé, toucher dans le vide : on sort de l'outil Texte (pas de nouvelle case) */
+      if (ouverte) ouverte.blur(); SEL.s = null; RD.text = false; RD.crayonOff = true; majBarTxt(); majSelTxt(); refreshTools(); redrawInk(); return; }
     SEL.s = null; majBarTxt(); majSelTxt();
     z = { x:e.clientX, y:e.clientY, x2:e.clientX, y2:e.clientY };
     box = document.createElement("div"); box.style.cssText = "position:fixed;z-index:79;pointer-events:none;border:2px dashed #6aa9ff;background:rgba(106,169,255,.12)"; $("#reader").appendChild(box);
@@ -4648,7 +4651,7 @@ $("#penE").onclick = () => { RD.eraser = !RD.eraser; if (RD.eraser){ RD.text = f
 $("#penO").onclick = () => { RD.obj = !RD.obj; if (RD.obj){ RD.text = false; RD.eraser = false; RD.objTab = null; RD.formeK = null; RD.objKi = null; RD.objKe = null; SELO.s = null; }
   refreshTools();
   if (RD.obj) aviser(modeElec() ? "Schéma en échelle : 1) « Échelle L1 / L2 » et glisse pour tracer les rails. 2) Choisis un symbole et clique sur un échelon. 3) Pour relier : pars d'un point bleu et glisse jusqu'à l'autre point bleu." : RD.objTab === "iso" ? "Touche un objet pour le choisir, double-clic pour le nommer. Pour en poser un : choisis-le dans la palette, puis clique sur la grille." : "Touche une forme pour la choisir, double-clic pour écrire sa valeur. Pour en ajouter : choisis une forme dans la palette, puis glisse. Clic à côté : plus rien de choisi.", modeElec() ? 10000 : 0); };
-$("#penT").onclick = () => { RD.text = !RD.text; if (RD.text){ RD.eraser = false; RD.obj = false; } refreshTools(); if (RD.text) aviser("Dessine un rectangle, puis écris dedans. Entrée valide (Maj+Entrée = nouvelle ligne)."); };
+$("#penT").onclick = () => { RD.text = !RD.text; if (RD.text){ RD.eraser = false; RD.obj = false; } refreshTools(); if (RD.text) aviser("Touche le tableau (ou dessine un rectangle), puis écris. Entrée = nouvelle ligne; touche à côté pour terminer."); };
 $("#wbZo").onclick = zout; $("#wbZi").onclick = zin; $("#penU").onclick = undoInk; $("#penR").onclick = redoInk;
 $("#penC").onclick = () => { if (!strokes().length) return; snapInk(); INKS[inkKey()] = []; redrawInk(); };
 $("#penX").onclick = () => { const w = RD.wb; RD.pen = false; RD.eraser = false; RD.text = false; if (w){ RD.wb = true; toggleWb(); } else { RD.wb = false; refreshTools(); } };
