@@ -1,6 +1,53 @@
 [
   {
     "date": "2026-10-29",
+    "type": "outil",
+    "titre": "La bibliothèque : recherche, hors ligne et cellulaire",
+    "texte": "Recherche dans tous les livres, filtre par programme, code QR pour les élèves, fonctionne sans Internet et sur cellulaire.",
+    "formation": [
+      {
+        "t": "Bouton lune / soleil en haut (cellulaire : Plus → Accueil clair) : accueil foncé ou clair. Chaque ordinateur se souvient du choix.",
+        "img": "nouveautes/accueil-clair.jpg"
+      },
+      {
+        "t": "Tape un mot dans la recherche : les pages qui en parlent s'affichent; clique pour ouvrir le livre à cette page.",
+        "img": "nouveautes/recherche.jpg"
+      },
+      {
+        "t": "Boutons DEP 5211 et DEP 5333 : seulement les livres de ce programme.",
+        "img": "nouveautes/filtre.jpg"
+      },
+      {
+        "t": "Dans un livre, bouton QR (touche Q) : les élèves scannent et arrivent à la même page.",
+        "img": "nouveautes/livre-qr.jpg"
+      },
+      {
+        "t": "Bouton « Tableau blanc » en haut : un tableau blanc s'ouvre tout de suite.",
+        "img": "nouveautes/bouton-tableau-blanc.jpg"
+      },
+      "Un livre ouvert une fois avec Internet s'ouvre ensuite sans Internet. Si une vieille version reste affichée : Ctrl+F5.",
+      {
+        "t": "Sur cellulaire : onglets en bas, balaie pour tourner les pages.",
+        "img": "nouveautes/tel-livre.jpg"
+      }
+    ],
+    "versions": [
+      {
+        "date": "2026-10-29",
+        "texte": "Nouveau : accueil clair, au choix (bouton lune / soleil en haut)."
+      },
+      {
+        "date": "2026-10-29",
+        "texte": "Fiche d'un livre : sa version et la date de sa dernière mise à jour."
+      },
+      {
+        "date": "2026-10-29",
+        "texte": "Cellulaire : le texte des livres n'est plus grossi par le navigateur (lignes qui se chevauchaient); le petit bouton Pause des animations ne cache plus le texte."
+      }
+    ]
+  },
+  {
+    "date": "2026-10-29",
     "type": "maj",
     "livre": "administration-batiment",
     "titre": "Administration d'un bâtiment et plan d'urgence",
@@ -385,45 +432,6 @@
       {
         "date": "2026-10-23",
         "texte": "Marge de sécurité en bas de l'écran : l'encadré du bas est remonté, pour les projecteurs qui coupent le bas de l'image."
-      }
-    ]
-  },
-  {
-    "date": "2026-10-29",
-    "type": "outil",
-    "titre": "La bibliothèque : recherche, hors ligne et cellulaire",
-    "texte": "Recherche dans tous les livres, filtre par programme, code QR pour les élèves, fonctionne sans Internet et sur cellulaire.",
-    "formation": [
-      {
-        "t": "Tape un mot dans la recherche : les pages qui en parlent s'affichent; clique pour ouvrir le livre à cette page.",
-        "img": "nouveautes/recherche.jpg"
-      },
-      {
-        "t": "Boutons DEP 5211 et DEP 5333 : seulement les livres de ce programme.",
-        "img": "nouveautes/filtre.jpg"
-      },
-      {
-        "t": "Dans un livre, bouton QR (touche Q) : les élèves scannent et arrivent à la même page.",
-        "img": "nouveautes/livre-qr.jpg"
-      },
-      {
-        "t": "Bouton « Tableau blanc » en haut : un tableau blanc s'ouvre tout de suite.",
-        "img": "nouveautes/bouton-tableau-blanc.jpg"
-      },
-      "Un livre ouvert une fois avec Internet s'ouvre ensuite sans Internet. Si une vieille version reste affichée : Ctrl+F5.",
-      {
-        "t": "Sur cellulaire : onglets en bas, balaie pour tourner les pages.",
-        "img": "nouveautes/tel-livre.jpg"
-      }
-    ],
-    "versions": [
-      {
-        "date": "2026-10-29",
-        "texte": "Fiche d'un livre : sa version et la date de sa dernière mise à jour."
-      },
-      {
-        "date": "2026-10-29",
-        "texte": "Cellulaire : le texte des livres n'est plus grossi par le navigateur (lignes qui se chevauchaient); le petit bouton Pause des animations ne cache plus le texte."
       }
     ]
   },

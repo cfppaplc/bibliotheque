@@ -104,6 +104,7 @@
     bouton « Tableau de bord » (touche E) dans tous les livres, « Revenir au livre » (touche L) sur le tableau.
     Le plein écran est demandé sur `document.documentElement` (jamais sur l'iframe) pour rester actif entre les deux.
 
+- **Accueil clair / foncé** (29 oct., au choix de Jeremy) : bouton `#themeBtn` (lune/soleil, premier de `.hbtns`) et entrée « Accueil clair » du menu Plus du cellulaire (`data-plus="theme"` → clique `#themeBtn`); classe `body.clair`, gardée dans `localStorage.accueilClair` ("1"/"0"), appliquée par un petit script juste après `<main id="rows">`. CSS `body.clair …` (bloc « Accueil clair » au début du `<style>`) : variables redéfinies seulement sur `header, #hero, main, footer` — le lecteur, le tableau blanc, la fiche du livre et le menu Plus restent foncés.
 - **Accès rapide au tableau blanc** : `#wbBtn` dans l'en-tête (a remplacé « A+ »; `#grosBtn` reste caché, utilisé par le menu Plus du cellulaire) → `ouvrirTableauBlanc()`.
   Sur `accueil.html` : `#b-wb` (touche B, visible seulement dans la bibliothèque) envoie `accueil-ouvrir {type:"tableau"}`; si le tableau blanc est déjà ouvert dessous, on y revient (`ouvrirDepuisTdb`), et `#b-wb` est caché au profit de « Revenir au tableau blanc ».
 
