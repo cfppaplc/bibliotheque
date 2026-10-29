@@ -44,7 +44,7 @@
     "date": "2026-10-28",
     "type": "outil",
     "titre": "Tableau blanc : formes, cotes et textes",
-    "texte": "Formes de dessin technique avec cotes et textes sur les côtés, qui gardent la couleur de la forme et la suivent quand elle bouge.",
+    "texte": "Couleur, cotes et textes sur les côtés, partout : formes, lignes, tuyaux iso, objets iso et symboles électriques.",
     "formation": [
       {
         "t": "Objets (le cube), onglet Formes : choisis une forme et glisse sur le tableau. Un clic seul pose une forme de taille normale.",
@@ -55,12 +55,16 @@
         "img": "nouveautes/formes-poignees.jpg"
       },
       {
-        "t": "Double-clic sur une forme : sa couleur, la taille du texte, « + Texte sur un côté » et « + Cote ».",
+        "t": "Double-clic sur une forme, une ligne, un tuyau iso, un objet iso ou un symbole électrique : sa couleur, la taille du texte, « + Texte sur un côté » et « + Cote ».",
         "img": "nouveautes/forme-couleur.jpg"
       },
       {
         "t": "Après « + Texte sur un côté » ou « + Cote », les côtés libres s'allument : touche celui que tu veux.",
         "img": "nouveautes/cote-cote.jpg"
+      },
+      {
+        "t": "Sur le plan isométrique, la cote suit les axes de la grille et donne la longueur en pas (ex. 6 carr.). Sur un tuyau dessiné au crayon, chaque tronçon droit se cote d'un coin à l'autre; sur un objet, d'un raccord à l'autre.",
+        "img": "nouveautes/iso-cotes.jpg"
       },
       "Les cotes et les textes prennent la couleur de la forme et la suivent quand tu la déplaces ou l'agrandis.",
       {
@@ -69,6 +73,10 @@
       }
     ],
     "versions": [
+      {
+        "date": "2026-10-28",
+        "texte": "Couleur et cotes aussi pour les tuyaux iso, les objets iso et les symboles électriques; cotes iso."
+      },
       {
         "date": "2026-10-28",
         "texte": "Couleur de la forme dans la case du double-clic; cotes et textes de la même couleur, qui suivent la forme; on choisit le côté."
