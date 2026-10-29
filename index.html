@@ -2563,7 +2563,10 @@ function dessinerForme(g, s, x1, y1, x2, y2, k, col){
     { const an0 = Math.atan2(y2 - y1, x2 - x1), off = (s.d || 0) * (g.canvas ? g.canvas.height : 0), DC = dirCote(s, an0), ox = DC[0] * off, oy = DC[1] * off;
       if (s.txt){ const tz = s.tz || 1; g.save(); g.fillStyle = col; g.font = "700 " + Math.round(16 * k * tz) + "px system-ui, sans-serif"; g.textAlign = "center"; g.textBaseline = "middle";   /* texte sur un côté (sans ligne de cote) */
         const tx = s.lb || "?", tw = g.measureText(tx).width, th = 16 * k * tz, sg = Math.sign(off) || 1, ux = DC[0] * sg, uy = DC[1] * sg, ext = Math.abs(ux) * tw / 2 + Math.abs(uy) * th / 2;   /* le texte ne touche jamais le côté */
-        const txx = (x1 + x2) / 2 + ux * (Math.abs(off) + ext), txy = (y1 + y2) / 2 + uy * (Math.abs(off) + ext); g.lineJoin = "round"; g.lineWidth = 4 * k * tz; g.strokeStyle = wbSombre() ? "rgba(0,0,0,.55)" : "rgba(255,255,255,.9)"; g.strokeText(tx, txx, txy); g.fillText(tx, txx, txy); g.restore(); return; }
+        const ext2 = s.iso ? th * .75 + (tw > Math.hypot(x2 - x1, y2 - y1) * .9 ? th * 1.1 : 0) : ext, txx = (x1 + x2) / 2 + ux * (Math.abs(off) + ext2), txy = (y1 + y2) / 2 + uy * (Math.abs(off) + ext2); g.lineJoin = "round"; g.lineWidth = 4 * k * tz; g.strokeStyle = wbSombre() ? "rgba(0,0,0,.55)" : "rgba(255,255,255,.9)";
+        g.translate(txx, txy); if (s.iso){ let a3 = an0; if (a3 > Math.PI / 2 + .01) a3 -= Math.PI; if (a3 < -Math.PI / 2 + .01) a3 += Math.PI;   /* plan iso : le texte suit l'angle de la pièce (lettres droites, comme un dessin iso) */
+          if (Math.abs(Math.cos(a3)) > .3) g.transform(Math.cos(a3), Math.sin(a3), 0, 1, 0, 0); else g.transform(0, -1, Math.cos(Math.PI / 6), -Math.sin(Math.PI / 6), 0, 0); }
+        g.strokeText(tx, 0, 0); g.fillText(tx, 0, 0); g.restore(); return; }
       if (Math.abs(off) > 2){ const sg = Math.sign(off), ux = DC[0] * sg, uy = DC[1] * sg, gap = 4 * k, dep = 8 * k;   /* lignes de rappel */
         g.save(); g.lineWidth = Math.max(1, lw * .5); g.beginPath();
         [[x1, y1], [x2, y2]].forEach(([x, y]) => { g.moveTo(x + ux * gap, y + uy * gap); g.lineTo(x + ox + ux * dep, y + oy + uy * dep); }); g.stroke(); g.restore(); g.beginPath(); }
