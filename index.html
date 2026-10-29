@@ -2566,6 +2566,7 @@ function dessinerForme(g, s, x1, y1, x2, y2, k, col){
         const ext2 = s.iso ? th * .75 + (tw > Math.hypot(x2 - x1, y2 - y1) * .9 ? th * 1.1 : 0) : ext, txx = (x1 + x2) / 2 + ux * (Math.abs(off) + ext2), txy = (y1 + y2) / 2 + uy * (Math.abs(off) + ext2); g.lineJoin = "round"; g.lineWidth = 4 * k * tz; g.strokeStyle = wbSombre() ? "rgba(0,0,0,.55)" : "rgba(255,255,255,.9)";
         g.translate(txx, txy); if (s.iso){ let a3 = an0; if (a3 > Math.PI / 2 + .01) a3 -= Math.PI; if (a3 < -Math.PI / 2 + .01) a3 += Math.PI;   /* plan iso : le texte suit l'angle de la pièce (lettres droites, comme un dessin iso) */
           if (Math.abs(Math.cos(a3)) > .3) g.transform(Math.cos(a3), Math.sin(a3), 0, 1, 0, 0); else g.transform(0, -1, Math.cos(Math.PI / 6), -Math.sin(Math.PI / 6), 0, 0); }
+        if (s.rot) g.rotate(s.rot * Math.PI / 180);   /* rotation choisie dans la case */
         g.strokeText(tx, 0, 0); g.fillText(tx, 0, 0); g.restore(); return; }
       if (Math.abs(off) > 2){ const sg = Math.sign(off), ux = DC[0] * sg, uy = DC[1] * sg, gap = 4 * k, dep = 8 * k;   /* lignes de rappel */
         g.save(); g.lineWidth = Math.max(1, lw * .5); g.beginPath();
@@ -2579,7 +2580,7 @@ function dessinerForme(g, s, x1, y1, x2, y2, k, col){
     g.stroke(); if (s.lb || (RD.wb && /^(quad|iso|isopts)$/.test(wbBg()))){        /* valeur choisie (double-clic), sinon sur une grille : longueur en carreaux */
       const u = 34 * RD.z * (window.devicePixelRatio || 1) * (/^iso/.test(wbBg()) ? 1.2 : 1), n = Math.hypot(x2 - x1, y2 - y1) / u;   /* plan iso : un pas de la grille iso */
       const r = Math.round(n * 10) / 10, txt = s.lb || ((String(r).replace(".", ",")) + " carr.");
-      g.save(); const sgL = s.d ? Math.sign(s.d) : 1, ec = 19 * k * Math.max(1, (s.tz || 1) * .85); g.translate((x1 + x2) / 2 + nx * ec * sgL, (y1 + y2) / 2 + ny * ec * sgL);   /* texte du côté extérieur */ let a3 = an; if (a3 > Math.PI / 2 || a3 < -Math.PI / 2) a3 += Math.PI; g.rotate(a3);
+      g.save(); const sgL = s.d ? Math.sign(s.d) : 1, ec = 19 * k * Math.max(1, (s.tz || 1) * .85); g.translate((x1 + x2) / 2 + nx * ec * sgL, (y1 + y2) / 2 + ny * ec * sgL);   /* texte du côté extérieur */ let a3 = an; if (a3 > Math.PI / 2 || a3 < -Math.PI / 2) a3 += Math.PI; g.rotate(a3 + (s.rot || 0) * Math.PI / 180);
       g.fillStyle = col; g.font = "700 " + Math.round(13 * k * (s.tz || 1)) + "px system-ui, sans-serif"; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText(txt, 0, 0); g.restore(); }
     return; }
   else if (t === "cercle"){ const r = Math.max(2, Math.hypot(x2 - x1, y2 - y1)); g.arc(x1, y1, r, 0, Math.PI * 2); g.moveTo(x1 - 6 * k, y1); g.lineTo(x1 + 6 * k, y1); g.moveTo(x1, y1 - 6 * k); g.lineTo(x1, y1 + 6 * k); g.stroke();
@@ -2775,7 +2776,8 @@ function modifierForme(s, cx, cy){
     r.innerHTML = '<span>' + lab + '</span><input data-cle="' + cle + '" placeholder="' + ph + '" style="min-height:36px;border-radius:8px;border:1px solid #2f2f33;padding:0 8px;font:700 .95rem system-ui;color:#111;background:#fff">';
     r.querySelector("input").value = s[cle] || ""; box.appendChild(r); });
   if (s.k !== "jonction" && s.t !== "maison" && !/^tuy/.test(s.t) && !s.hl) couleurForme(box, s);
-  if (s.t !== "bulle" && s.t !== "objet") tailleTexte(box, s);   /* objet : plus de nom, donc pas de taille de texte (chaque texte d'un côté a la sienne) */
+  if (s.t !== "bulle" && s.t !== "objet") tailleTexte(box, s);
+  if (s.t === "cote") pivoterTexte(box, s);   /* objet : plus de nom, donc pas de taille de texte (chaque texte d'un côté a la sienne) */
   /* pavé de position (flèches) retiré à la demande de Jeremy : la cote se décale avec sa poignée bleue */   /* forme qui accepte « + Texte sur un côté » : pas besoin du pavé de position */
   if (cotesPossibles(s)){ const rang = document.createElement("div"); rang.style.cssText = "display:flex;gap:6px;margin-top:10px";
     const st = "flex:1;min-height:40px;border-radius:9px;border:1px solid #6aa9ff;border-bottom-width:4px;color:#fff;font:800 .85rem system-ui;cursor:pointer;padding:0 6px";
@@ -2921,6 +2923,15 @@ function couleurForme(box, s){
   row.addEventListener("mousedown", e => e.preventDefault());
   row.querySelectorAll("[data-fcol]").forEach(b => b.onclick = () => { snapInk(); s.c = b.dataset.fcol; groupeCotes(s).forEach(o => o.c = s.c);   /* forme, ses cotes et ses textes : même couleur */ row.querySelectorAll("[data-fcol]").forEach(x => { const on = x === b; x.style.borderColor = on ? "#fff" : "#3a3a40"; x.style.boxShadow = on ? "0 0 0 2px #2a7bcf" : "none"; }); redrawInk(); });
   box.appendChild(row); }
+/* rotation du texte d'une cote ou d'un texte de côté (s.rot, en degrés, ajoutée à l'angle automatique) */
+function pivoterTexte(box, s){
+  const row = document.createElement("div"); row.style.cssText = "display:flex;align-items:center;gap:6px;margin-top:10px";
+  const bt = 'style="min-width:44px;min-height:38px;border-radius:9px;border:1px solid #3a3a40;border-bottom-width:4px;background:#1c1c1f;color:#e4e4e7;font:800 .95rem system-ui;cursor:pointer;padding:0 8px"';
+  row.innerHTML = '<span style="flex:1">Pivoter le texte</span><button type="button" data-r="-15" title="Tourner vers la gauche" ' + bt + '>⟲</button><b style="min-width:3em;text-align:center;font-variant-numeric:tabular-nums"></b><button type="button" data-r="15" title="Tourner vers la droite" ' + bt + '>⟳</button><button type="button" data-r="0" title="Revenir à l\'angle automatique" ' + bt + '>Auto</button>';
+  const aff = () => { row.querySelector("b").textContent = (s.rot || 0) + "°"; }; aff();
+  let snap = false;
+  row.querySelectorAll("[data-r]").forEach(b => b.onclick = () => { if (!snap){ snapInk(); snap = true; } const d = +b.dataset.r; if (!d) delete s.rot; else { let r = ((s.rot || 0) + d) % 360; if (r > 180) r -= 360; if (r <= -180) r += 360; if (r) s.rot = r; else delete s.rot; } aff(); redrawInk(); });
+  row.addEventListener("mousedown", e => e.preventDefault()); box.appendChild(row); }
 /* taille du texte (s.tz) : − / + */
 function tailleTexte(box, s){
   const row = document.createElement("div"); row.style.cssText = "display:flex;align-items:center;gap:6px;margin-top:10px";
