@@ -3437,7 +3437,7 @@ const MODELES = [
     f:[[[0,4],[0,1]], [[2,1],[4,1]], [[6,1],[8,1]], [[10,1],[10,4]], [[10,4],[2,4]]] }
 ];
 function nouveauTableau(fond){ if (!RD.wb) toggleWb(); const st = wbEtat(); if (strokes().length){ st.count++; st.n = st.count; } st.bg[st.n] = fond || st.bg[st.n] || "blanc"; majFond(); redrawInk(); refreshTools(); }
-/* Modèles du plan isométrique : objets [clé, m, n, miroir, debout] et tuyaux [couleur, [[m, n, h], …]] en pas de la grille iso */
+/* Modèles du plan isométrique : objets [clé, m, n, miroir, debout, hauteur] et tuyaux [couleur, [[m, n, h], …]] en pas de la grille iso */
 const ROUGE_ISO = "#e03131", BLEU_ISO = "#1c7ed6";
 const MODELES_ISO = [
   { id:"iso-pompe", nom:"Pompe avec vannes d'isolement", txt:"Une conduite avec une vanne de chaque côté de la pompe circulatrice, pour la sortir sans vider le système.",
@@ -3449,15 +3449,28 @@ const MODELES_ISO = [
   { id:"iso-boucle", nom:"Boucle de chauffage avec plinthes", txt:"Chaudière, pompe sur le départ, deux plinthes chauffantes, vanne et vase d'expansion sur le retour.",
     o:[["chaudiere", 0, 0], ["pompe", -2, 1], ["plinthe", -4, 8, 1], ["plinthe", -3, 10], ["vanne", 1, 4, 1], ["vase", 1, 6]],
     t:[[ROUGE_ISO, [[0, 1, 0], [-1, 1, 0]]], [ROUGE_ISO, [[-2, 1, 0], [-4, 1, 0], [-4, 5, 0]]], [ROUGE_ISO, [[-4, 8, 0], [-4, 10, 0], [-3, 10, 0]]],
-       [BLEU_ISO, [[0, 10, 0], [1, 10, 0], [1, 4, 0]]], [BLEU_ISO, [[1, 3, 0], [1, 2, 0]]]] }
+       [BLEU_ISO, [[0, 10, 0], [1, 10, 0], [1, 4, 0]]], [BLEU_ISO, [[1, 3, 0], [1, 2, 0]]]] },
+  { id:"iso-2zones", nom:"Chauffage sur 2 étages avec vannes de zone", txt:"Chaudière, pompe, deux zones commandées par des vannes motorisées : plinthe et radiateur au rez-de-chaussée; colonne montante, radiateur et plinthe à l'étage; retour commun avec vanne et vase d'expansion.",
+    o:[["chaudiere", 0, 0], ["pompe", -3, 1], ["vannemot", -5, 4, 1], ["plinthe", -5, 9, 1], ["radiateur", -3, 11], ["vannemot", -7, 1, 0, 1, 1], ["radiateur", -12, 1, 0, 0, 4], ["plinthe", -13, -3, 0, 0, 4], ["vanne", 1, 4, 1], ["vase", 1, 6]],
+    t:[[ROUGE_ISO, [[0, 1, 0], [-2, 1, 0]]], [ROUGE_ISO, [[-3, 1, 0], [-7, 1, 0]]], [ROUGE_ISO, [[-5, 1, 0], [-5, 3, 0]]], [ROUGE_ISO, [[-5, 4, 0], [-5, 6, 0]]],
+       [BLEU_ISO, [[-5, 9, 0], [-5, 11, 0], [-3, 11, 0]]], [BLEU_ISO, [[-1, 11, 0], [1, 11, 0], [1, 4, 0]]], [BLEU_ISO, [[1, 3, 0], [1, 2, 0]]],
+       [ROUGE_ISO, [[-7, 1, 0], [-7, 1, 1]]], [ROUGE_ISO, [[-7, 1, 2], [-7, 1, 4], [-10, 1, 4]]], [BLEU_ISO, [[-12, 1, 4], [-14, 1, 4], [-14, -3, 4], [-13, -3, 4]]],
+       [BLEU_ISO, [[-10, -3, 4], [-9, -3, 4], [-9, -3, 0], [-9, 12, 0], [1, 12, 0], [1, 11, 0]]]] },
+  { id:"iso-radiant", nom:"Plancher radiant avec collecteur 4 boucles", txt:"Chaudière, pompe et vanne 3 voies (eau tempérée), collecteur à 4 boucles de plancher radiant, retour vers la chaudière avec dérivation vers la vanne 3 voies et vase d'expansion.",
+    o:[["collecteur4", 0, 0], ["vanne3", -5, 0], ["pompe", -8, 0], ["chaudiere", -12, -3], ["vase", -8, 3]],
+    t:[[ROUGE_ISO, [[-12, -2, 0], [-13, -2, 0], [-13, 0, 0], [-8, 0, 0]]], [ROUGE_ISO, [[-7, 0, 0], [-5, 0, 0]]], [ROUGE_ISO, [[-3, 0, 0], [-1, 0, 0]]],
+       [BLEU_ISO, [[-1, 1, 0], [-1, 3, 0], [-11, 3, 0], [-11, -1, 0]]], [BLEU_ISO, [[-4, 3, 0], [-4, 1, 0]]],
+       ...[0, 1, 2, 3].map(i => ["#f08c00", [[i + 1, 0, 0], [i + 1, i - 5, 0], [9 - i, i - 5, 0], [9 - i, 6 - i, 0], [i + 1, 6 - i, 0], [i + 1, 1, 0]]])] }
 ];
 function poserModeleIso(m){
   nouveauTableau("iso");
   const c = $("#inkCanvas"), r = c.getBoundingClientRect(), S = $("#rstage").getBoundingClientRect(), W = c.width, H = c.height, k = W / r.width, a = 34 * RD.z * 1.2 * k, d = a * .8660254;
-  const cx = ((S.left + S.width * .55) - r.left) * k, cy = ((S.top + S.height * .42) - r.top) * k, i0 = Math.round(cx / d), j0 = Math.round(cy / a - (i0 & 1) * .5);   /* origine sur un point de la grille, vers le centre de l'écran */
+  const pts = m.o.map(o => [o[1], o[2], o[5] || 0]).concat(m.o.map(o => [o[1], o[2], (o[5] || 0) + (o[0] === "chaudiere" ? 3 : 1.5)]), ...m.t.map(t => t[1])), rel = pts.map(([mm, nn, hh]) => [(mm + nn) * d, (nn - mm) * a / 2 - (hh || 0) * a]);   /* le modèle est centré dans l'écran (à droite de la palette) */
+  const ob = $("#objBar"), gauche = ob && !ob.hidden && ob.offsetParent ? ob.getBoundingClientRect().right + 20 : S.left, mx = (Math.min(...rel.map(q => q[0])) + Math.max(...rel.map(q => q[0]))) / 2, my = (Math.min(...rel.map(q => q[1])) + Math.max(...rel.map(q => q[1]))) / 2;
+  const cx = ((gauche + S.right) / 2 - r.left) * k - mx, cy = ((S.top + S.bottom) / 2 - r.top) * k - my - a, i0 = Math.round(cx / d), j0 = Math.round(cy / a - (i0 & 1) * .5);   /* origine sur un point de la grille */
   const x0 = i0 * d, y0 = (j0 + (i0 & 1) * .5) * a, G = (mm, nn, hh) => [(x0 + (mm + nn) * d) / W, (y0 + (nn - mm) * a / 2 - (hh || 0) * a) / H], arr = strokes();
   m.t.forEach(([col, pts]) => { for (let i = 0; i + 1 < pts.length; i++){ const n = { c:col, hl:false, hc:null, w:4, t:"ligne", p:[G(...pts[i]), G(...pts[i + 1])] }; (decouperIso(n) || [n]).forEach(x => arr.push(x)); } });
-  m.o.forEach(([kk, mm, nn, mir, deb]) => { const o = { t:"objet", k:kk, o:mir ? 1 : 0, c:"#24282c", p:[G(mm, nn, 0)], w:4 }; if (deb) o.v = deb; arr.push(o); });
+  m.o.forEach(([kk, mm, nn, mir, deb, hh]) => { const o = { t:"objet", k:kk, o:mir ? 1 : 0, c:"#24282c", p:[G(mm, nn, hh || 0)], w:4 }; if (deb) o.v = deb; arr.push(o); });
   REFS[inkKey()] = baseCanevas(); redrawInk();
   aviser("Modèle « " + m.nom + " » posé. Touche un objet pour le déplacer, double-clic pour ajouter un texte ou une cote.", 5000);
 }
