@@ -7887,6 +7887,23 @@ window.addEventListener("online", () => { try { aviser("Internet est revenu."); 
   .acces-ok{color:#7ee2a0;font-size:.86rem;margin-top:10px}
   .acces-lien{background:none;border:0;color:#9ec5ff;font:inherit;font-size:.88rem;cursor:pointer;padding:0;margin-top:14px;text-decoration:underline}
   .acces-table{width:100%;border-collapse:collapse;font-size:.85rem;margin-top:8px}
+  .acces-fiches{display:flex;flex-direction:column;gap:10px;margin-top:10px}
+  .acces-fiche{border:1px solid #2a2a2f;border-radius:10px;padding:10px 12px;background:#18181c}
+  .acces-fiche .fh{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .acces-fiche .fh .qui{flex:1;min-width:150px;line-height:1.25}
+  .acces-fiche .fh .qui small{color:#8c8c92}
+  .acces-fiche .fh .abtn{padding:5px 10px;font-size:.8rem}
+  .acces-fiche .fh .cpt{font-size:.78rem;color:#a9a9ae;white-space:nowrap}
+  .acces-fiche details{margin-top:6px}
+  .acces-fiche summary{cursor:pointer;color:#a9a9ae;font-size:.84rem}
+  .acces-grp{margin-top:8px}
+  .acces-grp>.t{font-size:.72rem;color:#8c8c92;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
+  .acces-chips{display:flex;flex-wrap:wrap;gap:6px}
+  .acces-box label.acces-chip{margin:0;font-weight:500;display:inline-flex;align-items:center;gap:6px;border:1px solid #3a3a40;border-radius:999px;padding:4px 11px 4px 8px;font-size:.8rem;cursor:pointer;user-select:none;color:#cfcfd4;max-width:100%}
+  .acces-chip input{width:16px;height:16px;accent-color:#e50914;margin:0;cursor:pointer;flex:none}
+  .acces-chip:has(input:checked){border-color:#e50914;background:rgba(229,9,20,.14);color:#fff}
+  .acces-chip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+  @media (max-width:640px){.acces-fiche .fh .qui{flex-basis:100%}.acces-box label.acces-chip{font-size:.78rem}}
   .acces-table th,.acces-table td{border-bottom:1px solid #2a2a2f;padding:7px 6px;text-align:center}
   .acces-table th:first-child,.acces-table td:first-child{text-align:left}
   .acces-table th.liv{font-weight:600;font-size:.72rem;color:#a9a9ae;max-width:90px;line-height:1.2}
@@ -8131,18 +8148,24 @@ window.ACCES = (function(){
     if (!SESSION || !SESSION.admin) return;
     BROUILLON = JSON.parse(JSON.stringify(DATA)); box().classList.add("large"); ov().hidden = false; dessinerGerer();
   }
+  const OUVERTS = new Set();
   function dessinerGerer(msg){
     const D = BROUILLON, livres = Object.keys(D.livres), ids = Object.keys(D.comptes).sort((a, b) => D.comptes[a].nom.localeCompare(D.comptes[b].nom));
     const progs = PROGS(), court = c => /plomberie/i.test(c) ? "Plomberie" : /entretien/i.test(c) ? "EGI" : c;
-    const tete = '<tr><th>Enseignant</th><th class="liv">Programmes<br>(tous leurs livres)</th>' + livres.map(f => '<th class="liv">' + esc(titreDe(f)) + '</th>').join("") + '<th></th></tr>';
-    const lignes = ids.map(id => { const c = D.comptes[id];
-      return '<tr><td><b>' + esc(c.nom) + '</b>' + (c.admin ? '<span class="acces-tag">admin</span>' : '') + '<br><small style="color:#8c8c92">' + esc(id) + '</small></td>'
-        + '<td>' + (c.admin ? '<small style="color:#8c8c92">tout</small>' : progs.map(pg => '<button class="abtn' + ((c.prog || []).includes(pg) ? ' prim' : '') + '" style="padding:4px 9px;font-size:.78rem;margin:2px" data-prog="' + esc(pg) + '" data-pid="' + esc(id) + '" title="' + esc(progNom(pg)) + '">' + esc(court(pg)) + '</button>').join("")) + '</td>'
-        + livres.map(f => '<td><input type="checkbox" data-id="' + esc(id) + '" data-f="' + esc(f) + '"' + (D.livres[f].cles[id] ? " checked" : "") + (c.admin ? " disabled" : "") + '></td>').join("")
-        + '<td style="white-space:nowrap">' + (c.admin ? "" : '<button class="abtn" data-mdp="' + esc(id) + '" title="Donner un nouveau mot de passe à cet enseignant">Mot de passe</button> <button class="abtn" data-retirer="' + esc(id) + '" title="Retirer ce compte">Retirer</button>') + '</td></tr>'; }).join("");
+    const total = livres.length, parProg = {};
+    livres.forEach(f => { const l = LIVRES.find(x => x.fichier === f), c = (l && l.categorie) || "Autres"; (parProg[c] = parProg[c] || []).push(f); });
+    const grps = Object.keys(parProg).sort();
+    const lignes = ids.map(id => { const c = D.comptes[id], n = livres.filter(f => D.livres[f].cles[id]).length;
+      if (c.admin) return '<div class="acces-fiche"><div class="fh"><div class="qui"><b>' + esc(c.nom) + '</b><span class="acces-tag">admin</span><br><small>' + esc(id) + '</small></div><span class="cpt">Tous les livres</span></div></div>';
+      return '<div class="acces-fiche"><div class="fh"><div class="qui"><b>' + esc(c.nom) + '</b><br><small>' + esc(id) + '</small></div>'
+        + progs.map(pg => '<button class="abtn' + ((c.prog || []).includes(pg) ? ' prim' : '') + '" data-prog="' + esc(pg) + '" data-pid="' + esc(id) + '" title="Donner ou retirer tous les livres : ' + esc(progNom(pg)) + '">' + esc(court(pg)) + '</button>').join("")
+        + '<button class="abtn" data-mdp="' + esc(id) + '" title="Donner un nouveau mot de passe à cet enseignant">Mot de passe</button><button class="abtn" data-retirer="' + esc(id) + '" title="Retirer ce compte">Retirer</button></div>'
+        + '<details' + (OUVERTS.has(id) ? ' open' : '') + ' data-fiche="' + esc(id) + '"><summary>Livres permis : ' + n + ' sur ' + total + '</summary>'
+        + grps.map(g => '<div class="acces-grp"><div class="t">' + esc(court(g)) + '</div><div class="acces-chips">' + parProg[g].map(f => '<label class="acces-chip" title="' + esc(titreDe(f)) + '"><input type="checkbox" data-id="' + esc(id) + '" data-f="' + esc(f) + '"' + (D.livres[f].cles[id] ? " checked" : "") + '><span>' + esc(titreDe(f)) + '</span></label>').join("") + '</div></div>').join("")
+        + '</details></div>'; }).join("");
     let jeton = ""; try { jeton = localStorage.getItem("ghJeton") || ""; } catch(e){}
-    box().innerHTML = '<h2>Accès des enseignants</h2><p class="sous">Coche les livres que chaque enseignant peut ouvrir. Les changements partent en ligne quand tu touches « Publier ».</p>'
-      + (livres.length ? '<table class="acces-table">' + tete + lignes + '</table>' : '<p class="sous">Aucun livre protégé pour l\'instant.</p>')
+    box().innerHTML = '<h2>Accès des enseignants</h2><p class="sous">Touche « Livres permis » pour cocher les livres d\'un enseignant, ou ses programmes pour tout lui donner d\'un coup. Les changements partent en ligne quand tu touches « Publier ».</p>'
+      + (livres.length ? '<div class="acces-fiches">' + lignes + '</div>' : '<p class="sous">Aucun livre protégé pour l\'instant.</p>')
       + '<div class="acces-sec"><h3>Demandes reçues</h3><div id="gBoite"><p class="sous">Recherche des demandes…</p></div>'
       + '<details style="margin-top:8px"><summary style="cursor:pointer;color:#a9a9ae;font-size:.88rem">Coller un code reçu autrement (Teams, courriel)</summary><textarea id="gDem" placeholder="Colle ici le code DEMANDE-… reçu de l\'enseignant"></textarea><div class="acces-btns" style="justify-content:flex-start"><button class="abtn" id="gAjout">Ajouter cet enseignant</button></div></details></div>'
       + '<div class="acces-sec"><h3>Publication</h3><p class="sous" style="margin-bottom:6px">Pour publier d\'ici, colle une fois ta clé GitHub (gardée seulement sur cet ordinateur). Sinon, télécharge le fichier et envoie-le à Claude.</p>'
@@ -8150,6 +8173,7 @@ window.ACCES = (function(){
       + '<div class="acces-err" id="gErr"' + (msg && msg.err ? "" : " hidden") + '>' + (msg && msg.err ? esc(msg.err) : "") + '</div><div class="acces-ok" id="gOk"' + (msg && msg.ok ? "" : " hidden") + '>' + (msg && msg.ok ? esc(msg.ok) : "") + '</div>'
       + '<div class="acces-btns"><button id="gNon">Fermer</button><button id="gTel">Télécharger comptes.json</button><button class="prim" id="gPub">Publier</button></div>';
     const B = box();
+    B.querySelectorAll("details[data-fiche]").forEach(d => d.ontoggle = () => { d.open ? OUVERTS.add(d.dataset.fiche) : OUVERTS.delete(d.dataset.fiche); });
     B.querySelectorAll("input[type=checkbox][data-f]").forEach(cb => cb.onchange = async () => {
       const f = cb.dataset.f, id = cb.dataset.id; cb.disabled = true;
       try { if (cb.checked) BROUILLON.livres[f].cles[id] = await envelopper(f, BROUILLON.comptes[id].pub); else delete BROUILLON.livres[f].cles[id]; }
