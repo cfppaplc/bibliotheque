@@ -4861,47 +4861,6 @@ function versionLivre(l){ const e = (typeof NOUV !== "undefined" ? NOUV : []).fi
   const v = l.version ? "Version " + l.version : "", d = e ? (e.type === "ajout" ? "ajouté le " : "mis à jour le ") + dateFr(e.date) : "";
   return v && d ? v + " · " + d : v ? v : d ? d.charAt(0).toUpperCase() + d.slice(1) : ""; }
 /* Imprimer un livre ou l'enregistrer en PDF : toutes les pages l'une sous l'autre, format Lettre sans marges, en vectoriel (texte net à toute taille) */
-/* PDF prêt pour l'imprimeur : pdf/<fichier>.pdf (produit par outils/pdf_livres.js à la publication); s'il manque, repli sur l'impression du navigateur */
-async function telechargerPdf(l){
-  const url = "pdf/" + l.fichier + ".pdf", nom = (l.titre || l.fichier).replace(/[\\/:*?"<>|]+/g, " ").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/['’]/g, " ").replace(/[^\x20-\x7e]/g, "").replace(/\s+/g, " ").trim() + ".pdf";   /* nom sans accents : certains Chrome remplacent sinon le nom par « download » */
-  aviser("Téléchargement du PDF…", 2500);
-  try {
-    const r = await fetch(url, { cache:"no-cache" }); if (!r.ok) throw 0;
-    const blob = await r.blob(); const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob); a.download = nom; document.body.appendChild(a); a.click();
-    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 4000);
-    aviser("PDF téléchargé : " + nom, 4000);
-  } catch(e){ aviser("PDF pas encore prêt pour ce livre : la fenêtre d'impression s'ouvre (choisis « Enregistrer au format PDF »).", 6000); imprimerLivre(l); }
-}
-function imprimerLivre(l){
-  if (document.getElementById("cadreImpression")) return;
-  aviser("Préparation de l'impression de « " + l.titre + " »… (quelques secondes)", 8000);
-  fetch("livres/" + encodeURIComponent(l.fichier) + ".html").then(r => { if (!r.ok) throw 0; return r.text(); }).then(html => {
-    const f = document.createElement("iframe"); f.id = "cadreImpression"; f.setAttribute("aria-hidden", "true");
-    f.style.cssText = "position:fixed;left:-12000px;top:0;width:1200px;height:1000px;border:0;opacity:0;pointer-events:none";
-    const fin = () => setTimeout(() => f.remove(), 1500);
-    f.onload = () => setTimeout(async () => {
-      const w = f.contentWindow, d = f.contentDocument;
-      try { await d.fonts.ready; } catch(e){}
-      const pages = [...d.querySelectorAll(".page")].filter(x => !x.parentElement.closest(".page"));
-      if (!pages.length){ aviser("Ce livre ne peut pas être imprimé page par page."); fin(); return; }
-      const boite = d.createElement("div"); boite.id = "impression";
-      pages.forEach(pg => { pg.classList.add("vis", "cur", "hcur"); pg.classList.remove("out", "fwd", "back"); boite.appendChild(pg); });
-      d.body.appendChild(boite);
-      const st = d.createElement("style");
-      st.textContent = "@page{size:8.5in 11in;margin:0}"
-        + "html,body{margin:0!important;padding:0!important;background:#fff!important;overflow:visible!important;height:auto!important;width:auto!important;transform:none!important}"
-        + "body>*:not(#impression){display:none!important}#impression{display:block!important;position:static!important;transform:none!important}"
-        + "#impression>.page{display:block!important;position:relative!important;left:auto!important;top:auto!important;visibility:visible!important;opacity:1!important;transform:none!important;translate:none!important;"
-        + "width:816px!important;height:1056px!important;margin:0!important;box-shadow:none!important;break-after:page;page-break-after:always;overflow:hidden!important;content-visibility:visible!important}"
-        + "#impression *{animation-delay:-60s!important;animation-duration:.001s!important;animation-iteration-count:1!important;transition:none!important}"   /* animations à leur état final */
-        + "*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}";                                                                        /* couleurs et fonds imprimés */
-      d.head.appendChild(st);
-      setTimeout(() => { try { w.addEventListener("afterprint", fin); w.focus(); w.print(); } catch(e){ aviser("Impression impossible dans ce navigateur."); } fin(); }, 900);
-    }, 2500);
-    f.srcdoc = html; document.body.appendChild(f);
-  }).catch(() => aviser("Impossible d'ouvrir le livre pour l'imprimer (Internet ?)."));
-}
 function openModal(l){
   $("#panel").innerHTML = `
     <div class="panel-top ${couv(l) ? 'with-cover' : ''}" style="${couv(l) ? 'background:' + fond(l) : coverStyle(l) + ';background-size:cover'}">
@@ -4920,12 +4879,10 @@ function openModal(l){
       <p>${esc(l.description)}</p>
       <button class="btn btn-play" id="mRead">▶ Lire</button>
       <button class="btn btn-fav" id="mFav">${isFav(l) ? "✓ Dans ma liste" : "+ Ma liste"}</button>
-      ${l.fichier && !l.user ? '<button class="btn btn-fav" id="mPdf" title="Fichier PDF prêt pour l\'imprimeur : toutes les pages, format Lettre, vectoriel">Télécharger le PDF</button>' : ''}
     </div>`;
   $("#modal").classList.add("open");
   $(".close").onclick = closeModal;
   $("#mRead").onclick = () => lire(l);
-  if ($("#mPdf")) $("#mPdf").onclick = () => telechargerPdf(l);
   $("#mFav").onclick = () => {
     favs = isFav(l) ? favs.filter(f => f !== l.fichier) : [...favs, l.fichier];
     saveFavs(); openModal(l); render();
