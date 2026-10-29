@@ -1593,14 +1593,15 @@ function brancherSouris(win){
   const pannable = t => { try { const c = win.getComputedStyle(t).cursor; return c === "grab" || c === "auto" || c === "default" || c === "grabbing"; } catch(e){ return false; } };
   const fin = () => { if (!PAN.on) return; PAN.on = false; majCurseur(); };
   win.addEventListener("mousedown", e => {
+    if (e.button === 1){ e.preventDefault(); e.stopImmediatePropagation(); if (RD.z <= 1.01) return; PAN.b = 4; PAN.on = true; PAN.alvo = null; PAN.x = e.screenX; PAN.y = e.screenY; PAN.l = st().scrollLeft; PAN.t = st().scrollTop; doc.documentElement.style.cursor = "grabbing"; return; }   /* roulette enfoncée : on glisse la page (pas le défilement automatique du navigateur) */
     if (e.button !== 0 || RD.z <= 1.01 || outilActif()) return;
     if (e.target.closest && e.target.closest("a,button,input,select,textarea,label,summary,video,audio,[contenteditable]")) return;
-    PAN.on = true; PAN.alvo = null; PAN.x = e.screenX; PAN.y = e.screenY; PAN.l = st().scrollLeft; PAN.t = st().scrollTop;
+    PAN.b = 1; PAN.on = true; PAN.alvo = null; PAN.x = e.screenX; PAN.y = e.screenY; PAN.l = st().scrollLeft; PAN.t = st().scrollTop;
     doc.documentElement.style.cursor = RD.laser ? "none" : "grabbing"; e.preventDefault();
   });
   win.addEventListener("mousemove", e => {
     if (!PAN.on) return;
-    if (!(e.buttons & 1)){ fin(); return; }
+    if (!(e.buttons & (PAN.b || 1))){ fin(); return; }
     st().scrollLeft = PAN.l - (e.screenX - PAN.x); st().scrollTop = PAN.t - (e.screenY - PAN.y);
   });
   win.addEventListener("mouseup", fin); win.addEventListener("blur", fin);
@@ -1626,11 +1627,11 @@ function brancherSouris(win){
 (function(){
   const st = $("#rstage");
   st.addEventListener("mousedown", e => {
-    if (e.button !== 0 || RD.z <= 1 || outilActif() || !(e.target === st || e.target.id === "rinner" || e.target.id === "spine")) return;
-    PAN.on = true; PAN.alvo = null; PAN.x = e.screenX; PAN.y = e.screenY; PAN.l = st.scrollLeft; PAN.t = st.scrollTop; e.preventDefault();
+    if (e.button === 1){ e.preventDefault(); if (RD.z <= 1) return; } else if (e.button !== 0 || RD.z <= 1 || outilActif() || !(e.target === st || e.target.id === "rinner" || e.target.id === "spine")) return;
+    PAN.b = e.button === 1 ? 4 : 1; PAN.on = true; PAN.alvo = null; PAN.x = e.screenX; PAN.y = e.screenY; PAN.l = st.scrollLeft; PAN.t = st.scrollTop; e.preventDefault();
     st.style.cursor = "grabbing";
   });
-  document.addEventListener("mousemove", e => { if (!PAN.on) return; if (!(e.buttons & 1)){ PAN.on = false; majCurseur(); return; }
+  document.addEventListener("mousemove", e => { if (!PAN.on) return; if (!(e.buttons & (PAN.b || 1))){ PAN.on = false; majCurseur(); return; }
     st.scrollLeft = PAN.l - (e.screenX - PAN.x); st.scrollTop = PAN.t - (e.screenY - PAN.y); });
   document.addEventListener("mouseup", () => { if (PAN.on){ PAN.on = false; majCurseur(); } });
   st.addEventListener("wheel", e => {
