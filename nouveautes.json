@@ -1,6 +1,46 @@
 [
   {
     "date": "2026-10-29",
+    "type": "outil",
+    "titre": "Lecture des livres",
+    "texte": "Même barre, même table des matières et mêmes réponses pas à pas dans tous les livres. Zoom doux à la roulette. Impression en PDF.",
+    "formation": [
+      {
+        "t": "Touche M (ou ☰) : la table des matières.",
+        "img": "nouveautes/livre-tdm.jpg"
+      },
+      {
+        "t": "Bouton ✓ (touche R) : chaque clic montre la réponse suivante de la page (grisé = pas de réponse).",
+        "img": "nouveautes/livre-barre.jpg"
+      },
+      "Tiens › enfoncé pour avancer vite dans les pages.",
+      "Roulette = zoom sous la souris; une fois zoomé, glisse la page (ou garde la roulette enfoncée) pour te déplacer.",
+      {
+        "t": "Fiche du livre → Imprimer / PDF, puis choisis « Enregistrer au format PDF » (toutes les pages, format Lettre, qualité d'impression).",
+        "img": "nouveautes/livre-pdf.jpg"
+      }
+    ],
+    "versions": [
+      {
+        "date": "2026-10-29",
+        "texte": "Nouveau bouton Imprimer / PDF dans la fiche de chaque livre : toutes les pages, net à l'impression (texte et dessins vectoriels)."
+      },
+      {
+        "date": "2026-10-28",
+        "texte": "Roulette enfoncée : déplace la page zoomée. Petit jeu élastique au-delà des bords quand on glisse (la page revient en place)."
+      },
+      {
+        "date": "2026-10-28",
+        "texte": "Protection incendie : un seul zoom, celui de la bibliothèque (plus de zoom dans la page au double-clic ou à deux doigts), et beaucoup plus rapide."
+      },
+      {
+        "date": "2026-10-28",
+        "texte": "Page simple : le zoom à la roulette marche dans tous les livres."
+      }
+    ]
+  },
+  {
+    "date": "2026-10-29",
     "type": "maj",
     "livre": "dispositifs-electriques-c9",
     "titre": "Dispositifs électriques et électroniques (C9)",
@@ -228,42 +268,6 @@
       {
         "date": "2026-10-28",
         "texte": "Un nouveau fil peut partir du milieu d'un fil existant (jonction automatique)."
-      }
-    ]
-  },
-  {
-    "date": "2026-10-28",
-    "type": "outil",
-    "titre": "Lecture des livres",
-    "texte": "Même barre, même table des matières et mêmes réponses pas à pas dans tous les livres. Zoom doux à la roulette.",
-    "formation": [
-      {
-        "t": "Touche M (ou ☰) : la table des matières.",
-        "img": "nouveautes/livre-tdm.jpg"
-      },
-      {
-        "t": "Bouton ✓ (touche R) : chaque clic montre la réponse suivante de la page (grisé = pas de réponse).",
-        "img": "nouveautes/livre-barre.jpg"
-      },
-      "Tiens › enfoncé pour avancer vite dans les pages.",
-      "Roulette = zoom sous la souris; une fois zoomé, glisse la page (ou garde la roulette enfoncée) pour te déplacer."
-    ],
-    "versions": [
-      {
-        "date": "2026-10-28",
-        "texte": "Roulette enfoncée : déplace la page zoomée. Petit jeu élastique au-delà des bords quand on glisse (la page revient en place)."
-      },
-      {
-        "date": "2026-10-28",
-        "texte": "Protection incendie : un seul zoom, celui de la bibliothèque (plus de zoom dans la page au double-clic ou à deux doigts), et beaucoup plus rapide."
-      },
-      {
-        "date": "2026-10-28",
-        "texte": "Page simple : le zoom à la roulette marche dans tous les livres."
-      },
-      {
-        "date": "2026-10-28",
-        "texte": "Zoom à la roulette plus fluide; on se déplace en glissant partout et on peut dépasser les bords de la page."
       }
     ]
   },

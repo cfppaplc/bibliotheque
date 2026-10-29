@@ -4860,6 +4860,36 @@ document.addEventListener("DOMContentLoaded", () => { const ov = document.getEle
 function versionLivre(l){ const e = (typeof NOUV !== "undefined" ? NOUV : []).filter(n => n.livre === l.fichier && n.date).sort((a, b) => b.date.localeCompare(a.date))[0];
   const v = l.version ? "Version " + l.version : "", d = e ? (e.type === "ajout" ? "ajouté le " : "mis à jour le ") + dateFr(e.date) : "";
   return v && d ? v + " · " + d : v ? v : d ? d.charAt(0).toUpperCase() + d.slice(1) : ""; }
+/* Imprimer un livre ou l'enregistrer en PDF : toutes les pages l'une sous l'autre, format Lettre sans marges, en vectoriel (texte net à toute taille) */
+function imprimerLivre(l){
+  if (document.getElementById("cadreImpression")) return;
+  aviser("Préparation de l'impression de « " + l.titre + " »… (quelques secondes)", 8000);
+  fetch("livres/" + encodeURIComponent(l.fichier) + ".html").then(r => { if (!r.ok) throw 0; return r.text(); }).then(html => {
+    const f = document.createElement("iframe"); f.id = "cadreImpression"; f.setAttribute("aria-hidden", "true");
+    f.style.cssText = "position:fixed;left:-12000px;top:0;width:1200px;height:1000px;border:0;opacity:0;pointer-events:none";
+    const fin = () => setTimeout(() => f.remove(), 1500);
+    f.onload = () => setTimeout(async () => {
+      const w = f.contentWindow, d = f.contentDocument;
+      try { await d.fonts.ready; } catch(e){}
+      const pages = [...d.querySelectorAll(".page")].filter(x => !x.parentElement.closest(".page"));
+      if (!pages.length){ aviser("Ce livre ne peut pas être imprimé page par page."); fin(); return; }
+      const boite = d.createElement("div"); boite.id = "impression";
+      pages.forEach(pg => { pg.classList.add("vis", "cur", "hcur"); pg.classList.remove("out", "fwd", "back"); boite.appendChild(pg); });
+      d.body.appendChild(boite);
+      const st = d.createElement("style");
+      st.textContent = "@page{size:8.5in 11in;margin:0}"
+        + "html,body{margin:0!important;padding:0!important;background:#fff!important;overflow:visible!important;height:auto!important;width:auto!important;transform:none!important}"
+        + "body>*:not(#impression){display:none!important}#impression{display:block!important;position:static!important;transform:none!important}"
+        + "#impression>.page{display:block!important;position:relative!important;left:auto!important;top:auto!important;visibility:visible!important;opacity:1!important;transform:none!important;translate:none!important;"
+        + "width:816px!important;height:1056px!important;margin:0!important;box-shadow:none!important;break-after:page;page-break-after:always;overflow:hidden!important;content-visibility:visible!important}"
+        + "#impression *{animation-delay:-60s!important;animation-duration:.001s!important;animation-iteration-count:1!important;transition:none!important}"   /* animations à leur état final */
+        + "*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}";                                                                        /* couleurs et fonds imprimés */
+      d.head.appendChild(st);
+      setTimeout(() => { try { w.addEventListener("afterprint", fin); w.focus(); w.print(); } catch(e){ aviser("Impression impossible dans ce navigateur."); } fin(); }, 900);
+    }, 2500);
+    f.srcdoc = html; document.body.appendChild(f);
+  }).catch(() => aviser("Impossible d'ouvrir le livre pour l'imprimer (Internet ?)."));
+}
 function openModal(l){
   $("#panel").innerHTML = `
     <div class="panel-top ${couv(l) ? 'with-cover' : ''}" style="${couv(l) ? 'background:' + fond(l) : coverStyle(l) + ';background-size:cover'}">
@@ -4878,10 +4908,12 @@ function openModal(l){
       <p>${esc(l.description)}</p>
       <button class="btn btn-play" id="mRead">▶ Lire</button>
       <button class="btn btn-fav" id="mFav">${isFav(l) ? "✓ Dans ma liste" : "+ Ma liste"}</button>
+      ${l.fichier && !l.user ? '<button class="btn btn-fav" id="mPdf" title="Toutes les pages, en qualité d\'impression (vectoriel), format Lettre">Imprimer / PDF</button>' : ''}
     </div>`;
   $("#modal").classList.add("open");
   $(".close").onclick = closeModal;
   $("#mRead").onclick = () => lire(l);
+  if ($("#mPdf")) $("#mPdf").onclick = () => imprimerLivre(l);
   $("#mFav").onclick = () => {
     favs = isFav(l) ? favs.filter(f => f !== l.fichier) : [...favs, l.fichier];
     saveFavs(); openModal(l); render();
