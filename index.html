@@ -7979,7 +7979,7 @@ window.ACCES = (function(){
   const idDe = nom => sansAcc(nom).toLowerCase().replace(/[^a-z0-9]+/g, ".").replace(/^\.|\.$/g, "");
   const sansAcc = t => t.normalize("NFD").replace(/[̀-ͯ]/g, "");
   /* envoi automatique des demandes : service de courriel FormSubmit (adresse ou code secret fourni par FormSubmit). Vide = pas d'envoi, on montre le code à copier. */
-  const ENVOI_DEMANDES = "raymjere@csskamloup.gouv.qc.ca";   /* à remplacer par le code secret FormSubmit dès que Jeremy l'a reçu */
+  const ENVOI_DEMANDES = "djay.raymond@hotmail.com";   /* à remplacer par le code secret FormSubmit dès que Jeremy l'a reçu */
   async function envoyerDemande(code, nom, prog){
     if (!ENVOI_DEMANDES) throw new Error("envoi non configuré");
     const lien = location.origin + location.pathname + "#accepter=" + code.replace(/^DEMANDE-/, "");
