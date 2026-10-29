@@ -2128,7 +2128,8 @@ function wbSupprimer(){   /* supprime le tableau affiché : 1er toucher = « Sû
   st.bg = bg; st.count--; st.n = Math.min(n, st.count);
   SELO.s = null; window.SELM = []; majFond(); redrawInk(); refreshTools(); planifierSauvegarde(); aviser("Tableau " + n + " supprimé.");
 }
-function wbNouveau(){ const st = wbEtat(); st.count++; st.n = st.count; st.bg[st.n] = st.bg[st.n - 1] || "blanc"; majFond(); redrawInk(); refreshTools(); aviser("Tableau " + st.n + " ajouté."); }
+const wbVide = n => { const base = RD.book + "|wb" + n; return !Object.keys(INKS).some(k => (k === base || k.startsWith(base + ":")) && INKS[k] && INKS[k].length); };
+function wbNouveau(){ const st = wbEtat(), P = window.PREF ? window.PREF() : {}; st.count++; st.n = st.count; st.bg[st.n] = (P.fond && WBFONDS.some(f => f.k === P.fond)) ? P.fond : (st.bg[st.n - 1] || "blanc"); majFond(); redrawInk(); refreshTools(); aviser("Tableau " + st.n + " ajouté."); }
 function wbFondSuivant(){
   const st = wbEtat(), i = WBFONDS.findIndex(f => f.k === wbBg()), f = WBFONDS[(i + 1) % WBFONDS.length], av = inkKey(), avn = nomFond(wbBg());
   st.bg[st.n] = f.k; SELO.s = null; window.SELM = []; majFond(); redrawInk(); refreshTools(); aviser(f.n); apresFond(av, avn);
@@ -4970,8 +4971,11 @@ function ouvrirTableauBlanc(apres){
     let pret = false; try { pret = !!(RD.drv && RD.drv.state().tot > 0); } catch(e){}
     if (pret || n > 60){ clearInterval(t); if (!RD.wb) toggleWb();
       try { const P = window.PREF ? window.PREF() : {}, st = wbEtat();   /* préférences du prof : fond et couleur du crayon au départ */
-        const base = RD.book + "|wb" + st.n, vide = !Object.keys(INKS).some(k => (k === base || k.startsWith(base + ":")) && INKS[k] && INKS[k].length);   /* page vide : le fond préféré passe avant le fond retenu de la dernière fois */
-        if (P.fond && vide && st.bg[st.n] !== P.fond && WBFONDS.some(f => f.k === P.fond)){ st.bg[st.n] = P.fond; majFond(); redrawInk(); refreshTools(); }
+        if (P.fond && WBFONDS.some(f => f.k === P.fond)){
+          /* le dessin déjà là n'est jamais touché : on va sur un tableau vide (celui affiché, un autre déjà vide, sinon un nouveau à la fin) avec le fond préféré */
+          let v = wbVide(st.n) ? st.n : 0; for (let i = 1; !v && i <= st.count; i++) if (wbVide(i)) v = i;
+          if (!v){ st.count++; v = st.count; setTimeout(() => aviser("Nouveau tableau " + v + ". Ton dessin d'avant est au tableau " + (v - 1) + " (flèche ←).", 4500), 600); }
+          if (v !== st.n || st.bg[v] !== P.fond){ st.n = v; st.bg[v] = P.fond; majFond(); redrawInk(); refreshTools(); planifierSauvegarde(); } }
         if (P.crayon) { RD.color = P.crayon; refreshTools(); } } catch(e){}
       if (apres) setTimeout(apres, 120); } }, 100);
 }
