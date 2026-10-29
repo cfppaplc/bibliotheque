@@ -2864,6 +2864,13 @@ function groupeCotes(s){ const c = $("#inkCanvas"), W = c.width, H = c.height, p
   const sur = (o, f) => arcs(f).some(([u, v]) => (pres(u, o.p[0]) && pres(v, o.p[1])) || (pres(v, o.p[0]) && pres(u, o.p[1])));
   const tous = strokes(), f = s.t === "cote" ? tous.find(o => o !== s && o.t !== "cote" && o.p && sur(s, o)) : s;
   if (!f) return []; return [f].concat(tous.filter(o => o.t === "cote" && o !== f && sur(o, f))).filter(o => o !== s); }
+/* cotes et textes posés sur les côtés d'une forme : on retient le côté (et le sens) pour qu'ils suivent quand la forme bouge ou change de taille */
+function liensCotes(f){ if (!f || f.t === "cote" || !sommetsForme(f)) return null; const c = $("#inkCanvas"), W = c.width, H = c.height, pres = (u, v) => Math.hypot((u[0] - v[0]) * W, (u[1] - v[1]) * H) < 4;
+  const S = sommetsForme(f), n = S.P.length - (S.ferme ? 0 : 1), L = [];
+  strokes().forEach(o => { if (o.t !== "cote" || !o.p) return; for (let i = 0; i < n; i++){ const u = S.P[i], v = S.P[(i + 1) % S.P.length];
+    if (pres(u, o.p[0]) && pres(v, o.p[1])){ L.push([o, i, false]); return; } if (pres(v, o.p[0]) && pres(u, o.p[1])){ L.push([o, i, true]); return; } } });
+  return L.length ? L : null; }
+function suivreCotes(L, f){ const S = sommetsForme(f); if (!S || !L) return; L.forEach(([o, i, rev]) => { const u = S.P[i], v = S.P[(i + 1) % S.P.length]; if (!u || !v) return; o.p = rev ? [v.slice(), u.slice()] : [u.slice(), v.slice()]; }); }
 /* couleur de la forme, dans la case du double-clic */
 function couleurForme(box, s){
   const row = document.createElement("div"); row.style.cssText = "display:flex;align-items:center;gap:6px;margin-top:10px;flex-wrap:wrap";
@@ -3965,13 +3972,13 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     if (cur.poignee === 2){ if (!cur.snap){ snapInk(); cur.snap = true; } const o = cur.s, W = c.width, H = c.height, r = c.getBoundingClientRect(), q = [(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height];
       const a = o.p[0], b = o.p[1], an = Math.atan2((b[1] - a[1]) * H, (b[0] - a[0]) * W), d = (-(q[0] - (a[0] + b[0]) / 2) * W * Math.sin(an) + (q[1] - (a[1] + b[1]) / 2) * H * Math.cos(an));
       o.d = Math.abs(d) < 6 ? 0 : d / H; if (!rafTrait) rafTrait = requestAnimationFrame(() => { rafTrait = 0; redrawInk(); }); return; }
-    if (cur.poignee !== undefined){ if (!cur.snap){ snapInk(); cur.snap = true; } cur.s.p[cur.poignee] = /^tuy/.test(cur.s.t) ? aimanterTuyau(pt(e), cur.s.p[1 - cur.poignee], cur.s) : pt(e); if (!rafTrait) rafTrait = requestAnimationFrame(() => { rafTrait = 0; redrawInk(); }); return; }
+    if (cur.poignee !== undefined){ if (!cur.snap){ snapInk(); cur.snap = true; cur.cotes = liensCotes(cur.s); } cur.s.p[cur.poignee] = /^tuy/.test(cur.s.t) ? aimanterTuyau(pt(e), cur.s.p[1 - cur.poignee], cur.s) : pt(e); if (cur.cotes) suivreCotes(cur.cotes, cur.s); if (!rafTrait) rafTrait = requestAnimationFrame(() => { rafTrait = 0; redrawInk(); }); return; }
     if (cur.bouge){ const q = pt(e), dx = q[0] - cur.q0[0], dy = q[1] - cur.q0[1];
-      if (!cur.snap){ if (Math.hypot(e.clientX - cur.x0, e.clientY - cur.y0) < 5) return; snapInk(); cur.snap = true;
+      if (!cur.snap){ if (Math.hypot(e.clientX - cur.x0, e.clientY - cur.y0) < 5) return; snapInk(); cur.snap = true; cur.cotes = liensCotes(cur.bouge);   /* ses cotes et textes suivent */
         if (PORTS_PL[cur.bouge.t]){ const W = c.width, H = c.height, P = portsPlomb(cur.bouge, W, H); cur.liens = [];       /* tuyaux branchés : ils suivent l'appareil */
           strokes().forEach(o => { if (!/^tuy/.test(o.t || "")) return; o.p.forEach((e, i) => { if (P.some(pt => Math.hypot(pt.x - e[0] * W, pt.y - e[1] * H) < 3)) cur.liens.push([o, i, e.slice()]); }); }); } }
       if (cur.liens) cur.liens.forEach(([o, i, e]) => { o.p[i] = [e[0] + dx, e[1] + dy]; });
-      cur.bouge.p = cur.p0.map(v => [v[0] + dx, v[1] + dy]); if (!rafTrait) rafTrait = requestAnimationFrame(() => { rafTrait = 0; redrawInk(); }); return; }
+      cur.bouge.p = cur.p0.map(v => [v[0] + dx, v[1] + dy]); if (cur.cotes) suivreCotes(cur.cotes, cur.bouge); if (!rafTrait) rafTrait = requestAnimationFrame(() => { rafTrait = 0; redrawInk(); }); return; }
     if (cur.t){ cur.p[1] = pt(e); if (/^tuy/.test(cur.t)) cur.p[1] = aimanterTuyau(cur.p[1], cur.p[0], cur); }
     else if (cur.iso && !cur.hl) suivreIso(e);
     else { const evs = (e.getCoalescedEvents && e.getCoalescedEvents()) || [], r = rectToile(), mn = 1.2 / Math.max(r.width, 1);
