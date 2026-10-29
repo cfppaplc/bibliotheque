@@ -4656,7 +4656,7 @@ majEpaisseur();
   const rt = refreshTools; refreshTools = function(){ rt.apply(this, arguments); try { majCouleurCrayon(); } catch(e){} };
   majCouleurCrayon();
 })();
-$("#penE").onclick = () => { RD.eraser = !RD.eraser; if (RD.eraser){ RD.text = false; RD.obj = false; } refreshTools(); majPopGomme(); };
+$("#penE").onclick = () => { RD.eraser = !RD.eraser; if (RD.eraser){ RD.text = false; RD.obj = false; } RD.crayonOff = true; refreshTools(); majPopGomme(); };   /* la gomme remplace le crayon : en la rangeant, aucun outil (pas de retour au crayon) */
 /* taille de la gomme : petite fenêtre qui s'ouvre avec la gomme */
 (function(){
   const bar = $("#penBar"), pg = document.createElement("div"); pg.className = "ppop"; pg.id = "popGom"; pg.hidden = true;
