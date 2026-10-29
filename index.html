@@ -8006,11 +8006,11 @@ window.ACCES = (function(){
   async function envoyerDemande(code, nom){
     const r = await fetch(BOITE, { method:"POST", body:code, headers:{ Title:"Demande d'acces : " + sansAcc(nom), Tags:"books" } });
     if (!r.ok) throw new Error("réponse " + r.status);
-    try { localStorage.setItem("demandeEnAttente", JSON.stringify({ code, id:idDe(nom), nom, envoi:Date.now() })); } catch(e){}
+    try { localStorage.setItem("demandeEnAttente", JSON.stringify({ code, id:idDe(nom), nom, x:lireDemande(code).pub.x, envoi:Date.now() })); } catch(e){}
   }
   async function relancerDemande(){      /* au chargement : la demande de cet ordinateur est-elle encore en attente ? */
     let d = null; try { d = JSON.parse(localStorage.getItem("demandeEnAttente") || "null"); } catch(e){} if (!d) return;
-    if (DATA && DATA.comptes[d.id]){ try { localStorage.removeItem("demandeEnAttente"); } catch(e){} return; }
+    const cpt = DATA && DATA.comptes[d.id]; if (cpt && (!d.x || cpt.pub.x === d.x)){ try { localStorage.removeItem("demandeEnAttente"); } catch(e){} return; }
     if (Date.now() - (d.envoi || 0) > 6 * 3600e3) try { await envoyerDemande(d.code, d.nom); } catch(e){}
   }
   async function lireBoite(){            /* demandes reçues (12 dernières heures) + celles déjà vues sur cet ordinateur */
@@ -8079,22 +8079,23 @@ window.ACCES = (function(){
       + '<label for="acMdp">Mot de passe</label><input type="password" id="acMdp" autocomplete="current-password">'
       + '<div class="acces-err" id="acErr" hidden></div>'
       + '<div class="acces-btns"><button id="acNon">Annuler</button><button class="prim" id="acOui">Se connecter</button></div>'
-      + '<button class="acces-lien" id="acDem">Pas encore de compte ? Demander un accès</button>';
+      + '<button class="acces-lien" id="acDem">Pas encore de compte ? Demander un accès</button><br><button class="acces-lien" id="acOubli" style="margin-top:8px">Mot de passe oublié ?</button>';
     ov().hidden = false; setTimeout(() => document.getElementById("acId")?.focus(), 50);
     const go = async () => { const bt = document.getElementById("acOui"), er = document.getElementById("acErr"); bt.disabled = true; bt.textContent = "Vérification…"; er.hidden = true;
       try { await connexion(document.getElementById("acId").value, document.getElementById("acMdp").value); fermer(); aviser("Bienvenue, " + SESSION.nom + " !"); if (apres) apres(); }
       catch(e){ er.textContent = e.message; er.hidden = false; bt.disabled = false; bt.textContent = "Se connecter"; } };
     document.getElementById("acOui").onclick = go; document.getElementById("acMdp").onkeydown = e => { if (e.key === "Enter") go(); };
-    document.getElementById("acNon").onclick = fermer; document.getElementById("acDem").onclick = dlgDemande;
+    document.getElementById("acNon").onclick = fermer; document.getElementById("acDem").onclick = () => dlgDemande(false); document.getElementById("acOubli").onclick = () => dlgDemande(true);
   }
-  function dlgDemande(){
-    box().innerHTML = '<h2>Demander un accès</h2><p class="sous">Choisis ton mot de passe (au moins 10 caractères). ' + 'Ta demande partira toute seule à Jeremy' + '; dès qu\'il l\'accepte, tu pourras te connecter.</p>'
+  function dlgDemande(oubli){
+    box().innerHTML = (oubli ? '<h2>Mot de passe oublié</h2><p class="sous">Écris ton nom et choisis un nouveau mot de passe (au moins 10 caractères). Jeremy recevra la demande; dès qu\'il l\'accepte, ton nouveau mot de passe fonctionne. Tu gardes tous tes livres.</p>'
+      : '<h2>Demander un accès</h2><p class="sous">Choisis ton mot de passe (au moins 10 caractères). Ta demande partira toute seule à Jeremy; dès qu\'il l\'accepte, tu pourras te connecter.</p>')
       + '<label for="dNom">Prénom et nom</label><input type="text" id="dNom" autocomplete="name">'
       + '<label for="dMdp">Mot de passe</label><input type="password" id="dMdp" autocomplete="new-password">'
       + '<label for="dMdp2">Mot de passe (encore)</label><input type="password" id="dMdp2" autocomplete="new-password">'
-      + '<label>Programme(s) que tu enseignes</label>' + PROGS().map(c => '<label style="display:flex;gap:8px;align-items:center;font-weight:500;margin:6px 0"><input type="checkbox" class="dProg" value="' + esc(c) + '" style="width:18px;height:18px;accent-color:#e50914"> ' + esc(progNom(c)) + '</label>').join("")
+      + (oubli ? '' : '<label>Programme(s) que tu enseignes</label>') + (oubli ? [] : PROGS()).map(c => '<label style="display:flex;gap:8px;align-items:center;font-weight:500;margin:6px 0"><input type="checkbox" class="dProg" value="' + esc(c) + '" style="width:18px;height:18px;accent-color:#e50914"> ' + esc(progNom(c)) + '</label>').join("")
       + '<div class="acces-err" id="dErr" hidden></div>'
-      + '<div class="acces-btns"><button id="dNon">Annuler</button><button class="prim" id="dOui">Créer ma demande</button></div>';
+      + '<div class="acces-btns"><button id="dNon">Annuler</button><button class="prim" id="dOui">' + (oubli ? 'Envoyer ma demande' : 'Créer ma demande') + '</button></div>';
     ov().hidden = false; setTimeout(() => document.getElementById("dNom")?.focus(), 50);
     document.getElementById("dNon").onclick = fermer;
     document.getElementById("dOui").onclick = async () => {
@@ -8103,8 +8104,9 @@ window.ACCES = (function(){
       if (nom.split(/\s+/).length < 2) return err("Écris ton prénom et ton nom.");
       if (m1.length < 10) return err("Le mot de passe doit avoir au moins 10 caractères.");
       if (m1 !== m2) return err("Les deux mots de passe ne sont pas pareils.");
-      if (DATA && DATA.comptes[idDe(nom)]) return err("Ce nom a déjà un compte. Connecte-toi plutôt.");
-      const prog = [...document.querySelectorAll(".dProg:checked")].map(x => x.value); if (!prog.length) return err("Coche au moins un programme.");
+      if (!oubli && DATA && DATA.comptes[idDe(nom)]) return err("Ce nom a déjà un compte. Connecte-toi plutôt (ou « Mot de passe oublié ? »).");
+      if (oubli && !(DATA && DATA.comptes[idDe(nom)])) return err("Aucun compte à ce nom. Écris ton nom comme lors de ta première demande.");
+      const prog = [...document.querySelectorAll(".dProg:checked")].map(x => x.value); if (!oubli && !prog.length) return err("Coche au moins un programme.");
       const bt = document.getElementById("dOui"); bt.disabled = true; bt.textContent = "Création…";
       try { const code = await demande(nom, m1, prog);
         let envoye = false; try { bt.textContent = "Envoi à Jeremy…"; await envoyerDemande(code, nom); envoye = true; } catch(e){}
@@ -8137,7 +8139,7 @@ window.ACCES = (function(){
       return '<tr><td><b>' + esc(c.nom) + '</b>' + (c.admin ? '<span class="acces-tag">admin</span>' : '') + '<br><small style="color:#8c8c92">' + esc(id) + '</small></td>'
         + '<td>' + (c.admin ? '<small style="color:#8c8c92">tout</small>' : progs.map(pg => '<button class="abtn' + ((c.prog || []).includes(pg) ? ' prim' : '') + '" style="padding:4px 9px;font-size:.78rem;margin:2px" data-prog="' + esc(pg) + '" data-pid="' + esc(id) + '" title="' + esc(progNom(pg)) + '">' + esc(court(pg)) + '</button>').join("")) + '</td>'
         + livres.map(f => '<td><input type="checkbox" data-id="' + esc(id) + '" data-f="' + esc(f) + '"' + (D.livres[f].cles[id] ? " checked" : "") + (c.admin ? " disabled" : "") + '></td>').join("")
-        + '<td>' + (c.admin ? "" : '<button class="abtn" data-retirer="' + esc(id) + '" title="Retirer ce compte">Retirer</button>') + '</td></tr>'; }).join("");
+        + '<td style="white-space:nowrap">' + (c.admin ? "" : '<button class="abtn" data-mdp="' + esc(id) + '" title="Donner un nouveau mot de passe à cet enseignant">Mot de passe</button> <button class="abtn" data-retirer="' + esc(id) + '" title="Retirer ce compte">Retirer</button>') + '</td></tr>'; }).join("");
     let jeton = ""; try { jeton = localStorage.getItem("ghJeton") || ""; } catch(e){}
     box().innerHTML = '<h2>Accès des enseignants</h2><p class="sous">Coche les livres que chaque enseignant peut ouvrir. Les changements partent en ligne quand tu touches « Publier ».</p>'
       + (livres.length ? '<table class="acces-table">' + tete + lignes + '</table>' : '<p class="sous">Aucun livre protégé pour l\'instant.</p>')
@@ -8157,18 +8159,23 @@ window.ACCES = (function(){
       c.prog = c.prog || []; const ajoute = !c.prog.includes(pg); c.prog = ajoute ? c.prog.concat(pg) : c.prog.filter(x => x !== pg);
       try { await appliquerProgs(id, ajoute ? [pg] : [], ajoute ? [] : [pg]); dessinerGerer({ ok:c.nom + (ajoute ? " a maintenant tous les livres « " : " n'a plus les livres « ") + court(pg) + " »." }); }
       catch(e){ dessinerGerer({ err:e.message }); } });
+    B.querySelectorAll("[data-mdp]").forEach(b => b.onclick = async () => { const id = b.dataset.mdp, c = BROUILLON.comptes[id];
+      const m = prompt("Nouveau mot de passe pour " + c.nom + " (au moins 10 caractères).\nDonne-le-lui ensuite; il pourra se connecter dès que tu auras publié.", ""); if (m === null) return;
+      if (m.length < 10) return dessinerGerer({ err:"Le mot de passe doit avoir au moins 10 caractères." });
+      try { const d = lireDemande(await demande(c.nom, m, c.prog || [])); d.id = id; await remplacerCompte(d); dessinerGerer({ ok:"Nouveau mot de passe de " + c.nom + " prêt. Touche « Publier », puis donne-lui son mot de passe." }); }
+      catch(e){ dessinerGerer({ err:e.message }); } });
     B.querySelectorAll("[data-retirer]").forEach(b => b.onclick = () => { const id = b.dataset.retirer;
       if (!confirm("Retirer le compte de " + BROUILLON.comptes[id].nom + " ?")) return;
       delete BROUILLON.comptes[id]; for (const f in BROUILLON.livres) delete BROUILLON.livres[f].cles[id]; dessinerGerer(); });
     document.getElementById("gAjout").onclick = () => { try { const d = lireDemande(document.getElementById("gDem").value);
-        if (BROUILLON.comptes[d.id] && !confirm(d.nom + " a déjà un compte. Le remplacer (nouveau mot de passe) ?")) return;
-        BROUILLON.comptes[d.id] = { nom:d.nom, pub:d.pub, priv:d.priv, admin:false, prog:d.prog || [] }; for (const f in BROUILLON.livres) delete BROUILLON.livres[f].cles[d.id];
-        appliquerProgs(d.id, d.prog || [], []).then(() => dessinerGerer({ ok:d.nom + " est ajouté" + ((d.prog || []).length ? " avec les livres de : " + d.prog.map(court).join(", ") : "") + ". Vérifie les cases, puis touche « Publier »." }))
+        remplacerCompte(d).then(anc => dessinerGerer({ ok:anc ? "Nouveau mot de passe de " + d.nom + " prêt (ses livres sont gardés). Touche « Publier »."
+            : d.nom + " est ajouté" + ((d.prog || []).length ? " avec les livres de : " + d.prog.map(court).join(", ") : "") + ". Vérifie les cases, puis touche « Publier »." }))
           .catch(e => dessinerGerer({ err:e.message })); }
       catch(e){ dessinerGerer({ err:"Ce code n'est pas une demande valide." }); } };
     lireBoite().then(vues => { const zone = document.getElementById("gBoite"); if (!zone) return;
-      const att = Object.keys(vues || {}).filter(id => !BROUILLON.comptes[id]).map(id => { try { return Object.assign(lireDemande(vues[id].code), { t:vues[id].t, code:vues[id].code }); } catch(e){ return null; } }).filter(Boolean).sort((a, b) => b.t - a.t);
-      zone.innerHTML = att.length ? att.map(d => '<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #2a2a2f"><div style="flex:1"><b>' + esc(d.nom) + '</b> <small style="color:#8c8c92">' + esc(d.id) + '</small><br><small style="color:#a9a9ae">' + (d.prog || []).map(court).join(", ") + ' · ' + new Date(d.t * 1000).toLocaleString("fr-CA", { day:"numeric", month:"short", hour:"2-digit", minute:"2-digit" }) + '</small></div>'
+      const att = Object.keys(vues || {}).map(id => { try { return Object.assign(lireDemande(vues[id].code), { t:vues[id].t, code:vues[id].code }); } catch(e){ return null; } })
+        .filter(d => d && (!BROUILLON.comptes[d.id] || BROUILLON.comptes[d.id].pub.x !== d.pub.x)).sort((a, b) => b.t - a.t);
+      zone.innerHTML = att.length ? att.map(d => '<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #2a2a2f"><div style="flex:1"><b>' + esc(d.nom) + '</b> <small style="color:#8c8c92">' + esc(d.id) + '</small><br><small style="color:#a9a9ae">' + (BROUILLON.comptes[d.id] ? '<b style="color:#ffb020">Nouveau mot de passe</b>' : (d.prog || []).map(court).join(", ")) + ' · ' + new Date(d.t * 1000).toLocaleString("fr-CA", { day:"numeric", month:"short", hour:"2-digit", minute:"2-digit" }) + '</small></div>'
         + '<button class="abtn prim" data-acc="' + esc(d.id) + '">Accepter</button><button class="abtn" data-ign="' + esc(d.id) + '">Ignorer</button></div>').join("") : '<p class="sous" style="margin:0">Aucune demande en attente.</p>';
       zone.querySelectorAll("[data-acc]").forEach(bt => bt.onclick = () => { const d = att.find(x => x.id === bt.dataset.acc); document.getElementById("gDem").value = d.code; document.getElementById("gAjout").click(); });
       zone.querySelectorAll("[data-ign]").forEach(bt => bt.onclick = () => { oublierDemande(bt.dataset.ign); dessinerGerer({ ok:"Demande ignorée." }); }); });
@@ -8181,6 +8188,14 @@ window.ACCES = (function(){
       try { await publierGitHub(jt, BROUILLON); DATA = JSON.parse(JSON.stringify(BROUILLON)); try { localStorage.setItem("accesCopie", JSON.stringify(DATA)); } catch(e){}
         dessinerGerer({ ok:"Publié ! Les changements seront en ligne d'ici une minute ou deux." }); try { render(); } catch(e){} }
       catch(e){ dessinerGerer({ err:"Publication impossible : " + e.message }); } };
+  }
+  async function remplacerCompte(d){          /* nouveau compte, ou nouveau mot de passe d'un compte existant (ses livres sont gardés) */
+    const anc = BROUILLON.comptes[d.id], avait = anc ? Object.keys(BROUILLON.livres).filter(f => BROUILLON.livres[f].cles[d.id]) : [];
+    BROUILLON.comptes[d.id] = { nom:anc ? anc.nom : d.nom, pub:d.pub, priv:d.priv, admin:anc ? !!anc.admin : false, prog:anc ? (anc.prog || []) : (d.prog || []) };
+    for (const f in BROUILLON.livres) delete BROUILLON.livres[f].cles[d.id];
+    for (const f of avait) BROUILLON.livres[f].cles[d.id] = await envelopper(f, d.pub);
+    if (!anc) await appliquerProgs(d.id, d.prog || [], []);
+    return !!anc;
   }
   async function appliquerProgs(id, ajouter, retirer){       /* donne / retire tous les livres protégés d'un programme */
     for (const f in BROUILLON.livres){ const l = LIVRES.find(x => x.fichier === f); if (!l) continue;
