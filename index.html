@@ -1109,6 +1109,8 @@ const HOSTCSS = "#ui{display:none!important}nav#bar{display:none!important}div#a
   /* Transition de page commune à tous les livres (comme Plomberie et chauffage) : la nouvelle page apparaît en fondu en montant légèrement.
      On anime « translate » (et non « transform ») pour ne jamais gêner la mise à l'échelle propre à chaque livre. */
   + ".page.vis,.page.hcur{animation:biblioPage .45s cubic-bezier(.2,.7,.2,1) both!important}"
+  /* Protection incendie : les 100 pages cachées restaient dessinées à chaque zoom (1 à 3 s); on saute leur rendu, sans ombre */
+  + "#book>.page:not(.cur):not(.out){content-visibility:hidden;box-shadow:none!important}"
   + "#book>.page.out.fwd,#book>.page.out.back{animation:biblioPageOut .3s ease forwards!important;z-index:3!important}#book>.page.cur.fwd,#book>.page.cur.back{animation:biblioPage .45s cubic-bezier(.2,.7,.2,1) backwards!important;z-index:2!important}"
   + "@keyframes biblioPage{from{opacity:0;translate:0 8px}to{opacity:1;translate:none}}@keyframes biblioPageOut{from{opacity:1}to{opacity:0}}"
   + "@media (prefers-reduced-motion:reduce){.page.vis,.page.hcur,#book>.page.cur,#book>.page.out{animation-duration:.01s!important}}";   // masque la barre d'outils intégrée aux livres
@@ -1426,8 +1428,9 @@ function installAnim(win, doc){
     let list = []; try { list = doc.getAnimations(); } catch(e){}
     list.forEach(a => { const t = a.effect && a.effect.getTiming && a.effect.getTiming(), el = a.effect && a.effect.target;
       if (!t || t.iterations !== Infinity || !el || !el.getBoundingClientRect || (el.closest && el.closest("#h-anim"))) return;
+      if (el.checkVisibility && !el.checkVisibility({ visibilityProperty:true, opacityProperty:false })) return;   /* animation d'une page cachée (protection incendie) : pas de bouton Pause au milieu de la page */
       add(el, o => o.anims.push(a), t.duration >= 3000); });
-    doc.querySelectorAll("svg").forEach(s => { if (s.querySelector("animate,animateTransform,animateMotion,set") && s.pauseAnimations) add(s, o => { if (!o.svgs.includes(s)) o.svgs.push(s); }); });
+    doc.querySelectorAll("svg").forEach(s => { if (s.querySelector("animate,animateTransform,animateMotion,set") && s.pauseAnimations && !(s.checkVisibility && !s.checkVisibility({ visibilityProperty:true }))) add(s, o => { if (!o.svgs.includes(s)) o.svgs.push(s); }); });
     return G;
   }
   const paused = o => o.anims.some(a => a.playState === "paused") || o.svgs.some(s => s.animationsPaused && s.animationsPaused());
