@@ -7493,7 +7493,7 @@ return {matrice:function(texte){var q=new QRCode(-1,L.M);q.addData(texte);q.make
       const l = n.livre && LIVRES.find(x => x.fichier === n.livre);
       const id = "qnd" + j + "-" + i, form = Array.isArray(n.formation) ? n.formation : [], hist = Array.isArray(n.versions) ? n.versions : [];
       const detail = form.length || hist.length;
-      return `<div class="qn-it"><span class="qn-tag ${esc(n.type)}">${lab[n.type] || ""}</span><div class="qn-corps">${n.titre ? `<div class="qn-titre">${esc(n.titre)}${hist.length > 1 ? `<span class="qn-nv">${hist.length} mises à jour</span>` : ""}</div>` : ""}<p>${esc(n.texte)}${l ? ` <button type="button" data-ouvrir="${esc(l.fichier)}">Ouvrir le livre</button>` : ""}</p></div>`
+      return `<div class="qn-it"><span class="qn-tag ${esc(n.type)}">${lab[n.type] || ""}</span><div class="qn-corps">${n.titre ? `<div class="qn-titre">${esc(n.titre)}</div>` : ""}<p>${esc(n.texte)}${l ? ` <button type="button" data-ouvrir="${esc(l.fichier)}">Ouvrir le livre</button>` : ""}</p></div>`
         + (detail ? `<button type="button" class="qn-plus" aria-expanded="false" aria-controls="${id}" title="Mini-formation">+</button><div class="qn-detail" id="${id}" hidden>`
           + (form.length ? `<h3>Mini-formation</h3><ol>${form.map(f => typeof f === "string" ? `<li>${esc(f)}</li>` : `<li>${esc(f.t)}${f.img ? `<img class="qn-img" src="${esc(f.img)}" alt="" loading="lazy">` : ""}</li>`).join("")}</ol>` : "")
           + (hist.length ? `<h3 style="margin-top:12px">Historique</h3><ul class="qn-hist">${hist.map(v => `<li><span class="d">${esc(dateFr(v.date))}</span><span>${esc(v.texte)}</span></li>`).join("")}</ul>` : "") + `</div>` : "")

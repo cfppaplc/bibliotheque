@@ -18,6 +18,7 @@
 2. **Chaque mise à jour → « Quoi de neuf »** (`nouveautes.json`) : une entrée par *sujet* (pas par version), mettre à jour
    `date`, `texte`, la mini-formation `formation` et ajouter une ligne en tête de `versions`.
    **Avec de petites captures d'écran** dans `nouveautes/` (JPEG ≤ 960 px) : `{ "t": "…", "img": "nouveautes/x.jpg" }`.
+   **Garder ça court** (ménage du 28 oct., Jeremy trouvait ça mêlant) : ~15 sujets, 4 à 8 étapes par mini-formation, phrases courtes; quand une fonction change, **réécrire l'étape** au lieu d'en ajouter une (pas d'étapes « Nouveau : … » / « Corrigé : … », ça va dans `versions`); historique ≤ 4 lignes; captures à refaire si l'interface a changé. Copie d'avant le ménage : historique git.
 3. **Tester avant de publier** (Playwright + Chromium) et regarder les captures. Ne jamais publier du JS non vérifié :
    `outils/publier.sh` lance `verifier_scripts.py`, qui bloque la publication si un `<script>` a une erreur de syntaxe
    (une apostrophe non échappée dans une chaîne a déjà cassé le tableau de bord en ligne).
