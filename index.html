@@ -1178,7 +1178,7 @@ function renderHero(){
   const h = $("#hero");
   h.style.cssText = "background:linear-gradient(120deg,#3a0b0b 0%,#141414 68%)";
   h.innerHTML = `<div class="hero-content">
-    <h1>Tes livres de cours, prêts à projeter</h1>
+    <h1>${(window.titreAccueil && window.titreAccueil()) || "Tes livres de cours, prêts à projeter"}</h1>
     <p>Livres interactifs, plans et schémas pour la classe et l'atelier. <span class="hero-tag">Réservé aux enseignants</span></p>
     <button class="hero-aide" id="heroAide" type="button">❔ Aide</button>
   </div>
@@ -4955,7 +4955,11 @@ function ouvrirTableauBlanc(apres){
   ouvrirLivre(l, '<!doctype html><html><head><meta charset="utf-8"><title>Tableau blanc</title></head><body style="margin:0;background:#fff;height:100vh"></body></html>');
   let n = 0; const t = setInterval(() => { n++;
     let pret = false; try { pret = !!(RD.drv && RD.drv.state().tot > 0); } catch(e){}
-    if (pret || n > 60){ clearInterval(t); if (!RD.wb) toggleWb(); if (apres) setTimeout(apres, 120); } }, 100);
+    if (pret || n > 60){ clearInterval(t); if (!RD.wb) toggleWb();
+      try { const P = window.PREF ? window.PREF() : {}, st = wbEtat();   /* préférences du prof : fond et couleur du crayon au départ */
+        if (P.fond && !st.bg[st.n] && WBFONDS.some(f => f.k === P.fond)){ st.bg[st.n] = P.fond; majFond(); redrawInk(); refreshTools(); }
+        if (P.crayon) { RD.color = P.crayon; refreshTools(); } } catch(e){}
+      if (apres) setTimeout(apres, 120); } }, 100);
 }
 function ouvrirContenu(c){
   if (!c) return;
@@ -5506,7 +5510,11 @@ function offrirReprise(){
     [900, 1800, 3000, 4500].forEach(ms => setTimeout(() => { try { if (RD.book !== livre || !RD.drv || RD.bouge) return;
       if (!sur(RD.drv.state().label)){ RD.drv.goto(n); setTimeout(() => { try { syncSecond(); poll(); } catch(e){} }, 300); } } catch(e){} }, ms));
     return; }
-  const sv = POS[RD.book];
+  const sv = POS[RD.book], rp = (window.PREF && window.PREF().reprise) || "demander";
+  if (sv && sv.n > 1 && (!sv.tot || sv.n < sv.tot) && rp !== "demander"){   /* préférence du prof : reprendre toujours / jamais, sans demander */
+    if (rp === "toujours"){ setTimeout(() => { try { RD.drv.goto(sv.n); setTimeout(() => { syncSecond(); poll(); RD.armed = true; }, 400); } catch(e){ RD.armed = true; } }, 250); }
+    else RD.armed = true;
+    return; }
   if (sv && sv.n > 1 && (!sv.tot || sv.n < sv.tot)){
     $("#resumeTxt").textContent = "Reprendre à la page " + (sv.label || sv.n) + " ?";
     $("#resume").hidden = false;
@@ -7867,7 +7875,7 @@ window.addEventListener("online", () => { try { aviser("Internet est revenu."); 
 </script>
 <style>
   /* ---------- Accès protégé (29 oct.) : comptes enseignants, livres chiffrés ---------- */
-  #compteBtn .ini{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:#e50914;color:#fff;font-size:.7rem;font-weight:700}
+  #compteBtn .ini{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:var(--moi,#e50914);color:#fff;font-size:.7rem;font-weight:700}
   .cadenas{position:absolute;right:8px;bottom:8px;z-index:3;width:30px;height:30px;border-radius:50%;background:rgba(14,14,16,.82);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.4)}
   .acces-ov{position:fixed;inset:0;z-index:170;background:rgba(0,0,0,.66);display:flex;align-items:center;justify-content:center;padding:16px}
   .acces-ov[hidden]{display:none}
@@ -7898,6 +7906,17 @@ window.addEventListener("online", () => { try { aviser("Internet est revenu."); 
   .acces-fiche summary{cursor:pointer;color:#a9a9ae;font-size:.84rem}
   .acces-grp{margin-top:8px}
   .acces-grp>.t{font-size:.72rem;color:#8c8c92;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
+  .prefs h3{margin:16px 0 6px;font-size:.78rem;color:#8c8c92;text-transform:uppercase;letter-spacing:.05em}
+  .prefs .lig{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid #26262b;flex-wrap:wrap}
+  .prefs .lig>span{font-size:.92rem;color:#e4e4e7}
+  .prefs .seg{display:inline-flex;flex-wrap:wrap;gap:4px}
+  .prefs .seg button{border:1px solid #3a3a40;background:#232327;color:#d4d4d8;border-radius:999px;padding:5px 11px;font:600 .8rem inherit;font-family:inherit;cursor:pointer}
+  .prefs .seg button.on{background:#f1f1f2;color:#111;border-color:#f1f1f2}
+  .prefs .rond{width:26px;height:26px;border-radius:50%;border:2px solid transparent;padding:0;cursor:pointer;box-shadow:inset 0 0 0 1px rgba(255,255,255,.15)}
+  .prefs .rond.on{border-color:#fff;outline:2px solid rgba(255,255,255,.25)}
+  .prefs .ap{display:flex;align-items:center;gap:10px;margin:4px 0 2px}
+  .prefs .ap .ini{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;background:var(--moi,#e50914)}
+  .prefs .raz{background:none;border:0;color:#8c8c92;text-decoration:underline;cursor:pointer;font:inherit;font-size:.82rem;padding:0}
   .acces-chips{display:flex;flex-wrap:wrap;gap:6px}
   .acces-box label.acces-chip{margin:0;font-weight:500;display:inline-flex;align-items:center;gap:6px;border:1px solid #3a3a40;border-radius:999px;padding:4px 11px 4px 8px;font-size:.8rem;cursor:pointer;user-select:none;color:#cfcfd4;max-width:100%}
   .acces-chip input{width:16px;height:16px;accent-color:#e50914;margin:0;cursor:pointer;flex:none}
@@ -8081,6 +8100,7 @@ window.ACCES = (function(){
     else { b.innerHTML = ICO_PERS + '<span class="lbl"> Se connecter</span>'; b.title = "Se connecter (livres protégés)"; }
     b.setAttribute("aria-label", b.title);
     const t = document.getElementById("plusCompte"); if (t) t.textContent = SESSION ? "Mon compte (" + SESSION.nom + ")" : "Se connecter";
+    try { window.appliquerPrefs && window.appliquerPrefs(); } catch(e){}
   }
   function menu(){
     const m = document.getElementById("accesMenu"), b = document.getElementById("compteBtn");
@@ -8088,9 +8108,9 @@ window.ACCES = (function(){
     if (!m.hidden){ m.hidden = true; return; }
     m.innerHTML = '<div class="qui"><b>' + esc(SESSION.nom) + '</b>' + esc(SESSION.id) + (SESSION.admin ? ' <span class="acces-tag">admin</span>' : '') + '</div>'
       + (SESSION.admin ? '<button data-a="gerer">Gérer les accès des enseignants' + (NB_DEM ? ' (' + NB_DEM + ' demande' + (NB_DEM > 1 ? 's' : '') + ')' : '') + '</button>' : '')
-      + '<button data-a="sortir">Se déconnecter</button>';
+      + '<button data-a="prefs">Mes préférences</button><button data-a="sortir">Se déconnecter</button>';
     const r = b.getBoundingClientRect(); m.style.top = (r.bottom + 8 + scrollY) + "px"; m.style.left = Math.max(8, Math.min(innerWidth - 240, r.right - 230)) + "px"; m.hidden = false;
-    m.onclick = e => { const a = e.target.closest("[data-a]"); if (!a) return; m.hidden = true; if (a.dataset.a === "sortir") deconnexion().then(() => aviser("Tu es déconnecté sur cet ordinateur.")); else dlgGerer(); };
+    m.onclick = e => { const a = e.target.closest("[data-a]"); if (!a) return; m.hidden = true; if (a.dataset.a === "sortir") deconnexion().then(() => aviser("Tu es déconnecté sur cet ordinateur.")); else if (a.dataset.a === "prefs") window.dlgPrefs(); else dlgGerer(); };
   }
   document.addEventListener("pointerdown", e => { const m = document.getElementById("accesMenu"); if (m && !m.hidden && !m.contains(e.target) && !e.target.closest("#compteBtn")) m.hidden = true; });
 
@@ -8250,6 +8270,61 @@ window.ACCES = (function(){
   }
   setTimeout(() => { const b = document.getElementById("compteBtn"); if (b) b.onclick = menu; charger(); accepterDepuisLien(); }, 0);
   return { pret, get estPret(){ return estPret; }, protege, permis, verrouille, ouvrir, recherche, connexion, deconnexion, demande, lireDemande, dlgConnexion, menu, get session(){ return SESSION; }, get data(){ return DATA; }, charger };
+})();
+</script>
+
+
+<script>
+/* ---- Mes préférences (une par compte, gardées sur cet ordinateur : localStorage "prefs:<identifiant>") ---- */
+(function(){
+  const cle = () => { const S = window.ACCES && ACCES.session; return "prefs:" + (S ? S.id : "invite"); };
+  const lirePrefs = () => { try { return JSON.parse(localStorage.getItem(cle()) || "{}"); } catch(e){ return {}; } };
+  window.PREF = lirePrefs;
+  const COULEURS = [["#e50914","Rouge"],["#2a7bcf","Bleu"],["#1f9d6b","Vert"],["#e8890c","Orange"],["#7c4dff","Violet"],["#d63384","Rose"],["#5b6470","Gris"]];
+  const CRAYONS = [["#e2483d","Rouge"],["#1d4ed8","Bleu"],["#111111","Noir"],["#15803d","Vert"],["#f59e0b","Orange"]];
+  const FONDS = [["blanc","Blanc"],["quad","Quadrillé"],["iso","Iso"],["noir","Noir"],["vert","Vert"]];
+  const PROG = [["","Tous"],["Entretien général d'immeubles","EGI"],["Plomberie et chauffage","Plomberie"]];
+  window.titreAccueil = () => { const S = window.ACCES && ACCES.session; if (!S || lirePrefs().bonjour === false) return "";
+    return "Bonjour " + S.nom.split(/\s+/)[0] + " !"; };
+  let dejaProg = "";
+  window.appliquerPrefs = () => {
+    const P = lirePrefs(), r = document.documentElement;
+    if (P.couleur){ r.style.setProperty("--moi", P.couleur); r.style.setProperty("--accent", P.couleur); } else { r.style.removeProperty("--moi"); r.style.removeProperty("--accent"); }
+    if (P.theme === "clair" || P.theme === "fonce"){ const c = P.theme === "clair"; if (document.body.classList.contains("clair") !== c){ const b = document.getElementById("themeBtn"); if (b) b.click(); } }
+    const S = window.ACCES && ACCES.session;
+    if (S && P.prog !== undefined && dejaProg !== S.id + "|" + P.prog){ dejaProg = S.id + "|" + P.prog;   /* le programme au départ, une fois par connexion */
+      try { filtreProg = P.prog; ecrireLS("filtreProg", P.prog); } catch(e){} }
+    try { render(); renderHero(); } catch(e){}
+  };
+  const ecrire = (k, v) => { const P = lirePrefs(); if (v === null) delete P[k]; else P[k] = v; try { localStorage.setItem(cle(), JSON.stringify(P)); } catch(e){} dejaProg = ""; window.appliquerPrefs(); dessiner(); };
+  const esc2 = t => String(t).replace(/[&<>"]/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" })[c]);
+  const seg = (k, opts, cur) => '<div class="seg">' + opts.map(([v, n]) => '<button type="button" data-k="' + k + '" data-v="' + esc2(v) + '"' + (cur === v ? ' class="on"' : '') + '>' + n + '</button>').join("") + '</div>';
+  const ronds = (k, opts, cur) => '<div class="seg">' + opts.map(([v, n]) => '<button type="button" class="rond' + (cur === v ? ' on' : '') + '" style="background:' + v + '" title="' + n + '" aria-label="' + n + '" data-k="' + k + '" data-v="' + v + '"></button>').join("") + '</div>';
+  function dessiner(){
+    const B = document.getElementById("accesBox"), ov = document.getElementById("accesOv"); if (ov.hidden || !B.querySelector(".prefs")) return; contenu(B);
+  }
+  function contenu(B){
+    const P = lirePrefs(), S = ACCES.session || { nom:"Invité", id:"" }, ini = S.nom.split(/\s+/).map(m => m[0] || "").join("").slice(0, 2).toUpperCase();
+    const theme = P.theme || (document.body.classList.contains("clair") ? "clair" : "fonce");
+    B.innerHTML = '<div class="prefs"><h2>Mes préférences</h2><div class="ap"><span class="ini">' + ini + '</span><div><b>' + esc2(S.nom) + '</b><br><small style="color:#8c8c92">Gardées sur cet ordinateur, pour ton compte seulement.</small></div></div>'
+      + '<h3>Apparence</h3>'
+      + '<div class="lig"><span>Ma couleur</span>' + ronds("couleur", COULEURS, P.couleur || "#e50914") + '</div>'
+      + '<div class="lig"><span>Accueil</span>' + seg("theme", [["fonce","Foncé"],["clair","Clair"]], theme) + '</div>'
+      + '<div class="lig"><span>« Bonjour ' + esc2(S.nom.split(/\s+/)[0]) + ' » en haut</span>' + seg("bonjour", [["oui","Oui"],["non","Non"]], P.bonjour === false ? "non" : "oui") + '</div>'
+      + '<h3>Bibliothèque</h3>'
+      + '<div class="lig"><span>Livres affichés au départ</span>' + seg("prog", PROG, P.prog === undefined ? "" : P.prog) + '</div>'
+      + '<div class="lig"><span>Reprendre où j\'étais</span>' + seg("reprise", [["demander","Demander"],["toujours","Toujours"],["jamais","Jamais"]], P.reprise || "demander") + '</div>'
+      + '<h3>Tableau blanc</h3>'
+      + '<div class="lig"><span>Fond au départ</span>' + seg("fond", FONDS, P.fond || "blanc") + '</div>'
+      + '<div class="lig"><span>Couleur du crayon</span>' + ronds("crayon", CRAYONS, P.crayon || "#e2483d") + '</div>'
+      + '<div class="acces-btns" style="justify-content:space-between;align-items:center;margin-top:16px"><button type="button" class="raz" id="pRaz">Remettre comme au départ</button><button class="prim" id="pFin">Terminé</button></div></div>';
+    B.querySelectorAll("[data-k]").forEach(b => b.onclick = () => { const k = b.dataset.k, v = b.dataset.v;
+      ecrire(k, k === "bonjour" ? (v === "oui" ? null : false) : v); });
+    B.querySelector("#pFin").onclick = () => { document.getElementById("accesOv").hidden = true; };
+    B.querySelector("#pRaz").onclick = () => { try { localStorage.removeItem(cle()); } catch(e){} dejaProg = ""; window.appliquerPrefs(); dessiner(); };
+  }
+  window.dlgPrefs = () => { const ov = document.getElementById("accesOv"), B = document.getElementById("accesBox"); B.classList.remove("large"); ov.hidden = false; contenu(B); };
+  if (window.ACCES && ACCES.pret) ACCES.pret.then(() => window.appliquerPrefs()).catch(() => {});
 })();
 </script>
 
