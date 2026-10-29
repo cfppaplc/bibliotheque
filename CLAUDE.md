@@ -113,6 +113,7 @@
 - Lecteur : disposition de barre propre au téléphone (`DEF_TEL`, sauvée dans `tbLayoutTel`), gestes dans `brancherSouris` :
   balayer = `turn(±1)`, toucher au milieu = cacher/montrer les barres. La pastille « Tableau de bord » est cachée.
 - `accueil.html` : boutons du haut en icônes seulement, nom du programme caché.
+- Texte qui se chevauche sur cellulaire (29 oct.) : `text-size-adjust:100%` dans `HOSTCSS` (tous les livres; communiquer, C13 et micro-ordinateur ne l'avaient pas) et dans `index.html` — empêche le « font boosting » des navigateurs mobiles (Chromium sans tête ne le reproduit pas). Le bouton Pause des animations (`.h-actl`) est caché sur écran tactile ≤ 640 px. Rien de changé sur ordinateur.
 - Tester avec `devices['iPhone 13']` de Playwright (les gestes : `new w.Touch` + `TouchEvent` dans l'iframe du livre).
 
 ## accueil.html — repères

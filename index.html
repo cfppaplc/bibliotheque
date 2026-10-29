@@ -10,6 +10,7 @@
 <meta property="og:url" content="https://cfppaplc.github.io/bibliotheque/"><meta property="og:image" content="https://cfppaplc.github.io/bibliotheque/img/apercu.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="Bibliothèque du Pavillon de l'Avenir : trois livres de cours en éventail"><meta name="twitter:card" content="summary_large_image"><title>Bibliothèque — Pavillon de l'Avenir</title>
 <style>
+  html{-webkit-text-size-adjust:100%;text-size-adjust:100%}   /* cellulaire : pas de texte grossi par le navigateur (aucun effet sur ordinateur) */
   #reader.laseron,#reader.laseron *{cursor:none!important}
   :root{
     color-scheme:dark;
@@ -1111,6 +1112,8 @@ const HOSTCSS = "#ui{display:none!important}nav#bar{display:none!important}div#a
   + ".page.vis,.page.hcur{animation:biblioPage .45s cubic-bezier(.2,.7,.2,1) both!important}"
   /* Protection incendie : les 100 pages cachées restaient dessinées à chaque zoom (1 à 3 s); on saute leur rendu, sans ombre */
   + "#book>.page:not(.cur):not(.out){content-visibility:hidden;box-shadow:none!important}"
+  /* cellulaire : le navigateur grossissait le texte de certains livres (« font boosting ») et les lignes se chevauchaient; sans effet sur ordinateur */
+  + "html{-webkit-text-size-adjust:100%!important;text-size-adjust:100%!important}"
   + "#book>.page.out.fwd,#book>.page.out.back{animation:biblioPageOut .3s ease forwards!important;z-index:3!important}#book>.page.cur.fwd,#book>.page.cur.back{animation:biblioPage .45s cubic-bezier(.2,.7,.2,1) backwards!important;z-index:2!important}"
   + "@keyframes biblioPage{from{opacity:0;translate:0 8px}to{opacity:1;translate:none}}@keyframes biblioPageOut{from{opacity:1}to{opacity:0}}"
   + "@media (prefers-reduced-motion:reduce){.page.vis,.page.hcur,#book>.page.cur,#book>.page.out{animation-duration:.01s!important}}";   // masque la barre d'outils intégrée aux livres
@@ -1376,7 +1379,8 @@ const ANIM_CSS = '#h-anim{position:fixed;left:0;top:0;width:0;height:0;z-index:2
   + '.h-actl button:hover{background:#262629;color:#fff}'
   + '.h-actl svg{display:block}'
   + '.h-actl .hn{color:#8d8d94;font-weight:500;padding:0 4px 0 2px;font-variant-numeric:tabular-nums}'
-  + '.h-actl .hn:empty{display:none}';
+  + '.h-actl .hn:empty{display:none}'
+  + '@media (max-width:640px) and (pointer:coarse){.h-actl{display:none!important}}';   /* cellulaire : le petit bouton Pause cachait du texte */
 const AI = b => '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + b + '</svg>';
 const A_PAUSE = AI('<path d="M9 5v14M15 5v14"/>') + "Pause", A_PLAY = AI('<path d="M8 5l11 7-11 7z" fill="currentColor"/>') + "Lecture";
 const A_PREV = AI('<path d="M15 5l-7 7 7 7"/>'), A_NEXT = AI('<path d="M9 5l7 7-7 7"/>');
