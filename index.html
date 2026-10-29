@@ -2847,7 +2847,7 @@ function arcsForme(f){ const S = sommetsForme(f); if (!S) return []; let A = [];
   if (f.t === "objet" && !ELEC[f.k]){ const ports = A; A = []; const c = $("#inkCanvas"), W = c.width, H = c.height, G = objGeo(f, W, H); let B = null;
     G.shapes.forEach(sh => { if (sh.t !== "box") return; const v = (sh.m1 - sh.m0) * (sh.n1 - sh.n0) * (sh.h1 - sh.h0); if (!B || v > B[0]) B = [v, sh]; });
     if (B){ const b = B[1], N = q => [q[0] / W, q[1] / H], pres = (u, v) => Math.hypot((u[0] - v[0]) * W, (u[1] - v[1]) * H) < 6;
-      [[[b.m0, b.n1, b.h0], [b.m1, b.n1, b.h0]], [[b.m0, b.n0, b.h0], [b.m0, b.n1, b.h0]], [[b.m0, b.n0, b.h0], [b.m0, b.n0, b.h1]]].forEach(([U, V]) => {   /* arêtes du contour : longueur, profondeur, hauteur */
+      [[[b.m0, b.n1, b.h0], [b.m1, b.n1, b.h0]], [[b.m0, b.n0, b.h0], [b.m0, b.n1, b.h0]], [[b.m0, b.n0, b.h0], [b.m0, b.n0, b.h1]], [[b.m0, b.n0, b.h1], [b.m1, b.n0, b.h1]], [[b.m1, b.n0, b.h1], [b.m1, b.n1, b.h1]]].forEach(([U, V]) => {   /* arêtes du contour : longueur, profondeur, hauteur, puis les deux arêtes du haut */
         const u = N(G.P(...U)), v = N(G.P(...V)); if (!pres(u, v)) A.push([u, v]); }); }
     const proche = ([u, v]) => A.some(([a, b2]) => { const d1 = [(v[0] - u[0]) * W, (v[1] - u[1]) * H], d2 = [(b2[0] - a[0]) * W, (b2[1] - a[1]) * H], L1 = Math.hypot(...d1), L2 = Math.hypot(...d2);   /* raccord à raccord : gardé s'il n'est pas presque sur une arête */
       if (Math.abs(d1[0] * d2[1] - d1[1] * d2[0]) > .1 * L1 * L2) return false; const m = [((u[0] + v[0]) / 2 - a[0]) * W, ((u[1] + v[1]) / 2 - a[1]) * H]; return Math.abs(m[0] * d2[1] - m[1] * d2[0]) / (L2 || 1) < 18 * (window.devicePixelRatio || 1); });
