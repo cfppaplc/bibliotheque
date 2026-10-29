@@ -2563,7 +2563,7 @@ function dessinerForme(g, s, x1, y1, x2, y2, k, col){
     { const an0 = Math.atan2(y2 - y1, x2 - x1), off = (s.d || 0) * (g.canvas ? g.canvas.height : 0), DC = dirCote(s, an0), ox = DC[0] * off, oy = DC[1] * off;
       if (s.txt){ const tz = s.tz || 1; g.save(); g.fillStyle = col; g.font = "700 " + Math.round(16 * k * tz) + "px system-ui, sans-serif"; g.textAlign = "center"; g.textBaseline = "middle";   /* texte sur un côté (sans ligne de cote) */
         const tx = s.lb || "?", tw = g.measureText(tx).width, th = 16 * k * tz, sg = Math.sign(off) || 1, ux = DC[0] * sg, uy = DC[1] * sg, ext = Math.abs(ux) * tw / 2 + Math.abs(uy) * th / 2;   /* le texte ne touche jamais le côté */
-        const ext2 = s.iso ? th * .75 + (tw > Math.hypot(x2 - x1, y2 - y1) * .9 ? th * 1.1 : 0) : ext, txx = (x1 + x2) / 2 + ux * (Math.abs(off) + ext2), txy = (y1 + y2) / 2 + uy * (Math.abs(off) + ext2); g.lineJoin = "round"; g.lineWidth = 4 * k * tz; g.strokeStyle = wbSombre() ? "rgba(0,0,0,.55)" : "rgba(255,255,255,.9)";
+        const ext2 = s.dt ? 0 : s.iso ? th * .75 + (tw > Math.hypot(x2 - x1, y2 - y1) * .9 ? th * 1.1 : 0) : ext, txx = (x1 + x2) / 2 + ux * (Math.abs(off) + ext2), txy = (y1 + y2) / 2 + uy * (Math.abs(off) + ext2); g.lineJoin = "round"; g.lineWidth = 4 * k * tz; g.strokeStyle = wbSombre() ? "rgba(0,0,0,.55)" : "rgba(255,255,255,.9)";
         g.translate(txx, txy); if (s.iso){ let a3 = an0; if (a3 > Math.PI / 2 + .01) a3 -= Math.PI; if (a3 < -Math.PI / 2 + .01) a3 += Math.PI;   /* plan iso : le texte suit l'angle de la pièce (lettres droites, comme un dessin iso) */
           if (Math.abs(Math.cos(a3)) > .3) g.transform(Math.cos(a3), Math.sin(a3), 0, 1, 0, 0); else g.transform(0, -1, Math.cos(Math.PI / 6), -Math.sin(Math.PI / 6), 0, 0); }
         if (s.rot) g.rotate(s.rot * Math.PI / 180);   /* rotation choisie dans la case */
@@ -2734,7 +2734,9 @@ function dirCote(s, an){ const px = -Math.sin(an), py = Math.cos(an); if (!s.iso
   C.forEach((u, i) => { const par = Math.abs(u[0] * Math.sin(an) - u[1] * Math.cos(an)) < .2; if (par) return; let k = u[0] * px + u[1] * py, v = u; if (k < 0){ v = [-u[0], -u[1]]; k = -k; } const sc = k + (i === 0 ? .05 : 0); if (!b || sc > b[3]) b = [v[0], v[1], k, sc]; });
   return b ? [b[0], b[1], b[2]] : [px, py, 1]; }
 function milieuCote(s, W, H){ const a = s.p[0], b = s.p[1], an = Math.atan2((b[1] - a[1]) * H, (b[0] - a[0]) * W), off = (s.d || 0) * H, [ux, uy] = dirCote(s, an);
-  return [(a[0] + b[0]) / 2 * W + ux * off, (a[1] + b[1]) / 2 * H + uy * off]; }
+  let e = 0; if (s.txt && !s.dt){ const k = (window.devicePixelRatio || 1) * RD.z, tz = s.tz || 1, th = 16 * k * tz, g = $("#inkCanvas").getContext("2d"); g.save(); g.font = "700 " + Math.round(th) + "px system-ui, sans-serif"; const tw = g.measureText(s.lb || "?").width; g.restore();   /* texte de côté : la poignée est au centre du texte */
+    const sg = Math.sign(off) || 1, L = Math.hypot((b[0] - a[0]) * W, (b[1] - a[1]) * H); e = sg * (s.iso ? th * .75 + (tw > L * .9 ? th * 1.1 : 0) : Math.abs(ux) * tw / 2 + Math.abs(uy) * th / 2); }
+  return [(a[0] + b[0]) / 2 * W + ux * (off + e), (a[1] + b[1]) / 2 * H + uy * (off + e)]; }
 function poigneeCote(g, s, W, H, k){ const [x, y] = milieuCote(s, W, H), r = 11 * k, f = 6.5 * k, t = 2.6 * k;
   g.save(); g.setLineDash([]); g.fillStyle = "#2a7bcf"; g.strokeStyle = "#fff"; g.lineWidth = 1.5 * k; g.beginPath(); g.rect(x - r, y - r, 2 * r, 2 * r); g.fill(); g.stroke();
   g.strokeStyle = "#fff"; g.lineWidth = 1.6 * k; g.lineCap = "round"; g.lineJoin = "round"; g.beginPath(); g.moveTo(x - f, y); g.lineTo(x + f, y); g.moveTo(x, y - f); g.lineTo(x, y + f);
@@ -4028,7 +4030,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     if (cur.poignee !== undefined && !cur.snap && Math.hypot(e.clientX - cur.x0, e.clientY - cur.y0) < 5) return;
     if (cur.poignee === 2){ if (!cur.snap){ snapInk(); cur.snap = true; } const o = cur.s, W = c.width, H = c.height, r = c.getBoundingClientRect(), q = [(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height];
       const a = o.p[0], b = o.p[1], an = Math.atan2((b[1] - a[1]) * H, (b[0] - a[0]) * W), d = (-(q[0] - (a[0] + b[0]) / 2) * W * Math.sin(an) + (q[1] - (a[1] + b[1]) / 2) * H * Math.cos(an));
-      const kD = dirCote(o, an)[2] || 1; o.d = Math.abs(d) < 6 ? 0 : d / kD / H; if (!rafTrait) rafTrait = requestAnimationFrame(() => { rafTrait = 0; redrawInk(); }); return; }
+      const kD = dirCote(o, an)[2] || 1; if (o.txt) o.dt = 1; o.d = (o.txt ? d : Math.abs(d) < 6 ? 0 : d) / kD / H;   /* texte de côté : la poignée est le centre du texte, il peut toucher la forme */ if (!rafTrait) rafTrait = requestAnimationFrame(() => { rafTrait = 0; redrawInk(); }); return; }
     if (cur.poignee !== undefined){ if (!cur.snap){ snapInk(); cur.snap = true; cur.cotes = liensCotes(cur.s); } cur.s.p[cur.poignee] = /^tuy/.test(cur.s.t) ? aimanterTuyau(pt(e), cur.s.p[1 - cur.poignee], cur.s) : pt(e); if (cur.cotes) suivreCotes(cur.cotes, cur.s); if (!rafTrait) rafTrait = requestAnimationFrame(() => { rafTrait = 0; redrawInk(); }); return; }
     if (cur.bouge){ const q = pt(e), dx = q[0] - cur.q0[0], dy = q[1] - cur.q0[1];
       if (!cur.snap){ if (Math.hypot(e.clientX - cur.x0, e.clientY - cur.y0) < 5) return; snapInk(); cur.snap = true; cur.cotes = liensCotes(cur.bouge);   /* ses cotes et textes suivent */
