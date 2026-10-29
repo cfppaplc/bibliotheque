@@ -3960,9 +3960,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     c.setPointerCapture(e.pointerId);
     if (RD.eraser){ cur = "erase"; eraseAt(pt(e)); return; }
     if (RD.crayonOff && !RD.text && !RD.obj){ e.preventDefault();                          /* aucun outil : rien ne se dessine, mais toucher une forme ou un objet le choisit */
-      const r0 = c.getBoundingClientRect(), brut = [(e.clientX - r0.left) / r0.width, (e.clientY - r0.top) / r0.height];
-      if (SELO.s && SELO.s.t === "cote" && poigneeSous(SELO.s, brut) === 2){ RD.obj = true; RD.objTab = RD.objTab === "plomb" ? "plomb" : "formes"; refreshTools(); cur = { poignee:2, s:SELO.s, snap:false, x0:e.clientX, y0:e.clientY }; return; }   /* poignée d'un texte ou d'une cote, même par-dessus un objet */
-      const fc = formeSous(brut), hit = fc && fc.t === "cote" ? fc : (RD.wb ? objetSous(brut) : null) || fc;   /* une cote ou un texte de côté passe avant l'objet qu'il recouvre */
+      const r0 = c.getBoundingClientRect(), brut = [(e.clientX - r0.left) / r0.width, (e.clientY - r0.top) / r0.height], hit = (RD.wb ? objetSous(brut) : null) || formeSous(brut);
       if (!hit){ const tx = texteSous(brut); if (tx){ RD.text = true; RD.obj = false; refreshTools(); SEL.s = tx; majBarTxt(); majSelTxt(); redrawInk(); aviser("Texte choisi : glisse-le pour le déplacer, double-clic pour le modifier, Suppr pour l'effacer.", 3500); } return; }
       RD.obj = true; RD.objTab = null; RD.formeK = null; RD.objKi = null; RD.objKe = null; refreshTools();
       if (hit.t === "objet"){ if (choisirAutre(hit)) tapElement(hit, e); return; }
