@@ -67,10 +67,14 @@
         "t": "Sur le plan isométrique, la cote suit les axes de la grille et donne la longueur en pas (ex. 6 carr.). Sur un tuyau dessiné au crayon, chaque tronçon droit se cote d'un coin à l'autre; sur un objet, d'un raccord à l'autre.",
         "img": "nouveautes/iso-cotes.jpg"
       },
-      "Les cotes et les textes prennent la couleur de la forme et la suivent quand tu la déplaces ou l'agrandis.",
+      "Les cotes et les textes vont avec leur forme ou leur objet : même couleur, ils suivent quand tu la déplaces ou l'agrandis, ils sont copiés et effacés avec elle.",
       "Cote : touche-la puis tire son carré bleu pour l'éloigner ou la changer de côté."
     ],
     "versions": [
+      {
+        "date": "2026-10-28",
+        "texte": "Effacer ou copier une forme ou un objet emporte ses cotes et ses textes."
+      },
       {
         "date": "2026-10-28",
         "texte": "Flèches : texte au départ et à la pointe. Objets iso : textes et cotes sur la longueur, la profondeur et la hauteur, par-dessus l'objet. Pavé de flèches retiré."
@@ -82,10 +86,6 @@
       {
         "date": "2026-10-28",
         "texte": "Couleur et cotes aussi pour les tuyaux iso, les objets iso et les symboles électriques; cotes iso."
-      },
-      {
-        "date": "2026-10-28",
-        "texte": "Couleur de la forme dans la case du double-clic; cotes et textes de la même couleur, qui suivent la forme; on choisit le côté."
       }
     ]
   },

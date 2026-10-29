@@ -3009,6 +3009,7 @@ function eraseAt(p){
       if (px > G.bbox[0] + m && px < G.bbox[2] - m && py > G.bbox[1] + m && py < G.bbox[3] - m){ hits.add(s); break; } }
   }
   if (!hits.size) return;
+  [...hits].forEach(h => { if (h.t && h.t !== "cote" && h.t !== "texte") try { (liensCotes(h) || []).forEach(([o]) => hits.add(o)); } catch(er){} });   /* ses cotes et textes partent avec */
   const out = [];
   arr.forEach(s => {
     if (!hits.has(s)){ out.push(s); return; }
@@ -4481,7 +4482,7 @@ $("#tbPg").addEventListener("keydown", e => {
 })();
 /* Ctrl+C copie ce qui est choisi, Ctrl+V colle une copie un peu décalée (sur la grille), Ctrl+X coupe, Ctrl+D duplique */
 function copierColler(t){
-  const choix = () => (SELM.length ? SELM : [SELO.s]).filter(x => x && strokes().includes(x));
+  const choix = () => { let L = SELM.filter(x => x && strokes().includes(x)); if (!L.length) L = [SELO.s].filter(x => x && strokes().includes(x)); L.slice().forEach(o => { if (o.t !== "cote" && o.t !== "texte") try { (liensCotes(o) || []).forEach(([q]) => { if (!L.includes(q)) L.push(q); }); } catch(er){} }); return L; };   /* copier une forme copie aussi ses cotes */
   if (t === "c" || t === "x" || t === "d"){ const L = choix(); if (!L.length) return false; window.PRESSE = { L:JSON.parse(JSON.stringify(L)), n:0 };
     if (t === "x"){ effacerChoix(); aviser(L.length + " élément" + (L.length > 1 ? "s coupés" : " coupé") + " : Ctrl+V pour coller.", 2500); return true; }
     if (t === "c"){ aviser(L.length + " élément" + (L.length > 1 ? "s copiés" : " copié") + " : Ctrl+V pour coller.", 2500); return true; } }
@@ -4491,7 +4492,8 @@ function copierColler(t){
   snapInk(); const neufs = JSON.parse(JSON.stringify(P.L)).map(o => { o.p = o.p.map(q => [q[0] + dx * P.n, q[1] + dy * P.n]); return o; });
   neufs.forEach(o => strokes().push(o)); SELO.s = null; SELM = neufs.length > 1 ? neufs : []; if (neufs.length === 1) SELO.s = neufs[0];
   redrawInk(); try { majObjUI(); } catch(er){} return true; }
-function effacerChoix(){ const sel = (window.SELM && SELM.length ? SELM : [SELO.s]).filter(x => x && strokes().includes(x)); if (!sel.length) return;
+function effacerChoix(){ let sel = (window.SELM || []).filter(x => x && strokes().includes(x)); if (!sel.length) sel = [SELO.s].filter(x => x && strokes().includes(x)); if (!sel.length) return;   /* un groupe d'un autre tableau ne bloque pas Suppr */
+  sel.slice().forEach(o => { if (o.t !== "cote" && o.t !== "texte") try { (liensCotes(o) || []).forEach(([q]) => { if (!sel.includes(q)) sel.push(q); }); } catch(er){} });   /* une forme ou un objet effacé emporte ses cotes et ses textes */
   snapInk(); sel.forEach(o => { if (o.t === "objet" && typeof window.reparerApresSuppression === "function") window.reparerApresSuppression(o); });
   INKS[inkKey()] = strokes().filter(x => !sel.includes(x)); SELO.s = null; window.SELM = []; try { nettoyerJonctions(); } catch(er){} redrawInk(); try { majObjUI(); } catch(er){} }
 function recolorerSel(){ const M = (window.SELM || []).filter(x => strokes().includes(x)); if (M.length && !/^hl/.test(RD.color)){ snapInk(); M.forEach(x => x.c = RD.color); redrawInk(); return; }
