@@ -4957,7 +4957,8 @@ function ouvrirTableauBlanc(apres){
     let pret = false; try { pret = !!(RD.drv && RD.drv.state().tot > 0); } catch(e){}
     if (pret || n > 60){ clearInterval(t); if (!RD.wb) toggleWb();
       try { const P = window.PREF ? window.PREF() : {}, st = wbEtat();   /* préférences du prof : fond et couleur du crayon au départ */
-        if (P.fond && !st.bg[st.n] && WBFONDS.some(f => f.k === P.fond)){ st.bg[st.n] = P.fond; majFond(); redrawInk(); refreshTools(); }
+        const base = RD.book + "|wb" + st.n, vide = !Object.keys(INKS).some(k => (k === base || k.startsWith(base + ":")) && INKS[k] && INKS[k].length);   /* page vide : le fond préféré passe avant le fond retenu de la dernière fois */
+        if (P.fond && vide && st.bg[st.n] !== P.fond && WBFONDS.some(f => f.k === P.fond)){ st.bg[st.n] = P.fond; majFond(); redrawInk(); refreshTools(); }
         if (P.crayon) { RD.color = P.crayon; refreshTools(); } } catch(e){}
       if (apres) setTimeout(apres, 120); } }, 100);
 }
