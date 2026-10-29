@@ -555,6 +555,7 @@
   .penbar .prang[hidden]{display:none!important}
   .penbar .ptrace{width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;border-radius:9px}.penbar .ptrace.on{background:#1f6fc2;color:#fff;border-color:#6aa9ff}
   .penbar .plarg{display:flex;align-items:center;gap:8px;flex:1;min-width:260px}.penbar .plarg input{flex:1;min-width:170px;height:34px;accent-color:#2a7bcf;cursor:pointer}.penbar .plarg b{min-width:3.6em;text-align:right;color:#e4e4e7;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .penbar .psep{width:1px;align-self:stretch;margin:2px 4px;background:#3f3f46}
   .penbar .prang>.lab{font-size:.74rem;color:#a1a1aa;min-width:84px;letter-spacing:.02em}
   .penbar .ppop button[data-lab]{gap:6px;padding:0 10px}
   .penbar .ppop button[data-lab]::after{content:attr(data-lab);font-size:.82rem}
@@ -599,6 +600,8 @@
   .reader.wbon .penbar #popCol .plarg input{min-width:120px;height:28px}
   .reader.wbon .penbar #popCol .plarg svg{width:40px}
   .reader.wbon .penbar #popCol .plarg b{min-width:1.6em}
+  .reader.wbon .penbar #popCol .prang>.lab,.reader.wbon .penbar #popCol .plarg svg{display:none}   /* sans les mots : les pastilles et icônes suffisent (bulles d'aide au survol) */
+  .reader.wbon .penbar #popCol .plarg{flex:1}.reader.wbon .penbar #popCol .plarg input{min-width:0;width:100%}
   .reader.wbon #penSide{display:none!important}
   body:has(.reader.wbon.open) .toast{bottom:auto;top:calc(52px + env(safe-area-inset-top,0px))}   /* tableau blanc : les messages s'affichent en haut */
   .reader.pen-side.pen-fold .penbar{flex-wrap:nowrap}
@@ -613,7 +616,11 @@
   .wbboard[data-fond="isopts"]{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 173.2 100' preserveAspectRatio='none'%3E%3Cg fill='%237f97bd'%3E%3Ccircle cx='0' cy='0' r='2.6'/%3E%3Ccircle cx='173.2' cy='0' r='2.6'/%3E%3Ccircle cx='0' cy='100' r='2.6'/%3E%3Ccircle cx='173.2' cy='100' r='2.6'/%3E%3Ccircle cx='86.6' cy='50' r='2.6'/%3E%3C/g%3E%3C/svg%3E")}
   .wbboard[data-fond="iso"],.wbboard[data-fond="isopts"]{background-image:none!important}
   .wbboard[data-fond="lignes"]{background-image:none!important}
-  .penbar .swx{width:32px;height:32px;padding:0;border:2px solid #fff3;border-radius:50%;background:conic-gradient(red,yellow,lime,cyan,blue,magenta,red);cursor:pointer;overflow:hidden}
+  .penbar .swx{width:32px;height:32px;padding:0;border:2px solid #fff3;border-radius:50%;cursor:pointer;overflow:hidden;
+    /* « Autre couleur » : anneau de teintes douces + au centre la dernière couleur choisie et un petit + */
+    background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 8.6v6.8M8.6 12h6.8' stroke='%23fff' stroke-width='2.2' stroke-linecap='round'/%3E%3Cpath d='M12 8.6v6.8M8.6 12h6.8' stroke='%23000' stroke-opacity='.35' stroke-width='3.6' stroke-linecap='round'/%3E%3Cpath d='M12 8.6v6.8M8.6 12h6.8' stroke='%23fff' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E") center/72% no-repeat,
+      radial-gradient(circle, var(--perso,#888) 0 46%, #18181b 47% 55%, transparent 56%),
+      conic-gradient(#ef4444,#f59e0b,#eab308,#22c55e,#06b6d4,#3b82f6,#8b5cf6,#ec4899,#ef4444)}
   .penbar .swx.on{border-color:#fff;box-shadow:0 0 0 2px #000,0 0 0 4px #fff}
   .penbar .swx::-webkit-color-swatch-wrapper{padding:0;opacity:0}.penbar .swx::-webkit-color-swatch{border:0;opacity:0}
   .wbboard[data-fond="noir"]{background:radial-gradient(ellipse at 50% 40%,#2b3133,#1a1f21)}
@@ -4609,8 +4616,8 @@ $("#tbPg").addEventListener("keydown", e => {
   const bar = $("#penBar"), ref = bar.querySelector(".sep");
   const x = document.createElement("input"); x.type = "color"; x.className = "swx"; x.value = "#ff00aa"; x.title = "Autre couleur"; x.setAttribute("aria-label", "Autre couleur");
   try { const m = localStorage.getItem("penPerso"); if (m) x.value = m; } catch(e){}               /* la dernière couleur personnalisée est retenue */
-  x.oninput = () => { try { localStorage.setItem("penPerso", x.value); } catch(e){} RD.color = x.value; RD.eraser = false; RD.crayonOff = false; recolorerSel(); refreshTools(); x.classList.add("on"); };
-  bar.insertBefore(x, ref); RD.swx = x;
+  x.oninput = () => { x.style.setProperty("--perso", x.value); try { localStorage.setItem("penPerso", x.value); } catch(e){} RD.color = x.value; RD.eraser = false; RD.crayonOff = false; recolorerSel(); refreshTools(); x.classList.add("on"); };
+  x.style.setProperty("--perso", x.value); bar.insertBefore(x, ref); RD.swx = x;
 })();
 /* Ctrl+C copie ce qui est choisi, Ctrl+V colle une copie un peu décalée (sur la grille), Ctrl+X coupe, Ctrl+D duplique */
 function copierColler(t){
@@ -4677,13 +4684,15 @@ majEpaisseur();
   /* Couleur + épaisseur */
   const bc = document.createElement("button"); bc.id = "penCol"; bc.title = "Couleur et épaisseur du trait"; bc.setAttribute("aria-label", "Couleur et épaisseur"); bc.innerHTML = '<span class="pcur"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16.5 3.5l3 3L9 17l-4 1 1-4z"/><path d="M14.5 5.5l3 3"/><path class="pointe" stroke="none" d="M6 14l3 3-4 1z"/><path class="trait" stroke-width="2.6" d="M12 21h8"/></svg></span>';   /* symbole de crayon : la pointe et le trait ont la couleur choisie */
   const pc = pop("popCol");
-  pc.appendChild(rang("Couleur", [...bar.querySelectorAll(".sw")]));
-  pc.appendChild(rang("Surligneur", [...pc.querySelectorAll(".sw.hl")]));
-  if (RD.swx) pc.querySelector(".prang").appendChild(RD.swx);
+  /* une seule ligne : couleurs, autre couleur, | surligneurs (ronds = crayon, carrés = surligneur) */
+  { const sws = [...bar.querySelectorAll(".sw")], sep = document.createElement("span"); sep.className = "psep";
+    const r1 = rang("Couleur", sws.filter(b => !b.classList.contains("hl")).concat(RD.swx ? [RD.swx] : [], [sep], sws.filter(b => b.classList.contains("hl"))));
+    r1.querySelectorAll(".sw").forEach(b => { if (!b.title) b.title = (b.classList.contains("hl") ? "Surligneur " : "Crayon ") + (b.getAttribute("aria-label") || "").toLowerCase().replace(/^surligneur /, ""); });
+    pc.appendChild(r1); }
   /* épaisseur : une glissière (1 à 40) avec un aperçu du trait */
   try { RD.wPx = +localStorage.getItem("penLargeur") || 4; } catch(e){ RD.wPx = 4; }
   const lg = document.createElement("div"); lg.className = "plarg";
-  lg.innerHTML = '<input type="range" min="1" max="40" step="1" aria-label="Épaisseur du trait"><svg viewBox="0 0 60 44" width="60" height="44" aria-hidden="true"><line x1="8" y1="22" x2="52" y2="22" stroke-linecap="round"/></svg><b></b>';
+  lg.innerHTML = '<input type="range" min="1" max="40" step="1" aria-label="Épaisseur du trait" title="Épaisseur du trait"><svg viewBox="0 0 60 44" width="60" height="44" aria-hidden="true"><line x1="8" y1="22" x2="52" y2="22" stroke-linecap="round"/></svg><b></b>';
   const lgI = lg.querySelector("input"), lgL = lg.querySelector("line"), lgB = lg.querySelector("b");
   window.majLargeur = () => { const c = RD.color || "#e2483d"; lgI.value = RD.wPx; lgB.textContent = RD.wPx; lgL.setAttribute("stroke-width", Math.min(40, RD.wPx)); lgL.setAttribute("stroke", /^hl:/.test(c) ? c.slice(3) : c); };
   lgI.addEventListener("input", () => { RD.wPx = +lgI.value; RD.crayonOff = false; try { localStorage.setItem("penLargeur", RD.wPx); } catch(e){} majLargeur(); refreshTools(); });
