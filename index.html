@@ -922,7 +922,7 @@ document.addEventListener("keydown", e => { if (e.key !== "/" || e.ctrlKey || e.
   <div class="panel" id="panel"></div>
 </div>
 
-<footer><img class="foot-logo" src="img/pavillon-avenir.png" alt="Pavillon de l'Avenir"><div><b>Conçu par Jeremy, enseignant</b> · Pavillon de l'Avenir, centre de formation professionnelle</div><div class="foot-s">Espace réservé aux enseignants · Livres interactifs conçus pour la projection en classe</div><button class="adm-btn" id="adminBtn" aria-label="Administration" title="Administration">⚙</button></footer>
+<footer><img class="foot-logo" src="img/pavillon-avenir.png" alt="Pavillon de l'Avenir"><div><b>Conçu par Jeremy, enseignant</b> · Pavillon de l'Avenir, centre de formation professionnelle</div><div class="foot-s">Réservé aux élèves et enseignants du Pavillon de l'Avenir · Livres interactifs pour la classe et l'atelier</div><button class="adm-btn" id="adminBtn" aria-label="Administration" title="Administration">⚙</button></footer>
 
 <script>
 window.LIVRES_DATA = {};
@@ -1180,7 +1180,7 @@ function renderHero(){
   h.style.cssText = "background:linear-gradient(120deg,#3a0b0b 0%,#141414 68%)";
   h.innerHTML = `<div class="hero-content">
     <h1>${(window.titreAccueil && window.titreAccueil()) || "Tes livres de cours, prêts à projeter"}</h1>
-    <p>Livres interactifs, plans et schémas pour la classe et l'atelier. <span class="hero-tag">Réservé aux enseignants</span></p>
+    <p>Livres interactifs, plans et schémas pour la classe et l'atelier. <span class="hero-tag">Réservé aux élèves et enseignants du Pavillon de l'Avenir</span></p>
     <button class="hero-aide" id="heroAide" type="button">❔ Aide</button>
   </div>
   <div class="hero-stack">${vedettes().map(l => `<img src="${esc(couv(l))}" alt="">`).join("")}</div>`;
@@ -7788,10 +7788,10 @@ return {matrice:function(texte){var q=new QRCode(-1,L.M);q.addData(texte);q.make
 <div class="bv-ov" id="bienOv" hidden role="dialog" aria-label="Bienvenue"><div class="bien-box">
   <img class="bien-logo" src="img/pavillon-avenir.png" alt="Pavillon de l'Avenir">
   <h2>Bienvenue !</h2>
-  <p class="bien-sous">Tes livres de cours, plans et schémas, prêts à projeter en classe.</p>
-  <ol class="bien-et"><li><span>1</span><div><b>Choisis un livre</b>Clique sa couverture, puis « Lire ».</div></li>
-    <li><span>2</span><div><b>Projette</b>La barre en bas de l'écran tourne les pages, écrit sur la page et montre les réponses.</div></li>
-    <li><span>3</span><div><b>Besoin d'aide ?</b>Le lien « Aide », en haut, explique chaque bouton.</div></li></ol>
+  <p class="bien-sous">Tes livres de cours, réservés aux élèves et enseignants du Pavillon de l'Avenir.</p>
+  <ol class="bien-et"><li><span>1</span><div><b>Connecte-toi</b>Touche « Se connecter », en haut. Élève : ton enseignant te donne l'identifiant de ton groupe.</div></li>
+    <li><span>2</span><div><b>Choisis un livre</b>Touche sa couverture, puis « Lire ».</div></li>
+    <li><span>3</span><div><b>Écris dans le livre</b>La barre en bas tourne les pages; le crayon et le texte permettent d'écrire sur la page.</div></li></ol>
   <div class="bien-b"><button type="button" class="bv-lien" id="bienAide">Voir l'aide</button><button type="button" class="bv-ok" id="bienOk">C'est parti</button></div>
 </div></div>
 <div class="bv-ov" id="bvOv" hidden role="dialog" aria-label="Aide : la barre d'outils"><div class="bv-box">
@@ -8278,12 +8278,12 @@ window.ACCES = (function(){
   }
   const protegesPermis = () => { try { return Object.keys(DATA.livres).filter(f => DATA.livres[f].cles[SESSION.id]).length; } catch(e){ return 0; } };
   function dlgConnexion(apres){
-    box().innerHTML = marque('Se connecter', 'Les livres protégés s\'ouvrent avec ton compte enseignant. Ton mot de passe ne quitte jamais cet ordinateur.')
+    box().innerHTML = marque('Se connecter', 'Réservé aux élèves et enseignants du Pavillon de l\'Avenir. Élève : ton enseignant te donne l\'identifiant et le mot de passe de ton groupe.')
       + '<label for="acId">Identifiant</label><input type="text" id="acId" autocomplete="username" placeholder="prenom.nom">'
       + '<label for="acMdp">Mot de passe</label><input type="password" id="acMdp" autocomplete="current-password">'
       + '<div class="acces-err" id="acErr" hidden></div>'
       + '<div class="acces-btns"><button id="acNon">Annuler</button><button class="prim" id="acOui">Se connecter</button></div>'
-      + '<button class="acces-lien" id="acDem">Pas encore de compte ? Demander un accès</button><br><button class="acces-lien" id="acOubli" style="margin-top:8px">Mot de passe oublié ?</button>';
+      + '<button class="acces-lien" id="acDem">Enseignant sans compte ? Demander un accès</button><br><button class="acces-lien" id="acOubli" style="margin-top:8px">Mot de passe oublié ?</button>';
     ov().hidden = false; setTimeout(() => document.getElementById("acId")?.focus(), 50);
     const go = async () => { const bt = document.getElementById("acOui"), er = document.getElementById("acErr"); bt.disabled = true; bt.textContent = "Vérification…"; er.hidden = true;
       try { await connexion(document.getElementById("acId").value, document.getElementById("acMdp").value); bienvenue(apres); compterDemandes().catch(() => {}); }

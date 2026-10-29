@@ -9,7 +9,8 @@
 - Auteur : **Jeremy (Jérémy Raymond), enseignant au Pavillon de l'Avenir** (formation professionnelle, Québec).
   Programmes : **DEP 5211 Entretien général d'immeubles (EGI)** et **DEP 5333 Plomberie et chauffage**.
 - Usage réel : projeté en classe sur un tableau interactif (TNI), aussi sur ordinateur et téléphone. Public enseignant.
-  Le site est public; Jeremy le partage seulement avec ses collègues.
+  Le site est public; Jeremy le partage avec ses collègues et (depuis le 29 oct.) ses élèves, par comptes de groupe.
+  Mention affichée partout (bannière `.hero-tag`, pied de page, connexion, bienvenue `#bienOv`) : « Réservé aux élèves et enseignants du Pavillon de l'Avenir » (demande de Jeremy).
 - **Tout est en français (Québec)**, y compris les commentaires, les messages d'interface et les commits.
   Tutoiement dans l'interface (« Choisis… », « Ouvre… »). Signature : « Conçu par Jeremy, enseignant ».
 
