@@ -2682,11 +2682,7 @@ function redrawInk(){
   const k = (window.devicePixelRatio || 1) * RD.z;
   if (RD.wb && (/^iso/.test(wbBg()) || wbBg() === "lignes" || wbBg() === "quad")) grilleIso(g, c.width, c.height, k);
   const tous = INKS[inkKey()] || [];                                       /* les objets cachent les traits qui passent derrière ; les textes restent par-dessus */
-  /* ordre : tuyaux branchés sur un objet (sous l'objet), objets, puis tout ce qu'on écrit par-dessus (crayon, lignes, formes), cotes, textes */
-  const objs = tous.filter(s => s.t === "objet" && !ELEC[s.k]), raccords = []; objs.forEach(o => { try { objGeo(o, c.width, c.height).ports.forEach(q => raccords.push(q)); } catch(er){} });
-  const branche = s => raccords.length && s.t === "ligne" && !s.fil && s.p && s.p.some(q => raccords.some(r => Math.hypot(r[0] - q[0] * c.width, r[1] - q[1] * c.height) < 4));
-  const dessous = s => s.t !== "objet" && s.t !== "texte" && s.t !== "cote" && (branche(s) || !objs.length);
-  [dessous, s => s.t === "objet", s => s.t !== "objet" && s.t !== "texte" && s.t !== "cote" && !dessous(s), s => s.t === "cote", s => s.t === "texte"].forEach((f, i) => { tous.filter(f).forEach(s => drawStroke(g, s, c.width, c.height, k));
+  [s => s.t !== "objet" && s.t !== "texte" && s.t !== "cote", s => s.t === "objet", s => s.t === "cote", s => s.t === "texte"].forEach((f, i) => { tous.filter(f).forEach(s => drawStroke(g, s, c.width, c.height, k));
     /* croisementsIso retiré à la demande de Jeremy (28 oct.) : trop de bogues */ });
   if (window.SELM && SELM.length){ g.save(); g.setLineDash([6 * k, 4 * k]); g.lineWidth = 1.6 * k; g.strokeStyle = "#2a7bcf";
     let T = null; SELM.forEach(o => { if (!strokes().includes(o)) return; const b = boiteDe(o, c.width, c.height); if (!b) return;
@@ -3964,7 +3960,9 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     c.setPointerCapture(e.pointerId);
     if (RD.eraser){ cur = "erase"; eraseAt(pt(e)); return; }
     if (RD.crayonOff && !RD.text && !RD.obj){ e.preventDefault();                          /* aucun outil : rien ne se dessine, mais toucher une forme ou un objet le choisit */
-      const r0 = c.getBoundingClientRect(), brut = [(e.clientX - r0.left) / r0.width, (e.clientY - r0.top) / r0.height], hit = (RD.wb ? objetSous(brut) : null) || formeSous(brut);
+      const r0 = c.getBoundingClientRect(), brut = [(e.clientX - r0.left) / r0.width, (e.clientY - r0.top) / r0.height];
+      if (SELO.s && SELO.s.t === "cote" && poigneeSous(SELO.s, brut) === 2){ RD.obj = true; RD.objTab = RD.objTab === "plomb" ? "plomb" : "formes"; refreshTools(); cur = { poignee:2, s:SELO.s, snap:false, x0:e.clientX, y0:e.clientY }; return; }   /* poignée d'un texte ou d'une cote, même par-dessus un objet */
+      const fc = formeSous(brut), hit = fc && fc.t === "cote" ? fc : (RD.wb ? objetSous(brut) : null) || fc;   /* une cote ou un texte de côté passe avant l'objet qu'il recouvre */
       if (!hit){ const tx = texteSous(brut); if (tx){ RD.text = true; RD.obj = false; refreshTools(); SEL.s = tx; majBarTxt(); majSelTxt(); redrawInk(); aviser("Texte choisi : glisse-le pour le déplacer, double-clic pour le modifier, Suppr pour l'effacer.", 3500); } return; }
       RD.obj = true; RD.objTab = null; RD.formeK = null; RD.objKi = null; RD.objKe = null; refreshTools();
       if (hit.t === "objet"){ if (choisirAutre(hit)) tapElement(hit, e); return; }
