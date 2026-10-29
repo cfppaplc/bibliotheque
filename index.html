@@ -7951,7 +7951,11 @@ window.ACCES = (function(){
     else try { localStorage.setItem("accesCopie", JSON.stringify(DATA)); } catch(e){}
     try { const s = await idbGet("session"); if (s && DATA && DATA.comptes[s.id]) SESSION = Object.assign(s, { nom:DATA.comptes[s.id].nom, admin:!!DATA.comptes[s.id].admin }); } catch(e){}
     estPret = true; finPret(); majBouton(); try { render(); } catch(e){}
+    relancerDemande(); compterDemandes();
   }
+  let NB_DEM = 0;
+  async function compterDemandes(){ if (!SESSION || !SESSION.admin) return; const v = await lireBoite(); NB_DEM = Object.keys(v || {}).filter(id => !DATA.comptes[id]).length;
+    const b = document.getElementById("compteBtn"); if (b && NB_DEM){ b.style.boxShadow = "0 0 0 2px #e50914"; b.title = NB_DEM + " demande(s) d'accès en attente"; } }
   const protege = f => !!(DATA && DATA.livres && DATA.livres[f]);
   const permis = f => !!(SESSION && protege(f) && DATA.livres[f].cles[SESSION.id]);
   const verrouille = f => protege(f) && !permis(f);
@@ -7988,23 +7992,36 @@ window.ACCES = (function(){
     await idbSet("session", { id, priv });
     for (const k in CLES) delete CLES[k];
     try { INDEX_TEXTE = null; } catch(e){}
-    majBouton(); try { render(); } catch(e){}
+    majBouton(); try { render(); } catch(e){} compterDemandes();
   }
   async function deconnexion(){ SESSION = null; for (const k in CLES) delete CLES[k]; await idbSet("session", undefined); try { INDEX_TEXTE = null; } catch(e){} majBouton(); try { render(); } catch(e){} }
 
   /* ---- demande d'inscription : la paire de clés est créée ici; seule la clé publique et la clé privée cadenassée partent ---- */
   const idDe = nom => sansAcc(nom).toLowerCase().replace(/[^a-z0-9]+/g, ".").replace(/^\.|\.$/g, "");
   const sansAcc = t => t.normalize("NFD").replace(/[̀-ͯ]/g, "");
-  /* envoi automatique des demandes : service de courriel FormSubmit (adresse ou code secret fourni par FormSubmit). Vide = pas d'envoi, on montre le code à copier. */
-  const ENVOI_DEMANDES = "djay.raymond@hotmail.com";   /* à remplacer par le code secret FormSubmit dès que Jeremy l'a reçu */
-  async function envoyerDemande(code, nom, prog){
-    if (!ENVOI_DEMANDES) throw new Error("envoi non configuré");
-    const lien = location.origin + location.pathname + "#accepter=" + code.replace(/^DEMANDE-/, "");
-    const r = await fetch("https://formsubmit.co/ajax/" + ENVOI_DEMANDES, { method:"POST", headers:{ "Content-Type":"application/json", Accept:"application/json" },
-      body:JSON.stringify({ _subject:"Bibliothèque : demande d'accès de " + nom, _captcha:"false", _template:"box", Enseignant:nom, Programmes:(prog || []).map(progNom).join(", ") || "—",
-        "Pour accepter":"Ouvre ce lien sur ton ordinateur (connecté comme admin), vérifie les livres, puis touche Publier : " + lien, Code:code }) });
-    const j = await r.json().catch(() => ({})); if (!r.ok || String(j.success) === "false") throw new Error(j.message || ("réponse " + r.status));
+  /* boîte des demandes : sujet ntfy.sh (gratuit, sans compte). La demande va directement dans le panneau de l'admin.
+     ntfy.sh garde les messages 12 h : la demande est donc renvoyée toute seule (au plus toutes les 6 h) tant qu'elle n'est pas acceptée,
+     et le panneau garde sur l'ordinateur de l'admin les demandes déjà vues. Jeremy peut aussi s'abonner à ce sujet dans l'appli ntfy (avis sur son cellulaire). */
+  const BOITE = "https://ntfy.sh/biblio-pavillon-5edf93926a704efe";
+  async function envoyerDemande(code, nom){
+    const r = await fetch(BOITE, { method:"POST", body:code, headers:{ Title:"Demande d'acces : " + sansAcc(nom), Tags:"books" } });
+    if (!r.ok) throw new Error("réponse " + r.status);
+    try { localStorage.setItem("demandeEnAttente", JSON.stringify({ code, id:idDe(nom), nom, envoi:Date.now() })); } catch(e){}
   }
+  async function relancerDemande(){      /* au chargement : la demande de cet ordinateur est-elle encore en attente ? */
+    let d = null; try { d = JSON.parse(localStorage.getItem("demandeEnAttente") || "null"); } catch(e){} if (!d) return;
+    if (DATA && DATA.comptes[d.id]){ try { localStorage.removeItem("demandeEnAttente"); } catch(e){} return; }
+    if (Date.now() - (d.envoi || 0) > 6 * 3600e3) try { await envoyerDemande(d.code, d.nom); } catch(e){}
+  }
+  async function lireBoite(){            /* demandes reçues (12 dernières heures) + celles déjà vues sur cet ordinateur */
+    let vues = {}; try { vues = JSON.parse(localStorage.getItem("demandesVues") || "{}"); } catch(e){}
+    try { const r = await fetch(BOITE + "/json?poll=1&since=12h", { cache:"no-store" });
+      if (r.ok) (await r.text()).split("\n").filter(Boolean).forEach(l => { try { const m = JSON.parse(l); if (m.event !== "message" || !/^DEMANDE-/.test(m.message || "")) return;
+        const d = lireDemande(m.message); if (!vues[d.id] || vues[d.id].t < m.time) vues[d.id] = { code:m.message, t:m.time }; } catch(e){} }); } catch(e){}
+    try { localStorage.setItem("demandesVues", JSON.stringify(vues)); } catch(e){}
+    return vues;
+  }
+  const oublierDemande = id => { try { const v = JSON.parse(localStorage.getItem("demandesVues") || "{}"); delete v[id]; localStorage.setItem("demandesVues", JSON.stringify(v)); } catch(e){} };
   const PROGS = () => [...new Set(LIVRES.filter(l => l.fichier && l.categorie && !l.user).map(l => l.categorie))].sort();
   const progNom = c => { try { return nomProgramme(c); } catch(e){ return c; } };
   /* code de demande COURT : clé EC P-256; binaire = version(1) | programmes(1, bits) | clé publique(65) | sel(16) | iv(12) | clé privée chiffrée(48) | nom (UTF-8) */
@@ -8049,7 +8066,7 @@ window.ACCES = (function(){
     if (!SESSION){ dlgConnexion(); return; }
     if (!m.hidden){ m.hidden = true; return; }
     m.innerHTML = '<div class="qui"><b>' + esc(SESSION.nom) + '</b>' + esc(SESSION.id) + (SESSION.admin ? ' <span class="acces-tag">admin</span>' : '') + '</div>'
-      + (SESSION.admin ? '<button data-a="gerer">Gérer les accès des enseignants</button>' : '')
+      + (SESSION.admin ? '<button data-a="gerer">Gérer les accès des enseignants' + (NB_DEM ? ' (' + NB_DEM + ' demande' + (NB_DEM > 1 ? 's' : '') + ')' : '') + '</button>' : '')
       + '<button data-a="sortir">Se déconnecter</button>';
     const r = b.getBoundingClientRect(); m.style.top = (r.bottom + 8 + scrollY) + "px"; m.style.left = Math.max(8, Math.min(innerWidth - 240, r.right - 230)) + "px"; m.hidden = false;
     m.onclick = e => { const a = e.target.closest("[data-a]"); if (!a) return; m.hidden = true; if (a.dataset.a === "sortir") deconnexion().then(() => aviser("Tu es déconnecté sur cet ordinateur.")); else dlgGerer(); };
@@ -8063,7 +8080,7 @@ window.ACCES = (function(){
       + '<div class="acces-err" id="acErr" hidden></div>'
       + '<div class="acces-btns"><button id="acNon">Annuler</button><button class="prim" id="acOui">Se connecter</button></div>'
       + '<button class="acces-lien" id="acDem">Pas encore de compte ? Demander un accès</button>';
-    ov().hidden = false; setTimeout(() => document.getElementById("acId").focus(), 50);
+    ov().hidden = false; setTimeout(() => document.getElementById("acId")?.focus(), 50);
     const go = async () => { const bt = document.getElementById("acOui"), er = document.getElementById("acErr"); bt.disabled = true; bt.textContent = "Vérification…"; er.hidden = true;
       try { await connexion(document.getElementById("acId").value, document.getElementById("acMdp").value); fermer(); aviser("Bienvenue, " + SESSION.nom + " !"); if (apres) apres(); }
       catch(e){ er.textContent = e.message; er.hidden = false; bt.disabled = false; bt.textContent = "Se connecter"; } };
@@ -8071,14 +8088,14 @@ window.ACCES = (function(){
     document.getElementById("acNon").onclick = fermer; document.getElementById("acDem").onclick = dlgDemande;
   }
   function dlgDemande(){
-    box().innerHTML = '<h2>Demander un accès</h2><p class="sous">Choisis ton mot de passe (au moins 10 caractères). ' + (ENVOI_DEMANDES ? 'Ta demande partira toute seule à Jeremy' : 'Tu recevras un code à envoyer à Jeremy') + '; dès qu\'il l\'accepte, tu pourras te connecter.</p>'
+    box().innerHTML = '<h2>Demander un accès</h2><p class="sous">Choisis ton mot de passe (au moins 10 caractères). ' + 'Ta demande partira toute seule à Jeremy' + '; dès qu\'il l\'accepte, tu pourras te connecter.</p>'
       + '<label for="dNom">Prénom et nom</label><input type="text" id="dNom" autocomplete="name">'
       + '<label for="dMdp">Mot de passe</label><input type="password" id="dMdp" autocomplete="new-password">'
       + '<label for="dMdp2">Mot de passe (encore)</label><input type="password" id="dMdp2" autocomplete="new-password">'
       + '<label>Programme(s) que tu enseignes</label>' + PROGS().map(c => '<label style="display:flex;gap:8px;align-items:center;font-weight:500;margin:6px 0"><input type="checkbox" class="dProg" value="' + esc(c) + '" style="width:18px;height:18px;accent-color:#e50914"> ' + esc(progNom(c)) + '</label>').join("")
       + '<div class="acces-err" id="dErr" hidden></div>'
       + '<div class="acces-btns"><button id="dNon">Annuler</button><button class="prim" id="dOui">Créer ma demande</button></div>';
-    ov().hidden = false; setTimeout(() => document.getElementById("dNom").focus(), 50);
+    ov().hidden = false; setTimeout(() => document.getElementById("dNom")?.focus(), 50);
     document.getElementById("dNon").onclick = fermer;
     document.getElementById("dOui").onclick = async () => {
       const nom = document.getElementById("dNom").value.trim(), m1 = document.getElementById("dMdp").value, m2 = document.getElementById("dMdp2").value, er = document.getElementById("dErr");
@@ -8090,14 +8107,15 @@ window.ACCES = (function(){
       const prog = [...document.querySelectorAll(".dProg:checked")].map(x => x.value); if (!prog.length) return err("Coche au moins un programme.");
       const bt = document.getElementById("dOui"); bt.disabled = true; bt.textContent = "Création…";
       try { const code = await demande(nom, m1, prog);
-        let envoye = false; try { bt.textContent = "Envoi à Jeremy…"; await envoyerDemande(code, nom, prog); envoye = true; } catch(e){}
+        let envoye = false; try { bt.textContent = "Envoi à Jeremy…"; await envoyerDemande(code, nom); envoye = true; } catch(e){}
         if (envoye){ box().innerHTML = '<h2>Demande envoyée</h2><p class="sous">C\'est fait ! Jeremy a reçu ta demande. Dès qu\'il l\'accepte, touche « Se connecter » avec :</p>'
             + '<p style="font-size:1.05rem;margin:6px 0 4px">Identifiant : <b>' + esc(idDe(nom)) + '</b></p><p class="sous">et ton mot de passe. Garde-le bien : personne ne peut le retrouver.</p>'
             + '<div class="acces-btns"><button class="prim" id="dFin">Compris</button></div>';
           document.getElementById("dFin").onclick = fermer; return; }
-        box().innerHTML = '<h2>Demande prête</h2><p class="sous">Envoie ce code à Jeremy (courriel ou Teams). Ton identifiant sera <b>' + esc(idDe(nom)) + '</b>. Garde bien ton mot de passe : personne ne peut le retrouver.</p>'
+        box().innerHTML = '<h2>Demande prête</h2><p class="sous">L\'envoi automatique n\'a pas marché. Touche « Envoyer par Teams » (ou copie le code et envoie-le à Jeremy). Ton identifiant sera <b>' + esc(idDe(nom)) + '</b>. Garde bien ton mot de passe : personne ne peut le retrouver.</p>'
           + '<textarea id="dCode" readonly>' + code + '</textarea><div class="acces-ok" id="dOk" hidden>Code copié.</div>'
-          + '<div class="acces-btns"><button id="dFin">Fermer</button><button class="prim" id="dCopie">Copier le code</button></div>';
+          + '<div class="acces-btns"><button id="dFin">Fermer</button><button id="dCopie">Copier le code</button><button class="prim" id="dTeams">Envoyer par Teams</button></div>';
+        document.getElementById("dTeams").onclick = () => window.open("https://teams.microsoft.com/l/chat/0/0?users=raymjere@csskamloup.gouv.qc.ca&message=" + encodeURIComponent("Bonjour Jeremy, voici ma demande d'accès à la bibliothèque : " + location.origin + location.pathname + "#accepter=" + code.replace(/^DEMANDE-/, "")), "_blank");
         document.getElementById("dFin").onclick = fermer;
         document.getElementById("dCopie").onclick = () => { const t = document.getElementById("dCode"); t.select(); try { navigator.clipboard.writeText(code); } catch(e){ document.execCommand("copy"); } document.getElementById("dOk").hidden = false; };
       } catch(e){ err("Impossible de créer la demande : " + e.message); bt.disabled = false; bt.textContent = "Créer ma demande"; }
@@ -8123,7 +8141,8 @@ window.ACCES = (function(){
     let jeton = ""; try { jeton = localStorage.getItem("ghJeton") || ""; } catch(e){}
     box().innerHTML = '<h2>Accès des enseignants</h2><p class="sous">Coche les livres que chaque enseignant peut ouvrir. Les changements partent en ligne quand tu touches « Publier ».</p>'
       + (livres.length ? '<table class="acces-table">' + tete + lignes + '</table>' : '<p class="sous">Aucun livre protégé pour l\'instant.</p>')
-      + '<div class="acces-sec"><h3>Accepter une demande</h3><textarea id="gDem" placeholder="Colle ici le code DEMANDE-… reçu de l\'enseignant"></textarea><div class="acces-btns" style="justify-content:flex-start"><button class="abtn" id="gAjout">Ajouter cet enseignant</button></div></div>'
+      + '<div class="acces-sec"><h3>Demandes reçues</h3><div id="gBoite"><p class="sous">Recherche des demandes…</p></div>'
+      + '<details style="margin-top:8px"><summary style="cursor:pointer;color:#a9a9ae;font-size:.88rem">Coller un code reçu autrement (Teams, courriel)</summary><textarea id="gDem" placeholder="Colle ici le code DEMANDE-… reçu de l\'enseignant"></textarea><div class="acces-btns" style="justify-content:flex-start"><button class="abtn" id="gAjout">Ajouter cet enseignant</button></div></details></div>'
       + '<div class="acces-sec"><h3>Publication</h3><p class="sous" style="margin-bottom:6px">Pour publier d\'ici, colle une fois ta clé GitHub (gardée seulement sur cet ordinateur). Sinon, télécharge le fichier et envoie-le à Claude.</p>'
       + '<input type="password" id="gJeton" placeholder="Clé GitHub (github_pat_…)" value="' + esc(jeton) + '"></div>'
       + '<div class="acces-err" id="gErr"' + (msg && msg.err ? "" : " hidden") + '>' + (msg && msg.err ? esc(msg.err) : "") + '</div><div class="acces-ok" id="gOk"' + (msg && msg.ok ? "" : " hidden") + '>' + (msg && msg.ok ? esc(msg.ok) : "") + '</div>'
@@ -8147,6 +8166,12 @@ window.ACCES = (function(){
         appliquerProgs(d.id, d.prog || [], []).then(() => dessinerGerer({ ok:d.nom + " est ajouté" + ((d.prog || []).length ? " avec les livres de : " + d.prog.map(court).join(", ") : "") + ". Vérifie les cases, puis touche « Publier »." }))
           .catch(e => dessinerGerer({ err:e.message })); }
       catch(e){ dessinerGerer({ err:"Ce code n'est pas une demande valide." }); } };
+    lireBoite().then(vues => { const zone = document.getElementById("gBoite"); if (!zone) return;
+      const att = Object.keys(vues || {}).filter(id => !BROUILLON.comptes[id]).map(id => { try { return Object.assign(lireDemande(vues[id].code), { t:vues[id].t, code:vues[id].code }); } catch(e){ return null; } }).filter(Boolean).sort((a, b) => b.t - a.t);
+      zone.innerHTML = att.length ? att.map(d => '<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #2a2a2f"><div style="flex:1"><b>' + esc(d.nom) + '</b> <small style="color:#8c8c92">' + esc(d.id) + '</small><br><small style="color:#a9a9ae">' + (d.prog || []).map(court).join(", ") + ' · ' + new Date(d.t * 1000).toLocaleString("fr-CA", { day:"numeric", month:"short", hour:"2-digit", minute:"2-digit" }) + '</small></div>'
+        + '<button class="abtn prim" data-acc="' + esc(d.id) + '">Accepter</button><button class="abtn" data-ign="' + esc(d.id) + '">Ignorer</button></div>').join("") : '<p class="sous" style="margin:0">Aucune demande en attente.</p>';
+      zone.querySelectorAll("[data-acc]").forEach(bt => bt.onclick = () => { const d = att.find(x => x.id === bt.dataset.acc); document.getElementById("gDem").value = d.code; document.getElementById("gAjout").click(); });
+      zone.querySelectorAll("[data-ign]").forEach(bt => bt.onclick = () => { oublierDemande(bt.dataset.ign); dessinerGerer({ ok:"Demande ignorée." }); }); });
     document.getElementById("gNon").onclick = fermer;
     document.getElementById("gTel").onclick = () => { const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([JSON.stringify(BROUILLON, null, 1)], { type:"application/json" })); a.download = "comptes.json"; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 3000); };
     document.getElementById("gPub").onclick = async () => {
