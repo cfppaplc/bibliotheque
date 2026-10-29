@@ -7989,6 +7989,8 @@ window.addEventListener("online", () => { try { aviser("Internet est revenu."); 
   body.clair #compteBtn .cloche{border-color:#fff}
   @keyframes sonne{0%,58%,100%{transform:rotate(0)}62%{transform:rotate(18deg)}68%{transform:rotate(-16deg)}74%{transform:rotate(12deg)}80%{transform:rotate(-8deg)}86%{transform:rotate(4deg)}}
   
+  /* accueil 10 % plus petit sur ordinateur (demande de Jeremy, 29 oct.); livres, tableau blanc et cellulaire inchangés */
+  @media (min-width:641px){header,#hero,#filtres,main#rows,footer{zoom:.9}}
   .prefs h3{margin:16px 0 6px;font-size:.78rem;color:#8c8c92;text-transform:uppercase;letter-spacing:.05em}
   .prefs .lig{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid #26262b;flex-wrap:wrap}
   .prefs .lig>span{font-size:.92rem;color:#e4e4e7}
