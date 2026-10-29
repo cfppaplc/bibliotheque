@@ -882,7 +882,7 @@ document.addEventListener("keydown", e => { if (e.key !== "/" || e.ctrlKey || e.
     <span class="sep"></span>
     <button id="penW" aria-label="Épaisseur du trait" title="Épaisseur"></button><button id="penS" aria-label="Forme" title="Forme : trait libre, ligne, flèche, rectangle, ellipse"></button><button id="penT" aria-label="Zone de texte" title="Zone de texte : dessine un rectangle, puis écris dedans"></button><button id="penO" class="wbonly" hidden aria-label="Objets et symboles" title="Objets : plan isométrique (plinthe, radiateur…) ou schéma électrique en échelle (sur le quadrillé)"></button><button id="penE" aria-label="Gomme" title="Gomme"></button><button id="penU" aria-label="Annuler" title="Annuler (Ctrl+Z)"></button><button id="penR" aria-label="Rétablir" title="Rétablir (Ctrl+Y)"></button><button id="penC" aria-label="Tout effacer" title="Tout effacer sur cette page"></button>
     <span class="sep wbonly" hidden></span>
-    <button id="wbF" class="wbonly" hidden aria-label="Fond du tableau" title="Fond : blanc, quadrillé, lignes, plan isométrique, tableau noir, tableau vert"></button><button id="wbZo" class="wbonly" hidden aria-label="Dézoomer" title="Dézoomer (plus de place)"></button><span id="wbZv" class="wbonly wblbl" hidden>100%</span><button id="wbZi" class="wbonly" hidden aria-label="Zoomer" title="Zoomer"></button><button id="wbHand" class="wbonly" hidden aria-label="Déplacer le tableau" title="Déplacer le tableau (ou clic molette / Espace + glisser)"></button><span class="sep wbonly" hidden></span><button id="wbP" class="wbonly" hidden aria-label="Tableau précédent" title="Tableau précédent (←)"></button><span id="wbLbl" class="wbonly wblbl" hidden>1 / 1</span><button id="wbN" class="wbonly" hidden aria-label="Tableau suivant" title="Tableau suivant (→)"></button><button id="wbPlus" class="wbonly" hidden aria-label="Nouveau tableau" title="Ajouter un tableau"></button><button id="wbS" class="wbonly" hidden aria-label="Enregistrer en image" title="Enregistrer le tableau en image (PNG)"></button>
+    <button id="wbF" class="wbonly" hidden aria-label="Fond du tableau" title="Fond : blanc, quadrillé, lignes, plan isométrique, tableau noir, tableau vert"></button><button id="wbZo" class="wbonly" hidden aria-label="Dézoomer" title="Dézoomer (plus de place)"></button><span id="wbZv" class="wbonly wblbl" hidden>100%</span><button id="wbZi" class="wbonly" hidden aria-label="Zoomer" title="Zoomer"></button><button id="wbHand" class="wbonly" hidden aria-label="Déplacer le tableau" title="Déplacer le tableau (ou clic molette / Espace + glisser)"></button><span class="sep wbonly" hidden></span><button id="wbP" class="wbonly" hidden aria-label="Tableau précédent" title="Tableau précédent (←)"></button><span id="wbLbl" class="wbonly wblbl" hidden>1 / 1</span><button id="wbN" class="wbonly" hidden aria-label="Tableau suivant" title="Tableau suivant (→)"></button><button id="wbPlus" class="wbonly" hidden aria-label="Nouveau tableau" title="Ajouter un tableau"></button><button id="wbMoins" class="wbonly" hidden aria-label="Supprimer ce tableau" title="Supprimer ce tableau (toucher deux fois)"></button><button id="wbS" class="wbonly" hidden aria-label="Enregistrer en image" title="Enregistrer le tableau en image (PNG)"></button>
     <span class="sep"></span>
     <button id="penX" aria-label="Fermer le crayon"></button>
   </div>
@@ -2107,13 +2107,26 @@ const nomFond = k => ((WBFONDS.find(f => f.k === k) || {}).n || k).replace(/ \(.
 function majFond(){
   const b = $("#wbBoard"); b.dataset.fond = wbBg(); b.style.setProperty("--u", (34 * RD.z) + "px");
   const st = wbEtat(); $("#wbLbl").textContent = st.n + " / " + st.count;
-  $("#wbP").disabled = st.n <= 1; $("#wbN").disabled = st.n >= st.count;
+  $("#wbP").disabled = st.n <= 1; $("#wbN").disabled = st.n >= st.count; const m = $("#wbMoins"); if (m) m.disabled = st.count <= 1;
 }
 function wbAller(dir){
   const st = wbEtat();
   if (dir > 0){ if (st.n >= st.count){ aviser("Dernier tableau. Utilise + pour en ajouter un."); return; } st.n++; }
   else { if (st.n <= 1) return; st.n--; }
   majFond(); redrawInk(); refreshTools();
+}
+function wbSupprimer(){   /* supprime le tableau affiché : 1er toucher = « Sûr ? », 2e toucher (dans les 3 s) = supprimé; les tableaux suivants reculent d'un rang */
+  const b = $("#wbMoins"), st = wbEtat();
+  if (st.count <= 1){ aviser("Il reste un seul tableau. Pour le vider : « Tout effacer »."); return; }
+  if (!b.classList.contains("sur")){ b.classList.add("sur"); b.dataset.lab = "Sûr ? Touche encore"; clearTimeout(b._t); b._t = setTimeout(() => { b.classList.remove("sur"); b.dataset.lab = "Supprimer"; }, 3000); return; }
+  clearTimeout(b._t); b.classList.remove("sur"); b.dataset.lab = "Supprimer";
+  const L = RD.book + "|wb", n = st.n, re = new RegExp("^" + L.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "(\\d+)(:.*)?$");
+  [INKS, UNDO, REDO, REFS].forEach(T => { const neuf = {};
+    Object.keys(T).forEach(k => { const m = re.exec(k); if (!m) return; const i = +m[1], v = T[k]; delete T[k]; if (i === n) return; neuf[L + (i > n ? i - 1 : i) + (m[2] || "")] = v; });
+    Object.assign(T, neuf); });
+  const bg = {}; for (let i = 1; i <= st.count; i++) if (i !== n && st.bg[i]) bg[i > n ? i - 1 : i] = st.bg[i];
+  st.bg = bg; st.count--; st.n = Math.min(n, st.count);
+  SELO.s = null; window.SELM = []; majFond(); redrawInk(); refreshTools(); planifierSauvegarde(); aviser("Tableau " + n + " supprimé.");
 }
 function wbNouveau(){ const st = wbEtat(); st.count++; st.n = st.count; st.bg[st.n] = st.bg[st.n - 1] || "blanc"; majFond(); redrawInk(); refreshTools(); aviser("Tableau " + st.n + " ajouté."); }
 function wbFondSuivant(){
@@ -3183,7 +3196,7 @@ function redrawBientot(){ if (!rafInk) rafInk = requestAnimationFrame(() => { ra
   const c = $("#inkCanvas"), st = $("#rstage"), btn = $("#wbHand"); let spc = false, P = null;
   const majHand = () => { btn.classList.toggle("on", !!RD.hand); c.style.cursor = (RD.hand || spc) ? (P ? "grabbing" : "grab") : ""; };
   btn.onclick = () => { RD.hand = !RD.hand; if (RD.hand){ RD.eraser = false; RD.text = false; RD.obj = false; try { refreshTools(); } catch(e){} } majHand(); };
-  $("#penBar").addEventListener("click", e => { const b = e.target.closest("button"); if (b && RD.hand && !/^(wbHand|wbZo|wbZi|wbP|wbN|wbPlus|wbS|penFold|penSide|penU|penR)$/.test(b.id)){ RD.hand = false; majHand(); } }, true);
+  $("#penBar").addEventListener("click", e => { const b = e.target.closest("button"); if (b && RD.hand && !/^(wbHand|wbZo|wbZi|wbP|wbN|wbPlus|wbMoins|wbS|penFold|penSide|penU|penR)$/.test(b.id)){ RD.hand = false; majHand(); } }, true);
   document.addEventListener("keydown", e => { if (e.code !== "Space" || !RD.wb || /^(TEXTAREA|INPUT|SELECT)$/.test((e.target.tagName || ""))) return; e.preventDefault(); if (!spc){ spc = true; majHand(); } }, true);
   document.addEventListener("keyup", e => { if (e.code === "Space" && spc){ spc = false; majHand(); } }, true);
   document.addEventListener("pointerdown", e => {
@@ -4734,8 +4747,8 @@ document.querySelectorAll("#penBar .sw").forEach(b => b.onclick = () => { RD.col
 $("#penW").onclick = () => { RD.wIdx = (RD.wIdx + 1) % WIDTHS.length; majEpaisseur(); };
 function majEpaisseur(){ const c = $("#penW circle"); if (c) c.setAttribute("r", 2.5 + RD.wIdx * 2.5); }
 $("#penS").onclick = () => { const i = SHAPES.indexOf(RD.shape || null); RD.shape = SHAPES[(i + 1) % SHAPES.length]; RD.eraser = false; RD.text = false; RD.crayonOff = false; refreshTools(); };
-$("#wbF").onclick = wbFondSuivant; $("#wbP").onclick = () => wbAller(-1); $("#wbN").onclick = () => wbAller(1); $("#wbPlus").onclick = wbNouveau; $("#wbS").onclick = wbEnregistrer;
-[["penW","dot"],["wbHand","main"],["penE","eraser"],["penU","undo"],["penO","objet"],["wbZo","zmoins"],["wbZi","zplus"],["penT","texte"],["penR","redo"],["penC","trash"],["penX","close"],["wbF","fond"],["wbP","prev"],["wbN","next"],["wbPlus","plus"],["wbS","save"]].forEach(([id, n]) => setIcn($("#" + id), n));
+$("#wbF").onclick = wbFondSuivant; $("#wbP").onclick = () => wbAller(-1); $("#wbN").onclick = () => wbAller(1); $("#wbPlus").onclick = wbNouveau; $("#wbMoins").onclick = wbSupprimer; $("#wbS").onclick = wbEnregistrer;
+[["penW","dot"],["wbHand","main"],["penE","eraser"],["penU","undo"],["penO","objet"],["wbZo","zmoins"],["wbZi","zplus"],["penT","texte"],["penR","redo"],["penC","trash"],["penX","close"],["wbF","fond"],["wbP","prev"],["wbN","next"],["wbPlus","plus"],["wbMoins","trash"],["wbS","save"]].forEach(([id, n]) => setIcn($("#" + id), n));
 majEpaisseur();
 (function(){
   const bar = $("#penBar"), rd = $("#reader");
@@ -4800,7 +4813,7 @@ majEpaisseur();
   const pp = pop("popPlus");
   pp.appendChild(rang("Modifier", [nomme("penR", "Rétablir"), nomme("penC", "Tout effacer")]));
   pp.appendChild(rang("Affichage", [X("wbZo"), X("wbZv"), X("wbZi"), nomme("wbHand", "Déplacer")], true));
-  pp.appendChild(rang("Tableaux", [X("wbP"), X("wbLbl"), X("wbN"), nomme("wbPlus", "Nouveau")], true));
+  pp.appendChild(rang("Tableaux", [X("wbP"), X("wbLbl"), X("wbN"), nomme("wbPlus", "Nouveau"), nomme("wbMoins", "Supprimer")], true));
   const bsch = document.createElement("button"); bsch.id = "wbSch"; bsch.dataset.lab = "Mes schémas et modèles"; bsch.title = "Enregistrer, rouvrir, exporter un tableau; circuits prêts à utiliser";
   bsch.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h12l4 4v12H4z"/><path d="M8 4v5h7V4M8 20v-6h8v6"/></svg>';
   bsch.onclick = () => { fermer(); ouvrirSchemas(); };
@@ -7907,6 +7920,7 @@ window.addEventListener("online", () => { try { aviser("Internet est revenu."); 
   .acces-fiche summary{cursor:pointer;color:#a9a9ae;font-size:.84rem}
   .acces-grp{margin-top:8px}
   .acces-grp>.t{font-size:.72rem;color:#8c8c92;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
+  #wbMoins.sur{background:#b91c1c !important;color:#fff !important;border-color:#b91c1c !important}
   .prefs h3{margin:16px 0 6px;font-size:.78rem;color:#8c8c92;text-transform:uppercase;letter-spacing:.05em}
   .prefs .lig{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid #26262b;flex-wrap:wrap}
   .prefs .lig>span{font-size:.92rem;color:#e4e4e7}
