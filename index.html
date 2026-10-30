@@ -4722,6 +4722,51 @@ function verrouEleve(win, doc){
   const CL = ["answers", "stepans", "h-rep", "h-pas"], net = () => CL.forEach(c => doc.body.classList.contains(c) && doc.body.classList.remove(c)); net();
   new win.MutationObserver(net).observe(doc.body, { attributes:true, attributeFilter:["class"] });
   win.addEventListener("keydown", e => { if (/^r$/i.test(e.key || "") && !enSaisie(e.target)){ e.preventDefault(); e.stopImmediatePropagation(); } }, true);
+  /* l'élève touche le livre lui-même (sans outil) : écrire sur la ligne, cocher la case, encercler la réponse, écrire dans la zone de développement */
+  doc.addEventListener("click", e => {
+    if (!estEleve() || RD.wb || (RD.pen && !RD.crayonOff)) return;
+    if (e.target.closest && e.target.closest("a[href],button,input,select,textarea,summary,[contenteditable],[onclick],.nav,.toc,nav")) return;
+    const f = [$("#readerFrame"), $("#readerFrame2")].find(x => x && x.contentDocument === doc); if (!f) return;
+    const fr = f.getBoundingClientRect(), k = fr.width / (win.innerWidth || fr.width), X = fr.left + e.clientX * k, Y = fr.top + e.clientY * k;
+    if (ecrireIci(X, Y)){ e.preventDefault(); e.stopImmediatePropagation(); }
+  }, true);
+}
+/* encre de l'élève : bleu stylo, sauf s'il a choisi une autre couleur au crayon */
+const encreEleve = () => RD.color && !/^hl/.test(RD.color) && RD.color !== "#e2483d" ? RD.color : "#1d4ed8";
+function ecrireIci(X, Y){
+  const c = $("#inkCanvas"), r = c.getBoundingClientRect(); if (!r.width) return false;
+  const q = [(X - r.left) / r.width, (Y - r.top) / r.height], tx = texteSous(q);
+  if (tx){ modifierTexte(tx); return true; }                                   /* sa réponse déjà écrite : on la modifie */
+  const old = RD.color; RD.color = encreEleve();
+  try {
+    if (cocherDansLivre(X, Y)) return true;                                      /* case, V/F, choix */
+    const L = ligneDuLivre(X, Y);
+    if (L){ ouvrirTexte(L.x, L.y - L.hL, [(L.x - r.left) / r.width, (L.y - L.hL - r.top) / r.height], L.w, L.hL, null, L); return true; }
+    const Z = zoneDuLivre(X, Y);                                                 /* question à développement : grande case vide */
+    if (Z){ ouvrirTexte(Z.x, Z.y, [(Z.x - r.left) / r.width, (Z.y - r.top) / r.height], Z.w, Z.hL, null, Z); return true; }
+  } finally { RD.color = old; }
+  return false;
+}
+/* Zone de réponse vide sous le doigt (cadre bordé ou fond pâle, sans texte) : rend { x, y, w, hL, fs } comme ligneDuLivre, ou null */
+function zoneDuLivre(X, Y){
+  for (const id of ["#readerFrame", "#readerFrame2"]){
+    const f = $(id); if (!f || f.hidden) continue; const fr = f.getBoundingClientRect(); if (X < fr.left || X > fr.right || Y < fr.top || Y > fr.bottom) continue;
+    let win, doc; try { win = f.contentWindow; doc = f.contentDocument; } catch(e){ continue; } if (!doc || !doc.body) continue;
+    const s = fr.width / (win.innerWidth || fr.width), bx = (X - fr.left) / s, by = (Y - fr.top) / s;
+    for (const e of doc.elementsFromPoint(bx, by)){
+      if (e === doc.body || e === doc.documentElement || (e.matches && e.matches(".page,section,[data-page]"))) break;
+      const rr = e.getBoundingClientRect(), sc = e.offsetWidth ? rr.width / e.offsetWidth : 1; if (rr.width < 110 * sc || rr.height < 34 * sc || rr.height > 700 * sc) continue;
+      if ((e.textContent || "").replace(/\s+/g, "").length > 3 || e.querySelector("img,svg,canvas,table")) continue;
+      const cs = win.getComputedStyle(e), bord = ["Top", "Right", "Bottom", "Left"].filter(c => (parseFloat(cs["border" + c + "Width"]) || 0) >= .5 && cs["border" + c + "Style"] !== "none").length;
+      if (cs.backgroundImage && cs.backgroundImage !== "none") continue;          /* image ou dégradé décoratif : pas une zone de réponse */
+      const m = (cs.backgroundColor || "").match(/[\d.]+/g) || [], a = m.length > 3 ? +m[3] : (m.length ? 1 : 0), lum = m.length ? (.299 * m[0] + .587 * m[1] + .114 * m[2]) / 255 : 0;
+      const pale = a > .3 && lum > .85;                                           /* fond blanc ou pâle (feuille de réponse) */
+      if (!(bord >= 3 && (pale || a < .05)) && !(pale && rr.height >= 60 * sc && bord >= 1)) continue;
+      const fs = 14 * sc * s, hL = 22 * sc * s, pad = 6 * sc * s;
+      return { x:fr.left + rr.left * s + pad, y:fr.top + rr.top * s + pad, w:rr.width * s - 2 * pad, hL, fs, h:rr.height * s - 2 * pad };
+    }
+  }
+  return null;
 }
 function answers(){
   if (estEleve()) return;
