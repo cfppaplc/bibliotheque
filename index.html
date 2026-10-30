@@ -70,7 +70,7 @@
   /* En-tête épuré (29 oct., option D choisie par Jeremy) : logo sans boîte blanche, « Bibliothèque » sobre en gris */
   header .logo{gap:10px}
   header .logo-pav{background:transparent;padding:0;box-shadow:none!important}
-  header .logo-pav img{height:30px;filter:brightness(0) invert(1)}
+  header .logo-pav img{height:30px}header .logo-pav .lg-clr{display:none}body.clair header .logo-pav .lg-clr{display:block}body.clair header .logo-pav .lg-blc{display:none}   /* logo blanc propre (img/pavillon-avenir-blanc.png, A rouge gardé) sur fond foncé; couleurs en accueil clair */
   body.clair header .logo-pav img{filter:none;mix-blend-mode:multiply}
   header .logo-t{text-transform:none;letter-spacing:.01em;font-weight:600;font-size:1.05rem;color:var(--muted);border-left:1px solid #ffffff26;padding-left:12px}
   body.clair header .logo-t{border-left-color:#0000001f}
@@ -163,7 +163,7 @@
   .bv-tete h2{margin:0 0 4px;font-size:1.6rem}.bv-tete p{margin:0;color:#a9a9ae}
   .bien-box{background:#18181b;border:1px solid #2f2f33;border-radius:18px;max-width:460px;width:100%;margin-top:6vh;padding:0 0 18px;color:#f1f1f2;font-family:"Segoe UI",Roboto,Arial,sans-serif;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,.6);overflow:hidden;animation:bienIn .45s cubic-bezier(.2,.8,.2,1) both}
   .bien-tete{padding:26px 26px 20px;background:radial-gradient(120% 140% at 0% 0%,rgba(229,9,20,.42),transparent 62%),linear-gradient(180deg,#241416,#18181b);border-bottom:1px solid #2a2a2f}
-  .bien-tete img{height:42px;filter:brightness(0) invert(1);opacity:.95}
+  .bien-tete img{height:42px}
   .bien-tete h2{margin:12px 0 4px;font-size:1.7rem;letter-spacing:-.01em}.bien-tete p{margin:0;color:#b9b9be;font-size:.92rem;line-height:1.4}
   .bien-box .bien-et{margin:18px 20px 18px;gap:10px}
   .bien-box .bien-et li{background:#111114;border:1px solid #2a2a2f;border-radius:12px;padding:12px 14px;align-items:center;animation:bienCarte .45s cubic-bezier(.2,.8,.2,1) both}
@@ -790,7 +790,7 @@
   .timer-time .tm-edit{width:5.6ch;font:inherit;font-variant-numeric:tabular-nums;text-align:center;color:inherit;background:rgba(255,255,255,.08);border:0;border-bottom:2px solid #f1f1f2;border-radius:6px;padding:0;outline:none}
 </style></head><body>
 <header id="topbar">
-  <div class="logo"><span class="logo-pav"><img src="img/pavillon-avenir.png" alt="Pavillon de l'Avenir — Centre de formation professionnelle"></span><span class="logo-t">Bibliothèque</span></div>
+  <div class="logo"><span class="logo-pav"><img class="lg-blc" src="img/pavillon-avenir-blanc.png" alt="Pavillon de l'Avenir — Centre de formation professionnelle"><img class="lg-clr" src="img/pavillon-avenir.png" alt=""></span><span class="logo-t">Bibliothèque</span></div>
   <nav>
     <a data-view="all" class="active">Accueil</a>
     <a data-view="fav">Ma liste</a>
@@ -8008,7 +8008,7 @@ return {matrice:function(texte){var q=new QRCode(-1,L.M);q.addData(texte);q.make
 </script>
 
 <div class="bv-ov" id="bienOv" hidden role="dialog" aria-label="Bienvenue"><div class="bien-box">
-  <div class="bien-tete"><img src="img/pavillon-avenir.png" alt="Pavillon de l'Avenir"><h2>Bienvenue !</h2><p>Tes livres de cours, réservés aux enseignants du Pavillon de l'Avenir.</p></div>
+  <div class="bien-tete"><img src="img/pavillon-avenir-blanc.png" alt="Pavillon de l'Avenir"><h2>Bienvenue !</h2><p>Tes livres de cours, réservés aux enseignants du Pavillon de l'Avenir.</p></div>
   <ol class="bien-et">
     <li><span class="bi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 20c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg></span><div><b>Connecte-toi</b>Avec ton identifiant (prenom.nom). Pas de compte&nbsp;? «&nbsp;Demander un accès&nbsp;» dans la connexion.</div></li>
     <li><span class="bi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5z"/><path d="M4 19V5.5M8 7h8M8 11h6"/></svg></span><div><b>Choisis un livre</b>Touche sa couverture, puis «&nbsp;Lire&nbsp;».</div></li>
@@ -8204,7 +8204,7 @@ window.addEventListener("online", () => { try { aviser("Internet est revenu."); 
   .penbar .ppop #wbMoins::after{display:inline-block;max-width:0;opacity:0;overflow:hidden;white-space:nowrap;vertical-align:middle;transition:max-width .3s cubic-bezier(.2,.8,.2,1),opacity .2s,margin .3s;margin-left:0}
   .penbar .ppop #wbMoins.sur::after{max-width:170px;opacity:1;margin-left:6px}
   .acces-marque{margin:-22px -22px 14px;padding:22px 22px 16px;border-radius:16px 16px 0 0;background:radial-gradient(120% 140% at 0% 0%,rgba(229,9,20,.38),transparent 60%),linear-gradient(180deg,#221416,#18181b);border-bottom:1px solid #2a2a2f;text-align:center}
-  .acces-marque img{height:38px;width:auto;filter:brightness(0) invert(1);opacity:.95;animation:marqueIn .5s cubic-bezier(.2,.8,.2,1) both}
+  .acces-marque img{height:38px;width:auto;animation:marqueIn .5s cubic-bezier(.2,.8,.2,1) both}
   .acces-marque h2{margin:10px 0 2px!important}
   .acces-marque .sous{margin:0!important}
   @keyframes marqueIn{from{opacity:0;transform:translateY(-6px) scale(.96)}to{opacity:.95;transform:none}}
@@ -8232,7 +8232,7 @@ window.addEventListener("online", () => { try { aviser("Internet est revenu."); 
   .acces-succes .sous,.acces-succes .ident,.acces-succes .acces-btns{animation:monte .5s 1.15s both}
   .acces-succes .ident{display:inline-flex;align-items:center;gap:8px;margin:8px 0 4px;padding:8px 14px;border-radius:999px;background:#111114;border:1px solid #34343a;font-size:1rem}
   .acces-succes .ident b{color:#fff;letter-spacing:.02em}
-  .acces-succes img.mini{height:22px;filter:brightness(0) invert(1);opacity:.55;margin-top:14px}
+  .acces-succes img.mini{height:22px;opacity:.6;margin-top:14px}
   @keyframes trace{to{stroke-dashoffset:0}}
   @keyframes remplir{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:scale(1)}}
   @keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.12)}100%{transform:scale(1)}}
@@ -8482,7 +8482,7 @@ window.ACCES = (function(){
   }
   document.addEventListener("pointerdown", e => { const m = document.getElementById("accesMenu"); if (m && !m.hidden && !m.contains(e.target) && !e.target.closest("#compteBtn")) m.hidden = true; });
 
-  const marque = (titre, sous) => '<div class="acces-marque"><img src="img/pavillon-avenir.png" alt="Pavillon de l\'Avenir"><h2>' + titre + '</h2><p class="sous">' + sous + '</p></div>';
+  const marque = (titre, sous) => '<div class="acces-marque"><img src="img/pavillon-avenir-blanc.png" alt="Pavillon de l\'Avenir"><h2>' + titre + '</h2><p class="sous">' + sous + '</p></div>';
   const LOGO_PROG = { "Entretien général d'immeubles":"img/prog-egi.jpg", "Plomberie et chauffage":"img/prog-plomberie.jpg" };
   const ICO_PROG = { "Entretien général d'immeubles":'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V8l7-5 7 5v13"/><path d="M9 21v-6h6v6M9 10h.01M15 10h.01"/></svg>',
     "Plomberie et chauffage":'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h6v4h6a4 4 0 0 1 4 4v2h-4v-2H10v2H4z"/><path d="M18 18.5c0 1-.8 1.8-1.8 1.8s-1.7-.8-1.7-1.8c0-1.2 1.7-3 1.7-3s1.8 1.8 1.8 3z"/></svg>' };
@@ -8491,7 +8491,7 @@ window.ACCES = (function(){
     const conf = Array.from({ length:18 }, (_, i) => { const a = i / 18 * Math.PI * 2 + Math.random() * .3, d = 60 + Math.random() * 50;
       return '<i class="conf" style="background:' + C[i % C.length] + ';--x:' + Math.round(Math.cos(a) * d) + 'px;--y:' + Math.round(Math.sin(a) * d) + 'px;--r:' + Math.round(Math.random() * 540 - 270) + 'deg;animation-delay:' + (0.78 + Math.random() * .12).toFixed(2) + 's"></i>'; }).join("");
     return '<div class="acces-succes"><div class="crochet"><span class="halo"></span>' + conf + '<svg viewBox="0 0 100 100"><circle class="fond" cx="50" cy="50" r="45"/><circle class="cercle" cx="50" cy="50" r="45"/><path class="coche" d="M30 52l13 13 27-29"/></svg></div>'
-      + '<h2>' + titre + '</h2>' + html + '<br><img class="mini" src="img/pavillon-avenir.png" alt=""></div>';
+      + '<h2>' + titre + '</h2>' + html + '<br><img class="mini" src="img/pavillon-avenir-blanc.png" alt=""></div>';
   }
   function bienvenue(apres){   /* connexion réussie : pastille des initiales qui apparaît, cadenas qui s'ouvre, « Bonjour Prénom ! », puis fermeture toute seule */
     const ini = SESSION.nom.split(/\s+/).map(m => m[0] || "").join("").slice(0, 2).toUpperCase(), n = protegesPermis();
