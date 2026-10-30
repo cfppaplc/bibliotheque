@@ -8008,7 +8008,7 @@ return {matrice:function(texte){var q=new QRCode(-1,L.M);q.addData(texte);q.make
 </script>
 
 <div class="bv-ov" id="bienOv" hidden role="dialog" aria-label="Bienvenue"><div class="bien-box">
-  <div class="bien-tete"><img src="img/pavillon-avenir-blanc.png" alt="Pavillon de l'Avenir"><h2>Bienvenue !</h2><p>Tes livres de cours, réservés aux enseignants du Pavillon de l'Avenir.</p></div>
+  <div class="bien-tete"><img class="lg-blc" src="img/pavillon-avenir-blanc.png" alt="Pavillon de l'Avenir"><img class="lg-clr" src="img/pavillon-avenir.png" alt=""><h2>Bienvenue !</h2><p>Tes livres de cours, réservés aux enseignants du Pavillon de l'Avenir.</p></div>
   <ol class="bien-et">
     <li><span class="bi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 20c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg></span><div><b>Connecte-toi</b>Avec ton identifiant (prenom.nom). Pas de compte&nbsp;? «&nbsp;Demander un accès&nbsp;» dans la connexion.</div></li>
     <li><span class="bi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5z"/><path d="M4 19V5.5M8 7h8M8 11h6"/></svg></span><div><b>Choisis un livre</b>Touche sa couverture, puis «&nbsp;Lire&nbsp;».</div></li>
@@ -8300,6 +8300,73 @@ window.addEventListener("online", () => { try { aviser("Internet est revenu."); 
   .acces-menu .qui b{color:#f1f1f2;display:block;font-size:.92rem}
   .acces-menu button{display:block;width:100%;text-align:left;background:none;border:0;color:#f1f1f2;font:500 .9rem "Segoe UI",Roboto,Arial,sans-serif;padding:9px 10px;border-radius:8px;cursor:pointer}
   .acces-menu button:hover{background:#26262b}
+
+  /* ---------- Fenêtres en accueil clair (30 oct., demande de Jeremy : « les interfaces devraient suivre le choix ») ----------
+     fiche du livre, bienvenue, aide, Quoi de neuf, compte (connexion, demandes, préférences, panneau des accès), menus. Lecteur, tableau blanc, plans et accueil de classe restent foncés. */
+  .lg-clr{display:none} body.clair .lg-clr{display:inline-block} body.clair .lg-blc{display:none!important}
+  body.clair :is(.panel,.bien-box,.bv-box,.qn-box,.acces-box,.acces-menu,.plus-sheet){--text:#1d1d1f;--muted:#5f6068;--card:#fff;color:#1d1d1f;background:#fff;border-color:#e3e0da;box-shadow:0 24px 60px rgba(40,25,10,.28)}
+  body.clair :is(.modal,.bv-ov,.qn-ov,.acces-ov){background:rgba(40,32,24,.45)}
+  body.clair .plus-ov{background:rgba(40,32,24,.35)}
+  /* bandeaux du haut : rouge pâle, logo en couleurs */
+  body.clair :is(.bien-tete,.acces-marque){background:radial-gradient(120% 140% at 0% 0%,rgba(229,9,20,.16),transparent 62%),linear-gradient(180deg,#fdf1ef,#fff);border-bottom-color:#efe9e3}
+  body.clair :is(.bien-tete,.acces-marque) p,body.clair .acces-box p.sous,body.clair .bv-tete p,body.clair .qn-sous,body.clair .qn-jour,body.clair .bien-sous{color:#5f6068}
+  /* fiche du livre */
+  body.clair .panel-top::after{background:linear-gradient(to top,rgba(0,0,0,.45),rgba(0,0,0,0) 65%)}
+  body.clair .panel-top h2{color:#fff;text-shadow:0 2px 10px rgba(0,0,0,.45)}
+  body.clair .panel .close{background:#fff;color:#1d1d1f;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+  body.clair .panel-body p{color:#3d3d42}body.clair .panel-body p.m-version{color:#6b6b72}
+  body.clair .panel .meta .green{color:#16803c}
+  body.clair .panel .btn-play{background:#1d1d1f;color:#fff}body.clair .panel .btn-play:hover{background:#3a3a3f}
+  body.clair .panel .btn-fav{border-color:#bdb8b0;color:#1d1d1f}body.clair .panel .btn-fav:hover{border-color:#1d1d1f}
+  /* bienvenue */
+  body.clair .bien-box .bien-et li{background:#faf8f5;border-color:#ebe7e1}
+  body.clair .bien-box .bien-et b{color:#1d1d1f}body.clair .bien-box .bien-et div,body.clair .bien-et div{color:#5f6068}
+  body.clair .bien-box .bien-et span.bi{color:#d10812;background:rgba(229,9,20,.09)}
+  body.clair .bien-go{background:#1d1d1f;color:#fff}body.clair .bien-go:hover{background:#3a3a3f}
+  body.clair .bien-b span{color:#b9b5ae}
+  /* aide */
+  body.clair :is(.bv-barre,.bv-plus img){border-color:#e3e0da}
+  body.clair .bv-leg p,body.clair .bv-plus ul{color:#3d3d42}
+  body.clair .bv-leg kbd{background:#f3f1ed;border-color:#d4d0c8;color:#1d1d1f}
+  body.clair .bv-plus{border-top-color:#ebe7e1}body.clair .bv-pied label{color:#5f6068}
+  body.clair :is(.bv-lien,.qn-it p button){color:#1f5fbf}
+  /* Quoi de neuf */
+  body.clair .qn-it{border-top-color:#ebe7e1}
+  body.clair .qn-tag{color:#fff}body.clair .qn-tag.outil{background:#6b6b72}
+  body.clair .qn-plus{background:#fff;border-color:#d4d0c8;color:#1d1d1f}body.clair .qn-plus:hover{border-color:#1d1d1f}
+  body.clair .qn-plus[aria-expanded="true"]{background:#1f6fc2;border-color:#1f6fc2;color:#fff}
+  body.clair .qn-detail{background:#faf8f5;border-color:#ebe7e1}body.clair .qn-detail h3,body.clair .qn-nv{color:#6b6b72}
+  body.clair .qn-hist li{color:#3d3d42}body.clair .qn-hist .d{color:#8a8780}
+  body.clair .qn-img{border-color:#e3e0da;box-shadow:0 4px 14px rgba(40,25,10,.15)}
+  body.clair .qn-fermer{background:#fff;border-color:#bdb8b0;color:#1d1d1f}
+  /* fenêtres du compte */
+  body.clair .acces-box label{color:#3d3d42}
+  body.clair .acces-box :is(input[type=text],input[type=password],textarea){background:#fff;border-color:#d4d0c8;color:#1d1d1f}
+  body.clair .acces-box :is(input,textarea):focus{border-color:#1d1d1f}
+  body.clair :is(.acces-btns button,.acces-box .abtn){background:#fff;border-color:#d4d0c8;color:#1d1d1f}
+  body.clair :is(.acces-btns button,.acces-box .abtn):hover{background:#f3f1ed}
+  body.clair :is(.acces-btns button.prim,.acces-box .abtn.prim){background:#1d1d1f;border-color:#1d1d1f;color:#fff}
+  body.clair .acces-err{color:#c0262d}body.clair .acces-ok{color:#16803c}body.clair .acces-lien{color:#1f5fbf}
+  body.clair .acces-fiche{background:#faf8f5;border-color:#ebe7e1}
+  body.clair :is(.acces-fiche .fh .qui small,.acces-fiche .fh .cpt,.acces-fiche summary,.acces-grp>.t,.acces-table th.liv){color:#6b6b72}
+  body.clair .acces-box label.acces-chip{border-color:#d4d0c8;color:#3d3d42}
+  body.clair .acces-box label.acces-chip:has(input:checked){color:#1d1d1f;background:rgba(229,9,20,.08)}
+  body.clair :is(.acces-table th,.acces-table td){border-bottom-color:#ebe7e1}body.clair .acces-sec{border-top-color:#ebe7e1}
+  body.clair .acces-box label.acces-prog{background:#faf8f5;border-color:#e3e0da;color:#3d3d42}
+  body.clair .acces-box label.acces-prog:has(input:checked){background:rgba(229,9,20,.07);color:#1d1d1f;border-color:#e50914}
+  body.clair .acces-prog .plogo{box-shadow:0 2px 8px rgba(40,25,10,.15)}body.clair .acces-prog::after{border-color:#bdb8b0}
+  body.clair .acces-succes .ident{background:#faf8f5;border-color:#e3e0da}body.clair .acces-succes .ident b{color:#1d1d1f}
+  body.clair .acces-succes img.mini{opacity:.85}
+  body.clair .acces-bienv .cad{border-color:#fff}
+  body.clair .prefs .lig{border-bottom-color:#efebe5}body.clair .prefs .lig>span{color:#1d1d1f}body.clair .prefs h3{color:#6b6b72}
+  body.clair .prefs .seg button{background:#fff;border-color:#d4d0c8;color:#3d3d42}
+  body.clair .prefs .seg button.on{background:#1d1d1f;border-color:#1d1d1f;color:#fff}
+  body.clair .prefs .rond{box-shadow:inset 0 0 0 1px rgba(0,0,0,.12)}body.clair .prefs .rond.on{border-color:#1d1d1f;outline-color:rgba(0,0,0,.15)}
+  body.clair .acces-menu .qui{color:#6b6b72;border-bottom-color:#ebe7e1}body.clair .acces-menu .qui b{color:#1d1d1f}
+  body.clair .acces-menu button{color:#1d1d1f}body.clair .acces-menu button:hover{background:#f3f1ed}
+  /* menu Plus du cellulaire */
+  body.clair .plus-poignee{background:#d4d0c8}body.clair .plus-sheet button{color:#1d1d1f}
+  body.clair .plus-sheet button:active{background:#f3f1ed}body.clair .plus-sheet .plus-x{background:#f3f1ed;color:#3d3d42}
 </style>
 <div class="acces-ov" id="accesOv" hidden role="dialog" aria-modal="true"><div class="acces-box" id="accesBox"></div></div>
 <div class="acces-menu" id="accesMenu" hidden></div>
@@ -8482,7 +8549,7 @@ window.ACCES = (function(){
   }
   document.addEventListener("pointerdown", e => { const m = document.getElementById("accesMenu"); if (m && !m.hidden && !m.contains(e.target) && !e.target.closest("#compteBtn")) m.hidden = true; });
 
-  const marque = (titre, sous) => '<div class="acces-marque"><img src="img/pavillon-avenir-blanc.png" alt="Pavillon de l\'Avenir"><h2>' + titre + '</h2><p class="sous">' + sous + '</p></div>';
+  const marque = (titre, sous) => '<div class="acces-marque"><img class="lg-blc" src="img/pavillon-avenir-blanc.png" alt="Pavillon de l\'Avenir"><img class="lg-clr" src="img/pavillon-avenir.png" alt=""><h2>' + titre + '</h2><p class="sous">' + sous + '</p></div>';
   const LOGO_PROG = { "Entretien général d'immeubles":"img/prog-egi.jpg", "Plomberie et chauffage":"img/prog-plomberie.jpg" };
   const ICO_PROG = { "Entretien général d'immeubles":'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V8l7-5 7 5v13"/><path d="M9 21v-6h6v6M9 10h.01M15 10h.01"/></svg>',
     "Plomberie et chauffage":'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h6v4h6a4 4 0 0 1 4 4v2h-4v-2H10v2H4z"/><path d="M18 18.5c0 1-.8 1.8-1.8 1.8s-1.7-.8-1.7-1.8c0-1.2 1.7-3 1.7-3s1.8 1.8 1.8 3z"/></svg>' };
@@ -8491,7 +8558,7 @@ window.ACCES = (function(){
     const conf = Array.from({ length:18 }, (_, i) => { const a = i / 18 * Math.PI * 2 + Math.random() * .3, d = 60 + Math.random() * 50;
       return '<i class="conf" style="background:' + C[i % C.length] + ';--x:' + Math.round(Math.cos(a) * d) + 'px;--y:' + Math.round(Math.sin(a) * d) + 'px;--r:' + Math.round(Math.random() * 540 - 270) + 'deg;animation-delay:' + (0.78 + Math.random() * .12).toFixed(2) + 's"></i>'; }).join("");
     return '<div class="acces-succes"><div class="crochet"><span class="halo"></span>' + conf + '<svg viewBox="0 0 100 100"><circle class="fond" cx="50" cy="50" r="45"/><circle class="cercle" cx="50" cy="50" r="45"/><path class="coche" d="M30 52l13 13 27-29"/></svg></div>'
-      + '<h2>' + titre + '</h2>' + html + '<br><img class="mini" src="img/pavillon-avenir-blanc.png" alt=""></div>';
+      + '<h2>' + titre + '</h2>' + html + '<br><img class="mini lg-blc" src="img/pavillon-avenir-blanc.png" alt=""><img class="mini lg-clr" src="img/pavillon-avenir.png" alt=""></div>';
   }
   function bienvenue(apres){   /* connexion réussie : pastille des initiales qui apparaît, cadenas qui s'ouvre, « Bonjour Prénom ! », puis fermeture toute seule */
     const ini = SESSION.nom.split(/\s+/).map(m => m[0] || "").join("").slice(0, 2).toUpperCase(), n = protegesPermis();
