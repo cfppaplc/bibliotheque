@@ -2018,5 +2018,86 @@ if ("serviceWorker" in navigator && (location.protocol === "https:" || location.
   window.addEventListener("load", () => { navigator.serviceWorker.register("sw.js").catch(() => {}); });
 }
 </script>
+<style>
+/* ===== Bulles de description au survol (30 oct., demande de Jeremy) : remplacent les bulles grises du navigateur ===== */
+.bulle { position: fixed; z-index: 9999; left: 0; top: 0; max-width: 300px; padding: 10px 12px 10px; border-radius: 12px;
+  background: rgba(20,24,31,.97); color: #f4f5f7; font: 400 13px/1.35 "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  box-shadow: 0 14px 34px rgba(0,0,0,.35), 0 0 0 1px rgba(255,255,255,.07); pointer-events: none;
+  opacity: 0; transform: translateY(4px) scale(.97); transition: opacity .14s ease, transform .18s cubic-bezier(.2,.8,.2,1); }
+.bulle.dessous { transform: translateY(-4px) scale(.97); }
+.bulle.vue { opacity: 1; transform: none; }
+.bulle::after { content: ""; position: absolute; left: var(--fx, 50%); bottom: -5px; width: 10px; height: 10px; margin-left: -5px; background: inherit; transform: rotate(45deg); border-radius: 2px; }
+.bulle.dessous::after { bottom: auto; top: -5px; }
+.bulle .b-tete { display: flex; align-items: center; gap: 8px; }
+.bulle .b-h { flex: none; font: 700 11.5px "Segoe UI", Roboto, sans-serif; letter-spacing: .02em; padding: 2px 7px; border-radius: 6px; background: rgba(255,255,255,.12); color: #fff; }
+.bulle .b-t { font-weight: 650; font-size: 14px; color: #fff; }
+.bulle .b-kbd { flex: none; margin-left: auto; font: 700 11px ui-monospace, Consolas, monospace; min-width: 20px; text-align: center; padding: 2px 6px; border-radius: 5px; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.22); border-bottom-width: 2px; color: #fff; }
+.bulle .b-s { margin-top: 3px; color: #b8bfca; }
+.bulle .b-act { display: flex; align-items: flex-start; gap: 8px; margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,.1); color: #d9dde4; }
+.bulle .b-act + .b-act { margin-top: 4px; padding-top: 0; border-top: 0; }
+.bulle .b-act svg { flex: none; width: 16px; height: 16px; margin-top: 1px; color: #8fb8ff; }
+.bulle .b-act b { color: #fff; font-weight: 600; }
+@media (hover: none) { .bulle { display: none; } }
+@media (prefers-reduced-motion: reduce) { .bulle, .bulle.dessous { transform: none; transition: opacity .1s; } }
+</style>
+<script>
+/* Bulles : au survol d'un élément qui a un title, on le met de côté (data-bulle) et on affiche une bulle mise en forme.
+   « 9 h 00 · Théorie · clique pour ouvrir : X · double-clic : lier une action » → heure, titre, lignes d'action avec icône. Raccourci « (E) » / « (touche B) » → touche dessinée. */
+(function(){
+  const ICO = {
+    clic: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 9l10 4-4 1.6L13.4 19z"/><path d="M5 3.5l1.2 2.2M2.8 8.6l2.4.6M10 2.8l-.4 2.4"/></svg>',
+    dbl: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 9l10 4-4 1.6L13.4 19z"/><path d="M4.5 4.5a6 6 0 0 1 8.2-.6M2.8 9.5a9 9 0 0 1 .4-3"/></svg>',
+    lien: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>'
+  };
+  const esc = t => t.replace(/[&<>"]/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" }[c]));
+  const maj = t => t.charAt(0).toUpperCase() + t.slice(1);
+  function contenu(txt){
+    let kbd = "";
+    txt = txt.replace(/\s*\((?:touche\s+)?([A-Za-z0-9])\)/g, (m, k) => { kbd = k.toUpperCase(); return ""; });
+    const parts = txt.split(/\s+·\s+/).map(x => x.trim()).filter(Boolean);
+    let heure = "", titre = "", sous = [], act = [];
+    parts.forEach(x => {
+      if (!heure && /^\d{1,2}\s?h\s?\d{2}$|^\d{1,2}:\d{2}$/.test(x)) { heure = x; return; }
+      const m = x.match(/^(double-clic|clique pour ouvrir|ouvrir)\s*:\s*(.+)$/i);
+      if (m) { const k = /^double/i.test(m[1]) ? "dbl" : "clic", quoi = m[2].split(/\s+ou\s+/);
+        act.push(ICO[k] + '<span>' + (k === "dbl" ? "Double-clic : " : (/^ouvrir/i.test(m[1]) ? "Ouvre " : "Clic : ouvre ")) + quoi.map(q => "<b>" + esc(q) + "</b>").join(" ou ") + '</span>'); return; }
+      if (!titre) {
+        const d = x.match(/^(.{2,60}?)\s*:\s+(.{8,})$/);   /* « Tableau blanc : on revient ici… » → titre + phrase */
+        if (d && !/\d\s?h\s?\d/.test(d[1])) { titre = d[1]; sous.push(maj(d[2])); } else titre = x;
+        return; }
+      sous.push(maj(x));
+    });
+    if (!titre && !heure && !act.length) return "";
+    return '<div class="b-tete">' + (heure ? '<span class="b-h">' + esc(heure) + '</span>' : "") + '<span class="b-t">' + esc(titre) + '</span>' + (kbd ? '<span class="b-kbd">' + kbd + '</span>' : "") + '</div>'
+      + sous.map(x => '<div class="b-s">' + esc(x) + '</div>').join("")
+      + act.map(a => '<div class="b-act">' + a + '</div>').join("");
+  }
+  let bulle = null, cible = null, minuterie = 0, vueDepuis = 0;
+  const cacher = () => { clearTimeout(minuterie); if (cible && cible.dataset.bulle !== undefined && !cible.getAttribute("title")) cible.setAttribute("title", cible.dataset.bulle); cible = null;
+    if (bulle) { bulle.classList.remove("vue"); vueDepuis = Date.now(); } };
+  function montrer(el){
+    const html = contenu(el.dataset.bulle || ""); if (!html || !document.contains(el)) return;
+    if (!bulle) { bulle = document.createElement("div"); bulle.className = "bulle"; bulle.setAttribute("role", "tooltip"); document.body.append(bulle); }
+    bulle.innerHTML = html; bulle.style.left = "0px"; bulle.style.top = "0px";
+    const r = el.getBoundingClientRect(), b = bulle.getBoundingClientRect(), m = 8;
+    let x = r.left + r.width / 2 - b.width / 2; x = Math.max(m, Math.min(innerWidth - b.width - m, x));
+    let y = r.top - b.height - 10, dessous = false; if (y < m) { y = r.bottom + 10; dessous = true; }
+    bulle.classList.toggle("dessous", dessous);
+    bulle.style.setProperty("--fx", Math.max(14, Math.min(b.width - 14, r.left + r.width / 2 - x)) + "px");
+    bulle.style.left = Math.round(x) + "px"; bulle.style.top = Math.round(y) + "px";
+    requestAnimationFrame(() => bulle && bulle.classList.add("vue"));
+  }
+  document.addEventListener("pointerover", e => {
+    if (e.pointerType && e.pointerType !== "mouse") return;
+    const el = e.target.closest && e.target.closest("[title],[data-bulle]"); if (el === cible) return;
+    cacher(); if (!el) return;
+    const t = el.getAttribute("title"); if (t) { el.dataset.bulle = t; el.removeAttribute("title"); }   /* plus de bulle grise du navigateur */
+    if (!el.dataset.bulle) return;
+    cible = el; minuterie = setTimeout(() => montrer(el), Date.now() - vueDepuis < 400 ? 60 : 380);   /* d'une bulle à l'autre : tout de suite */
+  }, true);
+  document.addEventListener("pointerout", e => { if (cible && (!e.relatedTarget || !cible.contains(e.relatedTarget))) cacher(); }, true);
+  ["pointerdown", "keydown", "wheel", "scroll", "blur"].forEach(t => window.addEventListener(t, cacher, true));
+})();
+</script>
 </body>
 </html>

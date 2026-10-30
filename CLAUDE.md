@@ -147,6 +147,7 @@
   Les PDF/images/vidéos s'affichent dans le tableau; PowerPoint/Word/Excel sont téléchargés pour s'ouvrir dans leur programme.
 - **Ambiance du jour** : `AMBIANCES` (une palette par jour de semaine), `couleursDuJour()`; réglage `cfg.couleurs = "jour" | "fixe"`.
 - Icônes : style au trait uniquement (`ico(type)`, `ICO_P`), **pas d'émojis** (demande de Jeremy).
+- **Bulles au survol** (30 oct.) : script + style à la fin d'`accueil.html` : au survol à la souris, le `title` d'un élément passe dans `data-bulle` (plus de bulle grise du navigateur) et s'affiche dans `.bulle` (au-dessus, sinon dessous; flèche `--fx`). Le texte est découpé sur « · » : heure (« 8 h 40 ») en pastille, 1er morceau = titre (« Titre : phrase » → titre + sous-ligne), « clique pour ouvrir : … » / « double-clic : … » = lignes d'action avec icône, « (E) » / « (touche B) » = touche dessinée. Rien sur écran tactile.
 
 ## Outils (`outils/`)
 - `publier.sh "message" [livres…]` : commence par `git pull --autostash` du dépôt et recopie `comptes.json` en ligne dans le site (Jeremy le publie lui-même depuis le panneau Accès), puis vérification syntaxe → `recherche.json` → vérification des livres → commit + push.
