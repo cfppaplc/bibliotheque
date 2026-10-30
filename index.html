@@ -830,12 +830,18 @@ document.addEventListener("keydown", e => { if (e.key !== "/" || e.ctrlKey || e.
   const i = document.getElementById("search"); if (!i || !i.offsetParent) return; e.preventDefault(); i.focus(); });
 </script>
 <script>
-/* Accueil clair / foncé (29 oct.) : choix gardé sur cet ordinateur (localStorage.accueilClair) */
+/* Accueil clair / foncé (29 oct.) : choix gardé sur cet ordinateur (localStorage.accueilClair = "1"/"0").
+   Sans choix (30 oct., demande de Jeremy) : suit le réglage sombre/clair de l'ordinateur, même s'il change pendant que la page est ouverte. */
 (function(){
-  const lire = () => { try { return localStorage.getItem("accueilClair") === "1"; } catch(e){ return false; } };
+  const mq = window.matchMedia ? matchMedia("(prefers-color-scheme: light)") : null;
+  const choix = () => { try { return localStorage.getItem("accueilClair"); } catch(e){ return null; } };
+  const lire = () => { const v = choix(); return v === "1" ? true : v === "0" ? false : !!(mq && mq.matches); };
   const appliquer = c => { document.body.classList.toggle("clair", c); const b = document.getElementById("themeBtn"), t = document.getElementById("plusTheme");
     if (b){ b.title = c ? "Passer à l'accueil foncé" : "Passer à l'accueil clair"; b.setAttribute("aria-label", b.title); } if (t) t.textContent = c ? "Accueil foncé" : "Accueil clair"; };
   appliquer(lire());
+  if (mq){ const suivre = () => { if (choix() === null) appliquer(lire()); }; mq.addEventListener ? mq.addEventListener("change", suivre) : mq.addListener(suivre); }
+  window.themeAuto = () => { try { localStorage.removeItem("accueilClair"); } catch(e){} appliquer(lire()); };
+  window.themeEstAuto = () => choix() === null;
   const b = document.getElementById("themeBtn"); if (b) b.onclick = () => { const c = !document.body.classList.contains("clair"); try { localStorage.setItem("accueilClair", c ? "1" : "0"); } catch(e){} appliquer(c); };
 })();
 </script>
@@ -8765,7 +8771,8 @@ window.ACCES = (function(){
   window.appliquerPrefs = () => {
     const P = lirePrefs(), r = document.documentElement;
     if (P.couleur){ r.style.setProperty("--moi", P.couleur); r.style.setProperty("--accent", P.couleur); } else { r.style.removeProperty("--moi"); r.style.removeProperty("--accent"); }
-    if (P.theme === "clair" || P.theme === "fonce"){ const c = P.theme === "clair"; if (document.body.classList.contains("clair") !== c){ const b = document.getElementById("themeBtn"); if (b) b.click(); } }
+    if (P.theme === "auto"){ if (window.themeAuto && !window.themeEstAuto()) window.themeAuto(); }
+    else if (P.theme === "clair" || P.theme === "fonce"){ const c = P.theme === "clair"; if (document.body.classList.contains("clair") !== c){ const b = document.getElementById("themeBtn"); if (b) b.click(); } }
     const S = window.ACCES && ACCES.session;
     if (S && P.prog !== undefined && dejaProg !== S.id + "|" + P.prog){ dejaProg = S.id + "|" + P.prog;   /* le programme au départ, une fois par connexion */
       try { filtreProg = P.prog; ecrireLS("filtreProg", P.prog); } catch(e){} }
@@ -8780,11 +8787,11 @@ window.ACCES = (function(){
   }
   function contenu(B){
     const P = lirePrefs(), S = ACCES.session || { nom:"Invité", id:"" }, ini = S.nom.split(/\s+/).map(m => m[0] || "").join("").slice(0, 2).toUpperCase();
-    const theme = P.theme || (document.body.classList.contains("clair") ? "clair" : "fonce");
+    const theme = P.theme || (window.themeEstAuto && window.themeEstAuto() ? "auto" : document.body.classList.contains("clair") ? "clair" : "fonce");
     B.innerHTML = '<div class="prefs"><h2>Mes préférences</h2><div class="ap"><span class="ini">' + ini + '</span><div><b>' + esc2(S.nom) + '</b><br><small style="color:#8c8c92">Gardées sur cet ordinateur, pour ton compte seulement.</small></div></div>'
       + '<h3>Apparence</h3>'
       + '<div class="lig"><span>Ma couleur</span>' + ronds("couleur", COULEURS, P.couleur || "#e50914") + '</div>'
-      + '<div class="lig"><span>Accueil</span>' + seg("theme", [["fonce","Foncé"],["clair","Clair"]], theme) + '</div>'
+      + '<div class="lig"><span>Accueil</span>' + seg("theme", [["auto","Comme l'ordinateur"],["fonce","Foncé"],["clair","Clair"]], theme) + '</div>'
       + '<div class="lig"><span>« Bonjour ' + esc2(S.nom.split(/\s+/)[0]) + ' » en haut</span>' + seg("bonjour", [["oui","Oui"],["non","Non"]], P.bonjour === false ? "non" : "oui") + '</div>'
       + '<h3>Bibliothèque</h3>'
       + '<div class="lig"><span>Livres affichés au départ</span>' + seg("prog", PROG, P.prog === undefined ? "" : P.prog) + '</div>'
