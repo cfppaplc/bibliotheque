@@ -2507,6 +2507,9 @@ function habiller(g, txt, maxW){
     par.split(" ").forEach(w => {
       const t = ln ? ln + " " + w : w;
       if (ln && g.measureText(t).width > maxW){ out.push(ln); ln = w; } else ln = t;
+      while (maxW > 0 && ln.length > 1 && g.measureText(ln).width > maxW){       /* un mot plus long que la case : on le coupe (comme dans la case de saisie) */
+        let i = ln.length - 1; while (i > 1 && g.measureText(ln.slice(0, i)).width > maxW) i--;
+        out.push(ln.slice(0, i)); ln = ln.slice(i); }
     });
     out.push(ln);
   });
@@ -3243,7 +3246,7 @@ function ouvrirTexte(cx, cy, q, bw, bh, ex, lv){   /* lv = ligne d'un livre { hL
   const lig = ex ? !!ex.lig : (lv ? true : !!(RD.wb && wbBg() === "lignes")), hL = lv ? lv.hL : (ex && ex.lh ? ex.lh * c.getBoundingClientRect().height : 34 * 1.25 * RD.z);        /* feuille lignée : le texte s'écrit sur les lignes */
   if (lig && !ex && !lv){ const r = c.getBoundingClientRect(), top = Math.round((cy - r.top) / hL) * hL; cy = r.top + top; q = [q[0], top / r.height]; bh = Math.max(2 * hL, Math.round(bh / hL) * hL); }
   const ta = document.createElement("textarea"); ta.className = "inktxt"; ta.spellcheck = false; ta.placeholder = "Écrire…"; if (ex){ ta.value = ex.txt; ex.cache = true; redrawInk(); }
-  ta.style.cssText = "position:fixed;z-index:80;box-sizing:border-box;left:" + cx + "px;top:" + cy + "px;width:" + bw + "px;height:" + bh + "px;margin:0;padding:0;border:0;outline:2px dashed #6aa9ff;outline-offset:0;background:rgba(255,255,255,.08);resize:none;overflow:auto;white-space:pre-wrap;line-height:1.25;color:" + (col === "#24282c" && wbSombre() ? "#f4f1ea" : col);
+  ta.style.cssText = "position:fixed;z-index:80;box-sizing:border-box;left:" + cx + "px;top:" + cy + "px;width:" + bw + "px;height:" + bh + "px;margin:0;padding:0;border:0;outline:2px dashed #6aa9ff;outline-offset:0;background:rgba(255,255,255,.08);resize:none;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word;line-height:1.25;color:" + (col === "#24282c" && wbSombre() ? "#f4f1ea" : col);
   ta.style.font = txFont(P, fsCss).replace(/^((italic )?\d+ )/, "$1") ; ta.style.lineHeight = "1.25";
   if (lig){ const g2 = c.getContext("2d"); g2.font = txFont(P, fsCss); const mm = g2.measureText("Mg"), asc = mm.fontBoundingBoxAscent || fsCss * .9, desc = mm.fontBoundingBoxDescent || fsCss * .25;
     ta.style.lineHeight = hL + "px"; ta.style.paddingTop = Math.max(0, hL - 3 * RD.z - ((hL - (asc + desc)) / 2 + asc)) + "px"; }
