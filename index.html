@@ -3263,6 +3263,54 @@ function ouvrirTexte(cx, cy, q, bw, bh, ex, lv){   /* lv = ligne d'un livre { hL
 }
 /* Ligne de réponse d'un livre sous le doigt (x, y de l'écran) : bordure du bas (ligne, case à remplir) ou lignes répétées en fond.
    Rend { x, y (la ligne), w, hL (interligne), fs } en pixels de l'écran, ou null. Marche pour tous les livres, sans connaître leurs classes. */
+/* Case ou choix d'un livre sous le doigt : case dessinée (☐ □ ▢), petit carré vide (span.box…), ou choix à encercler (.opts > span, .choix > span, .vf > span).
+   Rend { kind:"case"|"rond", x, y, w, h } en pixels de l'écran, ou null. Sert aux élèves (et aux profs) pour cocher et encercler au bon endroit. */
+function caseDuLivre(X, Y){
+  for (const id of ["#readerFrame", "#readerFrame2"]){
+    const f = $(id); if (!f || f.hidden) continue; const fr = f.getBoundingClientRect(); if (X < fr.left || X > fr.right || Y < fr.top || Y > fr.bottom) continue;
+    let win, doc; try { win = f.contentWindow; doc = f.contentDocument; } catch(e){ continue; } if (!doc || !doc.body) continue;
+    const s = fr.width / (win.innerWidth || fr.width), bx = (X - fr.left) / s, by = (Y - fr.top) / s, tol = 16 / s;
+    const vis = e => { const cs = win.getComputedStyle(e); return cs.visibility !== "hidden" && cs.display !== "none" && +cs.opacity !== 0; };
+    const dist = r => Math.hypot(Math.max(r.left - bx, 0, bx - r.right), Math.max(r.top - by, 0, by - r.bottom));
+    const sous = doc.elementsFromPoint(bx, by), boite = (sous.find(e => e.matches && e.matches(".page,.slide,.diapo,section,[data-page]")) || doc.body);
+    let best = null; const prendre = (kind, r, d) => { if (d <= tol && (!best || d < best.d)) best = { kind, r, d }; };
+    /* 1. cases dessinées avec un caractère */
+    const tw = doc.createTreeWalker(boite, NodeFilter.SHOW_TEXT, { acceptNode:t => /[☐□▢◻⬜]/.test(t.data) ? 1 : 3 }); let t, n = 0;
+    while ((t = tw.nextNode()) && ++n < 3000){ const pr = t.parentElement && t.parentElement.getBoundingClientRect(); if (!pr || dist(pr) > tol || !vis(t.parentElement)) continue;
+      for (let i = 0; i < t.data.length; i++) if (/[☐□▢◻⬜]/.test(t.data[i])){ const rg = doc.createRange(); rg.setStart(t, i); rg.setEnd(t, i + 1); const r = rg.getBoundingClientRect(); if (r.width) prendre("case", r, dist(r)); } }
+    /* 2. petits carrés vides (bordure ou fond) */
+    n = 0; for (const e of boite.querySelectorAll("span,i,b,div,td")){ if (++n > 5000) break;
+      const r = e.getBoundingClientRect(); if (dist(r) > tol) continue;
+      if (r.width < 7 || r.width > 46 || r.height < 7 || r.height > 46 || Math.abs(r.width - r.height) > Math.max(r.width, r.height) * .35 || e.textContent.trim() || e.children.length) continue;
+      const cs = win.getComputedStyle(e); if (!vis(e)) continue; if ((parseFloat(cs.borderTopWidth) || 0) >= .5 && cs.borderTopStyle !== "none" || (parseFloat(cs.borderBottomWidth) || 0) >= .5 && (parseFloat(cs.borderLeftWidth) || 0) >= .5) prendre("case", r, dist(r)); }
+    if (best) return { kind:best.kind, x:fr.left + best.r.left * s, y:fr.top + best.r.top * s, w:best.r.width * s, h:best.r.height * s };
+    /* 3. choix à encercler : un enfant d'un groupe .opts / .choix / .vf (ou options, choices, qcm) */
+    const CH = /(^|\s)(opts?|options?|choix|choices?|vf|qcm)(\s|$)/;
+    for (const e of sous){ const p = e.parentElement; if (!p || !CH.test(p.className || "") || !vis(e)) continue;
+      let r = e.getBoundingClientRect(); try { const rg = doc.createRange(); rg.selectNodeContents(e); const rt = rg.getBoundingClientRect(); if (rt.width && rt.width < r.width) r = rt; } catch(x){}   /* le rond suit les mots, pas toute la largeur du bloc */
+      if (r.width && r.height < 120) return { kind:"rond", x:fr.left + r.left * s, y:fr.top + r.top * s, w:r.width * s, h:r.height * s }; }
+  }
+  return null;
+}
+/* Coche (✓) une case ou encercle un choix au point touché; un 2e toucher au même endroit l'enlève. Rend true si quelque chose a été fait. */
+function cocherDansLivre(X, Y){
+  if (RD.wb) return false; const B = caseDuLivre(X, Y); if (!B) return false;
+  const c = $("#inkCanvas"), r = c.getBoundingClientRect(), N = (x, y) => [(x - r.left) / r.width, (y - r.top) / r.height];
+  const cle = B.kind + ":" + Math.round((B.x + B.w / 2 - r.left) / r.width * 400) + "," + Math.round((B.y + B.h / 2 - r.top) / r.height * 400), arr = strokes();
+  const dans = o => { if (!o.coche || !o.cc) return false; const X0 = r.left + o.cc[0] * r.width, Y0 = r.top + o.cc[1] * r.height; return X0 >= B.x - 6 && X0 <= B.x + B.w + 6 && Y0 >= B.y - 6 && Y0 <= B.y + B.h + 6; };
+  snapInk(); const deja = arr.findIndex(o => o.coche === cle || dans(o));   /* même case (même si l'élément a un peu bougé sous le doigt) */
+  if (deja >= 0){ arr.splice(deja, 1); redrawInk(); return true; }
+  const col = /^hl/.test(RD.color) ? "#e2483d" : (RD.color || "#e2483d"), pts = [];
+  const seg = (a, b, k) => { for (let i = 0; i <= k; i++) pts.push(N(a[0] + (b[0] - a[0]) * i / k, a[1] + (b[1] - a[1]) * i / k)); };
+  if (B.kind === "case"){ const { x, y, w, h } = B, m = Math.max(w, h);
+    const A = [x + w * .12, y + h * .52], M = [x + w * .42, y + h * .86], Z = [x + w / 2 + m * .62, y + h / 2 - m * .78];   /* le crochet dépasse un peu en haut à droite, comme à la main */
+    seg(A, M, 6); pts.pop(); seg(M, Z, 10);
+    arr.push({ c:col, hl:false, w:Math.max(2.2, Math.min(5, m / RD.z * .17)), p:pts, coche:cle, cc:N(x + w / 2, y + h / 2) }); }
+  else { const cx = B.x + B.w / 2, cy = B.y + B.h / 2, rx = B.w / 2 + 7, ry = B.h / 2 + 5;
+    for (let i = 0; i <= 44; i++){ const a = -Math.PI * .6 + i / 40 * Math.PI * 2; pts.push(N(cx + rx * Math.cos(a), cy + ry * Math.sin(a))); }   /* un peu plus qu'un tour, comme un rond fait à la main */
+    arr.push({ c:col, hl:false, w:2.6, p:pts, coche:cle, cc:N(cx, cy) }); }
+  redrawInk(); try { planifierSauvegarde(); } catch(e){} return true;
+}
 function ligneDuLivre(X, Y){
   for (const id of ["#readerFrame", "#readerFrame2"]){
     const f = $(id); if (!f || f.hidden) continue; const fr = f.getBoundingClientRect(); if (X < fr.left || X > fr.right || Y < fr.top || Y > fr.bottom) continue;
@@ -4151,6 +4199,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     if (mv){ mv = null; return; }
     if (!z) return; const r = c.getBoundingClientRect(); box.remove(); box = null;
     let x = Math.min(z.x, z.x2), y = Math.min(z.y, z.y2), w = Math.abs(z.x2 - z.x), h = Math.abs(z.y2 - z.y); z = null;
+    if (!RD.wb && w < 40 && h < 30 && cocherDansLivre(x + w / 2, y + h / 2)) return;   /* case ou choix : coché / encerclé au bon endroit */
     if (!RD.wb && w < 40 && h < 30){ const L = ligneDuLivre(x + w / 2, y + h / 2);   /* livre : toucher une ligne de réponse = la case s'aligne dessus */
       if (L){ ouvrirTexte(L.x, L.y - L.hL, [(L.x - r.left) / r.width, (L.y - L.hL - r.top) / r.height], L.w, L.hL, null, L); return; } }
     if (w < 40) w = 260; if (h < 30) h = 90;                                /* simple clic : zone par défaut */
@@ -4285,6 +4334,9 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     if (cur && cur.raz){ const a = cur.p[0], b = cur.p[1]; if (Math.hypot(a[0] - b[0], a[1] - b[1]) < .004){        /* clic à côté d'une forme choisie : retour à aucun outil */
       const arr = strokes(), i = arr.indexOf(cur); if (i >= 0){ arr.splice(i, 1); (UNDO[inkKey()] || []).pop(); } cur = null; fond = null; RD.formeK = null; redrawInk(); majObjUI(); return; }
       delete cur.raz; }
+    if (cur && cur !== "erase" && !cur.t && !cur.hl && !cur.iso && !RD.wb && tap){ const r0 = c.getBoundingClientRect(), xs = cur.p.map(v => v[0] * r0.width), ys = cur.p.map(v => v[1] * r0.height);
+      if (Math.max(...xs) - Math.min(...xs) < 9 && Math.max(...ys) - Math.min(...ys) < 9 && caseDuLivre(tap.clientX, tap.clientY)){   /* crayon : simple toucher sur une case = crochet, sur un choix = rond */
+        const arr = strokes(), i = arr.indexOf(cur); if (i >= 0){ arr.splice(i, 1); (UNDO[inkKey()] || []).pop(); } cur = null; fond = null; RD.enTrait = false; cocherDansLivre(tap.clientX, tap.clientY); return; } }
     const finTrait = cur && cur !== "erase"; RD.enTrait = false;
     RD.erSnap = false;
     if (cur && cur !== "erase" && cur.t && FORMES_TAILLE[cur.t]){ const a = cur.p[0], b = cur.p[1]; if (Math.hypot(a[0] - b[0], a[1] - b[1]) < .004){ const r = c.getBoundingClientRect(), [tw, th] = FORMES_TAILLE[cur.t], dx = tw * RD.z / r.width / 2, dy = th * RD.z / r.height / 2; cur.p = [[a[0] - dx, a[1] - dy], [a[0] + dx, a[1] + dy]];
