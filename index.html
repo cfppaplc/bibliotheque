@@ -3250,11 +3250,12 @@ function ouvrirTexte(cx, cy, q, bw, bh, ex, lv){   /* lv = ligne d'un livre { hL
   let fini = false;
   const fin = ok => { if (fini) return; fini = true; const txt = ta.value.replace(/\s+$/, ""); ta.remove();
     if (ex){ ex.cache = false;
-      if (ok && txt !== ex.txt){ snapInk(key); if (!txt){ INKS[key] = INKS[key].filter(x => x !== ex); SEL.s = null; } else { ex.txt = txt; mesurerTexte(ex); } }
+      if (ok && txt !== ex.txt){ snapInk(key); if (!txt){ INKS[key] = INKS[key].filter(x => x !== ex); SEL.s = null; } else { ex.txt = txt; mesurerTexte(ex); if (ex.ch){ if (ex.fs0) { ex.fs = ex.fs0; ex.lh = ex.lh0; mesurerTexte(ex); } for (let k = 0; k < 10 && ex.bb && ex.bb[1] > ex.ch * 1.02; k++){ ex.fs *= .88; ex.lh *= .88; mesurerTexte(ex); } } } }
       redrawInk(); return; }
     if (ok && txt){ const s = { c:col, hl:false, w:4, t:"texte", lig, txt, p:[q, q], bw:bw / c.getBoundingClientRect().width, f:P.f, fs:P.fs, b:P.b, i:P.i };
       if (lv) s.lh = hL / c.getBoundingClientRect().height;
-      mesurerTexte(s); snapInk(key); (INKS[key] = INKS[key] || []).push(s); SEL.s = s; redrawInk(); } };
+      mesurerTexte(s);
+      if (lv && lv.h){ s.fs0 = s.fs; s.lh0 = s.lh; } if (lv && lv.h){ const Hc = s.ch = lv.h / c.getBoundingClientRect().height; for (let k = 0; k < 10 && s.bb && s.bb[1] > Hc * 1.02; k++){ s.fs *= .88; s.lh *= .88; mesurerTexte(s); } }   /* case d'un tableau : la réponse rapetisse pour rester dans sa case */ snapInk(key); (INKS[key] = INKS[key] || []).push(s); SEL.s = s; redrawInk(); } };
   ta.onkeydown = e => { e.stopPropagation(); if (e.key === "Escape"){ e.preventDefault(); fin(false); } else if (e.key === "Enter" && (e.ctrlKey || e.metaKey)){ e.preventDefault(); fin(true); } };   /* Entrée = nouvelle ligne; Ctrl+Entrée ou toucher à côté = terminé */
   if (!lig) ta.oninput = () => { if (ta.scrollHeight > ta.clientHeight){ ta.style.height = ta.scrollHeight + 4 + "px"; } };   /* la case grandit avec les lignes */
   if (lig) ta.oninput = () => { ta.style.height = "auto"; ta.style.height = Math.max(bh, Math.ceil(ta.scrollHeight / hL) * hL) + "px"; };   /* feuille lignée : Entrée passe à la ligne suivante, la zone grandit ; Ctrl+Entrée ou un clic ailleurs valide */
@@ -4200,6 +4201,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     if (!z) return; const r = c.getBoundingClientRect(); box.remove(); box = null;
     let x = Math.min(z.x, z.x2), y = Math.min(z.y, z.y2), w = Math.abs(z.x2 - z.x), h = Math.abs(z.y2 - z.y); z = null;
     if (!RD.wb && w < 40 && h < 30 && cocherDansLivre(x + w / 2, y + h / 2)) return;   /* case ou choix : coché / encerclé au bon endroit */
+    if (!RD.wb && w < 40 && h < 30){ const T = celluleDuLivre(x + w / 2, y + h / 2); if (T){ ouvrirTexte(T.x, T.y, [(T.x - r.left) / r.width, (T.y - r.top) / r.height], T.w, T.hL, null, T); return; } }
     if (!RD.wb && w < 40 && h < 30){ const L = ligneDuLivre(x + w / 2, y + h / 2);   /* livre : toucher une ligne de réponse = la case s'aligne dessus */
       if (L){ ouvrirTexte(L.x, L.y - L.hL, [(L.x - r.left) / r.width, (L.y - L.hL - r.top) / r.height], L.w, L.hL, null, L); return; } }
     if (w < 40) w = 260; if (h < 30) h = 90;                                /* simple clic : zone par défaut */
@@ -4740,12 +4742,40 @@ function ecrireIci(X, Y){
   const old = RD.color; RD.color = encreEleve();
   try {
     if (cocherDansLivre(X, Y)) return true;                                      /* case, V/F, choix */
+    const T = celluleDuLivre(X, Y);                                              /* cellule vide d'un tableau : le texte reste dans sa case */
+    if (T){ ouvrirTexte(T.x, T.y, [(T.x - r.left) / r.width, (T.y - r.top) / r.height], T.w, T.hL, null, T); return true; }
     const L = ligneDuLivre(X, Y);
     if (L){ ouvrirTexte(L.x, L.y - L.hL, [(L.x - r.left) / r.width, (L.y - L.hL - r.top) / r.height], L.w, L.hL, null, L); return true; }
     const Z = zoneDuLivre(X, Y);                                                 /* question à développement : grande case vide */
     if (Z){ ouvrirTexte(Z.x, Z.y, [(Z.x - r.left) / r.width, (Z.y - r.top) / r.height], Z.w, Z.hL, null, Z); return true; }
   } finally { RD.color = old; }
   return false;
+}
+/* Texte vraiment visible dans un élément (la réponse cachée du corrigé ne compte pas : transparente, invisible, opacité 0) */
+function texteVisible(el, win){
+  const tw = el.ownerDocument.createTreeWalker(el, NodeFilter.SHOW_TEXT); let t, n = 0;
+  while ((t = tw.nextNode()) && ++n < 400){ if (!t.data.replace(/[\s\u00a0]+/g, "")) continue;
+    let e = t.parentElement, ok = true;
+    for (; e && ok; e = e === el ? null : e.parentElement){ const cs = win.getComputedStyle(e);
+      if (cs.display === "none" || cs.visibility === "hidden" || +cs.opacity === 0 || parseFloat(cs.fontSize) === 0 || /rgba\([^)]*,\s*0\)|transparent/.test(cs.color)) ok = false; }
+    if (ok) return true; }
+  return false;
+}
+/* Cellule vide d'un tableau sous le doigt (td/th sans texte) : rend { x, y, w, hL, fs } (en haut à gauche de la cellule, marge comprise), ou null */
+function celluleDuLivre(X, Y){
+  for (const id of ["#readerFrame", "#readerFrame2"]){
+    const f = $(id); if (!f || f.hidden) continue; const fr = f.getBoundingClientRect(); if (X < fr.left || X > fr.right || Y < fr.top || Y > fr.bottom) continue;
+    let win, doc; try { win = f.contentWindow; doc = f.contentDocument; } catch(e){ continue; } if (!doc || !doc.body) continue;
+    const s = fr.width / (win.innerWidth || fr.width), bx = (X - fr.left) / s, by = (Y - fr.top) / s;
+    const td = doc.elementsFromPoint(bx, by).find(e => /^(TD|TH)$/.test(e.tagName)); if (!td) return null;
+    if (texteVisible(td, win) || td.querySelector("img,svg,input,canvas")) return null;
+    const rr = td.getBoundingClientRect(), sc = td.offsetWidth ? rr.width / td.offsetWidth : 1; if (rr.width < 30 * sc || rr.height < 14 * sc) return null;
+    const cs = win.getComputedStyle(td), pl = (parseFloat(cs.paddingLeft) || 4) * sc, pt = Math.min((parseFloat(cs.paddingTop) || 4) * sc, rr.height * .25);
+    const voisin = [...(td.parentElement ? td.parentElement.children : [])].find(x => x !== td && x.textContent.trim()), fsLivre = (voisin ? parseFloat(win.getComputedStyle(voisin).fontSize) || 14 : 14) * sc;
+    const fs = Math.min(fsLivre, Math.max(9 * sc, rr.height * .42)) * s, hL = fs * 1.4;   /* même taille que le texte du livre (ou plus petite si la case est basse) */
+    return { x:fr.left + (rr.left + pl) * s, y:fr.top + (rr.top + pt) * s, w:(rr.width - 2 * pl) * s, hL, fs, h:(rr.height - 2 * pt) * s };
+  }
+  return null;
 }
 /* Zone de réponse vide sous le doigt (cadre bordé ou fond pâle, sans texte) : rend { x, y, w, hL, fs } comme ligneDuLivre, ou null */
 function zoneDuLivre(X, Y){
@@ -4756,7 +4786,7 @@ function zoneDuLivre(X, Y){
     for (const e of doc.elementsFromPoint(bx, by)){
       if (e === doc.body || e === doc.documentElement || (e.matches && e.matches(".page,section,[data-page]"))) break;
       const rr = e.getBoundingClientRect(), sc = e.offsetWidth ? rr.width / e.offsetWidth : 1; if (rr.width < 110 * sc || rr.height < 34 * sc || rr.height > 700 * sc) continue;
-      if ((e.textContent || "").replace(/\s+/g, "").length > 3 || e.querySelector("img,svg,canvas,table")) continue;
+      if (texteVisible(e, win) || e.querySelector("img,svg,canvas,table")) continue;
       const cs = win.getComputedStyle(e), bord = ["Top", "Right", "Bottom", "Left"].filter(c => (parseFloat(cs["border" + c + "Width"]) || 0) >= .5 && cs["border" + c + "Style"] !== "none").length;
       if (cs.backgroundImage && cs.backgroundImage !== "none") continue;          /* image ou dégradé décoratif : pas une zone de réponse */
       const m = (cs.backgroundColor || "").match(/[\d.]+/g) || [], a = m.length > 3 ? +m[3] : (m.length ? 1 : 0), lum = m.length ? (.299 * m[0] + .587 * m[1] + .114 * m[2]) / 255 : 0;
