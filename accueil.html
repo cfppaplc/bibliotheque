@@ -629,6 +629,7 @@ html.anim-off .bgfx .flow, html.anim-off .bgfx .gauge-needle, html.anim-off .bgf
     <div class="sheet-actions">
       <button class="btn primary" type="submit">Afficher au tableau</button>
       <button class="btn" type="button" id="b-prep-cancel">Annuler</button>
+      <button class="btn" type="button" id="b-apercuBienv" title="Montre la carte que les élèves verront 5 minutes avant le début du cours">Voir la carte « Bienvenue »</button>
     </div>
   </form>
 </div>
@@ -1919,6 +1920,7 @@ $("form").addEventListener("submit", e => {
   save(); renderStatic(); tick(); fitSoon(); $("sheet").hidden = true;
 });
 $("sheet").addEventListener("click", e => { if (e.target.id === "sheet") $("sheet").hidden = true; });
+$("b-apercuBienv").onclick = () => { if (window.ambApercuBienvenue) ambApercuBienvenue($("f-comp").value); };   /* la compétence choisie dans le formulaire, même pas encore affichée */
 
 // Révéler la réponse
 function toggleAnswer() { const a = $("v-a"); a.hidden = !a.hidden; if (!a.hidden) { const q = rotCards().findIndex(el => el.dataset.w === "question"); if (q >= 0) showRot(q); } $("b-reveal").textContent = a.hidden ? "Révéler la réponse" : "Cacher la réponse"; }
@@ -2039,6 +2041,7 @@ html:not(.anim-off) .bgfx > svg, html:not(.anim-off) .bgfx > canvas { will-chang
 #accAccueil[hidden] { display: none; }
 #accAccueil.vu { opacity: 1; scale: 1; }
 #accAccueil.part { opacity: 0; scale: .88; translate: -50% -62%; }
+#accAccueil.apercu { z-index: 35; }          /* aperçu demandé depuis Préparer le cours : par-dessus le panneau */
 #accAccueil .aa-hey { font: 800 clamp(34px, 5.4vw, 76px)/1 var(--display); letter-spacing: -.02em; }
 #accAccueil .aa-hey span { color: var(--copper); }
 #accAccueil .aa-code { margin-top: clamp(12px, 1.6vw, 20px); font: 700 clamp(13px, 1.3vw, 18px) var(--body); letter-spacing: .14em; text-transform: uppercase; color: var(--copper); }
@@ -2123,17 +2126,31 @@ html.anim-off #accAccueil .aa-dans i { animation: none; }
   const carte = document.createElement("div"); carte.id = "accAccueil"; carte.hidden = true; carte.setAttribute("role", "status");
   carte.innerHTML = '<div class="aa-hey">Bienvenue<span>!</span></div><div class="aa-code"></div><div class="aa-comp"></div><div class="aa-dans"><i></i><span></span></div><div class="aa-x">Touche pour fermer</div>';
   document.body.append(carte);
-  let carteFermee = "";
-  carte.onclick = () => { carteFermee = jourCle(); partir(); };
+  let carteFermee = "", apercu = false;
+  carte.onclick = () => { if (apercu){ apercu = false; partir(); return; } carteFermee = jourCle(); partir(); };
+  /* Aperçu (bouton « Voir la carte Bienvenue » de Préparer le cours) : la carte de la prochaine période, à n'importe quelle heure; toucher = fermer */
+  function remplirCarte(texteDans, code){
+    const c = compInfo(code || cfg.comp);
+    carte.querySelector(".aa-code").textContent = c ? c[0] + (cfg.group ? " · " + cfg.group : "") : (cfg.group || "");
+    carte.querySelector(".aa-comp").textContent = c ? c[1] : (cfg.module || cfg.title || "");
+    carte.querySelector(".aa-dans span").textContent = texteDans;
+  }
+  function montrerCarte(){ if (carte.hidden){ carte.hidden = false; carte.classList.remove("part"); requestAnimationFrame(() => requestAnimationFrame(() => carte.classList.add("vu"))); } }
+  window.ambApercuBienvenue = code => {
+    const ps = periods(), d = new Date(), m = d.getHours() * 60 + d.getMinutes(), p = ps.find(x => x.start > m) || ps[0];
+    apercu = true; carte.classList.add("apercu");
+    remplirCarte(p ? (p.name === "Matin" && p.start <= m ? "Demain : " : "") + "Le cours commence à " + fmt(p.start) : "Le cours commence bientôt", code);
+    carte.querySelector(".aa-x").textContent = "Aperçu · touche pour fermer";
+    montrerCarte();
+  };
   const jourCle = () => new Date().toDateString() + "|" + (periods().find(p => p.start > new Date().getHours() * 60 + new Date().getMinutes()) || {}).start;
-  const partir = () => { if (carte.hidden) return; carte.classList.remove("vu"); carte.classList.add("part"); setTimeout(() => { carte.hidden = true; carte.classList.remove("part"); }, 850); };
+  const partir = () => { if (carte.hidden) return; carte.classList.remove("vu"); carte.classList.add("part"); setTimeout(() => { carte.hidden = true; carte.classList.remove("part", "apercu"); carte.querySelector(".aa-x").textContent = "Touche pour fermer"; }, 850); };
   function carteAccueil(avant){
+    if (apercu) return;
     if (E.ph === "avant" && carteFermee !== jourCle()){
-      const c = compInfo(cfg.comp), sec = Math.max(0, Math.round(E.reste * 60));
-      carte.querySelector(".aa-code").textContent = c ? c[0] + (cfg.group ? " · " + cfg.group : "") : (cfg.group || "");
-      carte.querySelector(".aa-comp").textContent = c ? c[1] : (cfg.module || cfg.title || "");
-      carte.querySelector(".aa-dans span").textContent = sec > 0 ? "Le cours commence dans " + dur(sec) : "On commence !";
-      if (carte.hidden){ carte.hidden = false; carte.classList.remove("part"); requestAnimationFrame(() => requestAnimationFrame(() => carte.classList.add("vu"))); }
+      const sec = Math.max(0, Math.round(E.reste * 60));
+      remplirCarte(sec > 0 ? "Le cours commence dans " + dur(sec) : "On commence !");
+      montrerCarte();
     } else if (!carte.hidden) partir();
   }
 
