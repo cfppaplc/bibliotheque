@@ -148,6 +148,13 @@ header { grid-column: 1 / -1; display: flex; align-items: center; justify-conten
 .period-top { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
 .period-nw { display: flex; align-items: center; gap: calc(var(--u) * 16); flex-wrap: wrap; }
 .exam-badge { font: 700 calc(var(--u) * 22) var(--display); letter-spacing: .06em; text-transform: uppercase; color: #fff; background: var(--copper); border-radius: 6px; padding: calc(var(--u) * 4) calc(var(--u) * 12); }
+.jour-choix { display: flex; flex-wrap: wrap; gap: 8px; margin: 2px 0 10px; }
+.jour-choix button, .jour-choix label { display: inline-flex; align-items: center; gap: 6px; height: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font: 600 15px var(--body); cursor: pointer; }
+.jour-choix button.on { background: var(--ink); color: var(--surface); border-color: var(--ink); }
+.jour-choix button .pret { width: 8px; height: 8px; border-radius: 50%; background: #2f9e44; }
+.jour-choix button.on .pret { background: #69db7c; }
+.jour-choix input[type=date] { border: 0; background: transparent; color: inherit; font: inherit; width: 0; padding: 0; opacity: 0; position: absolute; pointer-events: none; }
+.jour-note { margin: -2px 0 14px; padding: 10px 14px; border-radius: 10px; background: color-mix(in srgb, var(--water) 12%, transparent); font-size: 15px; line-height: 1.4; }
 .exam-opt { display: flex; gap: 12px; align-items: flex-start; margin: 4px 0 18px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; cursor: pointer; line-height: 1.35; }
 .exam-opt input { width: 22px; height: 22px; margin: 1px 0 0; flex: none; accent-color: #e50914; cursor: pointer; }
 .exam-opt small { display: block; opacity: .7; margin-top: 2px; }
@@ -609,9 +616,11 @@ html.anim-off .bgfx .flow, html.anim-off .bgfx .gauge-needle, html.anim-off .bgf
 <div class="sheet" id="prep" hidden>
   <form class="sheet-in" id="prepForm">
     <h2>Préparer le cours</h2>
+    <div class="jour-choix" id="f-jours" role="group" aria-label="Pour quel jour?"></div>
+    <p class="jour-note" id="f-jour-note" hidden></p>
     <div class="field"><label for="f-prog" class="step-q"><span class="num">1</span>Quel programme? <span class="tip-i" tabindex="0" role="img" aria-label="Aide : Le logo, le nom du programme et la liste des compétences changent selon ce choix." data-tip="Le logo, le nom du programme et la liste des compétences changent selon ce choix.">?</span></label><select id="f-prog"><option value="5333">DEP 5333 · Plomberie et chauffage</option><option value="5211">DEP 5211 · Entretien général d'immeubles</option></select></div>
     <div class="field"><label for="f-comp" class="step-q"><span class="num">2</span>Quelle compétence? <span class="tip-i" tabindex="0" role="img" aria-label="Aide : Elle s'affiche aux élèves et choisit l'arrière-plan." data-tip="Elle s'affiche aux élèves et choisit l'arrière-plan.">?</span></label><select id="f-comp"></select><input id="f-module" placeholder="Nom du module, si « Autre »"></div>
-    <div class="field"><label for="f-steps" class="step-q"><span class="num">3</span>Qu'est-ce qu'on fait aujourd'hui? <span class="tip-i" tabindex="0" role="img" aria-label="Aide : Une activité par ligne, dans l'ordre. L'accueil, les pauses et les heures s'ajoutent tout seuls." data-tip="Une activité par ligne, dans l'ordre. L'accueil, les pauses et les heures s'ajoutent tout seuls.">?</span></label><textarea id="f-steps" rows="6" placeholder="Théorie : les clapets antiretour&#10;Démonstration&#10;Travail pratique à l'atelier&#10;Rangement"></textarea>
+    <div class="field"><label for="f-steps" class="step-q"><span class="num">3</span><span id="f-q3">Qu'est-ce qu'on fait aujourd'hui?</span> <span class="tip-i" tabindex="0" role="img" aria-label="Aide : Une activité par ligne, dans l'ordre. L'accueil, les pauses et les heures s'ajoutent tout seuls." data-tip="Une activité par ligne, dans l'ordre. L'accueil, les pauses et les heures s'ajoutent tout seuls.">?</span></label><textarea id="f-steps" rows="6" placeholder="Théorie : les clapets antiretour&#10;Démonstration&#10;Travail pratique à l'atelier&#10;Rangement"></textarea>
       <details class="more" id="prep-more">
         <summary>Ajuster les durées et voir l'horaire <span class="tip-i" tabindex="0" role="img" aria-label="Aide : Pour aller plus loin : choisir la durée de chaque activité avec + et −, voir l'horaire exact de la période, ou demander une suggestion à Claude." data-tip="Pour aller plus loin : choisir la durée de chaque activité avec + et −, voir l'horaire exact de la période, ou demander une suggestion à Claude.">?</span></summary>
       <span class="prev-lbl">Durée de chaque activité <span class="tip-i" tabindex="0" role="img" aria-label="Aide : Clique sur + ou − pour choisir une durée (en bleu). Les activités en automatique se partagent le temps qui reste. ↺ remet en automatique." data-tip="Clique sur + ou − pour choisir une durée (en bleu). Les activités en automatique se partagent le temps qui reste. ↺ remet en automatique.">?</span></span>
@@ -1892,20 +1901,70 @@ function lierActivite(label){
     if (liste(LIENS_T[k]).length < MAX_LIENS) choix(row, row.querySelector(".lk-nom").textContent);
   }, 120);
 }
-function openPrep() {
-  const prog = (compInfo(cfg.comp) || [])[3] || cfg.prog || "5333";
+/* ===== Préparer un autre jour (30 oct., « j'aimerais pouvoir préparer mon cours de lundi ») =====
+   cfg.plans["AAAA-MM-JJ"] = { prog, comp, module, steps, liens, examen } : appliqué tout seul ce jour-là (appliquerPlanDuJour, au chargement et à minuit). */
+const isoJour = d => d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+const dateIso = s => { const [a, m, j] = s.split("-").map(Number); return new Date(a, m - 1, j); };
+const nomJour = (s, court) => { const t = dateIso(s).toLocaleDateString("fr-CA", court ? { weekday: "short", day: "numeric", month: "short" } : { weekday: "long", day: "numeric", month: "long" }); return t.charAt(0).toUpperCase() + t.slice(1); };
+function prochainJourClasse(){ const d = new Date(); do { d.setDate(d.getDate() + 1); } while (d.getDay() === 0 || d.getDay() === 6); return isoJour(d); }
+let JOUR_PREP = "";   /* "" = aujourd'hui */
+function planDe(jour){ if (!jour) return { prog: cfg.prog, comp: cfg.comp, module: cfg.module, steps: cfg.steps, liens: cfg.liens || {}, examen: cfg.examen === jourAuj() };
+  return (cfg.plans || {})[jour] || null; }
+function remplirPrep(jour){
+  JOUR_PREP = jour; const P = planDe(jour) || planDe(""), neuf = jour && !planDe(jour);
+  const prog = (compInfo(P.comp) || [])[3] || P.prog || "5333";
   $("f-prog").value = prog; fillComps(prog);
-  ["comp", "module", "steps", "amStart", "pmStart"].forEach(k => $("f-" + k).value = cfg[k]);
+  $("f-comp").value = P.comp; $("f-module").value = P.module || ""; $("f-steps").value = P.steps || "";
+  $("f-amStart").value = cfg.amStart; $("f-pmStart").value = cfg.pmStart;
   $("f-module").hidden = $("f-comp").value !== "autre";
-  $("f-exam").checked = cfg.examen === jourAuj();
-  $("prep").hidden = false; $("ai-why").hidden = true; $("ai-note").textContent = ""; preview(); $("f-comp").focus();
-  LIENS_T = JSON.parse(JSON.stringify(cfg.liens || {})); demanderCatalogue(); renderLiens();
+  $("f-exam").checked = !!P.examen && !neuf;
+  LIENS_T = JSON.parse(JSON.stringify(P.liens || {}));
+  const note = $("f-jour-note");
+  if (jour){ note.hidden = false; note.textContent = (neuf ? "Pas encore préparé : on part du cours d'aujourd'hui. " : "Déjà préparé. ") + "Il s'affichera tout seul " + nomJour(jour).toLowerCase() + " au matin; le tableau d'aujourd'hui ne change pas."; }
+  else note.hidden = true;
+  $("prepForm").querySelector('button[type="submit"]').textContent = jour ? "Enregistrer pour " + nomJour(jour, true).toLowerCase() : "Afficher au tableau";
+  $("f-q3").textContent = jour ? "Qu'est-ce qu'on fait " + nomJour(jour).toLowerCase().replace(/ \d.*/, "") + "?" : "Qu'est-ce qu'on fait aujourd'hui?";
+  const ex = $("f-exam").closest(".exam-opt").querySelector("b"); if (ex) ex.textContent = jour ? "Examen ce jour-là" : "Examen aujourd'hui";
+  boutonsJours(); preview(); renderLiens();
+}
+function boutonsJours(){
+  const box = $("f-jours"), plans = cfg.plans || {}, auj = isoJour(new Date()), pro = prochainJourClasse();
+  const jours = [...new Set([pro, ...Object.keys(plans).filter(j => j > auj)])].sort();
+  box.innerHTML = "";
+  const btn = (jour, txt) => { const b = document.createElement("button"); b.type = "button"; b.className = JOUR_PREP === jour ? "on" : "";
+    b.innerHTML = (jour && plans[jour] ? '<span class="pret" title="Déjà préparé"></span>' : "") + "<span></span>"; b.lastChild.textContent = txt; b.onclick = () => remplirPrep(jour); box.append(b); };
+  btn("", "Aujourd'hui");
+  jours.forEach(j => btn(j, nomJour(j, true)));
+  const autre = document.createElement("label"); autre.innerHTML = '<span>Autre jour…</span><input type="date">'; const inp = autre.querySelector("input"); inp.min = auj;
+  autre.onclick = e => { e.preventDefault(); try { inp.showPicker(); } catch(_){ inp.style.cssText = "opacity:1;width:auto;position:static;pointer-events:auto"; inp.focus(); } };
+  inp.onchange = () => { if (inp.value && inp.value > auj) remplirPrep(inp.value); else if (inp.value === auj) remplirPrep(""); };
+  box.append(autre);
+}
+function appliquerPlanDuJour(){
+  const plans = cfg.plans || {}, auj = isoJour(new Date()); let change = false;
+  /* le plus récent des jours arrivés (si le tableau n'a pas été ouvert ce jour-là, on prend quand même le dernier cours préparé) */
+  const arrive = Object.keys(plans).filter(j => j <= auj).sort().pop();
+  if (arrive){ const P = plans[arrive];
+    ["prog", "comp", "module", "steps"].forEach(k => { if (P[k] !== undefined) cfg[k] = P[k]; });
+    cfg.liens = P.liens || {}; cfg.examen = P.examen && arrive === auj ? jourAuj() : ""; change = true; }
+  Object.keys(plans).forEach(j => { if (j <= auj){ delete plans[j]; change = true; } });   /* les jours passés (et celui d'aujourd'hui, maintenant appliqué) */
+  if (change){ cfg.plans = plans; lastStepsKey = ""; save(); if (typeof renderStatic === "function"){ renderStatic(); tick(); } }
+}
+let jourPlans = isoJour(new Date());
+function openPrep() {
+  $("prep").hidden = false; $("ai-why").hidden = true; $("ai-note").textContent = "";
+  remplirPrep(""); $("f-comp").focus(); demanderCatalogue();
 }
 $("b-prep-cancel").onclick = () => $("prep").hidden = true;
 $("prep").addEventListener("click", e => { if (e.target.id === "prep") $("prep").hidden = true; });
 $("f-comp").addEventListener("change", () => { $("f-module").hidden = $("f-comp").value !== "autre"; });
 $("prepForm").addEventListener("submit", e => {
   e.preventDefault();
+  if (JOUR_PREP){           /* un autre jour : on garde le plan, le tableau d'aujourd'hui ne change pas */
+    cfg.plans = cfg.plans || {};
+    cfg.plans[JOUR_PREP] = { prog: $("f-prog").value, comp: $("f-comp").value, module: $("f-module").value, steps: $("f-steps").value, liens: JSON.parse(JSON.stringify(LIENS_T)), examen: $("f-exam").checked };
+    save(); $("prep").hidden = true; peMsg("Cours de " + nomJour(JOUR_PREP).toLowerCase() + " enregistré : il s'affichera tout seul ce jour-là."); return;
+  }
   ["comp", "module", "steps", "prog"].forEach(k => cfg[k] = $("f-" + k).value);
   cfg.liens = JSON.parse(JSON.stringify(LIENS_T)); lastStepsKey = ""; setTimeout(menageFichiers, 500);
   cfg.examen = $("f-exam").checked ? jourAuj() : "";
@@ -1920,7 +1979,7 @@ $("form").addEventListener("submit", e => {
   save(); renderStatic(); tick(); fitSoon(); $("sheet").hidden = true;
 });
 $("sheet").addEventListener("click", e => { if (e.target.id === "sheet") $("sheet").hidden = true; });
-$("b-apercuBienv").onclick = () => { if (window.ambApercuBienvenue) ambApercuBienvenue($("f-comp").value); };   /* la compétence choisie dans le formulaire, même pas encore affichée */
+$("b-apercuBienv").onclick = () => { if (window.ambApercuBienvenue) ambApercuBienvenue($("f-comp").value, JOUR_PREP ? nomJour(JOUR_PREP) : ""); };   /* la compétence choisie dans le formulaire, même pas encore affichée */
 
 // Révéler la réponse
 function toggleAnswer() { const a = $("v-a"); a.hidden = !a.hidden; if (!a.hidden) { const q = rotCards().findIndex(el => el.dataset.w === "question"); if (q >= 0) showRot(q); } $("b-reveal").textContent = a.hidden ? "Révéler la réponse" : "Cacher la réponse"; }
@@ -2015,7 +2074,9 @@ async function keepAwake() { try { if (navigator.wakeLock) await navigator.wakeL
 keepAwake();
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") keepAwake(); });
 
+appliquerPlanDuJour();
 renderStatic(); tick(); setInterval(tick, 1000);
+setInterval(() => { const j = isoJour(new Date()); if (j !== jourPlans){ jourPlans = j; appliquerPlanDuJour(); } }, 30000);
 </script>
 
 <script>
@@ -2136,10 +2197,11 @@ html.anim-off #accAccueil .aa-dans i { animation: none; }
     carte.querySelector(".aa-dans span").textContent = texteDans;
   }
   function montrerCarte(){ if (carte.hidden){ carte.hidden = false; carte.classList.remove("part"); requestAnimationFrame(() => requestAnimationFrame(() => carte.classList.add("vu"))); } }
-  window.ambApercuBienvenue = code => {
+  window.ambApercuBienvenue = (code, jour) => {
     const ps = periods(), d = new Date(), m = d.getHours() * 60 + d.getMinutes(), p = ps.find(x => x.start > m) || ps[0];
     apercu = true; carte.classList.add("apercu");
-    remplirCarte(p ? (p.name === "Matin" && p.start <= m ? "Demain : " : "") + "Le cours commence à " + fmt(p.start) : "Le cours commence bientôt", code);
+    const q = jour ? ps[0] : p;
+    remplirCarte(q ? (jour ? jour + " : " : p.name === "Matin" && p.start <= m ? "Demain : " : "") + "Le cours commence à " + fmt(q.start) : "Le cours commence bientôt", code);
     carte.querySelector(".aa-x").textContent = "Aperçu · touche pour fermer";
     montrerCarte();
   };
