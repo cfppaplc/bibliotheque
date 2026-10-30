@@ -154,6 +154,10 @@ header { grid-column: 1 / -1; display: flex; align-items: center; justify-conten
 .jour-choix button .pret { width: 8px; height: 8px; border-radius: 50%; background: #2f9e44; }
 .jour-choix button.on .pret { background: #69db7c; }
 .jour-choix input[type=date] { border: 0; background: transparent; color: inherit; font: inherit; width: 0; padding: 0; opacity: 0; position: absolute; pointer-events: none; }
+.jour-choix button:disabled { opacity: .4; cursor: default; }
+.duree-choix { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin: 2px 0 12px; }
+.duree-choix label { font: 600 15px var(--body); color: var(--muted); }
+.duree-choix select, .duree-choix input { height: 40px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font: 600 15px var(--body); padding: 0 10px; }
 .jour-note { margin: -2px 0 14px; padding: 10px 14px; border-radius: 10px; background: color-mix(in srgb, var(--water) 12%, transparent); font-size: 15px; line-height: 1.4; }
 .exam-opt { display: flex; gap: 12px; align-items: flex-start; margin: 4px 0 18px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; cursor: pointer; line-height: 1.35; }
 .exam-opt input { width: 22px; height: 22px; margin: 1px 0 0; flex: none; accent-color: #e50914; cursor: pointer; }
@@ -617,6 +621,8 @@ html.anim-off .bgfx .flow, html.anim-off .bgfx .gauge-needle, html.anim-off .bgf
   <form class="sheet-in" id="prepForm">
     <h2>Préparer le cours</h2>
     <div class="jour-choix" id="f-jours" role="group" aria-label="Pour quel jour?"></div>
+    <div class="jour-choix" id="f-pers" role="group" aria-label="Matin ou après-midi?"></div>
+    <div class="duree-choix"><label for="f-duree">Durée</label><select id="f-duree"></select><label for="f-debut">Commence à</label><input type="time" id="f-debut" step="300"></div>
     <p class="jour-note" id="f-jour-note" hidden></p>
     <div class="field"><label for="f-prog" class="step-q"><span class="num">1</span>Quel programme? <span class="tip-i" tabindex="0" role="img" aria-label="Aide : Le logo, le nom du programme et la liste des compétences changent selon ce choix." data-tip="Le logo, le nom du programme et la liste des compétences changent selon ce choix.">?</span></label><select id="f-prog"><option value="5333">DEP 5333 · Plomberie et chauffage</option><option value="5211">DEP 5211 · Entretien général d'immeubles</option></select></div>
     <div class="field"><label for="f-comp" class="step-q"><span class="num">2</span>Quelle compétence? <span class="tip-i" tabindex="0" role="img" aria-label="Aide : Elle s'affiche aux élèves et choisit l'arrière-plan." data-tip="Elle s'affiche aux élèves et choisit l'arrière-plan.">?</span></label><select id="f-comp"></select><input id="f-module" placeholder="Nom du module, si « Autre »"></div>
@@ -631,7 +637,7 @@ html.anim-off .bgfx .flow, html.anim-off .bgfx .gauge-needle, html.anim-off .bgf
       <ul class="ai-why" id="ai-why" hidden></ul>
       <ol class="preview" id="f-preview" aria-label="Aperçu de l'horaire du matin"></ol>
       </details></div>
-    <label class="exam-opt" for="f-exam"><input type="checkbox" id="f-exam"><span><b>Examen aujourd'hui</b> — pas de pause dans l'horaire<small>Revient tout seul à l'horaire normal demain.</small></span></label>
+    <label class="exam-opt" for="f-exam"><input type="checkbox" id="f-exam"><span><b>Examen aujourd'hui</b> — pas de pause dans l'horaire<small>Seulement pour ce cours.</small></span></label>
     <div class="field"><span class="step-q"><span class="num">4</span>Ouvrir quelque chose pendant une activité? <small class="opt">facultatif</small></span>
       <small class="lk-aide">Choisis une page de livre, un schéma, un plan, un fichier (PDF, image…), un lien web, une vidéo YouTube ou une minuterie pour une activité. En classe, un bouton « Ouvrir » apparaît quand l'activité commence.</small>
       <div class="lk-liste" id="f-liens"></div></div>
@@ -741,15 +747,34 @@ function dur(sec) {
 // Structure fixe d'une période : les pauses ne peuvent pas être retirées
 const BLOCKS = [["cours", 60], ["pause", 5], ["cours", 60], ["pause", 15], ["cours", 60]];
 const CLASS_MIN = 180, SPAN = 200;
-/* Examen : case à cocher dans « Préparer le cours ». Aucune pause dans l'horaire (3 h 20 d'un bloc); valable pour la journée seulement. */
+/* Examen : case à cocher dans « Préparer le cours ». Aucune pause dans l'horaire; valable pour la période préparée seulement. */
 const jourAuj = () => new Date().toDateString();
-function examOn() { const c = document.getElementById("f-exam"); if (c && !document.getElementById("prep").hidden) return c.checked; return cfg.examen === jourAuj(); }
-const blocs = () => examOn() ? [["cours", SPAN]] : BLOCKS;
-const classMin = () => examOn() ? SPAN : CLASS_MIN;
+const isoJour = d => d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+const dateIso = s => { const [a, m, j] = s.split("-").map(Number); return new Date(a, m - 1, j); };
+const nomJour = (s, court) => { const t = dateIso(s).toLocaleDateString("fr-CA", court ? { weekday: "short", day: "numeric", month: "short" } : { weekday: "long", day: "numeric", month: "long" }); return t.charAt(0).toUpperCase() + t.slice(1); };
+/* Durée d'un cours (30 oct., « des fois j'ai des cours de seulement une heure ») : chaque période (jour + matin/après-midi) peut avoir sa durée et son heure de début.
+   cfg.slot = "AAAA-MM-JJ|am" (période du contenu affiché), cfg.duree (minutes, 200 = période complète), cfg.debut ("HH:MM" ou "" = heure habituelle). */
+const DUREES = [[200, "Période complète · 3 h 20"], [60, "1 heure"], [90, "1 h 30"], [120, "2 heures"], [150, "2 h 30"]];
+function blocsPour(D, exam) {
+  if (exam) return [["cours", D]];
+  if (D === SPAN) return BLOCKS;
+  if (D <= 75) return [["cours", D]];                                   /* 1 heure : pas de pause */
+  if (D <= 145) { const a = Math.round((D - 5) / 2 / 5) * 5; return [["cours", a], ["pause", 5], ["cours", D - 5 - a]]; }
+  return [["cours", 60], ["pause", 5], ["cours", 60], ["pause", 15], ["cours", D - 140]];
+}
+function prepOuvert() { const p = document.getElementById("prep"); return !!p && !p.hidden; }
+function examOn() { const c = document.getElementById("f-exam"); if (c && prepOuvert()) return c.checked; return cfg.examen === jourAuj(); }
+const ctxForm = () => ({ D: +(document.getElementById("f-duree") || {}).value || SPAN, exam: document.getElementById("f-exam").checked });
+function ctxDe(start) { const p = periods().find(x => x.start === start); return { D: p ? p.end - p.start : SPAN, exam: !!(p && p.actif) && cfg.examen === jourAuj() }; }
+const blocs = ctx => blocsPour(ctx.D, ctx.exam);
+const classMin = ctx => blocs(ctx).reduce((t, [ty, d]) => t + (ty === "cours" ? d : 0), 0);
+const dureeTexte = m => m >= 60 ? Math.floor(m / 60) + " h" + (m % 60 ? " " + String(m % 60).padStart(2, "0") : "") : m + " min";
 
 function periods() {
-  return [["Matin", cfg.amStart], ["Après-midi", cfg.pmStart]].filter(p => /\d/.test(p[1] || ""))
-    .map(([name, t]) => ({ name, start: toMin(t), end: toMin(t) + SPAN })).sort((a, b) => a.start - b.start);
+  const auj = isoJour(new Date());
+  return [["Matin", "am", cfg.amStart], ["Après-midi", "pm", cfg.pmStart]].filter(p => /\d/.test(p[2] || ""))
+    .map(([name, key, t]) => { const actif = cfg.slot === auj + "|" + key, st = toMin(actif && cfg.debut ? cfg.debut : t), D = actif ? (+cfg.duree || SPAN) : SPAN;
+      return { name, key, actif, start: st, end: st + D }; }).sort((a, b) => a.start - b.start);
 }
 // Durées typiques selon les mots du point (en minutes). "flex" = activité qui absorbe le temps restant.
 const RULES = [
@@ -770,8 +795,10 @@ function estimate(label) {
   for (const [re, d, flex] of RULES) if (re.test(label)) return { d, flex: !!flex };
   return { d: 30, flex: false };
 }
-function points(text) {
-  const CLASS_MIN = classMin(), exam = examOn();
+function points(text, ctx) {
+  ctx = ctx || (prepOuvert() ? ctxForm() : { D: SPAN, exam: false });
+  const CLASS_MIN = classMin(ctx), exam = ctx.exam;
+  const PAUSES = []; { let c = 0; blocs(ctx).forEach(([ty, d]) => { if (ty === "cours") c += d; else PAUSES.push(c); }); }
   const items = text.split("\n").map(l => l.trim()).filter(Boolean).map(l => {
     const m = l.match(/^(\d+)\s*(?:min)?\s*\|\s*(.+)$/);
     return m ? { d: +m[1], label: m[2].trim(), fixed: true } : { label: l.replace(/^\|\s*/, ""), fixed: false };
@@ -805,7 +832,7 @@ function points(text) {
   for (let k = 0; k < list.length - 1; k++) {
     const L = list[k], R = list[k + 1];
     if (L.fixed || R.fixed || exam) continue;
-    for (const P of [60, 120]) {
+    for (const P of PAUSES) {
       if (L.b !== P && Math.abs(L.b - P) <= 10 && P - L.a >= 5 && R.b - P >= 5) { L.b = P; R.a = P; break; }
     }
   }
@@ -831,9 +858,10 @@ function cesure(txt) {
     return out;
   }).join(" ");
 }
-function timeline(start, text) {
-  const pts = points(text).list; const rows = []; let real = start, cls = 0;
-  blocs().forEach(([type, d]) => {
+function timeline(start, text, ctx) {
+  ctx = ctx || ctxDe(start);
+  const pts = points(text, ctx).list; const rows = []; let real = start, cls = 0;
+  blocs(ctx).forEach(([type, d]) => {
     if (type === "pause") { rows.push({ label: "Pause de " + d + " min", pause: true, start: real, end: real + d }); }
     else if (!pts.length) { rows.push({ label: "Cours", start: real, end: real + d }); }
     else pts.forEach(p => {
@@ -964,12 +992,12 @@ function tick() {
     $("v-pname").textContent = "Aucune période"; $("v-phours").textContent = "";
     $("v-status").textContent = "Ajoute ton horaire dans les réglages."; $("v-water").style.width = "0%";
   } else {
-    $("v-pname").textContent = ref.name; $("v-exam").hidden = !examOn();
+    $("v-pname").textContent = ref.name; $("v-exam").hidden = !ctxDe(ref.start).exam;
     $("v-phours").textContent = fmt(ref.start) + " à " + fmt(ref.end);
     if (cur) {
       const pct = (nowMin - cur.start) / (cur.end - cur.start) * 100;
       $("v-water").style.width = pct.toFixed(2) + "%";
-      $("v-status").textContent = (examOn() ? "Examen en cours · fin dans " : "Fin de la période dans ") + dur((cur.end - nowMin) * 60);
+      $("v-status").textContent = (ctxDe(cur.start).exam ? "Examen en cours · fin dans " : (cur.end - cur.start < SPAN ? "Fin du cours dans " : "Fin de la période dans ")) + dur((cur.end - nowMin) * 60);
     } else if (next) {
       $("v-water").style.width = "0%";
       $("v-status").textContent = "Le cours commence dans " + dur((next.start - nowMin) * 60);
@@ -1028,7 +1056,7 @@ function tick() {
       $("v-status").textContent = "C'est la pause! Retour en classe dans " + dur((inStep.end - nowMin) * 60);
     } else {
       const np = rows.find(r => r.start > nowMin && r.pause);
-      $("v-status").textContent = np ? "Prochaine pause dans " + dur((np.start - nowMin) * 60) : "Fin de la période dans " + dur((cur.end - nowMin) * 60);
+      $("v-status").textContent = np ? "Prochaine pause dans " + dur((np.start - nowMin) * 60) : (cur.end - cur.start < SPAN ? "Fin du cours dans " : "Fin de la période dans ") + dur((cur.end - nowMin) * 60);
     }
   }
   {
@@ -1498,14 +1526,14 @@ function openSettings() {
   $("sheet").hidden = false; $("f-title").focus(); $("ai-why").hidden = true; $("ai-note").textContent = ""; preview();
 }
 function preview() {
-  const nowM = new Date().getHours() * 60 + new Date().getMinutes(), pm = toMin(cfg.pmStart || "13:00"); const text = $("f-steps").value, start = nowM >= toMin(cfg.amStart || "08:30") + SPAN && nowM < pm + SPAN ? pm : toMin(cfg.amStart || "08:30");
-  const info = points(text);
-  const html = timeline(start, text).map(r => `<li class="${r.pause ? "p" : ""}"><span>${fmt(r.start)}–${fmt(r.end)}</span><span></span></li>`).join("");
+  const text = $("f-steps").value, ctx = ctxForm(), start = toMin($("f-debut").value || (PER_PREP === "pm" ? cfg.pmStart : cfg.amStart) || "08:30");
+  const info = points(text, ctx);
+  const html = timeline(start, text, ctx).map(r => `<li class="${r.pause ? "p" : ""}"><span>${fmt(r.start)}–${fmt(r.end)}</span><span></span></li>`).join("");
   $("f-preview").innerHTML = html;
-  const rows = timeline(start, text);
+  const rows = timeline(start, text, ctx);
   [...$("f-preview").children].forEach((li, k) => { li.lastChild.textContent = rows[k].label; });
   renderDurs();
-  if (info.over || info.cut) { const w = document.createElement("li"); w.innerHTML = '<span class="warn">Les durées dépassent ' + (examOn() ? "3 h 20" : "3 h") + ' de cours : les derniers points ne tiennent pas.</span>'; w.style.display = "block"; $("f-preview").append(w); }
+  if (info.over || info.cut) { const w = document.createElement("li"); w.innerHTML = '<span class="warn">Les durées dépassent ' + dureeTexte(classMin(ctx)) + ' de cours : les derniers points ne tiennent pas.</span>'; w.style.display = "block"; $("f-preview").append(w); }
 }
 ["f-steps", "f-amStart"].forEach(id => $(id).addEventListener("input", preview));
 $("f-exam").addEventListener("change", () => { preview(); $("prep-more").open = true; });
@@ -1517,7 +1545,7 @@ function renderDurs() {
   const acts = [];
   lines.forEach((l, idx) => { const t = l.trim(); if (!t) return; const m = t.match(/^(\d+)\s*(?:min)?\s*\|\s*(.+)$/); const label = m ? m[2].trim() : t.replace(/^\|\s*/, "");
     if (/^pause\b/i.test(label) || /^accueil\b|présences?\b/i.test(label)) return; acts.push({ idx, label, fixed: !!m }); });
-  const list = points(ta.value).list; // [0] = accueil
+  const list = points(ta.value, ctxForm()).list; // [0] = accueil
   const box = $("f-durs"); box.innerHTML = "";
   const row = (label, mins, opts = {}) => {
     const d = document.createElement("div"); d.className = "dur" + (opts.locked ? " locked" : "") + (opts.fixed ? " fixed" : "");
@@ -1553,16 +1581,17 @@ $("b-ai").addEventListener("click", async () => {
     .map(l => l.replace(/^\d+\s*(?:min)?\s*\|\s*/, ""));
   if (!lines.length) { $("ai-note").textContent = "Écris d'abord tes points, un par ligne."; return; }
   const btn = $("b-ai"); btn.disabled = true; $("ai-note").textContent = "Claude réfléchit…";
+  const ctxIA = ctxForm(), minIA = classMin(ctxIA), pausesIA = []; { let c = 0; blocs(ctxIA).forEach(([ty, d]) => { if (ty === "cours") c += d; else pausesIA.push(c); }); }
   const prompt = `Tu aides un enseignant du ${PROGS[$("f-prog").value] || "DEP 5333 · Plomberie et chauffage"} (formation professionnelle au Québec, élèves adultes et jeunes adultes) à planifier une période.
-La période contient 180 minutes de cours. Il y a une pause après 60 minutes de cours et une autre après 120 minutes de cours.
+La période contient ${minIA} minutes de cours.${pausesIA.length ? " Il y a une pause après " + pausesIA.join(" et après ") + " minutes de cours." : " Il n'y a pas de pause."}
 Compétence : ${moduleText($("f-comp").value, $("f-module").value) || "non précisée"}.
 Points de la période, dans l'ordre (garde cet ordre et ce libellé exact) :
 ${lines.map((l, k) => (k + 1) + ". " + l).join("\n")}
 
 Donne une durée réaliste à chaque point. Règles :
-- Le total doit faire exactement 180 minutes; chaque durée est un multiple de 5 et au moins 5.
+- Le total doit faire exactement ${minIA} minutes; chaque durée est un multiple de 5 et au moins 5.
 - Les activités pratiques à l'atelier prennent normalement le plus de temps; l'accueil et le bilan restent courts; prévois du temps de rangement réaliste si un point le mentionne.
-- Quand c'est raisonnable, fais tomber les changements d'activité sur les pauses (à 60 et à 120 minutes de cours).
+${pausesIA.length ? "- Quand c'est raisonnable, fais tomber les changements d'activité sur les pauses (à " + pausesIA.join(" et à ") + " minutes de cours)." : ""}
 - Pour chaque point, une raison très courte (10 mots maximum) en français.
 Réponds seulement en JSON : {"points":[{"label":"...","minutes":0,"raison":"..."}]}`;
   try {
@@ -1901,70 +1930,96 @@ function lierActivite(label){
     if (liste(LIENS_T[k]).length < MAX_LIENS) choix(row, row.querySelector(".lk-nom").textContent);
   }, 120);
 }
-/* ===== Préparer un autre jour (30 oct., « j'aimerais pouvoir préparer mon cours de lundi ») =====
-   cfg.plans["AAAA-MM-JJ"] = { prog, comp, module, steps, liens, examen } : appliqué tout seul ce jour-là (appliquerPlanDuJour, au chargement et à minuit). */
-const isoJour = d => d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
-const dateIso = s => { const [a, m, j] = s.split("-").map(Number); return new Date(a, m - 1, j); };
-const nomJour = (s, court) => { const t = dateIso(s).toLocaleDateString("fr-CA", court ? { weekday: "short", day: "numeric", month: "short" } : { weekday: "long", day: "numeric", month: "long" }); return t.charAt(0).toUpperCase() + t.slice(1); };
+/* ===== Préparer un autre jour ou une autre période (30 oct. : « préparer mon cours de lundi », « choisir am ou pm », « cours d'une heure ») =====
+   Une période = "AAAA-MM-JJ|am" ou "|pm". Le contenu affiché appartient à cfg.slot. Les autres périodes préparées attendent dans
+   cfg.plans[clé] = { prog, comp, module, steps, liens, examen, duree, debut } et s'appliquent toutes seules quand leur période arrive (appliquerPlans). */
 function prochainJourClasse(){ const d = new Date(); do { d.setDate(d.getDate() + 1); } while (d.getDay() === 0 || d.getDay() === 6); return isoJour(d); }
-let JOUR_PREP = "";   /* "" = aujourd'hui */
-function planDe(jour){ if (!jour) return { prog: cfg.prog, comp: cfg.comp, module: cfg.module, steps: cfg.steps, liens: cfg.liens || {}, examen: cfg.examen === jourAuj() };
-  return (cfg.plans || {})[jour] || null; }
-function remplirPrep(jour){
-  JOUR_PREP = jour; const P = planDe(jour) || planDe(""), neuf = jour && !planDe(jour);
+const NOM_PER = { am: "matin", pm: "après-midi" };
+const cleSlot = (jour, per) => (jour || isoJour(new Date())) + "|" + per;
+function slotActif(){ const d = new Date(), m = d.getHours() * 60 + d.getMinutes(), ps = periods();
+  const p = ps.find(x => m >= x.start && m < x.end) || ps.find(x => x.start > m); return p ? isoJour(d) + "|" + p.key : null; }
+function perPassee(per){ const d = new Date(), m = d.getHours() * 60 + d.getMinutes(), p = periods().find(x => x.key === per); return !p || m >= p.end; }
+function contenuActuel(){ return { prog: cfg.prog, comp: cfg.comp, module: cfg.module, steps: cfg.steps, liens: cfg.liens || {}, examen: cfg.examen === jourAuj(), duree: +cfg.duree || SPAN, debut: cfg.debut || "" }; }
+function contenuDe(k){ if (k === cfg.slot) return contenuActuel(); return (cfg.plans || {})[k] || null; }
+let JOUR_PREP = "", PER_PREP = "am";
+function remplirPrep(jour, per){
+  JOUR_PREP = jour; PER_PREP = per;
+  const k = cleSlot(jour, per), P0 = contenuDe(k), neuf = !P0, P = P0 || Object.assign(contenuActuel(), { examen: false, duree: SPAN, debut: "" });
   const prog = (compInfo(P.comp) || [])[3] || P.prog || "5333";
   $("f-prog").value = prog; fillComps(prog);
   $("f-comp").value = P.comp; $("f-module").value = P.module || ""; $("f-steps").value = P.steps || "";
   $("f-amStart").value = cfg.amStart; $("f-pmStart").value = cfg.pmStart;
   $("f-module").hidden = $("f-comp").value !== "autre";
-  $("f-exam").checked = !!P.examen && !neuf;
+  $("f-exam").checked = !!P.examen;
+  $("f-duree").value = String(DUREES.some(d => d[0] === +P.duree) ? +P.duree : SPAN);
+  $("f-debut").value = P.debut || (per === "pm" ? cfg.pmStart : cfg.amStart);
   LIENS_T = JSON.parse(JSON.stringify(P.liens || {}));
+  const actif = k === (slotActif() || cfg.slot), quand = jour ? nomJour(jour).toLowerCase() + (per === "am" ? " au matin" : " en après-midi") : (per === "am" ? "ce matin" : "cet après-midi");
   const note = $("f-jour-note");
-  if (jour){ note.hidden = false; note.textContent = (neuf ? "Pas encore préparé : on part du cours d'aujourd'hui. " : "Déjà préparé. ") + "Il s'affichera tout seul " + nomJour(jour).toLowerCase() + " au matin; le tableau d'aujourd'hui ne change pas."; }
+  if (!actif){ note.hidden = false; note.textContent = (neuf ? "Pas encore préparé : on part du cours affiché. " : "Déjà préparé. ") + "Il s'affichera tout seul " + quand + "; le tableau ne change pas d'ici là."; }
   else note.hidden = true;
-  $("prepForm").querySelector('button[type="submit"]').textContent = jour ? "Enregistrer pour " + nomJour(jour, true).toLowerCase() : "Afficher au tableau";
-  $("f-q3").textContent = jour ? "Qu'est-ce qu'on fait " + nomJour(jour).toLowerCase().replace(/ \d.*/, "") + "?" : "Qu'est-ce qu'on fait aujourd'hui?";
-  const ex = $("f-exam").closest(".exam-opt").querySelector("b"); if (ex) ex.textContent = jour ? "Examen ce jour-là" : "Examen aujourd'hui";
+  $("prepForm").querySelector('button[type="submit"]').textContent = actif ? "Afficher au tableau" : "Enregistrer pour " + (jour ? nomJour(jour, true).toLowerCase().replace(/ \d.*/, "") : (per === "pm" ? "cet" : "ce")) + " " + (per === "am" ? "matin" : "après-midi");
+  $("f-q3").textContent = "Qu'est-ce qu'on fait " + (jour ? nomJour(jour).toLowerCase().replace(/ \d.*/, "") + " " : "") + (per === "am" ? (jour ? "matin" : "ce matin") : (jour ? "après-midi" : "cet après-midi")) + "?";
+  const ex = $("f-exam").closest(".exam-opt").querySelector("b"); if (ex) ex.textContent = "Examen pendant ce cours";
   boutonsJours(); preview(); renderLiens();
 }
 function boutonsJours(){
-  const box = $("f-jours"), plans = cfg.plans || {}, auj = isoJour(new Date()), pro = prochainJourClasse();
-  const jours = [...new Set([pro, ...Object.keys(plans).filter(j => j > auj)])].sort();
-  box.innerHTML = "";
+  const plans = cfg.plans || {}, auj = isoJour(new Date()), pro = prochainJourClasse(), finiAuj = perPassee("am") && perPassee("pm");
+  const pret = j => Object.keys(plans).some(k => k.startsWith(j + "|"));
+  const jours = [...new Set([pro, ...Object.keys(plans).map(k => k.split("|")[0]).filter(j => j > auj)])].sort();
+  const box = $("f-jours"); box.innerHTML = "";
   const btn = (jour, txt) => { const b = document.createElement("button"); b.type = "button"; b.className = JOUR_PREP === jour ? "on" : "";
-    b.innerHTML = (jour && plans[jour] ? '<span class="pret" title="Déjà préparé"></span>' : "") + "<span></span>"; b.lastChild.textContent = txt; b.onclick = () => remplirPrep(jour); box.append(b); };
+    if (!jour && finiAuj){ b.disabled = true; b.title = "Les cours d'aujourd'hui sont terminés"; }
+    b.innerHTML = (jour && pret(jour) ? '<span class="pret" title="Déjà préparé"></span>' : "") + "<span></span>"; b.lastChild.textContent = txt;
+    b.onclick = () => { let per = PER_PREP; if (!jour && perPassee(per)) per = "pm"; remplirPrep(jour, per); }; box.append(b); };
   btn("", "Aujourd'hui");
   jours.forEach(j => btn(j, nomJour(j, true)));
   const autre = document.createElement("label"); autre.innerHTML = '<span>Autre jour…</span><input type="date">'; const inp = autre.querySelector("input"); inp.min = auj;
   autre.onclick = e => { e.preventDefault(); try { inp.showPicker(); } catch(_){ inp.style.cssText = "opacity:1;width:auto;position:static;pointer-events:auto"; inp.focus(); } };
-  inp.onchange = () => { if (inp.value && inp.value > auj) remplirPrep(inp.value); else if (inp.value === auj) remplirPrep(""); };
+  inp.onchange = () => { if (inp.value && inp.value > auj) remplirPrep(inp.value, PER_PREP); else if (inp.value === auj) remplirPrep("", PER_PREP); };
   box.append(autre);
+  /* matin / après-midi */
+  const bp = $("f-pers"); bp.innerHTML = "";
+  [["am", "Matin", cfg.amStart], ["pm", "Après-midi", cfg.pmStart]].forEach(([per, nom, t]) => {
+    const b = document.createElement("button"); b.type = "button"; b.className = PER_PREP === per ? "on" : "";
+    const k = cleSlot(JOUR_PREP, per), passe = !JOUR_PREP && perPassee(per);
+    if (passe){ b.disabled = true; b.title = "Ce cours est terminé"; }
+    b.innerHTML = ((plans[k] && k !== cfg.slot) ? '<span class="pret" title="Déjà préparé"></span>' : "") + "<span></span>"; b.lastChild.textContent = nom + " · " + fmt(toMin(t || "08:30"));
+    b.onclick = () => remplirPrep(JOUR_PREP, per); bp.append(b); });
 }
-function appliquerPlanDuJour(){
+function appliquerPlans(){
   const plans = cfg.plans || {}, auj = isoJour(new Date()); let change = false;
-  /* le plus récent des jours arrivés (si le tableau n'a pas été ouvert ce jour-là, on prend quand même le dernier cours préparé) */
-  const arrive = Object.keys(plans).filter(j => j <= auj).sort().pop();
-  if (arrive){ const P = plans[arrive];
-    ["prog", "comp", "module", "steps"].forEach(k => { if (P[k] !== undefined) cfg[k] = P[k]; });
-    cfg.liens = P.liens || {}; cfg.examen = P.examen && arrive === auj ? jourAuj() : ""; change = true; }
-  Object.keys(plans).forEach(j => { if (j <= auj){ delete plans[j]; change = true; } });   /* les jours passés (et celui d'aujourd'hui, maintenant appliqué) */
+  Object.keys(plans).forEach(k => { if (!k.includes("|")){ plans[k + "|am"] = plans[k]; delete plans[k]; change = true; } });   /* plans d'un jour entier (version du 30 oct., 17 h 50) → le matin */
+  const s = slotActif(), borne = s || auj + "|zz";
+  const arrives = Object.keys(plans).filter(k => k <= borne).sort();
+  if (arrives.length){ const k = arrives[arrives.length - 1], P = plans[k], ici = k === s;
+    ["prog", "comp", "module", "steps"].forEach(x => { if (P[x] !== undefined) cfg[x] = P[x]; });
+    cfg.liens = P.liens || {}; cfg.examen = ici && P.examen ? jourAuj() : ""; cfg.duree = ici ? (+P.duree || SPAN) : SPAN; cfg.debut = ici ? (P.debut || "") : "";
+    cfg.slot = s || cfg.slot; arrives.forEach(x => delete plans[x]); change = true; }
+  else if (s && cfg.slot !== s){         /* nouvelle période sans contenu préparé : même contenu, horaire habituel */
+    const vieux = cfg.slot; cfg.slot = s; if (vieux){ cfg.duree = SPAN; cfg.debut = ""; if (vieux.split("|")[0] !== auj) cfg.examen = ""; } change = true; }
   if (change){ cfg.plans = plans; lastStepsKey = ""; save(); if (typeof renderStatic === "function"){ renderStatic(); tick(); } }
 }
-let jourPlans = isoJour(new Date());
+let jourPlans = "";
 function openPrep() {
+  appliquerPlans();
   $("prep").hidden = false; $("ai-why").hidden = true; $("ai-note").textContent = "";
-  remplirPrep(""); $("f-comp").focus(); demanderCatalogue();
+  const s = slotActif();
+  if (s) remplirPrep("", s.split("|")[1]); else remplirPrep(prochainJourClasse(), "am");   /* journée terminée : on prépare le prochain jour de classe */
+  $("f-comp").focus(); demanderCatalogue();
 }
 $("b-prep-cancel").onclick = () => $("prep").hidden = true;
 $("prep").addEventListener("click", e => { if (e.target.id === "prep") $("prep").hidden = true; });
 $("f-comp").addEventListener("change", () => { $("f-module").hidden = $("f-comp").value !== "autre"; });
 $("prepForm").addEventListener("submit", e => {
   e.preventDefault();
-  if (JOUR_PREP){           /* un autre jour : on garde le plan, le tableau d'aujourd'hui ne change pas */
+  const k = cleSlot(JOUR_PREP, PER_PREP), duree = +$("f-duree").value || SPAN, defaut = PER_PREP === "pm" ? cfg.pmStart : cfg.amStart, debut = $("f-debut").value && $("f-debut").value !== defaut ? $("f-debut").value : "";
+  if (k !== (slotActif() || cfg.slot)){   /* une autre période : on la garde, le tableau ne change pas */
     cfg.plans = cfg.plans || {};
-    cfg.plans[JOUR_PREP] = { prog: $("f-prog").value, comp: $("f-comp").value, module: $("f-module").value, steps: $("f-steps").value, liens: JSON.parse(JSON.stringify(LIENS_T)), examen: $("f-exam").checked };
-    save(); $("prep").hidden = true; peMsg("Cours de " + nomJour(JOUR_PREP).toLowerCase() + " enregistré : il s'affichera tout seul ce jour-là."); return;
+    cfg.plans[k] = { prog: $("f-prog").value, comp: $("f-comp").value, module: $("f-module").value, steps: $("f-steps").value, liens: JSON.parse(JSON.stringify(LIENS_T)), examen: $("f-exam").checked, duree, debut };
+    save(); $("prep").hidden = true; peMsg("Cours " + (JOUR_PREP ? "de " + nomJour(JOUR_PREP).toLowerCase() : "d'aujourd'hui") + " " + (PER_PREP === "am" ? "matin" : "après-midi") + " enregistré : il s'affichera tout seul."); return;
   }
+  cfg.slot = k; cfg.duree = duree; cfg.debut = debut;
   ["comp", "module", "steps", "prog"].forEach(k => cfg[k] = $("f-" + k).value);
   cfg.liens = JSON.parse(JSON.stringify(LIENS_T)); lastStepsKey = ""; setTimeout(menageFichiers, 500);
   cfg.examen = $("f-exam").checked ? jourAuj() : "";
@@ -1979,7 +2034,8 @@ $("form").addEventListener("submit", e => {
   save(); renderStatic(); tick(); fitSoon(); $("sheet").hidden = true;
 });
 $("sheet").addEventListener("click", e => { if (e.target.id === "sheet") $("sheet").hidden = true; });
-$("b-apercuBienv").onclick = () => { if (window.ambApercuBienvenue) ambApercuBienvenue($("f-comp").value, JOUR_PREP ? nomJour(JOUR_PREP) : ""); };   /* la compétence choisie dans le formulaire, même pas encore affichée */
+$("b-apercuBienv").onclick = () => { if (window.ambApercuBienvenue) ambApercuBienvenue($("f-comp").value, (JOUR_PREP ? nomJour(JOUR_PREP) : "Aujourd'hui") + " " + NOM_PER[PER_PREP], toMin($("f-debut").value || "08:30")); };
+["f-duree", "f-debut"].forEach(id => $(id).addEventListener("change", preview));   /* la compétence choisie dans le formulaire, même pas encore affichée */
 
 // Révéler la réponse
 function toggleAnswer() { const a = $("v-a"); a.hidden = !a.hidden; if (!a.hidden) { const q = rotCards().findIndex(el => el.dataset.w === "question"); if (q >= 0) showRot(q); } $("b-reveal").textContent = a.hidden ? "Révéler la réponse" : "Cacher la réponse"; }
@@ -2074,9 +2130,10 @@ async function keepAwake() { try { if (navigator.wakeLock) await navigator.wakeL
 keepAwake();
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") keepAwake(); });
 
-appliquerPlanDuJour();
+$("f-duree").innerHTML = DUREES.map(([v, n]) => '<option value="' + v + '">' + n + '</option>').join("");
+appliquerPlans();
 renderStatic(); tick(); setInterval(tick, 1000);
-setInterval(() => { const j = isoJour(new Date()); if (j !== jourPlans){ jourPlans = j; appliquerPlanDuJour(); } }, 30000);
+setInterval(() => { const s = slotActif() || isoJour(new Date()); if (s !== jourPlans){ jourPlans = s; appliquerPlans(); } }, 30000);
 </script>
 
 <script>
@@ -2197,11 +2254,10 @@ html.anim-off #accAccueil .aa-dans i { animation: none; }
     carte.querySelector(".aa-dans span").textContent = texteDans;
   }
   function montrerCarte(){ if (carte.hidden){ carte.hidden = false; carte.classList.remove("part"); requestAnimationFrame(() => requestAnimationFrame(() => carte.classList.add("vu"))); } }
-  window.ambApercuBienvenue = (code, jour) => {
+  window.ambApercuBienvenue = (code, jour, debut) => {
     const ps = periods(), d = new Date(), m = d.getHours() * 60 + d.getMinutes(), p = ps.find(x => x.start > m) || ps[0];
     apercu = true; carte.classList.add("apercu");
-    const q = jour ? ps[0] : p;
-    remplirCarte(q ? (jour ? jour + " : " : p.name === "Matin" && p.start <= m ? "Demain : " : "") + "Le cours commence à " + fmt(q.start) : "Le cours commence bientôt", code);
+    remplirCarte(jour && debut != null ? jour + " : le cours commence à " + fmt(debut) : p ? (p.name === "Matin" && p.start <= m ? "Demain : " : "") + "Le cours commence à " + fmt(p.start) : "Le cours commence bientôt", code);
     carte.querySelector(".aa-x").textContent = "Aperçu · touche pour fermer";
     montrerCarte();
   };
