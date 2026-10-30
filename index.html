@@ -3284,18 +3284,19 @@ function caseDuLivre(X, Y){
       const r = e.getBoundingClientRect(); if (dist(r) > tol) continue;
       if (r.width < 7 || r.width > 46 || r.height < 7 || r.height > 46 || Math.abs(r.width - r.height) > Math.max(r.width, r.height) * .35 || e.textContent.trim() || e.children.length) continue;
       const cs = win.getComputedStyle(e); if (!vis(e)) continue; if ((parseFloat(cs.borderTopWidth) || 0) >= .5 && cs.borderTopStyle !== "none" || (parseFloat(cs.borderBottomWidth) || 0) >= .5 && (parseFloat(cs.borderLeftWidth) || 0) >= .5) prendre("case", r, dist(r)); }
+    if (best && best.d * s > 3){ const L = ligneDuLivre(X, Y); if (L && X >= L.x - 2 && X <= L.x + L.w + 2 && Math.abs(Y - L.y) < 26) best = null; }   /* doigt à côté de la case, sur une ligne : c'est la ligne qui gagne */
     if (best) return { kind:best.kind, x:fr.left + best.r.left * s, y:fr.top + best.r.top * s, w:best.r.width * s, h:best.r.height * s };
     /* 3. choix à encercler : un enfant d'un groupe .opts / .choix / .vf (ou options, choices, qcm) */
     const CH = /(^|\s)(opts?|options?|choix|choices?|vf|qcm)(\s|$)/;
-    for (const e of sous){ const p = e.parentElement; if (!p || !CH.test(p.className || "") || !vis(e)) continue;
+    for (const e of sous){ const p = e.parentElement; if (!p || !CH.test(p.className || "") || !vis(e) || !texteVisible(e, win) || e.textContent.trim().length > 120) continue;   /* un choix a des mots (une ligne de réponse vide n'est pas un choix) */
       let r = e.getBoundingClientRect(); try { const rg = doc.createRange(); rg.selectNodeContents(e); const rt = rg.getBoundingClientRect(); if (rt.width && rt.width < r.width) r = rt; } catch(x){}   /* le rond suit les mots, pas toute la largeur du bloc */
       if (r.width && r.height < 120) return { kind:"rond", x:fr.left + r.left * s, y:fr.top + r.top * s, w:r.width * s, h:r.height * s }; }
   }
   return null;
 }
 /* Coche (✓) une case ou encercle un choix au point touché; un 2e toucher au même endroit l'enlève. Rend true si quelque chose a été fait. */
-function cocherDansLivre(X, Y){
-  if (RD.wb) return false; const B = caseDuLivre(X, Y); if (!B) return false;
+function cocherDansLivre(X, Y, B0){
+  if (RD.wb) return false; const B = B0 || caseDuLivre(X, Y); if (!B) return false;
   const c = $("#inkCanvas"), r = c.getBoundingClientRect(), N = (x, y) => [(x - r.left) / r.width, (y - r.top) / r.height];
   const cle = B.kind + ":" + Math.round((B.x + B.w / 2 - r.left) / r.width * 400) + "," + Math.round((B.y + B.h / 2 - r.top) / r.height * 400), arr = strokes();
   const dans = o => { if (!o.coche || !o.cc) return false; const X0 = r.left + o.cc[0] * r.width, Y0 = r.top + o.cc[1] * r.height; return X0 >= B.x - 6 && X0 <= B.x + B.w + 6 && Y0 >= B.y - 6 && Y0 <= B.y + B.h + 6; };
@@ -3332,7 +3333,7 @@ function ligneDuLivre(X, Y){
         if (P >= 10 && P <= 80){ const Pv = P * sc, k = Math.max(1, Math.ceil((by - r.top) / Pv - .1)), y = Math.min(r.top + k * Pv, r.top + Math.floor(r.height / Pv + .01) * Pv);
           C.push({ y, l:r.left, r:r.right, sp:Pv, sc }); } } }
     let best = null, bd = 1e9;
-    C.forEach(c => { const d = c.y - by, cout = d >= -10 ? d + 10 : 40 - d; if (Math.abs(d) <= 40 && cout < bd){ bd = cout; best = c; } });
+    C.forEach(c => { const d = c.y - by, cout = d >= 0 ? d : d >= -8 ? 14 - 2 * d : 40 - d; if (Math.abs(d) <= 40 && cout < bd){ bd = cout; best = c; } });   /* on écrit au-dessus d'une ligne : la ligne sous le doigt gagne (avant : la ligne d'au-dessus passait devant) */
     if (!best) return null;
     const sc = best.sc || 1, fsB = Math.max(11 * sc, Math.min(30 * sc, (best.sp || 26 * sc) * .62)), hL = best.sp || fsB * 1.6;
     return { x:fr.left + best.l * s + 2, y:fr.top + best.y * s, w:Math.max(60, (best.r - best.l) * s - 4), hL:hL * s, fs:fsB * s };
@@ -4728,6 +4729,8 @@ function verrouEleve(win, doc){
   doc.addEventListener("click", e => {
     if (!estEleve() || RD.wb || (RD.pen && !RD.crayonOff)) return;
     if (e.target.closest && e.target.closest("a[href],button,input,select,textarea,summary,[contenteditable],[onclick],.nav,.toc,nav")) return;
+    for (let el = e.target, k = 0; el && el !== doc.body && k < 5; el = el.parentElement, k++)          /* élément cliquable du livre (simulateur, bouton dessiné) : le livre garde la main */
+      if (win.getComputedStyle(el).cursor === "pointer" && !el.closest(".opts,.choix,.vf,.options,.qcm,.choices,td,th,.blk")) return;   /* .blk (Administration) : « rejouer l'animation » d'un schéma, la réponse de l'élève passe avant */   /* une case de tableau cliquable (révèle le corrigé) : l'élève y écrit plutôt sa réponse */
     const f = [$("#readerFrame"), $("#readerFrame2")].find(x => x && x.contentDocument === doc); if (!f) return;
     const fr = f.getBoundingClientRect(), k = fr.width / (win.innerWidth || fr.width), X = fr.left + e.clientX * k, Y = fr.top + e.clientY * k;
     if (ecrireIci(X, Y)){ e.preventDefault(); e.stopImmediatePropagation(); }
@@ -4748,6 +4751,9 @@ function ecrireIci(X, Y){
     if (L){ ouvrirTexte(L.x, L.y - L.hL, [(L.x - r.left) / r.width, (L.y - L.hL - r.top) / r.height], L.w, L.hL, null, L); return true; }
     const Z = zoneDuLivre(X, Y);                                                 /* question à développement : grande case vide */
     if (Z){ ouvrirTexte(Z.x, Z.y, [(Z.x - r.left) / r.width, (Z.y - r.top) / r.height], Z.w, Z.hL, null, Z); return true; }
+    const I = reponseImage(X, Y);                                                /* page en image (Administration) : guidé par le corrigé caché */
+    if (I && I.kind === "rond") return cocherDansLivre(X, Y, I);
+    if (I){ ouvrirTexte(I.x, I.y, [(I.x - r.left) / r.width, (I.y - r.top) / r.height], I.w, I.hL, null, I); return true; }
   } finally { RD.color = old; }
   return false;
 }
@@ -4774,6 +4780,29 @@ function celluleDuLivre(X, Y){
     const voisin = [...(td.parentElement ? td.parentElement.children : [])].find(x => x !== td && x.textContent.trim()), fsLivre = (voisin ? parseFloat(win.getComputedStyle(voisin).fontSize) || 14 : 14) * sc;
     const fs = Math.min(fsLivre, Math.max(9 * sc, rr.height * .42)) * s, hL = fs * 1.4;   /* même taille que le texte du livre (ou plus petite si la case est basse) */
     return { x:fr.left + (rr.left + pl) * s, y:fr.top + (rr.top + pt) * s, w:(rr.width - 2 * pl) * s, hL, fs, h:(rr.height - 2 * pt) * s };
+  }
+  return null;
+}
+/* Page faite d'une image (ex. Administration) : le texte n'est pas lisible par le site, mais le corrigé caché (.ans) donne les places des réponses.
+   Près d'une réponse écrite (.hw) → case d'écriture à sa place; sur une rangée de choix (rond .ring du corrigé à moins de 70 px) → rond de même taille
+   dans la colonne des lettres, à la hauteur touchée; ailleurs sur la page → petite case d'écriture au doigt. */
+function reponseImage(X, Y){
+  for (const id of ["#readerFrame", "#readerFrame2"]){
+    const f = $(id); if (!f || f.hidden) continue; const fr = f.getBoundingClientRect(); if (X < fr.left || X > fr.right || Y < fr.top || Y > fr.bottom) continue;
+    let win, doc; try { win = f.contentWindow; doc = f.contentDocument; } catch(e){ continue; } if (!doc || !doc.body) continue;
+    const s = fr.width / (win.innerWidth || fr.width), bx = (X - fr.left) / s, by = (Y - fr.top) / s;
+    const page = doc.elementsFromPoint(bx, by).find(e => e.matches && e.matches(".page,section,[data-page]") && e.querySelector(".blk") && (!e.checkVisibility || e.checkVisibility({ visibilityProperty:true, opacityProperty:true })));   /* la page vraiment affichée (les autres sont empilées, cachées) */
+    if (!page) continue;
+    const A = [...page.querySelectorAll(".ans")].map(e => ({ e, r:e.getBoundingClientRect(), c:e.className })).filter(a => a.r.width || a.r.height);
+    const sc = page.offsetWidth ? page.getBoundingClientRect().width / page.offsetWidth : 1, d = r => Math.hypot(Math.max(r.left - bx, 0, bx - r.right), Math.max(r.top - by, 0, by - r.bottom));
+    let hw = null, dh = 1e9; A.filter(a => /\bhw\b/.test(a.c)).forEach(a => { const k = d(a.r); if (k < dh){ dh = k; hw = a; } });
+    if (hw && dh <= 26 * sc){ const fsB = (parseFloat(win.getComputedStyle(hw.e).fontSize) || 18) * sc * .78, w = Math.max(hw.r.width, 140 * sc);
+      return { kind:"texte", x:fr.left + hw.r.left * s, y:fr.top + hw.r.top * s, w:Math.min(w, page.getBoundingClientRect().right - hw.r.left - 8) * s, fs:fsB * s, hL:fsB * 1.35 * s }; }
+    let ring = null, dr = 1e9; A.filter(a => /\bring\b/.test(a.c)).forEach(a => { const k = Math.abs(a.r.top + a.r.height / 2 - by); if (k < dr && bx >= a.r.left - 30 * sc && bx <= a.r.left + 420 * sc){ dr = k; ring = a; } });
+    if (ring && dr <= 70 * sc){ const cy = dr < 10 * sc ? ring.r.top + ring.r.height / 2 : by;   /* près de la rangée du corrigé : exactement à sa place */
+      const rx = dr < 10 * sc && Math.abs(bx - (ring.r.left + ring.r.width / 2)) > ring.r.width * 1.2 ? bx - ring.r.width / 2 : ring.r.left;   /* choix côte à côte (Vrai ○ Faux) : le rond suit le doigt sur la rangée */
+      return { kind:"rond", x:fr.left + rx * s + 7, y:fr.top + (cy - ring.r.height / 2) * s + 5, w:ring.r.width * s - 14, h:ring.r.height * s - 10 }; }
+    const fs = 14 * sc * s; return { kind:"texte", x:X - 6, y:Y - fs * .9, w:Math.min(300 * sc * s, fr.right - X), fs, hL:fs * 1.4 };
   }
   return null;
 }
