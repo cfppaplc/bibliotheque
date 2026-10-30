@@ -187,7 +187,11 @@ header { grid-column: 1 / -1; display: flex; align-items: center; justify-conten
 .jour-choix button.on { background: var(--ink); color: var(--surface); border-color: var(--ink); }
 .jour-choix button .pret { width: 8px; height: 8px; border-radius: 50%; background: #2f9e44; }
 .jour-choix button.on .pret { background: #69db7c; }
-.jour-choix input[type=date] { border: 0; background: transparent; color: inherit; font: inherit; width: 0; padding: 0; opacity: 0; position: absolute; pointer-events: none; }
+.jour-choix label.autre-jour { position: relative; overflow: hidden; }
+.jour-choix label.autre-jour input[type=date] { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; border: 0; padding: 0; margin: 0; cursor: pointer; font-size: 16px; -webkit-appearance: none; appearance: none; }
+.jour-choix label.autre-jour input[type=date]::-webkit-calendar-picker-indicator { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; padding: 0; cursor: pointer; opacity: 0; }
+html .jour-choix label.autre-jour.on { background: #f1f1f2; color: #111; border-color: #f1f1f2; }
+html.ui-clair .jour-choix label.autre-jour.on { background: #1d1d1f; color: #fff; border-color: #1d1d1f; }
 .jour-choix button:disabled { opacity: .4; cursor: default; }
 .field.quand { padding: 14px 16px 6px; border: 1px solid var(--line); border-radius: 14px; background: color-mix(in srgb, var(--water) 5%, var(--surface)); margin-bottom: 18px; }
 .field.quand .step-q { margin-bottom: 10px; }
@@ -551,6 +555,23 @@ html.anim-off .bgfx .flow, html.anim-off .bgfx .gauge-needle, html.anim-off .bgf
 .tip-i:hover, .tip-i:focus-visible { background: #1c2330; border-color: #1c2330; color: #fff; }
 .tip-i::after { background: #1c2330; color: #fff; }
 
+/* Téléphone (30 oct.) : la frise dépassait l'écran → le téléphone élargissait toute la page (956 px) et les boutons du haut étaient hors de vue.
+   Pareil sur iPad (1 875 px). La frise défile maintenant de côté dans sa propre boîte (avec le repère « maintenant ») quand elle ne rentre pas, à toutes les tailles; la page garde la largeur de l'écran. */
+html, body { overflow-x: hidden; max-width: 100%; }
+@media all {
+  .tl-wrap { overflow-x: auto; overflow-y: hidden; padding-top: calc(var(--u) * 24); margin-top: calc(var(--u) * -10); scrollbar-width: none; -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; }
+  .tl-wrap::-webkit-scrollbar { display: none; }
+  .tl-wrap .tl-mark { top: 0; }
+
+}
+@media (max-width: 640px) {
+  html .sheet { padding: 8px; }
+  html .sheet-in { max-height: calc(100vh - 16px); max-height: calc(100dvh - 16px); padding: 18px 16px 0; }
+  .sheet .marque { margin: -18px -16px 2px; padding: 16px 16px 12px; }
+  html .sheet-actions .btn { flex: 1 1 0; padding: 0 10px; font-size: 15px; }
+  html .sheet-actions .btn.primary, html .sheet-actions button[type=submit] { flex-basis: 100%; }
+  .field.quand { padding: 12px 12px 4px; }
+}
 /* ===== Fenêtres comme celles de la bibliothèque (30 oct., « les interfaces doivent être comme celles de la home page ») =====
    Même look que les fenêtres du compte de la bibliothèque : carte centrée aux coins ronds, bandeau rouge avec le logo, champs et boutons arrondis,
    bouton principal blanc (foncé) / noir (clair). Suit le choix clair / foncé de la bibliothèque (html.ui-clair). L'écran projeté ne change pas. */
@@ -1584,7 +1605,7 @@ function fitSegLabels() {
 }
 // Remplit l'écran : agrandit au maximum sans qu'aucune zone déborde
 function overflows() {
-  const els = [app, ...app.querySelectorAll(".hero, .side, .side > .panel, .rot > .panel, .course, header")];
+  const els = [app, ...app.querySelectorAll(".hero, .side, .side > .panel, .rot > .panel, .course, header, .tl-wrap")];   /* .tl-wrap : la frise défile (30 oct.), sa largeur doit quand même compter */
   return els.some(el => el.offsetParent !== null && (el.scrollHeight > el.clientHeight + 1 || el.scrollWidth > el.clientWidth + 1));
 }
 function fit() {
@@ -2083,9 +2104,13 @@ function boutonsJours(){
     b.onclick = () => { let per = PER_PREP; if (!jour && perPassee(per)) per = "pm"; remplirPrep(jour, per); }; box.append(b); };
   btn("", "Aujourd'hui");
   jours.forEach(j => btn(j, nomJour(j, true)));
-  const autre = document.createElement("label"); autre.innerHTML = '<span>Autre jour…</span><input type="date">'; const inp = autre.querySelector("input"); inp.min = auj;
-  autre.onclick = e => { e.preventDefault(); try { inp.showPicker(); } catch(_){ inp.style.cssText = "opacity:1;width:auto;position:static;pointer-events:auto"; inp.focus(); } };
-  inp.onchange = () => { if (inp.value && inp.value > auj) remplirPrep(inp.value, PER_PREP); else if (inp.value === auj) remplirPrep("", PER_PREP); };
+  /* « Autre jour… » : le vrai champ de date couvre la pastille (invisible) : un toucher sur téléphone ouvre le calendrier du téléphone;
+     à l'ordinateur, showPicker() l'ouvre au clic (sinon il fallait viser la petite icône). */
+  const autre = document.createElement("label"); autre.className = "autre-jour"; autre.innerHTML = '<span>Autre jour…</span><input type="date" aria-label="Choisir un autre jour">'; const inp = autre.querySelector("input"); inp.min = auj;
+  if (JOUR_PREP && JOUR_PREP !== pro && !jours.includes(JOUR_PREP)) { inp.value = JOUR_PREP; autre.classList.add("on"); autre.firstChild.textContent = nomJour(JOUR_PREP, true); }
+  inp.addEventListener("click", () => { try { if (inp.showPicker) inp.showPicker(); } catch(_){} });
+  const choisir = () => { if (inp.value && inp.value > auj) remplirPrep(inp.value, PER_PREP); else if (inp.value === auj) remplirPrep("", PER_PREP); };
+  inp.addEventListener("change", choisir); inp.addEventListener("blur", () => { if (inp.value && inp.value !== JOUR_PREP && !(inp.value === auj && !JOUR_PREP)) choisir(); });
   box.append(autre);
   /* matin / après-midi */
   const bp = $("f-pers"); bp.innerHTML = "";
@@ -2115,7 +2140,9 @@ function openPrep() {
   $("prep").hidden = false; $("ai-why").hidden = true; $("ai-note").textContent = "";
   const s = slotActif();
   if (s) remplirPrep("", s.split("|")[1]); else remplirPrep(prochainJourClasse(), "am");   /* journée terminée : on prépare le prochain jour de classe */
-  $("f-comp").focus(); demanderCatalogue();
+  document.querySelector("#prep .sheet-in").scrollTop = 0;
+  if (!matchMedia("(pointer: coarse)").matches) $("f-comp").focus({ preventScroll: true });   /* au toucher : pas de focus (le formulaire sautait au milieu et la liste s'ouvrait) */
+  demanderCatalogue();
 }
 $("b-prep-cancel").onclick = () => $("prep").hidden = true;
 $("prep").addEventListener("click", e => { if (e.target.id === "prep") $("prep").hidden = true; });
@@ -2269,6 +2296,12 @@ function heuresDebut(v){ const L = []; for (let m = 7 * 60; m <= 21 * 60; m += 1
   $("f-debut").innerHTML = L.map(m => '<option value="' + String(Math.floor(m / 60)).padStart(2, "0") + ":" + String(m % 60).padStart(2, "0") + '">' + fmt(m) + '</option>').join(""); $("f-debut").value = v; }
 appliquerPlans();
 renderStatic(); tick(); setInterval(tick, 1000);
+/* Téléphone : la frise défile toute seule jusqu'à l'activité en cours (si on ne vient pas de la faire défiler soi-même) */
+(function(){ let dernier = null, touche = 0; const w = () => document.querySelector(".tl-wrap");
+  document.addEventListener("scroll", e => { if (e.target && e.target.classList && e.target.classList.contains("tl-wrap")) touche = Date.now(); }, true);
+  setInterval(() => { const wrap = w(); if (!wrap || wrap.scrollWidth <= wrap.clientWidth + 4 || Date.now() - touche < 15000) return; const now = wrap.querySelector(".seg.now");
+    if (now && now !== dernier){ dernier = now; wrap.scrollTo({ left: Math.max(0, now.offsetLeft - 24), behavior: "smooth" }); } }, 2000);
+})();
 setInterval(() => { const s = slotActif() || isoJour(new Date()); if (s !== jourPlans){ jourPlans = s; appliquerPlans(); } }, 30000);
 </script>
 
