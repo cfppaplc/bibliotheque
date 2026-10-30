@@ -457,7 +457,7 @@
   "date": "2026-10-30",
   "type": "outil",
   "titre": "Accueil de classe",
-  "texte": "Tableau d'accueil animé pour le début de période : date, déroulement, temps avant la pause, et un contenu à ouvrir pour chaque activité.",
+  "texte": "Tableau d'accueil animé pour le début de période : date, déroulement, temps avant la pause, un contenu à ouvrir pour chaque activité, et un fond vivant qui suit la période.",
   "formation": [
    {
     "t": "Bouton « Accueil de classe » en haut de la bibliothèque.",
@@ -475,10 +475,18 @@
     "t": "Dans un livre, « Tableau de bord » (touche E) y retourne; « Revenir au livre » (touche L) te remet à la même page.",
     "img": "nouveautes/tdb-retour.jpg"
    },
+   {
+    "t": "Le fond vit avec la période : plus calme à la pause, plus vif les 5 dernières minutes, petites surprises de temps en temps, carte « Bienvenue » 5 minutes avant le cours. « Préparer le cours » → « Fond animé » : Comme l'ordinateur, Toujours ou Jamais.",
+    "img": "nouveautes/tdb-bienvenue.jpg"
+   },
    "Jour d'examen : coche « Examen aujourd'hui » (pas de pauses).",
    "« Plein écran » une seule fois au début : il reste actif entre le tableau de bord et les livres."
   ],
   "versions": [
+   {
+    "date": "2026-10-30",
+    "texte": "Fond vivant : suit la période, détails animés propres à chaque compétence, profondeur, surprises toutes les 2-3 min, carte « Bienvenue » avant le cours, lumière qui change avec l'heure. Réglage « Fond animé » (le fond restait figé sur les ordinateurs où Windows coupe les animations)."
+   },
    {
     "date": "2026-10-30",
     "texte": "Au survol, une bulle claire décrit chaque bouton et chaque activité de la période : heure, titre, et ce que fait un clic ou un double-clic."
@@ -490,10 +498,6 @@
    {
     "date": "2026-10-23",
     "texte": "Bouton Tableau blanc sur le tableau de bord, et retour au tableau blanc ensuite."
-   },
-   {
-    "date": "2026-10-23",
-    "texte": "Marge de sécurité en bas de l'écran : l'encadré du bas est remonté, pour les projecteurs qui coupent le bas de l'image."
    }
   ]
  },
