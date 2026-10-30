@@ -8094,7 +8094,7 @@ return {matrice:function(texte){var q=new QRCode(-1,L.M);q.addData(texte);q.make
   $("#qnOv").addEventListener("click", e => { if (e.target.id === "qnOv") $("#qnOv").hidden = true; });
   document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("#qnOv").hidden) $("#qnOv").hidden = true; });
   fetch("nouveautes.json", { cache:"no-cache" }).then(r => r.ok ? r.json() : []).then(d => {
-    NOUV = (Array.isArray(d) ? d : []).sort((a, b) => b.date.localeCompare(a.date));
+    NOUV = (Array.isArray(d) ? d : []).filter(n => !n.cache).sort((a, b) => b.date.localeCompare(a.date));   /* cache:true = sujet pas encore annoncé (ex. version élève) */
     const vu = lireLS("nouvVu", ""); $("#qnPoint").hidden = !(NOUV[0] && NOUV[0].date > vu);
     try { render(); } catch(e){}
   }).catch(() => {});
