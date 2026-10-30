@@ -702,7 +702,11 @@ const LOGO_EGI = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAQDAwM
 const PROGS = { "5333": "DEP 5333 · Plomberie et chauffage", "5211": "DEP 5211 · Entretien général d'immeubles" };
 const COMPS = [["254-991", "Se situer au regard des organismes de l'industrie de la construction", "chantier", "5333"], ["254-992", "Prévenir les atteintes à la santé, à la sécurité et à l'intégrité physique sur les chantiers de construction", "securite", "5333"], ["307-402", "Se situer au regard du métier, de la démarche de formation et communiquer en milieu de travail", "chantier", "5333"], ["307-414", "Manutentionner des équipements, des matériaux et des produits", "atelier", "5333"], ["307-428", "Assembler des systèmes de mécanique de tuyauterie", "tuyaux", "5333"], ["307-435", "Installer des composants électriques", "elec", "5333"], ["307-443", "Interpréter des plans et devis", "plan", "5333"], ["307-458", "Installer des réseaux d'évacuation", "evacuation", "5333"], ["307-468", "Installer des réseaux de ventilation", "ventil", "5333"], ["307-478", "Intervenir sur des dispositifs de commande électriques et électroniques", "elec", "5333"], ["307-485", "Effectuer des travaux de soudage et de brasage", "soudure", "5333"], ["307-498", "Installer des systèmes de distribution d'eau chaude et d'eau froide, des équipements sanitaires et des accessoires", "tuyaux", "5333"], ["307-505", "Entretenir et réparer de la tuyauterie, des équipements sanitaires et des accessoires", "sanitaire", "5333"], ["307-513", "Présenter de l'information relative aux notions d'énergie et de chauffage", "flammes", "5333"], ["307-528", "Installer, entretenir et réparer des appareils alimentés au mazout", "flammes", "5333"], ["307-538", "Installer et réparer des systèmes de chauffage directs et renversés", "flammes", "5333"], ["307-544", "Installer et réparer des systèmes de chauffage périmétriques", "tuyaux", "5333"], ["307-558", "Installer des systèmes alimentés au gaz (naturel et propane)", "gaz", "5333"], ["307-565", "Installer et réparer des systèmes de chauffage par rayonnement", "radiant", "5333"], ["307-578", "Installer et réparer des systèmes à vapeur à basse pression", "tuyaux", "5333"], ["307-581", "Effectuer des recherches d'emploi", "communication", "5333"], ["436-201", "Se situer au regard du métier et de la démarche de formation", "chantier", "5211"], ["436-212", "Appliquer les règles de santé et de sécurité au travail", "securite", "5211"], ["436-222", "Entretenir des outils et des appareils, gérer un petit entrepôt", "atelier", "5211"], ["436-238", "Effectuer l'entretien ménager d'un bâtiment", "menage", "5211"], ["436-244", "Effectuer des travaux mineurs d'entretien général d'un bâtiment", "atelier", "5211"], ["436-255", "Effectuer des travaux simples d'entretien et de réparation en menuiserie", "bois", "5211"], ["436-266", "Diagnostiquer des problèmes simples sur les systèmes de la mécanique du bâtiment", "tuyaux", "5211"], ["436-274", "Effectuer des vérifications et des réparations mineures sur du matériel électrique", "elec", "5211"], ["436-282", "Communiquer en milieu de travail", "communication", "5211"], ["436-295", "Effectuer des travaux d'entretien sur un système de plomberie et chauffage", "sanitaire", "5211"], ["436-304", "Effectuer des travaux d'entretien sur un système de climatisation et de ventilation", "ventil", "5211"], ["436-312", "Effectuer des travaux d'entretien sur un système de protection incendie", "incendie", "5211"], ["436-323", "Interpréter des plans de bâtiments", "plan", "5211"], ["436-333", "Utiliser un micro-ordinateur", "informatique", "5211"], ["436-343", "Effectuer des tâches liées à l'administration d'un bâtiment et à l'application d'un plan d'urgence", "administration", "5211"], ["436-352", "Utiliser des moyens de recherche d'emploi", "communication", "5211"], ["436-364", "S'intégrer au marché du travail", "chantier", "5211"]];
 const compInfo = code => COMPS.find(c => c[0] === code);
-function moduleText(code = cfg.comp, other = cfg.module) { const c = compInfo(code); return c ? c[0] + " · " + c[1] : (other || ""); }
+/* Noms courts (30 oct., « simplifier le nom des matières ») : affichés partout; le titre officiel reste en bulle d'aide et pour l'aide de Claude. */
+const COURT = {"254-991": "Industrie de la construction", "254-992": "Santé et sécurité sur les chantiers", "307-402": "Le métier et la communication", "307-414": "Manutention", "307-428": "Mécanique de tuyauterie", "307-435": "Composants électriques", "307-443": "Plans et devis", "307-458": "Réseaux d'évacuation", "307-468": "Réseaux de ventilation", "307-478": "Commandes électriques et électroniques", "307-485": "Soudage et brasage", "307-498": "Eau chaude, eau froide et sanitaires", "307-505": "Entretien et réparation sanitaire", "307-513": "Notions d'énergie", "307-528": "Appareils au mazout", "307-538": "Chauffage direct et renversé", "307-544": "Chauffage périmétrique", "307-558": "Systèmes au gaz", "307-565": "Chauffage par rayonnement", "307-578": "Vapeur à basse pression", "307-581": "Recherche d'emploi", "436-201": "Le métier et la formation", "436-212": "Santé et sécurité", "436-222": "Outils et petit entrepôt", "436-238": "Entretien ménager", "436-244": "Entretien général mineur", "436-255": "Menuiserie", "436-266": "Diagnostic en mécanique du bâtiment", "436-274": "Matériel électrique", "436-282": "Communiquer en milieu de travail", "436-295": "Plomberie et chauffage", "436-304": "Climatisation et ventilation", "436-312": "Protection incendie", "436-323": "Plans de bâtiments", "436-333": "Micro-ordinateur", "436-343": "Administration et plan d'urgence", "436-352": "Recherche d'emploi", "436-364": "Intégration au marché du travail"};
+const titreComp = code => COURT[code] || (compInfo(code) || [])[1] || "";
+function moduleText(code = cfg.comp, other = cfg.module) { const c = compInfo(code); return c ? c[0] + " · " + titreComp(code) : (other || ""); }
+function moduleOfficiel(code, other) { const c = compInfo(code); return c ? c[0] + " · " + c[1] : (other || ""); }
 function bgKind() { if (cfg.bg && cfg.bg !== "auto") return cfg.bg; const c = compInfo(cfg.comp); return c ? c[2] : "tuyaux"; }
 
 const DEFAULTS = {
@@ -963,7 +967,7 @@ function renderStatic() {
   $("v-group").textContent = (cfg.group && !Object.values(PROGS).includes(cfg.group)) ? cfg.group : (PROGS[(compInfo(cfg.comp) || [])[3] || cfg.prog] || PROGS["5333"]);
   $("v-msg").textContent = cfg.msg; $("v-msg").hidden = !cfg.msg.trim();
   $("v-module").innerHTML = "";
-  const mt = moduleText(); if (mt.trim()) { const b = document.createElement("b"); b.textContent = "Au programme : "; $("v-module").append(b, mt); }
+  const mt = moduleText(); if (mt.trim()) { const b = document.createElement("b"); b.textContent = "Au programme : "; $("v-module").append(b, mt); $("v-module").title = moduleOfficiel(cfg.comp, cfg.module); }
   $("v-goals").innerHTML = "";
   cfg.goals.split("\n").filter(g => g.trim()).forEach(g => { const li = document.createElement("li"); li.textContent = g; $("v-goals").append(li); });
   $("v-ppe").innerHTML = cfg.ppe.filter(k => PPE[k]).map(k => `<figure>${PPE[k].svg}<figcaption>${PPE[k].name}</figcaption></figure>`).join("");
@@ -1398,7 +1402,7 @@ function applyBg() {
 function buildCompPick() {
   const box = $("comppick"); box.innerHTML = "";
   COMPS.filter(c => c[3] === ((compInfo(cfg.comp) || [])[3] || cfg.prog)).forEach(([code, title]) => { const b = document.createElement("button"); b.type = "button"; b.className = "comp-opt"; b.setAttribute("role", "option"); b.setAttribute("aria-selected", code === cfg.comp);
-    b.innerHTML = "<b></b><span></span>"; b.firstChild.textContent = code; b.lastChild.textContent = title;
+    b.innerHTML = "<b></b><span></span>"; b.firstChild.textContent = code; b.lastChild.textContent = titreComp(code); b.title = title;
     b.onclick = () => { cfg.comp = code; save(); renderStatic(); tick(); closeCompPick(); }; box.append(b); });
 }
 function closeCompPick() { $("comppick").hidden = true; $("b-comp").setAttribute("aria-expanded", "false"); }
@@ -1588,7 +1592,7 @@ $("b-ai").addEventListener("click", async () => {
   const ctxIA = ctxForm(), minIA = classMin(ctxIA), pausesIA = []; { let c = 0; blocs(ctxIA).forEach(([ty, d]) => { if (ty === "cours") c += d; else pausesIA.push(c); }); }
   const prompt = `Tu aides un enseignant du ${PROGS[$("f-prog").value] || "DEP 5333 · Plomberie et chauffage"} (formation professionnelle au Québec, élèves adultes et jeunes adultes) à planifier une période.
 La période contient ${minIA} minutes de cours.${pausesIA.length ? " Il y a une pause après " + pausesIA.join(" et après ") + " minutes de cours." : " Il n'y a pas de pause."}
-Compétence : ${moduleText($("f-comp").value, $("f-module").value) || "non précisée"}.
+Compétence : ${moduleOfficiel($("f-comp").value, $("f-module").value) || "non précisée"}.
 Points de la période, dans l'ordre (garde cet ordre et ce libellé exact) :
 ${lines.map((l, k) => (k + 1) + ". " + l).join("\n")}
 
@@ -1626,7 +1630,7 @@ $("keys").addEventListener("click", e => { if (e.target.id === "keys") $("keys")
 $("b-set").onclick = openSettings;
 function fillComps(prog) {
   const sel = $("f-comp"); sel.innerHTML = "";
-  COMPS.filter(c => c[3] === prog).forEach(([code, title]) => { const o = document.createElement("option"); o.value = code; o.textContent = code + " · " + title; sel.append(o); });
+  COMPS.filter(c => c[3] === prog).forEach(([code, title]) => { const o = document.createElement("option"); o.value = code; o.textContent = code + " · " + titreComp(code); o.title = title; sel.append(o); });
   const o = document.createElement("option"); o.value = "autre"; o.textContent = "Autre (écrire ci-dessous)"; sel.append(o);
 }
 $("f-prog").addEventListener("change", () => { fillComps($("f-prog").value); $("f-module").hidden = true; });
@@ -2256,7 +2260,7 @@ html.anim-off #accAccueil .aa-dans i { animation: none; }
   function remplirCarte(texteDans, code){
     const c = compInfo(code || cfg.comp);
     carte.querySelector(".aa-code").textContent = c ? c[0] + (cfg.group ? " · " + cfg.group : "") : (cfg.group || "");
-    carte.querySelector(".aa-comp").textContent = c ? c[1] : (cfg.module || cfg.title || "");
+    carte.querySelector(".aa-comp").textContent = c ? titreComp(c[0]) : (cfg.module || cfg.title || "");
     carte.querySelector(".aa-dans span").textContent = texteDans;
   }
   function montrerCarte(){ if (carte.hidden){ carte.hidden = false; carte.classList.remove("part"); requestAnimationFrame(() => requestAnimationFrame(() => carte.classList.add("vu"))); } }

@@ -140,7 +140,7 @@
 
 ## accueil.html — repères
 - Réglages dans `localStorage["accueil-atelier-v4"]` → objet `cfg` (fusionné avec `DEFAULTS`).
-- `COMPS` : `[code, nom, fond, programme]` pour chaque compétence (ex. `"436-282"`). `SCENES` : arrière-plans SVG animés par compétence.
+- `COMPS` : `[code, nom, fond, programme]` pour chaque compétence (ex. `"436-282"`). **Noms courts** (30 oct.) : `COURT[code]` / `titreComp(code)` affichés partout (liste de Préparer le cours, choix rapide, « Au programme », carte Bienvenue); titre officiel en `title` et dans la demande à Claude (`moduleOfficiel`). Nouvelle compétence : ajouter aussi son nom court. `SCENES` : arrière-plans SVG animés par compétence.
 - Période : `BLOCKS` (60 min, pause 5, 60, pause 15, 60), `points()`, `timeline()`. Case **« Examen aujourd'hui »** (`cfg.examen` = date du jour) : aucune pause.
 - **Contenus par activité** (« Préparer le cours », étape 4) : `cfg.liens[cléActivité]` = **liste** (ancien format : un seul objet; lire avec `liste()`/`liensDe()`).
   Types : `livre`, `schema`, `plan`, `tableau`, `minuterie`, `video` (YouTube, `ytInfo`), `fichier` (gardé dans IndexedDB `accueil-fichiers`). `web` (`urlWeb`, ouvert dans un nouvel onglet). Attention : `data-w` est déjà pris par les widgets, ne pas le réutiliser.
