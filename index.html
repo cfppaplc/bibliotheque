@@ -3311,7 +3311,7 @@ function cocherDansLivre(X, Y, B0){
     const A = [x + w * .12, y + h * .52], M = [x + w * .42, y + h * .86], Z = [x + w / 2 + m * .62, y + h / 2 - m * .78];   /* le crochet dépasse un peu en haut à droite, comme à la main */
     seg(A, M, 6); pts.pop(); seg(M, Z, 10);
     arr.push({ c:col, hl:false, w:Math.max(2.2, Math.min(5, m / RD.z * .17)), p:pts, coche:cle, cc:N(x + w / 2, y + h / 2) }); }
-  else { const cx = B.x + B.w / 2, cy = B.y + B.h / 2, rx = B.w / 2 + 7, ry = B.h / 2 + 5;
+  else { const cx = B.x + B.w / 2, cy = B.y + B.h / 2, rx = B.w / 2 + (B.pad === 0 ? 0 : 7), ry = B.h / 2 + (B.pad === 0 ? 0 : 5);
     for (let i = 0; i <= 44; i++){ const a = -Math.PI * .6 + i / 40 * Math.PI * 2; pts.push(N(cx + rx * Math.cos(a), cy + ry * Math.sin(a))); }   /* un peu plus qu'un tour, comme un rond fait à la main */
     arr.push({ c:col, hl:false, w:2.6, p:pts, coche:cle, cc:N(cx, cy) }); }
   redrawInk(); try { planifierSauvegarde(); } catch(e){} return true;
@@ -4729,6 +4729,8 @@ function verrouEleve(win, doc){
   new win.MutationObserver(net).observe(doc.body, { attributes:true, attributeFilter:["class"] });
   win.addEventListener("keydown", e => { if (/^r$/i.test(e.key || "") && !enSaisie(e.target)){ e.preventDefault(); e.stopImmediatePropagation(); } }, true);
   /* l'élève touche le livre lui-même (sans outil) : écrire sur la ligne, cocher la case, encercler la réponse, écrire dans la zone de développement */
+  win.addEventListener("dblclick", e => { if (estEleve() && !(e.target.closest && e.target.closest("button,input,textarea,select"))){ e.preventDefault(); e.stopImmediatePropagation(); } }, true);   /* élève : deux réponses touchées vite ne font pas zoomer le livre (Administration, Incendie, Ventilation, Plomberie) */
+  doc.addEventListener("pointerdown", e => { try { const pg = e.target.closest && e.target.closest(".page"); if (pg && pg.querySelector(".blk")) imagePage(pg, win); } catch(x){} }, true);   /* page en image : on lit l'image pendant que le doigt est posé */
   doc.addEventListener("click", e => {
     if (!estEleve() || RD.wb || (RD.pen && !RD.crayonOff)) return;
     if (e.target.closest && e.target.closest("a[href],button,input,select,textarea,summary,[contenteditable],[onclick],.nav,.toc,nav")) return;
@@ -4789,6 +4791,22 @@ function celluleDuLivre(X, Y){
 /* Page faite d'une image (ex. Administration) : le texte n'est pas lisible par le site, mais le corrigé caché (.ans) donne les places des réponses.
    Près d'une réponse écrite (.hw) → case d'écriture à sa place; sur une rangée de choix (rond .ring du corrigé à moins de 70 px) → rond de même taille
    dans la colonne des lettres, à la hauteur touchée; ailleurs sur la page → petite case d'écriture au doigt. */
+/* image d'une page (fond des .blk), lue en pixels pour trouver les rangées de texte; gardée pour les 6 dernières pages */
+const IMGPAGE = new Map();
+function imagePage(page, win){
+  const b = [...page.querySelectorAll(".blk")].find(x => !x.classList.contains("sk")) || page.querySelector(".blk"); if (!b) return null;
+  const m = (win.getComputedStyle(b).backgroundImage || "").match(/url\("?([^")]+)"?\)/); if (!m) return null;
+  let e = IMGPAGE.get(m[1]); if (e) return e.ctx || null;
+  e = {}; IMGPAGE.set(m[1], e); if (IMGPAGE.size > 6) IMGPAGE.delete(IMGPAGE.keys().next().value);
+  const im = new Image(); im.onload = () => { const W = page.offsetWidth || 816, H = page.offsetHeight || 1056, cv = document.createElement("canvas"); cv.width = W; cv.height = H;
+    const x = cv.getContext("2d", { willReadFrequently:true }); x.drawImage(im, 0, 0, W, H); e.ctx = x; }; im.src = m[1];
+  return null;
+}
+/* Page faite d'une image (ex. Administration) : le texte n'est pas lisible par le site, mais le corrigé caché (.ans) donne les places des réponses,
+   et l'image de la page (lue en pixels) donne les rangées de texte.
+   - rangée d'une réponse écrite (.hw) → case d'écriture à sa place;
+   - rangée de choix (un petit ○ gris devant la lettre, près d'un rond .ring du corrigé) → rond centré sur la lettre (ou sur le mot touché, si les choix sont côte à côte);
+   - titre de question ou ailleurs → petite case d'écriture au doigt. */
 function reponseImage(X, Y){
   for (const id of ["#readerFrame", "#readerFrame2"]){
     const f = $(id); if (!f || f.hidden) continue; const fr = f.getBoundingClientRect(); if (X < fr.left || X > fr.right || Y < fr.top || Y > fr.bottom) continue;
@@ -4796,16 +4814,46 @@ function reponseImage(X, Y){
     const s = fr.width / (win.innerWidth || fr.width), bx = (X - fr.left) / s, by = (Y - fr.top) / s;
     const page = doc.elementsFromPoint(bx, by).find(e => e.matches && e.matches(".page,section,[data-page]") && e.querySelector(".blk") && (!e.checkVisibility || e.checkVisibility({ visibilityProperty:true, opacityProperty:true })));   /* la page vraiment affichée (les autres sont empilées, cachées) */
     if (!page) continue;
-    const A = [...page.querySelectorAll(".ans")].map(e => ({ e, r:e.getBoundingClientRect(), c:e.className })).filter(a => a.r.width || a.r.height);
-    const sc = page.offsetWidth ? page.getBoundingClientRect().width / page.offsetWidth : 1, d = r => Math.hypot(Math.max(r.left - bx, 0, bx - r.right), Math.max(r.top - by, 0, by - r.bottom));
-    let hw = null, dh = 1e9; A.filter(a => /\bhw\b/.test(a.c)).forEach(a => { const k = d(a.r); if (k < dh){ dh = k; hw = a; } });
-    if (hw && dh <= 26 * sc){ const fsB = (parseFloat(win.getComputedStyle(hw.e).fontSize) || 18) * sc * .78, w = Math.max(hw.r.width, 140 * sc);
-      return { kind:"texte", x:fr.left + hw.r.left * s, y:fr.top + hw.r.top * s, w:Math.min(w, page.getBoundingClientRect().right - hw.r.left - 8) * s, fs:fsB * s, hL:fsB * 1.35 * s }; }
-    let ring = null, dr = 1e9; A.filter(a => /\bring\b/.test(a.c)).forEach(a => { const k = Math.abs(a.r.top + a.r.height / 2 - by); if (k < dr && bx >= a.r.left - 30 * sc && bx <= a.r.left + 420 * sc){ dr = k; ring = a; } });
-    if (ring && dr <= 70 * sc){ const cy = dr < 10 * sc ? ring.r.top + ring.r.height / 2 : by;   /* près de la rangée du corrigé : exactement à sa place */
-      const rx = dr < 10 * sc && Math.abs(bx - (ring.r.left + ring.r.width / 2)) > ring.r.width * 1.2 ? bx - ring.r.width / 2 : ring.r.left;   /* choix côte à côte (Vrai ○ Faux) : le rond suit le doigt sur la rangée */
-      return { kind:"rond", x:fr.left + rx * s + 7, y:fr.top + (cy - ring.r.height / 2) * s + 5, w:ring.r.width * s - 14, h:ring.r.height * s - 10 }; }
-    const fs = 14 * sc * s; return { kind:"texte", x:X - 6, y:Y - fs * .9, w:Math.min(300 * sc * s, fr.right - X), fs, hL:fs * 1.4 };
+    const pr = page.getBoundingClientRect(), k = page.offsetWidth ? pr.width / page.offsetWidth : 1;
+    const P = r => ({ l:(r.left - pr.left) / k, t:(r.top - pr.top) / k, w:r.width / k, h:r.height / k }), px = (bx - pr.left) / k, py = (by - pr.top) / k;   /* coordonnées de la page (816 px de large) */
+    const E = (x, y) => ({ x:fr.left + (pr.left + x * k) * s, y:fr.top + (pr.top + y * k) * s }), ech = k * s;            /* page → écran */
+    const A = [...page.querySelectorAll(".ans")].map(e => ({ e, r:P(e.getBoundingClientRect()), c:e.className })).filter(a => a.r.w || a.r.h);
+    /* 2. rangée de choix : on lit l'image. Un choix commence par un petit ○ gris; on encercle le premier mot après le ○ le plus proche à gauche du doigt. */
+    const g = imagePage(page, win);
+    if (g){
+      const W = g.canvas.width, H = g.canvas.height, lum = (d, i) => .299 * d[i] + .587 * d[i + 1] + .114 * d[i + 2];
+      const x0 = Math.max(0, Math.round(px - 220)), x1 = Math.min(W - 1, Math.round(px + 60)), y0 = Math.max(0, Math.round(py - 14)), y1 = Math.min(H - 1, Math.round(py + 14));
+      const D = g.getImageData(x0, y0, x1 - x0 + 1, y1 - y0 + 1).data, LW = x1 - x0 + 1, L = (x, y) => lum(D, ((y - y0) * LW + (x - x0)) * 4);
+      /* rangée de texte sous le doigt */
+      const ligneEncre = y => { for (let x = x0; x <= x1; x++) if (L(x, y) < 215) return true; return false; };
+      let t = Math.round(py), b = Math.round(py); if (!ligneEncre(t)){ let u = t, v = t; while (u > y0 && !ligneEncre(u)) u--; while (v < y1 && !ligneEncre(v)) v++; t = b = (py - u <= v - py && ligneEncre(u)) ? u : v; }
+      while (t > y0 && ligneEncre(t - 1)) t--; while (b < y1 && ligneEncre(b + 1)) b++;
+      if (b - t >= 5 && b - t <= 26){
+        const col = x => { let gris = 0, noir = 0; for (let y = t; y <= b; y++){ const v = L(x, y); if (v < 110) noir++; else if (v < 215) gris++; } return [gris, noir]; };
+        /* petits ○ gris : colonnes avec du gris et aucun noir, sur 6 à 15 px de large */
+        const R = []; let deb = -1;
+        const creux = (a, z) => { const m = Math.round((a + z) / 2); let haut = -1, bas = -1;   /* un ○ : du gris en haut et en bas de la colonne du milieu, du blanc au centre */
+          for (let y = t; y <= b; y++){ const v = L(m, y); if (v < 215){ if (haut < 0) haut = y; bas = y; } } const yc = Math.round((haut + bas) / 2); creux.v = [haut, bas]; return haut >= 0 && bas - haut >= 5 && bas - haut <= 16 && Math.abs((z - a) - (bas - haut)) <= 3 && haut > t - 1 && L(a, t) > 215 && L(z, t) > 215 && L(m, yc) > 215 && L(m, yc - 1) > 200 && L(m, yc + 1) > 200; };
+        for (let x = x0; x <= Math.min(x1, Math.round(px + 6)); x++){ const [gr, no] = col(x), rad = gr >= 1 && no === 0; if (rad && deb < 0) deb = x; if (!rad && deb >= 0){ if (x - deb >= 6 && x - deb <= 15 && creux(deb, x - 1)) R.push([deb, x - 1, creux.v[0], creux.v[1]]); deb = -1; } }
+        const rd = R.filter(r => r[0] <= px + 6 && r[0] > 40).pop();   /* pas dans la marge de la page */
+        if (rd){
+          let l = rd[1] + 1; while (l < x1 && col(l)[1] === 0 && l - rd[1] < 12) l++;          /* début du mot après le ○ */
+          let r = l, vide = 0; for (let x = l; x <= x1 && vide < 4; x++){ if (col(x)[1] > 0){ r = x; vide = 0; } else vide++; }   /* fin du mot : 4 colonnes vides */
+          if (col(l)[1] > 0 && r - l >= 3 && r - l <= 120){ const yc = (rd[2] + rd[3]) / 2, c = E((l + r) / 2, yc), w = (r - l + 12) * ech, h = (rd[3] - rd[2] + 9) * ech;   /* hauteur et centre du ○ : le rond suit la lettre, pas toute la rangée */ return { kind:"rond", x:c.x - w / 2, y:c.y - h / 2, w, h, pad:0 }; }
+        }
+      }
+    } else {
+      let ring = null, dr = 1e9; A.filter(a => /\bring\b/.test(a.c)).forEach(a => { const d = Math.abs(a.r.t + a.r.h / 2 - py); if (d < dr && px >= a.r.l - 40 && px <= a.r.l + 440){ dr = d; ring = a; } });
+      if (ring && dr < 10){ const c = E(ring.r.l + ring.r.w / 2, ring.r.t + ring.r.h / 2), w = ring.r.w * ech, h = ring.r.h * ech; return { kind:"rond", x:c.x - w / 2, y:c.y - h / 2, w, h, pad:0 }; }   /* image pas encore lue : seulement sur la rangée du corrigé */
+    }
+    /* 1. rangée d'une réponse écrite du corrigé */
+    let hw = null, dh = 1e9;
+    A.filter(a => /\bhw\b/.test(a.c)).forEach(a => { const hy = Math.max(a.r.h, 14), dy = Math.max(a.r.t - py, 0, py - (a.r.t + hy)), dx = Math.max(a.r.l - 40 - px, 0, px - (a.r.l + Math.max(a.r.w, 300)));
+      const d = Math.hypot(dx, dy * 2); if (dy <= 9 && dx <= 0 && d < dh){ dh = d; hw = a; } });
+    if (!hw) A.filter(a => /\bhw\b/.test(a.c)).forEach(a => { const d = Math.hypot(Math.max(a.r.l - px, 0, px - (a.r.l + a.r.w)), Math.max(a.r.t - py, 0, py - (a.r.t + a.r.h))); if (d <= 22 && d < dh){ dh = d; hw = a; } });
+    if (hw){ const fsP = (parseFloat(win.getComputedStyle(hw.e).fontSize) || 18) * .78, o = E(hw.r.l, hw.r.t);
+      return { kind:"texte", x:o.x, y:o.y, w:Math.min(Math.max(hw.r.w, 140), (page.offsetWidth || 816) - hw.r.l - 30) * ech, fs:fsP * ech, hL:fsP * 1.35 * ech }; }
+    const fs = 14 * ech; return { kind:"texte", x:X - 6, y:Y - fs * .9, w:Math.min(300 * ech, fr.right - X), fs, hL:fs * 1.4 };
   }
   return null;
 }
