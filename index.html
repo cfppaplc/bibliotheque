@@ -342,7 +342,7 @@
   .hero{min-height:300px!important;align-items:center!important}
   .hero-stack{right:8%!important;top:calc(50% + 52px)!important}
   .hero-stack img{height:230px!important;margin-left:-70px!important}
-  .hero-aide{position:relative;z-index:2;border:1px solid #ffffff44;background:#ffffff14;color:#fff;border-radius:999px;padding:9px 16px;font:600 .92rem inherit;font-family:inherit;cursor:pointer}.hero-aide:hover{background:#ffffff26}
+  .hero-aide{position:relative;z-index:2;border:1px solid #ffffff44;background:#ffffff14;color:#fff;border-radius:999px;padding:9px 16px;font-weight:600;font-size:.92rem;font-family:inherit;cursor:pointer}.hero-aide:hover{background:#ffffff26}
   .hero-stack{position:absolute;right:6%;top:calc(50% - 30px);transform:translateY(-50%);display:flex;align-items:center;z-index:1}
   .hero-stack img{height:min(40vh,330px);aspect-ratio:8.5/11;border-radius:4px;box-shadow:0 20px 50px rgba(0,0,0,.7);margin-left:-90px}
   .hero-stack img:first-child{margin-left:0;transform:rotate(-6deg) translateY(12px)}
@@ -798,7 +798,7 @@
     <a id="quoiNeuf" href="#" role="button">Quoi de neuf<span class="qn-point" id="qnPoint" hidden></span></a>
   </nav>
   <div class="search"><svg class="search-ico" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg><input id="search" type="search" placeholder="Chercher dans les livres…" aria-label="Rechercher un titre ou un mot dans les livres"><kbd class="search-kbd" title="Touche / pour chercher">/</kbd></div>
-  <div class="hbtns"><button class="hbtn" id="compteBtn" type="button"></button><button class="hbtn" id="themeBtn" type="button" title="Accueil clair ou foncé" aria-label="Accueil clair ou foncé"><svg class="ico-soleil" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/></svg><svg class="ico-lune" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg></button><button class="hbtn" id="planBtn" title="Afficher un plan technique au tableau" aria-label="Plans techniques"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3z"/><path d="M9 3v15M15 6v15"/></svg><span class="lbl"> Plans</span></button><button class="hbtn" id="accueilBtn" title="Ouvrir le tableau d'accueil de l'atelier" aria-label="Accueil de classe"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9.5 2.5h5M12 2.5V5"/></svg><span class="lbl"> Accueil de classe</span></button><button class="hbtn" id="wbBtn" title="Ouvrir un tableau blanc pour écrire et dessiner" aria-label="Tableau blanc"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3.5" width="18" height="12" rx="1.2"/><path d="M6.5 11.5c1.3-2.2 2.6-3 3.8-1.6s2.4 1 3.6-1.2 2.3-2 3.6-.7"/><path d="M12 15.5v2.5M7.5 21l4.5-3 4.5 3"/></svg><span class="lbl"> Tableau blanc</span></button><button class="hbtn" id="grosBtn" hidden title="Texte plus gros" aria-label="Texte plus gros" aria-pressed="false">A+</button><button class="hbtn" id="classeBtn" hidden title="Mode classe : cache la recherche et l'administration" aria-label="Mode classe"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c0 1.5 3 3 6 3s6-1.5 6-3v-5M22 9v6"/></svg><span class="lbl"> Mode classe</span></button></div>
+  <div class="hbtns"><button class="hbtn" id="compteBtn" type="button"></button><button class="hbtn" id="themeBtn" type="button" title="Accueil clair ou foncé" aria-label="Accueil clair ou foncé"><svg class="ico-soleil" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/></svg><svg class="ico-lune" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg></button><button class="hbtn" id="planBtn" title="Afficher un plan technique au tableau" aria-label="Plans techniques"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3z"/><path d="M9 3v15M15 6v15"/></svg><span class="lbl"> Plans</span></button><button class="hbtn" id="actBtn" title="Activités et cahiers à imprimer" aria-label="Activités"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3h8l3 3v15H5V3z" transform="translate(0 0)"/><path d="M9 11l2 2 4-4M9 17h6"/></svg><span class="lbl"> Activités</span></button><button class="hbtn" id="accueilBtn" title="Ouvrir le tableau d'accueil de l'atelier" aria-label="Accueil de classe"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9.5 2.5h5M12 2.5V5"/></svg><span class="lbl"> Accueil de classe</span></button><button class="hbtn" id="wbBtn" title="Ouvrir un tableau blanc pour écrire et dessiner" aria-label="Tableau blanc"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3.5" width="18" height="12" rx="1.2"/><path d="M6.5 11.5c1.3-2.2 2.6-3 3.8-1.6s2.4 1 3.6-1.2 2.3-2 3.6-.7"/><path d="M12 15.5v2.5M7.5 21l4.5-3 4.5 3"/></svg><span class="lbl"> Tableau blanc</span></button><button class="hbtn" id="grosBtn" hidden title="Texte plus gros" aria-label="Texte plus gros" aria-pressed="false">A+</button><button class="hbtn" id="classeBtn" hidden title="Mode classe : cache la recherche et l'administration" aria-label="Mode classe"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c0 1.5 3 3 6 3s6-1.5 6-3v-5M22 9v6"/></svg><span class="lbl"> Mode classe</span></button></div>
 </header>
 
 <section class="hero" id="hero"></section>
@@ -813,7 +813,7 @@
   <div class="plus-sheet" role="dialog" aria-label="Plus">
     <div class="plus-poignee" aria-hidden="true"></div>
     <button type="button" data-plus="aide"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.6M12 17.2v.1"/></svg>Aide</button>
-    <button type="button" data-plus="plans"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4L3 6.5v13.5l6-2.5 6 2.5 6-2.5V4l-6 2.5zM9 4v13.5M15 6.5V20"/></svg>Plans techniques</button>
+    <button type="button" data-plus="plans"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4L3 6.5v13.5l6-2.5 6 2.5 6-2.5V4l-6 2.5zM9 4v13.5M15 6.5V20"/></svg>Plans techniques</button><button type="button" data-plus="activites"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3h8l3 3v15H5V3z"/><path d="M9 11l2 2 4-4M9 17h6"/></svg>Activités</button>
     <button type="button" data-plus="accueil"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="4" width="17" height="12.5" rx="1.5"/><path d="M8 20h8M12 16.5V20"/></svg>Accueil de classe</button>
     <button type="button" data-plus="wb"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3.5" width="18" height="12" rx="1.2"/><path d="M6.5 11.5c1.3-2.2 2.6-3 3.8-1.6s2.4 1 3.6-1.2 2.3-2 3.6-.7"/><path d="M12 15.5v2.5M7.5 21l4.5-3 4.5 3"/></svg>Tableau blanc</button>
     <button type="button" data-plus="gros"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19l5-14 5 14M5.8 14h6.4M15 19l3-8 3 8M16 16.5h4"/></svg>Texte plus gros</button>
@@ -6013,7 +6013,7 @@ window.__htmlImpression = htmlImpression;
   const fermer = () => { ov.hidden = true; };
   ov.addEventListener("click", e => { if (e.target === ov) { fermer(); return; } const b = e.target.closest("[data-plus]"); if (!b) return; fermer();
     const k = b.dataset.plus, clic = id => { const x = document.getElementById(id); if (x) x.click(); };
-    if (k === "aide") clic("lienAide"); else if (k === "plans") clic("planBtn"); else if (k === "accueil") clic("accueilBtn"); else if (k === "gros") clic("grosBtn"); else if (k === "wb") clic("wbBtn"); else if (k === "theme") clic("themeBtn"); else if (k === "compte") clic("compteBtn"); });
+    if (k === "aide") clic("lienAide"); else if (k === "plans") clic("planBtn"); else if (k === "activites") clic("actBtn"); else if (k === "accueil") clic("accueilBtn"); else if (k === "gros") clic("grosBtn"); else if (k === "wb") clic("wbBtn"); else if (k === "theme") clic("themeBtn"); else if (k === "compte") clic("compteBtn"); });
   /* « Ma liste » et le point rouge de « Quoi de neuf » suivent ceux de l'en-tête */
   const sync = () => { const lf = document.querySelector('nav a[data-view="fav"]'), qp = document.getElementById("qnPoint");
     bar.querySelector('[data-tab="fav"]').hidden = !lf || lf.hidden; bar.querySelector(".tab-point").hidden = !qp || qp.hidden;
@@ -6262,6 +6262,105 @@ initAdmin();
   .accueil-close{background:#1b1b1d;color:#e6e6e8;border:1px solid #2f2f33;border-radius:8px;height:40px;padding:0 14px;font:600 .9rem "Segoe UI",Roboto,Arial,sans-serif;opacity:.35;display:inline-flex;align-items:center;gap:6px}
   .accueil-close:hover,.accueil-close:focus-visible{background:#262629;opacity:1}
 </style>
+<style>
+  .act-ov{position:fixed;inset:0;z-index:410;background:#0e0e10;color:#f1f1f3;font-family:"Segoe UI",Roboto,Arial,sans-serif;overflow:auto;-webkit-overflow-scrolling:touch}
+  .act-ov[hidden]{display:none}
+  .act-top{position:sticky;top:0;z-index:2;display:flex;align-items:center;gap:14px;padding:12px 22px;background:#0e0e10ee;backdrop-filter:blur(8px);border-bottom:1px solid #ffffff1c}
+  .act-back{display:inline-flex;align-items:center;gap:6px;background:#ffffff14;border:1px solid #ffffff30;color:inherit;border-radius:8px;height:42px;padding:0 14px;font-weight:600;font-size:.95rem;font-family:inherit;cursor:pointer}
+  .act-back:hover{background:#ffffff22}
+  .act-top h2{margin:0;font-size:1.25rem;display:flex;align-items:center;gap:10px}
+  .act-wrap{max-width:1100px;margin:0 auto;padding:22px 22px 60px}
+  .act-intro{margin:0 0 16px;color:#a9a9b0;font-size:.98rem}
+  .act-filtres{display:flex;flex-wrap:wrap;gap:8px 18px;margin-bottom:20px;align-items:center}
+  .act-grp{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+  .act-grp>span{font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:#8d8d95;margin-right:2px}
+  .act-pill{background:#ffffff10;border:1px solid #ffffff2a;color:inherit;border-radius:999px;height:36px;padding:0 14px;font-weight:600;font-size:.88rem;font-family:inherit;cursor:pointer}
+  .act-pill.on{background:#f1f1f3;color:#111;border-color:#f1f1f3}
+  .act-liste{display:grid;gap:16px}
+  .act-carte{display:grid;grid-template-columns:150px 1fr;gap:20px;background:#17171a;border:1px solid #ffffff1c;border-radius:16px;padding:16px;border-left:5px solid var(--ac,#e50914)}
+  .act-carte img{width:150px;height:auto;border-radius:8px;background:#fff;box-shadow:0 6px 18px #0008;align-self:start}
+  .act-tag{display:inline-flex;align-items:center;gap:6px;font-size:.74rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ac,#e50914);margin-bottom:6px}
+  .act-carte h3{margin:0 0 4px;font-size:1.35rem;line-height:1.2}
+  .act-comp{color:#c9c9d0;font-size:.95rem;margin-bottom:8px}
+  .act-desc{color:#a9a9b0;font-size:.95rem;line-height:1.45;margin:0 0 10px}
+  .act-meta{display:flex;flex-wrap:wrap;gap:6px 14px;color:#8d8d95;font-size:.85rem;margin-bottom:14px}
+  .act-btns{display:flex;flex-wrap:wrap;gap:8px}
+  .act-b{display:inline-flex;align-items:center;gap:7px;height:46px;padding:0 18px;border-radius:10px;border:1px solid #ffffff33;background:#ffffff12;color:inherit;font-weight:600;font-size:1rem;font-family:inherit;cursor:pointer;text-decoration:none}
+  .act-b.prim{background:#f1f1f3;color:#111;border-color:#f1f1f3}
+  .act-b:hover{filter:brightness(1.1)}
+  .act-vide{padding:40px 10px;text-align:center;color:#8d8d95}
+  body.clair .act-ov{background:#f6f4ef;color:#1d1d1f}
+  body.clair .act-top{background:#f6f4efee;border-color:#0000001a}
+  body.clair .act-back,body.clair .act-pill,body.clair .act-b{background:#fff;border-color:#d4d0c8}
+  body.clair .act-pill.on,body.clair .act-b.prim{background:#1d1d1f;color:#fff;border-color:#1d1d1f}
+  body.clair .act-carte{background:#fff;border-color:#e3dfd6}
+  body.clair .act-intro,body.clair .act-desc,body.clair .act-comp{color:#55555b}
+  body.clair .act-meta,body.clair .act-grp>span,body.clair .act-vide{color:#76767d}
+  @media (max-width:640px){
+    .act-top{padding:10px 14px}.act-wrap{padding:16px 14px 90px}
+    .act-carte{grid-template-columns:96px 1fr;gap:12px;padding:12px}.act-carte img{width:96px}
+    .act-carte h3{font-size:1.1rem}.act-b{height:44px;padding:0 14px;flex:1 1 auto;justify-content:center}
+  }
+</style>
+<div class="act-ov" id="actOv" hidden role="dialog" aria-label="Activités">
+  <div class="act-top">
+    <button class="act-back" id="actBack" type="button"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>Bibliothèque</button>
+    <h2><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3h8l3 3v15H5V3z"/><path d="M9 11l2 2 4-4M9 17h6"/></svg>Activités</h2>
+  </div>
+  <div class="act-wrap">
+    <p class="act-intro">Tes cahiers, suivis d'atelier et exercices à projeter ou à imprimer. Ils sont séparés des livres de compétence.</p>
+    <div class="act-filtres" id="actFiltres"></div>
+    <div class="act-liste" id="actListe"></div>
+  </div>
+</div>
+<script>
+/* Activités : PDF de Jeremy (suivis d'atelier, cahiers, exercices), séparés des livres. Pour en ajouter : déposer le PDF dans activites/ avec une image .jpg du même nom, puis une ligne ici. */
+(function(){
+  const ACTIVITES = [
+    { f:"montages-circuit-ferme", titre:"Montages en circuit fermé", type:"Cahier d'activités", prog:"Plomberie et chauffage",
+      comp:"307-428 · Mécanique de tuyauterie", pages:66,
+      desc:"27 activités de montage : fonte, PEX, cuivre, acier, acier rainuré, montages combinés, montants et supports, défis finaux. Calculs, tableaux et cases à cocher." }
+  ];
+  const COUL = { "Plomberie et chauffage":"#2f8fd8", "Entretien général d'immeubles":"#e0892b" };
+  const $ = id => document.getElementById(id), ov = $("actOv");
+  const F = { prog:"", type:"" };
+  const esc = t => String(t).replace(/[&<>"]/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" }[c]));
+  const IC_OUV = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M8 20h8M12 16v4"/></svg>';
+  const IC_IMP = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 9V3h10v6M7 17H4v-7h16v7h-3M7 14h10v7H7z"/></svg>';
+  const IC_DL = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></svg>';
+  function pills(cle, titre, valeurs){
+    return '<div class="act-grp"><span>' + titre + '</span>' + ['Tous'].concat(valeurs).map(v => {
+      const val = v === "Tous" ? "" : v; return '<button type="button" class="act-pill' + (F[cle] === val ? ' on' : '') + '" data-k="' + cle + '" data-v="' + esc(val) + '">' + esc(v) + '</button>'; }).join("") + '</div>';
+  }
+  function dessiner(){
+    const progs = [...new Set(ACTIVITES.map(a => a.prog))], types = [...new Set(ACTIVITES.map(a => a.type))];
+    $("actFiltres").innerHTML = (progs.length > 1 ? pills("prog", "Programme", progs) : "") + (types.length > 1 ? pills("type", "Type", types) : "");
+    const l = ACTIVITES.filter(a => (!F.prog || a.prog === F.prog) && (!F.type || a.type === F.type));
+    $("actListe").innerHTML = l.length ? l.map(a => '<article class="act-carte" style="--ac:' + (COUL[a.prog] || "#e50914") + '"><img src="activites/' + a.f + '.jpg" alt="" loading="lazy"><div>' +
+      '<div class="act-tag">' + esc(a.type) + '</div><h3>' + esc(a.titre) + '</h3><div class="act-comp">' + esc(a.comp) + '</div><p class="act-desc">' + esc(a.desc) + '</p>' +
+      '<div class="act-meta"><span>' + esc(a.prog) + '</span><span>' + a.pages + ' pages</span></div>' +
+      '<div class="act-btns"><button class="act-b prim" type="button" data-a="ouvrir" data-f="' + a.f + '">' + IC_OUV + 'Projeter au tableau</button>' +
+      '<button class="act-b" type="button" data-a="imprimer" data-f="' + a.f + '">' + IC_IMP + 'Imprimer</button>' +
+      '<a class="act-b" href="activites/' + a.f + '.pdf" download="' + esc(a.titre) + '.pdf">' + IC_DL + 'Télécharger</a></div></div></article>').join("")
+      : '<div class="act-vide">Aucune activité pour ce choix.</div>';
+  }
+  async function pdfDe(a){ const r = await fetch("activites/" + a.f + ".pdf"); if (!r.ok) throw new Error("introuvable"); return r.blob(); }
+  ov.addEventListener("click", async e => {
+    const p = e.target.closest(".act-pill"); if (p){ F[p.dataset.k] = p.dataset.v; dessiner(); return; }
+    const b = e.target.closest("[data-a]"); if (!b) return;
+    const a = ACTIVITES.find(x => x.f === b.dataset.f); if (!a) return;
+    if (b.dataset.a === "imprimer"){ window.open("activites/" + a.f + ".pdf", "_blank"); return; }
+    /* Projeter : la visionneuse des plans (zoom, crayon) affiche le PDF */
+    let blob; try { blob = await pdfDe(a); } catch (er) { window.open("activites/" + a.f + ".pdf", "_blank"); return; }
+    ov.hidden = true; document.getElementById("planBtn").click();
+    setTimeout(async () => { try { await window.__plans.charger({ id:"activite-" + a.f, name:a.titre, type:"pdf", blob, used:Date.now() }); if (!document.getElementById("plEmpty").hidden) window.open("activites/" + a.f + ".pdf", "_blank"); } catch (er) { window.open("activites/" + a.f + ".pdf", "_blank"); } }, 80);
+  });
+  $("actBack").onclick = () => { ov.hidden = true; };
+  document.addEventListener("keydown", e => { if (!ov.hidden && e.key === "Escape") ov.hidden = true; });
+  $("actBtn").addEventListener("click", () => { dessiner(); ov.hidden = false; ov.scrollTop = 0; });
+  window.__activites = ACTIVITES;
+})();
+</script>
 <div class="plan-ov" id="planOv" hidden role="dialog" aria-label="Plans techniques">
   <div class="pl-stage" id="plStage">
     <div class="pl-world" id="plWorld" hidden><canvas id="plCanvas"></canvas><svg id="plInk" xmlns="http://www.w3.org/2000/svg"></svg></div>
@@ -8191,7 +8290,7 @@ window.addEventListener("online", () => { try { aviser("Internet est revenu."); 
   .acces-box input:focus,.acces-box textarea:focus{border-color:#8c8c92;box-shadow:0 0 0 3px rgba(229,9,20,.2)}
   .acces-box textarea{min-height:90px;font-family:ui-monospace,Consolas,monospace;font-size:.75rem;word-break:break-all}
   .acces-btns{display:flex;gap:8px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap}
-  .acces-btns button,.acces-box .abtn{border:1px solid #3a3a40;background:#232327;color:#f1f1f2;border-radius:10px;padding:9px 16px;font:600 .9rem inherit;font-family:inherit;cursor:pointer}
+  .acces-btns button,.acces-box .abtn{border:1px solid #3a3a40;background:#232327;color:#f1f1f2;border-radius:10px;padding:9px 16px;font-weight:600;font-size:.9rem;font-family:inherit;cursor:pointer}
   .acces-btns button.prim,.acces-box .abtn.prim{background:#f1f1f2;color:#111;border-color:#f1f1f2}
   .acces-btns button:disabled{opacity:.5;cursor:default}
   .acces-err{color:#ff8a80;font-size:.86rem;margin-top:10px}
@@ -8269,7 +8368,7 @@ window.addEventListener("online", () => { try { aviser("Internet est revenu."); 
   @keyframes sonne{0%,58%,100%{transform:rotate(0)}62%{transform:rotate(18deg)}68%{transform:rotate(-16deg)}74%{transform:rotate(12deg)}80%{transform:rotate(-8deg)}86%{transform:rotate(4deg)}}
   
   /* mode élève (compte de groupe) : seulement lire, crayon, texte, gomme, annuler */
-  body.eleve #planBtn,body.eleve #accueilBtn,body.eleve #wbBtn,body.eleve #quoiNeuf,body.eleve #adminBtn,body.eleve .hero-tag,
+  body.eleve #planBtn,body.eleve #actBtn,body.eleve #plusOv [data-plus="activites"],body.eleve #accueilBtn,body.eleve #wbBtn,body.eleve #quoiNeuf,body.eleve #adminBtn,body.eleve .hero-tag,
   body.eleve #plusOv [data-plus="plans"],body.eleve #plusOv [data-plus="accueil"],body.eleve #plusOv [data-plus="wb"],
   body.eleve #tbAns,body.eleve #tbWb,body.eleve #tbTimer,body.eleve #tbSpot,body.eleve #tbCache,body.eleve #tbLaser,body.eleve #tbNoir,body.eleve #tbMark,body.eleve #tbPin,body.eleve #tbPrint,body.eleve #tbQr,
   body.eleve #tdbPill,body.eleve #readerTdb,body.eleve #tbMore,body.eleve #tbHelp,body.eleve #penO,body.eleve #wbSch,body.eleve #objSch,
@@ -8277,7 +8376,7 @@ window.addEventListener("online", () => { try { aviser("Internet est revenu."); 
   body.eleve #tbAnim,body.eleve #tbZo,body.eleve #tbZv,body.eleve #tbZi,body.eleve #tbDbl,body.eleve #tbFs,
   body.eleve #penFold,body.eleve #penSide,body.eleve #penE,body.eleve #penFs,body.eleve #penPlus{display:none!important}
   /* outils réservés aux profs connectés (demande de Jeremy, 29 oct.) */
-  body:not(.connecte) #planBtn,body:not(.connecte) #accueilBtn,body:not(.connecte) #wbBtn,
+  body:not(.connecte) #planBtn,body:not(.connecte) #actBtn,body:not(.connecte) #plusOv [data-plus="activites"],body:not(.connecte) #accueilBtn,body:not(.connecte) #wbBtn,
   body:not(.connecte) #plusOv [data-plus="plans"],body:not(.connecte) #plusOv [data-plus="accueil"],body:not(.connecte) #plusOv [data-plus="wb"]{display:none!important}
   /* accueil 10 % plus petit sur ordinateur (demande de Jeremy, 29 oct.); livres, tableau blanc et cellulaire inchangés */
   @media (min-width:641px){header,#hero,#filtres,main#rows,footer{zoom:.9}}
@@ -8285,7 +8384,7 @@ window.addEventListener("online", () => { try { aviser("Internet est revenu."); 
   .prefs .lig{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid #26262b;flex-wrap:wrap}
   .prefs .lig>span{font-size:.92rem;color:#e4e4e7}
   .prefs .seg{display:inline-flex;flex-wrap:wrap;gap:4px}
-  .prefs .seg button{border:1px solid #3a3a40;background:#232327;color:#d4d4d8;border-radius:999px;padding:5px 11px;font:600 .8rem inherit;font-family:inherit;cursor:pointer}
+  .prefs .seg button{border:1px solid #3a3a40;background:#232327;color:#d4d4d8;border-radius:999px;padding:5px 11px;font-weight:600;font-size:.8rem;font-family:inherit;cursor:pointer}
   .prefs .seg button.on{background:#f1f1f2;color:#111;border-color:#f1f1f2}
   .prefs .rond{width:26px;height:26px;border-radius:50%;border:2px solid transparent;padding:0;cursor:pointer;box-shadow:inset 0 0 0 1px rgba(255,255,255,.15)}
   .prefs .rond.on{border-color:#fff;outline:2px solid rgba(255,255,255,.25)}
@@ -8813,7 +8912,7 @@ window.ACCES = (function(){
   window.dlgPrefs = () => { const ov = document.getElementById("accesOv"), B = document.getElementById("accesBox"); B.classList.remove("large"); ov.hidden = false; contenu(B); };
   if (window.ACCES && ACCES.pret) ACCES.pret.then(() => window.appliquerPrefs()).catch(() => {});
   /* filet de sécurité : si un de ces boutons est touché sans être connecté, on ouvre la connexion, puis l'outil */
-  document.addEventListener("click", e => { const b = e.target.closest && e.target.closest('#planBtn, #accueilBtn, #wbBtn'); if (!b || (window.ACCES && ACCES.session)) return;
+  document.addEventListener("click", e => { const b = e.target.closest && e.target.closest('#planBtn, #actBtn, #accueilBtn, #wbBtn'); if (!b || (window.ACCES && ACCES.session)) return;
     e.preventDefault(); e.stopImmediatePropagation(); if (window.ACCES) ACCES.dlgConnexion(() => b.click()); }, true);
 })();
 </script>

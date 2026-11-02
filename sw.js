@@ -12,7 +12,7 @@ self.addEventListener("activate", e => {
   e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim()));
 });
 
-const estFichierLourd = u => /\/(livres|plans)\//.test(u.pathname);
+const estFichierLourd = u => /\/(livres|plans|activites)\//.test(u.pathname);
 const estExterne = u => /(^|\.)(cdnjs\.cloudflare\.com|cdn\.jsdelivr\.net|unpkg\.com|fonts\.googleapis\.com|fonts\.gstatic\.com)$/.test(u.hostname);
 
 function avecDelai(p, ms) { return Promise.race([p, new Promise((_, r) => setTimeout(() => r(new Error("délai")), ms))]); }

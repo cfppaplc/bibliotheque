@@ -32,6 +32,7 @@
 | `accueil.html` | « Accueil de classe » / tableau de bord projeté (horloge, période, timeline, contenus à ouvrir). Ouvert dans un `<iframe>` par `index.html`, ou seul. |
 | `livres/*.html` | Un livre animé par fichier, autonome (images en base64). Nom du fichier = champ `fichier` dans `LIVRES`. |
 | `plans/` | Dossiers de plans techniques (PDF + image de secours), ouverts par la visionneuse de plans. |
+| `activites/` | PDF d'activités de Jeremy (`<f>.pdf` + `<f>.jpg` couverture 420 px), liste `ACTIVITES` dans le script « Activités » d'`index.html` (avant `#planOv`). |
 | `nouveautes.json`, `nouveautes/` | « Quoi de neuf » et ses mini-formations (voir README). |
 | `recherche.json` | Texte de chaque page de chaque livre (recherche plein texte). **Généré** par `outils/index_recherche.py`. |
 | `sw.js` | Service worker hors ligne : pages du site en réseau d'abord; livres et plans en copie d'abord (mise à jour en arrière-plan). |
@@ -127,6 +128,8 @@
 - **Fenêtre de bienvenue** (`#bienOv`, refaite le 30 oct. au style des fenêtres du compte) : en-tête `.bien-tete` (logo blanc, dégradé rouge), 3 étapes en cartes (Connecte-toi, Choisis un livre, Feuillette — ne pas parler des réponses dans le livre tant que Jeremy ne la dit pas terminée, demande du 30 oct.) avec icônes au trait (`span.bi`, apparition décalée), gros bouton `#bienCo` « Se connecter » (ferme et ouvre `ACCES.dlgConnexion`; devient « C'est parti » si déjà connecté), liens « Voir l'aide » (`#bienAide`) · « Plus tard » (`#bienOk`).
 - **Accès rapide au tableau blanc** : `#wbBtn` dans l'en-tête (a remplacé « A+ »; `#grosBtn` reste caché, utilisé par le menu Plus du cellulaire) → `ouvrirTableauBlanc()`.
   Sur `accueil.html` : `#b-wb` (touche B, visible seulement dans la bibliothèque) envoie `accueil-ouvrir {type:"tableau"}`; si le tableau blanc est déjà ouvert dessous, on y revient (`ouvrirDepuisTdb`), et `#b-wb` est caché au profit de « Revenir au tableau blanc ».
+
+- **Activités** (1er nov., « mes activités en PDF, sans les mêler aux livres de compétence ») : bouton `#actBtn` (à côté de Plans; caché hors connexion et pour les élèves, entrée « Activités » du menu Plus) → overlay `#actOv` (cartes `.act-carte`, filtres Programme/Type si > 1 valeur, versions claire et cellulaire). Données : tableau `ACTIVITES` `{f, titre, type, prog, comp, pages, desc}`; fichiers `activites/<f>.pdf` + `.jpg`. « Projeter » = ouvre la visionneuse des plans et appelle `__plans.charger` (repli : PDF dans un onglet si pdf.js échoue); « Imprimer » = PDF dans un onglet; « Télécharger » = lien download. Pas chiffré (comme les plans). Pas encore fait : lien depuis la fiche d'un livre, lien dans « Préparer le cours » du tableau de bord. Ajouter une activité : PDF + jpg (`pdftoppm -r 60 -f 1 -l 1 -jpeg`, 420 px) + une ligne, `nouveautes.json`, publier.
 
 ## Téléphone (≤ 640 px)
 - CSS dans le bloc « Téléphone (≤ 640 px) » de `index.html` : `.hbtns` cachés, barre d'onglets `#tabbar` en bas
