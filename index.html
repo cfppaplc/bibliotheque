@@ -6308,6 +6308,26 @@ initAdmin();
   .pl-hint{background:rgba(22,22,24,.94);border-color:#ffffff1f;border-radius:10px;font-weight:500;backdrop-filter:blur(12px)}
   .pl-open{border-radius:6px;padding:14px 30px;font-size:1.05rem}
   .pl-ex,.pl-rec{border-radius:8px;border-color:#2f2f33;background:#1b1b1d}
+  /* Accueil des plans, style bibliothèque (3 nov.) : bannière, puis rangées de cartes avec l'aperçu de chaque bâtiment */
+  .pl-empty{justify-content:flex-start;align-items:stretch;gap:0;padding:78px 0 40px;text-align:left;overflow-y:auto}
+  .pl-empty .pn-hero{padding:34px clamp(20px,5vw,64px) 26px;background:linear-gradient(180deg,rgba(229,9,20,.14),rgba(0,0,0,0) 85%)}
+  .pl-empty .pn-hero h2{display:flex;align-items:center;gap:14px;font-size:clamp(1.9rem,4vw,3rem);margin:0 0 8px;letter-spacing:-.01em}
+  .pl-empty .pn-hero p{margin:0 0 20px;max-width:560px}
+  .pn-btns{display:flex;flex-wrap:wrap;align-items:center;gap:16px}
+  .pn-btns .pl-drop{border:1px dashed #4a525c;border-radius:999px;padding:11px 22px;max-width:none;width:auto;font-size:.92rem}
+  .pn-row{padding:10px clamp(20px,5vw,64px) 18px}
+  .pn-t{margin:0 0 14px;padding-left:12px;border-left:4px solid var(--moi,#e50914);font:700 1.15rem "Segoe UI",Roboto,Arial,sans-serif;color:var(--pi)}
+  .pn-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:18px}
+  .pl-empty .pn-card{display:flex;flex-direction:column;justify-content:flex-start;align-self:start;padding:0;text-align:left;background:none;border:0;border-radius:10px;color:var(--pi);cursor:pointer;transition:transform .18s ease}
+  .pl-empty .pn-card:hover{transform:translateY(-4px) scale(1.03);border:0}
+  .pl-empty .pn-card:focus-visible{outline:3px solid #fff;outline-offset:3px}
+  .pn-img{position:relative;display:block;aspect-ratio:640/496;border-radius:10px;overflow:hidden;background:#fff;box-shadow:0 6px 18px rgba(0,0,0,.45)}
+  .pn-img img{display:block;width:100%;height:100%;object-fit:cover}
+  .pn-img i{position:absolute;left:8px;top:8px;font:700 .72rem "Segoe UI",Roboto,Arial,sans-serif;font-style:normal;letter-spacing:.03em;background:rgba(14,14,15,.86);color:#fff;border-radius:6px;padding:3px 8px}
+  .pn-card b{display:block;margin:10px 2px 0;font:700 1.02rem "Segoe UI",Roboto,Arial,sans-serif}
+  .pn-card small{display:block;margin:2px 2px 0;color:var(--pm);font-weight:400;font-size:.82rem}
+  .pn-row .pl-recents{justify-content:flex-start;max-width:none}
+  @media (max-width:640px){.pn-cards{grid-template-columns:repeat(2,1fr);gap:12px}.pl-empty{padding-top:70px}}
   .accueil-close{background:#1b1b1d;color:#e6e6e8;border:1px solid #2f2f33;border-radius:8px;height:40px;padding:0 14px;font:600 .9rem "Segoe UI",Roboto,Arial,sans-serif;opacity:.35;display:inline-flex;align-items:center;gap:6px}
   .accueil-close:hover,.accueil-close:focus-visible{background:#262629;opacity:1}
 </style>
@@ -6416,18 +6436,24 @@ initAdmin();
     <div class="pl-world" id="plWorld" hidden><canvas id="plCanvas"></canvas><svg id="plInk" xmlns="http://www.w3.org/2000/svg"></svg></div>
   </div>
   <div class="pl-empty" id="plEmpty">
-    <h2 style="display:flex;align-items:center;gap:14px"><svg viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3z"/><path d="M9 3v15M15 6v15"/></svg>Plans techniques</h2>
-    <p>Ouvre un plan pour le projeter, l'agrandir avec les doigts et l'annoter au tableau.</p>
-    <button class="pl-open" id="plOpenBig" type="button">Ouvrir un plan (PDF ou image)</button>
-    <div class="pl-drop">ou glisse un fichier ici</div>
-    <div class="pl-exs" aria-label="Dossiers de plans d'exercice">
-      <div class="pl-exs-t">Dossiers de plans d'exercice</div>
-      <button class="pl-ex" data-ex="1" type="button">Maison unifamiliale<small>Dossier 1 · 19 feuilles · moderne, 2 étages et sous-sol</small></button>
-      <button class="pl-ex" data-ex="2" type="button">Duplex jumelé<small>Dossier 2 · 11 feuilles · dalle sur sol, plinthes</small></button>
-      <button class="pl-ex" data-ex="3" type="button">Bâtiment commercial<small>Dossier 3 · 11 feuilles · acier, toit plat, unité de toit</small></button>
-      <button class="pl-ex" data-ex="4" type="button">Centre commercial<small>Dossier 4 · 13 feuilles · terrain en pente, nivellement, drainage, profils</small></button>
+    <div class="pn-hero">
+      <h2><svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3z"/><path d="M9 3v15M15 6v15"/></svg>Plans techniques</h2>
+      <p>Projette un plan, agrandis-le avec les doigts et annote-le au tableau.</p>
+      <div class="pn-btns"><button class="pl-open" id="plOpenBig" type="button">Ouvrir un plan (PDF ou image)</button><span class="pl-drop">ou glisse un fichier ici</span></div>
     </div>
-    <div class="pl-recents" id="plRecents"></div>
+    <section class="pn-row" aria-label="Dossiers de plans d'exercice">
+      <h3 class="pn-t">Dossiers de plans d'exercice</h3>
+      <div class="pn-cards">
+        <button class="pl-ex pn-card" data-ex="1" type="button"><span class="pn-img"><img src="plans/dossier-1-apercu.jpg" alt="" loading="lazy"><i>19 feuilles</i></span><b>Maison unifamiliale</b><small>Dossier 1 · moderne, 2 étages et sous-sol</small></button>
+        <button class="pl-ex pn-card" data-ex="2" type="button"><span class="pn-img"><img src="plans/dossier-2-apercu.jpg" alt="" loading="lazy"><i>11 feuilles</i></span><b>Duplex jumelé</b><small>Dossier 2 · dalle sur sol, plinthes</small></button>
+        <button class="pl-ex pn-card" data-ex="3" type="button"><span class="pn-img"><img src="plans/dossier-3-apercu.jpg" alt="" loading="lazy"><i>11 feuilles</i></span><b>Bâtiment commercial</b><small>Dossier 3 · acier, toit plat, unité de toit</small></button>
+        <button class="pl-ex pn-card" data-ex="4" type="button"><span class="pn-img"><img src="plans/dossier-4-apercu.jpg" alt="" loading="lazy"><i>13 feuilles</i></span><b>Centre commercial</b><small>Dossier 4 · terrain en pente, nivellement, drainage</small></button>
+      </div>
+    </section>
+    <section class="pn-row" id="plRecRow" hidden aria-label="Plans récents">
+      <h3 class="pn-t">Ouverts récemment</h3>
+      <div class="pl-recents" id="plRecents"></div>
+    </section>
   </div>
   <div class="pl-top">
     <button class="pl-btn" id="plClose" type="button" aria-label="Retour à la bibliothèque"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg><span class="pl-lbl">Bibliothèque</span></button>
@@ -6539,6 +6565,7 @@ initAdmin();
     $("plEmpty").hidden = false; world.hidden = true; $("plBar").hidden = true; $("plPages").hidden = true; $("plSepP").hidden = true; $("plTitle").textContent = "";
     const box = $("plRecents"); box.innerHTML = "";
     const all = ((await getAll()) || []).sort((a, b) => b.used - a.used).slice(0, 12);
+    $("plRecRow").hidden = !all.length;
     all.forEach(f => {
       const r = document.createElement("div"); r.className = "pl-rec";
       const b = document.createElement("button"); b.type = "button"; b.textContent = f.name;
