@@ -4307,12 +4307,12 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     g.clearRect(0, 0, W, H); g.drawImage(fond, 0, 0); drawStroke(g, cur, W, H, k); };
   /* crayon sur plan iso : le trait avance le long d'un axe de la grille et ne tourne (coin net) que lorsque la main quitte cette ligne */
   const suivreIso = e => { const r = rectToile(), k = r.width / (c.offsetWidth || r.width), a = 34 * RD.z * 1.2 * k, d = a * .8660254, X0 = [e.clientX - r.left, e.clientY - r.top];
-    const X = cur.lisse = cur.lisse ? [cur.lisse[0] * .35 + X0[0] * .65, cur.lisse[1] * .35 + X0[1] * .65] : X0;   /* (3 nov.) lissage plus léger : moins de retard */ /* main lissée : un tremblement ne fait pas tourner la ligne */
+    const X = cur.fin ? X0 : (cur.lisse = cur.lisse ? [cur.lisse[0] * .35 + X0[0] * .65, cur.lisse[1] * .35 + X0[1] * .65] : X0);   /* (3 nov.) lissage plus léger : moins de retard */ /* main lissée : un tremblement ne fait pas tourner la ligne */
     const AXES = [[d, a / 2], [-d, -a / 2], [-d, a / 2], [d, -a / 2], [0, a], [0, -a]];
     if (!cur.coins) cur.coins = [[cur.p[0][0] * r.width, cur.p[0][1] * r.height]];
     if (!cur.hist) cur.hist = []; cur.hist.push(X); if (cur.hist.length > 60) cur.hist.shift();
-    const elan = () => { for (let i = cur.hist.length - 2; i >= 0; i--){ const H0 = cur.hist[i]; if (Math.hypot(X[0] - H0[0], X[1] - H0[1]) >= 1.3 * a) return [X[0] - H0[0], X[1] - H0[1]]; } return null; };   /* direction réelle de la main sur le dernier pas */
-    const choisirAxe = C => { const Q = cur.quitte || C, v = [X[0] - Q[0], X[1] - Q[1]]; if (Math.hypot(v[0], v[1]) < (cur.quitte ? .6 : .75) * a) return null;   /* la nouvelle direction = le chemin de la main depuis l'endroit où elle a quitté la ligne */   /* nouvelle direction : choisie seulement quand la main s'est assez éloignée du coin */ let b = null; AXES.forEach(D => { const t = (v[0] * D[0] + v[1] * D[1]) / (a * a); if (!b || t > b[0]) b = [t, D]; }); return b[1]; };
+    const elan = () => { for (let i = cur.hist.length - 2; i >= 0; i--){ const H0 = cur.hist[i]; if (Math.hypot(X[0] - H0[0], X[1] - H0[1]) >= .7 * a) return [X[0] - H0[0], X[1] - H0[1]]; } return null; };   /* direction réelle de la main sur le dernier pas */
+    const choisirAxe = C => { const Q = cur.fin ? C : (cur.quitte || C), v = [X[0] - Q[0], X[1] - Q[1]]; if (Math.hypot(v[0], v[1]) < (cur.fin ? .5 : cur.quitte ? .3 : .4) * a) return null;   /* la nouvelle direction = le chemin de la main depuis l'endroit où elle a quitté la ligne */   /* nouvelle direction : choisie seulement quand la main s'est assez éloignée du coin */ let b = null; AXES.forEach(D => { if (cur.quitte && cur.axeAvant && Math.abs(D[0] - cur.axeAvant[0]) < 1e-6 && Math.abs(D[1] - cur.axeAvant[1]) < 1e-6) return;   /* un virage ne reprend pas l'ancienne direction */ const t = (v[0] * D[0] + v[1] * D[1]) / (a * a); if (!b || t > b[0]) b = [t, D]; }); return b[1]; };
     let bout = null, vif = null;   /* vif = bout affiché pendant le trait (suit le doigt sur l'axe); bout = accroché à la grille, gardé au relâchement */
     const versAxe = (C, D, tr) => [C[0] + Math.max(0, tr) * D[0], C[1] + Math.max(0, tr) * D[1]];
     for (let tour = 0; tour < 12; tour++){
@@ -4327,11 +4327,11 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
         cur.axe = D2; if (!D2){ bout = C; const Q = cur.quitte || C, w = [X0[0] - Q[0], X0[1] - Q[1]]; if (!cur.quitte && Math.hypot(w[0], w[1]) > .2 * a){ let b = null; AXES.forEach(D => { const t = (w[0] * D[0] + w[1] * D[1]) / (a * a); if (!b || t > b[0]) b = [t, D]; }); vif = versAxe(C, b[1], b[0]); } break; } cur.quitte = null; continue; }
       const D = cur.axe; if (!D){ bout = C; break; }
       const v = [X[0] - C[0], X[1] - C[1]], tr = (v[0] * D[0] + v[1] * D[1]) / (a * a), perp = Math.abs(v[0] * D[1] - v[1] * D[0]) / a, t = Math.max(0, Math.round(tr));
-      if (perp <= .6 * a && tr > -.5){ cur.trOn = tr; cur.trMax = cur.trMax === undefined || tr < cur.trMax - .9 ? tr : Math.max(cur.trMax, tr);   /* bout atteint (remis à jour si on recule vraiment d'un pas) */ bout = [C[0] + t * D[0], C[1] + t * D[1]]; vif = versAxe(C, D, (v[0] * D[0] + v[1] * D[1]) / (a * a) + ((X0[0] - X[0]) * D[0] + (X0[1] - X[1]) * D[1]) / (a * a)); break; }
+      if (perp <= .42 * a && tr > -.5){ cur.trOn = tr; cur.trMax = cur.trMax === undefined || tr < cur.trMax - .9 ? tr : Math.max(cur.trMax, tr);   /* bout atteint (remis à jour si on recule vraiment d'un pas) */ bout = [C[0] + t * D[0], C[1] + t * D[1]]; vif = versAxe(C, D, (v[0] * D[0] + v[1] * D[1]) / (a * a) + ((X0[0] - X[0]) * D[0] + (X0[1] - X[1]) * D[1]) / (a * a)); break; }
       if (tr > -.5){ const M = elan(); if (!M || Math.abs(M[0] * D[1] - M[1] * D[0]) / Math.hypot(M[0], M[1]) / a < .42 && M[0] * D[0] + M[1] * D[1] > 0){ bout = [C[0] + t * D[0], C[1] + t * D[1]]; vif = versAxe(C, D, tr); break; } }   /* la main dérive mais va encore dans le même sens : pas de coin (on garde la ligne voulue) */
       const tc = Math.max(0, Math.round(cur.trMax !== undefined ? cur.trMax : tr));          /* coin au bout atteint sur la ligne (la main recule un peu en tournant) */
       if (tc >= 1) cur.coins.push([C[0] + tc * D[0], C[1] + tc * D[1]]);                    /* la main a quitté la ligne : coin net, puis nouvel axe */
-      cur.axe = null; cur.trOn = cur.trMax = undefined; cur.quitte = X.slice(); }
+      cur.axeAvant = cur.axe; cur.axe = null; cur.trOn = cur.trMax = undefined; cur.quitte = X.slice(); }
     if (!bout) bout = cur.coins[cur.coins.length - 1];
     const P = cur.coins.concat([bout]).filter((q, i, v) => !i || Math.hypot(q[0] - v[i - 1][0], q[1] - v[i - 1][1]) > .5);
     /* (29 oct., demande de Jeremy) plus de « crochet » redressé : on garde exactement le chemin tracé */
@@ -4361,6 +4361,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
   ["pointerup", "pointercancel"].forEach(t => c.addEventListener(t, ev => {
     if (rafTrait){ cancelAnimationFrame(rafTrait); rafTrait = 0; }
     const tap = ev.type === "pointerup" ? ev : null;
+    if (cur && cur.iso && !cur.hl && !cur.t && tap){ cur.fin = true; try { suivreIso(tap); } catch (_) {} delete cur.fin; }   /* dernier calcul avec la vraie position de la main */
     if (cur && cur.iso && cur.pFin){ cur.p = cur.pFin; delete cur.pFin; }   /* plan iso : au relâchement, le bout s'accroche à la grille */
     if (cur && (cur.bouge || cur.poignee !== undefined) && !cur.snap){ const o = cur.bouge || cur.s; cur = null; redrawInk(); tapElement(o, tap); return; }
     if (cur && (cur.bouge || cur.poignee !== undefined)){ cur = null; redrawInk(); return; }
