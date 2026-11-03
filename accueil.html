@@ -908,7 +908,7 @@ function periods() {
 }
 // Durées typiques selon les mots du point (en minutes). "flex" = activité qui absorbe le temps restant.
 const RULES = [
-  [/accueil|présence|presence|prise des présences/i, 10],
+  [/accueil|présence|presence|prise des présences/i, 5],
   [/rangement|nettoyage|ranger/i, 15],
   [/bilan|conclusion|synthèse|retour sur la|récapitul/i, 10],
   [/retour sur|rappel|révision rapide/i, 15],
@@ -934,7 +934,7 @@ function points(text, ctx) {
     return m ? { d: +m[1], label: m[2].trim(), fixed: true } : { label: l.replace(/^\|\s*/, ""), fixed: false };
   }).filter(it => !/^pause\b/i.test(it.label) && !/^accueil\b|présences?\b/i.test(it.label));
   // L'accueil et la prise des présences ouvrent toujours la période (fixe, comme les pauses)
-  items.unshift({ d: 10, label: "Accueil et présences", fixed: true, locked: true });
+  items.unshift({ d: 5, label: "Accueil et présences", fixed: true, locked: true });
   const fixedSum = items.reduce((t, it) => t + (it.fixed ? it.d : 0), 0);
   const free = items.filter(it => !it.fixed);
   free.forEach(it => Object.assign(it, estimate(it.label)));
@@ -1686,7 +1686,7 @@ function renderDurs() {
     if (!opts.fixed) d.querySelector(".rz").style.visibility = "hidden";
     box.append(d); return d;
   };
-  row("Accueil et présences", 10, { locked: true });
+  row("Accueil et présences", 5, { locked: true });
   acts.forEach((a, k) => {
     const it = list[k + 1], mins = it ? it.b - it.a : 0;
     const d = row(a.label, mins, { fixed: a.fixed });
