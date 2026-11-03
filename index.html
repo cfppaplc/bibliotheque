@@ -3895,6 +3895,22 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
         else if (!C.includes(o.t) && C.includes(t)){ const m = [(a[0] + z[0]) / 2, (a[1] + z[1]) / 2], r = Math.max(Math.abs(z[0] - a[0]) * W, Math.abs(z[1] - a[1]) * H) / 2; o.p = [m, [m[0] + r / W, m[1]]]; }
         o.t = t; if (t === "bulle" && !o.n) o.n = strokes().filter(x => x.t === "bulle").length; redrawInk(); majObjUI(); return; }
       RD.formeK = RD.formeK === t ? null : t; SELO.s = null; redrawInk(); majObjUI(); }; });
+  /* (3 nov.) Plomberie : glisser une vignette jusqu'au tableau la pose (comme un clic à cet endroit, pour la maison, les appareils et les raccords) */
+  bar.querySelectorAll('[data-g="plomb"] [data-f]').forEach(b => { const t = b.dataset.f, oc = b.onclick; let g0 = null, fant = null;
+    b.style.touchAction = "pan-y"; b.onclick = ev => { if (b.dataset.glisse) return; oc.call(b, ev); };
+    b.addEventListener("pointerdown", e => { g0 = { x:e.clientX, y:e.clientY }; try { b.setPointerCapture(e.pointerId); } catch(er){} });
+    b.addEventListener("pointermove", e => { if (!g0) return;
+      if (!fant){ if (Math.hypot(e.clientX - g0.x, e.clientY - g0.y) < 10) return;
+        fant = document.createElement("div"); fant.style.cssText = "position:fixed;z-index:95;pointer-events:none;width:120px;height:64px;margin:-32px 0 0 -60px;border-radius:10px;background:rgba(255,255,255,.85);border:2px dashed #2a7bcf;box-shadow:0 8px 20px rgba(0,0,0,.3)";
+        const im = document.createElement("img"); im.src = b.querySelector("canvas").toDataURL(); im.style.cssText = "width:100%;height:100%"; fant.appendChild(im); document.body.appendChild(fant); }
+      fant.style.left = e.clientX + "px"; fant.style.top = e.clientY + "px"; });
+    const fin = e => { if (fant){ fant.remove(); fant = null; b.dataset.glisse = "1"; setTimeout(() => delete b.dataset.glisse, 300);
+        if (e.type === "pointerup"){ const c = $("#inkCanvas"), r = c.getBoundingClientRect(), bb = bar.getBoundingClientRect();
+          if (c && e.clientX > r.left && e.clientX < r.right && e.clientY > r.top && e.clientY < r.bottom && !(e.clientX >= bb.left && e.clientX <= bb.right && e.clientY >= bb.top && e.clientY <= bb.bottom)){
+            RD.formeK = t; SELO.s = null; majObjUI();
+            const o = { bubbles:true, cancelable:true, clientX:e.clientX, clientY:e.clientY, pointerId:9001, pointerType:"mouse", isPrimary:true, button:0 };
+            c.dispatchEvent(new PointerEvent("pointerdown", Object.assign({ buttons:1 }, o))); c.dispatchEvent(new PointerEvent("pointerup", Object.assign({ buttons:0 }, o))); } } } g0 = null; };
+    b.addEventListener("pointerup", fin); b.addEventListener("pointercancel", fin); });
   /* vignettes des objets isométriques : on dessine l'objet à petite échelle puis on le centre */
   bar.querySelectorAll(".ciso [data-k]").forEach(b => { const k = b.dataset.k, cv = b.querySelector("canvas"), g = cv.getContext("2d"), W = cv.width, H = cv.height;
     const z0 = RD.z, dpr = window.devicePixelRatio || 1;
@@ -4257,7 +4273,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
   };
   c.addEventListener("pointerdown", e => {
     if (!(RD.pen || RD.wb) || RD.sim) return;
-    c.setPointerCapture(e.pointerId);
+    try { c.setPointerCapture(e.pointerId); } catch(er){}
     if (RD.eraser){ cur = "erase"; eraseAt(pt(e)); return; }
     if (RD.crayonOff && !RD.text && !RD.obj){ e.preventDefault();                          /* aucun outil : rien ne se dessine, mais toucher une forme ou un objet le choisit */
       const r0 = c.getBoundingClientRect(), brut = [(e.clientX - r0.left) / r0.width, (e.clientY - r0.top) / r0.height], hit = (RD.wb ? objetSous(brut) : null) || formeSous(brut);
@@ -4627,7 +4643,7 @@ function togglePen(){ RD.pen = !RD.pen; if (RD.pen) RD.spot = false; refreshTool
 function toggleWb(){
   RD.wb = !RD.wb; if (RD.wb){ RD.spot = false; RD.crayonOff = true; RD.eraser = false; RD.text = false; RD.obj = false; RD.formeK = null; RD.objKi = null; RD.objKe = null; try { SELO.s = null; } catch(e){} setTimeout(() => { try { aviser("Aucun outil choisi : touche le crayon pour écrire, ou touche une forme pour la choisir.", 3500); } catch(e){} }, 400); }   /* chaque ouverture : aucun outil choisi */
   const st = $("#rstage"); $("#reader").classList.toggle("wbon", !!RD.wb);
-  if (RD.wb){ RD.z = 1; sizeInner(); st.scrollLeft = (st.scrollWidth - st.clientWidth) / 2; st.scrollTop = (st.scrollHeight - st.clientHeight) / 2; }
+  if (RD.wb){ RD.z = zMin(); /* tableau blanc : toujours dézoomé à l'ouverture */ sizeInner(); st.scrollLeft = (st.scrollWidth - st.clientWidth) / 2; st.scrollTop = (st.scrollHeight - st.clientHeight) / 2; }
   else { RD.z = Math.max(1, RD.z); sizeInner(); st.scrollLeft = RD.mx || 0; st.scrollTop = RD.my || 0; }
   refreshTools();
 }
@@ -5281,7 +5297,8 @@ function ouvrirContenu(c){
 }
 /* retour au tableau de bord quand on ferme les plans */
 document.addEventListener("DOMContentLoaded", () => { const ov = document.getElementById("planOv"); if (!ov) return;
-  new MutationObserver(() => { if (ov.hidden && window.RETOUR_ACCUEIL){ window.RETOUR_ACCUEIL = false; try { window.ouvrirAccueil(); } catch(e){} } }).observe(ov, { attributes:true, attributeFilter:["hidden"] }); });
+  new MutationObserver(() => { if (ov.hidden && window.RETOUR_ACTIVITES){ window.RETOUR_ACTIVITES = false; try { document.getElementById("actBtn").click(); } catch(e){} }
+    if (ov.hidden && window.RETOUR_ACCUEIL){ window.RETOUR_ACCUEIL = false; try { window.ouvrirAccueil(); } catch(e){} } }).observe(ov, { attributes:true, attributeFilter:["hidden"] }); });
 /* version du livre (champ « version » de LIVRES) et date de la dernière mise à jour connue (Quoi de neuf) */
 function versionLivre(l){ const e = (typeof NOUV !== "undefined" ? NOUV : []).filter(n => n.livre === l.fichier && n.date).sort((a, b) => b.date.localeCompare(a.date))[0];
   const v = l.version ? "Version " + l.version : "", d = e ? (e.type === "ajout" ? "ajouté le " : "mis à jour le ") + dateFr(e.date) : "";
@@ -6375,7 +6392,7 @@ initAdmin();
     if (b.dataset.a === "imprimer"){ window.open("activites/" + a.f + ".pdf", "_blank"); return; }
     /* Projeter : la visionneuse des plans (zoom, crayon) affiche le PDF */
     let blob; try { blob = await pdfDe(a); } catch (er) { window.open("activites/" + a.f + ".pdf", "_blank"); return; }
-    ov.hidden = true; document.getElementById("planBtn").click();
+    ov.hidden = true; window.RETOUR_ACTIVITES = true; document.getElementById("planBtn").click();   /* le bouton Retour du plan revient à la liste des activités */
     setTimeout(async () => { try { await window.__plans.charger({ id:"activite-" + a.f, name:a.titre, type:"pdf", blob, used:Date.now() }); if (!document.getElementById("plEmpty").hidden) window.open("activites/" + a.f + ".pdf", "_blank"); } catch (er) { window.open("activites/" + a.f + ".pdf", "_blank"); } }, 80);
   });
   $("actBack").onclick = () => { ov.hidden = true; };
@@ -6849,10 +6866,10 @@ initAdmin();
     plan = null; $("plMenu").hidden = true; showEmpty();
   }
   const majRetour = () => { const accueil = !$("plEmpty").hidden, b = $("plClose");
-    b.querySelector(".pl-lbl").textContent = accueil ? "Bibliothèque" : "Tous les plans";
-    b.setAttribute("aria-label", accueil ? "Retour à la bibliothèque" : "Retour à l'accueil des plans"); b.title = b.getAttribute("aria-label"); };
+    b.querySelector(".pl-lbl").textContent = accueil ? "Bibliothèque" : window.RETOUR_ACTIVITES ? "Activités" : "Tous les plans";
+    b.setAttribute("aria-label", accueil ? "Retour à la bibliothèque" : window.RETOUR_ACTIVITES ? "Retour aux activités" : "Retour à l'accueil des plans"); b.title = b.getAttribute("aria-label"); };
   new MutationObserver(majRetour).observe($("plEmpty"), { attributes:true, attributeFilter:["hidden"] }); majRetour();
-  $("plClose").onclick = () => { if ($("plEmpty").hidden && plan) retourPlans(); else fermer(); };
+  $("plClose").onclick = () => { if ($("plEmpty").hidden && plan && !window.RETOUR_ACTIVITES) retourPlans(); else fermer(); };
   document.addEventListener("keydown", e => {
     if (ov.hidden) return;
     if (!$("plDlg").hidden) { if (e.key === "Escape") $("plCalNo").click(); return; }

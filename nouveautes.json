@@ -1,6 +1,6 @@
 [
   {
-    "date": "2026-11-01",
+    "date": "2026-11-03",
     "type": "outil",
     "titre": "Activités (cahiers et suivis en PDF)",
     "texte": "Une section à part pour tes activités en PDF, séparée des livres de compétence. Premier cahier : Montages en circuit fermé.",
@@ -17,6 +17,10 @@
       "« Imprimer » l'ouvre dans un onglet prêt à imprimer; « Télécharger » garde le PDF."
     ],
     "versions": [
+      {
+        "date": "2026-11-03",
+        "texte": "Le bouton Retour d'une activité projetée revient à la liste des activités."
+      },
       {
         "date": "2026-11-01",
         "texte": "Nouvelle section Activités avec le cahier Montages en circuit fermé (66 pages)."
@@ -290,6 +294,10 @@
     "versions": [
       {
         "date": "2026-11-03",
+        "texte": "Le tableau blanc s'ouvre toujours dézoomé (tout le tableau visible)."
+      },
+      {
+        "date": "2026-11-03",
         "texte": "Palette Objets : les explications (en bas de la palette et dans le message du haut) sont plus courtes."
       },
       {
@@ -299,10 +307,6 @@
       {
         "date": "2026-10-29",
         "texte": "Menu du crayon plus compact (3 lignes, sans les mots) et nouveau bouton « Autre couleur » qui montre ta dernière couleur choisie."
-      },
-      {
-        "date": "2026-10-29",
-        "texte": "Crayon : le premier trait se dessine dès le premier toucher (le menu des couleurs se ferme en même temps)."
       }
     ]
   },
@@ -403,7 +407,7 @@
     ]
   },
   {
-    "date": "2026-10-28",
+    "date": "2026-11-03",
     "type": "outil",
     "titre": "Tableau blanc : plomberie en coupe",
     "texte": "Une maison en coupe avec ses tuyaux (EF, EC, drain, évent, gaz) et ses appareils à l'échelle.",
@@ -416,6 +420,10 @@
       "Trace un tuyau près d'un point de raccord (bleu EF, rouge EC, vert drain) : il s'y branche. Double-clic sur un tuyau pour écrire son diamètre."
     ],
     "versions": [
+      {
+        "date": "2026-11-03",
+        "texte": "Plomberie : on peut glisser la maison, les appareils et les raccords de la palette jusqu'au tableau."
+      },
       {
         "date": "2026-10-28",
         "texte": "Maison en coupe détaillée, appareils à l'échelle posés sur le plancher, tuyaux branchés aux bons raccords."
@@ -547,6 +555,10 @@
     "versions": [
       {
         "date": "2026-11-03",
+        "texte": "Préparer le cours : glisser pour sélectionner du texte et relâcher dehors ne ferme plus la fenêtre."
+      },
+      {
+        "date": "2026-11-03",
         "texte": "« Accueil et présences » dure maintenant 5 min (avant : 10) au début de la période."
       },
       {
@@ -556,10 +568,6 @@
       {
         "date": "2026-10-30",
         "texte": "Fenêtres du tableau de bord (Préparer le cours, Réglages, menus, aperçu) au même look que la bibliothèque, claires ou foncées selon ton choix."
-      },
-      {
-        "date": "2026-10-30",
-        "texte": "« Aperçu du cours » dans Préparer le cours : le tableau de ce cours avant, au début, au milieu et à la fin."
       }
     ]
   },

@@ -1748,7 +1748,9 @@ document.addEventListener("click", e => { if (!$("menu").hidden && !e.target.clo
 $("b-set").addEventListener("click", closeMenu); $("b-wid").addEventListener("click", closeMenu);
 $("b-keys").onclick = () => { closeMenu(); $("keys").hidden = false; };
 $("b-keys-close").onclick = () => $("keys").hidden = true;
-$("keys").addEventListener("click", e => { if (e.target.id === "keys") $("keys").hidden = true; });
+/* fermer en touchant le fond — seulement si le clic a AUSSI commencé sur le fond (glisser pour sélectionner du texte et relâcher dehors ne ferme plus) */
+function fermerSurFond(id){ const el = $(id); let dedans = false; el.addEventListener("pointerdown", e => { dedans = e.target === el; }); el.addEventListener("click", e => { if (e.target === el && dedans) el.hidden = true; dedans = false; }); }
+fermerSurFond("keys");
 $("b-set").onclick = openSettings;
 function fillComps(prog) {
   const sel = $("f-comp"); sel.innerHTML = "";
@@ -2145,7 +2147,7 @@ function openPrep() {
   demanderCatalogue();
 }
 $("b-prep-cancel").onclick = () => $("prep").hidden = true;
-$("prep").addEventListener("click", e => { if (e.target.id === "prep") $("prep").hidden = true; });
+fermerSurFond("prep");
 $("f-comp").addEventListener("change", () => { $("f-module").hidden = $("f-comp").value !== "autre"; });
 $("prepForm").addEventListener("submit", e => {
   e.preventDefault();
@@ -2169,7 +2171,7 @@ $("form").addEventListener("submit", e => {
   cfg.ppe = [...$("f-ppe").querySelectorAll("input:checked")].map(i => i.value);
   save(); renderStatic(); tick(); fitSoon(); $("sheet").hidden = true;
 });
-$("sheet").addEventListener("click", e => { if (e.target.id === "sheet") $("sheet").hidden = true; });
+fermerSurFond("sheet");
 /* Aperçu du cours : le tableau dans un cadre, au jour et à l'heure du cours, avec le contenu du formulaire (pas encore enregistré) */
 const MOMENTS = [["avant", "Avant le cours"], ["debut", "Début"], ["milieu", "Milieu"], ["fin", "Fin"]];
 let momentApercu = "debut";
