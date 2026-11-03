@@ -1751,7 +1751,7 @@ function brancherSouris(win){
   doc.addEventListener("mouseleave", () => { $("#laser").hidden = true; });
   /* page simple : le cadre est rogné à la page, donc le zoom propre au livre (C9, M11…) ne montrerait qu'une bande; la bibliothèque zoome elle-même */
   win.addEventListener("wheel", e => {
-    if ((!RD.single && !win.__incendie) || RD.wb || e.shiftKey || (RD.drv && RD.drv.defile) || win.frameElement !== $("#readerFrame")) return;   /* protection incendie : toujours le zoom de la bibliothèque, comme les autres livres */
+    if ((!RD.single && !win.__incendie) || RD.wb || e.shiftKey || (RD.drv && RD.drv.defile) || (win.frameElement !== $("#readerFrame") && win.frameElement !== $("#readerFrame2"))) return;   /* protection incendie : toujours le zoom de la bibliothèque, comme les autres livres */
     e.preventDefault(); e.stopImmediatePropagation(); zoomSouris(e, win.frameElement); }, { capture:true, passive:false });
   if (win.__incendie){ const d = win.document, zv = d.getElementById("zv");   /* protection incendie : son zoom à lui (double-clic, deux doigts) est annulé aussitôt; seul le zoom de la bibliothèque reste */
     if (zv && win.MutationObserver) new win.MutationObserver(() => { if (d.body.classList.contains("zoomed")) zv.click(); }).observe(d.body, { attributes:true, attributeFilter:["class"] }); }
@@ -1793,6 +1793,7 @@ function setupSecond(){
     const win = f2.contentWindow, doc = f2.contentDocument;
     if (!doc || !doc.body) return;
     RD.drv2 = buildDriver(win, doc); hookKeys(win); try { verrouEleve(win, doc); } catch(e){}
+    try { brancherSouris(win); } catch(e){}   /* (3 nov.) double page : la roulette, le glisser et la roulette enfoncée marchent aussi sur la page de droite (avant : la page défilait au lieu de zoomer) */
     try { installAnim(win, doc); } catch(e){}
     try { win.dispatchEvent(new Event("resize")); } catch(e){}
     syncSecond(); setTimeout(layoutDbl, 400);
