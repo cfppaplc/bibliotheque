@@ -1688,7 +1688,7 @@ function pasDefilement(){
   PAN.raf = requestAnimationFrame(pasDefilement);
 }
 const ZS = { d:0, px:0, py:0, raf:0 };
-function zoomSouris(e, frame){
+function zoomSouris(e, frame){ ZS.t = Date.now();
   const st = $("#rstage"), sr = st.getBoundingClientRect(), fr = frame ? frame.getBoundingClientRect() : sr;
   ZS.px = (frame ? fr.left + e.clientX : e.clientX) - sr.left; ZS.py = (frame ? fr.top + e.clientY : e.clientY) - sr.top;
   ZS.d += Math.max(-40, Math.min(40, e.deltaY * (e.deltaMode === 1 ? 33 : 1)));
@@ -1699,8 +1699,9 @@ function zoomSourisPas(){
   const K = RD.wb ? WBK : 1, cx = (st.scrollLeft + px - (RD.mx || 0)) / (RD.z * K), cy = (st.scrollTop + py - (RD.my || 0)) / (RD.z * K);
   const z = Math.max(zMin(), Math.min(zMax(), RD.z * Math.exp(-d * .0075)));
   if (Math.abs(z - RD.z) < .002) return;
-  PAN.alvo = null; setZoom(z);
+  PAN.alvo = null; setZoom(z, true);
   st.scrollLeft = cx * RD.z * K + (RD.mx || 0) - px; st.scrollTop = cy * RD.z * K + (RD.my || 0) - py;
+  clearTimeout(ZS.fin); ZS.fin = setTimeout(() => { try { sizeInner(); } catch(e){} }, 160);   /* la roulette s'arrête : toile et dessin remis nets */
 }
 function majCurseur(){
   const c = RD.laser ? "none" : (RD.z > 1 && !outilActif() ? "grab" : "");
@@ -2058,7 +2059,7 @@ function appliquerPad(){
     f.style.top = pad ? pad.t + "px" : ""; f.style.height = pad ? "calc(100% + " + pad.h + "px)" : "";
   });
 }
-function sizeInner(){
+function sizeInner(rapide){   /* rapide = pendant la roulette : on agrandit seulement l'affichage; la toile du crayon est refaite à la fin (sinon 20 ms par cran) */
   appliquerPad(); try { majFond(); } catch(e){}
   const st = $("#rstage"), inn = $("#rinner"), c = $("#inkCanvas");
   const w = st.clientWidth, h = st.clientHeight, dpr = window.devicePixelRatio || 1;
@@ -2066,18 +2067,18 @@ function sizeInner(){
   const fz = RD.wb ? 0 : Math.max(0, Math.min(1, (RD.z - 1) / .5));                 /* livre zoomé : marge autour pour pouvoir amener un bord au milieu */
   RD.mx = Math.round(w * .4 * fz); RD.my = Math.round(h * .4 * fz); inn.style.margin = RD.my + "px " + RD.mx + "px";
   inn.style.width = (w * RD.z * K) + "px"; inn.style.height = (h * RD.z * K) + "px";
-  c.width = Math.round(w * RD.z * K * dpr); c.height = Math.round(h * RD.z * K * dpr);
+  if (!rapide){ c.width = Math.round(w * RD.z * K * dpr); c.height = Math.round(h * RD.z * K * dpr); }
   c.style.width = (w * RD.z * K) + "px"; c.style.height = (h * RD.z * K) + "px";
   $("#tbZv").textContent = Math.round(RD.z * 100) + "%"; $("#wbZv").textContent = Math.round(RD.z * 100) + "%";
   layoutDbl();
   majCurseur();
-  redrawInk();
+  if (!rapide) redrawInk();
 }
 const WBK = 2, zMin = () => RD.wb ? .5 : 1, zMax = () => RD.wb ? 2 : 3;
-function setZoom(z){
+function setZoom(z, rapide){
   const st = $("#rstage"), inn = $("#rinner"), ow = inn.offsetWidth || 1, oh = inn.offsetHeight || 1;
   const fx = (st.scrollLeft + st.clientWidth / 2 - (RD.mx || 0)) / ow, fy = (st.scrollTop + st.clientHeight / 2 - (RD.my || 0)) / oh;
-  RD.z = Math.max(zMin(), Math.min(zMax(), z)); sizeInner();
+  RD.z = Math.max(zMin(), Math.min(zMax(), z)); sizeInner(rapide);
   st.scrollLeft = fx * inn.offsetWidth + RD.mx - st.clientWidth / 2; st.scrollTop = fy * inn.offsetHeight + RD.my - st.clientHeight / 2;   /* on zoome vers le centre de ce qu'on regarde (avant : vers le coin en haut à gauche, ce qui donnait un effet de rognage) */
 }
 /* en page simple, le premier cran du zoom est « pleine largeur » : la page remplit toute la largeur de l'écran */
@@ -4756,7 +4757,8 @@ function dessinerMenu(){
   }));
 }
 function closeMenu(garderAide){ $("#noir").hidden = true; $("#mmenu").hidden = true; if (garderAide !== true) $("#help").hidden = true; }
-function turn(dir){ RD.bouge = true;
+function turn(dir){ if (Date.now() - (ZS.t || 0) < 350) return;   /* pendant et juste après un zoom à la roulette, aucune page ne se tourne */
+  RD.bouge = true;
   if (RD.wb){ wbAller(dir); return; }
   if (!RD.drv) return;
   if (ansPas(dir)){ setTimeout(poll, 60); return; }
