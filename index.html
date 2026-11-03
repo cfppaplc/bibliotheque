@@ -5162,7 +5162,7 @@ $("#penE").onclick = () => { RD.eraser = !RD.eraser; if (RD.eraser){ RD.text = f
 })();
 $("#penO").onclick = () => { RD.obj = !RD.obj; if (RD.obj){ RD.text = false; RD.eraser = false; RD.objTab = null; RD.formeK = null; RD.objKi = null; RD.objKe = null; SELO.s = null; }
   refreshTools();
-  if (RD.obj) aviser(modeElec() ? "Schéma en échelle : 1) « Échelle L1 / L2 » et glisse pour tracer les rails. 2) Choisis un symbole et clique sur un échelon. 3) Pour relier : pars d'un point bleu et glisse jusqu'à l'autre point bleu." : RD.objTab === "iso" ? "Touche un objet pour le choisir, double-clic pour le nommer. Pour en poser un : choisis-le dans la palette, puis clique sur la grille." : "Touche une forme pour la choisir, double-clic pour écrire sa valeur. Pour en ajouter : choisis une forme dans la palette, puis glisse. Clic à côté : plus rien de choisi.", modeElec() ? 10000 : 0); };
+  if (RD.obj) aviser(modeElec() ? "Échelle L1 / L2 : trace les rails, pose un symbole sur un échelon, relie les points bleus." : RD.objTab === "iso" ? "Touche un objet pour le choisir. Double-clic : le nommer." : "Touche une forme pour la choisir. Double-clic : écrire sa valeur.", modeElec() ? 10000 : 0); };
 $("#penT").onclick = () => { RD.text = !RD.text; if (RD.text){ RD.eraser = false; RD.obj = false; } refreshTools(); if (RD.text) aviser("Touche le tableau (ou dessine un rectangle), puis écris. Entrée = nouvelle ligne; touche à côté pour terminer."); };
 $("#wbZo").onclick = zout; $("#wbZi").onclick = zin; $("#penU").onclick = undoInk; $("#penR").onclick = redoInk;
 $("#penC").onclick = () => { if (!strokes().length) return; snapInk(); INKS[inkKey()] = []; redrawInk(); };
