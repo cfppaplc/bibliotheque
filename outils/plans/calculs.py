@@ -44,7 +44,7 @@ def feuille_plafond(self, c, numero=None, nom_niveau=None):
         if len(txt) * 5 * .5 * 25.4 / 72 * f.N > (x1 - x0) * .92: txt = f"{nom.replace(chr(10), ' ')}\nH {fmt(getattr(self, 'hc', 2700))}"      # deux lignes si le local est étroit
         f.texte((x0 + x1) / 2, y0 + 380 * k + (140 * k if "\n" in txt else 0), txt, 5, False, "c", GRIS)
         if nom.lower() in getattr(self, "detecteurs", []):
-            f.cercle(x0 + 450 * k, y1 - 450 * k, 130 * k, .6, ELEC, fill=white); f.texte(x0 + 450 * k, y1 - 450 * k - 30 * k, "DF", 4.5, True, "c", ELEC)
+            f.cercle(x0 + 450 * k, y1 - 450 * k, 105 * k, .5, ELEC, fill=white); f.texte(x0 + 450 * k, y1 - 450 * k - 30 * k, "DF", 3.8, True, "c", ELEC)
     cv = getattr(self, "cvca", {}) or {}
     for (x, y, lab, *_r) in cv.get("diffuseurs", []):
         r = 200 * k

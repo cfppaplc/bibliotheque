@@ -951,13 +951,13 @@ class Batiment:
             # interrupteur près de la porte
             sw = self._inter_pos(x0, y0, x1, y1)
             if sw:
-                f.texte(sw[0], sw[1], "S", 6.5, True, col=ELEC)
+                f.texte(sw[0], sw[1], "S", 5.2, True, col=ELEC)
                 f.c.setStrokeColor(ELEC); f.c.setLineWidth(.4); f.c.setDash(2, 2)
                 p1 = f.P(sw[0], sw[1] + 120 * k); p2 = f.P(*lums[0])
                 p = f.c.beginPath(); p.moveTo(*p1); p.curveTo(p1[0], (p1[1] + p2[1]) / 2, (p1[0] + p2[0]) / 2, p2[1], *p2); f.c.drawPath(p); f.c.setDash(); f.c.setStrokeColor(black)
             if nom.lower() in self.detecteurs:
                 ddx, ddy = min(900 * k, (x1 - x0) * .3), min(700 * k, (y1 - y0) * .3)
-                f.cercle(lx + ddx, ly - ddy, 170 * k, .6, ELEC, fill=white); f.texte(lx + ddx, ly - ddy, "DF", 4.8, True, col=ELEC)
+                f.cercle(lx + ddx, ly - ddy, 115 * k, .5, ELEC, fill=white); f.texte(lx + ddx, ly - ddy, "DF", 3.8, True, col=ELEC)
             circuits.append((no_circ, f"Prises et éclairage — {nom}".replace("\n", " "), "15 A", "1 × 15 A")); no_circ += 1
         # panneau
         pans = self.panneaux if hasattr(self, "panneaux") else [(*self.panneau, self.panneau_txt, getattr(self, "panneau_lab", None))]
@@ -968,7 +968,7 @@ class Batiment:
         for sp in self.prises_speciales:
             txt, pt, puiss = sp[:3]; dy = sp[3] if len(sp) > 3 else 330
             x, y = pt
-            f.cercle(x, y, 170 * k, .8, ELEC, fill=white); f.ligne(x - 170 * k, y, x + 170 * k, y, .6, ELEC); (f.texte(x, y + dy * k, txt, 5.2, True, col=ELEC) if dy is not None else None)
+            f.cercle(x, y, 115 * k, .6, ELEC, fill=white); f.ligne(x - 115 * k, y, x + 115 * k, y, .5, ELEC); (f.texte(x, y + dy * k, txt, 5.2, True, col=ELEC) if dy is not None else None)
             circuits.append((no_circ, txt, puiss, (("3 × " if "3 ph" in puiss else "2 × ") + puiss.split()[0] + " A") if any(v in puiss for v in ("240", "208", "600")) else "1 × " + puiss.split()[0] + " A")); no_circ += 1
         f.nord(DRAW[2] - 16, DRAW[3] - 18)
         f.titre_vue(DRAW[0] + 4, DRAW[1] + 6, 1, "PLAN D'ÉLECTRICITÉ", f"1:{self.Nplan}")
@@ -1011,12 +1011,12 @@ class Batiment:
     def _prise(self, f, x, y, rot, col):
         k = f.N / 50
         T = lambda a, b: tuple(v + o for v, o in zip(rotp(a, b, rot), (x, y)))
-        f.cercle(*T(0, 170 * k), 110 * k, .6, col, fill=white)
-        f.ligne(*T(-60 * k, 40 * k), *T(-60 * k, 300 * k), .5, col); f.ligne(*T(60 * k, 40 * k), *T(60 * k, 300 * k), .5, col)
+        f.cercle(*T(0, 120 * k), 75 * k, .5, col, fill=white)
+        f.ligne(*T(-42 * k, 30 * k), *T(-42 * k, 210 * k), .4, col); f.ligne(*T(42 * k, 30 * k), *T(42 * k, 210 * k), .4, col)
 
     def _lum(self, f, x, y):
-        k = f.N / 50; r = 220 * k
-        f.cercle(x, y, r, .7, ELEC, fill=white); f.ligne(x - r * .7, y - r * .7, x + r * .7, y + r * .7, .5, ELEC); f.ligne(x - r * .7, y + r * .7, x + r * .7, y - r * .7, .5, ELEC)
+        k = f.N / 50; r = 140 * k
+        f.cercle(x, y, r, .55, ELEC, fill=white); f.ligne(x - r * .7, y - r * .7, x + r * .7, y + r * .7, .4, ELEC); f.ligne(x - r * .7, y + r * .7, x + r * .7, y - r * .7, .4, ELEC)
 
     def _inter_pos(self, x0, y0, x1, y1):
         for o in self.portes:
