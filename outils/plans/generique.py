@@ -129,7 +129,7 @@ def feuille_finis(self, c):
     parts = [rows[i:i + par_col] for i in range(0, len(rows), par_col)] or [[]]
     y = 258
     for p in parts:
-        y = f.tableau(DRAW[0] + 4, y, "TABLEAU DES LOCAUX ET DES FINIS" if p is parts[0] else "SUITE", entetes, p, larg, h=h, size=size) - 10
+        y = f.tableau(DRAW[0] + 4, y, "TABLEAU DES LOCAUX ET DES FINIS" if p is parts[0] else "SUITE", entetes, p, larg, h=h, size=size, remplir=(30 if len(parts) == 1 else None)) - 10
     tot = sum(float(r[3].replace(",", ".")) for r in rows)
     f.vue(0, 0, 1)
     f.texte(DRAW[0] + 4, max(y + 6, 22), "Superficie totale des locaux : " + f"{tot:.1f}".replace(".", ",") + " m² (surfaces entre les faces intérieures des murs)", 7.5, True, "g")

@@ -250,8 +250,16 @@ class Feuille:
             self.bulle_grille(x_min - ext * k - 180 * k, y, str(j + 1))
 
     # ---------- tableaux (nomenclatures) ----------
-    def tableau(self, x_mm, y_mm, titre, entetes, lignes, largeurs, h=4.6, size=6.6):
+    def tableau(self, x_mm, y_mm, titre, entetes, lignes, largeurs, h=4.6, size=6.6, remplir=None):
+        """remplir = y minimal (mm) : agrandit lignes, texte et largeurs pour occuper la feuille (sans dépasser)."""
         c = self.c
+        if remplir is not None:
+            n = len(lignes) + 1
+            h2 = min(h * 2.0, (y_mm - remplir) / n)
+            if h2 > h:
+                size = size * min(h2 / h, 1.7, 1.3) ** .85; h = h2
+            k = min(318.0 / sum(largeurs), 1.3)
+            largeurs = [w * k for w in largeurs]
         W = sum(largeurs)
         c.setFont(FONT_B, 8.5); c.drawString(x_mm * MM, (y_mm + 2) * MM, titre)
         y = y_mm
@@ -259,14 +267,16 @@ class Feuille:
         xx = x_mm
         c.setFont(FONT_B, size)
         for e, w in zip(entetes, largeurs):
-            c.drawString((xx + 1.2) * MM, (y - h + 1.4) * MM, e); xx += w
+            c.drawString((xx + 1.2) * MM, (y - h / 2 - size * .125) * MM, e); xx += w
         y -= h
         c.setFont(FONT, size)
         for row in lignes:
             xx = x_mm
             c.setLineWidth(.3); c.rect(x_mm * MM, (y - h) * MM, W * MM, h * MM)
             for v, w in zip(row, largeurs):
-                c.drawString((xx + 1.2) * MM, (y - h + 1.4) * MM, str(v)); xx += w
+                t = str(v); sz = size
+                while sz > 4.6 and c.stringWidth(t, FONT, sz) > (w - 2.0) * MM: sz -= .2
+                c.setFont(FONT, sz); c.drawString((xx + 1.2) * MM, (y - h / 2 - sz * .125) * MM, t); xx += w
             y -= h
         xx = x_mm
         for w in largeurs[:-1]:

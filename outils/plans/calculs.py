@@ -111,7 +111,7 @@ def feuille_code(self, c):
         ligne("Isolation du toit", "R-50 minimum", "R-60")
     ligne("Fenestration (accès aux pompiers)", "Une ouverture libre par étage vers l'extérieur", "Plusieurs fenêtres et portes sur chaque façade")
     f.vue(0, 0, 1)
-    f.tableau(DRAW[0] + 4, 255, "ANALYSE SIMPLIFIÉE DU CODE DE CONSTRUCTION DU QUÉBEC (valeurs d'exercice)", ["Sujet", "Exigence", "Dans le projet", "Résultat"], rows, [74, 108, 92, 28], h=6, size=7)
+    f.tableau(DRAW[0] + 4, 255, "ANALYSE SIMPLIFIÉE DU CODE DE CONSTRUCTION DU QUÉBEC (valeurs d'exercice)", ["Sujet", "Exigence", "Dans le projet", "Résultat"], rows, [74, 108, 92, 28], h=6, size=7, remplir=40)
     f.notes("NOTES", ["Cette analyse est un exercice : les exigences sont simplifiées.", "Un projet réel se fait avec le code en vigueur et avec le professionnel concerné.",
                       "« À vérifier » signifie que la valeur calculée ne respecte pas l'exigence simplifiée, ou qu'elle n'a pas été calculée.", "Sources à consulter : Code de construction du Québec, chapitre I (Bâtiment) et chapitre III (Plomberie)."])
     c.showPage()
@@ -161,7 +161,7 @@ def feuille_bilan(self, c):
     niv = _lv_liste(self)
     rows = [[n, e, f"{fmt(w)} W"] for (n, e, w) in charges] + [["TOTAL", "", f"{fmt(total)} W ({_kw(total)} kW)"]]
     f.vue(0, 0, 1)
-    y = f.tableau(DRAW[0] + 4, 255, "BILAN DE CHARGE (VALEURS D'EXERCICE)", ["Charge", "Base de calcul", "Puissance"], rows, [88, 108, 40], h=5.6, size=7)
+    y = f.tableau(DRAW[0] + 4, 255, "BILAN DE CHARGE (VALEURS D'EXERCICE)", ["Charge", "Base de calcul", "Puissance"], rows, [88, 108, 40], h=5.6, size=7, remplir=110)
     f.texte(DRAW[0] + 4, y - 9, f"Courant calculé : {amp:.0f} A à {tension}  →  entrée de service retenue : {serv} A", 8.5, True, "g")
     # panneau : circuits par local
     circ = []

@@ -6328,12 +6328,15 @@ initAdmin();
   .pn-card b{display:block;margin:10px 2px 0;font:700 1.05rem "Segoe UI",Roboto,Arial,sans-serif}
   .pn-card small{display:block;margin:2px 2px 0;color:var(--pm);font-weight:400;font-size:.82rem}
   .pn-row .pl-recents{justify-content:flex-start;max-width:none}
-  .pn-exol{display:grid;grid-template-columns:auto auto auto auto;gap:8px 14px;justify-content:start;align-items:center;font-size:.95rem}
+  .pn-exol{display:grid;grid-template-columns:auto repeat(5,auto);gap:8px 12px;justify-content:start;align-items:center;font-size:.95rem}
+  .pn-exol b{font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;opacity:.65;padding-bottom:2px;border-bottom:1px solid rgba(128,128,128,.4)}
+  .pn-exol b.g3{grid-column:span 3}.pn-exol b.g2{grid-column:span 2}
+  @media (max-width:700px){.pn-exol{grid-template-columns:auto auto auto;gap:6px 8px;font-size:.85rem}.pn-exol b.g3,.pn-exol b.g2{grid-column:1/-1;margin-top:8px}.pn-exol span:empty{display:none}}
   .pn-exol span{font-weight:600}
   .pn-exol a{padding:6px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.25);color:inherit;text-decoration:none;text-align:center}
   .pn-exol a.corr{border-color:#2ea043;color:#56d364}
   .pn-exol a:hover{background:rgba(255,255,255,.1)}
-  .pn-exon{opacity:.7;font-size:.85rem;margin:10px 0 0}
+  .pn-exon{opacity:.7;font-size:.85rem;margin:18px 0 0}
   body.clair .pn-exol a{border-color:rgba(0,0,0,.25)} body.clair .pn-exol a.corr{color:#1a7f37;border-color:#1a7f37} body.clair .pn-exol a:hover{background:rgba(0,0,0,.06)}
   /* Plans en accueil clair (3 nov., « l'onglet Plans doit suivre le ton clair du site ») : mêmes couleurs que les fenêtres claires de la bibliothèque */
   body.clair .plan-ov{--pb:#f5f3ef;--pp:#ffffff;--pl:#e3e0da;--pi:#1d1d1f;--pm:#6b6b70}
@@ -6496,25 +6499,16 @@ initAdmin();
       </div>
     </section>
     <section class="pn-row pn-exo" aria-label="Exercices et corrigés">
-      <h3 class="pn-t">Exercices de lecture de plans</h3>
+      <h3 class="pn-t">Exercices pour les élèves</h3>
       <div class="pn-exol">
-        <span>Dossier 1</span><a href="plans/dossier-1-exercices.pdf" target="_blank" rel="noopener">Exercices</a><a class="corr" href="plans/dossier-1-corrige.pdf" target="_blank" rel="noopener">Corrigé</a><a href="plans/dossier-1-montage.pdf" target="_blank" rel="noopener">Fiches de montage</a>
-        <span>Dossier 2</span><a href="plans/dossier-2-exercices.pdf" target="_blank" rel="noopener">Exercices</a><a class="corr" href="plans/dossier-2-corrige.pdf" target="_blank" rel="noopener">Corrigé</a><a href="plans/dossier-2-montage.pdf" target="_blank" rel="noopener">Fiches de montage</a>
-        <span>Dossier 3</span><a href="plans/dossier-3-exercices.pdf" target="_blank" rel="noopener">Exercices</a><a class="corr" href="plans/dossier-3-corrige.pdf" target="_blank" rel="noopener">Corrigé</a><a href="plans/dossier-3-montage.pdf" target="_blank" rel="noopener">Fiches de montage</a>
-        <span>Dossier 4</span><a href="plans/dossier-4-exercices.pdf" target="_blank" rel="noopener">Exercices</a><a class="corr" href="plans/dossier-4-corrige.pdf" target="_blank" rel="noopener">Corrigé</a><a href="plans/dossier-4-montage.pdf" target="_blank" rel="noopener">Fiches de montage</a>
+        <span></span><b class="g3">Lecture de plans</b><b class="g2">Mesure à l'échelle</b>
+        <span>Dossier 1</span><a href="plans/dossier-1-exercices.pdf" target="_blank" rel="noopener">Exercices</a><a class="corr" href="plans/dossier-1-corrige.pdf" target="_blank" rel="noopener">Corrigé</a><a href="plans/dossier-1-montage.pdf" target="_blank" rel="noopener">Fiches de montage</a><a href="plans/dossier-1-echelle.pdf" target="_blank" rel="noopener">Exercices</a><a class="corr" href="plans/dossier-1-echelle-corrige.pdf" target="_blank" rel="noopener">Corrigé</a>
+        <span>Dossier 2</span><a href="plans/dossier-2-exercices.pdf" target="_blank" rel="noopener">Exercices</a><a class="corr" href="plans/dossier-2-corrige.pdf" target="_blank" rel="noopener">Corrigé</a><a href="plans/dossier-2-montage.pdf" target="_blank" rel="noopener">Fiches de montage</a><a href="plans/dossier-2-echelle.pdf" target="_blank" rel="noopener">Exercices</a><a class="corr" href="plans/dossier-2-echelle-corrige.pdf" target="_blank" rel="noopener">Corrigé</a>
+        <span>Dossier 3</span><a href="plans/dossier-3-exercices.pdf" target="_blank" rel="noopener">Exercices</a><a class="corr" href="plans/dossier-3-corrige.pdf" target="_blank" rel="noopener">Corrigé</a><a href="plans/dossier-3-montage.pdf" target="_blank" rel="noopener">Fiches de montage</a><a href="plans/dossier-3-echelle.pdf" target="_blank" rel="noopener">Exercices</a><a class="corr" href="plans/dossier-3-echelle-corrige.pdf" target="_blank" rel="noopener">Corrigé</a>
+        <span>Dossier 4</span><a href="plans/dossier-4-exercices.pdf" target="_blank" rel="noopener">Exercices</a><a class="corr" href="plans/dossier-4-corrige.pdf" target="_blank" rel="noopener">Corrigé</a><a href="plans/dossier-4-montage.pdf" target="_blank" rel="noopener">Fiches de montage</a><a href="plans/dossier-4-echelle.pdf" target="_blank" rel="noopener">Exercices</a><a class="corr" href="plans/dossier-4-echelle-corrige.pdf" target="_blank" rel="noopener">Corrigé</a>
+        <span>Dossier 5</span><i></i><i></i><i></i><a href="plans/dossier-5-echelle.pdf" target="_blank" rel="noopener">Exercices</a><a class="corr" href="plans/dossier-5-echelle-corrige.pdf" target="_blank" rel="noopener">Corrigé</a>
       </div>
-      <p class="pn-exon">Environ 20 questions par dossier, calculées sur les plans. Imprime la feuille d'exercices pour tes élèves; le corrigé indique où trouver chaque réponse. Les fiches de montage décrivent, pour chaque détail du dossier, les outils, les étapes et les erreurs fréquentes.</p>
-    </section>
-    <section class="pn-row pn-exo" aria-label="Exercices de mesure à l'échelle">
-      <h3 class="pn-t">Exercices de mesure à l'échelle</h3>
-      <div class="pn-exol">
-        <span>Dossier 1</span><a href="plans/dossier-1-echelle.pdf" target="_blank" rel="noopener">Exercices</a><a class="corr" href="plans/dossier-1-echelle-corrige.pdf" target="_blank" rel="noopener">Corrigé</a><span></span>
-        <span>Dossier 2</span><a href="plans/dossier-2-echelle.pdf" target="_blank" rel="noopener">Exercices</a><a class="corr" href="plans/dossier-2-echelle-corrige.pdf" target="_blank" rel="noopener">Corrigé</a><span></span>
-        <span>Dossier 3</span><a href="plans/dossier-3-echelle.pdf" target="_blank" rel="noopener">Exercices</a><a class="corr" href="plans/dossier-3-echelle-corrige.pdf" target="_blank" rel="noopener">Corrigé</a><span></span>
-        <span>Dossier 4</span><a href="plans/dossier-4-echelle.pdf" target="_blank" rel="noopener">Exercices</a><a class="corr" href="plans/dossier-4-echelle-corrige.pdf" target="_blank" rel="noopener">Corrigé</a><span></span>
-        <span>Dossier 5</span><a href="plans/dossier-5-echelle.pdf" target="_blank" rel="noopener">Exercices</a><a class="corr" href="plans/dossier-5-echelle-corrige.pdf" target="_blank" rel="noopener">Corrigé</a><span></span>
-      </div>
-      <p class="pn-exon">Pour l'échelimètre métrique : imprime les plans à 100 % (papier 11 × 17 po) et vérifie le trait de contrôle de 100 mm en bas de chaque feuille. Les échelles utilisées sont toutes lues par l'échelimètre (1:20, 1:25, 1:50, 1:75, 1:100, 1:125, 1:200, 1:250, 1:500, 1:1000).</p>
+      <p class="pn-exon"><strong>Lecture de plans</strong> : environ 20 questions par dossier, calculées sur les plans; le corrigé indique où trouver chaque réponse; les fiches de montage décrivent outils, étapes et erreurs fréquentes. <strong>Mesure à l'échelle</strong> : pour l'échelimètre métrique, imprime à 100 % (papier 11 × 17 po) et vérifie le trait de contrôle de 100 mm en bas de chaque feuille (échelles 1:20 à 1:1000).</p>
     </section>
     <section class="pn-row" id="plRecRow" hidden aria-label="Plans récents">
       <h3 class="pn-t">Ouverts récemment</h3>
