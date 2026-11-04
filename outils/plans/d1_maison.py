@@ -2,12 +2,17 @@
 """Dossier 1 — Maison unifamiliale contemporaine : toits monopentes décalés à grands débords, 2 étages et sous-sol (2026)."""
 from etages import *
 
-W, D, t = 11000, 8500, 300
+# Maison de grand standing : le plan de base (11 000 × 8 500) est étiré par X() et Y() après sa définition (voir « agrandir » plus bas).
+# Devant (y <= 4 400) et cage d'escalier (x <= 3 700) gardent leur taille; le reste est étiré de 50 %.
+KX = KY = 1.5; XB, YB = 3700, 4400
+def X(x): return x if x <= XB else XB + (x - XB) * KX
+def Y(y): return y if y <= YB else YB + (y - YB) * KY
+W, D, t = round(X(10700)) + 300, round(Y(8200)) + 300, 300
 S, N, O, E = t / 2, D - t / 2, t / 2, W - t / 2
 EP = 300                                   # planchers : solives en I 302 + contreplaqué
 ZSS, ZP1, ZP2 = -2100, 600, 3640           # dessus des planchers : sous-sol (dalle), rez-de-chaussée, étage
 ZT, EPT, ZPAR = 6600, 350, 8500            # toit : dessus de la structure au point bas, épaisseur, hauteur max. (bandeau du versant haut)
-XR = 6300                                  # limite entre les deux monopentes (bande vitrée)
+XR = round(X(6300))                                  # limite entre les deux monopentes (bande vitrée)
 XE0, XE1 = 2450, 3650                      # cage d'escalier (axes des murs)
 dossier = dict(projet="MAISON UNIFAMILIALE\nDOSSIER 1", adresse="125, rue des Érables\nVille fictive (Québec)", date="Octobre 2026", code="D1")
 
@@ -19,8 +24,8 @@ types_fen = {
     "E": dict(h=600, allege=1650, ouv="Coulissante (sous-sol)", verre="Double, faible émissivité"),
     "F": dict(h=1100, allege=1050, ouv="Battant — issue (margelle)", verre="Double, faible émissivité"),
 }
-commun = dict(dossier=dossier, W=W, D=D, t=t, types_fen=types_fen, Nplan=50, comptoirs=[], decal_etiq={}, cotes_interieures=[],
-              coupes=[(3050, -1250, "A", "e"), (3050, D + 1250, "A", "e")], coupe_long=dict(y=6900, N=75, lettre="B"),
+commun = dict(dossier=dossier, W=W, D=D, t=t, types_fen=types_fen, Nplan=75, comptoirs=[], decal_etiq={}, cotes_interieures=[],
+              coupes=[(3050, -1250, "A", "e"), (3050, D + 1250, "A", "e")], coupe_long=dict(y=round(Y(6900)), N=100, lettre="B"),
               sans_elec=[], dense_prises={}, lum_pos={}, prises_speciales=[], panneaux=[])
 EF_, EC_ = EF, EC
 
@@ -158,15 +163,53 @@ et = niveau(commun, no_plan="A-103", titre_plan="PLAN DE L'ÉTAGE", no_plomb="P-
     notes_cvca=["Colonne d'alimentation montant du sous-sol dans le mur de l'escalier.", "Un diffuseur sous chaque fenêtre de chambre.", "VRC : extraction des deux salles de bain et de la buanderie."],
 )
 
+# ---- étirement du plan de base (toutes les coordonnées écrites plus haut sont celles de la maison de 11 × 8,5 m)
+def P(p): return (round(X(p[0])), round(Y(p[1])))
+def PL(l): return [P(p) for p in l]
+def agrandir(lv):
+    if getattr(lv, "murs_int", None): lv.murs_int = [(round(X(a)), round(Y(b)), round(X(c)), round(Y(e)), w) for (a, b, c, e, w) in lv.murs_int]
+    for o in lv.portes + lv.fenetres:
+        if o["at"] in (S, N, O, E): o["s"] = round(X(o["s"]) if o["axe"] == "h" else Y(o["s"]))
+        elif o["axe"] == "h": o["at"], o["s"] = round(Y(o["at"])), round(X(o["s"]))
+        else: o["at"], o["s"] = round(X(o["at"])), round(Y(o["s"]))
+    lv.locaux = [(no, nm, round(X(a)), round(Y(b)), round(X(c)), round(Y(e))) for (no, nm, a, b, c, e) in lv.locaux]
+    lv.app = [(k, round(X(x)), round(Y(y)), r) for (k, x, y, r) in lv.app]
+    lv.comptoirs = [(round(X(a)), round(Y(b)), round(X(c)), round(Y(e)), lab) for (a, b, c, e, lab) in lv.comptoirs]
+    lv.cotes_interieures = [((round(X(a)), round(X(b)), round(Y(p)), o) if o == "h" else (round(Y(a)), round(Y(b)), round(X(p)), o)) for (a, b, p, o) in lv.cotes_interieures]
+    pl = getattr(lv, "plomb", None)
+    if pl:
+        for r in pl["reseaux"]:
+            for k in ("coll", "chutes", "ef", "ec", "sortie"):
+                if k in r: r[k] = PL(r[k])
+            if "compteur" in r: r["compteur"] = P(r["compteur"])
+        pl["etiq"] = [(txt, *P((x, y)), col, al) for (txt, x, y, col, al) in pl["etiq"]]
+    lv.prises_speciales = [(lab, P(p), sp, off) for (lab, p, sp, off) in lv.prises_speciales]
+    lv.panneaux = [(*P((x, y)), r, lab, P(lp)) for (x, y, r, lab, lp) in lv.panneaux]
+    cv = getattr(lv, "cvca", None)
+    if cv:
+        cv["gaines"] = [(PL(p), w, lab) for (p, w, lab) in cv.get("gaines", [])]
+        cv["diffuseurs"] = [(*P((x, y)), lab, fl) for (x, y, lab, fl) in cv.get("diffuseurs", [])]
+        cv["retours"] = [(*P((x, y)), lab) for (x, y, lab) in cv.get("retours", [])]
+        cv["equipements"] = [(*P((a, b)), *P((c, e)), lab) for (a, b, c, e, lab) in cv.get("equipements", [])]
+        cv["lignes"] = [(PL(p), col, lab) for (p, col, lab) in cv.get("lignes", [])]
+        cv["vrc"] = [(PL(p), lab) for (p, lab) in cv.get("vrc", [])]
+    if getattr(lv, "poutres", None): lv.poutres = [(*P((a, b)), *P((c, e)), lab) for (a, b, c, e, lab) in lv.poutres]
+    if getattr(lv, "poteaux", None): lv.poteaux = [(*P((x, y)), s_, lab) for (x, y, s_, lab) in lv.poteaux]
+    if getattr(lv, "cotes_fond", None): lv.cotes_fond = [((round(X(a)), round(X(b)), round(Y(p)), o) if o == "h" else (round(Y(a)), round(Y(b)), round(X(p)), o)) for (a, b, p, o) in lv.cotes_fond]
+    if getattr(lv, "axes_fond", None): lv.axes_fond = [round(X(a)) for a in lv.axes_fond]
+    if getattr(lv, "etiq_fond", None): lv.etiq_fond = [(lab, *P((x, y))) for (lab, x, y) in lv.etiq_fond]
+    lv.Nfond = 100
+for _lv in (ss, rdc, et): agrandir(_lv)
+
 maison = MaisonEtages(
     dossier=dossier, nom_court="Maison unifamiliale", W=W, D=D, t=t, lv=[ss, rdc, et], types_fen=types_fen,
-    description="Maison unifamiliale contemporaine de deux étages avec sous-sol aménagé : deux toits monopentes décalés à grands débords (900 mm) séparés par une bande vitrée, pierre naturelle à l'entrée, zinc prépatiné et cèdre brûlé, "
+    description="Grande maison unifamiliale de haut standing, deux étages et sous-sol aménagé (environ 14,5 × 10,4 m) : deux toits monopentes décalés à grands débords (900 mm) séparés par une bande vitrée, pierre naturelle à l'entrée, zinc prépatiné et cèdre brûlé, "
                 "grandes fenêtres au sud. Rez-de-chaussée à aire ouverte, quatre chambres, trois salles de bain ou salles d'eau. "
                 "Chauffage par air pulsé (fournaise électrique et thermopompe), ventilation par VRC.",
     ep=EP, zt=ZT, ep_toit=EPT, zpar=ZPAR, toit_plans=[(0, XR, 6600, 7000), (XR, W, 7700, 8100)], debord=900, fascia=350, z_sol=0, z_semelle=-2600, t_fond=250,
-    chutes=[(2450, 4300), (7950, 7900)], no_iso="P-104",
+    chutes=PL([(2450, 4300), (7950, 7900)]), no_iso="P-104",
     niveaux=[("Sol", "± 0", 0), ("Sous-sol", "– 2 100", ZSS), ("RDC", "+ 600", ZP1), ("Étage", "+ 3 640", ZP2), ("Toit bas", "+ 6 600", ZT), ("Haut du versant bas", "+ 7 000", 7000), ("Toit haut", "+ 8 100", 8100)],
-    volumes={"S": [(0, 2700, "pierre"), (2700, XR, "zinc"), (XR, 11000, "bois_brule")], "N": [(0, XR, "zinc"), (XR, 11000, "bois_brule")], "E": [(0, 8500, "pierre")], "O": [(0, 8500, "zinc")]},
+    volumes={"S": [(0, 2700, "pierre"), (2700, XR, "zinc"), (XR, W, "bois_brule")], "N": [(0, XR, "zinc"), (XR, W, "bois_brule")], "E": [(0, D, "pierre")], "O": [(0, D, "zinc")]},
     marquises={"S": [(300, 2700, ZP1 + 2600)]},
     etiq_elev={"S": [("Pierre naturelle (entrée)", 0.1, 5300, 300, 1500),
                      ("Marquise d'acier", 0.15, ZP1 + 2700, 3200, 400), ("Béton apparent, crépi", 0.6, 200, 300, -900)],
@@ -174,7 +217,7 @@ maison = MaisonEtages(
     notes_elev=["Revêtements : pierre naturelle (entrée et mur est), zinc prépatiné à joints debout (versant bas), cèdre brûlé (volume haut).",
                 "Marquise d'acier en porte-à-faux au-dessus de l'entrée.", "Deux toits monopentes décalés (pente d'environ 4 %) : débords de 900, bandeau d'aluminium noir; bande vitrée haute entre les deux versants (vue sur l'élévation ouest).",
                 "Fenêtres à cadre noir, verre triple. Hexagones : types de fenêtres, voir A-301.", "Fenêtres du sous-sol : margelles galvanisées (en tirets)."],
-    Ncoupe=75, Nmur=50, Nelev=105, coupe_A_x=3050, coupe_B_y=6900,
+    Ncoupe=75, Nmur=50, Nelev=125, coupe_A_x=3050, coupe_B_y=round(Y(6900)),
     volees=[(XE0, XE1, 1300, 4300, ZSS, ZP1), (XE0, XE1, 1300, 4300, ZP1, ZP2)],
     couches_mur=[("Zinc à joints debout 1 sur membrane (fourrures 19)", 8, "vinyle"), ("Fourrures 19 × 64 (lame d'air)", 19, "vide"), ("Isolant rigide 50 (R-10)", 50, "isolant_rigide"),
                  ("Panneau OSB 11", 11, "panneau"), ("Montants 38 × 140 à 400 c/c et laine R-24", 140, "laine"), ("Pare-vapeur (polyéthylène 0,15)", 0, "membrane"), ("Gypse 12,7", 13, "gypse")],
@@ -183,17 +226,17 @@ maison = MaisonEtages(
                   "M2 — Cloison : gypse 12,7 deux faces, montants 38 × 89 à 400 c/c (laine insonorisante autour des salles de bain).",
                   "P1 — Plancher : contreplaqué 19 collé-vissé, solives en I 302 à 400 c/c.", "D1 — Dalle du sous-sol : béton 100, isolant rigide 50, pierre 200.",
                   "F1 — Fondation : mur de béton 250, isolant rigide 50 extérieur, semelle 650 × 250, drain français."],
-    site=dict(N=200, echelle_txt="1:200", lot=(18000, 33000), pos=(3500, 7600), rue=1500, nom_rue="Rue des Érables", lot_no="4 123 456",
-              pavages=[(15400, 0, 17700, 13000, "ALLÉE\nASPHALTE"), (4300, 0, 5400, 7600, ""), (5500, 16100, 13500, 19300, "TERRASSE")],
-              services_x=1500, elec=(3500 + 1500, 7600), pluvial=False,
-              arbres=[(1800, 25000, 1800), (14500, 28500, 2200), (9000, 30000, 1500)],
-              niveaux=[(300, 300, "124,80"), (17700, 300, "124,65"), (300, 32700, "125,40"), (17700, 32700, "125,25"), (3500 + 6100, 7600 + 8500 + 800, "125,10")],
+    site=dict(N=250, echelle_txt="1:250", lot=(26000, 38000), pos=(4500, 8500), rue=1500, nom_rue="Rue des Érables", lot_no="4 123 456",
+              pavages=[(W + 6600, 0, W + 9600, 15000, "ALLÉE\nASPHALTE"), (5300, 0, 6400, 8500, ""), (7000, 8500 + D, W - 500, 8500 + D + 3300, "TERRASSE")],
+              services_x=1500, elec=(4500 + 1500, 8500), pluvial=False,
+              arbres=[(2200, 31000, 1900), (W + 4000, 33000, 2300), (11000, 35000, 1600)],
+              niveaux=[(300, 300, "124,80"), (25700, 300, "124,65"), (300, 37700, "125,40"), (25700, 37700, "125,25"), (4500 + W // 2, 8500 + D + 800, "125,10")],
               notes=["Implantation à confirmer par un arpenteur-géomètre.", "Marge avant minimale : 7,5 m. Marges latérales : 2,0 m.",
                      "Niveaux du terrain en mètres (altitude géodésique).", "Pente du terrain fini : 2 % minimum en s'éloignant du bâtiment."]),
     donnees=[["Usage", "Habitation unifamiliale"], ["Étages", "2 + sous-sol aménagé"], ["Emprise au sol", f"{str(round(W * D / 1e6, 1)).replace('.', ',')} m²"],
              ["Superficie habitable", f"{str(round(3 * (W - 600) * (D - 600) / 1e6)).replace('.', ',')} m² (3 niveaux)"],
              ["Structure", "Ossature de bois, solives en I, fondation de béton"], ["Toiture", "Deux monopentes décalés, membrane élastomère, débords 900"], ["Chauffage", "Air pulsé + thermopompe, VRC"],
-             ["Eau et égout", "Réseaux municipaux"], ["Lot", "18 000 × 33 000"]],
+             ["Eau et égout", "Réseaux municipaux"], ["Lot", "26 000 × 38 000"]],
 )
 
 if __name__ == "__main__":
