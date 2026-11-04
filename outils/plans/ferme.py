@@ -184,7 +184,7 @@ class Ferme:
         c_.setFont(FONT, 10.5)
         for l in wrap("Ferme laitière moderne de 120 vaches en lactation : étable à stabulation libre de 66 m × 29 m, 120 logettes, deux robots de traite, racleurs de fumier et repousse-fourrage automatiques, "
                       "abreuvoirs, ventilateurs de grand diamètre, rideaux latéraux et faîtière ouverte. Bloc de service (laiterie, bureau, machines) et aile des veaux entre deux couloirs d'alimentation traversants : le tracteur et la mélangeuse passent d'un bout à l'autre. "
-                      "Enclos libres au sud, fosse à lisier, silos-couloirs et hangar à machinerie. Structure d'acier, murets de béton, toit à deux versants avec panneaux solaires.", 95):
+                      "Enclos libres au sud, fosse à lisier, silos-couloirs, trois silos-tours et hangar à machinerie. Structure d'acier, murets de béton, toit à deux versants avec panneaux solaires.", 95):
             c_.drawString(24 * MM, yy * MM, l); yy -= 5.2
         lignes = [["000", "Page de garde et liste des feuilles"], ["A-001", "Légende, symboles et abréviations"], ["A-100", "Plan d'implantation de la ferme"], ["A-101", "Plan de l'étable"], ["A-201", "Élévations"],
                   ["A-301", "Coupe transversale de l'étable"], ["S-101", "Plan des fondations"], ["P-101", "Plan d'eau, de drainage et de laiterie"], ["P-102", "Abreuvoir à niveau constant : détails"], ["P-103", "Alimentation en eau des abreuvoirs (schéma)"],
@@ -237,7 +237,12 @@ class Ferme:
         f.texte(170000, 101500, "FOSSE À LISIER", 6, True); f.texte(170000, 97500, "Ø 30 m · 4 000 m³", 5.5)
         f.rect(60000, 118000, 120000, 138000, .8, fill=HexColor("#e6d9a6")); f.ligne(90000, 118000, 90000, 138000, .5)
         f.texte(75000, 128000, "SILO-COULOIR 1", 6, True); f.texte(105000, 128000, "SILO-COULOIR 2", 6, True)
-        f.cercle(140000, 125000, 3500, 1.0, black, fill=white); f.texte(140000, 119500, "Silo à grain Ø 7 m", 5, col=GRIS)
+        f.rect(136000, 117000, 172000, 133000, .4, fill=GRV)
+        for k, xs in enumerate((142000, 154000, 166000)):
+            f.cercle(xs, 125000, 4000, 1.2, black, fill=white); f.cercle(xs, 125000, 3500, .5, black); f.ligne(xs - 4000, 125000, xs + 4000, 125000, .3, GRIS); f.ligne(xs, 121000, xs, 129000, .3, GRIS)
+            f.texte(xs, 130500, f"S{k + 1}", 5.5, True)
+        f.texte(154000, 136500, "SILOS-TOURS S1 à S3 · Ø 8 m × 24 m", 5.5, True)
+        f.ligne(138000, 125000, 130000, 125000, .8, VERT, dash=[4, 2])
         f.cercle(48000, 28000, 600, .8, EF, fill=EF); f.texte(51000, 27000, "Puits", 5, col=EF)
         f.ligne(44000, 28000, 44000, 36000, 1.0, EF, dash=[4, 3])
         f.ligne(bx + W, by + 14500, 170000, 100000 - 15000, 1.0, HexColor("#555"), dash=[5, 3]); f.texte(bx + W + 12000, by + 6000, "Conduite de lisier", 5, col=GRIS)
