@@ -42,6 +42,15 @@ class MaisonEtages(Batiment):
     zt = dessus de la structure du toit, ep_toit, zpar = dessus du parapet, ep = épaisseur des planchers de bois."""
 
     # ------------------------------------------------------------------ utilitaires
+    def roof(self, x):
+        """Dessus de la structure du toit à l'abscisse x (monopentes décalés : liste toit_plans = [(x0, x1, z à x0, z à x1)])."""
+        tp = getattr(self, "toit_plans", None)
+        if not tp: return self.zt
+        p = tp[0]
+        for q in tp:
+            if x >= q[0]: p = q
+        return p[2] + (p[3] - p[2]) * (x - p[0]) / (p[1] - p[0])
+
     def z_haut(self, i):
         """Dessous de la structure au-dessus du niveau i."""
         return self.lv[i + 1].zf - self.ep if i + 1 < len(self.lv) else self.zt - self.ep_toit
@@ -49,6 +58,22 @@ class MaisonEtages(Batiment):
     def _pan(self, f, x0, x1, z0, z1, mat):
         if mat == "anthracite": BatimentModerne._panneaux(self, f, x0, x1, z0, z1, pas_x=1200, pas_z=1000)
         elif mat == "bois": BatimentModerne._bois(self, f, x0, x1, z0, z1)
+        elif mat == "zinc":            # zinc prépatiné à joints debout
+            f.rect(x0, z0, x1, z1, .6, fill=HexColor("#a7b1b3"))
+            x = x0 + 500
+            while x < x1 - 1: f.ligne(x, z0, x, z1, .3, HexColor("#6f7a7d")); f.ligne(x + 25, z0, x + 25, z1, .15, white); x += 500
+        elif mat == "bois_brule":      # cèdre brûlé (shou sugi ban), planches verticales
+            f.rect(x0, z0, x1, z1, .6, fill=HexColor("#2c2724"))
+            x = x0 + 150
+            while x < x1 - 1: f.ligne(x, z0, x, z1, .18, HexColor("#4a423c")); x += 150
+        elif mat == "pierre":          # pierre naturelle en assises irrégulières
+            f.rect(x0, z0, x1, z1, .6, fill=HexColor("#b9b1a4"))
+            z = z0 + 280; k = 0
+            while z < z1 - 1:
+                f.ligne(x0, z, x1, z, .25, HexColor("#7d766b"))
+                x = x0 + 150 * (k % 4) + 200
+                while x < x1 - 1: f.ligne(x, z - 280, x, z, .25, HexColor("#7d766b")); x += 500 + 170 * ((int(x) // 7 + k) % 3)
+                z += 280; k += 1
         else:
             f.rect(x0, z0, x1, z1, .6, fill=BLANC_FC)
             x = x0 + 1200
@@ -62,11 +87,32 @@ class MaisonEtages(Batiment):
         f.ligne(-1500, z0, L + 600, z0, 1.4)
         f.hachures(-1500, z0 - 400, L + 600, z0, 120, 45, GRIS_C)
         f.rect(0, z0, L, zp - 150, .5, fill=HexColor("#d9d9d6"))            # béton apparent (isolé, crépi)
+        tp = self.toit_plans; OV = self.debord; FA = self.fascia; XR = tp[0][1]; zmax = tp[-1][3]
+        ZB = HexColor("#2f3439")
+        ztop = {"S": zmax, "N": zmax, "E": tp[-1][3], "O": tp[0][2]}[cote]
+        if cote == "O":      # derrière le mur : versant bas, bande vitrée haute, versant haut (vus de face)
+            zb1, zb2, zh1, zh2 = tp[0][2], tp[0][3], tp[-1][2], tp[-1][3]
+            f.rect(-OV, zb1, L + OV, zb2, .6, fill=HexColor("#8a8f94"))
+            f.rect(0, zb2, L, zh1, .6, ZB, fill=HexColor("#3d4a52"))
+            n = max(1, round(L / 1500))
+            for k in range(n): f.rect(60 + (L - 120) * k / n + 20, zb2 + 60, 60 + (L - 120) * (k + 1) / n - 20, zh1 - 60, .4, MENEAU, fill=VERRE)
+            f.rect(-OV, zh1, L + OV, zh2, .6, fill=HexColor("#6f757a"))
         for (x0, x1, mat) in self.volumes.get(cote, [(0, L, "blanc")]):
-            self._pan(f, x0, x1, zp - 150, zpar, mat)
-        f.rect(-40, zpar - 90, L + 40, zpar, .8, fill=HexColor("#2f3439"))   # solin du parapet
+            self._pan(f, x0, x1, zp - 150, ztop, mat)
+        if cote in "SN":
+            m = (lambda x: x) if cote == "S" else (lambda x: L - x)
+            prof = sorted((m(x), z) for (x, z) in [(0, self.roof(0)), (XR, tp[0][3]), (XR, tp[1][2]), (L, self.roof(L))])
+            f.poly([(0, zmax + 20)] + prof + [(L, zmax + 20)], 0, white, close=True, fill=white)   # cache le mur au-dessus du toit
+            f.poly(prof, .8)
+            for (x0, x1, za, zb_) in tp:
+                a, b = (x0 - (OV if x0 == tp[0][0] else 0), x1 + (OV if x1 == tp[-1][1] else 0))
+                za2 = za + (zb_ - za) * (a - x0) / (x1 - x0); zb2_ = za + (zb_ - za) * (b - x0) / (x1 - x0)
+                f.poly([(m(a), za2 - FA + 80), (m(b), zb2_ - FA + 80), (m(b), zb2_ - FA - 120), (m(a), za2 - FA - 120)], .3, GRIS, close=True, fill=HexColor("#cfd3d6"))   # soffite
+                f.poly([(m(a), za2 + 80), (m(b), zb2_ + 80), (m(b), zb2_ + 80 - FA), (m(a), za2 + 80 - FA)], .8, black, close=True, fill=ZB)
+        else:
+            f.rect(-OV, ztop - FA + 80, L + OV, ztop + 80, .8, fill=ZB)
         f.ligne(0, self.lv[2].zf - self.ep / 2, L, self.lv[2].zf - self.ep / 2, .35, GRIS)   # joint creux entre les étages
-        self.z_faite = zpar
+        self.z_faite = zmax
         dern = {}
         for i, lv in enumerate(self.lv):
             zf = lv.zf
@@ -173,7 +219,7 @@ class MaisonEtages(Batiment):
         for cote_mur, (xa, xb) in ((0, (0, t)), (1, (L - t, L))):
             for i, lv in enumerate(self.lv):
                 zb = lv.zf if i else zp1 - ep          # sous-sol : le mur de bois commence sur la fondation
-                zh = self.lv[i + 1].zf - ep if i + 1 < len(self.lv) else zpar
+                zh = self.lv[i + 1].zf - ep if i + 1 < len(self.lv) else self.roof(pos if axe == "A" else (0 if cote_mur == 0 else self.W))
                 if i == 0:
                     trous = [(lv.zf + lv.types_fen[o["type"]]["allege"], lv.zf + lv.types_fen[o["type"]]["allege"] + lv.types_fen[o["type"]]["h"]) for o in ouv_mur(lv, cote_mur) if o in lv.fenetres]
                     xf0, xf1 = (0, tf) if cote_mur == 0 else (L - tf, L)
@@ -190,16 +236,28 @@ class MaisonEtages(Batiment):
                     zz = max(zz, b)
                 for (a, b) in trous:
                     f.ligne(xa, a, xa, b, .3); f.ligne(xb, a, xb, b, .3); f.ligne((xa + xb) / 2, a, (xa + xb) / 2, b, .6)
-        f.rect(-40, zpar - 60, t + 40, zpar, .5, fill=HexColor("#555")); f.rect(L - t - 40, zpar - 60, L + 40, zpar, .5, fill=HexColor("#555"))
         items.append(("M1 — mur extérieur (voir coupe de mur, A-302)", (t / 2, self.lv[1].zf + 1300)))
-        # toit plat
-        f.rect(t, zt - self.ep_toit, L - t, zt, .6, fill=white)
-        x = t + 300
-        while x < L - t - 100: f.ligne(x, zt - self.ep_toit + 30, x, zt - 30, .15, GRIS_C); x += 600
-        f.rect(t, zt - self.ep_toit + 40, L - t, zt - 60, .2, ISO_C, fill=ISO_C)
-        f.poly([(t, zt), (L / 2, zt + 120), (L - t, zt)], .9)                   # pente vers le drain de toit
-        f.ligne(t, zt + 130, L - t, zt + 130, .3, GRIS, dash=[3, 2])
-        items.append(("T1 — toit plat : membrane, isolant en pente, solives en I 356 et laine R-60", (L * .45, zt - self.ep_toit / 2)))
+        # toit : deux monopentes décalés (coupe B : en pente, avec bande vitrée; coupe A : horizontal), débords de 900
+        OV, FA, ept = self.debord, self.fascia, self.ep_toit
+        tp = self.toit_plans
+        if axe == "A": plans = [(-OV, L + OV, self.roof(pos), self.roof(pos))]
+        else: plans = [(-OV, tp[0][1], self.roof(-OV), tp[0][3]), (tp[1][0], L + OV, tp[1][2], self.roof(L + OV))]
+        NOIR = HexColor("#2f3439")
+        for (a, b, za, zb_) in plans:
+            f.poly([(a, za - ept), (b, zb_ - ept), (b, zb_), (a, za)], .6, close=True, fill=white)
+            x = a + 300
+            while x < b - 100: z_ = za + (zb_ - za) * (x - a) / (b - a); f.ligne(x, z_ - ept + 30, x, z_ - 30, .15, GRIS_C); x += 600
+            f.poly([(a, za - ept + 40), (b, zb_ - ept + 40), (b, zb_ - 60), (a, za - 60)], .2, ISO_C, close=True, fill=ISO_C)
+            f.poly([(a, za), (b, zb_), (b, zb_ + 70), (a, za + 70)], .6, black, close=True, fill=NOIR)
+            if a < 0: f.poly([(a - 30, za - ept - 80), (a - 30, za + 140), (a + 10, za + 140), (a + 10, za - ept - 80)], .5, black, close=True, fill=NOIR)
+            if b > L: f.poly([(b - 10, zb_ - ept - 80), (b - 10, zb_ + 140), (b + 30, zb_ + 140), (b + 30, zb_ - ept - 80)], .5, black, close=True, fill=NOIR)
+        if axe == "B":
+            xr = tp[0][1]; za, zb_ = tp[0][3], tp[1][2]
+            f.rect(xr - t, za - ept, xr, zb_, .6, fill=white)
+            f.rect(xr - t + 40, za + 60, xr - 40, zb_ - 60, .4, MENEAU, fill=VERRE)
+            for k in (1, 2): f.ligne(xr - t + 40, za + 60 + (zb_ - za - 120) * k / 3, xr - 40, za + 60 + (zb_ - za - 120) * k / 3, .3, MENEAU)
+            items.append(("Bande vitrée haute entre les deux toits", (xr + 100, za + (zb_ - za) / 2)))
+        xl = L * .45; items.append(("T1 — toit monopente : membrane, isolant en pente, solives en I 356, laine R-60 (débord 900)", (xl, (self.roof(xl) if axe == "B" else self.roof(pos)) - ept / 2)))
         # plafonds, murs intérieurs coupés, locaux
         for i, lv in enumerate(self.lv):
             zc = lv.zf + lv.hc
@@ -281,11 +339,11 @@ class MaisonEtages(Batiment):
     def _coupe_mur_etages(self, f):
         N = self.Nmur; ep, tf = self.ep, self.t_fond
         zs, z0, zss = self.z_semelle, self.z_sol, self.lv[0].zf
-        zp1, zp2, zt, zpar = self.lv[1].zf, self.lv[2].zf, self.zt, self.zpar
+        zp1, zp2, zt, zpar = self.lv[1].zf, self.lv[2].zf, self.zt, self.zt + 400
         couches = self.couches_mur; T = sum(e for (_, e, _) in couches)
         ext = sum(e for (_, e, st) in couches[:3])          # revêtement, fourrures, isolant rigide : devant le panneau OSB
         xmax = 650
-        f.vue(DRAW[0] + 258 + 700 / N, DRAW[1] + 6 - (zs - 300) / N, N)
+        f.vue(DRAW[0] + 258 + 1100 / N, DRAW[1] + 6 - (zs - 300) / N, N)
         pts = []
         _cp.motif(f, "terre", -700, zs - 300, -50, z0); f.ligne(-700, z0, 0, z0, 1.0)
         _cp.motif(f, "pierre", -520, zs, -200, zs + 420); f.cercle(-360, zs + 160, 55, .6, fill=white)
@@ -305,7 +363,7 @@ class MaisonEtages(Batiment):
             _cp.motif(f, "laine", 38, zf - ep + 20, 190, zf - 40)
         pts += [("Solive de rive, isolée par l'intérieur", (19, zp1 - ep / 2)), ("Solives en I 302 à 400 c/c, contreplaqué 19", (xmax * .7, zp2 - ep / 2))]
         # mur de bois (RDC + étage + parapet)
-        x = -ext; zb = zp1 - ep; zh = zpar - 90
+        x = -ext; zb = zp1 - ep; zh = zt
         for (nom, e, st) in couches:
             if e <= 0:
                 f.ligne(x, zp1, x, zt - self.ep_toit, .9, dash=[3, 1.5]); pts.append((nom, (x, zp2 + 1600))); continue
@@ -314,17 +372,16 @@ class MaisonEtages(Batiment):
                 for (a, b) in ((zp1, zp2 - ep), (zp2, zt - self.ep_toit)): _cp.motif(f, st, x, a, x + e, b)
             pts.append((nom, (x + e / 2, zp1 + 900 + len(pts) % 4 * 350)))
             x += e
-        # toit plat
-        zr = zt - self.ep_toit
-        f.rect(T - ext, zr, xmax, zt, .4, fill=BOIS_C); _cp.motif(f, "laine", T - ext, zr + 30, xmax, zt - 40)
-        f.poly([(T - ext, zt), (xmax, zt + 40)], .6); f.poly([(T - ext, zt + 40), (xmax, zt + 80)], .4); _cp.motif(f, "isolant_rigide", T - ext + 20, zt, xmax, zt + 60)
+        # toit monopente : débord de 900 (solives en I en porte-à-faux, bandeau d'aluminium noir, soffite ventilé)
+        zr = zt - self.ep_toit; OV = self.debord
+        f.rect(-OV, zr, xmax, zt, .4, fill=BOIS_C); _cp.motif(f, "laine", T - ext, zr + 30, xmax, zt - 40)
+        f.rect(-OV, zt, xmax, zt + 60, .4, fill=HexColor("#2f3439")); _cp.motif(f, "isolant_rigide", T - ext + 20, zt + 60, xmax, zt + 120)
+        f.rect(-OV, zr - 30, xmax, zr, .4, fill=HexColor("#cfd3d6"))
         f.rect(T - ext - 13, zr - 13, xmax, zr, .4, fill=HexColor("#f4f4f4"))
-        _cp.motif(f, "bois", 0, zt, T - ext, zh)                                 # muret du parapet
-        f.poly([(-ext - 60, zh - 150), (-ext - 60, zpar), (T - ext + 40, zpar), (T - ext + 40, zh - 100)], 1.0, HexColor("#444"))
-        f.poly([(T - ext, zt + 80), (T - ext, zh - 60)], 1.2, black)
-        pts += [("Membrane élastomère 2 plis, remontée sur le parapet", (xmax * .6, zt + 70)), ("Isolant rigide en pente (drainage)", (xmax * .8, zt + 30)),
-                ("Solives en I 356 et laine soufflée R-60", (xmax * .55, zr + self.ep_toit / 2)), ("Solin métallique du parapet", (T / 2 - ext, zpar)),
-                ("Plafond : pare-vapeur et gypse 12,7", (xmax * .4, zr - 6))]
+        f.poly([(-OV - 40, zr - 120), (-OV - 40, zt + 140), (-OV + 20, zt + 140), (-OV + 20, zr - 120)], .9, black, close=True, fill=HexColor("#2f3439"))
+        pts += [("Membrane élastomère 2 plis", (xmax * .6, zt + 30)), ("Isolant rigide en pente (drainage)", (xmax * .8, zt + 90)),
+                ("Solives en I 356 en porte-à-faux (débord 900) et laine R-60", (xmax * .55, zr + self.ep_toit / 2)), ("Bandeau d'aluminium noir", (-OV - 10, zt - 100)),
+                ("Soffite ventilé", (-OV * .5, zr - 15)), ("Plafond : pare-vapeur et gypse 12,7", (xmax * .4, zr - 6))]
         # rupture
         zz = zs - 300; pp = []
         while zz < zpar + 200: pp += [(xmax, zz), (xmax + 40, zz + 120), (xmax - 40, zz + 240)]; zz += 360

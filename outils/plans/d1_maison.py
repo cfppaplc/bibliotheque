@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
-"""Dossier 1 — Maison unifamiliale contemporaine : volume carré, toit plat, 2 étages et sous-sol (2026)."""
+"""Dossier 1 — Maison unifamiliale contemporaine : toits monopentes décalés à grands débords, 2 étages et sous-sol (2026)."""
 from etages import *
 
 W, D, t = 11000, 8500, 300
 S, N, O, E = t / 2, D - t / 2, t / 2, W - t / 2
 EP = 300                                   # planchers : solives en I 302 + contreplaqué
 ZSS, ZP1, ZP2 = -2100, 600, 3640           # dessus des planchers : sous-sol (dalle), rez-de-chaussée, étage
-ZT, EPT, ZPAR = 6600, 350, 7000            # toit plat : dessus de la structure, épaisseur, parapet
+ZT, EPT, ZPAR = 6600, 350, 8500            # toit : dessus de la structure au point bas, épaisseur, hauteur max. (bandeau du versant haut)
+XR = 6300                                  # limite entre les deux monopentes (bande vitrée)
 XE0, XE1 = 2450, 3650                      # cage d'escalier (axes des murs)
 dossier = dict(projet="MAISON UNIFAMILIALE\nDOSSIER 1", adresse="125, rue des Érables\nVille fictive (Québec)", date="Octobre 2026", code="D1")
 
@@ -159,26 +160,26 @@ et = niveau(commun, no_plan="A-103", titre_plan="PLAN DE L'ÉTAGE", no_plomb="P-
 
 maison = MaisonEtages(
     dossier=dossier, nom_court="Maison unifamiliale", W=W, D=D, t=t, lv=[ss, rdc, et], types_fen=types_fen,
-    description="Maison unifamiliale contemporaine de deux étages avec sous-sol aménagé : un volume carré à toit plat, panneaux de fibrociment blanc et gris anthracite, "
-                "lames de bois verticales autour de l'entrée, grandes fenêtres au sud. Rez-de-chaussée à aire ouverte, quatre chambres, trois salles de bain ou salles d'eau. "
+    description="Maison unifamiliale contemporaine de deux étages avec sous-sol aménagé : deux toits monopentes décalés à grands débords (900 mm) séparés par une bande vitrée, pierre naturelle à l'entrée, zinc prépatiné et cèdre brûlé, "
+                "grandes fenêtres au sud. Rez-de-chaussée à aire ouverte, quatre chambres, trois salles de bain ou salles d'eau. "
                 "Chauffage par air pulsé (fournaise électrique et thermopompe), ventilation par VRC.",
-    ep=EP, zt=ZT, ep_toit=EPT, zpar=ZPAR, z_sol=0, z_semelle=-2600, t_fond=250,
+    ep=EP, zt=ZT, ep_toit=EPT, zpar=ZPAR, toit_plans=[(0, XR, 6600, 7000), (XR, W, 7700, 8100)], debord=900, fascia=350, z_sol=0, z_semelle=-2600, t_fond=250,
     chutes=[(2450, 4300), (7950, 7900)], no_iso="P-104",
-    niveaux=[("Sol", "± 0", 0), ("Sous-sol", "– 2 100", ZSS), ("RDC", "+ 600", ZP1), ("Étage", "+ 3 640", ZP2), ("Toit", "+ 6 600", ZT), ("Parapet", "+ 7 000", ZPAR)],
-    volumes={"S": [(0, 2700, "bois"), (2700, 11000, "blanc")], "N": [(0, 11000, "blanc")], "E": [(0, 8500, "anthracite")], "O": [(0, 8500, "anthracite")]},
+    niveaux=[("Sol", "± 0", 0), ("Sous-sol", "– 2 100", ZSS), ("RDC", "+ 600", ZP1), ("Étage", "+ 3 640", ZP2), ("Toit bas", "+ 6 600", ZT), ("Haut du versant bas", "+ 7 000", 7000), ("Toit haut", "+ 8 100", 8100)],
+    volumes={"S": [(0, 2700, "pierre"), (2700, XR, "zinc"), (XR, 11000, "bois_brule")], "N": [(0, XR, "zinc"), (XR, 11000, "bois_brule")], "E": [(0, 8500, "pierre")], "O": [(0, 8500, "zinc")]},
     marquises={"S": [(300, 2700, ZP1 + 2600)]},
-    etiq_elev={"S": [("Lames de bois verticales (cèdre)", 0.12, 6000, 300, 1600), ("Panneaux de fibrociment blanc", 0.75, 6200, 0, 1300),
+    etiq_elev={"S": [("Pierre naturelle (entrée)", 0.1, 5300, 300, 1500),
                      ("Marquise d'acier", 0.15, ZP1 + 2700, 3200, 400), ("Béton apparent, crépi", 0.6, 200, 300, -900)],
-               "E": [("Panneaux de fibrociment gris anthracite", 0.5, 5300, 300, 1300)]},
-    notes_elev=["Revêtement : panneaux de fibrociment (blanc au sud et au nord, gris anthracite à l'est et à l'ouest), joints de 10 mm.",
-                "Lames de bois verticales autour de l'entrée; marquise d'acier en porte-à-faux.", "Toit plat avec parapet; solin d'aluminium noir.",
+               "E": [("Pierre naturelle", 0.5, 5300, 300, 1300)]},
+    notes_elev=["Revêtements : pierre naturelle (entrée et mur est), zinc prépatiné à joints debout (versant bas), cèdre brûlé (volume haut).",
+                "Marquise d'acier en porte-à-faux au-dessus de l'entrée.", "Deux toits monopentes décalés (pente d'environ 4 %) : débords de 900, bandeau d'aluminium noir; bande vitrée haute entre les deux versants (vue sur l'élévation ouest).",
                 "Fenêtres à cadre noir, verre triple. Hexagones : types de fenêtres, voir A-301.", "Fenêtres du sous-sol : margelles galvanisées (en tirets)."],
-    Ncoupe=75, Nmur=50, Nelev=100, coupe_A_x=3050, coupe_B_y=6900,
+    Ncoupe=75, Nmur=50, Nelev=105, coupe_A_x=3050, coupe_B_y=6900,
     volees=[(XE0, XE1, 1300, 4300, ZSS, ZP1), (XE0, XE1, 1300, 4300, ZP1, ZP2)],
-    couches_mur=[("Panneau de fibrociment 8", 8, "vinyle"), ("Fourrures 19 × 64 (lame d'air)", 19, "vide"), ("Isolant rigide 50 (R-10)", 50, "isolant_rigide"),
+    couches_mur=[("Zinc à joints debout 1 sur membrane (fourrures 19)", 8, "vinyle"), ("Fourrures 19 × 64 (lame d'air)", 19, "vide"), ("Isolant rigide 50 (R-10)", 50, "isolant_rigide"),
                  ("Panneau OSB 11", 11, "panneau"), ("Montants 38 × 140 à 400 c/c et laine R-24", 140, "laine"), ("Pare-vapeur (polyéthylène 0,15)", 0, "membrane"), ("Gypse 12,7", 13, "gypse")],
-    compositions=["T1 — Toit plat : membrane élastomère 2 plis, isolant rigide en pente, contreplaqué 19, solives en I 356, laine soufflée R-60, pare-vapeur, gypse 12,7.",
-                  "M1 — Mur extérieur : fibrociment 8, fourrures 19, isolant rigide 50, OSB 11, montants 38 × 140 à 400 c/c, laine R-24, pare-vapeur, gypse 12,7.",
+    compositions=["T1 — Toit monopente (débord 900) : membrane élastomère 2 plis, isolant rigide en pente, contreplaqué 19, solives en I 356, laine soufflée R-60, pare-vapeur, gypse 12,7.",
+                  "M1 — Mur extérieur : zinc à joints debout (ou pierre, ou cèdre brûlé), fourrures 19, isolant rigide 50, OSB 11, montants 38 × 140 à 400 c/c, laine R-24, pare-vapeur, gypse 12,7.",
                   "M2 — Cloison : gypse 12,7 deux faces, montants 38 × 89 à 400 c/c (laine insonorisante autour des salles de bain).",
                   "P1 — Plancher : contreplaqué 19 collé-vissé, solives en I 302 à 400 c/c.", "D1 — Dalle du sous-sol : béton 100, isolant rigide 50, pierre 200.",
                   "F1 — Fondation : mur de béton 250, isolant rigide 50 extérieur, semelle 650 × 250, drain français."],
@@ -191,7 +192,7 @@ maison = MaisonEtages(
                      "Niveaux du terrain en mètres (altitude géodésique).", "Pente du terrain fini : 2 % minimum en s'éloignant du bâtiment."]),
     donnees=[["Usage", "Habitation unifamiliale"], ["Étages", "2 + sous-sol aménagé"], ["Emprise au sol", f"{str(round(W * D / 1e6, 1)).replace('.', ',')} m²"],
              ["Superficie habitable", f"{str(round(3 * (W - 600) * (D - 600) / 1e6)).replace('.', ',')} m² (3 niveaux)"],
-             ["Structure", "Ossature de bois, solives en I, fondation de béton"], ["Toiture", "Plate, membrane élastomère, parapet"], ["Chauffage", "Air pulsé + thermopompe, VRC"],
+             ["Structure", "Ossature de bois, solives en I, fondation de béton"], ["Toiture", "Deux monopentes décalés, membrane élastomère, débords 900"], ["Chauffage", "Air pulsé + thermopompe, VRC"],
              ["Eau et égout", "Réseaux municipaux"], ["Lot", "18 000 × 33 000"]],
 )
 
