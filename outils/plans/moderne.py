@@ -7,6 +7,9 @@ ANTHRACITE, JOINT = HexColor("#5a6068"), HexColor("#7d848c")
 BOIS, LAME = HexColor("#d3a26a"), HexColor("#a9773f")
 VERRE, MENEAU = HexColor("#d6e8f5"), HexColor("#4f5a64")
 BANDEAU = HexColor("#2f3439")
+BRIQUE, JBRIQUE = HexColor("#b5543f"), HexColor("#d9b9ad")          # brique rouge (dossier 3)
+TOLE, NERVURE = HexColor("#8fa5a3"), HexColor("#6c8584")           # tôle d'acier nervurée, gris-vert
+BLOC, JBLOC = HexColor("#d4d2cb"), HexColor("#a7a49b")             # bloc de béton architectural
 
 
 class BatimentModerne(Batiment):
@@ -23,6 +26,30 @@ class BatimentModerne(Batiment):
         f.rect(x0, z0, x1, z1, .6, fill=BOIS)
         x = x0 + 150
         while x < x1 - 1: f.ligne(x, z0, x, z1, .18, LAME); x += 150
+
+    def _brique(self, f, x0, x1, z0, z1):
+        f.rect(x0, z0, x1, z1, .6, fill=BRIQUE)
+        z = z0 + 150
+        r = 0
+        while z < z1 - 1:
+            f.ligne(x0, z, x1, z, .12, JBRIQUE)
+            x = x0 + (r % 2) * 115
+            while x < x1: f.ligne(x, z - 150, x, z, .1, JBRIQUE); x += 230
+            z += 150; r += 1
+
+    def _tole(self, f, x0, x1, z0, z1):
+        f.rect(x0, z0, x1, z1, .6, fill=TOLE)
+        x = x0 + 76
+        while x < x1 - 1: f.ligne(x, z0, x, z1, .2, NERVURE); x += 76
+
+    def _bloc(self, f, x0, x1, z0, z1):
+        f.rect(x0, z0, x1, z1, .6, fill=BLOC)
+        z = z0 + 200; r = 0
+        while z < z1 - 1:
+            f.ligne(x0, z, x1, z, .15, JBLOC)
+            x = x0 + (r % 2) * 200
+            while x < x1: f.ligne(x, z - 200, x, z, .12, JBLOC); x += 400
+            z += 200; r += 1
 
     def _mur_rideau(self, f, x0, x1, z0, z1, traverse=3000):
         f.rect(x0, z0, x1, z1, .9, MENEAU, fill=VERRE)
@@ -43,6 +70,7 @@ class BatimentModerne(Batiment):
         for (x0, x1, mat, zh) in vols:
             if mat == "bois": self._bois(f, x0, x1, zp, zh)
             elif mat == "verre": self._mur_rideau(f, x0, x1, zp, zh, traverse=4200)
+            elif mat in ("brique", "tole", "bloc"): getattr(self, "_" + mat)(f, x0, x1, zp, zh)
             else: self._panneaux(f, x0, x1, zp, zh)
             f.ligne(x0 - 40, zh, x1 + 40, zh, 1.1)                  # solin
         self.z_faite = zpar
