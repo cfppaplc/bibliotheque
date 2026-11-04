@@ -40,7 +40,8 @@ def rtu_elev(f, x0, zr, L, h, vent=2, rep="", crochets=True, coupe_toit=False):
     # grille de serpentin (louvres) sur le premier panneau
     for k in range(6): f.ligne(t3[0] + 90, zc + 200 + k * h * .12, t3[1] - 90, zc + 200 + k * h * .12, .25, GRIS)
     # plaque signalétique
-    f.rect(t3[2] + 120, zc + h * .62, t3[2] + 520, zc + h * .62 + 140, .4, fill=white); f.texte(t3[2] + 320, zc + h * .62 + 70, rep or "UT", 5, True)
+    wm = max(400, 3.4 * f.N); hm = max(140, 1.9 * f.N); sz = 5 if f.N <= 50 else 3.8
+    f.rect(t3[2] + 80, zc + h * .62, t3[2] + 80 + wm, zc + h * .62 + hm, .4, fill=white); f.texte(t3[2] + 80 + wm / 2, zc + h * .62 + hm / 2, rep or "UT", sz, True)
     # ventilateurs du condenseur (dessus)
     zt = zc + h
     for i in range(vent):
@@ -57,7 +58,7 @@ def rtu_elev(f, x0, zr, L, h, vent=2, rep="", crochets=True, coupe_toit=False):
         for x in (x0 + 160, x0 + L - 160):
             f.poly([(x - 70, zt), (x + 70, zt), (x, zt + 190)], .6, close=True, fill=GRIS_P); f.cercle(x, zt + 95, 28, .5, fill=white)
     return dict(socle=(x0 + L * .5, zr + 200), caisson=(x0 + L * .5, zc + h * .3), fan=(x0 + L * .25, zt + 150), eco=(x0 - 180, zc + h * .45), sect=(x0 + L + 70, zc + h * .5),
-                lug=(x0 + L - 160, zt + 100), nom=(t3[2] + 320, zc + h * .62 + 70), top=zt + 300, panneau=((t3[1] + t3[2]) / 2, zc + h * .5), louvre=(x0 + L / 6, zc + h * .3))
+                lug=(x0 + L - 160, zt + 100), nom=(t3[2] + 80 + wm / 2, zc + h * .62 + hm / 2), top=zt + 300, panneau=((t3[1] + t3[2]) / 2, zc + h * .5), louvre=(x0 + L / 6, zc + h * .3))
 
 
 def rtu_plan(f, cx, cy, L, l, rep="", fans=2, degagement=True, cotes=False):

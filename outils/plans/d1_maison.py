@@ -184,7 +184,7 @@ rdc = niveau(commun, no_plan="A-102", titre_plan="PLAN DU REZ-DE-CHAUSSÉE", no_
     prises_speciales=[("Cuisinière 240 V", (11500, 10350), "40 A 240 V", 380), ("Lave-vaisselle", (12300, 10350), "15 A 120 V", -380), ("Hotte", (11500, 9500), "15 A 120 V", 380)],
     notes_elec=["Prises du comptoir : circuits de 20 A avec prises T, protection DDFT près de l'évier.", "Éclairage encastré DEL au séjour et à la cuisine.",
                 "Aucun point le long d'un mur à plus de 1,8 m d'une prise."],
-    cvca=dict(type="air", gaines=[([(XE1 + 100, 4500), (13500, 4500)], 300, "Conduit principal sous le plancher (voir M-101)")],
+    cvca=dict(type="air", gaines=[([(XE1 + 100, 4500), (13500, 4500)], 300, "Conduit principal sous le plancher (voir M-101)", (XE1 + 400, 3700))],
               diffuseurs=[(1500, 700, "10 L/s", True), (4000, 700, "20 L/s", True), (8500, 700, "30 L/s", True), (12000, 700, "30 L/s", True), (16000, 700, "30 L/s", True),
                           (20500, 700, "30 L/s", True), (2500, 7500, "25 L/s", True), (8200, 5200, "25 L/s", True), (11800, 5300, "25 L/s", True),
                           (15500, 8000, "25 L/s", True), (20500, 8000, "25 L/s", True)],

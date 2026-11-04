@@ -295,7 +295,7 @@ class Batiment:
             sx = bx + (s["services_x"][0] if isinstance(s["services_x"], list) else s["services_x"])
             f.poly([(sx - 1500, by), (sx - 1500, -s["rue"] - 1500)], 1.2, HexColor("#555"), dash=[2, 2]); f.texte(sx - 1800, -s["rue"] - 1200, "Égout pluvial Ø 150", 6, True, "d", HexColor("#555"))
         ex, ey = s["elec"]
-        f.ligne(ex, ey, ex, -s["rue"] + 1500, 1.0, ELEC, dash=[1, 2]); f.texte(ex + 250, (ey - s["rue"]) / 2, "Entrée électrique\nsouterraine", 6, True, "g", ELEC)
+        f.ligne(ex, ey, ex, -s["rue"] + 1500, 1.0, ELEC, dash=[1, 2]); f.texte(ex - 250, (ey - s["rue"]) / 2 - 1500, "Entrée électrique\nsouterraine", 6, True, "d", ELEC, halo=True)
         # arbres et niveaux
         for (ax_, ay, r) in s.get("arbres", []):
             f.cercle(ax_, ay, r, .5, HexColor("#3a7d44")); f.cercle(ax_, ay, r * 0.15, .5, HexColor("#3a7d44"))
@@ -1060,7 +1060,7 @@ class Batiment:
                     f.poly(path, 1.3, CVC_A)
                 s_ = 260 * k
                 f.rect(x - s_, y - s_, x + s_, y + s_, .7, CVC_A, fill=white); f.ligne(x - s_, y - s_, x + s_, y + s_, .4, CVC_A); f.ligne(x - s_, y + s_, x + s_, y - s_, .4, CVC_A)
-                f.texte(x, y + (s_ + 210 * k) * (1 if y < self.D / 2 else -1), lab, 5.2, True, col=CVC_A)
+                f.texte(x + s_ + 90 * k, y, lab, 5.2, True, "g", CVC_A, halo=True)
             for (x, y, lab) in m["retours"]:
                 s_ = 300 * k
                 f.rect(x - s_, y - s_ * .6, x + s_, y + s_ * .6, .8, CVC_R, fill=white)
