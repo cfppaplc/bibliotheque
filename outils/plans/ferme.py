@@ -187,7 +187,7 @@ class Ferme:
                       "Enclos libres au sud, fosse à lisier, silos-couloirs et hangar à machinerie. Structure d'acier, murets de béton, toit à deux versants avec panneaux solaires.", 95):
             c_.drawString(24 * MM, yy * MM, l); yy -= 5.2
         lignes = [["000", "Page de garde et liste des feuilles"], ["A-001", "Légende, symboles et abréviations"], ["A-100", "Plan d'implantation de la ferme"], ["A-101", "Plan de l'étable"], ["A-201", "Élévations"],
-                  ["A-301", "Coupe transversale de l'étable"], ["S-101", "Plan des fondations"], ["P-101", "Plan d'eau, de drainage et de laiterie"],
+                  ["A-301", "Coupe transversale de l'étable"], ["S-101", "Plan des fondations"], ["P-101", "Plan d'eau, de drainage et de laiterie"], ["P-102", "Abreuvoir à niveau constant : détails"], ["P-103", "Alimentation en eau des abreuvoirs (schéma)"],
                   ["E-101", "Électricité, ventilation et automatisation"]]
         f.tableau(24, yy - 10, "LISTE DES FEUILLES", ["Feuille", "Titre"], lignes, [22, 110], h=6, size=8.5)
         donnees = [["Usage", "Élevage laitier, 120 vaches en lactation"], ["Étable", "66 000 × 29 000 mm, 1 914 m²"], ["Logettes", f"{N_LOG} (4 rangées)"],
@@ -595,6 +595,10 @@ class Ferme:
         f.notes("LÉGENDE", ["Cercles noirs : ventilateurs HVLS", "Petits cercles orange : luminaires", "Tirets orange : circuits principaux", "Tirets bleus : rideaux latéraux"])
         c.showPage()
 
+    def abreuvoirs(self, c):
+        import abreuvoirs as _ab
+        _ab.p102(c, DOSSIER); _ab.p103(c, DOSSIER)
+
     def legende(self, c):
         import generique
         class _D: dossier = DOSSIER
@@ -603,7 +607,7 @@ class Ferme:
     def produire(self, chemin):
         c = rl_canvas.Canvas(chemin, pagesize=(PAGE_W * MM, PAGE_H * MM), pageCompression=1)
         c.setTitle("FERME LAITIÈRE DOSSIER 5 — dossier de plans d'exercice"); c.setAuthor("Pavillon de l'Avenir · plan pédagogique")
-        for fn in (self.garde, self.legende, self.site, self.plan, self.elevations, self.coupe, self.fondations, self.plomberie, self.electricite): fn(c)
+        for fn in (self.garde, self.legende, self.site, self.plan, self.elevations, self.coupe, self.fondations, self.plomberie, self.abreuvoirs, self.electricite): fn(c)
         c.save()
 
 
