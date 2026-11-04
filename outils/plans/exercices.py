@@ -1,12 +1,69 @@
 # -*- coding: utf-8 -*-
-"""Génère une feuille d'exercices et un corrigé pour un dossier, à partir de ses données (aucune réponse écrite à la main)."""
-import math, re
-from reportlab.pdfgen import canvas as rl_canvas
-from reportlab.lib.colors import HexColor, black, white
-from dessin import wrap, fmt, FONT, FONT_B, AUTEUR, LOGO, LOGO_R, MM
-import calculs
+"""Questionnaires de lecture de plans : questions calculées sur les données de chaque dossier (aucune réponse écrite à la main
+sauf pour la ferme), types variés, banque de questions plus grande que le questionnaire : chaque dossier en pioche une partie
+différente (rotation), a sa propre construction (par type, par discipline, par niveau, par défis) et ses images tirées des plans."""
+import os, re, random, subprocess, math
+from dessin import fmt
+import questionnaire as qs
+from batiment import APP
 
-PW, PH = 215.9, 279.4
+THEMES = {
+    1: dict(couleur="#1c5f8f", mode="type", indices="tous", kicker="Lecture de plans · Parcours guidé", prefixe="Partie ", lettres=True,
+            intro=["Parcours guidé : ouvre le dossier de plans (PDF ou papier 11 × 17 po) et réponds aux questions. Chaque partie a un type de question différent : lis bien la consigne.",
+                   "Une étiquette bleue te dit sur quelle feuille chercher."]),
+    2: dict(couleur="#2e7d4f", mode="discipline", indices="aucun", kicker="Lecture de plans · Visite de chantier", prefixe="Chantier ", lettres=False,
+            intro=["Visite de chantier : tu es technicien(ne) et le client t'envoie le dossier de ce duplex. Vérifie-le discipline par discipline (architecture, plomberie, électricité…).",
+                   "Cette fois, personne ne te dit sur quelle feuille chercher : c'est à toi de trouver."]),
+    3: dict(couleur="#c26a12", mode="niveau", indices="niv1", kicker="Lecture de plans · Trois niveaux", prefixe="Étape ", lettres=False,
+            intro=["Trois niveaux de difficulté : échauffement, mise en application, puis défi d'expert. Commence par le niveau 1 et monte à ton rythme.",
+                   "Au niveau 1, une étiquette bleue indique la feuille; ensuite, tu cherches seul(e)."]),
+    4: dict(couleur="#6a3fa0", mode="defis", indices="aucun", kicker="Lecture de plans · Défis", prefixe="Défi ", lettres=False,
+            intro=["Trois défis à relever : éclair (réponses rapides), observation (images tirées des plans) et réflexion (calculs et pièges).",
+                   "Chaque point compte : vise le meilleur pointage. Aucune étiquette ne t'aide."]),
+    5: dict(couleur="#3b7d2a", mode="discipline", indices="tous", kicker="Lecture de plans · Étude de cas", prefixe="Volet ", lettres=False,
+            intro=["Étude de cas : une ferme laitière moderne (étable à stabulation libre, robots de traite, silos). Explore le dossier volet par volet.",
+                   "Une étiquette bleue indique la feuille à consulter."]),
+}
+
+
+def _virg(x, n=1): return f"{x:.{n}f}".replace(".", ",")
+
+
+# ------------------------------------------------------------------ images tirées des plans
+_PAGES = {}
+
+
+def _pages(pdf):
+    if pdf in _PAGES: return _PAGES[pdf]
+    n = int(re.search(r"Pages:\s+(\d+)", subprocess.run(["pdfinfo", pdf], capture_output=True, text=True).stdout).group(1))
+    m = {}
+    for p in range(2, n + 1):
+        t = subprocess.run(["pdftotext", "-f", str(p), "-l", str(p), pdf, "-"], capture_output=True, text=True).stdout
+        if "TITRE DE LA FEUILLE" not in t: continue
+        for code in re.findall(r"^([A-Z]-\d{3})$", t, re.M): m.setdefault(code, p)
+    _PAGES[pdf] = m
+    return m
+
+
+def _vignette(pdf, code, sortie, larg=760):
+    p = _pages(pdf).get(code)
+    if not p: return None
+    base = sortie[:-4]
+    subprocess.run(["pdftoppm", "-r", "60", "-f", str(p), "-l", str(p), "-scale-to-x", str(larg), "-scale-to-y", "-1", "-png", "-singlefile", pdf, base], check=True)
+    return sortie if os.path.exists(sortie) else None
+
+
+def _cartouche(pdf, code, sortie):
+    p = _pages(pdf).get(code)
+    if not p: return None
+    base = sortie[:-4]
+    subprocess.run(["pdftoppm", "-r", "130", "-f", str(p), "-l", str(p), "-x", str(int(348 * 130 / 25.4)), "-y", str(int(236 * 130 / 25.4)), "-W", str(int(76 * 130 / 25.4)), "-H", str(int(35.5 * 130 / 25.4)), "-png", "-singlefile", pdf, base], check=True)
+    return sortie if os.path.exists(sortie) else None
+
+
+# ------------------------------------------------------------------ contexte
+class Ctx:
+    pass
 
 
 def _lv(b):
@@ -14,142 +71,478 @@ def _lv(b):
     return [("le rez-de-chaussée", b)]
 
 
-def _virg(x, n=1): return f"{x:.{n}f}".replace(".", ",")
-
-
-def questions(b, nb_feuilles):
-    """Retourne la liste de questions typées (voir questionnaire.py) — toutes calculées sur les données du dossier."""
-    import random
+def _contexte(b, nb, n, pdf, tmp):
     from collections import Counter
-    from batiment import APP
-    import questionnaire as qs
-    rng = random.Random(b.dossier["code"] + "q")
-    lv = _lv(b)
-    rdc = lv[1][1] if hasattr(b, "lv") else b
-    plan_no = getattr(rdc, "no_plan", "A-101")
-    Np = rdc.Nplan
+    C = Ctx(); C.b, C.n, C.nb, C.pdf = b, n, nb, pdf
+    C.rng = random.Random(f"{b.dossier['code']}-q")
+    C.lv = _lv(b); C.rdc = C.lv[1][1] if hasattr(b, "lv") else b
+    C.plan_no = getattr(C.rdc, "no_plan", "A-101"); C.Np = C.rdc.Nplan
+    C.nom = lambda x: x.replace("\n", " ")
+    C.loc = [(nv, x) for nv, l in C.lv for x in l.locaux]
+    C.aire = lambda x: (x[4] - x[2]) * (x[5] - x[3]) / 1e6
+    C.portes = [(l, o) for _, l in C.lv for o in l.portes if o.get("no")]
+    C.nwc = sum(1 for _, l in C.lv for (code, *_r) in getattr(l, "app", []) if code == "wc")
+    C.B = b.calcul_bilan(); C.tot = sum(C.aire(x) for _, x in C.loc)
+    C.gl = max(C.loc, key=lambda t: C.aire(t[1])); C.pl = min(C.loc, key=lambda t: C.aire(t[1]))
+    C.OU = f"Plan du rez-de-chaussée ({C.plan_no})"
+    C.cnt = Counter(o["type"] for _, l in C.lv for o in l.fenetres)
+    C.hc = getattr(C.rdc, "hc", None)
+    C.no_pl = getattr(C.rdc, "no_plomb", "P-101"); C.no_el = getattr(C.rdc, "no_elec", "E-101"); C.no_cv = getattr(C.rdc, "no_cvca", "M-101")
+    C.ce_loc = None
+    for _, l in C.lv:
+        for (code, x, y, _r) in getattr(l, "app", []):
+            if code == "ce":
+                C.ce_loc = next((C.nom(r[1]) + f" ({r[0]})" for r in l.locaux if r[2] <= x <= r[4] and r[3] <= y <= r[5]), None)
+    C.tmp = tmp
+    return C
+
+
+# ------------------------------------------------------------------ banque de questions (chaque fonction retourne une question ou None)
+def banque(C):
+    b, rng, qs_ = C.b, C.rng, qs
+    nom, aire = C.nom, C.aire
+    portes_w = sorted({o["w"] for _, o in C.portes})
+    std = [100, 125, 150, 200, 225, 300, 400, 600]; base = C.B["service"]
+    def autres_locaux(excl, k):
+        a = [x for _, x in C.loc if x is not excl and abs(aire(x) - aire(excl)) > .8]; rng.shuffle(a); return a[:k]
+    P = {k: [] for k in ("rep", "qcm", "vf", "trou", "assoc", "calc", "erreur", "ordre", "img")}
+    add = lambda t: (lambda f: P[t].append(f) or f)
+
+    # ---------- réponse courte
+    @add("rep")
+    def _(): return qs_.rep("Quelle est l'échelle du plan du rez-de-chaussée ?", f"1:{C.Np}", f"Cartouche de la feuille {C.plan_no}, case « Échelle »", cat="lecture")
+    @add("rep")
+    def _(): return qs_.rep("Combien de feuilles contient ce dossier de plans ?", str(C.nb), "Page de garde : liste des feuilles", cat="lecture")
+    @add("rep")
+    def _(): return qs_.rep("Quelle est la largeur hors tout du bâtiment, en millimètres ?", f"{fmt(b.W)} mm", "Cote extérieure, " + C.OU, cat="arch")
+    @add("rep")
+    def _(): return qs_.rep("Quelle est la profondeur hors tout du bâtiment, en millimètres ?", f"{fmt(b.D)} mm", "Cote extérieure, " + C.OU, cat="arch")
+    @add("rep")
+    def _():
+        g = max(C.portes, key=lambda t: t[1]["w"])[1]
+        return qs_.rep("Quelle est la porte la plus large du bâtiment ? Donne son numéro et sa largeur.", f"Porte {g['no']}, {fmt(g['w'])} mm", "Tableau des portes, feuille A-301", cat="arch")
+    @add("rep")
+    def _(): return qs_.rep("Quel est le plus grand local du bâtiment, et quelle est sa superficie ?", f"{nom(C.gl[1][1])} ({C.gl[1][0]}), {_virg(aire(C.gl[1]))} m²", "Tableau des locaux et des finis, feuille A-401", cat="arch")
+    @add("rep")
+    def _(): return qs_.rep("Quelle est la superficie totale des locaux du bâtiment ?", f"{_virg(C.tot)} m²", "Tableau des locaux et des finis, feuille A-401 (total sous le tableau)", cat="arch")
+    @add("rep")
+    def _(): return qs_.rep("Quel est le plus petit local du bâtiment, et quelle est sa superficie ?", f"{nom(C.pl[1][1])} ({C.pl[1][0]}), {_virg(aire(C.pl[1]))} m²", "Tableau des locaux et des finis, feuille A-401", cat="arch")
+    @add("rep")
+    def _():
+        t, k = C.cnt.most_common(1)[0]
+        return qs_.rep(f"Combien de fenêtres de type {t} (hexagone « {t} ») compte le bâtiment au total ?", str(k), "Tableau des fenêtres, feuille A-301 (colonne « Qté »)", cat="arch")
+    @add("rep")
+    def _(): return qs_.rep("Combien de portes numérotées compte le bâtiment au total ?", str(len(C.portes)), "Tableau des portes, feuille A-301", cat="arch")
+    @add("rep")
+    def _(): return qs_.rep("Quelle grosseur d'entrée de service électrique le bilan de charge retient-il ?", f"{base} A ({C.B['tension']})", "Bilan de charge, feuille E-201", cat="elec")
+    @add("rep")
+    def _(): return qs_.rep("Combien de toilettes (wc) y a-t-il dans le bâtiment ?", str(C.nwc), f"Plans de plomberie ({C.no_pl}) ou tableau des appareils", cat="plomb")
+    @add("rep")
+    def _():
+        ut = sum(APP[c][8] for _, l in C.lv for (c, *_r) in getattr(l, "app", []) if c in APP)
+        return qs_.rep("Quel est le nombre total d'unités d'évacuation (UT) du bâtiment ?", f"{ut:g} UT".replace(".", ","), "Tableau de dimensionnement de la plomberie, feuille P-201", cat="plomb")
+    @add("rep")
+    def _():
+        if not C.hc: return None
+        return qs_.rep("Quelle est la hauteur libre sous plafond du rez-de-chaussée, en millimètres ?", f"{fmt(C.hc)} mm", "Notes générales du plan du rez-de-chaussée", cat="arch")
+    @add("rep")
+    def _(): return qs_.rep("Combien de niveaux (sous-sol compris) compte le bâtiment ?", str(len(C.lv)), "Plans d'architecture et page de garde", cat="arch")
+    @add("rep")
+    def _():
+        if not C.ce_loc: return None
+        return qs_.rep("Dans quel local est installé le chauffe-eau (symbole C-E) ?", C.ce_loc, f"Plan de plomberie ({C.no_pl})", cat="plomb")
+    @add("rep")
+    def _():
+        r = rng.choice([x for _, x in C.loc])
+        return qs_.rep(f"Quel est le numéro du local « {nom(r[1])} » ?", r[0], "Plans d'architecture / tableau des locaux, feuille A-401", cat="arch")
+    @add("rep")
+    def _(): return qs_.rep("Quel est le numéro de la feuille du plan de plomberie du rez-de-chaussée ?", C.no_pl, "Page de garde : liste des feuilles", cat="lecture")
+    @add("rep")
+    def _(): return qs_.rep("À quelle adresse se trouve le projet ?", b.dossier["adresse"].split("\n")[0], "Cartouche, case « Projet »", cat="lecture")
+    @add("rep")
+    def _(): return qs_.rep("Quelle date est inscrite au cartouche ?", b.dossier["date"], "Cartouche, case « Date »", cat="lecture")
+    @add("rep")
+    def _(): return qs_.rep("Combien de fenêtres (tous types) compte le bâtiment ?", str(sum(C.cnt.values())), "Tableau des fenêtres, feuille A-301", cat="arch")
+    @add("rep")
+    def _(): return qs_.rep("Sur quelle feuille trouve-t-on le plan d'électricité du rez-de-chaussée ?", C.no_el, "Page de garde : liste des feuilles", cat="lecture")
+
+    # ---------- choix multiple
+    @add("qcm")
+    def _():
+        o, bon = qs_.options_numeriques(b.D, rng, 500, fmt=fmt, unite=" mm"); return qs_.qcm("Quelle est la profondeur hors tout du bâtiment ?", o, bon, "Cote extérieure, " + C.OU, cat="arch")
+    @add("qcm")
+    def _(): return qs_.qcm("Dans les élévations, que représente un hexagone contenant une lettre ?", ["Le type de fenêtre", "Le numéro d'une porte", "Une prise électrique", "Un point de vue de coupe"], "Le type de fenêtre", "Légende et abréviations, feuille A-001", cat="lecture")
+    @add("qcm")
+    def _():
+        if len(C.cnt) < 3: return None
+        t = [x for x, _ in C.cnt.most_common()][:4]
+        return qs_.qcm("Quel type de fenêtre est le plus fréquent dans le bâtiment ?", [f"Type {x}" for x in sorted(t)], f"Type {t[0]}", "Tableau des fenêtres, feuille A-301 (colonne « Qté »)", cat="arch")
+    @add("qcm")
+    def _():
+        a = autres_locaux(C.pl[1], 3); o = [f"{nom(x[1])} ({x[0]})" for x in a] + [f"{nom(C.pl[1][1])} ({C.pl[1][0]})"]; rng.shuffle(o)
+        return qs_.qcm("Lequel de ces locaux est le plus petit de tout le bâtiment ?", o, f"{nom(C.pl[1][1])} ({C.pl[1][0]})", "Tableau des locaux et des finis, feuille A-401", cat="arch")
+    @add("qcm")
+    def _():
+        a = [v for v in std if v != base]; rng.shuffle(a); o = sorted([base] + a[:3])
+        return qs_.qcm("Quelle entrée de service électrique le bilan de charge retient-il ?", [f"{v} A" for v in o], f"{base} A", "Bilan de charge, feuille E-201", cat="elec")
+    @add("qcm")
+    def _():
+        if not C.ce_loc: return None
+        a = [f"{nom(x[1])} ({x[0]})" for _, x in C.loc if f"{nom(x[1])} ({x[0]})" != C.ce_loc]; rng.shuffle(a)
+        o = a[:3] + [C.ce_loc]; rng.shuffle(o)
+        return qs_.qcm("Dans lequel de ces locaux le chauffe-eau est-il installé ?", o, C.ce_loc, f"Plan de plomberie ({C.no_pl})", cat="plomb")
+    @add("qcm")
+    def _():
+        o, bon = qs_.options_numeriques(C.nwc, rng, 1, mini=0); return qs_.qcm("Combien de toilettes (wc) compte le bâtiment ?", o, bon, f"Plans de plomberie ({C.no_pl})", cat="plomb")
+    @add("qcm")
+    def _():
+        o, bon = qs_.options_numeriques(len(C.lv), rng, 1); return qs_.qcm("Combien de niveaux (sous-sol compris) compte le bâtiment ?", o, bon, "Plans d'architecture", cat="arch")
+    @add("qcm")
+    def _():
+        w = min(portes_w); o = [f"{fmt(w)} mm"] + [f"{fmt(w + d)} mm" for d in (-100, 100, 200)]; o = sorted(set(o), key=lambda s: int(re.sub(r"\D", "", s)))
+        return qs_.qcm("Quelle est la largeur de la porte la plus étroite du bâtiment ?", o, f"{fmt(w)} mm", "Tableau des portes, feuille A-301", cat="arch")
+    @add("qcm")
+    def _():
+        o, bon = qs_.options_numeriques(round(C.tot), rng, 10, fmt=str, unite=" m²"); return qs_.qcm("Quelle est (à peu près) la superficie totale des locaux ?", o, bon, "Tableau des locaux et des finis, feuille A-401", cat="arch")
+
+    # ---------- vrai ou faux
+    def tf(): return rng.random() < .5
+    @add("vf")
+    def _():
+        v = tf(); n_ = C.nwc if v else C.nwc + rng.choice([1, 2]); return qs_.vf(f"Le bâtiment compte {n_} toilette(s).", v, "Plans de plomberie ou tableau des appareils", f"Il y a {C.nwc} toilette(s).", cat="plomb")
+    @add("vf")
+    def _():
+        p0 = C.portes[len(C.portes) // 2][1]; v = tf(); w = p0["w"] if v else p0["w"] + rng.choice([-100, 100])
+        return qs_.vf(f"La porte {p0['no']} mesure {fmt(w)} mm de large.", v, "Tableau des portes, feuille A-301", f"Elle mesure {fmt(p0['w'])} mm.", cat="arch")
+    @add("vf")
+    def _():
+        v = tf(); e = C.Np if v else rng.choice([x for x in (50, 75, 100, 125, 200) if x != C.Np])
+        return qs_.vf(f"Le plan du rez-de-chaussée est dessiné à l'échelle 1:{e}.", v, f"Cartouche de la feuille {C.plan_no}", f"L'échelle est 1:{C.Np}.", cat="lecture")
+    @add("vf")
+    def _():
+        v = tf(); seuil = int(b.W // 1000 * 1000) + (-2000 if v else 2000)
+        return qs_.vf(f"La largeur hors tout du bâtiment est {'supérieure' if v else 'inférieure'} à {fmt(seuil)} mm.", v, "Cote extérieure, " + C.OU, f"Elle est de {fmt(b.W)} mm : l'énoncé est faux.", cat="arch")
+    @add("vf")
+    def _():
+        if not C.ce_loc: return None
+        v = tf(); aut = [f"{nom(x[1])} ({x[0]})" for _, x in C.loc if f"{nom(x[1])} ({x[0]})" != C.ce_loc]; rng.shuffle(aut)
+        return qs_.vf(f"Le chauffe-eau (symbole C-E) est installé dans le local « {C.ce_loc if v else aut[0]} ».", v, f"Plan de plomberie ({C.no_pl})", f"Il est dans « {C.ce_loc} ».", cat="plomb")
+    @add("vf")
+    def _():
+        v = tf(); return qs_.vf(f"Le bilan de charge retient une entrée de service de {base if v else base * 2} A.", v, "Bilan de charge, feuille E-201", f"Il retient {base} A.", cat="elec")
+    @add("vf")
+    def _():
+        v = tf(); s_ = C.nb - 3 if v else C.nb + 3; return qs_.vf(f"Ce dossier contient plus de {s_} feuilles.", v, "Page de garde : liste des feuilles", f"Il contient {C.nb} feuilles : l'énoncé est faux.", cat="lecture")
+    @add("vf")
+    def _():
+        v = tf(); n_ = len(C.lv) if v else len(C.lv) + 1; return qs_.vf(f"Le bâtiment compte {n_} niveau(x), sous-sol compris.", v, "Plans d'architecture", f"Il compte {len(C.lv)} niveau(x).", cat="arch")
+    @add("vf")
+    def _():
+        v = tf(); return qs_.vf(f"Sur les plans de plomberie, le trait {'bleu' if v else 'rouge'} représente l'eau froide.", v, "Légende du plan de plomberie", "Le rouge représente l'eau chaude; l'eau froide est en bleu.", cat="plomb")
+
+    # ---------- texte à compléter
+    @add("trou")
+    def _(): return qs_.trou("Sur les plans de plomberie, le trait ______ représente l'eau froide (EF) et le trait ______ l'eau chaude (EC).", ["bleu", "rouge"], "Légende du plan de plomberie", cat="plomb")
+    @add("trou")
+    def _(): return qs_.trou("Ce bâtiment compte ______ niveau(x) et la superficie totale de ses locaux est de ______ m².", [str(len(C.lv)), _virg(C.tot)], "Plans d'architecture et feuille A-401", cat="arch")
+    @add("trou")
+    def _(): return qs_.trou("Dans le tableau de dimensionnement de la plomberie, UT veut dire « unité d'______ ».", ["évacuation"], "Feuille P-201 (en-tête du tableau)", cat="plomb")
+    @add("trou")
+    def _(): return qs_.trou(f"À l'échelle 1:{C.Np}, 1 mm sur le papier représente ______ mm dans la réalité.", [str(C.Np)], f"Cartouche de la feuille {C.plan_no}", cat="lecture")
+    @add("trou")
+    def _(): return qs_.trou("Hors tout, le bâtiment mesure ______ mm de large et ______ mm de profondeur.", [fmt(b.W), fmt(b.D)], "Cotes extérieures, " + C.OU, cat="arch")
+    @add("trou")
+    def _(): return qs_.trou("Le plan de plomberie du rez-de-chaussée est la feuille ______ et le plan d'électricité la feuille ______.", [C.no_pl, C.no_el], "Page de garde : liste des feuilles", cat="lecture")
+
+    # ---------- association
+    FEUILLES1 = [("A-201", "Élévations (vues extérieures)"), ("A-401", "Tableau des locaux et des finis"), ("P-201", "Dimensionnement de la plomberie"), ("E-201", "Bilan de charge et panneau")]
+    FEUILLES2 = [("A-001", "Légende, symboles et abréviations"), ("A-002", "Analyse du code de construction"), ("A-100", "Plan d'implantation et de site"), ("S-101", "Plan des fondations")]
+    ABREV1 = [("EF", "Eau froide"), ("EC", "Eau chaude"), ("VRC", "Ventilateur récupérateur de chaleur"), ("AFCI", "Disjoncteur anti-arcs")]
+    ABREV2 = [("UT", "Unité d'évacuation"), ("C-E", "Chauffe-eau"), ("DF", "Avertisseur de fumée"), ("LV", "Lave-vaisselle")]
+    @add("assoc")
+    def _(): return qs_.assoc("Associe chaque feuille à son contenu.", FEUILLES1, "Page de garde : liste des feuilles", rng, cat="lecture")
+    @add("assoc")
+    def _(): return qs_.assoc("Associe chaque abréviation à sa signification.", ABREV1, "Légende et abréviations, feuille A-001", rng, cat="lecture")
+    @add("assoc")
+    def _(): return qs_.assoc("Associe chaque feuille à son contenu.", FEUILLES2, "Page de garde : liste des feuilles", rng, cat="lecture")
+    @add("assoc")
+    def _(): return qs_.assoc("Associe chaque symbole ou sigle à sa signification.", ABREV2, "Légendes des plans de plomberie et d'électricité", rng, cat="elec")
+    @add("assoc")
+    def _():
+        l = [x for _, x in C.loc]; rng.shuffle(l); l = l[:4]
+        return qs_.assoc("Associe chaque local à son numéro.", [(nom(x[1]), x[0]) for x in l], "Plans d'architecture / tableau des locaux, feuille A-401", rng, cat="arch")
+
+    @add("assoc")
+    def _():
+        l = [x for _, x in C.loc]; rng.shuffle(l); l = l[4:8] if len(l) >= 8 else l[:4]
+        return qs_.assoc("Associe chaque numéro de local à son nom.", [(x[0], nom(x[1])) for x in l], "Plans d'architecture / tableau des locaux, feuille A-401", rng, cat="arch")
+    @add("assoc")
+    def _():
+        ps = [next(o for _, o in C.portes if o["w"] == w) for w in portes_w[:4]]
+        if len(ps) < 3: return None
+        return qs_.assoc("Associe chaque porte à sa largeur.", [(f"Porte {o['no']}", f"{fmt(o['w'])} mm") for o in ps], "Tableau des portes, feuille A-301", rng, cat="arch")
+    @add("assoc")
+    def _():
+        codes = [c for c in ("wc", "lav", "bain", "dou", "evd") if any(c == cc for _, l in C.lv for (cc, *_r) in getattr(l, "app", []))][:4]
+        if len(codes) < 3: return None
+        return qs_.assoc("Associe chaque appareil à sa charge hydraulique (unités d'évacuation).", [(APP[c][0].split(" (")[0], f"{APP[c][8]:g} UT".replace(".", ",")) for c in codes], "Tableau de dimensionnement de la plomberie, feuille P-201", rng, cat="plomb")
+
+    # ---------- calculs
+    def local_calc():
+        return rng.choice([x for _, x in C.loc if 6 <= aire(x) <= 60])
+    @add("calc")
+    def _():
+        c3 = local_calc(); L, Pf = c3[4] - c3[2], c3[5] - c3[3]
+        return qs_.calc(f"Le local {c3[0]} « {nom(c3[1])} » mesure {fmt(L)} mm sur {fmt(Pf)} mm (entre les faces intérieures). Calcule sa superficie en m².",
+                        [f"{fmt(L)} mm = {_virg(L / 1000, 2)} m;   {fmt(Pf)} mm = {_virg(Pf / 1000, 2)} m", f"{_virg(L / 1000, 2)} × {_virg(Pf / 1000, 2)} = {_virg(L * Pf / 1e6, 2)} m²"], f"{_virg(L * Pf / 1e6, 1)} m²", "Dimensions des locaux, " + C.OU + " et feuille A-401", cat="calc")
+    @add("calc")
+    def _():
+        if not C.hc: return None
+        c3 = local_calc(); L, Pf = c3[4] - c3[2], c3[5] - c3[3]
+        return qs_.calc(f"Calcule le volume d'air du local {c3[0]} « {nom(c3[1])} » (en m³), sachant que sa superficie est de {_virg(L * Pf / 1e6, 1)} m² et que la hauteur libre sous plafond est de {fmt(C.hc)} mm.",
+                        [f"{_virg(L * Pf / 1e6, 1)} m² × {_virg(C.hc / 1000, 2)} m = {_virg(L * Pf / 1e6 * C.hc / 1000, 1)} m³"], f"{_virg(L * Pf / 1e6 * C.hc / 1000, 1)} m³", "Superficie (A-401) × hauteur libre (notes générales)", cat="calc")
+    @add("calc")
+    def _():
+        codes = [c_ for c_ in ("bain", "wc", "lav", "evd", "dou") if any(c_ == cc for _, l in C.lv for (cc, *_r) in getattr(l, "app", []))][:3]
+        if len(codes) < 3: return None
+        nm = {k: APP[k][0].split(" (")[0].lower() for k in codes}; tt = sum(APP[k][8] for k in codes)
+        return qs_.calc(f"Additionne les unités d'évacuation (UT) d'une {nm[codes[0]]}, d'une {nm[codes[1]]} et d'un(e) {nm[codes[2]]}.",
+                        [" + ".join(f"{APP[k][8]:g}" for k in codes).replace(".", ",") + f" = {tt:g}".replace(".", ",") + " UT"], f"{tt:g} UT".replace(".", ","), "Tableau de dimensionnement de la plomberie, feuille P-201", cat="plomb")
+    @add("calc")
+    def _():
+        per = 2 * (b.W + b.D)
+        return qs_.calc("Calcule le périmètre extérieur du bâtiment (en mètres), à partir de sa largeur et de sa profondeur hors tout.",
+                        [f"2 × ({fmt(b.W)} + {fmt(b.D)}) mm = {fmt(per)} mm", f"{fmt(per)} mm ÷ 1 000 = {_virg(per / 1000, 1)} m"], f"{_virg(per / 1000, 1)} m", "Cotes extérieures, " + C.OU, cat="calc")
+    @add("calc")
+    def _():
+        p = b.W / C.Np
+        return qs_.calc(f"À l'échelle 1:{C.Np}, quelle longueur (en mm) la largeur hors tout du bâtiment ({fmt(b.W)} mm) occupe-t-elle sur le papier ?",
+                        [f"{fmt(b.W)} ÷ {C.Np} = {_virg(p, 1)} mm"], f"{_virg(p, 1)} mm", "Dimension réelle ÷ dénominateur de l'échelle", cat="calc")
+    @add("calc")
+    def _():
+        a = autres_locaux(C.gl[1], 2)
+        if len(a) < 1: return None
+        x, y = C.gl[1], a[0]
+        return qs_.calc(f"Le local « {nom(x[1])} » ({x[0]}) a une superficie de {_virg(aire(x))} m² et le local « {nom(y[1])} » ({y[0]}) de {_virg(aire(y))} m². Quelle est la superficie des deux locaux ensemble ?",
+                        [f"{_virg(aire(x))} + {_virg(aire(y))} = {_virg(aire(x) + aire(y))} m²"], f"{_virg(aire(x) + aire(y))} m²", "Tableau des locaux et des finis, feuille A-401", cat="calc")
+    @add("calc")
+    def _():
+        d = aire(C.gl[1]) - aire(C.pl[1])
+        return qs_.calc(f"Quelle est la différence de superficie entre le plus grand local ({_virg(aire(C.gl[1]))} m²) et le plus petit ({_virg(aire(C.pl[1]))} m²) ?",
+                        [f"{_virg(aire(C.gl[1]))} − {_virg(aire(C.pl[1]))} = {_virg(d)} m²"], f"{_virg(d)} m²", "Tableau des locaux et des finis, feuille A-401", cat="calc")
+    @add("calc")
+    def _():
+        pc = aire(C.gl[1]) / C.tot * 100
+        return qs_.calc(f"Le plus grand local fait {_virg(aire(C.gl[1]))} m² et la superficie totale des locaux est de {_virg(C.tot)} m². Quel pourcentage de la superficie totale représente-t-il (arrondi à l'unité) ?",
+                        [f"{_virg(aire(C.gl[1]))} ÷ {_virg(C.tot)} × 100 = {pc:.1f} %".replace(".", ",")], f"{pc:.0f} %", "Tableau des locaux et des finis, feuille A-401", cat="calc")
+
+    # ---------- trouve l'erreur
+    @add("erreur")
+    def _(): return qs_.erreur("« Sur les plans de plomberie, les conduites d'eau chaude sont en bleu et celles d'eau froide sont en rouge. »", "Les couleurs sont inversées : l'eau froide (EF) est bleue et l'eau chaude (EC) est rouge.", "Légende du plan de plomberie", cat="plomb")
+    @add("erreur")
+    def _(): return qs_.erreur(f"« Le plan du rez-de-chaussée est à l'échelle 1:{C.Np} : 1 mm sur le papier représente {max(1, C.Np // 10)} mm dans la réalité. »", f"1 mm sur le papier représente {C.Np} mm réels (et non {max(1, C.Np // 10)}).", f"Cartouche de la feuille {C.plan_no}", cat="lecture")
+    @add("erreur")
+    def _(): return qs_.erreur(f"« La largeur hors tout est de {fmt(b.W + 500)} mm et la profondeur hors tout est de {fmt(b.D)} mm. »", f"La largeur hors tout est de {fmt(b.W)} mm (et non {fmt(b.W + 500)} mm).", "Cotes extérieures, " + C.OU, cat="arch")
+    @add("erreur")
+    def _(): return qs_.erreur(f"« Ce dossier compte {C.nb} feuilles; le bilan de charge électrique se trouve sur la feuille A-401. »", "Le bilan de charge est sur la feuille E-201 (A-401 = tableau des locaux et des finis).", "Page de garde : liste des feuilles", cat="lecture")
+    @add("erreur")
+    def _(): return qs_.erreur(f"« Le bâtiment compte {C.nwc + 2} toilettes et {len(C.lv)} niveau(x). »", f"Il compte {C.nwc} toilette(s) (et non {C.nwc + 2}).", f"Plans de plomberie ({C.no_pl})", cat="plomb")
+    @add("erreur")
+    def _():
+        a = autres_locaux(C.gl[1], 1)
+        if not a: return None
+        return qs_.erreur(f"« Le plus grand local du bâtiment est « {nom(a[0][1])} » ({a[0][0]}). »", f"Le plus grand local est « {nom(C.gl[1][1])} » ({C.gl[1][0]}), {_virg(aire(C.gl[1]))} m².", "Tableau des locaux et des finis, feuille A-401", cat="arch")
+
+    # ---------- questions sur les feuilles : une par feuille, chaque dossier en pose d'autres
+    SHEETS = [("A-001", "la légende des symboles et des abréviations"), ("A-002", "l'analyse du code de construction"), ("A-100", "le plan d'implantation et de site"),
+              ("A-201", "les élévations (vues extérieures)"), ("A-401", "le tableau des locaux et des finis"), ("A-501", "les détails types de construction"),
+              ("S-101", "le plan des fondations"), ("P-201", "le dimensionnement de la plomberie"), ("E-201", "le bilan de charge électrique")]
+    for code, desc in SHEETS:
+        def _q(code=code, desc=desc):
+            autres = [c for c, _ in SHEETS if c != code]; rng.shuffle(autres); o = sorted([code] + autres[:3])
+            return qs_.qcm(f"Sur quelle feuille trouve-t-on {desc} ?", o, code, "Page de garde : liste des feuilles", cat="lecture")
+        P["qcm"].append(_q)
+        def _v(code=code, desc=desc):
+            v = tf(); autre = rng.choice([c for c, _ in SHEETS if c != code])
+            return qs_.vf(f"La feuille {code if v else autre} contient {desc}.", v, "Page de garde : liste des feuilles", f"{desc.capitalize()} : feuille {code}.", cat="lecture")
+        P["vf"].append(_v)
+        def _e(code=code, desc=desc):
+            autre, d2 = rng.choice([(c, d) for c, d in SHEETS if c != code])
+            return qs_.erreur(f"« La feuille {code} contient {d2}. »", f"La feuille {code} contient {desc}; {d2} se trouve sur la feuille {autre}.", "Page de garde : liste des feuilles", cat="lecture")
+        P["erreur"].append(_e)
+
+    # ---------- classement
+    @add("ordre")
+    def _():
+        c = sorted({round(aire(x), 1): x for _, x in C.loc}.items())
+        if len(c) < 4: return None
+        pas = max(1, len(c) // 4); ch = [c[i * pas][1] for i in range(4)]
+        return qs_.ordre("Classe ces locaux du plus petit au plus grand.", [f"{nom(x[1])} ({x[0]})" for x in ch], "du plus petit au plus grand", "Tableau des locaux et des finis, feuille A-401", rng, cat="arch")
+    @add("ordre")
+    def _():
+        c = sorted({round(aire(x), 1): x for _, x in C.loc}.items(), reverse=True)
+        if len(c) < 4: return None
+        ch = [c[i][1] for i in (0, 1, len(c) // 2, len(c) - 1)]
+        return qs_.ordre("Classe ces locaux du plus grand au plus petit.", [f"{nom(x[1])} ({x[0]})" for x in ch], "du plus grand au plus petit", "Tableau des locaux et des finis, feuille A-401", rng, cat="arch")
+    @add("ordre")
+    def _():
+        if len(portes_w) < 3: return None
+        ps = [next(o for _, o in C.portes if o["w"] == w) for w in portes_w[:4]]
+        return qs_.ordre("Classe ces portes de la plus étroite à la plus large.", [f"Porte {o['no']}" for o in ps], "de la plus étroite à la plus large", "Tableau des portes, feuille A-301", rng, cat="arch")
+
+    # ---------- images tirées des plans
+    def img_q(code, nom_img, w=70):
+        from PIL import Image
+        f = _vignette(C.pdf, code, os.path.join(C.tmp, f"{nom_img}.png")) if C.pdf else None
+        if not f: return None
+        iw, ih = Image.open(f).size; return f, w, w * ih / iw
+    def reconnaitre(code, bonne, cat):
+        r = img_q(code, f"v-{code}")
+        if not r: return None
+        f, w, h = r
+        noms = ["Plan de plomberie", "Plan d'électricité", "Plan de chauffage et de ventilation", "Élévations", "Plan des fondations", "Plan de toiture", "Plan du rez-de-chaussée"]
+        o = [bonne] + [x for x in noms if x != bonne][:3]; rng.shuffle(o)
+        q = qs_.qcm("Observe cette feuille (réduite) : de quel type de feuille s'agit-il ?", o, bonne, f"Feuille {code} (compare avec la liste de la page de garde)", cat=cat, niv=2)
+        q.update(img=f, img_w=w, img_h=h, legende="Miniature d'une feuille du dossier"); return q
+    @add("img")
+    def _():
+        f = _cartouche(C.pdf, C.plan_no, os.path.join(C.tmp, "cart.png")) if C.pdf else None
+        if not f: return None
+        from PIL import Image
+        iw, ih = Image.open(f).size; w = 62
+        q = qs_.rep("Lis ce cartouche : quel est le numéro de la feuille et son échelle ?", f"{C.plan_no}, échelle 1:{C.Np}", f"Cartouche de la feuille {C.plan_no}", cat="lecture", niv=1)
+        q.update(img=f, img_w=w, img_h=w * ih / iw, legende="Cartouche (coin inférieur droit d'une feuille)"); return q
+    @add("img")
+    def _(): return reconnaitre(C.no_pl, "Plan de plomberie", "plomb")
+    @add("img")
+    def _(): return reconnaitre(C.no_el, "Plan d'électricité", "elec")
+    @add("img")
+    def _(): return reconnaitre("S-101", "Plan des fondations", "arch")
+    @add("img")
+    def _(): return reconnaitre("A-201", "Élévations", "arch")
+    @add("img")
+    def _(): return reconnaitre(C.no_cv, "Plan de chauffage et de ventilation", "cvca")
+    return P
+
+
+QUOTAS = dict(img=2, rep=6, qcm=7, vf=6, trou=3, assoc=2, calc=4, erreur=3, ordre=2)
+
+
+def _choisir(pool, n, k, C):
+    """k questions valides de la banque. Le dossier n prend d'abord ses générateurs « à lui » (index ≡ n−1 mod 4) :
+    les 4 dossiers de bâtiments ne partagent ainsi presque aucune question; si sa part ne suffit pas, il pioche ensuite dans les autres."""
+    L = len(pool)
+    ordre = [i for i in range(L) if i % 4 == (n - 1) % 4] + [i for i in range(L) if i % 4 != (n - 1) % 4]
+    out = []
+    for i in ordre:
+        if len(out) >= k: break
+        try: q = pool[i]()
+        except Exception: q = None
+        if q is not None: out.append(q)
+    return out
+
+
+def questions(b, nb_feuilles, n=1, pdf=None, tmp="/tmp/qimg"):
+    os.makedirs(tmp, exist_ok=True)
+    C = _contexte(b, nb_feuilles, n, pdf, tmp)
+    P = banque(C)
     Q = []
-    nom_p = lambda n: n.replace("\n", " ")
-    loc = [(nv, x) for nv, l in lv for x in l.locaux]
-    aire = lambda x: (x[4] - x[2]) * (x[5] - x[3]) / 1e6
-    portes = [(l, o) for _, l in lv for o in l.portes if o.get("no")]
-    larg_portes = sorted({o["w"] for _, o in portes})
-    nwc = sum(1 for _, l in lv for (code, *_r) in getattr(l, "app", []) if code == "wc")
-    B = b.calcul_bilan()
-    tot = sum(aire(x) for _, x in loc)
-    gl = max(loc, key=lambda t: aire(t[1])); pl = min(loc, key=lambda t: aire(t[1]))
-    OU_PLAN = f"Plan du rez-de-chaussée ({plan_no})"
-
-    # ---------------- A. réponse courte
-    Q.append(qs.rep("Quelle est l'échelle du plan du rez-de-chaussée ?", f"1:{Np}", f"Cartouche de la feuille {plan_no}, case « Échelle »"))
-    Q.append(qs.rep("Combien de feuilles contient ce dossier de plans ?", str(nb_feuilles), "Page de garde : liste des feuilles"))
-    Q.append(qs.rep("Quelle est la largeur hors tout du bâtiment, en millimètres ?", f"{fmt(b.W)} mm", "Cote extérieure, " + OU_PLAN))
-    gros = max(portes, key=lambda t: t[1]["w"])
-    Q.append(qs.rep("Quelle est la porte la plus large du bâtiment ? Donne son numéro et sa largeur.", f"Porte {gros[1]['no']}, {fmt(gros[1]['w'])} mm", "Tableau des portes, feuille A-301"))
-    Q.append(qs.rep("Quel est le plus grand local du bâtiment, et quelle est sa superficie ?", f"{nom_p(gl[1][1])} ({gl[1][0]}), {_virg(aire(gl[1]))} m²", "Plans d'architecture / tableau des locaux, feuille A-401"))
-    Q.append(qs.rep("Quelle est la superficie totale des locaux du bâtiment ?", f"{_virg(tot)} m²", "Tableau des locaux et des finis, feuille A-401 (total sous le tableau)"))
-
-    # ---------------- B. choix multiple
-    ops, bon = qs.options_numeriques(b.D, rng, 500, fmt=fmt, unite=" mm")
-    Q.append(qs.qcm("Quelle est la profondeur hors tout du bâtiment ?", ops, bon, "Cote extérieure, " + OU_PLAN))
-    Q.append(qs.qcm("Sur quelle feuille trouve-t-on le tableau des locaux et des finis ?", ["A-401", "A-501", "S-101", "E-201"], "A-401", "Page de garde : liste des feuilles"))
-    Q.append(qs.qcm("Quelle feuille contient le bilan de charge électrique ?", ["P-201", "E-201", "M-001", "A-002"], "E-201", "Page de garde : liste des feuilles"))
-    Q.append(qs.qcm("Dans les élévations, que représente un hexagone contenant une lettre ?",
-                    ["Le type de fenêtre", "Le numéro d'une porte", "Une prise électrique", "Un point de vue de coupe"], "Le type de fenêtre", "Légende et abréviations, feuille A-001"))
-    cnt = Counter(o["type"] for _, l in lv for o in l.fenetres)
-    if len(cnt) >= 3:
-        types = [t for t, _ in cnt.most_common()][:4]
-        Q.append(qs.qcm("Quel type de fenêtre est le plus fréquent dans le bâtiment ?", [f"Type {t}" for t in sorted(types)], f"Type {types[0]}", "Tableau des fenêtres, feuille A-301 (colonne « Qté »)"))
-    autres = [x for _, x in loc if x is not pl[1] and abs(aire(x) - aire(pl[1])) > 1.0]; rng.shuffle(autres)
-    opts = [f"{nom_p(x[1])} ({x[0]})" for x in autres[:3]] + [f"{nom_p(pl[1][1])} ({pl[1][0]})"]; rng.shuffle(opts)
-    Q.append(qs.qcm("Lequel de ces locaux est le plus petit de tout le bâtiment ?", opts, f"{nom_p(pl[1][1])} ({pl[1][0]})", "Tableau des locaux et des finis, feuille A-401"))
-    std = [100, 125, 150, 200, 225, 300, 400, 600]
-    base = B["service"]; autres_a = [v for v in std if v != base]; rng.shuffle(autres_a)
-    ops = sorted([base] + autres_a[:3]); Q.append(qs.qcm("Quelle grosseur d'entrée de service électrique le bilan de charge retient-il ?", [f"{v} A" for v in ops], f"{base} A", "Bilan de charge, feuille E-201"))
-
-    # ---------------- C. vrai ou faux
-    v1 = rng.random() < .5; n_aff = nwc if v1 else nwc + rng.choice([-1, 1, 2]) if nwc > 1 else nwc + 1
-    Q.append(qs.vf(f"Le bâtiment compte {n_aff} toilette(s).", v1, "Plans de plomberie (symboles de toilette) ou tableau des appareils", f"Il y a {nwc} toilette(s)."))
-    p0 = portes[len(portes) // 2][1]; v2 = rng.random() < .5; w_aff = p0["w"] if v2 else p0["w"] + rng.choice([-100, 100])
-    Q.append(qs.vf(f"La porte {p0['no']} mesure {fmt(w_aff)} mm de large.", v2, "Tableau des portes, feuille A-301", f"Elle mesure {fmt(p0['w'])} mm."))
-    ech = [50, 75, 100, 125, 200]; v3 = rng.random() < .5; e_aff = Np if v3 else rng.choice([e for e in ech if e != Np])
-    Q.append(qs.vf(f"Le plan du rez-de-chaussée est dessiné à l'échelle 1:{e_aff}.", v3, f"Cartouche de la feuille {plan_no}", f"L'échelle est 1:{Np}."))
-    v4 = rng.random() < .5; seuil = int(b.W // 1000 * 1000) + (-2000 if v4 else 2000)
-    Q.append(qs.vf(f"La largeur hors tout du bâtiment est {'supérieure' if v4 else 'inférieure'} à {fmt(seuil)} mm.", v4, "Cote extérieure, " + OU_PLAN, f"Elle est de {fmt(b.W)} mm : l'énoncé est faux."))
-    ce = next(((l, (x, y)) for _, l in lv for (code, x, y, _r) in getattr(l, "app", []) if code == "ce"), None)
-    if ce:
-        loc_ce = next((nom_p(r[1]) for r in ce[0].locaux if r[2] <= ce[1][0] <= r[4] and r[3] <= ce[1][1] <= r[5]), None)
-        if loc_ce:
-            v5 = rng.random() < .5; aut = [nom_p(r[1]) for _, r in loc if nom_p(r[1]) != loc_ce]; rng.shuffle(aut)
-            Q.append(qs.vf(f"Le chauffe-eau (symbole C-E) est installé dans le local « {loc_ce if v5 else aut[0]} ».", v5, "Plan de plomberie (symbole C-E)", f"Il est dans « {loc_ce} »."))
-    v6 = rng.random() < .5
-    Q.append(qs.vf(f"Le bilan de charge retient une entrée de service de {base if v6 else base * 2} A.", v6, "Bilan de charge, feuille E-201", f"Il retient {base} A."))
-
-    # ---------------- D. texte à compléter
-    Q.append(qs.trou("Sur les plans de plomberie, le trait ______ représente l'eau froide (EF) et le trait ______ l'eau chaude (EC).", ["bleu", "rouge"], "Légende du plan de plomberie"))
-    Q.append(qs.trou(f"Ce bâtiment compte ______ niveau(x) et la superficie totale de ses locaux est de ______ m².", [str(len(lv)), _virg(tot)], "Plans d'architecture et feuille A-401"))
-    Q.append(qs.trou("Dans le tableau de dimensionnement de la plomberie, l'abréviation UT veut dire « unité d'______ ».", ["évacuation"], "Feuille P-201 (en-tête du tableau)"))
-
-    # ---------------- E. association
-    Q.append(qs.assoc("Associe chaque feuille à son contenu.", [("A-201", "Élévations (vues extérieures)"), ("A-401", "Tableau des locaux et des finis"), ("P-201", "Dimensionnement de la plomberie"), ("E-201", "Bilan de charge et panneau")], "Page de garde : liste des feuilles", rng))
-    Q.append(qs.assoc("Associe chaque abréviation à sa signification.", [("EF", "Eau froide"), ("EC", "Eau chaude"), ("VRC", "Ventilateur récupérateur de chaleur"), ("AFCI", "Disjoncteur anti-arcs")], "Légende et abréviations, feuille A-001", rng))
-
-    # ---------------- F. calculs
-    c3 = rng.choice([x for _, x in loc if 6 <= aire(x) <= 60])
-    larg, prof = c3[4] - c3[2], c3[5] - c3[3]
-    Q.append(qs.calc(f"Le local {c3[0]} « {nom_p(c3[1])} » mesure {fmt(larg)} mm sur {fmt(prof)} mm (entre les faces intérieures). Calcule sa superficie en m².",
-                     [f"{fmt(larg)} mm = {_virg(larg / 1000, 2)} m;   {fmt(prof)} mm = {_virg(prof / 1000, 2)} m", f"{_virg(larg / 1000, 2)} × {_virg(prof / 1000, 2)} = {_virg(larg * prof / 1e6, 2)} m²"],
-                     f"{_virg(larg * prof / 1e6, 1)} m²", "Dimensions des locaux, " + OU_PLAN + " et feuille A-401"))
-    hc = getattr(rdc, "hc", None)
-    if hc:
-        Q.append(qs.calc(f"Calcule le volume d'air du local {c3[0]} « {nom_p(c3[1])} » (en m³), sachant que la hauteur libre sous plafond est de {fmt(hc)} mm.",
-                         [f"Superficie = {_virg(larg * prof / 1e6, 2)} m²;   hauteur = {_virg(hc / 1000, 2)} m", f"{_virg(larg * prof / 1e6, 2)} × {_virg(hc / 1000, 2)} = {_virg(larg * prof * hc / 1e9, 1)} m³"],
-                         f"{_virg(larg * prof * hc / 1e9, 1)} m³", "Superficie (A-401) × hauteur libre (notes générales)"))
-    codes = [c_ for c_ in ("bain", "wc", "lav", "evd", "dou") if any(c_ == cc for _, l in lv for (cc, *_r) in getattr(l, "app", []))][:3]
-    if len(codes) >= 3:
-        nomc = {k: APP[k][0].split(" (")[0].lower() for k in codes}
-        tt = sum(APP[k][8] for k in codes)
-        Q.append(qs.calc(f"Additionne les unités d'évacuation (UT) d'une {nomc[codes[0]]}, d'une {nomc[codes[1]]} et d'un(e) {nomc[codes[2]]}.",
-                         [" + ".join(f"{APP[k][8]:g}" for k in codes).replace(".", ",") + f" = {tt:g}".replace(".", ",") + " UT"], f"{tt:g} UT".replace(".", ","), "Tableau de dimensionnement de la plomberie, feuille P-201"))
-    per = 2 * (b.W + b.D)
-    Q.append(qs.calc(f"Calcule le périmètre extérieur du bâtiment (en mètres), à partir de sa largeur et de sa profondeur hors tout.",
-                     [f"2 × ({fmt(b.W)} + {fmt(b.D)}) mm = {fmt(per)} mm", f"{fmt(per)} mm ÷ 1 000 = {_virg(per / 1000, 1)} m"], f"{_virg(per / 1000, 1)} m", "Cotes extérieures, " + OU_PLAN))
-
-    # ---------------- G. trouve l'erreur
-    Q.append(qs.erreur("« Sur les plans de plomberie, les conduites d'eau chaude sont en bleu et celles d'eau froide sont en rouge. »",
-                       "Les couleurs sont inversées : l'eau froide (EF) est bleue et l'eau chaude (EC) est rouge.", "Légende du plan de plomberie"))
-    Q.append(qs.erreur(f"« Le plan du rez-de-chaussée est à l'échelle 1:{Np} : 1 mm sur le papier représente {Np // 10} mm dans la réalité. »",
-                       f"1 mm sur le papier représente {Np} mm réels (et non {Np // 10}).", f"Cartouche de la feuille {plan_no}"))
-    Q.append(qs.erreur(f"« La largeur hors tout est de {fmt(b.W + 500)} mm et la profondeur hors tout est de {fmt(b.D)} mm. »",
-                       f"La largeur hors tout est de {fmt(b.W)} mm (et non {fmt(b.W + 500)} mm).", "Cotes extérieures, " + OU_PLAN))
-    Q.append(qs.erreur(f"« Ce dossier compte {nb_feuilles} feuilles; le bilan de charge électrique se trouve sur la feuille A-401. »",
-                       "Le bilan de charge est sur la feuille E-201 (A-401 = tableau des locaux et des finis).", "Page de garde : liste des feuilles"))
-
-    # ---------------- H. classement
-    cand = sorted({round(aire(x), 1): x for _, x in loc}.items())
-    if len(cand) >= 4:
-        pas = max(1, len(cand) // 4); ch = [cand[i * pas][1] for i in range(4)]; ch = ch[:4]
-        Q.append(qs.ordre("Classe ces locaux du plus petit au plus grand.", [f"{nom_p(x[1])} ({x[0]})" for x in ch], "du plus petit au plus grand", "Tableau des locaux et des finis, feuille A-401", rng))
-    if len(larg_portes) >= 3:
-        ps = []
-        for w in larg_portes[:4]:
-            o = next(o for _, o in portes if o["w"] == w); ps.append(o)
-        Q.append(qs.ordre("Classe ces portes de la plus étroite à la plus large.", [f"Porte {o['no']}" for o in ps], "de la plus étroite à la plus large", "Tableau des portes, feuille A-301", rng))
-
+    for t, k in QUOTAS.items(): Q += _choisir(P[t], n, k, C)
     import exercices6
     det = [(f_, q, r) for (f_, q, r) in exercices6.QUESTIONS if f_ in getattr(b, "details_meca", [])]
-    rng.shuffle(det)
-    for (f_, q, r) in det[:6]: Q.append(qs.rep(q, r, f"Feuille {f_} (détail)"))
+    random.Random(f"{n}-det").shuffle(det)
+    for (f_, q, r) in det[:4]: Q.append(qs.rep(q, r, f"Feuille {f_} (détail)", cat="plomb" if f_.startswith("P") else "cvca", niv=3))
     return Q
 
 
-def generer(b, nb_feuilles, chemin_ex, chemin_corr):
-    import questionnaire as qs
-    Q = questions(b, nb_feuilles)
-    nom = b.dossier["projet"].replace("\n", " — ")
+def _theme(n, site):
+    T = dict(THEMES[n]); T["couleur"] = qs.HexColor(T["couleur"])
+    th = os.path.join(site, "plans", f"dossier-{n}-elevation.jpg") if site else None
+    if th and os.path.exists(th): T["thumb"] = th
+    return T
+
+
+def generer(b, nb_feuilles, chemin_ex, chemin_corr, n=1, pdf=None, site=None):
+    Q = questions(b, nb_feuilles, n, pdf)
+    T = _theme(n, site); T["nom"] = f"Dossier {n} — {b.dossier['projet'].split(chr(10))[0].title()}"
     titre = b.dossier["projet"].split("\n")[0].title()
-    sous = b.dossier["projet"].split("\n")[1] + " — Lecture de plans"
-    cons = "Consigne : ouvre le dossier de plans et réponds aux questions. Les parties ont des types de questions différents : lis bien la consigne de chaque partie."
-    qs.generer_pdf(chemin_ex, titre, sous, Q, False, cons)
-    qs.generer_pdf(chemin_corr, titre, sous, Q, True, cons)
+    sous = f"Dossier {n} · Lecture de plans"
+    for (chemin, corr) in ((chemin_ex, False), (chemin_corr, True)):
+        qs.generer_pdf(chemin, titre, sous, Q, corr, "", T, THEMES[n]["mode"])
+    return Q
+
+
+# ------------------------------------------------------------------ dossier 5 : ferme laitière
+def questions_ferme(nb_feuilles, pdf=None, tmp="/tmp/qimg5"):
+    import ferme
+    os.makedirs(tmp, exist_ok=True)
+    rng = random.Random("ferme-q"); Q = []
+    W, D, N_LOG = ferme.W, ferme.D, ferme.N_LOG
+    S = W * D / 1e6; per = 2 * (W + D)
+    rep, qcm, vf, trou, assoc, calc, erreur, ordre = qs.rep, qs.qcm, qs.vf, qs.trou, qs.assoc, qs.calc, qs.erreur, qs.ordre
+    # réponse courte
+    Q += [rep("Quelle est la longueur de l'étable, en millimètres ?", f"{fmt(W)} mm", "Plan de l'étable, feuille A-101 (cotes)", cat="arch"),
+          rep("Combien de logettes compte l'étable ?", str(N_LOG), "Page de garde (« Logettes ») et plan de l'étable, feuille A-101", cat="arch"),
+          rep("Combien de robots de traite l'étable compte-t-elle ?", "2", "Page de garde (« Traite ») et plan de l'étable, feuille A-101", cat="arch"),
+          rep("À quelle hauteur se trouve le faîte du toit par rapport au sol (± 0) ?", f"+ {fmt(ferme.ZF)}", "Élévations, feuille A-201 (niveaux)", cat="arch"),
+          rep("Combien de silos-tours la ferme compte-t-elle, et quel est leur diamètre ?", "3 silos-tours, Ø 8 m", "Plan d'implantation (A-100) et élévation des silos (A-202)", cat="arch"),
+          rep("Combien de feuilles contient ce dossier de plans ?", str(nb_feuilles), "Page de garde : liste des feuilles", cat="lecture")]
+    # choix multiple
+    qcm_ = [qcm("Quelle est la pente du toit de l'étable ?", ["5°", "10°", "15°", "30°"], "10°", "Page de garde (« Toiture ») et coupe, feuille A-301", cat="arch"),
+            qcm("Quelle puissance de panneaux solaires la toiture porte-t-elle ?", ["60 kW", "90 kW", "120 kW", "240 kW"], "120 kW", "Page de garde et élévation sud, feuille A-201", cat="elec"),
+            qcm("Quelle est la hauteur du muret de béton ?", ["800 mm", "1 000 mm", "1 200 mm", "1 500 mm"], "1 200 mm", "Élévations, feuille A-201 (niveau « Muret »)", cat="arch"),
+            qcm("Sur quelle feuille trouve-t-on l'élévation des silos-tours ?", ["A-100", "A-202", "A-301", "S-101"], "A-202", "Page de garde : liste des feuilles", cat="lecture"),
+            qcm("Combien de rangées de logettes l'étable compte-t-elle ?", ["2", "3", "4", "6"], "4", "Page de garde et plan de l'étable, feuille A-101", cat="arch"),
+            qcm("Quelle est la largeur des grandes portes aux bouts des couloirs d'alimentation ?", ["2 500 mm", "3 000 mm", "3 500 mm", "4 500 mm"], "3 500 mm", "Notes d'élévation, feuille A-201", cat="arch"),
+            qcm("Combien d'abreuvoirs l'étable compte-t-elle ?", ["4", "6", "8", "10"], "6", "Plan de plomberie P-101 et feuille P-103", cat="plomb")]
+    rng.shuffle(qcm_); Q += qcm_[:5]
+    # vrai ou faux
+    Q += [vf("Le toit de l'étable est à deux versants.", True, "Élévations, feuille A-201", "", cat="arch"),
+          vf("Les silos-tours mesurent 12 m de haut.", False, "Élévation des silos-tours, feuille A-202", "Ils mesurent 24 m de haut.", cat="arch"),
+          vf("Le tracteur doit contourner l'étable pour alimenter les deux couloirs.", False, "Notes d'élévation, feuille A-201", "Les couloirs sont traversants : le tracteur passe d'un bout à l'autre.", cat="arch"),
+          vf("L'étable compte 6 abreuvoirs à niveau constant.", True, "Plan de plomberie, feuille P-101", "", cat="plomb"),
+          vf(f"Le lot de la ferme mesure 240 000 mm × 150 000 mm.", True, "Plan d'implantation, feuille A-100", "", cat="arch")]
+    # texte à compléter
+    Q += [trou("L'étable mesure ______ mm de long et ______ mm de large.", [fmt(W), fmt(D)], "Plan de l'étable, feuille A-101", cat="arch"),
+          trou("Le toit est à deux versants avec une pente de ______ degrés.", ["10"], "Coupe transversale, feuille A-301", cat="arch")]
+    # association
+    Q += [assoc("Associe chaque feuille à son contenu.", [("A-100", "Plan d'implantation de la ferme"), ("A-201", "Élévations de l'étable"), ("A-202", "Élévation des silos-tours"), ("S-101", "Plan des fondations")], "Page de garde : liste des feuilles", rng, cat="lecture"),
+          assoc("Associe chaque équipement à son rôle.", [("Robot de traite", "Trait les vaches automatiquement"), ("Racleur", "Nettoie les allées"), ("Repousse-fourrage", "Ramène le fourrage vers les vaches"), ("Ventilateur HVLS", "Brasse l'air lentement sur une grande surface")], "Légende et feuille E-101", rng, cat="elec")]
+    # calculs
+    Q += [calc(f"L'étable mesure {fmt(W)} mm sur {fmt(D)} mm. Calcule sa superficie en m².", [f"{W / 1000:.0f} m × {D / 1000:.0f} m = {S:.0f} m²".replace(".", ",")], f"{fmt(round(S))} m²", "Page de garde (« Étable ») et plan de l'étable, feuille A-101", cat="calc"),
+          calc(f"L'étable abrite {N_LOG} vaches. Quelle superficie (en m²) revient à chaque vache ? (arrondis à 0,1)", [f"{S:.0f} m² ÷ {N_LOG} vaches = {S / N_LOG:.2f} m²".replace(".", ",")], f"{S / N_LOG:.1f} m²".replace(".", ","), "Superficie de l'étable ÷ nombre de logettes", cat="calc"),
+          calc(f"Calcule le périmètre de l'étable (en mètres) : {fmt(W)} mm sur {fmt(D)} mm.", [f"2 × ({W / 1000:.0f} + {D / 1000:.0f}) = {per / 1000:.0f} m"], f"{per / 1000:.0f} m", "Plan de l'étable, feuille A-101", cat="calc"),
+          calc(f"Sur un plan à l'échelle 1:250, quelle longueur (en mm) l'étable ({fmt(W)} mm) occupe-t-elle sur le papier ?", [f"{fmt(W)} ÷ 250 = {W / 250:.0f} mm"], f"{W / 250:.0f} mm", "Dimension réelle ÷ dénominateur de l'échelle", cat="calc")]
+    # trouve l'erreur
+    Q += [erreur("« L'étable compte 120 logettes réparties en 2 rangées. »", "Les logettes sont réparties en 4 rangées.", "Page de garde et plan de l'étable, feuille A-101", cat="arch"),
+          erreur("« Les trois silos-tours de la ferme sont des silos-couloirs de 24 m de haut. »", "Ce sont des silos-tours (cylindres de 24 m); les silos-couloirs sont couchés au sol.", "Plan d'implantation, feuille A-100 et feuille A-202", cat="arch"),
+          erreur("« Le toit a une pente de 30° et la faîtière est fermée. »", "La pente est de 10° et la faîtière est ouverte (ventilation naturelle).", "Page de garde et feuille A-301", cat="arch")]
+    # classement
+    Q += [ordre("Classe ces éléments du plus bas au plus haut.", ["Muret de béton (1 200 mm)", "Corniche (4 500 mm)", "Faîte de l'étable (7 056 mm)", "Silo-tour (24 000 mm)"], "du plus bas au plus haut", "Élévations (A-201) et élévation des silos (A-202)", rng, cat="arch"),
+          ordre("Classe ces feuilles dans l'ordre de leur numéro (de la plus petite à la plus grande).", ["A-100", "A-201", "P-101", "E-101"], "ordre de la page de garde", "Page de garde : liste des feuilles", rng, cat="lecture")]
+    # images
+    if pdf:
+        from PIL import Image
+        pg = _pages(pdf)
+        for code, bonne in (("A-101", "Plan de l'étable"), ("A-201", "Élévations"), ("S-101", "Plan des fondations")):
+            f = _vignette(pdf, code, os.path.join(tmp, f"v-{code}.png"))
+            if not f: continue
+            iw, ih = Image.open(f).size
+            noms = ["Plan de l'étable", "Élévations", "Plan des fondations", "Plan d'électricité", "Plan de plomberie"]
+            o = [bonne] + [x for x in noms if x != bonne][:3]; rng.shuffle(o)
+            q = qcm("Observe cette feuille (réduite) : de quel type de feuille s'agit-il ?", o, bonne, f"Feuille {code}", cat="arch", niv=2)
+            q.update(img=f, img_w=68, img_h=68 * ih / iw, legende="Miniature d'une feuille du dossier"); Q.append(q)
+        f = _cartouche(pdf, "A-201", os.path.join(tmp, "cart.png"))
+        if f:
+            iw, ih = Image.open(f).size
+            q = rep("Lis ce cartouche : quel est le numéro de la feuille et son échelle ?", "A-201, échelle 1:250", "Cartouche de la feuille A-201", cat="lecture", niv=1)
+            q.update(img=f, img_w=62, img_h=62 * ih / iw, legende="Cartouche (coin inférieur droit d'une feuille)"); Q.append(q)
+    return Q
+
+
+def generer_ferme(nb_feuilles, chemin_ex, chemin_corr, pdf=None, site=None):
+    Q = questions_ferme(nb_feuilles, pdf)
+    T = _theme(5, site); T["nom"] = "Dossier 5 — Ferme laitière"
+    for (chemin, corr) in ((chemin_ex, False), (chemin_corr, True)):
+        qs.generer_pdf(chemin, "Ferme Laitière", "Dossier 5 · Lecture de plans", Q, corr, "", T, THEMES[5]["mode"])
     return Q

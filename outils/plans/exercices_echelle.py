@@ -189,16 +189,18 @@ def typer(Qs, seed):
     return T
 
 
-def pdf(chemin, Qs, nom_dossier, corrige, seed="x"):
-    import questionnaire as qs
-    T = typer(Qs, seed)
-    cons = "Imprime le dossier à 100 % (papier 11 × 17 po, jamais « Ajuster ») et vérifie le trait de contrôle de 100 mm. Utilise la bonne face de ton échelimètre. Tolérance : ± 1 mm sur le papier."
-    qs.generer_pdf(chemin, "Mesures à l'échelle", nom_dossier, T, corrige, cons)
+def pdf(chemin, Qs, nom_dossier, corrige, seed="x", n=1, site=None):
+    import questionnaire as qs, exercices
+    T = exercices._theme(n, site); T.update(kicker="Mesure à l'échelle · Échelimètre", nom=f"Dossier {n} — Mesures à l'échelle", indices="aucun", prefixe="Partie ", lettres=True,
+                                          intro=["Imprime le dossier à 100 % (papier 11 × 17 po, jamais « Ajuster ») et vérifie le trait de contrôle de 100 mm en bas de chaque feuille.",
+                                                 "Utilise la bonne face de ton échelimètre métrique. Tolérance : ± 1 mm sur le papier."])
+    T2 = typer(Qs, seed)
+    qs.generer_pdf(chemin, "Mesures à l'échelle", nom_dossier, T2, corrige, "", T, "type")
 
 
 def generer(site, n, b, nom_dossier):
     import os
     Qs = questions_ferme() if b is None else questions_batiment(b, f"D{n}")
-    pdf(os.path.join(site, "plans", f"dossier-{n}-echelle.pdf"), Qs, nom_dossier, False, f"D{n}")
-    pdf(os.path.join(site, "plans", f"dossier-{n}-echelle-corrige.pdf"), Qs, nom_dossier, True, f"D{n}")
+    pdf(os.path.join(site, "plans", f"dossier-{n}-echelle.pdf"), Qs, nom_dossier, False, f"D{n}", n, site)
+    pdf(os.path.join(site, "plans", f"dossier-{n}-echelle-corrige.pdf"), Qs, nom_dossier, True, f"D{n}", n, site)
     return Qs

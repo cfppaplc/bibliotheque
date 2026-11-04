@@ -34,6 +34,31 @@ def trouver_page(pdf, titre):
     return None
 
 
+def activites(n):
+    """Copie les questionnaires dans activites/ (onglet Activités du site) avec une couverture qui montre bien de quel plan il s'agit."""
+    from PIL import Image, ImageDraw, ImageFont
+    th = os.path.join(SITE, "plans", f"dossier-{n}-elevation.jpg")
+    couleurs = {1: "#1c5f8f", 2: "#2e7d4f", 3: "#c26a12", 4: "#6a3fa0", 5: "#3b7d2a"}
+    for kind, titre in (("lecture", "LECTURE DE PLANS"), ("echelle", "MESURE À L'ÉCHELLE")):
+        src = f"dossier-{n}-exercices.pdf" if kind == "lecture" else f"dossier-{n}-echelle.pdf"
+        cor = f"dossier-{n}-corrige.pdf" if kind == "lecture" else f"dossier-{n}-echelle-corrige.pdf"
+        if not os.path.exists(os.path.join(SITE, "plans", src)): continue
+        shutil.copy(os.path.join(SITE, "plans", src), os.path.join(SITE, "activites", f"plans-d{n}-{kind}.pdf"))
+        shutil.copy(os.path.join(SITE, "plans", cor), os.path.join(SITE, "activites", f"plans-d{n}-{kind}-corrige.pdf"))
+        W, H = 420, 297
+        im = Image.new("RGB", (W, H), "white"); d = ImageDraw.Draw(im)
+        d.rectangle([0, 0, W, 96], fill=couleurs[n])
+        try:
+            fb = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 44); fs = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 24)
+        except Exception: fb = fs = ImageFont.load_default()
+        d.text((16, 8), f"PLAN {n}", font=fb, fill="white"); d.text((16, 62), titre, font=fs, fill="white")
+        if os.path.exists(th):
+            t = Image.open(th).convert("RGB"); t = t.crop((20, 110, 940, 530)); t.thumbnail((W - 20, H - 150)); im.paste(t, ((W - t.width) // 2, 104))
+        d.text((16, H - 40), DOSSIERS_NOMS[n], font=fs, fill="#333333")
+        d.rectangle([0, H - 6, W, H], fill=couleurs[n])
+        im.save(os.path.join(SITE, "activites", f"plans-d{n}-{kind}.jpg"), quality=86)
+
+
 def produire(n, publier):
     mod, _, pdf, titre = DOSSIERS[n]
     chemin = os.path.join("sortie", pdf)
@@ -52,11 +77,15 @@ def produire(n, publier):
     shutil.copy(chemin, os.path.join(SITE, "plans", f"dossier-{n}.pdf"))
     if obj is not None:  # exercices + corrigé calculés sur les données du dossier
         import exercices
-        exercices.generer(obj, nb, os.path.join(SITE, "plans", f"dossier-{n}-exercices.pdf"), os.path.join(SITE, "plans", f"dossier-{n}-corrige.pdf"))
+        exercices.generer(obj, nb, os.path.join(SITE, "plans", f"dossier-{n}-exercices.pdf"), os.path.join(SITE, "plans", f"dossier-{n}-corrige.pdf"), n, chemin, SITE)
         import exercices6
         exercices6.montage(SITE, n, getattr(obj, "details_meca", []))
+    if obj is None:   # ferme : questionnaire écrit à la main
+        import exercices
+        exercices.generer_ferme(nb, os.path.join(SITE, "plans", f"dossier-{n}-exercices.pdf"), os.path.join(SITE, "plans", f"dossier-{n}-corrige.pdf"), chemin, SITE)
     import exercices_echelle
     exercices_echelle.generer(SITE, n, obj, f"{DOSSIERS_NOMS[n]} — Dossier {n}")
+    activites(n)
     p = trouver_page(chemin, titre)
     if p:
         subprocess.run(["pdftoppm", "-r", "100", "-f", str(p), "-l", str(p), "-png", chemin, f"/tmp/sec{n}"], check=True)

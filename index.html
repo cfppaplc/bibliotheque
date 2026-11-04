@@ -6396,6 +6396,10 @@ initAdmin();
   .act-carte{display:grid;grid-template-columns:150px 1fr;gap:20px;background:#17171a;border:1px solid #ffffff1c;border-radius:16px;padding:16px;border-left:5px solid var(--ac,#e50914)}
   .act-carte img{width:150px;height:auto;border-radius:8px;background:#fff;box-shadow:0 6px 18px #0008;align-self:start}
   .act-tag{display:inline-flex;align-items:center;gap:6px;font-size:.74rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ac,#e50914);margin-bottom:6px}
+  .act-imgw{position:relative;align-self:start}
+  .act-dos{position:absolute;left:-8px;top:10px;background:var(--ac);color:#fff;font-weight:800;font-size:.78rem;letter-spacing:.04em;text-transform:uppercase;padding:4px 10px;border-radius:0 8px 8px 0;box-shadow:0 3px 8px #0006}
+  .act-b.corr{border-color:#2ea043;color:#56d364}
+  body.clair .act-b.corr{color:#1a7f37;border-color:#1a7f37}
   .act-carte h3{margin:0 0 4px;font-size:1.35rem;line-height:1.2}
   .act-comp{color:#c9c9d0;font-size:.95rem;margin-bottom:8px}
   .act-desc{color:#a9a9b0;font-size:.95rem;line-height:1.45;margin:0 0 10px}
@@ -6436,11 +6440,32 @@ initAdmin();
   const ACTIVITES = [
     { f:"montages-circuit-ferme", titre:"Montages en circuit fermé", type:"Cahier d'activités", prog:"Plomberie et chauffage",
       comp:"307-428 · Mécanique de tuyauterie", pages:66,
-      desc:"27 activités de montage : fonte, PEX, cuivre, acier, acier rainuré, montages combinés, montants et supports, défis finaux. Calculs, tableaux et cases à cocher." }
+      desc:"27 activités de montage : fonte, PEX, cuivre, acier, acier rainuré, montages combinés, montants et supports, défis finaux. Calculs, tableaux et cases à cocher." },
+    { f:"plans-d1-lecture", titre:"Lecture de plans — Maison unifamiliale", type:"Exercices de plans", prog:"Plomberie et chauffage", comp:"Plan : Dossier 1 · Maison unifamiliale", pages:7, dossier:1, corrige:"plans-d1-lecture-corrige",
+      desc:"Questionnaire sur le dossier de plans 1 (à ouvrir dans Plans). Environ 35 questions : choix multiple, vrai ou faux, calculs, association, trouve l'erreur, images tirées des plans. Les questions sont propres à ce plan." },
+    { f:"plans-d1-echelle", titre:"Mesure à l'échelle — Maison unifamiliale", type:"Exercices de plans", prog:"Plomberie et chauffage", comp:"Plan : Dossier 1 · Maison unifamiliale", pages:8, dossier:1, corrige:"plans-d1-echelle-corrige",
+      desc:"Mesures à l'échelimètre sur le dossier 1 : mesures, conversions, calculs et questions de compréhension de l'échelle. Imprime le dossier à 100 %." },
+    { f:"plans-d2-lecture", titre:"Lecture de plans — Duplex jumelé", type:"Exercices de plans", prog:"Plomberie et chauffage", comp:"Plan : Dossier 2 · Duplex jumelé", pages:7, dossier:2, corrige:"plans-d2-lecture-corrige",
+      desc:"Questionnaire sur le dossier de plans 2 (à ouvrir dans Plans). Environ 35 questions : choix multiple, vrai ou faux, calculs, association, trouve l'erreur, images tirées des plans. Les questions sont propres à ce plan." },
+    { f:"plans-d2-echelle", titre:"Mesure à l'échelle — Duplex jumelé", type:"Exercices de plans", prog:"Plomberie et chauffage", comp:"Plan : Dossier 2 · Duplex jumelé", pages:7, dossier:2, corrige:"plans-d2-echelle-corrige",
+      desc:"Mesures à l'échelimètre sur le dossier 2 : mesures, conversions, calculs et questions de compréhension de l'échelle. Imprime le dossier à 100 %." },
+    { f:"plans-d3-lecture", titre:"Lecture de plans — Bâtiment commercial", type:"Exercices de plans", prog:"Plomberie et chauffage", comp:"Plan : Dossier 3 · Bâtiment commercial", pages:6, dossier:3, corrige:"plans-d3-lecture-corrige",
+      desc:"Questionnaire sur le dossier de plans 3 (à ouvrir dans Plans). Environ 35 questions : choix multiple, vrai ou faux, calculs, association, trouve l'erreur, images tirées des plans. Les questions sont propres à ce plan." },
+    { f:"plans-d3-echelle", titre:"Mesure à l'échelle — Bâtiment commercial", type:"Exercices de plans", prog:"Plomberie et chauffage", comp:"Plan : Dossier 3 · Bâtiment commercial", pages:7, dossier:3, corrige:"plans-d3-echelle-corrige",
+      desc:"Mesures à l'échelimètre sur le dossier 3 : mesures, conversions, calculs et questions de compréhension de l'échelle. Imprime le dossier à 100 %." },
+    { f:"plans-d4-lecture", titre:"Lecture de plans — Centre commercial", type:"Exercices de plans", prog:"Plomberie et chauffage", comp:"Plan : Dossier 4 · Centre commercial", pages:7, dossier:4, corrige:"plans-d4-lecture-corrige",
+      desc:"Questionnaire sur le dossier de plans 4 (à ouvrir dans Plans). Environ 35 questions : choix multiple, vrai ou faux, calculs, association, trouve l'erreur, images tirées des plans. Les questions sont propres à ce plan." },
+    { f:"plans-d4-echelle", titre:"Mesure à l'échelle — Centre commercial", type:"Exercices de plans", prog:"Plomberie et chauffage", comp:"Plan : Dossier 4 · Centre commercial", pages:7, dossier:4, corrige:"plans-d4-echelle-corrige",
+      desc:"Mesures à l'échelimètre sur le dossier 4 : mesures, conversions, calculs et questions de compréhension de l'échelle. Imprime le dossier à 100 %." },
+    { f:"plans-d5-lecture", titre:"Lecture de plans — Ferme laitière", type:"Exercices de plans", prog:"Plomberie et chauffage", comp:"Plan : Dossier 5 · Ferme laitière", pages:7, dossier:5, corrige:"plans-d5-lecture-corrige",
+      desc:"Questionnaire sur le dossier de plans 5 (à ouvrir dans Plans). Environ 35 questions : choix multiple, vrai ou faux, calculs, association, trouve l'erreur, images tirées des plans. Les questions sont propres à ce plan." },
+    { f:"plans-d5-echelle", titre:"Mesure à l'échelle — Ferme laitière", type:"Exercices de plans", prog:"Plomberie et chauffage", comp:"Plan : Dossier 5 · Ferme laitière", pages:6, dossier:5, corrige:"plans-d5-echelle-corrige",
+      desc:"Mesures à l'échelimètre sur le dossier 5 : mesures, conversions, calculs et questions de compréhension de l'échelle. Imprime le dossier à 100 %." }
   ];
   const COUL = { "Plomberie et chauffage":"#2f8fd8", "Entretien général d'immeubles":"#e0892b" };
+  const COUL_DOS = { 1:"#1c5f8f", 2:"#2e7d4f", 3:"#c26a12", 4:"#6a3fa0", 5:"#3b7d2a" };
   const $ = id => document.getElementById(id), ov = $("actOv");
-  const F = { prog:"", type:"" };
+  const F = { prog:"", type:"", dos:"" };
   const esc = t => String(t).replace(/[&<>"]/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" }[c]));
   const IC_OUV = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M8 20h8M12 16v4"/></svg>';
   const IC_IMP = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 9V3h10v6M7 17H4v-7h16v7h-3M7 14h10v7H7z"/></svg>';
@@ -6451,14 +6476,16 @@ initAdmin();
   }
   function dessiner(){
     const progs = [...new Set(ACTIVITES.map(a => a.prog))], types = [...new Set(ACTIVITES.map(a => a.type))];
-    $("actFiltres").innerHTML = (progs.length > 1 ? pills("prog", "Programme", progs) : "") + (types.length > 1 ? pills("type", "Type", types) : "");
-    const l = ACTIVITES.filter(a => (!F.prog || a.prog === F.prog) && (!F.type || a.type === F.type));
-    $("actListe").innerHTML = l.length ? l.map(a => '<article class="act-carte" style="--ac:' + (COUL[a.prog] || "#e50914") + '"><img src="activites/' + a.f + '.jpg" alt="" loading="lazy"><div>' +
+    const dossiers = [...new Set(ACTIVITES.filter(a => a.dossier).map(a => a.comp.replace("Plan : ", "")))];
+    $("actFiltres").innerHTML = (progs.length > 1 ? pills("prog", "Programme", progs) : "") + (types.length > 1 ? pills("type", "Type", types) : "") + (dossiers.length > 1 ? pills("dos", "Plan", dossiers) : "");
+    const l = ACTIVITES.filter(a => (!F.prog || a.prog === F.prog) && (!F.type || a.type === F.type) && (!F.dos || (a.comp || "").replace("Plan : ", "") === F.dos));
+    $("actListe").innerHTML = l.length ? l.map(a => '<article class="act-carte" style="--ac:' + (a.dossier ? COUL_DOS[a.dossier] : (COUL[a.prog] || "#e50914")) + '"><div class="act-imgw"><img src="activites/' + a.f + '.jpg" alt="" loading="lazy">' + '</div><div>' +
       '<div class="act-tag">' + esc(a.type) + '</div><h3>' + esc(a.titre) + '</h3><div class="act-comp">' + esc(a.comp) + '</div><p class="act-desc">' + esc(a.desc) + '</p>' +
       '<div class="act-meta"><span>' + esc(a.prog) + '</span><span>' + a.pages + ' pages</span></div>' +
       '<div class="act-btns"><button class="act-b prim" type="button" data-a="ouvrir" data-f="' + a.f + '">' + IC_OUV + 'Projeter au tableau</button>' +
       '<button class="act-b" type="button" data-a="imprimer" data-f="' + a.f + '">' + IC_IMP + 'Imprimer</button>' +
-      '<a class="act-b" href="activites/' + a.f + '.pdf" download="' + esc(a.titre) + '.pdf">' + IC_DL + 'Télécharger</a></div></div></article>').join("")
+      '<a class="act-b" href="activites/' + a.f + '.pdf" download="' + esc(a.titre) + '.pdf">' + IC_DL + 'Télécharger</a>' +
+      (a.corrige ? '<button class="act-b corr" type="button" data-a="corrige" data-f="' + a.f + '">Corrigé</button>' : '') + '</div></div></article>').join("")
       : '<div class="act-vide">Aucune activité pour ce choix.</div>';
   }
   async function pdfDe(a){ const r = await fetch("activites/" + a.f + ".pdf"); if (!r.ok) throw new Error("introuvable"); return r.blob(); }
@@ -6466,6 +6493,7 @@ initAdmin();
     const p = e.target.closest(".act-pill"); if (p){ F[p.dataset.k] = p.dataset.v; dessiner(); return; }
     const b = e.target.closest("[data-a]"); if (!b) return;
     const a = ACTIVITES.find(x => x.f === b.dataset.f); if (!a) return;
+    if (b.dataset.a === "corrige"){ window.open("activites/" + a.corrige + ".pdf", "_blank"); return; }
     if (b.dataset.a === "imprimer"){ window.open("activites/" + a.f + ".pdf", "_blank"); return; }
     /* Projeter : la visionneuse des plans (zoom, crayon) affiche le PDF */
     let blob; try { blob = await pdfDe(a); } catch (er) { window.open("activites/" + a.f + ".pdf", "_blank"); return; }
