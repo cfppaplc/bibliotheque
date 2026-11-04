@@ -162,7 +162,7 @@ def point_cote(f, x, y, zp, ze=None, align="g", col=black):
 
 
 def feuille_nivellement(self, c):
-    T = TERRAIN; N = 400
+    T = TERRAIN; N = 500
     f = Feuille(c, self.dossier, "C-101", "PLAN DE NIVELLEMENT\nET DE DRAINAGE PLUVIAL", f"1:{N}")
     LW, LD = LOT
     x0 = DRAW[0] + ((DRAW[2] - DRAW[0]) - LW / N) / 2 + 6; y0 = DRAW[1] + 10500 / N + 20
@@ -347,8 +347,8 @@ def feuille_nivellement(self, c):
 
 def feuille_profils(self, c):
     T = TERRAIN
-    f = Feuille(c, self.dossier, "C-102", "PROFILS DE TERRAIN\nET RÉSEAU PLUVIAL", "H 1:400 · V 1:100")
-    NH, NV = 400, 100
+    f = Feuille(c, self.dossier, "C-102", "PROFILS DE TERRAIN\nET RÉSEAU PLUVIAL", "H 1:500 · V 1:100")
+    NH, NV = 500, 100
     ROUGE, VERTC = HexColor("#f6c7c0"), HexColor("#cfe8cf")
     BRUN = HexColor("#8a5a2b")
 
@@ -406,7 +406,7 @@ def feuille_profils(self, c):
             while s <= L + 1:
                 cv.drawCentredString(X(s), (yy - 1) * MM, fn(s)); s += stations
         cv.setLineWidth(.6); cv.rect(X(0), Y(z_bas), (L / NH) * MM, (z_haut - z_bas) * 1000 / NV * MM)
-        f.titre_vue(ox - 2, yb - 4 * 4.2 - 9, num, titre, "H 1:400 · V 1:100 (exagération × 4)")
+        f.titre_vue(ox - 2, yb - 4 * 4.2 - 9, num, titre, "H 1:500 · V 1:100 (exagération × 5)")
 
     # Profil A-A' : nord-sud à x = 45 000, du centre de la rue (y = -6 000) au fond du lot
     def fa(s):
@@ -436,7 +436,7 @@ def feuille_profils(self, c):
     f.tableau(DRAW[0] + 112, DRAW[1] + 62, "CONDUITES PLUVIALES (PEHD)", ["Tronçon", "Ø (mm)", "Long. (m)", "Pente", "Radier amont", "Radier aval"], lignes, [22, 13, 14, 13, 16, 15], h=4.2, size=5.8)
     f.notes("COMMENT LIRE UN PROFIL", [
         "Le profil est une coupe du terrain le long d'une ligne du plan C-101 (A-A' ou B-B').",
-        "L'échelle verticale (1:100) est 4 fois plus grande que l'horizontale (1:400) : les pentes paraissent plus fortes.",
+        "L'échelle verticale (1:100) est 5 fois plus grande que l'horizontale (1:500) : les pentes paraissent plus fortes.",
         "Trait pointillé gris : terrain existant. Trait brun : terrain projeté (après les travaux).",
         "Rouge : déblai (on enlève de la terre). Vert : remblai (on en ajoute).",
         "Chaînage 0+045 = 45 m depuis le début de la ligne.",

@@ -89,8 +89,8 @@ def m301(c):
 
 
 def m302(c):
-    N = 8
-    f = Feuille(c, DOSSIER, "M-302", "CHAUDIÈRE MURALE\nÀ CONDENSATION", "1:8")
+    N = 10
+    f = Feuille(c, DOSSIER, "M-302", "CHAUDIÈRE MURALE\nÀ CONDENSATION", "1:10")
     base(f, N, -350)
     plancher(f, -350, 2380)
     # chaudière (cabinet 400 × 700, bas à 700 du plancher)
@@ -151,8 +151,8 @@ def m302(c):
 
 
 def m303(c):
-    N = 6
-    f = Feuille(c, DOSSIER, "M-303", "COLLECTEUR DE\nPLANCHER CHAUFFANT", "1:6")
+    N = 10
+    f = Feuille(c, DOSSIER, "M-303", "COLLECTEUR DE\nPLANCHER CHAUFFANT", "1:10")
     base(f, N, -350, -14)
     xs = [440 + 120 * k for k in range(6)]
     ya, yr = 900, 500
@@ -226,8 +226,8 @@ def jacket(f, x0, x1, y0, y1, dome):
 
 
 def p301(c):
-    N = 8
-    f = Feuille(c, DOSSIER, "P-301", "CHAUFFE-EAU\nÉLECTRIQUE", "1:8")
+    N = 10
+    f = Feuille(c, DOSSIER, "P-301", "CHAUFFE-EAU\nÉLECTRIQUE", "1:10")
     base(f, N, -300, -8)
     plancher(f, -300, 2300)
     d = 22
@@ -291,8 +291,8 @@ def p301(c):
 
 
 def p302(c):
-    N = 12
-    f = Feuille(c, DOSSIER, "P-302", "ENTRÉE D'EAU\nEN SOUS-SOL (COUPE)", "1:12")
+    N = 20
+    f = Feuille(c, DOSSIER, "P-302", "ENTRÉE D'EAU\nEN SOUS-SOL (COUPE)", "1:20")
     base(f, N, -1700, 8)
     d = 60
     grade = 2050
@@ -356,8 +356,8 @@ def wc(f, x):
 
 
 def p303(c):
-    N = 15
-    f = Feuille(c, DOSSIER, "P-303", "MUR HUMIDE : DRAINAGE\nET VENTILATION", "1:15")
+    N = 20
+    f = Feuille(c, DOSSIER, "P-303", "MUR HUMIDE : DRAINAGE\nET VENTILATION", "1:20")
     base(f, N, -2300, 17)
     f.ligne(-2300, 0, 2550, 0, 1.4)
     # plancher à solives et plafond
@@ -479,8 +479,8 @@ def p304(c):
 
 
 def p305(c):
-    N = 8
-    f = Feuille(c, DOSSIER, "P-305", "RACCORD DE GAZ\nÀ UN APPAREIL", "1:8")
+    N = 10
+    f = Feuille(c, DOSSIER, "P-305", "RACCORD DE GAZ\nÀ UN APPAREIL", "1:10")
     base(f, N, -300, -6)
     plancher(f, -300, 2300)
     f.rect(-300, 0, 0, 1560, .0, fill=HexColor("#f1efe8"), col=white); f.ligne(0, 0, 0, 1560, .9); f.hachures(-300, 0, 0, 1560, 70, 45, GRIS_C, .2)
@@ -525,23 +525,23 @@ def p305(c):
 
 
 def m001(c):
-    f = Feuille(c, DOSSIER, "M-001", "ROBINETTERIE ET\nACCESSOIRES", "1:6")
-    f.vue(DRAW[0] + 6, DRAW[1] + 22, 6)
-    d = 40
+    f = Feuille(c, DOSSIER, "M-001", "ROBINETTERIE ET\nACCESSOIRES", "1:10")
+    f.vue(DRAW[0] + 4, 26, 10)
+    d = 80
     items = [("Robinet à vanne", lambda s: robinet_vanne(s, 0, d)), ("Robinet à soupape", lambda s: robinet_soupape(s, 0, d)), ("Robinet à tournant\nsphérique", lambda s: robinet_sphere(s, 0, d)),
              ("Clapet antiretour\nà battant", lambda s: clapet(s, 0, d)), ("Filtre en Y", lambda s: filtre_y(s, 0, d)),
              ("Réducteur de pression", lambda s: reducteur(s, 0, d)), ("Compteur d'eau", lambda s: compteur(s, 0, d)), ("Circulateur", lambda s: circulateur(s, 0, d)),
              ("Vanne à trois voies\nmotorisée", lambda s: vanne3(s, 0, d)), ("Mélangeur\nthermostatique", lambda s: melangeur(s, 0, d)),
-             ("Soupape de sûreté", lambda s: soupape_surete(s, 0, 24)), ("Manomètre", lambda s: manometre(s, 0, 60, 32)), ("Thermomètre", lambda s: thermometre(s, 0)),
+             ("Soupape de sûreté", lambda s: soupape_surete(s, 0, 40)), ("Manomètre", lambda s: manometre(s, 0, 60, 32)), ("Thermomètre", lambda s: thermometre(s, 0)),
              ("Purgeur d'air\nautomatique", lambda s: purgeur(s, 0)), ("Vase d'expansion", lambda s: vase_expansion(s, 0, 70, 150))]
     for i, (nom, fn) in enumerate(items):
-        col, row = i % 5, i // 5
-        x = 200 + col * 400; y = 1100 - row * 480
-        tuyau(f, [(x - 180, y), (x + 180, y)], d, bouts=(False, False))
-        fn(Sym(f, x, y + (22 if i >= 10 and i != 10 else 0)))
-        f.texte(x, y - 130, nom, 8, True, "c")
+        col, row = i % 4, i // 4
+        x = 450 + col * 800; y = 1900 - row * 600
+        tuyau(f, [(x - 360, y), (x + 360, y)], d, bouts=(False, False))
+        fn(Sym(f, x, y + (30 if i >= 11 else 0)))
+        f.texte(x, y - 235, nom, 8, True, "c")
     f.vue(0, 0, 1)
-    f.notes("COMMENT LIRE", ["Chaque symbole est dessiné en élévation, monté sur un tuyau de 40 mm.", "Les brides, unions et poignées permettent de reconnaître le type de robinet à distance.",
+    f.notes("COMMENT LIRE", ["Chaque symbole est dessiné en élévation, à l'échelle 1:10, monté sur un tuyau de 80 mm de diamètre.", "Les brides, unions et poignées permettent de reconnaître le type de robinet à distance.",
                             "Ces symboles se retrouvent dans les gros plans M-301 à P-305.", "Le sens d'écoulement n'est donné que par les clapets et le circulateur (flèche)."])
     c.showPage()
 

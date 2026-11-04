@@ -91,7 +91,7 @@ duplex = BatimentJumele(
     coupe_long=dict(y=1500, N=100, lettre="B"),
     couches_mur=[("Pierre de parement 90 ou fibre de bois 11", 90, "brique"), ("Vide d'air 25", 25, "vide"), ("Panneau isolant rigide 25", 25, "isolant_rigide"),
                  ("Panneau OSB 11", 11, "panneau"), ("Montants 38 × 140 à 400 c/c et laine R-24", 140, "laine"), ("Pare-vapeur (polyéthylène 0,15)", 0, "membrane"), ("Gypse 12,7", 13, "gypse")],
-    Nplan=75, Nelev=120, Ncoupe=50, Nfond=100, axes_fond=[8000],
+    Nplan=75, Nelev=125, Ncoupe=50, Nfond=100, axes_fond=[8000],
     notes_plan=["Toutes les cotes sont en millimètres.", "Logement B symétrique du logement A (numéros 2xx).",
                 "Mur mitoyen : séparation coupe-feu 1 h, double ossature et deux épaisseurs de gypse type X de chaque côté.",
                 "Hauteur libre sous plafond : 2 440 mm.", "Dalle sur sol : voir S-101."],

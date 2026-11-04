@@ -98,6 +98,14 @@ class Feuille:
         c.setFont(FONT_B, 6.2); c.setFillColor(HexColor("#b00020"))
         c.drawString((x0 + 4) * MM, 44 * MM, "DESSIN À DES FINS D'ENSEIGNEMENT —")
         c.drawString((x0 + 4) * MM, 41.4 * MM, "NE PAS UTILISER POUR LA CONSTRUCTION")
+        # contrôle d'impression : ce trait doit mesurer exactement 100 mm sur le papier
+        c.setStrokeColor(black); c.setLineWidth(.5)
+        xa, ya = 238, 11.4
+        c.line(xa * MM, ya * MM, (xa + 100) * MM, ya * MM)
+        for k in range(0, 11):
+            c.line((xa + 10 * k) * MM, (ya - (1.6 if k % 5 == 0 else 1.0)) * MM, (xa + 10 * k) * MM, (ya + (1.6 if k % 5 == 0 else 1.0)) * MM)
+        c.setFont(FONT, 5.2); c.setFillColor(black)
+        c.drawRightString((xa - 2) * MM, (ya - 1.4) * MM, "Contrôle d'impression : ce trait mesure 100 mm (imprimer à 100 %, papier 11 × 17 po)")
         c.setFillColor(black)
 
     def notes(self, titre, lignes, y_top=None, size=7):

@@ -470,8 +470,8 @@ class Ferme:
 
     # ----------------------------------------------------------- fondations
     def fondations(self, c):
-        N = 300
-        f = Feuille(c, DOSSIER, "S-101", "PLAN DES FONDATIONS", "1:300 et 1:50")
+        N = 250
+        f = Feuille(c, DOSSIER, "S-101", "PLAN DES FONDATIONS", "1:250 et 1:50")
         self._centrer_plan(f, N, bas=126)
         xs = list(range(0, W + 1, 6000)) + [W]
         lettres = "ABCDEFGHIJKL"
@@ -492,7 +492,7 @@ class Ferme:
         f.texte(XS / 2, D / 2, "Dalle de laiterie\n(drain central)", 5, True)
         f.ligne(W + 100, 14500, W + 14000, 14500, 1.2, HexColor("#555"), dash=[5, 3])
         f.cote(0, W, -3800); f.cote(0, D, -3400, orient="v"); f.chaine(sorted(set(xs)), D + 4800, "h", total=False)
-        f.titre_vue(DRAW[0] + 4, 247, 1, "PLAN DES FONDATIONS", "1:300")
+        f.titre_vue(DRAW[0] + 4, 247, 1, "PLAN DES FONDATIONS", "1:250")
         # détail d'un portique
         f.vue(DRAW[0] + 215, 50, 50)
         f.rect(-3000, -300, 4500, 0, .6, fill=BETON); f.hachures(-3000, -1400, 4500, -300, 120, 45, GRIS_C)

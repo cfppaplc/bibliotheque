@@ -125,7 +125,7 @@ def feuille_coupes(self, c):
 
 def _N_mur(self):
     H = self._z_haut_mur() - (self.z_semelle - 300)
-    for N in (20, 25, 30, 40, 50):
+    for N in (20, 25, 50):
         if H / N <= 205: return N
     return 50
 

@@ -213,7 +213,7 @@ def _mur(f, x0, z0, z1, avec_gypse=True):
 
 
 def feuille_details(self, c):
-    f = Feuille(c, self.dossier, "A-501", "DÉTAILS TYPES\nDE CONSTRUCTION", "1:6 à 1:8")
+    f = Feuille(c, self.dossier, "A-501", "DÉTAILS TYPES\nDE CONSTRUCTION", "1:10")
     N = 6
     cw, ch = 162, 121
     top = DRAW[3] - 8
@@ -221,12 +221,12 @@ def feuille_details(self, c):
     pignon = getattr(self, "toit", "plat") == "pignon" or hasattr(self, "toit_plans")
     LAB = dict(size=5.4, larg=36)
 
-    def origine(i, ymin, xmin=0, marge_x=12, n=6):
+    def origine(i, ymin, xmin=0, marge_x=12, n=10):
         x, y = cases[i]
         f.vue(x + marge_x - xmin / n, y - 100 - ymin / n, n)
 
     # 1 appui de fenêtre -------------------------------------------------
-    origine(0, 300, xmin=-80, n=6)
+    origine(0, 300, xmin=-80, n=10)
     _mur(f, 0, 300, 400)
     _cp.motif(f, "bois", 60, 400, 150, 450)
     f.rect(70, 450, 140, 780, .6, fill=white); f.rect(78, 500, 90, 780, .5, fill=HexColor("#cfe3ee"))
@@ -238,9 +238,9 @@ def feuille_details(self, c):
              ("Mousse isolante et scellant autour du cadre", (130, 425)), ("Fenêtre à triple vitrage, cadre isolé", (110, 650)), ("Mur type M1 (voir A-302)", (230, 340)),
              ("Gypse 12,7 retourné au cadre", (250, 395))]
     _cp.etiquettes(f, items, 330, 300, 800, **LAB)
-    f.titre_vue(cases[0][0], cases[0][1] - 114, 1, "APPUI DE FENÊTRE", "1:6")
+    f.titre_vue(cases[0][0], cases[0][1] - 114, 1, "APPUI DE FENÊTRE", "1:10")
     # 2 seuil de porte ----------------------------------------------------
-    origine(1, -200, xmin=-340, n=8)
+    origine(1, -200, xmin=-340, n=10)
     _cp.motif(f, "beton", -20, -200, 250, 0)
     _cp.motif(f, "bois", 20, 0, 250, 38); _cp.motif(f, "panneau", 20, 38, 480, 57)
     _cp.motif(f, "bois", 0, 0, 38, 300); _cp.motif(f, "panneau", -20, 38, 20, 300)
@@ -251,9 +251,9 @@ def feuille_details(self, c):
     items = [("Marche de béton, pente 2 % vers l'extérieur", (-200, 120)), ("Seuil d'aluminium à rupture thermique", (25, 190)), ("Porte isolée avec coupe-bise", (80, 330)),
              ("Plancher fini 19 sur contreplaqué 19", (400, 70)), ("Solive de rive isolée", (120, 20)), ("Fondation en béton 250", (100, -150))]
     _cp.etiquettes(f, items, 560, -200, 420, **LAB)
-    f.titre_vue(cases[1][0], cases[1][1] - 114, 2, "SEUIL DE PORTE", "1:8")
+    f.titre_vue(cases[1][0], cases[1][1] - 114, 2, "SEUIL DE PORTE", "1:10")
     # 3 raccord de toit ----------------------------------------------------
-    origine(2, 250, xmin=-430, n=7)
+    origine(2, 250, xmin=-430, n=10)
     if pignon:
         _mur(f, 0, 250, 300)
         _cp.motif(f, "bois", -10, 300, 253, 360)
@@ -278,9 +278,9 @@ def feuille_details(self, c):
                  ("Pont d'acier (tôle nervurée)", (190, 400)), ("Mur type : voir la coupe de mur", (60, 350))]
         titre = "RACCORD DE TOIT PLAT ET PARAPET"
     _cp.etiquettes(f, items, 330, 250, 770, **LAB)
-    f.titre_vue(cases[2][0], cases[2][1] - 114, 3, titre, "1:7")
+    f.titre_vue(cases[2][0], cases[2][1] - 114, 3, titre, "1:10")
     # 4 dalle sur sol : joint de retrait --------------------------------------
-    origine(3, -330, xmin=-100, n=6)
+    origine(3, -330, xmin=-100, n=10)
     _cp.motif(f, "terre", -100, -330, 450, -300); _cp.motif(f, "pierre", -100, -300, 450, -100)
     f.ligne(-100, -100, 450, -100, .5, VE)
     _cp.motif(f, "isolant_rigide", -100, -100, 450, -50)
@@ -290,7 +290,7 @@ def feuille_details(self, c):
     items = [("Scellant souple dans le trait de scie", (185, 45)), ("Joint de retrait scié (1/4 de l'épaisseur)", (185, 0)), ("Dalle de béton 100, 25 MPa", (60, 20)),
              ("Isolant rigide 50", (300, -75)), ("Polyéthylène 0,15 (pare-vapeur)", (300, -100)), ("Pierre nette 200, compactée", (300, -200)), ("Sol naturel", (300, -315))]
     _cp.etiquettes(f, items, 500, -330, 140, **LAB)
-    f.titre_vue(cases[3][0], cases[3][1] - 114, 4, "DALLE SUR SOL : JOINT DE RETRAIT", "1:6")
+    f.titre_vue(cases[3][0], cases[3][1] - 114, 4, "DALLE SUR SOL : JOINT DE RETRAIT", "1:10")
     f.vue(0, 0, 1)
     f.notes("NOTES", ["Détails types : ils ne remplacent pas les plans d'atelier du fabricant.", "Respecter les chevauchements de membranes (100 mm minimum) et la continuité de l'isolant et du pare-vapeur.",
                       "Chaque détail est à lire avec la coupe de mur de la feuille de coupes.", "Les cotes sont en millimètres; échelles indiquées sous chaque détail."])

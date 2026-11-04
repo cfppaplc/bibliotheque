@@ -19,6 +19,9 @@ DOSSIERS = {
 }
 
 
+DOSSIERS_NOMS = {1: "Maison unifamiliale", 2: "Duplex jumelé", 3: "Bâtiment commercial", 4: "Centre commercial", 5: "Ferme laitière"}
+
+
 def pages(pdf):
     out = subprocess.run(["pdfinfo", pdf], capture_output=True, text=True).stdout
     return int(re.search(r"Pages:\s+(\d+)", out).group(1))
@@ -52,6 +55,8 @@ def produire(n, publier):
         exercices.generer(obj, nb, os.path.join(SITE, "plans", f"dossier-{n}-exercices.pdf"), os.path.join(SITE, "plans", f"dossier-{n}-corrige.pdf"))
         import exercices6
         exercices6.montage(SITE, n, getattr(obj, "details_meca", []))
+    import exercices_echelle
+    exercices_echelle.generer(SITE, n, obj, f"{DOSSIERS_NOMS[n]} — Dossier {n}")
     p = trouver_page(chemin, titre)
     if p:
         subprocess.run(["pdftoppm", "-r", "100", "-f", str(p), "-l", str(p), "-png", chemin, f"/tmp/sec{n}"], check=True)

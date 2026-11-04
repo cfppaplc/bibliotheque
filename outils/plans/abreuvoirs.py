@@ -18,10 +18,10 @@ def _tab(f, titre, lignes):
 
 
 def p102(c, DOSSIER):
-    f = Feuille(c, DOSSIER, "P-102", "ABREUVOIR À NIVEAU\nCONSTANT : DÉTAILS", "1:14, 1:18 et 1:20")
+    f = Feuille(c, DOSSIER, "P-102", "ABREUVOIR À NIVEAU\nCONSTANT : DÉTAILS", "1:20")
     # ================= 1. coupe longitudinale (1:14)
-    N = 14
-    f.vue(DRAW[0] + 44, 168, N)
+    N = 20
+    f.vue(DRAW[0] + 44, 185, N)
     L, H, base = 2200, 800, 150
     xs, ym = 2350, 700
     # dalle et socle
@@ -77,10 +77,10 @@ def p102(c, DOSSIER):
     etiq(f, "Boîte de jonction\nDDFT étanche", -380, 1050, -240, 790) if False else etiq(f, "Boîte de jonction\nDDFT", -450, 1000, -250, 790)
     etiq(f, "Mise à la terre\n(équipotentialité)", -520, 280, -330, 80)
     f.cote(0, H, -700, "800 (bord)", "v", 6.5) if False else f.cote(0, H, 2680, None, "v", 6.5) if False else None
-    f.vue(0, 0, 1); f.titre_vue(DRAW[0] + 6, 124, 1, "COUPE LONGITUDINALE DE L'ABREUVOIR", "1:14")
+    f.vue(0, 0, 1); f.titre_vue(DRAW[0] + 6, 150, 1, "COUPE LONGITUDINALE DE L'ABREUVOIR", "1:20")
     # ================= 2. coupe transversale (1:18)
-    N2 = 18
-    f.vue(DRAW[0] + 235, 74, N2)
+    N2 = 20
+    f.vue(DRAW[0] + 215, 115, N2)
     f.rect(-200, -100, 900, 0, .8, fill=BETON); f.ligne(-200, 0, 900, 0, 1.2)
     f.rect(100, 0, 600, 150, .8, fill=BETON); f.hachures(100, 0, 600, 150, 55, 45, GRIS_C, .22)
     f.rect(0, 150, 700, 800, 1.0, fill=HexColor("#d9dde0"))
@@ -91,10 +91,10 @@ def p102(c, DOSSIER):
     f.cote(0, 700, 920, None, "h", 6.5) if False else f.cote(0, 700, -170, None, "h", 6.5)
     f.cote(0, 800, 800, "800", "v", 6.5) if False else f.cote(0, 800, -300, "800", "v", 6.5)
     f.cote(200, 580, 780, "380", "v", 6.5) if False else None
-    f.vue(0, 0, 1); f.titre_vue(DRAW[0] + 224, 124, 2, "COUPE TRANSVERSALE", "1:18")
+    f.vue(0, 0, 1); f.titre_vue(DRAW[0] + 204, 98, 2, "COUPE TRANSVERSALE", "1:20")
     # ================= 3. plan (1:20)
     N3 = 20
-    f.vue(DRAW[0] + 30, 85, N3)
+    f.vue(DRAW[0] + 30, 100, N3)
     f.rect(0, 0, L, 700, 1.0, fill=HexColor("#d9dde0")); f.rect(50, 50, L - 50, 650, .5, fill=EAU_G)
     f.rect(1730, 50, 1760, 650, .6, fill=white); f.rect(1760, 50, L - 50, 650, .0, fill=white, col=white) if False else None
     f.rect(1760, 50, L - 50, 650, .5, fill=white)
@@ -105,7 +105,7 @@ def p102(c, DOSSIER):
     f.rect(2420, 300, 2500, 400, .6, fill=GRIS_P)
     f.cote(0, L, -300, None, "h", 6.5); f.cote(0, 700, -300, None, "v", 6.5) if False else f.cote(0, 700, 2650, None, "v", 6.5)
     f.texte(270, 520, "Vidange et\ntrop-plein", 5, False, "c"); f.texte(950, 480, "Élément chauffant", 5, False, "c"); f.texte(1950, 540, "Coffret du flotteur", 5, False, "c")
-    f.vue(0, 0, 1); f.titre_vue(DRAW[0] + 6, 75, 3, "PLAN DE L'ABREUVOIR", "1:20")
+    f.vue(0, 0, 1); f.titre_vue(DRAW[0] + 6, 70, 3, "PLAN DE L'ABREUVOIR", "1:20")
     _tab(f, "NOMENCLATURE", [
         ["Bac", "Acier inoxydable 2 200 × 700 × 800, environ 160 L; bords roulés"], ["Isolant", "Polyuréthane de 40 mm sur les parois et le fond (contre le gel)"],
         ["Socle", "Béton 150 mm, bac de niveau; dalle de l'étable dessous"], ["Robinet à flotteur", "Débit 20 L/min, dans un coffret fermé et protégé des vaches"],

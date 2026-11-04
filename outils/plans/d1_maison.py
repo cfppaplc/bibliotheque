@@ -132,7 +132,7 @@ def agrandir_ss(lv):
                           ("Entrée d'eau municipale", 4650, -900, EF_, "g"), ("Chutes Ø 3\" (voir P-104)", 7900, 9500, DR, "g")])
     lv.W, lv.D = W, D
     lv.emprise = (DX, DX + 11000); lv.S, lv.N_, lv.O, lv.E = nS, nN, nO, nE
-    lv.Nplan, lv.Nfond = 100, 120
+    lv.Nplan, lv.Nfond = 100, 125
     lv.coupes = [(6450, -1250, "A", "e"), (6450, D + 1250, "A", "e")]; lv.coupe_long = dict(y=8800, N=150, lettre="B")
 agrandir_ss(ss)
 
@@ -257,7 +257,7 @@ maison = MaisonEtages(
                 "Marquise d'acier en porte-à-faux au-dessus de l'entrée.",
                 "Trois toits monopentes (pente d'environ 4 à 10 %) : débords de 900, bandeau d'aluminium noir; le toit du volume haut monte vers l'est, celui de l'aile familiale descend vers l'est.",
                 "Fenêtres à cadre noir, verre triple. Hexagones : types de fenêtres, voir A-301.", "Fenêtres du sous-sol : margelles galvanisées (en tirets)."],
-    Ncoupe=75, Ncoupe_B=120, Nmur=50, Nelev=140, coupe_A_x=6450, coupe_B_y=8800,
+    Ncoupe=75, Ncoupe_B=125, Nmur=50, Nelev=125, coupe_A_x=6450, coupe_B_y=8800,
     volees=[(XE0, XE1, 1300, 4300, ZSS, ZP1), (XE0, XE1, 1300, 4300, ZP1, ZP2)],
     couches_mur=[("Zinc à joints debout 1 sur membrane (fourrures 19)", 8, "vinyle"), ("Fourrures 19 × 64 (lame d'air)", 19, "vide"), ("Isolant rigide 50 (R-10)", 50, "isolant_rigide"),
                  ("Panneau OSB 11", 11, "panneau"), ("Montants 38 × 140 à 400 c/c et laine R-24", 140, "laine"), ("Pare-vapeur (polyéthylène 0,15)", 0, "membrane"), ("Gypse 12,7", 13, "gypse")],

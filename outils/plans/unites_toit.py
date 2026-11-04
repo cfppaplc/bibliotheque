@@ -108,12 +108,12 @@ def feuille_toiture_unites(self, f, N):
 
 
 def feuille_unites(self, c):
-    f = Feuille(c, self.dossier, "M-102", "UNITÉS DE TOIT :\nDÉTAILS ET SOCLE", "1:25, 1:30 et 1:18")
+    f = Feuille(c, self.dossier, "M-102", "UNITÉS DE TOIT :\nDÉTAILS ET SOCLE", "1:25 et 1:20")
     unites = self.unites_toit
     ref = next(((r, t) for (r, t, *_x) in unites if t == 10), unites[0][:2])
     s = spec(ref[1]); L, h = s["L"], s["h"]
     # ---- 1. élévation (1:25)
-    f.vue(DRAW[0] + 6, 172, 25)
+    f.vue(DRAW[0] + 2, 172, 25)
     x0 = 600
     f.ligne(0, 0, x0 + L + 1100, 0, 1.2)
     g = rtu_elev(f, x0, 0, L, h, s["vent"], ref[0], True, True)
@@ -128,17 +128,17 @@ def feuille_unites(self, c):
     etiq(f, "Toit : tablier,\nisolant et membrane", x0 - 400, -450, x0 - 700, -110)
     f.vue(0, 0, 1); f.titre_vue(DRAW[0] + 6, 122, 1, f"ÉLÉVATION D'UNE UNITÉ DE {ref[1]} TONNES", "1:25")
     # ---- 2. plan (1:30)
-    f.vue(DRAW[0] + 190, 140, 30)
+    f.vue(DRAW[0] + 205, 140, 25)
     cx, cy = 1500, 1700
     rtu_plan(f, cx, cy, L, s["l"], ref[0], s["vent"], True, True)
     f.texte(cx, cy - s["l"] / 2 - 500, "DÉGAGEMENT D'ENTRETIEN : 1 000 MM", 5.5, True, "c", GRIS)
     etiq(f, "Économiseur", cx - L / 2 - 200, cy + s["l"] / 2 + 750, cx - L / 2 - 180, cy + 100)
     etiq(f, "Ventilateurs du\ncondenseur", cx + 300, cy + s["l"] / 2 + 950, cx + L * .2, cy + s["l"] * .1)
-    etiq(f, "Sectionneur", cx + L / 2 + 800, cy + s["l"] / 2 + 700, cx + L / 2 + 120, cy - s["l"] / 2 + s["l"] * .3)
+    etiq(f, "Sectionneur", cx + L / 2 + 300, cy + s["l"] / 2 + 1000, cx + L / 2 + 120, cy - s["l"] / 2 + s["l"] * .3)
     etiq(f, "Contour du socle", cx - L / 2 - 800, cy - s["l"] / 2 - 700, cx - L / 2 - 60, cy - s["l"] / 2 - 60)
-    f.vue(0, 0, 1); f.titre_vue(DRAW[0] + 190, 122, 2, f"PLAN D'UNE UNITÉ DE {ref[1]} TONNES", "1:30")
+    f.vue(0, 0, 1); f.titre_vue(DRAW[0] + 205, 122, 2, f"PLAN D'UNE UNITÉ DE {ref[1]} TONNES", "1:25")
     # ---- 3. coupe du socle (1:18)
-    N3 = 18
+    N3 = 20
     f.vue(DRAW[0] + 14 + 300 / N3, 24 + 400 / N3, N3)
     dk = 38
     f.rect(-300, 0, 1300, dk, .7, fill=GRIS_TC)
@@ -162,7 +162,7 @@ def feuille_unites(self, c):
     etiq(f, "Paroi du socle isolée", 1100, 1000, 500, 800)
     etiq(f, "Joint d'étanchéité", 1050, 1180, 480, 1220)
     etiq(f, "Gaine isolée (soufflage ou retour)", 1300, -330, 1250, -260) if False else etiq(f, "Gaine isolée", 1550, -150, 1250, -100)
-    f.vue(0, 0, 1); f.titre_vue(DRAW[0] + 6, 20, 3, "COUPE DU SOCLE ET RACCORD DE LA GAINE", "1:18")
+    f.vue(0, 0, 1); f.titre_vue(DRAW[0] + 6, 20, 3, "COUPE DU SOCLE ET RACCORD DE LA GAINE", "1:20")
     # ---- 4. tableau des unités
     rows = []
     for (rep, t, cx_, cy_) in unites:
