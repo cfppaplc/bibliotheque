@@ -52,6 +52,28 @@ class Feuille:
         c.setStrokeColor(black); c.setLineWidth(1.4)
         c.rect(8 * MM, 8 * MM, (PAGE_W - 16) * MM, (PAGE_H - 16) * MM)
         x0 = 348
+        BLEU = HexColor("#1c5f8f"); ROUGE = HexColor("#b00020")
+        # fonds du cartouche (avant les traits)
+        c.setFillColor(HexColor("#eef3f7")); c.rect(x0 * MM, 8 * MM, (PAGE_W - 8 - x0) * MM, 32 * MM, stroke=0, fill=1)
+        c.setFillColor(HexColor("#f6f8fa")); c.rect(x0 * MM, 40 * MM, (PAGE_W - 8 - x0) * MM, 34 * MM, stroke=0, fill=1)
+        c.setFillColor(BLEU); c.rect(x0 * MM, (PAGE_H - 8 - 1.6) * MM, (PAGE_W - 8 - x0) * MM, 1.6 * MM, stroke=0, fill=1)
+        c.setFillColor(ROUGE); c.rect(x0 * MM, (PAGE_H - 8 - 1.6) * MM, 14 * MM, 1.6 * MM, stroke=0, fill=1)
+        c.setFillColor(black)
+        # double filet : mince à l'extérieur, repères de zones dans la marge
+        c.setLineWidth(.3); c.rect(4.5 * MM, 4.5 * MM, (PAGE_W - 9) * MM, (PAGE_H - 9) * MM)
+        c.setLineWidth(.35); c.setFont(FONT, 5); c.setFillColor(HexColor("#555555"))
+        nz = 8; lz = "ABCD"
+        for k in range(nz):
+            xa_ = 8 + (PAGE_W - 16) * k / nz; xm = xa_ + (PAGE_W - 16) / nz / 2
+            if k:
+                c.line(xa_ * MM, 8 * MM, xa_ * MM, 4.5 * MM); c.line(xa_ * MM, (PAGE_H - 8) * MM, xa_ * MM, (PAGE_H - 4.5) * MM)
+            c.drawCentredString(xm * MM, 5.4 * MM, str(k + 1)); c.drawCentredString(xm * MM, (PAGE_H - 7.1) * MM, str(k + 1))
+        for k in range(4):
+            ya_ = 8 + (PAGE_H - 16) * k / 4; ym = ya_ + (PAGE_H - 16) / 8
+            if k:
+                c.line(8 * MM, ya_ * MM, 4.5 * MM, ya_ * MM); c.line((PAGE_W - 8) * MM, ya_ * MM, (PAGE_W - 4.5) * MM, ya_ * MM)
+            c.drawCentredString(6.2 * MM, (ym - 1) * MM, lz[3 - k]); c.drawCentredString((PAGE_W - 6.2) * MM, (ym - 1) * MM, lz[3 - k])
+        c.setFillColor(black); c.setStrokeColor(black)
         c.setLineWidth(1); c.line(x0 * MM, 8 * MM, x0 * MM, (PAGE_H - 8) * MM)
         d = self.dossier
         # Bandeau du haut : nom du projet
@@ -89,7 +111,7 @@ class Feuille:
         c.drawString((x0 + 41) * MM, 36 * MM, "FEUILLE")
         c.setFont(FONT_B, 8.5); c.drawString((x0 + 3) * MM, 29 * MM, self.echelle_txt)
         c.setFont(FONT, 8); c.drawString((x0 + 3) * MM, 13 * MM, d["date"])
-        c.setFont(FONT_B, 22); c.drawCentredString((x0 + 61) * MM, 21 * MM, self.numero)
+        c.setFont(FONT_B, 22); c.setFillColor(BLEU); c.drawCentredString((x0 + 61) * MM, 21 * MM, self.numero); c.setFillColor(black)
         c.setFont(FONT, 6.5); c.drawCentredString((x0 + 61) * MM, 13 * MM, f"Dossier {d['code']}")
         # Concepteur
         c.setFont(FONT, 6.5); c.drawString((x0 + 4) * MM, 51.5 * MM, "CONÇU PAR")

@@ -132,8 +132,8 @@ def agrandir_ss(lv):
                           ("Entrée d'eau municipale", 4650, -900, EF_, "g"), ("Chutes Ø 3\" (voir P-104)", 7900, 9500, DR, "g")])
     lv.W, lv.D = W, D
     lv.emprise = (DX, DX + 11000); lv.S, lv.N_, lv.O, lv.E = nS, nN, nO, nE
-    lv.Nplan, lv.Nfond = 100, 125
-    lv.coupes = [(6450, -1250, "A", "e"), (6450, D + 1250, "A", "e")]; lv.coupe_long = dict(y=8800, N=150, lettre="B")
+    lv.Nplan, lv.Nfond = 75, 125
+    lv.coupes = [(6450, -1250, "A", "e"), (6450, D + 1250, "A", "e")]; lv.coupe_long = dict(y=8800, N=150, lettre="B", x_rep=(DX - 3000, DX + 11000 + 3000))
 agrandir_ss(ss)
 
 commun = dict(dossier=dossier, W=W, D=D, t=t, types_fen=types_fen, Nplan=100, comptoirs=[], decal_etiq={}, cotes_interieures=[],
