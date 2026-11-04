@@ -113,6 +113,21 @@ class Feuille:
         c.setFont(FONT, 8); c.drawString((x0 + 3) * MM, 13 * MM, d["date"])
         c.setFont(FONT_B, 22); c.setFillColor(BLEU); c.drawCentredString((x0 + 61) * MM, 21 * MM, self.numero); c.setFillColor(black)
         c.setFont(FONT, 6.5); c.drawCentredString((x0 + 61) * MM, 13 * MM, f"Dossier {d['code']}")
+        # Sceau d'ingénieur FICTIF (exercice) : aucun nom, numéro ni ordre réel
+        cx, cy = x0 + 22, 96
+        c.saveState(); c.setStrokeColor(HexColor("#1c3f8f")); c.setFillColor(HexColor("#1c3f8f"))
+        c.setLineWidth(.9); c.circle(cx * MM, cy * MM, 13 * MM, stroke=1, fill=0)
+        c.setLineWidth(.35); c.circle(cx * MM, cy * MM, 11.2 * MM, stroke=1, fill=0)
+        c.circle(cx * MM, cy * MM, 6.3 * MM, stroke=1, fill=0)
+        c.setFont(FONT_B, 4.6); c.drawCentredString(cx * MM, (cy + 8.2) * MM, "INGÉNIEUR · SCEAU")
+        c.setFont(FONT_B, 4.6); c.drawCentredString(cx * MM, (cy - 9.6) * MM, "D'EXERCICE")
+        c.setFont(FONT_B, 5.4); c.drawCentredString(cx * MM, (cy + 1.6) * MM, "ING. J. EXEMPLE")
+        c.setFont(FONT, 4.6); c.drawCentredString(cx * MM, (cy - 1.4) * MM, "N° 000000")
+        c.setFont(FONT_B, 6); c.setFillColor(HexColor("#b00020")); c.translate(cx * MM, cy * MM); c.rotate(18)
+        c.setFillAlpha(.55); c.drawCentredString(0, -6.6 * MM, "FICTIF"); c.restoreState()
+        c.setFont(FONT, 5.2); c.setFillColor(black)
+        c.drawString((x0 + 40) * MM, (cy + 5) * MM, "SCEAU ET SIGNATURE"); c.setLineWidth(.4); c.line((x0 + 40) * MM, (cy - 2) * MM, (x0 + 84) * MM, (cy - 2) * MM)
+        c.drawString((x0 + 40) * MM, (cy - 5.5) * MM, "Sceau fictif : aucune valeur légale"); c.drawString((x0 + 40) * MM, (cy - 8.5) * MM, "(exercice de lecture de plans)")
         # Concepteur
         c.setFont(FONT, 6.5); c.drawString((x0 + 4) * MM, 51.5 * MM, "CONÇU PAR")
         c.setFont(FONT_B, 8.5); c.drawString((x0 + 4) * MM, 47.6 * MM, AUTEUR)
