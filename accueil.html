@@ -1244,6 +1244,14 @@ function tick() {
       mk.hidden = !cur;
     }
   }
+  {
+    let L = $("lueur");
+    if (!L) { L = document.createElement("div"); L.id = "lueur"; L.innerHTML = '<i class="lb"></i><i class="lc"></i>'; document.body.append(L); }
+    const p = cur && ref ? Math.min(1, Math.max(0, (nowMin - ref.start) / (ref.end - ref.start))) : 0;
+    L.style.height = (14 + p * 38).toFixed(1) + "%";
+    const r = cur && nowIdx >= 0 ? rows[nowIdx] : null;
+    L.classList.toggle("fin", !!r && (r.pause || r.end - nowMin <= 5));
+  }
   if (nowIdx >= 0 && $("v-left")) $("v-left").textContent = "encore " + dur((rows[nowIdx].end - nowMin) * 60);
 }
 
@@ -2872,6 +2880,15 @@ html.style-pro .tl-mark::before { top: calc(var(--u) * -6); border-width: calc(v
 html.style-pro .tl-mark::after { content: attr(data-h); position: absolute; left: 50%; bottom: calc(100% + calc(var(--u) * 6)); translate: -50% 0; white-space: nowrap;
   background: var(--copper); color: #1a1a1f; padding: calc(var(--u) * 4) calc(var(--u) * 14); border-radius: 6px; font-weight: 800; font-size: calc(var(--u) * 34);
   font-family: ui-monospace, "Cascadia Mono", "SF Mono", Consolas, "Liberation Mono", monospace; letter-spacing: .04em; }
+/* Lueur de fin de cours (4 nov.) : monte du bas avec l'avancement de la période; cuivre pendant les pauses et les 5 dernières minutes d'un bloc */
+#lueur { position: fixed; left: 0; right: 0; bottom: 0; height: 14%; z-index: -1; pointer-events: none; transition: height 2s linear; }
+#lueur i { position: absolute; inset: 0; transition: opacity 2.5s ease; }
+#lueur .lb { background: linear-gradient(to top, color-mix(in srgb, var(--water) 30%, transparent), color-mix(in srgb, var(--water) 10%, transparent) 55%, transparent); }
+#lueur .lc { background: linear-gradient(to top, color-mix(in srgb, var(--copper) 38%, transparent), color-mix(in srgb, var(--copper) 10%, transparent) 55%, transparent); opacity: 0; }
+#lueur.fin .lc { opacity: 1; } #lueur.fin .lb { opacity: 0; }
+#lueur::after { content: ""; position: fixed; left: 0; right: 0; bottom: 0; height: 3px; background: var(--water); box-shadow: 0 0 30px 6px var(--water); opacity: .8; transition: background 2.5s, box-shadow 2.5s; }
+#lueur.fin::after { background: var(--copper); box-shadow: 0 0 30px 6px var(--copper); }
+html:not(.style-pro) #lueur, html.apercu-mode #lueur { display: none; }
 </style>
 </body>
 </html>
