@@ -6311,22 +6311,22 @@ initAdmin();
   /* Accueil des plans, style bibliothèque (3 nov.) : bannière, puis rangées de cartes avec l'aperçu de chaque bâtiment */
   .pl-empty{justify-content:flex-start;align-items:stretch;gap:0;padding:78px 0 40px;text-align:left;overflow-y:auto}
   .pl-empty .pn-hero{padding:34px clamp(20px,5vw,64px) 26px;background:linear-gradient(180deg,rgba(229,9,20,.14),rgba(0,0,0,0) 85%)}
-  .pl-empty .pn-hero h2{display:flex;align-items:center;gap:14px;font-size:clamp(1.9rem,4vw,3rem);margin:0 0 8px;letter-spacing:-.01em}
+  .pl-empty .pn-hero h2{display:flex;align-items:center;gap:12px;font-size:clamp(1.6rem,3vw,2.3rem);margin:0 0 6px;letter-spacing:-.01em}
   .pl-empty .pn-hero p{margin:0 0 20px;max-width:560px}
   .pn-btns{display:flex;flex-wrap:wrap;align-items:center;gap:16px}
   .pn-btns .pl-drop{border:1px dashed #4a525c;border-radius:999px;padding:11px 22px;max-width:none;width:auto;font-size:.92rem}
   .pn-row{padding:10px clamp(20px,5vw,64px) 18px}
   .pn-t{margin:0 0 14px;padding-left:12px;border-left:4px solid var(--moi,#e50914);font:700 1.15rem "Segoe UI",Roboto,Arial,sans-serif;color:var(--pi)}
-  .pn-cards{display:grid;grid-template-columns:1fr;gap:26px 22px;max-width:1140px}
-  @media (min-width:760px){.pn-cards{grid-template-columns:1fr 1fr}}
+  .pn-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:22px 18px}
+  @media (min-width:641px){.pl-empty{zoom:.85}}   /* même réduction que l'accueil de la bibliothèque : tout était trop gros */
   .pl-empty .pn-card{display:flex;flex-direction:column;justify-content:flex-start;align-self:start;padding:0;text-align:left;background:none;border:0;border-radius:10px;color:var(--pi);cursor:pointer;transition:transform .18s ease}
   .pl-empty .pn-card:hover{transform:translateY(-4px) scale(1.03);border:0}
   .pl-empty .pn-card:focus-visible{outline:3px solid #fff;outline-offset:3px}
   .pn-img{position:relative;display:block;aspect-ratio:960/640;border-radius:10px;overflow:hidden;background:#fff;box-shadow:0 6px 18px rgba(0,0,0,.45)}
   .pn-img img{display:block;width:100%;height:100%;object-fit:cover}
   .pn-img i{position:absolute;left:8px;top:8px;font:700 .72rem "Segoe UI",Roboto,Arial,sans-serif;font-style:normal;letter-spacing:.03em;background:rgba(14,14,15,.86);color:#fff;border-radius:6px;padding:3px 8px}
-  .pn-card b{display:block;margin:12px 2px 0;font:700 1.2rem "Segoe UI",Roboto,Arial,sans-serif}
-  .pn-card small{display:block;margin:3px 2px 0;color:var(--pm);font-weight:400;font-size:.92rem}
+  .pn-card b{display:block;margin:10px 2px 0;font:700 1.05rem "Segoe UI",Roboto,Arial,sans-serif}
+  .pn-card small{display:block;margin:2px 2px 0;color:var(--pm);font-weight:400;font-size:.82rem}
   .pn-row .pl-recents{justify-content:flex-start;max-width:none}
   @media (max-width:640px){.pl-empty{padding-top:70px}}
   .accueil-close{background:#1b1b1d;color:#e6e6e8;border:1px solid #2f2f33;border-radius:8px;height:40px;padding:0 14px;font:600 .9rem "Segoe UI",Roboto,Arial,sans-serif;opacity:.35;display:inline-flex;align-items:center;gap:6px}
