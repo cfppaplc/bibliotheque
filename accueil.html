@@ -798,8 +798,6 @@ html.ui-clair #apercuOv .ap-moments button.on, html.ui-clair #apercuOv .ap-ferme
       <select id="f-clock"><option value="num">Numérique</option><option value="analog">À aiguilles</option><option value="mano">Manomètre</option><option value="led">Afficheur lumineux</option><option value="mini">Minimal (sans secondes)</option></select></div>
     <div class="field"><label for="f-theme">Couleurs <span class="tip-i" tabindex="0" role="img" aria-label="Aide : Sombre pour une classe tamisée, clair si la classe est très éclairée et que le projecteur pâlit l'image." data-tip="Sombre pour une classe tamisée, clair si la classe est très éclairée et que le projecteur pâlit l'image.">?</span></label><select id="f-theme"><option value="dark">Atelier sombre (acier)</option><option value="light">Clair (classe très éclairée)</option><option value="auto">Comme l'ordinateur</option></select></div>
     <div class="field"><label for="f-couleurs">Ambiance <span class="tip-i" tabindex="0" role="img" aria-label="Aide : Les couleurs changent chaque jour de la semaine pour garder l'attention des élèves. Lundi ardoise, mardi forêt, mercredi prune, jeudi pétrole, vendredi cuivre." data-tip="Les couleurs changent chaque jour de la semaine pour garder l'attention des élèves. Lundi ardoise, mardi forêt, mercredi prune, jeudi pétrole, vendredi cuivre.">?</span></label><select id="f-couleurs"><option value="jour">Change chaque jour (recommandé)</option><option value="fixe">Toujours la même</option></select></div>
-    <div class="field"><label for="f-bg">Arrière-plan <span class="tip-i" tabindex="0" role="img" aria-label="Aide : « Selon la compétence » change le fond tout seul selon la compétence choisie dans Préparer le cours." data-tip="« Selon la compétence » change le fond tout seul selon la compétence choisie dans Préparer le cours.">?</span></label><select id="f-bg"><option value="auto">Selon la compétence (automatique)</option><option value="tuyaux">Salle mécanique</option><option value="plan">Plan technique</option><option value="tole">Tôle d'acier</option><option value="beton">Béton de chantier</option><option value="soudure">Étincelles de soudure</option><option value="elec">Circuits électriques</option><option value="ventil">Conduits de ventilation</option><option value="flammes">Brûleur (flammes)</option><option value="gaz">Brûleur au gaz (flammes bleues)</option><option value="bois">Bois de menuiserie</option><option value="radiant">Plancher radiant</option><option value="sanitaire">Robinetterie et appareils sanitaires</option><option value="evacuation">Réseau d'évacuation</option><option value="securite">Santé et sécurité</option><option value="chantier">Chantier et métier</option><option value="communication">Communication</option><option value="atelier">Outils et entrepôt</option><option value="menage">Entretien ménager</option><option value="informatique">Informatique</option><option value="administration">Administration du bâtiment</option><option value="incendie">Protection incendie</option><option value="uni">Uni</option></select></div>
-    <div class="field"><label for="f-style">Style du fond <span class="tip-i" tabindex="0" role="img" aria-label="Sobre : fond uni avec une fine grille, aux couleurs du jour. Classique : dessins animés selon la matière." data-tip="Sobre : fond uni avec une fine grille, aux couleurs du jour. Classique : dessins animés selon la matière.">?</span></label><select id="f-style"><option value="pro">Sobre (professionnel)</option><option value="classique">Classique (dessins animés)</option></select></div>
     <div class="field"><label for="f-anim">Fond animé <span class="tip-i" tabindex="0" role="img" aria-label="Aide : Comme l'ordinateur : le fond reste figé si Windows a désactivé les effets d'animation. Toujours : le fond bouge quand même. Jamais : fond immobile." data-tip="Comme l'ordinateur : le fond reste figé si Windows a désactivé les effets d'animation. Toujours : le fond bouge quand même. Jamais : fond immobile.">?</span></label><select id="f-anim"><option value="auto">Comme l'ordinateur</option><option value="oui">Toujours</option><option value="non">Jamais</option></select></div>
     <div class="field"><label for="f-msg">Message du jour <span class="tip-i" tabindex="0" role="img" aria-label="Aide : Une consigne courte sous la citation, par exemple « Apportez vos lunettes ». Laisse vide pour ne rien afficher." data-tip="Une consigne courte sous la citation, par exemple « Apportez vos lunettes ». Laisse vide pour ne rien afficher.">?</span></label><input id="f-msg" placeholder="Aucun message"></div>
     <details class="more" id="adv">
@@ -1662,7 +1660,7 @@ setTimeout(fit, 1500);
 
 // Réglages
 function openSettings() {
-  ["title", "group", "msg", "amStart", "pmStart", "goals", "word", "def", "q", "a", "theme", "couleurs", "scale", "bg", "clock", "anim", "style"].forEach(k => $("f-" + k).value = cfg[k]);
+  ["title", "group", "msg", "amStart", "pmStart", "goals", "word", "def", "q", "a", "theme", "couleurs", "scale", "clock", "anim"].forEach(k => $("f-" + k).value = cfg[k]);
   $("f-ppe").innerHTML = Object.entries(PPE).map(([k, v]) => `<label><input type="checkbox" id="f-ppe-${k}" value="${k}" ${cfg.ppe.includes(k) ? "checked" : ""}> ${v.name}</label>`).join("");
   $("sheet").hidden = false; $("f-title").focus(); $("ai-why").hidden = true; $("ai-note").textContent = ""; preview();
 }
@@ -2177,7 +2175,7 @@ $("b-cancel").onclick = () => $("sheet").hidden = true;
 $("b-reset").onclick = () => { cfg = { ...DEFAULTS }; openSettings(); };
 $("form").addEventListener("submit", e => {
   e.preventDefault();
-  ["title", "group", "msg", "amStart", "pmStart", "goals", "word", "def", "q", "a", "theme", "couleurs", "scale", "bg", "clock", "anim", "style"].forEach(k => cfg[k] = $("f-" + k).value);
+  ["title", "group", "msg", "amStart", "pmStart", "goals", "word", "def", "q", "a", "theme", "couleurs", "scale", "clock", "anim"].forEach(k => cfg[k] = $("f-" + k).value);
   cfg.ppe = [...$("f-ppe").querySelectorAll("input:checked")].map(i => i.value);
   save(); renderStatic(); tick(); fitSoon(); $("sheet").hidden = true;
 });
@@ -2672,7 +2670,7 @@ html.anim-off #accAccueil .aa-dans i { animation: none; }
   }
   /* le fond est refait à chaque changement de compétence ou de réglage : on suit */
   const applyBg0 = applyBg;
-  applyBg = function(){ html.classList.toggle("style-pro", (cfg.style || "pro") !== "classique"); actif = animPermise(); html.classList.toggle("anim-off", !actif); reduceMotion = !actif; applyBg0(); demarrer(); };
+  applyBg = function(){ html.classList.add("style-pro"); cfg.bg = "auto"; actif = animPermise(); html.classList.toggle("anim-off", !actif); reduceMotion = !actif; applyBg0(); demarrer(); };
   MQ.addEventListener ? MQ.addEventListener("change", () => applyBg()) : MQ.addListener(() => applyBg());
   lireCouleurs(); peupler();
   applyBg();
