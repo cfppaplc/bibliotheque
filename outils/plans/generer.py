@@ -50,6 +50,9 @@ def produire(n, publier):
     print(f"dossier {n} : {nb} feuilles -> {chemin}")
     if not publier: return nb
     shutil.copy(chemin, os.path.join(SITE, "plans", f"dossier-{n}.pdf"))
+    if n == 6:
+        import exercices6
+        exercices6.generer(SITE)
     if obj is not None:  # exercices + corrigé calculés sur les données du dossier
         import exercices
         exercices.generer(obj, nb, os.path.join(SITE, "plans", f"dossier-{n}-exercices.pdf"), os.path.join(SITE, "plans", f"dossier-{n}-corrige.pdf"))
