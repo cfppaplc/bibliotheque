@@ -824,7 +824,7 @@ class Batiment:
         for pl in nets:
             if not pl.get("compteur"): continue
             mx, my = pl["compteur"]
-            f.rect(mx - 180, my - 120, mx + 180, my + 120, .6, EF, fill=EF); f.texte(mx + 300 * pl.get("lab_sens", 1), my, "Entrée d'eau, robinet d'arrêt\net compteur", 5.6, True, "g" if pl.get("lab_sens", 1) > 0 else "d", EF)
+            f.rect(mx - 180, my - 120, mx + 180, my + 120, .6, EF, fill=EF); f.texte(mx + 300 * pl.get("lab_sens", 1), my, "Entrée d'eau, robinet d'arrêt\net compteur", 5.6, True, "g" if pl.get("lab_sens", 1) > 0 else "d", EF, halo=True)
         pl = self.plomb
         for (txt, x, y, col, al) in self.plomb.get("etiq", []):
             f.texte(x, y, txt, 5.8, True, al, col)
@@ -990,7 +990,7 @@ class Batiment:
         rows = [[str(n_), t_[:34], a_, b_] for (n_, t_, a_, b_) in circuits[:18]]
         f.c.showPage() if False else None
         self._circuits = rows
-        f.tableau(352, f.zone_notes_haut - 2, "CIRCUITS (EXTRAIT)", ["No", "Usage", "Charge", "Disj."], rows[:min(len(rows), int((f.zone_notes_haut - 80) / 4.0))], [6, 37, 15, 13], h=4.0, size=5.5)
+        f.tableau(352, f.zone_notes_haut - 2, "CIRCUITS (EXTRAIT)", ["No", "Usage", "Charge", "Disj."], rows[:min(len(rows), int((f.zone_notes_haut - 106) / 4.0))], [6, 37, 15, 13], h=4.0, size=5.5)
         c.showPage()
 
     def _mur_sur(self, ax, fixe, a):

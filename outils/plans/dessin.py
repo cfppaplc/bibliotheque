@@ -113,21 +113,11 @@ class Feuille:
         c.setFont(FONT, 8); c.drawString((x0 + 3) * MM, 13 * MM, d["date"])
         c.setFont(FONT_B, 22); c.setFillColor(BLEU); c.drawCentredString((x0 + 61) * MM, 21 * MM, self.numero); c.setFillColor(black)
         c.setFont(FONT, 6.5); c.drawCentredString((x0 + 61) * MM, 13 * MM, f"Dossier {d['code']}")
-        # Sceau d'ingénieur FICTIF (exercice) : aucun nom, numéro ni ordre réel
-        cx, cy = x0 + 22, 96
-        c.saveState(); c.setStrokeColor(HexColor("#1c3f8f")); c.setFillColor(HexColor("#1c3f8f"))
-        c.setLineWidth(.9); c.circle(cx * MM, cy * MM, 13 * MM, stroke=1, fill=0)
-        c.setLineWidth(.35); c.circle(cx * MM, cy * MM, 11.2 * MM, stroke=1, fill=0)
-        c.circle(cx * MM, cy * MM, 6.3 * MM, stroke=1, fill=0)
-        c.setFont(FONT_B, 4.6); c.drawCentredString(cx * MM, (cy + 8.2) * MM, "INGÉNIEUR · SCEAU")
-        c.setFont(FONT_B, 4.6); c.drawCentredString(cx * MM, (cy - 9.6) * MM, "D'EXERCICE")
-        c.setFont(FONT_B, 5.4); c.drawCentredString(cx * MM, (cy + 1.6) * MM, "ING. J. EXEMPLE")
-        c.setFont(FONT, 4.6); c.drawCentredString(cx * MM, (cy - 1.4) * MM, "N° 000000")
-        c.setFont(FONT_B, 6); c.setFillColor(HexColor("#b00020")); c.translate(cx * MM, cy * MM); c.rotate(18)
-        c.setFillAlpha(.55); c.drawCentredString(0, -6.6 * MM, "FICTIF"); c.restoreState()
-        c.setFont(FONT, 5.2); c.setFillColor(black)
-        c.drawString((x0 + 40) * MM, (cy + 5) * MM, "SCEAU ET SIGNATURE"); c.setLineWidth(.4); c.line((x0 + 40) * MM, (cy - 2) * MM, (x0 + 72) * MM, (cy - 2) * MM)
-        c.drawString((x0 + 40) * MM, (cy - 5.5) * MM, "Sceau fictif : aucune valeur légale"); c.drawString((x0 + 40) * MM, (cy - 8.5) * MM, "(exercice de lecture de plans)")
+        # Sceau d'ingénieur FICTIF (exercice) : dessiné au changement de page, juste sous les notes (voir _sceau)
+        f_self = self
+        def _sp(*a_, **k_):
+            f_self._sceau(); del c.showPage; type(c).showPage(c)
+        c.showPage = _sp
         # Concepteur
         c.setFont(FONT, 6.5); c.drawString((x0 + 4) * MM, 51.5 * MM, "CONÇU PAR")
         c.setFont(FONT_B, 8.5); c.drawString((x0 + 4) * MM, 47.6 * MM, AUTEUR)
@@ -145,18 +135,42 @@ class Feuille:
         c.drawRightString((xa - 2) * MM, (ya - 1.4) * MM, "Contrôle d'impression : ce trait mesure 100 mm (imprimer à 100 %, papier 11 × 17 po)")
         c.setFillColor(black)
 
+    def _sceau(self):
+        c = self.c; x0 = 348
+        bas = getattr(self, "zone_notes_haut", 112)
+        r = 13 if bas - 2 - 76 >= 26 else max(6, (bas - 2 - 76) / 2)
+        k = r / 13; cx = x0 + 5 + 13 * k; cy = 76 + r + 0.5
+        c.saveState(); c.translate(cx * MM, cy * MM); c.scale(k, k)
+        c.setStrokeColor(HexColor("#1c3f8f")); c.setFillColor(HexColor("#1c3f8f"))
+        c.setLineWidth(.9); c.circle(0, 0, 13 * MM, stroke=1, fill=0)
+        c.setLineWidth(.35); c.circle(0, 0, 11.2 * MM, stroke=1, fill=0); c.circle(0, 0, 6.3 * MM, stroke=1, fill=0)
+        c.setFont(FONT_B, 4.6); c.drawCentredString(0, 8.2 * MM, "INGÉNIEUR · SCEAU"); c.drawCentredString(0, -9.6 * MM, "D'EXERCICE")
+        c.setFont(FONT_B, 5.4); c.drawCentredString(0, 1.6 * MM, "ING. J. EXEMPLE")
+        c.setFont(FONT, 4.6); c.drawCentredString(0, -1.4 * MM, "N° 000000")
+        c.saveState(); c.setFont(FONT_B, 6); c.setFillColor(HexColor("#b00020")); c.rotate(18); c.setFillAlpha(.55); c.drawCentredString(0, -6.6 * MM, "FICTIF"); c.restoreState()
+        c.restoreState()
+        c.setFillColor(black); c.setStrokeColor(black)
+        xt = cx + 13 * k + 3
+        c.setFont(FONT, 5.2); c.drawString(xt * MM, (cy + 5 * k) * MM, "SCEAU ET SIGNATURE"); c.setLineWidth(.4); c.line(xt * MM, (cy - 1) * MM, (PAGE_W - 12) * MM, (cy - 1) * MM)
+        c.setFont(FONT, 4.8); c.drawString(xt * MM, (cy - 4.5) * MM, "Sceau fictif : aucune valeur légale"); c.drawString(xt * MM, (cy - 7.5) * MM, "(exercice de lecture de plans)")
+
     def notes(self, titre, lignes, y_top=None, size=7):
         """Bloc de notes dans la colonne de droite."""
         c = self.c; x0 = 348
         y = (y_top if y_top is not None else self.zone_notes_haut)
+        # le bas de la colonne est réservé au sceau (y < 112) : texte réduit si les notes sont longues
+        def hauteur(sz, larg): return 4.5 + sum(len(wrap(l, larg)) * sz * 0.5 + 0.8 for l in lignes)
+        larg = 52 if size <= 7 else 46
+        for sz, lg in ((size, larg), (6.4, 60), (5.8, 66)):
+            if y - hauteur(sz, lg) >= 113 or sz == 5.8: size, larg = sz, lg; break
         c.setFont(FONT_B, 8); c.drawString((x0 + 4) * MM, y * MM, titre); y -= 4.5
         c.setFont(FONT, size)
         for l in lignes:
-            for i, part in enumerate(wrap(l, 52 if size <= 7 else 46)):
+            for i, part in enumerate(wrap(l, larg)):
                 c.drawString((x0 + 4 + (3 if i else 0)) * MM, y * MM, part); y -= size * 0.5
             y -= 0.8
         self.zone_notes_haut = y - 3
-        if y < 77: print(f"  ! notes trop longues sur {self.numero} ({self.dossier['code']}) : y = {y:.0f} mm")
+        if y < 112: print(f"  ! notes trop longues sur {self.numero} ({self.dossier['code']}) : y = {y:.0f} mm")
         return y
 
     def titre_vue(self, x_mm, y_mm, numero, texte, echelle):
@@ -215,11 +229,15 @@ class Feuille:
         c.circle(*self.P(x, y), self.L(r), stroke=1, fill=1 if fill is not None else 0)
         c.setStrokeColor(black); c.setFillColor(black)
 
-    def texte(self, x, y, t, size=7, bold=False, align="c", col=black, rot=0):
+    def texte(self, x, y, t, size=7, bold=False, align="c", col=black, rot=0, halo=False):
         c = self.c; c.setFillColor(col); c.setFont(FONT_B if bold else FONT, size)
         px, py = self.P(x, y)
         c.saveState(); c.translate(px, py); c.rotate(rot)
         lignes = t.split("\n")
+        if halo:   # fond blanc sous le texte (lisible par-dessus un plan)
+            lm = max(c.stringWidth(l, FONT_B if bold else FONT, size) for l in lignes); hh = len(lignes) * size * 1.15
+            x_ = {"c": -lm / 2, "g": 0, "d": -lm}.get(align, -lm); c.setFillColor(white)
+            c.rect(x_ - 1.2, -hh / 2 - size * .35 - 0.6, lm + 2.4, hh + 1.2, stroke=0, fill=1); c.setFillColor(col)
         for i, l in enumerate(lignes):
             yy = -i * size * 1.15 + (len(lignes) - 1) * size * 0.575 - size * 0.35
             if align == "c": c.drawCentredString(0, yy, l)
@@ -319,6 +337,7 @@ class Feuille:
         for w in largeurs[:-1]:
             xx += w; c.setLineWidth(.3); c.line(xx * MM, y_mm * MM, xx * MM, y * MM)
         c.setLineWidth(.6); c.rect(x_mm * MM, y * MM, W * MM, (y_mm - y) * MM)
+        if x_mm >= 348: self.zone_notes_haut = y - 3
         return y
 
 

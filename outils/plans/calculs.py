@@ -40,7 +40,9 @@ def feuille_plafond(self, c, numero=None, nom_niveau=None):
             nx_, ny_ = max(1, round((x1 - x0) / pas)), max(1, round((y1 - y0) / pas))
             lums = [(x0 + (x1 - x0) * (i + .5) / nx_, y0 + (y1 - y0) * (j + .5) / ny_) for j in range(ny_) for i in range(nx_)]
         for (a_, b_) in lums: self._lum(f, a_, b_)
-        f.texte((x0 + x1) / 2, y0 + 380 * k, f"{nom.replace(chr(10), ' ')} · H {fmt(getattr(self, 'hc', 2700))}", 5, False, "c", GRIS)
+        txt = f"{nom.replace(chr(10), ' ')} · H {fmt(getattr(self, 'hc', 2700))}"
+        if len(txt) * 5 * .5 * 25.4 / 72 * f.N > (x1 - x0) * .92: txt = f"{nom.replace(chr(10), ' ')}\nH {fmt(getattr(self, 'hc', 2700))}"      # deux lignes si le local est étroit
+        f.texte((x0 + x1) / 2, y0 + 380 * k + (140 * k if "\n" in txt else 0), txt, 5, False, "c", GRIS)
         if nom.lower() in getattr(self, "detecteurs", []):
             f.cercle(x0 + 450 * k, y1 - 450 * k, 130 * k, .6, ELEC, fill=white); f.texte(x0 + 450 * k, y1 - 450 * k - 30 * k, "DF", 4.5, True, "c", ELEC)
     cv = getattr(self, "cvca", {}) or {}

@@ -117,7 +117,7 @@ centre = BatimentModerne(
                   "Ancrages des poteaux : 4 tiges Ø 19, plaque d'assise 350 × 350 × 25."],
     plomb=dict(coll=[(7500, 16800), (23000, 16800)], sortie=[(7500, 16800), (7500, -1600)], chutes=[(15100, 16800), (19600, 16800)],
                ef=[(11200, -1600), (11200, 16200), (23000, 16200)], ec=[(9200, 17200), (9200, 16500), (23000, 16500)],
-               ef_extra=[[(11200, 16200), (11200, 17100), (9800, 17100)]], compteur=(11200, 14000), lab_sens=1, h_plafond=3750, h_toit=6700,
+               ef_extra=[[(11200, 16200), (11200, 17100), (9800, 17100)]], compteur=(11200, 14000), lab_sens=-1, h_plafond=3750, h_toit=6700,
                etiq=[('Collecteur Ø 4" sous dalle · pente 1 %', 7350, 16750, DR, "d"), ('EF Ø 1 1/2"', 22500, 16000, EF, "c"),
                      ("Vers l'égout municipal Ø 6\"", 7350, -2050, DR, "d"), ("Entrée d'eau Ø 2\" + gicleurs", 11350, -1400, EF, "g")]),
     titre_iso="SCHÉMA ISOMÉTRIQUE — DRAINAGE ET VENTILATION",
