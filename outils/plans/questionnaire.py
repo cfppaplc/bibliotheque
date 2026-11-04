@@ -125,7 +125,7 @@ def _bandeau(c, T, titre, sous, corr, premiere):
             c.setFillColor(ROUGE); c.setFont(FONT_B, 11); c.drawString(0, 0, "CORRIGÉ"); c.restoreState()
     else:
         _rr(c, 0, PH - 14, PW, 14, 0, fill=col)
-        c.setFillColor(white); c.setFont(FONT_B, 10.5); c.drawString(MX * MM, (PH - 9) * MM, titre + " (suite)" + (" — corrigé" if corr else ""))
+        c.setFillColor(white); c.setFont(FONT_B, 10.5); c.drawString(MX * MM, (PH - 9) * MM, titre + (" — corrigé" if corr else ""))
         c.setFont(FONT, 8.5); c.drawRightString((PW - MX) * MM, (PH - 9) * MM, sous)
     c.setFillColor(black)
 
@@ -314,16 +314,73 @@ def _groupes(Q, mode):
     return g
 
 
-def generer_pdf(chemin, titre_doc, sous, Q, corr, consigne_gen, theme=None, mode="type"):
-    T = dict(couleur=HexColor("#1c5f8f"), kicker="Pavillon de l'Avenir", nom=titre_doc, indices="tous", intro=None, thumb=None); T.update(theme or {})
-    total = sum(q["pts"] for q in Q)
-    c = rl_canvas.Canvas(chemin, pagesize=(PW * MM, PH * MM)); c.setTitle(titre_doc + (" — corrigé" if corr else "")); c.setAuthor("Pavillon de l'Avenir")
-    page = 1
-    _bandeau(c, T, titre_doc, sous, corr, True); y = PH - 46
-    y = _entete_info(c, T, total, y, corr)
-    T2 = dict(T)
-    if not corr: T2["intro"] = T.get("intro") or [consigne_gen]
-    y = _intro(c, T2, y, corr)
+def _couverture(c, T, titre_doc, sous, Q, corr, total, sections, npages):
+    """Page de garde : titre, grande image du dossier, chiffres clés, consignes, contenu, champs à remplir."""
+    col = T["couleur"]
+    _rr(c, 0, PH - 74, PW, 74, 0, fill=col)
+    _rr(c, MX - 2, PH - 29, 46, 22, 2.2, fill=white)
+    c.drawImage(LOGO, (MX + .5) * MM, (PH - 28) * MM + (20 - 42 / LOGO_R) / 2 * MM, 42 * MM, 42 / LOGO_R * MM, mask="auto")
+    c.setFillColor(white); c.setFont(FONT_B, 9); c.drawString(MX * MM, (PH - 40) * MM, T["kicker"].upper())
+    taille = 28 if len(titre_doc) < 26 else 23
+    c.setFont(FONT_B, taille); c.drawString(MX * MM, (PH - 53) * MM, titre_doc)
+    c.setFont(FONT, 12); c.drawString(MX * MM, (PH - 62) * MM, sous)
+    if corr:
+        c.saveState(); c.translate((PW - MX - 52) * MM, (PH - 24) * MM); c.rotate(7); _rr(c, -3, -4, 50, 13, 2, fill=white, stroke=ROUGE, lw=1.8)
+        c.setFillColor(ROUGE); c.setFont(FONT_B, 17); c.drawString(0, 0, "CORRIGÉ"); c.restoreState()
+    # grande image du dossier, posée à cheval sur le bandeau
+    cw, ch, cy = 111, 74, PH - 66
+    cx = (PW - cw) / 2
+    _rr(c, cx + 1.2, cy - ch - 1.2, cw, ch, 3, fill=HexColor("#cfd3d8"))
+    _rr(c, cx, cy - ch, cw, ch, 3, fill=white, stroke=GRIS_L, lw=.8)
+    if T.get("thumb"):
+        try: c.drawImage(T["thumb"], (cx + 3) * MM, (cy - ch + 3) * MM, (cw - 6) * MM, (ch - 6) * MM, preserveAspectRatio=True, anchor="c")
+        except Exception: pass
+    # chiffres clés
+    y = cy - ch - 9
+    nq = len(Q)
+    for i, (val, lab) in enumerate(((str(nq), "questions"), (str(total), "points"), (str(npages), "pages"), (str(len(sections)), "parties"))):
+        bx = MX + i * ((PW - 2 * MX + 5) / 4)
+        _rr(c, bx, y - 15, (PW - 2 * MX - 15) / 4, 15, 2.4, fill=GRIS_T, stroke=GRIS_L)
+        c.setFillColor(col); c.setFont(FONT_B, 17); c.drawCentredString((bx + (PW - 2 * MX - 15) / 8) * MM, (y - 8.3) * MM, val)
+        c.setFillColor(GRIS); c.setFont(FONT, 8.5); c.drawCentredString((bx + (PW - 2 * MX - 15) / 8) * MM, (y - 12.8) * MM, lab)
+    y -= 24
+    # deux colonnes : avant de commencer / contenu
+    xg, xd, lg = MX, MX + 92, 84
+    c.setFillColor(col); c.setFont(FONT_B, 11); c.drawString(xg * MM, y * MM, "Avant de commencer"); c.drawString(xd * MM, y * MM, "Contenu")
+    c.setStrokeColor(col); c.setLineWidth(.9); c.line(xg * MM, (y - 1.8) * MM, (xg + lg) * MM, (y - 1.8) * MM); c.line(xd * MM, (y - 1.8) * MM, (PW - MX) * MM, (y - 1.8) * MM)
+    c.setFillColor(black); c.setFont(FONT, 8.4); yy = y - 7
+    paras = (T.get("intro") or []) + ["Matériel : échelimètre métrique, crayon, gomme et calculatrice."]
+    for p in paras:
+        for l in wrap(p, 58): c.drawString(xg * MM, yy * MM, l); yy -= 4.0
+        yy -= 1.4
+    yy2 = y - 8
+    for (lettre, titre, pts, pg) in sections:
+        _rr(c, xd, yy2 - 1.6, 5.6, 5.6, 1.2, fill=col)
+        c.setFillColor(white); c.setFont(FONT_B, 8.5); c.drawCentredString((xd + 2.8) * MM, (yy2 + .3) * MM, lettre[:2].strip() or "·")
+        c.setFillColor(black); c.setFont(FONT, 9); c.drawString((xd + 8) * MM, yy2 * MM, titre[:34])
+        c.setFillColor(GRIS); c.setFont(FONT, 8.2); c.drawRightString((PW - MX) * MM, yy2 * MM, f"p. {pg} · {pts} pt{'s' if pts > 1 else ''}")
+        c.setStrokeColor(GRIS_L); c.setLineWidth(.3); c.line((xd + 8) * MM, (yy2 - 2.1) * MM, (PW - MX) * MM, (yy2 - 2.1) * MM)
+        yy2 -= 7.4
+    # champs à remplir (feuille d'élève) ou explication (corrigé)
+    c.setFillColor(black); c.setStrokeColor(black)
+    if corr:
+        _rr(c, MX, 20, PW - 2 * MX, 17, 2.4, fill=HexColor("#e8f5ec"), stroke=VERT)
+        c.setFillColor(VERT); c.setFont(FONT_B, 10); c.drawString((MX + 5) * MM, 30.5 * MM, f"Corrigé · total : {total} points")
+        c.setFont(FONT, 8.8); c.drawString((MX + 5) * MM, 25 * MM, "Réponses en vert. « Où la trouver » indique la feuille du dossier à consulter. Mesures : tolérance de ± 1 mm sur le papier.")
+    else:
+        _rr(c, MX, 17, PW - 2 * MX, 22, 2.6, fill=GRIS_T, stroke=GRIS_L)
+        c.setFillColor(GRIS); c.setFont(FONT, 8.5)
+        c.drawString((MX + 5) * MM, 33 * MM, "NOM"); c.drawString((MX + 92) * MM, 33 * MM, "GROUPE"); c.drawString((MX + 5) * MM, 23 * MM, "DATE"); c.drawString((MX + 92) * MM, 23 * MM, "NOTE")
+        c.setStrokeColor(GRIS); c.setLineWidth(.5)
+        for (a_, b_, y_) in ((MX + 17, MX + 85, 33), (MX + 108, PW - MX - 5, 33), (MX + 17, MX + 85, 23)): c.line(a_ * MM, (y_ - 1) * MM, b_ * MM, (y_ - 1) * MM)
+        c.setFillColor(black); c.setFont(FONT_B, 13); c.drawString((MX + 106) * MM, 22 * MM, f"_____ / {total}")
+    c.setFillColor(black); c.setStrokeColor(black)
+
+
+def _corps(c, T, titre_doc, sous, Q, corr, mode):
+    """Pages de questions (la page 1 est la page de garde). Retourne [(lettre, titre, points, page)] et le nombre de pages."""
+    page = 2; sections = []
+    _bandeau(c, T, titre_doc, sous, corr, False); y = PH - 22
     def nouvelle():
         nonlocal y, page
         _pied(c, T, page); c.showPage(); page += 1; _bandeau(c, T, titre_doc, sous, corr, False); y = PH - 22
@@ -331,9 +388,26 @@ def generer_pdf(chemin, titre_doc, sous, Q, corr, consigne_gen, theme=None, mode
     for gi, (titre_g, cons_g, qs) in enumerate(_groupes(Q, mode), 1):
         pts_g = sum(q["pts"] for q in qs)
         if y < 70: nouvelle()
-        y = _titre_section(c, T, y, T.get("prefixe", "Partie ") + (chr(64 + gi) if T.get("lettres", True) else str(gi)), titre_g, cons_g, pts_g)
+        lettre = (T.get("prefixe", "Partie ") + (chr(64 + gi) if T.get("lettres", True) else str(gi)))
+        sections.append((chr(64 + gi) if T.get("lettres", True) else str(gi), titre_g, pts_g, page))
+        y = _titre_section(c, T, y, lettre, titre_g, cons_g, pts_g)
         for q in qs:
             num += 1
             if y - _hauteur(q, corr) < 18: nouvelle()
             y = _question(c, T, q, num, y, corr)
-    _pied(c, T, page); c.save()
+    _pied(c, T, page)
+    return sections, page
+
+
+def generer_pdf(chemin, titre_doc, sous, Q, corr, consigne_gen, theme=None, mode="type"):
+    import io
+    T = dict(couleur=HexColor("#1c5f8f"), kicker="Pavillon de l'Avenir", nom=titre_doc, indices="tous", intro=None, thumb=None); T.update(theme or {})
+    if not corr: T["intro"] = T.get("intro") or [consigne_gen]
+    total = sum(q["pts"] for q in Q)
+    # 1re passe (sur du papier jetable) : sur quelle page commence chaque partie ?
+    tmp = rl_canvas.Canvas(io.BytesIO(), pagesize=(PW * MM, PH * MM)); sections, npages = _corps(tmp, T, titre_doc, sous, Q, corr, mode)
+    c = rl_canvas.Canvas(chemin, pagesize=(PW * MM, PH * MM)); c.setTitle(titre_doc + (" — corrigé" if corr else "")); c.setAuthor("Pavillon de l'Avenir")
+    _couverture(c, T, titre_doc, sous, Q, corr, total, sections, npages)
+    c.showPage()
+    _corps(c, T, titre_doc, sous, Q, corr, mode)
+    c.save()
