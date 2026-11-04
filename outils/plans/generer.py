@@ -36,27 +36,15 @@ def trouver_page(pdf, titre):
 
 def activites(n):
     """Copie les questionnaires dans activites/ (onglet Activités du site) avec une couverture qui montre bien de quel plan il s'agit."""
-    from PIL import Image, ImageDraw, ImageFont
-    th = os.path.join(SITE, "plans", f"dossier-{n}-elevation.jpg")
-    couleurs = {1: "#1c5f8f", 2: "#2e7d4f", 3: "#c26a12", 4: "#6a3fa0", 5: "#3b7d2a"}
     for kind, titre in (("lecture", "LECTURE + MESURE"),):
         src = f"dossier-{n}-exercices.pdf" if kind == "lecture" else f"dossier-{n}-echelle.pdf"
         cor = f"dossier-{n}-corrige.pdf" if kind == "lecture" else f"dossier-{n}-echelle-corrige.pdf"
         if not os.path.exists(os.path.join(SITE, "plans", src)): continue
         shutil.copy(os.path.join(SITE, "plans", src), os.path.join(SITE, "activites", f"plans-d{n}-{kind}.pdf"))
         shutil.copy(os.path.join(SITE, "plans", cor), os.path.join(SITE, "activites", f"plans-d{n}-{kind}-corrige.pdf"))
-        W, H = 420, 297
-        im = Image.new("RGB", (W, H), "white"); d = ImageDraw.Draw(im)
-        d.rectangle([0, 0, W, 96], fill=couleurs[n])
-        try:
-            fb = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 44); fs = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 24)
-        except Exception: fb = fs = ImageFont.load_default()
-        d.text((16, 8), f"PLAN {n}", font=fb, fill="white"); d.text((16, 62), titre, font=fs, fill="white")
-        if os.path.exists(th):
-            t = Image.open(th).convert("RGB"); t = t.crop((20, 110, 940, 530)); t.thumbnail((W - 20, H - 150)); im.paste(t, ((W - t.width) // 2, 104))
-        d.text((16, H - 40), DOSSIERS_NOMS[n], font=fs, fill="#333333")
-        d.rectangle([0, H - 6, W, H], fill=couleurs[n])
-        im.save(os.path.join(SITE, "activites", f"plans-d{n}-{kind}.jpg"), quality=86)
+        # couverture = la page de garde du questionnaire (même image partout)
+        base = os.path.join(SITE, "activites", f"plans-d{n}-{kind}")
+        subprocess.run(["pdftoppm", "-r", "60", "-f", "1", "-l", "1", "-scale-to-x", "420", "-scale-to-y", "-1", "-jpeg", "-jpegopt", "quality=88", "-singlefile", base + ".pdf", base], check=True)
 
 
 def produire(n, publier):
