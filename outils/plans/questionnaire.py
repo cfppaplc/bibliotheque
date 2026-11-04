@@ -198,7 +198,7 @@ def _question(c, T, q, num, y, corr):
     # numéro dans une pastille
     c.setFillColor(col); c.circle((MX + 3.4) * MM, (y - 1.4) * MM, 3.4 * MM, stroke=0, fill=1)
     c.setFillColor(white); c.setFont(FONT_B, 9 if num < 100 else 7); c.drawCentredString((MX + 3.4) * MM, (y - 2.6) * MM, str(num)); c.setFillColor(black)
-    if T.get("indices") == "tous" or (T.get("indices") == "niv1" and q.get("niv") == 1): _tag_feuille(c, T, x0, y - .5, q)
+    if not q.get("sans_tag") and (T.get("indices") == "tous" or (T.get("indices") == "niv1" and q.get("niv") == 1)): _tag_feuille(c, T, x0, y - .5, q)
     c.setFont(FONT_B, 10.2)
     for l in _lignes(q): c.drawString(x0 * MM, (y - 2) * MM, l); y -= 5
     y -= 2.4
@@ -215,7 +215,7 @@ def _question(c, T, q, num, y, corr):
             if q["v"] == "papier": r_ = f"→ {q['reel'] / 10:.1f} mm sur le papier".replace(".", ",")
             elif q["v"] == "reel": r_ = f"→ {q['reel']:,} mm".replace(",", " ")
             else: r_ = f"→ {q['reel']:,} mm réels   (≈ {q['reel'] / q['N']:.1f} mm sur le papier, tolérance ± {q['N']} mm réels)".replace(",", " ").replace(".", ",")
-            y -= _bonne(c, xr, y, r_) + 3
+            y -= _bonne(c, xr, y, r_); _ou(c, xr, y - .5, q.get("ou", "")) if q.get("ou") else None; y -= 8
         else:
             c.setFont(FONT, 9.3); c.setFillColor(GRIS)
             txt = {"papier": "Longueur sur le papier", "reel": "Dimension réelle"}.get(q["v"])

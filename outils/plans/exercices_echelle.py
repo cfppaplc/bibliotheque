@@ -148,8 +148,10 @@ def typer(Qs, seed):
     for q in Qs:
         if "conv" in q: T.append(qs.mesure(q["texte"], q["reel"], q["N"], "papier" if q["conv"] == "papier" else "reel"))
         else:
-            txt = f"{q['section']} · {q['f']} · échelle {NOMS_ECH.get(q['N'], '1:' + str(q['N']))} — " + (f"Mesure {q['texte']}." if not q["texte"].startswith("mesure") else q["texte"][0].upper() + q["texte"][1:] + ".")
-            T.append(qs.mesure(txt, q["reel"], q["N"]))
+            sec = re.sub(r"\s*\([A-Z]-\d{3}\)", "", q["section"])
+            txt = f"{sec} — " + (f"Mesure {q['texte']}." if not q["texte"].startswith("mesure") else q["texte"][0].upper() + q["texte"][1:] + ".")
+            txt = re.sub(r"\s*\(?\b[A-Z]-\d{3}\b\)?", "", txt)      # jamais le numéro de feuille : l'élève la trouve et lit l'échelle au cartouche
+            T.append(qs.mesure(txt, q["reel"], q["N"], ou=f"Feuille {q['f']}, échelle {NOMS_ECH.get(q['N'], '1:' + str(q['N']))}", sans_tag=True))
     ech = [20, 25, 50, 75, 100, 125, 200, 250, 500]
     ou = "Cartouche de la feuille (case « Échelle ») et échelimètre"
     # choix multiple

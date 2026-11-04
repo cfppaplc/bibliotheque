@@ -458,7 +458,7 @@ def _mesures(b, n, ferme=False):
 
 def _intro(n, mesure=True):
     T = list(THEMES[n]["intro"])
-    if mesure: T.append("Les mesures se font à l'échimètre métrique : imprime le dossier à 100 % (papier 11 × 17 po) et vérifie le trait de 100 mm au bas de chaque feuille.".replace("échimètre", "échelimètre"))
+    if mesure: T.append("Pour les mesures, c'est à toi de trouver la bonne feuille et de lire son échelle dans le cartouche. Utilise ton échelimètre métrique, imprime le dossier à 100 % (papier 11 × 17 po) et vérifie le trait de 100 mm au bas de chaque feuille.".replace("échimètre", "échelimètre"))
     return T
 
 
