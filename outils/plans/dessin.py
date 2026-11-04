@@ -126,7 +126,7 @@ class Feuille:
         c.setFont(FONT_B, 6); c.setFillColor(HexColor("#b00020")); c.translate(cx * MM, cy * MM); c.rotate(18)
         c.setFillAlpha(.55); c.drawCentredString(0, -6.6 * MM, "FICTIF"); c.restoreState()
         c.setFont(FONT, 5.2); c.setFillColor(black)
-        c.drawString((x0 + 40) * MM, (cy + 5) * MM, "SCEAU ET SIGNATURE"); c.setLineWidth(.4); c.line((x0 + 40) * MM, (cy - 2) * MM, (x0 + 84) * MM, (cy - 2) * MM)
+        c.drawString((x0 + 40) * MM, (cy + 5) * MM, "SCEAU ET SIGNATURE"); c.setLineWidth(.4); c.line((x0 + 40) * MM, (cy - 2) * MM, (x0 + 72) * MM, (cy - 2) * MM)
         c.drawString((x0 + 40) * MM, (cy - 5.5) * MM, "Sceau fictif : aucune valeur légale"); c.drawString((x0 + 40) * MM, (cy - 8.5) * MM, "(exercice de lecture de plans)")
         # Concepteur
         c.setFont(FONT, 6.5); c.drawString((x0 + 4) * MM, 51.5 * MM, "CONÇU PAR")

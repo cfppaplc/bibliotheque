@@ -704,6 +704,22 @@ class Batiment:
             sx, sy = rotp(90, 60, rot); px, py = x + sx, y + sy
             if a[5] not in ("—",) and code != "ce":
                 q, seg = self._projeter((px, py), pl["ec"]); f.poly(self._chemin((px, py), q, seg), 1.0, EC)
+        # chauffe-eau : arrivée d'eau froide (bas gauche) et sortie d'eau chaude (haut droite) raccordées aux colonnes
+        for (code, x, y, rot) in self.app:
+            if code != "ce": continue
+            pl = self._reseau_de((x, y))
+            sx, sy = rotp(-150, 40, rot); pf = (x + sx, y + sy)
+            q, seg = self._projeter(pf, pl["ef"]); f.poly(self._chemin(pf, q, seg), 1.2, EF); f.cercle(*pf, 45, .6, fill=EF)
+            sx, sy = rotp(150, 560, rot); pc = (x + sx, y + sy)
+            q, seg = self._projeter(pc, pl["ec"]); f.poly(self._chemin(pc, q, seg), 1.2, EC); f.cercle(*pc, 45, .6, fill=EC)
+        # niveaux supérieurs : les colonnes d'eau arrivent du niveau inférieur (montantes)
+        for pl in nets:
+            if pl.get("compteur") or any(c == "ce" for (c, _, _, _) in self.app): continue
+            for pts, col, lab in ((pl["ef"], EF, "EF"), (pl["ec"], EC, "EC")):
+                px, py = pts[0]; f.cercle(px, py, 95, .8, col, fill=white); f.cercle(px, py, 40, .6, col, fill=col)
+            ex, ey = pl["ef"][0]
+            hy = max(self.D + 600, ey + 700); f.ligne(ex, ey + 95, ex, hy - 100, .5, EF)
+            f.texte(ex, hy + 150, "Montantes EF et EC\n(du niveau inférieur)", 5, True, "c", EF)
         for pl in nets:
             if not pl.get("compteur"): continue
             mx, my = pl["compteur"]

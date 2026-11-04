@@ -126,7 +126,7 @@ def agrandir_ss(lv):
     lv.etiq_fond = [(lab, *PX((x, y))) for (lab, x, y) in lv.etiq_fond]
     # plomberie du sous-sol : collecteur sous la dalle jusqu'aux deux chutes (7 700 / 13 200, 10 400)
     lv.plomb = dict(reseaux=[dict(coll=[(13200, 10400), (7700, 10400), (7700, 4300), (5300, 4300)], sortie=[(5300, 4300), (5300, -1200)], chutes=[(7700, 10400), (13200, 10400)],
-                                  ef=[(4500, -1200), (4500, 3300), (5650, 3300), (5650, 10250), (7600, 10250)], ec=[(4450, 3550), (5550, 3550), (5550, 10150), (7600, 10150)],
+                                  ef=[(4500, -1200), (4500, 3300), (5650, 3300), (5650, 10250), (7600, 10250), (13100, 10250)], ec=[(4450, 3550), (5550, 3550), (5550, 10150), (7600, 10150), (13100, 10150)],
                                   compteur=(4500, 900), lab_sens=1)],
                     etiq=[('Collecteur Ø 4" sous la dalle · pente 2 %', 10200, 10250, DR, "c"), ("Vers l'égout municipal", 5150, -1000, DR, "d"),
                           ("Entrée d'eau municipale", 4650, -900, EF_, "g"), ("Chutes Ø 3\" (voir P-104)", 7900, 9500, DR, "g")])
