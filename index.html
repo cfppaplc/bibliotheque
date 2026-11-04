@@ -1729,7 +1729,6 @@ function brancherSouris(win){
     const actif = b.cible && b.cible.closest && b.cible.closest("a,button,input,select,textarea,label,summary,[onclick],[role=button],[contenteditable]");
     if (Math.abs(dx) < 10 && Math.abs(dy) < 10 && dt < 350 && !actif && matchMedia("(max-width:900px) and (pointer:coarse)").matches){
       const y = t.clientY / win.innerHeight; if (y > .18 && y < .82){ const R = $("#reader"); if (R.classList.contains("calme")) afficherBarres(); else if (R.classList.contains("auto")) { R.classList.add("calme"); } } } }, { passive:true });
-  const pannable = t => { try { const c = win.getComputedStyle(t).cursor; return c === "grab" || c === "auto" || c === "default" || c === "grabbing"; } catch(e){ return false; } };
   const fin = () => { if (!PAN.on) return; PAN.on = false; panFin(); majCurseur(); };
   /* (3 nov.) roulette enfoncée : jamais le défilement automatique de Windows (la page montait ou descendait toute seule et la roulette ne zoomait plus) */
   win.addEventListener("mousedown", e => { if (e.button === 1) e.preventDefault(); }, true);
@@ -2826,33 +2825,6 @@ function grilleIso(g, W, H, k){
   }
   g.restore();
 }
-/* plan isométrique : quand un tuyau passe par-dessus un autre, petite coupure ombrée sous celui du dessus (le dernier tracé est par-dessus) */
-function croisementsIso(g, tous, W, H, k){
-  /* un tuyau tracé en une fois est coupé en petits bouts (même groupe g) : on refait le trajet complet */
-  const grp = new Map(), polys = [];
-  tous.forEach(s => { if (!s.p || s.p.length < 2 || s.hl || !(!s.t || s.t === "ligne" || /^tuy/.test(s.t))) return; const key = s.g || s;
-    if (!grp.has(key)){ const P = { s, pts:s.p.map(q => [q[0] * W, q[1] * H]) }; grp.set(key, P); polys.push(P); }
-    else { const P = grp.get(key), d = P.pts[P.pts.length - 1], a = [s.p[0][0] * W, s.p[0][1] * H]; if (Math.hypot(d[0] - a[0], d[1] - a[1]) > 1) P.pts.push(a); s.p.slice(1).forEach(q => P.pts.push([q[0] * W, q[1] * H])); } });
-  polys.forEach(P => { let acc = 0; P.cum = [0]; for (let i = 1; i < P.pts.length; i++){ acc += Math.hypot(P.pts[i][0] - P.pts[i - 1][0], P.pts[i][1] - P.pts[i - 1][1]); P.cum.push(acc); } P.len = acc; });
-  const marge = 6 * k;
-  for (let j = 1; j < polys.length; j++){ const A = polys[j];
-    for (let i = 0; i < j; i++){ const B = polys[i], vus = new Set();
-      for (let a = 0; a + 1 < A.pts.length; a++){ const [ax, ay] = A.pts[a], [bx, by] = A.pts[a + 1], dx = bx - ax, dy = by - ay, lj = Math.hypot(dx, dy); if (lj < 1) continue;
-        for (let b = 0; b + 1 < B.pts.length; b++){ const [cx, cy] = B.pts[b], [ex, ey] = B.pts[b + 1];
-          if (Math.max(cx, ex) < Math.min(ax, bx) - 1 || Math.min(cx, ex) > Math.max(ax, bx) + 1 || Math.max(cy, ey) < Math.min(ay, by) - 1 || Math.min(cy, ey) > Math.max(ay, by) + 1) continue;
-          const fx = ex - cx, fy = ey - cy, li = Math.hypot(fx, fy), den = dx * fy - dy * fx; if (li < 1 || Math.abs(den) < 1e-6 * lj * li) continue;
-          const t = ((cx - ax) * fy - (cy - ay) * fx) / den, u = ((cx - ax) * dy - (cy - ay) * dx) / den; if (t < -.001 || t > 1.001 || u < -.001 || u > 1.001) continue;
-          const sA = A.cum[a] + t * lj, sB = B.cum[b] + u * li;
-          if (sA < marge || A.len - sA < marge || sB < marge || B.len - sB < marge) continue;      /* un bout de tuyau qui arrive sur l'autre = un raccord, pas un croisement */
-          const px = ax + dx * t, py = ay + dy * t, cle = Math.round(px / 3) + "," + Math.round(py / 3); if (vus.has(cle)) continue; vus.add(cle);
-          const w = (A.s.w || 4) * k, R = Math.max(9 * k, w * 2.2);
-          const trajet = (s0, s1) => { const out = [], at = d => { let m = 1; while (m < A.cum.length - 1 && A.cum[m] < d) m++; const q0 = A.pts[m - 1], q1 = A.pts[m], f = (d - A.cum[m - 1]) / ((A.cum[m] - A.cum[m - 1]) || 1); return [q0[0] + (q1[0] - q0[0]) * f, q0[1] + (q1[1] - q0[1]) * f]; };
-            s0 = Math.max(0, s0); s1 = Math.min(A.len, s1); out.push(at(s0)); A.cum.forEach((cv, m) => { if (cv > s0 && cv < s1) out.push(A.pts[m]); }); out.push(at(s1)); return out; };   /* le tuyau du dessus suit son vrai trajet (coins compris) */
-          const tr = (pts) => { g.beginPath(); pts.forEach((q, m) => m ? g.lineTo(q[0], q[1]) : g.moveTo(q[0], q[1])); g.stroke(); };
-          /* le tuyau du dessous est interrompu de chaque côté (comme sur un plan) et celui du dessus passe avec une légère ombre */
-          const wB = (B.s.w || 4) * k, vx = fx / li, vy = fy / li, sinA = Math.abs(dx * fy - dy * fx) / (lj * li) || 1, demi = (w / 2 + 3.5 * k) / sinA;
-          g.save(); g.lineCap = "butt"; g.strokeStyle = "#ffffff"; g.lineWidth = wB + 2 * k; g.beginPath(); g.moveTo(px - vx * demi, py - vy * demi); g.lineTo(px + vx * demi, py + vy * demi); g.stroke(); g.restore();
-          g.save(); g.lineCap = "round"; g.lineJoin = "round"; g.strokeStyle = A.s.c || "#24282c"; g.lineWidth = w; g.shadowColor = "rgba(0,0,0,.35)"; g.shadowBlur = 3 * k; g.shadowOffsetY = 1 * k; tr(trajet(sA - R * .8, sA + R * .8)); g.restore(); } } } } }
 function redrawInk(){
   try { recalerWb(); } catch(e){}
   const c = $("#inkCanvas"), g = c.getContext("2d");
@@ -2861,7 +2833,7 @@ function redrawInk(){
   if (RD.wb && (/^iso/.test(wbBg()) || wbBg() === "lignes" || wbBg() === "quad")) grilleIso(g, c.width, c.height, k);
   const tous = INKS[inkKey()] || [];                                       /* les objets cachent les traits qui passent derrière ; les textes restent par-dessus */
   [s => s.t !== "objet" && s.t !== "texte" && s.t !== "cote", s => s.t === "objet", s => s.t === "cote", s => s.t === "texte"].forEach((f, i) => { tous.filter(f).forEach(s => drawStroke(g, s, c.width, c.height, k));
-    /* croisementsIso retiré à la demande de Jeremy (28 oct.) : trop de bogues */ });
+    });
   if (window.SELM && SELM.length){ g.save(); g.setLineDash([6 * k, 4 * k]); g.lineWidth = 1.6 * k; g.strokeStyle = "#2a7bcf";
     let T = null; SELM.forEach(o => { if (!strokes().includes(o)) return; const b = boiteDe(o, c.width, c.height); if (!b) return;
       T = T ? [Math.min(T[0], b[0]), Math.min(T[1], b[1]), Math.max(T[2], b[2]), Math.max(T[3], b[3])] : b.slice();
@@ -3126,29 +3098,6 @@ function tailleTexte(box, s){
   row.addEventListener("pointerdown", e => e.preventDefault()); row.addEventListener("mousedown", e => e.preventDefault());   /* la case de texte garde le curseur */
   row.querySelectorAll("[data-tz]").forEach(b => b.onclick = () => { const v = Math.max(.5, Math.min(4, Math.round(((s.tz || 1) + (+b.dataset.tz) * .25) * 100) / 100));
     if (v === (s.tz || 1)) return; snapInk(); if (v === 1) delete s.tz; else s.tz = v; redrawInk(); maj(); });
-  maj(); }
-/* position de la cote par rapport à l'objet : la ligne de cote s'éloigne (s.d) du côté choisi; « centre » la remet sur l'objet */
-function padCote(box, s){
-  const FL = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6"/></svg>';
-  const CE = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7v10M20 7v10M4 12h16"/></svg>';
-  const T = { haut:[0, -1, 0, "En haut de l'objet"], gauche:[-1, 0, -90, "À gauche de l'objet"], centre:[0, 0, 0, "Sur l'objet"], droite:[1, 0, 90, "À droite de l'objet"], bas:[0, 1, 180, "En bas de l'objet"] };
-  const pad = document.createElement("div");
-  const cote = s.t === "cote", defaut = s.t === "objet" ? "bas" : /^(ligne|fleche|fleche2|accolade|tuy[A-Z]+)$/.test(s.t) ? "haut" : "centre";
-  pad.innerHTML = '<div style="margin:10px 0 6px;line-height:1.3">' + (cote && !s.txt ? "Position de la cote" : "Position du texte") + '</div><div class="cpad" style="display:grid;grid-template-columns:repeat(3,48px);grid-template-rows:repeat(3,42px);gap:5px;justify-content:center">'
-    + ["", "haut", "", "gauche", "centre", "droite", "", "bas", ""].map(k => k ? '<button type="button" data-pos="' + k + '" title="' + T[k][3] + '" aria-label="' + T[k][3] + '" style="display:flex;align-items:center;justify-content:center;border-radius:9px;border:1px solid #3a3a40;border-bottom-width:4px;background:#1c1c1f;color:#e4e4e7;cursor:pointer;padding:0">'
-      + (k === "centre" ? CE : '<span style="display:flex;transform:rotate(' + T[k][2] + 'deg)">' + FL + '</span>') + '</button>' : '<span></span>').join("") + '</div>';
-  box.appendChild(pad);
-  const c = $("#inkCanvas"), W = c.width, H = c.height, a = s.p[0], b = s.p[1] || s.p[0], an = Math.atan2((b[1] - a[1]) * H, (b[0] - a[0]) * W), nx = -Math.sin(an), ny = Math.cos(an);   /* un objet n'a qu'un point */
-  const pas = 34 * RD.z * (window.devicePixelRatio || 1) * 1.2;          /* distance par défaut : un peu plus d'un carreau */
-  const maj = () => pad.querySelectorAll("[data-pos]").forEach(bt => { const [vx, vy] = T[bt.dataset.pos], dot = nx * vx + ny * vy, centre = bt.dataset.pos === "centre";
-    const possible = !cote || centre || Math.abs(dot) > .3, actif = !cote ? (s.lp || defaut) === bt.dataset.pos : centre ? !s.d : (possible && s.d && Math.sign(s.d) === Math.sign(dot));
-    bt.disabled = !possible; bt.style.opacity = possible ? "1" : ".25"; bt.style.cursor = possible ? "pointer" : "default";
-    bt.style.background = actif ? "#1f6fc2" : "#1c1c1f"; bt.style.borderColor = actif ? "#6aa9ff" : "#3a3a40"; });
-  pad.addEventListener("pointerdown", e => e.preventDefault()); pad.addEventListener("mousedown", e => e.preventDefault());   /* la case de texte garde le curseur */
-  pad.querySelectorAll("[data-pos]").forEach(bt => bt.onclick = () => { if (bt.disabled) return; const [vx, vy] = T[bt.dataset.pos], dot = nx * vx + ny * vy;
-    if (!cote){ snapInk(); s.lp = bt.dataset.pos; if (!s.lb){ const i = box.querySelector("input"); if (i && i.value.trim()) s.lb = i.value.trim(); } redrawInk(); maj(); return; }   /* étiquette : où va le texte */
-    snapInk(); if (bt.dataset.pos === "centre") s.d = 0; else { const mag = Math.abs((s.d || 0) * H) || pas; s.d = Math.sign(dot) * mag / H; }
-    redrawInk(); maj(); });
   maj(); }
 let dernierTap = null;
 function tapElement(o, e){ if (!o || !e) return; const t = performance.now(), d = dernierTap; dernierTap = { o, t, x:e.clientX, y:e.clientY };
@@ -6387,21 +6336,10 @@ initAdmin();
   .act-back:hover{background:#262629}
   .act-top h2{margin:0;font-size:1rem;font-weight:600;color:#ddd;display:flex;align-items:center;gap:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .act-wrap{max-width:1100px;margin:0 auto;padding:22px 22px 60px}
-  .act-intro{margin:0 0 16px;color:#a9a9b0;font-size:.98rem}
-  .act-filtres{display:flex;flex-wrap:wrap;gap:8px 18px;margin-bottom:20px;align-items:center}
-  .act-grp{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
-  .act-grp>span{font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:#8d8d95;margin-right:2px}
-  .act-pill{background:#ffffff10;border:1px solid #ffffff2a;color:inherit;border-radius:999px;height:36px;padding:0 14px;font-weight:600;font-size:.88rem;font-family:inherit;cursor:pointer}
-  .act-pill.on{background:#f1f1f3;color:#111;border-color:#f1f1f3}
   .act-liste{display:grid;gap:16px}
-  .act-carte{display:grid;grid-template-columns:150px 1fr;gap:20px;background:#17171a;border:1px solid #ffffff1c;border-radius:16px;padding:16px;border-left:5px solid var(--ac,#e50914)}
-  .act-carte img{width:150px;height:auto;border-radius:8px;background:#fff;box-shadow:0 6px 18px #0008;align-self:start}
   .act-tag{display:inline-flex;align-items:center;gap:6px;font-size:.74rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ac,#e50914);margin-bottom:6px}
-  .act-imgw{position:relative;align-self:start}
-  .act-dos{position:absolute;left:-8px;top:10px;background:var(--ac);color:#fff;font-weight:800;font-size:.78rem;letter-spacing:.04em;text-transform:uppercase;padding:4px 10px;border-radius:0 8px 8px 0;box-shadow:0 3px 8px #0006}
   .act-b.corr{border-color:#2ea043;color:#56d364}
   body.clair .act-b.corr{color:#1a7f37;border-color:#1a7f37}
-  .act-carte h3{margin:0 0 4px;font-size:1.35rem;line-height:1.2}
   .act-comp{color:#c9c9d0;font-size:.95rem;margin-bottom:8px}
   .act-desc{color:#a9a9b0;font-size:.95rem;line-height:1.45;margin:0 0 10px}
   .act-meta{display:flex;flex-wrap:wrap;gap:6px 14px;color:#8d8d95;font-size:.85rem;margin-bottom:14px}
@@ -6411,38 +6349,10 @@ initAdmin();
   .act-b:hover{filter:brightness(1.1)}
   /* tri et filtres des activités (3 nov.) */
   .act-wrap{max-width:1240px}
-  .act-filtres{flex-direction:column;align-items:stretch;gap:10px;margin-bottom:22px}
-  .act-recherche{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center}
-  .act-recherche input{flex:1 1 260px;height:46px;border-radius:12px;border:1px solid #ffffff33;background:#ffffff10;color:inherit;padding:0 16px;font:inherit;font-size:1rem}
-  .act-recherche label{display:flex;align-items:center;gap:8px;color:#8d8d95;font-size:.82rem;text-transform:uppercase;letter-spacing:.06em}
-  .act-recherche select{height:46px;border-radius:12px;border:1px solid #ffffff33;background:#ffffff10;color:inherit;padding:0 12px;font:inherit;font-size:.95rem;text-transform:none;letter-spacing:0}
-  .act-recherche select option{color:#111}
-  .act-pill{display:inline-flex;align-items:center;gap:7px}
-  .act-pill b{font-weight:700;font-size:.78rem;opacity:.65;background:#ffffff1c;border-radius:999px;padding:1px 7px}
-  .act-pill.on b{background:#0002;opacity:.9}
-  .act-pt{width:10px;height:10px;border-radius:50%;display:inline-block}
-  .act-etat{display:flex;align-items:center;gap:14px;color:#8d8d95;font-size:.88rem}
-  .act-raz{background:none;border:0;color:#6ab0ff;font:inherit;font-weight:600;cursor:pointer;text-decoration:underline;padding:4px}
   .act-liste{grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px}
-  .act-sec{grid-column:1/-1;margin:14px 0 -4px;font-size:1.05rem;letter-spacing:.02em;display:flex;align-items:center;gap:10px;border-bottom:1px solid #ffffff1f;padding-bottom:8px}
-  .act-sec:first-child{margin-top:0}
-  .act-sec b{font-size:.78rem;background:#ffffff1c;border-radius:999px;padding:2px 9px;font-weight:700;color:#c9c9d0}
-  .act-carte{display:flex;flex-direction:column;gap:0;padding:0;overflow:hidden;border-left:1px solid #ffffff1c;border-top:5px solid var(--ac,#e50914)}
-  .act-imgw{align-self:stretch;background:#fff}
-  .act-carte img{width:100%;aspect-ratio:4/3;object-fit:cover;object-position:top;height:auto;border-radius:0;box-shadow:none;display:block;align-self:auto}
-  .act-corps{padding:14px 16px 16px;display:flex;flex-direction:column;flex:1}
-  .act-carte h3{font-size:1.15rem}
   .act-desc{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;font-size:.9rem}
-  .act-corps .act-btns{margin-top:auto}
-  .act-corps .act-btns .act-b{flex:1;justify-content:center}
   .act-btns2{display:flex;gap:8px;margin-top:8px}
   .act-btns2 .act-b{flex:1;height:40px;padding:0 10px;font-size:.88rem;justify-content:center}
-  body.clair .act-recherche input,body.clair .act-recherche select{background:#fff;border-color:#d4d0c8}
-  body.clair .act-pill b{background:#0000000f}
-  body.clair .act-pill.on b{background:#ffffff33}
-  body.clair .act-sec{border-color:#0000001a}
-  body.clair .act-sec b{background:#0000000f;color:#55555b}
-  body.clair .act-imgw{background:#fff}
   /* activités compactes (3 nov.) : rangées de tuiles comme les livres, fiche au toucher */
   .act-outils{margin-left:auto;display:flex;align-items:center;gap:10px;min-width:0}
   .act-rech{position:relative;display:flex;align-items:center}
@@ -6484,15 +6394,11 @@ initAdmin();
   body.clair .act-top h2{color:#1d1d1f}
   body.clair .act-back{background:#fff;border-color:#d4d0c8;color:#1d1d1f}
   body.clair .act-back:hover{background:#eeebe4}
-  body.clair .act-back,body.clair .act-pill,body.clair .act-b{background:#fff;border-color:#d4d0c8}
-  body.clair .act-pill.on,body.clair .act-b.prim{background:#1d1d1f;color:#fff;border-color:#1d1d1f}
-  body.clair .act-carte{background:#fff;border-color:#e3dfd6}
-  body.clair .act-intro,body.clair .act-desc,body.clair .act-comp{color:#55555b}
-  body.clair .act-meta,body.clair .act-grp>span,body.clair .act-vide{color:#76767d}
+  body.clair .act-back,body.clair .act-b{background:#fff;border-color:#d4d0c8}body.clair .act-b.prim{background:#1d1d1f;color:#fff;border-color:#1d1d1f}body.clair .act-desc,body.clair .act-comp{color:#55555b}
+  body.clair .act-meta,body.clair .act-vide{color:#76767d}
   @media (max-width:640px){
     .act-top{padding:10px 14px}.act-wrap{padding:16px 14px 90px}
-    .act-liste{grid-template-columns:1fr}.act-carte{padding:0}.act-carte img{width:100%}
-    .act-carte h3{font-size:1.1rem}.act-b{height:44px;padding:0 14px;flex:1 1 auto;justify-content:center}
+    .act-liste{grid-template-columns:1fr}.act-b{height:44px;padding:0 14px;flex:1 1 auto;justify-content:center}
   }
 </style>
 <div class="act-ov" id="actOv" hidden role="dialog" aria-label="Activités">
