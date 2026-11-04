@@ -8657,7 +8657,7 @@ window.ACCES = (function(){
       const c = new Uint8Array(await sub.encrypt({ name:"AES-GCM", iv }, k, brut)), e = new Uint8Array(await sub.exportKey("raw", eph.publicKey));
       const out = new Uint8Array(65 + 12 + c.length); out.set(e); out.set(iv, 65); out.set(c, 77); return "E" + b64(out); }
     const pk = await sub.importKey("jwk", Object.assign({}, pubJwk, { alg:"RSA-OAEP-256", ext:true }), { name:"RSA-OAEP", hash:"SHA-256" }, false, ["encrypt"]);
-    return b64(await sub.encrypt({ name:"RSA-OAEP" }, pk, brut)); }
+    for (;;){ const s = b64(await sub.encrypt({ name:"RSA-OAEP" }, pk, brut)); if (s[0] !== "E") return s; } }   /* une enveloppe RSA ne doit jamais commencer par « E » (marque des enveloppes EC) */
   async function ouvrirEnveloppe(env){          /* clé brute d'un livre, avec la clé privée de la session (RSA ou EC) */
     if (env[0] === "E"){ const u = unb64(env.slice(1)), k = await cleEC(SESSION.priv, u.subarray(0, 65)); return sub.decrypt({ name:"AES-GCM", iv:u.subarray(65, 77) }, k, u.subarray(77)); }
     return sub.decrypt({ name:"RSA-OAEP" }, SESSION.priv, unb64(env)); }
