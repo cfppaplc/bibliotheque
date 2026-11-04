@@ -6442,6 +6442,33 @@ initAdmin();
   body.clair .act-sec{border-color:#0000001a}
   body.clair .act-sec b{background:#0000000f;color:#55555b}
   body.clair .act-imgw{background:#fff}
+  /* activités compactes (3 nov.) : rangées de tuiles comme les livres, fiche au toucher */
+  .act-recherche input{width:100%;flex:1 1 100%}
+  .act-liste{display:block}
+  .act-rang{margin:0 0 26px}
+  .act-rh{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:10px;border-left:4px solid #e50914;padding-left:10px}
+  .act-rang h3{margin:0;font-size:1.15rem;display:flex;align-items:center;gap:10px}
+  .act-rang h3 b{font-size:.78rem;background:#ffffff1c;border-radius:999px;padding:2px 9px;color:#c9c9d0}
+  .act-tout{background:none;border:0;color:#6ab0ff;font:inherit;font-weight:600;cursor:pointer;padding:6px 4px}
+  .act-ligne{display:flex;gap:14px;overflow-x:auto;padding:4px 2px 14px;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch}
+  .act-rang.ouvert .act-ligne{flex-wrap:wrap;overflow:visible}
+  .act-tuile{flex:0 0 190px;width:190px;background:none;border:0;color:inherit;font:inherit;text-align:left;cursor:pointer;padding:0;scroll-snap-align:start;display:flex;flex-direction:column;gap:6px}
+  .act-vig{display:block;border-radius:10px;overflow:hidden;background:#fff;border-top:4px solid var(--ac);box-shadow:0 4px 14px #0007;transition:transform .15s}
+  .act-tuile:hover .act-vig,.act-tuile:focus-visible .act-vig{transform:translateY(-3px)}
+  .act-vig img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;object-position:top}
+  .act-nom{font-weight:700;font-size:.92rem;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .act-sous{font-size:.78rem;color:#8d8d95}
+  .act-fiche{position:fixed;inset:0;z-index:30;display:flex;align-items:center;justify-content:center;padding:16px}
+  .act-fiche[hidden]{display:none}
+  .act-fiche-fond{position:absolute;inset:0;background:#000a}
+  .act-fiche-boite{position:relative;display:grid;grid-template-columns:260px 1fr;gap:22px;background:#17171a;color:#f1f1f3;border:1px solid #ffffff22;border-top:5px solid var(--ac);border-radius:16px;padding:20px;max-width:760px;width:100%;max-height:92vh;overflow:auto}
+  .act-fiche-boite>img{width:100%;border-radius:10px;background:#fff;align-self:start}
+  .act-fiche-txt h3{margin:0 0 4px;font-size:1.35rem;line-height:1.2}
+  .act-x{position:absolute;right:10px;top:6px;background:none;border:0;color:inherit;font-size:1.8rem;line-height:1;cursor:pointer;opacity:.7}
+  body.clair .act-fiche-boite{background:#fff;color:#1d1d1f;border-color:#e3dfd6}
+  body.clair .act-rang h3 b{background:#0000000f;color:#55555b}
+  body.clair .act-sous{color:#76767d}
+  @media (max-width:640px){.act-tuile{flex-basis:150px;width:150px}.act-fiche-boite{grid-template-columns:1fr;gap:14px}.act-fiche-boite>img{max-width:260px}}
   .act-vide{padding:40px 10px;text-align:center;color:#8d8d95}
   body.clair .act-ov{background:#f6f4ef;color:#1d1d1f}
   body.clair .act-top{background:#f6f4efee;border-color:#0000001a}
@@ -6489,58 +6516,46 @@ initAdmin();
   const COUL = { "Plomberie et chauffage":"#2f8fd8", "Entretien général d'immeubles":"#e0892b" };
   const COUL_DOS = { 1:"#1c5f8f", 2:"#2e7d4f", 3:"#c26a12", 4:"#6a3fa0", 5:"#3b7d2a" };
   const $ = id => document.getElementById(id), ov = $("actOv");
-  const F = { type:"", dos:"", q:"", tri:"type" };
+  const F = { q:"" }, OUVERTS = new Set();
   const esc = t => String(t).replace(/[&<>"]/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" }[c]));
   const IC_OUV = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M8 20h8M12 16v4"/></svg>';
   const IC_IMP = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 9V3h10v6M7 17H4v-7h16v7h-3M7 14h10v7H7z"/></svg>';
   const IC_DL = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></svg>';
-  const NOM_COURT = { 1:"Maison", 2:"Duplex", 3:"Commerce", 4:"Centre", 5:"Ferme" };
-  function chip(cle, val, lbl, n, pt){
-    return '<button type="button" class="act-pill' + (F[cle] === val ? ' on' : '') + '" data-k="' + cle + '" data-v="' + esc(val) + '">' + (pt ? '<i class="act-pt" style="background:' + pt + '"></i>' : '') + esc(lbl) + '<b>' + n + '</b></button>';
-  }
-  function visibles(ignorer){
-    const q = F.q.trim().toLowerCase();
-    return ACTIVITES.filter(a => (ignorer === "type" || !F.type || a.type === F.type) && (ignorer === "dos" || !F.dos || String(a.dossier || "") === F.dos) &&
-      (!q || (a.titre + " " + a.comp + " " + a.desc + " " + a.type).toLowerCase().includes(q)));
-  }
-  function trier(l){
-    const ordreType = [...new Set(ACTIVITES.map(a => a.type))];
-    const cmp = { type: (x, y) => ordreType.indexOf(x.type) - ordreType.indexOf(y.type) || (x.dossier || 0) - (y.dossier || 0) || x.titre.localeCompare(y.titre, "fr"),
-                  plan: (x, y) => (x.dossier || 99) - (y.dossier || 99) || x.titre.localeCompare(y.titre, "fr"),
-                  titre: (x, y) => x.titre.localeCompare(y.titre, "fr") }[F.tri];
-    return l.slice().sort(cmp);
-  }
-  function carte(a){
+  function tuile(a){
     const ac = a.dossier ? COUL_DOS[a.dossier] : (COUL[a.prog] || "#e50914");
-    return '<article class="act-carte" style="--ac:' + ac + '"><div class="act-imgw"><img src="activites/' + a.f + '.jpg" alt="" loading="lazy"></div><div class="act-corps">' +
-      '<div class="act-tag">' + esc(a.type) + '</div><h3>' + esc(a.titre) + '</h3><div class="act-comp">' + esc(a.comp) + '</div><p class="act-desc">' + esc(a.desc) + '</p>' +
-      '<div class="act-meta"><span>' + a.pages + ' pages</span><span>' + esc(a.prog) + '</span></div>' +
-      '<div class="act-btns"><button class="act-b prim" type="button" data-a="ouvrir" data-f="' + a.f + '">' + IC_OUV + 'Projeter au tableau</button></div>' +
-      '<div class="act-btns2"><button class="act-b" type="button" data-a="imprimer" data-f="' + a.f + '" title="Ouvrir le PDF pour imprimer">' + IC_IMP + 'Imprimer</button>' +
-      '<a class="act-b" href="activites/' + a.f + '.pdf" download="' + esc(a.titre) + '.pdf" title="Télécharger le PDF">' + IC_DL + 'PDF</a>' +
-      (a.corrige ? '<button class="act-b corr" type="button" data-a="corrige" data-f="' + a.f + '" title="Corrigé (enseignant)">Corrigé</button>' : '') + '</div></div></article>';
+    return '<button type="button" class="act-tuile" style="--ac:' + ac + '" data-fiche="' + a.f + '" title="' + esc(a.titre) + '"><span class="act-vig"><img src="activites/' + a.f + '.jpg" alt="" loading="lazy"></span>' +
+      '<span class="act-nom">' + esc(a.titre) + '</span><span class="act-sous">' + a.pages + ' pages' + (a.corrige ? ' · corrigé' : '') + '</span></button>';
   }
   function dessiner(){
-    const types = [...new Set(ACTIVITES.map(a => a.type))], plans = [...new Set(ACTIVITES.filter(a => a.dossier).map(a => a.dossier))].sort();
-    const parType = visibles("type"), parPlan = visibles("dos");
-    let h = '<div class="act-recherche"><input id="actQ" type="search" placeholder="Chercher une activité…" value="' + esc(F.q) + '" aria-label="Chercher une activité"><label>Trier<select id="actTri"><option value="type"' + (F.tri === "type" ? " selected" : "") + '>Par type</option><option value="plan"' + (F.tri === "plan" ? " selected" : "") + '>Par plan</option><option value="titre"' + (F.tri === "titre" ? " selected" : "") + '>Par titre (A → Z)</option></select></label></div>';
-    if (types.length > 1) h += '<div class="act-grp"><span>Type</span>' + chip("type", "", "Tout", parType.length) + types.map(t => chip("type", t, t, parType.filter(a => a.type === t).length)).join("") + '</div>';
-    if (plans.length > 1) h += '<div class="act-grp"><span>Plan</span>' + chip("dos", "", "Tous", parPlan.length) + plans.map(n => chip("dos", String(n), n + " · " + NOM_COURT[n], parPlan.filter(a => a.dossier === n).length, COUL_DOS[n])).join("") + '</div>';
-    const l = trier(visibles()), actif = F.type || F.dos || F.q;
-    h += '<div class="act-etat"><span>' + l.length + ' activité' + (l.length > 1 ? 's' : '') + '</span>' + (actif ? '<button type="button" class="act-raz" id="actRaz">Effacer les filtres</button>' : '') + '</div>';
-    $("actFiltres").innerHTML = h;
-    if (!l.length){ $("actListe").innerHTML = '<div class="act-vide">Aucune activité pour ce choix.</div>'; return; }
-    let out = "", dernier = null;
-    l.forEach(a => {
-      if (F.tri === "type" && a.type !== dernier){ dernier = a.type; out += '<h3 class="act-sec">' + esc(a.type) + '<b>' + l.filter(x => x.type === a.type).length + '</b></h3>'; }
-      out += carte(a);
-    });
-    $("actListe").innerHTML = out;
+    const q = F.q.trim().toLowerCase();
+    const l = ACTIVITES.filter(a => !q || (a.titre + " " + a.comp + " " + a.desc + " " + a.type).toLowerCase().includes(q));
+    $("actFiltres").innerHTML = '<div class="act-recherche"><input id="actQ" type="search" placeholder="Chercher une activité…" value="' + esc(F.q) + '" aria-label="Chercher une activité"></div>';
+    if (!l.length){ $("actListe").innerHTML = '<div class="act-vide">Aucune activité trouvée.</div>'; return; }
+    const groupes = [...new Set(ACTIVITES.map(a => a.type))];
+    $("actListe").innerHTML = groupes.map(g => {
+      const m = l.filter(a => a.type === g).sort((x, y) => (x.dossier || 0) - (y.dossier || 0) || x.titre.localeCompare(y.titre, "fr")); if (!m.length) return "";
+      const ouvert = q || OUVERTS.has(g);
+      return '<section class="act-rang' + (ouvert ? ' ouvert' : '') + '"><div class="act-rh"><h3>' + esc(g) + '<b>' + m.length + '</b></h3>' + (m.length > 5 ? '<button type="button" class="act-tout" data-g="' + esc(g) + '">' + (ouvert ? 'Réduire' : 'Tout voir (' + m.length + ')') + '</button>' : '') + '</div><div class="act-ligne">' + m.map(tuile).join("") + '</div></section>';
+    }).join("");
   }
+  function fiche(a){
+    const ac = a.dossier ? COUL_DOS[a.dossier] : (COUL[a.prog] || "#e50914");
+    let f = $("actFiche"); if (!f){ f = document.createElement("div"); f.id = "actFiche"; f.className = "act-fiche"; ov.appendChild(f); }
+    f.style.setProperty("--ac", ac); f.hidden = false;
+    f.innerHTML = '<div class="act-fiche-fond" data-ferme="1"></div><div class="act-fiche-boite" role="dialog" aria-label="' + esc(a.titre) + '"><button type="button" class="act-x" data-ferme="1" aria-label="Fermer">×</button>' +
+      '<img src="activites/' + a.f + '.jpg" alt=""><div class="act-fiche-txt"><div class="act-tag">' + esc(a.type) + '</div><h3>' + esc(a.titre) + '</h3><div class="act-comp">' + esc(a.comp) + '</div><p class="act-desc">' + esc(a.desc) + '</p>' +
+      '<div class="act-meta"><span>' + a.pages + ' pages</span><span>' + esc(a.prog) + '</span></div>' +
+      '<div class="act-btns"><button class="act-b prim" type="button" data-a="ouvrir" data-f="' + a.f + '">' + IC_OUV + 'Projeter au tableau</button></div>' +
+      '<div class="act-btns2"><button class="act-b" type="button" data-a="imprimer" data-f="' + a.f + '">' + IC_IMP + 'Imprimer</button>' +
+      '<a class="act-b" href="activites/' + a.f + '.pdf" download="' + esc(a.titre) + '.pdf">' + IC_DL + 'PDF</a>' +
+      (a.corrige ? '<button class="act-b corr" type="button" data-a="corrige" data-f="' + a.f + '">Corrigé</button>' : '') + '</div></div></div>';
+  }
+  function fermerFiche(){ const f = $("actFiche"); if (f) f.hidden = true; }
   async function pdfDe(a){ const r = await fetch("activites/" + a.f + ".pdf"); if (!r.ok) throw new Error("introuvable"); return r.blob(); }
   ov.addEventListener("click", async e => {
-    const p = e.target.closest(".act-pill"); if (p){ F[p.dataset.k] = p.dataset.v; dessiner(); return; }
-    if (e.target.closest("#actRaz")){ F.type = ""; F.dos = ""; F.q = ""; dessiner(); return; }
+    if (e.target.closest("[data-ferme]")){ fermerFiche(); return; }
+    const t = e.target.closest(".act-tuile"); if (t){ const a = ACTIVITES.find(x => x.f === t.dataset.fiche); if (a) fiche(a); return; }
+    const g = e.target.closest(".act-tout"); if (g){ const k = g.dataset.g; OUVERTS.has(k) ? OUVERTS.delete(k) : OUVERTS.add(k); dessiner(); return; }
     const b = e.target.closest("[data-a]"); if (!b) return;
     const a = ACTIVITES.find(x => x.f === b.dataset.f); if (!a) return;
     if (b.dataset.a === "corrige"){ window.open("activites/" + a.corrige + ".pdf", "_blank"); return; }
@@ -6551,9 +6566,8 @@ initAdmin();
     setTimeout(async () => { try { await window.__plans.charger({ id:"activite-" + a.f, name:a.titre, type:"pdf", blob, used:Date.now() }); if (!document.getElementById("plEmpty").hidden) window.open("activites/" + a.f + ".pdf", "_blank"); } catch (er) { window.open("activites/" + a.f + ".pdf", "_blank"); } }, 80);
   });
   ov.addEventListener("input", e => { if (e.target.id === "actQ"){ F.q = e.target.value; const pos = e.target.selectionStart; dessiner(); const i = $("actQ"); i.focus(); try { i.setSelectionRange(pos, pos); } catch (er) {} } });
-  ov.addEventListener("change", e => { if (e.target.id === "actTri"){ F.tri = e.target.value; dessiner(); } });
   $("actBack").onclick = () => { ov.hidden = true; };
-  document.addEventListener("keydown", e => { if (!ov.hidden && e.key === "Escape") ov.hidden = true; });
+  document.addEventListener("keydown", e => { if (!ov.hidden && e.key === "Escape"){ const f = $("actFiche"); if (f && !f.hidden) fermerFiche(); else ov.hidden = true; } });
   $("actBtn").addEventListener("click", () => { dessiner(); ov.hidden = false; ov.scrollTop = 0; });
   window.__activites = ACTIVITES;
 })();
