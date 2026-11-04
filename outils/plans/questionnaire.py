@@ -77,13 +77,26 @@ def options_numeriques(vrai, rng, pas, n=4, unite="", fmt=str, mini=1):
 def _lignes(q, larg=88): return wrap(q["q"], larg)
 
 
+def _cols_qcm(q):
+    """Nombre de colonnes pour les choix : une rangée si très courts, deux colonnes si courts, sinon une liste."""
+    o = q.get("options", []); n = len(o); m = max((len(str(x)) for x in o), default=0)
+    if n <= 4 and m <= 12: return n
+    if n >= 3 and m <= 34: return 2
+    return 1
+
+
+def _rangs_qcm(q):
+    n = len(q.get("options", [])); c = _cols_qcm(q)
+    return -(-n // c) if c else n
+
+
 def _h_img(q):
     return (q["img_h"] + 5) if q.get("img") else 0
 
 
 def _hauteur(q, corr):
     n = len(_lignes(q)); t = q["t"]; h = _h_img(q)
-    base = {"mesure": n * 5 + (11 if corr else 15), "rep": n * 5 + (11 if corr else 14), "qcm": n * 5 + len(q.get("options", [])) * 5.4 + 5,
+    base = {"mesure": n * 5 + (11 if corr else 15), "rep": n * 5 + (11 if corr else 14), "qcm": n * 5 + _rangs_qcm(q) * 5.4 + 5,
             "vf": n * 5 + (12 if corr else 17), "trou": n * 6 + (12 if corr else 7), "assoc": n * 5 + len(q.get("gauche", [])) * 5.4 + 9,
             "calc": n * 5 + (len(q.get("etapes", [])) * 4.6 + 12 if corr else 30), "erreur": n * 5 + (13 if corr else 24),
             "ordre": n * 5 + len(q.get("items", [])) * 5.4 + (13 if corr else 12)}.get(t, 30)
@@ -212,10 +225,13 @@ def _question(c, T, q, num, y, corr):
         if corr: y -= _bonne(c, xr, y, "→ " + q["r"]); _ou(c, xr, y - 0.5, q["ou"]); y -= 7
         else: _ligne(c, xr, y - 4, PW - MX - xr, 'pointille'); y -= 11
     elif t == "qcm":
+        cols = _cols_qcm(q); lw = (PW - MX - xr) / cols
         for i, o in enumerate(q["options"]):
             bon = corr and i == q["bonne"]
-            _case(c, xr, y - .8, bon); c.setFont(FONT_B if bon else FONT, 10)
-            c.setFillColor(VERT if bon else black); c.drawString((xr + 6) * MM, y * MM, f"{LETTRES[i]})  {o}"); c.setFillColor(black); y -= 5.4
+            cx = xr + (i % cols) * lw
+            _case(c, cx, y - .8, bon); c.setFont(FONT_B if bon else FONT, 10)
+            c.setFillColor(VERT if bon else black); c.drawString((cx + 6) * MM, y * MM, f"{LETTRES[i]})  {o}"); c.setFillColor(black)
+            if i % cols == cols - 1 or i == len(q["options"]) - 1: y -= 5.4
         if corr: _ou(c, xr, y - .5, q["ou"]); y -= 5
         else: y -= 2
     elif t == "vf":
@@ -422,14 +438,16 @@ def _corps(c, T, titre_doc, sous, Q, corr, mode):
     num = 0
     for gi, (titre_g, cons_g, qs) in enumerate(_groupes(Q, mode), 1):
         pts_g = sum(q["pts"] for q in qs)
-        if y < 70: nouvelle()
+        if y - 18 - _hauteur(qs[0], corr) < 18 or y < 50: nouvelle()
         lettre = (T.get("prefixe", "Partie ") + (chr(64 + gi) if T.get("lettres", True) else str(gi)))
         sections.append((chr(64 + gi) if T.get("lettres", True) else str(gi), titre_g, len(qs), page))
         y = _titre_section(c, T, y, lettre, titre_g, cons_g, len(qs))
-        for q in qs:
+        for k, q in enumerate(qs):
             num += 1
             if y - _hauteur(q, corr) < 18: nouvelle()
             y = _question(c, T, q, num, y, corr)
+            if k < len(qs) - 1:   # filet fin entre deux questions
+                c.setStrokeColor(GRIS_L); c.setLineWidth(.3); c.line((MX + 10) * MM, (y + 3.3) * MM, (PW - MX) * MM, (y + 3.3) * MM); c.setStrokeColor(black)
         if y - 30 < 18: nouvelle()
         y, _h = _fait(c, T, y - 2, gi)
     if not corr:
