@@ -997,7 +997,8 @@ class Batiment:
         c.setAuthor("Pavillon de l'Avenir · plan pédagogique")
         self.feuille_garde(c)
         extra = [fn for (_, _, fn) in getattr(self, "feuilles_extra", [])]   # feuilles civiles (C-101…), après le plan de site
-        for fn in (self.feuille_site, *extra, self.feuille_plan, self.feuille_elevations, self.feuille_coupe, self.feuille_coupes, self.feuille_fondations,
+        for fn in (self.feuille_legende, self.feuille_site, *extra, self.feuille_plan, self.feuille_toiture, self.feuille_elevations, self.feuille_coupe, self.feuille_coupes,
+                   self.feuille_details, self.feuille_finis, self.feuille_fondations,
                    self.feuille_plomberie, self.feuille_iso, self.feuille_electricite, self.feuille_cvca):
             fn(c)
         c.save()
@@ -1016,8 +1017,10 @@ class Batiment:
         yy -= 4
         for l in wrap(self.description, 95):
             c_.drawString(24 * MM, yy * MM, l); yy -= 5.2
-        lignes = [["000", "Page de garde et liste des feuilles"], ["A-100", "Plan d'implantation et de site"], *[[n, t] for (n, t, _) in getattr(self, "feuilles_extra", [])], ["A-101", "Plan du rez-de-chaussée"],
-                  ["A-201", "Élévations"], ["A-301", "Coupe transversale et nomenclatures"], ["A-302", "Coupe longitudinale, coupe de mur et matériaux"], ["S-101", "Plan des fondations et détail type"],
+        lignes = [["000", "Page de garde et liste des feuilles"], ["A-001", "Légende, symboles et abréviations"], ["A-100", "Plan d'implantation et de site"],
+                  *[[n, t] for (n, t, _) in getattr(self, "feuilles_extra", [])], ["A-101", "Plan du rez-de-chaussée"], ["A-102", "Plan de toiture"],
+                  ["A-201", "Élévations"], ["A-301", "Coupe transversale et nomenclatures"], ["A-302", "Coupe longitudinale, coupe de mur et matériaux"],
+                  ["A-401", "Tableau des locaux et des finis"], ["A-501", "Détails types de construction"], ["S-101", "Plan des fondations et détail type"],
                   ["P-101", "Plan de plomberie"], ["P-102", "Schéma isométrique et nomenclature des appareils"],
                   ["E-101", "Plan d'électricité"], ["M-101", "Plan de chauffage, ventilation et climatisation"]]
         f.tableau(24, yy - 10, "LISTE DES FEUILLES", ["Feuille", "Titre"], lignes, [22, 110], h=6, size=8.5)
@@ -1032,5 +1035,7 @@ def f_inverse(*a):
     return a
 
 
+import generique as _gen
+_gen.installer(Batiment)
 for _n in ("feuille_coupes", "_N_mur", "_z_haut_mur", "_coupe_longitudinale", "_coupe_mur", "_legende_materiaux"):
     setattr(Batiment, _n, getattr(_coupes, _n))

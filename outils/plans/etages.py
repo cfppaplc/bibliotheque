@@ -493,10 +493,12 @@ class MaisonEtages(Batiment):
         c = rl_canvas.Canvas(chemin, pagesize=(PAGE_W * MM, PAGE_H * MM), pageCompression=1)
         c.setTitle(f"{self.dossier['projet'].replace(chr(10), ' ')} — dossier de plans d'exercice"); c.setAuthor("Pavillon de l'Avenir · plan pédagogique")
         self.feuille_garde(c)
+        self.feuille_legende(c)
         self.feuille_site(c)
-        for lv in reversed(self.lv): pass
         for lv in self.lv: lv.feuille_plan(c)
-        self.feuille_elevations(c); self.feuille_coupe(c); self.feuille_coupes(c); self.feuille_fondations(c)
+        self.feuille_toiture(c)
+        self.feuille_elevations(c); self.feuille_coupe(c); self.feuille_coupes(c); self.feuille_details(c); self.feuille_finis(c)
+        self.feuille_fondations(c); self.feuille_charpente(c)
         for lv in self.lv: lv.feuille_plomberie(c)
         self.feuille_iso(c)
         for lv in self.lv: lv.feuille_electricite(c)
@@ -504,10 +506,10 @@ class MaisonEtages(Batiment):
         c.save()
 
     def liste_feuilles(self):
-        L = [["000", "Page de garde et liste des feuilles"], ["A-100", "Plan d'implantation et de site"]]
+        L = [["000", "Page de garde et liste des feuilles"], ["A-001", "Légende, symboles et abréviations"], ["A-100", "Plan d'implantation et de site"]]
         L += [[lv.no_plan, lv.titre_plan.replace("\n", " ").capitalize()] for lv in self.lv]
-        L += [["A-201", "Élévations"], ["A-301", "Coupe transversale et nomenclatures"], ["A-302", "Coupe longitudinale, coupe de mur et matériaux"],
-              ["S-101", "Plan des fondations et détail type"]]
+        L += [["A-104", "Plan de toiture"], ["A-201", "Élévations"], ["A-301", "Coupe transversale et nomenclatures"], ["A-302", "Coupe longitudinale, coupe de mur et matériaux"],
+              ["A-401", "Tableau des locaux et des finis"], ["A-501", "Détails types de construction"], ["S-101", "Plan des fondations et détail type"], ["S-102", "Plans de charpente (planchers et toit)"]]
         L += [[lv.no_plomb, lv.titre_plomb.replace("\n", " ").capitalize()] for lv in self.lv] + [[self.no_iso, "Schéma isométrique et nomenclature des appareils"]]
         L += [[lv.no_elec, lv.titre_elec.replace("\n", " ").capitalize()] for lv in self.lv]
         L += [[lv.no_cvca, lv.titre_cvca.replace("\n", " ").capitalize()] for lv in self.lv]
@@ -534,3 +536,124 @@ class MaisonEtages(Batiment):
                                          "Les renvois (bulles de coupe, types de fenêtres, numéros de portes) relient les feuilles entre elles.",
                                          "Bâtiment fictif. Les valeurs sont plausibles mais non vérifiées pour la construction."])
         c.showPage()
+
+
+# ====================================================================== nouvelles feuilles : toiture et charpente
+def _toiture_maison(self, c):
+    N = 100
+    f = Feuille(c, self.dossier, "A-104", "PLAN DE TOITURE", f"1:{N}")
+    self._centrer(f, N)
+    W, D, k = self.W, self.D, N / 50
+    OV, tp = self.debord, self.toit_plans
+    XL, XRG = tp[1][0], tp[1][1]
+    f.rect(0, 0, W, D, .5, GRIS_C, dash=[4, 2])
+    for idx in (0, 2, 1):                          # le volume haut est dessiné en dernier : son débord recouvre les ailes
+        xa, xb, za, zb = tp[idx]
+        a = xa - (OV if idx < 2 else 0); b = xb + (OV if idx > 0 else 0)
+        f.rect(a, -OV, b, D + OV, 1.1, fill=HexColor("#dcdcdc") if idx == 1 else HexColor("#efefef"))
+        for yy in range(int(-OV) + 300, int(D + OV), 300): f.ligne(a, yy, b, yy, .1, GRIS_C)
+        pct = abs(zb - za) / (xb - xa) * 100
+        bas = xa if zb > za else xb                # côté bas (égout)
+        haut = xb if zb > za else xa
+        sens = -1 if zb > za else 1
+        for yy in (D * .25, D * .5, D * .75):
+            xm = (xa + xb) / 2
+            _fleche(f, xm - sens * (xb - xa) * .18, yy, xm + sens * (xb - xa) * .18, yy, .8)
+        f.texte((xa + xb) / 2, D * .5 + 450 * k, f"pente {pct:.0f} %".replace(".", ","), 6.5, True)
+        f.ligne(haut, -OV, haut, D + OV, 2.0, black); f.texte(haut + (-1 if haut == xb else 1) * 200 * k, D + OV + 250 * k, "haut du versant", 5.5, False, "d" if haut == xb else "g", GRIS)
+        eg = bas - sens * 0 + (-(OV) if bas == xa else OV) if (idx == 1 or (idx == 0 and bas == xa) or (idx == 2 and bas == xb)) else bas
+        f.ligne(eg, -OV, eg, D + OV, 2.4, DR)
+        for yy in (-OV + 120, D + OV - 120): f.cercle(eg + (110 if eg == bas else 0), yy, 110 * k, .8, DR, fill=white)
+    f.texte(-OV - 300 * k, D / 2, "Gouttière 125 mm", 6, True, "c", DR, rot=90)
+    f.texte(W + OV + 300 * k, D / 2, "Gouttière 125 mm", 6, True, "c", DR, rot=90)
+    f.texte((XL + XRG) / 2, D + OV + 1300 * k, "Volume central : sa gouttière côté ouest se vide dans le toit de l'aile d'entrée (descentes dans le mur)", 6, False, "c", GRIS)
+    f.ligne(XL, 0, XL, D, .8, black, dash=[6, 3]); f.ligne(XRG, 0, XRG, D, .8, black, dash=[6, 3])
+    f.cote(-OV, W + OV, -2300 * k); f.cote(-OV, D + OV, -2300 * k, orient="v")
+    f.chaine([0, XL, XRG, W], D + OV + 2400 * k, "h", total=False)
+    f.nord(DRAW[2] - 16, DRAW[3] - 18)
+    f.titre_vue(DRAW[0] + 4, DRAW[1] + 6, 1, "PLAN DE TOITURE", f"1:{N}"); f.barre_echelle(DRAW[0] + 120, DRAW[1] + 6, N)
+    f.notes("NOTES DE TOITURE", ["Trois toits monopentes à pente d'écoulement unique (voir les flèches), débords de 900 sur les quatre côtés des toits qui dépassent.",
+                                "Membrane élastomère 2 plis soudée, isolant rigide en pente sur le pont; relevés de 200 mm aux murs.",
+                                "Gouttières en aluminium 125 mm au bas de chaque versant; descentes pluviales aux extrémités, rejet à 1,5 m des fondations.",
+                                "Rives : bandeau d'aluminium noir de 350 mm. Aucun parapet : le drainage se fait par les gouttières.",
+                                "Charge de neige de calcul au sol : 2,9 kPa (valeur d'exercice). Prévoir des arrêts de neige au-dessus des entrées.",
+                                "Les flèches indiquent le sens d'écoulement de l'eau."])
+    c.showPage()
+
+
+def _charpente_maison(self, c):
+    f = Feuille(c, self.dossier, "S-102", "PLANS DE CHARPENTE\nPLANCHERS ET TOIT", "1:200")
+    N = 200
+    W, D = self.W, self.D
+    tp = self.toit_plans; XL, XRG = tp[1][0], tp[1][1]
+    ss, rdc, et = self.lv
+    cw = 163
+    col = [DRAW[0] + 8, DRAW[0] + 8 + cw]
+    row = [DRAW[3] - 22 - D / N, DRAW[3] - 22 - D / N - 112]
+    def cadre(i, j, n, titre):
+        f.vue(col[i], row[j], N); return (col[i], row[j] - 12)
+    # 1 plancher du RDC ---------------------------------------------------
+    f.vue(col[0], row[0], N)
+    e0, e1 = ss.emprise
+    f.rect(0, 0, W, D, .8, GRIS_C); f.rect(e0, 0, e1, D, 1.2)
+    for x in range(0, int(W), 800):
+        if not (e0 <= x <= e1): pass
+    for (a, b) in ((0, e0), (e1, W)): f.hachures(a, 0, b, D, 500, 45, GRIS_TC)
+    y = 0
+    xj = e0 + 250
+    while xj < e1 - 150:
+        if not (rdc.tremies[0][0] <= xj <= rdc.tremies[0][2]): f.ligne(xj, 250, xj, D - 250, .15, black)
+        else:
+            f.ligne(xj, rdc.tremies[0][3], xj, D - 250, .15, black); f.ligne(xj, 250, xj, rdc.tremies[0][1], .15, black)
+        xj += 400
+    tx0, ty0, tx1, ty1 = rdc.tremies[0]
+    f.rect(tx0, ty0, tx1, ty1, .7, fill=white); f.ligne(tx0, ty0, tx1, ty1, .4); f.ligne(tx0, ty1, tx1, ty0, .4)
+    for (x1, y1, x2, y2, lab) in ss.poutres: f.ligne(x1, y1, x2, y2, 2.2, black, dash=[10, 3, 2, 3]); f.texte((x1 + x2) / 2, y1 + 600, "Poutre W200 × 36", 5.5, True)
+    for (x, y_, sz, lab) in ss.poteaux: f.rect(x - 150, y_ - 150, x + 150, y_ + 150, .6, fill=black)
+    f.texte((e0 + e1) / 2, D * .8, "Solives en I 302 à 400 c/c", 6, True); f.texte(e0 / 2, D / 2, "AILE : dalle sur sol", 6, False, "c", GRIS); f.texte((e1 + W) / 2, D / 2, "AILE : dalle sur sol", 6, False, "c", GRIS)
+    f.cote(0, W, -900)
+    f.titre_vue(col[0], row[0] - 14, 1, "PLANCHER DU REZ-DE-CHAUSSÉE (SUR LE SOUS-SOL)", "1:200")
+    # 2 plancher de l'étage -----------------------------------------------
+    f.vue(col[1], row[0], N)
+    f.rect(0, 0, W, D, .4, GRIS_TC); f.rect(XL, 0, XRG, D, 1.2)
+    xj = XL + 250
+    t0 = et.tremies[0]
+    while xj < XRG - 150:
+        if t0[0] <= xj <= t0[2]: f.ligne(xj, t0[3], xj, D - 250, .15, black); f.ligne(xj, 250, xj, t0[1], .15, black)
+        else: f.ligne(xj, 250, xj, D - 250, .15, black)
+        xj += 400
+    f.rect(t0[0], t0[1], t0[2], t0[3], .7, fill=white); f.ligne(t0[0], t0[1], t0[2], t0[3], .4); f.ligne(t0[0], t0[3], t0[2], t0[1], .4)
+    f.ligne(et.O, 6700, et.E, 6700, 2.2, black, dash=[10, 3, 2, 3]); f.texte((XL + XRG) / 2, 6700 + 600, "Mur porteur (double sablière) : appui des solives", 5.5, True)
+    f.texte((XL + XRG) / 2, D * .12, "Solives en I 302 à 400 c/c", 6, True)
+    f.cote(XL, XRG, -900)
+    f.titre_vue(col[1], row[0] - 14, 2, "PLANCHER DE L'ÉTAGE", "1:200")
+    # 3 toit ---------------------------------------------------------------
+    f.vue(col[0], row[1], N)
+    OV = self.debord
+    f.rect(0, 0, W, D, .4, GRIS_C, dash=[4, 2])
+    for idx, (xa, xb, za, zb) in enumerate(tp):
+        a = xa - (OV if idx < 2 else 0); b = xb + (OV if idx > 0 else 0)
+        yy = -OV + 200
+        while yy < D + OV - 100: f.ligne(a, yy, b, yy, .15, black); yy += 400
+    for (xb, lab) in ((2900, "mur porteur"), (10462, "mur porteur"), (XL, ""), (XRG, "")):
+        f.ligne(xb, -OV, xb, D + OV, 1.6, black, dash=[10, 3, 2, 3])
+    f.ligne(19000, -OV, 19000, D + OV, 2.2, black, dash=[10, 3, 2, 3]); f.texte(19000, D + OV + 500, "Poutre de rive (LVL)", 5.5, True)
+    f.texte(W * .12, D / 2, "Chevrons en I 356 à 400 c/c", 6, True, "c", black); f.texte(W * .52, D * .12, "Chevrons en I 356 à 400 c/c", 6, True)
+    f.cote(-OV, W + OV, -1500)
+    f.titre_vue(col[0], row[1] - 14, 3, "CHARPENTE DU TOIT (CHEVRONS)", "1:200")
+    # 4 nomenclature ----------------------------------------------------------
+    f.vue(0, 0, 1)
+    f.tableau(col[1], row[1] + D / N + 6, "NOMENCLATURE DES ÉLÉMENTS PORTEURS", ["Élément", "Dimensions", "Espacement"],
+              [["Solives de plancher", "I 302 (type TJI)", "400 c/c"], ["Poutre du sous-sol", "W200 × 36 (acier)", "—"], ["Poteaux du sous-sol", "Ø 89 sur semelle 700", "—"],
+               ["Chevrons du toit", "I 356", "400 c/c"], ["Poutre de rive du toit", "LVL 3 plis 45 × 356", "—"], ["Murs extérieurs", "Montants 38 × 140", "400 c/c"],
+               ["Murs porteurs intérieurs", "Montants 38 × 89 doubles", "400 c/c"], ["Linteaux", "2 × LVL 45 × 241", "selon baie"]],
+              [52, 52, 32], h=5.4, size=6.8)
+    f.notes("NOTES DE CHARPENTE", ["Les solives sont perpendiculaires aux appuis; les trémies sont encadrées de solives doublées.", "Solives sous les cloisons parallèles : doublées.",
+                                    "Portées maximales des solives en I 302 : environ 6,7 m; vérifier avec les tables du fabricant.", "Les murs porteurs de l'étage descendent sur un mur ou une poutre du niveau inférieur.",
+                                    "Valeurs d'exercice, à faire valider par un ingénieur en structure."])
+    c.showPage()
+
+
+MaisonEtages.feuille_toiture = _toiture_maison
+MaisonEtages.feuille_charpente = _charpente_maison
+from generique import _fleche
