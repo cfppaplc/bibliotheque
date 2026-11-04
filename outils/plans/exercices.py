@@ -100,6 +100,7 @@ def _contexte(b, nb, n, pdf, tmp):
 # ------------------------------------------------------------------ questions avec image (variées : titres, cartouches, tableaux, légendes, disciplines)
 DISC = {"A": "Architecture", "S": "Structure", "P": "Plomberie", "E": "Électricité", "M": "Chauffage et ventilation (mécanique)", "C": "Génie civil"}
 _INFO = {}
+DE = {"A": "d'architecture", "S": "de structure", "P": "de plomberie", "E": "d'électricité", "M": "de chauffage et de ventilation", "C": "de génie civil"}
 
 
 def _texte_zone(pdf, page, x, y, w, h):
@@ -282,6 +283,70 @@ def images(C):
     return pool
 
 
+# ------------------------------------------------------------------ enquêtes : il faut fouiller le dossier (liste des feuilles, cartouches)
+def enquetes(C, P):
+    rng = C.rng
+    def feuilles():
+        l = [c for c in _pages(C.pdf) if c[0] in DISC and _info(C.pdf, c)] if C.pdf else []
+        return sorted(l, key=lambda c: _pages(C.pdf)[c])
+    def qui_suis_je(k):
+        def g():
+            L = feuilles()
+            if len(L) < 8: return None
+            ok = []
+            for c_ in L:
+                i = _info(C.pdf, c_)
+                if not re.match(r"^1:\d+$", i["ech"]): continue
+                memes = [d for d in L if d[0] == c_[0] and _info(C.pdf, d)["ech"] == i["ech"]]
+                mots = [m for m in re.findall(r"[A-Za-zÀ-ÿ]{6,}", i["titre"])]
+                for m in mots:
+                    if len(memes) == 1 or sum(1 for d in memes if m.lower() in _info(C.pdf, d)["titre"].lower()) == 1: ok.append((c_, m)); break
+            if not ok: return None
+            R = random.Random(f"{C.n}-qsj-{k}"); c_, m = R.sample(ok, 1)[0] if k else ok[(C.n * 3) % len(ok)]
+            i = _info(C.pdf, c_)
+            return qs.rep(f"Qui suis-je ? Je suis une feuille {DE[c_[0]]}. Mon échelle est {i['ech']}. Mon titre contient le mot « {m.lower()} ». Quel est mon numéro ?", c_, "Liste des feuilles et cartouches", cat="lecture", niv=3, sans_tag=True)
+        return g
+    def assoc_titres(k):
+        def g():
+            L = feuilles()
+            if len(L) < 8: return None
+            R = random.Random(f"{C.n}-at-{k}"); ch = []; vus = set()
+            for c_ in R.sample(L, len(L)):
+                t = _info(C.pdf, c_)["titre"]
+                if t not in vus and c_[0] not in [x[0] for x in ch]: ch.append(c_); vus.add(t)
+                if len(ch) == 4: break
+            if len(ch) < 4: return None
+            return qs.assoc("Relie chaque numéro de feuille à son titre (cherche dans la liste des feuilles).", [(c_, _info(C.pdf, c_)["titre"].capitalize()) for c_ in ch], "Page de garde : liste des feuilles", rng, cat="lecture", niv=2, sans_tag=True)
+        return g
+    def assoc_echelles(k):
+        def g():
+            L = feuilles()
+            R = random.Random(f"{C.n}-ae-{k}"); ch = []; ech = set()
+            for c_ in R.sample(L, len(L)):
+                e = _info(C.pdf, c_)["ech"]
+                if re.match(r"^1:\d+$", e) and e not in ech: ch.append(c_); ech.add(e)
+                if len(ch) == 4: break
+            if len(ch) < 4: return None
+            return qs.assoc("Relie chaque feuille à son échelle (lis le cartouche de chacune).", [(f"{c_} · {_info(C.pdf, c_)['titre'].capitalize()}"[:44], _info(C.pdf, c_)["ech"]) for c_ in ch], "Cartouche de chaque feuille, case « Échelle »", rng, cat="lecture", niv=2, sans_tag=True)
+        return g
+    def ordre_pages(k):
+        def g():
+            L = feuilles()
+            if len(L) < 8: return None
+            R = random.Random(f"{C.n}-op-{k}"); ch = []; vus = set()
+            for c_ in R.sample(L, len(L)):
+                t = _info(C.pdf, c_)["titre"]
+                if t not in vus: ch.append(c_); vus.add(t)
+                if len(ch) == 4: break
+            ch.sort(key=lambda c_: _pages(C.pdf)[c_])
+            return qs.ordre("Classe ces feuilles dans l'ordre où elles apparaissent dans le dossier (de la première à la dernière).", [_info(C.pdf, c_)["titre"].capitalize() for c_ in ch], "de la première à la dernière", "Page de garde : liste des feuilles", rng, cat="lecture", niv=2, sans_tag=True)
+        return g
+    def rapport():
+        g_, p_ = C.aire(C.gl[1]), C.aire(C.pl[1])
+        return qs.calc("Mission : combien de fois le plus grand local du bâtiment contient-il le plus petit ? (arrondi à l'unité)", ["Trouve le plus grand et le plus petit local dans le tableau des locaux (A-401)", "Divise la grande superficie par la petite"], f"environ {round(g_ / p_)} fois", "Tableau des locaux et des finis, feuille A-401", cat="arch", niv=3)
+    P["enq"] = [qui_suis_je(0), assoc_titres(0), ordre_pages(0), rapport, qui_suis_je(1), assoc_echelles(0), ordre_pages(1), assoc_titres(1), assoc_echelles(1)]
+
+
 # ------------------------------------------------------------------ banque de questions (chaque fonction retourne une question ou None)
 def banque(C):
     b, rng, qs_ = C.b, C.rng, qs
@@ -290,7 +355,7 @@ def banque(C):
     std = [100, 125, 150, 200, 225, 300, 400, 600]; base = C.B["service"]
     def autres_locaux(excl, k):
         a = [x for _, x in C.loc if x is not excl and abs(aire(x) - aire(excl)) > .8]; rng.shuffle(a); return a[:k]
-    P = {k: [] for k in ("rep", "qcm", "vf", "trou", "assoc", "calc", "erreur", "ordre", "img")}
+    P = {k: [] for k in ("rep", "qcm", "vf", "trou", "assoc", "calc", "erreur", "ordre", "img", "enq")}
     add = lambda t: (lambda f: P[t].append(f) or f)
 
     # ---------- réponse courte
@@ -576,10 +641,11 @@ def banque(C):
         return qs_.ordre("Classe ces portes de la plus étroite à la plus large.", [f"Porte {o['no']}" for o in ps], "de la plus étroite à la plus large", "Tableau des portes, feuille A-301", rng, cat="arch")
 
     P["img"] = images(C)
+    enquetes(C, P)
     return P
 
 
-QUOTAS = dict(img=6, rep=3, qcm=5, vf=3, trou=3, assoc=2, calc=4, erreur=3, ordre=2)
+QUOTAS = dict(img=6, enq=4, rep=3, qcm=5, vf=3, trou=3, assoc=2, calc=4, erreur=3, ordre=2)
 
 
 def _choisir(pool, n, k, C):

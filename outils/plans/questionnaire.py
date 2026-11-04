@@ -357,6 +357,61 @@ def _couverture(c, T, titre_doc, sous, Q, corr, total, sections, npages):
     c.setFillColor(black); c.setStrokeColor(black)
 
 
+FAITS = [
+    ("Le cartouche", "Le cartouche, dans le coin en bas à droite, donne toujours le numéro de la feuille, son titre, son échelle et la date. C'est la carte d'identité de la feuille."),
+    ("Les lettres", "La lettre d'un numéro de feuille te dit sa discipline : A = architecture, S = structure, P = plomberie, E = électricité, M = mécanique (chauffage, ventilation), C = génie civil."),
+    ("L'échelle", "À l'échelle 1:50, 1 mm sur le papier vaut 50 mm dans la réalité. Un trait de 20 mm sur la feuille représente donc 1 m."),
+    ("Les cotes", "Quand une cote est écrite sur le plan, on la lit. On ne mesure à la règle que s'il n'y a pas de cote, et jamais avant d'avoir vérifié l'échelle."),
+    ("La légende", "Un symbole que tu ne reconnais pas? Cherche la feuille de légende (A-001) : elle explique les symboles, les matériaux et les abréviations."),
+    ("La plomberie", "Sur un plan de plomberie, l'eau froide est en bleu, l'eau chaude en rouge, le drainage en vert et l'évent en pointillé. Les couleurs t'évitent de suivre la mauvaise tuyauterie."),
+    ("Les murs", "Les murs extérieurs sont dessinés plus épais que les cloisons : isolation, revêtement, structure. Une épaisseur de trait différente, c'est une information."),
+    ("Les coupes", "Une coupe montre ce qu'on verrait si on tranchait le bâtiment de haut en bas. C'est elle qui donne les hauteurs et les niveaux."),
+    ("Les élévations", "Une élévation est la vue d'une façade, de côté. On y lit les hauteurs, les matériaux et la position des fenêtres."),
+    ("Le trait de 100 mm", "Chaque feuille a un trait de contrôle de 100 mm. Si ton impression le mesure exactement, l'échelle est bonne. Sinon, l'imprimante a réduit la feuille."),
+    ("Les niveaux", "Un bâtiment à plusieurs niveaux a un plan par niveau. Pour suivre une colonne de chute, on passe d'une feuille à l'autre en gardant le même repère."),
+    ("La liste des feuilles", "La page de garde contient la liste de toutes les feuilles du dossier. Les chercheurs expérimentés commencent toujours par là."),
+]
+
+
+def _fait(c, T, y, gi):
+    """Petite bulle « Savais-tu ? » à la fin d'une partie : un fait à retenir."""
+    titre, texte = FAITS[(gi + T.get("fait0", 0)) % len(FAITS)]
+    lignes = wrap(texte, 118); h = 8 + 4.2 * len(lignes)
+    _rr(c, MX, y - h, PW - 2 * MX, h, 2.4, fill=HexColor("#fff7e0"), stroke=HexColor("#e6b422"), lw=.7)
+    c.setFillColor(HexColor("#e6b422")); c.circle((MX + 6) * MM, (y - h / 2) * MM, 3.6 * MM, stroke=0, fill=1)
+    c.setFillColor(white); c.setFont(FONT_B, 12); c.drawCentredString((MX + 6) * MM, (y - h / 2 - 1.5) * MM, "!")
+    c.setFillColor(HexColor("#7a5a00")); c.setFont(FONT_B, 8.6); c.drawString((MX + 13) * MM, (y - 4.6) * MM, ("À retenir · " + titre).upper())
+    c.setFillColor(HexColor("#4a4320")); c.setFont(FONT, 9)
+    for i, l in enumerate(lignes): c.drawString((MX + 13) * MM, (y - 9.2 - 4.2 * i) * MM, l)
+    c.setFillColor(black)
+    return y - h - 6, h
+
+
+SAIS_FAIRE = ["Je sais lire un cartouche : numéro, titre et échelle.",
+              "Je trouve une feuille grâce à la liste de la page de garde.",
+              "Je reconnais la discipline d'une feuille à sa lettre (A, S, P, E, M, C).",
+              "Je mesure avec l'échelimètre en choisissant la bonne échelle.",
+              "Je lis une légende de plomberie : EF, EC, drainage, évent.",
+              "Je peux expliquer ce que montre une feuille à un collègue."]
+
+
+def _bilan(c, T, y):
+    """Dernière page : ce que l'élève sait faire maintenant (auto-évaluation, rien n'est noté) + défi bonus."""
+    col = T["couleur"]; h = 12 + 8 * len(SAIS_FAIRE)
+    _rr(c, MX, y - 9, PW - 2 * MX, 9, 1.8, fill=col)
+    c.setFillColor(white); c.setFont(FONT_B, 11); c.drawString((MX + 4) * MM, (y - 6.2) * MM, "Ce que tu sais faire maintenant")
+    c.setFillColor(GRIS); c.setFont(FONT, 8.8); c.drawString((MX + 1) * MM, (y - 14) * MM, "Coche ce que tu sais faire. Personne ne te note : c'est pour toi.")
+    yy = y - 22
+    for t in SAIS_FAIRE:
+        _case(c, MX + 3, yy + 1.6); c.setFillColor(black); c.setFont(FONT, 10); c.drawString((MX + 11) * MM, yy * MM, t); yy -= 8
+    yy -= 3
+    _rr(c, MX, yy - 24, PW - 2 * MX, 24, 2.6, fill=HexColor("#eef4fb"), stroke=col, lw=.8)
+    c.setFillColor(col); c.setFont(FONT_B, 10); c.drawString((MX + 5) * MM, (yy - 7) * MM, "DÉFI BONUS")
+    c.setFillColor(black); c.setFont(FONT, 9.6)
+    for i, l in enumerate(wrap("Choisis une feuille du dossier et prépare trois questions pour un collègue : une pour lui faire trouver la feuille, une sur son échelle, une sur ce qu'elle montre. Ensuite, échangez vos questions!", 110)): c.drawString((MX + 5) * MM, (yy - 13 - 4.6 * i) * MM, l)
+    return yy - 30
+
+
 def _corps(c, T, titre_doc, sous, Q, corr, mode):
     """Pages de questions (la page 1 est la page de garde). Retourne [(lettre, titre, points, page)] et le nombre de pages."""
     page = 2; sections = []
@@ -375,6 +430,11 @@ def _corps(c, T, titre_doc, sous, Q, corr, mode):
             num += 1
             if y - _hauteur(q, corr) < 18: nouvelle()
             y = _question(c, T, q, num, y, corr)
+        if y - 30 < 18: nouvelle()
+        y, _h = _fait(c, T, y - 2, gi)
+    if not corr:
+        if y - 90 < 18: nouvelle()
+        y = _bilan(c, T, y - 2)
     _pied(c, T, page)
     return sections, page
 
