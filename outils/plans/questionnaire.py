@@ -136,22 +136,6 @@ def _pied(c, T, n):
     c.setStrokeColor(GRIS_L); c.setLineWidth(.4); c.line(MX * MM, 12.5 * MM, (PW - MX) * MM, 12.5 * MM); c.setFillColor(black); c.setStrokeColor(black)
 
 
-def _entete_info(c, T, total, y, corr):
-    if corr:
-        _rr(c, MX, y - 12, PW - 2 * MX, 12, 2, fill=HexColor("#e8f5ec"), stroke=VERT)
-        c.setFillColor(VERT); c.setFont(FONT_B, 9.5); c.drawString((MX + 4) * MM, (y - 5) * MM, f"Total : {total} points.   Les réponses sont en vert; « Où la trouver » indique la feuille à consulter.")
-        c.setFillColor(black); return y - 17
-    _rr(c, MX, y - 13, PW - 2 * MX, 13, 2, fill=GRIS_T, stroke=GRIS_L)
-    c.setFont(FONT, 9); c.setFillColor(GRIS)
-    c.drawString((MX + 3) * MM, (y - 4.2) * MM, "NOM"); c.drawString((MX + 78) * MM, (y - 4.2) * MM, "GROUPE"); c.drawString((MX + 110) * MM, (y - 4.2) * MM, "DATE")
-    c.drawString((MX + 140) * MM, (y - 4.2) * MM, "NOTE")
-    c.setFillColor(black); c.setStrokeColor(GRIS); c.setLineWidth(.4)
-    for (a, b) in ((MX + 3, MX + 75), (MX + 78, MX + 107), (MX + 110, MX + 137)): c.line(a * MM, (y - 11) * MM, b * MM, (y - 11) * MM)
-    c.setFont(FONT_B, 11); c.drawString((MX + 140) * MM, (y - 11) * MM, f"_____ / {total}")
-    c.setStrokeColor(black)
-    return y - 18
-
-
 def _intro(c, T, y, corr):
     if corr or not T.get("intro"): return y
     lignes = []
@@ -168,7 +152,7 @@ def _titre_section(c, T, y, num, titre, consigne, pts):
     col = T["couleur"]
     _rr(c, MX, y - 8.5, PW - 2 * MX, 8.5, 1.8, fill=col)
     c.setFillColor(white); c.setFont(FONT_B, 11); c.drawString((MX + 4) * MM, (y - 5.9) * MM, f"{num}  ·  {titre}")
-    c.setFont(FONT, 8.5); c.drawRightString((PW - MX - 4) * MM, (y - 5.8) * MM, f"{pts} pt{'s' if pts > 1 else ''}")
+    c.setFont(FONT, 8.5); c.drawRightString((PW - MX - 4) * MM, (y - 5.8) * MM, f"{pts} question{'s' if pts > 1 else ''}")
     c.setFillColor(GRIS); c.setFont(FONT, 8.8); c.drawString((MX + 1) * MM, (y - 13.2) * MM, consigne); c.setFillColor(black)
     return y - 18
 
@@ -277,9 +261,6 @@ def _question(c, T, q, num, y, corr):
                 _rr(c, xx, y - 4, 9, 6, 1, stroke=GRIS); xx += 9
                 if k < n - 1: c.setFont(FONT_B, 10); c.drawString((xx + 1.6) * MM, (y - 2) * MM, ">"); xx += 6
             y -= 10
-    # pastille de points
-    c.setFont(FONT, 7.5); c.setFillColor(GRIS)
-    c.drawRightString((PW - MX) * MM, (y + 2.3) * MM, f"{q['pts']} pt{'s' if q['pts'] > 1 else ''}"); c.setFillColor(black)
     return y - 4
 
 
@@ -338,11 +319,11 @@ def _couverture(c, T, titre_doc, sous, Q, corr, total, sections, npages):
     # chiffres clés
     y = cy - ch - 9
     nq = len(Q)
-    for i, (val, lab) in enumerate(((str(nq), "questions"), (str(total), "points"), (str(npages), "pages"), (str(len(sections)), "parties"))):
-        bx = MX + i * ((PW - 2 * MX + 5) / 4)
-        _rr(c, bx, y - 15, (PW - 2 * MX - 15) / 4, 15, 2.4, fill=GRIS_T, stroke=GRIS_L)
-        c.setFillColor(col); c.setFont(FONT_B, 17); c.drawCentredString((bx + (PW - 2 * MX - 15) / 8) * MM, (y - 8.3) * MM, val)
-        c.setFillColor(GRIS); c.setFont(FONT, 8.5); c.drawCentredString((bx + (PW - 2 * MX - 15) / 8) * MM, (y - 12.8) * MM, lab)
+    for i, (val, lab) in enumerate(((str(nq), "questions"), (str(npages), "pages"), (str(len(sections)), "parties"))):
+        bx = MX + i * ((PW - 2 * MX + 6) / 3)
+        _rr(c, bx, y - 15, (PW - 2 * MX - 12) / 3, 15, 2.4, fill=GRIS_T, stroke=GRIS_L)
+        c.setFillColor(col); c.setFont(FONT_B, 17); c.drawCentredString((bx + (PW - 2 * MX - 12) / 6) * MM, (y - 8.3) * MM, val)
+        c.setFillColor(GRIS); c.setFont(FONT, 8.5); c.drawCentredString((bx + (PW - 2 * MX - 12) / 6) * MM, (y - 12.8) * MM, lab)
     y -= 24
     # deux colonnes : avant de commencer / contenu
     xg, xd, lg = MX, MX + 92, 84
@@ -358,22 +339,21 @@ def _couverture(c, T, titre_doc, sous, Q, corr, total, sections, npages):
         _rr(c, xd, yy2 - 1.6, 5.6, 5.6, 1.2, fill=col)
         c.setFillColor(white); c.setFont(FONT_B, 8.5); c.drawCentredString((xd + 2.8) * MM, (yy2 + .3) * MM, lettre[:2].strip() or "·")
         c.setFillColor(black); c.setFont(FONT, 9); c.drawString((xd + 8) * MM, yy2 * MM, titre[:34])
-        c.setFillColor(GRIS); c.setFont(FONT, 8.2); c.drawRightString((PW - MX) * MM, yy2 * MM, f"p. {pg} · {pts} pt{'s' if pts > 1 else ''}")
+        c.setFillColor(GRIS); c.setFont(FONT, 8.2); c.drawRightString((PW - MX) * MM, yy2 * MM, f"p. {pg} · {pts} question{'s' if pts > 1 else ''}")
         c.setStrokeColor(GRIS_L); c.setLineWidth(.3); c.line((xd + 8) * MM, (yy2 - 2.1) * MM, (PW - MX) * MM, (yy2 - 2.1) * MM)
         yy2 -= 7.4
     # champs à remplir (feuille d'élève) ou explication (corrigé)
     c.setFillColor(black); c.setStrokeColor(black)
     if corr:
         _rr(c, MX, 20, PW - 2 * MX, 17, 2.4, fill=HexColor("#e8f5ec"), stroke=VERT)
-        c.setFillColor(VERT); c.setFont(FONT_B, 10); c.drawString((MX + 5) * MM, 30.5 * MM, f"Corrigé · total : {total} points")
+        c.setFillColor(VERT); c.setFont(FONT_B, 10); c.drawString((MX + 5) * MM, 30.5 * MM, "Corrigé de l'activité")
         c.setFont(FONT, 8.8); c.drawString((MX + 5) * MM, 25 * MM, "Réponses en vert. « Où la trouver » indique la feuille du dossier à consulter. Mesures : tolérance de ± 1 mm sur le papier.")
     else:
         _rr(c, MX, 17, PW - 2 * MX, 22, 2.6, fill=GRIS_T, stroke=GRIS_L)
         c.setFillColor(GRIS); c.setFont(FONT, 8.5)
-        c.drawString((MX + 5) * MM, 33 * MM, "NOM"); c.drawString((MX + 92) * MM, 33 * MM, "GROUPE"); c.drawString((MX + 5) * MM, 23 * MM, "DATE"); c.drawString((MX + 92) * MM, 23 * MM, "NOTE")
+        c.drawString((MX + 5) * MM, 33 * MM, "NOM"); c.drawString((MX + 92) * MM, 33 * MM, "GROUPE"); c.drawString((MX + 5) * MM, 23 * MM, "DATE")
         c.setStrokeColor(GRIS); c.setLineWidth(.5)
         for (a_, b_, y_) in ((MX + 17, MX + 85, 33), (MX + 108, PW - MX - 5, 33), (MX + 17, MX + 85, 23)): c.line(a_ * MM, (y_ - 1) * MM, b_ * MM, (y_ - 1) * MM)
-        c.setFillColor(black); c.setFont(FONT_B, 13); c.drawString((MX + 106) * MM, 22 * MM, f"_____ / {total}")
     c.setFillColor(black); c.setStrokeColor(black)
 
 
@@ -389,8 +369,8 @@ def _corps(c, T, titre_doc, sous, Q, corr, mode):
         pts_g = sum(q["pts"] for q in qs)
         if y < 70: nouvelle()
         lettre = (T.get("prefixe", "Partie ") + (chr(64 + gi) if T.get("lettres", True) else str(gi)))
-        sections.append((chr(64 + gi) if T.get("lettres", True) else str(gi), titre_g, pts_g, page))
-        y = _titre_section(c, T, y, lettre, titre_g, cons_g, pts_g)
+        sections.append((chr(64 + gi) if T.get("lettres", True) else str(gi), titre_g, len(qs), page))
+        y = _titre_section(c, T, y, lettre, titre_g, cons_g, len(qs))
         for q in qs:
             num += 1
             if y - _hauteur(q, corr) < 18: nouvelle()

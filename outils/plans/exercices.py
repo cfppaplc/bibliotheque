@@ -19,7 +19,7 @@ THEMES = {
                    "Au niveau 1, une étiquette bleue indique la feuille; ensuite, tu cherches seul(e)."]),
     4: dict(couleur="#6a3fa0", mode="defis", indices="aucun", kicker="Lecture de plans · Défis", prefixe="Défi ", lettres=False,
             intro=["Trois défis à relever : éclair (réponses rapides), observation (images tirées des plans) et réflexion (calculs et pièges).",
-                   "Chaque point compte : vise le meilleur pointage. Aucune étiquette ne t'aide."]),
+                   "Prends ton temps : aucune étiquette ne t'aide."]),
     5: dict(couleur="#3b7d2a", mode="discipline", indices="tous", kicker="Lecture de plans · Étude de cas", prefixe="Volet ", lettres=False,
             intro=["Étude de cas : une ferme laitière moderne (étable à stabulation libre, robots de traite, silos). Explore le dossier volet par volet.",
                    "Une étiquette bleue indique la feuille à consulter."]),
