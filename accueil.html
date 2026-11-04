@@ -1616,10 +1616,14 @@ function compactSteps(level) {
   if (hidAfter) { const m = document.createElement("li"); m.className = "more"; m.textContent = "+ " + hidAfter + " autre" + (hidAfter > 1 ? "s" : "") + " étape" + (hidAfter > 1 ? "s" : ""); $("v-steps").append(m); }
 }
 function fitSegLabels() {
+  let pire = 1;
   document.querySelectorAll("#v-tl .seg-l").forEach(el => {
     el.style.removeProperty("--shrink");
     for (let k = 1; k <= 8 && (el.scrollWidth > el.clientWidth + 2 || el.scrollHeight > el.clientHeight + 4); k++) el.style.setProperty("--shrink", (1 - k * 0.05).toFixed(2));
+    pire = Math.min(pire, parseFloat(el.style.getPropertyValue("--shrink")) || 1);
   });
+  /* même taille de texte pour toutes les cases (plus lisible de loin) */
+  if (pire < 1 && !document.querySelector("#v-tl .seg.p")?.closest(".tl")?.dataset.libre) document.querySelectorAll("#v-tl .seg-l").forEach(el => el.style.setProperty("--shrink", pire.toFixed(2)));
 }
 // Remplit l'écran : agrandit au maximum sans qu'aucune zone déborde
 function overflows() {
@@ -2889,6 +2893,17 @@ html.style-pro .tl-mark::after { content: attr(data-h); position: absolute; left
 #lueur::after { content: ""; position: fixed; left: 0; right: 0; bottom: 0; height: 3px; background: var(--water); box-shadow: 0 0 30px 6px var(--water); opacity: .8; transition: background 2.5s, box-shadow 2.5s; }
 #lueur.fin::after { background: var(--copper); box-shadow: 0 0 30px 6px var(--copper); }
 html:not(.style-pro) #lueur, html.apercu-mode #lueur { display: none; }
+/* Ligne du temps plus grosse, « Au programme » retiré (4 nov., pour les élèves au fond de la classe) */
+html.style-pro #v-module { display: none; }
+html.style-pro .tl { height: calc(var(--u) * 270); }
+html.style-pro .seg { padding: calc(var(--u) * 20) calc(var(--u) * 16) calc(var(--u) * 18); }
+html.style-pro .seg-l { font-size: calc(var(--u) * 66 * var(--shrink, 1)); }
+html.style-pro .seg-t { font-size: calc(var(--u) * 38); opacity: .8; letter-spacing: .02em; }
+html.style-pro .seg-l { -webkit-line-clamp: 3; }
+html.style-pro .seg.p .seg-l { font-size: calc(var(--u) * 36); }
+html.style-pro .tl-mark::after { font-size: calc(var(--u) * 42); }
+html.style-pro .tl-wrap { padding-top: calc(var(--u) * 92); }
+html.style-pro .tl-mark { top: calc(var(--u) * 74); }
 </style>
 </body>
 </html>
