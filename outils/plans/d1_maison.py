@@ -11,8 +11,8 @@ W, D, t = round(X(10700)) + 300, round(Y(8200)) + 300, 300
 S, N, O, E = t / 2, D - t / 2, t / 2, W - t / 2
 EP = 300                                   # planchers : solives en I 302 + contreplaqué
 ZSS, ZP1, ZP2 = -2100, 600, 3640           # dessus des planchers : sous-sol (dalle), rez-de-chaussée, étage
-ZT, EPT, ZPAR = 6600, 350, 8500            # toit : dessus de la structure au point bas, épaisseur, hauteur max. (bandeau du versant haut)
-XR = round(X(6300))                                  # limite entre les deux monopentes (bande vitrée)
+ZT, EPT, ZPAR = 6700, 350, 8200            # toit : dessus de la structure au point bas, épaisseur, hauteur max. (bandeau du versant haut)
+XL, XRG = 2300, 12000                       # volume haut (étage) : de x = 2 300 à x = 12 000 (coordonnées finales, déjà étirées); les ailes de chaque côté n'ont qu'un niveau
 XE0, XE1 = 2450, 3650                      # cage d'escalier (axes des murs)
 dossier = dict(projet="MAISON UNIFAMILIALE\nDOSSIER 1", adresse="125, rue des Érables\nVille fictive (Québec)", date="Octobre 2026", code="D1")
 
@@ -120,48 +120,49 @@ rdc = niveau(commun, no_plan="A-102", titre_plan="PLAN DU REZ-DE-CHAUSSÉE", no_
 )
 
 # ======================================================================== ÉTAGE
+OE, EE = XL + t // 2, XRG - t // 2           # axes des murs ouest et est de l'étage
 et = niveau(commun, no_plan="A-103", titre_plan="PLAN DE L'ÉTAGE", no_plomb="P-103", titre_plomb="PLOMBERIE\nÉTAGE",
     no_elec="E-103", titre_elec="ÉLECTRICITÉ\nÉTAGE", no_cvca="M-103", titre_cvca="CHAUFFAGE ET VENTILATION\nÉTAGE", zf=ZP2, hc=2610,
     tremies=[(XE0, 300, XE1, 4350)],
-    murs_int=[(XE0, 300, XE0, 4350, 125), (XE1, 300, XE1, 4350, 125), (6550, 300, 6550, 4350, 125), (300, 4350, XE0, 4350, 125), (XE1, 4350, 10700, 4350, 125),
-              (300, 5550, 10700, 5550, 125), (2950, 5550, 2950, 8200, 125), (4850, 5550, 4850, 8200, 125), (7950, 5550, 7950, 8200, 125)],
-    portes=[dict(no="201", axe="h", at=4350, s=900, w=760, sens=-1, pivot="a", quinc="Passage"),
-            dict(no="202", axe="h", at=4350, s=4100, w=815, sens=-1, pivot="a", quinc="Passage"),
-            dict(no="203", axe="h", at=4350, s=7100, w=815, sens=-1, pivot="a", quinc="Passage"),
-            dict(no="204", axe="h", at=5550, s=1500, w=760, sens=1, pivot="a", quinc="Intimité (verrou)"),
-            dict(no="205", axe="h", at=5550, s=3400, w=760, sens=1, pivot="a", quinc="Passage"),
-            dict(no="206", axe="h", at=5550, s=5300, w=815, sens=1, pivot="a", quinc="Passage"),
-            dict(no="207", axe="h", at=5550, s=8150, w=760, sens=1, pivot="a", quinc="Intimité (verrou)")],
-    fenetres=[dict(type="B", axe="h", at=S, s=900, w=900), dict(type="B", axe="h", at=S, s=4400, w=1500), dict(type="A", axe="h", at=S, s=7700, w=2400),
-              dict(type="C", axe="h", at=N, s=1300, w=900), dict(type="C", axe="h", at=N, s=3600, w=600), dict(type="B", axe="h", at=N, s=5700, w=1500), dict(type="C", axe="h", at=N, s=9000, w=900),
-              dict(type="B", axe="v", at=E, s=1500, w=1500), dict(type="C", axe="v", at=E, s=6600, w=600),
-              dict(type="B", axe="v", at=O, s=1800, w=900), dict(type="C", axe="v", at=O, s=6500, w=600)],
-    locaux=[("201", "Chambre 3", 300, 300, 2387, 4287), ("202", "Chambre 2", 3712, 300, 6487, 4287), ("203", "Chambre principale", 6612, 300, 10700, 4287),
-            ("204", "Corridor", 300, 4412, 10700, 5487), ("205", "Salle de bain", 300, 5612, 2887, 8200), ("206", "Buanderie", 3012, 5612, 4787, 8200),
-            ("207", "Bureau", 4912, 5612, 7887, 8200), ("208", "Salle de bain\nprincipale", 8012, 5612, 10700, 8200)],
-    decal_etiq={"204": (-1500, 0), "201": (0, 400)}, decal_coin={"204": (-2500, 0)},
-    app=[("bain", 1100, 8200, 180), ("wc", 300, 6300, 270), ("lav", 2887, 6900, 90), ("lave", 3600, 8200, 180),
-         ("dou", 10250, 8200, 180), ("wc", 8012, 7300, 270), ("lav", 10700, 6500, 90)],
-    comptoirs=[(6650, 1300, 7250, 3300, "g.-r.")],
+    murs_int=[(XE1, 300, XE1, 4350, 125), (7662, 300, 7662, 4350, 125), (XE1, 4350, EE, 4350, 125),
+              (OE, 6125, EE, 6125, 125), (5000, 6125, 5000, 10100, 125), (7000, 6125, 7000, 10100, 125), (9500, 6125, 9500, 10100, 125)],
+    portes=[dict(no="202", axe="h", at=4350, s=5200, w=815, sens=-1, pivot="a", quinc="Passage"),
+            dict(no="203", axe="h", at=4350, s=9000, w=815, sens=-1, pivot="a", quinc="Passage"),
+            dict(no="204", axe="h", at=6125, s=3000, w=760, sens=1, pivot="a", quinc="Intimité (verrou)"),
+            dict(no="205", axe="h", at=6125, s=5400, w=760, sens=1, pivot="a", quinc="Passage"),
+            dict(no="206", axe="h", at=6125, s=7500, w=815, sens=1, pivot="a", quinc="Passage"),
+            dict(no="207", axe="h", at=6125, s=9900, w=760, sens=1, pivot="a", quinc="Intimité (verrou)")],
+    fenetres=[dict(type="A", axe="h", at=S, s=4300, w=2400), dict(type="A", axe="h", at=S, s=8500, w=2400),
+              dict(type="C", axe="h", at=N, s=3300, w=900), dict(type="C", axe="h", at=N, s=5600, w=600), dict(type="B", axe="h", at=N, s=7600, w=1500), dict(type="C", axe="h", at=N, s=10300, w=900),
+              dict(type="B", axe="v", at=EE, s=1500, w=1500), dict(type="C", axe="v", at=EE, s=7500, w=600),
+              dict(type="B", axe="v", at=OE, s=1800, w=900), dict(type="C", axe="v", at=OE, s=7000, w=600)],
+    locaux=[("202", "Chambre 2", 3775, 300, 7600, 4287), ("203", "Chambre principale", 7725, 300, 11700, 4287),
+            ("204", "Corridor", 2600, 4412, 11700, 6063), ("205", "Salle de bain", 2600, 6188, 4937, 10100), ("206", "Buanderie", 5062, 6188, 6937, 10100),
+            ("207", "Bureau", 7062, 6188, 9437, 10100), ("208", "Salle de bain\nprincipale", 9562, 6188, 11700, 10100)],
+    decal_etiq={"204": (-1500, 0)},
+    app=[("bain", 3400, 10100, 180), ("wc", 2600, 7200, 270), ("lav", 4937, 8000, 90), ("lave", 5800, 10100, 180),
+         ("dou", 11000, 10100, 180), ("wc", 9562, 8200, 270), ("lav", 11700, 7400, 90)],
+    comptoirs=[(7800, 1300, 8400, 3300, "g.-r.")],
     escaliers=[(2512, 1300, 3588, 4300, 12, "s", "DESCEND (vide)", None, True)],
-    cotes_interieures=[(300, XE0, 800, "h"), (XE1, 6550, 800, "h"), (6550, 10700, 800, "h"), (4350, 5550, 9800, "v")],
+    cotes_interieures=[(OE, XE1, 800, "h"), (XE1, 7662, 800, "h"), (7662, EE, 800, "h"), (4350, 6125, 11300, "v")],
     notes_plan=["Toutes les cotes sont en millimètres.", "Hauteur libre sous plafond : 2 610 mm.", "Cage d'escalier ouverte : garde-corps de 900 au pourtour du vide.",
-                "Buanderie : drain de plancher et bac de récupération sous la laveuse."],
-    plomb=dict(reseaux=[dict(coll=[(2450, 4300), (2450, 8000)], chutes=[(2450, 4300)], ef=[(2300, 4450), (2300, 7900)], ec=[(2200, 4450), (2200, 7800)]),
-                        dict(coll=[(7950, 7900), (10400, 7900)], chutes=[(7950, 7900)], ef=[(8100, 7800), (10400, 7800)], ec=[(8100, 7700), (10400, 7700)])],
-               etiq=[("Chute C-1", 2600, 4150, DR, "g"), ("Chute C-2", 7800, 7600, DR, "d")]),
+                "L'étage ne couvre que le volume central; les ailes de chaque côté n'ont que le rez-de-chaussée.", "Buanderie : drain de plancher et bac de récupération sous la laveuse."],
+    plomb=dict(reseaux=[dict(coll=[(2450, 4300), (2450, 9000)], chutes=[(2450, 4300)], ef=[(2650, 4450), (2650, 8900)], ec=[(2750, 4450), (2750, 8800)]),
+                        dict(coll=[(10075, 9650), (11400, 9650)], chutes=[(10075, 9650)], ef=[(10200, 9550), (11400, 9550)], ec=[(10200, 9450), (11400, 9450)])],
+               etiq=[("Chute C-1", 2700, 4150, DR, "g"), ("Chute C-2", 9900, 9300, DR, "d")]),
     notes_plomb=["Branchements dans le plancher de l'étage (solives en I percées selon le fabricant).", "Laveuse : boîte de raccordement encastrée et bac de récupération.",
                  "Douche : drain linéaire, membrane d'étanchéité sous la céramique."],
-    detecteurs=["corridor", "chambre principale", "chambre 2", "chambre 3"], dense_prises={"salle de bain": False, "salle de bain\nprincipale": False, "buanderie": False, "corridor": False},
-    prises_speciales=[("Sécheuse 240 V", (4300, 7800), "30 A 240 V", -380)],
+    detecteurs=["corridor", "chambre principale", "chambre 2", "bureau"], dense_prises={"salle de bain": False, "salle de bain\nprincipale": False, "buanderie": False, "corridor": False},
+    prises_speciales=[("Sécheuse 240 V", (5900, 9900), "30 A 240 V", -380)],
     notes_elec=["Chambres : prises protégées par disjoncteur anti-arcs (AFCI).", "Avertisseurs de fumée et de CO dans le corridor et dans chaque chambre, reliés entre eux.",
                 "Ventilateurs des salles de bain sur minuterie (reliés au VRC)."],
-    cvca=dict(type="air", gaines=[([(XE1 + 100, 4950), (10400, 4950)], 250, "Conduit 250 × 150 dans le plancher du corridor")],
-              diffuseurs=[(1300, 700, "20 L/s", True), (5200, 700, "20 L/s", True), (9000, 700, "25 L/s", True), (6300, 7800, "15 L/s", True), (1600, 6000, "10 L/s", True), (9300, 6000, "10 L/s", True)],
-              retours=[(5000, 4950, "Retour (corridor)")],
-              vrc=[([(2700, 7600), (2700, 6200)], "Extraction 25 L/s"), ([(8300, 7600), (8300, 6200)], "Extraction 25 L/s"), ([(4500, 7600), (4500, 6600)], "Extraction 15 L/s")]),
+    cvca=dict(type="air", gaines=[([(XE1 + 100, 5250), (11500, 5250)], 250, "Conduit 250 × 150 dans le plancher du corridor")],
+              diffuseurs=[(5000, 700, "20 L/s", True), (9500, 700, "25 L/s", True), (11400, 2000, "10 L/s", True), (3000, 8000, "10 L/s", True), (8300, 9700, "15 L/s", True), (10700, 8000, "10 L/s", True)],
+              retours=[(5500, 5250, "Retour (corridor)")],
+              vrc=[([(3600, 9900), (3600, 6300)], "Extraction 25 L/s"), ([(10400, 9900), (10400, 6300)], "Extraction 25 L/s"), ([(6000, 9900), (6000, 6700)], "Extraction 15 L/s")]),
     notes_cvca=["Colonne d'alimentation montant du sous-sol dans le mur de l'escalier.", "Un diffuseur sous chaque fenêtre de chambre.", "VRC : extraction des deux salles de bain et de la buanderie."],
 )
+et.emprise = (XL, XRG); et.O, et.E = OE, EE
 
 # ---- étirement du plan de base (toutes les coordonnées écrites plus haut sont celles de la maison de 11 × 8,5 m)
 def P(p): return (round(X(p[0])), round(Y(p[1])))
@@ -199,19 +200,19 @@ def agrandir(lv):
     if getattr(lv, "axes_fond", None): lv.axes_fond = [round(X(a)) for a in lv.axes_fond]
     if getattr(lv, "etiq_fond", None): lv.etiq_fond = [(lab, *P((x, y))) for (lab, x, y) in lv.etiq_fond]
     lv.Nfond = 100
-for _lv in (ss, rdc, et): agrandir(_lv)
+for _lv in (ss, rdc): agrandir(_lv)
 
 maison = MaisonEtages(
     dossier=dossier, nom_court="Maison unifamiliale", W=W, D=D, t=t, lv=[ss, rdc, et], types_fen=types_fen,
     description="Grande maison unifamiliale de haut standing, deux étages et sous-sol aménagé (environ 14,5 × 10,4 m) : deux toits monopentes décalés à grands débords (900 mm) séparés par une bande vitrée, pierre naturelle à l'entrée, zinc prépatiné et cèdre brûlé, "
                 "grandes fenêtres au sud. Rez-de-chaussée à aire ouverte, quatre chambres, trois salles de bain ou salles d'eau. "
                 "Chauffage par air pulsé (fournaise électrique et thermopompe), ventilation par VRC.",
-    ep=EP, zt=ZT, ep_toit=EPT, zpar=ZPAR, toit_plans=[(0, XR, 6600, 7000), (XR, W, 7700, 8100)], debord=900, fascia=350, z_sol=0, z_semelle=-2600, t_fond=250,
+    ep=EP, zt=ZT, ep_toit=EPT, zpar=ZPAR, toit_plans=[(0, XL, 3750, 4000), (XL, XRG, 6700, 7700), (XRG, W, 4350, 3750)], mat_centre="bois_brule", debord=900, fascia=350, z_sol=0, z_semelle=-2600, t_fond=250,
     chutes=PL([(2450, 4300), (7950, 7900)]), no_iso="P-104",
-    niveaux=[("Sol", "± 0", 0), ("Sous-sol", "– 2 100", ZSS), ("RDC", "+ 600", ZP1), ("Étage", "+ 3 640", ZP2), ("Toit bas", "+ 6 600", ZT), ("Haut du versant bas", "+ 7 000", 7000), ("Toit haut", "+ 8 100", 8100)],
-    volumes={"S": [(0, 2700, "pierre"), (2700, XR, "zinc"), (XR, W, "bois_brule")], "N": [(0, XR, "zinc"), (XR, W, "bois_brule")], "E": [(0, D, "pierre")], "O": [(0, D, "zinc")]},
+    niveaux=[("Sol", "± 0", 0), ("Sous-sol", "– 2 100", ZSS), ("RDC", "+ 600", ZP1), ("Étage", "+ 3 640", ZP2), ("Toit des ailes", "+ 4 350", 4350), ("Toit du volume haut", "+ 6 700", ZT), ("Haut du toit", "+ 7 700", 7700)],
+    volumes={"S": [(0, XL, "zinc"), (XL, XRG, "bois_brule"), (XRG, W, "pierre")], "N": [(0, W - XRG, "pierre"), (W - XRG, W - XL, "bois_brule"), (W - XL, W, "zinc")], "E": [(0, D, "pierre")], "O": [(0, D, "zinc")]},
     marquises={"S": [(300, 2700, ZP1 + 2600)]},
-    etiq_elev={"S": [("Pierre naturelle (entrée)", 0.1, 5300, 300, 1500),
+    etiq_elev={"S": [("Zinc prépatiné (aile d'entrée)", 0.04, 5000, 200, 700), ("Cèdre brûlé (volume haut)", 0.5, 7600, 0, 300),
                      ("Marquise d'acier", 0.15, ZP1 + 2700, 3200, 400), ("Béton apparent, crépi", 0.6, 200, 300, -900)],
                "E": [("Pierre naturelle", 0.5, 5300, 300, 1300)]},
     notes_elev=["Revêtements : pierre naturelle (entrée et mur est), zinc prépatiné à joints debout (versant bas), cèdre brûlé (volume haut).",

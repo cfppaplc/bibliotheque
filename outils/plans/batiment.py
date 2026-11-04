@@ -40,6 +40,8 @@ class Batiment:
     def contour(self, off=0):
         """Contour du bâtiment décalé de off (positif = vers l'extérieur); en L si retrait."""
         W, D = self.W, self.D; r = getattr(self, "retrait", None)
+        em = getattr(self, "emprise", None)          # niveau qui n'occupe qu'une partie de l'emprise (x0, x1)
+        if em: return [(em[0] - off, -off), (em[1] + off, -off), (em[1] + off, D + off), (em[0] - off, D + off)]
         if not r: return [(-off, -off), (W + off, -off), (W + off, D + off), (-off, D + off)]
         xr, yr = r
         return [(-off, -off), (W + off, -off), (W + off, yr + off), (xr + off, yr + off), (xr + off, D + off), (-off, D + off)]
@@ -51,7 +53,7 @@ class Batiment:
     # =============================================================== PLAN D'ARCHITECTURE
     def murs(self, f, poche=GRIS):
         W, D, t = self.W, self.D, self.t
-        if getattr(self, "retrait", None):
+        if getattr(self, "retrait", None) or getattr(self, "emprise", None):
             f.poly(self.contour(0), 1.0, close=True, fill=poche); f.poly(self.contour(-t), .7, close=True, fill=white)
         else:
             f.rect(0, 0, W, D, w=1.0, fill=poche)
@@ -195,19 +197,21 @@ class Batiment:
         W, D = self.W, self.D; k = f.N / 50
         # Sud : ouvertures sur le mur sud
         rt = getattr(self, "retrait", None); xr, yr = rt if rt else (W, D)
-        for (axe, at, cote_y, a0, a1) in (("h", self.S, -800 * k, 0, W), ("h", self.N_, D + 800 * k, 0, xr)):
+        em = getattr(self, "emprise", None); e0, e1 = em if em else (0, W)
+        if em: xr = e1
+        for (axe, at, cote_y, a0, a1) in (("h", self.S, -800 * k, e0, e1), ("h", self.N_, D + 800 * k, e0, xr)):
             pts = {a0, a1}
             for o in self.fenetres + self.portes:
                 if o["axe"] == "h" and abs(o["at"] - at) < 1: pts |= {o["s"] + o["w"] / 2}
             f.chaine(sorted(pts), cote_y, "h", total=False)
-        for (at, cote_x, a0, a1) in ((self.O, -800 * k, 0, D), (self.E, W + 800 * k, 0, yr)):
+        for (at, cote_x, a0, a1) in ((self.O, e0 - 800 * k, 0, D), (self.E, e1 + 800 * k, 0, yr)):
             pts = {a0, a1}
             for o in self.fenetres + self.portes:
                 if o["axe"] == "v" and abs(o["at"] - at) < 1: pts |= {o["s"] + o["w"] / 2}
             f.chaine(sorted(pts), cote_x, "v", total=False)
         # cotes hors tout
-        f.cote(0, W, -1500 * k); f.cote(0, xr, D + 1500 * k)
-        f.cote(0, D, -1500 * k, orient="v"); f.cote(0, yr, W + 1500 * k, orient="v")
+        f.cote(e0, e1, -1500 * k); f.cote(e0, xr, D + 1500 * k)
+        f.cote(0, D, e0 - 1500 * k, orient="v"); f.cote(0, yr, e1 + 1500 * k, orient="v")
         if rt:
             f.cote(xr, W, yr + 1500 * k); f.cote(yr, D, xr + 1500 * k, orient="v")
 
