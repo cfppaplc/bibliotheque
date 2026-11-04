@@ -742,7 +742,7 @@
     .panel{max-height:92vh;border-radius:18px 18px 0 0}
     .panel-body{display:flex;flex-direction:column;padding:8px 18px 24px}
     .panel-body .meta{order:1}
-    .panel-body #mRead,.panel-body #mFav{order:2;width:100%;justify-content:center;margin:8px 0 0;padding:14px}
+    .panel-body #mRead,.panel-body #mFav,.panel-body #mImp,.panel-body #mPdf,.panel-body #mCorr{order:2;width:100%;justify-content:center;margin:8px 0 0;padding:14px}
     .panel-body p{order:3}
     /* Quoi de neuf : l'étiquette au-dessus du titre, le texte prend toute la largeur */
     .qn-ov{padding:0;align-items:stretch}
@@ -5291,7 +5291,7 @@ function openModal(l){
     saveFavs(); openModal(l); render();
   };
 }
-function closeModal(){ $("#modal").classList.remove("open"); }
+function closeModal(){ $("#modal").classList.remove("open", "sur-act"); }
 $("#modal").addEventListener("click", e => { if (e.target.id === "modal") closeModal(); });
 document.addEventListener("keydown", e => { if (e.key === "Escape") closeModal(); });
 
@@ -6331,28 +6331,18 @@ initAdmin();
 <style>
   .act-ov{position:fixed;inset:0;z-index:410;background:#0e0e10;color:#f1f1f3;font-family:"Segoe UI",Roboto,Arial,sans-serif;overflow:auto;-webkit-overflow-scrolling:touch}
   .act-ov[hidden]{display:none}
+  .modal.sur-act{z-index:420}
+  .panel-body .btn{margin-bottom:8px}
+  .panel-body a.btn{text-decoration:none}
   .act-top{position:sticky;top:0;z-index:2;display:flex;align-items:center;gap:16px;padding:calc(8px + env(safe-area-inset-top,0px)) 16px 8px;background:rgba(12,12,13,.84);backdrop-filter:blur(14px) saturate(1.2);-webkit-backdrop-filter:blur(14px) saturate(1.2);border-bottom:1px solid #232325}
   .act-back{display:inline-flex;align-items:center;gap:6px;background:#1b1b1d;border:1px solid #2f2f33;color:#e6e6e8;border-radius:6px;height:38px;padding:0 14px;font-weight:600;font-size:.9rem;font-family:inherit;cursor:pointer}
   .act-back:hover{background:#262629}
   .act-top h2{margin:0;font-size:1rem;font-weight:600;color:#ddd;display:flex;align-items:center;gap:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .act-wrap{max-width:1100px;margin:0 auto;padding:22px 22px 60px}
   .act-liste{display:grid;gap:16px}
-  .act-tag{display:inline-flex;align-items:center;gap:6px;font-size:.74rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ac,#e50914);margin-bottom:6px}
-  .act-b.corr{border-color:#2ea043;color:#56d364}
-  body.clair .act-b.corr{color:#1a7f37;border-color:#1a7f37}
-  .act-comp{color:#c9c9d0;font-size:.95rem;margin-bottom:8px}
-  .act-desc{color:#a9a9b0;font-size:.95rem;line-height:1.45;margin:0 0 10px}
-  .act-meta{display:flex;flex-wrap:wrap;gap:6px 14px;color:#8d8d95;font-size:.85rem;margin-bottom:14px}
-  .act-btns{display:flex;flex-wrap:wrap;gap:8px}
-  .act-b{display:inline-flex;align-items:center;gap:7px;height:46px;padding:0 18px;border-radius:10px;border:1px solid #ffffff33;background:#ffffff12;color:inherit;font-weight:600;font-size:1rem;font-family:inherit;cursor:pointer;text-decoration:none}
-  .act-b.prim{background:#f1f1f3;color:#111;border-color:#f1f1f3}
-  .act-b:hover{filter:brightness(1.1)}
   /* tri et filtres des activités (3 nov.) */
   .act-wrap{max-width:1240px}
   .act-liste{grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px}
-  .act-desc{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;font-size:.9rem}
-  .act-btns2{display:flex;gap:8px;margin-top:8px}
-  .act-btns2 .act-b{flex:1;height:40px;padding:0 10px;font-size:.88rem;justify-content:center}
   /* activités compactes (3 nov.) : rangées de tuiles comme les livres, fiche au toucher */
   .act-outils{margin-left:auto;display:flex;align-items:center;gap:10px;min-width:0}
   .act-rech{position:relative;display:flex;align-items:center}
@@ -6377,28 +6367,16 @@ initAdmin();
   .act-vig img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;object-position:top}
   .act-nom{font-weight:700;font-size:.92rem;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
   .act-sous{font-size:.78rem;color:#8d8d95}
-  .act-fiche{position:fixed;inset:0;z-index:30;display:flex;align-items:center;justify-content:center;padding:16px}
-  .act-fiche[hidden]{display:none}
-  .act-fiche-fond{position:absolute;inset:0;background:#000a}
-  .act-fiche-boite{position:relative;display:grid;grid-template-columns:260px 1fr;gap:22px;background:#17171a;color:#f1f1f3;border:1px solid #ffffff22;border-top:5px solid var(--ac);border-radius:16px;padding:20px;max-width:760px;width:100%;max-height:92vh;overflow:auto}
-  .act-fiche-boite>img{width:100%;border-radius:10px;background:#fff;align-self:start}
-  .act-fiche-txt h3{margin:0 0 4px;font-size:1.35rem;line-height:1.2}
-  .act-x{position:absolute;right:10px;top:6px;background:none;border:0;color:inherit;font-size:1.8rem;line-height:1;cursor:pointer;opacity:.7}
-  body.clair .act-fiche-boite{background:#fff;color:#1d1d1f;border-color:#e3dfd6}
   body.clair .act-rang h3 b{background:#0000000f;color:#55555b}
   body.clair .act-sous{color:#76767d}
-  @media (max-width:640px){.act-tuile{flex-basis:150px;width:150px}.act-fiche-boite{grid-template-columns:1fr;gap:14px}.act-fiche-boite>img{max-width:260px}}
+  @media (max-width:640px){.act-tuile{flex-basis:150px;width:150px}}
   .act-vide{padding:40px 10px;text-align:center;color:#8d8d95}
   body.clair .act-ov{background:#f6f4ef;color:#1d1d1f}
   body.clair .act-top{background:#f6f4efee;border-color:#0000001a}
   body.clair .act-top h2{color:#1d1d1f}
-  body.clair .act-back{background:#fff;border-color:#d4d0c8;color:#1d1d1f}
-  body.clair .act-back:hover{background:#eeebe4}
-  body.clair .act-back,body.clair .act-b{background:#fff;border-color:#d4d0c8}body.clair .act-b.prim{background:#1d1d1f;color:#fff;border-color:#1d1d1f}body.clair .act-desc,body.clair .act-comp{color:#55555b}
-  body.clair .act-meta,body.clair .act-vide{color:#76767d}
   @media (max-width:640px){
     .act-top{padding:10px 14px}.act-wrap{padding:16px 14px 90px}
-    .act-liste{grid-template-columns:1fr}.act-b{height:44px;padding:0 14px;flex:1 1 auto;justify-content:center}
+    .act-liste{grid-template-columns:1fr}
   }
 </style>
 <div class="act-ov" id="actOv" hidden role="dialog" aria-label="Activités">
@@ -6422,15 +6400,15 @@ initAdmin();
       comp:"307-428 · Mécanique de tuyauterie", pages:66,
       desc:"27 activités de montage : fonte, PEX, cuivre, acier, acier rainuré, montages combinés, montants et supports, défis finaux. Calculs, tableaux et cases à cocher." },
     { f:"plans-d1-lecture", titre:"Lecture et mesure — Maison unifamiliale", type:"Questionnaires de plans", prog:"Plomberie et chauffage", comp:"Plan : Dossier 1 · Maison unifamiliale", pages:9, dossier:1, corrige:"plans-d1-lecture-corrige",
-      desc:"Un seul questionnaire pour le dossier de plans 1 (à ouvrir dans Plans) : lecture du dossier et mesures à l\'échelimètre. Choix multiple, vrai ou faux, calculs, association, trouve l\'erreur, images tirées des plans. Les questions sont propres à ce plan." },
+      desc:"Un seul questionnaire pour le dossier de plans 1 : lecture du dossier et mesures à l\'échelimètre. Choix multiple, vrai ou faux, calculs, association, trouve l\'erreur, images tirées des plans. Les questions sont propres à ce plan." },
     { f:"plans-d2-lecture", titre:"Lecture et mesure — Duplex jumelé", type:"Questionnaires de plans", prog:"Plomberie et chauffage", comp:"Plan : Dossier 2 · Duplex jumelé", pages:9, dossier:2, corrige:"plans-d2-lecture-corrige",
-      desc:"Un seul questionnaire pour le dossier de plans 2 (à ouvrir dans Plans) : lecture du dossier et mesures à l\'échelimètre. Choix multiple, vrai ou faux, calculs, association, trouve l\'erreur, images tirées des plans. Les questions sont propres à ce plan." },
+      desc:"Un seul questionnaire pour le dossier de plans 2 : lecture du dossier et mesures à l\'échelimètre. Choix multiple, vrai ou faux, calculs, association, trouve l\'erreur, images tirées des plans. Les questions sont propres à ce plan." },
     { f:"plans-d3-lecture", titre:"Lecture et mesure — Bâtiment commercial", type:"Questionnaires de plans", prog:"Plomberie et chauffage", comp:"Plan : Dossier 3 · Bâtiment commercial", pages:9, dossier:3, corrige:"plans-d3-lecture-corrige",
-      desc:"Un seul questionnaire pour le dossier de plans 3 (à ouvrir dans Plans) : lecture du dossier et mesures à l\'échelimètre. Choix multiple, vrai ou faux, calculs, association, trouve l\'erreur, images tirées des plans. Les questions sont propres à ce plan." },
+      desc:"Un seul questionnaire pour le dossier de plans 3 : lecture du dossier et mesures à l\'échelimètre. Choix multiple, vrai ou faux, calculs, association, trouve l\'erreur, images tirées des plans. Les questions sont propres à ce plan." },
     { f:"plans-d4-lecture", titre:"Lecture et mesure — Centre commercial", type:"Questionnaires de plans", prog:"Plomberie et chauffage", comp:"Plan : Dossier 4 · Centre commercial", pages:9, dossier:4, corrige:"plans-d4-lecture-corrige",
-      desc:"Un seul questionnaire pour le dossier de plans 4 (à ouvrir dans Plans) : lecture du dossier et mesures à l\'échelimètre. Choix multiple, vrai ou faux, calculs, association, trouve l\'erreur, images tirées des plans. Les questions sont propres à ce plan." },
+      desc:"Un seul questionnaire pour le dossier de plans 4 : lecture du dossier et mesures à l\'échelimètre. Choix multiple, vrai ou faux, calculs, association, trouve l\'erreur, images tirées des plans. Les questions sont propres à ce plan." },
     { f:"plans-d5-lecture", titre:"Lecture et mesure — Ferme laitière", type:"Questionnaires de plans", prog:"Plomberie et chauffage", comp:"Plan : Dossier 5 · Ferme laitière", pages:9, dossier:5, corrige:"plans-d5-lecture-corrige",
-      desc:"Un seul questionnaire pour le dossier de plans 5 (à ouvrir dans Plans) : lecture du dossier et mesures à l\'échelimètre. Choix multiple, vrai ou faux, calculs, association, trouve l\'erreur, images tirées des plans. Les questions sont propres à ce plan." }
+      desc:"Un seul questionnaire pour le dossier de plans 5 : lecture du dossier et mesures à l\'échelimètre. Choix multiple, vrai ou faux, calculs, association, trouve l\'erreur, images tirées des plans. Les questions sont propres à ce plan." }
   ];
   const COUL = { "Plomberie et chauffage":"#2f8fd8", "Entretien général d'immeubles":"#e0892b" };
   const COUL_DOS = { 1:"#1c5f8f", 2:"#2e7d4f", 3:"#c26a12", 4:"#6a3fa0", 5:"#3b7d2a" };
@@ -6457,19 +6435,19 @@ initAdmin();
       return '<section class="act-rang' + (ouvert ? ' ouvert' : '') + '"><div class="act-rh"><h3>' + esc(g) + '<b>' + m.length + '</b></h3>' + (m.length > 5 ? '<button type="button" class="act-tout" data-g="' + esc(g) + '">' + (ouvert ? 'Réduire' : 'Tout voir (' + m.length + ')') + '</button>' : '') + '</div><div class="act-ligne">' + m.map(tuile).join("") + '</div></section>';
     }).join("");
   }
-  function fiche(a){
-    const ac = a.dossier ? COUL_DOS[a.dossier] : (COUL[a.prog] || "#e50914");
-    let f = $("actFiche"); if (!f){ f = document.createElement("div"); f.id = "actFiche"; f.className = "act-fiche"; ov.appendChild(f); }
-    f.style.setProperty("--ac", ac); f.hidden = false;
-    f.innerHTML = '<div class="act-fiche-fond" data-ferme="1"></div><div class="act-fiche-boite" role="dialog" aria-label="' + esc(a.titre) + '"><button type="button" class="act-x" data-ferme="1" aria-label="Fermer">×</button>' +
-      '<img src="activites/' + a.f + '.jpg" alt=""><div class="act-fiche-txt"><div class="act-tag">' + esc(a.type) + '</div><h3>' + esc(a.titre) + '</h3><div class="act-comp">' + esc(a.comp) + '</div><p class="act-desc">' + esc(a.desc) + '</p>' +
-      '<div class="act-meta"><span>' + a.pages + ' pages</span><span>' + esc(a.prog) + '</span></div>' +
-      '<div class="act-btns"><button class="act-b prim" type="button" data-a="ouvrir" data-f="' + a.f + '">' + IC_OUV + 'Projeter au tableau</button></div>' +
-      '<div class="act-btns2"><button class="act-b" type="button" data-a="imprimer" data-f="' + a.f + '">' + IC_IMP + 'Imprimer</button>' +
-      '<a class="act-b" href="activites/' + a.f + '.pdf" download="' + esc(a.titre) + '.pdf">' + IC_DL + 'PDF</a>' +
-      (a.corrige ? '<button class="act-b corr" type="button" data-a="corrige" data-f="' + a.f + '">Corrigé</button>' : '') + '</div></div></div>';
+  function fiche(a){   /* même fiche que celle d'un livre (#modal / #panel de la bibliothèque) */
+    const c = a.dossier ? COUL_DOS[a.dossier] : (COUL[a.prog] || "#e50914");
+    $("panel").innerHTML =
+      '<div class="panel-top with-cover" style="background:linear-gradient(160deg,' + c + ',#14141a)"><button class="close" aria-label="Fermer">✕</button><img class="panel-cover" src="activites/' + a.f + '.jpg" alt=""><h2>' + esc(a.titre) + '</h2></div>' +
+      '<div class="panel-body"><div class="meta"><span>' + esc(a.type) + '</span><span>' + a.pages + ' pages</span><span>' + esc(a.comp) + '</span><span>' + esc(a.prog) + '</span></div>' +
+      '<p>' + esc(a.desc) + '</p>' +
+      '<button class="btn btn-play" id="mRead" type="button" data-a="ouvrir" data-f="' + a.f + '">▶ Projeter</button>' +
+      '<button class="btn btn-fav" id="mImp" type="button" data-a="imprimer" data-f="' + a.f + '">Imprimer</button>' +
+      '<a class="btn btn-fav" id="mPdf" href="activites/' + a.f + '.pdf" download="' + esc(a.titre) + '.pdf">PDF</a>' +
+      (a.corrige ? '<button class="btn btn-fav" id="mCorr" type="button" data-a="corrige" data-f="' + a.f + '">Corrigé</button>' : '') + '</div>';
+    $("modal").classList.add("open", "sur-act");
+    $("panel").querySelector(".close").onclick = closeModal;
   }
-  function fermerFiche(){ const f = $("actFiche"); if (f) f.hidden = true; }
   async function pdfDe(a){ const r = await fetch("activites/" + a.f + ".pdf"); if (!r.ok) throw new Error("introuvable"); return r.blob(); }
   /* PDF -> petit livre « pages empilées » (une image par page) que le lecteur de livres sait ouvrir */
   async function livreDePdf(blob, titre){
@@ -6490,15 +6468,17 @@ initAdmin();
     return '<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"><title>' + esc(titre) + '</title><style>html,body{margin:0;background:#fff}.page{width:816px;position:relative;background:#fff;overflow:hidden}.page img{display:block;width:100%;height:100%}</style></head><body><div id="activite">' + out + '</div></body></html>';
   }
   ov.addEventListener("click", async e => {
-    if (e.target.closest("[data-ferme]")){ fermerFiche(); return; }
     const t = e.target.closest(".act-tuile"); if (t){ const a = ACTIVITES.find(x => x.f === t.dataset.fiche); if (a) fiche(a); return; }
     const g = e.target.closest(".act-tout"); if (g){ const k = g.dataset.g; OUVERTS.has(k) ? OUVERTS.delete(k) : OUVERTS.add(k); dessiner(); return; }
+  });
+  $("modal").addEventListener("click", async e => {
     const b = e.target.closest("[data-a]"); if (!b) return;
     const a = ACTIVITES.find(x => x.f === b.dataset.f); if (!a) return;
     if (b.dataset.a === "corrige"){ window.open("activites/" + a.corrige + ".pdf", "_blank"); return; }
     if (b.dataset.a === "imprimer"){ window.open("activites/" + a.f + ".pdf", "_blank"); return; }
     /* Projeter : l'activité s'ouvre dans le lecteur de livres (même barre d'outils que les livres de compétence) */
     let blob; try { blob = await pdfDe(a); } catch (er) { window.open("activites/" + a.f + ".pdf", "_blank"); return; }
+    closeModal();
     const l = { titre:a.titre, fichier:"activite-" + a.f, categorie:a.prog, couverture:"activites/" + a.f + ".jpg" };
     chargement(l);
     try {
@@ -6512,7 +6492,7 @@ initAdmin();
   ov.addEventListener("input", e => { if (e.target.id === "actQ"){ F.q = e.target.value; dessiner(); } });
   ov.addEventListener("change", e => { if (e.target.id === "actProg"){ F.p = e.target.value; dessiner(); } });
   $("actBack").onclick = () => { ov.hidden = true; };
-  document.addEventListener("keydown", e => { if (!ov.hidden && e.key === "Escape"){ const f = $("actFiche"); if (f && !f.hidden) fermerFiche(); else ov.hidden = true; } });
+  document.addEventListener("keydown", e => { if (!ov.hidden && e.key === "Escape" && !$("modal").classList.contains("open")) ov.hidden = true; }, true);   /* en capture : la fiche ouverte se ferme seule, la liste reste */
   $("actBtn").addEventListener("click", () => { dessiner(); ov.hidden = false; ov.scrollTop = 0; });
   window.__activites = ACTIVITES;
 })();
