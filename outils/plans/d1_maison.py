@@ -201,6 +201,12 @@ def agrandir(lv):
     if getattr(lv, "etiq_fond", None): lv.etiq_fond = [(lab, *P((x, y))) for (lab, x, y) in lv.etiq_fond]
     lv.Nfond = 100
 for _lv in (ss, rdc): agrandir(_lv)
+# fenêtres de grande taille dans les deux ailes basses (coordonnées finales)
+rdc.fenetres = [o for o in rdc.fenetres if not (o["axe"] == "v" and (o["at"] == E or (o["at"] == O and o["s"] in (1300, 6200))))]
+rdc.fenetres += [dict(type="A", axe="v", at=O, s=600, w=1700), dict(type="A", axe="v", at=O, s=6600, w=2600),
+                 dict(type="A", axe="v", at=E, s=700, w=2400), dict(type="D", axe="v", at=E, s=6400, w=2400),
+                 dict(type="A", axe="h", at=S, s=12100, w=2200), dict(type="D", axe="h", at=N, s=12100, w=2000),
+                 dict(type="A", axe="h", at=N, s=250, w=1800)]
 
 maison = MaisonEtages(
     dossier=dossier, nom_court="Maison unifamiliale", W=W, D=D, t=t, lv=[ss, rdc, et], types_fen=types_fen,
