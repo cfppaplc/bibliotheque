@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 from batiment import *
+from jumele import BatimentJumele
 
 W, D, t = 16000, 9000, 250
 S, N, O, E = t / 2, D - t / 2, t / 2, W - t / 2
-P = 0.5            # pente 6/12
+P = 0.33           # pente 4/12 (toit à quatre versants)
 zm = 2700
 faite = zm + D / 2 * P
 M = lambda x: W - x          # miroir autour du mur mitoyen
@@ -65,7 +66,10 @@ reseau_B = dict(coll=miroir_pts(reseau_A["coll"]), sortie=miroir_pts(reseau_A["s
                 ef=miroir_pts(reseau_A["ef"]), ec=miroir_pts(reseau_A["ec"]), ef_extra=[miroir_pts(p) for p in reseau_A["ef_extra"]],
                 compteur=(M(7000), 1650), lab_sens=1)
 
-duplex = Batiment(
+pans_S = [(0, W, "bois"), (3300, 5300, "pierre"), (M(5300), M(3300), "pierre"), (7400, 8600, "pierre")]
+pans_N = [(0, W, "bois"), (7400, 8600, "pierre")]
+duplex = BatimentJumele(
+    pans={"S": pans_S, "N": pans_N, "E": [(0, 9000, "bois"), (0, 2200, "pierre")], "O": [(0, 9000, "bois"), (9000 - 2200, 9000, "pierre")]},
     dossier=dict(projet="DUPLEX JUMELÉ\nDOSSIER 2", adresse="48-50, avenue du Parc\nVille fictive (Québec)", date="Octobre 2026", code="D2"),
     nom_court="Duplex jumelé (logements A et B)",
     description="Bâtiment de deux logements jumelés, séparés par un mur mitoyen coupe-feu. Construction à ossature de bois sur dalle de béton avec murs de fondation antigel. Chauffage par plinthes électriques, ventilation par un VRC dans chaque logement. Le logement B est symétrique du logement A.",
@@ -84,24 +88,24 @@ duplex = Batiment(
     cotes_interieures=[(250, 5400, 4000, "h"), (5400, 8000, 4000, "h"), (250, 4500, 1500, "v"), (4500, 8750, 1500, "v")],
     coupes=[(2000, -1000, "A", "e"), (2000, D + 1000, "A", "e")],
     coupe_long=dict(y=1500, N=100, lettre="B"),
-    couches_mur=[("Brique d'argile 90", 90, "brique"), ("Vide d'air 25", 25, "vide"), ("Panneau isolant rigide 25", 25, "isolant_rigide"),
+    couches_mur=[("Pierre de parement 90 ou fibre de bois 11", 90, "brique"), ("Vide d'air 25", 25, "vide"), ("Panneau isolant rigide 25", 25, "isolant_rigide"),
                  ("Panneau OSB 11", 11, "panneau"), ("Montants 38 × 140 à 400 c/c et laine R-24", 140, "laine"), ("Pare-vapeur (polyéthylène 0,15)", 0, "membrane"), ("Gypse 12,7", 13, "gypse")],
-    Nplan=75, Nelev=150, Ncoupe=50, Nfond=100, axes_fond=[8000],
+    Nplan=75, Nelev=120, Ncoupe=50, Nfond=100, axes_fond=[8000],
     notes_plan=["Toutes les cotes sont en millimètres.", "Logement B symétrique du logement A (numéros 2xx).",
                 "Mur mitoyen : séparation coupe-feu 1 h, double ossature et deux épaisseurs de gypse type X de chaque côté.",
                 "Hauteur libre sous plafond : 2 440 mm.", "Dalle sur sol : voir S-101."],
     z_sol=0, z_plancher=200, z_murs=zm, z_plafond=2640, z_semelle=-1600, ep_plancher=100, t_fond=200,
-    toit="pignon", pente=P, debord=450, revetement="brique",
+    toit="pignon", pente=P, debord=600, revetement="pierre et fibre de bois",
     niveaux=[("Sol", "± 0", 0), ("Dalle", "+ 200", 200), ("Plafond", "+ 2 640", 2640), ("Faîte", f"+ {fmt(round(faite, -1))}", "faite")],
-    notes_elev=["Revêtement : brique d'argile, joints de 10 mm.", "Toiture : bardeaux d'asphalte, pente 6 : 12.",
-                "Débord de toit : 450 mm.", "Hexagones : types de fenêtres, voir A-301."],
-    etiq_elev={"S": [("Brique d'argile", 0.03, 1500, -900, 0), ("Bardeaux d'asphalte", 0.08, zm + 1200, -1100, 300)]},
+    notes_elev=["Parement : pierre de parement claire et fibre de bois brun, à l'horizontale.", "Toiture à quatre versants : bardeaux d'asphalte gris anthracite, pente 4 : 12.",
+                "Débord de toit : 600 mm; fenêtres à cadre noir; auvents d'entrée en acier noir.", "Hexagones : types de fenêtres, voir A-301."],
+    etiq_elev={"S": [("Pierre de parement", 0.5, 1500, 0, -2300), ("Fibre de bois brun", 0.18, 600, 0, -1400), ("Bardeaux d'asphalte", 0.14, 3100, 0, 1500)]},
     type_plancher="dalle", murs_coupe=[(4500, 125)],
     etiq_coupe=[("T1 (toit)", 1800, zm + 1800 * P + 120, -3300, 0), ("Isolant R-41", 3000, zm + 200, -4400, 0),
                 ("M1 (mur ext.)", 125, 1500, -1300, 0), ("D1 (dalle)", 1500, 150, -2900, 0), ("F1 (fondation)", 100, -800, -1300, 0)],
     coupe_y=150, coupe_titre_x=236,
-    compositions=["T1 — Toit : bardeaux d'asphalte, membrane, contreplaqué 12,7, fermes 600 c/c, isolant soufflé R-41, pare-vapeur, gypse 12,7.",
-                  "M1 — Mur extérieur : brique 90, vide d'air 25, panneau isolant 25, OSB 11, montants 38 × 140 à 400 c/c, laine R-24, pare-vapeur, gypse 12,7.",
+    compositions=["T1 — Toit : bardeaux d'asphalte (pente 4 : 12, quatre versants), membrane, contreplaqué 12,7, fermes 600 c/c, isolant soufflé R-41, pare-vapeur, gypse 12,7.",
+                  "M1 — Mur extérieur : pierre de parement 90 ou fibre de bois 11, vide d'air 25, panneau isolant 25, OSB 11, montants 38 × 140 à 400 c/c, laine R-24, pare-vapeur, gypse 12,7.",
                   "M3 — Mur mitoyen : 2 × gypse type X, montants 38 × 89, vide d'air 25, montants 38 × 89, 2 × gypse type X. Indice 1 h.",
                   "D1 — Dalle : béton 100, 25 MPa, treillis, polyéthylène, isolant rigide 50, pierre concassée 150.",
                   "F1 — Fondation : mur antigel 200, 25 MPa, semelle 600 × 250, drain français."],
