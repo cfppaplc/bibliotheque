@@ -579,7 +579,8 @@ class Batiment:
         Nf = getattr(self, "Nfond", 75)
         f = Feuille(c, self.dossier, "S-101", "PLAN DES FONDATIONS\nET DÉTAIL TYPE", f"1:{Nf} et 1:20")
         W, D, tf = self.W, self.D, self.t_fond
-        f.vue(DRAW[0] + getattr(self, "fond_gauche", 38), DRAW[3] - getattr(self, "fond_haut", 32) - D / Nf, Nf)
+        em = getattr(self, "emprise", None); e0, e1 = em if em else (0, W)
+        f.vue(DRAW[0] + getattr(self, "fond_gauche", 38) - e0 / Nf, DRAW[3] - getattr(self, "fond_haut", 32) - D / Nf, Nf)
         if getattr(self, "grille_xy", None): f.grille(*self.grille_xy, 0, W, 0, D, ext=getattr(self, "grille_ext_fond", 1600))
         # murs de fondation
         rt = getattr(self, "retrait", None)
@@ -590,10 +591,14 @@ class Batiment:
             f.hachures(0, 0, W, tf, 160, 45, GRIS); f.hachures(0, D - tf, xr_, D, 160, 45, GRIS); f.hachures(0, 0, tf, D, 160, 45, GRIS)
             f.hachures(W - tf, 0, W, yr_, 160, 45, GRIS); f.hachures(xr_, yr_ - tf, W, yr_, 160, 45, GRIS); f.hachures(xr_ - tf, yr_, xr_, D, 160, 45, GRIS)
         else:
-            f.rect(0, 0, W, D, 1.0, fill=HexColor("#bdbdbd")); f.rect(tf, tf, W - tf, D - tf, .8, fill=white)
+            f.rect(e0, 0, e1, D, 1.0, fill=HexColor("#bdbdbd")); f.rect(e0 + tf, tf, e1 - tf, D - tf, .8, fill=white)
             # semelle continue (cachée)
-            f.rect(-200, -200, W + 200, D + 200, .5, dash=[4, 2]); f.rect(tf + 200, tf + 200, W - tf - 200, D - tf - 200, .5, dash=[4, 2])
-            f.hachures(0, 0, W, tf, 160, 45, GRIS); f.hachures(0, D - tf, W, D, 160, 45, GRIS); f.hachures(0, 0, tf, D, 160, 45, GRIS); f.hachures(W - tf, 0, W, D, 160, 45, GRIS)
+            f.rect(e0 - 200, -200, e1 + 200, D + 200, .5, dash=[4, 2]); f.rect(e0 + tf + 200, tf + 200, e1 - tf - 200, D - tf - 200, .5, dash=[4, 2])
+            f.hachures(e0, 0, e1, tf, 160, 45, GRIS); f.hachures(e0, D - tf, e1, D, 160, 45, GRIS); f.hachures(e0, 0, e0 + tf, D, 160, 45, GRIS); f.hachures(e1 - tf, 0, e1, D, 160, 45, GRIS)
+            if em:                      # murs de gel des ailes (en tirets : moins profonds), reliés au sous-sol
+                f.rect(0, 0, e0, D, .6, dash=[6, 3]); f.rect(e1, 0, W, D, .6, dash=[6, 3])
+                f.rect(0, 0, W, D, .9); f.rect(tf, tf, W - tf, D - tf, .5, dash=[4, 2])
+                f.texte(e0 / 2, D / 2, "AILE D'ENTRÉE\nmur de gel 250, dalle sur sol", 6.5, True, col=GRIS); f.texte((e1 + W) / 2, D / 2, "AILE FAMILIALE\nmur de gel 250, dalle sur sol", 6.5, True, col=GRIS)
         for (x1, y1, x2, y2) in getattr(self, "fond_int", []):   # murs ou semelles intérieurs
             if y1 == y2:
                 f.rect(x1, y1 - tf / 2, x2, y1 + tf / 2, .8, fill=HexColor("#bdbdbd")); f.rect(x1, y1 - tf / 2 - 200, x2, y1 + tf / 2 + 200, .4, dash=[4, 2])
@@ -608,8 +613,9 @@ class Batiment:
         if getattr(self, "poteaux", None):
             x, y, sz, lab = self.poteaux[0]; f.ligne(x + 80, y + 80, x + 1300, y + 1300 * f.N / 50, .3); f.texte(x + 1400, y + 1300 * f.N / 50, lab, 5.8, False, "g")
         # cotes
-        f.cote(0, W, -1400 * f.N / 50); f.cote(0, D, -1400 * f.N / 50, orient="v")
-        xs = sorted({0, W} | {p[0] for p in getattr(self, "poteaux", [])} | set(getattr(self, "axes_fond", [])))
+        f.cote(e0, e1, -1400 * f.N / 50); f.cote(0, D, -1400 * f.N / 50 + (e0 if em else 0), orient="v")
+        if em: f.cote(0, W, -2600 * f.N / 50)
+        xs = sorted({e0, e1} | {p[0] for p in getattr(self, "poteaux", [])} | set(getattr(self, "axes_fond", [])))
         if len(xs) > 2: f.chaine(xs, D + 1200 * f.N / 50, "h", total=False)
         for (a_, b_, dec, ori) in getattr(self, "cotes_fond", []): f.cote(a_, b_, dec, orient=ori)
         for (txt, x, y) in getattr(self, "etiq_fond", []): f.texte(x, y, txt, 6, True)

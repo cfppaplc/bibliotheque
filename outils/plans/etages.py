@@ -175,21 +175,32 @@ class MaisonEtages(Batiment):
         z0, zs, zss = self.z_sol, self.z_semelle, self.lv[0].zf
         zp1, zt, zpar = self.lv[1].zf, self.zt, self.zpar
         items = []
-        # terrain et fondations
+        # terrain et fondations (le sous-sol peut n'occuper qu'une partie de l'emprise : les ailes reposent sur des murs de gel et du remblai)
+        e0 = getattr(self.lv[0], "emprise", None)
+        s0, s1 = ((e0[0], e0[1]) if (e0 and axe == "B") else (0, L))
+        GR = HexColor("#cfcfcf"); IS = HexColor("#eef6ff")
         for (a, b) in ((-1800, 0), (L, L + 600)):
             f.ligne(a, z0, b, z0, 1.2); f.hachures(a, zs - 500, b, z0, 1.5 * f.N, 135, GRIS_C)
-        for (x, sg) in ((0, 1), (L - tf, -1)):
-            f.rect(x - 200, zs, x + tf + 200, zs + 250, .8, fill=HexColor("#cfcfcf")); f.hachures(x - 200, zs, x + tf + 200, zs + 250, 1.2 * f.N, 45, GRIS, .3)
-            f.rect(x, zs + 250, x + tf, zp1 - ep, .8, fill=HexColor("#cfcfcf")); f.hachures(x, zs + 250, x + tf, zp1 - ep, 1.2 * f.N, 45, GRIS, .3)
+        def mur_fond(x, sg, prof):
+            f.rect(x - 200, prof, x + tf + 200, prof + 250, .8, fill=GR); f.hachures(x - 200, prof, x + tf + 200, prof + 250, 1.2 * f.N, 45, GRIS, .3)
+            f.rect(x, prof + 250, x + tf, zp1 - ep, .8, fill=GR); f.hachures(x, prof + 250, x + tf, zp1 - ep, 1.2 * f.N, 45, GRIS, .3)
             xe = x - 50 if sg > 0 else x + tf
-            f.rect(xe, zs + 250, xe + 50, z0 + 300, .3, fill=HexColor("#eef6ff"))            # isolant rigide extérieur
-            dx = x - 400 if sg > 0 else x + tf + 400
-            f.cercle(dx, zs + 150, 60, .6, fill=white)
-        items.append(("F1 — mur de fondation 250, isolant rigide extérieur, drain français", (125, zs + 900)))
+            f.rect(xe, prof + 250, xe + 50, z0 + 300, .3, fill=IS)                           # isolant rigide extérieur
+            f.cercle(x - 400 if sg > 0 else x + tf + 400, prof + 150, 60, .6, fill=white)
+        mur_fond(s0, 1, zs); mur_fond(s1 - tf, -1, zs)
+        if s0 > 0 or s1 < L:                                                                # ailes : murs de gel (1 600 sous le sol), remblai et dalle
+            zg = -1600
+            for (a, b) in ((0, s0), (s1, L)):
+                if b - a < 1: continue
+                f.hachures(a + tf, zg + 250, b - tf, zp1 - ep - 100, 1.5 * f.N, 135, GRIS_C)
+                f.rect(a + tf, zp1 - ep - 100, b - tf, zp1, .6, fill=GR); f.rect(a + tf, zp1 - 19, b - tf, zp1, .3, fill=HexColor("#e6cf9a"))
+            mur_fond(0, 1, zg); mur_fond(L - tf, -1, zg)
+            items.append(("Ailes : mur de gel 250 à 1 600, remblai compacté et dalle sur sol", (s0 / 2 if s0 > 600 else (s1 + L) / 2, zg + 900)))
+        items.append(("F1 — mur de fondation 250, isolant rigide extérieur, drain français", (s0 + 125, zs + 900)))
         # dalle du sous-sol
-        f.rect(tf, zss - 100, L - tf, zss, .6, fill=HexColor("#cfcfcf")); f.rect(tf, zss - 150, L - tf, zss - 100, .3, fill=HexColor("#eef6ff"))
-        f.hachures(tf, zs + 250, L - tf, zss - 150, 1.0 * f.N, 30, GRIS_C)
-        items.append(("D1 — dalle 100 sur isolant 50 et pierre", (L * .62, zss - 50)))
+        f.rect(s0 + tf, zss - 100, s1 - tf, zss, .6, fill=GR); f.rect(s0 + tf, zss - 150, s1 - tf, zss - 100, .3, fill=IS)
+        f.hachures(s0 + tf, zs + 250, s1 - tf, zss - 150, 1.0 * f.N, 30, GRIS_C)
+        items.append(("D1 — dalle 100 sur isolant 50 et pierre", ((s0 + s1) * .55, zss - 50)))
         # planchers (avec trémies d'escalier)
         def vides(i):
             res = []
@@ -232,7 +243,7 @@ class MaisonEtages(Batiment):
                 sp = span(i)
                 if sp is None: continue
                 xa, xb = (sp[0], sp[0] + t) if cote_mur == 0 else (sp[1] - t, sp[1])
-                if i == 0: xa, xb = (0, t) if cote_mur == 0 else (L - t, L)
+                if i == 0: xa, xb = (sp[0], sp[0] + t) if cote_mur == 0 else (sp[1] - t, sp[1])
                 zb = lv.zf if i else zp1 - ep          # sous-sol : le mur de bois commence sur la fondation
                 xw = pos if axe == "A" else (sp[0] if cote_mur == 0 else sp[1] - 1)
                 sup = span(i + 1) if i + 1 < len(self.lv) else None
@@ -240,7 +251,7 @@ class MaisonEtages(Batiment):
                 zh = self.lv[i + 1].zf - ep if couvert else self.roof(xw) - self.ep_toit
                 if i == 0:
                     trous = [(lv.zf + lv.types_fen[o["type"]]["allege"], lv.zf + lv.types_fen[o["type"]]["allege"] + lv.types_fen[o["type"]]["h"]) for o in ouv_mur(lv, cote_mur) if o in lv.fenetres]
-                    xf0, xf1 = (0, tf) if cote_mur == 0 else (L - tf, L)
+                    xf0, xf1 = (sp[0], sp[0] + tf) if cote_mur == 0 else (sp[1] - tf, sp[1])
                     for (a, b) in trous:
                         f.rect(xf0 - 2, a, xf1 + 2, min(b, zp1 - ep), .3, fill=white); f.ligne((xf0 + xf1) / 2, a, (xf0 + xf1) / 2, min(b, zp1 - ep), .6)
                     continue
