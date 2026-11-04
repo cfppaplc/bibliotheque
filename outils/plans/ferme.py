@@ -392,11 +392,11 @@ class Ferme:
     def elevations(self, c):
         N = 250
         f = Feuille(c, DOSSIER, "A-201", "ÉLÉVATIONS", "1:250")
-        ox = DRAW[0] + 8
-        f.vue(ox, 196, N); self._elev_long(f, "S"); f.titre_vue(ox - 2, 183, 1, "ÉLÉVATION SUD (PRINCIPALE)", "1:250")
-        f.vue(ox, 122, N); self._elev_long(f, "N"); f.titre_vue(ox - 2, 109, 2, "ÉLÉVATION NORD", "1:250")
-        f.vue(ox, 50, N); self._elev_pignon(f, "E"); f.titre_vue(ox - 2, 34, 3, "ÉLÉVATION EST (AILE DES VEAUX)", "1:250")
-        f.vue(ox + 160, 50, N); self._elev_pignon(f, "O"); f.titre_vue(ox + 158, 34, 4, "ÉLÉVATION OUEST (BLOC DE SERVICE)", "1:250")
+        ox = DRAW[0] + 12
+        f.vue(ox, 226, N); self._elev_long(f, "S"); f.titre_vue(ox - 2, 212, 1, "ÉLÉVATION SUD (PRINCIPALE)", "1:250")
+        f.vue(ox, 150, N); self._elev_long(f, "N"); f.titre_vue(ox - 2, 136, 2, "ÉLÉVATION NORD", "1:250")
+        f.vue(ox, 74, N); self._elev_pignon(f, "E"); f.titre_vue(ox - 2, 60, 3, "ÉLÉVATION EST (AILE DES VEAUX)", "1:250")
+        f.vue(ox + 160, 74, N); self._elev_pignon(f, "O"); f.titre_vue(ox + 158, 60, 4, "ÉLÉVATION OUEST (BLOC DE SERVICE)", "1:250")
         f.notes("NOTES D'ÉLÉVATION", ["Muret de béton de 1 200 sur le pourtour; rideaux enroulables à commande automatique au-dessus.", "Toiture : tôle d'acier nervurée, pente 10°, faîtière ouverte de 600.",
                                       "Versant sud : panneaux solaires (120 kW) sur toute la longueur.", "Bloc de service (ouest) : lames de bois, entre les deux couloirs.",
                                       "Portillons de 3 000 au sud : sorties vers les enclos libres.", "Grandes portes de 3 500 aux deux bouts de chaque couloir d'alimentation : le tracteur traverse l'étable."])
