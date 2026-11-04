@@ -222,11 +222,62 @@ def images(C):
         o = [pl] + autres[:3]; rng.shuffle(o)
         return _avec_image(qs.qcm(f"Selon ce tableau, quel fini de plancher est prévu pour le local {no} « {nom} » ?", o, pl, "Tableau des locaux et des finis, feuille A-401", cat="arch", niv=2), f, 150, "Tableau des finis")
 
-    genres = [thumb_titre, cart_echelle, cart_titre, thumb_disc, donnees, legende, finis]
+    def zoom_mystere(s):
+        """Un extrait d'un plan (fenêtre de 85 × 55 mm choisie là où il y a du dessin) : de quelle feuille vient-il ?"""
+        if not C.pdf: return None
+        from PIL import Image
+        import random as _r
+        code = feuille(s + 2); info = _info(C.pdf, code)
+        f = _zone_png(C.pdf, info["page"], 0, 0, 431.8, 279.4, os.path.join(C.tmp, f"zm-{s}-full.png"), dpi=110)
+        im = Image.open(f).convert("RGB"); k = 110 / 25.4; W, H = im.size
+        w, h = int(85 * k), int(55 * k); R = _r.Random(f"{C.n}-{s}-zoom"); meilleur = None
+        for _ in range(60):
+            x = R.randint(int(18 * k), int(338 * k) - w); y = R.randint(int(18 * k), int(250 * k) - h)
+            g = im.crop((x, y, x + w, y + h)).convert("L").resize((40, 26)); px = list(g.getdata())
+            enc = sum(1 for v in px if v < 200) / len(px); var = sum((v - sum(px) / len(px)) ** 2 for v in px) / len(px)
+            if .06 < enc < .55 and (meilleur is None or var > meilleur[0]): meilleur = (var, x, y)
+        if not meilleur: return None
+        _, x, y = meilleur; out = os.path.join(C.tmp, f"zm-{s}.png"); im.crop((x, y, x + w, y + h)).save(out)
+        autres = [c for c in codes() if c[0] != code[0] and _info(C.pdf, c)]; rng.shuffle(autres)
+        pris = []; 
+        for c_ in autres:
+            if c_[0] not in [p[0] for p in pris]: pris.append(c_)
+            if len(pris) == 3: break
+        if len(pris) < 3: return None
+        o = [f"{code} · {info['titre'].capitalize()}"] + [f"{c_} · {_info(C.pdf, c_)['titre'].capitalize()}" for c_ in pris]; rng.shuffle(o)
+        return _avec_image(qs.qcm("🔍 Zoom mystère : cet extrait vient de quelle feuille du dossier ?".replace("🔍 ", ""), o, o[[x_.startswith(code) for x_ in o].index(True)], f"Feuille {code}", cat=cat_de(code), niv=3, sans_tag=True), out, 86, "Zoom mystère : un bout de plan agrandi")
+    def choix_grille(s):
+        """Quatre feuilles en miniature (A, B, C, D) : laquelle est celle qu'on décrit ?"""
+        if not C.pdf: return None
+        from PIL import Image, ImageDraw, ImageFont
+        cand = [c for c in codes() if _info(C.pdf, c)]; code = feuille(s + 1)
+        autres = [c for c in cand if c[0] != code[0]]; rng.shuffle(autres)
+        pris = []
+        for c_ in autres:
+            if c_[0] not in [p[0] for p in pris]: pris.append(c_)
+            if len(pris) == 3: break
+        if len(pris) < 3: return None
+        ordre = [code] + pris; rng.shuffle(ordre)
+        tuiles = []
+        for i, c_ in enumerate(ordre):
+            f = _vignette(C.pdf, c_, os.path.join(C.tmp, f"cg-{s}-{i}.png"), larg=520)
+            if not f: return None
+            tuiles.append(Image.open(f).convert("RGB"))
+        tw, th_ = 520, max(t.height for t in tuiles); G = Image.new("RGB", (tw * 2 + 30, th_ * 2 + 30), "white"); d = ImageDraw.Draw(G)
+        try: fb = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 46)
+        except Exception: fb = ImageFont.load_default()
+        for i, t in enumerate(tuiles):
+            x0, y0 = (i % 2) * (tw + 30), (i // 2) * (th_ + 30); G.paste(t, (x0, y0)); d.rectangle([x0, y0, x0 + tw - 1, y0 + t.height - 1], outline="#9aa3ad", width=3)
+            d.ellipse([x0 + 10, y0 + 10, x0 + 66, y0 + 66], fill="#1c5f8f"); d.text((x0 + 38, y0 + 38), "ABCD"[i], font=fb, fill="white", anchor="mm")
+        out = os.path.join(C.tmp, f"cg-{s}.png"); G.save(out)
+        L = "ABCD"[ordre.index(code)]; titre = _info(C.pdf, code)["titre"].capitalize()
+        return _avec_image(qs.qcm(f"Quelle feuille est « {titre} » ?", ["A", "B", "C", "D"], L, f"Feuille {code}", cat=cat_de(code), niv=2, sans_tag=True), out, 118, "Quatre feuilles du dossier (réduites)")
+
+    autres = [thumb_titre, cart_echelle, thumb_disc, donnees, cart_titre, legende, finis]
     pool = []
-    for j in range(5):        # indice 4j + p : le dossier p+1 reçoit une sorte différente à chaque rang
+    for j in range(6):        # indice 4j + p : le dossier p+1 reçoit les 2 défis visuels, puis 4 autres sortes (différentes d'un dossier à l'autre)
         for p in range(4):
-            g = genres[(j + p) % len(genres)]
+            g = zoom_mystere if j == 0 else choix_grille if j == 1 else autres[((j - 2) + 2 * p) % len(autres)]
             pool.append((lambda g=g, s=j * 4 + p: g(s)))
     return pool
 
@@ -528,7 +579,7 @@ def banque(C):
     return P
 
 
-QUOTAS = dict(img=4, rep=4, qcm=6, vf=4, trou=3, assoc=2, calc=4, erreur=3, ordre=2)
+QUOTAS = dict(img=6, rep=3, qcm=5, vf=3, trou=3, assoc=2, calc=4, erreur=3, ordre=2)
 
 
 def _choisir(pool, n, k, C):
