@@ -186,7 +186,7 @@ class Ferme:
                       "abreuvoirs, ventilateurs de grand diamètre, rideaux latéraux et faîtière ouverte. Bloc de service (laiterie, bureau, machines) et aile des veaux entre deux couloirs d'alimentation traversants : le tracteur et la mélangeuse passent d'un bout à l'autre. "
                       "Enclos libres au sud, fosse à lisier, silos-couloirs, trois silos-tours et hangar à machinerie. Structure d'acier, murets de béton, toit à deux versants avec panneaux solaires.", 95):
             c_.drawString(24 * MM, yy * MM, l); yy -= 5.2
-        lignes = [["000", "Page de garde et liste des feuilles"], ["A-001", "Légende, symboles et abréviations"], ["A-100", "Plan d'implantation de la ferme"], ["A-101", "Plan de l'étable"], ["A-201", "Élévations"],
+        lignes = [["000", "Page de garde et liste des feuilles"], ["A-001", "Légende, symboles et abréviations"], ["A-100", "Plan d'implantation de la ferme"], ["A-101", "Plan de l'étable"], ["A-201", "Élévations"], ["A-202", "Élévation des silos-tours"],
                   ["A-301", "Coupe transversale de l'étable"], ["S-101", "Plan des fondations"], ["P-101", "Plan d'eau, de drainage et de laiterie"], ["P-102", "Abreuvoir à niveau constant : détails"], ["P-103", "Alimentation en eau des abreuvoirs (schéma)"],
                   ["E-101", "Électricité, ventilation et automatisation"]]
         f.tableau(24, yy - 10, "LISTE DES FEUILLES", ["Feuille", "Titre"], lignes, [22, 110], h=6, size=8.5)
@@ -408,6 +408,41 @@ class Ferme:
         f.notes("NIVEAUX", ["Sol : ± 0", "Muret : + 1 200", "Corniche : + 4 500", "Faîte : + 7 056"])
         c.showPage()
 
+    def silos(self, c):
+        N = 200; H = 24000; R = 4000; HC = 21500
+        f = Feuille(c, DOSSIER, "A-202", "ÉLÉVATION DES\nSILOS-TOURS", "1:200")
+        f.vue(DRAW[0] + 18, 38, N)
+        f.ligne(-2000, 0, 52000, 0, 1.4); f.hachures(-2000, -350, 52000, 0, 130, 45, GRIS_C)
+        # bout de l'étable (corniche et faîte) en repère de hauteur
+        f.rect(-2000, 0, 0, 1200, .5, fill=BETON)
+        f.poly([(-2000, 1200), (-2000, ZC), (0, ZC), (0, 1200)], .5, close=True, fill=TOLE)
+        f.texte(-1000, ZC + 1500, "ÉTABLE", 4.5, True, col=GRIS)
+        CORPS = HexColor("#b9c4cc")
+        for k, xs in enumerate((12000, 25000, 38000)):
+            f.rect(xs - 5200, 0, xs + 5200, 600, .6, fill=BETON)                       # base de béton
+            f.rect(xs - R, 600, xs + R, HC, .9, fill=CORPS)                          # corps en anneaux d'acier
+            z = 2400
+            while z < HC: f.ligne(xs - R, z, xs + R, z, .25, NERV); z += 1800
+            f.poly([(xs - R, HC), (xs - 2800, HC + 1500), (xs, H), (xs + 2800, HC + 1500), (xs + R, HC)], .9, close=True, fill=GRIS_C)
+            f.ligne(xs, H, xs, H + 1800, .8)                                          # évent
+            f.rect(xs + R, 600, xs + R + 900, HC, .5, fill=white)                     # échelle à cage
+            z = 900
+            while z < HC: f.ligne(xs + R, z, xs + R + 900, z, .15, GRIS); z += 600
+            f.rect(xs - 700, 600, xs + 700, 2200, .5, fill=white)                     # porte de vidange
+            f.texte(xs, H + 3300, f"S{k + 1}", 6, True)
+        # déchargeur supérieur sur S1 et tuyau de chargement
+        f.rect(12000 - 1000, H, 12000 + 1000, H + 700, .6, fill=GRIS)
+        f.ligne(12000 + R + 450, HC, 12000 + R + 450, H + 2500, 1.0, RACLEUR); f.ligne(12000 + R + 450, H + 2500, 12000 - 5000, H + 2500, 1.0, RACLEUR)
+        # niveaux et cotes
+        for z, t in ((ZC, "Corniche de l'étable + 4 500"), (ZF, "Faîte de l'étable + 7 056")):
+            f.ligne(-2000, z, 52000, z, .35, GRIS, dash=[6, 3]); f.texte(53000, z, t, 5, True, anchor="l") if False else f.texte(55500, z + 700, t, 5, True)
+        f.cote(0, H, 47500, "24 000", orient="v")
+        f.cote(7000, 17000, -2500, "Ø 8 000") if False else None
+        f.titre_vue(DRAW[0] + 16, 22, 1, "ÉLÉVATION DES SILOS-TOURS S1 À S3", "1:200")
+        f.notes("NOTES", ["Trois silos-tours en acier Ø 8 m, corps de 21,5 m, toit en dôme (hauteur totale 24 m).", "Entraxe de 13 m; base de béton de 600 sous chaque silo.",
+                          "Porte de vidange au pied; échelle à cage jusqu'au toit.", "Chargement par le haut (tuyau de soufflage sur S1).", "Hauteur de l'étable en pointillé pour comparer."])
+        c.showPage()
+
     # ------------------------------------------------------------------ coupe
     def coupe(self, c):
         N = 100
@@ -612,7 +647,7 @@ class Ferme:
     def produire(self, chemin):
         c = rl_canvas.Canvas(chemin, pagesize=(PAGE_W * MM, PAGE_H * MM), pageCompression=1)
         c.setTitle("FERME LAITIÈRE DOSSIER 5 — dossier de plans d'exercice"); c.setAuthor("Pavillon de l'Avenir · plan pédagogique")
-        for fn in (self.garde, self.legende, self.site, self.plan, self.elevations, self.coupe, self.fondations, self.plomberie, self.abreuvoirs, self.electricite): fn(c)
+        for fn in (self.garde, self.legende, self.site, self.plan, self.elevations, self.silos, self.coupe, self.fondations, self.plomberie, self.abreuvoirs, self.electricite): fn(c)
         c.save()
 
 
