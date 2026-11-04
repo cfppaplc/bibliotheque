@@ -140,53 +140,65 @@ def entete(c, titre, sous):
     c.setLineWidth(.8); c.line(20 * MM, (PH - 35) * MM, (PW - 20) * MM, (PH - 35) * MM)
 
 
-def pdf(chemin, Qs, nom_dossier, corrige):
-    c = rl_canvas.Canvas(chemin, pagesize=(PW * MM, PH * MM)); c.setTitle(f"{nom_dossier} — mesures à l'échelle" + (" (corrigé)" if corrige else "")); c.setAuthor("Pavillon de l'Avenir")
-    t1 = "CORRIGÉ — MESURES À L'ÉCHELLE" if corrige else "EXERCICES DE MESURE À L'ÉCHELLE"
-    sous = nom_dossier + ("   (réservé à l'enseignant)" if corrige else "")
-    entete(c, t1, sous); y = PH - 46
-    if not corrige:
-        c.setFont(FONT, 10); c.drawString(20 * MM, y * MM, "Nom : ______________________________   Groupe : ____________   Date : ______________"); y -= 9
-        c.setFont(FONT_B, 10.5); c.drawString(20 * MM, y * MM, "Avant de commencer"); y -= 5.5; c.setFont(FONT, 9.6)
-        for t in ["Imprime le dossier à 100 % (taille réelle), papier 11 × 17 po. N'utilise jamais l'option « Ajuster ».",
-                  "Vérifie le trait de contrôle en bas de chaque feuille : il doit mesurer exactement 100 mm à ta règle.",
-                  "Utilise ton échelimètre métrique sur la bonne face : l'échelle écrite sous la question (ex. 1:100). Place le zéro au début de la mesure et lis directement la dimension réelle.",
-                  "Les dimensions des plans d'architecture sont en millimètres. Écris ta réponse en millimètres et note l'unité.",
-                  "Ta réponse est bonne si elle est à ± 1 mm près sur le papier (± l'échelle en mm réels)."]:
-            for k, l in enumerate(wrap(t, 100)): c.drawString((24 if k == 0 else 29) * MM, y * MM, ("• " if k == 0 else "") + l); y -= 4.4
-        y -= 3
-    sec_courante = None; n = 0
+def typer(Qs, seed):
+    """Transforme les questions de mesure en questions typées et ajoute des questions de compréhension de l'échelle (types variés)."""
+    import questionnaire as qs
+    rng = random.Random(seed)
+    T = []
     for q in Qs:
-        if q["section"] != sec_courante:
-            sec_courante = q["section"]
-            if y < 40: c.showPage(); entete(c, t1.split(" —")[0].replace("EXERCICES DE MESURE À L'ÉCHELLE","EXERCICES D'ÉCHELLE") + " (suite)", sous); y = PH - 46
-            c.setFillColor(HexColor("#b00020")); c.setFont(FONT_B, 11); c.drawString(20 * MM, y * MM, sec_courante.upper()); y -= 6; c.setFillColor(black)
-        n += 1
-        if "conv" in q: txt = q["texte"]
-        else: txt = f"Mesure {q['texte']}." if not q["texte"].startswith("mesure") else q["texte"][0].upper() + q["texte"][1:] + "."
-        lignes = wrap(f"{q['f']} · échelle {NOMS_ECH.get(q['N'], '1:' + str(q['N']))} — {txt}" if "conv" not in q else txt, 92)
-        besoin = len(lignes) * 4.8 + (10 if corrige else 14)
-        if y - besoin < 16: c.showPage(); entete(c, t1.split(" —")[0].replace("EXERCICES DE MESURE À L'ÉCHELLE","EXERCICES D'ÉCHELLE") + " (suite)", sous); y = PH - 46
-        c.setFont(FONT_B, 10)
-        for k, l in enumerate(lignes): c.drawString((20 if k == 0 else 26) * MM, y * MM, (f"{n}.  " if k == 0 else "") + l); y -= 4.8
-        if corrige:
-            if q.get("conv") == "papier": rep = f"→ {q['reel'] / 10:.1f} mm sur le papier".replace(".", ",")
-            else:
-                paper = q["reel"] / q["N"]
-                rep = f"→ {fmt(q['reel'])} mm réels   (≈ {paper:.1f} mm sur le papier, tolérance ± {fmt(q['N'])} mm réels)".replace(".", ",") if "conv" not in q else f"→ {fmt(q['reel'])} mm"
-            c.setFillColor(VERT); c.setFont(FONT_B, 10); c.drawString(26 * MM, y * MM, rep); c.setFillColor(black); y -= 7
+        if "conv" in q: T.append(qs.mesure(q["texte"], q["reel"], q["N"], "papier" if q["conv"] == "papier" else "reel"))
         else:
-            c.setFont(FONT, 9.5)
-            if q.get("conv") == "papier": c.drawString(26 * MM, (y - 3) * MM, "Longueur sur le papier : ______________ mm")
-            elif q.get("conv") == "reel": c.drawString(26 * MM, (y - 3) * MM, "Dimension réelle : ______________ mm")
-            else: c.drawString(26 * MM, (y - 3) * MM, "Mesure sur le papier : ________ mm        Dimension réelle : ______________ mm")
-            y -= 10
-    c.save()
+            txt = f"{q['section']} · {q['f']} · échelle {NOMS_ECH.get(q['N'], '1:' + str(q['N']))} — " + (f"Mesure {q['texte']}." if not q["texte"].startswith("mesure") else q["texte"][0].upper() + q["texte"][1:] + ".")
+            T.append(qs.mesure(txt, q["reel"], q["N"]))
+    ech = [20, 25, 50, 75, 100, 125, 200, 250, 500]
+    ou = "Cartouche de la feuille (case « Échelle ») et échelimètre"
+    # choix multiple
+    N1 = rng.choice([50, 100, 200]); mm = rng.choice([30, 40, 60, 80])
+    ops = sorted({mm * N1 // 1000 * 1000 // 1 or mm * N1, mm * N1, mm * N1 * 2, mm * N1 // 2, mm * N1 + 500}); ops = ops[:4]
+    if mm * N1 not in ops: ops[0] = mm * N1
+    ops = sorted(set(ops)); rng.shuffle(ops)
+    T.append(qs.qcm(f"Un mur mesure {mm} mm sur un plan à l'échelle 1:{N1}. Quelle est sa longueur réelle ?", [f"{o:,} mm".replace(",", " ") for o in ops], f"{mm * N1:,} mm".replace(",", " "), "Longueur papier × dénominateur de l'échelle"))
+    T.append(qs.qcm("Laquelle de ces échelles donne le plus GRAND dessin d'un même objet ?", ["1:500", "1:200", "1:50", "1:100"], "1:50", "Plus le dénominateur est petit, plus le dessin est grand"))
+    T.append(qs.qcm("À l'échelle 1:100, que représente 1 mm mesuré sur le papier ?", ["1 mm", "10 mm", "100 mm", "1 000 mm"], "100 mm", "Définition de l'échelle"))
+    # vrai ou faux
+    for k in range(3):
+        N2 = rng.choice([50, 100, 125, 200]); papier = rng.choice([12, 20, 24, 40]); vrai = rng.random() < .5
+        reel = papier * N2; aff = reel if vrai else reel + rng.choice([-1, 1]) * N2 * rng.choice([2, 5])
+        T.append(qs.vf(f"Sur un plan à l'échelle 1:{N2}, une ligne de {papier} mm représente {aff:,} mm dans la réalité.".replace(",", " "), vrai, ou, f"Elle représente {reel:,} mm ({papier} × {N2}).".replace(",", " ")))
+    T.append(qs.vf("L'échelimètre métrique sert à lire directement les dimensions réelles sans faire de calcul.", True, "Mode d'emploi de l'échelimètre"))
+    T.append(qs.vf("Si on imprime un plan en « Ajuster à la page », l'échelle écrite dans le cartouche reste exacte.", False, "Consigne d'impression", "L'impression doit se faire à 100 % : sinon l'échelle n'est plus exacte."))
+    # texte à compléter
+    T.append(qs.trou("Une échelle 1:50 veut dire que 1 mm sur le papier représente ______ mm dans la réalité; 1 m réel mesure donc ______ mm sur le papier.", ["50", "20"], "Définition de l'échelle"))
+    T.append(qs.trou("Le trait de contrôle en bas de chaque feuille doit mesurer exactement ______ mm à la règle.", ["100"], "Bas de chaque feuille"))
+    # association
+    T.append(qs.assoc("Associe chaque échelle à ce que 10 mm sur le papier représentent dans la réalité.", [("1:20", "200 mm"), ("1:50", "500 mm"), ("1:100", "1 000 mm"), ("1:200", "2 000 mm")], "Papier × dénominateur", rng))
+    # calculs
+    for k in range(3):
+        N3 = rng.choice([50, 75, 100, 125, 200]); reel = rng.choice([2400, 3600, 4800, 7500, 9000, 12000]); papier = reel / N3
+        if k == 0: T.append(qs.calc(f"Une pièce mesure {reel:,} mm de long. Quelle longueur aura-t-elle sur un plan à l'échelle 1:{N3} ?".replace(",", " "), [f"{reel} ÷ {N3} = {papier:.1f} mm".replace(".", ",")], f"{papier:.1f} mm".replace(".", ","), "Dimension réelle ÷ dénominateur"))
+        elif k == 1: T.append(qs.calc(f"Sur un plan à l'échelle 1:{N3}, un mur mesure {papier:.1f} mm. Calcule sa longueur réelle en mètres.".replace(".", ","), [f"{papier:.1f} × {N3} = {reel} mm".replace(".", ","), f"{reel} mm ÷ 1 000 = {reel / 1000:.1f} m".replace(".", ",")], f"{reel / 1000:.1f} m".replace(".", ","), "Longueur papier × dénominateur"))
+        else:
+            N4 = rng.choice([x for x in (50, 100, 200) if x != N3]); p2 = reel / N4
+            T.append(qs.calc(f"Un même mur de {reel:,} mm est dessiné sur deux plans : à 1:{N3} et à 1:{N4}. Quelle est la différence de longueur (en mm) entre les deux dessins ?".replace(",", " "), [f"1:{N3} → {papier:.1f} mm;   1:{N4} → {p2:.1f} mm".replace(".", ","), f"{abs(papier - p2):.1f} mm".replace(".", ",")], f"{abs(papier - p2):.1f} mm".replace(".", ","), "Dimension réelle ÷ dénominateur, pour chaque plan"))
+    # trouve l'erreur
+    T.append(qs.erreur("« Sur un plan 1:200, un mur de 25 mm sur le papier mesure 2 500 mm dans la réalité. »", "25 × 200 = 5 000 mm (et non 2 500 mm).", "Papier × dénominateur"))
+    T.append(qs.erreur("« Le plan A est à 1:50 et le plan B à 1:100 : la même pièce paraît donc plus petite sur le plan A. »", "C'est l'inverse : à 1:50, le dessin est plus grand qu'à 1:100.", "Plus le dénominateur est petit, plus le dessin est grand"))
+    # classement
+    sel = rng.sample([20, 50, 100, 200, 500], 4); sel.sort()
+    T.append(qs.ordre("Classe ces échelles de celle qui donne le plus GRAND dessin à celle qui donne le plus petit.", [f"1:{x}" for x in sel], "du plus grand dessin au plus petit", "Plus le dénominateur est petit, plus le dessin est grand", rng))
+    return T
+
+
+def pdf(chemin, Qs, nom_dossier, corrige, seed="x"):
+    import questionnaire as qs
+    T = typer(Qs, seed)
+    cons = "Imprime le dossier à 100 % (papier 11 × 17 po, jamais « Ajuster ») et vérifie le trait de contrôle de 100 mm. Utilise la bonne face de ton échelimètre. Tolérance : ± 1 mm sur le papier."
+    qs.generer_pdf(chemin, "Mesures à l'échelle", nom_dossier, T, corrige, cons)
 
 
 def generer(site, n, b, nom_dossier):
     import os
     Qs = questions_ferme() if b is None else questions_batiment(b, f"D{n}")
-    pdf(os.path.join(site, "plans", f"dossier-{n}-echelle.pdf"), Qs, nom_dossier, False)
-    pdf(os.path.join(site, "plans", f"dossier-{n}-echelle-corrige.pdf"), Qs, nom_dossier, True)
+    pdf(os.path.join(site, "plans", f"dossier-{n}-echelle.pdf"), Qs, nom_dossier, False, f"D{n}")
+    pdf(os.path.join(site, "plans", f"dossier-{n}-echelle-corrige.pdf"), Qs, nom_dossier, True, f"D{n}")
     return Qs

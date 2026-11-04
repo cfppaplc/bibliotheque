@@ -676,7 +676,30 @@ class Batiment:
         if a[1] == b[1]: return [p, (p[0], q[1])] if abs(p[0] - q[0]) < 1 else [p, (p[0], p[1]), (q[0], p[1]), q] if False else [p, (q[0], p[1]), q]
         return [p, (p[0], q[1]), q]
 
-    def _route(self, p, poly):
+    def _boites_app(self):
+        res = []
+        for (code, x, y, rot) in self.app:
+            if code not in APP: continue
+            w, d = APP[code][1], APP[code][2]
+            pts = [rotp(px, py, rot) for px, py in ((-w / 2, 0), (w / 2, 0), (w / 2, d), (-w / 2, d))]
+            xs = [x + q[0] for q in pts]; ys = [y + q[1] for q in pts]
+            res.append((min(xs), min(ys), max(xs), max(ys)))
+        return res
+
+    def _evite(self, ch, p, q=None):
+        """Chemin ch (de p vers la colonne) : refait par A* s'il traverse un autre appareil que celui du départ."""
+        bx = self._boites_app()
+        dedans = lambda r, pt: r[0] - 250 <= pt[0] <= r[2] + 250 and r[1] - 250 <= pt[1] <= r[3] + 250
+        autres = [r for r in bx if not dedans(r, p)]
+        def coupe(path):
+            for a, b in zip(path, path[1:]):
+                for r in autres:
+                    if abs(a[0] - b[0]) < 1 and r[0] + 30 < a[0] < r[2] - 30 and max(min(a[1], b[1]), r[1] + 30) < min(max(a[1], b[1]), r[3] - 30): return True
+                    if abs(a[1] - b[1]) < 1 and r[1] + 30 < a[1] < r[3] - 30 and max(min(a[0], b[0]), r[0] + 30) < min(max(a[0], b[0]), r[2] - 30): return True
+            return False
+        return autres, coupe(ch)
+
+    def _route(self, p, poly, eviter=()):
         """Trajet orthogonal de p jusqu'à la colonne poly en contournant les cloisons (A* sur grille de 100 mm; traverser un mur coûte cher)."""
         import heapq
         G = 100; x0, y0 = -300, -300
@@ -691,6 +714,7 @@ class Batiment:
         for (x1, y1, x2, y2, e) in self.murs_int:
             if y1 == y2: marquer(min(x1, x2), y1 - e / 2, max(x1, x2), y1 + e / 2, 35)
             else: marquer(x1 - e / 2, min(y1, y2), x1 + e / 2, max(y1, y2), 35)
+        for (xa, ya, xb, yb) in eviter: marquer(xa, ya, xb, yb, 250)
         cell = lambda q: (min(nx - 1, max(0, int(round((q[0] - x0) / G)))), min(ny - 1, max(0, int(round((q[1] - y0) / G)))))
         cibles = set()
         for (a, b) in zip(poly, poly[1:]):
@@ -750,7 +774,8 @@ class Batiment:
             if o and code not in ("lv",):
                 pl = self._reseau_de(o)
                 q, seg = self._projeter(o, pl["coll"]); ch = self._chemin(o, q, seg)
-                if self._long(ch) > 2200: ch = self._route(o, pl["coll"]) or ch
+                autres, coupe = self._evite(ch, o)
+                if self._long(ch) > 2200 or coupe: ch = self._route(o, pl["coll"], autres) or ch
                 f.poly(ch, 1.6, DR, dash=[5, 2])
         for pl in nets:
             f.poly(pl["ef"], 1.5, EF); f.poly(pl["ec"], 1.5, EC)
@@ -761,21 +786,33 @@ class Batiment:
             sx, sy = rotp(-90, 60, rot); px, py = x + sx, y + sy
             if a[4] not in ("—",) and code != "ce":
                 q, seg = self._projeter((px, py), pl["ef"]); ch = self._chemin((px, py), q, seg)
-                if self._long(ch) > 2200: ch = self._route((px, py), pl["ef"]) or ch
+                autres, coupe = self._evite(ch, (px, py))
+                if self._long(ch) > 2200 or coupe: ch = self._route((px, py), pl["ef"], autres) or ch
                 self._der(f, ch, 1.0, EF)
             sx, sy = rotp(90, 60, rot); px, py = x + sx, y + sy
             if a[5] not in ("—",) and code != "ce":
                 q, seg = self._projeter((px, py), pl["ec"]); ch = self._chemin((px, py), q, seg)
-                if self._long(ch) > 2200: ch = self._route((px, py), pl["ec"]) or ch
+                autres, coupe = self._evite(ch, (px, py))
+                if self._long(ch) > 2200 or coupe: ch = self._route((px, py), pl["ec"], autres) or ch
                 self._der(f, ch, 1.0, EC)
-        # chauffe-eau : arrivée d'eau froide (bas gauche) et sortie d'eau chaude (haut droite) raccordées aux colonnes
+        # chauffe-eau : eau froide et eau chaude raccordées par le côté le plus proche de chaque colonne (trajet en L court, sans détour)
         for (code, x, y, rot) in self.app:
             if code != "ce": continue
-            pl = self._reseau_de((x, y))
-            sx, sy = rotp(-150, 40, rot); pf = (x + sx, y + sy)
-            q, seg = self._projeter(pf, pl["ef"]); f.poly(self._chemin(pf, q, seg), 1.2, EF); f.cercle(*pf, 45, .6, fill=EF)
-            sx, sy = rotp(150, 560, rot); pc = (x + sx, y + sy)
-            q, seg = self._projeter(pc, pl["ec"]); f.poly(self._chemin(pc, q, seg), 1.2, EC); f.cercle(*pc, 45, .6, fill=EC)
+            pl = self._reseau_de((x, y)); pris = []
+            for cle, col in (("ef", EF), ("ec", EC)):
+                best = None
+                for (lx, ly, ox, oy) in ((-290, 300, -1, 0), (290, 300, 1, 0), (0, 15, 0, -1), (0, 585, 0, 1)):
+                    sx, sy = rotp(lx, ly, rot); p_ = (x + sx, y + sy); q, seg = self._projeter(p_, pl[cle])
+                    dx, dy = rotp(ox, oy, rot); d_ = abs(q[0] - p_[0]) + abs(q[1] - p_[1])
+                    horiz = abs(q[0] - p_[0]) >= abs(q[1] - p_[1])
+                    pen = 0 if ((abs(dx) > .5) == horiz) and ((q[0] - p_[0]) * dx + (q[1] - p_[1]) * dy >= -1) else 800
+                    if (lx, ly) in pris: pen += 5000
+                    if best is None or d_ + pen < best[0]: best = (d_ + pen, p_, q, seg, (lx, ly), dx, dy)
+                _, p_, q, seg, lp, dx, dy = best; pris.append(lp)
+                if abs(dx) > .5: ch = [p_, (q[0], p_[1]), q] if abs(q[0] - p_[0]) > 1 else [p_, q]
+                else: ch = [p_, (p_[0], q[1]), q] if abs(q[1] - p_[1]) > 1 else [p_, q]
+                if abs(q[0] - p_[0]) > 1 and abs(q[1] - p_[1]) > 1 and abs(dx) <= .5: ch = [p_, (p_[0], q[1]), q]
+                f.poly(ch, 1.2, col); f.cercle(*p_, 45, .6, fill=col)
         # niveaux supérieurs : les colonnes d'eau arrivent du niveau inférieur (montantes)
         for pl in nets:
             if pl.get("compteur") or any(c == "ce" for (c, _, _, _) in self.app): continue
