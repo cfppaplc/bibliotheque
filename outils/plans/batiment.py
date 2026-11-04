@@ -676,12 +676,61 @@ class Batiment:
         if a[1] == b[1]: return [p, (p[0], q[1])] if abs(p[0] - q[0]) < 1 else [p, (p[0], p[1]), (q[0], p[1]), q] if False else [p, (q[0], p[1]), q]
         return [p, (p[0], q[1]), q]
 
+    def _route(self, p, poly):
+        """Trajet orthogonal de p jusqu'à la colonne poly en contournant les cloisons (A* sur grille de 100 mm; traverser un mur coûte cher)."""
+        import heapq
+        G = 100; x0, y0 = -300, -300
+        nx = int((self.W + 600) / G) + 1; ny = int((self.D + 600) / G) + 1
+        cout = [[1] * ny for _ in range(nx)]
+        def marquer(xa, ya, xb, yb, c):
+            for i in range(max(0, int((xa - x0) / G)), min(nx, int((xb - x0) / G) + 1)):
+                for j in range(max(0, int((ya - y0) / G)), min(ny, int((yb - y0) / G) + 1)): cout[i][j] = max(cout[i][j], c)
+        t = self.t
+        for (a, b, c_, d_) in ((-300, -300, self.W + 300, t), (-300, self.D - t, self.W + 300, self.D + 300), (-300, -300, t, self.D + 300), (self.W - t, -300, self.W + 300, self.D + 300)):
+            marquer(a, b, c_, d_, 400)
+        for (x1, y1, x2, y2, e) in self.murs_int:
+            if y1 == y2: marquer(min(x1, x2), y1 - e / 2, max(x1, x2), y1 + e / 2, 35)
+            else: marquer(x1 - e / 2, min(y1, y2), x1 + e / 2, max(y1, y2), 35)
+        cell = lambda q: (min(nx - 1, max(0, int(round((q[0] - x0) / G)))), min(ny - 1, max(0, int(round((q[1] - y0) / G)))))
+        cibles = set()
+        for (a, b) in zip(poly, poly[1:]):
+            n = int(max(abs(a[0] - b[0]), abs(a[1] - b[1])) / G) + 1
+            for k in range(n + 1): cibles.add(cell((a[0] + (b[0] - a[0]) * k / n, a[1] + (b[1] - a[1]) * k / n)))
+        s = cell(p); D4 = ((1, 0), (-1, 0), (0, 1), (0, -1))
+        pq = [(0, s, -1)]; best = {(s, -1): 0}; prev = {}; fin = None
+        while pq:
+            c0, u, d = heapq.heappop(pq)
+            if best.get((u, d), 1e18) < c0: continue
+            if u in cibles: fin = (u, d); break
+            for k, (dx, dy) in enumerate(D4):
+                v = (u[0] + dx, u[1] + dy)
+                if not (0 <= v[0] < nx and 0 <= v[1] < ny): continue
+                c1 = c0 + cout[v[0]][v[1]] + (0 if d in (-1, k) else 8)
+                if c1 < best.get((v, k), 1e18): best[(v, k)] = c1; prev[(v, k)] = (u, d); heapq.heappush(pq, (c1, v, k))
+        if not fin: return None
+        pts = []; st = fin
+        while st in prev: pts.append(st[0]); st = prev[st]
+        pts.append(st[0]); pts.reverse()
+        P = [(x0 + u[0] * G, y0 + u[1] * G) for u in pts]
+        q, _ = self._projeter(P[-1], poly)
+        brut = [p, (P[0][0], p[1]), P[0]] + P[1:-1] + [(P[-1][0], q[1]) if abs(P[-1][0] - q[0]) < abs(P[-1][1] - q[1]) else (q[0], P[-1][1]), q]
+        out = []
+        for pt in brut:
+            if out and abs(out[-1][0] - pt[0]) < 1 and abs(out[-1][1] - pt[1]) < 1: continue
+            out.append(pt)
+        k = 1
+        while k < len(out) - 1:   # retire les points alignés
+            a_, b_, c_ = out[k - 1], out[k], out[k + 1]
+            if (abs(a_[0] - b_[0]) < 1 and abs(b_[0] - c_[0]) < 1) or (abs(a_[1] - b_[1]) < 1 and abs(b_[1] - c_[1]) < 1): out.pop(k)
+            else: k += 1
+        return out
+
     @staticmethod
     def _long(pts): return sum(abs(a[0] - b[0]) + abs(a[1] - b[1]) for a, b in zip(pts, pts[1:]))
 
     def _der(self, f, pts, w, col):
         """Dérivation : trait plein si courte; trait discontinu (dans le plafond ou le plancher) si longue."""
-        if self._long(pts) > 2200: f.poly(pts, w, col, dash=[8, 3]); self._longues = True
+        if self._long(pts) > 9000: f.poly(pts, w, col, dash=[8, 3]); self._longues = True
         else: f.poly(pts, w, col)
 
     def feuille_plomberie(self, c):
@@ -700,7 +749,9 @@ class Batiment:
             o = self.sortie(code, x, y, rot)
             if o and code not in ("lv",):
                 pl = self._reseau_de(o)
-                q, seg = self._projeter(o, pl["coll"]); ch = self._chemin(o, q, seg); f.poly(ch, 1.6, DR, dash=[5, 2] if self._long(ch) <= 2200 else [9, 3, 2, 3])
+                q, seg = self._projeter(o, pl["coll"]); ch = self._chemin(o, q, seg)
+                if self._long(ch) > 2200: ch = self._route(o, pl["coll"]) or ch
+                f.poly(ch, 1.6, DR, dash=[5, 2])
         for pl in nets:
             f.poly(pl["ef"], 1.5, EF); f.poly(pl["ec"], 1.5, EC)
             for pts in pl.get("ef_extra", []): f.poly(pts, 1.2, EF)
@@ -709,10 +760,14 @@ class Batiment:
             a = APP[code]; pl = self._reseau_de((x, y))
             sx, sy = rotp(-90, 60, rot); px, py = x + sx, y + sy
             if a[4] not in ("—",) and code != "ce":
-                q, seg = self._projeter((px, py), pl["ef"]); self._der(f, self._chemin((px, py), q, seg), 1.0, EF)
+                q, seg = self._projeter((px, py), pl["ef"]); ch = self._chemin((px, py), q, seg)
+                if self._long(ch) > 2200: ch = self._route((px, py), pl["ef"]) or ch
+                self._der(f, ch, 1.0, EF)
             sx, sy = rotp(90, 60, rot); px, py = x + sx, y + sy
             if a[5] not in ("—",) and code != "ce":
-                q, seg = self._projeter((px, py), pl["ec"]); self._der(f, self._chemin((px, py), q, seg), 1.0, EC)
+                q, seg = self._projeter((px, py), pl["ec"]); ch = self._chemin((px, py), q, seg)
+                if self._long(ch) > 2200: ch = self._route((px, py), pl["ec"]) or ch
+                self._der(f, ch, 1.0, EC)
         # chauffe-eau : arrivée d'eau froide (bas gauche) et sortie d'eau chaude (haut droite) raccordées aux colonnes
         for (code, x, y, rot) in self.app:
             if code != "ce": continue
