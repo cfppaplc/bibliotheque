@@ -530,10 +530,10 @@
     ]
   },
   {
-    "date": "2026-11-03",
+    "date": "2026-11-04",
     "type": "outil",
     "titre": "Accueil de classe",
-    "texte": "Tableau d'accueil animé pour le début de période : date, déroulement, temps avant la pause, un contenu à ouvrir pour chaque activité, et un fond vivant qui suit la période.",
+    "texte": "Tableau d'accueil animé pour le début de période : date, déroulement, temps avant la pause, la matière en cours avec un petit rappel, un contenu à ouvrir pour chaque activité, et un fond vivant qui suit la période.",
     "formation": [
       {
         "t": "Bouton « Accueil de classe » en haut de la bibliothèque.",
@@ -552,6 +552,10 @@
         "img": "nouveautes/tdb-carte.jpg"
       },
       {
+        "t": "La pastille « En cours » montre la matière de la période. Pendant le cours, un petit « Rappel » apparaît 15 secondes environ toutes les 9 minutes, avec une idée en lien avec la matière. Touche-le pour le fermer.",
+        "img": "nouveautes/tdb-matiere.jpg"
+      },
+      {
         "t": "Dans un livre, « Tableau de bord » (touche E) y retourne; « Revenir au livre » (touche L) te remet à la même page.",
         "img": "nouveautes/tdb-retour.jpg"
       },
@@ -559,10 +563,13 @@
         "t": "Le fond vit avec la période : plus calme à la pause, plus vif les 5 dernières minutes, petites surprises de temps en temps. Carte « Bienvenue » 5 minutes avant le cours. Plus → Réglages → « Fond animé » : Comme l'ordinateur, Toujours ou Jamais.",
         "img": "nouveautes/tdb-bienvenue.jpg"
       },
-      "Jour d'examen : coche « Examen aujourd'hui » (pas de pauses).",
-      "« Plein écran » une seule fois au début : il reste actif entre le tableau de bord et les livres."
+      "Jour d'examen : coche « Examen aujourd'hui » (pas de pauses). « Plein écran » une seule fois au début : il reste actif entre le tableau de bord et les livres."
     ],
     "versions": [
+      {
+        "date": "2026-11-04",
+        "texte": "Matière en cours bien visible (pastille « En cours ») et petit rappel qui revient pendant le cours."
+      },
       {
         "date": "2026-11-03",
         "texte": "Préparer le cours : glisser pour sélectionner du texte et relâcher dehors ne ferme plus la fenêtre."
@@ -574,10 +581,6 @@
       {
         "date": "2026-10-30",
         "texte": "Téléphone et iPad : les boutons du haut restent visibles (la frise défile de côté), « Autre jour… » ouvre le calendrier du téléphone, Préparer le cours s'ouvre en haut."
-      },
-      {
-        "date": "2026-10-30",
-        "texte": "Fenêtres du tableau de bord (Préparer le cours, Réglages, menus, aperçu) au même look que la bibliothèque, claires ou foncées selon ton choix."
       }
     ]
   },
