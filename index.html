@@ -6317,17 +6317,18 @@ initAdmin();
   .pn-btns .pl-drop{border:1px dashed #4a525c;border-radius:999px;padding:11px 22px;max-width:none;width:auto;font-size:.92rem}
   .pn-row{padding:10px clamp(20px,5vw,64px) 18px}
   .pn-t{margin:0 0 14px;padding-left:12px;border-left:4px solid var(--moi,#e50914);font:700 1.15rem "Segoe UI",Roboto,Arial,sans-serif;color:var(--pi)}
-  .pn-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:18px}
+  .pn-cards{display:grid;grid-template-columns:1fr;gap:26px 22px;max-width:1140px}
+  @media (min-width:760px){.pn-cards{grid-template-columns:1fr 1fr}}
   .pl-empty .pn-card{display:flex;flex-direction:column;justify-content:flex-start;align-self:start;padding:0;text-align:left;background:none;border:0;border-radius:10px;color:var(--pi);cursor:pointer;transition:transform .18s ease}
   .pl-empty .pn-card:hover{transform:translateY(-4px) scale(1.03);border:0}
   .pl-empty .pn-card:focus-visible{outline:3px solid #fff;outline-offset:3px}
-  .pn-img{position:relative;display:block;aspect-ratio:640/496;border-radius:10px;overflow:hidden;background:#fff;box-shadow:0 6px 18px rgba(0,0,0,.45)}
+  .pn-img{position:relative;display:block;aspect-ratio:960/640;border-radius:10px;overflow:hidden;background:#fff;box-shadow:0 6px 18px rgba(0,0,0,.45)}
   .pn-img img{display:block;width:100%;height:100%;object-fit:cover}
   .pn-img i{position:absolute;left:8px;top:8px;font:700 .72rem "Segoe UI",Roboto,Arial,sans-serif;font-style:normal;letter-spacing:.03em;background:rgba(14,14,15,.86);color:#fff;border-radius:6px;padding:3px 8px}
-  .pn-card b{display:block;margin:10px 2px 0;font:700 1.02rem "Segoe UI",Roboto,Arial,sans-serif}
-  .pn-card small{display:block;margin:2px 2px 0;color:var(--pm);font-weight:400;font-size:.82rem}
+  .pn-card b{display:block;margin:12px 2px 0;font:700 1.2rem "Segoe UI",Roboto,Arial,sans-serif}
+  .pn-card small{display:block;margin:3px 2px 0;color:var(--pm);font-weight:400;font-size:.92rem}
   .pn-row .pl-recents{justify-content:flex-start;max-width:none}
-  @media (max-width:640px){.pn-cards{grid-template-columns:repeat(2,1fr);gap:12px}.pl-empty{padding-top:70px}}
+  @media (max-width:640px){.pl-empty{padding-top:70px}}
   .accueil-close{background:#1b1b1d;color:#e6e6e8;border:1px solid #2f2f33;border-radius:8px;height:40px;padding:0 14px;font:600 .9rem "Segoe UI",Roboto,Arial,sans-serif;opacity:.35;display:inline-flex;align-items:center;gap:6px}
   .accueil-close:hover,.accueil-close:focus-visible{background:#262629;opacity:1}
 </style>
@@ -6444,10 +6445,10 @@ initAdmin();
     <section class="pn-row" aria-label="Dossiers de plans d'exercice">
       <h3 class="pn-t">Dossiers de plans d'exercice</h3>
       <div class="pn-cards">
-        <button class="pl-ex pn-card" data-ex="1" type="button"><span class="pn-img"><img src="plans/dossier-1-apercu.jpg" alt="" loading="lazy"><i>19 feuilles</i></span><b>Maison unifamiliale</b><small>Dossier 1 · moderne, 2 étages et sous-sol</small></button>
-        <button class="pl-ex pn-card" data-ex="2" type="button"><span class="pn-img"><img src="plans/dossier-2-apercu.jpg" alt="" loading="lazy"><i>11 feuilles</i></span><b>Duplex jumelé</b><small>Dossier 2 · dalle sur sol, plinthes</small></button>
-        <button class="pl-ex pn-card" data-ex="3" type="button"><span class="pn-img"><img src="plans/dossier-3-apercu.jpg" alt="" loading="lazy"><i>11 feuilles</i></span><b>Bâtiment commercial</b><small>Dossier 3 · acier, toit plat, unité de toit</small></button>
-        <button class="pl-ex pn-card" data-ex="4" type="button"><span class="pn-img"><img src="plans/dossier-4-apercu.jpg" alt="" loading="lazy"><i>13 feuilles</i></span><b>Centre commercial</b><small>Dossier 4 · terrain en pente, nivellement, drainage</small></button>
+        <button class="pl-ex pn-card" data-ex="1" type="button"><span class="pn-img"><img src="plans/dossier-1-elevation.jpg" alt="" loading="lazy"><i>19 feuilles</i></span><b>Maison unifamiliale</b><small>Dossier 1 · moderne, 2 étages et sous-sol</small></button>
+        <button class="pl-ex pn-card" data-ex="2" type="button"><span class="pn-img"><img src="plans/dossier-2-elevation.jpg" alt="" loading="lazy"><i>11 feuilles</i></span><b>Duplex jumelé</b><small>Dossier 2 · dalle sur sol, plinthes</small></button>
+        <button class="pl-ex pn-card" data-ex="3" type="button"><span class="pn-img"><img src="plans/dossier-3-elevation.jpg" alt="" loading="lazy"><i>11 feuilles</i></span><b>Bâtiment commercial</b><small>Dossier 3 · acier, toit plat, unité de toit</small></button>
+        <button class="pl-ex pn-card" data-ex="4" type="button"><span class="pn-img"><img src="plans/dossier-4-elevation.jpg" alt="" loading="lazy"><i>13 feuilles</i></span><b>Centre commercial</b><small>Dossier 4 · terrain en pente, nivellement, drainage</small></button>
       </div>
     </section>
     <section class="pn-row" id="plRecRow" hidden aria-label="Plans récents">
