@@ -259,6 +259,8 @@
   .reader-bar span{color:#ddd;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     [hidden]{display:none!important}
   .rstage{flex:1;min-height:0;overflow:auto;position:relative;background:#111}
+  .reader:not(.wbon) .rstage{scrollbar-width:none}
+  .reader:not(.wbon) .rstage::-webkit-scrollbar{display:none}
   .rinner{position:relative}
   .rinner iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#fff}
   .rinner.dbl{background:#0c0c0c}
@@ -1694,14 +1696,29 @@ function zoomSouris(e, frame){ ZS.t = Date.now();
   ZS.d += Math.max(-40, Math.min(40, e.deltaY * (e.deltaMode === 1 ? 33 : 1)));
   if (!ZS.raf) ZS.raf = requestAnimationFrame(zoomSourisPas);
 }
+/* Zoom à la roulette (4 nov.) : pendant le geste, on agrandit seulement l'image (transform, très léger); le vrai redimensionnement du livre
+   (qui fait recalculer toute la page) se fait une seule fois, quand la roulette s'arrête. Le point sous la souris reste sous la souris. */
 function zoomSourisPas(){
-  ZS.raf = 0; const st = $("#rstage"), px = ZS.px, py = ZS.py, d = Math.max(-80, Math.min(80, ZS.d)); ZS.d = 0;
-  const K = RD.wb ? WBK : 1, cx = (st.scrollLeft + px - (RD.mx || 0)) / (RD.z * K), cy = (st.scrollTop + py - (RD.my || 0)) / (RD.z * K);
-  const z = Math.max(zMin(), Math.min(zMax(), RD.z * Math.exp(-d * .0075)));
-  if (Math.abs(z - RD.z) < .002) return;
-  PAN.alvo = null; setZoom(z, true);
-  st.scrollLeft = cx * RD.z * K + (RD.mx || 0) - px; st.scrollTop = cy * RD.z * K + (RD.my || 0) - py;
-  clearTimeout(ZS.fin); ZS.fin = setTimeout(() => { try { sizeInner(); } catch(e){} }, 160);   /* la roulette s'arrête : toile et dessin remis nets */
+  ZS.raf = 0; const st = $("#rstage"), inn = $("#rinner"), px = ZS.px, py = ZS.py, d = Math.max(-80, Math.min(80, ZS.d)); ZS.d = 0;
+  if (!ZS.on){ ZS.on = true; ZS.z0 = RD.z; ZS.z = RD.z; ZS.sl = st.scrollLeft; ZS.stp = st.scrollTop; ZS.mx0 = RD.mx || 0; ZS.my0 = RD.my || 0; ZS.tx = 0; ZS.ty = 0; ZS.s = 1; PAN.alvo = null; }
+  const z = Math.max(zMin(), Math.min(zMax(), ZS.z * Math.exp(-d * .0075)));
+  if (Math.abs(z - ZS.z) > .0005){
+    const s0 = ZS.s, s1 = z / ZS.z0, bx = ZS.mx0 - ZS.sl, by = ZS.my0 - ZS.stp;
+    const ux = (px - bx - ZS.tx) / s0, uy = (py - by - ZS.ty) / s0;          /* point du livre sous la souris (unités du zoom de départ) */
+    ZS.tx = px - bx - ux * s1; ZS.ty = py - by - uy * s1; ZS.s = s1; ZS.z = z; ZS.px1 = px; ZS.py1 = py;
+    inn.style.transformOrigin = "0 0"; inn.style.transform = "translate(" + ZS.tx + "px," + ZS.ty + "px) scale(" + s1 + ")";
+    const t = Math.round(z * 100) + "%"; $("#tbZv").textContent = t; $("#wbZv").textContent = t;
+  }
+  clearTimeout(ZS.fin); ZS.fin = setTimeout(zoomSourisFin, 140);
+}
+function zoomSourisFin(){
+  if (!ZS.on) return; const st = $("#rstage"), inn = $("#rinner"), K = RD.wb ? WBK : 1;
+  const px = ZS.px1 == null ? ZS.px : ZS.px1, py = ZS.py1 == null ? ZS.py : ZS.py1;
+  const cx = ((px - (ZS.mx0 - ZS.sl) - ZS.tx) / ZS.s) / (ZS.z0 * K), cy = ((py - (ZS.my0 - ZS.stp) - ZS.ty) / ZS.s) / (ZS.z0 * K), z = ZS.z;
+  ZS.on = false; ZS.px1 = ZS.py1 = null; inn.style.transform = ""; inn.style.transformOrigin = "";
+  if (Math.abs(z - RD.z) > .002){ setZoom(z, true);
+    st.scrollLeft = cx * RD.z * K + (RD.mx || 0) - px; st.scrollTop = cy * RD.z * K + (RD.my || 0) - py; }
+  try { sizeInner(); } catch(e){}   /* toile et dessin remis nets */
 }
 function majCurseur(){
   const c = RD.laser ? "none" : (RD.z > 1 && !outilActif() ? "grab" : "");
@@ -2083,6 +2100,7 @@ function sizeInner(rapide){   /* rapide = pendant la roulette : on agrandit seul
 }
 const WBK = 2, zMin = () => RD.wb ? .5 : 1, zMax = () => RD.wb ? 2 : 3;
 function setZoom(z, rapide){
+  if (ZS.on && !ZS.enFin){ ZS.on = false; clearTimeout(ZS.fin); const i = $("#rinner"); i.style.transform = ""; i.style.transformOrigin = ""; }
   const st = $("#rstage"), inn = $("#rinner"), ow = inn.offsetWidth || 1, oh = inn.offsetHeight || 1;
   const fx = (st.scrollLeft + st.clientWidth / 2 - (RD.mx || 0)) / ow, fy = (st.scrollTop + st.clientHeight / 2 - (RD.my || 0)) / oh;
   RD.z = Math.max(zMin(), Math.min(zMax(), z)); sizeInner(rapide);
