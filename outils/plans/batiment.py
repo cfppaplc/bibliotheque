@@ -33,20 +33,37 @@ class Batiment:
         self.__dict__.update(d)
         t = self.t
         self.S, self.N_, self.O, self.E = t / 2, self.D - t / 2, t / 2, self.W - t / 2
+        # bâtiment en L : coin nord-est retiré (retrait = (xr, yr), faces extérieures du retrait)
+        r = getattr(self, "retrait", None)
+        self.N2, self.E2 = (r[1] - t / 2, r[0] - t / 2) if r else (None, None)
+
+    def contour(self, off=0):
+        """Contour du bâtiment décalé de off (positif = vers l'extérieur); en L si retrait."""
+        W, D = self.W, self.D; r = getattr(self, "retrait", None)
+        if not r: return [(-off, -off), (W + off, -off), (W + off, D + off), (-off, D + off)]
+        xr, yr = r
+        return [(-off, -off), (W + off, -off), (W + off, yr + off), (xr + off, yr + off), (xr + off, D + off), (-off, D + off)]
+
+    def aire_emprise(self):
+        r = getattr(self, "retrait", None)
+        return self.W * self.D - ((self.W - r[0]) * (self.D - r[1]) if r else 0)
 
     # =============================================================== PLAN D'ARCHITECTURE
     def murs(self, f, poche=GRIS):
         W, D, t = self.W, self.D, self.t
-        f.rect(0, 0, W, D, w=1.0, fill=poche)
-        f.rect(t, t, W - t, D - t, w=0.7, fill=white)
+        if getattr(self, "retrait", None):
+            f.poly(self.contour(0), 1.0, close=True, fill=poche); f.poly(self.contour(-t), .7, close=True, fill=white)
+        else:
+            f.rect(0, 0, W, D, w=1.0, fill=poche)
+            f.rect(t, t, W - t, D - t, w=0.7, fill=white)
         for (x1, y1, x2, y2, e) in self.murs_int:
             if y1 == y2: f.rect(min(x1, x2) - e / 2 * 0, y1 - e / 2, max(x1, x2), y1 + e / 2, w=.6, fill=GRIS_TC)
             else: f.rect(x1 - e / 2, min(y1, y2), x1 + e / 2, max(y1, y2), w=.6, fill=GRIS_TC)
 
     def _epaisseur(self, axe, at):
         t = self.t
-        if axe == "h" and (abs(at - self.S) < 1 or abs(at - self.N_) < 1): return t
-        if axe == "v" and (abs(at - self.O) < 1 or abs(at - self.E) < 1): return t
+        if axe == "h" and (abs(at - self.S) < 1 or abs(at - self.N_) < 1 or (self.N2 is not None and abs(at - self.N2) < 1)): return t
+        if axe == "v" and (abs(at - self.O) < 1 or abs(at - self.E) < 1 or (self.E2 is not None and abs(at - self.E2) < 1)): return t
         for (x1, y1, x2, y2, e) in self.murs_int:
             if axe == "h" and y1 == y2 and abs(y1 - at) < 1: return e
             if axe == "v" and x1 == x2 and abs(x1 - at) < 1: return e
@@ -177,19 +194,22 @@ class Batiment:
     def cotes_ext(self, f):
         W, D = self.W, self.D; k = f.N / 50
         # Sud : ouvertures sur le mur sud
-        for (axe, at, cote_y, orient) in (("h", self.S, -800 * k, "h"), ("h", self.N_, D + 800 * k, "h")):
-            pts = {0, W}
+        rt = getattr(self, "retrait", None); xr, yr = rt if rt else (W, D)
+        for (axe, at, cote_y, a0, a1) in (("h", self.S, -800 * k, 0, W), ("h", self.N_, D + 800 * k, 0, xr)):
+            pts = {a0, a1}
             for o in self.fenetres + self.portes:
                 if o["axe"] == "h" and abs(o["at"] - at) < 1: pts |= {o["s"] + o["w"] / 2}
             f.chaine(sorted(pts), cote_y, "h", total=False)
-        for (at, cote_x) in ((self.O, -800 * k), (self.E, W + 800 * k)):
-            pts = {0, D}
+        for (at, cote_x, a0, a1) in ((self.O, -800 * k, 0, D), (self.E, W + 800 * k, 0, yr)):
+            pts = {a0, a1}
             for o in self.fenetres + self.portes:
                 if o["axe"] == "v" and abs(o["at"] - at) < 1: pts |= {o["s"] + o["w"] / 2}
             f.chaine(sorted(pts), cote_x, "v", total=False)
         # cotes hors tout
-        f.cote(0, W, -1500 * k); f.cote(0, W, D + 1500 * k)
-        f.cote(0, D, -1500 * k, orient="v"); f.cote(0, D, W + 1500 * k, orient="v")
+        f.cote(0, W, -1500 * k); f.cote(0, xr, D + 1500 * k)
+        f.cote(0, D, -1500 * k, orient="v"); f.cote(0, yr, W + 1500 * k, orient="v")
+        if rt:
+            f.cote(xr, W, yr + 1500 * k); f.cote(yr, D, xr + 1500 * k, orient="v")
 
     def cotes_int(self, f):
         for (x1, x2, y, ori) in getattr(self, "cotes_interieures", []):
@@ -241,11 +261,20 @@ class Batiment:
                 f.rect(a + i * w_, b, a + (i + 1) * w_, b + 5500, .4)
             f.texte(a + w_ * n / 2, b + 6200, f"{n} CASES DE STATIONNEMENT 2 600 × 5 500", 6.5, col=GRIS)
         # bâtiment
-        f.rect(bx, by, bx + self.W, by + self.D, 1.2, fill=GRIS_TC)
-        f.hachures(bx, by, bx + self.W, by + self.D, 900, 45, GRIS_C)
-        f.rect(bx, by, bx + self.W, by + self.D, 1.2)
-        f.texte(bx + self.W / 2, by + self.D / 2 + 600, self.nom_court.upper(), 8, True)
-        f.texte(bx + self.W / 2, by + self.D / 2 - 600, f"Emprise au sol {str(round(self.W * self.D / 1e6, 1)).replace('.', ',')} m²", 6.5)
+        if getattr(self, "retrait", None):
+            xr_, yr_ = self.retrait
+            pts_ = [(bx + x, by + y) for (x, y) in self.contour(0)]
+            f.poly(pts_, 1.2, close=True, fill=GRIS_TC)
+            f.hachures(bx, by, bx + xr_, by + self.D, 900, 45, GRIS_C); f.hachures(bx + xr_, by, bx + self.W, by + yr_, 900, 45, GRIS_C)
+            f.poly(pts_, 1.2, close=True)
+            f.texte(bx + xr_ / 2, by + self.D / 2 + 600, self.nom_court.upper(), 8, True)
+            f.texte(bx + xr_ / 2, by + self.D / 2 - 600, f"Emprise au sol {str(round(self.aire_emprise() / 1e6, 1)).replace('.', ',')} m²", 6.5)
+        else:
+            f.rect(bx, by, bx + self.W, by + self.D, 1.2, fill=GRIS_TC)
+            f.hachures(bx, by, bx + self.W, by + self.D, 900, 45, GRIS_C)
+            f.rect(bx, by, bx + self.W, by + self.D, 1.2)
+            f.texte(bx + self.W / 2, by + self.D / 2 + 600, self.nom_court.upper(), 8, True)
+            f.texte(bx + self.W / 2, by + self.D / 2 - 600, f"Emprise au sol {str(round(self.W * self.D / 1e6, 1)).replace('.', ',')} m²", 6.5)
         # marges de recul
         cx_ = bx + self.W * s.get("cote_rel", 0.25)
         f.cote(0, by, cx_, orient="v", txt=f"{fmt(by)} (marge avant)")
@@ -334,8 +363,8 @@ class Batiment:
         for o in self.fenetres + self.portes:
             ax, at = o["axe"], o["at"]
             if cote == "S" and ax == "h" and abs(at - self.S) < 1: a = o["s"]
-            elif cote == "N" and ax == "h" and abs(at - self.N_) < 1: a = W - o["s"] - o["w"]
-            elif cote == "E" and ax == "v" and abs(at - self.E) < 1: a = o["s"]
+            elif cote == "N" and ax == "h" and (abs(at - self.N_) < 1 or (self.N2 is not None and abs(at - self.N2) < 1)): a = W - o["s"] - o["w"]
+            elif cote == "E" and ax == "v" and (abs(at - self.E) < 1 or (self.E2 is not None and abs(at - self.E2) < 1)): a = o["s"]
             elif cote == "O" and ax == "v" and abs(at - self.O) < 1: a = D - o["s"] - o["w"]
             else: continue
             res.append((a, o))
@@ -549,10 +578,18 @@ class Batiment:
         f.vue(DRAW[0] + getattr(self, "fond_gauche", 38), DRAW[3] - getattr(self, "fond_haut", 32) - D / Nf, Nf)
         if getattr(self, "grille_xy", None): f.grille(*self.grille_xy, 0, W, 0, D, ext=getattr(self, "grille_ext_fond", 1600))
         # murs de fondation
-        f.rect(0, 0, W, D, 1.0, fill=HexColor("#bdbdbd")); f.rect(tf, tf, W - tf, D - tf, .8, fill=white)
-        # semelle continue (cachée)
-        f.rect(-200, -200, W + 200, D + 200, .5, dash=[4, 2]); f.rect(tf + 200, tf + 200, W - tf - 200, D - tf - 200, .5, dash=[4, 2])
-        f.hachures(0, 0, W, tf, 160, 45, GRIS); f.hachures(0, D - tf, W, D, 160, 45, GRIS); f.hachures(0, 0, tf, D, 160, 45, GRIS); f.hachures(W - tf, 0, W, D, 160, 45, GRIS)
+        rt = getattr(self, "retrait", None)
+        if rt:
+            xr_, yr_ = rt
+            f.poly(self.contour(0), 1.0, close=True, fill=HexColor("#bdbdbd")); f.poly(self.contour(-tf), .8, close=True, fill=white)
+            f.poly(self.contour(200), .5, close=True, dash=[4, 2]); f.poly(self.contour(-tf - 200), .5, close=True, dash=[4, 2])
+            f.hachures(0, 0, W, tf, 160, 45, GRIS); f.hachures(0, D - tf, xr_, D, 160, 45, GRIS); f.hachures(0, 0, tf, D, 160, 45, GRIS)
+            f.hachures(W - tf, 0, W, yr_, 160, 45, GRIS); f.hachures(xr_, yr_ - tf, W, yr_, 160, 45, GRIS); f.hachures(xr_ - tf, yr_, xr_, D, 160, 45, GRIS)
+        else:
+            f.rect(0, 0, W, D, 1.0, fill=HexColor("#bdbdbd")); f.rect(tf, tf, W - tf, D - tf, .8, fill=white)
+            # semelle continue (cachée)
+            f.rect(-200, -200, W + 200, D + 200, .5, dash=[4, 2]); f.rect(tf + 200, tf + 200, W - tf - 200, D - tf - 200, .5, dash=[4, 2])
+            f.hachures(0, 0, W, tf, 160, 45, GRIS); f.hachures(0, D - tf, W, D, 160, 45, GRIS); f.hachures(0, 0, tf, D, 160, 45, GRIS); f.hachures(W - tf, 0, W, D, 160, 45, GRIS)
         for (x1, y1, x2, y2) in getattr(self, "fond_int", []):   # murs ou semelles intérieurs
             if y1 == y2:
                 f.rect(x1, y1 - tf / 2, x2, y1 + tf / 2, .8, fill=HexColor("#bdbdbd")); f.rect(x1, y1 - tf / 2 - 200, x2, y1 + tf / 2 + 200, .4, dash=[4, 2])
@@ -824,8 +861,8 @@ class Batiment:
 
     def _mur_sur(self, ax, fixe, a):
         t = self.t
-        if ax == "h" and (abs(fixe - t) < 90 or abs(fixe - (self.D - t)) < 90): return True
-        if ax == "v" and (abs(fixe - t) < 90 or abs(fixe - (self.W - t)) < 90): return True
+        if ax == "h" and (abs(fixe - t) < 90 or abs(fixe - (self.D - t)) < 90 or (self.N2 is not None and abs(fixe - (self.N2 - t / 2)) < 90)): return True
+        if ax == "v" and (abs(fixe - t) < 90 or abs(fixe - (self.W - t)) < 90 or (self.E2 is not None and abs(fixe - (self.E2 - t / 2)) < 90)): return True
         for (x1, y1, x2, y2, e) in self.murs_int:
             if ax == "h" and y1 == y2 and abs(y1 - fixe) <= e / 2 + 90 and min(x1, x2) - 50 <= a <= max(x1, x2) + 50: return True
             if ax == "v" and x1 == x2 and abs(x1 - fixe) <= e / 2 + 90 and min(y1, y2) - 50 <= a <= max(y1, y2) + 50: return True
