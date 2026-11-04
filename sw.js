@@ -1,8 +1,8 @@
 /* Bibliothèque des livres animés — mode hors ligne.
    - Les pages du site (bibliothèque, accueil, index de recherche) : réseau d'abord, copie gardée si Internet manque.
-   - Les livres et les plans : copie gardée sur l'ordinateur, ouverte tout de suite; on vérifie en arrière-plan
-     s'il existe une nouvelle version (sans retélécharger le livre s'il n'a pas changé). */
-const CACHE = "biblio-v1";
+   - Les livres : copie gardée sur l'ordinateur, ouverte tout de suite; on vérifie en arrière-plan s'il existe une nouvelle version.
+   - Les plans et les activités (PDF) : réseau d'abord (version à jour), copie gardée si Internet manque. */
+const CACHE = "biblio-v2";
 const BASE = ["./", "index.html", "accueil.html", "recherche.json", "nouveautes.json"];
 
 self.addEventListener("install", e => {
@@ -68,7 +68,8 @@ self.addEventListener("fetch", e => {
   if (req.method !== "GET") return;
   const u = new URL(req.url);
   if (u.origin === self.location.origin) {
-    if (estFichierLourd(u)) e.respondWith(copieDabord(req, e));
+    if (/\/livres\//.test(u.pathname)) e.respondWith(copieDabord(req, e));        /* livres : copie d'abord (gros fichiers) */
+    else if (/\/(plans|activites)\//.test(u.pathname)) e.respondWith(reseauDabord(req));   /* plans et activités : toujours la version à jour si Internet marche */
     else e.respondWith(reseauDabord(req));
   } else if (estExterne(u)) {
     e.respondWith(externe(req));

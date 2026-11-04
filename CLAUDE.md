@@ -35,7 +35,7 @@
 | `activites/` | PDF d'activités de Jeremy (`<f>.pdf` + `<f>.jpg` couverture 420 px), liste `ACTIVITES` dans le script « Activités » d'`index.html` (avant `#planOv`). |
 | `nouveautes.json`, `nouveautes/` | « Quoi de neuf » et ses mini-formations (voir README). |
 | `recherche.json` | Texte de chaque page de chaque livre (recherche plein texte). **Généré** par `outils/index_recherche.py`. |
-| `sw.js` | Service worker hors ligne : pages du site en réseau d'abord; livres et plans en copie d'abord (mise à jour en arrière-plan). |
+| `sw.js` | Service worker hors ligne (cache `biblio-v2`; **changer le numéro pour forcer la mise à jour chez tout le monde**) : pages du site, plans et activités en réseau d'abord; livres en copie d'abord (mise à jour en arrière-plan). |
 | `img/` | Logo Pavillon, icônes, image d'aperçu des liens (`apercu.jpg`). |
 | `outils/` | Scripts de travail (pas utilisés par le site). Voir plus bas. |
 
