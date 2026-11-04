@@ -2,7 +2,7 @@
    - Les pages du site (bibliothèque, accueil, index de recherche) : réseau d'abord, copie gardée si Internet manque.
    - Les livres : copie gardée sur l'ordinateur, ouverte tout de suite; on vérifie en arrière-plan s'il existe une nouvelle version.
    - Les plans et les activités (PDF) : réseau d'abord (version à jour), copie gardée si Internet manque. */
-const CACHE = "biblio-v3";
+const CACHE = "biblio-v4";
 const BASE = ["./", "index.html", "accueil.html", "recherche.json", "nouveautes.json"];
 
 self.addEventListener("install", e => {
@@ -36,6 +36,12 @@ async function reseauDabord(req) {
 async function copieDabord(req, evt) {
   const c = await caches.open(CACHE);
   const url = req.url.split("?")[0];
+  /* « ?frais=… » : la copie gardée est périmée (ex. livre rechiffré) → on prend le fichier du site et on remplace la copie */
+  if (new URL(req.url).searchParams.has("frais")) {
+    const r = await fetch(url, { cache: "no-store" });
+    if (r.status === 200) await c.put(url, r.clone());
+    return r;
+  }
   const m = await c.match(url);
   const verifier = async () => {
     try {

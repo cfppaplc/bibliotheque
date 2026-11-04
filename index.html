@@ -8696,10 +8696,12 @@ window.ACCES = (function(){
     const brut = await ouvrirEnveloppe(env);
     return CLES[f] = await sub.importKey("raw", brut, "AES-GCM", false, ["decrypt"]);
   }
-  async function dechiffrer(url, f){
-    const r = await fetch(url, { cache:"no-cache" }); if (!r.ok) throw new Error("fichier introuvable (" + r.status + ")");
+  async function dechiffrer(url, f, frais){
+    const r = await fetch(frais ? url + "?frais=" + Date.now() : url, { cache:"no-cache" }); if (!r.ok) throw new Error("fichier introuvable (" + r.status + ")");
     const u = new Uint8Array(await r.arrayBuffer()), k = await cleLivre(f);
-    const clair = await sub.decrypt({ name:"AES-GCM", iv:u.subarray(0, 12) }, k, u.subarray(12));
+    let clair;
+    try { clair = await sub.decrypt({ name:"AES-GCM", iv:u.subarray(0, 12) }, k, u.subarray(12)); }
+    catch(e){ if (!frais) return dechiffrer(url, f, true); throw e; }   /* copie gardée d'une ancienne version du livre : on reprend celle du site */
     return dec.decode(await gunzip(new Uint8Array(clair)));
   }
   const ouvrir = l => dechiffrer("livres/" + encodeURIComponent(l.fichier) + ".chiffre", l.fichier);
