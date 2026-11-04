@@ -162,6 +162,8 @@ class Batiment:
             if aire:
                 a = (x1 - x0) * (y1 - y0) / 1e6
                 f.texte(cx, cy - 160 * f.N / 50 - nl * lh / 2, f"{no} · {str(round(a, 1)).replace('.', ',')} m²", size - 1)
+                if getattr(self, "dims_locaux", True):
+                    f.texte(cx, cy - 160 * f.N / 50 - nl * lh / 2 - lh * .95, f"{(x1 - x0) / 1000:.2f} × {(y1 - y0) / 1000:.2f} m".replace(".", ","), size - 1.5, False, "c", GRIS)
 
     def appareils(self, f, couleur=black, etiquettes=False):
         for (code, x, y, rot) in self.app:
@@ -340,6 +342,9 @@ class Batiment:
         c.showPage()
 
     def _meubles(self, f):
+        if getattr(self, "ameubler", True):
+            import ameublement
+            ameublement.meubler(self, f)
         for (x0, y0, x1, y1, lab) in getattr(self, "comptoirs", []):
             f.rect(x0, y0, x1, y1, .45, dash=None)
             if lab: f.texte((x0 + x1) / 2, (y0 + y1) / 2, lab, 5.5, col=GRIS)
@@ -995,11 +1000,13 @@ class Batiment:
         c = rl_canvas.Canvas(chemin, pagesize=(PAGE_W * MM, PAGE_H * MM), pageCompression=1)
         c.setTitle(f"{self.dossier['projet'].replace(chr(10), ' ')} — dossier de plans d'exercice")
         c.setAuthor("Pavillon de l'Avenir · plan pédagogique")
+        import controle
+        for m in controle.controler(self, self.dossier.get("code", "")): print("  ! contrôle :", m)
         self.feuille_garde(c)
         extra = [fn for (_, _, fn) in getattr(self, "feuilles_extra", [])]   # feuilles civiles (C-101…), après le plan de site
-        for fn in (self.feuille_legende, self.feuille_site, *extra, self.feuille_plan, self.feuille_toiture, self.feuille_elevations, self.feuille_coupe, self.feuille_coupes,
+        for fn in (self.feuille_legende, self.feuille_code, self.feuille_site, *extra, self.feuille_plan, self.feuille_plafond, self.feuille_toiture, self.feuille_elevations, self.feuille_coupe, self.feuille_coupes,
                    self.feuille_details, self.feuille_finis, self.feuille_fondations,
-                   self.feuille_plomberie, self.feuille_iso, self.feuille_electricite, self.feuille_cvca):
+                   self.feuille_plomberie, self.feuille_iso, self.feuille_plomb_calc, self.feuille_electricite, self.feuille_bilan, self.feuille_cvca):
             fn(c)
         c.save()
 
@@ -1017,12 +1024,12 @@ class Batiment:
         yy -= 4
         for l in wrap(self.description, 95):
             c_.drawString(24 * MM, yy * MM, l); yy -= 5.2
-        lignes = [["000", "Page de garde et liste des feuilles"], ["A-001", "Légende, symboles et abréviations"], ["A-100", "Plan d'implantation et de site"],
-                  *[[n, t] for (n, t, _) in getattr(self, "feuilles_extra", [])], ["A-101", "Plan du rez-de-chaussée"], ["A-102", "Plan de toiture"],
+        lignes = [["000", "Page de garde et liste des feuilles"], ["A-001", "Légende, symboles et abréviations"], ["A-002", "Analyse du code de construction"], ["A-100", "Plan d'implantation et de site"],
+                  *[[n, t] for (n, t, _) in getattr(self, "feuilles_extra", [])], ["A-101", "Plan du rez-de-chaussée"], ["A-601", "Plan de plafond"], ["A-102", "Plan de toiture"],
                   ["A-201", "Élévations"], ["A-301", "Coupe transversale et nomenclatures"], ["A-302", "Coupe longitudinale, coupe de mur et matériaux"],
                   ["A-401", "Tableau des locaux et des finis"], ["A-501", "Détails types de construction"], ["S-101", "Plan des fondations et détail type"],
-                  ["P-101", "Plan de plomberie"], ["P-102", "Schéma isométrique et nomenclature des appareils"],
-                  ["E-101", "Plan d'électricité"], ["M-101", "Plan de chauffage, ventilation et climatisation"]]
+                  ["P-101", "Plan de plomberie"], ["P-102", "Schéma isométrique et nomenclature des appareils"], ["P-201", "Dimensionnement de la plomberie"],
+                  ["E-101", "Plan d'électricité"], ["E-201", "Bilan de charge et panneau"], ["M-101", "Plan de chauffage, ventilation et climatisation"]]
         f.tableau(24, yy - 10, "LISTE DES FEUILLES", ["Feuille", "Titre"], lignes, [22, 110], h=6, size=8.5)
         f.tableau(178, yy - 10, "DONNÉES DU BÂTIMENT", ["Élément", "Valeur"], self.donnees, [58, 92], h=6, size=8.5)
         f.notes("UTILISATION EN CLASSE", ["Ce dossier sert à apprendre à lire des plans : repérer les feuilles, les échelles, les symboles, les cotes et les liens entre les disciplines.",
@@ -1037,5 +1044,7 @@ def f_inverse(*a):
 
 import generique as _gen
 _gen.installer(Batiment)
+import calculs as _calc
+_calc.installer(Batiment)
 for _n in ("feuille_coupes", "_N_mur", "_z_haut_mur", "_coupe_longitudinale", "_coupe_mur", "_legende_materiaux"):
     setattr(Batiment, _n, getattr(_coupes, _n))

@@ -149,7 +149,7 @@ rdc = niveau(commun, no_plan="A-102", titre_plan="PLAN DU REZ-DE-CHAUSSÉE", no_
               (14100, 300, 14100, 1500, 125), (14100, 4500, 14100, 7200, 125), (14100, 9400, 14100, 10480, 125),
               (14100, 5862, 17700, 5862, 125), (19500, 5862, 23700, 5862, 125)],
     portes=[dict(no="101", axe="h", at=S, s=1000, w=1000, sens=1, pivot="a", h=2400, mat="Acier isolé, vitrage pleine hauteur", quinc="Serrure + pêne dormant"),
-            dict(no="102", axe="h", at=N, s=7000, w=2400, genre="coulissante", h=2400, mat="PVC, vitrage triple", quinc="Loquet + barre de sécurité"),
+            dict(no="102", axe="h", at=N, s=8100, w=1800, genre="coulissante", h=2400, mat="PVC, vitrage triple", quinc="Loquet + barre de sécurité"),
             dict(no="103", axe="v", at=2900, s=400, w=860, sens=1, pivot="a", quinc="Passage"),
             dict(no="104", axe="h", at=3050, s=900, w=760, sens=-1, pivot="b", quinc="Passage"),
             dict(no="105", axe="h", at=4350, s=3300, w=900, sens=1, pivot="a", quinc="Passage"),

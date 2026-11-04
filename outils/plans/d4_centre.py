@@ -31,7 +31,7 @@ portes = [
     dict(no="110", axe="h", at=YC1, s=38000, w=915, sens=1, pivot="a", mat="Acier", quinc="Barre panique"),
     dict(no="111", axe="v", at=O, s=12000, w=915, sens=1, pivot="a", h=2135, mat="Acier isolé", quinc="Barre panique (issue)"),
     dict(no="112", axe="v", at=E, s=12000, w=915, sens=1, pivot="a", h=2135, mat="Acier isolé", quinc="Barre panique (issue)"),
-    dict(no="113", axe="h", at=N, s=2600, w=3050, genre="double", sens=1, h=3050, mat="Porte de garage sectionnelle isolée", quinc="Opérateur électrique (quai)"),
+    dict(no="113", axe="h", at=N, s=1500, w=3050, genre="double", sens=1, h=3050, mat="Porte de garage sectionnelle isolée", quinc="Opérateur électrique (quai)"),
     dict(no="114", axe="h", at=YC2, s=7500, w=915, sens=1, pivot="a", mat="Acier", quinc="Serrure (accès restreint)"),
     dict(no="115", axe="h", at=YC2, s=12000, w=915, sens=1, pivot="a", mat="Acier", quinc="Serrure (accès restreint)"),
     dict(no="116", axe="h", at=YC2, s=16000, w=915, sens=1, pivot="a", quinc="Poussée-tirée + ferme-porte"),
@@ -45,7 +45,7 @@ fenetres = vitrines(S, [(500, 13850), (14150, 21850), (22150, 29850), (30150, 34
                     [p for p in portes if p["axe"] == "h" and abs(p["at"] - S) < 1]) + [
     dict(type="D", axe="v", at=O, s=5200, w=600), dict(type="D", axe="v", at=O, s=7100, w=600), dict(type="D", axe="v", at=O, s=9000, w=600),
     dict(type="D", axe="v", at=E, s=5200, w=600), dict(type="D", axe="v", at=E, s=7100, w=600), dict(type="D", axe="v", at=E, s=9000, w=600),
-    dict(type="C", axe="h", at=N, s=14500, w=7000), dict(type="C", axe="h", at=N, s=33000, w=6000),
+    dict(type="C", axe="h", at=N, s=14500, w=3000), dict(type="C", axe="h", at=N, s=18300, w=3000), dict(type="C", axe="h", at=N, s=33000, w=6000),
 ]
 locaux = [("101", "Épicerie", I0, I0, 13905, 10905), ("102", "Pharmacie", 14095, I0, 21905, 10905),
           ("103", "Restaurant", 22095, I0, 29905, 10905), ("104", "Boutique A", 30095, I0, 34905, 10905),

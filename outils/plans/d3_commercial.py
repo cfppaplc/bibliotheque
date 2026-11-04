@@ -18,7 +18,7 @@ portes = [
     dict(no="101", axe="h", at=S, s=5000, w=1830, genre="double", sens=-1, h=2135, mat="Aluminium et verre trempé", quinc="Barre panique + serrure à cylindre"),
     dict(no="102", axe="h", at=N, s=2000, w=1830, genre="double", sens=1, h=2135, mat="Acier isolé", quinc="Barre panique (livraison)"),
     dict(no="103", axe="v", at=E, s=7750, w=915, sens=1, pivot="a", h=2135, mat="Acier isolé", quinc="Barre panique (issue)"),
-    dict(no="104", axe="h", at=7400, s=9500, w=1830, genre="double", sens=1, quinc="Poussée-tirée"),
+    dict(no="104", axe="h", at=7400, s=9500, w=1830, genre="double", sens=-1, quinc="Poussée-tirée"),
     dict(no="105", axe="h", at=7400, s=24000, w=915, sens=-1, pivot="a", quinc="Bec-de-cane, serrure"),
     dict(no="106", axe="h", at=7400, s=27300, w=915, sens=-1, pivot="a", quinc="Bec-de-cane"),
     dict(no="107", axe="h", at=9000, s=3500, w=1830, genre="double", sens=1, mat="Acier", quinc="Serrure + arrêts"),

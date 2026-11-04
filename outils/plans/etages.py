@@ -492,26 +492,33 @@ class MaisonEtages(Batiment):
     def produire(self, chemin):
         c = rl_canvas.Canvas(chemin, pagesize=(PAGE_W * MM, PAGE_H * MM), pageCompression=1)
         c.setTitle(f"{self.dossier['projet'].replace(chr(10), ' ')} — dossier de plans d'exercice"); c.setAuthor("Pavillon de l'Avenir · plan pédagogique")
+        import controle
+        for lv, nm in zip(self.lv, ("D1 sous-sol", "D1 RDC", "D1 étage")):
+            for m in controle.controler(lv, nm): print("  ! contrôle :", m)
         self.feuille_garde(c)
         self.feuille_legende(c)
+        self.feuille_code(c)
         self.feuille_site(c)
         for lv in self.lv: lv.feuille_plan(c)
+        for i, (lv, nom) in enumerate(zip(self.lv, ("Sous-sol", "Rez-de-chaussée", "Étage"))): lv.feuille_plafond(c, f"A-60{i + 1}", nom)
         self.feuille_toiture(c)
         self.feuille_elevations(c); self.feuille_coupe(c); self.feuille_coupes(c); self.feuille_details(c); self.feuille_finis(c)
         self.feuille_fondations(c); self.feuille_charpente(c)
         for lv in self.lv: lv.feuille_plomberie(c)
         self.feuille_iso(c)
+        self.feuille_plomb_calc(c)
         for lv in self.lv: lv.feuille_electricite(c)
+        self.feuille_bilan(c)
         for lv in self.lv: lv.feuille_cvca(c)
         c.save()
 
     def liste_feuilles(self):
-        L = [["000", "Page de garde et liste des feuilles"], ["A-001", "Légende, symboles et abréviations"], ["A-100", "Plan d'implantation et de site"]]
+        L = [["000", "Page de garde et liste des feuilles"], ["A-001", "Légende, symboles et abréviations"], ["A-002", "Analyse du code de construction"], ["A-100", "Plan d'implantation et de site"]]
         L += [[lv.no_plan, lv.titre_plan.replace("\n", " ").capitalize()] for lv in self.lv]
-        L += [["A-104", "Plan de toiture"], ["A-201", "Élévations"], ["A-301", "Coupe transversale et nomenclatures"], ["A-302", "Coupe longitudinale, coupe de mur et matériaux"],
+        L += [["A-601", "Plans de plafond (sous-sol, RDC, étage)"], ["A-104", "Plan de toiture"], ["A-201", "Élévations"], ["A-301", "Coupe transversale et nomenclatures"], ["A-302", "Coupe longitudinale, coupe de mur et matériaux"],
               ["A-401", "Tableau des locaux et des finis"], ["A-501", "Détails types de construction"], ["S-101", "Plan des fondations et détail type"], ["S-102", "Plans de charpente (planchers et toit)"]]
-        L += [[lv.no_plomb, lv.titre_plomb.replace("\n", " ").capitalize()] for lv in self.lv] + [[self.no_iso, "Schéma isométrique et nomenclature des appareils"]]
-        L += [[lv.no_elec, lv.titre_elec.replace("\n", " ").capitalize()] for lv in self.lv]
+        L += [[lv.no_plomb, lv.titre_plomb.replace("\n", " ").capitalize()] for lv in self.lv] + [[self.no_iso, "Schéma isométrique et nomenclature des appareils"], ["P-201", "Dimensionnement de la plomberie"]]
+        L += [[lv.no_elec, lv.titre_elec.replace("\n", " ").capitalize()] for lv in self.lv] + [["E-201", "Bilan de charge et panneau"]]
         L += [[lv.no_cvca, lv.titre_cvca.replace("\n", " ").capitalize()] for lv in self.lv]
         return L
 
