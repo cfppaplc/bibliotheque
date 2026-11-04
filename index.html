@@ -5308,7 +5308,7 @@ function ouvrirContenu(c){
 }
 /* retour au tableau de bord quand on ferme les plans */
 document.addEventListener("DOMContentLoaded", () => { const ov = document.getElementById("planOv"); if (!ov) return;
-  new MutationObserver(() => { if (ov.hidden) ov.classList.remove("acte"); if (ov.hidden && window.RETOUR_ACTIVITES){ window.RETOUR_ACTIVITES = false; try { document.getElementById("actBtn").click(); } catch(e){} }
+  new MutationObserver(() => { if (ov.hidden && window.RETOUR_ACTIVITES){ window.RETOUR_ACTIVITES = false; try { document.getElementById("actBtn").click(); } catch(e){} }
     if (ov.hidden && window.RETOUR_ACCUEIL){ window.RETOUR_ACCUEIL = false; try { window.ouvrirAccueil(); } catch(e){} } }).observe(ov, { attributes:true, attributeFilter:["hidden"] }); });
 /* version du livre (champ « version » de LIVRES) et date de la dernière mise à jour connue (Quoi de neuf) */
 function versionLivre(l){ const e = (typeof NOUV !== "undefined" ? NOUV : []).filter(n => n.livre === l.fichier && n.date).sort((a, b) => b.date.localeCompare(a.date))[0];
@@ -6444,8 +6444,6 @@ initAdmin();
   body.clair .act-sec b{background:#0000000f;color:#55555b}
   body.clair .act-imgw{background:#fff}
   /* activités compactes (3 nov.) : rangées de tuiles comme les livres, fiche au toucher */
-  /* activité projetée : barre de lecture (pas d'outils de plan : mesurer, échelle, autre plan) */
-  .plan-ov.acte [data-tool="meas"],.plan-ov.acte #plmCal,.plan-ov.acte #plmOpen,.plan-ov.acte #plmAccueil{display:none!important}
   .act-outils{margin-left:auto;display:flex;align-items:center;gap:10px;min-width:0}
   .act-rech{position:relative;display:flex;align-items:center}
   .act-rech svg{position:absolute;left:12px;color:#8d8d95;pointer-events:none}
@@ -6595,16 +6593,14 @@ initAdmin();
     if (b.dataset.a === "imprimer"){ window.open("activites/" + a.f + ".pdf", "_blank"); return; }
     /* Projeter : l'activité s'ouvre dans le lecteur de livres (même barre d'outils que les livres de compétence) */
     let blob; try { blob = await pdfDe(a); } catch (er) { window.open("activites/" + a.f + ".pdf", "_blank"); return; }
-    const l = { titre:a.titre, fichier:"activite-" + a.f, categorie:a.prog };
+    const l = { titre:a.titre, fichier:"activite-" + a.f, categorie:a.prog, couverture:"activites/" + a.f + ".jpg" };
     chargement(l);
     try {
       const html = await livreDePdf(blob, a.titre);
       chargement(null); ov.hidden = true; window.RETOUR_ACTIVITES_LIVRE = true; ouvrirLivre(l, html);
     } catch (er) {
       chargement(null);
-      /* repli : visionneuse des plans */
-      ov.hidden = true; window.RETOUR_ACTIVITES = true; document.getElementById("planBtn").click(); document.getElementById("planOv").classList.add("acte");
-      setTimeout(async () => { try { await window.__plans.charger({ id:"activite-" + a.f, name:a.titre, type:"pdf", blob, used:Date.now() }); } catch (e2) { window.open("activites/" + a.f + ".pdf", "_blank"); } }, 80);
+      window.open("activites/" + a.f + ".pdf", "_blank");   /* si les pages ne se préparent pas : le PDF dans un onglet */
     }
   });
   ov.addEventListener("input", e => { if (e.target.id === "actQ"){ F.q = e.target.value; dessiner(); } });
