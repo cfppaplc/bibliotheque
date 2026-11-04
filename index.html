@@ -6170,7 +6170,7 @@ initAdmin();
   const catalogue = () => ({ type:"accueil-catalogue",
     livres:LIVRES.filter(l => l.fichier).map(l => ({ f:l.fichier, titre:l.titre, niveau:l.niveau || "", pages:l.pages || 0 })),
     modeles:MODELES.map(m => ({ id:m.id, nom:m.nom })), schemas:lireSch().map(x => ({ id:String(x.id), nom:x.nom })),
-    dossiers:[[1, "Maison unifamiliale"], [2, "Duplex jumelé"], [3, "Bâtiment commercial"], [4, "Centre commercial"], [5, "Ferme laitière"]] });
+    dossiers:[[1, "Maison unifamiliale"], [2, "Duplex jumelé"], [3, "Bâtiment commercial"], [4, "Centre commercial"], [5, "Ferme laitière"], [6, "Détails de plomberie et de chauffage"]] });
   window.addEventListener("message", e => {
     if (e.source === fr.contentWindow && e.data && e.data.type === "accueil-fermer") { marquerTdb(false); if (livreOuvert()) closeReader(); fermer(); return; }
     if (e.source === fr.contentWindow && e.data && e.data.type === "accueil-revenir") { if (livreOuvert()) fermer(true); return; }
@@ -6493,6 +6493,7 @@ initAdmin();
         <button class="pl-ex pn-card" data-ex="3" type="button"><span class="pn-img"><img src="plans/dossier-3-elevation.jpg" alt="" loading="lazy"><i>19 feuilles</i></span><b>Bâtiment commercial</b><small>Dossier 3 · plan en L avec cour, tour d'entrée en brique</small></button>
         <button class="pl-ex pn-card" data-ex="4" type="button"><span class="pn-img"><img src="plans/dossier-4-elevation.jpg" alt="" loading="lazy"><i>21 feuilles</i></span><b>Centre commercial</b><small>Dossier 4 · terrain en pente, nivellement, drainage</small></button>
         <button class="pl-ex pn-card" data-ex="5" type="button"><span class="pn-img"><img src="plans/dossier-5-elevation.jpg" alt="" loading="lazy"><i>9 feuilles</i></span><b>Ferme laitière</b><small>Dossier 5 · stabulation libre, robots de traite</small></button>
+        <button class="pl-ex pn-card" data-ex="6" type="button"><span class="pn-img"><img src="plans/dossier-6-elevation.jpg" alt="" loading="lazy"><i>10 feuilles</i></span><b>Détails de plomberie et de chauffage</b><small>Dossier 6 · gros plans : réservoir, chaudière, chauffe-eau, entrée d'eau, gaz</small></button>
       </div>
     </section>
     <section class="pn-row pn-exo" aria-label="Exercices et corrigés">
@@ -6930,7 +6931,7 @@ initAdmin();
   function hint(t) { const h = $("plHint"); h.textContent = t; h.hidden = false; clearTimeout(hintT); hintT = setTimeout(() => h.hidden = true, 4500); }
   $("plOpenBig").onclick = () => $("plFile").click();
   // Dossiers de plans d'exercice intégrés (PDF de 10 feuilles)
-  const DOSSIERS = { 1: "Maison unifamiliale", 2: "Duplex jumelé", 3: "Bâtiment commercial", 4: "Centre commercial", 5: "Ferme laitière" };
+  const DOSSIERS = { 1: "Maison unifamiliale", 2: "Duplex jumelé", 3: "Bâtiment commercial", 4: "Centre commercial", 5: "Ferme laitière", 6: "Détails de plomberie et de chauffage" };
   const b64blob = (id, type) => { const bin = atob(document.getElementById(id).textContent.trim()); return new Blob([Uint8Array.from(bin, ch => ch.charCodeAt(0))], { type }); };
   const fichierDossier = async (n, ext, type) => {
     if (document.getElementById("plDossier" + n + (ext === "png" ? "Img" : ""))) return b64blob("plDossier" + n + (ext === "png" ? "Img" : ""), type);

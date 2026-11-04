@@ -16,6 +16,7 @@ DOSSIERS = {
     3: ("d3_commercial", "commerce", "Dossier-3-Batiment-commercial.pdf", "PLAN DU REZ-DE-CHAUSSÉE"),
     4: ("d4_centre", "centre", "Dossier-4-Centre-commercial.pdf", "PLAN DU REZ-DE-CHAUSSÉE"),
     5: ("ferme", None, "Dossier-5-Ferme-laitiere.pdf", "PLAN DE L'ÉTABLE"),
+    6: ("d6_details", None, "Dossier-6-Details.pdf", "RÉSERVOIR TAMPON ET"),
 }
 
 
@@ -41,6 +42,8 @@ def produire(n, publier):
     obj = None
     if mod == "ferme":
         m.Ferme().produire(chemin)
+    elif mod == "d6_details":
+        m.produire(chemin)
     else:
         obj = getattr(m, DOSSIERS[n][1]); obj.produire(chemin)
     nb = pages(chemin)
