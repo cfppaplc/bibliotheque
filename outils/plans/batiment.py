@@ -676,7 +676,16 @@ class Batiment:
         if a[1] == b[1]: return [p, (p[0], q[1])] if abs(p[0] - q[0]) < 1 else [p, (p[0], p[1]), (q[0], p[1]), q] if False else [p, (q[0], p[1]), q]
         return [p, (p[0], q[1]), q]
 
+    @staticmethod
+    def _long(pts): return sum(abs(a[0] - b[0]) + abs(a[1] - b[1]) for a, b in zip(pts, pts[1:]))
+
+    def _der(self, f, pts, w, col):
+        """Dérivation : trait plein si courte; trait discontinu (dans le plafond ou le plancher) si longue."""
+        if self._long(pts) > 2200: f.poly(pts, w, col, dash=[8, 3]); self._longues = True
+        else: f.poly(pts, w, col)
+
     def feuille_plomberie(self, c):
+        self._longues = False
         f = Feuille(c, self.dossier, getattr(self, "no_plomb", "P-101"), getattr(self, "titre_plomb", "PLAN DE PLOMBERIE\nREZ-DE-CHAUSSÉE"), f"1:{self.Nplan}")
         self._centrer(f, self.Nplan)
         self.plan_base(f, etiquettes=False, pale=True)
@@ -691,7 +700,7 @@ class Batiment:
             o = self.sortie(code, x, y, rot)
             if o and code not in ("lv",):
                 pl = self._reseau_de(o)
-                q, seg = self._projeter(o, pl["coll"]); f.poly(self._chemin(o, q, seg), 1.6, DR, dash=[5, 2])
+                q, seg = self._projeter(o, pl["coll"]); ch = self._chemin(o, q, seg); f.poly(ch, 1.6, DR, dash=[5, 2] if self._long(ch) <= 2200 else [9, 3, 2, 3])
         for pl in nets:
             f.poly(pl["ef"], 1.5, EF); f.poly(pl["ec"], 1.5, EC)
             for pts in pl.get("ef_extra", []): f.poly(pts, 1.2, EF)
@@ -700,10 +709,10 @@ class Batiment:
             a = APP[code]; pl = self._reseau_de((x, y))
             sx, sy = rotp(-90, 60, rot); px, py = x + sx, y + sy
             if a[4] not in ("—",) and code != "ce":
-                q, seg = self._projeter((px, py), pl["ef"]); f.poly(self._chemin((px, py), q, seg), 1.0, EF)
+                q, seg = self._projeter((px, py), pl["ef"]); self._der(f, self._chemin((px, py), q, seg), 1.0, EF)
             sx, sy = rotp(90, 60, rot); px, py = x + sx, y + sy
             if a[5] not in ("—",) and code != "ce":
-                q, seg = self._projeter((px, py), pl["ec"]); f.poly(self._chemin((px, py), q, seg), 1.0, EC)
+                q, seg = self._projeter((px, py), pl["ec"]); self._der(f, self._chemin((px, py), q, seg), 1.0, EC)
         # chauffe-eau : arrivée d'eau froide (bas gauche) et sortie d'eau chaude (haut droite) raccordées aux colonnes
         for (code, x, y, rot) in self.app:
             if code != "ce": continue
@@ -730,7 +739,9 @@ class Batiment:
         f.nord(DRAW[2] - 16, DRAW[3] - 18)
         f.titre_vue(DRAW[0] + 4, DRAW[1] + 6, 1, "PLAN DE PLOMBERIE", f"1:{self.Nplan}")
         f.barre_echelle(DRAW[0] + 120, DRAW[1] + 6, self.Nplan)
-        f.notes("NOTES DE PLOMBERIE", self.notes_plomb)
+        nt = list(self.notes_plomb)
+        if self._longues: nt.append("Trait interrompu : longue dérivation dans le plancher ou le plafond, suit les solives (tracé schématique).")
+        f.notes("NOTES DE PLOMBERIE", nt)
         y = f.zone_notes_haut
         c_ = f.c; x0 = 352
         c_.setFont(FONT_B, 8); c_.drawString(x0 * MM, y * MM, "LÉGENDE"); y -= 5
