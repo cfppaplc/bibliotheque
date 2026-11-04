@@ -97,6 +97,140 @@ def _contexte(b, nb, n, pdf, tmp):
     return C
 
 
+# ------------------------------------------------------------------ questions avec image (variées : titres, cartouches, tableaux, légendes, disciplines)
+DISC = {"A": "Architecture", "S": "Structure", "P": "Plomberie", "E": "Électricité", "M": "Chauffage et ventilation (mécanique)", "C": "Génie civil"}
+_INFO = {}
+
+
+def _texte_zone(pdf, page, x, y, w, h):
+    pt = 72 / 25.4
+    out = subprocess.run(["pdftotext", "-f", str(page), "-l", str(page), "-x", str(int(x * pt)), "-y", str(int(y * pt)), "-W", str(int(w * pt)), "-H", str(int(h * pt)), "-layout", pdf, "-"], capture_output=True, text=True).stdout
+    return [l.strip() for l in out.splitlines() if l.strip()]
+
+
+def _mots(pdf, page):
+    from xml.etree import ElementTree as ET
+    x = subprocess.run(["pdftotext", "-bbox", "-f", str(page), "-l", str(page), pdf, "-"], capture_output=True, text=True).stdout
+    x = re.sub(r"<!DOCTYPE[^>]*>", "", x).replace('xmlns="http://www.w3.org/1999/xhtml"', "")
+    k = 25.4 / 72
+    return [(float(w.get("xMin")) * k, float(w.get("yMin")) * k, float(w.get("xMax")) * k, float(w.get("yMax")) * k, w.text or "") for w in ET.fromstring(x).iter("word")]
+
+
+def _info(pdf, code):
+    """Titre et échelle d'une feuille, lus dans son cartouche (texte réel du PDF)."""
+    cle = (pdf, code)
+    if cle in _INFO: return _INFO[cle]
+    p = _pages(pdf).get(code)
+    if not p: return None
+    t = [l for l in _texte_zone(pdf, p, 348, 207, 76, 19) if not l.startswith("TITRE DE LA") and not l.startswith("CONÇU")]
+    e = _texte_zone(pdf, p, 348, 242, 38, 11)
+    ech = e[1] if len(e) > 1 else ""
+    _INFO[cle] = dict(page=p, titre=" ".join(t), ech=ech); return _INFO[cle]
+
+
+def _zone_png(pdf, page, x, y, w, h, sortie, dpi=120):
+    k = dpi / 25.4
+    base = sortie[:-4]
+    subprocess.run(["pdftoppm", "-r", str(dpi), "-f", str(page), "-l", str(page), "-x", str(int(x * k)), "-y", str(int(y * k)), "-W", str(int(w * k)), "-H", str(int(h * k)), "-png", "-singlefile", pdf, base], check=True)
+    return sortie
+
+
+def _avec_image(q, f, w, legende):
+    from PIL import Image
+    iw, ih = Image.open(f).size
+    q.update(img=f, img_w=w, img_h=w * ih / iw, legende=legende); return q
+
+
+def images(C):
+    """Banque de questions avec image : 7 sortes × 4 feuilles différentes. Le dossier n prend les siennes (voir _choisir)."""
+    rng = C.rng
+    def codes():
+        c = [k for k in _pages(C.pdf) if k[0] in DISC]
+        return sorted(c)
+    def feuille(s, exclure=()):
+        l = [c for c in codes() if c not in exclure and _info(C.pdf, c)]
+        return l[(s * 5 + C.n * 3) % len(l)]
+    def cat_de(code): return {"P": "plomb", "E": "elec", "M": "cvca"}.get(code[0], "arch")
+    def titre_options(code):
+        t = _info(C.pdf, code)["titre"]; autres = list({_info(C.pdf, c)["titre"] for c in codes() if c != code and _info(C.pdf, c)} - {t}); rng.shuffle(autres)
+        o = [t] + autres[:3]; rng.shuffle(o); return o, t
+
+    def thumb_titre(s):
+        if not C.pdf: return None
+        code = feuille(s); f = _vignette(C.pdf, code, os.path.join(C.tmp, f"vt-{s}.png"))
+        if not f: return None
+        o, t = titre_options(code)
+        return _avec_image(qs.qcm("Observe cette feuille (réduite) : quel est son titre ?", o, t, f"Feuille {code} — titre au cartouche (ou page de garde)", cat=cat_de(code), niv=2), f, 72, "Miniature d'une feuille du dossier")
+    def cart_echelle(s):
+        if not C.pdf: return None
+        for k in range(len(codes())):
+            code = feuille(s + k); info = _info(C.pdf, code)
+            if re.match(r"^1:\d+$", info["ech"]): break
+        else: return None
+        f = _cartouche(C.pdf, code, os.path.join(C.tmp, f"ce-{s}.png"))
+        if not f: return None
+        v = int(info["ech"][2:]); ech = [20, 25, 50, 75, 100, 125, 200, 250, 500]; aut = [e for e in ech if e != v]; rng.shuffle(aut); o = sorted([v] + aut[:3])
+        return _avec_image(qs.qcm("Quelle est l'échelle de la feuille dont voici le cartouche ?", [f"1:{x}" for x in o], info["ech"], f"Cartouche de la feuille {code}, case « Échelle »", cat="lecture", niv=1), f, 60, "Cartouche (coin inférieur droit d'une feuille)")
+    def cart_titre(s):
+        if not C.pdf: return None
+        code = feuille(s); info = _info(C.pdf, code); f = _cartouche(C.pdf, code, os.path.join(C.tmp, f"ct-{s}.png"))
+        if not f: return None
+        return _avec_image(qs.rep("Lis ce cartouche : quel est le numéro de la feuille et quel est son titre ?", f"{code} — {info['titre'].capitalize()}", f"Cartouche de la feuille {code}", cat=cat_de(code), niv=1), f, 60, "Cartouche (coin inférieur droit d'une feuille)")
+    def thumb_disc(s):
+        if not C.pdf: return None
+        code = feuille(s); f = _vignette(C.pdf, code, os.path.join(C.tmp, f"vd-{s}.png"))
+        if not f: return None
+        bonne = DISC[code[0]]; aut = [v for k, v in DISC.items() if v != bonne]; rng.shuffle(aut); o = [bonne] + aut[:3]; rng.shuffle(o)
+        return _avec_image(qs.qcm("Observe cette feuille (réduite) : à quelle discipline appartient-elle ?", o, bonne, f"Lettre du numéro de la feuille ({code[0]} = {bonne.lower()})", cat=cat_de(code), niv=2), f, 72, "Miniature d'une feuille du dossier")
+    def donnees(s):
+        d = getattr(C.b, "donnees", None)
+        if not C.pdf or not d: return None
+        mot = next((m for m in _mots(C.pdf, 1) if m[4].startswith("DONN")), None)
+        if not mot: return None
+        f = _zone_png(C.pdf, 1, mot[0] - 3, mot[1] - 3, 120, 8 + 6.7 * len(d), os.path.join(C.tmp, f"dn-{s}.png"))
+        ligne = d[(s + C.n) % len(d)]
+        return _avec_image(qs.rep(f"Selon ce tableau de la page de garde, quelle est la valeur de « {ligne[0]} » ?", ligne[1], "Page de garde : « Données du bâtiment »", cat="lecture", niv=1), f, 100, "Extrait de la page de garde")
+    def legende(s):
+        if not C.pdf: return None
+        cand = [c for c in codes() if c[0] == "P" and "PLOMBERIE" in _info(C.pdf, c)["titre"].upper() and "SCHÉMA" not in _info(C.pdf, c)["titre"].upper()]
+        if not cand: return None
+        code = cand[0]; p = _info(C.pdf, code)["page"]
+        mot = next((m for m in _mots(C.pdf, p) if m[4] == "LÉGENDE"), None)
+        if not mot: return None
+        f = _zone_png(C.pdf, p, 346, mot[1] - 3, 78, 30, os.path.join(C.tmp, f"lg-{s}.png"))
+        items = [("l'eau froide (EF)", "bleu"), ("l'eau chaude (EC)", "rouge"), ("le drainage sanitaire", "vert"), ("la ventilation (évent)", "mauve")]
+        it = items[(s + C.n) % 4]
+        o = ["bleu", "rouge", "vert", "mauve"]
+        return _avec_image(qs.qcm(f"D'après cette légende d'un plan de plomberie, quelle couleur représente {it[0]} ?", o, it[1], f"Légende de la feuille {code}", cat="plomb", niv=1), f, 70, "Légende d'un plan de plomberie")
+    def finis(s):
+        if not C.pdf or not hasattr(C.b, "locaux") and not hasattr(C.b, "lv"): return None
+        p = _pages(C.pdf).get("A-401")
+        if not p: return None
+        mot = next((m for m in _mots(C.pdf, p) if m[4] == "TABLEAU"), None)
+        if not mot: return None
+        import generique
+        rows = []
+        for (nivnom, locaux, hc) in generique._niveaux_finis(C.b):
+            for (no, nom, *_r) in locaux:
+                pl, mu, pt, pb = generique.finis_de(nom)
+                if "sous-sol" in nivnom.lower() and pl.startswith("Bois"): pl = "Plancher flottant stratifié sur sous-couche"
+                rows.append((no, C.nom(nom), pl))
+        vis = rows[:3]; no, nom, pl = vis[(s + C.n) % len(vis)]
+        f = _zone_png(C.pdf, p, mot[0] - 3, mot[1] - 4, 200, 58, os.path.join(C.tmp, f"fi-{s}.png"))
+        autres = list({r[2] for r in rows} - {pl}); rng.shuffle(autres)
+        if len(autres) < 3: return None
+        o = [pl] + autres[:3]; rng.shuffle(o)
+        return _avec_image(qs.qcm(f"Selon ce tableau, quel fini de plancher est prévu pour le local {no} « {nom} » ?", o, pl, "Tableau des locaux et des finis, feuille A-401", cat="arch", niv=2), f, 150, "Tableau des finis")
+
+    genres = [thumb_titre, cart_echelle, cart_titre, thumb_disc, donnees, legende, finis]
+    pool = []
+    for j in range(5):        # indice 4j + p : le dossier p+1 reçoit une sorte différente à chaque rang
+        for p in range(4):
+            g = genres[(j + p) % len(genres)]
+            pool.append((lambda g=g, s=j * 4 + p: g(s)))
+    return pool
+
+
 # ------------------------------------------------------------------ banque de questions (chaque fonction retourne une question ou None)
 def banque(C):
     b, rng, qs_ = C.b, C.rng, qs
@@ -390,42 +524,11 @@ def banque(C):
         ps = [next(o for _, o in C.portes if o["w"] == w) for w in portes_w[:4]]
         return qs_.ordre("Classe ces portes de la plus étroite à la plus large.", [f"Porte {o['no']}" for o in ps], "de la plus étroite à la plus large", "Tableau des portes, feuille A-301", rng, cat="arch")
 
-    # ---------- images tirées des plans
-    def img_q(code, nom_img, w=70):
-        from PIL import Image
-        f = _vignette(C.pdf, code, os.path.join(C.tmp, f"{nom_img}.png")) if C.pdf else None
-        if not f: return None
-        iw, ih = Image.open(f).size; return f, w, w * ih / iw
-    def reconnaitre(code, bonne, cat):
-        r = img_q(code, f"v-{code}")
-        if not r: return None
-        f, w, h = r
-        noms = ["Plan de plomberie", "Plan d'électricité", "Plan de chauffage et de ventilation", "Élévations", "Plan des fondations", "Plan de toiture", "Plan du rez-de-chaussée"]
-        o = [bonne] + [x for x in noms if x != bonne][:3]; rng.shuffle(o)
-        q = qs_.qcm("Observe cette feuille (réduite) : de quel type de feuille s'agit-il ?", o, bonne, f"Feuille {code} (compare avec la liste de la page de garde)", cat=cat, niv=2)
-        q.update(img=f, img_w=w, img_h=h, legende="Miniature d'une feuille du dossier"); return q
-    @add("img")
-    def _():
-        f = _cartouche(C.pdf, C.plan_no, os.path.join(C.tmp, "cart.png")) if C.pdf else None
-        if not f: return None
-        from PIL import Image
-        iw, ih = Image.open(f).size; w = 62
-        q = qs_.rep("Lis ce cartouche : quel est le numéro de la feuille et son échelle ?", f"{C.plan_no}, échelle 1:{C.Np}", f"Cartouche de la feuille {C.plan_no}", cat="lecture", niv=1)
-        q.update(img=f, img_w=w, img_h=w * ih / iw, legende="Cartouche (coin inférieur droit d'une feuille)"); return q
-    @add("img")
-    def _(): return reconnaitre(C.no_pl, "Plan de plomberie", "plomb")
-    @add("img")
-    def _(): return reconnaitre(C.no_el, "Plan d'électricité", "elec")
-    @add("img")
-    def _(): return reconnaitre("S-101", "Plan des fondations", "arch")
-    @add("img")
-    def _(): return reconnaitre("A-201", "Élévations", "arch")
-    @add("img")
-    def _(): return reconnaitre(C.no_cv, "Plan de chauffage et de ventilation", "cvca")
+    P["img"] = images(C)
     return P
 
 
-QUOTAS = dict(img=2, rep=5, qcm=6, vf=5, trou=3, assoc=2, calc=4, erreur=3, ordre=2)
+QUOTAS = dict(img=4, rep=4, qcm=6, vf=4, trou=3, assoc=2, calc=4, erreur=3, ordre=2)
 
 
 def _choisir(pool, n, k, C):
@@ -541,23 +644,10 @@ def questions_ferme(nb_feuilles, pdf=None, tmp="/tmp/qimg5"):
     # classement
     Q += [ordre("Classe ces éléments du plus bas au plus haut.", ["Muret de béton (1 200 mm)", "Corniche (4 500 mm)", "Faîte de l'étable (7 056 mm)", "Silo-tour (24 000 mm)"], "du plus bas au plus haut", "Élévations (A-201) et élévation des silos (A-202)", rng, cat="arch"),
           ordre("Classe ces feuilles dans l'ordre de leur numéro (de la plus petite à la plus grande).", ["A-100", "A-201", "P-101", "E-101"], "ordre de la page de garde", "Page de garde : liste des feuilles", rng, cat="lecture")]
-    # images
+    # images tirées du PDF (sortes variées)
     if pdf:
-        from PIL import Image
-        pg = _pages(pdf)
-        for code, bonne in (("A-101", "Plan de l'étable"), ("A-201", "Élévations"), ("S-101", "Plan des fondations")):
-            f = _vignette(pdf, code, os.path.join(tmp, f"v-{code}.png"))
-            if not f: continue
-            iw, ih = Image.open(f).size
-            noms = ["Plan de l'étable", "Élévations", "Plan des fondations", "Plan d'électricité", "Plan de plomberie"]
-            o = [bonne] + [x for x in noms if x != bonne][:3]; rng.shuffle(o)
-            q = qcm("Observe cette feuille (réduite) : de quel type de feuille s'agit-il ?", o, bonne, f"Feuille {code}", cat="arch", niv=2)
-            q.update(img=f, img_w=68, img_h=68 * ih / iw, legende="Miniature d'une feuille du dossier"); Q.append(q)
-        f = _cartouche(pdf, "A-201", os.path.join(tmp, "cart.png"))
-        if f:
-            iw, ih = Image.open(f).size
-            q = rep("Lis ce cartouche : quel est le numéro de la feuille et son échelle ?", "A-201, échelle 1:250", "Cartouche de la feuille A-201", cat="lecture", niv=1)
-            q.update(img=f, img_w=62, img_h=62 * ih / iw, legende="Cartouche (coin inférieur droit d'une feuille)"); Q.append(q)
+        C = Ctx(); C.pdf, C.tmp, C.rng, C.n, C.b = pdf, tmp, rng, 5, None; C.nom = lambda x: x.replace("\n", " ")
+        Q += [q for q in _choisir(images(C), 5, 4, C)]
     Q += _mesures(None, 5, True)
     return Q
 
