@@ -69,6 +69,9 @@ def questions(b, nb_feuilles):
         if rev: Q.append(("Quel est le matériau de revêtement extérieur principal ?", str(rev).capitalize(), "Élévations, feuille A-201 (notes)"))
     Q.append(("Que veut dire l'abréviation « AFCI » ?", "Disjoncteur anti-arcs (protège les circuits des chambres)", "Légende et abréviations, feuille A-001"))
     Q.append(("Dans les élévations, que représente un hexagone contenant une lettre ?", "Le type de fenêtre (voir le tableau des fenêtres)", "Légende et abréviations, feuille A-001"))
+    import exercices6
+    for (f_, q, r) in exercices6.QUESTIONS:
+        if f_ in getattr(b, "details_meca", []): Q.append((q, r, f"Feuille {f_} (détail)"))
     return Q
 
 

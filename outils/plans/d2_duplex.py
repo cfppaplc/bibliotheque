@@ -69,6 +69,7 @@ reseau_B = dict(coll=miroir_pts(reseau_A["coll"]), sortie=miroir_pts(reseau_A["s
 pans_S = [(0, W, "bois"), (3300, 5300, "pierre"), (M(5300), M(3300), "pierre"), (7400, 8600, "pierre")]
 pans_N = [(0, W, "bois"), (7400, 8600, "pierre")]
 duplex = BatimentJumele(
+    details_meca=["M-001", "P-301", "P-302", "P-303"],
     pans={"S": pans_S, "N": pans_N, "E": [(0, 9000, "bois"), (0, 2200, "pierre")], "O": [(0, 9000, "bois"), (9000 - 2200, 9000, "pierre")]},
     dossier=dict(projet="DUPLEX JUMELÉ\nDOSSIER 2", adresse="48-50, avenue du Parc\nVille fictive (Québec)", date="Octobre 2026", code="D2"),
     nom_court="Duplex jumelé (logements A et B)",

@@ -1006,9 +1006,13 @@ class Batiment:
         extra = [fn for (_, _, fn) in getattr(self, "feuilles_extra", [])]   # feuilles civiles (C-101…), après le plan de site
         for fn in (self.feuille_legende, self.feuille_code, self.feuille_site, *extra, self.feuille_plan, self.feuille_plafond, self.feuille_toiture, self.feuille_elevations, self.feuille_coupe, self.feuille_coupes,
                    self.feuille_details, self.feuille_finis, self.feuille_fondations,
-                   self.feuille_plomberie, self.feuille_iso, self.feuille_plomb_calc, self.feuille_electricite, self.feuille_bilan, self.feuille_cvca, *([self.feuille_unites] if getattr(self, "unites_toit", None) else [])):
+                   self.feuille_plomberie, self.feuille_iso, self.feuille_plomb_calc, self.feuille_electricite, self.feuille_bilan, self.feuille_cvca, *([self.feuille_unites] if getattr(self, "unites_toit", None) else []), *([self._details_meca] if getattr(self, "details_meca", None) else [])):
             fn(c)
         c.save()
+
+    def _details_meca(self, c):
+        import d6_details as _d6
+        _d6.ajouter(c, self.dossier, self.details_meca)
 
     def feuille_garde(self, c):
         f = Feuille(c, self.dossier, "000", "PAGE DE GARDE\nET LISTE DES FEUILLES", "—")
@@ -1029,8 +1033,8 @@ class Batiment:
                   ["A-201", "Élévations"], ["A-301", "Coupe transversale et nomenclatures"], ["A-302", "Coupe longitudinale, coupe de mur et matériaux"],
                   ["A-401", "Tableau des locaux et des finis"], ["A-501", "Détails types de construction"], ["S-101", "Plan des fondations et détail type"],
                   ["P-101", "Plan de plomberie"], ["P-102", "Schéma isométrique et nomenclature des appareils"], ["P-201", "Dimensionnement de la plomberie"],
-                  ["E-101", "Plan d'électricité"], ["E-201", "Bilan de charge et panneau"], ["M-101", "Plan de chauffage, ventilation et climatisation"], *([["M-102", "Unités de toit : détails et socle"]] if getattr(self, "unites_toit", None) else [])]
-        f.tableau(24, yy - 10, "LISTE DES FEUILLES", ["Feuille", "Titre"], lignes, [22, 110], h=6, size=8.5)
+                  ["E-101", "Plan d'électricité"], ["E-201", "Bilan de charge et panneau"], ["M-101", "Plan de chauffage, ventilation et climatisation"], *([["M-102", "Unités de toit : détails et socle"]] if getattr(self, "unites_toit", None) else []), *(__import__("d6_details").liste(self.details_meca) if getattr(self, "details_meca", None) else [])]
+        h_ = min(6, (yy - 10 - 16) / (len(lignes) + 2)); f.tableau(24, yy - 10, "LISTE DES FEUILLES", ["Feuille", "Titre"], lignes, [22, 110], h=h_, size=min(8.5, h_ * 1.4))
         f.tableau(178, yy - 10, "DONNÉES DU BÂTIMENT", ["Élément", "Valeur"], self.donnees, [58, 92], h=6, size=8.5)
         f.notes("UTILISATION EN CLASSE", ["Ce dossier sert à apprendre à lire des plans : repérer les feuilles, les échelles, les symboles, les cotes et les liens entre les disciplines.",
                                          "Les renvois (bulles de coupe, types de fenêtres, numéros de portes) relient les feuilles entre elles.",

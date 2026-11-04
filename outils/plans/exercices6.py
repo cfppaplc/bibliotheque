@@ -120,14 +120,17 @@ def liste_exos(chemin, corrige):
     c.save()
 
 
-def fiches(chemin, pdf_dossier):
-    tmp = tempfile.mkdtemp(); subprocess.run(["pdftoppm", "-r", "70", "-png", pdf_dossier, os.path.join(tmp, "p")], check=True)
-    imgs = sorted(glob.glob(os.path.join(tmp, "p-*.png")))
-    c = rl_canvas.Canvas(chemin, pagesize=(PW * MM, PH * MM)); c.setTitle("Dossier 6 — Fiches de montage"); c.setAuthor("Pavillon de l'Avenir")
-    pages = {"M-301": 2, "M-302": 3, "M-303": 4, "P-301": 5, "P-302": 6, "P-303": 7, "P-304": 8, "P-305": 9}
+def fiches(chemin, codes):
+    """Fiches de montage des détails présents dans un dossier (une page chacune, avec vignette de la feuille)."""
+    import d6_details
+    pdf = tempfile.mktemp(suffix=".pdf"); d6_details.produire(pdf, codes)
+    tmp = tempfile.mkdtemp(); subprocess.run(["pdftoppm", "-r", "70", "-png", pdf, os.path.join(tmp, "p")], check=True)
+    imgs = dict(zip(codes, sorted(glob.glob(os.path.join(tmp, "p-*.png")))))
+    c = rl_canvas.Canvas(chemin, pagesize=(PW * MM, PH * MM)); c.setTitle("Fiches de montage"); c.setAuthor("Pavillon de l'Avenir")
     for no, (titre, outils, etapes, controles, erreurs) in FICHES.items():
+        if no not in imgs: continue
         entete(c, f"FICHE DE MONTAGE — {no}", titre)
-        c.drawImage(imgs[pages[no]], 20 * MM, (PH - 120) * MM, 110 * MM, 110 * 279.4 / 431.8 * MM) if False else c.drawImage(imgs[pages[no]], 20 * MM, (PH - 42 - 71) * MM, 110 * MM, 71 * MM)
+        c.drawImage(imgs[no], 20 * MM, (PH - 42 - 71) * MM, 110 * MM, 71 * MM)
         y = PH - 42 - 71 - 8
         def bloc(titre_b, items, num=False):
             nonlocal y
@@ -144,16 +147,12 @@ def fiches(chemin, pdf_dossier):
         bloc("Étapes de montage", etapes, True); bloc("Contrôles avant la mise en service", controles); bloc("Erreurs fréquentes", erreurs)
         c.setFillColor(GRIS); c.setFont(FONT, 7.5); c.drawString(20 * MM, 12 * MM, "Dessin à des fins d'enseignement : suivre la fiche du fabricant et les codes en vigueur. " + AUTEUR)
         c.showPage()
-    c.save(); shutil.rmtree(tmp)
+    c.save(); shutil.rmtree(tmp); os.remove(pdf)
 
 
-def generer(site):
-    d = os.path.join(site, "plans")
-    liste_exos(os.path.join(d, "dossier-6-exercices.pdf"), False)
-    liste_exos(os.path.join(d, "dossier-6-corrige.pdf"), True)
-    fiches(os.path.join(d, "dossier-6-montage.pdf"), os.path.join(d, "dossier-6.pdf"))
+def montage(site, n, codes):
+    if any(k in FICHES for k in codes): fiches(os.path.join(site, "plans", f"dossier-{n}-montage.pdf"), codes)
 
 
 if __name__ == "__main__":
-    generer(os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..")))
-    print("ok")
+    print("Utiliser generer.py")

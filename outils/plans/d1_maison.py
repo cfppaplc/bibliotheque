@@ -238,6 +238,7 @@ et = niveau(commun, no_plan="A-103", titre_plan="PLAN DE L'ÉTAGE", no_plomb="P-
 et.emprise = (XL, XRG); et.O, et.E = OE, EE
 
 maison = MaisonEtages(
+    details_meca=["M-001", "M-301", "M-302", "M-303", "P-301", "P-302", "P-303", "P-304"],
     dossier=dossier, nom_court="Maison unifamiliale", W=W, D=D, t=t, lv=[ss, rdc, et], types_fen=types_fen,
     description="Grande maison unifamiliale contemporaine (environ 24 × 10,8 m) : un volume central à deux étages entre une aile d'entrée et une aile familiale d'un seul niveau, "
                 "trois toits monopentes à grands débords (900 mm), pierre naturelle, zinc prépatiné et cèdre brûlé, grandes fenêtres pleine hauteur. Sous-sol aménagé sous le volume central. "

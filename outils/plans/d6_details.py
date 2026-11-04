@@ -567,13 +567,33 @@ def garde(c):
     c.showPage()
 
 
-def produire(chemin):
+DETAILS = {   # code de feuille : (fonction, titre dans la liste des feuilles)
+    "M-001": (m001, "Robinetterie et accessoires (légende des détails)"), "M-301": (m301, "Détail : réservoir tampon, circulateur et vanne à trois voies"),
+    "M-302": (m302, "Détail : chaudière murale à condensation"), "M-303": (m303, "Détail : collecteur de plancher chauffant"),
+    "P-301": (p301, "Détail : chauffe-eau électrique"), "P-302": (p302, "Détail : entrée d'eau en sous-sol (coupe)"),
+    "P-303": (p303, "Détail : mur humide, drainage et ventilation"), "P-304": (p304, "Détail : puisard et pompe de drainage (coupe)"),
+    "P-305": (p305, "Détail : raccord de gaz à un appareil"),
+}
+
+
+def ajouter(c, dossier, codes):
+    """Ajoute les feuilles de détail demandées dans le dossier d'un bâtiment (le cartouche prend le dossier hôte)."""
+    global DOSSIER
+    ancien = DOSSIER; DOSSIER = dossier
+    try:
+        for k in codes: DETAILS[k][0](c)
+    finally: DOSSIER = ancien
+
+
+def liste(codes): return [[k, DETAILS[k][1]] for k in codes]
+
+
+def produire(chemin, codes=None):
     c = rl_canvas.Canvas(chemin, pagesize=(PAGE_W * MM, PAGE_H * MM), pageCompression=1)
-    c.setTitle("DÉTAILS MÉCANIQUES DOSSIER 6 — dossier de plans d'exercice"); c.setAuthor("Pavillon de l'Avenir · plan pédagogique")
-    for fn in (garde, m001, m301, m302, m303, p301, p302, p303, p304, p305): fn(c)
-    c.save()
+    c.setTitle("DÉTAILS MÉCANIQUES — feuilles de détail"); c.setAuthor("Pavillon de l'Avenir · plan pédagogique")
+    ajouter(c, DOSSIER, codes or list(DETAILS)); c.save()
 
 
 if __name__ == "__main__":
     os.makedirs("sortie", exist_ok=True)
-    produire("sortie/Dossier-6-Details.pdf"); print("ok")
+    produire("sortie/Details-mecaniques.pdf"); print("ok")

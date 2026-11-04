@@ -510,6 +510,9 @@ class MaisonEtages(Batiment):
         for lv in self.lv: lv.feuille_electricite(c)
         self.feuille_bilan(c)
         for lv in self.lv: lv.feuille_cvca(c)
+        if getattr(self, "details_meca", None):
+            import d6_details as _d6
+            _d6.ajouter(c, self.dossier, self.details_meca)
         c.save()
 
     def liste_feuilles(self):
@@ -520,6 +523,9 @@ class MaisonEtages(Batiment):
         L += [[lv.no_plomb, lv.titre_plomb.replace("\n", " ").capitalize()] for lv in self.lv] + [[self.no_iso, "Schéma isométrique et nomenclature des appareils"], ["P-201", "Dimensionnement de la plomberie"]]
         L += [[lv.no_elec, lv.titre_elec.replace("\n", " ").capitalize()] for lv in self.lv] + [["E-201", "Bilan de charge et panneau"]]
         L += [[lv.no_cvca, lv.titre_cvca.replace("\n", " ").capitalize()] for lv in self.lv]
+        if getattr(self, "details_meca", None):
+            import d6_details as _d6
+            L += _d6.liste(self.details_meca)
         return L
 
     def feuille_garde(self, c):

@@ -16,7 +16,6 @@ DOSSIERS = {
     3: ("d3_commercial", "commerce", "Dossier-3-Batiment-commercial.pdf", "PLAN DU REZ-DE-CHAUSSÉE"),
     4: ("d4_centre", "centre", "Dossier-4-Centre-commercial.pdf", "PLAN DU REZ-DE-CHAUSSÉE"),
     5: ("ferme", None, "Dossier-5-Ferme-laitiere.pdf", "PLAN DE L'ÉTABLE"),
-    6: ("d6_details", None, "Dossier-6-Details.pdf", "RÉSERVOIR TAMPON ET"),
 }
 
 
@@ -42,20 +41,17 @@ def produire(n, publier):
     obj = None
     if mod == "ferme":
         m.Ferme().produire(chemin)
-    elif mod == "d6_details":
-        m.produire(chemin)
     else:
         obj = getattr(m, DOSSIERS[n][1]); obj.produire(chemin)
     nb = pages(chemin)
     print(f"dossier {n} : {nb} feuilles -> {chemin}")
     if not publier: return nb
     shutil.copy(chemin, os.path.join(SITE, "plans", f"dossier-{n}.pdf"))
-    if n == 6:
-        import exercices6
-        exercices6.generer(SITE)
     if obj is not None:  # exercices + corrigé calculés sur les données du dossier
         import exercices
         exercices.generer(obj, nb, os.path.join(SITE, "plans", f"dossier-{n}-exercices.pdf"), os.path.join(SITE, "plans", f"dossier-{n}-corrige.pdf"))
+        import exercices6
+        exercices6.montage(SITE, n, getattr(obj, "details_meca", []))
     p = trouver_page(chemin, titre)
     if p:
         subprocess.run(["pdftoppm", "-r", "100", "-f", str(p), "-l", str(p), "-png", chemin, f"/tmp/sec{n}"], check=True)
