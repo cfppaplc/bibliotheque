@@ -1006,7 +1006,7 @@ class Batiment:
         extra = [fn for (_, _, fn) in getattr(self, "feuilles_extra", [])]   # feuilles civiles (C-101…), après le plan de site
         for fn in (self.feuille_legende, self.feuille_code, self.feuille_site, *extra, self.feuille_plan, self.feuille_plafond, self.feuille_toiture, self.feuille_elevations, self.feuille_coupe, self.feuille_coupes,
                    self.feuille_details, self.feuille_finis, self.feuille_fondations,
-                   self.feuille_plomberie, self.feuille_iso, self.feuille_plomb_calc, self.feuille_electricite, self.feuille_bilan, self.feuille_cvca):
+                   self.feuille_plomberie, self.feuille_iso, self.feuille_plomb_calc, self.feuille_electricite, self.feuille_bilan, self.feuille_cvca, *([self.feuille_unites] if getattr(self, "unites_toit", None) else [])):
             fn(c)
         c.save()
 
@@ -1029,7 +1029,7 @@ class Batiment:
                   ["A-201", "Élévations"], ["A-301", "Coupe transversale et nomenclatures"], ["A-302", "Coupe longitudinale, coupe de mur et matériaux"],
                   ["A-401", "Tableau des locaux et des finis"], ["A-501", "Détails types de construction"], ["S-101", "Plan des fondations et détail type"],
                   ["P-101", "Plan de plomberie"], ["P-102", "Schéma isométrique et nomenclature des appareils"], ["P-201", "Dimensionnement de la plomberie"],
-                  ["E-101", "Plan d'électricité"], ["E-201", "Bilan de charge et panneau"], ["M-101", "Plan de chauffage, ventilation et climatisation"]]
+                  ["E-101", "Plan d'électricité"], ["E-201", "Bilan de charge et panneau"], ["M-101", "Plan de chauffage, ventilation et climatisation"], *([["M-102", "Unités de toit : détails et socle"]] if getattr(self, "unites_toit", None) else [])]
         f.tableau(24, yy - 10, "LISTE DES FEUILLES", ["Feuille", "Titre"], lignes, [22, 110], h=6, size=8.5)
         f.tableau(178, yy - 10, "DONNÉES DU BÂTIMENT", ["Élément", "Valeur"], self.donnees, [58, 92], h=6, size=8.5)
         f.notes("UTILISATION EN CLASSE", ["Ce dossier sert à apprendre à lire des plans : repérer les feuilles, les échelles, les symboles, les cotes et les liens entre les disciplines.",
@@ -1046,5 +1046,7 @@ import generique as _gen
 _gen.installer(Batiment)
 import calculs as _calc
 _calc.installer(Batiment)
+import unites_toit as _ut
+_ut.installer(Batiment)
 for _n in ("feuille_coupes", "_N_mur", "_z_haut_mur", "_coupe_longitudinale", "_coupe_mur", "_legende_materiaux"):
     setattr(Batiment, _n, getattr(_coupes, _n))

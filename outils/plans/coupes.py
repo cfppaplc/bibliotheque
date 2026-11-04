@@ -242,7 +242,9 @@ def _coupe_longitudinale(self, f):
         f.rect(t, zm + 613, W - t, zm + 623, .4, fill=black)
         for x in (0, W - t): f.rect(x - 40, zm + self.parapet, x + t + 40, zm + self.parapet + 60, .5, fill=HexColor("#777"))
         if getattr(self, "unite_toit", None):
-            f.rect(8800, zm + 623, 11200, zm + 623 + 1300, .4, dash=[3, 2]); f.texte(10000, zm + 623 + 650, "UT-1 (vue au-delà)", 5)
+            from unites_toit import rtu_elev, spec
+            _u = (getattr(self, "unites_toit", None) or [("UT-1", 10, 10000, 0)])[0]; _s = spec(_u[1])
+            rtu_elev(f, 10000 - _s["L"] / 2, zm + 623, _s["L"], _s["h"], _s["vent"], _u[0] + " (au-delà)", False)
         f.texte(W * .5, zm + 225, "Poutrelles ajourées coupées, 1 800 c/c", 5, col=GRIS)
     # locaux
     for (no, nom, x0, y0, x1, y1) in self.locaux:

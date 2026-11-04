@@ -84,7 +84,7 @@ centre = BatimentModerne(
                 "Carré plein : poteau d'acier HSS 203 × 203 (voir S-101).", "Murs mitoyens entre locaux : blocs 190, coupe-feu 1 h, jusqu'au platelage.",
                 "Plafonds : suspendus à 3 600 dans les locaux, structure apparente à l'arrière.", "Le plancher fini est à l'altitude 103,90 (voir C-101)."],
     z_sol=0, z_plancher=150, z_murs=zm, z_plafond=3750, z_semelle=-1600, ep_plancher=150, t_fond=300,
-    toit="plat", parapet=1500, unite_toit=True, debord=0, revetement="panneaux",
+    toit="plat", parapet=1500, unite_toit=True, unites_toit=[("UT-1", 15, 7000, 5400), ("UT-2", 10, 18000, 6400), ("UT-3", 10, 26000, 6400), ("UT-4", 5, 32500, 7100), ("UT-5", 5, 37400, 7100)], debord=0, revetement="panneaux",
     niveaux=[("Sol", "± 0", 0), ("Dalle 103,90", "+ 150", 150), ("Plafond", "+ 3 750", 3750), ("Toit", "+ 5 800", zm + 600), ("Parapet", "+ 6 700", "faite"), ("Volume-signal", "+ 8 800", 8800)],
     notes_elev=["Murs-rideaux type A : aluminium à bris thermique, verre triple, pleine hauteur devant chaque local.",
                 "Panneaux composites d'aluminium gris anthracite, joints de 15 mm (grille 1 500 × 1 000).",

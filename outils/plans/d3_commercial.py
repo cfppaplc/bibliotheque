@@ -69,7 +69,7 @@ commerce = BatimentModerne(
                 "Carré plein : poteau d'acier HSS 152 × 152 (voir S-101).", "Plafond suspendu à 3 600 mm (sauf entrepôt et salle mécanique : structure apparente).",
                 "Toilettes : cloisons de cabinets en stratifié (non illustrées), un cabinet accessible dans chaque local."],
     z_sol=0, z_plancher=150, z_murs=zm, z_plafond=3750, z_semelle=-1600, ep_plancher=150, t_fond=250,
-    toit="plat", parapet=1500, unite_toit=True, debord=0, revetement="brique",
+    toit="plat", parapet=1500, unite_toit=True, unites_toit=[("UT-1", 10, 15000, 8200)], debord=0, revetement="brique",
     niveaux=[("Sol", "± 0", 0), ("Dalle", "+ 150", 150), ("Plafond", "+ 3 750", 3750), ("Toit", "+ 5 800", zm + 600), ("Parapet", "+ 6 700", "faite"), ("Tour d'entrée", "+ 9 000", 9000)],
     notes_elev=["Tour d'entrée : brique d'argile rouge, fente vitrée pleine hauteur au-dessus de la porte; marquise d'acier en porte-à-faux.", "Façade de l'aire de vente : vitrines (type A) et tôle d'acier nervurée gris-vert.",
                 "Entrepôt (nord-ouest) : volume plus haut en blocs de béton architecturaux; façades est : brique et tôle nervurée.",

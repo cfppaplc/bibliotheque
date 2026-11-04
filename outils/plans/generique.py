@@ -184,7 +184,10 @@ def feuille_toiture(self, c):
             f.rect(xx - 150 * k, 20, xx + 150 * k, t - 20, .6, DR, fill=white)
         f.texte(xmax * .08, -450 * k, "Trop-plein 150 × 100", 5.5, False, "c", DR)
         f.rect(xmax * .22 - 400, D * .5 + 1500 * k, xmax * .22 + 400, D * .5 + 1500 * k + 800, .6, fill=white); f.texte(xmax * .22, D * .5 + 1500 * k + 1050, "Écoutille de toit 800 × 800", 5.5, False, "c")
-        if getattr(self, "unite_toit", None):
+        if getattr(self, "unites_toit", None):
+            import unites_toit as _u
+            _u.feuille_toiture_unites(self, f, N)
+        elif getattr(self, "unite_toit", None):
             ux = xmax * .6; f.rect(ux, D * .5 - 3300 * k - 300, ux + 2400, D * .5 - 3300 * k + 1100, .8, fill=white)
             f.texte(ux + 1200, D * .5 - 3300 * k + 200, "RTU", 6.5, True, "c", CVC_A); f.texte(ux + 1200, D * .5 - 3300 * k - 750 * k, "Unité de toit sur socle", 5.5, False, "c", GRIS)
         f.cote(0, W, -1500 * k); f.cote(0, D, -1500 * k, orient="v")

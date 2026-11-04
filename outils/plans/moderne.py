@@ -74,8 +74,9 @@ class BatimentModerne(Batiment):
             else: self._panneaux(f, x0, x1, zp, zh)
             f.ligne(x0 - 40, zh, x1 + 40, zh, 1.1)                  # solin
         self.z_faite = zpar
-        # unités de toit en retrait (pointillé)
-        if cote in "SN":
+        # unités de toit : seule la partie qui dépasse le parapet est visible
+        from unites_toit import sur_toit_elev
+        if not sur_toit_elev(self, f, cote, L, zpar) and cote in "SN":
             for ux in (L * .2, L * .5, L * .78):
                 f.rect(ux, zpar, ux + 2200, zpar + 900, .4, GRIS, dash=[3, 2])
             f.texte(L * .5 + 1100, zpar + 1500, "UNITÉS DE TOIT ET PANNEAUX SOLAIRES (en retrait, peu visibles)", 4.8, col=GRIS)
