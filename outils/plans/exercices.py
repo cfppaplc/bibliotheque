@@ -425,7 +425,7 @@ def banque(C):
     return P
 
 
-QUOTAS = dict(img=2, rep=6, qcm=7, vf=6, trou=3, assoc=2, calc=4, erreur=3, ordre=2)
+QUOTAS = dict(img=2, rep=5, qcm=6, vf=5, trou=3, assoc=2, calc=4, erreur=3, ordre=2)
 
 
 def _choisir(pool, n, k, C):
@@ -442,6 +442,26 @@ def _choisir(pool, n, k, C):
     return out
 
 
+def _mesures(b, n, ferme=False):
+    """Questions de mesure à l'échelle (échelimètre) à fusionner dans le questionnaire : ~8 mesures + quelques questions sur l'échelle."""
+    import exercices_echelle as ee
+    Qm = ee.questions_ferme() if ferme else ee.questions_batiment(b, f"D{n}")
+    T = ee.typer(Qm, f"D{n}")
+    mes = [q for q in T if q["t"] == "mesure"]; conc = [q for q in T if q["t"] != "mesure"]
+    pas = max(1, len(mes) // 8); mes = mes[::pas][:8]
+    rng = random.Random(f"mes-{n}"); rng.shuffle(conc)
+    quotas = dict(qcm=1, vf=1, trou=1, assoc=1, calc=2, erreur=1, ordre=1); out = []
+    for t, k in quotas.items(): out += [q for q in conc if q["t"] == t][:k]
+    for q in mes + out: q["cat"] = "mesure"
+    return mes + out
+
+
+def _intro(n, mesure=True):
+    T = list(THEMES[n]["intro"])
+    if mesure: T.append("Les mesures se font à l'échimètre métrique : imprime le dossier à 100 % (papier 11 × 17 po) et vérifie le trait de 100 mm au bas de chaque feuille.".replace("échimètre", "échelimètre"))
+    return T
+
+
 def questions(b, nb_feuilles, n=1, pdf=None, tmp="/tmp/qimg"):
     os.makedirs(tmp, exist_ok=True)
     C = _contexte(b, nb_feuilles, n, pdf, tmp)
@@ -452,6 +472,7 @@ def questions(b, nb_feuilles, n=1, pdf=None, tmp="/tmp/qimg"):
     det = [(f_, q, r) for (f_, q, r) in exercices6.QUESTIONS if f_ in getattr(b, "details_meca", [])]
     random.Random(f"{n}-det").shuffle(det)
     for (f_, q, r) in det[:4]: Q.append(qs.rep(q, r, f"Feuille {f_} (détail)", cat="plomb" if f_.startswith("P") else "cvca", niv=3))
+    Q += _mesures(b, n)
     return Q
 
 
@@ -464,9 +485,9 @@ def _theme(n, site):
 
 def generer(b, nb_feuilles, chemin_ex, chemin_corr, n=1, pdf=None, site=None):
     Q = questions(b, nb_feuilles, n, pdf)
-    T = _theme(n, site); T["nom"] = f"Dossier {n} — {b.dossier['projet'].split(chr(10))[0].title()}"
+    T = _theme(n, site); T["nom"] = f"Dossier {n} — {b.dossier['projet'].split(chr(10))[0].title()}"; T["intro"] = _intro(n)
     titre = b.dossier["projet"].split("\n")[0].title()
-    sous = f"Dossier {n} · Lecture de plans"
+    sous = f"Dossier {n} · Lecture de plans et mesure à l'échelle"
     for (chemin, corr) in ((chemin_ex, False), (chemin_corr, True)):
         qs.generer_pdf(chemin, titre, sous, Q, corr, "", T, THEMES[n]["mode"])
     return Q
@@ -537,12 +558,13 @@ def questions_ferme(nb_feuilles, pdf=None, tmp="/tmp/qimg5"):
             iw, ih = Image.open(f).size
             q = rep("Lis ce cartouche : quel est le numéro de la feuille et son échelle ?", "A-201, échelle 1:250", "Cartouche de la feuille A-201", cat="lecture", niv=1)
             q.update(img=f, img_w=62, img_h=62 * ih / iw, legende="Cartouche (coin inférieur droit d'une feuille)"); Q.append(q)
+    Q += _mesures(None, 5, True)
     return Q
 
 
 def generer_ferme(nb_feuilles, chemin_ex, chemin_corr, pdf=None, site=None):
     Q = questions_ferme(nb_feuilles, pdf)
-    T = _theme(5, site); T["nom"] = "Dossier 5 — Ferme laitière"
+    T = _theme(5, site); T["nom"] = "Dossier 5 — Ferme laitière"; T["intro"] = _intro(5)
     for (chemin, corr) in ((chemin_ex, False), (chemin_corr, True)):
-        qs.generer_pdf(chemin, "Ferme Laitière", "Dossier 5 · Lecture de plans", Q, corr, "", T, THEMES[5]["mode"])
+        qs.generer_pdf(chemin, "Ferme Laitière", "Dossier 5 · Lecture de plans et mesure à l'échelle", Q, corr, "", T, THEMES[5]["mode"])
     return Q

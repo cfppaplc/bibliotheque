@@ -198,3 +198,5 @@
   (déconseillé : fidélité incertaine; conseiller l'export PDF).
 
 - **Activités des plans (3 nov.)** : `generer.py::activites(n)` copie chaque questionnaire et son corrigé dans `activites/plans-d<n>-lecture|echelle(.pdf, -corrige.pdf, .jpg)` (couverture « PLAN n » colorée); entrées `ACTIVITES` d'`index.html` avec `dossier` et `corrige` (bouton « Corrigé » vert), filtre « Plan »; couleurs `COUL_DOS`.
+
+- **Un seul questionnaire par dossier (3 nov., « mélanger lecture et mesure »)** : `exercices._mesures(b, n)` ajoute ~8 mesures + 8 questions sur l'échelle (tirées de `exercices_echelle.typer`, `cat='mesure'`) aux questions de lecture; plus de fichiers `dossier-N-echelle*.pdf` ni de cartes d'activité séparées (`exercices_echelle.generer` n'est plus appelé; le module reste utilisé pour ses questions). Quotas de lecture réduits (`QUOTAS`), ~50 questions, 9 pages.

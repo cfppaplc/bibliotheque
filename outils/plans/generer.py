@@ -39,7 +39,7 @@ def activites(n):
     from PIL import Image, ImageDraw, ImageFont
     th = os.path.join(SITE, "plans", f"dossier-{n}-elevation.jpg")
     couleurs = {1: "#1c5f8f", 2: "#2e7d4f", 3: "#c26a12", 4: "#6a3fa0", 5: "#3b7d2a"}
-    for kind, titre in (("lecture", "LECTURE DE PLANS"), ("echelle", "MESURE À L'ÉCHELLE")):
+    for kind, titre in (("lecture", "LECTURE + MESURE"),):
         src = f"dossier-{n}-exercices.pdf" if kind == "lecture" else f"dossier-{n}-echelle.pdf"
         cor = f"dossier-{n}-corrige.pdf" if kind == "lecture" else f"dossier-{n}-echelle-corrige.pdf"
         if not os.path.exists(os.path.join(SITE, "plans", src)): continue
@@ -83,8 +83,6 @@ def produire(n, publier):
     if obj is None:   # ferme : questionnaire écrit à la main
         import exercices
         exercices.generer_ferme(nb, os.path.join(SITE, "plans", f"dossier-{n}-exercices.pdf"), os.path.join(SITE, "plans", f"dossier-{n}-corrige.pdf"), chemin, SITE)
-    import exercices_echelle
-    exercices_echelle.generer(SITE, n, obj, f"{DOSSIERS_NOMS[n]} — Dossier {n}")
     activites(n)
     p = trouver_page(chemin, titre)
     if p:
