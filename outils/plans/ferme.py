@@ -235,14 +235,14 @@ class Ferme:
         # fosse, silos
         f.cercle(170000, 100000, 15000, 1.0, black, fill=HexColor("#dfe3d6")); f.cercle(170000, 100000, 13500, .5, black)
         f.texte(170000, 101500, "FOSSE À LISIER", 6, True); f.texte(170000, 97500, "Ø 30 m · 4 000 m³", 5.5)
-        f.rect(60000, 118000, 120000, 138000, .8, fill=HexColor("#e6d9a6")); f.ligne(90000, 118000, 90000, 138000, .5)
-        f.texte(75000, 128000, "SILO-COULOIR 1", 6, True); f.texte(105000, 128000, "SILO-COULOIR 2", 6, True)
-        f.rect(136000, 117000, 172000, 133000, .4, fill=GRV)
-        for k, xs in enumerate((142000, 154000, 166000)):
+        f.rect(110000, 118000, 170000, 138000, .8, fill=HexColor("#e6d9a6")); f.ligne(140000, 118000, 140000, 138000, .5)
+        f.texte(125000, 128000, "SILO-COULOIR 1", 6, True); f.texte(155000, 128000, "SILO-COULOIR 2", 6, True)
+        f.rect(66000, 117000, 102000, 133000, .4, fill=GRV)
+        for k, xs in enumerate((72000, 84000, 96000)):
             f.cercle(xs, 125000, 4000, 1.2, black, fill=white); f.cercle(xs, 125000, 3500, .5, black); f.ligne(xs - 4000, 125000, xs + 4000, 125000, .3, GRIS); f.ligne(xs, 121000, xs, 129000, .3, GRIS)
             f.texte(xs, 130500, f"S{k + 1}", 5.5, True)
-        f.texte(154000, 136500, "SILOS-TOURS S1 à S3 · Ø 8 m × 24 m", 5.5, True)
-        f.ligne(138000, 125000, 130000, 125000, .8, VERT, dash=[4, 2])
+        f.texte(84000, 136500, "SILOS-TOURS S1 à S3 · Ø 8 m × 24 m", 5.5, True)
+        f.ligne(72000, 121000, 72000, 116000, .8, VERT, dash=[4, 2])
         f.cercle(48000, 28000, 600, .8, EF, fill=EF); f.texte(51000, 27000, "Puits", 5, col=EF)
         f.ligne(44000, 28000, 44000, 36000, 1.0, EF, dash=[4, 3])
         f.ligne(bx + W, by + 14500, 170000, 100000 - 15000, 1.0, HexColor("#555"), dash=[5, 3]); f.texte(bx + W + 12000, by + 6000, "Conduite de lisier", 5, col=GRIS)
@@ -398,15 +398,32 @@ class Ferme:
         N = 250
         f = Feuille(c, DOSSIER, "A-201", "ÉLÉVATIONS", "1:250")
         ox = DRAW[0] + 12
-        f.vue(ox, 226, N); self._elev_long(f, "S"); f.titre_vue(ox - 2, 212, 1, "ÉLÉVATION SUD (PRINCIPALE)", "1:250")
-        f.vue(ox, 150, N); self._elev_long(f, "N"); f.titre_vue(ox - 2, 136, 2, "ÉLÉVATION NORD", "1:250")
-        f.vue(ox, 74, N); self._elev_pignon(f, "E"); f.titre_vue(ox - 2, 60, 3, "ÉLÉVATION EST (AILE DES VEAUX)", "1:250")
-        f.vue(ox + 160, 74, N); self._elev_pignon(f, "O"); f.titre_vue(ox + 158, 60, 4, "ÉLÉVATION OUEST (BLOC DE SERVICE)", "1:250")
+        f.vue(ox, 140, N)
+        for k, xs in enumerate((12000, 24000, 36000)): self._tour(f, xs, k)
+        self._elev_long(f, "S"); f.titre_vue(ox - 2, 128, 1, "ÉLÉVATION SUD (PRINCIPALE)", "1:250")
+        f.vue(ox, 90, N); self._elev_long(f, "N"); f.titre_vue(ox - 2, 76, 2, "ÉLÉVATION NORD", "1:250")
+        f.vue(ox, 44, N); self._elev_pignon(f, "E"); f.titre_vue(ox - 2, 30, 3, "ÉLÉVATION EST (AILE DES VEAUX)", "1:250")
+        f.vue(ox + 160, 44, N); self._elev_pignon(f, "O"); f.titre_vue(ox + 158, 30, 4, "ÉLÉVATION OUEST (BLOC DE SERVICE)", "1:250")
         f.notes("NOTES D'ÉLÉVATION", ["Muret de béton de 1 200 sur le pourtour; rideaux enroulables à commande automatique au-dessus.", "Toiture : tôle d'acier nervurée, pente 10°, faîtière ouverte de 600.",
                                       "Versant sud : panneaux solaires (120 kW) sur toute la longueur.", "Bloc de service (ouest) : lames de bois, entre les deux couloirs.",
                                       "Portillons de 3 000 au sud : sorties vers les enclos libres.", "Grandes portes de 3 500 aux deux bouts de chaque couloir d'alimentation : le tracteur traverse l'étable."])
         f.notes("NIVEAUX", ["Sol : ± 0", "Muret : + 1 200", "Corniche : + 4 500", "Faîte : + 7 056"])
         c.showPage()
+
+    def _tour(self, f, xs, k):
+        H = 24000; R = 4000; HC = 21500
+        CORPS = HexColor("#b9c4cc")
+        f.rect(xs - 5200, 0, xs + 5200, 600, .6, fill=BETON)
+        f.rect(xs - R, 600, xs + R, HC, .9, fill=CORPS)
+        z = 2400
+        while z < HC: f.ligne(xs - R, z, xs + R, z, .25, NERV); z += 1800
+        f.poly([(xs - R, HC), (xs - 2800, HC + 1500), (xs, H), (xs + 2800, HC + 1500), (xs + R, HC)], .9, close=True, fill=GRIS_C)
+        f.ligne(xs, H, xs, H + 1800, .8)
+        f.rect(xs + R, 600, xs + R + 900, HC, .5, fill=white)
+        z = 900
+        while z < HC: f.ligne(xs + R, z, xs + R + 900, z, .15, GRIS); z += 600
+        f.rect(xs - 700, 600, xs + 700, 2200, .5, fill=white)
+        f.texte(xs, H + 3300, f"S{k + 1}", 6, True)
 
     def silos(self, c):
         N = 200; H = 24000; R = 4000; HC = 21500
@@ -417,19 +434,7 @@ class Ferme:
         f.rect(-2000, 0, 0, 1200, .5, fill=BETON)
         f.poly([(-2000, 1200), (-2000, ZC), (0, ZC), (0, 1200)], .5, close=True, fill=TOLE)
         f.texte(-1000, ZC + 1500, "ÉTABLE", 4.5, True, col=GRIS)
-        CORPS = HexColor("#b9c4cc")
-        for k, xs in enumerate((12000, 25000, 38000)):
-            f.rect(xs - 5200, 0, xs + 5200, 600, .6, fill=BETON)                       # base de béton
-            f.rect(xs - R, 600, xs + R, HC, .9, fill=CORPS)                          # corps en anneaux d'acier
-            z = 2400
-            while z < HC: f.ligne(xs - R, z, xs + R, z, .25, NERV); z += 1800
-            f.poly([(xs - R, HC), (xs - 2800, HC + 1500), (xs, H), (xs + 2800, HC + 1500), (xs + R, HC)], .9, close=True, fill=GRIS_C)
-            f.ligne(xs, H, xs, H + 1800, .8)                                          # évent
-            f.rect(xs + R, 600, xs + R + 900, HC, .5, fill=white)                     # échelle à cage
-            z = 900
-            while z < HC: f.ligne(xs + R, z, xs + R + 900, z, .15, GRIS); z += 600
-            f.rect(xs - 700, 600, xs + 700, 2200, .5, fill=white)                     # porte de vidange
-            f.texte(xs, H + 3300, f"S{k + 1}", 6, True)
+        for k, xs in enumerate((12000, 25000, 38000)): self._tour(f, xs, k)
         # déchargeur supérieur sur S1 et tuyau de chargement
         f.rect(12000 - 1000, H, 12000 + 1000, H + 700, .6, fill=GRIS)
         f.ligne(12000 + R + 450, HC, 12000 + R + 450, H + 2500, 1.0, RACLEUR); f.ligne(12000 + R + 450, H + 2500, 12000 - 5000, H + 2500, 1.0, RACLEUR)
