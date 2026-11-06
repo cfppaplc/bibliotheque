@@ -448,7 +448,6 @@
   .book:active{transform:scale(1.04)}
   .btn{transition:background .2s,transform .15s}
   .btn:active{transform:scale(.97)}
-  .modal.open{animation:fadeIn .22s ease}
   .modal.open .panel{animation:pop .3s cubic-bezier(.2,.8,.2,1)}
   .admin:not([hidden]),.pwbox:not([hidden]){animation:fadeIn .2s ease}
   .admin:not([hidden]) .admin-box,.pwbox:not([hidden]) .pwcard{animation:pop .28s cubic-bezier(.2,.8,.2,1)}
@@ -8701,7 +8700,7 @@ window.addEventListener("online", () => { try { aviser("Internet est revenu."); 
   .acces-succes .cercle{fill:none;stroke:#22c55e;stroke-width:5;stroke-dasharray:283;stroke-dashoffset:283;transform:rotate(-90deg);transform-origin:50% 50%;animation:trace .6s cubic-bezier(.65,0,.45,1) forwards}
   .acces-succes .fond{fill:#22c55e;opacity:0;transform-origin:50% 50%;animation:remplir .35s .5s cubic-bezier(.2,.8,.2,1) forwards}
   .acces-succes .coche{fill:none;stroke:#fff;stroke-width:7;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:60;stroke-dashoffset:60;animation:trace .4s .75s cubic-bezier(.65,0,.45,1) forwards}
-  .acces-succes .crochet svg{animation:pop .45s .5s cubic-bezier(.2,1.6,.4,1) both}
+  .acces-succes .crochet svg{animation:popCrochet .45s .5s cubic-bezier(.2,1.6,.4,1) both}
   .acces-succes .conf{position:absolute;left:50%;top:50%;width:8px;height:8px;border-radius:2px;opacity:0;animation:conf .9s .8s cubic-bezier(.1,.7,.3,1) forwards}
   .acces-succes h2{margin:4px 0 6px!important;animation:monte .5s 1s both}
   .acces-succes .sous,.acces-succes .ident,.acces-succes .acces-btns{animation:monte .5s 1.15s both}
@@ -8710,7 +8709,7 @@ window.addEventListener("online", () => { try { aviser("Internet est revenu."); 
   .acces-succes img.mini{height:22px;opacity:.6;margin-top:14px}
   @keyframes trace{to{stroke-dashoffset:0}}
   @keyframes remplir{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:scale(1)}}
-  @keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.12)}100%{transform:scale(1)}}
+  @keyframes popCrochet{0%{transform:scale(1)}40%{transform:scale(1.12)}100%{transform:scale(1)}}   /* (7 nov.) s'appelait « pop » et remplaçait le « pop » des fenêtres : la fiche d'un livre grossissait à 112 % en s'ouvrant = flash */
   @keyframes halo{from{transform:scale(.8);opacity:1}to{transform:scale(1.9);opacity:0}}
   @keyframes conf{0%{opacity:1;transform:translate(-50%,-50%) rotate(0)}100%{opacity:0;transform:translate(calc(-50% + var(--x)),calc(-50% + var(--y))) rotate(var(--r))}}
   @keyframes monte{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
