@@ -1300,13 +1300,13 @@ function chargement(l){
   c.innerHTML = `<div class="charge-c">` + (couv(l) ? `<img src="${esc(couv(l))}" alt="">` : "") + `<div><div class="charge-r" aria-hidden="true"></div><b>${esc(l.titre)}</b><span>Ouverture du livre…</span></div></div>`;
   c.hidden = false; const t0 = Date.now();
   /* (7 nov., demande de Jeremy) on laisse au livre le temps de bien s'ouvrir : une fois prêt, encore 1,5 s (images décodées, animations lancées),
-     au moins 2,5 s en tout, et on attend que les images de la page soient chargées (au plus 6 s de plus) */
+     au moins 4 s en tout, et on attend que les images de la page soient chargées (au plus 6 s de plus) */
   let tPret = 0;
   const imagesPretes = () => { try { const d = $("#readerFrame").contentDocument; return [...d.images].every(i => i.complete); } catch(e){ return true; } };
   chargeT = setInterval(() => { let pret = false; try { pret = !!(RD.drv && RD.drv.state().tot > 0); } catch(e){}
     const n = Date.now();
     if (pret && !tPret){ tPret = n; const sp = c.querySelector(".charge-c span"); if (sp) sp.textContent = "Préparation des pages et des animations…"; }
-    const fini = tPret && n - tPret > 1500 && n - t0 > 2500 && (imagesPretes() || n - tPret > 6000);
+    const fini = tPret && n - tPret > 1500 && n - t0 > 4000 && (imagesPretes() || n - tPret > 6000);
     if (fini || n - t0 > 45000 || !$("#reader").classList.contains("open") && n - t0 > 4000){ clearInterval(chargeT); c.hidden = true; } }, 150);
 }
 /* ---- Fenêtre de détails ---- */
