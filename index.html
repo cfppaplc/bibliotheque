@@ -1179,13 +1179,14 @@ function render(){
 
   let html = "";
   if (!query && view === "all"){
-    html += rowHTML("Continuer", list.filter(l => POS[l.fichier] && POS[l.fichier].n > 1).sort((a, b) => POS[b.fichier].t - POS[a.fichier].t));
+    /* « Continuer » : tout en bas (6 nov., peu utilisée au quotidien), après les programmes */
     /* « Nouveautés » retirée : les livres récents gardent leur étiquette et sont listés dans « Quoi de neuf » */
     if (favs.length) html += rowHTML("Ma liste", list.filter(isFav));
   }
   const cats = [...new Set(list.map(l => l.categorie))].sort((a, b) => nomProgramme(a).localeCompare(nomProgramme(b), "fr"));
   const parComp = (a, b) => (parseFloat(a.competence) || 999) - (parseFloat(b.competence) || 999) || a.titre.localeCompare(b.titre, "fr");
   cats.forEach(c => html += rowHTML(nomProgramme(c), list.filter(l => l.categorie === c).sort(parComp)));
+  if (!query && view === "all") html += rowHTML("Continuer", list.filter(l => POS[l.fichier] && POS[l.fichier].n > 1).sort((a, b) => POS[b.fichier].t - POS[a.fichier].t));
   rows.innerHTML = html;
   dessinerFiltres();
   if (query.length >= 3) chercherDansLivres(query);
