@@ -1749,6 +1749,34 @@ function zoomSourisFin(){
     st.scrollLeft = cx * RD.z * K + (RD.mx || 0) - px; st.scrollTop = cy * RD.z * K + (RD.my || 0) - py; }
   try { sizeInner(); } catch(e){}   /* toile et dessin remis nets */
 }
+/* Pincement à deux doigts = zoom (6 nov., écran tactile) : même zoom que la roulette (zoomSouris), centré entre les deux doigts.
+   Le petit trait que le 1er doigt a pu tracer avant l'arrivée du 2e est annulé à la fin du geste. */
+function brancherPincement(cible, frame){
+  let d0 = 0, actif = false, n0 = 0;
+  const dist = t => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
+  const garde = e => !frame ? ($("#reader") && $("#reader").classList.contains("open") && $("#reader").contains(e.target)) : true;
+  cible.addEventListener("touchstart", e => {
+    if (!garde(e)) return;
+    if (e.touches.length === 2){ d0 = dist(e.touches); actif = d0 > 20; }
+  }, { capture:true, passive:true });
+  /* nombre de traits avant que le 1er doigt (pointerdown, qui précède touchstart) ne commence le sien */
+  cible.addEventListener("pointerdown", e => { if (e.pointerType === "touch" && e.isPrimary && !actif){ try { n0 = strokes().length; } catch(x){ n0 = 0; } } }, { capture:true, passive:true });
+  cible.addEventListener("touchmove", e => {
+    if (!actif || e.touches.length !== 2) return;
+    const d = dist(e.touches); if (d < 20 || !d0) return;
+    e.preventDefault();
+    const mx = (e.touches[0].clientX + e.touches[1].clientX) / 2, my = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+    zoomSouris({ clientX:mx, clientY:my, deltaY: -Math.log(d / d0) / .0075, deltaMode:0 }, frame);
+    d0 = d;
+  }, { capture:true, passive:false });
+  const fin = e => {
+    if (!actif || e.touches.length) return; actif = false;
+    setTimeout(() => { try { if (strokes().length > n0) undoInk(); } catch(x){} }, 350);   /* trait parasite du 1er doigt */
+  };
+  cible.addEventListener("touchend", fin, { capture:true, passive:true });
+  cible.addEventListener("touchcancel", fin, { capture:true, passive:true });
+}
+brancherPincement(document, null);
 function majCurseur(){
   const c = RD.laser ? "none" : (RD.z > 1 && !outilActif() ? "grab" : "");
   [$("#readerFrame"), $("#readerFrame2")].forEach(f => { try {
@@ -1760,6 +1788,7 @@ function majCurseur(){
 }
 function brancherSouris(win){
   const doc = win.document, st = () => $("#rstage");
+  brancherPincement(win, win.frameElement);
   /* les barres reviennent quand la souris touche le haut ou le bas de l'écran, ou qu'on touche le bas */
   win.addEventListener("mousemove", e => { if (e.clientY < 70 || e.clientY > win.innerHeight - 110) afficherBarres(); }, { passive:true });
   win.addEventListener("touchstart", e => { const t = e.touches && e.touches[0]; if (t && (t.clientY < 50 || t.clientY > win.innerHeight - 70)) afficherBarres(); }, { passive:true });
