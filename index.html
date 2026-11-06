@@ -1784,7 +1784,7 @@ function zoomSourisPas(){
     inn.style.transformOrigin = "0 0"; inn.style.transform = "translate(" + ZS.tx + "px," + ZS.ty + "px) scale(" + s1 + ")";
     const t = Math.round(z * 100) + "%"; $("#tbZv").textContent = t; $("#wbZv").textContent = t;
   }
-  clearTimeout(ZS.fin); ZS.fin = setTimeout(zoomSourisFin, 140);
+  clearTimeout(ZS.fin); if (!ZS.tenu) ZS.fin = setTimeout(zoomSourisFin, 140);   /* doigts posés (pincement) : on attend qu'ils se lèvent, sinon une pause de 140 ms refait tout le livre et l'écran clignote */
 }
 function zoomSourisFin(){
   if (!ZS.on) return; const st = $("#rstage"), inn = $("#rinner"), K = RD.wb ? WBK : 1;
@@ -1806,7 +1806,7 @@ function brancherPincement(cible, frame){
   const garde = e => !frame ? ($("#reader") && $("#reader").classList.contains("open") && $("#reader").contains(e.target)) : true;
   cible.addEventListener("touchstart", e => {
     if (!garde(e)) return;
-    if (e.touches.length === 2){ d0 = dist(e.touches); actif = d0 > 20; }
+    if (e.touches.length === 2){ d0 = dist(e.touches); actif = d0 > 20; if (actif){ ZS.tenu = true; clearTimeout(ZS.fin); } }
   }, { capture:true, passive:true });
   /* nombre de traits avant que le 1er doigt (pointerdown, qui précède touchstart) ne commence le sien */
   cible.addEventListener("pointerdown", e => { if (e.pointerType === "touch" && e.isPrimary && !actif){ try { n0 = strokes().length; } catch(x){ n0 = 0; } } }, { capture:true, passive:true });
@@ -1820,7 +1820,7 @@ function brancherPincement(cible, frame){
     d0 = d;
   }, { capture:true, passive:false });
   const fin = e => {
-    if (!actif || e.touches.length) return; actif = false;
+    if (!actif || e.touches.length) return; actif = false; ZS.tenu = false; clearTimeout(ZS.fin); ZS.fin = setTimeout(zoomSourisFin, 60);
     setTimeout(() => { try { if (strokes().length > n0) undoInk(); } catch(x){} }, 350);   /* trait parasite du 1er doigt */
   };
   cible.addEventListener("touchend", fin, { capture:true, passive:true });
