@@ -5286,6 +5286,8 @@ function ouvrirLivre(l, brut){
   }
 }
 function lire(l){
+  /* « Lire » ouvre le livre en plein écran (réglage Mes préférences → Livre en plein écran); demandé tout de suite, pendant le geste de l'enseignant */
+  try { if (!document.fullscreenElement && !document.body.classList.contains("classe") && !(window.PREF && window.PREF().plein === false)) document.documentElement.requestFullscreen().catch(() => {}); } catch(e){}
   if (l.user){
     DB.getHtml(l.id).then(h => { if (h) ouvrirLivre(l, h); else aviser("Ce livre est introuvable sur cet ordinateur."); })
       .catch(() => aviser("Impossible de lire le livre enregistré."));
@@ -9222,6 +9224,7 @@ window.ACCES = (function(){
       + '<div class="lig"><span>Animations</span>' + seg("leger", [["auto","Automatique"],["non","Complètes"],["oui","Légères"]], window.modeLegerChoix ? window.modeLegerChoix() : "auto") + '</div>'
       + '<h3>Bibliothèque</h3>'
       + '<div class="lig"><span>Livres affichés au départ</span>' + seg("prog", PROG, P.prog === undefined ? "" : P.prog) + '</div>'
+      + '<div class="lig"><span>Livre en plein écran</span>' + seg("plein", [["oui","Oui"],["non","Non"]], P.plein === false ? "non" : "oui") + '</div>'
       + '<div class="lig"><span>Reprendre où j\'étais</span>' + seg("reprise", [["demander","Demander"],["toujours","Toujours"],["jamais","Jamais"]], P.reprise || "demander") + '</div>'
       + (ACCES.eleve ? '' : '<h3>Tableau blanc</h3>'
       + '<div class="lig"><span>Fond au départ</span>' + seg("fond", FONDS, P.fond || "blanc") + '</div>'
@@ -9229,7 +9232,7 @@ window.ACCES = (function(){
       + '<div class="acces-btns" style="justify-content:space-between;align-items:center;margin-top:16px"><button type="button" class="raz" id="pRaz">Remettre comme au départ</button><button class="prim" id="pFin">Terminé</button></div></div>';
     B.querySelectorAll("[data-k]").forEach(b => b.onclick = () => { const k = b.dataset.k, v = b.dataset.v;
       if (k === "leger"){ if (window.modeLegerFixer) window.modeLegerFixer(v); contenu(B); return; }
-      ecrire(k, k === "bonjour" ? (v === "oui" ? null : false) : v); });
+      ecrire(k, k === "bonjour" || k === "plein" ? (v === "oui" ? null : false) : v); });
     B.querySelector("#pFin").onclick = () => { document.getElementById("accesOv").hidden = true; };
     B.querySelector("#pRaz").onclick = () => { try { localStorage.removeItem(cle()); } catch(e){} dejaProg = ""; window.appliquerPrefs(); dessiner(); };
   }
