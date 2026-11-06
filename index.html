@@ -802,7 +802,52 @@
   @media (min-width:3200px){ #hero,#rows,footer,header{zoom:2} .hero{min-height:calc(62vh / 2)} .hero-stack img{height:min(calc(40vh / 2),330px)} }
 
   .timer-time .tm-edit{width:5.6ch;font:inherit;font-variant-numeric:tabular-nums;text-align:center;color:inherit;background:rgba(255,255,255,.08);border:0;border-bottom:2px solid #f1f1f2;border-radius:6px;padding:0;outline:none}
-</style></head><body>
+
+/* ---------- Mode léger (html.leger) : tableau interactif lent ---------- */
+html.leger *,html.leger *::before,html.leger *::after{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;will-change:auto!important;transition-duration:.01s!important;transition-delay:0s!important}
+html.leger *:not(.acces-succes *):not(.acces-marque img):not(.cadenas.secoue):not(#compteBtn .cloche svg):not(.sch-gard .ok):not(.charge-r),html.leger *::before,html.leger *::after{animation:none!important}
+html.leger{scroll-behavior:auto}
+</style><script>
+/* Mode léger (tableau interactif lent) : localStorage.modeLeger = "oui" | "non"; sans choix = automatique (le site mesure sa fluidité).
+   Classe html.leger : plus de flous, transitions ni animations d'ambiance. Même réglage pour la bibliothèque et l'accueil de classe. */
+(function(){
+  var h = document.documentElement, S;
+  try { S = window.localStorage; } catch(e){ S = null; }
+  function lire(k){ try { return S && S.getItem(k); } catch(e){ return null; } }
+  function ecrire(k, v){ try { if (S) S.setItem(k, v); } catch(e){} }
+  function appliquer(){ var m = lire("modeLeger"); h.classList.toggle("leger", m === "oui" || (m !== "non" && lire("modeLegerMesure") === "lent")); }
+  window.modeLegerChoix = function(){ return lire("modeLeger") || "auto"; };
+  window.modeLegerFixer = function(v){ try { if (!S) return; if (v === "auto") S.removeItem("modeLeger"); else S.setItem("modeLeger", v); } catch(e){} appliquer(); if (v === "auto") mesurer(); };
+  appliquer();
+  addEventListener("storage", function(e){ if (e.key === "modeLeger" || e.key === "modeLegerMesure") appliquer(); });
+  /* mesure : petit essai d'animation floutée pendant ~1,5 s, 3 s après le chargement; lent = image médiane > 28 ms (moins de ~35 images/s) */
+  function mesurer(){
+    if (lire("modeLeger") || !window.requestAnimationFrame) return;
+    var t = document.createElement("div");
+    t.style.cssText = "position:fixed;right:0;bottom:0;width:640px;height:360px;opacity:.03;pointer-events:none;z-index:-1;overflow:hidden";
+    t.innerHTML = '<div style="position:absolute;inset:0;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)"></div><div style="position:absolute;left:0;top:0;width:200%;height:100%;background:repeating-linear-gradient(90deg,#f00 0 40px,#00f 40px 80px);animation:modeLegerTest .6s linear infinite"></div>';
+    var st = document.createElement("style"); st.textContent = "@keyframes modeLegerTest{to{transform:translateX(-80px)}}";
+    document.head.appendChild(st); document.body.appendChild(t);
+    var d = [], prec = 0, vu = false;
+    function fin(){ t.remove(); st.remove(); }
+    function img(ts){
+      if (document.hidden) vu = true;
+      if (prec) d.push(ts - prec);
+      prec = ts;
+      if (d.length < 45 && !vu) return requestAnimationFrame(img);
+      fin();
+      if (vu || d.length < 30) return;
+      d = d.slice(5).sort(function(a, b){ return a - b; });
+      var med = d[d.length >> 1];
+      window.modeLegerMediane = med;
+      ecrire("modeLegerMesure", med > 28 ? "lent" : "ok"); appliquer();
+    }
+    requestAnimationFrame(img);
+  }
+  addEventListener("load", function(){ setTimeout(mesurer, 3000); });
+})();
+</script>
+</head><body>
 <header id="topbar">
   <div class="logo"><span class="logo-pav"><img class="lg-blc" src="img/pavillon-avenir-blanc.png" alt="Pavillon de l'Avenir — Centre de formation professionnelle"><img class="lg-clr" src="img/pavillon-avenir.png" alt=""></span><span class="logo-t">Bibliothèque</span></div>
   <nav>
@@ -1276,7 +1321,8 @@ const HOSTCSS = "#ui{display:none!important}nav#bar{display:none!important}div#a
   + "html{-webkit-text-size-adjust:100%!important;text-size-adjust:100%!important}"
   + "#book>.page.out.fwd,#book>.page.out.back{animation:biblioPageOut .3s ease forwards!important;z-index:3!important}#book>.page.cur.fwd,#book>.page.cur.back{animation:biblioPage .45s cubic-bezier(.2,.7,.2,1) backwards!important;z-index:2!important}"
   + "@keyframes biblioPage{from{opacity:0;translate:0 8px}to{opacity:1;translate:none}}@keyframes biblioPageOut{from{opacity:1}to{opacity:0}}"
-  + "@media (prefers-reduced-motion:reduce){.page.vis,.page.hcur,#book>.page.cur,#book>.page.out{animation-duration:.01s!important}}";   // masque la barre d'outils intégrée aux livres
+  + "@media (prefers-reduced-motion:reduce){.page.vis,.page.hcur,#book>.page.cur,#book>.page.out{animation-duration:.01s!important}}";
+const LEGERCSS = "*{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;will-change:auto!important}.page.vis,.page.hcur,#book>.page.cur,#book>.page.out{animation-duration:.01s!important}";   /* mode léger : livres sans flou ni transition de page */   // masque la barre d'outils intégrée aux livres
 const ICO_CHECK = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"/></svg>';
 const ICO_PAUSE = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5v14M15 5v14"/></svg>', ICO_PLAY = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5l11 7-11 7z" fill="currentColor"/></svg>';
 const RD = { book:"", drv:null, attached:false, z:1, pen:false, wb:false, spot:false, cache:false,
@@ -1916,7 +1962,7 @@ const APPAREIL_LEGER = (function(){
 })();
 window.addEventListener("resize", () => { try { majBoutonDbl(); } catch(e){} });
 function setupExtras(){
-  if (APPAREIL_LEGER) return;
+  if (APPAREIL_LEGER || document.documentElement.classList.contains("leger")) return;
   [3, 4].forEach(i => {
     const f = $("#readerFrame" + i);
     const go = () => { try { const d = f.contentDocument; if (d && d.body) RD["drv" + i] = buildDriver(f.contentWindow, d); } catch(e){} };
@@ -5222,7 +5268,7 @@ $("#penX").onclick = () => { const w = RD.wb; RD.pen = false; RD.eraser = false;
 /* ---- Ouvrir et fermer le lecteur ---- */
 function ouvrirLivre(l, brut){
   try {
-    const html = injectHead(brut, HOSTCSS);
+    const html = injectHead(brut, HOSTCSS + (document.documentElement.classList.contains("leger") ? LEGERCSS : ""));
     killExtras(); RD.html = html; marquerVu(l); $("#readerFrame2").hidden = true; $("#readerFrame2").srcdoc = ""; $("#rinner").classList.remove("dbl"); $("#tbDbl").classList.remove("on"); $("#spine").hidden = true; $("#readerFrame").style.left = $("#readerFrame").style.width = $("#readerFrame").style.clipPath = "";
     RD.t0 = Date.now(); RD.retry = 0; RD.first = undefined; RD.armed = false; RD.offered = false; $("#resume").hidden = true; clearTimeout(RD.resT);
     Object.assign(RD, { single:false, dbl:false, drv2:null, book:l.fichier, drv:null, attached:false, z:1, pen:false, wb:false, spot:false, cache:false, eraser:false, label:"", tot:0 });
@@ -9173,6 +9219,7 @@ window.ACCES = (function(){
       + '<div class="lig"><span>Ma couleur</span>' + ronds("couleur", COULEURS, P.couleur || "#e50914") + '</div>'
       + '<div class="lig"><span>Accueil</span>' + seg("theme", [["auto","Comme l'ordinateur"],["fonce","Foncé"],["clair","Clair"]], theme) + '</div>'
       + '<div class="lig"><span>« Bonjour ' + esc2(S.nom.split(/\s+/)[0]) + ' » en haut</span>' + seg("bonjour", [["oui","Oui"],["non","Non"]], P.bonjour === false ? "non" : "oui") + '</div>'
+      + '<div class="lig"><span>Animations</span>' + seg("leger", [["auto","Automatique"],["non","Complètes"],["oui","Légères"]], window.modeLegerChoix ? window.modeLegerChoix() : "auto") + '</div>'
       + '<h3>Bibliothèque</h3>'
       + '<div class="lig"><span>Livres affichés au départ</span>' + seg("prog", PROG, P.prog === undefined ? "" : P.prog) + '</div>'
       + '<div class="lig"><span>Reprendre où j\'étais</span>' + seg("reprise", [["demander","Demander"],["toujours","Toujours"],["jamais","Jamais"]], P.reprise || "demander") + '</div>'
@@ -9181,6 +9228,7 @@ window.ACCES = (function(){
       + '<div class="lig"><span>Couleur du crayon</span>' + ronds("crayon", CRAYONS, P.crayon || "#e2483d") + '</div>')
       + '<div class="acces-btns" style="justify-content:space-between;align-items:center;margin-top:16px"><button type="button" class="raz" id="pRaz">Remettre comme au départ</button><button class="prim" id="pFin">Terminé</button></div></div>';
     B.querySelectorAll("[data-k]").forEach(b => b.onclick = () => { const k = b.dataset.k, v = b.dataset.v;
+      if (k === "leger"){ if (window.modeLegerFixer) window.modeLegerFixer(v); contenu(B); return; }
       ecrire(k, k === "bonjour" ? (v === "oui" ? null : false) : v); });
     B.querySelector("#pFin").onclick = () => { document.getElementById("accesOv").hidden = true; };
     B.querySelector("#pRaz").onclick = () => { try { localStorage.removeItem(cle()); } catch(e){} dejaProg = ""; window.appliquerPrefs(); dessiner(); };
