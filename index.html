@@ -1299,8 +1299,15 @@ function chargement(l){
   if (!c){ c = document.createElement("div"); c.id = "chargeLivre"; c.className = "charge"; document.body.appendChild(c); }
   c.innerHTML = `<div class="charge-c">` + (couv(l) ? `<img src="${esc(couv(l))}" alt="">` : "") + `<div><div class="charge-r" aria-hidden="true"></div><b>${esc(l.titre)}</b><span>Ouverture du livre…</span></div></div>`;
   c.hidden = false; const t0 = Date.now();
+  /* (7 nov., demande de Jeremy) on laisse au livre le temps de bien s'ouvrir : une fois prêt, encore 1,5 s (images décodées, animations lancées),
+     au moins 2,5 s en tout, et on attend que les images de la page soient chargées (au plus 6 s de plus) */
+  let tPret = 0;
+  const imagesPretes = () => { try { const d = $("#readerFrame").contentDocument; return [...d.images].every(i => i.complete); } catch(e){ return true; } };
   chargeT = setInterval(() => { let pret = false; try { pret = !!(RD.drv && RD.drv.state().tot > 0); } catch(e){}
-    if (pret || Date.now() - t0 > 45000 || !$("#reader").classList.contains("open") && Date.now() - t0 > 4000){ clearInterval(chargeT); c.hidden = true; } }, 150);
+    const n = Date.now();
+    if (pret && !tPret){ tPret = n; const sp = c.querySelector(".charge-c span"); if (sp) sp.textContent = "Préparation des pages et des animations…"; }
+    const fini = tPret && n - tPret > 1500 && n - t0 > 2500 && (imagesPretes() || n - tPret > 6000);
+    if (fini || n - t0 > 45000 || !$("#reader").classList.contains("open") && n - t0 > 4000){ clearInterval(chargeT); c.hidden = true; } }, 150);
 }
 /* ---- Fenêtre de détails ---- */
 let toastT;
@@ -1770,6 +1777,19 @@ function pasDefilement(){
 const ZS = { d:0, px:0, py:0, raf:0 };
 /* Zoom : pas de fondu de page (7 nov.). Quand le livre se remet à l'échelle, sa page peut rejouer son fondu d'ouverture (opacité 0 → 1) = écran qui flashe noir.
    Pendant un zoom et 1,6 s après, on coupe cette animation dans tous les cadres du livre. */
+/* Livre zoomé qu'on glisse (7 nov.) : les animations qui tournent en boucle dans le livre (lueurs, pulsations) obligeaient à redessiner
+   la page agrandie à chaque image : jusqu'à 0,9 s par image sur le tableau interactif. On les met en pause pendant qu'on glisse ou zoome
+   (seulement si le livre est zoomé), et elles repartent 0,5 s après. Les pages elles-mêmes (fondu d'arrivée) ne sont pas touchées. */
+let ZPAUSE = 0;
+function pauseLivre(){
+  if (RD.z <= 1.01 && !ZS.on) return;
+  ["#readerFrame", "#readerFrame2"].forEach(id => { try { const d = $(id).contentDocument; if (!d || !d.head || d.getElementById("zpause")) return;
+    const st = d.createElement("style"); st.id = "zpause"; st.textContent = "body *:not(.page),body *::before,body *::after{animation-play-state:paused!important}"; d.head.appendChild(st);
+    d.querySelectorAll("svg").forEach(v => { try { if (v.animationsPaused && !v.animationsPaused()){ v.pauseAnimations(); v.dataset.zp = "1"; } } catch(e){} }); } catch(e){} });
+  clearTimeout(ZPAUSE);
+  ZPAUSE = setTimeout(() => ["#readerFrame", "#readerFrame2"].forEach(id => { try { const d = $(id).contentDocument, x = d.getElementById("zpause"); if (x) x.remove();
+    d.querySelectorAll("svg[data-zp]").forEach(v => { try { v.unpauseAnimations(); } catch(e){} delete v.dataset.zp; }); } catch(e){} }), 500);
+}
 let ZCALME = 0;
 function calmePage(){
   ["#readerFrame", "#readerFrame2", "#readerFrame3", "#readerFrame4"].forEach(id => { try { const d = $(id).contentDocument; if (!d || !d.head) return;
@@ -1787,7 +1807,7 @@ function zoomSouris(e, frame){ ZS.t = Date.now();
    (qui fait recalculer toute la page) se fait une seule fois, quand la roulette s'arrête. Le point sous la souris reste sous la souris. */
 function zoomSourisPas(){
   ZS.raf = 0; const st = $("#rstage"), inn = $("#rinner"), px = ZS.px, py = ZS.py, d = Math.max(-80, Math.min(80, ZS.d)); ZS.d = 0;
-  if (!ZS.on){ calmePage(); ZS.on = true; ZS.z0 = RD.z; ZS.z = RD.z; ZS.sl = st.scrollLeft; ZS.stp = st.scrollTop; ZS.mx0 = RD.mx || 0; ZS.my0 = RD.my || 0; ZS.tx = 0; ZS.ty = 0; ZS.s = 1; PAN.alvo = null; }
+  if (!RD.wb) pauseLivre(); if (!ZS.on){ calmePage(); ZS.on = true; ZS.z0 = RD.z; ZS.z = RD.z; ZS.sl = st.scrollLeft; ZS.stp = st.scrollTop; ZS.mx0 = RD.mx || 0; ZS.my0 = RD.my || 0; ZS.tx = 0; ZS.ty = 0; ZS.s = 1; PAN.alvo = null; }
   const z = Math.max(zMin(), Math.min(zMax(), ZS.z * Math.exp(-d * .0075)));
   if (Math.abs(z - ZS.z) > .0005){
     const s0 = ZS.s, s1 = z / ZS.z0, bx = ZS.mx0 - ZS.sl, by = ZS.my0 - ZS.stp;
@@ -3514,7 +3534,7 @@ function appliquerTxt(maj){
   $("#txC").onchange = () => {};
   $("#txE").onclick = () => { if (SEL.s) modifierTexte(SEL.s); };
   $("#txD").onclick = () => { const s = SEL.s; if (!s) return; snapInk(); INKS[inkKey()] = strokes().filter(x => x !== s); SEL.s = null; redrawInk(); majBarTxt(); };
-  $("#rstage").addEventListener("scroll", () => majSelTxt(), { passive:true });
+  $("#rstage").addEventListener("scroll", () => { majSelTxt(); if (!RD.wb) pauseLivre(); }, { passive:true });
 })();
 
 
