@@ -766,6 +766,15 @@
     .timer-btns button{min-width:46px;height:46px}.reader-bar button{padding:11px 18px}
     .hbtn{height:42px}.mmb{width:50px}
   }
+  /* ---------- Écran tactile (TNI, 6 nov.) : pas de survol, cibles de 44 px et plus ---------- */
+  @media (pointer:coarse) and (min-width:641px){
+    html{touch-action:manipulation}
+    .arrow{opacity:.9;width:56px;font-size:2.4rem;background:rgba(0,0,0,.6)}
+    .fchip{padding:13px 20px;min-height:49px}
+    #lienAide,#quoiNeuf{display:inline-flex;align-items:center;min-height:49px;padding:0 10px}
+    #compteBtn,#themeBtn,#adminBtn,.hbtn{min-height:49px;min-width:49px}
+    #search{height:49px}
+  }
   @media (min-width:1700px){
     .tb button{min-width:46px;height:46px}.tb input{height:46px;width:70px}
     .tb button svg,.penbar button svg,.timer-btns button svg{width:22px;height:22px}
