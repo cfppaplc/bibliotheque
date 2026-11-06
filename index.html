@@ -2245,9 +2245,9 @@ function appliquerPad(){
     f.style.top = pad ? pad.t + "px" : ""; f.style.height = pad ? "calc(100% + " + pad.h + "px)" : "";
   });
 }
-/* Zoom « photo » à l'essai (7 nov.) : activé sur un appareil en ouvrant le site avec ?zoom=photo (gardé dans localStorage.zoomPhoto), ?zoom=normal pour revenir.
+/* Zoom « photo » (7 nov.) : par défaut; ?zoom=normal sur un appareil = ancien zoom (gardé dans localStorage.zoomPhoto), ?zoom=photo pour revenir.
    Version d'avant ce changement : étiquette git « avant-zoom-photo ». */
-const ZOOM_PHOTO = (() => { try { const q = new URLSearchParams(location.search).get("zoom"); if (q) localStorage.zoomPhoto = q === "photo" ? "oui" : "non"; return localStorage.zoomPhoto === "oui"; } catch(e){ return false; } })();
+const ZOOM_PHOTO = (() => { try { const q = new URLSearchParams(location.search).get("zoom"); if (q) localStorage.zoomPhoto = q === "photo" ? "oui" : "non"; return localStorage.zoomPhoto !== "non"; } catch(e){ return true; } })();   /* (7 nov.) par défaut pour tous; ?zoom=normal = ancien zoom sur cet appareil */
 function zPhoto(){ return ZOOM_PHOTO && !RD.wb; }
 function sizeInner(rapide){   /* rapide = pendant la roulette : on agrandit seulement l'affichage; la toile du crayon est refaite à la fin (sinon 20 ms par cran) */
   appliquerPad(); try { majFond(); } catch(e){}
