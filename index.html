@@ -328,6 +328,12 @@
   .mm.mm-partie b{color:#cfd3d8}
   .mm:hover{background:#2c2c2c}
   @media (max-width:640px){.tb button{min-width:38px;height:38px}.tb input{height:38px}}
+  /* barre d'avancement (7 nov.) : animée par « transform » (elle avance même quand l'ordinateur est occupé à ouvrir le livre); 0 → 85 % en 4 s, puis lentement; pleine à la fin */
+  .charge-b{display:block;width:220px;height:4px;margin-top:10px;border-radius:2px;background:#ffffff1f;overflow:hidden}
+  .charge-b i{display:block;height:100%;background:#e50914;transform-origin:0 50%;transform:scaleX(.02);animation:chargeAv 4s cubic-bezier(.25,.6,.4,1) forwards,chargeAv2 8s 4s linear forwards}
+  .charge-b.fin i{animation:none;transform:scaleX(1);transition:transform .25s ease}
+  @keyframes chargeAv{to{transform:scaleX(.85)}}
+  @keyframes chargeAv2{from{transform:scaleX(.85)}to{transform:scaleX(.97)}}
   .charge{position:fixed;inset:0;z-index:900;display:flex;align-items:center;justify-content:center;background:rgba(10,10,11,.88);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
   .charge-c{display:flex;gap:18px;align-items:center;padding:18px 22px;border-radius:14px;background:rgba(22,22,24,.96);border:1px solid #ffffff1f;box-shadow:0 20px 60px rgba(0,0,0,.6);color:#f1f1f2;font-family:"Segoe UI",Roboto,Arial,sans-serif;max-width:90vw}
   .charge[hidden]{display:none}.charge img{height:120px;aspect-ratio:8.5/11;object-fit:cover;border-radius:4px;box-shadow:0 8px 24px rgba(0,0,0,.5)}
@@ -462,7 +468,7 @@
     html{scroll-behavior:auto}
     /* exception : crochet vert, bienvenue, cadenas, cloche et « Enregistré ! » jouent quand même (courts; sinon le crochet restait invisible
        quand Windows a « Effets d'animation » désactivé, comme sur l'ordinateur de Jeremy) */
-    *:not(.acces-succes *):not(.acces-marque img):not(.cadenas.secoue):not(#compteBtn .cloche svg):not(.sch-gard .ok),*::before,*::after{animation:none!important;transition:none!important}
+    *:not(.acces-succes *):not(.acces-marque img):not(.cadenas.secoue):not(#compteBtn .cloche svg):not(.sch-gard .ok):not(.charge-r):not(.charge-b i),*::before,*::after{animation:none!important;transition:none!important}
   }
   /* ---------- Finitions : progression, signets, mode classe ---------- */
   .row h2{border-left:4px solid var(--cc,#e50914);padding-left:10px}
@@ -806,7 +812,7 @@
 
 /* ---------- Mode léger (html.leger) : tableau interactif lent ---------- */
 html.leger *,html.leger *::before,html.leger *::after{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;will-change:auto!important;transition-duration:.01s!important;transition-delay:0s!important}
-html.leger *:not(.acces-succes *):not(.acces-marque img):not(.cadenas.secoue):not(#compteBtn .cloche svg):not(.sch-gard .ok):not(.charge-r),html.leger *::before,html.leger *::after{animation:none!important}
+html.leger *:not(.acces-succes *):not(.acces-marque img):not(.cadenas.secoue):not(#compteBtn .cloche svg):not(.sch-gard .ok):not(.charge-r):not(.charge-b i),html.leger *::before,html.leger *::after{animation:none!important}
 html.leger{scroll-behavior:auto}
 </style><script>
 /* Mode léger (tableau interactif lent) : localStorage.modeLeger = "oui" | "non"; sans choix = automatique (le site mesure sa fluidité).
@@ -1296,7 +1302,7 @@ function chargement(l){
   let c = document.getElementById("chargeLivre"); clearInterval(chargeT);
   if (!l){ if (c) c.hidden = true; return; }
   if (!c){ c = document.createElement("div"); c.id = "chargeLivre"; c.className = "charge"; document.body.appendChild(c); }
-  c.innerHTML = `<div class="charge-c">` + (couv(l) ? `<img src="${esc(couv(l))}" alt="">` : "") + `<div><div class="charge-r" aria-hidden="true"></div><b>${esc(l.titre)}</b><span>Ouverture du livre…</span></div></div>`;
+  c.innerHTML = `<div class="charge-c">` + (couv(l) ? `<img src="${esc(couv(l))}" alt="">` : "") + `<div><div class="charge-r" aria-hidden="true"></div><b>${esc(l.titre)}</b><span>Ouverture du livre…</span><i class="charge-b"><i></i></i></div></div>`;
   c.hidden = false; const t0 = Date.now();
   /* (7 nov., demande de Jeremy) on laisse au livre le temps de bien s'ouvrir : une fois prêt, encore 1,5 s (images décodées, animations lancées),
      au moins 4 s en tout, et on attend que les images de la page soient chargées (au plus 6 s de plus) */
@@ -1306,7 +1312,7 @@ function chargement(l){
     const n = Date.now();
     if (pret && !tPret){ tPret = n; const sp = c.querySelector(".charge-c span"); if (sp) sp.textContent = "Préparation des pages et des animations…"; }
     const fini = tPret && n - tPret > 1500 && n - t0 > 4000 && (imagesPretes() || n - tPret > 6000);
-    if (fini || n - t0 > 45000 || !$("#reader").classList.contains("open") && n - t0 > 4000){ clearInterval(chargeT); c.hidden = true; } }, 150);
+    if (fini || n - t0 > 45000 || !$("#reader").classList.contains("open") && n - t0 > 4000){ clearInterval(chargeT); const bb = c.querySelector(".charge-b"); if (bb && fini){ bb.classList.add("fin"); setTimeout(() => { c.hidden = true; }, 300); } else c.hidden = true; } }, 150);
 }
 /* ---- Fenêtre de détails ---- */
 let toastT;
