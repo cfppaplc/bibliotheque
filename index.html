@@ -262,6 +262,10 @@
   .reader:not(.wbon) .rstage{scrollbar-width:none}
   .reader:not(.wbon) .rstage::-webkit-scrollbar{display:none}
   .rinner{position:relative}
+  /* (7 nov.) zoom « comme une photo » : dans un livre, #rscale garde toujours la taille de l'écran (le livre n'est jamais recalculé)
+     et c'est un transform scale(z) qui l'agrandit. Tableau blanc : ancien zoom (taille réelle, pas de transform). */
+  .rscale{position:absolute;left:0;top:0;transform-origin:0 0}
+  .rinner.pad .rscale{overflow:hidden}
   .rinner iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#fff}
   .rinner.dbl{background:#0c0c0c}
   .rinner.dbl iframe{inset:auto;top:0;height:100%}
@@ -935,14 +939,14 @@ document.addEventListener("keydown", e => { if (e.key !== "/" || e.ctrlKey || e.
   <div class="reader-bar"><button id="readerBack">← Retour</button><button id="readerTdb" type="button" title="Tableau de bord (E) — le livre reste ouvert"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="4" width="17" height="12.5" rx="1.5"/><path d="M8 20h8M12 16.5V20"/></svg>Tableau de bord</button><span id="readerTitle"></span></div>
   <button class="tdb-pill" id="tdbPill" type="button" title="Retour au tableau de bord (E)"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="4" width="17" height="12.5" rx="1.5"/><path d="M8 20h8M12 16.5V20"/></svg>Tableau de bord</button>
   <div class="rstage" id="rstage">
-    <div class="rinner" id="rinner">
+    <div class="rinner" id="rinner"><div class="rscale" id="rscale">
       <iframe id="readerFrame" title="Livre" allow="fullscreen" allowfullscreen></iframe>
       <iframe id="readerFrame2" title="Livre, page de droite" hidden></iframe>
       <iframe id="readerFrame3" title="" hidden aria-hidden="true" tabindex="-1"></iframe>
       <iframe id="readerFrame4" title="" hidden aria-hidden="true" tabindex="-1"></iframe>
       <div class="spine" id="spine" hidden></div>
       <div class="wbboard" id="wbBoard" hidden></div>
-      <canvas class="ink" id="inkCanvas"></canvas><script>try{document.getElementById("inkCanvas").getContext("2d",{desynchronized:true});}catch(e){}</script>   <!-- crayon : affichage sans attendre l'image suivante (moins de retard); doit être le 1er getContext -->
+      <canvas class="ink" id="inkCanvas"></canvas><script>try{document.getElementById("inkCanvas").getContext("2d",{desynchronized:true});}catch(e){}</script></div>   <!-- crayon : affichage sans attendre l'image suivante (moins de retard); doit être le 1er getContext -->
       <div class="spot" id="spot" hidden></div>
       <div class="cache" id="cache" hidden><div class="cache-handle" id="cacheHandle">Glisse cette barre pour révéler</div></div>
     </div>
@@ -1595,6 +1599,7 @@ function enSaisie(t){
 const ANIM_CSS = '#h-anim{position:fixed;left:0;top:0;width:0;height:0;z-index:2147483000;pointer-events:none}'
   + '.h-actl{position:fixed;display:none;align-items:center;gap:3px;padding:3px;background:rgba(14,14,15,.94);border:1px solid #2f2f33;border-radius:8px;color:#e6e6e8;box-shadow:0 4px 14px rgba(0,0,0,.4);pointer-events:auto;white-space:nowrap;user-select:none;-webkit-user-select:none;opacity:.22;transition:opacity .2s;font:600 11px/1 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}'
   + '.h-actl.on{display:flex}'
+  + '.h-actl{zoom:calc(1 / var(--zb, 1))}'   /* zoom « photo » : le livre est agrandi par la bibliothèque, ce petit bouton garde sa taille */
   + '.h-actl .hg{display:inline-flex;align-items:center;justify-content:center;width:14px;height:24px;cursor:grab;color:#76767c;touch-action:none}.h-actl .hg:hover{color:#d4d4d8}.h-actl.drag{opacity:1}.h-actl.drag .hg{cursor:grabbing}'
   + '.h-actl.paused{opacity:.5}.h-actl.near,.h-actl:hover,.h-actl.paused.near{opacity:1}'
   + '.h-actl button{all:unset;box-sizing:border-box;min-width:24px;height:24px;padding:0 7px;display:inline-flex;align-items:center;justify-content:center;gap:4px;border-radius:6px;cursor:pointer;color:#d4d4d8;background:#18181a;border:1px solid #2f2f33;font:600 11px/1 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}'
@@ -1805,7 +1810,8 @@ function calmePage(){
 }
 function zoomSouris(e, frame){ ZS.t = Date.now();
   const st = $("#rstage"), sr = st.getBoundingClientRect(), fr = frame ? frame.getBoundingClientRect() : sr;
-  ZS.px = (frame ? fr.left + e.clientX : e.clientX) - sr.left; ZS.py = (frame ? fr.top + e.clientY : e.clientY) - sr.top;
+  const kf = frame && !e.ecran ? fr.width / (frame.offsetWidth || fr.width) : 1;   /* cadre agrandi par le zoom : ses coordonnées sont à remettre à l'échelle de l'écran */
+  ZS.px = (frame ? fr.left + e.clientX * kf : e.clientX) - sr.left; ZS.py = (frame ? fr.top + e.clientY * kf : e.clientY) - sr.top;
   ZS.d += Math.max(-40, Math.min(40, e.deltaY * (e.deltaMode === 1 ? 33 : 1)));
   if (!ZS.raf) ZS.raf = requestAnimationFrame(zoomSourisPas);
 }
@@ -1838,33 +1844,37 @@ function zoomSourisFin(){
 }
 /* Pincement à deux doigts = zoom (6 nov., écran tactile) : même zoom que la roulette (zoomSouris), centré entre les deux doigts.
    Le petit trait que le 1er doigt a pu tracer avant l'arrivée du 2e est annulé à la fin du geste. */
+/* (7 nov.) les doigts sont suivis pour TOUS les documents ensemble (bibliothèque + pages du livre) : en double page, un doigt sur chaque page
+   = deux documents qui ne voyaient chacun qu'un seul doigt, et le pincement ne marchait pas. Positions gardées en coordonnées de l'écran. */
+const PZ = { pts:new Map(), actif:false, apres:false, d0:0, n0:0 };
 function brancherPincement(cible, frame){
-  let d0 = 0, actif = false, n0 = 0, apres = false;
-  /* dans un livre, les coordonnées du doigt sont celles du cadre, qui est agrandi (transform) pendant le geste : on les remet à l'échelle de l'écran,
-     sinon la distance « rétrécit » à mesure que le zoom grandit et le pincement semble mou */
-  const k = () => { if (!frame) return 1; try { const w = frame.offsetWidth; return w ? frame.getBoundingClientRect().width / w : 1; } catch(x){ return 1; } };
-  const dist = t => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY) * k();
+  const nom = frame ? frame.id : "biblio";
+  const ecran = t => { if (!frame) return [t.clientX, t.clientY]; const r = frame.getBoundingClientRect(), k = frame.offsetWidth ? r.width / frame.offsetWidth : 1; return [r.left + t.clientX * k, r.top + t.clientY * k]; };
   const garde = e => !frame ? ($("#reader") && $("#reader").classList.contains("open") && $("#reader").contains(e.target)) : true;
+  const sync = e => { const n = Date.now(); [...PZ.pts.keys()].forEach(c => { if (c.startsWith(nom + ":") || n - PZ.pts.get(c).t > 4000) PZ.pts.delete(c); });   /* les doigts de ce document = ceux de e.touches */
+    for (const t of e.touches) PZ.pts.set(nom + ":" + t.identifier, { p:ecran(t), t:n }); };
+  const deux = () => { const v = [...PZ.pts.values()]; return v.length === 2 ? v.map(o => o.p) : null; };
   cible.addEventListener("touchstart", e => {
-    if (!garde(e)) return;
-    if (e.touches.length === 2){ d0 = dist(e.touches); actif = d0 > 12; if (actif){ apres = true; ZS.tenu = true; clearTimeout(ZS.fin); } }
+    if (!garde(e)) return; sync(e);
+    const q = deux(); if (q && !PZ.actif){ PZ.d0 = Math.hypot(q[0][0] - q[1][0], q[0][1] - q[1][1]); PZ.actif = PZ.d0 > 12; if (PZ.actif){ PZ.apres = true; ZS.tenu = true; clearTimeout(ZS.fin); } }
   }, { capture:true, passive:true });
   /* nombre de traits avant que le 1er doigt (pointerdown, qui précède touchstart) ne commence le sien */
-  cible.addEventListener("pointerdown", e => { if (e.pointerType === "touch" && e.isPrimary && !actif){ try { n0 = strokes().length; } catch(x){ n0 = 0; } } }, { capture:true, passive:true });
+  cible.addEventListener("pointerdown", e => { if (e.pointerType === "touch" && e.isPrimary && !PZ.actif){ try { PZ.n0 = strokes().length; } catch(x){ PZ.n0 = 0; } } }, { capture:true, passive:true });
   cible.addEventListener("touchmove", e => {
-    if (apres && !actif && e.touches.length === 1){ e.preventDefault(); return; }   /* (7 nov.) un doigt levé avant l'autre : celui qui reste ne fait plus glisser la page (l'écran « se replaçait » à la fin du pincement) */
-    if (!actif || e.touches.length !== 2) return;
-    const d = dist(e.touches); if (d < 12 || !d0) return;
+    sync(e);
+    if (PZ.apres && !PZ.actif && PZ.pts.size === 1){ e.preventDefault(); return; }   /* un doigt levé avant l'autre : celui qui reste ne fait plus glisser la page */
+    const q = deux(); if (!q) return;
+    if (!PZ.actif){ PZ.d0 = Math.hypot(q[0][0] - q[1][0], q[0][1] - q[1][1]); PZ.actif = PZ.d0 > 12; if (PZ.actif){ PZ.apres = true; ZS.tenu = true; clearTimeout(ZS.fin); e.preventDefault(); } return; }   /* le 2e doigt est arrivé ailleurs (autre page, bord de l'écran) : le navigateur ne l'annonce qu'au 1er mouvement */
+    const d = Math.hypot(q[0][0] - q[1][0], q[0][1] - q[1][1]); if (d < 12 || !PZ.d0) return;
     e.preventDefault();
-    const mx = (e.touches[0].clientX + e.touches[1].clientX) / 2, my = (e.touches[0].clientY + e.touches[1].clientY) / 2;
-    const ks = k();
-    zoomSouris({ clientX:mx * ks, clientY:my * ks, deltaY: -Math.log(d / d0) * 2.2 / .0075, deltaMode:0 }, frame);
-    d0 = d;
+    zoomSouris({ clientX:(q[0][0] + q[1][0]) / 2, clientY:(q[0][1] + q[1][1]) / 2, deltaY: -Math.log(d / PZ.d0) * 2.2 / .0075, deltaMode:0 }, null);
+    PZ.d0 = d;
   }, { capture:true, passive:false });
   const fin = e => {
-    if (actif && e.touches.length < 2){ actif = false; ZS.tenu = false; clearTimeout(ZS.fin); ZS.fin = setTimeout(zoomSourisFin, 60); }   /* le zoom se termine dès qu'un doigt se lève */
-    if (e.touches.length || !apres) return; apres = false;
-    setTimeout(() => { try { if (strokes().length > n0) undoInk(); } catch(x){} }, 350);   /* trait parasite du 1er doigt */
+    sync(e);
+    if (PZ.actif && PZ.pts.size < 2){ PZ.actif = false; ZS.tenu = false; clearTimeout(ZS.fin); ZS.fin = setTimeout(zoomSourisFin, 60); }   /* le zoom se termine dès qu'un doigt se lève */
+    if (PZ.pts.size || !PZ.apres) return; PZ.apres = false;
+    const n0 = PZ.n0; setTimeout(() => { try { if (strokes().length > n0) undoInk(); } catch(x){} }, 350);   /* trait parasite du 1er doigt */
   };
   cible.addEventListener("touchend", fin, { capture:true, passive:true });
   cible.addEventListener("touchcancel", fin, { capture:true, passive:true });
@@ -2020,7 +2030,7 @@ function setupExtras(){
 }
 function flipTurn(dir){
   try { flipTurnAnime(dir); } catch(e){
-    RD.flip = false; try { $("#rinner").classList.remove("flip"); $("#rinner").style.perspective = ""; } catch(_){}
+    RD.flip = false; try { $("#rinner").classList.remove("flip"); $("#rscale").style.perspective = ""; } catch(_){}
     try { RD.drv.goto(cibleTour(dir)); setTimeout(() => { syncSecond(); poll(); }, 200); } catch(_){}
   }
 }
@@ -2051,7 +2061,7 @@ function flipTurnAnime(dir){
     f[4].style.zIndex = 0; f[2].style.zIndex = 1; f[1].style.zIndex = 2; f[3].style.zIndex = 3;
     from = ["0deg", "90deg"]; to = ["-90deg", "0deg"];
   }
-  inn.classList.add("flip"); inn.style.perspective = "2600px";
+  inn.classList.add("flip"); $("#rscale").style.perspective = "2600px";
   flipper.style.transformOrigin = fo + "px 50%"; lander.style.transformOrigin = lo + "px 50%";
   const fin = () => {
     RD.calme = true;
@@ -2062,7 +2072,7 @@ function flipTurnAnime(dir){
       f[3].style.visibility = "hidden"; f[4].style.visibility = "hidden";
       f[1].style.visibility = "visible";
       if (!(t && m + 1 > t)) f[2].style.visibility = "visible";
-      inn.classList.remove("flip"); inn.style.perspective = "";
+      inn.classList.remove("flip"); $("#rscale").style.perspective = "";
       RD.flip = false; poll();
       if (RD.queued){ const q = RD.queued; RD.queued = 0; setTimeout(() => flipTurn(q), 30); }
     }, 330);
@@ -2093,7 +2103,7 @@ function retourSimple(essai, tentes){
 function natifDouble(){ try { return typeof $("#readerFrame").contentWindow.two === "function" || /\d\s*[-–]\s*\d/.test(String(RD.drv.state().label)); } catch(e){ return false; } }
 function layoutSingle(){
   if (!RD.single) return;
-  const inn = $("#rinner"), W = inn.clientWidth, H = inn.clientHeight, f = $("#readerFrame");
+  const inn = $("#rscale"), W = inn.clientWidth, H = inn.clientHeight, f = $("#readerFrame");
   const pd = RD.drv && RD.drv.pad, w = Math.floor(Math.min(W, pd ? (H - 16) * PAGE_RATIO + pd.w : H * PAGE_RATIO));
   f.style.width = w + "px"; f.style.left = Math.round((W - w) / 2) + "px"; f.style.clipPath = "";
   /* on rogne le cadre à la page elle-même, centrée */
@@ -2199,7 +2209,7 @@ function measurePage(f){
 function layoutDbl(){
   if (RD.single){ layoutSingle(); return; }
   if (!RD.dbl) return;
-  const inn = $("#rinner"), W = inn.clientWidth, H = inn.clientHeight;
+  const inn = $("#rscale"), W = inn.clientWidth, H = inn.clientHeight;
   if (W < 50 || H < 50) return;
   const pd = RD.drv && RD.drv.pad, w = Math.floor(Math.min(W / 2, pd ? (H - 16) * PAGE_RATIO + pd.w : H * PAGE_RATIO));
   const f1 = $("#readerFrame"), f2 = $("#readerFrame2");
@@ -2235,6 +2245,10 @@ function appliquerPad(){
     f.style.top = pad ? pad.t + "px" : ""; f.style.height = pad ? "calc(100% + " + pad.h + "px)" : "";
   });
 }
+/* Zoom « photo » à l'essai (7 nov.) : activé sur un appareil en ouvrant le site avec ?zoom=photo (gardé dans localStorage.zoomPhoto), ?zoom=normal pour revenir.
+   Version d'avant ce changement : étiquette git « avant-zoom-photo ». */
+const ZOOM_PHOTO = (() => { try { const q = new URLSearchParams(location.search).get("zoom"); if (q) localStorage.zoomPhoto = q === "photo" ? "oui" : "non"; return localStorage.zoomPhoto === "oui"; } catch(e){ return false; } })();
+function zPhoto(){ return ZOOM_PHOTO && !RD.wb; }
 function sizeInner(rapide){   /* rapide = pendant la roulette : on agrandit seulement l'affichage; la toile du crayon est refaite à la fin (sinon 20 ms par cran) */
   appliquerPad(); try { majFond(); } catch(e){}
   const st = $("#rstage"), inn = $("#rinner"), c = $("#inkCanvas");
@@ -2243,10 +2257,13 @@ function sizeInner(rapide){   /* rapide = pendant la roulette : on agrandit seul
   const fz = RD.wb ? 0 : Math.max(0, Math.min(1, (RD.z - 1) / .5));                 /* livre zoomé : marge autour pour pouvoir amener un bord au milieu */
   RD.mx = Math.round(w * .4 * fz); RD.my = Math.round(h * .4 * fz); inn.style.margin = RD.my + "px " + RD.mx + "px";
   inn.style.width = (w * RD.z * K) + "px"; inn.style.height = (h * RD.z * K) + "px";
+  const S = zPhoto() ? 1 : RD.z, rs = $("#rscale");                       /* S = échelle de mise en page; le reste du zoom est un transform */
+  rs.style.width = (w * S * K) + "px"; rs.style.height = (h * S * K) + "px"; rs.style.transform = zPhoto() && RD.z !== 1 ? "scale(" + RD.z + ")" : "";
+  ["#readerFrame", "#readerFrame2"].forEach(id => { try { $(id).contentDocument.documentElement.style.setProperty("--zb", zPhoto() ? RD.z : 1); } catch(e){} });
   if (!rapide){ const d0 = window.devicePixelRatio || 1, px = (w * RD.z * K) * (h * RD.z * K) * d0 * d0;
     RD.dprInk = d0 * Math.min(1, Math.sqrt(24e6 / Math.max(1, px)));
     c.width = Math.round(w * RD.z * K * RD.dprInk); c.height = Math.round(h * RD.z * K * RD.dprInk); }
-  c.style.width = (w * RD.z * K) + "px"; c.style.height = (h * RD.z * K) + "px";
+  c.style.width = (w * S * K) + "px"; c.style.height = (h * S * K) + "px";
   $("#tbZv").textContent = Math.round(RD.z * 100) + "%"; $("#wbZv").textContent = Math.round(RD.z * 100) + "%";
   layoutDbl();
   majCurseur();
@@ -2266,7 +2283,7 @@ function setZoom(z, rapide){
 }
 /* en page simple, le premier cran du zoom est « pleine largeur » : la page remplit toute la largeur de l'écran */
 function zPleineLargeur(){ if (!RD.single || RD.wb) return 0; try { const st = $("#rstage"), f = $("#readerFrame"), m = measurePage(f);
-  const base = m ? (m.r - m.l) / RD.z : st.clientHeight * PAGE_RATIO, z = (st.clientWidth - 8) / base; return z > zMin() + .05 ? Math.min(z, zMax()) : 0; } catch(e){ return 0; } }
+  const base = m ? (m.r - m.l) / (zPhoto() ? 1 : RD.z) : st.clientHeight * PAGE_RATIO, z = (st.clientWidth - 8) / base; return z > zMin() + .05 ? Math.min(z, zMax()) : 0; } catch(e){ return 0; } }
 const ZL = () => { const pl = zPleineLargeur(), t = [.5, .75, ...ZOOMS].filter(v => v >= zMin() && v <= zMax());
   return pl ? [...t.filter(v => v <= zMin() + .001 || v > pl + .12), pl].sort((a, b) => a - b) : t; };
 function zin(){ const pl = zPleineLargeur(), z0 = RD.z, z = ZL().find(v => v > RD.z + .01) || zMax(); setZoom(z);
