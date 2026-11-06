@@ -1776,7 +1776,7 @@ function pasDefilement(){
 }
 const ZS = { d:0, px:0, py:0, raf:0 };
 /* Zoom : pas de fondu de page (7 nov.). Quand le livre se remet à l'échelle, sa page peut rejouer son fondu d'ouverture (opacité 0 → 1) = écran qui flashe noir.
-   Pendant un zoom et 1,6 s après, on coupe cette animation dans tous les cadres du livre. */
+   Pendant un zoom et 1,6 s après, cette animation dure 0 s (pas « animation:none » : la remettre la faisait rejouer = flash à la fin du zoom). */
 /* Livre zoomé qu'on glisse (7 nov.) : les animations qui tournent en boucle dans le livre (lueurs, pulsations) obligeaient à redessiner
    la page agrandie à chaque image : jusqu'à 0,9 s par image sur le tableau interactif. On les met en pause pendant qu'on glisse ou zoome
    (seulement si le livre est zoomé), et elles repartent 0,5 s après. Les pages elles-mêmes (fondu d'arrivée) ne sont pas touchées. */
@@ -1793,7 +1793,7 @@ function pauseLivre(){
 let ZCALME = 0;
 function calmePage(){
   ["#readerFrame", "#readerFrame2", "#readerFrame3", "#readerFrame4"].forEach(id => { try { const d = $(id).contentDocument; if (!d || !d.head) return;
-    if (!d.getElementById("zcalme")){ const st = d.createElement("style"); st.id = "zcalme"; st.textContent = ".page,.page.vis,.page.hcur,#book>.page,#book>.page.cur,#book>.page.out{animation:none!important;transition:none!important}"; d.head.appendChild(st); } } catch(e){} });
+    if (!d.getElementById("zcalme")){ const st = d.createElement("style"); st.id = "zcalme"; st.textContent = ".page,.page.vis,.page.hcur,#book>.page,#book>.page.cur,#book>.page.out{animation-duration:0s!important;animation-delay:0s!important;transition:none!important}"; d.head.appendChild(st); } } catch(e){} });
   clearTimeout(ZCALME);
   ZCALME = setTimeout(() => ["#readerFrame", "#readerFrame2", "#readerFrame3", "#readerFrame4"].forEach(id => { try { const x = $(id).contentDocument.getElementById("zcalme"); if (x) x.remove(); } catch(e){} }), 1600);
 }
@@ -1848,7 +1848,7 @@ function brancherPincement(cible, frame){
     e.preventDefault();
     const mx = (e.touches[0].clientX + e.touches[1].clientX) / 2, my = (e.touches[0].clientY + e.touches[1].clientY) / 2;
     const ks = k();
-    zoomSouris({ clientX:mx * ks, clientY:my * ks, deltaY: -Math.log(d / d0) * 1.2 / .0075, deltaMode:0 }, frame);
+    zoomSouris({ clientX:mx * ks, clientY:my * ks, deltaY: -Math.log(d / d0) * 1.7 / .0075, deltaMode:0 }, frame);
     d0 = d;
   }, { capture:true, passive:false });
   const fin = e => {
