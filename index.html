@@ -1936,7 +1936,7 @@ function setupSecond(){
     syncSecond(); setTimeout(layoutDbl, 400);
     /* Certains livres gardent leur affichage « 2 pages » dans le cadre de gauche : on le remet sur une seule page */
     setTimeout(() => { try { if (RD.dbl && RD.drv && /\d\s*[-–]\s*\d/.test(RD.drv.state().label)){ RD.drv.goto(curPage()); setTimeout(() => { syncSecond(); layoutDbl(); }, 350); } } catch(e){} }, 700);
-    setTimeout(setupExtras, 300);
+    setTimeout(() => (window.requestIdleCallback || (f => setTimeout(f, 1)))(setupExtras, { timeout:4000 }), 6000);   /* (7 nov.) copies pour l'animation de page : 6 s après l'ouverture, quand l'ordinateur est libre (avant : 0,3 s = 4 copies du livre qui se chargent en même temps) */
   } catch(e){}
 }
 function syncSecond(){
@@ -2207,18 +2207,23 @@ function appliquerPad(){
 function sizeInner(rapide){   /* rapide = pendant la roulette : on agrandit seulement l'affichage; la toile du crayon est refaite à la fin (sinon 20 ms par cran) */
   appliquerPad(); try { majFond(); } catch(e){}
   const st = $("#rstage"), inn = $("#rinner"), c = $("#inkCanvas");
-  const w = st.clientWidth, h = st.clientHeight, dpr = window.devicePixelRatio || 1;
+  const w = st.clientWidth, h = st.clientHeight, dpr = DPRI();
   const K = RD.wb ? WBK : 1;                                              /* tableau blanc : espace de travail 2 fois plus grand que l'écran */
   const fz = RD.wb ? 0 : Math.max(0, Math.min(1, (RD.z - 1) / .5));                 /* livre zoomé : marge autour pour pouvoir amener un bord au milieu */
   RD.mx = Math.round(w * .4 * fz); RD.my = Math.round(h * .4 * fz); inn.style.margin = RD.my + "px " + RD.mx + "px";
   inn.style.width = (w * RD.z * K) + "px"; inn.style.height = (h * RD.z * K) + "px";
-  if (!rapide){ c.width = Math.round(w * RD.z * K * dpr); c.height = Math.round(h * RD.z * K * dpr); }
+  if (!rapide){ const d0 = window.devicePixelRatio || 1, px = (w * RD.z * K) * (h * RD.z * K) * d0 * d0;
+    RD.dprInk = d0 * Math.min(1, Math.sqrt(24e6 / Math.max(1, px)));
+    c.width = Math.round(w * RD.z * K * RD.dprInk); c.height = Math.round(h * RD.z * K * RD.dprInk); }
   c.style.width = (w * RD.z * K) + "px"; c.style.height = (h * RD.z * K) + "px";
   $("#tbZv").textContent = Math.round(RD.z * 100) + "%"; $("#wbZv").textContent = Math.round(RD.z * 100) + "%";
   layoutDbl();
   majCurseur();
   if (!rapide) redrawInk();
 }
+/* Toile du crayon : résolution plafonnée (7 nov.). Livre zoomé à 300 % sur le tableau interactif = toile de 70 à 300 Mo (transparente, mais gardée en mémoire graphique) :
+   le navigateur n'arrivait plus à dessiner le livre en glissant (zones grises). Au-delà de 24 millions de pixels, la toile est moins fine (seulement quand c'est très zoomé). */
+function DPRI(){ return RD.dprInk || window.devicePixelRatio || 1; }
 const WBK = 2, zMin = () => RD.wb ? .5 : 1, zMax = () => RD.wb ? 2 : 3;
 function setZoom(z, rapide){
   calmePage();
@@ -2370,7 +2375,7 @@ const polDe = s => s.k === "inter" ? (s.pol || "spst") : "";
 function surRails(s, G, x, y, m){ const [w, h] = s.sz || [8, 10], u = G.u, lx = (x - G.ox) / u, ly = (y - G.oy) / u;
   return ly > -1 - m && ly < h + m && (Math.abs(lx) < .45 + m || Math.abs(lx - w) < .45 + m); }
 const modeElec = () => !!RD.wb && wbBg() === "quad";
-const elecU = () => 34 * RD.z * (window.devicePixelRatio || 1);
+const elecU = () => 34 * RD.z * DPRI();
 function elecGeo(s, W, H){
   const u = s.__u || elecU(), ox = s.p[0][0] * W, oy = s.p[0][1] * H, o = s.k !== "rails" && !!s.o;
   const P = (x, y) => o ? [ox - y * u, oy + x * u] : [ox + x * u, oy + y * u];
@@ -2517,7 +2522,7 @@ function dessinerElec(g, s, W, H, k, col){
 }
 function objGeo(s, W, H){
   if (ELEC[s.k]) return elecGeo(s, W, H);
-  const dpr = window.devicePixelRatio || 1, a = (34 * RD.z) * 1.2 * dpr, d = a * .8660254, ox = s.p[0][0] * W, oy = s.p[0][1] * H, sw = s.o ? 1 : 0;
+  const dpr = DPRI(), a = (34 * RD.z) * 1.2 * dpr, d = a * .8660254, ox = s.p[0][0] * W, oy = s.p[0][1] * H, sw = s.o ? 1 : 0;
   /* pivoter = image en miroir gauche-droite : les mêmes faces restent visibles, donc l'objet est toujours complet */
   const P = (m, n, h) => [ox + (sw ? -(m + n) : (m + n)) * d, oy + (n - m) * a / 2 - (h || 0) * a];
   const def = OBJETS[s.k] || OBJETS.plinthe, shapes = [];
@@ -2896,7 +2901,7 @@ function dessinerForme(g, s, x1, y1, x2, y2, k, col){
     const tt = (fx, fy, tx, ty) => { const a2 = Math.atan2(ty - fy, tx - fx); g.moveTo(tx - Lc * Math.cos(a2 - .35), ty - Lc * Math.sin(a2 - .35)); g.lineTo(tx, ty); g.lineTo(tx - Lc * Math.cos(a2 + .35), ty - Lc * Math.sin(a2 + .35)); };
     tt(x1, y1, x2, y2); tt(x2, y2, x1, y1);
     g.stroke(); if (s.lb || (RD.wb && /^(quad|iso|isopts)$/.test(wbBg()))){        /* valeur choisie (double-clic), sinon sur une grille : longueur en carreaux */
-      const u = 34 * RD.z * (window.devicePixelRatio || 1) * (/^iso/.test(wbBg()) ? 1.2 : 1), n = Math.hypot(x2 - x1, y2 - y1) / u;   /* plan iso : un pas de la grille iso */
+      const u = 34 * RD.z * DPRI() * (/^iso/.test(wbBg()) ? 1.2 : 1), n = Math.hypot(x2 - x1, y2 - y1) / u;   /* plan iso : un pas de la grille iso */
       const r = Math.round(n * 10) / 10, txt = s.lb || ((String(r).replace(".", ",")) + " carr.");
       g.save(); const sgL = s.d ? Math.sign(s.d) : 1, ec = 19 * k * Math.max(1, (s.tz || 1) * .85); g.translate((x1 + x2) / 2 + nx * ec * sgL, (y1 + y2) / 2 + ny * ec * sgL);   /* texte du côté extérieur */ let a3 = an; if (a3 > Math.PI / 2 || a3 < -Math.PI / 2) a3 += Math.PI; g.rotate(a3 + (s.rot || 0) * Math.PI / 180);
       g.fillStyle = col; g.font = "700 " + Math.round(13 * k * (s.tz || 1)) + "px system-ui, sans-serif"; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText(txt, 0, 0); g.restore(); }
@@ -2943,7 +2948,7 @@ function dessinerForme(g, s, x1, y1, x2, y2, k, col){
 }
 /* La grille isométrique est dessinée ici, avec exactement les mêmes calculs que les objets et le crayon : plus aucun décalage après un zoom */
 function grilleIso(g, W, H, k){
-  const a = 34 * k * 1.2, d = a * .8660254, sl = (a / 2) / d, dpr = window.devicePixelRatio || 1;
+  const a = 34 * k * 1.2, d = a * .8660254, sl = (a / 2) / d, dpr = DPRI();
   g.save(); g.lineWidth = Math.max(1, dpr); g.strokeStyle = "#b4c6e0";
   if (wbBg() === "quad"){                                    /* quadrillé : un carreau = une unité des symboles électriques */
     const u = 34 * k; g.strokeStyle = "#cfd8e6"; g.beginPath();
@@ -2969,7 +2974,7 @@ function redrawInk(){
   try { recalerWb(); } catch(e){}
   const c = $("#inkCanvas"), g = c.getContext("2d");
   g.clearRect(0, 0, c.width, c.height);
-  const k = (window.devicePixelRatio || 1) * RD.z;
+  const k = DPRI() * RD.z;
   if (RD.wb && (/^iso/.test(wbBg()) || wbBg() === "lignes" || wbBg() === "quad")) grilleIso(g, c.width, c.height, k);
   const tous = INKS[inkKey()] || [];                                       /* les objets cachent les traits qui passent derrière ; les textes restent par-dessus */
   [s => s.t !== "objet" && s.t !== "texte" && s.t !== "cote", s => s.t === "objet", s => s.t === "cote", s => s.t === "texte"].forEach((f, i) => { tous.filter(f).forEach(s => drawStroke(g, s, c.width, c.height, k));
@@ -3025,7 +3030,7 @@ function dirCote(s, an){ const px = -Math.sin(an), py = Math.cos(an); if (!s.iso
   C.forEach((u, i) => { const par = Math.abs(u[0] * Math.sin(an) - u[1] * Math.cos(an)) < .2; if (par) return; let k = u[0] * px + u[1] * py, v = u; if (k < 0){ v = [-u[0], -u[1]]; k = -k; } const sc = k + (i === 0 ? .05 : 0); if (!b || sc > b[3]) b = [v[0], v[1], k, sc]; });
   return b ? [b[0], b[1], b[2]] : [px, py, 1]; }
 function milieuCote(s, W, H){ const a = s.p[0], b = s.p[1], an = Math.atan2((b[1] - a[1]) * H, (b[0] - a[0]) * W), off = (s.d || 0) * H, [ux, uy] = dirCote(s, an);
-  let e = 0; if (s.txt && !s.dt){ const k = (window.devicePixelRatio || 1) * RD.z, tz = s.tz || 1, th = 16 * k * tz, g = $("#inkCanvas").getContext("2d"); g.save(); g.font = "700 " + Math.round(th) + "px system-ui, sans-serif"; const tw = g.measureText(s.lb || "?").width; g.restore();   /* texte de côté : la poignée est au centre du texte */
+  let e = 0; if (s.txt && !s.dt){ const k = DPRI() * RD.z, tz = s.tz || 1, th = 16 * k * tz, g = $("#inkCanvas").getContext("2d"); g.save(); g.font = "700 " + Math.round(th) + "px system-ui, sans-serif"; const tw = g.measureText(s.lb || "?").width; g.restore();   /* texte de côté : la poignée est au centre du texte */
     const sg = Math.sign(off) || 1, L = Math.hypot((b[0] - a[0]) * W, (b[1] - a[1]) * H); e = sg * (s.iso ? th * .7 : Math.abs(ux) * tw / 2 + Math.abs(uy) * th / 2); }
   return [(a[0] + b[0]) / 2 * W + ux * (off + e), (a[1] + b[1]) / 2 * H + uy * (off + e)]; }
 function poigneeCote(g, s, W, H, k){ const [x, y] = milieuCote(s, W, H), r = 11 * k, f = 6.5 * k, t = 2.6 * k;
@@ -3033,18 +3038,18 @@ function poigneeCote(g, s, W, H, k){ const [x, y] = milieuCote(s, W, H), r = 11 
   g.strokeStyle = "#fff"; g.lineWidth = 1.6 * k; g.lineCap = "round"; g.lineJoin = "round"; g.beginPath(); g.moveTo(x - f, y); g.lineTo(x + f, y); g.moveTo(x, y - f); g.lineTo(x, y + f);
   [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(([dx, dy]) => { const px = x + dx * f, py = y + dy * f; g.moveTo(px - dx * t + dy * t, py - dy * t + dx * t); g.lineTo(px, py); g.lineTo(px - dx * t - dy * t, py - dy * t - dx * t); }); g.stroke(); g.restore(); }
 /* poignée de la forme sélectionnée sous le doigt (0 = début, 1 = fin, 2 = décalage de la cote) */
-function poigneeSous(s, q){ if (!s || !s.t || !FORMES[s.t] || !strokes().includes(s)) return -1; const c = $("#inkCanvas"), W = c.width, H = c.height, tol = 16 * (window.devicePixelRatio || 1);
+function poigneeSous(s, q){ if (!s || !s.t || !FORMES[s.t] || !strokes().includes(s)) return -1; const c = $("#inkCanvas"), W = c.width, H = c.height, tol = 16 * DPRI();
   if (s.t === "cote"){ const [mx, my] = milieuCote(s, W, H); if (Math.hypot(mx - q[0] * W, my - q[1] * H) < tol * 1.1) return 2; }
   const lg = Math.hypot((s.p[1][0] - s.p[0][0]) * W, (s.p[1][1] - s.p[0][1]) * H), tp = /^(ligne|fleche|fleche2|cote|tuy[A-Z]+)$/.test(s.t) ? Math.min(tol, lg * .22) : tol;   /* courte flèche : le milieu sert à la déplacer */
   for (let i = 1; i >= 0; i--){ if (i === 0 && (s.t === "bulle" || s.t === "cercle")) continue; if (Math.hypot((s.p[i][0] - q[0]) * W, (s.p[i][1] - q[1]) * H) < tp) return i; } return -1; }
 /* forme sous le doigt (la plus récente d'abord) : près de son trait, ou n'importe où dans une petite forme */
-function formeSous(q){ const c = $("#inkCanvas"), W = c.width, H = c.height, tol = 14 * (window.devicePixelRatio || 1), arr = strokes(); let dedans = null, pres = null;
+function formeSous(q){ const c = $("#inkCanvas"), W = c.width, H = c.height, tol = 14 * DPRI(), arr = strokes(); let dedans = null, pres = null;
   for (let i = arr.length - 1; i >= 0; i--){ const s = arr[i]; if (!s.t || !FORMES[s.t] || !s.p || s.p.length < 2) continue;
     const P = pointsTrait(s), x = q[0] * W, y = q[1] * H; let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
     for (let j = 0; j < P.length; j++){ const px = P[j][0] * W, py = P[j][1] * H; x0 = Math.min(x0, px); x1 = Math.max(x1, px); y0 = Math.min(y0, py); y1 = Math.max(y1, py);
       if (j){ const dd = distSeg([x, y], [P[j - 1][0] * W, P[j - 1][1] * H], [px, py], 1), lim = s.t === "cote" ? tol * 2.4 : /^(ligne|fleche|fleche2|tuy[A-Z]+)$/.test(s.t) ? tol * 1.6 : tol;   /* cote : on peut toucher son texte */
         if (dd < lim){ const sc = dd / lim - (s.t === "cote" ? .6 : 0); if (!pres || sc < pres[1]) pres = [s, sc]; } } }   /* trait le plus proche; une cote passe avant le trait qu'elle mesure */
-    const petite = x1 - x0 < 90 * (window.devicePixelRatio || 1) && y1 - y0 < 90 * (window.devicePixelRatio || 1), fermee = !/^(ligne|fleche|fleche2|cote|angle|axes|accolade|maison|tuy[A-Z]+)$/.test(s.t);
+    const petite = x1 - x0 < 90 * DPRI() && y1 - y0 < 90 * DPRI(), fermee = !/^(ligne|fleche|fleche2|cote|angle|axes|accolade|maison|tuy[A-Z]+)$/.test(s.t);
     if ((petite || fermee) && x > x0 - tol && x < x1 + tol && y > y0 - tol && y < y1 + tol){ const aire = (x1 - x0) * (y1 - y0); if (!dedans || aire < dedans[1]) dedans = [s, aire]; } }   /* l'intérieur compte aussi (la plus petite forme gagne) */
   return pres ? pres[0] : dedans ? dedans[0] : null; }
 /* double-clic sur une forme : choisir sa valeur (cote, angle, rayon, numéro de bulle) */
@@ -3143,7 +3148,7 @@ function arcsForme(f){ const S = sommetsForme(f); if (!S) return []; let A = [];
       [[[b.m0, b.n1, b.h0], [b.m1, b.n1, b.h0]], [[b.m0, b.n0, b.h0], [b.m0, b.n1, b.h0]], [[b.m0, b.n0, b.h0], [b.m0, b.n0, b.h1]], [[b.m0, b.n0, b.h1], [b.m1, b.n0, b.h1]], [[b.m1, b.n0, b.h1], [b.m1, b.n1, b.h1]]].forEach(([U, V]) => {   /* arêtes du contour : longueur, profondeur, hauteur, puis les deux arêtes du haut */
         const u = N(G.P(...U)), v = N(G.P(...V)); if (!pres(u, v)) A.push([u, v]); }); }
     const proche = ([u, v]) => A.some(([a, b2]) => { const d1 = [(v[0] - u[0]) * W, (v[1] - u[1]) * H], d2 = [(b2[0] - a[0]) * W, (b2[1] - a[1]) * H], L1 = Math.hypot(...d1), L2 = Math.hypot(...d2);   /* raccord à raccord : gardé s'il n'est pas presque sur une arête */
-      if (Math.abs(d1[0] * d2[1] - d1[1] * d2[0]) > .1 * L1 * L2) return false; const m = [((u[0] + v[0]) / 2 - a[0]) * W, ((u[1] + v[1]) / 2 - a[1]) * H]; return Math.abs(m[0] * d2[1] - m[1] * d2[0]) / (L2 || 1) < 18 * (window.devicePixelRatio || 1); });
+      if (Math.abs(d1[0] * d2[1] - d1[1] * d2[0]) > .1 * L1 * L2) return false; const m = [((u[0] + v[0]) / 2 - a[0]) * W, ((u[1] + v[1]) / 2 - a[1]) * H]; return Math.abs(m[0] * d2[1] - m[1] * d2[0]) / (L2 || 1) < 18 * DPRI(); });
     A = ports.filter(q => !proche(q)).concat(A); }
   return A; }
 /* + : une cote sur le prochain côté qui n'en a pas (pour une cote : sur un autre côté de la même forme) */
@@ -3161,7 +3166,7 @@ function ajouterCote(s, txt, choixIdx){
   const S = sommetsForme(f), Cx = S.P.reduce((t, q) => t + q[0], 0) / S.P.length * W, Cy = S.P.reduce((t, q) => t + q[1], 0) / S.P.length * H;
   const [u, v] = libre, an = Math.atan2((v[1] - u[1]) * H, (v[0] - u[0]) * W), nx = -Math.sin(an), ny = Math.cos(an), mx = (u[0] + v[0]) / 2 * W, my = (u[1] + v[1]) / 2 * H;
   const iso = RD.wb && /^iso/.test(wbBg()) && (f.t === "objet" || (f.t === "ligne" && f.g !== undefined)), [dx0, dy0] = iso ? dirCote({ iso:1 }, an) : [nx, ny];
-  let sg = S.ferme ? (Math.sign(dx0 * (mx - Cx) + dy0 * (my - Cy)) || 1) : (ny > 0 ? -1 : 1), ec = 30 * RD.z * (window.devicePixelRatio || 1);
+  let sg = S.ferme ? (Math.sign(dx0 * (mx - Cx) + dy0 * (my - Cy)) || 1) : (ny > 0 ? -1 : 1), ec = 30 * RD.z * DPRI();
   if (f.t === "objet"){ const B = objGeo(f, W, H).bbox, bx = (B[0] + B[2]) / 2, by = (B[1] + B[3]) / 2; sg = Math.sign(dx0 * (mx - bx) + dy0 * (my - by)) || 1; }   /* objet : du côté opposé au corps de l'objet, pour ne pas le cacher */
   snapInk(); const n = { t:"cote", c:f.c && !/^tuy|^maison/.test(f.t) ? f.c : "#24282c", hl:false, hc:null, w:2.5, p:[u.slice(), v.slice()], d:sg * (txt ? ec * .25 : ec) / H };
   if (RD.wb && /^iso/.test(wbBg()) && (f.t === "objet" || (f.t === "ligne" && f.g !== undefined))) n.iso = 1;   /* objet iso ou tuyau iso : le texte suit l'angle de la pièce; une forme (rectangle, triangle…) garde son texte à plat */
@@ -3254,7 +3259,7 @@ function boiteDe(s, W, H){
   if (!s.p || !s.p.length) return null;
   const xs = s.p.map(q => q[0] * W), ys = s.p.map(q => q[1] * H);
   if (s.t === "cercle" || s.t === "bulle"){ const r = Math.hypot(xs[1] - xs[0], ys[1] - ys[0]); return [xs[0] - r, ys[0] - r, xs[0] + r, ys[0] + r]; }
-  if (s.t === "texte"){ const k = (window.devicePixelRatio || 1) * RD.z; return [xs[0], ys[0], xs[0] + Math.max(40 * k, (s.bw || .1) * W), ys[0] + (s.fs || 28) * k * ((s.lig || [1]).length || 1) * 1.3]; }
+  if (s.t === "texte"){ const k = DPRI() * RD.z; return [xs[0], ys[0], xs[0] + Math.max(40 * k, (s.bw || .1) * W), ys[0] + (s.fs || 28) * k * ((s.lig || [1]).length || 1) * 1.3]; }
   return [Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)]; }
 window.SELM = [];
 function objetSous(q){ const c = $("#inkCanvas"), arr = strokes(), x = q[0] * c.width, y = q[1] * c.height;
@@ -3285,7 +3290,7 @@ function distSeg(p, u, v, a){
 }
 function eraseAt(p){
   const c = $("#inkCanvas"), a = c.width / c.height, arr = strokes(), r = rayonGomme();
-  const k0 = (window.devicePixelRatio || 1) * RD.z, rs = s => s.hl ? r + (s.w * 4 * k0 / 2) / c.height * .7 : r;   /* le surligneur est large : la gomme en tient compte */
+  const k0 = DPRI() * RD.z, rs = s => s.hl ? r + (s.w * 4 * k0 / 2) / c.height * .7 : r;   /* le surligneur est large : la gomme en tient compte */
   const touche = s => { const P = (!s.t ? s.p : pointsTrait(s)); if (!P || !P.length) return false; const r = rs(s);
     if (P.length === 1) return Math.hypot((P[0][0] - p[0]) * a, P[0][1] - p[1]) < r;
     for (let i = 1; i < P.length; i++) if (distSeg(p, P[i - 1], P[i], a) < r) return true; return false; };
@@ -3353,7 +3358,7 @@ function redrawBientot(){ if (!rafInk) rafInk = requestAnimationFrame(() => { ra
 /* ---- Zones de texte : créer, déplacer, modifier (police, taille, gras, italique, couleur) ---- */
 const TX = { f:TXFONTS[0][1], fs:32, b:true, i:false }, SEL = { s:null };
 function mesurerTexte(s){
-  const c = $("#inkCanvas"), g = c.getContext("2d"), k = (window.devicePixelRatio || 1) * RD.z, f = txFs(s) * k;
+  const c = $("#inkCanvas"), g = c.getContext("2d"), k = DPRI() * RD.z, f = txFs(s) * k;
   g.font = txFont(s, f); const lg = habiller(g, s.txt, s.bw * c.width); s.bb = [s.bw, lg.length * (s.lig ? (s.lh ? s.lh * c.height : 34 * 1.25 * k) : f * 1.25) / c.height];
 }
 function rectTexte(s){ const c = $("#inkCanvas"), r = c.getBoundingClientRect(); mesurerTexte(s);
@@ -3637,7 +3642,7 @@ function simOv(){ let ov = $("#simOv"); if (!ov){ ov = document.createElement("c
 function simFrame(t){
   if (!RD.sim) return;
   if (SIM.key !== inkKey()){ simStop(true); return; }
-  const ink = $("#inkCanvas"), ov = simOv(), S = $("#rstage").getBoundingClientRect(), r = ink.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
+  const ink = $("#inkCanvas"), ov = simOv(), S = $("#rstage").getBoundingClientRect(), r = ink.getBoundingClientRect(), dpr = DPRI();
   const w = Math.round(S.width * dpr), h = Math.round(S.height * dpr);
   if (ov.width !== w || ov.height !== h){ ov.width = w; ov.height = h; }
   Object.assign(ov.style, { left:S.left + "px", top:S.top + "px", width:S.width + "px", height:S.height + "px" }); ov.hidden = false;
@@ -3705,7 +3710,7 @@ function simStop(silence){
    Un tableau blanc garde la taille de la surface où il a été dessiné (REFS) : s'il est rouvert sur un écran d'une autre
    taille, ses traits sont remis à la même échelle que la grille, sinon les fils ne tomberaient plus sur les bornes. */
 const REFS = {}, CLE_SAUVE = "tableauxSauves";
-const baseCanevas = () => { const c = $("#inkCanvas"), d = (window.devicePixelRatio || 1) * RD.z; return [c.width / d, c.height / d]; };
+const baseCanevas = () => { const c = $("#inkCanvas"), d = DPRI() * RD.z; return [c.width / d, c.height / d]; };
 function recalerWb(){
   if (!RD.wb) return; const k = inkKey(), b = baseCanevas(), arr = INKS[k]; if (!b[0]) return;
   if (!REFS[k]){ REFS[k] = b; return; }
@@ -4011,7 +4016,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     b.addEventListener("pointerup", fin); b.addEventListener("pointercancel", fin); });
   /* vignettes des objets isométriques : on dessine l'objet à petite échelle puis on le centre */
   bar.querySelectorAll(".ciso [data-k]").forEach(b => { const k = b.dataset.k, cv = b.querySelector("canvas"), g = cv.getContext("2d"), W = cv.width, H = cv.height;
-    const z0 = RD.z, dpr = window.devicePixelRatio || 1;
+    const z0 = RD.z, dpr = DPRI();
     try { RD.z = 9 / (34 * 1.2 * dpr); const s0 = { t:"objet", k, p:[[0, 0]] }, G = objGeo(s0, W, H), bw = G.bbox[2] - G.bbox[0], bh = G.bbox[3] - G.bbox[1];
       const f = Math.min((W - 10) / Math.max(1, bw), (H - 8) / Math.max(1, bh)); RD.z *= Math.min(f, 3.5);
       const G2 = objGeo(s0, W, H), s1 = { t:"objet", k, p:[[(W / 2 - (G2.bbox[0] + G2.bbox[2]) / 2) / W, (H / 2 - (G2.bbox[1] + G2.bbox[3]) / 2) / H]] };
@@ -4192,7 +4197,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     if (x >= G.bbox[0] - 4 && x <= G.bbox[2] + 4 && y >= G.bbox[1] - 4 && y <= G.bbox[3] + 4) return s; } return null; };
   /* objet iso déplacé ou mis debout : chaque tuyau branché (liens = [tuyau, bout, x0, y0]) est refait droit sur la grille iso */
   const redresserIso = window.redresserIso = (obj, liensIso) => {
-      const W = c.width, H = c.height, dpr = window.devicePixelRatio || 1, a = 34 * RD.z * 1.2 * dpr, d = a * .8660254, arr = strokes();
+      const W = c.width, H = c.height, dpr = DPRI(), a = 34 * RD.z * 1.2 * dpr, d = a * .8660254, arr = strokes();
       const AX = [[d, a / 2], [-d, a / 2], [0, a]];
       const cr = (u, v) => u[0] * v[1] - u[1] * v[0], dot = (u, v) => u[0] * v[0] + u[1] * v[1], N = q => [q[0] / W, q[1] / H], P = q => [q[0] * W, q[1] * H], pres = (u, v) => Math.hypot(u[0] - v[0], u[1] - v[1]) < 2;
       const sens = v => { let best = null; AX.forEach(A => [1, -1].forEach(sg => { const D = [A[0] * sg, A[1] * sg], k = dot(D, v) / (a * Math.hypot(v[0], v[1]) || 1); if (!best || k > best.k) best = { D, k }; })); return best.D; };
@@ -4406,7 +4411,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
   });
   let fond = null, rafTrait = 0, deja = 0;
   const dessinerEnCours = () => { rafTrait = 0; if (!cur || cur === "erase") return;
-    const g = c.getContext("2d"), k = (window.devicePixelRatio || 1) * RD.z, W = c.width, H = c.height;
+    const g = c.getContext("2d"), k = DPRI() * RD.z, W = c.width, H = c.height;
     if (!fond){             /* trait libre opaque : on ajoute seulement les nouveaux bouts (aucun effacement de l'écran) */
       const P = cur.p; if (!P.length) return;
       g.save(); g.lineCap = "round"; g.lineJoin = "round"; g.lineWidth = cur.w * k;
@@ -4509,7 +4514,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
 })();
 /* tuyau : on s'aimante au bout (ou sur le trajet) d'un autre tuyau; depuis un point de départ, le tuyau reste droit ou à 45° */
 function aimanterTuyau(q, a, sauf){
-  const c = $("#inkCanvas"), W = c.width, H = c.height, dpr = window.devicePixelRatio || 1, lim = 14 * dpr; let best = null;
+  const c = $("#inkCanvas"), W = c.width, H = c.height, dpr = DPRI(), lim = 14 * dpr; let best = null;
   { const ty = ((sauf && sauf.t) || RD.formeK || "").replace(/^tuy/, ""); let bp = null;          /* raccord d'un appareil ou de la maison : le tuyau s'y branche */
     strokes().forEach(o => { if (!PORTS_PL[o.t]) return; portsPlomb(o, W, H).forEach(pt => { if (!portCompat(pt.ty, ty)) return; const d = Math.hypot(pt.x - q[0] * W, pt.y - q[1] * H); if (d < lim * 1.8 && (!bp || d < bp[1])) bp = [[pt.x / W, pt.y / H], d]; }); });
     if (bp) return bp[0]; }
@@ -4528,7 +4533,7 @@ function aimanterTuyau(q, a, sauf){
     const P = []; lignes.forEach(o => o.p.slice(0, 2).forEach(q => P.push(q))); let A = null, B = null, dm = -1;
     P.forEach(u => P.forEach(v => { const d = Math.hypot((u[0] - v[0]) * W, (u[1] - v[1]) * H); if (d > dm){ dm = d; A = u; B = v; } })); if (dm < 6) return false;
     if (A[0] > B[0]){ const t = A; A = B; B = t; }
-    const an = Math.atan2((B[1] - A[1]) * H, (B[0] - A[0]) * W), sg = Math.cos(an) > 0 ? -1 : 1, ec = 30 * RD.z * (window.devicePixelRatio || 1), f = lignes[0];
+    const an = Math.atan2((B[1] - A[1]) * H, (B[0] - A[0]) * W), sg = Math.cos(an) > 0 ? -1 : 1, ec = 30 * RD.z * DPRI(), f = lignes[0];
     const poser = txt => { snapInk(); const n = { t:"cote", c:f.c && !/^tuy/.test(f.t) ? f.c : "#24282c", hl:false, hc:null, w:2.5, p:[A.slice(), B.slice()], d:sg * (txt ? ec * .3 : ec) / H }; if (/^iso/.test(wbBg())) n.iso = 1; if (txt){ n.txt = 1; n.lb = "a"; }
       strokes().push(n); SELM = []; SELO.s = n; redrawInk(); try { majObjUI(); } catch(er){} modifierForme(n, cx, cy); };
     /* rien d'automatique : une petite case offre la couleur, un texte ou une cote sur ce tronçon */
@@ -4596,7 +4601,7 @@ function aimanterTuyau(q, a, sauf){
 /* Enregistrer le tableau en image : fond + traits */
 async function wbEnregistrer(){
   const c = $("#inkCanvas"), W = c.width, H = c.height, out = document.createElement("canvas"); out.width = W; out.height = H;
-  const g = out.getContext("2d"), f = wbBg(), u = 34 * RD.z * (window.devicePixelRatio || 1);
+  const g = out.getContext("2d"), f = wbBg(), u = 34 * RD.z * DPRI();
   if (f === "noir" || f === "vert"){ const gr = g.createRadialGradient(W / 2, H * .4, 10, W / 2, H * .4, Math.max(W, H) * .75); gr.addColorStop(0, f === "noir" ? "#2b3133" : "#2e6b52"); gr.addColorStop(1, f === "noir" ? "#1a1f21" : "#1d4a38"); g.fillStyle = gr; }
   else g.fillStyle = f === "lignes" ? "#fffef9" : "#ffffff";
   g.fillRect(0, 0, W, H); g.lineWidth = 1;
@@ -5133,7 +5138,7 @@ function copierColler(t){
     if (t === "x"){ effacerChoix(); aviser(L.length + " élément" + (L.length > 1 ? "s coupés" : " coupé") + " : Ctrl+V pour coller.", 2500); return true; }
     if (t === "c"){ aviser(L.length + " élément" + (L.length > 1 ? "s copiés" : " copié") + " : Ctrl+V pour coller.", 2500); return true; } }
   const P = window.PRESSE; if (!P || !P.L.length) return false; P.n++;
-  const c = $("#inkCanvas"), W = c.width, H = c.height, dpr = window.devicePixelRatio || 1;
+  const c = $("#inkCanvas"), W = c.width, H = c.height, dpr = DPRI();
   let dx, dy; if (/^iso/.test(wbBg())){ const a = 34 * RD.z * 1.2 * dpr; dx = 2 * a * .8660254 / W; dy = 0; } else { const u = 34 * RD.z * dpr; dx = 2 * u / W; dy = 2 * u / H; }
   snapInk(); const neufs = JSON.parse(JSON.stringify(P.L)).map(o => { o.p = o.p.map(q => [q[0] + dx * P.n, q[1] + dy * P.n]); return o; });
   neufs.forEach(o => strokes().push(o)); SELO.s = null; SELM = neufs.length > 1 ? neufs : []; if (neufs.length === 1) SELO.s = neufs[0];
