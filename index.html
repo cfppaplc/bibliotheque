@@ -934,7 +934,7 @@ document.addEventListener("keydown", e => { if (e.key !== "/" || e.ctrlKey || e.
       <iframe id="readerFrame4" title="" hidden aria-hidden="true" tabindex="-1"></iframe>
       <div class="spine" id="spine" hidden></div>
       <div class="wbboard" id="wbBoard" hidden></div>
-      <canvas class="ink" id="inkCanvas"></canvas>
+      <canvas class="ink" id="inkCanvas"></canvas><script>try{document.getElementById("inkCanvas").getContext("2d",{desynchronized:true});}catch(e){}</script>   <!-- crayon : affichage sans attendre l'image suivante (moins de retard); doit être le 1er getContext -->
       <div class="spot" id="spot" hidden></div>
       <div class="cache" id="cache" hidden><div class="cache-handle" id="cacheHandle">Glisse cette barre pour révéler</div></div>
     </div>
@@ -4457,7 +4457,8 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     else if (cur.iso && !cur.hl) suivreIso(e);
     else { const evs = (e.getCoalescedEvents && e.getCoalescedEvents()) || [], r = rectToile(), mn = 1.2 / Math.max(r.width, 1);
       (evs.length ? evs : [e]).forEach(ev => { const q = pt(ev), d = cur.p[cur.p.length - 1]; if (!d || Math.abs(q[0] - d[0]) > mn || Math.abs(q[1] - d[1]) * r.height / r.width > mn) cur.p.push(q); }); }   /* points à moins de 1 px : ignorés */   /* tous les points du crayon, même entre deux images */
-    if (!rafTrait) rafTrait = requestAnimationFrame(dessinerEnCours);
+    if (!fond){ if (rafTrait){ cancelAnimationFrame(rafTrait); rafTrait = 0; } dessinerEnCours(); }   /* trait libre : dessiné tout de suite (ajout léger), pas à l'image suivante = moins de retard */
+    else if (!rafTrait) rafTrait = requestAnimationFrame(dessinerEnCours);
   });
   ["pointerup", "pointercancel"].forEach(t => c.addEventListener(t, ev => {
     if (rafTrait){ cancelAnimationFrame(rafTrait); rafTrait = 0; }
