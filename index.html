@@ -1792,7 +1792,7 @@ function zoomSourisPas(){
     const s0 = ZS.s, s1 = z / ZS.z0, bx = ZS.mx0 - ZS.sl, by = ZS.my0 - ZS.stp;
     const ux = (px - bx - ZS.tx) / s0, uy = (py - by - ZS.ty) / s0;          /* point du livre sous la souris (unités du zoom de départ) */
     ZS.tx = px - bx - ux * s1; ZS.ty = py - by - uy * s1; ZS.s = s1; ZS.z = z; ZS.px1 = px; ZS.py1 = py;
-    inn.style.transformOrigin = "0 0"; inn.style.transform = "translate(" + ZS.tx + "px," + ZS.ty + "px) scale(" + s1 + ")";
+    inn.style.willChange = "transform"; inn.style.transformOrigin = "0 0"; inn.style.transform = "translate(" + ZS.tx + "px," + ZS.ty + "px) scale(" + s1 + ")";
     const t = Math.round(z * 100) + "%"; $("#tbZv").textContent = t; $("#wbZv").textContent = t;
   }
   clearTimeout(ZS.fin); if (!ZS.tenu) ZS.fin = setTimeout(zoomSourisFin, 140);   /* doigts posés (pincement) : on attend qu'ils se lèvent, sinon une pause de 140 ms refait tout le livre et l'écran clignote */
@@ -1801,7 +1801,7 @@ function zoomSourisFin(){
   if (!ZS.on) return; const st = $("#rstage"), inn = $("#rinner"), K = RD.wb ? WBK : 1;
   const px = ZS.px1 == null ? ZS.px : ZS.px1, py = ZS.py1 == null ? ZS.py : ZS.py1;
   const cx = ((px - (ZS.mx0 - ZS.sl) - ZS.tx) / ZS.s) / (ZS.z0 * K), cy = ((py - (ZS.my0 - ZS.stp) - ZS.ty) / ZS.s) / (ZS.z0 * K), z = ZS.z;
-  ZS.on = false; ZS.px1 = ZS.py1 = null; inn.style.transform = ""; inn.style.transformOrigin = "";
+  ZS.on = false; ZS.px1 = ZS.py1 = null; inn.style.transform = ""; inn.style.transformOrigin = ""; inn.style.willChange = "";
   if (Math.abs(z - RD.z) > .002){ setZoom(z, true);
     st.scrollLeft = cx * RD.z * K + (RD.mx || 0) - px; st.scrollTop = cy * RD.z * K + (RD.my || 0) - py; }
   try { sizeInner(); } catch(e){}   /* toile et dessin remis nets */
@@ -2221,7 +2221,7 @@ function sizeInner(rapide){   /* rapide = pendant la roulette : on agrandit seul
 const WBK = 2, zMin = () => RD.wb ? .5 : 1, zMax = () => RD.wb ? 2 : 3;
 function setZoom(z, rapide){
   calmePage();
-  if (ZS.on && !ZS.enFin){ ZS.on = false; clearTimeout(ZS.fin); const i = $("#rinner"); i.style.transform = ""; i.style.transformOrigin = ""; }
+  if (ZS.on && !ZS.enFin){ ZS.on = false; clearTimeout(ZS.fin); const i = $("#rinner"); i.style.transform = ""; i.style.transformOrigin = ""; i.style.willChange = ""; }
   const st = $("#rstage"), inn = $("#rinner"), ow = inn.offsetWidth || 1, oh = inn.offsetHeight || 1;
   const fx = (st.scrollLeft + st.clientWidth / 2 - (RD.mx || 0)) / ow, fy = (st.scrollTop + st.clientHeight / 2 - (RD.my || 0)) / oh;
   RD.z = Math.max(zMin(), Math.min(zMax(), z)); sizeInner(rapide);
