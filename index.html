@@ -9276,4 +9276,23 @@ window.ACCES = (function(){
   if (couleur){ if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", () => tous().forEach(poser)); else tous().forEach(poser); }
 })();
 </script>
+<button id="fsBtn" type="button" aria-label="Plein écran" title="Plein écran (Échap pour quitter)" hidden></button>
+<style>
+#fsBtn{position:fixed;top:3px;right:3px;z-index:2147483000;width:26px;height:26px;padding:0;border:0;border-radius:7px;background:rgba(20,20,22,.35);color:#fff;display:flex;align-items:center;justify-content:center;opacity:.3;cursor:pointer;transition:opacity .2s;-webkit-tap-highlight-color:transparent}
+#fsBtn[hidden]{display:none}
+#fsBtn:hover,#fsBtn:active{opacity:.95}
+#fsBtn svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+@media (pointer:coarse){#fsBtn{width:34px;height:34px;opacity:.4}}
+@media (max-width:640px){#fsBtn{display:none}}
+body.clair:not(:has(.reader.open)) #fsBtn{background:rgba(255,255,255,.55);color:#222}
+</style>
+<script>
+(function(){
+  const b = document.getElementById("fsBtn"); if (!b || !document.fullscreenEnabled) return;
+  const ENTRER = '<svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>', QUITTER = '<svg viewBox="0 0 24 24"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg>';
+  const maj = () => { const on = !!document.fullscreenElement; b.innerHTML = on ? QUITTER : ENTRER; b.title = on ? "Quitter le plein écran" : "Plein écran"; b.setAttribute("aria-label", b.title); b.hidden = false; };
+  b.addEventListener("click", e => { e.stopPropagation(); try { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen(); } catch(x){} });
+  document.addEventListener("fullscreenchange", maj); maj();
+})();
+</script>
 </body></html>
