@@ -763,7 +763,7 @@
   @media (pointer:coarse){
     .tb button{min-width:48px;height:48px}.tb input{height:48px}
     .penbar button:not(.sw){min-width:46px;height:46px}.penbar .sw{min-width:40px;width:40px;height:40px}
-    .timer-btns button{min-width:46px;height:46px}.reader-bar button{padding:11px 18px}
+    .timer-btns button{min-width:46px;height:46px}.reader-bar button{padding:11px 18px;min-height:48px}.pl-top button,.act-top button{min-height:48px}
     .hbtn{height:42px}.mmb{width:50px}
   }
   /* ---------- Écran tactile (TNI, 6 nov.) : pas de survol, cibles de 44 px et plus ---------- */
@@ -774,6 +774,9 @@
     #lienAide,#quoiNeuf{display:inline-flex;align-items:center;min-height:49px;padding:0 10px}
     #compteBtn,#themeBtn,#adminBtn,.hbtn{min-height:49px;min-width:49px}
     #search{height:49px}
+    #actProg,.act-rech input,#actQ{min-height:46px;height:46px}
+    #plOpenBig{min-height:46px}
+    #planOv a[href$="-montage.pdf"]{display:inline-flex;align-items:center;min-height:46px;padding:0 12px}
   }
   @media (min-width:1700px){
     .tb button{min-width:46px;height:46px}.tb input{height:46px;width:70px}
@@ -5337,6 +5340,25 @@ function openModal(l){
 function closeModal(){ $("#modal").classList.remove("open", "sur-act"); }
 $("#modal").addEventListener("click", e => { if (e.target.id === "modal") closeModal(); });
 document.addEventListener("keydown", e => { if (e.key === "Escape") closeModal(); });
+
+/* ---- Écran tactile : un seul doigt dessine (6 nov.). Un 2e doigt, la paume ou un pincement ne tracent rien et ne volent pas le trait en cours ---- */
+(function(){
+  const bas = new Map(), ignores = new Set();   /* bas : doigt → dernier mouvement (un doigt oublié depuis 1,5 s ne bloque rien) */
+  const surToile = e => e.pointerType === "touch" && e.target && e.target.classList && e.target.classList.contains("ink");
+  document.addEventListener("pointerdown", e => {
+    if (e.pointerType !== "touch") return;
+    const t = performance.now(); bas.forEach((v, id) => { if (t - v > 1500) bas.delete(id); });
+    if (bas.size && surToile(e)){ ignores.add(e.pointerId); e.stopImmediatePropagation(); e.preventDefault(); return; }
+    if (surToile(e)) bas.set(e.pointerId, t);
+  }, true);
+  document.addEventListener("pointermove", e => { if (ignores.has(e.pointerId)) e.stopImmediatePropagation(); else if (bas.has(e.pointerId)) bas.set(e.pointerId, performance.now()); }, true);
+  const fin = e => {
+    if (ignores.has(e.pointerId)){ ignores.delete(e.pointerId); e.stopImmediatePropagation(); return; }
+    bas.delete(e.pointerId);
+  };
+  document.addEventListener("pointerup", fin, true);
+  document.addEventListener("pointercancel", fin, true);
+})();
 
 /* ---- Glissement des rangées (flèches ‹ ›) : un seul mouvement doux, sans à-coups ---- */
 function glisserRangee(sc, dx){

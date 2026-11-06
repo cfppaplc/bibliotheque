@@ -2904,6 +2904,11 @@ html.style-pro .seg.p .seg-l { font-size: calc(var(--u) * 36); }
 html.style-pro .tl-mark::after { font-size: calc(var(--u) * 42); }
 html.style-pro .tl-wrap { padding-top: calc(var(--u) * 92); }
 html.style-pro .tl-mark { top: calc(var(--u) * 74); }
+  /* Écran tactile (TNI, 6 nov.) : boutons du haut à 48 px */
+  @media (pointer:coarse) and (min-width:641px){
+    .tools button,.tools a{min-height:48px}
+    #b-full,#b-comp,#b-more{min-height:48px}
+  }
 </style>
 </body>
 </html>
