@@ -272,6 +272,7 @@
   #tbDbl.on{background:#e50914}
   .wbboard{position:absolute;inset:0;background:#fff;z-index:2}
   .ink{position:absolute;left:0;top:0;z-index:3;touch-action:none;pointer-events:none}
+  #reader{touch-action:pan-x pan-y}
   .ink.live{pointer-events:auto;cursor:crosshair}
   .spot{position:absolute;inset:0;z-index:4;--x:50%;--y:50%;--r:150px;background:radial-gradient(circle at var(--x) var(--y),transparent var(--r),rgba(0,0,0,.88) calc(var(--r) + 4px))}
   .cache{position:absolute;left:0;right:0;bottom:0;top:40%;background:#1d1d20;z-index:5}
@@ -1314,6 +1315,7 @@ const HOSTCSS = "#ui{display:none!important}nav#bar{display:none!important}div#a
   /* Protection incendie : la page qui tourne en 3D est remplacée par un fondu rapide et doux */
   /* Transition de page commune à tous les livres (comme Plomberie et chauffage) : la nouvelle page apparaît en fondu en montant légèrement.
      On anime « translate » (et non « transform ») pour ne jamais gêner la mise à l'échelle propre à chaque livre. */
+  + "html{touch-action:pan-x pan-y!important}"   /* pas de zoom du navigateur au pincement : c'est la bibliothèque qui zoome (sinon le navigateur prend le geste et le pincement échoue 1 fois sur 3) */
   + ".page.vis,.page.hcur{animation:biblioPage .45s cubic-bezier(.2,.7,.2,1) both!important}"
   /* Protection incendie : les 100 pages cachées restaient dessinées à chaque zoom (1 à 3 s); on saute leur rendu, sans ombre */
   + "#book>.page:not(.cur):not(.out){content-visibility:hidden;box-shadow:none!important}"
