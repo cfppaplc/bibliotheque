@@ -6102,6 +6102,13 @@ function afficherBarres(){
   const r = $("#reader"); if (!r.classList.contains("open")) return;
   r.classList.remove("calme"); planifierBarres();
 }
+/* Tableau interactif (7 nov.) : barres cachées, un toucher du doigt ou du crayon en haut de l'écran les fait revenir (Retour, etc.) au lieu de tracer un trait.
+   À la souris, c'est déjà fait en approchant du haut (mousemove). */
+window.addEventListener("pointerdown", e => {
+  if (e.pointerType === "mouse" || e.clientY > 56) return;
+  const r = $("#reader"); if (!r || !r.classList.contains("open") || !r.classList.contains("calme")) return;
+  e.preventDefault(); e.stopImmediatePropagation(); afficherBarres();
+}, true);
 function basculerBarres(){
   const r = $("#reader");
   if (BAR.fixe){ return; }
