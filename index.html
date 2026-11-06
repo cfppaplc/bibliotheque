@@ -5325,12 +5325,38 @@ function closeModal(){ $("#modal").classList.remove("open", "sur-act"); }
 $("#modal").addEventListener("click", e => { if (e.target.id === "modal") closeModal(); });
 document.addEventListener("keydown", e => { if (e.key === "Escape") closeModal(); });
 
+/* ---- Glissement des rangées (flèches ‹ ›) : un seul mouvement doux, sans à-coups ---- */
+function glisserRangee(sc, dx){
+  const max = sc.scrollWidth - sc.clientWidth;
+  const depart = sc.scrollLeft;
+  /* clics rapprochés : on part de la destination déjà visée, le glissement continue au lieu de recommencer */
+  const but0 = sc._but != null ? sc._but : depart;
+  const but = Math.max(0, Math.min(max, but0 + dx));
+  if (Math.abs(but - depart) < 1) return;
+  sc._but = but;
+  if (sc._anim) cancelAnimationFrame(sc._anim);
+  if (matchMedia("(prefers-reduced-motion:reduce)").matches){ sc.style.scrollBehavior = "auto"; sc.scrollLeft = but; sc._but = null; return; }
+  sc.style.scrollBehavior = "auto";
+  const dist = but - depart, dur = Math.max(450, Math.min(1100, Math.abs(dist) * 0.9));
+  const t0 = performance.now();
+  const ease = t => t < .5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3) / 2;
+  const stop = () => { if (sc._anim){ cancelAnimationFrame(sc._anim); sc._anim = 0; } sc._but = null; sc.style.scrollBehavior = ""; };
+  ["wheel","touchstart","pointerdown"].forEach(ev => sc.addEventListener(ev, stop, { once:true, passive:true }));
+  const pas = now => {
+    const t = Math.min(1, (now - t0) / dur);
+    sc.scrollLeft = depart + dist * ease(t);
+    if (t < 1) sc._anim = requestAnimationFrame(pas);
+    else { sc._anim = 0; sc._but = null; sc.style.scrollBehavior = ""; }
+  };
+  sc._anim = requestAnimationFrame(pas);
+}
+
 /* ---- Événements ---- */
 $("#rows").addEventListener("click", e => {
   const arrow = e.target.closest(".arrow");
   if (arrow){
     const sc = arrow.parentElement.querySelector(".scroller");
-    sc.scrollBy({ left: (arrow.classList.contains("left") ? -1 : 1) * sc.clientWidth * .8 });
+    glisserRangee(sc, (arrow.classList.contains("left") ? -1 : 1) * sc.clientWidth * .8);
     return;
   }
   const card = e.target.closest(".book");
