@@ -1799,7 +1799,10 @@ function zoomSourisFin(){
    Le petit trait que le 1er doigt a pu tracer avant l'arrivée du 2e est annulé à la fin du geste. */
 function brancherPincement(cible, frame){
   let d0 = 0, actif = false, n0 = 0;
-  const dist = t => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
+  /* dans un livre, les coordonnées du doigt sont celles du cadre, qui est agrandi (transform) pendant le geste : on les remet à l'échelle de l'écran,
+     sinon la distance « rétrécit » à mesure que le zoom grandit et le pincement semble mou */
+  const k = () => { if (!frame) return 1; try { const w = frame.offsetWidth; return w ? frame.getBoundingClientRect().width / w : 1; } catch(x){ return 1; } };
+  const dist = t => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY) * k();
   const garde = e => !frame ? ($("#reader") && $("#reader").classList.contains("open") && $("#reader").contains(e.target)) : true;
   cible.addEventListener("touchstart", e => {
     if (!garde(e)) return;
@@ -1812,7 +1815,8 @@ function brancherPincement(cible, frame){
     const d = dist(e.touches); if (d < 20 || !d0) return;
     e.preventDefault();
     const mx = (e.touches[0].clientX + e.touches[1].clientX) / 2, my = (e.touches[0].clientY + e.touches[1].clientY) / 2;
-    zoomSouris({ clientX:mx, clientY:my, deltaY: -Math.log(d / d0) / .0075, deltaMode:0 }, frame);
+    const ks = k();
+    zoomSouris({ clientX:mx * ks, clientY:my * ks, deltaY: -Math.log(d / d0) * 1.2 / .0075, deltaMode:0 }, frame);
     d0 = d;
   }, { capture:true, passive:false });
   const fin = e => {
