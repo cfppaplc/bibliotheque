@@ -325,15 +325,16 @@
     ]
   },
   {
-    "date": "2026-11-03",
+    "date": "2026-11-07",
     "type": "outil",
     "titre": "Lecture des livres",
-    "texte": "Même barre, même table des matières et mêmes réponses pas à pas dans tous les livres. Zoom doux à la roulette.",
+    "texte": "Même barre et mêmes réponses pas à pas dans tous les livres. Nouvelle table des matières à droite : recherche dans le livre, Animations, Exercices.",
     "formation": [
       {
-        "t": "Touche M (ou ☰) : la table des matières.",
+        "t": "Touche M (ou ☰) : la table des matières s'ouvre à droite, le livre reste visible. « Tu es ici » montre le module en cours.",
         "img": "nouveautes/livre-tdm.jpg"
       },
+      "Écris un mot dans « Chercher dans ce livre » pour trouver toutes les pages qui en parlent. Les boutons Animations et Exercices les listent.",
       {
         "t": "Bouton ✓ (touche R) : chaque clic montre la réponse suivante de la page (grisé = pas de réponse).",
         "img": "nouveautes/livre-barre.jpg"
@@ -342,6 +343,10 @@
       "Roulette = zoom sous la souris; une fois zoomé, glisse la page (ou garde la roulette enfoncée) pour te déplacer."
     ],
     "versions": [
+      {
+        "date": "2026-11-07",
+        "texte": "Table des matières refaite : panneau à droite, recherche dans le livre, listes Animations et Exercices, « Tu es ici »."
+      },
       {
         "date": "2026-11-03",
         "texte": "Roulette : elle zoome toujours, même avec le crayon et sur la page de droite en double page (plus de page qui descend), plus fluide dans les livres et le tableau blanc; aucune page ne se tourne pendant le zoom; roulette enfoncée pour déplacer la page : plus de défilement automatique."
@@ -353,10 +358,6 @@
       {
         "date": "2026-10-28",
         "texte": "Roulette enfoncée : déplace la page zoomée. Petit jeu élastique au-delà des bords quand on glisse (la page revient en place)."
-      },
-      {
-        "date": "2026-10-28",
-        "texte": "Protection incendie : un seul zoom, celui de la bibliothèque (plus de zoom dans la page au double-clic ou à deux doigts), et beaucoup plus rapide."
       }
     ]
   },

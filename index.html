@@ -499,6 +499,28 @@
   .resume button{border:0;border-radius:5px;padding:7px 12px;font-weight:700;cursor:pointer;font-family:inherit}
   #resumeYes{background:var(--accent);color:#fff}
   #resumeNo{background:#eee;color:#000}
+  /* Table des matières en panneau à droite (7 nov.) : le livre reste visible */
+  .mmenu{justify-content:flex-end;align-items:stretch;padding:0;background:rgba(0,0,0,.38)}
+  .mmenu-box{max-width:none;width:min(470px,94vw);max-height:none;height:100%;border-radius:14px 0 0 14px;padding:18px 18px 24px;display:flex;flex-direction:column;overflow:hidden;box-shadow:-10px 0 40px #000a}
+  .mmenu:not([hidden]) .mmenu-box{animation:mmGlisse .28s cubic-bezier(.2,.8,.2,1)}
+  @keyframes mmGlisse{from{translate:40px 0;opacity:.4}}
+  .mm-top{display:flex;align-items:center;gap:10px;margin-bottom:12px}.mm-top h2{margin:0!important;flex:1}
+  .mm-x{width:46px;height:46px;border-radius:10px;border:1px solid #444;background:#222;color:#fff;font-size:1.1rem;cursor:pointer}
+  .mm-cherche{display:flex;align-items:center;gap:8px;background:#232326;border:1px solid #3a3a3e;border-radius:12px;padding:0 12px;height:48px;color:#999}
+  .mm-cherche input{flex:1;min-width:0;background:none;border:0;outline:0;color:#fff;font:inherit;font-size:1rem}
+  .mm-puces{display:flex;gap:8px;margin:10px 0 12px;flex-wrap:wrap}.mm-puces:empty{margin:6px 0}
+  .mm-puces button{height:44px;padding:0 16px;border-radius:22px;border:1px solid #444;background:#232326;color:#eee;font:inherit;font-weight:600;cursor:pointer}
+  .mm-puces button small{color:#aaa;font-weight:400;margin-left:4px}
+  .mm-puces button.on{background:#fff;color:#000;border-color:#fff}.mm-puces button.on small{color:#555}
+  .mmenu .mmenu-list{grid-template-columns:1fr;overflow:auto;flex:1;align-content:start;padding-right:4px}
+  .mmenu .mm{min-height:52px;padding:10px 14px}
+  .mmenu .mmenu-list{display:flex;flex-direction:column;gap:8px}.mmenu .mmenu-list>*{flex:none}.mmenu .mm-res{height:auto;align-items:flex-start}.mm-res b{margin-top:2px}
+  .mm span{flex:1;min-width:0}
+  .mm-p{flex:none;color:#888;font-size:.85rem}
+  .mm.mm-ici{background:#2f3036;border-color:#777}
+  .mm-tag{flex:none;font-style:normal;font-size:.78rem;font-weight:700;background:#fff;color:#000;border-radius:10px;padding:3px 8px}
+  .mm-ext{display:block;color:#aaa;font-size:.82rem;margin-top:3px;line-height:1.3;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+  @media (max-width:640px){.mmenu-box{width:100%;border-radius:0}}
   .mm-h{grid-column:1/-1;font-weight:700;color:#bbb;font-size:.85rem;letter-spacing:.06em;text-transform:uppercase;margin-top:6px}
   .help-grid{display:grid;grid-template-columns:auto 1fr;gap:8px 18px;align-items:center}
   .help-grid kbd{background:#2a2a2a;border:1px solid #555;border-bottom-width:2px;border-radius:5px;padding:2px 8px;font-family:inherit;font-size:.85rem;margin-right:4px;white-space:nowrap}
@@ -807,7 +829,7 @@
     .timer{padding:16px 22px}.timer-time{font-size:4.4rem}.timer-btns button{min-width:60px;height:60px;font-size:1.3rem}
     .reader-bar button{padding:14px 26px;font-size:1.2rem}#readerTitle{font-size:1.5rem}
     .barres-handle{width:90px;height:32px}
-    .mmenu-box{zoom:1.5}.toast{font-size:1.4rem;padding:18px 28px}
+    .mmenu-box{zoom:1.5;height:calc(100% / 1.5)}.toast{font-size:1.4rem;padding:18px 28px}
     .resume{font-size:1.4rem}
   }
   @media (min-width:2400px){ .hero{min-height:calc(62vh / 1.6)} .hero-stack img{height:min(calc(40vh / 1.6),330px)} }
@@ -1009,7 +1031,7 @@ document.addEventListener("keydown", e => { if (e.key !== "/" || e.ctrlKey || e.
     <div id="tbPop" role="menu" aria-label="Plus d'outils"><div class="tbph"><b>Plus d'outils</b><span><button id="tbOrg" title="Glisser les boutons pour les déplacer entre la barre et ce menu">✎ Organiser</button><button id="tbRaz" title="Remettre la disposition d'origine">Réinitialiser</button></span></div><div class="grid" id="tbGrid"></div><p class="tbhint">Mode organiser : glisse un bouton pour le changer de place ou le passer entre la barre et ce menu.</p></div>
   </div>
   <button class="barres-handle" id="barresHandle" aria-label="Afficher les barres d'outils" title="Afficher les outils (H)"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 15l6-6 6 6"/></svg></button>
-  <div class="mmenu" id="mmenu" hidden role="dialog" aria-label="Modules"><div class="mmenu-box"><h2>Aller à un module</h2><div class="mmenu-list" id="mmenuList"></div></div></div>
+  <div class="mmenu" id="mmenu" hidden role="dialog" aria-label="Modules"><div class="mmenu-box"><div class="mm-top"><h2>Table des matières</h2><button class="mm-x" id="mmX" aria-label="Fermer">✕</button></div><div class="mm-outils"><label class="mm-cherche"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="mmQ" type="search" placeholder="Chercher dans ce livre…" aria-label="Chercher dans ce livre" autocomplete="off"></label><div class="mm-puces" id="mmPuces"></div></div><div class="mmenu-list" id="mmenuList"></div></div></div>
 </div>
 
 <div class="modal" id="modal">
@@ -1415,7 +1437,7 @@ function titresModules(doc, goto){
   box.forEach((b, i) => { const h = b.querySelector("h1,h2"), t = h ? h.textContent.replace(/\s+/g, " ").trim() : "";
     if (!t || seen.has(t)) return; seen.add(t);
     const m = /^(?:module|chapitre|chapter|partie|compétence)\s*([\d.]+)\s*[—:.-]?\s*(.*)$/i.exec(t);
-    out.push({ tag:m ? m[1] : String(i + 1), text:(m && m[2]) || t, color:"", run:() => goto(i + 1) }); });
+    out.push({ tag:m ? m[1] : String(i + 1), text:(m && m[2]) || t, color:"", page:i + 1, run:() => goto(i + 1) }); });
   return out.length > 1 ? out : [];
 }
 
@@ -1537,10 +1559,10 @@ function buildDriver0(win, doc){
       else if (!RD.calme && calme){ calme.remove(); calme = null; }
       cur = Math.max(0, Math.min(pages.length - 1, i)); pages.forEach((p, k) => { if (k !== cur) p.classList.remove("hcur", "live"); }); pages[cur].classList.add("hcur", "live"); fit(); };
     win.addEventListener("resize", fit); show(0);
-    const modules = () => { const out = [{ tag:"⌂", text:"Couverture", color:"", run:() => show(0) }];
+    const modules = () => { const out = [{ tag:"⌂", text:"Couverture", color:"", page:1, run:() => show(0) }];
       pages.forEach((p, i) => { const h = p.querySelector("h1,h2"), t = h ? h.textContent.replace(/\s+/g, " ").trim() : "";
         const m = /^(module|chapitre|chapter|partie|compétence)\s*([\d.]+|[A-Z](?=\s*[—:.-]))\s*[—:.-]?\s*(.*)$/i.exec(t);   /* (7 nov.) aussi une lettre : Module F, Partie A */
-        if (m) out.push({ tag:m[2], text:m[3] || t, color:"", run:() => show(i) }); });
+        if (m) out.push({ tag:m[2], text:m[3] || t, color:"", page:i + 1, run:() => show(i) }); });
       return out.length > 1 ? out : []; };
     return Object.assign({ keys:true, prev:() => show(cur - 1), next:() => show(cur + 1),
       state:() => ({ label:String(cur + 1), tot:pages.length }), goto:n => show(n - 1), modules }, pz, repDriverPart(doc));
@@ -4873,14 +4895,14 @@ function uniformiserModules(mods){
   if (out.length && out.every(m => typeof m.page === "number" && !isNaN(m.page))) out.sort((a, b) => a.page - b.page || a.ordre - b.ordre);
   /* tous les livres commencent par la couverture dans la liste */
   if (out.length && !out.some(m => m.kind === "couverture") && RD.drv && RD.drv.goto)
-    out.unshift({ kind:"couverture", ico:ICO_MOD.couverture, tag:"", text:"Couverture", color:"#6b7280", run:() => RD.drv.goto(1) });
+    out.unshift({ kind:"couverture", ico:ICO_MOD.couverture, tag:"", text:"Couverture", color:"#6b7280", page:1, run:() => RD.drv.goto(1) });
   return out;
 }
 function openMenu(){
   const mods = RD.drv ? uniformiserModules(RD.drv.modules()) : [];
   if (!mods.length && !(MARKS[RD.book] || []).length){ aviser("Ce livre n'a pas de liste de modules ni de signets."); return; }
-  RD.modsMenu = mods; RD.editMark = -1;
-  dessinerMenu();
+  RD.modsMenu = mods; RD.editMark = -1; RD.mmVue = ""; $("#mmQ").value = "";
+  dessinerMenu(); tdmOutils();
   $("#help").hidden = true; $("#mmenu").hidden = false;
 }
 function dessinerMenu(){
@@ -4893,8 +4915,11 @@ function dessinerMenu(){
       : `<div class="mmrow"><button class="mm" data-mark="${esc(m.p)}" style="--a:#fff200"><b>${ICO_MOD.signet}</b><span>${esc(nomSignet(m))}${m.nom ? ` <small>· page ${esc(m.p)}</small>` : ""}</span></button><button class="mmb" data-mren="${i}" aria-label="Renommer le signet" title="Renommer">✏</button><button class="mmb" data-mdel="${i}" aria-label="Retirer le signet" title="Retirer">✕</button></div>`).join("");
     if (mods.length) h += `<div class="mm-h">Modules</div>`;
   }
-  h += mods.map((m, i) => `<button class="mm mm-${m.kind || "module"}" data-i="${i}" style="--a:${esc(m.color || "#e50914")}"><b>${m.ico || esc(m.tag)}</b><span>${esc(m.text)}</span></button>`).join("");
+  const pc = tdmPageCourante(); let ici = -1;
+  if (pc) mods.forEach((m, i) => { if (typeof m.page === "number" && m.page <= pc && (ici < 0 || m.page >= mods[ici].page)) ici = i; });
+  h += mods.map((m, i) => `<button class="mm mm-${m.kind || "module"}${i === ici ? " mm-ici" : ""}" data-i="${i}" style="--a:${esc(m.color || "#e50914")}"><b>${m.ico || esc(m.tag)}</b><span>${esc(m.text)}</span>${i === ici ? '<em class="mm-tag">Tu es ici</em>' : typeof m.page === "number" ? `<small class="mm-p">p. ${m.page}</small>` : ""}</button>`).join("");
   const L = $("#mmenuList"); L.innerHTML = h;
+  setTimeout(() => { const e = L.querySelector(".mm-ici"); if (e) e.scrollIntoView({ block:"center" }); }, 0);
   L.querySelectorAll(".mm[data-i]").forEach(b => b.onclick = () => { closeMenu(); mods[+b.dataset.i].run(); setTimeout(() => { syncSecond(); poll(); }, 300); });
   L.querySelectorAll(".mm[data-mark]").forEach(b => b.onclick = () => { closeMenu(); const n = parseInt(b.dataset.mark, 10); if (n && RD.drv) RD.drv.goto(n); setTimeout(() => { syncSecond(); poll(); }, 300); });
   L.querySelectorAll("[data-mren]").forEach(b => b.onclick = () => { RD.editMark = +b.dataset.mren; dessinerMenu(); const i = L.querySelector("[data-mname]"); if (i){ i.focus(); i.select(); } });
@@ -4912,6 +4937,59 @@ function dessinerMenu(){
     else e.stopPropagation();
   }));
 }
+/* ---- Table des matières (7 nov., idée D de Jeremy) : panneau à droite, recherche, Animations / Exercices ---- */
+function tdmDoc(){ try { return $("#readerFrame").contentDocument; } catch(e){ return null; } }
+function tdmPageCourante(){ try { return parseInt(RD.drv.state().label, 10) || 0; } catch(e){ return 0; } }
+function tdmPages(){
+  const d = tdmDoc(); if (!d) return [];
+  if (RD.tdmCache && RD.tdmCache.d === d) return RD.tdmCache.p;
+  const p = [...d.querySelectorAll(".page")].map((e, i) => {
+    let h = [...e.querySelectorAll("h1,h2,h3,.titre,.title")].map(x => x.textContent.replace(/\s+/g, " ").trim()).find(t => t && t.length < 90 && !/^module\s/i.test(t)) || "";
+    if (!h){ let best = 0; const w = e.ownerDocument.defaultView;   /* pas de titre balisé : le plus gros texte court de la page */
+      [...e.querySelectorAll("*")].slice(0, 400).forEach(x => { const t = [...x.childNodes].filter(c => c.nodeType === 3).map(c => c.nodeValue).join("").replace(/\s+/g, " ").trim();
+        if (t.length < 4 || t.length > 80 || /^module\s/i.test(t)) return; const f = parseFloat(w.getComputedStyle(x).fontSize) || 0; if (f > best + .5){ best = f; h = t; } });
+      if (best < 17) h = ""; }
+    const tw = e.ownerDocument.createTreeWalker(e, 4), mo = []; let nd; while ((nd = tw.nextNode())) if (!/^(SCRIPT|STYLE)$/.test(nd.parentNode.nodeName)) mo.push(nd.nodeValue);
+    const txt = mo.join(" ").replace(/\s+/g, " ").replace(/ ([,.;:!?)])/g, "$1");
+    const anim = !!e.querySelector('[class*="-st1"],[class*="dmc-"]') || /^\s*animation\b/i.test(h) || /\banim/i.test(e.className);
+    const exo = !!e.querySelector(".reponse:not(.exa),.reponse-choix,.ans:not(.exa),input,textarea");
+    return { n:i + 1, h, txt, anim, exo };
+  });
+  RD.tdmCache = { d, p }; return p;
+}
+function tdmOutils(){
+  const P = tdmPages(), na = P.filter(x => x.anim).length, ne = P.filter(x => x.exo).length;
+  const B = $("#mmPuces");
+  B.innerHTML = (na ? `<button data-vue="anim" class="${RD.mmVue === "anim" ? "on" : ""}">Animations <small>${na}</small></button>` : "")
+    + (ne ? `<button data-vue="exo" class="${RD.mmVue === "exo" ? "on" : ""}">Exercices <small>${ne}</small></button>` : "");
+  B.querySelectorAll("button").forEach(b => b.onclick = () => { RD.mmVue = RD.mmVue === b.dataset.vue ? "" : b.dataset.vue; $("#mmQ").value = ""; tdmOutils(); tdmListe(); });
+  $("#mmQ").parentElement.hidden = !P.length;
+}
+function tdmListe(){
+  const q = $("#mmQ").value.trim();
+  if (!RD.mmVue && q.length < 2){ dessinerMenu(); return; }
+  const P = tdmPages(), sans = s => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  let res, titre;
+  if (q.length >= 2){
+    const k = sans(q); titre = "Résultats pour « " + q + " »";
+    res = P.filter(x => sans(x.txt).includes(k)).slice(0, 40).map(x => { const t = sans(x.txt), j = t.indexOf(k), a = Math.max(0, j - 40);
+      return { n:x.n, t:x.h || "Page " + x.n, s:(a ? "…" : "") + x.txt.slice(a, j + k.length + 50).trim() + "…" }; });
+  } else {
+    titre = RD.mmVue === "anim" ? "Animations" : "Exercices";
+    res = [];
+    P.filter(x => RD.mmVue === "anim" ? x.anim : x.exo).forEach(x => { const t = x.h || "Page " + x.n, d = res[res.length - 1];
+      if (d && d.t === t && d.fin === x.n - 1){ d.fin = x.n; d.s = "Pages " + d.n + " à " + x.n; } else res.push({ n:x.n, fin:x.n, t, s:"" }); });
+  }
+  const pc = tdmPageCourante();
+  const L = $("#mmenuList");
+  L.innerHTML = `<div class="mm-h">${esc(titre)} <span class="mm-sub">— ${res.length || "aucun"}${res.length === 40 ? "+" : ""}</span></div>`
+    + res.map(r => `<button class="mm mm-res${r.n === pc ? " mm-ici" : ""}" data-pg="${r.n}" style="--a:${RD.mmVue === "anim" ? "#534AB7" : RD.mmVue === "exo" ? "#0F6E56" : "#185FA5"}"><b>${r.n}</b><span>${esc(r.t)}${r.s ? `<small class="mm-ext">${esc(r.s)}</small>` : ""}</span></button>`).join("");
+  L.querySelectorAll("[data-pg]").forEach(b => b.onclick = () => { closeMenu(); if (RD.drv) RD.drv.goto(+b.dataset.pg); setTimeout(() => { syncSecond(); poll(); }, 300); });
+  L.scrollTop = 0;
+}
+$("#mmQ").addEventListener("input", () => { if ($("#mmQ").value.trim().length >= 2) RD.mmVue = ""; tdmOutils(); tdmListe(); });
+$("#mmQ").addEventListener("keydown", e => { e.stopPropagation(); if (e.key === "Escape") closeMenu(); if (e.key === "Enter"){ const b = $("#mmenuList [data-pg]"); if (b) b.click(); } });
+$("#mmX").onclick = () => closeMenu();
 function closeMenu(garderAide){ $("#noir").hidden = true; $("#mmenu").hidden = true; if (garderAide !== true) $("#help").hidden = true; }
 function turn(dir){ if (Date.now() - (ZS.t || 0) < 350) return;   /* pendant et juste après un zoom à la roulette, aucune page ne se tourne */
   RD.bouge = true;
