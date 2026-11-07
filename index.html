@@ -2200,6 +2200,7 @@ function toggleDbl(){
 $("#readerFrame").addEventListener("load", () => { if ($("#reader").classList.contains("open") && $("#readerFrame").srcdoc) attach(); });
 
 function poll(){
+  try { tdmSuivre(); } catch(e){}
   /* Un livre lent à démarrer (polices, scripts) : on réessaie de brancher la barre jusqu'à 8 fois */
   if ($("#reader").classList.contains("open") && RD.t0 && RD.book !== "tableau-blanc" && (RD.retry || 0) < 8 && (!RD.drv || (RD.tot || 0) <= 1) && Date.now() - RD.t0 > 1800 * ((RD.retry || 0) + 1)){
     RD.retry = (RD.retry || 0) + 1; RD.attached = false; attach();
@@ -4928,7 +4929,7 @@ function dessinerMenu(){
   const pc = tdmPageCourante(); let ici = -1;
   if (pc) mods.forEach((m, i) => { if (typeof m.page === "number" && m.page <= pc && (ici < 0 || m.page >= mods[ici].page)) ici = i; });
   const tot = (() => { try { return RD.drv.state().tot || 0; } catch(e){ return 0; } })();
-  if ($("#mmOu")) { $("#mmOu").textContent = pc ? "Page " + pc + (tot ? " sur " + tot : "") : ""; $("#mmProg").style.width = (pc && tot ? Math.round(pc / tot * 100) : 0) + "%"; }
+  tdmEntete(pc, tot); RD.mmPc = pc;
   const finMod = i => { const n = mods.slice(i + 1).find(m => typeof m.page === "number" && m.page > mods[i].page); return n ? n.page - 1 : tot || mods[i].page; };
   h += mods.map((m, i) => { const ic = i === ici, f = typeof m.page === "number" ? finMod(i) : 0, nb = f && f >= m.page ? f - m.page + 1 : 0;
     const av = ic && nb ? Math.max(4, Math.round((pc - m.page + 1) / nb * 100)) : 0;
@@ -4954,6 +4955,18 @@ function dessinerMenu(){
 }
 /* ---- Table des matières (7 nov., idée D de Jeremy) : panneau à droite, recherche, Animations / Exercices ---- */
 function tdmDoc(){ try { return $("#readerFrame").contentDocument; } catch(e){ return null; } }
+function tdmEntete(pc, tot){ if (!$("#mmOu")) return; $("#mmOu").textContent = pc ? "Page " + pc + (tot ? " sur " + tot : "") : ""; $("#mmProg").style.width = (pc && tot ? Math.round(pc / tot * 100) : 0) + "%"; }
+/* « Tu es ici » en direct : appelé par poll() (aux 300 ms) pendant que la table est ouverte */
+function tdmSuivre(){
+  if ($("#mmenu").hidden || !RD.drv) return;
+  const pc = tdmPageCourante(); if (!pc || pc === RD.mmPc) return;
+  RD.mmPc = pc;
+  if (RD.mmVue || $("#mmQ").value.trim().length >= 2){
+    let tot = 0; try { tot = RD.drv.state().tot || 0; } catch(e){}
+    tdmEntete(pc, tot);
+    $("#mmenuList").querySelectorAll("[data-pg]").forEach(b => b.classList.toggle("mm-ici", +b.dataset.pg === pc));
+  } else if (RD.editMark < 0) dessinerMenu();
+}
 function tdmPageCourante(){ try { return parseInt(RD.drv.state().label, 10) || 0; } catch(e){ return 0; } }
 function tdmPages(){
   const d = tdmDoc(); if (!d) return [];
