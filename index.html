@@ -1395,15 +1395,18 @@ function pauseDriverPart(doc){
 /* Réponses « natives » pour tout livre : il suffit de marquer une réponse (class="reponse", "answer", "solution" ou "correction",
    ou l'attribut data-reponse). Le bouton ✓ de la bibliothèque les cache ou les montre toutes (le texte garde sa place, rien ne bouge). */
 const REP_SEL = ".reponse,.answer,.solution,.correction,[data-reponse],[data-answer]";
+/* (7 nov.) bonne réponse d'un choix multiple / vrai-faux : toujours visible (c'est un des choix), seulement surlignée par le livre;
+   elle compte dans le pas à pas (classe h-vu quand c'est son tour) mais n'est jamais cachée */
+const REP_CHOIX = ".reponse-choix";
 function repDriverPart(doc){
-  if (!doc.querySelector(REP_SEL)) return {};
+  if (!doc.querySelector(REP_SEL + "," + REP_CHOIX)) return {};
   const st = doc.createElement("style");
   /* cachées au départ, puis forcées visibles avec ✓ (même si le livre les cache lui-même en attendant la bibliothèque) */
   st.textContent = "body:not(.h-rep) :is(" + REP_SEL + "){visibility:hidden!important}body.h-rep :is(" + REP_SEL + "){visibility:visible!important}"
     + "body.h-pas :is(" + REP_SEL + ").h-vu{visibility:visible!important}";
   doc.documentElement.appendChild(st);
-  return { ansSimple:true, ansSel:REP_SEL, clsTout:["h-rep"], clsPas:["h-pas"], clsVu:"h-vu", answers:() => doc.body.classList.toggle("h-rep"),
-    ansInfo:() => ({ dis:!doc.querySelector(REP_SEL), mode:doc.body.classList.contains("h-rep") ? 2 : 0, s:0, t:0 }) };
+  return { ansSimple:true, ansSel:REP_SEL + "," + REP_CHOIX, clsTout:["h-rep"], clsPas:["h-pas"], clsVu:"h-vu", answers:() => doc.body.classList.toggle("h-rep"),
+    ansInfo:() => ({ dis:!doc.querySelector(REP_SEL + "," + REP_CHOIX), mode:doc.body.classList.contains("h-rep") ? 2 : 0, s:0, t:0 }) };
 }
 /* Chapitres d'un livre sans sommaire : les titres (h1, h2) placés dans une page, une diapo ou une section */
 function titresModules(doc, goto){
@@ -1536,7 +1539,7 @@ function buildDriver0(win, doc){
     win.addEventListener("resize", fit); show(0);
     const modules = () => { const out = [{ tag:"⌂", text:"Couverture", color:"", run:() => show(0) }];
       pages.forEach((p, i) => { const h = p.querySelector("h1,h2"), t = h ? h.textContent.replace(/\s+/g, " ").trim() : "";
-        const m = /^(module|chapitre|chapter|partie|compétence)\s*([\d.]+)\s*[—:.-]?\s*(.*)$/i.exec(t);
+        const m = /^(module|chapitre|chapter|partie|compétence)\s*([\d.]+|[A-Z](?=\s*[—:.-]))\s*[—:.-]?\s*(.*)$/i.exec(t);   /* (7 nov.) aussi une lettre : Module F, Partie A */
         if (m) out.push({ tag:m[2], text:m[3] || t, color:"", run:() => show(i) }); });
       return out.length > 1 ? out : []; };
     return Object.assign({ keys:true, prev:() => show(cur - 1), next:() => show(cur + 1),
@@ -2202,7 +2205,7 @@ function measurePage(f){
     while (e.parentElement && e.parentElement !== d.body && e.parentElement !== d.documentElement
            && e.parentElement.getBoundingClientRect().width < fw - 4) e = e.parentElement;
     /* page qui remplit tout le cadre (livre C13…) : la page, c'est elle, pas le contenu à l'intérieur (sinon ses marges blanches étaient rognées en double page) */
-    if (e.parentElement && e.parentElement.classList && e.parentElement.classList.contains("page") && e.parentElement.getBoundingClientRect().width >= fw - 4) e = e.parentElement;
+    { const pg = e.closest && e.closest(".page"); if (pg && pg.getBoundingClientRect().width >= fw - 4) e = pg; }   /* (7 nov.) même si le centre tombe sur un élément plus profond dans la page */
     const r = e.getBoundingClientRect();
     if (r.width < fw * .4 || r.width > fw) return null;
     return { l:Math.max(0, r.left), r:Math.min(fw, r.right) };
