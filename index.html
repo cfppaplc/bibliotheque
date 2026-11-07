@@ -9368,4 +9368,33 @@ body.clair:not(:has(.reader.open)) #fsBtn{background:rgba(255,255,255,.55);color
   document.addEventListener("fullscreenchange", maj); maj();
 })();
 </script>
+<script>
+/* (7 nov.) Livres téléchargés d'avance, tout seuls : une fois connecté, chaque livre permis est demandé en arrière-plan, un à la fois.
+   Le service worker (sw.js) le garde sur l'appareil (et, s'il l'a déjà, vérifie seulement s'il a changé : petite requête).
+   Pas sur données cellulaires ni en mode « économie de données »; en pause pendant qu'un livre ou le tableau blanc est ouvert. */
+(function(){
+  let fait = null, enCours = false;
+  const reseauOk = () => { const c = navigator.connection; if (!c) return true; if (c.saveData) return false; if (c.type === "cellular") return false; return !/(^|-)2g|3g/.test(c.effectiveType || ""); };
+  const occupe = () => { const r = document.getElementById("reader"); return (r && r.classList.contains("open")) || document.hidden; };
+  const attendre = ms => new Promise(r => setTimeout(r, ms));
+  async function tout(){
+    if (enCours || !window.ACCES || !ACCES.estPret || !ACCES.session || !navigator.serviceWorker || !navigator.serviceWorker.controller) return;
+    const id = ACCES.session.id; if (fait === id || !reseauOk()) return;
+    enCours = true;
+    try {
+      for (const l of (typeof LIVRES !== "undefined" ? LIVRES : [])){
+        if (!l.fichier) continue;
+        const prot = ACCES.protege(l.fichier); if (prot && !ACCES.permis(l.fichier)) continue;
+        while (occupe()) await attendre(5000);
+        if (!ACCES.session || ACCES.session.id !== id) return;
+        try { const r = await fetch("livres/" + encodeURIComponent(l.fichier) + (prot ? ".chiffre" : ".html")); if (r.body) await r.arrayBuffer(); } catch(e){}
+        await attendre(1500);
+      }
+      fait = id;
+    } finally { enCours = false; }
+  }
+  setTimeout(tout, 12000); setInterval(tout, 60000);
+  window.telechargerLivres = tout;
+})();
+</script>
 </body></html>
