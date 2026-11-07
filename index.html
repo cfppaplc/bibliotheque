@@ -335,7 +335,7 @@
   @media (max-width:640px){.tb button{min-width:38px;height:38px}.tb input{height:38px}}
   /* barre d'avancement (7 nov.) : animée par « transform » (elle avance même quand l'ordinateur est occupé à ouvrir le livre); 0 → 85 % en 4 s, puis lentement; pleine à la fin */
   .charge-b{display:block;width:220px;height:4px;margin-top:10px;border-radius:2px;background:#ffffff1f;overflow:hidden}
-  .charge-b i{display:block;height:100%;background:#e50914;transform-origin:0 50%;transform:scaleX(.02);animation:chargeAv 4s cubic-bezier(.25,.6,.4,1) forwards,chargeAv2 8s 4s linear forwards}
+  .charge-b i{display:block;height:100%;background:#e50914;transform-origin:0 50%;transform:scaleX(.02);animation:chargeAv 3s cubic-bezier(.25,.6,.4,1) forwards,chargeAv2 8s 3s linear forwards}
   .charge-b.fin i{animation:none;transform:scaleX(1);transition:transform .25s ease}
   @keyframes chargeAv{to{transform:scaleX(.85)}}
   @keyframes chargeAv2{from{transform:scaleX(.85)}to{transform:scaleX(.97)}}
@@ -1312,13 +1312,13 @@ function chargement(l){
   c.innerHTML = `<div class="charge-c">` + (couv(l) ? `<img src="${esc(couv(l))}" alt="">` : "") + `<div><div class="charge-r" aria-hidden="true"></div><b>${esc(l.titre)}</b><span>Ouverture du livre…</span><i class="charge-b"><i></i></i></div></div>`;
   c.hidden = false; const t0 = Date.now();
   /* (7 nov., demande de Jeremy) on laisse au livre le temps de bien s'ouvrir : une fois prêt, encore 1,5 s (images décodées, animations lancées),
-     au moins 4 s en tout, et on attend que les images de la page soient chargées (au plus 6 s de plus) */
+     au moins 3 s en tout, et on attend que les images de la page soient chargées (au plus 6 s de plus) */
   let tPret = 0;
   const imagesPretes = () => { try { const d = $("#readerFrame").contentDocument; return [...d.images].every(i => i.complete); } catch(e){ return true; } };
   chargeT = setInterval(() => { let pret = false; try { pret = !!(RD.drv && RD.drv.state().tot > 0); } catch(e){}
     const n = Date.now();
     if (pret && !tPret){ tPret = n; const sp = c.querySelector(".charge-c span"); if (sp) sp.textContent = "Préparation des pages et des animations…"; }
-    const fini = tPret && n - tPret > 1500 && n - t0 > 4000 && (imagesPretes() || n - tPret > 6000);
+    const fini = tPret && n - tPret > 1500 && n - t0 > 3000 && (imagesPretes() || n - tPret > 6000);
     if (fini || n - t0 > 45000 || !$("#reader").classList.contains("open") && n - t0 > 4000){ clearInterval(chargeT); const bb = c.querySelector(".charge-b"); if (bb && fini){ bb.classList.add("fin"); setTimeout(() => { c.hidden = true; }, 300); } else c.hidden = true; } }, 150);
 }
 /* ---- Fenêtre de détails ---- */
