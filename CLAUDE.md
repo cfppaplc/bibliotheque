@@ -25,6 +25,8 @@
    (une apostrophe non échappée dans une chaîne a déjà cassé le tableau de bord en ligne).
 4. Réponses à Jeremy : courtes, en français, sans jargon technique; dire ce qui a été testé et ce qui ne l'a pas été.
 
+**Normes des livres : `NORMES_LIVRES.md`** (format, réponses, table des matières, animations fluides). À relire et appliquer **à chaque nouveau livre ou mise à jour**; la mettre à jour quand la bibliothèque change (aussi copiée dans le projet claude.ai « site web bibliotheque » : `claude/normes-livres.md`).
+
 ## Fichiers
 | Fichier | Rôle |
 |---|---|
