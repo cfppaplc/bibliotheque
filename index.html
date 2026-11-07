@@ -827,7 +827,9 @@ html.leger{scroll-behavior:auto}
   try { S = window.localStorage; } catch(e){ S = null; }
   function lire(k){ try { return S && S.getItem(k); } catch(e){ return null; } }
   function ecrire(k, v){ try { if (S) S.setItem(k, v); } catch(e){} }
-  function appliquer(){ var m = lire("modeLeger"); h.classList.toggle("leger", m === "oui" || (m !== "non" && lire("modeLegerMesure") === "lent")); }
+  /* (7 nov.) cellulaire = mode léger d'office (sauf si « Complètes » est choisi) : petit écran tactile */
+  function cell(){ try { return matchMedia("(pointer:coarse)").matches && Math.min(screen.width, screen.height) <= 600; } catch(e){ return false; } }
+  function appliquer(){ var m = lire("modeLeger"); h.classList.toggle("leger", m === "oui" || (m !== "non" && (cell() || lire("modeLegerMesure") === "lent"))); }
   window.modeLegerChoix = function(){ return lire("modeLeger") || "auto"; };
   window.modeLegerFixer = function(v){ try { if (!S) return; if (v === "auto") S.removeItem("modeLeger"); else S.setItem("modeLeger", v); } catch(e){} appliquer(); if (v === "auto") mesurer(); };
   appliquer();
