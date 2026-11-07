@@ -504,7 +504,17 @@
   .mmenu-box{max-width:none;width:min(470px,94vw);max-height:none;height:100%;border-radius:14px 0 0 14px;padding:18px 18px 24px;display:flex;flex-direction:column;overflow:hidden;box-shadow:-10px 0 40px #000a}
   .mmenu:not([hidden]) .mmenu-box{animation:mmGlisse .28s cubic-bezier(.2,.8,.2,1)}
   @keyframes mmGlisse{from{translate:40px 0;opacity:.4}}
-  .mm-top{display:flex;align-items:center;gap:10px;margin-bottom:12px}.mm-top h2{margin:0!important;flex:1}
+  .mm-top{display:flex;align-items:center;gap:10px;margin-bottom:10px}.mm-titre{flex:1;min-width:0}.mm-top h2{margin:0!important;font-size:1.35rem}
+  .mm-ou{color:#9a9aa2;font-size:.88rem;margin-top:2px;font-variant-numeric:tabular-nums}
+  .mm-prog{height:4px;border-radius:2px;background:#2c2c31;margin:0 0 14px;overflow:hidden}.mm-prog i{display:block;height:100%;background:linear-gradient(90deg,#e50914,#ff6a3d);border-radius:2px;transition:width .4s}
+  .mmenu .mm{border:1px solid #34343a;border-left:1px solid #34343a;background:#212125;border-radius:12px;transition:background .15s,border-color .15s,transform .1s}
+  .mmenu .mm:hover{background:#2a2a30;border-color:#4a4a52}.mmenu .mm:active{transform:scale(.985)}
+  .mmenu .mm b{flex:none;width:36px;height:36px;border-radius:9px;background:var(--a,#e50914);color:#fff;font-size:1.05rem}
+  .mmenu .mm.mm-couverture b,.mmenu .mm.mm-intro b,.mmenu .mm.mm-lexique b,.mmenu .mm.mm-table b,.mmenu .mm.mm-sources b,.mmenu .mm.mm-annexe b,.mmenu .mm.mm-autre b,.mmenu .mm.mm-formatif b,.mmenu .mm.mm-projet b,.mmenu .mm.mm-bravo b{background:#33333a;color:#d8d8de}
+  .mmenu .mm.mm-ici{background:#2b2b33;border-color:#e50914;box-shadow:inset 3px 0 0 #e50914}
+  .mm-sous{display:block;color:#a8a8b0;font-size:.8rem;margin-top:3px}
+  .mm-av{display:block;height:3px;border-radius:2px;background:#3a3a42;margin-top:6px;position:relative;overflow:hidden}.mm-av::after{content:"";position:absolute;inset:0 auto 0 0;width:var(--av);background:#fff;border-radius:2px}
+  .mm-puces button{display:inline-flex;align-items:center;gap:7px}
   .mm-x{width:46px;height:46px;border-radius:10px;border:1px solid #444;background:#222;color:#fff;font-size:1.1rem;cursor:pointer}
   .mm-cherche{display:flex;align-items:center;gap:8px;background:#232326;border:1px solid #3a3a3e;border-radius:12px;padding:0 12px;height:48px;color:#999}
   .mm-cherche input{flex:1;min-width:0;background:none;border:0;outline:0;color:#fff;font:inherit;font-size:1rem}
@@ -514,11 +524,11 @@
   .mm-puces button.on{background:#fff;color:#000;border-color:#fff}.mm-puces button.on small{color:#555}
   .mmenu .mmenu-list{grid-template-columns:1fr;overflow:auto;flex:1;align-content:start;padding-right:4px}
   .mmenu .mm{min-height:52px;padding:10px 14px}
-  .mmenu .mmenu-list{display:flex;flex-direction:column;gap:8px}.mmenu .mmenu-list>*{flex:none}.mmenu .mm-res{height:auto;align-items:flex-start}.mm-res b{margin-top:2px}
+  .mmenu .mmenu-list{display:flex;flex-direction:column;gap:8px}.mmenu .mmenu-list>*{flex:none}.mmenu .mm-res{height:auto;align-items:center}.mmenu .mm-res:has(.mm-ext){align-items:flex-start}.mmenu .mm-res b{margin-top:0;width:auto;min-width:36px;padding:0 6px;font-size:.95rem}
   .mm span{flex:1;min-width:0}
   .mm-p{flex:none;color:#888;font-size:.85rem}
-  .mm.mm-ici{background:#2f3036;border-color:#777}
-  .mm-tag{flex:none;font-style:normal;font-size:.78rem;font-weight:700;background:#fff;color:#000;border-radius:10px;padding:3px 8px}
+
+  .mm-tag{flex:none;font-style:normal;font-size:.75rem;font-weight:700;background:#e50914;color:#fff;border-radius:10px;padding:3px 9px}
   .mm-ext{display:block;color:#aaa;font-size:.82rem;margin-top:3px;line-height:1.3;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
   @media (max-width:640px){.mmenu-box{width:100%;border-radius:0}}
   .mm-h{grid-column:1/-1;font-weight:700;color:#bbb;font-size:.85rem;letter-spacing:.06em;text-transform:uppercase;margin-top:6px}
@@ -1031,7 +1041,7 @@ document.addEventListener("keydown", e => { if (e.key !== "/" || e.ctrlKey || e.
     <div id="tbPop" role="menu" aria-label="Plus d'outils"><div class="tbph"><b>Plus d'outils</b><span><button id="tbOrg" title="Glisser les boutons pour les déplacer entre la barre et ce menu">✎ Organiser</button><button id="tbRaz" title="Remettre la disposition d'origine">Réinitialiser</button></span></div><div class="grid" id="tbGrid"></div><p class="tbhint">Mode organiser : glisse un bouton pour le changer de place ou le passer entre la barre et ce menu.</p></div>
   </div>
   <button class="barres-handle" id="barresHandle" aria-label="Afficher les barres d'outils" title="Afficher les outils (H)"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 15l6-6 6 6"/></svg></button>
-  <div class="mmenu" id="mmenu" hidden role="dialog" aria-label="Modules"><div class="mmenu-box"><div class="mm-top"><h2>Table des matières</h2><button class="mm-x" id="mmX" aria-label="Fermer">✕</button></div><div class="mm-outils"><label class="mm-cherche"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="mmQ" type="search" placeholder="Chercher dans ce livre…" aria-label="Chercher dans ce livre" autocomplete="off"></label><div class="mm-puces" id="mmPuces"></div></div><div class="mmenu-list" id="mmenuList"></div></div></div>
+  <div class="mmenu" id="mmenu" hidden role="dialog" aria-label="Modules"><div class="mmenu-box"><div class="mm-top"><div class="mm-titre"><h2>Table des matières</h2><div class="mm-ou" id="mmOu"></div></div><button class="mm-x" id="mmX" aria-label="Fermer">✕</button></div><div class="mm-prog"><i id="mmProg"></i></div><div class="mm-outils"><label class="mm-cherche"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="mmQ" type="search" placeholder="Chercher dans ce livre…" aria-label="Chercher dans ce livre" autocomplete="off"></label><div class="mm-puces" id="mmPuces"></div></div><div class="mmenu-list" id="mmenuList"></div></div></div>
 </div>
 
 <div class="modal" id="modal">
@@ -4917,7 +4927,12 @@ function dessinerMenu(){
   }
   const pc = tdmPageCourante(); let ici = -1;
   if (pc) mods.forEach((m, i) => { if (typeof m.page === "number" && m.page <= pc && (ici < 0 || m.page >= mods[ici].page)) ici = i; });
-  h += mods.map((m, i) => `<button class="mm mm-${m.kind || "module"}${i === ici ? " mm-ici" : ""}" data-i="${i}" style="--a:${esc(m.color || "#e50914")}"><b>${m.ico || esc(m.tag)}</b><span>${esc(m.text)}</span>${i === ici ? '<em class="mm-tag">Tu es ici</em>' : typeof m.page === "number" ? `<small class="mm-p">p. ${m.page}</small>` : ""}</button>`).join("");
+  const tot = (() => { try { return RD.drv.state().tot || 0; } catch(e){ return 0; } })();
+  if ($("#mmOu")) { $("#mmOu").textContent = pc ? "Page " + pc + (tot ? " sur " + tot : "") : ""; $("#mmProg").style.width = (pc && tot ? Math.round(pc / tot * 100) : 0) + "%"; }
+  const finMod = i => { const n = mods.slice(i + 1).find(m => typeof m.page === "number" && m.page > mods[i].page); return n ? n.page - 1 : tot || mods[i].page; };
+  h += mods.map((m, i) => { const ic = i === ici, f = typeof m.page === "number" ? finMod(i) : 0, nb = f && f >= m.page ? f - m.page + 1 : 0;
+    const av = ic && nb ? Math.max(4, Math.round((pc - m.page + 1) / nb * 100)) : 0;
+    return `<button class="mm mm-${m.kind || "module"}${ic ? " mm-ici" : ""}" data-i="${i}" style="--a:${esc(m.color || "#e50914")}"><b>${m.ico || esc(m.tag)}</b><span>${esc(m.text)}${ic && nb > 1 ? `<small class="mm-sous">Page ${pc - m.page + 1} sur ${nb} de ce module</small><i class="mm-av" style="--av:${av}%"></i>` : ""}</span>${ic ? '<em class="mm-tag">Tu es ici</em>' : typeof m.page === "number" ? `<small class="mm-p">p. ${m.page}</small>` : ""}</button>`; }).join("");
   const L = $("#mmenuList"); L.innerHTML = h;
   setTimeout(() => { const e = L.querySelector(".mm-ici"); if (e) e.scrollIntoView({ block:"center" }); }, 0);
   L.querySelectorAll(".mm[data-i]").forEach(b => b.onclick = () => { closeMenu(); mods[+b.dataset.i].run(); setTimeout(() => { syncSecond(); poll(); }, 300); });
@@ -4958,10 +4973,12 @@ function tdmPages(){
   RD.tdmCache = { d, p }; return p;
 }
 function tdmOutils(){
-  const P = tdmPages(), na = P.filter(x => x.anim).length, ne = P.filter(x => x.exo).length;
+  const P = tdmPages(), grp = k => { let n = 0, d = null; P.forEach(x => { if (!x[k]) return; const t = x.h || ""; if (!(d && d.t === t && d.f === x.n - 1)) n++; d = { t, f:x.n }; }); return n; };
+  const na = grp("anim"), ne = grp("exo");
   const B = $("#mmPuces");
-  B.innerHTML = (na ? `<button data-vue="anim" class="${RD.mmVue === "anim" ? "on" : ""}">Animations <small>${na}</small></button>` : "")
-    + (ne ? `<button data-vue="exo" class="${RD.mmVue === "exo" ? "on" : ""}">Exercices <small>${ne}</small></button>` : "");
+  const ic = d => '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + d + '</svg>';
+  B.innerHTML = (na ? `<button data-vue="anim" class="${RD.mmVue === "anim" ? "on" : ""}">${ic('<circle cx="12" cy="12" r="9"/><path d="M10 8.5l5 3.5-5 3.5z" fill="currentColor"/>')}Animations <small>${na}</small></button>` : "")
+    + (ne ? `<button data-vue="exo" class="${RD.mmVue === "exo" ? "on" : ""}">${ic('<path d="M9 4h6v3H9z"/><path d="M15 5h3v16H6V5h3"/><path d="M9 14l2 2 4-4"/>')}Exercices <small>${ne}</small></button>` : "");
   B.querySelectorAll("button").forEach(b => b.onclick = () => { RD.mmVue = RD.mmVue === b.dataset.vue ? "" : b.dataset.vue; $("#mmQ").value = ""; tdmOutils(); tdmListe(); });
   $("#mmQ").parentElement.hidden = !P.length;
 }
