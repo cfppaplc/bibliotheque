@@ -65,5 +65,19 @@ html{overflow-x:clip}
 .mp-tete a{display:inline-flex!important;align-items:center;min-height:40px;padding:8px 14px!important;border:1px solid rgba(128,128,128,.35)!important;border-radius:10px;font-size:14px!important;font-weight:600!important;color:inherit!important;text-decoration:none;background:transparent!important}
 .mp-tete a.cache{display:none!important}
 .mp-tete .mp-retour{order:99!important}
+
+.mp-nav{display:flex;align-items:center;gap:4px;flex:none;margin-left:6px}
+.mp-nav a{display:inline-flex!important;align-items:center;gap:6px;min-height:36px!important;padding:6px 10px!important;border:0!important;border-radius:9px;font-size:13.5px!important;font-weight:600!important;color:inherit!important;opacity:.78;text-decoration:none;white-space:nowrap;background:transparent!important}
+.mp-nav a:hover{opacity:1;background:rgba(128,128,128,.14)!important}
+.mp-nav a.ici{opacity:1;background:rgba(235,106,34,.16)!important;color:#EB6A22!important}
+body.inclus .mp-nav{display:none!important}
+@media (max-width:1250px){.mp-tete .mp-sous{display:none!important}}
+@media (max-width:980px){.mp-nav{display:none!important}}
 @media (max-width:640px){.mp-tete{padding:0 14px!important;height:70px;gap:10px}.mp-tete>img{height:22px!important}.mp-tete .mp-sous,.mp-tete #lienEcran{display:none!important}.mp-tete .mp-nom{font-size:14px!important;padding-left:10px;overflow:hidden;text-overflow:ellipsis;flex:0 1 auto!important;min-width:0}.mp-tete a{min-height:38px;padding:6px 11px!important;font-size:13px!important}}
 `; (document.head || document.documentElement).appendChild(st); })();
+
+/* barre de navigation commune : définie dans garde-nav.js (aussi chargé par la bibliothèque) */
+(function(){ const ici = "labo";
+  const poser = () => window.mpNavHTML && document.querySelectorAll(".mp-tete").forEach(h => { if (h.querySelector(".mp-nav")) return; const e = h.querySelector(".mp-esp"); if (e) e.insertAdjacentHTML("beforebegin", mpNavHTML(ici)); });
+  const s = document.createElement("script"); s.src = "garde-nav.js"; s.onload = () => { if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", poser); else poser(); };
+  (document.head || document.documentElement).appendChild(s); })();
