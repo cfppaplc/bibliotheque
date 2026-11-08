@@ -71,6 +71,25 @@
    "prog": [
     "Entretien général d'immeubles"
    ]
+  },
+  "claude.assistant": {
+   "nom": "Claude assistant",
+   "pub": {
+    "kty": "EC",
+    "crv": "P-256",
+    "x": "k55eSU-Zaux3DH0KF5yIvnA-l0j5Ov3oYqNuOr0ovqY",
+    "y": "DSiiuIIyx7EwVj9FbPJzkV0-7BW074b52nidpU70IyM"
+   },
+   "priv": {
+    "s": "pRFkiwhpnz8OeWI9E34IfQ==",
+    "i": "YJdDBcIZBeIPyiwO",
+    "c": "fs7kdKgcLAswALRCfSKUzoe8VJvllCqsSk/TfGR+QGzUGK3DH/1g8H04DNSMwlNw"
+   },
+   "admin": false,
+   "prog": [
+    "Entretien général d'immeubles",
+    "Plomberie et chauffage"
+   ]
   }
  },
  "livres": {
@@ -79,7 +98,8 @@
     "jeremy.raymond": "Mn2b6BTYjsLSJfCYNuC9+XZqNZj49b29FG3FhbBnpJ+rWZR7LAdFbnF6HQXXREbWJFTnBuUB9QVo3AfxCjogoBW7A1+BRb5dFX6xow4M40EYJzh8EZCPYjkK0c5PbmQakf5cpFi4J3ARpbgWhtLrZ/KS68mShXHad82uT6w2Rhw0ZUcdB2+DEQ/jmS6qA2ndVakA5A9SkZJfc4hU8uCgYchAvodIEugRa7P/0jI/TrYw1BpqouKnkB+ubc3qJarJzpQBz0zPc/QE5N+V0P7xLSAGKTd3qiYwi76IDLDtOzy+yMhuFaz3EHt3/IpSZO5dptZiGEhp5aglpwcvCXheLA==",
     "2608egi1": "EBJB8f7dDjD7q8ru47OZY03TfbHW17/PHpVveVpWUWCUE8ujxs26VXZv9btWfkeZIyiTBM7SFWUTwpgkzxrdPimwLUFhAIz0PCygVjwgjO2i1pqRhFgoGbfdbbbpSI8VmQfRwsV7FWUPzENQmxecqsXJ6yWmlqCu87RVsMeQ=",
     "michel.beauchesne": "EBAIcoSbpLz7klZMrojY17e8dQd+/oZvXCNxta79ebmERKQPSC3x7jwxi+YCsOXajoQOm7Dp8YIky/pJR60uq78o2FC4TNQ3KeNarFuxBWeYt6CsHi3g9Oh7yEIJhWbGoQl2ePuPDIcbhRdGwViOJews9xAgy8repI71DGgs=",
-    "marc.michaud": "EBGN9bbmZe45c9aY/xF7vv+Yo2mDseZr/hfyXt2JogaY78fxOMiKZk17xvQkcl+5Vu4gopQXmZzFXTr0tt1o/7gOtmiYRMg40Jo77bWJMIlsVURujPXeJJl2TRXdnKhc63HQ010v0T0gF8jSkAz5Cw/MpPaWOA6t4NxVgs7I="
+    "marc.michaud": "EBGN9bbmZe45c9aY/xF7vv+Yo2mDseZr/hfyXt2JogaY78fxOMiKZk17xvQkcl+5Vu4gopQXmZzFXTr0tt1o/7gOtmiYRMg40Jo77bWJMIlsVURujPXeJJl2TRXdnKhc63HQ010v0T0gF8jSkAz5Cw/MpPaWOA6t4NxVgs7I=",
+    "claude.assistant": "EBEAET80R8+aD/2VCeOOxOIq+dlDLzZSFA91sLD4GCaT/ViVblQvy9Sh4zY7359xX4dNAtFXUjUM++iPU1SbKdl5a5DXZahrdQQV+hyQCwsUenFBNqfGGEV+0ZsXnChhIZ4zJqMnet0rR2xL8+ZrHN5E5KdgltBCcK7NPZ2Y="
    }
   },
   "administration-batiment": {
@@ -87,21 +107,24 @@
     "jeremy.raymond": "Yipmql1XhXDSn0bTQcM2uCaE5zcTL+OfmIuhcwf0sUPTcosdPTCQ7TSVFYKgkpyYXrKhDyGSZLXSlTkY9fA+mhEIJZMA4oX8kUwXh6b5XMHj5W5MYT0sO5pAKENRLO0Qw0lWkKTwCvVBmzKSVkJJMoFyYS59aUZVkaVhIeMXDk1yWAR4KWH9X4Jr1Af6eHCPCQvVRKX9EyV/R33zcZ0q43/EowD4z1BoC702X9i+1IONHm50136Kd8vbzJ+8akfRJJK2RWR/C/cuwsCMncgGxKOm81zQvB2xRdSTOgftijWWAnVPGEk+3NPq8TWxsNlUN2IOGD2MmhG6lfTTjFtqpA==",
     "2608egi1": "EBAWnzUSXjaylLOJ13Axlcgp/XBvQbnoa9s9QrNDSSq3nSQSm16pKOc2mC2SbsJNx1wXnKdXuB4XPeo8fEccZPRrQ3KCVfxlrkbm4jaO/DD+EQtkpjU/Xc5o3hLecZWNj+wW1jdEljOPpptTKybk3eRkTZmlssj+BoTjzLTE=",
     "michel.beauchesne": "EBOdeBbLUTEf6O3GGHk7xTL0iIEk2tpI+kNiq1lM9Yk9s/LGAni+W72Ld8QQaTPWF9ITqqwy1WMutLJ4z9qDHfXuCwIAlU9kDHid2G3Xwlga+Gj1R+3pPag9cs4WOLaMDbOZ5BcTRqGf+4GvSb2/1T086nFAPGJkPv5wT6uo=",
-    "marc.michaud": "EBMTY7TQB3NpYzsgO70dlD2XuP6RCWIjUbrmJBY6W5ykwh5oq0Hl/z8vK8TMarrD9A75yJBs0/lUVzKdOzfJ4n3nA0ryej8P5rKL/GZm0nQuF4WvZglUjqvP26gqtNcuH5n1EgMrXLIUfuw0zNM/phj1/EjEyj2tagpFuUo8="
+    "marc.michaud": "EBMTY7TQB3NpYzsgO70dlD2XuP6RCWIjUbrmJBY6W5ykwh5oq0Hl/z8vK8TMarrD9A75yJBs0/lUVzKdOzfJ4n3nA0ryej8P5rKL/GZm0nQuF4WvZglUjqvP26gqtNcuH5n1EgMrXLIUfuw0zNM/phj1/EjEyj2tagpFuUo8=",
+    "claude.assistant": "EBAGsLQy41ply2d24cTieS1urisuF4lWJ1pV+ZQDj4ENdn5I8z/2B5nPixa4rNws/wBoHHHN/ULKlyW8BxRZBhQ7IPOgu/pMsxSJ6oQ1xQCEgCzUB0oYPOhPd1Up7lAj8VWRz0fOhmaVBimG26PfpERGrU3IX0dc0t1fM/H4="
    }
   },
   "dispositifs-electriques-c9": {
    "cles": {
     "jeremy.raymond": "JThqzCXiO4mWlv/pn5jtED4J0KBELGHe1OWpdunPS6d90pnopnV8fQxlbY1KfnHhBsaEzXPndZhKxo9GMaZaScURW2DJ6hR+NKtG2Y5WCpDx9tz9QbCmfVGlZH4+HIWIXO751rCp6v/uS1W55mGUV/uHro2/6gf9J/5K7NNTvR1uyGODkGb0eEYNYw/opSNILPveC/5Ekisg27ELMTjXf98V2ACjxh9doL9mKFjt5DW6R2I30cal/TSCgURpsch3Pjk3pHtE2iqAVfwgKoaDeJcpnTFLmBAAa53sEPc/Oakrcb6ianByHMFD5sOvIqz+Z0HbdvhMC9YDkEc+RubRUA==",
     "michel.beauchesne": "EBGlWJlT4E2oAxvPh2XHofnt1F9GJ4POUWkQdMlF5+/Je+ZcdXxvoJhX8xvXiW3F/95czIJ8d5FN2gAFAOrTlesyvcKV/MgxwyV783DuUh4VZMkkY9BOPg686B4LniJzMaYQB1OdQ5Vk+InBpxpBBTWUZPZ5h/+WgG4hht5k=",
-    "marc.michaud": "EBJmLpCGI4Ld7EkvbCfzPMBFgv1W0GGJYjgeHKB16xO6cmww9IkROeqhL8L8bGHY0RRqW0V9qxYd02eFFTcwSh5PH3oHamrzs5dkbK3DYtl0NoNlKgY4LfrUC2EV7R/NetTxofty8OVuKArH2X2VcwTktR8IKYog4IUULE8Y="
+    "marc.michaud": "EBJmLpCGI4Ld7EkvbCfzPMBFgv1W0GGJYjgeHKB16xO6cmww9IkROeqhL8L8bGHY0RRqW0V9qxYd02eFFTcwSh5PH3oHamrzs5dkbK3DYtl0NoNlKgY4LfrUC2EV7R/NetTxofty8OVuKArH2X2VcwTktR8IKYog4IUULE8Y=",
+    "claude.assistant": "EBIrsZQbMv5rd13ZkeUYsoyophJRMdMpQQOhgVHS+XsawstGwx3ChFJxu/y+XvB14xLVaZCDiNsF8ipSh6cFtKpU/l7uYS+2K1cMG91ws1XQtfif+L8eqFtU/ifb61RqEhqhlQMX0BltvDY1JGyyMdNIWy74otcjhU/HxjLU="
    }
   },
   "materiel-electrique-c13": {
    "cles": {
     "jeremy.raymond": "QLKq/CRPmOeeBUJ7XwXTcVFNQWDTvHKoKreWMIW2Rx8AR4XWb7o20TQZtqGYRh8x4e1bBq/Y41tOimmHf+/gPnYQvvtSe3ZVRVhX9slSDz0fMTQMTw6n+nqWXV3drAce2nAJRIyoPuMmbZ/fyOxY1PrFf4xNOGoMW7uRuC7Ed++W/5xnuq3ejpvM+HvhQHrWDGfun/h+lep+WOf+gX3YMsVRKiWvfAkIhVE7KYbERxPb9EY2RBoPHWYSC3pW2j6SsIp7l6aOTMEkmYz4qQQbVFVMoHtrkrBzeiatU/XGL67OjFmtq7W5q0sdfvRKPtLa7BAubsiLpkhw5geqGPRj+w==",
     "michel.beauchesne": "EBPiRS9EIUbJg5O5K6qdRPfkM+jgsONXky7d77BBaZdbdMBEamdo8ax5OzEg5XFnIlq93mI1UkIg0IDqiVHvYLAJmy+79Fg7ULtWQyqk8mt0Hoai5vRDVAGMH2h17DwedKy+m8+zPbvSpg6JKATfKQD9RMfAJwfng5AlMx3c=",
-    "marc.michaud": "EBAasADutWNofYpHRVkPShwyS/E7DtQ6QJRK516mmB64GR02+m5Kg2hG4LkIbZVQu3w0HxJicWFdYCE+T3+juOj4Qdc5Gy7g4mOz0HdHth1i2OoOJEDRRPf+1ck6h9XIDD/lmKpGUyj6ORWvIhNe1bS6NS6XcFSD/CQ2EDEQ="
+    "marc.michaud": "EBAasADutWNofYpHRVkPShwyS/E7DtQ6QJRK516mmB64GR02+m5Kg2hG4LkIbZVQu3w0HxJicWFdYCE+T3+juOj4Qdc5Gy7g4mOz0HdHth1i2OoOJEDRRPf+1ck6h9XIDD/lmKpGUyj6ORWvIhNe1bS6NS6XcFSD/CQ2EDEQ=",
+    "claude.assistant": "EBPDvMlnjEou9MsrB646JAfFmbrBdwhtVDG94bfNLn34BzYGTVhI/kP/cbz3757IDT5UBpq/5gWuzNzMcmuHd9JXNQICJ9QK+mFhcz32ZLyVAfLRkjM62dimhKWrsdcdvnt9awg13t85OGGI6mCJsQl3Wv4EdudP2hHluHgA="
    }
   },
   "micro-ordinateur": {
@@ -109,7 +132,8 @@
     "jeremy.raymond": "qLiqfWynDIAiWSs85b9mrAoPKdSd6SoriSF6iN0PzgnpkVOuZV7er4/lrx03ylfstl1pnATWSmhy/kBTP59MVo5Q5gIqY1myqee6uGanpu7zUE32onk7Xbqvzy+lJl3Oom1Nty6OraU0VQIpgVzAq0kGIo6Telp6BL2c5f2PHJmbBui1cGee05MNa5rkqBzZZ7j+CFX48+FSwi3suuxiMXwX+2vhav85LXqHWx9iYZqgUVZ3PYcw2slbEGN4BVtskJ4ryxeBWy+2fBhmmYvnH7/MykmwCA2nfIcEGTP/ioP5PlD8RNt5/OSDv7u98r2T/bhXV1TKIrn3mBVQllwDdg==",
     "2608egi1": "EBCyOJG6o6oY0r1MJOmNWerysIXLKOQvoiL8lj5Ydss40nbHL3xt4tKdOtD0rlILE/sSJbizr++nkRlXoHOBbCZmS5de2EN0ujkYy8F1qiP1AWxF7ye/K8DTyjim/3qLryaPKMgiGWyZQjnCZpORq7uXxOfysWP1Vf1Q9wQQ=",
     "michel.beauchesne": "EBIMitdQjTONVn5vFhKv5FIuyP+sqvSYaRzLXjn5+mwXeuw5AZjdCV1TgQ3zQwbfcpFLY5Oh7fEBAdv36hasL1Ihus7S1cQUBAEzlfk0lOHU/iyPZjHN5HMreT+lSw4fwzkt4dqvcziNS9G6ZGJgJjkE1d/GeajH0y52mGZs=",
-    "marc.michaud": "EBD1SUzqTnFDoL3wuPI5jaxBy8iumvrBFLL7MkgF3JkLC1ymRtm5Tr966q4FPKmHmUnO1StU1Vl43qNHhMdfmKSCbntLUYtqQLhU8M1wPYUiCPpZPZEytSxuWy4bj96zBREQYHQfct2olm81PxH+qTdMggHoOa3caXECHet4="
+    "marc.michaud": "EBD1SUzqTnFDoL3wuPI5jaxBy8iumvrBFLL7MkgF3JkLC1ymRtm5Tr966q4FPKmHmUnO1StU1Vl43qNHhMdfmKSCbntLUYtqQLhU8M1wPYUiCPpZPZEytSxuWy4bj96zBREQYHQfct2olm81PxH+qTdMggHoOa3caXECHet4=",
+    "claude.assistant": "EBIOP8BnBwROYGEimp1wkGTymN2xV6AW3+w4i3qQVRLQ16U+AymPWH0ix5bWa/N4Ae6sgJL9+rNwIJ1LJ3eExHz3uxu7dRJ0Rni6ceLPf/aoUEQ3cOU4jtdYLq3UYAeg1vkkV8lTYc0VglADrlSz6n8fnPd6SM0UHV6zJWcs="
    }
   },
   "plomberie-chauffage": {
@@ -117,7 +141,8 @@
     "jeremy.raymond": "QUE3jNWRKM8355clta9oe2rU33OoaUz+JlILeXiHUxCkG3eZsQms6rbP08gTO/VLfCtlnMJfxqsjWvW7FT4EpBQ0wmGjdJWhRIPk6M/C4tLWAJOUFUolKkdrzRhiO9HgHQBGGfdrGhge3aT6uRc8s3H3CSLQa2fZxg3ppxlHMY2dcNqvO/1dkDxAXWB8288SMTNEtqyga1SRmbpxEcN0Ogc7xnvC9ff3590hCocQT0p37NTaw991sZWpYXMsjYJT5Z+haZt/rm1dkOff8/r60jGOwjMi45kOqrKITHArRLTvYikdb0YylMQOtfRo9/nejYXGwAfqAkvrs0RGDmUzaA==",
     "2608egi1": "EBBVRLOG+7do5qHuRt2NuKqyK/ocBdeqwjs1f2MOaAjk0CTF7rKule3PpNHFJqa+wSz7v9XW+uoWzgTYXx/XM+3yjf/Pu+GZhEfdM/KqPjGEVAkpVzg2xoSu+60yD+57LiJAlQof3foh7eviDLVTS2KbBV0edYsPqJqEmuq0=",
     "michel.beauchesne": "EBFI/sLkx1bAoPSgYzsb9rpVaX9hmsYDf0LEzKxrg6pjINGa3fEMha6lnGEwqEuWaptQNE2IeQU5jxwD/ELcMhNdjL8XhLO4SYfCSTRWmk2oD/1jEMh0tgsn+bGFBg22UV+gOboQ6zuTt3LzdSHCMXM7sNpY8v+0pzb1+4gE=",
-    "marc.michaud": "EBPwIZSKHJS+NE8y7Lla5FB5Gv3M6hObZOv8IHyS02ZNGt82t2i9FNmUZ/z4jFb24Rmagw5HZbulKvBplNn1eSoQReo0DXph54AuE0VFbKgQzfu0aCT1so8AF+DEorpZzmtaRc2jSKoluzIYoHQhmL2DYNmIGy+1uA8SX2y4="
+    "marc.michaud": "EBPwIZSKHJS+NE8y7Lla5FB5Gv3M6hObZOv8IHyS02ZNGt82t2i9FNmUZ/z4jFb24Rmagw5HZbulKvBplNn1eSoQReo0DXph54AuE0VFbKgQzfu0aCT1so8AF+DEorpZzmtaRc2jSKoluzIYoHQhmL2DYNmIGy+1uA8SX2y4=",
+    "claude.assistant": "EBLsHaPsWgePMpXKdtTKlrx1snN0uFj8mXc/9gSlWMEVNnQonwoGhjfY43usPnMbgT1zsQkPCBWNa2GgimXVSik+ZFKolF2PqqV9RlQXweJAI9phN1eKhTQafbgBj1mNqDlON+AVPFWhrC7vU4ddVFs713wtfZdjvivEVFBc="
    }
   },
   "protection-incendie": {
@@ -125,7 +150,8 @@
     "jeremy.raymond": "onIkGl1H5UnWQ5QLqhqMfv983K9zor/lQTFCV2RQV6KFKf5nypWJMzSct3L53WlkdVkTyH2c/3KBj0Cqel4ukdG6jK6IMcgYM+RDQpSHiQhwmA46O+MDvVJCwWQhiBodm/pqtvQKAaUqlj7nFJihqgiF6wGg1nypuC/L0ZgGpcmycjrwEmf32cWGwI37Y1/mFxSLmXoa6fAn6m2qz+LOkKEXnJNHRkS8lxH+gFHrPj6GElBm9We69Zm0vzpkwD+NHfqLpTSYFLoKSVWFtdBrjIwP/t4tmAffT6H2/YRS/yixKSSMcHQqUm42VzcXKmm/X3u4uamDCbboECXubh8UZg==",
     "2608egi1": "EBHqNUz7il/krHCFLYVGqxBTCnKKZ48mK+NCK0RG/3mW/aV9qtZKkPTwpbR4qafm2bqzhvirp2U7eQ/pu5WlnNsYX1oqtMp7Fj/N+VsXTSi6ZG4yI9q+NtXQ5NG3qACVO0f8s294HZ/IXDDSKfxF3MTzBTIXVVQIU7q1r2Rk=",
     "michel.beauchesne": "EBPpr6kV0aIWwDOwwc99UMCuKlXuhos/Wap8ar8ADHMKIP0AQJh/TB4RNXLMO7fjoal8i1Dmq+VmTSdpBQV4A4SgRd6yY901idlAk9yaNMDhV8FO+xe7w9DQSDNjVpfIHrtNHkDQ9IQUCL5C8iUh2DKvZ+8l8OHihXSe1xBs=",
-    "marc.michaud": "EBG1vOOXcL4FmCJg/AdJcho4SG/8XJ/WOej2CpWuiqdRdG2q09As9sWfyCV06L+2QVVTTOGS0jCS2WUef4Rqu5vpACv/xCsvOrRamF2MCuHwWP76+rB+vZGg6QuCR7p4JCYO1mPyjZbZlsGum9a8gXV/o+OVsAB5dBG5ztYc="
+    "marc.michaud": "EBG1vOOXcL4FmCJg/AdJcho4SG/8XJ/WOej2CpWuiqdRdG2q09As9sWfyCV06L+2QVVTTOGS0jCS2WUef4Rqu5vpACv/xCsvOrRamF2MCuHwWP76+rB+vZGg6QuCR7p4JCYO1mPyjZbZlsGum9a8gXV/o+OVsAB5dBG5ztYc=",
+    "claude.assistant": "EBFZwVgyDeSFCgDX18WruZTaiRcVw0SY+MnrCdvk/1zZsN3+aPoVWdDrIQY9cm4ythZue+iM+VHDoOgmaCI2QOV+y+KUYZtRZ7YSLVOpMOJH5FLDdzSoae1iYt7rEsF+fzofKSUc+KN1hC2IxmQ0y8LF9UyNXe2lA1hfmzYg="
    }
   },
   "ventilation-climatisation-m11": {
@@ -133,20 +159,23 @@
     "jeremy.raymond": "lTCw9RVcJQmQxNDzTcvZIbWseNX9xgPtFUcMklmKOTLD/ON20cAj/NUg9V8h81r59RN41H7vuhPmm+kRkbQUUPSUF7Pn6kbak6rO1Bbf/yIlamBJKysQB75vYe2Qs82gfNdqk5nRUFb78QaBO4wsY2DHXri9TLI5D3AootvvvgW/+7NXO1Tqn8yJXLTn7/xv0PCYl6dCAUqSYkUAJrMDJUWm8mnUXi+JO4/X4ZFtfNF5SGyMFVsqjAFkGhAJmRwq+Nyi2IWJBT4qYhfq+AQ+3r+Nv1K5Lyf9Rp1+7CNLO+x2aqv4wd182DFZ6Qtsd3m2fDl/ROmLTyD9XppOnisVJQ==",
     "2608egi1": "EBBwlaT2MNgjj6GsNwNW9E5ZDNUj5dM0PkDDI/LUpqM1WnHLDG2f5b2E4H8FgpRvE7i9O3dsmqDzNx8UpqaKewE1PhLqQa253oXRYkKKyIezqc95G7I6UWlB1tOVskfNvxB8RW2V+zX+boPBMQNmcSseJqRcSHaNh/h65yEY=",
     "michel.beauchesne": "EBJENrSuQzFYbzR+9k50asuscZOz7WRIGvxpLNcu1uHOBoYIIEJew4C/Do3UDBKf7f/6aUqAxRpMN3vM9wBKPfvLLCkkOQ07vEwxH/iLCfd8Ss0/iVRk00XdtRU3FPPqcnsO2h4IcRLrS9TIDB01b9EDxacJxnCLeSo8rjbU=",
-    "marc.michaud": "EBKOBW/+idbbSGDojt192uvrnG9/4JqyfeAcW/M9EQVKGkuuGRmauEeWZbx7pPnrblg8i/XEuMciTHU25h7ZzERg9+3SXHHjUfjKvPLs/AGz+MWDSBF5jyIwSu0dUES2VtLIEhHExfYTEFoIIWQ+u4MGxSbYhT+d/aDNMwGs="
+    "marc.michaud": "EBKOBW/+idbbSGDojt192uvrnG9/4JqyfeAcW/M9EQVKGkuuGRmauEeWZbx7pPnrblg8i/XEuMciTHU25h7ZzERg9+3SXHHjUfjKvPLs/AGz+MWDSBF5jyIwSu0dUES2VtLIEhHExfYTEFoIIWQ+u4MGxSbYhT+d/aDNMwGs=",
+    "claude.assistant": "EBH05CSDrbIG3BJrGXkXMw05kWv/UL7Dtqxv5FCcBMGFvQIYndPrcT2Oasps0hK6YkBXIk5zMJ1zC0A5p37bMRPEQtw/ggTTcSGGjtwGMaoZwKAzHEBW47db9Rcv0/VRNpk2ta04amRksblQ1qQFs98BdhBbUeuh3u5XTsTo="
    }
   },
   "notions-energie-c13": {
    "cles": {
     "jeremy.raymond": "QaW9tjO1TJZ5H8BsiKAzEpupW9aFkG/hRhybmnjGWUAW/Sqfr83FPll4Jg21ObDccHGNF+xg2BIVpen5PIY51EMFSFGPOyDunJ2O0g01mi2sILl4mzjIbxlbOLW+gL52N1IIck1u5++Rp/8qQyd/LtmWbTOoN1XjEmNNxsbf8XEfdKvmpZdhD44CiisVpSYtFZhdFrmb0J8s0LeU6Y/h3c//9xBeDGP9EDUfIdxPwVPlgrMLTbS7MWCqHf63G/QMMZI4wGoXZ4D66n0YgrhXZID8Sdz2Ispbw1EB0GP8sGLKTYLpv7U7IixCEqI8sepwD0GS3NwyZqmfB7nlzHSD4w==",
     "michel.beauchesne": "EBLtKjdkv+T6adRNSprS9oViscaawNxwZJRpE3fKopbtMeKzCPqt+b+IloAHElenPIHGAsrlLnteSBXOfaqKllFDC+n3/hdkwGhoVnpGctdtv00J4fxmJulEH21f/IBvF/ztGuAIeZC0IZ8CD2Bw+/3fU9GsRlNSfTMPut8o=",
-    "marc.michaud": "EBGfhlHvY/Nvk8pIcvxgoHm/axjEW5QsL78wUzsdCGIRxq0l/TN1MOFv9Ud/ea6lB4e6AZeOVCDMSD3K1+1NgSatS1+oHsLYlwo1NYexmcOdUyVwAlsMMk1kbEQ4L6ZZUMACZWkZWuYLu2pCB9T5BtcGnF46weanVli6nuVo="
+    "marc.michaud": "EBGfhlHvY/Nvk8pIcvxgoHm/axjEW5QsL78wUzsdCGIRxq0l/TN1MOFv9Ud/ea6lB4e6AZeOVCDMSD3K1+1NgSatS1+oHsLYlwo1NYexmcOdUyVwAlsMMk1kbEQ4L6ZZUMACZWkZWuYLu2pCB9T5BtcGnF46weanVli6nuVo=",
+    "claude.assistant": "EBHHpcy9popxTyzeknq9f+O+LejvIPSicARadny89nuxvchZS3QLOFDmhMSPxH2nd95IXRybKlhXSb/DwqiSQQLDQOHHq77hR19k1u6U0/b/4CWcUompbPpLVOqGdGurcZP2u6aAIrcXi8cwesaXwSu23SXqy3FwYte+GzkI="
    }
   },
   "lecture-plans-devis-c6": {
    "cles": {
     "jeremy.raymond": "dj+0b4gQKBiGUc9w2Fdi42gNBOBmZSoROPaq8mn0jy25DFba/WHBb+acM2+ZNBOwWtPhklqmixxkXB9OygD7hc1vhEiH9ILV3qKkAK/w1d35030iCEb1EA0nbaGOLO9Sz1hXKKTsgBdimyfZrSLpm5DzcRB4JbzBpDFlB7RANt/CtT6AXDbk1rX3V+t9ib1ZH76aCEPH0icE7HAcKva4/ZNOamlRXrAyuGsKZ3SPq+6j+xMwjOX0CV2oEeIsoSpRaeCjOIL8ib8YFv/41uStHo6/ibkQ2XQmvvGarUv1bWEkCXWEgO93J6cQq/fX9x+8UXWzGqjkfBID+v5pQkq+Vw==",
-    "michel.beauchesne": "EBFs0+U5g6aEUI+DhDYlrYectdu1j//CltA/Uxnp8H7mrg1Z4Aiw4KfCyn8SUOYUyI1l58+BuLT0jzX52rptifG916/4B8CJTPgMKKM6hSRV/WdJjZt3MTNkxxWtu8IWRNG/RrAMZVxd2V+8vFA+tGR6eXcZT2l3XBSXbqPg="
+    "michel.beauchesne": "EBFs0+U5g6aEUI+DhDYlrYectdu1j//CltA/Uxnp8H7mrg1Z4Aiw4KfCyn8SUOYUyI1l58+BuLT0jzX52rptifG916/4B8CJTPgMKKM6hSRV/WdJjZt3MTNkxxWtu8IWRNG/RrAMZVxd2V+8vFA+tGR6eXcZT2l3XBSXbqPg=",
+    "claude.assistant": "EBF5VwYUYsHPJZThLY6aO8Eir8D5sxUW1rtxiDOWjO+YLLknb2hU/VDs+KODhPTVrtjX37eog9BIe8MrRgEjY3+UOkaPPxfOeTFmiVBl3KQVaEqkFccyKfZjI8vJOnQgazmqr2UekyejsZ0DPjp6uiGk5e2qUWxATEjg9tjM="
    }
   },
   "lecture-plans-batiments-egi": {
@@ -154,7 +183,8 @@
     "jeremy.raymond": "gMy4huPCRg4LqoqB1El8qOmLW3+qpPE3gB1Vp5ptcao8Di5RBbdexBjE8VHJMGNQU7atm6ZW5oBeb5OaqJQSnTwl2d383ZTncTDgZJAT96Ruw+NPrZtExhpkZum9kDW+ny2JbnpTmBzGLmFjYR2x2efIJsbThmpSZ1MAFOGBPWYII4kCiIE5oiDHMU9udeT90R2bqo7uV04np1X13nd6vpipRGM8CjYjJA4j8acByFSk0PktuiOZi5GJ6xUTYAr36Dcqg6YjAIE32nA27edqMjsW2p/6N3VUZQ8OLZpLDD266yrOKy45kWUQhNX59hW+WT8YAfIDjPel06VtxW9hyg==",
     "2608egi1": "EBLyxfEe5ry7QSsh01ibvco+XoGA/INFmSHR3zWNReMAkJi0arRdlDIW6OL3mc2gNY4Fg6UX+qEIt+IHUmOpndJATWKV6EkiNhRiWXSYPFS+Z3vWXws0jiUxg1FshfeRzkJyByUsm85o+FvaES5HdYxcsrjVIGmkXHzLdoZo=",
     "michel.beauchesne": "EBBQopClT1qNrOHST9Wl2/jHAMf+8Y14OOpiIBL/cnodCgAHptNI9CT53N9Fbl4usD1Ob93OGe22knIl7wv1XTMnR//NVUJgYLrGZ8wRy8MJBRQAauTJEj5xXgroUTrB1YnEV2XJnR8tuO1q5zWpEwOhpFLHQUTRbFOPyZWE=",
-    "marc.michaud": "EBNv9D+scC3M76UW7iy/yxqDBbVD17YOIVztqyCZUh2ex6GnZYNdPaFG9ZA98Cdjaw3Wt5Fn3HpztMuITiaThIQzPR4RfwssiSWpRg4RVAm57RuGK+X/UebtMDyo2QJj+LU1pt2BtD6l6zICBF7stMuAXpb1/demDnY00p4I="
+    "marc.michaud": "EBNv9D+scC3M76UW7iy/yxqDBbVD17YOIVztqyCZUh2ex6GnZYNdPaFG9ZA98Cdjaw3Wt5Fn3HpztMuITiaThIQzPR4RfwssiSWpRg4RVAm57RuGK+X/UebtMDyo2QJj+LU1pt2BtD6l6zICBF7stMuAXpb1/demDnY00p4I=",
+    "claude.assistant": "EBFZkDgGV2soy3h7v1tkHSI30oHpBFYeQm6NYya+RgbSHFFtPNR6nW9a2YvSMKFTrJupV0ewhNfHASKZEZ4swq1JbHOrFXSZv8i6hXRArlvfMbYGbrSxKg2ATQh7LiB4Vkue29ViJgnm1yCEdUpTnEOwIU3IVzgIkaik/5ho="
    }
   },
   "travaux-mineurs-egi": {
@@ -162,7 +192,8 @@
     "jeremy.raymond": "spfeEMvlkwEoqG3wKWvVEPE7CHWJigImmhSK4kzYef9+FHNypTFhnXR6xzxktsmq0LbkHseGzhqElBXzPCIgJsKQxwHemzl9DcWwAM6KlRponp8Qvb/JCsWKrIKfGyUgqJQZUqzZuZF6QTCMFCYfGJXAV9nYbUPshGmipCoy/54AQahdDCHL8WlRvrNr9MXyk9V3kUptjwJI4st0EetnV4OpUDgbl6zTIHNHUxM/dhok11VQgHO122iIY1vYxCD8mnkmWl4M93Eyg2b9qSlFUIJpWEE/Ekk7vMvYLnVEtobmCrYc6aDZOnQ6lX3J7ELywqnFv5xGWwFiuG3J77njAA==",
     "2608egi1": "EBMNjEowEey34byb+sehnCM3QYZTi9Ue/Qs1duZ8tZGBV7D+KQdqTUJgtuhpAzGpylhOvc+9oQ2KAIBvP5eHbw2QM2I48yO7QSxawtTrrb0VX2ToNh17FHyiWJvKPuUOnkLF5tb+EVVGWL/tKOsJFGSch9GK7UrvmQ1HRkRE=",
     "michel.beauchesne": "EBD4el/bZxoFVb+pmdGcLfL9lor/3An/19Mm/jQs/61+7uQuFkkbnGlvQJ/qMlcO9ZIHyo2xeAwIC8FtCh6vSMu6PBTsa6yk4pe2TiFFEq5HloWv62dXuHQwXy6ZKt3tWFHPFdIFS6rGVYHq+X6tvce2Y+vh3wP5Mqr0szv8=",
-    "marc.michaud": "EBJITpnlIpF6kzJkkk6T9soxMYmF/Dkvb47sHsjQJXh/vkiAbP+paj9bZQ6/mHVTQC+TXByELcVf9A1zZBApIQDxBtDfV5KbB0UWuQKkcJozEpHepOQYh4Uwj8Tm8dt74+KV1bJLZaCxNFUvvGwwzXz8bkA1PtvOjK8LVK20="
+    "marc.michaud": "EBJITpnlIpF6kzJkkk6T9soxMYmF/Dkvb47sHsjQJXh/vkiAbP+paj9bZQ6/mHVTQC+TXByELcVf9A1zZBApIQDxBtDfV5KbB0UWuQKkcJozEpHepOQYh4Uwj8Tm8dt74+KV1bJLZaCxNFUvvGwwzXz8bkA1PtvOjK8LVK20=",
+    "claude.assistant": "EBIhV42MAa1cjOBVug5i1AGTeA8uAWuFAvptXMflv7o/8CpVeEX+WNDlXqJ/9reilc8eHCW91/7jPoCfiu3rdza85ATh6a2cJtSkq1J+bpDkwY8MqqQh6Lb9EbkPobTkTooNtpSq3fB1rgSKD0xhsi9hEr9UdV6i++MXUZbw="
    }
   },
   "entretien-menager-egi": {
@@ -170,7 +201,8 @@
     "jeremy.raymond": "Wls2tkuC5HVIfrxB0yg9xDzoVDtX6cYUS25esH8b82ZU0INwPw6LZlxyqFiYjCLRGpT3NNwW1D+85R4qVopnjrPSUyRs3xvUBvB8LyKcfTSzMDi2depVDdWk8zKjrUR/snntC+nNzVyfbT8y1tb1T8ezGb8ukzpICDAUZnZexMPy+71dEwZHFaXgZRBPZkYR+xwHloTHY81UfmBWI1KB5OJqdV/4Xp7TB9hDPBUzdNNnvajaEBYp8wY+0agAuUE8FufLuBBaiSdLZqJ6QWptqeEy+34Snczys0YBCF8QgyGtvFmT+PRth6r7Bv+M0RohG9DPUfR/7re+LADe34Q2XA==",
     "2608egi1": "EBFyJKxIyCqMKU2Cvgb74R4bzaO3wR0yjFSJA4TqgtbSyAkuKPyZPFjTm28e8UmmxXBa69PvllE5ThRWoEa9urEMDNbYy+72bUMqT+ESkkKT2yJYQiqg1MHWbCAoQqEbe774QrH6a+WaPvja2MZhHdZESSboLi0n3C/Joz5M=",
     "michel.beauchesne": "EBKB4srrSHpw4+zPkM2kULAZNt4MTi/SRe1LsrWcaklYResvicrbHkuPsHw06qv7fNYIjeYFytkYoNqkqIG3LSmuttyrC4x79qx1DeQ99LXYMmPqCM0Jh7Vv6Y9sq+adcjskwDDMYfqixZRi/SCufa1tPHN1H2E1B416I4K0=",
-    "marc.michaud": "EBOwiWr+No7j8dhLIa7jgLagB+rybbsOfc/DK6zpSiJe/ORd4JPY2Sxrv12u0JGw0wYYgh0xza1aiAApSpG7NB2+qMt4NiLIMzWFjb4HScSRTSXLJpF6NJbQBwJzgPguNPk7PKqeXZjYo/WfTUg2vG3+JiRIpWfEpDtMTldY="
+    "marc.michaud": "EBOwiWr+No7j8dhLIa7jgLagB+rybbsOfc/DK6zpSiJe/ORd4JPY2Sxrv12u0JGw0wYYgh0xza1aiAApSpG7NB2+qMt4NiLIMzWFjb4HScSRTSXLJpF6NJbQBwJzgPguNPk7PKqeXZjYo/WfTUg2vG3+JiRIpWfEpDtMTldY=",
+    "claude.assistant": "EBBECdmQrQxoYumoxlHGSTV/HRqt5/xFJWuNwzzZlncjA9SFPBksDYpg4a3b5ZMoVDDzeKAbdWGoXuEQfk0dzYBSQyb4g4EP1RGctyrV21Nj6XvhXhUDiq6JVtPCNtHm6OwS3seFidzbk3BeV4K9yklgHncw1iS1nyDQQpQY="
    }
   }
  }
