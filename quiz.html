@@ -30,6 +30,13 @@ textarea{min-height:180px;font-family:ui-monospace,Menlo,Consolas,monospace;font
 .sous{color:var(--gris);font-size:13px}
 .wrap{max-width:1180px;margin:0 auto;padding:14px 16px 40px}
 .carte{background:var(--carte);border-radius:16px;padding:16px;margin-bottom:14px}
+.bil-moy{display:flex;gap:18px;align-items:baseline;margin:0 0 12px}.bil-moy b{font-size:34px}
+.bil-r{display:grid;grid-template-columns:28px 1fr 150px 46px;gap:10px;align-items:center;padding:8px 0;border-top:1px solid rgba(128,128,128,.18);font-size:14px}
+.bil-r .q{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.bil-r .q small{display:block;color:var(--gris);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bil-b{height:10px;border-radius:5px;background:rgba(128,128,128,.2);overflow:hidden}.bil-b i{display:block;height:100%;background:#1D9E75;border-radius:5px}
+.bil-r.revoir .bil-b i{background:#D9483B}.bil-r.revoir .pc{color:#D9483B}.bil-r .pc{font-weight:800;text-align:right}
+.bil-tag{display:inline-block;font-size:11px;font-weight:800;color:#fff;background:#D9483B;border-radius:4px;padding:1px 6px;margin-left:6px;vertical-align:1px}
+@media (max-width:600px){.bil-r{grid-template-columns:24px 1fr 60px 40px}}
 .carte h2{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--gris);margin:0 0 10px}
 .tbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}
 .tbar h1{font-size:20px;margin:0;flex:1}
@@ -144,12 +151,12 @@ th{font-size:12px;color:var(--gris);border-top:0}
 .lgs{position:relative}
 .lg{display:grid;grid-template-columns:4vw 1fr auto;gap:1vw;align-items:center;background:#22252B;border-radius:1vw;padding:1.1vw 1.6vw;margin-bottom:1vh;font-size:1.9vw;transition:transform .7s cubic-bezier(.2,.8,.2,1)}
 .lg .r{font-weight:900;color:#B5AFA6}.lg small.mo{color:#7CF0A8;font-size:1.3vw;margin-left:.6vw}.lg small.de{color:#FF9A90;font-size:1.3vw;margin-left:.6vw}.lg b{font-weight:900}.lg small{color:#7CF0A8;font-weight:800;margin-right:1.2vw;font-size:1.4vw}
-.podium{display:flex;justify-content:center;align-items:flex-end;gap:2vw;margin:2vh 0 2.5vh}
+.podium{display:flex;justify-content:center;align-items:flex-end;gap:2vw;margin:16vh 0 2.5vh}
 .podium div{width:16vw;border-radius:1.2vw 1.2vw 0 0;text-align:center;padding:1.5vw;font-weight:800;font-size:1.8vw;transform-origin:bottom;animation:leve .9s cubic-bezier(.2,.8,.2,1) both}
 .podium .p1{background:#B8901C;height:32vh;animation-delay:.9s}.podium .p2{background:#8A8F98;height:25vh;animation-delay:.45s}.podium .p3{background:#94603A;height:20vh}
 .podium b{display:block;font-size:4vw}
 @keyframes leve{from{transform:scaleY(0);opacity:0}}
-@media (prefers-reduced-motion:reduce){.coche circle,.coche path,.croix path{animation-duration:.01s}.podium div,.secoue,.monte,.ech div.bon{animation:none}}
+@media (prefers-reduced-motion:reduce){.coche circle,.coche path,.croix path{animation-duration:.01s}.secoue{animation:none}}
 /* ---------- Animer au tableau (un seul ordinateur) ---------- */
 #animBar{position:fixed;left:50%;bottom:2.2vh;transform:translateX(-50%);display:flex;flex-wrap:wrap;justify-content:center;max-width:calc(100vw - 16px);gap:8px;align-items:center;background:rgba(20,22,26,.88);padding:8px;border-radius:14px;z-index:60;box-shadow:0 8px 30px rgba(0,0,0,.4)}
 #animBar button{padding:12px 18px;font-size:15px;border-radius:10px;background:#3A3D45;color:#F2EFEA;min-height:46px}
@@ -172,7 +179,19 @@ body.inclus .grid{grid-template-columns:1fr}
 .perso em{display:none;font-style:normal;font-size:12px;color:#E5484D;font-weight:800}
 .perso.pris{opacity:.35;pointer-events:none}.perso.pris em{display:block}
 .perso.choisi{border-color:currentColor;transform:translateY(-2px)}
-.podium .col{display:flex;flex-direction:column;align-items:center;gap:1.2vh;width:auto;padding:0;background:none;animation:none;height:auto}
+.podium .col{display:flex;flex-direction:column;align-items:center;gap:1.2vh;width:auto;padding:0;background:none;animation:none;height:auto;position:relative}
+.podium .col>.pv{display:block;animation:podVis .6s cubic-bezier(.3,1.6,.5,1) both;position:relative;z-index:1}
+.podium .c3>.pv{animation-delay:1s}.podium .c2>.pv{animation-delay:2.4s}.podium .c1>.pv{animation-delay:4.4s}
+.podium .c3>.p3{animation-delay:.4s}.podium .c2>.p2{animation-delay:1.8s}.podium .c1>.p1{animation-delay:3.6s;height:36vh}
+@keyframes podVis{from{opacity:0;transform:translateY(-14vh) scale(.4)}}
+.podium .c1 .cour{position:absolute;left:50%;top:-5.2vw;width:5vw;height:5vw;margin-left:-2.5vw;color:#FFD166;filter:drop-shadow(0 .3vw .8vw rgba(255,209,102,.6));animation:podCour .7s cubic-bezier(.3,1.7,.5,1) 5s both}
+@keyframes podCour{from{opacity:0;transform:translateY(-6vh) rotate(-25deg) scale(.3)}}
+.podium .c1::before{content:"";position:absolute;left:50%;top:-12vh;width:46vw;height:90vh;margin-left:-23vw;background:conic-gradient(from 180deg at 50% 0,transparent 160deg,rgba(255,209,102,.22) 172deg,transparent 180deg,rgba(255,209,102,.22) 188deg,transparent 200deg);opacity:0;animation:podLum 1.2s ease-out 4.6s forwards;pointer-events:none;z-index:0}
+@keyframes podLum{to{opacity:1}}
+.podium .c1>.p1{box-shadow:0 0 0 rgba(255,209,102,0);animation:leve .9s cubic-bezier(.2,.8,.2,1) 3.6s both,podBrille 2.4s ease-in-out 5s infinite}
+@keyframes podBrille{50%{box-shadow:0 0 4vw rgba(255,209,102,.55)}}
+.podium .titre1{position:absolute;top:-8.4vw;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:1.5vw;font-weight:900;letter-spacing:.15em;text-transform:uppercase;color:#FFD166;animation:podVis .6s ease-out 5.3s both}
+.podium .pp{font-variant-numeric:tabular-nums}
 #joueur .ko2{color:#FFB4A8;font-weight:700;margin-bottom:6px}
 #joueur .persos{max-width:860px}
 /* ---------- Tableau de bord des quiz ---------- */
@@ -238,7 +257,7 @@ body.bord .grid{grid-template-columns:1fr}body.bord .grid>div:first-child{displa
 @keyframes annonceIn{to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
 .conf{position:fixed;width:.7vw;height:1.1vw;border-radius:.15vw;z-index:49;pointer-events:none;animation:confV 1.6s cubic-bezier(.2,.7,.4,1) forwards}
 @keyframes confV{0%{transform:translate(0,0) rotate(0)}60%{opacity:1}100%{transform:translate(var(--dx),calc(var(--dy) + 30vh)) rotate(var(--r));opacity:0}}
-@media (prefers-reduced-motion:reduce){.feu .flamme,.eclair,.cour,.lg.monteP{animation:none!important}.annonce{animation:none;opacity:1;transform:translate(-50%,-50%)}}
+
 
 /* Couleurs des choix (7 nov., « c'est mêlant ») : sarcelle, violet, orange, rose — lettre colorée + liséré, cartes foncées (pas de blocs pleins ni de formes) */
 .k0{--lc:#14A3A3}.k1{--lc:#8B6CE0}.k2{--lc:#E0892B}.k3{--lc:#D9488A}
@@ -388,6 +407,7 @@ Le propane s'accumule…
 <div id="vJeu" class="cache">
 <div class="carte"><h2 id="jTitre"></h2><div id="qCour">En attente des participants…</div><div class="sous" id="qInfo"></div>
 <div class="ctl" style="margin-top:12px"><button id="bGo">Commencer</button><button id="bSuite" class="btn2" disabled>Question suivante</button><button id="bFin" class="btn2">Quitter la partie</button></div></div>
+<div class="carte cache" id="bilan"></div>
 <div class="carte"><h2>Qui a répondu</h2>
 <table><thead><tr><th>Participant</th><th style="width:34%">Cette question</th><th style="width:12%">Points</th><th style="width:10%">Rang</th><th style="width:44px"></th></tr></thead><tbody id="tRep"></tbody></table></div>
 </div>
@@ -595,7 +615,18 @@ function telecommande(bord){
       bon: G.etat === "rev" ? Q.bon : null, cpt, nrep: Object.keys(G.reps).length, mises: G.etat === "mise" ? ids().filter(id => P[id].mise).length : 0,
       joueurs: ids().map(id => ({n: P[id].nom, av: P[id].av, pts: P[id].pts, r: r[id], g: G.etat === "rev" && G.reps[id] ? G.reps[id].g || 0 : 0, s: P[id].serie || 0, bo: G.etat === "rev" && G.reps[id] ? G.reps[id].bonus || 0 : 0, ra: G.etat === "rev" && G.reps[id] && G.reps[id].ok && id === plusRapide(G) ? 1 : 0})).sort((a, b) => a.r - b.r)};
   }
+  function dessinerBilan(){
+    const el = $("bilan"); if (!el) return; const B = (G.bilan || []).map((b, i) => b && Object.assign({i}, b)).filter(Boolean);
+    if (G.etat !== "fin" || !B.length) { el.classList.add("cache"); return; }
+    const pc = b => b.n ? Math.round(100 * b.ok / b.n) : 0, moy = Math.round(B.reduce((a, b) => a + pc(b), 0) / B.length), rev = B.filter(b => pc(b) < 60);
+    el.classList.remove("cache");
+    el.innerHTML = `<h2>Bilan de la classe · pour toi seulement</h2>
+      <div class="bil-moy"><b>${moy} %</b><span>de bonnes réponses en moyenne · ${rev.length ? `<b style="font-size:inherit;color:#D9483B">${rev.length} question${rev.length > 1 ? "s" : ""} à revoir</b>` : "rien à revoir, bravo !"}</span></div>
+      ${B.map(b => `<div class="bil-r${pc(b) < 60 ? " revoir" : ""}"><span>${b.i + 1}</span><div class="q">${esc(b.q)}${pc(b) < 60 ? '<span class="bil-tag">À revoir</span>' : ""}<small>Bonne réponse : ${esc(b.bon)}${b.n - b.rep > 0 ? ` · ${b.n - b.rep} sans réponse` : ""}</small></div><div class="bil-b"><i style="width:${pc(b)}%"></i></div><span class="pc">${pc(b)} %</span></div>`).join("")}
+      <div class="sous" style="margin-top:10px">Rien n'est gardé sur les élèves : ce bilan disparaît quand tu quittes la partie.</div>`;
+  }
   function maj(){
+    dessinerBilan();
     if (!G.quiz) { listeLob(); vue(); return; }
     const Q = G.jeu[G.i];
     $("jTitre").textContent = G.quiz.titre;
@@ -650,6 +681,7 @@ function telecommande(bord){
       const avantMise = P[id].pts - (x.g || 0); x.dbl = x.ok ? avantMise : -P[id].pts; P[id].pts += x.dbl; });
     const r = rangs(), n = ids().length, res = {};
     ids().forEach(id => { const x = G.reps[id]; res[id] = {rep: x ? x.c : null, ok: !!(x && x.ok), g: x ? x.g : 0, bonus: x ? x.bonus || 0 : 0, dbl: x ? x.dbl || 0 : 0, mise: !!(der && P[id].mise), serie: P[id].serie || 0, pts: P[id].pts, rang: r[id], avant: avant[id], bons: P[id].bons || 0}; });
+    (G.bilan = G.bilan || [])[G.i] = {q: Q.q, n, rep: ids().filter(id => G.reps[id] && G.reps[id].c != null && G.reps[id].c !== -1).length, ok: ids().filter(id => G.reps[id] && G.reps[id].ok).length, bon: texteBon(Q)};   /* bilan de la classe, pour l'enseignant */
     envoyer(topic, {m: "rev", i: G.i, bon: Q.bon, bonTxt: texteBon(Q), expl: Q.expl || "", res, n, classement: reg.classement, points: reg.points}); maj();
   }
   function finir(){
@@ -710,7 +742,7 @@ function telecommande(bord){
     const trouve = id => JSON.parse(JSON.stringify(tousQuiz().find(q => q.id === id)));
     document.querySelectorAll("[data-jouer]").forEach(b => b.onclick = () => {
       if (bord) { modes(b.dataset.jouer); return; }
-      G.quiz = trouve(b.dataset.jouer); G.etat = "lobby"; G.i = -1; G.jeu = []; appliquerCouleur(); montrer("vJeu");
+      G.quiz = trouve(b.dataset.jouer); G.etat = "lobby"; G.i = -1; G.jeu = []; G.bilan = []; appliquerCouleur(); montrer("vJeu");
       envoyer(topic, {m: "bienvenue", titre: G.quiz.titre, coul: R().coul, mode: R().mode}); envoyerCouv(); maj();
     });
     document.querySelectorAll("[data-modif]").forEach(b => b.onclick = () => editer(trouve(b.dataset.modif)));
@@ -930,7 +962,7 @@ function telecommande(bord){
      Les images des questions ne sont pas gardées (trop lourdes) : elles sont reprises du quiz d'origine. */
   function sauverPartie(){
     if (bord || !G.quiz || G.etat === "choix") return;
-    try { localStorage.setItem("quizPartie", JSON.stringify({code, t: Date.now(), quiz: G.quiz.id, i: G.i, etat: G.etat, t0: G.t0, reps: G.reps, dbl: !!G.dbl,
+    try { localStorage.setItem("quizPartie", JSON.stringify({code, t: Date.now(), quiz: G.quiz.id, i: G.i, etat: G.etat, t0: G.t0, reps: G.reps, dbl: !!G.dbl, bilan: G.bilan || [],
       jeu: G.jeu.map(Q => Object.assign({}, Q, {img: Q.img ? 1 : 0})), P})); } catch(e) {}
   }
   function oublierPartie(){ try { localStorage.removeItem("quizPartie"); } catch(e) {} }
@@ -942,7 +974,7 @@ function telecommande(bord){
     let S = null; try { S = JSON.parse(localStorage.getItem("quizPartie") || "null"); } catch(e) {}
     if (!S || S.code !== code || Date.now() - S.t > 3 * 3600e3) return false;
     const q = tousQuiz().find(x => x.id === S.quiz); if (!q) return false;
-    G.quiz = JSON.parse(JSON.stringify(q)); G.i = S.i; G.etat = S.etat; G.t0 = S.t0; G.reps = S.reps || {}; G.dbl = S.dbl;
+    G.quiz = JSON.parse(JSON.stringify(q)); G.i = S.i; G.etat = S.etat; G.t0 = S.t0; G.reps = S.reps || {}; G.dbl = S.dbl; G.bilan = S.bilan || [];
     G.jeu = (S.jeu || []).map(Q => { if (Q.img) { const o = G.quiz.qs.find(x => x.q === Q.q); Q.img = o && o.img || ""; } return Q; });
     Object.keys(S.P || {}).forEach(id => { P[id] = S.P[id]; if (!P[id].exclu) P[id].parti = true; });   /* absents tant qu'ils ne répondent pas à « qui » : un iPad parti ne bloque plus la fin des questions */
     envoyer(topic, {m: "qui", pour: "tous"});
@@ -1183,7 +1215,7 @@ function ecran(code){
         if (v.i > 0 && ancien[0] && ancien[0].n !== nouv[0]) setTimeout(() => {
           E.insertAdjacentHTML("beforeend", `<div class="annonce"><small>Nouveau premier</small>${esc(nouv[0])}</div>`);
           const z = E.querySelector(".annonce"); setTimeout(() => z && z.classList.add("part"), 2600); setTimeout(() => z && z.remove(), 3200);
-          if (!matchMedia("(prefers-reduced-motion: reduce)").matches) confettis(tete1);
+          confettis(tete1);
           accord();
         }, 1000);
         else if (rows.some(el => gain(el) >= 1)) { ton(523, .12, .08); setTimeout(() => ton(659, .12, .08), 90); setTimeout(() => ton(784, .18, .09), 180); }
@@ -1279,11 +1311,18 @@ function ecran(code){
       }
     } else if (v.etat === "fin") {
       if (cle !== dernier || force) {
-        const c = v.joueurs, p = (q, k) => q ? `<div class="col">${visage(q.av, "v-p")}<div class="p${k}"><b>${k}</b>${esc(q.n)}${v.reg.points === "aucun" ? "" : "<br>" + q.pts}</div></div>` : "";
+        const c = v.joueurs, p = (q, k) => q ? `<div class="col c${k}">${k === 1 ? '<span class="titre1">Meilleur score</span>' : ""}<span class="pv">${k === 1 ? COURONNE : ""}${visage(q.av, "v-p")}</span><div class="p${k}"><b>${k}</b>${esc(q.n)}${v.reg.points === "aucun" ? "" : `<br><span class="pp" data-v="${q.pts}">0</span>`}</div></div>` : "";
         /* sous le podium : les suivants (4e et plus) en deux colonnes compactes, pour que tout le monde soit visible */
         const reste = c.slice(3, 23).map(j => `<div class="lg"><span class="r">${j.r}</span><span>${visage(j.av, "v-e")}${esc(j.n)}</span><span>${v.reg.points === "aucun" ? "" : `<b>${j.pts}</b>`}</span></div>`).join("");
         E.innerHTML = tete("Podium · " + v.titre) + `<div class="podium">${p(c[1], 2)}${p(c[0], 1)}${p(c[2], 3)}</div>` + (reste ? `<div class="lgs fin">${reste}</div>` : "") + bSon();
-        if (cle !== dernier) setTimeout(accord, 900);
+        if (cle !== dernier) {   /* spectacle : 3e, 2e, roulement de tambour, puis le 1er */
+          const pts = (k, d) => setTimeout(() => { const e = E.querySelector(`.c${k} .pp`); if (e) compter(e, 0, +e.dataset.v, 1200); }, d);
+          pts(3, 900); pts(2, 2300); pts(1, 4300);
+          setTimeout(() => ton(392, .35, .1), 700); setTimeout(() => ton(494, .35, .1), 2100);
+          for (let i = 0; i < 18; i++) setTimeout(() => ton(110 + i * 4, .06, .05 + i * .004, "triangle"), 2900 + i * 75);   /* roulement */
+          setTimeout(() => { accord(); setTimeout(() => ton(1047, .9, .1), 380); }, 4400);
+          [4500, 5300, 6200].forEach(d => setTimeout(() => confettis(E.querySelector(".c1 .p1")), d));
+        }
       }
     }
     dernier = cle;
