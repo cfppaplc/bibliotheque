@@ -218,8 +218,13 @@
   .bien-et b{display:block;font-size:1.05rem;margin-bottom:2px}.bien-et div{color:#c8c8cc;line-height:1.4}
   .bien-b{display:flex;justify-content:center;align-items:center;gap:8px}
   .bv-barre{display:block;width:100%;border-radius:10px;border:1px solid #2a2a2d}
-  .bv-leg{list-style:none;padding:0;margin:16px 0 0;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px 18px}
-  .bv-leg li{display:flex;gap:10px;align-items:flex-start}.bv-leg .n{flex:none;width:26px;height:26px;border-radius:50%;background:#ff2d55;color:#fff;font-weight:800;font-size:.85rem;display:flex;align-items:center;justify-content:center}
+  .bv-leg{margin:16px 0 0;display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+  .bv-leg section{border:1px solid #2a2a2d;border-radius:12px;padding:14px 16px}
+  .bv-leg h4{margin:0 0 10px;font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;color:#EB6A22}
+  .bv-leg ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px}
+  .bv-leg .bv-i{flex:none;width:36px;height:36px;border-radius:9px;background:#1c1d22;color:#f2f2f4;display:flex;align-items:center;justify-content:center}
+  .bv-leg .bv-i svg{width:19px;height:19px}
+  .bv-leg li{display:flex;gap:11px;align-items:flex-start}.bv-leg .n{flex:none;width:26px;height:26px;border-radius:50%;background:#ff2d55;color:#fff;font-weight:800;font-size:.85rem;display:flex;align-items:center;justify-content:center}
   .bv-leg p{margin:2px 0 0;color:#c8c8cc;font-size:.88rem;line-height:1.4}.bv-leg kbd{font:700 .72rem ui-monospace,Consolas,monospace;background:#2a2a2d;border:1px solid #3a3a3f;border-radius:4px;padding:1px 6px;color:#e5e5e7;margin-left:4px}
   .bv-plus{display:flex;gap:18px;align-items:flex-start;margin-top:20px;padding-top:18px;border-top:1px solid #2a2a2d;flex-wrap:wrap}.bv-plus img{width:340px;max-width:100%;border-radius:10px;border:1px solid #2a2a2d}
   .bv-plus h3{margin:0 0 8px;font-size:1.05rem}.bv-plus ul{margin:0;padding-left:18px;color:#c8c8cc;font-size:.9rem;line-height:1.55}.bv-plus > div{flex:1;min-width:260px}
@@ -9000,11 +9005,10 @@ return {matrice:function(texte){var q=new QRCode(-1,L.M);q.addData(texte);q.make
   <div class="ah-onglets" id="ahOnglets" role="tablist"></div>
   <div class="ah-volet" id="ahRes" hidden></div>
   <div class="ah-volet" id="ahAutres" hidden></div>
-  <div class="ah-volet" id="ahLivres" data-v="livres"><h3 class="ah-h">La barre d'outils du lecteur</h3><p class="ah-p">Clique une couverture, puis « Lire ». Tout ce qu'il faut pour projeter est dans la barre en bas de l'écran.</p>
-  <img class="bv-barre" src="nouveautes/bv-barre.jpg" alt="Barre d'outils du lecteur, boutons numérotés de 1 à 10">
-  <ol class="bv-leg" id="bvLeg"></ol>
+  <div class="ah-volet" id="ahLivres" data-v="livres"><h3 class="ah-h">La barre d'outils du lecteur</h3><p class="ah-p">Clique une couverture, puis « Lire ». Tous les outils sont dans la barre en bas de l'écran. La petite touche à côté de chaque outil est son raccourci clavier.</p>
+  <div class="bv-leg" id="bvLeg"></div>
   <div class="bv-plus"><img src="nouveautes/bv-plus.jpg" alt="Menu Plus d'outils" loading="lazy"><div>
-    <h3>10 · Plus d'outils</h3>
+    <h3>Le bouton ⋯ « Plus d'outils »</h3>
     <ul><li><b>Minuterie</b> pour un travail chronométré.</li><li><b>Projecteur</b> et <b>Cache</b> pour attirer l'attention sur une partie de la page.</li>
     <li><b>Écran noir</b> pour ramener l'attention vers toi.</li><li><b>Code QR</b> : les élèves ouvrent le livre à la même page sur leur téléphone.</li>
     <li><b>✎ Organiser</b> : glisse un bouton entre la barre et ce menu pour garder tes outils préférés à portée de main.</li></ul></div></div>
@@ -9014,19 +9018,14 @@ return {matrice:function(texte){var q=new QRCode(-1,L.M);q.addData(texte);q.make
 </div></div>
 <script>
 (function(){
-  const LEG = [
-    ["Pages", "Flèches ← → ou tape un numéro de page.", "← →"],
-    ["Crayon", "Écris et dessine sur la page; le rond de couleur change la couleur et l'épaisseur.", "P"],
-    ["Réponses", "Montre les réponses de la page une à la fois, pour corriger avec le groupe. Grisé si la page n'en a pas.", "R"],
-    ["Animations", "Met en pause ou relance les animations du livre.", "A"],
-    ["Zoom", "Agrandis la page pour le fond de la classe; 100 % pour revenir.", "+ −"],
-    ["Tableau blanc", "Une page vierge, quadrillée ou isométrique, pour expliquer, faire un schéma électrique ou un plan de tuyauterie.", "B"],
-    ["Table des matières", "Va directement à un module ou à une section.", "M"],
-    ["Double page", "Affiche deux pages côte à côte, comme un livre ouvert.", "D"],
-    ["Plein écran", "Cache tout sauf le livre pour la projection.", "F"],
-    ["Plus d'outils", "Minuterie, projecteur, cache, écran noir, code QR… (voir plus bas).", ""]
+  /* 8 nov. : outils regroupés, avec l'icône du vrai bouton de la barre (#tb), au lieu de l'image numérotée */
+  const GR = [
+    ["Se déplacer", [["tbNext","Pages","Flèches ou numéro de page.","← →"],["tbMenu","Table des matières","Va à un module, cherche un mot.","M"]]],
+    ["Présenter", [["tbZi","Zoom","Agrandis pour le fond de la classe.","+ −"],["tbDbl","Double page","Deux pages côte à côte.","D"],["tbFs","Plein écran","Seulement le livre à l'écran.","F"],["tbAnim","Animations","Pause ou relance.","A"]]],
+    ["Écrire et corriger", [["tbPen","Crayon","Écris et dessine sur la page.","P"],["tbWb","Tableau blanc","Page vierge, quadrillée ou isométrique.","B"],["tbAns","Réponses","Une à la fois, pour corriger avec le groupe.","R"]]]
   ];
-  document.getElementById("bvLeg").innerHTML = LEG.map(([t, d, k], i) => `<li><span class="n">${i + 1}</span><div><b>${t}</b>${k ? ` <kbd>${k}</kbd>` : ""}<p>${d}</p></div></li>`).join("");
+  const ico = id => { const b = document.getElementById(id), v = b && b.querySelector("svg"); return v ? v.outerHTML : ""; };
+  document.getElementById("bvLeg").innerHTML = GR.map(([g, L]) => `<section><h4>${g}</h4><ul>${L.map(([id, t, d, k]) => `<li><span class="bv-i">${ico(id)}</span><div><b>${t}</b>${k ? ` <kbd>${k}</kbd>` : ""}<p>${d}</p></div></li>`).join("")}</ul></section>`).join("");
   /* 8 nov. : Aide en onglets (un par outil) + recherche + questions fréquentes. q = question, r = réponse (HTML), qn = sujet de « Quoi de neuf » (mini-formation) */
   const AIDE = [
     { k:"livres", t:"Livres", qn:"Lecture des livres", items:[
@@ -9640,7 +9639,7 @@ window.addEventListener("online", () => { try { aviser("Internet est revenu."); 
   body.clair .bien-b span{color:#b9b5ae}
   /* aide */
   body.clair :is(.bv-barre,.bv-plus img){border-color:#e3e0da}
-  body.clair .bv-leg p,body.clair .bv-plus ul{color:#3d3d42}
+  body.clair .bv-leg p,body.clair .bv-plus ul{color:#3d3d42}body.clair .bv-leg section{border-color:#e7e3dd;background:#fff}body.clair .bv-leg .bv-i{background:#1e2a44}
   body.clair .bv-leg kbd{background:#f3f1ed;border-color:#d4d0c8;color:#1d1d1f}
   body.clair .bv-plus{border-top-color:#ebe7e1}body.clair .bv-pied label{color:#5f6068}
   body.clair :is(.bv-lien,.qn-it p button){color:#1f5fbf}
