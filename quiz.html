@@ -745,18 +745,32 @@ function telecommande(bord){
     ed.reg = Object.assign({}, REG_DEF, ed.reg);
     $("eTitre").value = ed.titre; $("eSujet").value = ed.sujet || ""; dessinerCouv(); dessinerReg(); dessinerEd(); montrer("vEdit");
   }
+  /* images des quiz en WebP (≈ 3 fois plus léger que le JPEG, aussi net au tableau); JPEG si le navigateur ne sait pas faire de WebP */
+  function versWebp(c){ const w = c.toDataURL("image/webp", .72); return w.startsWith("data:image/webp") ? w : c.toDataURL("image/jpeg", .78); }
+  /* une fois : recompresser les images des quiz déjà faits (JPEG lourds → WebP) */
+  async function recompresserQuiz(){
+    let L; try { L = JSON.parse(localStorage.getItem("quizMaison") || "[]"); } catch(e){ return; } if (!Array.isArray(L)) return;
+    const reduire = (d, max) => new Promise(ok => { if (typeof d !== "string" || !d.startsWith("data:image/") || d.startsWith("data:image/webp") || d.length < 80000) return ok(d);
+      const im = new Image(); im.onload = () => { const k = Math.min(1, max / Math.max(im.width, im.height)), c = document.createElement("canvas");
+        c.width = Math.round(im.width * k); c.height = Math.round(im.height * k); c.getContext("2d").drawImage(im, 0, 0, c.width, c.height);
+        const n = versWebp(c); ok(n.length < d.length ? n : d); }; im.onerror = () => ok(d); im.src = d; });
+    let change = false;
+    for (const q of L){ if (q.couv){ const n = await reduire(q.couv, 1200); if (n !== q.couv){ q.couv = n; change = true; } }
+      for (const x of (q.qs || [])) if (x.img){ const n = await reduire(x.img, 800); if (n !== x.img){ x.img = n; change = true; } } }
+    if (change) try { localStorage.setItem("quizMaison", JSON.stringify(L)); } catch(e){} }
+  setTimeout(() => recompresserQuiz().catch(() => {}), 3000);
   function choisirImage(max, fait){
     const f = document.createElement("input"); f.type = "file"; f.accept = "image/*";
     f.onchange = () => { const fi = f.files[0]; if (!fi) return; const im = new Image();
       im.onload = () => { const k = Math.min(1, max / Math.max(im.width, im.height)), c = document.createElement("canvas");
         c.width = Math.round(im.width * k); c.height = Math.round(im.height * k); c.getContext("2d").drawImage(im, 0, 0, c.width, c.height);
-        fait(c.toDataURL("image/jpeg", .78)); URL.revokeObjectURL(im.src); };
+        fait(versWebp(c)); URL.revokeObjectURL(im.src); };
       im.src = URL.createObjectURL(fi); };
     f.click();
   }
   function dessinerCouv(){
     $("eCouv").innerHTML = ed.couv ? `<img src="${esc(ed.couv)}" alt="" style="height:70px;border-radius:8px"><button class="btn2" id="eCouvX">Retirer l'image du tableau</button>` : `<button class="btn2" id="eCouvB">+ Image du module (affichée au tableau pendant l'accueil)</button>`;
-    if ($("eCouvB")) $("eCouvB").onclick = () => choisirImage(1400, d => { ed.couv = d; dessinerCouv(); });
+    if ($("eCouvB")) $("eCouvB").onclick = () => choisirImage(1200, d => { ed.couv = d; dessinerCouv(); });
     if ($("eCouvX")) $("eCouvX").onclick = () => { delete ed.couv; dessinerCouv(); };
   }
   function dessinerReg(){
@@ -813,7 +827,7 @@ function telecommande(bord){
     document.querySelectorAll(".zsel").forEach(s => s.onchange = () => { lireEd(); dessinerEd(); });
     document.querySelectorAll("[data-zimg]").forEach(v => v.onclick = e => { const Q = ed.qs[+v.dataset.zimg]; if (!Q.zoom) return; const r = v.getBoundingClientRect();
       lireEd(); Q.zoom = {x: Math.round(100 * (e.clientX - r.left) / r.width), y: Math.round(100 * (e.clientY - r.top) / r.height)}; dessinerEd(); });
-    document.querySelectorAll("[data-img]").forEach(b => b.onclick = () => choisirImage(900, d => { lireEd(); ed.qs[+b.dataset.img].img = d; dessinerEd(); }));
+    document.querySelectorAll("[data-img]").forEach(b => b.onclick = () => choisirImage(800, d => { lireEd(); ed.qs[+b.dataset.img].img = d; dessinerEd(); }));
   }
   $("bNouveau").onclick = () => editer(null);
   document.querySelectorAll("[data-aj]").forEach(b => b.onclick = () => { lireEd(); ed.qs.push(qVide(b.dataset.aj)); dessinerEd(); setTimeout(() => { const L = document.querySelectorAll(".qe"); L[L.length - 1].scrollIntoView({block: "center", behavior: "smooth"}); const q = L[L.length - 1].querySelector(".tq"); if (q) q.focus(); }, 50); });

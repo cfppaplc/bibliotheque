@@ -1895,8 +1895,17 @@ const b64De = u8 => { let s = ""; for (let i = 0; i < u8.length; i += 0x8000) s 
 const u8De = b => { const s = atob(b), u = new Uint8Array(s.length); for (let i = 0; i < s.length; i++) u[i] = s.charCodeAt(i); return u; };
 const aEnvoyer = () => { try { return JSON.parse(localStorage.getItem("fichiersAEnvoyer") || "[]"); } catch(e){ return []; } };
 const marquerEnvoi = (id, oui) => { const L = aEnvoyer().filter(x => x !== id); if (oui) L.push(id); try { localStorage.setItem("fichiersAEnvoyer", JSON.stringify(L)); } catch(e){} };
+/* photo (JPEG/PNG) de plus de 300 Ko : la copie qui voyage est en WebP, 1920 px max (souvent 5 à 10 fois plus légère); l'original reste sur cet appareil.
+   Les PDF, vidéos et PowerPoint sont déjà compressés : ils voyagent tels quels (le coffre les passe quand même au gzip). */
+async function allegerImage(f){
+  if (!/^image\/(jpeg|png)$/.test(f.blob.type || "") || f.blob.size < 300000) return f;
+  const bm = await createImageBitmap(f.blob), k = Math.min(1, 1920 / Math.max(bm.width, bm.height)), c = document.createElement("canvas");
+  c.width = Math.round(bm.width * k); c.height = Math.round(bm.height * k); c.getContext("2d").drawImage(bm, 0, 0, c.width, c.height);
+  const b = await new Promise(ok => c.toBlob(ok, "image/webp", .8));
+  return b && b.type === "image/webp" && b.size < f.blob.size ? Object.assign({}, f, { blob: b }) : f; }
 async function envoyerFichier(id){
-  if (!window.COFFRE) return false; const f = await fLire(id); if (!f || !f.blob) { marquerEnvoi(id, false); return false; }
+  if (!window.COFFRE) return false; let f = await fLire(id); if (!f || !f.blob) { marquerEnvoi(id, false); return false; }
+  try { f = await allegerImage(f); } catch(e){}
   if (f.blob.size > MAX_FICHIER) { marquerEnvoi(id, false); return false; }   /* trop gros pour voyager : reste sur cet ordinateur */
   try { const u = new Uint8Array(await f.blob.arrayBuffer()), n = Math.max(1, Math.ceil(u.length / MORCEAU));
     for (let i = 0; i < n; i++) await COFFRE.envoyer("fichier:" + id + ":" + i, { b: b64De(u.subarray(i * MORCEAU, (i + 1) * MORCEAU)) });
