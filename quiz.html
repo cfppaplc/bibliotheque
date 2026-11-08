@@ -107,7 +107,7 @@ th{font-size:12px;color:var(--gris);border-top:0}
 .lob .qr{background:#fff;padding:1.2vw;border-radius:1.2vw}
 .lob .code{font-size:6vw;color:#fff;text-align:left;font-weight:900;letter-spacing:.12em}
 .lob .noms{display:flex;flex-wrap:wrap;gap:.8vw;margin-top:2vh}
-.lob .noms span{background:var(--acc);border-radius:3vw;padding:.8vw 1.6vw;font-size:1.6vw;font-weight:800;animation:pop .4s}
+.lob .noms span{display:inline-flex;align-items:center;background:var(--acc);border-radius:3vw;padding:.5vw 1.6vw .5vw .5vw;font-size:1.6vw;font-weight:800;animation:pop .4s}
 .son{position:absolute;right:3vw;bottom:3vh;background:#2B2E35;color:#F2EFEA;font-size:1.2vw;padding:.8vw 1.4vw}
 @keyframes pop{from{transform:scale(.6);opacity:0}}
 .eq{font-size:2.9vw;font-weight:800;text-align:center;margin:1vh 0 2.5vh;line-height:1.25}
@@ -130,6 +130,31 @@ th{font-size:12px;color:var(--gris);border-top:0}
 .podium b{display:block;font-size:4vw}
 @keyframes leve{from{transform:scaleY(0);opacity:0}}
 @media (prefers-reduced-motion:reduce){.coche circle,.coche path,.croix path{animation-duration:.01s}.podium div,.secoue,.monte,.ech div.bon{animation:none}}
+/* ---------- Animer au tableau (un seul ordinateur) ---------- */
+#animBar{position:fixed;left:50%;bottom:2.2vh;transform:translateX(-50%);display:flex;gap:8px;align-items:center;background:rgba(20,22,26,.88);padding:8px;border-radius:14px;z-index:60;box-shadow:0 8px 30px rgba(0,0,0,.4)}
+#animBar button{padding:12px 18px;font-size:15px;border-radius:10px;background:#3A3D45;color:#F2EFEA;min-height:46px}
+#animBar button.prim{background:var(--acc,#534AB7);color:#fff}
+#animBar button:disabled{opacity:.35}
+#tiroir{position:fixed;top:0;right:0;bottom:0;width:min(500px,94vw);transform:translateX(102%);transition:transform .35s ease;z-index:70;background:#E9E6E0;box-shadow:-10px 0 40px rgba(0,0,0,.45)}
+#tiroir.ouvert{transform:none}
+#tiroir iframe{width:100%;height:100%;border:0;display:block}
+#tiroir .fermer{position:absolute;left:-46px;top:12px;width:40px;height:40px;padding:0;border-radius:10px;background:#24211E;color:#fff;font-size:20px}
+body.inclus .tbar a,body.inclus #bEcran{display:none!important}
+body.inclus .grid{grid-template-columns:1fr}
+/* ---------- Personnages ---------- */
+.vis{position:relative;display:inline-flex;align-items:center;justify-content:center;border-radius:50%;overflow:hidden;background:var(--vc);color:#fff;font-weight:800;width:1em;height:1em;flex:none;vertical-align:middle;box-shadow:0 0 0 .04em rgba(255,255,255,.5)}
+.vis img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.vis b{font-size:.36em;letter-spacing:.02em}
+.v-s{font-size:28px;margin-right:6px}.v-m{font-size:46px}.v-l{font-size:84px}.v-e{font-size:2.6vw;margin-right:.6vw}.v-p{font-size:8vw}
+.persos{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin:14px 0}
+.perso{background:rgba(255,255,255,.08);color:inherit;border-radius:14px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:4px;border:3px solid transparent;font-weight:700;transition:transform .15s,border-color .2s}
+.perso b{font-size:14px;line-height:1.2;text-align:center}.perso small{opacity:.7;font-weight:500;font-size:12px;text-align:center}
+.perso em{display:none;font-style:normal;font-size:12px;color:#E5484D;font-weight:800}
+.perso.pris{opacity:.35;pointer-events:none}.perso.pris em{display:block}
+.perso.choisi{border-color:currentColor;transform:translateY(-2px)}
+.podium .col{display:flex;flex-direction:column;align-items:center;gap:1.2vh;width:auto;padding:0;background:none;animation:none;height:auto}
+#joueur .ko2{color:#FFB4A8;font-weight:700;margin-bottom:6px}
+#joueur .persos{max-width:860px}
 </style>
 </head>
 <body>
@@ -137,8 +162,9 @@ th{font-size:12px;color:var(--gris);border-top:0}
 <!-- ============ CHOIX DU RÔLE ============ -->
 <div id="role" class="cache"><div class="carte"><img class="logoC" src="img/pavillon-avenir.png" alt="Pavillon de l'Avenir"><h1 style="margin:0">Quiz maison</h1>
 <div class="sous">Labo interactif · tes propres questions sur les iPad</div>
-<div class="duo"><button id="rTele">📱 Télécommande<br><small style="font-weight:500">iPad de l'enseignant</small></button>
-<button id="rEcr" style="background:#24211E">🖥️ Écran de classe<br><small style="font-weight:500">tableau interactif</small></button></div>
+<div class="duo"><button id="rAnim" style="grid-column:1/-1;padding:24px 10px;font-size:19px">🖥️ Animer au tableau<br><small style="font-weight:500">un seul ordinateur : l'écran de classe avec ses commandes</small></button>
+<button id="rTele" style="background:#3A3936">💻 Télécommande<br><small style="font-weight:500">ton ordinateur ou ta tablette</small></button>
+<button id="rEcr" style="background:#24211E">📺 Écran de classe<br><small style="font-weight:500">sur un 2e appareil, avec le code</small></button></div>
 <div id="rCode" class="cache"><div class="sous" style="margin-top:14px">Tape le code affiché sur la télécommande</div>
 <input id="rIn" inputmode="numeric" maxlength="7" placeholder="000 000"><button id="rGo" style="width:100%">Afficher l'écran de classe</button></div>
 <div class="sous" style="margin-top:14px">Les élèves scannent le code QR : leur iPad devient une manette.</div>
@@ -155,7 +181,7 @@ th{font-size:12px;color:var(--gris);border-top:0}
 <div class="tbar"><img src="img/pavillon-avenir.png" alt="Pavillon de l'Avenir" style="height:30px"><h1>Quiz maison · télécommande</h1><a href="labo.html">‹ Labo interactif</a></div>
 <div class="grid">
 <div>
-<div class="carte"><h2>Les élèves scannent</h2><div id="qr"></div><div class="code" id="code"></div><div class="etat" id="etatT">Connexion…</div>
+<div class="carte"><h2>Les élèves scannent</h2><div id="qr"></div><div class="code" id="code"></div><div class="etat" id="etatT">Connexion…</div><button id="bEcran" style="width:100%;margin-top:10px">Ouvrir l'écran de classe</button>
 <div class="sous" style="margin-top:8px;text-align:center">Écran de classe : ouvre cette page sur le tableau, choisis « Écran de classe » et tape le code.</div></div>
 <div class="carte"><h2>Participants <span id="nbP"></span></h2><div id="listeLob" class="sous">Personne pour l'instant.</div></div>
 </div>
@@ -254,16 +280,32 @@ const EXEMPLE = {id: "exemple-incendie", exemple: true, titre: "Protection incen
   {q: "En classe B, un fil coupé ne change rien à la protection.", ch: ["Vrai", "Faux"], bon: 1, s: 15, expl: "Faux : les appareils au-delà de la coupure ne protègent plus. Le panneau affiche un trouble."},
   {q: "Qui autorise le réarmement après une alarme ?", ch: ["Le préposé", "Le gestionnaire", "Le service incendie", "La télésurveillance"], bon: 2, s: 15}
 ]};
+/* Personnages de chantier (noms fictifs). Chacun ne peut être choisi qu'une fois par partie. Photos : img/labo/perso/NN.jpg */
+const PERSOS = [
+  ["Marc-Antoine Pelletier", "Plombier"], ["Julie Bérubé", "Plombière"], ["Samuel Gagnon", "Électricien"], ["Émilie Dionne", "Électricienne"],
+  ["Kevin Bouchard", "Soudeur"], ["Mélanie Gauthier", "Soudeuse"], ["Jonathan Ouellet", "Frigoriste"], ["Karine Thériault", "Inspectrice en bâtiment"],
+  ["Alexandre Côté", "Pompier"], ["Audrey Lavoie", "Préposée à l'entretien"], ["Mathieu Lévesque", "Charpentier-menuisier"], ["Sophie Morin", "Ingénieure en mécanique"]];
+const persoImg = k => "img/labo/perso/" + String(k + 1).padStart(2, "0") + ".jpg";
+function visage(k, cls){
+  const p = PERSOS[k]; if (!p) return "";
+  const ini = p[0].split(/[\s-]+/).map(x => x[0]).slice(0, 2).join("");
+  return `<span class="vis ${cls || ""}" style="--vc:${["#534AB7", "#B3261E", "#185FA5", "#0F6E56", "#854F0B", "#3A3936"][k % 6]}"><b>${ini}</b><img src="${persoImg(k)}" alt="" onerror="this.remove()"></span>`;
+}
+function grillePersos(pris, choisi){
+  return `<div class="persos">${PERSOS.map((p, k) => `<button class="perso ${pris.includes(k) && k !== choisi ? "pris" : ""} ${k === choisi ? "choisi" : ""}" data-av="${k}">${visage(k, "v-l")}<b>${esc(p[0])}</b><small>${esc(p[1])}</small><em>Déjà pris</em></button>`).join("")}</div>`;
+}
 function mesQuiz(){ return stock.get("quizMaison", []); }
 function tousQuiz(){ return [EXEMPLE].concat(mesQuiz()); }
 
 const params = new URLSearchParams(location.search);
-if (params.get("j")) joueur(params.get("j").replace(/\D/g, "").slice(0, 6));
+if (params.get("animer")) animer([["bGo"], ["bSuite"]]);
+else if (params.get("j")) joueur(params.get("j").replace(/\D/g, "").slice(0, 6));
 else if (params.get("ecran")) ecran(params.get("ecran").replace(/\D/g, "").slice(0, 6));
 else if (params.get("tele")) telecommande();
 else {
   $("role").classList.remove("cache");
   $("rTele").onclick = () => { $("role").classList.add("cache"); telecommande(); };
+  $("rAnim").onclick = () => { location.search = "?animer=1"; };
   $("rEcr").onclick = () => { $("rCode").classList.remove("cache"); $("rIn").focus(); };
   $("rGo").onclick = () => { const c = $("rIn").value.replace(/\D/g, ""); if (c.length === 6) location.search = "?ecran=" + c; };
   $("rIn").addEventListener("keydown", e => { if (e.key === "Enter") $("rGo").click(); });
@@ -278,6 +320,9 @@ function telecommande(){
   stock.set("quizSession", {code, t: Date.now()});
   const topic = PREFIXE + code, url = location.href.split(/[?#]/)[0] + "?j=" + code;
   $("code").textContent = code.slice(0, 3) + " " + code.slice(3);
+  // dans « Animer au tableau », la télécommande est dans un tiroir : elle donne son code à la page
+  if (params.get("inclus")) { document.body.classList.add("inclus"); try { parent.postMessage({labo: "code", code}, "*"); } catch(e) {} }
+  $("bEcran").onclick = () => window.open(location.href.split(/[?#]/)[0] + "?ecran=" + code, "ecranClasse", "popup,width=1280,height=760");
   try { new QRCode($("qr"), {text: url, width: 180, height: 180, correctLevel: QRCode.CorrectLevel.M}); } catch(e) { $("qr").innerHTML = '<div class="sous" style="word-break:break-all">' + esc(url) + "</div>"; }
 
   const P = {};   // pid → {nom, pts, bons}
@@ -296,7 +341,7 @@ function telecommande(){
   function listeLob(){
     const ids = Object.keys(P);
     $("nbP").textContent = ids.length ? "(" + ids.length + ")" : "";
-    $("listeLob").innerHTML = ids.length ? ids.map(id => esc(P[id].nom)).join(" · ") : "Personne pour l'instant.";
+    $("listeLob").innerHTML = ids.length ? ids.map(id => visage(P[id].av, "v-s") + esc(P[id].nom) + (P[id].prenom ? " (" + esc(P[id].prenom) + ")" : "")).join("<br>") : "Personne pour l'instant.";
   }
   function table(){
     const r = rangs(), Q = G.jeu[G.i];
@@ -304,7 +349,7 @@ function telecommande(){
       const x = G.reps[id]; let c = '<span class="att">—</span>';
       if (G.etat === "question") c = x ? '<span class="ok">✓ a répondu</span>' : '<span class="att">en attente…</span>';
       else if (G.etat === "rev" && Q) c = x ? `<span class="pastille k${x.c}"></span>${esc(Q.ch[x.c])} · <span class="${x.c === Q.bon ? "ok" : "ko"}">${x.c === Q.bon ? (x.g ? "+" + x.g : "bonne") : "mauvaise"}</span>` : '<span class="ko">Pas répondu</span>';
-      return `<tr><td><b>${esc(P[id].nom)}</b></td><td>${c}</td><td>${P[id].pts}</td><td>${G.etat === "lobby" ? "—" : r[id]}</td></tr>`;
+      return `<tr><td><b>${visage(P[id].av, "v-s")}${esc(P[id].nom)}</b>${P[id].prenom ? ` <span class="sous">(${esc(P[id].prenom)})</span>` : ""}</td><td>${c}</td><td>${P[id].pts}</td><td>${G.etat === "lobby" ? "—" : r[id]}</td></tr>`;
     }).join("") || '<tr><td colspan="4" class="sous">Personne pour l\'instant.</td></tr>';
   }
   let vT = 0, vD = null;
@@ -316,7 +361,7 @@ function telecommande(){
       reg: {coul: reg.coul, son: reg.son, classement: reg.classement, points: reg.points, mode: reg.mode},
       couv: G.quiz && G.quiz.couv && !/^data:/.test(G.quiz.couv) ? G.quiz.couv : (G.quiz && G.quiz.couv ? "img" : ""), sujet: G.quiz ? G.quiz.sujet || "" : "",
       q: Q && ["question", "rev"].includes(G.etat) ? {q: Q.q, ch: Q.ch, s: Q.s, img: !!Q.img, expl: G.etat === "rev" ? Q.expl || "" : ""} : null, bon: G.etat === "rev" ? Q.bon : null, cpt, nrep: Object.keys(G.reps).length,
-      joueurs: Object.keys(P).map(id => ({n: P[id].nom, pts: P[id].pts, r: r[id], g: G.etat === "rev" && G.reps[id] ? G.reps[id].g || 0 : 0})).sort((a, b) => a.r - b.r)};
+      joueurs: Object.keys(P).map(id => ({n: P[id].nom, av: P[id].av, pts: P[id].pts, r: r[id], g: G.etat === "rev" && G.reps[id] ? G.reps[id].g || 0 : 0})).sort((a, b) => a.r - b.r)};
   }
   function maj(){
     if (!G.quiz) { listeLob(); vue(); return; }
@@ -331,6 +376,7 @@ function telecommande(){
     table(); listeLob(); vue();
   }
   function envoyerCouv(){ if (G.quiz && G.quiz.couv && /^data:/.test(G.quiz.couv)) envoyer(topic, {m: "img", i: -1, data: G.quiz.couv}); }
+  function envoyerPersos(){ envoyer(topic, {m: "persos", pris: Object.values(P).map(p => p.av).filter(v => v != null)}); }
   let minut = null;
   function qMsg(pour){ const Q = G.jeu[G.i]; return {m: "q", pour, i: G.i, n: G.jeu.length, q: Q.q, ch: Q.ch, t0: G.t0, s: Q.s, coul: R().coul}; }
   function question(){
@@ -364,8 +410,11 @@ function telecommande(){
 
   ecouter(topic, m => {
     if (m.m === "ecran?") { envoyer(topic, vueObj()); envoyerCouv(); const Q = G.jeu[G.i]; if (G.etat === "question" && Q && Q.img) envoyer(topic, {m: "img", i: G.i, data: Q.img}); return; }
+    if (m.m === "persos?") { envoyerPersos(); return; }
     if (m.m === "ici") {
+      if (m.av != null && Object.entries(P).some(([id, p]) => p.av === m.av && id !== m.pid)) { envoyer(topic, {m: "refus", pour: m.pid}); return; }
       if (!P[m.pid]) P[m.pid] = {nom: m.nom, pts: 0, bons: 0}; else P[m.pid].nom = m.nom;
+      P[m.pid].av = m.av; P[m.pid].prenom = m.prenom || ""; envoyerPersos();
       if (G.etat === "question") envoyer(topic, qMsg(m.pid));
       else envoyer(topic, {m: "bienvenue", pour: m.pid, titre: G.quiz ? G.quiz.titre : "", coul: R().coul, mode: R().mode});
       maj();
@@ -525,13 +574,28 @@ function joueur(code){
   const teinte = c => { if (c) $("joueur").style.setProperty("--fondJ", sombre(c)); };
   const COCHE = '<svg class="coche" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45"/><path d="M30 52l13 13 27-29"/></svg>';
   const CROIX = '<svg class="coche croix" viewBox="0 0 100 100"><path d="M32 32l36 36"/><path d="M68 32L32 68"/></svg>';
-  bx(`<h2>Quiz maison</h2><div>Écris ton nom ou celui de ton équipe</div><input id="jNom" maxlength="20" placeholder="Ton nom" value="${esc(stock.get("quizNom", ""))}"><button id="jGo" style="width:100%;font-size:20px;padding:16px;background:#fff;color:#24211E">Entrer</button>`);
   const pour = m => !m.pour || m.pour === pid;
-  $("jGo").onclick = () => {
-    nom = ($("jNom").value.trim() || "Joueur").slice(0, 20); stock.set("quizNom", nom);
-    $("nomJ").textContent = nom; bx('<div class="gros monte">Tu es dans la partie.</div><div>Regarde le tableau : ça commence bientôt.</div>');
+  let av = -1, entre = false, pris = [], prenom = "";
+  function ecranChoix(msg){
+    bx(`<h2>Choisis ton personnage</h2>${msg ? `<div class="ko2">${esc(msg)}</div>` : ""}${grillePersos(pris, av)}
+      <input id="jPre" maxlength="20" placeholder="Ton prénom (vu seulement par l'enseignant, facultatif)" value="${esc(stock.get("quizNom", ""))}">
+      <button id="jGo" style="width:100%;font-size:20px;padding:16px;background:#fff;color:#24211E" ${av < 0 ? "disabled" : ""}>Entrer</button>`);
+    document.querySelectorAll("#jBx .perso").forEach(b => b.onclick = () => { av = +b.dataset.av; const pre = $("jPre").value; ecranChoix(); $("jPre").value = pre; });
+    $("jGo").onclick = entrer;
+  }
+  function entrer(){
+    if (av < 0 || pris.includes(av)) return;
+    prenom = ($("jPre").value.trim()).slice(0, 20); stock.set("quizNom", prenom);
+    nom = PERSOS[av][0]; entre = true;
+    $("nomJ").innerHTML = visage(av, "v-m") + " " + esc(nom);
+    bx(`${visage(av, "v-l")}<div class="gros monte">Bienvenue, ${esc(nom)}.</div><div>Regarde le tableau : ça commence bientôt.</div>`);
+    envoyer(topic, {m: "ici", pid, nom, av, prenom});
+  }
+  ecranChoix();
     ecouter(topic, m => {
-      if (!pour(m)) return;
+      if (m.m === "persos") { pris = m.pris || []; if (!entre) { const pre = $("jPre") && $("jPre").value; ecranChoix(); if (pre != null) $("jPre").value = pre; } return; }
+      if (m.m === "refus" && m.pour === pid) { entre = false; av = -1; ecranChoix("Ce personnage vient d'être pris. Choisis-en un autre."); return; }
+      if (!entre || !pour(m)) return;
       if (m.coul) teinte(m.coul);
       if (m.m === "bienvenue") bx(`<div class="gros monte">Tu es dans la partie.</div><div>${esc(m.titre || "")}</div><div style="opacity:.7;margin-top:8px">Regarde le tableau : ça commence bientôt.</div>`);
       else if (m.m === "attente") bx('<div class="gros">Pause</div><div>L\'enseignant prépare la suite.</div>');
@@ -567,9 +631,28 @@ function joueur(code){
           <div class="rang monte">${r.bons} bonne${r.bons > 1 ? "s" : ""} réponse${r.bons > 1 ? "s" : ""} sur ${m.total}${m.points !== "aucun" ? " · " + r.pts + " points" : ""}</div>
           <div style="margin-top:14px;opacity:.75">Merci, ${esc(nom)}.</div>`);
       }
-    }, ok => { if (ok) envoyer(topic, {m: "ici", pid, nom}); });
-  };
-  $("jNom").addEventListener("keydown", e => { if (e.key === "Enter") $("jGo").click(); });
+    }, ok => { if (ok) { envoyer(topic, {m: "persos?"}); if (entre) envoyer(topic, {m: "ici", pid, nom, av, prenom}); } });
+}
+
+/* ===== Animer au tableau : un seul ordinateur (écran de classe + barre + tiroir de télécommande) ===== */
+function animer(boutons){
+  document.body.insertAdjacentHTML("beforeend", `<div id="tiroir"><button class="fermer" id="tirX" aria-label="Fermer la télécommande">›</button><iframe id="tirF" src="?tele=1&inclus=1" title="Télécommande"></iframe></div>
+    <div id="animBar">${boutons.map(([id], k) => `<button data-b="${id}" class="${k ? "" : "prim"}" disabled>…</button>`).join("")}<button id="tirB">Télécommande</button></div>`);
+  const T = $("tiroir"), F = $("tirF");
+  $("tirB").onclick = () => T.classList.toggle("ouvert");
+  $("tirX").onclick = () => T.classList.remove("ouvert");
+  addEventListener("message", e => { if (e.data && e.data.labo === "code" && !animer.code) { animer.code = e.data.code; ecran(e.data.code); } });
+  // les boutons de la barre reprennent l'état des vrais boutons de la télécommande
+  setInterval(() => {
+    let d = null; try { d = F.contentDocument; } catch(x) {}
+    document.querySelectorAll("#animBar [data-b]").forEach(b => {
+      const v = d && d.getElementById(b.dataset.b);
+      if (!v) { b.disabled = true; return; }
+      b.textContent = v.textContent; b.disabled = v.disabled || v.closest(".cache") != null;
+      b.style.display = b.disabled && b.dataset.cacher ? "none" : "";
+    });
+  }, 400);
+  document.querySelectorAll("#animBar [data-b]").forEach(b => b.onclick = () => { const v = F.contentDocument.getElementById(b.dataset.b); if (v && !v.disabled) v.click(); });
 }
 
 /* ================================ ÉCRAN DE CLASSE ================================ */
@@ -582,7 +665,7 @@ function ecran(code){
   const tete = t => `<div class="liseret"></div><div class="haut"><b><img class="logoE" src="img/pavillon-avenir-blanc.png" alt="Pavillon de l'Avenir">${esc(t)}</b><span>Quiz maison · code ${code.slice(0, 3)} ${code.slice(3)}</span></div>`;
   const bSon = () => `<button class="son" id="bSon">${sonOK ? "Son activé" : "Activer le son"}</button>`;
   function lignes(n, anim){
-    return `<div class="lgs">${V.joueurs.slice(0, n).map(j => `<div class="lg" data-n="${esc(j.n)}"><span class="r">${j.r}</span><span>${esc(j.n)}</span><span>${anim && j.g ? `<small>+${j.g}</small>` : ""}${V.reg.points === "aucun" ? "" : `<b data-de="${j.pts - (anim ? j.g : 0)}" data-a="${j.pts}">${j.pts - (anim ? j.g : 0)}</b>`}</span></div>`).join("")}</div>`;
+    return `<div class="lgs">${V.joueurs.slice(0, n).map(j => `<div class="lg" data-n="${esc(j.n)}"><span class="r">${j.r}</span><span>${visage(j.av, "v-e")}${esc(j.n)}</span><span>${anim && j.g ? `<small>+${j.g}</small>` : ""}${V.reg.points === "aucun" ? "" : `<b data-de="${j.pts - (anim ? j.g : 0)}" data-a="${j.pts}">${j.pts - (anim ? j.g : 0)}</b>`}</span></div>`).join("")}</div>`;
   }
   function animerLignes(){ // les rangées glissent à leur nouvelle place, les points montent
     E.querySelectorAll(".lg").forEach(el => {
@@ -599,7 +682,7 @@ function ecran(code){
       const cv = v.couv === "img" ? img[-1] : v.couv;
       E.innerHTML = tete(v.titre) + (cv ? `<div class="banniere"><img src="${esc(cv)}" alt=""><span>${v.sujet ? `<small>${esc(v.sujet)}</small>` : ""}${esc(v.titre)}</span></div>` : "") + `<div class="lob"><div class="qr" id="eQr"></div><div><div style="font-size:2vw;color:#B5AFA6">Scanne le code avec ton iPad</div>
         <div class="code">${code.slice(0, 3)} ${code.slice(3)}</div><div style="font-size:1.6vw;color:#B5AFA6">${v.joueurs.length} participant${v.joueurs.length > 1 ? "s" : ""}</div>
-        <div class="noms">${v.joueurs.map(j => `<span>${esc(j.n)}</span>`).join("")}</div></div></div>` + bSon();
+        <div class="noms">${v.joueurs.map(j => `<span>${visage(j.av, "v-e")}${esc(j.n)}</span>`).join("")}</div></div></div>` + bSon();
       try { const tq = cv ? .16 : .22; new QRCode($("eQr"), {text: url, width: Math.round(innerWidth * tq), height: Math.round(innerWidth * tq), correctLevel: QRCode.CorrectLevel.M}); } catch(e) { $("eQr").textContent = url; }
     } else if (v.etat === "question" && v.q) {
       const r = Math.max(0, Math.ceil((v.t0 + v.q.s * 1000 - n) / 1000));
@@ -623,7 +706,7 @@ function ecran(code){
       }
     } else if (v.etat === "fin") {
       if (cle !== dernier || force) {
-        const c = v.joueurs, p = (q, k) => q ? `<div class="p${k}"><b>${k}</b>${esc(q.n)}${v.reg.points === "aucun" ? "" : "<br>" + q.pts}</div>` : "";
+        const c = v.joueurs, p = (q, k) => q ? `<div class="col">${visage(q.av, "v-p")}<div class="p${k}"><b>${k}</b>${esc(q.n)}${v.reg.points === "aucun" ? "" : "<br>" + q.pts}</div></div>` : "";
         E.innerHTML = tete("Podium · " + v.titre) + `<div class="podium">${p(c[1], 2)}${p(c[0], 1)}${p(c[2], 3)}</div>` + lignes(10, false) + bSon();
         if (cle !== dernier) setTimeout(accord, 900);
       }

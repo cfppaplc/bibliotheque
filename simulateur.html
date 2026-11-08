@@ -149,7 +149,7 @@ th{font-size:12px;color:var(--gris);font-weight:700;border-top:0}
 .lob .qr{background:#fff;padding:1.2vw;border-radius:1.2vw}
 .lob .code{font-size:6vw;font-weight:900;letter-spacing:.12em;color:#fff;text-align:left;margin:0}
 .lob .eqs{display:flex;flex-wrap:wrap;gap:.8vw;margin-top:2vh}
-.lob .eqs span{background:#534AB7;border-radius:3vw;padding:.8vw 1.6vw;font-size:1.6vw;font-weight:800;animation:pop .4s}
+.lob .eqs span{display:inline-flex;align-items:center;background:#534AB7;border-radius:3vw;padding:.5vw 1.6vw .5vw .5vw;font-size:1.6vw;font-weight:800;animation:pop .4s}
 @keyframes pop{from{transform:scale(.6);opacity:0}}
 .eq-q{font-size:3vw;font-weight:800;text-align:center;margin:2vh 0 3vh;line-height:1.25}
 .eq-ch{display:grid;grid-template-columns:1fr 1fr;gap:1.4vw}
@@ -171,6 +171,30 @@ th{font-size:12px;color:var(--gris);font-weight:700;border-top:0}
 .podium .p1{background:#D89E00;height:30vh}.podium .p2{background:#8A8F98;height:22vh}.podium .p3{background:#A0582B;height:16vh}
 .podium b{display:block;font-size:4vw}
 .errs{font-size:1.6vw;color:#B5AFA6}.errs b{color:#FF8A80}
+/* ---------- Animer au tableau (un seul ordinateur) ---------- */
+#animBar{position:fixed;left:50%;bottom:2.2vh;transform:translateX(-50%);display:flex;gap:8px;align-items:center;background:rgba(20,22,26,.88);padding:8px;border-radius:14px;z-index:60;box-shadow:0 8px 30px rgba(0,0,0,.4)}
+#animBar button{padding:12px 18px;font-size:15px;border-radius:10px;background:#3A3D45;color:#F2EFEA;min-height:46px}
+#animBar button.prim{background:var(--acc,#534AB7);color:#fff}
+#animBar button:disabled{opacity:.35}
+#tiroir{position:fixed;top:0;right:0;bottom:0;width:min(500px,94vw);transform:translateX(102%);transition:transform .35s ease;z-index:70;background:#E9E6E0;box-shadow:-10px 0 40px rgba(0,0,0,.45)}
+#tiroir.ouvert{transform:none}
+#tiroir iframe{width:100%;height:100%;border:0;display:block}
+#tiroir .fermer{position:absolute;left:-46px;top:12px;width:40px;height:40px;padding:0;border-radius:10px;background:#24211E;color:#fff;font-size:20px}
+body.inclus .tbar a,body.inclus #bEcran{display:none!important}
+body.inclus .grid{grid-template-columns:1fr}
+/* ---------- Personnages ---------- */
+.vis{position:relative;display:inline-flex;align-items:center;justify-content:center;border-radius:50%;overflow:hidden;background:var(--vc);color:#fff;font-weight:800;width:1em;height:1em;flex:none;vertical-align:middle;box-shadow:0 0 0 .04em rgba(255,255,255,.5)}
+.vis img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.vis b{font-size:.36em;letter-spacing:.02em}
+.v-s{font-size:28px;margin-right:6px}.v-m{font-size:46px}.v-l{font-size:84px}.v-e{font-size:2.6vw;margin-right:.6vw}.v-p{font-size:8vw}
+.persos{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin:14px 0}
+.perso{background:rgba(255,255,255,.08);color:inherit;border-radius:14px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:4px;border:3px solid transparent;font-weight:700;transition:transform .15s,border-color .2s}
+.perso b{font-size:14px;line-height:1.2;text-align:center}.perso small{opacity:.7;font-weight:500;font-size:12px;text-align:center}
+.perso em{display:none;font-style:normal;font-size:12px;color:#E5484D;font-weight:800}
+.perso.pris{opacity:.35;pointer-events:none}.perso.pris em{display:block}
+.perso.choisi{border-color:currentColor;transform:translateY(-2px)}
+.podium .col{display:flex;flex-direction:column;align-items:center;gap:1.2vh;width:auto;padding:0;background:none;animation:none;height:auto}
+#entree{max-width:820px!important}#entree .perso{background:#F1EEE8;color:#24211E}#entree .ko2{color:#C62828;font-weight:700}
 </style>
 </head>
 <body>
@@ -178,8 +202,9 @@ th{font-size:12px;color:var(--gris);font-weight:700;border-top:0}
 <!-- ======================= CHOIX DU RÔLE ======================= -->
 <div id="role" class="cache"><div class="carte"><img class="logoC" src="img/pavillon-avenir.png" alt="Pavillon de l'Avenir"><h1>Simulateur de panneau d'alarme</h1>
 <div class="sous">Protection incendie · Les Habitations du Quai</div>
-<div class="duo"><button id="rTele">📱 Télécommande<br><small style="font-weight:500">iPad de l'enseignant</small></button>
-<button id="rEcr" style="background:#24211E">🖥️ Écran de classe<br><small style="font-weight:500">tableau interactif</small></button></div>
+<div class="duo"><button id="rAnim" style="grid-column:1/-1;padding:24px 10px;font-size:19px">🖥️ Animer au tableau<br><small style="font-weight:500">un seul ordinateur : l'écran de classe avec ses commandes</small></button>
+<button id="rTele" style="background:#3A3936">💻 Télécommande<br><small style="font-weight:500">ton ordinateur ou ta tablette</small></button>
+<button id="rEcr" style="background:#24211E">📺 Écran de classe<br><small style="font-weight:500">sur un 2e appareil, avec le code</small></button></div>
 <div id="rCode" class="cache"><div class="sous" style="margin-top:14px">Tape le code affiché sur la télécommande</div>
 <input id="rIn" inputmode="numeric" maxlength="7" placeholder="000 000"><button id="rGo" style="width:100%">Afficher l'écran de classe</button></div>
 <div class="sous" style="margin-top:14px">Les élèves, eux, scannent le code QR : leur iPad devient un panneau.</div>
@@ -195,7 +220,7 @@ th{font-size:12px;color:var(--gris);font-weight:700;border-top:0}
 <div class="grid">
 <div>
 <div class="carte"><h2>Les élèves scannent</h2><div id="qr"></div><div class="code mono" id="code"></div>
-<div class="etat" id="etatT">Connexion…</div></div>
+<div class="etat" id="etatT">Connexion…</div><button id="bEcran" style="width:100%;margin-top:10px">Ouvrir l'écran de classe</button></div>
 <div class="carte"><h2>Envoyer à</h2><select id="cible"><option value="tous">Toutes les équipes</option></select>
 <div class="sous" style="margin-top:8px">Un panneau qui arrive en retard reçoit les événements encore actifs.</div></div>
 <div class="carte"><h2>Événements actifs</h2><div id="actifs"><div class="sous">Aucun. Le système est normal.</div></div>
@@ -217,8 +242,9 @@ th{font-size:12px;color:var(--gris);font-weight:700;border-top:0}
 <div id="pann" class="cache">
 <div id="entree"><h1>Panneau d'alarme</h1>
 <div class="sous">Les Habitations du Quai · simulateur</div>
-<input id="equipe" placeholder="Nom de ton équipe" maxlength="20" autocomplete="off">
-<button id="go">Commencer</button>
+<div style="margin-top:10px;font-weight:700">Choisis le personnage de ton équipe</div><div id="persoG"></div>
+<input id="equipe" placeholder="Prénoms de l'équipe (vus seulement par l'enseignant, facultatif)" maxlength="40" autocomplete="off">
+<button id="go" disabled>Commencer</button>
 <div class="sous" style="margin-top:10px">Monte le son de l'iPad : le panneau sonne.</div></div>
 
 <div id="panneau" class="cache" style="width:min(980px,100%)">
@@ -338,6 +364,21 @@ function ecouter(topic, quand, etat){
 }
 
 const params = new URLSearchParams(location.search);
+/* Personnages de chantier (noms fictifs). Chacun ne peut être choisi qu'une fois par partie. Photos : img/labo/perso/NN.jpg */
+const PERSOS = [
+  ["Marc-Antoine Pelletier", "Plombier"], ["Julie Bérubé", "Plombière"], ["Samuel Gagnon", "Électricien"], ["Émilie Dionne", "Électricienne"],
+  ["Kevin Bouchard", "Soudeur"], ["Mélanie Gauthier", "Soudeuse"], ["Jonathan Ouellet", "Frigoriste"], ["Karine Thériault", "Inspectrice en bâtiment"],
+  ["Alexandre Côté", "Pompier"], ["Audrey Lavoie", "Préposée à l'entretien"], ["Mathieu Lévesque", "Charpentier-menuisier"], ["Sophie Morin", "Ingénieure en mécanique"]];
+const persoImg = k => "img/labo/perso/" + String(k + 1).padStart(2, "0") + ".jpg";
+function visage(k, cls){
+  const p = PERSOS[k]; if (!p) return "";
+  const ini = p[0].split(/[\s-]+/).map(x => x[0]).slice(0, 2).join("");
+  return `<span class="vis ${cls || ""}" style="--vc:${["#534AB7", "#B3261E", "#185FA5", "#0F6E56", "#854F0B", "#3A3936"][k % 6]}"><b>${ini}</b><img src="${persoImg(k)}" alt="" onerror="this.remove()"></span>`;
+}
+function grillePersos(pris, choisi){
+  return `<div class="persos">${PERSOS.map((p, k) => `<button class="perso ${pris.includes(k) && k !== choisi ? "pris" : ""} ${k === choisi ? "choisi" : ""}" data-av="${k}">${visage(k, "v-l")}<b>${esc(p[0])}</b><small>${esc(p[1])}</small><em>Déjà pris</em></button>`).join("")}</div>`;
+}
+
 /* =============================== DÉFI : les 8 missions =============================== */
 const MISSIONS = [
   {t: "Batterie faible", d: "Le panneau signale sa batterie.", evs: [[0, "e9"]],
@@ -360,12 +401,14 @@ const MISSIONS = [
 const Q_S = 20, LIMITE_S = 180;
 const SYMB = ["▲", "◆", "●", "■"];
 
-if (params.get("panneau")) panneau(params.get("panneau").replace(/\D/g, "").slice(0, 6));
+if (params.get("animer")) animer([["jGo"], ["jNext"]]);
+else if (params.get("panneau")) panneau(params.get("panneau").replace(/\D/g, "").slice(0, 6));
 else if (params.get("ecran")) ecran(params.get("ecran").replace(/\D/g, "").slice(0, 6));
 else if (params.get("tele")) telecommande();
 else {
   $("role").classList.remove("cache");
   $("rTele").onclick = () => { $("role").classList.add("cache"); telecommande(); };
+  $("rAnim").onclick = () => { location.search = "?animer=1"; };
   $("rEcr").onclick = () => { $("rCode").classList.remove("cache"); $("rIn").focus(); };
   $("rGo").onclick = () => { const c = $("rIn").value.replace(/\D/g, ""); if (c.length === 6) location.search = "?ecran=" + c; };
   $("rIn").addEventListener("keydown", e => { if (e.key === "Enter") $("rGo").click(); });
@@ -383,6 +426,9 @@ function telecommande(){
   const topic = PREFIXE + code;
   const url = location.href.split(/[?#]/)[0] + "?panneau=" + code;
   $("code").textContent = code.slice(0, 3) + " " + code.slice(3);
+  // dans « Animer au tableau », la télécommande est dans un tiroir : elle donne son code à la page
+  if (params.get("inclus")) { document.body.classList.add("inclus"); try { parent.postMessage({labo: "code", code}, "*"); } catch(e) {} }
+  $("bEcran").onclick = () => window.open(location.href.split(/[?#]/)[0] + "?ecran=" + code, "ecranClasse", "popup,width=1280,height=760");
   try { new QRCode($("qr"), {text: url, width: 180, height: 180, correctLevel: QRCode.CorrectLevel.M}); }
   catch(e) { $("qr").innerHTML = '<div class="sous" style="word-break:break-all">' + esc(url) + "</div>"; }
   $("nouv").onclick = () => { try { localStorage.removeItem("simuSession"); } catch(e) {} location.reload(); };
@@ -429,6 +475,7 @@ function telecommande(){
   }
   $("tout").onclick = () => { actifs = []; dessinerActifs(); envoyer(topic, {m: "raz", cible: $("cible").value}); };
 
+  function envoyerPersos(){ envoyer(topic, {m: "persos", pris: Object.values(equipes).map(q => q.av).filter(v => v != null)}); }
   function dessinerEquipes(){
     const ids = Object.keys(equipes);
     const sel = $("cible").value;
@@ -436,7 +483,7 @@ function telecommande(){
     $("cible").value = ids.includes(sel) ? sel : "tous";
     $("equipes").innerHTML = ids.length ? ids.map(i => {
       const q = equipes[i];
-      return `<tr><td><b>${esc(q.equipe)}</b></td><td><span class="etq e${q.etat || "N"}">${q.etat ? TYPE_FR[q.etat] : "Normal"}</span></td><td class="acts">${q.acts.slice(-6).reverse().map(a => `<div class="${a.mal ? "mal" : ""}">${hm(a.t)} · ${esc(a.txt)}</div>`).join("") || "—"}</td></tr>`;
+      return `<tr><td><b>${visage(q.av, "v-s")}${esc(q.equipe)}</b>${q.prenom ? `<div class="sous">${esc(q.prenom)}</div>` : ""}</td><td><span class="etq e${q.etat || "N"}">${q.etat ? TYPE_FR[q.etat] : "Normal"}</span></td><td class="acts">${q.acts.slice(-6).reverse().map(a => `<div class="${a.mal ? "mal" : ""}">${hm(a.t)} · ${esc(a.txt)}</div>`).join("") || "—"}</td></tr>`;
     }).join("") : '<tr><td colspan="3" class="sous">Aucune équipe connectée.</td></tr>';
   }
 
@@ -455,7 +502,7 @@ function telecommande(){
     return {m: "vue", code, etat: J.on ? J.etat : "lobby", i: J.i, n: MISSIONS.length, t0: J.t0, now: Date.now(),
       mis: J.i >= 0 ? {t: M.t, d: M.d, q: M.q, ch: M.ch} : null, bon: J.etat === "reveal" || J.etat === "mission" ? M.bon : null, compte,
       nrep: Object.keys(J.reps).length,
-      eqs: Object.keys(equipes).map(id => ({id, n: equipes[id].equipe, pts: J.sc[id] || 0, fa: J.fa[id] || 0, prog: J.prog[id] || 0,
+      eqs: Object.keys(equipes).map(id => ({id, n: equipes[id].equipe, av: equipes[id].av, pts: J.sc[id] || 0, fa: J.fa[id] || 0, prog: J.prog[id] || 0,
         fini: J.fini[id] != null ? J.fini[id] : null, gain: J.gain[id] || 0, rep: !!J.reps[id]})),
       errs: Object.entries(J.err).sort((a, b) => b[1] - a[1]).slice(0, 4)};
   }
@@ -525,10 +572,12 @@ function telecommande(){
 
   ecouter(topic, m => {
     jeuMsg(m);
+    if (m.m === "persos?") { envoyerPersos(); return; }
+    if (m.m === "ici" && m.av != null && Object.entries(equipes).some(([id, q]) => q.av === m.av && id !== m.moi)) { envoyer(topic, {m: "refus", pour: m.moi}); return; }
     if (m.m === "ici") {
       const neuf = !equipes[m.moi];
       equipes[m.moi] = equipes[m.moi] || {equipe: m.equipe, acts: []};
-      equipes[m.moi].equipe = m.equipe; equipes[m.moi].etat = m.etat || "";
+      equipes[m.moi].equipe = m.equipe; equipes[m.moi].etat = m.etat || ""; equipes[m.moi].av = m.av; equipes[m.moi].prenom = m.prenom || ""; envoyerPersos();
       dessinerEquipes(); vue();
       if (neuf && actifs.length) // l'équipe arrive : on lui envoie ce qui est encore actif
         envoyer(topic, {m: "rattrape", pour: m.moi, evs: actifs.filter(a => a.cible === "tous" || a.cible === m.moi).map(a => ({id: a.id, k: a.k, t: a.t, cause: a.cause}))});
@@ -544,6 +593,27 @@ function telecommande(){
   });
 }
 
+/* ===== Animer au tableau : un seul ordinateur (écran de classe + barre + tiroir de télécommande) ===== */
+function animer(boutons){
+  document.body.insertAdjacentHTML("beforeend", `<div id="tiroir"><button class="fermer" id="tirX" aria-label="Fermer la télécommande">›</button><iframe id="tirF" src="?tele=1&inclus=1" title="Télécommande"></iframe></div>
+    <div id="animBar">${boutons.map(([id], k) => `<button data-b="${id}" class="${k ? "" : "prim"}" disabled>…</button>`).join("")}<button id="tirB">Télécommande</button></div>`);
+  const T = $("tiroir"), F = $("tirF");
+  $("tirB").onclick = () => T.classList.toggle("ouvert");
+  $("tirX").onclick = () => T.classList.remove("ouvert");
+  addEventListener("message", e => { if (e.data && e.data.labo === "code" && !animer.code) { animer.code = e.data.code; ecran(e.data.code); } });
+  // les boutons de la barre reprennent l'état des vrais boutons de la télécommande
+  setInterval(() => {
+    let d = null; try { d = F.contentDocument; } catch(x) {}
+    document.querySelectorAll("#animBar [data-b]").forEach(b => {
+      const v = d && d.getElementById(b.dataset.b);
+      if (!v) { b.disabled = true; return; }
+      b.textContent = v.textContent; b.disabled = v.disabled || v.closest(".cache") != null;
+      b.style.display = b.disabled && b.dataset.cacher ? "none" : "";
+    });
+  }, 400);
+  document.querySelectorAll("#animBar [data-b]").forEach(b => b.onclick = () => { const v = F.contentDocument.getElementById(b.dataset.b); if (v && !v.disabled) v.click(); });
+}
+
 /* =============================== ÉCRAN DE CLASSE =============================== */
 function ecran(code){
   const topic = PREFIXE + code, E = $("ecr");
@@ -553,7 +623,7 @@ function ecran(code){
   const tete = t => `<div class="haut"><b><img class="logoE" src="img/pavillon-avenir-blanc.png" alt="Pavillon de l'Avenir">${t}</b><span>Défi panneau · code ${code.slice(0, 3)} ${code.slice(3)}</span></div>`;
   function classe(eqs){ return eqs.slice().sort((a, b) => b.pts - a.pts); }
   function lignes(eqs, mode){
-    return classe(eqs).map((q, r) => `<div class="lgn"><span class="rg">${r + 1}</span><div><div class="nm">${esc(q.n)}</div>
+    return classe(eqs).map((q, r) => `<div class="lgn"><span class="rg">${r + 1}</span><div><div class="nm">${visage(q.av, "v-e")}${esc(q.n)}</div>
       <div class="prog"><i style="width:${100 * q.prog / (V.n || 8)}%"></i></div></div>
       <div class="st ${q.fini != null ? "ok" : ""}">${mode === "mission" ? (q.fini != null ? "Réussi en " + q.fini + " s" : "En cours…") + (q.fa ? ` · ${q.fa} faute${q.fa > 1 ? "s" : ""}` : "") : (q.gain ? "+" + q.gain : "")}</div>
       <div><div class="pt">${q.pts}</div></div></div>`).join("") || '<div class="sous" style="font-size:1.6vw">En attente des équipes…</div>';
@@ -563,7 +633,7 @@ function ecran(code){
     if (v.etat === "lobby") {
       E.innerHTML = tete("Défi panneau d'alarme") + `<div class="banniere"><img src="img/labo/m5-panneau.jpg" alt=""><span><small>Protection incendie · module 5</small>Systèmes d'alarme et panneau</span></div><div class="lob"><div class="qr" id="eQr"></div><div><div style="font-size:2vw;color:#B5AFA6">Scanne le code avec ton iPad</div>
         <div class="code">${code.slice(0, 3)} ${code.slice(3)}</div><div style="font-size:1.6vw;color:#B5AFA6">${v.eqs.length} équipe${v.eqs.length > 1 ? "s" : ""} prête${v.eqs.length > 1 ? "s" : ""}</div>
-        <div class="eqs">${v.eqs.map(q => `<span>${esc(q.n)}</span>`).join("")}</div></div></div>`;
+        <div class="eqs">${v.eqs.map(q => `<span>${visage(q.av, "v-e")}${esc(q.n)}</span>`).join("")}</div></div></div>`;
       try { new QRCode($("eQr"), {text: url, width: Math.round(innerWidth * .17), height: Math.round(innerWidth * .17), correctLevel: QRCode.CorrectLevel.M}); } catch(e) { $("eQr").textContent = url; }
     } else if (v.etat === "question" || v.etat === "reveal") {
       const r = Math.max(0, Math.ceil((v.t0 + Q_S * 1000 - n) / 1000));
@@ -578,7 +648,7 @@ function ecran(code){
     } else if (v.etat === "classement") {
       E.innerHTML = tete("Classement après la mission " + (v.i + 1)) + lignes(v.eqs, "classement");
     } else if (v.etat === "fin") {
-      const c = classe(v.eqs), p = (q, k) => q ? `<div class="p${k}"><b>${k}</b>${esc(q.n)}<br>${q.pts}</div>` : "";
+      const c = classe(v.eqs), p = (q, k) => q ? `<div class="col">${visage(q.av, "v-p")}<div class="p${k}"><b>${k}</b>${esc(q.n)}<br>${q.pts}</div></div>` : "";
       E.innerHTML = tete("Podium") + `<div class="podium">${p(c[1], 2)}${p(c[0], 1)}${p(c[2], 3)}</div>` +
         (v.errs && v.errs.length ? `<div class="errs"><b>Erreurs les plus fréquentes :</b> ${v.errs.map(([t, k]) => esc(t) + " (" + k + ")").join(" · ")}</div>` : `<div class="errs">Aucune erreur : bravo à tous !</div>`);
     }
@@ -594,8 +664,9 @@ function ecran(code){
 function panneau(code){
   const topic = PREFIXE + code;
   $("pann").classList.remove("cache");
-  const moi = Math.random().toString(36).slice(2, 9);
-  let equipe = "";
+  let moi = null; try { moi = sessionStorage.getItem("simuMoi"); } catch(e) {}
+  if (!moi) { moi = Math.random().toString(36).slice(2, 9); try { sessionStorage.setItem("simuMoi", moi); } catch(e) {} }
+  let equipe = "", av = -1, prenom = "", entre = false, pris = [];
   let evs = [];          // {id, k, t, ack, cause}
   let sel = 0, silence = false, lamp = false, drill = false, silTr = false, sonOn = true;
   const journal = [];
@@ -623,7 +694,7 @@ function panneau(code){
   function etatGlobal(){ return evs.length ? typ(evs[0]) : ""; }
   function noter(txt){ journal.unshift(hm(Date.now()) + "  " + txt); $("journal").innerHTML = journal.map(l => "<div>" + esc(l) + "</div>").join(""); }
   function dire(txt){ $("msgp").textContent = txt; clearTimeout(dire.t); dire.t = setTimeout(() => $("msgp").textContent = "", 4000); }
-  function rapporter(txt, mal){ envoyer(topic, {m: "act", moi, equipe, etat: etatGlobal(), txt, mal: !!mal}); }
+  function rapporter(txt, mal){ envoyer(topic, {m: "act", moi, equipe, av, etat: etatGlobal(), txt, mal: !!mal}); }
 
   function afficher(){
     const L = $("lcd").children;
@@ -699,7 +770,7 @@ function panneau(code){
     if (typ(e) === "A") silence = false; else silTr = false;
     trier(); sel = 0; noter(TYPE_EN[ev(e).type] + " " + ev(e).nom + " " + ev(e).adr);
     if (enMission) { aEuEv = true; if (finiEnvoye) ban(banMis[0], banMis[1]); finiEnvoye = false; }
-    afficher(); if (!silencieux && !jeu) envoyer(topic, {m: "ici", moi, equipe, etat: etatGlobal()});
+    afficher(); if (!silencieux && !jeu) envoyer(topic, {m: "ici", moi, equipe, av, prenom, etat: etatGlobal()});
   }
   function pourMoi(m){ return !m.cible || m.cible === "tous" || m.cible === moi; }
 
@@ -791,14 +862,25 @@ function panneau(code){
   }
   $("vJournal").onclick = () => $("journal").classList.toggle("cache");
 
-  // ---- démarrage (le toucher débloque le son sur l'iPad)
+  // ---- choix du personnage de l'équipe, puis démarrage (le toucher débloque le son sur l'iPad)
+  function choix(msg){
+    $("persoG").innerHTML = (msg ? `<div class="ko2">${esc(msg)}</div>` : "") + grillePersos(pris, av);
+    document.querySelectorAll("#persoG .perso").forEach(b => b.onclick = () => { av = +b.dataset.av; choix(); });
+    $("go").disabled = av < 0;
+  }
+  choix();
   $("go").onclick = () => {
+    if (av < 0 || pris.includes(av)) return;
     try { ac = new (window.AudioContext || window.webkitAudioContext)(); ac.resume(); ton(440, .01, .001); } catch(e) {}
-    equipe = ($("equipe").value.trim() || "Équipe").slice(0, 20);
-    $("eqNom").textContent = equipe + " · " + code;
+    prenom = $("equipe").value.trim().slice(0, 40); equipe = PERSOS[av][0]; entre = true;
+    $("eqNom").innerHTML = visage(av, "v-s") + esc(equipe) + " · " + code;
     $("entree").classList.add("cache"); $("panneau").classList.remove("cache");
-    afficher();
+    afficher(); envoyer(topic, {m: "ici", moi, equipe, av, prenom, etat: etatGlobal()});
+  };
     ecouter(topic, m => {
+      if (m.m === "persos") { pris = m.pris || []; if (!entre) choix(); return; }
+      if (m.m === "refus" && m.pour === moi) { entre = false; av = -1; $("panneau").classList.add("cache"); $("entree").classList.remove("cache"); choix("Ce personnage vient d'être pris. Choisis-en un autre."); return; }
+      if (!entre) return;
       if (m.m === "ev" && pourMoi(m)) ajouter(m);
       else if (m.m === "rattrape" && m.pour === moi) m.evs.forEach(e => ajouter(e, true));
       else if (m.m === "cause" && pourMoi(m)) { const e = evs.find(x => x.id === m.id); if (e) e.cause = true; }
@@ -806,7 +888,7 @@ function panneau(code){
         const e = evs.find(x => x.id === m.id);
         if (e) { evs = evs.filter(x => x !== e); noter(TYPE_EN[ev(e).type] + " RESTORED " + ev(e).adr); afficher(); }
       } else if (m.m === "raz" && pourMoi(m)) { evs = []; silence = false; noter("SYSTEM NORMAL"); afficher(); }
-      else if (m.m === "qui") envoyer(topic, {m: "ici", moi, equipe, etat: etatGlobal()});
+      else if (m.m === "qui") envoyer(topic, {m: "ici", moi, equipe, av, prenom, etat: etatGlobal()});
       else if (m.m === "q") questionEleve(m);
       else if (m.m === "qfin") revealEleve(m);
       else if (m.m === "mission") missionEleve(m);
@@ -815,9 +897,8 @@ function panneau(code){
         if (m.stop) $("jeuBan").classList.add("cache"); else ban("Défi terminé !", "Regarde le podium au tableau."); }
     }, ok => {
       $("etatP").textContent = ok ? "● Relié à la télécommande" + (window.supabase ? "" : " (ntfy)") : "○ Connexion perdue, nouvel essai…";
-      if (ok) envoyer(topic, {m: "ici", moi, equipe, etat: etatGlobal()});
+      if (ok) { envoyer(topic, {m: "persos?"}); if (entre) envoyer(topic, {m: "ici", moi, equipe, av, prenom, etat: etatGlobal()}); }
     });
-  };
   $("equipe").addEventListener("keydown", e => { if (e.key === "Enter") $("go").click(); });
 }
 </script>
