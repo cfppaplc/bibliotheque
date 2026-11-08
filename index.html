@@ -906,6 +906,7 @@ html.leger{scroll-behavior:auto}
   addEventListener("load", function(){ setTimeout(mesurer, 3000); });
 })();
 </script>
+<script src="coffre.js"></script>
 </head><body>
 <header id="topbar">
   <div class="logo"><span class="logo-pav"><img class="lg-blc" src="img/metier-plus-blanc.svg" alt="Métier+"><img class="lg-clr" src="img/metier-plus.svg" alt=""></span><span class="logo-t">Bibliothèque</span></div>
@@ -9645,6 +9646,29 @@ body.clair:not(:has(.reader.open)) #fsBtn{background:rgba(255,255,255,.55);color
   }
   setTimeout(tout, 12000); setInterval(tout, 60000);
   window.telechargerLivres = tout;
+})();
+</script>
+<script>
+/* ---- Coffre (7 nov., « les quiz et les préférences doivent être reliés à l'utilisateur ») : mes données suivent mon compte sur tout appareil (coffre.js) ---- */
+(function(){
+  if (!window.COFFRE || !window.ACCES) return;
+  let attente = false, apresConnexion = false;
+  const recharger = async raison => {
+    try { for (const k of MIROIR){ const v = JSON.parse(localStorage.getItem(k) || "null"); await DB.setKv("m_" + k, v); } } catch(e){}   /* le double dans IndexedDB suit aussi */
+    if (document.querySelector("#reader.open") || document.querySelector("#accueilOv:not([hidden])")){ attente = true; return; }   /* jamais en plein livre : au retour à l'accueil */
+    setTimeout(() => location.reload(), apresConnexion ? 2300 : 0);
+  };
+  setInterval(() => { if (attente && !document.querySelector("#reader.open") && !document.querySelector("#accueilOv:not([hidden])")){ attente = false; location.reload(); } }, 1500);
+  const B = { cles:["favs", "pos", "marks", "rangsReduits", "filtreProg", "nouvVu", "prefs:{id}", "penPerso", "penLargeur", "gommeTaille", "objCats"],
+    vides:{ favs:"[]", pos:"{}", marks:"{}" }, apres:recharger };
+  const T = { cles:["tableauxSauves", "mesSchemas"], apres:recharger };
+  const go = () => { COFFRE.demarrer("biblio", B); COFFRE.demarrer("tableaux", T); };
+  ACCES.pret.then(go).catch(() => {});
+  let etaitCo = null;
+  new MutationObserver(() => { const co = document.body.classList.contains("connecte"); if (etaitCo === null){ etaitCo = co; return; } if (co === etaitCo) return; etaitCo = co;
+    COFFRE.oublier();
+    if (co){ apresConnexion = true; go(); } else COFFRE.quitter().then(() => recharger("depart")); }).observe(document.body, { attributes:true, attributeFilter:["class"] });
+  ACCES.pret.then(() => { etaitCo = document.body.classList.contains("connecte"); });
 })();
 </script>
 </body></html>

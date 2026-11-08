@@ -77,6 +77,7 @@
   addEventListener("load", function(){ setTimeout(mesurer, 3000); });
 })();
 </script>
+<script src="coffre.js"></script>
 </head>
 <body>
 <title>Accueil de l'atelier</title>
@@ -2961,5 +2962,9 @@ html.leger *,html.leger *::before,html.leger *::after{backdrop-filter:none!impor
 html.leger #lueur,html.leger .tl-mark,html.leger .seg,html.leger .seg::after{transition-duration:.01s!important}
 html.leger .sheet,html.leger .menu,html.leger #apercuOv{animation:none!important}
 </style>
+<script>
+/* Coffre : « Préparer le cours » et les réglages suivent le compte de l'enseignant (coffre.js); jamais en aperçu */
+if (window.COFFRE && !/[?&]apercu=/.test(location.search)) COFFRE.demarrer("accueil", { cles:["accueil-atelier-v4"], intervalle:180000, apres:() => location.reload() });
+</script>
 </body>
 </html>
