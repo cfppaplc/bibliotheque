@@ -9621,10 +9621,9 @@ window.ACCES = (function(){
       + (aRech.length ? '<label class="acces-rech"><input type="checkbox" id="gRech" checked><span><b>Couper vraiment l\'accès</b> : nouvelle clé pour ' + aRech.map(f => '« ' + esc(titreDe(f)) + ' »').join(", ") + '. Une vieille copie gardée par quelqu\'un qui n\'a plus l\'accès ne s\'ouvrira plus (un peu plus long à publier).</span></label>' : '')
       + (jeton   /* clé déjà enregistrée : invisible et impossible à changer dans le panneau (demande de Jeremy, 8 nov.); redemandée seulement si GitHub la refuse */
         ? '<input type="hidden" id="gJeton" value="">'
-        : '<div class="acces-sec"><h3>Publication</h3><p class="sous" style="margin-bottom:6px">Pour publier d\'ici, colle ta clé GitHub (gardée seulement sur cet ordinateur, jamais affichée ensuite). Sinon, télécharge le fichier et envoie-le à Claude.</p>'
-          + '<input type="password" id="gJeton" placeholder="Clé GitHub (github_pat_…)" value="" autocomplete="off"></div>')
+        : '<p class="sous acces-nocle">Publication possible seulement depuis l\'ordinateur où ta clé GitHub est enregistrée. Ici, tu peux regarder sans rien publier.</p><input type="hidden" id="gJeton" value="">')
       + '<div class="acces-err" id="gErr"' + (msg && msg.err ? "" : " hidden") + '>' + (msg && msg.err ? esc(msg.err) : "") + '</div><div class="acces-ok" id="gOk"' + (msg && msg.ok ? "" : " hidden") + '>' + (msg && msg.ok ? esc(msg.ok) : "") + '</div>'
-      + '<div class="acces-btns"><button id="gNon">Fermer</button>' + (jeton ? '' : '<button id="gTel">Télécharger comptes.json</button>') + '<button class="prim" id="gPub">Publier</button></div>';
+      + '<div class="acces-btns"><button id="gNon">Fermer</button>' + (jeton ? '<button class="prim" id="gPub">Publier</button>' : '') + '</div>';
     const B = box(); B.scrollTop = st0;
     B.querySelectorAll("[data-ong]").forEach(b => b.onclick = () => { ONGLET = b.dataset.ong; B.querySelectorAll("[data-ong]").forEach(x => x.classList.toggle("on", x === b));
       B.querySelectorAll(".acces-pane").forEach(p => { p.hidden = p.dataset.pane !== ONGLET; p.classList.toggle("anim", !p.hidden); }); voletCharge(); });
@@ -9698,7 +9697,7 @@ window.ACCES = (function(){
     document.getElementById("gNon").onclick = fermer;
     const gT = document.getElementById("gTel"); if (gT) gT.onclick = () => { const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([JSON.stringify(BROUILLON, null, 1)], { type:"application/json" })); a.download = "comptes.json"; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 3000); };
     const chg = document.getElementById("gChg"); if (chg) chg.onclick = e => { e.preventDefault(); const z = document.getElementById("gJetZone"); z.hidden = false; const i = document.getElementById("gJeton"); i.value = ""; i.focus(); chg.parentNode.hidden = true; };
-    document.getElementById("gPub").onclick = async () => {
+    if (document.getElementById("gPub")) document.getElementById("gPub").onclick = async () => {
       let jt = document.getElementById("gJeton").value.trim(); if (!jt) jt = jeton; if (!jt) return dessinerGerer({ err:"Colle d'abord ta clé GitHub (ou utilise « Télécharger comptes.json »)." });
       try { localStorage.setItem("ghJeton", jt); } catch(e){}
       const bt = document.getElementById("gPub"); bt.disabled = true; bt.textContent = "Publication…";
