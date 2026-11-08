@@ -13,7 +13,7 @@
   const ouvrir = ok => {
     html.classList.remove("garde-attente");
     if (ok) return;
-    const f = () => { document.body.insertAdjacentHTML("beforeend", `<div id="gardeOv"><div class="bx"><img src="img/pavillon-avenir-blanc.png" alt="Pavillon de l'Avenir"><h1>Réservé aux enseignants</h1>
+    const f = () => { document.body.insertAdjacentHTML("beforeend", `<div id="gardeOv"><div class="bx"><img src="img/metier-plus-blanc.svg" alt="Métier+"><h1>Réservé aux enseignants</h1>
       <p>Le Labo interactif, les quiz et les simulateurs sont offerts aux enseignants qui ont un accès à la bibliothèque. Connecte-toi dans la bibliothèque, puis reviens ici.</p>
       <a href="./">Ouvrir la bibliothèque</a><button id="gardeRe">Je suis connecté : réessayer</button><small>© 2026 Jérémy Raymond · Tous droits réservés</small></div></div>`);
       document.getElementById("gardeRe").onclick = () => location.reload(); };

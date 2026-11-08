@@ -3,6 +3,7 @@
 <head>
 <!-- © 2026 Jérémy Raymond. Tous droits réservés. Copie, modification ou revente interdites sans autorisation écrite (voir LICENCE.md). -->
 <meta charset="utf-8">
+<link rel="icon" href="img/metier-plus-icone.svg" type="image/svg+xml">
 <script src="garde.js"></script>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Simulateur de panneau d'alarme</title>
@@ -234,7 +235,7 @@ i.let,.ch4 button i{background:var(--lc,var(--acc))!important;color:#fff!importa
 
 <!-- ======================= CHOIX DU RÔLE ======================= -->
 <div id="role" class="cache">
-<div class="bordHaut"><img src="img/pavillon-avenir.png" alt="Pavillon de l'Avenir"><h1>Simulateurs <span>Protection incendie · Les Habitations du Quai</span></h1><a href="labo.html">‹ Labo interactif</a></div>
+<div class="bordHaut"><img src="img/metier-plus.svg" alt="Métier+"><h1>Simulateurs <span>Protection incendie · Les Habitations du Quai</span></h1><a href="labo.html">‹ Labo interactif</a></div>
 <div class="sous" style="margin:0 0 14px">Choisis une activité, puis comment l'afficher. Les élèves scannent le code QR : leur iPad devient un panneau d'alarme.</div>
 <div class="cartesS">
 <div class="cq"><div class="im" style="background-image:url('img/labo/m5-panneau.jpg')"><span>Mode libre</span></div><div class="co"><b>Panneau d'alarme</b><span class="sous">Tu déclenches alarmes, supervisions et troubles; les équipes lisent l'afficheur, règlent la cause et réarment.</span><div class="tg"><i>EGI 436-312</i><i>Module 5</i></div><button class="jouer" data-act="libre">Ouvrir</button></div></div>
@@ -249,7 +250,7 @@ i.let,.ch4 button i{background:var(--lc,var(--acc))!important;color:#fff!importa
 
 <!-- ======================= TÉLÉCOMMANDE (enseignant) ======================= -->
 <div id="tele" class="cache">
-<div class="tbar"><img src="img/pavillon-avenir.png" alt="Pavillon de l'Avenir" style="height:30px"><h1>Simulateur de panneau · télécommande</h1>
+<div class="tbar"><img src="img/metier-plus.svg" alt="Métier+" style="height:30px"><h1>Simulateur de panneau · télécommande</h1>
 <button id="nouv" style="background:#5F5E5A">Nouvelle session</button></div>
 <div class="grid">
 <div>
@@ -285,7 +286,7 @@ i.let,.ch4 button i{background:var(--lc,var(--acc))!important;color:#fff!importa
 <div id="panneau" class="cache" style="width:min(980px,100%)">
 <div id="jeuBan" class="cache"></div>
 <div class="facp">
-<div class="ftete"><span><img src="img/pavillon-avenir-blanc.png" alt="" style="height:16px;vertical-align:-3px;margin-right:8px;opacity:.85">PANNEAU DE CONTRÔLE D'ALARME INCENDIE · ADRESSABLE</span><span class="eq" id="eqNom"></span></div>
+<div class="ftete"><span><img src="img/metier-plus-blanc.svg" alt="" style="height:16px;vertical-align:-3px;margin-right:8px;opacity:.85">PANNEAU DE CONTRÔLE D'ALARME INCENDIE · ADRESSABLE</span><span class="eq" id="eqNom"></span></div>
 <div class="face">
 <div><div class="lcd" id="lcd"><div></div><div></div><div></div><div></div></div>
 <div class="nav"><button id="up">▲</button><button id="down">▼</button></div></div>
@@ -676,7 +677,7 @@ function ecran(code){
   E.classList.remove("cache");
   const url = location.href.split(/[?#]/)[0] + "?panneau=" + code;
   let V = {etat: "lobby", eqs: [], code}, decal = 0, tic = null, avant = {};
-  const tete = t => `<div class="haut"><b><img class="logoE" src="img/pavillon-avenir-blanc.png" alt="Pavillon de l'Avenir">${t}</b><span>Défi panneau · code ${code.slice(0, 3)} ${code.slice(3)}</span></div>`;
+  const tete = t => `<div class="haut"><b><img class="logoE" src="img/metier-plus-blanc.svg" alt="Métier+">${t}</b><span>Défi panneau · code ${code.slice(0, 3)} ${code.slice(3)}</span></div>`;
   function classe(eqs){ return eqs.slice().sort((a, b) => b.pts - a.pts); }
   function lignes(eqs, mode){
     return classe(eqs).map((q, r) => `<div class="lgn"><span class="rg">${r + 1}</span><div><div class="nm">${visage(q.av, "v-e")}${esc(q.n)}</div>

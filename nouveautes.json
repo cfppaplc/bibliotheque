@@ -1,887 +1,904 @@
 [
-  {
+ {
+  "date": "2026-11-07",
+  "type": "outil",
+  "titre": "Nouveau nom : Métier+",
+  "texte": "La bibliothèque et le Labo portent maintenant le nom Métier+, avec un nouveau logo. Le Pavillon de l'Avenir reste mentionné au bas de l'accueil.",
+  "formation": [
+   {
+    "t": "Le logo Métier+ est en haut de l'accueil, dans les fenêtres et dans le Labo."
+   },
+   {
+    "t": "Rien d'autre ne change : tes livres, tes tableaux et tes quiz sont au même endroit."
+   }
+  ],
+  "versions": [
+   "7 nov. : nouveau nom et logo."
+  ]
+ },
+ {
+  "date": "2026-11-07",
+  "type": "outil",
+  "titre": "Télécommande : contrôle le livre avec ton cellulaire",
+  "texte": "Plus besoin de rester devant le tableau : ton cellulaire devient la télécommande du livre (pages, modules, zoom, laser, réponses, tableau de bord).",
+  "formation": [
+   {
+    "t": "Dans un livre, touche le bouton Télécommande (petit cellulaire) dans la barre du bas.",
+    "img": "nouveautes/tele-qr.jpg"
+   },
+   {
+    "t": "Scanne le code QR avec ton cellulaire. Le code se ferme seul; « Télécommande branchée » s'affiche en haut du livre. Garde ce code pour toi."
+   },
+   {
+    "t": "Le grand pavé : touche à droite = page suivante, à gauche = page précédente. Pince avec deux doigts = zoom; glisse un doigt = te promener dans la page.",
+    "img": "nouveautes/tele-cell.jpg"
+   },
+   {
+    "t": "Les pastilles de modules en haut : touche-en une pour y aller. « Aller à… » : une page précise ou la liste complète."
+   },
+   {
+    "t": "Onglet « Laser » : le pavé = l'écran du tableau, un point rouge suit ton doigt."
+   },
+   {
+    "t": "Bouton « Tableau de bord » en haut : passe au tableau de bord et revient au livre (« Revenir au livre »)."
+   }
+  ],
+  "versions": [
+   {
     "date": "2026-11-07",
-    "type": "outil",
-    "titre": "Télécommande : contrôle le livre avec ton cellulaire",
-    "texte": "Plus besoin de rester devant le tableau : ton cellulaire devient la télécommande du livre (pages, modules, zoom, laser, réponses, tableau de bord).",
-    "formation": [
-      {
-        "t": "Dans un livre, touche le bouton Télécommande (petit cellulaire) dans la barre du bas.",
-        "img": "nouveautes/tele-qr.jpg"
-      },
-      {
-        "t": "Scanne le code QR avec ton cellulaire. Le code se ferme seul; « Télécommande branchée » s'affiche en haut du livre. Garde ce code pour toi."
-      },
-      {
-        "t": "Le grand pavé : touche à droite = page suivante, à gauche = page précédente. Pince avec deux doigts = zoom; glisse un doigt = te promener dans la page.",
-        "img": "nouveautes/tele-cell.jpg"
-      },
-      {
-        "t": "Les pastilles de modules en haut : touche-en une pour y aller. « Aller à… » : une page précise ou la liste complète."
-      },
-      {
-        "t": "Onglet « Laser » : le pavé = l'écran du tableau, un point rouge suit ton doigt."
-      },
-      {
-        "t": "Bouton « Tableau de bord » en haut : passe au tableau de bord et revient au livre (« Revenir au livre »)."
-      }
-    ],
-    "versions": [
-      {
-        "date": "2026-11-07",
-        "texte": "Nouvelle télécommande « tout en un pavé » : toucher pour tourner, pincer pour zoomer, glisser pour se déplacer, pastilles de modules, bouton Tableau de bord, laser; pastille « Télécommande branchée » dans le livre."
-      }
-    ]
-  },
-  {
+    "texte": "Nouvelle télécommande « tout en un pavé » : toucher pour tourner, pincer pour zoomer, glisser pour se déplacer, pastilles de modules, bouton Tableau de bord, laser; pastille « Télécommande branchée » dans le livre."
+   }
+  ]
+ },
+ {
+  "date": "2026-11-07",
+  "type": "outil",
+  "titre": "Labo interactif : simulateur de panneau, défi et quiz maison avec les iPad",
+  "texte": "Nouveau bouton « Labo » : des outils à faire en classe avec les iPad. Premier outil : un vrai panneau d'alarme incendie sur l'iPad de chaque équipe, piloté par ton iPad, et le « Défi panneau » (8 missions, questions éclair, classement au tableau).",
+  "formation": [
+   {
+    "t": "Bouton « Labo » en haut à droite (une fois connecté). S'il y a trop de boutons, touche › pour voir les autres.",
+    "img": "nouveautes/sim-bouton.jpg"
+   },
+   {
+    "t": "Sur l'ordinateur du tableau : ouvre le simulateur ou le quiz et choisis « Animer au tableau ». La barre du bas fait avancer la partie; « Télécommande » ouvre le détail. Avec deux écrans : « Télécommande » puis « Ouvrir l'écran de classe »."
+   },
+   {
+    "t": "Les élèves scannent le code QR avec leur iPad et choisissent un personnage de chantier : son nom fictif est proposé, et ils peuvent le changer. Un personnage choisi n'est plus offert aux autres.",
+    "img": "nouveautes/sim-ecran.jpg"
+   },
+   {
+    "t": "Quiz maison : touche « Jouer », puis règle la partie (qui joue, nombre de questions, temps, musique). « Pour les caler » : Mode expert, pénalité, choix cachés, double ou rien. Tes choix restent pour la prochaine fois."
+   },
+   {
+    "t": "Le panneau a les vrais boutons (accuser réception, silence, réarmement…) et des actions « Sur le terrain » à faire dans l'immeuble.",
+    "img": "nouveautes/sim-panneau.jpg"
+   },
+   {
+    "t": "Mode libre : déclenche une alarme, une supervision ou un trouble; tu vois ce que chaque équipe fait, les erreurs en rouge."
+   },
+   {
+    "t": "Défi panneau : « Lancer le défi ». Chaque mission = une question éclair, puis remettre le panneau à la normale. Classement et podium au tableau.",
+    "img": "nouveautes/sim-mission.jpg"
+   },
+   {
+    "t": "Quiz maison : « + Créer un quiz » ou « Coller des questions » (une * devant la bonne réponse). Réglages : image du module au tableau, couleur, points, classement, ordre mêlé, sons, explications. Tu vois qui a répondu; chaque élève voit son rang sur son iPad.",
+    "img": "nouveautes/quiz-ecran.jpg"
+   }
+  ],
+  "versions": [
+   {
     "date": "2026-11-07",
-    "type": "outil",
-    "titre": "Labo interactif : simulateur de panneau, défi et quiz maison avec les iPad",
-    "texte": "Nouveau bouton « Labo » : des outils à faire en classe avec les iPad. Premier outil : un vrai panneau d'alarme incendie sur l'iPad de chaque équipe, piloté par ton iPad, et le « Défi panneau » (8 missions, questions éclair, classement au tableau).",
-    "formation": [
-      {
-        "t": "Bouton « Labo » en haut à droite (une fois connecté). S'il y a trop de boutons, touche › pour voir les autres.",
-        "img": "nouveautes/sim-bouton.jpg"
-      },
-      {
-        "t": "Sur l'ordinateur du tableau : ouvre le simulateur ou le quiz et choisis « Animer au tableau ». La barre du bas fait avancer la partie; « Télécommande » ouvre le détail. Avec deux écrans : « Télécommande » puis « Ouvrir l'écran de classe »."
-      },
-      {
-        "t": "Les élèves scannent le code QR avec leur iPad et choisissent un personnage de chantier : son nom fictif est proposé, et ils peuvent le changer. Un personnage choisi n'est plus offert aux autres.",
-        "img": "nouveautes/sim-ecran.jpg"
-      },
-      {
-        "t": "Quiz maison : touche « Jouer », puis règle la partie (qui joue, nombre de questions, temps, musique). « Pour les caler » : Mode expert, pénalité, choix cachés, double ou rien. Tes choix restent pour la prochaine fois."
-      },
-      {
-        "t": "Le panneau a les vrais boutons (accuser réception, silence, réarmement…) et des actions « Sur le terrain » à faire dans l'immeuble.",
-        "img": "nouveautes/sim-panneau.jpg"
-      },
-      {
-        "t": "Mode libre : déclenche une alarme, une supervision ou un trouble; tu vois ce que chaque équipe fait, les erreurs en rouge."
-      },
-      {
-        "t": "Défi panneau : « Lancer le défi ». Chaque mission = une question éclair, puis remettre le panneau à la normale. Classement et podium au tableau.",
-        "img": "nouveautes/sim-mission.jpg"
-      },
-      {
-        "t": "Quiz maison : « + Créer un quiz » ou « Coller des questions » (une * devant la bonne réponse). Réglages : image du module au tableau, couleur, points, classement, ordre mêlé, sons, explications. Tu vois qui a répondu; chaque élève voit son rang sur son iPad.",
-        "img": "nouveautes/quiz-ecran.jpg"
-      }
-    ],
-    "versions": [
-      {
-        "date": "2026-11-07",
-        "texte": "Le Labo, les quiz et les simulateurs sont réservés aux enseignants connectés (les élèves rejoignent toujours avec le code QR, sans compte)."
-      },
-      {
-        "date": "2026-11-07",
-        "texte": "Quiz : nouveaux types (plusieurs bonnes réponses, remettre en ordre, calcul, trouve l'erreur, zoom mystère) et réglages pour les caler (pénalité, choix cachés 5 s, texte des choix sur l'iPad seulement, double ou rien, mode expert). Les quiz des livres en contiennent."
-      },
-      {
-        "date": "2026-11-07",
-        "texte": "Quiz des livres : 17 ou 18 questions par livre (des plus difficiles), 12 tirées au hasard à chaque partie. Avant de jouer : réglages rapides (qui joue, nombre de questions, ordre, temps, musique), gardés pour chaque quiz."
-      },
-      {
-        "date": "2026-11-07",
-        "texte": "Quiz : séries de bonnes réponses (flamme « 3 de suite », bonus +100 à +300 au choix), grosse remontée en vert au classement, « Tu remontes au 2e rang ! » sur l'iPad. Choix de réponse en couleur (sarcelle, violet, orange, rose) avec leur lettre. Podium : tout le monde visible sous le podium; iPad : visage, médaille et meilleure série. Simulateur : tableau de bord comme les quiz (Panneau d'alarme ou Défi panneau, puis Animer au tableau ou Télécommande)."
-      }
-    ]
-  },
-  {
+    "texte": "Le Labo, les quiz et les simulateurs sont réservés aux enseignants connectés (les élèves rejoignent toujours avec le code QR, sans compte)."
+   },
+   {
+    "date": "2026-11-07",
+    "texte": "Quiz : nouveaux types (plusieurs bonnes réponses, remettre en ordre, calcul, trouve l'erreur, zoom mystère) et réglages pour les caler (pénalité, choix cachés 5 s, texte des choix sur l'iPad seulement, double ou rien, mode expert). Les quiz des livres en contiennent."
+   },
+   {
+    "date": "2026-11-07",
+    "texte": "Quiz des livres : 17 ou 18 questions par livre (des plus difficiles), 12 tirées au hasard à chaque partie. Avant de jouer : réglages rapides (qui joue, nombre de questions, ordre, temps, musique), gardés pour chaque quiz."
+   },
+   {
+    "date": "2026-11-07",
+    "texte": "Quiz : séries de bonnes réponses (flamme « 3 de suite », bonus +100 à +300 au choix), grosse remontée en vert au classement, « Tu remontes au 2e rang ! » sur l'iPad. Choix de réponse en couleur (sarcelle, violet, orange, rose) avec leur lettre. Podium : tout le monde visible sous le podium; iPad : visage, médaille et meilleure série. Simulateur : tableau de bord comme les quiz (Panneau d'alarme ou Défi panneau, puis Animer au tableau ou Télécommande)."
+   }
+  ]
+ },
+ {
+  "date": "2026-11-06",
+  "type": "ajout",
+  "livre": "entretien-menager-egi",
+  "titre": "Nouveau livre (en construction) : Entretien ménager d'un bâtiment (EGI)",
+  "texte": "Compétence 436-238 du DEP Entretien général d'immeubles : 15 modules et un formatif, 245 pages. Le livre est en construction : des animations pas à pas s'ajouteront.",
+  "formation": [
+   "Les onglets 1 à 15 et F, à droite des pages, montrent dans quel module tu es.",
+   "Les cartes s'allument une à une : explique-les dans l'ordre; ◂ ▸ passent d'une carte à l'autre.",
+   "✓ affiche les réponses des activités, une à la fois ou toutes."
+  ],
+  "versions": [
+   {
     "date": "2026-11-06",
-    "type": "ajout",
-    "livre": "entretien-menager-egi",
-    "titre": "Nouveau livre (en construction) : Entretien ménager d'un bâtiment (EGI)",
-    "texte": "Compétence 436-238 du DEP Entretien général d'immeubles : 15 modules et un formatif, 245 pages. Le livre est en construction : des animations pas à pas s'ajouteront.",
-    "formation": [
-      "Les onglets 1 à 15 et F, à droite des pages, montrent dans quel module tu es.",
-      "Les cartes s'allument une à une : explique-les dans l'ordre; ◂ ▸ passent d'une carte à l'autre.",
-      "✓ affiche les réponses des activités, une à la fois ou toutes."
-    ],
-    "versions": [
-      {
-        "date": "2026-11-06",
-        "texte": "Version 2 : 245 pages, couverture animée."
-      }
-    ]
-  },
-  {
+    "texte": "Version 2 : 245 pages, couverture animée."
+   }
+  ]
+ },
+ {
+  "date": "2026-11-06",
+  "type": "ajout",
+  "livre": "travaux-mineurs-egi",
+  "titre": "Nouveau livre : Travaux mineurs d'entretien général (EGI)",
+  "texte": "Compétence 436-244 du DEP Entretien général d'immeubles : 12 modules, 38 ateliers dans les maisons d'essai, une page « Avant l'atelier » avant chacun et 12 animations pas à pas.",
+  "formation": [
+   "Chaque atelier a son montage dessiné, avec repères et étapes.",
+   "La page « Avant l'atelier » le précède : notions, erreurs à éviter, sécurité, évaluation.",
+   "Les pages « Animation » montrent un geste étape par étape; ◂ ▸ passent d'une étape à l'autre.",
+   "✓ affiche les réponses, une à la fois ou toutes."
+  ],
+  "versions": [
+   {
     "date": "2026-11-06",
-    "type": "ajout",
-    "livre": "travaux-mineurs-egi",
-    "titre": "Nouveau livre : Travaux mineurs d'entretien général (EGI)",
-    "texte": "Compétence 436-244 du DEP Entretien général d'immeubles : 12 modules, 38 ateliers dans les maisons d'essai, une page « Avant l'atelier » avant chacun et 12 animations pas à pas.",
-    "formation": [
-      "Chaque atelier a son montage dessiné, avec repères et étapes.",
-      "La page « Avant l'atelier » le précède : notions, erreurs à éviter, sécurité, évaluation.",
-      "Les pages « Animation » montrent un geste étape par étape; ◂ ▸ passent d'une étape à l'autre.",
-      "✓ affiche les réponses, une à la fois ou toutes."
-    ],
-    "versions": [
-      {
-        "date": "2026-11-06",
-        "texte": "Version 2 : couverture animée (l'éventail du nuancier s'ouvre)."
-      },
-      {
-        "date": "2026-11-05",
-        "texte": "Version 1 : 275 pages, dont 12 animations."
-      }
-    ]
-  },
-  {
+    "texte": "Version 2 : couverture animée (l'éventail du nuancier s'ouvre)."
+   },
+   {
     "date": "2026-11-05",
-    "type": "ajout",
-    "livre": "lecture-plans-batiments-egi",
-    "titre": "Nouveau livre : Lecture de plans de bâtiments (EGI)",
-    "texte": "Compétence 436-323 du DEP Entretien général d'immeubles : 9 modules (dont architecture et charpente, électricité, mécanique pour l'entretien, sécurité), vues éclatées 3D, 47 animations pas à pas et un formatif final. Tout le livre suit un même bâtiment : le Centre communautaire des Rapides.",
-    "formation": [
-      {
-        "t": "Les pages « Animation » suivent les pages de théorie et montrent la notion étape par étape.",
-        "img": "nouveautes/egi-animation.jpg"
-      },
-      "Les boutons ◂ ▸ sous l'animation passent d'une étape à l'autre; Pause l'arrête pour expliquer.",
-      "Les onglets 1 à 9 et F, à droite des pages, montrent dans quel module tu es.",
-      "✓ affiche les réponses des activités, une à la fois ou toutes. Les exemples en bleu restent visibles.",
-      "Le numéro imprimé en bas de chaque page est celui du livre papier (les animations n'ont pas de numéro)."
-    ],
-    "versions": [
-      {
-        "date": "2026-11-05",
-        "texte": "Version 3 : dessins recadrés partout, détail de la main courante refait, pattes des meubles en 3D corrigées, plus de place pour dessiner (p. 132, 137), gaine en 3D refaite (p. 218)."
-      },
-      {
-        "date": "2026-11-05",
-        "texte": "Version 2 : nouveau bâtiment d'exemple (Centre communautaire des Rapides) dans tout le livre, beaucoup moins de plomberie dans les modules 1 à 5; 293 pages dont 47 animations."
-      },
-      {
-        "date": "2026-11-05",
-        "texte": "Version 1 : 304 pages, dont 51 animations et le formatif final."
-      }
-    ]
-  },
-  {
+    "texte": "Version 1 : 275 pages, dont 12 animations."
+   }
+  ]
+ },
+ {
+  "date": "2026-11-05",
+  "type": "ajout",
+  "livre": "lecture-plans-batiments-egi",
+  "titre": "Nouveau livre : Lecture de plans de bâtiments (EGI)",
+  "texte": "Compétence 436-323 du DEP Entretien général d'immeubles : 9 modules (dont architecture et charpente, électricité, mécanique pour l'entretien, sécurité), vues éclatées 3D, 47 animations pas à pas et un formatif final. Tout le livre suit un même bâtiment : le Centre communautaire des Rapides.",
+  "formation": [
+   {
+    "t": "Les pages « Animation » suivent les pages de théorie et montrent la notion étape par étape.",
+    "img": "nouveautes/egi-animation.jpg"
+   },
+   "Les boutons ◂ ▸ sous l'animation passent d'une étape à l'autre; Pause l'arrête pour expliquer.",
+   "Les onglets 1 à 9 et F, à droite des pages, montrent dans quel module tu es.",
+   "✓ affiche les réponses des activités, une à la fois ou toutes. Les exemples en bleu restent visibles.",
+   "Le numéro imprimé en bas de chaque page est celui du livre papier (les animations n'ont pas de numéro)."
+  ],
+  "versions": [
+   {
     "date": "2026-11-05",
-    "type": "ajout",
-    "livre": "lecture-plans-devis-c6",
-    "titre": "Nouveau livre : Lecture de plans et devis (C6)",
-    "texte": "Compétence 6 du DEP Plomberie et chauffage (307-443) : 8 modules, un formatif final et 47 animations pas à pas (raccords, tuyau d'un étage à l'autre, échelles, devis, estimation).",
-    "formation": [
-      {
-        "t": "Les pages « Animation » suivent les pages de théorie : elles montrent la notion étape par étape.",
-        "img": "nouveautes/c6-animation.jpg"
-      },
-      "Les boutons ◂ ▸ sous l'animation passent d'une étape à l'autre; Pause l'arrête pour expliquer.",
-      "La liste des étapes (encadrée) montre où on en est.",
-      "✓ affiche les réponses des activités, une à la fois ou toutes. Les exemples en bleu restent visibles.",
-      "Le numéro imprimé en bas de chaque page est celui du livre papier (les animations n'ont pas de numéro)."
-    ],
-    "versions": [
-      {
-        "date": "2026-11-05",
-        "texte": "Version 2 : dessins recadrés, animation « Projeter les vues » refaite, cotes corrigées dans deux animations."
-      },
-      {
-        "date": "2026-11-05",
-        "texte": "Version 1 : 325 pages, dont 47 animations et le formatif final."
-      }
-    ]
-  },
-  {
+    "texte": "Version 3 : dessins recadrés partout, détail de la main courante refait, pattes des meubles en 3D corrigées, plus de place pour dessiner (p. 132, 137), gaine en 3D refaite (p. 218)."
+   },
+   {
+    "date": "2026-11-05",
+    "texte": "Version 2 : nouveau bâtiment d'exemple (Centre communautaire des Rapides) dans tout le livre, beaucoup moins de plomberie dans les modules 1 à 5; 293 pages dont 47 animations."
+   },
+   {
+    "date": "2026-11-05",
+    "texte": "Version 1 : 304 pages, dont 51 animations et le formatif final."
+   }
+  ]
+ },
+ {
+  "date": "2026-11-05",
+  "type": "ajout",
+  "livre": "lecture-plans-devis-c6",
+  "titre": "Nouveau livre : Lecture de plans et devis (C6)",
+  "texte": "Compétence 6 du DEP Plomberie et chauffage (307-443) : 8 modules, un formatif final et 47 animations pas à pas (raccords, tuyau d'un étage à l'autre, échelles, devis, estimation).",
+  "formation": [
+   {
+    "t": "Les pages « Animation » suivent les pages de théorie : elles montrent la notion étape par étape.",
+    "img": "nouveautes/c6-animation.jpg"
+   },
+   "Les boutons ◂ ▸ sous l'animation passent d'une étape à l'autre; Pause l'arrête pour expliquer.",
+   "La liste des étapes (encadrée) montre où on en est.",
+   "✓ affiche les réponses des activités, une à la fois ou toutes. Les exemples en bleu restent visibles.",
+   "Le numéro imprimé en bas de chaque page est celui du livre papier (les animations n'ont pas de numéro)."
+  ],
+  "versions": [
+   {
+    "date": "2026-11-05",
+    "texte": "Version 2 : dessins recadrés, animation « Projeter les vues » refaite, cotes corrigées dans deux animations."
+   },
+   {
+    "date": "2026-11-05",
+    "texte": "Version 1 : 325 pages, dont 47 animations et le formatif final."
+   }
+  ]
+ },
+ {
+  "date": "2026-11-03",
+  "type": "outil",
+  "titre": "Activités (cahiers et suivis en PDF)",
+  "texte": "Une section à part pour tes activités en PDF, séparée des livres de compétence. Premier cahier : Montages en circuit fermé.",
+  "formation": [
+   {
+    "t": "Bouton « Activités » en haut, à côté de Plans (après connexion).",
+    "img": "nouveautes/act-btn.jpg"
+   },
+   {
+    "t": "Chaque activité a sa carte : type, compétence, programme, nombre de pages.",
+    "img": "nouveautes/act-act.jpg"
+   },
+   "« Projeter au tableau » l'ouvre dans la visionneuse (zoom, crayon).",
+   "« Imprimer » l'ouvre dans un onglet prêt à imprimer; « Télécharger » garde le PDF."
+  ],
+  "versions": [
+   {
     "date": "2026-11-03",
-    "type": "outil",
-    "titre": "Activités (cahiers et suivis en PDF)",
-    "texte": "Une section à part pour tes activités en PDF, séparée des livres de compétence. Premier cahier : Montages en circuit fermé.",
-    "formation": [
-      {
-        "t": "Bouton « Activités » en haut, à côté de Plans (après connexion).",
-        "img": "nouveautes/act-btn.jpg"
-      },
-      {
-        "t": "Chaque activité a sa carte : type, compétence, programme, nombre de pages.",
-        "img": "nouveautes/act-act.jpg"
-      },
-      "« Projeter au tableau » l'ouvre dans la visionneuse (zoom, crayon).",
-      "« Imprimer » l'ouvre dans un onglet prêt à imprimer; « Télécharger » garde le PDF."
-    ],
-    "versions": [
-      {
-        "date": "2026-11-03",
-        "texte": "Le bouton Retour d'une activité projetée revient à la liste des activités."
-      },
-      {
-        "date": "2026-11-01",
-        "texte": "Nouvelle section Activités avec le cahier Montages en circuit fermé (66 pages)."
-      }
-    ]
-  },
-  {
+    "texte": "Le bouton Retour d'une activité projetée revient à la liste des activités."
+   },
+   {
+    "date": "2026-11-01",
+    "texte": "Nouvelle section Activités avec le cahier Montages en circuit fermé (66 pages)."
+   }
+  ]
+ },
+ {
+  "date": "2026-10-29",
+  "type": "outil",
+  "titre": "Version élève (iPad)",
+  "texte": "Un compte par groupe d'élèves : les livres en lecture, crayon et texte sur les lignes, sans les réponses.",
+  "formation": [
+   {
+    "t": "Ton menu (initiales) → Gérer les accès → « Groupes d'élèves » → + Créer un groupe : nom, mot de passe, programme. Puis « Publier ».",
+    "img": "nouveautes/eleves-groupe.jpg"
+   },
+   "Sur l'iPad : « Se connecter » avec l'identifiant du groupe (ex. egi.groupe.a) et son mot de passe.",
+   {
+    "t": "Côté élève, barre réduite : flèches, page, table des matières et Crayon (crayon, Texte, Annuler). Pas de réponses, de tableau blanc, de plans ni de tableau de bord.",
+    "img": "nouveautes/eleves-barre.jpg"
+   },
+   {
+    "t": "L'élève touche directement le livre, sans outil : sur une ligne ou dans une case d'un tableau, il écrit (en bleu, aligné, la réponse reste dans sa case); sur V, F ou une réponse, elle s'encercle; sur une case ☐, elle se coche. Il retouche sa réponse pour la modifier ou l'enlever.",
+    "img": "nouveautes/eleves-cocher.jpg"
+   },
+   {
+    "t": "Outil Texte : touche une ligne de réponse, la case se place sur la ligne. Entrée = ligne suivante. Ça marche aussi pour toi.",
+    "img": "nouveautes/eleves-ligne.jpg"
+   },
+   "Ce que l'élève écrit reste sur cet iPad. Mot de passe à changer : bouton « Mot de passe » du groupe dans ton panneau."
+  ],
+  "versions": [
+   {
     "date": "2026-10-29",
-    "type": "outil",
-    "titre": "Version élève (iPad)",
-    "texte": "Un compte par groupe d'élèves : les livres en lecture, crayon et texte sur les lignes, sans les réponses.",
-    "formation": [
-      {
-        "t": "Ton menu (initiales) → Gérer les accès → « Groupes d'élèves » → + Créer un groupe : nom, mot de passe, programme. Puis « Publier ».",
-        "img": "nouveautes/eleves-groupe.jpg"
-      },
-      "Sur l'iPad : « Se connecter » avec l'identifiant du groupe (ex. egi.groupe.a) et son mot de passe.",
-      {
-        "t": "Côté élève, barre réduite : flèches, page, table des matières et Crayon (crayon, Texte, Annuler). Pas de réponses, de tableau blanc, de plans ni de tableau de bord.",
-        "img": "nouveautes/eleves-barre.jpg"
-      },
-      {
-        "t": "L'élève touche directement le livre, sans outil : sur une ligne ou dans une case d'un tableau, il écrit (en bleu, aligné, la réponse reste dans sa case); sur V, F ou une réponse, elle s'encercle; sur une case ☐, elle se coche. Il retouche sa réponse pour la modifier ou l'enlever.",
-        "img": "nouveautes/eleves-cocher.jpg"
-      },
-      {
-        "t": "Outil Texte : touche une ligne de réponse, la case se place sur la ligne. Entrée = ligne suivante. Ça marche aussi pour toi.",
-        "img": "nouveautes/eleves-ligne.jpg"
-      },
-      "Ce que l'élève écrit reste sur cet iPad. Mot de passe à changer : bouton « Mot de passe » du groupe dans ton panneau."
-    ],
-    "versions": [
-      {
-        "date": "2026-10-29",
-        "texte": "Administration : le rond se place pile sur la lettre (ou sur Vrai / Faux), jamais sur un titre; deux touchers rapides ne font plus zoomer le livre."
-      },
-      {
-        "date": "2026-10-29",
-        "texte": "Testé dans les 8 livres : texte toujours sur la bonne ligne, Administration (pages en image) répond aussi aux touchers, simulateurs et animations des livres restent cliquables."
-      },
-      {
-        "date": "2026-10-29",
-        "texte": "Tableaux à remplir : la réponse s'écrit dans la bonne case et rapetisse au besoin pour y rester."
-      },
-      {
-        "date": "2026-10-29",
-        "texte": "Réponses directement dans le livre : toucher une ligne pour écrire, une case pour la cocher, V/F ou un choix pour l'encercler (sans choisir d'outil)."
-      }
-    ],
-    "cache": true
-  },
-  {
+    "texte": "Administration : le rond se place pile sur la lettre (ou sur Vrai / Faux), jamais sur un titre; deux touchers rapides ne font plus zoomer le livre."
+   },
+   {
+    "date": "2026-10-29",
+    "texte": "Testé dans les 8 livres : texte toujours sur la bonne ligne, Administration (pages en image) répond aussi aux touchers, simulateurs et animations des livres restent cliquables."
+   },
+   {
+    "date": "2026-10-29",
+    "texte": "Tableaux à remplir : la réponse s'écrit dans la bonne case et rapetisse au besoin pour y rester."
+   },
+   {
+    "date": "2026-10-29",
+    "texte": "Réponses directement dans le livre : toucher une ligne pour écrire, une case pour la cocher, V/F ou un choix pour l'encercler (sans choisir d'outil)."
+   }
+  ],
+  "cache": true
+ },
+ {
+  "date": "2026-11-06",
+  "type": "ajout",
+  "livre": "notions-energie-c13",
+  "titre": "Notions d'énergie (PLC13, C13 Plomberie)",
+  "texte": "Cahier du DEP 5333 (compétence 13, 307-513, 45 heures) : 113 pages, 7 modules, de la source d'énergie jusqu'au confort du client. Version animée : les courants d'air et de chaleur bougent dans les images.",
+  "formation": [
+   {
+    "t": "Dans la rangée « DEP 5333 · Plomberie et chauffage », touche la couverture « Notions d'énergie », puis « Lire ».",
+    "img": "nouveautes/livre-energie.jpg"
+   },
+   "Le menu ☰ mène aux 7 modules : sources d'énergie, pertes et gains, compenser les pertes, systèmes de chauffage, brûleurs à l'huile, économiser l'énergie, présenter à un client.",
+   "Dans les images, la lumière glisse le long des courants : l'air chaud monte, l'air froid descend ou entre. Bouton Pause pour figer.",
+   "Le bouton ✓ montre le corrigé : réponse par réponse avec →, ou toutes d'un coup.",
+   "La recherche en haut trouve aussi les mots de ce livre (ex. « degrés-jours », « thermopompe »)."
+  ],
+  "versions": [
+   {
     "date": "2026-11-06",
-    "type": "ajout",
-    "livre": "notions-energie-c13",
-    "titre": "Notions d'énergie (PLC13, C13 Plomberie)",
-    "texte": "Cahier du DEP 5333 (compétence 13, 307-513, 45 heures) : 113 pages, 7 modules, de la source d'énergie jusqu'au confort du client. Version animée : les courants d'air et de chaleur bougent dans les images.",
-    "formation": [
-      {
-        "t": "Dans la rangée « DEP 5333 · Plomberie et chauffage », touche la couverture « Notions d'énergie », puis « Lire ».",
-        "img": "nouveautes/livre-energie.jpg"
-      },
-      "Le menu ☰ mène aux 7 modules : sources d'énergie, pertes et gains, compenser les pertes, systèmes de chauffage, brûleurs à l'huile, économiser l'énergie, présenter à un client.",
-      "Dans les images, la lumière glisse le long des courants : l'air chaud monte, l'air froid descend ou entre. Bouton Pause pour figer.",
-      "Le bouton ✓ montre le corrigé : réponse par réponse avec →, ou toutes d'un coup.",
-      "La recherche en haut trouve aussi les mots de ce livre (ex. « degrés-jours », « thermopompe »)."
-    ],
-    "versions": [
-      {
-        "date": "2026-11-06",
-        "texte": "Version 95 animée : 113 pages en vraies pages (texte cherchable, corrigé pas à pas), nouvelles images réalistes partout, couverture et courants d'air animés."
-      },
-      {
-        "date": "2026-11-04",
-        "texte": "Version 44 : nouvelle couverture, pages plus aérées, données du Code de construction mises à jour (CNB 2020 et CNÉB 2020 modifiés Québec)."
-      },
-      {
-        "date": "2026-11-04",
-        "texte": "Version 40 : 109 pages, nouveau module 5 (brûleurs à l'huile et accessoires), bâtiments commerciaux, fiche technique en anglais, atelier de communication, lexique français-anglais."
-      },
-      {
-        "date": "2026-10-31",
-        "texte": "Version 37 : figures refaites aux pages 5 (énergie et puissance), 19, 21, 22 (où va la chaleur) et 26."
-      }
-    ]
-  },
-  {
-    "date": "2026-11-03",
-    "type": "outil",
-    "titre": "La bibliothèque : recherche, hors ligne et cellulaire",
-    "texte": "Recherche dans tous les livres, filtre par programme, code QR pour les élèves, fonctionne sans Internet et sur cellulaire.",
-    "formation": [
-      {
-        "t": "Bouton lune / soleil en haut (cellulaire : Plus → Accueil clair) : accueil foncé ou clair (au départ : comme l'ordinateur, réglable dans Mes préférences); les fenêtres (fiche du livre, connexion, préférences, Quoi de neuf, aide) suivent le choix. Chaque ordinateur se souvient du choix.",
-        "img": "nouveautes/accueil-clair.jpg"
-      },
-      "Livres avec un cadenas : « Se connecter » en haut (identifiant prenom.nom + mot de passe). Pas de compte ? « Demander un accès ». Mot de passe perdu ? « Mot de passe oublié ? ». La demande arrive directement à Jeremy.",
-      {
-        "t": "Une fois connecté, touche tes initiales → « Mes préférences » : ta couleur, accueil clair ou foncé, « Bonjour », tes livres au départ, reprendre la page, fond et crayon du tableau blanc (si ton tableau a déjà un dessin, il est gardé et un tableau vide s'ouvre avec ton fond).",
-        "img": "nouveautes/mes-preferences.jpg"
-      },
-      {
-        "t": "Tape un mot dans la recherche (ou appuie sur la touche /) : les pages qui en parlent s'affichent; clique pour ouvrir le livre à cette page.",
-        "img": "nouveautes/recherche.jpg"
-      },
-      {
-        "t": "Boutons DEP 5211 et DEP 5333 : seulement les livres de ce programme.",
-        "img": "nouveautes/filtre.jpg"
-      },
-      {
-        "t": "Dans un livre, bouton QR (touche Q) : les élèves scannent et arrivent à la même page.",
-        "img": "nouveautes/livre-qr.jpg"
-      },
-      {
-        "t": "Une fois connecté : boutons « Tableau blanc », « Plans » et « Accueil de classe » en haut (cachés avant la connexion).",
-        "img": "nouveautes/bouton-tableau-blanc.jpg"
-      },
-      "Un livre ouvert une fois avec Internet s'ouvre ensuite sans Internet. Si une vieille version reste affichée : Ctrl+F5.",
-      {
-        "t": "Sur cellulaire : onglets en bas, balaie pour tourner les pages.",
-        "img": "nouveautes/tel-livre.jpg"
-      }
-    ],
-    "versions": [
-      {
-        "date": "2026-11-07",
-        "texte": "Cinq livres (Micro-ordinateur, Communiquer, C9, Plomberie et chauffage, Ventilation) utilisent maintenant la même base que les nouveaux : mêmes boutons, table des matières et réponses une à une. Leurs animations sont gardées."
-      },
-      {
-        "date": "2026-11-07",
-        "texte": "Zoom plus fluide : le livre s'agrandit comme une photo, sans saut à la fin. Pincement à deux doigts plus sensible, aussi en double page. Tes livres se téléchargent tout seuls sur l'appareil après la connexion (pas sur données cellulaires)."
-      },
-      {
-        "date": "2026-11-06",
-        "texte": "Accueil : flèches ‹ › douces, rangée « Continuer » en bas. Écran tactile : pincer avec deux doigts zoome le tableau blanc et les livres. Mode léger : si l'appareil est lent (tableau interactif), le site coupe les flous et les transitions tout seul (Mes préférences → Animations). Un livre s'ouvre maintenant en plein écran (réglable dans Mes préférences)."
-      },
-      {
-        "date": "2026-11-03",
-        "texte": "Mes préférences : ta couleur change aussi le « A » du logo du Pavillon, partout sur le site."
-      },
-      {
-        "date": "2026-10-30",
-        "texte": "Accueil foncé ou clair : au départ, comme le réglage de l'ordinateur; les fenêtres suivent maintenant le choix (fiche du livre, bienvenue, connexion, préférences, accès, Quoi de neuf, aide, menu Plus). Logo du Pavillon en blanc refait proprement."
-      },
-      {
-        "date": "2026-10-29",
-        "texte": "« Mes préférences » pour chaque prof (couleur, accueil, livres au départ, reprise de la page, tableau blanc). Fenêtres de connexion et de demande refaites (logo, programmes en cartes avec leur logo, crochet vert animé à l'envoi). Connexion : « Bonjour » animé; cadenas qui bouge sur un livre verrouillé; cloche sur les initiales de l'admin quand une demande attend. Plans, Accueil de classe et Tableau blanc : seulement après la connexion; accueil 10 % plus petit sur ordinateur."
-      },
-      {
-        "date": "2026-10-29",
-        "texte": "Comptes enseignants : demandes envoyées directement à Jeremy, accès par programme (EGI / Plomberie), « Mot de passe oublié ? ». Panneau des accès : une fiche par enseignant (lisible même avec beaucoup de livres); une demande ignorée ne revient plus."
-      }
-    ]
-  },
-  {
-    "date": "2026-10-29",
-    "type": "maj",
-    "livre": "administration-batiment",
-    "titre": "Administration d'un bâtiment et plan d'urgence",
-    "texte": "Version 3 : nouvelle couverture. 146 pages, 13 chapitres (compétence 16).",
-    "formation": [
-      "Dans la bibliothèque, clique la couverture, puis « Lire » (ou « Ouvrir le livre » ci-dessus).",
-      "Flèches ← → (ou les boutons en bas) pour tourner les pages; tape un numéro dans la case pour sauter à une page.",
-      {
-        "t": "Touche M (ou le bouton ☰) : table des matières, avec une icône par type de section.",
-        "img": "nouveautes/livre-tdm.jpg"
-      }
-    ],
-    "versions": [
-      {
-        "date": "2026-10-29",
-        "texte": "Version 3 : nouvelle couverture."
-      },
-      {
-        "date": "2026-10-21",
-        "texte": "Nouveau livre de la compétence 16 : 146 pages, 13 chapitres."
-      }
-    ]
-  },
-  {
-    "date": "2026-10-29",
-    "type": "maj",
-    "livre": "protection-incendie",
-    "titre": "Protection incendie",
-    "texte": "Nouvelle couverture (flamme et alarme). 104 pages, corrigé intégré (bouton ✓) et simulateur de panneau d'alarme.",
-    "formation": [
-      "Dans la bibliothèque, clique la couverture, puis « Lire » (ou « Ouvrir le livre » ci-dessus).",
-      "Flèches ← → (ou les boutons en bas) pour tourner les pages; tape un numéro dans la case pour sauter à une page.",
-      {
-        "t": "Touche M (ou le bouton ☰) : table des matières, avec une icône par type de section.",
-        "img": "nouveautes/livre-tdm.jpg"
-      }
-    ],
-    "versions": [
-      {
-        "date": "2026-10-29",
-        "texte": "Nouvelle couverture (flamme et alarme)."
-      },
-      {
-        "date": "2026-10-21",
-        "texte": "Nouvelle version : 104 pages, corrigé intégré et simulateur de panneau d'alarme."
-      }
-    ]
-  },
-  {
-    "date": "2026-11-07",
-    "type": "outil",
-    "titre": "Lecture des livres",
-    "texte": "Même barre et mêmes réponses pas à pas dans tous les livres. Nouvelle table des matières à droite : recherche dans le livre, Animations, Exercices.",
-    "formation": [
-      {
-        "t": "Touche M (ou ☰) : la table des matières s'ouvre à droite, le livre reste visible. « Tu es ici » montre le module en cours.",
-        "img": "nouveautes/livre-tdm.jpg"
-      },
-      "Écris un mot dans « Chercher dans ce livre » pour trouver toutes les pages qui en parlent. Les boutons Animations et Exercices les listent.",
-      {
-        "t": "Bouton ✓ (touche R) : chaque clic montre la réponse suivante de la page (grisé = pas de réponse).",
-        "img": "nouveautes/livre-barre.jpg"
-      },
-      "Tiens › enfoncé pour avancer vite dans les pages.",
-      "Roulette = zoom sous la souris; une fois zoomé, glisse la page (ou garde la roulette enfoncée) pour te déplacer."
-    ],
-    "versions": [
-      {
-        "date": "2026-11-07",
-        "texte": "Table des matières refaite : panneau à droite, recherche dans le livre, listes Animations et Exercices, « Tu es ici »."
-      },
-      {
-        "date": "2026-11-03",
-        "texte": "Roulette : elle zoome toujours, même avec le crayon et sur la page de droite en double page (plus de page qui descend), plus fluide dans les livres et le tableau blanc; aucune page ne se tourne pendant le zoom; roulette enfoncée pour déplacer la page : plus de défilement automatique."
-      },
-      {
-        "date": "2026-10-29",
-        "texte": "L'avis « Reprendre à la page… » est plus petit et discret."
-      },
-      {
-        "date": "2026-10-28",
-        "texte": "Roulette enfoncée : déplace la page zoomée. Petit jeu élastique au-delà des bords quand on glisse (la page revient en place)."
-      }
-    ]
-  },
-  {
-    "date": "2026-10-29",
-    "type": "maj",
-    "livre": "dispositifs-electriques-c9",
-    "titre": "Dispositifs électriques et électroniques (C9)",
-    "texte": "Nouvelle version du cahier : 324 pages (50 de plus).",
-    "formation": [
-      "Ouvre le livre depuis l'accueil (DEP 5333 · Compétence 9) : le badge « Mis à jour » s'affiche 30 jours.",
-      "La table des matières (touche M) et les réponses (✓) fonctionnent comme avant."
-    ],
-    "versions": [
-      {
-        "date": "2026-10-29",
-        "texte": "Version 6 du cahier (324 pages)."
-      }
-    ]
-  },
-  {
-    "date": "2026-11-03",
-    "type": "outil",
-    "titre": "Tableau blanc : les outils",
-    "texte": "Une seule ligne d'outils : crayon, texte, objets, gomme, annuler, fond. Tout est gardé tout seul sur l'ordinateur.",
-    "formation": [
-      {
-        "t": "La barre : crayon, texte, objets (le cube), gomme, annuler, fond. ⋯ Plus : rétablir, tout effacer, zoom, tableaux précédent / suivant / nouveau / supprimer (toucher deux fois), Mes schémas, enregistrer en PNG.",
-        "img": "nouveautes/barre.jpg"
-      },
-      {
-        "t": "Crayon : un toucher l'active et ouvre son menu : couleurs (ronds), autre couleur (+), surligneurs (carrés), tracé (libre, ligne, flèche, rectangle, ellipse) et épaisseur. Touche-le encore pour l'éteindre.",
-        "img": "nouveautes/barre-couleur.jpg"
-      },
-      "Sans outil choisi : touche une forme, un objet ou un texte pour le choisir, glisse-le pour le déplacer, double-clic pour le modifier, Suppr pour l'effacer.",
-      "Texte : touche le tableau et écris (Entrée = nouvelle ligne). Toucher dans le vide termine le texte et range l'outil Texte. Échap annule.",
-      "Gomme : la fenêtre de taille reste ouverte et un cercle montre ce qui sera effacé. Touche la gomme encore pour la ranger (aucun outil, pas de retour au crayon).",
-      {
-        "t": "Plusieurs à la fois : sans outil choisi, glisse dans le vide pour tracer un cadre (avec un outil : Ctrl + glisser). Le groupe se déplace, change de couleur ou s'efface ensemble. Ctrl+C / Ctrl+V / Ctrl+D pour copier, coller, dupliquer.",
-        "img": "nouveautes/selection-multiple.jpg"
-      },
-      {
-        "t": "Chaque fond garde son propre dessin. En changeant de fond, un petit avis offre « Apporter ici » pour transporter le dessin.",
-        "img": "nouveautes/fond-dessin.jpg"
-      },
-      {
-        "t": "« Mes modèles » (en haut de la palette Objets, dans tous les onglets : Formes, Iso, Électricité, Plomberie) : donne un nom au tableau pour l'enregistrer, le rouvrir plus tard ou l'exporter vers un collègue.",
-        "img": "nouveautes/sch-miens.jpg"
-      }
-    ],
-    "versions": [
-      {
-        "date": "2026-11-03",
-        "texte": "Le tableau blanc s'ouvre toujours dézoomé (tout le tableau visible)."
-      },
-      {
-        "date": "2026-11-03",
-        "texte": "Palette Objets : les explications (en bas de la palette et dans le message du haut) sont plus courtes."
-      },
-      {
-        "date": "2026-10-29",
-        "texte": "⋯ Plus → Tableaux : bouton « Supprimer » pour enlever le tableau affiché (toucher deux fois)."
-      },
-      {
-        "date": "2026-10-29",
-        "texte": "Menu du crayon plus compact (3 lignes, sans les mots) et nouveau bouton « Autre couleur » qui montre ta dernière couleur choisie."
-      }
-    ]
-  },
-  {
-    "date": "2026-10-29",
-    "type": "outil",
-    "titre": "Tableau blanc : formes, cotes et textes",
-    "texte": "Couleur, cotes et textes sur les côtés, partout : formes, lignes, tuyaux iso, objets iso et symboles électriques.",
-    "formation": [
-      {
-        "t": "Objets (le cube), onglet Formes : choisis une forme et glisse sur le tableau. Un clic seul pose une forme de taille normale.",
-        "img": "nouveautes/objets-formes.jpg"
-      },
-      {
-        "t": "Pour changer sa taille : touche la forme, puis tire un des carrés blancs.",
-        "img": "nouveautes/formes-poignees.jpg"
-      },
-      {
-        "t": "Double-clic sur une forme, une ligne, un tuyau iso, un objet iso ou un symbole électrique : sa couleur, la taille du texte, « + Texte sur un côté » et « + Cote ».",
-        "img": "nouveautes/forme-couleur.jpg"
-      },
-      {
-        "t": "Après « + Texte sur un côté » ou « + Cote », les côtés libres s'allument : touche celui que tu veux.",
-        "img": "nouveautes/cote-cote.jpg"
-      },
-      "Flèche : double-clic, puis écris le texte où la flèche commence et où elle pointe (ex. « Eau froide » → « Robinet »).",
-      "Plusieurs bouts de tuyau : choisis-les avec Ctrl + cadre, puis double-clic sur l'un d'eux. Une case offre la couleur, « + Texte sur ce tronçon » ou « + Cote » d'un bout à l'autre.",
-      {
-        "t": "Sur le plan isométrique, la cote suit les axes de la grille et donne la longueur en pas (ex. 6 carr.). Sur un tuyau dessiné au crayon, chaque tronçon droit se cote d'un coin à l'autre; sur un objet, d'un raccord à l'autre.",
-        "img": "nouveautes/iso-cotes.jpg"
-      },
-      "Les cotes et les textes vont avec leur forme ou leur objet : même couleur, ils suivent quand tu la déplaces ou l'agrandis, ils sont copiés et effacés avec elle.",
-      "Touche une cote ou un texte de côté, puis tire son carré bleu pour le placer où tu veux, même collé à la forme. Double-clic : ⟲ / ⟳ font pivoter le texte, « Auto » le remet droit."
-    ],
-    "versions": [
-      {
-        "date": "2026-10-29",
-        "texte": "Sur le plan iso : le texte des formes reste à plat; seuls les objets et tuyaux iso ont le texte dans l'angle."
-      },
-      {
-        "date": "2026-10-28",
-        "texte": "Objets iso : côtés pris sur la forme entière (pompe, vannes, vase d'expansion), textes plus près de l'objet."
-      },
-      {
-        "date": "2026-10-28",
-        "texte": "Objets iso : textes et cotes aussi sur les deux arêtes du haut."
-      },
-      {
-        "date": "2026-10-28",
-        "texte": "Double-clic sur plusieurs lignes choisies : une case (couleur, texte, cote) au lieu d'une cote ajoutée toute seule."
-      }
-    ]
-  },
-  {
-    "date": "2026-11-03",
-    "type": "outil",
-    "titre": "Tableau blanc : plan isométrique",
-    "texte": "Catalogue de plomberie et chauffage en 3D sur la grille iso : objets qui se branchent, se mettent debout, et tuyaux toujours droits.",
-    "formation": [
-      {
-        "t": "Objets (le cube), onglet Iso : le fond passe au plan isométrique. Glisse une vanne ou une pompe sur un tuyau : elle s'y branche toute seule.",
-        "img": "nouveautes/glisser-brancher.jpg"
-      },
-      {
-        "t": "« Mes modèles » → « Modèles prêts à utiliser » → catégorie « Plan isométrique » : du plus simple (pompe avec vannes, radiateur) au plus complet (boucle avec plinthes, chauffage sur 2 étages avec vannes de zone, plancher radiant avec collecteur 4 boucles).",
-        "img": "nouveautes/modele-iso.jpg"
-      },
-      {
-        "t": "Le crayon suit les lignes de la grille : la ligne avance avec ta main et s'accroche à la grille quand tu lâches. Trompé ? Reviens sur ta ligne sans lâcher : elle s'efface.",
-        "img": "nouveautes/iso-crayon.jpg"
-      },
-      {
-        "t": "Objet choisi : « ⟳ Pivoter » le tourne, « ↕ Debout » le met sur un tuyau vertical (volant à gauche, puis à droite, puis couché).",
-        "img": "nouveautes/iso-debout.jpg"
-      },
-      {
-        "t": "Déplace un objet branché : ses tuyaux se refont droits, avec des coudes à 90°.",
-        "img": "nouveautes/iso-deplacer.jpg"
-      }
-    ],
-    "versions": [
-      {
-        "date": "2026-11-03",
-        "texte": "Crayon iso plus réactif : la ligne suit ta main pendant le trait et s'accroche à la grille au relâchement; les virages se détectent plus tôt, même sur des côtés d'un seul pas (petit cube 1×1)."
-      },
-      {
-        "date": "2026-10-29",
-        "texte": "Crayon iso : la ligne suit ce que tu dessines (plus de petits détours ni de coins ajoutés quand la main tremble ou dérive). Revenir sur ta ligne sans lâcher l'efface."
-      },
-      {
-        "date": "2026-10-29",
-        "texte": "Deux modèles iso plus complets : chauffage sur 2 étages avec vannes de zone, plancher radiant avec collecteur."
-      },
-      {
-        "date": "2026-10-29",
-        "texte": "Modèles prêts à utiliser en iso; modèles classés par catégorie (repliées au départ)."
-      }
-    ]
-  },
-  {
-    "date": "2026-11-03",
-    "type": "outil",
-    "titre": "Tableau blanc : plomberie en coupe",
-    "texte": "Une maison en coupe avec ses tuyaux (EF, EC, drain, évent, gaz) et ses appareils à l'échelle.",
-    "formation": [
-      {
-        "t": "Objets (le cube), onglet Plomberie : touche « Maison en coupe » puis clique sur le tableau.",
-        "img": "nouveautes/plomberie-coupe.jpg"
-      },
-      "Touche un appareil puis clique dans la maison : il se pose à l'échelle sur le plancher.",
-      "Trace un tuyau près d'un point de raccord (bleu EF, rouge EC, vert drain) : il s'y branche. Double-clic sur un tuyau pour écrire son diamètre."
-    ],
-    "versions": [
-      {
-        "date": "2026-11-03",
-        "texte": "Plomberie : on peut glisser la maison, les appareils et les raccords de la palette jusqu'au tableau."
-      },
-      {
-        "date": "2026-10-28",
-        "texte": "Maison en coupe détaillée, appareils à l'échelle posés sur le plancher, tuyaux branchés aux bons raccords."
-      },
-      {
-        "date": "2026-10-28",
-        "texte": "La plomberie a son propre onglet en haut de la palette."
-      }
-    ]
-  },
-  {
-    "date": "2026-10-28",
-    "type": "outil",
-    "titre": "Tableau blanc : schéma électrique en échelle",
-    "texte": "Dessine et anime des schémas en échelle sur le quadrillé, avec des modèles prêts et un exercice « Trouve la panne ».",
-    "formation": [
-      {
-        "t": "Objets (le cube), onglet Électricité : le fond passe au quadrillé. « Échelle L1/L2 » trace les rails.",
-        "img": "nouveautes/elec-echelle.jpg"
-      },
-      {
-        "t": "Glisse un symbole sur un fil : il s'y branche. « Relais complet » pose la bobine et ses contacts NO et NF.",
-        "img": "nouveautes/elec-relais.jpg"
-      },
-      {
-        "t": "Pour relier : glisse d'un point bleu à l'autre, ou pars du milieu d'un fil pour faire une jonction.",
-        "img": "nouveautes/elec-relier.jpg"
-      },
-      {
-        "t": "▶ Animer : garde un bouton enfoncé, clique un interrupteur. Rouge = L1, bleu = L2, points jaunes = courant.",
-        "img": "nouveautes/elec-animer.jpg"
-      },
-      {
-        "t": "Modèles : un circuit prêt à utiliser (marche-arrêt, chauffage 24 V, pompe de puisard…).",
-        "img": "nouveautes/sch-modeles.jpg"
-      },
-      {
-        "t": "Trouve la panne : une panne est cachée dans le circuit; « Révéler » la montre, « Réparer » remet tout en état.",
-        "img": "nouveautes/panne-revelee.jpg"
-      }
-    ],
-    "versions": [
-      {
-        "date": "2026-10-28",
-        "texte": "Animation corrigée : les lampes ne s'allument plus à travers un interrupteur ouvert."
-      },
-      {
-        "date": "2026-10-28",
-        "texte": "Choisir un symbole est de nouveau facile, même avec l'outil Fil."
-      },
-      {
-        "date": "2026-10-28",
-        "texte": "Un nouveau fil peut partir du milieu d'un fil existant (jonction automatique)."
-      }
-    ]
-  },
-  {
-    "date": "2026-11-03",
-    "type": "outil",
-    "titre": "Plans techniques",
-    "texte": "Cinq dossiers de plans d'exercice très complets, avec meubles, plafonds, code, bilan électrique, plomberie, gros plans de mécanique, exercices, corrigés et fiches de montage.",
-    "formation": [
-      {
-        "t": "Bouton « Plans » en haut de la bibliothèque : choisis un dossier d'exercice (une vue de la façade du bâtiment est affichée) ou ouvre ton propre plan (PDF ou image).",
-        "img": "nouveautes/plans.jpg"
-      },
-      {
-        "t": "Dossier 1 : maison contemporaine à deux toits décalés, deux étages et sous-sol.",
-        "img": "nouveautes/plans-maison-moderne.jpg"
-      },
-      {
-        "t": "Dossier 4 : centre commercial sur un terrain en pente (nivellement, drainage, profils).",
-        "img": "nouveautes/plans-d4.jpg"
-      },
-      "Dossier 2 : duplex jumelé à toit à quatre versants, pierre et bois, fenêtres noires et auvents d'entrée.",
-      "Chaque dossier de bâtiment contient aussi des gros plans (feuilles M-xxx et P-3xx) : chaque pièce est nommée par une flèche et décrite dans une nomenclature; M-001 donne les symboles de robinetterie.",
-      "Sous « Exercices de mesure à l'échelle » : des mesures à faire avec l'échelimètre (largeur d'un local, hauteur d'un niveau, marge de terrain…). Imprime à 100 % et vérifie le trait de 100 mm.",
-      "Dossier 5 : ferme laitière moderne (étable à stabulation libre, robots de traite, racleurs et repousse-fourrage automatiques, enclos libres).",
-      "Chaque dossier contient : légende, plan de toiture, plans de plafond, analyse du code, tableau des locaux et des finis, détails de construction, bilan électrique et dimensionnement de la plomberie. Les pièces sont meublées et leurs dimensions inscrites.",
-      "Sous les dossiers, « Exercices de lecture de plans » : questions à imprimer pour tes élèves, corrigé, et pour le dossier 6 des fiches de montage.",
-      "« Tous les plans » (ou Échap) ramène à la liste des dossiers."
-    ],
-    "versions": [
-      {
-        "date": "2026-11-03",
-        "texte": "Un seul questionnaire par plan : lecture de plans et mesure à l'échelimètre sont réunies (5 questionnaires au lieu de 10), avec corrigé, dans Plans et dans Activités."
-      },
-      {
-        "date": "2026-11-03",
-        "texte": "Questionnaires refaits : bandeau de couleur par plan, images tirées des plans, types de questions variés (choix multiple, vrai ou faux, calculs…) et construction différente pour chacun des 5 dossiers. Ils sont aussi dans l'onglet Activités (filtre « Plan »), avec leur corrigé."
-      },
-      {
-        "date": "2026-11-03",
-        "texte": "Toutes les échelles des plans sont maintenant lues par l'échelimètre métrique (1:20 à 1:1000), avec un trait de contrôle de 100 mm sur chaque feuille. Nouveaux exercices de mesure à l'échelle, différents pour chaque dossier, avec corrigé."
-      },
-      {
-        "date": "2026-11-03",
-        "texte": "Dossier 5 (ferme) : détails des abreuvoirs à niveau constant (coupes, plan, flotteur, vidange, chauffage antigel, mise à la terre) et schéma d'alimentation en eau des 6 abreuvoirs."
-      }
-    ]
-  },
-  {
+    "texte": "Version 95 animée : 113 pages en vraies pages (texte cherchable, corrigé pas à pas), nouvelles images réalistes partout, couverture et courants d'air animés."
+   },
+   {
     "date": "2026-11-04",
-    "type": "outil",
-    "titre": "Accueil de classe",
-    "texte": "Tableau d'accueil animé pour le début de période : date, déroulement, temps avant la pause, la matière en cours avec un petit rappel, un contenu à ouvrir pour chaque activité, et un fond vivant qui suit la période.",
-    "formation": [
-      {
-        "t": "Bouton « Accueil de classe » en haut de la bibliothèque.",
-        "img": "nouveautes/accueil.jpg"
-      },
-      {
-        "t": "« Préparer le cours » : la période, la compétence et le déroulement. À l'étape 5, « ＋ Ajouter » lie un livre, un schéma, un plan, une vidéo, un site ou un fichier à une activité.",
-        "img": "nouveautes/tdb-prep.jpg"
-      },
-      {
-        "t": "Étape 1 « Pour quand? » : le jour, Matin ou Après-midi, la durée (période complète, 1 h, 2 h…) et l'heure du début. Un cours préparé d'avance s'affiche tout seul à son moment. Point vert = déjà préparé. « Aperçu du cours » montre le tableau tel que les élèves le verront (avant, début, milieu, fin), sans rien changer.",
-        "img": "nouveautes/tdb-autre-jour.jpg"
-      },
-      {
-        "t": "En classe, « ▶ Ouvrir » (ou touche O) ouvre le contenu de l'activité en cours.",
-        "img": "nouveautes/tdb-carte.jpg"
-      },
-      {
-        "t": "La pastille « En cours » montre la matière de la période. Pendant le cours, un petit « Rappel » apparaît 15 secondes environ toutes les 9 minutes, avec une idée en lien avec la matière. Touche-le pour le fermer.",
-        "img": "nouveautes/tdb-matiere.jpg"
-      },
-      {
-        "t": "Dans un livre, « Tableau de bord » (touche E) y retourne; « Revenir au livre » (touche L) te remet à la même page.",
-        "img": "nouveautes/tdb-retour.jpg"
-      },
-      {
-        "t": "Le fond vit avec la période : plus calme à la pause, plus vif les 5 dernières minutes, petites surprises de temps en temps. Carte « Bienvenue » 5 minutes avant le cours. Plus → Réglages → « Fond animé » : Comme l'ordinateur, Toujours ou Jamais.",
-        "img": "nouveautes/tdb-bienvenue.jpg"
-      },
-      "Jour d'examen : coche « Examen aujourd'hui » (pas de pauses). « Plein écran » une seule fois au début : il reste actif entre le tableau de bord et les livres."
-    ],
-    "versions": [
-      {
-        "date": "2026-11-04",
-        "texte": "Ligne du temps plus grosse (texte de même taille partout) pour bien la voir du fond de la classe; la ligne « Au programme » est retirée."
-      },
-      {
-        "date": "2026-11-04",
-        "texte": "Lueur au bas de l'écran qui monte pendant le cours et passe au cuivre pendant les pauses et les 5 dernières minutes d'un bloc. Plus de halo autour des chiffres de l'heure."
-      },
-      {
-        "date": "2026-11-04",
-        "texte": "Ligne du temps refaite : coche verte sur les blocs finis, heure en bas de chaque bloc, barre de progression dans le bloc en cours et repère « maintenant » avec l'heure."
-      },
-      {
-        "date": "2026-11-04",
-        "texte": "Look plus technique : chiffres lumineux, repères de coins et fine barre de progression de la période."
-      }
-    ]
-  },
-  {
+    "texte": "Version 44 : nouvelle couverture, pages plus aérées, données du Code de construction mises à jour (CNB 2020 et CNÉB 2020 modifiés Québec)."
+   },
+   {
+    "date": "2026-11-04",
+    "texte": "Version 40 : 109 pages, nouveau module 5 (brûleurs à l'huile et accessoires), bâtiments commerciaux, fiche technique en anglais, atelier de communication, lexique français-anglais."
+   },
+   {
+    "date": "2026-10-31",
+    "texte": "Version 37 : figures refaites aux pages 5 (énergie et puissance), 19, 21, 22 (où va la chaleur) et 26."
+   }
+  ]
+ },
+ {
+  "date": "2026-11-03",
+  "type": "outil",
+  "titre": "La bibliothèque : recherche, hors ligne et cellulaire",
+  "texte": "Recherche dans tous les livres, filtre par programme, code QR pour les élèves, fonctionne sans Internet et sur cellulaire.",
+  "formation": [
+   {
+    "t": "Bouton lune / soleil en haut (cellulaire : Plus → Accueil clair) : accueil foncé ou clair (au départ : comme l'ordinateur, réglable dans Mes préférences); les fenêtres (fiche du livre, connexion, préférences, Quoi de neuf, aide) suivent le choix. Chaque ordinateur se souvient du choix.",
+    "img": "nouveautes/accueil-clair.jpg"
+   },
+   "Livres avec un cadenas : « Se connecter » en haut (identifiant prenom.nom + mot de passe). Pas de compte ? « Demander un accès ». Mot de passe perdu ? « Mot de passe oublié ? ». La demande arrive directement à Jeremy.",
+   {
+    "t": "Une fois connecté, touche tes initiales → « Mes préférences » : ta couleur, accueil clair ou foncé, « Bonjour », tes livres au départ, reprendre la page, fond et crayon du tableau blanc (si ton tableau a déjà un dessin, il est gardé et un tableau vide s'ouvre avec ton fond).",
+    "img": "nouveautes/mes-preferences.jpg"
+   },
+   {
+    "t": "Tape un mot dans la recherche (ou appuie sur la touche /) : les pages qui en parlent s'affichent; clique pour ouvrir le livre à cette page.",
+    "img": "nouveautes/recherche.jpg"
+   },
+   {
+    "t": "Boutons DEP 5211 et DEP 5333 : seulement les livres de ce programme.",
+    "img": "nouveautes/filtre.jpg"
+   },
+   {
+    "t": "Dans un livre, bouton QR (touche Q) : les élèves scannent et arrivent à la même page.",
+    "img": "nouveautes/livre-qr.jpg"
+   },
+   {
+    "t": "Une fois connecté : boutons « Tableau blanc », « Plans » et « Accueil de classe » en haut (cachés avant la connexion).",
+    "img": "nouveautes/bouton-tableau-blanc.jpg"
+   },
+   "Un livre ouvert une fois avec Internet s'ouvre ensuite sans Internet. Si une vieille version reste affichée : Ctrl+F5.",
+   {
+    "t": "Sur cellulaire : onglets en bas, balaie pour tourner les pages.",
+    "img": "nouveautes/tel-livre.jpg"
+   }
+  ],
+  "versions": [
+   {
     "date": "2026-11-07",
-    "type": "ajout",
-    "livre": "materiel-electrique-c13",
-    "titre": "Entretien de matériel électrique (en construction)",
-    "texte": "Nouveau cahier du DEP 5211 (compétence 13, 436-274, 60 heures) : 166 pages, 10 modules, de l'électricité du barrage à la maison jusqu'aux disjoncteurs, prises et interrupteurs. Version de travail : le livre porte le badge « En construction ».",
-    "formation": [
-      {
-        "t": "Le badge jaune « En construction » sur la couverture veut dire que le livre n'est pas encore la version finale : il peut changer.",
-        "img": "nouveautes/livre-c13-badge.jpg"
-      },
-      {
-        "t": "Il se lit comme les autres livres : flèches ← →, table des matières (touche M), réponses pas à pas (touche R), code QR (touche Q).",
-        "img": "nouveautes/livre-c13.jpg"
-      }
-    ],
-    "versions": [
-      {
-        "date": "2026-11-07",
-        "texte": "Version 3 : schémas animés presque partout (courant, électrons, turbine-alternateur), images corrigées et réponses ✓ dans les exercices."
-      },
-      {
-        "date": "2026-11-03",
-        "texte": "Double page : les marges des pages ne sont plus rognées (le texte ne touche plus le bord ni l'autre page)."
-      },
-      {
-        "date": "2026-10-23",
-        "texte": "Ajout du cahier, version en construction."
-      }
-    ]
-  },
-  {
-    "date": "2026-10-22",
-    "type": "ajout",
-    "livre": "communiquer",
-    "titre": "Communiquer en milieu de travail",
-    "texte": "Nouveau cahier d'apprentissage du DEP 5211 (compétence 436-282, 30 heures) : 176 pages, 9 modules, du rôle du préposé jusqu'aux situations difficiles et à l'éthique, avec jeux de rôle, documents de travail, cartes de mise en situation et jeux de communication en annexe.",
-    "formation": [
-      "Dans la bibliothèque, clique la couverture, puis « Lire » (ou « Ouvrir le livre » ci-dessus).",
-      {
-        "t": "Flèches ← → (ou les boutons en bas) pour tourner les pages; tape un numéro dans la case pour sauter à une page. Bouton ✓ (touche R) : les réponses apparaissent pas à pas.",
-        "img": "nouveautes/livre-communiquer.jpg"
-      },
-      {
-        "t": "Touche M (ou le bouton ☰) : les 9 modules et les annexes (lexique, modèles de documents, cartes, Loup-Garou, Naufragés!, plan dicté, chaîne de transmission).",
-        "img": "nouveautes/livre-communiquer-tdm.jpg"
-      }
-    ],
-    "versions": [
-      {
-        "date": "2026-10-22",
-        "texte": "Ajout du cahier (version 15)."
-      }
-    ]
-  },
-  {
+    "texte": "Cinq livres (Micro-ordinateur, Communiquer, C9, Plomberie et chauffage, Ventilation) utilisent maintenant la même base que les nouveaux : mêmes boutons, table des matières et réponses une à une. Leurs animations sont gardées."
+   },
+   {
     "date": "2026-11-07",
-    "type": "maj",
-    "livre": "micro-ordinateur",
-    "titre": "Utiliser un micro-ordinateur",
-    "texte": "Version 6 : 173 pages. 25 « Guides animés » (une page avant chaque activité faite à l'ordinateur : la souris fait la démarche, les étapes s'allument une à une), 32 images animées avec curseur, et un module 9 sur l'IA presque doublé : les IA populaires, l'IA dans le bâtiment et dans ta poche, Copilot dans Microsoft 365, les agents, les arnaques, les règles au Québec et un Défi pro de diagnostic.",
-    "formation": [
-      {
-        "t": "Avant une activité faite à l'ordinateur, une page « Guide animé » montre la démarche : la souris fait l'activité sur un exemple, et l'étape en cours s'allume en dessous.",
-        "img": "nouveautes/micro-guide-anime.jpg"
-      },
-      "Les boutons ◂ ▸ près de l'animation avancent d'une étape à la fois; Pause fige l'écran pour expliquer.",
-      "Les guides utilisent un exemple (fournaise, peinture, thermostat…) : ils ne donnent pas les réponses de l'activité.",
-      "Le numéro de page de la bibliothèque ne correspond plus au numéro imprimé : les guides n'existent que dans la version animée. Le numéro imprimé reste en bas de chaque page.",
-      "Module 9 (IA) : 11 nouvelles pages, de « Les IA les plus populaires » au « Métier dans 10 ans »."
-    ],
-    "versions": [
-      {
-        "date": "2026-11-07",
-        "texte": "Version 6 : 25 guides animés, démos avec curseur, module 9 sur l'IA allongé (173 pages)."
-      },
-      {
-        "date": "2026-10-21",
-        "texte": "Nouveau cahier d'apprentissage du DEP 5211 (compétence 15, module 436-333, 45 heures) : 137 pages, 9 modules, du portable et de Windows 11 jusqu'à la gestion de l'entretien (GMAO) et l'intelligence ar"
-      }
-    ]
-  },
-  {
+    "texte": "Zoom plus fluide : le livre s'agrandit comme une photo, sans saut à la fin. Pincement à deux doigts plus sensible, aussi en double page. Tes livres se téléchargent tout seuls sur l'appareil après la connexion (pas sur données cellulaires)."
+   },
+   {
+    "date": "2026-11-06",
+    "texte": "Accueil : flèches ‹ › douces, rangée « Continuer » en bas. Écran tactile : pincer avec deux doigts zoome le tableau blanc et les livres. Mode léger : si l'appareil est lent (tableau interactif), le site coupe les flous et les transitions tout seul (Mes préférences → Animations). Un livre s'ouvre maintenant en plein écran (réglable dans Mes préférences)."
+   },
+   {
+    "date": "2026-11-03",
+    "texte": "Mes préférences : ta couleur change aussi le « A » du logo du Pavillon, partout sur le site."
+   },
+   {
+    "date": "2026-10-30",
+    "texte": "Accueil foncé ou clair : au départ, comme le réglage de l'ordinateur; les fenêtres suivent maintenant le choix (fiche du livre, bienvenue, connexion, préférences, accès, Quoi de neuf, aide, menu Plus). Logo du Pavillon en blanc refait proprement."
+   },
+   {
+    "date": "2026-10-29",
+    "texte": "« Mes préférences » pour chaque prof (couleur, accueil, livres au départ, reprise de la page, tableau blanc). Fenêtres de connexion et de demande refaites (logo, programmes en cartes avec leur logo, crochet vert animé à l'envoi). Connexion : « Bonjour » animé; cadenas qui bouge sur un livre verrouillé; cloche sur les initiales de l'admin quand une demande attend. Plans, Accueil de classe et Tableau blanc : seulement après la connexion; accueil 10 % plus petit sur ordinateur."
+   },
+   {
+    "date": "2026-10-29",
+    "texte": "Comptes enseignants : demandes envoyées directement à Jeremy, accès par programme (EGI / Plomberie), « Mot de passe oublié ? ». Panneau des accès : une fiche par enseignant (lisible même avec beaucoup de livres); une demande ignorée ne revient plus."
+   }
+  ]
+ },
+ {
+  "date": "2026-10-29",
+  "type": "maj",
+  "livre": "administration-batiment",
+  "titre": "Administration d'un bâtiment et plan d'urgence",
+  "texte": "Version 3 : nouvelle couverture. 146 pages, 13 chapitres (compétence 16).",
+  "formation": [
+   "Dans la bibliothèque, clique la couverture, puis « Lire » (ou « Ouvrir le livre » ci-dessus).",
+   "Flèches ← → (ou les boutons en bas) pour tourner les pages; tape un numéro dans la case pour sauter à une page.",
+   {
+    "t": "Touche M (ou le bouton ☰) : table des matières, avec une icône par type de section.",
+    "img": "nouveautes/livre-tdm.jpg"
+   }
+  ],
+  "versions": [
+   {
+    "date": "2026-10-29",
+    "texte": "Version 3 : nouvelle couverture."
+   },
+   {
     "date": "2026-10-21",
-    "type": "maj",
-    "livre": "plomberie-chauffage",
-    "titre": "Plomberie et chauffage",
-    "texte": "Version officielle animée : 190 pages, 13 modules, formatif final et réponses pas à pas.",
-    "formation": [
-      "Dans la bibliothèque, clique la couverture, puis « Lire » (ou « Ouvrir le livre » ci-dessus).",
-      "Flèches ← → (ou les boutons en bas) pour tourner les pages; tape un numéro dans la case pour sauter à une page.",
-      {
-        "t": "Touche M (ou le bouton ☰) : table des matières, avec une icône par type de section.",
-        "img": "nouveautes/livre-tdm.jpg"
-      }
-    ],
-    "versions": []
-  }
+    "texte": "Nouveau livre de la compétence 16 : 146 pages, 13 chapitres."
+   }
+  ]
+ },
+ {
+  "date": "2026-10-29",
+  "type": "maj",
+  "livre": "protection-incendie",
+  "titre": "Protection incendie",
+  "texte": "Nouvelle couverture (flamme et alarme). 104 pages, corrigé intégré (bouton ✓) et simulateur de panneau d'alarme.",
+  "formation": [
+   "Dans la bibliothèque, clique la couverture, puis « Lire » (ou « Ouvrir le livre » ci-dessus).",
+   "Flèches ← → (ou les boutons en bas) pour tourner les pages; tape un numéro dans la case pour sauter à une page.",
+   {
+    "t": "Touche M (ou le bouton ☰) : table des matières, avec une icône par type de section.",
+    "img": "nouveautes/livre-tdm.jpg"
+   }
+  ],
+  "versions": [
+   {
+    "date": "2026-10-29",
+    "texte": "Nouvelle couverture (flamme et alarme)."
+   },
+   {
+    "date": "2026-10-21",
+    "texte": "Nouvelle version : 104 pages, corrigé intégré et simulateur de panneau d'alarme."
+   }
+  ]
+ },
+ {
+  "date": "2026-11-07",
+  "type": "outil",
+  "titre": "Lecture des livres",
+  "texte": "Même barre et mêmes réponses pas à pas dans tous les livres. Nouvelle table des matières à droite : recherche dans le livre, Animations, Exercices.",
+  "formation": [
+   {
+    "t": "Touche M (ou ☰) : la table des matières s'ouvre à droite, le livre reste visible. « Tu es ici » montre le module en cours.",
+    "img": "nouveautes/livre-tdm.jpg"
+   },
+   "Écris un mot dans « Chercher dans ce livre » pour trouver toutes les pages qui en parlent. Les boutons Animations et Exercices les listent.",
+   {
+    "t": "Bouton ✓ (touche R) : chaque clic montre la réponse suivante de la page (grisé = pas de réponse).",
+    "img": "nouveautes/livre-barre.jpg"
+   },
+   "Tiens › enfoncé pour avancer vite dans les pages.",
+   "Roulette = zoom sous la souris; une fois zoomé, glisse la page (ou garde la roulette enfoncée) pour te déplacer."
+  ],
+  "versions": [
+   {
+    "date": "2026-11-07",
+    "texte": "Table des matières refaite : panneau à droite, recherche dans le livre, listes Animations et Exercices, « Tu es ici »."
+   },
+   {
+    "date": "2026-11-03",
+    "texte": "Roulette : elle zoome toujours, même avec le crayon et sur la page de droite en double page (plus de page qui descend), plus fluide dans les livres et le tableau blanc; aucune page ne se tourne pendant le zoom; roulette enfoncée pour déplacer la page : plus de défilement automatique."
+   },
+   {
+    "date": "2026-10-29",
+    "texte": "L'avis « Reprendre à la page… » est plus petit et discret."
+   },
+   {
+    "date": "2026-10-28",
+    "texte": "Roulette enfoncée : déplace la page zoomée. Petit jeu élastique au-delà des bords quand on glisse (la page revient en place)."
+   }
+  ]
+ },
+ {
+  "date": "2026-10-29",
+  "type": "maj",
+  "livre": "dispositifs-electriques-c9",
+  "titre": "Dispositifs électriques et électroniques (C9)",
+  "texte": "Nouvelle version du cahier : 324 pages (50 de plus).",
+  "formation": [
+   "Ouvre le livre depuis l'accueil (DEP 5333 · Compétence 9) : le badge « Mis à jour » s'affiche 30 jours.",
+   "La table des matières (touche M) et les réponses (✓) fonctionnent comme avant."
+  ],
+  "versions": [
+   {
+    "date": "2026-10-29",
+    "texte": "Version 6 du cahier (324 pages)."
+   }
+  ]
+ },
+ {
+  "date": "2026-11-03",
+  "type": "outil",
+  "titre": "Tableau blanc : les outils",
+  "texte": "Une seule ligne d'outils : crayon, texte, objets, gomme, annuler, fond. Tout est gardé tout seul sur l'ordinateur.",
+  "formation": [
+   {
+    "t": "La barre : crayon, texte, objets (le cube), gomme, annuler, fond. ⋯ Plus : rétablir, tout effacer, zoom, tableaux précédent / suivant / nouveau / supprimer (toucher deux fois), Mes schémas, enregistrer en PNG.",
+    "img": "nouveautes/barre.jpg"
+   },
+   {
+    "t": "Crayon : un toucher l'active et ouvre son menu : couleurs (ronds), autre couleur (+), surligneurs (carrés), tracé (libre, ligne, flèche, rectangle, ellipse) et épaisseur. Touche-le encore pour l'éteindre.",
+    "img": "nouveautes/barre-couleur.jpg"
+   },
+   "Sans outil choisi : touche une forme, un objet ou un texte pour le choisir, glisse-le pour le déplacer, double-clic pour le modifier, Suppr pour l'effacer.",
+   "Texte : touche le tableau et écris (Entrée = nouvelle ligne). Toucher dans le vide termine le texte et range l'outil Texte. Échap annule.",
+   "Gomme : la fenêtre de taille reste ouverte et un cercle montre ce qui sera effacé. Touche la gomme encore pour la ranger (aucun outil, pas de retour au crayon).",
+   {
+    "t": "Plusieurs à la fois : sans outil choisi, glisse dans le vide pour tracer un cadre (avec un outil : Ctrl + glisser). Le groupe se déplace, change de couleur ou s'efface ensemble. Ctrl+C / Ctrl+V / Ctrl+D pour copier, coller, dupliquer.",
+    "img": "nouveautes/selection-multiple.jpg"
+   },
+   {
+    "t": "Chaque fond garde son propre dessin. En changeant de fond, un petit avis offre « Apporter ici » pour transporter le dessin.",
+    "img": "nouveautes/fond-dessin.jpg"
+   },
+   {
+    "t": "« Mes modèles » (en haut de la palette Objets, dans tous les onglets : Formes, Iso, Électricité, Plomberie) : donne un nom au tableau pour l'enregistrer, le rouvrir plus tard ou l'exporter vers un collègue.",
+    "img": "nouveautes/sch-miens.jpg"
+   }
+  ],
+  "versions": [
+   {
+    "date": "2026-11-03",
+    "texte": "Le tableau blanc s'ouvre toujours dézoomé (tout le tableau visible)."
+   },
+   {
+    "date": "2026-11-03",
+    "texte": "Palette Objets : les explications (en bas de la palette et dans le message du haut) sont plus courtes."
+   },
+   {
+    "date": "2026-10-29",
+    "texte": "⋯ Plus → Tableaux : bouton « Supprimer » pour enlever le tableau affiché (toucher deux fois)."
+   },
+   {
+    "date": "2026-10-29",
+    "texte": "Menu du crayon plus compact (3 lignes, sans les mots) et nouveau bouton « Autre couleur » qui montre ta dernière couleur choisie."
+   }
+  ]
+ },
+ {
+  "date": "2026-10-29",
+  "type": "outil",
+  "titre": "Tableau blanc : formes, cotes et textes",
+  "texte": "Couleur, cotes et textes sur les côtés, partout : formes, lignes, tuyaux iso, objets iso et symboles électriques.",
+  "formation": [
+   {
+    "t": "Objets (le cube), onglet Formes : choisis une forme et glisse sur le tableau. Un clic seul pose une forme de taille normale.",
+    "img": "nouveautes/objets-formes.jpg"
+   },
+   {
+    "t": "Pour changer sa taille : touche la forme, puis tire un des carrés blancs.",
+    "img": "nouveautes/formes-poignees.jpg"
+   },
+   {
+    "t": "Double-clic sur une forme, une ligne, un tuyau iso, un objet iso ou un symbole électrique : sa couleur, la taille du texte, « + Texte sur un côté » et « + Cote ».",
+    "img": "nouveautes/forme-couleur.jpg"
+   },
+   {
+    "t": "Après « + Texte sur un côté » ou « + Cote », les côtés libres s'allument : touche celui que tu veux.",
+    "img": "nouveautes/cote-cote.jpg"
+   },
+   "Flèche : double-clic, puis écris le texte où la flèche commence et où elle pointe (ex. « Eau froide » → « Robinet »).",
+   "Plusieurs bouts de tuyau : choisis-les avec Ctrl + cadre, puis double-clic sur l'un d'eux. Une case offre la couleur, « + Texte sur ce tronçon » ou « + Cote » d'un bout à l'autre.",
+   {
+    "t": "Sur le plan isométrique, la cote suit les axes de la grille et donne la longueur en pas (ex. 6 carr.). Sur un tuyau dessiné au crayon, chaque tronçon droit se cote d'un coin à l'autre; sur un objet, d'un raccord à l'autre.",
+    "img": "nouveautes/iso-cotes.jpg"
+   },
+   "Les cotes et les textes vont avec leur forme ou leur objet : même couleur, ils suivent quand tu la déplaces ou l'agrandis, ils sont copiés et effacés avec elle.",
+   "Touche une cote ou un texte de côté, puis tire son carré bleu pour le placer où tu veux, même collé à la forme. Double-clic : ⟲ / ⟳ font pivoter le texte, « Auto » le remet droit."
+  ],
+  "versions": [
+   {
+    "date": "2026-10-29",
+    "texte": "Sur le plan iso : le texte des formes reste à plat; seuls les objets et tuyaux iso ont le texte dans l'angle."
+   },
+   {
+    "date": "2026-10-28",
+    "texte": "Objets iso : côtés pris sur la forme entière (pompe, vannes, vase d'expansion), textes plus près de l'objet."
+   },
+   {
+    "date": "2026-10-28",
+    "texte": "Objets iso : textes et cotes aussi sur les deux arêtes du haut."
+   },
+   {
+    "date": "2026-10-28",
+    "texte": "Double-clic sur plusieurs lignes choisies : une case (couleur, texte, cote) au lieu d'une cote ajoutée toute seule."
+   }
+  ]
+ },
+ {
+  "date": "2026-11-03",
+  "type": "outil",
+  "titre": "Tableau blanc : plan isométrique",
+  "texte": "Catalogue de plomberie et chauffage en 3D sur la grille iso : objets qui se branchent, se mettent debout, et tuyaux toujours droits.",
+  "formation": [
+   {
+    "t": "Objets (le cube), onglet Iso : le fond passe au plan isométrique. Glisse une vanne ou une pompe sur un tuyau : elle s'y branche toute seule.",
+    "img": "nouveautes/glisser-brancher.jpg"
+   },
+   {
+    "t": "« Mes modèles » → « Modèles prêts à utiliser » → catégorie « Plan isométrique » : du plus simple (pompe avec vannes, radiateur) au plus complet (boucle avec plinthes, chauffage sur 2 étages avec vannes de zone, plancher radiant avec collecteur 4 boucles).",
+    "img": "nouveautes/modele-iso.jpg"
+   },
+   {
+    "t": "Le crayon suit les lignes de la grille : la ligne avance avec ta main et s'accroche à la grille quand tu lâches. Trompé ? Reviens sur ta ligne sans lâcher : elle s'efface.",
+    "img": "nouveautes/iso-crayon.jpg"
+   },
+   {
+    "t": "Objet choisi : « ⟳ Pivoter » le tourne, « ↕ Debout » le met sur un tuyau vertical (volant à gauche, puis à droite, puis couché).",
+    "img": "nouveautes/iso-debout.jpg"
+   },
+   {
+    "t": "Déplace un objet branché : ses tuyaux se refont droits, avec des coudes à 90°.",
+    "img": "nouveautes/iso-deplacer.jpg"
+   }
+  ],
+  "versions": [
+   {
+    "date": "2026-11-03",
+    "texte": "Crayon iso plus réactif : la ligne suit ta main pendant le trait et s'accroche à la grille au relâchement; les virages se détectent plus tôt, même sur des côtés d'un seul pas (petit cube 1×1)."
+   },
+   {
+    "date": "2026-10-29",
+    "texte": "Crayon iso : la ligne suit ce que tu dessines (plus de petits détours ni de coins ajoutés quand la main tremble ou dérive). Revenir sur ta ligne sans lâcher l'efface."
+   },
+   {
+    "date": "2026-10-29",
+    "texte": "Deux modèles iso plus complets : chauffage sur 2 étages avec vannes de zone, plancher radiant avec collecteur."
+   },
+   {
+    "date": "2026-10-29",
+    "texte": "Modèles prêts à utiliser en iso; modèles classés par catégorie (repliées au départ)."
+   }
+  ]
+ },
+ {
+  "date": "2026-11-03",
+  "type": "outil",
+  "titre": "Tableau blanc : plomberie en coupe",
+  "texte": "Une maison en coupe avec ses tuyaux (EF, EC, drain, évent, gaz) et ses appareils à l'échelle.",
+  "formation": [
+   {
+    "t": "Objets (le cube), onglet Plomberie : touche « Maison en coupe » puis clique sur le tableau.",
+    "img": "nouveautes/plomberie-coupe.jpg"
+   },
+   "Touche un appareil puis clique dans la maison : il se pose à l'échelle sur le plancher.",
+   "Trace un tuyau près d'un point de raccord (bleu EF, rouge EC, vert drain) : il s'y branche. Double-clic sur un tuyau pour écrire son diamètre."
+  ],
+  "versions": [
+   {
+    "date": "2026-11-03",
+    "texte": "Plomberie : on peut glisser la maison, les appareils et les raccords de la palette jusqu'au tableau."
+   },
+   {
+    "date": "2026-10-28",
+    "texte": "Maison en coupe détaillée, appareils à l'échelle posés sur le plancher, tuyaux branchés aux bons raccords."
+   },
+   {
+    "date": "2026-10-28",
+    "texte": "La plomberie a son propre onglet en haut de la palette."
+   }
+  ]
+ },
+ {
+  "date": "2026-10-28",
+  "type": "outil",
+  "titre": "Tableau blanc : schéma électrique en échelle",
+  "texte": "Dessine et anime des schémas en échelle sur le quadrillé, avec des modèles prêts et un exercice « Trouve la panne ».",
+  "formation": [
+   {
+    "t": "Objets (le cube), onglet Électricité : le fond passe au quadrillé. « Échelle L1/L2 » trace les rails.",
+    "img": "nouveautes/elec-echelle.jpg"
+   },
+   {
+    "t": "Glisse un symbole sur un fil : il s'y branche. « Relais complet » pose la bobine et ses contacts NO et NF.",
+    "img": "nouveautes/elec-relais.jpg"
+   },
+   {
+    "t": "Pour relier : glisse d'un point bleu à l'autre, ou pars du milieu d'un fil pour faire une jonction.",
+    "img": "nouveautes/elec-relier.jpg"
+   },
+   {
+    "t": "▶ Animer : garde un bouton enfoncé, clique un interrupteur. Rouge = L1, bleu = L2, points jaunes = courant.",
+    "img": "nouveautes/elec-animer.jpg"
+   },
+   {
+    "t": "Modèles : un circuit prêt à utiliser (marche-arrêt, chauffage 24 V, pompe de puisard…).",
+    "img": "nouveautes/sch-modeles.jpg"
+   },
+   {
+    "t": "Trouve la panne : une panne est cachée dans le circuit; « Révéler » la montre, « Réparer » remet tout en état.",
+    "img": "nouveautes/panne-revelee.jpg"
+   }
+  ],
+  "versions": [
+   {
+    "date": "2026-10-28",
+    "texte": "Animation corrigée : les lampes ne s'allument plus à travers un interrupteur ouvert."
+   },
+   {
+    "date": "2026-10-28",
+    "texte": "Choisir un symbole est de nouveau facile, même avec l'outil Fil."
+   },
+   {
+    "date": "2026-10-28",
+    "texte": "Un nouveau fil peut partir du milieu d'un fil existant (jonction automatique)."
+   }
+  ]
+ },
+ {
+  "date": "2026-11-03",
+  "type": "outil",
+  "titre": "Plans techniques",
+  "texte": "Cinq dossiers de plans d'exercice très complets, avec meubles, plafonds, code, bilan électrique, plomberie, gros plans de mécanique, exercices, corrigés et fiches de montage.",
+  "formation": [
+   {
+    "t": "Bouton « Plans » en haut de la bibliothèque : choisis un dossier d'exercice (une vue de la façade du bâtiment est affichée) ou ouvre ton propre plan (PDF ou image).",
+    "img": "nouveautes/plans.jpg"
+   },
+   {
+    "t": "Dossier 1 : maison contemporaine à deux toits décalés, deux étages et sous-sol.",
+    "img": "nouveautes/plans-maison-moderne.jpg"
+   },
+   {
+    "t": "Dossier 4 : centre commercial sur un terrain en pente (nivellement, drainage, profils).",
+    "img": "nouveautes/plans-d4.jpg"
+   },
+   "Dossier 2 : duplex jumelé à toit à quatre versants, pierre et bois, fenêtres noires et auvents d'entrée.",
+   "Chaque dossier de bâtiment contient aussi des gros plans (feuilles M-xxx et P-3xx) : chaque pièce est nommée par une flèche et décrite dans une nomenclature; M-001 donne les symboles de robinetterie.",
+   "Sous « Exercices de mesure à l'échelle » : des mesures à faire avec l'échelimètre (largeur d'un local, hauteur d'un niveau, marge de terrain…). Imprime à 100 % et vérifie le trait de 100 mm.",
+   "Dossier 5 : ferme laitière moderne (étable à stabulation libre, robots de traite, racleurs et repousse-fourrage automatiques, enclos libres).",
+   "Chaque dossier contient : légende, plan de toiture, plans de plafond, analyse du code, tableau des locaux et des finis, détails de construction, bilan électrique et dimensionnement de la plomberie. Les pièces sont meublées et leurs dimensions inscrites.",
+   "Sous les dossiers, « Exercices de lecture de plans » : questions à imprimer pour tes élèves, corrigé, et pour le dossier 6 des fiches de montage.",
+   "« Tous les plans » (ou Échap) ramène à la liste des dossiers."
+  ],
+  "versions": [
+   {
+    "date": "2026-11-03",
+    "texte": "Un seul questionnaire par plan : lecture de plans et mesure à l'échelimètre sont réunies (5 questionnaires au lieu de 10), avec corrigé, dans Plans et dans Activités."
+   },
+   {
+    "date": "2026-11-03",
+    "texte": "Questionnaires refaits : bandeau de couleur par plan, images tirées des plans, types de questions variés (choix multiple, vrai ou faux, calculs…) et construction différente pour chacun des 5 dossiers. Ils sont aussi dans l'onglet Activités (filtre « Plan »), avec leur corrigé."
+   },
+   {
+    "date": "2026-11-03",
+    "texte": "Toutes les échelles des plans sont maintenant lues par l'échelimètre métrique (1:20 à 1:1000), avec un trait de contrôle de 100 mm sur chaque feuille. Nouveaux exercices de mesure à l'échelle, différents pour chaque dossier, avec corrigé."
+   },
+   {
+    "date": "2026-11-03",
+    "texte": "Dossier 5 (ferme) : détails des abreuvoirs à niveau constant (coupes, plan, flotteur, vidange, chauffage antigel, mise à la terre) et schéma d'alimentation en eau des 6 abreuvoirs."
+   }
+  ]
+ },
+ {
+  "date": "2026-11-04",
+  "type": "outil",
+  "titre": "Accueil de classe",
+  "texte": "Tableau d'accueil animé pour le début de période : date, déroulement, temps avant la pause, la matière en cours avec un petit rappel, un contenu à ouvrir pour chaque activité, et un fond vivant qui suit la période.",
+  "formation": [
+   {
+    "t": "Bouton « Accueil de classe » en haut de la bibliothèque.",
+    "img": "nouveautes/accueil.jpg"
+   },
+   {
+    "t": "« Préparer le cours » : la période, la compétence et le déroulement. À l'étape 5, « ＋ Ajouter » lie un livre, un schéma, un plan, une vidéo, un site ou un fichier à une activité.",
+    "img": "nouveautes/tdb-prep.jpg"
+   },
+   {
+    "t": "Étape 1 « Pour quand? » : le jour, Matin ou Après-midi, la durée (période complète, 1 h, 2 h…) et l'heure du début. Un cours préparé d'avance s'affiche tout seul à son moment. Point vert = déjà préparé. « Aperçu du cours » montre le tableau tel que les élèves le verront (avant, début, milieu, fin), sans rien changer.",
+    "img": "nouveautes/tdb-autre-jour.jpg"
+   },
+   {
+    "t": "En classe, « ▶ Ouvrir » (ou touche O) ouvre le contenu de l'activité en cours.",
+    "img": "nouveautes/tdb-carte.jpg"
+   },
+   {
+    "t": "La pastille « En cours » montre la matière de la période. Pendant le cours, un petit « Rappel » apparaît 15 secondes environ toutes les 9 minutes, avec une idée en lien avec la matière. Touche-le pour le fermer.",
+    "img": "nouveautes/tdb-matiere.jpg"
+   },
+   {
+    "t": "Dans un livre, « Tableau de bord » (touche E) y retourne; « Revenir au livre » (touche L) te remet à la même page.",
+    "img": "nouveautes/tdb-retour.jpg"
+   },
+   {
+    "t": "Le fond vit avec la période : plus calme à la pause, plus vif les 5 dernières minutes, petites surprises de temps en temps. Carte « Bienvenue » 5 minutes avant le cours. Plus → Réglages → « Fond animé » : Comme l'ordinateur, Toujours ou Jamais.",
+    "img": "nouveautes/tdb-bienvenue.jpg"
+   },
+   "Jour d'examen : coche « Examen aujourd'hui » (pas de pauses). « Plein écran » une seule fois au début : il reste actif entre le tableau de bord et les livres."
+  ],
+  "versions": [
+   {
+    "date": "2026-11-04",
+    "texte": "Ligne du temps plus grosse (texte de même taille partout) pour bien la voir du fond de la classe; la ligne « Au programme » est retirée."
+   },
+   {
+    "date": "2026-11-04",
+    "texte": "Lueur au bas de l'écran qui monte pendant le cours et passe au cuivre pendant les pauses et les 5 dernières minutes d'un bloc. Plus de halo autour des chiffres de l'heure."
+   },
+   {
+    "date": "2026-11-04",
+    "texte": "Ligne du temps refaite : coche verte sur les blocs finis, heure en bas de chaque bloc, barre de progression dans le bloc en cours et repère « maintenant » avec l'heure."
+   },
+   {
+    "date": "2026-11-04",
+    "texte": "Look plus technique : chiffres lumineux, repères de coins et fine barre de progression de la période."
+   }
+  ]
+ },
+ {
+  "date": "2026-11-07",
+  "type": "ajout",
+  "livre": "materiel-electrique-c13",
+  "titre": "Entretien de matériel électrique (en construction)",
+  "texte": "Nouveau cahier du DEP 5211 (compétence 13, 436-274, 60 heures) : 166 pages, 10 modules, de l'électricité du barrage à la maison jusqu'aux disjoncteurs, prises et interrupteurs. Version de travail : le livre porte le badge « En construction ».",
+  "formation": [
+   {
+    "t": "Le badge jaune « En construction » sur la couverture veut dire que le livre n'est pas encore la version finale : il peut changer.",
+    "img": "nouveautes/livre-c13-badge.jpg"
+   },
+   {
+    "t": "Il se lit comme les autres livres : flèches ← →, table des matières (touche M), réponses pas à pas (touche R), code QR (touche Q).",
+    "img": "nouveautes/livre-c13.jpg"
+   }
+  ],
+  "versions": [
+   {
+    "date": "2026-11-07",
+    "texte": "Version 3 : schémas animés presque partout (courant, électrons, turbine-alternateur), images corrigées et réponses ✓ dans les exercices."
+   },
+   {
+    "date": "2026-11-03",
+    "texte": "Double page : les marges des pages ne sont plus rognées (le texte ne touche plus le bord ni l'autre page)."
+   },
+   {
+    "date": "2026-10-23",
+    "texte": "Ajout du cahier, version en construction."
+   }
+  ]
+ },
+ {
+  "date": "2026-10-22",
+  "type": "ajout",
+  "livre": "communiquer",
+  "titre": "Communiquer en milieu de travail",
+  "texte": "Nouveau cahier d'apprentissage du DEP 5211 (compétence 436-282, 30 heures) : 176 pages, 9 modules, du rôle du préposé jusqu'aux situations difficiles et à l'éthique, avec jeux de rôle, documents de travail, cartes de mise en situation et jeux de communication en annexe.",
+  "formation": [
+   "Dans la bibliothèque, clique la couverture, puis « Lire » (ou « Ouvrir le livre » ci-dessus).",
+   {
+    "t": "Flèches ← → (ou les boutons en bas) pour tourner les pages; tape un numéro dans la case pour sauter à une page. Bouton ✓ (touche R) : les réponses apparaissent pas à pas.",
+    "img": "nouveautes/livre-communiquer.jpg"
+   },
+   {
+    "t": "Touche M (ou le bouton ☰) : les 9 modules et les annexes (lexique, modèles de documents, cartes, Loup-Garou, Naufragés!, plan dicté, chaîne de transmission).",
+    "img": "nouveautes/livre-communiquer-tdm.jpg"
+   }
+  ],
+  "versions": [
+   {
+    "date": "2026-10-22",
+    "texte": "Ajout du cahier (version 15)."
+   }
+  ]
+ },
+ {
+  "date": "2026-11-07",
+  "type": "maj",
+  "livre": "micro-ordinateur",
+  "titre": "Utiliser un micro-ordinateur",
+  "texte": "Version 6 : 173 pages. 25 « Guides animés » (une page avant chaque activité faite à l'ordinateur : la souris fait la démarche, les étapes s'allument une à une), 32 images animées avec curseur, et un module 9 sur l'IA presque doublé : les IA populaires, l'IA dans le bâtiment et dans ta poche, Copilot dans Microsoft 365, les agents, les arnaques, les règles au Québec et un Défi pro de diagnostic.",
+  "formation": [
+   {
+    "t": "Avant une activité faite à l'ordinateur, une page « Guide animé » montre la démarche : la souris fait l'activité sur un exemple, et l'étape en cours s'allume en dessous.",
+    "img": "nouveautes/micro-guide-anime.jpg"
+   },
+   "Les boutons ◂ ▸ près de l'animation avancent d'une étape à la fois; Pause fige l'écran pour expliquer.",
+   "Les guides utilisent un exemple (fournaise, peinture, thermostat…) : ils ne donnent pas les réponses de l'activité.",
+   "Le numéro de page de la bibliothèque ne correspond plus au numéro imprimé : les guides n'existent que dans la version animée. Le numéro imprimé reste en bas de chaque page.",
+   "Module 9 (IA) : 11 nouvelles pages, de « Les IA les plus populaires » au « Métier dans 10 ans »."
+  ],
+  "versions": [
+   {
+    "date": "2026-11-07",
+    "texte": "Version 6 : 25 guides animés, démos avec curseur, module 9 sur l'IA allongé (173 pages)."
+   },
+   {
+    "date": "2026-10-21",
+    "texte": "Nouveau cahier d'apprentissage du DEP 5211 (compétence 15, module 436-333, 45 heures) : 137 pages, 9 modules, du portable et de Windows 11 jusqu'à la gestion de l'entretien (GMAO) et l'intelligence ar"
+   }
+  ]
+ },
+ {
+  "date": "2026-10-21",
+  "type": "maj",
+  "livre": "plomberie-chauffage",
+  "titre": "Plomberie et chauffage",
+  "texte": "Version officielle animée : 190 pages, 13 modules, formatif final et réponses pas à pas.",
+  "formation": [
+   "Dans la bibliothèque, clique la couverture, puis « Lire » (ou « Ouvrir le livre » ci-dessus).",
+   "Flèches ← → (ou les boutons en bas) pour tourner les pages; tape un numéro dans la case pour sauter à une page.",
+   {
+    "t": "Touche M (ou le bouton ☰) : table des matières, avec une icône par type de section.",
+    "img": "nouveautes/livre-tdm.jpg"
+   }
+  ],
+  "versions": []
+ }
 ]

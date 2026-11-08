@@ -3,6 +3,7 @@
 <head>
 <!-- © 2026 Jérémy Raymond. Tous droits réservés. Copie, modification ou revente interdites sans autorisation écrite (voir LICENCE.md). -->
 <meta charset="utf-8">
+<link rel="icon" href="img/metier-plus-icone.svg" type="image/svg+xml">
 <script src="garde.js"></script>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Quiz maison</title>
@@ -259,7 +260,7 @@ i.let,.ch4 button i{background:var(--lc,var(--acc))!important;color:#fff!importa
 <body>
 
 <!-- ============ CHOIX DU RÔLE ============ -->
-<div id="role" class="cache"><div class="carte"><img class="logoC" src="img/pavillon-avenir.png" alt="Pavillon de l'Avenir"><h1 style="margin:0">Quiz maison</h1>
+<div id="role" class="cache"><div class="carte"><img class="logoC" src="img/metier-plus.svg" alt="Métier+"><h1 style="margin:0">Quiz maison</h1>
 <div class="sous">Labo interactif · tes propres questions sur les iPad</div>
 <div class="duo"><button id="rAnim" style="grid-column:1/-1;padding:24px 10px;font-size:19px">🖥️ Animer au tableau<br><small style="font-weight:500">un seul ordinateur : l'écran de classe avec ses commandes</small></button>
 <button id="rTele" style="background:#3A3936">💻 Télécommande<br><small style="font-weight:500">ton ordinateur ou ta tablette</small></button>
@@ -273,11 +274,11 @@ i.let,.ch4 button i{background:var(--lc,var(--acc))!important;color:#fff!importa
 <div id="ecr" class="cache"></div>
 
 <!-- ============ JOUEUR ============ -->
-<div id="joueur" class="cache"><img src="img/pavillon-avenir-blanc.png" alt="" style="position:fixed;bottom:14px;left:50%;transform:translateX(-50%);height:24px;opacity:.6"><div class="nomj" id="nomJ"></div><div class="ptsj" id="ptsJ"></div><div class="bx" id="jBx"></div></div>
+<div id="joueur" class="cache"><img src="img/metier-plus-blanc.svg" alt="" style="position:fixed;bottom:14px;left:50%;transform:translateX(-50%);height:24px;opacity:.6"><div class="nomj" id="nomJ"></div><div class="ptsj" id="ptsJ"></div><div class="bx" id="jBx"></div></div>
 
 <!-- ============ TÉLÉCOMMANDE ============ -->
 <div id="tele" class="cache"><div class="wrap">
-<div class="tbar"><img src="img/pavillon-avenir.png" alt="Pavillon de l'Avenir" style="height:30px"><h1 id="tTitre">Quiz maison · télécommande</h1><a href="?role=1" id="lienEcran" class="cache">Écran de classe sur un 2e appareil</a><a href="labo.html">‹ Labo interactif</a></div>
+<div class="tbar"><img src="img/metier-plus.svg" alt="Métier+" style="height:30px"><h1 id="tTitre">Quiz maison · télécommande</h1><a href="?role=1" id="lienEcran" class="cache">Écran de classe sur un 2e appareil</a><a href="labo.html">‹ Labo interactif</a></div>
 <div class="grid">
 <div>
 <div class="carte"><h2>Les élèves scannent</h2><div id="qr"></div><div class="code" id="code"></div><div class="etat" id="etatT">Connexion…</div><button id="bEcran" style="width:100%;margin-top:10px">Ouvrir l'écran de classe</button>
@@ -977,7 +978,7 @@ function ecran(code){
   let V = {etat: "lobby", joueurs: [], titre: "Quiz maison", reg: {}, i: -1}, decal = 0, img = {}, sonOK = false, ac = null, dernier = "", posAvant = {}, tic = 0;
   function ton(f, d, v, type){ if (!sonOK || V.reg.son === "non") return; try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); const o = ac.createOscillator(), g = ac.createGain(); o.type = type || "sine"; o.frequency.value = f; o.connect(g); g.connect(ac.destination); g.gain.setValueAtTime(v, ac.currentTime); g.gain.exponentialRampToValueAtTime(.0001, ac.currentTime + d); o.start(); o.stop(ac.currentTime + d); } catch(e) {} }
   const accord = () => { ton(523, .5, .12); setTimeout(() => ton(659, .5, .1), 120); setTimeout(() => ton(784, .7, .1), 240); };
-  const tete = t => `<div class="liseret"></div><div class="haut"><b><img class="logoE" src="img/pavillon-avenir-blanc.png" alt="Pavillon de l'Avenir">${esc(t)}</b><span>Quiz maison · code ${code.slice(0, 3)} ${code.slice(3)}</span></div>`;
+  const tete = t => `<div class="liseret"></div><div class="haut"><b><img class="logoE" src="img/metier-plus-blanc.svg" alt="Métier+">${esc(t)}</b><span>Quiz maison · code ${code.slice(0, 3)} ${code.slice(3)}</span></div>`;
   const bSon = () => `<button class="son${sonOK ? " actif" : ""}" id="bSon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="currentColor"/>${sonOK ? '<path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>' : '<path d="M16 9.5l5 5M21 9.5l-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>'}</svg>${sonOK ? "Son activé" : "Activer le son"}</button>`;
   /* le navigateur exige un clic avant de jouer un son : le premier clic sur l'écran de classe (ex. « Commencer » en mode Animer) active le son,
      sauf si l'enseignant l'a coupé lui-même */

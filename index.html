@@ -4,12 +4,12 @@
      Pour un assistant (Claude) qui reprend ce code : lire d'abord CLAUDE.md à la racine du dépôt (architecture, règles, outils).
      À chaque changement : mettre à jour nouveautes.json (mini-formation + captures) et publier avec outils/publier.sh. -->
 <html lang="fr"><head>
-<!-- © 2026 Jérémy Raymond. Tous droits réservés. Copie, modification ou revente interdites sans autorisation écrite (voir LICENCE.md). --><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="icon" type="image/png" sizes="32x32" href="img/icone-32.png"><link rel="icon" type="image/png" sizes="192x192" href="img/icone-192.png"><link rel="apple-touch-icon" href="img/icone-180.png"><meta name="theme-color" content="#141414">
+<!-- © 2026 Jérémy Raymond. Tous droits réservés. Copie, modification ou revente interdites sans autorisation écrite (voir LICENCE.md). --><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="icon" href="img/metier-plus-icone.svg" type="image/svg+xml"><link rel="icon" type="image/png" sizes="32x32" href="img/icone-32.png"><link rel="icon" type="image/png" sizes="192x192" href="img/icone-192.png"><link rel="apple-touch-icon" href="img/icone-180.png"><meta name="theme-color" content="#141414">
 <meta name="description" content="Livres interactifs, plans et schémas pour la classe et l'atelier — Pavillon de l'Avenir, centre de formation professionnelle.">
-<meta property="og:type" content="website"><meta property="og:locale" content="fr_CA"><meta property="og:site_name" content="Pavillon de l'Avenir">
+<meta property="og:type" content="website"><meta property="og:locale" content="fr_CA"><meta property="og:site_name" content="Métier+">
 <meta property="og:title" content="Bibliothèque — Tes livres de cours, prêts à projeter"><meta property="og:description" content="Livres interactifs, plans et schémas pour la classe et l'atelier. Conçu par Jeremy, enseignant au Pavillon de l'Avenir.">
 <meta property="og:url" content="https://cfppaplc.github.io/bibliotheque/"><meta property="og:image" content="https://cfppaplc.github.io/bibliotheque/img/apercu.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Bibliothèque du Pavillon de l'Avenir : trois livres de cours en éventail"><meta name="twitter:card" content="summary_large_image"><title>Bibliothèque — Pavillon de l'Avenir</title>
+<meta property="og:image:alt" content="Bibliothèque du Pavillon de l'Avenir : trois livres de cours en éventail"><meta name="twitter:card" content="summary_large_image"><title>Métier+ — Bibliothèque</title>
 <style>
   html{-webkit-text-size-adjust:100%;text-size-adjust:100%}   /* cellulaire : pas de texte grossi par le navigateur (aucun effet sur ordinateur) */
   #reader.laseron,#reader.laseron *{cursor:none!important}
@@ -908,7 +908,7 @@ html.leger{scroll-behavior:auto}
 </script>
 </head><body>
 <header id="topbar">
-  <div class="logo"><span class="logo-pav"><img class="lg-blc" src="img/pavillon-avenir-blanc.png" alt="Pavillon de l'Avenir — Centre de formation professionnelle"><img class="lg-clr" src="img/pavillon-avenir.png" alt=""></span><span class="logo-t">Bibliothèque</span></div>
+  <div class="logo"><span class="logo-pav"><img class="lg-blc" src="img/metier-plus-blanc.svg" alt="Métier+"><img class="lg-clr" src="img/metier-plus.svg" alt=""></span><span class="logo-t">Bibliothèque</span></div>
   <nav>
     <a data-view="all" class="active">Accueil</a>
     <a data-view="fav">Ma liste</a>
@@ -1089,7 +1089,7 @@ document.addEventListener("keydown", e => { if (e.key !== "/" || e.ctrlKey || e.
   <div class="panel" id="panel"></div>
 </div>
 
-<footer><img class="foot-logo" src="img/pavillon-avenir.png" alt="Pavillon de l'Avenir"><div><b>Conçu par Jeremy, enseignant</b> · Pavillon de l'Avenir, centre de formation professionnelle</div><div class="foot-s">Réservé aux enseignants du Pavillon de l'Avenir · Livres interactifs pour la classe et l'atelier</div><div class="foot-s">© 2026 Jérémy Raymond · Tous droits réservés</div><button class="adm-btn" id="adminBtn" aria-label="Administration" title="Administration">⚙</button></footer>
+<footer><img class="foot-logo" src="img/pavillon-avenir.png" alt="Pavillon de l'Avenir"><div><b>Métier+ · Conçu par Jeremy, enseignant</b></div><div class="foot-s">Né au Pavillon de l'Avenir, centre de formation professionnelle</div><div class="foot-s">Réservé aux enseignants du Pavillon de l'Avenir · Livres interactifs pour la classe et l'atelier</div><div class="foot-s">© 2026 Jérémy Raymond · Tous droits réservés</div><button class="adm-btn" id="adminBtn" aria-label="Administration" title="Administration">⚙</button></footer>
 
 <script>
 window.LIVRES_DATA = {};
@@ -8673,7 +8673,7 @@ return {matrice:function(texte){var q=new QRCode(-1,L.M);q.addData(texte);q.make
 </script>
 
 <div class="bv-ov" id="bienOv" hidden role="dialog" aria-label="Bienvenue"><div class="bien-box">
-  <div class="bien-tete"><img class="lg-blc" src="img/pavillon-avenir-blanc.png" alt="Pavillon de l'Avenir"><img class="lg-clr" src="img/pavillon-avenir.png" alt=""><h2>Bienvenue !</h2><p>Tes livres de cours, réservés aux enseignants du Pavillon de l'Avenir.</p></div>
+  <div class="bien-tete"><img class="lg-blc" src="img/metier-plus-blanc.svg" alt="Métier+"><img class="lg-clr" src="img/metier-plus.svg" alt=""><h2>Bienvenue !</h2><p>Tes livres de cours, réservés aux enseignants du Pavillon de l'Avenir.</p></div>
   <ol class="bien-et">
     <li><span class="bi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 20c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg></span><div><b>Connecte-toi</b>Avec ton identifiant (prenom.nom). Pas de compte&nbsp;? «&nbsp;Demander un accès&nbsp;» dans la connexion.</div></li>
     <li><span class="bi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5z"/><path d="M4 19V5.5M8 7h8M8 11h6"/></svg></span><div><b>Choisis un livre</b>Touche sa couverture, puis «&nbsp;Lire&nbsp;».</div></li>
@@ -8683,7 +8683,7 @@ return {matrice:function(texte){var q=new QRCode(-1,L.M);q.addData(texte);q.make
   <div class="bien-b"><button type="button" class="bv-lien" id="bienAide">Voir l'aide</button><span>·</span><button type="button" class="bv-lien" id="bienOk">Plus tard</button></div>
 </div></div>
 <div class="bv-ov" id="bvOv" hidden role="dialog" aria-label="Aide : la barre d'outils"><div class="bv-box">
-  <div class="bv-tete"><img src="img/pavillon-avenir.png" alt=""><div><h2>Aide : la barre d'outils</h2><p>Clique une couverture, puis « Lire ». Tout ce qu'il faut pour projeter est dans la barre en bas de l'écran.</p></div></div>
+  <div class="bv-tete"><img src="img/metier-plus-icone.svg" alt=""><div><h2>Aide : la barre d'outils</h2><p>Clique une couverture, puis « Lire ». Tout ce qu'il faut pour projeter est dans la barre en bas de l'écran.</p></div></div>
   <img class="bv-barre" src="nouveautes/bv-barre.jpg" alt="Barre d'outils du lecteur, boutons numérotés de 1 à 10">
   <ol class="bv-leg" id="bvLeg"></ol>
   <div class="bv-plus"><img src="nouveautes/bv-plus.jpg" alt="Menu Plus d'outils" loading="lazy"><div>
@@ -9311,7 +9311,7 @@ window.ACCES = (function(){
   }
   document.addEventListener("pointerdown", e => { const m = document.getElementById("accesMenu"); if (m && !m.hidden && !m.contains(e.target) && !e.target.closest("#compteBtn")) m.hidden = true; });
 
-  const marque = (titre, sous) => '<div class="acces-marque"><img class="lg-blc" src="img/pavillon-avenir-blanc.png" alt="Pavillon de l\'Avenir"><img class="lg-clr" src="img/pavillon-avenir.png" alt=""><h2>' + titre + '</h2><p class="sous">' + sous + '</p></div>';
+  const marque = (titre, sous) => '<div class="acces-marque"><img class="lg-blc" src="img/metier-plus-blanc.svg" alt="Métier+"><img class="lg-clr" src="img/metier-plus.svg" alt=""><h2>' + titre + '</h2><p class="sous">' + sous + '</p></div>';
   const LOGO_PROG = { "Entretien général d'immeubles":"img/prog-egi.jpg", "Plomberie et chauffage":"img/prog-plomberie.jpg" };
   const ICO_PROG = { "Entretien général d'immeubles":'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V8l7-5 7 5v13"/><path d="M9 21v-6h6v6M9 10h.01M15 10h.01"/></svg>',
     "Plomberie et chauffage":'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h6v4h6a4 4 0 0 1 4 4v2h-4v-2H10v2H4z"/><path d="M18 18.5c0 1-.8 1.8-1.8 1.8s-1.7-.8-1.7-1.8c0-1.2 1.7-3 1.7-3s1.8 1.8 1.8 3z"/></svg>' };
@@ -9320,7 +9320,7 @@ window.ACCES = (function(){
     const conf = Array.from({ length:18 }, (_, i) => { const a = i / 18 * Math.PI * 2 + Math.random() * .3, d = 60 + Math.random() * 50;
       return '<i class="conf" style="background:' + C[i % C.length] + ';--x:' + Math.round(Math.cos(a) * d) + 'px;--y:' + Math.round(Math.sin(a) * d) + 'px;--r:' + Math.round(Math.random() * 540 - 270) + 'deg;animation-delay:' + (0.78 + Math.random() * .12).toFixed(2) + 's"></i>'; }).join("");
     return '<div class="acces-succes"><div class="crochet"><span class="halo"></span>' + conf + '<svg viewBox="0 0 100 100"><circle class="fond" cx="50" cy="50" r="45"/><circle class="cercle" cx="50" cy="50" r="45"/><path class="coche" d="M30 52l13 13 27-29"/></svg></div>'
-      + '<h2>' + titre + '</h2>' + html + '<br><img class="mini lg-blc" src="img/pavillon-avenir-blanc.png" alt=""><img class="mini lg-clr" src="img/pavillon-avenir.png" alt=""></div>';
+      + '<h2>' + titre + '</h2>' + html + '<br><img class="mini lg-blc" src="img/metier-plus-blanc.svg" alt=""><img class="mini lg-clr" src="img/metier-plus.svg" alt=""></div>';
   }
   function bienvenue(apres){   /* connexion réussie : pastille des initiales qui apparaît, cadenas qui s'ouvre, « Bonjour Prénom ! », puis fermeture toute seule */
     const ini = SESSION.nom.split(/\s+/).map(m => m[0] || "").join("").slice(0, 2).toUpperCase(), n = protegesPermis();
