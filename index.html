@@ -288,6 +288,7 @@
   /* collection Métier+ (8 nov.) : petit « + » sur chaque couverture, logo dans la barre des livres */
   .mp-coll{position:absolute;left:8px;bottom:8px;z-index:3;width:24px;height:24px;border-radius:6px;overflow:hidden;box-shadow:0 2px 6px rgba(0,0,0,.35);pointer-events:none}
   .mp-coll img{width:100%;height:100%;display:block}
+  .mp-coll.autre{display:grid;place-items:center;background:#3a4252;color:#e8ecf2}
   .reader:not(.wbon) .rb-logo{display:block;height:22px;opacity:.95}
   .reader.wbon .rb-logo{display:block}
   .reader.wbon #readerBack{order:99;margin-left:auto}
@@ -334,6 +335,22 @@
 
 @media (max-width:1250px){.mp-x{display:none!important}}
 @media (max-width:980px){.mp-nav{display:none!important}}
+/* En-têtes = celui de l'accueil (8 nov.) : pas de description, nom de largeur fixe (la barre ne bouge pas d'une page à l'autre), mêmes tailles que l'accueil (zoom .9) */
+.mp-sous2{display:none!important}
+.mp-tit{flex:none!important;min-width:140px;max-width:140px;box-sizing:border-box;padding-left:11px;margin-left:-13px!important}
+.reader.wbon .reader-bar .mp-tit{margin-left:-11px!important}
+.mp-nom2{font-size:15px}
+header .logo-t{min-width:156px;box-sizing:border-box}
+.pl-top .mp-nav,.act-top .mp-nav,.reader-bar .mp-nav{margin-left:6px}
+.pl-top .mp-nav a,.act-top .mp-nav a{min-height:32px!important;padding:5px 9px!important;font-size:12.2px!important;gap:5px}
+.pl-top .mp-nav svg,.act-top .mp-nav svg{width:14px;height:14px}
+.reader.wbon .reader-bar{background:#141414!important}
+.pl-top,.act-top,.reader.wbon .reader-bar{border-bottom:0!important;min-height:63px;box-sizing:border-box}
+.pl-top #plClose,.act-top #actBack,.reader.wbon #readerBack,.reader.wbon #readerTdb{min-height:31px!important;height:31px;padding:0 12px!important;border:1px solid rgba(255,255,255,.19)!important;border-radius:6px!important;background:rgba(255,255,255,.08)!important;font-weight:500!important;display:inline-flex;align-items:center;gap:4px}
+.pl-top #plClose,.act-top #actBack,.reader.wbon #readerTdb{font-size:12.7px!important}
+.reader.wbon #readerBack{font-size:0!important}.reader.wbon #readerBack::before{font-size:12.7px!important}
+.pl-top #plClose svg,.act-top #actBack svg{width:15px;height:15px}
+body.clair .pl-top #plClose,body.clair .act-top #actBack{border-color:rgba(0,0,0,.15)!important;background:rgba(0,0,0,.04)!important}
 
   .reader.wbon .reader-bar{min-height:63px;box-sizing:border-box;padding-left:4vw;padding-right:4vw}
   @media (max-width:640px){.rb-logo{height:22px}.reader.wbon .reader-bar{min-height:70px;padding-left:14px;padding-right:14px}}
@@ -1348,7 +1365,7 @@ function bookCard(l){
     ${badgeLivre(l) === "construction" ? '<span class="badge badge-constr" title="Livre en construction : pas encore la version finale">' + ICO_CONSTR + 'En construction</span>' : badgeLivre(l) === "nouveau" ? '<span class="badge">Nouveau</span>' : badgeLivre(l) === "maj" ? '<span class="badge badge-maj">Mis à jour</span>' : ''}
     ${isFav(l) ? '<span class="fav-mark">★</span>' : ''}
     ${window.ACCES && ACCES.verrouille(l.fichier) ? '<span class="cadenas" title="Livre protégé : connecte-toi pour l\'ouvrir">' + window.ICO_CADENAS + '</span>' : ''}
-    <span class="mp-coll" title="Collection Métier+"><img src="img/metier-plus-icone.svg" alt="Métier+"></span>
+    ${l.user ? '<span class="mp-coll autre" title="Livre ajouté par un enseignant (hors collection Métier+)"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h12v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5"/></svg></span>' : '<span class="mp-coll" title="Collection Métier+"><img src="img/metier-plus-icone.svg" alt="Métier+"></span>'}
     <div class="cover ${gen?'generated':''}" style="${coverStyle(l)}">
       ${gen ? `<div class="t">${esc(l.titre)}</div><div class="a">${esc(l.auteur)}</div>` : ''}
     </div>

@@ -23,7 +23,7 @@ def fmt(n):
 
 
 import os as _os
-LOGO = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "logo-pda.png")
+LOGO = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "logo-metier.png")
 LOGO_R = 358 / 141
 AUTEUR = "Jeremy, enseignant"
 
