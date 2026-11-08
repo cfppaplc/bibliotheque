@@ -226,6 +226,45 @@ header { grid-column: 1 / -1; display: flex; align-items: center; justify-conten
 #apercuOv .ap-moments button.on { background: #1c2330; color: #fff; border-color: #1c2330; }
 #apercuOv .ap-fermer { height: 40px; padding: 0 18px; border-radius: 8px; border: 0; background: #EB6A22; color: #fff; font: 700 15px "Segoe UI", Roboto, Arial, sans-serif; cursor: pointer; }
 #apercuOv iframe { flex: 1; width: 100%; border: 0; background: #000; }
+/* Préparer le cours agrandi (8 nov.) : grande fenêtre en deux colonnes, déroulement en rangées */
+html #prep .sheet-in.prep2 { width: min(1240px, calc(100vw - 32px)); display: grid; grid-template-columns: minmax(380px, 5fr) 7fr; grid-template-rows: auto 1fr auto; column-gap: 26px; align-content: start; }
+#prep .prep2 > .marque, #prep .prep2 > .sheet-actions { grid-column: 1 / -1; }
+#prep .prep2 > .p2-g, #prep .prep2 > .p2-d { min-width: 0; display: flex; flex-direction: column; gap: 14px; }
+#prep .prep2 .field { margin: 0; }
+#prep .prep2 #f-module:not([hidden]) { margin-top: 8px; }
+.deroul { display: flex; flex-direction: column; gap: 8px; }
+.dr-row { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto 34px; align-items: center; gap: 8px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+.dr-row .lk-top { grid-column: 2 / -1; display: block; margin: 0; }
+.dr-row .lk-choix { grid-column: 1 / -1; }
+.dr-fixe { opacity: .7; padding: 6px 10px; }
+.dr-nomf { font-weight: 600; font-size: 15px; }
+.dr-poi { cursor: grab; opacity: .45; font-size: 15px; letter-spacing: -3px; text-align: center; user-select: none; touch-action: none; }
+.dr-nom { font: inherit; font-size: 16px; font-weight: 600; border: 1px solid transparent; background: transparent; color: inherit; padding: 6px 8px; border-radius: 8px; min-width: 0; width: 100%; box-sizing: border-box; }
+.dr-nom:hover, .dr-nom:focus { border-color: var(--line); background: rgba(128,128,128,.08); outline: none; }
+.dr-dur { display: inline-flex; align-items: center; gap: 4px; }
+.dr-dur button { width: 34px; height: 34px; border-radius: 9px; border: 1px solid var(--line); background: transparent; color: inherit; font-size: 17px; cursor: pointer; }
+.dr-dur button:disabled { opacity: .3; }
+.dr-dur .rz { border: 0; font-size: 15px; opacity: .7; width: 26px; }
+.dr-dur b { min-width: 64px; text-align: center; font-size: 15px; line-height: 1.1; }
+.dr-dur b small { display: block; font-size: 10.5px; font-weight: 500; opacity: .6; }
+.dr-x { width: 34px; height: 34px; border: 0; background: transparent; color: inherit; opacity: .45; border-radius: 9px; cursor: pointer; font-size: 15px; }
+.dr-x:hover { opacity: 1; background: rgba(220,60,60,.15); }
+.dr-row .lk-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.dr-row .lk-add { font-size: 13px; padding: 5px 10px; }
+.dr-tient { opacity: .5; }
+.dr-avant { box-shadow: 0 -3px 0 #EB6A22; }
+.dr-apres { box-shadow: 0 3px 0 #EB6A22; }
+.dr-vide { opacity: .7; font-size: 14px; margin: 4px 2px; }
+.dr-ajout { display: flex; gap: 8px; margin-top: 10px; }
+.dr-ajout input { flex: 1; min-width: 0; font-size: 16px; padding: 10px 12px; border-radius: 10px; border: 1px dashed var(--line); background: transparent; color: inherit; }
+.p2-hor .preview { max-height: 260px; overflow: auto; margin: 4px 0 0; }
+@media (max-width: 900px) {
+  html #prep .sheet-in.prep2 { display: block; width: min(640px, calc(100vw - 16px)); }
+  #prep .prep2 > .p2-g, #prep .prep2 > .p2-d { margin-bottom: 14px; }
+  .dr-row { grid-template-columns: 18px minmax(0, 1fr) 30px; }
+  .dr-row .dr-dur { grid-column: 2 / 3; grid-row: 2; }
+  .dr-row .lk-top { grid-row: 3; }
+}
 /* Vue de la semaine (8 nov.) */
 .semaine { margin: 4px 0 10px; }
 .sem-tete { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
@@ -829,8 +868,9 @@ html.ui-clair #apercuOv .ap-moments button.on, html.ui-clair #apercuOv .ap-ferme
 </div>
 
 <div class="sheet" id="prep" hidden>
-  <form class="sheet-in" id="prepForm">
+  <form class="sheet-in prep2" id="prepForm">
     <div class="marque"><img class="lg-blc" src="img/metier-plus-blanc.svg" alt="Métier+"><img class="lg-clr" src="img/metier-plus.svg" alt=""><h2>Préparer le cours</h2><p>Choisis le moment, puis ce qu'on fait.</p></div>
+    <div class="p2-g">
     <div class="field quand"><span class="step-q"><span class="num">1</span>Pour quand? <span class="tip-i" tabindex="0" role="img" aria-label="Aide : Choisis le jour et la période. Un cours préparé d'avance s'affichera tout seul à son moment. Le point vert montre ce qui est déjà préparé." data-tip="Choisis le jour et la période. Un cours préparé d'avance s'affichera tout seul à son moment. Le point vert montre ce qui est déjà préparé.">?</span></span>
       <div class="semaine" id="f-semaine" aria-label="Choisis une période dans la semaine"></div>
       <div class="jour-choix" id="f-jours" hidden></div><div class="jour-choix" id="f-pers" hidden></div>
@@ -840,22 +880,21 @@ html.ui-clair #apercuOv .ap-moments button.on, html.ui-clair #apercuOv .ap-ferme
         <div id="f-exam-ici"><label class="exam-opt" for="f-exam"><input type="checkbox" id="f-exam"><span><b>Examen aujourd'hui</b> — pas de pause dans l'horaire<small>Seulement pour ce cours.</small></span></label></div>
       </details>
     </div>
-    <div class="field"><label for="f-prog" class="step-q"><span class="num">2</span>Quel programme? <span class="tip-i" tabindex="0" role="img" aria-label="Aide : Le logo, le nom du programme et la liste des compétences changent selon ce choix." data-tip="Le logo, le nom du programme et la liste des compétences changent selon ce choix.">?</span></label><select id="f-prog"><option value="5333">DEP 5333 · Plomberie et chauffage</option><option value="5211">DEP 5211 · Entretien général d'immeubles</option></select></div>
-    <div class="field"><label for="f-comp" class="step-q"><span class="num">3</span>Quelle compétence? <span class="tip-i" tabindex="0" role="img" aria-label="Aide : Elle s'affiche aux élèves et choisit l'arrière-plan." data-tip="Elle s'affiche aux élèves et choisit l'arrière-plan.">?</span></label><select id="f-comp"></select><input id="f-module" placeholder="Nom du module, si « Autre »"></div>
-    <div class="field"><label for="f-steps" class="step-q"><span class="num">4</span><span id="f-q3">Qu'est-ce qu'on fait aujourd'hui?</span> <span class="tip-i" tabindex="0" role="img" aria-label="Aide : Une activité par ligne, dans l'ordre. L'accueil, les pauses et les heures s'ajoutent tout seuls." data-tip="Une activité par ligne, dans l'ordre. L'accueil, les pauses et les heures s'ajoutent tout seuls.">?</span></label><textarea id="f-steps" rows="6" placeholder="Théorie : les clapets antiretour&#10;Démonstration&#10;Travail pratique à l'atelier&#10;Rangement"></textarea>
-      <details class="more" id="prep-more">
-        <summary>Ajuster les durées et voir l'horaire <span class="tip-i" tabindex="0" role="img" aria-label="Aide : Pour aller plus loin : choisir la durée de chaque activité avec + et −, voir l'horaire exact de la période, ou demander une suggestion à Claude." data-tip="Pour aller plus loin : choisir la durée de chaque activité avec + et −, voir l'horaire exact de la période, ou demander une suggestion à Claude.">?</span></summary>
-      <span class="prev-lbl">Durée de chaque activité <span class="tip-i" tabindex="0" role="img" aria-label="Aide : Clique sur + ou − pour choisir une durée (en bleu). Les activités en automatique se partagent le temps qui reste. ↺ remet en automatique." data-tip="Clique sur + ou − pour choisir une durée (en bleu). Les activités en automatique se partagent le temps qui reste. ↺ remet en automatique.">?</span></span>
-      <div class="durs" id="f-durs"></div>
-      <small id="f-durs-note" hidden></small>
-      <span class="prev-lbl">Horaire de la période <span class="tip-i" tabindex="0" role="img" aria-label="Aide : Aperçu de la prochaine période, pauses comprises." data-tip="Aperçu de la prochaine période, pauses comprises.">?</span></span>
+    <div class="field"><label for="f-compt" class="step-q"><span class="num">2</span>Quelle compétence? <span class="tip-i" tabindex="0" role="img" aria-label="Aide : Elle s'affiche aux élèves et choisit le logo du programme. Tape les premières lettres pour la trouver." data-tip="Elle s'affiche aux élèves et choisit le logo du programme. Tape les premières lettres pour la trouver.">?</span></label>
+      <select id="f-compt"></select><input id="f-module" placeholder="Nom du module, si « Autre »">
+      <select id="f-prog" hidden><option value="5333">DEP 5333 · Plomberie et chauffage</option><option value="5211">DEP 5211 · Entretien général d'immeubles</option></select><select id="f-comp" hidden></select></div>
+    </div><div class="p2-d">
+    <div class="field"><span class="step-q"><span class="num">3</span><span id="f-q3">Qu'est-ce qu'on fait?</span> <span class="tip-i" tabindex="0" role="img" aria-label="Aide : Une activité par rangée, dans l'ordre. Règle la durée avec − et +, ou laisse « auto ». Ajoute un livre, un quiz ou un fichier à ouvrir pendant l'activité. Glisse ⋮⋮ pour changer l'ordre." data-tip="Une activité par rangée, dans l'ordre. Règle la durée avec − et +, ou laisse « auto ». Ajoute un livre, un quiz ou un fichier à ouvrir pendant l'activité. Glisse ⋮⋮ pour changer l'ordre.">?</span></span>
+      <div class="deroul" id="f-deroul"></div>
+      <div class="dr-ajout"><input id="f-nouv" placeholder="+ Ajouter une activité (ex. : Démonstration du brasage)" enterkeyhint="done"><button class="btn" type="button" id="b-nouv">Ajouter</button></div>
+      <textarea id="f-steps" rows="6" hidden></textarea>
       <div class="ai" id="ai-box" hidden><button class="btn" type="button" id="b-ai">Suggérer les durées avec Claude</button><span class="ai-note" id="ai-note" aria-live="polite"></span></div>
       <ul class="ai-why" id="ai-why" hidden></ul>
-      <ol class="preview" id="f-preview" aria-label="Aperçu de l'horaire du matin"></ol>
-      </details></div>
-    <div class="field"><span class="step-q"><span class="num">5</span>Ouvrir quelque chose pendant une activité? <small class="opt">facultatif</small></span>
-      <small class="lk-aide">Choisis une page de livre, un schéma, un plan, un fichier (PDF, image…), un lien web, une vidéo YouTube ou une minuterie pour une activité. En classe, un bouton « Ouvrir » apparaît quand l'activité commence.</small>
-      <div class="lk-liste" id="f-liens"></div></div>
+      <details class="more" id="prep-more" hidden><summary></summary><div class="durs" id="f-durs"></div><small id="f-durs-note" hidden></small></details>
+      <div class="lk-liste" id="f-liens" hidden></div>
+    </div>
+    <div class="field p2-hor"><span class="step-q">Horaire de la période</span><ol class="preview" id="f-preview" aria-label="Aperçu de l'horaire"></ol></div>
+    </div>
     <div class="sheet-actions">
       <button class="btn primary" type="submit">Afficher au tableau</button>
       <button class="btn" type="button" id="b-prep-cancel">Annuler</button>
@@ -1766,6 +1805,7 @@ $("f-steps").addEventListener("input", () => { clearTimeout(window.__lkT); windo
 
 // Flèches pour ajuster la durée de chaque activité (par bonds de 5 min)
 function renderDurs() {
+  if ($("f-deroul")) return renderDeroul();
   const ta = $("f-steps"), lines = ta.value.split("\n");
   const acts = [];
   lines.forEach((l, idx) => { const t = l.trim(); if (!t) return; const m = t.match(/^(\d+)\s*(?:min)?\s*\|\s*(.+)$/); const label = m ? m[2].trim() : t.replace(/^\|\s*/, "");
@@ -1853,6 +1893,68 @@ function fillComps(prog) {
   const o = document.createElement("option"); o.value = "autre"; o.textContent = "Autre (écrire ci-dessous)"; sel.append(o);
 }
 $("f-prog").addEventListener("change", () => { fillComps($("f-prog").value); $("f-module").hidden = true; });
+/* Préparer le cours, version simplifiée (8 nov.) : programme + compétence en une seule liste (le programme se déduit), et un seul
+   « Déroulement » : chaque activité = une rangée avec sa durée et ses contenus. Le texte de #f-steps (caché) reste la source : « 45 | Théorie… ». */
+function remplirCompt(){
+  const s = $("f-compt"); if (!s) return; s.innerHTML = "";
+  Object.entries(PROGS).forEach(([prog, nom]) => { const g = document.createElement("optgroup"); g.label = nom;
+    COMPS.filter(c => c[3] === prog).forEach(([code, title]) => { const o = document.createElement("option"); o.value = prog + "|" + code; o.textContent = code + " · " + titreComp(code); o.title = title; g.append(o); });
+    const o = document.createElement("option"); o.value = prog + "|autre"; o.textContent = "Autre module (" + nom.replace(/ ·.*/, "") + ")"; g.append(o); s.append(g); });
+  s.value = $("f-prog").value + "|" + $("f-comp").value; }
+if ($("f-compt")) $("f-compt").addEventListener("change", () => { const [prog, code] = $("f-compt").value.split("|");
+  if ($("f-prog").value !== prog){ $("f-prog").value = prog; fillComps(prog); } $("f-comp").value = code; $("f-module").hidden = code !== "autre"; if (code === "autre") $("f-module").focus(); });
+const lignesSteps = () => $("f-steps").value.split("\n");
+function ecrireSteps(lines){ $("f-steps").value = lines.filter(l => l.trim()).join("\n"); preview(); }
+function lireLigne(l){ const t = l.trim(), m = t.match(/^(\d+)\s*(?:min)?\s*\|\s*(.+)$/); return { label: m ? m[2].trim() : t.replace(/^\|\s*/, ""), d: m ? +m[1] : null }; }
+const ligne = (label, d) => d ? d + " | " + label : label;
+function renderDeroul(){
+  const box = $("f-deroul"); if (!box) return;
+  const lines = lignesSteps(), acts = [];
+  lines.forEach((l, idx) => { if (!l.trim()) return; const x = lireLigne(l); if (/^pause\b/i.test(x.label) || /^accueil\b|présences?\b/i.test(x.label)) return; acts.push(Object.assign(x, { idx })); });
+  const list = points($("f-steps").value, ctxForm()).list;
+  box.innerHTML = '<div class="dr-row dr-fixe"><span class="dr-poi"></span><span class="dr-nomf">Accueil et présences</span><span class="dr-dur"><b>5 min<small>fixe</small></b></span></div>';
+  if (!acts.length) box.insertAdjacentHTML("beforeend", '<p class="dr-vide">Ajoute ta première activité ci-dessous : théorie, démonstration, atelier, rangement…</p>');
+  acts.forEach((a, k) => {
+    const it = list[k + 1], mins = it ? it.b - it.a : 0, r = document.createElement("div"); r.className = "dr-row lk-row"; r.dataset.i = a.idx;
+    r.innerHTML = '<span class="dr-poi" title="Glisser pour changer l\'ordre" aria-hidden="true">⋮⋮</span><input class="dr-nom" aria-label="Activité">'
+      + '<span class="dr-dur"><button type="button" class="mn" aria-label="Moins 5 minutes">−</button><b></b><button type="button" class="pl" aria-label="Plus 5 minutes">+</button><button type="button" class="rz" title="Revenir en automatique">↺</button></span>'
+      + '<button type="button" class="dr-x" aria-label="Retirer cette activité" title="Retirer">✕</button>'
+      + '<div class="lk-top"><span class="lk-nom" hidden></span><span class="lk-chips"></span></div>';
+    const inp = r.querySelector(".dr-nom"); inp.value = a.label; r.querySelector(".lk-nom").textContent = a.label;
+    r.querySelector(".dr-dur b").innerHTML = mins + " min<small>" + (a.d ? "choisie" : "auto") + "</small>";
+    if (!a.d) r.querySelector(".rz").style.visibility = "hidden"; r.querySelector(".mn").disabled = mins <= 5;
+    const L = () => lignesSteps();
+    r.querySelector(".mn").onclick = () => { const l = L(); l[a.idx] = ligne(a.label, Math.max(5, mins - 5)); ecrireSteps(l); };
+    r.querySelector(".pl").onclick = () => { const l = L(); l[a.idx] = ligne(a.label, mins + 5); ecrireSteps(l); };
+    r.querySelector(".rz").onclick = () => { const l = L(); l[a.idx] = a.label; ecrireSteps(l); };
+    r.querySelector(".dr-x").onclick = () => { const l = L(); l.splice(a.idx, 1); delete LIENS_T[cleLien(a.label)]; ecrireSteps(l); };
+    const renommer = () => { const n = inp.value.trim(); if (!n){ inp.value = a.label; return; } if (n === a.label) return;
+      const k0 = cleLien(a.label), k1 = cleLien(n); if (LIENS_T[k0] && !LIENS_T[k1]){ LIENS_T[k1] = LIENS_T[k0]; delete LIENS_T[k0]; }
+      const l = L(); l[a.idx] = ligne(n, a.d); ecrireSteps(l); };
+    inp.addEventListener("change", renommer); inp.addEventListener("keydown", e => { if (e.key === "Enter"){ e.preventDefault(); inp.blur(); } });
+    /* contenus de l'activité (mêmes pastilles et même choix qu'avant) */
+    const kk = cleLien(a.label), lks = liste(LIENS_T[kk]), top = r.querySelector(".lk-chips");
+    lks.forEach((c, i) => { const ch = document.createElement("span"); ch.className = "lk-chip"; ch.innerHTML = '<span></span><button type="button" aria-label="Retirer">✕</button>';
+      ch.firstChild.textContent = nomLien(c); ch.insertAdjacentHTML("afterbegin", ico(c.type)); ch.title = nomLien(c);
+      ch.lastChild.onclick = () => { const n = liste(LIENS_T[kk]).filter((_, j) => j !== i); if (n.length) LIENS_T[kk] = n; else delete LIENS_T[kk]; renderDeroul(); }; top.append(ch); });
+    if (lks.length < MAX_LIENS){ const b = document.createElement("button"); b.type = "button"; b.className = "lk-add"; b.textContent = lks.length ? "＋ Un autre" : "＋ Livre, quiz, fichier…"; b.onclick = () => choix(r, a.label); top.append(b); }
+    r.querySelector(".dr-poi").addEventListener("pointerdown", e => glisserActivite(e, r));
+    box.append(r);
+  });
+}
+/* changer l'ordre : glisser la poignée ⋮⋮ */
+function glisserActivite(e, row){
+  e.preventDefault(); const box = $("f-deroul"); let vise = null, apres = false; row.classList.add("dr-tient");
+  const mv = ev => { const el = document.elementFromPoint(ev.clientX, ev.clientY), r = el && el.closest(".dr-row.lk-row");
+    box.querySelectorAll(".dr-avant,.dr-apres").forEach(x => x.classList.remove("dr-avant", "dr-apres"));
+    if (r && r !== row){ const b = r.getBoundingClientRect(); apres = ev.clientY > b.top + b.height / 2; r.classList.add(apres ? "dr-apres" : "dr-avant"); vise = r; } else vise = null; };
+  const up = () => { removeEventListener("pointermove", mv); removeEventListener("pointerup", up); removeEventListener("pointercancel", up); row.classList.remove("dr-tient");
+    box.querySelectorAll(".dr-avant,.dr-apres").forEach(x => x.classList.remove("dr-avant", "dr-apres"));
+    if (!vise) return; const l = lignesSteps(), a = +row.dataset.i, v = +vise.dataset.i, x = l.splice(a, 1)[0]; let pos = v > a ? v - 1 : v; if (apres) pos++; l.splice(pos, 0, x); ecrireSteps(l); };
+  addEventListener("pointermove", mv); addEventListener("pointerup", up); addEventListener("pointercancel", up);
+}
+function ajouterActivite(){ const i = $("f-nouv"), v = i.value.trim(); if (!v) return; const l = lignesSteps().filter(x => x.trim()); l.push(v); i.value = ""; ecrireSteps(l); i.focus(); }
+if ($("b-nouv")){ $("b-nouv").onclick = ajouterActivite; $("f-nouv").addEventListener("keydown", e => { if (e.key === "Enter"){ e.preventDefault(); ajouterActivite(); } }); }
 
 // ---------- Contenus liés aux activités : page de livre, schéma, plan, tableau blanc, minuterie ----------
 /* Icônes au trait, même style que la barre d'outils des livres */
@@ -2077,6 +2179,7 @@ function activitesPrep(){
   return out;
 }
 function renderLiens(){
+  if ($("f-deroul")) return renderDeroul();
   const box = $("f-liens"); if (!box) return; box.innerHTML = "";
   const acts = activitesPrep();
   if (!acts.length){ box.innerHTML = '<span class="lk-note">Écris d\'abord tes activités à l\'étape 4.</span>'; return; }
@@ -2234,7 +2337,7 @@ function clicSimple(f){ clearTimeout(clicT); clicT = setTimeout(f, 280); }
 function lierActivite(label){
   clearTimeout(clicT); openPrep();
   setTimeout(() => {
-    const k = cleLien(label), row = [...document.querySelectorAll("#f-liens .lk-row")].find(x => cleLien(x.querySelector(".lk-nom").textContent) === k);
+    const k = cleLien(label), row = [...document.querySelectorAll("#f-deroul .lk-row, #f-liens .lk-row")].find(x => cleLien(x.querySelector(".lk-nom").textContent) === k);
     if (!row) return;
     row.scrollIntoView({ block:"center", behavior:"smooth" }); row.classList.add("lk-vise"); setTimeout(() => row.classList.remove("lk-vise"), 2200);
     if (liste(LIENS_T[k]).length < MAX_LIENS) choix(row, row.querySelector(".lk-nom").textContent);
@@ -2271,7 +2374,7 @@ function remplirPrep(jour, per){
   $("prepForm").querySelector('button[type="submit"]').textContent = actif ? "Afficher au tableau" : "Enregistrer pour " + (jour ? nomJour(jour, true).toLowerCase().replace(/ \d.*/, "") : (per === "pm" ? "cet" : "ce")) + " " + (per === "am" ? "matin" : "après-midi");
   $("f-q3").textContent = "Qu'est-ce qu'on fait " + (jour ? nomJour(jour).toLowerCase().replace(/ \d.*/, "") + " " : "") + (per === "am" ? (jour ? "matin" : "ce matin") : (jour ? "après-midi" : "cet après-midi")) + "?";
   const ex = $("f-exam").closest(".exam-opt").querySelector("b"); if (ex) ex.textContent = "Examen pendant ce cours";
-  boutonsJours(); preview(); renderLiens();
+  boutonsJours(); remplirCompt(); preview(); renderLiens();
 }
 /* Vue de la semaine (8 nov., « simplifier la préparation de cours », vue choisie par Jeremy) : 5 jours × matin / après-midi.
    Toucher une case = préparer cette période (même formulaire). Glisser un cours vers une case vide = le copier là. */
@@ -2364,7 +2467,7 @@ function openPrep() {
   const fds = [0, 6].includes(new Date().getDay());   /* fin de semaine : on prépare le prochain jour de classe */
   if (s && !fds) remplirPrep("", s.split("|")[1]); else remplirPrep(prochainJourClasse(), "am");   /* journée terminée : on prépare le prochain jour de classe */
   document.querySelector("#prep .sheet-in").scrollTop = 0;
-  if (!matchMedia("(pointer: coarse)").matches) $("f-comp").focus({ preventScroll: true });   /* au toucher : pas de focus (le formulaire sautait au milieu et la liste s'ouvrait) */
+  if (!matchMedia("(pointer: coarse)").matches && $("f-compt")) $("f-compt").focus({ preventScroll: true });   /* au toucher : pas de focus (le formulaire sautait au milieu et la liste s'ouvrait) */
   demanderCatalogue();
 }
 $("b-prep-cancel").onclick = () => $("prep").hidden = true;
