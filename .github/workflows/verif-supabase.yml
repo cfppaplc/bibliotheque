@@ -1,0 +1,32 @@
+# Vérification ponctuelle du coffre et des statistiques (Claude, 8 nov.). Écrit le résultat dans .github/verif-supabase.txt
+name: Vérification Supabase
+on:
+  push:
+    paths: [".github/workflows/verif-supabase.yml"]
+permissions:
+  contents: write
+jobs:
+  verif:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Essais
+        run: |
+          U="https://kjlotlhqrgekzohshmbn.supabase.co/rest/v1"
+          K="sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY"
+          H=(-H "apikey: $K" -H "Content-Type: application/json")
+          ID="verification-claude-0000000000000000"; J="jeton-verification-000000000000000"
+          {
+          echo "1 lire (vide ou deja la) : $(curl -s "${H[@]}" -X POST $U/rpc/coffre_lire -d "{\"p_id\":\"$ID\"}")"
+          echo "2 ecrire bon jeton : $(curl -s "${H[@]}" -X POST $U/rpc/coffre_ecrire -d "{\"p_id\":\"$ID\",\"p_jeton\":\"$J\",\"p_env\":\"x\",\"p_data\":\"essai\"}")"
+          echo "3 lire : $(curl -s "${H[@]}" -X POST $U/rpc/coffre_lire -d "{\"p_id\":\"$ID\"}" | cut -c1-120)"
+          echo "4 ecrire mauvais jeton (doit etre false) : $(curl -s "${H[@]}" -X POST $U/rpc/coffre_ecrire -d "{\"p_id\":\"$ID\",\"p_jeton\":\"mauvais-jeton-0000000000000000\",\"p_env\":\"x\",\"p_data\":\"pirate\"}")"
+          echo "5 lecture directe de la table (doit etre refusee) : HTTP $(curl -s -o /tmp/r -w '%{http_code}' "${H[@]}" "$U/coffre?select=id&limit=1") $(cut -c1-120 /tmp/r)"
+          echo "6 stats_plus : HTTP $(curl -s -o /dev/null -w '%{http_code}' "${H[@]}" -X POST $U/rpc/stats_plus -d '{"p_cle":"test:verification"}')"
+          echo "7 stats_lire : $(curl -s "${H[@]}" -X POST $U/rpc/stats_lire -d '{}' | cut -c1-300)"
+          echo "8 nombre de rangees du coffre visibles par liste (doit etre refuse) : HTTP $(curl -s -o /dev/null -w '%{http_code}' "${H[@]}" "$U/coffre")"
+          } | tee .github/verif-supabase.txt
+      - name: Garder le resultat
+        run: |
+          git config user.name "verification-automatique"; git config user.email "actions@users.noreply.github.com"
+          git add .github/verif-supabase.txt; git commit -m "Vérification Supabase : résultat"; git push
