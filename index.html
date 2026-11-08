@@ -10252,7 +10252,18 @@ document.addEventListener("click", e => { const b = e.target.closest && e.target
   const tete = document.getElementById("topbar"), logo = tete && tete.querySelector(".logo");
   if (logo){ if (!tete.querySelector(".mp-nav")) logo.insertAdjacentHTML("afterend", mpNavHTML("biblio").replace('class="mp-nav"', 'class="mp-nav mp-nav-tete"'));
     tete.querySelectorAll(".mp-nav a").forEach(a => a.onclick = e => { e.preventDefault(); if (a.dataset.nav === "biblio"){ const b = document.querySelector('header nav a[data-view="all"]'); if (b) b.click(); scrollTo({ top: 0, behavior: "smooth" }); return; } aller(a.dataset.nav); }); }
+  /* pied de page commun (garde-nav.js) : les liens ouvrent l'outil sans recharger la page */
+  const pied = document.querySelector("body > footer");
+  if (pied && window.mpPiedHTML && !pied.dataset.pied){ const adm = document.getElementById("adminBtn"); pied.dataset.pied = "1"; pied.classList.add("mp-pied"); pied.innerHTML = mpPiedHTML(); if (adm){ adm.hidden = true; pied.append(adm); }
+    pied.addEventListener("click", e => { const a = e.target.closest("[data-pied]"); if (!a) return; const k = a.dataset.pied; if (k === "labo") return;
+      e.preventDefault(); actionPied(k); }); }
+  function actionPied(k){
+    if (k === "biblio"){ scrollTo({ top:0, behavior:"smooth" }); return; }
+    if (k === "neuf" || k === "aide"){ const b = document.getElementById(k === "neuf" ? "quoiNeuf" : "lienAide"); if (b) b.click(); return; }
+    if (k === "compte"){ if (window.ACCES) ACCES.dlgConnexion(); return; }
+    aller(k); }
   const q = new URLSearchParams(location.search).get("ouvrir");
+  if (q && /^(neuf|aide|compte)$/.test(q)){ history.replaceState(null, "", location.pathname); document.documentElement.classList.remove("ouvre"); const go = () => actionPied(q); if (window.ACCES && ACCES.pret) ACCES.pret.then(() => setTimeout(go, 300)); else window.addEventListener("load", go); }
   if (q && BTN[q]){ history.replaceState(null, "", location.pathname); const go = () => { aller(q); setTimeout(() => document.documentElement.classList.remove("ouvre"), 350); };
     if (window.ACCES && ACCES.pret) ACCES.pret.then(go); else window.addEventListener("load", go); }
 })();
