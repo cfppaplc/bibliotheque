@@ -1385,7 +1385,7 @@ function renderHero(){
   h.style.cssText = "background:linear-gradient(120deg,#1b2540 0%,#141414 68%)";
   h.innerHTML = `<div class="hero-content">
     <h1>${(window.titreAccueil && window.titreAccueil()) || "La plateforme des enseignants en formation professionnelle"}</h1>
-    <p>Livres animés, plans, quiz et simulateurs : tout pour enseigner un métier, en classe comme à l'atelier. <span class="hero-tag">Réservé aux enseignants du Pavillon de l'Avenir</span></p>
+    <p>Livres de cours animés, plans techniques, activités et simulateurs, réunis pour enseigner un métier en classe comme à l'atelier. <span class="hero-tag">Réservé aux enseignants du Pavillon de l'Avenir</span></p>
     <button class="hero-aide" id="heroAide" type="button">❔ Aide</button>
   </div>
   <div class="hero-stack">${vedettes().map(l => `<img src="${esc(couv(l))}" alt="">`).join("")}</div>`;
@@ -8691,11 +8691,11 @@ return {matrice:function(texte){var q=new QRCode(-1,L.M);q.addData(texte);q.make
 </script>
 
 <div class="bv-ov" id="bienOv" hidden role="dialog" aria-label="Bienvenue"><div class="bien-box">
-  <div class="bien-tete"><img class="lg-blc" src="img/metier-plus-blanc.svg" alt="Métier+"><img class="lg-clr" src="img/metier-plus.svg" alt=""><h2>Bienvenue !</h2><p>Tes livres de cours, réservés aux enseignants du Pavillon de l'Avenir.</p></div>
+  <div class="bien-tete"><img class="lg-blc" src="img/metier-plus-blanc.svg" alt="Métier+"><img class="lg-clr" src="img/metier-plus.svg" alt=""><h2>Bienvenue !</h2><p>La plateforme pédagogique des enseignants en formation professionnelle. Accès réservé aux enseignants du Pavillon de l'Avenir.</p></div>
   <ol class="bien-et">
-    <li><span class="bi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 20c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg></span><div><b>Connecte-toi</b>Avec ton identifiant (prenom.nom). Pas de compte&nbsp;? «&nbsp;Demander un accès&nbsp;» dans la connexion.</div></li>
-    <li><span class="bi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5z"/><path d="M4 19V5.5M8 7h8M8 11h6"/></svg></span><div><b>Choisis un livre</b>Touche sa couverture, puis «&nbsp;Lire&nbsp;».</div></li>
-    <li><span class="bi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 6h7a3 3 0 0 1 3 3v11a2 2 0 0 0-2-2H2z"/><path d="M22 6h-7a3 3 0 0 0-3 3v11a2 2 0 0 1 2-2h8z"/></svg></span><div><b>Feuillette</b>Les flèches en bas tournent les pages; le menu ☰ mène aux chapitres.</div></li>
+    <li><span class="bi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 20c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg></span><div><b>Connecte-toi</b>Utilise ton identifiant (prenom.nom). Pas encore de compte&nbsp;? Touche «&nbsp;Demander un accès&nbsp;» dans la fenêtre de connexion.</div></li>
+    <li><span class="bi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5z"/><path d="M4 19V5.5M8 7h8M8 11h6"/></svg></span><div><b>Choisis un livre</b>Touche une couverture, puis «&nbsp;Lire&nbsp;» : le livre s'ouvre en plein écran, prêt à projeter.</div></li>
+    <li><span class="bi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 6h7a3 3 0 0 1 3 3v11a2 2 0 0 0-2-2H2z"/><path d="M22 6h-7a3 3 0 0 0-3 3v11a2 2 0 0 1 2-2h8z"/></svg></span><div><b>Présente</b>Les flèches tournent les pages; le menu ☰ ouvre la table des matières et la recherche.</div></li>
   </ol>
   <button type="button" class="bien-go" id="bienCo">Se connecter</button>
   <div class="bien-b"><button type="button" class="bv-lien" id="bienAide">Voir l'aide</button><span>·</span><button type="button" class="bv-lien" id="bienOk">Plus tard</button></div>
@@ -9459,7 +9459,7 @@ window.ACCES = (function(){
   }
   const protegesPermis = () => { try { return Object.keys(DATA.livres).filter(f => DATA.livres[f].cles[SESSION.id]).length; } catch(e){ return 0; } };
   function dlgConnexion(apres){
-    box().innerHTML = marque('Se connecter', 'Réservé aux enseignants du Pavillon de l\'Avenir. Ton mot de passe ne quitte jamais cet ordinateur.')
+    box().innerHTML = marque('Se connecter', 'Accès réservé aux enseignants du Pavillon de l\'Avenir. Ton mot de passe reste sur cet appareil : il n\'est jamais envoyé.')
       + '<label for="acId">Identifiant</label><input type="text" id="acId" autocomplete="username" placeholder="prenom.nom">'
       + '<label for="acMdp">Mot de passe</label><input type="password" id="acMdp" autocomplete="current-password">'
       + '<div class="acces-err" id="acErr" hidden></div>'
@@ -9473,8 +9473,8 @@ window.ACCES = (function(){
     document.getElementById("acNon").onclick = fermer; document.getElementById("acDem").onclick = () => dlgDemande(false); document.getElementById("acOubli").onclick = () => dlgDemande(true);
   }
   function dlgDemande(oubli){
-    box().innerHTML = (oubli ? marque('Mot de passe oublié', 'Écris ton nom et choisis un nouveau mot de passe (au moins 10 caractères). Jeremy recevra la demande; dès qu\'il l\'accepte, ton nouveau mot de passe fonctionne. Tu gardes tous tes livres.')
-      : marque('Demander un accès', 'Choisis ton mot de passe (au moins 10 caractères). Ta demande partira toute seule à Jeremy; dès qu\'il l\'accepte, tu pourras te connecter.'))
+    box().innerHTML = (oubli ? marque('Mot de passe oublié', 'Écris ton nom et choisis un nouveau mot de passe (au moins 10 caractères). La demande est transmise à l\'administrateur; dès qu\'elle est acceptée, ton nouveau mot de passe fonctionne. Tes livres et tes données sont conservés.')
+      : marque('Demander un accès', 'Choisis un mot de passe d\'au moins 10 caractères. Ta demande est transmise automatiquement à l\'administrateur; tu pourras te connecter dès qu\'elle sera acceptée.'))
       + '<label for="dNom">Prénom et nom</label><input type="text" id="dNom" autocomplete="name">'
       + '<label for="dMdp">Mot de passe</label><input type="password" id="dMdp" autocomplete="new-password">'
       + '<label for="dMdp2">Mot de passe (encore)</label><input type="password" id="dMdp2" autocomplete="new-password">'

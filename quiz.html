@@ -287,7 +287,7 @@ html.sombre body.bord .tbar a{color:#a99ff0}
 <button id="rEcr" style="background:#24211E">📺 Écran de classe<br><small style="font-weight:500">sur un 2e appareil, avec le code</small></button></div>
 <div id="rCode" class="cache"><div class="sous" style="margin-top:14px">Tape le code affiché sur la télécommande</div>
 <input id="rIn" inputmode="numeric" maxlength="7" placeholder="000 000"><button id="rGo" style="width:100%">Afficher l'écran de classe</button></div>
-<div class="sous" style="margin-top:14px">Les élèves scannent le code QR : leur iPad devient une manette.</div>
+<div class="sous" style="margin-top:14px">Les élèves scannent le code QR : leur iPad devient une manette de quiz.</div>
 <div style="margin-top:14px"><a href="labo.html" style="color:var(--acc);font-weight:700;text-decoration:none">‹ Labo interactif</a></div></div></div>
 
 <!-- ============ ÉCRAN DE CLASSE ============ -->
@@ -309,7 +309,7 @@ html.sombre body.bord .tbar a{color:#a99ff0}
 <div id="vChoix">
 <div class="carte"><h2>Mes quiz</h2><div id="quizMiens" class="cartes"></div>
 <div class="ctl" style="margin-top:12px"><button id="bNouveau">+ Créer un quiz</button><button class="btn2" id="bColler">Coller des questions</button><button class="btn2" id="bImport">Importer un fichier</button><input type="file" id="fImport" accept=".json,application/json" class="cache"></div></div>
-<div class="carte"><h2>Quiz prêts à jouer</h2><div class="sous" style="margin:-4px 0 12px">Un quiz par livre de la bibliothèque, avec des images du livre. « Copier et modifier » pour en faire ton propre quiz.</div><div id="quizListe" class="cartes"></div></div>
+<div class="carte"><h2>Quiz prêts à jouer</h2><div class="sous" style="margin:-4px 0 12px">Un quiz par livre de la bibliothèque, illustré avec ses figures. « Copier et modifier » en fait une version à toi.</div><div id="quizListe" class="cartes"></div></div>
 </div>
 <div id="vColler" class="cache"><div class="carte"><h2>Coller des questions</h2>
 <div class="sous" style="margin-bottom:8px">Une question par bloc, séparés par une ligne vide. Mets une <b>*</b> devant la bonne réponse et un <b>-</b> devant les autres (2 à 4 choix). Une ligne qui commence par <b>?</b> ajoute une explication. Plusieurs <b>*</b> = plusieurs bonnes réponses. <b>= 15,4 ± 0,1 VA</b> = question de calcul. Des lignes <b>1.</b> <b>2.</b> <b>3.</b> sous la question = étapes à remettre en ordre.</div>
@@ -348,7 +348,7 @@ Le propane s'accumule…
 <div id="eQs"></div>
 <div class="ajouts"><span>Ajouter une question :</span><button class="btn2" data-aj="choix">Choix</button><button class="btn2" data-aj="vf">Vrai ou faux</button><button class="btn2" data-aj="multi">Plusieurs bonnes</button><button class="btn2" data-aj="ordre">Remettre en ordre</button><button class="btn2" data-aj="nombre">Calcul</button><button class="btn2" data-aj="erreur">Trouve l'erreur</button></div>
 <div class="ctl"><button id="eSauve">Enregistrer</button><button class="btn2" id="eAnnule">Annuler</button></div>
-<div class="sous" style="margin-top:8px">Le quiz est gardé sur cet appareil. « Exporter » (dans la liste) te donne un fichier à garder ou à partager à un collègue.</div></div>
+<div class="sous" style="margin-top:8px">Le quiz est enregistré dans ton compte et te suit sur tous tes appareils. « Exporter » (dans la liste) crée un fichier à partager avec un collègue.</div></div>
 </div>
 <div id="vJeu" class="cache">
 <div class="carte"><h2 id="jTitre"></h2><div id="qCour">En attente des participants…</div><div class="sous" id="qInfo"></div>
@@ -656,7 +656,7 @@ function telecommande(bord){
       <button class="jouer" data-jouer="${q.id}" style="background:${esc(c)}">Jouer</button>
       <div class="pt">${q.exemple ? `<button class="btn2" data-copier="${q.id}">Copier et modifier</button>` : `<button class="btn2" data-modif="${q.id}">Modifier</button><button class="btn2" data-dupl="${q.id}">Dupliquer</button><button class="btn2" data-export="${q.id}">Exporter</button><button class="btn2" data-suppr="${q.id}">Supprimer</button>`}</div></div></div>`; };
     const miens = tousQuiz().filter(q => !q.exemple), prets = tousQuiz().filter(q => q.exemple);
-    $("quizMiens").innerHTML = miens.map(carte).join("") || '<div class="sous" style="grid-column:1/-1;padding:6px 2px">Tu n\'as pas encore de quiz à toi. Crée-en un, colle tes questions, ou touche « Copier et modifier » sur un quiz prêt à jouer.</div>';
+    $("quizMiens").innerHTML = miens.map(carte).join("") || '<div class="sous" style="grid-column:1/-1;padding:6px 2px">Tu n\'as pas encore de quiz. Crée-en un, colle une liste de questions, ou pars d\'un quiz prêt à jouer avec « Copier et modifier ».</div>';
     $("quizListe").innerHTML = prets.map(carte).join("");
     const trouve = id => JSON.parse(JSON.stringify(tousQuiz().find(q => q.id === id)));
     document.querySelectorAll("[data-jouer]").forEach(b => b.onclick = () => {
