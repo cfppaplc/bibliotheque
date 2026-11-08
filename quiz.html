@@ -6,6 +6,7 @@
 <title>Quiz maison</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.50.0/dist/umd/supabase.min.js"></script>
+<script src="quiz-livres.js"></script>
 <style>
 :root{--fond:#E9E6E0;--carte:#fff;--txt:#24211E;--gris:#6B665E;--ligne:#E2DDD3;--acc:#534AB7;--vert:#2E8B57;--rouge:#D93025}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -348,7 +349,9 @@ function grillePersos(pris, choisi){
   return `<div class="persos">${PERSOS.map((p, k) => `<button class="perso ${pris.includes(k) && k !== choisi ? "pris" : ""} ${k === choisi ? "choisi" : ""}" data-av="${k}">${visage(k, "v-l")}<b>${esc(p[0])}</b><small>${esc(p[1])}</small><em>Déjà pris</em></button>`).join("")}</div>`;
 }
 function mesQuiz(){ return stock.get("quizMaison", []); }
-function tousQuiz(){ return [EXEMPLE].concat(mesQuiz()); }
+/* quiz des livres (quiz-livres.js) : lecture seule, comme l'exemple */
+const LIVRES_Q = (window.QUIZ_LIVRES || []).map(q => Object.assign({}, q, {reg: Object.assign({}, REG_DEF, {coul: q.coul || REG_DEF.coul})}));
+function tousQuiz(){ return [EXEMPLE].concat(LIVRES_Q, mesQuiz()); }
 
 const params = new URLSearchParams(location.search);
 if (params.get("animer")) animer([["bGo"], ["bSuite"]]);
@@ -500,7 +503,7 @@ function telecommande(bord){
   function sauverListe(L){ if (!stock.set("quizMaison", L)) { avis("Mémoire de l'appareil pleine : enlève des images ou des quiz."); return false; } return true; }
   function listeQuiz(){
     $("quizListe").innerHTML = tousQuiz().map(q => { const c = (q.reg || {}).coul || REG_DEF.coul;
-      return `<div class="cq"><div class="im" style="--c:${esc(c)};${q.couv ? `background-image:url('${esc(q.couv)}')` : ""}"><span>${q.qs.length} questions</span></div>
+      return `<div class="cq"><div class="im" style="--c:${esc(c)};${q.couv ? `background-image:url('${esc(q.couv)}')` : ""}${q.livre ? ";background-position:50% 12%" : ""}"><span>${q.qs.length} questions</span></div>
       <div class="co"><b>${esc(q.titre)}</b><span class="sous">${esc(q.sujet || (q.exemple ? "Quiz d'exemple" : ""))}</span>
       <button class="jouer" data-jouer="${q.id}" style="background:${esc(c)}">Jouer</button>
       <div class="pt">${q.exemple ? `<button class="btn2" data-copier="${q.id}">Copier et modifier</button>` : `<button class="btn2" data-modif="${q.id}">Modifier</button><button class="btn2" data-dupl="${q.id}">Dupliquer</button><button class="btn2" data-export="${q.id}">Exporter</button><button class="btn2" data-suppr="${q.id}">Supprimer</button>`}</div></div></div>`; }).join("");
