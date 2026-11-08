@@ -665,6 +665,7 @@ function telecommande(bord){
     if (m.m === "ecran?") { envoyer(topic, vueObj()); envoyerCouv(); const Q = G.jeu[G.i]; if (G.etat === "question" && Q && Q.img) envoyer(topic, {m: "img", i: G.i, data: Q.img}); return; }
     if (m.m === "persos?") { envoyerPersos(); return; }
     if (m.pid && P[m.pid]) { const etait = P[m.pid].parti; P[m.pid].vu = Date.now(); if (m.m === "bye") { P[m.pid].parti = true; envoyerPersos(); maj(); return; } if (etait && m.m === "vie" && !P[m.pid].exclu) { P[m.pid].parti = false; envoyerPersos(); maj(); } }
+    if (m.m === "vie" && m.pid && !P[m.pid]) { envoyer(topic, {m: "qui", pour: m.pid}); return; }
     if (m.m === "vie" || m.m === "bye") return;
     if (m.m === "ici") {
       if (m.av != null && Object.entries(P).some(([id, p]) => !p.parti && p.av === m.av && id !== m.pid)) { envoyer(topic, {m: "refus", pour: m.pid}); return; }
@@ -993,14 +994,20 @@ function joueur(code){
     $("nomJ").innerHTML = visage(av, "v-m") + " " + esc(nom);
     bx(`${visage(av, "v-l")}<div class="gros monte">Bienvenue, ${esc(nom)}.</div><div>Regarde le tableau : ça commence bientôt.</div>`);
     envoyer(topic, {m: "ici", pid, nom, av, prenom});
+    try { sessionStorage.setItem("quizJoueur", JSON.stringify({code, av, nom, nomEdite, t: Date.now()})); } catch(e) {}
     if (!entrer.vie) { entrer.vie = setInterval(() => { if (entre) envoyer(topic, {m: "vie", pid}); }, 12000);
       addEventListener("pagehide", () => { if (entre) envoyer(topic, {m: "bye", pid}); }); }
   }
   ecranChoix();
+  // Joueur déjà entré (page rechargée, enseignant déconnecté) : on revient tout seul, sans rechoisir
+  try { const J = JSON.parse(sessionStorage.getItem("quizJoueur") || "null");
+    if (J && J.code === code && Date.now() - J.t < 4 * 3600e3 && J.av >= 0) { av = J.av; nomEdite = !!J.nomEdite; nomChoisi = J.nom; ecranChoix(); entrer();
+      bx(`${visage(av, "v-l")}<div class="gros monte">Te revoilà, ${esc(nom)}.</div><div>Tu es toujours dans la partie. Si l'enseignant s'est déconnecté, elle reprend dès qu'il revient.</div>`); } } catch(e) {}
     ecouter(topic, m => {
       if (m.m === "persos") { pris = m.pris || []; if (!entre) ecranChoix(ecranChoix.msg); return; }
-      if (m.m === "refus" && m.pour === pid) { entre = false; av = -1; if (!nomEdite) nomChoisi = ""; ecranChoix(m.raison === "plein" ? `La partie est pleine (${m.max} joueurs au plus). Demande à l'enseignant.` : "Ce personnage vient d'être pris. Choisis-en un autre."); return; }
-      if (m.m === "kick" && m.pour === pid) { entre = false; av = -1; ecranChoix("L'enseignant t'a retiré de la partie. Choisis un personnage pour revenir."); return; }
+      if (m.m === "refus" && m.pour === pid) { entre = false; try { sessionStorage.removeItem("quizJoueur"); } catch(e) {} av = -1; if (!nomEdite) nomChoisi = ""; ecranChoix(m.raison === "plein" ? `La partie est pleine (${m.max} joueurs au plus). Demande à l'enseignant.` : "Ce personnage vient d'être pris. Choisis-en un autre."); return; }
+      if (m.m === "qui" && m.pour === pid) { if (entre) envoyer(topic, {m: "ici", pid, nom, av, prenom}); return; }
+      if (m.m === "kick" && m.pour === pid) { entre = false; try { sessionStorage.removeItem("quizJoueur"); } catch(e) {} av = -1; ecranChoix("L'enseignant t'a retiré de la partie. Choisis un personnage pour revenir."); return; }
       if (!entre || !pour(m)) return;
       if (m.coul) teinte(m.coul);
       if (m.m === "bienvenue") bx(`<div class="gros monte">Tu es dans la partie.</div><div>${esc(m.titre || "")}</div><div style="opacity:.7;margin-top:8px">Regarde le tableau : ça commence bientôt.</div>`);
