@@ -18,7 +18,7 @@ window.mpPiedHTML = () => {
   return '<div class="mp-pied-haut"><div class="mp-pied-marque"><img class="lg-b" src="img/metier-plus-blanc.svg" alt="Métier+"><img class="lg-c" src="img/metier-plus.svg" alt="Métier+">'
     + '<p>La plateforme pédagogique des enseignants en formation professionnelle. Livres animés, plans, formatifs, quiz et simulations.</p></div>'
     + '<div><h4>Outils</h4><ul>' + outils + '</ul></div>'
-    + '<div><h4>Aide</h4><ul><li><a href="./?ouvrir=neuf" data-pied="neuf">Quoi de neuf</a></li><li><a href="./?ouvrir=aide" data-pied="aide">Aide</a></li><li><a href="presentation.html">Présentation de Métier+</a></li><li><a href="./?ouvrir=signal" data-pied="signal">Signaler un problème</a></li><li class="mp-pied-acces"><a href="./?ouvrir=compte" data-pied="compte">Demander un accès</a></li></ul></div></div>'
+    + '<div><h4>Aide</h4><ul><li><a href="./?ouvrir=neuf" data-pied="neuf">Quoi de neuf</a></li><li><a href="./?ouvrir=aide" data-pied="aide">Aide</a></li><li><a href="presentation.html">Présentation de Métier+</a></li><li><a href="./?ouvrir=signal" data-pied="signal">Signaler un problème</a></li><li><a href="confidentialite.html">Confidentialité</a></li><li class="mp-pied-acces"><a href="./?ouvrir=compte" data-pied="compte">Demander un accès</a></li></ul></div></div>'
     + '<div class="mp-pied-bas"><span>© 2026 Jérémy Raymond · Tous droits réservés · Réservé aux enseignants du Pavillon de l\'Avenir</span><span class="mp-pied-pav">Né au Pavillon de l\'Avenir <img src="img/pavillon-avenir.png" alt="Pavillon de l\'Avenir"></span></div>';
 };
 (function(){

@@ -312,7 +312,7 @@ body>div:not(.cache):not([hidden]){animation:fenFond .22s ease-out}
 <div id="entree"><h1>Panneau d'alarme</h1>
 <div class="sous">Les Habitations du Quai · simulateur</div>
 <div style="margin-top:10px;font-weight:700">Choisis le personnage de ton équipe</div><div id="persoG"></div>
-<div class="sous" style="margin-top:4px">Nom de ton équipe (tu peux le changer)</div>
+<div class="sous" style="margin-top:4px">Nom de ton équipe : garde celui du personnage, ou un surnom d'un mot (pas de vrais noms)</div>
 <input id="equipe" placeholder="Choisis d'abord un personnage" maxlength="24" autocomplete="off">
 <button id="go" disabled>Commencer</button>
 <div class="sous" style="margin-top:10px">Monte le son de l'iPad : le panneau sonne.</div></div>
@@ -352,6 +352,9 @@ body>div:not(.cache):not([hidden]){animation:fenFond .22s ease-out}
 </div>
 
 <script>
+/* Loi 25 : un nom tapé par l'élève = un seul mot (prénom ou surnom), jamais de nom de famille */
+function surnom(v){ return String(v || "").trim().split(/\s+/)[0].replace(/[^\p{L}\p{N}'_-]/gu, "").slice(0, 14); }
+
 /* Simulateur de panneau d'alarme — Protection incendie (EGI 436-312), module 5.
    Relais : ntfy.sh (port 443, sans compte). Un sujet par session : PREFIXE + code à 6 chiffres.
    Messages enseignant → panneaux : ev (événement), fin (trouble/supervision rétabli), cause (cause de l'alarme réglée), raz (tout normal).
@@ -966,7 +969,7 @@ function panneau(code){
   $("go").onclick = () => {
     if (av < 0 || pris.includes(av)) return;
     try { ac = new (window.AudioContext || window.webkitAudioContext)(); ac.resume(); ton(440, .01, .001); } catch(e) {}
-    equipe = ($("equipe").value.trim() || PERSOS[av][0]).slice(0, 24); entre = true;
+    equipe = (nomEdite ? surnom($("equipe").value) : "") || PERSOS[av][0]; entre = true;
     $("eqNom").innerHTML = visage(av, "v-s") + esc(equipe) + " · " + code;
     $("entree").classList.add("cache"); $("panneau").classList.remove("cache");
     afficher(); envoyer(topic, {m: "ici", moi, equipe, av, prenom, etat: etatGlobal()});

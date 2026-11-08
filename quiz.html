@@ -373,6 +373,9 @@ Le propane s'accumule…
 </div></div>
 
 <script>
+/* Loi 25 : un nom tapé par l'élève = un seul mot (prénom ou surnom), jamais de nom de famille */
+function surnom(v){ return String(v || "").trim().split(/\s+/)[0].replace(/[^\p{L}\p{N}'_-]/gu, "").slice(0, 14); }
+
 /* Quiz maison — Labo interactif (Pavillon de l'Avenir). Même relais que le simulateur : Supabase Realtime (broadcast), ntfy.sh en secours.
    Télécommande = autorité (ordre, points, rangs). Messages :
    télécommande → tous : bienvenue, q (question), img (image pour l'écran), rev (réponse + résultat de chacun), fin, attente, vue (écran)
@@ -920,7 +923,7 @@ function joueur(code){
   function ecranChoix(msg){
     ecranChoix.msg = msg;
     bx(`<h2>Choisis ton personnage</h2>${msg ? `<div class="ko2">${esc(msg)}</div>` : ""}${grillePersos(pris, av)}
-      <div style="margin-top:6px;opacity:.8">Ton nom dans la partie (tu peux le changer)</div>
+      <div style="margin-top:6px;opacity:.8">Ton nom dans la partie : garde celui du personnage, ou un prénom ou surnom (pas de nom de famille)</div>
       <input id="jPre" maxlength="24" placeholder="Choisis d'abord un personnage" value="${esc(nomChoisi)}">
       <button id="jGo" style="width:100%;font-size:20px;padding:16px;background:#fff;color:#24211E" ${av < 0 ? "disabled" : ""}>Entrer</button>`);
     document.querySelectorAll("#jBx .perso").forEach(b => b.onclick = () => { av = +b.dataset.av; if (!nomEdite) nomChoisi = PERSOS[av][0]; ecranChoix(); });
@@ -929,7 +932,7 @@ function joueur(code){
   }
   function entrer(){
     if (av < 0 || pris.includes(av)) return;
-    nom = ($("jPre").value.trim() || PERSOS[av][0]).slice(0, 24); entre = true;
+    nom = (nomEdite ? surnom($("jPre").value) : "") || PERSOS[av][0]; entre = true;
     $("nomJ").innerHTML = visage(av, "v-m") + " " + esc(nom);
     bx(`${visage(av, "v-l")}<div class="gros monte">Bienvenue, ${esc(nom)}.</div><div>Regarde le tableau : ça commence bientôt.</div>`);
     envoyer(topic, {m: "ici", pid, nom, av, prenom});
