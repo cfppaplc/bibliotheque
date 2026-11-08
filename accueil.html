@@ -1889,7 +1889,8 @@ function idsFichiers(){ const L = [cfg.liens || {}].concat(Object.values(cfg.pla
 function menageFichiers(){ const garder = idsFichiers();
   fCles().then(ks => (ks || []).forEach(k => { if (!garder.has(k)) fEnlever(k); })).catch(() => {}); }
 /* ---- Les fichiers suivent l'enseignant (8 nov.) : copie chiffrée dans son coffre, en morceaux de 5 Mo (rangées « fichier:<id> » + « fichier:<id>:<n> ») ---- */
-const MORCEAU = 5 * 1048576, MAX_FICHIER = 60 * 1048576;
+/* Supabase gratuit = 500 Mo pour tout le monde : seuls les petits fichiers voyagent (20 Mo), et le serveur refuse les gros envois passé 400 Mo (coffre.sql). */
+const MORCEAU = 5 * 1048576, MAX_FICHIER = 20 * 1048576;
 const b64De = u8 => { let s = ""; for (let i = 0; i < u8.length; i += 0x8000) s += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000)); return btoa(s); };
 const u8De = b => { const s = atob(b), u = new Uint8Array(s.length); for (let i = 0; i < s.length; i++) u[i] = s.charCodeAt(i); return u; };
 const aEnvoyer = () => { try { return JSON.parse(localStorage.getItem("fichiersAEnvoyer") || "[]"); } catch(e){ return []; } };
@@ -1900,6 +1901,7 @@ async function envoyerFichier(id){
   try { const u = new Uint8Array(await f.blob.arrayBuffer()), n = Math.max(1, Math.ceil(u.length / MORCEAU));
     for (let i = 0; i < n; i++) await COFFRE.envoyer("fichier:" + id + ":" + i, { b: b64De(u.subarray(i * MORCEAU, (i + 1) * MORCEAU)) });
     await COFFRE.envoyer("fichier:" + id, { nom: f.nom, type: f.blob.type || "", taille: u.length, n, date: f.date || Date.now() });
+    const r = registre(); r[id] = { d: aujourdhui(), n }; ecrireRegistre(r);
     marquerEnvoi(id, false); return true; }
   catch(e){ marquerEnvoi(id, true); return false; } }
 async function recevoirFichier(id){
@@ -1908,12 +1910,28 @@ async function recevoirFichier(id){
     for (let i = 0; i < m.n; i++){ const p = await COFFRE.recevoir("fichier:" + id + ":" + i); if (!p || !p.b) return null; parts.push(u8De(p.b)); }
     const v = { nom: m.nom, blob: new Blob(parts, { type: m.type || "" }), date: m.date || Date.now() }; await fMettre(id, v); return v; }
   catch(e){ return null; } }
+/* Registre des fichiers du coffre (synchronisé avec l'accueil : clé « fichiersCoffre ») : { id: { d: dernier jour d'usage, n: morceaux } }.
+   Un fichier qui n'est plus dans aucune activité (cours actuel ni cours préparé d'avance) est effacé du coffre un jour après son dernier cours. */
+const aujourdhui = () => new Date().toLocaleDateString("en-CA");
+const registre = () => { try { return JSON.parse(localStorage.getItem("fichiersCoffre") || "{}"); } catch(e){ return {}; } };
+const ecrireRegistre = r => { try { localStorage.setItem("fichiersCoffre", JSON.stringify(r)); } catch(e){} };
+async function menageCoffre(){
+  const r = registre(), utiles = idsFichiers(), auj = aujourdhui(), hier = new Date(Date.now() - 864e5).toLocaleDateString("en-CA");
+  const datesPlans = {}; Object.entries(cfg.plans || {}).forEach(([k, p]) => Object.values((p && p.liens) || {}).flatMap(liste).forEach(c => { if (c && c.type === "fichier") datesPlans[c.id] = k.slice(0, 10) > (datesPlans[c.id] || "") ? k.slice(0, 10) : datesPlans[c.id]; }));
+  let change = false;
+  for (const id of utiles) if (r[id]){ const d = datesPlans[id] && datesPlans[id] > auj ? datesPlans[id] : auj; if (r[id].d !== d && d > r[id].d){ r[id].d = d; change = true; } }
+  for (const id of Object.keys(r)) if (!utiles.has(id) && r[id].d < hier){
+    try { for (let i = 0; i < (r[id].n || 1); i++) await COFFRE.effacer("fichier:" + id + ":" + i); await COFFRE.effacer("fichier:" + id); delete r[id]; change = true; } catch(e){ break; } }
+  if (change) ecrireRegistre(r); }
 /* en arrière-plan : renvoyer ce qui n'a pas pu partir, puis aller chercher les fichiers des activités qui manquent sur cet appareil (prêts même sans Internet en classe) */
 async function synchroFichiers(){
   if (!window.COFFRE || /[?&]apercu=/.test(location.search)) return; const s = await COFFRE.session().catch(() => null); if (!s || s.eleve) return;
   for (const id of aEnvoyer()) await envoyerFichier(id);
   const ici = new Set((await fCles().catch(() => [])) || []);
-  for (const id of idsFichiers()) if (!ici.has(id)) await recevoirFichier(id); }
+  for (const id of idsFichiers()) if (!ici.has(id)) await recevoirFichier(id);
+  await menageCoffre().catch(() => {}); }
+/* demander au navigateur de ne jamais effacer de lui-même les fichiers gardés sur cet appareil (TNI : toujours prêts en classe) */
+try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch(e){}
 setTimeout(synchroFichiers, 4000); setInterval(synchroFichiers, 10 * 60000);
 function ouvrirFichier(c){
   fLire(c.id).then(async f => {
@@ -3026,9 +3044,10 @@ html.leger .sheet,html.leger .menu,html.leger #apercuOv{animation:none!important
 </style>
 <script>
 /* Coffre : « Préparer le cours » et les réglages suivent le compte de l'enseignant (coffre.js); jamais en aperçu */
-if (window.COFFRE && !/[?&]apercu=/.test(location.search)) COFFRE.demarrer("accueil", { cles:["accueil-atelier-v4"], intervalle:180000, apres:() => location.reload(),
+if (window.COFFRE && !/[?&]apercu=/.test(location.search)) COFFRE.demarrer("accueil", { cles:["accueil-atelier-v4", "fichiersCoffre"], intervalle:180000, apres:() => location.reload(),
   /* les cours préparés d'avance (cfg.plans) ne se perdent jamais entre l'ordinateur et le TNI : on garde ceux des deux côtés (seulement ceux d'aujourd'hui et plus tard) */
-  fusion: { "accueil-atelier-v4": (a, b, v) => { const choisi = v["accueil-atelier-v4"], autre = choisi === a ? b : a, C = JSON.parse(choisi), O = JSON.parse(autre);
+  fusion: { "fichiersCoffre": (a, b) => { const x = JSON.parse(a || "{}"), y = JSON.parse(b || "{}"); for (const k in y) if (!x[k] || y[k].d > x[k].d) x[k] = y[k]; return JSON.stringify(x); },
+    "accueil-atelier-v4": (a, b, v) => { const choisi = v["accueil-atelier-v4"], autre = choisi === a ? b : a, C = JSON.parse(choisi), O = JSON.parse(autre);
     const auj = new Date().toLocaleDateString("en-CA"), pl = Object.assign({}, C.plans || {});
     for (const k in (O.plans || {})) if (!(k in pl) && k.slice(0, 10) >= auj) pl[k] = O.plans[k];
     C.plans = pl; return JSON.stringify(C); } } });

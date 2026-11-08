@@ -176,5 +176,8 @@ window.COFFRE = (function(){
   /* objets isolés du compte (fichiers de « Préparer le cours »…) : une rangée chiffrée par objet */
   async function envoyer(so, obj){ const s = await session(); if (!s || s.eleve) throw new Error("pas de session"); await ecrire(s, so, obj); }
   async function recevoir(so){ const s = await session(); if (!s || s.eleve) throw new Error("pas de session"); return lire(s, so); }
-  return { demarrer, quitter, oublier, pousser, etat:() => ETAT, session, vu, stat, statsLire, envoyer, recevoir };
+  async function effacer(so){ const s = await session(); if (!s || s.eleve) throw new Error("pas de session");
+    const R = await rangee(s, so); delete RANG[s.id + "|" + so]; if (R.neuf) return true;
+    return (await rpc("coffre_effacer", { p_id:R.id, p_jeton:b64(R.brut.subarray(32, 64)) })) === true; }
+  return { demarrer, quitter, oublier, pousser, etat:() => ETAT, session, vu, stat, statsLire, envoyer, recevoir, effacer };
 })();
