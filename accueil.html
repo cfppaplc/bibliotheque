@@ -1828,6 +1828,8 @@ $("f-prog").addEventListener("change", () => { fillComps($("f-prog").value); $("
 // ---------- Contenus liés aux activités : page de livre, schéma, plan, tableau blanc, minuterie ----------
 /* Icônes au trait, même style que la barre d'outils des livres */
 const ICO_P = {
+  quiz: '<circle cx="12" cy="12" r="8.5"/><path d="M9.6 9.6a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .8-1 1.5v.6M12 17.2v.1"/>',
+  simulateur: '<rect x="4" y="3.5" width="16" height="17" rx="2"/><path d="M7.5 7.5h9v4h-9zM8 15h.01M12 15h.01M16 15h.01M8 18h8"/>',
   livre: '<path d="M12 6.5C10 5 7 4.6 4 5v13c3-.4 6 0 8 1.5 2-1.5 5-1.9 8-1.5V5c-3-.4-6 0-8 1.5zM12 6.5v13"/>',
   schema: '<path d="M13.5 3L5.5 13.5h6L10.5 21l8-10.5h-6z"/>',
   plan: '<rect x="4" y="4" width="16" height="16" rx="1.5"/><path d="M4 10h6V4M14 20v-6h6M10 14h4"/>',
@@ -1882,11 +1884,41 @@ function sorteFichier(nom, mime){
   return "autre";
 }
 /* Ménage : retire les fichiers qui ne sont plus liés à aucune activité */
-function menageFichiers(){ const garder = new Set(Object.values(cfg.liens || {}).flatMap(liste).filter(c => c.type === "fichier").map(c => c.id));
+function idsFichiers(){ const L = [cfg.liens || {}].concat(Object.values(cfg.plans || {}).map(p => (p && p.liens) || {}));   /* aussi les cours préparés d'avance */
+  return new Set(L.flatMap(o => Object.values(o).flatMap(liste)).filter(c => c && c.type === "fichier").map(c => c.id)); }
+function menageFichiers(){ const garder = idsFichiers();
   fCles().then(ks => (ks || []).forEach(k => { if (!garder.has(k)) fEnlever(k); })).catch(() => {}); }
+/* ---- Les fichiers suivent l'enseignant (8 nov.) : copie chiffrée dans son coffre, en morceaux de 5 Mo (rangées « fichier:<id> » + « fichier:<id>:<n> ») ---- */
+const MORCEAU = 5 * 1048576, MAX_FICHIER = 60 * 1048576;
+const b64De = u8 => { let s = ""; for (let i = 0; i < u8.length; i += 0x8000) s += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000)); return btoa(s); };
+const u8De = b => { const s = atob(b), u = new Uint8Array(s.length); for (let i = 0; i < s.length; i++) u[i] = s.charCodeAt(i); return u; };
+const aEnvoyer = () => { try { return JSON.parse(localStorage.getItem("fichiersAEnvoyer") || "[]"); } catch(e){ return []; } };
+const marquerEnvoi = (id, oui) => { const L = aEnvoyer().filter(x => x !== id); if (oui) L.push(id); try { localStorage.setItem("fichiersAEnvoyer", JSON.stringify(L)); } catch(e){} };
+async function envoyerFichier(id){
+  if (!window.COFFRE) return false; const f = await fLire(id); if (!f || !f.blob) { marquerEnvoi(id, false); return false; }
+  if (f.blob.size > MAX_FICHIER) { marquerEnvoi(id, false); return false; }   /* trop gros pour voyager : reste sur cet ordinateur */
+  try { const u = new Uint8Array(await f.blob.arrayBuffer()), n = Math.max(1, Math.ceil(u.length / MORCEAU));
+    for (let i = 0; i < n; i++) await COFFRE.envoyer("fichier:" + id + ":" + i, { b: b64De(u.subarray(i * MORCEAU, (i + 1) * MORCEAU)) });
+    await COFFRE.envoyer("fichier:" + id, { nom: f.nom, type: f.blob.type || "", taille: u.length, n, date: f.date || Date.now() });
+    marquerEnvoi(id, false); return true; }
+  catch(e){ marquerEnvoi(id, true); return false; } }
+async function recevoirFichier(id){
+  if (!window.COFFRE) return null;
+  try { const m = await COFFRE.recevoir("fichier:" + id); if (!m || !m.n) return null; const parts = [];
+    for (let i = 0; i < m.n; i++){ const p = await COFFRE.recevoir("fichier:" + id + ":" + i); if (!p || !p.b) return null; parts.push(u8De(p.b)); }
+    const v = { nom: m.nom, blob: new Blob(parts, { type: m.type || "" }), date: m.date || Date.now() }; await fMettre(id, v); return v; }
+  catch(e){ return null; } }
+/* en arrière-plan : renvoyer ce qui n'a pas pu partir, puis aller chercher les fichiers des activités qui manquent sur cet appareil (prêts même sans Internet en classe) */
+async function synchroFichiers(){
+  if (!window.COFFRE || /[?&]apercu=/.test(location.search)) return; const s = await COFFRE.session().catch(() => null); if (!s || s.eleve) return;
+  for (const id of aEnvoyer()) await envoyerFichier(id);
+  const ici = new Set((await fCles().catch(() => [])) || []);
+  for (const id of idsFichiers()) if (!ici.has(id)) await recevoirFichier(id); }
+setTimeout(synchroFichiers, 4000); setInterval(synchroFichiers, 10 * 60000);
 function ouvrirFichier(c){
-  fLire(c.id).then(f => {
-    if (!f || !f.blob){ alert("Ce fichier n'est plus sur cet ordinateur. Ajoute-le de nouveau dans « Préparer le cours »."); return; }
+  fLire(c.id).then(async f => {
+    if (!f || !f.blob){ if (window.__toast) window.__toast("Téléchargement du fichier…"); f = await recevoirFichier(c.id); }
+    if (!f || !f.blob){ alert("Ce fichier n'est pas encore arrivé sur cet appareil. Vérifie la connexion Internet, ou ajoute-le de nouveau dans « Préparer le cours »."); return; }
     const sorte = sorteFichier(f.nom, f.blob.type), url = URL.createObjectURL(f.blob);
     let ov = $("vid"); if (!ov){ lecteurVideo({ url:"", nom:"" }); fermerVideo(); ov = $("vid"); }
     window.__urlFichier = url; ov.classList.add("doc");
@@ -1935,6 +1967,8 @@ function nomLien(c){
   if (c.type === "tableau") return "Tableau blanc" + (c.fond === "quad" ? " quadrillé" : c.fond === "iso" ? " isométrique" : "");
   if (c.type === "minuterie") return "Minuterie " + c.min + " min";
   if (c.type === "fichier") return c.nom || "Fichier";
+  if (c.type === "quiz") return "Quiz · " + (c.titre || "");
+  if (c.type === "simulateur") return c.defi ? "Défi panneau" : "Simulateur de panneau";
   if (c.type === "web") return c.nom || hoteWeb(c.url);
   if (c.type === "video") return "Vidéo" + (c.nom ? " · " + c.nom : "") + (c.start ? " (à " + dureeTxt(c.start) + ")" : "");
   return "";
@@ -1967,6 +2001,9 @@ function ouvrirLien(c){
   if (!c) return;
   if (c.type === "minuterie"){ minuterie(c.min, c.nom); return; }
   if (c.type === "fichier"){ ouvrirFichier(c); return; }
+  /* Labo (8 nov.) : le quiz ou le simulateur s'ouvre en mode « Animer au tableau », dans un nouvel onglet (le tableau de bord reste ouvert dessous) */
+  if (c.type === "quiz" || c.type === "simulateur"){ const u = c.type === "quiz" ? "quiz.html?animer=1&quiz=" + encodeURIComponent(c.id) : "simulateur.html?animer=1" + (c.defi ? "&defi=1" : "");
+    const w = window.open(u, "_blank"); if (!w) location.assign(u); return; }
   if (c.type === "web"){ const w = window.open(c.url, "_blank", "noopener"); if (!w) location.assign(c.url); return; }
   if (c.type === "video"){ if (c.yt || /\.(mp4|webm|ogg)(\?|$)/i.test(c.url || "")) lecteurVideo(c); else window.open(c.url, "_blank", "noopener"); return; }
   if (window.parent !== window && CATAL){ try { window.parent.postMessage({ type:"accueil-ouvrir", contenu:c }, "*"); return; } catch(e){} }
@@ -2009,6 +2046,8 @@ function choix(row, label){
     + '<button type="button" class="lk-tuile" data-t="tableau"' + (enBiblio ? "" : " disabled") + '><b>' + ico("tableau") + '</b>Tableau blanc</button>'
     + '<button type="button" class="lk-tuile" data-t="minuterie"><b>' + ico("minuterie") + '</b>Minuterie</button>'
     + '<button type="button" class="lk-tuile" data-t="fichier"><b>' + ico("fichier") + '</b>Fichier (PDF, image…)</button>'
+    + '<button type="button" class="lk-tuile" data-t="quiz"><b>' + ico("quiz") + '</b>Quiz</button>'
+    + '<button type="button" class="lk-tuile" data-t="simulateur"><b>' + ico("simulateur") + '</b>Simulateur</button>'
     + '<button type="button" class="lk-tuile" data-t="web"><b>' + ico("web") + '</b>Lien web</button>'
     + '<button type="button" class="lk-tuile" data-t="video"><b>' + ico("video") + '</b>Vidéo YouTube</button></div>'
     + (enBiblio ? "" : '<p class="lk-note">Pour les livres, schémas et plans, ouvre ce tableau de bord depuis la bibliothèque.</p>')
@@ -2039,6 +2078,24 @@ function choix(row, label){
     if (ty === "tableau"){
       f.innerHTML = '<div class="lk-ok"><button type="button" class="prim" data-f="blanc">Blanc</button><button type="button" class="prim" data-f="quad">Quadrillé</button><button type="button" class="prim" data-f="iso">Isométrique</button><button type="button" class="prim" data-f="lignes">Lignes</button>' + annuler + '</div>';
       f.querySelectorAll("[data-f]").forEach(b => b.onclick = () => fini({ type:"tableau", fond:b.dataset.f }));
+    }
+    if (ty === "quiz"){
+      const opt = q => `<option value="${String(q.id).replace(/"/g, "")}">${String(q.titre || "Quiz").replace(/</g, "&lt;")}</option>`;
+      const dessiner = () => { let miens = []; try { miens = JSON.parse(localStorage.getItem("quizMaison") || "[]"); } catch(e){}
+        const prets = [{ id:"exemple-incendie", titre:"Protection incendie : révision des modules 1 à 5" }].concat(window.QUIZ_LIVRES || []);
+        f.innerHTML = '<select data-q>' + (miens.length ? '<optgroup label="Mes quiz">' + miens.map(opt).join("") + '</optgroup>' : "")
+          + '<optgroup label="Quiz prêts à jouer">' + prets.map(opt).join("") + '</optgroup></select>'
+          + '<small class="lk-aide">Le quiz s\'ouvrira en mode « Animer au tableau » : les élèves scannent le code QR avec leur iPad.</small>'
+          + '<div class="lk-ok"><button type="button" class="prim" data-v>Choisir</button>' + annuler + '</div>';
+        f.querySelector("[data-v]").onclick = () => { const s = f.querySelector("[data-q]"); fini({ type:"quiz", id:s.value, titre:s.options[s.selectedIndex].textContent }); };
+        const x = f.querySelector("[data-x]"); if (x) x.onclick = () => z.remove(); };
+      dessiner();
+      if (!window.QUIZ_LIVRES){ const sc = document.createElement("script"); sc.src = "quiz-livres.js"; sc.onload = () => { if (!f.hidden && f.querySelector("[data-q]")) dessiner(); }; document.head.append(sc); }
+    }
+    if (ty === "simulateur"){
+      f.innerHTML = '<div class="lk-ok"><button type="button" class="prim" data-s="0">Panneau d\'alarme (mode libre)</button><button type="button" class="prim" data-s="1">Défi panneau (8 missions)</button>' + annuler + '</div>'
+        + '<small class="lk-aide">S\'ouvre en mode « Animer au tableau » : chaque équipe scanne le code QR avec son iPad.</small>';
+      f.querySelectorAll("[data-s]").forEach(b => b.onclick = () => fini({ type:"simulateur", defi:b.dataset.s === "1" }));
     }
     if (ty === "minuterie"){
       f.innerHTML = '<div class="lk-ok">' + [5, 10, 15, 20, 30, 45].map(m => `<button type="button" class="prim" data-m="${m}">${m} min</button>`).join("") + annuler + '</div>';
@@ -2093,7 +2150,7 @@ function choix(row, label){
       ok.onclick = () => { if (!fich) return; ok.disabled = true; ok.textContent = "Enregistrement…";
         const id = "f" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
         fMettre(id, { nom: fich.name, blob: fich, date: Date.now() })
-          .then(() => fini({ type:"fichier", id, nom: fich.name, taille: fich.size }))
+          .then(() => { fini({ type:"fichier", id, nom: fich.name, taille: fich.size }); marquerEnvoi(id, true); envoyerFichier(id); })
           .catch(() => { ok.disabled = false; ok.textContent = "Choisir"; msg.textContent = "Impossible d'enregistrer ce fichier (espace plein ou navigation privée)."; }); };
       setTimeout(() => fi.click(), 30);
     }

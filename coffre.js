@@ -173,5 +173,8 @@ window.COFFRE = (function(){
   function stat(cle){ try { cle = String(cle).toLowerCase().replace(/[^a-z0-9:._-]/g, "-").slice(0, 90);
       fetch(API + "stats_plus", { method:"POST", headers:{ apikey:CLE_API, "Content-Type":"application/json" }, body:JSON.stringify({ p_cle:cle }), keepalive:true }).catch(() => {}); } catch(e){} }
   const statsLire = () => rpc("stats_lire", {});
-  return { demarrer, quitter, oublier, pousser, etat:() => ETAT, session, vu, stat, statsLire };
+  /* objets isolés du compte (fichiers de « Préparer le cours »…) : une rangée chiffrée par objet */
+  async function envoyer(so, obj){ const s = await session(); if (!s || s.eleve) throw new Error("pas de session"); await ecrire(s, so, obj); }
+  async function recevoir(so){ const s = await session(); if (!s || s.eleve) throw new Error("pas de session"); return lire(s, so); }
+  return { demarrer, quitter, oublier, pousser, etat:() => ETAT, session, vu, stat, statsLire, envoyer, recevoir };
 })();
