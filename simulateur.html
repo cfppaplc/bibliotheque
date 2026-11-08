@@ -100,9 +100,23 @@ th{font-size:12px;color:var(--gris);font-weight:700;border-top:0}
 @media (max-width:700px){#terrain{grid-template-columns:1fr 1fr}}
 @media (max-width:700px){.face{grid-template-columns:1fr}.leds{flex-direction:row;flex-wrap:wrap}.btns{grid-template-columns:1fr 1fr}}
 /* ---------- Choix du rôle ---------- */
-#role{max-width:560px;margin:8vh auto;padding:16px}
-#role .carte{text-align:center}
-#role h1{margin:0 0 6px;font-size:24px}
+#role{max-width:1100px;margin:0 auto;padding:18px 4vw 40px}
+.bordHaut{display:flex;align-items:center;gap:14px;margin:4px 0 10px}.bordHaut img{height:30px}
+.bordHaut h1{margin:0;font-size:22px;flex:1}.bordHaut h1 span{color:var(--gris);font-weight:500;font-size:14px;margin-left:8px}
+.bordHaut a{color:var(--txt);text-decoration:none;border:1px solid var(--ligne);background:var(--carte);border-radius:10px;padding:10px 14px;font-weight:700;font-size:14px}
+.cartesS{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+.cq{background:#fff;border:1px solid var(--ligne);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+.cq .im{height:150px;background:#7A1712 center/cover no-repeat;position:relative}
+.cq .im span{position:absolute;left:10px;bottom:8px;background:rgba(0,0,0,.6);color:#fff;font-size:12px;font-weight:700;border-radius:20px;padding:3px 10px}
+.cq .co{padding:12px 14px 14px;display:flex;flex-direction:column;gap:8px;flex:1}
+.cq .co b{font-size:17px}.cq .tg{display:flex;gap:6px}.cq .tg i{font-style:normal;font-size:12px;font-weight:700;border-radius:20px;padding:3px 10px;background:#F1EEE8;color:var(--gris)}
+.cq .jouer{margin-top:auto;font-size:16px;padding:12px;background:#B3261E}
+#modes{position:fixed;inset:0;background:rgba(20,22,26,.6);z-index:80;display:flex;align-items:center;justify-content:center;padding:16px}
+#modes .bx{background:#fff;border-radius:18px;padding:20px;max-width:640px;width:100%}
+#modes h2{margin:0 0 4px;font-size:20px}
+#modes .duo button{text-align:left;line-height:1.3}#modes .duo small{display:block;font-weight:500;font-size:13px;opacity:.85;margin-top:4px}
+#modes .btn2,#modes #mX{width:100%;background:#F1EEE8;color:var(--txt)}
+@media (max-width:640px){.bordHaut h1 span{display:none}#modes .duo{grid-template-columns:1fr}}
 #role .duo{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
 #role .duo button{padding:22px 10px;font-size:17px}
 #role input{font:inherit;font-size:30px;width:100%;text-align:center;letter-spacing:.2em;padding:10px;border-radius:12px;border:2px solid #C9C3B8;margin:12px 0}
@@ -216,15 +230,16 @@ i.let,.ch4 button i{background:var(--lc,var(--acc))!important;color:#fff!importa
 <body>
 
 <!-- ======================= CHOIX DU RÔLE ======================= -->
-<div id="role" class="cache"><div class="carte"><img class="logoC" src="img/pavillon-avenir.png" alt="Pavillon de l'Avenir"><h1>Simulateur de panneau d'alarme</h1>
-<div class="sous">Protection incendie · Les Habitations du Quai</div>
-<div class="duo"><button id="rAnim" style="grid-column:1/-1;padding:24px 10px;font-size:19px">🖥️ Animer au tableau<br><small style="font-weight:500">un seul ordinateur : l'écran de classe avec ses commandes</small></button>
-<button id="rTele" style="background:#3A3936">💻 Télécommande<br><small style="font-weight:500">ton ordinateur ou ta tablette</small></button>
-<button id="rEcr" style="background:#24211E">📺 Écran de classe<br><small style="font-weight:500">sur un 2e appareil, avec le code</small></button></div>
-<div id="rCode" class="cache"><div class="sous" style="margin-top:14px">Tape le code affiché sur la télécommande</div>
-<input id="rIn" inputmode="numeric" maxlength="7" placeholder="000 000"><button id="rGo" style="width:100%">Afficher l'écran de classe</button></div>
-<div class="sous" style="margin-top:14px">Les élèves, eux, scannent le code QR : leur iPad devient un panneau.</div>
-<div style="margin-top:14px"><a href="labo.html" style="color:var(--bleu);font-weight:700;text-decoration:none">‹ Labo interactif</a></div></div></div>
+<div id="role" class="cache">
+<div class="bordHaut"><img src="img/pavillon-avenir.png" alt="Pavillon de l'Avenir"><h1>Simulateurs <span>Protection incendie · Les Habitations du Quai</span></h1><a href="labo.html">‹ Labo interactif</a></div>
+<div class="sous" style="margin:0 0 14px">Choisis une activité, puis comment l'afficher. Les élèves scannent le code QR : leur iPad devient un panneau d'alarme.</div>
+<div class="cartesS">
+<div class="cq"><div class="im" style="background-image:url('img/labo/m5-panneau.jpg')"><span>Mode libre</span></div><div class="co"><b>Panneau d'alarme</b><span class="sous">Tu déclenches alarmes, supervisions et troubles; les équipes lisent l'afficheur, règlent la cause et réarment.</span><div class="tg"><i>EGI 436-312</i><i>Module 5</i></div><button class="jouer" data-act="libre">Ouvrir</button></div></div>
+<div class="cq"><div class="im" style="background-image:url('img/labo/incendie-immeuble.jpg')"><span>8 missions</span></div><div class="co"><b>Défi panneau</b><span class="sous">Question éclair, puis remettre le panneau à la normale. Points, pénalités, classement et podium au tableau.</span><div class="tg"><i>EGI 436-312</i><i>En équipes</i></div><button class="jouer" data-act="defi" style="background:#534AB7">Lancer un défi</button></div></div>
+</div>
+<div class="sous" style="margin-top:18px">Écran de classe sur un 2e appareil ? <a href="#" id="rEcr" style="color:var(--bleu);font-weight:700">Entre le code de la télécommande</a></div>
+<div id="rCode" class="cache" style="max-width:360px"><input id="rIn" inputmode="numeric" maxlength="7" placeholder="000 000"><button id="rGo" style="width:100%">Afficher l'écran de classe</button></div>
+</div>
 
 <!-- ======================= ÉCRAN DE CLASSE ======================= -->
 <div id="ecr" class="cache"></div>
@@ -418,15 +433,25 @@ const MISSIONS = [
 const Q_S = 20, LIMITE_S = 180;
 const SYMB = ["A", "B", "C", "D"];
 
-if (params.get("animer")) animer([["jGo"], ["jNext"]]);
+if (params.get("animer")) animer(params.get("defi") ? [["jGo"], ["jNext"]] : []);
 else if (params.get("panneau")) panneau(params.get("panneau").replace(/\D/g, "").slice(0, 6));
 else if (params.get("ecran")) ecran(params.get("ecran").replace(/\D/g, "").slice(0, 6));
-else if (params.get("tele")) telecommande();
+else if (params.get("tele")){ telecommande(); if (params.get("defi")) setTimeout(() => { const g = $("jGo"); if (g){ const c = g.closest(".carte") || g; c.scrollIntoView({block: "start"}); c.style.boxShadow = "0 0 0 3px #534AB7"; } }, 300); }
 else {
+  /* tableau de bord des simulateurs (comme celui des quiz) : activité → comment l'afficher */
   $("role").classList.remove("cache");
-  $("rTele").onclick = () => { $("role").classList.add("cache"); telecommande(); };
-  $("rAnim").onclick = () => { location.search = "?animer=1"; };
-  $("rEcr").onclick = () => { $("rCode").classList.remove("cache"); $("rIn").focus(); };
+  document.querySelectorAll("[data-act]").forEach(b => b.onclick = () => {
+    const defi = b.dataset.act === "defi", sfx = defi ? "&defi=1" : "";
+    document.body.insertAdjacentHTML("beforeend", `<div id="modes"><div class="bx"><h2>${defi ? "Défi panneau" : "Panneau d'alarme — mode libre"}</h2><div class="sous">Comment veux-tu afficher la partie ?</div>
+      <div class="duo"><button id="mAnim">Animer au tableau<small>Un seul ordinateur : l'écran de classe avec ses commandes en bas.</small></button>
+      <button id="mTele" style="background:#3A3936">Télécommande<small>Deux écrans : la télécommande ici, l'écran de classe sur le projecteur.</small></button></div>
+      <button id="mX">Annuler</button></div></div>`);
+    $("mAnim").onclick = () => { location.search = "?animer=1" + sfx; };
+    $("mTele").onclick = () => { location.search = "?tele=1" + sfx; };
+    $("mX").onclick = () => $("modes").remove();
+    $("modes").onclick = e => { if (e.target.id === "modes") $("modes").remove(); };
+  });
+  $("rEcr").onclick = e => { e.preventDefault(); $("rCode").classList.remove("cache"); $("rIn").focus(); };
   $("rGo").onclick = () => { const c = $("rIn").value.replace(/\D/g, ""); if (c.length === 6) location.search = "?ecran=" + c; };
   $("rIn").addEventListener("keydown", e => { if (e.key === "Enter") $("rGo").click(); });
 }
@@ -622,11 +647,11 @@ function telecommande(){
 
 /* ===== Animer au tableau : un seul ordinateur (écran de classe + barre + tiroir de télécommande) ===== */
 function animer(boutons){
-  document.body.insertAdjacentHTML("beforeend", `<div id="tiroir"><button class="fermer" id="tirX" aria-label="Fermer la télécommande">›</button><iframe id="tirF" src="?tele=1&inclus=1" title="Télécommande"></iframe></div>
-    <div id="animBar"><button id="retLabo" title="Retour au Labo interactif">‹ Labo</button>${boutons.map(([id], k) => `<button data-b="${id}" class="${k ? "" : "prim"}" disabled>…</button>`).join("")}<button id="tirB">Télécommande</button></div>`);
+  document.body.insertAdjacentHTML("beforeend", `<div id="tiroir"><button class="fermer" id="tirX" aria-label="Fermer la télécommande">›</button><iframe id="tirF" src="?tele=1&inclus=1${params.get("defi") ? "&defi=1" : ""}" title="Télécommande"></iframe></div>
+    <div id="animBar"><button id="retLabo" title="Retour aux simulateurs">‹ Simulateurs</button>${boutons.map(([id], k) => `<button data-b="${id}" class="${k ? "" : "prim"}" disabled>…</button>`).join("")}<button id="tirB">Télécommande</button></div>`);
   const T = $("tiroir"), F = $("tirF");
   $("tirB").onclick = () => T.classList.toggle("ouvert");
-  $("retLabo").onclick = () => { location.href = "labo.html"; };
+  $("retLabo").onclick = () => { location.href = "simulateur.html"; };
   $("tirX").onclick = () => T.classList.remove("ouvert");
   addEventListener("message", e => { if (e.data && e.data.labo === "code" && !animer.code) { animer.code = e.data.code; ecran(e.data.code); } });
   // les boutons de la barre reprennent l'état des vrais boutons de la télécommande
