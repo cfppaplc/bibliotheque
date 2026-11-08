@@ -135,6 +135,8 @@ th{font-size:12px;color:var(--gris);font-weight:700;border-top:0}
 /* ---------- Écran de classe (TNI) ---------- */
 #ecr{min-height:100vh;background:#16181C;color:#F2EFEA;padding:3vh 3vw}
 #ecr .haut{display:flex;justify-content:space-between;align-items:center;margin-bottom:2vh}
+#ecr .logoE{height:3.2vw;margin-right:1.2vw;vertical-align:middle}
+.logoC{height:34px;display:block;margin:0 auto 10px}
 #ecr .haut b{font-size:2.2vw;letter-spacing:.04em}
 #ecr .haut span{font-size:1.4vw;color:#B5AFA6}
 .lob{display:grid;grid-template-columns:auto 1fr;gap:4vw;align-items:center}
@@ -168,7 +170,7 @@ th{font-size:12px;color:var(--gris);font-weight:700;border-top:0}
 <body>
 
 <!-- ======================= CHOIX DU RÔLE ======================= -->
-<div id="role" class="cache"><div class="carte"><h1>Simulateur de panneau d'alarme</h1>
+<div id="role" class="cache"><div class="carte"><img class="logoC" src="img/pavillon-avenir.png" alt="Pavillon de l'Avenir"><h1>Simulateur de panneau d'alarme</h1>
 <div class="sous">Protection incendie · Les Habitations du Quai</div>
 <div class="duo"><button id="rTele">📱 Télécommande<br><small style="font-weight:500">iPad de l'enseignant</small></button>
 <button id="rEcr" style="background:#24211E">🖥️ Écran de classe<br><small style="font-weight:500">tableau interactif</small></button></div>
@@ -182,7 +184,7 @@ th{font-size:12px;color:var(--gris);font-weight:700;border-top:0}
 
 <!-- ======================= TÉLÉCOMMANDE (enseignant) ======================= -->
 <div id="tele" class="cache">
-<div class="tbar"><h1>Simulateur de panneau · télécommande</h1>
+<div class="tbar"><img src="img/pavillon-avenir.png" alt="Pavillon de l'Avenir" style="height:30px"><h1>Simulateur de panneau · télécommande</h1>
 <button id="nouv" style="background:#5F5E5A">Nouvelle session</button></div>
 <div class="grid">
 <div>
@@ -216,7 +218,7 @@ th{font-size:12px;color:var(--gris);font-weight:700;border-top:0}
 <div id="panneau" class="cache" style="width:min(980px,100%)">
 <div id="jeuBan" class="cache"></div>
 <div class="facp">
-<div class="ftete"><span>PANNEAU DE CONTRÔLE D'ALARME INCENDIE · ADRESSABLE</span><span class="eq" id="eqNom"></span></div>
+<div class="ftete"><span><img src="img/pavillon-avenir-blanc.png" alt="" style="height:16px;vertical-align:-3px;margin-right:8px;opacity:.85">PANNEAU DE CONTRÔLE D'ALARME INCENDIE · ADRESSABLE</span><span class="eq" id="eqNom"></span></div>
 <div class="face">
 <div><div class="lcd" id="lcd"><div></div><div></div><div></div><div></div></div>
 <div class="nav"><button id="up">▲</button><button id="down">▼</button></div></div>
@@ -542,7 +544,7 @@ function ecran(code){
   E.classList.remove("cache");
   const url = location.href.split(/[?#]/)[0] + "?panneau=" + code;
   let V = {etat: "lobby", eqs: [], code}, decal = 0, tic = null, avant = {};
-  const tete = t => `<div class="haut"><b>${t}</b><span>Défi panneau · code ${code.slice(0, 3)} ${code.slice(3)}</span></div>`;
+  const tete = t => `<div class="haut"><b><img class="logoE" src="img/pavillon-avenir-blanc.png" alt="Pavillon de l'Avenir">${t}</b><span>Défi panneau · code ${code.slice(0, 3)} ${code.slice(3)}</span></div>`;
   function classe(eqs){ return eqs.slice().sort((a, b) => b.pts - a.pts); }
   function lignes(eqs, mode){
     return classe(eqs).map((q, r) => `<div class="lgn"><span class="rg">${r + 1}</span><div><div class="nm">${esc(q.n)}</div>

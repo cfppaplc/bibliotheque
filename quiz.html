@@ -72,6 +72,8 @@ th{font-size:12px;color:var(--gris);border-top:0}
 /* écran de classe */
 #ecr{min-height:100vh;background:#16181C;color:#F2EFEA;padding:3vh 3vw}
 #ecr .haut{display:flex;justify-content:space-between;align-items:center;margin-bottom:2vh}
+#ecr .logoE{height:3.2vw;margin-right:1.2vw;vertical-align:middle}
+.logoC{height:34px;display:block;margin:0 auto 10px}
 #ecr .haut b{font-size:2.2vw}#ecr .haut span{font-size:1.4vw;color:#B5AFA6}
 .lob{display:grid;grid-template-columns:auto 1fr;gap:4vw;align-items:center}
 .lob .qr{background:#fff;padding:1.2vw;border-radius:1.2vw}
@@ -95,7 +97,7 @@ th{font-size:12px;color:var(--gris);border-top:0}
 <body>
 
 <!-- ============ CHOIX DU RÔLE ============ -->
-<div id="role" class="cache"><div class="carte"><h1 style="margin:0">Quiz maison</h1>
+<div id="role" class="cache"><div class="carte"><img class="logoC" src="img/pavillon-avenir.png" alt="Pavillon de l'Avenir"><h1 style="margin:0">Quiz maison</h1>
 <div class="sous">Labo interactif · tes propres questions sur les iPad</div>
 <div class="duo"><button id="rTele">📱 Télécommande<br><small style="font-weight:500">iPad de l'enseignant</small></button>
 <button id="rEcr" style="background:#24211E">🖥️ Écran de classe<br><small style="font-weight:500">tableau interactif</small></button></div>
@@ -108,11 +110,11 @@ th{font-size:12px;color:var(--gris);border-top:0}
 <div id="ecr" class="cache"></div>
 
 <!-- ============ JOUEUR ============ -->
-<div id="joueur" class="cache"><div class="nomj" id="nomJ"></div><div class="ptsj" id="ptsJ"></div><div class="bx" id="jBx"></div></div>
+<div id="joueur" class="cache"><img src="img/pavillon-avenir-blanc.png" alt="" style="position:fixed;bottom:14px;left:50%;transform:translateX(-50%);height:24px;opacity:.7"><div class="nomj" id="nomJ"></div><div class="ptsj" id="ptsJ"></div><div class="bx" id="jBx"></div></div>
 
 <!-- ============ TÉLÉCOMMANDE ============ -->
 <div id="tele" class="cache"><div class="wrap">
-<div class="tbar"><h1>Quiz maison · télécommande</h1><a href="labo.html">‹ Labo interactif</a></div>
+<div class="tbar"><img src="img/pavillon-avenir.png" alt="Pavillon de l'Avenir" style="height:30px"><h1>Quiz maison · télécommande</h1><a href="labo.html">‹ Labo interactif</a></div>
 <div class="grid">
 <div>
 <div class="carte"><h2>Les élèves scannent</h2><div id="qr"></div><div class="code" id="code"></div><div class="etat" id="etatT">Connexion…</div>
@@ -406,7 +408,7 @@ function ecran(code){
   const topic = PREFIXE + code, E = $("ecr"); E.classList.remove("cache");
   const url = location.href.split(/[?#]/)[0] + "?j=" + code;
   let V = {etat: "lobby", joueurs: [], titre: "Quiz maison"}, decal = 0;
-  const tete = t => `<div class="haut"><b>${esc(t)}</b><span>Quiz maison · code ${code.slice(0, 3)} ${code.slice(3)}</span></div>`;
+  const tete = t => `<div class="haut"><b><img class="logoE" src="img/pavillon-avenir-blanc.png" alt="Pavillon de l'Avenir">${esc(t)}</b><span>Quiz maison · code ${code.slice(0, 3)} ${code.slice(3)}</span></div>`;
   const top = (n) => V.joueurs.slice(0, n).map(j => `<div class="lg"><span class="r">${j.r}</span><span>${esc(j.n)}</span><b>${j.pts}</b></div>`).join("");
   function rendre(){
     const v = V, n = Date.now() + decal;

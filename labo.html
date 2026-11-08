@@ -12,6 +12,7 @@ html,body{margin:0;background:var(--fond);color:var(--txt);font-family:system-ui
 .haut{display:flex;align-items:center;gap:14px;padding:18px 4vw;border-bottom:1px solid var(--ligne)}
 .haut a{color:var(--txt);text-decoration:none;border:1px solid var(--ligne);border-radius:10px;padding:10px 14px;font-weight:600;font-size:15px;min-height:46px;display:inline-flex;align-items:center}
 .haut h1{margin:0;font-size:22px;flex:1}
+.logo{height:30px}.lg-c{display:none}html.clair .lg-c{display:block}html.clair .lg-b{display:none}
 .haut h1 span{color:var(--gris);font-weight:500;font-size:15px;margin-left:8px}
 main{padding:28px 4vw 60px;max-width:1300px;margin:0 auto}
 .intro{color:var(--gris);font-size:16px;margin:0 0 22px;max-width:760px;line-height:1.5}
@@ -42,7 +43,7 @@ a.carte:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(0,0,0,.35)}
 </script>
 </head>
 <body>
-<div class="haut"><a href="./">‹ Bibliothèque</a><h1>Labo interactif <span>Simulateurs et défis avec les iPad</span></h1></div>
+<div class="haut"><img class="logo lg-b" src="img/pavillon-avenir-blanc.png" alt="Pavillon de l'Avenir"><img class="logo lg-c" src="img/pavillon-avenir.png" alt="Pavillon de l'Avenir"><a href="./">‹ Bibliothèque</a><h1>Labo interactif <span>Simulateurs et défis avec les iPad</span></h1></div>
 <main>
 <p class="intro">Des outils à faire en classe avec les iPad des élèves. L'iPad de l'enseignant sert de télécommande, le tableau affiche l'écran de classe, et chaque équipe scanne un code QR. Aucun compte n'est nécessaire pour les élèves.</p>
 
