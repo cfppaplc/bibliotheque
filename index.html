@@ -222,6 +222,24 @@
   .bv-plus h3{margin:0 0 8px;font-size:1.05rem}.bv-plus ul{margin:0;padding-left:18px;color:#c8c8cc;font-size:.9rem;line-height:1.55}.bv-plus > div{flex:1;min-width:260px}
   .bv-lien{all:unset;cursor:pointer;color:#8fb8ff;font-weight:600;margin-right:16px}.bv-lien:hover{text-decoration:underline}
   .bv-pied{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:18px;flex-wrap:wrap}.bv-pied label{color:#a9a9ae;font-size:.88rem;display:flex;gap:8px;align-items:center}
+  .bv-tete{position:relative}.ah-x{all:unset;cursor:pointer;margin-left:auto;align-self:flex-start;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#a9a9ae;font-size:1.1rem}.ah-x:hover{background:#ffffff14;color:#fff}
+  .ah-cherche{display:flex;align-items:center;gap:10px;background:#232327;border:1px solid #34343a;border-radius:12px;padding:0 14px;margin-bottom:14px}.ah-cherche svg{width:20px;height:20px;color:#8a8a90;flex:none}
+  .ah-cherche input{all:unset;flex:1;padding:13px 0;font-size:1rem;color:inherit}.ah-cherche:focus-within{border-color:#EB6A22}
+  .ah-onglets{display:flex;gap:6px;overflow-x:auto;padding-bottom:12px;margin-bottom:6px;border-bottom:1px solid #2a2a2d;scrollbar-width:none}
+  .ah-onglets button{all:unset;cursor:pointer;white-space:nowrap;padding:9px 14px;border-radius:999px;font-weight:600;font-size:.92rem;color:#c8c8cc;background:#ffffff0d;min-height:22px}
+  .ah-onglets button:hover{background:#ffffff1a}.ah-onglets button.on{background:#EB6A22;color:#fff}
+  .ah-volet{padding-top:8px}.ah-h{margin:12px 0 10px;font-size:1.15rem}.ah-p{margin:0 0 12px;color:#a9a9ae}
+  .ah-q{border:1px solid #2c2c31;border-radius:12px;margin-bottom:8px;background:#ffffff06}.ah-q[open]{background:#ffffff0c}
+  .ah-q summary{cursor:pointer;list-style:none;padding:14px 44px 14px 16px;font-weight:650;position:relative}.ah-q summary::-webkit-details-marker{display:none}
+  .ah-q summary::after{content:"";position:absolute;right:18px;top:50%;width:8px;height:8px;border:solid #8a8a90;border-width:0 2px 2px 0;transform:translateY(-70%) rotate(45deg);transition:transform .2s}.ah-q[open] summary::after{transform:translateY(-30%) rotate(-135deg)}
+  .ah-q p{margin:0;padding:0 16px 12px;color:#c8c8cc;line-height:1.55}.ah-q .ah-mf{margin:0 16px 14px}
+  .ah-tag{font-size:.72rem;font-weight:700;margin-left:10px;padding:2px 8px;border-radius:999px;background:#EB6A2226;color:#ff9a5c;vertical-align:2px}
+  .ah-mf{all:unset;cursor:pointer;color:#8fb8ff;font-weight:600;font-size:.9rem}.ah-mf:hover{text-decoration:underline}
+  .ah-liens{display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-top:14px}.ah-go{all:unset;cursor:pointer;background:#EB6A22;color:#fff;font-weight:700;padding:10px 18px;border-radius:8px}
+  .ah-vide{color:#a9a9ae;padding:20px 0}
+  body.clair .ah-cherche{background:#f6f4f0;border-color:#e3e0da}body.clair .ah-onglets{border-bottom-color:#ebe7e1}body.clair .ah-onglets button{background:#f1eee9;color:#3d3d42}body.clair .ah-onglets button.on{background:#EB6A22;color:#fff}
+  body.clair .ah-q{border-color:#e6e2dc;background:#fff}body.clair .ah-q[open]{background:#fbfaf8}body.clair .ah-q p{color:#3d3d42}body.clair .ah-mf{color:#1f5fbf}body.clair .ah-tag{color:#b94f12}body.clair .ah-x:hover{background:#0000000d;color:#000}body.clair .ah-p{color:#5f6068}
+  @media (max-width:640px){.bv-box{padding:18px 16px}.bv-tete img{height:40px}.ah-q summary{padding:13px 40px 13px 14px}}
   .bv-ok{border:0;background:#EB6A22;color:#fff;border-radius:8px;padding:11px 22px;font:700 1rem inherit;font-family:inherit;cursor:pointer}
   .qn-ov{position:fixed;inset:0;z-index:560;background:rgba(0,0,0,.72);display:flex;align-items:flex-start;justify-content:center;padding:6vh 16px;overflow:auto}
   .qn-ov[hidden]{display:none}
@@ -8935,7 +8953,12 @@ return {matrice:function(texte){var q=new QRCode(-1,L.M);q.addData(texte);q.make
   <div class="bien-b"><button type="button" class="bv-lien" id="bienAide">Voir l'aide</button><span>·</span><button type="button" class="bv-lien" id="bienOk">Plus tard</button></div>
 </div></div>
 <div class="bv-ov" id="bvOv" hidden role="dialog" aria-label="Aide : la barre d'outils"><div class="bv-box">
-  <div class="bv-tete"><img src="img/metier-plus-icone.svg" alt=""><div><h2>Aide : la barre d'outils</h2><p>Clique une couverture, puis « Lire ». Tout ce qu'il faut pour projeter est dans la barre en bas de l'écran.</p></div></div>
+  <div class="bv-tete"><img src="img/metier-plus-icone.svg" alt=""><div><h2>Aide</h2><p>Trouve comment faire, outil par outil.</p></div><button type="button" class="ah-x" id="ahX" aria-label="Fermer">✕</button></div>
+  <label class="ah-cherche"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input id="ahQ" type="search" placeholder="Comment… (ex. : ajouter une cote)" autocomplete="off"></label>
+  <div class="ah-onglets" id="ahOnglets" role="tablist"></div>
+  <div class="ah-volet" id="ahRes" hidden></div>
+  <div class="ah-volet" id="ahAutres" hidden></div>
+  <div class="ah-volet" id="ahLivres" data-v="livres"><h3 class="ah-h">La barre d'outils du lecteur</h3><p class="ah-p">Clique une couverture, puis « Lire ». Tout ce qu'il faut pour projeter est dans la barre en bas de l'écran.</p>
   <img class="bv-barre" src="nouveautes/bv-barre.jpg" alt="Barre d'outils du lecteur, boutons numérotés de 1 à 10">
   <ol class="bv-leg" id="bvLeg"></ol>
   <div class="bv-plus"><img src="nouveautes/bv-plus.jpg" alt="Menu Plus d'outils" loading="lazy"><div>
@@ -8943,8 +8966,9 @@ return {matrice:function(texte){var q=new QRCode(-1,L.M);q.addData(texte);q.make
     <ul><li><b>Minuterie</b> pour un travail chronométré.</li><li><b>Projecteur</b> et <b>Cache</b> pour attirer l'attention sur une partie de la page.</li>
     <li><b>Écran noir</b> pour ramener l'attention vers toi.</li><li><b>Code QR</b> : les élèves ouvrent le livre à la même page sur leur téléphone.</li>
     <li><b>✎ Organiser</b> : glisse un bouton entre la barre et ce menu pour garder tes outils préférés à portée de main.</li></ul></div></div>
+  <div class="ah-liens" id="ahLivresPlus"></div></div>
   <div class="bv-pied"><span></span>
-    <div><button type="button" class="bv-lien" id="bvQn">Autres outils (schémas électriques, plans…) →</button><button type="button" id="bvOk" class="bv-ok">Fermer</button></div></div>
+    <div><button type="button" class="bv-lien" id="bvQn">Voir les nouveautés →</button><button type="button" id="bvOk" class="bv-ok">Fermer</button></div></div>
 </div></div>
 <script>
 (function(){
@@ -8961,9 +8985,81 @@ return {matrice:function(texte){var q=new QRCode(-1,L.M);q.addData(texte);q.make
     ["Plus d'outils", "Minuterie, projecteur, cache, écran noir, code QR… (voir plus bas).", ""]
   ];
   document.getElementById("bvLeg").innerHTML = LEG.map(([t, d, k], i) => `<li><span class="n">${i + 1}</span><div><b>${t}</b>${k ? ` <kbd>${k}</kbd>` : ""}<p>${d}</p></div></li>`).join("");
+  /* 8 nov. : Aide en onglets (un par outil) + recherche + questions fréquentes. q = question, r = réponse (HTML), qn = sujet de « Quoi de neuf » (mini-formation) */
+  const AIDE = [
+    { k:"livres", t:"Livres", qn:"Lecture des livres", items:[
+      ["Ouvrir un livre et le projeter", "Touche une couverture, puis « Lire ». Le livre s'ouvre en plein écran. Les flèches ← → tournent les pages; tu peux aussi taper un numéro de page."],
+      ["Montrer les réponses une à la fois", "Touche « Réponses » (touche R). Chaque appui sur → montre la réponse suivante de la page, pour corriger avec le groupe."],
+      ["Aller à un module ou chercher un mot", "Le menu ☰ (touche M) ouvre la table des matières à droite : modules, recherche dans tout le livre, liste des animations et des exercices."],
+      ["Écrire ou dessiner sur une page", "Touche le crayon (P). Tes traits restent sur la page, même après avoir fermé le livre. La gomme et Annuler sont dans la même barre."],
+      ["Agrandir pour le fond de la classe", "Pince avec deux doigts, tourne la roulette de la souris ou utilise + et −. Glisse pour te déplacer; « 100 % » revient à la page entière."],
+      ["Reprendre où j'étais", "En rouvrant un livre, la pastille « Reprendre à la page N ? » te ramène à ta dernière page. Tu peux régler ça dans Mes préférences."]]},
+    { k:"tele", t:"Télécommande", qn:"Télécommande", items:[
+      ["Contrôler le livre avec mon cellulaire", "Dans un livre, touche « Télécommande » dans la barre, puis scanne le code QR avec ton cellulaire. Tu tournes les pages, montres les réponses et pointes avec le laser sans retourner à l'ordinateur."],
+      ["Le cellulaire ne répond plus", "Garde la page de la télécommande ouverte à l'écran du cellulaire. Si la bibliothèque a été rechargée, scanne de nouveau le code QR : il change à chaque chargement."]]},
+    { k:"tableau", t:"Tableau blanc", qn:"Tableau blanc : les outils", items:[
+      ["Ouvrir un tableau blanc", "Touche « Tableau blanc » dans la barre du haut, ou la touche B dans un livre. Choisis le fond (blanc, quadrillé, isométrique) dans le menu ⋯."],
+      ["Ajouter une forme, une cote ou un texte", "Ouvre la palette Objets (le cube). Choisis une forme et glisse sur le tableau. Double-touche une forme pour la nommer, changer sa couleur ou ajouter une cote.", "Tableau blanc : formes, cotes et textes"],
+      ["Dessiner un plan isométrique", "Onglet « Iso » de la palette : dessine les tuyaux au crayon, puis glisse les raccords et appareils dessus. Ils se branchent tout seuls.", "Tableau blanc : plan isométrique"],
+      ["Faire un schéma électrique en échelle", "Onglet « Électricité » : pose les symboles, trace les fils, puis lance la simulation pour voir le courant passer.", "Tableau blanc : schéma électrique en échelle"],
+      ["Choisir et déplacer plusieurs éléments", "Sans outil, glisse dans le vide pour encadrer plusieurs éléments, ou Ctrl + clic. Suppr efface, Ctrl+C / Ctrl+V copie."],
+      ["Garder un schéma pour une autre fois", "Dans « Mes modèles », touche « Enregistrer ce tableau ». Il te suit sur tous tes ordinateurs."]]},
+    { k:"plans", t:"Plans", qn:"Plans techniques", items:[
+      ["Projeter un dossier de plans", "Ouvre Plans, choisis un dossier, puis navigue d'une feuille à l'autre avec la barre du bas. Le crayon fonctionne comme dans les livres."],
+      ["Imprimer pour mesurer à l'échelle", "Imprime à 100 % (taille réelle) sur du papier 11 × 17. Le trait de contrôle de 100 mm au bas de chaque feuille te permet de vérifier."],
+      ["Trouver les exercices des élèves", "Les questionnaires de lecture de plans, avec leur corrigé, sont dans Formatifs."]]},
+    { k:"formatifs", t:"Formatifs", qn:"Formatifs", items:[
+      ["Projeter, imprimer ou télécharger un formatif", "Ouvre Formatifs et touche une tuile : la fiche offre Projeter, Imprimer, PDF et, s'il y en a un, le Corrigé."],
+      ["Ajouter mes propres documents", "Glisse un PDF n'importe où dans la bibliothèque, ou utilise « Ajouter un document » dans le menu de ton compte. Choisis ensuite Livre, Formatif ou Plan. L'administrateur doit d'abord t'en donner la permission.", "Ajoute tes propres livres, formatifs et plans"],
+      ["Partager un document avec tous les enseignants", "Dans la fiche de ton document, touche « Proposer à tous ». L'administrateur le vérifie avant de le publier."]]},
+    { k:"labo", t:"Labo", qn:"Labo interactif", items:[
+      ["Lancer un quiz avec les iPad", "Ouvre Labo, puis Quiz. Choisis un quiz et « Animer au tableau ». Les élèves scannent le code QR et choisissent un personnage; aucun compte élève n'est nécessaire."],
+      ["Créer mon propre quiz", "Dans Quiz, touche « Nouveau quiz ». Tu peux aussi coller des questions toutes prêtes. Sauvegarde-les de temps en temps avec « Sauvegarder tous mes quiz »."],
+      ["Utiliser le simulateur de panneau d'alarme", "Ouvre Labo, puis Simulateurs. Chaque équipe a un panneau sur son iPad; tu déclenches les événements depuis la télécommande."]]},
+    { k:"accueil", t:"Accueil de classe", qn:"Accueil de classe", items:[
+      ["Projeter l'horaire de la période", "Ouvre « Accueil de classe » : l'horloge, la ligne du temps et l'activité en cours s'affichent pour la classe."],
+      ["Préparer un cours d'avance", "Touche « Préparer le cours », choisis le jour et la période dans la semaine, la compétence, puis les activités et leurs durées."],
+      ["Lier un livre, un quiz ou un fichier à une activité", "Dans le déroulement, touche « + Livre, quiz, fichier… » sous l'activité. Pendant le cours, un toucher sur l'activité l'ouvre."]]},
+    { k:"compte", t:"Mon compte", items:[
+      ["Me connecter", "Touche « Se connecter » et entre ton identifiant (prenom.nom) et ton mot de passe. Sur ton ordinateur, l'identifiant est retenu."],
+      ["Demander un accès", "Dans la fenêtre de connexion, touche « Demander un accès ». Choisis ton programme et un mot de passe; l'administrateur reçoit ta demande."],
+      ["J'ai oublié mon mot de passe", "Dans la fenêtre de connexion, touche « Mot de passe oublié ? » et choisis-en un nouveau. L'administrateur l'active pour toi."],
+      ["Mes données sont-elles sur tous mes ordinateurs?", "Oui : tes traits, tableaux, quiz, préférences et cours préparés te suivent quand tu te connectes ailleurs. Ils sont chiffrés avec ton mot de passe.", "Tes données te suivent sur tous les ordinateurs"],
+      ["Changer la couleur ou le thème", "Menu de ton compte → Mes préférences : couleur, thème clair ou foncé, plein écran, reprise de lecture, animations."],
+      ["C'est lent sur le tableau interactif", "Dans Mes préférences, mets « Animations » à « Légères ». Le site le fait souvent tout seul quand l'appareil est lent."]]}
+  ];
+  const OUTIL = { plans:"plans", formatifs:"activites", labo:"labo", accueil:"accueil", tableau:"tableau" };
+  const ong = document.getElementById("ahOnglets"), qIn = document.getElementById("ahQ"), res = document.getElementById("ahRes"), autres = document.getElementById("ahAutres"), livres = document.getElementById("ahLivres");
+  const sansAcc = t => t.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+  const carte = (it, g) => `<details class="ah-q"><summary>${it[0]}${g ? `<span class="ah-tag">${g.t}</span>` : ""}</summary><p>${it[1]}</p>${(it[2] || g && g.qn) ? `<button type="button" class="ah-mf" data-qn="${(it[2] || g.qn).replace(/"/g, "&quot;")}">Voir la mini-formation</button>` : ""}</details>`;
+  const pied = g => `<div class="ah-liens">${OUTIL[g.k] ? `<button type="button" class="ah-go" data-out="${OUTIL[g.k]}">Ouvrir ${g.t} ›</button>` : ""}${g.qn ? `<button type="button" class="ah-mf" data-qn="${g.qn}">Mini-formation : ${g.t}</button>` : ""}</div>`;
+  let onglet = "livres";
+  function montrer(k, garder){ onglet = k; if (!garder) qIn.value = ""; res.hidden = true;
+    ong.querySelectorAll("button").forEach(b => b.classList.toggle("on", b.dataset.k === k));
+    livres.hidden = k !== "livres"; const g = AIDE.find(x => x.k === k);
+    if (k === "livres"){ autres.hidden = true; document.getElementById("ahLivresPlus").innerHTML = `<h3 class="ah-h">Questions fréquentes</h3>` + g.items.map(it => carte(it)).join("") + pied(g); return; }
+    autres.hidden = false; autres.innerHTML = `<h3 class="ah-h">${g.t}</h3>` + g.items.map(it => carte(it)).join("") + pied(g); }
+  ong.innerHTML = AIDE.map(g => `<button type="button" role="tab" data-k="${g.k}">${g.t}</button>`).join("");
+  ong.onclick = e => { const b = e.target.closest("button[data-k]"); if (b) montrer(b.dataset.k); };
+  qIn.oninput = () => { const q = sansAcc(qIn.value.trim()); if (q.length < 2){ montrer(onglet, true); return; }
+    const VIDES = ["de","du","des","la","le","les","un","une","mon","ma","mes","ton","ta","tes","et","ou","a","au","aux","en","comment","faire","je","on","pour","sur","dans","est"];
+    let mots = q.split(/[\s'’?!.,]+/).filter(m => m.length > 1 && !VIDES.includes(m)); if (!mots.length) mots = [q];
+    const tr = [];
+    AIDE.forEach(g => g.items.forEach(it => { const ti = sansAcc(it[0]), t = sansAcc(it[0] + " " + it[1] + " " + g.t); const n = mots.filter(m => t.includes(m)).length;
+      if (n === mots.length || (mots.length > 2 && n >= mots.length - 1)) tr.push([n + mots.filter(m => ti.includes(m)).length * 2, it, g]); }));
+    tr.sort((a, b) => b[0] - a[0]);
+    livres.hidden = true; autres.hidden = true; res.hidden = false; ong.querySelectorAll("button").forEach(b => b.classList.remove("on"));
+    res.innerHTML = tr.length ? `<h3 class="ah-h">${tr.length} résultat${tr.length > 1 ? "s" : ""}</h3>` + tr.slice(0, 12).map(([, it, g]) => carte(it, g)).join("").replace("<details", "<details open") : `<p class="ah-vide">Rien trouvé. Essaie un autre mot, ou regarde dans <button type="button" class="bv-lien" data-qn="">Quoi de neuf</button>.</p>`; };
+  document.getElementById("bvOv").addEventListener("click", e => {
+    const m = e.target.closest("[data-qn]"); if (m){ document.getElementById("bvOv").hidden = true; if (m.dataset.qn && window.ouvrirQn) window.ouvrirQn(m.dataset.qn); else document.getElementById("quoiNeuf").click(); return; }
+    const o = e.target.closest("[data-out]"); if (o){ document.getElementById("bvOv").hidden = true; if (window.mpAller) window.mpAller(o.dataset.out); } });
+  document.getElementById("ahX").onclick = () => { document.getElementById("bvOv").hidden = true; };
+  window.aideOnglet = montrer;
+  montrer("livres");
+
   const ov = document.getElementById("bvOv");
   const fermer = () => { ov.hidden = true; };
-  window.ouvrirBienvenue = () => { ov.hidden = false; ov.scrollTop = 0; };
+  window.ouvrirBienvenue = k => { ov.hidden = false; ov.scrollTop = 0; try { window.aideOnglet(typeof k === "string" ? k : "livres"); } catch(e){} };
   document.getElementById("bvOk").onclick = fermer;
   document.getElementById("bvQn").onclick = () => { fermer(); document.getElementById("quoiNeuf").click(); };
   ov.addEventListener("click", e => { if (e.target === ov) fermer(); });
