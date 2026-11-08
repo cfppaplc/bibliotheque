@@ -46,12 +46,14 @@ h1{font-size:19px;margin:14px 0 2px;line-height:1.25;display:-webkit-box;-webkit
 .vide{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:var(--gris);gap:12px;padding:20px;font-size:16px;line-height:1.45}
 .vide b{color:var(--txt);font-size:20px}
 .cache{display:none!important}
-.mode{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:var(--carte);border-radius:12px;padding:4px;margin-top:14px}
+.mode{display:grid;grid-template-columns:.8fr 1.3fr .8fr;gap:4px;background:var(--carte);border-radius:12px;padding:4px;margin-top:14px}
 .mode button{border:0;border-radius:9px;background:transparent;color:var(--gris);font:700 14px system-ui;padding:9px}
 .mode button.on{background:var(--carte2);color:var(--txt)}
 .pad{flex:1;margin:12px 0;min-height:180px;border-radius:22px;background:#1B1B1B;border:1px solid #333;position:relative;touch-action:none;overflow:hidden;
   background-image:radial-gradient(circle,#3a3a3a 1.2px,transparent 1.4px);background-size:22px 22px}
 .pad span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--gris);font-size:15px;padding:20px;pointer-events:none;line-height:1.4}
+.pad.laser{background-image:none;background:#120606;border-color:#5a1414}
+.pad.laser i{width:22px;height:22px;margin:-11px 0 0 -11px;background:#FF2A2A;box-shadow:0 0 14px 4px rgba(255,42,42,.7)}
 .pad i{position:absolute;width:54px;height:54px;margin:-27px 0 0 -27px;border-radius:50%;background:rgba(229,9,20,.35);border:2px solid var(--rouge);pointer-events:none;display:none}
 </style>
 </head>
@@ -65,7 +67,7 @@ h1{font-size:19px;margin:14px 0 2px;line-height:1.25;display:-webkit-box;-webkit
   <div class="ou" id="ou"></div>
   <div class="barre"><b id="prog"></b></div>
   <div class="page" id="page">–</div>
-  <div class="mode"><button id="mPages" class="on">Pages</button><button id="mPad">Zoom et déplacer</button></div>
+  <div class="mode"><button id="mPages" class="on">Pages</button><button id="mPad">Zoom et déplacer</button><button id="mLaser">Laser</button></div>
   <div class="pad cache" id="pad"><span id="padTxt">Un doigt : te promener. Deux doigts : pincer pour zoomer.</span><i id="padDoigt"></i></div>
   <div class="fleches"><button id="prec" aria-label="Page précédente">‹</button><button id="suiv" aria-label="Page suivante">›</button></div>
   <div class="outils">
@@ -137,11 +139,11 @@ $("fNum").onkeydown = e => { if (e.key === "Enter") $("fGo").click(); };
 document.addEventListener("dblclick", e => e.preventDefault(), {passive: false});
 
 /* Pad tactile : glisser = se déplacer dans la page zoomée (comme le pavé d'un portable) */
-let modePad = false;
-function mode(p){ modePad = p; $("mPad").classList.toggle("on", p); $("mPages").classList.toggle("on", !p);
-  $("pad").classList.toggle("cache", !p); document.querySelector(".fleches").classList.toggle("cache", p); majPad(); }
-function majPad(){ $("padTxt").textContent = E && E.zoom > 1.02 ? "Un doigt : te promener. Deux doigts : pincer pour zoomer." : "Pince avec deux doigts pour zoomer, puis glisse un doigt pour te promener."; }
-$("mPages").onclick = () => mode(false); $("mPad").onclick = () => mode(true);
+let modePad = false, laser = false;
+function mode(p, las){ modePad = p; laser = !!las; $("mPad").classList.toggle("on", p && !laser); $("mPages").classList.toggle("on", !p); $("mLaser").classList.toggle("on", laser);
+  $("pad").classList.toggle("cache", !p); $("pad").classList.toggle("laser", laser); document.querySelector(".fleches").classList.toggle("cache", p); majPad(); }
+function majPad(){ $("padTxt").textContent = laser ? "Le pavé = l'écran du tableau. Pose le doigt : le point rouge apparaît au même endroit." : E && E.zoom > 1.02 ? "Un doigt : te promener. Deux doigts : pincer pour zoomer." : "Pince avec deux doigts pour zoomer, puis glisse un doigt pour te promener."; }
+$("mPages").onclick = () => mode(false); $("mPad").onclick = () => mode(true); $("mLaser").onclick = () => mode(true, true);
 (function(){
   /* 1 doigt = se déplacer; 2 doigts = pincer pour zoomer (comme sur une photo) */
   const pad = $("pad"), dg = $("padDoigt"), P = new Map(); let acc = [0, 0], f = 1, minu = null, dist0 = 0;
@@ -151,8 +153,16 @@ $("mPages").onclick = () => mode(false); $("mPad").onclick = () => mode(true);
   const plus = () => { if (!minu) minu = setTimeout(vider, 50); };
   const ecart = () => { const [a, b] = [...P.values()]; return Math.hypot(a[0] - b[0], a[1] - b[1]); };
   const montrer = e => { const r = pad.getBoundingClientRect(); dg.style.display = "block"; dg.style.left = (e.clientX - r.left) + "px"; dg.style.top = (e.clientY - r.top) + "px"; };
-  pad.addEventListener("pointerdown", e => { e.preventDefault(); try { pad.setPointerCapture(e.pointerId); } catch(x){} P.set(e.pointerId, [e.clientX, e.clientY]); montrer(e); if (P.size === 2) dist0 = ecart(); });
-  pad.addEventListener("pointermove", e => { if (!P.has(e.pointerId)) return; e.preventDefault(); const p = P.get(e.pointerId);
+  let las = null, lasT = null;
+  const laserEnv = () => { lasT = null; if (las) envoyer({m: "cmd", c: "laser", x: las[0], y: las[1], on: las[2]}); };
+  const laserA = (e, on) => { const r = pad.getBoundingClientRect(); las = [+((e.clientX - r.left) / r.width).toFixed(4), +((e.clientY - r.top) / r.height).toFixed(4), on];
+    if (!on){ clearTimeout(lasT); laserEnv(); } else if (!lasT) lasT = setTimeout(laserEnv, 40); };
+  pad.addEventListener("pointerdown", e => { if (laser){ e.preventDefault(); try { pad.setPointerCapture(e.pointerId); } catch(x){} P.set(e.pointerId, 1); montrer(e); laserA(e, 1); return; } });
+  pad.addEventListener("pointermove", e => { if (laser && P.has(e.pointerId)){ e.preventDefault(); montrer(e); laserA(e, 1); } });
+  pad.addEventListener("pointerup", e => { if (laser && P.has(e.pointerId)) laserA(e, 0); });
+  pad.addEventListener("pointercancel", e => { if (laser && P.has(e.pointerId)) laserA(e, 0); });
+  pad.addEventListener("pointerdown", e => { if (laser) return; e.preventDefault(); try { pad.setPointerCapture(e.pointerId); } catch(x){} P.set(e.pointerId, [e.clientX, e.clientY]); montrer(e); if (P.size === 2) dist0 = ecart(); });
+  pad.addEventListener("pointermove", e => { if (laser || !P.has(e.pointerId)) return; e.preventDefault(); const p = P.get(e.pointerId);
     if (P.size === 1){ acc[0] += e.clientX - p[0]; acc[1] += e.clientY - p[1]; }
     P.set(e.pointerId, [e.clientX, e.clientY]);
     if (P.size === 2){ const d = ecart(); if (dist0 > 20) f *= d / dist0; dist0 = d; }

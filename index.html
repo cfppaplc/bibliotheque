@@ -8854,10 +8854,22 @@ document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("#qrOv"
     else if (c === "anim") clic("tbAnim");
     else if (c === "noir") clic("tbNoir");
     else if (c === "pan"){ const sc = $("#rstage"); if (sc){ sc.scrollLeft += (+o.dx || 0) * 2.6; sc.scrollTop += (+o.dy || 0) * 2.6; } return; }
+    else if (c === "laser"){ laserTele(+o.x, +o.y, !!o.on); return; }
     else if (c === "pz"){ const st = $("#rstage"), r = st.getBoundingClientRect(), f = Math.max(.5, Math.min(2, +o.f || 1));   /* pincement sur le pavé = même zoom que la roulette, centré */
       zoomSouris({clientX: r.left + r.width / 2, clientY: r.top + r.height / 2, deltaY: -Math.log(f) / .0075, deltaMode: 0, ecran: 1}, null); setTimeout(pousser, 400); return; }
     else if (c === "zi") clic("tbZi"); else if (c === "zo") clic("tbZo"); else if (c === "zv") clic("tbZv");
     setTimeout(pousser, 250);
+  }
+  /* Pointeur laser de la télécommande : le pavé du cellulaire = l'écran (position absolue), point rouge lumineux qui s'efface au relâchement */
+  let dot = null, cache = null;
+  function laserTele(x, y, on){
+    if (!dot){ dot = document.createElement("div"); dot.id = "laserTele";
+      dot.style.cssText = "position:fixed;left:0;top:0;width:26px;height:26px;margin:-13px 0 0 -13px;border-radius:50%;background:radial-gradient(circle,#fff 0 18%,#ff2a2a 34%,rgba(255,30,30,.55) 60%,rgba(255,0,0,0) 72%);box-shadow:0 0 22px 8px rgba(255,40,40,.55);z-index:2147483000;pointer-events:none;opacity:0;transition:opacity .25s,transform 70ms linear;will-change:transform";
+      document.body.appendChild(dot); }
+    clearTimeout(cache);
+    dot.style.transform = `translate(${Math.round(x * innerWidth)}px, ${Math.round(y * innerHeight)}px)`;
+    if (on){ dot.style.opacity = 1; cache = setTimeout(() => { dot.style.opacity = 0; }, 4000); }
+    else cache = setTimeout(() => { dot.style.opacity = 0; }, 700);
   }
   function brancher(){
     if (T.canal) return Promise.resolve();
