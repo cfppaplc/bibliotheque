@@ -291,6 +291,14 @@
   html:has(#planOv:not([hidden])),html:has(#actOv:not([hidden])),html:has(#accueilOv:not([hidden])){overflow:hidden}
   html:has(#planOv:not([hidden])) body,html:has(#actOv:not([hidden])) body,html:has(#accueilOv:not([hidden])) body{overflow:hidden}
   .pl-top #plClose,.act-top #actBack{order:99;margin-left:auto}
+  /* barre de navigation dans l'en-tête de l'accueil : enseignant connecté, écran large; remplace « Bibliothèque », « Accueil » et les boutons d'outils */
+  .mp-nav-tete{display:none!important}
+  @media (min-width:981px){
+    body.connecte:not(.eleve):not(.classe) .mp-nav-tete{display:flex!important;margin-left:0}
+    body.connecte:not(.eleve):not(.classe) header .logo-t,body.connecte:not(.eleve):not(.classe) header>nav,body.connecte:not(.eleve):not(.classe) #hdefil,body.connecte:not(.eleve):not(.classe) #hflG,body.connecte:not(.eleve):not(.classe) #hflD{display:none!important}
+    body.connecte:not(.eleve):not(.classe) header .search{margin-left:auto}
+  }
+  @media (min-width:981px) and (max-width:1300px){body.connecte:not(.eleve):not(.classe) header .search input,body.connecte:not(.eleve):not(.classe) header .search input:focus{width:150px!important}body.connecte:not(.eleve):not(.classe) .mp-nav-tete a{padding:6px 7px!important;gap:4px}body.connecte:not(.eleve):not(.classe) header .search-kbd{display:none}}
 .mp-nav{display:flex;align-items:center;gap:4px;flex:none;margin-left:6px}
 .mp-nav a{display:inline-flex!important;align-items:center;gap:6px;min-height:36px!important;padding:6px 10px!important;border:0!important;border-radius:9px;font-size:13.5px!important;font-weight:600!important;color:inherit!important;opacity:.78;text-decoration:none;white-space:nowrap;background:transparent!important}
 .mp-nav a:hover{opacity:1;background:rgba(128,128,128,.14)!important}
@@ -10138,6 +10146,11 @@ document.addEventListener("click", e => { const b = e.target.closest && e.target
   [[".pl-top", "plans"], [".act-top", "activites"]].forEach(([sel, ici]) => { const bar = document.querySelector(sel); if (!bar || bar.querySelector(".mp-nav")) return;
     const logo = bar.querySelector(".top-logo:last-of-type") || bar.firstElementChild; logo.insertAdjacentHTML("afterend", mpNavHTML(ici));
     bar.querySelectorAll(".mp-nav a").forEach(a => a.onclick = e => { e.preventDefault(); if (a.classList.contains("ici")) return; aller(a.dataset.nav); }); });
+  /* même barre sur l'accueil (8 nov., « c'est la meilleure barre du site, elle devrait être partout ») */
+  window.mpAller = aller;
+  const tete = document.getElementById("topbar"), logo = tete && tete.querySelector(".logo");
+  if (logo && !tete.querySelector(".mp-nav")){ logo.insertAdjacentHTML("afterend", mpNavHTML("biblio").replace('class="mp-nav"', 'class="mp-nav mp-nav-tete"'));
+    tete.querySelectorAll(".mp-nav a").forEach(a => a.onclick = e => { e.preventDefault(); if (a.dataset.nav === "biblio"){ const b = document.querySelector('header nav a[data-view="all"]'); if (b) b.click(); scrollTo({ top: 0, behavior: "smooth" }); return; } aller(a.dataset.nav); }); }
   const q = new URLSearchParams(location.search).get("ouvrir");
   if (q && BTN[q]){ history.replaceState(null, "", location.pathname); const go = () => setTimeout(() => aller(q), 300);
     if (window.ACCES && ACCES.pret) ACCES.pret.then(go); else window.addEventListener("load", go); }
