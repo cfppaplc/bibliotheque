@@ -24,6 +24,14 @@
 })();
 </script>
 <style>html.apercu-mode .tools, html.apercu-mode #accAccueil .aa-x { display: none !important; }
+
+/* transitions des fenêtres (8 nov.) : Préparer le cours, Réglages, Raccourcis, menu Plus apparaissent en fondu (sans mouvement si les animations de Windows sont coupées) */
+@keyframes feuilleFond { from { opacity: 0; } to { opacity: 1; } }
+@keyframes feuilleIn { from { opacity: 0; transform: translateY(12px) scale(.985); } to { opacity: 1; transform: none; } }
+.sheet:not([hidden]) { animation: feuilleFond .2s ease-out; }
+.sheet:not([hidden]) > .sheet-in { animation: feuilleIn .28s cubic-bezier(.2,.8,.2,1); }
+.menu:not([hidden]) { animation: feuilleFond .15s ease-out; }
+@media (prefers-reduced-motion: reduce) { .sheet:not([hidden]) > .sheet-in { animation: feuilleFond .2s ease-out; } }
 /* transitions douces entre les pages (8 nov.) */
 @view-transition{navigation:auto}
 ::view-transition-old(root),::view-transition-new(root){animation-duration:.22s}

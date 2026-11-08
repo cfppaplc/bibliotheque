@@ -276,6 +276,14 @@ html.sombre body.bord :is(.ch4 button,.qe .k0,.qe .k1,.qe .k2,.qe .k3){border-co
 html.sombre body.bord .tbar a{color:#a99ff0}
 .wrap>.mp-tete{--mp-haut:14px}
 
+
+/* transitions (8 nov.) */
+@keyframes fenFond{from{opacity:0}to{opacity:1}}
+@keyframes fenIn{from{opacity:0;transform:translateY(10px) scale(.985)}to{opacity:1;transform:none}}
+#modes:not(.cache):not([hidden]){animation:fenFond .2s ease-out}
+#modes:not(.cache):not([hidden])>*{animation:fenIn .26s cubic-bezier(.2,.8,.2,1)}
+body>div:not(.cache):not([hidden]){animation:fenFond .22s ease-out}
+@media (prefers-reduced-motion:reduce){#modes:not(.cache):not([hidden])>*{animation:fenFond .2s ease-out}}
 /* transitions douces entre les pages (8 nov.) */
 @view-transition{navigation:auto}
 ::view-transition-old(root),::view-transition-new(root){animation-duration:.22s}

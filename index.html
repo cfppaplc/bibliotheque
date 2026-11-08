@@ -297,6 +297,10 @@
   ::view-transition-old(root),::view-transition-new(root){animation-duration:.22s}
   #planOv:not([hidden]),#actOv:not([hidden]),#accueilOv:not([hidden]){animation:ouvrirOv .22s ease-out}
   @keyframes ouvrirOv{from{opacity:0}to{opacity:1}}
+  @keyframes boiteIn{from{opacity:0;transform:translateY(10px) scale(.985)}to{opacity:1;transform:none}}
+  #qnOv:not([hidden]),#accesOv:not([hidden]),#bienOv:not([hidden]){animation:ouvrirOv .2s ease-out}
+  #accesOv:not([hidden])>.acces-box,#qnOv:not([hidden])>*{animation:boiteIn .26s cubic-bezier(.2,.8,.2,1)}
+  #mmenu:not([hidden]){animation:ouvrirOv .18s ease-out}
   /* nom + description des pages (comme le Labo) */
   .mp-tit{display:flex;align-items:baseline;gap:10px;order:-1;min-width:0;flex:0 1 auto;overflow:hidden;border-left:1px solid rgba(128,128,128,.35);padding-left:12px;margin-left:2px}
   .mp-nom2{font-size:15px;font-weight:600;color:#8b8f97;white-space:nowrap}
@@ -548,7 +552,9 @@
     html{scroll-behavior:auto}
     /* exception : crochet vert, bienvenue, cadenas, cloche et « Enregistré ! » jouent quand même (courts; sinon le crochet restait invisible
        quand Windows a « Effets d'animation » désactivé, comme sur l'ordinateur de Jeremy) */
-    *:not(.acces-succes *):not(.acces-marque img):not(.cadenas.secoue):not(#compteBtn .cloche svg):not(.sch-gard .ok):not(.charge-r):not(.charge-b i):not(#planOv):not(#actOv):not(#accueilOv),*::before,*::after{animation:none!important;transition:none!important}
+    *:not(.acces-succes *):not(.acces-marque img):not(.cadenas.secoue):not(#compteBtn .cloche svg):not(.sch-gard .ok):not(.charge-r):not(.charge-b i):not(#planOv):not(#actOv):not(#accueilOv):not(#qnOv):not(#accesOv):not(#bienOv):not(#plusOv),*::before,*::after{animation:none!important;transition-property:opacity,color,background-color,border-color,box-shadow,display,overlay!important}
+    /* 8 nov. (« améliore les transitions ») : « Effets d'animation » coupés = pas de mouvement, mais les fenêtres apparaissent en fondu au lieu d'apparaître d'un coup */
+    #qnOv:not([hidden]),#accesOv:not([hidden]),#bienOv:not([hidden]),#plusOv:not([hidden]){animation:ouvrirOv .2s ease-out!important}
   }
   /* ---------- Finitions : progression, signets, mode classe ---------- */
   .row h2{border-left:4px solid var(--cc,#EB6A22);padding-left:10px}
@@ -1561,7 +1567,7 @@ const HOSTCSS = "#ui{display:none!important}nav#bar{display:none!important}div#a
   + "html{-webkit-text-size-adjust:100%!important;text-size-adjust:100%!important}"
   + "#book>.page.out.fwd,#book>.page.out.back{animation:biblioPageOut .3s ease forwards!important;z-index:3!important}#book>.page.cur.fwd,#book>.page.cur.back{animation:biblioPage .45s cubic-bezier(.2,.7,.2,1) backwards!important;z-index:2!important}"
   + "@keyframes biblioPage{from{opacity:0;translate:0 8px}to{opacity:1;translate:none}}@keyframes biblioPageOut{from{opacity:1}to{opacity:0}}"
-  + "@media (prefers-reduced-motion:reduce){.page.vis,.page.hcur,#book>.page.cur,#book>.page.out{animation-duration:.01s!important}}";
+  + "@keyframes biblioFondu{from{opacity:0}to{opacity:1}}@media (prefers-reduced-motion:reduce){.page.vis,.page.hcur,#book>.page.cur,#book>.page.cur.fwd,#book>.page.cur.back{animation:biblioFondu .2s ease backwards!important}#book>.page.out,#book>.page.out.fwd,#book>.page.out.back{animation:biblioPageOut .18s ease forwards!important}}";
 const LEGERCSS = "*{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;will-change:auto!important}.page.vis,.page.hcur,#book>.page.cur,#book>.page.out{animation-duration:.01s!important}";   /* mode léger : livres sans flou ni transition de page */   // masque la barre d'outils intégrée aux livres
 const ICO_CHECK = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"/></svg>';
 const ICO_PAUSE = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5v14M15 5v14"/></svg>', ICO_PLAY = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5l11 7-11 7z" fill="currentColor"/></svg>';
@@ -10163,8 +10169,11 @@ document.addEventListener("click", e => { const b = e.target.closest && e.target
 /* Barre de navigation dans Plans et Activités + ouverture d'un outil demandé par une autre page (?ouvrir=plans|activites|accueil|tableau) */
 (function(){
   const BTN = { plans:"planBtn", activites:"actBtn", accueil:"accueilBtn", tableau:"wbBtn" }, FERMER = ["plClose", "actBack"];
-  let aller = k => { FERMER.forEach(id => { const b = document.getElementById(id); if (b && b.checkVisibility && b.checkVisibility()) b.click(); });
-    if (k === "biblio") return; if (k === "labo"){ location.href = "labo.html"; return; }
+  /* 8 nov. (« entre Activités et Plans on voit l'accueil une seconde ») : on ouvre d'abord le nouvel outil, puis on ferme l'ancien dessous */
+  let aller = k => { const ouverts = FERMER.map(id => document.getElementById(id)).filter(b => b && b.checkVisibility && b.checkVisibility());
+    const fermer = () => ouverts.forEach(b => { try { b.click(); } catch(e){} });
+    if (k === "biblio"){ fermer(); return; } if (k === "labo"){ location.href = "labo.html"; return; }
+    if (ouverts.length && BTN[k]){ document.documentElement.classList.add("ouvre"); const b = document.getElementById(BTN[k]); if (b) b.click(); setTimeout(() => { fermer(); setTimeout(() => document.documentElement.classList.remove("ouvre"), 200); }, 260); return; }
     setTimeout(() => { const b = document.getElementById(BTN[k]); if (b) b.click(); }, 60); };
   /* 8 nov. (« harmonise les en-têtes ») : partout logo · nom de la page · petite description · barre de navigation · retour à droite */
   const TIT = { plans:["Plans techniques", "Dossiers de plans et exercices de lecture"], activites:["Activités", "Cahiers et questionnaires à projeter ou imprimer"], tableau:["Tableau blanc", "Dessine, schématise et explique"] };

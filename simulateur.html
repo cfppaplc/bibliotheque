@@ -251,6 +251,14 @@ html.sombre body:has(#role:not(.cache)) #role input{background:#111114;color:#F2
 html.sombre #role a[style*="--bleu"],html.sombre #rEcr{color:#7db6ff!important}
 #role>.mp-tete{--mp-haut:18px}#tele>.mp-tete{--mp-haut:14px}
 
+
+/* transitions (8 nov.) */
+@keyframes fenFond{from{opacity:0}to{opacity:1}}
+@keyframes fenIn{from{opacity:0;transform:translateY(10px) scale(.985)}to{opacity:1;transform:none}}
+#modes:not(.cache):not([hidden]){animation:fenFond .2s ease-out}
+#modes:not(.cache):not([hidden])>*{animation:fenIn .26s cubic-bezier(.2,.8,.2,1)}
+body>div:not(.cache):not([hidden]){animation:fenFond .22s ease-out}
+@media (prefers-reduced-motion:reduce){#modes:not(.cache):not([hidden])>*{animation:fenFond .2s ease-out}}
 /* transitions douces entre les pages (8 nov.) */
 @view-transition{navigation:auto}
 ::view-transition-old(root),::view-transition-new(root){animation-duration:.22s}
