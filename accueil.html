@@ -224,7 +224,7 @@ header { grid-column: 1 / -1; display: flex; align-items: center; justify-conten
 #apercuOv .ap-moments { display: flex; flex-wrap: wrap; gap: 6px; }
 #apercuOv .ap-moments button { height: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid #d6dbe3; background: #fff; color: #1c2330; font: 600 15px "Segoe UI", Roboto, Arial, sans-serif; cursor: pointer; }
 #apercuOv .ap-moments button.on { background: #1c2330; color: #fff; border-color: #1c2330; }
-#apercuOv .ap-fermer { height: 40px; padding: 0 18px; border-radius: 8px; border: 0; background: #e50914; color: #fff; font: 700 15px "Segoe UI", Roboto, Arial, sans-serif; cursor: pointer; }
+#apercuOv .ap-fermer { height: 40px; padding: 0 18px; border-radius: 8px; border: 0; background: #EB6A22; color: #fff; font: 700 15px "Segoe UI", Roboto, Arial, sans-serif; cursor: pointer; }
 #apercuOv iframe { flex: 1; width: 100%; border: 0; background: #000; }
 .jour-choix { display: flex; flex-wrap: wrap; gap: 8px; margin: 2px 0 10px; }
 .jour-choix button, .jour-choix label { display: inline-flex; align-items: center; gap: 6px; height: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font: 600 15px var(--body); cursor: pointer; }
@@ -244,9 +244,9 @@ html.ui-clair .jour-choix label.autre-jour.on { background: #1d1d1f; color: #fff
 .duree-choix select { height: 42px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font: 600 16px var(--body); padding: 0 10px; }
 .jour-note { margin: 0 0 10px; padding: 10px 14px; border-radius: 10px; background: color-mix(in srgb, var(--water) 12%, transparent); font-size: 15px; line-height: 1.4; }
 .exam-opt { display: flex; gap: 12px; align-items: flex-start; margin: 4px 0 18px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; cursor: pointer; line-height: 1.35; }
-.exam-opt input { width: 22px; height: 22px; margin: 1px 0 0; flex: none; accent-color: #e50914; cursor: pointer; }
+.exam-opt input { width: 22px; height: 22px; margin: 1px 0 0; flex: none; accent-color: #EB6A22; cursor: pointer; }
 .exam-opt small { display: block; opacity: .7; margin-top: 2px; }
-.exam-opt:has(input:checked) { border-color: #e50914; background: color-mix(in srgb, #e50914 8%, transparent); }
+.exam-opt:has(input:checked) { border-color: #EB6A22; background: color-mix(in srgb, #EB6A22 8%, transparent); }
 .period-name { font-family: var(--display); font-weight: 700; font-size: calc(var(--u) * 40); line-height: 1; text-transform: uppercase; letter-spacing: .03em; }
 .period-hours { font-family: var(--display); font-weight: 500; font-size: calc(var(--u) * 34); color: var(--muted); font-variant-numeric: tabular-nums; }
 .module { font-size: calc(var(--u) * 27); line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--muted); }
@@ -550,7 +550,7 @@ html.anim-off .bgfx .flow, html.anim-off .bgfx .gauge-needle, html.anim-off .bgf
 .minu-b button.prim { background: var(--water); border-color: var(--water); color: #fff; }
 /* ===== Commandes : même style que la barre d'outils des livres de la bibliothèque ===== */
 .tools, .menu, .comppick, .dock, .sheet, .bgpick {
-  --surface: #181818; --bg: #111113; --ink: #f1f1f2; --muted: #a9a9ae; --line: #2f2f33; --copper: #e50914; --water: #8fb8ff; color-scheme: dark;
+  --surface: #181818; --bg: #111113; --ink: #f1f1f2; --muted: #a9a9ae; --line: #2f2f33; --copper: #EB6A22; --water: #8fb8ff; color-scheme: dark;
 }
 .tools .btn { height: 40px; padding: 0 14px; border-radius: 8px; background: #1b1b1d; color: #e6e6e8; border: 1px solid #2f2f33; font: 600 14px "Segoe UI", Roboto, Helvetica, Arial, sans-serif; display: inline-flex; align-items: center; gap: 8px; transition: background .2s, border-color .2s; }
 .tools .btn:hover { background: #262629; border-color: #3a3a3f; }
@@ -567,7 +567,7 @@ html.anim-off .bgfx .flow, html.anim-off .bgfx .gauge-needle, html.anim-off .bgf
   .tools .btn:not(.livre) svg { width: 20px; height: 20px; }
   .tools .btn.livre { max-width: 46vw; font-size: 13px; padding: 0 10px; }
 }
-.tools .btn.primary { background: #e50914; border-color: #e50914; color: #fff; }
+.tools .btn.primary { background: #EB6A22; border-color: #EB6A22; color: #fff; }
 .tools .btn.primary:hover { background: #f6121d; }
 .tools .btn svg { flex: none; }
 .menu, .comppick, .bgpick { background: rgba(22,22,24,.96); border: 1px solid #2f2f33; border-top: 1px solid #2f2f33; border-radius: 10px; backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
@@ -582,7 +582,7 @@ html.anim-off .bgfx .flow, html.anim-off .bgfx .gauge-needle, html.anim-off .bgf
 .field input:focus, .field textarea:focus, .field select:focus { outline: 2px solid #fff; outline-offset: 1px; }
 .sheet .btn, .dock .btn { height: 40px; padding: 0 16px; border-radius: 6px; background: #2a2a2a; border: 1px solid #666; color: #fff; font: 600 14px "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
 .sheet .btn:hover, .dock .btn:hover { border-color: #fff; }
-.sheet .btn.primary, .dock .btn.primary { background: #e50914; border-color: #e50914; }
+.sheet .btn.primary, .dock .btn.primary { background: #EB6A22; border-color: #EB6A22; }
 .dur, .preview { background: #111; border-color: #2f2f33; }
 .dur button { background: #1b1b1d; border-color: #2f2f33; color: #e6e6e8; }
 .dur button:hover { border-color: #6a6a70; }
@@ -603,7 +603,7 @@ html.anim-off .bgfx .flow, html.anim-off .bgfx .gauge-needle, html.anim-off .bgf
 .field input:focus, .field textarea:focus, .field select:focus { outline: 2px solid #1f6fc2; }
 .sheet .btn, .dock .btn { background: #f2f4f7; border: 1px solid #b9c1cc; color: #1c2330; }
 .sheet .btn:hover, .dock .btn:hover { border-color: #1c2330; background: #e9edf2; }
-.sheet .btn.primary, .dock .btn.primary { background: #e50914; border-color: #e50914; color: #fff; }
+.sheet .btn.primary, .dock .btn.primary { background: #EB6A22; border-color: #EB6A22; color: #fff; }
 .sheet .btn.primary:hover, .dock .btn.primary:hover { background: #f6121d; }
 .dur, .preview { background: #f2f4f7; border-color: #d6dbe3; }
 .dur button { background: #ffffff; border-color: #b9c1cc; color: #1c2330; }
@@ -634,30 +634,30 @@ html, body { overflow-x: hidden; max-width: 100%; }
    Même look que les fenêtres du compte de la bibliothèque : carte centrée aux coins ronds, bandeau rouge avec le logo, champs et boutons arrondis,
    bouton principal blanc (foncé) / noir (clair). Suit le choix clair / foncé de la bibliothèque (html.ui-clair). L'écran projeté ne change pas. */
 .sheet, .menu, .comppick, .bgpick, .lk-menu, #apercuOv, .dock {
-  --surface: #18181b; --bg: #0f0f11; --ink: #f1f1f2; --muted: #a9a9ae; --line: #2f2f33; --copper: #e50914; --water: #8fb8ff; color-scheme: dark; }
+  --surface: #18181b; --bg: #0f0f11; --ink: #f1f1f2; --muted: #a9a9ae; --line: #2f2f33; --copper: #EB6A22; --water: #8fb8ff; color-scheme: dark; }
 html.ui-clair .sheet, html.ui-clair .menu, html.ui-clair .comppick, html.ui-clair .bgpick, html.ui-clair .lk-menu, html.ui-clair #apercuOv, html.ui-clair .dock {
-  --surface: #ffffff; --bg: #faf8f5; --ink: #1d1d1f; --muted: #5f6068; --line: #e3e0da; --copper: #e50914; --water: #1f5fbf; color-scheme: light; }
+  --surface: #ffffff; --bg: #faf8f5; --ink: #1d1d1f; --muted: #5f6068; --line: #e3e0da; --copper: #EB6A22; --water: #1f5fbf; color-scheme: light; }
 html .sheet { background: rgba(0,0,0,.66); align-items: center; justify-content: center; padding: 16px; }
 html.ui-clair .sheet { background: rgba(40,32,24,.45); }
 html .sheet-in { width: min(580px, 100%); height: auto; max-height: calc(100vh - 32px); border-radius: 16px; border: 1px solid var(--line); background: var(--surface); color: var(--ink);
   box-shadow: 0 24px 60px rgba(0,0,0,.6); font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif; padding: 22px 22px 0; gap: 14px; }
 html.ui-clair .sheet-in { box-shadow: 0 24px 60px rgba(40,25,10,.28); }
 .sheet .marque { margin: -22px -22px 2px; padding: 20px 22px 16px; border-radius: 16px 16px 0 0; text-align: center; flex: none;
-  background: radial-gradient(120% 140% at 0% 0%, rgba(229,9,20,.38), transparent 60%), linear-gradient(180deg, #221416, #18181b); border-bottom: 1px solid #2a2a2f; }
-html.ui-clair .sheet .marque { background: radial-gradient(120% 140% at 0% 0%, rgba(229,9,20,.16), transparent 62%), linear-gradient(180deg, #fdf1ef, #fff); border-bottom-color: #efe9e3; }
+  background: radial-gradient(120% 140% at 0% 0%, rgba(235,106,34,.38), transparent 60%), linear-gradient(180deg, #131925, #18181b); border-bottom: 1px solid #2a2a2f; }
+html.ui-clair .sheet .marque { background: radial-gradient(120% 140% at 0% 0%, rgba(235,106,34,.16), transparent 62%), linear-gradient(180deg, #fdf1ef, #fff); border-bottom-color: #efe9e3; }
 .sheet .marque img { height: 34px; width: auto; }
 .sheet .marque .lg-clr, html.ui-clair .sheet .marque .lg-blc { display: none; }
 html.ui-clair .sheet .marque .lg-clr { display: inline; }
 html .sheet .marque h2 { margin: 8px 0 2px; font: 700 1.4rem "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: var(--ink); }
 .sheet .marque p { margin: 0; color: var(--muted); font-size: .92rem; }
 html .step-q { font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important; font-size: 1.12rem !important; color: var(--ink); }
-html .step-q .num { background: #e50914; width: 28px; height: 28px; font-size: 15px; }
+html .step-q .num { background: #EB6A22; width: 28px; height: 28px; font-size: 15px; }
 html .sheet .field label { color: var(--ink); }
 html .sheet .field input, html .sheet .field textarea, html .sheet .field select, html #prep select, html #prep textarea, html .duree-choix select {
   background: var(--bg); border: 1px solid #34343a; color: var(--ink); border-radius: 10px; padding: 9px 12px; }
 html.ui-clair .sheet .field input, html.ui-clair .sheet .field textarea, html.ui-clair .sheet .field select, html.ui-clair #prep select, html.ui-clair #prep textarea, html.ui-clair .duree-choix select {
   background: #fff; border-color: #d4d0c8; }
-html .sheet .field input:focus, html .sheet .field textarea:focus, html .sheet .field select:focus, html .duree-choix select:focus { outline: none; border-color: var(--muted); box-shadow: 0 0 0 3px rgba(229,9,20,.2); }
+html .sheet .field input:focus, html .sheet .field textarea:focus, html .sheet .field select:focus, html .duree-choix select:focus { outline: none; border-color: var(--muted); box-shadow: 0 0 0 3px rgba(235,106,34,.2); }
 html .sheet .btn { height: 42px; padding: 0 16px; border-radius: 10px; background: #232327; border: 1px solid #3a3a40; color: #f1f1f2; font: 600 15px "Segoe UI", Roboto, Helvetica, Arial, sans-serif; cursor: pointer; }
 html .sheet .btn:hover { background: #2c2c31; border-color: #4a4a50; }
 html .sheet .btn.primary { background: #f1f1f2; border-color: #f1f1f2; color: #111; }
@@ -2833,7 +2833,7 @@ html.anim-off #accAccueil .aa-dans i { animation: none; }
     im.onerror = () => res(null); im.src = src; });
   const poser = async img => { const s0 = img.dataset.logo0 || img.getAttribute("src") || ""; if (!/pavillon-avenir/.test(s0)) return; img.dataset.logo0 = s0;
     const rgb = hex(couleur), voulu = couleur;
-    if (!rgb || voulu.toLowerCase() === "#e50914"){ if (img.getAttribute("src") !== s0) img.src = s0; return; }
+    if (!rgb || voulu.toLowerCase() === "#EB6A22"){ if (img.getAttribute("src") !== s0) img.src = s0; return; }
     const u = await teinte(s0, rgb); if (u && voulu === couleur) img.src = u; };
   const tous = () => document.querySelectorAll('img[src*="pavillon-avenir"], img[data-logo0]');
   window.teinterLogo = c => { couleur = c || ""; try { couleur ? localStorage.setItem(CLE, couleur) : localStorage.removeItem(CLE); } catch(e){} tous().forEach(poser); };
