@@ -218,6 +218,26 @@ body.bord .grid{grid-template-columns:1fr}body.bord .grid>div:first-child{displa
 .medaille{position:absolute;right:-26px;bottom:-14px;width:54px;filter:drop-shadow(0 4px 8px rgba(0,0,0,.35))}
 .medaille.m1{--mc:#C99A1E}.medaille.m2{--mc:#8E959F}.medaille.m3{--mc:#A0663A}.serieJ.fort{color:#FFB15C;box-shadow:0 0 18px rgba(255,120,30,.35)}
 @media (prefers-reduced-motion:reduce){.flamme{animation:none}}
+/* 8 nov. : classement plus vivant (paliers de série, plus rapide, couronne, nouveau premier, petites remontées) */
+.feu.tiede{color:#F3C98B;background:rgba(240,190,120,.1)}
+.feu:not(.tiede) .flamme{animation:vacille .5s ease-in-out infinite alternate}
+@keyframes vacille{from{transform:scale(1) rotate(-4deg)}to{transform:scale(1.18) rotate(4deg)}}
+.eclair{display:inline-flex;align-items:center;gap:.3vw;margin-left:.6vw;font-size:1.2vw;font-weight:800;color:#FFD166;background:rgba(255,209,102,.12);border-radius:2vw;padding:.15vw .7vw;animation:pop .5s cubic-bezier(.3,1.6,.5,1) both .6s}
+.eclair svg{width:1.1em;height:1.1em}.eclair em{font-style:normal}
+@keyframes pop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+.lg .r{display:inline-flex;align-items:center;gap:.3vw}
+.cour{width:1.6vw;height:1.6vw;color:#FFD166;filter:drop-shadow(0 0 .5vw rgba(255,209,102,.6));animation:pop .45s cubic-bezier(.3,1.6,.5,1) both}
+.lg.premier{background:linear-gradient(90deg,rgba(255,209,102,.16),#22252B 60%);box-shadow:inset .3vw 0 0 #FFD166}
+.lg.monteP{animation:flashV 1.1s ease}
+@keyframes flashV{0%{background:#22252B}30%{background:#1F3A2A;box-shadow:0 0 0 .15vw #2E9E5B}100%{background:#22252B}}
+.annonce{position:fixed;left:50%;top:42%;transform:translate(-50%,-50%) scale(.6);opacity:0;z-index:50;text-align:center;font-size:4.4vw;font-weight:900;color:#fff;background:linear-gradient(135deg,#EB6A22,#C2410C);padding:1.6vw 3.4vw;border-radius:1.6vw;box-shadow:0 2vw 6vw rgba(0,0,0,.5);animation:annonceIn .55s cubic-bezier(.3,1.5,.5,1) forwards;transition:opacity .5s,transform .5s}
+.annonce small{display:block;font-size:1.5vw;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.85}
+.annonce.part{opacity:0!important;transform:translate(-50%,-60%) scale(.9)!important}
+@keyframes annonceIn{to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+.conf{position:fixed;width:.7vw;height:1.1vw;border-radius:.15vw;z-index:49;pointer-events:none;animation:confV 1.6s cubic-bezier(.2,.7,.4,1) forwards}
+@keyframes confV{0%{transform:translate(0,0) rotate(0)}60%{opacity:1}100%{transform:translate(var(--dx),calc(var(--dy) + 30vh)) rotate(var(--r));opacity:0}}
+@media (prefers-reduced-motion:reduce){.feu .flamme,.eclair,.cour,.lg.monteP{animation:none!important}.annonce{animation:none;opacity:1;transform:translate(-50%,-50%)}}
+
 /* Couleurs des choix (7 nov., « c'est mêlant ») : sarcelle, violet, orange, rose — lettre colorée + liséré, cartes foncées (pas de blocs pleins ni de formes) */
 .k0{--lc:#14A3A3}.k1{--lc:#8B6CE0}.k2{--lc:#E0892B}.k3{--lc:#D9488A}
 i.let,.ch4 button i{background:var(--lc,var(--acc))!important;color:#fff!important}
@@ -570,7 +590,7 @@ function telecommande(bord){
       couv: G.quiz && G.quiz.couv && !/^data:/.test(G.quiz.couv) ? G.quiz.couv : (G.quiz && G.quiz.couv ? "img" : ""), sujet: G.quiz ? G.quiz.sujet || "" : "",
       q: Q && ["question", "rev"].includes(G.etat) ? {q: Q.q, ch: Q.ch, s: Q.s, t, u: Q.u || "", zoom: Q.zoom || null, img: !!Q.img, expl: G.etat === "rev" ? Q.expl || "" : "", bonTxt: G.etat === "rev" ? texteBon(Q) : ""} : null,
       bon: G.etat === "rev" ? Q.bon : null, cpt, nrep: Object.keys(G.reps).length, mises: G.etat === "mise" ? ids().filter(id => P[id].mise).length : 0,
-      joueurs: ids().map(id => ({n: P[id].nom, av: P[id].av, pts: P[id].pts, r: r[id], g: G.etat === "rev" && G.reps[id] ? G.reps[id].g || 0 : 0, s: P[id].serie || 0, bo: G.etat === "rev" && G.reps[id] ? G.reps[id].bonus || 0 : 0})).sort((a, b) => a.r - b.r)};
+      joueurs: ids().map(id => ({n: P[id].nom, av: P[id].av, pts: P[id].pts, r: r[id], g: G.etat === "rev" && G.reps[id] ? G.reps[id].g || 0 : 0, s: P[id].serie || 0, bo: G.etat === "rev" && G.reps[id] ? G.reps[id].bonus || 0 : 0, ra: G.etat === "rev" && G.reps[id] && G.reps[id].ok && id === plusRapide() ? 1 : 0})).sort((a, b) => a.r - b.r)};
   }
   function maj(){
     if (!G.quiz) { listeLob(); vue(); return; }
@@ -1069,13 +1089,22 @@ function ecran(code){
     });
     posAvant = {}; E.querySelectorAll(".lg").forEach(el => posAvant[el.dataset.n] = el.getBoundingClientRect().top);
   }
+  /* 8 nov. (« ça doit donner le goût ») : joueur le plus rapide à bonne réponse de la question */
+  function confettis(el){ if (!el) return; const b = el.getBoundingClientRect(), C = ["#EB6A22", "#7CF0A8", "#FFD166", "#8B6CE0", "#14A3A3"];
+    for (let i = 0; i < 36; i++){ const c = document.createElement("i"); c.className = "conf"; c.style.left = (b.left + b.width * Math.random()) + "px"; c.style.top = (b.top + b.height / 2) + "px"; c.style.background = C[i % C.length];
+      c.style.setProperty("--dx", (Math.random() * 2 - 1) * 22 + "vw"); c.style.setProperty("--dy", -(8 + Math.random() * 22) + "vh"); c.style.setProperty("--r", (Math.random() * 720 - 360) + "deg");
+      document.body.appendChild(c); setTimeout(() => c.remove(), 1700); } }
+  function plusRapide(){ let m = null, t = 1e12; for (const id in (G.reps || {})) { const x = G.reps[id]; if (x && x.ok && x.ms < t) { t = x.ms; m = id; } } return m; }
+  const COURONNE = '<svg class="cour" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8l4.5 4L12 5l4.5 7L21 8l-2 11H5z" fill="currentColor"/></svg>';
+  const ECLAIR = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2L4 14h7l-1 8 9-12h-7z" fill="currentColor"/></svg>';
+  const palier = s => s >= 8 ? "Légendaire" : s >= 5 ? "Inarrêtable" : s >= 3 ? "En feu" : s === 2 ? "Ça chauffe" : "";
   function classement(v){
     const av = v.joueurs.map(j => Object.assign({}, j, {avant: j.pts - (j.g || 0)}));
     const ancien = av.slice().sort((a, b) => b.avant - a.avant || a.n.localeCompare(b.n)), N = Math.min(10, av.length);
     const rAvant = {}; ancien.forEach((j, k) => rAvant[j.n] = k + 1);
     const garde = av.filter(j => j.r <= N || rAvant[j.n] <= N);
     const ligne = j => { const d = rAvant[j.n] - j.r;
-      return `<div class="lg" data-n="${esc(j.n)}" data-r="${j.r}"><span class="r">${rAvant[j.n]}</span><span>${visage(j.av, "v-e")}${esc(j.n)}${v.i === 0 ? "" : d > 0 ? ` <small class="mo">▲ ${d}</small>` : d < 0 ? ` <small class="de">▼ ${-d}</small>` : ""}${j.s >= 3 ? ` <span class="feu${j.s >= 5 ? " fort" : ""}">${FLAMME}<em>${j.s} de suite</em></span>` : ""}</span><span>${j.g - (j.bo || 0) ? `<small>+${j.g - (j.bo || 0)}</small>` : ""}${j.bo ? `<small class="bo">+${j.bo} série</small>` : ""}${v.reg.points === "aucun" ? "" : `<b data-de="${j.avant}" data-a="${j.pts}">${j.avant}</b>`}</span></div>`; };
+      return `<div class="lg" data-n="${esc(j.n)}" data-r="${j.r}"><span class="r">${rAvant[j.n]}</span><span>${visage(j.av, "v-e")}${esc(j.n)}${v.i === 0 ? "" : d > 0 ? ` <small class="mo">▲ ${d}</small>` : d < 0 ? ` <small class="de">▼ ${-d}</small>` : ""}${j.s >= 2 ? ` <span class="feu${j.s >= 5 ? " fort" : ""}${j.s === 2 ? " tiede" : ""}">${j.s >= 3 ? FLAMME : ""}<em>${palier(j.s)} · ${j.s} de suite</em></span>` : ""}${j.ra ? ` <span class="eclair">${ECLAIR}<em>Plus rapide</em></span>` : ""}</span><span>${j.g - (j.bo || 0) ? `<small>+${j.g - (j.bo || 0)}</small>` : ""}${j.bo ? `<small class="bo">+${j.bo} série</small>` : ""}${v.reg.points === "aucun" ? "" : `<b data-de="${j.avant}" data-a="${j.pts}">${j.avant}</b>`}</span></div>`; };
     E.innerHTML = tete("Classement après la question " + (v.i + 1) + " sur " + v.n) + `<div class="lgs" id="eLgs">${garde.sort((a, b) => rAvant[a.n] - rAvant[b.n]).map(ligne).join("")}</div>` + bSon();
     const rows = [...E.querySelectorAll("#eLgs .lg")];
     if (rows.length < 1) return;
@@ -1090,8 +1119,18 @@ function ecran(code){
         rows.forEach((el, k) => { const cible = nouv.indexOf(el.dataset.n); el.style.transition = "transform .9s cubic-bezier(.2,.8,.2,1)"; el.style.transform = `translateY(${(cible - k) * pas}px)`; });
         setTimeout(() => rows.forEach(el => el.querySelector(".r").textContent = el.dataset.r), 500);
         /* grosse remontée (3 places et plus) : la rangée brille un instant */
-        if (v.i > 0) rows.forEach((el, k) => { if (k - nouv.indexOf(el.dataset.n) >= 3) setTimeout(() => { el.classList.add("remonte"); el.insertAdjacentHTML("beforeend", `<span class="remTxt">+${k - nouv.indexOf(el.dataset.n)} places</span>`); }, 900); });
-        ton(660, .2, .07);
+        const gain = el => rows.indexOf(el) - nouv.indexOf(el.dataset.n);
+        if (v.i > 0) rows.forEach(el => { const d = gain(el); if (d >= 3) setTimeout(() => { el.classList.add("remonte"); el.insertAdjacentHTML("beforeend", `<span class="remTxt">+${d} places</span>`); }, 900); else if (d >= 1) setTimeout(() => el.classList.add("monteP"), 900); });
+        const tete1 = rows.find(el => el.dataset.n === nouv[0]);
+        if (tete1) setTimeout(() => { const r = tete1.querySelector(".r"); r.insertAdjacentHTML("afterbegin", COURONNE); tete1.classList.add("premier"); }, 950);
+        if (v.i > 0 && ancien[0] && ancien[0].n !== nouv[0]) setTimeout(() => {
+          E.insertAdjacentHTML("beforeend", `<div class="annonce"><small>Nouveau premier</small>${esc(nouv[0])}</div>`);
+          const z = E.querySelector(".annonce"); setTimeout(() => z && z.classList.add("part"), 2600); setTimeout(() => z && z.remove(), 3200);
+          if (!matchMedia("(prefers-reduced-motion: reduce)").matches) confettis(tete1);
+          accord();
+        }, 1000);
+        else if (rows.some(el => gain(el) >= 1)) { ton(523, .12, .08); setTimeout(() => ton(659, .12, .08), 90); setTimeout(() => ton(784, .18, .09), 180); }
+        else ton(660, .2, .07);
       }, 1000);
     }, 80 * rows.length + 400);
     const b = $("bSon"); if (b) b.onclick = () => { sonOK = !sonOK; sonManuel = !sonOK; if (sonOK) { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); ac.resume(); } b.classList.toggle("actif", sonOK); b.innerHTML = bSon().replace(/^<button[^>]*>|<\/button>$/g, ""); };
@@ -1130,6 +1169,7 @@ function ecran(code){
     }
     if (veut) MUS.fin = v.t0 + v.q.s * 1000;
   }
+  if (/[?&]essaiClassement=1/.test(location.search)) window.__cl = classement;   // essais seulement
   function rendre(force){
     const v = V, n = Date.now() + decal, lecture = v.etat === "question" && v.q && n < v.t0 - 150, cle = v.etat + v.i + (lecture ? "L" : "");
     musique(v, n);
