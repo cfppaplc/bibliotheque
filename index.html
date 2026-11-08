@@ -1277,6 +1277,9 @@ const LIVRES = [
   { titre:"Utiliser un micro-ordinateur", auteur:"Jérémy Raymond", categorie:"Entretien général d'immeubles", niveau:"DEP 5211 · Compétence 15",
     pages:173, annee:2026, nouveau:true, couverture:"", couleurs:["#E8592C","#26303b"], lien:"", fichier:"micro-ordinateur", competence:"15", version:"6",
     description:"Cahier d'apprentissage de 45 heures en 9 modules : le portable et le poste de travail, Windows 11, fichiers et OneDrive, Internet et cybersécurité, Outlook et Teams, Word, Excel, la gestion de l'entretien (GMAO) et l'intelligence artificielle. Fil conducteur : une semaine à l'immeuble Les Érables." },
+  { titre:"Utiliser un micro-ordinateur — essai gratuit", auteur:"Jérémy Raymond", categorie:"Entretien général d'immeubles", niveau:"Essai gratuit · Module 1",
+    pages:17, annee:2026, couverture:"", couleurs:["#E8592C","#26303b"], lien:"", fichier:"essai-micro-ordinateur", essai:true, couvDe:"micro-ordinateur",
+    description:"Essai gratuit, sans connexion : la couverture, la table des matières et le module 1 (le portable et le poste de travail) du livre « Utiliser un micro-ordinateur », avec ses guides animés. Le livre complet compte 9 modules et 173 pages." },
   { titre:"Communiquer en milieu de travail", auteur:"Jérémy Raymond", categorie:"Entretien général d'immeubles", niveau:"DEP 5211 · Compétence 9",
     pages:176, annee:2026, nouveau:true, couverture:"", couleurs:["#8B6CFF","#211f33"], lien:"", fichier:"communiquer", competence:"9",
     description:"Cahier d'apprentissage de 30 heures (436-282) en 9 modules : le rôle du préposé, les bases de la communication, les occupants, le travail d'équipe, l'écrit professionnel, le téléphone et la radio, les situations difficiles, l'éthique et l'image professionnelle, et une évaluation formative. Jeux de rôle, documents de travail et situations tirées du terrain." },
@@ -1311,7 +1314,7 @@ function palette(titre){
   let h = 0; for (const c of titre) h = (h*31 + c.charCodeAt(0)) >>> 0;
   return PALETTES[h % PALETTES.length];
 }
-function couv(l){ return l.couverture || (window.COUVERTURES && COUVERTURES[l.fichier]) || ""; }
+function couv(l){ return l.couverture || (window.COUVERTURES && (COUVERTURES[l.fichier] || (l.couvDe && COUVERTURES[l.couvDe]))) || ""; }
 function fond(l){ const [a,b] = l.couleurs || palette(l.titre); return `linear-gradient(160deg,${a},${b})`; }
 function coverStyle(l){
   if (couv(l)) return `background-image:url('${esc(couv(l))}')`;
@@ -1365,7 +1368,7 @@ function bookCard(l){
   const gen = !couv(l);
   return `<div class="item">
   <div class="book" data-f="${esc(l.fichier)}">
-    ${badgeLivre(l) === "construction" ? '<span class="badge badge-constr" title="Livre en construction : pas encore la version finale">' + ICO_CONSTR + 'En construction</span>' : badgeLivre(l) === "nouveau" ? '<span class="badge">Nouveau</span>' : badgeLivre(l) === "maj" ? '<span class="badge badge-maj">Mis à jour</span>' : ''}
+    ${l.essai ? '<span class="badge badge-essai">Essai gratuit</span>' : badgeLivre(l) === "construction" ? '<span class="badge badge-constr" title="Livre en construction : pas encore la version finale">' + ICO_CONSTR + 'En construction</span>' : badgeLivre(l) === "nouveau" ? '<span class="badge">Nouveau</span>' : badgeLivre(l) === "maj" ? '<span class="badge badge-maj">Mis à jour</span>' : ''}
     ${isFav(l) ? '<span class="fav-mark">★</span>' : ''}
     ${window.ACCES && ACCES.verrouille(l.fichier) ? '<span class="cadenas" title="Livre protégé : connecte-toi pour l\'ouvrir">' + window.ICO_CADENAS + '</span>' : ''}
     ${l.user || l.perso || l.ens ? '<span class="mp-coll autre" title="Livre ajouté par un enseignant (hors collection Métier+)"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h12v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5"/></svg></span>' : '<span class="mp-coll" title="Collection Métier+"><img src="img/metier-plus-icone.svg" alt="Métier+"></span>'}
@@ -1423,18 +1426,20 @@ function dessinerFiltres(){
   bar.querySelectorAll(".fchip").forEach(b => b.onclick = () => { filtreProg = b.dataset.prog; ecrireLS("filtreProg", filtreProg); render(); });
 }
 /* visiteur = personne pas connectée sur cet appareil (ni session, ni enseignant déjà venu) */
+/* dernière page du livre d'essai : fermer le livre puis ouvrir la connexion ou la demande d'accès (appelé depuis le livre) */
+window.essaiFin = k => { try { closeReader(); } catch(e){} setTimeout(() => { if (!window.ACCES) return; if (k === "dem") ACCES.dlgDemande(false); else ACCES.dlgConnexion(); }, 250); };
 function estVisiteur(){ const b = document.body; const v = !(window.ACCES && ACCES.session) && !b.classList.contains("connecte") && !b.classList.contains("pre-co") && !b.classList.contains("classe");
   b.classList.toggle("visiteur", v); return v; }
 const VIS_OUTILS = [["Plans techniques", "Des dossiers de plans complets, à mettre à l'échelle et à mesurer directement au tableau.", '<path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3z"/><path d="M9 3v15M15 6v15"/>'],
   ["Formatifs", "Cahiers d'activités et questionnaires à projeter, imprimer ou télécharger.", '<path d="M8 3h8l3 3v15H5V3z"/><path d="M9 11l2 2 4-4M9 17h6"/>'],
   ["Labo", "Quiz et simulations joués avec les iPad de la classe, sans compte élève.", '<path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-9V3"/>']];
 function render(){
-  let list = LIVRES;
+  let list = LIVRES.filter(l => !l.essai);   /* l'essai gratuit est pour les visiteurs seulement */
   if (estVisiteur() && !query){
-    const tous = LIVRES.filter(l => l.fichier && !l.perso && l.fichier !== "tableau-blanc");
+    const tous = LIVRES.filter(l => l.fichier && !l.perso && l.fichier !== "tableau-blanc").sort((a, b) => (b.essai ? 1 : 0) - (a.essai ? 1 : 0));
     $("#rows").innerHTML = rowHTML("Les livres de Métier+", tous)
       + `<section class="vis-outils"><h2>Et aussi, une fois connecté</h2><div class="vis-cartes">${VIS_OUTILS.map(([t, d, i]) => `<div class="vis-carte"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${i}</svg><b>${t}</b><p>${d}</p></div>`).join("")}</div>
-        <p class="vis-note">Un livre t'intéresse ? Touche-le : on te demandera de te connecter.</p></section>`;
+        <p class="vis-note">Commence par l'<b>essai gratuit</b> : il s'ouvre sans connexion. Pour les autres livres, on te demandera de te connecter.</p></section>`;
     return; }
   const lienFav = document.querySelector('nav a[data-view="fav"]'); if (lienFav) lienFav.hidden = !favs.length;
   if (view === "fav" && !favs.length){ view = "all"; document.querySelectorAll("nav a[data-view]").forEach(a => a.classList.toggle("active", a.dataset.view === "all")); }
@@ -1481,6 +1486,7 @@ async function chercherDansLivres(q){
   if (jeton !== rechJeton || !$("#rows")) return;
   const nq = sansAccent(q.trim()), hits = [];
   for (const l of LIVRES){
+    if (l.essai && !estVisiteur()) continue;
     const pages = idx[l.fichier]; if (!pages) continue;
     if (filtreProg && l.categorie !== filtreProg && false) continue;
     pages.forEach((pg, i) => { const k = pg.n.indexOf(nq); if (k >= 0) hits.push({ l, page:i + 1, k, t:pg.t }); });
@@ -10388,6 +10394,7 @@ body.clair .vis-dem{border-color:rgba(0,0,0,.2);background:rgba(0,0,0,.03)}
 .vis-carte{padding:20px;border-radius:14px;background:rgba(128,128,128,.08);border:1px solid rgba(128,128,128,.16)}
 .vis-carte svg{color:#EB6A22;margin-bottom:10px}.vis-carte b{display:block;font-size:1.05rem;margin-bottom:6px}.vis-carte p{margin:0;opacity:.75;font-size:.92rem;line-height:1.45}
 .vis-note{margin:18px 0 0;opacity:.7;font-size:.92rem}
+.badge.badge-essai{background:#15803d;color:#fff}
 /* plus aéré (8 nov., « aérer la page ») */
 @media (min-width:641px){body.visiteur #hero .hero-content{padding-top:clamp(40px,6vh,80px);padding-bottom:clamp(30px,5vh,60px)}}
 body.visiteur #hero h1{font-size:clamp(2.4rem,4.6vw,3.6rem);letter-spacing:-.03em;margin-bottom:18px}
