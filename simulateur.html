@@ -203,6 +203,14 @@ body.inclus .grid{grid-template-columns:1fr}
 .eq-ch div.bon{background:#1F7A4D!important}
 .kick{border:1px solid rgba(127,127,127,.35);background:transparent;color:inherit;border-radius:8px;width:30px;height:30px;margin-left:8px;cursor:pointer;font-size:14px;opacity:.6;vertical-align:middle}.kick:hover{opacity:1;border-color:#C62828;color:#C62828}
 .ch4 button{font-size:20px}
+/* Couleurs des choix (7 nov., « c'est mêlant ») : sarcelle, violet, orange, rose — lettre colorée + liséré, cartes foncées (pas de blocs pleins ni de formes) */
+.k0{--lc:#14A3A3}.k1{--lc:#8B6CE0}.k2{--lc:#E0892B}.k3{--lc:#D9488A}
+i.let,.ch4 button i{background:var(--lc,var(--acc))!important;color:#fff!important}
+.ech>div.k0,.ech>div.k1,.ech>div.k2,.ech>div.k3,.eq-ch>div{box-shadow:inset .45vw 0 0 var(--lc);background:color-mix(in srgb,var(--lc) 14%,#262A31)!important}
+.ch4 button.k0,.ch4 button.k1,.ch4 button.k2,.ch4 button.k3{border-color:color-mix(in srgb,var(--lc) 65%,transparent)!important;background:color-mix(in srgb,var(--lc) 22%,rgba(0,0,0,.25))!important;box-shadow:inset 6px 0 0 var(--lc)}
+.ch4 button.choisi{border-color:#fff!important;background:color-mix(in srgb,var(--lc) 45%,rgba(0,0,0,.2))!important}
+.ech>div.bon{background:#1F7A4D!important;box-shadow:inset .45vw 0 0 #7CF0A8}
+.bon i.let{background:#fff!important;color:#1D6B3F!important}
 </style>
 </head>
 <body>
