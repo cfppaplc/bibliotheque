@@ -575,26 +575,27 @@ function joueur(code){
   const COCHE = '<svg class="coche" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45"/><path d="M30 52l13 13 27-29"/></svg>';
   const CROIX = '<svg class="coche croix" viewBox="0 0 100 100"><path d="M32 32l36 36"/><path d="M68 32L32 68"/></svg>';
   const pour = m => !m.pour || m.pour === pid;
-  let av = -1, entre = false, pris = [], prenom = "";
+  let av = -1, entre = false, pris = [], prenom = "", nomChoisi = "", nomEdite = false;
   function ecranChoix(msg){
     bx(`<h2>Choisis ton personnage</h2>${msg ? `<div class="ko2">${esc(msg)}</div>` : ""}${grillePersos(pris, av)}
-      <input id="jPre" maxlength="20" placeholder="Ton prénom (vu seulement par l'enseignant, facultatif)" value="${esc(stock.get("quizNom", ""))}">
+      <div style="margin-top:6px;opacity:.8">Ton nom dans la partie (tu peux le changer)</div>
+      <input id="jPre" maxlength="24" placeholder="Choisis d'abord un personnage" value="${esc(nomChoisi)}">
       <button id="jGo" style="width:100%;font-size:20px;padding:16px;background:#fff;color:#24211E" ${av < 0 ? "disabled" : ""}>Entrer</button>`);
-    document.querySelectorAll("#jBx .perso").forEach(b => b.onclick = () => { av = +b.dataset.av; const pre = $("jPre").value; ecranChoix(); $("jPre").value = pre; });
+    document.querySelectorAll("#jBx .perso").forEach(b => b.onclick = () => { av = +b.dataset.av; if (!nomEdite) nomChoisi = PERSOS[av][0]; ecranChoix(); });
+    $("jPre").oninput = () => { nomChoisi = $("jPre").value; nomEdite = !!nomChoisi.trim(); };
     $("jGo").onclick = entrer;
   }
   function entrer(){
     if (av < 0 || pris.includes(av)) return;
-    prenom = ($("jPre").value.trim()).slice(0, 20); stock.set("quizNom", prenom);
-    nom = PERSOS[av][0]; entre = true;
+    nom = ($("jPre").value.trim() || PERSOS[av][0]).slice(0, 24); entre = true;
     $("nomJ").innerHTML = visage(av, "v-m") + " " + esc(nom);
     bx(`${visage(av, "v-l")}<div class="gros monte">Bienvenue, ${esc(nom)}.</div><div>Regarde le tableau : ça commence bientôt.</div>`);
     envoyer(topic, {m: "ici", pid, nom, av, prenom});
   }
   ecranChoix();
     ecouter(topic, m => {
-      if (m.m === "persos") { pris = m.pris || []; if (!entre) { const pre = $("jPre") && $("jPre").value; ecranChoix(); if (pre != null) $("jPre").value = pre; } return; }
-      if (m.m === "refus" && m.pour === pid) { entre = false; av = -1; ecranChoix("Ce personnage vient d'être pris. Choisis-en un autre."); return; }
+      if (m.m === "persos") { pris = m.pris || []; if (!entre) ecranChoix(); return; }
+      if (m.m === "refus" && m.pour === pid) { entre = false; av = -1; if (!nomEdite) nomChoisi = ""; ecranChoix("Ce personnage vient d'être pris. Choisis-en un autre."); return; }
       if (!entre || !pour(m)) return;
       if (m.coul) teinte(m.coul);
       if (m.m === "bienvenue") bx(`<div class="gros monte">Tu es dans la partie.</div><div>${esc(m.titre || "")}</div><div style="opacity:.7;margin-top:8px">Regarde le tableau : ça commence bientôt.</div>`);

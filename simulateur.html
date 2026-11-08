@@ -243,7 +243,8 @@ body.inclus .grid{grid-template-columns:1fr}
 <div id="entree"><h1>Panneau d'alarme</h1>
 <div class="sous">Les Habitations du Quai · simulateur</div>
 <div style="margin-top:10px;font-weight:700">Choisis le personnage de ton équipe</div><div id="persoG"></div>
-<input id="equipe" placeholder="Prénoms de l'équipe (vus seulement par l'enseignant, facultatif)" maxlength="40" autocomplete="off">
+<div class="sous" style="margin-top:4px">Nom de ton équipe (tu peux le changer)</div>
+<input id="equipe" placeholder="Choisis d'abord un personnage" maxlength="24" autocomplete="off">
 <button id="go" disabled>Commencer</button>
 <div class="sous" style="margin-top:10px">Monte le son de l'iPad : le panneau sonne.</div></div>
 
@@ -865,14 +866,16 @@ function panneau(code){
   // ---- choix du personnage de l'équipe, puis démarrage (le toucher débloque le son sur l'iPad)
   function choix(msg){
     $("persoG").innerHTML = (msg ? `<div class="ko2">${esc(msg)}</div>` : "") + grillePersos(pris, av);
-    document.querySelectorAll("#persoG .perso").forEach(b => b.onclick = () => { av = +b.dataset.av; choix(); });
+    document.querySelectorAll("#persoG .perso").forEach(b => b.onclick = () => { av = +b.dataset.av; if (!nomEdite) $("equipe").value = PERSOS[av][0]; choix(); });
     $("go").disabled = av < 0;
   }
+  let nomEdite = false;
+  $("equipe").addEventListener("input", () => { nomEdite = !!$("equipe").value.trim(); });
   choix();
   $("go").onclick = () => {
     if (av < 0 || pris.includes(av)) return;
     try { ac = new (window.AudioContext || window.webkitAudioContext)(); ac.resume(); ton(440, .01, .001); } catch(e) {}
-    prenom = $("equipe").value.trim().slice(0, 40); equipe = PERSOS[av][0]; entre = true;
+    equipe = ($("equipe").value.trim() || PERSOS[av][0]).slice(0, 24); entre = true;
     $("eqNom").innerHTML = visage(av, "v-s") + esc(equipe) + " · " + code;
     $("entree").classList.add("cache"); $("panneau").classList.remove("cache");
     afficher(); envoyer(topic, {m: "ici", moi, equipe, av, prenom, etat: etatGlobal()});
