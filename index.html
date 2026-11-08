@@ -9665,8 +9665,8 @@ window.ACCES = (function(){
         box().classList.remove("large", "gestion"); box().innerHTML = succes('Publié !', '<p class="sous">Les changements seront en ligne d\'ici une minute ou deux.</p><div class="acces-btns" style="justify-content:center"><button id="gRet">Retour aux accès</button><button class="prim" id="gFin2">Fermer</button></div>');
         document.getElementById("gRet").onclick = () => { box().classList.add("large", "gestion"); dessinerGerer(); }; document.getElementById("gFin2").onclick = fermer;
         try { render(); } catch(e){} compterDemandes().catch(() => {}); }
-      catch(e){ const refusee = /401|403|Bad credentials|refusée/i.test(e.message); if (refusee) try { localStorage.removeItem("ghJeton"); } catch(x){}
-        dessinerGerer({ err:refusee ? "GitHub a refusé la clé (expirée ou retirée). Colle une nouvelle clé dans la case « Publication », puis touche « Publier »." : "Publication impossible : " + e.message}); } };
+      catch(e){ const refusee = /401|403|Bad credentials|refusée/i.test(e.message);   /* la clé reste enregistrée : personne ne peut la changer d'ici */
+        dessinerGerer({ err:refusee ? "GitHub a refusé la clé enregistrée (elle a peut-être expiré). Demande à Claude de la remplacer." : "Publication impossible : " + e.message}); } };
   }
   let STATS = null, HIST = null;
   function voletCharge(){ if (ONGLET === "stats") chargerStats(); if (ONGLET === "hist") chargerHist(); }
