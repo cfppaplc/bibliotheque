@@ -9979,7 +9979,7 @@ body.clair:not(:has(.reader.open)) #fsBtn{background:rgba(255,255,255,.55);color
     setTimeout(() => location.reload(), apresConnexion ? 2300 : 0);
   };
   setInterval(() => { if (attente && !document.querySelector("#reader.open") && !document.querySelector("#accueilOv:not([hidden])")){ attente = false; location.reload(); } }, 1500);
-  const B = { cles:["favs", "pos", "marks", "rangsReduits", "filtreProg", "nouvVu", "prefs:{id}", "penPerso", "penLargeur", "gommeTaille", "objCats"],
+  const B = { cles:["favs", "pos", "marks", "rangsReduits", "filtreProg", "nouvVu", "prefs:{id}", "penPerso", "penLargeur", "gommeTaille", "objCats", "ghJeton"],   /* ghJeton : la clé GitHub de l'admin le suit (chiffrée dans son coffre), retirée de l'appareil à la déconnexion */
     vides:{ favs:"[]", pos:"{}", marks:"{}" }, apres:recharger };
   const T = { cles:["tableauxSauves", "mesSchemas"], apres:recharger };
   const go = () => { COFFRE.demarrer("biblio", B).then(() => {   /* une fois par jour, un signe de vie (« vu il y a … » dans le panneau d'administration) */

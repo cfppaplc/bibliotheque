@@ -124,6 +124,7 @@ window.COFFRE = (function(){
       if (Object.keys(local).some(k => !(k in nuage.v))) { lsSet(meta(so, "sale"), "1"); planifier(so, 500); } else lsDel(meta(so, "sale"));
       return JSON.stringify(paquet(c, s.id)) !== avant;
     }
+    if (nuage && Object.keys(local).some(k => !(k in nuage.v))) lsSet(meta(so, "sale"), "1");   /* une clé ajoutée à la liste depuis le dernier envoi */
     if (lsGet(meta(so, "sale")) || (!nuage && Object.keys(local).length)) planifier(so, 500);
     return false;
   }
