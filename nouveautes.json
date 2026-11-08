@@ -2,6 +2,34 @@
   {
     "date": "2026-11-07",
     "type": "outil",
+    "titre": "Télécommande : contrôle le livre avec ton cellulaire",
+    "texte": "Plus besoin de rester devant le tableau : ton cellulaire devient la télécommande du livre ouvert (pages, réponses, modules, écran noir, zoom).",
+    "formation": [
+      {
+        "t": "Dans un livre, touche le bouton Télécommande (petit cellulaire) dans la barre du bas.",
+        "img": "nouveautes/tele-qr.jpg"
+      },
+      {
+        "t": "Scanne le code QR avec l'appareil photo de ton cellulaire. Le code se ferme seul quand c'est branché. Garde ce code pour toi."
+      },
+      {
+        "t": "Grosses flèches ‹ › pour les pages; dessous : Réponses, Animation, Écran noir, Modules, zoom et # pour aller à une page.",
+        "img": "nouveautes/tele-cell.jpg"
+      },
+      {
+        "t": "Si tu changes de livre, la télécommande suit. Elle a besoin d'Internet (même relais que le Labo)."
+      }
+    ],
+    "versions": [
+      {
+        "date": "2026-11-07",
+        "texte": "Première version."
+      }
+    ]
+  },
+  {
+    "date": "2026-11-07",
+    "type": "outil",
     "titre": "Labo interactif : simulateur de panneau, défi et quiz maison avec les iPad",
     "texte": "Nouveau bouton « Labo » : des outils à faire en classe avec les iPad. Premier outil : un vrai panneau d'alarme incendie sur l'iPad de chaque équipe, piloté par ton iPad, et le « Défi panneau » (8 missions, questions éclair, classement au tableau).",
     "formation": [
@@ -33,6 +61,10 @@
       }
     ],
     "versions": [
+      {
+        "date": "2026-11-07",
+        "texte": "Quiz : petite musique de fond pendant les questions (réglage « Musique pendant les questions »), plus pressée dans les 5 dernières secondes."
+      },
       {
         "date": "2026-11-07",
         "texte": "Quiz : tableau de bord de tous les quiz; réponses en lettres A B C D (style propre au Pavillon); bouton ✕ pour retirer un élève ou une équipe qui bogue (il peut revenir); 40 joueurs ou 15 panneaux au plus."

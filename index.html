@@ -1070,6 +1070,7 @@ document.addEventListener("keydown", e => { if (e.key !== "/" || e.ctrlKey || e.
     <button id="tbDbl" aria-label="Double page" title="Double page (D)"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6.5C10 5 7 4.6 4 5v13c3-.4 6 0 8 1.5 2-1.5 5-1.9 8-1.5V5c-3-.4-6 0-8 1.5zM12 6.5v13"/></svg></button>
     <button id="tbPin" aria-label="Barres automatiques" title="Barres : se cachent seules / restent affichées (épingle)"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 17v5"/><path d="M9 10.8a2 2 0 0 1-1.1 1.8l-1.8.9A2 2 0 0 0 5 15.2V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.8a2 2 0 0 0-1.1-1.8l-1.8-.9A2 2 0 0 1 15 10.8V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z"/></svg></button>
     <button id="tbPrint" aria-label="Imprimer une page" title="Imprimer la page affichée"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 9V4h10v5M7 17H5a1 1 0 0 1-1-1v-5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v5a1 1 0 0 1-1 1h-2"/><rect x="7" y="14" width="10" height="6" rx="1"/></svg></button>
+    <button id="tbTele" aria-label="Télécommande" title="Télécommande : contrôle le livre avec ton cellulaire"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="3" width="10" height="18" rx="2.2"/><path d="M10.5 7.5h3M12 17.5h.01"/><path d="M9.5 11.5l2.5 2 2.5-2"/></svg></button>
     <button id="tbQr" aria-label="Code QR pour les élèves" title="Code QR pour les élèves (Q)"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><path d="M14 14h2v2h-2zM18 14h2M14 18h2M18 18h2v2M18 16v2"/></svg></button>
     <button id="tbFs" aria-label="Plein écran" title="Plein écran (F)"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
     <button id="tbMore" aria-label="Plus d'outils" title="Plus d'outils" aria-expanded="false"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.9"/><circle cx="12" cy="12" r="1.9"/><circle cx="19" cy="12" r="1.9"/></svg></button>
@@ -6402,14 +6403,14 @@ window.__htmlImpression = htmlImpression;
 /* ---- Barre d'outils : menu déroulant « Plus d'outils » + boutons déplaçables ---- */
 (function(){
   const tb = $("#tb"), more = $("#tbMore"), pop = $("#tbPop"), grid = $("#tbGrid");
-  const MOV = ["tbPen","tbAns","tbAnim","tbZo","tbZv","tbZi","tbTimer","tbSpot","tbCache","tbWb","tbMenu","tbLaser","tbNoir","tbMark","tbHelp","tbDbl","tbPin","tbPrint","tbQr","tbFs"];
-  const DEF = { bar:["tbPen","tbAns","tbAnim","tbZo","tbZv","tbZi","tbWb","tbMenu","tbDbl","tbFs"], menu:["tbTimer","tbSpot","tbCache","tbLaser","tbNoir","tbMark","tbHelp","tbPin","tbPrint","tbQr"] };
+  const MOV = ["tbPen","tbAns","tbAnim","tbZo","tbZv","tbZi","tbTimer","tbSpot","tbCache","tbWb","tbMenu","tbLaser","tbNoir","tbMark","tbHelp","tbDbl","tbPin","tbPrint","tbQr","tbTele","tbFs"];
+  const DEF = { bar:["tbPen","tbAns","tbAnim","tbZo","tbZv","tbZi","tbWb","tbMenu","tbDbl","tbTele","tbFs"], menu:["tbTimer","tbSpot","tbCache","tbLaser","tbNoir","tbMark","tbHelp","tbPin","tbPrint","tbQr"] };
   MOV.forEach(id => $("#" + id).classList.add("mov"));
   const el = id => document.getElementById(id);
   const etiquette = b => { let l = b.querySelector(".tbl"); if (grid.contains(b)){ if (!l){ l = document.createElement("span"); l.className = "tbl"; b.appendChild(l); } l.textContent = b.getAttribute("aria-label") || b.title; } else if (l) l.remove(); };
   /* téléphone : une seule rangée (page précédente, numéro, page suivante, réponses, modules, plus) */
   const TEL = matchMedia("(max-width:640px)").matches;
-  const DEF_TEL = { bar:["tbAns","tbMenu"], menu:["tbPen","tbQr","tbMark","tbAnim","tbZo","tbZv","tbZi","tbTimer","tbSpot","tbCache","tbWb","tbLaser","tbNoir","tbHelp","tbDbl","tbPin","tbPrint","tbFs"] };
+  const DEF_TEL = { bar:["tbAns","tbMenu"], menu:["tbPen","tbQr","tbMark","tbAnim","tbZo","tbZv","tbZi","tbTimer","tbSpot","tbCache","tbWb","tbLaser","tbNoir","tbHelp","tbDbl","tbPin","tbPrint","tbFs","tbTele"] };
   const lire = () => { const L = lireLS(TEL ? "tbLayoutTel" : "tbLayout", null); const ok = L && Array.isArray(L.bar) && Array.isArray(L.menu); return ok ? L : TEL ? DEF_TEL : DEF; };
   const appliquer = L => {
     const vus = new Set(), place = (id, cont, avant) => { const b = el(id); if (!b || vus.has(id) || !MOV.includes(id)) return; vus.add(id); if (avant) cont.insertBefore(b, avant); else cont.appendChild(b); };
@@ -8812,6 +8813,80 @@ document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("#qrOv"
   setTimeout(() => essayer(0), 300);
 })();
 </script>
+<script>
+/* ---- Télécommande (7 nov.) : le cellulaire de l'enseignant contrôle le livre ouvert.
+   Relais Supabase Realtime (même projet que le Labo), canal « pda-livre-<jeton> »; le jeton (aléatoire, 16 car.) est dans le code QR.
+   Seuls des ordres et l'état (titre, page, modules) passent : jamais le contenu du livre. telecommande.html = la page du cellulaire. ---- */
+(function(){
+  const SB_URL = "https://kjlotlhqrgekzohshmbn.supabase.co", SB_CLE = "sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY";
+  const LIB = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.50.0/dist/umd/supabase.min.js";
+  const T = window.TELE = {jeton: "", canal: null, pret: false, branche: false, dernier: "", modsDe: "", mods: []};
+  function jeton(){ const a = new Uint8Array(12); crypto.getRandomValues(a); return [...a].map(x => "abcdefghijkmnpqrstuvwxyz23456789"[x % 32]).join("").slice(0, 16); }
+  function charger(){ return window.supabase ? Promise.resolve() : new Promise((ok, ko) => { const s = document.createElement("script"); s.src = LIB; s.onload = ok; s.onerror = ko; document.head.appendChild(s); }); }
+  function envoyer(o){ if (T.canal && T.pret) T.canal.send({type: "broadcast", event: "m", payload: o}).catch(() => {}); }
+  function mods(){
+    if (!RD.drv) return [];
+    if (T.modsDe === RD.book) return T.mods;
+    let L = []; try { L = uniformiserModules(RD.drv.modules() || []); } catch(e){}
+    T.modsDe = RD.book; T.mods = L; return L;
+  }
+  function etat(){
+    const ouvert = !!(RD.drv && $("#reader") && $("#reader").classList.contains("open"));
+    if (!ouvert) return {m: "etat", ouvert: false};
+    const l = LIVRES.find(x => x.fichier === RD.book) || {};
+    let lab = ""; try { lab = String(RD.drv.state().label || ""); } catch(e){}
+    let ans = null; try { const i = RD.drv.ansInfo && RD.drv.ansInfo(); if (i && !i.dis) ans = i.mode; } catch(e){}
+    return {m: "etat", ouvert: true, titre: l.titre || ($("#readerTitle") && $("#readerTitle").textContent) || (RD.wb ? "Tableau blanc" : "Livre"), label: lab, page: curPage(), tot: totPages(), ans,
+      noir: !!document.querySelector("#noir:not([hidden])"),
+      mods: mods().map(x => ({t: x.text || "", tag: x.tag || "", p: typeof x.page === "number" ? x.page : null}))};
+  }
+  function pousser(force){ if (!T.branche) return; const e = etat(), s = JSON.stringify(e); if (force || s !== T.dernier){ T.dernier = s; envoyer(e); } }
+  T.pousser = pousser;
+  function aller(n){ if (!RD.drv) return; n = Math.max(1, Math.min(totPages() || n, n)); RD.bouge = true; try { RD.drv.goto(n); } catch(e){} setTimeout(() => { try { syncSecond(); poll(); } catch(e){} pousser(); }, 280); }
+  function ordre(o){
+    if (o.m === "allo"){ T.branche = true; montrerBranche(); pousser(true); return; }
+    if (o.m !== "cmd" || !RD.drv) return;
+    const c = o.c, clic = id => { const b = $("#" + id); if (b && !b.disabled) b.click(); };
+    if (c === "next") turn(1); else if (c === "prev") turn(-1);
+    else if (c === "goto") aller(+o.n || 1);
+    else if (c === "mod"){ const x = mods()[o.i]; if (x){ if (typeof x.page === "number") aller(x.page); else if (x.run){ try { x.run(); } catch(e){} setTimeout(pousser, 300); } } }
+    else if (c === "rep") answers();
+    else if (c === "anim") clic("tbAnim");
+    else if (c === "noir") clic("tbNoir");
+    else if (c === "zi") clic("tbZi"); else if (c === "zo") clic("tbZo"); else if (c === "zv") clic("tbZv");
+    setTimeout(pousser, 250);
+  }
+  function brancher(){
+    if (T.canal) return Promise.resolve();
+    T.jeton = T.jeton || jeton();
+    return charger().then(() => {
+      const sb = window.supabase.createClient(SB_URL, SB_CLE, {realtime: {params: {eventsPerSecond: 20}}});
+      T.canal = sb.channel("pda-livre-" + T.jeton, {config: {broadcast: {self: false}}});
+      T.canal.on("broadcast", {event: "m"}, ({payload}) => { try { ordre(payload); } catch(e){} });
+      T.canal.subscribe(st => { T.pret = st === "SUBSCRIBED"; majEtatOv(); if (T.pret) pousser(true); });
+      setInterval(() => pousser(false), 500);
+    });
+  }
+  function lien(){ const u = new URL("telecommande.html", location.href); u.search = ""; u.hash = "k=" + T.jeton; return u.toString(); }
+  function majEtatOv(){ const p = $("#qrPage"); if (!p || $("#qrOv").hidden || !$("#qrOv").classList.contains("tele")) return;
+    p.textContent = T.branche ? "Télécommande branchée ✓" : T.pret ? "Prêt : scanne avec ton cellulaire" : "Connexion au relais…"; }
+  function montrerBranche(){ if ($("#qrOv").classList.contains("tele") && !$("#qrOv").hidden){ majEtatOv(); setTimeout(() => { if ($("#qrOv").classList.contains("tele")) $("#qrOv").hidden = true; }, 1200); } else if (window.aviser) aviser("Télécommande branchée"); }
+  window.montrerTele = function(){
+    const ov = $("#qrOv"), aide = ov.querySelector(".qr-aide"), deb = $("#qrDebut");
+    ov.classList.add("tele"); deb.hidden = true;
+    $("#qrTitre").textContent = "Télécommande";
+    aide.textContent = "Scanne ce code avec l'appareil photo de ton cellulaire : tu pourras tourner les pages, montrer les réponses et changer de module de n'importe où dans la classe. Garde ce code pour toi.";
+    $("#qrCode").innerHTML = ""; $("#qrUrl").textContent = ""; ov.hidden = false; majEtatOv();
+    brancher().then(() => { dessinerQr(lien()); majEtatOv(); }).catch(() => { $("#qrPage").textContent = "Relais injoignable : vérifie Internet."; });
+  };
+  $("#tbTele").onclick = () => window.montrerTele();
+  /* l'avis du code QR des élèves reprend son texte d'origine */
+  const aide0 = $("#qrOv .qr-aide").textContent, qr0 = window.montrerQr;
+  window.montrerQr = montrerQr = function(){ $("#qrOv").classList.remove("tele"); $("#qrOv .qr-aide").textContent = aide0; return qr0.apply(this, arguments); };
+  $("#tbQr").onclick = () => montrerQr();
+})();
+</script>
+
 
 <script>
 /* Mode hors ligne : les livres déjà ouverts restent sur l'ordinateur (voir sw.js) */

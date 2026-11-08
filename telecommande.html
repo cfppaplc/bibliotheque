@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#141414">
+<title>Télécommande</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.50.0/dist/umd/supabase.min.js"></script>
+<style>
+:root{--fond:#141414;--carte:#232323;--carte2:#2E2E2E;--txt:#F2EFEA;--gris:#A8A29A;--rouge:#E50914;--vert:#2E9E5B}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--fond);color:var(--txt);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;overscroll-behavior:none;-webkit-user-select:none;user-select:none}
+body{display:flex;flex-direction:column;padding:calc(env(safe-area-inset-top) + 12px) 14px calc(env(safe-area-inset-bottom) + 14px)}
+.haut{display:flex;align-items:center;gap:10px}
+.haut img{height:22px}
+.etat{margin-left:auto;font-size:13px;color:var(--gris);display:flex;align-items:center;gap:6px}
+.etat i{width:9px;height:9px;border-radius:50%;background:#777}.etat.ok i{background:var(--vert)}.etat.ko i{background:var(--rouge)}
+h1{font-size:19px;margin:14px 0 2px;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ou{color:var(--gris);font-size:14px;min-height:18px}
+.barre{height:5px;background:var(--carte2);border-radius:3px;margin:10px 0 14px;overflow:hidden}.barre b{display:block;height:100%;width:0;background:var(--rouge);transition:width .3s}
+.page{font-size:56px;font-weight:800;text-align:center;letter-spacing:-.02em;line-height:1}
+.page small{font-size:20px;color:var(--gris);font-weight:600}
+.fleches{flex:1;display:grid;grid-template-columns:1fr 1.6fr;gap:12px;margin:16px 0 12px;min-height:180px}
+.fleches button{border:0;border-radius:22px;background:var(--carte);color:var(--txt);font-size:64px;font-weight:300;touch-action:manipulation;transition:transform .08s,background .15s}
+.fleches #suiv{background:var(--rouge)}
+.fleches button:active{transform:scale(.97);background:#3a3a3a}.fleches #suiv:active{background:#B80710}
+.outils{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.outils button,.bas button{border:0;border-radius:14px;background:var(--carte);color:var(--txt);min-height:64px;font:600 12px system-ui,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;touch-action:manipulation}
+.outils button:active,.bas button:active{background:var(--carte2)}
+.outils button.on{background:#F2EFEA;color:#141414}
+.outils svg,.bas svg{width:24px;height:24px}
+.bas{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:8px;margin-top:8px}
+.bas button{flex-direction:row;font-size:15px}
+.feuille{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:flex-end;z-index:5}
+.feuille[hidden]{display:none}
+.feuille>div{background:#1C1C1C;width:100%;max-height:82vh;border-radius:20px 20px 0 0;padding:16px 14px calc(env(safe-area-inset-bottom) + 16px);display:flex;flex-direction:column;gap:12px}
+.feuille h2{margin:0;font-size:17px;display:flex;justify-content:space-between;align-items:center}
+.feuille h2 button{border:0;background:var(--carte2);color:var(--txt);border-radius:10px;width:40px;height:40px;font-size:18px}
+.saut{display:flex;gap:8px}.saut input{flex:1;min-width:0;font:700 24px system-ui;background:var(--carte);border:1px solid #3a3a3a;color:var(--txt);border-radius:12px;padding:10px 14px}
+.saut button{border:0;border-radius:12px;background:var(--rouge);color:#fff;font:700 17px system-ui;padding:0 20px}
+.liste{overflow:auto;display:flex;flex-direction:column;gap:6px;-webkit-overflow-scrolling:touch}
+.liste button{border:0;text-align:left;background:var(--carte);color:var(--txt);border-radius:12px;padding:13px 14px;font:600 15px system-ui;display:flex;gap:12px;align-items:center}
+.liste button.ici{outline:2px solid var(--rouge)}
+.liste em{font-style:normal;min-width:30px;height:30px;border-radius:8px;background:var(--carte2);display:inline-flex;align-items:center;justify-content:center;font-size:13px}
+.liste span{flex:1}.liste small{color:var(--gris);font-weight:500}
+.vide{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:var(--gris);gap:12px;padding:20px;font-size:16px;line-height:1.45}
+.vide b{color:var(--txt);font-size:20px}
+.cache{display:none!important}
+</style>
+</head>
+<body>
+<div class="haut"><img src="img/pavillon-avenir-blanc.png" alt="Pavillon de l'Avenir"><span class="etat" id="etat"><i></i><span>Connexion…</span></span></div>
+
+<div id="attente" class="vide"><b>Télécommande</b><span id="attTxt">Connexion à l'ordinateur du tableau…</span></div>
+
+<div id="tele" class="cache" style="display:flex;flex-direction:column;flex:1">
+  <h1 id="titre"></h1>
+  <div class="ou" id="ou"></div>
+  <div class="barre"><b id="prog"></b></div>
+  <div class="page" id="page">–</div>
+  <div class="fleches"><button id="prec" aria-label="Page précédente">‹</button><button id="suiv" aria-label="Page suivante">›</button></div>
+  <div class="outils">
+    <button id="bRep"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg><span id="bRepT">Réponses</span></button>
+    <button id="bAnim"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M8 5l11 7-11 7z"/></svg>Animation</button>
+    <button id="bNoir"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="12" rx="1.5" fill="currentColor"/><path d="M8 21h8"/></svg>Écran noir</button>
+    <button id="bAller"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h14M5 12h14M5 17h9"/></svg>Modules</button>
+  </div>
+  <div class="bas">
+    <button id="bZv">100 %</button>
+    <button id="bZo" aria-label="Zoom arrière"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M8 11h6M16 16l4 4"/></svg></button>
+    <button id="bZi" aria-label="Zoom avant"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M8 11h6M11 8v6M16 16l4 4"/></svg></button>
+    <button id="bPage" aria-label="Aller à une page">#</button>
+  </div>
+</div>
+
+<div class="feuille" id="feuille" hidden><div>
+  <h2><span>Aller à…</span><button id="fFermer" aria-label="Fermer">✕</button></h2>
+  <div class="saut"><input id="fNum" type="number" inputmode="numeric" placeholder="Page"><button id="fGo">Aller</button></div>
+  <div class="liste" id="fListe"></div>
+</div></div>
+
+<script>
+/* Télécommande des livres (Bibliothèque du Pavillon de l'Avenir).
+   Ouverte par le code QR du bouton « Télécommande » du lecteur : telecommande.html#k=<jeton>.
+   Envoie des ordres {m:"cmd", c} sur le canal Supabase « pda-livre-<jeton> »; reçoit l'état du livre {m:"etat"}. */
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"})[c]);
+const SB_URL = "https://kjlotlhqrgekzohshmbn.supabase.co", SB_CLE = "sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY";
+const jeton = (/k=([a-z0-9]{8,})/.exec(location.hash) || [])[1];
+let canal = null, pret = false, E = null, vuA = 0;
+
+function etat(t, cls){ const e = $("etat"); e.className = "etat " + (cls || ""); e.lastChild.textContent = t; }
+function envoyer(o){ if (canal && pret) canal.send({type: "broadcast", event: "m", payload: o}).catch(() => {}); }
+function cmd(c, x){ if (navigator.vibrate) navigator.vibrate(12); envoyer(Object.assign({m: "cmd", c}, x || {})); }
+
+function rendre(){
+  const ok = E && E.ouvert;
+  $("attente").classList.toggle("cache", !!ok); $("tele").classList.toggle("cache", !ok);
+  if (!ok){ $("attTxt").textContent = E ? "Branché ✓. Ouvre un livre sur l'ordinateur du tableau." : "Connexion à l'ordinateur du tableau…"; return; }
+  $("titre").textContent = E.titre || "";
+  const m = modIci(); $("ou").textContent = m ? (m.tag ? "Module " + m.tag + " — " : "") + m.t : "";
+  $("page").innerHTML = esc(E.label || E.page) + (E.tot ? ` <small>/ ${E.tot}</small>` : "");
+  $("prog").style.width = E.tot ? Math.min(100, 100 * E.page / E.tot) + "%" : "0";
+  $("bRep").disabled = E.ans == null; $("bRep").style.opacity = E.ans == null ? .35 : 1;
+  $("bRep").classList.toggle("on", E.ans > 0); $("bRepT").textContent = E.ans === 1 ? "Pas à pas" : E.ans === 2 ? "Toutes" : "Réponses";
+  $("bNoir").classList.toggle("on", !!E.noir);
+  $("bAller").style.opacity = (E.mods || []).length ? 1 : .35;
+  if (!$("feuille").hidden) liste();
+}
+function modIci(){ let r = null; (E.mods || []).forEach(m => { if (m.p != null && m.p <= E.page) r = m; }); return r; }
+function liste(){
+  const ici = modIci();
+  $("fListe").innerHTML = (E.mods || []).map((m, i) => `<button data-i="${i}" class="${m === ici ? "ici" : ""}"><em>${esc(m.tag || "•")}</em><span>${esc(m.t)}</span>${m.p ? `<small>p. ${m.p}</small>` : ""}</button>`).join("") || '<div style="color:var(--gris);padding:8px">Ce livre n\'a pas de table des matières.</div>';
+  $("fListe").querySelectorAll("[data-i]").forEach(b => b.onclick = () => { cmd("mod", {i: +b.dataset.i}); fermer(); });
+}
+function ouvrir(focusNum){ $("feuille").hidden = false; $("fNum").value = ""; $("fNum").placeholder = E && E.tot ? "Page (1 à " + E.tot + ")" : "Page"; liste();
+  const ici = $("fListe").querySelector(".ici"); if (ici) ici.scrollIntoView({block: "center"}); if (focusNum) $("fNum").focus(); }
+function fermer(){ $("feuille").hidden = true; $("fNum").blur(); }
+
+$("prec").onclick = () => cmd("prev"); $("suiv").onclick = () => cmd("next");
+$("bRep").onclick = () => cmd("rep"); $("bAnim").onclick = () => cmd("anim"); $("bNoir").onclick = () => cmd("noir");
+$("bZi").onclick = () => cmd("zi"); $("bZo").onclick = () => cmd("zo"); $("bZv").onclick = () => cmd("zv");
+$("bAller").onclick = () => ouvrir(false); $("bPage").onclick = () => ouvrir(true);
+$("fFermer").onclick = fermer; $("feuille").onclick = e => { if (e.target.id === "feuille") fermer(); };
+$("fGo").onclick = () => { const n = parseInt($("fNum").value, 10); if (n > 0){ cmd("goto", {n}); fermer(); } };
+$("fNum").onkeydown = e => { if (e.key === "Enter") $("fGo").click(); };
+document.addEventListener("dblclick", e => e.preventDefault(), {passive: false});
+
+/* écran allumé tant que la télécommande est ouverte */
+let verrou = null;
+async function eveil(){ try { if ("wakeLock" in navigator && document.visibilityState === "visible") verrou = await navigator.wakeLock.request("screen"); } catch(e){} }
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible"){ eveil(); envoyer({m: "allo"}); } });
+
+if (!jeton){ $("attTxt").innerHTML = "Ce lien n'est pas complet.<br>Dans le livre, touche le bouton <b>Télécommande</b> et scanne le code QR."; etat("Pas de code", "ko"); }
+else if (!window.supabase){ $("attTxt").textContent = "Impossible de joindre le relais. Vérifie Internet puis recharge la page."; etat("Hors ligne", "ko"); }
+else {
+  const sb = window.supabase.createClient(SB_URL, SB_CLE, {realtime: {params: {eventsPerSecond: 20}}});
+  canal = sb.channel("pda-livre-" + jeton, {config: {broadcast: {self: false}}});
+  canal.on("broadcast", {event: "m"}, ({payload: o}) => { if (o && o.m === "etat"){ E = o; vuA = Date.now(); etat("Branché", "ok"); rendre(); } });
+  canal.subscribe(st => { pret = st === "SUBSCRIBED"; if (pret){ etat("Recherche de l'ordinateur…"); envoyer({m: "allo"}); } else etat("Reconnexion…", "ko"); });
+  /* l'ordinateur répond à « allo »; sans réponse, on redemande */
+  setInterval(() => { if (pret && Date.now() - vuA > 6000){ envoyer({m: "allo"}); if (E && Date.now() - vuA > 15000) etat("Ordinateur muet", "ko"); } }, 3000);
+  eveil();
+}
+</script>
+</body>
+</html>

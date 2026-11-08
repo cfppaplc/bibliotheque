@@ -238,6 +238,7 @@ Le propane s'accumule…
 <label>Classement après chaque question<div class="seg" data-r="classement"><button data-v="oui">Oui</button><button data-v="non">À la fin seulement</button></div></label>
 <label>Ordre<div class="seg" data-r="melange"><button data-v="non">Tel quel</button><button data-v="q">Questions mêlées</button><button data-v="tout">Questions et choix mêlés</button></div></label>
 <label>Sons au tableau<div class="seg" data-r="son"><button data-v="oui">Oui</button><button data-v="non">Non</button></div></label>
+<label>Musique pendant les questions<div class="seg" data-r="musique"><button data-v="oui">Oui</button><button data-v="non">Non</button></div></label>
 <label>Couleur du quiz<div class="coul" id="eCoul"></div></label>
 </div>
 <div id="eQs"></div>
@@ -264,7 +265,7 @@ const $ = id => document.getElementById(id);
 const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"})[c]);
 const SYMB = ["A", "B", "C", "D"];
 const COULEURS = ["#534AB7", "#B3261E", "#185FA5", "#0F6E56", "#854F0B", "#3A3936"];
-const REG_DEF = {mode: "ind", points: "vitesse", classement: "oui", melange: "non", son: "oui", coul: "#534AB7"};
+const REG_DEF = {mode: "ind", points: "vitesse", classement: "oui", melange: "non", son: "oui", musique: "oui", coul: "#534AB7"};
 const sombre = h => { const n = parseInt(h.slice(1), 16), f = .38; return `rgb(${Math.round((n >> 16) * f + 18)},${Math.round((n >> 8 & 255) * f + 18)},${Math.round((n & 255) * f + 24)})`; };
 const ord = r => r + (r === 1 ? "er" : "e");
 
@@ -392,7 +393,7 @@ function telecommande(bord){
     const Q = G.jeu[G.i], r = rangs(), cpt = [0, 0, 0, 0], reg = R();
     Object.values(G.reps).forEach(x => cpt[x.c]++);
     return {m: "vue", code, etat: G.etat === "choix" ? "lobby" : G.etat, titre: G.quiz ? G.quiz.titre : "Quiz maison", i: G.i, n: G.jeu.length, t0: G.t0, now: Date.now(),
-      reg: {coul: reg.coul, son: reg.son, classement: reg.classement, points: reg.points, mode: reg.mode},
+      reg: {coul: reg.coul, son: reg.son, musique: reg.musique || "oui", classement: reg.classement, points: reg.points, mode: reg.mode},
       couv: G.quiz && G.quiz.couv && !/^data:/.test(G.quiz.couv) ? G.quiz.couv : (G.quiz && G.quiz.couv ? "img" : ""), sujet: G.quiz ? G.quiz.sujet || "" : "",
       q: Q && ["question", "rev"].includes(G.etat) ? {q: Q.q, ch: Q.ch, s: Q.s, img: !!Q.img, expl: G.etat === "rev" ? Q.expl || "" : ""} : null, bon: G.etat === "rev" ? Q.bon : null, cpt, nrep: Object.keys(G.reps).length,
       joueurs: ids().map(id => ({n: P[id].nom, av: P[id].av, pts: P[id].pts, r: r[id], g: G.etat === "rev" && G.reps[id] ? G.reps[id].g || 0 : 0})).sort((a, b) => a.r - b.r)};
@@ -765,8 +766,43 @@ function ecran(code){
     }, 80 * rows.length + 400);
     const b = $("bSon"); if (b) b.onclick = () => { sonOK = !sonOK; if (sonOK) { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); ac.resume(); } b.textContent = sonOK ? "Son activé" : "Activer le son"; };
   }
+
+  /* Musique de fond pendant une question (composée ici, synthétisée : aucun fichier, aucun droit d'auteur).
+     La-mineur, 104 bpm : basse douce, arpège léger, petit charleston; plus pressée dans les 5 dernières secondes. */
+  const MUS = {on: false, h: null, t: 0, pas: 0, fin: 0, gain: null};
+  const ACC = [[45, 57, 60, 64], [41, 57, 60, 65], [48, 55, 60, 64], [43, 55, 59, 62]];   // Am, F, C, G (notes MIDI)
+  const hz = n => 440 * Math.pow(2, (n - 69) / 12);
+  function note(f, t, d, v, type){ const o = ac.createOscillator(), g = ac.createGain(); o.type = type; o.frequency.value = f; o.connect(g); g.connect(MUS.gain);
+    g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(v, t + .015); g.gain.exponentialRampToValueAtTime(.0001, t + d); o.start(t); o.stop(t + d + .05); }
+  let bruit = null;
+  function charleston(t, v){ if (!bruit){ bruit = ac.createBuffer(1, ac.sampleRate * .05, ac.sampleRate); const d = bruit.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / d.length); }
+    const s = ac.createBufferSource(), f = ac.createBiquadFilter(), g = ac.createGain(); s.buffer = bruit; f.type = "highpass"; f.frequency.value = 7000; g.gain.value = v; s.connect(f); f.connect(g); g.connect(MUS.gain); s.start(t); }
+  function musiqueTour(){
+    const croche = 60 / 104 / 2;
+    while (MUS.t < ac.currentTime + .25){
+      const presse = Date.now() + decal > MUS.fin - 5000, sub = presse ? 2 : 1;
+      for (let s = 0; s < sub; s++){
+        const t = MUS.t + s * croche / sub, k = MUS.pas, a = ACC[Math.floor(k / 16) % 4];
+        if (s === 0 && k % 2 === 0) note(hz(a[0]), t, croche * 1.8, .16, "triangle");
+        const arp = [1, 2, 3, 2, 1, 3, 2, 3][k % 8]; note(hz(a[arp] + 12), t, croche * (presse ? .5 : .9), presse ? .045 : .035, "sine");
+        if (s === 0 && k % 2 === 1) charleston(t, presse ? .05 : .03);
+      }
+      MUS.t += croche; MUS.pas++;
+    }
+  }
+  function musique(v, n){
+    const veut = v.etat === "question" && sonOK && v.reg.son !== "non" && v.reg.musique !== "non" && v.q && (v.t0 + v.q.s * 1000 > n);
+    if (veut && !MUS.on){
+      try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); MUS.gain = ac.createGain(); MUS.gain.gain.value = .9; MUS.gain.connect(ac.destination);
+        MUS.on = true; MUS.t = ac.currentTime + .08; MUS.pas = 0; musiqueTour(); MUS.h = setInterval(musiqueTour, 60); } catch(e){}
+    } else if (!veut && MUS.on){
+      MUS.on = false; clearInterval(MUS.h); const g = MUS.gain; try { g.gain.setTargetAtTime(.0001, ac.currentTime, .12); setTimeout(() => g.disconnect(), 800); } catch(e){}
+    }
+    if (veut) MUS.fin = v.t0 + v.q.s * 1000;
+  }
   function rendre(force){
     const v = V, n = Date.now() + decal, cle = v.etat + v.i;
+    musique(v, n);
     document.documentElement.style.setProperty("--acc", (v.reg && v.reg.coul) || "#534AB7");
     if (v.etat === "lobby") {
       const cv = v.couv === "img" ? img[-1] : v.couv;
