@@ -262,6 +262,39 @@
   .qn-it p{margin:0;line-height:1.45}
   .qn-it p button{all:unset;cursor:pointer;color:#8fb8ff;font-weight:600;margin-left:6px}
   .qn-it p button:hover{text-decoration:underline}
+
+  /* Quoi de neuf, style magazine (8 nov.) */
+  .qn-box.qn2{max-width:1040px;padding:26px 28px 30px}
+  .qn2-tete{display:flex;align-items:flex-start;gap:12px}.qn2-tete>div{flex:1}
+  .qn2-x{all:unset;cursor:pointer;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#a9a9ae;font-size:1.1rem}.qn2-x:hover{background:#ffffff14;color:#fff}
+  .qn2-h{font-size:.78rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#a9a9ae;margin:16px 0 10px}
+  .qn2-carte{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;background:#202023;border:1px solid #2f2f33;border-radius:14px;overflow:hidden;transition:transform .15s,border-color .15s}
+  .qn2-carte:hover{transform:translateY(-2px);border-color:#4a4a50}.qn2-carte:focus-visible{outline:2px solid #EB6A22}
+  .qn2-img{display:block;height:130px;background:#2a2a2d center/cover no-repeat}
+  .qn2-txt{display:flex;flex-direction:column;gap:6px;padding:12px 14px 14px}
+  .qn2-meta{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+  .qn2-ico{width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;flex:none}.qn2-ico svg{width:16px;height:16px}
+  .qn2-ico.livres{background:#EB6A22}.qn2-ico.outils{background:#1E2A44}.qn2-ico.labo{background:#0F6E56}.qn2-ico.accueil{background:#534AB7}
+  .qn2-d{font-size:.78rem;color:#8a8a90;margin-left:auto}
+  .qn2-nv{font-size:.7rem;font-weight:800;color:#1a1a1a;background:#FFB547;border-radius:999px;padding:2px 8px}
+  .qn2-t{font-weight:750;font-size:1.02rem;line-height:1.25;color:inherit}
+  .qn2-p{color:#b9b9be;font-size:.88rem;line-height:1.45;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+  .qn2-carte.une{flex-direction:row;min-height:240px}.qn2-carte.une .qn2-img{flex:0 0 52%;height:auto}.qn2-carte.une .qn2-txt{justify-content:center;padding:22px 24px;gap:10px}
+  .qn2-carte.une .qn2-t{font-size:1.45rem}.qn2-carte.une .qn2-p{-webkit-line-clamp:5;font-size:.95rem}.qn2-voir{color:#ff9a5c;font-weight:700;font-size:.92rem}
+  .qn2-puces{display:flex;gap:6px;flex-wrap:wrap;margin:18px 0 12px}
+  .qn2-puces button{all:unset;cursor:pointer;padding:8px 14px;border-radius:999px;font-weight:600;font-size:.9rem;background:#ffffff0d;color:#c8c8cc}.qn2-puces button.on{background:#EB6A22;color:#fff}
+  .qn2-grille{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px}
+  .qn2-ret{all:unset;cursor:pointer;color:#8fb8ff;font-weight:600;margin:4px 0 10px;display:inline-block}
+  .qn2-ft{font-size:1.6rem;margin:10px 0 6px}.qn2-fp{color:#c8c8cc;line-height:1.5;margin:0 0 12px;max-width:760px}
+  .qn2-acts{display:flex;gap:10px;flex-wrap:wrap}.qn2-go{all:unset;cursor:pointer;background:#EB6A22;color:#fff;font-weight:700;padding:10px 18px;border-radius:8px}
+  .qn2-etapes{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:14px}
+  .qn2-etapes li{display:flex;gap:12px}.qn2-etapes p{margin:3px 0 0;line-height:1.5}
+  .qn2-n{flex:none;width:28px;height:28px;border-radius:50%;background:#EB6A22;color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center}
+  .qn2 .qn-img{max-width:min(100%,760px)}
+  @media (max-width:760px){.qn-box.qn2{padding:18px 16px 24px}.qn2-carte.une{flex-direction:column}.qn2-carte.une .qn2-img{flex:none;height:170px}.qn2-carte.une .qn2-t{font-size:1.2rem}}
+  body.clair .qn2-carte{background:#fff;border-color:#e6e2dc;box-shadow:0 2px 8px rgba(40,25,10,.06)}body.clair .qn2-carte:hover{border-color:#cfc9be}
+  body.clair .qn2-p,body.clair .qn2-fp{color:#4a4a50}body.clair .qn2-puces button{background:#f1eee9;color:#3d3d42}body.clair .qn2-puces button.on{background:#EB6A22;color:#fff}
+  body.clair .qn2-ret,body.clair .qn2-voir{color:#1f5fbf}body.clair .qn2-voir{color:#b94f12}body.clair .qn2-x:hover{background:#0000000d;color:#000}body.clair .qn2-img{background-color:#f1eee9}
   .qn-fermer{margin-top:18px;font:600 .95rem "Segoe UI",Roboto,Arial,sans-serif;padding:9px 18px;border-radius:6px;background:#2a2a2a;border:1px solid #666;color:#fff;cursor:pointer}
   .meta .constr{color:#F5C518;font-weight:700;display:inline-flex;align-items:center;gap:5px}
   .badge{position:absolute;top:8px;left:8px;background:var(--accent);font-size:.65rem;font-weight:700;padding:3px 7px;border-radius:3px;text-transform:uppercase;z-index:2}
@@ -9077,31 +9110,64 @@ return {matrice:function(texte){var q=new QRCode(-1,L.M);q.addData(texte);q.make
   if (!vu && !/[?&]livre=/.test(location.search)) setTimeout(() => { if (!document.querySelector(".reader.open")) bi.hidden = false; }, 700);
 })();
 </script>
-<div class="qn-ov" id="qnOv" hidden role="dialog" aria-label="Quoi de neuf"><div class="qn-box">
-  <h2>Quoi de neuf</h2><p class="qn-sous">Les livres ajoutés ou mis à jour et les nouveautés de la bibliothèque.</p>
-  <div id="qnListe"></div><button type="button" class="qn-fermer" id="qnFermer">Fermer</button>
+<div class="qn-ov" id="qnOv" hidden role="dialog" aria-label="Quoi de neuf"><div class="qn-box qn2">
+  <div class="qn2-tete"><div><h2>Quoi de neuf</h2><p class="qn-sous">Les nouveaux livres, les mises à jour et les nouveaux outils de Métier+.</p></div><button type="button" class="qn2-x" id="qnX" aria-label="Fermer">✕</button></div>
+  <div id="qnListe"></div><button type="button" class="qn-fermer" id="qnFermer" hidden>Fermer</button>
 </div></div>
 <script>
 (function(){
-  const lab = { ajout:"Nouveau livre", maj:"Mis à jour", outil:"Bibliothèque" };
-  function dessiner(){
-    const jours = [...new Set(NOUV.map(n => n.date))];
-    $("#qnListe").innerHTML = jours.map(j => `<div class="qn-jour">${esc(dateFr(j))}</div>` + NOUV.filter(n => n.date === j).map((n, i) => {
-      const l = n.livre && LIVRES.find(x => x.fichier === n.livre);
-      const id = "qnd" + j + "-" + i, form = Array.isArray(n.formation) ? n.formation : [], hist = Array.isArray(n.versions) ? n.versions : [];
-      const detail = form.length || hist.length;
-      return `<div class="qn-it"><span class="qn-tag ${esc(n.type)}">${lab[n.type] || ""}</span><div class="qn-corps">${n.titre ? `<div class="qn-titre">${esc(n.titre)}</div>` : ""}<p>${esc(n.texte)}${l ? ` <button type="button" data-ouvrir="${esc(l.fichier)}">Ouvrir le livre</button>` : ""}</p></div>`
-        + (detail ? `<button type="button" class="qn-plus" aria-expanded="false" aria-controls="${id}" title="Mini-formation">+</button><div class="qn-detail" id="${id}" hidden>`
-          + (form.length ? `<h3>Mini-formation</h3><ol>${form.map(f => typeof f === "string" ? `<li>${esc(f)}</li>` : `<li>${esc(f.t)}${f.img ? `<img class="qn-img" src="${esc(f.img)}" alt="" loading="lazy">` : ""}</li>`).join("")}</ol>` : "")
-          + (hist.length ? `<h3 style="margin-top:12px">Historique</h3><ul class="qn-hist">${hist.map(v => `<li><span class="d">${esc(dateFr(v.date))}</span><span>${esc(v.texte)}</span></li>`).join("")}</ul>` : "") + `</div>` : "")
-        + `</div>`; }).join("")).join("");
-    $("#qnListe").querySelectorAll(".qn-plus").forEach(b => b.onclick = () => { const d = document.getElementById(b.getAttribute("aria-controls")), o = d.hidden; d.hidden = !o; b.setAttribute("aria-expanded", String(o)); b.textContent = o ? "−" : "+"; b.title = o ? "Masquer" : "Mini-formation"; });
-    $("#qnListe").querySelectorAll("[data-ouvrir]").forEach(b => b.onclick = () => { const l = LIVRES.find(x => x.fichier === b.dataset.ouvrir); $("#qnOv").hidden = true; if (l) openModal(l); });
+  /* 8 nov. : « Quoi de neuf » en style magazine (option A choisie par Jeremy) : à la une, filtres, cartes, fiche détaillée */
+  const lab = { ajout:"Nouveau livre", maj:"Mis à jour", outil:"Outil" };
+  const CATS = [["tout", "Tout"], ["livres", "Livres"], ["outils", "Outils"], ["labo", "Labo"], ["accueil", "Accueil de classe"]];
+  const ICO = { livres:'<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5z"/><path d="M4 19V5.5M8 7h8"/>',
+    outils:'<path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2.4-.6-.6-2.4z"/>',
+    labo:'<path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-9V3"/>',
+    accueil:'<rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4M7 9h4M7 12h7"/>' };
+  const FOND = { livres:"img/presentation/livre.jpg", outils:"img/presentation/biblio.jpg", labo:"img/presentation/simu.jpg", accueil:"img/presentation/accueil.jpg" };
+  const OUTIL = [[/tableau blanc/i, "tableau"], [/plans? techniques|plans?\b/i, "plans"], [/formatif/i, "activites"], [/labo|quiz|simulat/i, "labo"], [/accueil de classe/i, "accueil"]];
+  let filtre = "tout", vuAvant = "";
+  const cat = n => n.livre || n.type === "ajout" || n.type === "maj" ? "livres" : /labo|quiz|simulat/i.test(n.titre || "") ? "labo" : /accueil de classe/i.test(n.titre || "") ? "accueil" : "outils";
+  const livreDe = n => n.livre && LIVRES.find(x => x.fichier === n.livre);
+  const imageDe = n => { const f = (n.formation || []).find(x => x && typeof x === "object" && x.img); if (f) return f.img;
+    const l = livreDe(n); if (l && window.COUVERTURES && COUVERTURES[l.couvDe || l.fichier]) return COUVERTURES[l.couvDe || l.fichier]; return FOND[cat(n)]; };
+  const outilDe = n => { if (cat(n) === "livres") return null; for (const [re, k] of OUTIL) if (re.test(n.titre || "")) return k; return null; };
+  const nouveau = n => vuAvant && n.date > vuAvant;
+  const svg = k => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICO[k]}</svg>`;
+  function actions(n){ const l = livreDe(n), o = outilDe(n);
+    return (l ? `<button type="button" class="qn2-go" data-ouvrir="${esc(l.fichier)}">Ouvrir le livre</button>` : "") + (o ? `<button type="button" class="qn2-go" data-outil="${o}">Essayer</button>` : ""); }
+  function liste(){
+    const L = NOUV.map((n, i) => ({ n, i })), une = L[0], reste = L.slice(1).filter(x => filtre === "tout" || cat(x.n) === filtre);
+    const c = (x, grand) => { const n = x.n, k = cat(n);
+      return `<button type="button" class="qn2-carte${grand ? " une" : ""}" data-i="${x.i}"><span class="qn2-img" style="background-image:url('${esc(imageDe(n))}')"></span><span class="qn2-txt">`
+        + `<span class="qn2-meta"><span class="qn2-ico ${k}">${svg(k)}</span><span class="qn-tag ${esc(n.type || "outil")}">${lab[n.type] || "Outil"}</span>${nouveau(n) ? '<span class="qn2-nv">Nouveau pour toi</span>' : ""}<span class="qn2-d">${esc(dateFr(n.date))}</span></span>`
+        + `<span class="qn2-t">${esc(n.titre || "")}</span><span class="qn2-p">${esc(n.texte || "")}</span>${grand ? '<span class="qn2-voir">Voir la mini-formation ›</span>' : ""}</span></button>`; };
+    $("#qnListe").innerHTML = (une && filtre === "tout" ? `<div class="qn2-h">À la une</div>${c(une, true)}` : "")
+      + `<div class="qn2-puces">${CATS.map(([k, t]) => `<button type="button" data-f="${k}" class="${k === filtre ? "on" : ""}">${t}</button>`).join("")}</div>`
+      + `<div class="qn2-grille">${(filtre === "tout" ? reste : L.filter(x => cat(x.n) === filtre)).map(x => c(x)).join("") || '<p class="qn-sous">Rien dans cette catégorie pour l\'instant.</p>'}</div>`;
   }
-  window.ouvrirQn = titre => { ouvrir(); const t = [...document.querySelectorAll("#qnListe .qn-titre")].find(x => x.textContent.startsWith(titre)); if (!t) return;
-    const it = t.closest(".qn-it"), b = it.querySelector(".qn-plus"); if (b && b.getAttribute("aria-expanded") !== "true") b.click(); setTimeout(() => it.scrollIntoView({ block:"start", behavior:"smooth" }), 60); };
-  function ouvrir(e){ if (e) e.preventDefault(); dessiner(); $("#qnOv").hidden = false;
+  function fiche(i){
+    const n = NOUV[i]; if (!n) return liste();
+    const form = Array.isArray(n.formation) ? n.formation : [], hist = Array.isArray(n.versions) ? n.versions : [], k = cat(n);
+    $("#qnListe").innerHTML = `<button type="button" class="qn2-ret" data-ret="1">‹ Toutes les nouveautés</button>`
+      + `<div class="qn2-fiche"><div class="qn2-meta"><span class="qn2-ico ${k}">${svg(k)}</span><span class="qn-tag ${esc(n.type || "outil")}">${lab[n.type] || "Outil"}</span><span class="qn2-d">${esc(dateFr(n.date))}</span></div>`
+      + `<h3 class="qn2-ft">${esc(n.titre || "")}</h3><p class="qn2-fp">${esc(n.texte || "")}</p><div class="qn2-acts">${actions(n)}</div>`
+      + (form.length ? `<div class="qn2-h">Mini-formation</div><ol class="qn2-etapes">${form.map((f, j) => { const t = typeof f === "string" ? f : f.t, im = typeof f === "object" && f.img;
+          return `<li><span class="qn2-n">${j + 1}</span><div><p>${esc(t)}</p>${im ? `<img class="qn-img" src="${esc(im)}" alt="" loading="lazy">` : ""}</div></li>`; }).join("")}</ol>` : "")
+      + (hist.length ? `<div class="qn2-h">Historique</div><ul class="qn-hist">${hist.map(v => `<li><span class="d">${esc(dateFr(v.date))}</span><span>${esc(v.texte)}</span></li>`).join("")}</ul>` : "") + `</div>`;
+    $("#qnOv").scrollTop = 0;
+  }
+  function dessiner(){ liste(); }
+  $("#qnListe").addEventListener("click", e => {
+    const f = e.target.closest("[data-f]"); if (f){ filtre = f.dataset.f; liste(); return; }
+    if (e.target.closest("[data-ret]")){ liste(); $("#qnOv").scrollTop = 0; return; }
+    const lv = e.target.closest("[data-ouvrir]"); if (lv){ const l = LIVRES.find(x => x.fichier === lv.dataset.ouvrir); $("#qnOv").hidden = true; if (l) openModal(l); return; }
+    const o = e.target.closest("[data-outil]"); if (o){ $("#qnOv").hidden = true; if (window.mpAller) window.mpAller(o.dataset.outil); return; }
+    const c = e.target.closest(".qn2-carte"); if (c) fiche(+c.dataset.i);
+  });
+  window.ouvrirQn = titre => { ouvrir(); const i = NOUV.findIndex(n => (n.titre || "").startsWith(titre)); if (i >= 0) fiche(i); };
+  function ouvrir(e){ if (e) e.preventDefault(); vuAvant = lireLS("nouvVu", ""); filtre = "tout"; dessiner(); $("#qnOv").hidden = false; $("#qnOv").scrollTop = 0;
     if (NOUV[0]){ ecrireLS("nouvVu", NOUV[0].date); $("#qnPoint").hidden = true; } }
+  $("#qnX").onclick = () => { $("#qnOv").hidden = true; };
   $("#quoiNeuf").addEventListener("click", ouvrir);
   $("#qnFermer").onclick = () => { $("#qnOv").hidden = true; };
   $("#qnOv").addEventListener("click", e => { if (e.target.id === "qnOv") $("#qnOv").hidden = true; });
