@@ -101,8 +101,11 @@
     linear-gradient(to right,rgba(0,0,0,.8) 0%,rgba(0,0,0,0) 65%)}
   .hero-content{position:relative;max-width:900px}
   /* Accueil dynamique (8 nov.) */
-  #hero.hp .hero-content{max-width:min(860px,54vw);width:100%}
+  #hero.hp .hero-content{max-width:860px;width:100%}
+  #hero.hp{min-height:0!important;padding-bottom:10px}
   @media (max-width:900px){#hero.hp .hero-content{max-width:none}}
+  @media (min-width:641px){body.connecte header nav #lienAide,body.connecte header nav #quoiNeuf{display:none}body.connecte #hdefil{max-width:min(760px,46vw)}}
+  #accesMenu .qn-point{display:inline-block;vertical-align:middle;margin-left:6px}
   #hero.hp .hp-sous{font-size:1.15rem;color:var(--muted);margin:.35rem 0 0}
   .hp-tuiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:16px;max-width:860px}
   .hp-t{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:#fff;font:inherit;font-weight:600;font-size:15px;min-height:66px;text-align:left;cursor:pointer;transition:background .15s,border-color .15s,transform .15s;min-width:0}
@@ -1456,10 +1459,9 @@ function accueilPerso(){
   const q = J("dernierQuiz");
   if (q && q.id && maintenant - q.t < 21 * 864e5) T.push(`<button class="hp-t" data-hp="quiz" data-q="${esc(q.id)}">${ic("r", '<circle cx="12" cy="12" r="9"/><path d="M10 8.5l5.5 3.5-5.5 3.5z"/>')}<span>Rejouer<small>${esc(q.titre)}</small></span></button>`);
   const tb = +(localStorage.getItem("dernierTableau") || 0);
-  T.push(`<button class="hp-t" data-hp="tableau">${ic("b", '<rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/>')}<span>${tb && maintenant - tb < 7 * 864e5 ? "Continuer ton tableau" : "Tableau blanc"}<small>Dessiner, schémas, plans iso</small></span></button>`);
-  T.push(`<button class="hp-t" data-hp="labo">${ic("m", '<path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-9V3"/>')}<span>Labo<small>Quiz et simulateurs</small></span></button>`);
-  if (!cours) T.push(`<button class="hp-t" data-hp="accueil">${ic("v", '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>')}<span>Accueil de classe<small>Horloge et horaire du cours</small></span></button>`);
-  return `<h1>${esc(window.titreAccueil && window.titreAccueil() || "Bonjour !")}</h1><p class="hp-sous">Que veux-tu enseigner aujourd'hui ?</p>${carte}<div class="hp-tuiles">${T.slice(0, 4).join("")}</div>`;
+  if (tb && maintenant - tb < 7 * 864e5) T.push(`<button class="hp-t" data-hp="tableau">${ic("b", '<rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/>')}<span>Continuer ton tableau<small>Tableau blanc</small></span></button>`);
+  /* seulement ce qui est personnel (les outils fixes sont dans la barre du haut) */
+  return `<h1>${esc(window.titreAccueil && window.titreAccueil() || "Bonjour !")}</h1><p class="hp-sous">Que veux-tu enseigner aujourd'hui ?</p>${carte}${T.length ? `<div class="hp-tuiles">${T.slice(0, 4).join("")}</div>` : ""}`;
 }
 function brancherAccueilPerso(h){
   const clic = id => { const b = document.getElementById(id); if (b) b.click(); };
@@ -1472,7 +1474,7 @@ function brancherAccueilPerso(h){
 function renderHero(){
   const h = $("#hero"), perso = accueilPerso();
   if (perso){ h.style.cssText = "background:linear-gradient(120deg,#1b2540 0%,#141414 68%)"; h.classList.add("hp");
-    h.innerHTML = `<div class="hero-content">${perso}</div><div class="hero-stack">${vedettes().map(l => `<img src="${esc(couv(l))}" alt="">`).join("")}</div>`;
+    h.innerHTML = `<div class="hero-content">${perso}</div>`;
     brancherAccueilPerso(h); return; }
   h.classList.remove("hp");
   h.style.cssText = "background:linear-gradient(120deg,#1b2540 0%,#141414 68%)";
@@ -9553,9 +9555,9 @@ window.ACCES = (function(){
     if (!m.hidden){ m.hidden = true; return; }
     m.innerHTML = '<div class="qui"><b>' + esc(SESSION.nom) + '</b>' + esc(SESSION.id) + (SESSION.admin ? ' <span class="acces-tag">admin</span>' : '') + '</div>'
       + (SESSION.admin ? '<button data-a="gerer">Gérer les accès des enseignants' + (NB_DEM ? ' (' + NB_DEM + ' demande' + (NB_DEM > 1 ? 's' : '') + ')' : '') + '</button>' : '')
-      + '<button data-a="prefs">Mes préférences</button><button data-a="sortir">Se déconnecter</button>';
+      + '<button data-a="prefs">Mes préférences</button><button data-a="neuf">Quoi de neuf' + (document.getElementById("qnPoint") && !document.getElementById("qnPoint").hidden ? ' <span class="qn-point"></span>' : '') + '</button><button data-a="aide">Aide</button><button data-a="sortir">Se déconnecter</button>';
     const r = b.getBoundingClientRect(); m.style.top = (r.bottom + 8 + scrollY) + "px"; m.style.left = Math.max(8, Math.min(innerWidth - 240, r.right - 230)) + "px"; m.hidden = false;
-    m.onclick = e => { const a = e.target.closest("[data-a]"); if (!a) return; m.hidden = true; if (a.dataset.a === "sortir") deconnexion().then(() => aviser("Tu es déconnecté sur cet ordinateur.")); else if (a.dataset.a === "prefs") window.dlgPrefs(); else dlgGerer(); };
+    m.onclick = e => { const a = e.target.closest("[data-a]"); if (!a) return; m.hidden = true; if (a.dataset.a === "neuf" || a.dataset.a === "aide"){ document.getElementById(a.dataset.a === "neuf" ? "quoiNeuf" : "lienAide").click(); return; } if (a.dataset.a === "sortir") deconnexion().then(() => aviser("Tu es déconnecté sur cet ordinateur.")); else if (a.dataset.a === "prefs") window.dlgPrefs(); else dlgGerer(); };
   }
   document.addEventListener("pointerdown", e => { const m = document.getElementById("accesMenu"); if (m && !m.hidden && !m.contains(e.target) && !e.target.closest("#compteBtn")) m.hidden = true; });
 
