@@ -4,7 +4,7 @@
 > Le `README.md` décrit le format de `nouveautes.json`; ce fichier-ci décrit tout le reste.
 
 ## Le projet en bref
-- Site : https://cfppaplc.github.io/bibliotheque/ (GitHub Pages, branche `main`, dossier racine, `.nojekyll`).
+- Site : https://metierplus.app (domaine acheté chez Porkbun le 8 nov., fichier `CNAME`; ancienne adresse https://cfppaplc.github.io/bibliotheque/ redirigée) (GitHub Pages, branche `main`, dossier racine, `.nojekyll`).
   Le dépôt *est* le site : aucun build, aucun framework. Fichiers HTML autonomes, CSS et JS intégrés.
 - Auteur : **Jeremy (Jérémy Raymond), enseignant au Pavillon de l'Avenir** (formation professionnelle, Québec).
   Programmes : **DEP 5211 Entretien général d'immeubles (EGI)** et **DEP 5333 Plomberie et chauffage**.
