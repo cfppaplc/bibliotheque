@@ -22,7 +22,9 @@ textarea{min-height:180px;font-family:ui-monospace,Menlo,Consolas,monospace;font
 .tbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}
 .tbar h1{font-size:20px;margin:0;flex:1}
 .tbar a{color:var(--acc);font-weight:700;text-decoration:none}
-.k0{background:#C8323C}.k1{background:#2563A8}.k2{background:#C08A12}.k3{background:#2E7D32}
+.k0,.k1,.k2,.k3{background:#2F3440;color:#fff}
+i.let{font-style:normal;display:inline-flex;align-items:center;justify-content:center;width:1.7em;height:1.7em;border-radius:8px;background:var(--acc,#534AB7);color:#fff;font-weight:800;flex:none;margin-right:.5em;font-size:.95em}
+.bon i.let{background:#fff;color:#1D6B3F}
 .btn2{background:#F1EEE8;color:#24211E}
 .ctl{display:flex;gap:8px;flex-wrap:wrap}.ctl button{flex:1;min-width:140px}
 .logoC{height:34px;display:block;margin:0 auto 10px}
@@ -71,7 +73,10 @@ th{font-size:12px;color:var(--gris);border-top:0}
 #joueur .bx{width:min(860px,100%);text-align:center}
 #joueur input{font-size:24px;text-align:center;margin:14px 0}
 #joueur h2{font-size:clamp(20px,3.4vw,30px);margin:0 0 18px;line-height:1.25}
-.ch4{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ch4{display:grid;grid-template-columns:1fr;gap:10px;text-align:left}
+.ch4 button{min-height:78px!important;border:2px solid rgba(255,255,255,.16)!important;background:rgba(255,255,255,.08)!important;color:#fff;justify-content:flex-start}
+.ch4 button.pas{opacity:.35}.ch4 button.choisi{border-color:#fff!important;background:rgba(255,255,255,.2)!important}
+.ch4 button i{font-style:normal;display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:10px;background:var(--acc,#534AB7);color:#fff;font-weight:800;font-size:20px!important;opacity:1!important;flex:none}
 .ch4 button{min-height:120px;font-size:clamp(16px,2.4vw,22px);border-radius:14px;display:flex;align-items:center;gap:12px;padding:16px;text-align:left;transition:opacity .3s,transform .2s}
 .ch4 button i{font-style:normal;font-size:24px;opacity:.85}
 .ch4 button.pas{opacity:.25}.ch4 button:active{transform:scale(.98)}
@@ -155,6 +160,26 @@ body.inclus .grid{grid-template-columns:1fr}
 .podium .col{display:flex;flex-direction:column;align-items:center;gap:1.2vh;width:auto;padding:0;background:none;animation:none;height:auto}
 #joueur .ko2{color:#FFB4A8;font-weight:700;margin-bottom:6px}
 #joueur .persos{max-width:860px}
+/* ---------- Tableau de bord des quiz ---------- */
+body.bord .grid{grid-template-columns:1fr}body.bord .grid>div:first-child{display:none}
+.cartes{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.cq{background:#fff;border:1px solid var(--ligne);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+.cq .im{height:130px;background:var(--c) center/cover no-repeat;position:relative}
+.cq .im span{position:absolute;left:10px;bottom:8px;background:rgba(0,0,0,.6);color:#fff;font-size:12px;font-weight:700;border-radius:20px;padding:3px 10px}
+.cq .co{padding:12px 14px 14px;display:flex;flex-direction:column;gap:6px;flex:1}
+.cq .co b{font-size:16px;line-height:1.25}
+.cq .co .jouer{margin-top:auto;font-size:16px;padding:12px}
+.cq .pt{display:flex;gap:6px;flex-wrap:wrap}.cq .pt button{flex:1;padding:7px 8px;font-size:12px}
+#modes{position:fixed;inset:0;background:rgba(20,22,26,.6);z-index:80;display:flex;align-items:center;justify-content:center;padding:16px}
+#modes .bx{background:#fff;border-radius:18px;padding:20px;max-width:640px;width:100%}
+#modes h2{margin:0 0 4px;font-size:20px;color:var(--txt);letter-spacing:0;text-transform:none}
+#modes .duo{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0 10px}
+#modes .duo button{padding:20px 12px;font-size:17px;line-height:1.3;text-align:left}
+#modes .duo small{display:block;font-weight:500;font-size:13px;opacity:.85;margin-top:4px}
+@media (max-width:640px){#modes .duo{grid-template-columns:1fr}}
+.ech div.bon{background:#1F7A4D!important}
+.kick{border:1px solid rgba(127,127,127,.35);background:transparent;color:inherit;border-radius:8px;width:30px;height:30px;margin-left:8px;cursor:pointer;font-size:14px;opacity:.6;vertical-align:middle}.kick:hover{opacity:1;border-color:#C62828;color:#C62828}
+.ch4 button{font-size:20px}
 </style>
 </head>
 <body>
@@ -178,7 +203,7 @@ body.inclus .grid{grid-template-columns:1fr}
 
 <!-- ============ TÉLÉCOMMANDE ============ -->
 <div id="tele" class="cache"><div class="wrap">
-<div class="tbar"><img src="img/pavillon-avenir.png" alt="Pavillon de l'Avenir" style="height:30px"><h1>Quiz maison · télécommande</h1><a href="labo.html">‹ Labo interactif</a></div>
+<div class="tbar"><img src="img/pavillon-avenir.png" alt="Pavillon de l'Avenir" style="height:30px"><h1 id="tTitre">Quiz maison · télécommande</h1><a href="?role=1" id="lienEcran" class="cache">Écran de classe sur un 2e appareil</a><a href="labo.html">‹ Labo interactif</a></div>
 <div class="grid">
 <div>
 <div class="carte"><h2>Les élèves scannent</h2><div id="qr"></div><div class="code" id="code"></div><div class="etat" id="etatT">Connexion…</div><button id="bEcran" style="width:100%;margin-top:10px">Ouvrir l'écran de classe</button>
@@ -187,7 +212,7 @@ body.inclus .grid{grid-template-columns:1fr}
 </div>
 <div>
 <div id="vChoix">
-<div class="carte"><h2>Mes quiz</h2><div id="quizListe"></div>
+<div class="carte"><h2>Mes quiz</h2><div id="quizListe" class="cartes"></div>
 <div class="ctl" style="margin-top:12px"><button id="bNouveau">+ Créer un quiz</button><button class="btn2" id="bColler">Coller des questions</button><button class="btn2" id="bImport">Importer un fichier</button><input type="file" id="fImport" accept=".json,application/json" class="cache"></div></div>
 </div>
 <div id="vColler" class="cache"><div class="carte"><h2>Coller des questions</h2>
@@ -237,7 +262,7 @@ const RELAIS = "https://ntfy.sh/", PREFIXE = "pda-quiz-";
 const SB_URL = "https://kjlotlhqrgekzohshmbn.supabase.co", SB_CLE = "sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY";
 const $ = id => document.getElementById(id);
 const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"})[c]);
-const SYMB = ["▲", "◆", "●", "■"];
+const SYMB = ["A", "B", "C", "D"];
 const COULEURS = ["#534AB7", "#B3261E", "#185FA5", "#0F6E56", "#854F0B", "#3A3936"];
 const REG_DEF = {mode: "ind", points: "vitesse", classement: "oui", melange: "non", son: "oui", coul: "#534AB7"};
 const sombre = h => { const n = parseInt(h.slice(1), 16), f = .38; return `rgb(${Math.round((n >> 16) * f + 18)},${Math.round((n >> 8 & 255) * f + 18)},${Math.round((n & 255) * f + 24)})`; };
@@ -245,6 +270,7 @@ const ord = r => r + (r === 1 ? "er" : "e");
 
 let canal = null, pret = false, attente = [];
 function envoyer(topic, obj){
+  if (window.SANS_RELAIS) return;
   if (window.supabase) { if (!pret) { attente.push(obj); return; } canal.send({type: "broadcast", event: "m", payload: obj}).catch(() => {}); return; }
   fetch(RELAIS + topic, {method: "POST", body: JSON.stringify(obj)}).catch(() => {});
 }
@@ -302,6 +328,7 @@ if (params.get("animer")) animer([["bGo"], ["bSuite"]]);
 else if (params.get("j")) joueur(params.get("j").replace(/\D/g, "").slice(0, 6));
 else if (params.get("ecran")) ecran(params.get("ecran").replace(/\D/g, "").slice(0, 6));
 else if (params.get("tele")) telecommande();
+else if (!params.get("role")) telecommande(true);
 else {
   $("role").classList.remove("cache");
   $("rTele").onclick = () => { $("role").classList.add("cache"); telecommande(); };
@@ -312,8 +339,9 @@ else {
 }
 
 /* ================================ TÉLÉCOMMANDE ================================ */
-function telecommande(){
+function telecommande(bord){
   $("tele").classList.remove("cache");
+  if (bord) { window.SANS_RELAIS = true; document.body.classList.add("bord"); $("tTitre").textContent = "Quiz maison · tableau de bord"; $("lienEcran").classList.remove("cache"); }
   let code = "";
   const s = stock.get("quizSession", null); if (s && Date.now() - s.t < 6 * 3600e3) code = s.code;
   if (!code) code = String(Math.floor(100000 + Math.random() * 900000));
@@ -327,6 +355,11 @@ function telecommande(){
 
   const P = {};   // pid → {nom, pts, bons, av, vu, parti}
   const ids = () => Object.keys(P).filter(id => !P[id].parti);
+  const MAX_J = 40;   // joueurs au plus dans une partie (Supabase gratuit : 200 connexions, on garde de la marge)
+  /* Retirer un joueur qui bogue : il voit un message et peut revenir en choisissant de nouveau */
+  document.addEventListener("click", e => { const b = e.target.closest("[data-kick]"); if (!b || bord) return; const id = b.dataset.kick; if (!P[id]) return;
+    P[id].parti = true; P[id].exclu = true; envoyer(topic, {m: "kick", pour: id}); envoyerPersos(); maj();
+    if (G.etat === "question" && ids().length && ids().every(x => G.reps[x])) setTimeout(reveler, 300); });
   const G = {quiz: null, jeu: [], i: -1, etat: "choix", t0: 0, reps: {}};   // etat : choix | lobby | question | rev | fin
   const R = () => Object.assign({}, REG_DEF, G.quiz && G.quiz.reg);
   const rangs = () => { const l = Object.entries(P).filter(([id]) => !P[id].parti).sort((a, b) => b[1].pts - a[1].pts || (b[1].bons || 0) - (a[1].bons || 0) || a[1].nom.localeCompare(b[1].nom)); const r = {}; l.forEach(([id], k) => r[id] = k + 1); return r; };
@@ -342,15 +375,15 @@ function telecommande(){
   function listeLob(){
     const L = ids();
     $("nbP").textContent = L.length ? "(" + L.length + ")" : "";
-    $("listeLob").innerHTML = L.length ? L.map(id => visage(P[id].av, "v-s") + esc(P[id].nom) + (P[id].prenom ? " (" + esc(P[id].prenom) + ")" : "")).join("<br>") : "Personne pour l'instant.";
+    $("listeLob").innerHTML = L.length ? L.map(id => visage(P[id].av, "v-s") + esc(P[id].nom) + (P[id].prenom ? " (" + esc(P[id].prenom) + ")" : "") + `<button class="kick" data-kick="${id}" title="Retirer de la partie (il pourra revenir)">✕</button>`).join("<br>") : "Personne pour l'instant.";
   }
   function table(){
     const r = rangs(), Q = G.jeu[G.i];
     $("tRep").innerHTML = ids().sort((a, b) => r[a] - r[b]).map(id => {
       const x = G.reps[id]; let c = '<span class="att">—</span>';
       if (G.etat === "question") c = x ? '<span class="ok">✓ a répondu</span>' : '<span class="att">en attente…</span>';
-      else if (G.etat === "rev" && Q) c = x ? `<span class="pastille k${x.c}"></span>${esc(Q.ch[x.c])} · <span class="${x.c === Q.bon ? "ok" : "ko"}">${x.c === Q.bon ? (x.g ? "+" + x.g : "bonne") : "mauvaise"}</span>` : '<span class="ko">Pas répondu</span>';
-      return `<tr><td><b>${visage(P[id].av, "v-s")}${esc(P[id].nom)}</b>${P[id].prenom ? ` <span class="sous">(${esc(P[id].prenom)})</span>` : ""}</td><td>${c}</td><td>${P[id].pts}</td><td>${G.etat === "lobby" ? "—" : r[id]}</td></tr>`;
+      else if (G.etat === "rev" && Q) c = x ? `<b>${SYMB[x.c]}.</b> ${esc(Q.ch[x.c])} · <span class="${x.c === Q.bon ? "ok" : "ko"}">${x.c === Q.bon ? (x.g ? "+" + x.g : "bonne") : "mauvaise"}</span>` : '<span class="ko">Pas répondu</span>';
+      return `<tr><td><b>${visage(P[id].av, "v-s")}${esc(P[id].nom)}</b>${P[id].prenom ? ` <span class="sous">(${esc(P[id].prenom)})</span>` : ""}<button class="kick" data-kick="${id}" title="Retirer de la partie (il pourra revenir)">✕</button></td><td>${c}</td><td>${P[id].pts}</td><td>${G.etat === "lobby" ? "—" : r[id]}</td></tr>`;
     }).join("") || '<tr><td colspan="4" class="sous">Personne pour l\'instant.</td></tr>';
   }
   let vT = 0, vD = null;
@@ -411,13 +444,15 @@ function telecommande(){
   $("bSuite").onclick = () => { if (G.etat === "question") { reveler(); return; } if (G.i + 1 >= G.jeu.length) { finir(); return; } G.i++; question(); };
   $("bFin").onclick = () => { clearTimeout(minut); envoyer(topic, {m: "attente"}); G.quiz = null; G.etat = "choix"; G.i = -1; G.jeu = []; document.documentElement.style.removeProperty("--acc"); montrer("vChoix"); listeQuiz(); vue(); };
 
-  ecouter(topic, m => {
+  if (!bord) ecouter(topic, m => {
     if (m.m === "ecran?") { envoyer(topic, vueObj()); envoyerCouv(); const Q = G.jeu[G.i]; if (G.etat === "question" && Q && Q.img) envoyer(topic, {m: "img", i: G.i, data: Q.img}); return; }
     if (m.m === "persos?") { envoyerPersos(); return; }
-    if (m.pid && P[m.pid]) { const etait = P[m.pid].parti; P[m.pid].vu = Date.now(); if (m.m === "bye") { P[m.pid].parti = true; envoyerPersos(); maj(); return; } if (etait && m.m === "vie") { P[m.pid].parti = false; envoyerPersos(); maj(); } }
+    if (m.pid && P[m.pid]) { const etait = P[m.pid].parti; P[m.pid].vu = Date.now(); if (m.m === "bye") { P[m.pid].parti = true; envoyerPersos(); maj(); return; } if (etait && m.m === "vie" && !P[m.pid].exclu) { P[m.pid].parti = false; envoyerPersos(); maj(); } }
     if (m.m === "vie" || m.m === "bye") return;
     if (m.m === "ici") {
       if (m.av != null && Object.entries(P).some(([id, p]) => !p.parti && p.av === m.av && id !== m.pid)) { envoyer(topic, {m: "refus", pour: m.pid}); return; }
+      if ((!P[m.pid] || P[m.pid].parti) && ids().length >= MAX_J) { envoyer(topic, {m: "refus", pour: m.pid, raison: "plein", max: MAX_J}); return; }
+      if (P[m.pid]) P[m.pid].exclu = false;
       if (!P[m.pid]) P[m.pid] = {nom: m.nom, pts: 0, bons: 0}; else P[m.pid].nom = m.nom;
       P[m.pid].av = m.av; P[m.pid].prenom = m.prenom || ""; P[m.pid].parti = false; P[m.pid].vu = Date.now(); envoyerPersos();
       if (G.etat === "question") envoyer(topic, qMsg(m.pid));
@@ -434,10 +469,14 @@ function telecommande(){
   function avis(t){ $("quizListe").insertAdjacentHTML("afterbegin", `<div class="ko" style="margin-bottom:8px">${esc(t)}</div>`); }
   function sauverListe(L){ if (!stock.set("quizMaison", L)) { avis("Mémoire de l'appareil pleine : enlève des images ou des quiz."); return false; } return true; }
   function listeQuiz(){
-    $("quizListe").innerHTML = tousQuiz().map(q => `<div class="qz"><i style="background:${esc((q.reg || {}).coul || REG_DEF.coul)}"></i><div class="t"><b>${esc(q.titre)}</b><span class="sous">${q.qs.length} questions${q.exemple ? " · quiz d'exemple" : ""}</span></div>
-      <button data-jouer="${q.id}">Jouer</button>${q.exemple ? `<button class="btn2" data-copier="${q.id}">Copier et modifier</button>` : `<button class="btn2" data-modif="${q.id}">Modifier</button><button class="btn2" data-dupl="${q.id}">Dupliquer</button><button class="btn2" data-export="${q.id}">Exporter</button><button class="btn2" data-suppr="${q.id}">Supprimer</button>`}</div>`).join("");
+    $("quizListe").innerHTML = tousQuiz().map(q => { const c = (q.reg || {}).coul || REG_DEF.coul;
+      return `<div class="cq"><div class="im" style="--c:${esc(c)};${q.couv ? `background-image:url('${esc(q.couv)}')` : ""}"><span>${q.qs.length} questions</span></div>
+      <div class="co"><b>${esc(q.titre)}</b><span class="sous">${esc(q.sujet || (q.exemple ? "Quiz d'exemple" : ""))}</span>
+      <button class="jouer" data-jouer="${q.id}" style="background:${esc(c)}">Jouer</button>
+      <div class="pt">${q.exemple ? `<button class="btn2" data-copier="${q.id}">Copier et modifier</button>` : `<button class="btn2" data-modif="${q.id}">Modifier</button><button class="btn2" data-dupl="${q.id}">Dupliquer</button><button class="btn2" data-export="${q.id}">Exporter</button><button class="btn2" data-suppr="${q.id}">Supprimer</button>`}</div></div></div>`; }).join("");
     const trouve = id => JSON.parse(JSON.stringify(tousQuiz().find(q => q.id === id)));
     document.querySelectorAll("[data-jouer]").forEach(b => b.onclick = () => {
+      if (bord) { modes(b.dataset.jouer); return; }
       G.quiz = trouve(b.dataset.jouer); G.etat = "lobby"; G.i = -1; G.jeu = []; appliquerCouleur(); montrer("vJeu");
       envoyer(topic, {m: "bienvenue", titre: G.quiz.titre, coul: R().coul, mode: R().mode}); envoyerCouv(); maj();
     });
@@ -533,7 +572,7 @@ function telecommande(){
       <button class="btn2" data-mv="${k},-1" ${k ? "" : "disabled"} aria-label="Monter">↑</button><button class="btn2" data-mv="${k},1" ${k < ed.qs.length - 1 ? "" : "disabled"} aria-label="Descendre">↓</button>
       <button class="btn2" data-del="${k}" ${ed.qs.length < 2 ? "disabled" : ""}>Retirer</button></div>
       <input class="tq" placeholder="La question" value="${esc(Q.q)}" maxlength="180" style="margin-top:8px">
-      ${Array.from({length: nb}, (_, c) => `<div class="ln"><input type="radio" name="b${k}" value="${c}" ${Q.bon === c ? "checked" : ""} title="Bonne réponse"><input class="tc" placeholder="${c < 2 ? "Choix " + (c + 1) : "Choix " + (c + 1) + " (facultatif)"}" value="${esc(Q.ch[c] || "")}" maxlength="80" ${vf ? "readonly" : ""} style="border-left:8px solid ${["#C8323C", "#2563A8", "#C08A12", "#2E7D32"][c]}"></div>`).join("")}
+      ${Array.from({length: nb}, (_, c) => `<div class="ln"><input type="radio" name="b${k}" value="${c}" ${Q.bon === c ? "checked" : ""} title="Bonne réponse"><input class="tc" placeholder="${c < 2 ? "Choix " + (c + 1) : "Choix " + (c + 1) + " (facultatif)"}" value="${esc(Q.ch[c] || "")}" maxlength="80" ${vf ? "readonly" : ""} style="border-left:8px solid #B9B3A9"></div>`).join("")}
       <textarea class="ex" placeholder="Explication affichée après la réponse (facultatif)" maxlength="240">${esc(Q.expl || "")}</textarea>
       <div class="img">${Q.img ? `<img src="${Q.img}" alt=""><button class="btn2" data-noimg="${k}">Retirer l'image</button>` : `<button class="btn2" data-img="${k}">+ Image (affichée au tableau)</button>`}<span class="sous">Coche le rond de la bonne réponse.</span></div></div>`;
     }).join("");
@@ -565,7 +604,22 @@ function telecommande(){
     document.documentElement.style.removeProperty("--acc");
     montrer("vChoix"); listeQuiz();
   };
+  // tableau de bord : choisir comment afficher la partie
+  function modes(id){
+    const q = tousQuiz().find(x => x.id === id);
+    document.body.insertAdjacentHTML("beforeend", `<div id="modes"><div class="bx"><h2>${esc(q.titre)}</h2><div class="sous">Comment veux-tu afficher la partie ?</div>
+      <div class="duo"><button id="mAnim">Animer au tableau<small>Un seul ordinateur : l'écran de classe avec ses commandes en bas.</small></button>
+      <button id="mTele" style="background:#3A3936">Télécommande<small>Deux écrans : la télécommande ici, l'écran de classe sur le projecteur.</small></button></div>
+      <button class="btn2" id="mX" style="width:100%">Annuler</button></div></div>`);
+    $("mAnim").onclick = () => { location.href = "?animer=1&quiz=" + encodeURIComponent(id); };
+    $("mTele").onclick = () => { location.href = "?tele=1&quiz=" + encodeURIComponent(id); };
+    $("mX").onclick = () => $("modes").remove();
+    $("modes").onclick = e => { if (e.target.id === "modes") $("modes").remove(); };
+  }
   listeQuiz(); maj();
+  // ouvert depuis le tableau de bord : le quiz choisi est prêt à jouer
+  const qp = params.get("quiz");
+  if (!bord && qp) { const b = document.querySelector(`[data-jouer="${CSS.escape(qp)}"]`); if (b) b.click(); }
 }
 
 /* ================================ JOUEUR (iPad de l'élève) ================================ */
@@ -582,6 +636,7 @@ function joueur(code){
   const pour = m => !m.pour || m.pour === pid;
   let av = -1, entre = false, pris = [], prenom = "", nomChoisi = "", nomEdite = false;
   function ecranChoix(msg){
+    ecranChoix.msg = msg;
     bx(`<h2>Choisis ton personnage</h2>${msg ? `<div class="ko2">${esc(msg)}</div>` : ""}${grillePersos(pris, av)}
       <div style="margin-top:6px;opacity:.8">Ton nom dans la partie (tu peux le changer)</div>
       <input id="jPre" maxlength="24" placeholder="Choisis d'abord un personnage" value="${esc(nomChoisi)}">
@@ -601,8 +656,9 @@ function joueur(code){
   }
   ecranChoix();
     ecouter(topic, m => {
-      if (m.m === "persos") { pris = m.pris || []; if (!entre) ecranChoix(); return; }
-      if (m.m === "refus" && m.pour === pid) { entre = false; av = -1; if (!nomEdite) nomChoisi = ""; ecranChoix("Ce personnage vient d'être pris. Choisis-en un autre."); return; }
+      if (m.m === "persos") { pris = m.pris || []; if (!entre) ecranChoix(ecranChoix.msg); return; }
+      if (m.m === "refus" && m.pour === pid) { entre = false; av = -1; if (!nomEdite) nomChoisi = ""; ecranChoix(m.raison === "plein" ? `La partie est pleine (${m.max} joueurs au plus). Demande à l'enseignant.` : "Ce personnage vient d'être pris. Choisis-en un autre."); return; }
+      if (m.m === "kick" && m.pour === pid) { entre = false; av = -1; ecranChoix("L'enseignant t'a retiré de la partie. Choisis un personnage pour revenir."); return; }
       if (!entre || !pour(m)) return;
       if (m.coul) teinte(m.coul);
       if (m.m === "bienvenue") bx(`<div class="gros monte">Tu es dans la partie.</div><div>${esc(m.titre || "")}</div><div style="opacity:.7;margin-top:8px">Regarde le tableau : ça commence bientôt.</div>`);
@@ -615,7 +671,7 @@ function joueur(code){
         chrono = setInterval(() => { const r = Math.max(0, fin - Date.now()), b = $("jBar"); if (b) b.style.width = Math.min(100, 100 * r / (m.s * 1000)) + "%"; if (!r) clearInterval(chrono); }, 150);
         document.querySelectorAll("#jBx [data-c]").forEach(b => b.onclick = () => {
           if (repI >= 0) return; repI = +b.dataset.c;
-          document.querySelectorAll("#jBx [data-c]").forEach(x => x.classList.toggle("pas", x !== b));
+          document.querySelectorAll("#jBx [data-c]").forEach(x => { x.classList.toggle("pas", x !== b); x.classList.toggle("choisi", x === b); });
           $("jBx").insertAdjacentHTML("beforeend", '<div class="monte" style="margin-top:14px;opacity:.8">Réponse envoyée.</div>');
           envoyer(topic, {m: "rep", pid, i: m.i, c: repI});
         });
@@ -644,7 +700,7 @@ function joueur(code){
 
 /* ===== Animer au tableau : un seul ordinateur (écran de classe + barre + tiroir de télécommande) ===== */
 function animer(boutons){
-  document.body.insertAdjacentHTML("beforeend", `<div id="tiroir"><button class="fermer" id="tirX" aria-label="Fermer la télécommande">›</button><iframe id="tirF" src="?tele=1&inclus=1" title="Télécommande"></iframe></div>
+  document.body.insertAdjacentHTML("beforeend", `<div id="tiroir"><button class="fermer" id="tirX" aria-label="Fermer la télécommande">›</button><iframe id="tirF" src="?tele=1&inclus=1${params.get("quiz") ? "&quiz=" + encodeURIComponent(params.get("quiz")) : ""}" title="Télécommande"></iframe></div>
     <div id="animBar"><button id="retLabo" title="Retour au Labo interactif">‹ Labo</button>${boutons.map(([id], k) => `<button data-b="${id}" class="${k ? "" : "prim"}" disabled>…</button>`).join("")}<button id="tirB">Télécommande</button></div>`);
   const T = $("tiroir"), F = $("tirF");
   $("tirB").onclick = () => T.classList.toggle("ouvert");
@@ -722,7 +778,7 @@ function ecran(code){
       const r = Math.max(0, Math.ceil((v.t0 + v.q.s * 1000 - n) / 1000));
       if (cle !== dernier || force) {
         E.innerHTML = tete("Question " + (v.i + 1) + " sur " + v.n) + `<div class="eq monte">${esc(v.q.q)}</div>${v.q.img && img[v.i] ? `<img class="eimg monte" src="${img[v.i]}" alt="">` : ""}
-          <div class="ech">${v.q.ch.map((c, k) => `<div class="k${k} monte" style="animation-delay:${.1 + k * .08}s"><span>${SYMB[k]} ${esc(c)}</span></div>`).join("")}</div>
+          <div class="ech">${v.q.ch.map((c, k) => `<div class="k${k} monte" style="animation-delay:${.1 + k * .08}s"><span><i class="let">${SYMB[k]}</i>${esc(c)}</span></div>`).join("")}</div>
           <div class="cpt"><span id="eRep"></span><b id="eT"></b></div>` + bSon();
         if (cle !== dernier) ton(440, .25, .08);
       }
@@ -732,7 +788,7 @@ function ecran(code){
       if (cle !== dernier || force) {
         const tot = Math.max(1, v.cpt.reduce((a, b) => a + b, 0));
         E.innerHTML = tete("Question " + (v.i + 1) + " sur " + v.n) + `<div class="eq">${esc(v.q.q)}</div>
-          <div class="ech">${v.q.ch.map((c, k) => `<div class="k${k} ${k === v.bon ? "bon" : "pas"}"><span>${k === v.bon ? "✓" : SYMB[k]} ${esc(c)}</span><em>${v.cpt[k]}</em><i class="bar" data-w="${100 * v.cpt[k] / tot}"></i></div>`).join("")}</div>
+          <div class="ech">${v.q.ch.map((c, k) => `<div class="k${k} ${k === v.bon ? "bon" : "pas"}"><span><i class="let">${k === v.bon ? "✓" : SYMB[k]}</i>${esc(c)}</span><em>${v.cpt[k]}</em><i class="bar" data-w="${100 * v.cpt[k] / tot}"></i></div>`).join("")}</div>
           ${v.q.expl ? `<div class="eexpl monte">${esc(v.q.expl)}</div>` : ""}
           ${v.reg.classement === "oui" ? `<div class="cpt"><span>Classement dans quelques secondes…</span></div>` : ""}` + bSon();
         requestAnimationFrame(() => E.querySelectorAll(".bar").forEach(b => b.style.width = b.dataset.w + "%"));
