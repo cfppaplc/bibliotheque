@@ -6916,7 +6916,7 @@ initAdmin();
 <style>
   .act-ov{position:fixed;inset:0;z-index:410;background:#0e0e10;color:#f1f1f3;font-family:"Segoe UI",Roboto,Arial,sans-serif;overflow:auto;-webkit-overflow-scrolling:touch}
   .act-ov[hidden]{display:none}
-  .modal.sur-act{z-index:420}
+  .modal.sur-act{z-index:430}
   .panel-body .btn{margin-bottom:8px}
   .panel-body a.btn{text-decoration:none}
   .act-top{position:sticky;top:0;z-index:2;display:flex;align-items:center;gap:16px;padding:calc(8px + env(safe-area-inset-top,0px)) 16px 8px;background:rgba(12,12,13,.84);backdrop-filter:blur(14px) saturate(1.2);-webkit-backdrop-filter:blur(14px) saturate(1.2);border-bottom:1px solid #232325}
@@ -9626,9 +9626,9 @@ window.ACCES = (function(){
     if (!m.hidden){ m.hidden = true; return; }
     m.innerHTML = '<div class="qui"><b>' + esc(SESSION.nom) + '</b>' + esc(SESSION.id) + (SESSION.admin ? ' <span class="acces-tag">admin</span>' : '') + '</div>'
       + (SESSION.admin ? '<button data-a="gerer">Gérer les accès des enseignants' + (NB_DEM ? ' (' + NB_DEM + ' demande' + (NB_DEM > 1 ? 's' : '') + ')' : '') + '</button>' : '')
-      + '<button data-a="prefs">Mes préférences</button><button data-a="neuf">Quoi de neuf' + (document.getElementById("qnPoint") && !document.getElementById("qnPoint").hidden ? ' <span class="qn-point"></span>' : '') + '</button><button data-a="aide">Aide</button><button data-a="sortir">Se déconnecter</button>';
+      + (window.MESDOCS && document.body.classList.contains("md-permis") ? '<button data-a="ajout">Ajouter un document</button>' : '') + '<button data-a="prefs">Mes préférences</button><button data-a="neuf">Quoi de neuf' + (document.getElementById("qnPoint") && !document.getElementById("qnPoint").hidden ? ' <span class="qn-point"></span>' : '') + '</button><button data-a="aide">Aide</button><button data-a="sortir">Se déconnecter</button>';
     const r = b.getBoundingClientRect(); m.style.top = (r.bottom + 8 + scrollY) + "px"; m.style.left = Math.max(8, Math.min(innerWidth - 240, r.right - 230)) + "px"; m.hidden = false;
-    m.onclick = e => { const a = e.target.closest("[data-a]"); if (!a) return; m.hidden = true; if (a.dataset.a === "neuf" || a.dataset.a === "aide"){ document.getElementById(a.dataset.a === "neuf" ? "quoiNeuf" : "lienAide").click(); return; } if (a.dataset.a === "sortir") deconnexion().then(() => aviser("Tu es déconnecté sur cet ordinateur.")); else if (a.dataset.a === "prefs") window.dlgPrefs(); else dlgGerer(); };
+    m.onclick = e => { const a = e.target.closest("[data-a]"); if (!a) return; m.hidden = true; if (a.dataset.a === "neuf" || a.dataset.a === "aide"){ document.getElementById(a.dataset.a === "neuf" ? "quoiNeuf" : "lienAide").click(); return; } if (a.dataset.a === "ajout"){ window.MESDOCS.dlgAjout(); return; } if (a.dataset.a === "sortir") deconnexion().then(() => aviser("Tu es déconnecté sur cet ordinateur.")); else if (a.dataset.a === "prefs") window.dlgPrefs(); else dlgGerer(); };
   }
   document.addEventListener("pointerdown", e => { const m = document.getElementById("accesMenu"); if (m && !m.hidden && !m.contains(e.target) && !e.target.closest("#compteBtn")) m.hidden = true; });
 
@@ -10224,4 +10224,38 @@ document.addEventListener("click", e => { const b = e.target.closest && e.target
     if (window.ACCES && ACCES.pret) ACCES.pret.then(go); else window.addEventListener("load", go); }
 })();
 </script>
+<style>
+/* ---- Mes documents (mesdocs.js) : fenêtre « Ajouter », zone de dépôt, voile de glisser-déposer ---- */
+.md-top{background:linear-gradient(160deg,#1E2A44,#14141a)!important;padding:24px 28px 18px!important;min-height:0!important;height:auto!important;display:block!important;color:#fff}
+.md-top h2{margin:0 0 4px;position:static!important;padding:0!important}.md-top p{margin:0;color:#c9ced8;font-size:.92rem}
+.md-corps{display:grid;gap:12px}
+.md-zone{display:grid;justify-items:center;gap:6px;padding:22px 16px;border:2px dashed rgba(128,128,128,.45);border-radius:14px;cursor:pointer;text-align:center;transition:border-color .15s,background .15s}
+.md-zone:hover,.md-zone.sur{border-color:#EB6A22;background:rgba(235,106,34,.08)}
+.md-zone.plein{border-style:solid;border-color:#EB6A22}
+.md-zone svg{color:#EB6A22}.md-zone b{font-size:1.02rem;word-break:break-all}.md-zone small{opacity:.7;font-size:.82rem}
+.md-q{font-weight:700;font-size:.92rem;margin-top:2px}
+.md-types{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.md-types button{display:grid;justify-items:center;gap:4px;padding:14px 8px;border:1px solid rgba(128,128,128,.35);border-radius:12px;background:rgba(128,128,128,.07);color:inherit;cursor:pointer;font:inherit;text-align:center}
+.md-types button b{font-size:1rem}.md-types button small{font-size:.74rem;opacity:.7;line-height:1.25}
+.md-types button.on{border-color:#EB6A22;background:rgba(235,106,34,.14);color:#EB6A22}.md-types button.on small{color:inherit}
+.md-types button:disabled{opacity:.3;cursor:not-allowed}
+.md-champs{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.md-champs label{display:grid;gap:4px;font-size:.84rem;font-weight:600}.md-champs label i{font-weight:400;opacity:.65}
+.md-champs .md-large{grid-column:1/-1}
+.md-champs input,.md-champs select{font:inherit;font-weight:400;padding:9px 11px;border-radius:9px;border:1px solid rgba(128,128,128,.4);background:rgba(128,128,128,.08);color:inherit}
+.md-champs label:first-child{grid-column:1/-1}
+.md-prop{display:flex;gap:10px;align-items:flex-start;padding:11px 12px;border-radius:11px;background:rgba(128,128,128,.08);cursor:pointer}
+.md-prop input{margin-top:3px;width:18px;height:18px;accent-color:#EB6A22}.md-prop span{display:grid;gap:2px}.md-prop small{opacity:.72;font-size:.8rem}
+.md-err{margin:0;color:#e2483d;font-weight:600}
+.md-etat{margin:14px 0 6px;font-size:.88rem;opacity:.8}
+.md-suppr.sur{border-color:#e2483d!important;color:#e2483d!important}
+.md-voile{position:fixed;inset:0;z-index:2000;display:grid;place-items:center;background:rgba(14,16,22,.72);backdrop-filter:blur(3px);pointer-events:none;animation:ouvrirOv .15s ease-out}
+.md-voile>div{display:grid;justify-items:center;gap:8px;padding:44px 64px;border:3px dashed #EB6A22;border-radius:22px;color:#fff;text-align:center}
+.md-voile svg{color:#EB6A22}.md-voile b{font-size:1.5rem}.md-voile small{opacity:.8}
+.md-btn{font:inherit;font-weight:600;font-size:.9rem;padding:9px 16px;border-radius:999px;border:1px solid #EB6A22;background:rgba(235,106,34,.12);color:#EB6A22;cursor:pointer;white-space:nowrap}
+.md-btn:hover{background:#EB6A22;color:#fff}
+.md-plus .pn-img{display:grid!important;place-items:center;border:2px dashed rgba(128,128,128,.45);background:transparent!important}.md-plus .pn-img i.md-plus-i{position:static!important;inset:auto!important;background:none!important;padding:0!important;font-style:normal;font-size:46px;font-weight:300;line-height:1;color:#EB6A22}
+@media (max-width:640px){.md-types{grid-template-columns:1fr}.md-types button{grid-template-columns:auto 1fr;justify-items:start;text-align:left}.md-types button small{grid-column:2}.md-types button svg{grid-row:span 2}.md-champs{grid-template-columns:1fr}}
+</style>
+<script src="mesdocs.js"></script>
 </body></html>
