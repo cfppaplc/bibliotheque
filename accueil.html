@@ -2831,14 +2831,19 @@ html.anim-off #accAccueil .aa-dans i { animation: none; }
         if (t > 0){ p[i] += (rgb[0] - p[i]) * t; p[i + 1] += (rgb[1] - p[i + 1]) * t; p[i + 2] += (rgb[2] - p[i + 2]) * t; } }
       g.putImageData(d, 0, 0); cache[k] = c.toDataURL("image/png"); res(cache[k]); } catch(e){ res(null); } };
     im.onerror = () => res(null); im.src = src; });
-  const poser = async img => { const s0 = img.dataset.logo0 || img.getAttribute("src") || ""; if (!/pavillon-avenir/.test(s0)) return; img.dataset.logo0 = s0;
+  /* Logo Métier+ (8 nov.) : le petit carré « + » prend aussi la couleur choisie (on remplace l'orange dans le SVG) */
+  const svgCache = {};
+  const teinteSvg = (src, c) => { const k = src + "|" + c; if (svgCache[k]) return Promise.resolve(svgCache[k]);
+    return fetch(src).then(r => r.text()).then(t => svgCache[k] = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(t.replace(/#F2762E/gi, c))).catch(() => null); };
+  const DEFAUT = c => !c || /^#(eb6a22|f2762e|e50914)$/i.test(c);
+  const poser = async img => { const s0 = img.dataset.logo0 || img.getAttribute("src") || ""; if (!/pavillon-avenir|metier-plus/.test(s0)) return; img.dataset.logo0 = s0;
     const rgb = hex(couleur), voulu = couleur;
-    if (!rgb || voulu.toLowerCase() === "#EB6A22"){ if (img.getAttribute("src") !== s0) img.src = s0; return; }
-    const u = await teinte(s0, rgb); if (u && voulu === couleur) img.src = u; };
-  const tous = () => document.querySelectorAll('img[src*="pavillon-avenir"], img[data-logo0]');
+    if (!rgb || DEFAUT(voulu)){ if (img.getAttribute("src") !== s0) img.src = s0; return; }
+    const u = /metier-plus/.test(s0) ? await teinteSvg(s0, voulu) : await teinte(s0, rgb); if (u && voulu === couleur) img.src = u; };
+  const tous = () => document.querySelectorAll('img[src*="pavillon-avenir"], img[src*="metier-plus"], img[data-logo0]');
   window.teinterLogo = c => { couleur = c || ""; try { couleur ? localStorage.setItem(CLE, couleur) : localStorage.removeItem(CLE); } catch(e){} tous().forEach(poser); };
   new MutationObserver(ms => { if (!couleur) return; ms.forEach(m => m.addedNodes.forEach(n => { if (n.nodeType !== 1) return;   /* fenêtres créées plus tard (connexion, bienvenue…) */
-    if (n.matches && n.matches('img[src*="pavillon-avenir"]')) poser(n); if (n.querySelectorAll) n.querySelectorAll('img[src*="pavillon-avenir"]').forEach(poser); })); }).observe(document.documentElement, { childList:true, subtree:true });
+    if (n.matches && n.matches('img[src*="pavillon-avenir"], img[src*="metier-plus"]')) poser(n); if (n.querySelectorAll) n.querySelectorAll('img[src*="pavillon-avenir"], img[src*="metier-plus"]').forEach(poser); })); }).observe(document.documentElement, { childList:true, subtree:true });
   addEventListener("storage", e => { if (e.key === CLE){ couleur = e.newValue || ""; tous().forEach(poser); } });   /* l'accueil de classe (cadre) suit la bibliothèque */
   if (couleur){ if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", () => tous().forEach(poser)); else tous().forEach(poser); }
 })();

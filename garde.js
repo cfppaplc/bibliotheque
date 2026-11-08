@@ -33,3 +33,15 @@
     } catch(e) { fin(false); } };
   } catch(e) { fin(false); }
 })();
+
+/* Logo Métier+ des pages du Labo (8 nov.) : version blanche en thème foncé, et le carré « + » à la couleur choisie dans « Mes préférences » (localStorage.logoCouleur) */
+(function(){
+  let c = ""; try { c = localStorage.getItem("logoCouleur") || ""; } catch(e){}
+  const perso = /^#[0-9a-f]{6}$/i.test(c) && !/^#(eb6a22|f2762e|e50914)$/i.test(c), cache = {};
+  const svg = src => cache[src] || (cache[src] = fetch(src).then(r => r.text()).then(t => "data:image/svg+xml;charset=utf-8," + encodeURIComponent(t.replace(/#F2762E/gi, c))).catch(() => null));
+  const poser = img => { let s = img.dataset.m0 || img.getAttribute("src") || ""; if (!/metier-plus/.test(s)) return; img.dataset.m0 = s;
+    if (img.dataset.blancAuto === "1" || img.closest(".tbar, .bordHaut")){ img.dataset.blancAuto = "1"; if (document.documentElement.classList.contains("sombre")) s = s.replace("metier-plus.svg", "metier-plus-blanc.svg"); }
+    if (perso) svg(s).then(u => { if (u) img.src = u; }); else if (img.getAttribute("src") !== s) img.src = s; };
+  const tout = () => document.querySelectorAll('img[src*="metier-plus"], img[data-m0]').forEach(poser);
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", tout); else tout();
+})();
