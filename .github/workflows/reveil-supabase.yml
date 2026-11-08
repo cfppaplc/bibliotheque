@@ -14,7 +14,7 @@ jobs:
         run: |
           URL="https://kjlotlhqrgekzohshmbn.supabase.co"
           CLE="sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY"
-          code=$(curl -s -o /dev/null -w "%{http_code}" "$URL/rest/v1/" -H "apikey: $CLE")
+          code=$(curl -s -o /dev/null -w "%{http_code}" "$URL/rest/v1/reveil?select=id&limit=1" -H "apikey: $CLE")
           echo "Base de données : HTTP $code"
           code2=$(curl -s -o /dev/null -w "%{http_code}" "$URL/auth/v1/health" -H "apikey: $CLE")
           echo "Service : HTTP $code2"
