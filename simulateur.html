@@ -79,6 +79,24 @@ th{font-size:12px;color:var(--gris);font-weight:700;border-top:0}
 #journal{background:#fff;border-radius:12px;margin-top:12px;max-height:260px;overflow:auto;padding:6px 12px}
 #journal div{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;padding:5px 0;border-bottom:1px solid #eee;color:#333}
 .msgp{color:#FCE9E6;font-size:13px;text-align:center;margin-top:8px;min-height:18px}
+.btns{grid-template-columns:repeat(3,1fr)}
+.b5{background:#7A5A12}.b6{background:#854F0B}
+.zones{display:flex;gap:6px;margin-top:12px;align-items:center;flex-wrap:wrap;background:#D9D6D0;border-radius:10px;padding:8px 12px}
+.zones b{font-size:11px;letter-spacing:.08em;color:#2B2926;margin-right:4px}
+.zones span{display:flex;align-items:center;gap:5px;font-size:11.5px;font-weight:800;color:#2B2926;background:#CBC7C0;border-radius:7px;padding:5px 8px}
+.zones i{width:13px;height:13px;border-radius:50%;background:#77736C}
+.zones .zA i{background:#FF3B30;box-shadow:0 0 8px #FF3B30}.zones .zT i{background:#FFC21A;box-shadow:0 0 8px #FFC21A}
+.strobe{grid-column:1/-1;padding:8px;display:flex;align-items:center;justify-content:center;gap:10px;background:#2B2926;color:#D9D6D0;border-radius:9px;font-size:12px;font-weight:700}
+.strobe b{width:30px;height:22px;border-radius:5px;background:#5a5650}
+.strobe.on b{animation:flash 1s infinite}
+@keyframes flash{0%,8%{background:#fff;box-shadow:0 0 22px 8px #fff}12%,100%{background:#5a5650;box-shadow:none}}
+.terrain{background:#fff;border-radius:14px;margin-top:12px;padding:12px 14px}
+.terrain h3{margin:0 0 8px;font-size:14px;color:#0F6E56}.terrain h3 small{font-weight:500;color:#6B665E}
+#terrain{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+#terrain button{background:#0F6E56;font-size:13px;text-align:left;padding:10px 12px;line-height:1.25}
+#terrain button[data-a=pompiers]{background:#993C1D}
+#terrain button[data-a=tech]{background:#534AB7}
+@media (max-width:700px){#terrain{grid-template-columns:1fr 1fr}}
 @media (max-width:700px){.face{grid-template-columns:1fr}.leds{flex-direction:row;flex-wrap:wrap}.btns{grid-template-columns:1fr 1fr}}
 </style>
 </head>
@@ -125,16 +143,22 @@ th{font-size:12px;color:var(--gris);font-weight:700;border-top:0}
 <div class="led j" id="lS"><i></i>SUPERVISION</div>
 <div class="led j" id="lT"><i></i>TROUBLE</div>
 <div class="led j" id="lSil"><i></i>SIGNAL SILENCIEUX</div>
+<div class="led j" id="lHS"><i></i>HORS SERVICE</div>
 </div></div>
+<div class="zones" id="zones"></div>
 <div class="btns">
 <button class="b1" id="kAck">ACCUSER RÉCEPTION<small>Acknowledge</small></button>
 <button class="b2" id="kSil">SILENCE SIGNAL<small>Signal silence</small></button>
 <button class="b3" id="kRaz">RÉARMEMENT<small>System reset</small></button>
 <button class="b4" id="kLamp">ESSAI DES VOYANTS<small>Lamp test</small></button>
+<button class="b5" id="kStr">SILENCE TROUBLE<small>Trouble silence</small></button>
+<button class="b6" id="kDrl">EXERCICE<small>Drill</small></button>
+<div class="strobe" id="strobe"><b></b>Stroboscope du corridor</div>
 </div>
 <div class="msgp" id="msgp"></div>
-<div class="bas"><span id="etatP">Connexion…</span><button id="vJournal">Journal d'événements</button></div>
+<div class="bas"><span id="etatP">Connexion…</span><span><button id="kSon">Son : activé</button> <button id="vJournal">Journal d'événements</button></span></div>
 </div>
+<div class="terrain"><h3>Sur le terrain <small>ce que tu fais dans l'immeuble</small></h3><div id="terrain"></div></div>
 <div id="journal" class="cache"></div>
 </div>
 </div>
@@ -153,21 +177,31 @@ const hm = x => { const d = new Date(x); return deux(d.getHours()) + ":" + deux(
 
 // Catalogue des événements des Habitations du Quai (mêmes messages que le dossier du module 5)
 const CAT = [
-  ["A", "SMOKE", "L1D037", "CORR 4E DEV LOG 412", "Détecteur de fumée", "Corridor 4e, devant le 412"],
-  ["A", "PULL STATION", "L1M005", "SORTIE EST RDC", "Déclencheur manuel", "Sortie est, rez-de-chaussée"],
-  ["A", "WATERFLOW", "Z03", "GICLEURS ETAGE 3", "Débit des gicleurs", "Zone 3, 3e étage"],
-  ["A", "DUCT SMOKE", "L1D090", "CONDUIT VENT. TOIT", "Détecteur de conduit", "Ventilation, toit"],
-  ["A", "HOOD SYSTEM", "L1M020", "HOTTE RESTAURANT", "Hotte du restaurant", "Extinction déclenchée"],
-  ["S", "VALVE TAMPER", "L1M031", "VANNE GICL. STATIONN.", "Vanne de gicleurs fermée", "Stationnement"],
-  ["S", "LOW AIR", "L1M032", "RESEAU SOUS AIR STAT.", "Basse pression d'air", "Réseau sous air, stationnement"],
-  ["S", "LOW TEMP", "L1M033", "LOCAL DES GICLEURS", "Basse température", "Local des gicleurs"],
-  ["T", "AC POWER FAIL", "PANEL", "PANNEAU PRINCIPAL", "Perte du 120 V", "Panneau principal"],
-  ["T", "LOW BATTERY", "PANEL", "PANNEAU PRINCIPAL", "Batterie faible", "Panneau principal"],
-  ["T", "GROUND FAULT", "PANEL", "PANNEAU PRINCIPAL", "Défaut de mise à la terre", "Quelque part sur le réseau"],
-  ["T", "NAC 2 OPEN", "NAC2", "SIGNALISATION 2E", "Circuit de signalisation ouvert", "Avertisseurs du 2e"],
-  ["T", "DIRTY DETECTOR", "L1D012", "CORR 1ER DEV LOG 108", "Détecteur encrassé", "Corridor 1er"],
-  ["T", "COMM FAIL", "DACT", "TRANSMETTEUR", "Perte de télésurveillance", "Transmetteur"]
-].map(([type, nom, adr, lieu, fr, frLieu], i) => ({k: "e" + i, type, nom, adr, lieu, fr, frLieu}));
+  ["A", "SMOKE", "L1D037", "CORR 4E DEV LOG 412", "Détecteur de fumée", "Corridor 4e, devant le 412", "4", "aerer"],
+  ["A", "PULL STATION", "L1M005", "SORTIE EST RDC", "Déclencheur manuel", "Sortie est, rez-de-chaussée", "R", "cle"],
+  ["A", "WATERFLOW", "Z03", "GICLEURS ETAGE 3", "Débit des gicleurs", "Zone 3, 3e étage", "3", "tech"],
+  ["A", "DUCT SMOKE", "L1D090", "CONDUIT VENT. TOIT", "Détecteur de conduit", "Ventilation, toit", "6", "aerer"],
+  ["A", "HOOD SYSTEM", "L1M020", "HOTTE RESTAURANT", "Hotte du restaurant", "Extinction déclenchée", "R", "tech"],
+  ["S", "VALVE TAMPER", "L1M031", "VANNE GICL. STATIONN.", "Vanne de gicleurs fermée", "Stationnement", "S", "vanne"],
+  ["S", "LOW AIR", "L1M032", "RESEAU SOUS AIR STAT.", "Basse pression d'air", "Réseau sous air, stationnement", "S", "compresseur"],
+  ["S", "LOW TEMP", "L1M033", "LOCAL DES GICLEURS", "Basse température", "Local des gicleurs", "S", "chauffage"],
+  ["T", "AC POWER FAIL", "PANEL", "PANNEAU PRINCIPAL", "Perte du 120 V", "Panneau principal", "", "courant"],
+  ["T", "LOW BATTERY", "PANEL", "PANNEAU PRINCIPAL", "Batterie faible", "Panneau principal", "", "batterie"],
+  ["T", "GROUND FAULT", "PANEL", "PANNEAU PRINCIPAL", "Défaut de mise à la terre", "Quelque part sur le réseau", "", "tech"],
+  ["T", "NAC 2 OPEN", "NAC2", "SIGNALISATION 2E", "Circuit de signalisation ouvert", "Avertisseurs du 2e", "2", "tech"],
+  ["T", "DIRTY DETECTOR", "L1D012", "CORR 1ER DEV LOG 108", "Détecteur encrassé", "Corridor 1er", "", "tech"],
+  ["T", "COMM FAIL", "DACT", "TRANSMETTEUR", "Perte de télésurveillance", "Transmetteur", "", "tech"],
+  ["T", "ZONE DISABLED", "Z04", "ZONE 4 HORS SERVICE", "Zone 4 hors service", "Travaux au 4e (isolée)", "4", "tech"]
+].map(([type, nom, adr, lieu, fr, frLieu, zone, fix], i) => ({k: "e" + i, type, nom, adr, lieu, fr, frLieu, zone, fix}));
+// Actions « sur le terrain » de l'élève
+const TERRAIN = [
+  ["cle", "Réarmer le déclencheur avec la clé"], ["aerer", "Aérer : la fumée est dissipée"],
+  ["vanne", "Rouvrir la vanne de gicleurs"], ["compresseur", "Redémarrer le compresseur"],
+  ["chauffage", "Rétablir le chauffage du local"], ["courant", "Le courant est rétabli"],
+  ["batterie", "Vérifier la batterie (rebrancher, laisser recharger)"], ["tech", "Appeler le technicien en alarme incendie"],
+  ["pompiers", "Les pompiers autorisent le réarmement"]
+];
+const ZONES = [["S", "STAT."], ["R", "RDC"], ["2", "2E"], ["3", "3E"], ["4", "4E"], ["5", "5E"], ["6", "6E"]];
 const TYPE_EN = {A: "ALARM", S: "SUPV", T: "TROUBLE"};
 const TYPE_FR = {A: "Alarme", S: "Supervision", T: "Trouble"};
 const PRIO = {A: 0, S: 1, T: 2};
@@ -286,7 +320,7 @@ function panneau(code){
   const moi = Math.random().toString(36).slice(2, 9);
   let equipe = "";
   let evs = [];          // {id, k, t, ack, cause}
-  let sel = 0, silence = false, lamp = false;
+  let sel = 0, silence = false, lamp = false, drill = false, silTr = false, sonOn = true;
   const journal = [];
 
   // ---- son
@@ -296,8 +330,8 @@ function panneau(code){
       g.gain.value = vol; o.start(); o.stop(ac.currentTime + dur); } catch(e) {}
   }
   function sons(){
-    const alarme = evs.some(e => typ(e) === "A") && !silence;
-    const nonAck = evs.some(e => !e.ack);
+    const alarme = sonOn && ((evs.some(e => typ(e) === "A") && !silence) || drill);
+    const nonAck = sonOn && !silTr && evs.some(e => !e.ack);
     if (alarme && !sonA) { // avertisseurs : code temporel 3 (0,5 s × 3, pause 1,5 s)
       const cycle = () => { [0, 1, 2].forEach(i => setTimeout(() => ton(740, .5, .09), i * 1000)); };
       cycle(); sonA = setInterval(cycle, 4000);
@@ -317,7 +351,10 @@ function panneau(code){
   function afficher(){
     const L = $("lcd").children;
     const pad = s => (s + " ".repeat(30)).slice(0, 30);
-    if (!evs.length) {
+    if (!evs.length && drill) {
+      L[0].textContent = pad("DRILL IN PROGRESS"); L[1].textContent = pad("EXERCICE D'EVACUATION");
+      L[2].textContent = pad(hm(Date.now())); L[3].textContent = pad("");
+    } else if (!evs.length) {
       const d = new Date();
       L[0].textContent = pad("SYSTEM NORMAL"); L[1].textContent = pad("LES HABITATIONS DU QUAI");
       L[2].textContent = pad(hm(d).slice(0, 5) + "  " + d.toLocaleDateString("fr-CA"));
@@ -335,6 +372,11 @@ function panneau(code){
     set("lCA", !evs.some(e => e.k === "e8"));
     set("lA", has("A"), nonAck("A")); set("lS", has("S"), nonAck("S")); set("lT", has("T") || evs.some(e => e.k === "e8"), nonAck("T"));
     set("lSil", silence && has("A"));
+    set("lHS", evs.some(e => e.k === "e14"));
+    $("zones").innerHTML = "<b>ZONES</b>" + ZONES.map(([z, n]) => {
+      const a = lamp || evs.some(e => typ(e) === "A" && ev(e).zone === z), t = !a && evs.some(e => e.k === "e14" && z === "4");
+      return `<span class="${a ? "zA" : t ? "zT" : ""}"><i></i>${n}</span>`; }).join("");
+    $("strobe").classList.toggle("on", lamp || drill || (has("A") && !silence));
     sons();
   }
   setInterval(() => { if (!evs.length) afficher(); }, 15000);
@@ -342,7 +384,7 @@ function panneau(code){
   function ajouter(e, silencieux){
     if (evs.some(x => x.id === e.id)) return;
     evs.push({id: e.id, k: e.k, t: e.t || Date.now(), ack: false, cause: !!e.cause});
-    if (typ(e) === "A") silence = false;
+    if (typ(e) === "A") silence = false; else silTr = false;
     trier(); sel = 0; noter(TYPE_EN[ev(e).type] + " " + ev(e).nom + " " + ev(e).adr);
     afficher(); if (!silencieux) envoyer(topic, {m: "ici", moi, equipe, etat: etatGlobal()});
   }
@@ -364,17 +406,21 @@ function panneau(code){
     rapporter("Silence signal", true);
   };
   $("kRaz").onclick = () => {
+    if (!evs.length && drill) { drill = false; noter("SYSTEM RESET"); afficher(); dire("Exercice terminé : système normal."); rapporter("Réarmement (fin de l'exercice)"); return; }
     if (!evs.length) { dire("Le système est déjà normal."); rapporter("Réarmement : déjà normal"); return; }
     noter("SYSTEM RESET");
     const alarmes = evs.filter(e => typ(e) === "A");
-    const bloque = alarmes.filter(e => !e.cause);
+    const pret = e => e.cause || (e.fixe && e.auth);
+    const bloque = alarmes.filter(e => !pret(e));
+    if (drill) { drill = false; noter("DRILL END"); }
     if (bloque.length) {
       // la cause est encore là : l'alarme revient aussitôt
-      evs = evs.filter(e => typ(e) !== "A" || !e.cause);
+      evs = evs.filter(e => typ(e) !== "A" || !pret(e));
       bloque.forEach(e => { e.ack = false; e.t = Date.now(); noter("ALARM " + ev(e).nom + " " + ev(e).adr); });
       silence = false; trier(); sel = 0; afficher();
-      dire("L'alarme revient : la cause n'est pas réglée. On ne réarme pas avant l'autorisation du service incendie.");
-      rapporter("Réarmement trop tôt : l'alarme est revenue", true);
+      const raison = bloque.some(e => !e.fixe && !e.cause) ? "la cause est encore là" : "les pompiers n'ont pas autorisé le réarmement";
+      dire("L'alarme revient : " + raison + ".");
+      rapporter("Réarmement trop tôt (" + raison + ") : l'alarme est revenue", true);
     } else {
       evs = evs.filter(e => typ(e) !== "A"); silence = false; sel = 0; afficher();
       dire(evs.length ? "Alarmes réarmées. Les troubles et supervisions restent tant que la cause est là." : "Système revenu à la normale.");
@@ -382,6 +428,45 @@ function panneau(code){
     }
   };
   $("kLamp").onclick = () => { lamp = true; afficher(); noter("LAMP TEST"); rapporter("Essai des voyants"); setTimeout(() => { lamp = false; afficher(); }, 3000); };
+  $("kStr").onclick = () => {
+    if (!evs.some(e => typ(e) !== "A")) { dire("Aucun trouble ni supervision."); rapporter("Silence trouble : rien à faire taire"); return; }
+    silTr = true; noter("TROUBLE SILENCE"); afficher();
+    dire("Le bip est arrêté. Le trouble reste affiché tant que la cause n'est pas réglée."); rapporter("Silence trouble");
+  };
+  $("kDrl").onclick = () => {
+    if (drill) { drill = false; noter("DRILL END"); afficher(); dire("Exercice terminé."); rapporter("Fin de l'exercice"); return; }
+    drill = true; noter("DRILL"); afficher();
+    dire("Exercice : tout l'immeuble sonne. Un exercice se planifie et s'annonce avant (touche encore pour arrêter).");
+    rapporter("Exercice déclenché", true);
+  };
+  $("kSon").onclick = () => { sonOn = !sonOn; $("kSon").textContent = "Son : " + (sonOn ? "activé" : "coupé"); afficher(); };
+  $("terrain").innerHTML = TERRAIN.map(([k, t]) => `<button data-a="${k}">${esc(t)}</button>`).join("");
+  document.querySelectorAll("#terrain button").forEach(b => b.onclick = () => terrain(b.dataset.a, b.textContent));
+  function terrain(k, txt){
+    if (k === "pompiers") {
+      const al = evs.filter(e => typ(e) === "A");
+      if (!al.length) { dire("Il n'y a pas d'alarme : les pompiers n'ont rien à autoriser."); rapporter(txt + " : aucune alarme", true); return; }
+      al.forEach(e => e.auth = true); noter("FIRE DEPT AUTHORIZATION");
+      dire(al.some(e => !e.fixe && !e.cause) ? "Autorisation reçue. Il faut encore régler la cause avant de réarmer." : "Autorisation reçue : tu peux réarmer.");
+      rapporter(txt); return;
+    }
+    const vis = evs.filter(e => ev(e).fix === k && !e.fixe && !e.tech);
+    if (!vis.length) {
+      dire(k === "tech" ? "Le technicien : rien sur ce panneau ne demande une réparation de ma part." : "Rien ne change sur le panneau : ce n'est pas la bonne action.");
+      rapporter(txt + " : rien ne change", true); return;
+    }
+    vis.forEach(e => {
+      const c = ev(e);
+      if (k === "tech") { e.tech = true; noter("SERVICE CALL " + c.adr); return; }
+      if (c.type === "A") { e.fixe = true; noter("FIELD: " + c.nom + " CLEARED"); }
+      else { evs = evs.filter(x => x !== e); noter(TYPE_EN[c.type] + " RESTORED " + c.adr); }
+    });
+    afficher();
+    if (k === "tech") dire("Technicien appelé : il viendra réparer. L'événement reste affiché jusqu'à sa réparation.");
+    else if (vis.some(e => typ(e) === "A")) dire("Cause réglée sur le terrain. Pour réarmer, il faut aussi l'autorisation des pompiers.");
+    else dire("Cause réglée : l'événement est rétabli (RESTORED).");
+    rapporter(txt);
+  }
   $("vJournal").onclick = () => $("journal").classList.toggle("cache");
 
   // ---- démarrage (le toucher débloque le son sur l'iPad)
