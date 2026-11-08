@@ -3,84 +3,98 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="theme-color" content="#141414">
+<meta name="theme-color" content="#121212">
 <title>Télécommande</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.50.0/dist/umd/supabase.min.js"></script>
 <style>
-:root{--fond:#141414;--carte:#232323;--carte2:#2E2E2E;--txt:#F2EFEA;--gris:#A8A29A;--rouge:#E50914;--vert:#2E9E5B}
+:root{--fond:#121212;--carte:#1E1E1E;--carte2:#2C2C2C;--txt:#F2EFEA;--gris:#A8A29A;--rouge:#E50914;--vert:#2E9E5B}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;height:100%;background:var(--fond);color:var(--txt);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;overscroll-behavior:none;-webkit-user-select:none;user-select:none}
-body{display:flex;flex-direction:column;padding:calc(env(safe-area-inset-top) + 12px) 14px calc(env(safe-area-inset-bottom) + 14px)}
-.haut{display:flex;align-items:center;gap:10px}
-.haut img{height:22px}
-.etat{margin-left:auto;font-size:13px;color:var(--gris);display:flex;align-items:center;gap:6px}
-.etat i{width:9px;height:9px;border-radius:50%;background:#777}.etat.ok i{background:var(--vert)}.etat.ko i{background:var(--rouge)}
-h1{font-size:19px;margin:14px 0 2px;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.ou{color:var(--gris);font-size:14px;min-height:18px}
-.barre{height:5px;background:var(--carte2);border-radius:3px;margin:10px 0 14px;overflow:hidden}.barre b{display:block;height:100%;width:0;background:var(--rouge);transition:width .3s}
-.page{font-size:56px;font-weight:800;text-align:center;letter-spacing:-.02em;line-height:1}
-.page small{font-size:20px;color:var(--gris);font-weight:600}
-.fleches{flex:1;display:grid;grid-template-columns:1fr 1.6fr;gap:12px;margin:16px 0 12px;min-height:180px}
-.fleches button{border:0;border-radius:22px;background:var(--carte);color:var(--txt);font-size:64px;font-weight:300;touch-action:manipulation;transition:transform .08s,background .15s}
-.fleches #suiv{background:var(--rouge)}
-.fleches button:active{transform:scale(.97);background:#3a3a3a}.fleches #suiv:active{background:#B80710}
-.outils{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-.outils button,.bas button{border:0;border-radius:14px;background:var(--carte);color:var(--txt);min-height:64px;font:600 12px system-ui,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;touch-action:manipulation}
-.outils button:active,.bas button:active{background:var(--carte2)}
-.outils button.on{background:#F2EFEA;color:#141414}
-.outils svg,.bas svg{width:24px;height:24px}
-.bas{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:8px;margin-top:8px}
-.bas button{flex-direction:row;font-size:15px}
+body{display:flex;flex-direction:column;padding:calc(env(safe-area-inset-top) + 10px) 14px calc(env(safe-area-inset-bottom) + 12px)}
+button{font-family:inherit;touch-action:manipulation}
+svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.cache{display:none!important}
+/* haut */
+.l1{display:flex;align-items:center;gap:10px}
+.l1 img{height:20px}
+.etat{margin-left:auto;font-size:13px;color:var(--gris);display:flex;align-items:center;gap:6px;background:var(--carte);border-radius:20px;padding:6px 11px}
+.etat i{width:8px;height:8px;border-radius:50%;background:#777}.etat.ok{color:#7BD39A}.etat.ok i{background:var(--vert)}.etat.ko i{background:var(--rouge)}
+.l2{display:flex;align-items:center;gap:10px;margin-top:12px}
+.l2 h1{flex:1;min-width:0;font-size:17px;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#bTdb{flex:none;border:0;background:var(--carte);color:var(--txt);border-radius:12px;padding:9px 12px;font-size:13px;font-weight:700;display:flex;gap:6px;align-items:center}
+#bTdb svg{width:18px;height:18px}
+#bTdb.on{background:var(--txt);color:var(--fond)}
+.page{display:flex;align-items:baseline;gap:8px;margin-top:8px}
+.page b{font-size:44px;font-weight:800;letter-spacing:-.02em;line-height:1.05}
+.page span{color:var(--gris);font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.barre{height:4px;background:var(--carte2);border-radius:2px;margin-top:8px;overflow:hidden}.barre i{display:block;height:100%;width:0;background:var(--rouge);transition:width .3s}
+.mods{display:flex;gap:6px;margin-top:10px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding-bottom:2px}
+.mods::-webkit-scrollbar{display:none}
+.mods button{flex:none;border:0;background:var(--carte);color:var(--gris);border-radius:10px;padding:9px 11px;font-size:13px;font-weight:700;white-space:nowrap}
+.mods button.on{background:#3a1012;color:#fff;box-shadow:inset 0 0 0 1.5px var(--rouge)}
+.mods em{font-style:normal;color:var(--txt);margin-right:5px}
+/* pavé */
+.pad{flex:1;min-height:170px;margin:12px 0 10px;border-radius:24px;background:#181818;border:1px solid #2C2C2C;position:relative;overflow:hidden;touch-action:none;
+  background-image:radial-gradient(circle,#333 1.2px,transparent 1.4px);background-size:22px 22px}
+.cote{position:absolute;top:0;bottom:0;width:50%;display:flex;align-items:center;justify-content:center;font-size:62px;font-weight:300;color:#bbb;pointer-events:none;transition:background .15s}
+.cote.g{left:0}.cote.d{right:0;color:#fff;background:linear-gradient(90deg,transparent,rgba(229,9,20,.22))}
+.cote.flash{background:rgba(255,255,255,.12)!important}
+.aide{position:absolute;left:0;right:0;bottom:12px;text-align:center;font-size:12px;color:#8a857e;pointer-events:none;padding:0 12px}
+.doigt{position:absolute;width:50px;height:50px;margin:-25px 0 0 -25px;border-radius:50%;background:rgba(229,9,20,.3);border:2px solid var(--rouge);pointer-events:none;display:none}
+.pad.laser{background:#120606;background-image:none;border-color:#5a1414}
+.pad.laser .cote{display:none}
+.pad.laser .doigt{width:22px;height:22px;margin:-11px 0 0 -11px;background:#FF2A2A;box-shadow:0 0 14px 4px rgba(255,42,42,.7)}
+.zoomtag{position:absolute;top:10px;right:12px;font-size:12px;font-weight:700;color:var(--gris);background:rgba(0,0,0,.4);border-radius:8px;padding:3px 8px;pointer-events:none}
+/* bas */
+.seg{display:grid;grid-template-columns:repeat(3,1fr);background:var(--carte);border-radius:14px;padding:4px}
+.seg button{border:0;background:transparent;color:var(--gris);border-radius:10px;padding:10px;font-size:14px;font-weight:700}
+.seg button.on{background:var(--txt);color:var(--fond)}
+.outils{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+.outils button{border:0;background:var(--carte);color:var(--txt);border-radius:14px;height:60px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:11px;font-weight:700}
+.outils button:active,.mods button:active,#bTdb:active{filter:brightness(1.3)}
+.outils button.on{background:var(--txt);color:var(--fond)}
+.outils button:disabled{opacity:.35}
+.outils b{font-size:15px}
+/* feuille Aller à */
 .feuille{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:flex-end;z-index:5}
 .feuille[hidden]{display:none}
-.feuille>div{background:#1C1C1C;width:100%;max-height:82vh;border-radius:20px 20px 0 0;padding:16px 14px calc(env(safe-area-inset-bottom) + 16px);display:flex;flex-direction:column;gap:12px}
+.feuille>div{background:#1A1A1A;width:100%;max-height:84vh;border-radius:20px 20px 0 0;padding:16px 14px calc(env(safe-area-inset-bottom) + 16px);display:flex;flex-direction:column;gap:12px}
 .feuille h2{margin:0;font-size:17px;display:flex;justify-content:space-between;align-items:center}
 .feuille h2 button{border:0;background:var(--carte2);color:var(--txt);border-radius:10px;width:40px;height:40px;font-size:18px}
 .saut{display:flex;gap:8px}.saut input{flex:1;min-width:0;font:700 24px system-ui;background:var(--carte);border:1px solid #3a3a3a;color:var(--txt);border-radius:12px;padding:10px 14px}
-.saut button{border:0;border-radius:12px;background:var(--rouge);color:#fff;font:700 17px system-ui;padding:0 20px}
+.saut button{border:0;border-radius:12px;background:var(--rouge);color:#fff;font-size:17px;font-weight:700;padding:0 20px}
 .liste{overflow:auto;display:flex;flex-direction:column;gap:6px;-webkit-overflow-scrolling:touch}
-.liste button{border:0;text-align:left;background:var(--carte);color:var(--txt);border-radius:12px;padding:13px 14px;font:600 15px system-ui;display:flex;gap:12px;align-items:center}
-.liste button.ici{outline:2px solid var(--rouge)}
+.liste button{border:0;text-align:left;background:var(--carte);color:var(--txt);border-radius:12px;padding:13px 14px;font-size:15px;font-weight:600;display:flex;gap:12px;align-items:center}
+.liste button.on{box-shadow:inset 0 0 0 2px var(--rouge)}
 .liste em{font-style:normal;min-width:30px;height:30px;border-radius:8px;background:var(--carte2);display:inline-flex;align-items:center;justify-content:center;font-size:13px}
 .liste span{flex:1}.liste small{color:var(--gris);font-weight:500}
+/* attente */
 .vide{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:var(--gris);gap:12px;padding:20px;font-size:16px;line-height:1.45}
 .vide b{color:var(--txt);font-size:20px}
-.cache{display:none!important}
-.mode{display:grid;grid-template-columns:.8fr 1.3fr .8fr;gap:4px;background:var(--carte);border-radius:12px;padding:4px;margin-top:14px}
-.mode button{border:0;border-radius:9px;background:transparent;color:var(--gris);font:700 14px system-ui;padding:9px}
-.mode button.on{background:var(--carte2);color:var(--txt)}
-.pad{flex:1;margin:12px 0;min-height:180px;border-radius:22px;background:#1B1B1B;border:1px solid #333;position:relative;touch-action:none;overflow:hidden;
-  background-image:radial-gradient(circle,#3a3a3a 1.2px,transparent 1.4px);background-size:22px 22px}
-.pad span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--gris);font-size:15px;padding:20px;pointer-events:none;line-height:1.4}
-.pad.laser{background-image:none;background:#120606;border-color:#5a1414}
-.pad.laser i{width:22px;height:22px;margin:-11px 0 0 -11px;background:#FF2A2A;box-shadow:0 0 14px 4px rgba(255,42,42,.7)}
-.pad i{position:absolute;width:54px;height:54px;margin:-27px 0 0 -27px;border-radius:50%;background:rgba(229,9,20,.35);border:2px solid var(--rouge);pointer-events:none;display:none}
 </style>
 </head>
 <body>
-<div class="haut"><img src="img/pavillon-avenir-blanc.png" alt="Pavillon de l'Avenir"><span class="etat" id="etat"><i></i><span>Connexion…</span></span></div>
+<div class="l1"><img src="img/pavillon-avenir-blanc.png" alt="Pavillon de l'Avenir"><span class="etat" id="etat"><i></i><span>Connexion…</span></span></div>
 
 <div id="attente" class="vide"><b>Télécommande</b><span id="attTxt">Connexion à l'ordinateur du tableau…</span></div>
 
-<div id="tele" class="cache" style="display:flex;flex-direction:column;flex:1">
-  <h1 id="titre"></h1>
-  <div class="ou" id="ou"></div>
-  <div class="barre"><b id="prog"></b></div>
-  <div class="page" id="page">–</div>
-  <div class="mode"><button id="mPages" class="on">Pages</button><button id="mPad">Zoom et déplacer</button><button id="mLaser">Laser</button></div>
-  <div class="pad cache" id="pad"><span id="padTxt">Un doigt : te promener. Deux doigts : pincer pour zoomer.</span><i id="padDoigt"></i></div>
-  <div class="fleches"><button id="prec" aria-label="Page précédente">‹</button><button id="suiv" aria-label="Page suivante">›</button></div>
-  <div class="outils">
-    <button id="bRep"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg><span id="bRepT">Réponses</span></button>
-    <button id="bAnim"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M8 5l11 7-11 7z"/></svg>Animation</button>
-    <button id="bNoir"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="12" rx="1.5" fill="currentColor"/><path d="M8 21h8"/></svg>Écran noir</button>
-    <button id="bAller"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h14M5 12h14M5 17h9"/></svg>Modules</button>
+<div id="tele" class="cache" style="display:flex;flex-direction:column;flex:1;min-height:0">
+  <div class="l2"><h1 id="titre"></h1><button id="bTdb"><svg viewBox="0 0 24 24"><rect x="3.5" y="4" width="17" height="12.5" rx="1.5"/><path d="M8 20h8M12 16.5V20"/></svg><span id="bTdbT">Tableau de bord</span></button></div>
+  <div class="page"><b id="pNum">–</b><span id="pInfo"></span></div>
+  <div class="barre"><i id="prog"></i></div>
+  <div class="mods" id="mods"></div>
+  <div class="pad" id="pad">
+    <div class="cote g" id="cG">‹</div><div class="cote d" id="cD">›</div>
+    <span class="zoomtag cache" id="zTag"></span>
+    <div class="aide" id="aide">Toucher : tourner · Pincer : zoomer · Glisser : se déplacer</div>
+    <i class="doigt" id="doigt"></i>
   </div>
-  <div class="bas">
-    <button id="bZv">100 %</button>
-    <button id="bZo" aria-label="Zoom arrière"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M8 11h6M16 16l4 4"/></svg></button>
-    <button id="bZi" aria-label="Zoom avant"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M8 11h6M11 8v6M16 16l4 4"/></svg></button>
-    <button id="bPage" aria-label="Aller à une page">#</button>
+  <div class="seg"><button id="sPages" class="on">Pages</button><button id="sLaser">Laser</button><button id="sAller">Aller à…</button></div>
+  <div class="outils">
+    <button id="bRep"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7"/></svg><span id="bRepT">Réponses</span></button>
+    <button id="bAnim"><svg viewBox="0 0 24 24"><path d="M8 5l11 7-11 7z"/></svg>Animation</button>
+    <button id="bNoir"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="12" rx="1.5" fill="currentColor"/><path d="M8 21h8"/></svg>Écran noir</button>
+    <button id="bZv"><b>100 %</b>Zoom</button>
   </div>
 </div>
 
@@ -91,63 +105,71 @@ h1{font-size:19px;margin:14px 0 2px;line-height:1.25;display:-webkit-box;-webkit
 </div></div>
 
 <script>
-/* Télécommande des livres (Bibliothèque du Pavillon de l'Avenir).
+/* Télécommande des livres (Bibliothèque du Pavillon de l'Avenir) — version « tout en un pavé » (7 nov.).
    Ouverte par le code QR du bouton « Télécommande » du lecteur : telecommande.html#k=<jeton>.
-   Envoie des ordres {m:"cmd", c} sur le canal Supabase « pda-livre-<jeton> »; reçoit l'état du livre {m:"etat"}. */
+   Envoie {m:"cmd", c} sur le canal Supabase « pda-livre-<jeton> », signe de vie {m:"vie"} aux 10 s; reçoit l'état du livre {m:"etat"}.
+   Pavé : toucher à droite/gauche = page suivante/précédente, 1 doigt glissé = se déplacer, 2 doigts = zoom; onglet Laser = point rouge au tableau. */
 const $ = id => document.getElementById(id);
 const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"})[c]);
 const SB_URL = "https://kjlotlhqrgekzohshmbn.supabase.co", SB_CLE = "sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY";
 const jeton = (/k=([a-z0-9]{8,})/.exec(location.hash) || [])[1];
-let canal = null, pret = false, E = null, vuA = 0;
+let canal = null, pret = false, E = null, vuA = 0, laser = false, modsCle = "";
 
 function etat(t, cls){ const e = $("etat"); e.className = "etat " + (cls || ""); e.lastChild.textContent = t; }
 function envoyer(o){ if (canal && pret) canal.send({type: "broadcast", event: "m", payload: o}).catch(() => {}); }
 function cmd(c, x){ if (navigator.vibrate) navigator.vibrate(12); envoyer(Object.assign({m: "cmd", c}, x || {})); }
 
+function modIci(){ let r = -1; (E.mods || []).forEach((m, i) => { if (m.p != null && m.p <= E.page) r = i; }); return r; }
+const courte = t => { t = String(t || ""); return t.length > 22 ? t.slice(0, 21) + "…" : t; };
 function rendre(){
   const ok = E && E.ouvert;
   $("attente").classList.toggle("cache", !!ok); $("tele").classList.toggle("cache", !ok);
-  if (!ok){ $("attTxt").textContent = E ? "Branché ✓. Ouvre un livre sur l'ordinateur du tableau." : "Connexion à l'ordinateur du tableau…"; return; }
+  if (!ok){ $("attTxt").textContent = E ? "Branché. Ouvre un livre sur l'ordinateur du tableau." : "Connexion à l'ordinateur du tableau…"; return; }
   $("titre").textContent = E.titre || "";
-  const m = modIci(); $("ou").textContent = m ? (m.tag ? "Module " + m.tag + " — " : "") + m.t : "";
-  $("page").innerHTML = esc(E.label || E.page) + (E.tot ? ` <small>/ ${E.tot}</small>` : "");
+  const i = modIci(), m = (E.mods || [])[i];
+  $("pNum").textContent = E.label || E.page;
+  $("pInfo").textContent = (E.tot ? "/ " + E.tot : "") + (m && m.tag ? " · Module " + m.tag : m ? " · " + m.t : "");
   $("prog").style.width = E.tot ? Math.min(100, 100 * E.page / E.tot) + "%" : "0";
-  $("bRep").disabled = E.ans == null; $("bRep").style.opacity = E.ans == null ? .35 : 1;
-  $("bRep").classList.toggle("on", E.ans > 0); $("bRepT").textContent = E.ans === 1 ? "Pas à pas" : E.ans === 2 ? "Toutes" : "Réponses";
+  /* pastilles des modules (refaites seulement si la liste change) */
+  const cle = JSON.stringify(E.mods || []);
+  if (cle !== modsCle){ modsCle = cle;
+    $("mods").innerHTML = (E.mods || []).map((x, k) => `<button data-i="${k}">${x.tag ? `<em>${esc(x.tag)}</em>` : ""}${esc(courte(x.t))}</button>`).join("");
+    $("mods").querySelectorAll("[data-i]").forEach(b => b.onclick = () => cmd("mod", {i: +b.dataset.i})); }
+  $("mods").classList.toggle("cache", !(E.mods || []).length);
+  $("mods").querySelectorAll("[data-i]").forEach(b => { const on = +b.dataset.i === i; if (on && !b.classList.contains("on")) b.scrollIntoView({inline: "center", block: "nearest", behavior: "smooth"}); b.classList.toggle("on", on); });
+  $("bTdb").classList.toggle("on", !!E.tdb); $("bTdbT").textContent = E.tdb ? "Revenir au livre" : "Tableau de bord";
+  $("bRep").disabled = E.ans == null; $("bRep").classList.toggle("on", E.ans > 0);
+  $("bRepT").textContent = E.ans === 1 ? "Pas à pas" : E.ans === 2 ? "Toutes" : "Réponses";
   $("bNoir").classList.toggle("on", !!E.noir);
-  $("bAller").style.opacity = (E.mods || []).length ? 1 : .35;
+  const z = E.zoom || 1; $("zTag").classList.toggle("cache", z < 1.02); $("zTag").textContent = Math.round(z * 100) + " %";
   if (!$("feuille").hidden) liste();
-  majPad();
 }
-function modIci(){ let r = null; (E.mods || []).forEach(m => { if (m.p != null && m.p <= E.page) r = m; }); return r; }
+
+/* onglets du bas */
+function onglet(n){ laser = n === "laser"; $("sPages").classList.toggle("on", !laser); $("sLaser").classList.toggle("on", laser); $("pad").classList.toggle("laser", laser);
+  $("aide").textContent = laser ? "Le pavé = l'écran du tableau : le point rouge suit ton doigt." : "Toucher : tourner · Pincer : zoomer · Glisser : se déplacer"; }
+$("sPages").onclick = () => onglet("pages"); $("sLaser").onclick = () => onglet("laser"); $("sAller").onclick = () => ouvrir();
+$("bTdb").onclick = () => cmd("tdb");
+$("bRep").onclick = () => cmd("rep"); $("bAnim").onclick = () => cmd("anim"); $("bNoir").onclick = () => cmd("noir"); $("bZv").onclick = () => cmd("zv");
+
+/* feuille « Aller à… » */
 function liste(){
   const ici = modIci();
-  $("fListe").innerHTML = (E.mods || []).map((m, i) => `<button data-i="${i}" class="${m === ici ? "ici" : ""}"><em>${esc(m.tag || "•")}</em><span>${esc(m.t)}</span>${m.p ? `<small>p. ${m.p}</small>` : ""}</button>`).join("") || '<div style="color:var(--gris);padding:8px">Ce livre n\'a pas de table des matières.</div>';
+  $("fListe").innerHTML = (E.mods || []).map((m, i) => `<button data-i="${i}" class="${i === ici ? "on" : ""}"><em>${esc(m.tag || "•")}</em><span>${esc(m.t)}</span>${m.p ? `<small>p. ${m.p}</small>` : ""}</button>`).join("") || '<div style="color:var(--gris);padding:8px">Ce livre n\'a pas de table des matières.</div>';
   $("fListe").querySelectorAll("[data-i]").forEach(b => b.onclick = () => { cmd("mod", {i: +b.dataset.i}); fermer(); });
 }
-function ouvrir(focusNum){ $("feuille").hidden = false; $("fNum").value = ""; $("fNum").placeholder = E && E.tot ? "Page (1 à " + E.tot + ")" : "Page"; liste();
-  const ici = $("fListe").querySelector(".ici"); if (ici) ici.scrollIntoView({block: "center"}); if (focusNum) $("fNum").focus(); }
+function ouvrir(){ $("feuille").hidden = false; $("fNum").value = ""; $("fNum").placeholder = E && E.tot ? "Page (1 à " + E.tot + ")" : "Page"; liste();
+  const ici = $("fListe").querySelector(".on"); if (ici) ici.scrollIntoView({block: "center"}); }
 function fermer(){ $("feuille").hidden = true; $("fNum").blur(); }
-
-$("prec").onclick = () => cmd("prev"); $("suiv").onclick = () => cmd("next");
-$("bRep").onclick = () => cmd("rep"); $("bAnim").onclick = () => cmd("anim"); $("bNoir").onclick = () => cmd("noir");
-$("bZi").onclick = () => { cmd("zi"); mode(true); }; $("bZo").onclick = () => cmd("zo"); $("bZv").onclick = () => { cmd("zv"); mode(false); };
-$("bAller").onclick = () => ouvrir(false); $("bPage").onclick = () => ouvrir(true);
 $("fFermer").onclick = fermer; $("feuille").onclick = e => { if (e.target.id === "feuille") fermer(); };
 $("fGo").onclick = () => { const n = parseInt($("fNum").value, 10); if (n > 0){ cmd("goto", {n}); fermer(); } };
 $("fNum").onkeydown = e => { if (e.key === "Enter") $("fGo").click(); };
 document.addEventListener("dblclick", e => e.preventDefault(), {passive: false});
 
-/* Pad tactile : glisser = se déplacer dans la page zoomée (comme le pavé d'un portable) */
-let modePad = false, laser = false;
-function mode(p, las){ modePad = p; laser = !!las; $("mPad").classList.toggle("on", p && !laser); $("mPages").classList.toggle("on", !p); $("mLaser").classList.toggle("on", laser);
-  $("pad").classList.toggle("cache", !p); $("pad").classList.toggle("laser", laser); document.querySelector(".fleches").classList.toggle("cache", p); majPad(); }
-function majPad(){ $("padTxt").textContent = laser ? "Le pavé = l'écran du tableau. Pose le doigt : le point rouge apparaît au même endroit." : E && E.zoom > 1.02 ? "Un doigt : te promener. Deux doigts : pincer pour zoomer." : "Pince avec deux doigts pour zoomer, puis glisse un doigt pour te promener."; }
-$("mPages").onclick = () => mode(false); $("mPad").onclick = () => mode(true); $("mLaser").onclick = () => mode(true, true);
+/* le pavé */
 (function(){
-  /* 1 doigt = se déplacer; 2 doigts = pincer pour zoomer (comme sur une photo) */
-  const pad = $("pad"), dg = $("padDoigt"), P = new Map(); let acc = [0, 0], f = 1, minu = null, dist0 = 0;
-  const vider = () => { minu = null;
+  const pad = $("pad"), dg = $("doigt"), P = new Map(); let acc = [0, 0], f = 1, minu = null, dist0 = 0, t0 = 0, p0 = null, bouge = 0, deux = false;
+  const vider = () => { clearTimeout(minu); minu = null;
     if (acc[0] || acc[1]){ envoyer({m: "cmd", c: "pan", dx: Math.round(acc[0]), dy: Math.round(acc[1])}); acc = [0, 0]; }
     if (Math.abs(f - 1) > .01){ envoyer({m: "cmd", c: "pz", f: +f.toFixed(3)}); f = 1; } };
   const plus = () => { if (!minu) minu = setTimeout(vider, 50); };
@@ -157,26 +179,35 @@ $("mPages").onclick = () => mode(false); $("mPad").onclick = () => mode(true); $
   const laserEnv = () => { lasT = null; if (las) envoyer({m: "cmd", c: "laser", x: las[0], y: las[1], on: las[2]}); };
   const laserA = (e, on) => { const r = pad.getBoundingClientRect(); las = [+((e.clientX - r.left) / r.width).toFixed(4), +((e.clientY - r.top) / r.height).toFixed(4), on];
     if (!on){ clearTimeout(lasT); laserEnv(); } else if (!lasT) lasT = setTimeout(laserEnv, 40); };
-  pad.addEventListener("pointerdown", e => { if (laser){ e.preventDefault(); try { pad.setPointerCapture(e.pointerId); } catch(x){} P.set(e.pointerId, 1); montrer(e); laserA(e, 1); return; } });
-  pad.addEventListener("pointermove", e => { if (laser && P.has(e.pointerId)){ e.preventDefault(); montrer(e); laserA(e, 1); } });
-  pad.addEventListener("pointerup", e => { if (laser && P.has(e.pointerId)) laserA(e, 0); });
-  pad.addEventListener("pointercancel", e => { if (laser && P.has(e.pointerId)) laserA(e, 0); });
-  pad.addEventListener("pointerdown", e => { if (laser) return; e.preventDefault(); try { pad.setPointerCapture(e.pointerId); } catch(x){} P.set(e.pointerId, [e.clientX, e.clientY]); montrer(e); if (P.size === 2) dist0 = ecart(); });
-  pad.addEventListener("pointermove", e => { if (laser || !P.has(e.pointerId)) return; e.preventDefault(); const p = P.get(e.pointerId);
-    if (P.size === 1){ acc[0] += e.clientX - p[0]; acc[1] += e.clientY - p[1]; }
+  pad.addEventListener("pointerdown", e => { e.preventDefault(); try { pad.setPointerCapture(e.pointerId); } catch(x){}
+    P.set(e.pointerId, [e.clientX, e.clientY]); montrer(e);
+    if (laser){ laserA(e, 1); return; }
+    if (P.size === 1){ t0 = Date.now(); p0 = [e.clientX, e.clientY]; bouge = 0; deux = false; acc = [0, 0]; }
+    if (P.size === 2){ dist0 = ecart(); deux = true; } });
+  pad.addEventListener("pointermove", e => { if (!P.has(e.pointerId)) return; e.preventDefault(); montrer(e);
+    if (laser){ laserA(e, 1); return; }
+    const p = P.get(e.pointerId);
+    if (P.size === 1 && !deux){ acc[0] += e.clientX - p[0]; acc[1] += e.clientY - p[1]; if (p0) bouge = Math.max(bouge, Math.hypot(e.clientX - p0[0], e.clientY - p0[1])); }
     P.set(e.pointerId, [e.clientX, e.clientY]);
     if (P.size === 2){ const d = ecart(); if (dist0 > 20) f *= d / dist0; dist0 = d; }
-    montrer(e); plus(); });
-  const fin = e => { P.delete(e.pointerId); dist0 = P.size === 2 ? ecart() : 0; if (!P.size) dg.style.display = "none"; vider(); };
+    if (deux || bouge > 12) plus(); });   /* un vrai glissement (pas un toucher) : on envoie le déplacement */
+  const fin = e => { if (!P.has(e.pointerId)) return;
+    if (laser) laserA(e, 0);
+    else if (P.size === 1 && !deux && bouge <= 12 && Date.now() - t0 < 450){
+      /* simple toucher : moitié droite = suivante, gauche = précédente */
+      acc = [0, 0]; const r = pad.getBoundingClientRect(), droite = e.clientX - r.left > r.width / 2;
+      cmd(droite ? "next" : "prev"); const c = $(droite ? "cD" : "cG"); c.classList.add("flash"); setTimeout(() => c.classList.remove("flash"), 160);
+    } else vider();
+    P.delete(e.pointerId); dist0 = P.size === 2 ? ecart() : 0; if (!P.size){ dg.style.display = "none"; p0 = null; } };
   pad.addEventListener("pointerup", fin); pad.addEventListener("pointercancel", fin);
-  /* iPhone : bloquer le zoom de la page elle-même pendant le geste */
+  /* iPhone : empêcher le zoom de la page elle-même pendant le geste */
   ["touchstart", "touchmove", "gesturestart", "gesturechange"].forEach(t => pad.addEventListener(t, e => e.preventDefault(), {passive: false}));
 })();
 
 /* écran allumé tant que la télécommande est ouverte */
-let verrou = null;
-async function eveil(){ try { if ("wakeLock" in navigator && document.visibilityState === "visible") verrou = await navigator.wakeLock.request("screen"); } catch(e){} }
+async function eveil(){ try { if ("wakeLock" in navigator && document.visibilityState === "visible") await navigator.wakeLock.request("screen"); } catch(e){} }
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible"){ eveil(); envoyer({m: "allo"}); } });
+addEventListener("pagehide", () => envoyer({m: "bye"}));
 
 if (!jeton){ $("attTxt").innerHTML = "Ce lien n'est pas complet.<br>Dans le livre, touche le bouton <b>Télécommande</b> et scanne le code QR."; etat("Pas de code", "ko"); }
 else if (!window.supabase){ $("attTxt").textContent = "Impossible de joindre le relais. Vérifie Internet puis recharge la page."; etat("Hors ligne", "ko"); }
@@ -185,7 +216,8 @@ else {
   canal = sb.channel("pda-livre-" + jeton, {config: {broadcast: {self: false}}});
   canal.on("broadcast", {event: "m"}, ({payload: o}) => { if (o && o.m === "etat"){ E = o; vuA = Date.now(); etat("Branché", "ok"); rendre(); } });
   canal.subscribe(st => { pret = st === "SUBSCRIBED"; if (pret){ etat("Recherche de l'ordinateur…"); envoyer({m: "allo"}); } else etat("Reconnexion…", "ko"); });
-  /* l'ordinateur répond à « allo »; sans réponse, on redemande */
+  setInterval(() => { if (pret) envoyer({m: "vie"}); }, 10000);
+  /* l'ordinateur répond à « allo »; sans nouvelles, on redemande */
   setInterval(() => { if (pret && Date.now() - vuA > 6000){ envoyer({m: "allo"}); if (E && Date.now() - vuA > 15000) etat("Ordinateur muet", "ko"); } }, 3000);
   eveil();
 }
