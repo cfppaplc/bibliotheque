@@ -1,4 +1,5 @@
 /* Quiz des livres de la bibliothèque (7 nov.) — un quiz par livre, questions et images tirées du livre.
+   Types : choix, vrai ou faux, plusieurs bonnes (multi), remettre en ordre (ordre), calcul (nombre), trouve l'erreur (erreur), zoom mystère (zoom).
    Chaque partie tire 12 questions au hasard (réglage « Questions », modifiable avant de jouer).
    Fabriqué par Claude à partir des livres (scratchpad ql/data.py); lecture seule : « Copier et modifier » pour l'adapter. */
 window.QUIZ_LIVRES = [
@@ -17,7 +18,6 @@ window.QUIZ_LIVRES = [
 "qs": [
 {
 "q": "Les employeurs engagent souvent un préposé d'abord pour…",
-"s": 20,
 "ch": [
 "Sa rapidité",
 "Sa fiabilité et son attitude",
@@ -25,12 +25,12 @@ window.QUIZ_LIVRES = [
 "Ses diplômes"
 ],
 "bon": 1,
+"s": 20,
 "expl": "C'est le savoir-être : la façon de te comporter avec les autres. Le reste, on peut te le montrer.",
 "img": "img/labo/quiz/livres/communiquer-01.jpg"
 },
 {
 "q": "Reformuler, c'est…",
-"s": 25,
 "ch": [
 "Redire dans tes mots ce que la personne a dit, pour vérifier que tu as compris",
 "Répéter mot pour mot ce qu'elle a dit",
@@ -38,12 +38,12 @@ window.QUIZ_LIVRES = [
 "Résumer la plainte au gestionnaire par écrit"
 ],
 "bon": 0,
+"s": 25,
 "expl": "La reformulation évite la majorité des erreurs de communication.",
 "img": "img/labo/quiz/livres/communiquer-02.jpg"
 },
 {
 "q": "Pour annoncer une coupure d'eau à une personne âgée, tu…",
-"s": 25,
 "ch": [
 "Passes le message par un voisin",
 "Parles plus fort, de loin",
@@ -51,12 +51,12 @@ window.QUIZ_LIVRES = [
 "Glisses seulement un avis sous la porte"
 ],
 "bon": 2,
+"s": 25,
 "expl": "Même respect, avec un peu plus de patience et d'attention.",
 "img": "img/labo/quiz/livres/communiquer-03.jpg"
 },
 {
 "q": "À la radio, comment dit-on la lettre D ?",
-"s": 20,
 "ch": [
 "Denis",
 "Delta",
@@ -64,11 +64,11 @@ window.QUIZ_LIVRES = [
 "David"
 ],
 "bon": 1,
+"s": 20,
 "expl": "On utilise l'alphabet phonétique international : B, D, P et T se ressemblent à la radio."
 },
 {
 "q": "À la radio, le modèle « BK-40T » se dit…",
-"s": 20,
 "ch": [
 "Bravo, Kilo, 40, Thomas",
 "Bé, Ka, quarante, Té",
@@ -76,21 +76,21 @@ window.QUIZ_LIVRES = [
 "Bravo, Kilo, tiret, 4, 0, Tango"
 ],
 "bon": 3,
+"s": 20,
 "expl": "Chaque lettre devient un mot de l'alphabet phonétique."
 },
 {
 "q": "Complète : « Le robinet ___ changé. »",
-"s": 20,
 "ch": [
 "est",
 "et"
 ],
 "bon": 0,
+"s": 20,
 "expl": "« est » se remplace par « était » : le robinet était changé."
 },
 {
 "q": "Devant un locataire fâché, ton objectif est d'agir…",
-"s": 25,
 "ch": [
 "Seulement quand il se met à crier",
 "Au niveau 3 : la colère",
@@ -98,11 +98,11 @@ window.QUIZ_LIVRES = [
 "Au niveau 1 ou 2 : agacement ou frustration"
 ],
 "bon": 3,
+"s": 25,
 "expl": "Plus tu reconnais tôt les signes, plus il est facile de faire baisser la tension."
 },
 {
 "q": "Voix plus forte, répétitions, reproches : c'est quel niveau ?",
-"s": 20,
 "ch": [
 "La colère",
 "Le calme",
@@ -110,11 +110,11 @@ window.QUIZ_LIVRES = [
 "L'agacement"
 ],
 "bon": 2,
+"s": 20,
 "expl": "Ta réaction : reformule, reste calme, propose une solution."
 },
 {
 "q": "Un locataire t'offre de l'argent pour passer avant les autres. Tu…",
-"s": 20,
 "ch": [
 "Refuses : c'est un conflit d'intérêts",
 "Acceptes si c'est un petit montant",
@@ -122,11 +122,11 @@ window.QUIZ_LIVRES = [
 "Acceptes et partages avec ton collègue"
 ],
 "bon": 0,
+"s": 20,
 "expl": "Même l'apparence de favoritisme nuit à ta réputation et à celle de l'employeur."
 },
 {
 "q": "Pourquoi écrire une consigne au changement de quart ?",
-"s": 25,
 "ch": [
 "Parce que les collègues ne lisent pas leurs textos",
 "Parce qu'un message se déforme de bouche à oreille",
@@ -134,12 +134,12 @@ window.QUIZ_LIVRES = [
 "Parce que c'est plus rapide que de parler"
 ],
 "bon": 1,
+"s": 25,
 "expl": "« Fuite au 304 » devient « une fuite au 3e, je pense » après trois personnes.",
 "img": "img/labo/quiz/livres/communiquer-10.jpg"
 },
 {
 "q": "Dans une équipe d'entretien, ton supérieur immédiat est habituellement…",
-"s": 20,
 "ch": [
 "Le syndicat de copropriété",
 "Le préposé de soir",
@@ -147,11 +147,11 @@ window.QUIZ_LIVRES = [
 "Le propriétaire"
 ],
 "bon": 2,
+"s": 20,
 "expl": "Tu dois savoir qui décide, à qui tu rends compte et avec qui tu partages l'information."
 },
 {
 "q": "Dans un rapport d'incident, la « description des faits » contient…",
-"s": 25,
 "ch": [
 "Ce que le témoin aurait dû faire",
 "Ce que tu penses de la personne blessée",
@@ -159,11 +159,11 @@ window.QUIZ_LIVRES = [
 "Qui est responsable de l'accident"
 ],
 "bon": 2,
+"s": 25,
 "expl": "On écrit des faits vérifiables : heure, lieu, gestes, témoins."
 },
 {
 "q": "Dans un rapport d'incident, on note le témoin avec…",
-"s": 25,
 "ch": [
 "Son prénom seulement",
 "Sa signature seulement",
@@ -171,11 +171,11 @@ window.QUIZ_LIVRES = [
 "Son nom, son logement et son numéro de téléphone"
 ],
 "bon": 3,
+"s": 25,
 "expl": "Il faut pouvoir le joindre plus tard."
 },
 {
 "q": "Pour un locataire, l'image du préposé, c'est…",
-"s": 25,
 "ch": [
 "L'image de l'immeuble",
 "L'affaire du gestionnaire seulement",
@@ -183,12 +183,12 @@ window.QUIZ_LIVRES = [
 "Une affaire personnelle"
 ],
 "bon": 0,
+"s": 25,
 "expl": "Un préposé soigné inspire confiance : on le laisse entrer plus facilement.",
 "img": "img/labo/quiz/livres/communiquer-14.jpg"
 },
 {
 "q": "Cris, gestes brusques, doigt pointé : c'est le niveau…",
-"s": 20,
 "ch": [
 "De la frustration",
 "Du calme",
@@ -196,11 +196,11 @@ window.QUIZ_LIVRES = [
 "De l'agacement"
 ],
 "bon": 2,
+"s": 20,
 "expl": "À ce niveau, pense à ta sécurité : garde ta distance et sache quand te retirer."
 },
 {
 "q": "Complète : « ___ outils-là sont à moi. »",
-"s": 20,
 "ch": [
 "Ses",
 "C'est",
@@ -208,21 +208,21 @@ window.QUIZ_LIVRES = [
 "Ces"
 ],
 "bon": 3,
+"s": 20,
 "expl": "Ces = ceux-là. Ses = les siens. C'est = cela est."
 },
 {
 "q": "Complète : « Les locataires ___ reçu l'avis. »",
-"s": 20,
 "ch": [
 "ont",
 "on"
 ],
 "bon": 0,
+"s": 20,
 "expl": "« ont » se remplace par « avaient »."
 },
 {
 "q": "Au début de son quart, le préposé…",
-"s": 25,
 "ch": [
 "Lit le registre du collègue de nuit et confirme qu'il est en poste",
 "Attend les appels des locataires",
@@ -230,7 +230,71 @@ window.QUIZ_LIVRES = [
 "Commence par ses courriels personnels"
 ],
 "bon": 0,
+"s": 25,
 "expl": "Presque chaque heure du quart comporte un échange."
+},
+{
+"q": "Lesquels font partie du savoir-être ?",
+"t": "multi",
+"ch": [
+"La politesse",
+"La ponctualité",
+"Savoir souder",
+"La fiabilité"
+],
+"bon": [
+0,
+1,
+3
+],
+"s": 25,
+"expl": "Le savoir-être, c'est la façon de te comporter avec les autres."
+},
+{
+"q": "Place les niveaux de l'escalade de la colère, du plus faible au plus fort.",
+"t": "ordre",
+"ch": [
+"Agacement",
+"Frustration",
+"Colère"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 40,
+"expl": "Ton objectif : agir au niveau 1 ou 2."
+},
+{
+"q": "Trouve l'erreur dans cette phrase.",
+"t": "erreur",
+"ch": [
+"À la radio, la lettre B",
+"se dit « Bravo »",
+"et la lettre D",
+"se dit « David »."
+],
+"bon": 3,
+"s": 30,
+"expl": "D se dit « Delta »."
+},
+{
+"q": "Zoom mystère : que fait le préposé ?",
+"ch": [
+"Le préposé lit un manuel",
+"Le préposé remet une facture",
+"Le préposé prend une photo",
+"Le préposé laisse une trace écrite"
+],
+"bon": 3,
+"s": 20,
+"expl": "Avec une personne âgée : parler lentement, face à elle, et laisser une trace écrite.",
+"img": "img/labo/quiz/livres/communiquer-22.jpg",
+"zoom": {
+"x": 78,
+"y": 45
+}
 }
 ]
 },
@@ -249,7 +313,6 @@ window.QUIZ_LIVRES = [
 "qs": [
 {
 "q": "Un voltmètre mesure toujours…",
-"s": 20,
 "ch": [
 "Une différence entre deux points",
 "Le courant dans le fil",
@@ -257,11 +320,11 @@ window.QUIZ_LIVRES = [
 "La résistance du circuit"
 ],
 "bon": 0,
+"s": 20,
 "expl": "Comme l'altitude : on mesure toujours par rapport à un autre point."
 },
 {
 "q": "Tu lis 0 V aux bornes d'un contact fermé. Ça veut dire…",
-"s": 25,
 "ch": [
 "Pas forcément sans danger : les deux bornes peuvent être à 120 V",
 "Que le circuit est hors tension",
@@ -269,11 +332,11 @@ window.QUIZ_LIVRES = [
 "Que le voltmètre est défectueux"
 ],
 "bon": 0,
+"s": 25,
 "expl": "120 V − 120 V = 0 V : les deux bornes sont sous tension !"
 },
 {
 "q": "Quand la bobine du relais est alimentée, le contact NO…",
-"s": 20,
 "ch": [
 "Devient un contact NF",
 "S'ouvre et coupe la charge",
@@ -281,11 +344,11 @@ window.QUIZ_LIVRES = [
 "Ne change pas"
 ],
 "bon": 2,
+"s": 20,
 "expl": "La bobine commande; le contact normalement ouvert se ferme."
 },
 {
 "q": "Sur un relais de zone Taco SR501, les bornes T T reçoivent…",
-"s": 20,
 "ch": [
 "La valve de zone",
 "Le thermostat (24 V)",
@@ -293,12 +356,12 @@ window.QUIZ_LIVRES = [
 "L'alimentation 120 V"
 ],
 "bon": 1,
+"s": 20,
 "expl": "T T = thermostat : la demande de chaleur.",
 "img": "img/labo/quiz/livres/dispositifs-electriques-c9-04.jpg"
 },
 {
 "q": "Deux moteurs de valve de 7,7 VA sur un transfo de 40 VA : ça passe ?",
-"s": 20,
 "ch": [
 "Oui, mais seulement en 120 V",
 "Oui : 15,4 VA, c'est sous 40 VA",
@@ -306,11 +369,11 @@ window.QUIZ_LIVRES = [
 "Non : il faut un transfo par valve"
 ],
 "bon": 1,
+"s": 20,
 "expl": "7,7 + 7,7 = 15,4 VA."
 },
 {
 "q": "Le L4064 (« fan-limit ») d'une fournaise…",
-"s": 25,
 "ch": [
 "Allume la veilleuse",
 "Fait partir le ventilateur et coupe le brûleur si le plénum surchauffe",
@@ -318,12 +381,12 @@ window.QUIZ_LIVRES = [
 "Mesure le CO dans le plénum"
 ],
 "bon": 1,
+"s": 25,
 "expl": "Une seule commande sur le plénum fait deux travaux : ventilateur et limite.",
 "img": "img/labo/quiz/livres/dispositifs-electriques-c9-06.jpg"
 },
 {
 "q": "Sur le L4064 illustré, la limite coupe le brûleur à…",
-"s": 20,
 "ch": [
 "200 °F",
 "100 °F",
@@ -331,11 +394,11 @@ window.QUIZ_LIVRES = [
 "125 °F"
 ],
 "bon": 0,
+"s": 20,
 "expl": "Réglages illustrés : arrêt ventilateur 100 °F, départ 125 °F, limite 200 °F."
 },
 {
 "q": "Un filtre bouché sur une fournaise fait surtout…",
-"s": 25,
 "ch": [
 "Surchauffer le plénum : la limite coupe le brûleur",
 "Démarrer le ventilateur plus tôt",
@@ -343,11 +406,11 @@ window.QUIZ_LIVRES = [
 "Ouvrir le disjoncteur"
 ],
 "bon": 0,
+"s": 25,
 "expl": "Moins d'air passe sur l'échangeur : la chaleur monte jusqu'à la limite."
 },
 {
 "q": "Le protectorelais R8184G voit la flamme grâce à…",
-"s": 20,
 "ch": [
 "Une thermopile",
 "Une tige d'ionisation",
@@ -355,11 +418,11 @@ window.QUIZ_LIVRES = [
 "Un thermocouple"
 ],
 "bon": 2,
+"s": 20,
 "expl": "La cellule au sulfure de cadmium réagit à la lumière de la flamme."
 },
 {
 "q": "Avec un module d'allumage intermittent, la valve principale s'ouvre…",
-"s": 25,
 "ch": [
 "Quand la limite haute s'ouvre",
 "Avant l'étincelle",
@@ -367,11 +430,11 @@ window.QUIZ_LIVRES = [
 "Dès que le thermostat demande"
 ],
 "bon": 2,
+"s": 25,
 "expl": "Le module allume la veilleuse, la prouve, puis ouvre la valve principale."
 },
 {
 "q": "Plus le numéro de calibre AWG est petit…",
-"s": 25,
 "ch": [
 "Plus le fil est gros et transporte de courant",
 "Plus la gaine est épaisse",
@@ -379,11 +442,11 @@ window.QUIZ_LIVRES = [
 "Plus le fil est long"
 ],
 "bon": 0,
+"s": 25,
 "expl": "Un fil trop petit chauffe et peut causer un incendie."
 },
 {
 "q": "Un fil de calibre 14 (NMD90) accepte au maximum…",
-"s": 20,
 "ch": [
 "30 A",
 "10 A",
@@ -391,11 +454,11 @@ window.QUIZ_LIVRES = [
 "20 A"
 ],
 "bon": 2,
+"s": 20,
 "expl": "Calibre 12 : 20 A; calibre 14 : 15 A."
 },
 {
 "q": "Au repos (bobine non alimentée), le contact fermé d'un relais est…",
-"s": 20,
 "ch": [
 "COM-NF",
 "COM-NO",
@@ -403,11 +466,11 @@ window.QUIZ_LIVRES = [
 "Aucun"
 ],
 "bon": 0,
+"s": 20,
 "expl": "Le ressort tient la lame contre NF."
 },
 {
 "q": "Un relais de commutation, c'est…",
-"s": 25,
 "ch": [
 "Un contacteur de moteur triphasé",
 "Un relais à deux bobines",
@@ -415,12 +478,12 @@ window.QUIZ_LIVRES = [
 "Un relais et son transformateur dans le même boîtier"
 ],
 "bon": 3,
+"s": 25,
 "expl": "Le RA89A reçoit le 120 V et fournit le 24 V au thermostat par T-T.",
 "img": "img/labo/quiz/livres/dispositifs-electriques-c9-14.jpg"
 },
 {
 "q": "Sur le RA89A, le thermostat se branche sur…",
-"s": 20,
 "ch": [
 "T-T",
 "1-2",
@@ -428,11 +491,11 @@ window.QUIZ_LIVRES = [
 "3-4"
 ],
 "bon": 0,
+"s": 20,
 "expl": "T-T = 24 V vers le thermostat."
 },
 {
 "q": "Fournaise haut rendement : quand le thermostat demande, il ferme…",
-"s": 20,
 "ch": [
 "R-W",
 "C-W",
@@ -440,11 +503,11 @@ window.QUIZ_LIVRES = [
 "R-Y"
 ],
 "bon": 0,
+"s": 20,
 "expl": "La carte reçoit 24 V sur W."
 },
 {
 "q": "Avant d'ouvrir le gaz, la fournaise haut rendement prouve…",
-"s": 25,
 "ch": [
 "Seulement le pressostat",
 "La flamme, puis le tirage",
@@ -452,11 +515,11 @@ window.QUIZ_LIVRES = [
 "Seulement la flamme"
 ],
 "bon": 2,
+"s": 25,
 "expl": "C'est ta carte routière pour dépanner."
 },
 {
 "q": "Avec un automate programmable, les sécurités (limite haute, bas niveau d'eau)…",
-"s": 25,
 "ch": [
 "Ne sont plus nécessaires",
 "Sont dans l'automate seulement",
@@ -464,7 +527,83 @@ window.QUIZ_LIVRES = [
 "Restent câblées en série sur la chaudière"
 ],
 "bon": 3,
+"s": 25,
 "expl": "L'automate commande, mais ne protège pas."
+},
+{
+"q": "Deux moteurs de valve de zone de 7,7 VA chacun : combien de VA en tout ?",
+"t": "nombre",
+"ch": [],
+"bon": 15.4,
+"s": 45,
+"tol": 0.05,
+"u": "VA",
+"expl": "7,7 + 7,7 = 15,4 VA, sous les 40 VA du transformateur."
+},
+{
+"q": "Lesquels se branchent avec du fil de commande calibre 18 ?",
+"t": "multi",
+"ch": [
+"Les thermostats",
+"Les valves de zone",
+"Les prises de la cuisine",
+"Les relais 24 V"
+],
+"bon": [
+0,
+1,
+3
+],
+"s": 25,
+"expl": "Les prises demandent du calibre 14 ou 12."
+},
+{
+"q": "Fournaise haut rendement : place les premières étapes dans l'ordre.",
+"t": "ordre",
+"ch": [
+"Le thermostat ferme R-W (demande)",
+"Vérifications : limites et pressostat",
+"Le tirage est prouvé",
+"L'allumage est prêt"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"expl": "La fournaise prouve tout avant d'ouvrir le gaz."
+},
+{
+"q": "Trouve l'erreur dans cette phrase.",
+"t": "erreur",
+"ch": [
+"Au repos, le ressort",
+"tient la lame",
+"contre le contact NO,",
+"donc COM-NF est fermé."
+],
+"bon": 2,
+"s": 30,
+"expl": "Au repos, la lame est contre NF."
+},
+{
+"q": "Zoom mystère : qu'est-ce que c'est ?",
+"ch": [
+"Un aquastat",
+"Un transformateur 40 VA",
+"Un relais de zone Taco SR501",
+"Un protectorelais R8184G"
+],
+"bon": 2,
+"s": 20,
+"expl": "Ses bornes T T reçoivent le thermostat.",
+"img": "img/labo/quiz/livres/dispositifs-electriques-c9-23.jpg",
+"zoom": {
+"x": 50,
+"y": 60
+}
 }
 ]
 },
@@ -483,7 +622,6 @@ window.QUIZ_LIVRES = [
 "qs": [
 {
 "q": "Débit d'un diffuseur = vitesse moyenne de l'air ×…",
-"s": 20,
 "ch": [
 "L'aire libre de la grille",
 "Le nombre de diffuseurs",
@@ -491,12 +629,12 @@ window.QUIZ_LIVRES = [
 "La pression statique"
 ],
 "bon": 0,
+"s": 20,
 "expl": "On mesure plusieurs points à l'anémomètre, on fait la moyenne, puis × l'aire libre.",
 "img": "img/labo/quiz/livres/ventilation-climatisation-m11-01.jpg"
 },
 {
 "q": "Une pièce reçoit moins d'air que prévu au devis. On ajuste…",
-"s": 20,
 "ch": [
 "Le registre de la branche",
 "Le compresseur",
@@ -504,11 +642,11 @@ window.QUIZ_LIVRES = [
 "Le filtre"
 ],
 "bon": 0,
+"s": 20,
 "expl": "On mesure à chaque diffuseur et on équilibre avec les registres."
 },
 {
 "q": "Les volets à lames opposées sont bons pour…",
-"s": 20,
 "ch": [
 "Seulement tout ouvrir ou tout fermer",
 "Régler finement un débit",
@@ -516,12 +654,12 @@ window.QUIZ_LIVRES = [
 "Humidifier l'air"
 ],
 "bon": 1,
+"s": 20,
 "expl": "Lames parallèles : tout ouvrir ou fermer. Lames opposées : régler finement.",
 "img": "img/labo/quiz/livres/ventilation-climatisation-m11-03.jpg"
 },
 {
 "q": "L'humidificateur sert à…",
-"s": 20,
 "ch": [
 "Refroidir l'air",
 "Enlever l'humidité l'été",
@@ -529,11 +667,11 @@ window.QUIZ_LIVRES = [
 "Filtrer la poussière"
 ],
 "bon": 2,
+"s": 20,
 "expl": "Négligé, il cause beaucoup de plaintes."
 },
 {
 "q": "Première étape de l'entretien d'un échangeur d'air (VRC/VRE)",
-"s": 20,
 "ch": [
 "Laver le noyau",
 "Changer les filtres",
@@ -541,11 +679,11 @@ window.QUIZ_LIVRES = [
 "Arrêter et débrancher (ou cadenasser)"
 ],
 "bon": 3,
+"s": 20,
 "expl": "On attend aussi l'arrêt des ventilateurs."
 },
 {
 "q": "En climatisation, le préposé n'ouvre jamais…",
-"s": 20,
 "ch": [
 "La grille de retour",
 "L'accès au filtre",
@@ -553,11 +691,11 @@ window.QUIZ_LIVRES = [
 "Le circuit de réfrigérant"
 ],
 "bon": 3,
+"s": 20,
 "expl": "Mais beaucoup de pannes viennent de l'air et de l'eau : ça, c'est ton travail."
 },
 {
 "q": "Autour de l'unité extérieure, il faut…",
-"s": 25,
 "ch": [
 "Planter une haie pour la cacher",
 "Coller l'unité au mur",
@@ -565,11 +703,11 @@ window.QUIZ_LIVRES = [
 "Mettre une bâche l'été"
 ],
 "bon": 2,
+"s": 25,
 "expl": "Le serpentin doit rester propre et l'air doit circuler."
 },
 {
 "q": "Le point d'équilibre d'une thermopompe, c'est…",
-"s": 25,
 "ch": [
 "La température de l'eau du réservoir",
 "La consigne du thermostat",
@@ -577,12 +715,12 @@ window.QUIZ_LIVRES = [
 "La température où elle dégivre"
 ],
 "bon": 2,
+"s": 25,
 "expl": "Plus il fait froid, plus la maison a besoin de chaleur… et moins la thermopompe en fournit.",
 "img": "img/labo/quiz/livres/ventilation-climatisation-m11-08.jpg"
 },
 {
 "q": "Plus froid que le point d'équilibre, il faut…",
-"s": 20,
 "ch": [
 "Un chauffage d'appoint",
 "Baisser le thermostat",
@@ -590,11 +728,11 @@ window.QUIZ_LIVRES = [
 "Arrêter la thermopompe"
 ],
 "bon": 0,
+"s": 20,
 "expl": "Les deux courbes se croisent au point d'équilibre."
 },
 {
 "q": "Un thermostat programmable…",
-"s": 25,
 "ch": [
 "Remplace la plinthe électrique",
 "Doit toujours être branché au Wi-Fi",
@@ -602,11 +740,11 @@ window.QUIZ_LIVRES = [
 "Mesure le CO₂"
 ],
 "bon": 2,
+"s": 25,
 "expl": "Les occupants y touchent beaucoup : c'est souvent là que commencent les plaintes."
 },
 {
 "q": "Un ventilateur sort l'air vicié et l'air frais entre par les fuites. Le bâtiment est…",
-"s": 20,
 "ch": [
 "En pression négative",
 "En pression positive",
@@ -614,11 +752,11 @@ window.QUIZ_LIVRES = [
 "Sans pression"
 ],
 "bon": 0,
+"s": 20,
 "expl": "C'est la ventilation par extraction."
 },
 {
 "q": "La ventilation naturelle est…",
-"s": 20,
 "ch": [
 "Contrôlée par un ventilateur",
 "Interdite dans les écoles",
@@ -626,11 +764,11 @@ window.QUIZ_LIVRES = [
 "Toujours en pression positive"
 ],
 "bon": 2,
+"s": 20,
 "expl": "Elle passe par les fenêtres, les fissures et le tirage."
 },
 {
 "q": "Déflexion d'une courroie : environ…",
-"s": 20,
 "ch": [
 "1/4 po par pouce de portée",
 "1 po au total",
@@ -638,12 +776,12 @@ window.QUIZ_LIVRES = [
 "1/16 po par pouce de portée"
 ],
 "bon": 2,
+"s": 20,
 "expl": "Trop tendue, elle détruit les roulements; trop lâche, elle glisse.",
 "img": "img/labo/quiz/livres/ventilation-climatisation-m11-13.jpg"
 },
 {
 "q": "Un échangeur d'air sort plus d'air qu'il n'en fait entrer. La maison est…",
-"s": 20,
 "ch": [
 "En pression positive",
 "En pression négative",
@@ -651,22 +789,22 @@ window.QUIZ_LIVRES = [
 "Équilibrée"
 ],
 "bon": 1,
+"s": 20,
 "expl": "Risque : refoulement d'un foyer ou d'un appareil à combustion."
 },
 {
 "q": "Plus d'air frais que d'évacuation, c'est…",
-"s": 25,
 "ch": [
 "Un débit équilibré",
 "Une ventilation naturelle",
 "Une pression négative : courants d'air",
 "Une pression positive : l'air humide est poussé dans les murs"
 ],
-"bon": 3
+"bon": 3,
+"s": 25
 },
 {
 "q": "Une chambre froide commerciale est habituellement entre…",
-"s": 20,
 "ch": [
 "2 et 4 °C",
 "0 et −2 °C",
@@ -674,11 +812,11 @@ window.QUIZ_LIVRES = [
 "−18 et −20 °C"
 ],
 "bon": 0,
+"s": 20,
 "expl": "L'alarme est réglée plus haut (ex. 7 °C)."
 },
 {
 "q": "Régulation pneumatique : le thermostat envoie un signal de…",
-"s": 20,
 "ch": [
 "Environ 20 psi",
 "3 à 15 psi",
@@ -686,11 +824,11 @@ window.QUIZ_LIVRES = [
 "60 à 90 psi"
 ],
 "bon": 1,
+"s": 20,
 "expl": "Réservoir 60 à 90 psi, principale ≈ 20 psi, signal 3 à 15 psi."
 },
 {
 "q": "Station de cadenassage : la règle de base…",
-"s": 20,
 "ch": [
 "Un cadenas par équipe",
 "Une clé pour tout le monde",
@@ -698,7 +836,62 @@ window.QUIZ_LIVRES = [
 "Un travailleur, un cadenas, une clé"
 ],
 "bon": 3,
+"s": 20,
 "expl": "Chacun protège sa propre vie."
+},
+{
+"q": "L'air passe à 500 pi/min dans une grille d'aire libre de 0,3 pi². Débit ?",
+"t": "nombre",
+"ch": [],
+"bon": 150,
+"s": 45,
+"tol": 1,
+"u": "pcm",
+"expl": "Débit = vitesse × aire libre = 500 × 0,3 = 150 pcm."
+},
+{
+"q": "Quels modes de ventilation utilisent un ventilateur ?",
+"t": "multi",
+"ch": [
+"Par alimentation",
+"Équilibrée",
+"Naturelle",
+"Par extraction"
+],
+"bon": [
+0,
+1,
+3
+],
+"s": 25,
+"expl": "La ventilation naturelle passe par les fenêtres, les fissures et le tirage."
+},
+{
+"q": "Entretien d'un échangeur d'air : dans l'ordre.",
+"t": "ordre",
+"ch": [
+"Arrêter et débrancher",
+"Nettoyer les filtres",
+"Nettoyer le noyau"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 40
+},
+{
+"q": "Trouve l'erreur dans cette phrase.",
+"t": "erreur",
+"ch": [
+"Plus d'évacuation que d'air frais",
+"met la maison",
+"en pression positive."
+],
+"bon": 2,
+"s": 30,
+"expl": "Plus d'évacuation que d'air frais = pression négative."
 }
 ]
 },
@@ -717,7 +910,6 @@ window.QUIZ_LIVRES = [
 "qs": [
 {
 "q": "La géothermie capte la chaleur…",
-"s": 20,
 "ch": [
 "Du réseau d'aqueduc",
 "De l'air extérieur",
@@ -725,12 +917,12 @@ window.QUIZ_LIVRES = [
 "Du soleil, directement"
 ],
 "bon": 2,
+"s": 20,
 "expl": "L'aérothermie capte l'air; le solaire chauffe l'eau directement.",
 "img": "img/labo/quiz/livres/notions-energie-c13-01.jpg"
 },
 {
 "q": "Le COP d'un système géothermique est d'environ…",
-"s": 20,
 "ch": [
 "3 à 4",
 "0,8",
@@ -738,11 +930,11 @@ window.QUIZ_LIVRES = [
 "10 à 12"
 ],
 "bon": 0,
+"s": 20,
 "expl": "Il fournit 3 à 4 fois plus de chaleur qu'il ne consomme d'électricité, toute l'année."
 },
 {
 "q": "L'enveloppe du bâtiment doit…",
-"s": 25,
 "ch": [
 "Seulement être étanche",
 "Isoler, être étanche à l'air et contrôler l'humidité",
@@ -750,12 +942,12 @@ window.QUIZ_LIVRES = [
 "Seulement isoler"
 ],
 "bon": 1,
+"s": 25,
 "expl": "Toit, murs, fenêtres, portes, fondation et plancher.",
 "img": "img/labo/quiz/livres/notions-energie-c13-03.jpg"
 },
 {
 "q": "La chaleur qui passe à travers les murs et les vitres, c'est…",
-"s": 20,
 "ch": [
 "La conduction",
 "Les fuites d'air",
@@ -763,11 +955,11 @@ window.QUIZ_LIVRES = [
 "La ventilation"
 ],
 "bon": 0,
+"s": 20,
 "expl": "Les fuites d'air passent par les fissures, la porte et le grenier."
 },
 {
 "q": "Formule de base en hydronique : Q (BTU/h) =",
-"s": 20,
 "ch": [
 "débit (GPM) ÷ ΔT",
 "500 × débit (GPM) × ΔT (°F)",
@@ -775,12 +967,12 @@ window.QUIZ_LIVRES = [
 "8,33 × débit (GPM)"
 ],
 "bon": 1,
+"s": 20,
 "expl": "En métrique : Q (W) ≈ 70 × débit (L/min) × ΔT (°C).",
 "img": "img/labo/quiz/livres/notions-energie-c13-05.jpg"
 },
 {
 "q": "D'où vient le 500 de la formule ?",
-"s": 20,
 "ch": [
 "8,33 lb par gallon × 60 minutes",
 "Une constante de pression",
@@ -788,11 +980,11 @@ window.QUIZ_LIVRES = [
 "Les BTU d'une livre de vapeur"
 ],
 "bon": 0,
+"s": 20,
 "expl": "8,33 × 60 ≈ 500."
 },
 {
 "q": "Dans une fournaise, l'air de la maison et les gaz brûlés…",
-"s": 25,
 "ch": [
 "Se mélangent au démarrage seulement",
 "Sortent ensemble par l'évent",
@@ -800,12 +992,12 @@ window.QUIZ_LIVRES = [
 "Se mélangent dans le plénum"
 ],
 "bon": 2,
+"s": 25,
 "expl": "Les gaz passent dans l'échangeur et sortent par l'évent.",
 "img": "img/labo/quiz/livres/notions-energie-c13-07.jpg"
 },
 {
 "q": "Dans un réseau mal équilibré, les émetteurs près de la chaudière…",
-"s": 20,
 "ch": [
 "Ne reçoivent pas assez de débit",
 "Reçoivent trop de débit",
@@ -813,12 +1005,12 @@ window.QUIZ_LIVRES = [
 "Restent toujours froids"
 ],
 "bon": 1,
+"s": 20,
 "expl": "L'eau prend toujours le chemin le plus facile; le retour inversé aide à équilibrer.",
 "img": "img/labo/quiz/livres/notions-energie-c13-08.jpg"
 },
 {
 "q": "La pompe à mazout d'un brûleur à pulvérisation pousse le mazout à…",
-"s": 20,
 "ch": [
 "500 lb/po²",
 "100 à 150 lb/po²",
@@ -826,12 +1018,12 @@ window.QUIZ_LIVRES = [
 "1 lb/po²"
 ],
 "bon": 1,
+"s": 20,
 "expl": "Le moteur fait tourner le ventilateur et la pompe sur le même arbre.",
 "img": "img/labo/quiz/livres/notions-energie-c13-09.jpg"
 },
 {
 "q": "Pour économiser l'énergie, on commence par…",
-"s": 25,
 "ch": [
 "Réduire les besoins : isolation, étanchéité, fenêtres",
 "Installer des panneaux solaires",
@@ -839,12 +1031,12 @@ window.QUIZ_LIVRES = [
 "Acheter l'appareil le plus efficace"
 ],
 "bon": 0,
+"s": 25,
 "expl": "Un appareil très efficace dans une maison qui fuit gaspille quand même.",
 "img": "img/labo/quiz/livres/notions-energie-c13-10.jpg"
 },
 {
 "q": "Conversion : R =",
-"s": 20,
 "ch": [
 "RSI × 3,412",
 "RSI ÷ 5,678",
@@ -852,11 +1044,11 @@ window.QUIZ_LIVRES = [
 "1 ÷ RSI"
 ],
 "bon": 2,
+"s": 20,
 "expl": "R en unités impériales, RSI en métrique."
 },
 {
 "q": "La valeur U, c'est…",
-"s": 20,
 "ch": [
 "1 ÷ RSI : la chaleur qui passe",
 "RSI × 5,678",
@@ -864,22 +1056,22 @@ window.QUIZ_LIVRES = [
 "La même chose que R"
 ],
 "bon": 0,
+"s": 20,
 "expl": "Plus U est petit, mieux ça isole."
 },
 {
 "q": "Plus la valeur R est élevée…",
-"s": 20,
 "ch": [
 "Moins le mur est étanche",
 "Plus le matériau isole",
 "Plus U est élevé",
 "Plus la chaleur passe"
 ],
-"bon": 1
+"bon": 1,
+"s": 20
 },
 {
 "q": "Le thermostat d'une plinthe se place…",
-"s": 25,
 "ch": [
 "Au plafond",
 "Sur un mur intérieur, à environ 1,5 m du plancher",
@@ -887,12 +1079,12 @@ window.QUIZ_LIVRES = [
 "Au-dessus de la plinthe"
 ],
 "bon": 1,
+"s": 25,
 "expl": "Loin de la fenêtre et de la plinthe.",
 "img": "img/labo/quiz/livres/notions-energie-c13-14.jpg"
 },
 {
 "q": "Une pièce perd 1 300 W. Quelle plinthe ?",
-"s": 20,
 "ch": [
 "1 500 W",
 "1 000 W",
@@ -900,11 +1092,11 @@ window.QUIZ_LIVRES = [
 "1 250 W"
 ],
 "bon": 0,
+"s": 20,
 "expl": "La puissance doit être au moins égale à la perte : on prend la grandeur tout juste supérieure."
 },
 {
 "q": "L'entretien annuel du brûleur se termine toujours par…",
-"s": 20,
 "ch": [
 "La purge du réservoir",
 "Le changement du gicleur",
@@ -912,11 +1104,11 @@ window.QUIZ_LIVRES = [
 "Une analyse de combustion"
 ],
 "bon": 3,
+"s": 20,
 "expl": "On remplace aussi le gicleur : son cône se déforme et fait de la suie."
 },
 {
 "q": "Q = 40 000 BTU/h, ΔT = 20 °F. Débit ?",
-"s": 20,
 "ch": [
 "2 GPM",
 "8 GPM",
@@ -924,11 +1116,11 @@ window.QUIZ_LIVRES = [
 "4 GPM"
 ],
 "bon": 3,
+"s": 20,
 "expl": "40 000 ÷ (500 × 20) = 4."
 },
 {
 "q": "Avantage du mazout cité dans le livre…",
-"s": 20,
 "ch": [
 "Réservoir sur place : autonomie",
 "Aucune émission",
@@ -936,7 +1128,76 @@ window.QUIZ_LIVRES = [
 "Aucun entretien"
 ],
 "bon": 0,
+"s": 20,
 "expl": "Inconvénient : prix variable et élevé, émissions."
+},
+{
+"q": "Chaudière de 60 000 BTU/h, ΔT de 20 °F : quel débit ?",
+"t": "nombre",
+"ch": [],
+"bon": 6,
+"s": 45,
+"tol": 0.1,
+"u": "GPM",
+"expl": "60 000 ÷ (500 × 20) = 6 GPM."
+},
+{
+"q": "Un isolant a un RSI de 3,5. Quelle est sa valeur R ?",
+"t": "nombre",
+"ch": [],
+"bon": 19.9,
+"s": 45,
+"tol": 0.2,
+"expl": "R = RSI × 5,678 = 19,9."
+},
+{
+"q": "Pour économiser l'énergie, place les étapes dans l'ordre.",
+"t": "ordre",
+"ch": [
+"Réduire les besoins",
+"Appareils efficaces",
+"Récupérer la chaleur",
+"Bien régler",
+"Énergies renouvelables"
+],
+"bon": [
+0,
+1,
+2,
+3,
+4
+],
+"s": 40,
+"expl": "On commence toujours par la base : réduire les besoins."
+},
+{
+"q": "Trouve l'erreur dans cette phrase.",
+"t": "erreur",
+"ch": [
+"La géothermie capte",
+"la chaleur de l'air extérieur",
+"avec un COP de 3 à 4."
+],
+"bon": 1,
+"s": 30,
+"expl": "La géothermie capte la chaleur du sol; l'aérothermie, celle de l'air."
+},
+{
+"q": "Zoom mystère : qu'est-ce que c'est ?",
+"ch": [
+"Un circulateur",
+"Une fournaise électrique",
+"Un chauffe-eau au gaz",
+"Un brûleur à l'huile à pulvérisation"
+],
+"bon": 3,
+"s": 20,
+"expl": "Moteur, ventilateur, pompe à mazout et allumeur.",
+"img": "img/labo/quiz/livres/notions-energie-c13-23.jpg",
+"zoom": {
+"x": 40,
+"y": 50
+}
 }
 ]
 },
@@ -955,7 +1216,6 @@ window.QUIZ_LIVRES = [
 "qs": [
 {
 "q": "Un grand immeuble reçoit généralement…",
-"s": 20,
 "ch": [
 "Du 120/240 V monophasé",
 "Du 25 kV jusqu'aux logements",
@@ -963,12 +1223,12 @@ window.QUIZ_LIVRES = [
 "Du triphasé 347/600 V"
 ],
 "bon": 3,
+"s": 20,
 "expl": "La tension est ensuite baissée à l'intérieur pour les prises et l'éclairage.",
 "img": "img/labo/quiz/livres/materiel-electrique-c13-01.jpg"
 },
 {
 "q": "Dans la chambre électrique, le transfo sec baisse la tension à…",
-"s": 20,
 "ch": [
 "347 V",
 "25 kV",
@@ -976,11 +1236,11 @@ window.QUIZ_LIVRES = [
 "120/208 V"
 ],
 "bon": 3,
+"s": 20,
 "expl": "Pour les prises et l'éclairage des logements."
 },
 {
 "q": "Qui peut exécuter des travaux d'installation électrique dans un immeuble ?",
-"s": 20,
 "ch": [
 "Le locataire",
 "Un entrepreneur électricien",
@@ -988,22 +1248,22 @@ window.QUIZ_LIVRES = [
 "Le préposé"
 ],
 "bon": 1,
+"s": 20,
 "expl": "Le préposé fait l'entretien dans son champ de compétence."
 },
 {
 "q": "Quel organisme s'occupe de la santé et de la sécurité du travail ?",
-"s": 20,
 "ch": [
 "Hydro-Québec",
 "La RBQ",
 "La CNESST",
 "La CMEQ"
 ],
-"bon": 2
+"bon": 2,
+"s": 20
 },
 {
 "q": "Pour mesurer une tension, on branche les pointes…",
-"s": 25,
 "ch": [
 "En série dans le circuit",
 "En parallèle, de chaque côté de ce qu'on mesure",
@@ -1011,11 +1271,11 @@ window.QUIZ_LIVRES = [
 "Seulement sur la mise à la terre"
 ],
 "bon": 1,
+"s": 25,
 "expl": "Se tromper de branchement peut endommager l'appareil… ou te blesser."
 },
 {
 "q": "En position AUTO, la génératrice…",
-"s": 20,
 "ch": [
 "Démarre seulement à la main",
 "Ne démarre jamais seule",
@@ -1023,11 +1283,11 @@ window.QUIZ_LIVRES = [
 "Peut démarrer seule à tout moment"
 ],
 "bon": 3,
+"s": 20,
 "expl": "Panne ou essai programmé : on ne met jamais les mains près des courroies."
 },
 {
 "q": "Pourquoi le local de la génératrice doit-il être ventilé ?",
-"s": 25,
 "ch": [
 "Pour refroidir les batteries",
 "Pour l'odeur du diesel seulement",
@@ -1035,11 +1295,11 @@ window.QUIZ_LIVRES = [
 "Ce n'est pas nécessaire"
 ],
 "bon": 2,
+"s": 25,
 "expl": "Le CO est invisible et sans odeur."
 },
 {
 "q": "Une ampoule halogène peut dépasser…",
-"s": 20,
 "ch": [
 "1000 °C",
 "50 °C",
@@ -1047,11 +1307,11 @@ window.QUIZ_LIVRES = [
 "200 °C"
 ],
 "bon": 3,
+"s": 20,
 "expl": "On laisse refroidir avant de la changer."
 },
 {
 "q": "Un cordon abîmé sur sa longueur : on…",
-"s": 20,
 "ch": [
 "Remplace le cordon au complet",
 "Met du ruban",
@@ -1059,12 +1319,12 @@ window.QUIZ_LIVRES = [
 "Le raccourcit"
 ],
 "bon": 0,
+"s": 20,
 "expl": "Même type, même calibre, même nombre de conducteurs.",
 "img": "img/labo/quiz/livres/materiel-electrique-c13-09.jpg"
 },
 {
 "q": "Au panneau électrique, le préposé ouvre seulement…",
-"s": 20,
 "ch": [
 "Le boîtier du disjoncteur principal",
 "Le couvercle",
@@ -1072,12 +1332,12 @@ window.QUIZ_LIVRES = [
 "L'accès aux barres"
 ],
 "bon": 2,
+"s": 20,
 "expl": "Derrière la porte : les disjoncteurs et le répertoire.",
 "img": "img/labo/quiz/livres/materiel-electrique-c13-10.jpg"
 },
 {
 "q": "Une personne est électrisée. Ton premier geste ?",
-"s": 25,
 "ch": [
 "Couper le courant sans toucher la victime",
 "La tirer par le bras",
@@ -1085,11 +1345,11 @@ window.QUIZ_LIVRES = [
 "Lui jeter de l'eau"
 ],
 "bon": 0,
+"s": 25,
 "expl": "Si tu la touches, tu deviens la deuxième victime."
 },
 {
 "q": "Les mesures de résistance et de continuité se font…",
-"s": 20,
 "ch": [
 "Sous tension",
 "Hors tension, sur un composant isolé",
@@ -1097,11 +1357,11 @@ window.QUIZ_LIVRES = [
 "En série dans le circuit"
 ],
 "bon": 1,
+"s": 20,
 "expl": "Le multimètre envoie lui-même un petit courant."
 },
 {
 "q": "Disjoncteur 15 A en 120 V : puissance maximale ?",
-"s": 20,
 "ch": [
 "1 440 W",
 "2 400 W",
@@ -1109,11 +1369,11 @@ window.QUIZ_LIVRES = [
 "1 800 W"
 ],
 "bon": 3,
+"s": 20,
 "expl": "P = U × I = 120 × 15."
 },
 {
 "q": "Même disjoncteur 15 A, charge continue (3 h et plus) : maximum ?",
-"s": 20,
 "ch": [
 "1 500 W",
 "1 440 W",
@@ -1121,11 +1381,11 @@ window.QUIZ_LIVRES = [
 "1 200 W"
 ],
 "bon": 1,
+"s": 20,
 "expl": "On limite à 80 % du calibre."
 },
 {
 "q": "Test d'un appareil réparé : de la lame de la fiche au boîtier, on doit lire…",
-"s": 20,
 "ch": [
 "Un bip (continuité)",
 "120 V",
@@ -1133,11 +1393,11 @@ window.QUIZ_LIVRES = [
 "0 Ω"
 ],
 "bon": 2,
+"s": 20,
 "expl": "Sinon, le boîtier pourrait être sous tension."
 },
 {
 "q": "Les avertisseurs de fumée récents sont…",
-"s": 25,
 "ch": [
 "Raccordés au 240 V",
 "À pile seulement",
@@ -1145,22 +1405,22 @@ window.QUIZ_LIVRES = [
 "Reliés au téléphone"
 ],
 "bon": 2,
+"s": 25,
 "expl": "Quand l'un sonne, tous sonnent."
 },
 {
 "q": "Un avertisseur de CO est exigé quand…",
-"s": 25,
 "ch": [
 "Il y a un appareil à combustion ou un garage attenant",
 "Il y a un échangeur d'air",
 "Il y a une plinthe électrique",
 "Le logement a plus de 3 pièces"
 ],
-"bon": 0
+"bon": 0,
+"s": 25
 },
 {
 "q": "Les essais de la génératrice sont notés…",
-"s": 20,
 "ch": [
 "Sur un post-it sur la porte",
 "Nulle part si tout va bien",
@@ -1168,7 +1428,72 @@ window.QUIZ_LIVRES = [
 "Dans le journal d'essai"
 ],
 "bon": 3,
+"s": 20,
 "expl": "C'est la preuve qu'elle fonctionne le jour où on en a besoin."
+},
+{
+"q": "Disjoncteur 20 A en 120 V : puissance maximale (100 %) ?",
+"t": "nombre",
+"ch": [],
+"bon": 2400,
+"s": 45,
+"u": "W",
+"expl": "P = U × I = 120 × 20 = 2 400 W."
+},
+{
+"q": "Même disjoncteur 20 A, charge continue (80 %) : maximum ?",
+"t": "nombre",
+"ch": [],
+"bon": 1920,
+"s": 45,
+"u": "W",
+"expl": "2 400 × 0,8 = 1 920 W."
+},
+{
+"q": "Avant de changer une ampoule, que fais-tu ?",
+"t": "multi",
+"ch": [
+"Laisser refroidir",
+"Visser sans forcer",
+"Toucher le culot pour vérifier",
+"Couper l'interrupteur"
+],
+"bon": [
+0,
+1,
+3
+],
+"s": 25,
+"expl": "On se blesse souvent en changeant une ampoule : chute, coupure, brûlure, choc."
+},
+{
+"q": "Trouve l'erreur dans cette phrase.",
+"t": "erreur",
+"ch": [
+"La continuité se mesure",
+"sous tension,",
+"sur un composant isolé."
+],
+"bon": 1,
+"s": 30,
+"expl": "Résistance et continuité se mesurent hors tension."
+},
+{
+"q": "Zoom mystère : qu'est-ce que c'est ?",
+"ch": [
+"Un transformateur",
+"Un groupe électrogène",
+"Un compteur d'électricité",
+"Un panneau de disjoncteurs"
+],
+"bon": 3,
+"s": 20,
+"expl": "Le préposé ouvre seulement la porte, jamais le couvercle.",
+"img": "img/labo/quiz/livres/materiel-electrique-c13-23.jpg",
+"zoom": {
+"x": 50,
+"y": 35
+}
 }
 ]
 },
@@ -1187,7 +1512,6 @@ window.QUIZ_LIVRES = [
 "qs": [
 {
 "q": "Quel nom de fichier respecte la règle du livre ?",
-"s": 25,
 "ch": [
 "scan0004.pdf",
 "2026-10-15_salle-meca_chauffe-eau-3_vidange.pdf",
@@ -1195,22 +1519,22 @@ window.QUIZ_LIVRES = [
 "chauffe eau.pdf"
 ],
 "bon": 1,
+"s": 25,
 "expl": "La date d'abord, puis le lieu, puis le sujet."
 },
 {
 "q": "Pourquoi mettre la date AAAA-MM-JJ au début du nom ?",
-"s": 25,
 "ch": [
 "Pour l'envoyer plus vite",
 "Les fichiers se placent tout seuls en ordre chronologique",
 "Windows l'exige",
 "Pour cacher le fichier"
 ],
-"bon": 1
+"bon": 1,
+"s": 25
 },
 {
 "q": "Quel fichier téléchargé est le plus risqué ?",
-"s": 20,
 "ch": [
 ".docx",
 ".pdf",
@@ -1218,12 +1542,12 @@ window.QUIZ_LIVRES = [
 ".exe"
 ],
 "bon": 3,
+"s": 20,
 "expl": "Un programme peut contenir un virus; un PDF est à faible risque.",
 "img": "img/labo/quiz/livres/micro-ordinateur-03.jpg"
 },
 {
 "q": "Par défaut, un fichier téléchargé va dans le dossier…",
-"s": 20,
 "ch": [
 "Documents",
 "Corbeille",
@@ -1231,11 +1555,11 @@ window.QUIZ_LIVRES = [
 "Bureau"
 ],
 "bon": 2,
+"s": 20,
 "expl": "Ensuite, déplace-le dans le bon dossier avec un bon nom."
 },
 {
 "q": "Dans une équipe d'entretien, Teams remplace surtout…",
-"s": 20,
 "ch": [
 "Le téléphone d'urgence",
 "Le courriel du gestionnaire",
@@ -1243,12 +1567,12 @@ window.QUIZ_LIVRES = [
 "Les textos éparpillés"
 ],
 "bon": 3,
+"s": 20,
 "expl": "Tout le monde voit la même information, au même endroit.",
 "img": "img/labo/quiz/livres/micro-ordinateur-05.jpg"
 },
 {
 "q": "Un rapport d'intervention raconte…",
-"s": 25,
 "ch": [
 "Les faits, dans l'ordre, avec les preuves (photos)",
 "Les excuses de l'équipe",
@@ -1256,12 +1580,12 @@ window.QUIZ_LIVRES = [
 "Seulement le coût des pièces"
 ],
 "bon": 0,
+"s": 25,
 "expl": "En-tête : date, lieu, équipement, ton nom.",
 "img": "img/labo/quiz/livres/micro-ordinateur-06.jpg"
 },
 {
 "q": "Le registre d'entretien dans Excel, c'est…",
-"s": 25,
 "ch": [
 "Des notes libres, sans colonnes",
 "Une ligne par intervention, toujours les mêmes colonnes",
@@ -1269,12 +1593,12 @@ window.QUIZ_LIVRES = [
 "Un fichier par intervention"
 ],
 "bon": 1,
+"s": 25,
 "expl": "C'est la mémoire de l'immeuble.",
 "img": "img/labo/quiz/livres/micro-ordinateur-07.jpg"
 },
 {
 "q": "Pour résumer 100 bons de travail par équipement, on utilise…",
-"s": 20,
 "ch": [
 "Word",
 "Un graphique en secteurs seulement",
@@ -1282,11 +1606,11 @@ window.QUIZ_LIVRES = [
 "La fonction SOMME sur chaque ligne"
 ],
 "bon": 2,
+"s": 20,
 "expl": "Combien de bons, combien d'heures, par équipement ou par mois."
 },
 {
 "q": "Coller les coordonnées d'un locataire dans une IA publique…",
-"s": 20,
 "ch": [
 "N'a aucune importance",
 "Peut être un incident selon la Loi 25",
@@ -1294,11 +1618,11 @@ window.QUIZ_LIVRES = [
 "Est permis si c'est pour un courriel"
 ],
 "bon": 1,
+"s": 20,
 "expl": "Les renseignements personnels doivent être protégés."
 },
 {
 "q": "Quelle demande à une IA est une bonne pratique au travail ?",
-"s": 25,
 "ch": [
 "« Écris le rapport, je ne le relirai pas »",
 "« Invente les heures travaillées de la semaine »",
@@ -1306,12 +1630,12 @@ window.QUIZ_LIVRES = [
 "« Corrige les fautes de ce rapport sans changer les faits »"
 ],
 "bon": 3,
+"s": 25,
 "expl": "Tu restes responsable de ce que tu envoies : relis toujours.",
 "img": "img/labo/quiz/livres/micro-ordinateur-10.jpg"
 },
 {
 "q": "Le haut de l'écran doit être…",
-"s": 20,
 "ch": [
 "À la hauteur du menton",
 "À la hauteur des yeux",
@@ -1319,22 +1643,22 @@ window.QUIZ_LIVRES = [
 "Au niveau de la table"
 ],
 "bon": 1,
+"s": 20,
 "expl": "Écran à une longueur de bras (50 à 70 cm)."
 },
 {
 "q": "Distance conseillée entre tes yeux et l'écran",
-"s": 20,
 "ch": [
 "50 à 70 cm",
 "Le plus proche possible",
 "20 à 30 cm",
 "1 à 1,5 m"
 ],
-"bon": 0
+"bon": 0,
+"s": 20
 },
 {
 "q": "Si le portable est volé, les fichiers dans OneDrive…",
-"s": 25,
 "ch": [
 "Sont encore sur les serveurs de Microsoft",
 "Sont perdus",
@@ -1342,12 +1666,12 @@ window.QUIZ_LIVRES = [
 "Sont sur la clé USB"
 ],
 "bon": 0,
+"s": 25,
 "expl": "OneDrive garde une copie et synchronise tes appareils.",
 "img": "img/labo/quiz/livres/micro-ordinateur-13.jpg"
 },
 {
 "q": "Pour agrandir une photo dans Word sans la déformer, on tire…",
-"s": 20,
 "ch": [
 "Le bord de la page",
 "Une poignée de côté",
@@ -1355,23 +1679,23 @@ window.QUIZ_LIVRES = [
 "La règle"
 ],
 "bon": 2,
+"s": 20,
 "expl": "Une poignée de côté l'écrase ou l'étire.",
 "img": "img/labo/quiz/livres/micro-ordinateur-14.jpg"
 },
 {
 "q": "Pour enlever le pied du locataire sur une photo dans Word…",
-"s": 20,
 "ch": [
 "Format de l'image → Rogner",
 "Habillage",
 "Insérer une légende",
 "Supprimer"
 ],
-"bon": 0
+"bon": 0,
+"s": 20
 },
 {
 "q": "« Salut, c'est Marc. Paie la facture urgente, nouveau compte. » Tu…",
-"s": 25,
 "ch": [
 "Transfères à un collègue",
 "Paies vite, c'est urgent",
@@ -1379,11 +1703,11 @@ window.QUIZ_LIVRES = [
 "Vérifies en rappelant au numéro que tu connais"
 ],
 "bon": 3,
+"s": 25,
 "expl": "L'IA peut imiter une voix avec quelques secondes d'enregistrement."
 },
 {
 "q": "Quelle date respecte le format du livre ?",
-"s": 20,
 "ch": [
 "15-10-2026",
 "2026-10-15",
@@ -1391,11 +1715,11 @@ window.QUIZ_LIVRES = [
 "10/15/2026"
 ],
 "bon": 1,
+"s": 20,
 "expl": "AAAA-MM-JJ : les fichiers se classent en ordre."
 },
 {
 "q": "Outlook dans le navigateur (outlook.office.com) et l'application…",
-"s": 20,
 "ch": [
 "Ont des boîtes différentes",
 "Montrent les mêmes messages",
@@ -1403,7 +1727,70 @@ window.QUIZ_LIVRES = [
 "Ne se synchronisent jamais"
 ],
 "bon": 1,
+"s": 20,
 "img": "img/labo/quiz/livres/micro-ordinateur-18.jpg"
+},
+{
+"q": "Un bon nom de fichier : dans quel ordre ?",
+"t": "ordre",
+"ch": [
+"La date (AAAA-MM-JJ)",
+"Le lieu",
+"Le sujet"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 40,
+"expl": "Ex. : 2026-10-15_salle-meca_chauffe-eau-3_vidange.pdf"
+},
+{
+"q": "Quels fichiers téléchargés sont à risque élevé ?",
+"t": "multi",
+"ch": [
+".bat",
+".exe",
+".pdf",
+".msi"
+],
+"bon": [
+0,
+1,
+3
+],
+"s": 25,
+"expl": "Un programme peut contenir un virus; un PDF est à faible risque."
+},
+{
+"q": "Trouve l'erreur dans cette phrase.",
+"t": "erreur",
+"ch": [
+"Si le portable est volé,",
+"les fichiers dans OneDrive",
+"sont perdus pour toujours."
+],
+"bon": 2,
+"s": 30,
+"expl": "OneDrive garde une copie sur les serveurs de Microsoft."
+},
+{
+"q": "Zoom mystère : qu'est-ce que c'est ?",
+"ch": [
+"Une mise à jour de Windows",
+"Un courriel du gestionnaire",
+"Une fausse alerte de sécurité (arnaque)",
+"Un antivirus légitime"
+],
+"bon": 2,
+"s": 20,
+"expl": "Ne clique sur rien et n'appelle pas le numéro.",
+"img": "img/labo/quiz/livres/micro-ordinateur-22.jpg",
+"zoom": {
+"x": 50,
+"y": 30
+}
 }
 ]
 },
@@ -1422,7 +1809,6 @@ window.QUIZ_LIVRES = [
 "qs": [
 {
 "q": "Sur un ruban à mesurer, chaque pouce est divisé en…",
-"s": 20,
 "ch": [
 "16 parties égales",
 "8 parties",
@@ -1430,11 +1816,11 @@ window.QUIZ_LIVRES = [
 "10 parties"
 ],
 "bon": 0,
+"s": 20,
 "expl": "Plus la ligne est longue, plus la fraction est « grosse »."
 },
 {
 "q": "La soudure capillaire fonctionne grâce à…",
-"s": 25,
 "ch": [
 "La capillarité : la soudure est aspirée dans le jeu mince",
 "La pression de l'eau",
@@ -1442,23 +1828,23 @@ window.QUIZ_LIVRES = [
 "Le serrage du raccord"
 ],
 "bon": 0,
+"s": 25,
 "expl": "Comme le café qui monte dans un morceau de sucre.",
 "img": "img/labo/quiz/livres/plomberie-chauffage-02.jpg"
 },
 {
 "q": "Le jeu entre le tuyau et le raccord est d'environ…",
-"s": 20,
 "ch": [
 "1/4 de pouce",
 "5 mm",
 "Aucun jeu",
 "L'épaisseur d'une feuille de papier"
 ],
-"bon": 3
+"bon": 3,
+"s": 20
 },
 {
 "q": "« Soudure à l'étain » se dit en anglais…",
-"s": 20,
 "ch": [
 "Soldering / Sweating",
 "Crimping",
@@ -1466,11 +1852,11 @@ window.QUIZ_LIVRES = [
 "Brazing"
 ],
 "bon": 0,
+"s": 20,
 "expl": "Sertissage = Press / Crimp."
 },
 {
 "q": "Pour le traitement de l'eau, le préposé…",
-"s": 25,
 "ch": [
 "Change les cartouches, ajoute le sel et surveille les signes de problème",
 "Ne touche jamais à rien",
@@ -1478,11 +1864,11 @@ window.QUIZ_LIVRES = [
 "Choisit l'équipement"
 ],
 "bon": 0,
+"s": 25,
 "img": "img/labo/quiz/livres/plomberie-chauffage-05.jpg"
 },
 {
 "q": "L'appareil qui génère le plus de bons de travail dans un immeuble ?",
-"s": 20,
 "ch": [
 "Le chauffe-eau",
 "La toilette",
@@ -1490,11 +1876,11 @@ window.QUIZ_LIVRES = [
 "Le drain de plancher"
 ],
 "bon": 1,
+"s": 20,
 "expl": "Une toilette qui coule peut gaspiller plusieurs centaines de litres par jour."
 },
 {
 "q": "La toilette coule sans arrêt : l'eau entre dans le trop-plein. On…",
-"s": 20,
 "ch": [
 "Ajoute un clapet",
 "Baisse le flotteur",
@@ -1502,11 +1888,11 @@ window.QUIZ_LIVRES = [
 "Change la cuvette"
 ],
 "bon": 1,
+"s": 20,
 "expl": "Le niveau est trop haut."
 },
 {
 "q": "« Anode sacrificielle » se dit en anglais…",
-"s": 20,
 "ch": [
 "Sacrificial anode rod",
 "Baffle",
@@ -1514,11 +1900,11 @@ window.QUIZ_LIVRES = [
 "Dip tube"
 ],
 "bon": 0,
+"s": 20,
 "expl": "Dip tube = tube plongeur."
 },
 {
 "q": "Un brûleur à l'huile qui manque d'air produit…",
-"s": 20,
 "ch": [
 "Une flamme plus propre",
 "De la suie et du monoxyde de carbone",
@@ -1526,11 +1912,11 @@ window.QUIZ_LIVRES = [
 "Un meilleur rendement"
 ],
 "bon": 1,
+"s": 20,
 "expl": "Trop d'air : la chaleur part dans la cheminée."
 },
 {
 "q": "L'entretien préventif se fait…",
-"s": 25,
 "ch": [
 "Seulement après une panne",
 "Quand un locataire se plaint",
@@ -1538,11 +1924,11 @@ window.QUIZ_LIVRES = [
 "Selon un calendrier, avant que le problème arrive"
 ],
 "bon": 3,
+"s": 25,
 "expl": "Plus le préventif est bien fait, moins il y a d'appels la nuit."
 },
 {
 "q": "Avec un coupe-tube, on serre…",
-"s": 20,
 "ch": [
 "Un quart de tour à chaque tour",
 "Seulement à la fin",
@@ -1550,22 +1936,22 @@ window.QUIZ_LIVRES = [
 "Le plus fort possible dès le départ"
 ],
 "bon": 0,
+"s": 20,
 "expl": "Coupe d'équerre, puis on ébavure."
 },
 {
 "q": "La bavure laissée à l'intérieur d'un tuyau…",
-"s": 25,
 "ch": [
 "Freine l'eau, fait du bruit et use le tuyau",
 "N'a aucun effet",
 "Améliore l'étanchéité",
 "Aide la soudure à entrer"
 ],
-"bon": 0
+"bon": 0,
+"s": 25
 },
 {
 "q": "Longueur de tuyau à couper =",
-"s": 20,
 "ch": [
 "Centre à centre − les deux prises",
 "Centre à centre − une prise",
@@ -1573,11 +1959,11 @@ window.QUIZ_LIVRES = [
 "Centre à centre seulement"
 ],
 "bon": 0,
+"s": 20,
 "expl": "La prise (take-off) va du centre du raccord au fond de l'emboîture."
 },
 {
 "q": "L'eau de pluie va…",
-"s": 25,
 "ch": [
 "Au puisard du voisin",
 "Dans la colonne de chute",
@@ -1585,12 +1971,12 @@ window.QUIZ_LIVRES = [
 "Au terrain, aux gouttières et au drain français"
 ],
 "bon": 3,
+"s": 25,
 "expl": "Rallonges : 1,5 à 2 m du mur.",
 "img": "img/labo/quiz/livres/plomberie-chauffage-14.jpg"
 },
 {
 "q": "Une chaudière en fonte en sections…",
-"s": 20,
 "ch": [
 "Ne dure pas longtemps",
 "Est très légère",
@@ -1598,11 +1984,11 @@ window.QUIZ_LIVRES = [
 "Craint le mazout"
 ],
 "bon": 2,
+"s": 20,
 "expl": "Très durable, mais lourde."
 },
 {
 "q": "Brûleur à l'huile : trop d'air donne…",
-"s": 20,
 "ch": [
 "De la suie",
 "De la chaleur perdue dans la cheminée",
@@ -1610,22 +1996,22 @@ window.QUIZ_LIVRES = [
 "Une flamme jaune"
 ],
 "bon": 1,
+"s": 20,
 "expl": "Pas assez d'air : suie et CO."
 },
 {
 "q": "Sur un ruban, la plus petite marque entre deux pouces vaut…",
-"s": 20,
 "ch": [
 "1/4 po",
 "1/16 po",
 "1/8 po",
 "1/32 po"
 ],
-"bon": 1
+"bon": 1,
+"s": 20
 },
 {
 "q": "Le registre d'entretien sert à…",
-"s": 20,
 "ch": [
 "Remplacer le bon de travail",
 "Calculer la paie",
@@ -1633,7 +2019,92 @@ window.QUIZ_LIVRES = [
 "Noter les plaintes des voisins"
 ],
 "bon": 2,
+"s": 20,
 "expl": "Ensemble, bon et registre montrent les problèmes qui reviennent."
+},
+{
+"q": "Combien de seizièmes dans 3/4 de pouce ?",
+"t": "nombre",
+"ch": [],
+"bon": 12,
+"s": 45,
+"u": "/16",
+"expl": "3/4 = 12/16."
+},
+{
+"q": "Centre à centre de 24 po, prise de 1/2 po à chaque bout : longueur à couper ?",
+"t": "nombre",
+"ch": [],
+"bon": 23,
+"s": 45,
+"u": "po",
+"expl": "24 − 1/2 − 1/2 = 23 po."
+},
+{
+"q": "Préparer un joint de cuivre : dans l'ordre.",
+"t": "ordre",
+"ch": [
+"Couper d'équerre",
+"Ébavurer",
+"Nettoyer le tuyau et le raccord",
+"Appliquer le flux",
+"Chauffer et souder"
+],
+"bon": [
+0,
+1,
+2,
+3,
+4
+],
+"s": 40,
+"expl": "Un joint étanche commence par une coupe d'équerre et un tuyau propre et ébavuré."
+},
+{
+"q": "Pour un traitement d'eau, que fait le préposé ?",
+"t": "multi",
+"ch": [
+"Ajouter le sel",
+"Surveiller les signes de problème",
+"Choisir l'équipement",
+"Changer les cartouches"
+],
+"bon": [
+0,
+1,
+3
+],
+"s": 25,
+"expl": "Il entretient l'équipement; il ne le choisit pas."
+},
+{
+"q": "Trouve l'erreur dans cette phrase.",
+"t": "erreur",
+"ch": [
+"Pas assez d'air",
+"dans le brûleur, c'est",
+"de la chaleur perdue",
+"dans la cheminée."
+],
+"bon": 0,
+"s": 30,
+"expl": "C'est trop d'air qui envoie la chaleur dans la cheminée. Pas assez d'air : suie et CO."
+},
+{
+"q": "Zoom mystère : qu'est-ce que c'est ?",
+"ch": [
+"Une pompe de puisard",
+"Un réservoir tampon",
+"Un chauffe-eau",
+"Un adoucisseur d'eau et ses filtres"
+],
+"bon": 3,
+"s": 20,
+"img": "img/labo/quiz/livres/plomberie-chauffage-24.jpg",
+"zoom": {
+"x": 62,
+"y": 55
+}
 }
 ]
 },
@@ -1652,29 +2123,28 @@ window.QUIZ_LIVRES = [
 "qs": [
 {
 "q": "On construit seulement avec les plans…",
-"s": 25,
 "ch": [
 "Émis pour construction, à la dernière révision",
 "D'une version précédente",
 "Pour soumission",
 "Préliminaires"
 ],
-"bon": 0
+"bon": 0,
+"s": 25
 },
 {
 "q": "Une révision est montrée sur le plan par…",
-"s": 20,
 "ch": [
 "Une étoile",
 "Un trait rouge",
 "Un astérisque",
 "Un nuage et un triangle"
 ],
-"bon": 3
+"bon": 3,
+"s": 20
 },
 {
 "q": "Le plombier voit une erreur dans un plan. Il…",
-"s": 20,
 "ch": [
 "Change le plan lui-même",
 "L'ignore",
@@ -1682,11 +2152,11 @@ window.QUIZ_LIVRES = [
 "Appelle le client"
 ],
 "bon": 2,
+"s": 20,
 "expl": "Le plombier ne change pas un plan."
 },
 {
 "q": "Un détail est dessiné à…",
-"s": 20,
 "ch": [
 "1:100",
 "Petite échelle (1:500)",
@@ -1694,23 +2164,23 @@ window.QUIZ_LIVRES = [
 "Grande échelle (1:5, 1:10, 1:20)"
 ],
 "bon": 3,
+"s": 20,
 "expl": "C'est un zoom sur une petite partie du bâtiment.",
 "img": "img/labo/quiz/livres/lecture-plans-devis-c6-04.jpg"
 },
 {
 "q": "À 1/4\" = 1'-0\", tu lis 7 pieds et 6 pouces. Ça s'écrit…",
-"s": 20,
 "ch": [
 "7\"-6'",
 "7,6'",
 "7'-6\"",
 "76\""
 ],
-"bon": 2
+"bon": 2,
+"s": 20
 },
 {
 "q": "Sur un plan de plomberie, « CC » veut dire…",
-"s": 20,
 "ch": [
 "Chauffe-eau commercial",
 "Colonne de chauffage",
@@ -1718,11 +2188,11 @@ window.QUIZ_LIVRES = [
 "Cuivre coudé"
 ],
 "bon": 2,
+"s": 20,
 "expl": "En anglais : SS (soil stack)."
 },
 {
 "q": "« RN » veut dire…",
-"s": 20,
 "ch": [
 "Réseau neuf",
 "Regard de nettoyage",
@@ -1730,11 +2200,11 @@ window.QUIZ_LIVRES = [
 "Robinet normal"
 ],
 "bon": 1,
+"s": 20,
 "expl": "En anglais : CO (cleanout)."
 },
 {
 "q": "Espacement maximal des supports de l'ABS/PVC horizontal",
-"s": 20,
 "ch": [
 "1,2 m",
 "2,5 m",
@@ -1742,22 +2212,22 @@ window.QUIZ_LIVRES = [
 "0,8 m"
 ],
 "bon": 0,
+"s": 20,
 "expl": "Le Code de plomberie fixe l'espacement selon le matériau et le diamètre."
 },
 {
 "q": "Espacement maximal des supports du PEX horizontal",
-"s": 20,
 "ch": [
 "3,0 m",
 "2,5 m",
 "0,8 m",
 "1,2 m"
 ],
-"bon": 2
+"bon": 2,
+"s": 20
 },
 {
 "q": "Ø 75, 75 mm et 3″ sur un plan désignent…",
-"s": 20,
 "ch": [
 "Le même diamètre nominal",
 "L'épaisseur de la paroi",
@@ -1765,11 +2235,11 @@ window.QUIZ_LIVRES = [
 "Trois tuyaux différents"
 ],
 "bon": 0,
+"s": 20,
 "expl": "C'est un nom commercial, pas une mesure au ruban."
 },
 {
 "q": "Sur un renvoi, le chiffre du haut est…",
-"s": 20,
 "ch": [
 "Le numéro de la vue",
 "L'échelle",
@@ -1777,12 +2247,12 @@ window.QUIZ_LIVRES = [
 "La révision"
 ],
 "bon": 0,
+"s": 20,
 "expl": "Le bas indique la feuille où se trouve la vue.",
 "img": "img/labo/quiz/livres/lecture-plans-devis-c6-11.jpg"
 },
 {
 "q": "Symbole « cercle avec un point » sur un plan de tuyauterie",
-"s": 20,
 "ch": [
 "Un regard",
 "Le tuyau descend",
@@ -1790,12 +2260,12 @@ window.QUIZ_LIVRES = [
 "Un robinet"
 ],
 "bon": 2,
+"s": 20,
 "expl": "Comme la pointe d'une flèche qui vient vers toi.",
 "img": "img/labo/quiz/livres/lecture-plans-devis-c6-12.jpg"
 },
 {
 "q": "Le radier d'un tuyau, c'est…",
-"s": 20,
 "ch": [
 "Le dessus du tuyau",
 "Le centre du tuyau",
@@ -1803,11 +2273,11 @@ window.QUIZ_LIVRES = [
 "Le fond intérieur du tuyau"
 ],
 "bon": 3,
+"s": 20,
 "expl": "En anglais : invert."
 },
 {
 "q": "Sur un croquis d'évacuation en élévation, on exagère…",
-"s": 20,
 "ch": [
 "La longueur",
 "Le diamètre",
@@ -1815,12 +2285,12 @@ window.QUIZ_LIVRES = [
 "Les raccords"
 ],
 "bon": 2,
+"s": 20,
 "expl": "On écrit quand même les valeurs exactes.",
 "img": "img/labo/quiz/livres/lecture-plans-devis-c6-14.jpg"
 },
 {
 "q": "Plan de rénovation : il montre trois catégories…",
-"s": 20,
 "ch": [
 "Plomberie, électricité, chauffage",
 "Eau froide, eau chaude, évacuation",
@@ -1828,12 +2298,12 @@ window.QUIZ_LIVRES = [
 "Avant, pendant, après"
 ],
 "bon": 2,
+"s": 20,
 "expl": "Chaque catégorie a son trait.",
 "img": "img/labo/quiz/livres/lecture-plans-devis-c6-15.jpg"
 },
 {
 "q": "Réseau à vapeur : le purgeur (T)…",
-"s": 20,
 "ch": [
 "Laisse passer la vapeur, retient l'eau",
 "Évacue l'air seulement",
@@ -1841,12 +2311,12 @@ window.QUIZ_LIVRES = [
 "Règle la pression"
 ],
 "bon": 2,
+"s": 20,
 "expl": "Le condensat (CD) revient à la chaudière par gravité.",
 "img": "img/labo/quiz/livres/lecture-plans-devis-c6-16.jpg"
 },
 {
 "q": "« EC » sur un plan de plomberie",
-"s": 20,
 "ch": [
 "Évacuation commerciale",
 "Eau chaude",
@@ -1854,11 +2324,11 @@ window.QUIZ_LIVRES = [
 "Eau de chauffage"
 ],
 "bon": 1,
+"s": 20,
 "expl": "En anglais : HW."
 },
 {
 "q": "Un extra (changement demandé par le client), c'est…",
-"s": 25,
 "ch": [
 "Un rabais",
 "Une erreur du plombier",
@@ -1866,7 +2336,81 @@ window.QUIZ_LIVRES = [
 "Une pénalité de retard"
 ],
 "bon": 2,
+"s": 25,
 "expl": "On calcule matériel + main-d'œuvre + frais."
+},
+{
+"q": "Quelles abréviations concernent l'évacuation ?",
+"t": "multi",
+"ch": [
+"CC (colonne de chute)",
+"EC (eau chaude)",
+"DP (drain de plancher)",
+"EF (eau froide)"
+],
+"bon": [
+0,
+2
+],
+"s": 25,
+"expl": "EF et EC concernent l'alimentation."
+},
+{
+"q": "Lire la règle d'architecte : dans l'ordre.",
+"t": "ordre",
+"ch": [
+"Lire l'échelle sous la vue",
+"Repérer le titre au bout de l'arête",
+"Placer la marque des pieds",
+"Lire les pouces à partir du zéro"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"expl": "Puis on additionne : 7 pieds + 6 pouces = 7'-6\"."
+},
+{
+"q": "Matériel d'un extra : 62,00 $ plus 5 %. Total ?",
+"t": "nombre",
+"ch": [],
+"bon": 65.1,
+"s": 45,
+"tol": 0.01,
+"u": "$",
+"expl": "62 × 1,05 = 65,10 $."
+},
+{
+"q": "Trouve l'erreur dans cette phrase.",
+"t": "erreur",
+"ch": [
+"On construit avec",
+"les plans préliminaires,",
+"à la dernière révision."
+],
+"bon": 1,
+"s": 30,
+"expl": "On construit seulement avec les plans émis pour construction."
+},
+{
+"q": "Zoom mystère : qu'est-ce que c'est ?",
+"ch": [
+"Une traversée de fondation de l'entrée d'eau",
+"Un drain de plancher",
+"Une colonne de ventilation",
+"Un regard de nettoyage"
+],
+"bon": 0,
+"s": 25,
+"expl": "Détail à grande échelle (1:5).",
+"img": "img/labo/quiz/livres/lecture-plans-devis-c6-23.jpg",
+"zoom": {
+"x": 50,
+"y": 50
+}
 }
 ]
 },
@@ -1885,7 +2429,6 @@ window.QUIZ_LIVRES = [
 "qs": [
 {
 "q": "Quand on plie un plan en accordéon, le cartouche…",
-"s": 20,
 "ch": [
 "Va à l'intérieur",
 "Est plié en deux",
@@ -1893,11 +2436,11 @@ window.QUIZ_LIVRES = [
 "Est découpé"
 ],
 "bon": 2,
+"s": 20,
 "img": "img/labo/quiz/livres/lecture-plans-batiments-egi-01.jpg"
 },
 {
 "q": "Une coupe montre le bâtiment…",
-"s": 20,
 "ch": [
 "Vu d'en haut",
 "En 3D seulement",
@@ -1905,12 +2448,12 @@ window.QUIZ_LIVRES = [
 "Vu de l'extérieur"
 ],
 "bon": 2,
+"s": 20,
 "expl": "On voit l'intérieur des murs, des planchers et des fondations.",
 "img": "img/labo/quiz/livres/lecture-plans-batiments-egi-02.jpg"
 },
 {
 "q": "Les axes d'un plan passent généralement par…",
-"s": 25,
 "ch": [
 "Les murs porteurs ou le centre des colonnes",
 "Les fenêtres",
@@ -1918,23 +2461,23 @@ window.QUIZ_LIVRES = [
 "Les portes"
 ],
 "bon": 0,
+"s": 25,
 "expl": "Lettres dans un sens, chiffres dans l'autre.",
 "img": "img/labo/quiz/livres/lecture-plans-batiments-egi-03.jpg"
 },
 {
 "q": "« L'extincteur est dans la travée E-F / 2-3 » : les axes servent…",
-"s": 20,
 "ch": [
 "De numéro de révision",
 "D'échelle",
 "D'adresse sur le plan",
 "De nom de local"
 ],
-"bon": 2
+"bon": 2,
+"s": 20
 },
 {
 "q": "La méthode du croquis d'une pièce :",
-"s": 20,
 "ch": [
 "On prend seulement des photos",
 "On copie le plan de l'architecte",
@@ -1942,12 +2485,12 @@ window.QUIZ_LIVRES = [
 "On dessine d'abord, on mesure ensuite"
 ],
 "bon": 3,
+"s": 20,
 "expl": "Ça évite de revenir avec une mesure manquante.",
 "img": "img/labo/quiz/livres/lecture-plans-batiments-egi-05.jpg"
 },
 {
 "q": "Un plan d'étage est une coupe horizontale à environ…",
-"s": 20,
 "ch": [
 "Au niveau du plafond",
 "1,2 m du plancher",
@@ -1955,12 +2498,12 @@ window.QUIZ_LIVRES = [
 "Au niveau du sol"
 ],
 "bon": 1,
+"s": 20,
 "expl": "On voit les murs coupés, les portes, les fenêtres.",
 "img": "img/labo/quiz/livres/lecture-plans-batiments-egi-06.jpg"
 },
 {
 "q": "Avant de percer un mur, quel plan regardes-tu en premier ?",
-"s": 25,
 "ch": [
 "P (plomberie)",
 "E (électricité)",
@@ -1968,23 +2511,23 @@ window.QUIZ_LIVRES = [
 "A (architecture) : mur porteur, coupe-feu ou mitoyen ?"
 ],
 "bon": 3,
+"s": 25,
 "expl": "Ensuite le plan E (les fils), puis le plan P (les tuyaux).",
 "img": "img/labo/quiz/livres/lecture-plans-batiments-egi-07.jpg"
 },
 {
 "q": "Tu dois travailler près d'un fil dans le mur. Tu…",
-"s": 20,
 "ch": [
 "Perces plus lentement",
 "Mets des gants seulement",
 "Coupes, cadenasses et vérifies",
 "Demandes au locataire"
 ],
-"bon": 2
+"bon": 2,
+"s": 20
 },
 {
 "q": "Un plan d'évacuation doit être orienté…",
-"s": 20,
 "ch": [
 "Vers la sortie principale",
 "Au choix",
@@ -1992,22 +2535,22 @@ window.QUIZ_LIVRES = [
 "Le nord toujours en haut"
 ],
 "bon": 2,
+"s": 20,
 "img": "img/labo/quiz/livres/lecture-plans-batiments-egi-09.jpg"
 },
 {
 "q": "Que trouve-t-on sur un plan d'évacuation ?",
-"s": 25,
 "ch": [
 "Les tuyaux et les fils",
 "Seulement les sorties",
 "Les cotes des murs",
 "« Vous êtes ici », sorties, équipements de sécurité, point de rassemblement"
 ],
-"bon": 3
+"bon": 3,
+"s": 25
 },
 {
 "q": "Dans un cartouche, que vérifies-tu d'abord ?",
-"s": 25,
 "ch": [
 "Le dessinateur",
 "La révision",
@@ -2015,23 +2558,23 @@ window.QUIZ_LIVRES = [
 "L'échelle"
 ],
 "bon": 2,
+"s": 25,
 "expl": "Puis le titre, l'échelle, la révision, le numéro de feuille.",
 "img": "img/labo/quiz/livres/lecture-plans-batiments-egi-11.jpg"
 },
 {
 "q": "Le plénum, c'est…",
-"s": 25,
 "ch": [
 "Le dessous du plancher",
 "La salle mécanique",
 "L'espace au-dessus du plafond où passent conduits et fils",
 "Le toit"
 ],
-"bon": 2
+"bon": 2,
+"s": 25
 },
 {
 "q": "Un « 2x4 » mesure réellement…",
-"s": 20,
 "ch": [
 "1 3/4 × 3 3/4 po",
 "2 × 3 1/2 po",
@@ -2039,11 +2582,11 @@ window.QUIZ_LIVRES = [
 "1 1/2 × 3 1/2 po (38 × 89 mm)"
 ],
 "bon": 3,
+"s": 20,
 "expl": "Dimension nominale = un nom, pas une mesure."
 },
 {
 "q": "Dans un mur extérieur, le pare-vapeur est…",
-"s": 20,
 "ch": [
 "Au milieu de l'isolant",
 "Dans le comble",
@@ -2051,23 +2594,23 @@ window.QUIZ_LIVRES = [
 "Côté froid, sous le revêtement"
 ],
 "bon": 2,
+"s": 20,
 "expl": "Il bloque l'humidité du bâtiment.",
 "img": "img/labo/quiz/livres/lecture-plans-batiments-egi-14.jpg"
 },
 {
 "q": "Les montants d'un mur sont souvent espacés de…",
-"s": 20,
 "ch": [
 "600 mm c/c",
 "300 mm c/c",
 "1 200 mm c/c",
 "400 mm c/c"
 ],
-"bon": 3
+"bon": 3,
+"s": 20
 },
 {
 "q": "Une prise ne fonctionne plus. Sur le schéma unifilaire, on part…",
-"s": 20,
 "ch": [
 "D'Hydro-Québec",
 "Du transfo",
@@ -2075,12 +2618,12 @@ window.QUIZ_LIVRES = [
 "De la charge et on remonte le trait"
 ],
 "bon": 3,
+"s": 20,
 "expl": "On trouve le panneau qui l'alimente : on le vérifie d'abord.",
 "img": "img/labo/quiz/livres/lecture-plans-batiments-egi-16.jpg"
 },
 {
 "q": "On passe un tuyau dans un mur coupe-feu. Le trou…",
-"s": 25,
 "ch": [
 "Se bouche au gypse",
 "Se remplit de mousse isolante ordinaire",
@@ -2088,12 +2631,12 @@ window.QUIZ_LIVRES = [
 "Se scelle avec un produit coupe-feu homologué"
 ],
 "bon": 3,
+"s": 25,
 "expl": "Et on garde une trace : photo et registre.",
 "img": "img/labo/quiz/livres/lecture-plans-batiments-egi-17.jpg"
 },
 {
 "q": "Sur un plan, une coupe est repérée par…",
-"s": 20,
 "ch": [
 "Un nuage",
 "Un cercle pointillé",
@@ -2101,7 +2644,98 @@ window.QUIZ_LIVRES = [
 "Une ligne de coupe avec des flèches"
 ],
 "bon": 3,
+"s": 20,
 "expl": "Les flèches indiquent le sens du regard."
+},
+{
+"q": "Avant de percer un mur : dans quel ordre ?",
+"t": "ordre",
+"ch": [
+"Plan A : le mur est-il porteur ?",
+"Plan E : y a-t-il un fil ?",
+"Plan P : y a-t-il des tuyaux ?",
+"Percer dans la zone sûre"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40
+},
+{
+"q": "Un mur extérieur, de l'intérieur vers l'extérieur.",
+"t": "ordre",
+"ch": [
+"Gypse",
+"Pare-vapeur",
+"Montants et isolant",
+"Revêtement (OSB)",
+"Pare-air"
+],
+"bon": [
+0,
+1,
+2,
+3,
+4
+],
+"s": 40
+},
+{
+"q": "Que trouve-t-on dans le cartouche d'une feuille ?",
+"t": "multi",
+"ch": [
+"L'échelle",
+"La révision",
+"Le titre de la feuille",
+"La liste des locataires"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 25
+},
+{
+"q": "Un 2x6 mesure réellement 1 1/2 po × combien de pouces ?",
+"t": "nombre",
+"ch": [],
+"bon": 5.5,
+"s": 45,
+"u": "po",
+"expl": "Un 2x6 réel : 1 1/2 × 5 1/2 po."
+},
+{
+"q": "Trouve l'erreur dans cette phrase.",
+"t": "erreur",
+"ch": [
+"Le plénum est l'espace",
+"sous le plancher",
+"où passent conduits et fils."
+],
+"bon": 1,
+"s": 30,
+"expl": "Le plénum est au-dessus du plafond."
+},
+{
+"q": "Zoom mystère : qu'est-ce que c'est ?",
+"ch": [
+"Un plan de plomberie",
+"Un plan d'évacuation",
+"Un plan d'électricité",
+"Un plan de toiture"
+],
+"bon": 1,
+"s": 20,
+"expl": "Il montre « Vous êtes ici », les sorties et le point de rassemblement.",
+"img": "img/labo/quiz/livres/lecture-plans-batiments-egi-24.jpg",
+"zoom": {
+"x": 50,
+"y": 60
+}
 }
 ]
 },
@@ -2120,7 +2754,6 @@ window.QUIZ_LIVRES = [
 "qs": [
 {
 "q": "Passage libre minimal pour un fauteuil roulant autour d'une zone de travail",
-"s": 20,
 "ch": [
 "1,1 m",
 "2 m",
@@ -2128,33 +2761,33 @@ window.QUIZ_LIVRES = [
 "0,8 m"
 ],
 "bon": 0,
+"s": 20,
 "expl": "Ton balisage protège les occupants et ton travail."
 },
 {
 "q": "Pendant un travail, les issues et les portes…",
-"s": 20,
 "ch": [
 "Peuvent être bloquées une heure",
 "Restent toujours libres",
 "Sont couvertes de polythène",
 "Sont fermées à clé"
 ],
-"bon": 1
+"bon": 1,
+"s": 20
 },
 {
 "q": "L'eau des descentes pluviales doit être éloignée de la fondation de…",
-"s": 20,
 "ch": [
 "1,5 à 2 m",
 "Ça n'a pas d'importance",
 "5 m",
 "30 cm"
 ],
-"bon": 0
+"bon": 0,
+"s": 20
 },
 {
 "q": "Les chantepleures, on…",
-"s": 20,
 "ch": [
 "Les peint",
 "Les remplit de mortier",
@@ -2162,11 +2795,11 @@ window.QUIZ_LIVRES = [
 "Les calfeutre avant l'hiver"
 ],
 "bon": 2,
+"s": 20,
 "expl": "Elles laissent sortir l'eau derrière le parement."
 },
 {
 "q": "Le composé à prise (en poudre) durcit…",
-"s": 20,
 "ch": [
 "En séchant à l'air, en 24 h",
 "Jamais complètement",
@@ -2174,11 +2807,11 @@ window.QUIZ_LIVRES = [
 "Au soleil"
 ],
 "bon": 2,
+"s": 20,
 "expl": "Le prémélangé, lui, sèche à l'air (12 à 24 h par couche)."
 },
 {
 "q": "Le bac de composé à prise devient tiède. Ça veut dire…",
-"s": 20,
 "ch": [
 "Il faut ajouter de l'eau",
 "Il commence à durcir",
@@ -2186,11 +2819,11 @@ window.QUIZ_LIVRES = [
 "Il est trop mouillé"
 ],
 "bon": 1,
+"s": 20,
 "expl": "La prise dégage de la chaleur."
 },
 {
 "q": "Une porcelaine absorbe moins de ___ de son poids en eau.",
-"s": 20,
 "ch": [
 "50 %",
 "0,5 %",
@@ -2198,11 +2831,11 @@ window.QUIZ_LIVRES = [
 "20 %"
 ],
 "bon": 1,
+"s": 20,
 "expl": "Plus la cuisson est chaude, moins la tuile boit l'eau."
 },
 {
 "q": "Une peinture au latex posée trop froide…",
-"s": 25,
 "ch": [
 "Devient poudreuse : les billes ne fusionnent pas",
 "Sèche plus vite",
@@ -2210,11 +2843,11 @@ window.QUIZ_LIVRES = [
 "Devient plus brillante"
 ],
 "bon": 0,
+"s": 25,
 "expl": "Respecte la température minimale de l'étiquette."
 },
 {
 "q": "Une tablette chargée de livres se fixe…",
-"s": 20,
 "ch": [
 "Avec de la colle de construction",
 "Dans les montants",
@@ -2222,34 +2855,34 @@ window.QUIZ_LIVRES = [
 "Avec du ruban double face"
 ],
 "bon": 1,
+"s": 20,
 "expl": "Aile longue de l'équerre contre le mur.",
 "img": "img/labo/quiz/livres/travaux-mineurs-egi-09.jpg"
 },
 {
 "q": "Une porte avec ferme-porte doit se refermer seule en…",
-"s": 20,
 "ch": [
 "Moins d'une seconde",
 "Une minute",
 "3 à 5 secondes",
 "15 à 20 secondes"
 ],
-"bon": 2
+"bon": 2,
+"s": 20
 },
 {
 "q": "SIMDUT veut dire…",
-"s": 25,
 "ch": [
 "Service d'information sur les métiers du travail",
 "Système international de mesure",
 "Système d'information sur les matières dangereuses utilisées au travail",
 "Système d'inspection des matériaux du travail"
 ],
-"bon": 2
+"bon": 2,
+"s": 25
 },
 {
 "q": "Le clapet antiretour sur l'égout…",
-"s": 25,
 "ch": [
 "Empêche l'égout de refouler dans le sous-sol",
 "Empêche le gel",
@@ -2257,12 +2890,12 @@ window.QUIZ_LIVRES = [
 "Empêche l'eau de pluie d'entrer dans le puisard"
 ],
 "bon": 0,
+"s": 25,
 "expl": "Si un seul élément de la chaîne bloque, l'eau entre au sous-sol.",
 "img": "img/labo/quiz/livres/travaux-mineurs-egi-12.jpg"
 },
 {
 "q": "Pour réparer une fissure de joint dans le gypse, on…",
-"s": 20,
 "ch": [
 "Peinture par-dessus",
 "Ouvre la fissure en V et pose un ruban",
@@ -2270,11 +2903,11 @@ window.QUIZ_LIVRES = [
 "Remplit seulement de composé"
 ],
 "bon": 1,
+"s": 20,
 "expl": "Le ruban relie les deux côtés."
 },
 {
 "q": "Céramique au plancher : couverture de mortier minimale",
-"s": 20,
 "ch": [
 "75 %",
 "95 %",
@@ -2282,22 +2915,22 @@ window.QUIZ_LIVRES = [
 "50 %"
 ],
 "bon": 1,
+"s": 20,
 "expl": "Aucun vide sous les coins : c'est là que la tuile casse."
 },
 {
 "q": "Creux du support au-delà duquel on corrige au mortier",
-"s": 20,
 "ch": [
 "3 mm",
 "10 mm",
 "6 mm",
 "1 mm"
 ],
-"bon": 0
+"bon": 0,
+"s": 20
 },
 {
 "q": "La double coupe du vinyle, c'est…",
-"s": 25,
 "ch": [
 "Couper la pièce neuve et le vieux vinyle en même temps",
 "Coller deux couches",
@@ -2305,29 +2938,97 @@ window.QUIZ_LIVRES = [
 "Couper d'abord le vieux, puis le neuf"
 ],
 "bon": 0,
+"s": 25,
 "expl": "Ça donne un joint parfait."
 },
 {
 "q": "On mesure la hauteur d'une installation à partir…",
-"s": 25,
 "ch": [
 "D'un meuble",
 "De l'objet voisin",
 "Du plafond suspendu",
 "D'un repère fixe : plancher fini, coin, cadre de porte"
 ],
-"bon": 3
+"bon": 3,
+"s": 25
 },
 {
 "q": "Coupe-froid des portes de patio coulissantes",
-"s": 20,
 "ch": [
 "Bande de mousse autocollante",
 "Bourrelet à rainure",
 "Brosse (velours)",
 "Silicone"
 ],
-"bon": 2
+"bon": 2,
+"s": 20
+},
+{
+"q": "Réparer une fissure de joint : dans l'ordre.",
+"t": "ordre",
+"ch": [
+"Ouvrir la fissure en V",
+"Dépoussiérer et remplir",
+"Poser le ruban dans le composé"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 40,
+"expl": "Le ruban relie les deux côtés."
+},
+{
+"q": "La double coupe du vinyle : dans l'ordre.",
+"t": "ordre",
+"ch": [
+"Trouver une retaille du même vinyle",
+"Poser la retaille par-dessus, motifs alignés",
+"Couper les deux épaisseurs en même temps"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 40
+},
+{
+"q": "Quels pictogrammes du SIMDUT verras-tu souvent dans ce cours ?",
+"t": "multi",
+"ch": [
+"Fragile",
+"Inflammable",
+"Irritant",
+"Recyclable"
+],
+"bon": [
+1,
+2
+],
+"s": 25
+},
+{
+"q": "Une rallonge de descente pluviale éloigne l'eau d'au moins combien de mètres ?",
+"t": "nombre",
+"ch": [],
+"bon": 1.5,
+"s": 45,
+"u": "m",
+"expl": "1,5 à 2 m de la fondation."
+},
+{
+"q": "Trouve l'erreur dans cette phrase.",
+"t": "erreur",
+"ch": [
+"La porcelaine est cuite",
+"entre 1 200 et 1 400 °C",
+"et absorbe plus de 5 % d'eau."
+],
+"bon": 2,
+"s": 30,
+"expl": "Une porcelaine absorbe moins de 0,5 % de son poids en eau."
 }
 ]
 },
@@ -2346,7 +3047,6 @@ window.QUIZ_LIVRES = [
 "qs": [
 {
 "q": "Dans des toilettes publiques, la première surface à nettoyer est…",
-"s": 20,
 "ch": [
 "Le miroir",
 "Le plancher",
@@ -2354,22 +3054,22 @@ window.QUIZ_LIVRES = [
 "L'urinoir"
 ],
 "bon": 0,
+"s": 20,
 "expl": "On va du plus propre au plus sale; le plancher en dernier."
 },
 {
 "q": "La toilette se nettoie…",
-"s": 25,
 "ch": [
 "La cuvette en premier",
 "De l'extérieur vers l'intérieur, la cuvette en dernier",
 "Avec le chiffon du lavabo",
 "Avant le miroir"
 ],
-"bon": 1
+"bon": 1,
+"s": 25
 },
 {
 "q": "Une microfibre bien pliée donne…",
-"s": 20,
 "ch": [
 "8 faces",
 "4 faces",
@@ -2377,11 +3077,11 @@ window.QUIZ_LIVRES = [
 "16 faces"
 ],
 "bon": 0,
+"s": 20,
 "expl": "Une face propre par surface."
 },
 {
 "q": "Pas d'eau chaude au chalet de l'aréna. Tu compenses en…",
-"s": 25,
 "ch": [
 "Laissant agir plus longtemps et en frottant plus",
 "Sautant le nettoyage",
@@ -2389,11 +3089,11 @@ window.QUIZ_LIVRES = [
 "Mélangeant deux produits"
 ],
 "bon": 0,
+"s": 25,
 "expl": "Température, temps, action mécanique et produit se compensent."
 },
 {
 "q": "Un tube fluorescent usé va…",
-"s": 20,
 "ch": [
 "Aux déchets",
 "Au recyclage",
@@ -2401,11 +3101,11 @@ window.QUIZ_LIVRES = [
 "Au compost"
 ],
 "bon": 2,
+"s": 20,
 "expl": "Il contient du mercure."
 },
 {
 "q": "Avant de laver un plancher, on…",
-"s": 20,
 "ch": [
 "Ouvre les fenêtres",
 "Enlève la poussière et les débris",
@@ -2413,12 +3113,12 @@ window.QUIZ_LIVRES = [
 "Mouille tout le plancher"
 ],
 "bon": 1,
+"s": 20,
 "expl": "Sinon, on fait de la boue.",
 "img": "img/labo/quiz/livres/entretien-menager-egi-06.jpg"
 },
 {
 "q": "Le lavage d'un plancher commence…",
-"s": 25,
 "ch": [
 "Près de la porte",
 "N'importe où",
@@ -2426,22 +3126,22 @@ window.QUIZ_LIVRES = [
 "Au fond, dans le coin le plus loin de la porte"
 ],
 "bon": 3,
+"s": 25,
 "expl": "Bordures d'abord, puis le centre en reculant."
 },
 {
 "q": "On change l'eau de lavage…",
-"s": 25,
 "ch": [
 "Seulement si elle sent mauvais",
 "Une fois par jour",
 "Jamais pendant le quart",
 "Dès qu'elle est grise ou entre deux types de locaux"
 ],
-"bon": 3
+"bon": 3,
+"s": 25
 },
 {
 "q": "La méthode en S pour les vitres, c'est…",
-"s": 20,
 "ch": [
 "On n'utilise pas de raclette",
 "La raclette ne quitte jamais la vitre",
@@ -2449,12 +3149,12 @@ window.QUIZ_LIVRES = [
 "On commence en bas"
 ],
 "bon": 1,
+"s": 20,
 "expl": "Ça évite les traces entre les passes.",
 "img": "img/labo/quiz/livres/entretien-menager-egi-09.jpg"
 },
 {
 "q": "Dans une piscine, un filtre encrassé…",
-"s": 20,
 "ch": [
 "Se lave à contre-courant",
 "Se vide dans le bassin",
@@ -2462,12 +3162,12 @@ window.QUIZ_LIVRES = [
 "Se nettoie au chlore pur"
 ],
 "bon": 0,
+"s": 20,
 "expl": "L'eau tourne en boucle : écumoires, pompe, filtre, chauffage, chlorateur.",
 "img": "img/labo/quiz/livres/entretien-menager-egi-10.jpg"
 },
 {
 "q": "L'étiquette du fournisseur d'un produit dangereux doit être…",
-"s": 20,
 "ch": [
 "Lisible, en français et en anglais",
 "En français seulement",
@@ -2475,11 +3175,11 @@ window.QUIZ_LIVRES = [
 "En anglais seulement"
 ],
 "bon": 0,
+"s": 20,
 "expl": "SIMDUT 2015."
 },
 {
 "q": "Le biofilm…",
-"s": 25,
 "ch": [
 "Disparaît avec de l'eau froide",
 "Protège les microbes : le désinfectant ne le traverse pas",
@@ -2487,12 +3187,12 @@ window.QUIZ_LIVRES = [
 "Se forme seulement sur le métal"
 ],
 "bon": 1,
+"s": 25,
 "expl": "Il faut d'abord le détruire mécaniquement (frotter).",
 "img": "img/labo/quiz/livres/entretien-menager-egi-12.jpg"
 },
 {
 "q": "Une protéase découpe…",
-"s": 20,
 "ch": [
 "Les gras",
 "Les amidons",
@@ -2500,12 +3200,12 @@ window.QUIZ_LIVRES = [
 "Le calcaire"
 ],
 "bon": 2,
+"s": 20,
 "expl": "Lipase : gras; amylase : amidon.",
 "img": "img/labo/quiz/livres/entretien-menager-egi-13.jpg"
 },
 {
 "q": "Pour épousseter, on…",
-"s": 25,
 "ch": [
 "Utilise un plumeau sec ordinaire",
 "Souffle la poussière",
@@ -2513,12 +3213,12 @@ window.QUIZ_LIVRES = [
 "Commence par le bas"
 ],
 "bon": 2,
+"s": 25,
 "expl": "Du haut vers le bas, en faisant le tour dans le même sens.",
 "img": "img/labo/quiz/livres/entretien-menager-egi-14.jpg"
 },
 {
 "q": "Un objet de valeur oublié dans une chambre…",
-"s": 20,
 "ch": [
 "Va au registre des objets trouvés",
 "Se garde en attendant",
@@ -2526,11 +3226,11 @@ window.QUIZ_LIVRES = [
 "Reste où il est"
 ],
 "bon": 0,
+"s": 20,
 "expl": "On ne touche qu'à ce qu'on doit nettoyer."
 },
 {
 "q": "Pourquoi le registre d'hiver est-il si important ?",
-"s": 20,
 "ch": [
 "Il sert seulement au gestionnaire",
 "Il compte le sel acheté",
@@ -2538,11 +3238,11 @@ window.QUIZ_LIVRES = [
 "Il remplace l'assurance"
 ],
 "bon": 2,
+"s": 20,
 "expl": "Sans registre, impossible de prouver que la rampe était entretenue."
 },
 {
 "q": "Un bon de travail, c'est…",
-"s": 20,
 "ch": [
 "La facture du client",
 "Le registre des heures",
@@ -2550,7 +3250,87 @@ window.QUIZ_LIVRES = [
 "La demande d'une tâche ponctuelle"
 ],
 "bon": 3,
+"s": 20,
 "expl": "Souvent dans une GMAO avec code QR."
+},
+{
+"q": "Laver un plancher : dans l'ordre.",
+"t": "ordre",
+"ch": [
+"Enlever la poussière et les débris",
+"Commencer au fond de la pièce",
+"Faire les bordures",
+"Laver le centre en 8, en reculant"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40
+},
+{
+"q": "Laver une vitre (méthode en S) : dans l'ordre.",
+"t": "ordre",
+"ch": [
+"Mouiller toute la vitre",
+"Essuyer une bande sèche en haut",
+"Placer la raclette dans le coin",
+"Descendre en S sans quitter la vitre"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40
+},
+{
+"q": "Quels objets vont aux RDD (résidus dangereux) ?",
+"t": "multi",
+"ch": [
+"Boîte de carton",
+"Pile",
+"Tube fluorescent",
+"Aérosol à moitié plein"
+],
+"bon": [
+1,
+2,
+3
+],
+"s": 25
+},
+{
+"q": "Trouve l'erreur dans cette phrase.",
+"t": "erreur",
+"ch": [
+"Le biofilm",
+"protège les microbes :",
+"le désinfectant le traverse facilement."
+],
+"bon": 2,
+"s": 30,
+"expl": "Le désinfectant n'arrive pas à traverser le biofilm : il faut frotter."
+},
+{
+"q": "Zoom mystère : qu'est-ce que c'est ?",
+"ch": [
+"Un chauffe-eau",
+"Le circuit d'eau d'une piscine",
+"Un système de gicleurs",
+"Un échangeur d'air"
+],
+"bon": 1,
+"s": 20,
+"expl": "L'eau tourne en boucle : écumoires, pompe, filtre, chauffage, chlorateur.",
+"img": "img/labo/quiz/livres/entretien-menager-egi-22.jpg",
+"zoom": {
+"x": 55,
+"y": 55
+}
 }
 ]
 }

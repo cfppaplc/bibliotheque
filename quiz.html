@@ -180,6 +180,8 @@ body.bord .grid{grid-template-columns:1fr}body.bord .grid>div:first-child{displa
 #modes .regRap{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px;margin:14px 0 16px;padding:14px;background:#F7F5F0;border-radius:12px}
 #modes .regRap label{font-size:12px;font-weight:800;color:var(--gris);display:flex;flex-direction:column;gap:5px;text-transform:uppercase;letter-spacing:.04em}
 #modes .regRap label:nth-child(2){grid-column:1/-1}
+#modes .corser{grid-column:1/-1;display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-top:1px solid var(--ligne);padding-top:12px;margin-top:2px}#modes .corser b{font-size:14px}#modes .corser small{color:var(--gris)}#modes .corser button{padding:8px 14px;background:#24211E;color:#fff}
+#modes .bx{max-height:94vh;overflow:auto}
 #modes .regRap .seg button{text-transform:none;letter-spacing:0;background:#fff;border:1px solid var(--ligne)}#modes .regRap .seg button.on{background:var(--acc);color:#fff;border-color:transparent}
 @media (max-width:640px){#modes .regRap{grid-template-columns:1fr}}
 #modes .duo{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0 10px}
@@ -216,6 +218,40 @@ i.let,.ch4 button i{background:var(--lc,var(--acc))!important;color:#fff!importa
 @media (max-width:700px){#animBar{left:8px;right:8px;transform:none}#animBar button{flex:1 1 40%}.son{top:64px;bottom:auto}}
 .lbl{display:block;font-size:12px;font-weight:800;color:var(--gris);text-transform:uppercase;letter-spacing:.04em;margin:10px 0 4px}
 .regD{margin:14px 0;border:1px solid var(--ligne);border-radius:12px;padding:0 14px;background:#FBFAF7}.regD summary{cursor:pointer;padding:14px 0;font-weight:800;list-style:none}.regD summary::before{content:"▸ ";color:var(--acc)}.regD[open] summary::before{content:"▾ "}.regD summary span{display:block;font-weight:500;font-size:13px;color:var(--gris);margin-top:2px}
+/* ---- Types de questions (7 nov.) ---- */
+.k4{--lc:#5B8DEF}.k5{--lc:#9AA34A}
+.ech>div.k4,.ech>div.k5,.eord>div{box-shadow:inset .45vw 0 0 var(--lc);background:color-mix(in srgb,var(--lc) 14%,#262A31)!important}
+.ch4 button.k4,.ch4 button.k5{border-color:color-mix(in srgb,var(--lc) 65%,transparent)!important;background:color-mix(in srgb,var(--lc) 22%,rgba(0,0,0,.25))!important;box-shadow:inset 6px 0 0 var(--lc)}
+.ch4 button:disabled{cursor:default}.ch4.multi button:not(.choisi){opacity:.8}.ch4.multi button.choisi i{background:#fff!important;color:#24211E!important}.ch4.multi button.choisi,.ch4.ordre button.choisi{border-color:#fff!important;box-shadow:inset 6px 0 0 var(--lc),0 0 0 2px #fff}
+.ch4.ordre button.choisi i{background:#fff!important;color:#24211E!important}
+.aideT{margin:4px 0 12px;opacity:.85;font-size:15px}.aideT.lec{font-size:18px;margin-top:20px}
+.valider{width:100%;margin-top:12px;font-size:20px;padding:16px;background:#fff;color:#24211E}.valider:disabled{opacity:.4}
+.duoB{display:grid;grid-template-columns:1fr 2fr;gap:10px;margin-top:12px}.duoB .valider{margin-top:0}
+.nbx{display:flex;gap:10px;align-items:center}.nbx input{flex:1;min-width:0;font-size:30px;font-weight:800;padding:16px;text-align:center;border-radius:14px;border:2px solid rgba(255,255,255,.3);background:rgba(0,0,0,.25);color:#fff}.nbx span{font-size:22px;font-weight:800}
+.ch4.mise button{min-height:96px!important}
+.etype{text-align:center;font-size:1.3vw;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#B5AFA6;margin-top:.5vh}
+.eord{display:grid;grid-template-columns:1fr 1fr;gap:1vw}.eord>div{border-radius:1vw;padding:1.3vw 1.8vw;font-size:1.7vw;font-weight:800}
+.eord.rev{grid-template-columns:1fr}.eord.rev>div{background:#1F4D36!important;box-shadow:inset .45vw 0 0 #7CF0A8;padding:.9vw 1.6vw}
+.ephr{font-size:2.2vw;font-weight:700;line-height:2.1;text-align:center;max-width:80vw;margin:0 auto}
+.ephr span{display:inline;padding:.2vw .6vw;border-radius:.6vw;background:color-mix(in srgb,var(--lc) 16%,transparent);box-shadow:inset 0 -.3vw 0 var(--lc);margin:0 .2vw}
+.ephr span em{font-style:normal;font-size:1.3vw;margin-left:.5vw;background:rgba(0,0,0,.3);border-radius:.6vw;padding:0 .5vw}
+.ephr.rev span.pas{opacity:.35}.ephr.rev span.faux{background:#7A2420;box-shadow:inset 0 -.3vw 0 #FF8A80}
+.enb{text-align:center;font-size:2vw;font-weight:700;color:#D8D2C8;margin-top:2vh}.enb small{color:#B5AFA6}
+.enbR{text-align:center;font-size:5vw;font-weight:900;color:#7CF0A8;margin-top:2vh}
+.elec{text-align:center;font-size:2.4vw;font-weight:800;color:#FFD27A;margin-top:3vh}
+.ech.lettres div{justify-content:center}.ech.lettres i.let{width:4vw;height:4vw;font-size:2.4vw}
+.ezoom{width:min(40vw,52vh);aspect-ratio:16/10;margin:0 auto 2.5vh;border-radius:1vw;background-size:300% auto;background-repeat:no-repeat;position:relative;box-shadow:0 0 0 .3vw rgba(255,255,255,.2)}
+.ezoom span{position:absolute;left:1vw;top:1vw;background:rgba(0,0,0,.6);color:#fff;font-size:1.1vw;font-weight:800;border-radius:2vw;padding:.3vw 1vw}
+.eimg.petit{max-height:22vh}
+.dblE{display:flex;flex-direction:column;align-items:center;gap:2vh;margin-top:8vh;text-align:center}.dblE b{font-size:6vw;color:#FFB15C}.dblE span{font-size:2vw;color:#D8D2C8;line-height:1.4}.dblE em{font-style:normal;font-size:2.4vw;font-weight:800;background:rgba(255,177,92,.15);border-radius:2vw;padding:.6vw 2vw}
+.ajouts{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:12px 0}.ajouts span{font-weight:800;color:var(--gris);font-size:13px;margin-right:4px}.ajouts button{padding:10px 12px}
+.qe .ln input[type=checkbox]{width:22px;height:22px;flex:none}.qe .ln .num{flex:none;width:26px;height:26px;border-radius:7px;background:var(--acc);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:13px}
+.nbE{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:8px}.nbE label{font-size:12px;font-weight:800;color:var(--gris);display:flex;flex-direction:column;gap:4px}
+.btn2.petit{padding:8px 12px;font-size:13px;margin-top:6px}
+.imgE{display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap}.imgE select{padding:9px;border-radius:9px;border:1px solid var(--ligne);margin-bottom:6px}
+.vignette{position:relative;display:inline-block;overflow:hidden;border-radius:8px}.vignette img{max-height:110px;border-radius:8px;display:block}.vignette.z{cursor:crosshair}
+.vignette i{position:absolute;width:33%;height:33%;transform:translate(-50%,-50%);border:3px solid #E0892B;border-radius:6px;box-shadow:0 0 0 999px rgba(0,0,0,.35);pointer-events:none}
+@media (max-width:640px){.nbE{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -253,7 +289,7 @@ i.let,.ch4 button i{background:var(--lc,var(--acc))!important;color:#fff!importa
 <div class="carte"><h2>Quiz prêts à jouer</h2><div class="sous" style="margin:-4px 0 12px">Un quiz par livre de la bibliothèque, avec des images du livre. « Copier et modifier » pour en faire ton propre quiz.</div><div id="quizListe" class="cartes"></div></div>
 </div>
 <div id="vColler" class="cache"><div class="carte"><h2>Coller des questions</h2>
-<div class="sous" style="margin-bottom:8px">Une question par bloc, séparés par une ligne vide. Mets une <b>*</b> devant la bonne réponse et un <b>-</b> devant les autres (2 à 4 choix). Une ligne qui commence par <b>?</b> ajoute une explication.</div>
+<div class="sous" style="margin-bottom:8px">Une question par bloc, séparés par une ligne vide. Mets une <b>*</b> devant la bonne réponse et un <b>-</b> devant les autres (2 à 4 choix). Une ligne qui commence par <b>?</b> ajoute une explication. Plusieurs <b>*</b> = plusieurs bonnes réponses. <b>= 15,4 ± 0,1 VA</b> = question de calcul. Des lignes <b>1.</b> <b>2.</b> <b>3.</b> sous la question = étapes à remettre en ordre.</div>
 <textarea id="tColler" placeholder="Quel signal donne une vanne de gicleurs fermée ?
 - Alarme
 * Supervision
@@ -277,13 +313,18 @@ Le propane s'accumule…
 <label>Ordre<div class="seg" data-r="melange"><button data-v="non">Tel quel</button><button data-v="q">Questions mêlées</button><button data-v="tout">Questions et choix mêlés</button></div></label>
 <label>Nombre de questions par partie (au hasard)<div class="seg" data-r="nb"><button data-v="tout">Toutes</button><button data-v="10">10</button><button data-v="12">12</button><button data-v="15">15</button><button data-v="20">20</button></div></label>
 <label>Temps pour répondre<div class="seg" data-r="temps"><button data-v="moins">Plus court</button><button data-v="normal">Normal</button><button data-v="plus">Plus long</button></div></label>
+<label>Pénalité (mauvaise réponse : −250)<div class="seg" data-r="penalite"><button data-v="non">Non</button><button data-v="oui">Oui</button></div></label>
+<label>Choix cachés 5 s (lire avant de répondre)<div class="seg" data-r="cache"><button data-v="non">Non</button><button data-v="oui">Oui</button></div></label>
+<label>Texte des choix seulement sur l'iPad<div class="seg" data-r="lettres"><button data-v="non">Non</button><button data-v="oui">Oui</button></div></label>
+<label>Double ou rien à la dernière question<div class="seg" data-r="double"><button data-v="non">Non</button><button data-v="oui">Oui</button></div></label>
 <label>Sons au tableau<div class="seg" data-r="son"><button data-v="oui">Oui</button><button data-v="non">Non</button></div></label>
 <label>Musique pendant les questions<div class="seg" data-r="musique"><button data-v="oui">Oui</button><button data-v="non">Non</button></div></label>
 <label>Bonus de série (3 bonnes de suite et plus : +100, +200, +300)<div class="seg" data-r="bonus"><button data-v="oui">Oui</button><button data-v="non">Non</button></div></label>
 <label>Couleur du quiz<div class="coul" id="eCoul"></div></label>
 </div></details>
 <div id="eQs"></div>
-<div class="ctl"><button class="btn2" id="eAjout">+ Question à choix</button><button class="btn2" id="eAjoutVF">+ Vrai ou faux</button><button id="eSauve">Enregistrer</button><button class="btn2" id="eAnnule">Annuler</button></div>
+<div class="ajouts"><span>Ajouter une question :</span><button class="btn2" data-aj="choix">Choix</button><button class="btn2" data-aj="vf">Vrai ou faux</button><button class="btn2" data-aj="multi">Plusieurs bonnes</button><button class="btn2" data-aj="ordre">Remettre en ordre</button><button class="btn2" data-aj="nombre">Calcul</button><button class="btn2" data-aj="erreur">Trouve l'erreur</button></div>
+<div class="ctl"><button id="eSauve">Enregistrer</button><button class="btn2" id="eAnnule">Annuler</button></div>
 <div class="sous" style="margin-top:8px">Le quiz est gardé sur cet appareil. « Exporter » (dans la liste) te donne un fichier à garder ou à partager à un collègue.</div></div>
 </div>
 <div id="vJeu" class="cache">
@@ -304,10 +345,36 @@ const RELAIS = "https://ntfy.sh/", PREFIXE = "pda-quiz-";
 const SB_URL = "https://kjlotlhqrgekzohshmbn.supabase.co", SB_CLE = "sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY";
 const $ = id => document.getElementById(id);
 const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"})[c]);
-const SYMB = ["A", "B", "C", "D"];
+const SYMB = ["A", "B", "C", "D", "E", "F"];
+/* ---- Types de questions (7 nov., « pour les caler ») : choix (défaut, aussi vrai ou faux), multi (plusieurs bonnes),
+   ordre (remettre en ordre), nombre (calcul tapé), erreur (trouve le morceau faux d'une phrase); une question à choix avec image
+   peut montrer son image en « zoom mystère » (Q.zoom = {x, y} en %, agrandie ×3; l'image entière apparaît à la réponse). ---- */
+const TYPES = {choix: "Choix", vf: "Vrai ou faux", multi: "Plusieurs bonnes réponses", ordre: "Remettre en ordre", nombre: "Calcul", erreur: "Trouve l'erreur"};
+const typeDe = Q => Q.t || "choix";
+const num = s => parseFloat(String(s == null ? "" : s).replace(/\s/g, "").replace(",", "."));
+const fmtN = x => String(Math.round(x * 1000) / 1000).replace(".", ",");
+function juste(Q, c){
+  const t = typeDe(Q);
+  if (c == null || c === -1) return false;
+  if (t === "multi") return Array.isArray(c) && c.length === Q.bon.length && c.every(x => Q.bon.includes(x));
+  if (t === "ordre") return Array.isArray(c) && c.join() === Q.bon.join();
+  if (t === "nombre") { const x = num(c); return !isNaN(x) && Math.abs(x - Q.bon) <= (+Q.tol || 0) + 1e-9; }
+  return c === Q.bon;
+}
+function texteBon(Q){ const t = typeDe(Q);
+  if (t === "multi") return Q.bon.map(k => SYMB[k] + ". " + Q.ch[k]).join("  ·  ");
+  if (t === "ordre") return Q.bon.map((k, j) => (j + 1) + ". " + Q.ch[k]).join("   ");
+  if (t === "nombre") return fmtN(Q.bon) + (Q.u ? " " + Q.u : "") + (+Q.tol ? " (± " + fmtN(+Q.tol) + ")" : "");
+  return Q.ch[Q.bon]; }
+function texteRep(Q, c){ const t = typeDe(Q);
+  if (c == null || c === -1) return "—";
+  if (t === "multi") return (c || []).map(k => SYMB[k]).join(", ") || "rien";
+  if (t === "ordre") return (c || []).map(k => SYMB[k]).join(" → ");
+  if (t === "nombre") return String(c) + (Q.u ? " " + Q.u : "");
+  return SYMB[c] + ". " + (Q.ch[c] || ""); }
 const FLAMME = '<svg class="flamme" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5c.6 3.2-1.4 4.9-2.9 6.6C7.6 10.8 6.5 12.6 6.5 15a5.5 5.5 0 0 0 11 0c0-2.3-1-4.1-2.2-5.6-.3 1.2-.9 2.1-1.9 2.6.4-3.4-.4-6.8-1.4-9.5z" fill="currentColor"/><path d="M12 13.2c-1.3 1.3-2 2.3-2 3.6a2 2 0 0 0 4 0c0-1.2-.7-2.3-2-3.6z" fill="#FFE7A3"/></svg>';
 const COULEURS = ["#534AB7", "#B3261E", "#185FA5", "#0F6E56", "#854F0B", "#3A3936"];
-const REG_DEF = {mode: "ind", points: "vitesse", classement: "oui", melange: "non", son: "oui", musique: "oui", bonus: "oui", nb: "tout", temps: "normal", coul: "#534AB7"};
+const REG_DEF = {mode: "ind", points: "vitesse", classement: "oui", melange: "non", son: "oui", musique: "oui", bonus: "oui", nb: "tout", temps: "normal", penalite: "non", cache: "non", lettres: "non", double: "non", coul: "#534AB7"};
 const sombre = h => { const n = parseInt(h.slice(1), 16), f = .38; return `rgb(${Math.round((n >> 16) * f + 18)},${Math.round((n >> 8 & 255) * f + 18)},${Math.round((n & 255) * f + 24)})`; };
 const ord = r => r + (r === 1 ? "er" : "e");
 
@@ -417,10 +484,22 @@ function telecommande(bord){
     if (r.melange !== "non") qs = melanger(qs);
     /* nombre de questions : tirage au hasard (dans l'ordre du quiz si « Tel quel ») */
     const nb = parseInt(r.nb, 10);
-    if (nb > 0 && qs.length > nb){ const garde = new Set(melanger(qs.map((_, k) => k)).slice(0, nb)); qs = qs.filter((_, k) => garde.has(k)); }
+    if (nb > 0 && qs.length > nb){
+      /* tirage varié : d'abord une question de chaque type spécial (plusieurs bonnes, ordre, calcul, erreur, zoom), puis le reste au hasard */
+      const sorte = Q => Q.zoom ? "zoom" : typeDe(Q), garde = new Set(), idx = melanger(qs.map((_, k) => k));
+      ["multi", "ordre", "nombre", "erreur", "zoom"].forEach(s => { const k = idx.find(j => sorte(qs[j]) === s); if (k != null && garde.size < Math.ceil(nb / 2)) garde.add(k); });
+      idx.forEach(k => { if (garde.size < nb) garde.add(k); });
+      qs = qs.filter((_, k) => garde.has(k)); if (r.melange !== "non") qs = melanger(qs); }
     if (r.temps === "plus") qs.forEach(Q => Q.s = Math.round((Q.s || 20) * 1.5));
     if (r.temps === "moins") qs.forEach(Q => Q.s = Math.max(10, Math.round((Q.s || 20) * .7)));
-    if (r.melange === "tout") qs.forEach(Q => { if (Q.ch.length === 2 && /^vrai$/i.test(Q.ch[0])) return; const p = melanger(Q.ch.map((_, k) => k)); Q.ch = p.map(k => Q.ch[k]); Q.bon = p.indexOf(Q.bon); });
+    qs.forEach(Q => {
+      const t = typeDe(Q);
+      if (t === "ordre") {   /* les étapes sont toujours mêlées (jamais dans le bon ordre au départ) */
+        const L = Q.ch, idx = L.map((_, k) => k); let p = melanger(idx); for (let e = 0; e < 8 && p.join() === idx.join(); e++) p = melanger(idx);
+        Q.ch = p.map(k => L[k]); Q.bon = idx.map(j => p.indexOf(j)); return; }
+      if (r.melange !== "tout" || t === "nombre" || t === "erreur" || (Q.ch.length === 2 && /^vrai$/i.test(Q.ch[0]))) return;
+      const p = melanger(Q.ch.map((_, k) => k)); Q.ch = p.map(k => Q.ch[k]);
+      Q.bon = t === "multi" ? Q.bon.map(b => p.indexOf(b)).sort((a, b) => a - b) : p.indexOf(Q.bon); });
     G.jeu = qs;
   }
   const appliquerCouleur = () => document.documentElement.style.setProperty("--acc", R().coul);
@@ -435,19 +514,23 @@ function telecommande(bord){
     $("tRep").innerHTML = ids().sort((a, b) => r[a] - r[b]).map(id => {
       const x = G.reps[id]; let c = '<span class="att">—</span>';
       if (G.etat === "question") c = x ? '<span class="ok">✓ a répondu</span>' : '<span class="att">en attente…</span>';
-      else if (G.etat === "rev" && Q) c = x ? `<b>${SYMB[x.c]}.</b> ${esc(Q.ch[x.c])} · <span class="${x.c === Q.bon ? "ok" : "ko"}">${x.c === Q.bon ? (x.g ? "+" + x.g : "bonne") : "mauvaise"}</span>` : '<span class="ko">Pas répondu</span>';
+      else if (G.etat === "mise") c = P[id].mise ? '<span class="ok">mise tout</span>' : '<span class="att">garde ses points</span>';
+      else if (G.etat === "rev" && Q) c = x && x.c != null ? `${esc(texteRep(Q, x.c))} · <span class="${x.ok ? "ok" : "ko"}">${x.ok ? (x.g ? "+" + x.g : "bonne") : x.g < 0 ? x.g : "mauvaise"}</span>${x.dbl ? ` · <b>${x.dbl > 0 ? "double +" + x.dbl : "mise perdue"}</b>` : ""}` : '<span class="ko">Pas répondu</span>' + (x && x.dbl ? " · <b>mise perdue</b>" : "");
       return `<tr><td><b>${visage(P[id].av, "v-s")}${esc(P[id].nom)}</b>${P[id].prenom ? ` <span class="sous">(${esc(P[id].prenom)})</span>` : ""}</td><td>${c}</td><td>${P[id].pts}</td><td>${G.etat === "lobby" ? "—" : r[id]}</td><td style="text-align:right"><button class="kick" data-kick="${id}" title="Retirer de la partie (il pourra revenir)">✕</button></td></tr>`;
     }).join("") || '<tr><td colspan="5" class="sous">Personne pour l\'instant.</td></tr>';
   }
   let vT = 0, vD = null;
   function vue(){ if (vD) return; vD = setTimeout(() => { vD = null; vT = Date.now(); envoyer(topic, vueObj()); }, Math.max(0, 450 - (Date.now() - vT))); }
   function vueObj(){
-    const Q = G.jeu[G.i], r = rangs(), cpt = [0, 0, 0, 0], reg = R();
-    Object.values(G.reps).forEach(x => cpt[x.c]++);
+    const Q = G.jeu[G.i], r = rangs(), reg = R(), t = Q ? typeDe(Q) : "choix";
+    let cpt = [0, 0, 0, 0, 0, 0];
+    if (Q && ["ordre", "nombre"].includes(t)) cpt = [Object.values(G.reps).filter(x => juste(Q, x.c)).length, Object.keys(G.reps).length];
+    else Object.values(G.reps).forEach(x => [].concat(x.c).forEach(k => { if (k >= 0) cpt[k]++; }));
     return {m: "vue", code, etat: G.etat === "choix" ? "lobby" : G.etat, titre: G.quiz ? G.quiz.titre : "Quiz maison", i: G.i, n: G.jeu.length, t0: G.t0, now: Date.now(),
-      reg: {coul: reg.coul, son: reg.son, musique: reg.musique || "oui", classement: reg.classement, points: reg.points, mode: reg.mode},
+      reg: {coul: reg.coul, son: reg.son, musique: reg.musique || "oui", classement: reg.classement, points: reg.points, mode: reg.mode, lettres: reg.lettres || "non"},
       couv: G.quiz && G.quiz.couv && !/^data:/.test(G.quiz.couv) ? G.quiz.couv : (G.quiz && G.quiz.couv ? "img" : ""), sujet: G.quiz ? G.quiz.sujet || "" : "",
-      q: Q && ["question", "rev"].includes(G.etat) ? {q: Q.q, ch: Q.ch, s: Q.s, img: !!Q.img, expl: G.etat === "rev" ? Q.expl || "" : ""} : null, bon: G.etat === "rev" ? Q.bon : null, cpt, nrep: Object.keys(G.reps).length,
+      q: Q && ["question", "rev"].includes(G.etat) ? {q: Q.q, ch: Q.ch, s: Q.s, t, u: Q.u || "", zoom: Q.zoom || null, img: !!Q.img, expl: G.etat === "rev" ? Q.expl || "" : "", bonTxt: G.etat === "rev" ? texteBon(Q) : ""} : null,
+      bon: G.etat === "rev" ? Q.bon : null, cpt, nrep: Object.keys(G.reps).length, mises: G.etat === "mise" ? ids().filter(id => P[id].mise).length : 0,
       joueurs: ids().map(id => ({n: P[id].nom, av: P[id].av, pts: P[id].pts, r: r[id], g: G.etat === "rev" && G.reps[id] ? G.reps[id].g || 0 : 0, s: P[id].serie || 0, bo: G.etat === "rev" && G.reps[id] ? G.reps[id].bonus || 0 : 0})).sort((a, b) => a.r - b.r)};
   }
   function maj(){
@@ -456,10 +539,11 @@ function telecommande(bord){
     $("jTitre").textContent = G.quiz.titre;
     $("qCour").textContent = G.etat === "lobby" ? "En attente des participants…" : G.etat === "fin" ? "Partie terminée : le classement final est sur chaque iPad." : (G.i + 1) + ". " + Q.q;
     $("qInfo").textContent = G.etat === "question" ? Object.keys(G.reps).length + " réponse(s) sur " + ids().length + " · " + Q.s + " s" :
-      G.etat === "rev" ? "Bonne réponse : " + Q.ch[Q.bon] + (R().classement === "oui" ? " · le rang de chacun est envoyé sur son iPad." : "") : G.quiz.qs.length + " questions";
+      G.etat === "rev" ? "Bonne réponse : " + texteBon(Q) + (R().classement === "oui" ? " · le rang de chacun est envoyé sur son iPad." : "") :
+      G.etat === "mise" ? "Double ou rien : " + ids().filter(id => P[id].mise).length + " joueur(s) misent. Touche « Question suivante » pour commencer." : G.quiz.qs.length + " questions";
     $("bGo").disabled = G.etat !== "lobby";
-    $("bSuite").disabled = !["question", "rev"].includes(G.etat);
-    $("bSuite").textContent = G.etat === "question" ? "Montrer la réponse" : G.i + 1 >= G.jeu.length ? "Voir le podium" : "Question suivante";
+    $("bSuite").disabled = !["question", "rev", "mise"].includes(G.etat);
+    $("bSuite").textContent = G.etat === "question" ? "Montrer la réponse" : G.etat === "mise" ? "Lancer la dernière question" : G.i + 1 >= G.jeu.length ? "Voir le podium" : "Question suivante";
     table(); listeLob(); vue();
   }
   function envoyerCouv(){ if (G.quiz && G.quiz.couv && /^data:/.test(G.quiz.couv)) envoyer(topic, {m: "img", i: -1, data: G.quiz.couv}); }
@@ -467,28 +551,44 @@ function telecommande(bord){
   setInterval(() => { let ch = false; Object.values(P).forEach(p => { if (!p.parti && Date.now() - (p.vu || 0) > 40000) { p.parti = true; ch = true; } }); if (ch) { envoyerPersos(); maj(); if (G.etat === "question" && ids().length && ids().every(id => G.reps[id])) setTimeout(reveler, 300); } }, 5000);
   function envoyerPersos(){ envoyer(topic, {m: "persos", pris: ids().map(id => P[id].av).filter(v => v != null)}); }
   let minut = null;
-  function qMsg(pour){ const Q = G.jeu[G.i]; return {m: "q", pour, i: G.i, n: G.jeu.length, q: Q.q, ch: Q.ch, t0: G.t0, s: Q.s, coul: R().coul}; }
+  function qMsg(pour){ const Q = G.jeu[G.i]; return {m: "q", pour, i: G.i, n: G.jeu.length, q: Q.q, ch: Q.ch, t: typeDe(Q), u: Q.u || "", nb: typeDe(Q) === "multi" ? Q.bon.length : 0,
+    t0: G.t0, lec: Math.max(0, G.t0 - Date.now()), s: Q.s, coul: R().coul, dbl: !!(G.dbl && pour && P[pour] && P[pour].mise)}; }
   function question(){
-    clearTimeout(minut); G.etat = "question"; G.reps = {}; G.t0 = Date.now() + 600;
-    const Q = G.jeu[G.i];
+    clearTimeout(minut); G.etat = "question"; G.reps = {};
+    const Q = G.jeu[G.i], lec = R().cache === "oui" ? 5000 : 0;   /* « choix cachés » : 5 s pour lire la question avant de voir les choix */
+    G.t0 = Date.now() + 600 + lec;
     if (Q.img) envoyer(topic, {m: "img", i: G.i, data: Q.img});
     envoyer(topic, qMsg());
-    minut = setTimeout(reveler, Q.s * 1000 + 1000); maj();
+    ids().forEach(id => { if (G.dbl && P[id].mise) envoyer(topic, {m: "dblrap", pour: id}); });
+    minut = setTimeout(reveler, lec + Q.s * 1000 + 1000); maj();
+  }
+  /* « Double ou rien » : avant la dernière question, chacun peut miser tous ses points */
+  function mise(){
+    clearTimeout(minut); G.etat = "mise"; G.dbl = true; ids().forEach(id => P[id].mise = false);
+    envoyer(topic, {m: "mise", pts: Object.fromEntries(ids().map(id => [id, P[id].pts]))});
+    minut = setTimeout(question, 15000); maj();
+  }
+  function suivante(){   /* passe à la question G.i (déjà avancée) */
+    if (R().double === "oui" && G.i === G.jeu.length - 1 && G.jeu.length > 1 && G.etat !== "mise") { mise(); return; }
+    question();
   }
   function reveler(){
     if (G.etat !== "question") return; clearTimeout(minut); G.etat = "rev";
-    const Q = G.jeu[G.i], reg = R(), avant = rangs();
+    const Q = G.jeu[G.i], reg = R(), avant = rangs(), der = G.dbl && G.i === G.jeu.length - 1;
     Object.entries(G.reps).forEach(([id, x]) => {
-      const bon = x.c === Q.bon;
+      const bon = x.ok = juste(Q, x.c);
       x.g = !bon || reg.points === "aucun" ? 0 : reg.points === "fixe" ? 1000 : Math.round(1000 - 500 * Math.min(1, Math.max(0, x.ms) / (Q.s * 1000)));
       if (P[id]) { P[id].serie = bon ? (P[id].serie || 0) + 1 : 0; P[id].max = Math.max(P[id].max || 0, P[id].serie);   /* série de bonnes réponses */
         x.bonus = bon && reg.bonus !== "non" && reg.points !== "aucun" && P[id].serie >= 3 ? 100 * Math.min(3, P[id].serie - 2) : 0; x.g += x.bonus;
+        if (!bon && reg.penalite === "oui" && reg.points !== "aucun") x.g = -Math.min(250, P[id].pts);   /* pénalité : jamais sous 0 */
         P[id].pts += x.g; P[id].bons = (P[id].bons || 0) + (bon ? 1 : 0); }
     });
     ids().forEach(id => { if (!G.reps[id]) P[id].serie = 0; });   /* pas répondu = série brisée */
+    if (der) ids().forEach(id => { if (!P[id].mise) return; const x = G.reps[id] || (G.reps[id] = {c: null, ms: 0, g: 0, ok: false});
+      const avantMise = P[id].pts - (x.g || 0); x.dbl = x.ok ? avantMise : -P[id].pts; P[id].pts += x.dbl; });
     const r = rangs(), n = ids().length, res = {};
-    ids().forEach(id => { const x = G.reps[id]; res[id] = {rep: x ? x.c : -1, g: x ? x.g : 0, bonus: x ? x.bonus || 0 : 0, serie: P[id].serie || 0, pts: P[id].pts, rang: r[id], avant: avant[id], bons: P[id].bons || 0}; });
-    envoyer(topic, {m: "rev", i: G.i, bon: Q.bon, bonTxt: Q.ch[Q.bon], expl: Q.expl || "", res, n, classement: reg.classement, points: reg.points}); maj();
+    ids().forEach(id => { const x = G.reps[id]; res[id] = {rep: x ? x.c : null, ok: !!(x && x.ok), g: x ? x.g : 0, bonus: x ? x.bonus || 0 : 0, dbl: x ? x.dbl || 0 : 0, mise: !!(der && P[id].mise), serie: P[id].serie || 0, pts: P[id].pts, rang: r[id], avant: avant[id], bons: P[id].bons || 0}; });
+    envoyer(topic, {m: "rev", i: G.i, bon: Q.bon, bonTxt: texteBon(Q), expl: Q.expl || "", res, n, classement: reg.classement, points: reg.points}); maj();
   }
   function finir(){
     clearTimeout(minut); G.etat = "fin";
@@ -496,8 +596,8 @@ function telecommande(bord){
     ids().forEach(id => res[id] = {pts: P[id].pts, rang: r[id], bons: P[id].bons || 0, max: P[id].max || 0});
     envoyer(topic, {m: "fin", res, n, total: G.jeu.length, points: R().points}); maj(); envoyer(topic, vueObj());
   }
-  $("bGo").onclick = () => { if (!G.quiz) return; Object.values(P).forEach(p => { p.pts = 0; p.bons = 0; }); preparer(); G.i = 0; question(); };
-  $("bSuite").onclick = () => { if (G.etat === "question") { reveler(); return; } if (G.i + 1 >= G.jeu.length) { finir(); return; } G.i++; question(); };
+  $("bGo").onclick = () => { if (!G.quiz) return; Object.values(P).forEach(p => { p.pts = 0; p.bons = 0; p.serie = 0; p.max = 0; p.mise = false; }); G.dbl = false; preparer(); G.i = 0; suivante(); };
+  $("bSuite").onclick = () => { if (G.etat === "question") { reveler(); return; } if (G.etat === "mise") { question(); return; } if (G.i + 1 >= G.jeu.length) { finir(); return; } G.i++; suivante(); };
   $("bFin").onclick = () => { clearTimeout(minut); envoyer(topic, {m: "attente"}); G.quiz = null; G.etat = "choix"; G.i = -1; G.jeu = []; document.documentElement.style.removeProperty("--acc"); montrer("vChoix"); listeQuiz(); vue(); };
 
   if (!bord) ecouter(topic, m => {
@@ -512,8 +612,10 @@ function telecommande(bord){
       if (!P[m.pid]) P[m.pid] = {nom: m.nom, pts: 0, bons: 0}; else P[m.pid].nom = m.nom;
       P[m.pid].av = m.av; P[m.pid].prenom = m.prenom || ""; P[m.pid].parti = false; P[m.pid].vu = Date.now(); envoyerPersos();
       if (G.etat === "question") envoyer(topic, qMsg(m.pid));
+      else if (G.etat === "mise") envoyer(topic, {m: "mise", pts: {[m.pid]: P[m.pid].pts}});
       else envoyer(topic, {m: "bienvenue", pour: m.pid, titre: G.quiz ? G.quiz.titre : "", coul: R().coul, mode: R().mode});
       maj();
+    } else if (m.m === "miser" && G.etat === "mise" && P[m.pid]) { P[m.pid].mise = !!m.oui; maj();
     } else if (m.m === "rep" && G.etat === "question" && m.i === G.i && P[m.pid] && !G.reps[m.pid]) {
       G.reps[m.pid] = {c: m.c, ms: Date.now() - G.t0}; maj();
       if (Object.keys(G.reps).length >= ids().length) setTimeout(reveler, 700);
@@ -566,14 +668,21 @@ function telecommande(bord){
     const blocs = $("tColler").value.split(/\n\s*\n/).map(b => b.split("\n").map(l => l.trim()).filter(Boolean)).filter(b => b.length);
     const qs = [], err = [];
     blocs.forEach((b, k) => {
-      const Q = {q: "", ch: [], bon: -1, s: 20, expl: ""};
+      const Q = {q: "", ch: [], bon: -1, s: 20, expl: ""}, bons = [], etapes = [];
       b.forEach(l => {
-        if (/^\*/.test(l)) { Q.bon = Q.ch.length; Q.ch.push(l.replace(/^\*\s*/, "")); }
+        let mm;
+        if ((mm = /^=\s*([-\d.,]+)\s*(?:±\s*([\d.,]+))?\s*(.*)$/.exec(l))) { Q.t = "nombre"; Q.bon = num(mm[1]); if (mm[2]) Q.tol = num(mm[2]); if (mm[3]) Q.u = mm[3].trim(); Q.s = 45; }
+        else if ((mm = /^\d+[.)]\s+(.+)$/.exec(l)) && Q.q) etapes.push(mm[1]);
+        else if (/^\*/.test(l)) { bons.push(Q.ch.length); Q.bon = Q.ch.length; Q.ch.push(l.replace(/^\*\s*/, "")); }
         else if (/^-/.test(l)) Q.ch.push(l.replace(/^-\s*/, ""));
         else if (/^\?/.test(l)) Q.expl = l.replace(/^\?\s*/, "");
         else Q.q = Q.q ? Q.q + " " + l : l;
       });
-      if (!Q.q || Q.ch.length < 2 || Q.ch.length > 4 || Q.bon < 0) err.push(k + 1); else qs.push(Q);
+      if (bons.length > 1) { Q.t = "multi"; Q.bon = bons; Q.s = 25; }
+      if (etapes.length >= 3) { Q.t = "ordre"; Q.ch = etapes.slice(0, 6); Q.bon = Q.ch.map((_, j) => j); Q.s = 40; }
+      if (Q.t === "nombre") { if (!Q.q || isNaN(Q.bon)) err.push(k + 1); else { Q.ch = []; qs.push(Q); } }
+      else if (Q.t === "ordre") { if (!Q.q) err.push(k + 1); else qs.push(Q); }
+      else if (!Q.q || Q.ch.length < 2 || Q.ch.length > 4 || Q.bon < 0) err.push(k + 1); else qs.push(Q);
     });
     if (!qs.length) { $("cMsg").textContent = "Aucune question reconnue. Vérifie les * et les -."; return; }
     editer({id: "q" + Date.now(), titre: "", reg: Object.assign({}, REG_DEF), qs});
@@ -581,7 +690,14 @@ function telecommande(bord){
   };
   /* ----- éditeur ----- */
   let ed = null;
-  function qVide(vf){ return vf ? {q: "", ch: ["Vrai", "Faux"], bon: 0, s: 15, expl: ""} : {q: "", ch: ["", "", "", ""], bon: 0, s: 20, expl: ""}; }
+  function qVide(t){
+    if (t === true || t === "vf") return {q: "", ch: ["Vrai", "Faux"], bon: 0, s: 15, expl: ""};
+    if (t === "multi") return {t, q: "", ch: ["", "", "", ""], bon: [], s: 25, expl: ""};
+    if (t === "ordre") return {t, q: "Place ces étapes dans le bon ordre.", ch: ["", "", "", ""], bon: [0, 1, 2, 3], s: 40, expl: ""};
+    if (t === "nombre") return {t, q: "", ch: [], bon: "", tol: 0, u: "", s: 45, expl: ""};
+    if (t === "erreur") return {t, q: "Trouve l'erreur dans cette phrase.", ch: ["", "", "", ""], bon: 0, s: 30, expl: ""};
+    return {q: "", ch: ["", "", "", ""], bon: 0, s: 20, expl: ""};
+  }
   function editer(q){
     const e = $("eErr"); if (e) e.remove();
     ed = JSON.parse(JSON.stringify(q || {id: "q" + Date.now(), titre: "", qs: [qVide()]}));
@@ -614,49 +730,67 @@ function telecommande(bord){
   function lireEd(){
     ed.titre = $("eTitre").value.trim(); ed.sujet = $("eSujet").value.trim();
     document.querySelectorAll(".qe").forEach((d, k) => {
-      const Q = ed.qs[k];
+      const Q = ed.qs[k], t = typeDe(Q);
       Q.q = d.querySelector(".tq").value.trim();
-      Q.ch = [...d.querySelectorAll(".tc")].map(x => x.value.trim());
-      Q.bon = +((d.querySelector("input[type=radio]:checked") || {}).value || 0);
-      Q.s = +d.querySelector("select").value;
+      Q.s = +d.querySelector("select.ts").value;
       Q.expl = d.querySelector(".ex").value.trim();
+      if (t === "nombre") { Q.bon = num(d.querySelector(".nbR").value); Q.tol = num(d.querySelector(".nbT").value) || 0; Q.u = d.querySelector(".nbU").value.trim(); Q.ch = []; return; }
+      Q.ch = [...d.querySelectorAll(".tc")].map(x => x.value.trim());
+      if (t === "multi") Q.bon = [...d.querySelectorAll("input[type=checkbox]:checked")].map(x => +x.value);
+      else if (t === "ordre") Q.bon = Q.ch.map((_, j) => j);
+      else Q.bon = +((d.querySelector("input[type=radio]:checked") || {}).value || 0);
+      const z = d.querySelector(".zsel"); if (z) { if (z.value === "zoom") Q.zoom = Q.zoom || {x: 50, y: 50}; else delete Q.zoom; }
     });
   }
   function dessinerEd(){
     $("eQs").innerHTML = ed.qs.map((Q, k) => {
-      const vf = Q.ch.length === 2 && /^vrai$/i.test(Q.ch[0]) && /^faux$/i.test(Q.ch[1]);
-      const nb = vf ? 2 : 4;
-      return `<div class="qe"><div class="tete"><b>Question ${k + 1}${vf ? " · vrai ou faux" : ""}</b>
-      <select>${[...new Set([10, 15, 20, 25, 30, 45, 60, +Q.s || 20])].sort((x, y) => x - y).map(s => `<option value="${s}" ${(+Q.s || 20) === s ? "selected" : ""}>${s} s</option>`).join("")}</select>
+      const t = typeDe(Q), vf = t === "choix" && Q.ch.length === 2 && /^vrai$/i.test(Q.ch[0]) && /^faux$/i.test(Q.ch[1]);
+      const nom = vf ? "vrai ou faux" : t === "choix" ? (Q.zoom ? "zoom mystère" : "") : TYPES[t].toLowerCase();
+      const tps = `<select class="ts" aria-label="Temps">${[...new Set([10, 15, 20, 25, 30, 40, 45, 60, 90, +Q.s || 20])].sort((x, y) => x - y).map(s => `<option value="${s}" ${(+Q.s || 20) === s ? "selected" : ""}>${s} s</option>`).join("")}</select>`;
+      let corps = "", aide = "Coche le rond de la bonne réponse.";
+      if (t === "nombre") { corps = `<div class="nbE"><label>Bonne réponse<input class="nbR" inputmode="decimal" value="${Q.bon === "" || Q.bon == null || isNaN(Q.bon) ? "" : esc(fmtN(Q.bon))}" placeholder="ex. 15,4"></label><label>Marge acceptée (±)<input class="nbT" inputmode="decimal" value="${+Q.tol ? esc(fmtN(+Q.tol)) : ""}" placeholder="0"></label><label>Unité<input class="nbU" value="${esc(Q.u || "")}" placeholder="ex. VA, GPM, m" maxlength="12"></label></div>`; aide = "L'élève tape un nombre; la virgule ou le point sont acceptés."; }
+      else if (t === "ordre") { const n = Math.max(3, Math.min(6, Q.ch.length)); corps = Array.from({length: n}, (_, c) => `<div class="ln"><b class="num">${c + 1}</b><input class="tc" placeholder="Étape ${c + 1}${c >= 3 ? " (facultatif)" : ""}" value="${esc(Q.ch[c] || "")}" maxlength="80"></div>`).join("") + (n < 6 ? `<button class="btn2 petit" data-plus="${k}">+ Une étape</button>` : ""); aide = "Écris les étapes dans le bon ordre : elles seront mêlées pendant la partie."; }
+      else if (t === "multi") { corps = Array.from({length: 4}, (_, c) => `<div class="ln"><input type="checkbox" value="${c}" ${(Q.bon || []).includes(c) ? "checked" : ""} title="Bonne réponse"><input class="tc" placeholder="Choix ${c + 1}${c >= 2 ? " (facultatif)" : ""}" value="${esc(Q.ch[c] || "")}" maxlength="80"></div>`).join(""); aide = "Coche toutes les bonnes réponses (au moins une). L'élève doit les trouver toutes."; }
+      else if (t === "erreur") { corps = Array.from({length: 4}, (_, c) => `<div class="ln"><input type="radio" name="b${k}" value="${c}" ${Q.bon === c ? "checked" : ""} title="Le morceau faux"><input class="tc" placeholder="Morceau ${c + 1} de la phrase${c >= 2 ? " (facultatif)" : ""}" value="${esc(Q.ch[c] || "")}" maxlength="90"></div>`).join(""); aide = "Coupe la phrase en morceaux, dans l'ordre. Coche le morceau qui contient l'erreur."; }
+      else corps = Array.from({length: vf ? 2 : 4}, (_, c) => `<div class="ln"><input type="radio" name="b${k}" value="${c}" ${Q.bon === c ? "checked" : ""} title="Bonne réponse"><input class="tc" placeholder="${c < 2 ? "Choix " + (c + 1) : "Choix " + (c + 1) + " (facultatif)"}" value="${esc(Q.ch[c] || "")}" maxlength="80" ${vf ? "readonly" : ""} style="border-left:8px solid #B9B3A9"></div>`).join("");
+      const zoomOk = Q.img && ["choix", "multi"].includes(t);
+      const imgBloc = Q.img ? `<div class="imgE"><div class="vignette ${Q.zoom ? "z" : ""}" data-zimg="${k}"><img src="${Q.img}" alt="">${Q.zoom ? `<i style="left:${Q.zoom.x}%;top:${Q.zoom.y}%"></i>` : ""}</div>
+          <div>${zoomOk ? `<select class="zsel" data-zk="${k}"><option value="">Image entière</option><option value="zoom" ${Q.zoom ? "selected" : ""}>Zoom mystère (un morceau agrandi)</option></select>${Q.zoom ? '<div class="sous">Touche l\'image pour choisir le morceau à montrer.</div>' : ""}` : ""}
+          <button class="btn2" data-noimg="${k}">Retirer l'image</button></div></div>` : `<button class="btn2" data-img="${k}">+ Image (affichée au tableau)</button>`;
+      return `<div class="qe" data-t="${t}"><div class="tete"><b>Question ${k + 1}${nom ? " · " + nom : ""}</b>${tps}
       <button class="btn2" data-mv="${k},-1" ${k ? "" : "disabled"} aria-label="Monter">↑</button><button class="btn2" data-mv="${k},1" ${k < ed.qs.length - 1 ? "" : "disabled"} aria-label="Descendre">↓</button>
       <button class="btn2" data-del="${k}" ${ed.qs.length < 2 ? "disabled" : ""}>Retirer</button></div>
-      <input class="tq" placeholder="La question" value="${esc(Q.q)}" maxlength="180" style="margin-top:8px">
-      ${Array.from({length: nb}, (_, c) => `<div class="ln"><input type="radio" name="b${k}" value="${c}" ${Q.bon === c ? "checked" : ""} title="Bonne réponse"><input class="tc" placeholder="${c < 2 ? "Choix " + (c + 1) : "Choix " + (c + 1) + " (facultatif)"}" value="${esc(Q.ch[c] || "")}" maxlength="80" ${vf ? "readonly" : ""} style="border-left:8px solid #B9B3A9"></div>`).join("")}
+      <input class="tq" placeholder="${t === "nombre" ? "La question (ex. : 2 moteurs de 7,7 VA : combien de VA en tout ?)" : "La question"}" value="${esc(Q.q)}" maxlength="180" style="margin-top:8px">
+      ${corps}
       <textarea class="ex" placeholder="Explication affichée après la réponse (facultatif)" maxlength="240">${esc(Q.expl || "")}</textarea>
-      <div class="img">${Q.img ? `<img src="${Q.img}" alt=""><button class="btn2" data-noimg="${k}">Retirer l'image</button>` : `<button class="btn2" data-img="${k}">+ Image (affichée au tableau)</button>`}<span class="sous">Coche le rond de la bonne réponse.</span></div></div>`;
+      <div class="img">${imgBloc}<span class="sous">${aide}</span></div></div>`;
     }).join("");
     document.querySelectorAll("[data-del]").forEach(b => b.onclick = () => { lireEd(); ed.qs.splice(+b.dataset.del, 1); dessinerEd(); });
     document.querySelectorAll("[data-mv]").forEach(b => b.onclick = () => { lireEd(); const [k, d] = b.dataset.mv.split(",").map(Number); const t = ed.qs[k]; ed.qs[k] = ed.qs[k + d]; ed.qs[k + d] = t; dessinerEd(); });
-    document.querySelectorAll("[data-noimg]").forEach(b => b.onclick = () => { lireEd(); delete ed.qs[+b.dataset.noimg].img; dessinerEd(); });
-    document.querySelectorAll("[data-img]").forEach(b => b.onclick = () => {
-      const f = document.createElement("input"); f.type = "file"; f.accept = "image/*";
-      f.onchange = () => { const fi = f.files[0]; if (!fi) return; const im = new Image();
-        im.onload = () => { const k = Math.min(1, 900 / Math.max(im.width, im.height)), c = document.createElement("canvas");
-          c.width = Math.round(im.width * k); c.height = Math.round(im.height * k); c.getContext("2d").drawImage(im, 0, 0, c.width, c.height);
-          lireEd(); ed.qs[+b.dataset.img].img = c.toDataURL("image/jpeg", .78); dessinerEd(); URL.revokeObjectURL(im.src); };
-        im.src = URL.createObjectURL(fi); };
-      f.click();
-    });
+    document.querySelectorAll("[data-plus]").forEach(b => b.onclick = () => { lireEd(); ed.qs[+b.dataset.plus].ch.push(""); dessinerEd(); });
+    document.querySelectorAll("[data-noimg]").forEach(b => b.onclick = () => { lireEd(); delete ed.qs[+b.dataset.noimg].img; delete ed.qs[+b.dataset.noimg].zoom; dessinerEd(); });
+    document.querySelectorAll(".zsel").forEach(s => s.onchange = () => { lireEd(); dessinerEd(); });
+    document.querySelectorAll("[data-zimg]").forEach(v => v.onclick = e => { const Q = ed.qs[+v.dataset.zimg]; if (!Q.zoom) return; const r = v.getBoundingClientRect();
+      lireEd(); Q.zoom = {x: Math.round(100 * (e.clientX - r.left) / r.width), y: Math.round(100 * (e.clientY - r.top) / r.height)}; dessinerEd(); });
+    document.querySelectorAll("[data-img]").forEach(b => b.onclick = () => choisirImage(900, d => { lireEd(); ed.qs[+b.dataset.img].img = d; dessinerEd(); }));
   }
   $("bNouveau").onclick = () => editer(null);
-  $("eAjout").onclick = () => { lireEd(); ed.qs.push(qVide()); dessinerEd(); };
-  $("eAjoutVF").onclick = () => { lireEd(); ed.qs.push(qVide(true)); dessinerEd(); };
+  document.querySelectorAll("[data-aj]").forEach(b => b.onclick = () => { lireEd(); ed.qs.push(qVide(b.dataset.aj)); dessinerEd(); setTimeout(() => { const L = document.querySelectorAll(".qe"); L[L.length - 1].scrollIntoView({block: "center", behavior: "smooth"}); const q = L[L.length - 1].querySelector(".tq"); if (q) q.focus(); }, 50); });
   $("eAnnule").onclick = () => { document.documentElement.style.removeProperty("--acc"); montrer("vChoix"); listeQuiz(); };
   $("eSauve").onclick = () => {
     lireEd();
-    const qs = ed.qs.map(Q => { const garde = Q.ch.map((t, c) => [t, c]).filter(([t]) => t); const o = {q: Q.q, ch: garde.map(g => g[0]), bon: garde.findIndex(g => g[1] === Q.bon), s: Q.s}; if (Q.expl) o.expl = Q.expl; if (Q.img) o.img = Q.img; return o; });
-    const err = !ed.titre ? "Donne un titre au quiz." : qs.some(Q => !Q.q) ? "Chaque question doit avoir un texte." : qs.some(Q => Q.ch.length < 2) ? "Chaque question doit avoir au moins 2 choix." : qs.some(Q => Q.bon < 0) ? "La bonne réponse cochée doit être un choix rempli." : "";
-    if (err) { $("eSauve").textContent = err; setTimeout(() => $("eSauve").textContent = "Enregistrer", 2600); return; }
+    let err = !ed.titre ? "Donne un titre au quiz." : "";
+    const qs = ed.qs.map((Q, k) => {
+      const t = typeDe(Q), o = {q: Q.q, s: Q.s}; if (t !== "choix") o.t = t;
+      if (!Q.q && !err) err = "La question " + (k + 1) + " n'a pas de texte.";
+      if (t === "nombre") { o.ch = []; o.bon = Q.bon; if (+Q.tol) o.tol = +Q.tol; if (Q.u) o.u = Q.u; if ((isNaN(Q.bon) || Q.bon === "") && !err) err = "Question " + (k + 1) + " : écris la bonne réponse (un nombre)."; }
+      else if (t === "ordre") { o.ch = Q.ch.filter(Boolean); o.bon = o.ch.map((_, j) => j); if (o.ch.length < 3 && !err) err = "Question " + (k + 1) + " : il faut au moins 3 étapes."; }
+      else { const garde = Q.ch.map((x, c) => [x, c]).filter(([x]) => x); o.ch = garde.map(g => g[0]);
+        if (t === "multi") { o.bon = garde.map((g, j) => Q.bon.includes(g[1]) ? j : -1).filter(j => j >= 0); if (!o.bon.length && !err) err = "Question " + (k + 1) + " : coche au moins une bonne réponse."; }
+        else { o.bon = garde.findIndex(g => g[1] === Q.bon); if (o.bon < 0 && !err) err = "Question " + (k + 1) + " : la bonne réponse cochée doit être remplie."; }
+        if (o.ch.length < 2 && !err) err = "Question " + (k + 1) + " : il faut au moins 2 choix."; }
+      if (Q.expl) o.expl = Q.expl; if (Q.img) o.img = Q.img; if (Q.zoom && Q.img) o.zoom = Q.zoom; return o; });
+    if (err) { $("eSauve").textContent = err; setTimeout(() => $("eSauve").textContent = "Enregistrer", 3200); return; }
     const q = {id: ed.id, titre: ed.titre, sujet: ed.sujet || "", reg: ed.reg, qs}; if (ed.couv) q.couv = ed.couv;
     const L = mesQuiz().filter(x => x.id !== q.id); L.push(q);
     if (!sauverListe(L)) return;
@@ -676,6 +810,11 @@ function telecommande(bord){
         <label>Ordre${seg("melange", [["non", "Tel quel"], ["tout", "Mêlé"]])}</label>
         <label>Temps pour répondre${seg("temps", [["moins", "Court"], ["normal", "Normal"], ["plus", "Long"]])}</label>
         <label>Musique${seg("musique", [["oui", "Oui"], ["non", "Non"]])}</label>
+        <div class="corser"><b>Pour les caler</b><button id="mExpert" class="btn2">Mode expert</button><small>temps court + pénalité + choix cachés</small></div>
+        <label>Pénalité${seg("penalite", [["non", "Non"], ["oui", "−250 si faux"]])}</label>
+        <label>Choix cachés${seg("cache", [["non", "Non"], ["oui", "5 s pour lire"]])}</label>
+        <label>Texte des choix${seg("lettres", [["non", "Au tableau"], ["oui", "iPad seulement"]])}</label>
+        <label>Double ou rien${seg("double", [["non", "Non"], ["oui", "À la dernière"]])}</label>
       </div>
       <div class="sous">Comment veux-tu afficher la partie ?</div>
       <div class="duo"><button id="mAnim">Animer au tableau<small>Un seul ordinateur : l'écran de classe avec ses commandes en bas.</small></button>
@@ -684,6 +823,7 @@ function telecommande(bord){
     document.querySelectorAll("#modes .seg[data-o]").forEach(s => s.querySelectorAll("button").forEach(b => b.onclick = () => {
       s.querySelectorAll("button").forEach(x => x.classList.toggle("on", x === b)); fixerReglage(id, s.dataset.o, b.dataset.v); }));
     if (String(r0.nb) !== String(Object.assign({}, REG_DEF, q.reg, reglagesDe(id)).nb)) fixerReglage(id, "nb", r0.nb);
+    $("mExpert").onclick = () => [["temps", "moins"], ["penalite", "oui"], ["cache", "oui"]].forEach(([k, v]) => { const b = document.querySelector(`#modes .seg[data-o="${k}"] [data-v="${v}"]`); if (b) b.click(); });
     $("mAnim").onclick = () => { location.href = "?animer=1&quiz=" + encodeURIComponent(id); };
     $("mTele").onclick = () => { location.href = "?tele=1&quiz=" + encodeURIComponent(id); };
     $("mX").onclick = () => $("modes").remove();
@@ -736,33 +876,63 @@ function joueur(code){
       if (m.coul) teinte(m.coul);
       if (m.m === "bienvenue") bx(`<div class="gros monte">Tu es dans la partie.</div><div>${esc(m.titre || "")}</div><div style="opacity:.7;margin-top:8px">Regarde le tableau : ça commence bientôt.</div>`);
       else if (m.m === "attente") bx('<div class="gros">Pause</div><div>L\'enseignant prépare la suite.</div>');
-      else if (m.m === "q") {
-        repI = -1;
-        bx(`<div style="opacity:.75">Question ${m.i + 1} sur ${m.n}</div><h2>${esc(m.q)}</h2><div class="chrono"><i id="jBar"></i></div>
-          <div class="ch4">${m.ch.map((c, k) => `<button class="k${k}" data-c="${k}"><i>${SYMB[k]}</i>${esc(c)}</button>`).join("")}</div>`);
-        const fin = m.t0 + m.s * 1000; clearInterval(chrono);
+      else if (m.m === "mise") {
+        if (m.pts[pid] == null) return; clearInterval(chrono);
+        const choisir = oui => { envoyer(topic, {m: "miser", pid, oui}); document.querySelectorAll("#jBx [data-mise]").forEach(b => b.classList.toggle("choisi", (b.dataset.mise === "1") === oui)); $("miseTxt").textContent = oui ? "Tu mises tout : bonne réponse = points doublés, sinon 0." : "Tu gardes tes points."; };
+        bx(`<div style="opacity:.75">Dernière question</div><h2>Double ou rien ?</h2><div class="rang">Tu as <b>${m.pts[pid]}</b> points.</div>
+          <div class="ch4 mise"><button data-mise="1" class="k1"><i>×2</i>Je mise tout</button><button data-mise="0" class="k0"><i>=</i>Je garde mes points</button></div><div id="miseTxt" style="margin-top:12px;opacity:.85">Choisis avant que la question arrive.</div>`);
+        document.querySelectorAll("#jBx [data-mise]").forEach(b => b.onclick = () => choisir(b.dataset.mise === "1"));
+      } else if (m.m === "dblrap") { const d = $("dblTag"); if (d) d.classList.remove("cache");
+      } else if (m.m === "q") {
+        repI = -1; const t = m.t || "choix", fin = m.t0 + m.s * 1000;
+        const envoi = c => { if (repI !== -1) return; repI = c; document.querySelectorAll("#jBx button").forEach(x => x.disabled = true);
+          $("jBx").insertAdjacentHTML("beforeend", '<div class="monte" style="margin-top:14px;opacity:.8">Réponse envoyée.</div>'); envoyer(topic, {m: "rep", pid, i: m.i, c}); };
+        const btns = (cl) => `<div class="ch4 ${cl || ""}">${m.ch.map((c, k) => `<button class="k${k}" data-c="${k}"><i>${SYMB[k]}</i><span>${esc(c)}</span></button>`).join("")}</div>`;
+        let corps = "";
+        if (t === "multi") corps = `<div class="aideT">Plusieurs bonnes réponses : touche toutes celles qui sont bonnes, puis Valider.</div>${btns("multi")}<button id="jOk" class="valider" disabled>Valider</button>`;
+        else if (t === "ordre") corps = `<div class="aideT">Touche les étapes dans le bon ordre (1, 2, 3…), puis Valider.</div>${btns("ordre")}<div class="duoB"><button id="jRaz" class="btn2">Recommencer</button><button id="jOk" class="valider" disabled>Valider</button></div>`;
+        else if (t === "nombre") corps = `<div class="aideT">Calcule et tape ta réponse${m.u ? " (en " + esc(m.u) + ")" : ""}.</div><div class="nbx"><input id="jNb" inputmode="decimal" autocomplete="off" placeholder="Ta réponse">${m.u ? `<span>${esc(m.u)}</span>` : ""}</div><button id="jOk" class="valider" disabled>Valider</button>`;
+        else corps = (t === "erreur" ? '<div class="aideT">Quel morceau de la phrase contient l\'erreur ?</div>' : "") + btns();
+        bx(`<div style="opacity:.75">Question ${m.i + 1} sur ${m.n}${m.dbl ? ' · <b style="color:#FFB15C">double ou rien</b>' : '<b id="dblTag" class="cache" style="color:#FFB15C"> · double ou rien</b>'}</div><h2>${esc(m.q)}</h2><div class="chrono"><i id="jBar"></i></div>
+          <div id="jCorps" class="${m.lec > 300 ? "cache" : ""}">${corps}</div>${m.lec > 300 ? `<div id="jLec" class="aideT lec">Lis bien la question… les choix arrivent dans <b id="jLecN">${Math.ceil(m.lec / 1000)}</b> s.</div>` : ""}`);
+        if (m.lec > 300) { const t1 = Date.now() + m.lec; const iv = setInterval(() => { const r = t1 - Date.now(), n = $("jLecN"); if (n) n.textContent = Math.max(0, Math.ceil(r / 1000)); if (r <= 0) { clearInterval(iv); const c = $("jCorps"), l = $("jLec"); if (c) c.classList.remove("cache"); if (l) l.remove(); } }, 200); }
+        clearInterval(chrono);
         chrono = setInterval(() => { const r = Math.max(0, fin - Date.now()), b = $("jBar"); if (b) b.style.width = Math.min(100, 100 * r / (m.s * 1000)) + "%"; if (!r) clearInterval(chrono); }, 150);
-        document.querySelectorAll("#jBx [data-c]").forEach(b => b.onclick = () => {
-          if (repI >= 0) return; repI = +b.dataset.c;
-          document.querySelectorAll("#jBx [data-c]").forEach(x => { x.classList.toggle("pas", x !== b); x.classList.toggle("choisi", x === b); });
-          $("jBx").insertAdjacentHTML("beforeend", '<div class="monte" style="margin-top:14px;opacity:.8">Réponse envoyée.</div>');
-          envoyer(topic, {m: "rep", pid, i: m.i, c: repI});
+        const B = [...document.querySelectorAll("#jBx [data-c]")];
+        if (t === "multi") { const sel = new Set();
+          B.forEach(b => b.onclick = () => { if (repI !== -1) return; const k = +b.dataset.c; sel.has(k) ? sel.delete(k) : sel.add(k); b.classList.toggle("choisi", sel.has(k)); b.querySelector("i").textContent = sel.has(k) ? "✓" : SYMB[k]; $("jOk").disabled = !sel.size; });
+          $("jOk").onclick = () => envoi([...sel].sort((a, b) => a - b));
+        } else if (t === "ordre") { let L = [];
+          const peindre = () => { B.forEach(b => { const p = L.indexOf(+b.dataset.c); b.classList.toggle("choisi", p >= 0); b.querySelector("i").textContent = p >= 0 ? p + 1 : SYMB[+b.dataset.c]; }); $("jOk").disabled = L.length !== B.length; };
+          B.forEach(b => b.onclick = () => { if (repI !== -1) return; const k = +b.dataset.c; if (L.includes(k)) L = L.slice(0, L.indexOf(k)); else L.push(k); peindre(); });
+          $("jRaz").onclick = () => { if (repI !== -1) return; L = []; peindre(); };
+          $("jOk").onclick = () => envoi(L.slice());
+        } else if (t === "nombre") { const inp = $("jNb");
+          inp.oninput = () => { inp.value = inp.value.replace(/[^0-9,.\- ]/g, ""); $("jOk").disabled = isNaN(num(inp.value)); };
+          inp.onkeydown = e => { if (e.key === "Enter" && !$("jOk").disabled) $("jOk").click(); };
+          $("jOk").onclick = () => { inp.blur(); envoi(inp.value.trim()); };
+        } else B.forEach(b => b.onclick = () => {
+          if (repI !== -1) return;
+          B.forEach(x => { x.classList.toggle("pas", x !== b); x.classList.toggle("choisi", x === b); });
+          envoi(+b.dataset.c);
         });
       } else if (m.m === "rev") {
         clearInterval(chrono);
         const r = m.res[pid]; if (!r) return;
-        const bon = r.rep === m.bon; pts = r.pts;
+        const bon = r.ok, rien = r.rep == null; pts = r.pts;
         const fl = m.i === 0 ? "" : r.avant && r.rang < r.avant ? `<span class="fl mo">▲ ${r.avant - r.rang}</span>` : r.avant && r.rang > r.avant ? `<span class="fl de">▼ ${r.rang - r.avant}</span>` : "";
-        bx(`${r.rep < 0 ? "" : bon ? COCHE : CROIX}
-          <div class="gros monte">${r.rep < 0 ? "Pas de réponse" : bon ? "Bonne réponse" : "Pas cette fois"}</div>
+        bx(`${rien ? "" : bon ? COCHE : CROIX}
+          <div class="gros monte">${rien ? "Pas de réponse" : bon ? "Bonne réponse" : "Pas cette fois"}</div>
           ${bon && m.points !== "aucun" ? `<div class="monte" style="font-size:26px;font-weight:800">+<span id="jGain">0</span></div>` : ""}
+          ${!bon && r.g < 0 ? `<div class="monte" style="font-size:22px;font-weight:800;color:#FFB4A8">${r.g} (pénalité)</div>` : ""}
+          ${r.mise ? `<div class="serieJ monte fort"><span>${r.dbl > 0 ? "Double ou rien : tes points doublent (+" + r.dbl + ") !" : "Double ou rien : mise perdue."}</span></div>` : ""}
           ${bon ? "" : `<div class="monte">La bonne réponse : <b>${esc(m.bonTxt)}</b></div>`}
           ${m.expl ? `<div class="expl monte">${esc(m.expl)}</div>` : ""}
           ${r.serie >= 3 ? `<div class="serieJ monte${r.serie >= 5 ? " fort" : ""}">${FLAMME}<span>${r.serie} bonnes de suite${r.bonus ? ` · bonus +${r.bonus}` : ""}</span></div>` : ""}
           ${m.classement === "oui" && m.i > 0 && r.avant && r.rang < r.avant ? `<div class="monte" style="font-weight:800;color:#7CF0A8">Tu remontes au ${ord(r.rang)} rang !</div>` : ""}
           ${m.classement === "oui" ? `<div class="rang monte">Tu es <b>${ord(r.rang)}</b> sur ${m.n}${m.points !== "aucun" ? " · " + pts + " points" : ""}${fl}</div>` : ""}`);
-        if (!bon && r.rep >= 0) { $("jBx").classList.add("secoue"); setTimeout(() => $("jBx").classList.remove("secoue"), 500); }
-        if (bon) compter($("jGain"), 0, r.g, 900);
+        if (!bon && !rien) { $("jBx").classList.add("secoue"); setTimeout(() => $("jBx").classList.remove("secoue"), 500); }
+        if (bon && $("jGain")) compter($("jGain"), 0, r.g, 900);
         if (m.points !== "aucun") $("ptsJ").textContent = pts + " pts";
       } else if (m.m === "fin") {
         const r = m.res[pid]; if (!r) return;
@@ -886,7 +1056,7 @@ function ecran(code){
     if (veut) MUS.fin = v.t0 + v.q.s * 1000;
   }
   function rendre(force){
-    const v = V, n = Date.now() + decal, cle = v.etat + v.i;
+    const v = V, n = Date.now() + decal, lecture = v.etat === "question" && v.q && n < v.t0 - 150, cle = v.etat + v.i + (lecture ? "L" : "");
     musique(v, n);
     document.documentElement.style.setProperty("--acc", (v.reg && v.reg.coul) || "#534AB7");
     if (v.etat === "lobby") {
@@ -895,21 +1065,41 @@ function ecran(code){
         <div class="code">${code.slice(0, 3)} ${code.slice(3)}</div><div style="font-size:1.6vw;color:#B5AFA6">${v.joueurs.length} participant${v.joueurs.length > 1 ? "s" : ""}</div>
         <div class="noms">${v.joueurs.map(j => `<span>${visage(j.av, "v-e")}${esc(j.n)}</span>`).join("")}</div></div></div>` + bSon();
       try { const tq = cv ? .16 : .22; new QRCode($("eQr"), {text: url, width: Math.round(innerWidth * tq), height: Math.round(innerWidth * tq), correctLevel: QRCode.CorrectLevel.M}); } catch(e) { $("eQr").textContent = url; }
-    } else if (v.etat === "question" && v.q) {
-      const r = Math.max(0, Math.ceil((v.t0 + v.q.s * 1000 - n) / 1000));
+    } else if (v.etat === "mise") {
       if (cle !== dernier || force) {
-        E.innerHTML = tete("Question " + (v.i + 1) + " sur " + v.n) + `<div class="eq monte">${esc(v.q.q)}</div>${v.q.img && img[v.i] ? `<img class="eimg monte" src="${img[v.i]}" alt="">` : ""}
-          <div class="ech">${v.q.ch.map((c, k) => `<div class="k${k} monte" style="animation-delay:${.1 + k * .08}s"><span><i class="let">${SYMB[k]}</i>${esc(c)}</span></div>`).join("")}</div>
-          <div class="cpt"><span id="eRep"></span><b id="eT"></b></div>` + bSon();
-        if (cle !== dernier) ton(440, .25, .08);
+        E.innerHTML = tete("Dernière question") + `<div class="dblE monte"><b>Double ou rien</b><span>Sur ton iPad : mise tous tes points.<br>Bonne réponse = points doublés. Mauvaise réponse = 0.</span><em id="eMises"></em></div>` + bSon();
+        if (cle !== dernier) accord();
       }
-      $("eRep").textContent = v.nrep + " réponse" + (v.nrep > 1 ? "s" : "") + " sur " + v.joueurs.length; $("eT").textContent = r;
-      if (r <= 5 && r > 0 && tic !== r) { tic = r; ton(880, .08, .06, "triangle"); }
+      $("eMises").textContent = v.mises + " joueur" + (v.mises > 1 ? "s misent" : " mise") + " tout";
+    } else if (v.etat === "question" && v.q) {
+      const t = v.q.t || "choix", r = Math.max(0, Math.ceil((v.t0 + v.q.s * 1000 - n) / 1000));
+      if (cle !== dernier || force) {
+        const im = v.q.img && img[v.i] ? (v.q.zoom ? `<div class="ezoom monte" style="background-image:url('${img[v.i]}');background-position:${+v.q.zoom.x}% ${+v.q.zoom.y}%"><span>Zoom mystère</span></div>` : `<img class="eimg monte" src="${img[v.i]}" alt="">`) : "";
+        const lettresSeul = v.reg.lettres === "oui" && ["choix", "multi"].includes(t);
+        let corps = "";
+        if (lecture) corps = `<div class="elec monte">Les choix arrivent dans <b id="eLec"></b> s</div>`;
+        else if (t === "erreur") corps = `<div class="ephr monte">${v.q.ch.map((c, k) => `<span class="k${k}"><i class="let">${SYMB[k]}</i>${esc(c)}</span>`).join(" ")}</div>`;
+        else if (t === "ordre") corps = `<div class="eord">${v.q.ch.map((c, k) => `<div class="k${k} monte" style="animation-delay:${.1 + k * .06}s"><span><i class="let">${SYMB[k]}</i>${esc(c)}</span></div>`).join("")}</div>`;
+        else if (t === "nombre") corps = `<div class="enb monte">Calcule et tape ta réponse sur ton iPad${v.q.u ? ` <small>(en ${esc(v.q.u)})</small>` : ""}</div>`;
+        else corps = `<div class="ech${lettresSeul ? " lettres" : ""}">${v.q.ch.map((c, k) => `<div class="k${k} monte" style="animation-delay:${.1 + k * .08}s"><span><i class="let">${SYMB[k]}</i>${lettresSeul ? "" : esc(c)}</span></div>`).join("")}</div>${lettresSeul ? '<div class="enb" style="font-size:1.6vw">Lis les choix sur ton iPad</div>' : ""}`;
+        const sous = {multi: "Plusieurs bonnes réponses", ordre: "Remets dans le bon ordre", nombre: "Calcul", erreur: "Trouve l'erreur"}[t];
+        E.innerHTML = tete("Question " + (v.i + 1) + " sur " + v.n) + (sous ? `<div class="etype">${sous}</div>` : "") + `<div class="eq monte">${esc(v.q.q)}</div>${im}${corps}
+          <div class="cpt"><span id="eRep"></span><b id="eT"></b></div>` + bSon();
+        if (cle !== dernier && !cle.endsWith("L")) ton(440, .25, .08);
+      }
+      $("eRep").textContent = v.nrep + " réponse" + (v.nrep > 1 ? "s" : "") + " sur " + v.joueurs.length;
+      if (lecture) { $("eLec").textContent = Math.max(1, Math.ceil((v.t0 - n) / 1000)); $("eT").textContent = ""; }
+      else { $("eT").textContent = r; if (r <= 5 && r > 0 && tic !== r) { tic = r; ton(880, .08, .06, "triangle"); } }
     } else if (v.etat === "rev" && v.q) {
       if (cle !== dernier || force) {
-        const tot = Math.max(1, v.cpt.reduce((a, b) => a + b, 0));
-        E.innerHTML = tete("Question " + (v.i + 1) + " sur " + v.n) + `<div class="eq">${esc(v.q.q)}</div>
-          <div class="ech">${v.q.ch.map((c, k) => `<div class="k${k} ${k === v.bon ? "bon" : "pas"}"><span><i class="let">${k === v.bon ? "✓" : SYMB[k]}</i>${esc(c)}</span><em>${v.cpt[k]}</em><i class="bar" data-w="${100 * v.cpt[k] / tot}"></i></div>`).join("")}</div>
+        const t = v.q.t || "choix", tot = Math.max(1, v.nrep), estBon = k => t === "multi" && Array.isArray(v.bon) ? v.bon.includes(k) : k === v.bon;
+        let corps;
+        if (t === "ordre") corps = `<div class="eord rev">${v.bon.map((k, j) => `<div class="bon monte" style="animation-delay:${j * .08}s"><span><i class="let">${j + 1}</i>${esc(v.q.ch[k])}</span></div>`).join("")}</div><div class="enb">${v.cpt[0]} sur ${v.cpt[1]} ont le bon ordre</div>`;
+        else if (t === "nombre") corps = `<div class="enbR monte">${esc(v.q.bonTxt)}</div><div class="enb">${v.cpt[0]} sur ${v.cpt[1]} ont trouvé</div>`;
+        else if (t === "erreur") corps = `<div class="ephr rev">${v.q.ch.map((c, k) => `<span class="k${k} ${k === v.bon ? "faux" : "pas"}"><i class="let">${SYMB[k]}</i>${esc(c)}<em>${v.cpt[k]}</em></span>`).join(" ")}</div>`;
+        else corps = `<div class="ech">${v.q.ch.map((c, k) => `<div class="k${k} ${estBon(k) ? "bon" : "pas"}"><span><i class="let">${estBon(k) ? "✓" : SYMB[k]}</i>${esc(c)}</span><em>${v.cpt[k]}</em><i class="bar" data-w="${100 * v.cpt[k] / tot}"></i></div>`).join("")}</div>`;
+        const im = v.q.img && img[v.i] && v.q.zoom ? `<img class="eimg petit monte" src="${img[v.i]}" alt="">` : "";
+        E.innerHTML = tete("Question " + (v.i + 1) + " sur " + v.n) + `<div class="eq">${esc(v.q.q)}</div>${im}${corps}
           ${v.q.expl ? `<div class="eexpl monte">${esc(v.q.expl)}</div>` : ""}
           ${v.reg.classement === "oui" ? `<div class="cpt"><span>Classement dans quelques secondes…</span></div>` : ""}` + bSon();
         requestAnimationFrame(() => E.querySelectorAll(".bar").forEach(b => b.style.width = b.dataset.w + "%"));
@@ -931,7 +1121,7 @@ function ecran(code){
     if (m.m === "img") { img[m.i] = m.data; if ((V.etat === "question" && V.i === m.i) || (m.i === -1 && V.etat === "lobby")) rendre(true); }
     else if (m.m === "vue") { V = m; decal = m.now - Date.now(); rendre(m.etat === "lobby"); }
   }, ok => { if (ok) envoyer(topic, {m: "ecran?"}); });
-  rendre(true); setInterval(() => { if (V.etat === "question") rendre(); }, 500);
+  rendre(true); setInterval(() => { if (V.etat === "question" || V.etat === "mise") rendre(); }, 400);
 }
 </script>
 </body>
