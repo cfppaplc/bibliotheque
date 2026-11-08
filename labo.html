@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Labo interactif</title>
+<style>
+:root{--fond:#141414;--carte:#1F1F1F;--carte2:#2A2A2A;--txt:#F2EFEA;--gris:#A8A29A;--ligne:#333;--rouge:#E50914;--violet:#534AB7}
+html.clair{--fond:#F3F1EC;--carte:#fff;--carte2:#F1EEE8;--txt:#24211E;--gris:#6B665E;--ligne:#E2DDD3}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--fond);color:var(--txt);font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+.haut{display:flex;align-items:center;gap:14px;padding:18px 4vw;border-bottom:1px solid var(--ligne)}
+.haut a{color:var(--txt);text-decoration:none;border:1px solid var(--ligne);border-radius:10px;padding:10px 14px;font-weight:600;font-size:15px;min-height:46px;display:inline-flex;align-items:center}
+.haut h1{margin:0;font-size:22px;flex:1}
+.haut h1 span{color:var(--gris);font-weight:500;font-size:15px;margin-left:8px}
+main{padding:28px 4vw 60px;max-width:1300px;margin:0 auto}
+.intro{color:var(--gris);font-size:16px;margin:0 0 22px;max-width:760px;line-height:1.5}
+h2{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--gris);margin:28px 0 12px}
+.grille{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.carte{background:var(--carte);border-radius:16px;overflow:hidden;display:flex;flex-direction:column;border:1px solid var(--ligne);text-decoration:none;color:inherit;transition:transform .2s,box-shadow .2s}
+a.carte:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(0,0,0,.35)}
+.vis{height:170px;display:flex;align-items:center;justify-content:center;position:relative}
+.vis svg{width:150px;height:auto}
+.corps{padding:16px 18px 18px;display:flex;flex-direction:column;gap:8px;flex:1}
+.corps b{font-size:18px}
+.corps p{margin:0;color:var(--gris);font-size:14px;line-height:1.45;flex:1}
+.tags{display:flex;gap:6px;flex-wrap:wrap}
+.tags span{font-size:12px;font-weight:700;border-radius:20px;padding:3px 10px;background:var(--carte2);color:var(--gris)}
+.go{margin-top:6px;background:var(--rouge);color:#fff;border-radius:10px;padding:12px;text-align:center;font-weight:700;font-size:15px}
+.bientot{opacity:.6}.bientot .go{background:var(--carte2);color:var(--gris)}
+.etapes{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.etapes div{background:var(--carte);border:1px solid var(--ligne);border-radius:14px;padding:14px 16px;font-size:14px;color:var(--gris);line-height:1.45}
+.etapes b{display:block;color:var(--txt);font-size:15px;margin-bottom:4px}
+.etapes i{font-style:normal;display:inline-flex;width:26px;height:26px;border-radius:50%;background:var(--violet);color:#fff;align-items:center;justify-content:center;font-weight:800;margin-bottom:6px}
+@media (max-width:640px){.haut h1 span{display:none}.grille{grid-template-columns:1fr}}
+</style>
+<script>
+/* Même thème que la bibliothèque : choix gardé dans localStorage.accueilClair, sinon l'ordinateur */
+(function(){ let c = null; try { c = localStorage.getItem("accueilClair"); } catch(e) {}
+  const clair = c === "1" || (c === null && matchMedia("(prefers-color-scheme: light)").matches);
+  if (clair) document.documentElement.classList.add("clair"); })();
+</script>
+</head>
+<body>
+<div class="haut"><a href="./">‹ Bibliothèque</a><h1>Labo interactif <span>Simulateurs et défis avec les iPad</span></h1></div>
+<main>
+<p class="intro">Des outils à faire en classe avec les iPad des élèves. L'iPad de l'enseignant sert de télécommande, le tableau affiche l'écran de classe, et chaque équipe scanne un code QR. Aucun compte n'est nécessaire pour les élèves.</p>
+
+<h2>Protection incendie</h2>
+<div class="grille">
+<a class="carte" href="simulateur.html">
+<div class="vis" style="background:linear-gradient(135deg,#7A1712,#B3261E)"><svg viewBox="0 0 160 110" aria-hidden="true"><rect x="8" y="6" width="144" height="98" rx="10" fill="#9A1F18" stroke="#fff" stroke-opacity=".3"/><rect x="20" y="18" width="88" height="40" rx="4" fill="#9DB89A"/><path d="M28 32h50M28 44h36" stroke="#1C2A1B" stroke-width="5" stroke-linecap="round"/><circle cx="126" cy="24" r="6" fill="#36D06A"/><circle cx="126" cy="40" r="6" fill="#FF3B30"/><circle cx="126" cy="56" r="6" fill="#FFC21A"/><rect x="20" y="70" width="28" height="22" rx="4" fill="#185FA5"/><rect x="54" y="70" width="28" height="22" rx="4" fill="#C62828" stroke="#fff" stroke-opacity=".4"/><rect x="88" y="70" width="28" height="22" rx="4" fill="#24211E"/><rect x="122" y="70" width="20" height="22" rx="4" fill="#5F5E5A"/></svg></div>
+<div class="corps"><b>Simulateur de panneau d'alarme</b>
+<p>Chaque équipe a un vrai panneau adressable sur son iPad. Tu déclenches alarmes, supervisions et troubles; les élèves lisent l'afficheur, règlent la cause sur le terrain et réarment au bon moment.</p>
+<div class="tags"><span>EGI 436-312</span><span>Module 5</span><span>Mode libre</span></div>
+<div class="go">Ouvrir le simulateur</div></div></a>
+
+<a class="carte" href="simulateur.html">
+<div class="vis" style="background:linear-gradient(135deg,#2E2775,#534AB7)"><svg viewBox="0 0 160 110" aria-hidden="true"><rect x="40" y="58" width="26" height="40" rx="3" fill="#8A8F98"/><rect x="67" y="38" width="26" height="60" rx="3" fill="#D89E00"/><rect x="94" y="70" width="26" height="28" rx="3" fill="#A0582B"/><text x="80" y="30" text-anchor="middle" font-size="22" font-weight="900" fill="#fff" font-family="system-ui">1</text><path d="M18 20l6 4-6 4zM136 18h10v10h-10z" fill="#fff" opacity=".5"/><circle cx="141" cy="52" r="5" fill="#fff" opacity=".5"/></svg></div>
+<div class="corps"><b>Défi panneau</b>
+<p>8 missions de plus en plus difficiles, comme un Kahoot : une question éclair, puis remettre le panneau à la normale. Points, pénalités, classement en direct et podium au tableau.</p>
+<div class="tags"><span>EGI 436-312</span><span>Module 5</span><span>En équipes</span></div>
+<div class="go">Lancer un défi</div></div></a>
+
+<div class="carte bientot">
+<div class="vis" style="background:var(--carte2)"><svg viewBox="0 0 160 110" aria-hidden="true"><rect x="22" y="16" width="54" height="36" rx="6" fill="#E21B3C"/><rect x="84" y="16" width="54" height="36" rx="6" fill="#1368CE"/><rect x="22" y="58" width="54" height="36" rx="6" fill="#D89E00"/><rect x="84" y="58" width="54" height="36" rx="6" fill="#26890C"/></svg></div>
+<div class="corps"><b>Quiz maison</b>
+<p>Tes propres questions, jouées sur les iPad avec le même code QR et le même classement au tableau.</p>
+<div class="tags"><span>Tous les cours</span></div>
+<div class="go">Bientôt</div></div></div>
+</div>
+
+<h2>Comment ça marche</h2>
+<div class="etapes">
+<div><i>1</i><b>Ton iPad : la télécommande</b>Ouvre le simulateur et choisis « Télécommande ». Un code à 6 chiffres et un code QR s'affichent.</div>
+<div><i>2</i><b>Le tableau : l'écran de classe</b>Ouvre la même page sur le tableau, choisis « Écran de classe » et tape le code.</div>
+<div><i>3</i><b>Les iPad des élèves</b>Chaque équipe scanne le code QR et écrit son nom. Son iPad devient un panneau d'alarme.</div>
+<div><i>4</i><b>À toi de jouer</b>Mode libre pour démontrer, ou « Lancer le défi » pour les 8 missions.</div>
+</div>
+</main>
+</body>
+</html>
