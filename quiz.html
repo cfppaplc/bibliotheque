@@ -180,6 +180,17 @@ body.bord .grid{grid-template-columns:1fr}body.bord .grid>div:first-child{displa
 .ech div.bon{background:#1F7A4D!important}
 .kick{border:1px solid rgba(127,127,127,.35);background:transparent;color:inherit;border-radius:8px;width:30px;height:30px;margin-left:8px;cursor:pointer;font-size:14px;opacity:.6;vertical-align:middle}.kick:hover{opacity:1;border-color:#C62828;color:#C62828}
 .ch4 button{font-size:20px}
+.flamme{width:1em;height:1em;vertical-align:-.12em;color:#E8873A;transform-origin:50% 90%;animation:flamme 1.4s ease-in-out infinite}
+@keyframes flamme{50%{transform:scale(1.08,.94) rotate(-3deg)}}
+.feu{display:inline-flex;align-items:center;gap:.3vw;margin-left:.8vw;font-size:1.25vw;font-weight:800;color:#F0A35E;background:rgba(232,135,58,.12);border-radius:2vw;padding:.15vw .7vw}
+.feu em{font-style:normal}.feu.fort{color:#FFB15C;background:rgba(255,120,30,.2);box-shadow:0 0 1.2vw rgba(255,120,30,.35)}.feu.fort .flamme{color:#FF7A1A;font-size:1.25em}
+.lg small.bo{color:#F0A35E;margin-right:.6vw;margin-left:-.2vw}
+.lg.remonte{box-shadow:0 0 0 .2vw #2E9E5B,0 0 2.4vw rgba(46,158,91,.55);background:#1F3A2A;transition:background .4s,box-shadow .4s,transform .9s cubic-bezier(.2,.8,.2,1)}
+.remTxt{position:absolute;right:1.4vw;top:-1.1vw;font-size:1.1vw;font-weight:800;color:#0F2A1A;background:#7CF0A8;border-radius:1vw;padding:.1vw .7vw}
+.lg{position:relative}
+.serieJ{display:inline-flex;align-items:center;gap:8px;font-weight:800;font-size:18px;color:#F0A35E;background:rgba(232,135,58,.14);border-radius:20px;padding:6px 14px;margin:6px auto}
+.serieJ .flamme{font-size:22px}.serieJ.fort{color:#FFB15C;box-shadow:0 0 18px rgba(255,120,30,.35)}
+@media (prefers-reduced-motion:reduce){.flamme{animation:none}}
 </style>
 </head>
 <body>
@@ -239,6 +250,7 @@ Le propane s'accumule…
 <label>Ordre<div class="seg" data-r="melange"><button data-v="non">Tel quel</button><button data-v="q">Questions mêlées</button><button data-v="tout">Questions et choix mêlés</button></div></label>
 <label>Sons au tableau<div class="seg" data-r="son"><button data-v="oui">Oui</button><button data-v="non">Non</button></div></label>
 <label>Musique pendant les questions<div class="seg" data-r="musique"><button data-v="oui">Oui</button><button data-v="non">Non</button></div></label>
+<label>Bonus de série (3 bonnes de suite et plus : +100, +200, +300)<div class="seg" data-r="bonus"><button data-v="oui">Oui</button><button data-v="non">Non</button></div></label>
 <label>Couleur du quiz<div class="coul" id="eCoul"></div></label>
 </div>
 <div id="eQs"></div>
@@ -264,8 +276,9 @@ const SB_URL = "https://kjlotlhqrgekzohshmbn.supabase.co", SB_CLE = "sb_publisha
 const $ = id => document.getElementById(id);
 const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"})[c]);
 const SYMB = ["A", "B", "C", "D"];
+const FLAMME = '<svg class="flamme" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5c.6 3.2-1.4 4.9-2.9 6.6C7.6 10.8 6.5 12.6 6.5 15a5.5 5.5 0 0 0 11 0c0-2.3-1-4.1-2.2-5.6-.3 1.2-.9 2.1-1.9 2.6.4-3.4-.4-6.8-1.4-9.5z" fill="currentColor"/><path d="M12 13.2c-1.3 1.3-2 2.3-2 3.6a2 2 0 0 0 4 0c0-1.2-.7-2.3-2-3.6z" fill="#FFE7A3"/></svg>';
 const COULEURS = ["#534AB7", "#B3261E", "#185FA5", "#0F6E56", "#854F0B", "#3A3936"];
-const REG_DEF = {mode: "ind", points: "vitesse", classement: "oui", melange: "non", son: "oui", musique: "oui", coul: "#534AB7"};
+const REG_DEF = {mode: "ind", points: "vitesse", classement: "oui", melange: "non", son: "oui", musique: "oui", bonus: "oui", coul: "#534AB7"};
 const sombre = h => { const n = parseInt(h.slice(1), 16), f = .38; return `rgb(${Math.round((n >> 16) * f + 18)},${Math.round((n >> 8 & 255) * f + 18)},${Math.round((n & 255) * f + 24)})`; };
 const ord = r => r + (r === 1 ? "er" : "e");
 
@@ -396,7 +409,7 @@ function telecommande(bord){
       reg: {coul: reg.coul, son: reg.son, musique: reg.musique || "oui", classement: reg.classement, points: reg.points, mode: reg.mode},
       couv: G.quiz && G.quiz.couv && !/^data:/.test(G.quiz.couv) ? G.quiz.couv : (G.quiz && G.quiz.couv ? "img" : ""), sujet: G.quiz ? G.quiz.sujet || "" : "",
       q: Q && ["question", "rev"].includes(G.etat) ? {q: Q.q, ch: Q.ch, s: Q.s, img: !!Q.img, expl: G.etat === "rev" ? Q.expl || "" : ""} : null, bon: G.etat === "rev" ? Q.bon : null, cpt, nrep: Object.keys(G.reps).length,
-      joueurs: ids().map(id => ({n: P[id].nom, av: P[id].av, pts: P[id].pts, r: r[id], g: G.etat === "rev" && G.reps[id] ? G.reps[id].g || 0 : 0})).sort((a, b) => a.r - b.r)};
+      joueurs: ids().map(id => ({n: P[id].nom, av: P[id].av, pts: P[id].pts, r: r[id], g: G.etat === "rev" && G.reps[id] ? G.reps[id].g || 0 : 0, s: P[id].serie || 0, bo: G.etat === "rev" && G.reps[id] ? G.reps[id].bonus || 0 : 0})).sort((a, b) => a.r - b.r)};
   }
   function maj(){
     if (!G.quiz) { listeLob(); vue(); return; }
@@ -429,10 +442,13 @@ function telecommande(bord){
     Object.entries(G.reps).forEach(([id, x]) => {
       const bon = x.c === Q.bon;
       x.g = !bon || reg.points === "aucun" ? 0 : reg.points === "fixe" ? 1000 : Math.round(1000 - 500 * Math.min(1, Math.max(0, x.ms) / (Q.s * 1000)));
-      if (P[id]) { P[id].pts += x.g; P[id].bons = (P[id].bons || 0) + (bon ? 1 : 0); }
+      if (P[id]) { P[id].serie = bon ? (P[id].serie || 0) + 1 : 0;   /* série de bonnes réponses */
+        x.bonus = bon && reg.bonus !== "non" && reg.points !== "aucun" && P[id].serie >= 3 ? 100 * Math.min(3, P[id].serie - 2) : 0; x.g += x.bonus;
+        P[id].pts += x.g; P[id].bons = (P[id].bons || 0) + (bon ? 1 : 0); }
     });
+    ids().forEach(id => { if (!G.reps[id]) P[id].serie = 0; });   /* pas répondu = série brisée */
     const r = rangs(), n = ids().length, res = {};
-    ids().forEach(id => { const x = G.reps[id]; res[id] = {rep: x ? x.c : -1, g: x ? x.g : 0, pts: P[id].pts, rang: r[id], avant: avant[id], bons: P[id].bons || 0}; });
+    ids().forEach(id => { const x = G.reps[id]; res[id] = {rep: x ? x.c : -1, g: x ? x.g : 0, bonus: x ? x.bonus || 0 : 0, serie: P[id].serie || 0, pts: P[id].pts, rang: r[id], avant: avant[id], bons: P[id].bons || 0}; });
     envoyer(topic, {m: "rev", i: G.i, bon: Q.bon, bonTxt: Q.ch[Q.bon], expl: Q.expl || "", res, n, classement: reg.classement, points: reg.points}); maj();
   }
   function finir(){
@@ -686,6 +702,8 @@ function joueur(code){
           ${bon && m.points !== "aucun" ? `<div class="monte" style="font-size:26px;font-weight:800">+<span id="jGain">0</span></div>` : ""}
           ${bon ? "" : `<div class="monte">La bonne réponse : <b>${esc(m.bonTxt)}</b></div>`}
           ${m.expl ? `<div class="expl monte">${esc(m.expl)}</div>` : ""}
+          ${r.serie >= 3 ? `<div class="serieJ monte${r.serie >= 5 ? " fort" : ""}">${FLAMME}<span>${r.serie} bonnes de suite${r.bonus ? ` · bonus +${r.bonus}` : ""}</span></div>` : ""}
+          ${m.classement === "oui" && m.i > 0 && r.avant && r.rang < r.avant ? `<div class="monte" style="font-weight:800;color:#7CF0A8">Tu remontes au ${ord(r.rang)} rang !</div>` : ""}
           ${m.classement === "oui" ? `<div class="rang monte">Tu es <b>${ord(r.rang)}</b> sur ${m.n}${m.points !== "aucun" ? " · " + pts + " points" : ""}${fl}</div>` : ""}`);
         if (!bon && r.rep >= 0) { $("jBx").classList.add("secoue"); setTimeout(() => $("jBx").classList.remove("secoue"), 500); }
         if (bon) compter($("jGain"), 0, r.g, 900);
@@ -747,7 +765,7 @@ function ecran(code){
     const rAvant = {}; ancien.forEach((j, k) => rAvant[j.n] = k + 1);
     const garde = av.filter(j => j.r <= N || rAvant[j.n] <= N);
     const ligne = j => { const d = rAvant[j.n] - j.r;
-      return `<div class="lg" data-n="${esc(j.n)}" data-r="${j.r}"><span class="r">${rAvant[j.n]}</span><span>${visage(j.av, "v-e")}${esc(j.n)}${v.i === 0 ? "" : d > 0 ? ` <small class="mo">▲ ${d}</small>` : d < 0 ? ` <small class="de">▼ ${-d}</small>` : ""}</span><span>${j.g ? `<small>+${j.g}</small>` : ""}${v.reg.points === "aucun" ? "" : `<b data-de="${j.avant}" data-a="${j.pts}">${j.avant}</b>`}</span></div>`; };
+      return `<div class="lg" data-n="${esc(j.n)}" data-r="${j.r}"><span class="r">${rAvant[j.n]}</span><span>${visage(j.av, "v-e")}${esc(j.n)}${v.i === 0 ? "" : d > 0 ? ` <small class="mo">▲ ${d}</small>` : d < 0 ? ` <small class="de">▼ ${-d}</small>` : ""}${j.s >= 3 ? ` <span class="feu${j.s >= 5 ? " fort" : ""}">${FLAMME}<em>${j.s} de suite</em></span>` : ""}</span><span>${j.g - (j.bo || 0) ? `<small>+${j.g - (j.bo || 0)}</small>` : ""}${j.bo ? `<small class="bo">+${j.bo} série</small>` : ""}${v.reg.points === "aucun" ? "" : `<b data-de="${j.avant}" data-a="${j.pts}">${j.avant}</b>`}</span></div>`; };
     E.innerHTML = tete("Classement après la question " + (v.i + 1) + " sur " + v.n) + `<div class="lgs" id="eLgs">${garde.sort((a, b) => rAvant[a.n] - rAvant[b.n]).map(ligne).join("")}</div>` + bSon();
     const rows = [...E.querySelectorAll("#eLgs .lg")];
     if (rows.length < 1) return;
@@ -761,6 +779,8 @@ function ecran(code){
         const nouv = garde.slice().sort((a, b) => a.r - b.r).map(j => j.n);
         rows.forEach((el, k) => { const cible = nouv.indexOf(el.dataset.n); el.style.transition = "transform .9s cubic-bezier(.2,.8,.2,1)"; el.style.transform = `translateY(${(cible - k) * pas}px)`; });
         setTimeout(() => rows.forEach(el => el.querySelector(".r").textContent = el.dataset.r), 500);
+        /* grosse remontée (3 places et plus) : la rangée brille un instant */
+        if (v.i > 0) rows.forEach((el, k) => { if (k - nouv.indexOf(el.dataset.n) >= 3) setTimeout(() => { el.classList.add("remonte"); el.insertAdjacentHTML("beforeend", `<span class="remTxt">+${k - nouv.indexOf(el.dataset.n)} places</span>`); }, 900); });
         ton(660, .2, .07);
       }, 1000);
     }, 80 * rows.length + 400);
