@@ -800,7 +800,7 @@
   ]
  },
  {
-  "date": "2026-11-04",
+  "date": "2026-11-08",
   "type": "outil",
   "titre": "Accueil de classe",
   "texte": "Tableau d'accueil animé pour le début de période : date, déroulement, temps avant la pause, la matière en cours avec un petit rappel, un contenu à ouvrir pour chaque activité, et un fond vivant qui suit la période.",
@@ -810,11 +810,11 @@
     "img": "nouveautes/accueil.jpg"
    },
    {
-    "t": "« Préparer le cours » : la période, la compétence et le déroulement. À l'étape 5, « ＋ Ajouter » lie un livre, un schéma, un plan, une vidéo, un site ou un fichier à une activité.",
+    "t": "« Préparer le cours » s'ouvre en grand : la semaine à gauche (cette semaine et la prochaine), le déroulement à droite. Chaque activité est une rangée : sa durée (− / +, ou touche le nombre pour l'écrire à la minute près) et « ＋ Livre, quiz, fichier… » pour ce qu'on ouvre pendant l'activité.",
     "img": "nouveautes/tdb-prep.jpg"
    },
    {
-    "t": "Étape 1 « Pour quand? » : le jour, Matin ou Après-midi, la durée (période complète, 1 h, 2 h…) et l'heure du début. Un cours préparé d'avance s'affiche tout seul à son moment. Point vert = déjà préparé. « Aperçu du cours » montre le tableau tel que les élèves le verront (avant, début, milieu, fin), sans rien changer.",
+    "t": "Touche une case de la semaine pour préparer ce matin-là ou cet après-midi-là. Glisse un cours sur une case libre (+) pour le copier. Durée, heure de début et examen : « Options du cours ».",
     "img": "nouveautes/tdb-autre-jour.jpg"
    },
    {
@@ -829,13 +829,13 @@
     "t": "Dans un livre, « Tableau de bord » (touche E) y retourne; « Revenir au livre » (touche L) te remet à la même page.",
     "img": "nouveautes/tdb-retour.jpg"
    },
-   {
-    "t": "Le fond vit avec la période : plus calme à la pause, plus vif les 5 dernières minutes, petites surprises de temps en temps. Carte « Bienvenue » 5 minutes avant le cours. Plus → Réglages → « Fond animé » : Comme l'ordinateur, Toujours ou Jamais.",
-    "img": "nouveautes/tdb-bienvenue.jpg"
-   },
-   "Jour d'examen : coche « Examen aujourd'hui » (pas de pauses). « Plein écran » une seule fois au début : il reste actif entre le tableau de bord et les livres."
+   "Jour d'examen : dans « Options du cours », coche « Examen » (pas de pauses pour cette période)."
   ],
   "versions": [
+   {
+    "date": "2026-11-08",
+    "texte": "Préparer le cours refait : grande fenêtre, vue de la semaine, déroulement en rangées, durées à la minute près."
+   },
    {
     "date": "2026-11-04",
     "texte": "Ligne du temps plus grosse (texte de même taille partout) pour bien la voir du fond de la classe; la ligne « Au programme » est retirée."
@@ -847,10 +847,6 @@
    {
     "date": "2026-11-04",
     "texte": "Ligne du temps refaite : coche verte sur les blocs finis, heure en bas de chaque bloc, barre de progression dans le bloc en cours et repère « maintenant » avec l'heure."
-   },
-   {
-    "date": "2026-11-04",
-    "texte": "Look plus technique : chiffres lumineux, repères de coins et fine barre de progression de la période."
    }
   ]
  },

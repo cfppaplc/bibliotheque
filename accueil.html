@@ -23,7 +23,11 @@
   Storage.prototype.setItem = function(k, v){ if (k === K && this === window.localStorage) return; return si.call(this, k, v); };
 })();
 </script>
-<style>html.apercu-mode .tools, html.apercu-mode #accAccueil .aa-x { display: none !important; }</style>
+<style>html.apercu-mode .tools, html.apercu-mode #accAccueil .aa-x { display: none !important; }
+/* transitions douces entre les pages (8 nov.) */
+@view-transition{navigation:auto}
+::view-transition-old(root),::view-transition-new(root){animation-duration:.22s}
+</style>
 <script>
 /* Fenêtres claires ou foncées comme la bibliothèque : localStorage.accueilClair ("1"/"0"), sinon le réglage de l'ordinateur */
 (function(){ const mq = matchMedia("(prefers-color-scheme: light)");
@@ -272,6 +276,7 @@ html #prep .sheet-in.prep2 { width: min(1240px, calc(100vw - 32px)); display: gr
 .semaine { margin: 4px 0 10px; }
 .sem-tete { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
 .sem-tete b { font-size: 15px; }
+.sem-tete .sem-du { font-weight: 500; opacity: .65; }
 .sem-fl { width: 40px; height: 36px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); color: inherit; font-size: 20px; cursor: pointer; }
 .sem-fl:disabled { opacity: .3; cursor: default; }
 .sem-grille { display: grid; grid-template-columns: 74px repeat(5, minmax(0, 1fr)); gap: 6px; align-items: stretch; }
@@ -300,7 +305,6 @@ html #prep .sheet-in.prep2 { width: min(1240px, calc(100vw - 32px)); display: gr
 .jour-choix button.on { background: var(--ink); color: var(--surface); border-color: var(--ink); }
 .jour-choix button .pret { width: 8px; height: 8px; border-radius: 50%; background: #2f9e44; }
 .jour-choix button.on .pret { background: #69db7c; }
-.jour-choix label.autre-jour { position: relative; overflow: hidden; }
 .jour-choix label.autre-jour input[type=date] { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; border: 0; padding: 0; margin: 0; cursor: pointer; font-size: 16px; -webkit-appearance: none; appearance: none; }
 .jour-choix label.autre-jour input[type=date]::-webkit-calendar-picker-indicator { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; padding: 0; cursor: pointer; opacity: 0; }
 html .jour-choix label.autre-jour.on { background: #f1f1f2; color: #111; border-color: #f1f1f2; }
@@ -876,7 +880,6 @@ html.ui-clair #apercuOv .ap-moments button.on, html.ui-clair #apercuOv .ap-ferme
     <div class="p2-g">
     <div class="field quand"><span class="step-q"><span class="num">1</span>Pour quand? <span class="tip-i" tabindex="0" role="img" aria-label="Aide : Choisis le jour et la période. Un cours préparé d'avance s'affichera tout seul à son moment. Le point vert montre ce qui est déjà préparé." data-tip="Choisis le jour et la période. Un cours préparé d'avance s'affichera tout seul à son moment. Le point vert montre ce qui est déjà préparé.">?</span></span>
       <div class="semaine" id="f-semaine" aria-label="Choisis une période dans la semaine"></div>
-      <div class="jour-choix" id="f-jours" hidden></div><div class="jour-choix" id="f-pers" hidden></div>
       <p class="jour-note" id="f-jour-note" hidden></p>
       <details class="opt-cours" id="f-opts"><summary>Options du cours <small id="f-opts-res"></small></summary>
         <div class="duree-choix"><label>Durée <select id="f-duree"></select></label><label>Début <select id="f-debut"></select></label></div>
@@ -913,7 +916,7 @@ html.ui-clair #apercuOv .ap-moments button.on, html.ui-clair #apercuOv .ap-ferme
       <select id="f-clock"><option value="num">Numérique</option><option value="analog">À aiguilles</option><option value="mano">Manomètre</option><option value="led">Afficheur lumineux</option><option value="mini">Minimal (sans secondes)</option></select></div>
     <div class="field"><label for="f-theme">Couleurs <span class="tip-i" tabindex="0" role="img" aria-label="Aide : Sombre pour une classe tamisée, clair si la classe est très éclairée et que le projecteur pâlit l'image." data-tip="Sombre pour une classe tamisée, clair si la classe est très éclairée et que le projecteur pâlit l'image.">?</span></label><select id="f-theme"><option value="dark">Atelier sombre (acier)</option><option value="light">Clair (classe très éclairée)</option><option value="auto">Comme l'ordinateur</option></select></div>
     <div class="field"><label for="f-couleurs">Ambiance <span class="tip-i" tabindex="0" role="img" aria-label="Aide : Les couleurs changent chaque jour de la semaine pour garder l'attention des élèves. Lundi ardoise, mardi forêt, mercredi prune, jeudi pétrole, vendredi cuivre." data-tip="Les couleurs changent chaque jour de la semaine pour garder l'attention des élèves. Lundi ardoise, mardi forêt, mercredi prune, jeudi pétrole, vendredi cuivre.">?</span></label><select id="f-couleurs"><option value="jour">Change chaque jour (recommandé)</option><option value="fixe">Toujours la même</option></select></div>
-    <div class="field"><label for="f-anim">Fond animé <span class="tip-i" tabindex="0" role="img" aria-label="Aide : Comme l'ordinateur : le fond reste figé si Windows a désactivé les effets d'animation. Toujours : le fond bouge quand même. Jamais : fond immobile." data-tip="Comme l'ordinateur : le fond reste figé si Windows a désactivé les effets d'animation. Toujours : le fond bouge quand même. Jamais : fond immobile.">?</span></label><select id="f-anim"><option value="auto">Comme l'ordinateur</option><option value="oui">Toujours</option><option value="non">Jamais</option></select></div>
+    <div class="field" hidden><label for="f-anim">Fond animé <span class="tip-i" tabindex="0" role="img" aria-label="Aide : Comme l'ordinateur : le fond reste figé si Windows a désactivé les effets d'animation. Toujours : le fond bouge quand même. Jamais : fond immobile." data-tip="Comme l'ordinateur : le fond reste figé si Windows a désactivé les effets d'animation. Toujours : le fond bouge quand même. Jamais : fond immobile.">?</span></label><select id="f-anim"><option value="auto">Comme l'ordinateur</option><option value="oui">Toujours</option><option value="non">Jamais</option></select></div>
     <div class="field"><label for="f-msg">Message du jour <span class="tip-i" tabindex="0" role="img" aria-label="Aide : Une consigne courte sous la citation, par exemple « Apportez vos lunettes ». Laisse vide pour ne rien afficher." data-tip="Une consigne courte sous la citation, par exemple « Apportez vos lunettes ». Laisse vide pour ne rien afficher.">?</span></label><input id="f-msg" placeholder="Aucun message"></div>
     <details class="more" id="adv">
       <summary>Réglages avancés <span class="tip-i" tabindex="0" role="img" aria-label="Aide : Nom affiché, heures de début des périodes, taille du texte et contenu des blocs facultatifs. Rarement nécessaires." data-tip="Nom affiché, heures de début des périodes, taille du texte et contenu des blocs facultatifs. Rarement nécessaires.">?</span></summary>
@@ -1403,268 +1406,12 @@ let reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;   /* 
 function rng(seed) { let x = seed; return () => (x = (x * 1103515245 + 12345) % 2147483648) / 2147483648; }
 function tokens() { const cs = getComputedStyle(document.documentElement); const g = n => cs.getPropertyValue(n).trim(); return { bg: g("--bg"), steel: g("--steel"), water: g("--water"), copper: g("--copper"), ink: g("--ink"), muted: g("--muted"), line: g("--line"), rivet: g("--rivet") }; }
 
-function svgTuyaux() {
-  const pipes = [
-    "M790 -40 V330 Q790 370 830 370 H1000",
-    "M1640 230 H1460 Q1410 230 1410 280 V690 Q1410 740 1360 740 H900 Q850 740 850 790 V940",
-    "M-40 690 H110 Q160 690 160 740 V940",
-    "M-40 880 H500 Q540 880 540 920",
-    "M1640 520 H1520"
-  ];
-  const fl = [[790,60,90],[790,250,90],[1410,420,90],[1100,740,0],[160,830,90],[300,880,0]];
-  const valves = [[790,160,90],[1410,600,90],[1520,520,0],[420,880,0]];
-  let g = '';
-  pipes.forEach(d => { g += `<path d="${d}" stroke="var(--steel)" stroke-width="30" fill="none"/><path d="${d}" stroke="var(--rivet)" stroke-width="10" fill="none" opacity=".45"/><path class="flow" d="${d}" stroke-width="4" opacity=".7"/>`; });
-  fl.forEach(([x, y, r]) => { g += `<g transform="translate(${x} ${y}) rotate(${r})"><rect x="-6" y="-24" width="12" height="48" rx="2" fill="var(--steel)" stroke="var(--rivet)" stroke-width="2"/><circle cx="0" cy="-17" r="2.5" fill="var(--rivet)"/><circle cx="0" cy="17" r="2.5" fill="var(--rivet)"/></g>`; });
-  valves.forEach(([x, y, r]) => { g += `<g transform="translate(${x} ${y}) rotate(${r})"><path d="M-22 -18 L22 18 V-18 L-22 18 Z" fill="var(--steel)" stroke="var(--rivet)" stroke-width="2"/><rect x="-3" y="-46" width="6" height="28" fill="var(--rivet)"/><circle cx="0" cy="-50" r="20" fill="none" stroke="var(--copper)" stroke-width="5" opacity=".85"/><path d="M-20 -50 H20 M0 -70 V-30" stroke="var(--copper)" stroke-width="3" opacity=".85"/></g>`; });
-  // Manomètre
-  g += `<g transform="translate(880 300)"><path d="M-90 0 H-30" stroke="var(--steel)" stroke-width="12"/><circle r="44" fill="var(--bg)" stroke="var(--rivet)" stroke-width="6"/>`;
-  for (let a = -135; a <= 135; a += 27) g += `<line x1="0" y1="-36" x2="0" y2="-28" stroke="var(--muted)" stroke-width="2" transform="rotate(${a})"/>`;
-  g += `<path d="M-30 18 A35 35 0 0 1 -18 -30" stroke="var(--water)" stroke-width="4" fill="none" opacity=".7"/><path d="M22 -28 A35 35 0 0 1 32 14" stroke="var(--copper)" stroke-width="4" fill="none"/><g class="gauge-needle"><line x1="0" y1="0" x2="0" y2="-32" stroke="var(--copper)" stroke-width="3"/></g><circle r="5" fill="var(--rivet)"/><text y="22" text-anchor="middle" font-size="9" fill="var(--muted)">kPa</text></g>`;
-  return `<svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">${g}</svg>`;
-}
-
-function svgPlan() {
-  const c = 'stroke="var(--water)" fill="none"';
-  let g = `<g opacity=".55" stroke-width="2.5">`;
-  // Réseau d'alimentation (trait plein) et de drainage (tirets)
-  g += `<path ${c} d="M60 840 H520 V620 H760 M520 720 H640 V560 M60 840 V700 H240"/>`;
-  g += `<path ${c} stroke-dasharray="14 8" d="M1540 90 H1180 V250 H980 M1180 170 H1320 V330 M1540 90 V420 H1400"/>`;
-  // Vannes (symbole papillon) et tés
-  [[300,840],[640,720],[1300,90],[1400,420]].forEach(([x,y]) => g += `<path ${c} d="M${x-12} ${y-9} L${x+12} ${y+9} V${y-9} L${x-12} ${y+9} Z"/>`);
-  [[520,720],[1180,170],[240,840]].forEach(([x,y]) => g += `<circle cx="${x}" cy="${y}" r="6" fill="var(--water)"/>`);
-  // Chauffe-eau
-  g += `<g transform="translate(700 70)"><rect ${c} x="0" y="40" width="110" height="200" rx="18"/><path ${c} d="M0 80 H110 M30 40 V0 H-60 M80 40 V10 H200 V230"/><path ${c} d="M188 150 L212 168 V150 L188 168 Z"/><circle cx="200" cy="90" r="6" fill="var(--water)"/><path ${c} d="M200 90 H260 V40"/><text x="55" y="160" text-anchor="middle" font-size="16" fill="var(--water)" stroke="none">CHAUFFE-EAU</text><text x="55" y="182" text-anchor="middle" font-size="14" fill="var(--water)" stroke="none">270 L</text><text x="214" y="125" font-size="14" fill="var(--water)" stroke="none">EF</text><text x="266" y="36" font-size="14" fill="var(--water)" stroke="none">EC Ø ¾ po</text></g>`;
-  // Cotes
-  g += `<path ${c} stroke-width="1.5" d="M60 880 H520 M60 870 V890 M520 870 V890"/><text x="290" y="874" text-anchor="middle" font-size="16" fill="var(--water)" stroke="none">3 600</text>`;
-  g += `<path ${c} stroke-width="1.5" d="M1580 90 V420 M1570 90 H1590 M1570 420 H1590"/><text x="1572" y="260" font-size="16" fill="var(--water)" stroke="none" transform="rotate(-90 1572 260)" text-anchor="middle">2 400</text>`;
-  g += `<text x="660" y="608" font-size="15" fill="var(--water)" stroke="none">Ø ¾ po CU</text><text x="1200" y="240" font-size="15" fill="var(--water)" stroke="none">DRAIN 3 po · PENTE 2 %</text>`;
-  // Cartouche
-  g += `<g transform="translate(1180 760)"><rect ${c} width="380" height="110"/><path ${c} stroke-width="1.5" d="M0 40 H380 M0 75 H380 M250 40 V110"/><text x="14" y="28" font-size="18" fill="var(--water)" stroke="none">PAVILLON DE L'AVENIR · PLOMBERIE</text><text x="14" y="64" font-size="15" fill="var(--water)" stroke="none">PLAN DE TUYAUTERIE · NIVEAU 1</text><text x="14" y="99" font-size="15" fill="var(--water)" stroke="none">DEP 5333</text><text x="264" y="64" font-size="15" fill="var(--water)" stroke="none">FEUILLE P-101</text><text x="264" y="99" font-size="15" fill="var(--water)" stroke="none">ÉCH. 1:50</text></g>`;
-  g += `</g>`;
-  return `<svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">${g}</svg>`;
-}
-
-function drawBois(cv) {
-  const t = tokens(), W = cv.width = innerWidth, H = cv.height = innerHeight, x = cv.getContext("2d"), r = rng(7);
-  x.fillStyle = t.bg; x.fillRect(0, 0, W, H);
-  const pw = 150;
-  for (let X = -pw / 2, k = 0; X < W; X += pw, k++) {
-    const tone = 0.10 + r() * 0.08, off = (k % 2) * 220 + r() * 120;
-    x.fillStyle = `rgba(150,95,45,${tone})`; x.fillRect(X, 0, pw - 4, H);
-    // Veinage
-    for (let g = 0; g < 14; g++) { const gx = X + 8 + r() * (pw - 20), amp = 3 + r() * 8, ph = r() * 6;
-      x.strokeStyle = `rgba(60,30,10,${0.10 + r() * 0.12})`; x.lineWidth = 1 + r() * 1.5; x.beginPath();
-      for (let y = 0; y <= H; y += 12) { const xx = gx + Math.sin(y / (60 + g * 7) + ph) * amp; y ? x.lineTo(xx, y) : x.moveTo(xx, y); } x.stroke(); }
-    // Nœuds
-    for (let n = 0; n < 2; n++) { const nx = X + 30 + r() * (pw - 60), ny = r() * H; x.strokeStyle = "rgba(60,30,10,.28)"; x.lineWidth = 2;
-      for (let q = 1; q < 5; q++) { x.beginPath(); x.ellipse(nx, ny, q * 4, q * 9, 0, 0, 7); x.stroke(); } }
-    // Joints de planches et vis
-    x.fillStyle = "rgba(0,0,0,.55)"; x.fillRect(X + pw - 4, 0, 4, H);
-    for (let Y = off % 300; Y < H; Y += 300) { x.fillRect(X, Y, pw - 4, 3); [X + 18, X + pw - 22].forEach(sx => { x.fillStyle = "rgba(190,190,190,.35)"; x.beginPath(); x.arc(sx, Y + 14, 4, 0, 7); x.fill(); x.fillStyle = "rgba(0,0,0,.55)"; }); }
-  }
-}
-function drawBeton(cv) {
-  const t = tokens(), W = cv.width = innerWidth, H = cv.height = innerHeight, x = cv.getContext("2d"), r = rng(42);
-  x.fillStyle = t.bg; x.fillRect(0, 0, W, H);
-  // Taches et nuances du béton
-  for (let i = 0; i < 70; i++) { const px = r() * W, py = r() * H, rad = 40 + r() * 220, g = x.createRadialGradient(px, py, 0, px, py, rad), light = r() > .5;
-    g.addColorStop(0, light ? "rgba(255,255,255,.05)" : "rgba(0,0,0,.10)"); g.addColorStop(1, "rgba(0,0,0,0)"); x.fillStyle = g; x.fillRect(px - rad, py - rad, rad * 2, rad * 2); }
-  // Grain
-  const n = x.getImageData(0, 0, W, H), d = n.data;
-  for (let i = 0; i < d.length; i += 4) { const v = (r() - .5) * 22; d[i] += v; d[i + 1] += v; d[i + 2] += v; }
-  x.putImageData(n, 0, 0);
-  // Petites bulles d'air
-  for (let i = 0; i < W * H / 9000; i++) { x.fillStyle = "rgba(0,0,0,.28)"; x.beginPath(); x.arc(r() * W, r() * H, .8 + r() * 2.2, 0, 7); x.fill(); }
-  // Joints de coffrage et trous de tirants
-  const pw = 360, ph = 240;
-  x.strokeStyle = "rgba(0,0,0,.35)"; x.lineWidth = 2;
-  for (let X = pw; X < W; X += pw) { x.beginPath(); x.moveTo(X, 0); x.lineTo(X, H); x.stroke(); }
-  for (let Y = ph; Y < H; Y += ph) { x.beginPath(); x.moveTo(0, Y); x.lineTo(W, Y); x.stroke(); }
-  for (let X = pw / 4; X < W; X += pw / 2) for (let Y = ph / 2; Y < H; Y += ph) {
-    const g = x.createRadialGradient(X - 2, Y - 2, 1, X, Y, 11); g.addColorStop(0, "rgba(0,0,0,.6)"); g.addColorStop(.7, "rgba(0,0,0,.35)"); g.addColorStop(1, "rgba(255,255,255,.06)");
-    x.fillStyle = g; x.beginPath(); x.arc(X, Y, 11, 0, 7); x.fill(); }
-}
-
-function runSoudure(cv) {
-  const x = cv.getContext("2d"); let W, H;
-  const size = () => { W = cv.width = innerWidth; H = cv.height = innerHeight; };
-  size(); cv._resize = size;
-  const sparks = []; const r = Math.random;
-  const emit = () => ({ ex: W * 0.47, ey: H * 0.33 });
-  function spawn(n) { const { ex, ey } = emit(); for (let i = 0; i < n; i++) { const a = -Math.PI / 2 + (r() - .5) * 2.6, v = 2 + r() * 7; sparks.push({ x: ex, y: ey, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 1, life: 1, decay: .008 + r() * .02 }); } }
-  function frame() {
-    x.clearRect(0, 0, W, H);
-    const { ex, ey } = emit(), flick = .6 + r() * .4;
-    const glow = x.createRadialGradient(ex, ey, 0, ex, ey, 260 * flick);
-    glow.addColorStop(0, `rgba(255,190,120,${.32 * flick})`); glow.addColorStop(.25, `rgba(255,120,40,${.12 * flick})`); glow.addColorStop(1, "rgba(0,0,0,0)");
-    x.fillStyle = glow; x.fillRect(0, 0, W, H);
-    if (!reduceMotion) spawn(3 + (r() * 5 | 0));
-    x.globalCompositeOperation = "lighter";
-    for (let i = sparks.length - 1; i >= 0; i--) { const p = sparks[i];
-      const ox = p.x, oy = p.y; p.vy += .16; p.vx *= .995; p.x += p.vx; p.y += p.vy; p.life -= p.decay;
-      if (p.y > H - 4 && p.vy > 0) { p.vy *= -.35; p.vx *= .6; p.y = H - 4; }
-      if (p.life <= 0) { sparks.splice(i, 1); continue; }
-      x.strokeStyle = `rgba(255,${150 + 100 * p.life | 0},${60 * p.life | 0},${p.life})`; x.lineWidth = 1.6;
-      x.beginPath(); x.moveTo(ox, oy); x.lineTo(p.x, p.y); x.stroke(); }
-    x.globalCompositeOperation = "source-over";
-    x.fillStyle = "rgba(255,245,230,.95)"; x.beginPath(); x.arc(ex, ey, 3 + flick * 2, 0, 7); x.fill();
-    if (!reduceMotion) bgAnim = requestAnimationFrame(frame);
-  }
-  if (reduceMotion) spawn(120);
-  frame();
-}
-
-function svgElec() {
-  const traces = ["M-20 30 H240 V-20", "M600 -20 V120 H900 V60 H1120", "M1620 300 H1500 V520 H1560 V760", "M-20 600 H90 V860 H380", "M760 80 V280 H980", "M1200 900 V820 H1460 V700"];
-  let g = `<g fill="none" stroke-linejoin="round">`;
-  traces.forEach(d => g += `<path d="${d}" stroke="var(--steel)" stroke-width="8"/><path class="flow" d="${d}" stroke-width="3" style="stroke:var(--copper);stroke-dasharray:6 60;animation-duration:1.6s"/>`);
-  [[900,120],[1120,60],[1500,520],[90,860],[380,860],[980,280],[1460,700]].forEach(([x, y]) => g += `<circle cx="${x}" cy="${y}" r="9" fill="var(--bg)" stroke="var(--rivet)" stroke-width="4"/>`);
-  // Schéma : relais, interrupteur et résistance
-  g += `<g transform="translate(700 150)" stroke="var(--water)" stroke-width="3" opacity=".8"><path d="M0 0 H60 l10 -14 l20 28 l20 -28 l20 28 l20 -28 l10 14 H220"/><path d="M220 0 H260 M260 0 l40 -22 M300 0 H360"/><circle cx="260" cy="0" r="4" fill="var(--water)"/><circle cx="300" cy="0" r="4" fill="var(--water)"/><rect x="40" y="60" width="80" height="50"/><path d="M40 85 H0 V0 M120 85 H160"/><text x="80" y="92" text-anchor="middle" font-size="18" fill="var(--water)" stroke="none">K1</text><text x="140" y="-24" font-size="16" fill="var(--water)" stroke="none">24 V c.a.</text></g>`;
-  return `<svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">${g}</g></svg>`;
-}
-function svgVentil() {
-  let g = `<g stroke="var(--rivet)" stroke-width="2">`;
-  const duct = (x, y, w, h) => { g += `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="var(--steel)"/>`; const vert = h > w; for (let k = 40; k < (vert ? h : w); k += 80) g += vert ? `<line x1="${x}" y1="${y + k}" x2="${x + w}" y2="${y + k}"/>` : `<line x1="${x + k}" y1="${y}" x2="${x + k}" y2="${y + h}"/>`; };
-  duct(-20, -40, 700, 70); duct(620, -40, 90, 160); duct(1180, -20, 110, 300); duct(1180, 210, 440, 100); duct(-20, 760, 700, 90); duct(1420, 520, 200, 80);
-  g += `</g>`;
-  // Flux d'air
-  ["M20 -5 H665 V110", "M1235 -10 V260 H1600", "M0 805 H660"].forEach(d => g += `<path class="flow" d="${d}" stroke-width="3" style="stroke-dasharray:20 30;opacity:.6"/>`);
-  // Ventilateur
-  g += `<g transform="translate(760 220)"><rect x="-110" y="-110" width="220" height="220" rx="10" fill="var(--steel)" stroke="var(--rivet)" stroke-width="3"/><circle r="92" fill="var(--bg)" stroke="var(--rivet)" stroke-width="3"/><g class="fan">`;
-  for (let a = 0; a < 360; a += 72) g += `<path d="M0 0 C 20 -30, 60 -70, 20 -86 C 0 -88, -10 -60, 0 0 Z" fill="var(--muted)" opacity=".85" transform="rotate(${a})"/>`;
-  g += `</g><circle r="14" fill="var(--rivet)"/>`;
-  for (let k = -80; k <= 80; k += 20) g += `<line x1="-92" y1="${k}" x2="92" y2="${k}" stroke="var(--rivet)" stroke-width="1.5" opacity=".5"/>`;
-  g += `</g>`;
-  return `<svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">${g}</svg>`;
-}
-function svgRadiant() {
-  let g = "";
-  const loop = (x0, y0, w, n, gap) => { let d = `M${x0} ${y0}`; for (let i = 0; i < n; i++) { const y = y0 + i * gap; d += i % 2 ? ` H${x0}` : ` H${x0 + w}`; if (i < n - 1) d += ` a${gap / 2} ${gap / 2} 0 0 ${i % 2 ? 0 : 1} 0 ${gap}`; } return d; };
-  const loops = [loop(-60, 40, 1720, 12, 76)];
-  loops.forEach(d => g += `<path d="${d}" stroke="var(--copper)" stroke-width="9" fill="none" opacity=".18"/><path class="flow" d="${d}" stroke-width="2.5" style="stroke:var(--copper);opacity:.4;animation-duration:3s"/>`);
-  // Collecteur
-  g += `<g transform="translate(720 70)"><rect width="300" height="34" rx="6" fill="var(--steel)" stroke="var(--rivet)" stroke-width="2"/>`;
-  for (let k = 30; k < 300; k += 48) g += `<rect x="${k}" y="34" width="14" height="40" fill="var(--rivet)"/><circle cx="${k + 7}" cy="-12" r="12" fill="none" stroke="var(--water)" stroke-width="4"/>`;
-  g += `<text x="150" y="110" text-anchor="middle" font-size="18" fill="var(--muted)">COLLECTEUR · 40 °C</text></g>`;
-  return `<svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">${g}</svg>`;
-}
-function runFlammes(cv, gaz) {
-  const x = cv.getContext("2d"); let W, H;
-  const size = () => { W = cv.width = innerWidth; H = cv.height = innerHeight; };
-  size(); cv._resize = size;
-  const parts = [], r = Math.random;
-  const jets = () => { const n = 7, cx = W * 0.47, y = H * 0.36, span = W * 0.12; return [...Array(n)].map((_, i) => [cx - span / 2 + span * i / (n - 1), y]); };
-  function frame() {
-    x.clearRect(0, 0, W, H);
-    const js = jets(), [cx, cy] = [W * 0.47, H * 0.36];
-    // Lueur de la chaufferie en bas de l'écran
-    const lg = x.createLinearGradient(0, H, 0, H * 0.55); lg.addColorStop(0, gaz ? "rgba(60,120,255,.18)" : "rgba(255,110,30,.20)"); lg.addColorStop(1, "rgba(0,0,0,0)"); x.fillStyle = lg; x.fillRect(0, 0, W, H);
-    const glow = x.createRadialGradient(cx, cy, 0, cx, cy, W * 0.12); glow.addColorStop(0, gaz ? "rgba(90,150,255,.25)" : "rgba(255,150,60,.28)"); glow.addColorStop(1, "rgba(0,0,0,0)"); x.fillStyle = glow; x.fillRect(0, 0, W, H);
-    // Rampe du brûleur
-    x.fillStyle = "rgba(120,130,140,.9)"; x.fillRect(js[0][0] - 14, cy, js[js.length - 1][0] - js[0][0] + 28, 10);
-    if (!reduceMotion || !parts.length) js.forEach(([jx, jy]) => { for (let k = 0; k < 3; k++) parts.push({ x: jx + (r() - .5) * 6, y: jy, vx: (r() - .5) * .5, vy: -(1.2 + r() * 1.6), life: 1, s: 7 + r() * 6 }); });
-    x.globalCompositeOperation = "lighter";
-    for (let i = parts.length - 1; i >= 0; i--) { const p = parts[i]; p.x += p.vx + Math.sin(p.y * .05) * .2; p.y += p.vy; p.life -= .03; p.s *= .97;
-      if (p.life <= 0) { parts.splice(i, 1); continue; }
-      const c = gaz ? (p.life > .6 ? `rgba(120,180,255,${p.life * .7})` : `rgba(60,90,255,${p.life * .5})`) : (p.life > .7 ? `rgba(255,230,140,${p.life * .7})` : `rgba(255,${90 + 100 * p.life | 0},30,${p.life * .55})`);
-      x.fillStyle = c; x.beginPath(); x.arc(p.x, p.y, p.s, 0, 7); x.fill(); }
-    x.globalCompositeOperation = "source-over";
-    if (!reduceMotion) bgAnim = requestAnimationFrame(frame);
-  }
-  frame();
-}
-
-/* ===== Scènes d'arrière-plan liées au cours : dessins au trait, placés dans les zones libres de l'écran =====
-   Zone principale : sous la citation, à gauche (x 40–740, y 390–575). Colonne : entre l'horloge et le panneau (x 570–740).
-   Les panneaux restent lisibles : les dessins sont fins, semi-transparents et surtout sur les bords. */
-const SC = (() => {
-  const T = (x, y, s, c, cls) => `<g transform="translate(${x} ${y}) scale(${s || 1})"${cls ? ` class="${cls}"` : ""}>${c}</g>`;
-  const L = (d, c) => `<path class="${c || "ln"}" d="${d}"/>`;
-  const R = (x, y, w, h, r, c) => `<rect class="${c || "ln"}" x="${x}" y="${y}" width="${w}" height="${h}" rx="${r || 0}"/>`;
-  const C = (x, y, r, c) => `<circle class="${c || "ln"}" cx="${x}" cy="${y}" r="${r}"/>`;
-  const TX = (x, y, t, sz, c) => `<text x="${x}" y="${y}" class="${c || "tx"}" font-size="${sz || 18}">${t}</text>`;
-  const tuyau = (d, flux) => `<path class="pipe" d="${d}"/>` + (flux ? `<path class="pflow" d="${d}"/>` : "");
-  /* ---- objets ---- */
-  const robinet = () => L("M0 70h80M14 70V52h52v18") + L("M40 52V36h56q16 0 16 16v8") + L("M24 28h32M40 28v8") + `<circle class="goutte" cx="112" cy="66" r="5"/>`;
-  const lavabo = () => L("M0 0h180q0 70-90 70T0 0z") + L("M70 70v40q0 26 20 26t20-26v-6") + L("M110 104h60") + T(40, -72, .8, robinet());
-  const toilette = () => R(10, 0, 90, 60, 6) + L("M0 70h120q0 50-50 60l6 40H44l6-40Q0 120 0 70z") + L("M30 18h30");
-  const chauffeEau = () => R(0, 0, 90, 220, 26) + L("M20 0v-40M70 0v-40") + C(45, 70, 16) + L("M45 70l8-8") + L("M20 190h50") + `<path class="flam" d="M30 214q15-26 15-40q8 14 15 40z"/>`;
-  const vanne = () => L("M-24 -16L24 16V-16L-24 16Z") + L("M0 0V-30") + C(0, -38, 12);
-  const cone = () => `<path class="fy" d="M30 0L60 110H0z"/>` + L("M30 0L60 110H0zM14 60h32M8 84h44", "ln") + R(-12, 110, 84, 12, 3);
-  const casque = () => `<path class="fy" d="M0 50q0-50 50-50t50 50z"/>` + L("M0 50q0-50 50-50t50 50zM-12 50h124v10H-12zM50 0v50M30 8v40M70 8v40");
-  const danger = () => `<path class="fy" d="M50 0L100 88H0z"/>` + L("M50 0L100 88H0z") + L("M50 30v30M50 72v2", "lk");
-  const bandes = w => { let g = `<rect class="fy" x="0" y="0" width="${w}" height="22"/>`; for (let x = -22; x < w; x += 44) g += `<path class="fk" d="M${x} 22L${x + 22} 0h22L${x + 22} 22z"/>`; return g; };
-  const immeuble = (w, h, et) => { let g = R(0, 0, w, h); for (let y = 18; y < h - 30; y += et) for (let x = 14; x < w - 20; x += 28) g += `<rect class="${(x * y) % 7 < 2 ? "win on" : "win"}" x="${x}" y="${y}" width="14" height="18"/>`; return g + R(w / 2 - 14, h - 34, 28, 34); };
-  const grue = () => L("M0 260V0M-14 260V0M0 0h-14M-7 0V-30M-7 -30L220 0M-7 -30L-80 0M-80 0h300M-80 0v18h40V0") + (() => { let g = ""; for (let y = 20; y < 260; y += 24) g += L(`M0 ${y}L-14 ${y + 24}`); return g; })() + `<g class="balance">${L("M160 0v120")}${L("M150 120h20l-4 14h-12z")}${R(140, 134, 40, 24, 2)}</g>`;
-  const bulle = (w, h, txt) => R(0, 0, w, h, 16) + L(`M24 ${h}l-6 22 26-22`) + (txt || `<circle class="dot d1" cx="${w / 2 - 22}" cy="${h / 2}" r="6"/><circle class="dot d2" cx="${w / 2}" cy="${h / 2}" r="6"/><circle class="dot d3" cx="${w / 2 + 22}" cy="${h / 2}" r="6"/>`);
-  const cellulaire = () => R(0, 0, 60, 110, 10) + L("M22 10h16M24 98h12") + R(8, 20, 44, 70, 3);
-  const enveloppe = () => R(0, 0, 100, 64, 4) + L("M0 0l50 38 50-38M0 64l36-30M100 64L64 34");
-  const cle = () => L("M0 0l70 70M70 70q8 8 20 4t10-20l-10 10-12-2-2-12 10-10q-16-4-24 6t-6 24") + L("M0 0q-12-12-4-22t22 4") ;
-  const marteau = () => L("M10 120L56 30") + L("M30 10l50 26-10 20-50-26z");
-  const tournevis = () => L("M0 0l60 60") + R(56, 56, 20, 60, 6) + L("M0 0l-10-10");
-  const etagere = () => { let g = L("M0 0v200M240 0v200M0 70h240M0 140h240M0 200h240"); [[10, 30, 60, 40], [80, 20, 50, 50], [140, 40, 80, 30], [20, 100, 90, 40], [130, 110, 60, 30], [10, 160, 70, 40], [100, 170, 120, 30]].forEach(([x, y, w, h]) => { g += R(x, y, w, h, 2) + L(`M${x + w / 2 - 8} ${y + 6}h16`); }); return g; };
-  const diable = () => L("M10 0l14 120h50M24 120l-6 10") + C(30, 132, 12) + R(32, 60, 50, 56, 2);
-  const seau = () => L("M0 20h90l-10 80H10z") + L("M10 20q35-40 70 0") + L("M60 -80l-10 100") + L("M38 20q12 18 24 0");
-  const vadrouille = () => L("M0 0l20 200") + L("M0 196q20 8 40 0l10 24H-10z") + L("M2 220l-4 20M14 220l-2 22M26 220v22M38 220l4 20");
-  const pluie = n => { let g = ""; for (let i = 0; i < n; i++) g += `<circle class="bulle b${i % 4}" cx="${(i * 47) % 320}" cy="${80 + (i * 29) % 60}" r="${6 + (i * 5) % 10}"/>`; return g; };
-  const etoile = () => L("M0 -14V14M-14 0H14M-7 -7l14 14M7 -7L-7 7", "lw tw");
-  const ecran = () => R(0, 0, 220, 140, 8) + R(12, 12, 196, 108, 3) + L("M110 140v26M70 166h80") + R(22, 24, 80, 50, 2, "lw") + L("M22 34h80", "lw") + R(112, 50, 86, 58, 2) + L("M112 60h86") + L("M30 90h60M30 100h40");
-  const curseur = () => L("M0 0v40l11-10 8 18 8-4-8-17h15z", "lw");
-  const clavier = () => { let g = R(0, 0, 260, 84, 8); for (let r = 0; r < 3; r++) for (let c = 0; c < 10; c++) g += R(10 + c * 24.5, 10 + r * 22, 19, 16, 3); return g + R(70, 76, 120, 6, 3); };
-  const nuage = () => L("M20 60h120q24 0 24-24t-26-24q-4-34-40-34-28 0-38 26-30-6-38 18-22 4-22 20t20 18z", "lw");
-  const wifi = () => L("M0 30q40-40 80 0M14 44q26-26 52 0M28 58q12-12 24 0", "lw sig") + C(40, 70, 4, "lw");
-  const cadenas = () => R(0, 30, 60, 50, 6) + L("M12 30V18q0-18 18-18t18 18v12M30 50v12");
-  const doc = (lignes) => { let g = L("M0 0h80l24 24v110H0z") + L("M80 0v24h24"); for (let i = 0; i < (lignes || 6); i++) g += L(`M14 ${40 + i * 14}h${i % 3 === 2 ? 46 : 76}`); return g; };
-  const calendrier = () => { let g = R(0, 0, 150, 130, 8) + L("M0 34h150M34 -10v20M116 -10v20"); for (let r = 0; r < 4; r++) for (let c = 0; c < 5; c++) g += R(10 + c * 27, 44 + r * 21, 20, 15, 2, (r === 1 && c === 3) ? "lc" : "ln"); return g; };
-  const pressePapier = () => R(0, 10, 110, 150, 8) + R(30, 0, 50, 22, 6) + L("M20 52l8 8 16-16M56 52h36M20 88l8 8 16-16M56 88h36M20 124h16M56 124h36", "ln");
-  const gicleur = () => L("M0 0v30") + L("M-16 30h32l-6 18h-20z") + L("M-24 52h48") + `<g class="jet">${L("M-10 58l-34 60M0 58v70M10 58l34 60M-18 56l-60 40M18 56l60 40", "lw spray")}</g>`;
-  const extincteur = () => `<path class="fr" d="M0 40q0-20 30-20t30 20v140q0 10-10 10H10q-10 0-10-10z"/>` + L("M0 40q0-20 30-20t30 20v140q0 10-10 10H10q-10 0-10-10z") + L("M20 20V0h20v20M40 6h30l14 22") + R(12, 70, 36, 50, 4);
-  const cloche = () => `<g class="sonne">${C(0, 0, 40)}${C(0, 0, 10)}${L("M-50 -50l-14-14M50 -50l14-14M-60 0h-18M60 0h18", "lc")}</g>`;
-  const sortie = () => `<rect class="fg" x="0" y="0" width="150" height="56" rx="6"/>` + R(0, 0, 150, 56, 6, "lgr") + TX(75, 38, "SORTIE", 26, "txg");
-  const flamme = () => `<path class="flam" d="M30 80q-34-20-18-56q4 18 16 22q-6-30 18-46q-2 24 16 40t-4 40z"/>`;
-  const drain = () => tuyau("M0 0H200L420 60H600V200", true) + tuyau("M200 0V-160", false) + L("M-30 -12h30M-30 12h30") + C(600, 230, 26);
-  const ptrap = () => tuyau("M0 0v50q0 34 34 34t34-34v-14h90", true);
-  /* ---- scènes (1600 × 900) ---- */
-  const S = {
-    sanitaire: () => T(70, 455, .82, lavabo()) + T(300, 440, .85, toilette()) + T(470, 488, .9, ptrap()) + T(615, 150, .9, chauffeEau()) + tuyau("M655 115V96H760", true) + T(700, 96, .8, vanne()),
-    evacuation: () => T(60, 430, 1, drain()) + T(610, 120, .8, L("M40 0v300") + L("M24 0h32") + TX(60, 160, "évent", 18)) + tuyau("M640 120V420H700", true),
-    securite: () => T(0, 878, 1, bandes(1600)) + T(70, 440, .9, cone()) + T(190, 470, .9, casque()) + T(330, 430, 1, danger()) + T(470, 455, .9, cone()) + T(620, 130, .9, danger()) + T(600, 260, .8, casque()),
-    chantier: () => T(40, 420, .75, immeuble(150, 200, 34)) + T(180, 405, .75, immeuble(120, 222, 34)) + T(300, 450, .75, immeuble(110, 160, 34)) + T(450, 440, .75, immeuble(170, 175, 34)) + T(650, 130, .6, grue()) + L("M20 572H740", "ln"),
-    communication: () => T(70, 410, 1, bulle(220, 80)) + T(330, 440, 1, bulle(160, 70, TX(80, 46, "Bonjour !", 24, "tx mid"))) + T(530, 410, 1, cellulaire()) + T(620, 150, 1, enveloppe()) + T(610, 260, .9, bulle(120, 60)),
-    atelier: () => T(40, 408, .75, etagere()) + T(270, 400, .9, cle()) + T(360, 400, .9, marteau()) + T(460, 410, .9, tournevis()) + T(560, 400, .9, diable()) + T(605, 130, 1, R(0, 0, 120, 230, 4) + `<rect class="ln pegs" x="10" y="10" width="100" height="210"/>` + T(20, 20, .6, cle()) + T(62, 80, .6, marteau()) + T(30, 160, .55, tournevis())),
-    menage: () => T(80, 440, 1, seau()) + T(230, 330, .9, vadrouille()) + T(320, 400, 1, pluie(10)) + T(640, 160, 1, etoile()) + T(700, 240, .8, etoile()) + T(560, 470, .7, etoile()) + T(612, 300, 1, pluie(4)),
-    informatique: () => T(60, 410, 1, ecran()) + T(300, 470, .9, clavier()) + T(190, 455, 1, curseur()) + T(600, 140, .9, nuage()) + T(615, 260, 1, wifi()) + T(640, 360, .9, cadenas()) + T(560, 420, .9, doc(4)),
-    administration: () => T(70, 410, .95, doc(6)) + T(100, 430, .95, doc(6)) + T(230, 420, 1, calendrier()) + T(420, 400, .95, pressePapier()) + T(560, 430, .7, immeuble(160, 190, 30)) + T(620, 140, .8, doc(5)),
-    incendie: () => tuyau("M20 412H520", false) + T(130, 420, .9, gicleur()) + T(360, 420, .9, gicleur()) + T(580, 410, .85, extincteur()) + T(670, 170, .8, cloche()) + T(590, 300, .9, sortie()) + T(232, 512, .7, flamme())
-  };
-  return S;
-})();
-const SCENES = { sanitaire:"Robinetterie et appareils sanitaires", evacuation:"Réseau d'évacuation", securite:"Santé et sécurité", chantier:"Chantier et métier", communication:"Communication", atelier:"Outils et entrepôt", menage:"Entretien ménager", informatique:"Informatique", administration:"Administration du bâtiment", incendie:"Protection incendie" };
-function svgScene(k){ return `<svg class="bgx" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">${SC[k] ? SC[k]() : ""}</svg>`; }
-
-function applyBg() {
-  cancelAnimationFrame(bgAnim); bgAnim = 0;
-  const host = $("bgfx"), kind = bgKind();
-  document.documentElement.dataset.bg = kind;
-  host.innerHTML = "";
-  if (kind === "tuyaux") host.innerHTML = svgTuyaux();
-  else if (kind === "plan") host.innerHTML = svgPlan();
-  else if (kind === "elec") host.innerHTML = svgElec();
-  else if (kind === "ventil") host.innerHTML = svgVentil();
-  else if (kind === "radiant") host.innerHTML = svgRadiant();
-  else if (SCENES[kind]) host.innerHTML = svgScene(kind);
-  else if (["beton", "bois", "soudure", "flammes", "gaz"].includes(kind)) {
-    const cv = document.createElement("canvas"); host.append(cv);
-    requestAnimationFrame(() => kind === "beton" ? drawBeton(cv) : kind === "bois" ? drawBois(cv) : kind === "soudure" ? runSoudure(cv) : runFlammes(cv, kind === "gaz"));
-  }
-}
+/* Anciens fonds d'écran animés (scènes SVG, canevas béton, bois, soudure, flammes) retirés le 8 nov. : ils étaient cachés depuis le 4 nov.
+   (style « Sobre ») mais tournaient encore en arrière-plan et ralentissaient le TNI. Historique git si besoin. */
+function applyBg() { cancelAnimationFrame(bgAnim); bgAnim = 0; document.documentElement.dataset.bg = bgKind(); $("bgfx").innerHTML = ""; }
 function closeCompPick() { $("comppick").hidden = true; $("b-comp").setAttribute("aria-expanded", "false"); }
 $("b-comp").onclick = e => { e.stopPropagation(); openPrep(); };
 document.addEventListener("click", e => { if (!$("comppick").hidden && !e.target.closest("#comppick, #b-comp")) closeCompPick(); });
-let bgTimer;
-addEventListener("resize", () => { clearTimeout(bgTimer); bgTimer = setTimeout(() => { if (["beton", "bois"].includes(bgKind())) applyBg(); else { const cv = document.querySelector("#bgfx canvas"); if (cv && cv._resize) cv._resize(); } }, 250); });
 
 // Carte tournante : ÉPI, mot technique et question, un à la fois
 let rotIdx = 0;
@@ -2394,10 +2141,14 @@ function semaine(){
   const box = $("f-semaine"); if (!box) return;
   const auj = isoJour(new Date()), esc = s => String(s).replace(/[&<>"]/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" }[c]));
   if (!SEM0){ const d = new Date((JOUR_PREP || auj) + "T12:00"); if (d.getDay() === 6) d.setDate(d.getDate() + 2); if (d.getDay() === 0) d.setDate(d.getDate() + 1); SEM0 = isoJour(lundiDe(d)); }
+  /* 8 nov. (Jeremy) : on prépare seulement la semaine actuelle et la suivante (fin de semaine : la semaine qui vient et la suivante) */
+  const b0 = new Date(); b0.setHours(12, 0, 0, 0); if (b0.getDay() === 6) b0.setDate(b0.getDate() + 2); if (b0.getDay() === 0) b0.setDate(b0.getDate() + 1);
+  const semMin = isoJour(lundiDe(b0)), semMax = (() => { const d = lundiDe(b0); d.setDate(d.getDate() + 7); return isoJour(d); })();
+  if (SEM0 < semMin) SEM0 = semMin; if (SEM0 > semMax) SEM0 = semMax;
   const l0 = new Date(SEM0 + "T12:00"), jours = [...Array(5)].map((_, i) => { const d = new Date(l0); d.setDate(d.getDate() + i); return isoJour(d); });
   const choisi = (JOUR_PREP || auj) + "|" + PER_PREP, actif = slotActif() || cfg.slot;
   const fin = new Date(l0); fin.setDate(fin.getDate() + 4);
-  let h = `<div class="sem-tete"><button type="button" class="sem-fl" data-sem="-7" aria-label="Semaine précédente"${SEM0 <= isoJour(lundiDe(new Date())) ? " disabled" : ""}>‹</button><b>Semaine du ${l0.toLocaleDateString("fr-CA", { day:"numeric", month:"long" })}</b><button type="button" class="sem-fl" data-sem="7" aria-label="Semaine suivante">›</button></div><div class="sem-grille"><span></span>`;
+  let h = `<div class="sem-tete"><button type="button" class="sem-fl" data-sem="-7" aria-label="Semaine précédente"${SEM0 <= semMin ? " disabled" : ""}>‹</button><b>${SEM0 === semMin ? "Cette semaine" : "Semaine prochaine"} <small class="sem-du">· du ${l0.toLocaleDateString("fr-CA", { day:"numeric", month:"long" })}</small></b><button type="button" class="sem-fl" data-sem="7" aria-label="Semaine suivante"${SEM0 >= semMax ? " disabled" : ""}>›</button></div><div class="sem-grille"><span></span>`;
   jours.forEach(j => { h += `<span class="sem-j${j === auj ? " auj" : ""}">${new Date(j + "T12:00").toLocaleDateString("fr-CA", { weekday:"short" }).replace(".", "")}<small>${+j.slice(8)}</small></span>`; });
   ["am", "pm"].forEach(per => { h += `<span class="sem-p">${per === "am" ? "Matin" : "Après-midi"}</span>`;
     jours.forEach(j => { const k = j + "|" + per, passe = j < auj || (j === auj && perPassee(per)), P = contenuDe(k), t = titreCours(P);
@@ -2427,32 +2178,6 @@ function glisserCours(e, src){
 function boutonsJours(){
   semaine();
   const d = +$("f-duree").value || SPAN, res = $("f-opts-res"); if (res) res.textContent = (d === SPAN ? "période complète" : (DUREES.find(x => x[0] === d) || [0, d + " min"])[1]) + ($("f-exam").checked ? " · examen" : "");
-  const plans = cfg.plans || {}, auj = isoJour(new Date()), pro = prochainJourClasse(), finiAuj = perPassee("am") && perPassee("pm");
-  const pret = j => Object.keys(plans).some(k => k.startsWith(j + "|"));
-  const jours = [...new Set([pro, ...Object.keys(plans).map(k => k.split("|")[0]).filter(j => j > auj)])].sort();
-  const box = $("f-jours"); box.innerHTML = "";
-  const btn = (jour, txt) => { const b = document.createElement("button"); b.type = "button"; b.className = JOUR_PREP === jour ? "on" : "";
-    if (!jour && finiAuj){ b.disabled = true; b.title = "Les cours d'aujourd'hui sont terminés"; }
-    b.innerHTML = (jour && pret(jour) ? '<span class="pret" title="Déjà préparé"></span>' : "") + "<span></span>"; b.lastChild.textContent = txt;
-    b.onclick = () => { let per = PER_PREP; if (!jour && perPassee(per)) per = "pm"; remplirPrep(jour, per); }; box.append(b); };
-  btn("", "Aujourd'hui");
-  jours.forEach(j => btn(j, nomJour(j, true)));
-  /* « Autre jour… » : le vrai champ de date couvre la pastille (invisible) : un toucher sur téléphone ouvre le calendrier du téléphone;
-     à l'ordinateur, showPicker() l'ouvre au clic (sinon il fallait viser la petite icône). */
-  const autre = document.createElement("label"); autre.className = "autre-jour"; autre.innerHTML = '<span>Autre jour…</span><input type="date" aria-label="Choisir un autre jour">'; const inp = autre.querySelector("input"); inp.min = auj;
-  if (JOUR_PREP && JOUR_PREP !== pro && !jours.includes(JOUR_PREP)) { inp.value = JOUR_PREP; autre.classList.add("on"); autre.firstChild.textContent = nomJour(JOUR_PREP, true); }
-  inp.addEventListener("click", () => { try { if (inp.showPicker) inp.showPicker(); } catch(_){} });
-  const choisir = () => { if (inp.value && inp.value > auj) remplirPrep(inp.value, PER_PREP); else if (inp.value === auj) remplirPrep("", PER_PREP); };
-  inp.addEventListener("change", choisir); inp.addEventListener("blur", () => { if (inp.value && inp.value !== JOUR_PREP && !(inp.value === auj && !JOUR_PREP)) choisir(); });
-  box.append(autre);
-  /* matin / après-midi */
-  const bp = $("f-pers"); bp.innerHTML = "";
-  [["am", "Matin", cfg.amStart], ["pm", "Après-midi", cfg.pmStart]].forEach(([per, nom, t]) => {
-    const b = document.createElement("button"); b.type = "button"; b.className = PER_PREP === per ? "on" : "";
-    const k = cleSlot(JOUR_PREP, per), passe = !JOUR_PREP && perPassee(per);
-    if (passe){ b.disabled = true; b.title = "Ce cours est terminé"; }
-    b.innerHTML = ((plans[k] && k !== cfg.slot) ? '<span class="pret" title="Déjà préparé"></span>' : "") + "<span></span>"; b.lastChild.textContent = nom + " · " + fmt(toMin(t || "08:30"));
-    b.onclick = () => remplirPrep(JOUR_PREP, per); bp.append(b); });
 }
 function appliquerPlans(){
   const plans = cfg.plans || {}, auj = isoJour(new Date()); let change = false;
@@ -2985,13 +2710,10 @@ html.anim-off #accAccueil .aa-dans i { animation: none; }
     for (let i = 0; i < bgfx.children.length; i++) bgfx.children[i].style.transform = "";
   }
   let figeT = 0;
-  function demarrer(){
+  function demarrer(){   /* 8 nov. : le fond animé (toiles #ambfx/#ambLum) est caché par le style Sobre : on ne le dessine plus, on suit seulement la période */
     cancelAnimationFrame(raf); clearInterval(figeT); actif = animPermise();
     html.classList.toggle("anim-off", !actif); reduceMotion = !actif;
-    lireCouleurs(); lumiere(); scene();
-    if (actif){ dernier = performance.now(); raf = requestAnimationFrame(image); }
-    else { suivrePeriode(); dessinerFige(); figeT = setInterval(() => { suivrePeriode(); lumiere(); }, 1000);
-      if (document.getAnimations) document.getAnimations().forEach(a => { const el = a.effect && a.effect.target; if (el && el.closest && el.closest("#bgfx")) { try { a.playbackRate = 1; } catch(e){} } }); }
+    suivrePeriode(); figeT = setInterval(suivrePeriode, 1000);
   }
   /* le fond est refait à chaque changement de compétence ou de réglage : on suit */
   const applyBg0 = applyBg;

@@ -250,6 +250,10 @@ html.sombre body:has(#role:not(.cache)) :is(.cq .tg i,#modes .btn2,#modes #mX){b
 html.sombre body:has(#role:not(.cache)) #role input{background:#111114;color:#F2EFEA;border-color:#3a3a40}
 html.sombre #role a[style*="--bleu"],html.sombre #rEcr{color:#7db6ff!important}
 #role>.mp-tete{--mp-haut:18px}#tele>.mp-tete{--mp-haut:14px}
+
+/* transitions douces entre les pages (8 nov.) */
+@view-transition{navigation:auto}
+::view-transition-old(root),::view-transition-new(root){animation-duration:.22s}
 </style>
 </head>
 <body>

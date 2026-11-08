@@ -275,6 +275,10 @@ html.sombre body.bord :is(.qe,.regD,#modes .regRap){background:#17171b}
 html.sombre body.bord :is(.ch4 button,.qe .k0,.qe .k1,.qe .k2,.qe .k3){border-color:#3a3a40}
 html.sombre body.bord .tbar a{color:#a99ff0}
 .wrap>.mp-tete{--mp-haut:14px}
+
+/* transitions douces entre les pages (8 nov.) */
+@view-transition{navigation:auto}
+::view-transition-old(root),::view-transition-new(root){animation-duration:.22s}
 </style>
 </head>
 <body>

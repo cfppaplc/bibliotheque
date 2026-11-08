@@ -79,6 +79,10 @@ svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.9;stroke
 .vide.sanscode ol{text-align:left;margin:14px auto 4px;padding-left:22px;max-width:320px;color:var(--txt);font-size:15px;line-height:1.5}
 .vide.sanscode li{margin:6px 0}
 .vide .retourB{display:inline-block;margin-top:14px;background:#EB6A22;color:#fff;text-decoration:none;font-weight:700;border-radius:12px;padding:12px 18px}
+
+/* transitions douces entre les pages (8 nov.) */
+@view-transition{navigation:auto}
+::view-transition-old(root),::view-transition-new(root){animation-duration:.22s}
 </style>
 </head>
 <body>
