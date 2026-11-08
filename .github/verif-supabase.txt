@@ -1,0 +1,8 @@
+1 lire (vide ou deja la) : []
+2 ecrire bon jeton : true
+3 lire : [{"env":"x","data":"essai","maj":"2026-11-08T05:20:06.388597+00:00"}]
+4 ecrire mauvais jeton (doit etre false) : false
+5 lecture directe de la table (doit etre refusee) : HTTP 401 {"code":"42501","details":null,"hint":"Grant the required privileges to the current role with: GRANT SELECT ON public.co
+6 stats_plus : HTTP 204
+7 stats_lire : [{"cle":"test:verification","mois":"2026-11","n":1}]
+8 nombre de rangees du coffre visibles par liste (doit etre refuse) : HTTP 401
