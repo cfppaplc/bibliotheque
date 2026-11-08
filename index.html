@@ -5,9 +5,9 @@
      À chaque changement : mettre à jour nouveautes.json (mini-formation + captures) et publier avec outils/publier.sh. -->
 <html lang="fr"><head>
 <!-- © 2026 Jérémy Raymond. Tous droits réservés. Copie, modification ou revente interdites sans autorisation écrite (voir LICENCE.md). --><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="icon" href="img/metier-plus-icone.svg" type="image/svg+xml"><link rel="icon" type="image/png" sizes="32x32" href="img/icone-32.png"><link rel="icon" type="image/png" sizes="192x192" href="img/icone-192.png"><link rel="apple-touch-icon" href="img/icone-180.png"><meta name="theme-color" content="#141414">
-<meta name="description" content="Livres interactifs, plans et schémas pour la classe et l'atelier — Pavillon de l'Avenir, centre de formation professionnelle.">
+<meta name="description" content="Métier+ : la plateforme des enseignants en formation professionnelle. Livres animés, plans, quiz et simulateurs pour la classe et l'atelier.">
 <meta property="og:type" content="website"><meta property="og:locale" content="fr_CA"><meta property="og:site_name" content="Métier+">
-<meta property="og:title" content="Bibliothèque — Tes livres de cours, prêts à projeter"><meta property="og:description" content="Livres interactifs, plans et schémas pour la classe et l'atelier. Conçu par Jeremy, enseignant au Pavillon de l'Avenir.">
+<meta property="og:title" content="Métier+ — La plateforme des enseignants en formation professionnelle"><meta property="og:description" content="Livres animés, plans, quiz et simulateurs pour la classe et l'atelier. Conçu par Jeremy, enseignant en formation professionnelle.">
 <meta property="og:url" content="https://cfppaplc.github.io/bibliotheque/"><meta property="og:image" content="https://cfppaplc.github.io/bibliotheque/img/apercu.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="Bibliothèque du Pavillon de l'Avenir : trois livres de cours en éventail"><meta name="twitter:card" content="summary_large_image"><title>Métier+ — Bibliothèque</title>
 <style>
@@ -1369,8 +1369,8 @@ function renderHero(){
   const h = $("#hero");
   h.style.cssText = "background:linear-gradient(120deg,#3a0b0b 0%,#141414 68%)";
   h.innerHTML = `<div class="hero-content">
-    <h1>${(window.titreAccueil && window.titreAccueil()) || "Tes livres de cours, prêts à projeter"}</h1>
-    <p>Livres interactifs, plans et schémas pour la classe et l'atelier. <span class="hero-tag">Réservé aux enseignants du Pavillon de l'Avenir</span></p>
+    <h1>${(window.titreAccueil && window.titreAccueil()) || "La plateforme des enseignants en formation professionnelle"}</h1>
+    <p>Livres animés, plans, quiz et simulateurs : tout pour enseigner un métier, en classe comme à l'atelier. <span class="hero-tag">Réservé aux enseignants du Pavillon de l'Avenir</span></p>
     <button class="hero-aide" id="heroAide" type="button">❔ Aide</button>
   </div>
   <div class="hero-stack">${vedettes().map(l => `<img src="${esc(couv(l))}" alt="">`).join("")}</div>`;
