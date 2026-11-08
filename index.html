@@ -104,7 +104,7 @@
   #hero.hp .hero-content{max-width:860px;width:100%}
   #hero.hp{min-height:0!important;padding-bottom:10px}
   @media (max-width:900px){#hero.hp .hero-content{max-width:none}}
-  @media (min-width:641px){body.connecte header nav #lienAide,body.connecte header nav #quoiNeuf{display:none}body.connecte #hdefil{max-width:min(760px,46vw)}}
+  @media (min-width:641px){body:is(.connecte,.pre-co) header nav #lienAide,body:is(.connecte,.pre-co) header nav #quoiNeuf{display:none}body:is(.connecte,.pre-co) #hdefil{max-width:min(760px,46vw)}}
   #accesMenu .qn-point{display:inline-block;vertical-align:middle;margin-left:6px}
   #hero.hp .hp-sous{font-size:1.15rem;color:var(--muted);margin:.35rem 0 0}
   .hp-tuiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:16px;max-width:860px}
@@ -292,6 +292,7 @@
   html:has(#planOv:not([hidden])) body,html:has(#actOv:not([hidden])) body,html:has(#accueilOv:not([hidden])) body{overflow:hidden}
   .pl-top #plClose,.act-top #actBack{order:99;margin-left:auto}
   /* transitions douces (8 nov., « la transition entre les pages n'est pas très smooth ») */
+  html.ouvre body{background:#0c0c0d}html.ouvre body>*:not(#planOv):not(#actOv):not(#accueilOv):not(#reader):not(.modal):not(#accesOv):not(.acces-ov){visibility:hidden}
   @view-transition{navigation:auto}
   ::view-transition-old(root),::view-transition-new(root){animation-duration:.22s}
   #planOv:not([hidden]),#actOv:not([hidden]),#accueilOv:not([hidden]){animation:ouvrirOv .22s ease-out}
@@ -313,11 +314,11 @@
   /* barre de navigation dans l'en-tête de l'accueil : enseignant connecté, écran large; remplace « Bibliothèque », « Accueil » et les boutons d'outils */
   .mp-nav-tete{display:none!important}
   @media (min-width:981px){
-    body.connecte:not(.eleve):not(.classe) .mp-nav-tete{display:flex!important;margin-left:0}
-    body.connecte:not(.eleve):not(.classe) header>nav,body.connecte:not(.eleve):not(.classe) #hdefil,body.connecte:not(.eleve):not(.classe) #hflG,body.connecte:not(.eleve):not(.classe) #hflD{display:none!important}
-    body.connecte:not(.eleve):not(.classe) header .search{margin-left:auto}
+    body:is(.connecte,.pre-co):not(.eleve):not(.classe) .mp-nav-tete{display:flex!important;margin-left:0}
+    body:is(.connecte,.pre-co):not(.eleve):not(.classe) header>nav,body:is(.connecte,.pre-co):not(.eleve):not(.classe) #hdefil,body:is(.connecte,.pre-co):not(.eleve):not(.classe) #hflG,body:is(.connecte,.pre-co):not(.eleve):not(.classe) #hflD{display:none!important}
+    body:is(.connecte,.pre-co):not(.eleve):not(.classe) header .search{margin-left:auto}
   }
-  @media (min-width:981px) and (max-width:1300px){body.connecte:not(.eleve):not(.classe) header .search input,body.connecte:not(.eleve):not(.classe) header .search input:focus{width:150px!important}body.connecte:not(.eleve):not(.classe) .mp-nav-tete a{padding:6px 7px!important;gap:4px}body.connecte:not(.eleve):not(.classe) header .search-kbd{display:none}}
+  @media (min-width:981px) and (max-width:1300px){body:is(.connecte,.pre-co):not(.eleve):not(.classe) header .search input,body:is(.connecte,.pre-co):not(.eleve):not(.classe) header .search input:focus{width:150px!important}body:is(.connecte,.pre-co):not(.eleve):not(.classe) .mp-nav-tete a{padding:6px 7px!important;gap:4px}body:is(.connecte,.pre-co):not(.eleve):not(.classe) header .search-kbd{display:none}}
 .mp-nav{display:flex;align-items:center;gap:4px;flex:none;margin-left:6px}
 .mp-nav a{display:inline-flex!important;align-items:center;gap:6px;min-height:36px!important;padding:6px 10px!important;border:0!important;border-radius:9px;font-size:13.5px!important;font-weight:600!important;color:inherit!important;opacity:.78;text-decoration:none;white-space:nowrap;background:transparent!important}
 .mp-nav a:hover{opacity:1;background:rgba(128,128,128,.14)!important}
@@ -990,8 +991,11 @@ html.leger{scroll-behavior:auto}
 </script>
 <script src="coffre.js"></script>
 </head><body>
+<script>/* 8 nov. : déjà connecté sur cet appareil → en-tête et accueil d'enseignant dès la 1re image (plus d'ancien en-tête une seconde) */try{if(localStorage.getItem("etaitConnecte"))document.body.classList.add("pre-co")}catch(e){}
+/* arrivée d'une autre page avec ?ouvrir=… : l'accueil reste caché (écran noir) jusqu'à ce que l'outil s'ouvre, au lieu de clignoter */
+if(/[?&]ouvrir=/.test(location.search)){document.documentElement.classList.add("ouvre");setTimeout(function(){document.documentElement.classList.remove("ouvre")},5000)}</script>
 <header id="topbar">
-  <div class="logo"><span class="logo-pav"><img class="lg-blc" src="img/metier-plus-blanc.svg" alt="Métier+"><img class="lg-clr" src="img/metier-plus.svg" alt=""></span><span class="logo-t">Bibliothèque</span></div>
+  <div class="logo"><span class="logo-pav"><img class="lg-blc" src="img/metier-plus-blanc.svg" alt="Métier+"><img class="lg-clr" src="img/metier-plus.svg" alt=""></span><span class="logo-t">Bibliothèque</span></div><nav class="mp-nav mp-nav-tete" aria-label="Outils"><a href="./" data-nav="biblio" class="ici" aria-current="page"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h12v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5"/></svg>Bibliothèque</a><a href="./?ouvrir=plans" data-nav="plans"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3z"/><path d="M9 3v15M15 6v15"/></svg>Plans</a><a href="./?ouvrir=activites" data-nav="activites"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4h6v3H9zM9 12h6M9 16h4"/></svg>Activités</a><a href="labo.html" data-nav="labo"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-9V3"/></svg>Labo</a><a href="./?ouvrir=accueil" data-nav="accueil"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Accueil de classe</a><a href="./?ouvrir=tableau" data-nav="tableau"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>Tableau blanc</a></nav>
   <nav>
     <a data-view="all" class="active">Accueil</a>
     <a data-view="fav">Ma liste</a>
@@ -1463,7 +1467,9 @@ function vedettes(){
 /* Accueil dynamique (8 nov., A + B + C choisis par Jeremy) : enseignant connecté = « Bonjour Prénom ! », carte du prochain cours préparé,
    et 4 tuiles qui suivent ses dernières actions (livre en cours, dernier quiz, tableau blanc, Labo, accueil de classe). Visiteur : texte de présentation. */
 function accueilPerso(){
-  const S = window.ACCES && ACCES.session; if (!S || S.eleve || !document.body.classList.contains("connecte")) return "";
+  let S = window.ACCES && ACCES.session; const pre = document.body.classList.contains("pre-co");
+  if (!S && pre){ let n = ""; try { n = localStorage.getItem("etaitConnecte") || ""; } catch(e){} S = { nom: n === "1" ? "" : n }; }
+  if (!S || S.eleve || !(document.body.classList.contains("connecte") || pre)) return "";
   const J = k => { try { return JSON.parse(localStorage.getItem(k) || "null"); } catch(e){ return null; } }, maintenant = Date.now(), H = new Date().getHours();
   const jour = d => d.toLocaleDateString("en-CA"), auj = jour(new Date()), dem = jour(new Date(maintenant + 864e5));
   /* prochain cours préparé (accueil de classe) */
@@ -1488,7 +1494,8 @@ function accueilPerso(){
   const tb = +(localStorage.getItem("dernierTableau") || 0);
   if (tb && maintenant - tb < 7 * 864e5) T.push(`<button class="hp-t" data-hp="tableau">${ic("b", '<rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/>')}<span>Continuer ton tableau<small>Tableau blanc</small></span></button>`);
   /* seulement ce qui est personnel (les outils fixes sont dans la barre du haut) */
-  return `<h1>${esc(window.titreAccueil && window.titreAccueil() || "Bonjour !")}</h1><p class="hp-sous">Que veux-tu enseigner aujourd'hui ?</p>${carte}${T.length ? `<div class="hp-tuiles">${T.slice(0, 4).join("")}</div>` : ""}`;
+  const prenom = (S.nom || "").split(/\s+/)[0];
+  return `<h1>${esc(window.titreAccueil && window.titreAccueil() || (prenom ? "Bonjour " + prenom + " !" : "Bonjour !"))}</h1><p class="hp-sous">Que veux-tu enseigner aujourd'hui ?</p>${carte}${T.length ? `<div class="hp-tuiles">${T.slice(0, 4).join("")}</div>` : ""}`;
 }
 function brancherAccueilPerso(h){
   const clic = id => { const b = document.getElementById(id); if (b) b.click(); };
@@ -9306,8 +9313,8 @@ window.addEventListener("online", () => { try { aviser("Internet est revenu."); 
   body.eleve #tbAnim,body.eleve #tbZo,body.eleve #tbZv,body.eleve #tbZi,body.eleve #tbDbl,body.eleve #tbFs,
   body.eleve #penFold,body.eleve #penSide,body.eleve #penE,body.eleve #penFs,body.eleve #penPlus{display:none!important}
   /* outils réservés aux profs connectés (demande de Jeremy, 29 oct.) */
-  body:not(.connecte) #planBtn,body:not(.connecte) #actBtn,body:not(.connecte) #simBtn,body:not(.connecte) #plusOv [data-plus="sim"],body:not(.connecte) #plusOv [data-plus="activites"],body:not(.connecte) #accueilBtn,body:not(.connecte) #wbBtn,
-  body:not(.connecte) #plusOv [data-plus="plans"],body:not(.connecte) #plusOv [data-plus="accueil"],body:not(.connecte) #plusOv [data-plus="wb"]{display:none!important}
+  body:not(.connecte):not(.pre-co) #planBtn,body:not(.connecte):not(.pre-co) #actBtn,body:not(.connecte):not(.pre-co) #simBtn,body:not(.connecte):not(.pre-co) #plusOv [data-plus="sim"],body:not(.connecte):not(.pre-co) #plusOv [data-plus="activites"],body:not(.connecte):not(.pre-co) #accueilBtn,body:not(.connecte):not(.pre-co) #wbBtn,
+  body:not(.connecte):not(.pre-co) #plusOv [data-plus="plans"],body:not(.connecte):not(.pre-co) #plusOv [data-plus="accueil"],body:not(.connecte):not(.pre-co) #plusOv [data-plus="wb"]{display:none!important}
   /* accueil 10 % plus petit sur ordinateur (demande de Jeremy, 29 oct.); livres, tableau blanc et cellulaire inchangés */
   @media (min-width:641px){header,#hero,#filtres,main#rows,footer{zoom:.9}}
   .prefs h3{margin:16px 0 6px;font-size:.78rem;color:#8c8c92;text-transform:uppercase;letter-spacing:.05em}
@@ -9576,6 +9583,8 @@ window.ACCES = (function(){
     b.setAttribute("aria-label", b.title);
     const t = document.getElementById("plusCompte"); if (t) t.textContent = SESSION ? "Mon compte (" + SESSION.nom + ")" : "Se connecter";
     document.body.classList.toggle("connecte", !!SESSION);
+    try { if (SESSION && !SESSION.eleve) localStorage.setItem("etaitConnecte", SESSION.nom || "1"); else if (estPret) localStorage.removeItem("etaitConnecte"); } catch(e){}
+    if (SESSION || estPret) document.body.classList.remove("pre-co");
     document.body.classList.toggle("eleve", !!(SESSION && SESSION.eleve));   /* compte de groupe d'élèves : lecture, crayon et texte seulement */   /* Plans, Accueil de classe, Tableau blanc : seulement une fois connecté */
     try { window.appliquerPrefs && window.appliquerPrefs(); } catch(e){}
   }
@@ -10167,10 +10176,10 @@ document.addEventListener("click", e => { const b = e.target.closest && e.target
   /* même barre sur l'accueil (8 nov., « c'est la meilleure barre du site, elle devrait être partout ») */
   window.mpAller = aller;
   const tete = document.getElementById("topbar"), logo = tete && tete.querySelector(".logo");
-  if (logo && !tete.querySelector(".mp-nav")){ logo.insertAdjacentHTML("afterend", mpNavHTML("biblio").replace('class="mp-nav"', 'class="mp-nav mp-nav-tete"'));
+  if (logo){ if (!tete.querySelector(".mp-nav")) logo.insertAdjacentHTML("afterend", mpNavHTML("biblio").replace('class="mp-nav"', 'class="mp-nav mp-nav-tete"'));
     tete.querySelectorAll(".mp-nav a").forEach(a => a.onclick = e => { e.preventDefault(); if (a.dataset.nav === "biblio"){ const b = document.querySelector('header nav a[data-view="all"]'); if (b) b.click(); scrollTo({ top: 0, behavior: "smooth" }); return; } aller(a.dataset.nav); }); }
   const q = new URLSearchParams(location.search).get("ouvrir");
-  if (q && BTN[q]){ history.replaceState(null, "", location.pathname); const go = () => setTimeout(() => aller(q), 300);
+  if (q && BTN[q]){ history.replaceState(null, "", location.pathname); const go = () => { aller(q); setTimeout(() => document.documentElement.classList.remove("ouvre"), 350); };
     if (window.ACCES && ACCES.pret) ACCES.pret.then(go); else window.addEventListener("load", go); }
 })();
 </script>
