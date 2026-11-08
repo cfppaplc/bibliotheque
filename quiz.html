@@ -178,7 +178,8 @@ body.bord .grid{grid-template-columns:1fr}body.bord .grid>div:first-child{displa
 #modes .duo small{display:block;font-weight:500;font-size:13px;opacity:.85;margin-top:4px}
 @media (max-width:640px){#modes .duo{grid-template-columns:1fr}}
 .ech div.bon{background:#1F7A4D!important}
-.kick{border:1px solid rgba(127,127,127,.35);background:transparent;color:inherit;border-radius:8px;width:30px;height:30px;margin-left:8px;cursor:pointer;font-size:14px;opacity:.6;vertical-align:middle}.kick:hover{opacity:1;border-color:#C62828;color:#C62828}
+.pj{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:4px 0;border-bottom:1px solid var(--ligne)}.pj span{display:flex;align-items:center;min-width:0}
+.kick{flex:none;border:1px solid rgba(127,127,127,.35);background:transparent;color:inherit;border-radius:8px;width:30px;height:30px;padding:0;cursor:pointer;font-size:14px;opacity:.6;vertical-align:middle}.kick:hover{opacity:1;border-color:#C62828;color:#C62828}
 .ch4 button{font-size:20px}
 .flamme{width:1em;height:1em;vertical-align:-.12em;color:#E8873A;transform-origin:50% 90%;animation:flamme 1.4s ease-in-out infinite}
 @keyframes flamme{50%{transform:scale(1.08,.94) rotate(-3deg)}}
@@ -273,7 +274,7 @@ Le propane s'accumule…
 <div class="carte"><h2 id="jTitre"></h2><div id="qCour">En attente des participants…</div><div class="sous" id="qInfo"></div>
 <div class="ctl" style="margin-top:12px"><button id="bGo">Commencer</button><button id="bSuite" class="btn2" disabled>Question suivante</button><button id="bFin" class="btn2">Quitter la partie</button></div></div>
 <div class="carte"><h2>Qui a répondu</h2>
-<table><thead><tr><th>Participant</th><th style="width:34%">Cette question</th><th style="width:12%">Points</th><th style="width:10%">Rang</th></tr></thead><tbody id="tRep"></tbody></table></div>
+<table><thead><tr><th>Participant</th><th style="width:34%">Cette question</th><th style="width:12%">Points</th><th style="width:10%">Rang</th><th style="width:44px"></th></tr></thead><tbody id="tRep"></tbody></table></div>
 </div>
 </div></div>
 </div></div>
@@ -401,7 +402,7 @@ function telecommande(bord){
   function listeLob(){
     const L = ids();
     $("nbP").textContent = L.length ? "(" + L.length + ")" : "";
-    $("listeLob").innerHTML = L.length ? L.map(id => visage(P[id].av, "v-s") + esc(P[id].nom) + (P[id].prenom ? " (" + esc(P[id].prenom) + ")" : "") + `<button class="kick" data-kick="${id}" title="Retirer de la partie (il pourra revenir)">✕</button>`).join("<br>") : "Personne pour l'instant.";
+    $("listeLob").innerHTML = L.length ? L.map(id => `<div class="pj"><span>${visage(P[id].av, "v-s")}${esc(P[id].nom)}${P[id].prenom ? ` <small class="sous">(${esc(P[id].prenom)})</small>` : ""}</span><button class="kick" data-kick="${id}" title="Retirer de la partie (il pourra revenir)">✕</button></div>`).join("") : "Personne pour l'instant.";
   }
   function table(){
     const r = rangs(), Q = G.jeu[G.i];
@@ -409,8 +410,8 @@ function telecommande(bord){
       const x = G.reps[id]; let c = '<span class="att">—</span>';
       if (G.etat === "question") c = x ? '<span class="ok">✓ a répondu</span>' : '<span class="att">en attente…</span>';
       else if (G.etat === "rev" && Q) c = x ? `<b>${SYMB[x.c]}.</b> ${esc(Q.ch[x.c])} · <span class="${x.c === Q.bon ? "ok" : "ko"}">${x.c === Q.bon ? (x.g ? "+" + x.g : "bonne") : "mauvaise"}</span>` : '<span class="ko">Pas répondu</span>';
-      return `<tr><td><b>${visage(P[id].av, "v-s")}${esc(P[id].nom)}</b>${P[id].prenom ? ` <span class="sous">(${esc(P[id].prenom)})</span>` : ""}<button class="kick" data-kick="${id}" title="Retirer de la partie (il pourra revenir)">✕</button></td><td>${c}</td><td>${P[id].pts}</td><td>${G.etat === "lobby" ? "—" : r[id]}</td></tr>`;
-    }).join("") || '<tr><td colspan="4" class="sous">Personne pour l\'instant.</td></tr>';
+      return `<tr><td><b>${visage(P[id].av, "v-s")}${esc(P[id].nom)}</b>${P[id].prenom ? ` <span class="sous">(${esc(P[id].prenom)})</span>` : ""}</td><td>${c}</td><td>${P[id].pts}</td><td>${G.etat === "lobby" ? "—" : r[id]}</td><td style="text-align:right"><button class="kick" data-kick="${id}" title="Retirer de la partie (il pourra revenir)">✕</button></td></tr>`;
+    }).join("") || '<tr><td colspan="5" class="sous">Personne pour l\'instant.</td></tr>';
   }
   let vT = 0, vD = null;
   function vue(){ if (vD) return; vD = setTimeout(() => { vD = null; vT = Date.now(); envoyer(topic, vueObj()); }, Math.max(0, 450 - (Date.now() - vT))); }
