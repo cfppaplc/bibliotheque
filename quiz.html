@@ -218,6 +218,8 @@ body.bord .grid{grid-template-columns:1fr}body.bord .grid>div:first-child{displa
 .medaille{position:absolute;right:-26px;bottom:-14px;width:54px;filter:drop-shadow(0 4px 8px rgba(0,0,0,.35))}
 .medaille.m1{--mc:#C99A1E}.medaille.m2{--mc:#8E959F}.medaille.m3{--mc:#A0663A}.serieJ.fort{color:#FFB15C;box-shadow:0 0 18px rgba(255,120,30,.35)}
 @media (prefers-reduced-motion:reduce){.flamme{animation:none}}
+.reprendreP{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:0 0 16px;padding:14px 18px;border-radius:14px;background:#1F3A2A;color:#CFF5DD;border:1px solid #2E9E5B}.reprendreP div{flex:1;min-width:220px;display:flex;flex-direction:column;gap:2px}.reprendreP span{opacity:.85;font-size:.92em}.reprendreP button{min-height:44px;border-radius:10px;padding:0 16px;font:inherit;font-weight:700;cursor:pointer;border:0}#bReprendre{background:#2E9E5B;color:#fff}
+.repris{position:fixed;left:50%;top:18px;transform:translateX(-50%);z-index:60;background:#1F3A2A;color:#CFF5DD;border:1px solid #2E9E5B;border-radius:10px;padding:10px 16px;font:600 15px/1.3 system-ui,sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.35)}
 /* 8 nov. : classement plus vivant (paliers de série, plus rapide, couronne, nouveau premier, petites remontées) */
 .feu.tiede{color:#F3C98B;background:rgba(240,190,120,.1)}
 .feu:not(.tiede) .flamme{animation:vacille .5s ease-in-out infinite alternate}
@@ -603,7 +605,7 @@ function telecommande(bord){
     $("bGo").disabled = G.etat !== "lobby";
     $("bSuite").disabled = !["question", "rev", "mise"].includes(G.etat);
     $("bSuite").textContent = G.etat === "question" ? "Montrer la réponse" : G.etat === "mise" ? "Lancer la dernière question" : G.i + 1 >= G.jeu.length ? "Voir le podium" : "Question suivante";
-    table(); listeLob(); vue();
+    table(); listeLob(); vue(); sauverPartie();
   }
   function envoyerCouv(){ if (G.quiz && G.quiz.couv && /^data:/.test(G.quiz.couv)) envoyer(topic, {m: "img", i: -1, data: G.quiz.couv}); }
   // un élève qui ne donne plus signe de vie depuis 40 s est retiré (son personnage redevient libre)
@@ -657,7 +659,7 @@ function telecommande(bord){
   }
   $("bGo").onclick = () => { if (!G.quiz) return; try { localStorage.setItem("dernierQuiz", JSON.stringify({ id: G.quiz.id, titre: G.quiz.titre || "Quiz", t: Date.now() })); } catch(e){} try { window.COFFRE && COFFRE.stat("quiz:" + (G.quiz.exemple ? G.quiz.id : "perso")); } catch(e){} Object.values(P).forEach(p => { p.pts = 0; p.bons = 0; p.serie = 0; p.max = 0; p.mise = false; }); G.dbl = false; preparer(); G.i = 0; suivante(); };
   $("bSuite").onclick = () => { if (G.etat === "question") { reveler(); return; } if (G.etat === "mise") { question(); return; } if (G.i + 1 >= G.jeu.length) { finir(); return; } G.i++; suivante(); };
-  $("bFin").onclick = () => { clearTimeout(minut); envoyer(topic, {m: "attente"}); G.quiz = null; G.etat = "choix"; G.i = -1; G.jeu = []; document.documentElement.style.removeProperty("--acc"); montrer("vChoix"); listeQuiz(); vue(); };
+  $("bFin").onclick = () => { oublierPartie(); clearTimeout(minut); envoyer(topic, {m: "attente"}); G.quiz = null; G.etat = "choix"; G.i = -1; G.jeu = []; document.documentElement.style.removeProperty("--acc"); montrer("vChoix"); listeQuiz(); vue(); };
 
   if (!bord) ecouter(topic, m => {
     if (m.m === "ecran?") { envoyer(topic, vueObj()); envoyerCouv(); const Q = G.jeu[G.i]; if (G.etat === "question" && Q && Q.img) envoyer(topic, {m: "img", i: G.i, data: Q.img}); return; }
@@ -921,10 +923,45 @@ function telecommande(bord){
     $("mX").onclick = () => $("modes").remove();
     $("modes").onclick = e => { if (e.target.id === "modes") $("modes").remove(); };
   }
+  /* 8 nov. (« quand l'enseignant change de page par erreur pendant un quiz, pas moyen de reconnecter ») :
+     la partie en cours est gardée sur l'appareil (même code, mêmes joueurs, mêmes points) et reprend au retour, 3 h au plus.
+     Les images des questions ne sont pas gardées (trop lourdes) : elles sont reprises du quiz d'origine. */
+  function sauverPartie(){
+    if (bord || !G.quiz || G.etat === "choix") return;
+    try { localStorage.setItem("quizPartie", JSON.stringify({code, t: Date.now(), quiz: G.quiz.id, i: G.i, etat: G.etat, t0: G.t0, reps: G.reps, dbl: !!G.dbl,
+      jeu: G.jeu.map(Q => Object.assign({}, Q, {img: Q.img ? 1 : 0})), P})); } catch(e) {}
+  }
+  function oublierPartie(){ try { localStorage.removeItem("quizPartie"); } catch(e) {} }
+  function reprendre(){
+    let S = null; try { S = JSON.parse(localStorage.getItem("quizPartie") || "null"); } catch(e) {}
+    if (!S || S.code !== code || Date.now() - S.t > 3 * 3600e3) return false;
+    const q = tousQuiz().find(x => x.id === S.quiz); if (!q) return false;
+    G.quiz = JSON.parse(JSON.stringify(q)); G.i = S.i; G.etat = S.etat; G.t0 = S.t0; G.reps = S.reps || {}; G.dbl = S.dbl;
+    G.jeu = (S.jeu || []).map(Q => { if (Q.img) { const o = G.quiz.qs.find(x => x.q === Q.q); Q.img = o && o.img || ""; } return Q; });
+    Object.keys(S.P || {}).forEach(id => { P[id] = S.P[id]; P[id].vu = Date.now(); });   /* 40 s pour donner signe de vie */
+    appliquerCouleur(); montrer("vJeu");
+    envoyer(topic, {m: "bienvenue", titre: G.quiz.titre, coul: R().coul, mode: R().mode}); envoyerCouv(); envoyerPersos();
+    const Q = G.jeu[G.i];
+    if (G.etat === "question" && Q) {
+      const reste = G.t0 + Q.s * 1000 + 1000 - Date.now();
+      if (reste <= 0) reveler(); else { if (Q.img) envoyer(topic, {m: "img", i: G.i, data: Q.img}); ids().filter(id => !G.reps[id]).forEach(id => envoyer(topic, qMsg(id))); minut = setTimeout(reveler, reste); }
+    } else if (G.etat === "mise") minut = setTimeout(question, 15000);
+    maj(); envoyer(topic, vueObj());
+    const t = document.createElement("div"); t.className = "repris"; t.textContent = "Partie reprise : les joueurs et les points sont conservés.";
+    document.body.appendChild(t); setTimeout(() => t.remove(), 4500);
+    return true;
+  }
   listeQuiz(); maj();
+  const repris = !bord && reprendre();
+  /* tableau de bord : une partie interrompue depuis moins de 3 h → bouton pour la reprendre */
+  if (bord) { let S = null; try { S = JSON.parse(localStorage.getItem("quizPartie") || "null"); } catch(e) {}
+    const q = S && Date.now() - S.t < 3 * 3600e3 && tousQuiz().find(x => x.id === S.quiz);
+    if (q) { const hd = $("tele").querySelector(".mp-tete"); (hd || $("tele")).insertAdjacentHTML(hd ? "afterend" : "afterbegin", `<div class="reprendreP"><div><b>Une partie est en cours</b><span>${esc(q.titre)} · ${Object.keys(S.P || {}).length} joueur(s) · question ${Math.max(1, S.i + 1)} sur ${(S.jeu || []).length || q.qs.length}</span></div><button id="bReprendre">Reprendre la partie</button><button class="btn2" id="bOublier">Terminer</button></div>`);
+      $("bReprendre").onclick = () => { location.href = "?animer=1"; };
+      $("bOublier").onclick = () => { oublierPartie(); document.querySelector(".reprendreP").remove(); }; } }
   // ouvert depuis le tableau de bord : le quiz choisi est prêt à jouer
   const qp = params.get("quiz");
-  if (!bord && qp) { const b = document.querySelector(`[data-jouer="${CSS.escape(qp)}"]`); if (b) b.click(); }
+  if (!bord && qp && !repris) { const b = document.querySelector(`[data-jouer="${CSS.escape(qp)}"]`); if (b) b.click(); }
 }
 
 /* ================================ JOUEUR (iPad de l'élève) ================================ */
