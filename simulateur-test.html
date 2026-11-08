@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Test du simulateur de panneau</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+:root{--fond:#EFECE6;--carte:#fff;--txt:#24211E;--gris:#6B665E;--bleu:#185FA5;--rouge:#D93025;--ambre:#E8A317;--vert:#2E8B57;--ligne:#E2DDD3}
+@media (prefers-color-scheme:dark){:root{--fond:#1b1a18;--carte:#2a2825;--txt:#F2EFEA;--gris:#B5AFA6;--ligne:#3a3733}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--fond);color:var(--txt);font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:820px;margin:0 auto;padding:18px 16px 40px}
+h1{font-size:22px;margin:4px 0}
+.carte{background:var(--carte);border-radius:16px;padding:18px;margin:14px 0}
+button{font:inherit;font-weight:700;border:0;border-radius:12px;padding:16px 18px;cursor:pointer;color:#fff;background:var(--bleu);touch-action:manipulation}
+.sous{color:var(--gris);font-size:14px}
+.qr{display:flex;gap:20px;align-items:center;flex-wrap:wrap}
+#qr{background:#fff;padding:10px;border-radius:12px;width:200px;height:200px}
+.code{font-size:44px;font-weight:900;letter-spacing:.12em;font-family:ui-monospace,monospace;color:var(--bleu)}
+.envoi{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.envoi button{padding:22px 6px;font-size:17px}
+table{width:100%;border-collapse:collapse;font-size:15px}
+td,th{padding:8px 6px;border-top:1px solid var(--ligne);text-align:left}
+.pt{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--vert);margin-right:6px}
+.ecran{background:#20303F;color:#9FE3A8;font-family:ui-monospace,monospace;border-radius:14px;padding:26px 16px;font-size:24px;text-align:center;min-height:120px;display:flex;align-items:center;justify-content:center}
+.ecran.A{background:var(--rouge);color:#fff;animation:clig 1s steps(2) infinite}.ecran.S,.ecran.T{background:var(--ambre);color:#24211E}
+@keyframes clig{50%{filter:brightness(1.35)}}
+.voyants{display:flex;gap:18px;justify-content:center;margin-top:14px;font-weight:700;font-size:14px}
+.voyants span::before{content:"";display:inline-block;width:14px;height:14px;border-radius:50%;background:#bbb;margin-right:6px;vertical-align:-2px}
+.voyants .on.A::before{background:var(--rouge)}.voyants .on.S::before,.voyants .on.T::before{background:var(--ambre)}.voyants .on.N::before{background:var(--vert)}
+input{font:inherit;font-size:22px;width:100%;padding:12px;border-radius:12px;border:2px solid #C9C3B8;margin:8px 0 12px}
+.journal{font-family:ui-monospace,monospace;font-size:13px;color:var(--gris);margin-top:12px;max-height:200px;overflow:auto}
+.cache{display:none}
+.etat{font-size:14px;margin-top:8px}
+@media (max-width:560px){.envoi{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- TÉLÉCOMMANDE (enseignant) -->
+<div id="tele" class="cache">
+<h1>Télécommande (enseignant)</h1>
+<div class="sous">Page de test : vérifie que les alarmes passent de cet appareil aux panneaux des élèves.</div>
+<div class="carte qr"><div id="qr"></div>
+<div><div class="sous">Les élèves scannent ce code avec leur iPad</div><div class="code" id="code"></div>
+<div class="sous" id="lien" style="word-break:break-all;max-width:420px"></div>
+<div class="etat" id="etatT">Connexion…</div></div></div>
+<div class="carte"><div class="envoi">
+<button data-t="A" style="background:var(--rouge)">ALARME</button>
+<button data-t="S" style="background:var(--ambre);color:#24211E">SUPERVISION</button>
+<button data-t="T" style="background:#5F5E5A">TROUBLE</button></div>
+<div style="margin-top:10px"><button id="raz" style="background:var(--vert);width:100%">Retour à la normale</button></div></div>
+<div class="carte"><b>Panneaux connectés</b> <span class="sous" id="nb">(aucun)</span>
+<table id="liste"><tr><th>Équipe</th><th>Dernier signal reçu</th><th>Délai</th></tr></table></div>
+</div>
+
+<!-- PANNEAU (élève) -->
+<div id="pann" class="cache">
+<div id="nom" class="carte"><h1>Panneau d'alarme</h1>
+<div class="sous">Écris le nom de ton équipe, puis touche Commencer.</div>
+<input id="equipe" placeholder="Équipe 1" maxlength="20">
+<button id="go" style="width:100%">Commencer</button></div>
+<div id="panneau" class="cache">
+<div class="carte"><div class="sous" id="titreP" style="margin-bottom:10px"></div>
+<div class="ecran" id="ecran">SYSTEM NORMAL</div>
+<div class="voyants"><span id="vN" class="on N">CA</span><span id="vA" class="A">ALARME</span><span id="vS" class="S">SUPERV.</span><span id="vT" class="T">TROUBLE</span></div>
+<div class="etat" id="etatP">Connexion…</div>
+<div class="journal" id="journal"></div></div></div>
+</div>
+
+</div>
+<script>
+// Relais : ntfy.sh (déjà utilisé par la bibliothèque pour les demandes d'accès), port 443, sans compte.
+const RELAIS = "https://ntfy.sh/";
+const PREFIXE = "pda-simu-test-";
+const MSG = {A: "ALARM  SMOKE L1D037", S: "SUPV  VALVE TAMPER", T: "TROUBLE  AC POWER FAIL", N: "SYSTEM NORMAL"};
+const $ = id => document.getElementById(id);
+const params = new URLSearchParams(location.search);
+
+function envoyer(topic, obj){
+  return fetch(RELAIS + topic, {method: "POST", body: JSON.stringify(obj)}).catch(() => {});
+}
+function ecouter(topic, quand, etat){
+  const es = new EventSource(RELAIS + topic + "/sse");
+  es.onopen = () => etat(true);
+  es.onerror = () => etat(false);
+  es.onmessage = e => { try { const d = JSON.parse(e.data); if (d.event === "message") quand(JSON.parse(d.message)); } catch(x) {} };
+  return es;
+}
+
+let audio = null;
+function bip(t){
+  try {
+    audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+    if (audio.state === "suspended") audio.resume();
+    const o = audio.createOscillator(), g = audio.createGain();
+    o.frequency.value = t === "A" ? 880 : 520; o.connect(g); g.connect(audio.destination);
+    g.gain.value = t === "x" ? 0.001 : .15; o.start(); o.stop(audio.currentTime + (t === "A" ? .9 : .3));
+  } catch(e) {}
+}
+
+if (params.get("panneau")) {
+  // ---------- Panneau
+  const code = params.get("panneau").replace(/\D/g, "").slice(0, 6);
+  $("pann").classList.remove("cache");
+  $("go").onclick = () => {
+    bip("x");
+    const equipe = ($("equipe").value.trim() || "Équipe") .slice(0, 20);
+    const moi = Math.random().toString(36).slice(2, 8);
+    $("nom").classList.add("cache"); $("panneau").classList.remove("cache");
+    $("titreP").textContent = equipe + " · session " + code;
+    ecouter(PREFIXE + code, m => {
+      if (m.k === "sig") {
+        const t = m.type;
+        $("ecran").className = "ecran " + (t === "N" ? "" : t); $("ecran").textContent = MSG[t];
+        ["A", "S", "T"].forEach(x => $("v" + x).classList.toggle("on", x === t));
+        if (t !== "N") bip(t);
+        $("journal").insertAdjacentHTML("afterbegin", `<div>${new Date().toLocaleTimeString("fr-CA")}  ${MSG[t]}</div>`);
+        envoyer(PREFIXE + code, {k: "recu", id: m.id, moi, equipe, type: t});
+      } else if (m.k === "qui") {
+        envoyer(PREFIXE + code, {k: "ici", moi, equipe});
+      }
+    }, ok => {
+      $("etatP").textContent = ok ? "● Relié à la télécommande" : "○ Connexion perdue, nouvel essai…";
+      $("etatP").style.color = ok ? "var(--vert)" : "var(--rouge)";
+      if (ok) envoyer(PREFIXE + code, {k: "ici", moi, equipe});
+    });
+  };
+} else {
+  // ---------- Télécommande
+  $("tele").classList.remove("cache");
+  const code = String(Math.floor(100000 + Math.random() * 900000));
+  const url = location.href.split(/[?#]/)[0] + "?panneau=" + code;
+  $("code").textContent = code.slice(0, 3) + " " + code.slice(3);
+  $("lien").textContent = url;
+  try { new QRCode($("qr"), {text: url, width: 180, height: 180, correctLevel: QRCode.CorrectLevel.M}); }
+  catch(e) { $("qr").textContent = "QR indisponible : ouvre le lien"; }
+  const panneaux = {}, envois = {};
+  function dessiner(){
+    const ids = Object.keys(panneaux);
+    $("nb").textContent = ids.length ? "(" + ids.length + ")" : "(aucun)";
+    $("liste").innerHTML = "<tr><th>Équipe</th><th>Dernier signal reçu</th><th>Délai</th></tr>" +
+      ids.map(i => { const p = panneaux[i]; return `<tr><td><span class="pt"></span>${p.equipe.replace(/</g, "&lt;")}</td><td>${p.dernier || "—"}</td><td>${p.ms != null ? p.ms + " ms" : "—"}</td></tr>`; }).join("");
+  }
+  ecouter(PREFIXE + code, m => {
+    if (m.k === "ici") { panneaux[m.moi] = panneaux[m.moi] || {equipe: m.equipe}; panneaux[m.moi].equipe = m.equipe; dessiner(); }
+    if (m.k === "recu" && envois[m.id]) {
+      panneaux[m.moi] = panneaux[m.moi] || {equipe: m.equipe};
+      panneaux[m.moi].dernier = MSG[m.type]; panneaux[m.moi].ms = Date.now() - envois[m.id];
+      dessiner();
+    }
+  }, ok => {
+    $("etatT").textContent = ok ? "● Relais connecté" : "○ Relais injoignable, nouvel essai…";
+    $("etatT").style.color = ok ? "var(--vert)" : "var(--rouge)";
+    if (ok) envoyer(PREFIXE + code, {k: "qui"});
+  });
+  function signal(t){
+    const id = Math.random().toString(36).slice(2);
+    envois[id] = Date.now();
+    envoyer(PREFIXE + code, {k: "sig", id, type: t});
+  }
+  document.querySelectorAll(".envoi button").forEach(b => b.onclick = () => signal(b.dataset.t));
+  $("raz").onclick = () => signal("N");
+}
+</script>
+</body>
+</html>
