@@ -619,7 +619,7 @@ function telecommande(bord){
     ids().forEach(id => res[id] = {pts: P[id].pts, rang: r[id], bons: P[id].bons || 0, max: P[id].max || 0});
     envoyer(topic, {m: "fin", res, n, total: G.jeu.length, points: R().points}); maj(); envoyer(topic, vueObj());
   }
-  $("bGo").onclick = () => { if (!G.quiz) return; try { window.COFFRE && COFFRE.stat("quiz:" + (G.quiz.exemple ? G.quiz.id : "perso")); } catch(e){} Object.values(P).forEach(p => { p.pts = 0; p.bons = 0; p.serie = 0; p.max = 0; p.mise = false; }); G.dbl = false; preparer(); G.i = 0; suivante(); };
+  $("bGo").onclick = () => { if (!G.quiz) return; try { localStorage.setItem("dernierQuiz", JSON.stringify({ id: G.quiz.id, titre: G.quiz.titre || "Quiz", t: Date.now() })); } catch(e){} try { window.COFFRE && COFFRE.stat("quiz:" + (G.quiz.exemple ? G.quiz.id : "perso")); } catch(e){} Object.values(P).forEach(p => { p.pts = 0; p.bons = 0; p.serie = 0; p.max = 0; p.mise = false; }); G.dbl = false; preparer(); G.i = 0; suivante(); };
   $("bSuite").onclick = () => { if (G.etat === "question") { reveler(); return; } if (G.etat === "mise") { question(); return; } if (G.i + 1 >= G.jeu.length) { finir(); return; } G.i++; suivante(); };
   $("bFin").onclick = () => { clearTimeout(minut); envoyer(topic, {m: "attente"}); G.quiz = null; G.etat = "choix"; G.i = -1; G.jeu = []; document.documentElement.style.removeProperty("--acc"); montrer("vChoix"); listeQuiz(); vue(); };
 
@@ -1185,7 +1185,7 @@ function ecran(code){
 <script>
 /* Coffre : mes quiz et leurs réglages suivent mon compte (coffre.js). Pendant une partie (écran, télécommande, joueur) : pas de rechargement */
 if (window.COFFRE && !/[?&](j|ecran|panneau)=/.test(location.search))
-  COFFRE.demarrer("quiz", { cles:["quizMaison", "quizReglages", "quizSupprimes"],
+  COFFRE.demarrer("quiz", { cles:["quizMaison", "quizReglages", "quizSupprimes", "dernierQuiz"],
     /* fusion quiz par quiz : un quiz modifié sur un appareil et un autre ailleurs, les deux restent (le plus récent gagne pour un même quiz) */
     fusion: {
       quizSupprimes: (a, b) => { const x = JSON.parse(a || "{}"), y = JSON.parse(b || "{}"); for (const k in y) x[k] = Math.max(x[k] || 0, y[k]); return JSON.stringify(x); },

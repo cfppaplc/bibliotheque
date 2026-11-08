@@ -100,6 +100,27 @@
     linear-gradient(to top,var(--bg) 0%,rgba(20,20,20,0) 45%),
     linear-gradient(to right,rgba(0,0,0,.8) 0%,rgba(0,0,0,0) 65%)}
   .hero-content{position:relative;max-width:900px}
+  /* Accueil dynamique (8 nov.) */
+  #hero.hp .hero-content{max-width:min(860px,54vw);width:100%}
+  @media (max-width:900px){#hero.hp .hero-content{max-width:none}}
+  #hero.hp .hp-sous{font-size:1.15rem;color:var(--muted);margin:.35rem 0 0}
+  .hp-tuiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:16px;max-width:860px}
+  .hp-t{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:#fff;font:inherit;font-weight:600;font-size:15px;min-height:66px;text-align:left;cursor:pointer;transition:background .15s,border-color .15s,transform .15s;min-width:0}
+  .hp-t:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.22)}.hp-t:active{transform:scale(.98)}
+  .hp-t>span:last-child{min-width:0}
+  .hp-t small{display:block;font-weight:500;color:#9aa1ad;font-size:12.5px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .hp-t .ic{width:40px;height:40px;border-radius:10px;display:grid;place-items:center;flex:none;background:#EB6A22}
+  .hp-t .ic{background:#EB6A22}.hp-t:nth-child(even) .ic{background:#2C3E66;box-shadow:inset 0 0 0 1px rgba(255,255,255,.14)}body.clair .hp-t:nth-child(even) .ic{background:#1E2A44}   /* couleurs du logo : orange et bleu marine, en alternance */
+  .hp-t img{width:38px;height:50px;object-fit:cover;border-radius:5px;flex:none}
+  .hp-cours{margin-top:20px;max-width:860px;display:flex;gap:16px;align-items:center;padding:16px 18px;border-radius:16px;background:linear-gradient(120deg,rgba(235,106,34,.2),rgba(255,255,255,.04));border:1px solid rgba(235,106,34,.5)}
+  .hp-cours .q{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#f3a46f;font-weight:700}
+  .hp-cours b{display:block;font-size:1.2rem;margin:3px 0}.hp-cours span{color:#b9bec8;font-size:14px}
+  .hp-c-t{min-width:0}
+  .hp-cours button{margin-left:auto;background:#fff;color:#111;border:0;border-radius:10px;padding:12px 16px;font:inherit;font-weight:700;font-size:14px;white-space:nowrap;cursor:pointer;flex:none}
+  body.clair .hp-t{background:#fff;border-color:#e3e0da;color:#1d1d1f}body.clair .hp-t:hover{background:#faf8f5}body.clair .hp-t small{color:#6b6b70}
+  body.clair .hp-cours{background:linear-gradient(120deg,rgba(235,106,34,.12),#fff);border-color:rgba(235,106,34,.45)}body.clair .hp-cours span{color:#555}body.clair .hp-cours .q{color:#c2561a}body.clair .hp-cours button{background:#1d1d1f;color:#fff}
+  @media (max-width:900px){.hp-tuiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  @media (max-width:640px){.hp-cours{flex-wrap:wrap}.hp-cours button{margin-left:0;width:100%}.hp-t{min-height:58px;padding:10px 12px;font-size:14px}}
   .hero h1{font-size:clamp(1.5rem,3vw,2.3rem);line-height:1.1;margin-bottom:6px}
   .hero p{color:#ddd;font-size:1.05rem;line-height:1.5;margin-bottom:20px;
     display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
@@ -263,6 +284,9 @@
   .rb-logo{display:none;height:27px;width:auto;flex:none;margin-right:4px}
   .reader.wbon .rb-logo{display:block}
   .reader.wbon #readerBack{order:99;margin-left:auto}
+  /* 8 nov. (« doubles barres de défilement ») : une fenêtre plein écran ouverte (Plans, Activités, Accueil de classe) bloque le défilement de la page derrière */
+  html:has(#planOv:not([hidden])),html:has(#actOv:not([hidden])),html:has(#accueilOv:not([hidden])){overflow:hidden}
+  html:has(#planOv:not([hidden])) body,html:has(#actOv:not([hidden])) body,html:has(#accueilOv:not([hidden])) body{overflow:hidden}
   .pl-top #plClose,.act-top #actBack{order:99;margin-left:auto}
   .reader.wbon .reader-bar{min-height:63px;box-sizing:border-box;padding-left:4vw;padding-right:4vw}
   @media (max-width:640px){.rb-logo{height:22px}.reader.wbon .reader-bar{min-height:70px;padding-left:14px;padding-right:14px}}
@@ -1398,8 +1422,51 @@ function vedettes(){
   const t = [...new Set([...feat, ...recents, ...avec.filter(l => !l.user)])].slice(0, 3);
   return t.length === 3 ? [t[1], t[0], t[2]] : t;
 }
+/* Accueil dynamique (8 nov., A + B + C choisis par Jeremy) : enseignant connecté = « Bonjour Prénom ! », carte du prochain cours préparé,
+   et 4 tuiles qui suivent ses dernières actions (livre en cours, dernier quiz, tableau blanc, Labo, accueil de classe). Visiteur : texte de présentation. */
+function accueilPerso(){
+  const S = window.ACCES && ACCES.session; if (!S || S.eleve || !document.body.classList.contains("connecte")) return "";
+  const J = k => { try { return JSON.parse(localStorage.getItem(k) || "null"); } catch(e){ return null; } }, maintenant = Date.now(), H = new Date().getHours();
+  const jour = d => d.toLocaleDateString("en-CA"), auj = jour(new Date()), dem = jour(new Date(maintenant + 864e5));
+  /* prochain cours préparé (accueil de classe) */
+  let carte = "", cours = null; const cfg = J("accueil-atelier-v4") || {};
+  const fini = k => k.slice(0, 10) === auj && (k.endsWith("|am") ? H >= 12 : H >= 17);
+  const plans = Object.keys(cfg.plans || {}).filter(k => k.slice(0, 10) >= auj && !fini(k)).sort();
+  if (cfg.slot && cfg.slot.slice(0, 10) === auj && !fini(cfg.slot) && (cfg.module || cfg.steps)) cours = { k: cfg.slot, p: cfg };
+  else if (plans.length) cours = { k: plans[0], p: cfg.plans[plans[0]] };
+  if (cours){ const d = cours.k.slice(0, 10), am = !cours.k.endsWith("|pm");
+    const quand = d === auj ? (am ? "ce matin" : "cet après-midi") : d === dem ? (am ? "demain matin" : "demain après-midi") : new Date(d + "T12:00").toLocaleDateString("fr-CA", { weekday:"long", day:"numeric", month:"long" }) + (am ? ", matin" : ", après-midi");
+    const etapes = String(cours.p.steps || "").split("\n").map(s => s.trim()).filter(Boolean), nl = Object.values(cours.p.liens || {}).flat().filter(Boolean).length;
+    const titre = cours.p.module || etapes[0] || "Cours préparé";
+    carte = `<div class="hp-cours"><div class="hp-c-t"><div class="q">Ton cours ${esc(quand)}</div><b>${esc(titre)}</b><span>${etapes.length} étape${etapes.length > 1 ? "s" : ""}${nl ? " · " + nl + " contenu" + (nl > 1 ? "s" : "") + " lié" + (nl > 1 ? "s" : "") : ""}</span></div><button type="button" data-hp="accueil">Ouvrir l'accueil de classe</button></div>`; }
+  /* tuiles, de la plus utile à la moins utile */
+  const T = [], ic = (c, d) => `<span class="ic ${c}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${d}</svg></span>`;
+  if (!cours && (H >= 14 || new Date().getDay() % 6 === 0)) T.push(`<button class="hp-t" data-hp="preparer">${ic("o", '<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4h6v3H9zM9 12h6M9 16h4"/>')}<span>Préparer demain<small>Accueil de classe</small></span></button>`);
+  const dernier = Object.entries(POS).filter(([f, p]) => p && p.n > 1 && LIVRES.some(l => l.fichier === f)).sort((a, b) => b[1].t - a[1].t)[0];
+  if (dernier){ const l = LIVRES.find(x => x.fichier === dernier[0]), c = couv(l);
+    T.push(`<button class="hp-t" data-hp="livre" data-f="${esc(l.fichier)}">${c ? `<img src="${esc(c)}" alt="">` : ic("o", '<path d="M4 5a2 2 0 0 1 2-2h12v16H6a2 2 0 0 0-2 2z"/>')}<span>Reprendre<small>${esc(l.titre)} · p. ${esc(dernier[1].label || dernier[1].n)}</small></span></button>`); }
+  const q = J("dernierQuiz");
+  if (q && q.id && maintenant - q.t < 21 * 864e5) T.push(`<button class="hp-t" data-hp="quiz" data-q="${esc(q.id)}">${ic("r", '<circle cx="12" cy="12" r="9"/><path d="M10 8.5l5.5 3.5-5.5 3.5z"/>')}<span>Rejouer<small>${esc(q.titre)}</small></span></button>`);
+  const tb = +(localStorage.getItem("dernierTableau") || 0);
+  T.push(`<button class="hp-t" data-hp="tableau">${ic("b", '<rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/>')}<span>${tb && maintenant - tb < 7 * 864e5 ? "Continuer ton tableau" : "Tableau blanc"}<small>Dessiner, schémas, plans iso</small></span></button>`);
+  T.push(`<button class="hp-t" data-hp="labo">${ic("m", '<path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-9V3"/>')}<span>Labo<small>Quiz et simulateurs</small></span></button>`);
+  if (!cours) T.push(`<button class="hp-t" data-hp="accueil">${ic("v", '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>')}<span>Accueil de classe<small>Horloge et horaire du cours</small></span></button>`);
+  return `<h1>${esc(window.titreAccueil && window.titreAccueil() || "Bonjour !")}</h1><p class="hp-sous">Que veux-tu enseigner aujourd'hui ?</p>${carte}<div class="hp-tuiles">${T.slice(0, 4).join("")}</div>`;
+}
+function brancherAccueilPerso(h){
+  const clic = id => { const b = document.getElementById(id); if (b) b.click(); };
+  h.querySelectorAll("[data-hp]").forEach(b => b.onclick = () => { const k = b.dataset.hp;
+    if (k === "accueil" || k === "preparer") clic("accueilBtn");
+    else if (k === "tableau") clic("wbBtn");
+    else if (k === "labo") clic("simBtn");
+    else if (k === "quiz") window.open("quiz.html?animer=1&quiz=" + encodeURIComponent(b.dataset.q), "_blank");
+    else if (k === "livre"){ const l = LIVRES.find(x => x.fichier === b.dataset.f); if (l){ RD.allerA = (POS[l.fichier] || {}).n || 1; lire(l); } } }); }
 function renderHero(){
-  const h = $("#hero");
+  const h = $("#hero"), perso = accueilPerso();
+  if (perso){ h.style.cssText = "background:linear-gradient(120deg,#1b2540 0%,#141414 68%)"; h.classList.add("hp");
+    h.innerHTML = `<div class="hero-content">${perso}</div><div class="hero-stack">${vedettes().map(l => `<img src="${esc(couv(l))}" alt="">`).join("")}</div>`;
+    brancherAccueilPerso(h); return; }
+  h.classList.remove("hp");
   h.style.cssText = "background:linear-gradient(120deg,#1b2540 0%,#141414 68%)";
   h.innerHTML = `<div class="hero-content">
     <h1>${(window.titreAccueil && window.titreAccueil()) || "La plateforme des enseignants en formation professionnelle"}</h1>
@@ -5583,6 +5650,7 @@ function lire(l){
   else aviser("Ce livre n'est pas encore disponible en ligne.");
 }
 function closeReader(){
+  setTimeout(() => { try { renderHero(); } catch(e){} }, 400);
   clearInterval(RD.poll); clearTimeout(BAR.t); clearTimeout(RD.attT);
   try { if (document.fullscreenElement && !document.body.classList.contains("classe") && !window.TDB_ACTIF) document.exitFullscreen(); } catch(e){}
   $("#reader").classList.remove("open");
@@ -5613,6 +5681,7 @@ function marquerTdb(on){
 function allerTableauDeBord(){ marquerTdb(true); try { window.ouvrirAccueil(); } catch(e){} }
 function fermerLivreVraiment(){ const t = window.TDB_ACTIF; marquerTdb(false); window.TDB_ACTIF = t; closeReader(); window.TDB_ACTIF = t; }
 function ouvrirTableauBlanc(apres){
+  try { localStorage.setItem("dernierTableau", String(Date.now())); } catch(e){}
   try { if (window.COFFRE && window.ACCES && ACCES.session && !ACCES.eleve) COFFRE.stat("outil:tableau"); } catch(e){}
   const l = { fichier:"tableau-blanc", titre:"Tableau blanc" };
   ouvrirLivre(l, '<!doctype html><html><head><meta charset="utf-8"><title>Tableau blanc</title></head><body style="margin:0;background:#fff;height:100vh"></body></html>');
@@ -10028,7 +10097,7 @@ body.clair:not(:has(.reader.open)) #fsBtn{background:rgba(255,255,255,.55);color
     setTimeout(() => location.reload(), apresConnexion ? 2300 : 0);
   };
   setInterval(() => { if (attente && !document.querySelector("#reader.open") && !document.querySelector("#accueilOv:not([hidden])")){ attente = false; location.reload(); } }, 1500);
-  const B = { cles:["favs", "pos", "marks", "rangsReduits", "filtreProg", "nouvVu", "prefs:{id}", "penPerso", "penLargeur", "gommeTaille", "objCats", "ghJeton"],   /* ghJeton : la clé GitHub de l'admin le suit (chiffrée dans son coffre), retirée de l'appareil à la déconnexion */
+  const B = { cles:["favs", "pos", "marks", "rangsReduits", "filtreProg", "nouvVu", "prefs:{id}", "penPerso", "penLargeur", "gommeTaille", "objCats", "ghJeton", "dernierTableau"],   /* ghJeton : la clé GitHub de l'admin le suit (chiffrée dans son coffre), retirée de l'appareil à la déconnexion */
     vides:{ favs:"[]", pos:"{}", marks:"{}" }, apres:recharger };
   const T = { cles:["tableauxSauves", "mesSchemas"], apres:recharger };
   const go = () => { COFFRE.demarrer("biblio", B).then(() => {   /* une fois par jour, un signe de vie (« vu il y a … » dans le panneau d'administration) */
