@@ -39,11 +39,16 @@
   let c = ""; try { c = localStorage.getItem("logoCouleur") || ""; } catch(e){}
   const perso = /^#[0-9a-f]{6}$/i.test(c) && !/^#(eb6a22|f2762e|e50914)$/i.test(c), cache = {};
   const svg = src => cache[src] || (cache[src] = fetch(src).then(r => r.text()).then(t => "data:image/svg+xml;charset=utf-8," + encodeURIComponent(t.replace(/#F2762E/gi, c))).catch(() => null));
+  /* fond réel derrière le logo (la télécommande reste claire même quand l'ordinateur est en thème foncé) */
+  const fonce = el => { for (let e = el; e && e.nodeType === 1; e = e.parentElement){ const m = getComputedStyle(e).backgroundColor.match(/[\d.]+/g);
+      if (m && (m.length < 4 || +m[3] > .5)) return (0.299 * m[0] + 0.587 * m[1] + 0.114 * m[2]) < 128; }
+    return document.documentElement.classList.contains("sombre"); };
   const poser = img => { let s = img.dataset.m0 || img.getAttribute("src") || ""; if (!/metier-plus/.test(s)) return; img.dataset.m0 = s;
-    if (img.dataset.blancAuto === "1" || img.closest(".tbar, .bordHaut, .mp-tete")){ img.dataset.blancAuto = "1"; if (document.documentElement.classList.contains("sombre")) s = s.replace("metier-plus.svg", "metier-plus-blanc.svg"); }
+    if (img.dataset.blancAuto === "1" || img.closest(".tbar, .bordHaut, .mp-tete")){ img.dataset.blancAuto = "1"; if (fonce(img)) s = s.replace("metier-plus.svg", "metier-plus-blanc.svg"); }
     if (perso) svg(s).then(u => { if (u) img.src = u; }); else if (img.getAttribute("src") !== s) img.src = s; };
   const tout = () => document.querySelectorAll('img[src*="metier-plus"], img[data-m0]').forEach(poser);
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", tout); else tout();
+  const go = () => { tout(); new MutationObserver(() => setTimeout(tout, 50)).observe(document.body, { attributes:true, attributeFilter:["class"] }); };
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", go); else go();
 })();
 
 /* En-tête commun Métier+ (8 nov., « le logo doit être placé pareil partout ») : même place, même taille que l'en-tête de la bibliothèque. */
@@ -59,5 +64,6 @@ html{overflow-x:clip}
 .mp-tete a,.mp-tete button{flex:none;white-space:nowrap;margin:0!important}
 .mp-tete a{display:inline-flex!important;align-items:center;min-height:40px;padding:8px 14px!important;border:1px solid rgba(128,128,128,.35)!important;border-radius:10px;font-size:14px!important;font-weight:600!important;color:inherit!important;text-decoration:none;background:transparent!important}
 .mp-tete a.cache{display:none!important}
+.mp-tete .mp-retour{margin-right:2px!important}
 @media (max-width:640px){.mp-tete{padding:0 14px!important;height:70px;gap:10px}.mp-tete>img{height:22px!important}.mp-tete .mp-sous,.mp-tete #lienEcran{display:none!important}.mp-tete .mp-nom{font-size:14px!important;padding-left:10px;overflow:hidden;text-overflow:ellipsis;flex:0 1 auto!important;min-width:0}.mp-tete a{min-height:38px;padding:6px 11px!important;font-size:13px!important}}
 `; (document.head || document.documentElement).appendChild(st); })();
