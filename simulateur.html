@@ -99,9 +99,85 @@ th{font-size:12px;color:var(--gris);font-weight:700;border-top:0}
 #terrain button[data-a=tech]{background:#534AB7}
 @media (max-width:700px){#terrain{grid-template-columns:1fr 1fr}}
 @media (max-width:700px){.face{grid-template-columns:1fr}.leds{flex-direction:row;flex-wrap:wrap}.btns{grid-template-columns:1fr 1fr}}
+/* ---------- Choix du rôle ---------- */
+#role{max-width:560px;margin:8vh auto;padding:16px}
+#role .carte{text-align:center}
+#role h1{margin:0 0 6px;font-size:24px}
+#role .duo{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+#role .duo button{padding:22px 10px;font-size:17px}
+#role input{font:inherit;font-size:30px;width:100%;text-align:center;letter-spacing:.2em;padding:10px;border-radius:12px;border:2px solid #C9C3B8;margin:12px 0}
+
+/* ---------- Défi (télécommande) ---------- */
+.defi{border:2px solid #534AB7}
+.defi h2{color:#534AB7!important}
+.defi .rang{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.defi .rang button{flex:1;min-width:140px}
+.mis{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.mis span{font-size:12px;font-weight:700;border-radius:20px;padding:4px 10px;background:#EEEAF9;color:#3C3489}
+.mis span.fait{background:#DDF2E5;color:#1D6B3F}.mis span.cour{background:#534AB7;color:#fff}
+#jeuEtat{font-size:15px;font-weight:700;margin-top:6px}
+
+/* ---------- Défi (panneau élève) ---------- */
+#jeuBan{background:#534AB7;color:#fff;border-radius:12px;padding:10px 14px;margin-bottom:10px;font-size:14px;display:flex;justify-content:space-between;gap:10px;align-items:center}
+#jeuBan b{font-size:15px}
+#jeuOv{position:fixed;inset:0;background:rgba(22,24,28,.94);z-index:50;display:flex;align-items:center;justify-content:center;padding:18px}
+#jeuOv .bx{width:min(900px,100%);color:#fff;text-align:center}
+#jeuOv h2{font-size:clamp(20px,3.4vw,32px);margin:0 0 18px;line-height:1.25}
+.ch4{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ch4 button{min-height:110px;font-size:clamp(16px,2.3vw,22px);border-radius:14px;display:flex;align-items:center;gap:12px;padding:16px;text-align:left}
+.ch4 button i{font-style:normal;font-size:26px}
+.k0{background:#E21B3C}.k1{background:#1368CE}.k2{background:#D89E00}.k3{background:#26890C}
+.ch4 button.pas{opacity:.35}.ch4 button.bon{outline:5px solid #fff}
+.gros{font-size:clamp(26px,5vw,48px);font-weight:900;margin:10px 0}
+.chrono{height:8px;border-radius:8px;background:rgba(255,255,255,.2);overflow:hidden;margin:14px 0}
+.chrono i{display:block;height:100%;background:#fff;width:100%}
+
+/* ---------- Écran de classe (TNI) ---------- */
+#ecr{min-height:100vh;background:#16181C;color:#F2EFEA;padding:3vh 3vw}
+#ecr .haut{display:flex;justify-content:space-between;align-items:center;margin-bottom:2vh}
+#ecr .haut b{font-size:2.2vw;letter-spacing:.04em}
+#ecr .haut span{font-size:1.4vw;color:#B5AFA6}
+.lob{display:grid;grid-template-columns:auto 1fr;gap:4vw;align-items:center}
+.lob .qr{background:#fff;padding:1.2vw;border-radius:1.2vw}
+.lob .code{font-size:6vw;font-weight:900;letter-spacing:.12em;color:#fff}
+.lob .eqs{display:flex;flex-wrap:wrap;gap:.8vw;margin-top:2vh}
+.lob .eqs span{background:#534AB7;border-radius:3vw;padding:.8vw 1.6vw;font-size:1.6vw;font-weight:800;animation:pop .4s}
+@keyframes pop{from{transform:scale(.6);opacity:0}}
+.eq-q{font-size:3vw;font-weight:800;text-align:center;margin:2vh 0 3vh;line-height:1.25}
+.eq-ch{display:grid;grid-template-columns:1fr 1fr;gap:1.4vw}
+.eq-ch div{border-radius:1.2vw;padding:2.2vw;font-size:2vw;font-weight:800;display:flex;justify-content:space-between;align-items:center;gap:1vw}
+.eq-ch div.pas{opacity:.3}.eq-ch div em{font-style:normal;font-size:2.4vw;background:rgba(0,0,0,.25);border-radius:1vw;padding:.2vw 1vw}
+.cpt{display:flex;justify-content:space-between;align-items:center;margin-top:3vh;font-size:1.8vw;color:#B5AFA6}
+.cpt b{font-size:4vw;color:#fff}
+.ecr-mis h1{font-size:3.2vw;margin:0}.ecr-mis p{font-size:1.7vw;color:#B5AFA6;margin:.6vh 0 2.5vh}
+.barre{height:1.2vw;border-radius:1vw;background:#2B2E35;overflow:hidden;margin-bottom:3vh}
+.barre i{display:block;height:100%;background:linear-gradient(90deg,#26890C,#D89E00,#E21B3C);transition:width 1s linear}
+.lgn{display:grid;grid-template-columns:3vw 1fr 9vw 9vw;gap:1vw;align-items:center;background:#22252B;border-radius:1vw;padding:1.2vw 1.4vw;margin-bottom:1vh;font-size:1.7vw;transition:transform .6s}
+.lgn .rg{font-weight:900;color:#B5AFA6}.lgn .nm{font-weight:800}
+.lgn .prog{height:.8vw;border-radius:1vw;background:#2B2E35;overflow:hidden;margin-top:.6vh}.lgn .prog i{display:block;height:100%;background:#534AB7}
+.lgn .st{font-size:1.4vw;color:#B5AFA6}.lgn .st.ok{color:#5BD08A;font-weight:800}
+.lgn .pt{font-weight:900;text-align:right;font-size:2vw}
+.lgn .gn{font-size:1.3vw;color:#5BD08A;font-weight:800;text-align:right}
+.podium{display:flex;justify-content:center;align-items:flex-end;gap:2vw;margin:4vh 0}
+.podium div{width:16vw;border-radius:1.2vw 1.2vw 0 0;text-align:center;padding:1.5vw;font-weight:900;font-size:1.8vw}
+.podium .p1{background:#D89E00;height:30vh}.podium .p2{background:#8A8F98;height:22vh}.podium .p3{background:#A0582B;height:16vh}
+.podium b{display:block;font-size:4vw}
+.errs{font-size:1.6vw;color:#B5AFA6}.errs b{color:#FF8A80}
 </style>
 </head>
 <body>
+
+<!-- ======================= CHOIX DU RÔLE ======================= -->
+<div id="role" class="cache"><div class="carte"><h1>Simulateur de panneau d'alarme</h1>
+<div class="sous">Protection incendie · Les Habitations du Quai</div>
+<div class="duo"><button id="rTele">📱 Télécommande<br><small style="font-weight:500">iPad de l'enseignant</small></button>
+<button id="rEcr" style="background:#24211E">🖥️ Écran de classe<br><small style="font-weight:500">tableau interactif</small></button></div>
+<div id="rCode" class="cache"><div class="sous" style="margin-top:14px">Tape le code affiché sur la télécommande</div>
+<input id="rIn" inputmode="numeric" maxlength="7" placeholder="000 000"><button id="rGo" style="width:100%">Afficher l'écran de classe</button></div>
+<div class="sous" style="margin-top:14px">Les élèves, eux, scannent le code QR : leur iPad devient un panneau.</div></div></div>
+
+<!-- ======================= ÉCRAN DE CLASSE ======================= -->
+<div id="ecr" class="cache"></div>
 
 <!-- ======================= TÉLÉCOMMANDE (enseignant) ======================= -->
 <div id="tele" class="cache">
@@ -117,7 +193,11 @@ th{font-size:12px;color:var(--gris);font-weight:700;border-top:0}
 <button id="tout" style="background:var(--vert);width:100%;margin-top:10px">Tout remettre à la normale</button></div>
 </div>
 <div>
-<div class="carte"><h2>Déclencher</h2><div id="catalogue"></div></div>
+<div class="carte defi"><h2>Défi panneau</h2>
+<div class="sous">8 missions envoyées à toutes les équipes : question éclair, puis remettre le panneau à la normale. Le classement s'affiche sur l'écran de classe (sur le tableau, ouvre cette page, choisis « Écran de classe » et tape le code).</div>
+<div id="jeuEtat">Pas commencé.</div><div class="mis" id="jeuMis"></div>
+<div class="rang"><button id="jGo" style="background:#534AB7">Lancer le défi</button><button id="jNext" style="background:#24211E" disabled>Mission suivante</button><button id="jStop" style="background:#5F5E5A" disabled>Arrêter</button></div></div>
+<div class="carte"><h2>Mode libre · Déclencher</h2><div id="catalogue"></div></div>
 <div class="carte"><h2>Scénarios</h2><div class="scen" id="scenarios"></div></div>
 <div class="carte"><h2>Panneaux des équipes</h2>
 <table><thead><tr><th style="width:22%">Équipe</th><th style="width:16%">État</th><th>Ce que l'équipe a fait</th></tr></thead><tbody id="equipes"><tr><td colspan="3" class="sous">Aucune équipe connectée.</td></tr></tbody></table></div>
@@ -133,6 +213,7 @@ th{font-size:12px;color:var(--gris);font-weight:700;border-top:0}
 <div class="sous" style="margin-top:10px">Monte le son de l'iPad : le panneau sonne.</div></div>
 
 <div id="panneau" class="cache" style="width:min(980px,100%)">
+<div id="jeuBan" class="cache"></div>
 <div class="facp">
 <div class="ftete"><span>PANNEAU DE CONTRÔLE D'ALARME INCENDIE · ADRESSABLE</span><span class="eq" id="eqNom"></span></div>
 <div class="face">
@@ -161,6 +242,7 @@ th{font-size:12px;color:var(--gris);font-weight:700;border-top:0}
 </div>
 <div class="terrain"><h3>Sur le terrain <small>ce que tu fais dans l'immeuble</small></h3><div id="terrain"></div></div>
 <div id="journal" class="cache"></div>
+<div id="jeuOv" class="cache"><div class="bx" id="jeuBx"></div></div>
 </div>
 </div>
 
@@ -247,8 +329,40 @@ function ecouter(topic, quand, etat){
 }
 
 const params = new URLSearchParams(location.search);
+/* =============================== DÉFI : les 8 missions =============================== */
+const MISSIONS = [
+  {t: "Batterie faible", d: "Le panneau signale sa batterie.", evs: [[0, "e9"]],
+   q: "« LOW BATTERY » est un signal de…", ch: ["Alarme", "Supervision", "Trouble", "Exercice"], bon: 2},
+  {t: "Vanne fermée", d: "Les plombiers ont travaillé au stationnement.", evs: [[0, "e5"]],
+   q: "Une vanne de gicleurs fermée donne un signal de…", ch: ["Alarme", "Supervision", "Trouble", "Aucun signal"], bon: 1},
+  {t: "Panne de courant", d: "Orage sur Rivière-du-Loup.", evs: [[0, "e8"], [15, "e9"]],
+   q: "Le panneau perd le 120 V. Qu'est-ce qui le garde en marche ?", ch: ["Rien : il s'éteint", "Ses batteries", "La télésurveillance", "Le transformateur"], bon: 1},
+  {t: "Défaut de mise à la terre", d: "Un message que tu ne peux pas réparer toi-même.", evs: [[0, "e10"]],
+   q: "Qui répare un défaut de mise à la terre ?", ch: ["Le préposé", "Les pompiers", "Le technicien en alarme incendie", "Le gestionnaire"], bon: 2},
+  {t: "Déclencheur tiré pour rien", d: "Vendredi, 23 h 55, sortie est.", evs: [[0, "e1"]],
+   q: "Avant de réarmer après une alarme, il faut…", ch: ["Accuser réception seulement", "L'autorisation du service incendie", "Attendre 5 minutes", "Couper le courant"], bon: 1},
+  {t: "Sablage au 4e", d: "Un entrepreneur sable le gypse au 4e.", evs: [[0, "e0"]],
+   q: "Le bouton « Silence signal » arrête…", ch: ["Le bip du panneau", "Les avertisseurs dans l'immeuble", "L'alarme pour de bon", "La télésurveillance"], bon: 1},
+  {t: "Feu à la cuisine", d: "Le restaurant du rez-de-chaussée.", evs: [[0, "e4"], [20, "e2"]],
+   q: "Un interrupteur de débit des gicleurs signale…", ch: ["Une vanne fermée", "De l'eau qui coule dans les gicleurs", "Une basse pression d'air", "Un fil coupé"], bon: 1},
+  {t: "Finale : tout en même temps", d: "Trois événements. Règle le plus urgent d'abord.", evs: [[0, "e6"], [0, "e11"], [10, "e0"]],
+   q: "Plusieurs événements en même temps : lequel régler en premier ?", ch: ["Le trouble", "La supervision", "L'alarme", "Le plus ancien"], bon: 2}
+];
+const Q_S = 20, LIMITE_S = 180;
+const SYMB = ["▲", "◆", "●", "■"];
+
 if (params.get("panneau")) panneau(params.get("panneau").replace(/\D/g, "").slice(0, 6));
-else telecommande();
+else if (params.get("ecran")) ecran(params.get("ecran").replace(/\D/g, "").slice(0, 6));
+else if (params.get("tele")) telecommande();
+else {
+  $("role").classList.remove("cache");
+  $("rTele").onclick = () => { $("role").classList.add("cache"); telecommande(); };
+  $("rEcr").onclick = () => { $("rCode").classList.remove("cache"); $("rIn").focus(); };
+  $("rGo").onclick = () => { const c = $("rIn").value.replace(/\D/g, ""); if (c.length === 6) location.search = "?ecran=" + c; };
+  $("rIn").addEventListener("keydown", e => { if (e.key === "Enter") $("rGo").click(); });
+}
+
+
 
 /* =============================== TÉLÉCOMMANDE =============================== */
 function telecommande(){
@@ -317,12 +431,96 @@ function telecommande(){
     }).join("") : '<tr><td colspan="3" class="sous">Aucune équipe connectée.</td></tr>';
   }
 
+  /* ----- moteur du défi ----- */
+  const J = {on: false, etat: "lobby", i: -1, t0: 0, sc: {}, fa: {}, prog: {}, reps: {}, fini: {}, gain: {}, envoyes: 0, err: {}, minuteurs: []};
+  function minuter(f, ms){ const t = setTimeout(f, ms); J.minuteurs.push(t); return t; }
+  function annuler(){ J.minuteurs.forEach(clearTimeout); J.minuteurs = []; }
+  let vueT = 0, vueDiff = null;
+  function vue(){
+    if (vueDiff) return; const att = Math.max(0, 600 - (Date.now() - vueT));
+    vueDiff = setTimeout(() => { vueDiff = null; vueT = Date.now(); envoyer(topic, vueObj()); }, att);
+  }
+  function vueObj(){
+    const M = MISSIONS[J.i] || {};
+    const compte = [0, 0, 0, 0]; Object.values(J.reps).forEach(r => compte[r.c]++);
+    return {m: "vue", code, etat: J.on ? J.etat : "lobby", i: J.i, n: MISSIONS.length, t0: J.t0, now: Date.now(),
+      mis: J.i >= 0 ? {t: M.t, d: M.d, q: M.q, ch: M.ch} : null, bon: J.etat === "reveal" || J.etat === "mission" ? M.bon : null, compte,
+      nrep: Object.keys(J.reps).length,
+      eqs: Object.keys(equipes).map(id => ({id, n: equipes[id].equipe, pts: J.sc[id] || 0, fa: J.fa[id] || 0, prog: J.prog[id] || 0,
+        fini: J.fini[id] != null ? J.fini[id] : null, gain: J.gain[id] || 0, rep: !!J.reps[id]})),
+      errs: Object.entries(J.err).sort((a, b) => b[1] - a[1]).slice(0, 4)};
+  }
+  function majJeu(){
+    const txt = {lobby: "Prêt : les équipes peuvent se joindre.", question: "Question éclair en cours…", reveal: "Réponse dévoilée.", mission: "Mission en cours : les équipes règlent leur panneau.", classement: "Classement affiché. Lance la mission suivante quand tu es prêt.", fin: "Défi terminé : podium affiché."};
+    $("jeuEtat").textContent = J.on ? "Mission " + (J.i + 1) + " sur " + MISSIONS.length + " · " + txt[J.etat] : (J.etat === "fin" ? txt.fin : "Pas commencé.");
+    $("jeuMis").innerHTML = MISSIONS.map((M, k) => `<span class="${k < J.i || (k === J.i && J.etat === "classement") ? "fait" : k === J.i ? "cour" : ""}">${k + 1}. ${esc(M.t)}</span>`).join("");
+    $("jGo").disabled = J.on; $("jStop").disabled = !J.on;
+    $("jNext").disabled = !J.on || !["classement", "mission"].includes(J.etat);
+    $("jNext").textContent = J.i + 1 >= MISSIONS.length && J.etat === "classement" ? "Voir le podium" : J.etat === "mission" ? "Terminer la mission" : "Mission suivante";
+    vue();
+  }
+  function question(){
+    annuler(); J.etat = "question"; J.t0 = Date.now(); J.reps = {}; J.gain = {}; J.fini = {};
+    actifs = []; dessinerActifs(); envoyer(topic, {m: "raz", cible: "tous"});
+    const M = MISSIONS[J.i];
+    envoyer(topic, {m: "q", i: J.i, n: MISSIONS.length, q: M.q, ch: M.ch, t0: J.t0, s: Q_S});
+    minuter(reveal, Q_S * 1000 + 400); majJeu();
+  }
+  function reveal(){
+    if (J.etat !== "question") return; annuler(); J.etat = "reveal";
+    const M = MISSIONS[J.i], gains = {};
+    Object.entries(J.reps).forEach(([id, r]) => { const g = r.c === M.bon ? Math.round(500 - 250 * Math.min(1, r.ms / (Q_S * 1000))) : 0; gains[id] = g; J.sc[id] = (J.sc[id] || 0) + g; });
+    J.gain = Object.assign({}, gains);
+    envoyer(topic, {m: "qfin", i: J.i, bon: M.bon, bonTxt: M.ch[M.bon], gains});
+    minuter(mission, 5000); majJeu();
+  }
+  function mission(){
+    annuler(); J.etat = "mission"; J.t0 = Date.now(); J.envoyes = 0; J.fini = {};
+    const M = MISSIONS[J.i];
+    envoyer(topic, {m: "mission", i: J.i, n: MISSIONS.length, t: M.t, d: M.d, t0: J.t0, s: LIMITE_S});
+    M.evs.forEach(([s, k]) => minuter(() => { if (J.etat === "mission") { declencher(k, "tous"); J.envoyes++; } }, 1500 + s * 1000));
+    minuter(classement, LIMITE_S * 1000); majJeu();
+  }
+  function classement(){
+    annuler(); if (J.i >= 0) Object.keys(equipes).forEach(id => { if (J.fini[id] != null) J.prog[id] = J.i + 1; });
+    J.etat = "classement"; envoyer(topic, {m: "pause", i: J.i}); majJeu();
+  }
+  function fin(){ annuler(); J.etat = "fin"; J.on = false; envoyer(topic, {m: "jeufin"}); majJeu(); envoyer(topic, vueObj()); }
+  function jeuMsg(m){
+    if (m.m === "ecran?") { envoyer(topic, vueObj()); return; }
+    if (!J.on) return;
+    if (m.m === "rep" && J.etat === "question" && m.i === J.i && !J.reps[m.moi]) {
+      J.reps[m.moi] = {c: m.c, ms: Date.now() - J.t0}; majJeu();
+      if (Object.keys(J.reps).length >= Object.keys(equipes).length) setTimeout(reveal, 600);
+    } else if (m.m === "fini" && J.etat === "mission" && m.i === J.i && J.fini[m.moi] == null && J.envoyes >= MISSIONS[J.i].evs.length) {
+      const s = Math.round((Date.now() - J.t0) / 1000);
+      const g = Math.round(1000 - 500 * Math.min(1, s / LIMITE_S));
+      J.fini[m.moi] = s; J.gain[m.moi] = (J.gain[m.moi] || 0) + g; J.sc[m.moi] = (J.sc[m.moi] || 0) + g; J.prog[m.moi] = J.i + 1;
+      majJeu();
+      if (Object.keys(J.fini).length >= Object.keys(equipes).length) minuter(classement, 2500);
+    } else if (m.m === "act" && m.mal && (J.etat === "mission" || J.etat === "question")) {
+      J.fa[m.moi] = (J.fa[m.moi] || 0) + 1; J.sc[m.moi] = (J.sc[m.moi] || 0) - 200;
+      const cle = m.txt.replace(/ \(.*\)| : .*/g, ""); J.err[cle] = (J.err[cle] || 0) + 1; majJeu();
+    }
+  }
+  $("jGo").onclick = () => {
+    Object.assign(J, {on: true, i: 0, sc: {}, fa: {}, prog: {}, err: {}}); question();
+  };
+  $("jNext").onclick = () => {
+    if (J.etat === "mission") { classement(); return; }
+    if (J.i + 1 >= MISSIONS.length) { fin(); return; }
+    J.i++; question();
+  };
+  $("jStop").onclick = () => { annuler(); J.on = false; J.etat = "lobby"; J.i = -1; envoyer(topic, {m: "jeufin", stop: true}); envoyer(topic, {m: "raz", cible: "tous"}); actifs = []; dessinerActifs(); majJeu(); };
+  majJeu();
+
   ecouter(topic, m => {
+    jeuMsg(m);
     if (m.m === "ici") {
       const neuf = !equipes[m.moi];
       equipes[m.moi] = equipes[m.moi] || {equipe: m.equipe, acts: []};
       equipes[m.moi].equipe = m.equipe; equipes[m.moi].etat = m.etat || "";
-      dessinerEquipes();
+      dessinerEquipes(); vue();
       if (neuf && actifs.length) // l'équipe arrive : on lui envoie ce qui est encore actif
         envoyer(topic, {m: "rattrape", pour: m.moi, evs: actifs.filter(a => a.cible === "tous" || a.cible === m.moi).map(a => ({id: a.id, k: a.k, t: a.t, cause: a.cause}))});
     } else if (m.m === "act") {
@@ -335,6 +533,52 @@ function telecommande(){
     $("etatT").style.color = ok ? "var(--vert)" : "var(--rouge)";
     if (ok) envoyer(topic, {m: "qui"});
   });
+}
+
+/* =============================== ÉCRAN DE CLASSE =============================== */
+function ecran(code){
+  const topic = PREFIXE + code, E = $("ecr");
+  E.classList.remove("cache");
+  const url = location.href.split(/[?#]/)[0] + "?panneau=" + code;
+  let V = {etat: "lobby", eqs: [], code}, decal = 0, tic = null, avant = {};
+  const tete = t => `<div class="haut"><b>${t}</b><span>Défi panneau · code ${code.slice(0, 3)} ${code.slice(3)}</span></div>`;
+  function classe(eqs){ return eqs.slice().sort((a, b) => b.pts - a.pts); }
+  function lignes(eqs, mode){
+    return classe(eqs).map((q, r) => `<div class="lgn"><span class="rg">${r + 1}</span><div><div class="nm">${esc(q.n)}</div>
+      <div class="prog"><i style="width:${100 * q.prog / (V.n || 8)}%"></i></div></div>
+      <div class="st ${q.fini != null ? "ok" : ""}">${mode === "mission" ? (q.fini != null ? "Réussi en " + q.fini + " s" : "En cours…") + (q.fa ? ` · ${q.fa} faute${q.fa > 1 ? "s" : ""}` : "") : (q.gain ? "+" + q.gain : "")}</div>
+      <div><div class="pt">${q.pts}</div></div></div>`).join("") || '<div class="sous" style="font-size:1.6vw">En attente des équipes…</div>';
+  }
+  function rendre(){
+    const v = V, n = Date.now() + decal;
+    if (v.etat === "lobby") {
+      E.innerHTML = tete("Défi panneau d'alarme") + `<div class="lob"><div class="qr" id="eQr"></div><div><div style="font-size:2vw;color:#B5AFA6">Scanne le code avec ton iPad</div>
+        <div class="code">${code.slice(0, 3)} ${code.slice(3)}</div><div style="font-size:1.6vw;color:#B5AFA6">${v.eqs.length} équipe${v.eqs.length > 1 ? "s" : ""} prête${v.eqs.length > 1 ? "s" : ""}</div>
+        <div class="eqs">${v.eqs.map(q => `<span>${esc(q.n)}</span>`).join("")}</div></div></div>`;
+      try { new QRCode($("eQr"), {text: url, width: Math.round(innerWidth * .24), height: Math.round(innerWidth * .24), correctLevel: QRCode.CorrectLevel.M}); } catch(e) { $("eQr").textContent = url; }
+    } else if (v.etat === "question" || v.etat === "reveal") {
+      const r = Math.max(0, Math.ceil((v.t0 + Q_S * 1000 - n) / 1000));
+      E.innerHTML = tete("Mission " + (v.i + 1) + " sur " + v.n + " · question éclair") + `<div class="eq-q">${esc(v.mis.q)}</div>
+        <div class="eq-ch">${v.mis.ch.map((c, k) => `<div class="k${k} ${v.etat === "reveal" && k !== v.bon ? "pas" : ""}"><span>${SYMB[k]} ${esc(c)}</span>${v.etat === "reveal" ? `<em>${v.compte[k]}</em>` : ""}</div>`).join("")}</div>
+        <div class="cpt"><span>${v.nrep} réponse${v.nrep > 1 ? "s" : ""} sur ${v.eqs.length}</span>${v.etat === "question" ? `<b>${r}</b>` : "<span>La mission commence…</span>"}</div>`;
+    } else if (v.etat === "mission") {
+      const el = Math.max(0, (n - v.t0) / 1000), r = Math.max(0, LIMITE_S - el);
+      E.innerHTML = tete("Mission " + (v.i + 1) + " sur " + v.n) + `<div class="ecr-mis"><h1>${esc(v.mis.t)}</h1><p>${esc(v.mis.d)} Chaque équipe ramène son panneau à la normale.</p></div>
+        <div class="cpt" style="margin:0 0 1vh"><span>Temps restant</span><b>${Math.floor(r / 60)}:${deux(Math.floor(r % 60))}</b></div>
+        <div class="barre"><i style="width:${100 * r / LIMITE_S}%"></i></div>${lignes(v.eqs, "mission")}`;
+    } else if (v.etat === "classement") {
+      E.innerHTML = tete("Classement après la mission " + (v.i + 1)) + lignes(v.eqs, "classement");
+    } else if (v.etat === "fin") {
+      const c = classe(v.eqs), p = (q, k) => q ? `<div class="p${k}"><b>${k}</b>${esc(q.n)}<br>${q.pts}</div>` : "";
+      E.innerHTML = tete("Podium") + `<div class="podium">${p(c[1], 2)}${p(c[0], 1)}${p(c[2], 3)}</div>` +
+        (v.errs && v.errs.length ? `<div class="errs"><b>Erreurs les plus fréquentes :</b> ${v.errs.map(([t, k]) => esc(t) + " (" + k + ")").join(" · ")}</div>` : `<div class="errs">Aucune erreur : bravo à tous !</div>`);
+    }
+  }
+  ecouter(topic, m => {
+    if (m.m === "vue") { V = m; decal = m.now - Date.now(); rendre(); }
+  }, ok => { if (ok) envoyer(topic, {m: "ecran?"}); });
+  rendre();
+  setInterval(() => { if (V.etat === "question" || V.etat === "mission") rendre(); }, 1000);
 }
 
 /* =============================== PANNEAU =============================== */
@@ -401,16 +645,52 @@ function panneau(code){
       const a = lamp || evs.some(e => typ(e) === "A" && ev(e).zone === z), t = !a && evs.some(e => e.k === "e14" && z === "4");
       return `<span class="${a ? "zA" : t ? "zT" : ""}"><i></i>${n}</span>`; }).join("");
     $("strobe").classList.toggle("on", lamp || drill || (has("A") && !silence));
-    sons();
+    sons(); verifierFini();
   }
   setInterval(() => { if (!evs.length) afficher(); }, 15000);
 
+  /* ----- défi : état du panneau ----- */
+  let jeu = false, missionI = -1, enMission = false, finiEnvoye = false, aEuEv = false;
+  function verifierFini(){
+    if (jeu && enMission && aEuEv && !evs.length && !drill && !finiEnvoye) {
+      finiEnvoye = true; envoyer(topic, {m: "fini", moi, equipe, i: missionI});
+      ban("Mission " + (missionI + 1) + " réussie ✓", "Panneau revenu à la normale. Attends la suite…");
+    }
+  }
+  function ban(titre, txt){ $("jeuBan").classList.remove("cache"); $("jeuBan").innerHTML = `<b>${esc(titre)}</b><span>${esc(txt)}</span>`; }
+  function ov(html){ $("jeuBx").innerHTML = html; $("jeuOv").classList.remove("cache"); }
+  function ovFerme(){ $("jeuOv").classList.add("cache"); }
+  let repI = -1, chronoQ = null;
+  function questionEleve(m){
+    jeu = true; enMission = false; missionI = m.i; repI = -1; $("kSon").classList.add("cache"); sonOn = true;
+    ov(`<div class="sous" style="color:#B5AFA6">Mission ${m.i + 1} sur ${m.n} · question éclair</div><h2>${esc(m.q)}</h2>
+      <div class="chrono"><i id="qBar"></i></div><div class="ch4">${m.ch.map((c, k) => `<button class="k${k}" data-c="${k}"><i>${SYMB[k]}</i>${esc(c)}</button>`).join("")}</div>`);
+    const fin = m.t0 + m.s * 1000, dur = m.s * 1000;
+    clearInterval(chronoQ); chronoQ = setInterval(() => { const r = Math.max(0, fin - Date.now()); const b = $("qBar"); if (b) b.style.width = (100 * r / dur) + "%"; if (!r) clearInterval(chronoQ); }, 200);
+    document.querySelectorAll("#jeuBx [data-c]").forEach(b => b.onclick = () => {
+      if (repI >= 0) return; repI = +b.dataset.c;
+      document.querySelectorAll("#jeuBx [data-c]").forEach(x => x.classList.toggle("pas", x !== b));
+      envoyer(topic, {m: "rep", moi, equipe, i: m.i, c: repI});
+    });
+  }
+  function revealEleve(m){
+    clearInterval(chronoQ);
+    const g = m.gains[moi] || 0, bon = repI === m.bon;
+    document.querySelectorAll("#jeuBx [data-c]").forEach(x => { x.classList.toggle("pas", +x.dataset.c !== m.bon); x.classList.toggle("bon", +x.dataset.c === m.bon); });
+    $("jeuBx").insertAdjacentHTML("beforeend", `<div class="gros" style="color:${bon ? "#5BD08A" : "#FF8A80"}">${repI < 0 ? "Pas de réponse" : bon ? "Bonne réponse ! +" + g : "Mauvaise réponse"}</div>${bon ? "" : `<div>La bonne réponse : <b>${esc(m.bonTxt)}</b></div>`}<div class="sous" style="color:#B5AFA6;margin-top:8px">Prépare-toi : la mission commence…</div>`);
+  }
+  let banMis = ["", ""];
+  function missionEleve(m){
+    ovFerme(); jeu = true; missionI = m.i; enMission = true; finiEnvoye = false; aEuEv = false;
+    banMis = ["Mission " + (m.i + 1) + " sur " + m.n + " · " + m.t, m.d + " Ramène le panneau à la normale."]; ban(banMis[0], banMis[1]);
+  }
   function ajouter(e, silencieux){
     if (evs.some(x => x.id === e.id)) return;
     evs.push({id: e.id, k: e.k, t: e.t || Date.now(), ack: false, cause: !!e.cause});
     if (typ(e) === "A") silence = false; else silTr = false;
     trier(); sel = 0; noter(TYPE_EN[ev(e).type] + " " + ev(e).nom + " " + ev(e).adr);
-    afficher(); if (!silencieux) envoyer(topic, {m: "ici", moi, equipe, etat: etatGlobal()});
+    if (enMission) { aEuEv = true; if (finiEnvoye) ban(banMis[0], banMis[1]); finiEnvoye = false; }
+    afficher(); if (!silencieux && !jeu) envoyer(topic, {m: "ici", moi, equipe, etat: etatGlobal()});
   }
   function pourMoi(m){ return !m.cible || m.cible === "tous" || m.cible === moi; }
 
@@ -481,12 +761,21 @@ function panneau(code){
     }
     vis.forEach(e => {
       const c = ev(e);
-      if (k === "tech") { e.tech = true; noter("SERVICE CALL " + c.adr); return; }
+      if (k === "tech") {
+        e.tech = true; noter("SERVICE CALL " + c.adr);
+        if (jeu) setTimeout(() => {
+          if (!evs.includes(e)) return;
+          if (c.type === "A") { e.fixe = true; noter("TECH: " + c.nom + " REPAIRED"); }
+          else { evs = evs.filter(x => x !== e); noter(TYPE_EN[c.type] + " RESTORED " + c.adr); }
+          dire("Le technicien a réparé : " + c.fr.toLowerCase() + "."); afficher();
+        }, 8000);
+        return;
+      }
       if (c.type === "A") { e.fixe = true; noter("FIELD: " + c.nom + " CLEARED"); }
       else { evs = evs.filter(x => x !== e); noter(TYPE_EN[c.type] + " RESTORED " + c.adr); }
     });
     afficher();
-    if (k === "tech") dire("Technicien appelé : il viendra réparer. L'événement reste affiché jusqu'à sa réparation.");
+    if (k === "tech") dire(jeu ? "Technicien appelé : il arrive dans quelques secondes." : "Technicien appelé : il viendra réparer. L'événement reste affiché jusqu'à sa réparation.");
     else if (vis.some(e => typ(e) === "A")) dire("Cause réglée sur le terrain. Pour réarmer, il faut aussi l'autorisation des pompiers.");
     else dire("Cause réglée : l'événement est rétabli (RESTORED).");
     rapporter(txt);
@@ -509,6 +798,12 @@ function panneau(code){
         if (e) { evs = evs.filter(x => x !== e); noter(TYPE_EN[ev(e).type] + " RESTORED " + ev(e).adr); afficher(); }
       } else if (m.m === "raz" && pourMoi(m)) { evs = []; silence = false; noter("SYSTEM NORMAL"); afficher(); }
       else if (m.m === "qui") envoyer(topic, {m: "ici", moi, equipe, etat: etatGlobal()});
+      else if (m.m === "q") questionEleve(m);
+      else if (m.m === "qfin") revealEleve(m);
+      else if (m.m === "mission") missionEleve(m);
+      else if (m.m === "pause") { enMission = false; ovFerme(); if (!finiEnvoye) ban("Mission " + (m.i + 1) + " terminée", "Le temps est écoulé. Regarde le classement au tableau."); }
+      else if (m.m === "jeufin") { jeu = false; enMission = false; ovFerme(); $("kSon").classList.remove("cache");
+        if (m.stop) $("jeuBan").classList.add("cache"); else ban("Défi terminé !", "Regarde le podium au tableau."); }
     }, ok => {
       $("etatP").textContent = ok ? "● Relié à la télécommande" + (window.supabase ? "" : " (ntfy)") : "○ Connexion perdue, nouvel essai…";
       if (ok) envoyer(topic, {m: "ici", moi, equipe, etat: etatGlobal()});
