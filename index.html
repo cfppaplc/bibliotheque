@@ -262,6 +262,8 @@
   /* 8 nov. : logo Métier+ dans la barre du tableau blanc, même place et même taille que l'en-tête de la bibliothèque (pas dans les livres) */
   .rb-logo{display:none;height:27px;width:auto;flex:none;margin-right:4px}
   .reader.wbon .rb-logo{display:block}
+  .reader.wbon #readerBack{order:99;margin-left:auto}
+  .pl-top #plClose,.act-top #actBack{order:99;margin-left:auto}
   .reader.wbon .reader-bar{min-height:63px;box-sizing:border-box;padding-left:4vw;padding-right:4vw}
   @media (max-width:640px){.rb-logo{height:22px}.reader.wbon .reader-bar{min-height:70px;padding-left:14px;padding-right:14px}}
   .reader-bar{flex:none;display:flex;align-items:center;gap:16px;padding:calc(8px + env(safe-area-inset-top,0px)) 16px 8px;background:#000;border-bottom:1px solid #333}

@@ -64,6 +64,6 @@ html{overflow-x:clip}
 .mp-tete a,.mp-tete button{flex:none;white-space:nowrap;margin:0!important}
 .mp-tete a{display:inline-flex!important;align-items:center;min-height:40px;padding:8px 14px!important;border:1px solid rgba(128,128,128,.35)!important;border-radius:10px;font-size:14px!important;font-weight:600!important;color:inherit!important;text-decoration:none;background:transparent!important}
 .mp-tete a.cache{display:none!important}
-.mp-tete .mp-retour{margin-right:2px!important}
+.mp-tete .mp-retour{order:99!important}
 @media (max-width:640px){.mp-tete{padding:0 14px!important;height:70px;gap:10px}.mp-tete>img{height:22px!important}.mp-tete .mp-sous,.mp-tete #lienEcran{display:none!important}.mp-tete .mp-nom{font-size:14px!important;padding-left:10px;overflow:hidden;text-overflow:ellipsis;flex:0 1 auto!important;min-width:0}.mp-tete a{min-height:38px;padding:6px 11px!important;font-size:13px!important}}
 `; (document.head || document.documentElement).appendChild(st); })();
