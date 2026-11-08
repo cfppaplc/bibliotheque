@@ -1045,7 +1045,10 @@ function ecran(code){
   const topic = PREFIXE + code, E = $("ecr"); E.classList.remove("cache");
   const url = location.href.split(/[?#]/)[0] + "?j=" + code;
   let V = {etat: "lobby", joueurs: [], titre: "Quiz maison", reg: {}, i: -1}, decal = 0, img = {}, sonOK = false, ac = null, dernier = "", posAvant = {}, tic = 0;
-  function ton(f, d, v, type){ if (!sonOK || V.reg.son === "non") return; try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); const o = ac.createOscillator(), g = ac.createGain(); o.type = type || "sine"; o.frequency.value = f; o.connect(g); g.connect(ac.destination); g.gain.setValueAtTime(v, ac.currentTime); g.gain.exponentialRampToValueAtTime(.0001, ac.currentTime + d); o.start(); o.stop(ac.currentTime + d); } catch(e) {} }
+  /* 8 nov. (« le son des quiz est vraiment bas ») : tout le son passe par un compresseur + gain ×3,2 (fort sans saturer) */
+  let MAITRE = null;
+  function maitre(){ if (MAITRE && MAITRE.context === ac) return MAITRE; const c = ac.createDynamicsCompressor(); c.threshold.value = -18; c.knee.value = 12; c.ratio.value = 4; c.attack.value = .003; c.release.value = .2; const g = ac.createGain(); g.gain.value = 3.2; c.connect(g); g.connect(ac.destination); return MAITRE = c; }
+  function ton(f, d, v, type){ if (!sonOK || V.reg.son === "non") return; try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); const o = ac.createOscillator(), g = ac.createGain(); o.type = type || "sine"; o.frequency.value = f; o.connect(g); g.connect(maitre()); g.gain.setValueAtTime(v, ac.currentTime); g.gain.exponentialRampToValueAtTime(.0001, ac.currentTime + d); o.start(); o.stop(ac.currentTime + d); } catch(e) {} }
   const accord = () => { ton(523, .5, .12); setTimeout(() => ton(659, .5, .1), 120); setTimeout(() => ton(784, .7, .1), 240); };
   const tete = t => `<div class="liseret"></div><div class="haut"><b><img class="logoE" src="img/metier-plus-blanc.svg" alt="Métier+">${esc(t)}</b><span>Quiz maison · code ${code.slice(0, 3)} ${code.slice(3)}</span></div>`;
   const bSon = () => `<button class="son${sonOK ? " actif" : ""}" id="bSon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="currentColor"/>${sonOK ? '<path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>' : '<path d="M16 9.5l5 5M21 9.5l-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>'}</svg>${sonOK ? "Son activé" : "Activer le son"}</button>`;
@@ -1120,7 +1123,7 @@ function ecran(code){
   function musique(v, n){
     const veut = v.etat === "question" && sonOK && v.reg.son !== "non" && v.reg.musique !== "non" && v.q && (v.t0 + v.q.s * 1000 > n);
     if (veut && !MUS.on){
-      try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); MUS.gain = ac.createGain(); MUS.gain.gain.value = .9; MUS.gain.connect(ac.destination);
+      try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); MUS.gain = ac.createGain(); MUS.gain.gain.value = .9; MUS.gain.connect(maitre());
         MUS.on = true; MUS.t = ac.currentTime + .08; MUS.pas = 0; musiqueTour(); MUS.h = setInterval(musiqueTour, 60); } catch(e){}
     } else if (!veut && MUS.on){
       MUS.on = false; clearInterval(MUS.h); const g = MUS.gain; try { g.gain.setTargetAtTime(.0001, ac.currentTime, .12); setTimeout(() => g.disconnect(), 800); } catch(e){}
