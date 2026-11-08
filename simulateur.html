@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Simulateur de panneau d'alarme</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.50.0/dist/umd/supabase.min.js"></script>
 <style>
 :root{--fond:#E9E6E0;--carte:#fff;--txt:#24211E;--gris:#6B665E;--ligne:#E2DDD3;--bleu:#185FA5;--rouge:#D93025;--ambre:#E8A317;--vert:#2E8B57}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -213,8 +214,31 @@ const SCEN = [
   {t: "Feu à la cuisine", d: "Hotte, puis débit des gicleurs 20 s plus tard", pas: [[0, "e4"], [20, "e2"]]}
 ];
 
-function envoyer(topic, obj){ return fetch(RELAIS + topic, {method: "POST", body: JSON.stringify(obj)}).catch(() => {}); }
+// Relais principal : Supabase Realtime (canal « broadcast », projet gratuit de Jeremy, clé publique faite pour une page web).
+// Secours : ntfy.sh si la bibliothèque Supabase ne se charge pas.
+const SB_URL = "https://kjlotlhqrgekzohshmbn.supabase.co";
+const SB_CLE = "sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY";
+let canal = null, pret = false, attente = [];
+function envoyer(topic, obj){
+  if (window.supabase) {
+    if (!pret) { attente.push(obj); return Promise.resolve(); }
+    return canal.send({type: "broadcast", event: "m", payload: obj}).catch(() => {});
+  }
+  return fetch(RELAIS + topic, {method: "POST", body: JSON.stringify(obj)}).catch(() => {});
+}
 function ecouter(topic, quand, etat){
+  if (window.supabase) {
+    const sb = window.supabase.createClient(SB_URL, SB_CLE, {realtime: {params: {eventsPerSecond: 20}}});
+    canal = sb.channel(topic, {config: {broadcast: {self: false}}});
+    canal.on("broadcast", {event: "m"}, ({payload}) => { try { quand(payload); } catch(x) {} });
+    canal.subscribe(st => {
+      const ok = st === "SUBSCRIBED";
+      if (ok && !pret) { pret = true; const a = attente; attente = []; a.forEach(o => envoyer(topic, o)); }
+      if (!ok && st !== "SUBSCRIBED") pret = st === "SUBSCRIBED";
+      etat(ok);
+    });
+    return canal;
+  }
   const es = new EventSource(RELAIS + topic + "/sse");
   es.onopen = () => etat(true);
   es.onerror = () => etat(false);
@@ -307,7 +331,7 @@ function telecommande(){
       dessinerEquipes();
     }
   }, ok => {
-    $("etatT").textContent = ok ? "● Relais connecté" : "○ Relais injoignable, nouvel essai…";
+    $("etatT").textContent = ok ? "● Relais connecté" + (window.supabase ? " (Supabase)" : " (ntfy)") : "○ Relais injoignable, nouvel essai…";
     $("etatT").style.color = ok ? "var(--vert)" : "var(--rouge)";
     if (ok) envoyer(topic, {m: "qui"});
   });
@@ -486,7 +510,7 @@ function panneau(code){
       } else if (m.m === "raz" && pourMoi(m)) { evs = []; silence = false; noter("SYSTEM NORMAL"); afficher(); }
       else if (m.m === "qui") envoyer(topic, {m: "ici", moi, equipe, etat: etatGlobal()});
     }, ok => {
-      $("etatP").textContent = ok ? "● Relié à la télécommande" : "○ Connexion perdue, nouvel essai…";
+      $("etatP").textContent = ok ? "● Relié à la télécommande" + (window.supabase ? "" : " (ntfy)") : "○ Connexion perdue, nouvel essai…";
       if (ok) envoyer(topic, {m: "ici", moi, equipe, etat: etatGlobal()});
     });
   };
