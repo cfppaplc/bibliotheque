@@ -7,12 +7,13 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.50.0/dist/umd/supabase.min.js"></script>
 <style>
-:root{--fond:#E9E6E0;--carte:#fff;--txt:#24211E;--gris:#6B665E;--ligne:#E2DDD3;--violet:#534AB7;--vert:#2E8B57;--rouge:#D93025}
+:root{--fond:#E9E6E0;--carte:#fff;--txt:#24211E;--gris:#6B665E;--ligne:#E2DDD3;--acc:#534AB7;--vert:#2E8B57;--rouge:#D93025}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:var(--fond);color:var(--txt);font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
-button{font:inherit;font-weight:700;border:0;border-radius:10px;cursor:pointer;touch-action:manipulation;color:#fff;background:var(--violet);padding:12px 14px}
+button{font:inherit;font-weight:700;border:0;border-radius:10px;cursor:pointer;touch-action:manipulation;color:#fff;background:var(--acc);padding:12px 14px}
 button:disabled{opacity:.4;cursor:default}
 input,select,textarea{font:inherit;font-size:16px;padding:10px;border-radius:10px;border:2px solid #C9C3B8;background:#fff;color:#24211E;width:100%}
+textarea{min-height:180px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:14px}
 .cache{display:none!important}
 .sous{color:var(--gris);font-size:13px}
 .wrap{max-width:1180px;margin:0 auto;padding:14px 16px 40px}
@@ -20,8 +21,11 @@ input,select,textarea{font:inherit;font-size:16px;padding:10px;border-radius:10p
 .carte h2{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--gris);margin:0 0 10px}
 .tbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}
 .tbar h1{font-size:20px;margin:0;flex:1}
-.tbar a{color:var(--violet);font-weight:700;text-decoration:none}
-.k0{background:#E21B3C}.k1{background:#1368CE}.k2{background:#D89E00}.k3{background:#26890C}
+.tbar a{color:var(--acc);font-weight:700;text-decoration:none}
+.k0{background:#C8323C}.k1{background:#2563A8}.k2{background:#C08A12}.k3{background:#2E7D32}
+.btn2{background:#F1EEE8;color:#24211E}
+.ctl{display:flex;gap:8px;flex-wrap:wrap}.ctl button{flex:1;min-width:140px}
+.logoC{height:34px;display:block;margin:0 auto 10px}
 
 /* rôle */
 #role{max-width:560px;margin:8vh auto;padding:16px}
@@ -33,13 +37,12 @@ input,select,textarea{font:inherit;font-size:16px;padding:10px;border-radius:10p
 /* télécommande */
 .grid{display:grid;grid-template-columns:330px 1fr;gap:14px;align-items:start}
 #qr{background:#fff;padding:8px;border-radius:10px;width:196px;height:196px;margin:0 auto}
-.code{font-size:34px;font-weight:900;letter-spacing:.12em;text-align:center;color:var(--violet);margin-top:6px;font-family:ui-monospace,Menlo,Consolas,monospace}
+.code{font-size:34px;font-weight:900;letter-spacing:.12em;text-align:center;color:var(--acc);margin-top:6px;font-family:ui-monospace,Menlo,Consolas,monospace}
 .etat{font-size:13px;text-align:center;margin-top:4px}
-.qz{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--ligne)}
-.qz div{flex:1}.qz b{display:block}
+.qz{display:flex;align-items:center;gap:8px;padding:10px 0;border-top:1px solid var(--ligne);flex-wrap:wrap}
+.qz .t{flex:1;min-width:200px}.qz b{display:block}
 .qz button{padding:9px 12px;font-size:14px}
-.btn2{background:#F1EEE8;color:#24211E}
-.ctl{display:flex;gap:8px;flex-wrap:wrap}.ctl button{flex:1;min-width:150px}
+.qz i{width:10px;height:38px;border-radius:5px;flex:none}
 #qCour{font-size:18px;font-weight:800;margin:6px 0}
 table{width:100%;border-collapse:collapse;font-size:14px}
 td,th{padding:8px 6px;border-top:1px solid var(--ligne);text-align:left}
@@ -49,49 +52,79 @@ th{font-size:12px;color:var(--gris);border-top:0}
 @media (max-width:820px){.grid{grid-template-columns:1fr}}
 
 /* éditeur */
-.qe{border:1px solid var(--ligne);border-radius:12px;padding:12px;margin-bottom:10px}
+.reg{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin:12px 0}
+.reg label{font-size:13px;font-weight:700;color:var(--gris);display:flex;flex-direction:column;gap:5px}
+.seg{display:flex;gap:4px;flex-wrap:wrap}.seg button{flex:1;padding:9px 8px;font-size:13px;background:#F1EEE8;color:#24211E}.seg button.on{background:var(--acc);color:#fff}
+.coul{display:flex;gap:8px}.coul button{width:34px;height:34px;padding:0;border-radius:50%;border:3px solid transparent}.coul button.on{border-color:#24211E}
+.qe{border:1px solid var(--ligne);border-radius:12px;padding:12px;margin-bottom:10px;background:#FCFBF9}
 .qe .ln{display:grid;grid-template-columns:28px 1fr;gap:8px;align-items:center;margin-top:6px}
 .qe .ln input[type=radio]{width:22px;height:22px}
-.qe .tete{display:flex;gap:8px;align-items:center}
+.qe .tete{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
 .qe .tete b{flex:1}
+.qe .tete button,.qe .tete select{width:auto;padding:7px 10px;font-size:13px}
+.qe .img{display:flex;gap:10px;align-items:center;margin-top:8px}
+.qe .img img{height:70px;border-radius:8px}
+.qe textarea.ex{min-height:0;height:46px;font-family:inherit;font-size:14px;margin-top:8px}
 
 /* joueur */
-#joueur{min-height:100vh;background:#2E2775;color:#fff;display:flex;align-items:center;justify-content:center;padding:18px}
+#joueur{min-height:100vh;background:var(--fondJ,#2B2A3D);color:#fff;display:flex;align-items:center;justify-content:center;padding:18px 18px 56px}
 #joueur .bx{width:min(860px,100%);text-align:center}
 #joueur input{font-size:24px;text-align:center;margin:14px 0}
 #joueur h2{font-size:clamp(20px,3.4vw,30px);margin:0 0 18px;line-height:1.25}
 .ch4{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.ch4 button{min-height:120px;font-size:clamp(16px,2.4vw,22px);border-radius:14px;display:flex;align-items:center;gap:12px;padding:16px;text-align:left}
-.ch4 button i{font-style:normal;font-size:26px}
-.ch4 button.pas{opacity:.3}.ch4 button.bon{outline:5px solid #fff}
-.gros{font-size:clamp(28px,6vw,54px);font-weight:900;margin:10px 0}
-.rang{font-size:clamp(18px,3vw,26px);background:rgba(255,255,255,.12);border-radius:14px;padding:14px;margin-top:14px}
-.chrono{height:8px;border-radius:8px;background:rgba(255,255,255,.2);overflow:hidden;margin:14px 0}.chrono i{display:block;height:100%;background:#fff}
-.nomj{position:fixed;top:12px;left:16px;font-weight:800;opacity:.8}.ptsj{position:fixed;top:12px;right:16px;font-weight:800;opacity:.8}
+.ch4 button{min-height:120px;font-size:clamp(16px,2.4vw,22px);border-radius:14px;display:flex;align-items:center;gap:12px;padding:16px;text-align:left;transition:opacity .3s,transform .2s}
+.ch4 button i{font-style:normal;font-size:24px;opacity:.85}
+.ch4 button.pas{opacity:.25}.ch4 button:active{transform:scale(.98)}
+.gros{font-size:clamp(26px,5.5vw,48px);font-weight:800;margin:10px 0}
+.rang{font-size:clamp(17px,2.8vw,24px);background:rgba(255,255,255,.1);border-radius:14px;padding:14px;margin-top:14px}
+.rang .fl{font-weight:800;margin-left:8px}.fl.mo{color:#7CF0A8}.fl.de{color:#FFB4A8}
+.chrono{height:6px;border-radius:6px;background:rgba(255,255,255,.18);overflow:hidden;margin:14px 0}.chrono i{display:block;height:100%;background:#fff}
+.expl{background:rgba(255,255,255,.08);border-left:4px solid rgba(255,255,255,.5);border-radius:8px;padding:10px 14px;margin-top:14px;text-align:left;font-size:15px;line-height:1.45}
+.nomj{position:fixed;top:12px;left:16px;font-weight:800;opacity:.85}.ptsj{position:fixed;top:12px;right:16px;font-weight:800;opacity:.85}
+.coche{width:96px;height:96px;margin:0 auto;display:block}
+.coche circle{stroke:#7CF0A8;stroke-width:5;fill:none;stroke-dasharray:283;stroke-dashoffset:283;animation:trace .6s ease-out forwards}
+.coche path{stroke:#7CF0A8;stroke-width:7;fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:80;stroke-dashoffset:80;animation:trace .35s .45s ease-out forwards}
+.croix path{stroke:#FFB4A8;stroke-width:7;fill:none;stroke-linecap:round;stroke-dasharray:60;stroke-dashoffset:60;animation:trace .3s ease-out forwards}
+.croix path+path{animation-delay:.15s}
+@keyframes trace{to{stroke-dashoffset:0}}
+.secoue{animation:secoue .45s}
+@keyframes secoue{20%,60%{transform:translateX(-7px)}40%,80%{transform:translateX(7px)}}
+.monte{animation:monte .5s ease-out both}
+@keyframes monte{from{opacity:0;transform:translateY(14px)}}
 
 /* écran de classe */
-#ecr{min-height:100vh;background:#16181C;color:#F2EFEA;padding:3vh 3vw}
+#ecr{min-height:100vh;background:#16181C;color:#F2EFEA;padding:3vh 3vw;position:relative}
 #ecr .haut{display:flex;justify-content:space-between;align-items:center;margin-bottom:2vh}
-#ecr .logoE{height:3.2vw;margin-right:1.2vw;vertical-align:middle}
-.logoC{height:34px;display:block;margin:0 auto 10px}
-#ecr .haut b{font-size:2.2vw}#ecr .haut span{font-size:1.4vw;color:#B5AFA6}
+#ecr .haut b{font-size:2.1vw}#ecr .haut span{font-size:1.3vw;color:#B5AFA6}
+#ecr .logoE{height:3vw;margin-right:1.2vw;vertical-align:middle}
+#ecr .liseret{position:absolute;left:0;right:0;top:0;height:.6vh;background:var(--acc)}
 .lob{display:grid;grid-template-columns:auto 1fr;gap:4vw;align-items:center}
 .lob .qr{background:#fff;padding:1.2vw;border-radius:1.2vw}
-.lob .code{font-size:6vw;color:#fff;text-align:left}
+.lob .code{font-size:6vw;color:#fff;text-align:left;font-weight:900;letter-spacing:.12em}
 .lob .noms{display:flex;flex-wrap:wrap;gap:.8vw;margin-top:2vh}
-.lob .noms span{background:#534AB7;border-radius:3vw;padding:.8vw 1.6vw;font-size:1.6vw;font-weight:800;animation:pop .4s}
+.lob .noms span{background:var(--acc);border-radius:3vw;padding:.8vw 1.6vw;font-size:1.6vw;font-weight:800;animation:pop .4s}
+.son{position:absolute;right:3vw;bottom:3vh;background:#2B2E35;color:#F2EFEA;font-size:1.2vw;padding:.8vw 1.4vw}
 @keyframes pop{from{transform:scale(.6);opacity:0}}
-.eq{font-size:3vw;font-weight:800;text-align:center;margin:2vh 0 3vh;line-height:1.25}
+.eq{font-size:2.9vw;font-weight:800;text-align:center;margin:1vh 0 2.5vh;line-height:1.25}
+.eimg{display:block;max-height:34vh;max-width:60vw;margin:0 auto 2.5vh;border-radius:1vw}
 .ech{display:grid;grid-template-columns:1fr 1fr;gap:1.4vw}
-.ech div{border-radius:1.2vw;padding:2.2vw;font-size:2vw;font-weight:800;display:flex;justify-content:space-between;align-items:center}
-.ech div.pas{opacity:.3}.ech em{font-style:normal;font-size:2.4vw;background:rgba(0,0,0,.25);border-radius:1vw;padding:.2vw 1vw}
+.ech div{border-radius:1.2vw;padding:2vw 2.2vw;font-size:2vw;font-weight:800;display:flex;justify-content:space-between;align-items:center;gap:1vw;position:relative;overflow:hidden;transition:opacity .5s}
+.ech div.pas{opacity:.25}
+.ech div.bon{box-shadow:0 0 0 .35vw #fff;animation:lueur 1.6s ease-in-out 2}
+@keyframes lueur{50%{box-shadow:0 0 0 .35vw #fff,0 0 3vw .6vw rgba(255,255,255,.35)}}
+.ech em{font-style:normal;font-size:2.2vw;background:rgba(0,0,0,.25);border-radius:1vw;padding:.2vw 1vw}
+.ech .bar{position:absolute;left:0;bottom:0;height:.6vw;background:rgba(255,255,255,.55);width:0;transition:width .9s ease-out}
 .cpt{display:flex;justify-content:space-between;align-items:center;margin-top:3vh;font-size:1.8vw;color:#B5AFA6}.cpt b{font-size:4vw;color:#fff}
-.lg{display:grid;grid-template-columns:4vw 1fr auto;gap:1vw;align-items:center;background:#22252B;border-radius:1vw;padding:1.2vw 1.6vw;margin-bottom:1vh;font-size:2vw}
-.lg .r{font-weight:900;color:#B5AFA6}.lg b{font-weight:900}
+.eexpl{margin-top:3vh;font-size:1.7vw;color:#D9D4CC;background:#22252B;border-left:.4vw solid var(--acc);border-radius:.8vw;padding:1.4vw 2vw}
+.lgs{position:relative}
+.lg{display:grid;grid-template-columns:4vw 1fr auto;gap:1vw;align-items:center;background:#22252B;border-radius:1vw;padding:1.1vw 1.6vw;margin-bottom:1vh;font-size:1.9vw;transition:transform .7s cubic-bezier(.2,.8,.2,1)}
+.lg .r{font-weight:900;color:#B5AFA6}.lg b{font-weight:900}.lg small{color:#7CF0A8;font-weight:800;margin-right:1.2vw;font-size:1.4vw}
 .podium{display:flex;justify-content:center;align-items:flex-end;gap:2vw;margin:4vh 0}
-.podium div{width:16vw;border-radius:1.2vw 1.2vw 0 0;text-align:center;padding:1.5vw;font-weight:900;font-size:1.8vw}
-.podium .p1{background:#D89E00;height:32vh}.podium .p2{background:#8A8F98;height:25vh}.podium .p3{background:#A0582B;height:20vh}
+.podium div{width:16vw;border-radius:1.2vw 1.2vw 0 0;text-align:center;padding:1.5vw;font-weight:800;font-size:1.8vw;transform-origin:bottom;animation:leve .9s cubic-bezier(.2,.8,.2,1) both}
+.podium .p1{background:#B8901C;height:32vh;animation-delay:.9s}.podium .p2{background:#8A8F98;height:25vh;animation-delay:.45s}.podium .p3{background:#94603A;height:20vh}
 .podium b{display:block;font-size:4vw}
+@keyframes leve{from{transform:scaleY(0);opacity:0}}
+@media (prefers-reduced-motion:reduce){.coche circle,.coche path,.croix path{animation-duration:.01s}.podium div,.secoue,.monte,.ech div.bon{animation:none}}
 </style>
 </head>
 <body>
@@ -104,13 +137,13 @@ th{font-size:12px;color:var(--gris);border-top:0}
 <div id="rCode" class="cache"><div class="sous" style="margin-top:14px">Tape le code affiché sur la télécommande</div>
 <input id="rIn" inputmode="numeric" maxlength="7" placeholder="000 000"><button id="rGo" style="width:100%">Afficher l'écran de classe</button></div>
 <div class="sous" style="margin-top:14px">Les élèves scannent le code QR : leur iPad devient une manette.</div>
-<div style="margin-top:14px"><a href="labo.html" style="color:var(--violet);font-weight:700;text-decoration:none">‹ Labo interactif</a></div></div></div>
+<div style="margin-top:14px"><a href="labo.html" style="color:var(--acc);font-weight:700;text-decoration:none">‹ Labo interactif</a></div></div></div>
 
 <!-- ============ ÉCRAN DE CLASSE ============ -->
 <div id="ecr" class="cache"></div>
 
 <!-- ============ JOUEUR ============ -->
-<div id="joueur" class="cache"><img src="img/pavillon-avenir-blanc.png" alt="" style="position:fixed;bottom:14px;left:50%;transform:translateX(-50%);height:24px;opacity:.7"><div class="nomj" id="nomJ"></div><div class="ptsj" id="ptsJ"></div><div class="bx" id="jBx"></div></div>
+<div id="joueur" class="cache"><img src="img/pavillon-avenir-blanc.png" alt="" style="position:fixed;bottom:14px;left:50%;transform:translateX(-50%);height:24px;opacity:.6"><div class="nomj" id="nomJ"></div><div class="ptsj" id="ptsJ"></div><div class="bx" id="jBx"></div></div>
 
 <!-- ============ TÉLÉCOMMANDE ============ -->
 <div id="tele" class="cache"><div class="wrap">
@@ -122,39 +155,61 @@ th{font-size:12px;color:var(--gris);border-top:0}
 <div class="carte"><h2>Participants <span id="nbP"></span></h2><div id="listeLob" class="sous">Personne pour l'instant.</div></div>
 </div>
 <div>
-<!-- choix du quiz -->
 <div id="vChoix">
-<div class="carte"><h2>Choisis un quiz</h2><div id="quizListe"></div>
-<div class="ctl" style="margin-top:12px"><button id="bNouveau">+ Créer un quiz</button><button class="btn2" id="bImport">Importer un fichier</button><input type="file" id="fImport" accept=".json,application/json" class="cache"></div></div>
+<div class="carte"><h2>Mes quiz</h2><div id="quizListe"></div>
+<div class="ctl" style="margin-top:12px"><button id="bNouveau">+ Créer un quiz</button><button class="btn2" id="bColler">Coller des questions</button><button class="btn2" id="bImport">Importer un fichier</button><input type="file" id="fImport" accept=".json,application/json" class="cache"></div></div>
 </div>
-<!-- éditeur -->
+<div id="vColler" class="cache"><div class="carte"><h2>Coller des questions</h2>
+<div class="sous" style="margin-bottom:8px">Une question par bloc, séparés par une ligne vide. Mets une <b>*</b> devant la bonne réponse et un <b>-</b> devant les autres (2 à 4 choix). Une ligne qui commence par <b>?</b> ajoute une explication.</div>
+<textarea id="tColler" placeholder="Quel signal donne une vanne de gicleurs fermée ?
+- Alarme
+* Supervision
+- Trouble
+? Un système de protection n'est plus prêt : c'est une supervision.
+
+Le propane s'accumule…
+* Au sol
+- Au plafond"></textarea>
+<div class="ctl" style="margin-top:10px"><button id="cOk">Créer le quiz</button><button class="btn2" id="cAnnule">Annuler</button></div><div id="cMsg" class="sous" style="margin-top:6px"></div></div></div>
 <div id="vEdit" class="cache">
 <div class="carte"><h2>Créer ou modifier un quiz</h2>
 <input id="eTitre" placeholder="Titre du quiz" maxlength="80" style="font-size:18px;font-weight:700">
-<div id="eQs" style="margin-top:12px"></div>
-<div class="ctl"><button class="btn2" id="eAjout">+ Ajouter une question</button><button id="eSauve">Enregistrer</button><button class="btn2" id="eAnnule">Annuler</button></div>
+<div class="reg">
+<label>Qui joue<div class="seg" data-r="mode"><button data-v="ind">Chaque élève</button><button data-v="eq">En équipes</button></div></label>
+<label>Points<div class="seg" data-r="points"><button data-v="vitesse">Selon la vitesse</button><button data-v="fixe">Fixes</button><button data-v="aucun">Sans points</button></div></label>
+<label>Classement après chaque question<div class="seg" data-r="classement"><button data-v="oui">Oui</button><button data-v="non">À la fin seulement</button></div></label>
+<label>Ordre<div class="seg" data-r="melange"><button data-v="non">Tel quel</button><button data-v="q">Questions mêlées</button><button data-v="tout">Questions et choix mêlés</button></div></label>
+<label>Sons au tableau<div class="seg" data-r="son"><button data-v="oui">Oui</button><button data-v="non">Non</button></div></label>
+<label>Couleur du quiz<div class="coul" id="eCoul"></div></label>
+</div>
+<div id="eQs"></div>
+<div class="ctl"><button class="btn2" id="eAjout">+ Question à choix</button><button class="btn2" id="eAjoutVF">+ Vrai ou faux</button><button id="eSauve">Enregistrer</button><button class="btn2" id="eAnnule">Annuler</button></div>
 <div class="sous" style="margin-top:8px">Le quiz est gardé sur cet appareil. « Exporter » (dans la liste) te donne un fichier à garder ou à partager à un collègue.</div></div>
 </div>
-<!-- partie -->
 <div id="vJeu" class="cache">
 <div class="carte"><h2 id="jTitre"></h2><div id="qCour">En attente des participants…</div><div class="sous" id="qInfo"></div>
 <div class="ctl" style="margin-top:12px"><button id="bGo">Commencer</button><button id="bSuite" class="btn2" disabled>Question suivante</button><button id="bFin" class="btn2">Quitter la partie</button></div></div>
 <div class="carte"><h2>Qui a répondu</h2>
-<table><thead><tr><th>Participant</th><th style="width:28%">Cette question</th><th style="width:14%">Points</th><th style="width:10%">Rang</th></tr></thead><tbody id="tRep"></tbody></table></div>
+<table><thead><tr><th>Participant</th><th style="width:34%">Cette question</th><th style="width:12%">Points</th><th style="width:10%">Rang</th></tr></thead><tbody id="tRep"></tbody></table></div>
 </div>
 </div></div>
 </div></div>
 
 <script>
-/* Quiz maison — Labo interactif. Même relais que le simulateur : Supabase Realtime (broadcast), ntfy.sh en secours.
-   Télécommande = autorité (questions, points, rangs). Messages :
-   télécommande → tous : q (question), rev (réponse + points + rang de chacun), fin (classement final), vue (pour l'écran)
-   joueur → télécommande : ici (arrivée), rep (réponse) ; écran → télécommande : ecran? */
+/* Quiz maison — Labo interactif (Pavillon de l'Avenir). Même relais que le simulateur : Supabase Realtime (broadcast), ntfy.sh en secours.
+   Télécommande = autorité (ordre, points, rangs). Messages :
+   télécommande → tous : bienvenue, q (question), img (image pour l'écran), rev (réponse + résultat de chacun), fin, attente, vue (écran)
+   joueur → télécommande : ici, rep ; écran → télécommande : ecran? */
 const RELAIS = "https://ntfy.sh/", PREFIXE = "pda-quiz-";
 const SB_URL = "https://kjlotlhqrgekzohshmbn.supabase.co", SB_CLE = "sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY";
 const $ = id => document.getElementById(id);
-const esc = s => String(s).replace(/[&<>"]/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"})[c]);
+const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"})[c]);
 const SYMB = ["▲", "◆", "●", "■"];
+const COULEURS = ["#534AB7", "#B3261E", "#185FA5", "#0F6E56", "#854F0B", "#3A3936"];
+const REG_DEF = {mode: "ind", points: "vitesse", classement: "oui", melange: "non", son: "oui", coul: "#534AB7"};
+const sombre = h => { const n = parseInt(h.slice(1), 16), f = .38; return `rgb(${Math.round((n >> 16) * f + 18)},${Math.round((n >> 8 & 255) * f + 18)},${Math.round((n & 255) * f + 24)})`; };
+const ord = r => r + (r === 1 ? "er" : "e");
+
 let canal = null, pret = false, attente = [];
 function envoyer(topic, obj){
   if (window.supabase) { if (!pret) { attente.push(obj); return; } canal.send({type: "broadcast", event: "m", payload: obj}).catch(() => {}); return; }
@@ -172,19 +227,24 @@ function ecouter(topic, quand, etat){
   es.onopen = () => etat(true); es.onerror = () => etat(false);
   es.onmessage = e => { try { const d = JSON.parse(e.data); if (d.event === "message") quand(JSON.parse(d.message)); } catch(x) {} };
 }
-const stock = {get(k, d){ try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch(e) { return d; } }, set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e) {} }};
+const stock = {get(k, d){ try { const v = JSON.parse(localStorage.getItem(k)); return v == null ? d : v; } catch(e) { return d; } }, set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch(e) { return false; } }};
+function compter(el, de, a, ms){ // chiffres qui montent doucement
+  if (!el) return; const t0 = performance.now();
+  const pas = t => { const k = Math.min(1, (t - t0) / ms); el.textContent = Math.round(de + (a - de) * (1 - Math.pow(1 - k, 3))); if (k < 1) requestAnimationFrame(pas); };
+  requestAnimationFrame(pas);
+}
 
 /* Quiz d'exemple (protection incendie, modules 1 à 5) */
-const EXEMPLE = {id: "exemple-incendie", exemple: true, titre: "Protection incendie : révision des modules 1 à 5", qs: [
-  {q: "Quel élément manque au triangle du feu pour faire le tétraèdre ?", ch: ["L'oxygène", "La réaction en chaîne", "La chaleur", "Le combustible"], bon: 1, s: 20},
-  {q: "Un feu d'huile de cuisson dans une friteuse est de classe…", ch: ["A", "B", "C", "K"], bon: 3, s: 20},
-  {q: "Le propane qui fuit s'accumule…", ch: ["Au plafond", "Au sol et dans le sous-sol", "Il se mélange partout", "Dans les conduits"], bon: 1, s: 20},
+const EXEMPLE = {id: "exemple-incendie", exemple: true, titre: "Protection incendie : révision des modules 1 à 5", reg: Object.assign({}, REG_DEF, {coul: "#B3261E"}), qs: [
+  {q: "Quel élément manque au triangle du feu pour faire le tétraèdre ?", ch: ["L'oxygène", "La réaction en chaîne", "La chaleur", "Le combustible"], bon: 1, s: 20, expl: "La réaction en chaîne entretient le feu; la poudre ABC agit surtout sur elle."},
+  {q: "Un feu d'huile de cuisson dans une friteuse est de classe…", ch: ["A", "B", "C", "K"], bon: 3, s: 20, expl: "Classe K : huiles et graisses de cuisson. On utilise l'agent humide de la hotte ou un extincteur K."},
+  {q: "Le propane qui fuit s'accumule…", ch: ["Au plafond", "Au sol et dans le sous-sol", "Il se mélange partout", "Dans les conduits"], bon: 1, s: 20, expl: "Densité ≈ 1,5 : plus lourd que l'air, il coule vers le bas."},
   {q: "Un extincteur à poudre ABC éteint surtout en…", ch: ["Refroidissant", "Brisant la réaction en chaîne", "Ajoutant de l'eau", "Retirant le combustible"], bon: 1, s: 20},
-  {q: "Hauteur maximale du dessus d'un extincteur de moins de 18 kg ?", ch: ["1,00 m", "1,53 m", "1,80 m", "2,00 m"], bon: 1, s: 20},
-  {q: "Le détecteur le mieux adapté au stationnement souterrain :", ch: ["À ionisation", "Photoélectrique", "Thermique", "De CO"], bon: 2, s: 20},
+  {q: "Hauteur maximale du dessus d'un extincteur de moins de 18 kg ?", ch: ["1,00 m", "1,53 m", "1,80 m", "2,00 m"], bon: 1, s: 20, expl: "NFPA 10 : 1,53 m (5 pi) au maximum, et au moins 10 cm du plancher."},
+  {q: "Le détecteur le mieux adapté au stationnement souterrain :", ch: ["À ionisation", "Photoélectrique", "Thermique", "De CO"], bon: 2, s: 20, expl: "Gaz d'échappement et poussière : un détecteur de fumée y ferait trop de fausses alarmes."},
   {q: "Un avertisseur de fumée se remplace au plus tard…", ch: ["Après 5 ans", "Après 10 ans", "Après 15 ans", "Quand il ne sonne plus"], bon: 1, s: 20},
-  {q: "Une vanne de gicleurs fermée donne un signal de…", ch: ["Alarme", "Supervision", "Trouble", "Aucun signal"], bon: 1, s: 15},
-  {q: "En classe B, un fil coupé fait afficher…", ch: ["Une alarme", "Un trouble", "Une supervision", "Rien"], bon: 1, s: 15},
+  {q: "Une vanne de gicleurs fermée donne un signal de…", ch: ["Alarme", "Supervision", "Trouble", "Aucun signal"], bon: 1, s: 15, expl: "Supervision : un système de protection n'est plus prêt à fonctionner."},
+  {q: "En classe B, un fil coupé ne change rien à la protection.", ch: ["Vrai", "Faux"], bon: 1, s: 15, expl: "Faux : les appareils au-delà de la coupure ne protègent plus. Le panneau affiche un trouble."},
   {q: "Qui autorise le réarmement après une alarme ?", ch: ["Le préposé", "Le gestionnaire", "Le service incendie", "La télésurveillance"], bon: 2, s: 15}
 ]};
 function mesQuiz(){ return stock.get("quizMaison", []); }
@@ -213,9 +273,18 @@ function telecommande(){
   $("code").textContent = code.slice(0, 3) + " " + code.slice(3);
   try { new QRCode($("qr"), {text: url, width: 180, height: 180, correctLevel: QRCode.CorrectLevel.M}); } catch(e) { $("qr").innerHTML = '<div class="sous" style="word-break:break-all">' + esc(url) + "</div>"; }
 
-  const P = {};       // pid → {nom, pts}
-  const G = {quiz: null, i: -1, etat: "choix", t0: 0, reps: {}};   // etat : choix | lobby | question | rev | fin
-  const rangs = () => { const l = Object.entries(P).sort((a, b) => b[1].pts - a[1].pts); const r = {}; l.forEach(([id], k) => r[id] = k + 1); return r; };
+  const P = {};   // pid → {nom, pts, bons}
+  const G = {quiz: null, jeu: [], i: -1, etat: "choix", t0: 0, reps: {}};   // etat : choix | lobby | question | rev | fin
+  const R = () => Object.assign({}, REG_DEF, G.quiz && G.quiz.reg);
+  const rangs = () => { const l = Object.entries(P).sort((a, b) => b[1].pts - a[1].pts || (b[1].bons || 0) - (a[1].bons || 0) || a[1].nom.localeCompare(b[1].nom)); const r = {}; l.forEach(([id], k) => r[id] = k + 1); return r; };
+  const melanger = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+  function preparer(){ // ordre et choix selon les réglages
+    const r = R(); let qs = G.quiz.qs.map(q => JSON.parse(JSON.stringify(q)));
+    if (r.melange !== "non") qs = melanger(qs);
+    if (r.melange === "tout") qs.forEach(Q => { if (Q.ch.length === 2 && /^vrai$/i.test(Q.ch[0])) return; const p = melanger(Q.ch.map((_, k) => k)); Q.ch = p.map(k => Q.ch[k]); Q.bon = p.indexOf(Q.bon); });
+    G.jeu = qs;
+  }
+  const appliquerCouleur = () => document.documentElement.style.setProperty("--acc", R().coul);
 
   function listeLob(){
     const ids = Object.keys(P);
@@ -223,67 +292,73 @@ function telecommande(){
     $("listeLob").innerHTML = ids.length ? ids.map(id => esc(P[id].nom)).join(" · ") : "Personne pour l'instant.";
   }
   function table(){
-    const r = rangs(), Q = G.quiz && G.quiz.qs[G.i];
+    const r = rangs(), Q = G.jeu[G.i];
     $("tRep").innerHTML = Object.keys(P).sort((a, b) => r[a] - r[b]).map(id => {
       const x = G.reps[id]; let c = '<span class="att">—</span>';
       if (G.etat === "question") c = x ? '<span class="ok">✓ a répondu</span>' : '<span class="att">en attente…</span>';
-      else if (G.etat === "rev" && Q) c = x ? `<span class="pastille k${x.c}"></span><span class="${x.c === Q.bon ? "ok" : "ko"}">${x.c === Q.bon ? "Bonne +" + x.g : "Mauvaise"}</span>` : '<span class="ko">Pas répondu</span>';
+      else if (G.etat === "rev" && Q) c = x ? `<span class="pastille k${x.c}"></span>${esc(Q.ch[x.c])} · <span class="${x.c === Q.bon ? "ok" : "ko"}">${x.c === Q.bon ? (x.g ? "+" + x.g : "bonne") : "mauvaise"}</span>` : '<span class="ko">Pas répondu</span>';
       return `<tr><td><b>${esc(P[id].nom)}</b></td><td>${c}</td><td>${P[id].pts}</td><td>${G.etat === "lobby" ? "—" : r[id]}</td></tr>`;
     }).join("") || '<tr><td colspan="4" class="sous">Personne pour l\'instant.</td></tr>';
   }
   let vT = 0, vD = null;
-  function vue(){ if (vD) return; vD = setTimeout(() => { vD = null; vT = Date.now(); envoyer(topic, vueObj()); }, Math.max(0, 500 - (Date.now() - vT))); }
+  function vue(){ if (vD) return; vD = setTimeout(() => { vD = null; vT = Date.now(); envoyer(topic, vueObj()); }, Math.max(0, 450 - (Date.now() - vT))); }
   function vueObj(){
-    const Q = G.quiz && G.quiz.qs[G.i], r = rangs(), cpt = [0, 0, 0, 0];
+    const Q = G.jeu[G.i], r = rangs(), cpt = [0, 0, 0, 0], reg = R();
     Object.values(G.reps).forEach(x => cpt[x.c]++);
-    return {m: "vue", code, etat: G.etat === "choix" ? "lobby" : G.etat, titre: G.quiz ? G.quiz.titre : "Quiz maison", i: G.i, n: G.quiz ? G.quiz.qs.length : 0, t0: G.t0, now: Date.now(),
-      q: Q ? {q: Q.q, ch: Q.ch, s: Q.s} : null, bon: G.etat === "rev" ? Q.bon : null, cpt, nrep: Object.keys(G.reps).length,
-      joueurs: Object.keys(P).map(id => ({n: P[id].nom, pts: P[id].pts, r: r[id]})).sort((a, b) => a.r - b.r)};
+    return {m: "vue", code, etat: G.etat === "choix" ? "lobby" : G.etat, titre: G.quiz ? G.quiz.titre : "Quiz maison", i: G.i, n: G.jeu.length, t0: G.t0, now: Date.now(),
+      reg: {coul: reg.coul, son: reg.son, classement: reg.classement, points: reg.points, mode: reg.mode},
+      q: Q && ["question", "rev"].includes(G.etat) ? {q: Q.q, ch: Q.ch, s: Q.s, img: !!Q.img, expl: G.etat === "rev" ? Q.expl || "" : ""} : null, bon: G.etat === "rev" ? Q.bon : null, cpt, nrep: Object.keys(G.reps).length,
+      joueurs: Object.keys(P).map(id => ({n: P[id].nom, pts: P[id].pts, r: r[id], g: G.etat === "rev" && G.reps[id] ? G.reps[id].g || 0 : 0})).sort((a, b) => a.r - b.r)};
   }
   function maj(){
     if (!G.quiz) { listeLob(); vue(); return; }
-    const Q = G.quiz.qs[G.i];
-    $("jTitre").textContent = G.quiz ? G.quiz.titre : "";
-    $("qCour").textContent = G.etat === "lobby" ? "En attente des participants…" : G.etat === "fin" ? "Partie terminée : classement envoyé à chaque participant." : (G.i + 1) + ". " + Q.q;
+    const Q = G.jeu[G.i];
+    $("jTitre").textContent = G.quiz.titre;
+    $("qCour").textContent = G.etat === "lobby" ? "En attente des participants…" : G.etat === "fin" ? "Partie terminée : le classement final est sur chaque iPad." : (G.i + 1) + ". " + Q.q;
     $("qInfo").textContent = G.etat === "question" ? Object.keys(G.reps).length + " réponse(s) sur " + Object.keys(P).length + " · " + Q.s + " s" :
-      G.etat === "rev" ? "Bonne réponse : " + Q.ch[Q.bon] + " · le rang de chacun est envoyé sur son iPad." : G.quiz ? G.quiz.qs.length + " questions" : "";
+      G.etat === "rev" ? "Bonne réponse : " + Q.ch[Q.bon] + (R().classement === "oui" ? " · le rang de chacun est envoyé sur son iPad." : "") : G.quiz.qs.length + " questions";
     $("bGo").disabled = G.etat !== "lobby";
     $("bSuite").disabled = !["question", "rev"].includes(G.etat);
-    $("bSuite").textContent = G.etat === "question" ? "Montrer la réponse" : G.i + 1 >= (G.quiz ? G.quiz.qs.length : 0) ? "Voir le podium" : "Question suivante";
+    $("bSuite").textContent = G.etat === "question" ? "Montrer la réponse" : G.i + 1 >= G.jeu.length ? "Voir le podium" : "Question suivante";
     table(); listeLob(); vue();
   }
   let minut = null;
+  function qMsg(pour){ const Q = G.jeu[G.i]; return {m: "q", pour, i: G.i, n: G.jeu.length, q: Q.q, ch: Q.ch, t0: G.t0, s: Q.s, coul: R().coul}; }
   function question(){
-    clearTimeout(minut); G.etat = "question"; G.reps = {}; G.t0 = Date.now();
-    const Q = G.quiz.qs[G.i];
-    envoyer(topic, {m: "q", i: G.i, n: G.quiz.qs.length, q: Q.q, ch: Q.ch, t0: G.t0, s: Q.s});
-    minut = setTimeout(reveler, Q.s * 1000 + 400); maj();
+    clearTimeout(minut); G.etat = "question"; G.reps = {}; G.t0 = Date.now() + 600;
+    const Q = G.jeu[G.i];
+    if (Q.img) envoyer(topic, {m: "img", i: G.i, data: Q.img});
+    envoyer(topic, qMsg());
+    minut = setTimeout(reveler, Q.s * 1000 + 1000); maj();
   }
   function reveler(){
     if (G.etat !== "question") return; clearTimeout(minut); G.etat = "rev";
-    const Q = G.quiz.qs[G.i];
-    Object.entries(G.reps).forEach(([id, x]) => { x.g = x.c === Q.bon ? Math.round(1000 - 500 * Math.min(1, x.ms / (Q.s * 1000))) : 0; if (P[id]) P[id].pts += x.g; });
+    const Q = G.jeu[G.i], reg = R(), avant = rangs();
+    Object.entries(G.reps).forEach(([id, x]) => {
+      const bon = x.c === Q.bon;
+      x.g = !bon || reg.points === "aucun" ? 0 : reg.points === "fixe" ? 1000 : Math.round(1000 - 500 * Math.min(1, Math.max(0, x.ms) / (Q.s * 1000)));
+      if (P[id]) { P[id].pts += x.g; P[id].bons = (P[id].bons || 0) + (bon ? 1 : 0); }
+    });
     const r = rangs(), n = Object.keys(P).length, res = {};
-    Object.keys(P).forEach(id => { const x = G.reps[id]; res[id] = {rep: x ? x.c : -1, g: x ? x.g : 0, pts: P[id].pts, rang: r[id]}; });
-    envoyer(topic, {m: "rev", i: G.i, bon: Q.bon, bonTxt: Q.ch[Q.bon], res, n}); maj();
+    Object.keys(P).forEach(id => { const x = G.reps[id]; res[id] = {rep: x ? x.c : -1, g: x ? x.g : 0, pts: P[id].pts, rang: r[id], avant: avant[id], bons: P[id].bons || 0}; });
+    envoyer(topic, {m: "rev", i: G.i, bon: Q.bon, bonTxt: Q.ch[Q.bon], expl: Q.expl || "", res, n, classement: reg.classement, points: reg.points}); maj();
   }
   function finir(){
     clearTimeout(minut); G.etat = "fin";
     const r = rangs(), n = Object.keys(P).length, res = {};
-    Object.keys(P).forEach(id => res[id] = {pts: P[id].pts, rang: r[id]});
-    envoyer(topic, {m: "fin", res, n}); maj(); envoyer(topic, vueObj());
+    Object.keys(P).forEach(id => res[id] = {pts: P[id].pts, rang: r[id], bons: P[id].bons || 0});
+    envoyer(topic, {m: "fin", res, n, total: G.jeu.length, points: R().points}); maj(); envoyer(topic, vueObj());
   }
-  $("bGo").onclick = () => { if (!G.quiz) return; Object.values(P).forEach(p => p.pts = 0); G.i = 0; question(); };
-  $("bSuite").onclick = () => { if (G.etat === "question") { reveler(); return; } if (G.i + 1 >= G.quiz.qs.length) { finir(); return; } G.i++; question(); };
-  $("bFin").onclick = () => { clearTimeout(minut); envoyer(topic, {m: "attente"}); G.quiz = null; G.etat = "choix"; G.i = -1; montrer("vChoix"); listeQuiz(); vue(); };
+  $("bGo").onclick = () => { if (!G.quiz) return; Object.values(P).forEach(p => { p.pts = 0; p.bons = 0; }); preparer(); G.i = 0; question(); };
+  $("bSuite").onclick = () => { if (G.etat === "question") { reveler(); return; } if (G.i + 1 >= G.jeu.length) { finir(); return; } G.i++; question(); };
+  $("bFin").onclick = () => { clearTimeout(minut); envoyer(topic, {m: "attente"}); G.quiz = null; G.etat = "choix"; G.i = -1; G.jeu = []; document.documentElement.style.removeProperty("--acc"); montrer("vChoix"); listeQuiz(); vue(); };
 
   ecouter(topic, m => {
-    if (m.m === "ecran?") { envoyer(topic, vueObj()); return; }
+    if (m.m === "ecran?") { envoyer(topic, vueObj()); const Q = G.jeu[G.i]; if (G.etat === "question" && Q && Q.img) envoyer(topic, {m: "img", i: G.i, data: Q.img}); return; }
     if (m.m === "ici") {
-      if (!P[m.pid]) P[m.pid] = {nom: m.nom, pts: 0}; else P[m.pid].nom = m.nom;
-      // celui qui arrive en retard voit la question en cours
-      if (G.etat === "question") { const Q = G.quiz.qs[G.i]; envoyer(topic, {m: "q", pour: m.pid, i: G.i, n: G.quiz.qs.length, q: Q.q, ch: Q.ch, t0: G.t0, s: Q.s}); }
-      else envoyer(topic, {m: "bienvenue", pour: m.pid, titre: G.quiz ? G.quiz.titre : ""});
+      if (!P[m.pid]) P[m.pid] = {nom: m.nom, pts: 0, bons: 0}; else P[m.pid].nom = m.nom;
+      if (G.etat === "question") envoyer(topic, qMsg(m.pid));
+      else envoyer(topic, {m: "bienvenue", pour: m.pid, titre: G.quiz ? G.quiz.titre : "", coul: R().coul, mode: R().mode});
       maj();
     } else if (m.m === "rep" && G.etat === "question" && m.i === G.i && P[m.pid] && !G.reps[m.pid]) {
       G.reps[m.pid] = {c: m.c, ms: Date.now() - G.t0}; maj();
@@ -291,68 +366,126 @@ function telecommande(){
     }
   }, ok => { $("etatT").textContent = ok ? "● Relais connecté" + (window.supabase ? " (Supabase)" : " (ntfy)") : "○ Relais injoignable, nouvel essai…"; $("etatT").style.color = ok ? "var(--vert)" : "var(--rouge)"; });
 
-  /* ----- liste et éditeur des quiz ----- */
-  function montrer(v){ ["vChoix", "vEdit", "vJeu"].forEach(x => $(x).classList.toggle("cache", x !== v)); }
+  /* ----- liste des quiz ----- */
+  function montrer(v){ ["vChoix", "vEdit", "vJeu", "vColler"].forEach(x => $(x).classList.toggle("cache", x !== v)); }
+  function avis(t){ $("quizListe").insertAdjacentHTML("afterbegin", `<div class="ko" style="margin-bottom:8px">${esc(t)}</div>`); }
+  function sauverListe(L){ if (!stock.set("quizMaison", L)) { avis("Mémoire de l'appareil pleine : enlève des images ou des quiz."); return false; } return true; }
   function listeQuiz(){
-    $("quizListe").innerHTML = tousQuiz().map(q => `<div class="qz"><div><b>${esc(q.titre)}</b><span class="sous">${q.qs.length} questions${q.exemple ? " · quiz d'exemple" : ""}</span></div>
-      <button data-jouer="${q.id}">Jouer</button>${q.exemple ? `<button class="btn2" data-copier="${q.id}">Copier et modifier</button>` : `<button class="btn2" data-modif="${q.id}">Modifier</button><button class="btn2" data-export="${q.id}">Exporter</button><button class="btn2" data-suppr="${q.id}">Supprimer</button>`}</div>`).join("");
-    document.querySelectorAll("[data-jouer]").forEach(b => b.onclick = () => { G.quiz = tousQuiz().find(q => q.id === b.dataset.jouer); G.etat = "lobby"; G.i = -1; montrer("vJeu"); envoyer(topic, {m: "bienvenue", titre: G.quiz.titre}); maj(); });
-    document.querySelectorAll("[data-modif]").forEach(b => b.onclick = () => editer(mesQuiz().find(q => q.id === b.dataset.modif)));
-    document.querySelectorAll("[data-copier]").forEach(b => b.onclick = () => { const q = JSON.parse(JSON.stringify(EXEMPLE)); delete q.exemple; q.id = "q" + Date.now(); q.titre += " (copie)"; editer(q, true); });
+    $("quizListe").innerHTML = tousQuiz().map(q => `<div class="qz"><i style="background:${esc((q.reg || {}).coul || REG_DEF.coul)}"></i><div class="t"><b>${esc(q.titre)}</b><span class="sous">${q.qs.length} questions${q.exemple ? " · quiz d'exemple" : ""}</span></div>
+      <button data-jouer="${q.id}">Jouer</button>${q.exemple ? `<button class="btn2" data-copier="${q.id}">Copier et modifier</button>` : `<button class="btn2" data-modif="${q.id}">Modifier</button><button class="btn2" data-dupl="${q.id}">Dupliquer</button><button class="btn2" data-export="${q.id}">Exporter</button><button class="btn2" data-suppr="${q.id}">Supprimer</button>`}</div>`).join("");
+    const trouve = id => JSON.parse(JSON.stringify(tousQuiz().find(q => q.id === id)));
+    document.querySelectorAll("[data-jouer]").forEach(b => b.onclick = () => {
+      G.quiz = trouve(b.dataset.jouer); G.etat = "lobby"; G.i = -1; G.jeu = []; appliquerCouleur(); montrer("vJeu");
+      envoyer(topic, {m: "bienvenue", titre: G.quiz.titre, coul: R().coul, mode: R().mode}); maj();
+    });
+    document.querySelectorAll("[data-modif]").forEach(b => b.onclick = () => editer(trouve(b.dataset.modif)));
+    document.querySelectorAll("[data-copier],[data-dupl]").forEach(b => b.onclick = () => { const q = trouve(b.dataset.copier || b.dataset.dupl); delete q.exemple; q.id = "q" + Date.now(); q.titre += " (copie)"; editer(q); });
     document.querySelectorAll("[data-export]").forEach(b => b.onclick = () => {
-      const q = mesQuiz().find(x => x.id === b.dataset.export), a = document.createElement("a");
-      a.href = URL.createObjectURL(new Blob([JSON.stringify({type: "quiz-pavillon", quiz: q}, null, 1)], {type: "application/json"}));
+      const q = trouve(b.dataset.export), a = document.createElement("a");
+      a.href = URL.createObjectURL(new Blob([JSON.stringify({type: "quiz-pavillon", quiz: q})], {type: "application/json"}));
       a.download = q.titre.replace(/[^\w\-àâçéèêëîïôûùüÿ ]/gi, "").slice(0, 50) + ".quiz.json"; a.click();
     });
     document.querySelectorAll("[data-suppr]").forEach(b => b.onclick = () => {
       if (b.dataset.sur !== "1") { b.dataset.sur = "1"; b.textContent = "Sûr ? Touche encore"; setTimeout(() => { b.dataset.sur = ""; b.textContent = "Supprimer"; }, 3000); return; }
-      stock.set("quizMaison", mesQuiz().filter(q => q.id !== b.dataset.suppr)); listeQuiz();
+      sauverListe(mesQuiz().filter(q => q.id !== b.dataset.suppr)); listeQuiz();
     });
   }
   $("bImport").onclick = () => $("fImport").click();
   $("fImport").onchange = async () => {
     const f = $("fImport").files[0]; if (!f) return;
     try { const d = JSON.parse(await f.text()); const q = d.quiz || d; if (!q.titre || !Array.isArray(q.qs)) throw 0;
-      q.id = "q" + Date.now(); delete q.exemple; stock.set("quizMaison", mesQuiz().concat([q])); listeQuiz(); }
-    catch(e) { $("quizListe").insertAdjacentHTML("afterbegin", '<div class="ko" style="margin-bottom:8px">Ce fichier n\'est pas un quiz.</div>'); }
+      q.id = "q" + Date.now(); delete q.exemple; sauverListe(mesQuiz().concat([q])); listeQuiz(); }
+    catch(e) { avis("Ce fichier n'est pas un quiz."); }
     $("fImport").value = "";
   };
-  let enEdition = null, nouveau = false;
-  function qVide(){ return {q: "", ch: ["", "", "", ""], bon: 0, s: 20}; }
-  function editer(q, neuf){
-    enEdition = JSON.parse(JSON.stringify(q || {id: "q" + Date.now(), titre: "", qs: [qVide()]})); nouveau = !!neuf || !q;
-    $("eTitre").value = enEdition.titre; dessinerEd(); montrer("vEdit");
+  /* ----- coller du texte ----- */
+  $("bColler").onclick = () => { $("tColler").value = ""; $("cMsg").textContent = ""; montrer("vColler"); };
+  $("cAnnule").onclick = () => montrer("vChoix");
+  $("cOk").onclick = () => {
+    const blocs = $("tColler").value.split(/\n\s*\n/).map(b => b.split("\n").map(l => l.trim()).filter(Boolean)).filter(b => b.length);
+    const qs = [], err = [];
+    blocs.forEach((b, k) => {
+      const Q = {q: "", ch: [], bon: -1, s: 20, expl: ""};
+      b.forEach(l => {
+        if (/^\*/.test(l)) { Q.bon = Q.ch.length; Q.ch.push(l.replace(/^\*\s*/, "")); }
+        else if (/^-/.test(l)) Q.ch.push(l.replace(/^-\s*/, ""));
+        else if (/^\?/.test(l)) Q.expl = l.replace(/^\?\s*/, "");
+        else Q.q = Q.q ? Q.q + " " + l : l;
+      });
+      if (!Q.q || Q.ch.length < 2 || Q.ch.length > 4 || Q.bon < 0) err.push(k + 1); else qs.push(Q);
+    });
+    if (!qs.length) { $("cMsg").textContent = "Aucune question reconnue. Vérifie les * et les -."; return; }
+    editer({id: "q" + Date.now(), titre: "", reg: Object.assign({}, REG_DEF), qs});
+    if (err.length) $("eQs").insertAdjacentHTML("beforebegin", `<div class="ko" id="eErr" style="margin-bottom:8px">Bloc(s) ignoré(s) : ${err.join(", ")} (il faut une question, 2 à 4 choix et une *).</div>`);
+  };
+  /* ----- éditeur ----- */
+  let ed = null;
+  function qVide(vf){ return vf ? {q: "", ch: ["Vrai", "Faux"], bon: 0, s: 15, expl: ""} : {q: "", ch: ["", "", "", ""], bon: 0, s: 20, expl: ""}; }
+  function editer(q){
+    const e = $("eErr"); if (e) e.remove();
+    ed = JSON.parse(JSON.stringify(q || {id: "q" + Date.now(), titre: "", qs: [qVide()]}));
+    ed.reg = Object.assign({}, REG_DEF, ed.reg);
+    $("eTitre").value = ed.titre; dessinerReg(); dessinerEd(); montrer("vEdit");
+  }
+  function dessinerReg(){
+    document.querySelectorAll(".seg[data-r]").forEach(s => s.querySelectorAll("button").forEach(b => {
+      b.classList.toggle("on", ed.reg[s.dataset.r] === b.dataset.v);
+      b.onclick = () => { ed.reg[s.dataset.r] = b.dataset.v; dessinerReg(); };
+    }));
+    $("eCoul").innerHTML = COULEURS.map(c => `<button style="background:${c}" class="${ed.reg.coul === c ? "on" : ""}" data-c="${c}" aria-label="Couleur"></button>`).join("");
+    $("eCoul").querySelectorAll("button").forEach(b => b.onclick = () => { ed.reg.coul = b.dataset.c; dessinerReg(); });
+    document.documentElement.style.setProperty("--acc", ed.reg.coul);
   }
   function lireEd(){
-    enEdition.titre = $("eTitre").value.trim();
+    ed.titre = $("eTitre").value.trim();
     document.querySelectorAll(".qe").forEach((d, k) => {
-      const Q = enEdition.qs[k];
+      const Q = ed.qs[k];
       Q.q = d.querySelector(".tq").value.trim();
       Q.ch = [...d.querySelectorAll(".tc")].map(x => x.value.trim());
       Q.bon = +((d.querySelector("input[type=radio]:checked") || {}).value || 0);
       Q.s = +d.querySelector("select").value;
+      Q.expl = d.querySelector(".ex").value.trim();
     });
   }
   function dessinerEd(){
-    $("eQs").innerHTML = enEdition.qs.map((Q, k) => `<div class="qe"><div class="tete"><b>Question ${k + 1}</b>
-      <select style="width:auto">${[10, 15, 20, 30, 45].map(s => `<option value="${s}" ${Q.s === s ? "selected" : ""}>${s} s</option>`).join("")}</select>
-      <button class="btn2" data-del="${k}" ${enEdition.qs.length < 2 ? "disabled" : ""}>Retirer</button></div>
-      <input class="tq" placeholder="La question" value="${esc(Q.q)}" maxlength="160" style="margin-top:8px">
-      ${[0, 1, 2, 3].map(c => `<div class="ln"><input type="radio" name="b${k}" value="${c}" ${Q.bon === c ? "checked" : ""} title="Bonne réponse"><input class="tc" placeholder="${c < 2 ? "Choix " + (c + 1) : "Choix " + (c + 1) + " (facultatif)"}" value="${esc(Q.ch[c] || "")}" maxlength="70" style="border-left:8px solid ${["#E21B3C", "#1368CE", "#D89E00", "#26890C"][c]}"></div>`).join("")}
-      <div class="sous" style="margin-top:6px">Coche le rond de la bonne réponse.</div></div>`).join("");
-    document.querySelectorAll("[data-del]").forEach(b => b.onclick = () => { lireEd(); enEdition.qs.splice(+b.dataset.del, 1); dessinerEd(); });
+    $("eQs").innerHTML = ed.qs.map((Q, k) => {
+      const vf = Q.ch.length === 2 && /^vrai$/i.test(Q.ch[0]) && /^faux$/i.test(Q.ch[1]);
+      const nb = vf ? 2 : 4;
+      return `<div class="qe"><div class="tete"><b>Question ${k + 1}${vf ? " · vrai ou faux" : ""}</b>
+      <select>${[10, 15, 20, 30, 45, 60].map(s => `<option value="${s}" ${Q.s === s ? "selected" : ""}>${s} s</option>`).join("")}</select>
+      <button class="btn2" data-mv="${k},-1" ${k ? "" : "disabled"} aria-label="Monter">↑</button><button class="btn2" data-mv="${k},1" ${k < ed.qs.length - 1 ? "" : "disabled"} aria-label="Descendre">↓</button>
+      <button class="btn2" data-del="${k}" ${ed.qs.length < 2 ? "disabled" : ""}>Retirer</button></div>
+      <input class="tq" placeholder="La question" value="${esc(Q.q)}" maxlength="180" style="margin-top:8px">
+      ${Array.from({length: nb}, (_, c) => `<div class="ln"><input type="radio" name="b${k}" value="${c}" ${Q.bon === c ? "checked" : ""} title="Bonne réponse"><input class="tc" placeholder="${c < 2 ? "Choix " + (c + 1) : "Choix " + (c + 1) + " (facultatif)"}" value="${esc(Q.ch[c] || "")}" maxlength="80" ${vf ? "readonly" : ""} style="border-left:8px solid ${["#C8323C", "#2563A8", "#C08A12", "#2E7D32"][c]}"></div>`).join("")}
+      <textarea class="ex" placeholder="Explication affichée après la réponse (facultatif)" maxlength="240">${esc(Q.expl || "")}</textarea>
+      <div class="img">${Q.img ? `<img src="${Q.img}" alt=""><button class="btn2" data-noimg="${k}">Retirer l'image</button>` : `<button class="btn2" data-img="${k}">+ Image (affichée au tableau)</button>`}<span class="sous">Coche le rond de la bonne réponse.</span></div></div>`;
+    }).join("");
+    document.querySelectorAll("[data-del]").forEach(b => b.onclick = () => { lireEd(); ed.qs.splice(+b.dataset.del, 1); dessinerEd(); });
+    document.querySelectorAll("[data-mv]").forEach(b => b.onclick = () => { lireEd(); const [k, d] = b.dataset.mv.split(",").map(Number); const t = ed.qs[k]; ed.qs[k] = ed.qs[k + d]; ed.qs[k + d] = t; dessinerEd(); });
+    document.querySelectorAll("[data-noimg]").forEach(b => b.onclick = () => { lireEd(); delete ed.qs[+b.dataset.noimg].img; dessinerEd(); });
+    document.querySelectorAll("[data-img]").forEach(b => b.onclick = () => {
+      const f = document.createElement("input"); f.type = "file"; f.accept = "image/*";
+      f.onchange = () => { const fi = f.files[0]; if (!fi) return; const im = new Image();
+        im.onload = () => { const k = Math.min(1, 900 / Math.max(im.width, im.height)), c = document.createElement("canvas");
+          c.width = Math.round(im.width * k); c.height = Math.round(im.height * k); c.getContext("2d").drawImage(im, 0, 0, c.width, c.height);
+          lireEd(); ed.qs[+b.dataset.img].img = c.toDataURL("image/jpeg", .78); dessinerEd(); URL.revokeObjectURL(im.src); };
+        im.src = URL.createObjectURL(fi); };
+      f.click();
+    });
   }
   $("bNouveau").onclick = () => editer(null);
-  $("eAjout").onclick = () => { lireEd(); enEdition.qs.push(qVide()); dessinerEd(); };
-  $("eAnnule").onclick = () => { montrer("vChoix"); listeQuiz(); };
+  $("eAjout").onclick = () => { lireEd(); ed.qs.push(qVide()); dessinerEd(); };
+  $("eAjoutVF").onclick = () => { lireEd(); ed.qs.push(qVide(true)); dessinerEd(); };
+  $("eAnnule").onclick = () => { document.documentElement.style.removeProperty("--acc"); montrer("vChoix"); listeQuiz(); };
   $("eSauve").onclick = () => {
     lireEd();
-    // on garde les choix remplis; la bonne réponse doit en faire partie
-    const qs = enEdition.qs.map(Q => { const garde = Q.ch.map((t, c) => [t, c]).filter(([t]) => t); return {q: Q.q, ch: garde.map(g => g[0]), bon: garde.findIndex(g => g[1] === Q.bon), s: Q.s}; });
-    const err = !enEdition.titre ? "Donne un titre au quiz." : qs.some(Q => !Q.q) ? "Chaque question doit avoir un texte." : qs.some(Q => Q.ch.length < 2) ? "Chaque question doit avoir au moins 2 choix." : qs.some(Q => Q.bon < 0) ? "La bonne réponse cochée doit être un choix rempli." : "";
-    if (err) { $("eSauve").textContent = err; setTimeout(() => $("eSauve").textContent = "Enregistrer", 2500); return; }
-    const q = {id: enEdition.id, titre: enEdition.titre, qs};
-    const L = mesQuiz().filter(x => x.id !== q.id); L.push(q); stock.set("quizMaison", L);
+    const qs = ed.qs.map(Q => { const garde = Q.ch.map((t, c) => [t, c]).filter(([t]) => t); const o = {q: Q.q, ch: garde.map(g => g[0]), bon: garde.findIndex(g => g[1] === Q.bon), s: Q.s}; if (Q.expl) o.expl = Q.expl; if (Q.img) o.img = Q.img; return o; });
+    const err = !ed.titre ? "Donne un titre au quiz." : qs.some(Q => !Q.q) ? "Chaque question doit avoir un texte." : qs.some(Q => Q.ch.length < 2) ? "Chaque question doit avoir au moins 2 choix." : qs.some(Q => Q.bon < 0) ? "La bonne réponse cochée doit être un choix rempli." : "";
+    if (err) { $("eSauve").textContent = err; setTimeout(() => $("eSauve").textContent = "Enregistrer", 2600); return; }
+    const q = {id: ed.id, titre: ed.titre, reg: ed.reg, qs};
+    const L = mesQuiz().filter(x => x.id !== q.id); L.push(q);
+    if (!sauverListe(L)) return;
+    document.documentElement.style.removeProperty("--acc");
     montrer("vChoix"); listeQuiz();
   };
   listeQuiz(); maj();
@@ -362,41 +495,54 @@ function telecommande(){
 function joueur(code){
   const topic = PREFIXE + code;
   $("joueur").classList.remove("cache");
-  // identité gardée pour l'onglet (un rechargement garde le même participant)
   let pid = null; try { pid = sessionStorage.getItem("quizPid"); } catch(e) {}
   if (!pid) { pid = Math.random().toString(36).slice(2, 9); try { sessionStorage.setItem("quizPid", pid); } catch(e) {} }
   let nom = "", repI = -1, chrono = null, pts = 0;
-  const bx = h => $("jBx").innerHTML = h;
-  bx(`<h2>Quiz maison</h2><div>Écris ton nom (ou celui de ton équipe)</div><input id="jNom" maxlength="20" placeholder="Ton nom" value="${esc(stock.get("quizNom", ""))}"><button id="jGo" style="width:100%;font-size:20px;padding:16px;background:#fff;color:#2E2775">Entrer</button>`);
+  const bx = h => { $("jBx").innerHTML = h; };
+  const teinte = c => { if (c) $("joueur").style.setProperty("--fondJ", sombre(c)); };
+  const COCHE = '<svg class="coche" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45"/><path d="M30 52l13 13 27-29"/></svg>';
+  const CROIX = '<svg class="coche croix" viewBox="0 0 100 100"><path d="M32 32l36 36"/><path d="M68 32L32 68"/></svg>';
+  bx(`<h2>Quiz maison</h2><div>Écris ton nom ou celui de ton équipe</div><input id="jNom" maxlength="20" placeholder="Ton nom" value="${esc(stock.get("quizNom", ""))}"><button id="jGo" style="width:100%;font-size:20px;padding:16px;background:#fff;color:#24211E">Entrer</button>`);
   const pour = m => !m.pour || m.pour === pid;
   $("jGo").onclick = () => {
     nom = ($("jNom").value.trim() || "Joueur").slice(0, 20); stock.set("quizNom", nom);
-    $("nomJ").textContent = nom; bx('<div class="gros">Tu es dans la partie !</div><div>Regarde le tableau : ça commence bientôt.</div>');
+    $("nomJ").textContent = nom; bx('<div class="gros monte">Tu es dans la partie.</div><div>Regarde le tableau : ça commence bientôt.</div>');
     ecouter(topic, m => {
       if (!pour(m)) return;
-      if (m.m === "bienvenue") bx(`<div class="gros">Tu es dans la partie !</div><div>${esc(m.titre || "")}</div><div class="sous" style="color:#cfc9ff;margin-top:8px">Regarde le tableau : ça commence bientôt.</div>`);
+      if (m.coul) teinte(m.coul);
+      if (m.m === "bienvenue") bx(`<div class="gros monte">Tu es dans la partie.</div><div>${esc(m.titre || "")}</div><div style="opacity:.7;margin-top:8px">Regarde le tableau : ça commence bientôt.</div>`);
       else if (m.m === "attente") bx('<div class="gros">Pause</div><div>L\'enseignant prépare la suite.</div>');
       else if (m.m === "q") {
         repI = -1;
-        bx(`<div style="opacity:.8">Question ${m.i + 1} sur ${m.n}</div><h2>${esc(m.q)}</h2><div class="chrono"><i id="jBar"></i></div>
+        bx(`<div style="opacity:.75">Question ${m.i + 1} sur ${m.n}</div><h2>${esc(m.q)}</h2><div class="chrono"><i id="jBar"></i></div>
           <div class="ch4">${m.ch.map((c, k) => `<button class="k${k}" data-c="${k}"><i>${SYMB[k]}</i>${esc(c)}</button>`).join("")}</div>`);
         const fin = m.t0 + m.s * 1000; clearInterval(chrono);
-        chrono = setInterval(() => { const r = Math.max(0, fin - Date.now()), b = $("jBar"); if (b) b.style.width = (100 * r / (m.s * 1000)) + "%"; if (!r) clearInterval(chrono); }, 200);
+        chrono = setInterval(() => { const r = Math.max(0, fin - Date.now()), b = $("jBar"); if (b) b.style.width = Math.min(100, 100 * r / (m.s * 1000)) + "%"; if (!r) clearInterval(chrono); }, 150);
         document.querySelectorAll("#jBx [data-c]").forEach(b => b.onclick = () => {
           if (repI >= 0) return; repI = +b.dataset.c;
           document.querySelectorAll("#jBx [data-c]").forEach(x => x.classList.toggle("pas", x !== b));
+          $("jBx").insertAdjacentHTML("beforeend", '<div class="monte" style="margin-top:14px;opacity:.8">Réponse envoyée.</div>');
           envoyer(topic, {m: "rep", pid, i: m.i, c: repI});
         });
       } else if (m.m === "rev") {
         clearInterval(chrono);
-        const r = m.res[pid]; if (!r) return; pts = r.pts; $("ptsJ").textContent = pts + " pts";
-        const bon = r.rep === m.bon;
-        bx(`<div class="gros" style="color:${bon ? "#7CF0A8" : "#FF9A90"}">${r.rep < 0 ? "Pas de réponse" : bon ? "Bonne réponse ! +" + r.g : "Mauvaise réponse"}</div>
-          ${bon ? "" : `<div>La bonne réponse : <b>${esc(m.bonTxt)}</b></div>`}
-          <div class="rang">Tu es <b>${r.rang}${r.rang === 1 ? "er" : "e"}</b> sur ${m.n} · ${pts} points</div>`);
+        const r = m.res[pid]; if (!r) return;
+        const bon = r.rep === m.bon; pts = r.pts;
+        const fl = m.i === 0 ? "" : r.avant && r.rang < r.avant ? `<span class="fl mo">▲ ${r.avant - r.rang}</span>` : r.avant && r.rang > r.avant ? `<span class="fl de">▼ ${r.rang - r.avant}</span>` : "";
+        bx(`${r.rep < 0 ? "" : bon ? COCHE : CROIX}
+          <div class="gros monte">${r.rep < 0 ? "Pas de réponse" : bon ? "Bonne réponse" : "Pas cette fois"}</div>
+          ${bon && m.points !== "aucun" ? `<div class="monte" style="font-size:26px;font-weight:800">+<span id="jGain">0</span></div>` : ""}
+          ${bon ? "" : `<div class="monte">La bonne réponse : <b>${esc(m.bonTxt)}</b></div>`}
+          ${m.expl ? `<div class="expl monte">${esc(m.expl)}</div>` : ""}
+          ${m.classement === "oui" ? `<div class="rang monte">Tu es <b>${ord(r.rang)}</b> sur ${m.n}${m.points !== "aucun" ? " · " + pts + " points" : ""}${fl}</div>` : ""}`);
+        if (!bon && r.rep >= 0) { $("jBx").classList.add("secoue"); setTimeout(() => $("jBx").classList.remove("secoue"), 500); }
+        if (bon) compter($("jGain"), 0, r.g, 900);
+        if (m.points !== "aucun") $("ptsJ").textContent = pts + " pts";
       } else if (m.m === "fin") {
         const r = m.res[pid]; if (!r) return;
-        bx(`<div style="opacity:.8">Classement final</div><div class="gros">${r.rang === 1 ? "🏆 " : ""}${r.rang}${r.rang === 1 ? "er" : "e"} sur ${m.n}</div><div class="rang">${r.pts} points</div><div style="margin-top:14px;opacity:.8">Bravo ${esc(nom)} !</div>`);
+        bx(`<div style="opacity:.75">Classement final</div><div class="gros monte">${ord(r.rang)} sur ${m.n}</div>
+          <div class="rang monte">${r.bons} bonne${r.bons > 1 ? "s" : ""} réponse${r.bons > 1 ? "s" : ""} sur ${m.total}${m.points !== "aucun" ? " · " + r.pts + " points" : ""}</div>
+          <div style="margin-top:14px;opacity:.75">Merci, ${esc(nom)}.</div>`);
       }
     }, ok => { if (ok) envoyer(topic, {m: "ici", pid, nom}); });
   };
@@ -407,29 +553,65 @@ function joueur(code){
 function ecran(code){
   const topic = PREFIXE + code, E = $("ecr"); E.classList.remove("cache");
   const url = location.href.split(/[?#]/)[0] + "?j=" + code;
-  let V = {etat: "lobby", joueurs: [], titre: "Quiz maison"}, decal = 0;
-  const tete = t => `<div class="haut"><b><img class="logoE" src="img/pavillon-avenir-blanc.png" alt="Pavillon de l'Avenir">${esc(t)}</b><span>Quiz maison · code ${code.slice(0, 3)} ${code.slice(3)}</span></div>`;
-  const top = (n) => V.joueurs.slice(0, n).map(j => `<div class="lg"><span class="r">${j.r}</span><span>${esc(j.n)}</span><b>${j.pts}</b></div>`).join("");
-  function rendre(){
-    const v = V, n = Date.now() + decal;
+  let V = {etat: "lobby", joueurs: [], titre: "Quiz maison", reg: {}, i: -1}, decal = 0, img = {}, sonOK = false, ac = null, dernier = "", posAvant = {}, tic = 0;
+  function ton(f, d, v, type){ if (!sonOK || V.reg.son === "non") return; try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); const o = ac.createOscillator(), g = ac.createGain(); o.type = type || "sine"; o.frequency.value = f; o.connect(g); g.connect(ac.destination); g.gain.setValueAtTime(v, ac.currentTime); g.gain.exponentialRampToValueAtTime(.0001, ac.currentTime + d); o.start(); o.stop(ac.currentTime + d); } catch(e) {} }
+  const accord = () => { ton(523, .5, .12); setTimeout(() => ton(659, .5, .1), 120); setTimeout(() => ton(784, .7, .1), 240); };
+  const tete = t => `<div class="liseret"></div><div class="haut"><b><img class="logoE" src="img/pavillon-avenir-blanc.png" alt="Pavillon de l'Avenir">${esc(t)}</b><span>Quiz maison · code ${code.slice(0, 3)} ${code.slice(3)}</span></div>`;
+  const bSon = () => `<button class="son" id="bSon">${sonOK ? "Son activé" : "Activer le son"}</button>`;
+  function lignes(n, anim){
+    return `<div class="lgs">${V.joueurs.slice(0, n).map(j => `<div class="lg" data-n="${esc(j.n)}"><span class="r">${j.r}</span><span>${esc(j.n)}</span><span>${anim && j.g ? `<small>+${j.g}</small>` : ""}${V.reg.points === "aucun" ? "" : `<b data-de="${j.pts - (anim ? j.g : 0)}" data-a="${j.pts}">${j.pts - (anim ? j.g : 0)}</b>`}</span></div>`).join("")}</div>`;
+  }
+  function animerLignes(){ // les rangées glissent à leur nouvelle place, les points montent
+    E.querySelectorAll(".lg").forEach(el => {
+      const n = el.dataset.n, y = el.getBoundingClientRect().top;
+      if (posAvant[n] != null && posAvant[n] !== y) { el.style.transition = "none"; el.style.transform = `translateY(${posAvant[n] - y}px)`; requestAnimationFrame(() => requestAnimationFrame(() => { el.style.transition = ""; el.style.transform = ""; })); }
+      const b = el.querySelector("b[data-a]"); if (b && b.dataset.de !== b.dataset.a) compter(b, +b.dataset.de, +b.dataset.a, 1100);
+    });
+    posAvant = {}; E.querySelectorAll(".lg").forEach(el => posAvant[el.dataset.n] = el.getBoundingClientRect().top);
+  }
+  function rendre(force){
+    const v = V, n = Date.now() + decal, cle = v.etat + v.i;
+    document.documentElement.style.setProperty("--acc", (v.reg && v.reg.coul) || "#534AB7");
     if (v.etat === "lobby") {
       E.innerHTML = tete(v.titre) + `<div class="lob"><div class="qr" id="eQr"></div><div><div style="font-size:2vw;color:#B5AFA6">Scanne le code avec ton iPad</div>
         <div class="code">${code.slice(0, 3)} ${code.slice(3)}</div><div style="font-size:1.6vw;color:#B5AFA6">${v.joueurs.length} participant${v.joueurs.length > 1 ? "s" : ""}</div>
-        <div class="noms">${v.joueurs.map(j => `<span>${esc(j.n)}</span>`).join("")}</div></div></div>`;
-      try { new QRCode($("eQr"), {text: url, width: Math.round(innerWidth * .24), height: Math.round(innerWidth * .24), correctLevel: QRCode.CorrectLevel.M}); } catch(e) { $("eQr").textContent = url; }
-    } else if (v.etat === "question" || v.etat === "rev") {
+        <div class="noms">${v.joueurs.map(j => `<span>${esc(j.n)}</span>`).join("")}</div></div></div>` + bSon();
+      try { new QRCode($("eQr"), {text: url, width: Math.round(innerWidth * .22), height: Math.round(innerWidth * .22), correctLevel: QRCode.CorrectLevel.M}); } catch(e) { $("eQr").textContent = url; }
+    } else if (v.etat === "question" && v.q) {
       const r = Math.max(0, Math.ceil((v.t0 + v.q.s * 1000 - n) / 1000));
-      E.innerHTML = tete("Question " + (v.i + 1) + " sur " + v.n) + `<div class="eq">${esc(v.q.q)}</div>
-        <div class="ech">${v.q.ch.map((c, k) => `<div class="k${k} ${v.etat === "rev" && k !== v.bon ? "pas" : ""}"><span>${SYMB[k]} ${esc(c)}</span>${v.etat === "rev" ? `<em>${v.cpt[k]}</em>` : ""}</div>`).join("")}</div>
-        <div class="cpt"><span>${v.nrep} réponse${v.nrep > 1 ? "s" : ""} sur ${v.joueurs.length}</span>${v.etat === "question" ? `<b>${r}</b>` : ""}</div>
-        ${v.etat === "rev" ? `<div style="margin-top:3vh">${top(5)}</div>` : ""}`;
+      if (cle !== dernier || force) {
+        E.innerHTML = tete("Question " + (v.i + 1) + " sur " + v.n) + `<div class="eq monte">${esc(v.q.q)}</div>${v.q.img && img[v.i] ? `<img class="eimg monte" src="${img[v.i]}" alt="">` : ""}
+          <div class="ech">${v.q.ch.map((c, k) => `<div class="k${k} monte" style="animation-delay:${.1 + k * .08}s"><span>${SYMB[k]} ${esc(c)}</span></div>`).join("")}</div>
+          <div class="cpt"><span id="eRep"></span><b id="eT"></b></div>` + bSon();
+        if (cle !== dernier) ton(440, .25, .08);
+      }
+      $("eRep").textContent = v.nrep + " réponse" + (v.nrep > 1 ? "s" : "") + " sur " + v.joueurs.length; $("eT").textContent = r;
+      if (r <= 5 && r > 0 && tic !== r) { tic = r; ton(880, .08, .06, "triangle"); }
+    } else if (v.etat === "rev" && v.q) {
+      if (cle !== dernier || force) {
+        const tot = Math.max(1, v.cpt.reduce((a, b) => a + b, 0));
+        E.innerHTML = tete("Question " + (v.i + 1) + " sur " + v.n) + `<div class="eq">${esc(v.q.q)}</div>
+          <div class="ech">${v.q.ch.map((c, k) => `<div class="k${k} ${k === v.bon ? "bon" : "pas"}"><span>${k === v.bon ? "✓" : SYMB[k]} ${esc(c)}</span><em>${v.cpt[k]}</em><i class="bar" data-w="${100 * v.cpt[k] / tot}"></i></div>`).join("")}</div>
+          ${v.q.expl ? `<div class="eexpl monte">${esc(v.q.expl)}</div>` : ""}
+          ${v.reg.classement === "oui" ? `<div style="margin-top:3vh">${lignes(5, true)}</div>` : ""}` + bSon();
+        requestAnimationFrame(() => E.querySelectorAll(".bar").forEach(b => b.style.width = b.dataset.w + "%"));
+        if (cle !== dernier) { accord(); animerLignes(); }
+      }
     } else if (v.etat === "fin") {
-      const c = v.joueurs, p = (q, k) => q ? `<div class="p${k}"><b>${k}</b>${esc(q.n)}<br>${q.pts}</div>` : "";
-      E.innerHTML = tete("Podium · " + v.titre) + `<div class="podium">${p(c[1], 2)}${p(c[0], 1)}${p(c[2], 3)}</div>` + top(10);
+      if (cle !== dernier || force) {
+        const c = v.joueurs, p = (q, k) => q ? `<div class="p${k}"><b>${k}</b>${esc(q.n)}${v.reg.points === "aucun" ? "" : "<br>" + q.pts}</div>` : "";
+        E.innerHTML = tete("Podium · " + v.titre) + `<div class="podium">${p(c[1], 2)}${p(c[0], 1)}${p(c[2], 3)}</div>` + lignes(10, false) + bSon();
+        if (cle !== dernier) setTimeout(accord, 900);
+      }
     }
+    dernier = cle;
+    const b = $("bSon"); if (b) b.onclick = () => { sonOK = !sonOK; if (sonOK) { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); ac.resume(); ton(660, .2, .08); } b.textContent = sonOK ? "Son activé" : "Activer le son"; };
   }
-  ecouter(topic, m => { if (m.m === "vue") { V = m; decal = m.now - Date.now(); rendre(); } }, ok => { if (ok) envoyer(topic, {m: "ecran?"}); });
-  rendre(); setInterval(() => { if (V.etat === "question") rendre(); }, 1000);
+  ecouter(topic, m => {
+    if (m.m === "img") { img[m.i] = m.data; if (V.etat === "question" && V.i === m.i) rendre(true); }
+    else if (m.m === "vue") { V = m; decal = m.now - Date.now(); rendre(m.etat === "lobby"); }
+  }, ok => { if (ok) envoyer(topic, {m: "ecran?"}); });
+  rendre(true); setInterval(() => { if (V.etat === "question") rendre(); }, 500);
 }
 </script>
 </body>
