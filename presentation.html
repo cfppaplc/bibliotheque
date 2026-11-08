@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<!-- © 2026 Jérémy Raymond. Tous droits réservés. Copie, modification ou revente interdites sans autorisation écrite (voir LICENCE.md). -->
+<html lang="fr-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Métier+ — L'atelier, au tableau</title>
+<meta name="description" content="Métier+ réunit les livres de cours animés, les plans techniques, les formatifs et les jeux de classe des enseignants en formation professionnelle, pensés pour le tableau interactif.">
+<meta property="og:title" content="Métier+ — L'atelier, au tableau">
+<meta property="og:description" content="La plateforme pédagogique des enseignants en formation professionnelle.">
+<meta property="og:image" content="https://metierplus.app/img/apercu-metier.jpg">
+<meta name="theme-color" content="#000000">
+<link rel="icon" href="img/metier-plus-icone.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="img/icone-180.png">
+<style>
+  @view-transition{navigation:auto}
+  :root{--or:#EB6A22;--or2:#F2762E;--marine:#1E2A44;--noir:#000;--gris:#f5f5f7;--txt:#1d1d1f;--doux:#86868b;--bord:rgba(255,255,255,.12);
+    --f:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI Variable Display","Segoe UI",Inter,Roboto,"Helvetica Neue",Arial,sans-serif}
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+  body{margin:0;background:#000;color:#f5f5f7;font-family:var(--f);-webkit-font-smoothing:antialiased;overflow-x:hidden;line-height:1.47}
+  img{max-width:100%;display:block}
+  a{color:inherit}
+  .w{width:min(1120px,calc(100% - 44px));margin:0 auto}
+
+  /* ---- barre du haut ---- */
+  .nav{position:sticky;top:0;z-index:50;height:52px;background:rgba(0,0,0,.72);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid rgba(255,255,255,.08)}
+  .nav .w{display:flex;align-items:center;gap:28px;height:100%}
+  .nav img{height:20px;width:auto}
+  .nav .liens{display:flex;gap:26px;margin-left:auto;font-size:13px}
+  .nav .liens a{text-decoration:none;opacity:.8}.nav .liens a:hover{opacity:1}
+  .nav .ouvrir{font-size:12.5px;font-weight:600;text-decoration:none;background:var(--or);color:#fff;padding:6px 14px;border-radius:999px;white-space:nowrap}
+  @media (max-width:820px){.nav .liens{display:none}.nav .ouvrir{margin-left:auto}}
+
+  /* ---- héros ---- */
+  .hero{position:relative;text-align:center;padding:96px 20px 0;overflow:hidden}
+  .hero::before{content:"";position:absolute;inset:-20% -10% auto;height:900px;background:radial-gradient(closest-side,rgba(235,106,34,.28),transparent 70%) 50% 40%/900px 620px no-repeat,radial-gradient(closest-side,rgba(60,90,160,.32),transparent 70%) 15% 70%/700px 520px no-repeat;pointer-events:none}
+  .surtitre{position:relative;font-size:clamp(15px,1.6vw,19px);font-weight:600;color:var(--or2);letter-spacing:.01em;margin:0 0 14px}
+  h1{position:relative;margin:0;font-size:clamp(52px,10.4vw,124px);line-height:1.02;letter-spacing:-.045em;font-weight:700}
+  h1 .grad{background:linear-gradient(180deg,#fff 30%,#b8bcc6);-webkit-background-clip:text;background-clip:text;color:transparent}
+  h1 .or{background:linear-gradient(100deg,#F2762E,#ffb27a);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .chapeau{position:relative;max-width:720px;margin:26px auto 0;font-size:clamp(18px,2.1vw,24px);line-height:1.35;color:#a1a1a6;font-weight:500;letter-spacing:-.01em}
+  .chapeau b{color:#f5f5f7;font-weight:600}
+  .actions{position:relative;display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin:34px 0 0}
+  .btn{display:inline-flex;align-items:center;gap:8px;font-size:17px;font-weight:600;text-decoration:none;padding:13px 26px;border-radius:999px;transition:transform .2s,background .2s}
+  .btn.plein{background:var(--or);color:#fff}.btn.plein:hover{background:#ff7d33;transform:translateY(-1px)}
+  .btn.lien{color:var(--or2);padding-left:6px;padding-right:6px}.btn.lien:hover{text-decoration:underline}
+  .scene{position:relative;margin:70px auto 0;width:min(1180px,calc(100% - 32px));perspective:1600px}
+  .tni{position:relative;border-radius:22px;padding:12px;background:linear-gradient(180deg,#2a2a2e,#121214);box-shadow:0 60px 120px -30px rgba(235,106,34,.25),0 40px 80px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.12);transform-origin:50% 100%}
+  .tni img{border-radius:12px;width:100%;aspect-ratio:16/10;object-fit:cover}
+  .tni::after{content:"";position:absolute;left:12%;right:12%;bottom:-26px;height:14px;border-radius:0 0 18px 18px;background:linear-gradient(#1b1b1e,#0b0b0c)}
+  @supports (animation-timeline:view()){
+    @media (prefers-reduced-motion:no-preference){
+      .hero .tni{animation:redresse linear both;animation-timeline:view();animation-range:entry 0% cover 45%}
+      @keyframes redresse{from{transform:rotateX(18deg) scale(.92);opacity:.4}to{transform:none;opacity:1}}
+    }
+  }
+  .couvs{position:absolute;inset:auto 0 -8% 0;pointer-events:none}
+  .couv{position:absolute;width:clamp(70px,9vw,128px);border-radius:8px;box-shadow:0 20px 40px rgba(0,0,0,.55);transform:rotate(var(--r));animation:flotte 7s ease-in-out infinite alternate;animation-delay:var(--d)}
+  @keyframes flotte{to{transform:rotate(var(--r)) translateY(-14px)}}
+  @media (max-width:760px){.couvs{display:none}}
+
+  /* ---- chiffres ---- */
+  .chiffres{padding:150px 0 110px}
+  .chiffres .grille{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;text-align:center}
+  .chiffres b{display:block;font-size:clamp(46px,6.4vw,80px);font-weight:700;letter-spacing:-.04em;line-height:1;background:linear-gradient(180deg,#fff,#9a9aa2);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .chiffres span{display:block;margin-top:10px;color:#a1a1a6;font-size:17px;line-height:1.3}
+  @media (max-width:760px){.chiffres .grille{grid-template-columns:1fr 1fr;row-gap:48px}}
+
+  /* ---- sections ---- */
+  section{position:relative}
+  .sec{padding:130px 0}
+  .clair{background:var(--gris);color:var(--txt)}
+  .blanc{background:#fff;color:var(--txt)}
+  .eyebrow{font-size:clamp(17px,1.7vw,21px);font-weight:600;margin:0 0 12px;color:var(--or)}
+  h2{margin:0;font-size:clamp(40px,6.2vw,80px);line-height:1.04;letter-spacing:-.035em;font-weight:700}
+  .clair h2,.blanc h2{color:var(--txt)}
+  .lead{max-width:760px;margin:22px 0 0;font-size:clamp(19px,2vw,24px);line-height:1.38;color:#a1a1a6;font-weight:500;letter-spacing:-.01em}
+  .clair .lead,.blanc .lead{color:#6e6e73}
+  .lead b{color:inherit;font-weight:600}
+  .clair .lead b,.blanc .lead b{color:var(--txt)}
+  .centre{text-align:center}.centre .lead{margin-left:auto;margin-right:auto}
+  .ecran{margin-top:60px;border-radius:20px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.08)}
+  .clair .ecran,.blanc .ecran{box-shadow:0 30px 70px rgba(30,42,68,.22);border-color:rgba(0,0,0,.06)}
+  .ecran img{width:100%}
+  .points{display:grid;grid-template-columns:repeat(4,1fr);gap:34px;margin-top:64px}
+  .points.trois{grid-template-columns:repeat(3,1fr)}
+  .point svg{width:34px;height:34px;color:var(--or);margin-bottom:14px}
+  .point h3{margin:0 0 8px;font-size:21px;letter-spacing:-.015em;line-height:1.2}
+  .point p{margin:0;color:#a1a1a6;font-size:16.5px;line-height:1.45}
+  .clair .point p,.blanc .point p{color:#6e6e73}
+  @media (max-width:900px){.points,.points.trois{grid-template-columns:1fr 1fr}}
+  @media (max-width:560px){.points,.points.trois{grid-template-columns:1fr}.sec{padding:96px 0}}
+
+  /* côte à côte */
+  .duo{display:grid;grid-template-columns:1.05fr 1fr;gap:70px;align-items:center}
+  .duo.inv{grid-template-columns:1fr 1.05fr}.duo.inv>.txt{order:2}
+  @media (max-width:900px){.duo,.duo.inv{grid-template-columns:1fr;gap:50px}.duo.inv>.txt{order:0}}
+  .liste{list-style:none;padding:0;margin:34px 0 0;display:grid;gap:16px}
+  .liste li{display:flex;gap:14px;align-items:flex-start;font-size:18px;line-height:1.4}
+  .liste li::before{content:"";flex:none;width:22px;height:22px;margin-top:2px;border-radius:50%;background:var(--or) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 12.5l4 4 8-9'/%3E%3C/svg%3E") center/14px no-repeat}
+  .liste li span{color:#a1a1a6}.clair .liste li span,.blanc .liste li span{color:#6e6e73}
+
+  /* téléphone (télécommande, dessinée en HTML) */
+  .tel{width:min(320px,80vw);margin:0 auto;aspect-ratio:9/19.3;border-radius:52px;padding:13px;background:linear-gradient(145deg,#3a3a3e,#111);box-shadow:0 40px 90px rgba(0,0,0,.6),inset 0 0 0 2px #4a4a50}
+  .tel .ecr{position:relative;height:100%;border-radius:40px;overflow:hidden;background:#f5f5f7;color:#1d1d1f;display:flex;flex-direction:column;padding:46px 16px 18px;gap:12px}
+  .tel .ecr::before{content:"";position:absolute;top:11px;left:50%;width:96px;height:28px;margin-left:-48px;border-radius:20px;background:#000}
+  .tel .t1{display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:600}
+  .tel .t1 img{height:15px}.tel .t1 i{font-style:normal;color:#15803d}
+  .tel .tt{font-size:15px;font-weight:700;line-height:1.2}
+  .tel .pg{font-size:12px;color:#6e6e73}.tel .barre{height:4px;border-radius:4px;background:#e2e2e6;overflow:hidden}.tel .barre i{display:block;height:100%;width:38%;background:var(--or)}
+  .tel .mods{display:flex;gap:6px;overflow:hidden}.tel .mods span{flex:none;font-size:11px;padding:5px 9px;border-radius:999px;background:#e8e8ed}.tel .mods span.on{background:#fff;box-shadow:inset 0 0 0 2px var(--or);font-weight:600}
+  .tel .pad{flex:1;border-radius:22px;background:linear-gradient(160deg,#1E2A44,#0f1626);color:#fff;display:grid;grid-template-columns:1fr 1fr;align-items:center;text-align:center;position:relative;overflow:hidden}
+  .tel .pad span{font-size:44px;font-weight:200;opacity:.85}
+  .tel .pad::after{content:"";position:absolute;width:26px;height:26px;border-radius:50%;background:rgba(242,118,46,.9);box-shadow:0 0 0 10px rgba(242,118,46,.25);left:62%;top:44%;animation:doigt 3.2s ease-in-out infinite}
+  @keyframes doigt{0%,100%{transform:translate(0,0)}50%{transform:translate(-60px,22px)}}
+  .tel .ong{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;font-size:11.5px;text-align:center}.tel .ong span{padding:7px 0;border-radius:9px;background:#e8e8ed}.tel .ong span.on{background:var(--or);color:#fff;font-weight:600}
+  .tel .outils{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;font-size:10.5px;text-align:center}.tel .outils span{padding:9px 0;border-radius:10px;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+
+  /* éventail de formatifs */
+  .eventail{position:relative;height:clamp(360px,44vw,520px)}
+  .eventail{overflow:visible}.eventail img{position:absolute;left:50%;top:50%;width:clamp(150px,19vw,240px);border-radius:10px;box-shadow:0 30px 60px rgba(30,42,68,.28);transform:translate(-50%,-50%) rotate(var(--r)) translate(var(--x),0)}
+  .eventail img:nth-child(1){--r:-10deg;--x:-58%}.eventail img:nth-child(2){--r:-3deg;--x:-20%}.eventail img:nth-child(3){--r:4deg;--x:18%}.eventail img:nth-child(4){--r:11deg;--x:56%}
+
+  /* glisser-déposer (dessiné) */
+  .depot{position:relative;max-width:520px;margin:0 auto;aspect-ratio:4/3;border:3px dashed rgba(235,106,34,.6);border-radius:28px;display:grid;place-items:center;background:rgba(235,106,34,.06)}
+  .depot .fich{position:absolute;width:110px;height:140px;border-radius:12px;background:#fff;box-shadow:0 20px 40px rgba(0,0,0,.35);display:grid;place-items:center;color:#c0392b;font-weight:800;font-size:22px;animation:tombe 4s cubic-bezier(.3,.7,.3,1) infinite}
+  .depot .fich::before{content:"";position:absolute;top:0;right:0;width:30px;height:30px;background:linear-gradient(225deg,#f5f5f7 50%,#ddd 50%);border-radius:0 12px 0 6px}
+  @keyframes tombe{0%{transform:translate(160px,-150px) rotate(14deg);opacity:0}25%{opacity:1}55%,80%{transform:translate(0,0) rotate(0)}100%{transform:translate(0,0) scale(.9);opacity:0}}
+  .depot .choix{position:absolute;bottom:22px;display:flex;gap:10px}
+  .depot .choix span{font-size:14px;font-weight:600;padding:8px 16px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16)}
+  .depot .choix span.on{background:var(--or);border-color:var(--or)}
+
+  /* sécurité */
+  .cadenas{width:120px;height:120px;margin:0 auto 34px;border-radius:32px;display:grid;place-items:center;background:linear-gradient(160deg,#1E2A44,#0c1120);box-shadow:0 20px 50px rgba(30,42,68,.35)}
+  .cadenas svg{width:58px;height:58px;color:var(--or2)}
+
+  /* fin */
+  .fin{padding:150px 0 120px;text-align:center;background:radial-gradient(closest-side,rgba(235,106,34,.22),transparent 70%) 50% 60%/900px 500px no-repeat,#000}
+  .fin img.logo{height:clamp(46px,7vw,78px);width:auto;margin:0 auto 30px}
+  .fin h2{font-size:clamp(36px,5.6vw,68px)}
+  footer{border-top:1px solid rgba(255,255,255,.1);padding:26px 0 40px;font-size:12px;color:#86868b}
+  footer .w{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;align-items:center}
+  footer img{height:26px;background:#fff;border-radius:6px;padding:3px 6px}
+
+  /* apparitions au défilement */
+  .rv{opacity:0;transform:translateY(40px);transition:opacity 1s cubic-bezier(.2,.7,.2,1),transform 1s cubic-bezier(.2,.7,.2,1)}
+  .rv.vu{opacity:1;transform:none}
+  .rv.d1{transition-delay:.12s}.rv.d2{transition-delay:.24s}.rv.d3{transition-delay:.36s}
+  @media (prefers-reduced-motion:reduce){.rv{transform:none;transition:opacity .6s}.couv,.tel .pad::after,.depot .fich{animation:none}.depot .fich{opacity:1}}
+  html:not(.js) .rv{opacity:1;transform:none}
+</style>
+<script>document.documentElement.classList.add("js")</script>
+</head>
+<body>
+
+<nav class="nav" aria-label="Présentation">
+  <div class="w">
+    <a href="#haut" aria-label="Métier+"><img src="img/metier-plus-blanc.svg" alt="Métier+"></a>
+    <div class="liens"><a href="#livres">Livres</a><a href="#plans">Plans</a><a href="#formatifs">Formatifs</a><a href="#classe">Accueil de classe</a><a href="#labo">Labo</a><a href="#documents">Tes documents</a></div>
+    <a class="ouvrir" href="./">Ouvrir Métier+</a>
+  </div>
+</nav>
+
+<header class="hero" id="haut">
+  <p class="surtitre rv">Pour les enseignants de la formation professionnelle</p>
+  <h1 class="rv d1"><span class="grad">L'atelier,</span><br><span class="or">au tableau.</span></h1>
+  <p class="chapeau rv d2">Métier+ réunit <b>tes livres de cours animés, tes plans techniques, tes formatifs et tes jeux de classe</b> dans une seule plateforme, pensée pour le tableau interactif.</p>
+  <div class="actions rv d3"><a class="btn plein" href="./">Ouvrir Métier+</a><a class="btn lien" href="#livres">Découvrir ›</a></div>
+  <div class="scene">
+    <div class="tni"><img src="img/presentation/biblio.jpg" alt="La bibliothèque Métier+ : livres de cours par programme, sur le tableau interactif" fetchpriority="high"></div>
+    <div class="couvs" aria-hidden="true">
+      <img class="couv" src="img/labo/quiz/livres/plomberie-chauffage-couv.jpg" alt="" style="left:-2%;bottom:30%;--r:-12deg;--d:0s">
+      <img class="couv" src="img/labo/quiz/livres/lecture-plans-devis-c6-couv.jpg" alt="" style="left:5%;bottom:4%;--r:-4deg;--d:-2s">
+      <img class="couv" src="img/labo/quiz/livres/ventilation-climatisation-m11-couv.jpg" alt="" style="right:-1%;bottom:34%;--r:11deg;--d:-1s">
+      <img class="couv" src="img/labo/quiz/livres/notions-energie-c13-couv.jpg" alt="" style="right:6%;bottom:6%;--r:4deg;--d:-3s">
+    </div>
+  </div>
+</header>
+
+<section class="chiffres">
+  <div class="w grille">
+    <div class="rv"><b>13</b><span>livres de cours animés</span></div>
+    <div class="rv d1"><b>123</b><span>feuilles de plans<br>en 5 dossiers</span></div>
+    <div class="rv d2"><b>250+</b><span>questions de quiz<br>prêtes à jouer</span></div>
+    <div class="rv d3"><b>2</b><span>programmes : DEP 5211<br>et DEP 5333</span></div>
+  </div>
+</section>
+
+<section class="sec clair" id="livres">
+  <div class="w centre">
+    <p class="eyebrow rv">Livres animés</p>
+    <h2 class="rv d1">Le manuel prend vie.</h2>
+    <p class="lead rv d2">Chaque page s'ajuste au tableau. Les démonstrations se jouent étape par étape, et les réponses apparaissent <b>une à la fois</b>, au rythme de ta classe.</p>
+    <div class="ecran rv"><img src="img/presentation/livre.jpg" alt="Un cahier de montages de tuyauterie ouvert dans le lecteur de Métier+" loading="lazy"></div>
+    <div class="points" style="text-align:left">
+      <div class="point rv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4 4 10-10"/></svg><h3>Réponses pas à pas</h3><p>Le corrigé est dans le livre. Tu le dévoiles une réponse à la fois, ou tout d'un coup.</p></div>
+      <div class="point rv d1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1-4L16.5 4.5a2 2 0 0 1 3 3L8 19z"/></svg><h3>Crayon et texte</h3><p>Écris sur les lignes, coche les cases, encercle les choix. Tes annotations restent sur la page.</p></div>
+      <div class="point rv d2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5M8.5 11h5M11 8.5v5"/></svg><h3>Zoom au doigt</h3><p>Pince l'écran pour agrandir un détail, glisse pour te déplacer. Fluide, même en 4K.</p></div>
+      <div class="point rv d3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg><h3>Table des matières</h3><p>Modules, animations et exercices en un toucher, avec la recherche dans tout le livre.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec">
+  <div class="w duo">
+    <div class="txt">
+      <p class="eyebrow rv">Télécommande</p>
+      <h2 class="rv d1">Reste debout.<br>Ton cellulaire s'occupe du reste.</h2>
+      <p class="lead rv d2">Scanne le code au tableau : ton cellulaire devient la télécommande du livre. Tourne les pages, saute à un module, montre les réponses, pointe avec le laser.</p>
+      <ul class="liste rv d3"><li><div>Un pavé tactile <span>pour tourner, zoomer et te déplacer</span></div></li><li><div>Un laser <span>pour pointer sur l'écran de la classe</span></div></li><li><div>Aucune installation <span>: une page web, rien à télécharger</span></div></li></ul>
+    </div>
+    <div class="rv d1" aria-hidden="true">
+      <div class="tel"><div class="ecr">
+        <div class="t1"><img src="img/metier-plus.svg" alt=""><i>● Branché</i></div>
+        <div class="tt">Montages de tuyauterie</div>
+        <div class="pg">Page 25 sur 66</div><div class="barre"><i></i></div>
+        <div class="mods"><span>Fonte</span><span class="on">PEX</span><span>Cuivre</span><span>Acier</span></div>
+        <div class="pad"><span>‹</span><span>›</span></div>
+        <div class="ong"><span class="on">Pages</span><span>Laser</span><span>Aller à…</span></div>
+        <div class="outils"><span>Réponses</span><span>Animation</span><span>Écran noir</span><span>100 %</span></div>
+      </div></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec blanc" id="plans">
+  <div class="w centre">
+    <p class="eyebrow rv">Plans techniques</p>
+    <h2 class="rv d1">Des plans à l'échelle.<br>Pour vrai.</h2>
+    <p class="lead rv d2">Ouvre un dossier de plans complet au tableau, mets-le à l'échelle et <b>mesure directement à l'écran</b>. Annote, surligne et passe d'une feuille à l'autre sans quitter la classe.</p>
+    <div class="ecran rv"><img src="img/presentation/plan.jpg" alt="Le plan du rez-de-chaussée d'une maison ouvert dans la visionneuse de plans" loading="lazy"></div>
+    <div class="points trois" style="text-align:left">
+      <div class="point rv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17L17 3l4 4L7 21zM7 13l2 2M10 10l2 2M13 7l2 2"/></svg><h3>Mesure à l'échelle</h3><p>Choisis l'échelle du plan ou trace une cote connue, puis mesure n'importe quelle distance.</p></div>
+      <div class="point rv d1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3z"/><path d="M9 3v15M15 6v15"/></svg><h3>5 dossiers complets</h3><p>Maison, duplex, bâtiment commercial, centre commercial et ferme laitière : architecture, structure, plomberie, électricité, mécanique.</p></div>
+      <div class="point rv d2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3h8l3 3v15H5V3z"/><path d="M9 11l2 2 4-4M9 17h6"/></svg><h3>Questionnaires et corrigés</h3><p>Pour chaque dossier : lecture de plans et mesure à l'échelimètre, avec le corrigé.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec clair" id="formatifs">
+  <div class="w duo inv">
+    <div class="txt">
+      <p class="eyebrow rv">Formatifs</p>
+      <h2 class="rv d1">Tes formatifs, prêts à projeter.</h2>
+      <p class="lead rv d2">Cahiers d'activités et questionnaires s'ouvrent dans le même lecteur que les livres. Projette-les, imprime-les ou télécharge-les en un toucher.</p>
+      <ul class="liste rv d3"><li><div>Classés par programme <span>et faciles à retrouver</span></div></li><li><div>Le corrigé à portée de main <span>quand il existe</span></div></li><li><div>Le crayon et le zoom <span>comme dans les livres</span></div></li></ul>
+    </div>
+    <div class="eventail rv d1" aria-hidden="true">
+      <img src="activites/montages-circuit-ferme.jpg" alt="">
+      <img src="activites/plans-d1-lecture.jpg" alt="">
+      <img src="activites/plans-d4-lecture.jpg" alt="">
+      <img src="activites/plans-d5-lecture.jpg" alt="">
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="classe">
+  <div class="w centre">
+    <p class="eyebrow rv">Accueil de classe</p>
+    <h2 class="rv d1">Le cours, d'un coup d'œil.</h2>
+    <p class="lead rv d2">L'heure, la période, les pauses et le déroulement du cours, projetés pour toute la classe. Prépare ta semaine d'avance : <b>le bon livre, le bon plan ou le bon quiz s'ouvre au bon moment</b>.</p>
+    <div class="ecran rv"><img src="img/presentation/accueil.jpg" alt="L'accueil de classe : horloge, activité en cours et ligne du temps de la période" loading="lazy"></div>
+  </div>
+</section>
+
+<section class="sec blanc" id="labo">
+  <div class="w centre">
+    <p class="eyebrow rv">Labo interactif</p>
+    <h2 class="rv d1">La classe joue.<br>L'atelier apprend.</h2>
+    <p class="lead rv d2">Des quiz et des simulateurs joués avec les iPad de la classe. Les élèves scannent un code, choisissent un personnage du métier et répondent. <b>Aucun compte élève, aucune installation.</b></p>
+  </div>
+  <div class="w duo" style="margin-top:60px">
+    <div class="rv"><div class="ecran" style="margin:0"><img src="img/presentation/simu.jpg" alt="Le défi panneau d'alarme du simulateur de protection incendie" loading="lazy"></div>
+      <ul class="liste"><li><div>Quiz maison <span>: tes questions, ou plus de 250 questions tirées des livres</span></div></li><li><div>Simulateur de panneau d'alarme <span>: chaque iPad devient un panneau</span></div></li><li><div>Classement, séries et podium <span>: sobres, pour un public adulte</span></div></li></ul></div>
+    <div class="rv d1"><img src="img/presentation/tel.jpg" alt="Sur le cellulaire ou l'iPad, l'élève choisit son personnage" loading="lazy" style="width:min(300px,70vw);margin:0 auto;border-radius:36px;box-shadow:0 30px 70px rgba(30,42,68,.28);border:8px solid #111"></div>
+  </div>
+</section>
+
+<section class="sec" id="documents">
+  <div class="w duo">
+    <div class="txt">
+      <p class="eyebrow rv">Tes documents</p>
+      <h2 class="rv d1">Ton matériel.<br>Nos outils.</h2>
+      <p class="lead rv d2">Garde tes notes de cours et tes plans d'exercice. Glisse ton PDF dans Métier+, choisis <b>livre, formatif ou plan</b> : il s'ouvre avec le crayon, le zoom, la télécommande et la mesure à l'échelle.</p>
+      <ul class="liste rv d3"><li><div>Il te suit <span>sur tous tes ordinateurs</span></div></li><li><div>Visible pour toi seulement <span>jusqu'à ce que tu le proposes</span></div></li><li><div>Proposé à tous <span>après l'approbation de l'administrateur</span></div></li></ul>
+    </div>
+    <div class="rv d1" aria-hidden="true">
+      <div class="depot"><div class="fich">PDF</div><div class="choix"><span>Livre</span><span class="on">Formatif</span><span>Plan</span></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec clair">
+  <div class="w centre">
+    <div class="cadenas rv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></div>
+    <p class="eyebrow rv d1">Confidentialité</p>
+    <h2 class="rv d1">Protégé, de bout en bout.</h2>
+    <p class="lead rv d2">Les livres sont chiffrés : seuls les enseignants qui y ont droit peuvent les ouvrir. Tes préférences, tes quiz et tes documents te suivent d'un ordinateur à l'autre, <b>chiffrés avec la clé de ton compte</b>.</p>
+    <div class="points trois" style="text-align:left">
+      <div class="point rv"><h3>Accès par enseignant</h3><p>L'administrateur choisit qui ouvre quel livre, par programme ou livre par livre.</p></div>
+      <div class="point rv d1"><h3>Ton mot de passe reste chez toi</h3><p>Il ne quitte jamais ton navigateur : il sert seulement à ouvrir ta clé.</p></div>
+      <div class="point rv d2"><h3>Fonctionne hors ligne</h3><p>Les livres déjà ouverts restent disponibles en classe, même si Internet flanche.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="fin">
+  <div class="w">
+    <img class="logo rv" src="img/metier-plus-blanc.svg" alt="Métier+">
+    <h2 class="rv d1">Conçu en classe.<br>Pour la classe.</h2>
+    <p class="lead rv d2" style="margin:22px auto 0">Né au Pavillon de l'Avenir, par un enseignant de plomberie et chauffage, pour les enseignants de la formation professionnelle.</p>
+    <div class="actions rv d3"><a class="btn plein" href="./">Ouvrir Métier+</a></div>
+  </div>
+</section>
+
+<footer>
+  <div class="w"><span>© 2026 Jérémy Raymond. Tous droits réservés.</span><span>Réservé aux enseignants du Pavillon de l'Avenir</span><img src="img/pavillon-avenir.png" alt="Pavillon de l'Avenir" onerror="this.remove()"></div>
+</footer>
+
+<script>
+(function(){
+  const els = document.querySelectorAll(".rv");
+  if (!("IntersectionObserver" in window)){ els.forEach(e => e.classList.add("vu")); return; }
+  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting){ e.target.classList.add("vu"); io.unobserve(e.target); } }), { rootMargin:"0px 0px -8% 0px", threshold:.12 });
+  els.forEach(e => io.observe(e));
+})();
+</script>
+</body>
+</html>
