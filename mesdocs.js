@@ -129,13 +129,12 @@ window.MESDOCS = (function(){
 
   /* ---- ouvrir ---- */
   function pleinEcran(){ try { if (!document.fullscreenElement && !document.body.classList.contains("classe") && !(window.PREF && PREF().plein === false)){ window.FS_PAR = "livre"; document.documentElement.requestFullscreen().catch(() => { window.FS_PAR = ""; }); } } catch(x){} }
-  async function versLivre(bl, ext, titre, cle){
+  async function versLivre(bl, ext, titre, complet){   /* PDF : pages dessinées à mesure (rapide); complet = toutes les pages dans le fichier (publication) */
     if (ext === "html") return bl.text();
-    const c = cle && await fGet(cle + ":livre"); if (c) return c;
-    const h = await livreDePdf(bl, titre); if (cle) fPut(cle + ":livre", h).catch(() => {}); return h; }
+    return livreDePdf(bl, titre, !!complet); }
   async function ouvrirLivrePerso(l){
-    const x = doc(l.id); if (!x) return; pleinEcran(); chargement(l);
-    try { const bl = await blob(x.id), h = await versLivre(bl, x.ext, x.titre, x.id + ":" + (x.maj || 0)); chargement(null); ouvrirLivre(l, h); }
+    const x = doc(l.id); if (!x) return; pleinEcran(); chargement(l, true);
+    try { const bl = await blob(x.id), h = await versLivre(bl, x.ext, x.titre); chargement(l); ouvrirLivre(l, h); }
     catch(er){ chargement(null); if (/court/.test(er.message)) ouvrirFichier(x.id); else avis(er.message === "introuvable" ? "Ce fichier n'est pas sur cet ordinateur (il dépasse 20 Mo ou n'est pas encore arrivé)." : "Impossible d'ouvrir ce document : " + er.message); } }
   async function ouvrirFichier(id, telecharger){
     const x = doc(id); try { const bl = await blob(id), u = URL.createObjectURL(bl);
@@ -298,7 +297,7 @@ window.MESDOCS = (function(){
     const ov = q("#accesOv"); if (ov) ov.hidden = true;
     if (p.k === "plan"){ q("#planBtn").click(); setTimeout(() => window.__plans.charger({ id:"prop_" + p.pid, name:"Aperçu : " + p.titre, type:p.ext === "pdf" ? "pdf" : "img", blob:bl, used:Date.now() }), 300); return; }
     const l = { titre:"Aperçu : " + p.titre, fichier:"prop-" + p.pid, categorie:p.prog };
-    chargement(l); try { const h = await versLivre(bl, p.ext, p.titre); chargement(null); ouvrirLivre(l, h); } catch(er){ chargement(null); const u = URL.createObjectURL(bl); window.open(u, "_blank"); } }
+    chargement(l, true); try { const h = await versLivre(bl, p.ext, p.titre); chargement(l); ouvrirLivre(l, h); } catch(er){ chargement(null); const u = URL.createObjectURL(bl); window.open(u, "_blank"); } }
   async function jpgDe(bl, ext){ const ap = await apercu(bl, ext); return ap.couv ? unb64(ap.couv.split(",")[1]) : null; }
   async function publier(p){
     const jt = localStorage.getItem("ghJeton"); if (!jt) throw new Error("la publication n'est pas activée sur cet ordinateur");
@@ -311,7 +310,7 @@ window.MESDOCS = (function(){
     if (p.k === "act"){ files["activites/" + f + ".pdf"] = u; if (jpg) files["activites/" + f + ".jpg"] = jpg; }
     else if (p.k === "plan"){ const fx = p.ext === "pdf" ? "pdf" : (/png/.test(p.type) ? "png" : /webp/.test(p.type) ? "webp" : "jpg"); ent.fx = fx; files["plans/ens-" + f + "." + fx] = u; if (jpg) files["plans/ens-" + f + ".jpg"] = jpg; }
     else {   /* livre : chiffré comme les autres, clé pour les admins et les enseignants de son programme */
-      const h = await versLivre(bl, p.ext, p.titre), gz = new Uint8Array(await new Response(new Blob([h]).stream().pipeThrough(new CompressionStream("gzip"))).arrayBuffer());
+      const h = await versLivre(bl, p.ext, p.titre, true), gz = new Uint8Array(await new Response(new Blob([h]).stream().pipeThrough(new CompressionStream("gzip"))).arrayBuffer());
       const brut = crypto.getRandomValues(new Uint8Array(32)), k = await crypto.subtle.importKey("raw", brut, "AES-GCM", false, ["encrypt"]), iv = crypto.getRandomValues(new Uint8Array(12));
       const c = new Uint8Array(await crypto.subtle.encrypt({ name:"AES-GCM", iv }, k, gz)), out = new Uint8Array(12 + c.length); out.set(iv); out.set(c, 12);
       files["livres/" + f + ".chiffre"] = out;

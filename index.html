@@ -1553,7 +1553,7 @@ function renderHero(){
 
 /* ---- Ouverture d'un livre : une carte au centre de l'écran (plus de message par-dessus la barre d'outils) ---- */
 let chargeT = 0;
-function chargement(l){
+function chargement(l, attente){   /* attente : on prépare encore le livre (PDF, téléchargement) : ne pas fermer l'écran de chargement au bout de 4 s */
   let c = document.getElementById("chargeLivre"); clearInterval(chargeT);
   if (!l){ if (c) c.hidden = true; return; }
   if (!c){ c = document.createElement("div"); c.id = "chargeLivre"; c.className = "charge"; document.body.appendChild(c); }
@@ -1567,7 +1567,7 @@ function chargement(l){
     const n = Date.now();
     if (pret && !tPret){ tPret = n; const sp = c.querySelector(".charge-c span"); if (sp) sp.textContent = "Préparation des pages et des animations…"; }
     const fini = tPret && n - tPret > 1500 && n - t0 > 3000 && (imagesPretes() || n - tPret > 6000);
-    if (fini || n - t0 > 45000 || !$("#reader").classList.contains("open") && n - t0 > 4000){ clearInterval(chargeT); const bb = c.querySelector(".charge-b"); if (bb && fini){ bb.classList.add("fin"); setTimeout(() => { c.hidden = true; }, 300); } else c.hidden = true; } }, 150);
+    if (fini || n - t0 > 45000 || !attente && !$("#reader").classList.contains("open") && n - t0 > 4000 || attente && n - t0 > 180000){ clearInterval(chargeT); const bb = c.querySelector(".charge-b"); if (bb && fini){ bb.classList.add("fin"); setTimeout(() => { c.hidden = true; }, 300); } else c.hidden = true; } }, 150);
 }
 /* ---- Fenêtre de détails ---- */
 let toastT;
@@ -7041,22 +7041,52 @@ initAdmin();
   }
   async function pdfDe(a){ if (a.perso) return MESDOCS.blob(a.id); const r = await fetch("activites/" + a.f + ".pdf"); if (!r.ok) throw new Error("introuvable"); return r.blob(); }
   /* PDF -> petit livre « pages empilées » (une image par page) que le lecteur de livres sait ouvrir */
-  async function livreDePdf(blob, titre){
-    if (!(window.pdfjsLib && window.pdfjsLib.getDocument)){
-      const base = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/";
-      const load = src => new Promise((ok, ko) => { const sc = document.createElement("script"); sc.src = src; sc.onload = ok; sc.onerror = ko; document.head.append(sc); });
-      await load(base + "pdf.min.js"); window.pdfjsLib.GlobalWorkerOptions.workerSrc = base + "pdf.worker.min.js";
-    }
+  /* PDF -> livre. Rapide (8 nov., « il prend 3 min à ouvrir ») : le livre s'ouvre tout de suite avec des pages vides, et chaque page est dessinée
+     au moment où on l'affiche (page en cours + 2 suivantes + 1 précédente), par la bibliothèque (window.__pdfPage). complet = toutes les pages en images
+     dans le fichier (livre autonome, pour la publication). */
+  async function pdfjsPret(){
+    if (window.pdfjsLib && window.pdfjsLib.getDocument) return;
+    const base = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/";
+    const load = src => new Promise((ok, ko) => { const sc = document.createElement("script"); sc.src = src; sc.onload = ok; sc.onerror = ko; document.head.append(sc); });
+    await load(base + "pdf.min.js"); window.pdfjsLib.GlobalWorkerOptions.workerSrc = base + "pdf.worker.min.js";
+  }
+  window.__PDFS = window.__PDFS || {};
+  window.__pdfPage = (id, n) => { const d = window.__PDFS[id]; if (!d) return Promise.reject(new Error("fermé"));
+    if (d.c[n]) return d.c[n];
+    return d.c[n] = new Promise((ok, ko) => { d.pile.push({ n, ok, ko }); setTimeout(() => tourner(d), 0); }); };
+  /* la dernière page demandée passe en premier (on saute loin dans le livre : pas d'attente derrière les pages d'avant) */
+  async function tourner(d){
+    if (d.occupe) return; d.occupe = true;
+    while (d.pile.length){ const { n, ok, ko } = d.pile.pop();
+      try { const pg = await d.doc.getPage(n), v1 = pg.getViewport({ scale:1 }), vp = pg.getViewport({ scale:1300 / v1.width });
+        const cv = document.createElement("canvas"); cv.width = Math.round(vp.width); cv.height = Math.round(vp.height); const x = cv.getContext("2d"); x.fillStyle = "#fff"; x.fillRect(0, 0, cv.width, cv.height);
+        await pg.render({ canvasContext:x, viewport:vp }).promise; ok(cv.toDataURL("image/jpeg", .82)); }
+      catch(e){ delete d.c[n]; ko(e); } }
+    d.occupe = false; }
+  const STYLE_PDF = '<style>html,body{margin:0;background:#fff}.page{width:816px;position:relative;background:#fff;overflow:hidden}.page img{display:block;width:100%;height:100%;object-fit:contain}.page i.att{position:absolute;inset:0;display:grid;place-items:center;font:600 18px Arial,sans-serif;color:#9a9aa2;font-style:normal}</style>';
+  async function livreDePdf(blob, titre, complet){
+    await pdfjsPret();
     const pdf = await window.pdfjsLib.getDocument({ data: await blob.arrayBuffer() }).promise;
     if (pdf.numPages < 3) throw new Error("trop court");
+    const p1 = (await pdf.getPage(1)).getViewport({ scale:1 }), h = Math.round(816 * p1.height / p1.width);
     let out = "";
-    for (let i = 1; i <= pdf.numPages; i++){
-      const pg = await pdf.getPage(i), v1 = pg.getViewport({ scale:1 }), vp = pg.getViewport({ scale:1300 / v1.width });
-      const cv = document.createElement("canvas"); cv.width = Math.round(vp.width); cv.height = Math.round(vp.height);
-      await pg.render({ canvasContext:cv.getContext("2d"), viewport:vp }).promise;
-      out += '<section class="page" style="height:' + Math.round(816 * v1.height / v1.width) + 'px"><img alt="" src="' + cv.toDataURL("image/jpeg", .82) + '"></section>';
+    if (complet){
+      for (let i = 1; i <= pdf.numPages; i++){
+        const pg = await pdf.getPage(i), v1 = pg.getViewport({ scale:1 }), vp = pg.getViewport({ scale:1300 / v1.width });
+        const cv = document.createElement("canvas"); cv.width = Math.round(vp.width); cv.height = Math.round(vp.height);
+        await pg.render({ canvasContext:cv.getContext("2d"), viewport:vp }).promise;
+        out += '<section class="page" style="height:' + Math.round(816 * v1.height / v1.width) + 'px"><img alt="" src="' + cv.toDataURL("image/jpeg", .82) + '"></section>';
+      }
+      return '<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"><title>' + esc(titre) + '</title>' + STYLE_PDF + '</head><body><div id="activite">' + out + '</div></body></html>';
     }
-    return '<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"><title>' + esc(titre) + '</title><style>html,body{margin:0;background:#fff}.page{width:816px;position:relative;background:#fff;overflow:hidden}.page img{display:block;width:100%;height:100%}</style></head><body><div id="activite">' + out + '</div></body></html>';
+    const id = "p" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+    for (const k in window.__PDFS) if (Date.now() - window.__PDFS[k].t > 6 * 3600e3) delete window.__PDFS[k];
+    window.__PDFS[id] = { doc:pdf, c:{}, pile:[], t:Date.now() };
+    for (let i = 1; i <= pdf.numPages; i++) out += '<section class="page" data-n="' + i + '" style="height:' + h + 'px"><i class="att">Page ' + i + '…</i><img alt=""></section>';
+    const js = '(function(){var P=parent,ID="' + id + '";function m(s){var n=+s.dataset.n;if(s.dataset.ok)return;s.dataset.ok="1";P.__pdfPage(ID,n).then(function(u){var im=s.querySelector("img");im.src=u;var a=s.querySelector(".att");if(a)a.remove();}).catch(function(){s.dataset.ok="";});}'
+      + 'function t(){var pg=document.querySelectorAll(".page"),c=-1;for(var i=0;i<pg.length;i++){var s=pg[i];if(s.classList.contains("hcur")||s.classList.contains("live")){c=i;break;}}if(c<0)c=0;[c+2,c-1,c+1,c].forEach(function(k){if(pg[k])m(pg[k]);});}'
+      + 't();setInterval(t,250);})();';
+    return '<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"><title>' + esc(titre) + '</title>' + STYLE_PDF + '</head><body><div id="activite">' + out + '</div><script>' + js + '<\/script></body></html>';
   }
   ov.addEventListener("click", async e => {
     const t = e.target.closest(".act-tuile"); if (t){ const a = ACTIVITES.find(x => x.f === t.dataset.fiche); if (a) fiche(a); return; }
@@ -7073,10 +7103,10 @@ initAdmin();
     let blob; try { blob = await pdfDe(a); } catch (er) { if (a.perso){ aviser("Ce fichier n'est pas disponible sur cet ordinateur."); return; } window.open("activites/" + a.f + ".pdf", "_blank"); return; }
     closeModal();
     const l = { titre:a.titre, fichier:"activite-" + a.f, categorie:a.prog, couverture:a.img || "activites/" + a.f + ".jpg" };
-    chargement(l);
+    chargement(l, true);
     try {
       const html = await livreDePdf(blob, a.titre);
-      chargement(null); ov.hidden = true; window.RETOUR_ACTIVITES_LIVRE = true; ouvrirLivre(l, html);
+      chargement(l); ov.hidden = true; window.RETOUR_ACTIVITES_LIVRE = true; ouvrirLivre(l, html);
     } catch (er) {
       chargement(null);
       if (a.perso) MESDOCS.ouvrirFichier(a.id); else window.open("activites/" + a.f + ".pdf", "_blank");   /* si les pages ne se préparent pas : le PDF dans un onglet */
