@@ -9727,7 +9727,7 @@ window.ACCES = (function(){
     dessinerStats(); }
   function dessinerStats(){ const z = document.getElementById("gStats"); if (!z || !STATS) return;
     const mois = new Date().toLocaleDateString("en-CA").slice(0, 7), somme = {};
-    STATS.filter(r => FILTRE.per === "12" || r.mois === mois).forEach(r => somme[r.cle] = (somme[r.cle] || 0) + r.n);
+    STATS.filter(r => !/^test:/.test(r.cle) && (FILTRE.per === "12" || r.mois === mois)).forEach(r => somme[r.cle] = (somme[r.cle] || 0) + r.n);
     const nomQuiz = id => id.startsWith("livre-") ? titreDe(id.slice(6)) : id === "perso" ? "Quiz faits par les enseignants" : id === "exemple-incendie" ? "Quiz d'exemple (protection incendie)" : id;
     const OUT = { tableau:"Tableau blanc", plans:"Plans techniques", activites:"Activités", labo:"Labo interactif", accueil:"Accueil de classe", telecommande:"Télécommande des livres" };
     const bloc = (titre, pref, nom, coul) => { const L = Object.keys(somme).filter(k => k.startsWith(pref)).map(k => [nom(k.slice(pref.length)), somme[k]]).sort((a, b) => b[1] - a[1]).slice(0, 10);
