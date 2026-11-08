@@ -98,6 +98,11 @@ th{font-size:12px;color:var(--gris);border-top:0}
 #ecr .haut b{font-size:2.1vw}#ecr .haut span{font-size:1.3vw;color:#B5AFA6}
 #ecr .logoE{height:3vw;margin-right:1.2vw;vertical-align:middle}
 #ecr .liseret{position:absolute;left:0;right:0;top:0;height:.6vh;background:var(--acc)}
+.banniere{position:relative;height:30vh;border-radius:1.2vw;overflow:hidden;margin-bottom:3vh;animation:monte .6s ease-out both}
+.banniere img{width:100%;height:100%;object-fit:cover;display:block}
+.banniere::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 35%,rgba(0,0,0,.72))}
+.banniere span{position:absolute;left:2vw;bottom:2vh;z-index:1;font-size:2.6vw;font-weight:800;color:#fff;text-shadow:0 2px 12px rgba(0,0,0,.5)}
+.banniere small{display:block;font-size:1.3vw;font-weight:600;opacity:.85;letter-spacing:.06em;text-transform:uppercase}
 .lob{display:grid;grid-template-columns:auto 1fr;gap:4vw;align-items:center}
 .lob .qr{background:#fff;padding:1.2vw;border-radius:1.2vw}
 .lob .code{font-size:6vw;color:#fff;text-align:left;font-weight:900;letter-spacing:.12em}
@@ -174,6 +179,8 @@ Le propane s'accumule…
 <div id="vEdit" class="cache">
 <div class="carte"><h2>Créer ou modifier un quiz</h2>
 <input id="eTitre" placeholder="Titre du quiz" maxlength="80" style="font-size:18px;font-weight:700">
+<input id="eSujet" placeholder="Cours ou module (ex. : Plomberie · module 3), affiché au tableau" maxlength="60" style="margin-top:8px">
+<div class="img" style="display:flex;gap:10px;align-items:center;margin-top:8px" id="eCouv"></div>
 <div class="reg">
 <label>Qui joue<div class="seg" data-r="mode"><button data-v="ind">Chaque élève</button><button data-v="eq">En équipes</button></div></label>
 <label>Points<div class="seg" data-r="points"><button data-v="vitesse">Selon la vitesse</button><button data-v="fixe">Fixes</button><button data-v="aucun">Sans points</button></div></label>
@@ -235,7 +242,7 @@ function compter(el, de, a, ms){ // chiffres qui montent doucement
 }
 
 /* Quiz d'exemple (protection incendie, modules 1 à 5) */
-const EXEMPLE = {id: "exemple-incendie", exemple: true, titre: "Protection incendie : révision des modules 1 à 5", reg: Object.assign({}, REG_DEF, {coul: "#B3261E"}), qs: [
+const EXEMPLE = {id: "exemple-incendie", exemple: true, titre: "Protection incendie : révision des modules 1 à 5", couv: "img/labo/incendie-immeuble.jpg", sujet: "Protection incendie · modules 1 à 5", reg: Object.assign({}, REG_DEF, {coul: "#B3261E"}), qs: [
   {q: "Quel élément manque au triangle du feu pour faire le tétraèdre ?", ch: ["L'oxygène", "La réaction en chaîne", "La chaleur", "Le combustible"], bon: 1, s: 20, expl: "La réaction en chaîne entretient le feu; la poudre ABC agit surtout sur elle."},
   {q: "Un feu d'huile de cuisson dans une friteuse est de classe…", ch: ["A", "B", "C", "K"], bon: 3, s: 20, expl: "Classe K : huiles et graisses de cuisson. On utilise l'agent humide de la hotte ou un extincteur K."},
   {q: "Le propane qui fuit s'accumule…", ch: ["Au plafond", "Au sol et dans le sous-sol", "Il se mélange partout", "Dans les conduits"], bon: 1, s: 20, expl: "Densité ≈ 1,5 : plus lourd que l'air, il coule vers le bas."},
@@ -307,6 +314,7 @@ function telecommande(){
     Object.values(G.reps).forEach(x => cpt[x.c]++);
     return {m: "vue", code, etat: G.etat === "choix" ? "lobby" : G.etat, titre: G.quiz ? G.quiz.titre : "Quiz maison", i: G.i, n: G.jeu.length, t0: G.t0, now: Date.now(),
       reg: {coul: reg.coul, son: reg.son, classement: reg.classement, points: reg.points, mode: reg.mode},
+      couv: G.quiz && G.quiz.couv && !/^data:/.test(G.quiz.couv) ? G.quiz.couv : (G.quiz && G.quiz.couv ? "img" : ""), sujet: G.quiz ? G.quiz.sujet || "" : "",
       q: Q && ["question", "rev"].includes(G.etat) ? {q: Q.q, ch: Q.ch, s: Q.s, img: !!Q.img, expl: G.etat === "rev" ? Q.expl || "" : ""} : null, bon: G.etat === "rev" ? Q.bon : null, cpt, nrep: Object.keys(G.reps).length,
       joueurs: Object.keys(P).map(id => ({n: P[id].nom, pts: P[id].pts, r: r[id], g: G.etat === "rev" && G.reps[id] ? G.reps[id].g || 0 : 0})).sort((a, b) => a.r - b.r)};
   }
@@ -322,6 +330,7 @@ function telecommande(){
     $("bSuite").textContent = G.etat === "question" ? "Montrer la réponse" : G.i + 1 >= G.jeu.length ? "Voir le podium" : "Question suivante";
     table(); listeLob(); vue();
   }
+  function envoyerCouv(){ if (G.quiz && G.quiz.couv && /^data:/.test(G.quiz.couv)) envoyer(topic, {m: "img", i: -1, data: G.quiz.couv}); }
   let minut = null;
   function qMsg(pour){ const Q = G.jeu[G.i]; return {m: "q", pour, i: G.i, n: G.jeu.length, q: Q.q, ch: Q.ch, t0: G.t0, s: Q.s, coul: R().coul}; }
   function question(){
@@ -354,7 +363,7 @@ function telecommande(){
   $("bFin").onclick = () => { clearTimeout(minut); envoyer(topic, {m: "attente"}); G.quiz = null; G.etat = "choix"; G.i = -1; G.jeu = []; document.documentElement.style.removeProperty("--acc"); montrer("vChoix"); listeQuiz(); vue(); };
 
   ecouter(topic, m => {
-    if (m.m === "ecran?") { envoyer(topic, vueObj()); const Q = G.jeu[G.i]; if (G.etat === "question" && Q && Q.img) envoyer(topic, {m: "img", i: G.i, data: Q.img}); return; }
+    if (m.m === "ecran?") { envoyer(topic, vueObj()); envoyerCouv(); const Q = G.jeu[G.i]; if (G.etat === "question" && Q && Q.img) envoyer(topic, {m: "img", i: G.i, data: Q.img}); return; }
     if (m.m === "ici") {
       if (!P[m.pid]) P[m.pid] = {nom: m.nom, pts: 0, bons: 0}; else P[m.pid].nom = m.nom;
       if (G.etat === "question") envoyer(topic, qMsg(m.pid));
@@ -376,7 +385,7 @@ function telecommande(){
     const trouve = id => JSON.parse(JSON.stringify(tousQuiz().find(q => q.id === id)));
     document.querySelectorAll("[data-jouer]").forEach(b => b.onclick = () => {
       G.quiz = trouve(b.dataset.jouer); G.etat = "lobby"; G.i = -1; G.jeu = []; appliquerCouleur(); montrer("vJeu");
-      envoyer(topic, {m: "bienvenue", titre: G.quiz.titre, coul: R().coul, mode: R().mode}); maj();
+      envoyer(topic, {m: "bienvenue", titre: G.quiz.titre, coul: R().coul, mode: R().mode}); envoyerCouv(); maj();
     });
     document.querySelectorAll("[data-modif]").forEach(b => b.onclick = () => editer(trouve(b.dataset.modif)));
     document.querySelectorAll("[data-copier],[data-dupl]").forEach(b => b.onclick = () => { const q = trouve(b.dataset.copier || b.dataset.dupl); delete q.exemple; q.id = "q" + Date.now(); q.titre += " (copie)"; editer(q); });
@@ -425,7 +434,21 @@ function telecommande(){
     const e = $("eErr"); if (e) e.remove();
     ed = JSON.parse(JSON.stringify(q || {id: "q" + Date.now(), titre: "", qs: [qVide()]}));
     ed.reg = Object.assign({}, REG_DEF, ed.reg);
-    $("eTitre").value = ed.titre; dessinerReg(); dessinerEd(); montrer("vEdit");
+    $("eTitre").value = ed.titre; $("eSujet").value = ed.sujet || ""; dessinerCouv(); dessinerReg(); dessinerEd(); montrer("vEdit");
+  }
+  function choisirImage(max, fait){
+    const f = document.createElement("input"); f.type = "file"; f.accept = "image/*";
+    f.onchange = () => { const fi = f.files[0]; if (!fi) return; const im = new Image();
+      im.onload = () => { const k = Math.min(1, max / Math.max(im.width, im.height)), c = document.createElement("canvas");
+        c.width = Math.round(im.width * k); c.height = Math.round(im.height * k); c.getContext("2d").drawImage(im, 0, 0, c.width, c.height);
+        fait(c.toDataURL("image/jpeg", .78)); URL.revokeObjectURL(im.src); };
+      im.src = URL.createObjectURL(fi); };
+    f.click();
+  }
+  function dessinerCouv(){
+    $("eCouv").innerHTML = ed.couv ? `<img src="${esc(ed.couv)}" alt="" style="height:70px;border-radius:8px"><button class="btn2" id="eCouvX">Retirer l'image du tableau</button>` : `<button class="btn2" id="eCouvB">+ Image du module (affichée au tableau pendant l'accueil)</button>`;
+    if ($("eCouvB")) $("eCouvB").onclick = () => choisirImage(1400, d => { ed.couv = d; dessinerCouv(); });
+    if ($("eCouvX")) $("eCouvX").onclick = () => { delete ed.couv; dessinerCouv(); };
   }
   function dessinerReg(){
     document.querySelectorAll(".seg[data-r]").forEach(s => s.querySelectorAll("button").forEach(b => {
@@ -437,7 +460,7 @@ function telecommande(){
     document.documentElement.style.setProperty("--acc", ed.reg.coul);
   }
   function lireEd(){
-    ed.titre = $("eTitre").value.trim();
+    ed.titre = $("eTitre").value.trim(); ed.sujet = $("eSujet").value.trim();
     document.querySelectorAll(".qe").forEach((d, k) => {
       const Q = ed.qs[k];
       Q.q = d.querySelector(".tq").value.trim();
@@ -482,7 +505,7 @@ function telecommande(){
     const qs = ed.qs.map(Q => { const garde = Q.ch.map((t, c) => [t, c]).filter(([t]) => t); const o = {q: Q.q, ch: garde.map(g => g[0]), bon: garde.findIndex(g => g[1] === Q.bon), s: Q.s}; if (Q.expl) o.expl = Q.expl; if (Q.img) o.img = Q.img; return o; });
     const err = !ed.titre ? "Donne un titre au quiz." : qs.some(Q => !Q.q) ? "Chaque question doit avoir un texte." : qs.some(Q => Q.ch.length < 2) ? "Chaque question doit avoir au moins 2 choix." : qs.some(Q => Q.bon < 0) ? "La bonne réponse cochée doit être un choix rempli." : "";
     if (err) { $("eSauve").textContent = err; setTimeout(() => $("eSauve").textContent = "Enregistrer", 2600); return; }
-    const q = {id: ed.id, titre: ed.titre, reg: ed.reg, qs};
+    const q = {id: ed.id, titre: ed.titre, sujet: ed.sujet || "", reg: ed.reg, qs}; if (ed.couv) q.couv = ed.couv;
     const L = mesQuiz().filter(x => x.id !== q.id); L.push(q);
     if (!sauverListe(L)) return;
     document.documentElement.style.removeProperty("--acc");
@@ -573,10 +596,11 @@ function ecran(code){
     const v = V, n = Date.now() + decal, cle = v.etat + v.i;
     document.documentElement.style.setProperty("--acc", (v.reg && v.reg.coul) || "#534AB7");
     if (v.etat === "lobby") {
-      E.innerHTML = tete(v.titre) + `<div class="lob"><div class="qr" id="eQr"></div><div><div style="font-size:2vw;color:#B5AFA6">Scanne le code avec ton iPad</div>
+      const cv = v.couv === "img" ? img[-1] : v.couv;
+      E.innerHTML = tete(v.titre) + (cv ? `<div class="banniere"><img src="${esc(cv)}" alt=""><span>${v.sujet ? `<small>${esc(v.sujet)}</small>` : ""}${esc(v.titre)}</span></div>` : "") + `<div class="lob"><div class="qr" id="eQr"></div><div><div style="font-size:2vw;color:#B5AFA6">Scanne le code avec ton iPad</div>
         <div class="code">${code.slice(0, 3)} ${code.slice(3)}</div><div style="font-size:1.6vw;color:#B5AFA6">${v.joueurs.length} participant${v.joueurs.length > 1 ? "s" : ""}</div>
         <div class="noms">${v.joueurs.map(j => `<span>${esc(j.n)}</span>`).join("")}</div></div></div>` + bSon();
-      try { new QRCode($("eQr"), {text: url, width: Math.round(innerWidth * .22), height: Math.round(innerWidth * .22), correctLevel: QRCode.CorrectLevel.M}); } catch(e) { $("eQr").textContent = url; }
+      try { const tq = cv ? .16 : .22; new QRCode($("eQr"), {text: url, width: Math.round(innerWidth * tq), height: Math.round(innerWidth * tq), correctLevel: QRCode.CorrectLevel.M}); } catch(e) { $("eQr").textContent = url; }
     } else if (v.etat === "question" && v.q) {
       const r = Math.max(0, Math.ceil((v.t0 + v.q.s * 1000 - n) / 1000));
       if (cle !== dernier || force) {
@@ -608,7 +632,7 @@ function ecran(code){
     const b = $("bSon"); if (b) b.onclick = () => { sonOK = !sonOK; if (sonOK) { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); ac.resume(); ton(660, .2, .08); } b.textContent = sonOK ? "Son activé" : "Activer le son"; };
   }
   ecouter(topic, m => {
-    if (m.m === "img") { img[m.i] = m.data; if (V.etat === "question" && V.i === m.i) rendre(true); }
+    if (m.m === "img") { img[m.i] = m.data; if ((V.etat === "question" && V.i === m.i) || (m.i === -1 && V.etat === "lobby")) rendre(true); }
     else if (m.m === "vue") { V = m; decal = m.now - Date.now(); rendre(m.etat === "lobby"); }
   }, ok => { if (ok) envoyer(topic, {m: "ecran?"}); });
   rendre(true); setInterval(() => { if (V.etat === "question") rendre(); }, 500);
