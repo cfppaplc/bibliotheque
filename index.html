@@ -9274,6 +9274,7 @@ document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("#qrOv"
   function aller(n){ if (!RD.drv) return; n = Math.max(1, Math.min(totPages() || n, n)); RD.bouge = true; try { RD.drv.goto(n); } catch(e){} setTimeout(() => { try { syncSecond(); poll(); } catch(e){} pousser(); }, 280); }
   T.ordre = o => ordre(o);   /* pour les essais */
   function ordre(o){
+    if (o.m === "allo" || o.m === "vie"){ try { localStorage.setItem("teleJeton", JSON.stringify({k: T.jeton, t: Date.now(), vu: Date.now()})); } catch(e){} }   /* un cellulaire est branché : on se rebranchera seul après un rechargement */
     if (o.m === "allo"){ const neuf = Date.now() - (T.vu || 0) > 25000; T.branche = true; T.vu = Date.now(); majPill(); if (neuf) montrerBranche(); pousser(true); return; }
     if (o.m === "vie"){ T.vu = Date.now(); majPill(); return; }
     if (o.m === "bye"){ T.vu = 0; majPill(); return; }
@@ -9311,15 +9312,22 @@ document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("#qrOv"
   setInterval(majPill, 2000);
   function brancher(){
     if (T.canal) return Promise.resolve();
-    T.jeton = T.jeton || jeton();
+    /* même lien pendant 24 h sur cet ordinateur : recharger la page ne débranche plus le cellulaire */
+    if (!T.jeton){ try { const g = JSON.parse(localStorage.getItem("teleJeton") || "null"); if (g && g.k && Date.now() - g.t < 864e5) T.jeton = g.k; } catch(e){} }
+    T.jeton = T.jeton || jeton(); try { localStorage.setItem("teleJeton", JSON.stringify({k: T.jeton, t: Date.now()})); } catch(e){}
     return charger().then(() => {
-      const sb = window.supabase.createClient(SB_URL, SB_CLE, {realtime: {params: {eventsPerSecond: 60}}});
-      T.canal = sb.channel("pda-livre-" + T.jeton, {config: {broadcast: {self: false}}});
-      T.canal.on("broadcast", {event: "m"}, ({payload}) => { try { ordre(payload); } catch(e){} });
-      T.canal.subscribe(st => { T.pret = st === "SUBSCRIBED"; majEtatOv(); if (T.pret) pousser(true); });
+      const sb = T.sb = window.supabase.createClient(SB_URL, SB_CLE, {realtime: {params: {eventsPerSecond: 60}}});
+      const abonner = () => {
+        T.canal = sb.channel("pda-livre-" + T.jeton, {config: {broadcast: {self: false}}});
+        T.canal.on("broadcast", {event: "m"}, ({payload}) => { try { ordre(payload); } catch(e){} });
+        T.canal.subscribe(st => { T.pret = st === "SUBSCRIBED"; majEtatOv(); if (T.pret) pousser(true);
+          else if (/CLOSED|ERROR|TIMED_OUT/.test(st) && !T.reco){ T.reco = setTimeout(() => { T.reco = 0; try { sb.removeChannel(T.canal); } catch(e){} abonner(); }, 3000); } });   /* relais coupé : on se rebranche seul */
+      };
+      abonner();
       setInterval(() => pousser(false), 500);
     });
   }
+  try { const g = JSON.parse(localStorage.getItem("teleJeton") || "null"); if (g && g.vu && Date.now() - g.vu < 4 * 3600e3) setTimeout(() => brancher().catch(() => {}), 2500); } catch(e){}
   function lien(){ const u = new URL("telecommande.html", location.href); u.search = ""; u.hash = "k=" + T.jeton; return u.toString(); }
   function majEtatOv(){ const p = $("#qrPage"); if (!p || $("#qrOv").hidden || !$("#qrOv").classList.contains("tele")) return;
     p.textContent = T.branche ? "Télécommande branchée ✓" : T.pret ? "Prêt : scanne avec ton cellulaire" : "Connexion au relais…"; }

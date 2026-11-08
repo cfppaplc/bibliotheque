@@ -226,9 +226,17 @@ if (!jeton){ $("attente").classList.add("sanscode"); $("attTxt").innerHTML = "Ce
 else if (!window.supabase){ $("attTxt").textContent = "Impossible de joindre le relais. Vérifie Internet puis recharge la page."; etat("Hors ligne", "ko"); }
 else {
   const sb = window.supabase.createClient(SB_URL, SB_CLE, {realtime: {params: {eventsPerSecond: 60}}});
-  canal = sb.channel("pda-livre-" + jeton, {config: {broadcast: {self: false}}});
-  canal.on("broadcast", {event: "m"}, ({payload: o}) => { if (o && o.m === "etat"){ E = o; vuA = Date.now(); etat("Branché", "ok"); rendre(); } });
-  canal.subscribe(st => { pret = st === "SUBSCRIBED"; if (pret){ etat("Recherche de l'ordinateur…"); envoyer({m: "allo"}); } else etat("Reconnexion…", "ko"); });
+  let reco = 0;
+  let t0 = 0;
+  const abonner = () => { t0 = Date.now();   /* relais coupé (cellulaire en veille, réseau) : on se rebranche seul */
+    canal = sb.channel("pda-livre-" + jeton, {config: {broadcast: {self: false}}});
+    canal.on("broadcast", {event: "m"}, ({payload: o}) => { if (o && o.m === "etat"){ E = o; vuA = Date.now(); etat("Branché", "ok"); rendre(); } });
+    canal.subscribe(st => { pret = st === "SUBSCRIBED"; if (pret){ etat("Recherche de l'ordinateur…"); envoyer({m: "allo"}); } else { etat("Reconnexion…", "ko"); if (/CLOSED|ERROR|TIMED_OUT/.test(st) && !reco) reco = setTimeout(rebrancher, 2500); } });
+  };
+  const rebrancher = () => { reco = 0; try { sb.removeChannel(canal); } catch(e){} abonner(); };
+  abonner();
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && !pret && !reco) rebrancher(); });
+  setInterval(() => { if (!pret && !reco && Date.now() - t0 > 12000 && document.visibilityState === "visible") rebrancher(); }, 4000);
   setInterval(() => { if (pret) envoyer({m: "vie"}); }, 10000);
   /* l'ordinateur répond à « allo »; sans nouvelles, on redemande */
   setInterval(() => { if (pret && Date.now() - vuA > 6000){ envoyer({m: "allo"}); if (E && Date.now() - vuA > 15000) etat("Ordinateur muet", "ko"); } }, 3000);
