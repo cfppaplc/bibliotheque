@@ -8854,6 +8854,8 @@ document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("#qrOv"
     else if (c === "anim") clic("tbAnim");
     else if (c === "noir") clic("tbNoir");
     else if (c === "pan"){ const sc = $("#rstage"); if (sc){ sc.scrollLeft += (+o.dx || 0) * 2.6; sc.scrollTop += (+o.dy || 0) * 2.6; } return; }
+    else if (c === "pz"){ const st = $("#rstage"), r = st.getBoundingClientRect(), f = Math.max(.5, Math.min(2, +o.f || 1));   /* pincement sur le pavé = même zoom que la roulette, centré */
+      zoomSouris({clientX: r.left + r.width / 2, clientY: r.top + r.height / 2, deltaY: -Math.log(f) / .0075, deltaMode: 0, ecran: 1}, null); setTimeout(pousser, 400); return; }
     else if (c === "zi") clic("tbZi"); else if (c === "zo") clic("tbZo"); else if (c === "zv") clic("tbZv");
     setTimeout(pousser, 250);
   }
@@ -8861,7 +8863,7 @@ document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("#qrOv"
     if (T.canal) return Promise.resolve();
     T.jeton = T.jeton || jeton();
     return charger().then(() => {
-      const sb = window.supabase.createClient(SB_URL, SB_CLE, {realtime: {params: {eventsPerSecond: 20}}});
+      const sb = window.supabase.createClient(SB_URL, SB_CLE, {realtime: {params: {eventsPerSecond: 60}}});
       T.canal = sb.channel("pda-livre-" + T.jeton, {config: {broadcast: {self: false}}});
       T.canal.on("broadcast", {event: "m"}, ({payload}) => { try { ordre(payload); } catch(e){} });
       T.canal.subscribe(st => { T.pret = st === "SUBSCRIBED"; majEtatOv(); if (T.pret) pousser(true); });

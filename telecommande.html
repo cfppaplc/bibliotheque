@@ -65,8 +65,8 @@ h1{font-size:19px;margin:14px 0 2px;line-height:1.25;display:-webkit-box;-webkit
   <div class="ou" id="ou"></div>
   <div class="barre"><b id="prog"></b></div>
   <div class="page" id="page">–</div>
-  <div class="mode"><button id="mPages" class="on">Pages</button><button id="mPad">Déplacer</button></div>
-  <div class="pad cache" id="pad"><span id="padTxt">Glisse le doigt pour te promener dans la page.</span><i id="padDoigt"></i></div>
+  <div class="mode"><button id="mPages" class="on">Pages</button><button id="mPad">Zoom et déplacer</button></div>
+  <div class="pad cache" id="pad"><span id="padTxt">Un doigt : te promener. Deux doigts : pincer pour zoomer.</span><i id="padDoigt"></i></div>
   <div class="fleches"><button id="prec" aria-label="Page précédente">‹</button><button id="suiv" aria-label="Page suivante">›</button></div>
   <div class="outils">
     <button id="bRep"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg><span id="bRepT">Réponses</span></button>
@@ -140,16 +140,27 @@ document.addEventListener("dblclick", e => e.preventDefault(), {passive: false})
 let modePad = false;
 function mode(p){ modePad = p; $("mPad").classList.toggle("on", p); $("mPages").classList.toggle("on", !p);
   $("pad").classList.toggle("cache", !p); document.querySelector(".fleches").classList.toggle("cache", p); majPad(); }
-function majPad(){ $("padTxt").textContent = E && E.zoom > 1.02 ? "Glisse le doigt pour te promener dans la page." : "Zoome d'abord avec la loupe +, puis glisse le doigt ici pour te promener."; }
+function majPad(){ $("padTxt").textContent = E && E.zoom > 1.02 ? "Un doigt : te promener. Deux doigts : pincer pour zoomer." : "Pince avec deux doigts pour zoomer, puis glisse un doigt pour te promener."; }
 $("mPages").onclick = () => mode(false); $("mPad").onclick = () => mode(true);
 (function(){
-  const pad = $("pad"), dg = $("padDoigt"); let der = null, acc = [0, 0], minu = null;
-  const vider = () => { if (acc[0] || acc[1]){ envoyer({m: "cmd", c: "pan", dx: Math.round(acc[0]), dy: Math.round(acc[1])}); acc = [0, 0]; } minu = null; };
-  pad.addEventListener("pointerdown", e => { pad.setPointerCapture(e.pointerId); der = [e.clientX, e.clientY]; const r = pad.getBoundingClientRect(); dg.style.display = "block"; dg.style.left = (e.clientX - r.left) + "px"; dg.style.top = (e.clientY - r.top) + "px"; });
-  pad.addEventListener("pointermove", e => { if (!der) return; acc[0] += e.clientX - der[0]; acc[1] += e.clientY - der[1]; der = [e.clientX, e.clientY];
-    const r = pad.getBoundingClientRect(); dg.style.left = (e.clientX - r.left) + "px"; dg.style.top = (e.clientY - r.top) + "px"; if (!minu) minu = setTimeout(vider, 40); });
-  const fin = () => { der = null; dg.style.display = "none"; vider(); };
+  /* 1 doigt = se déplacer; 2 doigts = pincer pour zoomer (comme sur une photo) */
+  const pad = $("pad"), dg = $("padDoigt"), P = new Map(); let acc = [0, 0], f = 1, minu = null, dist0 = 0;
+  const vider = () => { minu = null;
+    if (acc[0] || acc[1]){ envoyer({m: "cmd", c: "pan", dx: Math.round(acc[0]), dy: Math.round(acc[1])}); acc = [0, 0]; }
+    if (Math.abs(f - 1) > .01){ envoyer({m: "cmd", c: "pz", f: +f.toFixed(3)}); f = 1; } };
+  const plus = () => { if (!minu) minu = setTimeout(vider, 50); };
+  const ecart = () => { const [a, b] = [...P.values()]; return Math.hypot(a[0] - b[0], a[1] - b[1]); };
+  const montrer = e => { const r = pad.getBoundingClientRect(); dg.style.display = "block"; dg.style.left = (e.clientX - r.left) + "px"; dg.style.top = (e.clientY - r.top) + "px"; };
+  pad.addEventListener("pointerdown", e => { e.preventDefault(); try { pad.setPointerCapture(e.pointerId); } catch(x){} P.set(e.pointerId, [e.clientX, e.clientY]); montrer(e); if (P.size === 2) dist0 = ecart(); });
+  pad.addEventListener("pointermove", e => { if (!P.has(e.pointerId)) return; e.preventDefault(); const p = P.get(e.pointerId);
+    if (P.size === 1){ acc[0] += e.clientX - p[0]; acc[1] += e.clientY - p[1]; }
+    P.set(e.pointerId, [e.clientX, e.clientY]);
+    if (P.size === 2){ const d = ecart(); if (dist0 > 20) f *= d / dist0; dist0 = d; }
+    montrer(e); plus(); });
+  const fin = e => { P.delete(e.pointerId); dist0 = P.size === 2 ? ecart() : 0; if (!P.size) dg.style.display = "none"; vider(); };
   pad.addEventListener("pointerup", fin); pad.addEventListener("pointercancel", fin);
+  /* iPhone : bloquer le zoom de la page elle-même pendant le geste */
+  ["touchstart", "touchmove", "gesturestart", "gesturechange"].forEach(t => pad.addEventListener(t, e => e.preventDefault(), {passive: false}));
 })();
 
 /* écran allumé tant que la télécommande est ouverte */
@@ -160,7 +171,7 @@ document.addEventListener("visibilitychange", () => { if (document.visibilitySta
 if (!jeton){ $("attTxt").innerHTML = "Ce lien n'est pas complet.<br>Dans le livre, touche le bouton <b>Télécommande</b> et scanne le code QR."; etat("Pas de code", "ko"); }
 else if (!window.supabase){ $("attTxt").textContent = "Impossible de joindre le relais. Vérifie Internet puis recharge la page."; etat("Hors ligne", "ko"); }
 else {
-  const sb = window.supabase.createClient(SB_URL, SB_CLE, {realtime: {params: {eventsPerSecond: 20}}});
+  const sb = window.supabase.createClient(SB_URL, SB_CLE, {realtime: {params: {eventsPerSecond: 60}}});
   canal = sb.channel("pda-livre-" + jeton, {config: {broadcast: {self: false}}});
   canal.on("broadcast", {event: "m"}, ({payload: o}) => { if (o && o.m === "etat"){ E = o; vuA = Date.now(); etat("Branché", "ok"); rendre(); } });
   canal.subscribe(st => { pret = st === "SUBSCRIBED"; if (pret){ etat("Recherche de l'ordinateur…"); envoyer({m: "allo"}); } else etat("Reconnexion…", "ko"); });
