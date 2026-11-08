@@ -9621,7 +9621,8 @@ window.ACCES = (function(){
       + (aRech.length ? '<label class="acces-rech"><input type="checkbox" id="gRech" checked><span><b>Couper vraiment l\'accès</b> : nouvelle clé pour ' + aRech.map(f => '« ' + esc(titreDe(f)) + ' »').join(", ") + '. Une vieille copie gardée par quelqu\'un qui n\'a plus l\'accès ne s\'ouvrira plus (un peu plus long à publier).</span></label>' : '')
       + (jeton   /* clé déjà enregistrée : invisible et impossible à changer dans le panneau (demande de Jeremy, 8 nov.); redemandée seulement si GitHub la refuse */
         ? '<input type="hidden" id="gJeton" value="">'
-        : '<p class="sous acces-nocle">Publication possible seulement depuis l\'ordinateur où ta clé GitHub est enregistrée. Ici, tu peux regarder sans rien publier.</p><input type="hidden" id="gJeton" value="">')
+        : '<p class="sous acces-nocle">Cet appareil n\'a pas encore la clé GitHub : tu peux regarder sans rien publier. <a href="#" id="gAct" style="color:#a9a9ae">Activer la publication ici</a> (une seule fois : la clé ne pourra plus être changée ni affichée).</p>'
+          + '<div id="gActZone" hidden><input type="password" id="gJeton" placeholder="Clé GitHub (github_pat_…)" value="" autocomplete="off"><div class="acces-btns" style="justify-content:flex-start"><button class="abtn prim" id="gActOk">Enregistrer la clé</button></div></div>')
       + '<div class="acces-err" id="gErr"' + (msg && msg.err ? "" : " hidden") + '>' + (msg && msg.err ? esc(msg.err) : "") + '</div><div class="acces-ok" id="gOk"' + (msg && msg.ok ? "" : " hidden") + '>' + (msg && msg.ok ? esc(msg.ok) : "") + '</div>'
       + '<div class="acces-btns"><button id="gNon">Fermer</button>' + (jeton ? '<button class="prim" id="gPub">Publier</button>' : '') + '</div>';
     const B = box(); B.scrollTop = st0;
@@ -9697,6 +9698,9 @@ window.ACCES = (function(){
     document.getElementById("gNon").onclick = fermer;
     const gT = document.getElementById("gTel"); if (gT) gT.onclick = () => { const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([JSON.stringify(BROUILLON, null, 1)], { type:"application/json" })); a.download = "comptes.json"; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 3000); };
     const chg = document.getElementById("gChg"); if (chg) chg.onclick = e => { e.preventDefault(); const z = document.getElementById("gJetZone"); z.hidden = false; const i = document.getElementById("gJeton"); i.value = ""; i.focus(); chg.parentNode.hidden = true; };
+    const gAct = document.getElementById("gAct"); if (gAct){ gAct.onclick = e => { e.preventDefault(); document.getElementById("gActZone").hidden = false; document.getElementById("gJeton").focus(); };
+      document.getElementById("gActOk").onclick = () => { const v = document.getElementById("gJeton").value.trim(); if (!/^(github_pat_|ghp_)/.test(v)) return dessinerGerer({ err:"Ce n'est pas une clé GitHub (elle commence par github_pat_)." });
+        try { localStorage.setItem("ghJeton", v); } catch(x){} dessinerGerer({ ok:"Clé enregistrée sur cet appareil. Tu peux maintenant publier d'ici." }); }; }
     if (document.getElementById("gPub")) document.getElementById("gPub").onclick = async () => {
       let jt = document.getElementById("gJeton").value.trim(); if (!jt) jt = jeton; if (!jt) return dessinerGerer({ err:"Colle d'abord ta clé GitHub (ou utilise « Télécharger comptes.json »)." });
       try { localStorage.setItem("ghJeton", jt); } catch(e){}
