@@ -1365,7 +1365,7 @@ function bookCard(l){
     ${badgeLivre(l) === "construction" ? '<span class="badge badge-constr" title="Livre en construction : pas encore la version finale">' + ICO_CONSTR + 'En construction</span>' : badgeLivre(l) === "nouveau" ? '<span class="badge">Nouveau</span>' : badgeLivre(l) === "maj" ? '<span class="badge badge-maj">Mis à jour</span>' : ''}
     ${isFav(l) ? '<span class="fav-mark">★</span>' : ''}
     ${window.ACCES && ACCES.verrouille(l.fichier) ? '<span class="cadenas" title="Livre protégé : connecte-toi pour l\'ouvrir">' + window.ICO_CADENAS + '</span>' : ''}
-    ${l.user ? '<span class="mp-coll autre" title="Livre ajouté par un enseignant (hors collection Métier+)"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h12v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5"/></svg></span>' : '<span class="mp-coll" title="Collection Métier+"><img src="img/metier-plus-icone.svg" alt="Métier+"></span>'}
+    ${l.user || l.perso || l.ens ? '<span class="mp-coll autre" title="Livre ajouté par un enseignant (hors collection Métier+)"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h12v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5"/></svg></span>' : '<span class="mp-coll" title="Collection Métier+"><img src="img/metier-plus-icone.svg" alt="Métier+"></span>'}
     <div class="cover ${gen?'generated':''}" style="${coverStyle(l)}">
       ${gen ? `<div class="t">${esc(l.titre)}</div><div class="a">${esc(l.auteur)}</div>` : ''}
     </div>
@@ -1443,6 +1443,8 @@ function render(){
     /* « Nouveautés » retirée : les livres récents gardent leur étiquette et sont listés dans « Quoi de neuf » */
     if (favs.length) html += rowHTML("Ma liste", list.filter(isFav));
   }
+  html += rowHTML("Mes livres", list.filter(l => l.perso));
+  list = list.filter(l => !l.perso);
   const cats = [...new Set(list.map(l => l.categorie))].sort((a, b) => nomProgramme(a).localeCompare(nomProgramme(b), "fr"));
   const parComp = (a, b) => (parseFloat(a.competence) || 999) - (parseFloat(b.competence) || 999) || a.titre.localeCompare(b.titre, "fr");
   cats.forEach(c => html += rowHTML(nomProgramme(c), list.filter(l => l.categorie === c).sort(parComp)));
@@ -7009,15 +7011,15 @@ initAdmin();
   const IC_DL = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></svg>';
   function tuile(a){
     const ac = a.dossier ? COUL_DOS[a.dossier] : (COUL[a.prog] || "#EB6A22");
-    return '<button type="button" class="act-tuile" style="--ac:' + ac + '" data-fiche="' + a.f + '" title="' + esc(a.titre) + '"><span class="act-vig"><img src="activites/' + a.f + '.jpg" alt="" loading="lazy"></span>' +
-      '<span class="act-nom">' + esc(a.titre) + '</span><span class="act-sous">' + a.pages + ' pages' + (a.corrige ? ' · corrigé' : '') + '</span></button>';
+    return '<button type="button" class="act-tuile" style="--ac:' + ac + '" data-fiche="' + a.f + '" title="' + esc(a.titre) + '"><span class="act-vig"><img src="' + (a.img || 'activites/' + a.f + '.jpg') + '" alt="" loading="lazy"></span>' +
+      '<span class="act-nom">' + esc(a.titre) + '</span><span class="act-sous">' + (a.pages ? a.pages + ' pages' : 'PDF') + (a.corrige ? ' · corrigé' : '') + '</span></button>';
   }
   function dessiner(){
     const q = F.q.trim().toLowerCase();
     const l = ACTIVITES.filter(a => (!F.p || progsDe(a).includes(F.p)) && (!q || (a.titre + " " + a.comp + " " + a.desc + " " + a.type).toLowerCase().includes(q)));
     const sp = $("actProg"); if (sp && sp.options.length < 2){ [...new Set(ACTIVITES.flatMap(progsDe))].forEach(p => sp.add(new Option(p, p))); sp.parentNode.hidden = false; }
     if (!l.length){ $("actListe").innerHTML = '<div class="act-vide">Aucune activité trouvée.</div>'; return; }
-    const groupes = [...new Set(ACTIVITES.map(a => a.type))];
+    const groupes = [...new Set(ACTIVITES.map(a => a.type))].sort((x, y) => (y === "Mes activités") - (x === "Mes activités"));
     $("actListe").innerHTML = groupes.map(g => {
       const m = l.filter(a => a.type === g).sort((x, y) => (x.dossier || 0) - (y.dossier || 0) || x.titre.localeCompare(y.titre, "fr")); if (!m.length) return "";
       const ouvert = q || OUVERTS.has(g);
@@ -7027,17 +7029,17 @@ initAdmin();
   function fiche(a){   /* même fiche que celle d'un livre (#modal / #panel de la bibliothèque) */
     const c = a.dossier ? COUL_DOS[a.dossier] : (COUL[a.prog] || "#EB6A22");
     $("panel").innerHTML =
-      '<div class="panel-top with-cover" style="background:linear-gradient(160deg,' + c + ',#14141a)"><button class="close" aria-label="Fermer">✕</button><img class="panel-cover" src="activites/' + a.f + '.jpg" alt=""><h2>' + esc(a.titre) + '</h2></div>' +
-      '<div class="panel-body"><div class="meta"><span>' + esc(a.type) + '</span><span>' + a.pages + ' pages</span><span>' + esc(a.comp) + '</span><span>' + esc(progsDe(a).join(' · ')) + '</span></div>' +
+      '<div class="panel-top with-cover" style="background:linear-gradient(160deg,' + c + ',#14141a)"><button class="close" aria-label="Fermer">✕</button><img class="panel-cover" src="' + (a.img || 'activites/' + a.f + '.jpg') + '" alt=""><h2>' + esc(a.titre) + '</h2></div>' +
+      '<div class="panel-body"><div class="meta"><span>' + esc(a.type) + '</span><span>' + (a.pages ? a.pages + ' pages' : 'PDF') + '</span><span>' + esc(a.comp) + '</span><span>' + esc(progsDe(a).join(' · ')) + '</span></div>' +
       '<p>' + esc(a.desc) + '</p>' +
       '<button class="btn btn-play" id="mRead" type="button" data-a="ouvrir" data-f="' + a.f + '">▶ Projeter</button>' +
       '<button class="btn btn-fav" id="mImp" type="button" data-a="imprimer" data-f="' + a.f + '">Imprimer</button>' +
-      '<a class="btn btn-fav" id="mPdf" href="activites/' + a.f + '.pdf" download="' + esc(a.titre) + '.pdf">PDF</a>' +
-      (a.corrige ? '<button class="btn btn-fav" id="mCorr" type="button" data-a="corrige" data-f="' + a.f + '">Corrigé</button>' : '') + '</div>';
+      (a.perso ? '<button class="btn btn-fav" type="button" data-a="pdf" data-f="' + a.f + '">PDF</button>' : '<a class="btn btn-fav" id="mPdf" href="activites/' + a.f + '.pdf" download="' + esc(a.titre) + '.pdf">PDF</a>') +
+      (a.corrige ? '<button class="btn btn-fav" id="mCorr" type="button" data-a="corrige" data-f="' + a.f + '">Corrigé</button>' : '') + (a.perso && window.MESDOCS ? MESDOCS.boutonsFiche(a.id) : '') + '</div>';
     $("modal").classList.add("open", "sur-act");
     $("panel").querySelector(".close").onclick = closeModal;
   }
-  async function pdfDe(a){ const r = await fetch("activites/" + a.f + ".pdf"); if (!r.ok) throw new Error("introuvable"); return r.blob(); }
+  async function pdfDe(a){ if (a.perso) return MESDOCS.blob(a.id); const r = await fetch("activites/" + a.f + ".pdf"); if (!r.ok) throw new Error("introuvable"); return r.blob(); }
   /* PDF -> petit livre « pages empilées » (une image par page) que le lecteur de livres sait ouvrir */
   async function livreDePdf(blob, titre){
     if (!(window.pdfjsLib && window.pdfjsLib.getDocument)){
@@ -7064,18 +7066,20 @@ initAdmin();
     const b = e.target.closest("[data-a]"); if (!b) return;
     const a = ACTIVITES.find(x => x.f === b.dataset.f); if (!a) return;
     if (b.dataset.a === "corrige"){ window.open("activites/" + a.corrige + ".pdf", "_blank"); return; }
+    if (a.perso && (b.dataset.a === "imprimer" || b.dataset.a === "pdf")){ MESDOCS.ouvrirFichier(a.id, b.dataset.a === "pdf"); return; }
+    if (a.perso && b.dataset.a !== "ouvrir") return;
     if (b.dataset.a === "imprimer"){ window.open("activites/" + a.f + ".pdf", "_blank"); return; }
     /* Projeter : l'activité s'ouvre dans le lecteur de livres (même barre d'outils que les livres de compétence) */
-    let blob; try { blob = await pdfDe(a); } catch (er) { window.open("activites/" + a.f + ".pdf", "_blank"); return; }
+    let blob; try { blob = await pdfDe(a); } catch (er) { if (a.perso){ aviser("Ce fichier n'est pas disponible sur cet ordinateur."); return; } window.open("activites/" + a.f + ".pdf", "_blank"); return; }
     closeModal();
-    const l = { titre:a.titre, fichier:"activite-" + a.f, categorie:a.prog, couverture:"activites/" + a.f + ".jpg" };
+    const l = { titre:a.titre, fichier:"activite-" + a.f, categorie:a.prog, couverture:a.img || "activites/" + a.f + ".jpg" };
     chargement(l);
     try {
       const html = await livreDePdf(blob, a.titre);
       chargement(null); ov.hidden = true; window.RETOUR_ACTIVITES_LIVRE = true; ouvrirLivre(l, html);
     } catch (er) {
       chargement(null);
-      window.open("activites/" + a.f + ".pdf", "_blank");   /* si les pages ne se préparent pas : le PDF dans un onglet */
+      if (a.perso) MESDOCS.ouvrirFichier(a.id); else window.open("activites/" + a.f + ".pdf", "_blank");   /* si les pages ne se préparent pas : le PDF dans un onglet */
     }
   });
   ov.addEventListener("input", e => { if (e.target.id === "actQ"){ F.q = e.target.value; dessiner(); } });
@@ -7083,7 +7087,7 @@ initAdmin();
   $("actBack").onclick = () => { ov.hidden = true; };
   document.addEventListener("keydown", e => { if (!ov.hidden && e.key === "Escape" && !$("modal").classList.contains("open")) ov.hidden = true; }, true);   /* en capture : la fiche ouverte se ferme seule, la liste reste */
   $("actBtn").addEventListener("click", () => { dessiner(); ov.hidden = false; ov.scrollTop = 0; });
-  window.__activites = ACTIVITES;
+  window.__activites = ACTIVITES; window.livreDePdf = livreDePdf; window.__dessinerAct = () => { try { dessiner(); } catch(e){} };
 })();
 </script>
 <div class="plan-ov" id="planOv" hidden role="dialog" aria-label="Plans techniques">
@@ -9714,6 +9718,7 @@ window.ACCES = (function(){
     profs:'<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.2-5.5 6.5-5.5s5.9 1.9 6.5 5.5"/><circle cx="17.5" cy="9" r="2.6"/><path d="M16.5 14.6c2.6.2 4.4 1.9 5 5.4"/></svg>',
     livres:'<svg viewBox="0 0 24 24"><path d="M4 4.5h6a2 2 0 0 1 2 2V20a2 2 0 0 0-2-2H4z"/><path d="M20 4.5h-6a2 2 0 0 0-2 2V20a2 2 0 0 1 2-2h6z"/></svg>',
     stats:'<svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>',
+    props:'<svg viewBox="0 0 24 24"><path d="M12 15V4M7 9l5-5 5 5M4 15v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4"/></svg>',
     hist:'<svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 2.6-6.4L3 8"/><path d="M3 3v5h5M12 7v5l3.5 2"/></svg>',
     oeil:'<svg viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>',
     etoile:'<svg viewBox="0 0 24 24"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/></svg>',
@@ -9753,7 +9758,8 @@ window.ACCES = (function(){
       if (c.admin) return '<div class="acces-fiche f2"' + att + '><div class="fh">' + avatar(c) + '<div class="qui"><b>' + esc(majus(c.nom)) + '</b><span class="acces-tag">admin</span><small>' + esc(id) + ' · ' + vuSpan(id) + '</small></div><span class="tous">Tous les livres</span></div></div>';
       return '<div class="acces-fiche f2"' + att + '><div class="fh">' + avatar(c) + '<div class="qui"><b>' + esc(majus(c.nom)) + '</b>' + (c.eleve ? '<span class="acces-tag" style="background:#15803d">groupe</span>' : '') + '<small>' + esc(id) + ' · ' + vuSpan(id) + '</small></div>'
         + '<div class="progs">' + progs.map(pg => { const on = (c.prog || []).includes(pg); return '<button class="pg' + (on ? ' on' : '') + '" data-prog="' + esc(pg) + '" data-pid="' + esc(id) + '" title="' + (on ? 'Retirer' : 'Donner') + ' tous les livres : ' + esc(progNom(pg)) + '">' + (on ? SVGC : '') + esc(court(pg)) + '</button>'; }).join("") + '</div>'
-        + '<div class="act"><button class="ico" data-mdp="' + esc(id) + '" title="Nouveau mot de passe">' + SVGK + '</button><button class="ico rouge" data-retirer="' + esc(id) + '" title="Retirer ce compte">' + SVGP + '</button></div></div>'
+        + (c.eleve ? '' : '<button class="pg' + (c.ajout ? ' on' : '') + '" data-ajout="' + esc(id) + '" title="' + (c.ajout ? 'Retirer la permission' : 'Permettre') + ' d\'ajouter ses propres livres, activités et plans">' + (c.ajout ? SVGC : '') + 'Ajouts</button>')
+        + '<div class="act"><button class="ico" data-mdp=""' + esc(id) + '" title="Nouveau mot de passe">' + SVGK + '</button><button class="ico rouge" data-retirer="' + esc(id) + '" title="Retirer ce compte">' + SVGP + '</button></div></div>'
         + '<details' + (OUVERTS.has(id) ? ' open' : '') + ' data-fiche="' + esc(id) + '"><summary><span class="jauge"><i style="width:' + (total ? n / total * 100 : 0) + '%"></i></span><b>' + n + '</b>&nbsp;livre' + (n > 1 ? 's' : '') + ' sur ' + total + '<span class="voir">Choisir les livres</span></summary>'
         + grps.map(g => '<div class="acces-grp"><div class="t">' + esc(court(g)) + '</div><div class="acces-chips">' + parProg[g].map(f => '<label class="acces-chip" title="' + esc(titreDe(f)) + '"><input type="checkbox" data-id="' + esc(id) + '" data-f="' + esc(f) + '"' + (D.livres[f].cles[id] ? " checked" : "") + '><span>' + esc(titreDe(f)) + '</span></label>').join("") + '</div></div>').join("")
         + '</details></div>'; };
@@ -9790,7 +9796,7 @@ window.ACCES = (function(){
       + '<div class="acces-stats"><div><b>' + nProf + '</b><span>enseignant' + (nProf > 1 ? 's' : '') + '</span></div><div><b>' + nGr + '</b><span>groupe' + (nGr > 1 ? 's' : '') + ' d\'élèves</span></div>'
       + '<div><b>' + livres.length + '</b><span>livres protégés</span></div><div class="dem"><b id="gStatDem">…</b><span>demandes</span></div>'
       + '<div class="' + (aPublier ? 'pub' : 'ok') + '"><b>' + (aPublier ? '!' : '✓') + '</b><span>' + (aPublier ? 'à publier' : 'tout est publié') + '</span></div></div>'
-      + '<div class="acces-onglets">' + ong("profs", "Enseignants") + ong("livres", "Livres") + ong("stats", "Statistiques") + ong("hist", "Historique") + '</div>'
+      + '<div class="acces-onglets">' + ong("profs", "Enseignants") + ong("livres", "Livres") + ong("props", "Propositions") + ong("stats", "Statistiques") + ong("hist", "Historique") + '</div>'
       + '<div class="acces-pane"' + vol("profs") + '><p class="sous">Touche « Choisir les livres » pour cocher les livres d\'un enseignant, ou ses programmes (EGI, Plomberie) pour tout lui donner d\'un coup. Pastille verte : venu dans les 7 derniers jours. Les changements partent en ligne quand tu touches « Publier ».</p>'
       + '<div class="acces-outils"><input type="text" id="gQ" enterkeyhint="search" placeholder="Chercher un nom…" value="' + esc(FILTRE.q) + '" autocomplete="off">'
       + '<select id="gTri" title="Trier"><option value="nom"' + (FILTRE.tri === "nom" ? " selected" : "") + '>Trier : nom de famille</option><option value="prog"' + (FILTRE.tri === "prog" ? " selected" : "") + '>Trier : programme</option><option value="peu"' + (FILTRE.tri === "peu" ? " selected" : "") + '>Trier : moins de livres</option></select>'
@@ -9806,6 +9812,7 @@ window.ACCES = (function(){
       + '<details style="margin-top:8px"><summary style="cursor:pointer;color:#a9a9ae;font-size:.88rem">Coller un code reçu autrement (Teams, courriel)</summary><textarea id="gDem" placeholder="Colle ici le code DEMANDE-… reçu de l\'enseignant"></textarea><div class="acces-btns" style="justify-content:flex-start"><button class="abtn" id="gAjout">Ajouter cet enseignant</button></div></details></div>'
       + volInvite + '</div>'
       + '<div class="acces-pane"' + vol("livres") + '>' + volLivres + '</div>'
+      + '<div class="acces-pane"' + vol("props") + '><div id="gProps"><p class="sous">Chargement…</p></div></div>'
       + '<div class="acces-pane"' + vol("stats") + '>' + volStats + '</div>'
       + '<div class="acces-pane"' + vol("hist") + '>' + volHist + '</div>'
       + (aRech.length ? '<label class="acces-rech"><input type="checkbox" id="gRech" checked><span><b>Couper vraiment l\'accès</b> : nouvelle clé pour ' + aRech.map(f => '« ' + esc(titreDe(f)) + ' »').join(", ") + '. Une vieille copie gardée par quelqu\'un qui n\'a plus l\'accès ne s\'ouvrira plus (un peu plus long à publier).</span></label>' : '')
@@ -9860,6 +9867,8 @@ window.ACCES = (function(){
       try { if (cb.checked) BROUILLON.livres[f].cles[id] = await envelopper(f, BROUILLON.comptes[id].pub); else delete BROUILLON.livres[f].cles[id]; }
       catch(e){ cb.checked = !cb.checked; dessinerGerer({ err:e.message }); return; }
       dessinerGerer(); });
+    B.querySelectorAll("[data-ajout]").forEach(b => b.onclick = () => { const c = BROUILLON.comptes[b.dataset.ajout]; c.ajout = !c.ajout; if (!c.ajout) delete c.ajout;
+      dessinerGerer({ ok:c.nom + (c.ajout ? " pourra ajouter ses propres documents" : " ne pourra plus ajouter de documents") + " (après « Publier »)." }); });
     B.querySelectorAll("[data-prog]").forEach(b => b.onclick = async () => { const id = b.dataset.pid, pg = b.dataset.prog, c = BROUILLON.comptes[id];
       c.prog = c.prog || []; const ajoute = !c.prog.includes(pg); c.prog = ajoute ? c.prog.concat(pg) : c.prog.filter(x => x !== pg);
       try { await appliquerProgs(id, ajoute ? [pg] : [], ajoute ? [] : [pg]); dessinerGerer({ ok:c.nom + (ajoute ? " a maintenant tous les livres « " : " n'a plus les livres « ") + court(pg) + " »." }); }
@@ -9911,7 +9920,7 @@ window.ACCES = (function(){
         dessinerGerer({ err:refusee ? "GitHub a refusé la clé enregistrée (elle a peut-être expiré). Demande à Claude de la remplacer." : "Publication impossible : " + e.message}); } };
   }
   let STATS = null, HIST = null;
-  function voletCharge(){ if (ONGLET === "stats") chargerStats(); if (ONGLET === "hist") chargerHist(); }
+  function voletCharge(){ if (ONGLET === "props" && window.MESDOCS) MESDOCS.panneau(document.getElementById("gProps")); if (ONGLET === "stats") chargerStats(); if (ONGLET === "hist") chargerHist(); }
   async function chargerStats(){ if (STATS) return dessinerStats();
     try { STATS = await COFFRE.statsLire(); } catch(e){ const z = document.getElementById("gStats"); if (z) z.innerHTML = '<div class="acces-vide">' + ICO.stats + '<p>Les statistiques commencent dès que la table <b>stats</b> existe dans Supabase (commande SQL envoyée par Claude). Elles se remplissent ensuite toutes seules.</p></div>'; return; }
     dessinerStats(); }
@@ -10009,7 +10018,8 @@ window.ACCES = (function(){
     if (SESSION) go(); else dlgConnexion(go);
   }
   setTimeout(() => { const b = document.getElementById("compteBtn"); if (b) b.onclick = menu; charger(); accepterDepuisLien(); invitationDepuisLien(); }, 0);
-  return { pret, get estPret(){ return estPret; }, protege, permis, verrouille, ouvrir, recherche, connexion, deconnexion, demande, lireDemande, dlgConnexion, menu, get session(){ return SESSION; }, get eleve(){ return !!(SESSION && SESSION.eleve); }, get data(){ return DATA; }, charger };
+  return { pret, get estPret(){ return estPret; }, protege, permis, verrouille, ouvrir, recherche, connexion, deconnexion, demande, lireDemande, dlgConnexion, menu, get session(){ return SESSION; }, get eleve(){ return !!(SESSION && SESSION.eleve); }, get data(){ return DATA; }, charger, outils:{ commitGitHub:(...a) => commitGitHub(...a), envelopperPour:(...a) => envelopperPour(...a), BOITE, sansAcc:t => sansAcc(t),
+    integrer(f, livre, ajouts){ if (f && livre){ DATA.livres[f] = JSON.parse(JSON.stringify(livre)); if (BROUILLON) BROUILLON.livres[f] = JSON.parse(JSON.stringify(livre)); } if (REGL) REGL.ajouts = JSON.parse(JSON.stringify(ajouts || [])); } } };
 })();
 </script>
 
@@ -10166,8 +10176,8 @@ body.clair:not(:has(.reader.open)) #fsBtn{background:rgba(255,255,255,.55);color
     setTimeout(() => location.reload(), apresConnexion ? 2300 : 0);
   };
   setInterval(() => { if (attente && !document.querySelector("#reader.open") && !document.querySelector("#accueilOv:not([hidden])")){ attente = false; location.reload(); } }, 1500);
-  const B = { cles:["favs", "pos", "marks", "rangsReduits", "filtreProg", "nouvVu", "prefs:{id}", "penPerso", "penLargeur", "gommeTaille", "objCats", "ghJeton", "dernierTableau"],   /* ghJeton : la clé GitHub de l'admin le suit (chiffrée dans son coffre), retirée de l'appareil à la déconnexion */
-    vides:{ favs:"[]", pos:"{}", marks:"{}" }, apres:recharger };
+  const B = { cles:["favs", "pos", "marks", "rangsReduits", "filtreProg", "nouvVu", "prefs:{id}", "penPerso", "penLargeur", "gommeTaille", "objCats", "ghJeton", "dernierTableau", "mesDocs", "propsEnAttente"],   /* ghJeton : la clé GitHub de l'admin le suit (chiffrée dans son coffre), retirée de l'appareil à la déconnexion */
+    vides:{ favs:"[]", pos:"{}", marks:"{}" }, apres:recharger, fusion:{ mesDocs:(a, b) => window.fusionMesDocs ? fusionMesDocs(a, b) : null } };
   const T = { cles:["tableauxSauves", "mesSchemas"], apres:recharger };
   const go = () => { COFFRE.demarrer("biblio", B).then(() => {   /* une fois par jour, un signe de vie (« vu il y a … » dans le panneau d'administration) */
       try { if (Date.now() - (+localStorage.getItem("coffre:biblio:vu") || 0) > 20 * 3600e3){ localStorage.setItem("coffre:biblio:vu", String(Date.now())); COFFRE.pousser("biblio"); } } catch(e){} });

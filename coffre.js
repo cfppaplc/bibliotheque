@@ -179,5 +179,18 @@ window.COFFRE = (function(){
   async function effacer(so){ const s = await session(); if (!s || s.eleve) throw new Error("pas de session");
     const R = await rangee(s, so); delete RANG[s.id + "|" + so]; if (R.neuf) return true;
     return (await rpc("coffre_effacer", { p_id:R.id, p_jeton:b64(R.brut.subarray(32, 64)) })) === true; }
-  return { demarrer, quitter, oublier, pousser, etat:() => ETAT, session, vu, stat, statsLire, envoyer, recevoir, effacer };
+  /* ---- dépôt pour l'administrateur (propositions des enseignants, 8 nov.) : chiffré pour SA clé publique; lui seul peut le lire puis l'effacer ---- */
+  async function deposer(nom, obj, pub){
+    const id = await hex("metier+|depot|" + nom), brut = crypto.getRandomValues(new Uint8Array(64)), env = await envelopper(brut, pub);
+    const k = await sub.importKey("raw", brut.subarray(0, 32), "AES-GCM", false, ["encrypt"]), iv = crypto.getRandomValues(new Uint8Array(12));
+    const c = new Uint8Array(await sub.encrypt({ name:"AES-GCM", iv }, k, await gz(enc.encode(JSON.stringify(obj)), true))), out = new Uint8Array(12 + c.length); out.set(iv); out.set(c, 12);
+    if (await rpc("coffre_ecrire", { p_id:id, p_jeton:b64(brut.subarray(32, 64)), p_env:env, p_data:b64(out) }) !== true) throw new Error("dépôt refusé"); }
+  async function ouvrirDepot(nom){ const s = await session(); if (!s) throw new Error("pas de session");
+    const id = await hex("metier+|depot|" + nom), r = await rpc("coffre_lire", { p_id:id }), row = r && r[0]; if (!row) return null;
+    return { id, row, brut:new Uint8Array(await ouvrir(row.env, s.priv)) }; }
+  async function prendre(nom){ const D = await ouvrirDepot(nom); if (!D || !D.row.data) return null;
+    const u = unb64(D.row.data), k = await sub.importKey("raw", D.brut.subarray(0, 32), "AES-GCM", false, ["decrypt"]);
+    return JSON.parse(dec.decode(await gz(new Uint8Array(await sub.decrypt({ name:"AES-GCM", iv:u.subarray(0, 12) }, k, u.subarray(12))), false))); }
+  async function jeter(nom){ const D = await ouvrirDepot(nom); if (!D) return true; return (await rpc("coffre_effacer", { p_id:D.id, p_jeton:b64(D.brut.subarray(32, 64)) })) === true; }
+  return { demarrer, quitter, oublier, pousser, etat:() => ETAT, session, vu, stat, statsLire, envoyer, recevoir, effacer, deposer, prendre, jeter };
 })();
