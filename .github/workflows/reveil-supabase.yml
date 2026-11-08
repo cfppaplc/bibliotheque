@@ -1,0 +1,21 @@
+# Garde le projet Supabase du Labo interactif éveillé.
+# Supabase (gratuit) met un projet en pause après 7 jours sans activité;
+# cette tâche lui envoie une petite demande tous les 3 jours.
+name: Réveil Supabase (Labo)
+on:
+  schedule:
+    - cron: "17 9 */3 * *"   # tous les 3 jours, 4 h 17 (heure de l'Est)
+  workflow_dispatch: {}      # bouton « Run workflow » pour l'essayer à la main
+jobs:
+  reveil:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Demande à la base de données
+        run: |
+          URL="https://kjlotlhqrgekzohshmbn.supabase.co"
+          CLE="sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY"
+          code=$(curl -s -o /dev/null -w "%{http_code}" "$URL/rest/v1/" -H "apikey: $CLE")
+          echo "Base de données : HTTP $code"
+          code2=$(curl -s -o /dev/null -w "%{http_code}" "$URL/auth/v1/health" -H "apikey: $CLE")
+          echo "Service : HTTP $code2"
+          if [ "$code" = "000" ] && [ "$code2" = "000" ]; then echo "Supabase injoignable"; exit 1; fi
