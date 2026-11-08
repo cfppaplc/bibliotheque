@@ -8837,7 +8837,7 @@ document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("#qrOv"
     let lab = ""; try { lab = String(RD.drv.state().label || ""); } catch(e){}
     let ans = null; try { const i = RD.drv.ansInfo && RD.drv.ansInfo(); if (i && !i.dis) ans = i.mode; } catch(e){}
     return {m: "etat", ouvert: true, titre: l.titre || ($("#readerTitle") && $("#readerTitle").textContent) || (RD.wb ? "Tableau blanc" : "Livre"), label: lab, page: curPage(), tot: totPages(), ans,
-      noir: !!document.querySelector("#noir:not([hidden])"),
+      noir: !!document.querySelector("#noir:not([hidden])"), zoom: Math.round((RD.z || 1) * 100) / 100,
       mods: mods().map(x => ({t: x.text || "", tag: x.tag || "", p: typeof x.page === "number" ? x.page : null}))};
   }
   function pousser(force){ if (!T.branche) return; const e = etat(), s = JSON.stringify(e); if (force || s !== T.dernier){ T.dernier = s; envoyer(e); } }
@@ -8853,6 +8853,7 @@ document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("#qrOv"
     else if (c === "rep") answers();
     else if (c === "anim") clic("tbAnim");
     else if (c === "noir") clic("tbNoir");
+    else if (c === "pan"){ const sc = $("#rstage"); if (sc){ sc.scrollLeft += (+o.dx || 0) * 2.6; sc.scrollTop += (+o.dy || 0) * 2.6; } return; }
     else if (c === "zi") clic("tbZi"); else if (c === "zo") clic("tbZo"); else if (c === "zv") clic("tbZv");
     setTimeout(pousser, 250);
   }

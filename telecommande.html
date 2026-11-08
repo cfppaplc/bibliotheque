@@ -46,6 +46,13 @@ h1{font-size:19px;margin:14px 0 2px;line-height:1.25;display:-webkit-box;-webkit
 .vide{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:var(--gris);gap:12px;padding:20px;font-size:16px;line-height:1.45}
 .vide b{color:var(--txt);font-size:20px}
 .cache{display:none!important}
+.mode{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:var(--carte);border-radius:12px;padding:4px;margin-top:14px}
+.mode button{border:0;border-radius:9px;background:transparent;color:var(--gris);font:700 14px system-ui;padding:9px}
+.mode button.on{background:var(--carte2);color:var(--txt)}
+.pad{flex:1;margin:12px 0;min-height:180px;border-radius:22px;background:#1B1B1B;border:1px solid #333;position:relative;touch-action:none;overflow:hidden;
+  background-image:radial-gradient(circle,#3a3a3a 1.2px,transparent 1.4px);background-size:22px 22px}
+.pad span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--gris);font-size:15px;padding:20px;pointer-events:none;line-height:1.4}
+.pad i{position:absolute;width:54px;height:54px;margin:-27px 0 0 -27px;border-radius:50%;background:rgba(229,9,20,.35);border:2px solid var(--rouge);pointer-events:none;display:none}
 </style>
 </head>
 <body>
@@ -58,6 +65,8 @@ h1{font-size:19px;margin:14px 0 2px;line-height:1.25;display:-webkit-box;-webkit
   <div class="ou" id="ou"></div>
   <div class="barre"><b id="prog"></b></div>
   <div class="page" id="page">–</div>
+  <div class="mode"><button id="mPages" class="on">Pages</button><button id="mPad">Déplacer</button></div>
+  <div class="pad cache" id="pad"><span id="padTxt">Glisse le doigt pour te promener dans la page.</span><i id="padDoigt"></i></div>
   <div class="fleches"><button id="prec" aria-label="Page précédente">‹</button><button id="suiv" aria-label="Page suivante">›</button></div>
   <div class="outils">
     <button id="bRep"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg><span id="bRepT">Réponses</span></button>
@@ -106,6 +115,7 @@ function rendre(){
   $("bNoir").classList.toggle("on", !!E.noir);
   $("bAller").style.opacity = (E.mods || []).length ? 1 : .35;
   if (!$("feuille").hidden) liste();
+  majPad();
 }
 function modIci(){ let r = null; (E.mods || []).forEach(m => { if (m.p != null && m.p <= E.page) r = m; }); return r; }
 function liste(){
@@ -119,12 +129,28 @@ function fermer(){ $("feuille").hidden = true; $("fNum").blur(); }
 
 $("prec").onclick = () => cmd("prev"); $("suiv").onclick = () => cmd("next");
 $("bRep").onclick = () => cmd("rep"); $("bAnim").onclick = () => cmd("anim"); $("bNoir").onclick = () => cmd("noir");
-$("bZi").onclick = () => cmd("zi"); $("bZo").onclick = () => cmd("zo"); $("bZv").onclick = () => cmd("zv");
+$("bZi").onclick = () => { cmd("zi"); mode(true); }; $("bZo").onclick = () => cmd("zo"); $("bZv").onclick = () => { cmd("zv"); mode(false); };
 $("bAller").onclick = () => ouvrir(false); $("bPage").onclick = () => ouvrir(true);
 $("fFermer").onclick = fermer; $("feuille").onclick = e => { if (e.target.id === "feuille") fermer(); };
 $("fGo").onclick = () => { const n = parseInt($("fNum").value, 10); if (n > 0){ cmd("goto", {n}); fermer(); } };
 $("fNum").onkeydown = e => { if (e.key === "Enter") $("fGo").click(); };
 document.addEventListener("dblclick", e => e.preventDefault(), {passive: false});
+
+/* Pad tactile : glisser = se déplacer dans la page zoomée (comme le pavé d'un portable) */
+let modePad = false;
+function mode(p){ modePad = p; $("mPad").classList.toggle("on", p); $("mPages").classList.toggle("on", !p);
+  $("pad").classList.toggle("cache", !p); document.querySelector(".fleches").classList.toggle("cache", p); majPad(); }
+function majPad(){ $("padTxt").textContent = E && E.zoom > 1.02 ? "Glisse le doigt pour te promener dans la page." : "Zoome d'abord avec la loupe +, puis glisse le doigt ici pour te promener."; }
+$("mPages").onclick = () => mode(false); $("mPad").onclick = () => mode(true);
+(function(){
+  const pad = $("pad"), dg = $("padDoigt"); let der = null, acc = [0, 0], minu = null;
+  const vider = () => { if (acc[0] || acc[1]){ envoyer({m: "cmd", c: "pan", dx: Math.round(acc[0]), dy: Math.round(acc[1])}); acc = [0, 0]; } minu = null; };
+  pad.addEventListener("pointerdown", e => { pad.setPointerCapture(e.pointerId); der = [e.clientX, e.clientY]; const r = pad.getBoundingClientRect(); dg.style.display = "block"; dg.style.left = (e.clientX - r.left) + "px"; dg.style.top = (e.clientY - r.top) + "px"; });
+  pad.addEventListener("pointermove", e => { if (!der) return; acc[0] += e.clientX - der[0]; acc[1] += e.clientY - der[1]; der = [e.clientX, e.clientY];
+    const r = pad.getBoundingClientRect(); dg.style.left = (e.clientX - r.left) + "px"; dg.style.top = (e.clientY - r.top) + "px"; if (!minu) minu = setTimeout(vider, 40); });
+  const fin = () => { der = null; dg.style.display = "none"; vider(); };
+  pad.addEventListener("pointerup", fin); pad.addEventListener("pointercancel", fin);
+})();
 
 /* écran allumé tant que la télécommande est ouverte */
 let verrou = null;
