@@ -9636,7 +9636,7 @@ window.ACCES = (function(){
 
   /* ---------------- interface ---------------- */
   const ov = () => document.getElementById("accesOv"), box = () => document.getElementById("accesBox");
-  const fermer = () => { ov().hidden = true; box().classList.remove("large", "gestion"); box().onclick = null; };
+  const fermer = () => { ov().hidden = true; box().classList.remove("large", "gestion", "co2"); box().onclick = null; };
   const ICO_PERS = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 20c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>';
   window.ICO_CADENAS = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
   function majBouton(){
@@ -9685,19 +9685,45 @@ window.ACCES = (function(){
     setTimeout(fin, 1900); box().onclick = fin;
   }
   const protegesPermis = () => { try { return Object.keys(DATA.livres).filter(f => DATA.livres[f].cles[SESSION.id]).length; } catch(e){ return 0; } };
+  /* Écran de connexion (8 nov., idées 1 à 5 choisies par Jeremy) : deux parties (visuel Métier+ à gauche), identifiant retenu sur l'appareil
+     (« Bonjour Marc » + « Ce n'est pas toi ? »), œil pour voir le mot de passe, avertissement Majuscules, erreur qui tremble,
+     message pendant le déverrouillage, gros champs au TNI. */
+  const OEIL = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>';
+  const OEIL_X = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l18 18M10.6 5.1A10.6 10.6 0 0 1 12 5c6.4 0 10 7 10 7a17.6 17.6 0 0 1-3.2 4.1M6.6 6.6C3.8 8.4 2 12 2 12s3.6 7 10 7a9.7 9.7 0 0 0 5.4-1.6M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>';
+  function coVisuel(){
+    const C = window.COUVERTURES || {}, ls = Object.keys(C).slice(0, 10).map(f => C[f]);
+    const col = (a, d) => '<div class="co-col" style="--d:' + d + 's">' + [...a, ...a].map(u => '<img src="' + u + '" alt="">').join("") + '</div>';
+    return '<div class="co-vis" aria-hidden="true"><div class="co-murs">' + (ls.length ? col(ls.filter((x, k) => k % 2 === 0), 0) + col(ls.filter((x, k) => k % 2 === 1), -14) : '') + '</div>'
+      + '<div class="co-txt"><img src="img/metier-plus-blanc.svg" alt=""><b>L\'atelier, au tableau.</b><span>Tes livres, tes plans, tes formatifs, tes quiz et tes simulations, au même endroit.</span></div></div>';
+  }
   function dlgConnexion(apres){
-    box().innerHTML = marque('Se connecter', 'Accès réservé aux enseignants du Pavillon de l\'Avenir. Ton mot de passe reste sur cet appareil : il n\'est jamais envoyé.')
-      + '<label for="acId">Identifiant</label><input type="text" id="acId" autocomplete="username" placeholder="prenom.nom">'
-      + '<label for="acMdp">Mot de passe</label><input type="password" id="acMdp" autocomplete="current-password">'
+    let id0 = "", nom0 = ""; try { id0 = localStorage.getItem("dernierId") || ""; nom0 = localStorage.getItem("dernierNom") || ""; } catch(e){}
+    if (id0 && !(DATA && DATA.comptes[id0])) id0 = "";
+    box().classList.add("co2");
+    box().innerHTML = coVisuel() + '<div class="co-form">' + marque(id0 ? 'Bonjour ' + esc((nom0 || id0).split(/[\s.]+/)[0].replace(/^./, c => c.toUpperCase())) + ' !' : 'Se connecter', id0 ? 'Entre ton mot de passe pour ouvrir tes livres.' : 'Accès réservé aux enseignants du Pavillon de l\'Avenir. Ton mot de passe reste sur cet appareil : il n\'est jamais envoyé.')
+      + '<div id="acIdBloc"' + (id0 ? ' hidden' : '') + '><label for="acId">Identifiant</label><input type="text" id="acId" autocomplete="username" placeholder="prenom.nom" value="' + esc(id0) + '" autocapitalize="off" spellcheck="false"></div>'
+      + (id0 ? '<p class="co-qui">Connexion de <b>' + esc(id0) + '</b> · <button class="acces-lien" id="acPasMoi" type="button">Ce n\'est pas toi ?</button></p>' : '')
+      + '<label for="acMdp">Mot de passe</label><div class="co-mdp"><input type="password" id="acMdp" autocomplete="current-password"><button type="button" id="acOeil" class="co-oeil" aria-label="Voir le mot de passe" title="Voir le mot de passe">' + OEIL + '</button></div>'
+      + '<div class="co-maj" id="acMaj" hidden>Majuscules activées</div>'
       + '<div class="acces-err" id="acErr" hidden></div>'
+      + '<div class="co-prog" id="acProg" hidden><i></i><span>Déverrouillage de tes livres…</span></div>'
       + '<div class="acces-btns"><button id="acNon">Annuler</button><button class="prim" id="acOui">Se connecter</button></div>'
-      + '<button class="acces-lien" id="acDem">Pas encore de compte ? Demander un accès</button><br><button class="acces-lien" id="acOubli" style="margin-top:8px">Mot de passe oublié ?</button>';
-    ov().hidden = false; setTimeout(() => document.getElementById("acId")?.focus(), 50);
-    const go = async () => { const bt = document.getElementById("acOui"), er = document.getElementById("acErr"); bt.disabled = true; bt.textContent = "Vérification…"; er.hidden = true;
-      try { await connexion(document.getElementById("acId").value, document.getElementById("acMdp").value); bienvenue(apres); compterDemandes().catch(() => {}); }
-      catch(e){ er.textContent = e.message; er.hidden = false; bt.disabled = false; bt.textContent = "Se connecter"; } };
-    document.getElementById("acOui").onclick = go; document.getElementById("acMdp").onkeydown = e => { if (e.key === "Enter") go(); };
-    document.getElementById("acNon").onclick = fermer; document.getElementById("acDem").onclick = () => dlgDemande(false); document.getElementById("acOubli").onclick = () => dlgDemande(true);
+      + '<button class="acces-lien" id="acDem">Pas encore de compte ? Demander un accès</button><br><button class="acces-lien" id="acOubli" style="margin-top:8px">Mot de passe oublié ?</button></div>';
+    ov().hidden = false; setTimeout(() => document.getElementById(id0 ? "acMdp" : "acId")?.focus(), 50);
+    const mdp = document.getElementById("acMdp"), maj = document.getElementById("acMaj");
+    document.getElementById("acOeil").onclick = () => { const v = mdp.type === "password"; mdp.type = v ? "text" : "password"; const b = document.getElementById("acOeil"); b.innerHTML = v ? OEIL_X : OEIL; b.setAttribute("aria-label", v ? "Cacher le mot de passe" : "Voir le mot de passe"); mdp.focus(); };
+    const verifMaj = e => { try { maj.hidden = !(e.getModifierState && e.getModifierState("CapsLock")); } catch(x){} };
+    mdp.addEventListener("keydown", verifMaj); mdp.addEventListener("keyup", verifMaj);
+    const pm = document.getElementById("acPasMoi"); if (pm) pm.onclick = () => { try { localStorage.removeItem("dernierId"); localStorage.removeItem("dernierNom"); } catch(e){} dlgConnexion(apres); };
+    const go = async () => { const bt = document.getElementById("acOui"), er = document.getElementById("acErr"), pr = document.getElementById("acProg"); bt.disabled = true; bt.textContent = "Vérification…"; er.hidden = true; pr.hidden = false;
+      try { const id = document.getElementById("acId").value; await connexion(id, mdp.value);
+        try { localStorage.setItem("dernierId", id.trim().toLowerCase()); localStorage.setItem("dernierNom", (DATA.comptes[id.trim().toLowerCase()] || {}).nom || ""); } catch(e){}
+        box().classList.remove("co2"); bienvenue(apres); compterDemandes().catch(() => {}); }
+      catch(e){ pr.hidden = true; er.textContent = e.message; er.hidden = false; bt.disabled = false; bt.textContent = "Se connecter";
+        const f = box().querySelector(".co-form"); f.classList.remove("tremble"); void f.offsetWidth; f.classList.add("tremble"); mdp.select(); } };
+    document.getElementById("acOui").onclick = go; mdp.onkeydown = e => { if (e.key === "Enter") go(); };
+    document.getElementById("acId").onkeydown = e => { if (e.key === "Enter") mdp.focus(); };
+    document.getElementById("acNon").onclick = fermer; document.getElementById("acDem").onclick = () => { box().classList.remove("co2"); dlgDemande(false); }; document.getElementById("acOubli").onclick = () => { box().classList.remove("co2"); dlgDemande(true); };
   }
   function dlgDemande(oubli){
     box().innerHTML = (oubli ? marque('Mot de passe oublié', 'Écris ton nom et choisis un nouveau mot de passe (au moins 10 caractères). La demande est transmise à l\'administrateur; dès qu\'elle est acceptée, ton nouveau mot de passe fonctionne. Tes livres et tes données sont conservés.')
@@ -10111,7 +10137,7 @@ window.ACCES = (function(){
     B.querySelector("#pFin").onclick = () => { document.getElementById("accesOv").hidden = true; };
     B.querySelector("#pRaz").onclick = () => { try { localStorage.removeItem(cle()); } catch(e){} dejaProg = ""; window.appliquerPrefs(); dessiner(); };
   }
-  window.dlgPrefs = () => { const ov = document.getElementById("accesOv"), B = document.getElementById("accesBox"); B.classList.remove("large", "gestion"); ov.hidden = false; contenu(B); };
+  window.dlgPrefs = () => { const ov = document.getElementById("accesOv"), B = document.getElementById("accesBox"); B.classList.remove("large", "gestion", "co2"); ov.hidden = false; contenu(B); };
   if (window.ACCES && ACCES.pret) ACCES.pret.then(() => window.appliquerPrefs()).catch(() => {});
   /* filet de sécurité : si un de ces boutons est touché sans être connecté, on ouvre la connexion, puis l'outil */
   document.addEventListener("click", e => { const b = e.target.closest && e.target.closest('#planBtn, #actBtn, #simBtn, #accueilBtn, #wbBtn'); if (!b || (window.ACCES && ACCES.session)) return;
@@ -10300,6 +10326,32 @@ document.addEventListener("click", e => { const b = e.target.closest && e.target
 .md-btn:hover{background:#EB6A22;color:#fff}
 .md-plus .pn-img{display:grid!important;place-items:center;border:2px dashed rgba(128,128,128,.45);background:transparent!important}.md-plus .pn-img i.md-plus-i{position:static!important;inset:auto!important;background:none!important;padding:0!important;font-style:normal;font-size:46px;font-weight:300;line-height:1;color:#EB6A22}
 @media (max-width:640px){.md-types{grid-template-columns:1fr}.md-types button{grid-template-columns:auto 1fr;justify-items:start;text-align:left}.md-types button small{grid-column:2}.md-types button svg{grid-row:span 2}.md-champs{grid-template-columns:1fr}}
+</style>
+<style>
+/* ---- Écran de connexion en deux parties (8 nov.) ---- */
+#accesBox.co2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);width:min(880px,94vw);max-width:none;padding:0;overflow:hidden}
+#accesBox.co2 .co-form{padding:0 30px 26px;min-width:0}
+#accesBox.co2 .acces-marque{margin:0 -30px 18px}
+.co-vis{position:relative;overflow:hidden;background:linear-gradient(160deg,#1E2A44,#0c1120);min-height:520px}
+.co-murs{position:absolute;inset:-40px -20px;display:grid;grid-template-columns:1fr 1fr;gap:14px;transform:rotate(-8deg);opacity:.55}
+.co-col{display:grid;gap:14px;animation:coDefile 46s linear infinite;animation-delay:var(--d)}
+.co-col img{width:100%;border-radius:8px;box-shadow:0 10px 24px rgba(0,0,0,.45)}
+@keyframes coDefile{from{transform:translateY(0)}to{transform:translateY(-50%)}}
+.co-txt{position:absolute;left:0;right:0;bottom:0;padding:90px 28px 28px;background:linear-gradient(transparent,rgba(10,14,26,.94) 45%);color:#fff;display:grid;gap:8px}
+.co-txt img{height:28px;width:auto}.co-txt b{font-size:24px;letter-spacing:-.02em;line-height:1.15}.co-txt span{color:#b8c0cf;font-size:14px;line-height:1.45}
+.co-qui{margin:-6px 0 12px;font-size:.88rem;opacity:.8}
+.co-mdp{position:relative}.co-mdp input{padding-right:48px!important;width:100%;box-sizing:border-box}
+.co-oeil{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:38px;height:38px;border:0;background:transparent;color:inherit;opacity:.65;cursor:pointer;display:grid;place-items:center;border-radius:8px}
+.co-oeil:hover{opacity:1;background:rgba(128,128,128,.14)}
+.co-maj{margin:6px 0 0;font-size:.82rem;font-weight:600;color:#f59e0b}
+.co-prog{margin:12px 0 0;font-size:.86rem;opacity:.85}.co-prog i{display:block;height:4px;border-radius:4px;background:rgba(128,128,128,.25);overflow:hidden;margin-bottom:6px;position:relative}
+.co-prog i::after{content:"";position:absolute;inset:0 60% 0 0;background:#EB6A22;border-radius:4px;animation:coProg 1.1s ease-in-out infinite}
+@keyframes coProg{from{transform:translateX(-100%)}to{transform:translateX(250%)}}
+.co-form.tremble{animation:coTremble .42s}
+@keyframes coTremble{20%{transform:translateX(-8px)}40%{transform:translateX(7px)}60%{transform:translateX(-5px)}80%{transform:translateX(3px)}}
+@media (prefers-reduced-motion:reduce){.co-col{animation:none!important}.co-form.tremble{animation:none!important}}
+@media (pointer:coarse) and (min-width:641px){#accesBox.co2 input{min-height:52px;font-size:18px}#accesBox.co2 .acces-btns button{min-height:52px;font-size:17px;padding:0 24px}.co-oeil{width:46px;height:46px}}
+@media (max-width:760px){#accesBox.co2{grid-template-columns:1fr;width:min(440px,94vw)}.co-vis{display:none}}
 </style>
 <script src="mesdocs.js"></script>
 </body></html>
