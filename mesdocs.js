@@ -7,7 +7,7 @@
      Administration → Propositions et le publie (GitHub : activites/, plans/, livres/<f>.chiffre protégé; liste dans reglages.json « ajouts »). */
 window.MESDOCS = (function(){
   const MAX = 20 * 1048576, QUOTA = 100 * 1048576, MORCEAU = 5 * 1048576;
-  const NOMS = { livre:"Livre", act:"Activité", plan:"Plan" };
+  const NOMS = { livre:"Livre", act:"Formatif", plan:"Plan" };
   const PROGS = [["Plomberie et chauffage", "Plomberie et chauffage"], ["Entretien général d'immeubles", "Entretien général d'immeubles"]];
   const e = t => String(t == null ? "" : t).replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
   const q = s => document.querySelector(s);
@@ -97,7 +97,7 @@ window.MESDOCS = (function(){
     } catch(x){}
     const A = window.__activites; if (A){
       for (let i = A.length - 1; i >= 0; i--) if (A[i].perso) A.splice(i, 1);
-      d.filter(x => x.k === "act").forEach(x => A.push({ f:"p_" + x.id, perso:true, id:x.id, titre:x.titre, type:"Mes activités", prog:x.prog, progs:[x.prog], comp:x.comp || "Mon activité", pages:x.pages || 0, desc:x.desc || "Ton activité. Visible seulement pour toi.", img:x.couv || "img/metier-plus-icone.svg" }));
+      d.filter(x => x.k === "act").forEach(x => A.push({ f:"p_" + x.id, perso:true, id:x.id, titre:x.titre, type:"Mes formatifs", prog:x.prog, progs:[x.prog], comp:x.comp || "Mon formatif", pages:x.pages || 0, desc:x.desc || "Ton formatif. Visible seulement pour toi.", img:x.couv || "img/metier-plus-icone.svg" }));
       if (window.__dessinerAct && !q("#actOv").hidden) __dessinerAct(); }
     dessinerPlans();
   }
@@ -111,7 +111,7 @@ window.MESDOCS = (function(){
     } catch(x){}
     const A = window.__activites; if (A){
       for (let i = A.length - 1; i >= 0; i--) if (A[i].ens) A.splice(i, 1);
-      aj.filter(a => a.k === "act").forEach(a => A.push({ f:a.f, ens:true, titre:a.titre, type:"Activités des enseignants", prog:a.prog, progs:[a.prog], comp:a.comp || "Proposée par " + a.de, pages:a.pages || 0, desc:a.desc || "Proposée par " + a.de + "." })); }
+      aj.filter(a => a.k === "act").forEach(a => A.push({ f:a.f, ens:true, titre:a.titre, type:"Formatifs des enseignants", prog:a.prog, progs:[a.prog], comp:a.comp || "Proposé par " + a.de, pages:a.pages || 0, desc:a.desc || "Proposé par " + a.de + "." })); }
     dessinerPlans();
   }
   function dessinerPlans(){
@@ -155,7 +155,7 @@ window.MESDOCS = (function(){
     if (!permis()){ avis(sess() ? "L'ajout de documents n'est pas activé pour ton compte. Demande-le à l'administrateur." : "Connecte-toi pour ajouter tes documents."); return; }
     FICHIER = null; TYPE = k || "";
     const S = sess(), c = ACCES.data.comptes[S.id] || {}, pd = (c.prog && c.prog[0]) || (window.filtreProg) || PROGS[0][0];
-    q("#panel").innerHTML = '<div class="panel-top md-top"><button class="close" aria-label="Fermer">✕</button><h2>Ajouter un document</h2><p>Ton PDF devient un livre, une activité ou un plan, avec tous les outils de Métier+.</p></div>'
+    q("#panel").innerHTML = '<div class="panel-top md-top"><button class="close" aria-label="Fermer">✕</button><h2>Ajouter un document</h2><p>Ton PDF devient un livre, un formatif ou un plan, avec tous les outils de Métier+.</p></div>'
       + '<div class="panel-body md-corps">'
       + '<label class="md-zone" id="mdZone"><input type="file" id="mdFich" accept=".pdf,application/pdf,image/*,.html,.htm" hidden>'
       + '<svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4M7 9l5-5 5 5M4 15v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4"/></svg>'
@@ -180,7 +180,7 @@ window.MESDOCS = (function(){
     q("#mdOk").onclick = valider;
     if (f) choisirFichier(f); else majTypes();
   }
-  const SOUS = { livre:"Dans « Mes livres »", act:"Dans Activités", plan:"Échelle et mesure" };
+  const SOUS = { livre:"Dans « Mes livres »", act:"Dans Formatifs", plan:"Échelle et mesure" };
   const ICO = {
     livre:'<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5a2 2 0 0 1 2-2h12v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5"/></svg>',
     act:'<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3h8l3 3v15H5V3z"/><path d="M9 11l2 2 4-4M9 17h6"/></svg>',
@@ -200,7 +200,7 @@ window.MESDOCS = (function(){
   async function valider(){
     const err = q("#mdErr"), dire = m => { err.hidden = false; err.textContent = m; };
     if (!FICHIER) return dire("Choisis d'abord un fichier.");
-    if (!TYPE) return dire("Choisis si c'est un livre, une activité ou un plan.");
+    if (!TYPE) return dire("Choisis si c'est un livre, un formatif ou un plan.");
     const titre = q("#mdTitre").value.trim(); if (!titre) return dire("Donne-lui un titre.");
     const b = q("#mdOk"); b.disabled = true; b.textContent = "Préparation…";
     try {
@@ -210,7 +210,7 @@ window.MESDOCS = (function(){
       d.docs.push({ id, k:TYPE, titre, prog:q("#mdProg").value, comp:q("#mdComp").value.trim(), desc:q("#mdDesc").value.trim(), ext, nom:f.name, taille:f.size, couv:ap.couv, pages:ap.pages, added:Date.now(), maj:Date.now(), nuage:0 });
       sauver(d); const prop = q("#mdProp").checked, k = TYPE;
       closeModal(); integrer();
-      avis(NOMS[k] + " ajouté" + (k === "act" ? "e" : "") + (k === "livre" ? " dans « Mes livres »" : k === "act" ? " dans Activités" : " dans Plans") + ".", 3500);
+      avis(NOMS[k] + " ajouté" + (k === "livre" ? " dans « Mes livres »" : k === "act" ? " dans Formatifs" : " dans Plans") + ".", 3500);
       envoyerNuage(id).then(ok => { if (!ok && f.size > MAX) avis("Ce fichier dépasse 20 Mo : il reste seulement sur cet ordinateur.", 5000); else if (!ok && nuageTotal() + f.size > QUOTA) avis("Ton espace (100 Mo) est plein : ce fichier reste seulement sur cet ordinateur.", 5000); });
       if (prop) proposer(id);
     } catch(er){ b.disabled = false; b.textContent = "Ajouter"; dire("Impossible d'ajouter ce fichier : " + er.message); } }
@@ -280,7 +280,7 @@ window.MESDOCS = (function(){
   async function panneau(el){
     if (!el) return; el.innerHTML = '<p class="sous">Chargement…</p>';
     const L = await lirePropositions(), aj = (typeof REGLAGES !== "undefined" && REGLAGES.ajouts) || [];
-    el.innerHTML = '<p class="sous">Les enseignants qui ont la permission « Ajouts » (bouton sur leur fiche, onglet Enseignants) peuvent te proposer un livre, une activité ou un plan. « Publier » le met en ligne pour tous : un livre est protégé (seuls les enseignants de son programme l\'ouvrent), une activité ou un plan est public, comme les tiens.</p>'
+    el.innerHTML = '<p class="sous">Les enseignants qui ont la permission « Ajouts » (bouton sur leur fiche, onglet Enseignants) peuvent te proposer un livre, un formatif ou un plan. « Publier » le met en ligne pour tous : un livre est protégé (seuls les enseignants de son programme l\'ouvrent), un formatif ou un plan est public, comme les tiens.</p>'
       + (L.length ? '<div class="acces-fiches">' + L.map(p => '<div class="acces-fiche f2 md-pr" data-pid="' + e(p.pid) + '"><div class="fh"><div class="qui"><b>' + e(p.titre) + '</b><small>' + NOMS[p.k] + ' · ' + e(p.prog) + (p.comp ? ' · ' + e(p.comp) : '') + ' · ' + mo(p.taille) + (p.pages ? ' · ' + p.pages + ' pages' : '') + '<br>Proposé par ' + e(p.de) + ' le ' + new Date(p.t).toLocaleDateString("fr-CA") + '</small></div>'
           + '<div class="progs"><button class="pg" data-prv="voir">Aperçu</button><button class="pg on" data-prv="pub">Publier</button><button class="pg" data-prv="non">Refuser</button></div></div><p class="sous md-msg" hidden></p></div>').join("") + '</div>'
         : '<p class="sous"><b>Aucune proposition en attente.</b></p>')
@@ -330,7 +330,7 @@ window.MESDOCS = (function(){
   /* ---- glisser-déposer n'importe où (bibliothèque, Activités) ---- */
   let voile = null, prof = 0;
   const peutDeposer = ev => permis() && ev.dataTransfer && [...(ev.dataTransfer.types || [])].includes("Files") && !q("#reader.open") && (!q("#planOv") || q("#planOv").hidden) && !q("#modal.open");
-  document.addEventListener("dragenter", ev => { if (!peutDeposer(ev)) return; prof++; if (!voile){ voile = document.createElement("div"); voile.className = "md-voile"; voile.innerHTML = '<div><svg viewBox="0 0 24 24" width="54" height="54" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4M7 9l5-5 5 5M4 15v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4"/></svg><b>Dépose ton fichier</b><small>Tu choisiras ensuite : livre, activité ou plan</small></div>'; document.body.append(voile); } });
+  document.addEventListener("dragenter", ev => { if (!peutDeposer(ev)) return; prof++; if (!voile){ voile = document.createElement("div"); voile.className = "md-voile"; voile.innerHTML = '<div><svg viewBox="0 0 24 24" width="54" height="54" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4M7 9l5-5 5 5M4 15v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4"/></svg><b>Dépose ton fichier</b><small>Tu choisiras ensuite : livre, formatif ou plan</small></div>'; document.body.append(voile); } });
   document.addEventListener("dragover", ev => { if (voile) ev.preventDefault(); });
   document.addEventListener("dragleave", () => { if (voile && --prof <= 0){ voile.remove(); voile = null; prof = 0; } });
   document.addEventListener("drop", ev => { if (!voile) return; ev.preventDefault(); voile.remove(); voile = null; prof = 0;
@@ -339,7 +339,7 @@ window.MESDOCS = (function(){
   /* ---- boutons « + Ajouter » ---- */
   function boutons(){
     const ok = permis();
-    const act = q("#actOv .act-outils"); if (act && !q("#mdAjAct")) act.insertAdjacentHTML("beforeend", '<button type="button" class="md-btn" id="mdAjAct" data-mdajout="act">+ Ajouter une activité</button>');
+    const act = q("#actOv .act-outils"); if (act && !q("#mdAjAct")) act.insertAdjacentHTML("beforeend", '<button type="button" class="md-btn" id="mdAjAct" data-mdajout="act">+ Ajouter un formatif</button>');
     const pl = q("#plEmpty .pn-btns"); if (pl && !q("#mdAjPl")) pl.insertAdjacentHTML("beforeend", '<button type="button" class="md-btn" id="mdAjPl" data-mdajout="plan">+ Ajouter à mes plans</button>');
     document.querySelectorAll("#mdAjAct, #mdAjPl").forEach(b => b.hidden = !ok);
     document.body.classList.toggle("md-permis", ok); }
