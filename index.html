@@ -1422,8 +1422,20 @@ function dessinerFiltres(){
   bar.innerHTML = chip("", "Tous les programmes") + cats.map(c => chip(c, nomProgramme(c))).join("");
   bar.querySelectorAll(".fchip").forEach(b => b.onclick = () => { filtreProg = b.dataset.prog; ecrireLS("filtreProg", filtreProg); render(); });
 }
+/* visiteur = personne pas connectée sur cet appareil (ni session, ni enseignant déjà venu) */
+function estVisiteur(){ const b = document.body; const v = !(window.ACCES && ACCES.session) && !b.classList.contains("connecte") && !b.classList.contains("pre-co") && !b.classList.contains("classe");
+  b.classList.toggle("visiteur", v); return v; }
+const VIS_OUTILS = [["Plans techniques", "Des dossiers de plans complets, à mettre à l'échelle et à mesurer directement au tableau.", '<path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3z"/><path d="M9 3v15M15 6v15"/>'],
+  ["Formatifs", "Cahiers d'activités et questionnaires à projeter, imprimer ou télécharger.", '<path d="M8 3h8l3 3v15H5V3z"/><path d="M9 11l2 2 4-4M9 17h6"/>'],
+  ["Labo", "Quiz et simulations joués avec les iPad de la classe, sans compte élève.", '<path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-9V3"/>']];
 function render(){
   let list = LIVRES;
+  if (estVisiteur() && !query){
+    const tous = LIVRES.filter(l => l.fichier && !l.perso && l.fichier !== "tableau-blanc");
+    $("#rows").innerHTML = rowHTML("Les livres de Métier+", tous)
+      + `<section class="vis-outils"><h2>Et aussi, une fois connecté</h2><div class="vis-cartes">${VIS_OUTILS.map(([t, d, i]) => `<div class="vis-carte"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${i}</svg><b>${t}</b><p>${d}</p></div>`).join("")}</div>
+        <p class="vis-note">Un livre t'intéresse ? Touche-le : on te demandera de te connecter.</p></section>`;
+    return; }
   const lienFav = document.querySelector('nav a[data-view="fav"]'); if (lienFav) lienFav.hidden = !favs.length;
   if (view === "fav" && !favs.length){ view = "all"; document.querySelectorAll("nav a[data-view]").forEach(a => a.classList.toggle("active", a.dataset.view === "all")); }
   if (view === "fav") list = list.filter(isFav);
@@ -1545,6 +1557,14 @@ function renderHero(){
     brancherAccueilPerso(h); return; }
   h.classList.remove("hp");
   h.style.cssText = "background:linear-gradient(120deg,#1b2540 0%,#141414 68%)";
+  if (estVisiteur()){   /* visiteur (pas connecté) : accueil simplifié, 8 nov. */
+    h.innerHTML = `<div class="hero-content"><h1>L'atelier, au tableau.</h1>
+      <p>Métier+ réunit les livres de cours animés, les plans techniques, les formatifs, les quiz et les simulations des enseignants en formation professionnelle. <span class="hero-tag">Réservé aux enseignants du Pavillon de l'Avenir</span></p>
+      <div class="vis-btns"><button class="vis-co" id="visCo" type="button">Se connecter</button><button class="vis-dem" id="visDem" type="button">Demander un accès</button><a class="vis-dec" href="presentation.html">Découvrir Métier+ ›</a></div></div>
+      <div class="hero-stack">${vedettes().map(l => `<img src="${esc(couv(l))}" alt="">`).join("")}</div>`;
+    $("#visCo").onclick = () => window.ACCES && ACCES.dlgConnexion();
+    $("#visDem").onclick = () => window.ACCES && ACCES.dlgDemande(false);
+    return; }
   h.innerHTML = `<div class="hero-content">
     <h1>${(window.titreAccueil && window.titreAccueil()) || "La plateforme des enseignants en formation professionnelle"}</h1>
     <p>Livres de cours animés, plans techniques, formatifs et simulateurs, réunis pour enseigner un métier en classe comme à l'atelier. <span class="hero-tag">Réservé aux enseignants du Pavillon de l'Avenir</span></p>
@@ -10077,7 +10097,7 @@ window.ACCES = (function(){
     if (SESSION) go(); else dlgConnexion(go);
   }
   setTimeout(() => { const b = document.getElementById("compteBtn"); if (b) b.onclick = menu; charger(); accepterDepuisLien(); invitationDepuisLien(); }, 0);
-  return { pret, get estPret(){ return estPret; }, protege, permis, verrouille, ouvrir, recherche, connexion, deconnexion, demande, lireDemande, dlgConnexion, menu, get session(){ return SESSION; }, get eleve(){ return !!(SESSION && SESSION.eleve); }, get data(){ return DATA; }, charger, outils:{ commitGitHub:(...a) => commitGitHub(...a), envelopperPour:(...a) => envelopperPour(...a), BOITE, sansAcc:t => sansAcc(t),
+  return { pret, get estPret(){ return estPret; }, protege, permis, verrouille, ouvrir, recherche, connexion, deconnexion, demande, lireDemande, dlgConnexion, dlgDemande, menu, get session(){ return SESSION; }, get eleve(){ return !!(SESSION && SESSION.eleve); }, get data(){ return DATA; }, charger, outils:{ commitGitHub:(...a) => commitGitHub(...a), envelopperPour:(...a) => envelopperPour(...a), BOITE, sansAcc:t => sansAcc(t),
     integrer(f, livre, ajouts){ if (f && livre){ DATA.livres[f] = JSON.parse(JSON.stringify(livre)); if (BROUILLON) BROUILLON.livres[f] = JSON.parse(JSON.stringify(livre)); } if (REGL) REGL.ajouts = JSON.parse(JSON.stringify(ajouts || [])); } } };
 })();
 </script>
@@ -10352,6 +10372,23 @@ document.addEventListener("click", e => { const b = e.target.closest && e.target
 @media (prefers-reduced-motion:reduce){.co-col{animation:none!important}.co-form.tremble{animation:none!important}}
 @media (pointer:coarse) and (min-width:641px){#accesBox.co2 input{min-height:52px;font-size:18px}#accesBox.co2 .acces-btns button{min-height:52px;font-size:17px;padding:0 24px}.co-oeil{width:46px;height:46px}}
 @media (max-width:760px){#accesBox.co2{grid-template-columns:1fr;width:min(440px,94vw)}.co-vis{display:none}}
+</style>
+<style>
+/* ---- Accueil du visiteur (pas connecté), 8 nov. ---- */
+body.visiteur #filtres,body.visiteur header .search,body.visiteur .cadenas,body.visiteur nav a[data-view="fav"],body.visiteur #tabbar [data-tab="fav"]{display:none!important}
+.vis-btns{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-top:22px}
+.vis-co{font:inherit;font-weight:700;font-size:1.05rem;padding:13px 30px;border-radius:999px;border:0;background:#EB6A22;color:#fff;cursor:pointer}
+.vis-co:hover{background:#ff7d33}
+.vis-dem{font:inherit;font-weight:600;padding:12px 22px;border-radius:999px;border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.06);color:inherit;cursor:pointer}
+body.clair .vis-dem{border-color:rgba(0,0,0,.2);background:rgba(0,0,0,.03)}
+.vis-dec{color:#F2762E;font-weight:600;text-decoration:none;padding:12px 6px}.vis-dec:hover{text-decoration:underline}
+.vis-outils{padding:10px 4vw 30px}
+.vis-outils h2{font-size:1.25rem;margin:10px 0 16px}
+.vis-cartes{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.vis-carte{padding:20px;border-radius:14px;background:rgba(128,128,128,.08);border:1px solid rgba(128,128,128,.16)}
+.vis-carte svg{color:#EB6A22;margin-bottom:10px}.vis-carte b{display:block;font-size:1.05rem;margin-bottom:6px}.vis-carte p{margin:0;opacity:.75;font-size:.92rem;line-height:1.45}
+.vis-note{margin:18px 0 0;opacity:.7;font-size:.92rem}
+@media (max-width:760px){.vis-cartes{grid-template-columns:1fr}.vis-btns{gap:8px}.vis-co,.vis-dem{flex:1 1 auto;text-align:center}}
 </style>
 <script src="mesdocs.js"></script>
 </body></html>
