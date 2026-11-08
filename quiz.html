@@ -4,6 +4,12 @@
 <!-- © 2026 Jérémy Raymond. Tous droits réservés. Copie, modification ou revente interdites sans autorisation écrite (voir LICENCE.md). -->
 <meta charset="utf-8">
 <link rel="icon" href="img/metier-plus-icone.svg" type="image/svg+xml">
+<script>
+/* Même thème que la bibliothèque (localStorage.accueilClair, sinon l'ordinateur) : tableaux de bord en foncé ou en clair */
+(function(){ let c = null; try { c = localStorage.getItem("accueilClair"); } catch(e) {}
+  const clair = c === "1" || (c === null && matchMedia("(prefers-color-scheme: light)").matches);
+  document.documentElement.classList.add(clair ? "clair" : "sombre"); })();
+</script>
 <script src="garde.js"></script>
 <script src="coffre.js"></script>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -258,6 +264,17 @@ i.let,.ch4 button i{background:var(--lc,var(--acc))!important;color:#fff!importa
 @media (max-width:640px){.nbE{grid-template-columns:1fr}}
 @media (max-width:640px){ .tbar{display:flex;flex-wrap:wrap;align-items:center;row-gap:8px} .tbar>img{order:1} .tbar>a:last-child{order:2;margin-left:auto;white-space:nowrap}
   .tbar h1{order:3;flex-basis:100%;font-size:1.25rem;margin:0} .tbar #lienEcran{order:4;flex-basis:100%;font-size:.9rem} }
+
+/* Tableau de bord du quiz en foncé (8 nov., comme la bibliothèque) */
+html.sombre body.bord{--fond:#141414;--carte:#1D1D21;--txt:#F2EFEA;--gris:#A8A29A;--ligne:#33333A}
+html.sombre body.bord :is(input,select,textarea){background:#111114;color:#F2EFEA;border-color:#3a3a40}
+html.sombre body.bord :is(.btn2,.seg button:not(.on),#modes .regRap .seg button:not(.on)){background:#2A2A30;color:#F2EFEA}
+html.sombre body.bord :is(.cq,#modes .bx){background:#1D1D21}
+html.sombre body.bord .cq{border-color:#2f2f35}
+html.sombre body.bord :is(.qe,.regD,#modes .regRap){background:#17171b}
+html.sombre body.bord :is(.ch4 button,.qe .k0,.qe .k1,.qe .k2,.qe .k3){border-color:#3a3a40}
+html.sombre body.bord .tbar img,html.sombre #role .logoC{content:url(img/metier-plus-blanc.svg)}
+html.sombre body.bord .tbar a{color:#a99ff0}
 </style>
 </head>
 <body>

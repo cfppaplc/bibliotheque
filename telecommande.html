@@ -73,12 +73,18 @@ svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.9;stroke
 /* attente */
 .vide{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:var(--gris);gap:12px;padding:20px;font-size:16px;line-height:1.45}
 .vide b{color:var(--txt);font-size:20px}
+
+/* Écran d'attente (8 nov.) : logo, étapes, lien vers la bibliothèque */
+.vide .attLogo{height:34px;margin-bottom:6px;opacity:.95}
+.vide.sanscode ol{text-align:left;margin:14px auto 4px;padding-left:22px;max-width:320px;color:var(--txt);font-size:15px;line-height:1.5}
+.vide.sanscode li{margin:6px 0}
+.vide .retourB{display:inline-block;margin-top:14px;background:#EB6A22;color:#fff;text-decoration:none;font-weight:700;border-radius:12px;padding:12px 18px}
 </style>
 </head>
 <body>
 <div class="l1"><img src="img/metier-plus-blanc.svg" alt="Métier+"><span class="etat" id="etat"><i></i><span>Connexion…</span></span></div>
 
-<div id="attente" class="vide"><b>Télécommande</b><span id="attTxt">Connexion à l'ordinateur du tableau…</span></div>
+<div id="attente" class="vide"><img class="attLogo" src="img/metier-plus-blanc.svg" alt="Métier+"><b>Télécommande</b><span id="attTxt">Connexion à l'ordinateur du tableau…</span></div>
 
 <div id="tele" class="cache" style="display:flex;flex-direction:column;flex:1;min-height:0">
   <div class="l2"><h1 id="titre"></h1><button id="bTdb"><svg viewBox="0 0 24 24"><rect x="3.5" y="4" width="17" height="12.5" rx="1.5"/><path d="M8 20h8M12 16.5V20"/></svg><span id="bTdbT">Tableau de bord</span></button></div>
@@ -211,7 +217,7 @@ async function eveil(){ try { if ("wakeLock" in navigator && document.visibility
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible"){ eveil(); envoyer({m: "allo"}); } });
 addEventListener("pagehide", () => envoyer({m: "bye"}));
 
-if (!jeton){ $("attTxt").innerHTML = "Ce lien n'est pas complet.<br>Dans le livre, touche le bouton <b>Télécommande</b> et scanne le code QR."; etat("Pas de code", "ko"); }
+if (!jeton){ $("attente").classList.add("sanscode"); $("attTxt").innerHTML = "Ce lien n'est pas complet.<ol><li>Ouvre un livre dans la bibliothèque, sur l'ordinateur du tableau.</li><li>Touche le bouton <b>Télécommande</b> dans la barre du bas.</li><li>Scanne le code QR avec ce cellulaire.</li></ol><a class=\"retourB\" href=\"./\">Ouvrir la bibliothèque</a>"; etat("Pas de code", "ko"); }
 else if (!window.supabase){ $("attTxt").textContent = "Impossible de joindre le relais. Vérifie Internet puis recharge la page."; etat("Hors ligne", "ko"); }
 else {
   const sb = window.supabase.createClient(SB_URL, SB_CLE, {realtime: {params: {eventsPerSecond: 60}}});
