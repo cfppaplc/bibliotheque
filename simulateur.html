@@ -191,7 +191,7 @@ i.let{font-style:normal;display:inline-flex;align-items:center;justify-content:c
 .podium b{display:block;font-size:4vw}
 .errs{font-size:1.6vw;color:#B5AFA6}.errs b{color:#FF8A80}
 /* ---------- Animer au tableau (un seul ordinateur) ---------- */
-#animBar{position:fixed;left:50%;bottom:2.2vh;transform:translateX(-50%);display:flex;gap:8px;align-items:center;background:rgba(20,22,26,.88);padding:8px;border-radius:14px;z-index:60;box-shadow:0 8px 30px rgba(0,0,0,.4)}
+#animBar{position:fixed;left:50%;bottom:2.2vh;transform:translateX(-50%);display:flex;flex-wrap:wrap;justify-content:center;max-width:calc(100vw - 16px);gap:8px;align-items:center;background:rgba(20,22,26,.88);padding:8px;border-radius:14px;z-index:60;box-shadow:0 8px 30px rgba(0,0,0,.4)}
 #animBar button{padding:12px 18px;font-size:15px;border-radius:10px;background:#3A3D45;color:#F2EFEA;min-height:46px}
 #animBar button.prim{background:var(--acc,#534AB7);color:#fff}
 #animBar button:disabled{opacity:.35}
@@ -225,6 +225,7 @@ i.let,.ch4 button i{background:var(--lc,var(--acc))!important;color:#fff!importa
 .ch4 button.choisi{border-color:#fff!important;background:color-mix(in srgb,var(--lc) 45%,rgba(0,0,0,.2))!important}
 .ech>div.bon{background:#1F7A4D!important;box-shadow:inset .45vw 0 0 #7CF0A8}
 .bon i.let{background:#fff!important;color:#1D6B3F!important}
+@media (max-width:700px){#animBar{left:8px;right:8px;transform:none}#animBar button{flex:1 1 40%}.son{top:64px;bottom:auto}}
 </style>
 </head>
 <body>

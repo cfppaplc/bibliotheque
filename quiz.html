@@ -22,7 +22,7 @@ textarea{min-height:180px;font-family:ui-monospace,Menlo,Consolas,monospace;font
 .carte h2{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--gris);margin:0 0 10px}
 .tbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}
 .tbar h1{font-size:20px;margin:0;flex:1}
-.tbar a{color:var(--acc);font-weight:700;text-decoration:none}
+.tbar a{color:var(--acc);font-weight:700;text-decoration:none;padding:10px 6px;display:inline-block}
 .k0,.k1,.k2,.k3{background:#2F3440;color:#fff}
 i.let{font-style:normal;display:inline-flex;align-items:center;justify-content:center;width:1.7em;height:1.7em;border-radius:8px;background:var(--acc,#534AB7);color:#fff;font-weight:800;flex:none;margin-right:.5em;font-size:.95em}
 .bon i.let{background:#fff;color:#1D6B3F}
@@ -114,7 +114,10 @@ th{font-size:12px;color:var(--gris);border-top:0}
 .lob .code{font-size:6vw;color:#fff;text-align:left;font-weight:900;letter-spacing:.12em}
 .lob .noms{display:flex;flex-wrap:wrap;gap:.8vw;margin-top:2vh}
 .lob .noms span{display:inline-flex;align-items:center;background:var(--acc);border-radius:3vw;padding:.5vw 1.6vw .5vw .5vw;font-size:1.6vw;font-weight:800;animation:pop .4s}
-.son{position:absolute;right:3vw;bottom:3vh;background:#2B2E35;color:#F2EFEA;font-size:1.2vw;padding:.8vw 1.4vw}
+.son{position:absolute;right:3vw;bottom:3vh;background:#2B2E35;color:#F2EFEA;font-size:max(14px,1.2vw);padding:max(10px,.8vw) max(16px,1.4vw);display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(255,255,255,.18)}
+.son svg{width:1.4em;height:1.4em}.son:not(.actif){animation:sonAppel 2.4s ease-in-out infinite}
+@keyframes sonAppel{50%{box-shadow:0 0 0 6px rgba(255,255,255,.12)}}
+@media (prefers-reduced-motion:reduce){.son{animation:none!important}}
 @keyframes pop{from{transform:scale(.6);opacity:0}}
 .eq{font-size:2.9vw;font-weight:800;text-align:center;margin:1vh 0 2.5vh;line-height:1.25}
 .eimg{display:block;max-height:34vh;max-width:60vw;margin:0 auto 2.5vh;border-radius:1vw}
@@ -137,7 +140,7 @@ th{font-size:12px;color:var(--gris);border-top:0}
 @keyframes leve{from{transform:scaleY(0);opacity:0}}
 @media (prefers-reduced-motion:reduce){.coche circle,.coche path,.croix path{animation-duration:.01s}.podium div,.secoue,.monte,.ech div.bon{animation:none}}
 /* ---------- Animer au tableau (un seul ordinateur) ---------- */
-#animBar{position:fixed;left:50%;bottom:2.2vh;transform:translateX(-50%);display:flex;gap:8px;align-items:center;background:rgba(20,22,26,.88);padding:8px;border-radius:14px;z-index:60;box-shadow:0 8px 30px rgba(0,0,0,.4)}
+#animBar{position:fixed;left:50%;bottom:2.2vh;transform:translateX(-50%);display:flex;flex-wrap:wrap;justify-content:center;max-width:calc(100vw - 16px);gap:8px;align-items:center;background:rgba(20,22,26,.88);padding:8px;border-radius:14px;z-index:60;box-shadow:0 8px 30px rgba(0,0,0,.4)}
 #animBar button{padding:12px 18px;font-size:15px;border-radius:10px;background:#3A3D45;color:#F2EFEA;min-height:46px}
 #animBar button.prim{background:var(--acc,#534AB7);color:#fff}
 #animBar button:disabled{opacity:.35}
@@ -170,7 +173,7 @@ body.bord .grid{grid-template-columns:1fr}body.bord .grid>div:first-child{displa
 .cq .co{padding:12px 14px 14px;display:flex;flex-direction:column;gap:6px;flex:1}
 .cq .co b{font-size:16px;line-height:1.25}
 .cq .co .jouer{margin-top:auto;font-size:16px;padding:12px}
-.cq .pt{display:flex;gap:6px;flex-wrap:wrap}.cq .pt button{flex:1;padding:7px 8px;font-size:12px}
+.cq .pt{display:flex;gap:6px;flex-wrap:wrap}.cq .pt button{flex:1;padding:10px 8px;font-size:13px;min-height:38px}
 #modes{position:fixed;inset:0;background:rgba(20,22,26,.6);z-index:80;display:flex;align-items:center;justify-content:center;padding:16px}
 #modes .bx{background:#fff;border-radius:18px;padding:20px;max-width:640px;width:100%}
 #modes h2{margin:0 0 4px;font-size:20px;color:var(--txt);letter-spacing:0;text-transform:none}
@@ -210,6 +213,9 @@ i.let,.ch4 button i{background:var(--lc,var(--acc))!important;color:#fff!importa
 .ch4 button.choisi{border-color:#fff!important;background:color-mix(in srgb,var(--lc) 45%,rgba(0,0,0,.2))!important}
 .ech>div.bon{background:#1F7A4D!important;box-shadow:inset .45vw 0 0 #7CF0A8}
 .bon i.let{background:#fff!important;color:#1D6B3F!important}
+@media (max-width:700px){#animBar{left:8px;right:8px;transform:none}#animBar button{flex:1 1 40%}.son{top:64px;bottom:auto}}
+.lbl{display:block;font-size:12px;font-weight:800;color:var(--gris);text-transform:uppercase;letter-spacing:.04em;margin:10px 0 4px}
+.regD{margin:14px 0;border:1px solid var(--ligne);border-radius:12px;padding:0 14px;background:#FBFAF7}.regD summary{cursor:pointer;padding:14px 0;font-weight:800;list-style:none}.regD summary::before{content:"▸ ";color:var(--acc)}.regD[open] summary::before{content:"▾ "}.regD summary span{display:block;font-weight:500;font-size:13px;color:var(--gris);margin-top:2px}
 </style>
 </head>
 <body>
@@ -260,21 +266,22 @@ Le propane s'accumule…
 <div class="ctl" style="margin-top:10px"><button id="cOk">Créer le quiz</button><button class="btn2" id="cAnnule">Annuler</button></div><div id="cMsg" class="sous" style="margin-top:6px"></div></div></div>
 <div id="vEdit" class="cache">
 <div class="carte"><h2>Créer ou modifier un quiz</h2>
-<input id="eTitre" placeholder="Titre du quiz" maxlength="80" style="font-size:18px;font-weight:700">
-<input id="eSujet" placeholder="Cours ou module (ex. : Plomberie · module 3), affiché au tableau" maxlength="60" style="margin-top:8px">
+<label class="lbl" for="eTitre">Titre du quiz</label><input id="eTitre" placeholder="Ex. : Les robinets d'arrêt" maxlength="80" style="font-size:18px;font-weight:700">
+<label class="lbl" for="eSujet">Cours ou module (affiché au tableau)</label><input id="eSujet" placeholder="Ex. : Plomberie · module 3" maxlength="60">
 <div class="img" style="display:flex;gap:10px;align-items:center;margin-top:8px" id="eCouv"></div>
+<details class="regD"><summary>Réglages de la partie <span>qui joue, points, ordre, temps, sons, couleur… (tu peux aussi les changer juste avant de jouer)</span></summary>
 <div class="reg">
 <label>Qui joue<div class="seg" data-r="mode"><button data-v="ind">Chaque élève</button><button data-v="eq">En équipes</button></div></label>
 <label>Points<div class="seg" data-r="points"><button data-v="vitesse">Selon la vitesse</button><button data-v="fixe">Fixes</button><button data-v="aucun">Sans points</button></div></label>
 <label>Classement après chaque question<div class="seg" data-r="classement"><button data-v="oui">Oui</button><button data-v="non">À la fin seulement</button></div></label>
 <label>Ordre<div class="seg" data-r="melange"><button data-v="non">Tel quel</button><button data-v="q">Questions mêlées</button><button data-v="tout">Questions et choix mêlés</button></div></label>
-<label>Nombre de questions par partie<div class="seg" data-r="nb"><button data-v="tout">Toutes</button><button data-v="10">10 au hasard</button><button data-v="15">15 au hasard</button></div></label>
+<label>Nombre de questions par partie (au hasard)<div class="seg" data-r="nb"><button data-v="tout">Toutes</button><button data-v="10">10</button><button data-v="12">12</button><button data-v="15">15</button><button data-v="20">20</button></div></label>
 <label>Temps pour répondre<div class="seg" data-r="temps"><button data-v="moins">Plus court</button><button data-v="normal">Normal</button><button data-v="plus">Plus long</button></div></label>
 <label>Sons au tableau<div class="seg" data-r="son"><button data-v="oui">Oui</button><button data-v="non">Non</button></div></label>
 <label>Musique pendant les questions<div class="seg" data-r="musique"><button data-v="oui">Oui</button><button data-v="non">Non</button></div></label>
 <label>Bonus de série (3 bonnes de suite et plus : +100, +200, +300)<div class="seg" data-r="bonus"><button data-v="oui">Oui</button><button data-v="non">Non</button></div></label>
 <label>Couleur du quiz<div class="coul" id="eCoul"></div></label>
-</div>
+</div></details>
 <div id="eQs"></div>
 <div class="ctl"><button class="btn2" id="eAjout">+ Question à choix</button><button class="btn2" id="eAjoutVF">+ Vrai ou faux</button><button id="eSauve">Enregistrer</button><button class="btn2" id="eAnnule">Annuler</button></div>
 <div class="sous" style="margin-top:8px">Le quiz est gardé sur cet appareil. « Exporter » (dans la liste) te donne un fichier à garder ou à partager à un collègue.</div></div>
@@ -620,7 +627,7 @@ function telecommande(bord){
       const vf = Q.ch.length === 2 && /^vrai$/i.test(Q.ch[0]) && /^faux$/i.test(Q.ch[1]);
       const nb = vf ? 2 : 4;
       return `<div class="qe"><div class="tete"><b>Question ${k + 1}${vf ? " · vrai ou faux" : ""}</b>
-      <select>${[10, 15, 20, 30, 45, 60].map(s => `<option value="${s}" ${Q.s === s ? "selected" : ""}>${s} s</option>`).join("")}</select>
+      <select>${[...new Set([10, 15, 20, 25, 30, 45, 60, +Q.s || 20])].sort((x, y) => x - y).map(s => `<option value="${s}" ${(+Q.s || 20) === s ? "selected" : ""}>${s} s</option>`).join("")}</select>
       <button class="btn2" data-mv="${k},-1" ${k ? "" : "disabled"} aria-label="Monter">↑</button><button class="btn2" data-mv="${k},1" ${k < ed.qs.length - 1 ? "" : "disabled"} aria-label="Descendre">↓</button>
       <button class="btn2" data-del="${k}" ${ed.qs.length < 2 ? "disabled" : ""}>Retirer</button></div>
       <input class="tq" placeholder="La question" value="${esc(Q.q)}" maxlength="180" style="margin-top:8px">
@@ -799,7 +806,13 @@ function ecran(code){
   function ton(f, d, v, type){ if (!sonOK || V.reg.son === "non") return; try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); const o = ac.createOscillator(), g = ac.createGain(); o.type = type || "sine"; o.frequency.value = f; o.connect(g); g.connect(ac.destination); g.gain.setValueAtTime(v, ac.currentTime); g.gain.exponentialRampToValueAtTime(.0001, ac.currentTime + d); o.start(); o.stop(ac.currentTime + d); } catch(e) {} }
   const accord = () => { ton(523, .5, .12); setTimeout(() => ton(659, .5, .1), 120); setTimeout(() => ton(784, .7, .1), 240); };
   const tete = t => `<div class="liseret"></div><div class="haut"><b><img class="logoE" src="img/pavillon-avenir-blanc.png" alt="Pavillon de l'Avenir">${esc(t)}</b><span>Quiz maison · code ${code.slice(0, 3)} ${code.slice(3)}</span></div>`;
-  const bSon = () => `<button class="son" id="bSon">${sonOK ? "Son activé" : "Activer le son"}</button>`;
+  const bSon = () => `<button class="son${sonOK ? " actif" : ""}" id="bSon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="currentColor"/>${sonOK ? '<path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>' : '<path d="M16 9.5l5 5M21 9.5l-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>'}</svg>${sonOK ? "Son activé" : "Activer le son"}</button>`;
+  /* le navigateur exige un clic avant de jouer un son : le premier clic sur l'écran de classe (ex. « Commencer » en mode Animer) active le son,
+     sauf si l'enseignant l'a coupé lui-même */
+  let sonManuel = false;
+  document.addEventListener("pointerdown", e => { if (sonOK || sonManuel || e.target.closest("#bSon")) return;
+    sonOK = true; try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); ac.resume(); } catch(x) {}
+    const b = $("bSon"); if (b){ b.classList.add("actif"); b.innerHTML = bSon().replace(/^<button[^>]*>|<\/button>$/g, ""); } }, true);
   function lignes(n, anim){
     return `<div class="lgs">${V.joueurs.slice(0, n).map(j => `<div class="lg" data-n="${esc(j.n)}"><span class="r">${j.r}</span><span>${visage(j.av, "v-e")}${esc(j.n)}</span><span>${anim && j.g ? `<small>+${j.g}</small>` : ""}${V.reg.points === "aucun" ? "" : `<b data-de="${j.pts - (anim ? j.g : 0)}" data-a="${j.pts}">${j.pts - (anim ? j.g : 0)}</b>`}</span></div>`).join("")}</div>`;
   }
@@ -836,7 +849,7 @@ function ecran(code){
         ton(660, .2, .07);
       }, 1000);
     }, 80 * rows.length + 400);
-    const b = $("bSon"); if (b) b.onclick = () => { sonOK = !sonOK; if (sonOK) { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); ac.resume(); } b.textContent = sonOK ? "Son activé" : "Activer le son"; };
+    const b = $("bSon"); if (b) b.onclick = () => { sonOK = !sonOK; sonManuel = !sonOK; if (sonOK) { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); ac.resume(); } b.classList.toggle("actif", sonOK); b.innerHTML = bSon().replace(/^<button[^>]*>|<\/button>$/g, ""); };
   }
 
   /* Musique de fond pendant une question (composée ici, synthétisée : aucun fichier, aucun droit d'auteur).
@@ -912,7 +925,7 @@ function ecran(code){
       }
     }
     dernier = cle;
-    const b = $("bSon"); if (b) b.onclick = () => { sonOK = !sonOK; if (sonOK) { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); ac.resume(); ton(660, .2, .08); } b.textContent = sonOK ? "Son activé" : "Activer le son"; };
+    const b = $("bSon"); if (b) b.onclick = () => { sonOK = !sonOK; sonManuel = !sonOK; if (sonOK) { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); ac.resume(); ton(660, .2, .08); } b.classList.toggle("actif", sonOK); b.innerHTML = bSon().replace(/^<button[^>]*>|<\/button>$/g, ""); };
   }
   ecouter(topic, m => {
     if (m.m === "img") { img[m.i] = m.data; if ((V.etat === "question" && V.i === m.i) || (m.i === -1 && V.etat === "lobby")) rendre(true); }

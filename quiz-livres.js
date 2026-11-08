@@ -7,7 +7,7 @@ window.QUIZ_LIVRES = [
 "exemple": true,
 "livre": true,
 "titre": "Communiquer en milieu de travail",
-"sujet": "12 questions au hasard à chaque partie",
+"sujet": "Quiz du livre",
 "couv": "img/labo/quiz/livres/communiquer-couv.jpg",
 "coul": "#185FA5",
 "reg": {
@@ -239,7 +239,7 @@ window.QUIZ_LIVRES = [
 "exemple": true,
 "livre": true,
 "titre": "Dispositifs électriques et électroniques",
-"sujet": "12 questions au hasard à chaque partie",
+"sujet": "Quiz du livre",
 "couv": "img/labo/quiz/livres/dispositifs-electriques-c9-couv.jpg",
 "coul": "#E0892B",
 "reg": {
@@ -473,7 +473,7 @@ window.QUIZ_LIVRES = [
 "exemple": true,
 "livre": true,
 "titre": "Ventilation et climatisation",
-"sujet": "12 questions au hasard à chaque partie",
+"sujet": "Quiz du livre",
 "couv": "img/labo/quiz/livres/ventilation-climatisation-m11-couv.jpg",
 "coul": "#14A3A3",
 "reg": {
@@ -707,7 +707,7 @@ window.QUIZ_LIVRES = [
 "exemple": true,
 "livre": true,
 "titre": "Notions d'énergie",
-"sujet": "12 questions au hasard à chaque partie",
+"sujet": "Quiz du livre",
 "couv": "img/labo/quiz/livres/notions-energie-c13-couv.jpg",
 "coul": "#0F6E56",
 "reg": {
@@ -945,7 +945,7 @@ window.QUIZ_LIVRES = [
 "exemple": true,
 "livre": true,
 "titre": "Entretien de matériel électrique",
-"sujet": "12 questions au hasard à chaque partie",
+"sujet": "Quiz du livre",
 "couv": "img/labo/quiz/livres/materiel-electrique-c13-couv.jpg",
 "coul": "#8B6CE0",
 "reg": {
@@ -1177,7 +1177,7 @@ window.QUIZ_LIVRES = [
 "exemple": true,
 "livre": true,
 "titre": "Utiliser un micro-ordinateur",
-"sujet": "12 questions au hasard à chaque partie",
+"sujet": "Quiz du livre",
 "couv": "img/labo/quiz/livres/micro-ordinateur-couv.jpg",
 "coul": "#185FA5",
 "reg": {
@@ -1412,7 +1412,7 @@ window.QUIZ_LIVRES = [
 "exemple": true,
 "livre": true,
 "titre": "Plomberie et chauffage",
-"sujet": "12 questions au hasard à chaque partie",
+"sujet": "Quiz du livre",
 "couv": "img/labo/quiz/livres/plomberie-chauffage-couv.jpg",
 "coul": "#B3261E",
 "reg": {
@@ -1642,7 +1642,7 @@ window.QUIZ_LIVRES = [
 "exemple": true,
 "livre": true,
 "titre": "Lecture de plans et devis",
-"sujet": "12 questions au hasard à chaque partie",
+"sujet": "Quiz du livre",
 "couv": "img/labo/quiz/livres/lecture-plans-devis-c6-couv.jpg",
 "coul": "#854F0B",
 "reg": {
@@ -1875,7 +1875,7 @@ window.QUIZ_LIVRES = [
 "exemple": true,
 "livre": true,
 "titre": "Lecture de plans de bâtiments",
-"sujet": "12 questions au hasard à chaque partie",
+"sujet": "Quiz du livre",
 "couv": "img/labo/quiz/livres/lecture-plans-batiments-egi-couv.jpg",
 "coul": "#534AB7",
 "reg": {
@@ -2110,7 +2110,7 @@ window.QUIZ_LIVRES = [
 "exemple": true,
 "livre": true,
 "titre": "Travaux mineurs d'entretien général",
-"sujet": "12 questions au hasard à chaque partie",
+"sujet": "Quiz du livre",
 "couv": "img/labo/quiz/livres/travaux-mineurs-egi-couv.jpg",
 "coul": "#D9488A",
 "reg": {
@@ -2336,7 +2336,7 @@ window.QUIZ_LIVRES = [
 "exemple": true,
 "livre": true,
 "titre": "Entretien ménager d'un bâtiment",
-"sujet": "12 questions au hasard à chaque partie",
+"sujet": "Quiz du livre",
 "couv": "img/labo/quiz/livres/entretien-menager-egi-couv.jpg",
 "coul": "#2E8B57",
 "reg": {
