@@ -2969,7 +2969,12 @@ html.leger .sheet,html.leger .menu,html.leger #apercuOv{animation:none!important
 </style>
 <script>
 /* Coffre : « Préparer le cours » et les réglages suivent le compte de l'enseignant (coffre.js); jamais en aperçu */
-if (window.COFFRE && !/[?&]apercu=/.test(location.search)) COFFRE.demarrer("accueil", { cles:["accueil-atelier-v4"], intervalle:180000, apres:() => location.reload() });
+if (window.COFFRE && !/[?&]apercu=/.test(location.search)) COFFRE.demarrer("accueil", { cles:["accueil-atelier-v4"], intervalle:180000, apres:() => location.reload(),
+  /* les cours préparés d'avance (cfg.plans) ne se perdent jamais entre l'ordinateur et le TNI : on garde ceux des deux côtés (seulement ceux d'aujourd'hui et plus tard) */
+  fusion: { "accueil-atelier-v4": (a, b, v) => { const choisi = v["accueil-atelier-v4"], autre = choisi === a ? b : a, C = JSON.parse(choisi), O = JSON.parse(autre);
+    const auj = new Date().toLocaleDateString("en-CA"), pl = Object.assign({}, C.plans || {});
+    for (const k in (O.plans || {})) if (!(k in pl) && k.slice(0, 10) >= auj) pl[k] = O.plans[k];
+    C.plans = pl; return JSON.stringify(C); } } });
 </script>
 </body>
 </html>

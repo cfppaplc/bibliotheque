@@ -57,10 +57,10 @@ window.COFFRE = (function(){
   /* ---- rangée du compte pour une sorte (id = empreinte : personne ne peut deviner ni lister) ---- */
   const RANG = {};
   async function rangee(s, so){
-    const cle = s.id + "|" + so; if (RANG[cle]) return RANG[cle];
+    const cle = s.id + "|" + so; if (RANG[cle] && !RANG[cle].neuf) return RANG[cle];   /* place encore vide : on revérifie (un autre appareil a pu la créer entre-temps) */
     for (let n = 0; n < 4; n++){
       const id = await hex("metier+|" + s.id + "|" + so + "|" + n), r = await rpc("coffre_lire", { p_id:id }), row = r && r[0];
-      if (!row){ const brut = crypto.getRandomValues(new Uint8Array(64)); return RANG[cle] = { id, brut, env:await envelopper(brut, s.pub), data:null }; }
+      if (!row){ if (RANG[cle] && RANG[cle].neuf && RANG[cle].id === id) return Object.assign(RANG[cle], { data:null }); const brut = crypto.getRandomValues(new Uint8Array(64)); return RANG[cle] = { id, brut, env:await envelopper(brut, s.pub), data:null, neuf:true }; }
       try { return RANG[cle] = { id, brut:new Uint8Array(await ouvrir(row.env, s.priv)), env:row.env, data:row.data }; } catch(e){}   /* pas à nous : place suivante */
     }
     throw new Error("coffre : aucune place");
@@ -79,6 +79,7 @@ window.COFFRE = (function(){
     const out = new Uint8Array(12 + c.length); out.set(iv); out.set(c, 12);
     const ok = await rpc("coffre_ecrire", { p_id:R.id, p_jeton:b64(R.brut.subarray(32, 64)), p_env:R.env, p_data:b64(out) });
     if (ok !== true){ delete RANG[s.id + "|" + so]; throw new Error("coffre : écriture refusée"); }
+    R.neuf = false;
   }
 
   /* ---- synchronisation ---- */
@@ -105,7 +106,8 @@ window.COFFRE = (function(){
     const c = SORTES[so]; if (!c || !c.id || !c.s) return false;
     if (c.occupe){ planifier(so, 3000); return false; }
     c.occupe = true; clearTimeout(c.min);
-    try { const t = +lsGet(meta(so, "t")) || Date.now();
+    try { if (c.fusion && await tirer(so, "envoi") && c.apres) c.apres("fusion");   /* un autre appareil a écrit entre-temps : on fusionne avant d'envoyer */
+      const t = +lsGet(meta(so, "t")) || Date.now();
       await ecrire(c.s, so, { t, v:paquet(c, c.id) });
       if ((+lsGet(meta(so, "t")) || t) === t) lsDel(meta(so, "sale"));
       lsDel(meta(so, "reste:" + c.id)); etat("ok"); return true; }
@@ -117,16 +119,17 @@ window.COFFRE = (function(){
   async function tirer(so, raison){
     const c = SORTES[so], s = c.s; let nuage;
     try { nuage = await lire(s, so); etat("ok"); } catch(e){ etat("hors"); return false; }
-    const tl = +lsGet(meta(so, "t")) || 0, local = paquet(c, s.id);
-    if (nuage && nuage.t > tl){
-      const v = Object.assign({}, local, nuage.v), avant = JSON.stringify(local);
-      poser(c, s.id, v); lsSet(meta(so, "t"), String(nuage.t));
-      if (Object.keys(local).some(k => !(k in nuage.v))) { lsSet(meta(so, "sale"), "1"); planifier(so, 500); } else lsDel(meta(so, "sale"));
-      return JSON.stringify(paquet(c, s.id)) !== avant;
-    }
-    if (nuage && Object.keys(local).some(k => !(k in nuage.v))) lsSet(meta(so, "sale"), "1");   /* une clé ajoutée à la liste depuis le dernier envoi */
-    if (lsGet(meta(so, "sale")) || (!nuage && Object.keys(local).length)) planifier(so, 500);
-    return false;
+    const tl = +lsGet(meta(so, "t")) || 0, local = paquet(c, s.id), avant = JSON.stringify(local);
+    if (!nuage){ if (Object.keys(local).length) planifier(so, 500); return false; }
+    /* le plus récent gagne clé par clé; une clé absente d'un côté est gardée */
+    const v = nuage.t > tl ? Object.assign({}, local, nuage.v) : Object.assign({}, nuage.v, local);
+    /* clés « fusionnées » (ex. quiz : quiz par quiz, rien ne se perd entre deux appareils), dans l'ordre de cfg.fusion */
+    if (c.fusion) for (const k in c.fusion){ const a = local[k], b = nuage.v[k];
+      if (a != null && b != null && a !== b){ try { const m = c.fusion[k](a, b, v); if (m != null) v[k] = m; } catch(e){} } }
+    const changeLocal = JSON.stringify(v) !== avant, changeNuage = Object.keys(v).some(k => v[k] !== nuage.v[k]);
+    if (changeLocal){ poser(c, s.id, v); lsSet(meta(so, "t"), String(Math.max(tl, nuage.t))); }
+    if (changeNuage){ lsSet(meta(so, "sale"), "1"); if (raison !== "envoi") planifier(so, 500); } else lsDel(meta(so, "sale"));
+    return changeLocal && JSON.stringify(paquet(c, s.id)) !== avant;
   }
 
   async function demarrer(so, cfg){
@@ -163,7 +166,8 @@ window.COFFRE = (function(){
   function oublier(){ SESS = null; }
   /* dernière visite d'un compte (pour le panneau d'administration) : date de la dernière mise à jour de ses rangées */
   async function vu(compte){ let m = 0;
-    for (const so of ["biblio", "quiz"]){ const r = await rpc("coffre_lire", { p_id:await hex("metier+|" + compte + "|" + so + "|0") }); if (r && r[0] && r[0].maj) m = Math.max(m, Date.parse(r[0].maj)); }
+    for (const so of ["biblio", "quiz"]) for (let n = 0; n < 3; n++){ const r = await rpc("coffre_lire", { p_id:await hex("metier+|" + compte + "|" + so + "|" + n) });
+      if (!r || !r[0]) break; if (r[0].maj) m = Math.max(m, Date.parse(r[0].maj)); }
     return m; }
   /* statistiques anonymes : un compteur par livre / quiz / outil et par mois (table « stats », outils/coffre.sql) */
   function stat(cle){ try { cle = String(cle).toLowerCase().replace(/[^a-z0-9:._-]/g, "-").slice(0, 90);

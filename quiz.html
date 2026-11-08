@@ -307,7 +307,7 @@ html.sombre body.bord .tbar a{color:#a99ff0}
 <div>
 <div id="vChoix">
 <div class="carte"><h2>Mes quiz</h2><div id="quizMiens" class="cartes"></div>
-<div class="ctl" style="margin-top:12px"><button id="bNouveau">+ Créer un quiz</button><button class="btn2" id="bColler">Coller des questions</button><button class="btn2" id="bImport">Importer un fichier</button><input type="file" id="fImport" accept=".json,application/json" class="cache"></div></div>
+<div class="ctl" style="margin-top:12px"><button id="bNouveau">+ Créer un quiz</button><button class="btn2" id="bColler">Coller des questions</button><button class="btn2" id="bImport">Importer un fichier</button><button class="btn2" id="bSauveTout" title="Un seul fichier avec tous tes quiz, à garder dans ton OneDrive">Sauvegarder tous mes quiz</button><input type="file" id="fImport" accept=".json,application/json" class="cache"></div></div>
 <div class="carte"><h2>Quiz prêts à jouer</h2><div class="sous" style="margin:-4px 0 12px">Un quiz par livre de la bibliothèque, illustré avec ses figures. « Copier et modifier » en fait une version à toi.</div><div id="quizListe" class="cartes"></div></div>
 </div>
 <div id="vColler" class="cache"><div class="carte"><h2>Coller des questions</h2>
@@ -347,7 +347,7 @@ Le propane s'accumule…
 <div id="eQs"></div>
 <div class="ajouts"><span>Ajouter une question :</span><button class="btn2" data-aj="choix">Choix</button><button class="btn2" data-aj="vf">Vrai ou faux</button><button class="btn2" data-aj="multi">Plusieurs bonnes</button><button class="btn2" data-aj="ordre">Remettre en ordre</button><button class="btn2" data-aj="nombre">Calcul</button><button class="btn2" data-aj="erreur">Trouve l'erreur</button></div>
 <div class="ctl"><button id="eSauve">Enregistrer</button><button class="btn2" id="eAnnule">Annuler</button></div>
-<div class="sous" style="margin-top:8px">Le quiz est enregistré dans ton compte et te suit sur tous tes appareils. « Exporter » (dans la liste) crée un fichier à partager avec un collègue.</div></div>
+<div class="sous" style="margin-top:8px">Le quiz est enregistré dans ton compte et te suit sur tous tes appareils. « Exporter » (dans la liste) crée un fichier à partager avec un collègue; « Sauvegarder tous mes quiz » en fait une copie complète.</div></div>
 </div>
 <div id="vJeu" class="cache">
 <div class="carte"><h2 id="jTitre"></h2><div id="qCour">En attente des participants…</div><div class="sous" id="qInfo"></div>
@@ -647,7 +647,16 @@ function telecommande(bord){
   /* ----- liste des quiz ----- */
   function montrer(v){ ["vChoix", "vEdit", "vJeu", "vColler"].forEach(x => $(x).classList.toggle("cache", x !== v)); }
   function avis(t){ $("quizListe").insertAdjacentHTML("afterbegin", `<div class="ko" style="margin-bottom:8px">${esc(t)}</div>`); }
-  function sauverListe(L){ if (!stock.set("quizMaison", L)) { avis("Mémoire de l'appareil pleine : enlève des images ou des quiz."); return false; } return true; }
+  function sauverListe(L){
+    /* chaque quiz garde l'heure de sa dernière modification (maj) et chaque suppression est notée (quizSupprimes) : le coffre fusionne quiz par quiz entre deux appareils */
+    const avant = {}, now = Date.now(); mesQuiz().forEach(q => avant[q.id] = q);
+    L.forEach(q => { const a = avant[q.id]; if (!a) { q.maj = q.maj || now; return; } const x = Object.assign({}, a), y = Object.assign({}, q); delete x.maj; delete y.maj; if (JSON.stringify(x) !== JSON.stringify(y)) q.maj = now; else q.maj = a.maj || q.maj || 0; });
+    const sup = stock.get("quizSupprimes", {}), ids = new Set(L.map(q => q.id)); let s2 = false;
+    Object.keys(avant).forEach(id => { if (!ids.has(id)) { sup[id] = now; s2 = true; } });
+    L.forEach(q => { if (sup[q.id] && sup[q.id] < (q.maj || 0)) { delete sup[q.id]; s2 = true; } });
+    if (s2) stock.set("quizSupprimes", sup);
+    if (!stock.set("quizMaison", L)) { avis("Mémoire de l'appareil pleine : enlève des images ou des quiz."); return false; } return true; }
+  window.__listeQuiz = () => { if (!$("vChoix").classList.contains("cache")) listeQuiz(); };
   function listeQuiz(){
     const carte = q => { const c = (q.reg || {}).coul || REG_DEF.coul;
       return `<div class="cq"><div class="im" style="--c:${esc(c)};${q.couv ? `background-image:url('${esc(q.couv)}')` : ""}${q.livre ? ";background-position:50% 12%" : ""}"><span>${q.qs.length} questions</span></div>
@@ -676,9 +685,19 @@ function telecommande(bord){
     });
   }
   $("bImport").onclick = () => $("fImport").click();
+  $("bSauveTout").onclick = () => { const L = mesQuiz(); if (!L.length) { avis("Tu n'as pas encore de quiz à sauvegarder."); return; }
+    const a = document.createElement("a"), d = new Date().toLocaleDateString("en-CA");
+    a.href = URL.createObjectURL(new Blob([JSON.stringify({type: "quiz-pavillon-lot", date: new Date().toISOString(), quiz: L, reglages: stock.get("quizReglages", {})})], {type: "application/json"}));
+    a.download = "mes-quiz-" + d + ".quiz.json"; a.click(); };
   $("fImport").onchange = async () => {
     const f = $("fImport").files[0]; if (!f) return;
-    try { const d = JSON.parse(await f.text()); const q = d.quiz || d; if (!q.titre || !Array.isArray(q.qs)) throw 0;
+    try { const d = JSON.parse(await f.text());
+      if (d.type === "quiz-pavillon-lot" && Array.isArray(d.quiz)) {   /* restaurer une sauvegarde : mêmes quiz (mêmes identifiants), le plus récent gagne, rien en double */
+        const L = mesQuiz(), parId = {}; L.forEach((q, i) => parId[q.id] = i); let n = 0;
+        d.quiz.forEach(q => { if (!q || !q.titre || !Array.isArray(q.qs)) return; if (parId[q.id] == null) { L.push(q); n++; } else if ((q.maj || 0) > (L[parId[q.id]].maj || 0)) { L[parId[q.id]] = q; n++; } });
+        if (d.reglages) stock.set("quizReglages", Object.assign({}, d.reglages, stock.get("quizReglages", {})));
+        sauverListe(L); listeQuiz(); avis(n ? n + " quiz récupéré(s) de la sauvegarde." : "Tous les quiz de cette sauvegarde sont déjà là."); $("fImport").value = ""; return; }
+      const q = d.quiz || d; if (!q.titre || !Array.isArray(q.qs)) throw 0;
       q.id = "q" + Date.now(); delete q.exemple; sauverListe(mesQuiz().concat([q])); listeQuiz(); }
     catch(e) { avis("Ce fichier n'est pas un quiz."); }
     $("fImport").value = "";
@@ -1151,7 +1170,16 @@ function ecran(code){
 <script>
 /* Coffre : mes quiz et leurs réglages suivent mon compte (coffre.js). Pendant une partie (écran, télécommande, joueur) : pas de rechargement */
 if (window.COFFRE && !/[?&](j|ecran|panneau)=/.test(location.search))
-  COFFRE.demarrer("quiz", { cles:["quizMaison", "quizReglages"], apres:() => { if (!/[?&](animer|tele)=/.test(location.search)) location.reload(); } });
+  COFFRE.demarrer("quiz", { cles:["quizMaison", "quizReglages", "quizSupprimes"],
+    /* fusion quiz par quiz : un quiz modifié sur un appareil et un autre ailleurs, les deux restent (le plus récent gagne pour un même quiz) */
+    fusion: {
+      quizSupprimes: (a, b) => { const x = JSON.parse(a || "{}"), y = JSON.parse(b || "{}"); for (const k in y) x[k] = Math.max(x[k] || 0, y[k]); return JSON.stringify(x); },
+      quizMaison: (a, b, v) => { const A = JSON.parse(a || "[]"), B = JSON.parse(b || "[]"), sup = JSON.parse(v.quizSupprimes || "{}"), out = [], pos = {};
+        [A, B].forEach(L => L.forEach(q => { if (!q || !q.id) return; if (pos[q.id] == null) { pos[q.id] = out.length; out.push(q); } else if ((q.maj || 0) > (out[pos[q.id]].maj || 0)) out[pos[q.id]] = q; }));
+        return JSON.stringify(out.filter(q => !(sup[q.id] && sup[q.id] >= (q.maj || 0)))); },
+      quizReglages: (a, b) => JSON.stringify(Object.assign({}, JSON.parse(b || "{}"), JSON.parse(a || "{}")))
+    },
+    apres: r => { if (r === "fusion") { window.__listeQuiz && window.__listeQuiz(); return; } if (!/[?&](animer|tele)=/.test(location.search)) location.reload(); } });
 </script>
 </body>
 </html>
