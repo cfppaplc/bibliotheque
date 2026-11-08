@@ -164,7 +164,7 @@ window.MESDOCS = (function(){
       + '<div class="md-champs"><label><span>Titre</span><input id="mdTitre" maxlength="90" placeholder="Ex. : Soudure au cuivre — module 4"></label>'
       + '<label><span>Programme</span><select id="mdProg">' + PROGS.map(p => '<option' + (p[0] === pd ? ' selected' : '') + '>' + e(p[0]) + '</option>').join("") + '</select></label>'
       + '<label><span>Compétence ou module <i>(facultatif)</i></span><input id="mdComp" maxlength="80" placeholder="Ex. : Compétence 5"></label>'
-      + '<label class="md-large"><span>Description <i>(facultatif)</i></span><input id="mdDesc" maxlength="240"></label></div>'
+      + '<label class="md-large"><span>Description <i>(automatique, tu peux la changer)</i></span><textarea id="mdDesc" maxlength="240" rows="2"></textarea></label></div>'
       + '<label class="md-prop"><input type="checkbox" id="mdProp"><span><b>Proposer aux autres enseignants</b><small>L\'administrateur le regarde, puis le publie pour tout le monde. Sinon, il reste visible pour toi seulement.</small></span></label>'
       + '<p class="md-err" id="mdErr" hidden></p>'
       + '<button class="btn btn-play" id="mdOk" type="button">Ajouter</button><button class="btn btn-fav" id="mdNon" type="button">Annuler</button></div>';
@@ -195,7 +195,61 @@ window.MESDOCS = (function(){
     err.hidden = true; FICHIER = f;
     q("#mdZone").classList.add("plein"); q("#mdZt").textContent = f.name; q("#mdZs").textContent = mo(f.size) + (f.size > MAX ? " · plus de 20 Mo : il restera seulement sur cet ordinateur" : "") + " · touche pour en choisir un autre";
     const t = q("#mdTitre"); if (!t.value) t.value = f.name.replace(/\.[^.]+$/, "").replace(/[_-]+/g, " ").replace(/\s+/g, " ").trim().slice(0, 90);
-    majTypes(); }
+    majTypes(); remplirAuto(f, ext); }
+  /* ---- description automatique (8 nov.) : tirée du texte des premières pages (PDF) ou du livre (HTML); le prof peut la changer ---- */
+  async function texteDe(f, ext){
+    if (ext === "html"){ const d = new DOMParser().parseFromString(await f.text(), "text/html"); d.querySelectorAll("script,style,.reponse,.ans").forEach(x => x.remove());
+      return { lignes:[...d.querySelectorAll("h1,h2,h3,p,li")].map(x => x.textContent.replace(/\s+/g, " ").trim()).filter(Boolean).slice(0, 80).map((t, k) => ({ t, p:k < 6 ? 1 : 2 })), titre:(d.querySelector("title") || {}).textContent || "" }; }
+    if (ext !== "pdf") return null;
+    await pdfjs(); const pdf = await pdfjsLib.getDocument({ data:await f.arrayBuffer() }).promise, lignes = [];
+    let titre = ""; try { const m = await pdf.getMetadata(); titre = (m && m.info && m.info.Title) || ""; } catch(x){}
+    for (let i = 1; i <= Math.min(4, pdf.numPages); i++){ const tc = await (await pdf.getPage(i)).getTextContent(); let l = "", y = null, fin = 0;
+      tc.items.forEach(it => { const t = it.transform || [0, 0, 0, 0, 0, 0], yy = Math.round(t[5]), x = t[4];
+        if (y !== null && (Math.abs(yy - y) > 4 || x - fin > 28)){ if (l.trim()) lignes.push({ t:l.replace(/\s+/g, " ").trim(), p:i }); l = ""; }   /* nouvelle ligne : autre hauteur, ou autre colonne */
+        l += it.str + (it.hasEOL ? " " : ""); y = yy; fin = x + (it.width || 0); });
+      if (l.trim()) lignes.push({ t:l.replace(/\s+/g, " ").trim(), p:i }); }
+    return { lignes, titre, pages:pdf.numPages };
+  }
+  function resumer(T, titre){
+    const L = T.lignes.map(x => x.t), txt = L.join(" ");
+    const txtP = L.map((x, k) => /[.!?:;,]$/.test(x) || x.length >= 60 || /^[a-zà-ÿ(]/.test(L[k + 1] || "") ? x : x + ".").join(" ");   /* un titre court sans point = fin de phrase */
+    const comp = (txt.match(/\b(Comp[ée]tence\s+\d{1,2})\b/i) || txt.match(/\b(\d{3}-\d{3})\b/) || [])[1] || "";
+    const bidon = x => /^(nom|groupe|date|signature|note|page\s*\d)/i.test(x) || /_{3,}|\.{4,}/.test(x) || /conception\s*:/i.test(x) || /^page \d+ (de|sur) \d+$/i.test(x);
+    const simple = t => (t || "").toLowerCase().normalize("NFD").replace(/[^a-z0-9]/g, "");
+    /* 1. sous-titre de la couverture (page 1) : une ligne de 3 mots et plus qui n'est ni le titre ni une mention */
+    const sous = T.lignes.filter(x => x.p === 1).map(x => x.t).find(x => x.split(" ").length >= 3 && x.length <= 140 && !bidon(x) && simple(x) !== simple(titre) && !/^[^a-zà-ÿ]*$/.test(x)) || "";
+    /* 2. première vraie phrase */
+    const phrase = txtP.split(/(?<=[.!?])\s+(?=[A-ZÀ-Ý])/).map(x => x.trim()).find(x => { const m = x.split(" ").length, chiffres = (x.match(/\d/g) || []).length;
+      return m >= 7 && m <= 45 && chiffres / x.length < .04 && !/\bp\.\s*\d/.test(x) && !bidon(x) && /[a-zà-ÿ]/.test(x) && !x.includes(sous); }) || "";
+    /* 3. sujets d'une table des matières (« Activité 3 · Fonte : … p. 9 ») */
+    const vus = new Set(), sujets = [];
+    const avecP = T.lignes.filter(x => /\bp\.\s*\d+/.test(x.t)).length >= 2;
+    T.lignes.forEach(o => { const x = o.t; if (sujets.length >= 4 || o.p === 1 || !(avecP ? /\bp\.\s*\d+/ : /·/).test(x) || x.length > 90 || bidon(x) || !/[a-zà-ÿ]/.test(x)) return;
+      let t = x.replace(/\bp\.\s*\d+.*$/, "").replace(/[●○•]+/g, "").replace(/^\s*(activit[ée]|chapitre|module|partie|rappel|section|th[eè]me)?\s*\d*\s*[·:.-]\s*/i, "").replace(/\s*[·:]\s*$/, "").trim();
+      t = t.split(/\s*[·:]\s*/)[0].replace(/^\d+\s+/, "").trim();
+      if (t.length < 3 || t.length > 40 || /^\d+$/.test(t) || simple(t) === simple(titre) || /questions?|pages?|parties?/i.test(t)) return;
+      const k = simple(t); if (!vus.has(k)){ vus.add(k); sujets.push(t); } });
+    let d = [sous && sous.replace(/[.\s]+$/, "") + ".", phrase].filter(Boolean).join(" ");
+    if (sujets.length >= 2 && d.length < 170) d += (d ? " " : "") + "Contenu : " + sujets.join(", ") + ".";
+    if (d.length > 240){ d = d.slice(0, 237); d = d.slice(0, d.lastIndexOf(" ")) + "…"; }
+    /* titre de la couverture : les lignes de la page 1 avant le sous-titre (sans mentions en majuscules) */
+    const p1 = T.lignes.filter(x => x.p === 1).map(x => x.t), fin = sous ? p1.indexOf(sous) : p1.length;
+    const tc = p1.slice(0, fin < 0 ? p1.length : fin).filter(x => !bidon(x) && /[a-zà-ÿ]/.test(x) && x.length < 80).join(" ").replace(/\s+/g, " ").trim();
+    const titreCouv = tc.split(" ").length >= 2 && tc.split(" ").length <= 10 ? tc : "";
+    return { desc:d, comp, titre:titreCouv };
+  }
+  let AUTO = null;
+  function remplirAuto(f, ext){
+    const desc = q("#mdDesc"), comp = q("#mdComp"); if (!desc) return;
+    const jeton = AUTO = {}; desc.placeholder = "Description en préparation…";
+    texteDe(f, ext).then(T => { if (AUTO !== jeton || !T) return; const r = resumer(T, (q("#mdTitre") || {}).value || T.titre);
+      if (r.desc && !desc.value.trim()) desc.value = r.desc;
+      if (r.comp && comp && !comp.value.trim()) comp.value = r.comp;
+      const t = q("#mdTitre"), nomFichier = f.name.replace(/\.[^.]+$/, "").replace(/[_-]+/g, " ").replace(/\s+/g, " ").trim().slice(0, 90);
+      if (r.titre && t && t.value === nomFichier) t.value = r.titre.slice(0, 90);
+      else if (T.titre && T.titre.trim().length > 3 && t && t.value === nomFichier && !/^(microsoft|untitled|document|sans titre)/i.test(T.titre.trim())) t.value = T.titre.trim().slice(0, 90);
+    }).catch(() => {}).finally(() => { if (AUTO === jeton) desc.placeholder = "Remplie automatiquement si le fichier contient du texte"; });
+  }
   async function valider(){
     const err = q("#mdErr"), dire = m => { err.hidden = false; err.textContent = m; };
     if (!FICHIER) return dire("Choisis d'abord un fichier.");

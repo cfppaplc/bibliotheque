@@ -11,7 +11,7 @@
         "t": "Glisse ton fichier n'importe où sur la bibliothèque, ou touche « + Ajouter » dans Formatifs ou Plans (aussi : menu de ton compte → Ajouter un document)."
       },
       {
-        "t": "Choisis Livre, Formatif ou Plan, donne-lui un titre et un programme, puis « Ajouter »."
+        "t": "Choisis Livre, Formatif ou Plan. Le titre, la description et la compétence se remplissent seuls à partir du PDF : vérifie, puis « Ajouter »."
       },
       {
         "t": "Livre : rangée « Mes livres ». Formatif : « Mes formatifs ». Plan : « Mes plans », avec l'échelle et la mesure."
@@ -24,6 +24,10 @@
       }
     ],
     "versions": [
+      {
+        "date": "2026-11-08",
+        "texte": "Titre, description et compétence remplis automatiquement à partir du texte du PDF (tu peux les changer)."
+      },
       {
         "date": "2026-11-08",
         "texte": "Un PDF s'ouvre maintenant en quelques secondes : chaque page se prépare au moment où tu l'affiches (avant : toutes les pages d'avance, jusqu'à 3 minutes)."
