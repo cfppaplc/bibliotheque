@@ -123,7 +123,7 @@ th{font-size:12px;color:var(--gris);border-top:0}
 .eexpl{margin-top:3vh;font-size:1.7vw;color:#D9D4CC;background:#22252B;border-left:.4vw solid var(--acc);border-radius:.8vw;padding:1.4vw 2vw}
 .lgs{position:relative}
 .lg{display:grid;grid-template-columns:4vw 1fr auto;gap:1vw;align-items:center;background:#22252B;border-radius:1vw;padding:1.1vw 1.6vw;margin-bottom:1vh;font-size:1.9vw;transition:transform .7s cubic-bezier(.2,.8,.2,1)}
-.lg .r{font-weight:900;color:#B5AFA6}.lg b{font-weight:900}.lg small{color:#7CF0A8;font-weight:800;margin-right:1.2vw;font-size:1.4vw}
+.lg .r{font-weight:900;color:#B5AFA6}.lg small.mo{color:#7CF0A8;font-size:1.3vw;margin-left:.6vw}.lg small.de{color:#FF9A90;font-size:1.3vw;margin-left:.6vw}.lg b{font-weight:900}.lg small{color:#7CF0A8;font-weight:800;margin-right:1.2vw;font-size:1.4vw}
 .podium{display:flex;justify-content:center;align-items:flex-end;gap:2vw;margin:4vh 0}
 .podium div{width:16vw;border-radius:1.2vw 1.2vw 0 0;text-align:center;padding:1.5vw;font-weight:800;font-size:1.8vw;transform-origin:bottom;animation:leve .9s cubic-bezier(.2,.8,.2,1) both}
 .podium .p1{background:#B8901C;height:32vh;animation-delay:.9s}.podium .p2{background:#8A8F98;height:25vh;animation-delay:.45s}.podium .p3{background:#94603A;height:20vh}
@@ -269,16 +269,16 @@ function compter(el, de, a, ms){ // chiffres qui montent doucement
 
 /* Quiz d'exemple (protection incendie, modules 1 à 5) */
 const EXEMPLE = {id: "exemple-incendie", exemple: true, titre: "Protection incendie : révision des modules 1 à 5", couv: "img/labo/incendie-immeuble.jpg", sujet: "Protection incendie · modules 1 à 5", reg: Object.assign({}, REG_DEF, {coul: "#B3261E"}), qs: [
-  {q: "Quel élément manque au triangle du feu pour faire le tétraèdre ?", ch: ["L'oxygène", "La réaction en chaîne", "La chaleur", "Le combustible"], bon: 1, s: 20, expl: "La réaction en chaîne entretient le feu; la poudre ABC agit surtout sur elle."},
-  {q: "Un feu d'huile de cuisson dans une friteuse est de classe…", ch: ["A", "B", "C", "K"], bon: 3, s: 20, expl: "Classe K : huiles et graisses de cuisson. On utilise l'agent humide de la hotte ou un extincteur K."},
-  {q: "Le propane qui fuit s'accumule…", ch: ["Au plafond", "Au sol et dans le sous-sol", "Il se mélange partout", "Dans les conduits"], bon: 1, s: 20, expl: "Densité ≈ 1,5 : plus lourd que l'air, il coule vers le bas."},
-  {q: "Un extincteur à poudre ABC éteint surtout en…", ch: ["Refroidissant", "Brisant la réaction en chaîne", "Ajoutant de l'eau", "Retirant le combustible"], bon: 1, s: 20},
-  {q: "Hauteur maximale du dessus d'un extincteur de moins de 18 kg ?", ch: ["1,00 m", "1,53 m", "1,80 m", "2,00 m"], bon: 1, s: 20, expl: "NFPA 10 : 1,53 m (5 pi) au maximum, et au moins 10 cm du plancher."},
-  {q: "Le détecteur le mieux adapté au stationnement souterrain :", ch: ["À ionisation", "Photoélectrique", "Thermique", "De CO"], bon: 2, s: 20, expl: "Gaz d'échappement et poussière : un détecteur de fumée y ferait trop de fausses alarmes."},
-  {q: "Un avertisseur de fumée se remplace au plus tard…", ch: ["Après 5 ans", "Après 10 ans", "Après 15 ans", "Quand il ne sonne plus"], bon: 1, s: 20},
-  {q: "Une vanne de gicleurs fermée donne un signal de…", ch: ["Alarme", "Supervision", "Trouble", "Aucun signal"], bon: 1, s: 15, expl: "Supervision : un système de protection n'est plus prêt à fonctionner."},
-  {q: "En classe B, un fil coupé ne change rien à la protection.", ch: ["Vrai", "Faux"], bon: 1, s: 15, expl: "Faux : les appareils au-delà de la coupure ne protègent plus. Le panneau affiche un trouble."},
-  {q: "Qui autorise le réarmement après une alarme ?", ch: ["Le préposé", "Le gestionnaire", "Le service incendie", "La télésurveillance"], bon: 2, s: 15}
+  {q: "Quel élément manque au triangle du feu pour faire le tétraèdre ?", ch: ["L'oxygène", "La réaction en chaîne", "La chaleur", "Le combustible"], bon: 1, s: 20, expl: "La réaction en chaîne entretient le feu; la poudre ABC agit surtout sur elle.", img: "img/labo/quiz/incendie-01.jpg"},
+  {q: "Un feu d'huile de cuisson dans une friteuse est de classe…", ch: ["A", "B", "C", "K"], bon: 3, s: 20, expl: "Classe K : huiles et graisses de cuisson. On utilise l'agent humide de la hotte ou un extincteur K.", img: "img/labo/quiz/incendie-02.jpg"},
+  {q: "Le propane qui fuit s'accumule…", ch: ["Au plafond", "Au sol et dans le sous-sol", "Il se mélange partout", "Dans les conduits"], bon: 1, s: 20, expl: "Densité ≈ 1,5 : plus lourd que l'air, il coule vers le bas.", img: "img/labo/quiz/incendie-03.jpg"},
+  {q: "Un extincteur à poudre ABC éteint surtout en…", ch: ["Refroidissant", "Brisant la réaction en chaîne", "Ajoutant de l'eau", "Retirant le combustible"], bon: 1, s: 20, img: "img/labo/quiz/incendie-04.jpg"},
+  {q: "Hauteur maximale du dessus d'un extincteur de moins de 18 kg ?", ch: ["1,00 m", "1,53 m", "1,80 m", "2,00 m"], bon: 1, s: 20, expl: "NFPA 10 : 1,53 m (5 pi) au maximum, et au moins 10 cm du plancher.", img: "img/labo/quiz/incendie-05.jpg"},
+  {q: "Le détecteur le mieux adapté au stationnement souterrain :", ch: ["À ionisation", "Photoélectrique", "Thermique", "De CO"], bon: 2, s: 20, expl: "Gaz d'échappement et poussière : un détecteur de fumée y ferait trop de fausses alarmes.", img: "img/labo/quiz/incendie-06.jpg"},
+  {q: "Un avertisseur de fumée se remplace au plus tard…", ch: ["Après 5 ans", "Après 10 ans", "Après 15 ans", "Quand il ne sonne plus"], bon: 1, s: 20, img: "img/labo/quiz/incendie-07.jpg"},
+  {q: "Une vanne de gicleurs fermée donne un signal de…", ch: ["Alarme", "Supervision", "Trouble", "Aucun signal"], bon: 1, s: 15, expl: "Supervision : un système de protection n'est plus prêt à fonctionner.", img: "img/labo/quiz/incendie-08.jpg"},
+  {q: "En classe B, un fil coupé ne change rien à la protection.", ch: ["Vrai", "Faux"], bon: 1, s: 15, expl: "Faux : les appareils au-delà de la coupure ne protègent plus. Le panneau affiche un trouble.", img: "img/labo/quiz/incendie-09.jpg"},
+  {q: "Qui autorise le réarmement après une alarme ?", ch: ["Le préposé", "Le gestionnaire", "Le service incendie", "La télésurveillance"], bon: 2, s: 15, img: "img/labo/quiz/incendie-10.jpg"}
 ]};
 /* Personnages de chantier (noms fictifs). Chacun ne peut être choisi qu'une fois par partie. Photos : img/labo/perso/NN.jpg */
 const PERSOS = [
@@ -325,10 +325,11 @@ function telecommande(){
   $("bEcran").onclick = () => window.open(location.href.split(/[?#]/)[0] + "?ecran=" + code, "ecranClasse", "popup,width=1280,height=760");
   try { new QRCode($("qr"), {text: url, width: 180, height: 180, correctLevel: QRCode.CorrectLevel.M}); } catch(e) { $("qr").innerHTML = '<div class="sous" style="word-break:break-all">' + esc(url) + "</div>"; }
 
-  const P = {};   // pid → {nom, pts, bons}
+  const P = {};   // pid → {nom, pts, bons, av, vu, parti}
+  const ids = () => Object.keys(P).filter(id => !P[id].parti);
   const G = {quiz: null, jeu: [], i: -1, etat: "choix", t0: 0, reps: {}};   // etat : choix | lobby | question | rev | fin
   const R = () => Object.assign({}, REG_DEF, G.quiz && G.quiz.reg);
-  const rangs = () => { const l = Object.entries(P).sort((a, b) => b[1].pts - a[1].pts || (b[1].bons || 0) - (a[1].bons || 0) || a[1].nom.localeCompare(b[1].nom)); const r = {}; l.forEach(([id], k) => r[id] = k + 1); return r; };
+  const rangs = () => { const l = Object.entries(P).filter(([id]) => !P[id].parti).sort((a, b) => b[1].pts - a[1].pts || (b[1].bons || 0) - (a[1].bons || 0) || a[1].nom.localeCompare(b[1].nom)); const r = {}; l.forEach(([id], k) => r[id] = k + 1); return r; };
   const melanger = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
   function preparer(){ // ordre et choix selon les réglages
     const r = R(); let qs = G.quiz.qs.map(q => JSON.parse(JSON.stringify(q)));
@@ -339,13 +340,13 @@ function telecommande(){
   const appliquerCouleur = () => document.documentElement.style.setProperty("--acc", R().coul);
 
   function listeLob(){
-    const ids = Object.keys(P);
-    $("nbP").textContent = ids.length ? "(" + ids.length + ")" : "";
-    $("listeLob").innerHTML = ids.length ? ids.map(id => visage(P[id].av, "v-s") + esc(P[id].nom) + (P[id].prenom ? " (" + esc(P[id].prenom) + ")" : "")).join("<br>") : "Personne pour l'instant.";
+    const L = ids();
+    $("nbP").textContent = L.length ? "(" + L.length + ")" : "";
+    $("listeLob").innerHTML = L.length ? L.map(id => visage(P[id].av, "v-s") + esc(P[id].nom) + (P[id].prenom ? " (" + esc(P[id].prenom) + ")" : "")).join("<br>") : "Personne pour l'instant.";
   }
   function table(){
     const r = rangs(), Q = G.jeu[G.i];
-    $("tRep").innerHTML = Object.keys(P).sort((a, b) => r[a] - r[b]).map(id => {
+    $("tRep").innerHTML = ids().sort((a, b) => r[a] - r[b]).map(id => {
       const x = G.reps[id]; let c = '<span class="att">—</span>';
       if (G.etat === "question") c = x ? '<span class="ok">✓ a répondu</span>' : '<span class="att">en attente…</span>';
       else if (G.etat === "rev" && Q) c = x ? `<span class="pastille k${x.c}"></span>${esc(Q.ch[x.c])} · <span class="${x.c === Q.bon ? "ok" : "ko"}">${x.c === Q.bon ? (x.g ? "+" + x.g : "bonne") : "mauvaise"}</span>` : '<span class="ko">Pas répondu</span>';
@@ -361,14 +362,14 @@ function telecommande(){
       reg: {coul: reg.coul, son: reg.son, classement: reg.classement, points: reg.points, mode: reg.mode},
       couv: G.quiz && G.quiz.couv && !/^data:/.test(G.quiz.couv) ? G.quiz.couv : (G.quiz && G.quiz.couv ? "img" : ""), sujet: G.quiz ? G.quiz.sujet || "" : "",
       q: Q && ["question", "rev"].includes(G.etat) ? {q: Q.q, ch: Q.ch, s: Q.s, img: !!Q.img, expl: G.etat === "rev" ? Q.expl || "" : ""} : null, bon: G.etat === "rev" ? Q.bon : null, cpt, nrep: Object.keys(G.reps).length,
-      joueurs: Object.keys(P).map(id => ({n: P[id].nom, av: P[id].av, pts: P[id].pts, r: r[id], g: G.etat === "rev" && G.reps[id] ? G.reps[id].g || 0 : 0})).sort((a, b) => a.r - b.r)};
+      joueurs: ids().map(id => ({n: P[id].nom, av: P[id].av, pts: P[id].pts, r: r[id], g: G.etat === "rev" && G.reps[id] ? G.reps[id].g || 0 : 0})).sort((a, b) => a.r - b.r)};
   }
   function maj(){
     if (!G.quiz) { listeLob(); vue(); return; }
     const Q = G.jeu[G.i];
     $("jTitre").textContent = G.quiz.titre;
     $("qCour").textContent = G.etat === "lobby" ? "En attente des participants…" : G.etat === "fin" ? "Partie terminée : le classement final est sur chaque iPad." : (G.i + 1) + ". " + Q.q;
-    $("qInfo").textContent = G.etat === "question" ? Object.keys(G.reps).length + " réponse(s) sur " + Object.keys(P).length + " · " + Q.s + " s" :
+    $("qInfo").textContent = G.etat === "question" ? Object.keys(G.reps).length + " réponse(s) sur " + ids().length + " · " + Q.s + " s" :
       G.etat === "rev" ? "Bonne réponse : " + Q.ch[Q.bon] + (R().classement === "oui" ? " · le rang de chacun est envoyé sur son iPad." : "") : G.quiz.qs.length + " questions";
     $("bGo").disabled = G.etat !== "lobby";
     $("bSuite").disabled = !["question", "rev"].includes(G.etat);
@@ -376,7 +377,9 @@ function telecommande(){
     table(); listeLob(); vue();
   }
   function envoyerCouv(){ if (G.quiz && G.quiz.couv && /^data:/.test(G.quiz.couv)) envoyer(topic, {m: "img", i: -1, data: G.quiz.couv}); }
-  function envoyerPersos(){ envoyer(topic, {m: "persos", pris: Object.values(P).map(p => p.av).filter(v => v != null)}); }
+  // un élève qui ne donne plus signe de vie depuis 40 s est retiré (son personnage redevient libre)
+  setInterval(() => { let ch = false; Object.values(P).forEach(p => { if (!p.parti && Date.now() - (p.vu || 0) > 40000) { p.parti = true; ch = true; } }); if (ch) { envoyerPersos(); maj(); if (G.etat === "question" && ids().length && ids().every(id => G.reps[id])) setTimeout(reveler, 300); } }, 5000);
+  function envoyerPersos(){ envoyer(topic, {m: "persos", pris: ids().map(id => P[id].av).filter(v => v != null)}); }
   let minut = null;
   function qMsg(pour){ const Q = G.jeu[G.i]; return {m: "q", pour, i: G.i, n: G.jeu.length, q: Q.q, ch: Q.ch, t0: G.t0, s: Q.s, coul: R().coul}; }
   function question(){
@@ -394,14 +397,14 @@ function telecommande(){
       x.g = !bon || reg.points === "aucun" ? 0 : reg.points === "fixe" ? 1000 : Math.round(1000 - 500 * Math.min(1, Math.max(0, x.ms) / (Q.s * 1000)));
       if (P[id]) { P[id].pts += x.g; P[id].bons = (P[id].bons || 0) + (bon ? 1 : 0); }
     });
-    const r = rangs(), n = Object.keys(P).length, res = {};
-    Object.keys(P).forEach(id => { const x = G.reps[id]; res[id] = {rep: x ? x.c : -1, g: x ? x.g : 0, pts: P[id].pts, rang: r[id], avant: avant[id], bons: P[id].bons || 0}; });
+    const r = rangs(), n = ids().length, res = {};
+    ids().forEach(id => { const x = G.reps[id]; res[id] = {rep: x ? x.c : -1, g: x ? x.g : 0, pts: P[id].pts, rang: r[id], avant: avant[id], bons: P[id].bons || 0}; });
     envoyer(topic, {m: "rev", i: G.i, bon: Q.bon, bonTxt: Q.ch[Q.bon], expl: Q.expl || "", res, n, classement: reg.classement, points: reg.points}); maj();
   }
   function finir(){
     clearTimeout(minut); G.etat = "fin";
-    const r = rangs(), n = Object.keys(P).length, res = {};
-    Object.keys(P).forEach(id => res[id] = {pts: P[id].pts, rang: r[id], bons: P[id].bons || 0});
+    const r = rangs(), n = ids().length, res = {};
+    ids().forEach(id => res[id] = {pts: P[id].pts, rang: r[id], bons: P[id].bons || 0});
     envoyer(topic, {m: "fin", res, n, total: G.jeu.length, points: R().points}); maj(); envoyer(topic, vueObj());
   }
   $("bGo").onclick = () => { if (!G.quiz) return; Object.values(P).forEach(p => { p.pts = 0; p.bons = 0; }); preparer(); G.i = 0; question(); };
@@ -411,16 +414,18 @@ function telecommande(){
   ecouter(topic, m => {
     if (m.m === "ecran?") { envoyer(topic, vueObj()); envoyerCouv(); const Q = G.jeu[G.i]; if (G.etat === "question" && Q && Q.img) envoyer(topic, {m: "img", i: G.i, data: Q.img}); return; }
     if (m.m === "persos?") { envoyerPersos(); return; }
+    if (m.pid && P[m.pid]) { const etait = P[m.pid].parti; P[m.pid].vu = Date.now(); if (m.m === "bye") { P[m.pid].parti = true; envoyerPersos(); maj(); return; } if (etait && m.m === "vie") { P[m.pid].parti = false; envoyerPersos(); maj(); } }
+    if (m.m === "vie" || m.m === "bye") return;
     if (m.m === "ici") {
-      if (m.av != null && Object.entries(P).some(([id, p]) => p.av === m.av && id !== m.pid)) { envoyer(topic, {m: "refus", pour: m.pid}); return; }
+      if (m.av != null && Object.entries(P).some(([id, p]) => !p.parti && p.av === m.av && id !== m.pid)) { envoyer(topic, {m: "refus", pour: m.pid}); return; }
       if (!P[m.pid]) P[m.pid] = {nom: m.nom, pts: 0, bons: 0}; else P[m.pid].nom = m.nom;
-      P[m.pid].av = m.av; P[m.pid].prenom = m.prenom || ""; envoyerPersos();
+      P[m.pid].av = m.av; P[m.pid].prenom = m.prenom || ""; P[m.pid].parti = false; P[m.pid].vu = Date.now(); envoyerPersos();
       if (G.etat === "question") envoyer(topic, qMsg(m.pid));
       else envoyer(topic, {m: "bienvenue", pour: m.pid, titre: G.quiz ? G.quiz.titre : "", coul: R().coul, mode: R().mode});
       maj();
     } else if (m.m === "rep" && G.etat === "question" && m.i === G.i && P[m.pid] && !G.reps[m.pid]) {
       G.reps[m.pid] = {c: m.c, ms: Date.now() - G.t0}; maj();
-      if (Object.keys(G.reps).length >= Object.keys(P).length) setTimeout(reveler, 700);
+      if (Object.keys(G.reps).length >= ids().length) setTimeout(reveler, 700);
     }
   }, ok => { $("etatT").textContent = ok ? "● Relais connecté" + (window.supabase ? " (Supabase)" : " (ntfy)") : "○ Relais injoignable, nouvel essai…"; $("etatT").style.color = ok ? "var(--vert)" : "var(--rouge)"; });
 
@@ -591,6 +596,8 @@ function joueur(code){
     $("nomJ").innerHTML = visage(av, "v-m") + " " + esc(nom);
     bx(`${visage(av, "v-l")}<div class="gros monte">Bienvenue, ${esc(nom)}.</div><div>Regarde le tableau : ça commence bientôt.</div>`);
     envoyer(topic, {m: "ici", pid, nom, av, prenom});
+    if (!entrer.vie) { entrer.vie = setInterval(() => { if (entre) envoyer(topic, {m: "vie", pid}); }, 12000);
+      addEventListener("pagehide", () => { if (entre) envoyer(topic, {m: "bye", pid}); }); }
   }
   ecranChoix();
     ecouter(topic, m => {
@@ -638,9 +645,10 @@ function joueur(code){
 /* ===== Animer au tableau : un seul ordinateur (écran de classe + barre + tiroir de télécommande) ===== */
 function animer(boutons){
   document.body.insertAdjacentHTML("beforeend", `<div id="tiroir"><button class="fermer" id="tirX" aria-label="Fermer la télécommande">›</button><iframe id="tirF" src="?tele=1&inclus=1" title="Télécommande"></iframe></div>
-    <div id="animBar">${boutons.map(([id], k) => `<button data-b="${id}" class="${k ? "" : "prim"}" disabled>…</button>`).join("")}<button id="tirB">Télécommande</button></div>`);
+    <div id="animBar"><button id="retLabo" title="Retour au Labo interactif">‹ Labo</button>${boutons.map(([id], k) => `<button data-b="${id}" class="${k ? "" : "prim"}" disabled>…</button>`).join("")}<button id="tirB">Télécommande</button></div>`);
   const T = $("tiroir"), F = $("tirF");
   $("tirB").onclick = () => T.classList.toggle("ouvert");
+  $("retLabo").onclick = () => { location.href = "labo.html"; };
   $("tirX").onclick = () => T.classList.remove("ouvert");
   addEventListener("message", e => { if (e.data && e.data.labo === "code" && !animer.code) { animer.code = e.data.code; ecran(e.data.code); } });
   // les boutons de la barre reprennent l'état des vrais boutons de la télécommande
@@ -676,6 +684,31 @@ function ecran(code){
     });
     posAvant = {}; E.querySelectorAll(".lg").forEach(el => posAvant[el.dataset.n] = el.getBoundingClientRect().top);
   }
+  function classement(v){
+    const av = v.joueurs.map(j => Object.assign({}, j, {avant: j.pts - (j.g || 0)}));
+    const ancien = av.slice().sort((a, b) => b.avant - a.avant || a.n.localeCompare(b.n)), N = Math.min(10, av.length);
+    const rAvant = {}; ancien.forEach((j, k) => rAvant[j.n] = k + 1);
+    const garde = av.filter(j => j.r <= N || rAvant[j.n] <= N);
+    const ligne = j => { const d = rAvant[j.n] - j.r;
+      return `<div class="lg" data-n="${esc(j.n)}" data-r="${j.r}"><span class="r">${rAvant[j.n]}</span><span>${visage(j.av, "v-e")}${esc(j.n)}${v.i === 0 ? "" : d > 0 ? ` <small class="mo">▲ ${d}</small>` : d < 0 ? ` <small class="de">▼ ${-d}</small>` : ""}</span><span>${j.g ? `<small>+${j.g}</small>` : ""}${v.reg.points === "aucun" ? "" : `<b data-de="${j.avant}" data-a="${j.pts}">${j.avant}</b>`}</span></div>`; };
+    E.innerHTML = tete("Classement après la question " + (v.i + 1) + " sur " + v.n) + `<div class="lgs" id="eLgs">${garde.sort((a, b) => rAvant[a.n] - rAvant[b.n]).map(ligne).join("")}</div>` + bSon();
+    const rows = [...E.querySelectorAll("#eLgs .lg")];
+    if (rows.length < 1) return;
+    const pas = rows.length > 1 ? rows[1].getBoundingClientRect().top - rows[0].getBoundingClientRect().top : 0;
+    rows.forEach(el => { el.style.opacity = 0; el.style.transform = "translateY(12px)"; });
+    rows.forEach((el, k) => setTimeout(() => { el.style.transition = "opacity .4s, transform .4s"; el.style.opacity = 1; el.style.transform = ""; }, 80 * k));
+    setTimeout(() => {
+      // les points montent, puis chaque rangée glisse à son nouveau rang
+      rows.forEach(el => { const b = el.querySelector("b[data-a]"); if (b && b.dataset.de !== b.dataset.a) compter(b, +b.dataset.de, +b.dataset.a, 900); });
+      setTimeout(() => {
+        const nouv = garde.slice().sort((a, b) => a.r - b.r).map(j => j.n);
+        rows.forEach((el, k) => { const cible = nouv.indexOf(el.dataset.n); el.style.transition = "transform .9s cubic-bezier(.2,.8,.2,1)"; el.style.transform = `translateY(${(cible - k) * pas}px)`; });
+        setTimeout(() => rows.forEach(el => el.querySelector(".r").textContent = el.dataset.r), 500);
+        ton(660, .2, .07);
+      }, 1000);
+    }, 80 * rows.length + 400);
+    const b = $("bSon"); if (b) b.onclick = () => { sonOK = !sonOK; if (sonOK) { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); ac.resume(); } b.textContent = sonOK ? "Son activé" : "Activer le son"; };
+  }
   function rendre(force){
     const v = V, n = Date.now() + decal, cle = v.etat + v.i;
     document.documentElement.style.setProperty("--acc", (v.reg && v.reg.coul) || "#534AB7");
@@ -701,9 +734,9 @@ function ecran(code){
         E.innerHTML = tete("Question " + (v.i + 1) + " sur " + v.n) + `<div class="eq">${esc(v.q.q)}</div>
           <div class="ech">${v.q.ch.map((c, k) => `<div class="k${k} ${k === v.bon ? "bon" : "pas"}"><span>${k === v.bon ? "✓" : SYMB[k]} ${esc(c)}</span><em>${v.cpt[k]}</em><i class="bar" data-w="${100 * v.cpt[k] / tot}"></i></div>`).join("")}</div>
           ${v.q.expl ? `<div class="eexpl monte">${esc(v.q.expl)}</div>` : ""}
-          ${v.reg.classement === "oui" ? `<div style="margin-top:3vh">${lignes(5, true)}</div>` : ""}` + bSon();
+          ${v.reg.classement === "oui" ? `<div class="cpt"><span>Classement dans quelques secondes…</span></div>` : ""}` + bSon();
         requestAnimationFrame(() => E.querySelectorAll(".bar").forEach(b => b.style.width = b.dataset.w + "%"));
-        if (cle !== dernier) { accord(); animerLignes(); }
+        if (cle !== dernier) { accord(); clearTimeout(rendre.tc); if (v.reg.classement === "oui") rendre.tc = setTimeout(() => { if (dernier === cle) classement(v); }, 5500); }
       }
     } else if (v.etat === "fin") {
       if (cle !== dernier || force) {

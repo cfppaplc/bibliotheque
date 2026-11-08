@@ -476,9 +476,11 @@ function telecommande(){
   }
   $("tout").onclick = () => { actifs = []; dessinerActifs(); envoyer(topic, {m: "raz", cible: $("cible").value}); };
 
-  function envoyerPersos(){ envoyer(topic, {m: "persos", pris: Object.values(equipes).map(q => q.av).filter(v => v != null)}); }
+  const eqIds = () => Object.keys(equipes).filter(id => !equipes[id].parti);
+  setInterval(() => { let ch = false; Object.values(equipes).forEach(q => { if (!q.parti && Date.now() - (q.vu || Date.now()) > 40000) { q.parti = true; ch = true; } }); if (ch) { envoyerPersos(); dessinerEquipes(); vue(); } }, 5000);
+  function envoyerPersos(){ envoyer(topic, {m: "persos", pris: eqIds().map(id => equipes[id].av).filter(v => v != null)}); }
   function dessinerEquipes(){
-    const ids = Object.keys(equipes);
+    const ids = eqIds();
     const sel = $("cible").value;
     $("cible").innerHTML = '<option value="tous">Toutes les équipes</option>' + ids.map(i => `<option value="${i}">${esc(equipes[i].equipe)}</option>`).join("");
     $("cible").value = ids.includes(sel) ? sel : "tous";
@@ -503,7 +505,7 @@ function telecommande(){
     return {m: "vue", code, etat: J.on ? J.etat : "lobby", i: J.i, n: MISSIONS.length, t0: J.t0, now: Date.now(),
       mis: J.i >= 0 ? {t: M.t, d: M.d, q: M.q, ch: M.ch} : null, bon: J.etat === "reveal" || J.etat === "mission" ? M.bon : null, compte,
       nrep: Object.keys(J.reps).length,
-      eqs: Object.keys(equipes).map(id => ({id, n: equipes[id].equipe, av: equipes[id].av, pts: J.sc[id] || 0, fa: J.fa[id] || 0, prog: J.prog[id] || 0,
+      eqs: eqIds().map(id => ({id, n: equipes[id].equipe, av: equipes[id].av, pts: J.sc[id] || 0, fa: J.fa[id] || 0, prog: J.prog[id] || 0,
         fini: J.fini[id] != null ? J.fini[id] : null, gain: J.gain[id] || 0, rep: !!J.reps[id]})),
       errs: Object.entries(J.err).sort((a, b) => b[1] - a[1]).slice(0, 4)};
   }
@@ -539,7 +541,7 @@ function telecommande(){
     minuter(classement, LIMITE_S * 1000); majJeu();
   }
   function classement(){
-    annuler(); if (J.i >= 0) Object.keys(equipes).forEach(id => { if (J.fini[id] != null) J.prog[id] = J.i + 1; });
+    annuler(); if (J.i >= 0) eqIds().forEach(id => { if (J.fini[id] != null) J.prog[id] = J.i + 1; });
     J.etat = "classement"; envoyer(topic, {m: "pause", i: J.i}); majJeu();
   }
   function fin(){ annuler(); J.etat = "fin"; J.on = false; envoyer(topic, {m: "jeufin"}); majJeu(); envoyer(topic, vueObj()); }
@@ -548,13 +550,13 @@ function telecommande(){
     if (!J.on) return;
     if (m.m === "rep" && J.etat === "question" && m.i === J.i && !J.reps[m.moi]) {
       J.reps[m.moi] = {c: m.c, ms: Date.now() - J.t0}; majJeu();
-      if (Object.keys(J.reps).length >= Object.keys(equipes).length) setTimeout(reveal, 600);
+      if (Object.keys(J.reps).length >= eqIds().length) setTimeout(reveal, 600);
     } else if (m.m === "fini" && J.etat === "mission" && m.i === J.i && J.fini[m.moi] == null && J.envoyes >= MISSIONS[J.i].evs.length) {
       const s = Math.round((Date.now() - J.t0) / 1000);
       const g = Math.round(1000 - 500 * Math.min(1, s / LIMITE_S));
       J.fini[m.moi] = s; J.gain[m.moi] = (J.gain[m.moi] || 0) + g; J.sc[m.moi] = (J.sc[m.moi] || 0) + g; J.prog[m.moi] = J.i + 1;
       majJeu();
-      if (Object.keys(J.fini).length >= Object.keys(equipes).length) minuter(classement, 2500);
+      if (Object.keys(J.fini).length >= eqIds().length) minuter(classement, 2500);
     } else if (m.m === "act" && m.mal && (J.etat === "mission" || J.etat === "question")) {
       J.fa[m.moi] = (J.fa[m.moi] || 0) + 1; J.sc[m.moi] = (J.sc[m.moi] || 0) - 200;
       const cle = m.txt.replace(/ \(.*\)| : .*/g, ""); J.err[cle] = (J.err[cle] || 0) + 1; majJeu();
@@ -574,11 +576,13 @@ function telecommande(){
   ecouter(topic, m => {
     jeuMsg(m);
     if (m.m === "persos?") { envoyerPersos(); return; }
-    if (m.m === "ici" && m.av != null && Object.entries(equipes).some(([id, q]) => q.av === m.av && id !== m.moi)) { envoyer(topic, {m: "refus", pour: m.moi}); return; }
+    if (m.moi && equipes[m.moi]) { const q = equipes[m.moi]; q.vu = Date.now(); if (m.m === "bye") { q.parti = true; envoyerPersos(); dessinerEquipes(); vue(); return; } if (q.parti && m.m === "vie") { q.parti = false; envoyerPersos(); dessinerEquipes(); vue(); } }
+    if (m.m === "vie" || m.m === "bye") return;
+    if (m.m === "ici" && m.av != null && Object.entries(equipes).some(([id, q]) => !q.parti && q.av === m.av && id !== m.moi)) { envoyer(topic, {m: "refus", pour: m.moi}); return; }
     if (m.m === "ici") {
       const neuf = !equipes[m.moi];
       equipes[m.moi] = equipes[m.moi] || {equipe: m.equipe, acts: []};
-      equipes[m.moi].equipe = m.equipe; equipes[m.moi].etat = m.etat || ""; equipes[m.moi].av = m.av; equipes[m.moi].prenom = m.prenom || ""; envoyerPersos();
+      equipes[m.moi].equipe = m.equipe; equipes[m.moi].etat = m.etat || ""; equipes[m.moi].av = m.av; equipes[m.moi].prenom = m.prenom || ""; equipes[m.moi].parti = false; equipes[m.moi].vu = Date.now(); envoyerPersos();
       dessinerEquipes(); vue();
       if (neuf && actifs.length) // l'équipe arrive : on lui envoie ce qui est encore actif
         envoyer(topic, {m: "rattrape", pour: m.moi, evs: actifs.filter(a => a.cible === "tous" || a.cible === m.moi).map(a => ({id: a.id, k: a.k, t: a.t, cause: a.cause}))});
@@ -597,9 +601,10 @@ function telecommande(){
 /* ===== Animer au tableau : un seul ordinateur (écran de classe + barre + tiroir de télécommande) ===== */
 function animer(boutons){
   document.body.insertAdjacentHTML("beforeend", `<div id="tiroir"><button class="fermer" id="tirX" aria-label="Fermer la télécommande">›</button><iframe id="tirF" src="?tele=1&inclus=1" title="Télécommande"></iframe></div>
-    <div id="animBar">${boutons.map(([id], k) => `<button data-b="${id}" class="${k ? "" : "prim"}" disabled>…</button>`).join("")}<button id="tirB">Télécommande</button></div>`);
+    <div id="animBar"><button id="retLabo" title="Retour au Labo interactif">‹ Labo</button>${boutons.map(([id], k) => `<button data-b="${id}" class="${k ? "" : "prim"}" disabled>…</button>`).join("")}<button id="tirB">Télécommande</button></div>`);
   const T = $("tiroir"), F = $("tirF");
   $("tirB").onclick = () => T.classList.toggle("ouvert");
+  $("retLabo").onclick = () => { location.href = "labo.html"; };
   $("tirX").onclick = () => T.classList.remove("ouvert");
   addEventListener("message", e => { if (e.data && e.data.labo === "code" && !animer.code) { animer.code = e.data.code; ecran(e.data.code); } });
   // les boutons de la barre reprennent l'état des vrais boutons de la télécommande
@@ -879,6 +884,8 @@ function panneau(code){
     $("eqNom").innerHTML = visage(av, "v-s") + esc(equipe) + " · " + code;
     $("entree").classList.add("cache"); $("panneau").classList.remove("cache");
     afficher(); envoyer(topic, {m: "ici", moi, equipe, av, prenom, etat: etatGlobal()});
+    if (!choix.vie) { choix.vie = setInterval(() => { if (entre) envoyer(topic, {m: "vie", moi}); }, 12000);
+      addEventListener("pagehide", () => { if (entre) envoyer(topic, {m: "bye", moi}); }); }
   };
     ecouter(topic, m => {
       if (m.m === "persos") { pris = m.pris || []; if (!entre) choix(); return; }
