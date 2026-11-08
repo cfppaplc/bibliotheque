@@ -37,3 +37,27 @@ window.mpPiedHTML = () => {
   const poser = () => document.querySelectorAll(".droits").forEach(d => { if (d.dataset.pied) return; d.dataset.pied = "1"; d.removeAttribute("style"); d.classList.add("mp-pied"); d.innerHTML = mpPiedHTML(); });
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", poser); else poser();
 })();
+/* Mention « ALPHA » collée au coin du logo Métier+ (8 nov., option A choisie par Jeremy). Pour la retirer : ALPHA = false. */
+(function(){
+  const ALPHA = true; if (!ALPHA) return;
+  const st = document.createElement("style");
+  st.textContent = ".logo-pav{position:relative}"
+    + ".logo-pav::after,.mp-alpha i{content:'ALPHA';position:absolute;top:-9px;font:800 9px/1 system-ui,sans-serif;font-style:normal;letter-spacing:.08em;color:#fff;background:#EB6A22;padding:3px 5px 2px;border-radius:5px;pointer-events:none;white-space:nowrap}"
+    + ".logo-pav::after{right:-10px}"
+    + ".mp-alpha{flex:none;width:0;align-self:center;height:22px;position:relative;overflow:visible!important;min-width:0!important;padding:0!important;border:0!important;background:none!important}.mp-alpha i{right:-6px;top:-10px}"
+    + ".reader.wbon .reader-bar>.mp-alpha{order:-2}.reader:not(.wbon) .reader-bar>.mp-alpha{display:none}"
+    + "@media (max-width:640px){.logo-pav::after,.mp-alpha i{font-size:8px;padding:2px 4px 1px;top:-8px}}";
+  document.head.append(st);
+  const poser = () => document.querySelectorAll(".mp-tete, .pl-top, .act-top, .reader-bar").forEach(bar => {
+    if (bar.querySelector(":scope>.mp-alpha")) return;
+    const imgs = [...bar.children].filter(e => e.tagName === "IMG" && /metier-plus/.test(e.getAttribute("src") || ""));
+    if (!imgs.length) return;
+    const g = parseFloat(getComputedStyle(bar).columnGap) || 0;   // l'espace ajouté par la pastille est repris : rien ne bouge
+    const s = document.createElement("span"); s.className = "mp-alpha"; s.style.marginLeft = (-g) + "px"; s.innerHTML = "<i>ALPHA</i>"; s.setAttribute("aria-hidden", "true");
+    const o = getComputedStyle(imgs[imgs.length - 1]).order; if (!bar.classList.contains("reader-bar") && o !== "0") s.style.order = o;   // logo placé en tête par « order »
+    imgs[imgs.length - 1].after(s);
+  });
+  let f = 0; const plus_tard = () => { if (!f) f = requestAnimationFrame(() => { f = 0; poser(); }); };
+  const go = () => { poser(); new MutationObserver(plus_tard).observe(document.body, { childList:true, subtree:true }); };
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", go); else go();
+})();
