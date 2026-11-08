@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<!-- © 2026 Jérémy Raymond. Tous droits réservés. -->
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Métier+ — Test du navigateur</title>
+<style>
+body{margin:0;background:#141414;color:#eee;font:22px/1.4 Arial,sans-serif;padding:30px 40px}
+h1{font-size:34px;margin:0 0 6px}p{color:#aaa;margin:0 0 20px}
+#ua{font-size:17px;color:#ffb27a;word-break:break-all;margin-bottom:18px}
+table{border-collapse:collapse;width:100%;max-width:1100px}td{padding:6px 10px;border-bottom:1px solid #333}
+.ok{color:#5dd27a;font-weight:bold}.non{color:#ff5a4f;font-weight:bold}
+#res{font-size:30px;margin:18px 0}
+</style></head><body>
+<h1>Métier+ : test du navigateur</h1>
+<p>Prends une photo de cette page et envoie-la à Claude.</p>
+<div id="ua"></div><div id="res"></div>
+<table id="t"></table>
+<script>
+var T = [];
+function essai(nom, f){ var r = false; try { r = !!f(); } catch(e){ r = false; } T.push([nom, r]); }
+function syntaxe(code){ try { new Function(code); return true; } catch(e){ return false; } }
+essai("Chaînage optionnel  a?.b", function(){ return syntaxe("var a={};return a?.b"); });
+essai("Fusion  a ?? b", function(){ return syntaxe("var a;return a??1"); });
+essai("Affectation  a ??= b", function(){ return syntaxe("var a;a??=1"); });
+essai("Fonctions async / await", function(){ return syntaxe("async function f(){await 1}"); });
+essai("Propriétés de classe", function(){ return syntaxe("class A{x=1}"); });
+essai("replaceAll", function(){ return "aa".replaceAll; });
+essai("Array.at", function(){ return [].at; });
+essai("Object.fromEntries", function(){ return Object.fromEntries; });
+essai("Chiffrement (crypto.subtle)", function(){ return window.crypto && crypto.subtle; });
+essai("Décompression (DecompressionStream)", function(){ return window.DecompressionStream; });
+essai("IndexedDB", function(){ return window.indexedDB; });
+essai("BroadcastChannel", function(){ return window.BroadcastChannel; });
+essai("IntersectionObserver", function(){ return window.IntersectionObserver; });
+essai("ResizeObserver", function(){ return window.ResizeObserver; });
+essai("Pointer events", function(){ return window.PointerEvent; });
+essai("Service worker", function(){ return navigator.serviceWorker; });
+essai("CSS gap en flex", function(){ var d=document.createElement("div");d.style.cssText="display:flex;flex-direction:column;row-gap:1px;position:absolute";d.appendChild(document.createElement("div"));d.appendChild(document.createElement("div"));document.body.appendChild(d);var r=d.scrollHeight===1;d.remove();return r; });
+essai("CSS :is()", function(){ return CSS.supports("selector(:is(a))"); });
+essai("CSS :has()", function(){ return CSS.supports("selector(:has(a))"); });
+essai("CSS clamp()", function(){ return CSS.supports("width","clamp(1px,2px,3px)"); });
+essai("CSS aspect-ratio", function(){ return CSS.supports("aspect-ratio","1/1"); });
+essai("CSS inset", function(){ return CSS.supports("inset","0"); });
+essai("CSS color-mix", function(){ return CSS.supports("color","color-mix(in srgb,red,blue)"); });
+essai("CSS backdrop-filter", function(){ return CSS.supports("backdrop-filter","blur(2px)") || CSS.supports("-webkit-backdrop-filter","blur(2px)"); });
+essai("CSS zoom", function(){ return CSS.supports("zoom","0.9"); });
+var ua = navigator.userAgent, m = ua.match(/Chrome\/(\d+)/);
+document.getElementById("ua").textContent = ua;
+var n = 0; T.forEach(function(x){ if (!x[1]) n++; });
+document.getElementById("res").innerHTML = (m ? "Moteur : Chrome " + m[1] + " · " : "") + (n ? '<span class="non">' + n + " élément(s) manquant(s)</span>" : '<span class="ok">Tout est pris en charge</span>');
+document.getElementById("t").innerHTML = T.map(function(x){ return "<tr><td>" + x[0] + "</td><td class=\"" + (x[1] ? "ok\">Oui" : "non\">Non") + "</td></tr>"; }).join("");
+</script>
+</body></html>
