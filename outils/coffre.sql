@@ -37,3 +37,34 @@ revoke all on function public.coffre_lire(text) from public;
 revoke all on function public.coffre_ecrire(text, text, text, text) from public;
 grant execute on function public.coffre_lire(text) to anon, authenticated;
 grant execute on function public.coffre_ecrire(text, text, text, text) to anon, authenticated;
+
+-- Statistiques anonymes (7 nov.) : combien de fois chaque livre, quiz ou outil est ouvert, par mois. Jamais par qui.
+create table if not exists public.stats (
+  cle  text not null,
+  mois text not null,
+  n    integer not null default 0,
+  primary key (cle, mois)
+);
+alter table public.stats enable row level security;
+revoke all on public.stats from anon, authenticated;
+
+create or replace function public.stats_plus(p_cle text)
+returns void
+language plpgsql security definer set search_path = public as $$
+begin
+  if p_cle !~ '^[a-z]+:[a-z0-9._-]{1,80}$' then return; end if;
+  insert into public.stats (cle, mois, n) values (p_cle, to_char(now() at time zone 'America/Toronto', 'YYYY-MM'), 1)
+  on conflict (cle, mois) do update set n = public.stats.n + 1;
+end;
+$$;
+
+create or replace function public.stats_lire()
+returns table(cle text, mois text, n integer)
+language sql security definer set search_path = public as $$
+  select s.cle, s.mois, s.n from public.stats s where s.mois >= to_char(now() - interval '12 months', 'YYYY-MM');
+$$;
+
+revoke all on function public.stats_plus(text) from public;
+revoke all on function public.stats_lire() from public;
+grant execute on function public.stats_plus(text) to anon, authenticated;
+grant execute on function public.stats_lire() to anon, authenticated;

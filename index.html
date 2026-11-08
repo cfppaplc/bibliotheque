@@ -1208,6 +1208,18 @@ function coverStyle(l){
 let view = "all", query = "";
 const ADM = { tab:"add", pend:[], editing:null, confirmDel:null, extraCats:[], ovr:{}, uid:0, ord:[], feat:[], lastBackup:0, lighten:true };
 const POS = lireLS("pos", {});
+/* Réglages des livres publiés depuis le panneau d'administration (reglages.json, 7 nov.) : cachés, « En construction », « Nouveau », vedette */
+let REGLAGES = { caches:[], construction:{}, nouveau:{}, vedette:[] };
+const LIVRES_CACHES = [];
+function appliquerReglages(R){
+  REGLAGES = Object.assign({ caches:[], construction:{}, nouveau:{}, vedette:[] }, R || {});
+  const tous = [...LIVRES, ...LIVRES_CACHES]; tous.forEach((l, i) => { if (l._i === undefined) l._i = l.user ? 1e6 + i : i; if (l._c0 === undefined) l._c0 = !!l.enConstruction;
+    const c = REGLAGES.construction[l.fichier]; l.enConstruction = c === undefined ? l._c0 : !!c; });
+  tous.sort((a, b) => a._i - b._i);
+  LIVRES.splice(0, LIVRES.length, ...tous.filter(l => !REGLAGES.caches.includes(l.fichier)));
+  LIVRES_CACHES.splice(0, LIVRES_CACHES.length, ...tous.filter(l => REGLAGES.caches.includes(l.fichier)));
+}
+fetch("reglages.json", { cache:"no-cache" }).then(r => r.ok ? r.json() : null).then(R => { if (!R) return; appliquerReglages(R); try { render(); renderHero(); } catch(e){} }).catch(() => {});
 
 function progression(l){
   const sp = POS[l.fichier];
@@ -1221,7 +1233,8 @@ const dateFr = d => { try { return new Date(d + "T12:00:00").toLocaleDateString(
 function majRecente(l){ const e = NOUV.find(n => n.livre === l.fichier && (n.type === "maj" || n.type === "ajout")); if (!e) return null;
   return (Date.now() - new Date(e.date + "T12:00:00")) < 30 * 864e5 ? e : null; }
 /* « Nouveau » pendant 30 jours : date de l'ajout dans Quoi de neuf, ou date d'ajout par l'administration */
-function estNouveau(l){ const e = NOUV.find(n => n.livre === l.fichier && n.type === "ajout"), t = e ? new Date(e.date + "T12:00:00").getTime() : (l.user ? (l.added || 0) : 0);
+function estNouveau(l, RG){ const fo = (RG || REGLAGES).nouveau[l.fichier]; if (fo === false) return false;
+  const e = NOUV.find(n => n.livre === l.fichier && n.type === "ajout"), t = fo ? new Date(fo + "T12:00:00").getTime() : e ? new Date(e.date + "T12:00:00").getTime() : (l.user ? (l.added || 0) : 0);
   return !!t && (Date.now() - t) < 30 * 864e5; }
 /* Livres déjà ouverts sur cet ordinateur : le badge « Nouveau » ou « Mis à jour » disparaît une fois le livre ouvert (ou après 30 jours) */
 const vuLe = l => { try { return (JSON.parse(localStorage.getItem("livresVus") || "{}"))[l.fichier || l.id] || 0; } catch(e){ return 0; } };
@@ -1361,7 +1374,7 @@ async function chercherDansLivres(q){
    Le plus récent est au centre, devant. */
 function vedettes(){
   const avec = LIVRES.filter(l => couv(l));
-  const feat = ADM.feat.map(f => avec.find(l => l.fichier === f)).filter(Boolean);
+  const feat = (REGLAGES.vedette.length ? REGLAGES.vedette : ADM.feat).map(f => avec.find(l => l.fichier === f)).filter(Boolean);
   const recents = avec.filter(l => l.user).sort((x, y) => (y.added || 0) - (x.added || 0));
   if (!feat.length && !recents.length) return avec.slice(0, 3);   /* aucun ajout : l'aperçu d'origine */
   const t = [...new Set([...feat, ...recents, ...avec.filter(l => !l.user)])].slice(0, 3);
@@ -1369,7 +1382,7 @@ function vedettes(){
 }
 function renderHero(){
   const h = $("#hero");
-  h.style.cssText = "background:linear-gradient(120deg,#3a0b0b 0%,#141414 68%)";
+  h.style.cssText = "background:linear-gradient(120deg,#1b2540 0%,#141414 68%)";
   h.innerHTML = `<div class="hero-content">
     <h1>${(window.titreAccueil && window.titreAccueil()) || "La plateforme des enseignants en formation professionnelle"}</h1>
     <p>Livres animés, plans, quiz et simulateurs : tout pour enseigner un métier, en classe comme à l'atelier. <span class="hero-tag">Réservé aux enseignants du Pavillon de l'Avenir</span></p>
@@ -5515,6 +5528,7 @@ function ouvrirLivre(l, brut){
   }
 }
 function lire(l){
+  try { if (window.COFFRE && window.ACCES && ACCES.session && !ACCES.eleve) COFFRE.stat(l.fichier === "tableau-blanc" ? "outil:tableau" : "livre:" + (l.fichier || "ajoute")); } catch(e){}   /* statistiques anonymes */
   /* « Lire » ouvre le livre en plein écran (réglage Mes préférences → Livre en plein écran); demandé tout de suite, pendant le geste de l'enseignant */
   try { if (!document.fullscreenElement && !document.body.classList.contains("classe") && !(window.PREF && window.PREF().plein === false)) document.documentElement.requestFullscreen().catch(() => {}); } catch(e){}
   if (l.user){
@@ -5581,6 +5595,7 @@ function marquerTdb(on){
 function allerTableauDeBord(){ marquerTdb(true); try { window.ouvrirAccueil(); } catch(e){} }
 function fermerLivreVraiment(){ const t = window.TDB_ACTIF; marquerTdb(false); window.TDB_ACTIF = t; closeReader(); window.TDB_ACTIF = t; }
 function ouvrirTableauBlanc(apres){
+  try { if (window.COFFRE && window.ACCES && ACCES.session && !ACCES.eleve) COFFRE.stat("outil:tableau"); } catch(e){}
   const l = { fichier:"tableau-blanc", titre:"Tableau blanc" };
   ouvrirLivre(l, '<!doctype html><html><head><meta charset="utf-8"><title>Tableau blanc</title></head><body style="margin:0;background:#fff;height:100vh"></body></html>');
   let n = 0; const t = setInterval(() => { n++;
@@ -8961,6 +8976,67 @@ window.addEventListener("online", () => { try { aviser("Internet est revenu."); 
   body.clair .acces-outils select{background:#fff;border-color:#d9d5cd;color:#1d1d1f}
   .acces-puces{display:flex;flex-wrap:wrap;gap:6px;flex-basis:100%}.acces-puces .abtn{padding:5px 12px;font-size:.8rem;border-radius:99px}
   .acces-fiche[hidden]{display:none}
+  /* ---- Panneau d'administration (7 nov., « je veux qu'il soit beau ») ---- */
+  .acces-box.gestion{max-width:min(980px,96vw)}
+  .acces-tete h2{margin:0 0 2px;font-size:1.5rem;letter-spacing:-.01em}
+  .acces-box.gestion .acces-stats>div{background:linear-gradient(180deg,#1e1e23,#17171b);padding:12px 8px;transition:transform .15s,border-color .15s}
+  .acces-box.gestion .acces-stats b{font-size:1.6rem;font-variant-numeric:tabular-nums}
+  .acces-stats .dem{cursor:pointer}.acces-stats .dem:hover{transform:translateY(-1px)}
+  .acces-onglets{display:flex;gap:4px;background:#111114;border:1px solid #2a2a2f;border-radius:12px;padding:4px;margin:2px 0 14px}
+  .acces-onglets button{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;border:0;background:transparent;color:#a9a9ae;font:inherit;font-weight:600;font-size:.9rem;padding:10px 8px;border-radius:9px;cursor:pointer;transition:background .2s,color .2s}
+  .acces-onglets button:hover{color:#f1f1f2;background:#1d1d22}
+  .acces-onglets button.on{background:var(--accent);color:#fff;box-shadow:0 4px 14px rgba(235,106,34,.35)}
+  .acces-box.gestion svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+  .acces-pane[hidden]{display:none}
+  .acces-pane.anim{animation:accesPane .25s ease-out}
+  @keyframes accesPane{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .acces-fiche .vu{color:#8c8c92}
+  .acces-livs{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:10px;margin-top:8px}
+  .acces-liv{display:flex;gap:12px;border:1px solid #2a2a2f;border-radius:12px;padding:10px;background:#18181c;transition:opacity .2s,border-color .2s}
+  .acces-liv:hover{border-color:#3a3a40}
+  .acces-liv.masque{opacity:.5}
+  .acces-liv .cv{width:62px;height:82px;border-radius:6px;background-size:cover;background-position:top;flex:none;box-shadow:0 4px 12px rgba(0,0,0,.4)}
+  .acces-liv .tx{min-width:0;flex:1}.acces-liv .tx b{display:block;font-size:.92rem;line-height:1.25}
+  .acces-liv .tx small{color:#8c8c92;font-size:.76rem}.acces-liv .tx em{color:#ff8a4c;font-style:normal;font-weight:700}
+  .acces-liv .tgs{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
+  .acces-box.gestion .tg{display:inline-flex;align-items:center;gap:5px;border:1px solid #34343a;background:transparent;color:#a9a9ae;border-radius:99px;padding:4px 10px;font:inherit;font-size:.75rem;font-weight:600;cursor:pointer;transition:all .15s}
+  .acces-box.gestion .tg svg{width:13px;height:13px;stroke-width:2.2}
+  .acces-box.gestion .tg:hover{border-color:#5a5a62;color:#f1f1f2}
+  .acces-box.gestion .tg.on[data-rl=vis]{background:rgba(34,197,94,.14);border-color:#22c55e;color:#4ade80}
+  .acces-box.gestion .tg.on[data-rl=constr]{background:rgba(245,197,24,.14);border-color:#e8b10e;color:#f5c518}
+  .acces-box.gestion .tg.on[data-rl=nouv]{background:rgba(42,123,207,.16);border-color:#3b8be0;color:#7db6ff}
+  .acces-box.gestion .tg.on[data-rl=ved]{background:rgba(235,106,34,.16);border-color:var(--accent);color:#ffb27d}
+  .acces-box.gestion .tg.rech.on{background:rgba(224,49,49,.16);border-color:#e03131;color:#ff8787}
+  .acces-per{display:flex;gap:6px;margin-bottom:12px}.acces-per .abtn{border-radius:99px}
+  .acces-total{font-size:.95rem;color:#a9a9ae;margin-bottom:10px}.acces-total b{font-size:1.9rem;color:#f1f1f2;margin-right:6px;font-variant-numeric:tabular-nums}
+  .acces-graph{background:#18181c;border:1px solid #2a2a2f;border-radius:12px;padding:12px 14px;margin-bottom:10px}
+  .acces-graph h3{margin:0 0 8px;font-size:.95rem}
+  .acces-graph .br{display:grid;grid-template-columns:minmax(0,40%) 1fr 44px;gap:10px;align-items:center;padding:4px 0}
+  .acces-graph .n{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:.84rem}
+  .acces-graph .b{height:10px;background:#26262b;border-radius:99px;overflow:hidden}
+  .acces-graph .b i{display:block;height:100%;border-radius:99px;transform-origin:left;animation:accesBar .7s cubic-bezier(.2,.8,.2,1) both}
+  @keyframes accesBar{from{transform:scaleX(0)}to{transform:none}}
+  .acces-graph .br>b{text-align:right;font-variant-numeric:tabular-nums;font-size:.86rem}
+  .acces-vide{text-align:center;padding:26px 16px;color:#a9a9ae;border:1px dashed #34343a;border-radius:12px}
+  .acces-vide svg{width:34px!important;height:34px!important;color:var(--accent);margin-bottom:6px}
+  .acces-hist .h{display:grid;grid-template-columns:62px 1fr auto;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid #2a2a2f}
+  .acces-hist .d b{display:block;font-size:.88rem}.acces-hist .d span{font-size:.74rem;color:#8c8c92}
+  .acces-hist .c span{display:inline-block;margin:2px 5px 2px 0;padding:3px 9px;border-radius:99px;font-size:.77rem;background:#26262b;color:#c8c8cc}
+  .acces-hist .c .plus{background:rgba(34,197,94,.14);color:#4ade80}.acces-hist .c .moins{background:rgba(224,49,49,.14);color:#ff8787}
+  .acces-hist .act{font-size:.74rem;color:#4ade80;font-weight:700;white-space:nowrap}
+  .acces-rech{display:flex;gap:10px;align-items:flex-start;margin:14px 0 4px;padding:11px 13px;border-radius:12px;background:rgba(235,106,34,.1);border:1px solid rgba(235,106,34,.45);font-size:.84rem;line-height:1.4;cursor:pointer}
+  .acces-rech input{margin-top:3px;accent-color:var(--accent)}
+  .acces-box.gestion #gInv{display:inline-flex;align-items:center;gap:7px}
+  @media (max-width:640px){.acces-onglets button span{font-size:.72rem}.acces-onglets button{flex-direction:column;gap:3px;padding:8px 2px}
+    .acces-livs{grid-template-columns:1fr}.acces-graph .br{grid-template-columns:minmax(0,45%) 1fr 36px}.acces-hist .h{grid-template-columns:52px 1fr}.acces-hist .h>button,.acces-hist .h>.act{grid-column:2;justify-self:start}}
+  body.clair .acces-box.gestion .acces-stats>div{background:linear-gradient(180deg,#fff,#f7f5f1)}
+  body.clair .acces-onglets{background:#f3f1ed;border-color:#e3e0da}body.clair .acces-onglets button{color:#5f6068}body.clair .acces-onglets button:hover{background:#e9e6e0;color:#1d1d1f}
+  body.clair .acces-onglets button.on{color:#fff}
+  body.clair :is(.acces-liv,.acces-graph){background:#faf8f5;border-color:#ebe7e1}body.clair .acces-graph .b{background:#ebe7e1}
+  body.clair .acces-total b{color:#1d1d1f}body.clair .acces-box.gestion .tg{border-color:#d9d5cd;color:#5f6068}
+  body.clair .acces-box.gestion .tg.on[data-rl=vis]{color:#15803d}body.clair .acces-box.gestion .tg.on[data-rl=constr]{color:#a16207}body.clair .acces-box.gestion .tg.on[data-rl=nouv]{color:#1f6fc2}body.clair .acces-box.gestion .tg.on[data-rl=ved]{color:#c2410c}body.clair .acces-box.gestion .tg.rech.on{color:#c92a2a}
+  body.clair .acces-hist .h{border-color:#ebe7e1}body.clair .acces-hist .c span{background:#efece6;color:#3a3a40}body.clair .acces-hist .c .plus{color:#15803d}body.clair .acces-hist .c .moins{color:#c92a2a}body.clair .acces-hist .act{color:#15803d}
+  body.clair .acces-rech{background:#fff4ec}
   @media (max-width:640px){.acces-stats{grid-template-columns:repeat(3,1fr)}}
   body.clair .acces-stats>div{background:#faf8f5;border-color:#ebe7e1}body.clair .acces-stats span{color:#6b6b72}
   .acces-fiche{border:1px solid #2a2a2f;border-radius:10px;padding:10px 12px;background:#18181c}
@@ -9299,7 +9375,7 @@ window.ACCES = (function(){
 
   /* ---------------- interface ---------------- */
   const ov = () => document.getElementById("accesOv"), box = () => document.getElementById("accesBox");
-  const fermer = () => { ov().hidden = true; box().classList.remove("large"); box().onclick = null; };
+  const fermer = () => { ov().hidden = true; box().classList.remove("large", "gestion"); box().onclick = null; };
   const ICO_PERS = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 20c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>';
   window.ICO_CADENAS = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
   function majBouton(){
@@ -9403,9 +9479,24 @@ window.ACCES = (function(){
   const titreDe = f => { const l = LIVRES.find(x => x.fichier === f); return l ? l.titre : f; };
   function dlgGerer(){
     if (!SESSION || !SESSION.admin) return;
-    BROUILLON = JSON.parse(JSON.stringify(DATA)); box().classList.add("large"); ov().hidden = false; dessinerGerer();
+    BROUILLON = JSON.parse(JSON.stringify(DATA)); REGL = clone(REGLAGES); FORCER_RECH.clear(); box().classList.add("large", "gestion"); ov().hidden = false; dessinerGerer();
   }
   const OUVERTS = new Set();
+  let ONGLET = "profs", REGL = null; const FORCER_RECH = new Set(), VU = {};
+  const clone = o => JSON.parse(JSON.stringify(o));
+  const ICO = {
+    profs:'<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.2-5.5 6.5-5.5s5.9 1.9 6.5 5.5"/><circle cx="17.5" cy="9" r="2.6"/><path d="M16.5 14.6c2.6.2 4.4 1.9 5 5.4"/></svg>',
+    livres:'<svg viewBox="0 0 24 24"><path d="M4 4.5h6a2 2 0 0 1 2 2V20a2 2 0 0 0-2-2H4z"/><path d="M20 4.5h-6a2 2 0 0 0-2 2V20a2 2 0 0 1 2-2h6z"/></svg>',
+    stats:'<svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>',
+    hist:'<svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 2.6-6.4L3 8"/><path d="M3 3v5h5M12 7v5l3.5 2"/></svg>',
+    oeil:'<svg viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>',
+    etoile:'<svg viewBox="0 0 24 24"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/></svg>',
+    neuf:'<svg viewBox="0 0 24 24"><path d="M12 2v4M12 18v4M2 12h4M18 12h4M5 5l2.8 2.8M16.2 16.2 19 19M5 19l2.8-2.8M16.2 7.8 19 5"/></svg>',
+    cle:'<svg viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="m11 12 9-9M17 6l3 3M14 9l2 2"/></svg>',
+    lien:'<svg viewBox="0 0 24 24"><path d="M10 14a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 10a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>' };
+  const constrDe = l => REGL.construction[l.fichier] !== undefined ? !!REGL.construction[l.fichier] : !!l._c0;
+  const nouvDe = l => estNouveau(l, REGL);
+  const ilYa = d => { if (!d) return "jamais vu sur Métier+"; const j = Math.floor((Date.now() - d) / 864e5); return j <= 0 ? "vu aujourd'hui" : j === 1 ? "vu hier" : j < 45 ? "vu il y a " + j + " jours" : "vu il y a " + Math.round(j / 30) + " mois"; };
   const FILTRE = { q:"", type:"tous", tri:"nom" };   /* recherche et tri du panneau (7 nov.) : gardés entre deux redessins */
   function filtrerFiches(){ const B = box(), q = FILTRE.q.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""); let vus = 0;
     B.querySelectorAll(".acces-fiche[data-cherche]").forEach(f => { const ok = (!q || f.dataset.cherche.includes(q))
@@ -9424,20 +9515,44 @@ window.ACCES = (function(){
     const lignes = ids.map(id => { const c = D.comptes[id], n = livres.filter(f => D.livres[f].cles[id]).length;
       const att = ' data-cherche="' + esc((c.nom + " " + id).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")) + '" data-eleve="' + (c.eleve ? 1 : 0) + '" data-progs="' + esc((c.admin ? progs : (c.prog || [])).join("|")) + '"';
       if (c.admin) return '<div class="acces-fiche"' + att + '><div class="fh"><div class="qui"><b>' + esc(c.nom) + '</b><span class="acces-tag">admin</span><br><small>' + esc(id) + '</small></div><span class="cpt">Tous les livres</span></div></div>';
-      return '<div class="acces-fiche"' + att + '><div class="fh"><div class="qui"><b>' + esc(c.nom) + '</b>' + (c.eleve ? '<span class="acces-tag" style="background:#15803d">élèves</span>' : '') + '<br><small>' + esc(id) + '</small></div>'
+      return '<div class="acces-fiche"' + att + '><div class="fh"><div class="qui"><b>' + esc(c.nom) + '</b>' + (c.eleve ? '<span class="acces-tag" style="background:#15803d">élèves</span>' : '') + '<br><small>' + esc(id) + ' · <span class="vu" data-vu="' + esc(id) + '">' + (id in VU ? ilYa(VU[id]) : "…") + '</span></small></div>'
         + progs.map(pg => '<button class="abtn' + ((c.prog || []).includes(pg) ? ' prim' : '') + '" data-prog="' + esc(pg) + '" data-pid="' + esc(id) + '" title="Donner ou retirer tous les livres : ' + esc(progNom(pg)) + '">' + esc(court(pg)) + '</button>').join("")
         + '<button class="abtn" data-mdp="' + esc(id) + '" title="Donner un nouveau mot de passe à cet enseignant">Mot de passe</button><button class="abtn" data-retirer="' + esc(id) + '" title="Retirer ce compte">Retirer</button></div>'
         + '<details' + (OUVERTS.has(id) ? ' open' : '') + ' data-fiche="' + esc(id) + '"><summary>Livres permis : ' + n + ' sur ' + total + '</summary>'
         + grps.map(g => '<div class="acces-grp"><div class="t">' + esc(court(g)) + '</div><div class="acces-chips">' + parProg[g].map(f => '<label class="acces-chip" title="' + esc(titreDe(f)) + '"><input type="checkbox" data-id="' + esc(id) + '" data-f="' + esc(f) + '"' + (D.livres[f].cles[id] ? " checked" : "") + '><span>' + esc(titreDe(f)) + '</span></label>').join("") + '</div></div>').join("")
         + '</details></div>'; }).join("");
     let jeton = ""; try { jeton = localStorage.getItem("ghJeton") || ""; } catch(e){}
-    const nProf = ids.filter(id => !D.comptes[id].eleve).length, nGr = ids.length - nProf, aPublier = JSON.stringify(D) !== JSON.stringify(DATA);
+    const nProf = ids.filter(id => !D.comptes[id].eleve).length, nGr = ids.length - nProf;
+    const retires = Object.keys(D.livres).filter(f => DATA.livres[f] && Object.keys(DATA.livres[f].cles).some(id => !D.livres[f].cles[id]));
+    const aRech = [...new Set([...retires, ...FORCER_RECH])].filter(f => D.livres[f]);
+    const aPublier = JSON.stringify(D) !== JSON.stringify(DATA) || JSON.stringify(REGL) !== JSON.stringify(REGLAGES) || FORCER_RECH.size > 0;
+    const vol = k => ' data-pane="' + k + '"' + (ONGLET === k ? '' : ' hidden');
+    const ong = (k, lab) => '<button class="' + (ONGLET === k ? 'on' : '') + '" data-ong="' + k + '">' + ICO[k] + '<span>' + lab + '</span></button>';
+    const pool = [...LIVRES.filter(l => l.fichier && !l.user && l.fichier !== "tableau-blanc"), ...LIVRES_CACHES];
+    const tg = (k, f, on, lab, ic) => '<button class="tg' + (on ? ' on' : '') + '" data-rl="' + k + '" data-f="' + esc(f) + '">' + ic + lab + '</button>';
+    const volLivres = '<p class="sous">Ce que tu changes ici s\'applique pour tous les enseignants quand tu touches « Publier ». « Nouveau » dure 30 jours; « En vedette » = les livres du haut de l\'accueil (3 au plus).</p><div class="acces-livs">'
+      + pool.map(l => { const f = l.fichier, cache = REGL.caches.includes(f), prot = !!D.livres[f], nAcc = prot ? Object.keys(D.livres[f].cles).length : 0, cv = couv(l);
+        return '<div class="acces-liv' + (cache ? ' masque' : '') + '"><div class="cv" style="' + (cv ? "background-image:url('" + cv + "')" : "background:" + fond(l)) + '"></div><div class="tx"><b>' + esc(l.titre) + '</b>'
+          + '<small>' + esc(court(l.categorie || "")) + ' · ' + (prot ? nAcc + ' accès' : 'public') + (FORCER_RECH.has(f) ? ' · <em>sera rechiffré</em>' : '') + '</small><div class="tgs">'
+          + tg("vis", f, !cache, cache ? "Caché" : "Visible", ICO.oeil) + tg("constr", f, constrDe(l), "En construction", ICO_CONSTR) + tg("nouv", f, nouvDe(l), "Nouveau", ICO.neuf) + tg("ved", f, REGL.vedette.includes(f), "En vedette", ICO.etoile)
+          + (prot ? '<button class="tg rech' + (FORCER_RECH.has(f) ? ' on' : '') + '" data-rech="' + esc(f) + '" title="Nouvelle clé : seuls ceux qui ont encore l\'accès pourront l\'ouvrir, même avec une vieille copie">' + ICO.cle + 'Couper les anciens accès</button>' : '')
+          + '</div></div></div>'; }).join("") + '</div>';
+    const volStats = '<div class="acces-per"><button class="abtn' + (FILTRE.per === "12" ? '' : ' prim') + '" data-per="mois">Ce mois-ci</button><button class="abtn' + (FILTRE.per === "12" ? ' prim' : '') + '" data-per="12">12 derniers mois</button></div><div id="gStats"><p class="sous">Chargement des statistiques…</p></div>'
+      + '<p class="sous" style="font-size:.78rem;margin-top:12px">Anonyme : on compte seulement combien de fois chaque livre, quiz ou outil est ouvert, jamais par qui.</p>';
+    const volHist = '<div class="acces-sec" style="margin-top:0;border-top:0;padding-top:0"><h3>Sauvegarde</h3><p class="sous">Une copie complète des comptes, des accès et des réglages des livres. Garde-la dans ton OneDrive.</p>'
+      + '<div class="acces-btns" style="justify-content:flex-start"><button class="abtn prim" id="gSauve">Télécharger une sauvegarde</button><label class="abtn" for="gRest" style="cursor:pointer">Restaurer une sauvegarde</label><input type="file" id="gRest" accept=".json,application/json" hidden></div></div>'
+      + '<div class="acces-sec"><h3>Historique des accès</h3><p class="sous">Chaque publication, avec ce qui a changé. « Revenir » remet les comptes et les accès de ce moment-là (vérifie, puis « Publier »).</p><div id="gHist"><p class="sous">Chargement…</p></div></div>';
+    const volInvite = '<div class="acces-sec"><h3>Inviter un enseignant</h3><p class="sous">Envoie-lui ce lien (Teams, courriel) : sa demande arrive avec les bons programmes déjà cochés.</p>'
+      + '<div class="acces-chips">' + progs.map(pg => '<label class="acces-chip"><input type="checkbox" class="invProg" value="' + esc(court(pg).toLowerCase()) + '" checked><span>' + esc(progNom(pg)) + '</span></label>').join("") + '</div>'
+      + '<div class="acces-btns" style="justify-content:flex-start"><button class="abtn prim" id="gInv">' + ICO.lien + ' Copier le lien d\'invitation</button><span class="acces-ok" id="gInvOk" hidden style="margin:0">Lien copié !</span></div></div>';
     const puce = (v, l) => '<button class="abtn' + (FILTRE.type === v ? ' prim' : '') + '" data-ftype="' + esc(v) + '">' + esc(l) + '</button>';
-    box().innerHTML = '<h2>Accès des enseignants</h2>'
+    const st0 = box().scrollTop;
+    box().innerHTML = '<div class="acces-tete"><div><h2>Administration</h2><p class="sous" style="margin:0">Métier+ · comptes, livres et suivi</p></div></div>'
       + '<div class="acces-stats"><div><b>' + nProf + '</b><span>enseignant' + (nProf > 1 ? 's' : '') + '</span></div><div><b>' + nGr + '</b><span>groupe' + (nGr > 1 ? 's' : '') + ' d\'élèves</span></div>'
       + '<div><b>' + livres.length + '</b><span>livres protégés</span></div><div class="dem"><b id="gStatDem">…</b><span>demandes</span></div>'
       + '<div class="' + (aPublier ? 'pub' : 'ok') + '"><b>' + (aPublier ? '!' : '✓') + '</b><span>' + (aPublier ? 'à publier' : 'tout est publié') + '</span></div></div>'
-      + '<p class="sous">Touche « Livres permis » pour cocher les livres d\'un enseignant, ou ses programmes pour tout lui donner d\'un coup. Les changements partent en ligne quand tu touches « Publier ».</p>'
+      + '<div class="acces-onglets">' + ong("profs", "Enseignants") + ong("livres", "Livres") + ong("stats", "Statistiques") + ong("hist", "Historique") + '</div>'
+      + '<div class="acces-pane"' + vol("profs") + '><p class="sous">Touche « Livres permis » pour cocher les livres d\'un enseignant, ou ses programmes pour tout lui donner d\'un coup. Les changements partent en ligne quand tu touches « Publier ».</p>'
       + '<div class="acces-outils"><input type="text" id="gQ" enterkeyhint="search" placeholder="Chercher un nom…" value="' + esc(FILTRE.q) + '" autocomplete="off">'
       + '<select id="gTri" title="Trier"><option value="nom"' + (FILTRE.tri === "nom" ? " selected" : "") + '>Trier : nom</option><option value="prog"' + (FILTRE.tri === "prog" ? " selected" : "") + '>Trier : programme</option><option value="peu"' + (FILTRE.tri === "peu" ? " selected" : "") + '>Trier : moins de livres</option></select>'
       + '<div class="acces-puces">' + puce("tous", "Tous") + puce("prof", "Enseignants") + progs.map(pg => puce(pg, court(pg))).join("") + puce("eleve", "Groupes") + '</div></div>'
@@ -9450,13 +9565,42 @@ window.ACCES = (function(){
       + '<div class="acces-btns" style="justify-content:flex-start"><button class="abtn prim" id="grOui">Créer le groupe</button></div></details></div>'
       + '<div class="acces-sec"><h3>Demandes reçues</h3><div id="gBoite"><p class="sous">Recherche des demandes…</p></div>'
       + '<details style="margin-top:8px"><summary style="cursor:pointer;color:#a9a9ae;font-size:.88rem">Coller un code reçu autrement (Teams, courriel)</summary><textarea id="gDem" placeholder="Colle ici le code DEMANDE-… reçu de l\'enseignant"></textarea><div class="acces-btns" style="justify-content:flex-start"><button class="abtn" id="gAjout">Ajouter cet enseignant</button></div></details></div>'
+      + volInvite + '</div>'
+      + '<div class="acces-pane"' + vol("livres") + '>' + volLivres + '</div>'
+      + '<div class="acces-pane"' + vol("stats") + '>' + volStats + '</div>'
+      + '<div class="acces-pane"' + vol("hist") + '>' + volHist + '</div>'
+      + (aRech.length ? '<label class="acces-rech"><input type="checkbox" id="gRech" checked><span><b>Couper vraiment l\'accès</b> : nouvelle clé pour ' + aRech.map(f => '« ' + esc(titreDe(f)) + ' »').join(", ") + '. Une vieille copie gardée par quelqu\'un qui n\'a plus l\'accès ne s\'ouvrira plus (un peu plus long à publier).</span></label>' : '')
       + (jeton   /* clé déjà enregistrée : on ne la montre plus, seulement un petit lien « Changer » */
         ? '<p class="sous" style="margin-top:14px;font-size:.8rem">Clé GitHub enregistrée sur cet ordinateur · <a href="#" id="gChg" style="color:#a9a9ae">Changer</a></p><div id="gJetZone" hidden><input type="password" id="gJeton" placeholder="Nouvelle clé GitHub (github_pat_…)" value="' + esc(jeton) + '"></div>'
         : '<div class="acces-sec"><h3>Publication</h3><p class="sous" style="margin-bottom:6px">Pour publier d\'ici, colle une fois ta clé GitHub (gardée seulement sur cet ordinateur). Sinon, télécharge le fichier et envoie-le à Claude.</p>'
           + '<input type="password" id="gJeton" placeholder="Clé GitHub (github_pat_…)" value=""></div>')
       + '<div class="acces-err" id="gErr"' + (msg && msg.err ? "" : " hidden") + '>' + (msg && msg.err ? esc(msg.err) : "") + '</div><div class="acces-ok" id="gOk"' + (msg && msg.ok ? "" : " hidden") + '>' + (msg && msg.ok ? esc(msg.ok) : "") + '</div>'
       + '<div class="acces-btns"><button id="gNon">Fermer</button>' + (jeton ? '' : '<button id="gTel">Télécharger comptes.json</button>') + '<button class="prim" id="gPub">Publier</button></div>';
-    const B = box();
+    const B = box(); B.scrollTop = st0;
+    B.querySelectorAll("[data-ong]").forEach(b => b.onclick = () => { ONGLET = b.dataset.ong; B.querySelectorAll("[data-ong]").forEach(x => x.classList.toggle("on", x === b));
+      B.querySelectorAll(".acces-pane").forEach(p => { p.hidden = p.dataset.pane !== ONGLET; p.classList.toggle("anim", !p.hidden); }); voletCharge(); });
+    const sdem = B.querySelector(".acces-stats .dem"); if (sdem) sdem.onclick = () => B.querySelector('[data-ong="profs"]').click();
+    B.querySelectorAll("[data-rl]").forEach(b => b.onclick = () => { const f = b.dataset.f, l = [...LIVRES, ...LIVRES_CACHES].find(x => x.fichier === f), k = b.dataset.rl;
+      if (k === "vis") REGL.caches = REGL.caches.includes(f) ? REGL.caches.filter(x => x !== f) : REGL.caches.concat(f);
+      if (k === "constr") REGL.construction[f] = !constrDe(l);
+      if (k === "nouv") REGL.nouveau[f] = nouvDe(l) ? false : new Date().toLocaleDateString("en-CA");
+      if (k === "ved"){ REGL.vedette = REGL.vedette.includes(f) ? REGL.vedette.filter(x => x !== f) : [f].concat(REGL.vedette).slice(0, 3); }
+      dessinerGerer(); });
+    B.querySelectorAll("[data-rech]").forEach(b => b.onclick = () => { const f = b.dataset.rech; FORCER_RECH.has(f) ? FORCER_RECH.delete(f) : FORCER_RECH.add(f); dessinerGerer(); });
+    B.querySelectorAll("[data-per]").forEach(b => b.onclick = () => { FILTRE.per = b.dataset.per; B.querySelectorAll("[data-per]").forEach(x => x.classList.toggle("prim", x === b)); dessinerStats(); });
+    const gInv = document.getElementById("gInv"); if (gInv) gInv.onclick = () => { const pr = [...B.querySelectorAll(".invProg:checked")].map(x => x.value).join(",");
+      const lien = location.origin + location.pathname + "#inviter=" + encodeURIComponent(pr || "tous"); try { navigator.clipboard.writeText(lien); } catch(e){} document.getElementById("gInvOk").hidden = false; prompt("Lien d'invitation (déjà copié) :", lien); };
+    document.getElementById("gSauve").onclick = () => { const a = document.createElement("a");
+      a.href = URL.createObjectURL(new Blob([JSON.stringify({ type:"metier-plus-sauvegarde", date:new Date().toISOString(), comptes:BROUILLON, reglages:REGL }, null, 1)], { type:"application/json" }));
+      a.download = "metier-plus-sauvegarde-" + new Date().toLocaleDateString("en-CA") + ".json"; a.click(); };
+    document.getElementById("gRest").onchange = async e => { const fi = e.target.files[0]; if (!fi) return;
+      try { const j = JSON.parse(await fi.text()), c = j.type === "metier-plus-sauvegarde" ? j.comptes : j; if (!c || !c.comptes || !c.livres) throw new Error("ce fichier n'est pas une sauvegarde");
+        await restaurer(c); if (j.reglages) REGL = Object.assign({ caches:[], construction:{}, nouveau:{}, vedette:[] }, j.reglages); ONGLET = "profs";
+        dessinerGerer({ ok:"Sauvegarde du " + (j.date ? new Date(j.date).toLocaleDateString("fr-CA") : "fichier") + " chargée. Vérifie, puis touche « Publier »." }); }
+      catch(x){ dessinerGerer({ err:"Restauration impossible : " + x.message }); } };
+    voletCharge();
+    if (window.COFFRE && COFFRE.vu) ids.filter(id => !(id in VU)).forEach(id => COFFRE.vu(id).then(d => { VU[id] = d; const s = B.querySelector('[data-vu="' + CSS.escape(id) + '"]'); if (s) s.textContent = ilYa(d); }).catch(() => { VU[id] = 0; }));
+    else ids.forEach(id => { const s = B.querySelector('[data-vu="' + CSS.escape(id) + '"]'); if (s && s.textContent === "…") s.textContent = ""; });
     const gQ = document.getElementById("gQ"); if (gQ){ gQ.oninput = () => { FILTRE.q = gQ.value; filtrerFiches(); };
       document.getElementById("gTri").onchange = e => { FILTRE.tri = e.target.value; dessinerGerer(); };
       B.querySelectorAll("[data-ftype]").forEach(b => b.onclick = () => { FILTRE.type = b.dataset.ftype; B.querySelectorAll("[data-ftype]").forEach(x => x.classList.toggle("prim", x === b)); filtrerFiches(); });
@@ -9476,7 +9620,7 @@ window.ACCES = (function(){
       const f = cb.dataset.f, id = cb.dataset.id; cb.disabled = true;
       try { if (cb.checked) BROUILLON.livres[f].cles[id] = await envelopper(f, BROUILLON.comptes[id].pub); else delete BROUILLON.livres[f].cles[id]; }
       catch(e){ cb.checked = !cb.checked; dessinerGerer({ err:e.message }); return; }
-      cb.disabled = false; });
+      dessinerGerer(); });
     B.querySelectorAll("[data-prog]").forEach(b => b.onclick = async () => { const id = b.dataset.pid, pg = b.dataset.prog, c = BROUILLON.comptes[id];
       c.prog = c.prog || []; const ajoute = !c.prog.includes(pg); c.prog = ajoute ? c.prog.concat(pg) : c.prog.filter(x => x !== pg);
       try { await appliquerProgs(id, ajoute ? [pg] : [], ajoute ? [] : [pg]); dessinerGerer({ ok:c.nom + (ajoute ? " a maintenant tous les livres « " : " n'a plus les livres « ") + court(pg) + " »." }); }
@@ -9509,12 +9653,71 @@ window.ACCES = (function(){
       let jt = document.getElementById("gJeton").value.trim(); if (!jt) jt = jeton; if (!jt) return dessinerGerer({ err:"Colle d'abord ta clé GitHub (ou utilise « Télécharger comptes.json »)." });
       try { localStorage.setItem("ghJeton", jt); } catch(e){}
       const bt = document.getElementById("gPub"); bt.disabled = true; bt.textContent = "Publication…";
-      try { await publierGitHub(jt, BROUILLON); DATA = JSON.parse(JSON.stringify(BROUILLON)); try { localStorage.setItem("accesCopie", JSON.stringify(DATA)); } catch(e){}
-        box().classList.remove("large"); box().innerHTML = succes('Publié !', '<p class="sous">Les changements seront en ligne d\'ici une minute ou deux.</p><div class="acces-btns" style="justify-content:center"><button id="gRet">Retour aux accès</button><button class="prim" id="gFin2">Fermer</button></div>');
-        document.getElementById("gRet").onclick = () => { box().classList.add("large"); dessinerGerer(); }; document.getElementById("gFin2").onclick = fermer;
+      try { const D2 = clone(BROUILLON), fichiers = {}, rch = document.getElementById("gRech") && document.getElementById("gRech").checked ? aRech : [];
+        for (const f of rch){ bt.textContent = "Nouvelle clé : « " + titreDe(f) + " »…"; Object.assign(fichiers, await rechiffrer(f, D2)); }
+        if (JSON.stringify(D2) !== JSON.stringify(DATA)) fichiers["comptes.json"] = JSON.stringify(D2, null, 1);
+        if (JSON.stringify(REGL) !== JSON.stringify(REGLAGES)) fichiers["reglages.json"] = JSON.stringify(REGL, null, 1);
+        if (!Object.keys(fichiers).length) return dessinerGerer({ ok:"Rien à publier : tout est déjà en ligne." });
+        bt.textContent = "Envoi…";
+        await commitGitHub(jt, fichiers, "Administration : " + [fichiers["comptes.json"] && "accès", fichiers["reglages.json"] && "réglages des livres", rch.length && rch.length + " livre(s) rechiffré(s)"].filter(Boolean).join(", "));
+        BROUILLON = D2; DATA = clone(D2); rch.forEach(f => delete CLES[f]); FORCER_RECH.clear(); if (fichiers["reglages.json"]){ appliquerReglages(clone(REGL)); }
+        try { localStorage.setItem("accesCopie", JSON.stringify(DATA)); } catch(e){}
+        box().classList.remove("large", "gestion"); box().innerHTML = succes('Publié !', '<p class="sous">Les changements seront en ligne d\'ici une minute ou deux.</p><div class="acces-btns" style="justify-content:center"><button id="gRet">Retour aux accès</button><button class="prim" id="gFin2">Fermer</button></div>');
+        document.getElementById("gRet").onclick = () => { box().classList.add("large", "gestion"); dessinerGerer(); }; document.getElementById("gFin2").onclick = fermer;
         try { render(); } catch(e){} compterDemandes().catch(() => {}); }
       catch(e){ dessinerGerer({ err:"Publication impossible : " + e.message + (/401|403|Bad credentials|refusée/i.test(e.message) ? " — ta clé GitHub est peut-être expirée : touche « Changer » et colles-en une nouvelle." : "") }); } };
   }
+  let STATS = null, HIST = null;
+  function voletCharge(){ if (ONGLET === "stats") chargerStats(); if (ONGLET === "hist") chargerHist(); }
+  async function chargerStats(){ if (STATS) return dessinerStats();
+    try { STATS = await COFFRE.statsLire(); } catch(e){ const z = document.getElementById("gStats"); if (z) z.innerHTML = '<div class="acces-vide">' + ICO.stats + '<p>Les statistiques commencent dès que la table <b>stats</b> existe dans Supabase (commande SQL envoyée par Claude). Elles se remplissent ensuite toutes seules.</p></div>'; return; }
+    dessinerStats(); }
+  function dessinerStats(){ const z = document.getElementById("gStats"); if (!z || !STATS) return;
+    const mois = new Date().toLocaleDateString("en-CA").slice(0, 7), somme = {};
+    STATS.filter(r => FILTRE.per === "12" || r.mois === mois).forEach(r => somme[r.cle] = (somme[r.cle] || 0) + r.n);
+    const nomQuiz = id => id.startsWith("livre-") ? titreDe(id.slice(6)) : id === "perso" ? "Quiz faits par les enseignants" : id === "exemple-incendie" ? "Quiz d'exemple (protection incendie)" : id;
+    const OUT = { tableau:"Tableau blanc", plans:"Plans techniques", activites:"Activités", labo:"Labo interactif", accueil:"Accueil de classe", telecommande:"Télécommande des livres" };
+    const bloc = (titre, pref, nom, coul) => { const L = Object.keys(somme).filter(k => k.startsWith(pref)).map(k => [nom(k.slice(pref.length)), somme[k]]).sort((a, b) => b[1] - a[1]).slice(0, 10);
+      const max = Math.max(1, ...L.map(x => x[1]));
+      return '<div class="acces-graph"><h3>' + titre + '</h3>' + (L.length ? L.map(([n, v]) => '<div class="br"><span class="n" title="' + esc(n) + '">' + esc(n) + '</span><span class="b"><i style="width:' + Math.max(3, v / max * 100) + '%;background:' + coul + '"></i></span><b>' + v + '</b></div>').join("") : '<p class="sous" style="margin:0">Rien encore pour cette période.</p>') + '</div>'; };
+    const tot = Object.values(somme).reduce((a, b) => a + b, 0);
+    z.innerHTML = '<div class="acces-total"><b>' + tot + '</b> ouvertures ' + (FILTRE.per === "12" ? "dans les 12 derniers mois" : "ce mois-ci") + '</div>'
+      + bloc("Livres les plus ouverts", "livre:", titreDe, "var(--accent)") + bloc("Quiz les plus joués", "quiz:", nomQuiz, "#8B6CE0") + bloc("Outils", "outil:", k => OUT[k] || k, "#14A3A3") + bloc("Simulateurs", "simu:", k => k === "defi" ? "Défi panneau" : "Panneau d'alarme (libre)", "#E0892B"); }
+  async function chargerHist(){ const z = document.getElementById("gHist"); if (!z) return; if (HIST) return dessinerHist();
+    try { let jeton = ""; try { jeton = localStorage.getItem("ghJeton") || ""; } catch(e){}
+      const r = await fetch("https://api.github.com/repos/" + DEPOT + "/commits?path=comptes.json&per_page=15", { headers:jeton ? { Authorization:"Bearer " + jeton } : {}, cache:"no-store" });
+      if (!r.ok) throw new Error("GitHub " + r.status); const L = await r.json();
+      const vers = await Promise.all(L.map(c => fetch("https://raw.githubusercontent.com/" + DEPOT + "/" + c.sha + "/comptes.json").then(x => x.ok ? x.json() : null).catch(() => null)));
+      HIST = L.map((c, i) => ({ date:c.commit.author.date, d:vers[i], avant:vers[i + 1] })).filter(h => h.d); dessinerHist(); }
+    catch(e){ z.innerHTML = '<p class="sous">Historique indisponible pour l\'instant (' + esc(e.message) + ').</p>'; } }
+  function changements(a, b){ const out = [], nom = id => (b.comptes[id] || (a && a.comptes[id]) || {}).nom || id, court = f => titreDe(f).replace(/\s*[:(].*$/, "");
+    if (!a) return [["neutre", "Première version"]];
+    for (const id in b.comptes) if (!a.comptes[id]) out.push(["plus", "Nouveau compte : " + nom(id)]); else if (a.comptes[id].pub.x !== b.comptes[id].pub.x || a.comptes[id].pub.n !== b.comptes[id].pub.n) out.push(["neutre", "Nouveau mot de passe : " + nom(id)]);
+    for (const id in a.comptes) if (!b.comptes[id]) out.push(["moins", "Compte retiré : " + nom(id)]);
+    const gain = {}, perte = {};
+    for (const f of new Set([...Object.keys(a.livres), ...Object.keys(b.livres)])){ const ca = (a.livres[f] || {}).cles || {}, cb = (b.livres[f] || {}).cles || {};
+      for (const id in cb) if (!ca[id] && a.comptes[id]) (gain[id] = gain[id] || []).push(court(f));
+      for (const id in ca) if (!cb[id] && b.comptes[id]) (perte[id] = perte[id] || []).push(court(f)); }
+    for (const id in gain) out.push(["plus", nom(id) + " : + " + gain[id].join(", ")]);
+    for (const id in perte) out.push(["moins", nom(id) + " : − " + perte[id].join(", ")]);
+    return out.length ? out : [["neutre", "Nouvelles clés de livres (mise à jour d'un livre)"]]; }
+  function dessinerHist(){ const z = document.getElementById("gHist"); if (!z) return;
+    z.innerHTML = '<div class="acces-hist">' + HIST.map((h, i) => '<div class="h"><div class="d"><b>' + new Date(h.date).toLocaleDateString("fr-CA", { day:"numeric", month:"short" }) + '</b><span>' + new Date(h.date).toLocaleTimeString("fr-CA", { hour:"2-digit", minute:"2-digit" }) + '</span></div>'
+      + '<div class="c">' + changements(h.avant, h.d).map(([s, t]) => '<span class="' + s + '">' + esc(t) + '</span>').join("") + '</div>'
+      + (i ? '<button class="abtn" data-hv="' + i + '">Revenir</button>' : '<span class="act">Version en ligne</span>') + '</div>').join("") + '</div>';
+    z.querySelectorAll("[data-hv]").forEach(b => b.onclick = async () => { const h = HIST[+b.dataset.hv];
+      if (!confirm("Remettre les comptes et les accès du " + new Date(h.date).toLocaleString("fr-CA") + " ? Rien ne part tant que tu ne touches pas « Publier ».")) return;
+      try { await restaurer(h.d); ONGLET = "profs"; dessinerGerer({ ok:"Accès du " + new Date(h.date).toLocaleDateString("fr-CA") + " remis. Vérifie, puis touche « Publier »." }); } catch(e){ dessinerGerer({ err:e.message }); } }); }
+  /* remet les comptes et les accès d'une ancienne version, avec les clés ACTUELLES des livres (une vieille enveloppe ne marcherait plus après un rechiffrement) */
+  async function restaurer(V){ const D = BROUILLON;
+    for (const id in V.comptes) if (!D.comptes[id]) D.comptes[id] = clone(V.comptes[id]); else D.comptes[id].prog = clone(V.comptes[id].prog || []);
+    for (const id of Object.keys(D.comptes)) if (!V.comptes[id] && !D.comptes[id].admin){ delete D.comptes[id]; for (const f in D.livres) delete D.livres[f].cles[id]; }
+    for (const f in D.livres) for (const id in D.comptes){ if (D.comptes[id].admin) continue; const veut = !!(V.livres[f] && V.livres[f].cles[id]), a = !!D.livres[f].cles[id];
+      if (veut && !a) D.livres[f].cles[id] = await envelopper(f, D.comptes[id].pub); if (!veut && a) delete D.livres[f].cles[id]; } }
+  /* lien d'invitation : #inviter=egi,plomberie → demande d'accès avec ces programmes déjà cochés */
+  async function invitationDepuisLien(){ const m = location.hash.match(/^#inviter=(.*)$/); if (!m) return; await pret; history.replaceState(null, "", location.pathname + location.search);
+    if (SESSION) return; const v = decodeURIComponent(m[1]).split(","); dlgDemande(false); ov().hidden = false;
+    document.querySelectorAll(".dProg").forEach(c => { const k = /plomberie/i.test(c.value) ? "plomberie" : /entretien/i.test(c.value) ? "egi" : c.value.toLowerCase(); c.checked = v.includes("tous") || v.includes(k); }); }
   async function remplacerCompte(d){          /* nouveau compte, ou nouveau mot de passe d'un compte existant (ses livres sont gardés) */
     const anc = BROUILLON.comptes[d.id], avait = anc ? Object.keys(BROUILLON.livres).filter(f => BROUILLON.livres[f].cles[d.id]) : [];
     BROUILLON.comptes[d.id] = { nom:anc ? anc.nom : d.nom, pub:d.pub, priv:d.priv, admin:anc ? !!anc.admin : false, prog:anc ? (anc.prog || []) : (d.prog || []) };
@@ -9528,6 +9731,32 @@ window.ACCES = (function(){
     for (const f in BROUILLON.livres){ const l = LIVRES.find(x => x.fichier === f); if (!l) continue;
       if (ajouter.includes(l.categorie) && !BROUILLON.livres[f].cles[id]) BROUILLON.livres[f].cles[id] = await envelopper(f, BROUILLON.comptes[id].pub);
       if (retirer.includes(l.categorie)) delete BROUILLON.livres[f].cles[id]; } }
+  const DEPOT = "cfppaplc/bibliotheque";
+  async function commitGitHub(jeton, fichiers, message, essai){   /* plusieurs fichiers en un seul commit (API Git Data) : comptes.json, reglages.json, livres rechiffrés */
+    const api = "https://api.github.com/repos/" + DEPOT + "/git/", h = { Authorization:"Bearer " + jeton, Accept:"application/vnd.github+json", "Content-Type":"application/json" };
+    const j = async (u, o) => { const r = await fetch(api + u, Object.assign({ headers:h, cache:"no-store" }, o)); if (r.status === 401) throw new Error("clé GitHub refusée"); if (!r.ok) throw new Error("GitHub a répondu " + r.status); return r.json(); };
+    const ref = await j("ref/heads/main"), base = await j("commits/" + ref.object.sha), tree = [];
+    for (const chemin in fichiers){ const v = fichiers[chemin], bl = await j("blobs", { method:"POST", body:JSON.stringify({ content:b64(typeof v === "string" ? enc.encode(v) : v), encoding:"base64" }) });
+      tree.push({ path:chemin, mode:"100644", type:"blob", sha:bl.sha }); }
+    const tr = await j("trees", { method:"POST", body:JSON.stringify({ base_tree:base.tree.sha, tree }) });
+    const c = await j("commits", { method:"POST", body:JSON.stringify({ message, tree:tr.sha, parents:[ref.object.sha] }) });
+    try { await j("refs/heads/main", { method:"PATCH", body:JSON.stringify({ sha:c.sha }) }); }
+    catch(e){ if (essai) throw e; return commitGitHub(jeton, fichiers, message, true); }   /* quelqu'un a publié entre-temps : on recommence sur la nouvelle version */
+  }
+  /* Couper vraiment un accès : nouvelle clé pour le livre (et sa recherche), donnée seulement à ceux qui l'ont encore */
+  async function rechiffrer(f, D){
+    const env = DATA.livres[f] && DATA.livres[f].cles[SESSION.id]; if (!env) throw new Error("tu n'as pas la clé de « " + titreDe(f) + " »");
+    const vieille = await sub.importKey("raw", new Uint8Array(await ouvrirEnveloppe(env)), "AES-GCM", false, ["decrypt"]);
+    const brut = crypto.getRandomValues(new Uint8Array(32)), neuve = await sub.importKey("raw", brut, "AES-GCM", false, ["encrypt"]), out = {};
+    for (const [dos, oblig] of [["livres/", true], ["recherche/", false]]){
+      const r = await fetch(dos + f + ".chiffre?frais=" + Date.now(), { cache:"no-store" }); if (!r.ok){ if (oblig) throw new Error("livre introuvable : " + f); continue; }
+      const u = new Uint8Array(await r.arrayBuffer()), clair = new Uint8Array(await sub.decrypt({ name:"AES-GCM", iv:u.subarray(0, 12) }, vieille, u.subarray(12)));
+      const iv = crypto.getRandomValues(new Uint8Array(12)), c = new Uint8Array(await sub.encrypt({ name:"AES-GCM", iv }, neuve, clair)), o = new Uint8Array(12 + c.length); o.set(iv); o.set(c, 12);
+      out[dos + f + ".chiffre"] = o; }
+    const cles = {}; for (const id in D.livres[f].cles) if (D.comptes[id]) cles[id] = await envelopperPour(brut, D.comptes[id].pub);
+    if (D.comptes[SESSION.id]) cles[SESSION.id] = await envelopperPour(brut, D.comptes[SESSION.id].pub);
+    D.livres[f].cles = cles; return out;
+  }
   async function publierGitHub(jeton, donnees){
     const depot = "cfppaplc/bibliotheque", url = "https://api.github.com/repos/" + depot + "/contents/comptes.json", h = { Authorization:"Bearer " + jeton, Accept:"application/vnd.github+json" };
     const a = await fetch(url, { headers:h, cache:"no-store" }); if (a.status === 401) throw new Error("clé GitHub refusée"); const sha = a.ok ? (await a.json()).sha : undefined;
@@ -9544,7 +9773,7 @@ window.ACCES = (function(){
     const go = () => { if (!SESSION || !SESSION.admin){ aviser("Ce lien est pour Jeremy (compte administrateur)."); return; } dlgGerer(); const t = document.getElementById("gDem"); if (t){ t.value = code; document.getElementById("gAjout").click(); } };
     if (SESSION) go(); else dlgConnexion(go);
   }
-  setTimeout(() => { const b = document.getElementById("compteBtn"); if (b) b.onclick = menu; charger(); accepterDepuisLien(); }, 0);
+  setTimeout(() => { const b = document.getElementById("compteBtn"); if (b) b.onclick = menu; charger(); accepterDepuisLien(); invitationDepuisLien(); }, 0);
   return { pret, get estPret(){ return estPret; }, protege, permis, verrouille, ouvrir, recherche, connexion, deconnexion, demande, lireDemande, dlgConnexion, menu, get session(){ return SESSION; }, get eleve(){ return !!(SESSION && SESSION.eleve); }, get data(){ return DATA; }, charger };
 })();
 </script>
@@ -9604,7 +9833,7 @@ window.ACCES = (function(){
     B.querySelector("#pFin").onclick = () => { document.getElementById("accesOv").hidden = true; };
     B.querySelector("#pRaz").onclick = () => { try { localStorage.removeItem(cle()); } catch(e){} dejaProg = ""; window.appliquerPrefs(); dessiner(); };
   }
-  window.dlgPrefs = () => { const ov = document.getElementById("accesOv"), B = document.getElementById("accesBox"); B.classList.remove("large"); ov.hidden = false; contenu(B); };
+  window.dlgPrefs = () => { const ov = document.getElementById("accesOv"), B = document.getElementById("accesBox"); B.classList.remove("large", "gestion"); ov.hidden = false; contenu(B); };
   if (window.ACCES && ACCES.pret) ACCES.pret.then(() => window.appliquerPrefs()).catch(() => {});
   /* filet de sécurité : si un de ces boutons est touché sans être connecté, on ouvre la connexion, puis l'outil */
   document.addEventListener("click", e => { const b = e.target.closest && e.target.closest('#planBtn, #actBtn, #simBtn, #accueilBtn, #wbBtn'); if (!b || (window.ACCES && ACCES.session)) return;
@@ -9700,7 +9929,9 @@ body.clair:not(:has(.reader.open)) #fsBtn{background:rgba(255,255,255,.55);color
   const B = { cles:["favs", "pos", "marks", "rangsReduits", "filtreProg", "nouvVu", "prefs:{id}", "penPerso", "penLargeur", "gommeTaille", "objCats"],
     vides:{ favs:"[]", pos:"{}", marks:"{}" }, apres:recharger };
   const T = { cles:["tableauxSauves", "mesSchemas"], apres:recharger };
-  const go = () => { COFFRE.demarrer("biblio", B); COFFRE.demarrer("tableaux", T); };
+  const go = () => { COFFRE.demarrer("biblio", B).then(() => {   /* une fois par jour, un signe de vie (« vu il y a … » dans le panneau d'administration) */
+      try { if (Date.now() - (+localStorage.getItem("coffre:biblio:vu") || 0) > 20 * 3600e3){ localStorage.setItem("coffre:biblio:vu", String(Date.now())); COFFRE.pousser("biblio"); } } catch(e){} });
+    COFFRE.demarrer("tableaux", T); };
   ACCES.pret.then(go).catch(() => {});
   let etaitCo = null;
   new MutationObserver(() => { const co = document.body.classList.contains("connecte"); if (etaitCo === null){ etaitCo = co; return; } if (co === etaitCo) return; etaitCo = co;
@@ -9708,5 +9939,11 @@ body.clair:not(:has(.reader.open)) #fsBtn{background:rgba(255,255,255,.55);color
     if (co){ apresConnexion = true; go(); } else COFFRE.quitter().then(() => recharger("depart")); }).observe(document.body, { attributes:true, attributeFilter:["class"] });
   ACCES.pret.then(() => { etaitCo = document.body.classList.contains("connecte"); });
 })();
+</script>
+<script>
+/* Statistiques anonymes des outils (7 nov.) : un compteur par ouverture, jamais par qui */
+document.addEventListener("click", e => { const b = e.target.closest && e.target.closest("#planBtn,#accueilBtn,#actBtn,#simBtn,#tbTele,[data-plus=plans],[data-plus=accueil],[data-plus=sim]"); if (!b || !window.COFFRE || !window.ACCES || !ACCES.session || ACCES.eleve) return;
+  const k = /plan/i.test(b.id + (b.dataset.plus || "")) ? "plans" : /accueil/i.test(b.id + (b.dataset.plus || "")) ? "accueil" : /act/i.test(b.id) ? "activites" : /sim/i.test(b.id + (b.dataset.plus || "")) ? "labo" : "telecommande";
+  COFFRE.stat("outil:" + k); }, true);
 </script>
 </body></html>

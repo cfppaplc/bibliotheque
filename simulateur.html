@@ -5,6 +5,7 @@
 <meta charset="utf-8">
 <link rel="icon" href="img/metier-plus-icone.svg" type="image/svg+xml">
 <script src="garde.js"></script>
+<script src="coffre.js"></script>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Simulateur de panneau d'alarme</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -969,5 +970,9 @@ function panneau(code){
 </script>
 <style>.droits{display:none}body.bord .droits,#role:not(.cache)~.droits{display:block}</style>
 <div class="droits" style="text-align:center;font-size:12px;opacity:.6;padding:18px 12px 24px">© 2026 Jérémy Raymond · Tous droits réservés</div>
+<script>
+/* statistiques anonymes : une ouverture de la télécommande ou de l'animation au tableau */
+if (window.COFFRE && /[?&](tele|animer)=/.test(location.search) && !/inclus=1/.test(location.search)) COFFRE.stat("simu:" + (/[?&]defi=1/.test(location.search) ? "defi" : "libre"));
+</script>
 </body>
 </html>

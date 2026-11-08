@@ -160,5 +160,13 @@ window.COFFRE = (function(){
     SESS = null;
   }
   function oublier(){ SESS = null; }
-  return { demarrer, quitter, oublier, pousser, etat:() => ETAT, session };
+  /* dernière visite d'un compte (pour le panneau d'administration) : date de la dernière mise à jour de ses rangées */
+  async function vu(compte){ let m = 0;
+    for (const so of ["biblio", "quiz"]){ const r = await rpc("coffre_lire", { p_id:await hex("metier+|" + compte + "|" + so + "|0") }); if (r && r[0] && r[0].maj) m = Math.max(m, Date.parse(r[0].maj)); }
+    return m; }
+  /* statistiques anonymes : un compteur par livre / quiz / outil et par mois (table « stats », outils/coffre.sql) */
+  function stat(cle){ try { cle = String(cle).toLowerCase().replace(/[^a-z0-9:._-]/g, "-").slice(0, 90);
+      fetch(API + "stats_plus", { method:"POST", headers:{ apikey:CLE_API, "Content-Type":"application/json" }, body:JSON.stringify({ p_cle:cle }), keepalive:true }).catch(() => {}); } catch(e){} }
+  const statsLire = () => rpc("stats_lire", {});
+  return { demarrer, quitter, oublier, pousser, etat:() => ETAT, session, vu, stat, statsLire };
 })();
