@@ -1,0 +1,25 @@
+name: verif-claude
+on: push
+permissions: { contents: write }
+jobs:
+  v:
+    if: contains(github.event.head_commit.message, 'verif-claude')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          U=https://kjlotlhqrgekzohshmbn.supabase.co/rest/v1/rpc
+          K=sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY
+          r(){ curl -s -X POST "$U/$1" -H "apikey: $K" -H "Content-Type: application/json" -d "$2"; echo; }
+          ID=verification-claude-effacer-$RANDOM$RANDOM
+          {
+          echo "1 effacer inconnu: $(r coffre_effacer '{"p_id":"x-inexistant-0000000000000","p_jeton":"jjjjjjjjjjjjjjjjjjjjjjjj"}')"
+          echo "2 ecrire: $(r coffre_ecrire "{\"p_id\":\"$ID\",\"p_jeton\":\"jeton-de-verification-123456\",\"p_env\":\"e\",\"p_data\":\"d\"}")"
+          echo "3 lire: $(r coffre_lire "{\"p_id\":\"$ID\"}")"
+          echo "4 effacer mauvais jeton: $(r coffre_effacer "{\"p_id\":\"$ID\",\"p_jeton\":\"mauvais-jeton-0000000000000\"}")"
+          echo "5 effacer bon jeton: $(r coffre_effacer "{\"p_id\":\"$ID\",\"p_jeton\":\"jeton-de-verification-123456\"}")"
+          echo "6 lire apres: $(r coffre_lire "{\"p_id\":\"$ID\"}")"
+          } > verif-claude.txt
+          cat verif-claude.txt
+          git config user.name verif; git config user.email verif@local
+          git add verif-claude.txt; git commit -m "resultat verif"; git push
