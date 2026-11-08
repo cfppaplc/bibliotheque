@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+<!-- © 2026 Jérémy Raymond. Tous droits réservés. Copie, modification ou revente interdites sans autorisation écrite (voir LICENCE.md). -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Simulateur de panneau d'alarme</title>
@@ -962,5 +963,7 @@ function panneau(code){
   $("equipe").addEventListener("keydown", e => { if (e.key === "Enter") $("go").click(); });
 }
 </script>
+<style>.droits{display:none}body.bord .droits,#role:not(.cache)~.droits{display:block}</style>
+<div class="droits" style="text-align:center;font-size:12px;opacity:.6;padding:18px 12px 24px">© 2026 Jérémy Raymond · Tous droits réservés</div>
 </body>
 </html>

@@ -3,7 +3,8 @@
      Bibliothèque : accueil, lecteur de livres (RD, buildDriver, HOSTCSS), tableau blanc et schémas électriques, plans, accueil de classe intégré.
      Pour un assistant (Claude) qui reprend ce code : lire d'abord CLAUDE.md à la racine du dépôt (architecture, règles, outils).
      À chaque changement : mettre à jour nouveautes.json (mini-formation + captures) et publier avec outils/publier.sh. -->
-<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="icon" type="image/png" sizes="32x32" href="img/icone-32.png"><link rel="icon" type="image/png" sizes="192x192" href="img/icone-192.png"><link rel="apple-touch-icon" href="img/icone-180.png"><meta name="theme-color" content="#141414">
+<html lang="fr"><head>
+<!-- © 2026 Jérémy Raymond. Tous droits réservés. Copie, modification ou revente interdites sans autorisation écrite (voir LICENCE.md). --><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="icon" type="image/png" sizes="32x32" href="img/icone-32.png"><link rel="icon" type="image/png" sizes="192x192" href="img/icone-192.png"><link rel="apple-touch-icon" href="img/icone-180.png"><meta name="theme-color" content="#141414">
 <meta name="description" content="Livres interactifs, plans et schémas pour la classe et l'atelier — Pavillon de l'Avenir, centre de formation professionnelle.">
 <meta property="og:type" content="website"><meta property="og:locale" content="fr_CA"><meta property="og:site_name" content="Pavillon de l'Avenir">
 <meta property="og:title" content="Bibliothèque — Tes livres de cours, prêts à projeter"><meta property="og:description" content="Livres interactifs, plans et schémas pour la classe et l'atelier. Conçu par Jeremy, enseignant au Pavillon de l'Avenir.">
@@ -1088,7 +1089,7 @@ document.addEventListener("keydown", e => { if (e.key !== "/" || e.ctrlKey || e.
   <div class="panel" id="panel"></div>
 </div>
 
-<footer><img class="foot-logo" src="img/pavillon-avenir.png" alt="Pavillon de l'Avenir"><div><b>Conçu par Jeremy, enseignant</b> · Pavillon de l'Avenir, centre de formation professionnelle</div><div class="foot-s">Réservé aux enseignants du Pavillon de l'Avenir · Livres interactifs pour la classe et l'atelier</div><button class="adm-btn" id="adminBtn" aria-label="Administration" title="Administration">⚙</button></footer>
+<footer><img class="foot-logo" src="img/pavillon-avenir.png" alt="Pavillon de l'Avenir"><div><b>Conçu par Jeremy, enseignant</b> · Pavillon de l'Avenir, centre de formation professionnelle</div><div class="foot-s">Réservé aux enseignants du Pavillon de l'Avenir · Livres interactifs pour la classe et l'atelier</div><div class="foot-s">© 2026 Jérémy Raymond · Tous droits réservés</div><button class="adm-btn" id="adminBtn" aria-label="Administration" title="Administration">⚙</button></footer>
 
 <script>
 window.LIVRES_DATA = {};
