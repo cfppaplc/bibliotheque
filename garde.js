@@ -40,8 +40,24 @@
   const perso = /^#[0-9a-f]{6}$/i.test(c) && !/^#(eb6a22|f2762e|e50914)$/i.test(c), cache = {};
   const svg = src => cache[src] || (cache[src] = fetch(src).then(r => r.text()).then(t => "data:image/svg+xml;charset=utf-8," + encodeURIComponent(t.replace(/#F2762E/gi, c))).catch(() => null));
   const poser = img => { let s = img.dataset.m0 || img.getAttribute("src") || ""; if (!/metier-plus/.test(s)) return; img.dataset.m0 = s;
-    if (img.dataset.blancAuto === "1" || img.closest(".tbar, .bordHaut")){ img.dataset.blancAuto = "1"; if (document.documentElement.classList.contains("sombre")) s = s.replace("metier-plus.svg", "metier-plus-blanc.svg"); }
+    if (img.dataset.blancAuto === "1" || img.closest(".tbar, .bordHaut, .mp-tete")){ img.dataset.blancAuto = "1"; if (document.documentElement.classList.contains("sombre")) s = s.replace("metier-plus.svg", "metier-plus-blanc.svg"); }
     if (perso) svg(s).then(u => { if (u) img.src = u; }); else if (img.getAttribute("src") !== s) img.src = s; };
   const tout = () => document.querySelectorAll('img[src*="metier-plus"], img[data-m0]').forEach(poser);
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", tout); else tout();
 })();
+
+/* En-tête commun Métier+ (8 nov., « le logo doit être placé pareil partout ») : même place, même taille que l'en-tête de la bibliothèque. */
+(function(){ const st = document.createElement("style"); st.textContent = `
+html{overflow-x:clip}
+.mp-tete{display:flex!important;flex-wrap:nowrap!important;align-items:center;gap:14px;box-sizing:border-box;width:100vw;max-width:none;margin:calc(-1 * var(--mp-haut, 0px)) 0 18px calc(50% - 50vw)!important;padding:0 4vw!important;height:63px;border-bottom:1px solid rgba(128,128,128,.22);background:transparent}
+.mp-tete>*{order:0!important;flex-basis:auto!important}
+.mp-tete>img{height:27px!important;width:auto;flex:none;margin:0!important}
+.mp-tete>img.lg-c{display:none}html.clair .mp-tete>img.lg-c{display:block}html.clair .mp-tete>img.lg-b{display:none}
+.mp-tete .mp-nom{margin:0!important;font-size:15px!important;font-weight:600;color:#8b8f97!important;border-left:1px solid rgba(128,128,128,.35);padding-left:12px;white-space:nowrap;flex:none!important;line-height:1.2}
+.mp-tete .mp-sous{font-size:13.5px;color:#8b8f97;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.mp-tete .mp-esp{flex:1 1 0!important;min-width:0}
+.mp-tete a,.mp-tete button{flex:none;white-space:nowrap;margin:0!important}
+.mp-tete a{display:inline-flex!important;align-items:center;min-height:40px;padding:8px 14px!important;border:1px solid rgba(128,128,128,.35)!important;border-radius:10px;font-size:14px!important;font-weight:600!important;color:inherit!important;text-decoration:none;background:transparent!important}
+.mp-tete a.cache{display:none!important}
+@media (max-width:640px){.mp-tete{padding:0 14px!important;height:70px;gap:10px}.mp-tete>img{height:22px!important}.mp-tete .mp-sous,.mp-tete #lienEcran{display:none!important}.mp-tete .mp-nom{font-size:14px!important;padding-left:10px;overflow:hidden;text-overflow:ellipsis;flex:0 1 auto!important;min-width:0}.mp-tete a{min-height:38px;padding:6px 11px!important;font-size:13px!important}}
+`; (document.head || document.documentElement).appendChild(st); })();

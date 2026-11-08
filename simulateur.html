@@ -13,7 +13,7 @@
 <script src="garde.js"></script>
 <script src="coffre.js"></script>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Simulateur de panneau d'alarme</title>
+<title>Métier+ — Simulateurs</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.50.0/dist/umd/supabase.min.js"></script>
 <style>
@@ -249,13 +249,14 @@ html.sombre body:has(#role:not(.cache)) .cq{border-color:#2f2f35}
 html.sombre body:has(#role:not(.cache)) :is(.cq .tg i,#modes .btn2,#modes #mX){background:#2A2A30;color:#F2EFEA}
 html.sombre body:has(#role:not(.cache)) #role input{background:#111114;color:#F2EFEA;border-color:#3a3a40}
 html.sombre #role a[style*="--bleu"],html.sombre #rEcr{color:#7db6ff!important}
+#role>.mp-tete{--mp-haut:18px}#tele>.mp-tete{--mp-haut:14px}
 </style>
 </head>
 <body>
 
 <!-- ======================= CHOIX DU RÔLE ======================= -->
 <div id="role" class="cache">
-<div class="bordHaut"><img src="img/metier-plus.svg" alt="Métier+"><h1>Simulateurs <span>Protection incendie · Les Habitations du Quai</span></h1><a href="labo.html">‹ Labo interactif</a></div>
+<div class="bordHaut mp-tete"><img src="img/metier-plus.svg" alt="Métier+"><h1 class="mp-nom">Simulateurs</h1><span class="mp-sous">Protection incendie · Les Habitations du Quai</span><span class="mp-esp"></span><a href="labo.html">‹ Labo interactif</a></div>
 <div class="sous" style="margin:0 0 14px">Choisis une activité, puis le mode d'affichage. Les élèves scannent le code QR : leur iPad devient un panneau d'alarme.</div>
 <div class="cartesS">
 <div class="cq"><div class="im" style="background-image:url('img/labo/m5-panneau.jpg')"><span>Mode libre</span></div><div class="co"><b>Panneau d'alarme</b><span class="sous">Tu déclenches alarmes, supervisions et troubles; les équipes lisent l'afficheur, corrigent la cause et réarment.</span><div class="tg"><i>EGI 436-312</i><i>Module 5</i></div><button class="jouer" data-act="libre">Ouvrir</button></div></div>
@@ -270,7 +271,7 @@ html.sombre #role a[style*="--bleu"],html.sombre #rEcr{color:#7db6ff!important}
 
 <!-- ======================= TÉLÉCOMMANDE (enseignant) ======================= -->
 <div id="tele" class="cache">
-<div class="tbar"><img src="img/metier-plus.svg" alt="Métier+" style="height:30px"><h1>Simulateur de panneau · télécommande</h1>
+<div class="tbar mp-tete"><img src="img/metier-plus.svg" alt="Métier+"><h1 class="mp-nom">Simulateur de panneau · télécommande</h1><span class="mp-esp"></span>
 <button id="nouv" style="background:#5F5E5A">Nouvelle session</button></div>
 <div class="grid">
 <div>

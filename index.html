@@ -8994,6 +8994,10 @@ window.addEventListener("online", () => { try { aviser("Internet est revenu."); 
   .acces-fiche[hidden]{display:none}
   /* Plans et Activités : même présentation (8 nov., « deux interfaces différentes qui devraient être pareilles, avec le logo ») */
   .top-logo{height:20px;width:auto;margin:0 4px 0 2px;flex:none;align-self:center}
+  /* 8 nov. (« le logo doit être placé pareil partout ») : Plans et Activités = même place et même taille que l'en-tête de la bibliothèque */
+  .pl-top,.act-top{min-height:63px;box-sizing:border-box;padding-left:4vw!important;padding-right:4vw!important}
+  .pl-top .top-logo,.act-top .top-logo{order:-1;height:27px;margin:0 6px 0 0}
+  @media (max-width:640px){.pl-top,.act-top{min-height:70px;padding-left:14px!important;padding-right:14px!important}.pl-top .top-logo,.act-top .top-logo{height:22px}}
   .top-logo.lg-clr{display:none}body.clair .top-logo.lg-clr{display:inline-block}body.clair .top-logo.lg-blc{display:none}
   .act-top h2{display:none}
   .act-ov .act-hero{padding:34px clamp(20px,5vw,64px) 26px;background:linear-gradient(180deg,rgba(235,106,34,.14),rgba(0,0,0,0) 85%)}

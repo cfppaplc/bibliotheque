@@ -13,7 +13,7 @@
 <script src="garde.js"></script>
 <script src="coffre.js"></script>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Quiz maison</title>
+<title>Métier+ — Quiz maison</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.50.0/dist/umd/supabase.min.js"></script>
 <script src="quiz-livres.js"></script>
@@ -274,6 +274,7 @@ html.sombre body.bord .cq{border-color:#2f2f35}
 html.sombre body.bord :is(.qe,.regD,#modes .regRap){background:#17171b}
 html.sombre body.bord :is(.ch4 button,.qe .k0,.qe .k1,.qe .k2,.qe .k3){border-color:#3a3a40}
 html.sombre body.bord .tbar a{color:#a99ff0}
+.wrap>.mp-tete{--mp-haut:14px}
 </style>
 </head>
 <body>
@@ -297,7 +298,7 @@ html.sombre body.bord .tbar a{color:#a99ff0}
 
 <!-- ============ TÉLÉCOMMANDE ============ -->
 <div id="tele" class="cache"><div class="wrap">
-<div class="tbar"><img src="img/metier-plus.svg" alt="Métier+" style="height:30px"><h1 id="tTitre">Quiz maison · télécommande</h1><a href="?role=1" id="lienEcran" class="cache">Écran de classe sur un 2e appareil</a><a href="labo.html">‹ Labo interactif</a></div>
+<div class="tbar mp-tete"><img src="img/metier-plus.svg" alt="Métier+"><h1 class="mp-nom" id="tTitre">Quiz maison · télécommande</h1><span class="mp-esp"></span><a href="?role=1" id="lienEcran" class="cache">Écran de classe sur un 2e appareil</a><a href="labo.html">‹ Labo interactif</a></div>
 <div class="grid">
 <div>
 <div class="carte"><h2>Les élèves scannent</h2><div id="qr"></div><div class="code" id="code"></div><div class="etat" id="etatT">Connexion…</div><button id="bEcran" style="width:100%;margin-top:10px">Ouvrir l'écran de classe</button>
@@ -478,7 +479,7 @@ else {
 /* ================================ TÉLÉCOMMANDE ================================ */
 function telecommande(bord){
   $("tele").classList.remove("cache");
-  if (bord) { window.SANS_RELAIS = true; document.body.classList.add("bord"); $("tTitre").textContent = "Quiz maison · tableau de bord"; $("lienEcran").classList.remove("cache"); }
+  if (bord) { window.SANS_RELAIS = true; document.body.classList.add("bord"); $("tTitre").textContent = "Quiz maison"; $("lienEcran").classList.remove("cache"); }
   let code = "";
   const s = stock.get("quizSession", null); if (s && Date.now() - s.t < 6 * 3600e3) code = s.code;
   if (!code) code = String(Math.floor(100000 + Math.random() * 900000));
