@@ -864,6 +864,8 @@
 html.leger *,html.leger *::before,html.leger *::after{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;will-change:auto!important;transition-duration:.01s!important;transition-delay:0s!important}
 html.leger *:not(.acces-succes *):not(.acces-marque img):not(.cadenas.secoue):not(#compteBtn .cloche svg):not(.sch-gard .ok):not(.charge-r):not(.charge-b i),html.leger *::before,html.leger *::after{animation:none!important}
 html.leger{scroll-behavior:auto}
+/* Cellulaire (7 nov., « améliore la version cellulaire ») : texte d'accueil complet (plus de « …. » ni de mention cachée) */
+@media (max-width:640px){ .hero p{display:block;-webkit-line-clamp:unset;overflow:visible;font-size:.95rem;margin-bottom:14px} .hero .hero-tag{display:inline-block;margin-top:8px} }
 </style><script>
 /* Mode léger (tableau interactif lent) : localStorage.modeLeger = "oui" | "non"; sans choix = automatique (le site mesure sa fluidité).
    Classe html.leger : plus de flous, transitions ni animations d'ambiance. Même réglage pour la bibliothèque et l'accueil de classe. */
