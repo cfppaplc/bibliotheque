@@ -7,6 +7,10 @@
 <script>/* 1re visite sur cet appareil (8 nov., demande de Jeremy) : on montre d'abord la page de présentation. Jamais pour un enseignant déjà venu, ni pour un lien direct (livre, outil, invitation, code QR). */
 (function(){ try { var L = localStorage; if (L.getItem("presentationVue") || L.getItem("etaitConnecte") || L.getItem("bienvenueVu") || location.search || location.hash || window.top !== window) return;
   L.setItem("presentationVue", "1"); location.replace("presentation.html"); } catch(e){} })();</script>
+<script>/* 8 nov. : la page reste cachée tant que tout n'est pas lu (avant, on voyait une demi-seconde une page à moitié construite : en-tête et cartes sans style) */
+(function(){ var d = document.documentElement, c = false; try { var v = localStorage.getItem("accueilClair"); c = v === "1" || (v === null && matchMedia("(prefers-color-scheme: light)").matches); } catch(e){}
+  d.style.background = c ? "#f5f3ef" : "#141414"; setTimeout(function(){ d.classList.add("pret"); }, 4000); })();</script>
+<style>html:not(.pret)>body{visibility:hidden}</style>
 <!-- © 2026 Jérémy Raymond. Tous droits réservés. Copie, modification ou revente interdites sans autorisation écrite (voir LICENCE.md). --><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="icon" href="img/metier-plus-icone.svg" type="image/svg+xml"><link rel="icon" type="image/png" sizes="32x32" href="img/icone-32.png"><link rel="icon" type="image/png" sizes="192x192" href="img/icone-192.png"><link rel="apple-touch-icon" href="img/icone-180.png"><meta name="theme-color" content="#141414">
 <meta name="description" content="Métier+ : la plateforme des enseignants en formation professionnelle. Livres animés, plans, quiz et simulateurs pour la classe et l'atelier.">
 <meta property="og:type" content="website"><meta property="og:locale" content="fr_CA"><meta property="og:site_name" content="Métier+">
@@ -10306,8 +10310,8 @@ document.addEventListener("click", e => { const b = e.target.closest && e.target
     tete.querySelectorAll(".mp-nav a").forEach(a => a.onclick = e => { e.preventDefault(); if (a.dataset.nav === "biblio"){ const b = document.querySelector('header nav a[data-view="all"]'); if (b) b.click(); scrollTo({ top: 0, behavior: "smooth" }); return; } aller(a.dataset.nav); }); }
   /* pied de page commun (garde-nav.js) : les liens ouvrent l'outil sans recharger la page */
   const pied = document.querySelector("body > footer");
-  if (pied && window.mpPiedHTML && !pied.dataset.pied){ const adm = document.getElementById("adminBtn"); pied.dataset.pied = "1"; pied.classList.add("mp-pied"); pied.innerHTML = mpPiedHTML(); if (adm){ adm.hidden = true; pied.append(adm); }
-    pied.addEventListener("click", e => { const a = e.target.closest("[data-pied]"); if (!a) return; const k = a.dataset.pied; if (k === "labo") return;
+  if (pied && window.mpPiedHTML && !pied.dataset.piedPose){ const adm = document.getElementById("adminBtn"); pied.dataset.piedPose = "1"; pied.classList.add("mp-pied"); pied.innerHTML = mpPiedHTML(); if (adm){ adm.hidden = true; pied.append(adm); }
+    pied.addEventListener("click", e => { const a = e.target.closest("a[data-pied]"); if (!a) return; const k = a.dataset.pied; if (k === "labo") return;
       e.preventDefault(); actionPied(k); }); }
   function actionPied(k){
     if (k === "biblio"){ scrollTo({ top:0, behavior:"smooth" }); return; }
@@ -10412,5 +10416,6 @@ body.visiteur .mp-pied{margin-top:30px}
 @media (max-width:640px){body.visiteur .vis-outils{padding:30px 18px 50px}}
 @media (max-width:760px){.vis-cartes{grid-template-columns:1fr}.vis-btns{gap:8px}.vis-co,.vis-dem{flex:1 1 auto;text-align:center}}
 </style>
+<script>document.documentElement.classList.add("pret")</script>
 <script src="mesdocs.js"></script>
 </body></html>

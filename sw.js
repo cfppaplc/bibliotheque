@@ -2,7 +2,7 @@
    - Les pages du site (bibliothèque, accueil, index de recherche) : réseau d'abord, copie gardée si Internet manque.
    - Les livres : copie gardée sur l'ordinateur, ouverte tout de suite; on vérifie en arrière-plan s'il existe une nouvelle version.
    - Les plans et les activités (PDF) : réseau d'abord (version à jour), copie gardée si Internet manque. */
-const CACHE = "biblio-v48";
+const CACHE = "biblio-v49";
 const BASE = ["./", "index.html", "accueil.html", "recherche.json", "nouveautes.json"];
 
 self.addEventListener("install", e => {
