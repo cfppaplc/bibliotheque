@@ -437,6 +437,7 @@ const FLAMME = '<svg class="flamme" viewBox="0 0 24 24" aria-hidden="true"><path
 const COULEURS = ["#534AB7", "#B3261E", "#185FA5", "#0F6E56", "#854F0B", "#3A3936"];
 const REG_DEF = {mode: "ind", points: "vitesse", classement: "oui", melange: "non", son: "oui", musique: "oui", bonus: "oui", nb: "tout", temps: "normal", penalite: "non", cache: "non", lettres: "non", double: "non", coul: "#534AB7"};
 const sombre = h => { const n = parseInt(h.slice(1), 16), f = .38; return `rgb(${Math.round((n >> 16) * f + 18)},${Math.round((n >> 8 & 255) * f + 18)},${Math.round((n & 255) * f + 24)})`; };
+function plusRapide(G){ let m = null, t = 1e12; for (const id in (G.reps || {})) { const x = G.reps[id]; if (x && x.ok && x.ms < t) { t = x.ms; m = id; } } return m; }
 const ord = r => r + (r === 1 ? "er" : "e");
 
 let canal = null, pret = false, attente = [];
@@ -592,7 +593,7 @@ function telecommande(bord){
       couv: G.quiz && G.quiz.couv && !/^data:/.test(G.quiz.couv) ? G.quiz.couv : (G.quiz && G.quiz.couv ? "img" : ""), sujet: G.quiz ? G.quiz.sujet || "" : "",
       q: Q && ["question", "rev"].includes(G.etat) ? {q: Q.q, ch: Q.ch, s: Q.s, t, u: Q.u || "", zoom: Q.zoom || null, img: !!Q.img, expl: G.etat === "rev" ? Q.expl || "" : "", bonTxt: G.etat === "rev" ? texteBon(Q) : ""} : null,
       bon: G.etat === "rev" ? Q.bon : null, cpt, nrep: Object.keys(G.reps).length, mises: G.etat === "mise" ? ids().filter(id => P[id].mise).length : 0,
-      joueurs: ids().map(id => ({n: P[id].nom, av: P[id].av, pts: P[id].pts, r: r[id], g: G.etat === "rev" && G.reps[id] ? G.reps[id].g || 0 : 0, s: P[id].serie || 0, bo: G.etat === "rev" && G.reps[id] ? G.reps[id].bonus || 0 : 0, ra: G.etat === "rev" && G.reps[id] && G.reps[id].ok && id === plusRapide() ? 1 : 0})).sort((a, b) => a.r - b.r)};
+      joueurs: ids().map(id => ({n: P[id].nom, av: P[id].av, pts: P[id].pts, r: r[id], g: G.etat === "rev" && G.reps[id] ? G.reps[id].g || 0 : 0, s: P[id].serie || 0, bo: G.etat === "rev" && G.reps[id] ? G.reps[id].bonus || 0 : 0, ra: G.etat === "rev" && G.reps[id] && G.reps[id].ok && id === plusRapide(G) ? 1 : 0})).sort((a, b) => a.r - b.r)};
   }
   function maj(){
     if (!G.quiz) { listeLob(); vue(); return; }
@@ -933,13 +934,18 @@ function telecommande(bord){
       jeu: G.jeu.map(Q => Object.assign({}, Q, {img: Q.img ? 1 : 0})), P})); } catch(e) {}
   }
   function oublierPartie(){ try { localStorage.removeItem("quizPartie"); } catch(e) {} }
+  // Quitter la page par le Labo ou la barre = fin de la partie (les iPad sont avisés)
+  window.quitterPartie = () => { if (!G.quiz) return false; oublierPartie(); clearTimeout(minut); envoyer(topic, {m: "ferme"}); return true; };
+  document.addEventListener("click", e => { const l = e.target.closest && e.target.closest("a[href]"); if (!l || /^#|quiz\.html/.test(l.getAttribute("href")) || l.target === "_blank") return;
+    if (window.quitterPartie()) { e.preventDefault(); const u = l.href; (window.top || window).setTimeout(() => { (window.top || window).location.href = u; }, 400); } }, true);
   function reprendre(){
     let S = null; try { S = JSON.parse(localStorage.getItem("quizPartie") || "null"); } catch(e) {}
     if (!S || S.code !== code || Date.now() - S.t > 3 * 3600e3) return false;
     const q = tousQuiz().find(x => x.id === S.quiz); if (!q) return false;
     G.quiz = JSON.parse(JSON.stringify(q)); G.i = S.i; G.etat = S.etat; G.t0 = S.t0; G.reps = S.reps || {}; G.dbl = S.dbl;
     G.jeu = (S.jeu || []).map(Q => { if (Q.img) { const o = G.quiz.qs.find(x => x.q === Q.q); Q.img = o && o.img || ""; } return Q; });
-    Object.keys(S.P || {}).forEach(id => { P[id] = S.P[id]; P[id].vu = Date.now(); });   /* 40 s pour donner signe de vie */
+    Object.keys(S.P || {}).forEach(id => { P[id] = S.P[id]; if (!P[id].exclu) P[id].parti = true; });   /* absents tant qu'ils ne répondent pas à « qui » : un iPad parti ne bloque plus la fin des questions */
+    envoyer(topic, {m: "qui", pour: "tous"});
     appliquerCouleur(); montrer("vJeu");
     envoyer(topic, {m: "bienvenue", titre: G.quiz.titre, coul: R().coul, mode: R().mode}); envoyerCouv(); envoyerPersos();
     const Q = G.jeu[G.i];
@@ -1003,10 +1009,16 @@ function joueur(code){
   try { const J = JSON.parse(sessionStorage.getItem("quizJoueur") || "null");
     if (J && J.code === code && Date.now() - J.t < 4 * 3600e3 && J.av >= 0) { av = J.av; nomEdite = !!J.nomEdite; nomChoisi = J.nom; ecranChoix(); entrer();
       bx(`${visage(av, "v-l")}<div class="gros monte">Te revoilà, ${esc(nom)}.</div><div>Tu es toujours dans la partie. Si l'enseignant s'est déconnecté, elle reprend dès qu'il revient.</div>`); } } catch(e) {}
+    let reT = 0; const reannoncer = () => { if (entre && Date.now() - reT > 3000) { reT = Date.now(); envoyer(topic, {m: "ici", pid, nom, av, prenom}); } };
     ecouter(topic, m => {
-      if (m.m === "persos") { pris = m.pris || []; if (!entre) ecranChoix(ecranChoix.msg); return; }
+      // La télécommande ne me connaît pas (rechargée, partie neuve) : je me réannonce tout seul
+      if (m.m === "persos") { pris = m.pris || []; if (!entre) ecranChoix(ecranChoix.msg); else if (!pris.includes(av)) reannoncer(); return; }
+      if (m.m === "bienvenue" && !m.pour) reannoncer();
       if (m.m === "refus" && m.pour === pid) { entre = false; try { sessionStorage.removeItem("quizJoueur"); } catch(e) {} av = -1; if (!nomEdite) nomChoisi = ""; ecranChoix(m.raison === "plein" ? `La partie est pleine (${m.max} joueurs au plus). Demande à l'enseignant.` : "Ce personnage vient d'être pris. Choisis-en un autre."); return; }
-      if (m.m === "qui" && m.pour === pid) { if (entre) envoyer(topic, {m: "ici", pid, nom, av, prenom}); return; }
+      if (m.m === "qui" && (m.pour === pid || m.pour === "tous")) { if (entre) envoyer(topic, {m: "ici", pid, nom, av, prenom}); return; }
+      if (m.m === "ferme" && entre) { entre = false; try { sessionStorage.removeItem("quizJoueur"); } catch(e) {} clearInterval(chrono);
+        bx(`<div class="gros monte">Partie terminée</div><div>L'enseignant a fermé le quiz. Merci d'avoir joué !</div><button id="jRe" style="margin-top:18px;font-size:18px;padding:14px 20px;background:#fff;color:#24211E">Rejoindre une nouvelle partie</button>`);
+        $("jRe").onclick = () => { av = -1; ecranChoix(); }; return; }
       if (m.m === "kick" && m.pour === pid) { entre = false; try { sessionStorage.removeItem("quizJoueur"); } catch(e) {} av = -1; ecranChoix("L'enseignant t'a retiré de la partie. Choisis un personnage pour revenir."); return; }
       if (!entre || !pour(m)) return;
       if (m.coul) teinte(m.coul);
@@ -1088,7 +1100,9 @@ function animer(boutons){
     <div id="animBar"><button id="retLabo" title="Retour au Labo interactif">‹ Labo</button>${boutons.map(([id], k) => `<button data-b="${id}" class="${k ? "" : "prim"}" disabled>…</button>`).join("")}<button id="tirB">Télécommande</button></div>`);
   const T = $("tiroir"), F = $("tirF");
   $("tirB").onclick = () => T.classList.toggle("ouvert");
-  $("retLabo").onclick = () => { location.href = "labo.html"; };
+  const quitter = u => { let q = false; try { q = F.contentWindow.quitterPartie && F.contentWindow.quitterPartie(); } catch(x) {} setTimeout(() => { location.href = u; }, q ? 400 : 0); };
+  $("retLabo").onclick = () => quitter("labo.html");
+  document.addEventListener("click", e => { const l = e.target.closest && e.target.closest("a[href]"); if (!l || /^#|quiz\.html/.test(l.getAttribute("href")) || l.target === "_blank") return; e.preventDefault(); quitter(l.href); }, true);
   $("tirX").onclick = () => T.classList.remove("ouvert");
   addEventListener("message", e => { if (e.data && e.data.labo === "code" && !animer.code) { animer.code = e.data.code; ecran(e.data.code); } });
   // les boutons de la barre reprennent l'état des vrais boutons de la télécommande
@@ -1138,7 +1152,6 @@ function ecran(code){
     for (let i = 0; i < 36; i++){ const c = document.createElement("i"); c.className = "conf"; c.style.left = (b.left + b.width * Math.random()) + "px"; c.style.top = (b.top + b.height / 2) + "px"; c.style.background = C[i % C.length];
       c.style.setProperty("--dx", (Math.random() * 2 - 1) * 22 + "vw"); c.style.setProperty("--dy", -(8 + Math.random() * 22) + "vh"); c.style.setProperty("--r", (Math.random() * 720 - 360) + "deg");
       document.body.appendChild(c); setTimeout(() => c.remove(), 1700); } }
-  function plusRapide(){ let m = null, t = 1e12; for (const id in (G.reps || {})) { const x = G.reps[id]; if (x && x.ok && x.ms < t) { t = x.ms; m = id; } } return m; }
   const COURONNE = '<svg class="cour" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8l4.5 4L12 5l4.5 7L21 8l-2 11H5z" fill="currentColor"/></svg>';
   const ECLAIR = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2L4 14h7l-1 8 9-12h-7z" fill="currentColor"/></svg>';
   const palier = s => s >= 8 ? "Légendaire" : s >= 5 ? "Inarrêtable" : s >= 3 ? "En feu" : s === 2 ? "Ça chauffe" : "";
