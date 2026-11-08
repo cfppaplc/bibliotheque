@@ -291,11 +291,26 @@
   html:has(#planOv:not([hidden])),html:has(#actOv:not([hidden])),html:has(#accueilOv:not([hidden])){overflow:hidden}
   html:has(#planOv:not([hidden])) body,html:has(#actOv:not([hidden])) body,html:has(#accueilOv:not([hidden])) body{overflow:hidden}
   .pl-top #plClose,.act-top #actBack{order:99;margin-left:auto}
+  /* nom + description des pages (comme le Labo) */
+  .mp-tit{display:flex;align-items:baseline;gap:10px;order:-1;min-width:0;flex:0 1 auto;overflow:hidden;border-left:1px solid rgba(128,128,128,.35);padding-left:12px;margin-left:2px}
+  .mp-nom2{font-size:15px;font-weight:600;color:#8b8f97;white-space:nowrap}
+  .mp-sous2{font-size:13.5px;color:#8b8f97;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+  .pl-top>*:not(.mp-tit),.act-top>*:not(.mp-tit),.reader.wbon .reader-bar>*:not(.mp-tit){flex-shrink:0}
+  .reader.wbon .rb-logo{order:-2}
+  .reader.wbon .reader-bar{background:#0c0c0d;border-bottom:1px solid #232325}
+  .reader.wbon #readerTdb,.reader.wbon #readerBack{white-space:nowrap;min-height:40px;padding:8px 14px;border:1px solid rgba(255,255,255,.22);border-radius:10px;background:transparent;font-size:14px;font-weight:600;color:#fff}
+  .reader.wbon #readerBack{font-size:0}.reader.wbon #readerBack::before{content:"‹ Bibliothèque";font-size:14px}
+  .reader-bar .mp-tit,.reader-bar .mp-nav{display:none!important}
+  .reader.wbon .reader-bar .mp-tit{display:flex!important}
+  .reader.wbon #readerTitle{display:none}
+  @media (min-width:981px){.reader.wbon .reader-bar .mp-nav{display:flex!important}}
+  @media (max-width:1250px){.mp-sous2{display:none}}
+  @media (max-width:640px){.mp-tit{display:none!important}}
   /* barre de navigation dans l'en-tête de l'accueil : enseignant connecté, écran large; remplace « Bibliothèque », « Accueil » et les boutons d'outils */
   .mp-nav-tete{display:none!important}
   @media (min-width:981px){
     body.connecte:not(.eleve):not(.classe) .mp-nav-tete{display:flex!important;margin-left:0}
-    body.connecte:not(.eleve):not(.classe) header .logo-t,body.connecte:not(.eleve):not(.classe) header>nav,body.connecte:not(.eleve):not(.classe) #hdefil,body.connecte:not(.eleve):not(.classe) #hflG,body.connecte:not(.eleve):not(.classe) #hflD{display:none!important}
+    body.connecte:not(.eleve):not(.classe) header>nav,body.connecte:not(.eleve):not(.classe) #hdefil,body.connecte:not(.eleve):not(.classe) #hflG,body.connecte:not(.eleve):not(.classe) #hflD{display:none!important}
     body.connecte:not(.eleve):not(.classe) header .search{margin-left:auto}
   }
   @media (min-width:981px) and (max-width:1300px){body.connecte:not(.eleve):not(.classe) header .search input,body.connecte:not(.eleve):not(.classe) header .search input:focus{width:150px!important}body.connecte:not(.eleve):not(.classe) .mp-nav-tete a{padding:6px 7px!important;gap:4px}body.connecte:not(.eleve):not(.classe) header .search-kbd{display:none}}
@@ -5633,7 +5648,7 @@ function ouvrirLivre(l, brut){
 function lire(l){
   try { if (window.COFFRE && window.ACCES && ACCES.session && !ACCES.eleve) COFFRE.stat(l.fichier === "tableau-blanc" ? "outil:tableau" : "livre:" + (l.fichier || "ajoute")); } catch(e){}   /* statistiques anonymes */
   /* « Lire » ouvre le livre en plein écran (réglage Mes préférences → Livre en plein écran); demandé tout de suite, pendant le geste de l'enseignant */
-  try { if (!document.fullscreenElement && !document.body.classList.contains("classe") && !(window.PREF && window.PREF().plein === false)) document.documentElement.requestFullscreen().catch(() => {}); } catch(e){}
+  try { if (!document.fullscreenElement && !document.body.classList.contains("classe") && !(window.PREF && window.PREF().plein === false)){ window.FS_PAR = "livre"; document.documentElement.requestFullscreen().catch(() => { window.FS_PAR = ""; }); } } catch(e){}
   if (l.user){
     DB.getHtml(l.id).then(h => { if (h) ouvrirLivre(l, h); else aviser("Ce livre est introuvable sur cet ordinateur."); })
       .catch(() => aviser("Impossible de lire le livre enregistré."));
@@ -5667,10 +5682,13 @@ function lire(l){
   } else if (l.lien) window.open(l.lien, "_blank");
   else aviser("Ce livre n'est pas encore disponible en ligne.");
 }
+window.FS_PAR = "";   /* qui a demandé le plein écran : "livre" | "accueil" | "" (toi, par un bouton ou F11 : jamais quitté automatiquement) */
+document.addEventListener("fullscreenchange", () => { if (!document.fullscreenElement) window.FS_PAR = ""; });
 function closeReader(){
   setTimeout(() => { try { renderHero(); } catch(e){} }, 400);
   clearInterval(RD.poll); clearTimeout(BAR.t); clearTimeout(RD.attT);
-  try { if (document.fullscreenElement && !document.body.classList.contains("classe") && !window.TDB_ACTIF) document.exitFullscreen(); } catch(e){}
+  /* 8 nov. (« ça quitte le plein écran même si on ne l'a pas demandé ») : on ne quitte que le plein écran que le livre a lui-même demandé */
+  try { if (document.fullscreenElement && window.FS_PAR === "livre" && !document.body.classList.contains("classe") && !window.TDB_ACTIF) document.exitFullscreen(); } catch(e){}
   $("#reader").classList.remove("open");
   $("#resume").hidden = true; clearTimeout(RD.resT); $("#noir").hidden = true; if (RD.laser) toggleLaser();
   killExtras(); $("#readerFrame").srcdoc = ""; $("#readerFrame2").srcdoc = ""; $("#readerFrame2").hidden = true; $("#rinner").classList.remove("dbl"); RD.dbl = false; RD.single = false; RD.drv2 = null;
@@ -6621,7 +6639,7 @@ initAdmin();
   }
   /* on garde le plein écran tant qu'on reste en classe (tableau de bord ↔ livre) */
   function fermer(versLivre) {
-    if (!versLivre && document.fullscreenElement && !document.body.classList.contains("classe")) document.exitFullscreen().catch(() => {});
+    if (!versLivre && document.fullscreenElement && window.FS_PAR === "accueil" && !document.body.classList.contains("classe")) document.exitFullscreen().catch(() => {});
     ov.hidden = true;
     if (versLivre) setTimeout(() => { try { $("#readerFrame").focus(); } catch (e) {} }, 60);
   }
@@ -6656,7 +6674,7 @@ initAdmin();
     if (peEl()) { (document.exitFullscreen || document.webkitExitFullscreen).call(document); return; }
     const pe = document.documentElement, req = pe.requestFullscreen || pe.webkitRequestFullscreen;
     if (!req || !(document.fullscreenEnabled || document.webkitFullscreenEnabled)) { peSignal(false); return; }
-    try { const p = req.call(pe); if (p && p.catch) p.catch(() => peSignal(false)); } catch (err) { peSignal(false); }
+    window.FS_PAR = "accueil"; try { const p = req.call(pe); if (p && p.catch) p.catch(() => peSignal(false)); } catch (err) { peSignal(false); }
   });
   document.addEventListener("fullscreenchange", () => peSignal(true)); document.addEventListener("webkitfullscreenchange", () => peSignal(true));
   document.getElementById("accueilBtn").addEventListener("click", ouvrir);
@@ -7162,7 +7180,7 @@ initAdmin();
     if (!plan) showEmpty();
   }
   function fermer() {
-    if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+    if (document.fullscreenElement === ov) document.exitFullscreen().catch(() => {});   /* seulement le plein écran du plan lui-même */
     ov.hidden = true; $("plMenu").hidden = true;
   }
   async function showEmpty() {
@@ -10140,11 +10158,15 @@ document.addEventListener("click", e => { const b = e.target.closest && e.target
 /* Barre de navigation dans Plans et Activités + ouverture d'un outil demandé par une autre page (?ouvrir=plans|activites|accueil|tableau) */
 (function(){
   const BTN = { plans:"planBtn", activites:"actBtn", accueil:"accueilBtn", tableau:"wbBtn" }, FERMER = ["plClose", "actBack"];
-  const aller = k => { FERMER.forEach(id => { const b = document.getElementById(id); if (b && b.checkVisibility && b.checkVisibility()) b.click(); });
+  let aller = k => { FERMER.forEach(id => { const b = document.getElementById(id); if (b && b.checkVisibility && b.checkVisibility()) b.click(); });
     if (k === "biblio") return; if (k === "labo"){ const b = document.getElementById("simBtn"); if (b) b.click(); return; }
     setTimeout(() => { const b = document.getElementById(BTN[k]); if (b) b.click(); }, 60); };
-  [[".pl-top", "plans"], [".act-top", "activites"]].forEach(([sel, ici]) => { const bar = document.querySelector(sel); if (!bar || bar.querySelector(".mp-nav")) return;
-    const logo = bar.querySelector(".top-logo:last-of-type") || bar.firstElementChild; logo.insertAdjacentHTML("afterend", mpNavHTML(ici));
+  /* 8 nov. (« harmonise les en-têtes ») : partout logo · nom de la page · petite description · barre de navigation · retour à droite */
+  const TIT = { plans:["Plans techniques", "Dossiers de plans et exercices de lecture"], activites:["Activités", "Cahiers et questionnaires à projeter ou imprimer"], tableau:["Tableau blanc", "Dessine, schématise et explique"] };
+  const titre = k => `<span class="mp-tit"><b class="mp-nom2">${TIT[k][0]}</b><span class="mp-sous2">${TIT[k][1]}</span></span>`;
+  if (window.closeReader){ const a0 = aller; aller = k => { const r = document.getElementById("reader"); if (r && r.classList.contains("open") && r.classList.contains("wbon") && k !== "tableau"){ closeReader(); setTimeout(() => a0(k), 80); } else a0(k); }; }
+  [[".pl-top", "plans"], [".act-top", "activites"], [".reader-bar", "tableau"]].forEach(([sel, ici]) => { const bar = document.querySelector(sel); if (!bar || bar.querySelector(".mp-nav")) return;
+    const logo = bar.querySelector(".top-logo:last-of-type, .rb-logo") || bar.firstElementChild; logo.insertAdjacentHTML("afterend", titre(ici) + mpNavHTML(ici));
     bar.querySelectorAll(".mp-nav a").forEach(a => a.onclick = e => { e.preventDefault(); if (a.classList.contains("ici")) return; aller(a.dataset.nav); }); });
   /* même barre sur l'accueil (8 nov., « c'est la meilleure barre du site, elle devrait être partout ») */
   window.mpAller = aller;

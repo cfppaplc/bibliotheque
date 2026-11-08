@@ -247,6 +247,9 @@ html #prep .sheet-in.prep2 { width: min(1240px, calc(100vw - 32px)); display: gr
 .dr-dur .rz { border: 0; font-size: 15px; opacity: .7; width: 26px; }
 .dr-dur b { min-width: 64px; text-align: center; font-size: 15px; line-height: 1.1; }
 .dr-dur b small { display: block; font-size: 10.5px; font-weight: 500; opacity: .6; }
+.dr-ecrire { cursor: text; border-radius: 8px; padding: 2px 0; }
+.dr-ecrire:hover { background: rgba(128,128,128,.12); }
+.dr-dur b input { width: 60px; font: inherit; font-size: 15px; text-align: center; padding: 4px; border-radius: 8px; border: 1px solid #EB6A22; background: transparent; color: inherit; }
 .dr-x { width: 34px; height: 34px; border: 0; background: transparent; color: inherit; opacity: .45; border-radius: 9px; cursor: pointer; font-size: 15px; }
 .dr-x:hover { opacity: 1; background: rgba(220,60,60,.15); }
 .dr-row .lk-chips { display: flex; flex-wrap: wrap; gap: 6px; }
@@ -1922,9 +1925,14 @@ function renderDeroul(){
       + '<div class="lk-top"><span class="lk-nom" hidden></span><span class="lk-chips"></span></div>';
     const inp = r.querySelector(".dr-nom"); inp.value = a.label; r.querySelector(".lk-nom").textContent = a.label;
     r.querySelector(".dr-dur b").innerHTML = mins + " min<small>" + (a.d ? "choisie" : "auto") + "</small>";
-    if (!a.d) r.querySelector(".rz").style.visibility = "hidden"; r.querySelector(".mn").disabled = mins <= 5;
+    /* à la minute près (8 nov.) : toucher la durée pour l'écrire */
+    const bv = r.querySelector(".dr-dur b"); bv.tabIndex = 0; bv.title = "Toucher pour écrire la durée exacte"; bv.classList.add("dr-ecrire");
+    bv.onclick = () => { if (bv.querySelector("input")) return; bv.innerHTML = '<input type="number" min="1" max="240" inputmode="numeric" aria-label="Minutes">'; const ip = bv.firstChild; ip.value = mins; ip.focus(); ip.select();
+      const ok = () => { const v = Math.round(+ip.value); const l = L(); if (v >= 1 && v <= 240 && v !== mins){ l[a.idx] = ligne(a.label, v); ecrireSteps(l); } else renderDeroul(); };
+      ip.addEventListener("keydown", e => { if (e.key === "Enter"){ e.preventDefault(); ip.blur(); } if (e.key === "Escape"){ ip.onblur = null; renderDeroul(); } }); ip.onblur = ok; };
+    if (!a.d) r.querySelector(".rz").style.visibility = "hidden"; r.querySelector(".mn").disabled = mins <= 1;
     const L = () => lignesSteps();
-    r.querySelector(".mn").onclick = () => { const l = L(); l[a.idx] = ligne(a.label, Math.max(5, mins - 5)); ecrireSteps(l); };
+    r.querySelector(".mn").onclick = () => { const l = L(); l[a.idx] = ligne(a.label, Math.max(1, mins - 5)); ecrireSteps(l); };
     r.querySelector(".pl").onclick = () => { const l = L(); l[a.idx] = ligne(a.label, mins + 5); ecrireSteps(l); };
     r.querySelector(".rz").onclick = () => { const l = L(); l[a.idx] = a.label; ecrireSteps(l); };
     r.querySelector(".dr-x").onclick = () => { const l = L(); l.splice(a.idx, 1); delete LIENS_T[cleLien(a.label)]; ecrireSteps(l); };
@@ -2619,7 +2627,7 @@ keepAwake();
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") keepAwake(); });
 
 $("f-duree").innerHTML = DUREES.map(([v, n]) => '<option value="' + v + '">' + n + '</option>').join("");
-function heuresDebut(v){ const L = []; for (let m = 7 * 60; m <= 21 * 60; m += 15) L.push(m); [cfg.amStart, cfg.pmStart, v].forEach(t => { if (t && /\d/.test(t)) { const m = toMin(t); if (!L.includes(m)) L.push(m); } }); L.sort((a, b) => a - b);
+function heuresDebut(v){ const L = []; for (let m = 7 * 60; m <= 21 * 60; m += 5) L.push(m); [cfg.amStart, cfg.pmStart, v].forEach(t => { if (t && /\d/.test(t)) { const m = toMin(t); if (!L.includes(m)) L.push(m); } }); L.sort((a, b) => a - b);
   $("f-debut").innerHTML = L.map(m => '<option value="' + String(Math.floor(m / 60)).padStart(2, "0") + ":" + String(m % 60).padStart(2, "0") + '">' + fmt(m) + '</option>').join(""); $("f-debut").value = v; }
 appliquerPlans();
 renderStatic(); tick(); setInterval(tick, 1000);
