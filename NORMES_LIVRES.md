@@ -3,7 +3,7 @@
 > À donner à Claude (ou à vérifier soi-même) **chaque fois qu'on fabrique ou met à jour un livre**.
 > But : que le livre s'ouvre vite, tourne bien sur le tableau interactif (TNI), l'ordinateur et le cellulaire,
 > et que tous les outils de la bibliothèque marchent dessus (pages, table des matières, ✓ réponses, crayon, zoom, recherche).
-> Mis à jour le 7 novembre 2026.
+> Mis à jour le 8 novembre 2026.
 
 ## 1. Le fichier
 - **Un seul fichier `.html` autonome** : images, polices, CSS et JS **dedans** (images en base64, WebP qualité ~80).
@@ -22,6 +22,11 @@
   Un zoom interne (double-clic, deux doigts, touches) **entre en conflit** avec celui de la bibliothèque : n'en mettre aucun.
 - **Page 1 = couverture** (`<section class="page cover">`). Sa capture sert de vignette dans la bibliothèque.
 - Rien en `position:fixed` dans le livre (ça ne suit pas la page quand on zoome).
+- **Logo Métier+ (8 nov.)** : **version PDF à imprimer** = logo Métier+ (`img/metier-plus.svg`) sur la couverture,
+  en haut à droite de préférence (sinon un autre coin), ~25 à 35 mm de large, sur une **zone libre réservée en concevant
+  la couverture** : jamais par-dessus du texte, d'un titre ou d'un dessin important. Les élèves peuvent ainsi parler
+  du « livre Métier+ compétence N ». **Version web : pas de logo dans le livre** (la bibliothèque affiche déjà la petite
+  icône Métier+ sur chaque couverture).
 
 ## 3. Table des matières
 - Au début de chaque module, un titre **`<h2 class="mod">Module 3 — Titre du module</h2>`**
@@ -67,6 +72,7 @@
 - [ ] Un seul `.html`, rien d'externe, < 15 Mo
 - [ ] Vrai texte, polices intégrées
 - [ ] `section.page` de même taille, page 1 = couverture
+- [ ] PDF imprimé : logo Métier+ dans un coin libre de la couverture (pas sur le texte); version web sans logo
 - [ ] Aucune navigation / aucun zoom propres au livre, rien en `position:fixed`
 - [ ] `h2.mod` « Module N — … » au début de chaque module
 - [ ] Réponses en `class="reponse"`, qui gardent leur place
