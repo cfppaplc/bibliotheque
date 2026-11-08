@@ -2,7 +2,7 @@
 <!-- © 2026 Jérémy Raymond. Tous droits réservés. Copie, modification ou revente interdites sans autorisation écrite (voir LICENCE.md). -->
 <html lang="fr-CA">
 <head>
-<meta charset="utf-8">
+<meta charset="utf-8"><script src="vieux-navigateur.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Métier+ — L'atelier, au tableau</title>
 <meta name="description" content="Métier+ réunit les livres de cours animés, les plans techniques, les formatifs, les quiz et les simulations des enseignants en formation professionnelle, pensés pour le tableau interactif.">
@@ -149,8 +149,13 @@
   .rv.d1{transition-delay:.12s}.rv.d2{transition-delay:.24s}.rv.d3{transition-delay:.36s}
   @media (prefers-reduced-motion:reduce){.rv{transform:none;transition:opacity .6s}.couv,.tel .pad::after,.depot .fich{animation:none}.depot .fich{opacity:1}}
   html:not(.js) .rv{opacity:1;transform:none}
+  /* Téléviseurs et vieux navigateurs sans « gap » en flex : espaces refaits avec des marges */
+  html.sans-gap .nav .w>*+*{margin-left:28px}html.sans-gap .nav .liens>*+*{margin-left:26px}
+  html.sans-gap .actions>*{margin:0 7px 10px}html.sans-gap .btn>*+*{margin-left:8px}
+  html.sans-gap .liste li>*+*{margin-left:14px}html.sans-gap .tel .ecr>*+*{margin-top:12px}
+  html.sans-gap .tel .mods>*+*{margin-left:6px}html.sans-gap .depot .choix>*+*{margin-left:10px}html.sans-gap footer .w>*{margin:0 10px 6px 0}
 </style>
-<script>document.documentElement.classList.add("js");try{localStorage.setItem("presentationVue","1")}catch(e){}</script>
+<script>document.documentElement.classList.add("js");/* vieux navigateurs (téléviseurs Samsung…) : pas de « gap » en flex */(function(){try{var d=document.createElement("div");d.style.cssText="display:flex;flex-direction:column;row-gap:1px;position:absolute";d.appendChild(document.createElement("div"));d.appendChild(document.createElement("div"));document.documentElement.appendChild(d);if(d.scrollHeight!==1)document.documentElement.classList.add("sans-gap");d.remove()}catch(e){}})();try{localStorage.setItem("presentationVue","1")}catch(e){}</script>
 </head>
 <body>
 
@@ -321,8 +326,11 @@
 <script>
 (function(){
   const els = document.querySelectorAll(".rv");
+  /* Le haut de la page s'affiche toujours, et si l'observateur ne répond pas (certains téléviseurs), tout s'affiche après 1,5 s */
+  requestAnimationFrame(() => document.querySelectorAll(".hero .rv").forEach(e => e.classList.add("vu")));
+  let repondu = false; setTimeout(() => { if (!repondu) els.forEach(e => e.classList.add("vu")); }, 1500);
   if (!("IntersectionObserver" in window)){ els.forEach(e => e.classList.add("vu")); return; }
-  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting){ e.target.classList.add("vu"); io.unobserve(e.target); } }), { rootMargin:"0px 0px -8% 0px", threshold:.12 });
+  const io = new IntersectionObserver(es => es.forEach(e => { repondu = true; if (e.isIntersecting){ e.target.classList.add("vu"); io.unobserve(e.target); } }), { rootMargin:"0px 0px -8% 0px", threshold:.12 });
   els.forEach(e => io.observe(e));
 })();
 </script>
