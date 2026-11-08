@@ -11,7 +11,7 @@
 (function(){ var d = document.documentElement, c = false; try { var v = localStorage.getItem("accueilClair"); c = v === "1" || (v === null && matchMedia("(prefers-color-scheme: light)").matches); } catch(e){}
   d.style.background = c ? "#f5f3ef" : "#141414"; setTimeout(function(){ d.classList.add("pret"); }, 4000); })();</script>
 <style>html:not(.pret)>body{visibility:hidden}</style>
-<!-- © 2026 Jérémy Raymond. Tous droits réservés. Copie, modification ou revente interdites sans autorisation écrite (voir LICENCE.md). --><meta charset="utf-8"><script src="vieux-navigateur.js"></script><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="icon" href="img/metier-plus-icone.svg" type="image/svg+xml"><link rel="icon" type="image/png" sizes="32x32" href="img/icone-32.png"><link rel="icon" type="image/png" sizes="192x192" href="img/icone-192.png"><link rel="apple-touch-icon" href="img/icone-180.png"><meta name="theme-color" content="#141414">
+<!-- © 2026 Jérémy Raymond. Tous droits réservés. Copie, modification ou revente interdites sans autorisation écrite (voir LICENCE.md). --><meta charset="utf-8"><script src="vieux-navigateur.js"></script><script src="signaler.js"></script><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="icon" href="img/metier-plus-icone.svg" type="image/svg+xml"><link rel="icon" type="image/png" sizes="32x32" href="img/icone-32.png"><link rel="icon" type="image/png" sizes="192x192" href="img/icone-192.png"><link rel="apple-touch-icon" href="img/icone-180.png"><meta name="theme-color" content="#141414">
 <meta name="description" content="Métier+ : la plateforme des enseignants en formation professionnelle. Livres animés, plans, quiz et simulateurs pour la classe et l'atelier.">
 <meta property="og:type" content="website"><meta property="og:locale" content="fr_CA"><meta property="og:site_name" content="Métier+">
 <meta property="og:title" content="Métier+ — La plateforme des enseignants en formation professionnelle"><meta property="og:description" content="Livres animés, plans, quiz et simulateurs pour la classe et l'atelier. Conçu par Jeremy, enseignant en formation professionnelle.">
@@ -1919,6 +1919,8 @@ function attach(){
   let win, doc;
   try { win = f.contentWindow; doc = f.contentDocument; if (!doc || !doc.body) return; } catch(e){ return; }
   RD.drv = buildDriver(win, doc);
+  window.RD = RD;   // pour signaler.js (livre et page dans un signalement)
+  try { if (!win.__sgBranche){ win.__sgBranche = 1; win.addEventListener("error", e => { if (window.mpErreurLivre && (!e.target || e.target === win)) mpErreurLivre(e.message, "livre " + RD.book + (e.lineno ? ":" + e.lineno : "")); }); } } catch(e){}
   setTimeout(() => { try { appliquerPad(); sizeInner(); } catch(e){} }, 0);
   /* Le bouton ✓ est toujours là (barre identique partout) ; grisé si le livre n'a pas de réponses */
   $("#tbAns").hidden = false; $("#tbAns").dataset.k = "";
@@ -9061,6 +9063,7 @@ return {matrice:function(texte){var q=new QRCode(-1,L.M);q.addData(texte);q.make
       ["Préparer un cours d'avance", "Touche « Préparer le cours », choisis le jour et la période dans la semaine, la compétence, puis les activités et leurs durées."],
       ["Lier un livre, un quiz ou un fichier à une activité", "Dans le déroulement, touche « + Livre, quiz, fichier… » sous l'activité. Pendant le cours, un toucher sur l'activité l'ouvre."]]},
     { k:"compte", t:"Mon compte", items:[
+      ["Quelque chose ne marche pas", "Ouvre le menu de ton compte (tes initiales en haut à droite) et touche « Signaler un problème ». Écris une phrase : l'administrateur la reçoit tout de suite, avec le livre et la page où tu étais."],
       ["Me connecter", "Touche « Se connecter » et entre ton identifiant (prenom.nom) et ton mot de passe. Sur ton ordinateur, l'identifiant est retenu."],
       ["Demander un accès", "Dans la fenêtre de connexion, touche « Demander un accès ». Choisis ton programme et un mot de passe; l'administrateur reçoit ta demande."],
       ["J'ai oublié mon mot de passe", "Dans la fenêtre de connexion, touche « Mot de passe oublié ? » et choisis-en un nouveau. L'administrateur l'active pour toi."],
@@ -9858,9 +9861,9 @@ window.ACCES = (function(){
     if (!m.hidden){ m.hidden = true; return; }
     m.innerHTML = '<div class="qui"><b>' + esc(SESSION.nom) + '</b>' + esc(SESSION.id) + (SESSION.admin ? ' <span class="acces-tag">admin</span>' : '') + '</div>'
       + (SESSION.admin ? '<button data-a="gerer">Gérer les accès des enseignants' + (NB_DEM ? ' (' + NB_DEM + ' demande' + (NB_DEM > 1 ? 's' : '') + ')' : '') + '</button>' : '')
-      + (window.MESDOCS && document.body.classList.contains("md-permis") ? '<button data-a="ajout">Ajouter un document</button>' : '') + '<button data-a="prefs">Mes préférences</button><button data-a="neuf">Quoi de neuf' + (document.getElementById("qnPoint") && !document.getElementById("qnPoint").hidden ? ' <span class="qn-point"></span>' : '') + '</button><button data-a="aide">Aide</button><button data-a="sortir">Se déconnecter</button>';
+      + (window.MESDOCS && document.body.classList.contains("md-permis") ? '<button data-a="ajout">Ajouter un document</button>' : '') + '<button data-a="prefs">Mes préférences</button><button data-a="neuf">Quoi de neuf' + (document.getElementById("qnPoint") && !document.getElementById("qnPoint").hidden ? ' <span class="qn-point"></span>' : '') + '</button><button data-a="aide">Aide</button><button data-a="signal">Signaler un problème</button><button data-a="sortir">Se déconnecter</button>';
     const r = b.getBoundingClientRect(); m.style.top = (r.bottom + 8 + scrollY) + "px"; m.style.left = Math.max(8, Math.min(innerWidth - 240, r.right - 230)) + "px"; m.hidden = false;
-    m.onclick = e => { const a = e.target.closest("[data-a]"); if (!a) return; m.hidden = true; if (a.dataset.a === "neuf" || a.dataset.a === "aide"){ document.getElementById(a.dataset.a === "neuf" ? "quoiNeuf" : "lienAide").click(); return; } if (a.dataset.a === "ajout"){ window.MESDOCS.dlgAjout(); return; } if (a.dataset.a === "sortir") deconnexion().then(() => aviser("Tu es déconnecté sur cet ordinateur.")); else if (a.dataset.a === "prefs") window.dlgPrefs(); else dlgGerer(); };
+    m.onclick = e => { const a = e.target.closest("[data-a]"); if (!a) return; m.hidden = true; if (a.dataset.a === "neuf" || a.dataset.a === "aide"){ document.getElementById(a.dataset.a === "neuf" ? "quoiNeuf" : "lienAide").click(); return; } if (a.dataset.a === "ajout"){ window.MESDOCS.dlgAjout(); return; } if (a.dataset.a === "signal"){ window.mpSignaler(); return; } if (a.dataset.a === "sortir") deconnexion().then(() => aviser("Tu es déconnecté sur cet ordinateur.")); else if (a.dataset.a === "prefs") window.dlgPrefs(); else dlgGerer(); };
   }
   document.addEventListener("pointerdown", e => { const m = document.getElementById("accesMenu"); if (m && !m.hidden && !m.contains(e.target) && !e.target.closest("#compteBtn")) m.hidden = true; });
 
@@ -10486,9 +10489,10 @@ document.addEventListener("click", e => { const b = e.target.closest && e.target
     if (k === "biblio"){ scrollTo({ top:0, behavior:"smooth" }); return; }
     if (k === "neuf" || k === "aide"){ const b = document.getElementById(k === "neuf" ? "quoiNeuf" : "lienAide"); if (b) b.click(); return; }
     if (k === "compte"){ if (window.ACCES) ACCES.dlgConnexion(); return; }
+    if (k === "signal"){ if (window.mpSignaler) mpSignaler(); return; }
     aller(k); }
   const q = new URLSearchParams(location.search).get("ouvrir");
-  if (q && /^(neuf|aide|compte)$/.test(q)){ history.replaceState(null, "", location.pathname); document.documentElement.classList.remove("ouvre"); const go = () => actionPied(q); if (window.ACCES && ACCES.pret) ACCES.pret.then(() => setTimeout(go, 300)); else window.addEventListener("load", go); }
+  if (q && /^(neuf|aide|compte|signal)$/.test(q)){ history.replaceState(null, "", location.pathname); document.documentElement.classList.remove("ouvre"); const go = () => actionPied(q); if (window.ACCES && ACCES.pret) ACCES.pret.then(() => setTimeout(go, 300)); else window.addEventListener("load", go); }
   if (q && BTN[q]){ history.replaceState(null, "", location.pathname); const go = () => { aller(q); setTimeout(() => document.documentElement.classList.remove("ouvre"), 350); };
     if (window.ACCES && ACCES.pret) ACCES.pret.then(go); else window.addEventListener("load", go); }
 })();
