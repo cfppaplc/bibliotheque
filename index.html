@@ -5,7 +5,7 @@
      À chaque changement : mettre à jour nouveautes.json (mini-formation + captures) et publier avec outils/publier.sh. -->
 <html lang="fr"><head>
 <script>/* 1re visite sur cet appareil (8 nov., demande de Jeremy) : on montre d'abord la page de présentation. Jamais pour un enseignant déjà venu, ni pour un lien direct (livre, outil, invitation, code QR). */
-(function(){ try { var L = localStorage; if (L.getItem("presentationVue") || L.getItem("etaitConnecte") || L.getItem("bienvenueVu") || location.search || location.hash || window.top !== window) return;
+(function(){ try { var L = localStorage; if (L.getItem("presentationVue") || L.getItem("etaitConnecte") || L.getItem("bienvenueVu") || location.search || location.hash || window.top !== window || /bot|crawl|spider|slurp|facebookexternalhit|preview/i.test(navigator.userAgent)) return;
   L.setItem("presentationVue", "1"); location.replace("presentation.html"); } catch(e){} })();</script>
 <script>/* 8 nov. : la page reste cachée tant que tout n'est pas lu (avant, on voyait une demi-seconde une page à moitié construite : en-tête et cartes sans style) */
 (function(){ var d = document.documentElement, c = false; try { var v = localStorage.getItem("accueilClair"); c = v === "1" || (v === null && matchMedia("(prefers-color-scheme: light)").matches); } catch(e){}
@@ -16,7 +16,10 @@
 <meta property="og:type" content="website"><meta property="og:locale" content="fr_CA"><meta property="og:site_name" content="Métier+">
 <meta property="og:title" content="Métier+ — La plateforme des enseignants en formation professionnelle"><meta property="og:description" content="Livres animés, plans, quiz et simulateurs pour la classe et l'atelier. Conçu par Jeremy, enseignant en formation professionnelle.">
 <meta property="og:url" content="https://metierplus.app/"><meta property="og:image" content="https://metierplus.app/img/apercu-metier.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Métier+ : la plateforme des enseignants en formation professionnelle, trois livres de cours en éventail"><meta name="twitter:card" content="summary_large_image"><title>Métier+ — Bibliothèque</title>
+<meta property="og:image:alt" content="Métier+ : la plateforme des enseignants en formation professionnelle, trois livres de cours en éventail"><meta name="twitter:card" content="summary_large_image"><link rel="canonical" href="https://metierplus.app/">
+<meta name="keywords" content="formation professionnelle, DEP, plomberie et chauffage, entretien général d'immeubles, livres animés, tableau interactif, enseignant, Québec">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Métier+","url":"https://metierplus.app/","applicationCategory":"EducationalApplication","operatingSystem":"Navigateur web","inLanguage":"fr-CA","description":"Plateforme des enseignants en formation professionnelle au Québec : livres de cours animés, plans techniques, formatifs, quiz et simulations pour le tableau interactif.","audience":{"@type":"EducationalAudience","educationalRole":"teacher"},"educationalLevel":"Formation professionnelle (DEP)","author":{"@type":"Person","name":"Jérémy Raymond"},"image":"https://metierplus.app/img/apercu-metier.jpg"}</script>
+<title>Métier+ — Livres animés et outils pour la formation professionnelle (DEP)</title>
 <style>
   html{-webkit-text-size-adjust:100%;text-size-adjust:100%}   /* cellulaire : pas de texte grossi par le navigateur (aucun effet sur ordinateur) */
   #reader.laseron,#reader.laseron *{cursor:none!important}

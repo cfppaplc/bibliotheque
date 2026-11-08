@@ -3,7 +3,7 @@ import re, subprocess, sys, tempfile, os
 site = sys.argv[1]; err = 0
 for f in ["index.html", "accueil.html"]:
     s = open(os.path.join(site, f), encoding="utf-8").read()
-    for i, sc in enumerate(re.findall(r'<script(?![^>]*\bsrc=)[^>]*>(.*?)</script>', s, re.S)):
+    for i, sc in enumerate(re.findall(r'<script(?![^>]*\b(?:src=|type="application/ld\+json"))[^>]*>(.*?)</script>', s, re.S)):
         if not sc.strip(): continue
         with tempfile.NamedTemporaryFile("w", suffix=".js", delete=False) as t: t.write(sc)
         r = subprocess.run(["node", "--check", t.name], capture_output=True, text=True); os.unlink(t.name)
