@@ -1087,6 +1087,14 @@ html.leger{scroll-behavior:auto}
 })();
 </script>
 <script src="coffre.js"></script>
+<style>
+#rbFold,#rbOpen{display:none}
+.reader.wbon #rbFold{display:inline-flex;align-items:center;justify-content:center;order:99;flex:none;width:38px;height:38px;padding:0!important;border-radius:10px;border:1px solid #333;background:transparent;color:#ddd;cursor:pointer}
+.reader.wbon #rbFold:hover{background:#222}
+.reader.wbon.rb-fold .reader-bar{display:none!important}
+.reader.wbon.rb-fold #rbOpen{display:flex;align-items:center;justify-content:center;position:absolute;top:0;left:50%;translate:-50% 0;z-index:60;width:64px;height:30px;border:1px solid #333;border-top:0;border-radius:0 0 14px 14px;background:#141414;color:#eee;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.25)}
+@media (pointer:coarse){.reader.wbon #rbFold{width:46px;height:46px}.reader.wbon.rb-fold #rbOpen{width:80px;height:40px}}
+</style>
 </head><body>
 <script>/* 8 nov. : déjà connecté sur cet appareil → en-tête et accueil d'enseignant dès la 1re image (plus d'ancien en-tête une seconde) */try{if(localStorage.getItem("etaitConnecte"))document.body.classList.add("pre-co")}catch(e){}
 /* arrivée d'une autre page avec ?ouvrir=… : l'accueil reste caché (écran noir) jusqu'à ce que l'outil s'ouvre, au lieu de clignoter */
@@ -5670,6 +5678,18 @@ majEpaisseur();
     const te = ob.querySelector(".tete"); if (te) te.appendChild(o); else ob.insertBefore(o, ob.firstChild);
     o.onclick = () => { ob.classList.toggle("of"); o.innerHTML = ob.classList.contains("of") ? SV.open.replace(/<path d="M4 20[^>]*>.*?<path d="M14.5[^>]*>/, '<path d="M12 3l8 4.5v9L12 21l-8-4.5v-9zM12 12l8-4.5M12 12v9M12 12L4 7.5"/>') : SV.fold; };
   }
+})();
+/* ---- Barre du haut du tableau blanc : la cacher / la rouvrir (9 nov.) ---- */
+(function(){
+  const rd = $("#reader"), bar = rd && rd.querySelector(".reader-bar"); if (!bar) return;
+  const ch = d => '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="' + d + '"/></svg>';
+  const f = document.createElement("button"); f.id = "rbFold"; f.type = "button"; f.innerHTML = ch("M6 15l6-6 6 6");
+  f.title = "Cacher la barre du haut"; f.setAttribute("aria-label", f.title); bar.appendChild(f);
+  const o = document.createElement("button"); o.id = "rbOpen"; o.type = "button"; o.innerHTML = ch("M6 9l6 6 6-6");
+  o.title = "Montrer la barre du haut"; o.setAttribute("aria-label", o.title); rd.appendChild(o);
+  function maj(v){ rd.classList.toggle("rb-fold", v); try { localStorage.setItem("wbBarreCachee", v ? "1" : "0"); } catch(e){} setTimeout(() => window.dispatchEvent(new Event("resize")), 30); }
+  f.onclick = () => maj(true); o.onclick = () => maj(false);
+  try { if (localStorage.getItem("wbBarreCachee") === "1") rd.classList.add("rb-fold"); } catch(e){}
 })();
 /* ---- Barre du crayon simplifiée pour les débutants : rien n'est retiré, les outils moins utilisés vont dans deux menus ---- */
 (function(){

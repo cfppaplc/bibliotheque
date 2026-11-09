@@ -3349,5 +3349,36 @@ html.apercu-mode #mpCoin{display:none}
 <script>/* barre d'avancement de l'activité en cours (copie --pg de la case en cours de la frise) */
 setInterval(() => { const s = document.querySelector("#v-tl .seg.now:not(.p)"), i = document.getElementById("v-nowav"); if (i) i.style.setProperty("--pg", s ? (s.style.getPropertyValue("--pg") || "0%") : "0%"); }, 1000);</script>
 <div id="mpCoin" aria-hidden="true"><img class="lg-blc" src="img/metier-plus-blanc.svg" alt=""><img class="lg-clr" src="img/metier-plus.svg" alt=""></div>
+<style>
+/* Ménage en version crème (9 nov.) : suit le choix Clair de l'accueil de classe */
+@keyframes mnFlashC{0%,100%{background:#FFFCF6;border-color:#1E2A441f}
+  50%{background:color-mix(in srgb,#D97B6C calc(var(--u) * 30%),#FFFCF6);border-color:color-mix(in srgb,#D97B6C calc(20% + var(--u) * 60%),#FFFCF6)}}
+html.force-light #menage{background:radial-gradient(circle at 50% 0%,#FFFCF6,#F1E8D8 70%)!important;color:#1E2A44}
+html.force-light #menage .mn-btn{background:#1E2A4412;color:#1E2A44}
+html.force-light #menage .mn-barre{background:#1E2A4418}
+html.force-light #menage li{background:#FFFCF6;border-color:#1E2A441f}
+html.force-light #menage li:not(.fait){animation-name:mnFlashC}
+html.force-light #menage .mn-c{border-color:#1E2A4466}
+html.force-light #menage .mn-tete small b,#menage .mn-reste,#menage .mn-rf{color:#C9561A}
+html.force-light #menage .mn-aide,#menage .mb-s{color:#1E8A55}
+html.force-light #menage .mn-bravo{color:#1E8A55}
+html.force-light #menage .mb-t{color:#1E2A44}
+html.force-light #menage .mb-l{border-color:#1E2A4433;color:#1E2A44aa}
+html.force-light #mnAideT{box-shadow:0 30px 80px #1E2A4440}
+@media (prefers-color-scheme: light){
+html:not(.force-dark) #menage{background:radial-gradient(circle at 50% 0%,#FFFCF6,#F1E8D8 70%)!important;color:#1E2A44}
+html:not(.force-dark) #menage .mn-btn{background:#1E2A4412;color:#1E2A44}
+html:not(.force-dark) #menage .mn-barre{background:#1E2A4418}
+html:not(.force-dark) #menage li{background:#FFFCF6;border-color:#1E2A441f}
+html:not(.force-dark) #menage li:not(.fait){animation-name:mnFlashC}
+html:not(.force-dark) #menage .mn-c{border-color:#1E2A4466}
+html:not(.force-dark) #menage .mn-tete small b,#menage .mn-reste,#menage .mn-rf{color:#C9561A}
+html:not(.force-dark) #menage .mn-aide,#menage .mb-s{color:#1E8A55}
+html:not(.force-dark) #menage .mn-bravo{color:#1E8A55}
+html:not(.force-dark) #menage .mb-t{color:#1E2A44}
+html:not(.force-dark) #menage .mb-l{border-color:#1E2A4433;color:#1E2A44aa}
+html:not(.force-dark) #mnAideT{box-shadow:0 30px 80px #1E2A4440}
+}
+</style>
 </body>
 </html>
