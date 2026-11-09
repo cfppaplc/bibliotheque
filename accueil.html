@@ -3100,6 +3100,18 @@ html.apercu-mode #menage{display:none}
   let APERCU = null;   /* tâches de l'éditeur montrées en aperçu, pas encore enregistrées */
   const M = () => Object.assign({}, DEF, cfg.menage || {}, APERCU ? {taches: APERCU} : {});
   const norm = x => String(x || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+  /* « atelier » reconnu malgré majuscules, accents, s, lettres doublées ou une petite faute (attelier, atlier, ateleir…) */
+  const serre = x => norm(x).replace(/[^a-z0-9]+/g, " ").replace(/(.)\1+/g, "$1").trim();
+  const ecart = (a, b) => { const d = Array.from({length: b.length + 1}, (_, j) => j);
+    for (let i = 1; i <= a.length; i++) { let p = d[0]; d[0] = i;
+      for (let j = 1; j <= b.length; j++) { const t = d[j]; d[j] = Math.min(d[j] + 1, d[j - 1] + 1, p + (a[i - 1] === b[j - 1] ? 0 : 1),
+        i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1] ? p : 99); p = t; } } return d[b.length]; };
+  function contientMot(label, mot){
+    const L = serre(label), M0 = serre(mot); if (!M0) return false; if (L.includes(M0)) return true;
+    const tol = M0.length >= 5 ? 1 : 0; if (!tol || M0.includes(" ")) return false;
+    return L.split(" ").some(w => { w = w.replace(/[sx]$/, ""); return Math.abs(w.length - M0.length) <= 1 && ecart(w, M0) <= tol; });
+  }
+  window.menageMot = contientMot;
   const el = document.getElementById("menage"), ul = document.getElementById("mnListe");
   const lireFait = () => { try { return JSON.parse(localStorage.menageFait || "{}"); } catch(e) { return {}; } };
   let cle = null, force = false, mini = false, rendu = "";
@@ -3132,7 +3144,7 @@ html.apercu-mode #menage{display:none}
     const m = M(), now = new Date(), nowMin = now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60;
     let actif = null;
     try { const ps = periods(), cur = ps.find(p => nowMin >= p.start && nowMin < p.end);
-      if (cur && m.mot) { const r = timeline(cur.start, cfg.steps).find(r => !r.pause && nowMin >= r.start && nowMin < r.end && norm(r.label).includes(norm(m.mot)));
+      if (cur && m.mot) { const r = timeline(cur.start, cfg.steps).find(r => !r.pause && nowMin >= r.start && nowMin < r.end && contientMot(r.label, m.mot));
         if (r && r.end - nowMin <= m.min) actif = r; } } catch(e) {}
     const jour = now.toISOString().slice(0, 10);
     actifVu = !!actif; document.getElementById("mnMini").textContent = force && !actif ? "✕" : "–"; el.classList.toggle("apercu", !!(force && !actif));
