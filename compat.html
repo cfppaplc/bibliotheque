@@ -50,4 +50,5 @@ var n = 0; T.forEach(function(x){ if (!x[1]) n++; });
 document.getElementById("res").innerHTML = (m ? "Moteur : Chrome " + m[1] + " · " : "") + (n ? '<span class="non">' + n + " élément(s) manquant(s)</span>" : '<span class="ok">Tout est pris en charge</span>');
 document.getElementById("t").innerHTML = T.map(function(x){ return "<tr><td>" + x[0] + "</td><td class=\"" + (x[1] ? "ok\">Oui" : "non\">Non") + "</td></tr>"; }).join("");
 </script>
+<script src="plein-ecran.js"></script>
 </body></html>

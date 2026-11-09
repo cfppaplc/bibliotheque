@@ -11,7 +11,7 @@
 (function(){ var d = document.documentElement, c = false; try { var v = localStorage.getItem("accueilClair"); c = v === "1" || (v === null && matchMedia("(prefers-color-scheme: light)").matches); } catch(e){}
   d.style.background = c ? "#f5f3ef" : "#141414"; setTimeout(function(){ d.classList.add("pret"); }, 4000); })();</script>
 <style>html:not(.pret)>body{visibility:hidden}</style>
-<!-- © 2026 Jérémy Raymond. Tous droits réservés. Copie, modification ou revente interdites sans autorisation écrite (voir LICENCE.md). --><meta charset="utf-8"><script src="vieux-navigateur.js"></script><script src="signaler.js"></script><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="icon" href="img/metier-plus-icone.svg" type="image/svg+xml"><link rel="icon" type="image/png" sizes="32x32" href="img/icone-32.png"><link rel="icon" type="image/png" sizes="192x192" href="img/icone-192.png"><link rel="apple-touch-icon" href="img/icone-180.png"><meta name="theme-color" content="#141414">
+<!-- © 2026 Jérémy Raymond. Tous droits réservés. Copie, modification ou revente interdites sans autorisation écrite (voir LICENCE.md). --><meta charset="utf-8"><script src="vieux-navigateur.js"></script><script src="signaler.js"></script><script src="plein-ecran.js"></script><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="icon" href="img/metier-plus-icone.svg" type="image/svg+xml"><link rel="icon" type="image/png" sizes="32x32" href="img/icone-32.png"><link rel="icon" type="image/png" sizes="192x192" href="img/icone-192.png"><link rel="apple-touch-icon" href="img/icone-180.png"><meta name="theme-color" content="#141414">
 <meta name="description" content="Métier+ : la plateforme des enseignants en formation professionnelle. Livres animés, plans, quiz et simulateurs pour la classe et l'atelier.">
 <meta property="og:type" content="website"><meta property="og:locale" content="fr_CA"><meta property="og:site_name" content="Métier+">
 <meta property="og:title" content="Métier+ — La plateforme des enseignants en formation professionnelle"><meta property="og:description" content="Livres animés, plans, quiz et simulateurs pour la classe et l'atelier. Conçu par Jeremy, enseignant en formation professionnelle.">
@@ -10388,25 +10388,7 @@ window.ACCES = (function(){
   if (couleur){ if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", () => tous().forEach(poser)); else tous().forEach(poser); }
 })();
 </script>
-<button id="fsBtn" type="button" aria-label="Plein écran" title="Plein écran (Échap pour quitter)" hidden></button>
-<style>
-#fsBtn{position:fixed;top:3px;right:3px;z-index:2147483000;width:26px;height:26px;padding:0;border:0;border-radius:7px;background:rgba(20,20,22,.35);color:#fff;display:flex;align-items:center;justify-content:center;opacity:.3;cursor:pointer;transition:opacity .2s;-webkit-tap-highlight-color:transparent}
-#fsBtn[hidden]{display:none}
-#fsBtn:hover,#fsBtn:active{opacity:.95}
-#fsBtn svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-@media (pointer:coarse){#fsBtn{width:34px;height:34px;opacity:.4}}
-@media (max-width:640px){#fsBtn{display:none}}
-body.clair:not(:has(.reader.open)) #fsBtn{background:rgba(255,255,255,.55);color:#222}
-</style>
-<script>
-(function(){
-  const b = document.getElementById("fsBtn"); if (!b || !document.fullscreenEnabled) return;
-  const ENTRER = '<svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>', QUITTER = '<svg viewBox="0 0 24 24"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg>';
-  const maj = () => { const on = !!document.fullscreenElement; b.innerHTML = on ? QUITTER : ENTRER; b.title = on ? "Quitter le plein écran" : "Plein écran"; b.setAttribute("aria-label", b.title); b.hidden = false; };
-  b.addEventListener("click", e => { e.stopPropagation(); try { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen(); } catch(x){} });
-  document.addEventListener("fullscreenchange", maj); maj();
-})();
-</script>
+
 <script>
 /* (7 nov.) Livres téléchargés d'avance, tout seuls : une fois connecté, chaque livre permis est demandé en arrière-plan, un à la fois.
    Le service worker (sw.js) le garde sur l'appareil (et, s'il l'a déjà, vérifie seulement s'il a changé : petite requête).
