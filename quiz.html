@@ -88,7 +88,7 @@ th{font-size:12px;color:var(--gris);border-top:0}
 .qe textarea.ex{min-height:0;height:46px;font-family:inherit;font-size:14px;margin-top:8px}
 
 /* joueur */
-#joueur{min-height:100vh;background:var(--fondJ,#2B2A3D);color:#fff;display:flex;align-items:center;justify-content:center;padding:18px 18px 56px}
+#joueur{min-height:100vh;background:var(--fondJ,#2B2A3D);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px 18px 56px}
 #joueur .bx{width:min(860px,100%);text-align:center}
 #joueur input{font-size:24px;text-align:center;margin:14px 0}
 #joueur h2{font-size:clamp(20px,3.4vw,30px);margin:0 0 18px;line-height:1.25}
@@ -120,7 +120,9 @@ th{font-size:12px;color:var(--gris);border-top:0}
 #ecr{min-height:100vh;background:#16181C;color:#F2EFEA;padding:3vh 3vw;position:relative}
 #ecr .haut{display:flex;justify-content:space-between;align-items:center;margin-bottom:2vh}
 #ecr .haut b{font-size:2.1vw}#ecr .haut span{font-size:1.3vw;color:#B5AFA6}
-#ecr .logoE{height:3vw;margin-right:1.2vw;vertical-align:middle}
+#ecr .logoE{height:3.6vw;margin-right:1.4vw;vertical-align:middle}
+/* Logo Métier+ toujours visible sur l'écran de classe (9 nov.) */
+#ecr::after{content:"";position:fixed;left:2vw;bottom:2.2vh;width:13vw;height:3.6vw;background:url(img/metier-plus-blanc.svg) left bottom/contain no-repeat;opacity:.95;pointer-events:none;z-index:5}
 #ecr .liseret{position:absolute;left:0;right:0;top:0;height:.6vh;background:var(--acc)}
 .banniere{position:relative;height:30vh;border-radius:1.2vw;overflow:hidden;margin-bottom:3vh;animation:monte .6s ease-out both}
 .banniere img{width:100%;height:100%;object-fit:cover;display:block}
@@ -354,7 +356,7 @@ body>div:not(.cache):not([hidden]){animation:fenFond .22s ease-out}
 <div id="ecr" class="cache"></div>
 
 <!-- ============ JOUEUR ============ -->
-<div id="joueur" class="cache"><img src="img/metier-plus-blanc.svg" alt="" style="position:fixed;bottom:14px;left:50%;transform:translateX(-50%);height:24px;opacity:.6"><div class="nomj" id="nomJ"></div><div class="ptsj" id="ptsJ"></div><div class="bx" id="jBx"></div></div>
+<div id="joueur" class="cache"><img src="img/metier-plus-blanc.svg" alt="" style="display:block;margin:4px auto 10px;height:32px"><div class="nomj" id="nomJ"></div><div class="ptsj" id="ptsJ"></div><div class="bx" id="jBx"></div></div>
 
 <!-- ============ TÉLÉCOMMANDE ============ -->
 <div id="tele" class="cache"><div class="wrap">
