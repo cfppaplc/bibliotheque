@@ -418,15 +418,29 @@ function envoyer(topic, obj){
 }
 function ecouter(topic, quand, etat){
   if (window.supabase) {
+    /* (9 nov.) réabonnement automatique si le lien tombe (iPad en veille, Wi-Fi qui saute) */
     const sb = window.supabase.createClient(SB_URL, SB_CLE, {realtime: {params: {eventsPerSecond: 20}}});
-    canal = sb.channel(topic, {config: {broadcast: {self: false}}});
-    canal.on("broadcast", {event: "m"}, ({payload}) => { try { quand(payload); } catch(x) {} });
-    canal.subscribe(st => {
-      const ok = st === "SUBSCRIBED";
-      if (ok && !pret) { pret = true; const a = attente; attente = []; a.forEach(o => envoyer(topic, o)); }
-      if (!ok && st !== "SUBSCRIBED") pret = st === "SUBSCRIBED";
-      etat(ok);
+    let gen = 0, ok = false, reT = null, cache = 0;
+    const abonner = () => {
+      const g = ++gen; clearTimeout(reT); reT = null;
+      if (canal) { try { sb.removeChannel(canal); } catch(x) {} }
+      pret = false;
+      canal = sb.channel(topic, {config: {broadcast: {self: false}}});
+      canal.on("broadcast", {event: "m"}, ({payload}) => { try { quand(payload); } catch(x) {} });
+      canal.subscribe(st => {
+        if (g !== gen) return;
+        ok = st === "SUBSCRIBED";
+        if (ok) { pret = true; const a = attente; attente = []; a.forEach(o => envoyer(topic, o)); }
+        else { pret = false; if (!reT) reT = setTimeout(abonner, 2000); }
+        etat(ok);
+      });
+    };
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) { cache = Date.now(); return; }
+      if (!ok || (cache && Date.now() - cache > 15000)) abonner();
     });
+    addEventListener("online", () => abonner());
+    abonner();
     return canal;
   }
   const es = new EventSource(RELAIS + topic + "/sse");
