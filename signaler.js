@@ -33,7 +33,7 @@
 
   /* ---- Erreurs automatiques ---- */
   var vues = {}, nb = 0;
-  var BRUIT = /ResizeObserver loop|Script error\.?$|AbortError|NotAllowedError|play\(\) request|fullscreen|Load failed|Failed to fetch|NetworkError|cancelled|annulé|chrome-extension|moz-extension|safari-extension/i;
+  var BRUIT = /ResizeObserver loop|Script error\.?$|AbortError|NotAllowedError|play\(\) request|fullscreen|Load failed|Failed to fetch|NetworkError|cancelled|annulé|chrome-extension|moz-extension|safari-extension|Transition was aborted|invalid state|View ?transition/i;
   function erreur(msg, ou){
     msg = String(msg || "").slice(0, 300);
     if (!msg || BRUIT.test(msg) || BRUIT.test(ou || "")) return;
