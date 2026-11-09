@@ -859,6 +859,7 @@ html.ui-clair #apercuOv .ap-moments button.on, html.ui-clair #apercuOv .ap-ferme
   <button type="button" role="menuitem" id="b-set">Réglages</button>
   <button type="button" role="menuitem" id="b-wid">Choisir les blocs affichés</button>
   <button type="button" role="menuitem" id="b-keys">Raccourcis clavier</button>
+  <button type="button" role="menuitem" id="b-menage">Ménage de l'atelier</button>
 </div>
 <div class="sheet" id="keys" hidden>
   <div class="sheet-in keys-in">
@@ -2978,6 +2979,122 @@ if (window.COFFRE && !/[?&]apercu=/.test(location.search)) COFFRE.demarrer("accu
     const s = typeof slotActif === "function" ? slotActif() : "", borne = s || auj + "|zz";
     for (const k in (O.plans || {})) if (!(k in pl) && k > borne) pl[k] = O.plans[k];   /* seulement les périodes pas encore commencées : une période arrivée est retirée par appliquerPlans (sinon boucle de rechargements) */
     C.plans = pl; return JSON.stringify(C); } } });
+</script>
+
+<style>
+/* Ménage de l'atelier (9 nov.) : liste de tâches cochées par les élèves dans les dernières minutes d'une activité « atelier » */
+#menage{position:fixed;right:24px;bottom:24px;z-index:60;width:min(560px,44vw);max-height:calc(100vh - 48px);display:flex;flex-direction:column;
+  background:#141a26;color:#fff;border:1px solid #ffffff22;border-radius:18px;box-shadow:0 24px 60px #0008;font-family:Inter,system-ui,sans-serif;
+  transform:translateY(20px);opacity:0;transition:opacity .35s,transform .35s}
+#menage.on{transform:none;opacity:1}
+#menage .mn-tete{display:flex;align-items:center;gap:12px;padding:16px 18px 10px}
+#menage .mn-tete h2{margin:0;font-size:24px;flex:1}
+#menage .mn-tete small{display:block;font-size:14px;font-weight:500;opacity:.7;margin-top:2px}
+#menage .mn-btn{background:#ffffff14;border:0;color:#fff;border-radius:10px;min-width:44px;height:44px;font-size:18px;cursor:pointer}
+#menage .mn-barre{height:8px;margin:0 18px 10px;background:#ffffff18;border-radius:6px;overflow:hidden}
+#menage .mn-barre i{display:block;height:100%;width:0;background:#2EB872;transition:width .4s}
+#menage ul{list-style:none;margin:0;padding:0 12px 12px;overflow:auto}
+#menage li{margin:6px 0;border-radius:12px;background:#ffffff0d}
+#menage li .mn-l{display:flex;align-items:center;gap:14px;padding:12px 12px;min-height:52px}
+#menage .mn-c{flex:0 0 40px;height:40px;border-radius:10px;border:3px solid #ffffff66;background:none;cursor:pointer;display:grid;place-items:center;color:#fff;font-size:24px;font-weight:900}
+#menage li.fait .mn-c{background:#2EB872;border-color:#2EB872}
+#menage .mn-t{flex:1;font-size:20px;font-weight:700;cursor:pointer;text-align:left;background:none;border:0;color:inherit;padding:4px 0;font-family:inherit}
+#menage li.fait .mn-t{opacity:.55;text-decoration:line-through}
+#menage .mn-i{font-size:13px;opacity:.6;white-space:nowrap}
+#menage .mn-d{display:none;padding:0 16px 14px 66px;font-size:17px;line-height:1.45;opacity:.9}
+#menage li.ouvert .mn-d{display:block}
+#menage .mn-bravo{display:none;margin:0 18px 16px;padding:14px;border-radius:12px;background:#2EB87233;color:#7CF0B0;font-size:20px;font-weight:800;text-align:center}
+#menage.fini .mn-bravo{display:block}
+#menage.mini{width:auto;cursor:pointer}
+#menage.mini ul,#menage.mini .mn-barre,#menage.mini .mn-bravo,#menage.mini .mn-tete .mn-btn{display:none}
+#menage.mini .mn-tete{padding:12px 18px}
+#menage.mini .mn-tete h2{font-size:18px}
+#menageEd textarea{width:100%;min-height:260px;font:15px/1.5 Inter,system-ui,sans-serif;box-sizing:border-box}
+#menageEd .ed-l{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:10px 0}
+#menageEd input{font:inherit;padding:6px 8px}
+html.apercu-mode #menage{display:none}
+</style>
+<div id="menage" hidden aria-live="polite">
+  <div class="mn-tete"><div style="flex:1"><h2>Ménage de l'atelier <span id="mnCompte"></span></h2><small id="mnSous">Coche ta tâche quand elle est faite · touche le nom pour voir les détails</small></div>
+    <button type="button" class="mn-btn" id="mnMini" title="Réduire">–</button></div>
+  <div class="mn-barre"><i id="mnBarre"></i></div>
+  <ul id="mnListe"></ul>
+  <div class="mn-bravo">L'atelier est propre. Bravo l'équipe !</div>
+</div>
+<div class="sheet" id="menageEd" hidden>
+  <div class="sheet-in">
+    <h2>Ménage de l'atelier</h2>
+    <p style="opacity:.8;margin:4px 0 10px">Une tâche par ligne. Pour ajouter une description que les élèves voient en touchant la tâche : <b>Tâche | description</b>.</p>
+    <textarea id="mnTxt"></textarea>
+    <div class="ed-l"><label>Apparaît dans les <input id="mnMin" type="number" min="1" max="60" style="width:70px"> dernières minutes des activités contenant le mot <input id="mnMot" style="width:140px"></label></div>
+    <div class="ed-l"><button type="button" class="prim" id="mnOk">Enregistrer</button><button type="button" id="mnVoir">Afficher maintenant</button><button type="button" id="mnAnn">Fermer</button></div>
+  </div>
+</div>
+<script>
+/* Ménage de l'atelier (9 nov., demande de Jeremy) : cfg.menage = {taches:[{t, d}], mot, min}; cases cochées par occurrence dans localStorage.menageFait */
+(() => {
+  const DEF = {mot: "atelier", min: 10, taches: [
+    {t: "Ranger les outils", d: "Remettre chaque outil à sa place sur le panneau ou dans le coffre de la cabine."},
+    {t: "Balayer la cabine", d: "Balai et porte-poussière; vider dans la poubelle."},
+    {t: "Ramasser les retailles", d: "Bouts de tuyaux et raccords dans le bac de récupération."},
+    {t: "Fermer l'eau et le gaz", d: "Robinets fermés, bonbonnes de soudure fermées et rangées."},
+    {t: "Nettoyer l'établi", d: "Essuyer la surface, rien ne traîne."}]};
+  const M = () => Object.assign({}, DEF, cfg.menage || {});
+  const norm = x => String(x || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+  const el = document.getElementById("menage"), ul = document.getElementById("mnListe");
+  const lireFait = () => { try { return JSON.parse(localStorage.menageFait || "{}"); } catch(e) { return {}; } };
+  let cle = null, force = false, mini = false, rendu = "";
+  function dessiner(){
+    const m = M(), F = lireFait()[cle] || [], n = m.taches.length, f = F.filter(i => i < n).length;
+    const k = JSON.stringify([m.taches, F, cle]); if (k === rendu) return; rendu = k;
+    const ouverts = [...ul.querySelectorAll("li.ouvert")].map(li => +li.dataset.i);
+    ul.innerHTML = m.taches.map((x, i) => `<li data-i="${i}" class="${F.includes(i) ? "fait" : ""} ${ouverts.includes(i) ? "ouvert" : ""}"><div class="mn-l"><button type="button" class="mn-c" aria-label="Fait">${F.includes(i) ? "✓" : ""}</button><button type="button" class="mn-t"></button>${x.d ? '<span class="mn-i">détails ▾</span>' : ""}</div><div class="mn-d"></div></li>`).join("");
+    ul.querySelectorAll("li").forEach((li, i) => { li.querySelector(".mn-t").textContent = m.taches[i].t; li.querySelector(".mn-d").textContent = m.taches[i].d || ""; });
+    document.getElementById("mnCompte").textContent = n ? `· ${f}/${n}` : "";
+    document.getElementById("mnBarre").style.width = n ? (100 * f / n) + "%" : "0";
+    el.classList.toggle("fini", n > 0 && f === n);
+  }
+  ul.addEventListener("click", e => {
+    const li = e.target.closest("li"); if (!li) return; const i = +li.dataset.i;
+    if (e.target.closest(".mn-c")) { const T = lireFait(), F = T[cle] || []; T[cle] = F.includes(i) ? F.filter(x => x !== i) : F.concat(i);
+      for (const k in T) if (k.slice(0, 10) < new Date(Date.now() - 7 * 864e5).toISOString().slice(0, 10)) delete T[k];
+      try { localStorage.menageFait = JSON.stringify(T); } catch(x) {} rendu = ""; dessiner(); }
+    else if (e.target.closest(".mn-t, .mn-i")) li.classList.toggle("ouvert");
+  });
+  let actifVu = false;
+  document.getElementById("mnMini").onclick = e => { e.stopPropagation(); if (force && !actifVu) { force = false; montrer(false); return; } mini = true; el.classList.add("mini"); };
+  el.addEventListener("click", () => { if (mini) { mini = false; el.classList.remove("mini"); } });
+  function montrer(on){
+    if (on && el.hidden) { el.hidden = false; requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add("on"))); }
+    else if (!on && !el.hidden) { el.classList.remove("on"); setTimeout(() => { if (!el.classList.contains("on")) el.hidden = true; }, 360); }
+  }
+  function verifier(){
+    const m = M(), now = new Date(), nowMin = now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60;
+    let actif = null;
+    try { const ps = periods(), cur = ps.find(p => nowMin >= p.start && nowMin < p.end);
+      if (cur && m.mot) { const r = timeline(cur.start, cfg.steps).find(r => !r.pause && nowMin >= r.start && nowMin < r.end && norm(r.label).includes(norm(m.mot)));
+        if (r && r.end - nowMin <= m.min) actif = r; } } catch(e) {}
+    const jour = now.toISOString().slice(0, 10);
+    actifVu = !!actif; document.getElementById("mnMini").textContent = force && !actif ? "✕" : "–";
+    if (actif) { cle = jour + "|" + Math.round(actif.start); force = false; }
+    else if (force) cle = cle || jour + "|manuel";
+    if (actif || force) { dessiner(); montrer(true); } else montrer(false);
+  }
+  setInterval(verifier, 5000); setTimeout(verifier, 1500);
+  // Modifier la liste (Plus → Ménage de l'atelier)
+  const ed = document.getElementById("menageEd");
+  document.getElementById("b-menage").onclick = () => { closeMenu(); const m = M();
+    document.getElementById("mnTxt").value = m.taches.map(x => x.t + (x.d ? " | " + x.d : "")).join("\n");
+    document.getElementById("mnMin").value = m.min; document.getElementById("mnMot").value = m.mot; ed.hidden = false; };
+  const fermerEd = () => { ed.hidden = true; };
+  document.getElementById("mnAnn").onclick = fermerEd;
+  document.getElementById("mnOk").onclick = () => {
+    const taches = document.getElementById("mnTxt").value.split("\n").map(l => l.trim()).filter(Boolean).map(l => { const [t, ...d] = l.split("|"); return {t: t.trim(), d: d.join("|").trim()}; });
+    cfg.menage = {taches, mot: document.getElementById("mnMot").value.trim() || "atelier", min: Math.max(1, Math.min(60, +document.getElementById("mnMin").value || 10))};
+    save(); rendu = ""; fermerEd(); verifier(); };
+  document.getElementById("mnVoir").onclick = () => { fermerEd(); force = true; cle = new Date().toISOString().slice(0, 10) + "|manuel"; mini = false; el.classList.remove("mini"); verifier(); };
+  window.menageTest = verifier;
+})();
 </script>
 </body>
 </html>
