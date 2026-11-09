@@ -734,6 +734,13 @@ function telecommande(bord){
     if (m.m === "vie" && m.pid && !P[m.pid]) { envoyer(topic, {m: "qui", pour: m.pid}); return; }
     if (m.m === "vie" || m.m === "bye") return;
     if (m.m === "ici") {
+      /* 9 nov. : même prénom = même joueur qui revient (iPad planté, QR rescanné : nouvel identifiant) → il reprend ses points.
+         Même prénom qu'un autre joueur encore présent avec un autre personnage → refusé (deux fois le même prénom interdit). */
+      const nrm = x => String(x || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
+      const dbl = Object.entries(P).find(([id, p]) => id !== m.pid && !p.exclu && nrm(p.nom) === nrm(m.nom));
+      if (dbl) { const [oid, op] = dbl, absent = op.parti || Date.now() - (op.vu || 0) > 25000;
+        if (op.av === m.av || absent) { P[m.pid] = op; delete P[oid]; if (G.reps[oid]) { G.reps[m.pid] = G.reps[oid]; delete G.reps[oid]; } envoyer(topic, {m: "remplace", pour: oid}); }
+        else { envoyer(topic, {m: "refus", pour: m.pid, raison: "nom"}); return; } }
       if (m.av != null && Object.entries(P).some(([id, p]) => !p.parti && p.av === m.av && id !== m.pid)) { envoyer(topic, {m: "refus", pour: m.pid}); return; }
       if ((!P[m.pid] || P[m.pid].parti) && ids().length >= MAX_J) { envoyer(topic, {m: "refus", pour: m.pid, raison: "plein", max: MAX_J}); return; }
       if (P[m.pid]) P[m.pid].exclu = false;
@@ -1060,12 +1067,12 @@ function joueur(code){
     $("jGo").onclick = entrer;
   }
   function entrer(){
-    if (av < 0 || pris.includes(av)) return;
+    if (av < 0) return;   /* personnage déjà pris : la télécommande décide (même prénom = c'est lui qui revient) */
     nom = (nomEdite ? surnom($("jPre").value) : "") || PERSOS[av][0]; entre = true;
     $("nomJ").innerHTML = visage(av, "v-m") + " " + esc(nom);
     bx(`${visage(av, "v-l")}<div class="gros monte">Bienvenue, ${esc(nom)}.</div><div>Regarde le tableau : ça commence bientôt.</div>`);
     envoyer(topic, {m: "ici", pid, nom, av, prenom});
-    try { sessionStorage.setItem("quizJoueur", JSON.stringify({code, av, nom, nomEdite, t: Date.now()})); } catch(e) {}
+    try { const J = JSON.stringify({code, av, nom, nomEdite, t: Date.now()}); sessionStorage.setItem("quizJoueur", J); localStorage.setItem("quizDernier", J); } catch(e) {}
     if (!entrer.vie) { entrer.vie = setInterval(() => { if (entre) envoyer(topic, {m: "vie", pid}); }, 12000);
       addEventListener("pagehide", () => { if (entre) envoyer(topic, {m: "bye", pid}); });
       /* l'iPad ne se met pas en veille pendant la partie (Safari 16.4 et plus); redemandé au retour sur la page */
@@ -1073,6 +1080,9 @@ function joueur(code){
       eveil(); document.addEventListener("visibilitychange", eveil); }
   }
   ecranChoix();
+  /* Revenu par un nouvel onglet (iPad planté, QR rescanné) : personnage et prénom déjà choisis, « Entrer » reprend ses points */
+  try { const D = JSON.parse(localStorage.getItem("quizDernier") || "null");
+    if (D && D.code === code && Date.now() - D.t < 4 * 3600e3 && D.av >= 0 && !sessionStorage.getItem("quizJoueur")) { av = D.av; nomEdite = !!D.nomEdite; nomChoisi = D.nom; ecranChoix("Tu étais déjà dans la partie : touche « Entrer » pour reprendre tes points."); } } catch(e) {}
   // Joueur déjà entré (page rechargée, enseignant déconnecté) : on revient tout seul, sans rechoisir
   try { const J = JSON.parse(sessionStorage.getItem("quizJoueur") || "null");
     if (J && J.code === code && Date.now() - J.t < 4 * 3600e3 && J.av >= 0) { av = J.av; nomEdite = !!J.nomEdite; nomChoisi = J.nom; ecranChoix(); entrer();
@@ -1082,6 +1092,8 @@ function joueur(code){
       // La télécommande ne me connaît pas (rechargée, partie neuve) : je me réannonce tout seul
       if (m.m === "persos") { pris = m.pris || []; if (!entre) ecranChoix(ecranChoix.msg); else if (!pris.includes(av)) reannoncer(); return; }
       if (m.m === "bienvenue" && !m.pour) reannoncer();
+      if (m.m === "remplace" && m.pour === pid) { entre = false; clearInterval(chrono); bx('<div class="gros">Tu es revenu sur un autre écran.</div><div>Ta partie continue là-bas, avec tes points.</div>'); return; }
+      if (m.m === "refus" && m.pour === pid && m.raison === "nom") { entre = false; try { sessionStorage.removeItem("quizJoueur"); } catch(e) {} nomEdite = true; nomChoisi = ""; ecranChoix("Ce prénom est déjà utilisé dans la partie. Écris un autre prénom ou surnom."); return; }
       if (m.m === "refus" && m.pour === pid) { entre = false; try { sessionStorage.removeItem("quizJoueur"); } catch(e) {} av = -1; if (!nomEdite) nomChoisi = ""; ecranChoix(m.raison === "plein" ? `La partie est pleine (${m.max} joueurs au plus). Demande à l'enseignant.` : "Ce personnage vient d'être pris. Choisis-en un autre."); return; }
       if (m.m === "qui" && (m.pour === pid || m.pour === "tous")) { if (entre) envoyer(topic, {m: "ici", pid, nom, av, prenom}); return; }
       if (m.m === "ferme" && entre) { entre = false; try { sessionStorage.removeItem("quizJoueur"); } catch(e) {} clearInterval(chrono);
