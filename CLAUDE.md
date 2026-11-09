@@ -211,7 +211,7 @@
 - Liste des dossiers dans `index.html` : boutons `.pl-ex[data-ex]`, `DOSSIERS`, et `dossiers` du catalogue envoyé au tableau de bord.
 
 ## Points ouverts / à savoir
-- « Communiquer en milieu de travail » (436-282) a été classé **Compétence 9** par déduction (Plomberie et chauffage = 10 = 436-295).
+- **Numérotation des compétences EGI de l'école (8 nov., capture des dossiers de Jeremy)** : 1 = 436-201, 2 = 212, 3 = 222, 4 = 238, 5 = 244, 6 = 255, 7 = 282 (Communiquer), 8 = 352 (Recherche d'emploi), 9 = 266, 10 = 295, 11 = 304, 12 = 312, 13 = 274, 14 = 323, 15 = 333, 16 = 343, 17 = 364 (18 = Élèves d'un jour). Elle ne suit pas l'ordre officiel des codes. Cartes de l'accueil : `.comp` sans le « DEP 5211 · » du début (demande de Jeremy). Ancienne note : « Communiquer » avait été classé 9 par déduction.
   À confirmer avec Jeremy : les numéros de compétence ne suivent pas l'ordre des codes (le livre C13 indique « Module 13 · 436-274 »),
   donc ce 9 est douteux.
 - Le 22 octobre 2026, GitHub Pages a semblé arrêter de publier pendant un moment après des push réussis.

@@ -1307,7 +1307,7 @@ window.COUVERTURES = {
    ===================================================================== */
 /* Liste des livres. Ajouter un livre : voir CLAUDE.md (« Ajouter un livre ») — fichier dans livres/, entrée ici, couverture dans window.COUVERTURES, entrée « ajout » dans nouveautes.json. */
 const LIVRES = [
-  { titre:"Entretien ménager d'un bâtiment", auteur:"Jérémy Raymond", categorie:"Entretien général d'immeubles", niveau:"DEP 5211 · 436-238",
+  { titre:"Entretien ménager d'un bâtiment", auteur:"Jérémy Raymond", categorie:"Entretien général d'immeubles", niveau:"DEP 5211 · Compétence 4 · 436-238", competence:"4",
     pages:245, annee:2026, nouveau:true, couverture:"", couleurs:["#f2c230","#14191e"], lien:"", fichier:"entretien-menager-egi", version:"4", enConstruction:true,
     description:"Cahier d'apprentissage de 120 heures (436-238) : 15 modules et un formatif. Microbes et désinfection, chimie des produits, produits verts et cycle de l'azote, surfaces et machines, planchers et tapis, hôtel, aréna, vitres et hauteur, hiver, piscines, terrain, urgences et sinistres, gestion. Études de cas, ateliers pratiques, cartes « Urgence du jour » et réponses pas à pas." },
   { titre:"Moyens de recherche d'emploi", auteur:"Jérémy Raymond", categorie:"Entretien général d'immeubles", niveau:"DEP 5211 · Compétence 8 · 436-352", competence:"8",
@@ -1347,8 +1347,8 @@ const LIVRES = [
   { titre:"Utiliser un micro-ordinateur — essai gratuit", auteur:"Jérémy Raymond", categorie:"Entretien général d'immeubles", niveau:"Essai gratuit · Module 1",
     pages:17, annee:2026, couverture:"", couleurs:["#E8592C","#26303b"], lien:"", fichier:"essai-micro-ordinateur", essai:true, couvDe:"micro-ordinateur",
     description:"Essai gratuit, sans connexion : la couverture, la table des matières et le module 1 (le portable et le poste de travail) du livre « Utiliser un micro-ordinateur », avec ses guides animés. Le livre complet compte 9 modules et 173 pages." },
-  { titre:"Communiquer en milieu de travail", auteur:"Jérémy Raymond", categorie:"Entretien général d'immeubles", niveau:"DEP 5211 · Compétence 9",
-    pages:176, annee:2026, nouveau:true, couverture:"", couleurs:["#8B6CFF","#211f33"], lien:"", fichier:"communiquer", competence:"9",
+  { titre:"Communiquer en milieu de travail", auteur:"Jérémy Raymond", categorie:"Entretien général d'immeubles", niveau:"DEP 5211 · Compétence 7",
+    pages:176, annee:2026, nouveau:true, couverture:"", couleurs:["#8B6CFF","#211f33"], lien:"", fichier:"communiquer", competence:"7",
     description:"Cahier d'apprentissage de 30 heures (436-282) en 9 modules : le rôle du préposé, les bases de la communication, les occupants, le travail d'équipe, l'écrit professionnel, le téléphone et la radio, les situations difficiles, l'éthique et l'image professionnelle, et une évaluation formative. Jeux de rôle, documents de travail et situations tirées du terrain." },
   { titre:"Entretien de matériel électrique", auteur:"Jérémy Raymond", categorie:"Entretien général d'immeubles", niveau:"DEP 5211 · Compétence 13",
     pages:166, annee:2026, nouveau:true, enConstruction:true, couverture:"", couleurs:["#C6F432","#18191c"], lien:"", fichier:"materiel-electrique-c13", version:"3", competence:"13",
@@ -1446,7 +1446,7 @@ function bookCard(l){
     ${progression(l)}
   </div>
   <div class="ttl" title="${esc(l.titre)}">${esc(l.titre)}</div>
-  ${l.competence || l.niveau ? `<div class="comp">${esc(l.niveau || ("Compétence " + l.competence))}</div>` : ''}
+  ${l.competence || l.niveau ? `<div class="comp">${esc(((l.niveau || "").replace(/^DEP\s*\d+\s*·\s*/, "")) || ("Compétence " + l.competence))}</div>` : ''}
   </div>`;
 }
 
