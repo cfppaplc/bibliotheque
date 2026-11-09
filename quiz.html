@@ -508,12 +508,18 @@ const EXEMPLE = {id: "exemple-incendie", exemple: true, titre: "Protection incen
 const PERSOS = [
   ["Marc-Antoine Pelletier", "Plombier"], ["Julie Bérubé", "Plombière"], ["Samuel Gagnon", "Électricien"], ["Émilie Dionne", "Électricienne"],
   ["Kevin Bouchard", "Soudeur"], ["Mélanie Gauthier", "Soudeuse"], ["Jonathan Ouellet", "Frigoriste"], ["Karine Thériault", "Inspectrice en bâtiment"],
-  ["Alexandre Côté", "Pompier"], ["Audrey Lavoie", "Préposée à l'entretien"], ["Mathieu Lévesque", "Charpentier-menuisier"], ["Sophie Morin", "Ingénieure en mécanique"]];
+  ["Alexandre Côté", "Pompier"], ["Audrey Lavoie", "Préposée à l'entretien"], ["Mathieu Lévesque", "Charpentier-menuisier"], ["Sophie Morin", "Ingénieure en mécanique"],
+  /* 9 nov. : 30 personnages (classes de 20 et plus); les 12 premiers ont une photo, les autres ont leurs initiales */
+  ["Olivier Tremblay", "Mécanicien de machines fixes"], ["Catherine Roy", "Plombière"], ["Maxime Fortin", "Électricien"], ["Valérie Pelletier", "Frigoriste"],
+  ["Vincent Gagné", "Tuyauteur"], ["Isabelle Lapointe", "Estimatrice en construction"], ["Patrick Caron", "Mécanicien en protection-incendie"], ["Marie-Ève Dubé", "Préposée à l'entretien"],
+  ["Nicolas Bélanger", "Briqueteur-maçon"], ["Geneviève Ouellette", "Contremaîtresse de chantier"], ["Jérôme Paradis", "Calorifugeur"], ["Annie Michaud", "Soudeuse"],
+  ["Simon Desjardins", "Plâtrier"], ["Chloé Fournier", "Technicienne en bâtiment"], ["David Bergeron", "Couvreur"], ["Noémie St-Pierre", "Électricienne"],
+  ["Gabriel Lemieux", "Ferblantier"], ["Laurence Boucher", "Inspectrice en bâtiment"]];
 const persoImg = k => "img/labo/perso/" + String(k + 1).padStart(2, "0") + ".jpg";
 function visage(k, cls){
   const p = PERSOS[k]; if (!p) return "";
   const ini = p[0].split(/[\s-]+/).map(x => x[0]).slice(0, 2).join("");
-  return `<span class="vis ${cls || ""}" style="--vc:${["#534AB7", "#B3261E", "#185FA5", "#0F6E56", "#854F0B", "#3A3936"][k % 6]}"><b>${ini}</b><img src="${persoImg(k)}" alt="" onerror="this.remove()"></span>`;
+  return `<span class="vis ${cls || ""}" style="--vc:${["#534AB7", "#B3261E", "#185FA5", "#0F6E56", "#854F0B", "#3A3936"][k % 6]}"><b>${ini}</b>${k < 12 ? `<img src="${persoImg(k)}" alt="" onerror="this.remove()">` : ""}</span>`;
 }
 function grillePersos(pris, choisi){
   return `<div class="persos">${PERSOS.map((p, k) => `<button class="perso ${pris.includes(k) && k !== choisi ? "pris" : ""} ${k === choisi ? "choisi" : ""}" data-av="${k}">${visage(k, "v-l")}<b>${esc(p[0])}</b><small>${esc(p[1])}</small><em>Déjà pris</em></button>`).join("")}</div>`;
