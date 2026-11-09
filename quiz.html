@@ -531,11 +531,11 @@ const PERSOS = [
   ["Kevin Bouchard", "Soudeur"], ["Mélanie Gauthier", "Soudeuse"], ["Jonathan Ouellet", "Frigoriste"], ["Karine Thériault", "Inspectrice en bâtiment"],
   ["Alexandre Côté", "Pompier"], ["Audrey Lavoie", "Préposée à l'entretien"], ["Mathieu Lévesque", "Charpentier-menuisier"], ["Sophie Morin", "Ingénieure en mécanique"],
   /* 9 nov. : 30 personnages (classes de 20 et plus); les 12 premiers ont une photo, les autres ont leurs initiales */
-  ["Olivier Tremblay", "Mécanicien de machines fixes"], ["Catherine Roy", "Plombière"], ["Maxime Fortin", "Électricien"], ["Valérie Pelletier", "Frigoriste"],
-  ["Vincent Gagné", "Tuyauteur"], ["Isabelle Lapointe", "Estimatrice en construction"], ["Patrick Caron", "Mécanicien en protection-incendie"], ["Marie-Ève Dubé", "Préposée à l'entretien"],
-  ["Nicolas Bélanger", "Briqueteur-maçon"], ["Geneviève Ouellette", "Contremaîtresse de chantier"], ["Jérôme Paradis", "Calorifugeur"], ["Annie Michaud", "Soudeuse"],
-  ["Simon Desjardins", "Plâtrier"], ["Chloé Fournier", "Technicienne en bâtiment"], ["David Bergeron", "Couvreur"], ["Noémie St-Pierre", "Électricienne"],
-  ["Gabriel Lemieux", "Ferblantier"], ["Laurence Boucher", "Inspectrice en bâtiment"]];
+  ["Olivier Tremblay", "Cuisinier"], ["Catherine Roy", "Infirmière auxiliaire"], ["Maxime Fortin", "Mécanicien automobile"], ["Valérie Pelletier", "Comptable"],
+  ["Vincent Gagné", "Opérateur de machinerie lourde"], ["Isabelle Lapointe", "Préposée aux bénéficiaires"], ["Patrick Caron", "Boucher"], ["Marie-Ève Dubé", "Coiffeuse"],
+  ["Nicolas Bélanger", "Camionneur"], ["Geneviève Ouellette", "Adjointe administrative"], ["Jérôme Paradis", "Technicien en soutien informatique"], ["Annie Michaud", "Pâtissière"],
+  ["Simon Desjardins", "Horticulteur-paysagiste"], ["Chloé Fournier", "Assistante dentaire"], ["David Bergeron", "Ébéniste"], ["Noémie St-Pierre", "Esthéticienne"],
+  ["Gabriel Lemieux", "Machiniste"], ["Laurence Boucher", "Fleuriste"]];
 const persoImg = k => "img/labo/perso/" + String(k + 1).padStart(2, "0") + ".jpg";
 function visage(k, cls){
   const p = PERSOS[k]; if (!p) return "";
