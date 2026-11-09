@@ -154,6 +154,7 @@ th{font-size:12px;color:var(--gris);border-top:0}
 .cpt{display:flex;justify-content:space-between;align-items:center;margin-top:3vh;font-size:1.8vw;color:#B5AFA6}.cpt b{font-size:4vw;color:#fff}
 .eexpl{margin-top:3vh;font-size:1.7vw;color:#D9D4CC;background:#22252B;border-left:.4vw solid var(--acc);border-radius:.8vw;padding:1.4vw 2vw}
 .lgs{position:relative}
+#eLgs .lg{font-size:calc(1.9vw * var(--k,1));padding:calc(1.1vw * var(--k,1)) 1.6vw;margin-bottom:calc(1vh * var(--k,1))}#eLgs .v-e{font-size:calc(2.6vw * var(--k,1))}
 .lg{display:grid;grid-template-columns:4vw 1fr auto;gap:1vw;align-items:center;background:#22252B;border-radius:1vw;padding:1.1vw 1.6vw;margin-bottom:1vh;font-size:1.9vw;transition:transform .7s cubic-bezier(.2,.8,.2,1)}
 .lg .r{font-weight:900;color:#B5AFA6}.lg small.mo{color:#7CF0A8;font-size:1.3vw;margin-left:.6vw}.lg small.de{color:#FF9A90;font-size:1.3vw;margin-left:.6vw}.lg b{font-weight:900}.lg small{color:#7CF0A8;font-weight:800;margin-right:1.2vw;font-size:1.4vw}
 .podium{display:flex;justify-content:center;align-items:flex-end;gap:2vw;margin:16vh 0 2.5vh}
@@ -1246,7 +1247,13 @@ function ecran(code){
     E.innerHTML = tete("Classement après la question " + (v.i + 1) + " sur " + v.n) + `<div class="lgs" id="eLgs">${garde.sort((a, b) => rAvant[a.k] - rAvant[b.k]).map(ligne).join("")}</div>` + bSon();
     const rows = [...E.querySelectorAll("#eLgs .lg")];
     if (rows.length < 1) return;
-    const pas = rows.length > 1 ? rows[1].getBoundingClientRect().top - rows[0].getBoundingClientRect().top : 0;
+    let pas;
+    /* 9 nov. : seulement les 10 premiers; ceux qui sortent du top glissent hors du cadre, ceux qui y entrent arrivent du bas */
+    { /* 9 nov. : les 10 premiers tiennent dans l'écran, au-dessus des boutons du bas */
+      const L = $("eLgs"), m = rows[Math.min(N, rows.length) - 1].getBoundingClientRect().bottom - rows[0].getBoundingClientRect().top, dispo = innerHeight - rows[0].getBoundingClientRect().top - ($("animBar") ? 90 : 30);
+      if (m > dispo) L.style.setProperty("--k", Math.max(.55, dispo / m * .97).toFixed(3)); }
+    pas = rows.length > 1 ? rows[1].getBoundingClientRect().top - rows[0].getBoundingClientRect().top : 0;
+    if (rows.length > N){ const L = $("eLgs"); L.style.height = (rows[N - 1].getBoundingClientRect().bottom - rows[0].getBoundingClientRect().top) + "px"; L.style.overflow = "hidden"; }
     rows.forEach(el => { el.style.opacity = 0; el.style.transform = "translateY(12px)"; });
     rows.forEach((el, k) => setTimeout(() => { el.style.transition = "opacity .4s, transform .4s"; el.style.opacity = 1; el.style.transform = ""; }, 80 * k));
     setTimeout(() => {
