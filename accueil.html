@@ -3046,8 +3046,8 @@ html.apercu-mode #menage{display:none}
 /* Urgence (9 nov., Jeremy : « plus le temps avance, plus les ménages pas faits flashent; personne part si c'est pas coché ») : --u = 0 → 1 selon le temps écoulé, --vit = durée d'un flash */
 #menage{--u:0;--vit:2.6s}
 #menage li:not(.fait){animation:mnFlash var(--vit) ease-in-out infinite}
-@keyframes mnFlash{0%,100%{background:#ffffff0d;border-color:#ffffff14;box-shadow:none}
-  50%{background:color-mix(in srgb,#D97B6C calc(var(--u) * 26%),#ffffff0d);border-color:color-mix(in srgb,#D97B6C calc(20% + var(--u) * 55%),#ffffff22);box-shadow:0 0 calc(var(--u) * 22px) color-mix(in srgb,#D97B6C calc(var(--u) * 35%),transparent)}}
+@keyframes mnFlash{0%,100%{background:#ffffff0d;border-color:#ffffff14}
+  50%{background:color-mix(in srgb,#D97B6C calc(var(--u) * 26%),#ffffff0d);border-color:color-mix(in srgb,#D97B6C calc(20% + var(--u) * 55%),#ffffff22)}}
 #menage .mn-pers{display:none;margin:0 0 1.6vh;padding:1.2vh 1vw;border-radius:12px;background:#B5574D;color:#fff;text-align:center;font-weight:800;font-size:clamp(20px,2.2vw,40px);animation:mnPers var(--vit) ease-in-out infinite}
 #menage.presse:not(.fini) .mn-pers{display:block}
 @keyframes mnPers{50%{background:#9A4A42}}
