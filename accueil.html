@@ -812,7 +812,7 @@ html.ui-clair #apercuOv .ap-moments button.on, html.ui-clair #apercuOv .ap-ferme
 
   <aside class="side">
     <div class="panel now-card" data-w="maintenant">
-      <div class="now-blk"><span class="now-lbl">Maintenant</span><div class="now-txt" id="v-now">—</div><div class="now-time" id="v-nowt"></div><button class="now-go" id="v-go" type="button" hidden></button></div>
+      <div class="now-blk"><span class="now-lbl">Maintenant</span><div class="now-txt" id="v-now">—</div><div class="now-time" id="v-nowt"></div><div class="now-av" aria-hidden="true"><i id="v-nowav"></i></div><button class="now-go" id="v-go" type="button" hidden></button></div>
       <div class="now-blk nxt" id="v-nextblk"><span class="now-lbl">Ensuite</span><div class="next-txt" id="v-next"></div><div class="now-time" id="v-nextt"></div><button class="now-go petit" id="v-go2" type="button" hidden></button></div>
     </div>
     <div class="panel" data-w="deroulement">
@@ -3282,6 +3282,19 @@ html.style-pro .seg.p { background: repeating-linear-gradient(135deg, color-mix(
 html.style-pro .seg.p.now { background: repeating-linear-gradient(135deg, color-mix(in srgb, var(--copper) 35%, transparent) 0 6px, transparent 6px 14px) !important; border: 2px solid var(--copper) !important; }
 html.style-pro .exam-badge, html.style-pro .en-cours { box-shadow: none; }
 #lueur { opacity: .35; }
+/* Idée « Maintenant en vedette » (9 nov., « as-tu une autre idée, tu as le droit de changer des choses ») :
+   la carte Maintenant ressort (bande orange, étiquette en pastille, barre d'avancement de l'activité), Ensuite devient une ligne compacte. */
+html.style-pro .now-card { position: relative; overflow: hidden; padding-left: calc(var(--u) * 52) !important; justify-content: center; }
+html.style-pro .now-card::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: calc(var(--u) * 10); background: linear-gradient(var(--copper), #F2A35E); }
+html.style-pro .now-blk:not(.nxt) .now-lbl { align-self: flex-start; background: color-mix(in srgb, var(--copper) 18%, transparent); color: var(--copper); border-radius: 999px; padding: calc(var(--u) * 4) calc(var(--u) * 16); }
+html.style-pro .now-blk:not(.nxt) .now-lbl::before { display: none; }
+html.style-pro .now-txt { font-size: calc(var(--u) * 92); letter-spacing: -.01em; }
+html.style-pro .now-av { height: calc(var(--u) * 8); border-radius: 99px; background: color-mix(in srgb, var(--ink) 10%, transparent); overflow: hidden; margin-top: calc(var(--u) * 10); }
+html.style-pro .now-av i { display: block; height: 100%; width: var(--pg, 0%); background: linear-gradient(90deg, var(--copper), #F2A35E); border-radius: 99px; transition: width 1s linear; }
+html.style-pro .now-blk.nxt { flex-direction: row; flex-wrap: wrap; align-items: baseline; gap: 0 calc(var(--u) * 16); padding-top: calc(var(--u) * 26); border-top: 1px solid var(--line); }
+html.style-pro .now-blk.nxt .next-txt { font-size: calc(var(--u) * 42); opacity: 1; }
+html.style-pro .now-blk.nxt .now-time { font-size: calc(var(--u) * 30); }
+html.style-pro .now-card hr, html.style-pro .now-card .sep { display: none; }
 #mpCoin{position:fixed;right:clamp(16px,1.6vw,32px);bottom:clamp(10px,1.3vh,24px);height:clamp(22px,2.6vh,40px);z-index:5;opacity:.85;pointer-events:none}
 #mpCoin img{height:100%;display:block}
 #mpCoin .lg-clr{display:none}
@@ -3289,6 +3302,8 @@ html.force-light #mpCoin .lg-blc{display:none} html.force-light #mpCoin .lg-clr{
 @media (prefers-color-scheme: light){ html:not(.force-dark) #mpCoin .lg-blc{display:none} html:not(.force-dark) #mpCoin .lg-clr{display:block} }
 html.apercu-mode #mpCoin{display:none}
 </style>
+<script>/* barre d'avancement de l'activité en cours (copie --pg de la case en cours de la frise) */
+setInterval(() => { const s = document.querySelector("#v-tl .seg.now:not(.p)"), i = document.getElementById("v-nowav"); if (i) i.style.setProperty("--pg", s ? (s.style.getPropertyValue("--pg") || "0%") : "0%"); }, 1000);</script>
 <div id="mpCoin" aria-hidden="true"><img class="lg-blc" src="img/metier-plus-blanc.svg" alt=""><img class="lg-clr" src="img/metier-plus.svg" alt=""></div>
 </body>
 </html>
