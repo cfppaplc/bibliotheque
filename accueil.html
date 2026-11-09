@@ -3263,6 +3263,25 @@ html.style-pro .seg.done:not(.p) .seg-t::before { color: var(--copper); }
 html.style-pro .tl-mark::after { color: #fff; border-radius: 999px; }
 html.style-pro .period .water { box-shadow: none; }
 html.style-pro .clock { font-feature-settings: "tnum" 1 !important; }
+/* Épuré (9 nov., « améliore l'apparence pour ressembler plus au reste du site, épurer ») */
+html.style-pro .brand-text { text-transform: none; letter-spacing: 0; font-weight: 500; }
+html.style-pro .brand-text strong { font-weight: 700; }
+html.style-pro .quote { padding-left: 0; }
+html.style-pro .quote::before { display: none; }
+html.style-pro .quote blockquote { font-style: normal; font-weight: 400; color: color-mix(in srgb, var(--ink) 82%, transparent); font-size: calc(var(--u) * 34); }
+html.style-pro .quote figcaption { font-size: calc(var(--u) * 20); }
+html.style-pro .panel, html.style-pro .period { box-shadow: none !important; background: color-mix(in srgb, var(--surface) 92%, transparent) !important; }
+html.style-pro .now-lbl { font-size: calc(var(--u) * 20) !important; font-weight: 600; }
+html.style-pro .nxt .now-lbl::before { background: var(--muted); box-shadow: none; }
+html.style-pro .now-blk.nxt .now-time { color: var(--muted); }
+html.style-pro .seg { border: 1px solid var(--line) !important; background: transparent !important; }
+html.style-pro .seg.done .seg-l, html.style-pro .seg.done .seg-t { opacity: .45; }
+html.style-pro .seg.now { background: color-mix(in srgb, var(--copper) 14%, transparent) !important; border: 2px solid var(--copper) !important; box-shadow: none !important; }
+html.style-pro .seg.now::after, html.style-pro .tl-mark { box-shadow: none !important; }
+html.style-pro .seg.p { background: repeating-linear-gradient(135deg, color-mix(in srgb, var(--line) 70%, transparent) 0 6px, transparent 6px 14px) !important; border: 1px solid var(--line) !important; }
+html.style-pro .seg.p.now { background: repeating-linear-gradient(135deg, color-mix(in srgb, var(--copper) 35%, transparent) 0 6px, transparent 6px 14px) !important; border: 2px solid var(--copper) !important; }
+html.style-pro .exam-badge, html.style-pro .en-cours { box-shadow: none; }
+#lueur { opacity: .35; }
 #mpCoin{position:fixed;right:clamp(16px,1.6vw,32px);bottom:clamp(10px,1.3vh,24px);height:clamp(22px,2.6vh,40px);z-index:5;opacity:.85;pointer-events:none}
 #mpCoin img{height:100%;display:block}
 #mpCoin .lg-clr{display:none}
