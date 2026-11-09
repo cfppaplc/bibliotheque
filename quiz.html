@@ -527,16 +527,16 @@ const EXEMPLE = {id: "exemple-incendie", exemple: true, titre: "Protection incen
 ]};
 /* Personnages de chantier (noms fictifs). Chacun ne peut être choisi qu'une fois par partie. Photos : img/labo/perso/NN.jpg */
 const PERSOS = [
-  ["Marc-Antoine", "Plombier"], ["Julie", "Vendeuse-conseil"], ["Samuel", "Électricien"], ["Émilie", "Serveuse"],
-  ["Kevin", "Soudeur-monteur"], ["Mélanie", "Productrice laitière"], ["Jonathan", "Frigoriste"], ["Karine", "Assistante technique en pharmacie"],
+  ["Marc-Antoine", "Plombier"], ["Julie", "Vendeuse-conseil"], ["Wilson", "Électricien"], ["Daniela", "Serveuse"],
+  ["Kevin", "Soudeur-monteur"], ["Mélanie", "Productrice laitière"], ["Karim", "Frigoriste"], ["Linh", "Assistante technique en pharmacie"],
   ["Alexandre", "Électromécanicien"], ["Audrey", "Préposée à l'entretien"], ["Mathieu", "Charpentier-menuisier"], ["Sophie", "Débosseleuse-peintre"],
   /* 9 nov. : 30 personnages (classes de 20 et plus); tous ont une photo (13 à 30 : métiers de toute la FP) */
-  ["Olivier", "Cuisinier"], ["Catherine", "Infirmière auxiliaire"], ["Maxime", "Mécanicien automobile"], ["Valérie", "Comptable"],
-  ["Vincent", "Opérateur de machinerie lourde"], ["Isabelle", "Préposée aux bénéficiaires"], ["Patrick", "Boucher"], ["Marie-Ève", "Coiffeuse"],
-  ["Nicolas", "Camionneur"], ["Geneviève", "Adjointe administrative"], ["Jérôme", "Technicien en soutien informatique"], ["Annie", "Pâtissière"],
-  ["Simon", "Horticulteur-paysagiste"], ["Chloé", "Assistante dentaire"], ["David", "Ébéniste"], ["Noémie", "Esthéticienne"],
+  ["Olivier", "Cuisinier"], ["Aminata", "Infirmière auxiliaire"], ["Carlos", "Mécanicien automobile"], ["Valérie", "Comptable"],
+  ["Vincent", "Opérateur de machinerie lourde"], ["Nadège", "Préposée aux bénéficiaires"], ["Patrick", "Boucher"], ["Marie-Ève", "Coiffeuse"],
+  ["Mamadou", "Camionneur"], ["Geneviève", "Adjointe administrative"], ["Arjun", "Technicien en soutien informatique"], ["Annie", "Pâtissière"],
+  ["Simon", "Horticulteur-paysagiste"], ["Yasmine", "Assistante dentaire"], ["David", "Ébéniste"], ["Noémie", "Esthéticienne"],
   ["Gabriel", "Machiniste"], ["Laurence", "Fleuriste"]];
-const persoImg = k => "img/labo/perso/" + String(k + 1).padStart(2, "0") + ".jpg?v=2";
+const persoImg = k => "img/labo/perso/" + String(k + 1).padStart(2, "0") + ".jpg?v=3";
 function visage(k, cls){
   const p = PERSOS[k]; if (!p) return "";
   const ini = p[0].split(/[\s-]+/).map(x => x[0]).slice(0, 2).join("");
