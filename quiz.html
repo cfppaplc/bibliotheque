@@ -365,7 +365,7 @@ body>div:not(.cache):not([hidden]){animation:fenFond .22s ease-out}
 <div class="grid">
 <div>
 <div class="carte"><h2>Les élèves scannent</h2><div id="qr"></div><div class="code" id="code"></div><div class="etat" id="etatT">Connexion…</div><button id="bEcran" style="width:100%;margin-top:10px">Ouvrir l'écran de classe</button>
-<div class="sous" style="margin-top:8px;text-align:center">Écran de classe : ouvre cette page sur le tableau, choisis « Écran de classe » et tape le code.</div></div>
+<div class="sous" style="margin-top:8px;text-align:center">Sur le tableau : metierplus.app/quiz.html → « Écran de classe » (sous les quiz prêts à jouer), puis tape ce code.</div></div>
 <div class="carte"><h2>Participants <span id="nbP"></span></h2><div id="listeLob" class="sous">Personne pour l'instant.</div></div>
 </div>
 <div>
@@ -373,6 +373,7 @@ body>div:not(.cache):not([hidden]){animation:fenFond .22s ease-out}
 <div class="carte"><h2>Mes quiz</h2><div id="quizMiens" class="cartes"></div>
 <div class="ctl" style="margin-top:12px"><button id="bNouveau">+ Créer un quiz</button><button class="btn2" id="bColler">Coller des questions</button><button class="btn2" id="bImport">Importer un fichier</button><button class="btn2" id="bSauveTout" title="Un seul fichier avec tous tes quiz, à garder dans ton OneDrive">Sauvegarder tous mes quiz</button><input type="file" id="fImport" accept=".json,application/json" class="cache"></div></div>
 <div class="carte"><h2>Quiz prêts à jouer</h2><div class="sous" style="margin:-4px 0 12px">Un quiz par livre de la bibliothèque, illustré avec ses figures. « Copier et modifier » en fait une version à toi.</div><div id="quizListe" class="cartes"></div></div>
+<div class="sous celQuiz" style="margin:4px 2px 18px">Animer avec ton cellulaire ? Sur ton cell, choisis un quiz puis « Télécommande ». Sur le tableau, ouvre <a href="quiz.html?role=1#ecran" style="color:var(--acc);font-weight:700">Écran de classe</a> et tape le code à 6 chiffres affiché sur ton cell.</div>
 </div>
 <div id="vColler" class="cache"><div class="carte"><h2>Coller des questions</h2>
 <div class="sous" style="margin-bottom:8px">Une question par bloc, séparés par une ligne vide. Mets une <b>*</b> devant la bonne réponse et un <b>-</b> devant les autres (2 à 4 choix). Une ligne qui commence par <b>?</b> ajoute une explication. Plusieurs <b>*</b> = plusieurs bonnes réponses. <b>= 15,4 ± 0,1 VA</b> = question de calcul. Des lignes <b>1.</b> <b>2.</b> <b>3.</b> sous la question = étapes à remettre en ordre.</div>
@@ -567,6 +568,7 @@ else {
   $("rTele").onclick = () => { $("role").classList.add("cache"); telecommande(); };
   $("rAnim").onclick = () => { location.search = "?animer=1"; };
   $("rEcr").onclick = () => { $("rCode").classList.remove("cache"); $("rIn").focus(); };
+  if (location.hash === "#ecran") $("rEcr").click();
   $("rGo").onclick = () => { const c = $("rIn").value.replace(/\D/g, ""); if (c.length === 6) location.search = "?ecran=" + c; };
   $("rIn").addEventListener("keydown", e => { if (e.key === "Enter") $("rGo").click(); });
 }
