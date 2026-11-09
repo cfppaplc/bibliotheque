@@ -177,7 +177,14 @@ th{font-size:12px;color:var(--gris);border-top:0}
 #man .mh{display:flex;align-items:center;gap:10px}#man .mh img{height:26px}#man .mh span{margin-left:auto;font-size:13px;color:#9AA3B5}#man .mh span.ok{color:#7CF0A8}
 #man .mt{font-size:15px;color:#9AA3B5}#man .mc{font-size:26px;font-weight:800;line-height:1.25}
 #man .ma{background:rgba(235,106,34,.14);border:1px solid rgba(235,106,34,.4);border-radius:12px;padding:10px 12px;font-size:16px}#man .ma:empty{display:none}
-#man .mbig{margin-top:auto;min-height:34vh;border-radius:22px;background:#EB6A22;color:#fff;font-size:30px;font-weight:800;border:0}#man .mbig:disabled{background:#2A3245;color:#7D8699}
+#man{overflow-y:auto;padding-bottom:calc(30vh + 20px)}
+#man .mrow{display:flex;gap:10px;align-items:center}#man .mrow .m2{flex:1}#man .mtmp{font-size:28px;font-weight:800;min-width:76px;color:#F28A3C}
+#man .m2.on{background:#1E8A55}#man .m2:disabled{opacity:.4}#man .mfin{background:transparent;border:1px solid #3A4358;color:#9AA3B5;min-height:48px;font-size:15px}
+#man .mlist{background:#161d2c;border-radius:14px;padding:10px 12px}#man .mlist summary{font-weight:700;font-size:17px;cursor:pointer}
+#man .mj{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid #232c40;font-size:16px}#man .mj b{width:26px;color:#9AA3B5}#man .mj .mn{flex:1;min-width:0}#man .mj small{display:block;font-size:13px;color:#9AA3B5}#man .mj small.ok{color:#7CF0A8}#man .mj small.ko{color:#FF9A90}
+#man .mj i{font-style:normal;color:#9AA3B5}#man .mj i.ok{color:#7CF0A8}#man .mj em{font-style:normal;font-weight:800;min-width:48px;text-align:right}#man .mj button{background:#2A3245;color:#F2EFEA;border:0;border-radius:10px;min-width:44px;height:40px;font-size:15px}#man .mj button.sur{background:#B3261E}
+#man .mbas{position:fixed;left:0;right:0;bottom:0;padding:10px 18px calc(14px + env(safe-area-inset-bottom));background:linear-gradient(transparent,#0e1320 22%);display:flex;flex-direction:column;gap:10px}
+#man .mbig{min-height:24vh;border-radius:22px;background:#EB6A22;color:#fff;font-size:30px;font-weight:800;border:0}#man .mbig:disabled{background:#2A3245;color:#7D8699}
 #man .m2{min-height:60px;border-radius:14px;background:#2A3245;color:#F2EFEA;font-size:18px;font-weight:700;border:0}#man .m2.cache{display:none}
 #tiroir iframe{width:100%;height:100%;border:0;display:block}
 #tiroir .fermer{position:absolute;left:-46px;top:12px;width:40px;height:40px;padding:0;border-radius:10px;background:#24211E;color:#fff;font-size:20px}
@@ -752,11 +759,22 @@ function telecommande(bord){
   function etatManette(){
     const b = id => { const e = $(id); return {t: e.textContent, d: !!e.disabled}; };
     const att = G.etat === "question" ? ids().filter(id => !G.reps[id]).map(id => P[id].nom) : [];
-    return {m: "mstat", go: b("bGo"), suite: b("bSuite"), cour: $("qCour").textContent, att, n: ids().length, etat: G.etat, titre: G.quiz ? G.quiz.titre || "Quiz" : ""};
+    const r = rangs(), Q = G.jeu[G.i], rev = G.etat === "rev" && Q;
+    const j = ids().sort((x, y) => r[x] - r[y]).map(id => { const x = G.reps[id];
+      return {id, n: P[id].nom, pts: P[id].pts, r: r[id], a: G.etat === "question" ? !!x : null, txt: rev && x && x.c != null ? texteRep(Q, x.c) : "", ok: rev ? !!(x && x.ok) : null}; });
+    return {m: "mstat", go: b("bGo"), suite: b("bSuite"), cour: $("qCour").textContent, att, n: ids().length, etat: G.etat, titre: G.quiz ? G.quiz.titre || "Quiz" : "",
+      j, fin: G.etat === "question" && Q ? G.t0 + Q.s * 1000 : 0, lec: G.etat === "question" ? G.t0 : 0};
   }
-  function pousserMan(force){ if (Date.now() - manVu > 90000) return; const o = etatManette(), j = JSON.stringify(o); if (force || j !== manDer) { manDer = j; envoyer(topic, o); } }
+  function pousserMan(force){ if (Date.now() - manVu > 90000) return; const o = etatManette(), j = JSON.stringify(o); if (force || j !== manDer) { manDer = j; o.now = Date.now(); envoyer(topic, o); } }
   if (!bord) setInterval(pousserMan, 700);
-  function manetteCmd(m){ manVu = Date.now(); if ((m.b === "bGo" || m.b === "bSuite") && !$(m.b).disabled) $(m.b).click(); setTimeout(() => pousserMan(true), 250); }
+  function manetteCmd(m){ manVu = Date.now();
+    if ((m.b === "bGo" || m.b === "bSuite") && !$(m.b).disabled) $(m.b).click();
+    else if (m.b === "plus10" && G.etat === "question" && G.jeu[G.i]) {   /* +10 s à la question en cours (écran, iPad qui n'ont pas répondu, minuterie) */
+      const Q = G.jeu[G.i]; Q.s += 10; clearTimeout(minut); minut = setTimeout(reveler, Math.max(500, G.t0 + Q.s * 1000 + 1000 - Date.now()));
+      ids().filter(id => !G.reps[id]).forEach(id => envoyer(topic, qMsg(id))); maj(); }
+    else if (m.b === "kick" && m.id && P[m.id]) { const k = document.querySelector(`[data-kick="${m.id}"]`); if (k) k.click(); }
+    else if (m.b === "fin" && G.etat !== "choix") $("bFin").click();
+    setTimeout(() => pousserMan(true), 250); }
   if (!bord) ecouter(topic, m => {
     if (m.m === "cmd") { if (m.k === MK) manetteCmd(m); return; }
     if (m.m === "ecran?") { envoyer(topic, vueObj()); envoyerCouv(); const Q = G.jeu[G.i]; if (G.etat === "question" && Q && Q.img) envoyer(topic, {m: "img", i: G.i, data: Q.img}); return; }
@@ -1210,18 +1228,33 @@ function manette(code, k){
   const topic = PREFIXE + code;
   document.body.insertAdjacentHTML("beforeend", `<div id="man"><div class="mh"><img src="img/metier-plus-blanc.svg" alt="Métier+"><span id="mEtat">Connexion…</span></div>
     <div class="mt" id="mTitre">Quiz</div><div class="mc" id="mCour">En attente de la partie…</div><div class="ma" id="mAtt"></div>
-    <button class="mbig" id="mGo" disabled>…</button><button class="m2 cache" id="mAutre"></button></div>`);
-  let S = null, recu = 0;
+    <div class="mrow"><span id="mT" class="mtmp"></span><button class="m2" id="mPlus" disabled>+10 s</button><button class="m2" id="mSon">Son</button></div>
+    <details class="mlist" id="mDet"><summary id="mSum">Participants</summary><div id="mJ"></div></details>
+    <button class="m2 mfin" id="mFin">Quitter la partie</button>
+    <div class="mbas"><button class="m2 cache" id="mAutre"></button><button class="mbig" id="mGo" disabled>…</button></div></div>`);
+  let S = null, recu = 0, dec = 0, sur = {};
   const cmd = b => envoyer(topic, {m: "cmd", k, b});
   const dessiner = () => { if (!S) return;
     $("mTitre").textContent = S.titre || "Quiz"; $("mCour").textContent = S.cour || "";
     $("mAtt").textContent = S.att && S.att.length && S.att.length <= 12 ? "En attente de " + S.att.length + " : " + S.att.join(", ") : S.att && S.att.length ? "En attente de " + S.att.length + " participants" : "";
     const go = S.go && !S.go.d, prim = go ? S.go : S.suite, id = go ? "bGo" : "bSuite";
     $("mGo").textContent = prim ? prim.t : "…"; $("mGo").disabled = !prim || prim.d; $("mGo").dataset.b = id;
-    const autre = go && S.suite && !S.suite.d; $("mAutre").classList.toggle("cache", !autre); if (autre) { $("mAutre").textContent = S.suite.t; $("mAutre").dataset.b = "bSuite"; } };
+    if (S.etat === "choix") { $("mGo").textContent = "Partie terminée"; $("mGo").disabled = true; $("mCour").textContent = "Choisis un autre quiz au tableau."; $("mAutre").classList.add("cache"); }
+    const autre = go && S.suite && !S.suite.d; $("mAutre").classList.toggle("cache", !autre); if (autre) { $("mAutre").textContent = S.suite.t; $("mAutre").dataset.b = "bSuite"; }
+    $("mPlus").disabled = S.etat !== "question"; $("mFin").classList.toggle("cache", !S.etat || S.etat === "choix");
+    const L = S.j || []; $("mSum").textContent = (S.etat === "lobby" || S.etat === "choix" ? "Participants" : "Classement et réponses") + " (" + L.length + ")";
+    $("mJ").innerHTML = L.map(x => `<div class="mj"><b>${x.r || "–"}</b><span class="mn">${esc(x.n)}${x.txt ? `<small class="${x.ok ? "ok" : "ko"}">${esc(x.txt)}</small>` : x.ok === false && S.etat === "rev" ? '<small class="ko">pas répondu</small>' : ""}</span>${x.a === true ? '<i class="ok">✓</i>' : x.a === false ? '<i>…</i>' : ""}<em>${x.pts}</em><button data-k="${esc(x.id)}" class="${sur[x.id] ? "sur" : ""}">${sur[x.id] ? "Retirer ?" : "✕"}</button></div>`).join("") || '<div class="mt">Personne pour l\'instant.</div>'; };
+  const minuterie = () => { if (!S || !S.fin) { $("mT").textContent = ""; return; } const n = Date.now() + dec;
+    $("mT").textContent = n < S.lec ? "Lecture…" : Math.max(0, Math.ceil((S.fin - n) / 1000)) + " s"; };
+  setInterval(minuterie, 250);
+  $("mPlus").onclick = () => cmd("plus10");
+  $("mSon").onclick = () => cmd("son");
+  $("mJ").onclick = e => { const b = e.target.closest("button[data-k]"); if (!b) return; const id = b.dataset.k;
+    if (sur[id]) { delete sur[id]; envoyer(topic, {m: "cmd", k, b: "kick", id}); } else { sur = {[id]: 1}; setTimeout(() => { delete sur[id]; dessiner(); }, 3000); } dessiner(); };
+  let finSur = 0; $("mFin").onclick = () => { if (Date.now() - finSur < 3000) { cmd("fin"); finSur = 0; $("mFin").textContent = "Quitter la partie"; } else { finSur = Date.now(); $("mFin").textContent = "Sûr ? Touche encore"; setTimeout(() => { $("mFin").textContent = "Quitter la partie"; }, 3000); } };
   $("mGo").onclick = e => { if (navigator.vibrate) navigator.vibrate(30); cmd(e.currentTarget.dataset.b); };
   $("mAutre").onclick = e => cmd(e.currentTarget.dataset.b);
-  ecouter(topic, m => { if (m.m === "mstat") { S = m; recu = Date.now(); dessiner(); } }, ok => { $("mEtat").textContent = ok ? "Branché" : "Connexion…"; $("mEtat").classList.toggle("ok", ok); if (ok) cmd("etat"); });
+  ecouter(topic, m => { if (m.m === "mstat") { S = m; recu = Date.now(); if (m.now) dec = m.now - Date.now(); dessiner(); } else if (m.m === "mson") { $("mSon").textContent = m.on ? "Son : oui" : "Son : non"; $("mSon").classList.toggle("on", m.on); } }, ok => { $("mEtat").textContent = ok ? "Branché" : "Connexion…"; $("mEtat").classList.toggle("ok", ok); if (ok) cmd("etat"); });
   setInterval(() => { cmd("etat"); if (recu && Date.now() - recu > 15000) { $("mEtat").textContent = "Le tableau ne répond pas"; $("mEtat").classList.remove("ok"); } }, 8000);
   const eveil = () => { try { if (navigator.wakeLock && !document.hidden) navigator.wakeLock.request("screen").catch(() => {}); } catch(e) {} };
   eveil(); document.addEventListener("visibilitychange", eveil);
@@ -1243,7 +1276,9 @@ function animer(boutons){
   $("celX").onclick = () => $("celOv").classList.add("cache");
   /* 9 nov. (« le QR de l'enseignant d'abord, puis celui des élèves ») : à l'ouverture, le QR de l'enseignant couvre l'écran;
      dès que son cellulaire envoie une commande avec la bonne clé, il disparaît et l'écran des élèves (code QR des élèves) apparaît. */
-  window.manetteVue = m => { if (m.k && m.k === animer.mk) { animer.cell = true; $("celOv").classList.add("cache"); $("celB").textContent = "Cell branché"; } };
+  window.manetteVue = m => { if (!m.k || m.k !== animer.mk) return; animer.cell = true; $("celOv").classList.add("cache"); $("celB").textContent = "Cell branché";
+    const env = () => { const b = $("bSon"); envoyer(PREFIXE + animer.code, {m: "mson", on: !!(b && b.classList.contains("actif"))}); };
+    if (m.b === "son") { const b = $("bSon"); if (b) b.click(); setTimeout(env, 150); } else if (m.b === "etat") env(); };
   const auto = setInterval(() => { if (!animer.code || !animer.mk) return; clearInterval(auto);
     let deja = false; try { deja = sessionStorage.getItem("celPropose") === animer.code; sessionStorage.setItem("celPropose", animer.code); } catch(x) {}
     if (!deja && !animer.cell) $("celB").click(); }, 300);
