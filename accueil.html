@@ -3001,7 +3001,7 @@ if (window.COFFRE && !/[?&]apercu=/.test(location.search)) COFFRE.demarrer("accu
 #menage .mn-t{flex:1;font-size:20px;font-weight:700;cursor:pointer;text-align:left;background:none;border:0;color:inherit;padding:4px 0;font-family:inherit}
 #menage li.fait .mn-t{opacity:.55;text-decoration:line-through}
 #menage .mn-i{font-size:13px;opacity:.6;white-space:nowrap}
-#menage .mn-d{display:none;padding:0 16px 14px 66px;font-size:17px;line-height:1.45;opacity:.9}
+#menage .mn-d{display:none;white-space:pre-line;padding:0 16px 14px 66px;font-size:17px;line-height:1.45;opacity:.9}
 #menage li.ouvert .mn-d{display:block}
 #menage .mn-bravo{display:none;margin:0 18px 16px;padding:14px;border-radius:12px;background:#2EB87233;color:#7CF0B0;font-size:20px;font-weight:800;text-align:center}
 #menage.fini .mn-bravo{display:block}
@@ -3015,7 +3015,7 @@ if (window.COFFRE && !/[?&]apercu=/.test(location.search)) COFFRE.demarrer("accu
 html.apercu-mode #menage{display:none}
 </style>
 <div id="menage" hidden aria-live="polite">
-  <div class="mn-tete"><div style="flex:1"><h2>Ménage de l'atelier <span id="mnCompte"></span></h2><small id="mnSous">Coche ta tâche quand elle est faite · touche le nom pour voir les détails</small></div>
+  <div class="mn-tete"><div style="flex:1"><h2>Ménage de l'atelier <span id="mnCompte"></span></h2><small id="mnSous">Coche ta tâche quand elle est faite · touche le nom pour voir les détails · <b>Tâche terminée? Aide les autres!</b></small></div>
     <button type="button" class="mn-btn" id="mnMini" title="Réduire">–</button></div>
   <div class="mn-barre"><i id="mnBarre"></i></div>
   <ul id="mnListe"></ul>
@@ -3034,11 +3034,15 @@ html.apercu-mode #menage{display:none}
 /* Ménage de l'atelier (9 nov., demande de Jeremy) : cfg.menage = {taches:[{t, d}], mot, min}; cases cochées par occurrence dans localStorage.menageFait */
 (() => {
   const DEF = {mot: "atelier", min: 10, taches: [
-    {t: "Ranger les outils", d: "Remettre chaque outil à sa place sur le panneau ou dans le coffre de la cabine."},
-    {t: "Balayer la cabine", d: "Balai et porte-poussière; vider dans la poubelle."},
-    {t: "Ramasser les retailles", d: "Bouts de tuyaux et raccords dans le bac de récupération."},
-    {t: "Fermer l'eau et le gaz", d: "Robinets fermés, bonbonnes de soudure fermées et rangées."},
-    {t: "Nettoyer l'établi", d: "Essuyer la surface, rien ne traîne."}]};
+    {"t": "Balai – Zones principales (ZP)", "d": "Objectif : Assurer la propreté des zones de circulation. · Balayer les allées principales, corridors et zones de passage. · Balayer l’entrée de l’atelier et le seuil des portes. · Retirer les débris visibles (copeaux, poussière, morceaux de tuyaux). · Ramasser la poussière avec la pelle et la jeter aux déchets. · S’assurer que les voies sont dégagées pour la sécurité."},
+    {"t": "Moppe – Zones principales (ZP)", "d": "Objectif : Assurer une surface propre et non glissante. · Passer la moppe dans les allées principales. · Essuyer les zones où il y a eu de l’eau, du flux ou des liquides. · Rincer et essorer la moppe, vider et nettoyer le seau. · Laisser les surfaces propres et sécuritaires."},
+    {"t": "Balai – Zones secondaires (ZS)", "d": "Objectif : Nettoyer les zones autour des postes de travail. · Balayer autour des établis, comptoirs, machines et postes individuels. · Balayer sous et derrière les établis et les machines. · Retirer les petits débris laissés par les activités pratiques. · S’assurer que le sol autour des postes est propre."},
+    {"t": "Moppe – Zones secondaires (ZS)", "d": "Objectif : Compléter le nettoyage des zones secondaires. · Passer la moppe autour des postes, comptoirs et machines. · Nettoyer les petites zones où il y a eu des éclaboussures ou des liquides. · Enlever les taches tenaces au sol (graisse, flux séché). · Laisser les surfaces propres et sécuritaires."},
+    {"t": "Surfaces / Comptoirs", "d": "Objectif : Remettre les surfaces de travail en état. · Essuyer établis, tables, comptoirs et machines fixes. · Essuyer les poignées, les interrupteurs et l’extérieur des machines. · Retirer les traces de flux, marqueurs, poussières, copeaux. · Vérifier que les surfaces sont prêtes pour la prochaine période."},
+    {"t": "Matériel et outils", "d": "Objectif : Organiser le matériel utilisé pendant la période. · Ranger collets, coudes, joints, vis, adaptateurs, etc. · Faire l’entretien des filières. · Remettre le matériel et les outils dans les bacs ou étagères désignées. · Vérifier qu’aucun outil ne manque."},
+    {"t": "Déchets / Recyclage", "d": "Objectif : Vider et organiser les déchets. · Vider les bacs de déchets et de recyclage. · Ramasser les déchets au sol (papier, plastique, métal). · Remplacer les sacs et nettoyer l’extérieur des bacs. · Apporter les sacs pleins à l’endroit prévu. · Remettre les bacs à leur emplacement."},
+    {"t": "Nettoyage de la pièce d’entretien", "d": "Objectif : Remettre la pièce d’entretien propre et fonctionnelle. · Ranger les outils, accessoires et produits d’entretien (savon, brosses, nettoyants). · Nettoyer les surfaces (comptoirs, évier, étagères) et essuyer les traces de flux, graisse, eau ou résidus. · Jeter les déchets et résidus dans les bacs appropriés. · Balayer et passer la moppe si nécessaire. · S’assurer que la pièce est dégagée et prête pour le prochain usage."},
+    {"t": "Rangement de l’entrepôt", "d": "Objectif : Maintenir l’entrepôt organisé et sécuritaire. · Ranger les boîtes, bacs et contenants déplacés durant la période. · Trier les matériaux laissés sur les tables, au sol ou dans les bacs. · Remettre les matériaux aux étagères désignées. · Jeter les résidus inutilisables (petits morceaux, emballages). · Réorganiser les sections désordonnées (PVC, cuivre, acier, etc.). · Vérifier que les allées sont dégagées et que les items lourds sont rangés de façon sécuritaire."}]};
   const M = () => Object.assign({}, DEF, cfg.menage || {});
   const norm = x => String(x || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
   const el = document.getElementById("menage"), ul = document.getElementById("mnListe");
@@ -3049,7 +3053,7 @@ html.apercu-mode #menage{display:none}
     const k = JSON.stringify([m.taches, F, cle]); if (k === rendu) return; rendu = k;
     const ouverts = [...ul.querySelectorAll("li.ouvert")].map(li => +li.dataset.i);
     ul.innerHTML = m.taches.map((x, i) => `<li data-i="${i}" class="${F.includes(i) ? "fait" : ""} ${ouverts.includes(i) ? "ouvert" : ""}"><div class="mn-l"><button type="button" class="mn-c" aria-label="Fait">${F.includes(i) ? "✓" : ""}</button><button type="button" class="mn-t"></button>${x.d ? '<span class="mn-i">détails ▾</span>' : ""}</div><div class="mn-d"></div></li>`).join("");
-    ul.querySelectorAll("li").forEach((li, i) => { li.querySelector(".mn-t").textContent = m.taches[i].t; li.querySelector(".mn-d").textContent = m.taches[i].d || ""; });
+    ul.querySelectorAll("li").forEach((li, i) => { li.querySelector(".mn-t").textContent = m.taches[i].t; li.querySelector(".mn-d").textContent = String(m.taches[i].d || "").split(/ · /).map((p, j) => j ? "• " + p : p).join("\n"); });
     document.getElementById("mnCompte").textContent = n ? `· ${f}/${n}` : "";
     document.getElementById("mnBarre").style.width = n ? (100 * f / n) + "%" : "0";
     el.classList.toggle("fini", n > 0 && f === n);
