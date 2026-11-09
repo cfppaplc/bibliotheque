@@ -171,6 +171,14 @@ th{font-size:12px;color:var(--gris);border-top:0}
 #qAtt{margin-top:10px;padding:10px 12px;border-radius:10px;background:rgba(235,106,34,.12);border:1px solid rgba(235,106,34,.35);display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;font-size:15px}#qAtt b{color:#C9561A}#qAtt span{display:inline-flex;align-items:center}#qAtt.cache{display:none}
 #tiroir{position:fixed;top:0;right:0;bottom:0;width:min(500px,94vw);transform:translateX(102%);transition:transform .35s ease;z-index:70;background:#E9E6E0;box-shadow:-10px 0 40px rgba(0,0,0,.45)}
 #tiroir.ouvert{transform:none}
+#celOv{position:fixed;inset:0;z-index:90;background:rgba(10,12,16,.82);display:flex;align-items:center;justify-content:center}#celOv.cache{display:none}
+#celOv .bx{background:#fff;color:#1E2A44;border-radius:18px;padding:26px 30px;text-align:center;max-width:420px}#celOv h2{margin:0 0 14px;font-size:22px}#celOv #celQr{display:flex;justify-content:center}#celOv p{margin:14px 0;font-size:15px;color:#555}#celOv button{background:#1E2A44;color:#fff}
+#man{position:fixed;inset:0;background:#0e1320;color:#F2EFEA;display:flex;flex-direction:column;padding:18px 18px calc(18px + env(safe-area-inset-bottom));gap:14px;font-family:system-ui,"Segoe UI",Roboto,sans-serif}
+#man .mh{display:flex;align-items:center;gap:10px}#man .mh img{height:26px}#man .mh span{margin-left:auto;font-size:13px;color:#9AA3B5}#man .mh span.ok{color:#7CF0A8}
+#man .mt{font-size:15px;color:#9AA3B5}#man .mc{font-size:26px;font-weight:800;line-height:1.25}
+#man .ma{background:rgba(235,106,34,.14);border:1px solid rgba(235,106,34,.4);border-radius:12px;padding:10px 12px;font-size:16px}#man .ma:empty{display:none}
+#man .mbig{margin-top:auto;min-height:34vh;border-radius:22px;background:#EB6A22;color:#fff;font-size:30px;font-weight:800;border:0}#man .mbig:disabled{background:#2A3245;color:#7D8699}
+#man .m2{min-height:60px;border-radius:14px;background:#2A3245;color:#F2EFEA;font-size:18px;font-weight:700;border:0}#man .m2.cache{display:none}
 #tiroir iframe{width:100%;height:100%;border:0;display:block}
 #tiroir .fermer{position:absolute;left:-46px;top:12px;width:40px;height:40px;padding:0;border-radius:10px;background:#24211E;color:#fff;font-size:20px}
 body.inclus .tbar a,body.inclus #bEcran{display:none!important}
@@ -559,6 +567,7 @@ function tousQuiz(){ return [EXEMPLE].concat(LIVRES_Q, mesQuiz()); }
 
 const params = new URLSearchParams(location.search);
 if (params.get("animer")) animer([["bGo"], ["bSuite"]]);
+else if (params.get("manette")) manette(params.get("manette").replace(/\D/g, "").slice(0, 6), params.get("k") || "");
 else if (params.get("j")) joueur(params.get("j").replace(/\D/g, "").slice(0, 6));
 else if (params.get("ecran")) ecran(params.get("ecran").replace(/\D/g, "").slice(0, 6));
 else if (params.get("tele")) telecommande();
@@ -580,11 +589,12 @@ function telecommande(bord){
   let code = "";
   const s = stock.get("quizSession", null); if (s && Date.now() - s.t < 6 * 3600e3) code = s.code;
   if (!code) code = String(Math.floor(100000 + Math.random() * 900000));
-  stock.set("quizSession", {code, t: Date.now()});
+  const MK = (s && s.code === code && s.mk) || Math.random().toString(36).slice(2, 10);   /* clé de la manette du cellulaire (9 nov.) */
+  stock.set("quizSession", {code, t: Date.now(), mk: MK});
   const topic = PREFIXE + code, url = location.href.split(/[?#]/)[0] + "?j=" + code;
   $("code").textContent = code.slice(0, 3) + " " + code.slice(3);
   // dans « Animer au tableau », la télécommande est dans un tiroir : elle donne son code à la page
-  if (params.get("inclus")) { document.body.classList.add("inclus"); try { parent.postMessage({labo: "code", code}, "*"); } catch(e) {} }
+  if (params.get("inclus")) { document.body.classList.add("inclus"); try { parent.postMessage({labo: "code", code, mk: MK}, "*"); } catch(e) {} }
   $("bEcran").onclick = () => window.open(location.href.split(/[?#]/)[0] + "?ecran=" + code, "ecranClasse", "popup,width=1280,height=760");
   try { new QRCode($("qr"), {text: url, width: 180, height: 180, correctLevel: QRCode.CorrectLevel.M}); } catch(e) { $("qr").innerHTML = '<div class="sous" style="word-break:break-all">' + esc(url) + "</div>"; }
 
@@ -736,7 +746,19 @@ function telecommande(bord){
   $("bSuite").onclick = () => { if (G.etat === "question") { reveler(); return; } if (G.etat === "mise") { question(); return; } if (G.i + 1 >= G.jeu.length) { finir(); return; } G.i++; suivante(); };
   $("bFin").onclick = () => { oublierPartie(); clearTimeout(minut); envoyer(topic, {m: "attente"}); G.quiz = null; G.etat = "choix"; G.i = -1; G.jeu = []; document.documentElement.style.removeProperty("--acc"); montrer("vChoix"); listeQuiz(); vue(); };
 
+  /* Manette du cellulaire (9 nov., « contrôler avec mon cell, ça doit être facile ») : le cell envoie {m:"cmd", k, b},
+     la télécommande touche le bouton à sa place et renvoie son état. Sans la bonne clé (dans le QR de l'enseignant), rien ne se passe. */
+  let manVu = 0, manDer = "";
+  function etatManette(){
+    const b = id => { const e = $(id); return {t: e.textContent, d: !!e.disabled}; };
+    const att = G.etat === "question" ? ids().filter(id => !G.reps[id]).map(id => P[id].nom) : [];
+    return {m: "mstat", go: b("bGo"), suite: b("bSuite"), cour: $("qCour").textContent, att, n: ids().length, etat: G.etat, titre: G.quiz ? G.quiz.titre || "Quiz" : ""};
+  }
+  function pousserMan(force){ if (Date.now() - manVu > 90000) return; const o = etatManette(), j = JSON.stringify(o); if (force || j !== manDer) { manDer = j; envoyer(topic, o); } }
+  if (!bord) setInterval(pousserMan, 700);
+  function manetteCmd(m){ manVu = Date.now(); if ((m.b === "bGo" || m.b === "bSuite") && !$(m.b).disabled) $(m.b).click(); setTimeout(() => pousserMan(true), 250); }
   if (!bord) ecouter(topic, m => {
+    if (m.m === "cmd") { if (m.k === MK) manetteCmd(m); return; }
     if (m.m === "ecran?") { envoyer(topic, vueObj()); envoyerCouv(); const Q = G.jeu[G.i]; if (G.etat === "question" && Q && Q.img) envoyer(topic, {m: "img", i: G.i, data: Q.img}); return; }
     if (m.m === "persos?") { envoyerPersos(); return; }
     if (m.pid && P[m.pid]) { const etait = P[m.pid].parti; P[m.pid].vu = Date.now(); if (m.m === "bye") { P[m.pid].parti = true; envoyerPersos(); maj(); return; } if (etait && m.m === "vie" && !P[m.pid].exclu) { P[m.pid].parti = false; envoyerPersos(); maj(); } }
@@ -1183,17 +1205,49 @@ function joueur(code){
     }, ok => { if (ok) { envoyer(topic, {m: "persos?"}); if (entre) envoyer(topic, {m: "ici", pid, nom, av, prenom}); } });
 }
 
+/* ===== Manette du cellulaire de l'enseignant (9 nov.) : un gros bouton = la prochaine étape de la partie ===== */
+function manette(code, k){
+  const topic = PREFIXE + code;
+  document.body.insertAdjacentHTML("beforeend", `<div id="man"><div class="mh"><img src="img/metier-plus-blanc.svg" alt="Métier+"><span id="mEtat">Connexion…</span></div>
+    <div class="mt" id="mTitre">Quiz</div><div class="mc" id="mCour">En attente de la partie…</div><div class="ma" id="mAtt"></div>
+    <button class="mbig" id="mGo" disabled>…</button><button class="m2 cache" id="mAutre"></button></div>`);
+  let S = null, recu = 0;
+  const cmd = b => envoyer(topic, {m: "cmd", k, b});
+  const dessiner = () => { if (!S) return;
+    $("mTitre").textContent = S.titre || "Quiz"; $("mCour").textContent = S.cour || "";
+    $("mAtt").textContent = S.att && S.att.length && S.att.length <= 12 ? "En attente de " + S.att.length + " : " + S.att.join(", ") : S.att && S.att.length ? "En attente de " + S.att.length + " participants" : "";
+    const go = S.go && !S.go.d, prim = go ? S.go : S.suite, id = go ? "bGo" : "bSuite";
+    $("mGo").textContent = prim ? prim.t : "…"; $("mGo").disabled = !prim || prim.d; $("mGo").dataset.b = id;
+    const autre = go && S.suite && !S.suite.d; $("mAutre").classList.toggle("cache", !autre); if (autre) { $("mAutre").textContent = S.suite.t; $("mAutre").dataset.b = "bSuite"; } };
+  $("mGo").onclick = e => { if (navigator.vibrate) navigator.vibrate(30); cmd(e.currentTarget.dataset.b); };
+  $("mAutre").onclick = e => cmd(e.currentTarget.dataset.b);
+  ecouter(topic, m => { if (m.m === "mstat") { S = m; recu = Date.now(); dessiner(); } }, ok => { $("mEtat").textContent = ok ? "Branché" : "Connexion…"; $("mEtat").classList.toggle("ok", ok); if (ok) cmd("etat"); });
+  setInterval(() => { cmd("etat"); if (recu && Date.now() - recu > 15000) { $("mEtat").textContent = "Le tableau ne répond pas"; $("mEtat").classList.remove("ok"); } }, 8000);
+  const eveil = () => { try { if (navigator.wakeLock && !document.hidden) navigator.wakeLock.request("screen").catch(() => {}); } catch(e) {} };
+  eveil(); document.addEventListener("visibilitychange", eveil);
+}
+
 /* ===== Animer au tableau : un seul ordinateur (écran de classe + barre + tiroir de télécommande) ===== */
 function animer(boutons){
   document.body.insertAdjacentHTML("beforeend", `<div id="tiroir"><button class="fermer" id="tirX" aria-label="Fermer la télécommande">›</button><iframe id="tirF" src="?tele=1&inclus=1${params.get("quiz") ? "&quiz=" + encodeURIComponent(params.get("quiz")) : ""}" title="Télécommande"></iframe></div>
-    <div id="animBar"><button id="retLabo" title="Retour à mes quiz">‹ Mes quiz</button>${boutons.map(([id], k) => `<button data-b="${id}" class="${k ? "" : "prim"}" disabled>…</button>`).join("")}<button id="tirB">Télécommande</button></div>`);
+    <div id="animBar"><button id="retLabo" title="Retour à mes quiz">‹ Mes quiz</button>${boutons.map(([id], k) => `<button data-b="${id}" class="${k ? "" : "prim"}" disabled>…</button>`).join("")}<button id="celB" title="Mener la partie avec ton cellulaire">Mon cell</button><button id="tirB">Télécommande</button></div><div id="celOv" class="cache"><div class="bx"><h2>Mène la partie avec ton cellulaire</h2><div id="celQr"></div><p>Scanne avec ton cellulaire. Il doit être connecté à ton compte Métier+ (une seule fois). Le code des élèves apparaît dès que ton cell est branché.</p><button id="celX">Continuer sans cellulaire</button></div></div>`);
   const T = $("tiroir"), F = $("tirF");
   $("tirB").onclick = () => T.classList.toggle("ouvert");
   const quitter = u => { let q = false; try { q = F.contentWindow.quitterPartie && F.contentWindow.quitterPartie(); } catch(x) {} setTimeout(() => { location.href = u; }, q ? 400 : 0); };
   $("retLabo").onclick = () => quitter("quiz.html");
   document.addEventListener("click", e => { const l = e.target.closest && e.target.closest("a[href]"); if (!l || /^#/.test(l.getAttribute("href")) || l.target === "_blank") return; e.preventDefault(); quitter(l.href); }, true);
   $("tirX").onclick = () => T.classList.remove("ouvert");
-  addEventListener("message", e => { if (e.data && e.data.labo === "code" && !animer.code) { animer.code = e.data.code; ecran(e.data.code); } });
+  $("celB").onclick = () => { if (!animer.code || !animer.mk) return; const u = location.href.split(/[?#]/)[0] + "?manette=" + animer.code + "&k=" + animer.mk;
+    $("celQr").innerHTML = ""; try { new QRCode($("celQr"), {text: u, width: 260, height: 260, correctLevel: QRCode.CorrectLevel.M}); } catch(x) { $("celQr").textContent = u; }
+    $("celOv").classList.remove("cache"); };
+  $("celX").onclick = () => $("celOv").classList.add("cache");
+  /* 9 nov. (« le QR de l'enseignant d'abord, puis celui des élèves ») : à l'ouverture, le QR de l'enseignant couvre l'écran;
+     dès que son cellulaire envoie une commande avec la bonne clé, il disparaît et l'écran des élèves (code QR des élèves) apparaît. */
+  window.manetteVue = m => { if (m.k && m.k === animer.mk) { animer.cell = true; $("celOv").classList.add("cache"); $("celB").textContent = "Cell branché"; } };
+  const auto = setInterval(() => { if (!animer.code || !animer.mk) return; clearInterval(auto);
+    let deja = false; try { deja = sessionStorage.getItem("celPropose") === animer.code; sessionStorage.setItem("celPropose", animer.code); } catch(x) {}
+    if (!deja && !animer.cell) $("celB").click(); }, 300);
+  addEventListener("message", e => { if (e.data && e.data.labo === "code" && e.data.mk) animer.mk = e.data.mk; if (e.data && e.data.labo === "code" && !animer.code) { animer.code = e.data.code; ecran(e.data.code); } });
   // les boutons de la barre reprennent l'état des vrais boutons de la télécommande
   setInterval(() => {
     let d = null; try { d = F.contentDocument; } catch(x) {}
@@ -1394,6 +1448,7 @@ function ecran(code){
     const b = $("bSon"); if (b) b.onclick = () => { sonOK = !sonOK; sonManuel = !sonOK; if (sonOK) { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); ac.resume(); ton(660, .2, .08); } b.classList.toggle("actif", sonOK); b.innerHTML = bSon().replace(/^<button[^>]*>|<\/button>$/g, ""); };
   }
   ecouter(topic, m => {
+    if (m.m === "cmd") { if (window.manetteVue) window.manetteVue(m); return; }
     if (m.m === "img") { img[m.i] = m.data; if ((V.etat === "question" && V.i === m.i) || (m.i === -1 && V.etat === "lobby")) rendre(true); }
     else if (m.m === "vue") { V = m; decal = m.now - Date.now(); rendre(m.etat === "lobby"); }
   }, ok => { if (ok) envoyer(topic, {m: "ecran?"}); });
