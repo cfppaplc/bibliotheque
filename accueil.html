@@ -3033,11 +3033,21 @@ html.apercu-mode #menage{display:none}
 #menage.apercu .mn-btn{display:block}
 @media (max-width:900px){#menage ul{grid-template-columns:1fr 1fr}}
 @media (max-width:600px){#menage ul{grid-template-columns:1fr}}
+/* Urgence (9 nov., Jeremy : « plus le temps avance, plus les ménages pas faits flashent; personne part si c'est pas coché ») : --u = 0 → 1 selon le temps écoulé, --vit = durée d'un flash */
+#menage{--u:0;--vit:2.6s}
+#menage li:not(.fait){animation:mnFlash var(--vit) ease-in-out infinite}
+@keyframes mnFlash{0%,100%{background:#ffffff0d;border-color:#ffffff14;box-shadow:none}
+  50%{background:color-mix(in srgb,#E5484D calc(var(--u) * 55%),#ffffff0d);border-color:color-mix(in srgb,#E5484D calc(25% + var(--u) * 75%),#F2A35E);box-shadow:0 0 calc(var(--u) * 40px) color-mix(in srgb,#E5484D calc(var(--u) * 70%),transparent)}}
+#menage .mn-pers{display:none;margin:0 0 1.6vh;padding:1.2vh 1vw;border-radius:12px;background:#E5484D;color:#fff;text-align:center;font-weight:900;font-size:clamp(20px,2.2vw,40px);animation:mnPers var(--vit) ease-in-out infinite}
+#menage.presse:not(.fini) .mn-pers{display:block}
+@keyframes mnPers{50%{background:#9e1f24;transform:scale(1.015)}}
+#menage .mn-reste{font-variant-numeric:tabular-nums;color:#F2A35E}
 </style>
 <div id="menage" hidden aria-live="polite">
-  <div class="mn-tete"><div style="flex:1"><h2>Ménage de l'atelier <span id="mnCompte"></span></h2><small id="mnSous">Coche ta tâche quand elle est faite · touche le nom pour voir les détails · <b>Tâche terminée? Aide les autres!</b></small></div>
+  <div class="mn-tete"><div style="flex:1"><h2>Ménage de l'atelier <span id="mnCompte"></span> <span class="mn-reste" id="mnReste"></span></h2><small id="mnSous">Coche ta tâche quand elle est faite · touche le nom pour voir les détails · <b>Tâche terminée? Aide les autres!</b></small></div>
     <button type="button" class="mn-btn" id="mnMini" title="Fermer l'aperçu">–</button></div>
   <div class="mn-barre"><i id="mnBarre"></i></div>
+  <div class="mn-pers">Personne ne part tant que tout n'est pas coché !</div>
   <ul id="mnListe"></ul>
   <div class="mn-bravo">L'atelier est propre. Bravo l'équipe !</div>
 </div>
@@ -3102,9 +3112,16 @@ html.apercu-mode #menage{display:none}
     actifVu = !!actif; document.getElementById("mnMini").textContent = force && !actif ? "✕" : "–"; el.classList.toggle("apercu", !!(force && !actif));
     if (actif) { cle = jour + "|" + Math.round(actif.start); force = false; }
     else if (force) cle = cle || jour + "|manuel";
-    if (actif || force) { dessiner(); montrer(true); } else montrer(false);
+    if (actif || force) {
+      const reste = actif ? actif.end - nowMin : (window.menageReste ?? m.min / 2);
+      const u = Math.max(0, Math.min(1, 1 - reste / m.min));
+      el.style.setProperty("--u", u.toFixed(3)); el.style.setProperty("--vit", (2.6 - 2.2 * u).toFixed(2) + "s");
+      el.classList.toggle("presse", reste <= Math.min(3, m.min / 2));
+      const mn = Math.max(0, Math.ceil(reste));
+      document.getElementById("mnReste").textContent = "· " + (mn <= 1 ? "moins d'une minute" : mn + " min");
+      dessiner(); montrer(true); } else montrer(false);
   }
-  setInterval(verifier, 5000); setTimeout(verifier, 1500);
+  setInterval(verifier, 2000); setTimeout(verifier, 1500);
   // Modifier la liste (Plus → Ménage de l'atelier)
   const ed = document.getElementById("menageEd");
   document.getElementById("b-menage").onclick = () => { closeMenu(); const m = M();
