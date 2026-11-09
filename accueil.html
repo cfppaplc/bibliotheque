@@ -3019,7 +3019,9 @@ if (window.COFFRE && !/[?&]apercu=/.test(location.search)) COFFRE.demarrer("accu
 #menageEd .mt-b{display:flex;gap:4px}
 #menageEd .mt-b button{min-width:36px;height:32px;padding:0 8px}
 #menageEd .ed-l{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:10px 0}
-#menageEd input{font:inherit;padding:6px 8px}
+#menageEd .mt-reg{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:6px}
+#menageEd .mt-r{border:1px solid var(--line,#8883);background:transparent!important}
+#menageEd .mt-b .btn{min-width:38px;height:38px;padding:0;justify-content:center}
 html.apercu-mode #menage{display:none}
 /* Plein écran (9 nov., Jeremy : « au complet sur toute la page, ne pas partir, pour inciter les élèves à venir cocher ») */
 #menage{inset:0;right:0;bottom:0;width:auto;max-height:none;border-radius:0;border:0;z-index:9000;padding:2.5vh 3vw;box-sizing:border-box;background:radial-gradient(circle at 50% 0%,#1d2a40,#0d121c 70%)}
@@ -3072,12 +3074,14 @@ html.apercu-mode #menage{display:none}
 </div>
 <div class="sheet" id="menageEd" hidden>
   <div class="sheet-in">
-    <h2>Ménage de l'atelier</h2>
-    <p style="opacity:.8;margin:4px 0 10px">Le nom de la tâche, puis ce que les élèves voient en la touchant : une étape par ligne.</p>
+    <div class="marque"><img class="lg-blc" src="img/metier-plus-blanc.svg" alt="Métier+"><img class="lg-clr" src="img/metier-plus.svg" alt=""><h2>Ménage de l'atelier</h2><p>Le nom de chaque tâche, puis les étapes que les élèves voient en la touchant (une par ligne).</p></div>
     <div class="mt-liste" id="mnListeEd"></div>
     <div class="ed-l"><button type="button" class="btn" id="mnAjout">+ Ajouter une tâche</button><button type="button" class="btn" id="mnDef">Remettre la liste de départ</button></div>
-    <div class="ed-l"><label>Apparaît dans les <input id="mnMin" type="number" min="1" max="60" style="width:70px"> dernières minutes des activités contenant le mot <input id="mnMot" style="width:140px"></label></div>
-    <div class="ed-l"><button type="button" class="btn primary" id="mnOk">Enregistrer</button><button type="button" class="btn" id="mnVoir">Aperçu</button><button type="button" class="btn" id="mnAnn">Fermer</button></div>
+    <div class="mt-reg">
+      <div class="field"><label for="mnMin">Apparaît dans les dernières…</label><select id="mnMin"><option value="5">5 minutes</option><option value="10">10 minutes</option><option value="15">15 minutes</option><option value="20">20 minutes</option><option value="30">30 minutes</option></select></div>
+      <div class="field"><label for="mnMot">… des activités dont le nom contient</label><input id="mnMot" placeholder="atelier"></div>
+    </div>
+    <div class="sheet-actions"><button type="button" class="btn primary" id="mnOk">Enregistrer</button><button type="button" class="btn" id="mnVoir">Aperçu</button><button type="button" class="btn" id="mnAnn">Annuler</button></div>
   </div>
 </div>
 <script>
@@ -3149,7 +3153,7 @@ html.apercu-mode #menage{display:none}
   const ed = document.getElementById("menageEd");
   document.getElementById("b-menage").onclick = () => { closeMenu(); const m = M();
     remplirEd(m.taches);
-    document.getElementById("mnMin").value = m.min; document.getElementById("mnMot").value = m.mot; ed.hidden = false; };
+    { const sel = document.getElementById("mnMin"); if (![...sel.options].some(o => +o.value === +m.min)) sel.add(new Option(m.min + " minutes", m.min)); sel.value = String(m.min); } document.getElementById("mnMot").value = m.mot; ed.hidden = false; };
   const fermerEd = () => { ed.hidden = true; };
   const LE = document.getElementById("mnListeEd");
   function remplirEd(taches){
@@ -3158,7 +3162,8 @@ html.apercu-mode #menage{display:none}
   }
   function ajouterEd(x){
     const r = document.createElement("div"); r.className = "mt-r";
-    r.innerHTML = '<span class="mt-n"></span><input class="mt-t" placeholder="Nom de la tâche"><div class="mt-b"><button type="button" data-m="h" title="Monter">▲</button><button type="button" data-m="b" title="Descendre">▼</button><button type="button" data-m="x" title="Retirer">✕</button></div><textarea placeholder="Une étape par ligne (facultatif)"></textarea>';
+    r.className = "mt-r field";
+    r.innerHTML = '<span class="mt-n"></span><input class="mt-t" placeholder="Nom de la tâche"><div class="mt-b"><button type="button" class="btn" data-m="h" title="Monter">▲</button><button type="button" class="btn" data-m="b" title="Descendre">▼</button><button type="button" class="btn" data-m="x" title="Retirer">✕</button></div><textarea placeholder="Une étape par ligne (facultatif)"></textarea>';
     r.querySelector(".mt-t").value = x.t || "";
     r.querySelector("textarea").value = String(x.d || "").split(/ · /).join("\n");
     LE.appendChild(r); numeroter(); return r;
