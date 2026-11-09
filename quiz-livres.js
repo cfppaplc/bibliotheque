@@ -389,7 +389,7 @@ window.QUIZ_LIVRES = [
 "id": "defi-eclair",
 "exemple": true,
 "titre": "Défi éclair",
-"sujet": "Sports et culture générale, en images",
+"sujet": "Sports, géo, histoire et culture générale",
 "couv": "img/labo/quiz/punch-couv.svg",
 "coul": "#B3261E",
 "reg": {
@@ -800,6 +800,199 @@ window.QUIZ_LIVRES = [
 "bon": 0,
 "s": 20,
 "expl": "9,58 s, à Berlin en 2009. Ça fait une moyenne de près de 38 km/h."
+},
+{
+"q": "Dans quel pays se trouvent ces célèbres pyramides de Gizeh ?",
+"ch": [
+"Mexique",
+"Égypte",
+"Pérou",
+"Soudan"
+],
+"bon": 1,
+"s": 15,
+"img": "img/labo/quiz/punch/17.jpg",
+"expl": "En Égypte, près du Caire. La grande pyramide a environ 4 500 ans."
+},
+{
+"q": "Quel point cardinal indique la pointe orange de l'aiguille ?",
+"ch": [
+"Nord",
+"Est",
+"Sud",
+"Ouest"
+],
+"bon": 3,
+"s": 15,
+"img": "img/labo/quiz/punch/18.jpg",
+"expl": "L'ouest : à gauche quand le nord est en haut. En anglais, c'est W (west)."
+},
+{
+"q": "Quelle est la capitale de l'Australie ?",
+"ch": [
+"Sydney",
+"Melbourne",
+"Canberra",
+"Perth"
+],
+"bon": 2,
+"s": 15,
+"expl": "Canberra, une ville construite exprès pour être la capitale, entre Sydney et Melbourne."
+},
+{
+"q": "Quel est le plus grand océan du monde ?",
+"ch": [
+"Atlantique",
+"Indien",
+"Arctique",
+"Pacifique"
+],
+"bon": 3,
+"s": 15,
+"expl": "Le Pacifique : à lui seul, il est plus grand que toutes les terres émergées réunies."
+},
+{
+"q": "Quel pays compte le plus d'habitants ?",
+"ch": [
+"Chine",
+"Inde",
+"États-Unis",
+"Indonésie"
+],
+"bon": 1,
+"s": 20,
+"expl": "L'Inde a dépassé la Chine en 2023, avec plus de 1,4 milliard d'habitants."
+},
+{
+"q": "Lesquels de ces pays sont traversés par l'équateur ?",
+"t": "multi",
+"ch": [
+"Brésil",
+"Kenya",
+"Mexique",
+"Égypte"
+],
+"bon": [
+0,
+1
+],
+"s": 30,
+"expl": "Le Brésil et le Kenya. Le Mexique et l'Égypte sont entièrement au nord de l'équateur."
+},
+{
+"q": "Combien de fuseaux horaires y a-t-il au Canada ?",
+"t": "nombre",
+"ch": [],
+"bon": 6,
+"tol": 0,
+"u": "fuseaux",
+"s": 30,
+"expl": "6 : Pacifique, Rocheuses, Centre, Est, Atlantique et Terre-Neuve (avec sa demi-heure de décalage)."
+},
+{
+"q": "Place ces montagnes de la plus basse à la plus haute.",
+"t": "ordre",
+"ch": [
+"Mont Royal",
+"Mont Tremblant",
+"Mont Blanc",
+"Mont Everest"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 35,
+"expl": "Environ 233 m, 875 m, 4 805 m et 8 849 m."
+},
+{
+"q": "En quelle année Samuel de Champlain a-t-il fondé Québec ?",
+"ch": [
+"1534",
+"1608",
+"1759",
+"1867"
+],
+"bon": 1,
+"s": 20,
+"expl": "1608. En 1534, c'est Jacques Cartier qui arrive à Gaspé; 1759, la bataille des plaines d'Abraham; 1867, la Confédération."
+},
+{
+"q": "Place ces événements du plus ancien au plus récent.",
+"t": "ordre",
+"ch": [
+"Fondation de Québec",
+"Bataille des plaines d'Abraham",
+"Confédération canadienne",
+"Premiers pas sur la Lune"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"expl": "1608, 1759, 1867 et 1969."
+},
+{
+"q": "Trouve l'erreur dans cette phrase.",
+"t": "erreur",
+"ch": [
+"En 1534, Jacques Cartier",
+"plante une croix à Gaspé",
+"et prend possession du territoire",
+"au nom du roi d'Angleterre."
+],
+"bon": 3,
+"s": 30,
+"expl": "Au nom du roi de France, François Ier."
+},
+{
+"q": "Qui a été le premier humain à marcher sur la Lune ?",
+"ch": [
+"Youri Gagarine",
+"Buzz Aldrin",
+"Neil Armstrong",
+"Marc Garneau"
+],
+"bon": 2,
+"s": 15,
+"expl": "Neil Armstrong, le 21 juillet 1969. Gagarine a été le premier humain dans l'espace (1961); Marc Garneau, le premier Canadien (1984)."
+},
+{
+"q": "En quelle année le mur de Berlin est-il tombé ?",
+"t": "nombre",
+"ch": [],
+"bon": 1989,
+"tol": 0,
+"u": "",
+"s": 30,
+"expl": "En 1989. L'Allemagne a été réunifiée l'année suivante, en 1990."
+},
+{
+"q": "La Révolution tranquille a transformé le Québec dans les années 1960.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 12,
+"expl": "Vrai : réforme de l'éducation, création du ministère de l'Éducation, nationalisation de l'électricité avec Hydro-Québec."
+},
+{
+"q": "En quelle année a pris fin la Deuxième Guerre mondiale ?",
+"ch": [
+"1918",
+"1939",
+"1945",
+"1950"
+],
+"bon": 2,
+"s": 15,
+"expl": "1945. Elle avait commencé en 1939; 1918 est la fin de la Première Guerre mondiale."
 }
 ]
 },
