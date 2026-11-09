@@ -3295,7 +3295,15 @@ html.style-pro .now-blk.nxt { flex-direction: row; flex-wrap: wrap; align-items:
 html.style-pro .now-blk.nxt .next-txt { font-size: calc(var(--u) * 42); opacity: 1; }
 html.style-pro .now-blk.nxt .now-time { font-size: calc(var(--u) * 30); }
 html.style-pro .now-card hr, html.style-pro .now-card .sep { display: none; }
-#mpCoin{position:fixed;right:clamp(16px,1.6vw,32px);bottom:clamp(10px,1.3vh,24px);height:clamp(22px,2.6vh,40px);z-index:5;opacity:.85;pointer-events:none}
+/* Choix F : le « + » du logo (9 nov.) */
+html.style-pro .quote blockquote { font-style: italic; }
+html.style-pro .quote { padding-left: calc(var(--u) * 50) !important; max-width: 48em; }
+html.style-pro .quote::before { display: block !important; content: "+"; left: 0; top: calc(var(--u) * 10); width: calc(var(--u) * 34); height: calc(var(--u) * 34); border-radius: 22%; background: var(--copper); color: #fff; font-family: inherit; font-size: calc(var(--u) * 30); font-weight: 800; line-height: calc(var(--u) * 34); text-align: center; }
+html.style-pro .now-card::before { display: none; }
+html.style-pro .now-card { padding-left: calc(var(--u) * 40) !important; }
+html.style-pro .now-card::after { content: "+"; position: absolute; right: calc(var(--u) * 22); top: calc(var(--u) * 22); width: calc(var(--u) * 64); height: calc(var(--u) * 64); border-radius: 22%; background: var(--copper); color: #fff; font-size: calc(var(--u) * 52); font-weight: 800; line-height: calc(var(--u) * 62); text-align: center; }
+html.style-pro .tl-mark::after { content: "Tu es ici · " attr(data-h); }
+#mpCoin{position:fixed;right:clamp(16px,1.6vw,32px);bottom:clamp(10px,1.3vh,24px);height:clamp(28px,3.4vh,52px);z-index:5;opacity:1;pointer-events:none}
 #mpCoin img{height:100%;display:block}
 #mpCoin .lg-clr{display:none}
 html.force-light #mpCoin .lg-blc{display:none} html.force-light #mpCoin .lg-clr{display:block}
