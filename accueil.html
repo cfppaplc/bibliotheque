@@ -857,7 +857,7 @@ html.ui-clair #apercuOv .ap-moments button.on, html.ui-clair #apercuOv .ap-ferme
 <div class="comppick" id="comppick" hidden role="listbox" aria-label="Choisir la compétence"></div>
 <div class="menu" id="menu" hidden role="menu">
   <button type="button" role="menuitem" id="b-set">Réglages</button>
-  <button type="button" role="menuitem" id="b-wid">Choisir les blocs affichés</button>
+  <button type="button" role="menuitem" id="b-wid" hidden>Choisir les blocs affichés</button>
   <button type="button" role="menuitem" id="b-keys">Raccourcis clavier</button>
   <button type="button" role="menuitem" id="b-menage">Ménage de l'atelier</button>
 </div>
@@ -922,10 +922,10 @@ html.ui-clair #apercuOv .ap-moments button.on, html.ui-clair #apercuOv .ap-ferme
 <div class="sheet" id="sheet" hidden>
   <form class="sheet-in" id="form">
     <div class="marque"><img class="lg-blc" src="img/metier-plus-blanc.svg" alt="Métier+"><img class="lg-clr" src="img/metier-plus.svg" alt=""><h2>Réglages</h2><p>L'apparence du tableau de bord.</p></div>
-    <div class="field"><label for="f-clock">Style d'horloge <span class="tip-i" tabindex="0" role="img" aria-label="Aide : choisis l'apparence de l'heure" data-tip="Numérique : grands chiffres. Aiguilles : horloge classique. Manomètre : l'heure lue sur un cadran de pression. Afficheur : chiffres lumineux de panneau de contrôle. Minimal : heures et minutes seulement.">?</span></label>
+    <div class="field" hidden><label for="f-clock">Style d'horloge <span class="tip-i" tabindex="0" role="img" aria-label="Aide : choisis l'apparence de l'heure" data-tip="Numérique : grands chiffres. Aiguilles : horloge classique. Manomètre : l'heure lue sur un cadran de pression. Afficheur : chiffres lumineux de panneau de contrôle. Minimal : heures et minutes seulement.">?</span></label>
       <select id="f-clock"><option value="num">Numérique</option><option value="analog">À aiguilles</option><option value="mano">Manomètre</option><option value="led">Afficheur lumineux</option><option value="mini">Minimal (sans secondes)</option></select></div>
-    <div class="field"><label for="f-theme">Couleurs <span class="tip-i" tabindex="0" role="img" aria-label="Aide : Sombre pour une classe tamisée, clair si la classe est très éclairée et que le projecteur pâlit l'image." data-tip="Sombre pour une classe tamisée, clair si la classe est très éclairée et que le projecteur pâlit l'image.">?</span></label><select id="f-theme"><option value="dark">Atelier sombre (acier)</option><option value="light">Clair (classe très éclairée)</option><option value="auto">Comme l'ordinateur</option></select></div>
-    <div class="field"><label for="f-couleurs">Ambiance <span class="tip-i" tabindex="0" role="img" aria-label="Aide : Les couleurs changent chaque jour de la semaine pour garder l'attention des élèves. Lundi ardoise, mardi forêt, mercredi prune, jeudi pétrole, vendredi cuivre." data-tip="Les couleurs changent chaque jour de la semaine pour garder l'attention des élèves. Lundi ardoise, mardi forêt, mercredi prune, jeudi pétrole, vendredi cuivre.">?</span></label><select id="f-couleurs"><option value="jour">Change chaque jour (recommandé)</option><option value="fixe">Toujours la même</option></select></div>
+    <div class="field"><label for="f-theme">Couleurs <span class="tip-i" tabindex="0" role="img" aria-label="Aide : Sombre pour une classe tamisée, clair si la classe est très éclairée et que le projecteur pâlit l'image." data-tip="Sombre pour une classe tamisée, clair si la classe est très éclairée et que le projecteur pâlit l'image.">?</span></label><select id="f-theme"><option value="dark">Foncé</option><option value="light">Clair (classe très éclairée)</option><option value="auto">Comme l'ordinateur</option></select></div>
+    <div class="field" hidden><label for="f-couleurs">Ambiance <span class="tip-i" tabindex="0" role="img" aria-label="Aide : Les couleurs changent chaque jour de la semaine pour garder l'attention des élèves. Lundi ardoise, mardi forêt, mercredi prune, jeudi pétrole, vendredi cuivre." data-tip="Les couleurs changent chaque jour de la semaine pour garder l'attention des élèves. Lundi ardoise, mardi forêt, mercredi prune, jeudi pétrole, vendredi cuivre.">?</span></label><select id="f-couleurs"><option value="jour">Change chaque jour (recommandé)</option><option value="fixe">Toujours la même</option></select></div>
     <div class="field" hidden><label for="f-anim">Fond animé <span class="tip-i" tabindex="0" role="img" aria-label="Aide : Comme l'ordinateur : le fond reste figé si Windows a désactivé les effets d'animation. Toujours : le fond bouge quand même. Jamais : fond immobile." data-tip="Comme l'ordinateur : le fond reste figé si Windows a désactivé les effets d'animation. Toujours : le fond bouge quand même. Jamais : fond immobile.">?</span></label><select id="f-anim"><option value="auto">Comme l'ordinateur</option><option value="oui">Toujours</option><option value="non">Jamais</option></select></div>
     <div class="field"><label>Ménage de l'atelier</label><button type="button" class="btn" id="b-menageReg">Modifier les tâches du ménage</button></div>
     <div class="field"><label for="f-msg">Message du jour <span class="tip-i" tabindex="0" role="img" aria-label="Aide : Une consigne courte sous la citation, par exemple « Apportez vos lunettes ». Laisse vide pour ne rien afficher." data-tip="Une consigne courte sous la citation, par exemple « Apportez vos lunettes ». Laisse vide pour ne rien afficher.">?</span></label><input id="f-msg" placeholder="Aucun message"></div>
@@ -936,7 +936,7 @@ html.ui-clair #apercuOv .ap-moments button.on, html.ui-clair #apercuOv .ap-ferme
       <div class="field"><label>Début des périodes <span class="tip-i" tabindex="0" role="img" aria-label="Aide : Chaque période dure 3 h 20 : 60 min de cours, pause de 5 min, 60 min, pause de 15 min, 60 min. Les pauses se placent toutes seules." data-tip="Chaque période dure 3 h 20 : 60 min de cours, pause de 5 min, 60 min, pause de 15 min, 60 min. Les pauses se placent toutes seules.">?</span></label>
       <div class="times"><label for="f-amStart">Matin</label><input type="time" id="f-amStart"><label for="f-pmStart">Après-midi</label><input type="time" id="f-pmStart"></div></div>
       <div class="field"><label for="f-scale">Taille du texte <span class="tip-i" tabindex="0" role="img" aria-label="Aide : Automatique remplit l'écran. Au clavier : + et − pour grossir ou réduire, 0 pour revenir en automatique." data-tip="Automatique remplit l'écran. Au clavier : + et − pour grossir ou réduire, 0 pour revenir en automatique.">?</span></label><select id="f-scale"><option value="auto">Automatique (remplit l'écran)</option><option value="0.8">80 %</option><option value="0.9">90 %</option><option value="1">100 %</option><option value="1.1">110 %</option><option value="1.2">120 %</option><option value="1.35">135 %</option><option value="1.5">150 %</option></select></div>
-      <details class="more sub">
+      <details class="more sub" hidden>
       <summary>Contenu des blocs facultatifs <span class="tip-i" tabindex="0" role="img" aria-label="Aide : Ces blocs sont cachés au départ. Pour les montrer aux élèves, active-les avec le bouton Widgets." data-tip="Ces blocs sont cachés au départ. Pour les montrer aux élèves, active-les avec le bouton Widgets.">?</span></summary>
       <div class="field"><label for="f-goals">Objectifs du jour <span class="tip-i" tabindex="0" role="img" aria-label="Aide : Un objectif par ligne." data-tip="Un objectif par ligne.">?</span></label><textarea id="f-goals"></textarea></div>
       <div class="field"><label>ÉPI à afficher</label><div class="checks" id="f-ppe"></div></div>
@@ -1003,7 +1003,7 @@ const DEFAULTS = {
 
 let cfg = { ...DEFAULTS };
 const OLD_MSG = "On commence à l'heure : pose ton sac et sors ton cahier de notes.";
-try { const s = localStorage.getItem("accueil-atelier-v4"); if (s) cfg = { ...DEFAULTS, ...JSON.parse(s) }; if (cfg.msg === OLD_MSG) cfg.msg = ""; if (!cfg.themeV2) { cfg.theme = "dark"; cfg.themeV2 = 1; } if (!cfg.compV) { cfg.comp = "307-505"; cfg.module = ""; cfg.bg = "auto"; cfg.compV = 1; } if (!cfg.simpleV) { cfg.hidden = [...new Set([...(cfg.hidden || []), "objectifs", "epi", "mot", "question"])]; cfg.simpleV = 1; } if (!cfg.simpleV2) { cfg.hidden = [...new Set([...(cfg.hidden || []), "deroulement"])]; cfg.simpleV2 = 1; } } catch (e) {}
+try { const s = localStorage.getItem("accueil-atelier-v4"); if (s) cfg = { ...DEFAULTS, ...JSON.parse(s) }; if (cfg.msg === OLD_MSG) cfg.msg = ""; if (!cfg.themeV2) { cfg.theme = "dark"; cfg.themeV2 = 1; } if (!cfg.compV) { cfg.comp = "307-505"; cfg.module = ""; cfg.bg = "auto"; cfg.compV = 1; } if (!cfg.simpleV) { cfg.hidden = [...new Set([...(cfg.hidden || []), "objectifs", "epi", "mot", "question"])]; cfg.simpleV = 1; } if (!cfg.simpleV2) { cfg.hidden = [...new Set([...(cfg.hidden || []), "deroulement"])]; cfg.simpleV2 = 1; } if (!cfg.simpleV3) { cfg.hidden = ["objectifs", "epi", "mot", "question", "deroulement"]; cfg.clock = "num"; cfg.couleurs = "fixe"; cfg.simpleV3 = 1; } } catch (e) {}
 function save() { try { localStorage.setItem("accueil-atelier-v4", JSON.stringify(cfg)); } catch (e) {} }
 
 const $ = id => document.getElementById(id);
@@ -1165,7 +1165,7 @@ function ambianceDuJour() { return AMBIANCES[new Date().getDay()]; }
 function couleursDuJour() {
   const r = document.documentElement; jourCouleurs = jourAuj();
   VARS_AMB.forEach(v => r.style.removeProperty(v));
-  if (cfg.couleurs === "fixe") return;
+  return;   /* Style Métier+ (9 nov.) : plus d'ambiance du jour, couleurs fixes */
   const a = ambianceDuJour();
   const sombre = cfg.theme === "dark" || (cfg.theme !== "light" && matchMedia("(prefers-color-scheme: dark)").matches);
   if (sombre) { r.style.setProperty("--bg", a.bg); r.style.setProperty("--surface", a.surface); r.style.setProperty("--line", a.line); r.style.setProperty("--steel", a.steel); r.style.setProperty("--rivet", a.rivet); r.style.setProperty("--copper", a.copper); r.style.setProperty("--water", a.water); }
@@ -3244,5 +3244,25 @@ html.apercu-mode #menage{display:none}
   window.menageTest = verifier;
 })();
 </script>
+<style>
+/* Style Métier+ (9 nov., Jeremy : « plus style Métier+, ça doit fitter avec le reste; trop d'options d'affichage, c'est complexe ») :
+   palette du logo (bleu marine + orange), panneaux arrondis comme la bibliothèque, police de la bibliothèque, plus de repères de coins ni de police technique. */
+:root, html.force-dark:root, html.force-dark.force-dark:root { --bg:#0e1320; --surface:#161d2c; --line:#283247; --ink:#F2F4F7; --muted:#9AA6BB; --copper:#EB6A22; --water:#F28A3C; --done:#6b768c; --steel:#3a4660; --rivet:#3a4660;
+  --display:"Segoe UI",Roboto,Arial,sans-serif; --body:"Segoe UI",Roboto,Arial,sans-serif; color-scheme:dark }
+@media (prefers-color-scheme: light){ html:not(.force-dark):root { --bg:#F3F5F9; --surface:#fff; --line:#dde2ea; --ink:#1E2A44; --muted:#5f6b82; --copper:#EB6A22; --water:#D9621C; --done:#9aa3b5; color-scheme:light } }
+html.force-light.force-light:root { --bg:#F3F5F9; --surface:#fff; --line:#dde2ea; --ink:#1E2A44; --muted:#5f6b82; --copper:#EB6A22; --water:#D9621C; --done:#9aa3b5; color-scheme:light }
+html.style-pro body { background: radial-gradient(1400px 700px at 85% -15%, color-mix(in srgb, var(--copper) 12%, transparent), transparent 60%), var(--bg) !important; }
+html.style-pro body::before, html.style-pro body::after { display: none !important; }
+html.style-pro .panel, html.style-pro .period { background: var(--surface) !important; background-image: none !important; border: 1px solid var(--line) !important; border-radius: 18px !important; box-shadow: 0 10px 40px rgba(0,0,0,.18) !important; }
+html.style-pro .now-lbl, html.style-pro .period-hours, html.style-pro .exam-badge, html.style-pro .seg-t, html.style-pro .now-time, html.style-pro .mt-k, html.style-pro .tl-mark::after {
+  font-family: var(--body) !important; letter-spacing: 0 !important; font-variant-numeric: tabular-nums; }
+html.style-pro .now-lbl { letter-spacing: .08em !important; color: var(--muted); }
+html.style-pro .now-lbl::before { background: var(--copper); box-shadow: 0 0 10px var(--copper); }
+html.style-pro .seg { border-radius: 12px; }
+html.style-pro .seg.done:not(.p) .seg-t::before { color: var(--copper); }
+html.style-pro .tl-mark::after { color: #fff; border-radius: 999px; }
+html.style-pro .period .water { box-shadow: none; }
+html.style-pro .clock { font-feature-settings: "tnum" 1 !important; }
+</style>
 </body>
 </html>
