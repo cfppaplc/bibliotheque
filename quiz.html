@@ -168,6 +168,7 @@ th{font-size:12px;color:var(--gris);border-top:0}
 #animBar button{padding:12px 18px;font-size:15px;border-radius:10px;background:#3A3D45;color:#F2EFEA;min-height:46px}
 #animBar button.prim{background:var(--acc,#534AB7);color:#fff}
 #animBar button:disabled{opacity:.35}
+#qAtt{margin-top:10px;padding:10px 12px;border-radius:10px;background:rgba(235,106,34,.12);border:1px solid rgba(235,106,34,.35);display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;font-size:15px}#qAtt b{color:#C9561A}#qAtt span{display:inline-flex;align-items:center}#qAtt.cache{display:none}
 #tiroir{position:fixed;top:0;right:0;bottom:0;width:min(500px,94vw);transform:translateX(102%);transition:transform .35s ease;z-index:70;background:#E9E6E0;box-shadow:-10px 0 40px rgba(0,0,0,.45)}
 #tiroir.ouvert{transform:none}
 #tiroir iframe{width:100%;height:100%;border:0;display:block}
@@ -413,7 +414,7 @@ Le propane s'accumule…
 <div class="sous" style="margin-top:8px">Le quiz est enregistré dans ton compte et te suit sur tous tes appareils. « Exporter » (dans la liste) crée un fichier à partager avec un collègue; « Sauvegarder tous mes quiz » en fait une copie complète.</div></div>
 </div>
 <div id="vJeu" class="cache">
-<div class="carte"><h2 id="jTitre"></h2><div id="qCour">En attente des participants…</div><div class="sous" id="qInfo"></div>
+<div class="carte"><h2 id="jTitre"></h2><div id="qCour">En attente des participants…</div><div class="sous" id="qInfo"></div><div id="qAtt" class="cache"></div>
 <div class="ctl" style="margin-top:12px"><button id="bGo">Commencer</button><button id="bSuite" class="btn2" disabled>Question suivante</button><button id="bFin" class="btn2">Quitter la partie</button></div></div>
 <div class="carte cache" id="bilan"></div>
 <div class="carte"><h2>Qui a répondu</h2>
@@ -635,6 +636,10 @@ function telecommande(bord){
       else if (G.etat === "rev" && Q) c = x && x.c != null ? `${esc(texteRep(Q, x.c))} · <span class="${x.ok ? "ok" : "ko"}">${x.ok ? (x.g ? "+" + x.g : "bonne") : x.g < 0 ? x.g : "mauvaise"}</span>${x.dbl ? ` · <b>${x.dbl > 0 ? "double +" + x.dbl : "mise perdue"}</b>` : ""}` : '<span class="ko">Pas répondu</span>' + (x && x.dbl ? " · <b>mise perdue</b>" : "");
       return `<tr><td><b>${visage(P[id].av, "v-s")}${esc(P[id].nom)}</b>${P[id].prenom ? ` <span class="sous">(${esc(P[id].prenom)})</span>` : ""}</td><td>${c}</td><td>${P[id].pts}</td><td>${G.etat === "lobby" ? "—" : r[id]}</td><td style="text-align:right"><button class="kick" data-kick="${id}" title="Retirer de la partie (il pourra revenir)">✕</button></td></tr>`;
     }).join("") || '<tr><td colspan="5" class="sous">Personne pour l\'instant.</td></tr>';
+    /* 9 nov. : qui n'a pas encore répondu (seulement sur la télécommande, jamais au tableau) */
+    const att = G.etat === "question" ? ids().filter(id => !G.reps[id]) : [];
+    $("qAtt").classList.toggle("cache", !att.length);
+    $("qAtt").innerHTML = att.length ? `<b>En attente de ${att.length} :</b> ${att.map(id => `<span>${visage(P[id].av, "v-s")}${esc(P[id].nom)}</span>`).join("")}` : "";
   }
   let vT = 0, vD = null;
   function vue(){ if (vD) return; vD = setTimeout(() => { vD = null; vT = Date.now(); envoyer(topic, vueObj()); }, Math.max(0, 450 - (Date.now() - vT))); }
@@ -1194,7 +1199,9 @@ function animer(boutons){
       const v = d && d.getElementById(b.dataset.b);
       if (!v) { b.disabled = true; return; }
       b.textContent = v.textContent; b.disabled = v.disabled || v.closest(".cache") != null;
-      b.style.display = b.disabled && b.dataset.cacher ? "none" : "";
+      /* 9 nov. : « Commencer » disparaît une fois la partie lancée; le bouton qu'on peut toucher est en couleur */
+      b.style.display = b.disabled && (b.dataset.cacher || b.dataset.b === "bGo") ? "none" : "";
+      b.classList.toggle("prim", !b.disabled);
     });
   }, 400);
   document.querySelectorAll("#animBar [data-b]").forEach(b => b.onclick = () => { const v = F.contentDocument.getElementById(b.dataset.b); if (v && !v.disabled) v.click(); });

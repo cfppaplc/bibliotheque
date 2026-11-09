@@ -685,6 +685,17 @@ function telecommande(){
     if (m.m === "persos?") { envoyerPersos(); return; }
     if (m.moi && equipes[m.moi]) { const q = equipes[m.moi]; q.vu = Date.now(); if (m.m === "bye") { q.parti = true; envoyerPersos(); dessinerEquipes(); vue(); return; } if (q.parti && m.m === "vie" && !q.exclu) { q.parti = false; envoyerPersos(); dessinerEquipes(); vue(); } }
     if (m.m === "vie" || m.m === "bye") return;
+    if (m.m === "ici") {
+      /* 9 nov. (comme le quiz) : même nom d'équipe = la même équipe qui revient (iPad planté, QR rescanné) → elle reprend ses points.
+         Même nom qu'une autre équipe encore présente avec un autre personnage → refusé. */
+      const nrm = x => String(x || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
+      const dbl = Object.entries(equipes).find(([id, q]) => id !== m.moi && !q.exclu && nrm(q.equipe) === nrm(m.equipe));
+      if (dbl) { const [oid, oq] = dbl, absent = oq.parti || Date.now() - (oq.vu || 0) > 25000;
+        if (oq.av === m.av || absent) { equipes[m.moi] = oq; delete equipes[oid];
+          ["sc", "fa", "prog", "fini", "gain", "reps"].forEach(k => { if (J[k] && J[k][oid] != null) { J[k][m.moi] = J[k][oid]; delete J[k][oid]; } });
+          envoyer(topic, {m: "remplace", pour: oid}); }
+        else { envoyer(topic, {m: "refus", pour: m.moi, raison: "nom"}); return; } }
+    }
     if (m.m === "ici" && m.av != null && Object.entries(equipes).some(([id, q]) => !q.parti && q.av === m.av && id !== m.moi)) { envoyer(topic, {m: "refus", pour: m.moi}); return; }
     if (m.m === "ici" && (!equipes[m.moi] || equipes[m.moi].parti) && eqIds().length >= MAX_EQ) { envoyer(topic, {m: "refus", pour: m.moi, raison: "plein", max: MAX_EQ}); return; }
     if (m.m === "ici") {
@@ -999,7 +1010,8 @@ function panneau(code){
   };
     ecouter(topic, m => {
       if (m.m === "persos") { pris = m.pris || []; if (!entre) choix(choix.msg); return; }
-      if (m.m === "refus" && m.pour === moi) { entre = false; av = -1; $("panneau").classList.add("cache"); $("entree").classList.remove("cache"); choix(m.raison === "plein" ? `La classe est pleine (${m.max} panneaux au plus). Demande à l'enseignant.` : "Ce personnage vient d'être pris. Choisis-en un autre."); return; }
+      if (m.m === "refus" && m.pour === moi) { entre = false; av = -1; $("panneau").classList.add("cache"); $("entree").classList.remove("cache"); choix(m.raison === "plein" ? `La classe est pleine (${m.max} panneaux au plus). Demande à l'enseignant.` : m.raison === "nom" ? "Une autre équipe porte déjà ce nom. Choisis un autre nom." : "Ce personnage vient d'être pris. Choisis-en un autre."); return; }
+      if (m.m === "remplace" && m.pour === moi) { entre = false; $("panneau").classList.add("cache"); $("entree").classList.remove("cache"); choix("Ton équipe est revenue sur un autre iPad. La partie continue là-bas."); return; }
       if (m.m === "kick" && m.pour === moi) { entre = false; av = -1; $("panneau").classList.add("cache"); $("entree").classList.remove("cache"); choix("L'enseignant a retiré ton panneau. Choisis un personnage pour revenir."); return; }
       if (!entre) return;
       if (m.m === "ev" && pourMoi(m)) ajouter(m);
