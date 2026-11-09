@@ -927,6 +927,7 @@ html.ui-clair #apercuOv .ap-moments button.on, html.ui-clair #apercuOv .ap-ferme
     <div class="field"><label for="f-theme">Couleurs <span class="tip-i" tabindex="0" role="img" aria-label="Aide : Sombre pour une classe tamisée, clair si la classe est très éclairée et que le projecteur pâlit l'image." data-tip="Sombre pour une classe tamisée, clair si la classe est très éclairée et que le projecteur pâlit l'image.">?</span></label><select id="f-theme"><option value="dark">Atelier sombre (acier)</option><option value="light">Clair (classe très éclairée)</option><option value="auto">Comme l'ordinateur</option></select></div>
     <div class="field"><label for="f-couleurs">Ambiance <span class="tip-i" tabindex="0" role="img" aria-label="Aide : Les couleurs changent chaque jour de la semaine pour garder l'attention des élèves. Lundi ardoise, mardi forêt, mercredi prune, jeudi pétrole, vendredi cuivre." data-tip="Les couleurs changent chaque jour de la semaine pour garder l'attention des élèves. Lundi ardoise, mardi forêt, mercredi prune, jeudi pétrole, vendredi cuivre.">?</span></label><select id="f-couleurs"><option value="jour">Change chaque jour (recommandé)</option><option value="fixe">Toujours la même</option></select></div>
     <div class="field" hidden><label for="f-anim">Fond animé <span class="tip-i" tabindex="0" role="img" aria-label="Aide : Comme l'ordinateur : le fond reste figé si Windows a désactivé les effets d'animation. Toujours : le fond bouge quand même. Jamais : fond immobile." data-tip="Comme l'ordinateur : le fond reste figé si Windows a désactivé les effets d'animation. Toujours : le fond bouge quand même. Jamais : fond immobile.">?</span></label><select id="f-anim"><option value="auto">Comme l'ordinateur</option><option value="oui">Toujours</option><option value="non">Jamais</option></select></div>
+    <div class="field"><label>Ménage de l'atelier</label><button type="button" class="btn" id="b-menageReg">Modifier les tâches du ménage</button></div>
     <div class="field"><label for="f-msg">Message du jour <span class="tip-i" tabindex="0" role="img" aria-label="Aide : Une consigne courte sous la citation, par exemple « Apportez vos lunettes ». Laisse vide pour ne rien afficher." data-tip="Une consigne courte sous la citation, par exemple « Apportez vos lunettes ». Laisse vide pour ne rien afficher.">?</span></label><input id="f-msg" placeholder="Aucun message"></div>
     <details class="more" id="adv">
       <summary>Réglages avancés <span class="tip-i" tabindex="0" role="img" aria-label="Aide : Nom affiché, heures de début des périodes, taille du texte et contenu des blocs facultatifs. Rarement nécessaires." data-tip="Nom affiché, heures de début des périodes, taille du texte et contenu des blocs facultatifs. Rarement nécessaires.">?</span></summary>
@@ -3009,7 +3010,14 @@ if (window.COFFRE && !/[?&]apercu=/.test(location.search)) COFFRE.demarrer("accu
 #menage.mini ul,#menage.mini .mn-barre,#menage.mini .mn-bravo,#menage.mini .mn-tete .mn-btn{display:none}
 #menage.mini .mn-tete{padding:12px 18px}
 #menage.mini .mn-tete h2{font-size:18px}
-#menageEd textarea{width:100%;min-height:260px;font:15px/1.5 Inter,system-ui,sans-serif;box-sizing:border-box}
+#menageEd textarea{width:100%;min-height:70px;font:14px/1.45 Inter,system-ui,sans-serif;box-sizing:border-box;resize:vertical}
+#menageEd .mt-liste{max-height:52vh;overflow:auto;display:flex;flex-direction:column;gap:10px;padding-right:4px}
+#menageEd .mt-r{display:grid;grid-template-columns:28px 1fr auto;gap:6px 10px;align-items:start;padding:10px;border-radius:12px;background:#8881}
+#menageEd .mt-n{font-weight:800;opacity:.6;padding-top:8px;text-align:center}
+#menageEd .mt-r input.mt-t{font-weight:700;width:100%;box-sizing:border-box}
+#menageEd .mt-r textarea{grid-column:2}
+#menageEd .mt-b{display:flex;gap:4px}
+#menageEd .mt-b button{min-width:36px;height:32px;padding:0 8px}
 #menageEd .ed-l{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:10px 0}
 #menageEd input{font:inherit;padding:6px 8px}
 html.apercu-mode #menage{display:none}
@@ -3054,10 +3062,11 @@ html.apercu-mode #menage{display:none}
 <div class="sheet" id="menageEd" hidden>
   <div class="sheet-in">
     <h2>Ménage de l'atelier</h2>
-    <p style="opacity:.8;margin:4px 0 10px">Une tâche par ligne. Pour ajouter une description que les élèves voient en touchant la tâche : <b>Tâche | description</b>.</p>
-    <textarea id="mnTxt"></textarea>
+    <p style="opacity:.8;margin:4px 0 10px">Le nom de la tâche, puis ce que les élèves voient en la touchant : une étape par ligne.</p>
+    <div class="mt-liste" id="mnListeEd"></div>
+    <div class="ed-l"><button type="button" class="btn" id="mnAjout">+ Ajouter une tâche</button><button type="button" class="btn" id="mnDef">Remettre la liste de départ</button></div>
     <div class="ed-l"><label>Apparaît dans les <input id="mnMin" type="number" min="1" max="60" style="width:70px"> dernières minutes des activités contenant le mot <input id="mnMot" style="width:140px"></label></div>
-    <div class="ed-l"><button type="button" class="prim" id="mnOk">Enregistrer</button><button type="button" id="mnVoir">Afficher maintenant</button><button type="button" id="mnAnn">Fermer</button></div>
+    <div class="ed-l"><button type="button" class="btn primary" id="mnOk">Enregistrer</button><button type="button" class="btn" id="mnVoir">Aperçu</button><button type="button" class="btn" id="mnAnn">Fermer</button></div>
   </div>
 </div>
 <script>
@@ -3073,7 +3082,8 @@ html.apercu-mode #menage{display:none}
     {"t": "Déchets / Recyclage", "d": "Objectif : Vider et organiser les déchets. · Vider les bacs de déchets et de recyclage. · Ramasser les déchets au sol (papier, plastique, métal). · Remplacer les sacs et nettoyer l’extérieur des bacs. · Apporter les sacs pleins à l’endroit prévu. · Remettre les bacs à leur emplacement."},
     {"t": "Nettoyage de la pièce d’entretien", "d": "Objectif : Remettre la pièce d’entretien propre et fonctionnelle. · Ranger les outils, accessoires et produits d’entretien (savon, brosses, nettoyants). · Nettoyer les surfaces (comptoirs, évier, étagères) et essuyer les traces de flux, graisse, eau ou résidus. · Jeter les déchets et résidus dans les bacs appropriés. · Balayer et passer la moppe si nécessaire. · S’assurer que la pièce est dégagée et prête pour le prochain usage."},
     {"t": "Rangement de l’entrepôt", "d": "Objectif : Maintenir l’entrepôt organisé et sécuritaire. · Ranger les boîtes, bacs et contenants déplacés durant la période. · Trier les matériaux laissés sur les tables, au sol ou dans les bacs. · Remettre les matériaux aux étagères désignées. · Jeter les résidus inutilisables (petits morceaux, emballages). · Réorganiser les sections désordonnées (PVC, cuivre, acier, etc.). · Vérifier que les allées sont dégagées et que les items lourds sont rangés de façon sécuritaire."}]};
-  const M = () => Object.assign({}, DEF, cfg.menage || {});
+  let APERCU = null;   /* tâches de l'éditeur montrées en aperçu, pas encore enregistrées */
+  const M = () => Object.assign({}, DEF, cfg.menage || {}, APERCU ? {taches: APERCU} : {});
   const norm = x => String(x || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
   const el = document.getElementById("menage"), ul = document.getElementById("mnListe");
   const lireFait = () => { try { return JSON.parse(localStorage.menageFait || "{}"); } catch(e) { return {}; } };
@@ -3096,7 +3106,7 @@ html.apercu-mode #menage{display:none}
     else if (e.target.closest(".mn-t, .mn-i")) li.classList.toggle("ouvert");
   });
   let actifVu = false;
-  document.getElementById("mnMini").onclick = e => { e.stopPropagation(); if (force && !actifVu) { force = false; montrer(false); return; } mini = true; el.classList.add("mini"); };
+  document.getElementById("mnMini").onclick = e => { e.stopPropagation(); if (force && !actifVu) { force = false; montrer(false); if (APERCU) { APERCU = null; rendu = ""; ed.hidden = false; } return; } mini = true; el.classList.add("mini"); };
   el.addEventListener("click", () => { if (mini) { mini = false; el.classList.remove("mini"); } });
   function montrer(on){
     if (on && el.hidden) { el.hidden = false; requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add("on"))); }
@@ -3125,15 +3135,36 @@ html.apercu-mode #menage{display:none}
   // Modifier la liste (Plus → Ménage de l'atelier)
   const ed = document.getElementById("menageEd");
   document.getElementById("b-menage").onclick = () => { closeMenu(); const m = M();
-    document.getElementById("mnTxt").value = m.taches.map(x => x.t + (x.d ? " | " + x.d : "")).join("\n");
+    remplirEd(m.taches);
     document.getElementById("mnMin").value = m.min; document.getElementById("mnMot").value = m.mot; ed.hidden = false; };
   const fermerEd = () => { ed.hidden = true; };
+  const LE = document.getElementById("mnListeEd");
+  function remplirEd(taches){
+    LE.innerHTML = "";
+    taches.forEach(x => ajouterEd(x));
+  }
+  function ajouterEd(x){
+    const r = document.createElement("div"); r.className = "mt-r";
+    r.innerHTML = '<span class="mt-n"></span><input class="mt-t" placeholder="Nom de la tâche"><div class="mt-b"><button type="button" data-m="h" title="Monter">▲</button><button type="button" data-m="b" title="Descendre">▼</button><button type="button" data-m="x" title="Retirer">✕</button></div><textarea placeholder="Une étape par ligne (facultatif)"></textarea>';
+    r.querySelector(".mt-t").value = x.t || "";
+    r.querySelector("textarea").value = String(x.d || "").split(/ · /).join("\n");
+    LE.appendChild(r); numeroter(); return r;
+  }
+  const numeroter = () => LE.querySelectorAll(".mt-n").forEach((n, i) => n.textContent = i + 1);
+  LE.addEventListener("click", e => { const b = e.target.closest("[data-m]"); if (!b) return; const r = b.closest(".mt-r");
+    if (b.dataset.m === "x") r.remove(); else if (b.dataset.m === "h" && r.previousElementSibling) LE.insertBefore(r, r.previousElementSibling);
+    else if (b.dataset.m === "b" && r.nextElementSibling) LE.insertBefore(r.nextElementSibling, r); numeroter(); });
+  document.getElementById("mnAjout").onclick = () => { const r = ajouterEd({}); r.scrollIntoView({block: "nearest"}); r.querySelector(".mt-t").focus(); };
+  document.getElementById("mnDef").onclick = () => remplirEd(DEF.taches);
   document.getElementById("mnAnn").onclick = fermerEd;
   document.getElementById("mnOk").onclick = () => {
-    const taches = document.getElementById("mnTxt").value.split("\n").map(l => l.trim()).filter(Boolean).map(l => { const [t, ...d] = l.split("|"); return {t: t.trim(), d: d.join("|").trim()}; });
+    const taches = lireEd(); APERCU = null;
     cfg.menage = {taches, mot: document.getElementById("mnMot").value.trim() || "atelier", min: Math.max(1, Math.min(60, +document.getElementById("mnMin").value || 10))};
     save(); rendu = ""; fermerEd(); verifier(); };
-  document.getElementById("mnVoir").onclick = () => { fermerEd(); force = true; cle = new Date().toISOString().slice(0, 10) + "|manuel"; mini = false; el.classList.remove("mini"); verifier(); };
+  const lireEd = () => [...document.querySelectorAll("#mnListeEd .mt-r")].map(r => ({t: r.querySelector(".mt-t").value.trim(),
+      d: r.querySelector("textarea").value.split("\n").map(l => l.replace(/^[•\-*]\s*/, "").trim()).filter(Boolean).join(" · ")})).filter(x => x.t);
+  document.getElementById("mnVoir").onclick = () => { APERCU = lireEd(); rendu = ""; if (window.menageReste == null) window.menageReste = 2.5; fermerEd(); force = true; cle = new Date().toISOString().slice(0, 10) + "|manuel"; mini = false; el.classList.remove("mini"); verifier(); };
+  document.getElementById("b-menageReg").onclick = () => { document.getElementById("b-cancel").click(); document.getElementById("b-menage").click(); };
   window.menageTest = verifier;
 })();
 </script>
