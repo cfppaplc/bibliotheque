@@ -1237,13 +1237,13 @@ function ecran(code){
   const ECLAIR = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2L4 14h7l-1 8 9-12h-7z" fill="currentColor"/></svg>';
   const palier = s => s >= 8 ? "Légendaire" : s >= 5 ? "Inarrêtable" : s >= 3 ? "En feu" : s === 2 ? "Ça chauffe" : "";
   function classement(v){
-    const av = v.joueurs.map(j => Object.assign({}, j, {avant: j.pts - (j.g || 0)}));
+    const av = v.joueurs.map((j, i) => Object.assign({}, j, {k: "j" + i, avant: j.pts - (j.g || 0)}));
     const ancien = av.slice().sort((a, b) => b.avant - a.avant || a.n.localeCompare(b.n)), N = Math.min(10, av.length);
-    const rAvant = {}; ancien.forEach((j, k) => rAvant[j.n] = k + 1);
-    const garde = av.filter(j => j.r <= N || rAvant[j.n] <= N);
-    const ligne = j => { const d = rAvant[j.n] - j.r;
-      return `<div class="lg" data-n="${esc(j.n)}" data-r="${j.r}"><span class="r">${rAvant[j.n]}</span><span>${visage(j.av, "v-e")}${esc(j.n)}${v.i === 0 ? "" : d > 0 ? ` <small class="mo">▲ ${d}</small>` : d < 0 ? ` <small class="de">▼ ${-d}</small>` : ""}${j.s >= 2 ? ` <span class="feu${j.s >= 5 ? " fort" : ""}${j.s === 2 ? " tiede" : ""}">${j.s >= 3 ? FLAMME : ""}<em>${palier(j.s)} · ${j.s} de suite</em></span>` : ""}${j.ra ? ` <span class="eclair">${ECLAIR}<em>Plus rapide</em></span>` : ""}</span><span>${j.g - (j.bo || 0) ? `<small>+${j.g - (j.bo || 0)}</small>` : ""}${j.bo ? `<small class="bo">+${j.bo} série</small>` : ""}${v.reg.points === "aucun" ? "" : `<b data-de="${j.avant}" data-a="${j.pts}">${j.avant}</b>`}</span></div>`; };
-    E.innerHTML = tete("Classement après la question " + (v.i + 1) + " sur " + v.n) + `<div class="lgs" id="eLgs">${garde.sort((a, b) => rAvant[a.n] - rAvant[b.n]).map(ligne).join("")}</div>` + bSon();
+    const rAvant = {}; ancien.forEach((j, k) => rAvant[j.k] = k + 1);
+    const garde = av.filter(j => j.r <= N || rAvant[j.k] <= N);
+    const ligne = j => { const d = rAvant[j.k] - j.r;
+      return `<div class="lg" data-n="${j.k}" data-r="${j.r}"><span class="r">${rAvant[j.k]}</span><span>${visage(j.av, "v-e")}${esc(j.n)}${v.i === 0 ? "" : d > 0 ? ` <small class="mo">▲ ${d}</small>` : d < 0 ? ` <small class="de">▼ ${-d}</small>` : ""}${j.s >= 2 ? ` <span class="feu${j.s >= 5 ? " fort" : ""}${j.s === 2 ? " tiede" : ""}">${j.s >= 3 ? FLAMME : ""}<em>${palier(j.s)} · ${j.s} de suite</em></span>` : ""}${j.ra ? ` <span class="eclair">${ECLAIR}<em>Plus rapide</em></span>` : ""}</span><span>${j.g - (j.bo || 0) ? `<small>+${j.g - (j.bo || 0)}</small>` : ""}${j.bo ? `<small class="bo">+${j.bo} série</small>` : ""}${v.reg.points === "aucun" ? "" : `<b data-de="${j.avant}" data-a="${j.pts}">${j.avant}</b>`}</span></div>`; };
+    E.innerHTML = tete("Classement après la question " + (v.i + 1) + " sur " + v.n) + `<div class="lgs" id="eLgs">${garde.sort((a, b) => rAvant[a.k] - rAvant[b.k]).map(ligne).join("")}</div>` + bSon();
     const rows = [...E.querySelectorAll("#eLgs .lg")];
     if (rows.length < 1) return;
     const pas = rows.length > 1 ? rows[1].getBoundingClientRect().top - rows[0].getBoundingClientRect().top : 0;
@@ -1253,7 +1253,7 @@ function ecran(code){
       // les points montent, puis chaque rangée glisse à son nouveau rang
       rows.forEach(el => { const b = el.querySelector("b[data-a]"); if (b && b.dataset.de !== b.dataset.a) compter(b, +b.dataset.de, +b.dataset.a, 900); });
       setTimeout(() => {
-        const nouv = garde.slice().sort((a, b) => a.r - b.r).map(j => j.n);
+        const nouv = garde.slice().sort((a, b) => a.r - b.r).map(j => j.k);
         rows.forEach((el, k) => { const cible = nouv.indexOf(el.dataset.n); el.style.transition = "transform .9s cubic-bezier(.2,.8,.2,1)"; el.style.transform = `translateY(${(cible - k) * pas}px)`; });
         setTimeout(() => rows.forEach(el => el.querySelector(".r").textContent = el.dataset.r), 500);
         /* grosse remontée (3 places et plus) : la rangée brille un instant */
@@ -1261,8 +1261,8 @@ function ecran(code){
         if (v.i > 0) rows.forEach(el => { const d = gain(el); if (d >= 3) setTimeout(() => { el.classList.add("remonte"); el.insertAdjacentHTML("beforeend", `<span class="remTxt">+${d} places</span>`); }, 900); else if (d >= 1) setTimeout(() => el.classList.add("monteP"), 900); });
         const tete1 = rows.find(el => el.dataset.n === nouv[0]);
         if (tete1) setTimeout(() => { const r = tete1.querySelector(".r"); r.insertAdjacentHTML("afterbegin", COURONNE); tete1.classList.add("premier"); }, 950);
-        if (v.i > 0 && ancien[0] && ancien[0].n !== nouv[0]) setTimeout(() => {
-          E.insertAdjacentHTML("beforeend", `<div class="annonce"><small>Nouveau premier</small>${esc(nouv[0])}</div>`);
+        if (v.i > 0 && ancien[0] && ancien[0].k !== nouv[0]) setTimeout(() => {
+          E.insertAdjacentHTML("beforeend", `<div class="annonce"><small>Nouveau premier</small>${esc((av.find(j => j.k === nouv[0]) || {}).n || "")}</div>`);
           const z = E.querySelector(".annonce"); setTimeout(() => z && z.classList.add("part"), 2600); setTimeout(() => z && z.remove(), 3200);
           confettis(tete1);
           accord();
