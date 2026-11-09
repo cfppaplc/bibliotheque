@@ -3120,7 +3120,8 @@ html.apercu-mode #menage{display:none}
         if (r && r.end - nowMin <= m.min) actif = r; } } catch(e) {}
     const jour = now.toISOString().slice(0, 10);
     actifVu = !!actif; document.getElementById("mnMini").textContent = force && !actif ? "✕" : "–"; el.classList.toggle("apercu", !!(force && !actif));
-    if (actif) { cle = jour + "|" + Math.round(actif.start); force = false; }
+    if (actif) { cle = jour + "|" + Math.round(actif.start); force = false;
+      if (sessionStorage.menageFerme === cle) { montrer(false); return; } }
     else if (force) cle = cle || jour + "|manuel";
     if (actif || force) {
       const reste = actif ? actif.end - nowMin : (window.menageReste ?? m.min / 2);
@@ -3165,6 +3166,14 @@ html.apercu-mode #menage{display:none}
       d: r.querySelector("textarea").value.split("\n").map(l => l.replace(/^[•\-*]\s*/, "").trim()).filter(Boolean).join(" · ")})).filter(x => x.t);
   document.getElementById("mnVoir").onclick = () => { APERCU = lireEd(); rendu = ""; if (window.menageReste == null) window.menageReste = 2.5; fermerEd(); force = true; cle = new Date().toISOString().slice(0, 10) + "|manuel"; mini = false; el.classList.remove("mini"); verifier(); };
   document.getElementById("b-menageReg").onclick = () => { document.getElementById("b-cancel").click(); document.getElementById("b-menage").click(); };
+  /* Fermeture secrète (9 nov., Jeremy) : garder le doigt 3 s sur le titre « Ménage de l'atelier » → fermé pour cette fois (onglet en cours) */
+  { const h = el.querySelector(".mn-tete h2"); let tm = null;
+    const fin = () => { clearTimeout(tm); tm = null; };
+    h.addEventListener("pointerdown", () => { fin(); tm = setTimeout(() => { tm = null;
+      if (actifVu) sessionStorage.menageFerme = cle; force = false;
+      if (APERCU) { APERCU = null; rendu = ""; ed.hidden = false; } montrer(false); }, 3000); });
+    ["pointerup", "pointerleave", "pointercancel"].forEach(t => h.addEventListener(t, fin));
+    h.addEventListener("contextmenu", e => e.preventDefault()); h.style.userSelect = "none"; h.style.webkitUserSelect = "none"; }
   window.menageTest = verifier;
 })();
 </script>
