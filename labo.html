@@ -41,6 +41,40 @@ a.carte:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(0,0,0,.35)}
 @media (max-width:640px){ .haut{display:flex;flex-wrap:wrap;align-items:center;row-gap:10px} .haut .logo{order:1} .haut a{order:2;margin-left:auto;white-space:nowrap}
   .haut h1{order:3;flex-basis:100%;font-size:1.35rem;margin:0} .haut h1 span{display:block;margin:2px 0 0} }
 
+
+/* Labo refait (9 nov.) */
+main{max-width:1500px}
+.lb-hero{display:flex;align-items:center;gap:22px;margin:8px 0 6px}
+.lb-ico{width:64px;height:64px;border-radius:16px;background:#1E2A44;display:grid;place-items:center;flex:none}
+.lb-hero h1{margin:0;font-size:40px;line-height:1.1}.lb-hero p{margin:4px 0 0;color:var(--gris);font-size:17px}
+.lb-q{margin-left:auto;width:46px;height:46px;border-radius:50%;border:1px solid var(--ligne);background:var(--carte);color:var(--gris);font-weight:800;font-size:18px;cursor:pointer;flex:none}
+.lb-rep{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px}
+.lb-rc{background:var(--carte);border:1px solid var(--ligne);border-radius:16px;padding:14px;display:flex;gap:14px;align-items:center;text-decoration:none;color:inherit}
+.lb-rc img{width:72px;height:72px;object-fit:cover;border-radius:10px;flex:none;background:var(--carte2)}
+.lb-rc b{display:block;font-size:16px}.lb-rc small{color:var(--gris)}
+.lb-btn{margin-left:auto;background:var(--rouge);color:#fff;border-radius:10px;padding:10px 16px;font-weight:700;font-size:14px;white-space:nowrap}
+.lb-btn.m{background:#1E2A44}html:not(.clair) .lb-btn.m{background:#2B3B5E}
+.lb-act{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px}
+.lb-c{background:#1E2A44;color:#fff;border-radius:18px;overflow:hidden;position:relative;text-decoration:none;display:flex;flex-direction:column;transition:transform .2s,box-shadow .2s}
+.lb-c:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(0,0,0,.3)}
+.lb-im{height:150px;display:grid;place-items:center;background:linear-gradient(135deg,#1E2A44,#2B3B5E)}.lb-im svg{width:140px}
+.lb-bd{padding:16px 18px 18px;display:flex;flex-direction:column;gap:8px;flex:1}.lb-bd b{font-size:19px}
+.lb-bd p{margin:0;color:#c9d1e0;font-size:14px;line-height:1.45;flex:1}
+.lb-tags{display:flex;gap:6px;flex-wrap:wrap}.lb-tags span{font-size:12px;font-weight:600;background:#ffffff1a;padding:4px 10px;border-radius:99px}
+.lb-plus{position:absolute;right:14px;top:14px;width:34px;height:34px;border-radius:22%;background:#EB6A22;display:grid;place-items:center;font-weight:900;font-size:24px;line-height:1}
+.lb-qz{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:22px 16px;padding:4px 2px 14px}
+.lb-t,.lb-nouv{text-decoration:none;color:inherit;min-width:0}
+.lb-cv{position:relative;height:226px;border-radius:12px;overflow:hidden;background:var(--carte2);box-shadow:0 6px 18px rgba(0,0,0,.15);transition:transform .2s}
+.lb-cv::before{content:"";position:absolute;inset:-20px;background:var(--u) center/cover;filter:blur(18px) brightness(.8)}
+.lb-cv img{position:relative;width:100%;height:100%;object-fit:contain}
+.lb-t:hover .lb-cv{transform:translateY(-3px)}
+.lb-t b{display:block;font-size:14px;margin-top:8px;line-height:1.25}.lb-t small{color:var(--gris);font-size:12.5px}
+.lb-nouv{height:226px;border:2px dashed var(--ligne);border-radius:12px;display:grid;place-items:center;color:var(--gris);font-weight:700;text-align:center;box-sizing:border-box}
+#lbDlg{border:0;border-radius:18px;padding:22px;max-width:860px;width:calc(100% - 40px);background:var(--fond);color:var(--txt)}
+#lbDlg::backdrop{background:rgba(0,0,0,.5)}#lbDlg h3{margin:0 0 14px;font-size:22px}
+#lbDlg>button{margin-top:16px;background:var(--rouge);color:#fff;border:0;border-radius:10px;padding:12px 20px;font-weight:700;font-size:15px;cursor:pointer}
+.etapes i{background:#EB6A22!important}
+@media (max-width:640px){.lb-hero h1{font-size:30px}.lb-ico{width:52px;height:52px}.lb-rep,.lb-act{grid-template-columns:1fr}}
 /* transitions douces entre les pages (8 nov.) */
 @view-transition{navigation:auto}
 ::view-transition-old(root),::view-transition-new(root){animation-duration:.22s}
@@ -55,50 +89,64 @@ a.carte:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(0,0,0,.35)}
 <body>
 <div class="mp-tete"><img class="lg-b" src="img/metier-plus-blanc.svg" alt="Métier+"><img class="lg-c" src="img/metier-plus.svg" alt="Métier+"><a class="mp-retour" href="./">‹ Bibliothèque</a><h1 class="mp-nom">Labo interactif</h1><span class="mp-sous">Simulateurs et défis avec les iPad</span><nav class="mp-nav" aria-label="Outils"><a href="./" data-nav="biblio"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h12v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5"/></svg>Bibliothèque</a><a href="./?ouvrir=plans" data-nav="plans"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3z"/><path d="M9 3v15M15 6v15"/></svg>Plans</a><a href="./?ouvrir=activites" data-nav="activites"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4h6v3H9zM9 12h6M9 16h4"/></svg>Formatifs</a><a href="labo.html" data-nav="labo" class="ici" aria-current="page"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-9V3"/></svg>Labo</a><a href="./?ouvrir=accueil" data-nav="accueil"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Accueil de classe</a><a href="./?ouvrir=tableau" data-nav="tableau"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>Tableau blanc</a></nav><span class="mp-esp"></span></div>
 <main>
-<p class="intro">Des activités interactives pour la classe : les élèves participent avec leur iPad, sans compte ni installation. Sur l'ordinateur du tableau, choisis « Animer au tableau » : l'écran de classe s'affiche avec ses commandes et un code QR à scanner.</p>
+<div class="lb-hero"><div class="lb-ico"><svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="#EB6A22" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-9V3"/></svg></div>
+<div><h1>Labo</h1><p>Quiz et simulations : la classe participe avec ses iPad, tu animes au tableau.</p></div>
+<button class="lb-q" id="lbAide" type="button" title="Comment ça marche" aria-label="Comment ça marche">?</button></div>
 
-<h2>Protection incendie</h2>
-<div class="grille">
-<a class="carte" href="simulateur.html">
-<div class="vis" style="background:linear-gradient(135deg,#7A1712,#B3261E)"><svg viewBox="0 0 160 110" aria-hidden="true"><rect x="8" y="6" width="144" height="98" rx="10" fill="#9A1F18" stroke="#fff" stroke-opacity=".3"/><rect x="20" y="18" width="88" height="40" rx="4" fill="#9DB89A"/><path d="M28 32h50M28 44h36" stroke="#1C2A1B" stroke-width="5" stroke-linecap="round"/><circle cx="126" cy="24" r="6" fill="#36D06A"/><circle cx="126" cy="40" r="6" fill="#FF3B30"/><circle cx="126" cy="56" r="6" fill="#FFC21A"/><rect x="20" y="70" width="28" height="22" rx="4" fill="#185FA5"/><rect x="54" y="70" width="28" height="22" rx="4" fill="#C62828" stroke="#fff" stroke-opacity=".4"/><rect x="88" y="70" width="28" height="22" rx="4" fill="#24211E"/><rect x="122" y="70" width="20" height="22" rx="4" fill="#5F5E5A"/></svg></div>
-<div class="corps"><b>Simulateur de panneau d'alarme</b>
-<p>Chaque équipe dispose d'un panneau adressable complet sur son iPad. Tu déclenches alarmes, supervisions et troubles; les élèves lisent l'afficheur, corrigent la cause sur le terrain et réarment au bon moment.</p>
-<div class="tags"><span>EGI 436-312</span><span>Module 5</span><span>Mode libre</span></div>
-<div class="go">Ouvrir le simulateur</div></div></a>
+<section id="lbRep" hidden><h2>Reprendre</h2><div class="lb-rep" id="lbRepL"></div></section>
 
-<a class="carte" href="simulateur.html">
-<div class="vis" style="background:linear-gradient(135deg,#2E2775,#534AB7)"><svg viewBox="0 0 160 110" aria-hidden="true"><rect x="40" y="58" width="26" height="40" rx="3" fill="#8A8F98"/><rect x="67" y="38" width="26" height="60" rx="3" fill="#D89E00"/><rect x="94" y="70" width="26" height="28" rx="3" fill="#A0582B"/><text x="80" y="30" text-anchor="middle" font-size="22" font-weight="900" fill="#fff" font-family="system-ui">1</text><path d="M18 20l6 4-6 4zM136 18h10v10h-10z" fill="#fff" opacity=".5"/><circle cx="141" cy="52" r="5" fill="#fff" opacity=".5"/></svg></div>
-<div class="corps"><b>Défi panneau</b>
-<p>Huit missions de difficulté croissante : une question éclair, puis la remise à la normale du panneau. Points, pénalités, classement en direct et podium au tableau.</p>
-<div class="tags"><span>EGI 436-312</span><span>Module 5</span><span>En équipes</span></div>
-<div class="go">Lancer un défi</div></div></a>
-
+<h2>Activités</h2>
+<div class="lb-act">
+<a class="lb-c" href="simulateur.html?animer=1" data-rec="Simulateur de panneau d'alarme|img/labo/m5-panneau.jpg"><span class="lb-plus">+</span><div class="lb-im"><svg viewBox="0 0 120 90" aria-hidden="true"><rect x="10" y="8" width="100" height="74" rx="10" fill="#0e1320" stroke="#EB6A22" stroke-width="2"/><rect x="22" y="20" width="56" height="26" rx="4" fill="#F2A35E"/><path d="M28 30h36M28 38h24" stroke="#5a2a10" stroke-width="3" stroke-linecap="round"/><circle cx="92" cy="24" r="4" fill="#2EB872"/><circle cx="92" cy="36" r="4" fill="#EB6A22"/><circle cx="92" cy="48" r="4" fill="#F2C94C"/><rect x="22" y="56" width="16" height="14" rx="3" fill="#3E5C9A"/><rect x="44" y="56" width="16" height="14" rx="3" fill="#EB6A22"/><rect x="66" y="56" width="16" height="14" rx="3" fill="#3E5C9A"/></svg></div>
+<div class="lb-bd"><b>Simulateur de panneau d'alarme</b><p>Chaque équipe a son panneau adressable sur iPad. Tu déclenches alarmes et troubles; les élèves corrigent la cause et réarment.</p><div class="lb-tags"><span>EGI 436-312</span><span>Module 5</span><span>Mode libre</span></div></div></a>
+<a class="lb-c" href="simulateur.html?animer=1&amp;defi=1" data-rec="Défi panneau|img/labo/m5-panneau.jpg"><span class="lb-plus">+</span><div class="lb-im"><svg viewBox="0 0 120 90" aria-hidden="true"><rect x="22" y="44" width="22" height="36" rx="3" fill="#3E5C9A"/><rect x="49" y="22" width="22" height="58" rx="3" fill="#EB6A22"/><rect x="76" y="54" width="22" height="26" rx="3" fill="#F2A35E"/><text x="60" y="16" fill="#fff" font-size="16" font-weight="800" text-anchor="middle" font-family="system-ui">1</text></svg></div>
+<div class="lb-bd"><b>Défi panneau</b><p>Huit missions de difficulté croissante : question éclair, puis remise à la normale. Classement en direct et podium.</p><div class="lb-tags"><span>EGI 436-312</span><span>En équipes</span></div></div></a>
+<a class="lb-c" href="quiz.html"><span class="lb-plus">+</span><div class="lb-im"><svg viewBox="0 0 120 90" aria-hidden="true"><g font-family="system-ui" font-size="11" font-weight="800" fill="#fff"><rect x="20" y="12" width="80" height="14" rx="4" fill="#ffffff1f"/><rect x="20" y="12" width="14" height="14" rx="4" fill="#EB6A22"/><text x="24" y="23">A</text><rect x="20" y="32" width="80" height="14" rx="4" fill="#ffffff1f"/><rect x="20" y="32" width="14" height="14" rx="4" fill="#3E5C9A"/><text x="24" y="43">B</text><rect x="20" y="52" width="80" height="14" rx="4" fill="#ffffff1f"/><rect x="20" y="52" width="14" height="14" rx="4" fill="#3E5C9A"/><text x="24" y="63">C</text><rect x="20" y="72" width="80" height="14" rx="4" fill="#ffffff1f"/><rect x="20" y="72" width="14" height="14" rx="4" fill="#3E5C9A"/><text x="24" y="83">D</text></g></svg></div>
+<div class="lb-bd"><b>Créer ou modifier un quiz</b><p>Écris tes questions ou colle une liste. Choix, vrai ou faux, calcul, ordre, trouve l'erreur.</p><div class="lb-tags"><span>Tous les cours</span></div></div></a>
+<a class="lb-c" href="./"><span class="lb-plus">+</span><div class="lb-im"><svg viewBox="0 0 120 90" aria-hidden="true"><rect x="44" y="8" width="32" height="74" rx="7" fill="#0e1320" stroke="#fff" stroke-opacity=".5" stroke-width="2"/><rect x="49" y="18" width="22" height="7" rx="2" fill="#2EB872"/><rect x="49" y="30" width="22" height="34" rx="4" fill="#1E2A44" stroke="#EB6A22" stroke-width="1.5"/><path d="M84 28q9 17 0 34M90 22q14 23 0 46" fill="none" stroke="#fff" stroke-opacity=".45" stroke-width="2.5" stroke-linecap="round"/></svg></div>
+<div class="lb-bd"><b>Télécommande des livres</b><p>Ton cellulaire pilote le livre projeté. Dans un livre, touche l'icône du cellulaire puis scanne le code.</p><div class="lb-tags"><span>Tous les livres</span><span>Cellulaire</span></div></div></a>
 </div>
 
-<h2>Pour tous les cours</h2>
-<div class="grille">
-<a class="carte" href="quiz.html">
-<div class="vis" style="background:linear-gradient(135deg,#1E1A4D,#2E2775)"><svg viewBox="0 0 160 110" aria-hidden="true"><g font-family="system-ui" font-weight="800" font-size="16" fill="#fff"><rect x="28" y="12" width="104" height="18" rx="5" fill="#fff" opacity=".14"/><rect x="28" y="12" width="18" height="18" rx="5" fill="#8C84E0"/><text x="37" y="26" text-anchor="middle" font-size="12">A</text><rect x="28" y="35" width="104" height="18" rx="5" fill="#fff" opacity=".14"/><rect x="28" y="35" width="18" height="18" rx="5" fill="#8C84E0"/><text x="37" y="49" text-anchor="middle" font-size="12">B</text><rect x="28" y="58" width="104" height="18" rx="5" fill="#fff" opacity=".14"/><rect x="28" y="58" width="18" height="18" rx="5" fill="#8C84E0"/><text x="37" y="72" text-anchor="middle" font-size="12">C</text><rect x="28" y="81" width="104" height="18" rx="5" fill="#fff" opacity=".14"/><rect x="28" y="81" width="18" height="18" rx="5" fill="#8C84E0"/><text x="37" y="95" text-anchor="middle" font-size="12">D</text></g></svg></div>
-<div class="corps"><b>Quiz maison</b>
-<p>Un quiz prêt à jouer pour chaque livre, illustré avec ses figures. Crée aussi les tiens ou colle une liste de questions. Tu suis les réponses en direct; chaque élève voit son rang sur son iPad.</p>
-<div class="tags"><span>Tous les cours</span><span>Individuel ou en équipe</span></div>
-<div class="go" style="background:#534AB7">Ouvrir le quiz</div></div></a>
-<a class="carte" href="./">
-<div class="vis" style="background:linear-gradient(135deg,#1C2B23,#0F6E56)"><svg viewBox="0 0 160 110" aria-hidden="true"><rect x="58" y="10" width="44" height="90" rx="9" fill="#121212" stroke="#fff" stroke-opacity=".5" stroke-width="2"/><rect x="64" y="22" width="32" height="10" rx="3" fill="#2E9E5B"/><rect x="64" y="38" width="32" height="44" rx="6" fill="#1E1E1E" stroke="#EB6A22" stroke-width="1.5"/><path d="M73 60l-5 0M92 60l-5 0" stroke="#fff" stroke-width="3" stroke-linecap="round"/><circle cx="80" cy="91" r="3" fill="#fff" opacity=".6"/><path d="M110 30q12 25 0 50M118 22q20 33 0 66" fill="none" stroke="#fff" stroke-opacity=".45" stroke-width="2.5" stroke-linecap="round"/></svg></div>
-<div class="corps"><b>Télécommande des livres</b>
-<p>Ton cellulaire pilote le livre projeté : pages, modules, zoom, pointeur laser et réponses. Dans un livre, touche l'icône du cellulaire dans la barre du bas, puis scanne le code.</p>
-<div class="tags"><span>Tous les livres</span><span>Cellulaire</span></div>
-<div class="go" style="background:#0F6E56">Ouvrir la bibliothèque</div></div></a>
-</div>
+<section id="lbMiens" hidden><h2>Mes quiz</h2><div class="lb-qz" id="lbMiensL"></div></section>
+<h2>Quiz prêts à jouer</h2>
+<div class="lb-qz" id="lbQz"><a class="lb-nouv" href="quiz.html">+ Nouveau<br>quiz</a></div>
 
-<h2>Comment ça marche</h2>
+<dialog id="lbDlg"><h3>Comment ça marche</h3>
 <div class="etapes">
-<div><i>1</i><b>L'ordinateur du tableau</b>Ouvre le simulateur ou un quiz, puis choisis « Animer au tableau ». L'écran de classe s'affiche avec un code QR.</div>
-<div><i>2</i><b>Les commandes</b>La barre du bas lance la partie et la fait avancer. Le bouton « Télécommande » ouvre un panneau détaillé : réponses reçues, événements en cours, réglages.</div>
-<div><i>3</i><b>Les iPad des élèves</b>Chaque élève ou équipe scanne le code QR et choisit un personnage. L'iPad devient un panneau d'alarme ou une manette de quiz.</div>
-<div><i>4</i><b>Deux écrans ?</b>Avec un portable relié au projecteur, choisis plutôt « Télécommande », puis « Ouvrir l'écran de classe », et glisse cette fenêtre sur l'écran projeté.</div>
-</div>
+<div><i>1</i><b>L'ordinateur du tableau</b>Touche une activité ou un quiz : l'écran de classe s'affiche avec ses commandes et un code QR.</div>
+<div><i>2</i><b>Les commandes</b>La barre du bas lance la partie et la fait avancer. « Télécommande » ouvre le panneau détaillé : réponses, événements, réglages.</div>
+<div><i>3</i><b>Les iPad des élèves</b>Chaque élève ou équipe scanne le code QR et choisit un personnage. Aucun compte, aucune installation.</div>
+<div><i>4</i><b>Deux écrans ?</b>Avec un portable relié au projecteur, choisis « Télécommande », puis « Ouvrir l'écran de classe », et glisse cette fenêtre sur l'écran projeté.</div>
+</div><button type="button" id="lbDlgX">Fermer</button></dialog>
 </main>
+<script src="quiz-livres.js"></script>
+<script>
+/* Labo refait (9 nov., maquette choisie par Jeremy) : Reprendre, activités, quiz en tuiles */
+(function(){
+  const $ = id => document.getElementById(id), esc = t => String(t == null ? "" : t).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+  const lire = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) || d; } catch(e) { return d; } };
+  const EX = {id:"exemple-incendie", titre:"Protection incendie", couv:"img/labo/incendie-immeuble.jpg", sujet:"Modules 1 à 5", n:10};
+  const LIVRES = (window.QUIZ_LIVRES || []).map(q => ({id:q.id, titre:q.titre, couv:q.couv, n:(q.qs || []).length, sujet:q.sujet}));
+  const TOUS = [EX].concat(LIVRES);
+  const lien = id => "quiz.html?animer=1&quiz=" + encodeURIComponent(id);
+  function noter(r){ const L = lire("laboRecents", []).filter(x => x.href !== r.href); L.unshift(Object.assign({t: Date.now()}, r)); try { localStorage.setItem("laboRecents", JSON.stringify(L.slice(0, 6))); } catch(e){} }
+  function tuile(q){ const c = q.couv || "img/labo/quiz/culture-couv.svg";
+    return `<a class="lb-t" href="${lien(q.id)}" data-id="${esc(q.id)}" data-titre="${esc(q.titre)}" data-img="${esc(c)}"><div class="lb-cv" style="--u:url('${esc(c)}')"><img src="${esc(c)}" alt="" loading="lazy"></div><b>${esc(q.titre)}</b><small>${q.n ? q.n + " questions" : esc(q.sujet || "")}</small></a>`; }
+  $("lbQz").insertAdjacentHTML("beforeend", TOUS.map(tuile).join(""));
+  const miens = lire("quizMaison", []); if (Array.isArray(miens) && miens.length){ $("lbMiens").hidden = false;
+    $("lbMiensL").innerHTML = miens.map(q => tuile({id:q.id, titre:q.titre || "Mon quiz", couv:q.couv, n:(q.qs || []).length})).join(""); }
+  document.addEventListener("click", e => { const t = e.target.closest(".lb-t"); if (t) noter({href: t.getAttribute("href"), titre: "Quiz · " + t.dataset.titre, img: t.dataset.img});
+    const c = e.target.closest(".lb-c[data-rec]"); if (c){ const [titre, img] = c.dataset.rec.split("|"); noter({href: c.getAttribute("href"), titre, img}); } });
+  // Reprendre : activités lancées d'ici + dernier quiz joué
+  const R = lire("laboRecents", []), dq = lire("dernierQuiz", null);
+  if (dq && dq.id && !R.some(r => r.href === lien(dq.id))){ const q = TOUS.find(x => x.id === dq.id) || (Array.isArray(miens) && miens.find(x => x.id === dq.id)); R.push({href: lien(dq.id), titre: "Quiz · " + (dq.titre || "Quiz"), img: q && q.couv || "img/labo/quiz/culture-couv.svg", t: dq.t || 0}); }
+  R.sort((a, b) => b.t - a.t);
+  const quand = t => { const j = Math.floor((new Date().setHours(0,0,0,0) - new Date(t).setHours(0,0,0,0)) / 864e5); return j <= 0 ? "Aujourd'hui" : j === 1 ? "Hier" : "Il y a " + j + " jours"; };
+  const vus = R.filter(r => Date.now() - r.t < 30 * 864e5).slice(0, 3);
+  if (vus.length){ $("lbRep").hidden = false; $("lbRepL").innerHTML = vus.map((r, i) => `<a class="lb-rc" href="${esc(r.href)}"><img src="${esc(r.img)}" alt=""><div><b>${esc(r.titre)}</b><small>${quand(r.t)}</small></div><span class="lb-btn${i ? " m" : ""}">${/quiz/.test(r.href) ? "Rejouer" : "Relancer"}</span></a>`).join(""); }
+  const d = $("lbDlg"); $("lbAide").onclick = () => d.showModal(); $("lbDlgX").onclick = () => d.close(); d.addEventListener("click", e => { if (e.target === d) d.close(); });
+})();
+</script>
 <div class="droits" style="text-align:center;font-size:12px;opacity:.6;padding:18px 12px 24px">© 2026 Jérémy Raymond · Tous droits réservés</div>
 </body>
 </html>
