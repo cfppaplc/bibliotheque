@@ -3013,10 +3013,30 @@ if (window.COFFRE && !/[?&]apercu=/.test(location.search)) COFFRE.demarrer("accu
 #menageEd .ed-l{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:10px 0}
 #menageEd input{font:inherit;padding:6px 8px}
 html.apercu-mode #menage{display:none}
+/* Plein écran (9 nov., Jeremy : « au complet sur toute la page, ne pas partir, pour inciter les élèves à venir cocher ») */
+#menage{inset:0;right:0;bottom:0;width:auto;max-height:none;border-radius:0;border:0;z-index:9000;padding:2.5vh 3vw;box-sizing:border-box;background:radial-gradient(circle at 50% 0%,#1d2a40,#0d121c 70%)}
+#menage .mn-tete{padding:0 0 1.5vh}
+#menage .mn-tete h2{font-size:clamp(28px,3.6vw,64px);letter-spacing:-.01em}
+#menage .mn-tete small{font-size:clamp(15px,1.4vw,26px);margin-top:.6vh}
+#menage .mn-tete small b{color:#F2A35E}
+#menage .mn-barre{height:14px;margin:0 0 2vh;border-radius:8px}
+#menage ul{display:grid;grid-template-columns:repeat(3,1fr);gap:1.4vh 1.2vw;align-content:start;align-items:start;padding:0;flex:1}
+#menage li{margin:0;border:2px solid #ffffff14;border-radius:16px;transition:background .3s,border-color .3s}
+#menage li.fait{background:#2EB8721f;border-color:#2EB87266}
+#menage li .mn-l{padding:1.6vh 1vw;min-height:9vh;gap:1vw}
+#menage .mn-c{flex:0 0 clamp(40px,3.4vw,64px);height:clamp(40px,3.4vw,64px);font-size:clamp(24px,2.2vw,40px);border-radius:12px}
+#menage .mn-t{font-size:clamp(18px,1.7vw,32px);line-height:1.2}
+#menage .mn-i{font-size:clamp(12px,.9vw,17px)}
+#menage .mn-d{padding:0 1vw 1.6vh;font-size:clamp(14px,1.1vw,21px)}
+#menage .mn-bravo{margin:2vh 0 0;font-size:clamp(22px,2.4vw,44px);padding:2vh}
+#menage .mn-btn{display:none}
+#menage.apercu .mn-btn{display:block}
+@media (max-width:900px){#menage ul{grid-template-columns:1fr 1fr}}
+@media (max-width:600px){#menage ul{grid-template-columns:1fr}}
 </style>
 <div id="menage" hidden aria-live="polite">
   <div class="mn-tete"><div style="flex:1"><h2>Ménage de l'atelier <span id="mnCompte"></span></h2><small id="mnSous">Coche ta tâche quand elle est faite · touche le nom pour voir les détails · <b>Tâche terminée? Aide les autres!</b></small></div>
-    <button type="button" class="mn-btn" id="mnMini" title="Réduire">–</button></div>
+    <button type="button" class="mn-btn" id="mnMini" title="Fermer l'aperçu">–</button></div>
   <div class="mn-barre"><i id="mnBarre"></i></div>
   <ul id="mnListe"></ul>
   <div class="mn-bravo">L'atelier est propre. Bravo l'équipe !</div>
@@ -3079,7 +3099,7 @@ html.apercu-mode #menage{display:none}
       if (cur && m.mot) { const r = timeline(cur.start, cfg.steps).find(r => !r.pause && nowMin >= r.start && nowMin < r.end && norm(r.label).includes(norm(m.mot)));
         if (r && r.end - nowMin <= m.min) actif = r; } } catch(e) {}
     const jour = now.toISOString().slice(0, 10);
-    actifVu = !!actif; document.getElementById("mnMini").textContent = force && !actif ? "✕" : "–";
+    actifVu = !!actif; document.getElementById("mnMini").textContent = force && !actif ? "✕" : "–"; el.classList.toggle("apercu", !!(force && !actif));
     if (actif) { cle = jour + "|" + Math.round(actif.start); force = false; }
     else if (force) cle = cle || jour + "|manuel";
     if (actif || force) { dessiner(); montrer(true); } else montrer(false);
