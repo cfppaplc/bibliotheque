@@ -3,6 +3,36 @@
 <head>
 <!-- © 2026 Jérémy Raymond. Tous droits réservés. Copie, modification ou revente interdites sans autorisation écrite (voir LICENCE.md). -->
 <meta charset="utf-8"><script src="vieux-navigateur.js"></script><script src="signaler.js"></script><script src="plein-ecran.js"></script>
+<script>/* 9 nov. (« seuls les enseignants peuvent utiliser la remote ») : même garde que le Labo (session enseignant de Métier+ sur ce cellulaire; compte de groupe d'élèves refusé) */
+(function(){
+  const q = new URLSearchParams(location.search);
+    const html = document.documentElement; html.classList.add("garde-attente");
+  const st = document.createElement("style");
+  st.textContent = "html.garde-attente body{visibility:hidden}#gardeOv{position:fixed;inset:0;z-index:99999;background:#141414;color:#F2EFEA;display:flex;align-items:center;justify-content:center;padding:20px;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;visibility:visible}#gardeOv .bx{max-width:460px;background:#1F1F1F;border:1px solid #333;border-radius:18px;padding:26px;text-align:center}#gardeOv img{height:34px;margin-bottom:14px}#gardeOv h1{font-size:21px;margin:0 0 8px}#gardeOv p{color:#A8A29A;line-height:1.5;margin:0 0 18px}#gardeOv a,#gardeOv button{display:block;width:100%;box-sizing:border-box;border:0;border-radius:12px;padding:14px;font:700 16px system-ui,sans-serif;margin-top:10px;cursor:pointer;text-decoration:none}#gardeOv a{background:#E50914;color:#fff}#gardeOv button{background:#2A2A2A;color:#F2EFEA}#gardeOv small{display:block;margin-top:16px;color:#777;font-size:12px}";
+  document.head.appendChild(st);
+  const ouvrir = ok => {
+    html.classList.remove("garde-attente");
+    if (ok) return;
+    const f = () => { document.body.insertAdjacentHTML("beforeend", `<div id="gardeOv"><div class="bx"><img src="img/metier-plus-blanc.svg" alt="Métier+"><h1>Réservé aux enseignants</h1>
+      <p>La télécommande est réservée aux enseignants. Connecte-toi une fois à Métier+ sur ce cellulaire (ton compte enseignant), puis rescanne le code.</p>
+      <a href="./" target="_blank">Ouvrir Métier+ et me connecter</a><button id="gardeRe">Je suis connecté : réessayer</button><small>© 2026 Jérémy Raymond · Tous droits réservés</small></div></div>`);
+      document.getElementById("gardeRe").onclick = () => location.reload(); };
+    document.body ? f() : addEventListener("DOMContentLoaded", f);
+  };
+  let fini = false; const fin = ok => { if (!fini) { fini = true; ouvrir(ok); } };
+  setTimeout(() => fin(false), 4000);
+  try {
+    const r = indexedDB.open("acces", 1);
+    r.onupgradeneeded = () => r.result.createObjectStore("s");
+    r.onerror = () => fin(false);
+    r.onsuccess = () => { try {
+      const t = r.result.transaction("s").objectStore("s").get("session");
+      t.onerror = () => fin(false);
+      t.onsuccess = () => { const s = t.result; if (!s || !s.id) return fin(false);
+        fetch("comptes.json", {cache: "no-store"}).then(x => x.json()).then(d => { const c = d && d.comptes && d.comptes[s.id]; fin(!!c && !c.eleve); }).catch(() => fin(true)); };
+    } catch(e) { fin(false); } };
+  } catch(e) { fin(false); }
+})();</script>
 <link rel="icon" href="img/metier-plus-icone.svg" type="image/svg+xml">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#121212">
