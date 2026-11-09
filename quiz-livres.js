@@ -386,6 +386,424 @@ window.QUIZ_LIVRES = [
 ]
 },
 {
+"id": "defi-eclair",
+"exemple": true,
+"titre": "Défi éclair",
+"sujet": "Sports et culture générale, en images",
+"couv": "img/labo/quiz/punch-couv.svg",
+"coul": "#B3261E",
+"reg": {
+"nb": "15",
+"melange": "tout"
+},
+"qs": [
+{
+"q": "À quel pays appartient ce drapeau ?",
+"ch": [
+"Jamaïque",
+"Brésil",
+"Afrique du Sud",
+"Tanzanie"
+],
+"bon": 0,
+"s": 15,
+"img": "img/labo/quiz/punch/01.jpg",
+"expl": "La Jamaïque : une croix jaune en X avec du vert et du noir. C'est le seul drapeau national sans rouge, blanc ni bleu."
+},
+{
+"q": "À quel pays appartient ce drapeau ?",
+"ch": [
+"Norvège",
+"Suède",
+"Finlande",
+"Danemark"
+],
+"bon": 1,
+"s": 15,
+"img": "img/labo/quiz/punch/02.jpg",
+"expl": "La Suède : croix jaune sur fond bleu. La Finlande a une croix bleue sur fond blanc."
+},
+{
+"q": "Lequel est le drapeau de l'Irlande ?",
+"ch": [
+"A",
+"B",
+"C",
+"D"
+],
+"bon": 2,
+"s": 20,
+"img": "img/labo/quiz/punch/03.jpg",
+"expl": "C : vert, blanc, orange (le vert du côté du mât). A est la Côte d'Ivoire (à l'envers de l'Irlande), B l'Italie, D l'Inde."
+},
+{
+"q": "Au hockey, combien de joueurs d'une même équipe sont sur la glace en même temps, gardien compris ?",
+"t": "nombre",
+"ch": [],
+"bon": 6,
+"tol": 0,
+"u": "joueurs",
+"s": 20,
+"img": "img/labo/quiz/punch/04.jpg",
+"expl": "6 : un gardien, deux défenseurs et trois attaquants (sans punition)."
+},
+{
+"q": "Au soccer, à combien de mètres du but est le point de penalty ?",
+"t": "nombre",
+"ch": [],
+"bon": 11,
+"tol": 0,
+"u": "m",
+"s": 25,
+"img": "img/labo/quiz/punch/05.jpg",
+"expl": "11 mètres (12 verges). C'est pour ça qu'on dit un « tir de 11 mètres »."
+},
+{
+"q": "À quelle hauteur du sol est l'anneau d'un panier de basketball ?",
+"ch": [
+"2,75 m",
+"3,05 m",
+"3,35 m",
+"3,65 m"
+],
+"bon": 1,
+"s": 20,
+"img": "img/labo/quiz/punch/06.jpg",
+"expl": "3,05 m, soit exactement 10 pieds, partout dans le monde, de la NBA au gymnase de l'école."
+},
+{
+"q": "Au football canadien, combien de joueurs par équipe sont sur le terrain ?",
+"ch": [
+"10",
+"11",
+"12",
+"13"
+],
+"bon": 2,
+"s": 20,
+"img": "img/labo/quiz/punch/07.jpg",
+"expl": "12 au football canadien, contre 11 au football américain. Le terrain canadien est aussi plus grand."
+},
+{
+"q": "Au tennis, c'est 40-40 (égalité). Le joueur qui gagne le point suivant a…",
+"ch": [
+"Le jeu",
+"L'avantage",
+"Le set",
+"50 points"
+],
+"bon": 1,
+"s": 15,
+"img": "img/labo/quiz/punch/08.jpg",
+"expl": "L'avantage. Il doit gagner un 2e point de suite pour remporter le jeu, sinon on revient à égalité."
+},
+{
+"q": "Combien de trous compte un parcours de golf complet ?",
+"t": "nombre",
+"ch": [],
+"bon": 18,
+"tol": 0,
+"u": "trous",
+"s": 20,
+"img": "img/labo/quiz/punch/09.jpg",
+"expl": "18 trous. Plusieurs petits terrains n'en ont que 9 : on fait alors le tour deux fois."
+},
+{
+"q": "Combien de cases y a-t-il sur un échiquier ?",
+"t": "nombre",
+"ch": [],
+"bon": 64,
+"tol": 0,
+"u": "cases",
+"s": 25,
+"img": "img/labo/quiz/punch/10.jpg",
+"expl": "8 × 8 = 64 cases, 32 pâles et 32 foncées."
+},
+{
+"q": "Aux fléchettes, combien vaut le petit centre rouge de la cible ?",
+"ch": [
+"25",
+"50",
+"60",
+"100"
+],
+"bon": 1,
+"s": 20,
+"img": "img/labo/quiz/punch/11.jpg",
+"expl": "50 points. L'anneau vert autour vaut 25. Le plus payant reste le triple 20 : 60 points."
+},
+{
+"q": "Au bowling à 10 quilles, quel est le score parfait (12 abats de suite) ?",
+"t": "nombre",
+"ch": [],
+"bon": 300,
+"tol": 0,
+"u": "points",
+"s": 30,
+"img": "img/labo/quiz/punch/12.jpg",
+"expl": "300 points : 12 abats (strikes) de suite."
+},
+{
+"q": "En course automobile, ce drapeau veut dire…",
+"ch": [
+"Ralentir",
+"Fin de la course",
+"Accident sur la piste",
+"Dernier tour"
+],
+"bon": 1,
+"s": 15,
+"img": "img/labo/quiz/punch/13.jpg",
+"expl": "Le drapeau à damier : la course est finie. Le jaune = danger, ralentir; le blanc = dernier tour (en IndyCar et NASCAR)."
+},
+{
+"q": "Au billard 8 boules, quelle boule doit être empochée en dernier ?",
+"ch": [
+"La blanche",
+"La noire (8)",
+"La jaune (1)",
+"La rayée 15"
+],
+"bon": 1,
+"s": 15,
+"img": "img/labo/quiz/punch/14.jpg",
+"expl": "La 8 noire. L'empocher trop tôt fait perdre la partie sur-le-champ."
+},
+{
+"q": "Zoom mystère : quelle balle se cache ici ?",
+"ch": [
+"Balle de tennis",
+"Balle de baseball",
+"Balle de golf",
+"Ballon de volleyball"
+],
+"bon": 1,
+"s": 20,
+"img": "img/labo/quiz/punch/15.jpg",
+"zoom": {
+"x": 30,
+"y": 45
+},
+"expl": "Une balle de baseball : 108 doubles coutures rouges, faites à la main."
+},
+{
+"q": "Il est 15 h à Montréal. Quelle heure est-il à Vancouver ?",
+"ch": [
+"12 h",
+"13 h",
+"14 h",
+"18 h"
+],
+"bon": 0,
+"s": 20,
+"img": "img/labo/quiz/punch/16.jpg",
+"expl": "12 h : Vancouver a 3 heures de retard sur Montréal (heure du Pacifique)."
+},
+{
+"q": "Quelle équipe a remporté le plus de coupes Stanley ?",
+"ch": [
+"Maple Leafs de Toronto",
+"Red Wings de Détroit",
+"Canadiens de Montréal",
+"Bruins de Boston"
+],
+"bon": 2,
+"s": 15,
+"expl": "Les Canadiens de Montréal : 24 coupes Stanley, la dernière en 1993."
+},
+{
+"q": "Quel numéro a été retiré dans toute la LNH en l'honneur de Wayne Gretzky ?",
+"ch": [
+"66",
+"87",
+"99",
+"9"
+],
+"bon": 2,
+"s": 15,
+"expl": "Le 99. Aucun joueur de la LNH ne peut plus le porter depuis 2000."
+},
+{
+"q": "Quel pays a gagné la Coupe du monde de soccer en 2022 ?",
+"ch": [
+"France",
+"Brésil",
+"Argentine",
+"Croatie"
+],
+"bon": 2,
+"s": 15,
+"expl": "L'Argentine de Lionel Messi, en finale contre la France aux tirs au but."
+},
+{
+"q": "Quel est le sport national d'été du Canada ?",
+"ch": [
+"Le soccer",
+"La crosse",
+"Le baseball",
+"Le football canadien"
+],
+"bon": 1,
+"s": 20,
+"expl": "La crosse (loi de 1994). Le hockey est le sport national d'hiver."
+},
+{
+"q": "Laurent Duvernay-Tardif, Québécois devenu médecin, a gagné le Super Bowl dans quel sport ?",
+"ch": [
+"Hockey",
+"Football",
+"Basketball",
+"Baseball"
+],
+"bon": 1,
+"s": 15,
+"expl": "Au football, avec les Chiefs de Kansas City en 2020."
+},
+{
+"q": "Au soccer, le gardien peut toucher le ballon avec les mains partout sur le terrain.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 1,
+"s": 12,
+"expl": "Faux : seulement dans sa surface de réparation."
+},
+{
+"q": "Un match de hockey de la LNH dure trois périodes de 20 minutes.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 12,
+"expl": "Vrai : 60 minutes de jeu effectif, sans compter les arrêts."
+},
+{
+"q": "Quelle est la distance d'un marathon ?",
+"t": "nombre",
+"ch": [],
+"bon": 42.195,
+"tol": 0.2,
+"u": "km",
+"s": 30,
+"expl": "42,195 km. Une réponse entre 42 et 42,4 est acceptée."
+},
+{
+"q": "Lesquels sont des sports des Jeux olympiques d'été ?",
+"t": "multi",
+"ch": [
+"L'escalade",
+"Le breaking (danse)",
+"Le curling",
+"Le biathlon"
+],
+"bon": [
+0,
+1
+],
+"s": 30,
+"expl": "L'escalade (depuis 2020) et le breaking (à Paris en 2024). Le curling et le biathlon sont aux Jeux d'hiver."
+},
+{
+"q": "Place ces événements tenus au Canada du plus ancien au plus récent.",
+"t": "ordre",
+"ch": [
+"Expo 67 à Montréal",
+"Jeux olympiques de Montréal",
+"Jeux olympiques de Calgary",
+"Jeux olympiques de Vancouver"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"expl": "1967, 1976 (été), 1988 (hiver) et 2010 (hiver)."
+},
+{
+"q": "Place ces animaux du plus léger au plus lourd.",
+"t": "ordre",
+"ch": [
+"Chat",
+"Cerf de Virginie",
+"Orignal",
+"Éléphant d'Afrique"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 35,
+"expl": "Environ 4 kg, 100 kg, 500 kg et 6 000 kg."
+},
+{
+"q": "Trouve l'erreur dans cette phrase.",
+"t": "erreur",
+"ch": [
+"Le Super Bowl",
+"se joue chaque année en février",
+"et oppose les deux meilleures équipes",
+"de la LNH."
+],
+"bon": 3,
+"s": 30,
+"expl": "C'est la NFL (football). La LNH, c'est le hockey."
+},
+{
+"q": "Trouve l'erreur dans cette phrase.",
+"t": "erreur",
+"ch": [
+"Le Tour de France",
+"est une course cycliste de trois semaines",
+"qui se termine traditionnellement",
+"à Marseille."
+],
+"bon": 3,
+"s": 30,
+"expl": "Elle se termine traditionnellement à Paris, sur les Champs-Élysées."
+},
+{
+"q": "Quel est l'animal terrestre le plus rapide ?",
+"ch": [
+"Le lion",
+"Le guépard",
+"Le cheval",
+"L'antilope"
+],
+"bon": 1,
+"s": 15,
+"expl": "Le guépard : plus de 100 km/h en pointe, mais seulement sur quelques centaines de mètres."
+},
+{
+"q": "Combien d'os compte le squelette d'un adulte ?",
+"t": "nombre",
+"ch": [],
+"bon": 206,
+"tol": 0,
+"u": "os",
+"s": 30,
+"expl": "206 os. Un bébé en a environ 300 : plusieurs se soudent en grandissant."
+},
+{
+"q": "Quel est le record du monde d'Usain Bolt au 100 m ?",
+"ch": [
+"9,58 s",
+"9,69 s",
+"9,81 s",
+"10,02 s"
+],
+"bon": 0,
+"s": 20,
+"expl": "9,58 s, à Berlin en 2009. Ça fait une moyenne de près de 38 km/h."
+}
+]
+},
+{
 "id": "livre-communiquer",
 "exemple": true,
 "livre": true,
