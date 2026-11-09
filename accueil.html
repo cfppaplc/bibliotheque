@@ -3303,6 +3303,21 @@ html.style-pro .now-card::before { display: none; }
 html.style-pro .now-card { padding-left: calc(var(--u) * 40) !important; }
 html.style-pro .now-card::after { content: "+"; position: absolute; right: calc(var(--u) * 22); top: calc(var(--u) * 22); width: calc(var(--u) * 64); height: calc(var(--u) * 64); border-radius: 22%; background: var(--copper); color: #fff; font-size: calc(var(--u) * 52); font-weight: 800; line-height: calc(var(--u) * 62); text-align: center; }
 html.style-pro .tl-mark::after { content: "Tu es ici · " attr(data-h); }
+html.style-pro .clock .sec { display: none; }
+html.style-pro .now-card { justify-content: center !important; }
+html.style-pro .date { font-weight: 600; }
+html.style-pro .now-blk:not(.nxt) .now-lbl { background: none !important; padding: 0 !important; letter-spacing: .16em; font-weight: 700; }
+html.style-pro .now-txt { font-size: calc(var(--u) * 100) !important; line-height: 1.02; }
+html.style-pro .period { display: grid !important; grid-template-columns: auto 1fr auto; column-gap: calc(var(--u) * 28); align-items: baseline; }
+html.style-pro .period > * { grid-column: 1 / -1; }
+html.style-pro .period-top { display: contents !important; }
+html.style-pro .period-nw { grid-column: 1; }
+html.style-pro .period > .status { grid-column: 2; grid-row: 1; margin: 0 !important; }
+html.style-pro .period-hours { grid-column: 3; grid-row: 1; }
+html.style-pro .period .tube { display: none !important; }
+html.style-pro .seg:not(.p) { background: color-mix(in srgb, var(--ink) 6%, var(--surface)) !important; border-color: transparent !important; border-radius: calc(var(--u) * 16) !important; }
+html.style-pro .seg.fait:not(.p), html.style-pro .seg.done:not(.p) { background: color-mix(in srgb, var(--ink) 2%, var(--bg)) !important; }
+html.style-pro .seg.now:not(.p) { background: color-mix(in srgb, var(--copper) 24%, var(--surface)) !important; border: calc(var(--u) * 5) solid var(--copper) !important; }
 #mpCoin{position:fixed;right:clamp(16px,1.6vw,32px);bottom:clamp(10px,1.3vh,24px);height:clamp(28px,3.4vh,52px);z-index:5;opacity:1;pointer-events:none}
 #mpCoin img{height:100%;display:block}
 #mpCoin .lg-clr{display:none}
