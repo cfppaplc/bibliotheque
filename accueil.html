@@ -3263,6 +3263,13 @@ html.style-pro .seg.done:not(.p) .seg-t::before { color: var(--copper); }
 html.style-pro .tl-mark::after { color: #fff; border-radius: 999px; }
 html.style-pro .period .water { box-shadow: none; }
 html.style-pro .clock { font-feature-settings: "tnum" 1 !important; }
+#mpCoin{position:fixed;right:clamp(16px,1.6vw,32px);bottom:clamp(10px,1.3vh,24px);height:clamp(22px,2.6vh,40px);z-index:5;opacity:.85;pointer-events:none}
+#mpCoin img{height:100%;display:block}
+#mpCoin .lg-clr{display:none}
+html.force-light #mpCoin .lg-blc{display:none} html.force-light #mpCoin .lg-clr{display:block}
+@media (prefers-color-scheme: light){ html:not(.force-dark) #mpCoin .lg-blc{display:none} html:not(.force-dark) #mpCoin .lg-clr{display:block} }
+html.apercu-mode #mpCoin{display:none}
 </style>
+<div id="mpCoin" aria-hidden="true"><img class="lg-blc" src="img/metier-plus-blanc.svg" alt=""><img class="lg-clr" src="img/metier-plus.svg" alt=""></div>
 </body>
 </html>
