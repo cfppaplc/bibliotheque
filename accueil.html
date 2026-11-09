@@ -3048,6 +3048,19 @@ html.apercu-mode #menage{display:none}
 #menage li:not(.fait){animation:mnFlash var(--vit) ease-in-out infinite}
 @keyframes mnFlash{0%,100%{background:#ffffff0d;border-color:#ffffff14}
   50%{background:color-mix(in srgb,#D97B6C calc(var(--u) * 26%),#ffffff0d);border-color:color-mix(in srgb,#D97B6C calc(20% + var(--u) * 55%),#ffffff22)}}
+#menage .mn-tt{flex:1;display:flex;flex-direction:column;align-items:flex-start;gap:.5vh;min-width:0}
+#menage .mn-eq{display:inline-block;background:#F2A35E;color:#1a1206;font-weight:900;border-radius:999px;padding:.25vh .8vw;font-size:clamp(13px,1.05vw,20px);letter-spacing:.02em}
+#menage li.fait .mn-eq{background:#2EB872;color:#fff}
+#menage li.renfort{border-style:dashed;animation:none}
+#menage li.renfort .mn-t{cursor:default;opacity:.85}
+#menage .mn-rf{flex:0 0 clamp(40px,3.4vw,64px);height:clamp(40px,3.4vw,64px);display:grid;place-items:center;font-size:clamp(24px,2.2vw,40px);font-weight:900;color:#F2A35E}
+#menage .mn-aide{display:none;color:#7CF0B0;font-weight:800;font-size:clamp(13px,1.05vw,20px)}
+#menage li.fait .mn-aide{display:block}
+#mnAideT{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(.9);opacity:0;pointer-events:none;z-index:9001;background:#2EB872;color:#fff;border-radius:22px;padding:3vh 4vw;text-align:center;box-shadow:0 30px 80px #0009;display:flex;flex-direction:column;gap:1vh}
+#mnAideT b{font-size:clamp(30px,3.6vw,70px);font-weight:900}
+#mnAideT span{font-size:clamp(22px,2.4vw,46px);font-weight:700}
+#mnAideT.on{animation:mnAideT 2.6s ease forwards}
+@keyframes mnAideT{0%{opacity:0;transform:translate(-50%,-50%) scale(.85)}10%,75%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-50%) scale(1)}}
 #menage .mn-pers{display:none;margin:0 0 1.6vh;padding:1.2vh 1vw;border-radius:12px;background:#B5574D;color:#fff;text-align:center;font-weight:800;font-size:clamp(20px,2.2vw,40px);animation:mnPers var(--vit) ease-in-out infinite}
 #menage.presse:not(.fini) .mn-pers{display:block}
 @keyframes mnPers{50%{background:#9A4A42}}
@@ -3070,6 +3083,7 @@ html.apercu-mode #menage{display:none}
   <div class="mn-barre"><i id="mnBarre"></i></div>
   <div class="mn-pers">Personne ne part tant que tout n'est pas coché !</div>
   <ul id="mnListe"></ul>
+  <div id="mnAideT"><b>Tâche terminée !</b><span>Aide les autres équipes</span></div>
   <div class="mn-bravo"><div class="mb-ok">✓</div><div class="mb-t">Bravo la gang !</div><div class="mb-s">L'atelier est propre. <span id="mnBon">Bon dîner !</span></div><button type="button" class="mb-l" id="mnRevoir">Revoir la liste</button></div>
 </div>
 <div class="sheet" id="menageEd" hidden>
@@ -3080,6 +3094,8 @@ html.apercu-mode #menage{display:none}
     <div class="mt-reg">
       <div class="field"><label for="mnMin">Apparaît dans les dernières…</label><select id="mnMin"><option value="5">5 minutes</option><option value="10">10 minutes</option><option value="15">15 minutes</option><option value="20">20 minutes</option><option value="30">30 minutes</option></select></div>
       <div class="field"><label for="mnMot">… des activités dont le nom contient</label><input id="mnMot" placeholder="atelier"></div>
+      <div class="field"><label for="mnEq">Équipes (rotation chaque lundi)</label><select id="mnEq"><option value="0">Pas d'équipes</option><option value="2">2 équipes</option><option value="3">3 équipes</option><option value="4">4 équipes</option><option value="5">5 équipes</option><option value="6">6 équipes</option><option value="7">7 équipes</option><option value="8">8 équipes</option><option value="9">9 équipes</option><option value="10">10 équipes</option><option value="11">11 équipes</option><option value="12">12 équipes</option><option value="13">13 équipes</option><option value="14">14 équipes</option><option value="15">15 équipes</option><option value="16">16 équipes</option><option value="17">17 équipes</option><option value="18">18 équipes</option><option value="19">19 équipes</option><option value="20">20 équipes</option></select></div>
+      <div class="field"><label>Rotation</label><button type="button" class="btn" id="mnRot">Équipe 1 à la tâche 1 cette semaine</button><small id="mnRotTxt" style="opacity:.75;display:block;margin-top:4px"></small></div>
     </div>
     <div class="sheet-actions"><button type="button" class="btn primary" id="mnOk">Enregistrer</button><button type="button" class="btn" id="mnVoir">Aperçu</button><button type="button" class="btn" id="mnAnn">Annuler</button></div>
   </div>
@@ -3087,7 +3103,7 @@ html.apercu-mode #menage{display:none}
 <script>
 /* Ménage de l'atelier (9 nov., demande de Jeremy) : cfg.menage = {taches:[{t, d}], mot, min}; cases cochées par occurrence dans localStorage.menageFait */
 (() => {
-  const DEF = {mot: "atelier", min: 10, taches: [
+  const DEF = {mot: "atelier", min: 10, equipes: 10, depart: "2026-11-09", taches: [
     {"t": "Balai – Zones principales (ZP)", "d": "Objectif : Assurer la propreté des zones de circulation. · Balayer les allées principales, corridors et zones de passage. · Balayer l’entrée de l’atelier et le seuil des portes. · Retirer les débris visibles (copeaux, poussière, morceaux de tuyaux). · Ramasser la poussière avec la pelle et la jeter aux déchets. · S’assurer que les voies sont dégagées pour la sécurité."},
     {"t": "Moppe – Zones principales (ZP)", "d": "Objectif : Assurer une surface propre et non glissante. · Passer la moppe dans les allées principales. · Essuyer les zones où il y a eu de l’eau, du flux ou des liquides. · Rincer et essorer la moppe, vider et nettoyer le seau. · Laisser les surfaces propres et sécuritaires."},
     {"t": "Balai – Zones secondaires (ZS)", "d": "Objectif : Nettoyer les zones autour des postes de travail. · Balayer autour des établis, comptoirs, machines et postes individuels. · Balayer sous et derrière les établis et les machines. · Retirer les petits débris laissés par les activités pratiques. · S’assurer que le sol autour des postes est propre."},
@@ -3098,7 +3114,7 @@ html.apercu-mode #menage{display:none}
     {"t": "Nettoyage de la pièce d’entretien", "d": "Objectif : Remettre la pièce d’entretien propre et fonctionnelle. · Ranger les outils, accessoires et produits d’entretien (savon, brosses, nettoyants). · Nettoyer les surfaces (comptoirs, évier, étagères) et essuyer les traces de flux, graisse, eau ou résidus. · Jeter les déchets et résidus dans les bacs appropriés. · Balayer et passer la moppe si nécessaire. · S’assurer que la pièce est dégagée et prête pour le prochain usage."},
     {"t": "Rangement de l’entrepôt", "d": "Objectif : Maintenir l’entrepôt organisé et sécuritaire. · Ranger les boîtes, bacs et contenants déplacés durant la période. · Trier les matériaux laissés sur les tables, au sol ou dans les bacs. · Remettre les matériaux aux étagères désignées. · Jeter les résidus inutilisables (petits morceaux, emballages). · Réorganiser les sections désordonnées (PVC, cuivre, acier, etc.). · Vérifier que les allées sont dégagées et que les items lourds sont rangés de façon sécuritaire."}]};
   let APERCU = null;   /* tâches de l'éditeur montrées en aperçu, pas encore enregistrées */
-  const M = () => Object.assign({}, DEF, cfg.menage || {}, APERCU ? {taches: APERCU} : {});
+  const M = () => Object.assign({}, DEF, cfg.menage || {}, APERCU || {});
   const norm = x => String(x || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
   /* « atelier » reconnu malgré majuscules, accents, s, lettres doublées ou une petite faute (attelier, atlier, ateleir…) */
   const serre = x => norm(x).replace(/[^a-z0-9]+/g, " ").replace(/(.)\1+/g, "$1").trim();
@@ -3115,12 +3131,25 @@ html.apercu-mode #menage{display:none}
   const el = document.getElementById("menage"), ul = document.getElementById("mnListe");
   const lireFait = () => { try { return JSON.parse(localStorage.menageFait || "{}"); } catch(e) { return {}; } };
   let cle = null, force = false, mini = false, rendu = "";
+  /* Rotation des équipes (9 nov., « 10 équipes, rotation 1 fois par semaine, 1 tâche par équipe ») :
+     chaque lundi, chaque équipe passe à la tâche suivante; s'il y a plus d'équipes que de tâches, les équipes en trop sont « Renfort ». */
+  const lundi = d => { const x = new Date(d); x.setHours(12, 0, 0, 0); x.setDate(x.getDate() - (x.getDay() + 6) % 7); return x; };
+  const isoJour = d => { const x = new Date(d); return x.getFullYear() + "-" + String(x.getMonth() + 1).padStart(2, "0") + "-" + String(x.getDate()).padStart(2, "0"); };
+  function rotation(m){
+    const eq = Math.max(0, +m.equipes || 0), n = m.taches.length, slots = Math.max(eq, n);
+    if (!eq) return {eq, slots, equipe: () => null};
+    const w = Math.round((lundi(new Date()) - lundi(new Date((m.depart || DEF.depart) + "T12:00"))) / 6048e5);
+    return {eq, slots, equipe: s => { const k = ((s - w) % slots + slots) % slots; return k < eq ? k + 1 : null; }};
+  }
   function dessiner(){
     const m = M(), F = lireFait()[cle] || [], n = m.taches.length, f = F.filter(i => i < n).length;
-    const k = JSON.stringify([m.taches, F, cle]); if (k === rendu) return; rendu = k;
+    const R = rotation(m);
+    const k = JSON.stringify([m.taches, F, cle, m.equipes, m.depart, isoJour(lundi(new Date()))]); if (k === rendu) return; rendu = k;
+    const badge = s => { const e = R.equipe(s); return e ? `<span class="mn-eq">Équipe ${e}</span>` : ""; };
     const ouverts = [...ul.querySelectorAll("li.ouvert")].map(li => +li.dataset.i);
-    ul.innerHTML = m.taches.map((x, i) => `<li data-i="${i}" class="${F.includes(i) ? "fait" : ""} ${ouverts.includes(i) ? "ouvert" : ""}"><div class="mn-l"><button type="button" class="mn-c" aria-label="Fait">${F.includes(i) ? "✓" : ""}</button><button type="button" class="mn-t"></button>${x.d ? '<span class="mn-i">détails ▾</span>' : ""}</div><div class="mn-d"></div></li>`).join("");
-    ul.querySelectorAll("li").forEach((li, i) => { li.querySelector(".mn-t").textContent = m.taches[i].t; li.querySelector(".mn-d").textContent = String(m.taches[i].d || "").split(/ · /).map((p, j) => j ? "• " + p : p).join("\n"); });
+    ul.innerHTML = m.taches.map((x, i) => `<li data-i="${i}" class="${F.includes(i) ? "fait" : ""} ${ouverts.includes(i) ? "ouvert" : ""}"><div class="mn-l"><button type="button" class="mn-c" aria-label="Fait">${F.includes(i) ? "✓" : ""}</button><div class="mn-tt">${badge(i)}<button type="button" class="mn-t"></button><span class="mn-aide">Fait ! Va aider les autres</span></div>${x.d ? '<span class="mn-i">détails ▾</span>' : ""}</div><div class="mn-d"></div></li>`).join("")
+      + Array.from({length: R.slots - n}, (_, j) => R.equipe(n + j) ? `<li class="renfort"><div class="mn-l"><span class="mn-rf">+</span><div class="mn-tt">${badge(n + j)}<span class="mn-t">Renfort : aide les autres équipes</span></div></div></li>` : "").join("");
+    ul.querySelectorAll("li[data-i]").forEach((li, i) => { li.querySelector(".mn-t").textContent = m.taches[i].t; li.querySelector(".mn-d").textContent = String(m.taches[i].d || "").split(/ · /).map((p, j) => j ? "• " + p : p).join("\n"); });
     document.getElementById("mnCompte").textContent = n ? `· ${f}/${n}` : "";
     document.getElementById("mnBarre").style.width = n ? (100 * f / n) + "%" : "0";
     el.classList.toggle("fini", n > 0 && f === n); if (f < n) el.classList.remove("revoir");
@@ -3130,7 +3159,9 @@ html.apercu-mode #menage{display:none}
     const li = e.target.closest("li"); if (!li) return; const i = +li.dataset.i;
     if (e.target.closest(".mn-c")) { const T = lireFait(), F = T[cle] || []; T[cle] = F.includes(i) ? F.filter(x => x !== i) : F.concat(i);
       for (const k in T) if (k.slice(0, 10) < new Date(Date.now() - 7 * 864e5).toISOString().slice(0, 10)) delete T[k];
-      try { localStorage.menageFait = JSON.stringify(T); } catch(x) {} rendu = ""; dessiner(); }
+      try { localStorage.menageFait = JSON.stringify(T); } catch(x) {} rendu = ""; dessiner();
+      const n = M().taches.length, f = (T[cle] || []).filter(x => x < n).length;
+      if (T[cle].includes(i) && f < n) { const t = document.getElementById("mnAideT"); t.classList.remove("on"); void t.offsetWidth; t.classList.add("on"); } }
     else if (e.target.closest(".mn-t, .mn-i")) li.classList.toggle("ouvert");
   });
   let actifVu = false;
@@ -3165,7 +3196,13 @@ html.apercu-mode #menage{display:none}
   const ed = document.getElementById("menageEd");
   document.getElementById("b-menage").onclick = () => { closeMenu(); const m = M();
     remplirEd(m.taches);
-    { const sel = document.getElementById("mnMin"); if (![...sel.options].some(o => +o.value === +m.min)) sel.add(new Option(m.min + " minutes", m.min)); sel.value = String(m.min); } document.getElementById("mnMot").value = m.mot; ed.hidden = false; };
+    { const sel = document.getElementById("mnMin"); if (![...sel.options].some(o => +o.value === +m.min)) sel.add(new Option(m.min + " minutes", m.min)); sel.value = String(m.min); } document.getElementById("mnMot").value = m.mot;
+    document.getElementById("mnEq").value = String(m.equipes || 0); DEPART = m.depart || DEF.depart; majRotTxt(); ed.hidden = false; };
+  let DEPART = DEF.depart;
+  function majRotTxt(){ const R = rotation({taches: lireEd(), equipes: +document.getElementById("mnEq").value, depart: DEPART});
+    document.getElementById("mnRotTxt").textContent = R.eq ? "Cette semaine : l'équipe 1 fait « " + ((lireEd()[[...Array(R.slots).keys()].find(s => R.equipe(s) === 1)] || {}).t || "Renfort") + " »." : ""; }
+  document.getElementById("mnEq").onchange = majRotTxt;
+  document.getElementById("mnRot").onclick = () => { DEPART = isoJour(lundi(new Date())); majRotTxt(); };
   const fermerEd = () => { ed.hidden = true; };
   const LE = document.getElementById("mnListeEd");
   function remplirEd(taches){
@@ -3189,11 +3226,11 @@ html.apercu-mode #menage{display:none}
   document.getElementById("mnAnn").onclick = fermerEd;
   document.getElementById("mnOk").onclick = () => {
     const taches = lireEd(); APERCU = null;
-    cfg.menage = {taches, mot: document.getElementById("mnMot").value.trim() || "atelier", min: Math.max(1, Math.min(60, +document.getElementById("mnMin").value || 10))};
+    cfg.menage = {taches, equipes: +document.getElementById("mnEq").value, depart: DEPART, mot: document.getElementById("mnMot").value.trim() || "atelier", min: Math.max(1, Math.min(60, +document.getElementById("mnMin").value || 10))};
     save(); rendu = ""; fermerEd(); verifier(); };
   const lireEd = () => [...document.querySelectorAll("#mnListeEd .mt-r")].map(r => ({t: r.querySelector(".mt-t").value.trim(),
       d: r.querySelector("textarea").value.split("\n").map(l => l.replace(/^[•\-*]\s*/, "").trim()).filter(Boolean).join(" · ")})).filter(x => x.t);
-  document.getElementById("mnVoir").onclick = () => { APERCU = lireEd(); rendu = ""; if (window.menageReste == null) window.menageReste = 2.5; fermerEd(); force = true; cle = new Date().toISOString().slice(0, 10) + "|manuel"; mini = false; el.classList.remove("mini"); verifier(); };
+  document.getElementById("mnVoir").onclick = () => { APERCU = {taches: lireEd(), equipes: +document.getElementById("mnEq").value, depart: DEPART}; rendu = ""; if (window.menageReste == null) window.menageReste = 2.5; fermerEd(); force = true; cle = new Date().toISOString().slice(0, 10) + "|manuel"; mini = false; el.classList.remove("mini"); verifier(); };
   document.getElementById("b-menageReg").onclick = () => { document.getElementById("b-cancel").click(); document.getElementById("b-menage").click(); };
   /* Fermeture secrète (9 nov., Jeremy) : garder le doigt 3 s sur le titre « Ménage de l'atelier » → fermé pour cette fois (onglet en cours) */
   { const h = el.querySelector(".mn-tete h2"); let tm = null;
