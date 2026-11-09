@@ -4,6 +4,388 @@
    Fabriqué par Claude à partir des livres (scratchpad ql/data.py); lecture seule : « Copier et modifier » pour l'adapter. */
 window.QUIZ_LIVRES = [
 {
+"id": "culture-generale",
+"exemple": true,
+"titre": "Culture générale",
+"sujet": "Géo, politique, arts, sciences et sports",
+"couv": "img/labo/quiz/culture-couv.svg",
+"coul": "#534AB7",
+"reg": {
+"nb": "15",
+"melange": "tout"
+},
+"qs": [
+{
+"q": "Quelle est la capitale du Canada ?",
+"ch": [
+"Toronto",
+"Montréal",
+"Ottawa",
+"Québec"
+],
+"bon": 2,
+"s": 15,
+"expl": "Ottawa, en Ontario, sur la rivière des Outaouais, juste en face de Gatineau."
+},
+{
+"q": "Quel est le plus grand pays du monde en superficie ?",
+"ch": [
+"Canada",
+"Russie",
+"Chine",
+"États-Unis"
+],
+"bon": 1,
+"s": 20,
+"expl": "La Russie. Le Canada arrive 2e, juste devant la Chine et les États-Unis."
+},
+{
+"q": "Place ces provinces de la plus petite à la plus grande.",
+"t": "ordre",
+"ch": [
+"Île-du-Prince-Édouard",
+"Nouveau-Brunswick",
+"Ontario",
+"Québec"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"expl": "Le Québec est la plus grande province : environ 1,5 million de km², trois fois la France."
+},
+{
+"q": "Lesquelles sont des capitales de province ?",
+"t": "multi",
+"ch": [
+"Halifax",
+"Vancouver",
+"Regina",
+"Calgary"
+],
+"bon": [
+0,
+2
+],
+"s": 30,
+"expl": "Halifax (N.-É.) et Regina (Sask.). Les capitales de la C.-B. et de l'Alberta sont Victoria et Edmonton."
+},
+{
+"q": "Combien y a-t-il de provinces au Canada ?",
+"t": "nombre",
+"ch": [],
+"bon": 10,
+"tol": 0,
+"u": "provinces",
+"s": 25,
+"expl": "10 provinces et 3 territoires (Yukon, Territoires du Nord-Ouest, Nunavut)."
+},
+{
+"q": "Le mont Everest est la plus haute montagne du monde.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15,
+"expl": "Vrai : environ 8 849 m au-dessus du niveau de la mer, entre le Népal et la Chine."
+},
+{
+"q": "Quel fleuve passe à Montréal et à Québec ?",
+"ch": [
+"Le fleuve Saint-Laurent",
+"La rivière Richelieu",
+"Le fleuve Mississippi",
+"La rivière Saguenay"
+],
+"bon": 0,
+"s": 15,
+"expl": "Le Saint-Laurent relie les Grands Lacs à l'océan Atlantique."
+},
+{
+"q": "Combien de députés siègent à l'Assemblée nationale du Québec ?",
+"t": "nombre",
+"ch": [],
+"bon": 125,
+"tol": 0,
+"u": "députés",
+"s": 30,
+"expl": "125 circonscriptions, donc 125 députés."
+},
+{
+"q": "Au Canada, qui est le chef de l'État ?",
+"ch": [
+"Le premier ministre",
+"Le monarque (le roi)",
+"Le gouverneur général",
+"Le président du Sénat"
+],
+"bon": 1,
+"s": 20,
+"expl": "Le Canada est une monarchie constitutionnelle : le roi est chef de l'État, le premier ministre dirige le gouvernement."
+},
+{
+"q": "Trouve l'erreur dans cette phrase.",
+"t": "erreur",
+"ch": [
+"Au Québec, les élections générales",
+"ont lieu à date fixe,",
+"tous les cinq ans,",
+"au mois d'octobre."
+],
+"bon": 2,
+"s": 30,
+"expl": "C'est tous les quatre ans : le premier lundi d'octobre."
+},
+{
+"q": "À quel âge peut-on voter aux élections au Québec ?",
+"ch": [
+"16 ans",
+"18 ans",
+"19 ans",
+"21 ans"
+],
+"bon": 1,
+"s": 15,
+"expl": "18 ans, et il faut être citoyen canadien."
+},
+{
+"q": "Qui était le premier ministre du Canada à la Confédération, en 1867 ?",
+"ch": [
+"Wilfrid Laurier",
+"John A. Macdonald",
+"George-Étienne Cartier",
+"Pierre Elliott Trudeau"
+],
+"bon": 1,
+"s": 20,
+"expl": "John A. Macdonald. George-Étienne Cartier était un des Pères de la Confédération."
+},
+{
+"q": "Le Parlement du Canada compte combien de chambres ?",
+"ch": [
+"Une",
+"Deux",
+"Trois",
+"Quatre"
+],
+"bon": 1,
+"s": 20,
+"expl": "Deux : la Chambre des communes (élue) et le Sénat (nommé)."
+},
+{
+"q": "Qui a peint La Joconde ?",
+"ch": [
+"Michel-Ange",
+"Léonard de Vinci",
+"Pablo Picasso",
+"Vincent van Gogh"
+],
+"bon": 1,
+"s": 15,
+"expl": "Léonard de Vinci, au début des années 1500. Elle est au Louvre, à Paris."
+},
+{
+"q": "Dans quelle ville du Québec est née Céline Dion ?",
+"ch": [
+"Laval",
+"Charlemagne",
+"Trois-Rivières",
+"Sherbrooke"
+],
+"bon": 1,
+"s": 20,
+"expl": "Charlemagne, dans Lanaudière, en 1968. Elle était la cadette de 14 enfants !"
+},
+{
+"q": "Le Cirque du Soleil a été fondé en…",
+"ch": [
+"France",
+"Belgique",
+"États-Unis",
+"Québec"
+],
+"bon": 3,
+"s": 15,
+"expl": "À Baie-Saint-Paul, dans Charlevoix, en 1984."
+},
+{
+"q": "Place ces constructions de la plus ancienne à la plus récente.",
+"t": "ordre",
+"ch": [
+"Pyramides de Gizeh",
+"Colisée de Rome",
+"Tour Eiffel",
+"Stade olympique de Montréal"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"expl": "Environ 2500 av. J.-C., 80 apr. J.-C., 1889, puis 1976 pour les Jeux de Montréal."
+},
+{
+"q": "Lesquels sont des instruments à vent ?",
+"t": "multi",
+"ch": [
+"Trompette",
+"Violon",
+"Flûte",
+"Saxophone"
+],
+"bon": [
+0,
+2,
+3
+],
+"s": 30,
+"expl": "Le violon est un instrument à cordes. Le saxophone est en métal, mais c'est quand même un bois : il a une anche !"
+},
+{
+"q": "Qui a écrit Les Misérables ?",
+"ch": [
+"Victor Hugo",
+"Molière",
+"Jules Verne",
+"Émile Zola"
+],
+"bon": 0,
+"s": 20,
+"expl": "Victor Hugo, en 1862. Jean Valjean, Cosette, Javert…"
+},
+{
+"q": "Qui a composé la musique de l'Ô Canada ?",
+"ch": [
+"Félix Leclerc",
+"Calixa Lavallée",
+"Gilles Vigneault",
+"Oscar Peterson"
+],
+"bon": 1,
+"s": 25,
+"expl": "Calixa Lavallée, en 1880, pour la Saint-Jean-Baptiste. Les paroles françaises sont d'Adolphe-Basile Routhier."
+},
+{
+"q": "Quelle planète est la plus proche du Soleil ?",
+"ch": [
+"Vénus",
+"Mars",
+"Mercure",
+"La Terre"
+],
+"bon": 2,
+"s": 15,
+"expl": "Mercure. Vénus est pourtant la plus chaude, à cause de son atmosphère épaisse."
+},
+{
+"q": "Trouve l'erreur dans cette phrase.",
+"t": "erreur",
+"ch": [
+"La Terre fait le tour",
+"du Soleil",
+"en environ 24 heures."
+],
+"bon": 2,
+"s": 25,
+"expl": "Le tour du Soleil prend environ 365 jours. En 24 heures, la Terre tourne sur elle-même."
+},
+{
+"q": "Combien d'os compte le squelette d'un adulte ?",
+"t": "nombre",
+"ch": [],
+"bon": 206,
+"tol": 0,
+"u": "os",
+"s": 30,
+"expl": "206. Un bébé en a environ 300 : plusieurs se soudent en grandissant."
+},
+{
+"q": "Quel est le symbole chimique de l'or ?",
+"ch": [
+"Or",
+"Au",
+"Ag",
+"Go"
+],
+"bon": 1,
+"s": 20,
+"expl": "Au, du latin aurum. Ag, c'est l'argent."
+},
+{
+"q": "Au niveau de la mer, l'eau bout à 100 °C.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15,
+"expl": "Vrai. En montagne, elle bout plus bas : la pression de l'air est plus faible."
+},
+{
+"q": "Qui est reconnu comme l'inventeur du téléphone ?",
+"ch": [
+"Thomas Edison",
+"Alexander Graham Bell",
+"Nikola Tesla",
+"Guglielmo Marconi"
+],
+"bon": 1,
+"s": 20,
+"expl": "Alexander Graham Bell, en 1876. Il a fait plusieurs essais à Brantford, en Ontario."
+},
+{
+"q": "Combien de coupes Stanley les Canadiens de Montréal ont-ils gagnées ?",
+"t": "nombre",
+"ch": [],
+"bon": 24,
+"tol": 0,
+"u": "coupes",
+"s": 30,
+"expl": "24, un record. La dernière date de 1993."
+},
+{
+"q": "Au hockey, combien de joueurs par équipe sont sur la glace (gardien compris) ?",
+"ch": [
+"5",
+"6",
+"7",
+"11"
+],
+"bon": 1,
+"s": 15,
+"expl": "6 : un gardien, deux défenseurs et trois attaquants."
+},
+{
+"q": "Montréal a accueilli les Jeux olympiques d'été en…",
+"ch": [
+"1967",
+"1976",
+"1980",
+"1988"
+],
+"bon": 1,
+"s": 20,
+"expl": "1976. En 1967, c'était l'Expo 67. Calgary a eu les Jeux d'hiver en 1988."
+},
+{
+"q": "La tour Eiffel se trouve à Londres.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 1,
+"s": 10,
+"expl": "Faux ! Elle est à Paris. À Londres, on a Big Ben et le London Eye."
+}
+]
+},
+{
 "id": "livre-communiquer",
 "exemple": true,
 "livre": true,
