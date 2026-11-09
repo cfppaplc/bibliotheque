@@ -358,6 +358,10 @@
   .reader:not(.wbon) .rb-logo{display:block;height:22px;opacity:.95}
   .reader.wbon .rb-logo{display:block}
   .reader.wbon #readerBack{order:99;margin-left:auto}
+  #readerLivre{display:none}
+  .reader.wbon.wblivre #readerLivre{display:inline-flex;align-items:center;order:98;margin-left:auto;white-space:nowrap;min-height:31px;height:31px;padding:0 12px;border:0;border-radius:6px;background:#EB6A22;color:#fff;font-size:12.7px;font-weight:700;cursor:pointer}
+  .reader.wbon.wblivre #readerBack{margin-left:8px}
+  @media (pointer:coarse){.reader.wbon.wblivre #readerLivre{min-height:40px;height:40px;padding:0 16px;font-size:14px}}
   /* 8 nov. (« doubles barres de défilement ») : une fenêtre plein écran ouverte (Plans, Activités, Accueil de classe) bloque le défilement de la page derrière */
   html:has(#planOv:not([hidden])),html:has(#actOv:not([hidden])),html:has(#accueilOv:not([hidden])){overflow:hidden}
   html:has(#planOv:not([hidden])) body,html:has(#actOv:not([hidden])) body,html:has(#accueilOv:not([hidden])) body{overflow:hidden}
@@ -1190,7 +1194,7 @@ document.addEventListener("keydown", e => { if (e.key !== "/" || e.ctrlKey || e.
 </div>
 
 <div class="reader" id="reader">
-  <div class="reader-bar"><img class="rb-logo" src="img/metier-plus-blanc.svg" alt="Métier+"><button id="readerBack">← Retour</button><button id="readerTdb" type="button" title="Tableau de bord (E) — le livre reste ouvert"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="4" width="17" height="12.5" rx="1.5"/><path d="M8 20h8M12 16.5V20"/></svg>Tableau de bord</button><span id="readerTitle"></span><span id="telePill" hidden title="Ton cellulaire contrôle ce livre"><i></i>Télécommande branchée</span></div>
+  <div class="reader-bar"><img class="rb-logo" src="img/metier-plus-blanc.svg" alt="Métier+"><button id="readerBack">← Retour</button><button id="readerTdb" type="button" title="Tableau de bord (E) — le livre reste ouvert"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="4" width="17" height="12.5" rx="1.5"/><path d="M8 20h8M12 16.5V20"/></svg>Tableau de bord</button><button id="readerLivre" type="button" title="Revenir au livre (B)">‹ Revenir au livre</button><span id="readerTitle"></span><span id="telePill" hidden title="Ton cellulaire contrôle ce livre"><i></i>Télécommande branchée</span></div>
   <button class="tdb-pill" id="tdbPill" type="button" title="Retour au tableau de bord (E)"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="4" width="17" height="12.5" rx="1.5"/><path d="M8 20h8M12 16.5V20"/></svg>Tableau de bord</button>
   <div class="rstage" id="rstage">
     <div class="rinner" id="rinner"><div class="rscale" id="rscale">
@@ -5147,6 +5151,7 @@ function togglePen(){ RD.pen = !RD.pen; if (RD.pen) RD.spot = false; refreshTool
 function toggleWb(){
   RD.wb = !RD.wb; if (RD.wb){ RD.spot = false; RD.crayonOff = true; RD.eraser = false; RD.text = false; RD.obj = false; RD.formeK = null; RD.objKi = null; RD.objKe = null; try { SELO.s = null; } catch(e){} setTimeout(() => { try { aviser("Aucun outil choisi : touche le crayon pour écrire, ou touche une forme pour la choisir.", 3500); } catch(e){} }, 400); }   /* chaque ouverture : aucun outil choisi */
   const st = $("#rstage"); $("#reader").classList.toggle("wbon", !!RD.wb);
+  $("#reader").classList.toggle("wblivre", !!RD.wb && RD.book !== "tableau-blanc");   /* tableau blanc ouvert par-dessus un livre : bouton « Revenir au livre » */
   if (RD.wb){ RD.z = zMin(); /* tableau blanc : toujours dézoomé à l'ouverture */ sizeInner(); st.scrollLeft = (st.scrollWidth - st.clientWidth) / 2; st.scrollTop = (st.scrollHeight - st.clientHeight) / 2; }
   else { RD.z = Math.max(1, RD.z); sizeInner(); st.scrollLeft = RD.mx || 0; st.scrollTop = RD.my || 0; }
   refreshTools();
@@ -5589,6 +5594,7 @@ $("#tbTimer").onclick = toggleTimer;
 $("#tbSpot").onclick = toggleSpot;
 $("#tbCache").onclick = toggleCache;
 $("#tbWb").onclick = toggleWb;
+$("#readerLivre").onclick = () => { if (RD.wb) toggleWb(); };
 $("#tbMenu").onclick = openMenu;
 $("#tbFs").onclick = toggleFs;
 $("#tbDbl").onclick = toggleDbl;
