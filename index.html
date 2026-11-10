@@ -2962,8 +2962,8 @@ function objGeo(s, W, H){
     box(.1, -.06, .3, .06, .1, .26, "#aab4c0"); box(0, -.12, .1, .12, .03, .36, "#9aa7b5");      /* côté proche : tuyau et bride */
   }
   else if (s.k === "vanne"){
-    box(.7, -.07, 1, .07, .08, .3, "#aab4c0"); box(.28, -.2, .72, .2, 0, .5, "#e0b3b3");           /* tuyau éloigné et corps */
-    cyl(.5, 0, .13, .5, .85, "#c98f8f"); cyl(.5, 0, .045, .85, 1.1, "#9aa7b5"); cyl(.5, 0, .3, 1.1, 1.17, "#c0392b", 0);   /* chapeau, tige, volant rouge */
+    box(.7, -.07, 1, .07, .08, .3, "#aab4c0"); box(.28, -.2, .72, .2, 0, .5, "#d9b45a");           /* tuyau éloigné et corps (laiton) */
+    cyl(.5, 0, .13, .5, .85, "#c79a3a"); cyl(.5, 0, .045, .85, 1.1, "#aeb7c2"); cyl(.5, 0, .3, 1.1, 1.17, "#d6342a", 0);   /* chapeau, tige, volant rouge */
     box(0, -.07, .3, .07, .08, .3, "#aab4c0");                                                      /* tuyau proche */
   }
   else if (s.k === "collecteur4" || s.k === "collecteur6"){
@@ -3045,12 +3045,15 @@ function dessinerObjet(g, s, W, H, k, col){
   g.lineJoin = "round"; g.lineCap = "round"; g.lineWidth = Math.max(1.2, 2 * k);
   const poly = (pts, fill) => { g.beginPath(); pts.forEach((q, i) => i ? g.lineTo(q[0], q[1]) : g.moveTo(q[0], q[1])); g.closePath(); g.fillStyle = fill; g.fill(); g.strokeStyle = col; g.stroke(); };
   const ombre = (hex, f) => { const n = parseInt(hex.slice(1), 16), r = n >> 16, gg = (n >> 8) & 255, b = n & 255; return "rgb(" + Math.round(r * f) + "," + Math.round(gg * f) + "," + Math.round(b * f) + ")"; };
+  /* Rendu soigné (9 nov., essai sur la vanne, liste BEAU) : faces plus contrastées, dessus éclairci, reflets sur les cylindres, volant à rayons */
+  const beau = BEAU.has(s.k), clair = (hex, f) => { const n = parseInt(hex.slice(1), 16), r = n >> 16, gg = (n >> 8) & 255, b = n & 255; return "rgb(" + Math.round(r + (255 - r) * f) + "," + Math.round(gg + (255 - gg) * f) + "," + Math.round(b + (255 - b) * f) + ")"; };
   G.shapes.forEach(sh => {
     if (sh.t === "box"){
       const { m0, n0, m1, n1, h0, h1 } = sh;
-      poly([P(m0, n0, h0), P(m0, n1, h0), P(m0, n1, h1), P(m0, n0, h1)], ombre(sh.fill, .86));
-      poly([P(m0, n1, h0), P(m1, n1, h0), P(m1, n1, h1), P(m0, n1, h1)], ombre(sh.fill, .72));
-      poly([P(m0, n0, h1), P(m1, n0, h1), P(m1, n1, h1), P(m0, n1, h1)], sh.fill);
+      poly([P(m0, n0, h0), P(m0, n1, h0), P(m0, n1, h1), P(m0, n0, h1)], ombre(sh.fill, beau ? .9 : .86));
+      poly([P(m0, n1, h0), P(m1, n1, h0), P(m1, n1, h1), P(m0, n1, h1)], ombre(sh.fill, beau ? .64 : .72));
+      poly([P(m0, n0, h1), P(m1, n0, h1), P(m1, n1, h1), P(m0, n1, h1)], beau ? clair(sh.fill, .32) : sh.fill);
+      if (beau){ const A = P(m0, n1, h1), B = P(m1, n1, h1); g.save(); g.strokeStyle = "rgba(255,255,255,.7)"; g.lineWidth = Math.max(1, 1.1 * k); g.beginPath(); g.moveTo(A[0] + (B[0] - A[0]) * .12, A[1] + (B[1] - A[1]) * .12 - 1.5 * k); g.lineTo(A[0] + (B[0] - A[0]) * .88, A[1] + (B[1] - A[1]) * .88 - 1.5 * k); g.stroke(); g.restore(); }
       if (sh.extra && sh.extra.segs){ g.lineWidth = Math.max(1, 1.2 * k); g.beginPath(); sh.extra.segs.forEach(([u, v]) => { const A = P(...u), B = P(...v); g.moveTo(A[0], A[1]); g.lineTo(B[0], B[1]); }); g.stroke(); g.lineWidth = Math.max(1.2, 2 * k); }
       if (sh.extra && sh.extra.fins){ const [f0, f1, st, y0, y1] = sh.extra.fins; g.lineWidth = Math.max(1, 1.2 * k); g.beginPath();
         for (let m = f0; m <= f1 + .001; m += st){ const A = P(m0 + m, n1, y0), B = P(m0 + m, n1, y1); g.moveTo(A[0], A[1]); g.lineTo(B[0], B[1]); } g.stroke(); g.lineWidth = Math.max(1.2, 2 * k); }
@@ -3074,17 +3077,23 @@ function dessinerObjet(g, s, W, H, k, col){
       g.beginPath(); g.arc(c[0] - sh.R * a * .22, c[1] - sh.R * a * .25, sh.R * a * .5, 0, Math.PI * 2); g.fillStyle = sh.fill; g.fill();
     } else if (sh.t === "cyln"){
       const cap = n => Array.from({ length:40 }, (_, i) => { const th = i / 40 * Math.PI * 2; return P(sh.m + sh.R * Math.cos(th), n, sh.h + sh.R * Math.sin(th)); });
-      poly(enveloppe(cap(sh.n0).concat(cap(sh.n1))), ombre(sh.fill, .78)); poly(cap(sh.n1), sh.fill);
+      poly(enveloppe(cap(sh.n0).concat(cap(sh.n1))), ombre(sh.fill, beau ? .68 : .78)); poly(cap(sh.n1), beau ? clair(sh.fill, .22) : sh.fill);
       const c = P(sh.m, sh.n1, sh.h); g.beginPath(); g.arc(c[0], c[1], a * .09, 0, 7); g.fillStyle = ombre(sh.fill, .7); g.fill(); g.stroke();
       g.beginPath(); cap(sh.n1).forEach((q, i) => { const r = .62, x = c[0] + (q[0] - c[0]) * r, y = c[1] + (q[1] - c[1]) * r; i ? g.lineTo(x, y) : g.moveTo(x, y); }); g.closePath(); g.lineWidth = Math.max(1, 1.2 * k); g.stroke(); g.lineWidth = Math.max(1.2, 2 * k);
     } else if (sh.t === "cylm"){                                           /* cylindre couché (objet debout) : on voit le bout côté m0 */
       const cap = m => Array.from({ length:40 }, (_, i) => { const th = i / 40 * Math.PI * 2; return P(m, sh.n + sh.R * Math.cos(th), sh.h + sh.R * Math.sin(th)); });
-      poly(enveloppe(cap(sh.m0).concat(cap(sh.m1))), ombre(sh.fill, .8)); poly(cap(sh.m0), sh.fill);
+      poly(enveloppe(cap(sh.m0).concat(cap(sh.m1))), ombre(sh.fill, beau ? .68 : .8)); poly(cap(sh.m0), beau ? clair(sh.fill, .22) : sh.fill);
     } else if (sh.t === "cyl"){
       const c0 = P(sh.m, sh.n, sh.h0), c1 = P(sh.m, sh.n, sh.h1), rx = sh.R * a * 1.22, ry = sh.R * a * .71;
-      g.beginPath(); g.moveTo(c0[0] - rx, c0[1]); g.ellipse(c0[0], c0[1], rx, ry, 0, Math.PI, 0, true); g.lineTo(c1[0] + rx, c1[1]); g.ellipse(c1[0], c1[1], rx, ry, 0, 0, Math.PI, false); g.closePath(); g.fillStyle = ombre(sh.fill, .8); g.fill(); g.strokeStyle = col; g.stroke();
+      g.beginPath(); g.moveTo(c0[0] - rx, c0[1]); g.ellipse(c0[0], c0[1], rx, ry, 0, Math.PI, 0, true); g.lineTo(c1[0] + rx, c1[1]); g.ellipse(c1[0], c1[1], rx, ry, 0, 0, Math.PI, false); g.closePath();
+      if (beau){ const gr = g.createLinearGradient(c0[0] - rx, 0, c0[0] + rx, 0); gr.addColorStop(0, ombre(sh.fill, .6)); gr.addColorStop(.3, clair(sh.fill, .45)); gr.addColorStop(.62, sh.fill); gr.addColorStop(1, ombre(sh.fill, .55)); g.fillStyle = gr; } else g.fillStyle = ombre(sh.fill, .8);
+      g.fill(); g.strokeStyle = col; g.stroke();
       if (sh.rings){ g.lineWidth = Math.max(1, 1.2 * k); for (let i = 1; i <= sh.rings; i++){ const cy = c0[1] + (c1[1] - c0[1]) * i / (sh.rings + 1); g.beginPath(); g.ellipse(c0[0], cy, rx, ry, 0, 0, Math.PI, false); g.stroke(); } g.lineWidth = Math.max(1.2, 2 * k); }
-      g.beginPath(); g.ellipse(c1[0], c1[1], rx, ry, 0, 0, Math.PI * 2); g.fillStyle = sh.fill; g.fill(); g.stroke();
+      g.beginPath(); g.ellipse(c1[0], c1[1], rx, ry, 0, 0, Math.PI * 2); g.fillStyle = beau ? clair(sh.fill, .2) : sh.fill; g.fill(); g.stroke();
+      if (beau && sh.R >= .18 && sh.h1 - sh.h0 < .12){   /* volant : jante, 4 rayons et moyeu */
+        g.save(); g.lineWidth = Math.max(1, 1.2 * k); g.beginPath(); g.ellipse(c1[0], c1[1], rx * .7, ry * .7, 0, 0, 7); g.fillStyle = ombre(sh.fill, .7); g.fill(); g.stroke();
+        g.lineWidth = Math.max(1.5, 2.6 * k); g.strokeStyle = clair(sh.fill, .15); g.beginPath(); [[1, 0], [0, 1], [.7, .7], [.7, -.7]].forEach(([x, y]) => { g.moveTo(c1[0] - rx * .7 * x, c1[1] - ry * .7 * y); g.lineTo(c1[0] + rx * .7 * x, c1[1] + ry * .7 * y); }); g.stroke();
+        g.strokeStyle = col; g.lineWidth = Math.max(1, 1.2 * k); g.beginPath(); g.ellipse(c1[0], c1[1], rx * .22, ry * .22, 0, 0, 7); g.fillStyle = "#e9edf2"; g.fill(); g.stroke(); g.restore(); }
     } else if (sh.t === "vanne"){
       poly([P(0, 0, .35), P(0, 0, -.35), P(.5, 0, 0)], def2(s)); poly([P(1, 0, .35), P(1, 0, -.35), P(.5, 0, 0)], def2(s));
       const c = P(.5, 0, 0), t = P(.5, 0, .95); g.beginPath(); g.moveTo(c[0], c[1]); g.lineTo(t[0], t[1]); g.stroke(); g.beginPath(); g.ellipse(t[0], t[1], a * .22, a * .11, 0, 0, 7); g.stroke();
@@ -3094,6 +3103,7 @@ function dessinerObjet(g, s, W, H, k, col){
   return G;
 }
 const def2 = s => OBJETS[s.k].fill;
+const BEAU = new Set(["vanne"]);   /* objets iso au rendu soigné (essai du 9 nov. : la vanne; ajouter les autres si Jeremy aime) */
 const TXFONTS = [["Sans","system-ui,'Segoe UI',Arial,sans-serif"],["Serif","Georgia,'Times New Roman',serif"],["Mono","ui-monospace,Consolas,'Courier New',monospace"],["Manuscrite","'Segoe Print','Comic Sans MS','Bradley Hand',cursive"],["Titre","Impact,'Arial Black',sans-serif"]];
 const txFs = s => s.fs || (12 + s.w * 5);
 const txFont = (s, px) => (s.i ? "italic " : "") + (s.b === false ? 400 : s.b === true ? 700 : 600) + " " + px + "px " + (s.f || TXFONTS[0][1]);
