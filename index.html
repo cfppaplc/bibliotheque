@@ -9509,6 +9509,20 @@ window.addEventListener("online", () => { try { aviser("Internet est revenu."); 
   body.clair .acces-fiche.f2 .voir{border-color:#d9d5cd}body.clair .acces-fiche.f2 .tous{color:#c2410c}
   /* ---- Panneau d'administration (7 nov., « je veux qu'il soit beau ») ---- */
   .acces-box.gestion{max-width:min(980px,96vw)}
+  /* Administration en pleine page (9 nov.) : hauteur fixe (les onglets ne sautent plus), barre « Publier » toujours visible, fiches sur 2 colonnes */
+  #accesOv:has(.acces-box.gestion){padding:0}
+  .acces-box.gestion{width:100%;max-width:none;height:100vh;height:100dvh;max-height:none;border-radius:0;border:0;padding:22px max(18px,calc((100vw - 1240px) / 2)) 0;display:flex;flex-direction:column}
+  .acces-box.gestion>*{flex:none}
+  .acces-box.gestion .acces-pied{position:sticky;bottom:0;margin-top:auto;background:inherit;border-top:1px solid rgba(128,128,128,.28);padding:10px 0 14px;z-index:3}
+  .acces-box.gestion .acces-pied .acces-btns{margin-top:0;align-items:center}
+  .acces-box.gestion .acces-etat{margin-right:auto;font-size:.88rem;opacity:.75}.acces-box.gestion .acces-etat.pub{opacity:1;color:#EB6A22;font-weight:700}
+  .acces-box.gestion .acces-pied .prim{min-width:140px;min-height:44px;font-size:1rem}
+  .acces-box.gestion .acces-pane{padding-bottom:18px}
+  .acces-info{margin:0 0 10px;font-size:.85rem}.acces-info summary{cursor:pointer;display:inline-flex;align-items:center;gap:6px;opacity:.7;list-style:none}.acces-info summary::-webkit-details-marker{display:none}
+  .acces-info summary::before{content:"?";display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;border:1px solid currentColor;font-weight:700;font-size:.75rem}.acces-info[open] summary{opacity:1}.acces-info p{margin:8px 0 0}
+  .acces-plusL{display:inline-block;position:relative}.acces-plusL summary{list-style:none;cursor:pointer;display:inline-grid;place-items:center;width:30px;height:24px;border-radius:99px;border:1px solid rgba(128,128,128,.4);font-weight:800;line-height:1}.acces-plusL summary::-webkit-details-marker{display:none}
+  .acces-plusL[open]{display:block;margin-top:4px}.acces-plusL[open] summary{margin-bottom:6px}
+  @media (min-width:1100px){.acces-box.gestion .acces-fiches{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px;align-items:start}.acces-box.gestion .acces-fiches>.acces-ent,.acces-box.gestion .acces-fiches>#gRien{grid-column:1/-1}.acces-box.gestion .acces-fiches>.acces-fiche{margin:0}}
   .acces-tete h2{margin:0 0 2px;font-size:1.5rem;letter-spacing:-.01em}
   .acces-box.gestion .acces-stats>div{background:linear-gradient(180deg,#1e1e23,#17171b);padding:12px 8px;transition:transform .15s,border-color .15s}
   .acces-box.gestion .acces-stats b{font-size:1.6rem;font-variant-numeric:tabular-nums}
@@ -10104,12 +10118,12 @@ window.ACCES = (function(){
     const ong = (k, lab) => '<button class="' + (ONGLET === k ? 'on' : '') + '" data-ong="' + k + '">' + ICO[k] + '<span>' + lab + '</span></button>';
     const pool = [...LIVRES.filter(l => l.fichier && !l.user && l.fichier !== "tableau-blanc"), ...LIVRES_CACHES];
     const tg = (k, f, on, lab, ic) => '<button class="tg' + (on ? ' on' : '') + '" data-rl="' + k + '" data-f="' + esc(f) + '">' + ic + lab + '</button>';
-    const volLivres = '<p class="sous">Ce que tu changes ici s\'applique pour tous les enseignants quand tu touches « Publier ». « Nouveau » dure 30 jours; « En vedette » = les livres du haut de l\'accueil (3 au plus).</p><div class="acces-livs">'
+    const volLivres = '<details class="acces-info"><summary>Comment ça marche</summary><p class="sous">Ce que tu changes ici s\'applique pour tous les enseignants quand tu touches « Publier ». « Nouveau » dure 30 jours; « En vedette » = les livres du haut de l\'accueil (3 au plus). Le menu « ⋯ » d\'un livre protégé permet de couper les anciens accès.</p></details><div class="acces-livs">'
       + pool.map(l => { const f = l.fichier, cache = REGL.caches.includes(f), prot = !!D.livres[f], nAcc = prot ? Object.keys(D.livres[f].cles).length : 0, cv = couv(l);
         return '<div class="acces-liv' + (cache ? ' masque' : '') + '"><div class="cv" style="' + (cv ? "background-image:url('" + cv + "')" : "background:" + fond(l)) + '"></div><div class="tx"><b>' + esc(l.titre) + '</b>'
           + '<small>' + esc(court(l.categorie || "")) + ' · ' + (prot ? nAcc + ' accès' : 'public') + (FORCER_RECH.has(f) ? ' · <em>sera rechiffré</em>' : '') + '</small><div class="tgs">'
           + tg("vis", f, !cache, cache ? "Caché" : "Visible", ICO.oeil) + tg("constr", f, constrDe(l), "En construction", ICO_CONSTR) + tg("nouv", f, nouvDe(l), "Nouveau", ICO.neuf) + tg("ved", f, REGL.vedette.includes(f), "En vedette", ICO.etoile)
-          + (prot ? '<button class="tg rech' + (FORCER_RECH.has(f) ? ' on' : '') + '" data-rech="' + esc(f) + '" title="Nouvelle clé : seuls ceux qui ont encore l\'accès pourront l\'ouvrir, même avec une vieille copie">' + ICO.cle + 'Couper les anciens accès</button>' : '')
+          + (prot ? '<details class="acces-plusL"' + (FORCER_RECH.has(f) ? ' open' : '') + '><summary title="Plus d\'options" aria-label="Plus d\'options">⋯</summary><button class="tg rech' + (FORCER_RECH.has(f) ? ' on' : '') + '" data-rech="' + esc(f) + '" title="Nouvelle clé : seuls ceux qui ont encore l\'accès pourront l\'ouvrir, même avec une vieille copie">' + ICO.cle + 'Couper les anciens accès</button></details>' : '')
           + '</div></div></div>'; }).join("") + '</div>';
     const volStats = '<div class="acces-per"><button class="abtn' + (FILTRE.per === "12" ? '' : ' prim') + '" data-per="mois">Ce mois-ci</button><button class="abtn' + (FILTRE.per === "12" ? ' prim' : '') + '" data-per="12">12 derniers mois</button></div><div id="gStats"><p class="sous">Chargement des statistiques…</p></div>'
       + '<p class="sous" style="font-size:.78rem;margin-top:12px">Anonyme : on compte seulement combien de fois chaque livre, quiz ou outil est ouvert, jamais par qui.</p>';
@@ -10126,7 +10140,7 @@ window.ACCES = (function(){
       + '<div><b>' + livres.length + '</b><span>livres protégés</span></div><div class="dem"><b id="gStatDem">…</b><span>demandes</span></div>'
       + '<div class="' + (aPublier ? 'pub' : 'ok') + '"><b>' + (aPublier ? '!' : '✓') + '</b><span>' + (aPublier ? 'à publier' : 'tout est publié') + '</span></div></div>'
       + '<div class="acces-onglets">' + ong("profs", "Enseignants") + ong("livres", "Livres") + ong("props", "Propositions") + ong("stats", "Statistiques") + ong("hist", "Historique") + '</div>'
-      + '<div class="acces-pane"' + vol("profs") + '><p class="sous">Touche « Choisir les livres » pour cocher les livres d\'un enseignant, ou ses programmes (EGI, Plomberie) pour tout lui donner d\'un coup. Pastille verte : venu dans les 7 derniers jours. Les changements partent en ligne quand tu touches « Publier ».</p>'
+      + '<div class="acces-pane"' + vol("profs") + '><details class="acces-info"><summary>Comment ça marche</summary><p class="sous">Touche « Choisir les livres » pour cocher les livres d\'un enseignant, ou ses programmes (EGI, Plomberie) pour tout lui donner d\'un coup. Pastille verte : venu dans les 7 derniers jours. Les changements partent en ligne quand tu touches « Publier ».</p></details>'
       + '<div class="acces-outils"><input type="text" id="gQ" enterkeyhint="search" placeholder="Chercher un nom…" value="' + esc(FILTRE.q) + '" autocomplete="off">'
       + '<select id="gTri" title="Trier"><option value="nom"' + (FILTRE.tri === "nom" ? " selected" : "") + '>Trier : nom de famille</option><option value="prog"' + (FILTRE.tri === "prog" ? " selected" : "") + '>Trier : programme</option><option value="peu"' + (FILTRE.tri === "peu" ? " selected" : "") + '>Trier : moins de livres</option></select>'
       + '<div class="acces-puces">' + puce("tous", "Tous") + puce("prof", "Enseignants") + progs.map(pg => puce(pg, court(pg))).join("") + puce("eleve", "Groupes") + '</div></div>'
@@ -10149,8 +10163,8 @@ window.ACCES = (function(){
         ? '<input type="hidden" id="gJeton" value="">'
         : '<p class="sous acces-nocle">Cet appareil n\'a pas encore la clé GitHub : tu peux regarder sans rien publier. <a href="#" id="gAct" style="color:#a9a9ae">Activer la publication ici</a> (une seule fois : la clé ne pourra plus être changée ni affichée).</p>'
           + '<div id="gActZone" hidden><input type="password" id="gJeton" placeholder="Clé GitHub (github_pat_…)" value="" autocomplete="off"><div class="acces-btns" style="justify-content:flex-start"><button class="abtn prim" id="gActOk">Enregistrer la clé</button></div></div>')
-      + '<div class="acces-err" id="gErr"' + (msg && msg.err ? "" : " hidden") + '>' + (msg && msg.err ? esc(msg.err) : "") + '</div><div class="acces-ok" id="gOk"' + (msg && msg.ok ? "" : " hidden") + '>' + (msg && msg.ok ? esc(msg.ok) : "") + '</div>'
-      + '<div class="acces-btns"><button id="gNon">Fermer</button>' + (jeton ? '<button class="prim" id="gPub">Publier</button>' : '') + '</div>';
+      + '<div class="acces-pied"><div class="acces-err" id="gErr"' + (msg && msg.err ? "" : " hidden") + '>' + (msg && msg.err ? esc(msg.err) : "") + '</div><div class="acces-ok" id="gOk"' + (msg && msg.ok ? "" : " hidden") + '>' + (msg && msg.ok ? esc(msg.ok) : "") + '</div>'
+      + '<div class="acces-btns"><span class="acces-etat' + (aPublier ? ' pub' : '') + '">' + (aPublier ? 'Des changements attendent d\'être publiés' : 'Tout est publié') + '</span><button id="gNon">Fermer</button>' + (jeton ? '<button class="prim" id="gPub">Publier</button>' : '') + '</div></div>';
     const B = box(); B.scrollTop = st0;
     B.querySelectorAll("[data-ong]").forEach(b => b.onclick = () => { ONGLET = b.dataset.ong; B.querySelectorAll("[data-ong]").forEach(x => x.classList.toggle("on", x === b));
       B.querySelectorAll(".acces-pane").forEach(p => { p.hidden = p.dataset.pane !== ONGLET; p.classList.toggle("anim", !p.hidden); }); voletCharge(); });
@@ -10270,7 +10284,7 @@ window.ACCES = (function(){
       if (!r.ok) throw new Error("GitHub " + r.status); const L = await r.json();
       const vers = await Promise.all(L.map(c => fetch("https://raw.githubusercontent.com/" + DEPOT + "/" + c.sha + "/comptes.json").then(x => x.ok ? x.json() : null).catch(() => null)));
       HIST = L.map((c, i) => ({ date:c.commit.author.date, d:vers[i], avant:vers[i + 1] })).filter(h => h.d); dessinerHist(); }
-    catch(e){ z.innerHTML = '<p class="sous">Historique indisponible pour l\'instant (' + esc(e.message) + ').</p>'; } }
+    catch(e){ z.innerHTML = '<p class="sous">Historique indisponible pour l\'instant (' + esc(/fetch|network|load/i.test(e.message || "") ? "pas de connexion à GitHub : vérifie Internet et réessaie" : e.message) + ').</p>'; } }
   function changements(a, b){ const out = [], nom = id => (b.comptes[id] || (a && a.comptes[id]) || {}).nom || id, court = f => titreDe(f).replace(/\s*[:(].*$/, "");
     if (!a) return [["neutre", "Première version"]];
     for (const id in b.comptes) if (!a.comptes[id]) out.push(["plus", "Nouveau compte : " + nom(id)]); else if (a.comptes[id].pub.x !== b.comptes[id].pub.x || a.comptes[id].pub.n !== b.comptes[id].pub.n) out.push(["neutre", "Nouveau mot de passe : " + nom(id)]);
