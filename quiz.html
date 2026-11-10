@@ -82,7 +82,15 @@ th{font-size:12px;color:var(--gris);border-top:0}
 .qe .ln input[type=radio]{width:22px;height:22px}
 .qe .tete{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
 .qe .tete b{flex:1}
-.qe .tete button,.qe .tete select{width:auto;padding:7px 10px;font-size:13px}
+.qe .tete button,.qe .tete select{width:auto;padding:7px 10px;font-size:13px;min-height:42px;min-width:42px}
+/* Réglages de l'éditeur refaits (9 nov., même style que la fenêtre d'avant-partie) : deux colonnes, nom à gauche, choix alignés à droite */
+.regD .reg{grid-template-columns:1fr 1fr;gap:2px 30px;margin:4px 0 14px}
+.regD .reg label{display:grid;grid-template-columns:minmax(0,1fr) 280px;align-items:center;gap:10px;padding:5px 0;font-size:14px;font-weight:600;color:var(--txt)}
+.regD .reg .seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:3px;padding:3px;border-radius:11px;background:rgba(128,128,128,.16)}
+.regD .reg .seg button{border:0!important;background:transparent!important;border-radius:8px;min-height:34px;padding:0 3px;font-size:13px;font-weight:600;white-space:nowrap;color:inherit}
+.regD .reg .seg button.on{background:#EB6A22!important;color:#fff!important;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+@media (max-width:1100px){.regD .reg{grid-template-columns:1fr}}
+@media (max-width:640px){.regD .reg label{grid-template-columns:1fr;gap:5px;padding:8px 0}}
 .qe .img{display:flex;gap:10px;align-items:center;margin-top:8px}
 .qe .img img{height:70px;border-radius:8px}
 .qe textarea.ex{min-height:0;height:46px;font-family:inherit;font-size:14px;margin-top:8px}
@@ -424,18 +432,18 @@ Le propane s'accumule…
 <details class="regD"><summary>Réglages de la partie <span>qui joue, points, ordre, temps, sons, couleur… (tu peux aussi les changer juste avant de jouer)</span></summary>
 <div class="reg">
 <label>Qui joue<div class="seg" data-r="mode"><button data-v="ind">Chaque élève</button><button data-v="eq">En équipes</button></div></label>
-<label>Points<div class="seg" data-r="points"><button data-v="vitesse">Selon la vitesse</button><button data-v="fixe">Fixes</button><button data-v="aucun">Sans points</button></div></label>
-<label>Classement après chaque question<div class="seg" data-r="classement"><button data-v="oui">Oui</button><button data-v="non">À la fin seulement</button></div></label>
-<label>Ordre<div class="seg" data-r="melange"><button data-v="non">Tel quel</button><button data-v="q">Questions mêlées</button><button data-v="tout">Questions et choix mêlés</button></div></label>
-<label>Nombre de questions par partie (au hasard)<div class="seg" data-r="nb"><button data-v="tout">Toutes</button><button data-v="10">10</button><button data-v="12">12</button><button data-v="15">15</button><button data-v="20">20</button></div></label>
-<label>Temps pour répondre<div class="seg" data-r="temps"><button data-v="moins">Plus court</button><button data-v="normal">Normal</button><button data-v="plus">Plus long</button></div></label>
-<label>Pénalité (mauvaise réponse : −250)<div class="seg" data-r="penalite"><button data-v="non">Non</button><button data-v="oui">Oui</button></div></label>
-<label>Choix cachés 5 s (lire avant de répondre)<div class="seg" data-r="cache"><button data-v="non">Non</button><button data-v="oui">Oui</button></div></label>
-<label>Texte des choix seulement sur l'iPad<div class="seg" data-r="lettres"><button data-v="non">Non</button><button data-v="oui">Oui</button></div></label>
-<label>Double ou rien à la dernière question<div class="seg" data-r="double"><button data-v="non">Non</button><button data-v="oui">Oui</button></div></label>
+<label>Points<div class="seg" data-r="points"><button data-v="vitesse">Vitesse</button><button data-v="fixe">Fixes</button><button data-v="aucun">Aucun</button></div></label>
+<label>Classement<div class="seg" data-r="classement"><button data-v="oui">Chaque question</button><button data-v="non">À la fin</button></div></label>
+<label>Mêler<div class="seg" data-r="melange"><button data-v="non">Rien</button><button data-v="q">Questions</button><button data-v="tout">Tout</button></div></label>
+<label>Questions par partie<div class="seg" data-r="nb"><button data-v="tout">Toutes</button><button data-v="10">10</button><button data-v="12">12</button><button data-v="15">15</button><button data-v="20">20</button></div></label>
+<label>Temps pour répondre<div class="seg" data-r="temps"><button data-v="moins">Court</button><button data-v="normal">Normal</button><button data-v="plus">Long</button></div></label>
+<label>Pénalité (−250 si faux)<div class="seg" data-r="penalite"><button data-v="non">Non</button><button data-v="oui">Oui</button></div></label>
+<label>Choix cachés 5 s<div class="seg" data-r="cache"><button data-v="non">Non</button><button data-v="oui">Oui</button></div></label>
+<label>Choix sur l'iPad seulement<div class="seg" data-r="lettres"><button data-v="non">Non</button><button data-v="oui">Oui</button></div></label>
+<label>Double ou rien (dernière)<div class="seg" data-r="double"><button data-v="non">Non</button><button data-v="oui">Oui</button></div></label>
 <label>Sons au tableau<div class="seg" data-r="son"><button data-v="oui">Oui</button><button data-v="non">Non</button></div></label>
-<label>Musique pendant les questions<div class="seg" data-r="musique"><button data-v="oui">Oui</button><button data-v="non">Non</button></div></label>
-<label>Bonus de série (3 bonnes de suite et plus : +100, +200, +300)<div class="seg" data-r="bonus"><button data-v="oui">Oui</button><button data-v="non">Non</button></div></label>
+<label>Musique<div class="seg" data-r="musique"><button data-v="oui">Oui</button><button data-v="non">Non</button></div></label>
+<label title="3 bonnes de suite et plus : +100, +200, +300">Bonus de série<div class="seg" data-r="bonus"><button data-v="oui">Oui</button><button data-v="non">Non</button></div></label>
 <label>Couleur du quiz<div class="coul" id="eCoul"></div></label>
 </div></details>
 <div id="eQs"></div>
