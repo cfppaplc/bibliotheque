@@ -6721,27 +6721,27 @@ window.__htmlImpression = htmlImpression;
 (function(){
   const tb = $("#tb"), more = $("#tbMore"), pop = $("#tbPop"), grid = $("#tbGrid");
   const MOV = ["tbPen","tbAns","tbAnim","tbZo","tbZv","tbZi","tbTimer","tbSpot","tbCache","tbWb","tbMenu","tbLaser","tbNoir","tbMark","tbHelp","tbDbl","tbPin","tbPrint","tbQr","tbTele","tbFs"];
-  const DEF = { bar:["tbPen","tbAns","tbAnim","tbZo","tbZv","tbZi","tbWb","tbMenu","tbDbl","tbTele","tbFs"], menu:["tbTimer","tbSpot","tbCache","tbLaser","tbNoir","tbMark","tbHelp","tbPin","tbPrint","tbQr"] };
+  const DEF = { bar:["tbAns","tbAnim","tbMenu","tbPen","tbWb","tbZv","tbDbl","tbFs","tbTele"], menu:["tbTimer","tbSpot","tbCache","tbLaser","tbNoir","tbMark","tbHelp","tbPin","tbPrint","tbQr","tbZo","tbZi"] };   /* 9 nov. : groupes Présenter · Écrire · Affichage; zoom − / + dans « Plus d'outils » (roulette et pincement suffisent) */
   MOV.forEach(id => $("#" + id).classList.add("mov"));
   const el = id => document.getElementById(id);
   const etiquette = b => { let l = b.querySelector(".tbl"); if (grid.contains(b)){ if (!l){ l = document.createElement("span"); l.className = "tbl"; b.appendChild(l); } l.textContent = b.getAttribute("aria-label") || b.title; } else if (l) l.remove(); };
   /* téléphone : une seule rangée (page précédente, numéro, page suivante, réponses, modules, plus) */
   const TEL = matchMedia("(max-width:640px)").matches;
   const DEF_TEL = { bar:["tbAns","tbMenu"], menu:["tbPen","tbQr","tbMark","tbAnim","tbZo","tbZv","tbZi","tbTimer","tbSpot","tbCache","tbWb","tbLaser","tbNoir","tbHelp","tbDbl","tbPin","tbPrint","tbFs","tbTele"] };
-  const lire = () => { const L = lireLS(TEL ? "tbLayoutTel" : "tbLayout", null); const ok = L && Array.isArray(L.bar) && Array.isArray(L.menu); return ok ? L : TEL ? DEF_TEL : DEF; };
+  const lire = () => { const L = lireLS(TEL ? "tbLayoutTel" : "tbLayout2", null); const ok = L && Array.isArray(L.bar) && Array.isArray(L.menu); return ok ? L : TEL ? DEF_TEL : DEF; };
   const appliquer = L => {
     const vus = new Set(), place = (id, cont, avant) => { const b = el(id); if (!b || vus.has(id) || !MOV.includes(id)) return; vus.add(id); if (avant) cont.insertBefore(b, avant); else cont.appendChild(b); };
     L.bar.forEach(id => place(id, tb, more)); L.menu.forEach(id => place(id, grid));
     MOV.forEach(id => { if (!vus.has(id)) place(id, DEF.menu.includes(id) ? grid : tb, DEF.menu.includes(id) ? null : more); });
     MOV.forEach(id => etiquette(el(id)));
   };
-  const sauver = () => { try { localStorage.setItem(TEL ? "tbLayoutTel" : "tbLayout", JSON.stringify({ bar:MOV.filter(id => el(id).parentNode === tb).sort((a, b) => (el(a).compareDocumentPosition(el(b)) & 4) ? -1 : 1), menu:[...grid.children].map(b => b.id) })); } catch(e){} };
+  const sauver = () => { try { localStorage.setItem(TEL ? "tbLayoutTel" : "tbLayout2", JSON.stringify({ bar:MOV.filter(id => el(id).parentNode === tb).sort((a, b) => (el(a).compareDocumentPosition(el(b)) & 4) ? -1 : 1), menu:[...grid.children].map(b => b.id) })); } catch(e){} };
   appliquer(lire());
   const fermer = () => { if (tb.classList.contains("edit")) return; pop.classList.remove("open"); more.setAttribute("aria-expanded", "false"); more.classList.remove("on"); };
   const ouvrir = () => { pop.classList.add("open"); more.setAttribute("aria-expanded", "true"); more.classList.add("on"); };
   more.onclick = e => { e.stopPropagation(); if (pop.classList.contains("open")){ tb.classList.remove("edit"); fermer(); } else ouvrir(); };
   $("#tbOrg").onclick = () => { tb.classList.toggle("edit"); $("#tbOrg").textContent = tb.classList.contains("edit") ? "✔ Terminé" : "✎ Organiser"; if (!tb.classList.contains("edit")) sauver(); };
-  $("#tbRaz").onclick = () => { try { localStorage.removeItem(TEL ? "tbLayoutTel" : "tbLayout"); } catch(e){} appliquer(TEL ? DEF_TEL : DEF); };
+  $("#tbRaz").onclick = () => { try { localStorage.removeItem(TEL ? "tbLayoutTel" : "tbLayout2"); } catch(e){} appliquer(TEL ? DEF_TEL : DEF); };
   /* un clic sur un outil du menu le referme (sauf en mode organiser) */
   grid.addEventListener("click", () => setTimeout(fermer, 0));
   document.addEventListener("pointerdown", e => { if (pop.classList.contains("open") && !tb.classList.contains("edit") && !pop.contains(e.target) && e.target !== more && !more.contains(e.target)) fermer(); }, true);
@@ -10628,6 +10628,21 @@ body.visiteur .mp-pied{margin-top:30px}
   .reader.wbon .penbar>button[data-mot]{flex-direction:column;gap:3px;min-width:64px;height:60px;padding:5px 6px}
   .reader.wbon .penbar>button[data-mot]::after{content:attr(data-mot);font-size:.7rem;font-weight:600;line-height:1;white-space:nowrap}
   .reader.wbon .penbar #penFs{display:none!important}
+  /* ---- Lecteur de livres (9 nov.) : mots sous les icônes, groupes, crayon à la place de la barre, même bulle que le tableau blanc ---- */
+  #tb{min-height:78px}
+  #tb>button[data-mot]{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-width:66px;height:60px;padding:5px 6px}
+  #tb>button[data-mot]::after{content:attr(data-mot);font-size:.7rem;font-weight:600;line-height:1;white-space:nowrap}
+  #tb>#tbAns,#tb>#tbPen,#tb>#tbZv,#tb>#tbTele{margin-left:16px}
+  .reader:not(.wbon):not(.pen-side):not(.pen-fold):has(#penBar:not([hidden])) #tb>*:not(#tbPrev):not(#tbPg):not(#tbTot):not(#tbNext){display:none!important}
+  .reader:not(.wbon):not(.pen-side):not(.pen-fold) .penbar{bottom:calc(11px + env(safe-area-inset-bottom,0px))!important;left:calc(50% + 124px);transform:none;flex-wrap:nowrap;border-color:#333;box-shadow:none;background:#000;z-index:45}
+  .reader:not(.wbon):not(.pen-side):not(.pen-fold) .penbar>#penFold,.reader:not(.wbon):not(.pen-side):not(.pen-fold) .penbar>#penSide,.reader:not(.wbon):not(.pen-side):not(.pen-fold) .penbar>.sep,.reader:not(.wbon) .penbar>#penFs{display:none!important}
+  .reader:not(.wbon):not(.pen-side):not(.pen-fold) .penbar>#penDone{display:inline-flex!important;align-items:center;background:#EB6A22;border-color:#EB6A22;color:#fff;font-weight:700;font-size:.9rem;padding:0 16px;margin-left:8px}
+  .reader:not(.wbon) .penbar #popCol .prang:has(.ptrace),.reader:not(.wbon) .penbar #popCol .prang:has(.plarg),.reader:not(.wbon) .penbar #popCol .prang>.lab{display:none!important}
+  .reader:not(.wbon) .penbar #popCol .wbq.gros{display:inline-flex;border:0;padding:0;gap:8px;min-height:0}
+  .reader:not(.wbon):not(.pen-side) .penbar #popCol{left:0;transform:none}
+  .reader:not(.wbon):not(.pen-side) .penbar #popPlus{left:auto;right:0;transform:none}
+  .reader:not(.wbon) .penbar #penCol{position:relative}
+  .reader:not(.wbon) .penbar #penCol::before{content:"";position:absolute;top:2px;right:2px;width:11px;height:11px;border-radius:50%;background:var(--pcb,#e2483d);border:2px solid #f4f4f5}
   /* Outils regroupés par catégorie (9 nov.) : Écrire | Dessiner et outils | Tableaux | Plus; mêmes icônes, un espace entre les groupes */
   .reader.wbon .penbar .sep{display:none}
   .reader.wbon .penbar .wbq{border:0;padding:0 2px}
@@ -10659,6 +10674,7 @@ body.visiteur .mp-pied{margin-top:30px}
   .reader.wbon .penbar .wbq.nav{order:30;margin-left:18px}.reader.wbon .penbar #penPlus{order:40;margin-left:12px}
 }
 .penbar .wbq{display:none}
+#penDone{display:none}
 .reader:not(.wbon) #wbToutB,.reader:not(.wbon) #wbRetB{display:none!important}
 .reader.wbon .penbar .wbq{display:inline-flex;align-items:center;gap:6px;padding:0 6px;border-left:1px solid #2f2f33;border-right:1px solid #2f2f33;min-height:44px}
 .penbar .wbq button.c{min-width:34px;width:34px;height:34px;border-radius:50%;background:var(--c);border:2px solid #3a3a40;padding:0}
@@ -10726,11 +10742,15 @@ body.visiteur .mp-pied{margin-top:30px}
 
   /* 3. mots sous les icônes */
   /* la rangée « Tracé » est cachée sur le tableau blanc : toujours revenir au trait libre */
-  document.addEventListener("click", e => { if (!e.target.closest || !e.target.closest("#penCol") || !RD.wb || innerWidth < 900) return;
+  document.addEventListener("click", e => { if (!e.target.closest || !e.target.closest("#penCol") || innerWidth < 900) return;
     const t = document.querySelector("#popCol .ptrace"); if (t && !t.classList.contains("on")) t.click();
     /* crayon déjà actif : toucher « Crayon » ouvre la bulle des couleurs (un 2e toucher range le crayon) */
     const pc = document.getElementById("popCol"), actif = !RD.eraser && !RD.text && !RD.obj && !RD.crayonOff;
     if (actif && pc && pc.hidden){ e.stopPropagation(); e.preventDefault(); const pp = document.getElementById("popPlus"); if (pp) pp.hidden = true; pc.hidden = false; e.target.closest("#penCol").classList.add("open"); } }, true);
+  /* Lecteur de livres (9 nov.) : mots sous les icônes de la barre, bouton « Terminé » de la barre du crayon */
+  { const M = { tbPen:"Crayon", tbAns:"Réponses", tbAnim:"Animation", tbWb:"Tableau blanc", tbMenu:"Sommaire", tbDbl:"2 pages", tbTele:"Télécommande", tbFs:"Plein écran", tbMore:"Plus", tbTimer:"Minuterie", tbSpot:"Projecteur", tbCache:"Cache", tbLaser:"Laser", tbNoir:"Écran noir", tbMark:"Signet", tbHelp:"Raccourcis", tbPin:"Barres", tbPrint:"Imprimer", tbQr:"Code QR" };
+    Object.keys(M).forEach(id => { const b = document.getElementById(id); if (b) b.dataset.mot = M[id]; });
+    const d = document.createElement("button"); d.type = "button"; d.id = "penDone"; d.textContent = "Terminé"; d.title = "Ranger le crayon et revenir aux outils du livre"; d.onclick = () => { const t = Q("#tbPen"); if (t) t.click(); }; bar.appendChild(d); }
   const MOTS = { penFold:"Cacher", penCol:"Crayon", penT:"Texte", penO:"Formes", penE:"Gomme", penU:"Annuler", wbF:"Fond", penPlus:"Plus" };
   Object.keys(MOTS).forEach(id => { const b = document.getElementById(id); if (b && b.parentNode === bar) b.dataset.mot = MOTS[id]; });
 
@@ -10758,10 +10778,11 @@ body.visiteur .mp-pied{margin-top:30px}
   qg.addEventListener("click", e => { const b = e.target.closest("[data-qg]"); if (!b) return; e.stopPropagation();
     const i = document.querySelector("#popCol .plarg input"); if (i){ i.value = b.dataset.qg; i.dispatchEvent(new Event("input", {bubbles:true})); } else RD.wPx = +b.dataset.qg; crayon(); refreshTools(); });
   /* le menu de la gomme s'ouvre au-dessus de son bouton */
-  bar.addEventListener("click", e => { if (!RD.wb || innerWidth < 900 || !e.target.closest || !e.target.closest("#penE")) return;
+  bar.addEventListener("click", e => { if (innerWidth < 900 || !e.target.closest || !e.target.closest("#penE")) return;
     setTimeout(() => { const g = Q("#popGom"), b = Q("#penE"); if (g && b){ g.style.left = Math.max(8, Math.min(b.offsetLeft, bar.clientWidth - g.offsetWidth - 8)) + "px"; g.style.transform = "none"; } }, 0); });
-  setInterval(() => { if (!RD.wb) return; const actif = !RD.crayonOff && !RD.eraser && !RD.text;
-    try { const bc = Q("#penCol"), cur = bc && bc.querySelector(".pcur"); if (cur) bc.style.setProperty("--pcb", cur.style.getPropertyValue("--pc") || "#e2483d");   /* pastille de la couleur en cours sur « Crayon » */
+  setInterval(() => { try { const bc = Q("#penCol"), cur = bc && bc.querySelector(".pcur"); if (cur && bc.offsetWidth) bc.style.setProperty("--pcb", cur.style.getPropertyValue("--pc") || "#e2483d"); } catch(e){}
+    if (!RD.wb) return; const actif = !RD.crayonOff && !RD.eraser && !RD.text;
+    try {   /* pastille de la couleur en cours sur « Crayon » */
       const zv = Q("#wbZv"), t = Math.round(RD.z / zMin() * 100) + "%"; if (zv && zv.textContent !== t) zv.textContent = t; } catch(e){}   /* 100 % = la vue de départ du tableau */
     qc.querySelectorAll("button").forEach(b => b.classList.toggle("on", actif && RD.color === b.dataset.qc));
     qg.querySelectorAll("button").forEach(b => b.classList.toggle("on", actif && +RD.wPx === +b.dataset.qg)); }, 300);
