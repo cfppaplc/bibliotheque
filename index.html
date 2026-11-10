@@ -6604,7 +6604,7 @@ function planifierBarres(ms){
     if (!$("#reader").classList.contains("open") || BAR.fixe) return;
     if (barresOccupees()){ planifierBarres(1500); return; }
     $("#reader").classList.add("calme");
-  }, ms || 3200);
+  }, ms || 8000);   /* 10 nov. : 3,2 s → 8 s (« disparaît trop tôt ») */
 }
 function afficherBarres(){
   const r = $("#reader"); if (!r.classList.contains("open")) return;
@@ -10724,6 +10724,7 @@ body.visiteur .mp-pied{margin-top:30px}
   .reader.wbon .penbar .wbq.nav{order:30;margin-left:18px}.reader.wbon .penbar #penPlus{order:40;margin-left:12px}
 }
 .penbar .wbq{display:none}
+#penBar,#tb{touch-action:pan-x}
 #penDone{display:none}
 /* Écran tactile (revue de nuit du 9 nov.) : petits liens et pastilles trop bas pour le doigt → au moins 40 px de haut */
 @media (pointer:coarse){.qn2-ret,.ah-mf,.ah-go,#bvQn,#pRaz,#acOubli,#acDem,.acces-lien{min-height:40px;display:inline-flex;align-items:center}#ahX{min-width:40px;min-height:40px}
@@ -10962,4 +10963,18 @@ body:has(.reader.open:not(.wbon)) .toast{bottom:calc(98px + env(safe-area-inset-
 </script>
 <script>document.documentElement.classList.add("pret")</script>
 <script src="mesdocs.js"></script>
+<script>
+/* 10 nov. (Jeremy) : glisser vers le bas sur une barre du bas = la cacher (tableau blanc : comme la flèche; livre : barres cachées, un toucher les ramène) */
+(() => { let D = null;
+  document.addEventListener("pointerdown", e => { const bar = e.target.closest && e.target.closest("#penBar, #tb"); D = bar ? {bar, x: e.clientX, y: e.clientY, fait: false} : null; }, true);
+  document.addEventListener("pointermove", e => { if (!D || D.fait) return; const dy = e.clientY - D.y, dx = Math.abs(e.clientX - D.x);
+    if (dy < 45 || dy < dx * 1.5) return; D.fait = true; const R = document.getElementById("reader"); if (!R || !R.classList.contains("open")) return;
+    if (D.bar.id === "penBar" && R.classList.contains("wbon")) { if (!R.classList.contains("pen-fold")) { const f = document.getElementById("penFold"); if (f) f.click(); } }
+    else if (D.bar.id === "tb" && !R.classList.contains("wbon")) { try { clearTimeout(BAR.t); } catch(x) {} R.classList.add("calme"); }
+    const stop = ev => { ev.stopPropagation(); ev.preventDefault(); document.removeEventListener("click", stop, true); };
+    document.addEventListener("click", stop, true); setTimeout(() => document.removeEventListener("click", stop, true), 400); }, true);
+  document.addEventListener("pointerup", () => { D = null; }, true);
+  document.addEventListener("pointercancel", () => { D = null; }, true);
+})();
+</script>
 </body></html>
