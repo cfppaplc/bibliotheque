@@ -384,7 +384,8 @@
   .reader.wbon .rb-logo{order:-2}
   .reader.wbon .reader-bar{background:#0c0c0d;border-bottom:1px solid #232325}
   .reader.wbon #readerTdb,.reader.wbon #readerBack{white-space:nowrap;min-height:40px;padding:8px 14px;border:1px solid rgba(255,255,255,.22);border-radius:10px;background:transparent;font-size:14px;font-weight:600;color:#fff}
-  .reader.wbon #readerBack{font-size:0}.reader.wbon #readerBack::before{content:"‹ Bibliothèque";font-size:14px}
+  .reader.wbon #readerBack{font-size:0}.reader.wbon #readerBack::before{content:attr(data-ret);font-size:14px}
+  .reader.wbon #readerTdb{display:none!important}
   .reader-bar .mp-tit,.reader-bar .mp-nav{display:none!important}
   .reader.wbon .reader-bar .mp-tit{display:flex!important}
   .reader.wbon #readerTitle{display:none}
@@ -1099,7 +1100,7 @@ html.leger{scroll-behavior:auto}
 </head><body>
 <script>/* 8 nov. : déjà connecté sur cet appareil → en-tête et accueil d'enseignant dès la 1re image (plus d'ancien en-tête une seconde) */try{if(localStorage.getItem("etaitConnecte"))document.body.classList.add("pre-co")}catch(e){}
 /* arrivée d'une autre page avec ?ouvrir=… : l'accueil reste caché (écran noir) jusqu'à ce que l'outil s'ouvre, au lieu de clignoter */
-if(/[?&]ouvrir=/.test(location.search)){document.documentElement.classList.add("ouvre");setTimeout(function(){document.documentElement.classList.remove("ouvre")},5000)}</script>
+if(/[?&]ouvrir=/.test(location.search)){try{var _r=document.referrer&&new URL(document.referrer);if(_r&&_r.origin===location.origin&&!/\/(index\.html)?$/.test(_r.pathname))window.MP_RETOUR=document.referrer}catch(_e){}document.documentElement.classList.add("ouvre");setTimeout(function(){document.documentElement.classList.remove("ouvre")},5000)}</script>
 <header id="topbar">
   <div class="logo"><span class="logo-pav"><img class="lg-blc" src="img/metier-plus-blanc.svg" alt="Métier+"><img class="lg-clr" src="img/metier-plus.svg" alt=""></span><span class="logo-t">Bibliothèque</span></div><nav class="mp-nav mp-nav-tete" aria-label="Outils"><a href="./" data-nav="biblio" class="ici" aria-current="page"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h12v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5"/></svg>Bibliothèque</a><a href="./?ouvrir=plans" data-nav="plans"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3z"/><path d="M9 3v15M15 6v15"/></svg>Plans</a><a href="./?ouvrir=activites" data-nav="activites"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4h6v3H9zM9 12h6M9 16h4"/></svg>Formatifs</a><a href="labo.html" data-nav="labo"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-9V3"/></svg>Labo</a><a href="./?ouvrir=accueil" data-nav="accueil"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Accueil de classe</a><a href="./?ouvrir=tableau" data-nav="tableau"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>Tableau blanc</a></nav>
   <nav>
@@ -10975,6 +10976,22 @@ body:has(.reader.open:not(.wbon)) .toast{bottom:calc(98px + env(safe-area-inset-
     document.addEventListener("click", stop, true); setTimeout(() => document.removeEventListener("click", stop, true), 400); }, true);
   document.addEventListener("pointerup", () => { D = null; }, true);
   document.addEventListener("pointercancel", () => { D = null; }, true);
+})();
+</script>
+<script>
+/* 10 nov. (Jeremy) : bouton de retour dynamique = revient à la page d'avant.
+   Arrivé d'une autre page (Labo, quiz…) par ?ouvrir= : le retour de l'outil ouvert y ramène (MP_RETOUR, posé en tête de page).
+   Tableau blanc : « ‹ Accueil de classe » s'il a été ouvert depuis l'accueil de classe, sinon « ‹ Bibliothèque ». */
+(() => { const NOMS = {"labo.html":"Labo","quiz.html":"Quiz","simulateur.html":"Simulateur","accueil.html":"Accueil de classe"};
+  const nomRet = () => { try { const f = new URL(window.MP_RETOUR).pathname.split("/").pop(); return NOMS[f] || "Retour"; } catch(x) { return "Retour"; } };
+  const rb = document.getElementById("readerBack"), pc = document.getElementById("plClose"), ab = document.getElementById("actBack");
+  const ecrire = (b, t) => { if (!b) return; const l = b.querySelector(".pl-lbl"); if (l) l.textContent = t; else { const n = [...b.childNodes].reverse().find(x => x.nodeType === 3); if (n) n.textContent = t; } };
+  const maj = () => { if (rb) rb.dataset.ret = "‹ " + (window.TDB_ACTIF ? "Accueil de classe" : window.MP_RETOUR ? nomRet() : "Bibliothèque");
+    const t = window.MP_RETOUR ? nomRet() : "Bibliothèque"; ecrire(pc, t); ecrire(ab, t); };
+  maj(); setInterval(maj, 600);
+  const ret = e => { if (!window.MP_RETOUR || window.TDB_ACTIF) return; if (e.currentTarget === rb && !document.getElementById("reader").classList.contains("wbon")) return;
+    e.stopImmediatePropagation(); e.preventDefault(); const u = window.MP_RETOUR; window.MP_RETOUR = null; if (history.length > 1) history.back(); else location.href = u; };
+  [rb, pc, ab].forEach(b => b && b.addEventListener("click", ret, true));
 })();
 </script>
 </body></html>
