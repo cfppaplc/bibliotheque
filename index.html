@@ -1650,7 +1650,7 @@ function renderHero(){
   h.classList.remove("hp");
   h.style.cssText = "background:linear-gradient(120deg,#1b2540 0%,#141414 68%)";
   if (estVisiteur()){   /* visiteur (pas connecté) : accueil simplifié, 8 nov. */
-    h.innerHTML = `<div class="hero-content"><h1>L'atelier, au tableau.</h1>
+    h.innerHTML = `<div class="hero-content"><h1>Enseigner un métier, simplement.</h1>
       <p>Métier+ réunit les livres de cours animés, les plans techniques, les formatifs, les quiz et les simulations des enseignants en formation professionnelle. <span class="hero-tag">Réservé aux enseignants du Pavillon de l'Avenir</span></p>
       <div class="vis-btns"><button class="vis-co" id="visCo" type="button">Se connecter</button><button class="vis-dem" id="visDem" type="button">Demander un accès</button><a class="vis-dec" href="presentation.html">Découvrir Métier+ ›</a></div></div>
       <div class="hero-stack">${vedettes().map(l => `<img src="${esc(couv(l))}" alt="">`).join("")}</div>`;
@@ -9993,7 +9993,7 @@ window.ACCES = (function(){
     const C = window.COUVERTURES || {}, ls = Object.keys(C).slice(0, 10).map(f => C[f]);
     const col = (a, d) => '<div class="co-col" style="--d:' + d + 's">' + [...a, ...a].map(u => '<img src="' + u + '" alt="">').join("") + '</div>';
     return '<div class="co-vis" aria-hidden="true"><div class="co-murs">' + (ls.length ? col(ls.filter((x, k) => k % 2 === 0), 0) + col(ls.filter((x, k) => k % 2 === 1), -14) : '') + '</div>'
-      + '<div class="co-txt"><img src="img/metier-plus-blanc.svg" alt=""><b>L\'atelier, au tableau.</b><span>Tes livres, tes plans, tes formatifs, tes quiz et tes simulations, au même endroit.</span></div></div>';
+      + '<div class="co-txt"><img src="img/metier-plus-blanc.svg" alt=""><b>Enseigner un métier, simplement.</b><span>Tes livres, tes plans, tes formatifs, tes quiz et tes simulations, au même endroit.</span></div></div>';
   }
   function dlgConnexion(apres){
     let id0 = "", nom0 = ""; try { id0 = localStorage.getItem("dernierId") || ""; nom0 = localStorage.getItem("dernierNom") || ""; } catch(e){}
