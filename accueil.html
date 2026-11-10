@@ -313,6 +313,7 @@ html #prep .sheet-in.prep2 { width: min(1240px, calc(100vw - 32px)); display: gr
 .sem-c.on { outline: 2.5px solid #EB6A22; outline-offset: 1px; }
 .sem-c.sem-vise { background: rgba(235,106,34,.25); border-style: solid; }
 .sem-c.sem-src { opacity: .4; }
+.sem-c.plein { touch-action: none; }   /* au doigt, glisser un cours = copier (et non faire défiler la fenêtre) */
 .sem-tag { position: absolute; top: 3px; left: 50%; transform: translateX(-50%); font-style: normal; font-size: 9.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: #2f9e44; white-space: nowrap; }
 .sem-c.tab > span { margin-top: 10px; }
 .sem-fantome { position: fixed; z-index: 99999; pointer-events: none; opacity: .9; box-shadow: 0 8px 24px rgba(0,0,0,.35); background: #EB6A22 !important; color: #fff; }
@@ -2191,6 +2192,9 @@ function semaine(){
     if (b.classList.contains("plein")) b.addEventListener("pointerdown", e => glisserCours(e, b)); });
 }
 /* glisser un cours vers une période libre = copie (rien n'est jamais écrasé) */
+/* Tableau interactif : après un glissé, la fenêtre pouvait rester blanche (affichage pas rafraîchi) : on force un nouveau dessin */
+function repeindrePrep(){ const f = document.querySelector("#prep .sheet-in"); if (!f) return;
+  requestAnimationFrame(() => { f.style.display = "none"; void f.offsetHeight; f.style.display = ""; const y = f.scrollTop; f.scrollTop = y + 1; f.scrollTop = y; }); }
 function glisserCours(e, src){
   const x0 = e.clientX, y0 = e.clientY; let fant = null, cible = null;
   const mv = ev => { if (!fant && Math.hypot(ev.clientX - x0, ev.clientY - y0) < 8) return;
@@ -2204,7 +2208,7 @@ function glisserCours(e, src){
     cible.classList.remove("sem-vise"); const P = contenuDe(src.dataset.k); if (!P) return;
     const k = cible.dataset.k; cfg.plans = cfg.plans || {}; cfg.plans[k] = JSON.parse(JSON.stringify(Object.assign({}, P, { examen: false })));
     save(); const [j, per] = k.split("|"); peMsg("Cours copié : " + nomJour(j).toLowerCase() + " " + (per === "am" ? "matin" : "après-midi") + ".");
-    remplirPrep(j === isoJour(new Date()) ? "" : j, per); };
+    remplirPrep(j === isoJour(new Date()) ? "" : j, per); repeindrePrep(); };
   addEventListener("pointermove", mv); addEventListener("pointerup", up); addEventListener("pointercancel", up);
 }
 function boutonsJours(){
