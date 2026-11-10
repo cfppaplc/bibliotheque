@@ -216,6 +216,7 @@ body.presseJ #joueur::after{content:"";position:fixed;inset:0;pointer-events:non
 #man.m3 .mbig:disabled{background:#232c40;box-shadow:none}#man.m3 .mbig:active{transform:scale(.98)}
 #man.m3 #mAutre{background:#161d2c;border:1px solid #3A4358}
 #man.m3 .mvolc .mbar{flex:none}#man.m3 .mvol{flex:none}#man.m3 .mfin{background:transparent;border:1px solid #3A4358;color:#9AA3B5;min-height:48px;font-size:15px}
+body.celCo #animBar{display:none!important}
 #man .m2{min-height:60px;border-radius:14px;background:#2A3245;color:#F2EFEA;font-size:18px;font-weight:700;border:0}#man .m2.cache{display:none}
 #tiroir iframe{width:100%;height:100%;border:0;display:block}
 #tiroir .fermer{position:absolute;left:-46px;top:12px;width:40px;height:40px;padding:0;border-radius:10px;background:#24211E;color:#fff;font-size:20px}
@@ -1346,13 +1347,15 @@ function animer(boutons){
      dès que son cellulaire envoie une commande avec la bonne clé, il disparaît et l'écran des élèves (code QR des élèves) apparaît. */
   { const mb = $("musB"), maj = () => { if (mb && window.quizMusiqueNom) mb.textContent = "♪ " + quizMusiqueNom(); };
     if (mb){ setTimeout(maj, 300); mb.onclick = () => { quizMusique(); maj(); }; $("volM").onclick = () => { const v = quizVolume(-.2); mb.title = "Volume " + Math.round(v * 100) + " %"; }; $("volP").onclick = () => { const v = quizVolume(.2); mb.title = "Volume " + Math.round(v * 100) + " %"; }; } }
-  window.manetteVue = m => { if (!m.k || m.k !== animer.mk) return; animer.cell = true; $("celOv").classList.add("cache"); $("celB").textContent = "Cell branché";
+  window.manetteVue = m => { if (!m.k || m.k !== animer.mk) return; animer.cell = true; animer.celVu = Date.now(); document.body.classList.add("celCo"); $("celOv").classList.add("cache"); $("celB").textContent = "Cell branché";
     const env = () => { const b = $("bSon"); envoyer(PREFIXE + animer.code, {m: "mson", on: !!(b && b.classList.contains("actif"))}); };
     const envM = () => envoyer(PREFIXE + animer.code, {m: "mmus", nom: window.quizMusiqueNom ? quizMusiqueNom() : "", vol: +(localStorage.quizVolume || 1)});
     if (m.b === "son") { const b = $("bSon"); if (b) b.click(); setTimeout(env, 150); }
     else if (m.b === "mus" && window.quizMusique) { quizMusique(); envM(); }
     else if ((m.b === "vol+" || m.b === "vol-") && window.quizVolume) { quizVolume(m.b === "vol+" ? .2 : -.2); envM(); }
     else if (m.b === "etat") { env(); envM(); } };
+  /* 10 nov. : barre du bas cachée tant que le cellulaire est branché (il envoie « etat » aux 8 s); revient après 30 s sans nouvelles */
+  setInterval(() => { if (animer.celVu && Date.now() - animer.celVu > 30000) document.body.classList.remove("celCo"); }, 5000);
   const auto = setInterval(() => { if (!animer.code || !animer.mk) return; clearInterval(auto);
     let deja = false; try { deja = sessionStorage.getItem("celPropose") === animer.code; sessionStorage.setItem("celPropose", animer.code); } catch(x) {}
     if (!deja && !animer.cell) $("celB").click(); }, 300);
