@@ -100,8 +100,8 @@
   h.style.background = clair ? "#F5EFE3" : "#0e1320";
   window.__pretAccueil = function(){ h.classList.add("pret"); }; setTimeout(window.__pretAccueil, 3000); })();
 </script>
-<style>html:not(.pret)>body{visibility:hidden}html.pret>body{animation:accPret .25s ease backwards}@keyframes accPret{from{opacity:0}to{opacity:1}}</style>
-</head>
+<style>html:not(.pret)>body{visibility:hidden}html.pret>body{animation:none}@keyframes accPret{from{opacity:0}to{opacity:1}}</style>
+<style>html.mn-plein .app,html.mn-plein #mpFond,html.mn-plein #bgfx,html.mn-plein #ambfx,html.mn-plein #ambLum,html.mn-plein #lueur,html.mn-plein #mpCoin{visibility:hidden!important}</style></head>
 <body>
 <meta name="robots" content="noindex">
 <title>Métier+ — Accueil de classe</title>
@@ -3193,6 +3193,7 @@ html.apercu-mode #menage{display:none}
   document.getElementById("mnMini").onclick = e => { e.stopPropagation(); if (force && !actifVu) { force = false; montrer(false); if (APERCU) { APERCU = null; rendu = ""; ed.hidden = false; } return; } mini = true; el.classList.add("mini"); };
   el.addEventListener("click", () => { if (mini) { mini = false; el.classList.remove("mini"); } });
   function montrer(on){
+    document.documentElement.classList.toggle("mn-plein", !!on);
     if (on && el.hidden) { el.style.transition = "none"; el.hidden = false; el.classList.add("on"); void el.offsetHeight; el.style.transition = ""; }   /* ouverture nette, sans fondu (le fondu montrait l'accueil à travers, sur le tableau) */
     else if (!on && !el.hidden) { el.style.transition = "none"; el.classList.remove("on"); el.hidden = true; void el.offsetHeight; el.style.transition = ""; }   /* fermeture nette : le fondu laissait un fantôme du ménage sur le tableau (vidéo du 10 nov.) */
   }
