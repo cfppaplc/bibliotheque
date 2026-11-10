@@ -10631,7 +10631,11 @@ body.visiteur .mp-pied{margin-top:30px}
   /* Outils regroupés par catégorie (9 nov.) : Écrire | Dessiner et outils | Tableaux | Plus; mêmes icônes, un espace entre les groupes */
   .reader.wbon .penbar .sep{display:none}
   .reader.wbon .penbar .wbq{border:0;padding:0 2px}
-  .reader.wbon .penbar #penFold{order:-1}
+  .reader.wbon .penbar #penFold{order:50;min-width:30px!important;width:30px;padding:0!important;margin-left:4px;opacity:.75}
+  .reader.wbon .penbar #penFold::after{display:none!important}
+  .reader.wbon.pen-fold .penbar #penFold{min-width:52px!important;width:52px;height:52px;margin:0;opacity:1}
+  /* menu du crayon sans doublons : il reste Autre couleur + surligneurs (couleurs, grosseurs et formes sont déjà sur la barre) */
+  .reader.wbon .penbar #popCol .sw:not(.hl):not(.swx),.reader.wbon .penbar #popCol .psep,.reader.wbon .penbar #popCol .prang:has(.ptrace),.reader.wbon .penbar #popCol .prang:has(.plarg){display:none!important}
   .reader.wbon .penbar #penCol{order:10;margin-left:12px}.reader.wbon .penbar .wbq.coul{order:11}.reader.wbon .penbar .wbq.gros{order:12}
   .reader.wbon .penbar #penT{order:13}.reader.wbon .penbar #penE{order:14}.reader.wbon .penbar #penU{order:15}
   .reader.wbon .penbar #penO{order:20;margin-left:18px}.reader.wbon .penbar #wbRegB{order:21}.reader.wbon .penbar #wbCalcB{order:22}.reader.wbon .penbar #wbF{order:23}
@@ -10700,6 +10704,9 @@ body.visiteur .mp-pied{margin-top:30px}
     return r; };
 
   /* 3. mots sous les icônes */
+  /* la rangée « Tracé » est cachée sur le tableau blanc : toujours revenir au trait libre */
+  document.addEventListener("click", e => { if (!e.target.closest || !e.target.closest("#penCol") || !RD.wb || innerWidth < 900) return;
+    const t = document.querySelector("#popCol .ptrace"); if (t && !t.classList.contains("on")) t.click(); }, true);
   const MOTS = { penFold:"Cacher", penCol:"Crayon", penT:"Texte", penO:"Formes", penE:"Gomme", penU:"Annuler", wbF:"Fond", penPlus:"Plus" };
   Object.keys(MOTS).forEach(id => { const b = document.getElementById(id); if (b && b.parentNode === bar) b.dataset.mot = MOTS[id]; });
 
