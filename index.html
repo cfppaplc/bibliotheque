@@ -1682,7 +1682,8 @@ function chargement(l, attente){   /* attente : on prépare encore le livre (PDF
     const n = Date.now();
     if (pret && !tPret){ tPret = n; const sp = c.querySelector(".charge-c span"); if (sp) sp.textContent = "Préparation des pages et des animations…"; }
     const fini = tPret && n - tPret > 1500 && n - t0 > 3000 && (imagesPretes() || n - tPret > 6000);
-    if (fini || n - t0 > 45000 || !attente && !$("#reader").classList.contains("open") && n - t0 > 4000 || attente && n - t0 > 180000){ clearInterval(chargeT); const bb = c.querySelector(".charge-b"); if (bb && fini){ bb.classList.add("fin"); setTimeout(() => { c.hidden = true; }, 300); } else c.hidden = true; } }, 150);
+    if (!tPret && n - t0 > 6000 && !c._lent){ c._lent = 1; const sp = c.querySelector(".charge-c span"); if (sp) sp.textContent = "Téléchargement et déverrouillage du livre… (plus long la première fois)"; }
+    if (fini || !attente && n - t0 > 45000 || !attente && !$("#reader").classList.contains("open") && n - t0 > 4000 || attente && n - t0 > 180000){ clearInterval(chargeT); const bb = c.querySelector(".charge-b"); if (bb && fini){ bb.classList.add("fin"); setTimeout(() => { c.hidden = true; }, 300); } else c.hidden = true; } }, 150);
 }
 /* ---- Fenêtre de détails ---- */
 let toastT;
@@ -2391,6 +2392,7 @@ const APPAREIL_LEGER = (function(){
 window.addEventListener("resize", () => { try { majBoutonDbl(); } catch(e){} });
 function setupExtras(){
   if (APPAREIL_LEGER || document.documentElement.classList.contains("leger")) return;
+  try { if (matchMedia("(any-pointer:coarse)").matches) return; } catch(e){}   /* 10 nov. : écran tactile (TNI) = pas de copies du livre (chaque copie recharge tout le livre) */
   [3, 4].forEach(i => {
     const f = $("#readerFrame" + i);
     const go = () => { try { const d = f.contentDocument; if (d && d.body) RD["drv" + i] = buildDriver(f.contentWindow, d); } catch(e){} };
@@ -5852,7 +5854,7 @@ function lire(l){
         const cads = [...document.querySelectorAll('.book[data-f="' + l.fichier + '"] .cadenas')].filter(c => c.offsetParent);
         cads.forEach(c => { c.classList.remove("secoue"); void c.offsetWidth; c.classList.add("secoue"); });
         setTimeout(() => { if (!ACCES.session) ACCES.dlgConnexion(() => lire(l)); else aviser("Ce livre ne t'est pas encore permis. Demande l'accès à Jeremy."); }, cads.length ? 520 : 0); return; }
-      chargement(l);
+      chargement(l, true);   /* 10 nov. (TNI) : garder l'écran de chargement jusqu'à ce que le livre soit prêt (avant : caché après 4 s → écran noir) */
       ACCES.ouvrir(l).then(h => ouvrirLivre(l, h)).catch(err => { chargement(null); aviser("Impossible d'ouvrir ce livre : " + err.message + "."); });
       return; } }
   if (l.fichier && window.LIVRES_DATA && LIVRES_DATA[l.fichier]){
@@ -5865,7 +5867,7 @@ function lire(l){
       aviser("Impossible d'ouvrir ce livre : " + err.message);
     }
   } else if (l.fichier && (window.LIVRES_EXTERNES || location.protocol.startsWith("http"))) {
-    chargement(l);
+    chargement(l, true);
     fetch("livres/" + encodeURIComponent(l.fichier) + ".html", { cache: "no-cache" })
       .then(r => { if (!r.ok) throw new Error("fichier introuvable (" + r.status + ")"); return r.text(); })
       .then(h => ouvrirLivre(l, h))
