@@ -100,7 +100,7 @@
   h.style.background = clair ? "#F5EFE3" : "#0e1320";
   window.__pretAccueil = function(){ h.classList.add("pret"); }; setTimeout(window.__pretAccueil, 3000); })();
 </script>
-<style>html:not(.pret)>body{visibility:hidden}html.pret>body{animation:accPret .25s ease both}@keyframes accPret{from{opacity:0}to{opacity:1}}</style>
+<style>html:not(.pret)>body{visibility:hidden}html.pret>body{animation:accPret .25s ease backwards}@keyframes accPret{from{opacity:0}to{opacity:1}}</style>
 </head>
 <body>
 <meta name="robots" content="noindex">
