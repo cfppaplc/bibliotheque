@@ -10661,6 +10661,7 @@ body.visiteur .mp-pied{margin-top:30px}
   repeating-linear-gradient(90deg,#3d2f05 0 2px,transparent 2px var(--u)),
   repeating-linear-gradient(90deg,#3d2f05 0 1px,transparent 1px calc(var(--u) / 2)) 0 0/100% 60% no-repeat,
   repeating-linear-gradient(90deg,#3d2f05 0 1px,transparent 1px calc(var(--u) / 10)) 0 0/100% 35% no-repeat}
+#wbRegle .grad{cursor:crosshair}#wbRegle .trace{position:absolute;top:0;height:4px;transform:translateY(-50%);border-radius:3px;pointer-events:none}#wbRegle .trace[hidden]{display:none}
 #wbRegle .nums{position:absolute;left:0;top:36px;height:22px;right:0;font-size:15px;font-weight:700}
 #wbRegle .nums i{position:absolute;font-style:normal;transform:translateX(-50%)}
 #wbRegle .rinfo{position:absolute;left:12px;bottom:6px;font-size:14px;font-weight:700;display:flex;gap:8px;align-items:center}
@@ -10742,14 +10743,14 @@ body.visiteur .mp-pied{margin-top:30px}
   const glisser = (poignee, el, quoi) => { let d = null;
     poignee.addEventListener("pointerdown", e => { if (e.target.closest("button")) return; d = quoi(e); try { poignee.setPointerCapture(e.pointerId); } catch(x){} e.preventDefault(); e.stopPropagation(); });
     poignee.addEventListener("pointermove", e => { if (d){ d.bouge(e); e.stopPropagation(); } });
-    const fin = e => { d = null; }; poignee.addEventListener("pointerup", fin); poignee.addEventListener("pointercancel", fin); };
+    const fin = e => { if (d && d.fin){ try { d.fin(e); } catch(x){} } d = null; }; poignee.addEventListener("pointerup", fin); poignee.addEventListener("pointercancel", fin); };
   glisser(calc.querySelector(".ct"), calc, e => { const r = calc.getBoundingClientRect(), dx = e.clientX - r.left, dy = e.clientY - r.top;
     return { bouge: m => { calc.style.left = Math.max(0, Math.min(innerWidth - 80, m.clientX - dx)) + "px"; calc.style.top = Math.max(0, Math.min(innerHeight - 60, m.clientY - dy)) + "px"; calc.style.right = "auto"; } }; });
   ["pointerdown", "pointerup", "click", "touchstart"].forEach(t => calc.addEventListener(t, e => e.stopPropagation()));
 
   /* 7. règle graduée (1 graduation numérotée = 1 carreau du quadrillé), qu'on glisse et qu'on tourne par la poignée orange */
   const reg = document.createElement("div"); reg.id = "wbRegle"; reg.hidden = true;
-  reg.innerHTML = '<div class="grad"></div><div class="nums"></div><div class="rinfo"><span id="wbRegA">0°</span><button type="button" data-a="0">0°</button><button type="button" data-a="45">45°</button><button type="button" data-a="90">90°</button></div><button type="button" class="rx" aria-label="Ranger la règle">✕</button><div class="rot" title="Glisse pour tourner la règle">⟳</div>';
+  reg.innerHTML = '<div class="grad"></div><div class="nums"></div><div class="trace" hidden></div><div class="rinfo"><span id="wbRegL">cm</span><span id="wbRegA">0°</span><button type="button" data-a="0">0°</button><button type="button" data-a="45">45°</button><button type="button" data-a="90">90°</button></div><button type="button" class="rx" aria-label="Ranger la règle">✕</button><div class="rot" title="Glisse pour tourner la règle">⟳</div>';
   document.body.appendChild(reg);
   const RG = { x: 0, y: 0, a: 0, n: 20 };
   const pasNum = u => u >= 30 ? 1 : u >= 15 ? 2 : 5;
@@ -10757,7 +10758,18 @@ body.visiteur .mp-pied{margin-top:30px}
     reg.style.left = RG.x + "px"; reg.style.top = RG.y + "px"; reg.style.transform = "rotate(" + RG.a + "deg)";
     reg.querySelector("#wbRegA").textContent = (Math.round((-RG.a % 360 + 360) % 360)) + "°";
     const N = reg.querySelector(".nums"); if (N.dataset.u !== String(u)){ N.dataset.u = u; const pn = pasNum(u); N.innerHTML = Array.from({length: RG.n + 1}, (_, k) => k % pn ? "" : `<i style="left:${k * u + (k ? 0 : 8)}px">${k}</i>`).join(""); } };
-  glisser(reg, reg, e => { if (e.target.closest(".rot")){ return { bouge: m => { let a = Math.atan2(m.clientY - RG.y, m.clientX - RG.x) * 180 / Math.PI; const s = Math.round(a / 15) * 15; if (Math.abs(a - s) < 3) a = s; RG.a = a; poser(); } }; }
+  glisser(reg, reg, e => {
+    /* crayon actif + départ sur le bord gradué : trait droit le long de la règle, longueur affichée en cm (1 cm = 1 carreau) */
+    if (e.target.closest(".grad") && RD.wb && !RD.crayonOff && !RD.eraser && !RD.text && !RD.obj){
+      const u = 34 * (RD.z || 1), rad = RG.a * Math.PI / 180, dx = Math.cos(rad), dy = Math.sin(rad), L = RG.n * u, tr = reg.querySelector(".trace"), lab = reg.querySelector("#wbRegL");
+      const proj = m => Math.max(0, Math.min(L, (m.clientX - RG.x) * dx + (m.clientY - RG.y) * dy)), col = /^hl/.test(RD.color || "") ? "#24282c" : (RD.color || "#e2483d");
+      const t0 = proj(e); let t1 = t0;
+      const voir = () => { tr.hidden = false; tr.style.left = Math.min(t0, t1) + "px"; tr.style.width = Math.abs(t1 - t0) + "px"; tr.style.background = col; tr.style.height = Math.max(3, (RD.wPx || 4) * (RD.z || 1)) + "px"; lab.textContent = (Math.round(Math.abs(t1 - t0) / u * 10) / 10).toString().replace(".", ",") + " cm"; };
+      voir();
+      return { bouge: m => { t1 = proj(m); voir(); }, fin: () => { tr.hidden = true; lab.textContent = "cm"; if (Math.abs(t1 - t0) < 4) return;
+        const c = document.getElementById("inkCanvas"), r = c.getBoundingClientRect(), q = t => [(RG.x + dx * t - r.left) / r.width, (RG.y + dy * t - r.top) / r.height];
+        snapInk(); const k = inkKey(); (INKS[k] = INKS[k] || []).push({ t:"ligne", c:col, w:RD.wPx || 4, p:[q(t0), q(t1)] }); redrawInk(); try { planifierSauvegarde(); } catch(x){} } }; }
+    if (e.target.closest(".rot")){ return { bouge: m => { let a = Math.atan2(m.clientY - RG.y, m.clientX - RG.x) * 180 / Math.PI; const s = Math.round(a / 15) * 15; if (Math.abs(a - s) < 3) a = s; RG.a = a; poser(); } }; }
     const dx = e.clientX - RG.x, dy = e.clientY - RG.y; return { bouge: m => { RG.x = m.clientX - dx; RG.y = m.clientY - dy; poser(); } }; });
   reg.addEventListener("click", e => { const b = e.target.closest("[data-a]"); if (b){ RG.a = -(+b.dataset.a); poser(); } if (e.target.closest(".rx")) reg.hidden = true; e.stopPropagation(); });
   setInterval(() => { if (!reg.hidden) poser(); }, 500);
