@@ -10666,6 +10666,8 @@ body.visiteur .mp-pied{margin-top:30px}
   .reader.wbon .penbar #popPlus button[data-lab]{min-height:48px;padding:0 14px;gap:12px;border-color:transparent;justify-content:flex-start;flex:1}
   .reader.wbon .penbar #popPlus button[data-lab]::after{font-size:.95rem;font-weight:600}
   .reader.wbon .penbar #wbRetB{order:16}
+  .reader.wbon .penbar #wbAnimB{order:24;background:#1f7a3f;border-color:#2f9e44;color:#fff}.reader.wbon .penbar #wbAnimB.stop{background:#a61e1e;border-color:#e03131}
+  .reader.wbon .penbar #wbAnimB[hidden]{display:none!important}
   .reader.wbon .penbar #penCol{position:relative}
   .reader.wbon .penbar #penCol::before{content:"";position:absolute;top:4px;right:5px;width:15px;height:15px;border-radius:50%;background:var(--pcb,#e2483d);border:2px solid #f4f4f5;box-shadow:0 0 0 1px #18181b}
   .reader.wbon .penbar #wbSupB.sur{background:#b3261e;border-color:#b3261e;color:#fff}
@@ -10677,6 +10679,7 @@ body.visiteur .mp-pied{margin-top:30px}
 }
 .penbar .wbq{display:none}
 #penDone{display:none}
+.reader:not(.wbon) #wbAnimB{display:none!important}
 body:has(.reader.open:not(.wbon)) .toast{bottom:calc(98px + env(safe-area-inset-bottom,0px))}   /* dans un livre : les messages passent au-dessus de la barre (ils cachaient les boutons) */
 /* Plus d'outils allégé (9 nov.) : Code QR élèves (version élève pas lancée : à remettre au lancement), Raccourcis (dans l'Aide), Barres automatiques (dans Mes préférences), Projecteur (le Cache suffit), Signet */
 #tbQr,#tbHelp,#tbPin,#tbSpot,#tbMark{display:none!important}
@@ -10756,7 +10759,7 @@ body:has(.reader.open:not(.wbon)) .toast{bottom:calc(98px + env(safe-area-inset-
   { const M = { tbPen:"Crayon", tbAns:"Réponses", tbAnim:"Animation", tbWb:"Tableau blanc", tbMenu:"Sommaire", tbDbl:"2 pages", tbTele:"Télécommande", tbFs:"Plein écran", tbMore:"Plus", tbTimer:"Minuterie", tbSpot:"Projecteur", tbCache:"Cache", tbLaser:"Laser", tbNoir:"Écran noir", tbMark:"Signet", tbHelp:"Raccourcis", tbPin:"Barres", tbPrint:"Imprimer", tbQr:"Code QR" };
     Object.keys(M).forEach(id => { const b = document.getElementById(id); if (b) b.dataset.mot = M[id]; });
     const d = document.createElement("button"); d.type = "button"; d.id = "penDone"; d.textContent = "Terminé"; d.title = "Ranger le crayon et revenir aux outils du livre"; d.onclick = () => { const t = Q("#tbPen"); if (t) t.click(); }; bar.appendChild(d); }
-  const MOTS = { penFold:"Cacher", penCol:"Crayon", penT:"Texte", penO:"Formes", penE:"Gomme", penU:"Annuler", wbF:"Fond", penPlus:"Plus" };
+  const MOTS = { penFold:"Cacher", penCol:"Crayon", penT:"Texte", penO:"Objets", penE:"Gomme", penU:"Annuler", wbF:"Fond", penPlus:"Plus" };
   Object.keys(MOTS).forEach(id => { const b = document.getElementById(id); if (b && b.parentNode === bar) b.dataset.mot = MOTS[id]; });
 
   /* 4. couleurs et grosseurs directement sur la barre */
@@ -10799,6 +10802,34 @@ body:has(.reader.open:not(.wbon)) .toast{bottom:calc(98px + env(safe-area-inset-
     const p = nav.querySelector("#wbPlus"); if (p) p.title = "Nouveau tableau";
     /* un tableau vide (nouveau, ou en changeant de tableau) : crayon prêt */
     nav.addEventListener("click", () => setTimeout(() => { try { if (RD.wb && wbVide(wbEtat().n) && RD.crayonOff && !RD.obj && !RD.text && !RD.eraser){ RD.crayonOff = false; refreshTools(); } } catch(e){} }, 150)); }
+
+  /* Palette Objets revue (9 nov.) : couleurs Métier+, onglets sur une rangée, formes principales + « Plus de formes », plomberie par groupes, Animer en haut */
+  try { const ob = Q("#objBar"); if (ob && !ob.dataset.revu){ ob.dataset.revu = "1";
+    const court = { elec:"Élec.", plomb:"Plomb." }; ob.querySelectorAll(".onglets [data-tab]").forEach(b => { if (court[b.dataset.tab]){ if (!b.title) b.title = b.textContent; b.textContent = court[b.dataset.tab]; } });
+    const gf = ob.querySelector('.grp[data-g="formes"] .cgrid'), PRINC = ["ligne", "fleche", "cote", "rect", "cercle", "triangle", "angle", "crochet"];
+    if (gf){ PRINC.slice().reverse().forEach(k => { const b = gf.querySelector('[data-f="' + k + '"]'); if (b) gf.insertBefore(b, gf.firstChild); });
+      gf.querySelectorAll("[data-f]").forEach(b => { if (!PRINC.includes(b.dataset.f)) b.classList.add("sec"); });
+      const pl = document.createElement("button"); pl.type = "button"; pl.className = "plusF"; const g = gf.parentNode; let ouvert = false; try { ouvert = localStorage.formesTout === "1"; } catch(e){}
+      const maj = () => { g.classList.toggle("tout", ouvert); pl.textContent = ouvert ? "▴ Moins de formes" : "▾ Plus de formes (12)"; }; pl.onclick = () => { ouvert = !ouvert; try { localStorage.formesTout = ouvert ? "1" : "0"; } catch(e){} maj(); }; gf.after(pl); maj(); }
+    const gp = ob.querySelector('.grp[data-g="plomb"] .cgrid');
+    if (gp){ [["Maison et tuyaux", ["maison", "tuyEF", "tuyEC", "tuyDR", "tuyEV", "tuyGZ"]], ["Raccords et robinets", ["plVanne", "plClapet", "plTe", "plCoude", "plSiphon", "plCompteur", "plCF", "plCC"]], ["Appareils", ["plCE", "plLav", "plWC", "plBain", "plEvier", "plLaveuse", "plAvaloir"]]].forEach(([n, ks]) => {
+        const t = document.createElement("span"); t.className = "ctit"; t.textContent = n; gp.appendChild(t); ks.forEach(k => { const b = gp.querySelector('[data-f="' + k + '"]'); if (b) gp.appendChild(b); }); }); }
+    const stl = document.createElement("style"); stl.textContent = '#objBar .tete{order:-5}#objBar .onglets{order:-4;grid-template-columns:repeat(4,1fr)!important}#objBar .onglets button{font-size:.66rem!important;padding:0!important}#objBar #objSim{order:-3;min-height:40px!important;font-weight:700}#objBar .simAide{order:-2}'
+      + '#objBar .onglets button.on{background:#EB6A22!important;border-color:#EB6A22!important}#objBar button.on{border-color:#EB6A22}#objBar button:hover,#objBar .cgrid button:hover{border-color:#F28A3C}'
+      + '#objBar .cgrid button.on{background:#fdebdd!important;border-color:#EB6A22!important;color:#7a3410!important;box-shadow:inset 0 0 0 1px #EB6A22!important}#objBar .filcols button.on{border-color:#EB6A22!important;box-shadow:0 0 0 2px #EB6A22!important}'
+      + '#objBar .aide,#objBar .taille em{color:#b9bfcc!important}#objBar .aide b{color:#F28A3C!important}'
+      + '#objBar .sch-btn{order:90;background:transparent!important;border-color:#3a3a40!important;color:#d4d4d8!important;margin:4px 0 0!important}#objBar #objX{order:99}'
+      + '#objBar .grp[data-g="formes"]:not(.tout) .sec{display:none!important}#objBar .plusF{text-align:center!important;background:transparent!important;color:#a1a1aa!important;font-size:.74rem;min-height:30px!important}'
+      + '#objBar .ctit{grid-column:1/-1;font-size:.7rem;text-transform:uppercase;letter-spacing:.04em;color:#a1a1aa;padding:6px 2px 1px}#objBar .ctit:first-child{padding-top:0}';
+    document.head.appendChild(stl); } } catch(e){}
+  /* « Animer » sur la barre du tableau blanc dès qu'il y a un symbole électrique ou un fil sur le tableau (avant : bouton tout en bas de l'onglet Électricité) */
+  try { const ab = document.createElement("button"); ab.type = "button"; ab.id = "wbAnimB"; ab.hidden = true; ab.dataset.mot = "Animer"; ab.title = "Faire fonctionner le schéma électrique : le courant circule";
+    const IC = ['<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>', '<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>'];
+    ab.innerHTML = IC[0]; const ro = Q("#penO"); if (ro && ro.parentNode === bar) bar.insertBefore(ab, ro.nextSibling); else bar.appendChild(ab);
+    ab.onclick = () => { try { if (RD.sim){ simStop(); return; }
+      if (!RD.obj){ const o = Q("#penO"); if (o) o.click(); } const t = Q('#objBar [data-tab="elec"]'); if (t && RD.objTab !== "elec") t.click(); setTimeout(() => { try { simStart(); } catch(e){} }, 60); } catch(e){} };
+    setInterval(() => { try { if (!RD.wb){ if (!ab.hidden) ab.hidden = true; return; } const L = INKS[inkKey()] || [], y = !!RD.sim || (wbBg() === "quad" && L.some(s => s && (s.fil || (s.t === "objet" && ELEC[s.k]))));
+      if (ab.hidden === y) ab.hidden = !y; const on = !!RD.sim; if (ab.classList.contains("stop") !== on){ ab.classList.toggle("stop", on); ab.innerHTML = IC[on ? 1 : 0]; ab.dataset.mot = on ? "Arrêter" : "Animer"; } } catch(e){} }, 400); } catch(e){}
 
   /* 6. calculatrice */
   const calc = document.createElement("div"); calc.id = "wbCalc"; calc.hidden = true;
