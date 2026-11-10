@@ -10628,6 +10628,14 @@ body.visiteur .mp-pied{margin-top:30px}
   .reader.wbon .penbar>button[data-mot]{flex-direction:column;gap:3px;min-width:64px;height:60px;padding:5px 6px}
   .reader.wbon .penbar>button[data-mot]::after{content:attr(data-mot);font-size:.7rem;font-weight:600;line-height:1;white-space:nowrap}
   .reader.wbon .penbar #penFs{display:none!important}
+  /* Outils regroupés par catégorie (9 nov.) : Écrire | Dessiner et outils | Tableaux | Plus; mêmes icônes, un espace entre les groupes */
+  .reader.wbon .penbar .sep{display:none}
+  .reader.wbon .penbar .wbq{border:0;padding:0 2px}
+  .reader.wbon .penbar #penFold{order:-1}
+  .reader.wbon .penbar #penCol{order:10;margin-left:12px}.reader.wbon .penbar .wbq.coul{order:11}.reader.wbon .penbar .wbq.gros{order:12}
+  .reader.wbon .penbar #penT{order:13}.reader.wbon .penbar #penE{order:14}.reader.wbon .penbar #penU{order:15}
+  .reader.wbon .penbar #penO{order:20;margin-left:18px}.reader.wbon .penbar #wbRegB{order:21}.reader.wbon .penbar #wbCalcB{order:22}.reader.wbon .penbar #wbF{order:23}
+  .reader.wbon .penbar .wbq.nav{order:30;margin-left:18px}.reader.wbon .penbar #penPlus{order:40;margin-left:12px}
 }
 .penbar .wbq{display:none}
 .reader.wbon .penbar .wbq{display:inline-flex;align-items:center;gap:6px;padding:0 6px;border-left:1px solid #2f2f33;border-right:1px solid #2f2f33;min-height:44px}
