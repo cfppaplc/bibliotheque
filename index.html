@@ -10635,13 +10635,29 @@ body.visiteur .mp-pied{margin-top:30px}
   .reader.wbon .penbar #penFold::after{display:none!important}
   .reader.wbon.pen-fold .penbar #penFold{min-width:52px!important;width:52px;height:52px;margin:0;opacity:1}
   /* menu du crayon sans doublons : il reste Autre couleur + surligneurs (couleurs, grosseurs et formes sont déjà sur la barre) */
-  .reader.wbon .penbar #popCol .sw:not(.hl):not(.swx),.reader.wbon .penbar #popCol .psep,.reader.wbon .penbar #popCol .prang:has(.ptrace),.reader.wbon .penbar #popCol .prang:has(.plarg){display:none!important}
+  .reader.wbon .penbar #popCol .prang:has(.ptrace),.reader.wbon .penbar #popCol .prang:has(.plarg){display:none!important}
+  /* couleurs et grosseurs dans la bulle au-dessus du crayon (plus sur la barre) */
+  .reader.wbon .penbar>.wbq.coul{display:none!important}
+  .reader.wbon .penbar #popCol{left:8px;transform:none;zoom:1;padding:10px 12px;gap:8px}
+  .reader.wbon .penbar #popCol .sw{width:38px;height:38px;min-width:38px}
+  .reader.wbon .penbar #popCol .wbq.gros{border:0;padding:0;gap:8px;min-height:0}
+  /* « Plus » : liste courte, une action par ligne */
+  .reader.wbon .penbar #popPlus{left:auto;right:0;transform:none;gap:2px;padding:8px}
+  .reader.wbon .penbar #popPlus .prang:has(#penR),.reader.wbon .penbar #popPlus .prang:has(#wbMoins),.reader.wbon .penbar #popPlus .prang>.lab{display:none!important}
+  .reader.wbon .penbar #popPlus .prang{gap:6px;padding:3px 0}
+  .reader.wbon .penbar #popPlus .prang+.prang{border-top:1px solid #2a2a2f}
+  .reader.wbon .penbar #popPlus button[data-lab]{min-height:48px;padding:0 14px;gap:12px;border-color:transparent;justify-content:flex-start;flex:1}
+  .reader.wbon .penbar #popPlus button[data-lab]::after{font-size:.95rem;font-weight:600}
+  .reader.wbon .penbar #wbRetB{order:16}
+  .reader.wbon .penbar #wbSupB.sur{background:#b3261e;border-color:#b3261e;color:#fff}
+  .reader.wbon .penbar #popGom #wbToutB{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:8px;min-height:44px;padding:0 14px;width:100%;font-weight:600;font-size:.9rem}
   .reader.wbon .penbar #penCol{order:10;margin-left:12px}.reader.wbon .penbar .wbq.coul{order:11}.reader.wbon .penbar .wbq.gros{order:12}
   .reader.wbon .penbar #penT{order:13}.reader.wbon .penbar #penE{order:14}.reader.wbon .penbar #penU{order:15}
   .reader.wbon .penbar #penO{order:20;margin-left:18px}.reader.wbon .penbar #wbRegB{order:21}.reader.wbon .penbar #wbCalcB{order:22}.reader.wbon .penbar #wbF{order:23}
   .reader.wbon .penbar .wbq.nav{order:30;margin-left:18px}.reader.wbon .penbar #penPlus{order:40;margin-left:12px}
 }
 .penbar .wbq{display:none}
+.reader:not(.wbon) #wbToutB,.reader:not(.wbon) #wbRetB{display:none!important}
 .reader.wbon .penbar .wbq{display:inline-flex;align-items:center;gap:6px;padding:0 6px;border-left:1px solid #2f2f33;border-right:1px solid #2f2f33;min-height:44px}
 .penbar .wbq button.c{min-width:34px;width:34px;height:34px;border-radius:50%;background:var(--c);border:2px solid #3a3a40;padding:0}
 .penbar .wbq button.c.on{border-color:#fff;box-shadow:0 0 0 3px var(--c)}
@@ -10706,7 +10722,10 @@ body.visiteur .mp-pied{margin-top:30px}
   /* 3. mots sous les icônes */
   /* la rangée « Tracé » est cachée sur le tableau blanc : toujours revenir au trait libre */
   document.addEventListener("click", e => { if (!e.target.closest || !e.target.closest("#penCol") || !RD.wb || innerWidth < 900) return;
-    const t = document.querySelector("#popCol .ptrace"); if (t && !t.classList.contains("on")) t.click(); }, true);
+    const t = document.querySelector("#popCol .ptrace"); if (t && !t.classList.contains("on")) t.click();
+    /* crayon déjà actif : toucher « Crayon » ouvre la bulle des couleurs (un 2e toucher range le crayon) */
+    const pc = document.getElementById("popCol"), actif = !RD.eraser && !RD.text && !RD.obj && !RD.crayonOff;
+    if (actif && pc && pc.hidden){ e.stopPropagation(); e.preventDefault(); const pp = document.getElementById("popPlus"); if (pp) pp.hidden = true; pc.hidden = false; e.target.closest("#penCol").classList.add("open"); } }, true);
   const MOTS = { penFold:"Cacher", penCol:"Crayon", penT:"Texte", penO:"Formes", penE:"Gomme", penU:"Annuler", wbF:"Fond", penPlus:"Plus" };
   Object.keys(MOTS).forEach(id => { const b = document.getElementById(id); if (b && b.parentNode === bar) b.dataset.mot = MOTS[id]; });
 
@@ -10717,6 +10736,17 @@ body.visiteur .mp-pied{margin-top:30px}
   const qg = document.createElement("span"); qg.className = "wbq gros";
   qg.innerHTML = GROS.map(([w, d], k) => `<button type="button" class="g" data-qg="${w}" style="--d:${d}px" title="${["Trait fin", "Trait moyen", "Gros trait"][k]}" aria-label="${["Trait fin", "Trait moyen", "Gros trait"][k]}"><i></i></button>`).join("");
   const apresCrayon = Q("#penCol"); if (apresCrayon && apresCrayon.parentNode === bar){ bar.insertBefore(qg, apresCrayon.nextSibling); bar.insertBefore(qc, qg); }
+  { const pc = Q("#popCol"); if (pc) pc.appendChild(qg); }   /* les 3 grosseurs vont dans la bulle du crayon */
+  /* Rétablir sur la barre, poubelle à côté des tableaux, Tout effacer dans le menu de la gomme : ils cliquent les vrais boutons de « Plus » */
+  setTimeout(() => { try {
+    const pr = Q("#penR"), pu = Q("#penU"), pm = Q("#wbMoins"), pcl = Q("#penC"), nav = bar.querySelector(".wbq.nav"), pg = Q("#popGom");
+    if (pr && pu && !Q("#wbRetB")){ const b = document.createElement("button"); b.type = "button"; b.id = "wbRetB"; b.className = "wbq"; b.title = "Rétablir (Ctrl+Y)"; b.setAttribute("aria-label", "Rétablir"); b.dataset.mot = "Rétablir"; b.innerHTML = (pr.querySelector("svg") || {}).outerHTML || "↷"; b.onclick = () => pr.click(); bar.insertBefore(b, pu.nextSibling);
+      b.style.cssText = "border:1px solid #2f2f33;border-radius:10px;padding:5px 6px"; }
+    if (pm && nav && !Q("#wbSupB")){ const b = document.createElement("button"); b.type = "button"; b.id = "wbSupB"; b.title = "Supprimer ce tableau (toucher deux fois)"; b.setAttribute("aria-label", "Supprimer ce tableau"); b.innerHTML = (pm.querySelector("svg") || {}).outerHTML || "✕"; let t = 0;
+      b.onclick = () => { pm.click(); clearTimeout(t); if (b.classList.contains("sur")) b.classList.remove("sur"); else { b.classList.add("sur"); t = setTimeout(() => b.classList.remove("sur"), 3000); } };
+      nav.appendChild(b); setInterval(() => { if (RD.wb) b.disabled = pm.disabled; }, 500); }
+    if (pcl && pg && !Q("#wbToutB")){ const b = document.createElement("button"); b.type = "button"; b.id = "wbToutB"; b.innerHTML = ((pcl.querySelector("svg") || {}).outerHTML || "") + "<span>Tout effacer</span>"; b.onclick = () => pcl.click(); pg.appendChild(b); }
+  } catch(e){} }, 0);
   const crayon = () => { RD.eraser = false; RD.text = false; RD.crayonOff = false; };
   qc.addEventListener("click", e => { const b = e.target.closest("[data-qc]"); if (!b) return; e.stopPropagation();
     const sw = document.querySelector('#popCol .sw[data-c="' + b.dataset.qc + '"]'); if (sw) sw.click(); else RD.color = b.dataset.qc; crayon(); refreshTools(); });
