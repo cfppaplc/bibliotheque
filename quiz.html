@@ -342,6 +342,14 @@ i.let,.ch4 button i{background:var(--lc,var(--acc))!important;color:#fff!importa
 .ezoom span{position:absolute;left:1vw;top:1vw;background:rgba(0,0,0,.6);color:#fff;font-size:1.1vw;font-weight:800;border-radius:2vw;padding:.3vw 1vw}
 .eimg.petit{max-height:22vh}
 .dblE{display:flex;flex-direction:column;align-items:center;gap:2vh;margin-top:8vh;text-align:center}.dblE b{font-size:6vw;color:#FFB15C}.dblE span{font-size:2vw;color:#D8D2C8;line-height:1.4}.dblE em{font-style:normal;font-size:2.4vw;font-weight:800;background:rgba(255,177,92,.15);border-radius:2vw;padding:.6vw 2vw}
+/* Éditeur (9 nov.) : barre du bas toujours visible (ajouter une question, Enregistrer) et questions remplies repliées sur une ligne */
+.edBas{position:sticky;bottom:0;z-index:5;display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;background:#fff;border-top:1px solid var(--ligne);margin:14px -4px 0;padding:10px 4px 12px;box-shadow:0 -8px 16px -12px rgba(0,0,0,.25)}
+.edBas .ajouts{margin:0;flex:1 1 420px}.edBas .ajouts button{padding:8px 10px;font-size:13px}.edBas .ctl{flex:0 0 auto;margin-left:auto}.edBas .ctl button{min-width:120px}.edBas #eSauve{min-width:170px}
+html.sombre body.bord .edBas{background:#1f1f24}
+@media (max-width:640px){.edBas{display:block;margin-left:0;margin-right:0;padding:8px 0 10px}.edBas .ajouts{display:block;white-space:nowrap;overflow-x:auto;width:0;min-width:100%;margin:0 0 8px;padding-bottom:2px}.edBas .ajouts button{display:inline-block;width:auto;margin-right:6px}.edBas .ajouts span{display:inline-block}.edBas .ctl{display:flex;margin:0}.edBas .ctl button,.edBas #eSauve{flex:1;min-width:0}}
+.qe .tete b{cursor:pointer}.qe .tete b::before{content:"▾ ";color:var(--acc)}.qe.plie .tete b::before{content:"▸ "}
+.qe .tete .resume{display:none}.qe.plie .tete b{flex:0 0 auto}.qe.plie .tete .resume{display:block;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--gris);font-size:14px;cursor:pointer}
+.qe.plie>*:not(.tete){display:none!important}.qe.plie .tete select{display:none}
 .ajouts{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:12px 0}.ajouts span{font-weight:800;color:var(--gris);font-size:13px;margin-right:4px}.ajouts button{padding:10px 12px}
 .qe .ln input[type=checkbox]{width:22px;height:22px;flex:none}.qe .ln .num{flex:none;width:26px;height:26px;border-radius:7px;background:var(--acc);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:13px}
 .nbE{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:8px}.nbE label{font-size:12px;font-weight:800;color:var(--gris);display:flex;flex-direction:column;gap:4px}
@@ -447,8 +455,8 @@ Le propane s'accumule…
 <label>Couleur du quiz<div class="coul" id="eCoul"></div></label>
 </div></details>
 <div id="eQs"></div>
-<div class="ajouts"><span>Ajouter une question :</span><button class="btn2" data-aj="choix">Choix</button><button class="btn2" data-aj="vf">Vrai ou faux</button><button class="btn2" data-aj="multi">Plusieurs bonnes</button><button class="btn2" data-aj="ordre">Remettre en ordre</button><button class="btn2" data-aj="nombre">Calcul</button><button class="btn2" data-aj="erreur">Trouve l'erreur</button></div>
-<div class="ctl"><button id="eSauve">Enregistrer</button><button class="btn2" id="eAnnule">Annuler</button></div>
+<div class="edBas"><div class="ajouts"><span>Ajouter une question :</span><button class="btn2" data-aj="choix">Choix</button><button class="btn2" data-aj="vf">Vrai ou faux</button><button class="btn2" data-aj="multi">Plusieurs bonnes</button><button class="btn2" data-aj="ordre">Remettre en ordre</button><button class="btn2" data-aj="nombre">Calcul</button><button class="btn2" data-aj="erreur">Trouve l'erreur</button></div>
+<div class="ctl"><button id="eSauve">Enregistrer</button><button class="btn2" id="eAnnule">Annuler</button></div></div>
 <div class="sous" style="margin-top:8px">Le quiz est enregistré dans ton compte et te suit sur tous tes appareils. « Exporter » (dans la liste) crée un fichier à partager avec un collègue; « Sauvegarder tous mes quiz » en fait une copie complète.</div></div>
 </div>
 <div id="vJeu" class="cache">
@@ -1535,6 +1543,20 @@ if (window.COFFRE && !/[?&](j|ecran|panneau)=/.test(location.search))
       quizReglages: (a, b) => JSON.stringify(Object.assign({}, JSON.parse(b || "{}"), JSON.parse(a || "{}")))
     },
     apres: r => { if (r === "fusion") { window.__listeQuiz && window.__listeQuiz(); return; } if (!/[?&](animer|tele)=/.test(location.search)) location.reload(); } });
+</script>
+<script>
+/* Éditeur de quiz : les questions déjà remplies se replient sur une ligne (les champs restent dans la page, rien ne change à l'enregistrement); une seule question ouverte à la fois */
+(function(){ var Z = document.getElementById("eQs"); if (!Z) return; var OUV = null, n0 = 0;
+  function appliquer(){ var L = Z.querySelectorAll(".qe"); if (L.length > n0 && n0) OUV = L.length - 1; n0 = L.length;
+    L.forEach(function(q, i){ var t = q.querySelector(".tete"), tq = q.querySelector(".tq"), b = t && t.querySelector("b"); if (!t || !b) return;
+      var r = t.querySelector(".resume"); if (!r){ r = document.createElement("span"); r.className = "resume"; b.after(r); }
+      r.textContent = tq && tq.value.trim() ? tq.value.trim() : "(question vide)";
+      q.classList.toggle("plie", i !== OUV && !!(tq && tq.value.trim())); }); }
+  new MutationObserver(function(M){ if (M.some(function(m){ return m.target === Z; })) appliquer(); }).observe(Z, { childList:true });
+  Z.addEventListener("click", function(e){ var c = e.target.closest && e.target.closest(".tete b, .tete .resume"); if (!c) return; var q = c.closest(".qe"), i = [].indexOf.call(Z.querySelectorAll(".qe"), q);
+    OUV = OUV === i && !q.classList.contains("plie") ? null : i; appliquer(); if (OUV === i){ var f = q.querySelector(".tq"); if (f) f.focus(); } });
+  Z.addEventListener("focusin", function(e){ var q = e.target.closest && e.target.closest(".qe"); if (!q || q.classList.contains("plie")) return; OUV = [].indexOf.call(Z.querySelectorAll(".qe"), q); });
+  appliquer(); })();
 </script>
 </body>
 </html>
