@@ -8,7 +8,7 @@
   const q = new URLSearchParams(location.search);
     const html = document.documentElement; html.classList.add("garde-attente");
   const st = document.createElement("style");
-  st.textContent = "html.garde-attente body{visibility:hidden}#gardeOv{position:fixed;inset:0;z-index:99999;background:#141414;color:#F2EFEA;display:flex;align-items:center;justify-content:center;padding:20px;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;visibility:visible}#gardeOv .bx{max-width:460px;background:#1F1F1F;border:1px solid #333;border-radius:18px;padding:26px;text-align:center}#gardeOv img{height:34px;margin-bottom:14px}#gardeOv h1{font-size:21px;margin:0 0 8px}#gardeOv p{color:#A8A29A;line-height:1.5;margin:0 0 18px}#gardeOv a,#gardeOv button{display:block;width:100%;box-sizing:border-box;border:0;border-radius:12px;padding:14px;font:700 16px system-ui,sans-serif;margin-top:10px;cursor:pointer;text-decoration:none}#gardeOv a{background:#E50914;color:#fff}#gardeOv button{background:#2A2A2A;color:#F2EFEA}#gardeOv small{display:block;margin-top:16px;color:#777;font-size:12px}";
+  st.textContent = "html.garde-attente body{visibility:hidden}#gardeOv{position:fixed;inset:0;z-index:99999;background:#141414;color:#F2EFEA;display:flex;align-items:center;justify-content:center;padding:20px;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;visibility:visible}#gardeOv .bx{max-width:460px;background:#1F1F1F;border:1px solid #333;border-radius:18px;padding:26px;text-align:center}#gardeOv img{height:34px;margin-bottom:14px}#gardeOv h1{font-size:21px;margin:0 0 8px}#gardeOv p{color:#A8A29A;line-height:1.5;margin:0 0 18px}#gardeOv a,#gardeOv button{display:block;width:100%;box-sizing:border-box;border:0;border-radius:12px;padding:14px;font:700 16px system-ui,sans-serif;margin-top:10px;cursor:pointer;text-decoration:none}#gardeOv a{background:#EB6A22;color:#fff}#gardeOv button{background:#2A2A2A;color:#F2EFEA}#gardeOv small{display:block;margin-top:16px;color:#777;font-size:12px}";
   document.head.appendChild(st);
   const ouvrir = ok => {
     html.classList.remove("garde-attente");
@@ -35,12 +35,12 @@
 })();</script>
 <link rel="icon" href="img/metier-plus-icone.svg" type="image/svg+xml">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="theme-color" content="#121212">
+<meta name="theme-color" content="#0e1320">
 <meta name="robots" content="noindex">
 <title>Métier+ — Télécommande</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.50.0/dist/umd/supabase.min.js"></script>
 <style>
-:root{--fond:#121212;--carte:#1E1E1E;--carte2:#2C2C2C;--txt:#F2EFEA;--gris:#A8A29A;--rouge:#E50914;--vert:#2E9E5B}
+:root{--fond:#0e1320;--carte:#161d2c;--carte2:#232c40;--txt:#F2EFEA;--gris:#9AA3B5;--rouge:#EB6A22;--vert:#2E9E5B}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;height:100%;background:var(--fond);color:var(--txt);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;overscroll-behavior:none;-webkit-user-select:none;user-select:none}
 body{display:flex;flex-direction:column;padding:calc(env(safe-area-inset-top) + 10px) 14px calc(env(safe-area-inset-bottom) + 12px)}
@@ -49,7 +49,8 @@ svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.9;stroke
 .cache{display:none!important}
 /* haut */
 .l1{display:flex;align-items:center;gap:10px}
-.l1 img{height:22px}
+.l1 img{height:28px}
+.ens{white-space:nowrap;font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#fff;background:#B3261E;border-radius:999px;padding:4px 9px}
 .etat{margin-left:auto;font-size:13px;color:var(--gris);display:flex;align-items:center;gap:6px;background:var(--carte);border-radius:20px;padding:6px 11px}
 .etat i{width:8px;height:8px;border-radius:50%;background:#777}.etat.ok{color:#7BD39A}.etat.ok i{background:var(--vert)}.etat.ko i{background:var(--rouge)}
 .l2{display:flex;align-items:center;gap:10px;margin-top:12px}
@@ -64,16 +65,16 @@ svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.9;stroke
 .mods{display:flex;gap:6px;margin-top:10px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding-bottom:2px}
 .mods::-webkit-scrollbar{display:none}
 .mods button{flex:none;border:0;background:var(--carte);color:var(--gris);border-radius:10px;padding:9px 11px;font-size:13px;font-weight:700;white-space:nowrap}
-.mods button.on{background:#3a1012;color:#fff;box-shadow:inset 0 0 0 1.5px var(--rouge)}
+.mods button.on{background:rgba(235,106,34,.18);color:#fff;box-shadow:inset 0 0 0 1.5px var(--rouge)}
 .mods em{font-style:normal;color:var(--txt);margin-right:5px}
 /* pavé */
-.pad{flex:1;min-height:170px;margin:12px 0 10px;border-radius:24px;background:#181818;border:1px solid #2C2C2C;position:relative;overflow:hidden;touch-action:none;
-  background-image:radial-gradient(circle,#333 1.2px,transparent 1.4px);background-size:22px 22px}
+.pad{flex:1;min-height:170px;margin:12px 0 10px;border-radius:24px;background:#121827;border:1px solid #232c40;position:relative;overflow:hidden;touch-action:none;
+  background-image:radial-gradient(circle,#2a3448 1.2px,transparent 1.4px);background-size:22px 22px}
 .cote{position:absolute;top:0;bottom:0;width:50%;display:flex;align-items:center;justify-content:center;font-size:62px;font-weight:300;color:#bbb;pointer-events:none;transition:background .15s}
-.cote.g{left:0}.cote.d{right:0;color:#fff;background:linear-gradient(90deg,transparent,rgba(229,9,20,.22))}
+.cote.g{left:0}.cote.d{right:0;color:#fff;background:linear-gradient(90deg,transparent,rgba(235,106,34,.22))}
 .cote.flash{background:rgba(255,255,255,.12)!important}
-.aide{position:absolute;left:0;right:0;bottom:12px;text-align:center;font-size:12px;color:#8a857e;pointer-events:none;padding:0 12px}
-.doigt{position:absolute;width:50px;height:50px;margin:-25px 0 0 -25px;border-radius:50%;background:rgba(229,9,20,.3);border:2px solid var(--rouge);pointer-events:none;display:none}
+.aide{position:absolute;left:0;right:0;bottom:12px;text-align:center;font-size:12px;color:#7D8699;pointer-events:none;padding:0 12px}
+.doigt{position:absolute;width:50px;height:50px;margin:-25px 0 0 -25px;border-radius:50%;background:rgba(235,106,34,.3);border:2px solid var(--rouge);pointer-events:none;display:none}
 .pad.laser{background:#120606;background-image:none;border-color:#5a1414}
 .pad.laser .cote{display:none}
 .pad.laser .doigt{width:22px;height:22px;margin:-11px 0 0 -11px;background:#FF2A2A;box-shadow:0 0 14px 4px rgba(255,42,42,.7)}
@@ -91,10 +92,10 @@ svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.9;stroke
 /* feuille Aller à */
 .feuille{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:flex-end;z-index:5}
 .feuille[hidden]{display:none}
-.feuille>div{background:#1A1A1A;width:100%;max-height:84vh;border-radius:20px 20px 0 0;padding:16px 14px calc(env(safe-area-inset-bottom) + 16px);display:flex;flex-direction:column;gap:12px}
+.feuille>div{background:#141b29;width:100%;max-height:84vh;border-radius:20px 20px 0 0;padding:16px 14px calc(env(safe-area-inset-bottom) + 16px);display:flex;flex-direction:column;gap:12px}
 .feuille h2{margin:0;font-size:17px;display:flex;justify-content:space-between;align-items:center}
 .feuille h2 button{border:0;background:var(--carte2);color:var(--txt);border-radius:10px;width:40px;height:40px;font-size:18px}
-.saut{display:flex;gap:8px}.saut input{flex:1;min-width:0;font:700 24px system-ui;background:var(--carte);border:1px solid #3a3a3a;color:var(--txt);border-radius:12px;padding:10px 14px}
+.saut{display:flex;gap:8px}.saut input{flex:1;min-width:0;font:700 24px system-ui;background:var(--carte);border:1px solid #2f3a52;color:var(--txt);border-radius:12px;padding:10px 14px}
 .saut button{border:0;border-radius:12px;background:var(--rouge);color:#fff;font-size:17px;font-weight:700;padding:0 20px}
 .liste{overflow:auto;display:flex;flex-direction:column;gap:6px;-webkit-overflow-scrolling:touch}
 .liste button{border:0;text-align:left;background:var(--carte);color:var(--txt);border-radius:12px;padding:13px 14px;font-size:15px;font-weight:600;display:flex;gap:12px;align-items:center}
@@ -117,7 +118,7 @@ svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.9;stroke
 </style>
 </head>
 <body>
-<div class="l1"><img src="img/metier-plus-blanc.svg" alt="Métier+"><span class="etat" id="etat"><i></i><span>Connexion…</span></span></div>
+<div class="l1"><img src="img/metier-plus-blanc.svg" alt="Métier+"><span class="ens">Enseignant seulement</span><span class="etat" id="etat"><i></i><span>Connexion…</span></span></div>
 
 <div id="attente" class="vide"><img class="attLogo" src="img/metier-plus-blanc.svg" alt="Métier+"><b>Télécommande</b><span id="attTxt">Connexion à l'ordinateur du tableau…</span></div>
 

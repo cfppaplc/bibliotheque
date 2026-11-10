@@ -171,6 +171,8 @@ th{font-size:12px;color:var(--gris);border-top:0}
 #qAtt{margin-top:10px;padding:10px 12px;border-radius:10px;background:rgba(235,106,34,.12);border:1px solid rgba(235,106,34,.35);display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;font-size:15px}#qAtt b{color:#C9561A}#qAtt span{display:inline-flex;align-items:center}#qAtt.cache{display:none}
 #tiroir{position:fixed;top:0;right:0;bottom:0;width:min(500px,94vw);transform:translateX(102%);transition:transform .35s ease;z-index:70;background:#E9E6E0;box-shadow:-10px 0 40px rgba(0,0,0,.45)}
 #tiroir.ouvert{transform:none}
+body.presseJ #joueur::after{content:"";position:fixed;inset:0;pointer-events:none;border:10px solid #E5484D;animation:presseJ .7s ease-in-out infinite alternate;z-index:50}
+@keyframes presseJ{from{opacity:.25}to{opacity:1}}
 #celOv{position:fixed;inset:0;z-index:90;background:rgba(10,12,16,.82);display:flex;align-items:center;justify-content:center}#celOv.cache{display:none}
 #celOv .prof{display:inline-block;background:#B3261E;color:#fff;font-weight:800;font-size:15px;letter-spacing:.06em;text-transform:uppercase;padding:6px 14px;border-radius:999px;margin-bottom:12px}#celOv .bx{background:#fff;color:#1E2A44;border-radius:18px;padding:26px 30px;text-align:center;max-width:420px}#celOv h2{margin:0 0 14px;font-size:22px}#celOv #celQr{display:flex;justify-content:center}#celOv p{margin:14px 0;font-size:15px;color:#555}#celOv button{background:#1E2A44;color:#fff}
 #man{position:fixed;inset:0;background:#0e1320;color:#F2EFEA;display:flex;flex-direction:column;padding:18px 18px calc(18px + env(safe-area-inset-bottom));gap:14px;font-family:system-ui,"Segoe UI",Roboto,sans-serif}
@@ -1163,7 +1165,7 @@ function joueur(code){
       } else if (m.m === "q") {
         repI = -1; const t = m.t || "choix", fin = m.t0 + m.s * 1000;
         const envoi = c => { if (repI !== -1) return; repI = c; document.querySelectorAll("#jBx button").forEach(x => x.disabled = true);
-          $("jBx").insertAdjacentHTML("beforeend", '<div class="monte" style="margin-top:14px;opacity:.8">Réponse envoyée.</div>'); envoyer(topic, {m: "rep", pid, i: m.i, c}); };
+          $("jBx").insertAdjacentHTML("beforeend", '<div class="monte" style="margin-top:14px;opacity:.8">Réponse envoyée.</div>'); window.__repQ = m.i; envoyer(topic, {m: "rep", pid, i: m.i, c}); };
         const btns = (cl) => `<div class="ch4 ${cl || ""}">${m.ch.map((c, k) => `<button class="k${k}" data-c="${k}"><i>${SYMB[k]}</i><span>${esc(c)}</span></button>`).join("")}</div>`;
         let corps = "";
         if (t === "multi") corps = `<div class="aideT">Plusieurs bonnes réponses : touche toutes celles qui sont bonnes, puis Valider.</div>${btns("multi")}<button id="jOk" class="valider" disabled>Valider</button>`;
@@ -1174,7 +1176,14 @@ function joueur(code){
           <div id="jCorps" class="${m.lec > 300 ? "cache" : ""}">${corps}</div>${m.lec > 300 ? `<div id="jLec" class="aideT lec">Lis bien la question… les choix arrivent dans <b id="jLecN">${Math.ceil(m.lec / 1000)}</b> s.</div>` : ""}`);
         if (m.lec > 300) { const t1 = Date.now() + m.lec; const iv = setInterval(() => { const r = t1 - Date.now(), n = $("jLecN"); if (n) n.textContent = Math.max(0, Math.ceil(r / 1000)); if (r <= 0) { clearInterval(iv); const c = $("jCorps"), l = $("jLec"); if (c) c.classList.remove("cache"); if (l) l.remove(); } }, 200); }
         clearInterval(chrono);
-        chrono = setInterval(() => { const r = Math.max(0, fin - Date.now()), b = $("jBar"); if (b) b.style.width = Math.min(100, 100 * r / (m.s * 1000)) + "%"; if (!r) clearInterval(chrono); }, 150);
+        /* 9 nov. (« les élèves pourraient sentir leur cell vibrer s'ils ne répondent pas ») : 5 s avant la fin, si l'élève n'a pas répondu :
+           vibration (Android; Apple ne permet pas aux sites de faire vibrer l'iPad ni l'iPhone) + bord de l'écran qui pulse en rouge (partout) */
+        let rappel = false; document.body.classList.remove("presseJ");
+        chrono = setInterval(() => { const r = Math.max(0, fin - Date.now()), b = $("jBar"); if (b) b.style.width = Math.min(100, 100 * r / (m.s * 1000)) + "%";
+          const attend = !!$("jCorps") && window.__repQ !== m.i;
+          if (!rappel && attend && r > 0 && r <= 5000) { rappel = true; document.body.classList.add("presseJ"); try { if (navigator.vibrate) navigator.vibrate([250, 120, 250, 120, 400]); } catch(x) {} }
+          if (rappel && (!attend || !r)) document.body.classList.remove("presseJ");
+          if (!r) clearInterval(chrono); }, 150);
         const B = [...document.querySelectorAll("#jBx [data-c]")];
         if (t === "multi") { const sel = new Set();
           B.forEach(b => b.onclick = () => { if (repI !== -1) return; const k = +b.dataset.c; sel.has(k) ? sel.delete(k) : sel.add(k); b.classList.toggle("choisi", sel.has(k)); b.querySelector("i").textContent = sel.has(k) ? "✓" : SYMB[k]; $("jOk").disabled = !sel.size; });
