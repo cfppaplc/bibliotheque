@@ -9171,7 +9171,7 @@ return {matrice:function(texte){var q=new QRCode(-1,L.M);q.addData(texte);q.make
   document.getElementById("bienAide").onclick = () => { finBi(); ouvrirBienvenue(); };
   bi.addEventListener("click", e => { if (e.target === bi) finBi(); });
   document.addEventListener("keydown", e => { if (e.key === "Escape" && !bi.hidden) finBi(); });
-  let vu = ""; try { vu = localStorage.getItem("bienvenueVu") || ""; } catch(e){}
+  let vu = ""; try { vu = localStorage.getItem("bienvenueVu") || localStorage.getItem("presentationVue") || ""; } catch(e){}   /* 9 nov. : pas de fenêtre de bienvenue après la présentation (ça faisait deux explications de suite) */
   if (!vu && !/[?&]livre=/.test(location.search)) setTimeout(() => { if (!document.querySelector(".reader.open")) bi.hidden = false; }, 700);
 })();
 </script>
