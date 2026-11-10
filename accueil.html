@@ -314,6 +314,9 @@ html #prep .sheet-in.prep2 { width: min(1240px, calc(100vw - 32px)); display: gr
 .sem-c.sem-vise { background: rgba(235,106,34,.25); border-style: solid; }
 .sem-c.sem-src { opacity: .4; }
 .sem-c.plein { touch-action: none; }
+.sem-poub { position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%); z-index: 9999; display: flex; align-items: center; gap: 12px; padding: 18px 30px; border-radius: 16px; border: 2px dashed #B5574D; background: rgba(181,87,77,.18); color: #F2D3CE; font: 700 18px/1.2 inherit; pointer-events: none; }
+.sem-poub svg { width: 30px; height: 30px; } .sem-poub.vise { background: #B5574D; color: #fff; border-style: solid; }
+html.force-light .sem-poub { color: #8E3A31; } html.force-light .sem-poub.vise { color: #fff; }
 .sem-act { grid-column: 1 / -1; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 8px; }
 .sem-act .btn { min-height: 44px; } .sem-act .btn.sur { background: #B5574D; color: #fff; border-color: #B5574D; }
 .sem-act span { font-weight: 600; flex: 1; }
@@ -2221,14 +2224,18 @@ function copierCours(srcK, k){ const P = contenuDe(srcK); if (!P) return;
   save(); const [j, per] = k.split("|"); peMsg("Cours copié : " + nomJour(j).toLowerCase() + " " + (per === "am" ? "matin" : "après-midi") + ".");
   remplirPrep(j === isoJour(new Date()) ? "" : j, per); repeindrePrep(); }
 function glisserCours(e, src){
-  const x0 = e.clientX, y0 = e.clientY; let fant = null, cible = null;
+  const x0 = e.clientX, y0 = e.clientY; let fant = null, cible = null, poub = null, surPoub = false;
   const mv = ev => { if (!fant && Math.hypot(ev.clientX - x0, ev.clientY - y0) < 8) return;
-    if (!fant){ fant = src.cloneNode(true); fant.className = "sem-c plein sem-fantome"; fant.style.width = src.offsetWidth + "px"; document.body.append(fant); src.classList.add("sem-src"); }
+    if (!fant){ fant = src.cloneNode(true); fant.className = "sem-c plein sem-fantome"; fant.style.width = src.offsetWidth + "px"; document.body.append(fant); src.classList.add("sem-src");
+      if (cfg.plans && cfg.plans[src.dataset.k]){ poub = document.createElement("div"); poub.className = "sem-poub"; poub.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4.5h6V7M6.5 7l1 13h9l1-13M10 11v6M14 11v6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Glisse ici pour effacer ce cours'; document.body.append(poub); } }
+    if (poub){ const r = poub.getBoundingClientRect(), d = ev.clientX >= r.left && ev.clientX <= r.right && ev.clientY >= r.top && ev.clientY <= r.bottom; poub.classList.toggle("vise", d); surPoub = d; }
     fant.style.left = ev.clientX - src.offsetWidth / 2 + "px"; fant.style.top = ev.clientY - 20 + "px";
     const el = document.elementFromPoint(ev.clientX, ev.clientY), c = el && el.closest(".sem-c");
     if (cible && cible !== c) cible.classList.remove("sem-vise"); cible = c && c !== src && !c.disabled && !c.classList.contains("plein") ? c : null; if (cible) cible.classList.add("sem-vise"); };
   const up = () => { removeEventListener("pointermove", mv); removeEventListener("pointerup", up); removeEventListener("pointercancel", up);
     if (!fant) return; fant.remove(); src.classList.remove("sem-src"); src._glisse = true; setTimeout(() => src._glisse = false, 50);
+    if (poub){ poub.remove(); if (surPoub){ if (cible) cible.classList.remove("sem-vise"); const k = src.dataset.k; delete cfg.plans[k]; save(); peMsg("Cours effacé.");
+      const [j, per] = k.split("|"); remplirPrep(j === isoJour(new Date()) ? "" : j, per); repeindrePrep(); return; } }
     if (!cible){ peMsg("Glisse le cours sur une case libre (+) pour le copier."); return; }
     cible.classList.remove("sem-vise"); copierCours(src.dataset.k, cible.dataset.k); };
   addEventListener("pointermove", mv); addEventListener("pointerup", up); addEventListener("pointercancel", up);
