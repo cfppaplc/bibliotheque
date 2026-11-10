@@ -94,7 +94,9 @@
 /* Pas d'ancienne interface au chargement (10 nov.) : le style Métier+ est posé par du code et des feuilles de style placés plus bas dans la page;
    en attendant, on voyait l'ancien écran une seconde. La page reste cachée (fond de la bonne couleur) jusqu'à la fin du chargement (au plus 3 s). */
 (function(){ var h = document.documentElement, t = ""; h.classList.add("style-pro");
-  try { t = (JSON.parse(localStorage.getItem("accueil-atelier-v4") || "{}") || {}).theme || ""; } catch(e){}
+  try { var _c = JSON.parse(localStorage.getItem("accueil-atelier-v4") || "{}") || {}; t = _c.themeV3 ? (_c.theme || "") : "auto"; } catch(e){}
+  /* 10 nov. : « Comme le site » = suit le choix Clair / Foncé de la bibliothèque (localStorage.accueilClair), sinon l'ordinateur */
+  if (t !== "light" && t !== "dark") { try { var _s = localStorage.getItem("accueilClair"); t = _s === "1" ? "light" : _s === "0" ? "dark" : ""; } catch(e){} }
   var clair = t === "light" || (t !== "dark" && window.matchMedia && matchMedia("(prefers-color-scheme: light)").matches);
   if (t === "light") h.classList.add("force-light"); if (t === "dark") h.classList.add("force-dark");
   h.style.background = clair ? "#F5EFE3" : "#0e1320";
@@ -948,7 +950,7 @@ html.ui-clair #apercuOv .ap-moments button.on, html.ui-clair #apercuOv .ap-ferme
     <div class="marque"><img class="lg-blc" src="img/metier-plus-blanc.svg" alt="Métier+"><img class="lg-clr" src="img/metier-plus.svg" alt=""><h2>Réglages</h2><p>L'apparence du tableau de bord.</p></div>
     <div class="field" hidden><label for="f-clock">Style d'horloge <span class="tip-i" tabindex="0" role="img" aria-label="Aide : choisis l'apparence de l'heure" data-tip="Numérique : grands chiffres. Aiguilles : horloge classique. Manomètre : l'heure lue sur un cadran de pression. Afficheur : chiffres lumineux de panneau de contrôle. Minimal : heures et minutes seulement.">?</span></label>
       <select id="f-clock"><option value="num">Numérique</option><option value="analog">À aiguilles</option><option value="mano">Manomètre</option><option value="led">Afficheur lumineux</option><option value="mini">Minimal (sans secondes)</option></select></div>
-    <div class="field"><label for="f-theme">Couleurs <span class="tip-i" tabindex="0" role="img" aria-label="Aide : Sombre pour une classe tamisée, clair si la classe est très éclairée et que le projecteur pâlit l'image." data-tip="Sombre pour une classe tamisée, clair si la classe est très éclairée et que le projecteur pâlit l'image.">?</span></label><select id="f-theme"><option value="dark">Foncé</option><option value="light">Clair (classe très éclairée)</option><option value="auto">Comme l'ordinateur</option></select></div>
+    <div class="field"><label for="f-theme">Couleurs <span class="tip-i" tabindex="0" role="img" aria-label="Aide : Sombre pour une classe tamisée, clair si la classe est très éclairée et que le projecteur pâlit l'image." data-tip="Sombre pour une classe tamisée, clair si la classe est très éclairée et que le projecteur pâlit l'image.">?</span></label><select id="f-theme"><option value="dark">Foncé</option><option value="light">Clair (classe très éclairée)</option><option value="auto">Comme le site</option></select></div>
     <div class="field" hidden><label for="f-couleurs">Ambiance <span class="tip-i" tabindex="0" role="img" aria-label="Aide : Les couleurs changent chaque jour de la semaine pour garder l'attention des élèves. Lundi ardoise, mardi forêt, mercredi prune, jeudi pétrole, vendredi cuivre." data-tip="Les couleurs changent chaque jour de la semaine pour garder l'attention des élèves. Lundi ardoise, mardi forêt, mercredi prune, jeudi pétrole, vendredi cuivre.">?</span></label><select id="f-couleurs"><option value="jour">Change chaque jour (recommandé)</option><option value="fixe">Toujours la même</option></select></div>
     <div class="field" hidden><label for="f-anim">Fond animé <span class="tip-i" tabindex="0" role="img" aria-label="Aide : Comme l'ordinateur : le fond reste figé si Windows a désactivé les effets d'animation. Toujours : le fond bouge quand même. Jamais : fond immobile." data-tip="Comme l'ordinateur : le fond reste figé si Windows a désactivé les effets d'animation. Toujours : le fond bouge quand même. Jamais : fond immobile.">?</span></label><select id="f-anim"><option value="auto">Comme l'ordinateur</option><option value="oui">Toujours</option><option value="non">Jamais</option></select></div>
     <div class="field"><label>Ménage de l'atelier</label><button type="button" class="btn" id="b-menageReg">Modifier les tâches du ménage</button></div>
@@ -1015,7 +1017,7 @@ const DEFAULTS = {
   def: "Dispositif qui laisse passer l'eau dans un seul sens et empêche le retour d'écoulement dans le réseau d'alimentation.",
   q: "Pourquoi ferme-t-on l'eau en amont avant de démonter un robinet?",
   a: "Pour couper la pression dans la section de tuyauterie et éviter l'inondation pendant le démontage.",
-  theme: "dark",
+  theme: "auto",
   couleurs: "jour",
   anim: "auto",
   style: "pro",
@@ -1027,7 +1029,7 @@ const DEFAULTS = {
 
 let cfg = { ...DEFAULTS };
 const OLD_MSG = "On commence à l'heure : pose ton sac et sors ton cahier de notes.";
-try { const s = localStorage.getItem("accueil-atelier-v4"); if (s) cfg = { ...DEFAULTS, ...JSON.parse(s) }; if (cfg.msg === OLD_MSG) cfg.msg = ""; if (!cfg.themeV2) { cfg.theme = "dark"; cfg.themeV2 = 1; } if (!cfg.compV) { cfg.comp = "307-505"; cfg.module = ""; cfg.bg = "auto"; cfg.compV = 1; } if (!cfg.simpleV) { cfg.hidden = [...new Set([...(cfg.hidden || []), "objectifs", "epi", "mot", "question"])]; cfg.simpleV = 1; } if (!cfg.simpleV2) { cfg.hidden = [...new Set([...(cfg.hidden || []), "deroulement"])]; cfg.simpleV2 = 1; } if (!cfg.simpleV3) { cfg.hidden = ["objectifs", "epi", "mot", "question", "deroulement"]; cfg.clock = "num"; cfg.couleurs = "fixe"; cfg.simpleV3 = 1; } } catch (e) {}
+try { const s = localStorage.getItem("accueil-atelier-v4"); if (s) cfg = { ...DEFAULTS, ...JSON.parse(s) }; if (cfg.msg === OLD_MSG) cfg.msg = ""; if (!cfg.themeV2) { cfg.theme = "dark"; cfg.themeV2 = 1; } if (!cfg.themeV3) { cfg.theme = "auto"; cfg.themeV3 = 1; } if (!cfg.compV) { cfg.comp = "307-505"; cfg.module = ""; cfg.bg = "auto"; cfg.compV = 1; } if (!cfg.simpleV) { cfg.hidden = [...new Set([...(cfg.hidden || []), "objectifs", "epi", "mot", "question"])]; cfg.simpleV = 1; } if (!cfg.simpleV2) { cfg.hidden = [...new Set([...(cfg.hidden || []), "deroulement"])]; cfg.simpleV2 = 1; } if (!cfg.simpleV3) { cfg.hidden = ["objectifs", "epi", "mot", "question", "deroulement"]; cfg.clock = "num"; cfg.couleurs = "fixe"; cfg.simpleV3 = 1; } } catch (e) {}
 function save() { try { localStorage.setItem("accueil-atelier-v4", JSON.stringify(cfg)); } catch (e) {} }
 
 const $ = id => document.getElementById(id);
@@ -1198,9 +1200,12 @@ function couleursDuJour() {
 function applyTheme() {
   const r = document.documentElement;
   setTimeout(couleursDuJour, 0);
-  r.classList.toggle("force-light", cfg.theme === "light");
-  r.classList.toggle("force-dark", cfg.theme === "dark");
+  let t = cfg.theme;
+  if (t !== "light" && t !== "dark") { const s = localStorage.getItem("accueilClair"); t = s === "1" ? "light" : s === "0" ? "dark" : ""; }
+  r.classList.toggle("force-light", t === "light");
+  r.classList.toggle("force-dark", t === "dark");
 }
+addEventListener("storage", e => { if (e.key === "accueilClair") applyTheme(); });
 
 // ---------- Horloges ----------
 const SEG = { 0: "abcdef", 1: "bc", 2: "abged", 3: "abgcd", 4: "fgbc", 5: "afgcd", 6: "afgedc", 7: "abc", 8: "abcdefg", 9: "abcdfg" };
