@@ -1,6 +1,109 @@
 [
   {
     "date": "2026-11-09",
+    "type": "outil",
+    "titre": "Tableau blanc : les outils",
+    "texte": "Barre refaite : les outils sont regroupés et nommés, les couleurs s'ouvrent au-dessus du crayon, et il y a une règle en cm, un rapporteur et une calculatrice.",
+    "formation": [
+      {
+        "t": "La barre, de gauche à droite : Crayon, Texte, Gomme, Annuler, Rétablir · Objets, Règle, Calcul, Fond · les tableaux ‹ 1 / 2 › + et la poubelle · Plus.",
+        "img": "nouveautes/barre.jpg"
+      },
+      {
+        "t": "Crayon : touche-le pour ouvrir la bulle (couleurs, autre couleur, surligneurs, trois grosseurs). La pastille montre la couleur en cours. Un tableau vide s'ouvre avec le crayon prêt.",
+        "img": "nouveautes/barre-couleur.jpg"
+      },
+      "Sans outil choisi : touche une forme, un objet ou un texte pour le choisir, glisse-le pour le déplacer, double-clic pour le modifier, Suppr pour l'effacer.",
+      "Texte : touche le tableau et écris (Entrée = nouvelle ligne). Toucher dans le vide termine le texte.",
+      "Gomme : son menu règle la taille et offre « Tout effacer ». Touche la gomme encore pour la ranger.",
+      {
+        "t": "Règle : en cm (1 cm = 1 carreau). Glisse-la, tourne-la avec la poignée orange. Avec le crayon, glisse le long de son bord gradué : le trait est droit et sa longueur s'affiche. « Angles » ajoute un rapporteur.",
+        "img": "nouveautes/regle.jpg"
+      },
+      "Calcul : une calculatrice à déplacer sur le tableau. « Sci » ajoute sin, cos, tan (angles en degrés), xʸ et log.",
+      "Fond : change le fond du tableau, ton dessin suit. « Plus » : zoom, déplacer, enregistrer en image, Mes schémas et modèles."
+    ],
+    "versions": [
+      {
+        "date": "2026-11-09",
+        "texte": "Barre regroupée par catégories avec les mots; bulle du crayon; Rétablir, poubelle du tableau et « Tout effacer » replacés; règle en cm, rapporteur, calculatrice scientifique; le dessin suit le fond."
+      },
+      {
+        "date": "2026-11-03",
+        "texte": "Le tableau blanc s'ouvre toujours dézoomé (tout le tableau visible)."
+      },
+      {
+        "date": "2026-11-03",
+        "texte": "Palette Objets : les explications (en bas de la palette et dans le message du haut) sont plus courtes."
+      },
+      {
+        "date": "2026-10-29",
+        "texte": "⋯ Plus → Tableaux : bouton « Supprimer » pour enlever le tableau affiché (toucher deux fois)."
+      }
+    ]
+  },
+  {
+    "date": "2026-11-09",
+    "type": "outil",
+    "titre": "Lecture des livres",
+    "texte": "Barre du bas plus claire : chaque outil a son nom. Le crayon prend la place des outils du livre le temps d'écrire.",
+    "formation": [
+      {
+        "t": "La barre : les pages, puis Réponses, Animation, Sommaire · Crayon, Tableau blanc · 100 %, 2 pages, Plein écran · Télécommande · Plus.",
+        "img": "nouveautes/livre-barre.jpg"
+      },
+      {
+        "t": "Sommaire (touche M) : la table des matières s'ouvre à droite, le livre reste visible. Recherche dans le livre, Animations, Exercices, « Tu es ici ».",
+        "img": "nouveautes/livre-tdm.jpg"
+      },
+      "Réponses (touche R) : chaque clic sur › montre la réponse suivante de la page.",
+      {
+        "t": "Crayon : ses outils remplacent ceux du livre; les flèches de page restent. « Terminé » ramène les outils du livre.",
+        "img": "nouveautes/livre-crayon.jpg"
+      },
+      "Zoom : pince ou tourne la roulette; « 100 % » revient à la page entière. Une fois zoomé, glisse la page pour te déplacer.",
+      "Plus : minuterie, cache, pointeur laser, écran noir, imprimer une page. Les barres qui se cachent seules se règlent dans Mes préférences."
+    ],
+    "versions": [
+      {
+        "date": "2026-11-09",
+        "texte": "Mots sous les icônes et outils regroupés; le crayon s'ouvre dans la barre (bouton « Terminé »); même bulle de couleurs que le tableau blanc; « Plus » allégé."
+      },
+      {
+        "date": "2026-11-07",
+        "texte": "Table des matières refaite : panneau à droite, recherche dans le livre, listes Animations et Exercices, « Tu es ici »."
+      },
+      {
+        "date": "2026-11-03",
+        "texte": "Roulette : elle zoome toujours, même avec le crayon et sur la page de droite en double page (plus de page qui descend), plus fluide dans les livres et le tableau blanc; aucune page ne se tourne pendant le zoom; roulette enfoncée pour déplacer la page : plus de défilement automatique."
+      },
+      {
+        "date": "2026-10-29",
+        "texte": "L'avis « Reprendre à la page… » est plus petit et discret."
+      }
+    ]
+  },
+  {
+    "date": "2026-11-09",
+    "titre": "Quiz : mène la partie avec ton cellulaire",
+    "texte": "Ton cellulaire devient la manette du quiz : tu restes dans la classe pendant que le tableau affiche la partie. Classement animé, et une partie interrompue reprend où elle était.",
+    "formation": [
+      "Lance un quiz en « Animer au tableau » : un code QR « Enseignant seulement » apparaît. Scanne-le avec ton cellulaire (connecté à Métier+).",
+      "Sur le cellulaire : un gros bouton pour l'étape suivante, la minuterie, « +10 s », le son, qui a répondu, et retirer un joueur.",
+      "Avant la partie, la fenêtre des réglages est plus claire : qui joue, nombre de questions, ordre, temps, musique, et « Pour les corser ».",
+      "Le classement montre les 10 premiers. Un élève qui revient (iPad rechargé) garde ses points.",
+      "Cinq secondes avant la fin, l'écran de l'élève qui n'a pas répondu clignote en rouge (et vibre sur Android)."
+    ],
+    "versions": [
+      {
+        "date": "2026-11-09",
+        "texte": "Manette au cellulaire, fenêtre d'avant-partie refaite, classement limité aux 10 premiers, rappel de fin de question."
+      },
+      "8 nov. : classement animé, son plus fort, reprise d'une partie interrompue."
+    ]
+  },
+  {
+    "date": "2026-11-09",
     "type": "ajout",
     "livre": "montages-electriques-c5",
     "titre": "Nouveau livre : Ateliers de montages électriques (Plomberie, compétence 5)",
@@ -16,20 +119,6 @@
         "date": "2026-11-09",
         "texte": "Version 1 : 23 pages, schémas filaires en plan technique."
       }
-    ]
-  },
-  {
-    "date": "2026-11-08",
-    "titre": "Quiz : classement animé et partie qui reprend",
-    "texte": "Le classement entre les questions est plus vivant, le son est plus fort, et une partie interrompue par erreur reprend là où elle était. Un élève dont l'iPad se recharge, ou dont l'enseignant se déconnecte, revient tout seul dans la partie avec son personnage. À la fin, un bilan pour l'enseignant montre les questions à revoir, et le podium se dévoile du 3e au 1er.",
-    "formation": [
-      "Après chaque question : « Ça chauffe » (2 de suite), « En feu » (3), « Inarrêtable » (5), « Légendaire » (8), et un éclair pour la réponse la plus rapide.",
-      "Quand le premier change : grande annonce « Nouveau premier » avec confettis. Chaque joueur qui remonte s'allume en vert.",
-      "Page fermée ou changée par erreur ? Reviens dans le quiz : la partie reprend avec les mêmes joueurs et les mêmes points (3 h au plus).",
-      "Depuis la page des quiz, le bandeau vert « Une partie est en cours » permet aussi de la reprendre."
-    ],
-    "versions": [
-      "8 nov. : classement animé, son plus fort, reprise d'une partie interrompue."
     ]
   },
   {
@@ -617,43 +706,6 @@
     ]
   },
   {
-    "date": "2026-11-07",
-    "type": "outil",
-    "titre": "Lecture des livres",
-    "texte": "Même barre et mêmes réponses pas à pas dans tous les livres. Nouvelle table des matières à droite : recherche dans le livre, Animations, Exercices.",
-    "formation": [
-      {
-        "t": "Touche M (ou ☰) : la table des matières s'ouvre à droite, le livre reste visible. « Tu es ici » montre le module en cours.",
-        "img": "nouveautes/livre-tdm.jpg"
-      },
-      "Écris un mot dans « Chercher dans ce livre » pour trouver toutes les pages qui en parlent. Les boutons Animations et Exercices les listent.",
-      {
-        "t": "Bouton ✓ (touche R) : chaque clic montre la réponse suivante de la page (grisé = pas de réponse).",
-        "img": "nouveautes/livre-barre.jpg"
-      },
-      "Tiens › enfoncé pour avancer vite dans les pages.",
-      "Roulette = zoom sous la souris; une fois zoomé, glisse la page (ou garde la roulette enfoncée) pour te déplacer."
-    ],
-    "versions": [
-      {
-        "date": "2026-11-07",
-        "texte": "Table des matières refaite : panneau à droite, recherche dans le livre, listes Animations et Exercices, « Tu es ici »."
-      },
-      {
-        "date": "2026-11-03",
-        "texte": "Roulette : elle zoome toujours, même avec le crayon et sur la page de droite en double page (plus de page qui descend), plus fluide dans les livres et le tableau blanc; aucune page ne se tourne pendant le zoom; roulette enfoncée pour déplacer la page : plus de défilement automatique."
-      },
-      {
-        "date": "2026-10-29",
-        "texte": "L'avis « Reprendre à la page… » est plus petit et discret."
-      },
-      {
-        "date": "2026-10-28",
-        "texte": "Roulette enfoncée : déplace la page zoomée. Petit jeu élastique au-delà des bords quand on glisse (la page revient en place)."
-      }
-    ]
-  },
-  {
     "date": "2026-10-29",
     "type": "maj",
     "livre": "dispositifs-electriques-c9",
@@ -667,55 +719,6 @@
       {
         "date": "2026-10-29",
         "texte": "Version 6 du cahier (324 pages)."
-      }
-    ]
-  },
-  {
-    "date": "2026-11-03",
-    "type": "outil",
-    "titre": "Tableau blanc : les outils",
-    "texte": "Une seule ligne d'outils : crayon, texte, objets, gomme, annuler, fond. Tout est gardé tout seul sur l'ordinateur.",
-    "formation": [
-      {
-        "t": "La barre : crayon, texte, objets (le cube), gomme, annuler, fond. ⋯ Plus : rétablir, tout effacer, zoom, tableaux précédent / suivant / nouveau / supprimer (toucher deux fois), Mes schémas, enregistrer en PNG.",
-        "img": "nouveautes/barre.jpg"
-      },
-      {
-        "t": "Crayon : un toucher l'active et ouvre son menu : couleurs (ronds), autre couleur (+), surligneurs (carrés), tracé (libre, ligne, flèche, rectangle, ellipse) et épaisseur. Touche-le encore pour l'éteindre.",
-        "img": "nouveautes/barre-couleur.jpg"
-      },
-      "Sans outil choisi : touche une forme, un objet ou un texte pour le choisir, glisse-le pour le déplacer, double-clic pour le modifier, Suppr pour l'effacer.",
-      "Texte : touche le tableau et écris (Entrée = nouvelle ligne). Toucher dans le vide termine le texte et range l'outil Texte. Échap annule.",
-      "Gomme : la fenêtre de taille reste ouverte et un cercle montre ce qui sera effacé. Touche la gomme encore pour la ranger (aucun outil, pas de retour au crayon).",
-      {
-        "t": "Plusieurs à la fois : sans outil choisi, glisse dans le vide pour tracer un cadre (avec un outil : Ctrl + glisser). Le groupe se déplace, change de couleur ou s'efface ensemble. Ctrl+C / Ctrl+V / Ctrl+D pour copier, coller, dupliquer.",
-        "img": "nouveautes/selection-multiple.jpg"
-      },
-      {
-        "t": "Chaque fond garde son propre dessin. En changeant de fond, un petit avis offre « Apporter ici » pour transporter le dessin.",
-        "img": "nouveautes/fond-dessin.jpg"
-      },
-      {
-        "t": "« Mes modèles » (en haut de la palette Objets, dans tous les onglets : Formes, Iso, Électricité, Plomberie) : donne un nom au tableau pour l'enregistrer, le rouvrir plus tard ou l'exporter vers un collègue.",
-        "img": "nouveautes/sch-miens.jpg"
-      }
-    ],
-    "versions": [
-      {
-        "date": "2026-11-03",
-        "texte": "Le tableau blanc s'ouvre toujours dézoomé (tout le tableau visible)."
-      },
-      {
-        "date": "2026-11-03",
-        "texte": "Palette Objets : les explications (en bas de la palette et dans le message du haut) sont plus courtes."
-      },
-      {
-        "date": "2026-10-29",
-        "texte": "⋯ Plus → Tableaux : bouton « Supprimer » pour enlever le tableau affiché (toucher deux fois)."
-      },
-      {
-        "date": "2026-10-29",
-        "texte": "Menu du crayon plus compact (3 lignes, sans les mots) et nouveau bouton « Autre couleur » qui montre ta dernière couleur choisie."
       }
     ]
   },
@@ -770,7 +773,7 @@
     ]
   },
   {
-    "date": "2026-11-03",
+    "date": "2026-11-09",
     "type": "outil",
     "titre": "Tableau blanc : plan isométrique",
     "texte": "Catalogue de plomberie et chauffage en 3D sur la grille iso : objets qui se branchent, se mettent debout, et tuyaux toujours droits.",
@@ -798,6 +801,10 @@
     ],
     "versions": [
       {
+        "date": "2026-11-09",
+        "texte": "Les vannes s'appellent maintenant « valves » (Valve, Valve à bille, Valve 3 voies, Valve motorisée); nouvelle valve solénoïde à bobine rouge; palette Objets aux couleurs Métier+, onglets sur une rangée."
+      },
+      {
         "date": "2026-11-03",
         "texte": "Crayon iso plus réactif : la ligne suit ta main pendant le trait et s'accroche à la grille au relâchement; les virages se détectent plus tôt, même sur des côtés d'un seul pas (petit cube 1×1)."
       },
@@ -808,10 +815,6 @@
       {
         "date": "2026-10-29",
         "texte": "Deux modèles iso plus complets : chauffage sur 2 étages avec vannes de zone, plancher radiant avec collecteur."
-      },
-      {
-        "date": "2026-10-29",
-        "texte": "Modèles prêts à utiliser en iso; modèles classés par catégorie (repliées au départ)."
       }
     ]
   },
@@ -844,7 +847,7 @@
     ]
   },
   {
-    "date": "2026-10-28",
+    "date": "2026-11-09",
     "type": "outil",
     "titre": "Tableau blanc : schéma électrique en échelle",
     "texte": "Dessine et anime des schémas en échelle sur le quadrillé, avec des modèles prêts et un exercice « Trouve la panne ».",
@@ -872,9 +875,14 @@
       {
         "t": "Trouve la panne : une panne est cachée dans le circuit; « Révéler » la montre, « Réparer » remet tout en état.",
         "img": "nouveautes/panne-revelee.jpg"
-      }
+      },
+      "Animer : dès qu'il y a un symbole ou un fil sur le tableau, un bouton vert « Animer » apparaît sur la barre. Un toucher lance le courant; il devient « Arrêter »."
     ],
     "versions": [
+      {
+        "date": "2026-11-09",
+        "texte": "Bouton « Animer » sur la barre du tableau blanc (avant : au bas de l'onglet Électricité)."
+      },
       {
         "date": "2026-10-28",
         "texte": "Animation corrigée : les lampes ne s'allument plus à travers un interrupteur ouvert."
