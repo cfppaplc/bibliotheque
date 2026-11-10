@@ -2740,19 +2740,20 @@ function enveloppe(pts){
 }
 /* collecteur : départ (haut, rouge) en n=0, retour (bas, bleu) en n=1 ; ports = [départ principal, retour principal, N départs de boucle, N retours de boucle] */
 const manP = N => [[-1,0],[-1,1], ...Array.from({length:N}, (_, i) => [i+1, 0]), ...Array.from({length:N}, (_, i) => [i+1, 1])];
-const DEBOUT_OK = /^(plinthe|radiateur|pompe|vanne|boisseau|vannemot|vanne3)$/;   /* objets qu'on peut mettre debout (tuyau vertical) */
+const DEBOUT_OK = /^(plinthe|radiateur|pompe|vanne|boisseau|vannemot|vanne3|valvesol)$/;   /* objets qu'on peut mettre debout (tuyau vertical) */
 const OBJETS = {
   plinthe:   { n:"Plinthe chauffante", ports:[[0,0],[3,0]], fill:"#d9dee5" },
   radiateur: { n:"Radiateur",          ports:[[0,0],[2,0]], fill:"#e8ecf1" },
   chaudiere: { n:"Chaudière",          ports:[[0,1],[1,2]], fill:"#c7d1dd" },
   pompe:     { n:"Pompe circulatrice",              ports:[[0,0],[1,0]], fill:"#cfe0f2" },
-  vanne:     { n:"Vanne",              ports:[[0,0],[1,0]], fill:"#f0c9c9" },
-  boisseau:  { n:"Vanne à boisseau",  ports:[[0,0],[1,0]], fill:"#d9b45a" },
+  vanne:     { n:"Valve",              ports:[[0,0],[1,0]], fill:"#f0c9c9" },
+  boisseau:  { n:"Valve à bille",  ports:[[0,0],[1,0]], fill:"#d9b45a" },
   collecteur4:{ n:"Collecteur 4 boucles", ports:manP(4), fill:"#d9dee5" },
   collecteur6:{ n:"Collecteur 6 boucles", ports:manP(6), fill:"#d9dee5" },
   serpentin: { n:"Serpentin (plancher radiant)", ports:[[0,0]], fill:"#e07070" },
-  vanne3:    { n:"Vanne 3 voies",     ports:[[0,0],[2,0],[1,1]], fill:"#d9a3a3" },
-  vannemot:  { n:"Vanne motorisée",    ports:[[0,0],[1,0]], fill:"#d9a3a3" },
+  vanne3:    { n:"Valve 3 voies",     ports:[[0,0],[2,0],[1,1]], fill:"#d9a3a3" },
+  vannemot:  { n:"Valve motorisée",    ports:[[0,0],[1,0]], fill:"#d9a3a3" },
+  valvesol:  { n:"Valve solénoïde",    ports:[[0,0],[1,0]], fill:"#d9b45a" },   /* 9 nov. : valve électrique à bobine rouge sur corps de laiton (le genre utilisé à l'atelier), sans marque dessinée */
   vase:      { n:"Vase d'expansion",   ports:[[0,0]],       fill:"#f3dcc2" }
 };
 /* ---- Schéma électrique en échelle : symboles posés sur le quadrillé ; les fils s'accrochent aux bornes et suivent le symbole ---- */
@@ -2994,6 +2995,14 @@ function objGeo(s, W, H){
     cyl(.5, 0, .05, .45, .62, "#9aa7b5"); box(.12, -.04, .88, .04, .62, .7, "#c0392b");                          /* tige et poignée (ouverte) */
     box(.28, -.1, .38, .1, .05, .33, "#8f9cab"); box(0, -.07, .3, .07, .08, .3, "#aab4c0");                     /* écrou et tuyau proche */
   }
+  else if (s.k === "valvesol"){
+    box(.7, -.07, 1, .07, .08, .3, "#aab4c0"); box(.28, -.2, .72, .2, 0, .5, "#d9b45a");           /* tuyau éloigné et corps de laiton */
+    cyl(.5, 0, .11, .5, .72, "#3c4650");                                                           /* tube du plongeur */
+    box(.28, -.24, .72, .24, .72, 1.3, "#c8102e");                                                 /* bobine rouge */
+    box(.4, .24, .6, .42, .86, 1.12, "#9aa7b5");                                                   /* entrée du conduit électrique */
+    cyl(.5, 0, .08, 1.3, 1.38, "#d7dce2", 0);                                                      /* écrou du dessus */
+    box(0, -.07, .3, .07, .08, .3, "#aab4c0");                                                     /* tuyau proche */
+  }
   else if (s.k === "vannemot"){
     box(.7, -.07, 1, .07, .08, .3, "#aab4c0"); box(.3, -.2, .7, .2, 0, .45);                       /* tuyau éloigné et corps de vanne */
     cyl(.5, 0, .11, .45, .75, "#9aa7b5"); box(.26, -.2, .74, .2, .75, 1.2, "#35506b", { fins:[.08, .4, .08, .83, 1.12] });   /* tige et servomoteur */
@@ -3002,9 +3011,9 @@ function objGeo(s, W, H){
   }
   else if (s.k === "vase"){ cyl(0, 0, .09, 0, .4, "#9aa7b5"); cyl(0, 0, .5, .35, 1.55, "#d4574f", 1); cyl(0, 0, .08, 1.55, 1.7, "#8f9cab"); }
   const LV = def.ports && def.ports.length ? Math.round(Math.max(...def.ports.map(q => q[0]))) : 1;   /* debout : les raccords restent sur la grille; vers le haut et vers le bas échangent les deux raccords */
-  { const cH = { vanne:.19, boisseau:.19, vannemot:.19, vanne3:.19, pompe:.185 }[s.k];   /* le bout de tuyau de l'objet est centré sur le raccord (avant, le raccord était sous le tuyau) */
+  { const cH = { vanne:.19, boisseau:.19, vannemot:.19, vanne3:.19, valvesol:.19, pompe:.185 }[s.k];   /* le bout de tuyau de l'objet est centré sur le raccord (avant, le raccord était sous le tuyau) */
     if (cH) shapes.forEach(sh => ["h", "h0", "h1"].forEach(c => { if (typeof sh[c] === "number") sh[c] -= cH; })); }
-  if (/^(vanne|boisseau|vannemot|vanne3)$/.test(s.k)){ const f = .68;                          /* vannes plus fines : même longueur (raccords sur la grille), section et volant réduits */
+  if (/^(vanne|boisseau|vannemot|vanne3|valvesol)$/.test(s.k)){ const f = .68;                          /* vannes plus fines : même longueur (raccords sur la grille), section et volant réduits */
     shapes.forEach(sh => { ["n", "n0", "n1", "h", "h0", "h1", "R"].forEach(c => { if (typeof sh[c] === "number" && !(c[0] === "n" && Math.abs(sh[c]) > .9)) sh[c] *= f; });   /* une branche qui va jusqu'à un raccord garde sa longueur */
       if (sh.extra && sh.extra.fins){ const F = sh.extra.fins.slice(); F[3] *= f; F[4] *= f; sh.extra = Object.assign({}, sh.extra, { fins:F }); } }); }
   /* objet debout : l'axe du tuyau devient vertical. Vers le haut : volant tourné vers la gauche; vers le bas : volant vers la droite (raccords échangés) */
@@ -3103,7 +3112,7 @@ function dessinerObjet(g, s, W, H, k, col){
   return G;
 }
 const def2 = s => OBJETS[s.k].fill;
-const BEAU = new Set(["vanne"]);   /* objets iso au rendu soigné (essai du 9 nov. : la vanne; ajouter les autres si Jeremy aime) */
+const BEAU = new Set(["vanne", "valvesol"]);   /* objets iso au rendu soigné (essai du 9 nov. : la vanne; ajouter les autres si Jeremy aime) */
 const TXFONTS = [["Sans","system-ui,'Segoe UI',Arial,sans-serif"],["Serif","Georgia,'Times New Roman',serif"],["Mono","ui-monospace,Consolas,'Courier New',monospace"],["Manuscrite","'Segoe Print','Comic Sans MS','Bradley Hand',cursive"],["Titre","Impact,'Arial Black',sans-serif"]];
 const txFs = s => s.fs || (12 + s.w * 5);
 const txFont = (s, px) => (s.i ? "italic " : "") + (s.b === false ? 400 : s.b === true ? 700 : 600) + " " + px + "px " + (s.f || TXFONTS[0][1]);
