@@ -10377,6 +10377,7 @@ window.ACCES = (function(){
       + '<h3>Bibliothèque</h3>'
       + '<div class="lig"><span>Livres affichés au départ</span>' + seg("prog", PROG, P.prog === undefined ? "" : P.prog) + '</div>'
       + '<div class="lig"><span>Livre en plein écran</span>' + seg("plein", [["oui","Oui"],["non","Non"]], P.plein === false ? "non" : "oui") + '</div>'
+      + '<div class="lig"><span>Barres du livre</span>' + seg("barres", [["auto","Se cachent seules"],["fixes","Toujours visibles"]], localStorage.barresFixes === "1" ? "fixes" : "auto") + '</div>'
       + '<div class="lig"><span>Reprendre où j\'étais</span>' + seg("reprise", [["demander","Demander"],["toujours","Toujours"],["jamais","Jamais"]], P.reprise || "demander") + '</div>'
       + (ACCES.eleve ? '' : '<h3>Tableau blanc</h3>'
       + '<div class="lig"><span>Fond au départ</span>' + seg("fond", FONDS, P.fond || "blanc") + '</div>'
@@ -10384,6 +10385,7 @@ window.ACCES = (function(){
       + '<div class="acces-btns" style="justify-content:space-between;align-items:center;margin-top:16px"><button type="button" class="raz" id="pRaz">Remettre comme au départ</button><button class="prim" id="pFin">Terminé</button></div></div>';
     B.querySelectorAll("[data-k]").forEach(b => b.onclick = () => { const k = b.dataset.k, v = b.dataset.v;
       if (k === "leger"){ if (window.modeLegerFixer) window.modeLegerFixer(v); contenu(B); return; }
+      if (k === "barres"){ if ((localStorage.barresFixes === "1") !== (v === "fixes")) document.getElementById("tbPin").click(); contenu(B); return; }   /* l'ancien bouton « Barres automatiques » de Plus d'outils, maintenant caché */
       ecrire(k, k === "bonjour" || k === "plein" ? (v === "oui" ? null : false) : v); });
     B.querySelector("#pFin").onclick = () => { document.getElementById("accesOv").hidden = true; };
     B.querySelector("#pRaz").onclick = () => { try { localStorage.removeItem(cle()); } catch(e){} dejaProg = ""; window.appliquerPrefs(); dessiner(); };
@@ -10675,6 +10677,8 @@ body.visiteur .mp-pied{margin-top:30px}
 }
 .penbar .wbq{display:none}
 #penDone{display:none}
+/* Plus d'outils allégé (9 nov.) : Code QR élèves (version élève pas lancée : à remettre au lancement), Raccourcis (dans l'Aide), Barres automatiques (dans Mes préférences), Projecteur (le Cache suffit), Signet */
+#tbQr,#tbHelp,#tbPin,#tbSpot,#tbMark{display:none!important}
 .reader:not(.wbon) #wbToutB,.reader:not(.wbon) #wbRetB{display:none!important}
 .reader.wbon .penbar .wbq{display:inline-flex;align-items:center;gap:6px;padding:0 6px;border-left:1px solid #2f2f33;border-right:1px solid #2f2f33;min-height:44px}
 .penbar .wbq button.c{min-width:34px;width:34px;height:34px;border-radius:50%;background:var(--c);border:2px solid #3a3a40;padding:0}
