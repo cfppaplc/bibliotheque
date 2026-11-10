@@ -9222,10 +9222,12 @@ return {matrice:function(texte){var q=new QRCode(-1,L.M);q.addData(texte);q.make
   }).catch(() => {});
 })();
 </script>
+<style>.qr-ens{display:none}.qr-ov.tele .qr-ens{display:inline-block;background:#B3261E;color:#fff;font-weight:800;font-size:14px;letter-spacing:.06em;text-transform:uppercase;padding:6px 14px;border-radius:999px;margin-bottom:10px}</style>
 <div class="qr-ov" id="qrOv" hidden role="dialog" aria-label="Code QR pour les élèves">
   <div class="qr-box">
     <div class="qr-code" id="qrCode"></div>
     <div class="qr-txt">
+      <div class="qr-ens">Enseignant seulement</div>
       <h2 id="qrTitre"></h2>
       <p id="qrPage"></p>
       <p class="qr-aide">Les élèves scannent le code avec l'appareil photo de leur téléphone : le livre s'ouvre à cette page.</p>
