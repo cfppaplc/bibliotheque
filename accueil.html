@@ -3194,7 +3194,7 @@ html.apercu-mode #menage{display:none}
   el.addEventListener("click", () => { if (mini) { mini = false; el.classList.remove("mini"); } });
   function montrer(on){
     if (on && el.hidden) { el.hidden = false; requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add("on"))); }
-    else if (!on && !el.hidden) { el.classList.remove("on"); setTimeout(() => { if (!el.classList.contains("on")) el.hidden = true; }, 360); }
+    else if (!on && !el.hidden) { el.style.transition = "none"; el.classList.remove("on"); el.hidden = true; void el.offsetHeight; el.style.transition = ""; }   /* fermeture nette : le fondu laissait un fantôme du ménage sur le tableau (vidéo du 10 nov.) */
   }
   function verifier(){
     const m = M(), now = new Date(), nowMin = now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60;
