@@ -242,6 +242,16 @@ body.bord{--acc:#EB6A22;--fond:#F3F1EC}html.sombre body.bord{--acc:#EB6A22}
 #modes .bx{max-height:94vh;overflow:auto}
 #modes .regRap .seg button{text-transform:none;letter-spacing:0;background:#fff;border:1px solid var(--ligne)}#modes .regRap .seg button.on{background:var(--acc);color:#fff;border-color:transparent}
 @media (max-width:640px){#modes .regRap{grid-template-columns:1fr}}
+/* Fenêtre d'avant-partie refaite (9 nov., même style que Mes préférences) : nom à gauche, choix à droite, tous alignés et de la même largeur */
+#modes .regRap.r2{display:block;background:transparent;padding:0;margin:6px 0 14px}
+#modes .regRap.r2 h3{display:flex;align-items:center;gap:12px;margin:16px 0 2px;padding-bottom:6px;border-bottom:1px solid var(--ligne);font-size:12px;font-weight:800;color:var(--gris);text-transform:uppercase;letter-spacing:.05em}
+#modes .regRap.r2 h3 button{margin-left:auto;padding:6px 14px;font-size:13px;text-transform:none;letter-spacing:0;background:#24211E;color:#fff;border-radius:99px}
+#modes .regRap.r2 label{display:grid;grid-template-columns:minmax(0,1fr) 340px;align-items:center;gap:14px;padding:6px 0;font-size:15px;font-weight:600;color:var(--txt);text-transform:none;letter-spacing:0}
+#modes .regRap.r2 label small{display:block;font-weight:400;font-size:12px;opacity:.6}
+#modes .regRap.r2 .seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:3px;padding:3px;border-radius:11px;background:rgba(128,128,128,.16)}
+#modes .regRap.r2 .seg button{border:0!important;background:transparent!important;border-radius:8px;min-height:36px;padding:0 4px;font-size:14px;font-weight:600;white-space:nowrap;color:inherit}
+#modes .regRap.r2 .seg button.on{background:#EB6A22!important;color:#fff!important;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+@media (max-width:640px){#modes .regRap.r2 label{grid-template-columns:1fr;gap:5px;padding:8px 0}}
 #modes .duo{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0 10px}
 #modes .duo button{padding:20px 12px;font-size:17px;line-height:1.3;text-align:left}
 #modes .duo small{display:block;font-weight:500;font-size:13px;opacity:.85;margin-top:4px}
@@ -1022,20 +1032,21 @@ function telecommande(bord){
   function modes(id){
     const q = tousQuiz().find(x => x.id === id), r0 = Object.assign({}, REG_DEF, q.reg, reglagesDe(id)), n = q.qs.length;
     const seg = (k, opts) => `<div class="seg" data-o="${k}">${opts.map(([v, t]) => `<button data-v="${v}" class="${String(r0[k]) === v ? "on" : ""}">${t}</button>`).join("")}</div>`;
-    const nbOpts = [["tout", "Toutes (" + n + ")"]].concat([10, 12, 15, 20].filter(x => x < n).map(x => [String(x), x + " au hasard"]));
+    const nbOpts = [["tout", "Toutes (" + n + ")"]].concat([10, 12, 15, 20].filter(x => x < n).map(x => [String(x), String(x)]));
     if (!nbOpts.some(([v]) => v === String(r0.nb))) r0.nb = "tout";
     document.body.insertAdjacentHTML("beforeend", `<div id="modes"><div class="bx"><h2>${esc(q.titre)}</h2>
-      <div class="regRap">
-        <label>Qui joue${seg("mode", [["ind", "Chaque élève"], ["eq", "En équipes"]])}</label>
-        <label>Questions${seg("nb", nbOpts)}</label>
-        <label>Ordre${seg("melange", [["non", "Tel quel"], ["tout", "Mêlé"]])}</label>
-        <label>Temps pour répondre${seg("temps", [["moins", "Court"], ["normal", "Normal"], ["plus", "Long"]])}</label>
-        <label>Musique${seg("musique", [["oui", "Oui"], ["non", "Non"]])}</label>
-        <div class="corser"><b>Pour les caler</b><button id="mExpert" class="btn2">Mode expert</button><small>temps court + pénalité + choix cachés</small></div>
-        <label>Pénalité${seg("penalite", [["non", "Non"], ["oui", "−250 si faux"]])}</label>
-        <label>Choix cachés${seg("cache", [["non", "Non"], ["oui", "5 s pour lire"]])}</label>
-        <label>Texte des choix${seg("lettres", [["non", "Au tableau"], ["oui", "iPad seulement"]])}</label>
-        <label>Double ou rien${seg("double", [["non", "Non"], ["oui", "À la dernière"]])}</label>
+      <div class="regRap r2">
+        <h3>La partie</h3>
+        <label><span>Qui joue</span>${seg("mode", [["ind", "Chaque élève"], ["eq", "En équipes"]])}</label>
+        <label><span>Questions<small>un nombre = tirées au hasard</small></span>${seg("nb", nbOpts)}</label>
+        <label><span>Ordre</span>${seg("melange", [["non", "Tel quel"], ["tout", "Mêlé"]])}</label>
+        <label><span>Temps pour répondre</span>${seg("temps", [["moins", "Court"], ["normal", "Normal"], ["plus", "Long"]])}</label>
+        <label><span>Musique</span>${seg("musique", [["oui", "Oui"], ["non", "Non"]])}</label>
+        <h3>Pour les corser <button id="mExpert" class="btn2" title="Temps court + pénalité + choix cachés">Mode expert</button></h3>
+        <label><span>Pénalité</span>${seg("penalite", [["non", "Non"], ["oui", "−250 si faux"]])}</label>
+        <label><span>Choix cachés</span>${seg("cache", [["non", "Non"], ["oui", "5 s pour lire"]])}</label>
+        <label><span>Texte des choix</span>${seg("lettres", [["non", "Au tableau"], ["oui", "iPad seulement"]])}</label>
+        <label><span>Double ou rien</span>${seg("double", [["non", "Non"], ["oui", "À la dernière"]])}</label>
       </div>
       <div class="sous">Comment veux-tu afficher la partie ?</div>
       <div class="duo"><button id="mAnim">Animer au tableau<small>Un seul ordinateur : l'écran de classe avec ses commandes en bas.</small></button>
