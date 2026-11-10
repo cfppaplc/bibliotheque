@@ -87,6 +87,11 @@
   .clair .lead b,.blanc .lead b{color:var(--txt)}
   .centre{text-align:center}.centre .lead{margin-left:auto;margin-right:auto}
   .ecran{margin-top:60px;border-radius:20px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.08)}
+  .photo{margin-top:60px;border-radius:22px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.35)}
+  .photo img{display:block;width:100%;height:auto}
+  .photo-leg{margin-top:14px;font-size:.92rem;opacity:.65;text-align:center}
+  .photos2{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:60px}.photos2 .photo{margin-top:0}
+  @media (max-width:760px){.photos2{grid-template-columns:1fr}}
   .clair .ecran,.blanc .ecran{box-shadow:0 30px 70px rgba(30,42,68,.22);border-color:rgba(0,0,0,.06)}
   .ecran img{width:100%}
   .points{display:grid;grid-template-columns:repeat(4,1fr);gap:34px;margin-top:64px}
@@ -198,6 +203,15 @@
   </div>
 </section>
 
+<section class="sec">
+  <div class="w centre">
+    <p class="eyebrow rv">En classe</p>
+    <h2 class="rv d1">Pensé pour l'atelier.</h2>
+    <p class="lead rv d2">Projeté sur le tableau interactif, au milieu des établis. Gros boutons, gros texte : tout se lit du fond de la classe.</p>
+    <div class="photo rv"><img src="img/presentation/photo-enseignant.jpg" alt="Un enseignant montre un plan de Métier+ sur le tableau interactif de l'atelier" loading="lazy"></div>
+  </div>
+</section>
+
 <section class="sec clair" id="livres">
   <div class="w centre">
     <p class="eyebrow rv">Livres animés</p>
@@ -221,17 +235,7 @@
       <p class="lead rv d2">Scanne le code au tableau : ton cellulaire devient la télécommande du livre. Tourne les pages, saute à un module, montre les réponses, pointe avec le laser.</p>
       <ul class="liste rv d3"><li><div>Un pavé tactile <span>pour tourner, zoomer et te déplacer</span></div></li><li><div>Un laser <span>pour pointer sur l'écran de la classe</span></div></li><li><div>Aucune installation <span>: une page web, rien à télécharger</span></div></li></ul>
     </div>
-    <div class="rv d1" aria-hidden="true">
-      <div class="tel"><div class="ecr">
-        <div class="t1"><img src="img/metier-plus.svg" alt=""><i>● Branché</i></div>
-        <div class="tt">Montages de tuyauterie</div>
-        <div class="pg">Page 25 sur 66</div><div class="barre"><i></i></div>
-        <div class="mods"><span>Fonte</span><span class="on">PEX</span><span>Cuivre</span><span>Acier</span></div>
-        <div class="pad"><span>‹</span><span>›</span></div>
-        <div class="ong"><span class="on">Pages</span><span>Laser</span><span>Aller à…</span></div>
-        <div class="outils"><span>Réponses</span><span>Animation</span><span>Écran noir</span><span>100 %</span></div>
-      </div></div>
-    </div>
+    <div class="rv d1"><div class="photo" style="margin-top:0"><img src="img/presentation/photo-telecommande.jpg" alt="Un enseignant tient son cellulaire : la télécommande de Métier+ contrôle le livre projeté au tableau" loading="lazy"></div></div>
   </div>
 </section>
 
@@ -271,7 +275,10 @@
     <p class="eyebrow rv">Accueil de classe</p>
     <h2 class="rv d1">Le cours, d'un coup d'œil.</h2>
     <p class="lead rv d2">L'heure, la période, les pauses et le déroulement du cours, projetés pour toute la classe. Prépare ta semaine d'avance : <b>le bon livre, le bon plan ou le bon quiz s'ouvre au bon moment</b>.</p>
-    <div class="ecran rv"><img src="img/presentation/accueil.jpg" alt="L'accueil de classe : horloge, activité en cours et ligne du temps de la période" loading="lazy"></div>
+    <div class="photos2">
+      <div class="rv"><div class="photo"><img src="img/presentation/photo-accueil.jpg" alt="L'accueil de classe projeté dans l'atelier, avant l'arrivée des élèves" loading="lazy"></div><p class="photo-leg">Le matin : l'horloge, la période et le déroulement du cours.</p></div>
+      <div class="rv d1"><div class="photo"><img src="img/presentation/photo-menage.jpg" alt="En fin de cours, les élèves font le ménage pendant que la liste des tâches s'affiche au tableau" loading="lazy"></div><p class="photo-leg">En fin de cours : chaque équipe coche sa tâche de ménage.</p></div>
+    </div>
   </div>
 </section>
 
@@ -281,6 +288,7 @@
     <h2 class="rv d1">La classe participe.<br>L'atelier apprend.</h2>
     <p class="lead rv d2">Des quiz et des simulateurs joués avec les iPad de la classe. Les élèves scannent un code, choisissent un personnage du métier et répondent. <b>Aucun compte élève, aucune installation.</b></p>
   </div>
+  <div class="w"><div class="photo rv"><img src="img/presentation/photo-quiz.jpg" alt="Des élèves répondent à un quiz Métier+ sur leurs tablettes, la question projetée au tableau" loading="lazy"></div></div>
   <div class="w duo" style="margin-top:60px">
     <div class="rv"><div class="ecran" style="margin:0"><img src="img/presentation/simu.jpg" alt="Le défi panneau d'alarme du simulateur de protection incendie" loading="lazy"></div>
       <ul class="liste"><li><div>Quiz maison <span>: tes questions, ou plus de 250 questions tirées des livres</span></div></li><li><div>Simulateur de panneau d'alarme <span>: chaque iPad devient un panneau</span></div></li><li><div>Classement, séries et podium <span>: sobres, pour un public adulte</span></div></li></ul></div>
