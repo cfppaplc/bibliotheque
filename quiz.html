@@ -220,6 +220,8 @@ body.inclus .grid{grid-template-columns:1fr}
 #joueur .persos{max-width:860px}
 /* ---------- Tableau de bord des quiz ---------- */
 body.bord .grid{grid-template-columns:1fr}body.bord .grid>div:first-child{display:none}
+body.bord{--acc:#EB6A22;--fond:#F3F1EC}html.sombre body.bord{--acc:#EB6A22}
+#pretsD>summary{cursor:pointer;font-weight:800;font-size:17px;list-style:none;display:flex;align-items:center;gap:10px}#pretsD>summary::-webkit-details-marker{display:none}#pretsD>summary::before{content:"›";font-size:22px;transition:transform .2s}#pretsD[open]>summary::before{transform:rotate(90deg)}#pretsD>summary small{font-weight:500;color:var(--gris);font-size:13px}
 .cartes{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
 .cq{background:#fff;border:1px solid var(--ligne);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
 .cq .im{height:130px;background:var(--c) center/cover no-repeat;position:relative}
@@ -361,14 +363,14 @@ body>div:not(.cache):not([hidden]){animation:fenFond .22s ease-out}
 
 <!-- ============ CHOIX DU RÔLE ============ -->
 <div id="role" class="cache"><div class="carte"><img class="logoC" src="img/metier-plus.svg" alt="Métier+"><h1 style="margin:0">Quiz maison</h1>
-<div class="sous">Labo interactif · tes propres questions sur les iPad</div>
+<div class="sous">Labo · tes propres questions sur les iPad</div>
 <div class="duo"><button id="rAnim" style="grid-column:1/-1;padding:24px 10px;font-size:19px">🖥️ Animer au tableau<br><small style="font-weight:500">un seul ordinateur : l'écran de classe avec ses commandes</small></button>
 <button id="rTele" style="background:#3A3936">💻 Télécommande<br><small style="font-weight:500">ton ordinateur ou ta tablette</small></button>
 <button id="rEcr" style="background:#24211E">📺 Écran de classe<br><small style="font-weight:500">sur un 2e appareil, avec le code</small></button></div>
 <div id="rCode" class="cache"><div class="sous" style="margin-top:14px">Tape le code affiché sur la télécommande</div>
 <input id="rIn" inputmode="numeric" maxlength="7" placeholder="000 000"><button id="rGo" style="width:100%">Afficher l'écran de classe</button></div>
 <div class="sous" style="margin-top:14px">Les élèves scannent le code QR : leur iPad devient une manette de quiz.</div>
-<div style="margin-top:14px"><a href="labo.html" style="color:var(--acc);font-weight:700;text-decoration:none">‹ Labo interactif</a></div></div></div>
+<div style="margin-top:14px"><a href="labo.html" style="color:var(--acc);font-weight:700;text-decoration:none">‹ Labo</a></div></div></div>
 
 <!-- ============ ÉCRAN DE CLASSE ============ -->
 <div id="ecr" class="cache"></div>
@@ -389,7 +391,7 @@ body>div:not(.cache):not([hidden]){animation:fenFond .22s ease-out}
 <div id="vChoix">
 <div class="carte"><h2>Mes quiz</h2><div id="quizMiens" class="cartes"></div>
 <div class="ctl" style="margin-top:12px"><button id="bNouveau">+ Créer un quiz</button><button class="btn2" id="bColler">Coller des questions</button><button class="btn2" id="bImport">Importer un fichier</button><button class="btn2" id="bSauveTout" title="Un seul fichier avec tous tes quiz, à garder dans ton OneDrive">Sauvegarder tous mes quiz</button><input type="file" id="fImport" accept=".json,application/json" class="cache"></div></div>
-<div class="carte"><h2>Quiz prêts à jouer</h2><div class="sous" style="margin:-4px 0 12px">Un quiz par livre de la bibliothèque, illustré avec ses figures. « Copier et modifier » en fait une version à toi.</div><div id="quizListe" class="cartes"></div></div>
+<div class="carte"><details id="pretsD"><summary>Partir d'un quiz prêt <small id="pretsN"></small></summary><div class="sous" style="margin:8px 0 12px">Pour jouer tout de suite, passe par le <a href="labo.html" style="color:var(--acc);font-weight:700">Labo</a>. Ici, « Copier et modifier » fait d'un quiz prêt une version à toi; « Jouer » ouvre ses réglages (nombre de questions, temps, équipes).</div><div id="quizListe" class="cartes"></div></details></div>
 <div class="sous celQuiz" style="margin:4px 2px 18px">Animer avec ton cellulaire ? Sur ton cell, choisis un quiz puis « Télécommande ». Sur le tableau, ouvre <a href="quiz.html?role=1#ecran" style="color:var(--acc);font-weight:700">Écran de classe</a> et tape le code à 6 chiffres affiché sur ton cell.</div>
 </div>
 <div id="vColler" class="cache"><div class="carte"><h2>Coller des questions</h2>
@@ -445,7 +447,7 @@ Le propane s'accumule…
 /* Loi 25 : un nom tapé par l'élève = un seul mot (prénom ou surnom), jamais de nom de famille */
 function surnom(v){ return String(v || "").trim().split(/\s+/)[0].replace(/[^\p{L}\p{N}'_-]/gu, "").slice(0, 14); }
 
-/* Quiz maison — Labo interactif (Pavillon de l'Avenir). Même relais que le simulateur : Supabase Realtime (broadcast), ntfy.sh en secours.
+/* Quiz maison — Labo (Pavillon de l'Avenir). Même relais que le simulateur : Supabase Realtime (broadcast), ntfy.sh en secours.
    Télécommande = autorité (ordre, points, rangs). Messages :
    télécommande → tous : bienvenue, q (question), img (image pour l'écran), rev (réponse + résultat de chacun), fin, attente, vue (écran)
    joueur → télécommande : ici, rep ; écran → télécommande : ecran? */
@@ -825,11 +827,11 @@ function telecommande(bord){
     const carte = q => { const c = (q.reg || {}).coul || REG_DEF.coul;
       return `<div class="cq"><div class="im${q.livre && q.couv ? " livre" : ""}" style="--c:${esc(c)};${q.couv ? (q.livre ? `--u:url('${esc(q.couv)}')` : `background-image:url('${esc(q.couv)}')`) : ""}"><span>${q.qs.length} questions</span></div>
       <div class="co"><b>${esc(q.titre)}</b><span class="sous">${esc(q.sujet || (q.exemple ? "Quiz d'exemple" : ""))}</span>
-      <button class="jouer" data-jouer="${q.id}" style="background:${esc(c)}">Jouer</button>
+      <button class="jouer" data-jouer="${q.id}" style="background:${bord ? "#EB6A22" : esc(c)}">Jouer</button>
       <div class="pt">${q.exemple ? `<button class="btn2" data-copier="${q.id}">Copier et modifier</button>` : `<button class="btn2" data-modif="${q.id}">Modifier</button><button class="btn2" data-dupl="${q.id}">Dupliquer</button><button class="btn2" data-export="${q.id}">Exporter</button><button class="btn2" data-suppr="${q.id}">Supprimer</button>`}</div></div></div>`; };
     const miens = tousQuiz().filter(q => !q.exemple), prets = tousQuiz().filter(q => q.exemple);
     $("quizMiens").innerHTML = miens.map(carte).join("") || '<div class="sous" style="grid-column:1/-1;padding:6px 2px">Tu n\'as pas encore de quiz. Crée-en un, colle une liste de questions, ou pars d\'un quiz prêt à jouer avec « Copier et modifier ».</div>';
-    $("quizListe").innerHTML = prets.map(carte).join("");
+    $("quizListe").innerHTML = prets.map(carte).join(""); if ($("pretsN")) $("pretsN").textContent = "(" + prets.length + ")";
     const trouve = id => JSON.parse(JSON.stringify(tousQuiz().find(q => q.id === id)));
     document.querySelectorAll("[data-jouer]").forEach(b => b.onclick = () => {
       if (bord) { modes(b.dataset.jouer); return; }
@@ -1023,7 +1025,7 @@ function telecommande(bord){
     const nbOpts = [["tout", "Toutes (" + n + ")"]].concat([10, 12, 15, 20].filter(x => x < n).map(x => [String(x), x + " au hasard"]));
     if (!nbOpts.some(([v]) => v === String(r0.nb))) r0.nb = "tout";
     document.body.insertAdjacentHTML("beforeend", `<div id="modes"><div class="bx"><h2>${esc(q.titre)}</h2>
-      <div class="regRap" style="--acc:${esc(r0.coul)}">
+      <div class="regRap">
         <label>Qui joue${seg("mode", [["ind", "Chaque élève"], ["eq", "En équipes"]])}</label>
         <label>Questions${seg("nb", nbOpts)}</label>
         <label>Ordre${seg("melange", [["non", "Tel quel"], ["tout", "Mêlé"]])}</label>
@@ -1272,7 +1274,7 @@ function manette(code, k){
 /* ===== Animer au tableau : un seul ordinateur (écran de classe + barre + tiroir de télécommande) ===== */
 function animer(boutons){
   document.body.insertAdjacentHTML("beforeend", `<div id="tiroir"><button class="fermer" id="tirX" aria-label="Fermer la télécommande">›</button><iframe id="tirF" src="?tele=1&inclus=1${params.get("quiz") ? "&quiz=" + encodeURIComponent(params.get("quiz")) : ""}" title="Télécommande"></iframe></div>
-    <div id="animBar"><button id="retLabo" title="Retour à mes quiz">‹ Mes quiz</button>${boutons.map(([id], k) => `<button data-b="${id}" class="${k ? "" : "prim"}" disabled>…</button>`).join("")}<button id="celB" title="Mener la partie avec ton cellulaire">Mon cell</button><button id="tirB">Télécommande</button></div><div id="celOv" class="cache"><div class="bx"><div class="prof">Professeur seulement</div><h2>Mène la partie avec ton cellulaire</h2><div id="celQr"></div><p>Scanne avec ton cellulaire. Il doit être connecté à ton compte Métier+ (une seule fois). Le code des élèves apparaît dès que ton cell est branché.</p><button id="celX">Continuer sans cellulaire</button></div></div>`);
+    <div id="animBar"><button id="retLabo" title="Retour à mes quiz">‹ Mes quiz</button>${boutons.map(([id], k) => `<button data-b="${id}" class="${k ? "" : "prim"}" disabled>…</button>`).join("")}<button id="celB" title="Mener la partie avec ton cellulaire">Mon cell</button><button id="tirB">Télécommande</button></div><div id="celOv" class="cache"><div class="bx"><div class="prof">Enseignant seulement</div><h2>Mène la partie avec ton cellulaire</h2><div id="celQr"></div><p>Scanne avec ton cellulaire. Il doit être connecté à ton compte Métier+ (une seule fois). Le code des élèves apparaît dès que ton cell est branché.</p><button id="celX">Continuer sans cellulaire</button></div></div>`);
   const T = $("tiroir"), F = $("tirF");
   $("tirB").onclick = () => T.classList.toggle("ouvert");
   const quitter = u => { let q = false; try { q = F.contentWindow.quitterPartie && F.contentWindow.quitterPartie(); } catch(x) {} setTimeout(() => { location.href = u; }, q ? 400 : 0); };

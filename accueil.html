@@ -1347,7 +1347,15 @@ function tick() {
       nowT = "Le cours commence bientôt"; nowSub = "à " + fmt(next.start) + " · dans " + dur((next.start - nowMin) * 60);
       const firstReal = rows.find(r => !/^Accueil/.test(r.label) && !r.pause) || rows[0];
       nextT = firstReal.label; nextSub = "à " + fmt(firstReal.start);
-    } else { nowT = "Bonne fin de journée!"; }
+    } else { nowT = "Bonne fin de journée!";
+      /* 9 nov. : après les cours, « Ensuite » montre le prochain cours préparé (ou invite à le préparer) */
+      try { const d = new Date(), j = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+        const ici = j + "|" + (d.getHours() < 12 ? "am" : "pm"), k = Object.keys(cfg.plans || {}).filter(x => /\|/.test(x) && x > ici).sort()[0];
+        if (k && typeof titreCours === "function") { const [jj, per] = k.split("|"), dd = new Date(jj + "T12:00:00"), ecart = Math.round((dd - new Date(j + "T12:00:00")) / 864e5);
+          nextT = titreCours(cfg.plans[k]) || "Cours préparé";
+          nextSub = (ecart === 0 ? "cet" : ecart === 1 ? "demain" : dd.toLocaleDateString("fr-CA", {weekday: "long"})) + (per === "am" ? (ecart === 0 ? " avant-midi" : " matin") : " après-midi");
+          if (ecart === 0) nextSub = "cet après-midi"; }
+        else { nextT = "Prochain cours pas encore préparé"; nextSub = "Touche « Préparer le cours » en haut"; } } catch(x) {} }
     if ($("v-now").textContent !== nowT || $("v-next").textContent !== nextT) {
       $("v-now").textContent = nowT; $("v-next").textContent = nextT; $("v-nextblk").hidden = !nextT;
       if (typeof fitSoon === "function") fitSoon();
@@ -3378,6 +3386,17 @@ html:not(.force-dark) #menage .mn-bravo{color:#1E8A55}
 html:not(.force-dark) #menage .mb-t{color:#1E2A44}
 html:not(.force-dark) #menage .mb-l{border-color:#1E2A4433;color:#1E2A44aa}
 html:not(.force-dark) #mnAideT{box-shadow:0 30px 80px #1E2A4440}
+}
+</style>
+<style>
+/* Cellulaire (9 nov., revue des interfaces) : l'heure tient dans l'écran, la période sur trois lignes, le logo du coin ne passe plus sur le texte */
+@media (max-width: 640px) {
+  html.style-pro .clock { font-size: min(calc(var(--u) * 290), 25vw) !important; white-space: nowrap; }
+  html.style-pro .date { font-size: min(calc(var(--u) * 54), 5.6vw) !important; }
+  html.style-pro .period { display: block !important; }
+  html.style-pro .period > .status { margin: 6px 0 !important; }
+  html.style-pro .period-hours { display: block; }
+  #mpCoin { display: none !important; }
 }
 </style>
 </body>
