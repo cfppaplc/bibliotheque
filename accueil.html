@@ -90,6 +90,17 @@
 })();
 </script>
 <script src="coffre.js"></script>
+<script>
+/* Pas d'ancienne interface au chargement (10 nov.) : le style Métier+ est posé par du code et des feuilles de style placés plus bas dans la page;
+   en attendant, on voyait l'ancien écran une seconde. La page reste cachée (fond de la bonne couleur) jusqu'à la fin du chargement (au plus 3 s). */
+(function(){ var h = document.documentElement, t = ""; h.classList.add("style-pro");
+  try { t = (JSON.parse(localStorage.getItem("accueil-atelier-v4") || "{}") || {}).theme || ""; } catch(e){}
+  var clair = t === "light" || (t !== "dark" && window.matchMedia && matchMedia("(prefers-color-scheme: light)").matches);
+  if (t === "light") h.classList.add("force-light"); if (t === "dark") h.classList.add("force-dark");
+  h.style.background = clair ? "#F5EFE3" : "#0e1320";
+  window.__pretAccueil = function(){ h.classList.add("pret"); }; setTimeout(window.__pretAccueil, 3000); })();
+</script>
+<style>html:not(.pret)>body{visibility:hidden}html.pret>body{animation:accPret .25s ease both}@keyframes accPret{from{opacity:0}to{opacity:1}}</style>
 </head>
 <body>
 <meta name="robots" content="noindex">
@@ -3400,5 +3411,6 @@ html:not(.force-dark) #mnAideT{box-shadow:0 30px 80px #1E2A4440}
   #mpCoin { display: none !important; }
 }
 </style>
+<script>requestAnimationFrame(function(){ setTimeout(function(){ if (window.__pretAccueil) window.__pretAccueil(); }, 280); });</script>
 </body>
 </html>
