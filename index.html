@@ -10705,7 +10705,8 @@ body.visiteur .mp-pied{margin-top:30px}
   .reader.wbon .penbar #popCol .wbq.gros{border:0;padding:0;gap:8px;min-height:0}
   /* « Plus » : liste courte, une action par ligne */
   .reader.wbon .penbar #popPlus{left:auto;right:0;transform:none;gap:2px;padding:8px}
-  .reader.wbon .penbar #popPlus .prang:has(#penR),.reader.wbon .penbar #popPlus .prang:has(#wbMoins),.reader.wbon .penbar #popPlus .prang>.lab{display:none!important}
+  .reader.wbon .penbar #popPlus .prang:has(#penR),.reader.wbon .penbar #popPlus .prang>.lab{display:none!important}
+  .reader.wbon .penbar #popPlus .prang:has(#wbMoins)>:not(#wbMoins){display:none!important}
   .reader.wbon .penbar #popPlus .prang{gap:6px;padding:3px 0}
   .reader.wbon .penbar #popPlus .prang+.prang{border-top:1px solid #2a2a2f}
   .reader.wbon .penbar #popPlus button[data-lab]{min-height:48px;padding:0 14px;gap:12px;border-color:transparent;justify-content:flex-start;flex:1}
@@ -10741,8 +10742,11 @@ body:has(.reader.open:not(.wbon)) .toast{bottom:calc(98px + env(safe-area-inset-
 .penbar .wbq #wbLbl{min-width:54px;text-align:center;font-weight:700;color:#e4e4e7;font-size:.9rem}
 .penbar .wbq.nav button{min-width:40px;height:44px}
 @media (max-width:899px){.reader.wbon .penbar .wbq.coul,.reader.wbon .penbar .wbq.gros,.reader.wbon .penbar #wbCalcB,.reader.wbon .penbar #wbRegB{display:none}}
-@media (min-width:1500px){#objBar{transform:scale(1.3);transform-origin:top left;max-height:calc((100% - 170px) / 1.3)!important}
-  .reader.wbon .penbar{max-width:98vw!important;flex-wrap:nowrap!important}}
+@media (min-width:1500px){#objBar{transform:scale(1.3);transform-origin:top left;max-height:calc((100% - 170px) / 1.3)!important}}
+/* 10 nov. (photo du TNI : barre en 2 blocs) : toujours une seule rangée dès 900 px; boutons resserrés sous 1500 px */
+@media (min-width:900px){.reader.wbon:not(.pen-fold) .penbar{max-width:98vw!important;flex-wrap:nowrap!important}}
+@media (min-width:900px) and (max-width:1499px){.reader.wbon .penbar>button{min-width:50px!important;padding-left:4px!important;padding-right:4px!important}
+  .reader.wbon .penbar #penO,.reader.wbon .penbar .wbq.nav,.reader.wbon .penbar #penCol{margin-left:6px!important}.reader.wbon .penbar #penPlus{margin-left:6px!important}}
 /* calculatrice */
 #wbCalc{position:fixed;right:40px;top:110px;z-index:100001;width:330px;background:#14181f;border:1px solid #2f3a52;border-radius:18px;box-shadow:0 18px 50px rgba(0,0,0,.5);padding:12px;font-family:system-ui,"Segoe UI",Roboto,sans-serif;touch-action:none;user-select:none}
 #wbCalc[hidden],#wbRegle[hidden]{display:none}
@@ -10823,9 +10827,10 @@ body:has(.reader.open:not(.wbon)) .toast{bottom:calc(98px + env(safe-area-inset-
     const pr = Q("#penR"), pu = Q("#penU"), pm = Q("#wbMoins"), pcl = Q("#penC"), nav = bar.querySelector(".wbq.nav"), pg = Q("#popGom");
     if (pr && pu && !Q("#wbRetB")){ const b = document.createElement("button"); b.type = "button"; b.id = "wbRetB"; b.className = "wbq"; b.title = "Rétablir (Ctrl+Y)"; b.setAttribute("aria-label", "Rétablir"); b.dataset.mot = "Rétablir"; b.innerHTML = (pr.querySelector("svg") || {}).outerHTML || "↷"; b.onclick = () => pr.click(); bar.insertBefore(b, pu.nextSibling);
       b.style.cssText = "border:1px solid #2f2f33;border-radius:10px;padding:5px 6px"; }
-    if (pm && nav && !Q("#wbSupB")){ const b = document.createElement("button"); b.type = "button"; b.id = "wbSupB"; b.title = "Supprimer ce tableau (toucher deux fois)"; b.setAttribute("aria-label", "Supprimer ce tableau"); b.innerHTML = (pm.querySelector("svg") || {}).outerHTML || "✕"; let t = 0;
-      b.onclick = () => { pm.click(); clearTimeout(t); if (b.classList.contains("sur")) b.classList.remove("sur"); else { b.classList.add("sur"); t = setTimeout(() => b.classList.remove("sur"), 3000); } };
-      nav.appendChild(b); setInterval(() => { if (RD.wb) b.disabled = pm.disabled; }, 500); }
+    if (pm && nav && !Q("#wbSupB")){ const b = document.createElement("button"); b.type = "button"; b.id = "wbSupB"; b.title = "Effacer tout le tableau (toucher deux fois; Annuler le ramène)"; b.setAttribute("aria-label", "Effacer tout le tableau"); b.innerHTML = (pm.querySelector("svg") || {}).outerHTML || "✕"; let t = 0;
+      /* 10 nov. (Jeremy) : la poubelle efface ce qu'il y a au tableau (comme « Tout effacer »); supprimer le tableau = menu Plus */
+      b.onclick = () => { clearTimeout(t); if (b.classList.contains("sur")) { b.classList.remove("sur"); if (pcl) pcl.click(); } else { b.classList.add("sur"); t = setTimeout(() => b.classList.remove("sur"), 3000); } };
+      nav.appendChild(b); setInterval(() => { if (RD.wb) { let n = 0; try { n = strokes().length; } catch(x) {} b.disabled = !n; if (!n) b.classList.remove("sur"); } }, 500); }
     if (pcl && pg && !Q("#wbToutB")){ const b = document.createElement("button"); b.type = "button"; b.id = "wbToutB"; b.innerHTML = ((pcl.querySelector("svg") || {}).outerHTML || "") + "<span>Tout effacer</span>"; b.onclick = () => pcl.click(); pg.appendChild(b); }
   } catch(e){} }, 0);
   const crayon = () => { RD.eraser = false; RD.text = false; RD.crayonOff = false; };
