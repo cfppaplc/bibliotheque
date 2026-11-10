@@ -14,7 +14,7 @@
 <script src="coffre.js"></script>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex">
-<title>Métier+ — Quiz maison</title>
+<title>Métier+ — Quiz</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.50.0/dist/umd/supabase.min.js"></script>
 <script src="quiz-livres.js"></script>
@@ -596,7 +596,7 @@ else {
 /* ================================ TÉLÉCOMMANDE ================================ */
 function telecommande(bord){
   $("tele").classList.remove("cache");
-  if (bord) { window.SANS_RELAIS = true; document.body.classList.add("bord"); $("tTitre").textContent = "Quiz maison"; $("lienEcran").classList.remove("cache"); }
+  if (bord) { window.SANS_RELAIS = true; document.body.classList.add("bord"); $("tTitre").textContent = "Mes quiz"; $("lienEcran").classList.remove("cache"); const rr = document.querySelector("#tele .mp-retour"); if (rr) { rr.textContent = "‹ Labo"; rr.href = "labo.html"; } }
   let code = "";
   const s = stock.get("quizSession", null); if (s && Date.now() - s.t < 6 * 3600e3) code = s.code;
   if (!code) code = String(Math.floor(100000 + Math.random() * 900000));
