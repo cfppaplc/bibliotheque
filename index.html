@@ -10649,6 +10649,8 @@ body.visiteur .mp-pied{margin-top:30px}
   .reader.wbon .penbar #popPlus button[data-lab]{min-height:48px;padding:0 14px;gap:12px;border-color:transparent;justify-content:flex-start;flex:1}
   .reader.wbon .penbar #popPlus button[data-lab]::after{font-size:.95rem;font-weight:600}
   .reader.wbon .penbar #wbRetB{order:16}
+  .reader.wbon .penbar #penCol{position:relative}
+  .reader.wbon .penbar #penCol::before{content:"";position:absolute;top:4px;right:5px;width:15px;height:15px;border-radius:50%;background:var(--pcb,#e2483d);border:2px solid #f4f4f5;box-shadow:0 0 0 1px #18181b}
   .reader.wbon .penbar #wbSupB.sur{background:#b3261e;border-color:#b3261e;color:#fff}
   .reader.wbon .penbar #popGom #wbToutB{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:8px;min-height:44px;padding:0 14px;width:100%;font-weight:600;font-size:.9rem}
   .reader.wbon .penbar #penCol{order:10;margin-left:12px}.reader.wbon .penbar .wbq.coul{order:11}.reader.wbon .penbar .wbq.gros{order:12}
@@ -10690,6 +10692,7 @@ body.visiteur .mp-pied{margin-top:30px}
   repeating-linear-gradient(90deg,#3d2f05 0 1px,transparent 1px calc(var(--u) / 2)) 0 0/100% 60% no-repeat,
   repeating-linear-gradient(90deg,#3d2f05 0 1px,transparent 1px calc(var(--u) / 10)) 0 0/100% 35% no-repeat}
 #wbRegle .grad{cursor:crosshair}#wbRegle .trace{position:absolute;top:0;height:4px;transform:translateY(-50%);border-radius:3px;pointer-events:none}#wbRegle .trace[hidden]{display:none}
+#wbRegle .rap[hidden]{display:none}
 #wbRegle .nums{position:absolute;left:0;top:36px;height:22px;right:0;font-size:15px;font-weight:700}
 #wbRegle .nums i{position:absolute;font-style:normal;transform:translateX(-50%)}
 #wbRegle .rinfo{position:absolute;left:12px;bottom:6px;font-size:14px;font-weight:700;display:flex;gap:8px;align-items:center}
@@ -10752,7 +10755,12 @@ body.visiteur .mp-pied{margin-top:30px}
     const sw = document.querySelector('#popCol .sw[data-c="' + b.dataset.qc + '"]'); if (sw) sw.click(); else RD.color = b.dataset.qc; crayon(); refreshTools(); });
   qg.addEventListener("click", e => { const b = e.target.closest("[data-qg]"); if (!b) return; e.stopPropagation();
     const i = document.querySelector("#popCol .plarg input"); if (i){ i.value = b.dataset.qg; i.dispatchEvent(new Event("input", {bubbles:true})); } else RD.wPx = +b.dataset.qg; crayon(); refreshTools(); });
+  /* le menu de la gomme s'ouvre au-dessus de son bouton */
+  bar.addEventListener("click", e => { if (!RD.wb || innerWidth < 900 || !e.target.closest || !e.target.closest("#penE")) return;
+    setTimeout(() => { const g = Q("#popGom"), b = Q("#penE"); if (g && b){ g.style.left = Math.max(8, Math.min(b.offsetLeft, bar.clientWidth - g.offsetWidth - 8)) + "px"; g.style.transform = "none"; } }, 0); });
   setInterval(() => { if (!RD.wb) return; const actif = !RD.crayonOff && !RD.eraser && !RD.text;
+    try { const bc = Q("#penCol"), cur = bc && bc.querySelector(".pcur"); if (cur) bc.style.setProperty("--pcb", cur.style.getPropertyValue("--pc") || "#e2483d");   /* pastille de la couleur en cours sur « Crayon » */
+      const zv = Q("#wbZv"), t = Math.round(RD.z / zMin() * 100) + "%"; if (zv && zv.textContent !== t) zv.textContent = t; } catch(e){}   /* 100 % = la vue de départ du tableau */
     qc.querySelectorAll("button").forEach(b => b.classList.toggle("on", actif && RD.color === b.dataset.qc));
     qg.querySelectorAll("button").forEach(b => b.classList.toggle("on", actif && +RD.wPx === +b.dataset.qg)); }, 300);
 
@@ -10795,7 +10803,7 @@ body.visiteur .mp-pied{margin-top:30px}
 
   /* 7. règle graduée (1 graduation numérotée = 1 carreau du quadrillé), qu'on glisse et qu'on tourne par la poignée orange */
   const reg = document.createElement("div"); reg.id = "wbRegle"; reg.hidden = true;
-  reg.innerHTML = '<div class="grad"></div><div class="nums"></div><div class="trace" hidden></div><div class="rinfo"><span id="wbRegL">cm</span><span id="wbRegA">0°</span><button type="button" data-a="0">0°</button><button type="button" data-a="45">45°</button><button type="button" data-a="90">90°</button></div><button type="button" class="rx" aria-label="Ranger la règle">✕</button><div class="rot" title="Glisse pour tourner la règle">⟳</div>';
+  reg.innerHTML = '<div class="grad"></div><div class="nums"></div><div class="trace" hidden></div><div class="rinfo"><span id="wbRegL">cm</span><span id="wbRegA">0°</span><button type="button" data-a="0">0°</button><button type="button" data-a="45">45°</button><button type="button" data-a="90">90°</button><button type="button" class="brap" title="Rapporteur">Angles</button></div><div class="rap" hidden></div><button type="button" class="rx" aria-label="Ranger la règle">✕</button><div class="rot" title="Glisse pour tourner la règle">⟳</div>';
   document.body.appendChild(reg);
   const RG = { x: 0, y: 0, a: 0, n: 20 };
   const pasNum = u => u >= 30 ? 1 : u >= 15 ? 2 : 5;
@@ -10816,7 +10824,15 @@ body.visiteur .mp-pied{margin-top:30px}
         snapInk(); const k = inkKey(); (INKS[k] = INKS[k] || []).push({ t:"ligne", c:col, w:RD.wPx || 4, p:[q(t0), q(t1)] }); redrawInk(); try { planifierSauvegarde(); } catch(x){} } }; }
     if (e.target.closest(".rot")){ return { bouge: m => { let a = Math.atan2(m.clientY - RG.y, m.clientX - RG.x) * 180 / Math.PI; const s = Math.round(a / 15) * 15; if (Math.abs(a - s) < 3) a = s; RG.a = a; poser(); } }; }
     const dx = e.clientX - RG.x, dy = e.clientY - RG.y; return { bouge: m => { RG.x = m.clientX - dx; RG.y = m.clientY - dy; poser(); } }; });
-  reg.addEventListener("click", e => { const b = e.target.closest("[data-a]"); if (b){ RG.a = -(+b.dataset.a); poser(); } if (e.target.closest(".rx")) reg.hidden = true; e.stopPropagation(); });
+  { /* rapporteur : demi-cercle gradué centré sur le 0 de la règle (angles mesurés à partir du bord gradué) */
+    const R = 170, P = (r, a) => [(R + r * Math.cos(a * Math.PI / 180)).toFixed(1), (R - r * Math.sin(a * Math.PI / 180)).toFixed(1)]; let h = "";
+    for (let a = 0; a <= 180; a += 5){ const l = a % 45 === 0 ? 20 : a % 15 === 0 ? 14 : 8, p = P(R, a), q = P(R - l, a); h += `<line x1="${p[0]}" y1="${p[1]}" x2="${q[0]}" y2="${q[1]}" stroke="#3d2f05" stroke-width="${a % 15 ? 1 : 2}"/>`; }
+    [22.5, 67.5, 112.5, 157.5].forEach(a => { const p = P(R, a), q = P(R - 16, a); h += `<line x1="${p[0]}" y1="${p[1]}" x2="${q[0]}" y2="${q[1]}" stroke="#C9561A" stroke-width="2"/>`; });
+    [0, 30, 45, 60, 90, 120, 135, 150, 180].forEach(a => { const p = P(R - 36, a); if (a % 180 === 0) p[1] = (p[1] - 12).toFixed(1); h += `<text x="${p[0]}" y="${p[1]}" text-anchor="middle" dominant-baseline="middle" font-size="15" font-weight="700" fill="#3d2f05">${a}</text>`; });
+    [22.5, 157.5].forEach(a => { const p = P(R - 34, a); h += `<text x="${p[0]}" y="${p[1]}" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="700" fill="#C9561A">${String(a).replace(".", ",")}</text>`; });
+    const rp = reg.querySelector(".rap"); rp.innerHTML = `<svg width="${2 * R}" height="${R}" viewBox="0 0 ${2 * R} ${R}"><path d="M0 ${R}A${R} ${R} 0 0 1 ${2 * R} ${R}Z" fill="rgba(255,224,130,.55)" stroke="#8a6d1a" stroke-width="2"/>${h}<circle cx="${R}" cy="${R}" r="4" fill="#C9561A"/></svg>`;
+    rp.style.cssText = `position:absolute;left:${-R}px;top:${-R - 2}px;width:${2 * R}px;height:${R}px;pointer-events:none`; }
+  reg.addEventListener("click", e => { const b = e.target.closest("[data-a]"); if (b){ RG.a = -(+b.dataset.a); poser(); } if (e.target.closest(".brap")){ const rp = reg.querySelector(".rap"); rp.hidden = !rp.hidden; } if (e.target.closest(".rx")) reg.hidden = true; e.stopPropagation(); });
   setInterval(() => { if (!reg.hidden) poser(); }, 500);
 
   /* boutons Calculatrice et Règle sur la barre */
