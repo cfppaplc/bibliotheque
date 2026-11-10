@@ -9063,10 +9063,10 @@ return {matrice:function(texte){var q=new QRCode(-1,L.M);q.addData(texte);q.make
   <div class="ah-volet" id="ahAutres" hidden></div>
   <div class="ah-volet" id="ahLivres" data-v="livres"><h3 class="ah-h">La barre d'outils du lecteur</h3><p class="ah-p">Clique une couverture, puis « Lire ». Tous les outils sont dans la barre en bas de l'écran. La petite touche à côté de chaque outil est son raccourci clavier.</p>
   <div class="bv-leg" id="bvLeg"></div>
-  <div class="bv-plus"><img src="nouveautes/bv-plus.jpg" alt="Menu Plus d'outils" loading="lazy"><div>
-    <h3>Le bouton ⋯ « Plus d'outils »</h3>
-    <ul><li><b>Minuterie</b> pour un travail chronométré.</li><li><b>Projecteur</b> et <b>Cache</b> pour attirer l'attention sur une partie de la page.</li>
-    <li><b>Écran noir</b> pour ramener l'attention vers toi.</li><li><b>Code QR</b> : les élèves ouvrent le livre à la même page sur leur téléphone.</li>
+  <div class="bv-plus"><div>
+    <h3>Le bouton ⋯ « Plus »</h3>
+    <ul><li><b>Minuterie</b> pour un travail chronométré.</li><li><b>Cache</b> pour montrer une partie de la page à la fois.</li><li><b>Pointeur laser</b> pour montrer un détail.</li>
+    <li><b>Écran noir</b> pour ramener l'attention vers toi.</li><li><b>Imprimer une page</b> et les boutons de zoom − et +.</li>
     <li><b>✎ Organiser</b> : glisse un bouton entre la barre et ce menu pour garder tes outils préférés à portée de main.</li></ul></div></div>
   <div class="ah-liens" id="ahLivresPlus"></div></div>
   <div class="bv-pied"><span></span>
@@ -10724,6 +10724,9 @@ body.visiteur .mp-pied{margin-top:30px}
 }
 .penbar .wbq{display:none}
 #penDone{display:none}
+/* Écran tactile (revue de nuit du 9 nov.) : petits liens et pastilles trop bas pour le doigt → au moins 40 px de haut */
+@media (pointer:coarse){.qn2-ret,.ah-mf,.ah-go,#bvQn,#pRaz,#acOubli,#acDem,.acces-lien{min-height:40px;display:inline-flex;align-items:center}#ahX{min-width:40px;min-height:40px}
+  .acces-box.gestion .acces-puces .abtn,.acces-box.gestion .tg{min-height:38px}.acces-plusL summary{width:44px;height:38px}#objBar #objF{min-height:40px;width:40px}}
 .reader:not(.wbon) #wbAnimB{display:none!important}
 body:has(.reader.open:not(.wbon)) .toast{bottom:calc(98px + env(safe-area-inset-bottom,0px))}   /* dans un livre : les messages passent au-dessus de la barre (ils cachaient les boutons) */
 /* Plus d'outils allégé (9 nov.) : Code QR élèves (version élève pas lancée : à remettre au lancement), Raccourcis (dans l'Aide), Barres automatiques (dans Mes préférences), Projecteur (le Cache suffit), Signet */
