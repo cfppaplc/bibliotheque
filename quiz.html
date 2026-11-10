@@ -188,7 +188,7 @@ body.presseJ #joueur::after{content:"";position:fixed;inset:0;pointer-events:non
 #man .mt{font-size:15px;color:#9AA3B5}#man .mc{font-size:26px;font-weight:800;line-height:1.25}
 #man .ma{background:rgba(235,106,34,.14);border:1px solid rgba(235,106,34,.4);border-radius:12px;padding:10px 12px;font-size:16px}#man .ma:empty{display:none}
 #man{overflow-y:auto;padding-bottom:calc(30vh + 20px)}
-#man .mrow{display:flex;gap:10px;align-items:center}#man .mrow .m2{flex:1}#man .mtmp{font-size:28px;font-weight:800;min-width:76px;color:#F28A3C}
+#man .mrow{display:flex;gap:10px;align-items:center}#man .mvol{flex:1.2;text-align:center;font-weight:700;color:#C9CFDB;font-size:15px}#man #mVm,#man #mVp{flex:0 0 64px;font-size:28px}#man .mrow .m2{flex:1}#man .mtmp{font-size:28px;font-weight:800;min-width:76px;color:#F28A3C}
 #man .m2.on{background:#1E8A55}#man .m2:disabled{opacity:.4}#man .mfin{background:transparent;border:1px solid #3A4358;color:#9AA3B5;min-height:48px;font-size:15px}
 #man .mlist{background:#161d2c;border-radius:14px;padding:10px 12px}#man .mlist summary{font-weight:700;font-size:17px;cursor:pointer}
 #man .mj{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid #232c40;font-size:16px}#man .mj b{width:26px;color:#9AA3B5}#man .mj .mn{flex:1;min-width:0}#man .mj small{display:block;font-size:13px;color:#9AA3B5}#man .mj small.ok{color:#7CF0A8}#man .mj small.ko{color:#FF9A90}
@@ -1267,6 +1267,7 @@ function manette(code, k){
   document.body.insertAdjacentHTML("beforeend", `<div id="man"><div class="mh"><img src="img/metier-plus-blanc.svg" alt="Métier+"><span id="mEtat">Connexion…</span></div>
     <div class="mt" id="mTitre">Quiz</div><div class="mc" id="mCour">En attente de la partie…</div><div class="ma" id="mAtt"></div>
     <div class="mrow"><span id="mT" class="mtmp"></span><button class="m2" id="mPlus" disabled>+10 s</button><button class="m2" id="mSon">Son</button></div>
+    <div class="mrow"><button class="m2" id="mVm" aria-label="Baisser le son">−</button><span class="mvol" id="mVol">Volume</span><button class="m2" id="mVp" aria-label="Monter le son">+</button><button class="m2" id="mMus">Musique</button></div>
     <details class="mlist" id="mDet"><summary id="mSum">Participants</summary><div id="mJ"></div></details>
     <button class="m2 mfin" id="mFin">Quitter la partie</button>
     <div class="mbas"><button class="m2 cache" id="mAutre"></button><button class="mbig" id="mGo" disabled>…</button></div></div>`);
@@ -1287,12 +1288,13 @@ function manette(code, k){
   setInterval(minuterie, 250);
   $("mPlus").onclick = () => cmd("plus10");
   $("mSon").onclick = () => cmd("son");
+  $("mVm").onclick = () => cmd("vol-"); $("mVp").onclick = () => cmd("vol+"); $("mMus").onclick = () => cmd("mus");
   $("mJ").onclick = e => { const b = e.target.closest("button[data-k]"); if (!b) return; const id = b.dataset.k;
     if (sur[id]) { delete sur[id]; envoyer(topic, {m: "cmd", k, b: "kick", id}); } else { sur = {[id]: 1}; setTimeout(() => { delete sur[id]; dessiner(); }, 3000); } dessiner(); };
   let finSur = 0; $("mFin").onclick = () => { if (Date.now() - finSur < 3000) { cmd("fin"); finSur = 0; $("mFin").textContent = "Quitter la partie"; } else { finSur = Date.now(); $("mFin").textContent = "Sûr ? Touche encore"; setTimeout(() => { $("mFin").textContent = "Quitter la partie"; }, 3000); } };
   $("mGo").onclick = e => { if (navigator.vibrate) navigator.vibrate(30); cmd(e.currentTarget.dataset.b); };
   $("mAutre").onclick = e => cmd(e.currentTarget.dataset.b);
-  ecouter(topic, m => { if (m.m === "mstat") { S = m; recu = Date.now(); if (m.now) dec = m.now - Date.now(); dessiner(); } else if (m.m === "mson") { $("mSon").textContent = m.on ? "Son : oui" : "Son : non"; $("mSon").classList.toggle("on", m.on); } }, ok => { $("mEtat").textContent = ok ? "Branché" : "Connexion…"; $("mEtat").classList.toggle("ok", ok); if (ok) cmd("etat"); });
+  ecouter(topic, m => { if (m.m === "mstat") { S = m; recu = Date.now(); if (m.now) dec = m.now - Date.now(); dessiner(); } else if (m.m === "mmus") { $("mMus").textContent = "♪ " + m.nom; $("mVol").textContent = "Volume " + Math.round(m.vol * 100) + " %"; } else if (m.m === "mson") { $("mSon").textContent = m.on ? "Son : oui" : "Son : non"; $("mSon").classList.toggle("on", m.on); } }, ok => { $("mEtat").textContent = ok ? "Branché" : "Connexion…"; $("mEtat").classList.toggle("ok", ok); if (ok) cmd("etat"); });
   setInterval(() => { cmd("etat"); if (recu && Date.now() - recu > 15000) { $("mEtat").textContent = "Le tableau ne répond pas"; $("mEtat").classList.remove("ok"); } }, 8000);
   const eveil = () => { try { if (navigator.wakeLock && !document.hidden) navigator.wakeLock.request("screen").catch(() => {}); } catch(e) {} };
   eveil(); document.addEventListener("visibilitychange", eveil);
@@ -1301,7 +1303,7 @@ function manette(code, k){
 /* ===== Animer au tableau : un seul ordinateur (écran de classe + barre + tiroir de télécommande) ===== */
 function animer(boutons){
   document.body.insertAdjacentHTML("beforeend", `<div id="tiroir"><button class="fermer" id="tirX" aria-label="Fermer la télécommande">›</button><iframe id="tirF" src="?tele=1&inclus=1${params.get("quiz") ? "&quiz=" + encodeURIComponent(params.get("quiz")) : ""}" title="Télécommande"></iframe></div>
-    <div id="animBar"><button id="retLabo" title="Retour à mes quiz">‹ Mes quiz</button>${boutons.map(([id], k) => `<button data-b="${id}" class="${k ? "" : "prim"}" disabled>…</button>`).join("")}<button id="celB" title="Mener la partie avec ton cellulaire">Mon cell</button><button id="tirB">Télécommande</button></div><div id="celOv" class="cache"><div class="bx"><div class="prof">Enseignant seulement</div><h2>Mène la partie avec ton cellulaire</h2><div id="celQr"></div><p>Scanne avec ton cellulaire. Il doit être connecté à ton compte Métier+ (une seule fois). Le code des élèves apparaît dès que ton cell est branché.</p><button id="celX">Continuer sans cellulaire</button></div></div>`);
+    <div id="animBar"><button id="retLabo" title="Retour à mes quiz">‹ Mes quiz</button>${boutons.map(([id], k) => `<button data-b="${id}" class="${k ? "" : "prim"}" disabled>…</button>`).join("")}<button id="celB" title="Mener la partie avec ton cellulaire">Mon cell</button><button id="tirB">Télécommande</button><button id="musB" title="Changer la musique">♪</button><button id="volM" title="Baisser le son">−</button><button id="volP" title="Monter le son">+</button></div><div id="celOv" class="cache"><div class="bx"><div class="prof">Enseignant seulement</div><h2>Mène la partie avec ton cellulaire</h2><div id="celQr"></div><p>Scanne avec ton cellulaire. Il doit être connecté à ton compte Métier+ (une seule fois). Le code des élèves apparaît dès que ton cell est branché.</p><button id="celX">Continuer sans cellulaire</button></div></div>`);
   const T = $("tiroir"), F = $("tirF");
   $("tirB").onclick = () => T.classList.toggle("ouvert");
   const quitter = u => { let q = false; try { q = F.contentWindow.quitterPartie && F.contentWindow.quitterPartie(); } catch(x) {} setTimeout(() => { location.href = u; }, q ? 400 : 0); };
@@ -1314,9 +1316,15 @@ function animer(boutons){
   $("celX").onclick = () => $("celOv").classList.add("cache");
   /* 9 nov. (« le QR de l'enseignant d'abord, puis celui des élèves ») : à l'ouverture, le QR de l'enseignant couvre l'écran;
      dès que son cellulaire envoie une commande avec la bonne clé, il disparaît et l'écran des élèves (code QR des élèves) apparaît. */
+  { const mb = $("musB"), maj = () => { if (mb && window.quizMusiqueNom) mb.textContent = "♪ " + quizMusiqueNom(); };
+    if (mb){ setTimeout(maj, 300); mb.onclick = () => { quizMusique(); maj(); }; $("volM").onclick = () => { const v = quizVolume(-.2); mb.title = "Volume " + Math.round(v * 100) + " %"; }; $("volP").onclick = () => { const v = quizVolume(.2); mb.title = "Volume " + Math.round(v * 100) + " %"; }; } }
   window.manetteVue = m => { if (!m.k || m.k !== animer.mk) return; animer.cell = true; $("celOv").classList.add("cache"); $("celB").textContent = "Cell branché";
     const env = () => { const b = $("bSon"); envoyer(PREFIXE + animer.code, {m: "mson", on: !!(b && b.classList.contains("actif"))}); };
-    if (m.b === "son") { const b = $("bSon"); if (b) b.click(); setTimeout(env, 150); } else if (m.b === "etat") env(); };
+    const envM = () => envoyer(PREFIXE + animer.code, {m: "mmus", nom: window.quizMusiqueNom ? quizMusiqueNom() : "", vol: +(localStorage.quizVolume || 1)});
+    if (m.b === "son") { const b = $("bSon"); if (b) b.click(); setTimeout(env, 150); }
+    else if (m.b === "mus" && window.quizMusique) { quizMusique(); envM(); }
+    else if ((m.b === "vol+" || m.b === "vol-") && window.quizVolume) { quizVolume(m.b === "vol+" ? .2 : -.2); envM(); }
+    else if (m.b === "etat") { env(); envM(); } };
   const auto = setInterval(() => { if (!animer.code || !animer.mk) return; clearInterval(auto);
     let deja = false; try { deja = sessionStorage.getItem("celPropose") === animer.code; sessionStorage.setItem("celPropose", animer.code); } catch(x) {}
     if (!deja && !animer.cell) $("celB").click(); }, 300);
@@ -1343,7 +1351,11 @@ function ecran(code){
   let V = {etat: "lobby", joueurs: [], titre: "Quiz maison", reg: {}, i: -1}, decal = 0, img = {}, sonOK = false, ac = null, dernier = "", posAvant = {}, tic = 0;
   /* 8 nov. (« le son des quiz est vraiment bas ») : tout le son passe par un compresseur + gain ×3,2 (fort sans saturer) */
   let MAITRE = null;
-  function maitre(){ if (MAITRE && MAITRE.context === ac) return MAITRE; const c = ac.createDynamicsCompressor(); c.threshold.value = -18; c.knee.value = 12; c.ratio.value = 4; c.attack.value = .003; c.release.value = .2; const g = ac.createGain(); g.gain.value = 3.2; c.connect(g); g.connect(ac.destination); return MAITRE = c; }
+  /* Volume et style de musique choisis par l'enseignant (10 nov., manette du cellulaire et barre du tableau) */
+  let MAITRE_G = null;
+  const VOL = () => { const v = +localStorage.quizVolume; return v >= 0 && v <= 2 ? v : 1; };
+  window.quizVolume = d => { const v = Math.round(Math.max(0, Math.min(2, VOL() + d)) * 10) / 10; localStorage.quizVolume = v; try { if (MAITRE_G) MAITRE_G.gain.setTargetAtTime(3.2 * v, ac.currentTime, .05); } catch(e) {} return v; };
+  function maitre(){ if (MAITRE && MAITRE.context === ac) return MAITRE; const c = ac.createDynamicsCompressor(); c.threshold.value = -18; c.knee.value = 12; c.ratio.value = 4; c.attack.value = .003; c.release.value = .2; const g = ac.createGain(); g.gain.value = 3.2 * VOL(); c.connect(g); g.connect(ac.destination); MAITRE_G = g; return MAITRE = c; }
   function ton(f, d, v, type){ if (!sonOK || V.reg.son === "non") return; try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); const o = ac.createOscillator(), g = ac.createGain(); o.type = type || "sine"; o.frequency.value = f; o.connect(g); g.connect(maitre()); g.gain.setValueAtTime(v, ac.currentTime); g.gain.exponentialRampToValueAtTime(.0001, ac.currentTime + d); o.start(); o.stop(ac.currentTime + d); } catch(e) {} }
   const accord = () => { ton(523, .5, .12); setTimeout(() => ton(659, .5, .1), 120); setTimeout(() => ton(784, .7, .1), 240); };
   const tete = t => `<div class="liseret"></div><div class="haut"><b><img class="logoE" src="img/metier-plus-blanc.svg" alt="Métier+">${esc(t)}</b><span>Quiz maison · code ${code.slice(0, 3)} ${code.slice(3)}</span></div>`;
@@ -1427,14 +1439,22 @@ function ecran(code){
   let bruit = null;
   function charleston(t, v){ if (!bruit){ bruit = ac.createBuffer(1, ac.sampleRate * .05, ac.sampleRate); const d = bruit.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / d.length); }
     const s = ac.createBufferSource(), f = ac.createBiquadFilter(), g = ac.createGain(); s.buffer = bruit; f.type = "highpass"; f.frequency.value = 7000; g.gain.value = v; s.connect(f); f.connect(g); g.connect(MUS.gain); s.start(t); }
+  const STYLES = [
+    {nom: "Atelier", bpm: 104, acc: ACC, basse: "triangle", arp: "sine"},
+    {nom: "Énergie", bpm: 128, acc: [[48, 60, 64, 67], [43, 59, 62, 67], [45, 57, 60, 64], [41, 57, 60, 65]], basse: "square", arp: "triangle"},
+    {nom: "Calme", bpm: 84, acc: [[50, 62, 65, 69], [43, 59, 62, 65], [48, 60, 64, 67], [45, 57, 60, 64]], basse: "sine", arp: "sine"},
+    {nom: "Suspense", bpm: 96, acc: [[40, 52, 55, 59], [40, 52, 55, 58], [36, 52, 55, 60], [38, 50, 54, 57]], basse: "sawtooth", arp: "sine"}];
+  const STY = () => STYLES[(+localStorage.quizMusiqueStyle || 0) % STYLES.length];
+  window.quizMusique = () => { localStorage.quizMusiqueStyle = ((+localStorage.quizMusiqueStyle || 0) + 1) % STYLES.length; MUS.pas = 0; return STY().nom; };
+  window.quizMusiqueNom = () => STY().nom;
   function musiqueTour(){
-    const croche = 60 / 104 / 2;
+    const st = STY(), croche = 60 / st.bpm / 2;
     while (MUS.t < ac.currentTime + .25){
       const presse = Date.now() + decal > MUS.fin - 5000, sub = presse ? 2 : 1;
       for (let s = 0; s < sub; s++){
-        const t = MUS.t + s * croche / sub, k = MUS.pas, a = ACC[Math.floor(k / 16) % 4];
-        if (s === 0 && k % 2 === 0) note(hz(a[0]), t, croche * 1.8, .16, "triangle");
-        const arp = [1, 2, 3, 2, 1, 3, 2, 3][k % 8]; note(hz(a[arp] + 12), t, croche * (presse ? .5 : .9), presse ? .045 : .035, "sine");
+        const t = MUS.t + s * croche / sub, k = MUS.pas, a = st.acc[Math.floor(k / 16) % 4];
+        if (s === 0 && k % 2 === 0) note(hz(a[0]), t, croche * 1.8, st.basse === "triangle" || st.basse === "sine" ? .16 : .06, st.basse);
+        const arp = [1, 2, 3, 2, 1, 3, 2, 3][k % 8]; note(hz(a[arp] + 12), t, croche * (presse ? .5 : .9), presse ? .045 : .035, st.arp);
         if (s === 0 && k % 2 === 1) charleston(t, presse ? .05 : .03);
       }
       MUS.t += croche; MUS.pas++;

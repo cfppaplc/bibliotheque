@@ -313,7 +313,14 @@ html #prep .sheet-in.prep2 { width: min(1240px, calc(100vw - 32px)); display: gr
 .sem-c.on { outline: 2.5px solid #EB6A22; outline-offset: 1px; }
 .sem-c.sem-vise { background: rgba(235,106,34,.25); border-style: solid; }
 .sem-c.sem-src { opacity: .4; }
-.sem-c.plein { touch-action: none; }   /* au doigt, glisser un cours = copier (et non faire défiler la fenêtre) */
+.sem-c.plein { touch-action: none; }
+.sem-act { grid-column: 1 / -1; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 8px; }
+.sem-act .btn { min-height: 44px; } .sem-act .btn.sur { background: #B5574D; color: #fff; border-color: #B5574D; }
+.sem-act span { font-weight: 600; flex: 1; }
+#f-semaine.copie .sem-c:not(.plein):not(:disabled) { border: 2px solid var(--copper, #EB6A22); }
+.dr-ord { display: inline-flex; gap: 2px; } .dr-ord button { width: 34px; height: 34px; border: 0; border-radius: 9px; background: transparent; color: inherit; opacity: .6; font-size: 12px; cursor: pointer; }
+.dr-ord button:disabled { opacity: .15; }
+@media (pointer:coarse){ .dr-ord button, .dr-x { width: 44px; height: 44px; opacity: .85; } }   /* au doigt, glisser un cours = copier (et non faire défiler la fenêtre) */
 .sem-tag { position: absolute; top: 3px; left: 50%; transform: translateX(-50%); font-style: normal; font-size: 9.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: #2f9e44; white-space: nowrap; }
 .sem-c.tab > span { margin-top: 10px; }
 .sem-fantome { position: fixed; z-index: 99999; pointer-events: none; opacity: .9; box-shadow: 0 8px 24px rgba(0,0,0,.35); background: #EB6A22 !important; color: #fff; }
@@ -1701,6 +1708,7 @@ function renderDeroul(){
     const it = list[k + 1], mins = it ? it.b - it.a : 0, r = document.createElement("div"); r.className = "dr-row lk-row"; r.dataset.i = a.idx;
     r.innerHTML = '<span class="dr-poi" title="Glisser pour changer l\'ordre" aria-hidden="true">⋮⋮</span><input class="dr-nom" aria-label="Activité">'
       + '<span class="dr-dur"><button type="button" class="mn" aria-label="Moins 5 minutes">−</button><b></b><button type="button" class="pl" aria-label="Plus 5 minutes">+</button><button type="button" class="rz" title="Revenir en automatique">↺</button></span>'
+      + '<span class="dr-ord"><button type="button" class="dr-h" aria-label="Monter">▲</button><button type="button" class="dr-b" aria-label="Descendre">▼</button></span>'
       + '<button type="button" class="dr-x" aria-label="Retirer cette activité" title="Retirer">✕</button>'
       + '<div class="lk-top"><span class="lk-nom" hidden></span><span class="lk-chips"></span></div>';
     const inp = r.querySelector(".dr-nom"); inp.value = a.label; r.querySelector(".lk-nom").textContent = a.label;
@@ -1715,6 +1723,8 @@ function renderDeroul(){
     r.querySelector(".mn").onclick = () => { const l = L(); l[a.idx] = ligne(a.label, Math.max(1, mins - 5)); ecrireSteps(l); };
     r.querySelector(".pl").onclick = () => { const l = L(); l[a.idx] = ligne(a.label, mins + 5); ecrireSteps(l); };
     r.querySelector(".rz").onclick = () => { const l = L(); l[a.idx] = a.label; ecrireSteps(l); };
+    { const bouge = d => { const l = L(), i = a.idx; let j = i + d; while (j >= 0 && j < l.length && !l[j].trim()) j += d; if (j < 0 || j >= l.length) return; const x = l[i]; l[i] = l[j]; l[j] = x; ecrireSteps(l); };
+      const bh = r.querySelector(".dr-h"), bb = r.querySelector(".dr-b"); bh.disabled = k === 0; bb.disabled = k === acts.length - 1; bh.onclick = () => bouge(-1); bb.onclick = () => bouge(1); }
     r.querySelector(".dr-x").onclick = () => { const l = L(); l.splice(a.idx, 1); delete LIENS_T[cleLien(a.label)]; ecrireSteps(l); };
     const renommer = () => { const n = inp.value.trim(); if (!n){ inp.value = a.label; return; } if (n === a.label) return;
       const k0 = cleLien(a.label), k1 = cleLien(n); if (LIENS_T[k0] && !LIENS_T[k1]){ LIENS_T[k1] = LIENS_T[k0]; delete LIENS_T[k0]; }
@@ -2186,15 +2196,30 @@ function semaine(){
   ["am", "pm"].forEach(per => { h += `<span class="sem-p">${per === "am" ? "Matin" : "Après-midi"}</span>`;
     jours.forEach(j => { const k = j + "|" + per, passe = j < auj || (j === auj && perPassee(per)), P = contenuDe(k), t = titreCours(P);
       h += `<button type="button" class="sem-c${P ? " plein" : ""}${k === choisi ? " on" : ""}${k === actif ? " tab" : ""}" data-k="${k}"${passe ? " disabled" : ""} title="${t ? t.replace(/"/g, "&quot;") : "Période libre"}">${k === actif ? '<i class="sem-tag">Au tableau</i>' : ""}<span>${t ? esc(t) : passe ? "" : "+"}</span></button>`; }); });
+  { const P = contenuDe(choisi), libre = choisi !== actif && cfg.plans && cfg.plans[choisi];
+    if (COPIE) h += `<div class="sem-act"><span>Touche une case libre (+) pour y copier le cours.</span><button type="button" class="btn" data-sa="annuler">Annuler</button></div>`;
+    else if (P) h += `<div class="sem-act"><button type="button" class="btn" data-sa="copier">Copier ce cours vers…</button>${libre ? '<button type="button" class="btn" data-sa="effacer">Effacer ce cours</button>' : ""}</div>`; }
   box.innerHTML = h + "</div>";
+  if (COPIE) box.classList.add("copie"); else box.classList.remove("copie");
+  box.querySelectorAll("[data-sa]").forEach(b => b.onclick = () => { const v = b.dataset.sa;
+    if (v === "copier"){ COPIE = choisi; semaine(); }
+    else if (v === "annuler"){ COPIE = null; semaine(); }
+    else if (v === "effacer"){ if (!b.classList.contains("sur")){ b.classList.add("sur"); b.textContent = "Sûr ? Touche encore"; setTimeout(() => { if (b.isConnected){ b.classList.remove("sur"); b.textContent = "Effacer ce cours"; } }, 3000); return; }
+      delete cfg.plans[choisi]; save(); peMsg("Cours effacé."); const [j, per] = choisi.split("|"); remplirPrep(j === auj ? "" : j, per); repeindrePrep(); } });
   box.querySelectorAll("[data-sem]").forEach(b => b.onclick = () => { const d = new Date(SEM0 + "T12:00"); d.setDate(d.getDate() + +b.dataset.sem); SEM0 = isoJour(d); semaine(); });
-  box.querySelectorAll(".sem-c").forEach(b => { b.onclick = () => { if (b._glisse) { b._glisse = false; return; } const [j, per] = b.dataset.k.split("|"); remplirPrep(j === auj ? "" : j, per); };
+  box.querySelectorAll(".sem-c").forEach(b => { b.onclick = () => { if (b._glisse) { b._glisse = false; return; }
+      if (COPIE){ if (b.classList.contains("plein") || b.disabled){ peMsg("Choisis une case libre (+)."); return; } const src = COPIE; COPIE = null; copierCours(src, b.dataset.k); return; } const [j, per] = b.dataset.k.split("|"); remplirPrep(j === auj ? "" : j, per); };
     if (b.classList.contains("plein")) b.addEventListener("pointerdown", e => glisserCours(e, b)); });
 }
 /* glisser un cours vers une période libre = copie (rien n'est jamais écrasé) */
 /* Tableau interactif : après un glissé, la fenêtre pouvait rester blanche (affichage pas rafraîchi) : on force un nouveau dessin */
 function repeindrePrep(){ const f = document.querySelector("#prep .sheet-in"); if (!f) return;
   requestAnimationFrame(() => { f.style.display = "none"; void f.offsetHeight; f.style.display = ""; const y = f.scrollTop; f.scrollTop = y + 1; f.scrollTop = y; }); }
+let COPIE = null;   /* copie au toucher (10 nov., le glisser ne marchait pas au tableau interactif) */
+function copierCours(srcK, k){ const P = contenuDe(srcK); if (!P) return;
+  cfg.plans = cfg.plans || {}; cfg.plans[k] = JSON.parse(JSON.stringify(Object.assign({}, P, { examen: false })));
+  save(); const [j, per] = k.split("|"); peMsg("Cours copié : " + nomJour(j).toLowerCase() + " " + (per === "am" ? "matin" : "après-midi") + ".");
+  remplirPrep(j === isoJour(new Date()) ? "" : j, per); repeindrePrep(); }
 function glisserCours(e, src){
   const x0 = e.clientX, y0 = e.clientY; let fant = null, cible = null;
   const mv = ev => { if (!fant && Math.hypot(ev.clientX - x0, ev.clientY - y0) < 8) return;
@@ -2205,10 +2230,7 @@ function glisserCours(e, src){
   const up = () => { removeEventListener("pointermove", mv); removeEventListener("pointerup", up); removeEventListener("pointercancel", up);
     if (!fant) return; fant.remove(); src.classList.remove("sem-src"); src._glisse = true; setTimeout(() => src._glisse = false, 50);
     if (!cible){ peMsg("Glisse le cours sur une case libre (+) pour le copier."); return; }
-    cible.classList.remove("sem-vise"); const P = contenuDe(src.dataset.k); if (!P) return;
-    const k = cible.dataset.k; cfg.plans = cfg.plans || {}; cfg.plans[k] = JSON.parse(JSON.stringify(Object.assign({}, P, { examen: false })));
-    save(); const [j, per] = k.split("|"); peMsg("Cours copié : " + nomJour(j).toLowerCase() + " " + (per === "am" ? "matin" : "après-midi") + ".");
-    remplirPrep(j === isoJour(new Date()) ? "" : j, per); repeindrePrep(); };
+    cible.classList.remove("sem-vise"); copierCours(src.dataset.k, cible.dataset.k); };
   addEventListener("pointermove", mv); addEventListener("pointerup", up); addEventListener("pointercancel", up);
 }
 function boutonsJours(){
