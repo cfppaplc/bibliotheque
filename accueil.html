@@ -56,7 +56,7 @@
   function lire(k){ try { return S && S.getItem(k); } catch(e){ return null; } }
   function ecrire(k, v){ try { if (S) S.setItem(k, v); } catch(e){} }
   /* (7 nov.) cellulaire = mode léger d'office (sauf si « Complètes » est choisi) : petit écran tactile */
-  function cell(){ try { return matchMedia("(pointer:coarse)").matches && Math.min(screen.width, screen.height) <= 600; } catch(e){ return false; } }
+  function cell(){ try { return matchMedia("(pointer:coarse)").matches || matchMedia("(any-pointer:coarse)").matches; } catch(e){ return false; } }   /* accueil de classe : tout écran tactile (TNI) = léger */
   function appliquer(){ var m = lire("modeLeger"); h.classList.toggle("leger", m === "oui" || (m !== "non" && (cell() || lire("modeLegerMesure") === "lent"))); }
   window.modeLegerChoix = function(){ return lire("modeLeger") || "auto"; };
   window.modeLegerFixer = function(v){ try { if (!S) return; if (v === "auto") S.removeItem("modeLeger"); else S.setItem("modeLeger", v); } catch(e){} appliquer(); if (v === "auto") mesurer(); };
@@ -3362,6 +3362,7 @@ html.style-pro .seg.now:not(.p) { background: color-mix(in srgb, var(--copper) 2
 @keyframes mpPlus { from { transform: translate(0, 0) rotate(0deg); } 50% { transform: translate(4vw, -6vh) rotate(12deg); } to { transform: translate(-3vw, 5vh) rotate(-8deg); } }
 @keyframes mpLueur { from { transform: translate(0, 0) scale(1); } to { transform: translate(8vw, 6vh) scale(1.12); } }
 html.leger #mpFond *, html.apercu-mode #mpFond * { animation: none !important; }
+html.leger #mpFond { display: none !important; }   /* TNI : pas de grosses lueurs floues (le fond flashait, la fenêtre devenait blanche) */
 html.ui-clair #mpFond i { opacity: .5; }
 html.style-pro .hero .quote, html.style-pro .hero .matiere { margin-top: auto; }
 #mpCoin{position:fixed;right:clamp(16px,1.6vw,32px);bottom:clamp(10px,1.3vh,24px);height:clamp(28px,3.4vh,52px);z-index:5;opacity:1;pointer-events:none}
