@@ -1313,8 +1313,18 @@ function tick() {
   rows.forEach((r, i) => { if (cur && nowMin >= r.start && nowMin < r.end) nowIdx = i; });
   const allDone = ref && !cur && !next;
   const key = rows.map(r => r.start + r.label).join() + "|" + nowIdx + "|" + allDone + "|" + (cur ? 1 : 0);
-  if (key !== lastStepsKey) {
+  const struct = rows.map(r => r.start + r.label).join() + "|" + (cur ? 1 : 0), tlE = $("v-tl");
+  if (lastStepsKey && key !== lastStepsKey && struct === window.__tlStruct && tlE.children.length === rows.length && list.children.length === rows.length) {
+    /* 10 nov. (« léger reloading » au changement de bloc) : même déroulement, seul le bloc en cours change → classes mises à jour sur place, sans tout redessiner */
     lastStepsKey = key;
+    rows.forEach((r, i) => { const done = !!(allDone || (cur && nowMin >= r.end)), sg = tlE.children[i], li = list.children[i];
+      sg.classList.toggle("done", done); sg.classList.toggle("now", i === nowIdx);
+      li.classList.toggle("done", done); li.classList.toggle("now", i === nowIdx); li.dataset.done = done ? 1 : 0; });
+    let sp = $("v-left"); if (!sp) { sp = document.createElement("span"); sp.className = "left"; sp.id = "v-left"; }
+    const liN = list.children[nowIdx]; if (liN) liN.querySelector(".txt").append(sp); else sp.remove();
+  }
+  if (key !== lastStepsKey) {
+    lastStepsKey = key; window.__tlStruct = struct;
     list.innerHTML = "";
     const tl = $("v-tl"); tl.innerHTML = "";
     rows.forEach((r, i) => {
