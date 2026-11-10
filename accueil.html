@@ -3193,7 +3193,7 @@ html.apercu-mode #menage{display:none}
   document.getElementById("mnMini").onclick = e => { e.stopPropagation(); if (force && !actifVu) { force = false; montrer(false); if (APERCU) { APERCU = null; rendu = ""; ed.hidden = false; } return; } mini = true; el.classList.add("mini"); };
   el.addEventListener("click", () => { if (mini) { mini = false; el.classList.remove("mini"); } });
   function montrer(on){
-    if (on && el.hidden) { el.hidden = false; requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add("on"))); }
+    if (on && el.hidden) { el.style.transition = "none"; el.hidden = false; el.classList.add("on"); void el.offsetHeight; el.style.transition = ""; }   /* ouverture nette, sans fondu (le fondu montrait l'accueil à travers, sur le tableau) */
     else if (!on && !el.hidden) { el.style.transition = "none"; el.classList.remove("on"); el.hidden = true; void el.offsetHeight; el.style.transition = ""; }   /* fermeture nette : le fondu laissait un fantôme du ménage sur le tableau (vidéo du 10 nov.) */
   }
   function verifier(){
