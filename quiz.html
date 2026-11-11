@@ -1546,6 +1546,9 @@ function animer(boutons){
   $("tirB").onclick = () => T.classList.toggle("ouvert");
   const quitter = u => { let q = false; try { q = F.contentWindow.quitterPartie && F.contentWindow.quitterPartie(); } catch(x) {} setTimeout(() => { location.href = u; }, q ? 400 : 0); };
   $("retLabo").onclick = () => quitter("quiz.html");
+  try { const qid = params.get("quiz"), qq = qid && tousQuiz().find(x => x.id === qid);   /* 11 nov. : une présentation revient à « Mes présentations » du Labo */
+    if (qq && estPres(qq)) { $("retLabo").textContent = "‹ Mes présentations"; $("retLabo").title = "Retour à mes présentations";
+      $("retLabo").onclick = () => { try { localStorage.setItem("laboOnglet", "pres"); } catch(e){} quitter("labo.html"); }; } } catch(e) {}
   document.addEventListener("click", e => { const l = e.target.closest && e.target.closest("a[href]"); if (!l || /^#/.test(l.getAttribute("href")) || l.target === "_blank") return; e.preventDefault(); quitter(l.href); }, true);
   $("tirX").onclick = () => T.classList.remove("ouvert");
   $("celB").onclick = () => { if (!animer.code || !animer.mk) return; const u = location.href.split(/[?#]/)[0] + "?manette=" + animer.code + "&k=" + animer.mk;
