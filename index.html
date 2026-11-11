@@ -10996,4 +10996,34 @@ body:has(.reader.open:not(.wbon)) .toast{bottom:calc(98px + env(safe-area-inset-
   [rb, pc, ab].forEach(b => b && b.addEventListener("click", ret, true));
 })();
 </script>
+<style id="crayonLivreMots">
+/* Lecteur de livres (11 nov., « pas de choix de crayon ou d'efface ») : mots sous les outils du crayon, comme au tableau blanc */
+.reader:not(.wbon):not(.pen-side):not(.pen-fold) .penbar>button[data-mot]{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-width:58px;height:60px;padding:5px 4px}
+.reader:not(.wbon):not(.pen-side):not(.pen-fold) .penbar>button[data-mot]::after{content:attr(data-mot);font-size:.7rem;font-weight:600;line-height:1;white-space:nowrap}
+@media (max-width:1500px){.reader:not(.wbon):not(.pen-side):not(.pen-fold) .penbar{left:auto!important;right:12px}}
+</style>
+<script>
+/* 11 nov. : (1) crayon ouvert dans un livre = la bulle des couleurs et grosseurs s'ouvre tout de suite;
+   (2) effacer avec la main (paume) sur le tableau interactif : un gros contact tactile efface pendant le geste, puis l'outil d'avant revient */
+(function(){
+  document.addEventListener("click", e => { if (!e.target.closest || !e.target.closest("#tbPen")) return;
+    setTimeout(() => { try { const pb = document.getElementById("penBar"), pc = document.getElementById("popCol"), rd = document.getElementById("reader");
+      if (!pb || pb.hidden || !pc || !pc.hidden || (rd && rd.classList.contains("wbon")) || RD.eraser || RD.text || RD.obj) return;
+      pc.hidden = false; const b = document.getElementById("penCol"); if (b) b.classList.add("open"); } catch(x){} }, 120); });
+  let P = null; const SEUIL = 45;
+  const estToile = t => t && (t.id === "inkCanvas" || (t.classList && t.classList.contains("ink")));
+  window.paumeSeuil = SEUIL;
+  document.addEventListener("pointerdown", e => { try {
+    if (e.pointerType !== "touch" || !estToile(e.target) || P) return;
+    const taille = Math.max(e.width || 0, e.height || 0); if (taille < SEUIL) return;
+    if (!(RD.pen || RD.wb) || RD.sim) return;
+    P = { id: e.pointerId, av: { eraser: RD.eraser, text: RD.text, obj: RD.obj, crayonOff: RD.crayonOff, g: RD.gommeT } };
+    RD.eraser = true; RD.text = false; RD.obj = false; RD.crayonOff = false;
+    RD.gommeT = Math.max(RD.gommeT || 1, Math.min(8, taille / 22));   /* la gomme a la taille de la main */
+  } catch(x){} }, true);
+  const fin = e => { if (!P || e.pointerId !== P.id) return; const av = P.av; P = null;
+    setTimeout(() => { try { RD.eraser = av.eraser; RD.text = av.text; RD.obj = av.obj; RD.crayonOff = av.crayonOff; RD.gommeT = av.g; if (window.redrawInk) redrawInk(); } catch(x){} }, 0); };
+  document.addEventListener("pointerup", fin, true); document.addEventListener("pointercancel", fin, true);
+})();
+</script>
 </body></html>
