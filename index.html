@@ -11014,8 +11014,9 @@ body:has(.reader.open:not(.wbon)) .toast{bottom:calc(98px + env(safe-area-inset-
   const estToile = t => t && (t.id === "inkCanvas" || (t.classList && t.classList.contains("ink")));
   window.paumeSeuil = SEUIL;
   document.addEventListener("pointerdown", e => { try {
-    if (e.pointerType !== "touch" || !estToile(e.target) || P) return;
-    const taille = Math.max(e.width || 0, e.height || 0); if (taille < SEUIL) return;
+    if (!estToile(e.target) || P) return;
+    const gommeStylet = e.pointerType === "pen" && (e.buttons & 32);   /* bout « gomme » d'un stylet */
+    const taille = Math.max(e.width || 0, e.height || 0); if (!gommeStylet && (e.pointerType !== "touch" || taille < SEUIL)) return;
     if (!(RD.pen || RD.wb) || RD.sim) return;
     P = { id: e.pointerId, av: { eraser: RD.eraser, text: RD.text, obj: RD.obj, crayonOff: RD.crayonOff, g: RD.gommeT } };
     RD.eraser = true; RD.text = false; RD.obj = false; RD.crayonOff = false;

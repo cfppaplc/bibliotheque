@@ -1,0 +1,29 @@
+<!doctype html>
+<!-- © 2026 Jérémy Raymond. Tous droits réservés. Page de diagnostic : ce que le tableau interactif envoie au navigateur. -->
+<html lang="fr"><head><meta charset="utf-8"><meta name="robots" content="noindex"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Métier+ — Essai du toucher</title>
+<style>
+html,body{margin:0;height:100%;background:#0e1320;color:#EEF2F7;font:500 22px/1.4 "Segoe UI",Roboto,sans-serif;touch-action:none;user-select:none;overflow:hidden}
+#zone{position:fixed;inset:0}
+.haut{position:fixed;top:0;left:0;right:0;padding:18px 24px;background:#161d2c;border-bottom:2px solid #EB6A22;z-index:2}
+.haut b{color:#F28A3C}
+#liste{position:fixed;left:24px;top:150px;z-index:2;white-space:pre;font:600 24px/1.5 Consolas,monospace}
+#max{position:fixed;left:24px;bottom:24px;z-index:2;font-size:26px}
+.rond{position:fixed;border:3px solid #F28A3C;border-radius:50%;transform:translate(-50%,-50%);pointer-events:none}
+</style></head><body>
+<div class="haut">Essai du toucher : touche l'écran avec <b>un doigt</b>, puis pose <b>la paume</b> à plat et glisse.<br>Prends une photo de l'écran pendant que la paume est posée et envoie-la à Claude.</div>
+<div id="zone"></div><div id="liste"></div><div id="max"></div>
+<script>
+const A = new Map(); let maxT = 0, maxN = 0, types = new Set();
+const liste = document.getElementById("liste"), mx = document.getElementById("max"), zone = document.getElementById("zone");
+function maj(){ let s = "Contacts en ce moment : " + A.size + "\n";
+  A.forEach((e, id) => { s += "#" + id + "  " + e.pointerType + "  " + Math.round(e.width) + " × " + Math.round(e.height) + " px  pression " + (e.pressure || 0).toFixed(2) + "  boutons " + e.buttons + "\n"; });
+  liste.textContent = s; mx.textContent = "Plus gros contact vu : " + Math.round(maxT) + " px · Plus de contacts en même temps : " + maxN + " · Types : " + [...types].join(", "); }
+function rond(e){ let r = document.getElementById("r" + e.pointerId); if (!r){ r = document.createElement("div"); r.className = "rond"; r.id = "r" + e.pointerId; document.body.appendChild(r); }
+  r.style.left = e.clientX + "px"; r.style.top = e.clientY + "px"; r.style.width = Math.max(10, e.width) + "px"; r.style.height = Math.max(10, e.height) + "px"; }
+const vu = e => { A.set(e.pointerId, e); types.add(e.pointerType); maxT = Math.max(maxT, e.width || 0, e.height || 0); maxN = Math.max(maxN, A.size); rond(e); maj(); };
+zone.addEventListener("pointerdown", vu); zone.addEventListener("pointermove", e => { if (A.has(e.pointerId)) vu(e); });
+const fin = e => { A.delete(e.pointerId); const r = document.getElementById("r" + e.pointerId); if (r) r.remove(); maj(); };
+zone.addEventListener("pointerup", fin); zone.addEventListener("pointercancel", fin);
+zone.addEventListener("contextmenu", e => e.preventDefault()); maj();
+</script></body></html>
