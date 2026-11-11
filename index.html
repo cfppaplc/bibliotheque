@@ -11000,7 +11000,9 @@ body:has(.reader.open:not(.wbon)) .toast{bottom:calc(98px + env(safe-area-inset-
 /* Lecteur de livres (11 nov., « pas de choix de crayon ou d'efface ») : mots sous les outils du crayon, comme au tableau blanc */
 .reader:not(.wbon):not(.pen-side):not(.pen-fold) .penbar>button[data-mot]{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-width:58px;height:60px;padding:5px 4px}
 .reader:not(.wbon):not(.pen-side):not(.pen-fold) .penbar>button[data-mot]::after{content:attr(data-mot);font-size:.7rem;font-weight:600;line-height:1;white-space:nowrap}
-@media (max-width:1500px){.reader:not(.wbon):not(.pen-side):not(.pen-fold) .penbar{left:auto!important;right:12px}}
+/* 11 nov. (« le crayon à droite ») : crayon ouvert = la barre du crayon au centre, les pages ‹ › vont à gauche */
+.reader:not(.wbon):not(.pen-side):not(.pen-fold):has(#penBar:not([hidden])) #tb{justify-content:flex-start!important;padding-left:16px!important}
+.reader:not(.wbon):not(.pen-side):not(.pen-fold) .penbar{left:50%!important;right:auto!important;transform:translateX(-50%)!important}
 </style>
 <script>
 /* 11 nov. : (1) crayon ouvert dans un livre = la bulle des couleurs et grosseurs s'ouvre tout de suite;
