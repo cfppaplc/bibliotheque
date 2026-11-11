@@ -11010,6 +11010,17 @@ body:has(.reader.open:not(.wbon)) .toast{bottom:calc(98px + env(safe-area-inset-
     setTimeout(() => { try { const pb = document.getElementById("penBar"), pc = document.getElementById("popCol"), rd = document.getElementById("reader");
       if (!pb || pb.hidden || !pc || !pc.hidden || (rd && rd.classList.contains("wbon")) || RD.eraser || RD.text || RD.obj) return;
       pc.hidden = false; const b = document.getElementById("penCol"); if (b) b.classList.add("open"); } catch(x){} }, 120); });
+
+  /* La bulle du crayon s'ouvre au-dessus du bouton Crayon (pas collée à gauche de la barre) */
+  const placerBulle = () => { try { const pc = document.getElementById("popCol"), pb = document.getElementById("penBar"), b = document.getElementById("penCol"), rd = document.getElementById("reader");
+    if (!pc || pc.hidden || !pb || !b || !rd || rd.classList.contains("pen-side")) return;
+    const r = pb.getBoundingClientRect(), rb = b.getBoundingClientRect(), w = pc.offsetWidth;
+    let x = rb.left + rb.width / 2 - w / 2; x = Math.max(8, Math.min(innerWidth - w - 8, x));
+    pc.style.setProperty("left", (x - r.left) + "px", "important"); pc.style.setProperty("right", "auto", "important"); pc.style.setProperty("transform", "none", "important");
+  } catch(x){} };
+  const pcEl = document.getElementById("popCol");
+  if (pcEl) new MutationObserver(() => requestAnimationFrame(placerBulle)).observe(pcEl, { attributes: true, attributeFilter: ["hidden"] });
+  addEventListener("resize", placerBulle);
   let P = null; const SEUIL = 45;
   const estToile = t => t && (t.id === "inkCanvas" || (t.classList && t.classList.contains("ink")));
   window.paumeSeuil = SEUIL;
