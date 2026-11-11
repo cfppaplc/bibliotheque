@@ -2223,7 +2223,7 @@ function semaine(){
     if (v === "copier"){ COPIE = choisi; semaine(); }
     else if (v === "annuler"){ COPIE = null; semaine(); }
     else if (v === "effacer"){ if (!b.classList.contains("sur")){ b.classList.add("sur"); b.textContent = "Sûr ? Touche encore"; setTimeout(() => { if (b.isConnected){ b.classList.remove("sur"); b.textContent = "Effacer ce cours"; } }, 3000); return; }
-      delete cfg.plans[choisi]; save(); peMsg("Cours effacé."); const [j, per] = choisi.split("|"); remplirPrep(j === auj ? "" : j, per); repeindrePrep(); } });
+      effacerPlan(choisi); save(); peMsg("Cours effacé."); const [j, per] = choisi.split("|"); remplirPrep(j === auj ? "" : j, per); repeindrePrep(); } });
   box.querySelectorAll("[data-sem]").forEach(b => b.onclick = () => { const d = new Date(SEM0 + "T12:00"); d.setDate(d.getDate() + +b.dataset.sem); SEM0 = isoJour(d); semaine(); });
   box.querySelectorAll(".sem-c").forEach(b => { b.onclick = () => { if (b._glisse) { b._glisse = false; return; }
       if (COPIE){ if (b.classList.contains("plein") || b.disabled){ peMsg("Choisis une case libre (+)."); return; } const src = COPIE; COPIE = null; copierCours(src, b.dataset.k); return; } const [j, per] = b.dataset.k.split("|"); remplirPrep(j === auj ? "" : j, per); };
@@ -2235,7 +2235,7 @@ function repeindrePrep(){ const f = document.querySelector("#prep .sheet-in"); i
   requestAnimationFrame(() => { f.style.display = "none"; void f.offsetHeight; f.style.display = ""; const y = f.scrollTop; f.scrollTop = y + 1; f.scrollTop = y; }); }
 let COPIE = null;   /* copie au toucher (10 nov., le glisser ne marchait pas au tableau interactif) */
 function copierCours(srcK, k){ const P = contenuDe(srcK); if (!P) return;
-  cfg.plans = cfg.plans || {}; cfg.plans[k] = JSON.parse(JSON.stringify(Object.assign({}, P, { examen: false })));
+  cfg.plans = cfg.plans || {}; cfg.plans[k] = JSON.parse(JSON.stringify(Object.assign({}, P, { examen: false, t: Date.now() }))); if (cfg.plansSup) delete cfg.plansSup[k];
   save(); const [j, per] = k.split("|"); peMsg("Cours copié : " + nomJour(j).toLowerCase() + " " + (per === "am" ? "matin" : "après-midi") + ".");
   remplirPrep(j === isoJour(new Date()) ? "" : j, per); repeindrePrep(); }
 function glisserCours(e, src){
@@ -2249,7 +2249,7 @@ function glisserCours(e, src){
     if (cible && cible !== c) cible.classList.remove("sem-vise"); cible = c && c !== src && !c.disabled && !c.classList.contains("plein") ? c : null; if (cible) cible.classList.add("sem-vise"); };
   const up = () => { removeEventListener("pointermove", mv); removeEventListener("pointerup", up); removeEventListener("pointercancel", up);
     if (!fant) return; fant.remove(); src.classList.remove("sem-src"); src._glisse = true; setTimeout(() => src._glisse = false, 50);
-    if (poub){ poub.remove(); if (surPoub){ if (cible) cible.classList.remove("sem-vise"); const k = src.dataset.k; delete cfg.plans[k]; save(); peMsg("Cours effacé.");
+    if (poub){ poub.remove(); if (surPoub){ if (cible) cible.classList.remove("sem-vise"); const k = src.dataset.k; effacerPlan(k); save(); peMsg("Cours effacé.");
       const [j, per] = k.split("|"); remplirPrep(j === isoJour(new Date()) ? "" : j, per); repeindrePrep(); return; } }
     if (!cible){ peMsg("Glisse le cours sur une case libre (+) pour le copier."); return; }
     cible.classList.remove("sem-vise"); copierCours(src.dataset.k, cible.dataset.k); };
@@ -2259,6 +2259,8 @@ function boutonsJours(){
   semaine();
   const d = +$("f-duree").value || SPAN, res = $("f-opts-res"); if (res) res.textContent = (d === SPAN ? "période complète" : (DUREES.find(x => x[0] === d) || [0, d + " min"])[1]) + ($("f-exam").checked ? " · examen" : "");
 }
+/* Cours effacé : on note quand (cfg.plansSup), sinon la copie du coffre le ramenait (10 nov.) */
+function effacerPlan(k){ if (!cfg.plans) return; delete cfg.plans[k]; cfg.plansSup = cfg.plansSup || {}; cfg.plansSup[k] = Date.now(); }
 function appliquerPlans(){
   const plans = cfg.plans || {}, auj = isoJour(new Date()); let change = false;
   Object.keys(plans).forEach(k => { if (!k.includes("|")){ plans[k + "|am"] = plans[k]; delete plans[k]; change = true; } });   /* plans d'un jour entier (version du 30 oct., 17 h 50) → le matin */
@@ -2292,7 +2294,7 @@ $("prepForm").addEventListener("submit", e => {
   const k = cleSlot(JOUR_PREP, PER_PREP), duree = +$("f-duree").value || SPAN, defaut = PER_PREP === "pm" ? cfg.pmStart : cfg.amStart, debut = $("f-debut").value && $("f-debut").value !== defaut ? $("f-debut").value : "";
   if (k !== (slotActif() || cfg.slot)){   /* une autre période : on la garde, le tableau ne change pas */
     cfg.plans = cfg.plans || {};
-    cfg.plans[k] = { prog: $("f-prog").value, comp: $("f-comp").value, module: $("f-module").value, steps: $("f-steps").value, liens: JSON.parse(JSON.stringify(LIENS_T)), examen: $("f-exam").checked, duree, debut };
+    cfg.plans[k] = { prog: $("f-prog").value, comp: $("f-comp").value, module: $("f-module").value, steps: $("f-steps").value, liens: JSON.parse(JSON.stringify(LIENS_T)), examen: $("f-exam").checked, duree, debut, t: Date.now() }; if (cfg.plansSup) delete cfg.plansSup[k];
     save(); $("prep").hidden = true; peMsg("Cours " + (JOUR_PREP ? "de " + nomJour(JOUR_PREP).toLowerCase() : "d'aujourd'hui") + " " + (PER_PREP === "am" ? "matin" : "après-midi") + " enregistré : il s'affichera tout seul."); return;
   }
   cfg.slot = k; cfg.duree = duree; cfg.debut = debut;
@@ -3048,7 +3050,9 @@ if (window.COFFRE && !/[?&]apercu=/.test(location.search)) COFFRE.demarrer("accu
     const auj = new Date().toLocaleDateString("en-CA"), pl = Object.assign({}, C.plans || {});
     const s = typeof slotActif === "function" ? slotActif() : "", borne = s || auj + "|zz";
     for (const k in (O.plans || {})) if (!(k in pl) && k > borne) pl[k] = O.plans[k];   /* seulement les périodes pas encore commencées : une période arrivée est retirée par appliquerPlans (sinon boucle de rechargements) */
-    C.plans = pl; return JSON.stringify(C); } } });
+    const sup = Object.assign({}, O.plansSup || {}); for (const k in (C.plansSup || {})) sup[k] = Math.max(sup[k] || 0, C.plansSup[k]);
+    for (const k in sup){ if (k < auj){ delete sup[k]; continue; } if (pl[k] && (pl[k].t || 0) < sup[k]) delete pl[k]; }   /* un cours effacé ne revient pas, sauf s'il a été refait après */
+    C.plans = pl; C.plansSup = sup; return JSON.stringify(C); } } });
 </script>
 
 <style>
