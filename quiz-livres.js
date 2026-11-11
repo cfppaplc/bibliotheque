@@ -19,7 +19,8 @@ window.QUIZ_LIVRES = [
 "t": "diapo",
 "img": "img/labo/quiz/demo/01.jpg",
 "q": "",
-"s": 0
+"s": 0,
+"mv": "focus"
 },
 {
 "t": "nuage",
@@ -32,19 +33,22 @@ window.QUIZ_LIVRES = [
 "t": "diapo",
 "img": "img/labo/quiz/demo/02.jpg",
 "q": "",
-"s": 0
+"s": 0,
+"mv": "focus"
 },
 {
 "t": "diapo",
 "img": "img/labo/quiz/demo/03.jpg",
 "q": "",
-"s": 0
+"s": 0,
+"mv": "focus"
 },
 {
 "t": "diapo",
 "img": "img/labo/quiz/demo/04.jpg",
 "q": "",
-"s": 0
+"s": 0,
+"mv": "kb"
 },
 {
 "q": "Combien de feuilles de plans techniques sont prêtes dans Métier+ ?",
@@ -62,7 +66,8 @@ window.QUIZ_LIVRES = [
 "t": "diapo",
 "img": "img/labo/quiz/demo/05.jpg",
 "q": "",
-"s": 0
+"s": 0,
+"mv": "kb"
 },
 {
 "t": "multi",
@@ -85,7 +90,8 @@ window.QUIZ_LIVRES = [
 "t": "diapo",
 "img": "img/labo/quiz/demo/06.jpg",
 "q": "",
-"s": 0
+"s": 0,
+"mv": "kb"
 },
 {
 "t": "ordre",
@@ -109,7 +115,8 @@ window.QUIZ_LIVRES = [
 "t": "diapo",
 "img": "img/labo/quiz/demo/07.jpg",
 "q": "",
-"s": 0
+"s": 0,
+"mv": "kb"
 },
 {
 "q": "Le ménage de l'atelier apparaît tout seul à la fin du cours.",
@@ -125,7 +132,8 @@ window.QUIZ_LIVRES = [
 "t": "diapo",
 "img": "img/labo/quiz/demo/08.jpg",
 "q": "",
-"s": 0
+"s": 0,
+"mv": "kb"
 },
 {
 "q": "Pour jouer à un quiz, chaque élève doit se créer un compte.",
@@ -153,19 +161,22 @@ window.QUIZ_LIVRES = [
 "t": "diapo",
 "img": "img/labo/quiz/demo/09.jpg",
 "q": "",
-"s": 0
+"s": 0,
+"mv": "kb"
 },
 {
 "t": "diapo",
 "img": "img/labo/quiz/demo/10.jpg",
 "q": "",
-"s": 0
+"s": 0,
+"mv": "focus"
 },
 {
 "t": "diapo",
 "img": "img/labo/quiz/demo/11.jpg",
 "q": "",
-"s": 0
+"s": 0,
+"mv": "focus"
 },
 {
 "q": "Depuis combien d'années PowerPoint existe-t-il ?",
@@ -208,7 +219,8 @@ window.QUIZ_LIVRES = [
 "t": "diapo",
 "img": "img/labo/quiz/demo/12.jpg",
 "q": "",
-"s": 0
+"s": 0,
+"mv": "focus"
 }
 ]
 },

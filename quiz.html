@@ -383,7 +383,12 @@ html.sombre body.bord .edBas{background:#1f1f24}
 .enuage{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;align-content:center;gap:.6vw 1.6vw;min-height:44vh;margin:2vw 4vw;text-align:center}.enuage.fin{min-height:58vh}
 .enuage .mot{font-weight:800;line-height:1.05;transition:font-size .6s cubic-bezier(.3,1.4,.5,1)}.enuage .mot.neuf{animation:motIn .6s cubic-bezier(.3,1.5,.5,1)}.enuage .vide{opacity:.5;font-size:2vw}
 @keyframes motIn{from{opacity:0;transform:scale(.3)}to{opacity:1;transform:none}}
-.ediapo{position:fixed;inset:0;background:#000;display:flex;align-items:center;justify-content:center;z-index:5}.ediapo img{max-width:100%;max-height:100%;object-fit:contain}
+.ediapo{position:fixed;inset:0;background:#000;display:flex;align-items:center;justify-content:center;z-index:5}.ediapo img{max-width:100%;max-height:100%;object-fit:contain;animation:diaIn .7s ease-out both}
+.ediapo{overflow:hidden}.ediapo.kb img{animation:diaKb 16s cubic-bezier(.2,.6,.4,1) both}.ediapo.kb.k1 img{animation-name:diaKb2}.ediapo.focus img{animation:diaFocus 1.3s cubic-bezier(.2,.8,.2,1) both}
+@keyframes diaIn{from{opacity:0;transform:scale(1.03)}}
+@keyframes diaKb{0%{opacity:0;transform:scale(1.02)}5%{opacity:1}100%{transform:scale(1.13) translate(-2.5%,-1.5%)}}
+@keyframes diaKb2{0%{opacity:0;transform:scale(1.13) translate(2.5%,1%)}5%{opacity:1}100%{transform:scale(1.02)}}
+@keyframes diaFocus{from{opacity:0;filter:blur(22px);transform:scale(1.08)}}
 .qe .tete b{cursor:pointer}.qe .tete b::before{content:"▾ ";color:var(--acc)}.qe.plie .tete b::before{content:"▸ "}
 .qe .tete .resume{display:none}.qe.plie .tete b{flex:0 0 auto}.qe.plie .tete .resume{display:block;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--gris);font-size:14px;cursor:pointer}
 .qe.plie>*:not(.tete){display:none!important}.qe.plie .tete select{display:none}
@@ -764,7 +769,7 @@ function telecommande(bord){
       reg: {coul: reg.coul, son: reg.son, musique: reg.musique || "oui", classement: reg.classement, points: reg.points, mode: reg.mode, lettres: reg.lettres || "non"},
       couv: G.quiz && G.quiz.couv && !/^data:/.test(G.quiz.couv) ? G.quiz.couv : (G.quiz && G.quiz.couv ? "img" : ""), sujet: G.quiz ? G.quiz.sujet || "" : "",
       q: Q && ["question", "rev"].includes(G.etat) ? {q: Q.q, ch: Q.ch, s: Q.s, t, u: Q.u || "", zoom: Q.zoom || null, img: !!Q.img, expl: G.etat === "rev" ? Q.expl || "" : "", bonTxt: G.etat === "rev" ? texteBon(Q) : ""} : null,
-      pres: estPres(G.quiz), mots: Q && typeDe(Q) === "nuage" ? compterMots(G.reps, G.masques) : null, dref: G.etat === "diapo" && Q ? Q.ref || "" : "", mains: G.mains ? G.mains.size : 0,
+      pres: estPres(G.quiz), mots: Q && typeDe(Q) === "nuage" ? compterMots(G.reps, G.masques) : null, dref: G.etat === "diapo" && Q ? Q.ref || "" : "", mains: G.mains ? G.mains.size : 0, dmv: G.etat === "diapo" && Q ? Q.mv || "" : "",
       bon: G.etat === "rev" ? Q.bon : null, cpt, nrep: Object.keys(G.reps).length, mises: G.etat === "mise" ? ids().filter(id => P[id].mise).length : 0,
       joueurs: ids().map(id => ({n: P[id].nom, av: P[id].av, pts: P[id].pts, r: r[id], g: G.etat === "rev" && G.reps[id] ? G.reps[id].g || 0 : 0, s: P[id].serie || 0, bo: G.etat === "rev" && G.reps[id] ? G.reps[id].bonus || 0 : 0, ra: G.etat === "rev" && G.reps[id] && G.reps[id].ok && id === plusRapide(G) ? 1 : 0})).sort((a, b) => a.r - b.r)};
   }
@@ -1079,7 +1084,7 @@ function telecommande(bord){
     ed.titre = $("eTitre").value.trim(); ed.sujet = $("eSujet").value.trim();
     document.querySelectorAll(".qe").forEach((d, k) => {
       const Q = ed.qs[k], t = typeDe(Q);
-      if (t === "diapo") return;
+      if (t === "diapo") { const sm = d.querySelector(".dmv"); if (sm) { if (sm.value) Q.mv = sm.value; else delete Q.mv; } return; }
       Q.q = d.querySelector(".tq").value.trim();
       Q.s = +d.querySelector("select.ts").value;
       Q.expl = d.querySelector(".ex").value.trim();
@@ -1101,7 +1106,8 @@ function telecommande(bord){
     $("eQs").innerHTML = ed.qs.map((Q, k) => {
       if (typeDe(Q) === "diapo") { nD++; return `<div class="qe diapo" data-t="diapo"><div class="tete"><strong>Diapo ${nD}</strong>
         <button class="btn2" data-mv="${k},-1" ${k ? "" : "disabled"} aria-label="Monter">↑</button><button class="btn2" data-mv="${k},1" ${k < ed.qs.length - 1 ? "" : "disabled"} aria-label="Descendre">↓</button>
-        <button class="btn2" data-del="${k}" ${ed.qs.length < 2 ? "disabled" : ""}>Retirer</button></div>
+        <button class="btn2" data-del="${k}" ${ed.qs.length < 2 ? "disabled" : ""}>Retirer</button>
+        <select class="dmv" aria-label="Mouvement" title="Comment la diapo arrive au tableau"><option value="">Fondu</option><option value="kb" ${Q.mv === "kb" ? "selected" : ""}>Zoom lent (photo)</option><option value="focus" ${Q.mv === "focus" ? "selected" : ""}>Mise au point</option></select></div>
         <div class="diaE"><img src="${Q.img}" alt="Diapo ${nD}"><button class="btn2 apres" data-apres="${k}">+ Question ici</button></div></div>`; }
       nQ++;
       const t = typeDe(Q), vf = t === "choix" && Q.ch.length === 2 && /^vrai$/i.test(Q.ch[0]) && /^faux$/i.test(Q.ch[1]);
@@ -1189,7 +1195,7 @@ function telecommande(bord){
     lireEd();
     let err = !ed.titre ? "Donne un titre au quiz." : "";
     const qs = ed.qs.map((Q, k) => {
-      const t = typeDe(Q); if (t === "diapo") { if (Q.ref) DIA.envoyer(Q.ref); const o = {t, img: Q.img, q: "", s: 0}; if (Q.ref) o.ref = Q.ref; if (Q.txt) o.txt = Q.txt; return o; }
+      const t = typeDe(Q); if (t === "diapo") { if (Q.ref) DIA.envoyer(Q.ref); const o = {t, img: Q.img, q: "", s: 0}; if (Q.ref) o.ref = Q.ref; if (Q.txt) o.txt = Q.txt; if (Q.mv) o.mv = Q.mv; return o; }
       const o = {q: Q.q, s: Q.s}; if (t !== "choix") o.t = t;
       if (!Q.q && !err) err = "La question " + (k + 1) + " n'a pas de texte.";
       if (t === "nuage") { o.ch = []; o.bon = null; }
@@ -1683,7 +1689,7 @@ function ecran(code){
       try { const tq = cv ? .16 : .22; new QRCode($("eQr"), {text: url, width: Math.round(innerWidth * tq), height: Math.round(innerWidth * tq), correctLevel: QRCode.CorrectLevel.M}); } catch(e) { $("eQr").textContent = url; }
     } else if (v.etat === "diapo") {
       diapoImg(v);
-      if (cle !== dernier || force) E.innerHTML = img[v.i] ? `<div class="ediapo"><img src="${img[v.i]}" alt=""></div>` + bSon() : tete(v.titre) + bSon();
+      if (cle !== dernier || force) E.innerHTML = img[v.i] ? `<div class="ediapo ${v.dmv === "kb" || v.dmv === "focus" ? v.dmv : ""} k${v.i % 2}"><img src="${img[v.i]}" alt=""></div>` + bSon() : tete(v.titre) + bSon();
     } else if (v.etat === "mise") {
       if (cle !== dernier || force) {
         E.innerHTML = tete("Dernière question") + `<div class="dblE monte"><b>Double ou rien</b><span>Sur ton iPad : mise tous tes points.<br>Bonne réponse = points doublés. Mauvaise réponse = 0.</span><em id="eMises"></em></div>` + bSon();
