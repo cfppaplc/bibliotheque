@@ -108,9 +108,18 @@ main{max-width:1500px}
 <div class="lb-bd"><b>Présentation avec questions</b><p>Ton PowerPoint (enregistré en PDF) au tableau, avec des questions entre les diapos. Points, classement et podium.</p><div class="lb-tags"><span>Tous les cours</span><span>Nouveau</span></div></div></a>
 </div>
 
-<section id="lbMiens" hidden><h2>Mes quiz et présentations</h2><div class="lb-qz" id="lbMiensL"></div></section>
+<div class="lb-ong" role="tablist"><button type="button" data-ong="quiz" role="tab">Quiz</button><button type="button" data-ong="pres" role="tab">Présentations</button></div>
+<div data-volet="quiz">
+<section id="lbMiens" hidden><h2>Mes quiz</h2><div class="lb-qz" id="lbMiensL"></div></section>
 <h2>Quiz prêts à jouer</h2>
 <div class="lb-qz" id="lbQz"><a class="lb-nouv" href="quiz.html">+ Nouveau<br>quiz</a></div>
+</div>
+<div data-volet="pres" hidden>
+<section id="lbMesP" hidden><h2>Mes présentations</h2><div class="lb-qz" id="lbMesPL"></div></section>
+<h2>Présentations prêtes</h2>
+<div class="lb-qz" id="lbPres"><a class="lb-nouv" href="quiz.html?pres=1">+ Nouvelle<br>présentation</a></div>
+</div>
+<style>.lb-ong{display:flex;gap:6px;margin:34px 0 4px;border-bottom:1px solid rgba(128,128,128,.3)}.lb-ong button{font:inherit;font-weight:700;font-size:1.05rem;background:none;border:0;border-bottom:3px solid transparent;padding:10px 18px;min-height:46px;color:inherit;opacity:.65;cursor:pointer}.lb-ong button.on{opacity:1;border-bottom-color:#EB6A22;color:#EB6A22}</style>
 <p class="lb-2e">Deux écrans (télécommande sur ton ordinateur, écran de classe sur le projecteur) ? <a href="quiz.html?role=1">Quiz</a> · <a href="simulateur.html?role=1">Simulateur</a></p>
 
 <dialog id="lbDlg"><h3>Comment ça marche</h3>
@@ -128,16 +137,23 @@ main{max-width:1500px}
   const $ = id => document.getElementById(id), esc = t => String(t == null ? "" : t).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
   const lire = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) || d; } catch(e) { return d; } };
   const EX = {id:"exemple-incendie", titre:"Protection incendie", couv:"img/labo/incendie-immeuble.jpg", sujet:"Modules 1 à 5", n:10};
-  const LIVRES = (window.QUIZ_LIVRES || []).map(q => ({id:q.id, titre:q.titre, couv:q.couv, n:(q.qs || []).length, sujet:q.sujet}));
+  const estP = q => (q.qs || []).some(x => x.t === "diapo");
+  const PRES = (window.QUIZ_LIVRES || []).filter(estP).map(q => ({id:q.id, titre:q.titre, couv:q.couv, n:(q.qs || []).length, sujet:"Présentation · " + (q.qs || []).filter(x => x.t === "diapo").length + " diapos"}));
+  const LIVRES = (window.QUIZ_LIVRES || []).filter(q => !estP(q)).map(q => ({id:q.id, titre:q.titre, couv:q.couv, n:(q.qs || []).length, sujet:q.sujet}));
   const TOUS = [EX].concat(LIVRES);
   const lien = id => "quiz.html?animer=1&quiz=" + encodeURIComponent(id);
   function noter(r){ const L = lire("laboRecents", []).filter(x => x.href !== r.href); L.unshift(Object.assign({t: Date.now()}, r)); try { localStorage.setItem("laboRecents", JSON.stringify(L.slice(0, 6))); } catch(e){} }
   function tuile(q){ const c = q.couv || "img/labo/quiz/culture-couv.svg";
     return `<a class="lb-t" href="${lien(q.id)}" data-id="${esc(q.id)}" data-titre="${esc(q.titre)}" data-img="${esc(c)}"><div class="lb-cv" style="--u:url('${esc(c)}')"><img src="${esc(c)}" alt="" loading="lazy"></div><b>${esc(q.titre)}</b><small>${q.sujet && /^Présentation/.test(q.sujet) ? esc(q.sujet) : q.n ? q.n + " questions" : esc(q.sujet || "")}</small></a>`; }
   $("lbQz").insertAdjacentHTML("beforeend", TOUS.map(tuile).join(""));
-  const miens = lire("quizMaison", []); if (Array.isArray(miens) && miens.length){ $("lbMiens").hidden = false;
-    const pres = q => (q.qs || []).some(x => x.t === "diapo");
-    $("lbMiensL").innerHTML = miens.map(q => tuile({id:q.id, titre:q.titre || "Mon quiz", couv:q.couv || (pres(q) && ((q.qs || []).find(x => x.t === "diapo") || {}).img), n:(q.qs || []).length, sujet: pres(q) ? "Présentation · " + (q.qs || []).filter(x => x.t === "diapo").length + " diapos" : ""})).join(""); }
+  $("lbPres").insertAdjacentHTML("beforeend", PRES.map(tuile).join(""));
+  const miens = lire("quizMaison", []); if (Array.isArray(miens) && miens.length){
+    const pres = q => (q.qs || []).some(x => x.t === "diapo"), T = q => tuile({id:q.id, titre:q.titre || (pres(q) ? "Ma présentation" : "Mon quiz"), couv:q.couv || (pres(q) && ((q.qs || []).find(x => x.t === "diapo") || {}).img), n:(q.qs || []).length, sujet: pres(q) ? "Présentation · " + (q.qs || []).filter(x => x.t === "diapo").length + " diapos" : ""});
+    const mq = miens.filter(q => !pres(q)), mp = miens.filter(pres);
+    if (mq.length){ $("lbMiens").hidden = false; $("lbMiensL").innerHTML = mq.map(T).join(""); }
+    if (mp.length){ $("lbMesP").hidden = false; $("lbMesPL").innerHTML = mp.map(T).join(""); } }
+  { const ong = k => { document.querySelectorAll("[data-ong]").forEach(b => b.classList.toggle("on", b.dataset.ong === k)); document.querySelectorAll("[data-volet]").forEach(v => v.hidden = v.dataset.volet !== k); try { localStorage.setItem("laboOnglet", k); } catch(e){} };
+    document.querySelectorAll("[data-ong]").forEach(b => b.onclick = () => ong(b.dataset.ong)); ong(localStorage.getItem("laboOnglet") === "pres" ? "pres" : "quiz"); }
   document.addEventListener("click", e => { const t = e.target.closest(".lb-t"); if (t) noter({href: t.getAttribute("href"), titre: "Quiz · " + t.dataset.titre, img: t.dataset.img});
     const c = e.target.closest(".lb-c[data-rec]"); if (c){ const [titre, img] = c.dataset.rec.split("|"); noter({href: c.getAttribute("href"), titre, img}); } });
   // Reprendre : activités lancées d'ici + dernier quiz joué
