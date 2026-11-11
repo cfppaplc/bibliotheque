@@ -11047,8 +11047,32 @@ body:has(.reader.open:not(.wbon)) .toast{bottom:calc(98px + env(safe-area-inset-
     try { undoInk(); } catch(x){}                  /* …et l'enlève */
     activer(e); faux("pointerdown", e, cible);     /* puis la même main continue en gomme */
   } catch(x){} }, true);
+  /* Pendant la paume : les autres contacts (bouts des doigts de la même main) ne dessinent pas et ne font pas zoomer (zoom = l'écran qui « saute ») */
+  let finPaume = 0; const occupe = () => P || PL || performance.now() - finPaume < 200;
+  const bloque = e => { if (!occupe()) return; const id = P ? P.id : PL ? PL.id : null; if (e.pointerId !== undefined && e.pointerId === id) return; e.stopImmediatePropagation(); if (e.cancelable && e.type !== "pointerdown") e.preventDefault(); };
+  ["pointerdown", "pointermove", "pointerup"].forEach(t => window.addEventListener(t, e => { if (!SYN && e.pointerType === "touch") bloque(e); }, true));
+  ["touchstart", "touchmove"].forEach(t => window.addEventListener(t, e => { if (occupe()) e.stopImmediatePropagation(); }, { capture: true, passive: true }));
+  /* Livre sans crayon ouvert : la paume efface quand même (on efface directement, sans ouvrir la barre du crayon) */
+  let PL = null;
+  const versToile = (e, fr) => { const c = document.getElementById("inkCanvas"), rc = c.getBoundingClientRect(), rf = fr.getBoundingClientRect(), k = fr.offsetWidth ? rf.width / fr.offsetWidth : 1;
+    return [(rf.left + e.clientX * k - rc.left) / rc.width, (rf.top + e.clientY * k - rc.top) / rc.height]; };
+  const brancher = fr => { let w; try { w = fr.contentWindow; if (!w || w.__paumeOk) return; w.__paumeOk = 1; } catch(x){ return; }
+    w.addEventListener("pointerdown", e => { try {
+      if (PL || P || RD.pen || RD.wb || !estPaume(e)) return;
+      const rd = document.getElementById("reader"); if (!rd || !rd.classList.contains("open")) return;
+      PL = { id: e.pointerId, fr, g: RD.gommeT }; RD.gommeT = Math.max(3, Math.min(8, taille(e) / 18)); RD.erSnap = false;
+      e.stopImmediatePropagation(); e.preventDefault(); eraseAt(versToile(e, fr));
+    } catch(x){} }, true);
+    w.addEventListener("pointermove", e => { if (PL && e.pointerId === PL.id){ e.stopImmediatePropagation(); e.preventDefault(); try { eraseAt(versToile(e, PL.fr)); } catch(x){} }
+      else if (PL && e.pointerType === "touch") e.stopImmediatePropagation(); }, true);
+    const finL = e => { if (!PL || e.pointerId !== PL.id) return; e.stopImmediatePropagation(); RD.gommeT = PL.g; RD.erSnap = false; PL = null; finPaume = performance.now();
+      try { (window.planifierSauvegarde || window.sauverTableaux || (() => {}))(); } catch(x){} };
+    w.addEventListener("pointerup", finL, true); w.addEventListener("pointercancel", finL, true);
+    ["touchstart", "touchmove"].forEach(t => w.addEventListener(t, e => { if (occupe()) e.stopImmediatePropagation(); }, { capture: true, passive: true }));
+  };
+  setInterval(() => { try { const rd = document.getElementById("reader"); if (rd && rd.classList.contains("open")) rd.querySelectorAll("iframe").forEach(brancher); } catch(x){} }, 1000);
   const fin = e => { if (SYN) return; if (trait && e.pointerId === trait.id) trait = null;
-    if (!P || e.pointerId !== P.id) return; const av = P.av; P = null;
+    if (!P || e.pointerId !== P.id) return; finPaume = performance.now(); const av = P.av; P = null;
     setTimeout(() => { try { RD.eraser = av.eraser; RD.text = av.text; RD.obj = av.obj; RD.crayonOff = av.crayonOff; RD.gommeT = av.g; if (window.redrawInk) redrawInk(); } catch(x){} }, 0); };
   document.addEventListener("pointerup", fin, true); document.addEventListener("pointercancel", fin, true);
 })();
