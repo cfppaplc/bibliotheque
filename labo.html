@@ -108,7 +108,7 @@ main{max-width:1500px}
 <div class="lb-bd"><b>Présentation avec questions</b><p>Ton PowerPoint (enregistré en PDF) au tableau, avec des questions entre les diapos. Points, classement et podium.</p><div class="lb-tags"><span>Tous les cours</span><span>Nouveau</span></div></div></a>
 </div>
 
-<section id="lbMiens" hidden><h2>Mes quiz</h2><div class="lb-qz" id="lbMiensL"></div></section>
+<section id="lbMiens" hidden><h2>Mes quiz et présentations</h2><div class="lb-qz" id="lbMiensL"></div></section>
 <h2>Quiz prêts à jouer</h2>
 <div class="lb-qz" id="lbQz"><a class="lb-nouv" href="quiz.html">+ Nouveau<br>quiz</a></div>
 <p class="lb-2e">Deux écrans (télécommande sur ton ordinateur, écran de classe sur le projecteur) ? <a href="quiz.html?role=1">Quiz</a> · <a href="simulateur.html?role=1">Simulateur</a></p>
@@ -133,10 +133,11 @@ main{max-width:1500px}
   const lien = id => "quiz.html?animer=1&quiz=" + encodeURIComponent(id);
   function noter(r){ const L = lire("laboRecents", []).filter(x => x.href !== r.href); L.unshift(Object.assign({t: Date.now()}, r)); try { localStorage.setItem("laboRecents", JSON.stringify(L.slice(0, 6))); } catch(e){} }
   function tuile(q){ const c = q.couv || "img/labo/quiz/culture-couv.svg";
-    return `<a class="lb-t" href="${lien(q.id)}" data-id="${esc(q.id)}" data-titre="${esc(q.titre)}" data-img="${esc(c)}"><div class="lb-cv" style="--u:url('${esc(c)}')"><img src="${esc(c)}" alt="" loading="lazy"></div><b>${esc(q.titre)}</b><small>${q.n ? q.n + " questions" : esc(q.sujet || "")}</small></a>`; }
+    return `<a class="lb-t" href="${lien(q.id)}" data-id="${esc(q.id)}" data-titre="${esc(q.titre)}" data-img="${esc(c)}"><div class="lb-cv" style="--u:url('${esc(c)}')"><img src="${esc(c)}" alt="" loading="lazy"></div><b>${esc(q.titre)}</b><small>${q.sujet && /^Présentation/.test(q.sujet) ? esc(q.sujet) : q.n ? q.n + " questions" : esc(q.sujet || "")}</small></a>`; }
   $("lbQz").insertAdjacentHTML("beforeend", TOUS.map(tuile).join(""));
   const miens = lire("quizMaison", []); if (Array.isArray(miens) && miens.length){ $("lbMiens").hidden = false;
-    $("lbMiensL").innerHTML = miens.map(q => tuile({id:q.id, titre:q.titre || "Mon quiz", couv:q.couv, n:(q.qs || []).length})).join(""); }
+    const pres = q => (q.qs || []).some(x => x.t === "diapo");
+    $("lbMiensL").innerHTML = miens.map(q => tuile({id:q.id, titre:q.titre || "Mon quiz", couv:q.couv || (pres(q) && ((q.qs || []).find(x => x.t === "diapo") || {}).img), n:(q.qs || []).length, sujet: pres(q) ? "Présentation · " + (q.qs || []).filter(x => x.t === "diapo").length + " diapos" : ""})).join(""); }
   document.addEventListener("click", e => { const t = e.target.closest(".lb-t"); if (t) noter({href: t.getAttribute("href"), titre: "Quiz · " + t.dataset.titre, img: t.dataset.img});
     const c = e.target.closest(".lb-c[data-rec]"); if (c){ const [titre, img] = c.dataset.rec.split("|"); noter({href: c.getAttribute("href"), titre, img}); } });
   // Reprendre : activités lancées d'ici + dernier quiz joué
