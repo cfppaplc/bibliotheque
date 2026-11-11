@@ -231,7 +231,7 @@ body.eLobby .noms{padding-bottom:70px}
 body.eDiapo #animBar{left:auto;right:1vw;bottom:1vh;transform:none;flex-wrap:nowrap;padding:5px;gap:6px;background:rgba(20,22,26,.55);opacity:.6;transition:opacity .2s}
 body.eDiapo #animBar:hover{opacity:1}
 body.eDiapo #animBar button{min-height:36px;padding:7px 12px;font-size:13px}
-body.eDiapo #animBar [data-b]:not([data-b="bSuite"]):not([data-b="bFin"]),body.eDiapo #animBar button:disabled,body.eDiapo #retLabo,body.eDiapo #celB,body.eDiapo #tirB,body.eDiapo #musB,body.eDiapo #volM,body.eDiapo #volP{display:none!important}
+body.eDiapo #animBar [data-b]:not([data-b="bSuite"]):not([data-b="bFin"]):not([data-b="bPause"]),body.eDiapo #animBar button:disabled,body.eDiapo #retLabo,body.eDiapo #celB,body.eDiapo #tirB,body.eDiapo #musB,body.eDiapo #volM,body.eDiapo #volP{display:none!important}
 #man .m2{min-height:60px;border-radius:14px;background:#2A3245;color:#F2EFEA;font-size:18px;font-weight:700;border:0}#man .m2.cache{display:none}
 #tiroir iframe{width:100%;height:100%;border:0;display:block}
 #tiroir .fermer{position:absolute;left:-46px;top:12px;width:40px;height:40px;padding:0;border-radius:10px;background:#24211E;color:#fff;font-size:20px}
@@ -529,7 +529,7 @@ Le propane s'accumule…
 </div>
 <div id="vJeu" class="cache">
 <div class="carte"><h2 id="jTitre"></h2><div id="qCour">En attente des participants…</div><div class="sous" id="qInfo"></div><div id="qAtt" class="cache"></div>
-<div class="ctl" style="margin-top:12px"><button id="bGo">Commencer</button><button id="bSuite" class="btn2" disabled>Question suivante</button><button id="bFin" class="btn2">Quitter la partie</button></div></div>
+<div class="ctl" style="margin-top:12px"><button id="bGo">Commencer</button><button id="bSuite" class="btn2" disabled>Question suivante</button><button id="bPause" class="btn2" disabled hidden>Pause</button><button id="bFin" class="btn2">Quitter la partie</button></div></div>
 <div class="carte cache" id="bilan"></div>
 <div class="carte"><h2>Qui a répondu</h2>
 <table><thead><tr><th>Participant</th><th style="width:34%">Cette question</th><th style="width:12%">Points</th><th style="width:10%">Rang</th><th style="width:44px"></th></tr></thead><tbody id="tRep"></tbody></table></div>
@@ -696,7 +696,7 @@ function fixerReglage(id, k, v){ const t = stock.get("quizReglages", {}) || {}; 
 function tousQuiz(){ return [EXEMPLE].concat(LIVRES_Q, mesQuiz()); }
 
 const params = new URLSearchParams(location.search);
-if (params.get("animer")) animer([["bGo"], ["bSuite"]]);
+if (params.get("animer")) animer([["bGo"], ["bSuite"], ["bPause"]]);
 else if (params.get("manette")) manette(params.get("manette").replace(/\D/g, "").slice(0, 6), params.get("k") || "");
 else if (params.get("j")) joueur(params.get("j").replace(/\D/g, "").slice(0, 6));
 else if (params.get("ecran")) ecran(params.get("ecran").replace(/\D/g, "").slice(0, 6));
@@ -821,6 +821,7 @@ function telecommande(bord){
       G.etat === "rev" ? "Bonne réponse : " + texteBon(Q) + (R().classement === "oui" ? " · le rang de chacun est envoyé sur son iPad." : "") :
       G.etat === "mise" ? "Double ou rien : " + ids().filter(id => P[id].mise).length + " joueur(s) misent. Touche « Question suivante » pour commencer." : G.etat === "diapo" ? "Diapo au tableau · les iPad affichent « Regarde le tableau »." : G.quiz.qs.length + " éléments";
     $("bGo").disabled = G.etat !== "lobby";
+    { const bp = $("bPause"), au = !!(G.quiz && G.quiz.auto); bp.hidden = !au; bp.disabled = !(au && G.etat === "diapo"); bp.textContent = G.pause ? "▶ Reprendre" : "❚❚ Pause"; }
     $("bSuite").disabled = !["question", "rev", "mise", "diapo", "connexion"].includes(G.etat);
     $("bSuite").textContent = G.etat === "question" ? "Montrer la réponse" : G.etat === "mise" ? "Lancer la dernière question" : G.i + 1 >= G.jeu.length ? "Voir le podium" : typeDe(G.jeu[G.i + 1]) === "diapo" ? "Diapo suivante" : "Question suivante";
     if (Q && typeDe(Q) === "nuage" && ["question", "rev"].includes(G.etat)) {
@@ -837,13 +838,15 @@ function telecommande(bord){
   let minut = null;
   function qMsg(pour){ const Q = G.jeu[G.i]; return {m: "q", pour, i: G.i, n: G.jeu.length, qn: G.jeu.slice(0, G.i + 1).filter(x => !HORS_Q(x)).length, nq: G.jeu.filter(x => !HORS_Q(x)).length, q: Q.q, ch: Q.ch, t: typeDe(Q), u: Q.u || "", nb: typeDe(Q) === "multi" ? Q.bon.length : 0,
     t0: G.t0, lec: Math.max(0, G.t0 - Date.now()), s: Q.s, coul: R().coul, dbl: !!(G.dbl && pour && P[pour] && P[pour].mise)}; }
+  function planAuto(){ clearTimeout(minut); const D = G.jeu && G.jeu[G.i];   /* 11 nov. : présentation qui défile seule, en boucle; Pause l'arrête */
+    if (G.quiz && G.quiz.auto && !G.pause && G.etat === "diapo" && D) minut = setTimeout(() => { if (G.etat !== "diapo" || G.pause) return; G.i = G.i + 1 >= G.jeu.length ? 0 : G.i + 1; suivante(); }, (D.d || G.quiz.auto) * 1000); }
   function question(){
     clearTimeout(minut);
     if (typeDe(G.jeu[G.i]) === "connexion") { G.etat = "connexion"; G.reps = {}; envoyer(topic, {m: "bienvenue", titre: G.quiz.titre, coul: R().coul, mode: R().mode}); maj(); return; }   /* page de connexion au milieu d'une présentation */
     if (typeDe(G.jeu[G.i]) === "diapo") { const D = G.jeu[G.i]; G.etat = "diapo"; G.reps = {};
       if (!D.ref && D.img) envoyer(topic, {m: "img", i: G.i, data: D.img});   /* anciennes diapos (image dans le quiz) */
       envoyer(topic, {m: "diapo", i: G.i}); maj();
-      if (G.quiz && G.quiz.auto) minut = setTimeout(() => { if (G.etat !== "diapo") return; G.i = G.i + 1 >= G.jeu.length ? 0 : G.i + 1; suivante(); }, (D.d || G.quiz.auto) * 1000);   /* 11 nov. : présentation qui défile seule, en boucle */
+      planAuto();
       return; }
     G.etat = "question"; G.reps = {};
     const Q = G.jeu[G.i], lec = R().cache === "oui" ? 5000 : 0;   /* « choix cachés » : 5 s pour lire la question avant de voir les choix */
@@ -890,7 +893,8 @@ function telecommande(bord){
     ids().forEach(id => res[id] = {pts: P[id].pts, rang: r[id], bons: P[id].bons || 0, max: P[id].max || 0});
     envoyer(topic, {m: "fin", res, n, total: G.jeu.filter(x => !SANS_PTS.includes(typeDe(x))).length, points: R().points}); maj(); envoyer(topic, vueObj());
   }
-  $("bGo").onclick = () => { if (!G.quiz) return; try { localStorage.setItem("dernierQuiz", JSON.stringify({ id: G.quiz.id, titre: G.quiz.titre || "Quiz", t: Date.now() })); } catch(e){} try { window.COFFRE && COFFRE.stat("quiz:" + (G.quiz.exemple ? G.quiz.id : "perso")); } catch(e){} Object.values(P).forEach(p => { p.pts = 0; p.bons = 0; p.serie = 0; p.max = 0; p.mise = false; }); G.dbl = false; G.masques = {}; G.mains = new Set(); preparer(); (G.jeu || []).forEach(x => { if (x.ref) DIA.obtenir(x.ref); }); G.i = 0; suivante(); };
+  $("bGo").onclick = () => { if (!G.quiz) return; G.pause = false; try { localStorage.setItem("dernierQuiz", JSON.stringify({ id: G.quiz.id, titre: G.quiz.titre || "Quiz", t: Date.now() })); } catch(e){} try { window.COFFRE && COFFRE.stat("quiz:" + (G.quiz.exemple ? G.quiz.id : "perso")); } catch(e){} Object.values(P).forEach(p => { p.pts = 0; p.bons = 0; p.serie = 0; p.max = 0; p.mise = false; }); G.dbl = false; G.masques = {}; G.mains = new Set(); preparer(); (G.jeu || []).forEach(x => { if (x.ref) DIA.obtenir(x.ref); }); G.i = 0; suivante(); };
+  $("bPause").onclick = () => { G.pause = !G.pause; planAuto(); maj(); };
   $("bSuite").onclick = () => { if (G.etat === "question") { reveler(); return; } if (G.etat === "mise") { question(); return; } if (G.i + 1 >= G.jeu.length) { finir(); return; } G.i++; suivante(); };
   $("bFin").onclick = () => { oublierPartie(); clearTimeout(minut); envoyer(topic, {m: "attente"}); G.quiz = null; G.etat = "choix"; G.i = -1; G.jeu = []; document.documentElement.style.removeProperty("--acc"); montrer("vChoix"); listeQuiz(); vue(); };
 
@@ -1570,7 +1574,7 @@ function animer(boutons){
       if (!v) { b.disabled = true; return; }
       b.textContent = v.textContent; b.disabled = v.disabled || v.closest(".cache") != null;
       /* 9 nov. : « Commencer » disparaît une fois la partie lancée; le bouton qu'on peut toucher est en couleur */
-      b.style.display = b.disabled && (b.dataset.cacher || b.dataset.b === "bGo") ? "none" : "";
+      b.style.display = v.hidden || (b.disabled && (b.dataset.cacher || b.dataset.b === "bGo" || b.dataset.b === "bPause")) ? "none" : "";
       b.classList.toggle("prim", !b.disabled);
     });
   }, 400);
