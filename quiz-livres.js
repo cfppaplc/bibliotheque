@@ -20,7 +20,12 @@ window.QUIZ_LIVRES = [
 "img": "img/labo/quiz/demo/01.jpg",
 "q": "",
 "s": 0,
-"mv": "focus"
+"lg": [
+35.16,
+36.67,
+29.69,
+13.89
+]
 },
 {
 "t": "nuage",
@@ -47,8 +52,7 @@ window.QUIZ_LIVRES = [
 "t": "diapo",
 "img": "img/labo/quiz/demo/04.jpg",
 "q": "",
-"s": 0,
-"mv": "kb"
+"s": 0
 },
 {
 "q": "Combien de feuilles de plans techniques sont prêtes dans Métier+ ?",
@@ -66,8 +70,7 @@ window.QUIZ_LIVRES = [
 "t": "diapo",
 "img": "img/labo/quiz/demo/05.jpg",
 "q": "",
-"s": 0,
-"mv": "kb"
+"s": 0
 },
 {
 "t": "multi",
@@ -90,8 +93,7 @@ window.QUIZ_LIVRES = [
 "t": "diapo",
 "img": "img/labo/quiz/demo/06.jpg",
 "q": "",
-"s": 0,
-"mv": "kb"
+"s": 0
 },
 {
 "t": "ordre",
@@ -115,8 +117,7 @@ window.QUIZ_LIVRES = [
 "t": "diapo",
 "img": "img/labo/quiz/demo/07.jpg",
 "q": "",
-"s": 0,
-"mv": "kb"
+"s": 0
 },
 {
 "q": "Le ménage de l'atelier apparaît tout seul à la fin du cours.",
@@ -132,8 +133,7 @@ window.QUIZ_LIVRES = [
 "t": "diapo",
 "img": "img/labo/quiz/demo/08.jpg",
 "q": "",
-"s": 0,
-"mv": "kb"
+"s": 0
 },
 {
 "q": "Pour jouer à un quiz, chaque élève doit se créer un compte.",
@@ -161,8 +161,7 @@ window.QUIZ_LIVRES = [
 "t": "diapo",
 "img": "img/labo/quiz/demo/09.jpg",
 "q": "",
-"s": 0,
-"mv": "kb"
+"s": 0
 },
 {
 "t": "diapo",
@@ -220,7 +219,12 @@ window.QUIZ_LIVRES = [
 "img": "img/labo/quiz/demo/12.jpg",
 "q": "",
 "s": 0,
-"mv": "focus"
+"lg": [
+35.16,
+32.27,
+29.69,
+13.89
+]
 }
 ]
 },
