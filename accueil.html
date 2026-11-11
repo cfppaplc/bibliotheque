@@ -2065,7 +2065,7 @@ function choix(row, label){
         f.querySelector("[data-v]").onclick = () => { const s = f.querySelector("[data-q]"); fini({ type:"quiz", id:s.value, titre:s.options[s.selectedIndex].textContent }); };
         const x = f.querySelector("[data-x]"); if (x) x.onclick = () => z.remove(); };
       dessiner();
-      if (!window.QUIZ_LIVRES){ const sc = document.createElement("script"); sc.src = "quiz-livres.js?v=1794414221"; sc.onload = () => { if (!f.hidden && f.querySelector("[data-q]")) dessiner(); }; document.head.append(sc); }
+      if (!window.QUIZ_LIVRES){ const sc = document.createElement("script"); sc.src = "quiz-livres.js?v=1794414378"; sc.onload = () => { if (!f.hidden && f.querySelector("[data-q]")) dessiner(); }; document.head.append(sc); }
     }
     if (ty === "simulateur"){
       f.innerHTML = '<div class="lk-ok"><button type="button" class="prim" data-s="0">Panneau d\'alarme (mode libre)</button><button type="button" class="prim" data-s="1">Défi panneau (8 missions)</button>' + annuler + '</div>'
