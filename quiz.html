@@ -1297,7 +1297,7 @@ function telecommande(bord){
   function sauverPartie(){
     if (bord || !G.quiz || G.etat === "choix") return;
     try { localStorage.setItem("quizPartie", JSON.stringify({code, t: Date.now(), quiz: G.quiz.id, i: G.i, etat: G.etat, t0: G.t0, reps: G.reps, dbl: !!G.dbl, bilan: G.bilan || [],
-      jeu: G.jeu.map(Q => Object.assign({}, Q, {img: Q.img ? 1 : 0})), P})); } catch(e) {}
+      jeu: G.jeu.map(Q => Object.assign({}, Q, {img: Q.img ? (/^data:/.test(Q.img) ? 1 : Q.img) : 0})), P})); } catch(e) {}
   }
   function oublierPartie(){ try { localStorage.removeItem("quizPartie"); } catch(e) {} }
   // Quitter la page par le Labo ou la barre = fin de la partie (les iPad sont avisés)
@@ -1309,7 +1309,8 @@ function telecommande(bord){
     if (!S || S.code !== code || Date.now() - S.t > 3 * 3600e3) return false;
     const q = tousQuiz().find(x => x.id === S.quiz); if (!q) return false;
     G.quiz = JSON.parse(JSON.stringify(q)); G.i = S.i; G.etat = S.etat; G.t0 = S.t0; G.reps = S.reps || {}; G.dbl = S.dbl; G.bilan = S.bilan || [];
-    G.jeu = (S.jeu || []).map(Q => { if (Q.img) { const o = G.quiz.qs.find(x => x.q === Q.q); Q.img = o && o.img || ""; } return Q; });
+    let nD = 0; const DQ = G.quiz.qs.filter(x => x.t === "diapo");
+    G.jeu = (S.jeu || []).map(Q => { if (Q.t === "diapo") { const o = DQ[nD++]; if (Q.img === 1 && o) Q.img = o.img; return Q; } if (Q.img === 1) { const o = G.quiz.qs.find(x => x.q === Q.q); Q.img = o && o.img || ""; } return Q; });
     Object.keys(S.P || {}).forEach(id => { P[id] = S.P[id]; if (!P[id].exclu) P[id].parti = true; });   /* absents tant qu'ils ne répondent pas à « qui » : un iPad parti ne bloque plus la fin des questions */
     envoyer(topic, {m: "qui", pour: "tous"});
     appliquerCouleur(); montrer("vJeu");
@@ -1319,6 +1320,7 @@ function telecommande(bord){
       const reste = G.t0 + Q.s * 1000 + 1000 - Date.now();
       if (reste <= 0) reveler(); else { if (Q.img) envoyer(topic, {m: "img", i: G.i, data: Q.img}); ids().filter(id => !G.reps[id]).forEach(id => envoyer(topic, qMsg(id))); minut = setTimeout(reveler, reste); }
     } else if (G.etat === "mise") minut = setTimeout(question, 15000);
+    else if (G.etat === "diapo") planAuto();   /* 11 nov. : une présentation reprise continue de défiler */
     maj(); envoyer(topic, vueObj());
     const t = document.createElement("div"); t.className = "repris"; t.textContent = "Partie reprise : les joueurs et les points sont conservés.";
     document.body.appendChild(t); setTimeout(() => t.remove(), 4500);
