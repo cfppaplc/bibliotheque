@@ -11021,19 +11021,34 @@ body:has(.reader.open:not(.wbon)) .toast{bottom:calc(98px + env(safe-area-inset-
   const pcEl = document.getElementById("popCol");
   if (pcEl) new MutationObserver(() => requestAnimationFrame(placerBulle)).observe(pcEl, { attributes: true, attributeFilter: ["hidden"] });
   addEventListener("resize", placerBulle);
-  let P = null; const SEUIL = 45;
+  /* Tableau SMART (vidéo du 11 nov.) : le bout des doigts arrive en « touch » 1 × 1 px, la paume et le dos de la main en « pen » de 20 à 80 px,
+     et la taille grandit souvent après le début du contact : on vérifie au début ET pendant le geste */
+  let P = null, SYN = false; const SEUIL = { touch: 30, pen: 18 };
   const estToile = t => t && (t.id === "inkCanvas" || (t.classList && t.classList.contains("ink")));
   window.paumeSeuil = SEUIL;
-  document.addEventListener("pointerdown", e => { try {
-    if (!estToile(e.target) || P) return;
-    const gommeStylet = e.pointerType === "pen" && (e.buttons & 32);   /* bout « gomme » d'un stylet */
-    const taille = Math.max(e.width || 0, e.height || 0); if (!gommeStylet && (e.pointerType !== "touch" || taille < SEUIL)) return;
-    if (!(RD.pen || RD.wb) || RD.sim) return;
-    P = { id: e.pointerId, av: { eraser: RD.eraser, text: RD.text, obj: RD.obj, crayonOff: RD.crayonOff, g: RD.gommeT } };
+  const taille = e => Math.max(e.width || 0, e.height || 0);
+  const estPaume = e => (e.pointerType === "pen" && (e.buttons & 32)) || ((e.pointerType === "touch" || e.pointerType === "pen") && taille(e) >= SEUIL[e.pointerType]);
+  const activer = e => { P = { id: e.pointerId, av: { eraser: RD.eraser, text: RD.text, obj: RD.obj, crayonOff: RD.crayonOff, g: RD.gommeT } };
     RD.eraser = true; RD.text = false; RD.obj = false; RD.crayonOff = false;
-    RD.gommeT = Math.max(RD.gommeT || 1, Math.min(8, taille / 22));   /* la gomme a la taille de la main */
+    RD.gommeT = Math.max(RD.gommeT || 1, Math.min(8, Math.max(3, taille(e) / 18))); };   /* la gomme a la taille de la main */
+  const faux = (t, e, cible) => { SYN = true; try { cible.dispatchEvent(new PointerEvent(t, { pointerId: e.pointerId, pointerType: e.pointerType, isPrimary: true, clientX: e.clientX, clientY: e.clientY, buttons: t === "pointerup" ? 0 : 1, bubbles: true, cancelable: true })); } finally { SYN = false; } };
+  let trait = null;   /* contact qui dessine en ce moment avec le crayon (peut devenir une paume en cours de route) */
+  document.addEventListener("pointerdown", e => { try {
+    if (SYN || !estToile(e.target) || P) return;
+    if (!(RD.pen || RD.wb) || RD.sim) return;
+    if (estPaume(e)){ activer(e); trait = null; return; }
+    trait = (!RD.eraser && !RD.text && !RD.obj && !RD.crayonOff) ? { id: e.pointerId, cible: e.target, t: performance.now() } : null;
   } catch(x){} }, true);
-  const fin = e => { if (!P || e.pointerId !== P.id) return; const av = P.av; P = null;
+  document.addEventListener("pointermove", e => { try {
+    if (SYN || P || !trait || e.pointerId !== trait.id || !estPaume(e)) return;
+    if (performance.now() - trait.t > 1500) { trait = null; return; }   /* un vrai trait commencé depuis longtemps : on n'y touche pas */
+    const cible = trait.cible; trait = null;
+    faux("pointerup", e, cible);                   /* termine le trait commencé par la main… */
+    try { undoInk(); } catch(x){}                  /* …et l'enlève */
+    activer(e); faux("pointerdown", e, cible);     /* puis la même main continue en gomme */
+  } catch(x){} }, true);
+  const fin = e => { if (SYN) return; if (trait && e.pointerId === trait.id) trait = null;
+    if (!P || e.pointerId !== P.id) return; const av = P.av; P = null;
     setTimeout(() => { try { RD.eraser = av.eraser; RD.text = av.text; RD.obj = av.obj; RD.crayonOff = av.crayonOff; RD.gommeT = av.g; if (window.redrawInk) redrawInk(); } catch(x){} }, 0); };
   document.addEventListener("pointerup", fin, true); document.addEventListener("pointercancel", fin, true);
 })();
