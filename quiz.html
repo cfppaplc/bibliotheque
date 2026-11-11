@@ -17,7 +17,7 @@
 <title>Métier+ — Quiz</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.50.0/dist/umd/supabase.min.js"></script>
-<script src="quiz-livres.js?v=202611102333"></script>
+<script src="quiz-livres.js?v=202611102341"></script>
 <style>
 :root{--fond:#E9E6E0;--carte:#fff;--txt:#24211E;--gris:#6B665E;--ligne:#E2DDD3;--acc:#534AB7;--vert:#2E8B57;--rouge:#D93025}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -943,8 +943,10 @@ function telecommande(bord){
     } else if (m.m === "miser" && G.etat === "mise" && P[m.pid]) { P[m.pid].mise = !!m.oui; maj();
     } else if (m.m === "diapoQ" && G.jeu[m.i] && G.jeu[m.i].ref) {   /* l'écran (2e appareil) n'a pas la diapo : on lui envoie une version légère */
       DIA.obtenir(G.jeu[m.i].ref).then(d => d ? DIA.leger(d) : G.jeu[m.i].img).then(d => { if (d) envoyer(topic, {m: "img", i: m.i, data: d}); });
+    } else if (m.m === "rep" && m.i === G.i && P[m.pid] && G.reps[m.pid]) {
+      envoyer(topic, {m: "recu", pour: m.pid, i: m.i});   /* réponse renvoyée (réseau lent) : déjà notée, on confirme encore */
     } else if (m.m === "rep" && G.etat === "question" && m.i === G.i && P[m.pid] && !G.reps[m.pid]) {
-      G.reps[m.pid] = {c: m.c, ms: Date.now() - G.t0}; maj();
+      G.reps[m.pid] = {c: m.c, ms: Date.now() - G.t0}; envoyer(topic, {m: "recu", pour: m.pid, i: m.i}); maj();
       if (Object.keys(G.reps).length >= ids().length) setTimeout(reveler, 700);
     }
   }, ok => { $("etatT").textContent = ok ? "● Relais connecté" + (window.supabase ? " (Supabase)" : " (ntfy)") : "○ Relais injoignable, nouvel essai…"; $("etatT").style.color = ok ? "var(--vert)" : "var(--rouge)"; });
@@ -1377,6 +1379,7 @@ function joueur(code){
       // La télécommande ne me connaît pas (rechargée, partie neuve) : je me réannonce tout seul
       if (m.m === "persos") { pris = m.pris || []; if (!entre) ecranChoix(ecranChoix.msg); else if (!pris.includes(av)) reannoncer(); return; }
       if (m.m === "bienvenue" && !m.pour) reannoncer();
+      if (m.m === "recu" && m.pour === pid) { window.__repRecu = m.i; return; }
       if (m.m === "remplace" && m.pour === pid) { entre = false; clearInterval(chrono); bx('<div class="gros">Tu es revenu sur un autre écran.</div><div>Ta partie continue là-bas, avec tes points.</div>'); return; }
       if (m.m === "refus" && m.pour === pid && m.raison === "nom") { entre = false; try { sessionStorage.removeItem("quizJoueur"); } catch(e) {} nomEdite = true; nomChoisi = ""; ecranChoix("Ce prénom est déjà utilisé dans la partie. Écris un autre prénom ou surnom."); return; }
       if (m.m === "refus" && m.pour === pid) { entre = false; try { sessionStorage.removeItem("quizJoueur"); } catch(e) {} av = -1; if (!nomEdite) nomChoisi = ""; ecranChoix(m.raison === "plein" ? `La partie est pleine (${m.max} joueurs au plus). Demande à l'enseignant.` : "Ce personnage vient d'être pris. Choisis-en un autre."); return; }
@@ -1401,7 +1404,10 @@ function joueur(code){
       } else if (m.m === "q") {
         repI = -1; const t = m.t || "choix", fin = m.t0 + m.s * 1000;
         const envoi = c => { if (repI !== -1) return; repI = c; document.querySelectorAll("#jBx button").forEach(x => x.disabled = true);
-          $("jBx").insertAdjacentHTML("beforeend", '<div class="monte" style="margin-top:14px;opacity:.8">Réponse envoyée.</div>'); window.__repQ = m.i; envoyer(topic, {m: "rep", pid, i: m.i, c}); };
+          $("jBx").insertAdjacentHTML("beforeend", '<div class="monte" style="margin-top:14px;opacity:.8">Réponse envoyée.</div>'); window.__repQ = m.i; const R = {m: "rep", pid, i: m.i, c}; envoyer(topic, R);
+          /* 10 nov. (« ma réponse est pas partie ») : renvoyée aux 2 s tant que la télécommande ne l'a pas confirmée (message perdu sur un réseau lent) */
+          clearInterval(window.__repRenv); window.__repRecu = -1; let n = 0;
+          window.__repRenv = setInterval(() => { if (window.__repRecu === m.i || ++n > 12 || Date.now() > fin + 3000) { clearInterval(window.__repRenv); return; } envoyer(topic, R); }, 2000); };
         const btns = (cl) => `<div class="ch4 ${cl || ""}">${m.ch.map((c, k) => `<button class="k${k}" data-c="${k}"><i>${SYMB[k]}</i><span>${esc(c)}</span></button>`).join("")}</div>`;
         let corps = "";
         if (t === "multi") corps = `<div class="aideT">Plusieurs bonnes réponses : touche toutes celles qui sont bonnes, puis Valider.</div>${btns("multi")}<button id="jOk" class="valider" disabled>Valider</button>`;

@@ -138,14 +138,16 @@ window.QUIZ_LIVRES = [
 "s": 0
 },
 {
-"q": "Le ménage de l'atelier apparaît tout seul à la fin du cours.",
+"q": "10 plombiers compagnons perdent chacun 10 minutes par jour. Combien ça coûte en un an ?",
 "ch": [
-"Vrai",
-"Faux"
+"1 800 $",
+"7 500 $",
+"18 000 $",
+"45 000 $"
 ],
-"bon": 0,
-"s": 15,
-"expl": "La liste prend tout l'écran et les élèves cochent eux-mêmes. Toi, tu supervises."
+"bon": 2,
+"s": 25,
+"expl": "100 minutes par jour à 45,36 $ de l'heure (compagnon tuyauteur, résidentiel léger, janvier 2026) : environ 76 $ par jour, donc 18 000 $ sur 240 jours de travail, sans compter les avantages sociaux. Chaque minute compte."
 },
 {
 "t": "diapo",
