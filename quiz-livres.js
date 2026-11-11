@@ -8,11 +8,17 @@ window.QUIZ_LIVRES = [
 "exemple": true,
 "titre": "Découvre Métier+",
 "sujet": "Présentation",
-"couv": "img/labo/quiz/demo/01.jpg",
+"couv": "img/labo/quiz/demo/couv.jpg",
 "coul": "#EB6A22",
 "reg": {
 "nb": "tout",
-"melange": "non"
+"melange": "non",
+"mode": "ind",
+"temps": "normal",
+"penalite": "non",
+"cache": "non",
+"lettres": "non",
+"double": "non"
 },
 "qs": [
 {
@@ -28,13 +34,6 @@ window.QUIZ_LIVRES = [
 ]
 },
 {
-"t": "nuage",
-"q": "En un mot : qu'est-ce qui te prend le plus de temps à préparer ?",
-"ch": [],
-"bon": null,
-"s": 45
-},
-{
 "t": "diapo",
 "img": "img/labo/quiz/demo/02.jpg",
 "q": "",
@@ -47,6 +46,18 @@ window.QUIZ_LIVRES = [
 "q": "",
 "s": 0,
 "mv": "focus"
+},
+{
+"t": "connexion",
+"q": "",
+"s": 0
+},
+{
+"t": "nuage",
+"q": "En un mot : qu'est-ce qui te prend le plus de temps à préparer ?",
+"ch": [],
+"bon": null,
+"s": 45
 },
 {
 "t": "diapo",
@@ -226,7 +237,8 @@ window.QUIZ_LIVRES = [
 13.89
 ]
 }
-]
+],
+"fixe": true
 },
 {
 "id": "culture-generale",
