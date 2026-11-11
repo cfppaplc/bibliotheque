@@ -48,6 +48,13 @@ window.QUIZ_LIVRES = [
 "mv": "focus"
 },
 {
+"t": "diapo",
+"img": "img/labo/quiz/demo/13.jpg",
+"q": "",
+"s": 0,
+"mv": "focus"
+},
+{
 "t": "connexion",
 "q": "",
 "s": 0
