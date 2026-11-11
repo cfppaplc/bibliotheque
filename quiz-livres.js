@@ -4,6 +4,89 @@
    Fabriqué par Claude à partir des livres (scratchpad ql/data.py); lecture seule : « Copier et modifier » pour l'adapter. */
 window.QUIZ_LIVRES = [
 {
+"id": "dep-plomberie-chauffage",
+"exemple": true,
+"fixe": true,
+"auto": 7,
+"titre": "DEP Plomberie et chauffage",
+"sujet": "Présentation du programme",
+"couv": "img/labo/quiz/plomberie/couv.jpg",
+"coul": "#EB6A22",
+"reg": {
+"nb": "tout",
+"melange": "non",
+"mode": "ind"
+},
+"qs": [
+{
+"t": "diapo",
+"img": "img/labo/quiz/plomberie/01.jpg",
+"q": "",
+"s": 0
+},
+{
+"t": "diapo",
+"img": "img/labo/quiz/plomberie/02.jpg",
+"q": "",
+"s": 0
+},
+{
+"t": "diapo",
+"img": "img/labo/quiz/plomberie/03.jpg",
+"q": "",
+"s": 0
+},
+{
+"t": "diapo",
+"img": "img/labo/quiz/plomberie/04.jpg",
+"q": "",
+"s": 0
+},
+{
+"t": "diapo",
+"img": "img/labo/quiz/plomberie/05.jpg",
+"q": "",
+"s": 0
+},
+{
+"t": "diapo",
+"img": "img/labo/quiz/plomberie/06.jpg",
+"q": "",
+"s": 0
+},
+{
+"t": "diapo",
+"img": "img/labo/quiz/plomberie/07.jpg",
+"q": "",
+"s": 0
+},
+{
+"t": "diapo",
+"img": "img/labo/quiz/plomberie/08.jpg",
+"q": "",
+"s": 0
+},
+{
+"t": "diapo",
+"img": "img/labo/quiz/plomberie/09.jpg",
+"q": "",
+"s": 0
+},
+{
+"t": "diapo",
+"img": "img/labo/quiz/plomberie/10.jpg",
+"q": "",
+"s": 0
+},
+{
+"t": "diapo",
+"img": "img/labo/quiz/plomberie/11.jpg",
+"q": "",
+"s": 0
+}
+]
+},
+{
 "id": "decouvre-metier-plus",
 "exemple": true,
 "titre": "Découvre Métier+",
