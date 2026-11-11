@@ -17,7 +17,7 @@
 <title>Métier+ — Quiz</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.50.0/dist/umd/supabase.min.js"></script>
-<script src="quiz-livres.js?v=202611102312"></script>
+<script src="quiz-livres.js?v=202611102333"></script>
 <style>
 :root{--fond:#E9E6E0;--carte:#fff;--txt:#24211E;--gris:#6B665E;--ligne:#E2DDD3;--acc:#534AB7;--vert:#2E8B57;--rouge:#D93025}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -227,6 +227,11 @@ body.eLobby #animBar{bottom:1vh;padding:5px;gap:6px;background:rgba(20,22,26,.7)
 body.eLobby #animBar button{min-height:38px;padding:8px 14px;font-size:14px}
 body.eLobby #animBar [data-b]:not([data-b="bGo"]):not([data-b="bSuite"]),body.eLobby #animBar button:disabled,body.eLobby #musB,body.eLobby #volM,body.eLobby #volP{display:none!important}
 body.eLobby .noms{padding-bottom:70px}
+/* diapo : petite barre dans le coin, ne cache pas le texte de la diapo */
+body.eDiapo #animBar{left:auto;right:1vw;bottom:1vh;transform:none;flex-wrap:nowrap;padding:5px;gap:6px;background:rgba(20,22,26,.55);opacity:.6;transition:opacity .2s}
+body.eDiapo #animBar:hover{opacity:1}
+body.eDiapo #animBar button{min-height:36px;padding:7px 12px;font-size:13px}
+body.eDiapo #animBar [data-b]:not([data-b="bSuite"]):not([data-b="bFin"]),body.eDiapo #animBar button:disabled,body.eDiapo #retLabo,body.eDiapo #celB,body.eDiapo #tirB,body.eDiapo #musB,body.eDiapo #volM,body.eDiapo #volP{display:none!important}
 #man .m2{min-height:60px;border-radius:14px;background:#2A3245;color:#F2EFEA;font-size:18px;font-weight:700;border:0}#man .m2.cache{display:none}
 #tiroir iframe{width:100%;height:100%;border:0;display:block}
 #tiroir .fermer{position:absolute;left:-46px;top:12px;width:40px;height:40px;padding:0;border-radius:10px;background:#24211E;color:#fff;font-size:20px}
@@ -1361,13 +1366,12 @@ function joueur(code){
       eveil(); document.addEventListener("visibilitychange", eveil); }
   }
   ecranChoix();
-  /* Revenu par un nouvel onglet (iPad planté, QR rescanné) : personnage et prénom déjà choisis, « Entrer » reprend ses points */
-  try { const D = JSON.parse(localStorage.getItem("quizDernier") || "null");
-    if (D && D.code === code && Date.now() - D.t < 4 * 3600e3 && D.av >= 0 && !sessionStorage.getItem("quizJoueur")) { av = D.av; nomEdite = !!D.nomEdite; nomChoisi = D.nom; ecranChoix("Tu étais déjà dans la partie : touche « Entrer » pour reprendre tes points."); } } catch(e) {}
-  // Joueur déjà entré (page rechargée, enseignant déconnecté) : on revient tout seul, sans rechoisir
-  try { const J = JSON.parse(sessionStorage.getItem("quizJoueur") || "null");
+  /* Déjà dans la partie (page rechargée, iPad planté, QR rescanné, nouvel onglet) : on revient tout seul, sans rechoisir;
+     la télécommande lui redonne sa fiche et ses points (même prénom) */
+  try { const J = JSON.parse(sessionStorage.getItem("quizJoueur") || "null") || JSON.parse(localStorage.getItem("quizDernier") || "null");
     if (J && J.code === code && Date.now() - J.t < 4 * 3600e3 && J.av >= 0) { av = J.av; nomEdite = !!J.nomEdite; nomChoisi = J.nom; ecranChoix(); entrer();
-      bx(`${visage(av, "v-l")}<div class="gros monte">Te revoilà, ${esc(nom)}.</div><div>Tu es toujours dans la partie. Si l'enseignant s'est déconnecté, elle reprend dès qu'il revient.</div>`); } } catch(e) {}
+      bx(`${visage(av, "v-l")}<div class="gros monte">Te revoilà, ${esc(nom)}.</div><div>Tu es toujours dans la partie, avec tes points. Regarde le tableau.</div><button id="jPasMoi" style="margin-top:22px;background:transparent;border:1px solid rgba(255,255,255,.35);color:inherit;font-size:15px;padding:10px 16px;border-radius:10px">Ce n'est pas moi</button>`);
+      const pm = $("jPasMoi"); if (pm) pm.onclick = () => { try { envoyer(topic, {m: "bye", pid}); sessionStorage.removeItem("quizJoueur"); localStorage.removeItem("quizDernier"); } catch(e) {} entre = false; av = -1; nomEdite = false; nomChoisi = ""; ecranChoix(); }; } } catch(e) {}
     let reT = 0; const reannoncer = () => { if (entre && Date.now() - reT > 3000) { reT = Date.now(); envoyer(topic, {m: "ici", pid, nom, av, prenom}); } };
     ecouter(topic, m => {
       // La télécommande ne me connaît pas (rechargée, partie neuve) : je me réannonce tout seul
@@ -1712,6 +1716,7 @@ function ecran(code){
     musique(v, n);
     document.documentElement.style.setProperty("--acc", (v.reg && v.reg.coul) || "#534AB7");
     document.body.classList.toggle("eLobby", v.etat === "lobby" || v.etat === "connexion");
+    document.body.classList.toggle("eDiapo", v.etat === "diapo");
     if (v.etat === "lobby" && v.conn) {   /* présentation avec page de connexion plus loin : écran titre seulement */
       const cv = v.couv === "img" ? img[-1] : v.couv;
       if (cle !== dernier || force) E.innerHTML = tete(v.titre) + (cv ? `<div class="banniere grande"><i class="bfond" style="--u:url('${esc(cv)}')"></i><img src="${esc(cv)}" alt=""><span>${v.sujet ? `<small>${esc(v.sujet)}</small>` : ""}${esc(v.titre)}</span></div>` : `<div class="eq">${esc(v.titre)}</div>`) + bSon();

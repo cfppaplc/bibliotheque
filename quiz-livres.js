@@ -23,7 +23,7 @@ window.QUIZ_LIVRES = [
 "qs": [
 {
 "t": "diapo",
-"img": "img/labo/quiz/demo/01.jpg",
+"img": "img/labo/quiz/demo/01.jpg?v=2",
 "q": "",
 "s": 0,
 "lg": [
@@ -35,21 +35,21 @@ window.QUIZ_LIVRES = [
 },
 {
 "t": "diapo",
-"img": "img/labo/quiz/demo/02.jpg",
+"img": "img/labo/quiz/demo/02.jpg?v=2",
 "q": "",
 "s": 0,
 "mv": "focus"
 },
 {
 "t": "diapo",
-"img": "img/labo/quiz/demo/03.jpg",
+"img": "img/labo/quiz/demo/03.jpg?v=2",
 "q": "",
 "s": 0,
 "mv": "focus"
 },
 {
 "t": "diapo",
-"img": "img/labo/quiz/demo/13.jpg",
+"img": "img/labo/quiz/demo/13.jpg?v=2",
 "q": "",
 "s": 0,
 "mv": "focus"
@@ -68,7 +68,7 @@ window.QUIZ_LIVRES = [
 },
 {
 "t": "diapo",
-"img": "img/labo/quiz/demo/04.jpg",
+"img": "img/labo/quiz/demo/04.jpg?v=2",
 "q": "",
 "s": 0
 },
@@ -86,7 +86,7 @@ window.QUIZ_LIVRES = [
 },
 {
 "t": "diapo",
-"img": "img/labo/quiz/demo/05.jpg",
+"img": "img/labo/quiz/demo/05.jpg?v=2",
 "q": "",
 "s": 0
 },
@@ -109,7 +109,7 @@ window.QUIZ_LIVRES = [
 },
 {
 "t": "diapo",
-"img": "img/labo/quiz/demo/06.jpg",
+"img": "img/labo/quiz/demo/06.jpg?v=2",
 "q": "",
 "s": 0
 },
@@ -133,7 +133,7 @@ window.QUIZ_LIVRES = [
 },
 {
 "t": "diapo",
-"img": "img/labo/quiz/demo/07.jpg",
+"img": "img/labo/quiz/demo/07.jpg?v=2",
 "q": "",
 "s": 0
 },
@@ -149,7 +149,7 @@ window.QUIZ_LIVRES = [
 },
 {
 "t": "diapo",
-"img": "img/labo/quiz/demo/08.jpg",
+"img": "img/labo/quiz/demo/08.jpg?v=2",
 "q": "",
 "s": 0
 },
@@ -177,20 +177,20 @@ window.QUIZ_LIVRES = [
 },
 {
 "t": "diapo",
-"img": "img/labo/quiz/demo/09.jpg",
+"img": "img/labo/quiz/demo/09.jpg?v=2",
 "q": "",
 "s": 0
 },
 {
 "t": "diapo",
-"img": "img/labo/quiz/demo/10.jpg",
+"img": "img/labo/quiz/demo/10.jpg?v=2",
 "q": "",
 "s": 0,
 "mv": "focus"
 },
 {
 "t": "diapo",
-"img": "img/labo/quiz/demo/11.jpg",
+"img": "img/labo/quiz/demo/11.jpg?v=2",
 "q": "",
 "s": 0,
 "mv": "focus"
@@ -234,7 +234,7 @@ window.QUIZ_LIVRES = [
 },
 {
 "t": "diapo",
-"img": "img/labo/quiz/demo/12.jpg",
+"img": "img/labo/quiz/demo/12.jpg?v=2",
 "q": "",
 "s": 0,
 "lg": [
