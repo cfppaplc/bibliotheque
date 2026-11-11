@@ -369,6 +369,9 @@ i.let,.ch4 button i{background:var(--lc,var(--acc))!important;color:#fff!importa
 .edBas .ajouts{margin:0;flex:1 1 420px}.edBas .ajouts button{padding:8px 10px;font-size:13px}.edBas .ctl{flex:0 0 auto;margin-left:auto}.edBas .ctl button{min-width:120px}.edBas #eSauve{min-width:170px}
 html.sombre body.bord .edBas{background:#1f1f24}
 @media (max-width:640px){.edBas{display:block;margin-left:0;margin-right:0;padding:8px 0 10px}.edBas .ajouts{display:block;white-space:nowrap;overflow-x:auto;width:0;min-width:100%;margin:0 0 8px;padding-bottom:2px}.edBas .ajouts button{display:inline-block;width:auto;margin-right:6px}.edBas .ajouts span{display:inline-block}.edBas .ctl{display:flex;margin:0}.edBas .ctl button,.edBas #eSauve{flex:1;min-width:0}}
+.pres-deb{display:grid;grid-template-columns:1fr auto;gap:6px 18px;align-items:center;background:#1E2A44;color:#fff;border-radius:14px;padding:18px 20px;margin:0 0 14px}.pres-deb b{font-size:20px;grid-column:1}.pres-deb span{grid-column:1;opacity:.9;line-height:1.5}.pres-deb .btn{grid-column:2;grid-row:1/3;background:#EB6A22;color:#fff;border:0;padding:14px 22px;font-size:17px;border-radius:12px;cursor:pointer}@media(max-width:640px){.pres-deb{grid-template-columns:1fr}.pres-deb .btn{grid-column:1;grid-row:auto}}
+.qe.diapo .tete strong{flex:1}.diaE{display:flex;gap:12px;align-items:flex-end;margin-top:8px}.diaE img{width:min(360px,60%);border-radius:8px;border:1px solid #0002;display:block}.diaE .apres{margin-left:auto}
+.ediapo{position:fixed;inset:0;background:#000;display:flex;align-items:center;justify-content:center;z-index:5}.ediapo img{max-width:100%;max-height:100%;object-fit:contain}
 .qe .tete b{cursor:pointer}.qe .tete b::before{content:"▾ ";color:var(--acc)}.qe.plie .tete b::before{content:"▸ "}
 .qe .tete .resume{display:none}.qe.plie .tete b{flex:0 0 auto}.qe.plie .tete .resume{display:block;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--gris);font-size:14px;cursor:pointer}
 .qe.plie>*:not(.tete){display:none!important}.qe.plie .tete select{display:none}
@@ -477,7 +480,7 @@ Le propane s'accumule…
 <label>Couleur du quiz<div class="coul" id="eCoul"></div></label>
 </div></details>
 <div id="eQs"></div>
-<div class="edBas"><div class="ajouts"><span>Ajouter une question :</span><button class="btn2" data-aj="choix">Choix</button><button class="btn2" data-aj="vf">Vrai ou faux</button><button class="btn2" data-aj="multi">Plusieurs bonnes</button><button class="btn2" data-aj="ordre">Remettre en ordre</button><button class="btn2" data-aj="nombre">Calcul</button><button class="btn2" data-aj="erreur">Trouve l'erreur</button></div>
+<div class="edBas"><div class="ajouts"><span>Ajouter une question :</span><button class="btn2" data-aj="choix">Choix</button><button class="btn2" data-aj="vf">Vrai ou faux</button><button class="btn2" data-aj="multi">Plusieurs bonnes</button><button class="btn2" data-aj="ordre">Remettre en ordre</button><button class="btn2" data-aj="nombre">Calcul</button><button class="btn2" data-aj="erreur">Trouve l'erreur</button><button class="btn2" id="ePdf" title="Enregistre ton PowerPoint en PDF, puis choisis-le ici">+ Diapos d'un PowerPoint (PDF)</button></div>
 <div class="ctl"><button id="eSauve">Enregistrer</button><button class="btn2" id="eAnnule">Annuler</button></div></div>
 <div class="sous" style="margin-top:8px">Le quiz est enregistré dans ton compte et te suit sur tous tes appareils. « Exporter » (dans la liste) crée un fichier à partager avec un collègue; « Sauvegarder tous mes quiz » en fait une copie complète.</div></div>
 </div>
@@ -670,6 +673,7 @@ function telecommande(bord){
   const melanger = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
   function preparer(){ // ordre et choix selon les réglages
     const r = R(); let qs = G.quiz.qs.map(q => JSON.parse(JSON.stringify(q)));
+    if (qs.some(q => typeDe(q) === "diapo")) { G.jeu = qs; return; }   /* présentation : diapos et questions dans l'ordre, toutes */
     if (r.melange !== "non") qs = melanger(qs);
     /* nombre de questions : tirage au hasard (dans l'ordre du quiz si « Tel quel ») */
     const nb = parseInt(r.nb, 10);
@@ -719,7 +723,8 @@ function telecommande(bord){
     let cpt = [0, 0, 0, 0, 0, 0];
     if (Q && ["ordre", "nombre"].includes(t)) cpt = [Object.values(G.reps).filter(x => juste(Q, x.c)).length, Object.keys(G.reps).length];
     else Object.values(G.reps).forEach(x => [].concat(x.c).forEach(k => { if (k >= 0) cpt[k]++; }));
-    return {m: "vue", code, etat: G.etat === "choix" ? "lobby" : G.etat, titre: G.quiz ? G.quiz.titre : "Quiz maison", i: G.i, n: G.jeu.length, t0: G.t0, now: Date.now(),
+    const nq = G.jeu.filter(x => typeDe(x) !== "diapo").length, qn = G.jeu.slice(0, G.i + 1).filter(x => typeDe(x) !== "diapo").length;
+    return {m: "vue", code, etat: G.etat === "choix" ? "lobby" : G.etat, titre: G.quiz ? G.quiz.titre : "Quiz maison", i: G.i, n: G.jeu.length, qn, nq, t0: G.t0, now: Date.now(),
       reg: {coul: reg.coul, son: reg.son, musique: reg.musique || "oui", classement: reg.classement, points: reg.points, mode: reg.mode, lettres: reg.lettres || "non"},
       couv: G.quiz && G.quiz.couv && !/^data:/.test(G.quiz.couv) ? G.quiz.couv : (G.quiz && G.quiz.couv ? "img" : ""), sujet: G.quiz ? G.quiz.sujet || "" : "",
       q: Q && ["question", "rev"].includes(G.etat) ? {q: Q.q, ch: Q.ch, s: Q.s, t, u: Q.u || "", zoom: Q.zoom || null, img: !!Q.img, expl: G.etat === "rev" ? Q.expl || "" : "", bonTxt: G.etat === "rev" ? texteBon(Q) : ""} : null,
@@ -741,13 +746,13 @@ function telecommande(bord){
     if (!G.quiz) { listeLob(); vue(); return; }
     const Q = G.jeu[G.i];
     $("jTitre").textContent = G.quiz.titre;
-    $("qCour").textContent = G.etat === "lobby" ? "En attente des participants…" : G.etat === "fin" ? "Partie terminée : le classement final est sur chaque iPad." : (G.i + 1) + ". " + Q.q;
+    $("qCour").textContent = G.etat === "lobby" ? "En attente des participants…" : G.etat === "fin" ? "Partie terminée : le classement final est sur chaque iPad." : G.etat === "diapo" ? "Diapo " + (G.jeu.slice(0, G.i + 1).filter(x => typeDe(x) === "diapo").length) : (G.i + 1) + ". " + Q.q;
     $("qInfo").textContent = G.etat === "question" ? Object.keys(G.reps).length + " réponse(s) sur " + ids().length + " · " + Q.s + " s" :
       G.etat === "rev" ? "Bonne réponse : " + texteBon(Q) + (R().classement === "oui" ? " · le rang de chacun est envoyé sur son iPad." : "") :
-      G.etat === "mise" ? "Double ou rien : " + ids().filter(id => P[id].mise).length + " joueur(s) misent. Touche « Question suivante » pour commencer." : G.quiz.qs.length + " questions";
+      G.etat === "mise" ? "Double ou rien : " + ids().filter(id => P[id].mise).length + " joueur(s) misent. Touche « Question suivante » pour commencer." : G.etat === "diapo" ? "Diapo au tableau · les iPad affichent « Regarde le tableau »." : G.quiz.qs.length + " éléments";
     $("bGo").disabled = G.etat !== "lobby";
-    $("bSuite").disabled = !["question", "rev", "mise"].includes(G.etat);
-    $("bSuite").textContent = G.etat === "question" ? "Montrer la réponse" : G.etat === "mise" ? "Lancer la dernière question" : G.i + 1 >= G.jeu.length ? "Voir le podium" : "Question suivante";
+    $("bSuite").disabled = !["question", "rev", "mise", "diapo"].includes(G.etat);
+    $("bSuite").textContent = G.etat === "question" ? "Montrer la réponse" : G.etat === "mise" ? "Lancer la dernière question" : G.i + 1 >= G.jeu.length ? "Voir le podium" : typeDe(G.jeu[G.i + 1]) === "diapo" ? "Diapo suivante" : "Question suivante";
     table(); listeLob(); vue(); sauverPartie();
   }
   function envoyerCouv(){ if (G.quiz && G.quiz.couv && /^data:/.test(G.quiz.couv)) envoyer(topic, {m: "img", i: -1, data: G.quiz.couv}); }
@@ -755,10 +760,12 @@ function telecommande(bord){
   setInterval(() => { let ch = false; Object.values(P).forEach(p => { if (!p.parti && Date.now() - (p.vu || 0) > 40000) { p.parti = true; ch = true; } }); if (ch) { envoyerPersos(); maj(); if (G.etat === "question" && ids().length && ids().every(id => G.reps[id])) setTimeout(reveler, 300); } }, 5000);
   function envoyerPersos(){ envoyer(topic, {m: "persos", pris: ids().map(id => P[id].av).filter(v => v != null)}); }
   let minut = null;
-  function qMsg(pour){ const Q = G.jeu[G.i]; return {m: "q", pour, i: G.i, n: G.jeu.length, q: Q.q, ch: Q.ch, t: typeDe(Q), u: Q.u || "", nb: typeDe(Q) === "multi" ? Q.bon.length : 0,
+  function qMsg(pour){ const Q = G.jeu[G.i]; return {m: "q", pour, i: G.i, n: G.jeu.length, qn: G.jeu.slice(0, G.i + 1).filter(x => typeDe(x) !== "diapo").length, nq: G.jeu.filter(x => typeDe(x) !== "diapo").length, q: Q.q, ch: Q.ch, t: typeDe(Q), u: Q.u || "", nb: typeDe(Q) === "multi" ? Q.bon.length : 0,
     t0: G.t0, lec: Math.max(0, G.t0 - Date.now()), s: Q.s, coul: R().coul, dbl: !!(G.dbl && pour && P[pour] && P[pour].mise)}; }
   function question(){
-    clearTimeout(minut); G.etat = "question"; G.reps = {};
+    clearTimeout(minut);
+    if (typeDe(G.jeu[G.i]) === "diapo") { G.etat = "diapo"; G.reps = {}; envoyer(topic, {m: "img", i: G.i, data: G.jeu[G.i].img}); envoyer(topic, {m: "diapo", i: G.i}); maj(); return; }
+    G.etat = "question"; G.reps = {};
     const Q = G.jeu[G.i], lec = R().cache === "oui" ? 5000 : 0;   /* « choix cachés » : 5 s pour lire la question avant de voir les choix */
     G.t0 = Date.now() + 600 + lec;
     if (Q.img) envoyer(topic, {m: "img", i: G.i, data: Q.img});
@@ -799,7 +806,7 @@ function telecommande(bord){
     clearTimeout(minut); G.etat = "fin";
     const r = rangs(), n = ids().length, res = {};
     ids().forEach(id => res[id] = {pts: P[id].pts, rang: r[id], bons: P[id].bons || 0, max: P[id].max || 0});
-    envoyer(topic, {m: "fin", res, n, total: G.jeu.length, points: R().points}); maj(); envoyer(topic, vueObj());
+    envoyer(topic, {m: "fin", res, n, total: G.jeu.filter(x => typeDe(x) !== "diapo").length, points: R().points}); maj(); envoyer(topic, vueObj());
   }
   $("bGo").onclick = () => { if (!G.quiz) return; try { localStorage.setItem("dernierQuiz", JSON.stringify({ id: G.quiz.id, titre: G.quiz.titre || "Quiz", t: Date.now() })); } catch(e){} try { window.COFFRE && COFFRE.stat("quiz:" + (G.quiz.exemple ? G.quiz.id : "perso")); } catch(e){} Object.values(P).forEach(p => { p.pts = 0; p.bons = 0; p.serie = 0; p.max = 0; p.mise = false; }); G.dbl = false; preparer(); G.i = 0; suivante(); };
   $("bSuite").onclick = () => { if (G.etat === "question") { reveler(); return; } if (G.etat === "mise") { question(); return; } if (G.i + 1 >= G.jeu.length) { finir(); return; } G.i++; suivante(); };
@@ -1000,6 +1007,7 @@ function telecommande(bord){
     ed.titre = $("eTitre").value.trim(); ed.sujet = $("eSujet").value.trim();
     document.querySelectorAll(".qe").forEach((d, k) => {
       const Q = ed.qs[k], t = typeDe(Q);
+      if (t === "diapo") return;
       Q.q = d.querySelector(".tq").value.trim();
       Q.s = +d.querySelector("select.ts").value;
       Q.expl = d.querySelector(".ex").value.trim();
@@ -1012,7 +1020,13 @@ function telecommande(bord){
     });
   }
   function dessinerEd(){
+    let nQ = 0, nD = 0;
     $("eQs").innerHTML = ed.qs.map((Q, k) => {
+      if (typeDe(Q) === "diapo") { nD++; return `<div class="qe diapo" data-t="diapo"><div class="tete"><strong>Diapo ${nD}</strong>
+        <button class="btn2" data-mv="${k},-1" ${k ? "" : "disabled"} aria-label="Monter">↑</button><button class="btn2" data-mv="${k},1" ${k < ed.qs.length - 1 ? "" : "disabled"} aria-label="Descendre">↓</button>
+        <button class="btn2" data-del="${k}" ${ed.qs.length < 2 ? "disabled" : ""}>Retirer</button></div>
+        <div class="diaE"><img src="${Q.img}" alt="Diapo ${nD}"><button class="btn2 apres" data-apres="${k}">+ Question ici</button></div></div>`; }
+      nQ++;
       const t = typeDe(Q), vf = t === "choix" && Q.ch.length === 2 && /^vrai$/i.test(Q.ch[0]) && /^faux$/i.test(Q.ch[1]);
       const nom = vf ? "vrai ou faux" : t === "choix" ? (Q.zoom ? "zoom mystère" : "") : TYPES[t].toLowerCase();
       const tps = `<select class="ts" aria-label="Temps">${[...new Set([10, 15, 20, 25, 30, 40, 45, 60, 90, +Q.s || 20])].sort((x, y) => x - y).map(s => `<option value="${s}" ${(+Q.s || 20) === s ? "selected" : ""}>${s} s</option>`).join("")}</select>`;
@@ -1026,7 +1040,7 @@ function telecommande(bord){
       const imgBloc = Q.img ? `<div class="imgE"><div class="vignette ${Q.zoom ? "z" : ""}" data-zimg="${k}"><img src="${Q.img}" alt="">${Q.zoom ? `<i style="left:${Q.zoom.x}%;top:${Q.zoom.y}%"></i>` : ""}</div>
           <div>${zoomOk ? `<select class="zsel" data-zk="${k}"><option value="">Image entière</option><option value="zoom" ${Q.zoom ? "selected" : ""}>Zoom mystère (un morceau agrandi)</option></select>${Q.zoom ? '<div class="sous">Touche l\'image pour choisir le morceau à montrer.</div>' : ""}` : ""}
           <button class="btn2" data-noimg="${k}">Retirer l'image</button></div></div>` : `<button class="btn2" data-img="${k}">+ Image (affichée au tableau)</button>`;
-      return `<div class="qe" data-t="${t}"><div class="tete"><b>Question ${k + 1}${nom ? " · " + nom : ""}</b>${tps}
+      return `<div class="qe" data-t="${t}"><div class="tete"><b>Question ${nQ}${nom ? " · " + nom : ""}</b>${tps}
       <button class="btn2" data-mv="${k},-1" ${k ? "" : "disabled"} aria-label="Monter">↑</button><button class="btn2" data-mv="${k},1" ${k < ed.qs.length - 1 ? "" : "disabled"} aria-label="Descendre">↓</button>
       <button class="btn2" data-del="${k}" ${ed.qs.length < 2 ? "disabled" : ""}>Retirer</button></div>
       <input class="tq" placeholder="${t === "nombre" ? "La question (ex. : 2 moteurs de 7,7 VA : combien de VA en tout ?)" : "La question"}" value="${esc(Q.q)}" maxlength="180" style="margin-top:8px">
@@ -1035,6 +1049,8 @@ function telecommande(bord){
       <div class="img">${imgBloc}<span class="sous">${aide}</span></div></div>`;
     }).join("");
     document.querySelectorAll("[data-del]").forEach(b => b.onclick = () => { lireEd(); ed.qs.splice(+b.dataset.del, 1); dessinerEd(); });
+    document.querySelectorAll("[data-apres]").forEach(b => b.onclick = () => { lireEd(); const k = +b.dataset.apres + 1; ed.qs.splice(k, 0, qVide()); dessinerEd();
+      setTimeout(() => { const q = document.querySelectorAll(".qe")[k]; if (q) { q.scrollIntoView({block: "center", behavior: "smooth"}); const f = q.querySelector(".tq"); if (f) f.focus(); } }, 50); });
     document.querySelectorAll("[data-mv]").forEach(b => b.onclick = () => { lireEd(); const [k, d] = b.dataset.mv.split(",").map(Number); const t = ed.qs[k]; ed.qs[k] = ed.qs[k + d]; ed.qs[k + d] = t; dessinerEd(); });
     document.querySelectorAll("[data-plus]").forEach(b => b.onclick = () => { lireEd(); ed.qs[+b.dataset.plus].ch.push(""); dessinerEd(); });
     document.querySelectorAll("[data-noimg]").forEach(b => b.onclick = () => { lireEd(); delete ed.qs[+b.dataset.noimg].img; delete ed.qs[+b.dataset.noimg].zoom; dessinerEd(); });
@@ -1044,13 +1060,41 @@ function telecommande(bord){
     document.querySelectorAll("[data-img]").forEach(b => b.onclick = () => choisirImage(800, d => { lireEd(); ed.qs[+b.dataset.img].img = d; dessinerEd(); }));
   }
   $("bNouveau").onclick = () => editer(null);
+  /* Présentation avec questions (10 nov., idée de Jeremy) : les pages d'un PowerPoint enregistré en PDF deviennent des diapos (t:"diapo", img);
+     l'enseignant ajoute des questions entre les diapos (« + Question ici »). En partie : diapo au tableau, iPad « Regarde le tableau », rien à répondre. */
+  async function pdfjsPret(){ if (window.pdfjsLib && window.pdfjsLib.getDocument) return;
+    const base = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/";
+    await new Promise((ok, ko) => { const sc = document.createElement("script"); sc.src = base + "pdf.min.js"; sc.onload = ok; sc.onerror = ko; document.head.append(sc); });
+    window.pdfjsLib.GlobalWorkerOptions.workerSrc = base + "pdf.worker.min.js"; }
+  async function importerPdf(fi){
+    const b = $("ePdf"), t0 = b.textContent; b.disabled = true;
+    try { b.textContent = "Ouverture du PDF…"; await pdfjsPret();
+      const pdf = await window.pdfjsLib.getDocument({data: await fi.arrayBuffer()}).promise, n = Math.min(pdf.numPages, 60), L = [];
+      for (let i = 1; i <= n; i++){ b.textContent = "Diapo " + i + " sur " + n + "…";
+        const pg = await pdf.getPage(i), v0 = pg.getViewport({scale: 1}), v = pg.getViewport({scale: 1600 / Math.max(v0.width, v0.height)}), c = document.createElement("canvas");
+        c.width = Math.round(v.width); c.height = Math.round(v.height); const x = c.getContext("2d"); x.fillStyle = "#fff"; x.fillRect(0, 0, c.width, c.height);
+        await pg.render({canvasContext: x, viewport: v}).promise; L.push({t: "diapo", img: versWebp(c), q: "", s: 0}); }
+      lireEd(); const vide = ed.qs.length === 1 && !ed.qs[0].q && typeDe(ed.qs[0]) !== "diapo";
+      ed.qs = vide ? L : ed.qs.concat(L);
+      if (!ed.titre) { ed.titre = fi.name.replace(/\.pdf$/i, "").replace(/[_-]+/g, " ").trim(); $("eTitre").value = ed.titre; }
+      const pd = $("ePres"); if (pd) pd.remove();
+      dessinerEd(); b.textContent = n + " diapos ajoutées" + (pdf.numPages > n ? " (60 au plus)" : "");
+    } catch(e) { b.textContent = "Impossible de lire ce PDF"; }
+    setTimeout(() => { b.textContent = t0; b.disabled = false; }, 3500); }
+  function choisirPdf(){ const f = document.createElement("input"); f.type = "file"; f.accept = "application/pdf,.pdf"; f.onchange = () => f.files[0] && importerPdf(f.files[0]); f.click(); }
+  window.__importerPdf = importerPdf;
+  $("ePdf").onclick = choisirPdf;
+  if (/[?&]pres=1/.test(location.search) && bord) setTimeout(() => { editer(null);
+    $("eQs").insertAdjacentHTML("beforebegin", `<div id="ePres" class="pres-deb"><b>Présentation avec questions</b><span>1. Dans PowerPoint : Fichier › Enregistrer sous › PDF.<br>2. Choisis ce PDF ici : chaque page devient une diapo.<br>3. Touche « + Question ici » sous une diapo pour ajouter une question.</span><button class="btn" id="ePresB">Choisir le PDF</button></div>`);
+    $("ePresB").onclick = choisirPdf; }, 300);
   document.querySelectorAll("[data-aj]").forEach(b => b.onclick = () => { lireEd(); ed.qs.push(qVide(b.dataset.aj)); dessinerEd(); setTimeout(() => { const L = document.querySelectorAll(".qe"); L[L.length - 1].scrollIntoView({block: "center", behavior: "smooth"}); const q = L[L.length - 1].querySelector(".tq"); if (q) q.focus(); }, 50); });
   $("eAnnule").onclick = () => { document.documentElement.style.removeProperty("--acc"); montrer("vChoix"); listeQuiz(); };
   $("eSauve").onclick = () => {
     lireEd();
     let err = !ed.titre ? "Donne un titre au quiz." : "";
     const qs = ed.qs.map((Q, k) => {
-      const t = typeDe(Q), o = {q: Q.q, s: Q.s}; if (t !== "choix") o.t = t;
+      const t = typeDe(Q); if (t === "diapo") return {t, img: Q.img, q: "", s: 0};
+      const o = {q: Q.q, s: Q.s}; if (t !== "choix") o.t = t;
       if (!Q.q && !err) err = "La question " + (k + 1) + " n'a pas de texte.";
       if (t === "nombre") { o.ch = []; o.bon = Q.bon; if (+Q.tol) o.tol = +Q.tol; if (Q.u) o.u = Q.u; if ((isNaN(Q.bon) || Q.bon === "") && !err) err = "Question " + (k + 1) + " : écris la bonne réponse (un nombre)."; }
       else if (t === "ordre") { o.ch = Q.ch.filter(Boolean); o.bon = o.ch.map((_, j) => j); if (o.ch.length < 3 && !err) err = "Question " + (k + 1) + " : il faut au moins 3 étapes."; }
@@ -1205,6 +1249,7 @@ function joueur(code){
       if (!entre || !pour(m)) return;
       if (m.coul) teinte(m.coul);
       if (m.m === "bienvenue") bx(`<div class="gros monte">Tu es dans la partie.</div><div>${esc(m.titre || "")}</div><div style="opacity:.7;margin-top:8px">Regarde le tableau : ça commence bientôt.</div>`);
+      else if (m.m === "diapo") { clearInterval(chrono); bx('<div class="gros monte">Regarde le tableau</div><div style="opacity:.75">Garde ton iPad près de toi.</div>'); }
       else if (m.m === "attente") bx('<div class="gros">Pause</div><div>L\'enseignant prépare la suite.</div>');
       else if (m.m === "mise") {
         if (m.pts[pid] == null) return; clearInterval(chrono);
@@ -1223,7 +1268,7 @@ function joueur(code){
         else if (t === "ordre") corps = `<div class="aideT">Touche les étapes dans le bon ordre (1, 2, 3…), puis Valider.</div>${btns("ordre")}<div class="duoB"><button id="jRaz" class="btn2">Recommencer</button><button id="jOk" class="valider" disabled>Valider</button></div>`;
         else if (t === "nombre") corps = `<div class="aideT">Calcule et tape ta réponse${m.u ? " (en " + esc(m.u) + ")" : ""}.</div><div class="nbx"><input id="jNb" inputmode="decimal" autocomplete="off" placeholder="Ta réponse">${m.u ? `<span>${esc(m.u)}</span>` : ""}</div><button id="jOk" class="valider" disabled>Valider</button>`;
         else corps = (t === "erreur" ? '<div class="aideT">Quel morceau de la phrase contient l\'erreur ?</div>' : "") + btns();
-        bx(`<div style="opacity:.75">Question ${m.i + 1} sur ${m.n}${m.dbl ? ' · <b style="color:#FFB15C">double ou rien</b>' : '<b id="dblTag" class="cache" style="color:#FFB15C"> · double ou rien</b>'}</div><h2>${esc(m.q)}</h2><div class="chrono"><i id="jBar"></i></div>
+        bx(`<div style="opacity:.75">Question ${m.qn || m.i + 1} sur ${m.nq || m.n}${m.dbl ? ' · <b style="color:#FFB15C">double ou rien</b>' : '<b id="dblTag" class="cache" style="color:#FFB15C"> · double ou rien</b>'}</div><h2>${esc(m.q)}</h2><div class="chrono"><i id="jBar"></i></div>
           <div id="jCorps" class="${m.lec > 300 ? "cache" : ""}">${corps}</div>${m.lec > 300 ? `<div id="jLec" class="aideT lec">Lis bien la question… les choix arrivent dans <b id="jLecN">${Math.ceil(m.lec / 1000)}</b> s.</div>` : ""}`);
         if (m.lec > 300) { const t1 = Date.now() + m.lec; const iv = setInterval(() => { const r = t1 - Date.now(), n = $("jLecN"); if (n) n.textContent = Math.max(0, Math.ceil(r / 1000)); if (r <= 0) { clearInterval(iv); const c = $("jCorps"), l = $("jLec"); if (c) c.classList.remove("cache"); if (l) l.remove(); } }, 200); }
         clearInterval(chrono);
@@ -1423,7 +1468,7 @@ function ecran(code){
     const garde = av.filter(j => j.r <= N || rAvant[j.k] <= N);
     const ligne = j => { const d = rAvant[j.k] - j.r;
       return `<div class="lg" data-n="${j.k}" data-r="${j.r}"><span class="r">${rAvant[j.k]}</span><span>${visage(j.av, "v-e")}${esc(j.n)}${v.i === 0 ? "" : d > 0 ? ` <small class="mo">▲ ${d}</small>` : d < 0 ? ` <small class="de">▼ ${-d}</small>` : ""}${j.s >= 2 ? ` <span class="feu${j.s >= 5 ? " fort" : ""}${j.s === 2 ? " tiede" : ""}">${j.s >= 3 ? FLAMME : ""}<em>${palier(j.s)} · ${j.s} de suite</em></span>` : ""}${j.ra ? ` <span class="eclair">${ECLAIR}<em>Plus rapide</em></span>` : ""}</span><span>${j.g - (j.bo || 0) ? `<small>+${j.g - (j.bo || 0)}</small>` : ""}${j.bo ? `<small class="bo">+${j.bo} série</small>` : ""}${v.reg.points === "aucun" ? "" : `<b data-de="${j.avant}" data-a="${j.pts}">${j.avant}</b>`}</span></div>`; };
-    E.innerHTML = tete("Classement après la question " + (v.i + 1) + " sur " + v.n) + `<div class="lgs" id="eLgs">${garde.sort((a, b) => rAvant[a.k] - rAvant[b.k]).map(ligne).join("")}</div>` + bSon();
+    E.innerHTML = tete("Classement après la question " + (v.qn || v.i + 1) + " sur " + (v.nq || v.n)) + `<div class="lgs" id="eLgs">${garde.sort((a, b) => rAvant[a.k] - rAvant[b.k]).map(ligne).join("")}</div>` + bSon();
     const rows = [...E.querySelectorAll("#eLgs .lg")];
     if (rows.length < 1) return;
     let pas;
@@ -1512,6 +1557,8 @@ function ecran(code){
         <div class="code">${code.slice(0, 3)} ${code.slice(3)}</div><div style="font-size:1.6vw;color:#B5AFA6">${v.joueurs.length} participant${v.joueurs.length > 1 ? "s" : ""}</div>
         <div class="noms">${v.joueurs.map(j => `<span>${visage(j.av, "v-e")}${esc(j.n)}</span>`).join("")}</div></div></div>` + bSon();
       try { const tq = cv ? .16 : .22; new QRCode($("eQr"), {text: url, width: Math.round(innerWidth * tq), height: Math.round(innerWidth * tq), correctLevel: QRCode.CorrectLevel.M}); } catch(e) { $("eQr").textContent = url; }
+    } else if (v.etat === "diapo") {
+      if (cle !== dernier || force) E.innerHTML = img[v.i] ? `<div class="ediapo"><img src="${img[v.i]}" alt=""></div>` + bSon() : tete(v.titre) + bSon();
     } else if (v.etat === "mise") {
       if (cle !== dernier || force) {
         E.innerHTML = tete("Dernière question") + `<div class="dblE monte"><b>Double ou rien</b><span>Sur ton iPad : mise tous tes points.<br>Bonne réponse = points doublés. Mauvaise réponse = 0.</span><em id="eMises"></em></div>` + bSon();
@@ -1530,7 +1577,7 @@ function ecran(code){
         else if (t === "nombre") corps = `<div class="enb monte">Calcule et tape ta réponse sur ton iPad${v.q.u ? ` <small>(en ${esc(v.q.u)})</small>` : ""}</div>`;
         else corps = `<div class="ech${lettresSeul ? " lettres" : ""}">${v.q.ch.map((c, k) => `<div class="k${k} monte" style="animation-delay:${.1 + k * .08}s"><span><i class="let">${SYMB[k]}</i>${lettresSeul ? "" : esc(c)}</span></div>`).join("")}</div>${lettresSeul ? '<div class="enb" style="font-size:1.6vw">Lis les choix sur ton iPad</div>' : ""}`;
         const sous = {multi: "Plusieurs bonnes réponses", ordre: "Remets dans le bon ordre", nombre: "Calcul", erreur: "Trouve l'erreur"}[t];
-        E.innerHTML = tete("Question " + (v.i + 1) + " sur " + v.n) + (sous ? `<div class="etype">${sous}</div>` : "") + `<div class="eq monte">${esc(v.q.q)}</div>${im}${corps}
+        E.innerHTML = tete("Question " + (v.qn || v.i + 1) + " sur " + (v.nq || v.n)) + (sous ? `<div class="etype">${sous}</div>` : "") + `<div class="eq monte">${esc(v.q.q)}</div>${im}${corps}
           <div class="cpt"><span id="eRep"></span><b id="eT"></b></div>` + bSon();
         if (cle !== dernier && !cle.endsWith("L")) ton(440, .25, .08);
       }
@@ -1546,7 +1593,7 @@ function ecran(code){
         else if (t === "erreur") corps = `<div class="ephr rev">${v.q.ch.map((c, k) => `<span class="k${k} ${k === v.bon ? "faux" : "pas"}"><i class="let">${SYMB[k]}</i>${esc(c)}<em>${v.cpt[k]}</em></span>`).join(" ")}</div>`;
         else corps = `<div class="ech">${v.q.ch.map((c, k) => `<div class="k${k} ${estBon(k) ? "bon" : "pas"}"><span><i class="let">${estBon(k) ? "✓" : SYMB[k]}</i>${esc(c)}</span><em>${v.cpt[k]}</em><i class="bar" data-w="${100 * v.cpt[k] / tot}"></i></div>`).join("")}</div>`;
         const im = v.q.img && img[v.i] && v.q.zoom ? `<img class="eimg petit monte" src="${img[v.i]}" alt="">` : "";
-        E.innerHTML = tete("Question " + (v.i + 1) + " sur " + v.n) + `<div class="eq">${esc(v.q.q)}</div>${im}${corps}
+        E.innerHTML = tete("Question " + (v.qn || v.i + 1) + " sur " + (v.nq || v.n)) + `<div class="eq">${esc(v.q.q)}</div>${im}${corps}
           ${v.q.expl ? `<div class="eexpl monte">${esc(v.q.expl)}</div>` : ""}
           ${v.reg.classement === "oui" ? `<div class="cpt"><span>Classement dans quelques secondes…</span></div>` : ""}` + bSon();
         requestAnimationFrame(() => E.querySelectorAll(".bar").forEach(b => b.style.width = b.dataset.w + "%"));
@@ -1573,7 +1620,7 @@ function ecran(code){
   }
   ecouter(topic, m => {
     if (m.m === "cmd") { if (window.manetteVue) window.manetteVue(m); return; }
-    if (m.m === "img") { img[m.i] = m.data; if ((V.etat === "question" && V.i === m.i) || (m.i === -1 && V.etat === "lobby")) rendre(true); }
+    if (m.m === "img") { img[m.i] = m.data; if (((V.etat === "question" || V.etat === "diapo") && V.i === m.i) || (m.i === -1 && V.etat === "lobby")) rendre(true); }
     else if (m.m === "vue") { V = m; decal = m.now - Date.now(); rendre(m.etat === "lobby"); }
   }, ok => { if (ok) envoyer(topic, {m: "ecran?"}); });
   rendre(true); setInterval(() => { if (V.etat === "question" || V.etat === "mise") rendre(); }, 400);
