@@ -1307,6 +1307,7 @@ function telecommande(bord){
   function reprendre(){
     let S = null; try { S = JSON.parse(localStorage.getItem("quizPartie") || "null"); } catch(e) {}
     if (!S || S.code !== code || Date.now() - S.t > 3 * 3600e3) return false;
+    { const qp = params.get("quiz"); if (qp && qp !== S.quiz) { try { localStorage.removeItem("quizPartie"); } catch(e) {} return false; } }   /* 11 nov. : un autre quiz choisi = nouvelle partie, pas la reprise de l'ancienne */
     const q = tousQuiz().find(x => x.id === S.quiz); if (!q) return false;
     G.quiz = JSON.parse(JSON.stringify(q)); G.i = S.i; G.etat = S.etat; G.t0 = S.t0; G.reps = S.reps || {}; G.dbl = S.dbl; G.bilan = S.bilan || [];
     let nD = 0; const DQ = G.quiz.qs.filter(x => x.t === "diapo");
