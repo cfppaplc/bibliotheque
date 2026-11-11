@@ -499,7 +499,7 @@ if (params.get("animer")) animer(params.get("defi") ? [["jGo"], ["jNext"]] : [])
 else if (params.get("panneau")) panneau(params.get("panneau").replace(/\D/g, "").slice(0, 6));
 else if (params.get("ecran")) ecran(params.get("ecran").replace(/\D/g, "").slice(0, 6));
 else if (params.get("tele")){ telecommande(); if (params.get("defi")) setTimeout(() => { const g = $("jGo"); if (g){ const c = g.closest(".carte") || g; c.scrollIntoView({block: "start"}); c.style.boxShadow = "0 0 0 3px #534AB7"; } }, 300); }
-else if (!params.get("role")) location.replace("labo.html");   /* 9 nov. : le Labo est la seule porte d'entrée; ?role=1 garde le choix « 2 écrans » */
+else if (!params.get("role")) (window.gardeOk || Promise.resolve(true)).then(ok => { if (ok) location.replace("labo.html"); });   /* 9 nov. : le Labo est la seule porte d'entrée; ?role=1 garde le choix « 2 écrans » */
 else {
   /* choix de l'affichage (2 écrans) : activité → comment l'afficher */
   $("role").classList.remove("cache");
@@ -758,7 +758,7 @@ function ecran(code){
   function rendre(){
     const v = V, n = Date.now() + decal;
     if (v.etat === "lobby") {
-      E.innerHTML = tete("Défi panneau d'alarme") + `<div class="banniere"><img src="img/labo/m5-panneau.jpg" alt=""><span><small>Protection incendie · module 5</small>Systèmes d'alarme et panneau</span></div><div class="lob"><div class="qr" id="eQr"></div><div><div style="font-size:2vw;color:#B5AFA6">Scanne le code avec ton iPad</div>
+      E.innerHTML = tete("Défi panneau d'alarme") + `<div class="banniere"><img src="img/labo/m5-panneau.jpg" alt=""><span><small>Protection incendie · module 5</small>Systèmes d'alarme et panneau</span></div><div class="lob"><div class="qr" id="eQr"></div><div><div style="font-size:2vw;color:#B5AFA6">Scanne le code avec ton iPad</div><div style="font-size:1.4vw;color:#8E897F;margin-top:.3vw">Pas de caméra ? Va sur <b style="color:#F2EFEA">${location.host}/simulateur</b> et entre le code.</div>
         <div class="code">${code.slice(0, 3)} ${code.slice(3)}</div><div style="font-size:1.6vw;color:#B5AFA6">${v.eqs.length} équipe${v.eqs.length > 1 ? "s" : ""} prête${v.eqs.length > 1 ? "s" : ""}</div>
         <div class="eqs">${v.eqs.map(q => `<span>${visage(q.av, "v-e")}${esc(q.n)}</span>`).join("")}</div></div></div>`;
       try { new QRCode($("eQr"), {text: url, width: Math.round(innerWidth * .17), height: Math.round(innerWidth * .17), correctLevel: QRCode.CorrectLevel.M}); } catch(e) { $("eQr").textContent = url; }

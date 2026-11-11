@@ -13,13 +13,24 @@
   const ouvrir = ok => {
     html.classList.remove("garde-attente");
     if (ok) return;
+    /* 10 nov. : metierplus.app/quiz (ou /simulateur) sans compte = l'élève entre le code de la partie (si le code QR ne marche pas) */
+    const jeu = /quiz/.test(location.pathname) ? "j" : /simulateur/.test(location.pathname) ? "panneau" : "";
+    const f0 = () => { document.body.insertAdjacentHTML("beforeend", `<div id="gardeOv"><div class="bx"><img src="img/metier-plus-blanc.svg" alt="Métier+"><h1>Entre le code de la partie</h1>
+      <p>Le code est affiché au tableau.</p><input id="gardeCode" inputmode="numeric" autocomplete="off" maxlength="9" placeholder="000 000" style="width:100%;box-sizing:border-box;font:800 40px system-ui,sans-serif;letter-spacing:.15em;text-align:center;padding:14px;border-radius:12px;border:2px solid #444;background:#141414;color:#fff">
+      <a href="#" id="gardeGo" style="opacity:.4">Entrer</a><button id="gardeProf">Je suis enseignant</button><small>© 2026 Jérémy Raymond · Tous droits réservés</small></div></div>`);
+      const i = document.getElementById("gardeCode"), go = document.getElementById("gardeGo"), val = () => i.value.replace(/\D/g, "");
+      i.oninput = () => { go.style.opacity = val().length === 6 ? 1 : .4; }; i.focus();
+      const entrer = e => { if (e) e.preventDefault(); if (val().length === 6) location.href = location.pathname.replace(/[^/]*$/, "") + (jeu === "j" ? "quiz.html" : "simulateur.html") + "?" + jeu + "=" + val(); };
+      go.onclick = entrer; i.onkeydown = e => { if (e.key === "Enter") entrer(e); };
+      document.getElementById("gardeProf").onclick = () => { document.getElementById("gardeOv").remove(); f(); }; };
     const f = () => { document.body.insertAdjacentHTML("beforeend", `<div id="gardeOv"><div class="bx"><img src="img/metier-plus-blanc.svg" alt="Métier+"><h1>Réservé aux enseignants</h1>
       <p>Le Labo, les quiz et les simulateurs sont offerts aux enseignants qui ont un accès à la bibliothèque. Connecte-toi dans la bibliothèque, puis reviens ici.</p>
       <a href="./">Ouvrir la bibliothèque</a><button id="gardeRe">Je suis connecté : réessayer</button><small>© 2026 Jérémy Raymond · Tous droits réservés</small></div></div>`);
       document.getElementById("gardeRe").onclick = () => location.reload(); };
-    document.body ? f() : addEventListener("DOMContentLoaded", f);
+    const g = jeu ? f0 : f; document.body ? g() : addEventListener("DOMContentLoaded", g);
   };
-  let fini = false; const fin = ok => { if (!fini) { fini = true; ouvrir(ok); } };
+  let okRes; window.gardeOk = new Promise(r => okRes = r);
+  let fini = false; const fin = ok => { if (!fini) { fini = true; okRes(ok); ouvrir(ok); } };
   setTimeout(() => fin(false), 4000);
   try {
     const r = indexedDB.open("acces", 1);
