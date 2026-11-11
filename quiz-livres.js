@@ -147,7 +147,7 @@ window.QUIZ_LIVRES = [
 ],
 "bon": 2,
 "s": 25,
-"expl": "100 minutes par jour à 45,36 $ de l'heure (compagnon tuyauteur, résidentiel léger, janvier 2026) : environ 76 $ par jour, donc 18 000 $ sur 240 jours de travail, sans compter les avantages sociaux. Chaque minute compte."
+"expl": "100 minutes par jour à 45,36 $ de l'heure (compagnon tuyauteur, résidentiel léger, janvier 2026) : environ 76 $ par jour, donc 18 000 $ par année. Voilà pourquoi on insiste : pas de niaisage pendant le ménage. La solution ? Métier+ affiche le ménage tout seul à la fin du cours : chaque équipe sait quoi faire, et on part quand tout est coché."
 },
 {
 "t": "diapo",
