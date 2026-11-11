@@ -7,7 +7,7 @@ window.QUIZ_LIVRES = [
 "id": "dep-plomberie-chauffage",
 "exemple": true,
 "fixe": true,
-"auto": 7,
+"auto": 5,
 "titre": "DEP Plomberie et chauffage",
 "sujet": "Présentation du programme",
 "couv": "img/labo/quiz/plomberie/couv.jpg",
@@ -45,18 +45,20 @@ window.QUIZ_LIVRES = [
 {
 "t": "diapo",
 "img": "img/labo/quiz/plomberie/05.jpg",
+"mv": "kb",
 "q": "",
 "s": 0
 },
 {
 "t": "diapo",
 "img": "img/labo/quiz/plomberie/06.jpg",
+"mv": "kb",
 "q": "",
 "s": 0
 },
 {
 "t": "diapo",
-"img": "img/labo/quiz/plomberie/07.jpg",
+"img": "img/labo/quiz/plomberie/07.jpg?v=2",
 "q": "",
 "s": 0
 },
