@@ -217,6 +217,11 @@ body.presseJ #joueur::after{content:"";position:fixed;inset:0;pointer-events:non
 #man.m3 #mAutre{background:#161d2c;border:1px solid #3A4358}
 #man.m3 .mvolc .mbar{flex:none}#man.m3 .mvol{flex:none}#man.m3 .mfin{background:transparent;border:1px solid #3A4358;color:#9AA3B5;min-height:48px;font-size:15px}
 body.celCo #animBar{display:none!important}
+/* 10 nov. : salle d'attente = barre réduite à l'essentiel (elle cachait les participants) */
+body.eLobby #animBar{bottom:1vh;padding:5px;gap:6px;background:rgba(20,22,26,.7)}
+body.eLobby #animBar button{min-height:38px;padding:8px 14px;font-size:14px}
+body.eLobby #animBar [data-b]:not([data-b="bGo"]),body.eLobby #musB,body.eLobby #volM,body.eLobby #volP{display:none!important}
+body.eLobby .noms{padding-bottom:70px}
 #man .m2{min-height:60px;border-radius:14px;background:#2A3245;color:#F2EFEA;font-size:18px;font-weight:700;border:0}#man .m2.cache{display:none}
 #tiroir iframe{width:100%;height:100%;border:0;display:block}
 #tiroir .fermer{position:absolute;left:-46px;top:12px;width:40px;height:40px;padding:0;border-radius:10px;background:#24211E;color:#fff;font-size:20px}
@@ -1693,7 +1698,11 @@ function ecran(code){
     const v = V, n = Date.now() + decal, lecture = v.etat === "question" && v.q && n < v.t0 - 150, cle = v.etat + v.i + (lecture ? "L" : "");
     musique(v, n);
     document.documentElement.style.setProperty("--acc", (v.reg && v.reg.coul) || "#534AB7");
+    document.body.classList.toggle("eLobby", v.etat === "lobby");
     if (v.etat === "lobby") {
+      const nj = v.joueurs.length;   /* 10 nov. : petit son quand un participant arrive */
+      if (rendre.nj != null && nj > rendre.nj && sonOK) { ton(784, .12, .07); setTimeout(() => ton(1175, .22, .07), 110); }
+      rendre.nj = nj;
       const cv = v.couv === "img" ? img[-1] : v.couv;
       E.innerHTML = tete(v.titre) + (cv ? `<div class="banniere" style="--u:url('${esc(cv)}')"><i class="bfond"></i><img src="${esc(cv)}" alt="" onload="if(this.naturalHeight>this.naturalWidth*1.1)this.parentNode.classList.add('port')"><span>${v.sujet ? `<small>${esc(v.sujet)}</small>` : ""}${esc(v.titre)}</span></div>` : "") + `<div class="lob"><div class="qr" id="eQr"></div><div><div style="font-size:2vw;color:#B5AFA6">Scanne le code avec ton iPad</div>
         <div class="code">${code.slice(0, 3)} ${code.slice(3)}</div><div style="font-size:1.6vw;color:#B5AFA6">${v.joueurs.length} participant${v.joueurs.length > 1 ? "s" : ""}</div>
