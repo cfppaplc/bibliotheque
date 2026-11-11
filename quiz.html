@@ -17,7 +17,7 @@
 <title>Métier+ — Quiz</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.50.0/dist/umd/supabase.min.js"></script>
-<script src="quiz-livres.js?v=1794413953"></script>
+<script src="quiz-livres.js?v=1794414221"></script>
 <style>
 :root{--fond:#E9E6E0;--carte:#fff;--txt:#24211E;--gris:#6B665E;--ligne:#E2DDD3;--acc:#534AB7;--vert:#2E8B57;--rouge:#D93025}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -843,7 +843,7 @@ function telecommande(bord){
     if (typeDe(G.jeu[G.i]) === "diapo") { const D = G.jeu[G.i]; G.etat = "diapo"; G.reps = {};
       if (!D.ref && D.img) envoyer(topic, {m: "img", i: G.i, data: D.img});   /* anciennes diapos (image dans le quiz) */
       envoyer(topic, {m: "diapo", i: G.i}); maj();
-      if (G.quiz && G.quiz.auto) minut = setTimeout(() => { if (G.etat !== "diapo") return; G.i = G.i + 1 >= G.jeu.length ? 0 : G.i + 1; suivante(); }, G.quiz.auto * 1000);   /* 11 nov. : présentation qui défile seule, en boucle */
+      if (G.quiz && G.quiz.auto) minut = setTimeout(() => { if (G.etat !== "diapo") return; G.i = G.i + 1 >= G.jeu.length ? 0 : G.i + 1; suivante(); }, (D.d || G.quiz.auto) * 1000);   /* 11 nov. : présentation qui défile seule, en boucle */
       return; }
     G.etat = "question"; G.reps = {};
     const Q = G.jeu[G.i], lec = R().cache === "oui" ? 5000 : 0;   /* « choix cachés » : 5 s pour lire la question avant de voir les choix */

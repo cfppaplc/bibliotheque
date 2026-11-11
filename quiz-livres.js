@@ -45,17 +45,16 @@ window.QUIZ_LIVRES = [
 {
 "t": "diapo",
 "img": "img/labo/quiz/plomberie/05.jpg",
-"mv": "kb",
 "q": "",
 "s": 0
 },
 {
 "t": "diapo",
 "img": "img/labo/quiz/plomberie/06.jpg",
-"mv": "kb",
 "q": "",
 "s": 0
 },
+{"t": "diapo", "img": "img/labo/quiz/plomberie/ra89a.webp", "q": "", "s": 0, "d": 16},
 {
 "t": "diapo",
 "img": "img/labo/quiz/plomberie/07.jpg?v=2",
