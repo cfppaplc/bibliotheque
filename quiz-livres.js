@@ -4,6 +4,215 @@
    Fabriqué par Claude à partir des livres (scratchpad ql/data.py); lecture seule : « Copier et modifier » pour l'adapter. */
 window.QUIZ_LIVRES = [
 {
+"id": "decouvre-metier-plus",
+"exemple": true,
+"titre": "Découvre Métier+",
+"sujet": "Présentation",
+"couv": "img/labo/quiz/demo/01.jpg",
+"coul": "#EB6A22",
+"reg": {
+"nb": "tout",
+"melange": "non"
+},
+"qs": [
+{
+"t": "diapo",
+"img": "img/labo/quiz/demo/01.jpg",
+"q": "",
+"s": 0
+},
+{
+"t": "nuage",
+"q": "En un mot : qu'est-ce qui te prend le plus de temps à préparer ?",
+"ch": [],
+"bon": null,
+"s": 45
+},
+{
+"t": "diapo",
+"img": "img/labo/quiz/demo/02.jpg",
+"q": "",
+"s": 0
+},
+{
+"t": "diapo",
+"img": "img/labo/quiz/demo/03.jpg",
+"q": "",
+"s": 0
+},
+{
+"t": "diapo",
+"img": "img/labo/quiz/demo/04.jpg",
+"q": "",
+"s": 0
+},
+{
+"q": "Combien de feuilles de plans techniques sont prêtes dans Métier+ ?",
+"ch": [
+"12",
+"45",
+"123",
+"300"
+],
+"bon": 2,
+"s": 20,
+"expl": "123 feuilles prêtes à projeter, avec questionnaires et corrigés. Fini les plans jaunis photocopiés en 1998."
+},
+{
+"t": "diapo",
+"img": "img/labo/quiz/demo/05.jpg",
+"q": "",
+"s": 0
+},
+{
+"t": "multi",
+"q": "Avec ton cellulaire comme télécommande, tu peux…",
+"ch": [
+"Tourner les pages du livre",
+"Pointer au laser sur le tableau",
+"Mener un quiz debout dans la classe",
+"Corriger les examens tout seul"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 25,
+"expl": "Pages, laser, zoom et quiz : tu enseignes debout, au milieu de ta classe. La correction ? Ça, c'est encore ton travail."
+},
+{
+"t": "diapo",
+"img": "img/labo/quiz/demo/06.jpg",
+"q": "",
+"s": 0
+},
+{
+"t": "ordre",
+"q": "Remets dans l'ordre : ton cours dans Métier+.",
+"ch": [
+"Je prépare le déroulement de la période",
+"J'ouvre l'accueil de classe au tableau",
+"J'ouvre le livre au bon moment",
+"Les élèves font le ménage de fin de cours"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 35,
+"expl": "Tu prépares ta semaine d'avance. Le jour même, tu ouvres et tout est là."
+},
+{
+"t": "diapo",
+"img": "img/labo/quiz/demo/07.jpg",
+"q": "",
+"s": 0
+},
+{
+"q": "Le ménage de l'atelier apparaît tout seul à la fin du cours.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15,
+"expl": "La liste prend tout l'écran et les élèves cochent eux-mêmes. Toi, tu supervises."
+},
+{
+"t": "diapo",
+"img": "img/labo/quiz/demo/08.jpg",
+"q": "",
+"s": 0
+},
+{
+"q": "Pour jouer à un quiz, chaque élève doit se créer un compte.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 1,
+"s": 15,
+"expl": "Zéro compte, zéro mot de passe oublié. Un code QR et ils jouent en 10 secondes."
+},
+{
+"t": "sondage",
+"q": "Qu'est-ce qui t'aiderait le plus en classe ?",
+"ch": [
+"Les livres animés",
+"Les quiz et présentations",
+"Les plans techniques",
+"L'accueil de classe"
+],
+"bon": null,
+"s": 30
+},
+{
+"t": "diapo",
+"img": "img/labo/quiz/demo/09.jpg",
+"q": "",
+"s": 0
+},
+{
+"t": "diapo",
+"img": "img/labo/quiz/demo/10.jpg",
+"q": "",
+"s": 0
+},
+{
+"t": "diapo",
+"img": "img/labo/quiz/demo/11.jpg",
+"q": "",
+"s": 0
+},
+{
+"q": "Depuis combien d'années PowerPoint existe-t-il ?",
+"ch": [
+"15 ans",
+"25 ans",
+"39 ans",
+"50 ans"
+],
+"bon": 2,
+"s": 20,
+"expl": "Lancé en 1987. Il serait peut-être temps de mettre un peu d'action dans vos présentations."
+},
+{
+"q": "Pour transformer ton PowerPoint en présentation Métier+, tu l'enregistres en…",
+"ch": [
+"Word",
+"PDF",
+"Image",
+"Excel"
+],
+"bon": 1,
+"s": 20,
+"expl": "Fichier › Enregistrer sous › PDF, puis tu le glisses dans Métier+. Ton vieux PowerPoint reprend vie."
+},
+{
+"t": "echelle",
+"q": "Je me vois utiliser Métier+ dans ma classe.",
+"ch": [
+"1",
+"2",
+"3",
+"4",
+"5"
+],
+"bon": null,
+"s": 20
+},
+{
+"t": "diapo",
+"img": "img/labo/quiz/demo/12.jpg",
+"q": "",
+"s": 0
+}
+]
+},
+{
 "id": "culture-generale",
 "exemple": true,
 "titre": "Culture générale",
