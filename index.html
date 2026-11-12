@@ -10061,12 +10061,13 @@ window.ACCES = (function(){
     box().innerHTML = (oubli ? marque('Mot de passe oublié', 'Écris ton nom et choisis un nouveau mot de passe (au moins 10 caractères). La demande est transmise à l\'administrateur; dès qu\'elle est acceptée, ton nouveau mot de passe fonctionne. Tes livres et tes données sont conservés.')
       : marque('Demander un accès', 'Choisis un mot de passe d\'au moins 10 caractères. Ta demande est transmise automatiquement à l\'administrateur; tu pourras te connecter dès qu\'elle sera acceptée.'))
       + '<label for="dNom">Prénom et nom</label><input type="text" id="dNom" autocomplete="name">'
-      + '<label for="dMdp">Mot de passe</label><input type="password" id="dMdp" autocomplete="new-password">'
-      + '<label for="dMdp2">Mot de passe (encore)</label><input type="password" id="dMdp2" autocomplete="new-password">'
+      + '<label for="dMdp">Mot de passe</label><div class="co-mdp"><input type="password" id="dMdp" autocomplete="new-password"><button type="button" class="co-oeil dOeil" data-champ="dMdp" aria-label="Voir le mot de passe" title="Voir le mot de passe">' + OEIL + '</button></div>'
+      + '<label for="dMdp2">Mot de passe (encore)</label><div class="co-mdp"><input type="password" id="dMdp2" autocomplete="new-password"><button type="button" class="co-oeil dOeil" data-champ="dMdp2" aria-label="Voir le mot de passe" title="Voir le mot de passe">' + OEIL + '</button></div>'
       + (oubli ? '' : '<label>Programme(s) que tu enseignes</label><div class="acces-progs">' + PROGS().map(c => '<label class="acces-prog"><input type="checkbox" class="dProg" value="' + esc(c) + '">' + (LOGO_PROG[c] ? '<img class="plogo" src="' + LOGO_PROG[c] + '" alt="">' : (ICO_PROG[c] || '')) + esc(progNom(c)) + '</label>').join("") + '</div>')
       + '<div class="acces-err" id="dErr" hidden></div>'
       + '<div class="acces-btns"><button id="dNon">Annuler</button><button class="prim" id="dOui">' + (oubli ? 'Envoyer ma demande' : 'Créer ma demande') + '</button></div>';
     ov().hidden = false; setTimeout(() => document.getElementById("dNom")?.focus(), 50);
+    document.querySelectorAll(".dOeil").forEach(b => b.onclick = () => { const c = document.getElementById(b.dataset.champ), v = c.type === "password"; c.type = v ? "text" : "password"; b.innerHTML = v ? OEIL_X : OEIL; b.setAttribute("aria-label", v ? "Cacher le mot de passe" : "Voir le mot de passe"); b.title = b.getAttribute("aria-label"); });
     document.getElementById("dNon").onclick = fermer;
     document.getElementById("dOui").onclick = async () => {
       const nom = document.getElementById("dNom").value.trim(), m1 = document.getElementById("dMdp").value, m2 = document.getElementById("dMdp2").value, er = document.getElementById("dErr");
