@@ -1318,7 +1318,7 @@ function tick() {
   let nowIdx = -1;
   rows.forEach((r, i) => { if (cur && nowMin >= r.start && nowMin < r.end) nowIdx = i; });
   const allDone = ref && !cur && !next;
-  const key = rows.map(r => r.start + r.label).join() + "|" + JSON.stringify(cfg.local || "") + JSON.stringify(cfg.menage ? [cfg.menage.mot, cfg.menage.min] : 0) + "|" + nowIdx + "|" + allDone + "|" + (cur ? 1 : 0);
+  const key = rows.map(r => r.start + r.label).join() + "|" + JSON.stringify(cfg.local || "") + JSON.stringify(window.menageReglages ? (m => [m.mot, m.min])(window.menageReglages()) : 0) + "|" + nowIdx + "|" + allDone + "|" + (cur ? 1 : 0);
   const ZM = zoneMenage(rows), zmK = ZM.map(z => z.i + ":" + z.start).join();
   const struct = rows.map(r => r.start + r.label).join() + "|" + (cur ? 1 : 0) + "|" + zmK, tlE = $("v-tl");
   if (lastStepsKey && key !== lastStepsKey && struct === window.__tlStruct && tlE.children.length === rows.length && list.children.length === rows.length) {
@@ -3228,7 +3228,7 @@ html.apercu-mode #menage{display:none}
   const ADMIN = () => { try { return !!localStorage.ghJeton; } catch(e) { return false; } };
   const monLocal = () => { let id = ""; try { id = localStorage.accueilLocal || ""; } catch(e) {}
     const c = cfg.local && LOC.locaux.find(l => l.id === cfg.local); if (c) return c;   /* 12 nov. : le local choisi dans Préparer le cours passe avant celui de l'appareil */
-    return LOC.locaux.find(l => l.id === id) || null; };
+    return LOC.locaux.find(l => l.id === id) || (LOC.locaux.length === 1 ? LOC.locaux[0] : null); };   /* 12 nov. : un seul local publié → c'est lui (sinon le TNI gardait l'ancienne liste perso à 10 min) */
   window.locauxListe = () => LOC.locaux;
   async function chargerLocaux(){
     try { const r = await fetch("locaux.json?t=" + Date.now(), {cache: "no-store"}); if (!r.ok) return;
