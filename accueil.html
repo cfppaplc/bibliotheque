@@ -3311,9 +3311,13 @@ html.apercu-mode #menage{display:none}
       el.style.setProperty("--u", u.toFixed(3)); el.style.setProperty("--vit", (2.6 - 2.2 * u).toFixed(2) + "s");
       el.classList.toggle("presse", reste <= Math.min(3, m.min / 2));
       const mn = Math.max(0, Math.ceil(reste));
-      document.getElementById("mnReste").textContent = "· " + (mn <= 1 ? "moins d'une minute" : mn + " min");
+      FIN_MN = Date.now() + reste * 60000; majReste();   /* 12 nov. : minutes et secondes qui descendent (mises à jour chaque seconde) */
       dessiner(); montrer(true); } else montrer(false);
   }
+  let FIN_MN = 0;
+  function majReste(){ const e = document.getElementById("mnReste"); if (!e || el.hidden || !FIN_MN) return;
+    const t = Math.max(0, Math.ceil((FIN_MN - Date.now()) / 1000)); e.textContent = Math.floor(t / 60) + ":" + String(t % 60).padStart(2, "0"); }
+  setInterval(majReste, 250);
   setInterval(verifier, 2000); setTimeout(verifier, 1500);
   // Modifier la liste (Plus → Ménage de l'atelier)
   const ed = document.getElementById("menageEd");
@@ -3564,6 +3568,10 @@ html:not(.force-dark) #mnAideT{box-shadow:0 30px 80px #1E2A4440}
   background:repeating-linear-gradient(135deg,rgba(47,179,122,.22) 0 8px,rgba(47,179,122,.08) 8px 16px);
   display:flex;align-items:center;justify-content:center;writing-mode:vertical-rl;
   color:#1E8A55;font-weight:800;font-size:calc(var(--u,1px)*30);letter-spacing:.06em;text-transform:uppercase;overflow:hidden;white-space:nowrap}
+
+/* Compte à rebours du ménage (12 nov.) */
+#menage .mn-reste{display:inline-block;margin-left:.4em;padding:.05em .45em;border-radius:.3em;background:#1E2A44;color:#fff;font-variant-numeric:tabular-nums;font-weight:800;letter-spacing:.02em}
+#menage.presse .mn-reste{background:#B5574D}
 </style>
 <script>requestAnimationFrame(function(){ setTimeout(function(){ if (window.__pretAccueil) window.__pretAccueil(); }, 280); });</script>
 </body>
