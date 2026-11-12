@@ -10075,8 +10075,10 @@ window.ACCES = (function(){
       if (nom.split(/\s+/).length < 2) return err("Écris ton prénom et ton nom.");
       if (m1.length < 10) return err("Le mot de passe doit avoir au moins 10 caractères.");
       if (m1 !== m2) return err("Les deux mots de passe ne sont pas pareils.");
-      if (!oubli && DATA && DATA.comptes[idDe(nom)]) return err("Ce nom a déjà un compte. Connecte-toi plutôt (ou « Mot de passe oublié ? »).");
-      if (oubli && !(DATA && DATA.comptes[idDe(nom)])) return err("Aucun compte à ce nom. Écris ton nom comme lors de ta première demande.");
+      let CPT = DATA && DATA.comptes;   /* la liste gardée peut être vieille (compte retiré il y a peu) : on relit celle en ligne */
+      try { const r = await fetch("comptes.json?t=" + Date.now(), { cache:"no-store" }); if (r.ok) CPT = (await r.json()).comptes || CPT; } catch(e){}
+      if (!oubli && CPT && CPT[idDe(nom)]) return err("Ce nom a déjà un compte. Connecte-toi plutôt (ou « Mot de passe oublié ? »).");
+      if (oubli && !(CPT && CPT[idDe(nom)])) return err("Aucun compte à ce nom. Écris ton nom comme lors de ta première demande.");
       const prog = [...document.querySelectorAll(".dProg:checked")].map(x => x.value); if (!oubli && !prog.length) return err("Coche au moins un programme.");
       const bt = document.getElementById("dOui"); bt.disabled = true; bt.textContent = "Création…";
       try { const code = await demande(nom, m1, prog);
