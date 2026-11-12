@@ -10573,6 +10573,11 @@ document.addEventListener("click", e => { const b = e.target.closest && e.target
 </script>
 <script src="garde-nav.js"></script>
 <script>
+/* 12 nov. (erreur reçue du TNI : « mpNavHTML is not defined ») : si garde-nav.js n'est pas arrivé (réseau lent), la page continue sans barre et le recharge une fois */
+if (typeof window.mpNavHTML !== "function"){ window.mpNavHTML = () => "";
+  const s = document.createElement("script"); s.src = "garde-nav.js?r=" + Date.now(); document.head.appendChild(s); }
+</script>
+<script>
 /* Barre de navigation dans Plans et Activités + ouverture d'un outil demandé par une autre page (?ouvrir=plans|activites|accueil|tableau) */
 (function(){
   const BTN = { plans:"planBtn", activites:"actBtn", accueil:"accueilBtn", tableau:"wbBtn" }, FERMER = ["plClose", "actBack"];
