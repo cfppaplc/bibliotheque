@@ -1037,6 +1037,7 @@ html.zflou .reader:not(.wbon) #rinner{will-change:transform}
 html.leger *,html.leger *::before,html.leger *::after{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;will-change:auto!important;transition-duration:.01s!important;transition-delay:0s!important}
 html.leger *:not(.acces-succes *):not(.acces-marque img):not(.cadenas.secoue):not(#compteBtn .cloche svg):not(.sch-gard .ok):not(.charge-r):not(.charge-b i),html.leger *::before,html.leger *::after{animation:none!important}
 html.leger{scroll-behavior:auto}
+html.leger::view-transition-old(root),html.leger::view-transition-new(root){animation:none!important}
 /* Cellulaire (7 nov., « améliore la version cellulaire ») : texte d'accueil complet (plus de « …. » ni de mention cachée) */
 @media (max-width:640px){ .hero p{display:block;-webkit-line-clamp:unset;overflow:visible;font-size:.92rem;line-height:1.45;margin-bottom:12px}
   /* Proportions sur cellulaire (8 nov., « mal proportionné ») */
@@ -1060,7 +1061,9 @@ html.leger{scroll-behavior:auto}
   function ecrire(k, v){ try { if (S) S.setItem(k, v); } catch(e){} }
   /* (7 nov.) cellulaire = mode léger d'office (sauf si « Complètes » est choisi) : petit écran tactile */
   function cell(){ try { return matchMedia("(pointer:coarse)").matches && Math.min(screen.width, screen.height) <= 600; } catch(e){ return false; } }
-  function appliquer(){ var m = lire("modeLeger"); h.classList.toggle("leger", m === "oui" || (m !== "non" && (cell() || lire("modeLegerMesure") === "lent"))); }
+  /* (12 nov.) tableau interactif = écran tactile sans souris principale (pointer:coarse) ou tactile en plus (any-pointer:coarse) sur un grand écran : mode léger d'office aussi (sauf « Complètes ») */
+  function tni(){ try { return (matchMedia("(pointer:coarse)").matches || matchMedia("(any-pointer:coarse)").matches) && Math.min(screen.width, screen.height) > 600 && !/iPad|Macintosh/.test(navigator.userAgent); } catch(e){ return false; } }
+  function appliquer(){ var m = lire("modeLeger"); h.classList.toggle("leger", m === "oui" || (m !== "non" && (cell() || tni() || lire("modeLegerMesure") === "lent"))); }
   window.modeLegerChoix = function(){ return lire("modeLeger") || "auto"; };
   window.modeLegerFixer = function(v){ try { if (!S) return; if (v === "auto") S.removeItem("modeLeger"); else S.setItem("modeLeger", v); } catch(e){} appliquer(); if (v === "auto") mesurer(); };
   appliquer();

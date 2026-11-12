@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<!-- © 2026 Jérémy Raymond. Tous droits réservés. -->
+<html lang="fr"><head><meta charset="utf-8"><script src="vieux-navigateur.js"></script>
+<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
+<title>Métier+ — Test de vitesse</title><link rel="icon" href="img/icone-32.png">
+<style>
+body{margin:0;font:18px/1.45 "Segoe UI",Roboto,sans-serif;background:#0e1320;color:#eef1f6}
+main{max-width:980px;margin:0 auto;padding:28px 24px 60px}
+h1{font-size:30px;margin:6px 0 4px}h2{font-size:21px;margin:26px 0 10px;color:#F28A3C}
+.c{background:#161d2c;border:1px solid #2a3348;border-radius:14px;padding:16px 18px;margin:10px 0}
+table{width:100%;border-collapse:collapse}td{padding:7px 4px;border-bottom:1px solid #2a3348}td:first-child{color:#a9b2c3;width:46%}
+button{font:inherit;font-weight:700;border:0;border-radius:12px;padding:16px 22px;min-height:56px;background:#EB6A22;color:#fff;cursor:pointer;margin:4px 6px 4px 0}
+button.g{background:#232c40}button.on{outline:3px solid #F28A3C}
+.res{font-size:22px;font-weight:700}.ok{color:#4ade80}.moy{color:#facc15}.mal{color:#f87171}
+#scene{position:relative;height:220px;overflow:hidden;border-radius:12px;background:#fff;margin-top:12px}
+#scene .pg{position:absolute;inset:0;background:repeating-linear-gradient(0deg,#fff 0 30px,#eef 30px 31px);display:flex;align-items:center;justify-content:center;color:#1E2A44;font-size:40px;font-weight:800}
+#scene .flou{position:absolute;inset:0;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+textarea{width:100%;box-sizing:border-box;height:150px;font:14px monospace;background:#0b0f19;color:#cfd6e3;border:1px solid #2a3348;border-radius:10px;padding:10px}
+</style></head><body><main>
+<img src="img/metier-plus-blanc.svg" alt="Métier+" style="height:30px">
+<h1>Test de vitesse de cet écran</h1>
+<p>Ouvre cette page sur le tableau interactif et touche « Lancer le test ». Ça prend environ 20 secondes. Ensuite, touche « Copier le résultat » et envoie-le à Claude.</p>
+<div class="c"><table id="info"></table></div>
+<button id="go">Lancer le test</button>
+<div id="scene" hidden><div class="pg" id="pg">Page 1</div></div>
+<div class="c" id="resC" hidden><table id="res"></table></div>
+<h2>Animations de Métier+ sur cet écran</h2>
+<div class="c"><p id="modeTxt" style="margin:0 0 8px"></p>
+<button class="g" data-m="auto">Automatique</button><button class="g" data-m="oui">Légères</button><button class="g" data-m="non">Complètes</button></div>
+<button class="g" id="copie">Copier le résultat</button>
+<textarea id="out" readonly></textarea>
+</main>
+<script>
+(function(){
+  var R = {}, $ = function(i){ return document.getElementById(i); };
+  function mm(q){ try { return matchMedia(q).matches; } catch(e){ return false; } }
+  function info(){
+    R.navigateur = navigator.userAgent; R.ecran = screen.width + " × " + screen.height + " (× " + (devicePixelRatio || 1) + ")";
+    R.fenetre = innerWidth + " × " + innerHeight; R.processeurs = navigator.hardwareConcurrency || "?"; R.memoire = navigator.deviceMemory ? navigator.deviceMemory + " Go" : "?";
+    R.pointeur = (mm("(pointer:coarse)") ? "tactile" : mm("(pointer:fine)") ? "souris" : "aucun") + (mm("(any-pointer:coarse)") ? " · tactile présent" : "");
+    R.animationsSysteme = mm("(prefers-reduced-motion:reduce)") ? "coupées" : "actives";
+    var m = null; try { m = localStorage.getItem("modeLeger"); } catch(e){}
+    var tn = (mm("(pointer:coarse)") || mm("(any-pointer:coarse)")) && Math.min(screen.width, screen.height) > 600 && !/iPad|Macintosh/.test(navigator.userAgent), pc = mm("(pointer:coarse)") && Math.min(screen.width, screen.height) <= 600;
+    R.modeLeger = m || ("automatique (" + (tn || pc ? "légères ici : écran tactile" : "complètes ici") + ")"); R.mesure = (function(){ try { return localStorage.getItem("modeLegerMesure") || "-"; } catch(e){ return "-"; } })();
+    var L = [["Écran", R.ecran], ["Fenêtre", R.fenetre], ["Processeurs", R.processeurs], ["Mémoire", R.memoire], ["Pointeur", R.pointeur], ["Effets d'animation du système", R.animationsSysteme], ["Animations de Métier+", R.modeLeger]];
+    $("info").innerHTML = L.map(function(x){ return "<tr><td>" + x[0] + "</td><td>" + x[1] + "</td></tr>"; }).join("");
+    $("modeTxt").textContent = "Choix actuel : " + ({ oui:"Légères", non:"Complètes" }[R.modeLeger] || R.modeLeger.replace(/^a/, "A")) + ". « Légères » = sans flou ni transitions (plus rapide au tableau).";
+    [].forEach.call(document.querySelectorAll("[data-m]"), function(b){ b.classList.toggle("on", (/^automatique/.test(R.modeLeger) ? "auto" : R.modeLeger) === b.dataset.m); });
+    sortie();
+  }
+  function sortie(){ $("out").value = Object.keys(R).map(function(k){ return k + " : " + (typeof R[k] === "object" ? JSON.stringify(R[k]) : R[k]); }).join("\n"); }
+  function mesurer(duree, avant, cb){ var t = [], d0 = performance.now(), prec = d0, n = 0;
+    function f(now){ t.push(now - prec); prec = now; avant(n++); if (now - d0 < duree) requestAnimationFrame(f); else { t.shift(); t.sort(function(a, b){ return a - b; }); cb({ med:t[t.length >> 1] || 0, p95:t[Math.floor(t.length * .95)] || 0, n:t.length }); } }
+    requestAnimationFrame(f); }
+  function note(ms){ return ms < 20 ? '<span class="ok">fluide</span>' : ms < 40 ? '<span class="moy">un peu lent</span>' : '<span class="mal">lent</span>'; }
+  function ligne(nom, r){ return "<tr><td>" + nom + "</td><td class=res>" + Math.round(1000 / Math.max(r.med, 1)) + " images/s · " + note(r.p95) + "</td></tr>"; }
+  $("go").onclick = function(){
+    var sc = $("scene"), pg = $("pg"), out = [], b = this; b.disabled = true; b.textContent = "Test en cours…"; sc.hidden = false; $("resC").hidden = false; $("res").innerHTML = "";
+    mesurer(3000, function(){}, function(r1){ R.repos = r1; $("res").innerHTML += ligne("Au repos", r1);
+      mesurer(4000, function(n){ pg.style.transform = "translateX(" + (Math.sin(n / 10) * 60) + "px)"; }, function(r2){ R.glisser = r2; pg.style.transform = ""; $("res").innerHTML += ligne("Page qui glisse", r2);
+        var f = document.createElement("div"); f.className = "flou"; sc.appendChild(f);
+        mesurer(4000, function(n){ pg.style.transform = "translateX(" + (Math.sin(n / 10) * 60) + "px)"; }, function(r3){ R.flou = r3; f.remove(); pg.style.transform = ""; $("res").innerHTML += ligne("Avec flou (effet vitré)", r3);
+          var t0 = performance.now(), i = 0; (function tour(){ pg.textContent = "Page " + (++i); pg.style.opacity = 0; pg.animate([{ opacity:0, translate:"0 8px" }, { opacity:1, translate:"0 0" }], { duration:450 }).onfinish = function(){ pg.style.opacity = 1; if (i < 8) tour(); else { R.tourner8pages = Math.round(performance.now() - t0) + " ms (idéal 3600)"; $("res").innerHTML += "<tr><td>8 pages tournées</td><td class=res>" + R.tourner8pages + "</td></tr>";
+            var h0 = performance.now(), big = document.createElement("div"); big.innerHTML = new Array(4000).join('<p style="margin:0">Texte de page pour mesurer.</p>'); document.body.appendChild(big); big.offsetHeight; R.miseEnPage = Math.round(performance.now() - h0) + " ms"; big.remove();
+            $("res").innerHTML += "<tr><td>Mise en page lourde</td><td class=res>" + R.miseEnPage + "</td></tr>";
+            sc.hidden = true; b.disabled = false; b.textContent = "Relancer le test"; sortie(); } }; })(); }); }); });
+  };
+  [].forEach.call(document.querySelectorAll("[data-m]"), function(b){ b.onclick = function(){ try { if (b.dataset.m === "auto") localStorage.removeItem("modeLeger"); else localStorage.setItem("modeLeger", b.dataset.m); } catch(e){} info(); }; });
+  $("copie").onclick = function(){ var t = $("out"); t.select(); try { navigator.clipboard.writeText(t.value); } catch(e){ document.execCommand("copy"); } this.textContent = "Copié !"; };
+  info();
+})();
+</script></body></html>
