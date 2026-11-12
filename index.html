@@ -432,6 +432,7 @@ body.clair .act-top #actBack{color:#1E2A44!important}
     [hidden]{display:none!important}
   .rstage{flex:1;min-height:0;overflow:auto;position:relative;background:#111}
   .reader:not(.wbon) .rstage{scrollbar-width:none}
+  .reader.zredess:not(.wbon) .rstage{background:#fff}
   .reader:not(.wbon) .rstage::-webkit-scrollbar{display:none}
   .rinner{position:relative}
   /* (7 nov.) zoom « comme une photo » : dans un livre, #rscale garde toujours la taille de l'écran (le livre n'est jamais recalculé)
@@ -2209,6 +2210,9 @@ function zoomSourisFin(){
   const px = ZS.px1 == null ? ZS.px : ZS.px1, py = ZS.py1 == null ? ZS.py : ZS.py1;
   const cx = ((px - (ZS.mx0 - ZS.sl) - ZS.tx) / ZS.s) / (ZS.z0 * K), cy = ((py - (ZS.my0 - ZS.stp) - ZS.ty) / ZS.s) / (ZS.z0 * K), z = ZS.z;
   ZS.on = false; ZS.px1 = ZS.py1 = null; inn.style.transform = ""; inn.style.transformOrigin = ""; inn.style.willChange = ""; $("#reader").classList.remove("zg"); $("#inkCanvas").style.visibility = "";
+  /* (12 nov., vidéo du TNI) après un zoom, le tableau met ~2 s à redessiner la page agrandie : on voyait le fond noir (écran noir).
+     Pendant ce temps, fond blanc comme la page : on ne voit plus de flash noir. */
+  if (!RD.wb){ const R = $("#reader"); R.classList.add("zredess"); clearTimeout(ZS.blanc); ZS.blanc = setTimeout(() => R.classList.remove("zredess"), 3500); }
   if (Math.abs(z - RD.z) > .002){ setZoom(z, true);
     st.scrollLeft = cx * RD.z * K + (RD.mx || 0) - px; st.scrollTop = cy * RD.z * K + (RD.my || 0) - py; }
   try { sizeInner(); } catch(e){}   /* toile et dessin remis nets */
