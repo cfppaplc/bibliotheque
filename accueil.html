@@ -924,6 +924,7 @@ html.ui-clair #apercuOv .ap-moments button.on, html.ui-clair #apercuOv .ap-ferme
     </div>
     <div class="field"><label for="f-compt" class="step-q"><span class="num">2</span>Quelle compétence? <span class="tip-i" tabindex="0" role="img" aria-label="Aide : Elle s'affiche aux élèves et choisit le logo du programme. Tape les premières lettres pour la trouver." data-tip="Elle s'affiche aux élèves et choisit le logo du programme. Tape les premières lettres pour la trouver.">?</span></label>
       <select id="f-compt"></select><input id="f-module" placeholder="Nom du module, si « Autre »">
+      <div class="local-choix" id="f-local" role="group" aria-label="Local"></div>
       <select id="f-prog" hidden><option value="5333">DEP 5333 · Plomberie et chauffage</option><option value="5211">DEP 5211 · Entretien général d'immeubles</option></select><select id="f-comp" hidden></select></div>
     </div><div class="p2-d">
     <div class="field"><span class="step-q"><span class="num">3</span><span id="f-q3">Qu'est-ce qu'on fait?</span> <span class="tip-i" tabindex="0" role="img" aria-label="Aide : Une activité par rangée, dans l'ordre. Règle la durée avec − et +, ou laisse « auto ». Ajoute un livre, un quiz ou un fichier à ouvrir pendant l'activité. Glisse ⋮⋮ pour changer l'ordre." data-tip="Une activité par rangée, dans l'ordre. Règle la durée avec − et +, ou laisse « auto ». Ajoute un livre, un quiz ou un fichier à ouvrir pendant l'activité. Glisse ⋮⋮ pour changer l'ordre.">?</span></span>
@@ -1317,8 +1318,9 @@ function tick() {
   let nowIdx = -1;
   rows.forEach((r, i) => { if (cur && nowMin >= r.start && nowMin < r.end) nowIdx = i; });
   const allDone = ref && !cur && !next;
-  const key = rows.map(r => r.start + r.label).join() + "|" + nowIdx + "|" + allDone + "|" + (cur ? 1 : 0);
-  const struct = rows.map(r => r.start + r.label).join() + "|" + (cur ? 1 : 0), tlE = $("v-tl");
+  const key = rows.map(r => r.start + r.label).join() + "|" + JSON.stringify(cfg.local || "") + JSON.stringify(cfg.menage ? [cfg.menage.mot, cfg.menage.min] : 0) + "|" + nowIdx + "|" + allDone + "|" + (cur ? 1 : 0);
+  const ZM = zoneMenage(rows), zmK = ZM.map(z => z.i + ":" + z.start).join();
+  const struct = rows.map(r => r.start + r.label).join() + "|" + (cur ? 1 : 0) + "|" + zmK, tlE = $("v-tl");
   if (lastStepsKey && key !== lastStepsKey && struct === window.__tlStruct && tlE.children.length === rows.length && list.children.length === rows.length) {
     /* 10 nov. (« léger reloading » au changement de bloc) : même déroulement, seul le bloc en cours change → classes mises à jour sur place, sans tout redessiner */
     lastStepsKey = key;
@@ -1343,6 +1345,8 @@ function tick() {
       const lks2 = r.pause ? [] : liensDe(r.label);
       if (lks2.length){ const ic = document.createElement("span"); ic.className = "seg-lk"; ic.innerHTML = lks2.map(c => ico(c.type)).join(""); d.append(ic); d.classList.add("a-lien"); d.title += " · clique pour ouvrir : " + lks2.map(nomLien).join(" ou "); d.onclick = e => clicSimple(() => ouvrirLiens(lks2, e)); }
       if (!r.pause){ d.title += " · double-clic : lier une action"; d.ondblclick = e => { e.preventDefault(); lierActivite(r.label); }; }
+      const zm = ZM.find(z => z.i === i);
+      if (zm){ const b = document.createElement("span"); b.className = "seg-mn"; b.style.left = (100 * (zm.start - r.start) / len).toFixed(1) + "%"; b.textContent = "Ménage"; d.append(b); d.title += " · ménage à " + fmt(zm.start); }
       tl.append(d);
     });
     rows.forEach((r, i) => {
@@ -2168,7 +2172,7 @@ const cleSlot = (jour, per) => (jour || isoJour(new Date())) + "|" + per;
 function slotActif(){ const d = new Date(), m = d.getHours() * 60 + d.getMinutes(), ps = periods();
   const p = ps.find(x => m >= x.start && m < x.end) || ps.find(x => x.start > m); return p ? isoJour(d) + "|" + p.key : null; }
 function perPassee(per){ const d = new Date(), m = d.getHours() * 60 + d.getMinutes(), p = periods().find(x => x.key === per); return !p || m >= p.end; }
-function contenuActuel(){ return { prog: cfg.prog, comp: cfg.comp, module: cfg.module, steps: cfg.steps, liens: cfg.liens || {}, examen: cfg.examen === jourAuj(), duree: +cfg.duree || SPAN, debut: cfg.debut || "" }; }
+function contenuActuel(){ return { prog: cfg.prog, comp: cfg.comp, module: cfg.module, steps: cfg.steps, liens: cfg.liens || {}, examen: cfg.examen === jourAuj(), duree: +cfg.duree || SPAN, debut: cfg.debut || "", local: cfg.local || "" }; }
 function contenuDe(k){ if (k === cfg.slot) return contenuActuel(); return (cfg.plans || {})[k] || null; }
 let JOUR_PREP = "", PER_PREP = "am";
 function remplirPrep(jour, per){
@@ -2179,7 +2183,7 @@ function remplirPrep(jour, per){
   $("f-comp").value = P.comp; $("f-module").value = P.module || ""; $("f-steps").value = P.steps || "";
   $("f-amStart").value = cfg.amStart; $("f-pmStart").value = cfg.pmStart;
   $("f-module").hidden = $("f-comp").value !== "autre";
-  $("f-exam").checked = !!P.examen;
+  $("f-exam").checked = !!P.examen; localChoix(P.local || "");
   $("f-duree").value = String(DUREES.some(d => d[0] === +P.duree) ? +P.duree : SPAN);
   heuresDebut(P.debut || (per === "pm" ? cfg.pmStart : cfg.amStart));
   LIENS_T = JSON.parse(JSON.stringify(P.liens || {}));
@@ -2259,6 +2263,26 @@ function boutonsJours(){
   semaine();
   const d = +$("f-duree").value || SPAN, res = $("f-opts-res"); if (res) res.textContent = (d === SPAN ? "période complète" : (DUREES.find(x => x[0] === d) || [0, d + " min"])[1]) + ($("f-exam").checked ? " · examen" : "");
 }
+/* Local du cours (12 nov., Jeremy) : « atelier » = ménage à la fin du cours; « classe » = pas de ménage; vide = ancienne règle (nom d'activité) */
+let LOCAL_F = "";
+/* Choix : « Classe » (pas de ménage) + les locaux de locaux.json (ex. Atelier DEP1 : sa liste de ménage, à la fin du cours); aucun locaux.json → « Atelier » */
+function localChoix(v){ LOCAL_F = v || ""; const box = $("f-local"); if (!box) return;
+  const L = (window.locauxListe ? window.locauxListe() : []) || [], opts = [["classe", "Classe"]].concat(L.length ? L.map(l => [l.id, l.nom]) : [["atelier", "Atelier"]]);
+  if (LOCAL_F && !opts.some(o => o[0] === LOCAL_F)) opts.push([LOCAL_F, LOCAL_F === "atelier" ? "Atelier" : "Local retiré"]);
+  box.innerHTML = '<span>Local</span>'; opts.forEach(([id, nom]) => { const b = document.createElement("button"); b.type = "button"; b.dataset.l = id; b.textContent = nom;
+    b.classList.toggle("on", id === LOCAL_F); b.onclick = () => localChoix(LOCAL_F === id ? "" : id); box.append(b); });
+  const r = document.createElement("small"); r.textContent = !LOCAL_F ? "" : LOCAL_F === "classe" ? "Pas de ménage" : "Ménage à la fin du cours"; box.append(r); }
+/* Zones de ménage d'un déroulement (frise + plein écran du ménage) : [{i, start, end}] */
+function zoneMenage(rows){
+  const m = Object.assign({ mot:"atelier", min:10 }, window.menageReglages ? window.menageReglages() : (cfg.menage || {})), Z = [];
+  if (cfg.local){ if (cfg.local === "classe") return Z;
+    for (let i = rows.length - 1; i >= 0; i--) if (!rows[i].pause){ const r = rows[i]; Z.push({ i, start: Math.max(r.start, r.end - m.min), end: r.end }); break; }
+    return Z; }
+  const ok = (l, w) => window.menageMot ? window.menageMot(l, w) : String(l).toLowerCase().includes(String(w).toLowerCase());
+  rows.forEach((r, i) => { if (!r.pause && m.mot && ok(r.label, m.mot)) Z.push({ i, start: Math.max(r.start, r.end - m.min), end: r.end }); });
+  return Z;
+}
+window.zoneMenage = zoneMenage;
 /* Cours effacé : on note quand (cfg.plansSup), sinon la copie du coffre le ramenait (10 nov.) */
 function effacerPlan(k){ if (!cfg.plans) return; delete cfg.plans[k]; cfg.plansSup = cfg.plansSup || {}; cfg.plansSup[k] = Date.now(); }
 function appliquerPlans(){
@@ -2268,7 +2292,7 @@ function appliquerPlans(){
   const arrives = Object.keys(plans).filter(k => k <= borne).sort();
   if (arrives.length){ const k = arrives[arrives.length - 1], P = plans[k], ici = k === s;
     ["prog", "comp", "module", "steps"].forEach(x => { if (P[x] !== undefined) cfg[x] = P[x]; });
-    cfg.liens = P.liens || {}; cfg.examen = ici && P.examen ? jourAuj() : ""; cfg.duree = ici ? (+P.duree || SPAN) : SPAN; cfg.debut = ici ? (P.debut || "") : "";
+    cfg.liens = P.liens || {}; cfg.examen = ici && P.examen ? jourAuj() : ""; cfg.duree = ici ? (+P.duree || SPAN) : SPAN; cfg.debut = ici ? (P.debut || "") : ""; cfg.local = P.local || "";
     cfg.slot = s || cfg.slot; arrives.forEach(x => delete plans[x]); change = true; }
   else if (s && cfg.slot !== s){         /* nouvelle période sans contenu préparé : même contenu, horaire habituel */
     const vieux = cfg.slot; cfg.slot = s; if (vieux){ cfg.duree = SPAN; cfg.debut = ""; if (vieux.split("|")[0] !== auj) cfg.examen = ""; } change = true; }
@@ -2294,10 +2318,10 @@ $("prepForm").addEventListener("submit", e => {
   const k = cleSlot(JOUR_PREP, PER_PREP), duree = +$("f-duree").value || SPAN, defaut = PER_PREP === "pm" ? cfg.pmStart : cfg.amStart, debut = $("f-debut").value && $("f-debut").value !== defaut ? $("f-debut").value : "";
   if (k !== (slotActif() || cfg.slot)){   /* une autre période : on la garde, le tableau ne change pas */
     cfg.plans = cfg.plans || {};
-    cfg.plans[k] = { prog: $("f-prog").value, comp: $("f-comp").value, module: $("f-module").value, steps: $("f-steps").value, liens: JSON.parse(JSON.stringify(LIENS_T)), examen: $("f-exam").checked, duree, debut, t: Date.now() }; if (cfg.plansSup) delete cfg.plansSup[k];
+    cfg.plans[k] = { local: LOCAL_F, prog: $("f-prog").value, comp: $("f-comp").value, module: $("f-module").value, steps: $("f-steps").value, liens: JSON.parse(JSON.stringify(LIENS_T)), examen: $("f-exam").checked, duree, debut, t: Date.now() }; if (cfg.plansSup) delete cfg.plansSup[k];
     save(); $("prep").hidden = true; peMsg("Cours " + (JOUR_PREP ? "de " + nomJour(JOUR_PREP).toLowerCase() : "d'aujourd'hui") + " " + (PER_PREP === "am" ? "matin" : "après-midi") + " enregistré : il s'affichera tout seul."); return;
   }
-  cfg.slot = k; cfg.duree = duree; cfg.debut = debut;
+  cfg.slot = k; cfg.duree = duree; cfg.debut = debut; cfg.local = LOCAL_F;
   ["comp", "module", "steps", "prog"].forEach(k => cfg[k] = $("f-" + k).value);
   cfg.liens = JSON.parse(JSON.stringify(LIENS_T)); lastStepsKey = ""; setTimeout(menageFichiers, 500);
   cfg.examen = $("f-exam").checked ? jourAuj() : "";
@@ -3198,13 +3222,17 @@ html.apercu-mode #menage{display:none}
   let LOC = {maj: 0, locaux: []};
   try { const c = JSON.parse(localStorage.locauxCache || "null"); if (c && c.locaux) LOC = c; } catch(e) {}
   const ADMIN = () => { try { return !!localStorage.ghJeton; } catch(e) { return false; } };
-  const monLocal = () => { let id = ""; try { id = localStorage.accueilLocal || ""; } catch(e) {} return LOC.locaux.find(l => l.id === id) || null; };
+  const monLocal = () => { let id = ""; try { id = localStorage.accueilLocal || ""; } catch(e) {}
+    const c = cfg.local && LOC.locaux.find(l => l.id === cfg.local); if (c) return c;   /* 12 nov. : le local choisi dans Préparer le cours passe avant celui de l'appareil */
+    return LOC.locaux.find(l => l.id === id) || null; };
+  window.locauxListe = () => LOC.locaux;
   async function chargerLocaux(){
     try { const r = await fetch("locaux.json?t=" + Date.now(), {cache: "no-store"}); if (!r.ok) return;
-      const j = await r.json(); if (j && j.locaux && (j.maj || 0) >= (LOC.maj || 0)) { LOC = j; localStorage.locauxCache = JSON.stringify(j); rendu = ""; } } catch(e) {}
+      const j = await r.json(); if (j && j.locaux && (j.maj || 0) >= (LOC.maj || 0)) { LOC = j; localStorage.locauxCache = JSON.stringify(j); rendu = ""; try { if (!$("prep").hidden) localChoix(LOCAL_F); } catch(x) {} } } catch(e) {}
   }
   chargerLocaux(); setInterval(chargerLocaux, 10 * 60 * 1000);
   const M = () => { const L = monLocal(); return Object.assign({}, DEF, L ? L.menage : (cfg.menage || {}), APERCU || {}); };
+  window.menageReglages = M;
   const norm = x => String(x || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
   /* « atelier » reconnu malgré majuscules, accents, s, lettres doublées ou une petite faute (attelier, atlier, ateleir…) */
   const serre = x => norm(x).replace(/[^a-z0-9]+/g, " ").replace(/(.)\1+/g, "$1").trim();
@@ -3266,8 +3294,8 @@ html.apercu-mode #menage{display:none}
     const m = M(), now = new Date(), nowMin = now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60;
     let actif = null;
     try { const ps = periods(), cur = ps.find(p => nowMin >= p.start && nowMin < p.end);
-      if (cur && m.mot) { const r = timeline(cur.start, cfg.steps).find(r => !r.pause && nowMin >= r.start && nowMin < r.end && contientMot(r.label, m.mot));
-        if (r && r.end - nowMin <= m.min) actif = r; } } catch(e) {}
+      if (cur) { const rows = timeline(cur.start, cfg.steps), z = zoneMenage(rows).find(z => nowMin >= z.start && nowMin < z.end);
+        if (z) actif = rows[z.i]; } } catch(e) {}   /* 12 nov. : zones partagées avec la frise (local « Atelier » = fin du cours) */
     const jour = now.toISOString().slice(0, 10);
     actifVu = !!actif; document.getElementById("mnMini").textContent = force && !actif ? "✕" : "–"; el.classList.toggle("apercu", !!(force && !actif));
     if (actif) { cle = jour + "|" + Math.round(actif.start); force = false;
@@ -3521,6 +3549,17 @@ html:not(.force-dark) #mnAideT{box-shadow:0 30px 80px #1E2A4440}
   html.style-pro .period-hours { display: block; }
   #mpCoin { display: none !important; }
 }
+
+/* Local du cours + ménage sur la frise (12 nov.) */
+.local-choix{display:flex;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap}
+.local-choix>span{font-weight:600;opacity:.8;margin-right:4px}
+.local-choix button{min-height:40px;padding:0 18px;border-radius:999px;border:1px solid color-mix(in srgb,currentColor 25%,transparent);background:transparent;color:inherit;font:inherit;cursor:pointer}
+.local-choix button.on{background:#EB6A22;border-color:#EB6A22;color:#fff}
+.local-choix small{opacity:.7}
+.seg-mn{position:absolute;top:0;bottom:0;right:0;z-index:1;pointer-events:none;border-left:2px dashed #2FB37A;
+  background:repeating-linear-gradient(135deg,rgba(47,179,122,.22) 0 8px,rgba(47,179,122,.08) 8px 16px);
+  display:flex;align-items:center;justify-content:center;writing-mode:vertical-rl;
+  color:#1E8A55;font-weight:800;font-size:calc(var(--u,1px)*30);letter-spacing:.06em;text-transform:uppercase;overflow:hidden;white-space:nowrap}
 </style>
 <script>requestAnimationFrame(function(){ setTimeout(function(){ if (window.__pretAccueil) window.__pretAccueil(); }, 280); });</script>
 </body>
