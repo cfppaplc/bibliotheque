@@ -9854,7 +9854,7 @@ window.ACCES = (function(){
 
   let estPret = false, finPret; const pret = new Promise(r => finPret = r);
   async function charger(){
-    try { const r = await fetch("comptes.json", { cache:"no-cache" }); DATA = r.ok ? await r.json() : null; } catch(e){ DATA = null; }
+    try { const r = await fetch("comptes.json?t=" + Date.now(), { cache:"no-store" }); DATA = r.ok ? await r.json() : null; } catch(e){ DATA = null; }
     if (!DATA) try { DATA = JSON.parse(localStorage.getItem("accesCopie") || "null"); } catch(e){}          /* hors ligne : dernière copie */
     else try { localStorage.setItem("accesCopie", JSON.stringify(DATA)); } catch(e){}
     try { const s = await idbGet("session"); if (s && DATA && DATA.comptes[s.id]) SESSION = Object.assign(s, { nom:DATA.comptes[s.id].nom, admin:!!DATA.comptes[s.id].admin, eleve:!!DATA.comptes[s.id].eleve }); } catch(e){}
@@ -10101,8 +10101,14 @@ window.ACCES = (function(){
   /* ---- gestion des accès (admin) : demandes, cases à cocher par livre, publication ---- */
   let BROUILLON = null;
   const titreDe = f => { const l = LIVRES.find(x => x.fichier === f); return l ? l.titre : f; };
-  function dlgGerer(){
+  async function enLigne(){   /* la liste des comptes telle qu'elle est vraiment sur GitHub (pas une copie en cache) */
+    let jt = ""; try { jt = localStorage.getItem("ghJeton") || ""; } catch(e){}
+    if (jt) try { const r = await fetch("https://api.github.com/repos/" + DEPOT + "/contents/comptes.json?ref=main&t=" + Date.now(), { headers:{ Authorization:"Bearer " + jt, Accept:"application/vnd.github.raw+json" }, cache:"no-store" }); if (r.ok) return await r.json(); } catch(e){}
+    try { const r = await fetch("comptes.json?t=" + Date.now(), { cache:"no-store" }); if (r.ok) return await r.json(); } catch(e){}
+    return null; }
+  async function dlgGerer(){
     if (!SESSION || !SESSION.admin) return;
+    const frais = await enLigne(); if (frais){ DATA = frais; try { localStorage.setItem("accesCopie", JSON.stringify(DATA)); } catch(e){} }
     BROUILLON = JSON.parse(JSON.stringify(DATA)); REGL = clone(REGLAGES); FORCER_RECH.clear(); box().classList.add("large", "gestion"); ov().hidden = false; dessinerGerer();
   }
   const OUVERTS = new Set();
@@ -10298,7 +10304,10 @@ window.ACCES = (function(){
       let jt = document.getElementById("gJeton").value.trim(); if (!jt) jt = jeton; if (!jt) return dessinerGerer({ err:"Colle d'abord ta clé GitHub (ou utilise « Télécharger comptes.json »)." });
       try { localStorage.setItem("ghJeton", jt); } catch(e){}
       const bt = document.getElementById("gPub"); bt.disabled = true; bt.textContent = "Publication…";
-      try { const D2 = clone(BROUILLON), fichiers = {}, rch = document.getElementById("gRech") && document.getElementById("gRech").checked ? aRech : [];
+      try { const frais = await enLigne();   /* quelqu'un (ou un autre appareil) a publié depuis l'ouverture du panneau : ne pas écraser son travail */
+        if (frais && JSON.stringify(frais.comptes) !== JSON.stringify(DATA.comptes)){ DATA = frais; BROUILLON = clone(frais); try { localStorage.setItem("accesCopie", JSON.stringify(DATA)); } catch(e){}
+          return dessinerGerer({ err:"La liste des comptes a changé en ligne depuis que tu as ouvert ce panneau (autre appareil ou autre publication). Je l'ai rechargée : refais tes changements, puis « Publier »." }); }
+        const D2 = clone(BROUILLON), fichiers = {}, rch = document.getElementById("gRech") && document.getElementById("gRech").checked ? aRech : [];
         for (const f of rch){ bt.textContent = "Nouvelle clé : « " + titreDe(f) + " »…"; Object.assign(fichiers, await rechiffrer(f, D2)); }
         if (JSON.stringify(D2) !== JSON.stringify(DATA)) fichiers["comptes.json"] = JSON.stringify(D2, null, 1);
         if (JSON.stringify(REGL) !== JSON.stringify(REGLAGES)) fichiers["reglages.json"] = JSON.stringify(REGL, null, 1);
@@ -10408,11 +10417,11 @@ window.ACCES = (function(){
   async function accepterDepuisLien(){
     const m = location.hash.match(/^#accepter=(.+)$/); if (!m) return; await pret;
     const code = "DEMANDE-" + decodeURIComponent(m[1]); history.replaceState(null, "", location.pathname + location.search);
-    const go = () => { if (!SESSION || !SESSION.admin){ aviser("Ce lien est pour Jeremy (compte administrateur)."); return; } dlgGerer(); const t = document.getElementById("gDem"); if (t){ t.value = code; document.getElementById("gAjout").click(); } };
+    const go = async () => { if (!SESSION || !SESSION.admin){ aviser("Ce lien est pour Jeremy (compte administrateur)."); return; } await dlgGerer(); const t = document.getElementById("gDem"); if (t){ t.value = code; document.getElementById("gAjout").click(); } };
     if (SESSION) go(); else dlgConnexion(go);
   }
   setTimeout(() => { const b = document.getElementById("compteBtn"); if (b) b.onclick = menu; charger(); accepterDepuisLien(); invitationDepuisLien(); }, 0);
-  return { pret, get estPret(){ return estPret; }, protege, permis, verrouille, ouvrir, recherche, connexion, deconnexion, demande, lireDemande, dlgConnexion, dlgDemande, menu, get session(){ return SESSION; }, get eleve(){ return !!(SESSION && SESSION.eleve); }, get data(){ return DATA; }, charger, outils:{ commitGitHub:(...a) => commitGitHub(...a), envelopperPour:(...a) => envelopperPour(...a), BOITE, sansAcc:t => sansAcc(t),
+  return { pret, get estPret(){ return estPret; }, protege, permis, verrouille, ouvrir, recherche, connexion, deconnexion, demande, lireDemande, dlgConnexion, dlgDemande, menu, get session(){ return SESSION; }, get eleve(){ return !!(SESSION && SESSION.eleve); }, get data(){ return DATA; }, charger, outils:{ enLigne:() => enLigne(), commitGitHub:(...a) => commitGitHub(...a), envelopperPour:(...a) => envelopperPour(...a), BOITE, sansAcc:t => sansAcc(t),
     integrer(f, livre, ajouts){ if (f && livre){ DATA.livres[f] = JSON.parse(JSON.stringify(livre)); if (BROUILLON) BROUILLON.livres[f] = JSON.parse(JSON.stringify(livre)); } if (REGL) REGL.ajouts = JSON.parse(JSON.stringify(ajouts || [])); } } };
 })();
 </script>

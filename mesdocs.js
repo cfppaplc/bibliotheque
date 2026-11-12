@@ -368,7 +368,7 @@ window.MESDOCS = (function(){
       const brut = crypto.getRandomValues(new Uint8Array(32)), k = await crypto.subtle.importKey("raw", brut, "AES-GCM", false, ["encrypt"]), iv = crypto.getRandomValues(new Uint8Array(12));
       const c = new Uint8Array(await crypto.subtle.encrypt({ name:"AES-GCM", iv }, k, gz)), out = new Uint8Array(12 + c.length); out.set(iv); out.set(c, 12);
       files["livres/" + f + ".chiffre"] = out;
-      const C = JSON.parse(JSON.stringify(ACCES.data)); livre = { cles:{} };
+      const C = JSON.parse(JSON.stringify((ACCES.outils.enLigne && await ACCES.outils.enLigne()) || ACCES.data)); livre = { cles:{} };   /* liste à jour, pas la copie du début */
       for (const id in C.comptes){ const x = C.comptes[id]; if (x.admin || (x.prog || []).includes(p.prog)) livre.cles[id] = await ACCES.outils.envelopperPour(brut, x.pub); }
       C.livres[f] = livre; files["comptes.json"] = JSON.stringify(C, null, 1);
       if (jpg){ files["img/couv/" + f + ".jpg"] = jpg; ent.couv = 1; } }
