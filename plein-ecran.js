@@ -5,6 +5,33 @@
   if (window.top !== window || /[?&]inclus=1/.test(location.search)) return;
   var d = document;
   if (!(d.fullscreenEnabled || d.webkitFullscreenEnabled)) return;
+
+  /* Garder le plein écran d'une page à l'autre (12 nov., « quand on clique sur Labo, ça revient en écran normal ») :
+     le navigateur quitte toujours le plein écran en changeant de page et ne permet de le redemander qu'après un geste.
+     Page quittée en plein écran → drapeau; sur la page suivante, le 1er toucher ou la 1re touche le rétablit. */
+  function enFs(){ return d.fullscreenElement || d.webkitFullscreenElement; }
+  window.addEventListener("pagehide", function(){ try { if (enFs()) sessionStorage.mpPleinEcran = String(Date.now()); } catch(x){} });
+  var t0 = 0; try { t0 = +sessionStorage.mpPleinEcran || 0; sessionStorage.removeItem("mpPleinEcran"); } catch(x){}
+  if (t0 && Date.now() - t0 < 120000) {
+    var bulle = null;
+    var retablir = function(){
+      d.removeEventListener("pointerup", retablir, true); d.removeEventListener("keydown", retablir, true); d.removeEventListener("touchend", retablir, true);
+      if (bulle) bulle.remove();
+      if (enFs()) return;
+      try { var r = d.documentElement; var p = (r.requestFullscreen || r.webkitRequestFullscreen).call(r); if (p && p.catch) p.catch(function(){}); } catch(x){}
+    };
+    d.addEventListener("pointerup", retablir, true); d.addEventListener("keydown", retablir, true); d.addEventListener("touchend", retablir, true);
+    var montrer = function(){
+      if (enFs() || !d.body || innerWidth <= 640) return;
+      bulle = d.createElement("div"); bulle.id = "fsRetour";
+      bulle.textContent = "Touche l'écran pour revenir en plein écran";
+      bulle.style.cssText = "position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:2147483000;background:rgba(14,19,32,.9);color:#fff;font:600 14px/1.2 'Segoe UI',Roboto,sans-serif;padding:9px 16px;border-radius:999px;box-shadow:0 4px 18px rgba(0,0,0,.3);pointer-events:none;transition:opacity .4s";
+      d.body.appendChild(bulle);
+      setTimeout(function(){ if (bulle) bulle.style.opacity = "0"; }, 5000);
+      setTimeout(function(){ if (bulle) { bulle.remove(); bulle = null; } }, 5500);
+    };
+    if (d.body) montrer(); else d.addEventListener("DOMContentLoaded", montrer);
+  }
   function poser(){
     if (d.getElementById("fsBtn")) return;
     var st = d.createElement("style");
