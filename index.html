@@ -9894,7 +9894,9 @@ window.ACCES = (function(){
   }
 
   async function connexion(id, mdp){
-    id = (id || "").trim().toLowerCase(); const c = DATA && DATA.comptes[id];
+    id = (id || "").trim().toLowerCase();
+    try { const r = await fetch("comptes.json?t=" + Date.now(), { cache:"no-store" }); if (r.ok){ DATA = await r.json(); try { localStorage.setItem("accesCopie", JSON.stringify(DATA)); } catch(e){} } } catch(e){}   /* compte accepté ou mot de passe changé depuis l'ouverture de la page : pas besoin de la recharger */
+    const c = DATA && DATA.comptes[id];
     if (!c) throw new Error("Identifiant inconnu. Si tu viens de faire ta demande, attends que Jeremy l'accepte.");
     let pk8;
     try { pk8 = await sub.decrypt({ name:"AES-GCM", iv:unb64(c.priv.i) }, await cleMdp(mdp, unb64(c.priv.s)), unb64(c.priv.c)); }
