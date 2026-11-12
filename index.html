@@ -2222,15 +2222,15 @@ function brancherPincement(cible, frame){
   const nom = frame ? frame.id : "biblio";
   const ecran = t => { if (!frame) return [t.clientX, t.clientY]; const r = frame.getBoundingClientRect(), k = frame.offsetWidth ? r.width / frame.offsetWidth : 1; return [r.left + t.clientX * k, r.top + t.clientY * k]; };
   const garde = e => !frame ? ($("#reader") && $("#reader").classList.contains("open") && $("#reader").contains(e.target)) : true;
-  const sync = e => { const n = Date.now(); [...PZ.pts.keys()].forEach(c => { if (c.startsWith(nom + ":") || n - PZ.pts.get(c).t > 4000) PZ.pts.delete(c); });   /* les doigts de ce document = ceux de e.touches */
-    for (const t of e.touches) PZ.pts.set(nom + ":" + t.identifier, { p:ecran(t), t:n }); };
+  const sync = e => { const n = Date.now(); [...PZ.pts.keys()].forEach(c => { if (c.startsWith(nom + ":t") || n - PZ.pts.get(c).t > 4000) PZ.pts.delete(c); });   /* les doigts de ce document = ceux de e.touches */
+    for (const t of e.touches) PZ.pts.set(nom + ":t" + t.identifier, { p:ecran(t), t:n }); };
   const deux = () => { const v = [...PZ.pts.values()]; return v.length === 2 ? v.map(o => o.p) : null; };
   cible.addEventListener("touchstart", e => {
     if (!garde(e)) return; sync(e);
     const q = deux(); if (q && !PZ.actif){ PZ.d0 = Math.hypot(q[0][0] - q[1][0], q[0][1] - q[1][1]); PZ.actif = PZ.d0 > 12; if (PZ.actif){ PZ.apres = true; ZS.tenu = true; clearTimeout(ZS.fin); } }
   }, { capture:true, passive:true });
   /* nombre de traits avant que le 1er doigt (pointerdown, qui précède touchstart) ne commence le sien */
-  cible.addEventListener("pointerdown", e => { if (e.pointerType === "touch" && e.isPrimary && !PZ.actif){ try { PZ.n0 = strokes().length; } catch(x){ PZ.n0 = 0; } } }, { capture:true, passive:true });
+  cible.addEventListener("pointerdown", e => { if ((e.pointerType === "touch" || e.pointerType === "pen") && e.isPrimary && !PZ.actif && !PZ.pts.size){ try { PZ.n0 = strokes().length; } catch(x){ PZ.n0 = 0; } } }, { capture:true, passive:true });
   cible.addEventListener("touchmove", e => {
     sync(e);
     if (PZ.apres && !PZ.actif && PZ.pts.size === 1){ e.preventDefault(); return; }   /* un doigt levé avant l'autre : celui qui reste ne fait plus glisser la page */
@@ -2249,6 +2249,28 @@ function brancherPincement(cible, frame){
   };
   cible.addEventListener("touchend", fin, { capture:true, passive:true });
   cible.addEventListener("touchcancel", fin, { capture:true, passive:true });
+  /* (12 nov.) TNI SMART : dans un pincement, un des deux doigts arrive souvent en « pen » 1 × 1 px (vidéo de contact.html).
+     Un « pen » ne donne aucun événement touch : le pincement ne voyait qu'un doigt, et ce doigt-là faisait glisser la page
+     pendant que l'autre défilait = page qui saute / flash. On compte donc aussi ces doigts « pen » (petits, sans gomme). */
+  const estDoigtPen = e => e.pointerType === "pen" && !(e.buttons & 32) && Math.max(e.width || 1, e.height || 1) < 18;
+  const evaluer = e => {
+    const q = deux(); if (!q) return;
+    const d = Math.hypot(q[0][0] - q[1][0], q[0][1] - q[1][1]);
+    if (!PZ.actif){ PZ.d0 = d; PZ.actif = d > 12; if (PZ.actif){ PZ.apres = true; ZS.tenu = true; clearTimeout(ZS.fin); if (PAN.on){ PAN.on = false; try { panFin(); } catch(x){} } } return; }
+    if (d < 12 || !PZ.d0) return;
+    if (e.cancelable) e.preventDefault();
+    zoomSouris({ clientX:(q[0][0] + q[1][0]) / 2, clientY:(q[0][1] + q[1][1]) / 2, deltaY: -Math.log(d / PZ.d0) * 2.2 / .0075, deltaMode:0 }, null);
+    PZ.d0 = d;
+  };
+  cible.addEventListener("pointerdown", e => { if (!estDoigtPen(e) || !garde(e)) return; PZ.pts.set(nom + ":p" + e.pointerId, { p:ecran(e), t:Date.now() });
+    if (PZ.pts.size === 2){ try { PZ.n0 = Math.min(PZ.n0 == null ? 1e9 : PZ.n0, strokes().length); } catch(x){} evaluer(e); if (PZ.actif) e.preventDefault(); } }, { capture:true });
+  cible.addEventListener("pointermove", e => { const c = nom + ":p" + e.pointerId; if (!PZ.pts.has(c)) return; PZ.pts.set(c, { p:ecran(e), t:Date.now() });
+    if (PZ.actif || PZ.pts.size === 2){ evaluer(e); e.stopImmediatePropagation(); } }, { capture:true });
+  const finPen = e => { const c = nom + ":p" + e.pointerId; if (!PZ.pts.has(c)) return; PZ.pts.delete(c);
+    if (PZ.actif && PZ.pts.size < 2){ PZ.actif = false; ZS.tenu = false; clearTimeout(ZS.fin); ZS.fin = setTimeout(zoomSourisFin, 60); }
+    if (!PZ.pts.size && PZ.apres){ PZ.apres = false; const n0 = PZ.n0; setTimeout(() => { try { if (strokes().length > n0) undoInk(); } catch(x){} }, 350); } };
+  cible.addEventListener("pointerup", finPen, { capture:true });
+  cible.addEventListener("pointercancel", finPen, { capture:true });
 }
 brancherPincement(document, null);
 function majCurseur(){
