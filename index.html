@@ -10105,7 +10105,9 @@ window.ACCES = (function(){
   const titreDe = f => { const l = LIVRES.find(x => x.fichier === f); return l ? l.titre : f; };
   async function enLigne(){   /* la liste des comptes telle qu'elle est vraiment sur GitHub (pas une copie en cache) */
     let jt = ""; try { jt = localStorage.getItem("ghJeton") || ""; } catch(e){}
-    if (jt) try { const r = await fetch("https://api.github.com/repos/" + DEPOT + "/contents/comptes.json?ref=main&t=" + Date.now(), { headers:{ Authorization:"Bearer " + jt, Accept:"application/vnd.github.raw+json" }, cache:"no-store" }); if (r.ok) return await r.json(); } catch(e){}
+    if (jt) try { const h = { Authorization:"Bearer " + jt }, api = "https://api.github.com/repos/" + DEPOT;   /* par le numéro du dernier commit : jamais une vieille copie */
+      const rf = await fetch(api + "/git/ref/heads/main?t=" + Date.now(), { headers:h, cache:"no-store" }); const sha = rf.ok ? (await rf.json()).object.sha : "main";
+      const r = await fetch(api + "/contents/comptes.json?ref=" + sha, { headers:Object.assign({ Accept:"application/vnd.github.raw+json" }, h), cache:"no-store" }); if (r.ok) return await r.json(); } catch(e){}
     try { const r = await fetch("comptes.json?t=" + Date.now(), { cache:"no-store" }); if (r.ok) return await r.json(); } catch(e){}
     return null; }
   async function dlgGerer(){
@@ -10307,8 +10309,20 @@ window.ACCES = (function(){
       try { localStorage.setItem("ghJeton", jt); } catch(e){}
       const bt = document.getElementById("gPub"); bt.disabled = true; bt.textContent = "Publication…";
       try { const frais = await enLigne();   /* quelqu'un (ou un autre appareil) a publié depuis l'ouverture du panneau : ne pas écraser son travail */
-        if (frais && JSON.stringify(frais.comptes) !== JSON.stringify(DATA.comptes)){ DATA = frais; BROUILLON = clone(frais); try { localStorage.setItem("accesCopie", JSON.stringify(DATA)); } catch(e){}
-          return dessinerGerer({ err:"La liste des comptes a changé en ligne depuis que tu as ouvert ce panneau (autre appareil ou autre publication). Je l'ai rechargée : refais tes changements, puis « Publier »." }); }
+        if (frais && JSON.stringify(frais) !== JSON.stringify(DATA)){   /* fusion : mes changements (DATA → BROUILLON) posés sur la version en ligne, celle des autres est gardée */
+          const J = x => JSON.stringify(x === undefined ? null : x), M = clone(frais); M.comptes = M.comptes || {}; M.livres = M.livres || {};
+          const ids = new Set([...Object.keys(DATA.comptes || {}), ...Object.keys(BROUILLON.comptes || {})]);
+          ids.forEach(id => { const a = (DATA.comptes || {})[id], b = (BROUILLON.comptes || {})[id]; if (J(a) === J(b)) return; if (b) M.comptes[id] = clone(b); else delete M.comptes[id]; });
+          const fs = new Set([...Object.keys(DATA.livres || {}), ...Object.keys(BROUILLON.livres || {})]);
+          fs.forEach(f => { const a = (DATA.livres || {})[f], b = (BROUILLON.livres || {})[f], m = M.livres[f];
+            if (J(a) === J(b)) return;
+            if (!b){ delete M.livres[f]; return; }
+            if (!m || !a){ M.livres[f] = clone(b); return; }
+            if (J((m.cles || {})[SESSION.id]) !== J((a.cles || {})[SESSION.id])) return;   /* livre rechiffré en ligne entre-temps : on garde la version en ligne */
+            const ks = new Set([...Object.keys(a.cles || {}), ...Object.keys(b.cles || {})]); m.cles = m.cles || {};
+            ks.forEach(id => { const x = (a.cles || {})[id], y = (b.cles || {})[id]; if (x === y) return; if (y) m.cles[id] = y; else delete m.cles[id]; }); });
+          for (const f in M.livres) for (const id in (M.livres[f].cles || {})) if (!M.comptes[id]) delete M.livres[f].cles[id];   /* pas de clé pour un compte retiré */
+          DATA = frais; BROUILLON = M; try { localStorage.setItem("accesCopie", JSON.stringify(DATA)); } catch(e){} }
         const D2 = clone(BROUILLON), fichiers = {}, rch = document.getElementById("gRech") && document.getElementById("gRech").checked ? aRech : [];
         for (const f of rch){ bt.textContent = "Nouvelle clé : « " + titreDe(f) + " »…"; Object.assign(fichiers, await rechiffrer(f, D2)); }
         if (JSON.stringify(D2) !== JSON.stringify(DATA)) fichiers["comptes.json"] = JSON.stringify(D2, null, 1);
