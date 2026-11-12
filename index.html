@@ -433,6 +433,8 @@ body.clair .act-top #actBack{color:#1E2A44!important}
   .rstage{flex:1;min-height:0;overflow:auto;position:relative;background:#111}
   .reader:not(.wbon) .rstage{scrollbar-width:none}
   .reader.zredess:not(.wbon) .rstage{background:#fff}
+  /* (12 nov., essai demandé par Jeremy) zoom « flou » : la page agrandie n'est pas redessinée (image étirée), donc pas d'écran vide au TNI */
+  html.zflou .reader:not(.wbon) #rscale{will-change:transform}
   .reader:not(.wbon) .rstage::-webkit-scrollbar{display:none}
   .rinner{position:relative}
   /* (7 nov.) zoom « comme une photo » : dans un livre, #rscale garde toujours la taille de l'écran (le livre n'est jamais recalculé)
@@ -11109,5 +11111,14 @@ body:has(.reader.open:not(.wbon)) .toast{bottom:calc(98px + env(safe-area-inset-
     setTimeout(() => { try { RD.eraser = av.eraser; RD.text = av.text; RD.obj = av.obj; RD.crayonOff = av.crayonOff; RD.gommeT = av.g; if (window.redrawInk) redrawInk(); } catch(x){} }, 0); };
   document.addEventListener("pointerup", fin, true); document.addEventListener("pointercancel", fin, true);
 })();
+</script>
+<script>
+/* Zoom flou (12 nov.) : par défaut sur écran tactile (TNI). ?zoomflou=0 pour l'enlever sur cet appareil, ?zoomflou=1 pour le forcer. */
+(function(){ try {
+  const q = new URLSearchParams(location.search).get("zoomflou");
+  if (q === "0" || q === "1") localStorage.zoomFlou = q;
+  const v = localStorage.zoomFlou, tactile = matchMedia("(any-pointer:coarse)").matches;
+  if (v === "1" || (v !== "0" && tactile)) document.documentElement.classList.add("zflou");
+} catch(e){} })();
 </script>
 </body></html>
