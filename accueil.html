@@ -2279,7 +2279,11 @@ function zoneMenage(rows){
     for (let i = rows.length - 1; i >= 0; i--) if (!rows[i].pause){ const r = rows[i]; Z.push({ i, start: Math.max(r.start, r.end - m.min), end: r.end }); break; }
     return Z; }
   const ok = (l, w) => window.menageMot ? window.menageMot(l, w) : String(l).toLowerCase().includes(String(w).toLowerCase());
-  rows.forEach((r, i) => { if (!r.pause && m.mot && ok(r.label, m.mot)) Z.push({ i, start: Math.max(r.start, r.end - m.min), end: r.end }); });
+  /* 12 nov. : une activité coupée par une pause (« … (suite) ») n'a du ménage qu'à sa vraie fin, pas avant chaque pause */
+  const base = l => String(l).replace(/ \(suite\)$/, "");
+  rows.forEach((r, i) => { if (r.pause || !m.mot || !ok(r.label, m.mot)) return;
+    const nx = rows.slice(i + 1).find(x => !x.pause); if (nx && base(nx.label) === base(r.label)) return;
+    Z.push({ i, start: Math.max(r.start, r.end - m.min), end: r.end }); });
   return Z;
 }
 window.zoneMenage = zoneMenage;
