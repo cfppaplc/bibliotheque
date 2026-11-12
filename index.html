@@ -1685,7 +1685,7 @@ function chargement(l, attente){   /* attente : on prépare encore le livre (PDF
   chargeT = setInterval(() => { let pret = false; try { pret = !!(RD.drv && RD.drv.state().tot > 0); } catch(e){}
     const n = Date.now();
     if (pret && !tPret){ tPret = n; const sp = c.querySelector(".charge-c span"); if (sp) sp.textContent = "Préparation des pages et des animations…"; }
-    const fini = tPret && n - tPret > 1500 && n - t0 > 3000 && (imagesPretes() || n - tPret > 6000);
+    const fini = tPret && n - tPret > 500 && (imagesPretes() || n - tPret > 4000);   /* 12 nov. : plus de minimum de 3 s (on attendait pour rien) */
     if (!tPret && n - t0 > 6000 && !c._lent){ c._lent = 1; const sp = c.querySelector(".charge-c span"); if (sp) sp.textContent = "Téléchargement et déverrouillage du livre… (plus long la première fois)"; }
     if (fini || !attente && n - t0 > 45000 || !attente && !$("#reader").classList.contains("open") && n - t0 > 4000 || attente && n - t0 > 180000){ clearInterval(chargeT); const bb = c.querySelector(".charge-b"); if (bb && fini){ bb.classList.add("fin"); setTimeout(() => { c.hidden = true; }, 300); } else c.hidden = true; } }, 150);
 }
@@ -9883,7 +9883,10 @@ window.ACCES = (function(){
     catch(e){ if (!frais) return dechiffrer(url, f, true); throw e; }   /* copie gardée d'une ancienne version du livre : on reprend celle du site */
     return dec.decode(await gunzip(new Uint8Array(clair)));
   }
-  const ouvrir = l => dechiffrer("livres/" + encodeURIComponent(l.fichier) + ".chiffre", l.fichier);
+  /* 12 nov. : les 2 derniers livres ouverts restent déchiffrés en mémoire (pas sur le disque) : les rouvrir ne refait ni le téléchargement ni le déchiffrement */
+  const MEMO = new Map();
+  const ouvrir = async l => { const f = l.fichier; if (MEMO.has(f)){ const h = MEMO.get(f); MEMO.delete(f); MEMO.set(f, h); return h; }
+    const h = await dechiffrer("livres/" + encodeURIComponent(f) + ".chiffre", f); MEMO.set(f, h); while (MEMO.size > 2) MEMO.delete(MEMO.keys().next().value); return h; };
   async function recherche(){            /* pages des livres permis, pour la recherche plein texte */
     const out = {}; if (!SESSION || !DATA) return out;
     await Promise.all(Object.keys(DATA.livres).filter(permis).map(async f => { try { out[f] = JSON.parse(await dechiffrer("recherche/" + encodeURIComponent(f) + ".chiffre", f)); } catch(e){} }));
