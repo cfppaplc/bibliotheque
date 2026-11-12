@@ -953,7 +953,7 @@ html.ui-clair #apercuOv .ap-moments button.on, html.ui-clair #apercuOv .ap-ferme
     <div class="field"><label for="f-theme">Couleurs <span class="tip-i" tabindex="0" role="img" aria-label="Aide : Sombre pour une classe tamisée, clair si la classe est très éclairée et que le projecteur pâlit l'image." data-tip="Sombre pour une classe tamisée, clair si la classe est très éclairée et que le projecteur pâlit l'image.">?</span></label><select id="f-theme"><option value="dark">Foncé</option><option value="light">Clair (classe très éclairée)</option><option value="auto">Comme le site</option></select></div>
     <div class="field" hidden><label for="f-couleurs">Ambiance <span class="tip-i" tabindex="0" role="img" aria-label="Aide : Les couleurs changent chaque jour de la semaine pour garder l'attention des élèves. Lundi ardoise, mardi forêt, mercredi prune, jeudi pétrole, vendredi cuivre." data-tip="Les couleurs changent chaque jour de la semaine pour garder l'attention des élèves. Lundi ardoise, mardi forêt, mercredi prune, jeudi pétrole, vendredi cuivre.">?</span></label><select id="f-couleurs"><option value="jour">Change chaque jour (recommandé)</option><option value="fixe">Toujours la même</option></select></div>
     <div class="field" hidden><label for="f-anim">Fond animé <span class="tip-i" tabindex="0" role="img" aria-label="Aide : Comme l'ordinateur : le fond reste figé si Windows a désactivé les effets d'animation. Toujours : le fond bouge quand même. Jamais : fond immobile." data-tip="Comme l'ordinateur : le fond reste figé si Windows a désactivé les effets d'animation. Toujours : le fond bouge quand même. Jamais : fond immobile.">?</span></label><select id="f-anim"><option value="auto">Comme l'ordinateur</option><option value="oui">Toujours</option><option value="non">Jamais</option></select></div>
-    <div class="field"><label>Ménage de l'atelier</label><button type="button" class="btn" id="b-menageReg">Modifier les tâches du ménage</button></div>
+    <div class="field"><label>Ménage du local</label><button type="button" class="btn" id="b-menageReg">Local et tâches du ménage</button></div>
     <div class="field"><label for="f-msg">Message du jour <span class="tip-i" tabindex="0" role="img" aria-label="Aide : Une consigne courte sous la citation, par exemple « Apportez vos lunettes ». Laisse vide pour ne rien afficher." data-tip="Une consigne courte sous la citation, par exemple « Apportez vos lunettes ». Laisse vide pour ne rien afficher.">?</span></label><input id="f-msg" placeholder="Aucun message"></div>
     <details class="more" id="adv">
       <summary>Réglages avancés <span class="tip-i" tabindex="0" role="img" aria-label="Aide : Nom affiché, heures de début des périodes, taille du texte et contenu des blocs facultatifs. Rarement nécessaires." data-tip="Nom affiché, heures de début des périodes, taille du texte et contenu des blocs facultatifs. Rarement nécessaires.">?</span></summary>
@@ -3095,6 +3095,11 @@ if (window.COFFRE && !/[?&]apercu=/.test(location.search)) COFFRE.demarrer("accu
 #menageEd .mt-reg{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:6px}
 #menageEd .mt-r{border:1px solid var(--line,#8883);background:transparent!important}
 #menageEd .mt-b .btn{min-width:38px;height:38px;padding:0;justify-content:center}
+#menageEd .mt-loc{margin:4px 0 14px;padding:12px;border-radius:12px;border:1px solid #EB6A2266;background:#EB6A220d}
+#menageEd .mt-locr{display:flex;gap:8px;flex-wrap:wrap;align-items:center}#menageEd .mt-locr select{flex:1;min-width:220px}
+#menageEd .mt-loc small{display:block;margin-top:6px;opacity:.8}
+#menageEd.lecture .mt-b,#menageEd.lecture .ed-l,#menageEd.lecture #mnRot,#menageEd.lecture #mnOk{display:none}
+#menageEd .mt-loc.sansadmin #mnLocN,#menageEd .mt-loc.sansadmin #mnLocR{display:none}
 html.apercu-mode #menage{display:none}
 /* Plein écran (9 nov., Jeremy : « au complet sur toute la page, ne pas partir, pour inciter les élèves à venir cocher ») */
 #menage{inset:0;right:0;bottom:0;width:auto;max-height:none;border-radius:0;border:0;z-index:9000;padding:2.5vh 3vw;box-sizing:border-box;background:radial-gradient(circle at 50% 0%,#1d2a40,#0d121c 70%)}
@@ -3162,6 +3167,7 @@ html.apercu-mode #menage{display:none}
 <div class="sheet" id="menageEd" hidden>
   <div class="sheet-in">
     <div class="marque"><img class="lg-blc" src="img/metier-plus-blanc.svg" alt="Métier+"><img class="lg-clr" src="img/metier-plus.svg" alt=""><h2>Ménage de l'atelier</h2><p>Le nom de chaque tâche, puis les étapes que les élèves voient en la touchant (une par ligne).</p></div>
+    <div class="field mt-loc"><label for="mnLoc">Ce tableau est dans le local</label><div class="mt-locr"><select id="mnLoc"></select><button type="button" class="btn" id="mnLocN">+ Nouveau local</button><button type="button" class="btn" id="mnLocR">Renommer</button></div><small id="mnLocTxt"></small></div>
     <div class="mt-liste" id="mnListeEd"></div>
     <div class="ed-l"><button type="button" class="btn" id="mnAjout">+ Ajouter une tâche</button><button type="button" class="btn" id="mnDef">Remettre la liste de départ</button></div>
     <div class="mt-reg">
@@ -3187,7 +3193,18 @@ html.apercu-mode #menage{display:none}
     {"t": "Nettoyage de la pièce d’entretien", "d": "Objectif : Remettre la pièce d’entretien propre et fonctionnelle. · Ranger les outils, accessoires et produits d’entretien (savon, brosses, nettoyants). · Nettoyer les surfaces (comptoirs, évier, étagères) et essuyer les traces de flux, graisse, eau ou résidus. · Jeter les déchets et résidus dans les bacs appropriés. · Balayer et passer la moppe si nécessaire. · S’assurer que la pièce est dégagée et prête pour le prochain usage."},
     {"t": "Rangement de l’entrepôt", "d": "Objectif : Maintenir l’entrepôt organisé et sécuritaire. · Ranger les boîtes, bacs et contenants déplacés durant la période. · Trier les matériaux laissés sur les tables, au sol ou dans les bacs. · Remettre les matériaux aux étagères désignées. · Jeter les résidus inutilisables (petits morceaux, emballages). · Réorganiser les sections désordonnées (PVC, cuivre, acier, etc.). · Vérifier que les allées sont dégagées et que les items lourds sont rangés de façon sécuritaire."}]};
   let APERCU = null;   /* tâches de l'éditeur montrées en aperçu, pas encore enregistrées */
-  const M = () => Object.assign({}, DEF, cfg.menage || {}, APERCU || {});
+  /* Ménage par local (12 nov., Jeremy : « assigné par local », seul l'administrateur modifie) :
+     locaux.json (publié sur GitHub) = {maj, locaux:[{id, nom, menage}]}; le local de l'appareil = localStorage.accueilLocal (pas synchronisé). */
+  let LOC = {maj: 0, locaux: []};
+  try { const c = JSON.parse(localStorage.locauxCache || "null"); if (c && c.locaux) LOC = c; } catch(e) {}
+  const ADMIN = () => { try { return !!localStorage.ghJeton; } catch(e) { return false; } };
+  const monLocal = () => { let id = ""; try { id = localStorage.accueilLocal || ""; } catch(e) {} return LOC.locaux.find(l => l.id === id) || null; };
+  async function chargerLocaux(){
+    try { const r = await fetch("locaux.json?t=" + Date.now(), {cache: "no-store"}); if (!r.ok) return;
+      const j = await r.json(); if (j && j.locaux && (j.maj || 0) >= (LOC.maj || 0)) { LOC = j; localStorage.locauxCache = JSON.stringify(j); rendu = ""; } } catch(e) {}
+  }
+  chargerLocaux(); setInterval(chargerLocaux, 10 * 60 * 1000);
+  const M = () => { const L = monLocal(); return Object.assign({}, DEF, L ? L.menage : (cfg.menage || {}), APERCU || {}); };
   const norm = x => String(x || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
   /* « atelier » reconnu malgré majuscules, accents, s, lettres doublées ou une petite faute (attelier, atlier, ateleir…) */
   const serre = x => norm(x).replace(/[^a-z0-9]+/g, " ").replace(/(.)\1+/g, "$1").trim();
@@ -3268,10 +3285,47 @@ html.apercu-mode #menage{display:none}
   setInterval(verifier, 2000); setTimeout(verifier, 1500);
   // Modifier la liste (Plus → Ménage de l'atelier)
   const ed = document.getElementById("menageEd");
-  document.getElementById("b-menage").onclick = () => { closeMenu(); const m = M();
+  document.getElementById("b-menage").onclick = () => { closeMenu(); chargerLocaux().then(() => { if (!ed.hidden) { remplirLoc(); } }); remplirLoc(); remplirTout(); ed.hidden = false; };
+  function remplirTout(){ const m = M();
     remplirEd(m.taches);
     { const sel = document.getElementById("mnMin"); if (![...sel.options].some(o => +o.value === +m.min)) sel.add(new Option(m.min + " minutes", m.min)); sel.value = String(m.min); } document.getElementById("mnMot").value = m.mot;
-    document.getElementById("mnEq").value = String(m.equipes || 0); DEPART = m.depart || DEF.depart; majRotTxt(); ed.hidden = false; };
+    document.getElementById("mnEq").value = String(m.equipes || 0); DEPART = m.depart || DEF.depart; majRotTxt(); majLecture(); }
+  const SEL = document.getElementById("mnLoc"), TXT = document.getElementById("mnLocTxt");
+  function remplirLoc(){
+    const id = (monLocal() || {}).id || "";
+    SEL.innerHTML = '<option value="">Aucun local (liste personnelle)</option>' + LOC.locaux.map(l => '<option></option>').join("");
+    LOC.locaux.forEach((l, i) => { const o = SEL.options[i + 1]; o.value = l.id; o.textContent = l.nom; });
+    SEL.value = id; document.querySelector("#menageEd .mt-loc").classList.toggle("sansadmin", !ADMIN());
+    document.getElementById("mnLocR").hidden = !id;
+  }
+  function majLecture(){
+    const L = monLocal(), lect = !!L && !ADMIN();
+    ed.classList.toggle("lecture", lect);
+    ed.querySelectorAll("#mnListeEd input, #mnListeEd textarea, #mnMin, #mnMot, #mnEq").forEach(x => x.disabled = lect);
+    TXT.textContent = L ? (ADMIN() ? "Tous les tableaux de ce local ont cette liste. « Enregistrer » la publie pour tout le monde." : "Les tâches de ce local sont gérées par l'administrateur. Tous les enseignants de ce local ont la même liste.")
+      : (LOC.locaux.length ? "Choisis le local où se trouve ce tableau : tous ses enseignants auront la même liste." : (ADMIN() ? "Crée un local : la liste ci-dessous lui sera donnée." : "Aucun local n'a encore été créé par l'administrateur."));
+  }
+  SEL.onchange = () => { try { if (SEL.value) localStorage.accueilLocal = SEL.value; else localStorage.removeItem("accueilLocal"); } catch(e) {}
+    rendu = ""; remplirLoc(); remplirTout(); verifier(); };
+  const idDe = nom => (nom.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "local") + "-" + Math.random().toString(36).slice(2, 6);
+  document.getElementById("mnLocN").onclick = () => { if (!ADMIN()) return;
+    const nom = (prompt("Nom du local (ex. : Atelier de plomberie, local 105)") || "").trim(); if (!nom) return;
+    const L = {id: idDe(nom), nom, menage: lireMenage()}; LOC.locaux.push(L);
+    try { localStorage.accueilLocal = L.id; } catch(e) {} remplirLoc(); majLecture();
+    TXT.textContent = "Local « " + nom + " » créé avec la liste ci-dessous. Touche « Enregistrer » pour le publier."; };
+  document.getElementById("mnLocR").onclick = () => { const L = monLocal(); if (!L || !ADMIN()) return;
+    const nom = (prompt("Nouveau nom du local", L.nom) || "").trim(); if (!nom) return; L.nom = nom; remplirLoc();
+    TXT.textContent = "Touche « Enregistrer » pour publier le nouveau nom."; };
+  const DEPOT = "cfppaplc/bibliotheque";
+  async function publierLocaux(){
+    const jeton = localStorage.ghJeton; LOC.maj = Date.now();
+    const texte = JSON.stringify(LOC, null, 1) + "\n"; localStorage.locauxCache = JSON.stringify(LOC);
+    const url = "https://api.github.com/repos/" + DEPOT + "/contents/locaux.json", h = {Authorization: "Bearer " + jeton, Accept: "application/vnd.github+json"};
+    let sha; const g = await fetch(url, {headers: h, cache: "no-store"}); if (g.ok) sha = (await g.json()).sha; else if (g.status !== 404) throw new Error("GitHub " + g.status);
+    const b64 = btoa(unescape(encodeURIComponent(texte)));
+    const p = await fetch(url, {method: "PUT", headers: Object.assign({"Content-Type": "application/json"}, h), body: JSON.stringify({message: "Ménage : locaux et tâches", content: b64, sha})});
+    if (!p.ok) throw new Error("GitHub " + p.status);
+  }
   let DEPART = DEF.depart;
   function majRotTxt(){ const R = rotation({taches: lireEd(), equipes: +document.getElementById("mnEq").value, depart: DEPART});
     document.getElementById("mnRotTxt").textContent = R.eq ? "Cette semaine : l'équipe 1 fait « " + ((lireEd()[[...Array(R.slots).keys()].find(s => R.equipe(s) === 1)] || {}).t || "Renfort") + " »." : ""; }
@@ -3299,9 +3353,12 @@ html.apercu-mode #menage{display:none}
   document.getElementById("mnDef").onclick = () => remplirEd(DEF.taches);
   document.getElementById("mnAnn").onclick = fermerEd;
   document.getElementById("mnOk").onclick = () => {
-    const taches = lireEd(); APERCU = null;
-    cfg.menage = {taches, equipes: +document.getElementById("mnEq").value, depart: DEPART, mot: document.getElementById("mnMot").value.trim() || "atelier", min: Math.max(1, Math.min(60, +document.getElementById("mnMin").value || 10))};
+    APERCU = null; const L = monLocal();
+    if (L) { if (!ADMIN()) return; L.menage = lireMenage(); const b = document.getElementById("mnOk"); b.disabled = true; TXT.textContent = "Publication…";
+      publierLocaux().then(() => { rendu = ""; fermerEd(); verifier(); }).catch(e => { TXT.textContent = "La publication n'a pas fonctionné (" + e.message + "). Réessaie dans un moment."; }).finally(() => { b.disabled = false; }); return; }
+    cfg.menage = lireMenage();
     save(); rendu = ""; fermerEd(); verifier(); };
+  function lireMenage(){ return {taches: lireEd(), equipes: +document.getElementById("mnEq").value, depart: DEPART, mot: document.getElementById("mnMot").value.trim() || "atelier", min: Math.max(1, Math.min(60, +document.getElementById("mnMin").value || 10))}; }
   const lireEd = () => [...document.querySelectorAll("#mnListeEd .mt-r")].map(r => ({t: r.querySelector(".mt-t").value.trim(),
       d: r.querySelector("textarea").value.split("\n").map(l => l.replace(/^[•\-*]\s*/, "").trim()).filter(Boolean).join(" · ")})).filter(x => x.t);
   document.getElementById("mnVoir").onclick = () => { APERCU = {taches: lireEd(), equipes: +document.getElementById("mnEq").value, depart: DEPART}; rendu = ""; if (window.menageReste == null) window.menageReste = 2.5; fermerEd(); force = true; cle = new Date().toISOString().slice(0, 10) + "|manuel"; mini = false; el.classList.remove("mini"); verifier(); };
