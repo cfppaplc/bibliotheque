@@ -1063,7 +1063,7 @@ html.leger::view-transition-old(root),html.leger::view-transition-new(root){anim
   function cell(){ try { return matchMedia("(pointer:coarse)").matches && Math.min(screen.width, screen.height) <= 600; } catch(e){ return false; } }
   /* (12 nov.) tableau interactif = écran tactile sans souris principale (pointer:coarse) ou tactile en plus (any-pointer:coarse) sur un grand écran : mode léger d'office aussi (sauf « Complètes ») */
   function tni(){ try { return (matchMedia("(pointer:coarse)").matches || matchMedia("(any-pointer:coarse)").matches) && Math.min(screen.width, screen.height) > 600 && !/iPad|Macintosh/.test(navigator.userAgent); } catch(e){ return false; } }
-  function appliquer(){ var m = lire("modeLeger"); h.classList.toggle("leger", m === "oui" || (m !== "non" && (cell() || tni() || lire("modeLegerMesure") === "lent"))); }
+  function appliquer(){ var m = lire("modeLeger"); h.classList.toggle("leger", m === "oui" || (m !== "non" && (cell() || lire("modeLegerMesure") === "lent"))); }
   window.modeLegerChoix = function(){ return lire("modeLeger") || "auto"; };
   window.modeLegerFixer = function(v){ try { if (!S) return; if (v === "auto") S.removeItem("modeLeger"); else S.setItem("modeLeger", v); } catch(e){} appliquer(); if (v === "auto") mesurer(); };
   appliquer();
