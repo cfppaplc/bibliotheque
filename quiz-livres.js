@@ -727,6 +727,148 @@ window.QUIZ_LIVRES = [
 },
 "qs": [
 {
+"q": "Un multimètre sert à mesurer…",
+"ch": [
+"Volts, ampères et ohms (et plus)",
+"Seulement les volts",
+"Seulement la température",
+"La pression d'eau"
+],
+"bon": 0,
+"s": 15,
+"expl": "Multi = plusieurs : tension (V), courant (A), résistance (Ω), continuité, et parfois d'autres fonctions."
+},
+{
+"q": "Sur un multimètre, la sonde NOIRE se branche dans la borne…",
+"ch": [
+"COM",
+"V Ω",
+"10 A",
+"mA"
+],
+"bon": 0,
+"s": 15,
+"expl": "Noir = COM (commun), toujours. Le rouge change de borne selon ce qu'on mesure."
+},
+{
+"q": "Pour mesurer une tension, la sonde ROUGE va dans la borne…",
+"ch": [
+"V Ω (volts / ohms)",
+"10 A",
+"COM",
+"Aucune, on utilise seulement le noir"
+],
+"bon": 0,
+"s": 20,
+"expl": "Rouge dans V Ω pour les volts, les ohms et la continuité. La borne A sert seulement aux ampères."
+},
+{
+"q": "Le symbole V~ (avec une vague) sur le sélecteur veut dire…",
+"ch": [
+"Tension alternative (AC)",
+"Tension continue (DC)",
+"Résistance",
+"Continuité"
+],
+"bon": 0,
+"s": 15,
+"expl": "La vague ~ = alternatif (prises, 120/240 V). La ligne droite ⎓ = continu (piles, batteries)."
+},
+{
+"q": "Le symbole V⎓ (lignes droites) sert à mesurer…",
+"ch": [
+"Une pile ou une batterie",
+"Une prise de 120 V",
+"Un élément chauffant hors tension",
+"Le courant d'un fil"
+],
+"bon": 0,
+"s": 15,
+"expl": "V⎓ = tension continue (DC) : piles, batteries d'auto, alimentations électroniques."
+},
+{
+"q": "Pour mesurer une tension, on place les sondes…",
+"ch": [
+"En parallèle (de chaque côté de l'appareil ou de la source)",
+"En série (on coupe le fil)",
+"Sur le même fil",
+"Seulement sur la mise à la terre"
+],
+"bon": 0,
+"s": 20,
+"expl": "Les volts se mesurent entre deux points : une sonde de chaque côté, sans couper le circuit."
+},
+{
+"q": "Pour mesurer des ampères avec les sondes (pas une pince), le multimètre doit être…",
+"ch": [
+"En série dans le circuit (le courant passe dans l'appareil)",
+"En parallèle sur la charge",
+"Sur la borne V Ω",
+"Hors tension"
+],
+"bon": 0,
+"s": 25,
+"expl": "Les ampères se mesurent en série : il faut ouvrir le circuit. C'est pourquoi la pince ampèremétrique est plus simple et plus sécuritaire."
+},
+{
+"q": "Sur l'écran du multimètre, « OL » veut dire…",
+"ch": [
+"Hors plage / circuit ouvert (trop grand pour être mesuré)",
+"Tout est correct",
+"La pile est faible",
+"Courant alternatif"
+],
+"bon": 0,
+"s": 20,
+"expl": "OL = Over Limit. En ohms, ça veut dire circuit ouvert (fil coupé, fusible brûlé)."
+},
+{
+"q": "L'icône avec des ondes sonores (♪ ou •)))) sur le sélecteur, c'est…",
+"ch": [
+"Le mode continuité : il bipe si le circuit est fermé",
+"Le volume du multimètre",
+"Le mode Bluetooth",
+"Le test de pile"
+],
+"bon": 0,
+"s": 20,
+"expl": "Mode continuité : le multimètre bipe quand il y a un chemin complet. Toujours sur un circuit hors tension."
+},
+{
+"q": "Le bouton HOLD sert à…",
+"ch": [
+"Figer la valeur affichée à l'écran",
+"Allumer l'écran",
+"Changer de mode AC/DC",
+"Remettre à zéro"
+],
+"bon": 0,
+"s": 15,
+"expl": "HOLD garde la lecture à l'écran : pratique quand on mesure dans un endroit où on ne voit pas l'afficheur."
+},
+{
+"q": "On peut mesurer des ohms sur un circuit sous tension si on fait attention.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 1,
+"s": 15,
+"expl": "Faux ! Toujours couper le courant avant de mesurer des ohms : lecture fausse et risque d'endommager l'appareil."
+},
+{
+"q": "Avant de mesurer, il faut d'abord…",
+"ch": [
+"Choisir la bonne fonction au sélecteur",
+"Toucher les deux sondes ensemble pendant la mesure",
+"Débrancher la sonde noire",
+"Mettre le sélecteur sur OFF"
+],
+"bon": 0,
+"s": 15,
+"expl": "Bonne fonction (V~, V⎓, Ω…), bonnes bornes, puis on mesure. Une mauvaise position peut faire sauter le fusible interne."
+},
+{
 "q": "La tension électrique se mesure en…",
 "ch": [
 "Volts (V)",
