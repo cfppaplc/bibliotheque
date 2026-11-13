@@ -4189,8 +4189,11 @@ function recalerWb(){
   if (!REFS[k]){ REFS[k] = b; return; }
   const [rw, rh] = REFS[k]; if (Math.abs(rw - b[0]) < 1 && Math.abs(rh - b[1]) < 1) return;
   const fx = rw / b[0], fy = rh / b[1];
-  (arr || []).forEach(s => { if (s.p) s.p = s.p.map(q => [q[0] * fx, q[1] * fy]); if (s.bw) s.bw *= fx; if (s.bb) s.bb = [s.bb[0] * fx, s.bb[1] * fy]; });
-  REFS[k] = b; UNDO[k] = []; REDO[k] = [];
+  const ech = L => (L || []).forEach(s => { if (s.p) s.p = s.p.map(q => [q[0] * fx, q[1] * fy]); if (s.bw) s.bw *= fx; if (s.bb) s.bb = [s.bb[0] * fx, s.bb[1] * fy]; });
+  ech(arr);
+  /* 13 nov. : les étapes d'Annuler suivent aussi (avant, elles étaient effacées à chaque changement de taille du tableau : au TNI, Ctrl+Z ne marchait que 1 ou 2 fois) */
+  (UNDO[k] || []).forEach(ech); (REDO[k] || []).forEach(ech);
+  REFS[k] = b;
 }
 const arrondir = v => typeof v === "number" ? Math.round(v * 1e5) / 1e5 : Array.isArray(v) ? v.map(arrondir) : v;
 const copieTraits = arr => (arr || []).map(s => { const o = {}; for (const k in s) if (k !== "cache") o[k] = (k === "p" || k === "bb" || k === "bw") ? arrondir(s[k]) : s[k]; return o; });
