@@ -582,7 +582,9 @@ function juste(Q, c){
   if (c == null || c === -1) return false;
   if (t === "multi") return Array.isArray(c) && c.length === Q.bon.length && c.every(x => Q.bon.includes(x));
   if (t === "ordre") return Array.isArray(c) && c.join() === Q.bon.join();
-  if (t === "nombre") { const x = num(c); return !isNaN(x) && Math.abs(x - Q.bon) <= (+Q.tol || 0) + 1e-9; }
+  if (t === "nombre") {   /* (13 nov.) point ou virgule acceptés partout; « 1.250 » / « 1,250 » / « 1 250,5 » : on essaie aussi la lecture en milliers */
+    const s = String(c).replace(/\s/g, ""), essais = [num(s), parseFloat(s.replace(/[.,](?=\d{3}(\D|$))/g, "").replace(",", ".")), parseFloat(s.replace(/[.,](?=.*[.,])/g, "").replace(",", "."))];
+    return essais.some(x => !isNaN(x) && Math.abs(x - Q.bon) <= (+Q.tol || 0) + 1e-9); }
   return c === Q.bon;
 }
 function texteBon(Q){ const t = typeDe(Q);
@@ -833,6 +835,7 @@ function telecommande(bord){
   }
   function envoyerCouv(){ if (G.quiz && G.quiz.couv && /^data:/.test(G.quiz.couv)) envoyer(topic, {m: "img", i: -1, data: G.quiz.couv}); }
   // un élève qui ne donne plus signe de vie depuis 40 s est retiré (son personnage redevient libre)
+  setInterval(() => { if (ids().length) envoyer(topic, {m: "pouls"}); }, 8000);   /* (13 nov.) signe de vie pour les iPad : sans nouvelles, ils se rebranchent */
   setInterval(() => { let ch = false; Object.values(P).forEach(p => { if (!p.parti && Date.now() - (p.vu || 0) > 40000) { p.parti = true; ch = true; } }); if (ch) { envoyerPersos(); maj(); if (G.etat === "question" && ids().length && ids().every(id => G.reps[id])) setTimeout(reveler, 300); } }, 5000);
   function envoyerPersos(){ envoyer(topic, {m: "persos", pris: ids().map(id => P[id].av).filter(v => v != null)}); }
   let minut = null;
@@ -1378,7 +1381,13 @@ function joueur(code){
       addEventListener("pagehide", () => { if (entre) envoyer(topic, {m: "bye", pid}); });
       /* l'iPad ne se met pas en veille pendant la partie (Safari 16.4 et plus); redemandé au retour sur la page */
       const eveil = () => { try { if (navigator.wakeLock && !document.hidden) navigator.wakeLock.request("screen").catch(() => {}); } catch(e) {} };
-      eveil(); document.addEventListener("visibilitychange", eveil); }
+      eveil(); document.addEventListener("visibilitychange", eveil);
+      /* (13 nov., « certains élèves décrochent ») : le lien peut mourir sans le dire (Wi-Fi qui change, iPad en veille).
+         Sans message de la télécommande depuis 25 s (elle envoie « pouls » aux 8 s), on se rebranche et on se réannonce. */
+      window.__dernierMsg = Date.now();
+      const reco = () => { let r = $("jReco"); if (!r) { r = document.createElement("div"); r.id = "jReco"; r.textContent = "Reconnexion…"; r.style.cssText = "position:fixed;top:10px;left:50%;transform:translateX(-50%);background:#EB6A22;color:#fff;font:600 15px system-ui;padding:8px 16px;border-radius:99px;z-index:99"; document.body.appendChild(r); } r.hidden = false; };
+      setInterval(() => { if (!entre || document.hidden) return; if (Date.now() - window.__dernierMsg > 25000) { reco(); window.__dernierMsg = Date.now() - 10000; if (window.relaisRebrancher) window.relaisRebrancher(); } }, 5000);
+      document.addEventListener("visibilitychange", () => { if (!document.hidden && entre) { envoyer(topic, {m: "vie", pid}); envoyer(topic, {m: "ici", pid, nom, av, prenom}); } }); }
   }
   ecranChoix();
   /* Déjà dans la partie (page rechargée, iPad planté, QR rescanné, nouvel onglet) : on revient tout seul, sans rechoisir;
@@ -1389,6 +1398,8 @@ function joueur(code){
       const pm = $("jPasMoi"); if (pm) pm.onclick = () => { try { envoyer(topic, {m: "bye", pid}); sessionStorage.removeItem("quizJoueur"); localStorage.removeItem("quizDernier"); } catch(e) {} entre = false; av = -1; nomEdite = false; nomChoisi = ""; ecranChoix(); }; } } catch(e) {}
     let reT = 0; const reannoncer = () => { if (entre && Date.now() - reT > 3000) { reT = Date.now(); envoyer(topic, {m: "ici", pid, nom, av, prenom}); } };
     ecouter(topic, m => {
+      window.__dernierMsg = Date.now(); const rc = $("jReco"); if (rc) rc.hidden = true;
+      if (m.m === "pouls") return;
       // La télécommande ne me connaît pas (rechargée, partie neuve) : je me réannonce tout seul
       if (m.m === "persos") { pris = m.pris || []; if (!entre) ecranChoix(ecranChoix.msg); else if (!pris.includes(av)) reannoncer(); return; }
       if (m.m === "bienvenue" && !m.pour) reannoncer();
