@@ -3283,9 +3283,24 @@ html.apercu-mode #menage{display:none}
       for (const k in T) if (k.slice(0, 10) < new Date(Date.now() - 7 * 864e5).toISOString().slice(0, 10)) delete T[k];
       try { localStorage.menageFait = JSON.stringify(T); } catch(x) {} rendu = ""; dessiner();
       const n = M().taches.length, f = (T[cle] || []).filter(x => x < n).length;
+      if (T[cle].includes(i) && n > 0 && f === n) sonMenage(true);
       if (T[cle].includes(i) && f < n) { const t = document.getElementById("mnAideT"); t.classList.remove("on"); void t.offsetWidth; t.classList.add("on"); } }
     else if (e.target.closest(".mn-t, .mn-i")) li.classList.toggle("ouvert");
   });
+  /* 13 nov. (« un son motivant à la fin du ménage ») : fanfare quand tout est coché */
+  let AC = null;
+  function sonMenage(fin){ try {
+    AC = AC || new (window.AudioContext || window.webkitAudioContext)(); if (AC.state === "suspended") AC.resume();
+    const t0 = AC.currentTime + .02, out = AC.createGain(); out.gain.value = .5; out.connect(AC.destination);
+    const note = (f, t, d, v, type) => { const o = AC.createOscillator(), g = AC.createGain(); o.type = type || "triangle"; o.frequency.value = f;
+      g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(v, t + .015); g.gain.exponentialRampToValueAtTime(.001, t + d);
+      o.connect(g); g.connect(out); o.start(t); o.stop(t + d + .05); };
+    if (!fin) { note(880, t0, .25, .5); note(1320, t0 + .08, .35, .4); return; }
+    [523, 659, 784, 1047].forEach((f, k) => note(f, t0 + k * .12, .3, .55, "square"));            /* montée do-mi-sol-do */
+    [784, 1047].forEach((f, k) => note(f, t0 + .55 + k * .12, .2, .5, "square"));                  /* ta-ta */
+    [523, 659, 784, 1047, 1319].forEach(f => { note(f, t0 + .85, 1.6, .32, "sawtooth"); note(f, t0 + .85, 1.8, .35); });  /* grand accord final */
+    note(130.8, t0 + .85, 1.6, .5, "triangle");
+  } catch(x) {} }
   let actifVu = false;
   document.getElementById("mnMini").onclick = e => { e.stopPropagation(); if (force && !actifVu) { force = false; montrer(false); if (APERCU) { APERCU = null; rendu = ""; ed.hidden = false; } return; } mini = true; el.classList.add("mini"); };
   el.addEventListener("click", () => { if (mini) { mini = false; el.classList.remove("mini"); } });
