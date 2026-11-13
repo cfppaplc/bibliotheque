@@ -3287,7 +3287,7 @@ html.apercu-mode #menage{display:none}
       if (T[cle].includes(i) && f < n) { const t = document.getElementById("mnAideT"); t.classList.remove("on"); void t.offsetWidth; t.classList.add("on"); } }
     else if (e.target.closest(".mn-t, .mn-i")) li.classList.toggle("ouvert");
   });
-  /* 13 nov. (« un son motivant à la fin du ménage ») : fanfare quand tout est coché */
+  /* 13 nov. (« un son motivant à la fin du ménage ») : marimba quand tout est coché */
   let AC = null;
   function sonMenage(fin){ try {
     AC = AC || new (window.AudioContext || window.webkitAudioContext)(); if (AC.state === "suspended") AC.resume();
@@ -3295,11 +3295,9 @@ html.apercu-mode #menage{display:none}
     const note = (f, t, d, v, type) => { const o = AC.createOscillator(), g = AC.createGain(); o.type = type || "triangle"; o.frequency.value = f;
       g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(v, t + .015); g.gain.exponentialRampToValueAtTime(.001, t + d);
       o.connect(g); g.connect(out); o.start(t); o.stop(t + d + .05); };
-    if (!fin) { note(880, t0, .25, .5); note(1320, t0 + .08, .35, .4); return; }
-    [523, 659, 784, 1047].forEach((f, k) => note(f, t0 + k * .12, .3, .55, "square"));            /* montée do-mi-sol-do */
-    [784, 1047].forEach((f, k) => note(f, t0 + .55 + k * .12, .2, .5, "square"));                  /* ta-ta */
-    [523, 659, 784, 1047, 1319].forEach(f => { note(f, t0 + .85, 1.6, .32, "sawtooth"); note(f, t0 + .85, 1.8, .35); });  /* grand accord final */
-    note(130.8, t0 + .85, 1.6, .5, "triangle");
+    const dl = AC.createDelay(), fb = AC.createGain(), w = AC.createGain(); dl.delayTime.value = .23; fb.gain.value = .32; w.gain.value = .35;   /* léger écho */
+    out.connect(dl); dl.connect(fb); fb.connect(dl); dl.connect(w); w.connect(AC.destination);
+    [[523.3, 0], [659.3, .13], [784, .26], [1046.5, .42]].forEach(([f, d]) => { note(f, t0 + d, .6, .45, "sine"); note(f * 4, t0 + d, .08, .12, "sine"); });   /* marimba (choix 3 de Jeremy) */
   } catch(x) {} }
   let actifVu = false;
   document.getElementById("mnMini").onclick = e => { e.stopPropagation(); if (force && !actifVu) { force = false; montrer(false); if (APERCU) { APERCU = null; rendu = ""; ed.hidden = false; } return; } mini = true; el.classList.add("mini"); };
