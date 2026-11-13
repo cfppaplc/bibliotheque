@@ -11176,7 +11176,7 @@ body:has(.reader.open:not(.wbon)) .toast{bottom:calc(98px + env(safe-area-inset-
   const q = new URLSearchParams(location.search).get("zoomflou");
   if (q === "0" || q === "1") localStorage.zoomFlou = q;
   const v = localStorage.zoomFlou, tactile = matchMedia("(any-pointer:coarse)").matches;
-  if (v === "1" || (v !== "0" && tactile)) document.documentElement.classList.add("zflou");
+  if (v === "1") document.documentElement.classList.add("zflou");   /* 13 nov. : plus par défaut au TNI (écrans noirs : mémoire graphique) */
 } catch(e){} })();
 </script>
 </body></html>
