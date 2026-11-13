@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<!-- © 2026 Jérémy Raymond. Tous droits réservés. -->
+<html lang="fr-CA"><head><meta charset="utf-8"><script src="garde-admin.js"></script><title>Métier+ — Test de connexion</title><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<link rel="icon" href="img/metier-plus-icone.svg">
+<style>
+body{margin:0;font-family:"Segoe UI",Roboto,sans-serif;background:#0e1320;color:#fff;display:flex;flex-direction:column;align-items:center;padding:30px 16px}
+img.logo{height:34px;margin-bottom:18px}h1{margin:0 0 6px;font-size:1.8rem}
+p.sous{margin:0 0 22px;color:#aab3c5;text-align:center;max-width:620px}
+.l{width:100%;max-width:760px;display:flex;flex-direction:column;gap:12px}
+.r{background:#161d2c;border:1px solid #232c40;border-radius:14px;padding:16px 20px;display:flex;gap:14px;align-items:center}
+.r b{display:block;font-size:1.1rem}.r span{color:#aab3c5;font-size:.95rem}
+.r .v{margin-left:auto;font-weight:700;font-size:1.15rem;text-align:right;white-space:nowrap}
+.pt{width:14px;height:14px;border-radius:50%;background:#556;flex:none}
+.ok .pt{background:#2ecc71}.moy .pt{background:#f1c40f}.mal .pt{background:#e74c3c}
+button{font:inherit;font-weight:700;background:#EB6A22;color:#fff;border:0;border-radius:12px;padding:14px 22px;min-height:48px;cursor:pointer;margin:4px}
+button.s{background:#232c40}
+.retour{margin-top:26px;color:#aab3c5}.retour a{color:#EB6A22}
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.50.0/dist/umd/supabase.min.js"></script>
+</head><body>
+<img class="logo" src="img/metier-plus-blanc.svg" alt="Métier+">
+<h1>Test de connexion</h1>
+<p class="sous">Vérifie si Internet est assez bon ici pour ouvrir les livres et jouer aux quiz (les iPad des élèves aussi). Environ 30 secondes.</p>
+<button id="go">Lancer le test</button>
+<div class="l" id="L" style="margin-top:14px">
+ <div class="r" id="r1"><i class="pt"></i><div><b>Temps de réponse du site</b><span>Délai avant que Métier+ réponde</span></div><div class="v">—</div></div>
+ <div class="r" id="r2"><i class="pt"></i><div><b>Vitesse de téléchargement</b><span>Temps pour recevoir un gros livre (11 Mo)</span></div><div class="v">—</div></div>
+ <div class="r" id="r3"><i class="pt"></i><div><b>Relais des quiz</b><span>Aller-retour d'un message (quiz, simulateur, télécommande)</span></div><div class="v">—</div></div>
+ <div class="r" id="r4"><i class="pt"></i><div><b>Avis et signalements</b><span>Service qui transmet les demandes d'accès et les problèmes</span></div><div class="v">—</div></div>
+</div>
+<p class="sous" id="bilan" style="margin-top:18px"></p>
+<p class="retour"><a href="tests.html">‹ Pages d'essai</a></p>
+<script>
+const $=s=>document.querySelector(s);
+function mettre(id,c,t,s){const r=$("#"+id);r.className="r "+c;r.querySelector(".v").innerHTML=t;if(s)r.querySelector("span").textContent=s}
+const med=a=>{a=a.slice().sort((x,y)=>x-y);return a[Math.floor(a.length/2)]};
+async function t1(){const a=[];for(let i=0;i<5;i++){const t=performance.now();await fetch("version.json?x="+Math.random(),{cache:"no-store"});a.push(performance.now()-t)}
+ const m=Math.round(med(a));mettre("r1",m<150?"ok":m<500?"moy":"mal",m+" ms");return m}
+async function t2(){const t=performance.now();const r=await fetch("livres/notions-energie-c13.chiffre?x="+Math.random(),{cache:"no-store"});const b=await r.arrayBuffer();
+ const s=(performance.now()-t)/1000,mb=b.byteLength*8/1e6/s;mettre("r2",mb>20?"ok":mb>5?"moy":"mal",mb.toFixed(1)+" Mb/s<br><small>"+s.toFixed(1)+" s</small>");return mb}
+function t3(){return new Promise(res=>{let fini=false;const fin=(c,t,v)=>{if(fini)return;fini=true;mettre("r3",c,t);try{sb.removeChannel(ch)}catch(e){}res(v)};
+ setTimeout(()=>fin("mal","pas de réponse",null),15000);
+ let sb,ch;try{sb=supabase.createClient("https://kjlotlhqrgekzohshmbn.supabase.co","sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY",{realtime:{params:{eventsPerSecond:20}}})}catch(e){return fin("mal","bloqué",null)}
+ const a=[],envoi={};let n=0,perdus=0;
+ ch=sb.channel("pda-test-"+Math.random().toString(36).slice(2),{config:{broadcast:{self:true}}});
+ ch.on("broadcast",{event:"p"},({payload})=>{if(envoi[payload.i]!=null){a.push(performance.now()-envoi[payload.i]);delete envoi[payload.i]}});
+ ch.subscribe(st=>{if(st!=="SUBSCRIBED")return;const go=()=>{if(n>=10){setTimeout(()=>{perdus=Object.keys(envoi).length;
+   if(!a.length)return fin("mal","aucun message",null);const m=Math.round(med(a));
+   fin(perdus?"mal":m<250?"ok":m<700?"moy":"mal",m+" ms"+(perdus?"<br><small>"+perdus+" perdu(s) sur 10</small>":""),m)},1500);return}
+   envoi[n]=performance.now();ch.send({type:"broadcast",event:"p",payload:{i:n}});n++;setTimeout(go,300)};go()})})}
+async function t4(){try{const t=performance.now();const r=await fetch("https://ntfy.sh/v1/health",{cache:"no-store"});const m=Math.round(performance.now()-t);
+ mettre("r4",r.ok?"ok":"mal",r.ok?m+" ms":"erreur");return r.ok}catch(e){mettre("r4","mal","bloqué");return false}}
+$("#go").onclick=async()=>{$("#go").disabled=true;$("#go").textContent="Test en cours…";$("#bilan").textContent="";
+ document.querySelectorAll(".r").forEach(r=>{r.className="r";r.querySelector(".v").textContent="…"});
+ let a,b,c,d;try{a=await t1()}catch(e){mettre("r1","mal","bloqué")}try{b=await t2()}catch(e){mettre("r2","mal","bloqué")}
+ c=await t3();d=await t4();
+ const pb=[];if(!b||b<5)pb.push("les livres seront lents à ouvrir la première fois");if(!c||c>=700)pb.push("les quiz risquent de décrocher (le réseau de l'école bloque peut-être le relais)");if(!d)pb.push("les demandes d'accès et signalements ne passeront pas");
+ $("#bilan").textContent=pb.length?"À surveiller : "+pb.join("; ")+".":"Tout est correct ici.";
+ $("#go").disabled=false;$("#go").textContent="Refaire le test"};
+</script>
+</body></html>

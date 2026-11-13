@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<!-- © 2026 Jérémy Raymond. Tous droits réservés. -->
+<html lang="fr-CA"><head><meta charset="utf-8"><script src="garde-admin.js"></script><title>Métier+ — Écran, son et stockage</title><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<link rel="icon" href="img/metier-plus-icone.svg">
+<style>
+body{margin:0;font-family:"Segoe UI",Roboto,sans-serif;background:#0e1320;color:#fff;display:flex;flex-direction:column;align-items:center;padding:30px 16px}
+img.logo{height:34px;margin-bottom:18px}h1{margin:0 0 6px;font-size:1.8rem}
+p.sous{margin:0 0 22px;color:#aab3c5;text-align:center;max-width:620px}
+.l{width:100%;max-width:760px;display:flex;flex-direction:column;gap:12px}
+.r{background:#161d2c;border:1px solid #232c40;border-radius:14px;padding:16px 20px;display:flex;gap:14px;align-items:center}
+.r b{display:block;font-size:1.1rem}.r span{color:#aab3c5;font-size:.95rem}
+.r .v{margin-left:auto;font-weight:700;font-size:1.15rem;text-align:right;white-space:nowrap}
+.pt{width:14px;height:14px;border-radius:50%;background:#556;flex:none}
+.ok .pt{background:#2ecc71}.moy .pt{background:#f1c40f}.mal .pt{background:#e74c3c}
+button{font:inherit;font-weight:700;background:#EB6A22;color:#fff;border:0;border-radius:12px;padding:14px 22px;min-height:48px;cursor:pointer;margin:4px}
+button.s{background:#232c40}
+.retour{margin-top:26px;color:#aab3c5}.retour a{color:#EB6A22}
+</style>
+
+</head><body>
+<img class="logo" src="img/metier-plus-blanc.svg" alt="Métier+">
+<h1>Écran, son et stockage</h1>
+<p class="sous">Pour vérifier un tableau interactif, une télé ou un iPad avant de s'en servir en classe.</p>
+<div class="l">
+ <div class="r"><div><b>Écran</b><span id="ec"></span></div></div>
+ <div class="r"><div><b>Plein écran</b><span>Le carré du coin de Métier+ doit marcher ici.</span></div><div class="v"><button id="fs">Essayer</button></div></div>
+ <div class="r" style="flex-wrap:wrap"><div style="flex:1 1 260px"><b>Son</b><span>Un son à gauche, à droite, puis 3 volumes. Si on n'entend rien : volume de l'appareil, ou haut-parleur (HDMI) mal choisi.</span></div>
+  <div class="v"><button class="s" data-p="-1">Gauche</button><button class="s" data-p="1">Droite</button><button data-v="1">Volumes</button></div></div>
+ <div class="r" id="rs"><i class="pt"></i><div><b>Stockage</b><span id="st">Place pour garder les livres hors ligne</span></div><div class="v" id="stv">…</div></div>
+</div>
+<p class="retour"><a href="tests.html">‹ Pages d'essai</a></p>
+<script>
+const $=s=>document.querySelector(s);
+function ecran(){const d=devicePixelRatio||1,t=matchMedia("(any-pointer:coarse)").matches;
+ $("#ec").innerHTML=innerWidth+" × "+innerHeight+" (taille vue par le site) · "+Math.round(screen.width*d)+" × "+Math.round(screen.height*d)+" pixels réels · zoom ×"+d+" · "+(t?"tactile":"pas tactile")+(screen.orientation?" · "+(screen.orientation.type.startsWith("portrait")?"portrait":"paysage"):"")}
+ecran();addEventListener("resize",ecran);
+$("#fs").onclick=async()=>{try{if(document.fullscreenElement){await document.exitFullscreen()}else{await document.documentElement.requestFullscreen()}}catch(e){$("#fs").textContent="Refusé"}};
+document.addEventListener("fullscreenchange",()=>{$("#fs").textContent=document.fullscreenElement?"Sortir":"Essayer";ecran()});
+let ac;function bip(f,t,d,v,p){ac=ac||new (window.AudioContext||window.webkitAudioContext)();const o=ac.createOscillator(),g=ac.createGain();let n=g;
+ if(p&&ac.createStereoPanner){const s=ac.createStereoPanner();s.pan.value=p;g.connect(s);n=s}n.connect(ac.destination);o.connect(g);o.frequency.value=f;
+ const t0=ac.currentTime+t;g.gain.setValueAtTime(0,t0);g.gain.linearRampToValueAtTime(v,t0+.02);g.gain.exponentialRampToValueAtTime(.001,t0+d);o.start(t0);o.stop(t0+d+.05)}
+document.querySelectorAll("[data-p]").forEach(b=>b.onclick=()=>{const p=+b.dataset.p;bip(660,0,.4,.5,p);bip(880,.45,.5,.5,p)});
+$("[data-v]").onclick=()=>{[.1,.35,.9].forEach((v,i)=>bip(523,i*.7,.55,v,0))};
+(async()=>{try{const e=await navigator.storage.estimate();const lib=(e.quota-e.usage)/1e9,p=navigator.storage.persisted?await navigator.storage.persisted():false;
+ $("#rs").className="r "+(lib>1?"ok":lib>.3?"moy":"mal");$("#stv").innerHTML=lib.toFixed(1)+" Go libres<br><small>Métier+ utilise "+(e.usage/1e6).toFixed(0)+" Mo</small>";
+ $("#st").textContent="Place pour garder les livres hors ligne · "+(p?"protégée (le navigateur ne l'efface pas)":"pas protégée (le navigateur peut l'effacer s'il manque de place)")}catch(e){$("#stv").textContent="inconnu"}})();
+</script>
+</body></html>
