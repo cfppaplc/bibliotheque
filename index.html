@@ -6791,27 +6791,27 @@ window.__htmlImpression = htmlImpression;
 (function(){
   const tb = $("#tb"), more = $("#tbMore"), pop = $("#tbPop"), grid = $("#tbGrid");
   const MOV = ["tbPen","tbAns","tbAnim","tbZo","tbZv","tbZi","tbTimer","tbSpot","tbCache","tbWb","tbMenu","tbLaser","tbNoir","tbMark","tbHelp","tbDbl","tbPin","tbPrint","tbQr","tbTele","tbFs"];
-  const DEF = { bar:["tbAns","tbAnim","tbMenu","tbPen","tbWb","tbZv","tbDbl","tbFs","tbTele"], menu:["tbTimer","tbSpot","tbCache","tbLaser","tbNoir","tbMark","tbHelp","tbPin","tbPrint","tbQr","tbZo","tbZi"] };   /* 9 nov. : groupes Présenter · Écrire · Affichage; zoom − / + dans « Plus d'outils » (roulette et pincement suffisent) */
+  const DEF = { bar:["tbAns","tbMenu","tbPen","tbWb","tbZv","tbDbl","tbFs","tbTele"], menu:["tbAnim","tbTimer","tbSpot","tbCache","tbLaser","tbNoir","tbMark","tbHelp","tbPin","tbPrint","tbQr","tbZo","tbZi"] };   /* 9 nov. : groupes Présenter · Écrire · Affichage; zoom − / + dans « Plus d'outils » (roulette et pincement suffisent) */
   MOV.forEach(id => $("#" + id).classList.add("mov"));
   const el = id => document.getElementById(id);
   const etiquette = b => { let l = b.querySelector(".tbl"); if (grid.contains(b)){ if (!l){ l = document.createElement("span"); l.className = "tbl"; b.appendChild(l); } l.textContent = b.getAttribute("aria-label") || b.title; } else if (l) l.remove(); };
   /* téléphone : une seule rangée (page précédente, numéro, page suivante, réponses, modules, plus) */
   const TEL = matchMedia("(max-width:640px)").matches;
   const DEF_TEL = { bar:["tbAns","tbMenu"], menu:["tbPen","tbQr","tbMark","tbAnim","tbZo","tbZv","tbZi","tbTimer","tbSpot","tbCache","tbWb","tbLaser","tbNoir","tbHelp","tbDbl","tbPin","tbPrint","tbFs","tbTele"] };
-  const lire = () => { const L = lireLS(TEL ? "tbLayoutTel" : "tbLayout2", null); const ok = L && Array.isArray(L.bar) && Array.isArray(L.menu); return ok ? L : TEL ? DEF_TEL : DEF; };
+  const lire = () => { const L = lireLS(TEL ? "tbLayoutTel" : "tbLayout3", null); const ok = L && Array.isArray(L.bar) && Array.isArray(L.menu); return ok ? L : TEL ? DEF_TEL : DEF; };
   const appliquer = L => {
     const vus = new Set(), place = (id, cont, avant) => { const b = el(id); if (!b || vus.has(id) || !MOV.includes(id)) return; vus.add(id); if (avant) cont.insertBefore(b, avant); else cont.appendChild(b); };
     L.bar.forEach(id => place(id, tb, more)); L.menu.forEach(id => place(id, grid));
     MOV.forEach(id => { if (!vus.has(id)) place(id, DEF.menu.includes(id) ? grid : tb, DEF.menu.includes(id) ? null : more); });
     MOV.forEach(id => etiquette(el(id)));
   };
-  const sauver = () => { try { localStorage.setItem(TEL ? "tbLayoutTel" : "tbLayout2", JSON.stringify({ bar:MOV.filter(id => el(id).parentNode === tb).sort((a, b) => (el(a).compareDocumentPosition(el(b)) & 4) ? -1 : 1), menu:[...grid.children].map(b => b.id) })); } catch(e){} };
+  const sauver = () => { try { localStorage.setItem(TEL ? "tbLayoutTel" : "tbLayout3", JSON.stringify({ bar:MOV.filter(id => el(id).parentNode === tb).sort((a, b) => (el(a).compareDocumentPosition(el(b)) & 4) ? -1 : 1), menu:[...grid.children].map(b => b.id) })); } catch(e){} };
   appliquer(lire());
   const fermer = () => { if (tb.classList.contains("edit")) return; pop.classList.remove("open"); more.setAttribute("aria-expanded", "false"); more.classList.remove("on"); };
   const ouvrir = () => { pop.classList.add("open"); more.setAttribute("aria-expanded", "true"); more.classList.add("on"); };
   more.onclick = e => { e.stopPropagation(); if (pop.classList.contains("open")){ tb.classList.remove("edit"); fermer(); } else ouvrir(); };
   $("#tbOrg").onclick = () => { tb.classList.toggle("edit"); $("#tbOrg").textContent = tb.classList.contains("edit") ? "✔ Terminé" : "✎ Organiser"; if (!tb.classList.contains("edit")) sauver(); };
-  $("#tbRaz").onclick = () => { try { localStorage.removeItem(TEL ? "tbLayoutTel" : "tbLayout2"); } catch(e){} appliquer(TEL ? DEF_TEL : DEF); };
+  $("#tbRaz").onclick = () => { try { localStorage.removeItem(TEL ? "tbLayoutTel" : "tbLayout3"); } catch(e){} appliquer(TEL ? DEF_TEL : DEF); };
   /* un clic sur un outil du menu le referme (sauf en mode organiser) */
   grid.addEventListener("click", () => setTimeout(fermer, 0));
   document.addEventListener("pointerdown", e => { if (pop.classList.contains("open") && !tb.classList.contains("edit") && !pop.contains(e.target) && e.target !== more && !more.contains(e.target)) fermer(); }, true);
