@@ -15,4 +15,6 @@ if [ $# -gt 0 ]; then
   NODE_PATH=$(npm root -g) node outils/verifier_livre.js http://localhost:8790/ "$@" || true
   kill $SRV 2>/dev/null || true
 fi
+# 13 nov. : numéro de version affiché en bas à gauche des pages (plein-ecran.js)
+printf '{"v":"%s"}\n' "$(TZ=America/Toronto date '+%Y-%m-%d %H:%M')" > version.json
 git add -A && git commit -q -m "$MSG" && git push origin main 2>&1 | tail -1

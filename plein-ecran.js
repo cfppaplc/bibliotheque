@@ -53,3 +53,18 @@
   }
   if (d.body) poser(); else d.addEventListener("DOMContentLoaded", poser);
 })();
+
+/* 13 nov. (Jeremy : « vérifier que ma version concorde avec celle du site ») : petite version en bas à gauche.
+   version.json est écrit par outils/publier.sh à chaque publication. La version lue au chargement de la page
+   est comparée aux 5 min avec celle en ligne : si elle a changé, « recharge » s'affiche. */
+(function(){
+  if (window.top !== window || /[?&]inclus=1/.test(location.search)) return;
+  const lire = () => fetch("version.json?t=" + Date.now(), { cache: "no-store" }).then(r => r.json()).then(j => j.v).catch(() => "");
+  const fmt = v => { const m = /^(\d{4})-(\d\d)-(\d\d) (\d\d):(\d\d)$/.exec(v || ""); return m ? "v " + (+m[3]) + " " + ["janv.","févr.","mars","avr.","mai","juin","juil.","août","sept.","oct.","nov.","déc."][m[2] - 1] + " " + m[4] + " h " + m[5] : ""; };
+  lire().then(v0 => { if (!v0) return;
+    const e = document.createElement("div"); e.id = "mpVersion"; e.textContent = fmt(v0); e.title = "Version de cette page : " + v0;
+    e.style.cssText = "position:fixed;left:6px;bottom:4px;z-index:2147483000;font:11px/1 system-ui,sans-serif;color:rgba(128,128,128,.55);pointer-events:none;user-select:none";
+    (document.body || document.documentElement).appendChild(e);
+    setInterval(() => lire().then(v => { if (v && v !== v0){ e.textContent = fmt(v0) + " · nouvelle version " + fmt(v).slice(2) + " : recharge la page"; e.style.color = "#EB6A22"; } }), 300000);
+  });
+})();
