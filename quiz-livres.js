@@ -866,6 +866,19 @@ window.QUIZ_LIVRES = [
 "expl": "Le réseau d'Hydro-Québec est en courant alternatif : V~."
 },
 {
+"q": "Œil de lynx : un collègue veut mesurer la tension de cette batterie de 12 V. Qu'est-ce qui cloche ?",
+"ch": [
+"Les deux sondes touchent la même borne (+) : il lira 0 V",
+"Les sondes sont inversées",
+"Il faut mesurer en ampères",
+"Il faut enlever la batterie du véhicule"
+],
+"bon": 0,
+"s": 30,
+"img": "img/labo/quiz/multimetre/batterie.jpg",
+"expl": "Pour lire une tension, une sonde va sur chaque borne : rouge sur le +, noire sur le −. Sur la même borne, la différence de potentiel est 0 V."
+},
+{
 "q": "Tu mesures une batterie de 12 V. Sur quelle position mets-tu le sélecteur ?",
 "ch": [
 "V~",
