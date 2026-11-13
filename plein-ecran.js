@@ -60,7 +60,7 @@
 (function(){
   if (window.top !== window || /[?&]inclus=1/.test(location.search)) return;
   /* 13 nov. : seulement pour le compte de Jeremy (connecté sur cet appareil), invisible pour les autres */
-  try { if (localStorage.getItem("dernierId") !== "jeremy.raymond" || !localStorage.getItem("etaitConnecte")) return; } catch(e){ return; }
+  try { const co = localStorage.getItem("etaitConnecte") || ""; if (!co || (localStorage.getItem("dernierId") !== "jeremy.raymond" && !/j[ée]r[ée]my/i.test(co))) return; } catch(e){ return; }
   const lire = () => fetch("version.json?t=" + Date.now(), { cache: "no-store" }).then(r => r.json()).then(j => j.v).catch(() => "");
   const fmt = v => { const m = /^(\d{4})-(\d\d)-(\d\d) (\d\d):(\d\d)$/.exec(v || ""); return m ? "v " + (+m[3]) + " " + ["janv.","févr.","mars","avr.","mai","juin","juil.","août","sept.","oct.","nov.","déc."][m[2] - 1] + " " + m[4] + " h " + m[5] : ""; };
   lire().then(v0 => { if (!v0) return;
