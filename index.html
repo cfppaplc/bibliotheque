@@ -1061,8 +1061,6 @@ html.leger::view-transition-old(root),html.leger::view-transition-new(root){anim
   function ecrire(k, v){ try { if (S) S.setItem(k, v); } catch(e){} }
   /* (7 nov.) cellulaire = mode léger d'office (sauf si « Complètes » est choisi) : petit écran tactile */
   function cell(){ try { return matchMedia("(pointer:coarse)").matches && Math.min(screen.width, screen.height) <= 600; } catch(e){ return false; } }
-  /* (12 nov.) tableau interactif = écran tactile sans souris principale (pointer:coarse) ou tactile en plus (any-pointer:coarse) sur un grand écran : mode léger d'office aussi (sauf « Complètes ») */
-  function tni(){ try { return (matchMedia("(pointer:coarse)").matches || matchMedia("(any-pointer:coarse)").matches) && Math.min(screen.width, screen.height) > 600 && !/iPad|Macintosh/.test(navigator.userAgent); } catch(e){ return false; } }
   function appliquer(){ var m = lire("modeLeger"); h.classList.toggle("leger", m === "oui" || (m !== "non" && (cell() || lire("modeLegerMesure") === "lent"))); }
   window.modeLegerChoix = function(){ return lire("modeLeger") || "auto"; };
   window.modeLegerFixer = function(v){ try { if (!S) return; if (v === "auto") S.removeItem("modeLeger"); else S.setItem("modeLeger", v); } catch(e){} appliquer(); if (v === "auto") mesurer(); };
@@ -2425,7 +2423,6 @@ const APPAREIL_LEGER = (function(){
 window.addEventListener("resize", () => { try { majBoutonDbl(); } catch(e){} });
 function setupExtras(){
   if (APPAREIL_LEGER || document.documentElement.classList.contains("leger")) return;
-  try { if (matchMedia("(any-pointer:coarse)").matches) return; } catch(e){}   /* 10 nov. : écran tactile (TNI) = pas de copies du livre (chaque copie recharge tout le livre) */
   [3, 4].forEach(i => {
     const f = $("#readerFrame" + i);
     const go = () => { try { const d = f.contentDocument; if (d && d.body) RD["drv" + i] = buildDriver(f.contentWindow, d); } catch(e){} };
