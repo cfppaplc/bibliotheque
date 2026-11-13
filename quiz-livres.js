@@ -815,6 +815,7 @@ window.QUIZ_LIVRES = [
 "Affiche OL"
 ],
 "bon": 0,
+"img": "img/labo/quiz/multimetre/cordon.jpg",
 "s": 25,
 "expl": "Le courant aller et le courant retour s'annulent. Il faut entourer un seul conducteur (ou utiliser un séparateur de cordon)."
 },
