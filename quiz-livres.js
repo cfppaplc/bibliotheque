@@ -715,6 +715,428 @@ window.QUIZ_LIVRES = [
 ]
 },
 {
+"id": "multimetre-fluke-302",
+"exemple": true,
+"titre": "Le multimètre (Fluke 302+)",
+"sujet": "Ampères, volts AC/DC, ohms et continuité",
+"couv": "img/labo/quiz/multimetre-couv.svg",
+"coul": "#E8B400",
+"reg": {
+"nb": "15",
+"melange": "tout"
+},
+"qs": [
+{
+"q": "La pince Fluke 302+ mesure le courant (ampères) de quelle façon ?",
+"ch": [
+"Avec les mâchoires refermées autour d'un fil",
+"Avec les sondes branchées en série",
+"Avec les sondes branchées en parallèle",
+"Dans la borne COM et la borne A"
+],
+"bon": 0,
+"s": 20,
+"expl": "La 302+ mesure le courant alternatif seulement avec ses mâchoires, jusqu'à 400 A. Pas besoin d'ouvrir le circuit."
+},
+{
+"q": "La Fluke 302+ peut mesurer le courant continu (A DC) avec ses mâchoires.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 1,
+"s": 15,
+"expl": "Faux : la 302+ mesure seulement le courant alternatif (A~), jusqu'à 400 A. Pour le DC en ampères, il faut un autre modèle."
+},
+{
+"q": "Quel est le courant maximal que la Fluke 302+ peut mesurer ?",
+"ch": [
+"40 A",
+"400 A",
+"600 A",
+"1000 A"
+],
+"bon": 1,
+"s": 15,
+"expl": "400,0 A en courant alternatif. Les modèles 303 et 305 montent plus haut."
+},
+{
+"q": "Quelle tension maximale la Fluke 302+ peut-elle mesurer (AC ou DC) ?",
+"ch": [
+"120 V",
+"240 V",
+"600 V",
+"1000 V"
+],
+"bon": 2,
+"s": 15,
+"expl": "600 V en AC comme en DC. Elle est classée CAT III 600 V / CAT IV 300 V."
+},
+{
+"q": "Ta lecture d'ohms affiche « OL ». Ça veut dire…",
+"ch": [
+"Le circuit est ouvert ou la résistance dépasse la plage (4000 Ω sur la 302+)",
+"La pile est faible",
+"Il y a un court-circuit",
+"Il reste de la tension dans le circuit"
+],
+"bon": 0,
+"s": 20,
+"expl": "OL = « overload » : résistance trop grande pour la plage, ou circuit ouvert (fil coupé, fusible brûlé)."
+},
+{
+"t": "nombre",
+"q": "Le mode continuité de la Fluke 302+ émet un bip quand la résistance est égale ou inférieure à combien d'ohms ?",
+"ch": [],
+"bon": 70,
+"tol": 0,
+"u": "Ω",
+"s": 25,
+"expl": "Bip à 70 Ω ou moins. Sous ce seuil, le chemin est considéré comme continu."
+},
+{
+"q": "Tu veux lire une valeur et la garder à l'écran après avoir retiré la pince d'un endroit difficile. Quel bouton ?",
+"ch": [
+"HOLD (gel de la lecture)",
+"Le rétroéclairage",
+"Le sélecteur à OFF",
+"Il faut prendre une photo"
+],
+"bon": 0,
+"s": 15,
+"expl": "Le bouton HOLD fige la dernière lecture à l'écran."
+},
+{
+"q": "Mise en situation : tu refermes la pince autour du cordon complet d'un aspirateur en marche (les deux fils dans la mâchoire). La lecture…",
+"ch": [
+"Est près de 0 A",
+"Est le double du vrai courant",
+"Est exacte",
+"Affiche OL"
+],
+"bon": 0,
+"s": 25,
+"expl": "Le courant aller et le courant retour s'annulent. Il faut entourer un seul conducteur (ou utiliser un séparateur de cordon)."
+},
+{
+"q": "Mise en situation : une plinthe électrique de 2000 W sur 240 V. Quel courant devrais-tu lire avec la pince ?",
+"ch": [
+"Environ 4,2 A",
+"Environ 8,3 A",
+"Environ 16,7 A",
+"Environ 24 A"
+],
+"bon": 1,
+"s": 30,
+"expl": "I = P ÷ V = 2000 ÷ 240 ≈ 8,3 A."
+},
+{
+"t": "nombre",
+"q": "Un élément de chauffe-eau de 4500 W fonctionne à 240 V. Quel courant la pince devrait-elle indiquer ? (au dixième)",
+"ch": [],
+"bon": 18.8,
+"tol": 0.2,
+"u": "A",
+"s": 35,
+"expl": "I = 4500 ÷ 240 = 18,75 A, donc environ 18,8 A."
+},
+{
+"q": "Mise en situation : le disjoncteur d'un circuit de 15 A saute souvent. Avec la pince sur le fil de phase, tu lis 17 A. Conclusion ?",
+"ch": [
+"Le circuit est surchargé",
+"Le disjoncteur est trop gros",
+"Le neutre est coupé",
+"La pince est déréglée"
+],
+"bon": 0,
+"s": 25,
+"expl": "17 A dépasse 15 A : trop d'appareils sur ce circuit. Le disjoncteur fait son travail."
+},
+{
+"q": "Tu vérifies une prise de courant ordinaire. Sur quelle position mets-tu le sélecteur ?",
+"ch": [
+"V~ (tension alternative)",
+"V⎓ (tension continue)",
+"Ω",
+"A~"
+],
+"bon": 0,
+"s": 15,
+"expl": "Le réseau d'Hydro-Québec est en courant alternatif : V~."
+},
+{
+"q": "Tu mesures une batterie de 12 V. Sur quelle position mets-tu le sélecteur ?",
+"ch": [
+"V~",
+"V⎓ (tension continue)",
+"A~",
+"Ω avec bip"
+],
+"bon": 1,
+"s": 15,
+"expl": "Une batterie donne du courant continu : V⎓ (ligne droite et pointillé)."
+},
+{
+"q": "Mise en situation : le transformateur d'un thermostat donne 24 V au secondaire. Quel mode utilises-tu ?",
+"ch": [
+"V~",
+"V⎓",
+"Ω",
+"A~"
+],
+"bon": 0,
+"s": 20,
+"expl": "Un transformateur ne fonctionne qu'en alternatif : son secondaire de 24 V est en AC."
+},
+{
+"q": "Mise en situation : tu mesures une batterie de 12 V, mais le sélecteur est resté sur V~. Que risques-tu de lire ?",
+"ch": [
+"Une valeur fausse, souvent près de 0",
+"Exactement 12 V",
+"24 V",
+"OL"
+],
+"bon": 0,
+"s": 25,
+"expl": "En mode AC, l'appareil cherche une tension qui varie. Une tension continue stable donne une lecture fausse. Toujours vérifier AC ou DC avant de lire."
+},
+{
+"q": "La tension se mesure…",
+"ch": [
+"En parallèle, sondes de chaque côté de la charge",
+"En série, en ouvrant le circuit",
+"Avec la pince autour d'un fil",
+"Circuit hors tension seulement"
+],
+"bon": 0,
+"s": 20,
+"expl": "Le voltmètre se branche en parallèle : une sonde de chaque côté de ce qu'on mesure."
+},
+{
+"q": "Mise en situation : panneau résidentiel 120/240 V. Entre les deux phases (L1 et L2), tu devrais lire…",
+"ch": [
+"120 V",
+"208 V",
+"240 V",
+"0 V"
+],
+"bon": 2,
+"s": 20,
+"expl": "120 V entre une phase et le neutre, 240 V entre les deux phases."
+},
+{
+"t": "ordre",
+"q": "Remets dans l'ordre : vérifier l'absence de tension avant de travailler.",
+"ch": [
+"Vérifier le multimètre sur une source sous tension connue",
+"Mesurer le circuit sur lequel tu vas travailler",
+"Revérifier le multimètre sur la source connue",
+"Travailler seulement si les deux vérifications confirment 0 V"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"expl": "On vérifie l'appareil avant et après : un multimètre brisé qui affiche 0 V peut tuer."
+},
+{
+"q": "Mise en situation : un thermocouple de chauffe-eau au gaz donne environ 25 mV DC. La Fluke 302+ peut-elle bien le mesurer ?",
+"ch": [
+"Non : elle n'a pas de plage de millivolts",
+"Oui, en V~",
+"Oui, avec la pince",
+"Oui, en mode Ω"
+],
+"bon": 0,
+"s": 30,
+"expl": "Sa plage DC va jusqu'à 600,0 V avec une résolution de 0,1 V : 25 mV afficherait 0,0. Il faut un multimètre avec une plage mV."
+},
+{
+"q": "Avant de mesurer une résistance en ohms, il faut…",
+"ch": [
+"Couper l'alimentation du circuit",
+"Mettre le sélecteur sur A~",
+"Laisser le circuit sous tension",
+"Refermer la pince sur le fil"
+],
+"bon": 0,
+"s": 15,
+"expl": "Jamais d'ohms sous tension : la lecture est fausse et l'appareil peut être endommagé."
+},
+{
+"q": "Mise en situation : tu testes un fusible retiré du circuit en mode continuité. L'appareil bipe. Le fusible est…",
+"ch": [
+"Bon",
+"Brûlé",
+"En court-circuit avec la terre",
+"Impossible à dire"
+],
+"bon": 0,
+"s": 20,
+"expl": "Bip = chemin continu (≤ 70 Ω) : le fusible n'est pas ouvert, il est bon."
+},
+{
+"q": "Mise en situation : même test sur un autre fusible, pas de bip et l'écran affiche OL. Le fusible est…",
+"ch": [
+"Bon",
+"Brûlé (ouvert)",
+"Trop gros",
+"Mal installé"
+],
+"bon": 1,
+"s": 20,
+"expl": "Circuit ouvert = OL et pas de bip : le fusible est brûlé."
+},
+{
+"t": "nombre",
+"q": "Un élément de chauffe-eau de 4500 W à 240 V. Quelle résistance devrais-tu lire à froid, environ ? (au dixième)",
+"ch": [],
+"bon": 12.8,
+"tol": 0.3,
+"u": "Ω",
+"s": 40,
+"expl": "R = V² ÷ P = 240 × 240 ÷ 4500 = 12,8 Ω. OL = élément coupé; près de 0 Ω = court-circuit."
+},
+{
+"q": "Mise en situation : tu mesures l'élément d'une plinthe et tu lis OL. Le problème probable ?",
+"ch": [
+"L'élément est coupé (ouvert)",
+"L'élément est parfait",
+"Le thermostat est trop chaud",
+"Il manque du courant"
+],
+"bon": 0,
+"s": 25,
+"expl": "Une résistance de chauffage doit donner quelques dizaines d'ohms. OL = filament coupé."
+},
+{
+"t": "multi",
+"q": "Le mode continuité (bip) sert à…",
+"ch": [
+"Suivre un fil d'un bout à l'autre",
+"Vérifier un interrupteur (fermé = bip)",
+"Tester un fusible hors circuit",
+"Mesurer la tension d'une prise"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"expl": "Le bip vérifie un chemin électrique, toujours circuit hors tension. Pour une prise, c'est le mode V~."
+},
+{
+"q": "Pourquoi utiliser le bip plutôt que lire les ohms pour suivre un fil ?",
+"ch": [
+"On garde les yeux sur le travail, l'oreille suffit",
+"Le bip est plus précis",
+"Le bip mesure aussi la tension",
+"Les ohms ne marchent pas sur le cuivre"
+],
+"bon": 0,
+"s": 20,
+"expl": "Le son permet de travailler sans regarder l'écran, par exemple dans un plafond ou derrière un appareil."
+},
+{
+"t": "erreur",
+"q": "Trouve l'erreur.",
+"ch": [
+"La loi d'Ohm s'écrit",
+"V = R × I,",
+"donc le courant",
+"se calcule I = V × R."
+],
+"bon": 3,
+"s": 30,
+"expl": "I = V ÷ R. Si la tension monte, le courant monte; si la résistance monte, le courant baisse."
+},
+{
+"q": "Quelle est la fréquence du réseau électrique au Québec ?",
+"ch": [
+"50 Hz",
+"60 Hz",
+"100 Hz",
+"120 Hz"
+],
+"bon": 1,
+"s": 15,
+"expl": "60 Hz en Amérique du Nord (50 Hz en Europe)."
+},
+{
+"q": "Le fil neutre d'un circuit résidentiel est habituellement de quelle couleur ?",
+"ch": [
+"Blanc",
+"Noir",
+"Rouge",
+"Vert"
+],
+"bon": 0,
+"s": 15,
+"expl": "Neutre = blanc; phases = noir et rouge; mise à la terre = vert ou nu."
+},
+{
+"t": "nombre",
+"q": "Deux résistances de 20 Ω et 30 Ω sont branchées en série. Résistance totale ?",
+"ch": [],
+"bon": 50,
+"tol": 0,
+"u": "Ω",
+"s": 25,
+"expl": "En série, les résistances s'additionnent : 20 + 30 = 50 Ω."
+},
+{
+"t": "nombre",
+"q": "Deux résistances de 20 Ω branchées en parallèle. Résistance totale ?",
+"ch": [],
+"bon": 10,
+"tol": 0,
+"u": "Ω",
+"s": 30,
+"expl": "Deux résistances égales en parallèle = la moitié : 10 Ω."
+},
+{
+"q": "Une bobine de valve de 24 V consomme 0,5 A. Quelle est sa puissance ?",
+"ch": [
+"12 W",
+"24,5 W",
+"48 W",
+"2 W"
+],
+"bon": 0,
+"s": 25,
+"expl": "P = V × I = 24 × 0,5 = 12 W."
+},
+{
+"q": "Le disjoncteur protège surtout…",
+"ch": [
+"Le fil contre la surchauffe",
+"L'appareil contre l'usure",
+"La personne contre toute décharge",
+"Le compteur d'Hydro"
+],
+"bon": 0,
+"s": 20,
+"expl": "Le disjoncteur protège le conducteur. Pour les personnes près de l'eau, c'est le DDFT (disjoncteur différentiel)."
+},
+{
+"q": "La Fluke 302+ est classée CAT III 600 V. Ça veut dire qu'elle est conçue pour…",
+"ch": [
+"Les circuits de distribution du bâtiment (panneaux, prises)",
+"Seulement les piles",
+"Les lignes d'Hydro-Québec à haute tension",
+"Seulement l'électronique"
+],
+"bon": 0,
+"s": 25,
+"expl": "CAT III = installation fixe du bâtiment. CAT IV 300 V = source de l'installation (entrée électrique) jusqu'à 300 V."
+}
+]
+},
+{
 "id": "defi-eclair",
 "exemple": true,
 "titre": "Défi éclair",
