@@ -516,7 +516,7 @@ Le propane s'accumule…
 <label>Pénalité (−250 si faux)<div class="seg" data-r="penalite"><button data-v="non">Non</button><button data-v="oui">Oui</button></div></label>
 <label>Choix cachés 5 s<div class="seg" data-r="cache"><button data-v="non">Non</button><button data-v="oui">Oui</button></div></label>
 <label>Choix sur l'iPad seulement<div class="seg" data-r="lettres"><button data-v="non">Non</button><button data-v="oui">Oui</button></div></label>
-<label>Double ou rien (vers 40 %)<div class="seg" data-r="double"><button data-v="non">Non</button><button data-v="oui">Oui</button></div></label>
+<label>Double ou rien (vers 40 % et à la fin)<div class="seg" data-r="double"><button data-v="non">Non</button><button data-v="oui">Oui</button></div></label>
 <label>Sons au tableau<div class="seg" data-r="son"><button data-v="oui">Oui</button><button data-v="non">Non</button></div></label>
 <label>Musique<div class="seg" data-r="musique"><button data-v="oui">Oui</button><button data-v="non">Non</button></div></label>
 <label title="3 bonnes de suite et plus : +100, +200, +300">Bonus de série<div class="seg" data-r="bonus"><button data-v="oui">Oui</button><button data-v="non">Non</button></div></label>
@@ -862,21 +862,23 @@ function telecommande(bord){
   /* « Double ou rien » : chacun peut miser tous ses points. 13 nov. (Jeremy) : vers 40 % du quiz plutôt qu'à la dernière question,
      pour laisser aux joueurs le temps de se reprendre. iDbl() = index de la question visée (questions avec points seulement). */
   function iDbl(){ const S = []; (G.jeu || []).forEach((x, i) => { if (!SANS_PTS.includes(typeDe(x))) S.push(i); });
-    if (S.length < 2) return -1; return S[Math.min(S.length - 1, Math.max(1, Math.round(S.length * .4)))]; }
+    if (S.length < 2) return []; const a = S[Math.min(S.length - 1, Math.max(1, Math.round(S.length * .4)))], b = S[S.length - 1];
+    return a === b ? [a] : [a, b]; }   /* 13 nov. (Jeremy) : aussi à la dernière question */
+  const dblFaits = () => Array.isArray(G.dblFait) ? G.dblFait : [];
   function mise(){
     clearTimeout(minut); G.etat = "mise"; G.dbl = true; ids().forEach(id => P[id].mise = false);
     envoyer(topic, {m: "mise", pts: Object.fromEntries(ids().map(id => [id, P[id].pts]))});
     minut = setTimeout(question, 15000); maj();
   }
   function suivante(){   /* passe à la question G.i (déjà avancée) */
-    if (R().double === "oui" && !G.dblFait && G.i === iDbl() && G.etat !== "mise") { mise(); return; }
+    if (R().double === "oui" && iDbl().includes(G.i) && !dblFaits().includes(G.i) && G.etat !== "mise") { mise(); return; }
     question();
   }
   function reveler(){
     if (G.etat !== "question") return; clearTimeout(minut); G.etat = "rev";
     if (typeDe(G.jeu[G.i]) === "nuage") { envoyer(topic, {m: "rev", i: G.i, nuage: true}); maj(); return; }
     if (["sondage", "echelle"].includes(typeDe(G.jeu[G.i]))) { envoyer(topic, {m: "rev", i: G.i, sp: true}); maj(); return; }   /* sondage, échelle : rien de noté */   /* nuage de mots : ni points ni série touchés */
-    const Q = G.jeu[G.i], reg = R(), avant = rangs(), der = G.dbl && G.i === iDbl();
+    const Q = G.jeu[G.i], reg = R(), avant = rangs(), der = G.dbl && iDbl().includes(G.i);
     Object.entries(G.reps).forEach(([id, x]) => {
       const bon = x.ok = juste(Q, x.c);
       x.g = !bon || reg.points === "aucun" ? 0 : reg.points === "fixe" ? 1000 : Math.round(1000 - 500 * Math.min(1, Math.max(0, x.ms) / (Q.s * 1000)));
@@ -890,7 +892,7 @@ function telecommande(bord){
       const avantMise = P[id].pts - (x.g || 0); x.dbl = x.ok ? avantMise : -P[id].pts; P[id].pts += x.dbl; });
     const r = rangs(), n = ids().length, res = {};
     ids().forEach(id => { const x = G.reps[id]; res[id] = {rep: x ? x.c : null, ok: !!(x && x.ok), g: x ? x.g : 0, bonus: x ? x.bonus || 0 : 0, dbl: x ? x.dbl || 0 : 0, mise: !!(der && P[id].mise), serie: P[id].serie || 0, pts: P[id].pts, rang: r[id], avant: avant[id], bons: P[id].bons || 0}; });
-    if (der){ G.dbl = false; G.dblFait = true; }   /* la mise ne vaut que pour cette question */
+    if (der){ G.dbl = false; G.dblFait = dblFaits().concat(G.i); }   /* la mise ne vaut que pour cette question */
     (G.bilan = G.bilan || [])[G.i] = {q: Q.q, n, rep: ids().filter(id => G.reps[id] && G.reps[id].c != null && G.reps[id].c !== -1).length, ok: ids().filter(id => G.reps[id] && G.reps[id].ok).length, bon: texteBon(Q)};   /* bilan de la classe, pour l'enseignant */
     envoyer(topic, {m: "rev", i: G.i, bon: Q.bon, bonTxt: texteBon(Q), expl: Q.expl || "", res, n, classement: reg.classement, points: reg.points}); maj();
   }
@@ -990,7 +992,7 @@ function telecommande(bord){
     const trouve = id => JSON.parse(JSON.stringify(tousQuiz().find(q => q.id === id)));
     document.querySelectorAll("[data-jouer]").forEach(b => b.onclick = () => {
       if (bord) { modes(b.dataset.jouer); return; }
-      G.quiz = trouve(b.dataset.jouer); G.etat = "lobby"; G.i = -1; G.jeu = []; G.bilan = []; G.dbl = false; G.dblFait = false; appliquerCouleur(); montrer("vJeu");
+      G.quiz = trouve(b.dataset.jouer); G.etat = "lobby"; G.i = -1; G.jeu = []; G.bilan = []; G.dbl = false; G.dblFait = []; appliquerCouleur(); montrer("vJeu");
       envoyer(topic, {m: "bienvenue", titre: G.quiz.titre, coul: R().coul, mode: R().mode}); envoyerCouv(); maj();
     });
     document.querySelectorAll("[data-modif]").forEach(b => b.onclick = () => editer(trouve(b.dataset.modif)));
@@ -1283,7 +1285,7 @@ function telecommande(bord){
         <label><span>Pénalité</span>${seg("penalite", [["non", "Non"], ["oui", "−250 si faux"]])}</label>
         <label><span>Choix cachés</span>${seg("cache", [["non", "Non"], ["oui", "5 s pour lire"]])}</label>
         <label><span>Texte des choix</span>${seg("lettres", [["non", "Au tableau"], ["oui", "iPad seulement"]])}</label>
-        <label><span>Double ou rien</span>${seg("double", [["non", "Non"], ["oui", "Vers 40 % du quiz"]])}</label>
+        <label><span>Double ou rien</span>${seg("double", [["non", "Non"], ["oui", "Vers 40 % et à la fin"]])}</label>
       </div>
       <div class="sous">Comment veux-tu afficher la partie ?</div>
       <div class="duo"><button id="mAnim">Animer au tableau<small>Un seul ordinateur : l'écran de classe avec ses commandes en bas.</small></button>
@@ -1303,7 +1305,7 @@ function telecommande(bord){
      Les images des questions ne sont pas gardées (trop lourdes) : elles sont reprises du quiz d'origine. */
   function sauverPartie(){
     if (bord || !G.quiz || G.etat === "choix") return;
-    try { localStorage.setItem("quizPartie", JSON.stringify({code, t: Date.now(), quiz: G.quiz.id, i: G.i, etat: G.etat, t0: G.t0, reps: G.reps, dbl: !!G.dbl, dblFait: !!G.dblFait, bilan: G.bilan || [],
+    try { localStorage.setItem("quizPartie", JSON.stringify({code, t: Date.now(), quiz: G.quiz.id, i: G.i, etat: G.etat, t0: G.t0, reps: G.reps, dbl: !!G.dbl, dblFait: dblFaits(), bilan: G.bilan || [],
       jeu: G.jeu.map(Q => Object.assign({}, Q, {img: Q.img ? (/^data:/.test(Q.img) ? 1 : Q.img) : 0})), P})); } catch(e) {}
   }
   function oublierPartie(){ try { localStorage.removeItem("quizPartie"); } catch(e) {} }
@@ -1316,7 +1318,7 @@ function telecommande(bord){
     if (!S || S.code !== code || Date.now() - S.t > 3 * 3600e3) return false;
     { const qp = params.get("quiz"); if (qp && qp !== S.quiz) { try { localStorage.removeItem("quizPartie"); } catch(e) {} return false; } }   /* 11 nov. : un autre quiz choisi = nouvelle partie, pas la reprise de l'ancienne */
     const q = tousQuiz().find(x => x.id === S.quiz); if (!q) return false;
-    G.quiz = JSON.parse(JSON.stringify(q)); G.i = S.i; G.etat = S.etat; G.t0 = S.t0; G.reps = S.reps || {}; G.dbl = S.dbl; G.dblFait = !!S.dblFait; G.bilan = S.bilan || [];
+    G.quiz = JSON.parse(JSON.stringify(q)); G.i = S.i; G.etat = S.etat; G.t0 = S.t0; G.reps = S.reps || {}; G.dbl = S.dbl; G.dblFait = Array.isArray(S.dblFait) ? S.dblFait : []; G.bilan = S.bilan || [];
     let nD = 0; const DQ = G.quiz.qs.filter(x => x.t === "diapo");
     G.jeu = (S.jeu || []).map(Q => { if (Q.t === "diapo") { const o = DQ[nD++]; if (Q.img === 1 && o) Q.img = o.img; return Q; } if (Q.img === 1) { const o = G.quiz.qs.find(x => x.q === Q.q); Q.img = o && o.img || ""; } return Q; });
     Object.keys(S.P || {}).forEach(id => { P[id] = S.P[id]; if (!P[id].exclu) P[id].parti = true; });   /* absents tant qu'ils ne répondent pas à « qui » : un iPad parti ne bloque plus la fin des questions */
