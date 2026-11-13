@@ -839,7 +839,7 @@ function telecommande(bord){
   setInterval(() => { let ch = false; Object.values(P).forEach(p => { if (!p.parti && Date.now() - (p.vu || 0) > 40000) { p.parti = true; ch = true; } }); if (ch) { envoyerPersos(); maj(); if (G.etat === "question" && ids().length && ids().every(id => G.reps[id])) setTimeout(reveler, 300); } }, 5000);
   function envoyerPersos(){ envoyer(topic, {m: "persos", pris: ids().map(id => P[id].av).filter(v => v != null)}); }
   let minut = null;
-  function qMsg(pour){ const Q = G.jeu[G.i]; return {m: "q", pour, i: G.i, n: G.jeu.length, qn: G.jeu.slice(0, G.i + 1).filter(x => !HORS_Q(x)).length, nq: G.jeu.filter(x => !HORS_Q(x)).length, q: Q.q, ch: Q.ch, t: typeDe(Q), u: Q.u || "", nb: typeDe(Q) === "multi" ? Q.bon.length : 0,
+  function qMsg(pour){ const Q = G.jeu[G.i]; return {m: "q", now: Date.now(), pour, i: G.i, n: G.jeu.length, qn: G.jeu.slice(0, G.i + 1).filter(x => !HORS_Q(x)).length, nq: G.jeu.filter(x => !HORS_Q(x)).length, q: Q.q, ch: Q.ch, t: typeDe(Q), u: Q.u || "", nb: typeDe(Q) === "multi" ? Q.bon.length : 0,
     t0: G.t0, lec: Math.max(0, G.t0 - Date.now()), s: Q.s, coul: R().coul, dbl: !!(G.dbl && pour && P[pour] && P[pour].mise)}; }
   function planAuto(){ clearTimeout(minut); const D = G.jeu && G.jeu[G.i];   /* 11 nov. : présentation qui défile seule, en boucle; Pause l'arrête */
     if (G.quiz && G.quiz.auto && !G.pause && G.etat === "diapo" && D) minut = setTimeout(() => { if (G.etat !== "diapo" || G.pause) return; G.i = G.i + 1 >= G.jeu.length ? 0 : G.i + 1; suivante(); }, (D.d || G.quiz.auto) * 1000); }
@@ -857,7 +857,7 @@ function telecommande(bord){
     if (Q.img) envoyer(topic, {m: "img", i: G.i, data: Q.img});
     envoyer(topic, qMsg());
     ids().forEach(id => { if (G.dbl && P[id].mise) envoyer(topic, {m: "dblrap", pour: id}); });
-    minut = setTimeout(reveler, lec + Q.s * 1000 + 1000); maj();
+    minut = setTimeout(reveler, lec + Q.s * 1000 + 2500); maj();
   }
   /* « Double ou rien » : chacun peut miser tous ses points. 13 nov. (Jeremy) : vers 40 % du quiz plutôt qu'à la dernière question,
      pour laisser aux joueurs le temps de se reprendre. iDbl() = index de la question visée (questions avec points seulement). */
@@ -922,7 +922,7 @@ function telecommande(bord){
   function manetteCmd(m){ manVu = Date.now();
     if ((m.b === "bGo" || m.b === "bSuite") && !$(m.b).disabled) $(m.b).click();
     else if (m.b === "plus10" && G.etat === "question" && G.jeu[G.i]) {   /* +10 s à la question en cours (écran, iPad qui n'ont pas répondu, minuterie) */
-      const Q = G.jeu[G.i]; Q.s += 10; clearTimeout(minut); minut = setTimeout(reveler, Math.max(500, G.t0 + Q.s * 1000 + 1000 - Date.now()));
+      const Q = G.jeu[G.i]; Q.s += 10; clearTimeout(minut); minut = setTimeout(reveler, Math.max(500, G.t0 + Q.s * 1000 + 2500 - Date.now()));
       ids().filter(id => !G.reps[id]).forEach(id => envoyer(topic, qMsg(id))); maj(); }
     else if (m.b === "kick" && m.id && P[m.id]) { const k = document.querySelector(`[data-kick="${m.id}"]`); if (k) k.click(); }
     else if (m.b === "fin" && G.etat !== "choix") $("bFin").click();
@@ -1325,7 +1325,7 @@ function telecommande(bord){
     envoyer(topic, {m: "bienvenue", titre: G.quiz.titre, coul: R().coul, mode: R().mode}); envoyerCouv(); envoyerPersos();
     const Q = G.jeu[G.i];
     if (G.etat === "question" && Q) {
-      const reste = G.t0 + Q.s * 1000 + 1000 - Date.now();
+      const reste = G.t0 + Q.s * 1000 + 2500 - Date.now();
       if (reste <= 0) reveler(); else { if (Q.img) envoyer(topic, {m: "img", i: G.i, data: Q.img}); ids().filter(id => !G.reps[id]).forEach(id => envoyer(topic, qMsg(id))); minut = setTimeout(reveler, reste); }
     } else if (G.etat === "mise") minut = setTimeout(question, 15000);
     else if (G.etat === "diapo") planAuto();   /* 11 nov. : une présentation reprise continue de défiler */
@@ -1426,7 +1426,7 @@ function joueur(code){
         document.querySelectorAll("#jBx [data-mise]").forEach(b => b.onclick = () => choisir(b.dataset.mise === "1"));
       } else if (m.m === "dblrap") { const d = $("dblTag"); if (d) d.classList.remove("cache");
       } else if (m.m === "q") {
-        repI = -1; const t = m.t || "choix", fin = m.t0 + m.s * 1000;
+        repI = -1; const t = m.t || "choix", fin = m.t0 + m.s * 1000 - (m.now ? m.now - Date.now() : 0);   /* (13 nov.) horloge de l'iPad décalée : on compte avec celle de la télécommande */
         const envoi = c => { if (repI !== -1) return; repI = c; document.querySelectorAll("#jBx button").forEach(x => x.disabled = true);
           $("jBx").insertAdjacentHTML("beforeend", '<div class="monte" style="margin-top:14px;opacity:.8">Réponse envoyée.</div>'); window.__repQ = m.i; const R = {m: "rep", pid, i: m.i, c}; envoyer(topic, R);
           /* 10 nov. (« ma réponse est pas partie ») : renvoyée aux 2 s tant que la télécommande ne l'a pas confirmée (message perdu sur un réseau lent) */
@@ -1447,11 +1447,13 @@ function joueur(code){
         clearInterval(chrono);
         /* 9 nov. (« les élèves pourraient sentir leur cell vibrer s'ils ne répondent pas ») : 5 s avant la fin, si l'élève n'a pas répondu :
            vibration (Android; Apple ne permet pas aux sites de faire vibrer l'iPad ni l'iPhone) + bord de l'écran qui pulse en rouge (partout) */
-        let rappel = false; document.body.classList.remove("presseJ");
+        let rappel = false; window.__autoEnv = 0; document.body.classList.remove("presseJ");
         chrono = setInterval(() => { const r = Math.max(0, fin - Date.now()), b = $("jBar"); if (b) b.style.width = Math.min(100, 100 * r / (m.s * 1000)) + "%";
           const attend = !!$("jCorps") && window.__repQ !== m.i;
           if (!rappel && attend && r > 0 && r <= 5000) { rappel = true; document.body.classList.add("presseJ"); try { if (navigator.vibrate) navigator.vibrate([250, 120, 250, 120, 400]); } catch(x) {} }
           if (rappel && (!attend || !r)) document.body.classList.remove("presseJ");
+          /* (13 nov., « des réponses écrites sur la tablette ne sont pas comptées ») : réponse tapée ou choisie sans Valider → envoyée toute seule à la fin */
+          if (attend && r <= 700 && !window.__autoEnv) { const ok = $("jOk"); if (ok && !ok.disabled) { window.__autoEnv = 1; ok.click(); } }
           if (!r) clearInterval(chrono); }, 150);
         const B = [...document.querySelectorAll("#jBx [data-c]")];
         if (t === "multi") { const sel = new Set();
