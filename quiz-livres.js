@@ -719,7 +719,7 @@ window.QUIZ_LIVRES = [
 "exemple": true,
 "titre": "Le multimètre (Fluke 302+)",
 "sujet": "Ampères, volts AC/DC, ohms et continuité",
-"couv": "img/labo/quiz/multimetre-couv.svg",
+"couv": "img/labo/quiz/multimetre-couv.jpg",
 "coul": "#E8B400",
 "reg": {
 "nb": "15",
