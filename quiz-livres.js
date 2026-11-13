@@ -715,6 +715,444 @@ window.QUIZ_LIVRES = [
 ]
 },
 {
+"id": "electricite-base",
+"exemple": true,
+"titre": "L'électricité de base",
+"sujet": "Volts, ampères, ohms, circuits et sécurité",
+"couv": "img/labo/quiz/electricite-couv.jpg",
+"coul": "#2F7DE1",
+"reg": {
+"nb": "15",
+"melange": "tout"
+},
+"qs": [
+{
+"q": "La tension électrique se mesure en…",
+"ch": [
+"Volts (V)",
+"Ampères (A)",
+"Ohms (Ω)",
+"Watts (W)"
+],
+"bon": 0,
+"s": 15,
+"expl": "Tension = volts. Courant = ampères. Résistance = ohms. Puissance = watts."
+},
+{
+"q": "Le courant électrique se mesure en…",
+"ch": [
+"Ampères (A)",
+"Volts (V)",
+"Ohms (Ω)",
+"Hertz (Hz)"
+],
+"bon": 0,
+"s": 15,
+"expl": "Le courant, c'est la quantité d'électricité qui circule : en ampères."
+},
+{
+"q": "La résistance se mesure en…",
+"ch": [
+"Ohms (Ω)",
+"Watts (W)",
+"Volts (V)",
+"Ampères (A)"
+],
+"bon": 0,
+"s": 15,
+"expl": "La résistance freine le courant. Elle se mesure en ohms (Ω)."
+},
+{
+"q": "Si on compare l'électricité à l'eau dans un tuyau, la tension (volts) ressemble à…",
+"ch": [
+"La pression",
+"Le débit",
+"La longueur du tuyau",
+"La couleur de l'eau"
+],
+"bon": 0,
+"s": 20,
+"expl": "Tension = pression qui pousse. Courant = débit. Résistance = un tuyau étroit qui freine."
+},
+{
+"q": "Et le courant (ampères) ressemble à…",
+"ch": [
+"Le débit d'eau",
+"La pression",
+"Le diamètre du robinet",
+"La température"
+],
+"bon": 0,
+"s": 20,
+"expl": "Le courant, c'est combien d'électricité passe chaque seconde, comme un débit en litres par minute."
+},
+{
+"q": "Le courant d'une prise de maison est…",
+"ch": [
+"Alternatif (AC)",
+"Continu (DC)",
+"Statique",
+"Ça dépend de la pièce"
+],
+"bon": 0,
+"s": 15,
+"expl": "Les prises donnent du courant alternatif à 60 Hz. Les piles et batteries donnent du continu."
+},
+{
+"q": "Une pile de 9 V donne du courant…",
+"ch": [
+"Continu (DC)",
+"Alternatif (AC)",
+"Triphasé",
+"À 60 Hz"
+],
+"bon": 0,
+"s": 15,
+"expl": "Piles et batteries = courant continu : il circule toujours dans le même sens."
+},
+{
+"q": "Le cuivre est un bon conducteur.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 10,
+"expl": "Vrai : le cuivre laisse passer facilement le courant. C'est pourquoi les fils sont en cuivre."
+},
+{
+"q": "Lequel de ces matériaux est un isolant ?",
+"ch": [
+"Le caoutchouc",
+"Le cuivre",
+"L'aluminium",
+"L'eau du robinet"
+],
+"bon": 0,
+"s": 15,
+"expl": "Le caoutchouc, le plastique, le verre et le bois sec sont des isolants. L'eau du robinet conduit le courant."
+},
+{
+"q": "L'eau pure du robinet ne conduit pas l'électricité, donc on peut toucher un appareil branché les mains mouillées.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 1,
+"s": 15,
+"expl": "Faux ! L'eau du robinet contient des minéraux et conduit le courant. Mains mouillées = danger."
+},
+{
+"q": "Pour qu'une ampoule s'allume, le circuit doit être…",
+"ch": [
+"Fermé",
+"Ouvert",
+"Coupé au milieu",
+"Sans source"
+],
+"bon": 0,
+"s": 15,
+"expl": "Le courant doit pouvoir faire un tour complet : de la source, à travers l'ampoule, et retour."
+},
+{
+"q": "Un interrupteur ouvert…",
+"ch": [
+"Coupe le courant",
+"Laisse passer le courant",
+"Augmente la tension",
+"Protège contre la foudre"
+],
+"bon": 0,
+"s": 15,
+"expl": "Ouvert = le chemin est coupé, la lumière est éteinte. Fermé = le courant passe."
+},
+{
+"t": "ordre",
+"q": "Remets dans l'ordre le chemin du courant dans un circuit simple d'une lampe.",
+"ch": [
+"Le disjoncteur du panneau",
+"L'interrupteur",
+"La lampe",
+"Le retour par le neutre"
+],
+"s": 40,
+"expl": "Le courant part du panneau (disjoncteur), passe par l'interrupteur, allume la lampe et revient par le neutre."
+},
+{
+"q": "Dans un montage en série de 3 lumières, si une ampoule brûle…",
+"ch": [
+"Toutes s'éteignent",
+"Seulement celle-là s'éteint",
+"Les autres éclairent plus fort",
+"Rien ne change"
+],
+"bon": 0,
+"s": 20,
+"expl": "En série, il n'y a qu'un chemin : une ampoule coupée ouvre tout le circuit."
+},
+{
+"q": "Les prises d'une maison sont branchées…",
+"ch": [
+"En parallèle",
+"En série",
+"En étoile",
+"Une seule par circuit"
+],
+"bon": 0,
+"s": 20,
+"expl": "En parallèle, chaque prise reçoit 120 V et fonctionne même si une autre est vide."
+},
+{
+"q": "Un court-circuit, c'est…",
+"ch": [
+"Le courant qui passe par un chemin sans résistance (ex. : phase touche le neutre)",
+"Un fil trop long",
+"Une ampoule brûlée",
+"Un interrupteur ouvert"
+],
+"bon": 0,
+"s": 20,
+"expl": "Sans résistance, le courant devient énorme : le disjoncteur doit couper tout de suite."
+},
+{
+"q": "Une prise ordinaire au Québec donne environ…",
+"ch": [
+"120 V",
+"240 V",
+"12 V",
+"600 V"
+],
+"bon": 0,
+"s": 15,
+"expl": "Prise ordinaire = 120 V. Sécheuse, cuisinière, chauffe-eau = 240 V."
+},
+{
+"q": "Un chauffe-eau électrique résidentiel fonctionne habituellement à…",
+"ch": [
+"240 V",
+"120 V",
+"24 V",
+"12 V"
+],
+"bon": 0,
+"s": 15,
+"expl": "Le chauffe-eau est branché entre les deux phases : 240 V."
+},
+{
+"q": "Un thermostat de chaudière (bas voltage) fonctionne souvent à…",
+"ch": [
+"24 V AC",
+"120 V AC",
+"240 V AC",
+"9 V DC"
+],
+"bon": 0,
+"s": 20,
+"expl": "Les commandes de chauffage utilisent souvent 24 V AC, donné par un petit transformateur."
+},
+{
+"q": "Le fil de mise à la terre est…",
+"ch": [
+"Vert ou nu",
+"Blanc",
+"Noir",
+"Rouge"
+],
+"bon": 0,
+"s": 15,
+"expl": "Terre = vert ou cuivre nu. Neutre = blanc. Phases = noir et rouge."
+},
+{
+"q": "À quoi sert la mise à la terre ?",
+"ch": [
+"Donner un chemin sûr au courant en cas de défaut",
+"Faire fonctionner l'appareil",
+"Augmenter la tension",
+"Économiser de l'électricité"
+],
+"bon": 0,
+"s": 20,
+"expl": "Si une phase touche le boîtier, le courant part à la terre et le disjoncteur coupe, au lieu de passer par toi."
+},
+{
+"q": "Une prise DDFT (avec boutons TEST et RESET) sert surtout à…",
+"ch": [
+"Protéger les personnes contre les chocs près de l'eau",
+"Protéger le fil contre la surchauffe",
+"Économiser l'énergie",
+"Augmenter la puissance"
+],
+"bon": 0,
+"s": 20,
+"expl": "Le DDFT coupe dès qu'une petite fuite de courant est détectée (ex. : dans l'eau). On le trouve dans la salle de bain, la cuisine, dehors."
+},
+{
+"q": "Le disjoncteur saute toujours sur le même circuit quand on branche la bouilloire et le four micro-ondes. La cause probable ?",
+"ch": [
+"Le circuit est surchargé",
+"Le disjoncteur est trop gros",
+"Il manque une ampoule",
+"La tension est trop basse"
+],
+"bon": 0,
+"s": 25,
+"expl": "Deux gros appareils sur le même circuit demandent trop d'ampères : le disjoncteur protège le fil."
+},
+{
+"q": "Remplacer un disjoncteur de 15 A par un de 30 A règle le problème sans danger.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 1,
+"s": 20,
+"expl": "Faux ! Le fil d'un circuit de 15 A n'est pas fait pour 30 A : il chaufferait et pourrait causer un incendie."
+},
+{
+"q": "La loi d'Ohm s'écrit…",
+"ch": [
+"V = R × I",
+"V = R ÷ I",
+"I = V × R",
+"R = V × I"
+],
+"bon": 0,
+"s": 20,
+"expl": "Tension = résistance × courant. Donc I = V ÷ R et R = V ÷ I."
+},
+{
+"t": "nombre",
+"q": "Un élément de 24 Ω est branché sur 240 V. Quel courant circule ?",
+"ch": [],
+"bon": 10,
+"tol": 0,
+"u": "A",
+"s": 30,
+"expl": "I = V ÷ R = 240 ÷ 24 = 10 A."
+},
+{
+"t": "nombre",
+"q": "Une ampoule de 60 W à 120 V. Quel courant consomme-t-elle ? (au dixième)",
+"ch": [],
+"bon": 0.5,
+"tol": 0,
+"u": "A",
+"s": 30,
+"expl": "I = P ÷ V = 60 ÷ 120 = 0,5 A."
+},
+{
+"t": "nombre",
+"q": "Un chauffe-eau de 3000 W à 240 V. Quel courant ? (au dixième)",
+"ch": [],
+"bon": 12.5,
+"tol": 0,
+"u": "A",
+"s": 30,
+"expl": "I = P ÷ V = 3000 ÷ 240 = 12,5 A."
+},
+{
+"q": "Une plinthe consomme 5 A à 240 V. Quelle est sa puissance ?",
+"ch": [
+"1200 W",
+"48 W",
+"245 W",
+"2400 W"
+],
+"bon": 0,
+"s": 25,
+"expl": "P = V × I = 240 × 5 = 1200 W."
+},
+{
+"t": "nombre",
+"q": "Trois résistances de 10 Ω en série. Résistance totale ?",
+"ch": [],
+"bon": 30,
+"tol": 0,
+"u": "Ω",
+"s": 20,
+"expl": "En série, on additionne : 10 + 10 + 10 = 30 Ω."
+},
+{
+"q": "Si la résistance augmente et que la tension reste pareille, le courant…",
+"ch": [
+"Diminue",
+"Augmente",
+"Reste pareil",
+"Devient alternatif"
+],
+"bon": 0,
+"s": 20,
+"expl": "I = V ÷ R : plus la résistance est grande, moins le courant passe."
+},
+{
+"q": "1 kW, c'est…",
+"ch": [
+"1000 W",
+"100 W",
+"10 W",
+"1 000 000 W"
+],
+"bon": 0,
+"s": 10,
+"expl": "Kilo = mille. Un chauffe-eau de 4,5 kW = 4500 W."
+},
+{
+"t": "erreur",
+"q": "Trouve l'erreur.",
+"ch": [
+"La puissance se mesure en watts,",
+"elle se calcule P = V × I,",
+"et un appareil de 1200 W à 120 V",
+"consomme 100 A."
+],
+"bon": 3,
+"s": 30,
+"expl": "I = P ÷ V = 1200 ÷ 120 = 10 A, pas 100 A."
+},
+{
+"t": "multi",
+"q": "Avant de travailler sur un circuit, il faut…",
+"ch": [
+"Couper le disjoncteur",
+"Vérifier l'absence de tension avec un appareil",
+"Mettre un cadenas ou une étiquette si possible",
+"Toucher le fil pour voir s'il est mort"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 35,
+"expl": "Couper, cadenasser, vérifier avec un appareil. On ne touche jamais un fil pour « tester »."
+},
+{
+"q": "Le corps humain peut être blessé gravement par un courant aussi faible que…",
+"ch": [
+"Environ 0,05 A (50 mA)",
+"100 A",
+"1000 A",
+"Seulement à haute tension"
+],
+"bon": 0,
+"s": 25,
+"expl": "Quelques dizaines de milliampères à travers le cœur peuvent être mortels. C'est pourquoi le DDFT coupe à environ 5 mA."
+},
+{
+"q": "Un fil dont la gaine est fondue ou noircie indique probablement…",
+"ch": [
+"Une surchauffe (mauvaise connexion ou surcharge)",
+"Un fil neuf",
+"Un bon fonctionnement",
+"De l'humidité normale"
+],
+"bon": 0,
+"s": 20,
+"expl": "La chaleur vient souvent d'une connexion lâche ou d'un circuit trop chargé. À réparer avant de remettre en marche."
+}
+]
+},
+{
 "id": "multimetre-fluke-302",
 "exemple": true,
 "titre": "Le multimètre (Fluke 302+)",
