@@ -57,7 +57,7 @@
       },
       "Sans outil choisi : touche une forme, un objet ou un texte pour le choisir, glisse-le pour le déplacer, double-clic pour le modifier, Suppr pour l'effacer.",
       "Texte : touche le tableau et écris (Entrée = nouvelle ligne). Toucher dans le vide termine le texte.",
-      "Gomme : son menu règle la taille et offre « Tout effacer ». Touche la gomme encore pour la ranger.",
+      "Gomme : son menu règle la taille et offre « Tout effacer », puis se cache seul pour ne pas gêner. Touche la gomme deux fois pour le revoir.",
       {
         "t": "Règle : en cm (1 cm = 1 carreau). Glisse-la, tourne-la avec la poignée orange. Avec le crayon, glisse le long de son bord gradué : le trait est droit et sa longueur s'affiche. « Angles » ajoute un rapporteur.",
         "img": "nouveautes/regle.jpg"
@@ -66,6 +66,10 @@
       "Fond : change le fond du tableau, ton dessin suit. « Plus » : zoom, déplacer, enregistrer en image, Mes schémas et modèles."
     ],
     "versions": [
+      {
+        "date": "2026-11-13",
+        "texte": "Le menu de la gomme se cache seul après quelques secondes (ou dès que tu effaces) : la gomme reste active."
+      },
       {
         "date": "2026-11-13",
         "texte": "Annuler (Ctrl+Z ou le bouton) remonte maintenant toutes les étapes, même après que la barre ou l'écran a changé de taille."
@@ -77,10 +81,6 @@
       {
         "date": "2026-11-09",
         "texte": "Barre regroupée par catégories avec les mots; bulle du crayon; Rétablir, poubelle du tableau et « Tout effacer » replacés; règle en cm, rapporteur, calculatrice scientifique; le dessin suit le fond."
-      },
-      {
-        "date": "2026-11-03",
-        "texte": "Le tableau blanc s'ouvre toujours dézoomé (tout le tableau visible)."
       }
     ]
   },

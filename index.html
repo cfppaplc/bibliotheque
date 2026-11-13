@@ -5832,7 +5832,14 @@ $("#penE").onclick = () => { RD.eraser = !RD.eraser; if (RD.eraser){ RD.text = f
   const inp = pg.querySelector("input"), cer = pg.querySelector("circle"), val = pg.querySelector("b");
   const maj = () => { inp.value = RD.gommeT; cer.setAttribute("r", Math.min(20, 3 + RD.gommeT * 3)); val.textContent = "× " + String(RD.gommeT).replace(".", ","); };
   inp.addEventListener("input", () => { RD.gommeT = +inp.value; try { localStorage.setItem("gommeTaille", RD.gommeT); } catch(e){} maj(); });
-  window.majPopGomme = () => { pg.hidden = !RD.eraser; maj(); try { majGommeCur(); } catch(e){} };
+  /* 13 nov. (« la fenêtre de la gomme gêne et cache le tableau ») : elle s'ouvre quand on prend la gomme, puis se cache seule
+     2,5 s après le dernier réglage (ou dès qu'on touche le tableau); la gomme reste active. */
+  let avant = false, minu = null;
+  const cacherBientot = (ms) => { clearTimeout(minu); minu = setTimeout(() => { if (!pg.matches(":hover")) pg.hidden = true; else cacherBientot(1200); }, ms); };
+  window.majPopGomme = () => { if (!RD.eraser) pg.hidden = true; else if (!avant){ pg.hidden = false; cacherBientot(3000); } avant = !!RD.eraser; maj(); try { majGommeCur(); } catch(e){} };
+  inp.addEventListener("input", () => cacherBientot(2500));
+  pg.addEventListener("pointerup", () => cacherBientot(2500));
+  $("#inkCanvas").addEventListener("pointerdown", () => { if (RD.eraser){ clearTimeout(minu); pg.hidden = true; } }, true);
   /* la fenêtre reste ouverte tant que la gomme est active (avant : elle se fermait au premier coup de gomme) */
   /* cercle sous la souris : la vraie taille de la gomme */
   const cur = document.createElement("div"); cur.id = "gommeCur"; cur.hidden = true;
