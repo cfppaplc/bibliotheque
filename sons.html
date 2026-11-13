@@ -13,12 +13,12 @@ span{color:#aab3c5;font-size:.95rem}
 <h1>Sons de fin du ménage</h1>
 <p>Touche une carte pour l'écouter. Dis à Claude le numéro que tu préfères.</p>
 <div class="g">
- <button data-s="1"><b><i>1</i>Fanfare</b><span>Montée de 4 notes, « ta-ta », grand accord (celle en place).</span></button>
- <button data-s="2"><b><i>2</i>Victoire de jeu vidéo</b><span>Arpège rapide style arcade, puis note qui tient.</span></button>
- <button data-s="3"><b><i>3</i>Roulement + cymbale</b><span>Roulement de tambour qui monte, coup de cymbale et accord.</span></button>
- <button data-s="4"><b><i>4</i>Applaudissements</b><span>Petit « ding-ding » puis la foule qui applaudit.</span></button>
- <button data-s="5"><b><i>5</i>Carillon</b><span>Cloches douces, plus calme.</span></button>
- <button data-s="6"><b><i>6</i>Sifflet de fin de match</b><span>Trois coups de sifflet d'arbitre, puis la foule.</span></button>
+ <button data-s="1"><b><i>1</i>Accord de piano</b><span>Un accord chaud et posé, qui résonne.</span></button>
+ <button data-s="2"><b><i>2</i>Confirmation douce</b><span>Deux notes claires, comme une validation sur un appareil.</span></button>
+ <button data-s="3"><b><i>3</i>Marimba</b><span>Trois notes boisées qui montent, discret et chaleureux.</span></button>
+ <button data-s="4"><b><i>4</i>Nappe qui s'ouvre</b><span>Son feutré qui s'élève lentement, style ambiance.</span></button>
+ <button data-s="5"><b><i>5</i>Cloche de réception</b><span>Un seul « ding » net de clochette d'hôtel.</span></button>
+ <button data-s="6"><b><i>6</i>Résolution jazz</b><span>Petite progression d'accords qui se termine en douceur.</span></button>
 </div>
 <script>
 let AC;
@@ -28,18 +28,17 @@ function note(out,f,t,d,v,type,glide){ const o=AC.createOscillator(),g=AC.create
 function bruit(out,t,d,v,filtre,q){ const n=AC.sampleRate*d|0,b=AC.createBuffer(1,n,AC.sampleRate),c=b.getChannelData(0); for(let i=0;i<n;i++)c[i]=Math.random()*2-1;
   const s=AC.createBufferSource(),f=AC.createBiquadFilter(),g=AC.createGain(); s.buffer=b; f.type="bandpass"; f.frequency.value=filtre||2000; f.Q.value=q||.8;
   g.gain.setValueAtTime(v,t); g.gain.exponentialRampToValueAtTime(.001,t+d); s.connect(f); f.connect(g); g.connect(out); s.start(t); }
+function piano(out,f,t,d,v){ [1,2,3,4].forEach((h,k)=>note(out,f*h,t,d/(1+k*.6),v/(1+k*1.8),"sine")); }
+function echo(o){ const dl=AC.createDelay(),fb=AC.createGain(),w=AC.createGain(); dl.delayTime.value=.23; fb.gain.value=.32; w.gain.value=.35; const e=AC.createGain(); e.connect(AC.destination); e.gain.value=.55; o.connect(dl); dl.connect(fb); fb.connect(dl); dl.connect(w); w.connect(e); return o; }
 const SONS={
- 1(){ const [t,o]=ctx(); [523,659,784,1047].forEach((f,k)=>note(o,f,t+k*.12,.3,.55,"square")); [784,1047].forEach((f,k)=>note(o,f,t+.55+k*.12,.2,.5,"square"));
-   [523,659,784,1047,1319].forEach(f=>{note(o,f,t+.85,1.6,.32,"sawtooth");note(o,f,t+.85,1.8,.35)}); note(o,130.8,t+.85,1.6,.5); },
- 2(){ const [t,o]=ctx(); [392,523,659,784,1047,1319,1568].forEach((f,k)=>note(o,f,t+k*.07,.12,.45,"square"));
-   [1047,1319,1568,2093].forEach((f,k)=>note(o,f,t+.6+k*.05,.15,.4,"square")); note(o,2093,t+.85,1.1,.4,"square"); note(o,1047,t+.85,1.1,.3,"triangle"); },
- 3(){ const [t,o]=ctx(); for(let i=0;i<34;i++){ const ti=t+i*.045; bruit(o,ti,.08,.12+i*.012,1800,1.2); }
-   bruit(o,t+1.6,1.8,.9,6000,.5); bruit(o,t+1.6,.25,1,150,1); [262,330,392,523].forEach(f=>{note(o,f,t+1.6,1.6,.35,"sawtooth");note(o,f*2,t+1.6,1.6,.2)}); },
- 4(){ const [t,o]=ctx(); note(o,1319,t,.4,.5,"sine"); note(o,1760,t+.15,.6,.5,"sine");
-   for(let i=0;i<140;i++){ const ti=t+.4+Math.random()*2.6, env=Math.min(1,(ti-t-.4)/.4)*Math.max(0,1-(ti-t-2.2)/.8); bruit(o,ti,.05,.35*env+.02,1500+Math.random()*2500,1.5); } },
- 5(){ const [t,o]=ctx(); [[1319,0],[1047,.25],[1175,.5],[784,.75],[784,1.25],[1175,1.5],[1319,1.75],[1047,2]].forEach(([f,d])=>{note(o,f,t+d,1.4,.35,"sine");note(o,f*2.76,t+d,.6,.08,"sine")}); },
- 6(){ const [t,o]=ctx(); [[0,.18],[.3,.18],[.6,.9]].forEach(([d,l])=>{ note(o,2900,t+d,l,.35,"sine",3100); note(o,2950,t+d,l,.2,"sine"); bruit(o,t+d,l,.1,3000,3); });
-   for(let i=0;i<120;i++){ const ti=t+1.4+Math.random()*2.2; bruit(o,ti,.05,.28*Math.max(0,1-(ti-t-1.4)/2.2)+.03,1800+Math.random()*2000,1.5); } }
+ 1(){ const [t,o]=ctx(); echo(o); [261.6,329.6,392,493.9,587.3].forEach((f,k)=>piano(o,f,t+k*.04,3.2,.32)); piano(o,130.8,t,3.4,.35); },
+ 2(){ const [t,o]=ctx(); echo(o); note(o,880,t,.5,.4,"sine"); note(o,1318.5,t+.14,1.1,.4,"sine"); note(o,2637,t+.14,.4,.06,"sine"); },
+ 3(){ const [t,o]=ctx(); echo(o); [[523.3,0],[659.3,.13],[784,.26],[1046.5,.42]].forEach(([f,d])=>{ note(o,f,t+d,.6,.45,"sine"); note(o,f*4,t+d,.08,.12,"sine"); }); },
+ 4(){ const [t,o]=ctx(); [261.6,392,523.3,659.3,784].forEach((f,k)=>{ const os=AC.createOscillator(),g=AC.createGain(),fl=AC.createBiquadFilter(); os.type="sawtooth"; os.frequency.value=f; os.detune.value=(k%2?6:-6);
+     fl.type="lowpass"; fl.frequency.setValueAtTime(300,t); fl.frequency.linearRampToValueAtTime(2200,t+1.6); g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(.09,t+1.2); g.gain.linearRampToValueAtTime(0,t+3.4);
+     os.connect(fl); fl.connect(g); g.connect(o); os.start(t); os.stop(t+3.5); }); note(o,1568,t+1.2,1.8,.12,"sine"); },
+ 5(){ const [t,o]=ctx(); echo(o); [[2093,1],[5278,.25],[3136,.18],[6900,.06]].forEach(([f,v])=>note(o,f,t,2.4,.45*v,"sine")); },
+ 6(){ const [t,o]=ctx(); echo(o); [[[146.8,349.2,440,523.3],0],[[196,349.2,493.9,587.3],.55],[[130.8,329.6,392,493.9,587.3],1.1]].forEach(([acc,d],k)=>acc.forEach(f=>piano(o,f,t+d,k===2?3:.9,.26))); }
 };
 document.querySelectorAll("button").forEach(b=>b.onclick=()=>{ document.querySelectorAll("button").forEach(x=>x.classList.remove("on")); b.classList.add("on"); SONS[b.dataset.s](); });
 </script></body></html>
