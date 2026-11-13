@@ -11176,4 +11176,9 @@ body:has(.reader.open:not(.wbon)) .toast{bottom:calc(98px + env(safe-area-inset-
   if (v === "1") document.documentElement.classList.add("zflou");   /* 13 nov. : plus par défaut au TNI (écrans noirs : mémoire graphique) */
 } catch(e){} })();
 </script>
+<script>/* 13 nov. : bouton 100 % de la barre du livre visible seulement quand le livre est zoomé (demande de Jeremy) */
+(function(){ const b = document.getElementById("tbZv"); if (!b) return;
+ const maj = () => b.classList.toggle("zcache", b.textContent.trim() === "100%");
+ new MutationObserver(maj).observe(b, {childList:true, characterData:true, subtree:true}); maj();
+ const st = document.createElement("style"); st.textContent = "#tb>#tbZv.zcache{display:none!important}"; document.head.appendChild(st); })();</script>
 </body></html>
