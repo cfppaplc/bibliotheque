@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<!-- © 2026 Jérémy Raymond. Tous droits réservés. -->
+<html lang="fr-CA"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Métier+ — Pages d'essai</title>
+<link rel="icon" href="img/metier-plus-icone.svg">
+<style>
+body{margin:0;font-family:"Segoe UI",Roboto,sans-serif;background:#0e1320;color:#fff;display:flex;flex-direction:column;align-items:center;padding:30px 16px}
+img.logo{height:34px;margin-bottom:18px}
+h1{margin:0 0 6px;font-size:1.8rem}
+p.sous{margin:0 0 26px;color:#aab3c5;text-align:center;max-width:620px}
+.grille{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;width:100%;max-width:760px}
+@media (max-width:600px){.grille{grid-template-columns:1fr}}
+a.carte{display:block;background:#161d2c;border:1px solid #232c40;border-radius:16px;padding:22px;color:#fff;text-decoration:none;min-height:110px;transition:border-color .2s,transform .2s}
+a.carte:hover,a.carte:focus{border-color:#EB6A22;transform:translateY(-2px)}
+a.carte b{display:block;font-size:1.3rem;margin-bottom:8px}
+a.carte b i{font-style:normal;color:#EB6A22;margin-right:8px}
+a.carte span{color:#aab3c5;line-height:1.4}
+.retour{margin-top:30px;color:#aab3c5}
+.retour a{color:#EB6A22}
+</style></head><body>
+<img class="logo" src="img/metier-plus-blanc.svg" alt="Métier+">
+<h1>Pages d'essai</h1>
+<p class="sous">Pour vérifier un appareil (tableau interactif, iPad, télé…) ou essayer quelque chose avant de le mettre dans le site.</p>
+<div class="grille">
+ <a class="carte" href="compat.html"><b><i>1</i>Test du navigateur</b><span>Version du navigateur et ce qu'il sait faire. Si des lignes sont rouges, Métier+ ne marchera pas bien sur cet appareil.</span></a>
+ <a class="carte" href="perf.html"><b><i>2</i>Test de vitesse</b><span>Mesure si l'écran est assez rapide pour les animations (images par seconde, processeur, mémoire).</span></a>
+ <a class="carte" href="contact.html"><b><i>3</i>Essai du toucher</b><span>Montre comment l'écran voit le doigt, le crayon et la paume (taille, type de contact).</span></a>
+ <a class="carte" href="sons.html"><b><i>4</i>Sons du ménage</b><span>Écouter les sons proposés pour la fin du ménage de l'atelier.</span></a>
+</div>
+<p class="retour"><a href="./">‹ Retour à Métier+</a></p>
+</body></html>
