@@ -3492,7 +3492,7 @@ function cadrePx(s, W, H){ const P = pointsTrait(s); let x0 = 1e9, y0 = 1e9, x1 
 function cadreForme(g, s, W, H, k){ const P = pointsTrait(s); if (!P || !P.length) return;
   let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9; P.forEach(([x, y]) => { x0 = Math.min(x0, x * W); x1 = Math.max(x1, x * W); y0 = Math.min(y0, y * H); y1 = Math.max(y1, y * H); });
   const m = 10 * k; g.save(); g.setLineDash([8 * k, 6 * k]); g.strokeStyle = "#2a7bcf"; g.lineWidth = 2 * k; g.strokeRect(x0 - m, y0 - m, x1 - x0 + 2 * m, y1 - y0 + 2 * m);
-  g.setLineDash([]); if (s.t === "cote") poigneeCote(g, s, W, H, k); const hp = 7 * k; s.p.slice(0, 2).forEach(([x, y], i) => { if (i === 0 && (s.t === "bulle" || s.t === "cercle")) return; g.fillStyle = "#fff"; g.fillRect(x * W - hp, y * H - hp, 2 * hp, 2 * hp); g.strokeRect(x * W - hp, y * H - hp, 2 * hp, 2 * hp); });
+  g.setLineDash([]); if (s.t === "cote") poigneeCote(g, s, W, H, k); const hp = (matchMedia("(any-pointer:coarse)").matches ? 13 : 7) * k; s.p.slice(0, 2).forEach(([x, y], i) => { if (i === 0 && (s.t === "bulle" || s.t === "cercle")) return; g.fillStyle = "#fff"; g.fillRect(x * W - hp, y * H - hp, 2 * hp, 2 * hp); g.strokeRect(x * W - hp, y * H - hp, 2 * hp, 2 * hp); });
   g.restore(); }
 /* direction du décalage d'une cote : perpendiculaire au côté, ou (cote iso) l'axe de la grille iso le plus proche, vertical de préférence */
 function dirCote(s, an){ const px = -Math.sin(an), py = Math.cos(an); if (!s.iso) return [px, py, 1];
@@ -3508,7 +3508,7 @@ function poigneeCote(g, s, W, H, k){ const [x, y] = milieuCote(s, W, H), r = 11 
   g.strokeStyle = "#fff"; g.lineWidth = 1.6 * k; g.lineCap = "round"; g.lineJoin = "round"; g.beginPath(); g.moveTo(x - f, y); g.lineTo(x + f, y); g.moveTo(x, y - f); g.lineTo(x, y + f);
   [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(([dx, dy]) => { const px = x + dx * f, py = y + dy * f; g.moveTo(px - dx * t + dy * t, py - dy * t + dx * t); g.lineTo(px, py); g.lineTo(px - dx * t - dy * t, py - dy * t - dx * t); }); g.stroke(); g.restore(); }
 /* poignée de la forme sélectionnée sous le doigt (0 = début, 1 = fin, 2 = décalage de la cote) */
-function poigneeSous(s, q){ if (!s || !s.t || !FORMES[s.t] || !strokes().includes(s)) return -1; const c = $("#inkCanvas"), W = c.width, H = c.height, tol = 16 * DPRI();
+function poigneeSous(s, q){ if (!s || !s.t || !FORMES[s.t] || !strokes().includes(s)) return -1; const c = $("#inkCanvas"), W = c.width, H = c.height, tol = (matchMedia("(any-pointer:coarse)").matches ? 34 : 16) * DPRI();   /* 13 nov. : poignées plus faciles à prendre au doigt (TNI) */
   if (s.t === "cote"){ const [mx, my] = milieuCote(s, W, H); if (Math.hypot(mx - q[0] * W, my - q[1] * H) < tol * 1.1) return 2; }
   const lg = Math.hypot((s.p[1][0] - s.p[0][0]) * W, (s.p[1][1] - s.p[0][1]) * H), tp = /^(ligne|fleche|fleche2|cote|tuy[A-Z]+)$/.test(s.t) ? Math.min(tol, lg * .22) : tol;   /* courte flèche : le milieu sert à la déplacer */
   for (let i = 1; i >= 0; i--){ if (i === 0 && (s.t === "bulle" || s.t === "cercle")) continue; if (Math.hypot((s.p[i][0] - q[0]) * W, (s.p[i][1] - q[1]) * H) < tp) return i; } return -1; }
@@ -4814,12 +4814,12 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
   });
   c.addEventListener("pointermove", e => {
     if (mv){ const q = qOf(e); if (!mv.snap && Math.hypot(q[0] - mv.q0[0], q[1] - mv.q0[1]) > .003){ snapInk(); mv.snap = true; }
-      if (mv.snap){ mv.s.p[0] = [mv.p0[0] + q[0] - mv.q0[0], mv.p0[1] + q[1] - mv.q0[1]]; mv.s.p[1] = mv.s.p[0]; redrawInk(); } return; }
+      if (mv.snap){ mv.s.p[0] = [mv.p0[0] + q[0] - mv.q0[0], mv.p0[1] + q[1] - mv.q0[1]]; mv.s.p[1] = mv.s.p[0]; redrawBientot(); } return; }
     if (!z) return; z.x2 = e.clientX; z.y2 = e.clientY;
     box.style.left = Math.min(z.x, z.x2) + "px"; box.style.top = Math.min(z.y, z.y2) + "px"; box.style.width = Math.abs(z.x2 - z.x) + "px"; box.style.height = Math.abs(z.y2 - z.y) + "px";
   });
   ["pointerup", "pointercancel"].forEach(t => c.addEventListener(t, () => {
-    if (mv){ mv = null; return; }
+    if (mv){ const fini = mv.snap; mv = null; if (fini) redrawInk(); return; }
     if (!z) return; const r = c.getBoundingClientRect(); box.remove(); box = null;
     let x = Math.min(z.x, z.x2), y = Math.min(z.y, z.y2), w = Math.abs(z.x2 - z.x), h = Math.abs(z.y2 - z.y); z = null;
     if (!RD.wb && w < 40 && h < 30 && cocherDansLivre(x + w / 2, y + h / 2)) return;   /* case ou choix : coché / encerclé au bon endroit */
