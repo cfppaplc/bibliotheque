@@ -2297,8 +2297,8 @@ function brancherSouris(win){
   const doc = win.document, st = () => $("#rstage");
   brancherPincement(win, win.frameElement);
   /* les barres reviennent quand la souris touche le haut ou le bas de l'écran, ou qu'on touche le bas */
-  win.addEventListener("mousemove", e => { if (e.clientY < 70 || e.clientY > win.innerHeight - 110) afficherBarres(); }, { passive:true });
-  win.addEventListener("touchstart", e => { const t = e.touches && e.touches[0]; if (t && (t.clientY < 50 || t.clientY > win.innerHeight - 70)) afficherBarres(); }, { passive:true });
+  win.addEventListener("mousemove", e => { if (e.buttons) return; bordBarres(e.clientY, win.innerHeight); }, { passive:true });
+  win.addEventListener("touchstart", e => { const t = e.touches && e.touches[0]; if (t && (t.clientY < 28 || t.clientY > win.innerHeight - 36)) afficherBarres(); }, { passive:true });
   /* Balayer à gauche ou à droite = page suivante ou précédente; un toucher simple au milieu affiche ou cache les barres */
   let bal = null;
   win.addEventListener("touchstart", e => { bal = null; if (!e.touches || e.touches.length !== 1 || RD.pen || RD.wb || RD.text || RD.obj || RD.z > 1.01) return;
@@ -6652,6 +6652,14 @@ function planifierBarres(ms){
     $("#reader").classList.add("calme");
   }, ms || 8000);   /* 10 nov. : 3,2 s → 8 s (« disparaît trop tôt ») */
 }
+/* 13 nov. (« trop sensible pour réapparaître ») : la souris doit rester 0,4 s tout près du bord (28 px en haut, 40 px en bas),
+   sans bouton enfoncé; avant : 70 / 110 px, aussitôt. */
+const BORD = { t:null };
+function bordBarres(y, h){
+  const r = $("#reader"); if (!r || !r.classList.contains("calme")){ clearTimeout(BORD.t); BORD.t = null; return; }
+  if (y < 28 || y > h - 40){ if (!BORD.t) BORD.t = setTimeout(() => { BORD.t = null; afficherBarres(); }, 400); }
+  else { clearTimeout(BORD.t); BORD.t = null; }
+}
 function afficherBarres(){
   const r = $("#reader"); if (!r.classList.contains("open")) return;
   r.classList.remove("calme"); planifierBarres();
@@ -6681,7 +6689,7 @@ $("#tbPin").onclick = () => {
   setTimeout(() => { try { sizeInner(); } catch(e){} window.dispatchEvent(new Event("resize")); }, 60);
 };
 $("#barresHandle").onclick = afficherBarres;
-document.addEventListener("mousemove", e => { if ($("#reader").classList.contains("open") && (e.clientY < 70 || e.clientY > window.innerHeight - 110)) afficherBarres(); }, { passive:true });
+document.addEventListener("mousemove", e => { if (!e.buttons && $("#reader").classList.contains("open")) bordBarres(e.clientY, window.innerHeight); }, { passive:true });
 document.addEventListener("fullscreenchange", () => { if ($("#reader").classList.contains("open")) setTimeout(afficherBarres, 100); });
 
 
