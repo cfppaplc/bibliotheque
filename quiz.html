@@ -605,10 +605,12 @@ function texteRep(Q, c){ const t = typeDe(Q);
   return SYMB[c] + ". " + (Q.ch[c] || ""); }
 const FLAMME = '<svg class="flamme" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5c.6 3.2-1.4 4.9-2.9 6.6C7.6 10.8 6.5 12.6 6.5 15a5.5 5.5 0 0 0 11 0c0-2.3-1-4.1-2.2-5.6-.3 1.2-.9 2.1-1.9 2.6.4-3.4-.4-6.8-1.4-9.5z" fill="currentColor"/><path d="M12 13.2c-1.3 1.3-2 2.3-2 3.6a2 2 0 0 0 4 0c0-1.2-.7-2.3-2-3.6z" fill="#FFE7A3"/></svg>';
 const COULEURS = ["#534AB7", "#B3261E", "#185FA5", "#0F6E56", "#854F0B", "#3A3936"];
-const REG_DEF = {mode: "ind", points: "vitesse", classement: "oui", melange: "non", son: "oui", musique: "oui", bonus: "oui", nb: "tout", temps: "normal", penalite: "non", cache: "non", lettres: "non", double: "non", coul: "#534AB7"};
+const REG_DEF = {mode: "ind", points: "vitesse", classement: "oui", melange: "non", son: "oui", musique: "oui", bonus: "oui", nb: "tout", temps: "normal", penalite: "non", cache: "non", lettres: "non", double: "non", indice: "non", coul: "#534AB7"};
 const sombre = h => { const n = parseInt(h.slice(1), 16), f = .38; return `rgb(${Math.round((n >> 16) * f + 18)},${Math.round((n >> 8 & 255) * f + 18)},${Math.round((n & 255) * f + 24)})`; };
 function plusRapide(G){ let m = null, t = 1e12; for (const id in (G.reps || {})) { const x = G.reps[id]; if (x && x.ok && x.ms < t) { t = x.ms; m = id; } } return m; }
 const ord = r => r + (r === 1 ? "er" : "e");
+window.__indice = ret => { (ret || []).forEach(k => { const x = document.querySelector('#jBx [data-c="' + k + '"]'); if (x) { x.disabled = true; x.style.opacity = ".2"; x.style.textDecoration = "line-through"; } });
+  const b = document.getElementById("jInd"); if (b) { b.disabled = true; b.textContent = "Indice utilisé : " + (ret || []).length + " choix enlevé" + ((ret || []).length > 1 ? "s" : "") + " (−500)"; } };
 
 let canal = null, pret = false, attente = [];
 function envoyer(topic, obj){
@@ -840,7 +842,7 @@ function telecommande(bord){
   function envoyerPersos(){ envoyer(topic, {m: "persos", pris: ids().map(id => P[id].av).filter(v => v != null)}); }
   let minut = null;
   function qMsg(pour){ const Q = G.jeu[G.i]; return {m: "q", now: Date.now(), pour, i: G.i, n: G.jeu.length, qn: G.jeu.slice(0, G.i + 1).filter(x => !HORS_Q(x)).length, nq: G.jeu.filter(x => !HORS_Q(x)).length, q: Q.q, ch: Q.ch, t: typeDe(Q), u: Q.u || "", nb: typeDe(Q) === "multi" ? Q.bon.length : 0,
-    t0: G.t0, lec: Math.max(0, G.t0 - Date.now()), s: Q.s, coul: R().coul, dbl: !!(G.dbl && pour && P[pour] && P[pour].mise)}; }
+    t0: G.t0, lec: Math.max(0, G.t0 - Date.now()), s: Q.s, coul: R().coul, dbl: !!(G.dbl && pour && P[pour] && P[pour].mise), ind: R().indice === "oui" && typeDe(Q) === "choix" && (Q.ch || []).length >= 3, ret: pour && P[pour] && P[pour].ind === G.i ? P[pour].indR : null}; }
   function planAuto(){ clearTimeout(minut); const D = G.jeu && G.jeu[G.i];   /* 11 nov. : présentation qui défile seule, en boucle; Pause l'arrête */
     if (G.quiz && G.quiz.auto && !G.pause && G.etat === "diapo" && D) minut = setTimeout(() => { if (G.etat !== "diapo" || G.pause) return; G.i = G.i + 1 >= G.jeu.length ? 0 : G.i + 1; suivante(); }, (D.d || G.quiz.auto) * 1000); }
   function question(){
@@ -955,6 +957,15 @@ function telecommande(bord){
       maj();
     } else if (m.m === "main" && P[m.pid]) { (G.mains = G.mains || new Set()).add(m.pid); maj();   /* main levée anonyme : on compte, on ne nomme jamais */
     } else if (m.m === "mainsRaz") { G.mains = new Set(); maj();
+    } else if (m.m === "indice" && G.etat === "question" && m.i === G.i && P[m.pid] && !G.reps[m.pid] && R().indice === "oui") {
+      /* 13 nov. (Jeremy) : indice à 500 points = 2 mauvais choix enlevés (1 s'il n'y a que 3 choix) */
+      const J = P[m.pid], Q = G.jeu[G.i];
+      if (J.ind !== G.i) {
+        if ((J.pts || 0) < 500) { envoyer(topic, {m: "indiceR", pour: m.pid, i: G.i, non: true}); return; }
+        const faux = Q.ch.map((_, k) => k).filter(k => k !== Q.bon).sort(() => Math.random() - .5);
+        J.pts -= 500; J.ind = G.i; J.indR = faux.slice(0, Q.ch.length >= 4 ? 2 : 1); maj();
+      }
+      envoyer(topic, {m: "indiceR", pour: m.pid, i: G.i, ret: J.indR});
     } else if (m.m === "miser" && G.etat === "mise" && P[m.pid]) { P[m.pid].mise = !!m.oui; maj();
     } else if (m.m === "diapoQ" && G.jeu[m.i] && G.jeu[m.i].ref) {   /* l'écran (2e appareil) n'a pas la diapo : on lui envoie une version légère */
       DIA.obtenir(G.jeu[m.i].ref).then(d => d ? DIA.leger(d) : G.jeu[m.i].img).then(d => { if (d) envoyer(topic, {m: "img", i: m.i, data: d}); });
@@ -1285,6 +1296,7 @@ function telecommande(bord){
         <label><span>Pénalité</span>${seg("penalite", [["non", "Non"], ["oui", "−250 si faux"]])}</label>
         <label><span>Choix cachés</span>${seg("cache", [["non", "Non"], ["oui", "5 s pour lire"]])}</label>
         <label><span>Texte des choix</span>${seg("lettres", [["non", "Au tableau"], ["oui", "iPad seulement"]])}</label>
+        <label><span>Indice<small>l'élève paie 500 points pour enlever des mauvais choix</small></span>${seg("indice", [["non", "Non"], ["oui", "Oui (−500)"]])}</label>
         <label><span>Double ou rien</span>${seg("double", [["non", "Non"], ["oui", "Vers 40 % et à la fin"]])}</label>
       </div>
       <div class="sous">Comment veux-tu afficher la partie ?</div>
@@ -1406,6 +1418,9 @@ function joueur(code){
       if (m.m === "persos") { pris = m.pris || []; if (!entre) ecranChoix(ecranChoix.msg); else if (!pris.includes(av)) reannoncer(); return; }
       if (m.m === "bienvenue" && !m.pour) reannoncer();
       if (m.m === "recu" && m.pour === pid) { window.__repRecu = m.i; return; }
+      if (m.m === "indiceR" && m.pour === pid) { if (m.i !== window.__qI) return; const b = $("jInd");
+        if (m.non) { if (b) { b.textContent = "Il faut au moins 500 points pour un indice"; b.disabled = true; } return; }
+        window.__indice(m.ret || []); return; }
       if (m.m === "remplace" && m.pour === pid) { entre = false; clearInterval(chrono); bx('<div class="gros">Tu es revenu sur un autre écran.</div><div>Ta partie continue là-bas, avec tes points.</div>'); return; }
       if (m.m === "refus" && m.pour === pid && m.raison === "nom") { entre = false; try { sessionStorage.removeItem("quizJoueur"); } catch(e) {} nomEdite = true; nomChoisi = ""; ecranChoix("Ce prénom est déjà utilisé dans la partie. Écris un autre prénom ou surnom."); return; }
       if (m.m === "refus" && m.pour === pid) { entre = false; try { sessionStorage.removeItem("quizJoueur"); } catch(e) {} av = -1; if (!nomEdite) nomChoisi = ""; ecranChoix(m.raison === "plein" ? `La partie est pleine (${m.max} joueurs au plus). Demande à l'enseignant.` : "Ce personnage vient d'être pris. Choisis-en un autre."); return; }
@@ -1458,6 +1473,12 @@ function joueur(code){
           if (attend && r <= 700 && !window.__autoEnv) { const ok = $("jOk"); if (ok && !ok.disabled) { window.__autoEnv = 1; ok.click(); } }
           if (!r) clearInterval(chrono); }, 150);
         const B = [...document.querySelectorAll("#jBx [data-c]")];
+        window.__qI = m.i;
+        if (m.ind && t === "choix") {
+          $("jCorps").insertAdjacentHTML("beforeend", '<button id="jInd" class="btn2" style="margin-top:14px;width:100%;min-height:48px">Indice : enlever des mauvais choix (−500 points)</button>');
+          $("jInd").onclick = () => { if (repI !== -1) return; $("jInd").disabled = true; $("jInd").textContent = "Indice demandé…"; envoyer(topic, {m: "indice", pid, i: m.i}); };
+          if (m.ret) window.__indice(m.ret);
+        }
         if (t === "multi") { const sel = new Set();
           B.forEach(b => b.onclick = () => { if (repI !== -1) return; const k = +b.dataset.c; sel.has(k) ? sel.delete(k) : sel.add(k); b.classList.toggle("choisi", sel.has(k)); b.querySelector("i").textContent = sel.has(k) ? "✓" : SYMB[k]; $("jOk").disabled = !sel.size; });
           $("jOk").onclick = () => envoi([...sel].sort((a, b) => a - b));
