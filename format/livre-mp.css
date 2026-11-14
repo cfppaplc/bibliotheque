@@ -226,7 +226,7 @@ body.h-rep .page.mp.adm .reponse-choix,.page.mp.adm .reponse-choix.h-vu{box-shad
 .page.mp .mp-vf>span::before,.page.mp.mo .vf>span::before{content:none!important}
 .page.mp.em .vfb .box{display:none!important}
 :is(body.h-rep,body.corr,body.answers:not(.stepans)) .page.mp :is(.mp-vf>.reponse-choix,.vf>.ansob,.vfb>.ok),.page.mp :is(.mp-vf>.reponse-choix.h-vu,.vf>.ansob.shown,.vfb>.ok.shown){border-color:#1E8A55!important;background:#E9F6EF!important;color:#14633d!important}
-.page.mp .mp-qq{flex-wrap:nowrap!important;align-items:flex-start}.page.mp .mp-qq>:not(.mp-no){flex:1;min-width:0}
+.page.mp .mp-qq{display:block!important;position:relative}.page.mp .mp-qq:has(>.mp-no){padding-left:34px}.page.mp .mp-qq>.mp-no{position:absolute;left:0;top:-2px;display:flex;align-items:center;justify-content:center;font-style:normal}
 .page.mp .mp-no{width:24px;height:24px;border-radius:7px;background:#1E2A44!important;font-size:12px}
 .page.mp :is(.mp-ch,.opts,.choix,.ch):has(>span:nth-child(4)){grid-template-columns:1fr 1fr!important}
 .page.mp :is(.mp-ch,.opts,.choix,.ch):has(>span:nth-child(3)):not(:has(>span:nth-child(4))){grid-template-columns:repeat(3,minmax(0,1fr))!important}
@@ -244,3 +244,23 @@ body.h-rep .page.mp.adm .reponse-choix,.page.mp.adm .reponse-choix.h-vu{box-shad
 .page.mp :is(.ligne-rep,.line)>:is(.reponse,.ans,.rep-l){position:absolute!important;left:6px!important;right:0!important;bottom:4px!important;top:auto!important;font:14px/1.2 MPI6,sans-serif!important;white-space:nowrap;background:none!important}
 .page.mp .ecr{font:14px/26px MPI6,sans-serif!important}
 .page.mp :is(.mp-lig,.lines,.ligne-rep,.line,.ecr,td,.blank,.fbox,.rep) :is(.ans,.reponse):not(.ans-cx):not(.okm):not(.ckm),.page.mp .ecr{color:#1d4ed8!important;font-style:normal!important;font-weight:normal!important;font-family:MPI6,sans-serif!important}
+/* Correctifs de placement (14 nov., tour de vérification) */
+.page.mp.pi .mp-sit{display:block!important}
+.page.mp .opt{white-space:normal!important}
+.page.mp :is(.mp-lig,.lines):has(>:is(.ans,.reponse)~:is(.ans,.reponse)){height:auto!important;padding-top:0!important}
+.page.mp :is(.mp-lig,.lines):has(>:is(.ans,.reponse)~:is(.ans,.reponse))>:is(.ans,.reponse){position:relative!important;top:4px!important;left:6px!important;display:block!important}
+.page.mp :is(.ligne-rep,.line){height:auto!important;min-height:30px!important;border-bottom:0!important;background:repeating-linear-gradient(to bottom,transparent 0 29px,#b9c0c6 29px 30px)!important}
+.page.mp :is(.ligne-rep,.line)>:is(.reponse,.ans,.rep-l){position:relative!important;display:block!important;left:6px!important;right:auto!important;top:4px!important;bottom:auto!important;line-height:30px!important;white-space:normal!important;margin-bottom:4px!important}
+.page.mp.me .body>:is(.mini,.fill){overflow:visible!important;flex-shrink:0!important}
+.page.mp .body svg[data-real]{zoom:calc(1 / var(--mpz,1))}
+.page.mp .body:has(svg[data-real]){left:58px!important;right:46px!important}
+.page.mp .body:has(svg[data-real]) :is(.mp-act,.mp-enc,.act,.card):has(svg[data-real]){padding-left:6px!important;padding-right:6px!important}
+.page.mp svg[data-real]{max-width:none!important;flex-shrink:0!important}
+.page.mp.me .body>p.meta,.page.mp.me .body>img.mp-tdm{position:static!important;margin:6px 0 0!important}
+.page.mp.me .body>img.mp-tdm{align-self:flex-end}
+.page.mp .mp-sur{white-space:normal!important;line-height:1.15!important}
+.page.mp .body:has(svg[data-real]){left:52px!important;right:30px!important}
+.page.mp.pi table.mp-tab:has(th:nth-child(7)){table-layout:fixed;width:100%!important;font-size:9.5px!important}.page.mp.pi table.mp-tab:has(th:nth-child(7)) :is(th,td){padding:4px 3px!important;overflow-wrap:anywhere}
+.page.mp.pi .mp-tab th,.page.mp.pi table th{background:#1e2a33!important;color:#fff!important}
+.page.mp.mp-ouv .mp-bande:has(img.mp-photo)~:is(.mp-mod,.mp-dur){background:rgba(20,24,28,.62);padding:5px 10px;border-radius:6px;text-shadow:none}
+.page.mp.em .docu .hand{font-family:MPI6,sans-serif!important;font-style:italic;color:#1d4ed8}

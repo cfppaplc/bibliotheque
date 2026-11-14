@@ -6,7 +6,9 @@ r=json.load(open('/tmp/mp/mesure.json'));s=open(f,encoding='utf-8').read()
 P=list(re.finditer(r'<section class="page[^"]*"[^>]*>',s));out=[];last=0;n=0
 for i,m in enumerate(P):
     tag=m.group(0);x=r[i] if i<len(r) else [i,None]
-    if x[1] is not None:
+    if 'data-z1' in tag:
+        tag=re.sub(r';--mpz:[0-9.]+','',tag)
+    elif x[1] is not None:
         H=564 if x[2] else 902;k0=float((re.findall(r"--mpz:([0-9.]+)",tag) or [1])[-1]);used=(H-x[1])
         k=None
         if x[1]<-2: k=max(MN,round(max(k0*(H-8)/used,k0*.94),3))

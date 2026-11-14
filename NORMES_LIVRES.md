@@ -28,6 +28,16 @@
   du « livre Métier+ compétence N ». **Version web : pas de logo dans le livre** (la bibliothèque affiche déjà la petite
   icône Métier+ sur chaque couverture).
 
+## 2b. Mise en page commune Métier+ (obligatoire pour tout nouveau livre, 14 nov.)
+- Une seule feuille de style : `format/livre-mp.css` (la bibliothèque l'ajoute à tout livre dont les pages ont la classe `mp`). Changer le style de tous les livres = modifier ce fichier, sans rechiffrer.
+- Pages `section.page.mp` avec les classes `mp-*` : `mpband` (bande du programme, vert EGI / bleu Plomberie), `mp-tete`, `mp-pied` (logo Métier+ à droite), `mp-h2` + pastille, `mp-h3`, encadrés `mp-enc` (`mp-ret`, `mp-sit`, `mp-sec`, `mp-ok`, `mp-sav`), `mp-tab`, `mp-act`, ouverture de module `mp-ouv` (carré Métier+ avec le numéro).
+- Questions, thème A : choix `.mp-ch` en cartes à lettres A B C D (bonne réponse `reponse-choix`, verte quand on montre les réponses), V/F en pastilles, questions `.mp-q` / `.mp-qq` + numéro `.mp-no`.
+- Lignes d'écriture : interligne unique de 30 px (`.mp-lig`); la réponse (`.reponse`, bleue) est posée sur les lignes et ne doit jamais dépasser son cadre.
+- Dessin à l'échelle réelle (règle à l'échelle) : `svg[data-real]` avec sa largeur en mm; la mise à l'échelle de la page ne le touche pas. Garder le trait de contrôle de 100 mm.
+- Couverture et page de fin : modèle `outils/couvertures/` (ajouter le livre dans `livres.py`).
+- Avant de publier : `outils/format-livres/questions.py` → ajustement (`prep_mes.py` + mesure + `ajuster2.py`, aucune page qui déborde) → vérification du texte qui se chevauche ou sort de la page, réponses affichées → comparaison mot à mot avec la version d'avant (rien de supprimé sans le dire à Jeremy).
+- Exceptions : EGI 10, EGI 11 et Plomberie 13 gardent leur mise en page; C9 a seulement le cadre (`mpc`).
+
 ## 3. Table des matières
 - Au début de chaque module, un titre **`<h2 class="mod">Module 3 — Titre du module</h2>`**
   (peut être caché avec `hidden`). La bibliothèque construit la table des matières toute seule à partir de
@@ -69,6 +79,7 @@
 5. Publier **seulement quand Jeremy dit « publie »**.
 
 ## Liste rapide (à cocher)
+- [ ] Mise en page commune `mp` (section 2b), réponses qui ne dépassent pas leurs lignes, aucune page qui déborde
 - [ ] Un seul `.html`, rien d'externe, < 15 Mo
 - [ ] Vrai texte, polices intégrées
 - [ ] `section.page` de même taille, page 1 = couverture
