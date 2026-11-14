@@ -10296,6 +10296,7 @@ window.ACCES = (function(){
       try { await appliquerProgs(id, ajoute ? [pg] : [], ajoute ? [] : [pg]); dessinerGerer({ ok:c.nom + (ajoute ? " a maintenant tous les livres « " : " n'a plus les livres « ") + court(pg) + " »." }); }
       catch(e){ dessinerGerer({ err:e.message }); } });
     B.querySelectorAll("[data-mdp]").forEach(b => b.onclick = async () => { const id = b.dataset.mdp, c = BROUILLON.comptes[id];
+      if (!c) return dessinerGerer({ err:"Ce compte n'est plus dans la liste. Ferme puis rouvre le panneau." });
       const m = prompt("Nouveau mot de passe pour " + c.nom + " (au moins 10 caractères).\nDonne-le-lui ensuite; il pourra se connecter dès que tu auras publié.", ""); if (m === null) return;
       if (m.length < 10) return dessinerGerer({ err:"Le mot de passe doit avoir au moins 10 caractères." });
       try { const d = lireDemande(await demande(c.nom, m, c.prog || [])); d.id = id; await remplacerCompte(d); dessinerGerer({ ok:"Nouveau mot de passe de " + c.nom + " prêt. Touche « Publier », puis donne-lui son mot de passe." }); }
