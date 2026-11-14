@@ -199,3 +199,17 @@ body.h-rep .page.mp.adm .reponse-choix,.page.mp.adm .reponse-choix.h-vu{box-shad
 .page.mp.c5 svg.sch{max-height:330px}
 .page.mp.c5 .mp-sit{display:block!important}.page.mp.c5 .mp-sit ol{margin:4px 0;padding-left:22px}
 .page.mp.re.mp-ouv .mp-avenir{left:72px;text-transform:none;letter-spacing:.5px;line-height:1.4}
+/* Livre C9 « Dispositifs électriques » : cadre commun seulement (div.page.mpc.c9, sans .mp pour ne pas toucher l'intérieur des pages) */
+.page.mpc .mpband{position:absolute;left:0;top:0;bottom:0;width:10px;background:var(--mp-p);z-index:40}
+.page.mpc .mp-tete{position:absolute;left:72px;right:60px;top:40px;display:flex;justify-content:space-between;font:10px MPI8,sans-serif;letter-spacing:2px;text-transform:uppercase;color:#7a8590;border-bottom:1px solid #e3e6e9;padding-bottom:10px;z-index:3}
+.page.mpc .mp-tete b{color:var(--mp-c);font-weight:normal}
+.page.mpc .mp-pied{position:absolute;left:72px;right:60px;bottom:30px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;font:10.5px MPI6,sans-serif;color:#7a8590;border-top:1px solid #e3e6e9;padding-top:10px;z-index:3}
+.page.mpc .mp-pied .n{font:15px MPD9,sans-serif;color:#1e2a33}
+.page.mpc .mp-pied img{height:16px;justify-self:end}
+.page.mpc .mp-etapes{position:absolute;left:72px;right:60px;top:22px;display:flex;gap:4px;z-index:3}.page.mpc .mp-etapes i{flex:1;height:5px;border-radius:3px;background:#e3e6e9}.page.mpc .mp-etapes i.on{background:var(--mp-c);opacity:.4}.page.mpc .mp-etapes i.cur{background:var(--mp-c)}
+.page.mpc .mpband{display:block!important}
+.page.mpc .mp-tete,.page.mpc .mp-pied{font-family:MPI8,sans-serif}.page.mpc .mp-pied{font-family:MPI6,sans-serif}
+.page.mpc.c9 .mp-tete{top:24px}.page.mpc.c9 .mp-etapes{top:10px;z-index:5}
+.page.mpc.c9b .mp-etapes i{background:rgba(255,255,255,.25)}
+.page.mpc.c9 .mp-pied{bottom:14px;background:#fff}
+.page.mpc.c9 .mp-tete span:last-child{color:#a0a8b0}
