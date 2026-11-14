@@ -148,3 +148,11 @@ body.h-rep .page.mp.adm .reponse-choix,.page.mp.adm .reponse-choix.h-vu{box-shad
 .page.mp.adm .mp-duo{display:grid;gap:14px;align-items:start}.page.mp.adm .mp-duo>*{margin:8px 0;min-width:0}
 .page.mp.adm .mp-sur.fond{background:#fff;padding:0 3px;border-radius:2px}
 .page.mp.adm .mp-fig.plein{height:100%;width:auto;margin:0 auto}
+/* Livre « Entretien ménager » : sections .page.mp.em */
+.page.mp.em .body li{font-size:13.5px;line-height:1.5}
+.page.mp.em .mp-kick{font:11px MPI8,sans-serif;letter-spacing:1.5px;text-transform:uppercase;color:var(--mp-c);margin:0 0 -4px}
+.page.mp.em .mp-enc div.t{display:block}
+.page.mp.em .mp-cm{border-left-color:var(--mp-c)}
+.page.mp.em .mp-sit{display:block}
+.page.mp.em .mp-act{display:block}
+.page.mp.em.mp-ouv .mp-bas>*{zoom:var(--mpz,1)}
