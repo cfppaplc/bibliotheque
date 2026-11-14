@@ -83,3 +83,14 @@
 .page.mp.m3d.mp-ouv .mp-bas>*{zoom:var(--mpz,1)}
 .page.mp.m3d .mp-fe{justify-self:end;display:flex;align-items:center;gap:12px;font-size:9px;letter-spacing:.5px}.page.mp.m3d .mp-fe img{height:16px}
 .page.mp.m3d.mp-ouv .mp-badge{position:absolute;right:60px;top:30px;z-index:2;font:11px MPI8,sans-serif;letter-spacing:2px;color:#fff;background:rgba(0,0,0,.45);border-radius:6px;padding:4px 10px}
+/* Livres au format « Travaux mineurs » : sections .page.mp.tm */
+.page.mp.tm .body li{font-size:13.5px;line-height:1.5}
+.page.mp.tm .mp-enc ul{margin:4px 0 0;padding-left:18px}
+.page.mp.tm .mp-enc div.t{display:block}
+.page.mp.tm .lead{font-size:15px;color:#4a5560}
+.page.mp.tm .lines i{border-bottom-color:#b9c0c6}
+.page.mp.tm .mp-cap{text-align:center;font-style:normal}
+.page.mp.tm.mp-ouv .mp-obj li{padding:3px 0 3px 22px}.page.mp.tm.mp-ouv .mp-obj li::before{top:10px}
+.page.mp.tm.mp-ouv .mp-mat{font-size:12.5px}.page.mp.tm.mp-ouv .mp-bas>*{zoom:var(--mpz,1)}
+.page.mp.tm.mp-ouv .mp-bande>svg{width:300px!important;height:300px!important;top:80px!important}
+.page.mp.tm.mp-ouv .mp-mat{display:block}
