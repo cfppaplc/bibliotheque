@@ -1559,7 +1559,7 @@ function render(){
   const cats = [...new Set(list.map(l => l.categorie))].sort((a, b) => nomProgramme(a).localeCompare(nomProgramme(b), "fr"));
   const parComp = (a, b) => (parseFloat(a.competence) || 999) - (parseFloat(b.competence) || 999) || a.titre.localeCompare(b.titre, "fr");
   cats.forEach(c => html += rowHTML(nomProgramme(c), list.filter(l => l.categorie === c).sort(parComp)));
-  if (!query && view === "all") html += rowHTML("Continuer", list.filter(l => POS[l.fichier] && POS[l.fichier].n > 1).sort((a, b) => POS[b.fichier].t - POS[a.fichier].t));
+  /* rangée « Continuer » retirée le 14 nov. (pas utilisée, demande de Jeremy) */
   rows.innerHTML = html;
   dessinerFiltres();
   if (query.length >= 3) chercherDansLivres(query);
@@ -1633,7 +1633,8 @@ function accueilPerso(){
     T.push(`<button class="hp-t" data-hp="livre" data-f="${esc(l.fichier)}">${c ? `<img src="${esc(c)}" alt="">` : ic("o", '<path d="M4 5a2 2 0 0 1 2-2h12v16H6a2 2 0 0 0-2 2z"/>')}<span>Reprendre<small>${esc(l.titre)} · p. ${esc(dernier[1].label || dernier[1].n)}</small></span></button>`); }
   const q = J("dernierQuiz");
   if (q && q.id && maintenant - q.t < 21 * 864e5) T.push(`<button class="hp-t" data-hp="quiz" data-q="${esc(q.id)}">${ic("r", '<circle cx="12" cy="12" r="9"/><path d="M10 8.5l5.5 3.5-5.5 3.5z"/>')}<span>Rejouer<small>${esc(q.titre)}</small></span></button>`);
-  /* tuile « Continuer ton tableau » retirée le 14 nov. (pas utilisée, demande de Jeremy) */
+  const tb = +(localStorage.getItem("dernierTableau") || 0);
+  if (tb && maintenant - tb < 7 * 864e5) T.push(`<button class="hp-t" data-hp="tableau">${ic("b", '<rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/>')}<span>Continuer ton tableau<small>Tableau blanc</small></span></button>`);
   /* seulement ce qui est personnel (les outils fixes sont dans la barre du haut) */
   const prenom = (S.nom || "").split(/\s+/)[0];
   return `<h1>${esc(window.titreAccueil && window.titreAccueil() || (prenom ? "Bonjour " + prenom + " !" : "Bonjour !"))}</h1><p class="hp-sous">Que veux-tu enseigner aujourd'hui ?</p>${carte}${T.length ? `<div class="hp-tuiles">${T.slice(0, 4).join("")}</div>` : ""}`;
