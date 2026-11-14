@@ -14,5 +14,6 @@ L=[
 ('montages-electriques-c5','MONTAGES','ÉLECTRIQUES','Du montage filaire au schéma à échelle',5,'plc','COMPÉTENCE 5 · 307-435','','#E8590C'),
 ('lecture-plans-devis-c6','PLANS','ET DEVIS',"Du plan d'ensemble au montage de la tuyauterie",6,'plc','COMPÉTENCE 6 · 307-443','45','#2F6AA3'),
 ('dispositifs-electriques-c9','DISPOSITIFS','ÉLECTRIQUES',"Commandes des systèmes de chauffage",9,'plc','COMPÉTENCE 9 · 307-478','','#E0A800'),
+('recherche-emploi-plc','RECHERCHE',"D'EMPLOI","Construction ou hors construction : trouve ta place",21,'plc','COMPÉTENCE 21 · 307-581','15','#C4622D'),
 ('notions-energie-c13','NOTIONS',"D'ÉNERGIE","De la source d'énergie jusqu'au confort du client",13,'plc','COMPÉTENCE 13 · 307-513','45','#E0457B'),
 ]
