@@ -40,6 +40,7 @@ def conv(h):
         parts=[x.strip() for x in pt.split('·')];mod=parts[0];dur=' · '.join(parts[1:])
         num=re.sub(r'\D','',mod) or mod[-1:]
         img=hero.find('img');ph=f'<img class="mp-photo" src="{img["src"]}">' if img else ''
+        phd=hero.select_one('.ph');av=('<b>'+phd.b.get_text(strip=True)+'</b> · '+phd.b.next_sibling.strip() if phd and phd.b and phd.b.next_sibling else 'IMAGE DU MODULE À VENIR')
         h1=mn.find('h1');t1=h1.decode_contents() if h1 else ''
         if h1:h1.decompose()
         ld=mn.select_one('p.lead')
@@ -47,7 +48,7 @@ def conv(h):
         styler(mn);rest=mn.decode_contents()
         chap=sec.select_one('h2.mod');pd=pied(ft) if ft else ''
         sec.clear();sec['class']=sec['class']+['mp-ouv']
-        sec.append(H(f'''{chap or ''}<i class="mpband"></i><div class="mp-bande">{ph}<span class="mp-avenir">IMAGE DU MODULE À VENIR</span></div><div class="mp-mod">{mod.upper()}</div><div class="mp-num">{num}</div><div class="mp-dur">{dur.upper()}</div>
+        sec.append(H(f'''{chap or ''}<i class="mpband"></i><div class="mp-bande">{ph}<span class="mp-avenir">{av}</span></div><div class="mp-mod">{mod.upper()}</div><div class="mp-num">{num}</div><div class="mp-dur">{dur.upper()}</div>
 <div class="mp-bas"><h1>{t1}</h1>{rest}</div>{pd}'''))
         return str(so)
     st=hd.select_one('.steps');lab=hd.select_one('.lab')
