@@ -1,0 +1,4 @@
+const {chromium}=require('playwright');(async()=>{const b=await chromium.launch();const p=await b.newPage({viewport:{width:1000,height:1200}});
+await p.goto('file:///tmp/mp/mesure.html',{waitUntil:'load'});await p.waitForTimeout(1500);
+const r=await p.evaluate(()=>{const P=[...document.querySelectorAll('#spread > .page')];return P.map((pg,i)=>{if(!pg.classList.contains('mp')||pg.classList.contains('mp-ouv'))return [i,null];const bd=pg.querySelector('.body');if(!bd)return [i,null];const B=bd.getBoundingClientRect();let m=B.top;for(const c of bd.children){const r=c.getBoundingClientRect();if(r.height)m=Math.max(m,r.bottom)};return [i,Math.round(B.bottom-m),!!pg.querySelector('svg,img:not([src^="data:image/svg"])'),(pg.querySelector('.mp-h2')||{}).textContent||'']})});
+require('fs').writeFileSync('/tmp/mp/mesure.json',JSON.stringify(r));await b.close()})();
