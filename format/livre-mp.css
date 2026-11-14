@@ -101,3 +101,15 @@
 .page.mp.re .mp-act{border-radius:12px}
 .page.mp.re.mp-ouv .mp-bas>*{zoom:var(--mpz,1)}
 .page.mp.re.mp-ouv .mp-intro{font-size:14px}
+/* Livres au format « Micro-ordinateur » : sections .page.mp.mo */
+.page.mp.mo .body li{font-size:13.5px;line-height:1.5}
+.page.mp.mo .mp-h3::before{content:none}
+.page.mp.mo .mp-ab{padding:0}
+.page.mp.mo .mp-enc .t{display:block}
+.page.mp.mo.mp-ouv{color:#1e2a33}
+.page.mp.mo.mp-ouv .mp-touches{position:absolute;right:50px;top:110px;width:400px;display:flex;flex-wrap:wrap;gap:12px;z-index:1;font:20px MPD9,sans-serif}
+.page.mp.mo.mp-ouv .mp-touches span{margin:0!important}
+.page.mp.mo.mp-ouv h1{text-transform:none}
+.page.mp.mo.mp-ouv .mp-bas>*{zoom:var(--mpz,1)}
+.page.mp.mo h3.mp-h2::before,.page.mp.mo h3.mp-h3::before{content:none}
+.page.mp.mo .mp-pied span:first-child{font-size:9px;line-height:1.3}
