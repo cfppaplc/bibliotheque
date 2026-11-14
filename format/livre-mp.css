@@ -170,3 +170,18 @@ body.h-rep .page.mp.adm .reponse-choix,.page.mp.adm .reponse-choix.h-vu{box-shad
 .page.mp.pi.mp-ouv .mp-bande{height:340px}.page.mp.pi.mp-ouv .mp-bas{top:362px}
 .page.mp.pi.mp-ouv .mp-mod{top:56px}.page.mp.pi.mp-ouv .mp-num{top:100px}.page.mp.pi.mp-ouv .mp-dur{top:296px}
 .page.mp.pi.mp-ouv .mp-num.long{width:auto;padding:0 28px;font-size:72px}
+/* Livre « Entretien de matériel électrique » (C13 EGI) : sections .page.mp.me */
+.page.mp.me{padding:0!important}
+.page.mp.me .body{display:flex;flex-direction:column;gap:12px}
+.page.mp.me .body>*{flex-shrink:0}.page.mp.me .body>.mini,.page.mp.me .body>.fill{flex-shrink:1}
+.page.mp.me .mp-enc{margin:0}.page.mp.me .mp-enc p{color:inherit}
+.page.mp.me .mp-sit,.page.mp.me .mp-sec{display:flex}
+.page.mp.me .mp-act{margin:0}
+.page.mp.me .card.top{border-top-color:var(--mp-c)}
+.page.mp.me.mp-ouv .mp-bande{background:#16181B}
+.page.mp.me.mp-ouv .mp-bande>svg{left:auto!important;right:40px!important;top:auto!important;bottom:30px!important;width:520px!important;height:auto!important}
+.page.mp.me.mp-ouv .mp-duo{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.page.mp.me.mp-ouv .mp-bas>*{zoom:var(--mpz,1)}
+.page.mp.me.mp-ouv .mp-bande img.mp-ill{position:absolute;right:60px;top:40px;height:390px;max-width:440px;object-fit:contain;z-index:1;filter:drop-shadow(0 5px 6px rgba(0,0,0,.3))}
+.page.mp.me.mp-ouv .mp-bande:has(img.mp-ill) .mp-avenir{display:none}
+.page.mp.me .mp-ret b[style],.page.mp.me .card b[style]{color:var(--mp-c)!important}
