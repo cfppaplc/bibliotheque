@@ -20,13 +20,18 @@
   "type": "maj",
   "livre": "communiquer",
   "titre": "Nouvelle mise en page Métier+ des livres",
-  "texte": "Premier livre dans la mise en page commune Métier+ : même en-tête et pied de page, ouvertures de module avec grand numéro, encadrés et tableaux identiques. Les autres livres suivront. Aussi dans Lecture de plans de bâtiments (EGI) Lecture de plans et devis (C6) Travaux mineurs Recherche d'emploi et Utiliser un micro-ordinateur (aussi l'essai gratuit) Entretien ménager, Protection incendie, Entretien de matériel électrique, Montages électriques (C5), Recherche d'emploi (Plomberie), Dispositifs électriques (C9 : en-tête et pied de page communs) et Administration d'un bâtiment, maintenant en vraies pages (texte cherchable, livre 6 fois plus léger).",
+  "texte": "Premier livre dans la mise en page commune Métier+ : même en-tête et pied de page, ouvertures de module avec grand numéro, encadrés et tableaux identiques. Les autres livres suivront. Aussi dans Lecture de plans de bâtiments (EGI) Lecture de plans et devis (C6) Travaux mineurs Recherche d'emploi et Utiliser un micro-ordinateur (aussi l'essai gratuit) Entretien ménager, Protection incendie, Entretien de matériel électrique, Montages électriques (C5), Recherche d'emploi (Plomberie), Dispositifs électriques (C9 : en-tête et pied de page communs) et Administration d'un bâtiment, maintenant en vraies pages (texte cherchable, livre 6 fois plus léger). Les questions ont maintenant le même look dans tous ces livres : choix A B C D en grosses cartes faciles à toucher, Vrai/Faux en pastilles, et réponses en bleu posées sur les lignes.",
   "formation": [
    "Chaque module s'ouvre sur une grande page : numéro du module, objectifs, mots clés et atelier.",
    "En haut de chaque page : le module et la section. En bas : le livre, le numéro de page et Métier+.",
-   "Les encadrés ont toujours la même couleur : À retenir (couleur du livre), À éviter (rouge), À privilégier (vert), Sur le terrain (foncé)."
+   "Les encadrés ont toujours la même couleur : À retenir (couleur du livre), À éviter (rouge), À privilégier (vert), Sur le terrain (foncé).",
+   "Questions à choix : chaque choix est une carte avec sa lettre (A, B, C, D). Touche « Réponses » : la bonne carte devient verte."
   ],
   "versions": [
+   {
+    "date": "2026-11-14",
+    "texte": "Même thème pour toutes les questions des livres (cartes à lettres) et réponses écrites alignées sur les lignes."
+   },
    {
     "date": "2026-11-14",
     "texte": "Entretien ménager, Protection incendie, Entretien de matériel électrique, Montages électriques (C5), Recherche d'emploi (Plomberie) et C9 (cadre) passés à la mise en page commune."
@@ -38,10 +43,6 @@
    {
     "date": "2026-11-14",
     "texte": "Travaux mineurs, Recherche d'emploi et Micro-ordinateur passés à la mise en page Métier+; bande de couleur remise à l'intérieur."
-   },
-   {
-    "date": "2026-11-14",
-    "texte": "Lecture de plans (EGI et C6) passés à la mise en page Métier+; plus de bande de couleur à l'intérieur des livres (impression noir et blanc)."
    }
   ]
  },
