@@ -94,3 +94,10 @@
 .page.mp.tm.mp-ouv .mp-mat{font-size:12.5px}.page.mp.tm.mp-ouv .mp-bas>*{zoom:var(--mpz,1)}
 .page.mp.tm.mp-ouv .mp-bande>svg{width:300px!important;height:300px!important;top:80px!important}
 .page.mp.tm.mp-ouv .mp-mat{display:block}
+/* Livres au format « Recherche d'emploi » : sections .page.mp.re (encadrés gardent leur icône ronde .box::before/::after) */
+.page.mp.re .mp-enc.box{padding-left:46px}
+.page.mp.re .mp-enc.box::before{left:14px;top:13px}.page.mp.re .mp-enc.box::after{left:14px;top:13px}
+.page.mp.re .body li{font-size:13.5px;line-height:1.5}
+.page.mp.re .mp-act{border-radius:12px}
+.page.mp.re.mp-ouv .mp-bas>*{zoom:var(--mpz,1)}
+.page.mp.re.mp-ouv .mp-intro{font-size:14px}
