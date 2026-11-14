@@ -113,3 +113,38 @@
 .page.mp.mo.mp-ouv .mp-bas>*{zoom:var(--mpz,1)}
 .page.mp.mo h3.mp-h2::before,.page.mp.mo h3.mp-h3::before{content:none}
 .page.mp.mo .mp-pied span:first-child{font-size:9px;line-height:1.3}
+/* Livre « Administration d'un bâtiment » (refait du PDF) : sections .page.mp.adm */
+.page.mp.adm .mp-fig{position:relative;container-type:inline-size;margin:8px 0;width:100%}
+.page.mp.adm .mp-fig img{position:absolute;inset:0;width:100%;height:100%;display:block}
+.page.mp.adm .mp-sur{position:absolute;white-space:nowrap;line-height:1.15;color:#1d4ed8;font-family:MPI6,sans-serif}
+.page.mp.adm .mp-tabt{font:12px MPI8,sans-serif;letter-spacing:1px;text-transform:uppercase;color:#4a5560;margin:12px 0 4px}
+.page.mp.adm .mp-petit{font-size:12px;color:#4a5560}
+.page.mp.adm .mp-loi{border-left-color:#6a4c93}.page.mp.adm .mp-loi .t{color:#6a4c93}
+.page.mp.adm ul{margin:4px 0 8px;padding-left:20px}.page.mp.adm li{font-size:13.5px;line-height:1.5;margin:2px 0}
+.page.mp.adm ul.mp-coche{list-style:none;padding-left:4px}.page.mp.adm ul.mp-coche li::before{content:"";display:inline-block;width:11px;height:11px;border:1.5px solid #8a96a0;border-radius:3px;margin-right:8px;vertical-align:-1px}
+.page.mp.adm .mp-chap{display:flex;gap:22px;align-items:center;margin:4px 0 14px}
+.page.mp.adm .mp-chapn{flex:none;position:relative;width:96px;height:96px;border-radius:26px;background:#1E2A44;color:#fff;font:60px/96px MPD9,sans-serif;text-align:center}
+.page.mp.adm .mp-chapn::after{content:"+";position:absolute;right:-9px;top:-9px;width:32px;height:32px;border-radius:9px;background:#F2762E;font:24px/32px MPD9,sans-serif}
+.page.mp.adm .mp-chapl{font:11px MPI8,sans-serif;letter-spacing:2px;text-transform:uppercase;color:var(--mp-c)}
+.page.mp.adm .mp-chap h1,.page.mp.adm .mp-qhead h1{font:30px/1.1 MPD9,sans-serif;margin:4px 0 4px;color:#1e2a33}
+.page.mp.adm .mp-chap p,.page.mp.adm .mp-qhead p{margin:0;color:#4a5560}
+.page.mp.adm .mp-qhead{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;border-bottom:3px solid var(--mp-c);padding-bottom:10px;margin-bottom:10px}
+.page.mp.adm .mp-score{flex:none;border:1.5px solid #e3e6e9;border-radius:10px;padding:6px 14px;font:10px MPI8,sans-serif;letter-spacing:1.5px;color:#7a8590;text-align:center}
+.page.mp.adm .mp-score b{display:block;font:20px MPD9,sans-serif;color:#1e2a33;letter-spacing:0}
+.page.mp.adm .mp-nom{display:grid;grid-template-columns:2fr 1fr 1fr;gap:16px;font:11px MPI8,sans-serif;color:#4a5560;margin-bottom:12px}
+.page.mp.adm .mp-nom span{border-bottom:1px solid #b9c0c6;padding-bottom:4px}
+.page.mp.adm .mp-q{margin:12px 0}
+.page.mp.adm .mp-ch{flex-direction:column;gap:4px}
+.page.mp.adm .mp-ch>span{display:inline-block;padding:1px 6px;border-radius:12px}
+.page.mp.adm .mp-ch{display:flex;flex-wrap:wrap;flex-direction:row;gap:4px 22px}
+body.h-rep .page.mp.adm .reponse-choix,.page.mp.adm .reponse-choix.h-vu{box-shadow:0 0 0 2px #1d4ed8;color:#1d4ed8}
+.page.mp.adm .mp-assoc p{margin:4px 0 4px 30px;font-size:13.5px}
+.page.mp.adm .blank{display:inline-block;min-width:44px;border-bottom:1.5px solid #8a96a0;margin-right:10px;text-align:center}
+.page.mp.adm .mp-lig{margin:4px 0 6px 30px;min-height:30px}
+.page.mp.adm .ans.reponse{color:#1d4ed8;font-family:MPI6,sans-serif}
+.page.mp.adm .mp-lig .ans{display:block;line-height:30px;font-size:14px}
+.page.mp.adm.mp-ouv .mp-bas>*{zoom:var(--mpz,1)}
+.page.mp.adm .mp-sit{display:block}
+.page.mp.adm .mp-duo{display:grid;gap:14px;align-items:start}.page.mp.adm .mp-duo>*{margin:8px 0;min-width:0}
+.page.mp.adm .mp-sur.fond{background:#fff;padding:0 3px;border-radius:2px}
+.page.mp.adm .mp-fig.plein{height:100%;width:auto;margin:0 auto}
