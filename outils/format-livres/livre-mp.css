@@ -61,3 +61,4 @@
 .page.mp.mp-ouv .mp-bande:has(img.mp-photo)>svg{display:none}
 .page.mp .body>*{zoom:var(--mpz,1)}
 .page.mp .mp-image{position:relative;border-radius:12px;background:repeating-linear-gradient(45deg,#eef0f2 0 12px,#e4e7ea 12px 24px);margin:14px 0;overflow:hidden}.page.mp .mp-image span{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);text-align:center;font:11px MPI8,sans-serif;letter-spacing:2px;color:#8a96a0}.page.mp .mp-image img{width:100%;height:100%;object-fit:cover;display:block}
+.page.mp .mp-etapes{position:absolute;left:72px;right:60px;top:22px;display:flex;gap:4px;z-index:3}.page.mp .mp-etapes i{flex:1;height:5px;border-radius:3px;background:#e3e6e9}.page.mp .mp-etapes i.on{background:var(--mp-c);opacity:.4}.page.mp .mp-etapes i.cur{background:var(--mp-c)}
