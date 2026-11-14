@@ -20,7 +20,7 @@ def conv(h):
     so=H(h);sec=so.section;hd=sec.select_one('div.hd')
     if not hd: return h
     m=re.search(r'--m:\s*(#[0-9a-fA-F]+)',sec.get('style',''));acc=m.group(1) if m else '#16222c'
-    sec['class']=sec.get('class',[])+['mp'];sec['style']=sec.get('style','')+f';--mp-c:{acc};--mp-p:{prog}'
+    sec['class']=sec.get('class',[])+['mp','m3d'];sec['style']=sec.get('style','')+f';--mp-c:{acc};--mp-p:{prog}'
     tab=hd.select_one('.tab');tt=hd.select_one('.t');rr=hd.select_one('.r')
     tab=tab.get_text(strip=True) if tab else '';tt=tt.get_text(strip=True) if tt else '';rr=rr.get_text(strip=True) if rr else ''
     side=sec.select_one('div.side');ft=sec.select_one('div.ft');fw=sec.select_one('div.fitwrap')
@@ -84,6 +84,6 @@ def conv(h):
     return str(so)
 out=[s[:P[0]]]+[conv(s[P[i]:P[i+1]]) for i in range(len(P)-1)]+[s[P[-1]:]]
 r=''.join(out)
-css=open(D+'livre-mp.css').read()+open(D+'livre-mp-m3d.css').read()
+css=open('/home/claude/bibliotheque/format/livre-mp.css').read()
 r=r.replace('</head>','<style id="mp-format">'+fonts+css+'</style></head>',1)
 open(dst,'w',encoding='utf-8').write(r);print('ok',r.count('class="page') ,r.count(' mp"')+r.count(' mp '))

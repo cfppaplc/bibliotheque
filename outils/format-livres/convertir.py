@@ -84,6 +84,6 @@ for i in range(a,b):
     out.append(conv(s[P[i]:P[i+1]]))
 out.append(s[P[b]:])
 r=''.join(out)
-css=open('/tmp/mp/livre-mp.css').read()
+css=open('/home/claude/bibliotheque/format/livre-mp.css').read()
 r=r.replace('</head>','<style id="mp-format">'+fonts+css+'</style></head>',1)
 open(dst,'w',encoding='utf-8').write(r);print('ok')

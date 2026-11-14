@@ -1704,6 +1704,14 @@ function aviser(msg, ms){
 const INKS = {};                         // traits du crayon, par livre et par page
 const WIDTHS = [2, 4, 8];
 const ZOOMS = [1, 1.25, 1.5, 2, 2.5, 3];
+/* (14 nov.) Format commun Métier+ : une seule feuille (format/livre-mp.css) ajoutée à la fin de tout livre converti (.page.mp),
+   donc un changement de style = ce fichier seulement (la copie dans le livre ne sert que de secours). */
+let MPCSS = ""; fetch("format/livre-mp.css", { cache:"no-cache" }).then(r => r.ok ? r.text() : "").then(t => { MPCSS = t; }).catch(() => {});
+function avecFormatMp(html){
+  if (!MPCSS || !/<section class="page[^"]*\bmp\b/.test(html)) return html;
+  const tag = '<style id="mp-commun">' + MPCSS + "</style>", i = html.toLowerCase().lastIndexOf("</body>");
+  return i < 0 ? html + tag : html.slice(0, i) + tag + html.slice(i);
+}
 const HOSTCSS = "#ui{display:none!important}nav#bar{display:none!important}div#anim{display:none!important}"
   /* Protection incendie : la page qui tourne en 3D est remplacée par un fondu rapide et doux */
   /* Transition de page commune à tous les livres (comme Plomberie et chauffage) : la nouvelle page apparaît en fondu en montant légèrement.
@@ -5865,7 +5873,7 @@ $("#penX").onclick = () => { const w = RD.wb; RD.pen = false; RD.eraser = false;
 /* ---- Ouvrir et fermer le lecteur ---- */
 function ouvrirLivre(l, brut){
   try {
-    const html = injectHead(brut, HOSTCSS + (document.documentElement.classList.contains("leger") ? LEGERCSS : ""));
+    const html = avecFormatMp(injectHead(brut, HOSTCSS + (document.documentElement.classList.contains("leger") ? LEGERCSS : "")));
     killExtras(); RD.html = html; marquerVu(l); $("#readerFrame2").hidden = true; $("#readerFrame2").srcdoc = ""; $("#rinner").classList.remove("dbl"); $("#tbDbl").classList.remove("on"); $("#spine").hidden = true; $("#readerFrame").style.left = $("#readerFrame").style.width = $("#readerFrame").style.clipPath = "";
     RD.t0 = Date.now(); RD.retry = 0; RD.first = undefined; RD.armed = false; RD.offered = false; $("#resume").hidden = true; clearTimeout(RD.resT);
     Object.assign(RD, { single:false, dbl:false, drv2:null, book:l.fichier, drv:null, attached:false, z:1, pen:false, wb:false, spot:false, cache:false, eraser:false, label:"", tot:0 });

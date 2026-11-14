@@ -1,4 +1,5 @@
-/* Format commun des livres Métier+ — une seule feuille pour tous les livres */
+/* Format commun des livres Métier+ : SOURCE UNIQUE. La bibliothèque l'ajoute à tous les livres convertis à l'ouverture (index.html, MPCSS).
+   Les outils de conversion copient aussi ce fichier dans chaque livre (secours). */
 .page.mp{--mp-c:#7B5CE0;--mp-p:#1B7A55;--mp-f:#1e2a33;background:#fff!important;color:#1e2a33;font-family:MPI5,Inter,sans-serif}
 .page.mp .mpband{position:absolute;left:0;top:0;bottom:0;width:10px;background:var(--mp-p);z-index:40}
 .page.mp .mp-tete{position:absolute;left:72px;right:60px;top:40px;display:flex;justify-content:space-between;font:10px MPI8,sans-serif;letter-spacing:2px;text-transform:uppercase;color:#7a8590;border-bottom:1px solid #e3e6e9;padding-bottom:10px;z-index:3}
@@ -64,3 +65,21 @@
 .page.mp .mp-etapes{position:absolute;left:72px;right:60px;top:22px;display:flex;gap:4px;z-index:3}.page.mp .mp-etapes i{flex:1;height:5px;border-radius:3px;background:#e3e6e9}.page.mp .mp-etapes i.on{background:var(--mp-c);opacity:.4}.page.mp .mp-etapes i.cur{background:var(--mp-c)}
 /* 14 nov. : pas de bande de couleur à l'intérieur (livres imprimés en noir et blanc) */
 .page.mp .mpband{display:none!important}
+
+/* Livres au format « Maquette 3D » (Lecture de plans EGI, C6) : sections .page.mp.m3d */
+/* Ajouts pour les livres au format « Maquette 3D » (lecture de plans EGI, C6) */
+.page.mp.m3d .mp-ab{padding:0}
+.page.mp.m3d .mp-act-t{display:inline-block}
+.page.mp.m3d .body .tight{font-size:inherit;line-height:inherit}
+.page.mp.m3d .body li{font-size:13.5px;line-height:1.5}
+.page.mp.m3d .lines i{border-bottom-color:#b9c0c6}
+.page.mp.m3d .mp-enc{outline:none;box-shadow:none}.page.mp.m3d .mp-act{outline:none;box-shadow:none;overflow:visible}
+.page.mp.m3d .mp-enc ul{margin:4px 0 0;padding-left:18px}
+.page.mp.m3d.mp-ouv .mp-mat{font-size:12.5px}.page.mp.m3d.mp-ouv .mp-mat .t{margin-top:6px}
+.page.mp.m3d .mp-cap{text-align:center;font-style:normal}
+.page.mp.m3d .mp-pied span:first-child{font-size:9px;line-height:1.3}
+.page.mp.m3d.mp-ouv .mp-obj li{padding:3px 0 3px 22px}.page.mp.m3d.mp-ouv .mp-obj li::before{top:10px}
+.page.mp.m3d.mp-ouv .mp-mat{columns:2;column-gap:24px}.page.mp.m3d.mp-ouv .mp-mat .t{break-after:avoid}.page.mp.m3d.mp-ouv .mp-mat ul{margin-top:0}
+.page.mp.m3d.mp-ouv .mp-bas>*{zoom:var(--mpz,1)}
+.page.mp.m3d .mp-fe{justify-self:end;display:flex;align-items:center;gap:12px;font-size:9px;letter-spacing:.5px}.page.mp.m3d .mp-fe img{height:16px}
+.page.mp.m3d.mp-ouv .mp-badge{position:absolute;right:60px;top:30px;z-index:2;font:11px MPI8,sans-serif;letter-spacing:2px;color:#fff;background:rgba(0,0,0,.45);border-radius:6px;padding:4px 10px}
