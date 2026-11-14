@@ -156,3 +156,17 @@ body.h-rep .page.mp.adm .reponse-choix,.page.mp.adm .reponse-choix.h-vu{box-shad
 .page.mp.em .mp-sit{display:block}
 .page.mp.em .mp-act{display:block}
 .page.mp.em.mp-ouv .mp-bas>*{zoom:var(--mpz,1)}
+/* Livre « Protection incendie » : sections .page.mp.pi */
+.page.mp.pi .mp-cm{border-left:4px solid var(--mp-c)}
+.page.mp.pi .mp-enc .t{display:block}
+.page.mp.pi.mp-ouv .mp-duo{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.page.mp.pi.mp-ouv .mp-obj li{font-size:12.5px;padding:3px 0 3px 22px}.page.mp.pi.mp-ouv .mp-obj li::before{top:9px}
+.page.mp.pi.mp-ouv .mp-cont{list-style:none;padding:0;margin:6px 0;font-size:12.5px}
+.page.mp.pi.mp-ouv .mp-cont li{display:flex;justify-content:space-between;gap:8px;padding:3px 0;border-bottom:1px solid #e3e6e9}
+.page.mp.pi.mp-ouv .mp-cont li b{color:var(--mp-c);margin-right:8px}
+.page.mp.pi.mp-ouv .fait{margin:10px 0 0}
+.page.mp.pi.mp-ouv .mp-bas>*{zoom:var(--mpz,1)}
+.page.mp.pi.mp-ouv .mp-duo.un{grid-template-columns:1fr}
+.page.mp.pi.mp-ouv .mp-bande{height:340px}.page.mp.pi.mp-ouv .mp-bas{top:362px}
+.page.mp.pi.mp-ouv .mp-mod{top:56px}.page.mp.pi.mp-ouv .mp-num{top:100px}.page.mp.pi.mp-ouv .mp-dur{top:296px}
+.page.mp.pi.mp-ouv .mp-num.long{width:auto;padding:0 28px;font-size:72px}
