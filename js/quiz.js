@@ -821,6 +821,8 @@ function telecommande(bord){
   // ouvert depuis le tableau de bord : le quiz choisi est prêt à jouer
   const qp = params.get("quiz");
   if (!bord && qp && !repris) { const b = document.querySelector(`[data-jouer="${CSS.escape(qp)}"]`); if (b) b.click(); }
+  /* 15 nov. (Jeremy) : un quiz touché dans le Labo ouvre d'abord ses options, avant la salle d'attente */
+  { const c = params.get("choisir"); if (bord && c && tousQuiz().some(x => x.id === c)) modes(c); }
 }
 
 /* ================================ JOUEUR (iPad de l'élève) ================================ */
