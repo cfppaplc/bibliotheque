@@ -477,7 +477,7 @@ function coffreOuvrir(id){
     <div id="lst" class="lst${prop || !liste.length ? " ed" : ""}"></div>
     ${mien ? `<div class="lact"><button class="btn" id="aMod">${liste.length ? "Modifier la liste" : "Écrire la liste"}</button>${autres.length ? `<select id="aCp"><option value="">Copier d'un autre coffre…</option>${autres.map(([i, c]) => `<option value="${i}">${esc(c.nom)}</option>`).join("")}</select>` : ""}</div>` : `<div class="lact"><button class="btn" id="aMod">Modifier la liste</button></div><p class="info">Coffre partagé par ${esc(((COMPTES[cf.de] || {}).nom || cf.de || "").split(" ")[0])} : vous voyez le même historique. Tu peux changer la liste; seul lui peut demander un nouvel inventaire.</p>`}
     ${hist ? `<details class="hd"><summary>Historique</summary>${hist}<button class="btn lien" id="aImp" style="margin-top:8px">Imprimer tout l'historique</button></details>` : ""}
-    <div class="act">${mien ? `<button class="btn lien" id="aX">Retirer le coffre</button><button class="btn lien" id="aRn">Renommer</button><span class="esp"></span>` : ""}${mqH ? `<button class="btn vert" id="aRg">Remis en ordre</button>` : ""}${mien ? `<button class="btn" id="aEtat" title="Remettre le coffre dans l'état de ton choix (en cas de bogue)">Changer l'état…</button>` : ""}<button class="btn" id="aF">Fermer</button><button class="btn p" id="aOk" hidden>${prop ? "Approuver la liste" : "Enregistrer"}</button></div>`);
+    <div class="act">${mien ? `<button class="btn lien" id="aRn">Renommer</button><span class="esp"></span>` : ""}${mqH ? `<button class="btn vert" id="aRg">Remis en ordre</button>` : ""}${mien ? `<button class="btn" id="aEtat" title="Remettre le coffre dans l'état de ton choix (en cas de bogue)">Changer l'état…</button>` : ""}<button class="btn" id="aF">Fermer</button><button class="btn p" id="aOk" hidden>${prop ? "Approuver la liste" : "Enregistrer"}</button></div>`);
   let L = liste.map(x => ({ q:x.q, n:x.n }));
   const lst = $("#lst"), ed = () => lst.classList.contains("ed");
   const peindre = () => {
@@ -607,7 +607,9 @@ async function vueProf(){
   if (ADMIN && !Object.keys(K.at).length){ try { const L = (await (await fetch("locaux.json", { cache:"no-store" })).json()).locaux || []; L.forEach(l => K.at[l.id] = { nom:l.nom, t:1 }); } catch(e) {} }
   dessiner();
   $("#atS").onchange = e => { AT = e.target.value; localStorage.setItem("coffresAtelierChoisi", AT); dessiner(); majPart(); };
-  $("#bAtN").onclick = () => { const n = prompt("Nom de l'atelier (ex. « Atelier EGI »)"); if (!n || !n.trim()) return; const id = "at-" + nid(); K.at[id] = { nom:n.trim().slice(0, 40), t:Date.now() }; AT = id; localStorage.setItem("coffresAtelierChoisi", AT); sauver(); dessiner(); majPart(); };
+  $("#bAtN").onclick = () => { const n = prompt("Nom de l'atelier (ex. « Atelier EGI »)"); if (!n || !n.trim()) return; const id = "at-" + nid(); K.at[id] = { nom:n.trim().slice(0, 40), t:Date.now() }; AT = id;
+    const nb = Math.min(40, Math.max(0, parseInt(prompt("Combien de coffres dans cet atelier ? (tu pourras en ajouter plus tard)", "10"), 10) || 0));
+    for (let i = 1; i <= nb; i++) K.cf["c" + nid() + i] = { at:id, nom:"Coffre " + i, liste:[], t:Date.now() }; localStorage.setItem("coffresAtelierChoisi", AT); sauver(); dessiner(); majPart(); };
   $("#bCfN").onclick = () => { const n = prompt("Nom du coffre (ex. « Coffre 3 » ou « Cabine 3 »)", "Coffre " + (coffresDe(AT).length + 1)); if (!n || !n.trim()) return;
     const id = "c" + nid(); K.cf[id] = { at:AT, nom:n.trim().slice(0, 40), liste:[], t:Date.now() }; sauver(); dessiner(); coffreOuvrir(id); };
   $("#cfs").onclick = e => { const b = e.target.closest("[data-cf]"); if (b) coffreOuvrir(b.dataset.cf); };
