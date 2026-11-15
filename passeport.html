@@ -116,6 +116,15 @@ html.eleve body{background:var(--fond)}
 .toile canvas{display:block;width:100%;height:180px}
 .toile span{position:absolute;left:14px;bottom:10px;color:#999;font-size:13px;pointer-events:none}
 .cd{color:var(--gris);font-weight:650;font-size:.8em;letter-spacing:1px}
+.so{background:var(--carte,#fff);border:1px solid var(--fil,#e5dac6);border-radius:16px;padding:14px 16px;margin:0 0 16px}
+.so h2{margin:0 0 8px;font-size:19px}.so h2 small{color:var(--gris);font-weight:650;font-size:14px;margin-left:6px}
+.so-l{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;padding:9px 0;border-top:1px solid var(--fil,#e5dac6)}
+.so-l b{min-width:150px}.so-l .btn{margin-left:auto;min-height:40px;padding:6px 14px}
+.so .h{color:var(--gris);font-size:14px}.so .pf{background:#D9534F;color:#fff;border-radius:999px;padding:2px 9px;font-size:12.5px;font-weight:700}
+.so details{margin-top:8px}.so summary{cursor:pointer;font-weight:650;color:var(--gris);padding:6px 0}
+.so-h{display:grid;grid-template-columns:110px 84px 1fr 1.4fr;gap:8px;padding:6px 0;border-top:1px solid var(--fil,#e5dac6);font-size:14px;align-items:center}
+.so-h .sortie{color:#C9561A;font-weight:700}.so-h .retour{color:#1E8A55;font-weight:700}
+@media (max-width:640px){.so-h{grid-template-columns:1fr 1fr}.so-l b{min-width:0;width:100%}}
 .engage{color:var(--gris);font-size:14px;line-height:1.45;margin:12px 0}
 .fini{text-align:center;padding:40px 10px}.fini .rond{width:96px;height:96px;border-radius:50%;background:var(--vert);color:#fff;display:grid;place-items:center;font-size:52px;margin:0 auto 18px}
 .err{color:#D9534F;font-weight:650;margin-top:10px}
@@ -137,6 +146,7 @@ html.eleve body{background:var(--fond)}
     <button class="btn" id="bProt" hidden>Modifier les formations</button>
   </div>
   <p class="info" id="etat"></p>
+  <div id="sorties"></div>
   <div class="tw" id="tw"></div><div class="cartes" id="cm"></div>
   <p class="info" style="margin-top:14px">✓ vert = signé par l'élève · ✓ bleu = validé par toi. Touche une case pour voir la signature. <button class="btn" id="bEffG" style="min-height:36px;padding:6px 12px;margin-left:8px">Effacer ce groupe</button></p>
 </main>
@@ -192,9 +202,12 @@ async function vueEleve(){
   const o = outil(Q.get("o"));
   if (!o){ V.innerHTML = `<div class="top"><img src="${LOGO}" alt="Métier+"></div><h1>Outil introuvable</h1><p class="sous">Ce code QR ne correspond à aucun outil. Avise ton enseignant.</p>`; return; }
   const ens = Q.get("e") || "", grp = Q.get("g") || "";
+  let faits = {}; try { faits = JSON.parse(localStorage.getItem("passFaits") || "{}"); } catch(e) {}
+  if (faits[o.id] && !Q.get("formation") && ens) return sortieVue(o, ens, V);
   const coche = new Set();
   V.innerHTML = `<div class="top"><img src="${LOGO}" alt="Métier+"><span class="esp" style="flex:1"></span><span class="tag">Passeport d'outils</span></div>
     <span class="tag">Formation</span><h1>${esc(o.nom)}</h1>
+    ${ens ? `<button type="button" class="btn" id="dejaF" style="margin:4px 0 10px;min-height:44px">J'ai déjà ma formation : prendre ou rapporter l'outil</button>` : ""}
     <p class="sous">Lis chaque étape et touche-la pour la cocher. Quand tout est coché, écris ton prénom, ton groupe et signe.</p>
     ${o.epi && o.epi.length ? `<span class="tag">Équipement de protection</span><div class="epi" style="margin-top:8px">${o.epi.map(x => `<span>${esc(x)}</span>`).join("")}</div>` : ""}
     <span class="tag">Les étapes</span><div class="prog"><i id="pg"></i></div>
@@ -210,6 +223,7 @@ async function vueEleve(){
       <p class="err" id="er" hidden></p>
     </div>
     ${ens ? "" : `<p class="engage" style="margin-top:20px">Ce code ne contient pas le nom de l'enseignant : la signature ne peut pas être envoyée. Avise ton enseignant.</p>`}`;
+  if ($("#dejaF")) $("#dejaF").onclick = () => sortieVue(o, ens, V);
   const maj = () => { $("#pg").style.width = (coche.size / o.etapes.length * 100) + "%"; $("#sg").hidden = !(ens && coche.size === o.etapes.length); pret(); };
   V.querySelectorAll(".et").forEach(el => { const t = () => { const i = +el.dataset.i; coche.has(i) ? coche.delete(i) : coche.add(i);
       el.classList.toggle("on", coche.has(i)); el.setAttribute("aria-checked", coche.has(i)); maj(); };
@@ -259,7 +273,10 @@ async function vueEleve(){
       try { if (obj.p) localStorage.setItem("passPrenom", obj.p); if (obj.c) localStorage.setItem("passCode", obj.c); localStorage.setItem("passGroupe", obj.g); } catch(e) {}
       V.innerHTML = `<div class="top"><img src="${LOGO}" alt="Métier+"></div><div class="fini"><div class="rond">✓</div><h1>C'est signé !</h1>
         <p class="sous">${esc(obj.p)} · ${esc(o.nom)} · ${jour(obj.t)}<br>Ta signature est envoyée à ton enseignant.</p>
-        <p class="engage">Rappel : refais les étapes chaque fois que tu utilises l'outil.</p></div>`;
+        <p class="engage">Rappel : refais les étapes chaque fois que tu utilises l'outil.</p>
+        <button class="btn p" id="bPrend" style="width:100%;min-height:56px;font-size:18px;margin-top:10px">Prendre l'outil maintenant</button></div>`;
+      try { faits[o.id] = Date.now(); localStorage.setItem("passFaits", JSON.stringify(faits)); } catch(e) {}
+      $("#bPrend").onclick = () => sortieVue(o, ens, V);
     } catch(e){
       b.disabled = false; b.textContent = "Signer et envoyer"; er.hidden = false;
       er.textContent = e.message === "ens" ? "Ce code QR ne correspond à aucun enseignant. Avise ton enseignant." : "L'envoi n'a pas fonctionné. Vérifie la connexion Internet et réessaie.";
@@ -268,9 +285,57 @@ async function vueEleve(){
   maj();
 }
 
+/* Prendre ou rapporter un outil (14 nov.) : l'élève déjà formé scanne le même code QR */
+async function sortieVue(o, ens, V){
+  let S = {}; try { S = JSON.parse(localStorage.getItem("passSorties") || "{}"); } catch(e) {}
+  const dehors = !!S[o.id];
+  V.innerHTML = `<div class="top"><img src="${LOGO}" alt="Métier+"><span class="esp" style="flex:1"></span><span class="tag">Passeport d'outils</span></div>
+    <span class="tag">Sortie d'outil</span><h1>${esc(o.nom)}</h1>
+    <p class="sous">${dehors ? "Tu rapportes l'outil? Touche « Je rapporte l'outil »." : "Indique que tu prends l'outil. Ton enseignant voit qui l'a et depuis quand."}</p>
+    <div class="signer"><label>Ton groupe</label><div id="sgB" class="epi" style="margin:4px 0 10px"></div><input id="sgr" type="text" maxlength="20" placeholder="Numéro du groupe" hidden>
+      <div id="scZ" hidden><label for="scd">Ton code (3 chiffres)</label><input id="scd" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" placeholder="000" style="font-size:28px;letter-spacing:8px;text-align:center;max-width:160px"><p class="err" id="scEr" hidden>Ce code n'existe pas dans ce groupe.</p></div>
+      <div id="spZ" hidden><label for="spn">Ton prénom</label><input id="spn" type="text" maxlength="22" placeholder="Prénom (ex. : Marc ou Marc B.)"></div>
+      <div style="display:grid;gap:10px;margin-top:14px">
+        <button class="btn ${dehors ? "" : "p"}" id="sPrend" style="min-height:58px;font-size:19px" disabled>Je prends l'outil</button>
+        <button class="btn ${dehors ? "p" : ""}" id="sRap" style="min-height:58px;font-size:19px" disabled>Je rapporte l'outil</button></div>
+      <p class="err" id="sEr" hidden></p></div>
+    <p style="margin-top:16px"><a href="?o=${encodeURIComponent(o.id)}&e=${encodeURIComponent(ens)}&formation=1">Revoir la formation</a></p>`;
+  const gr = $("#sgr"), cd = $("#scd"), pn = $("#spn");
+  try { gr.value = localStorage.getItem("passGroupe") || ""; cd.value = localStorage.getItem("passCode") || ""; pn.value = localStorage.getItem("passPrenom") || ""; } catch(e) {}
+  const INFO = await PARTAGE.lire(ens);
+  if (!INFO.grp.length) gr.hidden = false; else if (!INFO.grp.includes(gr.value)) gr.value = "";
+  const parCode = () => !!(INFO.codes && INFO.codes[gr.value] && INFO.codes[gr.value].length);
+  const peindre = () => { $("#sgB").innerHTML = INFO.grp.map(g => `<button type="button" class="btn${g === gr.value ? " p" : ""}" data-g="${esc(g)}" style="min-height:52px;min-width:90px;font-size:18px">${esc(g)}</button>`).join("");
+    $("#sgB").querySelectorAll("button").forEach(b => b.onclick = () => { gr.value = b.dataset.g; peindre(); pret(); }); };
+  function pret(){ const pc = parCode(); $("#scZ").hidden = !pc; $("#spZ").hidden = pc || !gr.value;
+    const cOk = pc && cd.value.length === 3 && INFO.codes[gr.value].includes(cd.value);
+    $("#scEr").hidden = !(pc && cd.value.length === 3 && !cOk);
+    const ok = gr.value.trim() && (pc ? cOk : prenom(pn.value).length >= 2); $("#sPrend").disabled = $("#sRap").disabled = !ok; }
+  cd.oninput = () => { cd.value = cd.value.replace(/\D/g, "").slice(0, 3); pret(); }; pn.oninput = gr.oninput = pret;
+  peindre(); pret();
+  const envoyer = async k => {
+    const er = $("#sEr"); er.hidden = true; $("#sPrend").disabled = $("#sRap").disabled = true;
+    try {
+      const d = await (await fetch("comptes.json", { cache:"no-store" })).json(), c = d.comptes && d.comptes[ens];
+      if (!c || !c.pub) throw new Error("ens");
+      const pc = parCode(), obj = { v:1, k, uid:crypto.getRandomValues(new Uint32Array(2)).join("-"), o:o.id, nom:o.nom, p:pc ? "" : prenom(pn.value), c:pc ? cd.value : undefined, g:gr.value.trim().replace(/[<>"]/g, "").slice(0, 20), t:Date.now() };
+      const dep = async (id, pub) => { for (let n = 0; n < 400; n++){ try { await COFFRE.deposer("passeport|" + id + "|" + n, obj, pub); return true; } catch(e){ if (!/refus/.test(e.message)) throw e; } } return false; };
+      if (!await dep(ens, c.pub)) throw new Error("plein");
+      for (const id of new Set(INFO.part[obj.g] || [])){ const cc = d.comptes[id]; if (id !== ens && cc && cc.pub && !cc.eleve){ try { await dep(id, cc.pub); } catch(e) {} } }
+      try { if (k === "sortie") S[o.id] = obj.t; else delete S[o.id]; localStorage.setItem("passSorties", JSON.stringify(S));
+        localStorage.setItem("passGroupe", obj.g); if (obj.c) localStorage.setItem("passCode", obj.c); if (obj.p) localStorage.setItem("passPrenom", obj.p); } catch(e) {}
+      const h = new Date(obj.t).toLocaleTimeString("fr-CA", { hour:"2-digit", minute:"2-digit" }).replace(":", " h ");
+      V.innerHTML = `<div class="top"><img src="${LOGO}" alt="Métier+"></div><div class="fini"><div class="rond">✓</div><h1>${k === "sortie" ? "Bon travail !" : "Merci !"}</h1>
+        <p class="sous">${esc(o.nom)} ${k === "sortie" ? "pris" : "rapporté"} à ${h}.<br>C'est noté chez ton enseignant.</p>
+        ${k === "sortie" ? `<p class="engage">Refais les étapes de sécurité avant de commencer. Rescanne le code quand tu rapportes l'outil.</p>` : ""}</div>`;
+    } catch(e){ er.hidden = false; er.textContent = "L'envoi n'a pas fonctionné. Vérifie Internet et réessaie."; pret(); }
+  };
+  $("#sPrend").onclick = () => envoyer("sortie"); $("#sRap").onclick = () => envoyer("retour");
+}
+
 /* ================= Vue de l'enseignant ================= */
 const CLE = "passeportOutils", CLE_J = "passPartageJeton";
-function lireD(){ try { const d = JSON.parse(localStorage.getItem(CLE) || "null"); if (d && d.el) return d; } catch(e) {} return { el:{}, val:{}, grp:{}, vus:{} }; }
+function lireD(){ try { const d = JSON.parse(localStorage.getItem(CLE) || "null"); if (d && d.el) return d; } catch(e) {} return { el:{}, val:{}, grp:{}, vus:{}, mv:{} }; }
 let D = lireD(), GRP = localStorage.getItem("passeportGroupe") || "";
 const sauver = () => { localStorage.setItem(CLE, JSON.stringify(D)); clearTimeout(sauver.p); sauver.p = setTimeout(publierGrp, 1500); };
 /* liste publique des groupes (pour les boutons de l'élève) + partage, réécrite quand les groupes changent */
@@ -286,8 +351,8 @@ const nid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 
 const groupes = () => Object.keys(D.grp).filter(g => D.grp[g] && !D.grp[g].x).sort((a, b) => a.localeCompare(b, "fr"));
 const eleves = g => Object.entries(D.el).filter(([, e]) => !e.x && e.g === g).map(([id, e]) => Object.assign({ id }, e)).sort((a, b) => a.p.localeCompare(b.p, "fr"));
 /* fusion de deux appareils : élément par élément, le plus récent gagne (t) */
-function fusion(a, b){ const A = JSON.parse(a || "null") || { el:{}, val:{}, grp:{}, vus:{} }, B = JSON.parse(b || "null") || { el:{}, val:{}, grp:{}, vus:{} };
-  for (const k of ["el", "val", "grp", "vus"]){ A[k] = A[k] || {}; const y = B[k] || {};
+function fusion(a, b){ const A = JSON.parse(a || "null") || { el:{}, val:{}, grp:{}, vus:{}, mv:{} }, B = JSON.parse(b || "null") || { el:{}, val:{}, grp:{}, vus:{}, mv:{} };
+  for (const k of ["el", "val", "grp", "vus", "mv"]){ A[k] = A[k] || {}; const y = B[k] || {};
     for (const i in y){ const x = A[k][i]; if (!x || (typeof y[i] === "object" ? (y[i].t || 0) > (x.t || 0) : y[i] > x)) A[k][i] = y[i]; } }
   return JSON.stringify(A); }
 function toast(t){ const d = document.createElement("div"); d.className = "toast"; d.textContent = t; document.body.appendChild(d); setTimeout(() => d.remove(), 3500); }
@@ -298,6 +363,7 @@ document.addEventListener("keydown", e => { if (e.key === "Escape") fermer(); })
 
 function dessiner(){
   let mig = false; Object.values(D.el).forEach(e => { if (!e.x && !e.c){ e.c = codeLibre(); e.t = Date.now(); mig = true; } }); if (mig) sauver();
+  dessinerSorties();
   const gs = groupes(); if (!gs.includes(GRP)) GRP = gs[0] || "";
   $("#grp").innerHTML = gs.length ? gs.map(g => `<option ${g === GRP ? "selected" : ""}>${esc(g)}</option>`).join("") : `<option value="">Aucun groupe</option>`;
   $("#bEl").disabled = $("#bEffG").disabled = !GRP;
@@ -313,6 +379,21 @@ function dessiner(){
   $("#cm").innerHTML = L.map(e => { let n = 0; const ch = O.map(o => { const v = D.val[e.id + "|" + o.id], f = v && v.d; if (f) n++;
       return `<button class="c ${f ? (v.s ? "s" : "v") : ""}" data-e="${e.id}" data-o="${o.id}">${f ? "✓ " : ""}${esc(o.nom.replace(/ \(.*\)$/, ""))}</button>`; }).join("");
     return `<div class="ce"><div class="t"><button data-el="${e.id}">${esc(e.p)} <small class="cd">${e.c || ""}</small></button><small>${n} sur ${O.length}</small></div><div class="ch">${ch}</div></div>`; }).join("");
+}
+/* Sorties d'outils (14 nov.) : l'élève déjà formé scanne pour prendre ou rapporter l'outil */
+function dessinerSorties(){
+  const M = Object.entries(D.mv || {}).map(([u, m]) => Object.assign({ u }, m)).filter(m => m.d > Date.now() - 60 * 864e5).sort((a, b) => b.d - a.d);
+  const Z = $("#sorties"); if (!M.length){ Z.innerHTML = ""; return; }
+  const qui = m => { const e = D.el[m.e]; return e ? esc(e.p) + (e.c ? ` <small class="cd">${e.c}</small>` : "") + ` <small class="cd">· ${esc(e.g)}</small>` : "Élève retiré"; };
+  const nomO = id => { const o = outil(id); return o ? esc(o.nom.replace(/ \(.*\)$/, "")) : esc(id); };
+  const quand = d => { const x = new Date(d), h = x.toLocaleTimeString("fr-CA", { hour:"2-digit", minute:"2-digit" }).replace(":", " h ");
+    return new Date().toDateString() === x.toDateString() ? h : x.toLocaleDateString("fr-CA", { day:"numeric", month:"short" }) + ", " + h; };
+  const dern = {}; M.forEach(m => { if (!dern[m.o]) dern[m.o] = m; });
+  const dehors = Object.values(dern).filter(m => m.k === "sortie");
+  Z.innerHTML = `<div class="so"><h2>Outils sortis <small>${dehors.length ? dehors.length : "aucun"}</small></h2>
+    ${dehors.map(m => `<div class="so-l"><b>${nomO(m.o)}</b><span>${qui(m)}</span><span class="h">depuis ${quand(m.d)}</span>${D.val[m.e + "|" + m.o] && D.val[m.e + "|" + m.o].d ? "" : `<span class="pf">pas formé</span>`}<button class="btn" data-rap="${m.o}" data-e="${m.e}">Rapporté</button></div>`).join("") || `<p class="info">Tous les outils sont rentrés.</p>`}
+    <details><summary>Historique (60 jours)</summary>${M.slice(0, 80).map(m => `<div class="so-h"><span class="h">${quand(m.d)}</span><span class="${m.k}">${m.k === "sortie" ? "Sorti" : "Rapporté"}</span><b>${nomO(m.o)}</b><span>${qui(m)}</span></div>`).join("")}</details></div>`;
+  Z.querySelectorAll("[data-rap]").forEach(b => b.onclick = () => { D.mv["p" + nid()] = { e:b.dataset.e, o:b.dataset.rap, k:"retour", d:Date.now(), t:Date.now() }; sauver(); dessinerSorties(); });
 }
 function caseOuvrir(eid, oid){
   const e = D.el[eid], o = outil(oid), k = eid + "|" + oid, v = D.val[k];
@@ -347,14 +428,19 @@ function trouverEleve(p, g){
 /* signatures déposées par les élèves (chiffrées pour ma clé) : places passeport|<moi>|0, 1, 2… */
 let RELEVE = false;
 async function releve(manuel){
-  if (RELEVE) return; RELEVE = true; let n = 0, vides = 0, neufs = 0;
+  if (RELEVE) return; RELEVE = true; let n = 0, vides = 0, neufs = 0, mvts = 0;
   try {
     const s = await COFFRE.session(); if (!s) return;
     for (let i = 0; i < 400 && vides < 6; i++){
       const nom = "passeport|" + s.id + "|" + i; let x = null;
       try { x = await COFFRE.prendre(nom); } catch(e) { x = null; }
       if (!x){ vides++; continue; } vides = 0; n++;
-      if (!D.vus[x.uid]){
+      if (!D.vus[x.uid] && x.k){ /* sortie ou retour d'un outil */
+        const pc = x.c && Object.entries(D.el).find(([, e]) => !e.x && e.c === x.c);
+        const g = pc ? pc[1].g : groupeDe(x.g, prenom(x.p)), eid = pc ? pc[0] : trouverEleve(prenom(x.p) || "Élève " + (x.c || ""), g);
+        D.mv = D.mv || {}; D.mv[x.uid] = { e:eid, o:x.o, k:x.k === "retour" ? "retour" : "sortie", d:x.t, t:Date.now() };
+        D.vus[x.uid] = Date.now(); mvts++;
+      } else if (!D.vus[x.uid]){
         const parCode = x.c && Object.entries(D.el).find(([, e]) => !e.x && e.c === x.c);
         const g = parCode ? parCode[1].g : groupeDe(x.g, prenom(x.p)), eid = parCode ? parCode[0] : trouverEleve(prenom(x.p) || "Élève " + (x.c || ""), g), k = eid + "|" + x.o, v = D.val[k];
         if (!v || !v.d || v.d < x.t){ D.val[k] = { d:x.t, s:x.s, n:x.n, t:Date.now() }; neufs++; }
@@ -363,7 +449,7 @@ async function releve(manuel){
       }
       try { await COFFRE.jeter(nom); } catch(e) {}
     }
-    if (neufs){ sauver(); dessiner(); toast(neufs === 1 ? "1 nouvelle signature" : neufs + " nouvelles signatures"); }
+    if (neufs || mvts){ sauver(); dessiner(); toast([neufs ? (neufs === 1 ? "1 nouvelle signature" : neufs + " nouvelles signatures") : "", mvts ? (mvts === 1 ? "1 sortie ou retour d'outil" : mvts + " sorties ou retours d'outils") : ""].filter(Boolean).join(" · ")); }
     else if (manuel) toast("Aucune nouvelle signature");
     $("#etat").textContent = "Vérifié à " + new Date().toLocaleTimeString("fr-CA", { hour:"2-digit", minute:"2-digit" });
   } finally { RELEVE = false; }
