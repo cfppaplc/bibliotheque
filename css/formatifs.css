@@ -1,0 +1,51 @@
+  .act-ov{position:fixed;inset:0;z-index:410;background:#0e0e10;color:#f1f1f3;font-family:"Segoe UI",Roboto,Arial,sans-serif;overflow:auto;-webkit-overflow-scrolling:touch}
+  .act-ov[hidden]{display:none}
+  .modal.sur-act{z-index:430}
+  .panel-body .btn{margin-bottom:8px}
+  #mRead{padding:13px 34px;font-size:1.1rem}
+  @media (pointer:coarse) and (min-width:641px){#mRead{padding:17px 44px;font-size:1.25rem}#mFav{padding:17px 26px;font-size:1.1rem}}
+  .panel-body a.btn{text-decoration:none}
+  .act-top{position:sticky;top:0;z-index:2;display:flex;align-items:center;gap:16px;padding:calc(8px + env(safe-area-inset-top,0px)) 16px 8px;background:rgba(12,12,13,.84);backdrop-filter:blur(14px) saturate(1.2);-webkit-backdrop-filter:blur(14px) saturate(1.2);border-bottom:1px solid #232325}
+  .act-back{display:inline-flex;align-items:center;gap:6px;background:#1b1b1d;border:1px solid #2f2f33;color:#e6e6e8;border-radius:6px;height:38px;padding:0 14px;font-weight:600;font-size:.9rem;font-family:inherit;cursor:pointer}
+  .act-back:hover{background:#262629}
+  .act-top h2{margin:0;font-size:1rem;font-weight:600;color:#ddd;display:flex;align-items:center;gap:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .act-wrap{max-width:1100px;margin:0 auto;padding:22px 22px 60px}
+  .act-liste{display:grid;gap:16px}
+  /* tri et filtres des activités (3 nov.) */
+  .act-wrap{max-width:1240px}
+  .act-liste{grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px}
+  /* activités compactes (3 nov.) : rangées de tuiles comme les livres, fiche au toucher */
+  .act-outils{margin-left:auto;display:flex;align-items:center;gap:10px;min-width:0}
+  .act-rech{position:relative;display:flex;align-items:center}
+  .act-rech svg{position:absolute;left:12px;color:#8d8d95;pointer-events:none}
+  .act-rech input{width:260px;height:38px;border-radius:999px;border:1px solid #ffffff2a;background:#ffffff10;color:inherit;padding:0 14px 0 36px;font:inherit;font-size:.92rem}
+  .act-rech input:focus{outline:none;border-color:#ffffff66;width:320px}
+  #actProg{height:38px;border-radius:999px;border:1px solid #ffffff2a;background:#ffffff10;color:inherit;padding:0 12px;font:inherit;font-size:.88rem;max-width:210px}
+  #actProg option{color:#111}
+  body.clair .act-rech input,body.clair #actProg{background:#fff;border-color:#d4d0c8}
+  @media (max-width:640px){.act-top{flex-wrap:wrap}.act-top h2{display:none}.act-outils{flex:1 1 100%;margin-left:0}.act-rech{flex:1}.act-rech input,.act-rech input:focus{width:100%}#actProg{max-width:46%}}
+  .act-liste{display:block}
+  .act-rang{margin:0 0 26px}
+  .act-rh{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:10px;border-left:4px solid #EB6A22;padding-left:10px}
+  .act-rang h3{margin:0;font-size:1.15rem;display:flex;align-items:center;gap:10px}
+  .act-rang h3 b{font-size:.78rem;background:#ffffff1c;border-radius:999px;padding:2px 9px;color:#c9c9d0}
+  .act-tout{background:none;border:0;color:#6ab0ff;font:inherit;font-weight:600;cursor:pointer;padding:6px 4px}
+  .act-ligne{display:flex;gap:14px;overflow-x:auto;padding:4px 2px 14px;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch}
+  .act-rang.ouvert .act-ligne{flex-wrap:wrap;overflow:visible}
+  .act-tuile{flex:0 0 190px;width:190px;background:none;border:0;color:inherit;font:inherit;text-align:left;cursor:pointer;padding:0;scroll-snap-align:start;display:flex;flex-direction:column;gap:6px}
+  .act-vig{display:block;border-radius:10px;overflow:hidden;background:#fff;border-top:4px solid var(--ac);box-shadow:0 4px 14px #0007;transition:transform .15s}
+  .act-tuile:hover .act-vig,.act-tuile:focus-visible .act-vig{transform:translateY(-3px)}
+  .act-vig img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;object-position:top}
+  .act-nom{font-weight:700;font-size:.92rem;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .act-sous{font-size:.78rem;color:#8d8d95}
+  body.clair .act-rang h3 b{background:#0000000f;color:#55555b}
+  body.clair .act-sous{color:#76767d}
+  @media (max-width:640px){.act-tuile{flex-basis:150px;width:150px}}
+  .act-vide{padding:40px 10px;text-align:center;color:#8d8d95}
+  body.clair .act-ov{background:#f6f4ef;color:#1d1d1f}
+  body.clair .act-top{background:#f6f4efee;border-color:#0000001a}
+  body.clair .act-top h2{color:#1d1d1f}
+  @media (max-width:640px){
+    .act-top{padding:10px 14px}.act-wrap{padding:16px 14px 90px}
+    .act-liste{grid-template-columns:1fr}
+  }

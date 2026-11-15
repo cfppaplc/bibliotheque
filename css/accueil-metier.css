@@ -1,0 +1,100 @@
+/* Style Métier+ (9 nov., Jeremy : « plus style Métier+, ça doit fitter avec le reste; trop d'options d'affichage, c'est complexe ») :
+   palette du logo (bleu marine + orange), panneaux arrondis comme la bibliothèque, police de la bibliothèque, plus de repères de coins ni de police technique. */
+:root, html.force-dark:root, html.force-dark.force-dark:root { --bg:#0e1320; --surface:#161d2c; --line:#283247; --ink:#F2F4F7; --muted:#9AA6BB; --copper:#EB6A22; --water:#F28A3C; --done:#6b768c; --steel:#3a4660; --rivet:#3a4660;
+  --display:"Segoe UI",Roboto,Arial,sans-serif; --body:"Segoe UI",Roboto,Arial,sans-serif; color-scheme:dark }
+@media (prefers-color-scheme: light){ html:not(.force-dark):root { --bg:#F5EFE3; --surface:#FFFCF6; --line:#E5DAC6; --ink:#1E2A44; --muted:#6F6656; --copper:#EB6A22; --water:#D9621C; --done:#9aa3b5; color-scheme:light } }
+html.force-light.force-light:root { --bg:#F5EFE3; --surface:#FFFCF6; --line:#E5DAC6; --ink:#1E2A44; --muted:#6F6656; --copper:#EB6A22; --water:#D9621C; --done:#9aa3b5; color-scheme:light }
+html.style-pro body { background: radial-gradient(1400px 700px at 85% -15%, color-mix(in srgb, var(--copper) 12%, transparent), transparent 60%), var(--bg) !important; }
+html.style-pro body::before, html.style-pro body::after { display: none !important; }
+html.style-pro .panel, html.style-pro .period { background: var(--surface) !important; background-image: none !important; border: 1px solid var(--line) !important; border-radius: 18px !important; box-shadow: 0 10px 40px rgba(0,0,0,.18) !important; }
+html.style-pro .now-lbl, html.style-pro .period-hours, html.style-pro .exam-badge, html.style-pro .seg-t, html.style-pro .now-time, html.style-pro .mt-k, html.style-pro .tl-mark::after {
+  font-family: var(--body) !important; letter-spacing: 0 !important; font-variant-numeric: tabular-nums; }
+html.style-pro .now-lbl { letter-spacing: .08em !important; color: var(--muted); }
+html.style-pro .now-lbl::before { background: var(--copper); box-shadow: 0 0 10px var(--copper); }
+html.style-pro .seg { border-radius: 12px; }
+html.style-pro .seg.done:not(.p) .seg-t::before { color: var(--copper); }
+html.style-pro .tl-mark::after { color: #fff; border-radius: 999px; }
+html.style-pro .period .water { box-shadow: none; }
+html.style-pro .clock { font-feature-settings: "tnum" 1 !important; }
+/* Épuré (9 nov., « améliore l'apparence pour ressembler plus au reste du site, épurer ») */
+html.style-pro .brand-text { text-transform: none; letter-spacing: 0; font-weight: 500; }
+html.style-pro .brand-text strong { font-weight: 700; }
+html.style-pro .quote { padding-left: 0; }
+html.style-pro .quote::before { display: none; }
+html.style-pro .quote blockquote { font-style: normal; font-weight: 400; color: color-mix(in srgb, var(--ink) 82%, transparent); font-size: calc(var(--u) * 34); }
+html.style-pro .quote figcaption { font-size: calc(var(--u) * 20); }
+html.style-pro .panel, html.style-pro .period { box-shadow: none !important; background: color-mix(in srgb, var(--surface) 92%, transparent) !important; }
+html.style-pro .now-lbl { font-size: calc(var(--u) * 20) !important; font-weight: 600; }
+html.style-pro .nxt .now-lbl::before { background: var(--muted); box-shadow: none; }
+html.style-pro .now-blk.nxt .now-time { color: var(--muted); }
+html.style-pro .seg { border: 1px solid var(--line) !important; background: transparent !important; }
+html.style-pro .seg.done .seg-l, html.style-pro .seg.done .seg-t { opacity: .45; }
+html.style-pro .seg.now { background: color-mix(in srgb, var(--copper) 14%, transparent) !important; border: 2px solid var(--copper) !important; box-shadow: none !important; }
+html.style-pro .seg.now::after, html.style-pro .tl-mark { box-shadow: none !important; }
+html.style-pro .seg.p { background: repeating-linear-gradient(135deg, color-mix(in srgb, var(--line) 70%, transparent) 0 6px, transparent 6px 14px) !important; border: 1px solid var(--line) !important; }
+html.style-pro .seg.p.now { background: repeating-linear-gradient(135deg, color-mix(in srgb, var(--copper) 35%, transparent) 0 6px, transparent 6px 14px) !important; border: 2px solid var(--copper) !important; }
+html.style-pro .exam-badge, html.style-pro .en-cours { box-shadow: none; }
+#lueur { opacity: .35; }
+/* Idée « Maintenant en vedette » (9 nov., « as-tu une autre idée, tu as le droit de changer des choses ») :
+   la carte Maintenant ressort (bande orange, étiquette en pastille, barre d'avancement de l'activité), Ensuite devient une ligne compacte. */
+html.style-pro .now-card { position: relative; overflow: hidden; padding-left: calc(var(--u) * 52) !important; justify-content: center; }
+html.style-pro .now-card::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: calc(var(--u) * 10); background: linear-gradient(var(--copper), #F2A35E); }
+html.style-pro .now-blk:not(.nxt) .now-lbl { align-self: flex-start; background: color-mix(in srgb, var(--copper) 18%, transparent); color: var(--copper); border-radius: 999px; padding: calc(var(--u) * 4) calc(var(--u) * 16); }
+html.style-pro .now-blk:not(.nxt) .now-lbl::before { display: none; }
+html.style-pro .now-txt { font-size: calc(var(--u) * 92); letter-spacing: -.01em; }
+html.style-pro .now-av { height: calc(var(--u) * 8); border-radius: 99px; background: color-mix(in srgb, var(--ink) 10%, transparent); overflow: hidden; margin-top: calc(var(--u) * 10); }
+html.style-pro .now-av i { display: block; height: 100%; width: var(--pg, 0%); background: linear-gradient(90deg, var(--copper), #F2A35E); border-radius: 99px; transition: width 1s linear; }
+html.style-pro .now-blk.nxt { flex-direction: row; flex-wrap: wrap; align-items: baseline; gap: 0 calc(var(--u) * 16); padding-top: calc(var(--u) * 26); border-top: 1px solid var(--line); }
+html.style-pro .now-blk.nxt .next-txt { font-size: calc(var(--u) * 42); opacity: 1; }
+html.style-pro .now-blk.nxt .now-time { font-size: calc(var(--u) * 30); }
+html.style-pro .now-card hr, html.style-pro .now-card .sep { display: none; }
+/* Choix F : le « + » du logo (9 nov.) */
+html.style-pro .quote blockquote { font-style: italic; }
+html.style-pro .quote { padding-left: calc(var(--u) * 50) !important; max-width: 48em; }
+html.style-pro .quote::before { display: block !important; content: "+"; left: 0; top: calc(var(--u) * 10); width: calc(var(--u) * 34); height: calc(var(--u) * 34); border-radius: 22%; background: var(--copper); color: #fff; font-family: inherit; font-size: calc(var(--u) * 30); font-weight: 800; line-height: calc(var(--u) * 34); text-align: center; }
+html.style-pro .now-card::before { display: none; }
+html.style-pro .now-card { padding-left: calc(var(--u) * 40) !important; }
+html.style-pro .now-card::after { content: "+"; position: absolute; right: calc(var(--u) * 22); top: calc(var(--u) * 22); width: calc(var(--u) * 64); height: calc(var(--u) * 64); border-radius: 22%; background: var(--copper); color: #fff; font-size: calc(var(--u) * 52); font-weight: 800; line-height: calc(var(--u) * 62); text-align: center; }
+html.style-pro .tl-mark::after { content: "Tu es ici · " attr(data-h); }
+html.style-pro .clock .sec { display: none; }
+html.style-pro .brand { visibility: hidden !important; }
+html.style-pro .clock { font-size: calc(var(--u) * 290) !important; }
+html.style-pro .date { font-size: calc(var(--u) * 54) !important; }
+html.style-pro .quote blockquote { font-size: calc(var(--u) * 42) !important; }
+html.style-pro .quote::before { top: calc(var(--u) * 12) !important; width: calc(var(--u) * 40) !important; height: calc(var(--u) * 40) !important; line-height: calc(var(--u) * 40) !important; font-size: calc(var(--u) * 34) !important; }
+html.style-pro .quote { padding-left: calc(var(--u) * 58) !important; }
+html.style-pro .now-card { justify-content: center !important; }
+html.style-pro .date { font-weight: 600; }
+html.style-pro .now-blk:not(.nxt) .now-lbl { background: none !important; padding: 0 !important; letter-spacing: .16em; font-weight: 700; }
+html.style-pro .now-txt { font-size: calc(var(--u) * 100) !important; line-height: 1.02; }
+html.style-pro .period { display: grid !important; grid-template-columns: auto 1fr auto; column-gap: calc(var(--u) * 28); align-items: baseline; }
+html.style-pro .period > * { grid-column: 1 / -1; }
+html.style-pro .period-top { display: contents !important; }
+html.style-pro .period-nw { grid-column: 1; }
+html.style-pro .period > .status { grid-column: 2; grid-row: 1; margin: 0 !important; }
+html.style-pro .period-hours { grid-column: 3; grid-row: 1; }
+html.style-pro .period .tube { display: none !important; }
+html.style-pro .seg:not(.p) { background: color-mix(in srgb, var(--ink) 6%, var(--surface)) !important; border-color: transparent !important; border-radius: calc(var(--u) * 16) !important; }
+html.style-pro .seg.fait:not(.p), html.style-pro .seg.done:not(.p) { background: color-mix(in srgb, var(--ink) 2%, var(--bg)) !important; }
+html.style-pro .seg.now:not(.p) { background: color-mix(in srgb, var(--copper) 24%, var(--surface)) !important; border: calc(var(--u) * 5) solid var(--copper) !important; }
+/* Fond Métier+ (9 nov.) : « + » du logo qui flottent lentement, deux lueurs */
+#mpFond { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+#mpFond b { position: absolute; width: 70vmax; height: 70vmax; border-radius: 50%; will-change: transform; animation: mpLueur 60s ease-in-out infinite alternate; }
+#mpFond .g1 { left: -25vmax; top: -30vmax; background: radial-gradient(closest-side, color-mix(in srgb, var(--copper) 13%, transparent), transparent); }
+#mpFond .g2 { right: -30vmax; bottom: -35vmax; background: radial-gradient(closest-side, color-mix(in srgb, #3E5C9A 22%, transparent), transparent); animation-duration: 75s; animation-direction: alternate-reverse; }
+#mpFond i { position: absolute; width: var(--t); height: var(--t); border-radius: 22%; border: 2px solid color-mix(in srgb, var(--copper) 30%, transparent); opacity: .28; will-change: transform; animation: mpPlus 90s ease-in-out infinite alternate; }
+#mpFond i::before, #mpFond i::after { content: ""; position: absolute; left: 50%; top: 50%; background: color-mix(in srgb, var(--copper) 45%, transparent); border-radius: 2px; transform: translate(-50%, -50%); }
+#mpFond i::before { width: 46%; height: 9%; }
+#mpFond i::after { width: 9%; height: 46%; }
+@keyframes mpPlus { from { transform: translate(0, 0) rotate(0deg); } 50% { transform: translate(4vw, -6vh) rotate(12deg); } to { transform: translate(-3vw, 5vh) rotate(-8deg); } }
+@keyframes mpLueur { from { transform: translate(0, 0) scale(1); } to { transform: translate(8vw, 6vh) scale(1.12); } }
+html.leger #mpFond *, html.apercu-mode #mpFond * { animation: none !important; }
+html.leger #mpFond { display: none !important; }   /* TNI : pas de grosses lueurs floues (le fond flashait, la fenêtre devenait blanche) */
+html.ui-clair #mpFond i { opacity: .5; }
+html.style-pro .hero .quote, html.style-pro .hero .matiere { margin-top: auto; }
+#mpCoin{position:fixed;right:clamp(16px,1.6vw,32px);bottom:clamp(10px,1.3vh,24px);height:clamp(28px,3.4vh,52px);z-index:5;opacity:1;pointer-events:none}
+#mpCoin img{height:100%;display:block}
+#mpCoin .lg-clr{display:none}
+html.force-light #mpCoin .lg-blc{display:none} html.force-light #mpCoin .lg-clr{display:block}
+@media (prefers-color-scheme: light){ html:not(.force-dark) #mpCoin .lg-blc{display:none} html:not(.force-dark) #mpCoin .lg-clr{display:block} }
+html.apercu-mode #mpCoin{display:none}

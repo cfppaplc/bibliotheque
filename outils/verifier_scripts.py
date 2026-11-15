@@ -8,5 +8,10 @@ for f in ["index.html", "accueil.html"]:
         with tempfile.NamedTemporaryFile("w", suffix=".js", delete=False) as t: t.write(sc)
         r = subprocess.run(["node", "--check", t.name], capture_output=True, text=True); os.unlink(t.name)
         if r.returncode: err += 1; print(f"ERREUR de syntaxe dans {f}, script {i}:\n" + r.stderr[:600])
+# 15 nov. : le code des pages est maintenant aussi dans js/*.js
+import glob
+for f in sorted(glob.glob(os.path.join(site, "js", "*.js"))) + [os.path.join(site, x) for x in ("garde.js", "garde-nav.js", "coffre.js", "sync-partage.js", "mesdocs.js", "signaler.js", "plein-ecran.js") if os.path.exists(os.path.join(site, x))]:
+    r = subprocess.run(["node", "--check", f], capture_output=True, text=True)
+    if r.returncode: err += 1; print(f"ERREUR de syntaxe dans {os.path.relpath(f, site)}:\n" + r.stderr[:600])
 if err: sys.exit(1)
 print("scripts : syntaxe OK")

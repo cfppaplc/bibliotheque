@@ -1,0 +1,73 @@
+/* Interface technique (4 nov.) : chiffres lumineux, libellés en police technique, repères de coins, fine barre de progression */
+html.style-pro .clock { text-shadow: none; font-feature-settings: "tnum" 1, "zero" 1; }
+html.style-pro .now-lbl, html.style-pro .period-hours, html.style-pro .exam-badge, html.style-pro .seg-t, html.style-pro .now-time, html.style-pro .mt-k {
+  font-family: ui-monospace, "Cascadia Mono", "SF Mono", Consolas, "Liberation Mono", monospace; letter-spacing: .06em; font-variant-numeric: tabular-nums; }
+html.style-pro .now-lbl::before { content: ""; display: inline-block; width: .5em; height: .5em; border-radius: 50%; background: #3ddc84; margin-right: .6em; vertical-align: .08em; box-shadow: 0 0 10px #3ddc84; }
+html.style-pro .panel, html.style-pro .period {
+  --cn: color-mix(in srgb, var(--water) 75%, #fff); --cl: 16px; --ce: 2px;
+  background-image:
+    linear-gradient(var(--cn), var(--cn)), linear-gradient(var(--cn), var(--cn)),
+    linear-gradient(var(--cn), var(--cn)), linear-gradient(var(--cn), var(--cn)),
+    linear-gradient(var(--cn), var(--cn)), linear-gradient(var(--cn), var(--cn)),
+    linear-gradient(var(--cn), var(--cn)), linear-gradient(var(--cn), var(--cn)) !important;
+  background-repeat: no-repeat !important;
+  background-size: var(--cl) var(--ce), var(--ce) var(--cl), var(--cl) var(--ce), var(--ce) var(--cl), var(--cl) var(--ce), var(--ce) var(--cl), var(--cl) var(--ce), var(--ce) var(--cl) !important;
+  background-position: left top, left top, right top, right top, left bottom, left bottom, right bottom, right bottom !important; }
+html.style-pro .period .tube { display: block; height: 4px; margin: 2px 0 4px; }
+html.style-pro .period .tube::before, html.style-pro .period .tube::after { display: none; }
+html.style-pro .period .tube-in { border: 0; border-radius: 2px; background: color-mix(in srgb, var(--line) 80%, transparent); }
+html.style-pro .period .water { background: linear-gradient(90deg, color-mix(in srgb, var(--water) 55%, transparent), var(--water)); box-shadow: 0 0 12px var(--water); }
+html.style-pro .period .water::after { display: none; }
+/* Ligne du temps améliorée (4 nov.) : cases sobres, coche verte, heure en bas, barre de progression dans la case en cours, repère « maintenant » avec son heure */
+html.style-pro .tl-wrap { margin-top: 0; padding-top: calc(var(--u) * 80); }
+html.style-pro .tl { gap: 8px; }
+html.style-pro .seg { border-radius: 6px; justify-content: space-between; align-items: flex-start; gap: 0; padding: calc(var(--u) * 16) calc(var(--u) * 14) calc(var(--u) * 14);
+  background: color-mix(in srgb, var(--ink) 8%, var(--surface)); border: 1px solid color-mix(in srgb, var(--ink) 18%, var(--surface)); }
+html.style-pro .seg-t { font-size: calc(var(--u) * 30); opacity: .7; }
+html.style-pro .seg.done { background: color-mix(in srgb, var(--ink) 4%, var(--surface)); border-color: color-mix(in srgb, var(--ink) 10%, var(--surface)); }
+html.style-pro .seg.done:not(.p) .seg-l::before { content: none; }
+html.style-pro .seg.done:not(.p) .seg-t::before { content: "\2713\00a0"; color: #34d399; font-weight: 900; opacity: 1; }
+html.style-pro .seg.now { background: color-mix(in srgb, var(--water) 24%, var(--surface)); border: 2px solid var(--water); box-shadow: 0 0 24px color-mix(in srgb, var(--water) 30%, transparent); }
+html.style-pro .seg.now .seg-l { color: var(--ink); }
+html.style-pro .seg.now .seg-t { color: var(--water); opacity: 1; }
+html.style-pro .seg.now::after { content: ""; position: absolute; left: 0; bottom: 0; height: calc(var(--u) * 9); width: var(--pg, 0%); background: var(--water); box-shadow: 0 0 12px var(--water); transition: width 1s linear; }
+html.style-pro .seg.p { align-items: center; justify-content: center; padding: 0 4px;
+  background: repeating-linear-gradient(135deg, color-mix(in srgb, var(--ink) 9%, var(--surface)) 0 8px, color-mix(in srgb, var(--ink) 3%, var(--surface)) 8px 16px);
+  border: 1px dashed color-mix(in srgb, var(--ink) 25%, var(--surface)); }
+html.style-pro .seg.p.now { background: repeating-linear-gradient(135deg, color-mix(in srgb, var(--copper) 40%, var(--surface)) 0 8px, color-mix(in srgb, var(--copper) 20%, var(--surface)) 8px 16px); border: 2px solid var(--copper); box-shadow: 0 0 24px color-mix(in srgb, var(--copper) 30%, transparent); }
+html.style-pro .seg.p.now::after { background: var(--copper); box-shadow: 0 0 12px var(--copper); }
+html.style-pro .tl-mark { width: 3px; margin-left: -1.5px; background: var(--copper); box-shadow: 0 0 10px var(--copper); top: calc(var(--u) * 62); }
+html.style-pro .tl-mark::before { top: calc(var(--u) * -6); border-width: calc(var(--u) * 14) calc(var(--u) * 12) 0; }
+html.style-pro .tl-mark::after { content: attr(data-h); position: absolute; left: 50%; bottom: calc(100% + calc(var(--u) * 6)); translate: -50% 0; white-space: nowrap;
+  background: var(--copper); color: #1a1a1f; padding: calc(var(--u) * 4) calc(var(--u) * 14); border-radius: 6px; font-weight: 800; font-size: calc(var(--u) * 34);
+  font-family: ui-monospace, "Cascadia Mono", "SF Mono", Consolas, "Liberation Mono", monospace; letter-spacing: .04em; }
+/* Lueur de fin de cours (4 nov.) : monte du bas avec l'avancement de la période; cuivre pendant les pauses et les 5 dernières minutes d'un bloc */
+#lueur { position: fixed; left: 0; right: 0; bottom: 0; height: 14%; z-index: -1; pointer-events: none; transition: height 2s linear; }
+#lueur i { position: absolute; inset: 0; transition: opacity 2.5s ease; }
+#lueur .lb { background: linear-gradient(to top, color-mix(in srgb, var(--water) 30%, transparent), color-mix(in srgb, var(--water) 10%, transparent) 55%, transparent); }
+#lueur .lc { background: linear-gradient(to top, color-mix(in srgb, var(--copper) 38%, transparent), color-mix(in srgb, var(--copper) 10%, transparent) 55%, transparent); opacity: 0; }
+#lueur.fin .lc { opacity: 1; } #lueur.fin .lb { opacity: 0; }
+#lueur::after { content: ""; position: fixed; left: 0; right: 0; bottom: 0; height: 3px; background: var(--water); box-shadow: 0 0 30px 6px var(--water); opacity: .8; transition: background 2.5s, box-shadow 2.5s; }
+#lueur.fin::after { background: var(--copper); box-shadow: 0 0 30px 6px var(--copper); }
+html:not(.style-pro) #lueur, html.apercu-mode #lueur { display: none; }
+/* Ligne du temps plus grosse, « Au programme » retiré (4 nov., pour les élèves au fond de la classe) */
+html.style-pro #v-module { display: none; }
+html.style-pro .tl { height: calc(var(--u) * 270); }
+html.style-pro .seg { padding: calc(var(--u) * 20) calc(var(--u) * 16) calc(var(--u) * 18); }
+html.style-pro .seg-l { font-size: calc(var(--u) * 66 * var(--shrink, 1)); }
+html.style-pro .seg-t { font-size: calc(var(--u) * 38); opacity: .8; letter-spacing: .02em; }
+html.style-pro .seg-l { -webkit-line-clamp: 3; }
+html.style-pro .seg.p .seg-l { font-size: calc(var(--u) * 36); }
+html.style-pro .tl-mark::after { font-size: calc(var(--u) * 42); }
+html.style-pro .tl-wrap { padding-top: calc(var(--u) * 92); }
+html.style-pro .tl-mark { top: calc(var(--u) * 74); }
+  /* Écran tactile (TNI, 6 nov.) : boutons du haut à 48 px */
+  @media (pointer:coarse) and (min-width:641px){
+    .tools button,.tools a{min-height:48px}
+    #b-full,#b-comp,#b-more{min-height:48px}
+  }
+
+/* Mode léger : tableau interactif lent (voir le script en haut) */
+html.leger *,html.leger *::before,html.leger *::after{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;will-change:auto!important}
+html.leger #lueur,html.leger .tl-mark,html.leger .seg,html.leger .seg::after{transition-duration:.01s!important}
+html.leger .sheet,html.leger .menu,html.leger #apercuOv{animation:none!important}

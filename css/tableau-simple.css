@@ -1,0 +1,108 @@
+@media (min-width:900px){
+  .reader.wbon .penbar{gap:6px;padding:8px 10px}
+  .reader.wbon .penbar>button[data-mot]{flex-direction:column;gap:3px;min-width:64px;height:60px;padding:5px 6px}
+  .reader.wbon .penbar>button[data-mot]::after{content:attr(data-mot);font-size:.7rem;font-weight:600;line-height:1;white-space:nowrap}
+  .reader.wbon .penbar #penFs{display:none!important}
+  /* ---- Lecteur de livres (9 nov.) : mots sous les icônes, groupes, crayon à la place de la barre, même bulle que le tableau blanc ---- */
+  #tb{min-height:78px}
+  #tb>button[data-mot]{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-width:66px;height:60px;padding:5px 6px}
+  #tb>button[data-mot]::after{content:attr(data-mot);font-size:.7rem;font-weight:600;line-height:1;white-space:nowrap}
+  #tb>#tbAns,#tb>#tbPen,#tb>#tbZv,#tb>#tbTele{margin-left:16px}
+  .reader:not(.wbon):not(.pen-side):not(.pen-fold):has(#penBar:not([hidden])) #tb>*:not(#tbPrev):not(#tbPg):not(#tbTot):not(#tbNext){display:none!important}
+  .reader:not(.wbon):not(.pen-side):not(.pen-fold) .penbar{bottom:calc(11px + env(safe-area-inset-bottom,0px))!important;left:calc(50% + 124px);transform:none;flex-wrap:nowrap;border-color:#333;box-shadow:none;background:#000;z-index:45}
+  .reader:not(.wbon):not(.pen-side):not(.pen-fold) .penbar>#penFold,.reader:not(.wbon):not(.pen-side):not(.pen-fold) .penbar>#penSide,.reader:not(.wbon):not(.pen-side):not(.pen-fold) .penbar>.sep,.reader:not(.wbon) .penbar>#penFs{display:none!important}
+  .reader:not(.wbon):not(.pen-side):not(.pen-fold) .penbar>#penDone{display:inline-flex!important;align-items:center;background:#EB6A22;border-color:#EB6A22;color:#fff;font-weight:700;font-size:.9rem;padding:0 16px;margin-left:8px}
+  .reader:not(.wbon) .penbar #popCol .prang:has(.ptrace),.reader:not(.wbon) .penbar #popCol .prang:has(.plarg),.reader:not(.wbon) .penbar #popCol .prang>.lab{display:none!important}
+  .reader:not(.wbon) .penbar #popCol .wbq.gros{display:inline-flex;border:0;padding:0;gap:8px;min-height:0}
+  .reader:not(.wbon):not(.pen-side) .penbar #popCol{left:0;transform:none}
+  .reader:not(.wbon):not(.pen-side) .penbar #popPlus{left:auto;right:0;transform:none}
+  .reader:not(.wbon) .penbar #penCol{position:relative}
+  .reader:not(.wbon) .penbar #penCol::before{content:"";position:absolute;top:2px;right:2px;width:11px;height:11px;border-radius:50%;background:var(--pcb,#e2483d);border:2px solid #f4f4f5}
+  /* Outils regroupés par catégorie (9 nov.) : Écrire | Dessiner et outils | Tableaux | Plus; mêmes icônes, un espace entre les groupes */
+  .reader.wbon .penbar .sep{display:none}
+  .reader.wbon .penbar .wbq{border:0;padding:0 2px}
+  .reader.wbon .penbar #penFold{order:50;min-width:30px!important;width:30px;padding:0!important;margin-left:4px;opacity:.75}
+  .reader.wbon .penbar #penFold::after{display:none!important}
+  .reader.wbon.pen-fold .penbar #penFold{min-width:52px!important;width:52px;height:52px;margin:0;opacity:1}
+  /* menu du crayon sans doublons : il reste Autre couleur + surligneurs (couleurs, grosseurs et formes sont déjà sur la barre) */
+  .reader.wbon .penbar #popCol .prang:has(.ptrace),.reader.wbon .penbar #popCol .prang:has(.plarg){display:none!important}
+  /* couleurs et grosseurs dans la bulle au-dessus du crayon (plus sur la barre) */
+  .reader.wbon .penbar>.wbq.coul{display:none!important}
+  .reader.wbon .penbar #popCol{left:8px;transform:none;zoom:1;padding:10px 12px;gap:8px}
+  .reader.wbon .penbar #popCol .sw{width:38px;height:38px;min-width:38px}
+  .reader.wbon .penbar #popCol .wbq.gros{border:0;padding:0;gap:8px;min-height:0}
+  /* « Plus » : liste courte, une action par ligne */
+  .reader.wbon .penbar #popPlus{left:auto;right:0;transform:none;gap:2px;padding:8px}
+  .reader.wbon .penbar #popPlus .prang:has(#penR),.reader.wbon .penbar #popPlus .prang>.lab{display:none!important}
+  .reader.wbon .penbar #popPlus .prang:has(#wbMoins)>:not(#wbMoins){display:none!important}
+  .reader.wbon .penbar #popPlus .prang{gap:6px;padding:3px 0}
+  .reader.wbon .penbar #popPlus .prang+.prang{border-top:1px solid #2a2a2f}
+  .reader.wbon .penbar #popPlus button[data-lab]{min-height:48px;padding:0 14px;gap:12px;border-color:transparent;justify-content:flex-start;flex:1}
+  .reader.wbon .penbar #popPlus button[data-lab]::after{font-size:.95rem;font-weight:600}
+  .reader.wbon .penbar #wbRetB{order:16}
+  .reader.wbon .penbar #wbAnimB{order:24;background:#1f7a3f;border-color:#2f9e44;color:#fff}.reader.wbon .penbar #wbAnimB.stop{background:#a61e1e;border-color:#e03131}
+  .reader.wbon .penbar #wbAnimB[hidden]{display:none!important}
+  .reader.wbon .penbar #penCol{position:relative}
+  .reader.wbon .penbar #penCol::before{content:"";position:absolute;top:4px;right:5px;width:15px;height:15px;border-radius:50%;background:var(--pcb,#e2483d);border:2px solid #f4f4f5;box-shadow:0 0 0 1px #18181b}
+  .reader.wbon .penbar #wbSupB.sur{background:#b3261e;border-color:#b3261e;color:#fff}
+  .reader.wbon .penbar #popGom #wbToutB{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:8px;min-height:44px;padding:0 14px;width:100%;font-weight:600;font-size:.9rem}
+  .reader.wbon .penbar #penCol{order:10;margin-left:12px}.reader.wbon .penbar .wbq.coul{order:11}.reader.wbon .penbar .wbq.gros{order:12}
+  .reader.wbon .penbar #penT{order:13}.reader.wbon .penbar #penE{order:14}.reader.wbon .penbar #penU{order:15}
+  .reader.wbon .penbar #penO{order:20;margin-left:18px}.reader.wbon .penbar #wbRegB{order:21}.reader.wbon .penbar #wbCalcB{order:22}.reader.wbon .penbar #wbF{order:23}
+  .reader.wbon .penbar .wbq.nav{order:30;margin-left:18px}.reader.wbon .penbar #penPlus{order:40;margin-left:12px}
+}
+.penbar .wbq{display:none}
+#penBar,#tb{touch-action:pan-x}
+#penDone{display:none}
+/* Écran tactile (revue de nuit du 9 nov.) : petits liens et pastilles trop bas pour le doigt → au moins 40 px de haut */
+@media (pointer:coarse){.qn2-ret,.ah-mf,.ah-go,#bvQn,#pRaz,#acOubli,#acDem,.acces-lien{min-height:40px;display:inline-flex;align-items:center}#ahX{min-width:40px;min-height:40px}
+  .acces-box.gestion .acces-puces .abtn,.acces-box.gestion .tg{min-height:38px}.acces-plusL summary{width:44px;height:38px}#objBar #objF{min-height:40px;width:40px}}
+.reader:not(.wbon) #wbAnimB{display:none!important}
+body:has(.reader.open:not(.wbon)) .toast{bottom:calc(98px + env(safe-area-inset-bottom,0px))}   /* dans un livre : les messages passent au-dessus de la barre (ils cachaient les boutons) */
+/* Plus d'outils allégé (9 nov.) : Code QR élèves (version élève pas lancée : à remettre au lancement), Raccourcis (dans l'Aide), Barres automatiques (dans Mes préférences), Projecteur (le Cache suffit), Signet */
+#tbQr,#tbHelp,#tbPin,#tbSpot,#tbMark{display:none!important}
+.reader:not(.wbon) #wbToutB,.reader:not(.wbon) #wbRetB{display:none!important}
+.reader.wbon .penbar .wbq{display:inline-flex;align-items:center;gap:6px;padding:0 6px;border-left:1px solid #2f2f33;border-right:1px solid #2f2f33;min-height:44px}
+.penbar .wbq button.c{min-width:34px;width:34px;height:34px;border-radius:50%;background:var(--c);border:2px solid #3a3a40;padding:0}
+.penbar .wbq button.c.on{border-color:#fff;box-shadow:0 0 0 3px var(--c)}
+.penbar .wbq button.g{min-width:36px;width:36px;height:36px;border-radius:9px;padding:0}
+.penbar .wbq button.g i{display:block;border-radius:50%;background:#e4e4e7;width:var(--d);height:var(--d)}
+.penbar .wbq button.g.on{border-color:#fff;background:#2a2a2d}
+.penbar .wbq #wbLbl{min-width:54px;text-align:center;font-weight:700;color:#e4e4e7;font-size:.9rem}
+.penbar .wbq.nav button{min-width:40px;height:44px}
+@media (max-width:899px){.reader.wbon .penbar .wbq.coul,.reader.wbon .penbar .wbq.gros,.reader.wbon .penbar #wbCalcB,.reader.wbon .penbar #wbRegB{display:none}}
+@media (min-width:1500px){#objBar{transform:scale(1.3);transform-origin:top left;max-height:calc((100% - 170px) / 1.3)!important}}
+/* 10 nov. (photo du TNI : barre en 2 blocs) : toujours une seule rangée dès 900 px; boutons resserrés sous 1500 px */
+@media (min-width:900px){.reader.wbon:not(.pen-fold) .penbar{max-width:98vw!important;flex-wrap:nowrap!important}}
+@media (min-width:900px) and (max-width:1499px){.reader.wbon .penbar>button{min-width:50px!important;padding-left:4px!important;padding-right:4px!important}
+  .reader.wbon .penbar #penO,.reader.wbon .penbar .wbq.nav,.reader.wbon .penbar #penCol{margin-left:6px!important}.reader.wbon .penbar #penPlus{margin-left:6px!important}}
+/* calculatrice */
+#wbCalc{position:fixed;right:40px;top:110px;z-index:100001;width:330px;background:#14181f;border:1px solid #2f3a52;border-radius:18px;box-shadow:0 18px 50px rgba(0,0,0,.5);padding:12px;font-family:system-ui,"Segoe UI",Roboto,sans-serif;touch-action:none;user-select:none}
+#wbCalc[hidden],#wbRegle[hidden]{display:none}
+#wbCalc .ct{display:flex;align-items:center;color:#9AA3B5;font-size:13px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;cursor:grab;padding:2px 4px 8px}
+#wbCalc .ct button{margin-left:auto;width:36px;height:36px;border-radius:10px;border:0;background:#232c40;color:#fff;font-size:18px;cursor:pointer}
+#wbCalc .cexp{min-height:20px;color:#9AA3B5;font-size:16px;text-align:right;padding:0 8px;overflow:hidden;white-space:nowrap}
+#wbCalc .cres{background:#0b0f16;color:#fff;border-radius:12px;font-size:44px;font-weight:800;text-align:right;padding:8px 12px;margin:4px 0 10px;overflow:hidden;white-space:nowrap;min-height:68px}
+#wbCalc .ck{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+#wbCalc .ck button{height:60px;border-radius:12px;border:0;background:#232c40;color:#fff;font-size:24px;font-weight:700;cursor:pointer;touch-action:manipulation}
+#wbCalc .ck button:active{filter:brightness(1.4)}
+#wbCalc .ck button.op{background:#2f3a52;color:#F28A3C}
+#wbCalc .ck button.eg{background:#EB6A22}
+#wbCalc .ck button.pt{font-size:18px;color:#c9d1e0}
+#wbCalc .ck.sci{display:none;margin-bottom:8px}#wbCalc.sci .ck.sci{display:grid}#wbCalc .ck.sci button{height:46px;font-size:16px;background:#1b2233}
+#wbCalc .ct .bsci{width:auto;padding:0 12px;font-size:13px;font-weight:700;margin-right:8px}#wbCalc.sci .ct .bsci{background:#EB6A22}#wbCalc .ct .bsci+button{margin-left:0}
+/* règle */
+#wbRegle{position:fixed;z-index:100000;left:50%;top:45%;height:96px;transform-origin:0 0;touch-action:none;user-select:none;cursor:grab;
+  background:rgba(30,42,68,.9);border:2px solid #EB6A22;border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.3);color:#fff;font-family:system-ui,"Segoe UI",Roboto,sans-serif}
+#wbRegle .grad{position:absolute;left:0;right:0;top:0;height:34px;background:
+  repeating-linear-gradient(90deg,#fff 0 2px,transparent 2px var(--u)),
+  repeating-linear-gradient(90deg,#fff 0 1px,transparent 1px calc(var(--u) / 2)) 0 0/100% 60% no-repeat,
+  repeating-linear-gradient(90deg,#fff 0 1px,transparent 1px calc(var(--u) / 10)) 0 0/100% 35% no-repeat}
+#wbRegle .grad{cursor:crosshair}#wbRegle .trace{position:absolute;top:0;height:4px;transform:translateY(-50%);border-radius:3px;pointer-events:none}#wbRegle .trace[hidden]{display:none}
+#wbRegle .rap[hidden]{display:none}
+#wbRegle .nums{position:absolute;left:0;top:36px;height:22px;right:0;font-size:15px;font-weight:700}
+#wbRegle .nums i{position:absolute;font-style:normal;transform:translateX(-50%)}
+#wbRegle .rinfo{position:absolute;left:12px;bottom:6px;font-size:14px;font-weight:700;display:flex;gap:8px;align-items:center}
+#wbRegle .rinfo button,#wbRegle .rx{border:0;border-radius:8px;background:#EB6A22;color:#fff;font-weight:700;font-size:14px;min-width:40px;height:32px;padding:0 10px;cursor:pointer}
+#wbRegle .rx{position:absolute;right:54px;bottom:6px}
+#wbRegle .rot{position:absolute;right:-22px;top:50%;width:44px;height:44px;margin-top:-22px;border-radius:50%;background:#EB6A22;border:3px solid #fff;cursor:grab;display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;box-shadow:0 4px 12px rgba(0,0,0,.35)}

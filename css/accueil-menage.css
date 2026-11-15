@@ -1,0 +1,98 @@
+/* Ménage de l'atelier (9 nov.) : liste de tâches cochées par les élèves dans les dernières minutes d'une activité « atelier » */
+#menage{position:fixed;right:24px;bottom:24px;z-index:60;width:min(560px,44vw);max-height:calc(100vh - 48px);display:flex;flex-direction:column;
+  background:#141a26;color:#fff;border:1px solid #ffffff22;border-radius:18px;box-shadow:0 24px 60px #0008;font-family:Inter,system-ui,sans-serif;
+  transform:translateY(20px);opacity:0;transition:opacity .35s,transform .35s}
+#menage.on{transform:none;opacity:1}
+#menage .mn-tete{display:flex;align-items:center;gap:12px;padding:16px 18px 10px}
+#menage .mn-tete h2{margin:0;font-size:24px;flex:1}
+#menage .mn-tete small{display:block;font-size:14px;font-weight:500;opacity:.7;margin-top:2px}
+#menage .mn-btn{background:#ffffff14;border:0;color:#fff;border-radius:10px;min-width:44px;height:44px;font-size:18px;cursor:pointer}
+#menage .mn-barre{height:8px;margin:0 18px 10px;background:#ffffff18;border-radius:6px;overflow:hidden}
+#menage .mn-barre i{display:block;height:100%;width:0;background:#2EB872;transition:width .4s}
+#menage ul{list-style:none;margin:0;padding:0 12px 12px;overflow:auto}
+#menage li{margin:6px 0;border-radius:12px;background:#ffffff0d}
+#menage li .mn-l{display:flex;align-items:center;gap:14px;padding:12px 12px;min-height:52px}
+#menage .mn-c{flex:0 0 40px;height:40px;border-radius:10px;border:3px solid #ffffff66;background:none;cursor:pointer;display:grid;place-items:center;color:#fff;font-size:24px;font-weight:900}
+#menage li.fait .mn-c{background:#2EB872;border-color:#2EB872}
+#menage .mn-t{flex:1;font-size:20px;font-weight:700;cursor:pointer;text-align:left;background:none;border:0;color:inherit;padding:4px 0;font-family:inherit}
+#menage li.fait .mn-t{opacity:.55;text-decoration:line-through}
+#menage .mn-i{font-size:13px;opacity:.6;white-space:nowrap}
+#menage .mn-d{display:none;white-space:pre-line;padding:0 16px 14px 66px;font-size:17px;line-height:1.45;opacity:.9}
+#menage li.ouvert .mn-d{display:block}
+#menage .mn-bravo{display:none;margin:0 18px 16px;padding:14px;border-radius:12px;background:#2EB87233;color:#7CF0B0;font-size:20px;font-weight:800;text-align:center}
+#menage.fini .mn-bravo{display:block}
+#menage.mini{width:auto;cursor:pointer}
+#menage.mini ul,#menage.mini .mn-barre,#menage.mini .mn-bravo,#menage.mini .mn-tete .mn-btn{display:none}
+#menage.mini .mn-tete{padding:12px 18px}
+#menage.mini .mn-tete h2{font-size:18px}
+#menageEd textarea{width:100%;min-height:70px;font:14px/1.45 Inter,system-ui,sans-serif;box-sizing:border-box;resize:vertical}
+#menageEd .mt-liste{display:flex;flex-direction:column;gap:10px;padding-right:4px}
+#menageEd .mt-r{display:grid;grid-template-columns:28px 1fr auto;gap:6px 10px;align-items:start;padding:10px;border-radius:12px;background:#8881}
+#menageEd .mt-n{font-weight:800;opacity:.6;padding-top:8px;text-align:center}
+#menageEd .mt-r input.mt-t{font-weight:700;width:100%;box-sizing:border-box}
+#menageEd .mt-r textarea{grid-column:2}
+#menageEd .mt-b{display:flex;gap:4px}
+#menageEd .mt-b button{min-width:36px;height:32px;padding:0 8px}
+#menageEd .ed-l{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:10px 0}
+#menageEd .mt-reg{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:6px}
+#menageEd .mt-r{border:1px solid var(--line,#8883);background:transparent!important}
+#menageEd .mt-b .btn{min-width:38px;height:38px;padding:0;justify-content:center}
+#menageEd .mt-loc{margin:4px 0 14px;padding:12px;border-radius:12px;border:1px solid #EB6A2266;background:#EB6A220d}
+#menageEd .mt-locr{display:flex;gap:8px;flex-wrap:wrap;align-items:center}#menageEd .mt-locr select{flex:1;min-width:220px}
+#menageEd .mt-loc small{display:block;margin-top:6px;opacity:.8}
+#menageEd.lecture .mt-b,#menageEd.lecture .ed-l,#menageEd.lecture #mnRot,#menageEd.lecture #mnOk{display:none}
+#menageEd .mt-loc.sansadmin #mnLocN,#menageEd .mt-loc.sansadmin #mnLocR{display:none}
+html.apercu-mode #menage{display:none}
+/* Plein écran (9 nov., Jeremy : « au complet sur toute la page, ne pas partir, pour inciter les élèves à venir cocher ») */
+#menage{inset:0;right:0;bottom:0;width:auto;max-height:none;border-radius:0;border:0;z-index:9000;padding:2.5vh 3vw;box-sizing:border-box;background:radial-gradient(circle at 50% 0%,#1d2a40,#0d121c 70%)}
+#menage .mn-tete{padding:0 0 1.5vh}
+#menage .mn-tete h2{font-size:clamp(28px,3.6vw,64px);letter-spacing:-.01em}
+#menage .mn-tete small{font-size:clamp(15px,1.4vw,26px);margin-top:.6vh}
+#menage .mn-tete small b{color:#F2A35E}
+#menage .mn-barre{height:14px;margin:0 0 2vh;border-radius:8px}
+#menage ul{display:grid;grid-template-columns:repeat(3,1fr);gap:1.4vh 1.2vw;align-content:start;align-items:start;padding:0;flex:1}
+#menage li{margin:0;border:2px solid #ffffff14;border-radius:16px;transition:background .3s,border-color .3s}
+#menage li.fait{background:#2EB8721f;border-color:#2EB87266}
+#menage li .mn-l{padding:1.6vh 1vw;min-height:9vh;gap:1vw}
+#menage .mn-c{flex:0 0 clamp(40px,3.4vw,64px);height:clamp(40px,3.4vw,64px);font-size:clamp(24px,2.2vw,40px);border-radius:12px}
+#menage .mn-t{font-size:clamp(18px,1.7vw,32px);line-height:1.2}
+#menage .mn-i{font-size:clamp(12px,.9vw,17px)}
+#menage .mn-d{padding:0 1vw 1.6vh;font-size:clamp(14px,1.1vw,21px)}
+#menage .mn-bravo{margin:2vh 0 0;font-size:clamp(22px,2.4vw,44px);padding:2vh}
+#menage .mn-btn{display:none}
+#menage.apercu .mn-btn{display:block}
+@media (max-width:900px){#menage ul{grid-template-columns:1fr 1fr}}
+@media (max-width:600px){#menage ul{grid-template-columns:1fr}}
+/* Urgence (9 nov., Jeremy : « plus le temps avance, plus les ménages pas faits flashent; personne part si c'est pas coché ») : --u = 0 → 1 selon le temps écoulé, --vit = durée d'un flash */
+#menage{--u:0;--vit:2.6s}
+#menage li:not(.fait){animation:mnFlash var(--vit) ease-in-out infinite}
+@keyframes mnFlash{0%,100%{background:#ffffff0d;border-color:#ffffff14}
+  50%{background:color-mix(in srgb,#D97B6C calc(var(--u) * 26%),#ffffff0d);border-color:color-mix(in srgb,#D97B6C calc(20% + var(--u) * 55%),#ffffff22)}}
+#menage .mn-tt{flex:1;display:flex;flex-direction:column;align-items:flex-start;gap:.5vh;min-width:0}
+#menage .mn-eq{display:inline-block;background:#F2A35E;color:#1a1206;font-weight:900;border-radius:999px;padding:.25vh .8vw;font-size:clamp(13px,1.05vw,20px);letter-spacing:.02em}
+#menage li.fait .mn-eq{background:#2EB872;color:#fff}
+#menage li.renfort{border-style:dashed;animation:none}
+#menage li.renfort .mn-t{cursor:default;opacity:.85}
+#menage .mn-rf{flex:0 0 clamp(40px,3.4vw,64px);height:clamp(40px,3.4vw,64px);display:grid;place-items:center;font-size:clamp(24px,2.2vw,40px);font-weight:900;color:#F2A35E}
+#menage .mn-aide{display:none;color:#7CF0B0;font-weight:800;font-size:clamp(13px,1.05vw,20px)}
+#menage li.fait .mn-aide{display:block}
+#mnAideT{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(.9);opacity:0;pointer-events:none;z-index:9001;background:#2EB872;color:#fff;border-radius:22px;padding:3vh 4vw;text-align:center;box-shadow:0 30px 80px #0009;display:flex;flex-direction:column;gap:1vh}
+#mnAideT b{font-size:clamp(30px,3.6vw,70px);font-weight:900}
+#mnAideT span{font-size:clamp(22px,2.4vw,46px);font-weight:700}
+#mnAideT.on{animation:mnAideT 2.6s ease forwards}
+@keyframes mnAideT{0%{opacity:0;transform:translate(-50%,-50%) scale(.85)}10%,75%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-50%) scale(1)}}
+#menage .mn-pers{display:none;margin:0 0 1.6vh;padding:1.2vh 1vw;border-radius:12px;background:#B5574D;color:#fff;text-align:center;font-weight:800;font-size:clamp(20px,2.2vw,40px);animation:mnPers var(--vit) ease-in-out infinite}
+#menage.presse:not(.fini) .mn-pers{display:block}
+@keyframes mnPers{50%{background:#9A4A42}}
+#menage .mn-reste{font-variant-numeric:tabular-nums;color:#F2A35E}
+/* Fin du ménage (9 nov., « Bravo la gang, bon dîner / bonne soirée ») : grand message, la liste se cache */
+#menage.fini:not(.revoir) ul,#menage.fini .mn-barre{display:none}
+#menage.fini:not(.revoir) .mn-bravo{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:none;margin:0;gap:2vh;animation:mbIn .6s ease-out}
+#menage.fini.revoir .mn-bravo{display:block}
+#menage.fini.revoir .mn-bravo .mb-ok,#menage.fini.revoir .mn-bravo .mb-l{display:none}
+#menage.fini.revoir .mb-t{display:inline;font-size:inherit}#menage.fini.revoir .mb-s{display:inline;font-size:inherit;margin-left:.4em}
+#menage .mb-ok{width:clamp(90px,10vw,170px);height:clamp(90px,10vw,170px);border-radius:50%;background:#2EB872;color:#fff;display:grid;place-items:center;font-size:clamp(56px,6vw,110px);font-weight:900;box-shadow:0 0 60px #2EB87266}
+#menage .mb-t{font-size:clamp(44px,6.5vw,120px);color:#fff;font-weight:900;letter-spacing:-.02em}
+#menage .mb-s{font-size:clamp(22px,2.6vw,48px);color:#7CF0B0;font-weight:700}
+#menage .mb-l{margin-top:2vh;background:none;border:1px solid #ffffff33;color:#ffffffaa;border-radius:10px;padding:8px 16px;font:600 15px Inter,system-ui,sans-serif;cursor:pointer}
+@keyframes mbIn{from{opacity:0;transform:scale(.94)}}
