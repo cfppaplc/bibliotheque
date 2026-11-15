@@ -410,6 +410,11 @@ function appliquerSync(P, de){ const E = lireEnv(), e = E[de] = E[de] || {}; let
 function fusion(a, b){ const A = Object.assign(vide(), JSON.parse(a || "null") || {}), B = JSON.parse(b || "null") || {};
   for (const k of ["at", "cf", "ev", "vus", "part"]){ const y = B[k] || {}; for (const i in y){ const x = A[k][i]; if (!x || (typeof y[i] === "object" ? (y[i].t || 0) > (x.t || 0) : y[i] > x)) A[k][i] = y[i]; } }
   return JSON.stringify(A); }
+/* Coffre retiré puis recréé (même atelier, même numéro ou même nom) = même identifiant : son code QR remarche. */
+const numCf = n => (String(n || "").match(/\d+/) || [""])[0];
+function nouveauCoffre(at, nom){ const k = numCf(nom), bas = nom.toLowerCase();
+  const id = Object.keys(K.cf).find(c => K.cf[c].x && K.cf[c].at === at && (k ? numCf(K.cf[c].nom) === k : (K.cf[c].nom || "").toLowerCase() === bas)) || "c" + nid();
+  K.cf[id] = Object.assign({ liste:[] }, K.cf[id], { at, nom, t:Date.now() }); delete K.cf[id].x; return id; }
 function majAtX(){ const b = $("#bAtX"); if (b) b.hidden = !(window.ADMIN && K.at[AT] && !K.at[AT].x); }
 const ateliers = () => Object.entries(K.at).filter(([, a]) => !a.x).sort((a, b) => a[1].nom.localeCompare(b[1].nom, "fr"));
 /* coffres affichés : les miens + ceux des ateliers que des collègues partagent avec moi (lecture seule) */
@@ -540,7 +545,7 @@ function coffreOuvrir(id){
       toast(k === "ok" ? "Le coffre est en fonctionnement normal" : k === "rem" ? "Remise à faire par l'équipe qui l'avait" : "En attente de la nouvelle équipe"); }); };
   if ($("#aRg")) $("#aRg").onclick = () => { K.ev["r" + nid()] = { cf:id, k:"regle", d:Date.now(), t:Date.now(), par:window.__moi }; sauver(); fermer(); dessiner(); toast("Coffre remis en ordre"); };
   if ($("#aRn")) $("#aRn").onclick = () => { const n = prompt("Nouveau nom du coffre", K.cf[id].nom); if (n && n.trim()){ K.cf[id].nom = n.trim().slice(0, 40); K.cf[id].t = Date.now(); sauver(); fermer(); dessiner(); } };
-  let sur = 0; if ($("#aX")) $("#aX").onclick = e => { if (!sur++){ e.target.textContent = "Son code QR ne marchera plus. Touche encore pour retirer"; e.target.classList.add("danger"); return; } K.cf[id] = { x:1, t:Date.now(), at:"", nom:"" }; sauver(); fermer(); dessiner(); };
+  let sur = 0; if ($("#aX")) $("#aX").onclick = e => { if (!sur++){ e.target.textContent = "Son code QR sera en pause jusqu'à ce que tu recrées ce coffre. Touche encore pour retirer"; e.target.classList.add("danger"); return; } K.cf[id] = Object.assign({}, K.cf[id], { x:1, t:Date.now() }); sauver(); fermer(); dessiner(); };
 }
 /* dépôts des élèves (chiffrés pour ma clé) : coffres|<moi>|0, 1, 2… */
 let RELEVE = false;
@@ -615,15 +620,16 @@ async function vueProf(){
   if (ADMIN && !Object.keys(K.at).length){ try { const L = (await (await fetch("locaux.json", { cache:"no-store" })).json()).locaux || []; L.forEach(l => K.at[l.id] = { nom:l.nom, t:1 }); } catch(e) {} }
   dessiner();
   $("#atS").onchange = e => { AT = e.target.value; localStorage.setItem("coffresAtelierChoisi", AT); dessiner(); majPart(); };
-  $("#bAtN").onclick = () => { const n = prompt("Nom de l'atelier (ex. « Atelier EGI »)"); if (!n || !n.trim()) return; const id = "at-" + nid(); K.at[id] = { nom:n.trim().slice(0, 40), t:Date.now() }; AT = id;
+  $("#bAtN").onclick = () => { const n = prompt("Nom de l'atelier (ex. « Atelier EGI »)"); if (!n || !n.trim()) return; const nm = n.trim().slice(0, 40), vieux = Object.keys(K.at).find(a => K.at[a].x && (K.at[a].nom || "").toLowerCase() === nm.toLowerCase());
+    const id = vieux || "at-" + nid(); K.at[id] = Object.assign({}, K.at[id], { nom:nm, t:Date.now() }); delete K.at[id].x; AT = id;
     const nb = Math.min(40, Math.max(0, parseInt(prompt("Combien de coffres dans cet atelier ? (tu pourras en ajouter plus tard)", "10"), 10) || 0));
-    for (let i = 1; i <= nb; i++) K.cf["c" + nid() + i] = { at:id, nom:"Coffre " + i, liste:[], t:Date.now() }; localStorage.setItem("coffresAtelierChoisi", AT); sauver(); dessiner(); majPart(); };
-  { let sur = 0, tm; $("#bAtX").onclick = e => { if (!sur++){ const n = coffresDe(AT).filter(c => c.moi).length; e.target.textContent = n ? "Les codes QR de ses " + n + " coffres ne marcheront plus. Touche encore" : "Sûr ? Touche encore"; e.target.classList.add("danger"); tm = setTimeout(() => { sur = 0; e.target.textContent = "Retirer l'atelier"; e.target.classList.remove("danger"); }, 4000); return; } clearTimeout(tm); sur = 0; e.target.textContent = "Retirer l'atelier"; e.target.classList.remove("danger");
+    for (let i = 1; i <= nb; i++) if (!coffresDe(id).some(c => c.moi && numCf(c.nom) === String(i))) nouveauCoffre(id, "Coffre " + i); localStorage.setItem("coffresAtelierChoisi", AT); sauver(); dessiner(); majPart(); };
+  { let sur = 0, tm; $("#bAtX").onclick = e => { if (!sur++){ const n = coffresDe(AT).filter(c => c.moi).length; e.target.textContent = n ? "Les codes QR de ses " + n + " coffres seront en pause jusqu'à ce que tu recrées cet atelier. Touche encore" : "Sûr ? Touche encore"; e.target.classList.add("danger"); tm = setTimeout(() => { sur = 0; e.target.textContent = "Retirer l'atelier"; e.target.classList.remove("danger"); }, 4000); return; } clearTimeout(tm); sur = 0; e.target.textContent = "Retirer l'atelier"; e.target.classList.remove("danger");
     if (!K.at[AT]) return; const t = Date.now();
-    Object.keys(K.cf).forEach(c => { if (K.cf[c].at === AT) K.cf[c] = { x:1, t, at:"", nom:"" }; }); K.at[AT] = { x:1, t, nom:"" };
+    Object.keys(K.cf).forEach(c => { if (K.cf[c].at === AT && !K.cf[c].x) K.cf[c] = Object.assign({}, K.cf[c], { x:1, t }); }); K.at[AT] = Object.assign({}, K.at[AT], { x:1, t });
     AT = (ateliers()[0] || [""])[0]; localStorage.setItem("coffresAtelierChoisi", AT); sauver(); dessiner(); majPart(); }; }
   $("#bCfN").onclick = () => { const n = prompt("Nom du coffre (ex. « Coffre 3 » ou « Cabine 3 »)", "Coffre " + (coffresDe(AT).length + 1)); if (!n || !n.trim()) return;
-    const id = "c" + nid(); K.cf[id] = { at:AT, nom:n.trim().slice(0, 40), liste:[], t:Date.now() }; sauver(); dessiner(); coffreOuvrir(id); };
+    const id = nouveauCoffre(AT, n.trim().slice(0, 40)); sauver(); dessiner(); coffreOuvrir(id); };
   $("#cfs").onclick = e => { const b = e.target.closest("[data-cf]"); if (b) coffreOuvrir(b.dataset.cf); };
   $("#bQr").onclick = imprimerQr;
   $("#bInv").onclick = () => { const ids = coffresDe(AT).filter(c => c.moi).map(c => c.id); if (!ids.length) return;
