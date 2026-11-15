@@ -46,6 +46,9 @@ table.g{border-collapse:separate;border-spacing:0;min-width:100%}
 .ok{display:inline-flex;flex-direction:column;align-items:center;gap:2px;color:var(--vert);font-weight:800}
 .ok i{font-style:normal;font-size:20px;line-height:1}.ok small{color:var(--gris);font-weight:600}
 .ok.ens{color:#3E7CC9}
+.ok.dem{color:#E08A1E}.ok.dem small{color:#E08A1E}
+.dmx{display:flex;gap:10px;align-items:flex-start;padding:10px 4px;font-size:16px;cursor:pointer;min-height:44px}.dmx input{width:22px;height:22px;flex:none;margin-top:1px}
+.dmE{text-align:left;background:#FFF4E5;border:1px solid #F2C98B;border-radius:12px;padding:12px 14px;margin:14px 0;color:#5a3b10}.dmE ol{margin:8px 0 6px 20px;padding:0}.dmE li{margin:4px 0}.dmE small{color:#7a5a2a}
 .vide{padding:40px;text-align:center;color:var(--gris)}
 /* fenêtres */
 .ov{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:16px;z-index:50}
@@ -75,6 +78,7 @@ table.g{border-collapse:separate;border-spacing:0;min-width:100%}
   .ce .ch button{border:1px solid var(--fil,#e5dac6);background:transparent;border-radius:999px;padding:7px 11px;font:inherit;font-size:13.5px;color:var(--gris);min-height:38px}
   .ce .ch button.s{background:#1E8A55;border-color:#1E8A55;color:#fff;font-weight:650}
   .ce .ch button.v{background:#1F5FAD;border-color:#1F5FAD;color:#fff;font-weight:650}
+  .ce .ch button.d{background:#FFF4E5;border-color:#E08A1E;color:#9a5a10;font-weight:650}
   .rq{flex-direction:column;align-items:stretch!important;gap:6px!important}.rq .tl{display:grid!important;grid-template-columns:repeat(3,1fr)}
   .el .sigb{flex-direction:column-reverse}.el .sigb .btn{width:100%}.el .sigb .esp{display:none}
 }
@@ -149,7 +153,7 @@ html.eleve body{background:var(--fond)}
   <p class="info" id="etat"></p>
   <div id="sorties"></div>
   <div class="tw" id="tw"></div><div class="cartes" id="cm"></div>
-  <p class="info" style="margin-top:14px">✓ vert = signé par l'élève · ✓ bleu = validé par toi. Touche une case pour voir la signature. <button class="btn" id="bEffG" style="min-height:36px;padding:6px 12px;margin-left:8px">Effacer ce groupe</button></p>
+  <p class="info" style="margin-top:14px"><span style="color:#E08A1E">◐ orange</span> = théorie signée, démonstration à faire · ✓ vert = formé (signé + démonstration) · ✓ bleu = validé par toi. Touche une case pour voir la signature ou valider la démonstration. <button class="btn" id="bEffG" style="min-height:36px;padding:6px 12px;margin-left:8px">Effacer ce groupe</button></p>
 </main>
 </div>
 
@@ -207,6 +211,12 @@ async function vueEleve(){
   const R0 = ens ? await PARTAGE.lire(ens) : { suivi:[], formes:{}, grp:[], codes:null }, suivi = R0.suivi.includes(o.id);
   let monCode = ""; try { monCode = localStorage.getItem("passCode") || ""; } catch(e) {}
   if (!faits[o.id] && monCode && (R0.formes[o.id] || []).includes(monCode)) faits[o.id] = 1;
+  if (faits[o.id] && !Q.get("formation") && ens && monCode && R0.codes && !(R0.formes[o.id] || []).includes(monCode)){
+    V.innerHTML = `<div class="top"><img src="${LOGO}" alt="Métier+"></div><div class="fini"><div class="rond" style="background:#E08A1E">◐</div><h1>Il te reste la démonstration</h1>
+      <p class="sous">${esc(o.nom)} · ta théorie est signée.</p><div class="dmE"><b>Montre à ton enseignant que tu sais faire</b><ol>${demoDe(o).map(x => `<li>${esc(x)}</li>`).join("")}</ol><small>${suivi ? "Tu pourras prendre l'outil quand ton enseignant aura validé ta démonstration." : "Ton enseignant la valide sur son tableau."}</small></div>
+      <p><a href="?o=${encodeURIComponent(o.id)}&e=${encodeURIComponent(ens)}&formation=1">Revoir la formation</a></p></div>`;
+    return;
+  }
   if (faits[o.id] && !Q.get("formation") && ens){
     if (suivi) return sortieVue(o, ens, V);
     V.innerHTML = `<div class="top"><img src="${LOGO}" alt="Métier+"></div><div class="fini"><div class="rond">✓</div><h1>Tu as ta formation</h1>
@@ -282,9 +292,10 @@ async function vueEleve(){
         if (id !== ens && cc && cc.pub && !cc.eleve){ try { await deposer(id, cc.pub); } catch(e) {} } }
       try { if (obj.p) localStorage.setItem("passPrenom", obj.p); if (obj.c) localStorage.setItem("passCode", obj.c); localStorage.setItem("passGroupe", obj.g); } catch(e) {}
       V.innerHTML = `<div class="top"><img src="${LOGO}" alt="Métier+"></div><div class="fini"><div class="rond">✓</div><h1>C'est signé !</h1>
-        <p class="sous">${esc(obj.p)} · ${esc(o.nom)} · ${jour(obj.t)}<br>Ta signature est envoyée à ton enseignant.</p>
+        <p class="sous">${esc(obj.p || (obj.c ? "Code " + obj.c : ""))} · ${esc(o.nom)} · ${jour(obj.t)}<br>Ta signature est envoyée à ton enseignant.</p>
+        <div class="dmE"><b>Dernière étape : montre à ton enseignant que tu sais faire</b><ol>${demoDe(o).map(x => `<li>${esc(x)}</li>`).join("")}</ol><small>Tu seras formé quand ton enseignant aura vu ta démonstration.</small></div>
         <p class="engage">Rappel : refais les étapes chaque fois que tu utilises l'outil.</p>
-        ${suivi ? `<button class="btn p" id="bPrend" style="width:100%;min-height:56px;font-size:18px;margin-top:10px">Prendre l'outil maintenant</button>` : ""}</div>`;
+        ${false ? `<button class="btn p" id="bPrend" style="width:100%;min-height:56px;font-size:18px;margin-top:10px">Prendre l'outil maintenant</button>` : ""}</div>`;
       try { faits[o.id] = Date.now(); localStorage.setItem("passFaits", JSON.stringify(faits)); } catch(e) {}
       if ($("#bPrend")) $("#bPrend").onclick = () => sortieVue(o, ens, V);
     } catch(e){
@@ -379,7 +390,10 @@ async function publierGrp(){
   try { await PARTAGE.ecrire(window.__moi, { grp:L, part:PART, codes:C }); localStorage.setItem("passGrpPub", k); } catch(e) {} }
 /* codes à 3 chiffres des élèves (14 nov.) : seuls les numéros sont publics, jamais les prénoms */
 /* codes des élèves déjà formés, par outil (numéros seulement) : l'élève formé ne refait pas la formation sur un autre appareil */
-const formesPub = () => { const F = {}; for (const k in D.val){ const v = D.val[k]; if (!v || !v.d) continue; const [eid, oid] = k.split("|"), e = D.el[eid];
+/* démonstration (14 nov.) : une signature d'élève devient « formé » seulement quand l'enseignant a vu les manipulations */
+const forme = v => !!(v && v.d && (v.m || !v.s)), aDemo = v => !!(v && v.d && v.s && !v.m);
+const DEMO_DEF = ["Faire une utilisation complète de l'outil devant l'enseignant."], demoDe = o => (o && o.demo && o.demo.length) ? o.demo : DEMO_DEF;
+const formesPub = () => { const F = {}; for (const k in D.val){ const v = D.val[k]; if (!forme(v)) continue; const [eid, oid] = k.split("|"), e = D.el[eid];
   if (e && !e.x && e.c) (F[oid] = F[oid] || []).push(e.c); } for (const o in F) F[o].sort(); return F; };
 const codesPub = L => { const C = {}; L.forEach(g => C[g] = []); Object.values(D.el).forEach(e => { if (!e.x && e.c && C[e.g]) C[e.g].push(e.c); }); return C; };
 function codeLibre(){ const pris = new Set(Object.values(D.el).filter(e => !e.x && e.c).map(e => e.c));
@@ -410,11 +424,11 @@ function dessiner(){
   if (!L.length){ $("#tw").innerHTML = `<div class="vide">Aucun élève dans ce groupe pour l'instant. Ajoute-les, ou attends leurs premières signatures : ils s'ajoutent tout seuls.</div>`; return; }
   $("#tw").innerHTML = `<table class="g"><thead><tr><th class="nom">Élève</th>${O.map(o => `<th>${esc(o.nom)}</th>`).join("")}</tr></thead><tbody>${
     L.map(e => `<tr><td class="nom"><button data-el="${e.id}">${esc(e.p)} <small class="cd">${e.c || ""}</small></button></td>${O.map(o => { const v = D.val[e.id + "|" + o.id];
-      return `<td><button class="c" data-e="${e.id}" data-o="${o.id}" aria-label="${esc(e.p + " · " + o.nom)}">${v && v.d ? `<span class="ok ${v.s ? "" : "ens"}"><i>✓</i><small>${new Date(v.d).toLocaleDateString("fr-CA", { day:"numeric", month:"short" })}</small></span>` : ""}</button></td>`; }).join("")}</tr>`).join("")
+      return `<td><button class="c" data-e="${e.id}" data-o="${o.id}" aria-label="${esc(e.p + " · " + o.nom)}">${aDemo(v) ? `<span class="ok dem"><i style="font-size:22px">◐</i><small>à démontrer</small></span>` : forme(v) ? `<span class="ok ${v.s ? "" : "ens"}"><i>✓</i><small>${new Date(v.d).toLocaleDateString("fr-CA", { day:"numeric", month:"short" })}</small></span>` : ""}</button></td>`; }).join("")}</tr>`).join("")
   }</tbody></table>`;
   /* cellulaire : une carte par élève, une pastille par outil */
-  $("#cm").innerHTML = L.map(e => { let n = 0; const ch = O.map(o => { const v = D.val[e.id + "|" + o.id], f = v && v.d; if (f) n++;
-      return `<button class="c ${f ? (v.s ? "s" : "v") : ""}" data-e="${e.id}" data-o="${o.id}">${f ? "✓ " : ""}${esc(o.nom.replace(/ \(.*\)$/, ""))}</button>`; }).join("");
+  $("#cm").innerHTML = L.map(e => { let n = 0; const ch = O.map(o => { const v = D.val[e.id + "|" + o.id], f = forme(v), dm = aDemo(v); if (f) n++;
+      return `<button class="c ${f ? (v.s ? "s" : "v") : dm ? "d" : ""}" data-e="${e.id}" data-o="${o.id}">${f ? "✓ " : dm ? "◐ " : ""}${esc(o.nom.replace(/ \(.*\)$/, ""))}</button>`; }).join("");
     return `<div class="ce"><div class="t"><button data-el="${e.id}">${esc(e.p)} <small class="cd">${e.c || ""}</small></button><small>${n} sur ${O.length}</small></div><div class="ch">${ch}</div></div>`; }).join("");
 }
 /* Sorties d'outils (14 nov.) : l'élève déjà formé scanne pour prendre ou rapporter l'outil */
@@ -428,19 +442,25 @@ function dessinerSorties(){
   const dern = {}; M.forEach(m => { if (!dern[m.o]) dern[m.o] = m; });
   const dehors = Object.values(dern).filter(m => m.k === "sortie");
   Z.innerHTML = `<div class="so"><h2>Outils sortis <small>${dehors.length ? dehors.length : "aucun"}</small></h2>
-    ${dehors.map(m => `<div class="so-l"><b>${nomO(m.o)}</b><span>${qui(m)}</span><span class="h">depuis ${quand(m.d)}</span>${D.val[m.e + "|" + m.o] && D.val[m.e + "|" + m.o].d ? "" : `<span class="pf">pas formé</span>`}<button class="btn" data-rap="${m.o}" data-e="${m.e}">Rapporté</button></div>`).join("") || `<p class="info">Tous les outils sont rentrés.</p>`}
+    ${dehors.map(m => `<div class="so-l"><b>${nomO(m.o)}</b><span>${qui(m)}</span><span class="h">depuis ${quand(m.d)}</span>${forme(D.val[m.e + "|" + m.o]) ? "" : `<span class="pf">${aDemo(D.val[m.e + "|" + m.o]) ? "démo à faire" : "pas formé"}</span>`}<button class="btn" data-rap="${m.o}" data-e="${m.e}">Rapporté</button></div>`).join("") || `<p class="info">Tous les outils sont rentrés.</p>`}
     <details><summary>Historique (60 jours)</summary>${M.slice(0, 80).map(m => `<div class="so-h"><span class="h">${quand(m.d)}</span><span class="${m.k}">${m.k === "sortie" ? "Sorti" : "Rapporté"}</span><b>${nomO(m.o)}</b><span>${qui(m)}</span></div>`).join("")}</details></div>`;
   Z.querySelectorAll("[data-rap]").forEach(b => b.onclick = () => { D.mv["p" + nid()] = { e:b.dataset.e, o:b.dataset.rap, k:"retour", d:Date.now(), t:Date.now() }; sauver(); dessinerSorties(); });
 }
 function caseOuvrir(eid, oid){
   const e = D.el[eid], o = outil(oid), k = eid + "|" + oid, v = D.val[k];
-  if (v && v.d) ouvrir(`<h2>${esc(e.p)} · ${esc(o.nom)}</h2><p>${v.s ? "Formation suivie et signée par l'élève" : "Validé par toi"} le ${jour(v.d)}${v.s ? ` (${v.n || o.etapes.length} étapes cochées)` : ""}.</p>${sigSvg(v.s)}
+  const dm = demoDe(o);
+  if (aDemo(v)) ouvrir(`<h2>${esc(e.p)} · ${esc(o.nom)}</h2><p>Théorie signée le ${jour(v.d)}. <b>Il reste la démonstration :</b> l'élève fait ces manipulations devant toi. Coche celles qui sont réussies.</p>${sigSvg(v.s)}
+    <div id="dmL">${dm.map((x, i) => `<label class="dmx"><input type="checkbox" data-i="${i}"> <span>${esc(x)}</span></label>`).join("")}</div>
+    <div class="act"><button class="btn" id="aRet">Retirer</button><button class="btn" id="aF">Plus tard</button><button class="btn p" id="aDm" disabled>Démonstration réussie</button></div>`);
+  else if (v && v.d) ouvrir(`<h2>${esc(e.p)} · ${esc(o.nom)}</h2><p>${v.s ? "Formation suivie et signée par l'élève" : "Validé par toi"} le ${jour(v.d)}${v.s ? ` (${v.n || o.etapes.length} étapes cochées)` : ""}.${v.m && v.s ? ` Démonstration réussie devant toi le ${jour(v.m)}.` : ""}</p>${sigSvg(v.s)}
     <div class="act"><button class="btn" id="aRet">Retirer</button><button class="btn p" id="aF">Fermer</button></div>`);
   else ouvrir(`<h2>${esc(e.p)} · ${esc(o.nom)}</h2><p>Pas encore signé. L'élève scanne le code QR de l'outil, suit la formation et signe. Tu peux aussi le valider toi-même (sans signature).</p>
     <div class="act"><button class="btn" id="aF">Fermer</button><button class="btn m" id="aVal">Valider moi-même</button></div>`);
   $("#aF").onclick = fermer;
+  if ($("#aDm")){ const cs = [...$("#dmL").querySelectorAll("input")]; cs.forEach(c => c.onchange = () => $("#aDm").disabled = !cs.every(x => x.checked));
+    $("#aDm").onclick = () => { D.val[k] = Object.assign({}, v, { m:Date.now(), t:Date.now() }); sauver(); fermer(); dessiner(); }; }
   if ($("#aRet")) $("#aRet").onclick = () => { D.val[k] = { d:0, t:Date.now() }; sauver(); fermer(); dessiner(); };
-  if ($("#aVal")) $("#aVal").onclick = () => { D.val[k] = { d:Date.now(), t:Date.now() }; sauver(); fermer(); dessiner(); };
+  if ($("#aVal")) $("#aVal").onclick = () => { D.val[k] = { d:Date.now(), m:Date.now(), t:Date.now() }; sauver(); fermer(); dessiner(); };
 }
 function eleveOuvrir(eid){
   const e = D.el[eid];
@@ -480,7 +500,7 @@ async function releve(manuel){
       } else if (!D.vus[x.uid]){
         const parCode = x.c && Object.entries(D.el).find(([, e]) => !e.x && e.c === x.c);
         const g = parCode ? parCode[1].g : groupeDe(x.g, prenom(x.p)), eid = parCode ? parCode[0] : trouverEleve(prenom(x.p) || "Élève " + (x.c || ""), g), k = eid + "|" + x.o, v = D.val[k];
-        if (!v || !v.d || v.d < x.t){ D.val[k] = { d:x.t, s:x.s, n:x.n, t:Date.now() }; neufs++; }
+        if (!v || !v.d || v.d < x.t){ D.val[k] = { d:x.t, s:x.s, n:x.n, m:v && v.m || undefined, t:Date.now() }; neufs++; }
         D.vus[x.uid] = Date.now();
         if (!GRP) GRP = g;
       }
@@ -528,7 +548,8 @@ function imprimerQr(){
 function editerProt(){
   const ligne = o => `<div class="ed-o" data-id="${esc(o.id)}"><div class="r"><input type="text" class="eN" value="${esc(o.nom)}" placeholder="Nom de l'outil"><button class="btn eX" title="Retirer">✕</button></div>
     <input type="text" class="eE" value="${esc((o.epi || []).join(", "))}" placeholder="Équipement de protection (séparé par des virgules)">
-    <textarea class="eT" placeholder="Une étape par ligne">${esc((o.etapes || []).join("\n"))}</textarea></div>`;
+    <textarea class="eT" placeholder="Une étape par ligne">${esc((o.etapes || []).join("\n"))}</textarea>
+    <textarea class="eD" placeholder="Manipulations à faire devant toi (une par ligne, 2 ou 3)">${esc((o.demo || []).join("\n"))}</textarea></div>`;
   ouvrir(`<h2>Formations des outils</h2><p>Une étape par ligne. Garde des phrases courtes : l'élève coche chacune.</p><div id="eL">${PROT.outils.map(ligne).join("")}</div>
     <button class="btn" id="eA">+ Ajouter un outil</button><p class="err" id="eEr" hidden></p>
     <div class="act"><button class="btn" id="aF">Annuler</button><button class="btn p" id="aOk">Publier</button></div>`);
@@ -539,7 +560,7 @@ function editerProt(){
     const out = [...$("#eL").querySelectorAll(".ed-o")].map(d => { const nom = d.querySelector(".eN").value.trim();
       const id = d.dataset.id || sansAcc(nom).replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 30) || nid();
       return { id, nom, progs:(outil(d.dataset.id) || {}).progs || ["plc", "egi"], epi:d.querySelector(".eE").value.split(",").map(x => x.trim()).filter(Boolean),
-        etapes:d.querySelector(".eT").value.split("\n").map(x => x.trim()).filter(Boolean) }; }).filter(o => o.nom && o.etapes.length);
+        etapes:d.querySelector(".eT").value.split("\n").map(x => x.trim()).filter(Boolean), demo:d.querySelector(".eD").value.split("\n").map(x => x.trim()).filter(Boolean) }; }).filter(o => o.nom && o.etapes.length);
     const N = { maj:Date.now(), outils:out }, b = $("#aOk"); b.disabled = true; b.textContent = "Publication…";
     try {
       const jeton = localStorage.ghJeton, url = "https://api.github.com/repos/cfppaplc/bibliotheque/contents/protocoles.json", h = { Authorization:"Bearer " + jeton, Accept:"application/vnd.github+json" };
