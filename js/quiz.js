@@ -1195,7 +1195,10 @@ function ecran(code){
   let bruit = null;
   function charleston(t, v){ if (!bruit){ bruit = ac.createBuffer(1, ac.sampleRate * .05, ac.sampleRate); const d = bruit.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / d.length); }
     const s = ac.createBufferSource(), f = ac.createBiquadFilter(), g = ac.createGain(); s.buffer = bruit; f.type = "highpass"; f.frequency.value = 7000; g.gain.value = v; s.connect(f); f.connect(g); g.connect(MUS.gain); s.start(t); }
+  /* 15 nov. (« les élèves trouvent la musique stressante ») : style Doux par défaut, plus d'accélération dans les 5 dernières secondes,
+     musique moins forte; doux:true = pas de charleston */
   const STYLES = [
+    {nom: "Doux", bpm: 72, acc: [[48, 60, 64, 67], [45, 57, 60, 64], [41, 57, 60, 65], [43, 55, 59, 62]], basse: "sine", arp: "sine", doux: true},
     {nom: "Atelier", bpm: 104, acc: ACC, basse: "triangle", arp: "sine"},
     {nom: "Énergie", bpm: 128, acc: [[48, 60, 64, 67], [43, 59, 62, 67], [45, 57, 60, 64], [41, 57, 60, 65]], basse: "square", arp: "triangle"},
     {nom: "Calme", bpm: 84, acc: [[50, 62, 65, 69], [43, 59, 62, 65], [48, 60, 64, 67], [45, 57, 60, 64]], basse: "sine", arp: "sine"},
@@ -1206,12 +1209,12 @@ function ecran(code){
   function musiqueTour(){
     const st = STY(), croche = 60 / st.bpm / 2;
     while (MUS.t < ac.currentTime + .25){
-      const presse = Date.now() + decal > MUS.fin - 5000, sub = presse ? 2 : 1;
+      const presse = false, sub = presse ? 2 : 1;
       for (let s = 0; s < sub; s++){
         const t = MUS.t + s * croche / sub, k = MUS.pas, a = st.acc[Math.floor(k / 16) % 4];
         if (s === 0 && k % 2 === 0) note(hz(a[0]), t, croche * 1.8, st.basse === "triangle" || st.basse === "sine" ? .16 : .06, st.basse);
         const arp = [1, 2, 3, 2, 1, 3, 2, 3][k % 8]; note(hz(a[arp] + 12), t, croche * (presse ? .5 : .9), presse ? .045 : .035, st.arp);
-        if (s === 0 && k % 2 === 1) charleston(t, presse ? .05 : .03);
+        if (s === 0 && k % 2 === 1 && !st.doux) charleston(t, presse ? .05 : .03);
       }
       MUS.t += croche; MUS.pas++;
     }
@@ -1219,7 +1222,7 @@ function ecran(code){
   function musique(v, n){
     const veut = v.etat === "question" && sonOK && v.reg.son !== "non" && v.reg.musique !== "non" && v.q && (v.t0 + v.q.s * 1000 > n);
     if (veut && !MUS.on){
-      try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); MUS.gain = ac.createGain(); MUS.gain.gain.value = .9; MUS.gain.connect(maitre());
+      try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); MUS.gain = ac.createGain(); MUS.gain.gain.value = .55; MUS.gain.connect(maitre());
         MUS.on = true; MUS.t = ac.currentTime + .08; MUS.pas = 0; musiqueTour(); MUS.h = setInterval(musiqueTour, 60); } catch(e){}
     } else if (!veut && MUS.on){
       MUS.on = false; clearInterval(MUS.h); const g = MUS.gain; try { g.gain.setTargetAtTime(.0001, ac.currentTime, .12); setTimeout(() => g.disconnect(), 800); } catch(e){}
@@ -1279,7 +1282,7 @@ function ecran(code){
       $("eRep").textContent = v.nrep + " réponse" + (v.nrep > 1 ? "s" : "") + " sur " + v.joueurs.length;
       if (v.q.t === "nuage") nuage($("eNuage"), v.mots);
       if (lecture) { $("eLec").textContent = Math.max(1, Math.ceil((v.t0 - n) / 1000)); $("eT").textContent = ""; }
-      else { $("eT").textContent = r; if (r <= 5 && r > 0 && tic !== r) { tic = r; ton(880, .08, .06, "triangle"); } }
+      else { $("eT").textContent = r; if (r <= 5 && r > 0 && tic !== r) { tic = r; ton(523, .06, .025, "sine"); } }
     } else if (v.etat === "rev" && v.q && ["sondage", "echelle"].includes(v.q.t)) {
       if (cle !== dernier || force) {
         const ec = v.q.t === "echelle", n5 = ec ? 5 : v.q.ch.length, tot = Math.max(1, v.cpt.slice(0, n5).reduce((a, b) => a + b, 0));
