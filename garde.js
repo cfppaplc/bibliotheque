@@ -104,9 +104,11 @@ body.inclus .mp-nav{display:none!important}
    La correction H tolère ~30 % de pertes; le logo couvre ~5 % du code. */
 window.qrLogo = function(el){
   if (!el || el.querySelector(".qrLogo")) return;
-  if (getComputedStyle(el).position === "static") el.style.position = "relative";
-  el.style.display = el.style.display || "inline-block"; el.style.lineHeight = "0";
+  /* le code est mis dans une petite boîte de sa taille : le logo s'y centre même si la page est cachée (impression) */
+  var w = document.createElement("span"); w.className = "qrBoite"; w.style.cssText = "position:relative;display:inline-block;line-height:0;vertical-align:top";
+  [].slice.call(el.childNodes).forEach(function(c){ w.appendChild(c); });
+  el.appendChild(w);
   var i = document.createElement("img"); i.className = "qrLogo"; i.alt = ""; i.src = "img/metier-plus-icone.svg";
-  i.style.cssText = "position:absolute;left:50%;top:50%;width:22%;height:22%;transform:translate(-50%,-50%);background:#fff;padding:3%;border-radius:12%;box-sizing:content-box;pointer-events:none";
-  el.appendChild(i);
+  i.style.cssText = "position:absolute;left:50%;top:50%;width:20%;height:20%;padding:3%;transform:translate(-50%,-50%);background:#fff;border-radius:12%;box-sizing:content-box;pointer-events:none";
+  w.appendChild(i);
 };
