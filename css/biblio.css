@@ -1017,3 +1017,21 @@ html.sobre *,html.sobre *::before,html.sobre *::after{backdrop-filter:none!impor
 html.sobre *:not(.acces-succes *):not(.acces-marque img):not(.cadenas.secoue):not(#compteBtn .cloche svg):not(.sch-gard .ok):not(.charge-r):not(.charge-b i):not(#mmenu),html.sobre *::before,html.sobre *::after{animation:none!important;transition-duration:.01s!important;transition-delay:0s!important}
 html.sobre::view-transition-old(root),html.sobre::view-transition-new(root){animation:none!important}
 html.sobre .reader-bar,html.sobre #tb,html.sobre .penbar{background-color:rgba(18,22,32,.97)!important}
+
+/* Boutons de la fiche du livre (15 nov., « ils sont laids ») */
+.m-acts{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+.m-acts .btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;height:50px;margin:0;padding:0 22px;border-radius:12px;font-family:inherit;font-weight:600;font-size:16px;line-height:1;transition:background .15s,border-color .15s,transform .1s}
+.m-acts .btn svg{width:20px;height:20px;flex:none}
+.m-acts .btn:active{transform:scale(.97)}
+.m-acts #mRead{background:#EB6A22;color:#fff;border:0;padding:0 34px;font-size:17px;box-shadow:0 6px 18px rgba(235,106,34,.32)}
+.m-acts #mRead:hover{background:#d65c17}
+.m-acts .btn-fav{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.2);color:#f2f2f4}
+.m-acts .btn-fav:hover{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.35)}
+.m-acts #mFav.on{color:#6fd39a;border-color:rgba(111,211,154,.45);background:rgba(111,211,154,.1)}
+.m-acts .btn:disabled{opacity:.6;cursor:wait}
+body.clair .panel .m-acts #mRead{background:#EB6A22;color:#fff}body.clair .panel .m-acts #mRead:hover{background:#d65c17}
+body.clair .panel .m-acts .btn-fav{background:#f4f1eb;border:1px solid #ddd7cc;color:#1d1d1f}
+body.clair .panel .m-acts .btn-fav:hover{background:#ebe6dc;border-color:#c9c2b5}
+body.clair .panel .m-acts #mFav.on{color:#1E8A55;border-color:#a9d8bd;background:#eaf6ef}
+@media (max-width:640px){.m-acts{flex-direction:column}.m-acts .btn{width:100%}}
+@media (pointer:coarse) and (min-width:641px){.m-acts .btn{height:56px}}

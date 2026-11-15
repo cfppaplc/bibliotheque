@@ -905,17 +905,19 @@ function openModal(l){
       <p><strong>Par ${esc(l.auteur)}</strong></p>
       ${versionLivre(l) ? `<p class="m-version">${esc(versionLivre(l))}</p>` : ""}
       <p>${esc(l.description)}</p>
-      <button class="btn btn-play" id="mRead">▶ Lire</button>
-      <button class="btn btn-fav" id="mFav">${isFav(l) ? "✓ Dans ma liste" : "+ Ma liste"}</button>
-      <button class="btn btn-fav" id="mPdf" hidden>PDF pour imprimer</button>
+      <div class="m-acts">
+      <button class="btn btn-play" id="mRead"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg>Lire</button>
+      <button class="btn btn-fav${isFav(l) ? " on" : ""}" id="mFav"><svg viewBox="0 0 24 24" aria-hidden="true">${isFav(l) ? '<path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>' : '<path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>'}</svg>${isFav(l) ? "Dans ma liste" : "Ma liste"}</button>
+      <button class="btn btn-fav" id="mPdf" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8V3.5h10V8M7 17H4.5v-7a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v7H17M7 14h10v6.5H7z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/></svg><span>PDF pour imprimer</span></button>
+      </div>
     </div>`;
   $("#modal").classList.add("open");
   $(".close").onclick = closeModal;
   $("#mRead").onclick = () => lire(l);
   /* 15 nov. (Jeremy) : PDF du livre pour imprimer, administrateur seulement (pdf/<f>.chiffre, clé dans pdf/cles.json) */
   if (window.ACCES && ACCES.pdfDispo) ACCES.pdfDispo(l.fichier).then(ok => { const b = $("#mPdf"); if (!ok || !b) return; b.hidden = false;
-    b.onclick = async () => { const t = b.textContent; b.disabled = true; b.textContent = "Préparation du PDF…";
-      try { await ACCES.pdfTelecharger(l.fichier, l.titre); b.textContent = t; } catch(e){ b.textContent = "PDF introuvable"; setTimeout(() => b.textContent = t, 3000); } b.disabled = false; }; });
+    const sp = b.querySelector("span"); b.onclick = async () => { const t = sp.textContent; b.disabled = true; sp.textContent = "Préparation du PDF…";
+      try { await ACCES.pdfTelecharger(l.fichier, l.titre); sp.textContent = t; } catch(e){ sp.textContent = "PDF introuvable"; setTimeout(() => sp.textContent = t, 3000); } b.disabled = false; }; });
   $("#mFav").onclick = () => {
     favs = isFav(l) ? favs.filter(f => f !== l.fichier) : [...favs, l.fichier];
     saveFavs(); openModal(l); render();
