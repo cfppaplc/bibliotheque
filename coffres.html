@@ -367,7 +367,8 @@ function dessiner(){
   const C = coffresDe(AT);
   if (!C.length){ L.innerHTML = `<div class="vide">Aucun coffre dans cet atelier. Touche « + Coffre ».</div>`; return; }
   L.innerHTML = C.map(cf => { const s = etat(cf), n = Object.keys(s.mq).length;
-    const et = s.c === "v" ? "Complet" : s.c === "r" ? (n === 1 ? "1 article manque" : n + " articles manquent") : s.c === "o" ? "Liste à approuver" : "Liste à faire";
+    if (s.att && s.c === "v"){ s.c = "o"; }
+    const et = s.att && !n ? "Changement d'équipe" : s.c === "v" ? "Complet" : s.c === "r" ? (n === 1 ? "1 article manque" : n + " articles manquent") : s.c === "o" ? "Liste à approuver" : "Liste à faire";
     return `<button class="cf ${s.c}" data-cf="${cf.id}"><span class="et2">${et}</span><b>${esc(cf.nom)}</b><small>${s.att === "chg" ? (cf.chg ? "Changement d'équipe : remise à faire par l'équipe qui quitte" : "Nouvel inventaire demandé : en attente du prochain scan") : s.att === "rem" ? "Remis par " + nomDe(s.rem) + " : en attente de la nouvelle équipe" : s.der ? "À " + nomDe(s.der) + " depuis " + heure(s.der.d) : cf.liste && cf.liste.length ? cf.liste.length + " articles · pas encore scanné" : cf.prop ? "Liste écrite par " + nomDe(cf.prop.w) + " : touche pour l'approuver" : "Le premier élève qui scanne écrit la liste"}</small></button>`; }).join("");
 }
 function coffreOuvrir(id){
