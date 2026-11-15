@@ -112,9 +112,16 @@ html.clair .mp-plusM,body.clair .mp-plusM{background:#fff;color:#1E2A44;border-c
   if (!document.getElementById("gaCss")) { const st = document.createElement("style"); st.id = "gaCss";
     st.textContent = 'html.sansGA [data-nav="outils"],html.sansGA [data-pied="outils"]{display:none!important}'; document.head.appendChild(st); }
   const vis = v => { H.classList.toggle("sansGA", !v && !ici); if (window.mpNavPlier) try { window.mpNavPlier(); } catch(e) {} };
-  let moi = "", co = ""; try { moi = localStorage.getItem("dernierId") || ""; co = localStorage.getItem("etaitConnecte") || ""; } catch(e) {}
-  if (!moi || !co) { vis(false); return; }
+  /* 15 nov. (« mon compte admin ne voit plus Gestion d'atelier ») : le compte est lu dans la session de la bibliothèque
+     (IndexedDB « acces »), pas seulement dans dernierId (absent si la connexion date d'avant le 8 nov.) */
   let c = null; try { c = JSON.parse(localStorage.getItem("gaVisible") || "null"); } catch(e) {}
+  vis(!!(c && c.v));
+  const session = () => new Promise(ok => { try { const r = indexedDB.open("acces", 1);
+    r.onupgradeneeded = () => r.result.createObjectStore("s"); r.onerror = () => ok("");
+    r.onsuccess = () => { try { const t = r.result.transaction("s").objectStore("s").get("session"); t.onsuccess = () => ok((t.result && t.result.id) || ""); t.onerror = () => ok(""); } catch(e) { ok(""); } };
+  } catch(e) { ok(""); } });
+  (async () => { let moi = await session(); if (!moi) try { if (localStorage.getItem("etaitConnecte")) moi = localStorage.getItem("dernierId") || ""; } catch(e) {}
+  if (!moi) { vis(false); return; }
   vis(!!(c && c.id === moi && c.v));
   if (c && c.id === moi && Date.now() - c.t < 600000) return;
   const API = "https://kjlotlhqrgekzohshmbn.supabase.co/rest/v1/rpc/coffre_lire", CLE = "sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY";
@@ -127,5 +134,5 @@ html.clair .mp-plusM,body.clair .mp-plusM{background:#fff;color:#1E2A44;border-c
       if (!r.ok) return; const row = (await r.json() || [])[0], d = row && row.data ? JSON.parse(row.data) : {};
       for (const g in (d.part || {})) if ((d.part[g] || []).includes(moi)) v = true; }));
     localStorage.setItem("gaVisible", JSON.stringify({id: moi, v, t: Date.now()})); vis(v);
-  } catch(e) {} })();
+  } catch(e) {} })(); })();
 })();
