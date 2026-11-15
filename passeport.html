@@ -559,7 +559,7 @@ function dlgCodes(){
       L.forEach(e => { if (i && i % par === 0){ h += `<div class="pg">${pg}</div>`; pg = ""; } const j = i % par, c = j % F.c, l = Math.floor(j / F.c);
         pg += etq(Object.assign({}, e, { st:` style="left:${F.x0 + c * F.dx}in;top:${F.y0 + l * F.dy}in"` })); i++; });
       Z.innerHTML = h + `<div class="pg">${pg}</div>`; }
-    setTimeout(() => print(), 300); };
+    setTimeout(() => window.mpImprimerQrs ? mpImprimerQrs() : print(), 300); };
 }
 function dlgQr(){
   if (!window.__moi) return toast("Connecte-toi d'abord à la bibliothèque.");
@@ -584,7 +584,7 @@ function imprimerQr(){
     c.innerHTML = `<img class="l" src="img/metier-plus.svg" alt=""><b>${esc(o.nom)}</b><div class="q"></div><small>${tailleDe(o.id) === "p" ? "Scanne avant d'utiliser" : "Scanne avant d'utiliser cet outil : formation et signature"}</small>`;
     Z.appendChild(c); new QRCode(c.querySelector(".q"), { text:url, width:360, height:360, correctLevel:QRCode.CorrectLevel.H }); if (window.qrLogo) qrLogo(c.querySelector(".q"));
   });
-  setTimeout(() => { Z.querySelectorAll("canvas").forEach(c => { const i = c.parentNode.querySelector("img:not(.qrLogo)"); if (i && i.src) c.remove(); }); print(); }, 600);
+  setTimeout(() => { Z.querySelectorAll("canvas").forEach(c => { const i = c.parentNode.querySelector("img:not(.qrLogo)"); if (i && i.src) c.remove(); }); window.mpImprimerQrs ? mpImprimerQrs() : print(); }, 600);
 }
 
 /* formations : l'administrateur les modifie et les publie (protocoles.json, comme les locaux du ménage) */

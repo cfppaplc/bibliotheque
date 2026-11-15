@@ -175,7 +175,7 @@ main{max-width:1500px}
 <div id="peRegM" hidden><button id="mPl"><b>Placer les équipes</b><small>Un toucher par élève</small></button><button id="peLoc"><b>Locaux</b><small>Choisir les locaux</small></button><button id="peShare"><b>Partager</b><small>Avec un collègue</small></button><button id="mEff"><b>Effacer ce groupe</b><small>Fin d'année : signatures du groupe effacées</small></button></div></div>
 <div class="ga-ong" role="tablist"><button data-t="el" class="on">Élèves</button><button data-t="fo">Formations</button><button data-t="co">Coffres</button></div>
 <button class="lb-q" id="gaQ" aria-label="Aide">?</button></div>
-<div id="afaire"></div>
+<div id="afaire"></div><div id="plBan" hidden style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:10px 0;padding:12px 16px;border-radius:12px;background:#FFF1E6;border:1px solid #EB6A22;color:#1E2A44;font-weight:600"><span style="flex:1;min-width:220px">Placement des équipes : touche le numéro de chaque élève.</span><button id="plFin" class="pe-plb on">✓ Terminé, revenir à la liste</button></div>
 <section class="ga-t" id="t-el"><div class="pe-bar"><input id="peQ" type="search" placeholder="Chercher un élève ou un code"><button id="pePl" class="pe-plb on" hidden>Terminé</button><button id="gaEl" class="pe-plb" hidden>+ Élèves</button><button id="gaCodes" class="pe-plb" hidden>Codes des élèves</button></div><div class="pe-l" id="peL"></div></section>
 <section class="ga-t" id="t-fo" hidden><iframe id="fFo" src="passeport.html" title="Formations"></iframe></section>
 <section class="ga-t" id="t-co" hidden><iframe id="fCo" src="coffres.html" title="Coffres"></iframe></section>
@@ -262,7 +262,7 @@ main{max-width:1500px}
     return `<div class="pe-r${PLACE ? " place" : ""}" role="button" tabindex="0" data-el="${e.id}"><div class="pe-n"><b>${esc(e.p)}</b><small>${[e.c ? "code " + esc(e.c) : "", e.eq && ($("#peQ").value.trim() || PLACE) ? "équipe " + e.eq : ""].filter(Boolean).join(" · ")}</small></div><div class="pe-f"><em>${n} sur ${O.length}</em>${f}</div><div class="pe-c">${c}</div>${pl}</div>`;
   }
   function dessiner(){
-    afaire(); majLoc(); majShare(); $("#pePl").hidden = !PLACE;
+    afaire(); majLoc(); majShare(); $("#pePl").hidden = true; $("#plBan").hidden = !PLACE; $("#plBan").style.display = PLACE ? "flex" : "none";
     { const ac = avecCoffres(), bc = document.querySelector('.ga-ong [data-t="co"]'); bc.hidden = !ac && !ADM(); $("#mPl").hidden = false; $("#gaGrpN").hidden = !ADM(); $("#gaEl").hidden = !ADM() || !groupe() || PLACE; $("#gaCodes").hidden = !groupe() || PLACE;
       if (bc.hidden && !$("#t-co").hidden){ document.querySelectorAll(".ga-ong button").forEach(x => x.classList.toggle("on", x.dataset.t === "el")); ["el","fo","co"].forEach(x => $("#t-" + x).hidden = x !== "el"); } }
     const L = $("#peL"), q = sansAcc($("#peQ").value), g = groupe();
@@ -369,6 +369,9 @@ main{max-width:1500px}
   /* Placer les équipes : chaque élève a ses numéros sur sa ligne (administrateur) */
   let PLACE = false;
   $("#pePl").onclick = () => { PLACE = false; dessiner(); };
+  $("#plFin").onclick = () => { PLACE = false; dessiner(); };
+  document.addEventListener("keydown", ev => { if (ev.key === "Escape" && PLACE){ PLACE = false; dessiner(); } });
+  document.querySelector('.ga-ong [data-t="el"]').addEventListener("click", () => { if (PLACE){ PLACE = false; dessiner(); } });
   /* boutons du registre sur la page Élèves : ouvrent la fenêtre dans l'onglet Formations, puis reviennent */
   function viaFormations(id){ const w = fFo.contentWindow, d = w && w.document; if (!d) return;
     const bt = typeof id === "function" ? null : d.getElementById(id); if (!bt && typeof id !== "function") return;

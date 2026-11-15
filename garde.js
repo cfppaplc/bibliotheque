@@ -129,7 +129,25 @@ window.mpImprimer = function(titre, sous, entetes, rangees){
     <p class="pied">Document confidentiel : renseignements sur des élèves (Loi 25). À conserver en lieu sûr.</p></html>`;
   const f = document.createElement("iframe"); f.style.cssText = "position:fixed;width:0;height:0;border:0;right:0;bottom:0"; document.body.appendChild(f);
   f.contentDocument.open(); f.contentDocument.write(html); f.contentDocument.close();
-  const go = () => { try { f.contentWindow.focus(); f.contentWindow.print(); } catch (x) {} setTimeout(() => f.remove(), 60000); };
+  let fait = false; const go = () => { if (fait) return; fait = true; try { f.contentWindow.focus(); f.contentWindow.print(); } catch (x) {} setTimeout(() => f.remove(), 60000); };
   const im = f.contentDocument.querySelector("img"); if (im && !im.complete){ im.onload = im.onerror = go; setTimeout(go, 1500); } else go();
 };
 window.mpDateHeure = t => new Date(t).toLocaleString("fr-CA", { year:"numeric", month:"short", day:"numeric", hour:"2-digit", minute:"2-digit" }).replace(/(\d+):(\d+)/, "$1 h $2");
+
+/* Impression des codes QR et étiquettes (15 nov., « le chargement avant impression plante ») :
+   dans Gestion d'atelier, la page est dans un cadre; imprimer depuis le cadre faisait planter l'aperçu.
+   On imprime plutôt #qrs dans une petite fenêtre à part, avec les mêmes styles. */
+window.mpImprimerQrs = function(){
+  const Z = document.getElementById("qrs");
+  if (!Z || window.top === window) return print();
+  const w = window.open("", "_blank", "width=900,height=700");
+  if (!w) return print();
+  const styles = [...document.querySelectorAll("style,link[rel=stylesheet]")].map(s => s.outerHTML).join("");
+  w.document.open();
+  w.document.write(`<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"><base href="${location.href.replace(/[^/]*$/, "")}"><title>Impression · Métier+</title>${styles}<style>#qrs{display:block!important}body{margin:0;background:#fff}</style></head><body>${Z.outerHTML}</body></html>`);
+  w.document.close();
+  let fait = false; const go = () => { if (fait) return; fait = true; try { w.focus(); w.print(); } catch(e) {} setTimeout(() => { try { w.close(); } catch(e) {} }, 500); };
+  const imgs = [...w.document.images].filter(i => !i.complete);
+  if (!imgs.length) setTimeout(go, 200);
+  else { let n = imgs.length; const un = () => { if (--n <= 0) setTimeout(go, 200); }; imgs.forEach(i => { i.onload = i.onerror = un; }); setTimeout(go, 4000); }
+};
