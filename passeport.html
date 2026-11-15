@@ -434,7 +434,7 @@ function dessiner(){
 /* Sorties d'outils (14 nov.) : l'élève déjà formé scanne pour prendre ou rapporter l'outil */
 function dessinerSorties(){
   const M = Object.entries(D.mv || {}).map(([u, m]) => Object.assign({ u }, m)).filter(m => m.d > Date.now() - 60 * 864e5).sort((a, b) => b.d - a.d);
-  const Z = $("#sorties"); if (!M.length){ Z.innerHTML = ""; return; }
+  const Z = $("#sorties"); if (!SORTIES || !M.length){ Z.innerHTML = ""; return; }
   const qui = m => { const e = D.el[m.e]; return e ? esc(e.p) + (e.c ? ` <small class="cd">${e.c}</small>` : "") + ` <small class="cd">· ${esc(e.g)}</small>` : "Élève retiré"; };
   const nomO = id => { const o = outil(id); return o ? esc(o.nom.replace(/ \(.*\)$/, "")) : esc(id); };
   const quand = d => { const x = new Date(d), h = x.toLocaleTimeString("fr-CA", { hour:"2-digit", minute:"2-digit" }).replace(":", " h ");
@@ -516,13 +516,15 @@ async function releve(manuel){
 const TAILLE_DEF = { "escabeau":"g", "scie-onglets":"g", "fileteuse":"g", "oxyacetylene":"g", "chalumeau-propane":"m", "sertisseuse":"m" };
 /* suivi des sorties : seulement pour les outils choisis (les plus chers); les autres passent par le magasinier */
 const SUIVI_DEF = ["sertisseuse", "fileteuse"];
-const suivis = () => { try { const s = JSON.parse(localStorage.getItem("passSuivi") || "null"); return Array.isArray(s) ? s : SUIVI_DEF; } catch(e){ return SUIVI_DEF; } };
+/* 14 nov. : sorties retirées (« on enlève le double scan ») : plus aucun outil suivi; le code reste au besoin (SORTIES = true pour le remettre) */
+const SORTIES = false;
+const suivis = () => { if (!SORTIES) return []; try { const s = JSON.parse(localStorage.getItem("passSuivi") || "null"); return Array.isArray(s) ? s : SUIVI_DEF; } catch(e){ return SUIVI_DEF; } };
 const tailleDe = id => { try { const T = JSON.parse(localStorage.getItem("passQrTailles") || "{}"); return T[id] || TAILLE_DEF[id] || "p"; } catch(e){ return "p"; } };
 function dlgQr(){
   if (!window.__moi) return toast("Connecte-toi d'abord à la bibliothèque.");
   const seg = o => `<span class="tl" data-id="${esc(o.id)}" style="display:inline-flex;gap:4px">${[["p","Petit"],["m","Moyen"],["g","Grand"]].map(([k, n]) => `<button type="button" class="btn${tailleDe(o.id) === k ? " p" : ""}" data-t="${k}" style="min-height:42px;padding:6px 12px">${n}</button>`).join("")}</span>`;
   ouvrir(`<h2>Codes QR à imprimer</h2><p>Petit : collé sur l'outil (3 cm). Moyen : sur l'étui ou la boîte (5,5 cm). Grand : au mur près de la machine (12 cm).</p><p>« Suivre les sorties » : pour les outils chers seulement. L'élève formé rescanne pour prendre et rapporter l'outil; les autres outils passent par le magasinier.</p>
-    ${PROT.outils.map(o => `<div class="rq" style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--fil,#e5dac6)"><span style="flex:1;font-weight:650">${esc(o.nom)}</span><label style="display:inline-flex;align-items:center;gap:6px;font-size:14px;color:var(--gris);white-space:nowrap"><input type="checkbox" class="sv" data-id="${esc(o.id)}" ${suivis().includes(o.id) ? "checked" : ""} style="width:22px;height:22px"> Suivre les sorties</label>${seg(o)}</div>`).join("")}
+    ${PROT.outils.map(o => `<div class="rq" style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--fil,#e5dac6)"><span style="flex:1;font-weight:650">${esc(o.nom)}</span><label style="display:${SORTIES ? "inline-flex" : "none"};align-items:center;gap:6px;font-size:14px;color:var(--gris);white-space:nowrap"><input type="checkbox" class="sv" data-id="${esc(o.id)}" ${suivis().includes(o.id) ? "checked" : ""} style="width:22px;height:22px"> Suivre les sorties</label>${seg(o)}</div>`).join("")}
     <div class="act"><button class="btn" id="aF">Annuler</button><button class="btn p" id="aOk">Imprimer</button></div>`);
   $("#bx").querySelectorAll(".tl").forEach(z => z.querySelectorAll("button").forEach(b => b.onclick = () => {
     let T = {}; try { T = JSON.parse(localStorage.getItem("passQrTailles") || "{}"); } catch(e) {}
