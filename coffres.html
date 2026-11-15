@@ -266,7 +266,7 @@ async function vueEleve(){
   const dormant = () => parCode && !(cf.eqc || []).length;
   const ferme = () => { V.innerHTML = `<div class="top"><img src="${LOGO}" alt="Métier+"></div><h1>${esc(cf.nom)}</h1><p class="sous">Ce coffre n'est assigné à aucune équipe pour l'instant. Avise ton enseignant.</p>`; };
   let mc = "", mp = ""; try { mc = localStorage.getItem("passCode") || ""; mp = localStorage.getItem("passPrenom") || ""; } catch(e) {}
-  const idt = `<div class="idt">${(cf.eqc || []).length > 1 ? "<style>label[for=c2],#c2{display:none}</style>" : ""}${parCode ? `<label for="cd">Ton code (3 chiffres)</label><input id="cd" inputmode="numeric" maxlength="3" value="${esc(mc)}" autocomplete="off">`
+  const idt = `<div class="idt">${parCode && (cf.eqc || []).length ? "<style>label[for=c2],#c2{display:none}</style>" : ""}${parCode ? `<label for="cd">Ton code (3 chiffres)</label><input id="cd" inputmode="numeric" maxlength="3" value="${esc(mc)}" autocomplete="off">`
     : `<label for="pn">Ton prénom</label><input id="pn" maxlength="24" value="${esc(mp)}" autocomplete="given-name">`}
     <label for="c2">${parCode ? "Code de ton coéquipier" : "Prénom de ton coéquipier"} <small style="font-weight:500;color:var(--gris)">(si vous êtes deux)</small></label><input id="c2" ${parCode ? 'inputmode="numeric" maxlength="3"' : 'maxlength="24"'} autocomplete="off"><p class="err" id="er" hidden></p></div>`;
   const qui = () => { const v2 = $("#c2").value.trim();
