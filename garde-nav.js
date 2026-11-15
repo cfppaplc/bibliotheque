@@ -103,3 +103,29 @@ html.clair .mp-plusM,body.clair .mp-plusM{background:#fff;color:#1E2A44;border-c
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", go); else go();
   window.mpNavPlier = bientot;
 })();
+
+/* 15 nov. (Jeremy : « Gestion d'atelier devrait seulement être affiché si tu as un groupe partagé avec toi ») :
+   le lien est montré à l'administrateur et aux enseignants à qui un groupe est partagé (rangée publique du registre).
+   Résultat gardé dans localStorage.gaVisible ("1"/"0"), revérifié au plus aux 10 min. Inconnu = caché. */
+(() => {
+  const H = document.documentElement, ici = /outils-atelier|passeport|coffres/.test(location.pathname);
+  if (!document.getElementById("gaCss")) { const st = document.createElement("style"); st.id = "gaCss";
+    st.textContent = 'html.sansGA [data-nav="outils"],html.sansGA [data-pied="outils"]{display:none!important}'; document.head.appendChild(st); }
+  const vis = v => { H.classList.toggle("sansGA", !v && !ici); if (window.mpNavPlier) try { window.mpNavPlier(); } catch(e) {} };
+  let moi = "", co = ""; try { moi = localStorage.getItem("dernierId") || ""; co = localStorage.getItem("etaitConnecte") || ""; } catch(e) {}
+  if (!moi || !co) { vis(false); return; }
+  let c = null; try { c = JSON.parse(localStorage.getItem("gaVisible") || "null"); } catch(e) {}
+  vis(!!(c && c.id === moi && c.v));
+  if (c && c.id === moi && Date.now() - c.t < 600000) return;
+  const API = "https://kjlotlhqrgekzohshmbn.supabase.co/rest/v1/rpc/coffre_lire", CLE = "sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY";
+  const hache = async s => [...new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s)))].map(b => b.toString(16).padStart(2, "0")).join("");
+  (async () => { try {
+    const C = (await (await fetch("comptes.json", {cache: "no-store"})).json()).comptes || {};
+    let v = !!(C[moi] && C[moi].admin);
+    if (!v) await Promise.all(Object.keys(C).filter(id => id !== moi && !C[id].eleve).map(async id => {
+      const r = await fetch(API, {method: "POST", headers: {apikey: CLE, "Content-Type": "application/json"}, body: JSON.stringify({p_id: await hache("metier+|partage-passeport|" + id)})});
+      if (!r.ok) return; const row = (await r.json() || [])[0], d = row && row.data ? JSON.parse(row.data) : {};
+      for (const g in (d.part || {})) if ((d.part[g] || []).includes(moi)) v = true; }));
+    localStorage.setItem("gaVisible", JSON.stringify({id: moi, v, t: Date.now()})); vis(v);
+  } catch(e) {} })();
+})();
