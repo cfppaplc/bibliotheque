@@ -59,6 +59,25 @@ table.g{border-collapse:separate;border-spacing:0;min-width:100%}
 .ed-o{border:1px solid var(--ligne);border-radius:12px;padding:12px;margin:10px 0;display:grid;gap:8px}
 .ed-o .r{display:flex;gap:8px}.ed-o .r input{flex:1}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--mar);color:#fff;padding:12px 20px;border-radius:12px;font-weight:650;z-index:60}
+/* cellulaire (14 nov., « tout croche sur cellulaire ») */
+.cartes{display:none}
+@media (max-width:640px){
+  .hero p.long{display:none}.hero p.court{display:block!important}
+  .barre{display:grid!important;grid-template-columns:1fr 1fr;gap:8px}
+  .barre select{grid-column:1/-1;min-height:48px;font-size:17px}
+  .barre .esp{display:none}.barre .btn{width:100%;margin:0}
+  .barre #bQr{grid-column:1/-1;order:-1}
+  .tw{display:none}.cartes{display:grid;gap:10px}
+  .ce{background:var(--carte,#fff);border:1px solid var(--fil,#e5dac6);border-radius:14px;padding:12px}
+  .ce .t{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+  .ce .t button{all:unset;font-weight:750;font-size:17px;cursor:pointer}.ce .t small{color:var(--gris);font-weight:650}
+  .ce .ch{display:flex;flex-wrap:wrap;gap:6px}
+  .ce .ch button{border:1px solid var(--fil,#e5dac6);background:transparent;border-radius:999px;padding:7px 11px;font:inherit;font-size:13.5px;color:var(--gris);min-height:38px}
+  .ce .ch button.s{background:#1E8A55;border-color:#1E8A55;color:#fff;font-weight:650}
+  .ce .ch button.v{background:#1F5FAD;border-color:#1F5FAD;color:#fff;font-weight:650}
+  .rq{flex-direction:column;align-items:stretch!important;gap:6px!important}.rq .tl{display:grid!important;grid-template-columns:repeat(3,1fr)}
+  .el .sigb{flex-direction:column-reverse}.el .sigb .btn{width:100%}.el .sigb .esp{display:none}
+}
 /* codes QR à imprimer */
 #qrs{display:none}
 @media print{
@@ -105,7 +124,7 @@ html.eleve body{background:var(--fond)}
 <div id="vueProf" hidden>
 <div class="mp-tete"><img class="lg-b" src="img/metier-plus-blanc.svg" alt="Métier+"><img class="lg-c" src="img/metier-plus.svg" alt="Métier+"><a class="mp-retour" href="labo.html">‹ Labo</a><h1 class="mp-nom">Passeport</h1><span class="mp-esp"></span></div>
 <main>
-  <div class="hero"><div><h1>Passeport d'outils</h1><p>Un code QR par outil, pour tous tes groupes. L'élève le scanne, suit la formation, coche chaque étape, écrit son prénom et son groupe, puis signe. Sa signature arrive ici, dans son groupe, avec la date. Si le groupe n'est pas reconnu, elle va dans « À classer ».</p></div></div>
+  <div class="hero"><div><h1>Passeport d'outils</h1><p class="long">Un code QR par outil, pour tous tes groupes. L'élève le scanne, suit la formation, coche chaque étape, écrit son prénom et son groupe, puis signe. Sa signature arrive ici, dans son groupe, avec la date. Si le groupe n'est pas reconnu, elle va dans « À classer ».</p><p class="court" style="display:none">Imprime un code QR par outil. L'élève le scanne, suit la formation et signe : sa signature arrive ici.</p></div></div>
   <div class="barre">
     <select id="grp" aria-label="Groupe"></select>
     <button class="btn" id="bGrpN">+ Groupe</button>
@@ -117,7 +136,7 @@ html.eleve body{background:var(--fond)}
     <button class="btn" id="bProt" hidden>Modifier les formations</button>
   </div>
   <p class="info" id="etat"></p>
-  <div class="tw" id="tw"></div>
+  <div class="tw" id="tw"></div><div class="cartes" id="cm"></div>
   <p class="info" style="margin-top:14px">✓ vert = signé par l'élève · ✓ bleu = validé par toi. Touche une case pour voir la signature. <button class="btn" id="bEffG" style="min-height:36px;padding:6px 12px;margin-left:8px">Effacer ce groupe</button></p>
 </main>
 </div>
@@ -185,7 +204,7 @@ async function vueEleve(){
       <label for="gr">Ton groupe</label><div id="grB" class="epi" style="margin:4px 0 10px"></div><input id="gr" type="text" autocomplete="off" maxlength="20" placeholder="Numéro du groupe (ex. : 2608)">
       <label>Signe avec ton doigt</label><div class="toile"><canvas id="cv"></canvas><span>Signe ici</span></div>
       <p class="engage">En signant, je confirme avoir suivi la formation sur l'outil « ${esc(o.nom)} » et je m'engage à respecter ces étapes chaque fois que je l'utilise.</p>
-      <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn" id="bEff">Effacer la signature</button><span class="esp" style="flex:1"></span><button class="btn p" id="bEnv" disabled>Signer et envoyer</button></div>
+      <div class="sigb" style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn" id="bEff">Effacer la signature</button><span class="esp" style="flex:1"></span><button class="btn p" id="bEnv" disabled>Signer et envoyer</button></div>
       <p class="err" id="er" hidden></p>
     </div>
     ${ens ? "" : `<p class="engage" style="margin-top:20px">Ce code ne contient pas le nom de l'enseignant : la signature ne peut pas être envoyée. Avise ton enseignant.</p>`}`;
@@ -269,12 +288,17 @@ function dessiner(){
   $("#grp").innerHTML = gs.length ? gs.map(g => `<option ${g === GRP ? "selected" : ""}>${esc(g)}</option>`).join("") : `<option value="">Aucun groupe</option>`;
   $("#bEl").disabled = $("#bEffG").disabled = !GRP;
   const L = eleves(GRP), O = PROT.outils;
+  $("#cm").innerHTML = "";
   if (!GRP){ $("#tw").innerHTML = `<div class="vide">Commence par créer un groupe (ex. « 2608 »), puis imprime les codes QR des outils.</div>`; return; }
   if (!L.length){ $("#tw").innerHTML = `<div class="vide">Aucun élève dans ce groupe pour l'instant. Ajoute-les, ou attends leurs premières signatures : ils s'ajoutent tout seuls.</div>`; return; }
   $("#tw").innerHTML = `<table class="g"><thead><tr><th class="nom">Élève</th>${O.map(o => `<th>${esc(o.nom)}</th>`).join("")}</tr></thead><tbody>${
     L.map(e => `<tr><td class="nom"><button data-el="${e.id}">${esc(e.p)}</button></td>${O.map(o => { const v = D.val[e.id + "|" + o.id];
       return `<td><button class="c" data-e="${e.id}" data-o="${o.id}" aria-label="${esc(e.p + " · " + o.nom)}">${v && v.d ? `<span class="ok ${v.s ? "" : "ens"}"><i>✓</i><small>${new Date(v.d).toLocaleDateString("fr-CA", { day:"numeric", month:"short" })}</small></span>` : ""}</button></td>`; }).join("")}</tr>`).join("")
   }</tbody></table>`;
+  /* cellulaire : une carte par élève, une pastille par outil */
+  $("#cm").innerHTML = L.map(e => { let n = 0; const ch = O.map(o => { const v = D.val[e.id + "|" + o.id], f = v && v.d; if (f) n++;
+      return `<button class="c ${f ? (v.s ? "s" : "v") : ""}" data-e="${e.id}" data-o="${o.id}">${f ? "✓ " : ""}${esc(o.nom.replace(/ \(.*\)$/, ""))}</button>`; }).join("");
+    return `<div class="ce"><div class="t"><button data-el="${e.id}">${esc(e.p)}</button><small>${n} sur ${O.length}</small></div><div class="ch">${ch}</div></div>`; }).join("");
 }
 function caseOuvrir(eid, oid){
   const e = D.el[eid], o = outil(oid), k = eid + "|" + oid, v = D.val[k];
@@ -337,7 +361,7 @@ function dlgQr(){
   if (!window.__moi) return toast("Connecte-toi d'abord à la bibliothèque.");
   const seg = o => `<span class="tl" data-id="${esc(o.id)}" style="display:inline-flex;gap:4px">${[["p","Petit"],["m","Moyen"],["g","Grand"]].map(([k, n]) => `<button type="button" class="btn${tailleDe(o.id) === k ? " p" : ""}" data-t="${k}" style="min-height:42px;padding:6px 12px">${n}</button>`).join("")}</span>`;
   ouvrir(`<h2>Codes QR à imprimer</h2><p>Petit : collé sur l'outil (3 cm). Moyen : sur l'étui ou la boîte (5,5 cm). Grand : au mur près de la machine (12 cm).</p>
-    ${PROT.outils.map(o => `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--fil,#e5dac6)"><span style="flex:1;font-weight:650">${esc(o.nom)}</span>${seg(o)}</div>`).join("")}
+    ${PROT.outils.map(o => `<div class="rq" style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--fil,#e5dac6)"><span style="flex:1;font-weight:650">${esc(o.nom)}</span>${seg(o)}</div>`).join("")}
     <div class="act"><button class="btn" id="aF">Annuler</button><button class="btn p" id="aOk">Imprimer</button></div>`);
   $("#bx").querySelectorAll(".tl").forEach(z => z.querySelectorAll("button").forEach(b => b.onclick = () => {
     let T = {}; try { T = JSON.parse(localStorage.getItem("passQrTailles") || "{}"); } catch(e) {}
@@ -434,7 +458,7 @@ async function vueProf(){
   let surG = 0; $("#bEffG").onclick = ev => { if (!GRP) return; if (!surG++){ ev.target.textContent = "Sûr ? Les signatures du groupe seront effacées"; setTimeout(() => { surG = 0; ev.target.textContent = "Effacer ce groupe"; }, 4000); return; }
     const t = Date.now(); for (const id in D.el) if (D.el[id].g === GRP){ D.el[id] = { x:1, t, g:GRP, p:"" }; for (const k in D.val) if (k.startsWith(id + "|")) D.val[k] = { d:0, t }; }
     D.grp[GRP] = { x:1, t }; GRP = ""; sauver(); surG = 0; ev.target.textContent = "Effacer ce groupe"; dessiner(); };
-  $("#tw").onclick = e => { const c = e.target.closest("button.c"); if (c) return caseOuvrir(c.dataset.e, c.dataset.o);
+  $("#cm").onclick = $("#tw").onclick = e => { const c = e.target.closest("button.c"); if (c) return caseOuvrir(c.dataset.e, c.dataset.o);
     const n = e.target.closest("button[data-el]"); if (n) eleveOuvrir(n.dataset.el); };
   $("#bQr").onclick = dlgQr;
   $("#bMaj").onclick = () => releve(true);
