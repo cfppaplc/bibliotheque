@@ -70,7 +70,7 @@ table.g{border-collapse:separate;border-spacing:0;min-width:100%}
   .tw{display:none}.cartes{display:grid;gap:10px}
   .ce{background:var(--carte,#fff);border:1px solid var(--fil,#e5dac6);border-radius:14px;padding:12px}
   .ce .t{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
-  .ce .t button{all:unset;font-weight:750;font-size:17px;cursor:pointer}.ce .t small{color:var(--gris);font-weight:650}
+  .ce .t button{all:unset;font-weight:750;font-size:17px;cursor:pointer}.cd{color:var(--gris);font-weight:650;font-size:.8em;letter-spacing:1px}.ce .t small{color:var(--gris);font-weight:650}
   .ce .ch{display:flex;flex-wrap:wrap;gap:6px}
   .ce .ch button{border:1px solid var(--fil,#e5dac6);background:transparent;border-radius:999px;padding:7px 11px;font:inherit;font-size:13.5px;color:var(--gris);min-height:38px}
   .ce .ch button.s{background:#1E8A55;border-color:#1E8A55;color:#fff;font-weight:650}
@@ -115,6 +115,7 @@ html.eleve body{background:var(--fond)}
 .toile{position:relative;background:#fff;border-radius:12px;border:2px dashed #bbb;touch-action:none}
 .toile canvas{display:block;width:100%;height:180px}
 .toile span{position:absolute;left:14px;bottom:10px;color:#999;font-size:13px;pointer-events:none}
+.cd{color:var(--gris);font-weight:650;font-size:.8em;letter-spacing:1px}
 .engage{color:var(--gris);font-size:14px;line-height:1.45;margin:12px 0}
 .fini{text-align:center;padding:40px 10px}.fini .rond{width:96px;height:96px;border-radius:50%;background:var(--vert);color:#fff;display:grid;place-items:center;font-size:52px;margin:0 auto 18px}
 .err{color:#D9534F;font-weight:650;margin-top:10px}
@@ -175,11 +176,11 @@ const PARTAGE = (() => {
   const API = "https://kjlotlhqrgekzohshmbn.supabase.co/rest/v1/rpc/", CLEAPI = "sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY";
   const id = async ens => [...new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode("metier+|partage-passeport|" + ens)))].map(b => b.toString(16).padStart(2, "0")).join("");
   const rpc = async (f, a) => { const r = await fetch(API + f, { method:"POST", headers:{ apikey:CLEAPI, "Content-Type":"application/json" }, body:JSON.stringify(a) }); if (!r.ok) throw new Error("coffre " + r.status); return r.json(); };
-  async function lire(ens){ try { const r = await rpc("coffre_lire", { p_id:await id(ens) }), row = r && r[0]; const v = row && row.data ? JSON.parse(row.data) : {}; return { grp:v.grp || [], part:v.part || {} }; } catch(e){ return { grp:[], part:{} }; } }
+  async function lire(ens){ try { const r = await rpc("coffre_lire", { p_id:await id(ens) }), row = r && r[0]; const v = row && row.data ? JSON.parse(row.data) : {}; return { grp:v.grp || [], part:v.part || {}, codes:v.codes || null }; } catch(e){ return { grp:[], part:{}, codes:null }; } }
   async function ecrire(ens, o){
     let j = localStorage.getItem("passPartageJeton");
     if (!j){ j = btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(32)))); localStorage.setItem("passPartageJeton", j); }
-    if (await rpc("coffre_ecrire", { p_id:await id(ens), p_jeton:j, p_env:"public", p_data:JSON.stringify({ grp:o.grp, part:o.part, t:Date.now() }) }) !== true) throw new Error("refus");
+    if (await rpc("coffre_ecrire", { p_id:await id(ens), p_jeton:j, p_env:"public", p_data:JSON.stringify({ grp:o.grp, part:o.part, codes:o.codes || null, t:Date.now() }) }) !== true) throw new Error("refus");
   }
   return { lire, ecrire };
 })();
@@ -200,7 +201,8 @@ async function vueEleve(){
     <div id="ets">${o.etapes.map((x, i) => `<div class="et" data-i="${i}" role="checkbox" aria-checked="false" tabindex="0"><span class="n">${i + 1}</span><span>${esc(x)}</span><span class="bx2"></span></div>`).join("")}</div>
     <div class="signer" id="sg" hidden>
       <h2>Ta signature</h2>
-      <label for="pn">Ton prénom</label><input id="pn" type="text" autocomplete="off" maxlength="22" placeholder="Prénom (ex. : Marc ou Marc B.)">
+      <label for="pn" id="pnL">Ton prénom</label><input id="pn" type="text" autocomplete="off" maxlength="22" placeholder="Prénom (ex. : Marc ou Marc B.)">
+      <div id="cdZ" hidden><label for="cd">Ton code (3 chiffres, donné par ton enseignant)</label><input id="cd" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" maxlength="3" placeholder="000" style="font-size:28px;letter-spacing:8px;text-align:center;max-width:160px"><p class="err" id="cdEr" hidden>Ce code n'existe pas dans ce groupe. Vérifie avec ton enseignant.</p></div>
       <label for="gr">Ton groupe</label><div id="grB" class="epi" style="margin:4px 0 10px"></div><input id="gr" type="text" autocomplete="off" maxlength="20" placeholder="Numéro du groupe (ex. : 2608)">
       <label>Signe avec ton doigt</label><div class="toile"><canvas id="cv"></canvas><span>Signe ici</span></div>
       <p class="engage">En signant, je confirme avoir suivi la formation sur l'outil « ${esc(o.nom)} » et je m'engage à respecter ces étapes chaque fois que je l'utilise.</p>
@@ -227,19 +229,26 @@ async function vueEleve(){
   const pn = $("#pn"), gr = $("#gr"); pn.oninput = gr.oninput = pret;
   try { pn.value = localStorage.getItem("passPrenom") || ""; gr.value = grp || localStorage.getItem("passGroupe") || ""; } catch(e) {}
   /* groupes créés par l'enseignant : l'élève touche le sien (pas de faute de frappe possible) */
-  let INFO = { grp:[], part:{} };
+  var INFO = { grp:[], part:{}, codes:null };
+  const cd = $("#cd"); cd.oninput = () => { cd.value = cd.value.replace(/\D/g, "").slice(0, 3); pret(); };
+  try { cd.value = localStorage.getItem("passCode") || ""; } catch(e) {}
+  function parCode(){ const g = $("#gr"); return !!(INFO && INFO.codes && g && INFO.codes[g.value] && INFO.codes[g.value].length); }
   if (ens) PARTAGE.lire(ens).then(r => { INFO = r; if (!r.grp.length) return;
     const z = $("#grB"); gr.hidden = true; if (!r.grp.includes(gr.value)) gr.value = "";
     const peindre = () => { z.innerHTML = r.grp.map(g => `<button type="button" class="btn${g === gr.value ? " p" : ""}" data-g="${esc(g)}" style="min-height:52px;min-width:90px;font-size:18px">${esc(g)}</button>`).join("");
       z.querySelectorAll("button").forEach(b => b.onclick = () => { gr.value = b.dataset.g; peindre(); pret(); }); };
     peindre(); pret(); });
-  function pret(){ const b = $("#bEnv"); if (b) b.disabled = !(prenom(pn.value).length >= 2 && gr.value.trim().length >= 1 && traits.reduce((n, t) => n + t.length, 0) >= 8 && coche.size === o.etapes.length); }
+  function pret(){ const b = $("#bEnv"); if (!b) return; const pc = parCode(), cd = $("#cd"), gr = $("#gr");
+    $("#cdZ").hidden = !pc; $("#pnL").hidden = pn.hidden = pc;
+    const cOk = pc && cd.value.length === 3 && INFO.codes[gr.value].includes(cd.value);
+    $("#cdEr").hidden = !(pc && cd.value.length === 3 && !cOk);
+    b.disabled = !((pc ? cOk : prenom(pn.value).length >= 2) && gr.value.trim().length >= 1 && traits.reduce((n, t) => n + t.length, 0) >= 8 && coche.size === o.etapes.length); }
   $("#bEnv").onclick = async () => {
     const b = $("#bEnv"), er = $("#er"); b.disabled = true; b.textContent = "Envoi…"; er.hidden = true;
     try {
       const d = await (await fetch("comptes.json", { cache:"no-store" })).json(), c = d.comptes && d.comptes[ens];
       if (!c || !c.pub) throw new Error("ens");
-      const obj = { v:1, uid:crypto.getRandomValues(new Uint32Array(2)).join("-"), o:o.id, nom:o.nom, p:prenom(pn.value), g:gr.value.trim().replace(/[<>"]/g, "").slice(0, 20), t:Date.now(), s:traits, n:o.etapes.length };
+      const obj = { v:1, uid:crypto.getRandomValues(new Uint32Array(2)).join("-"), o:o.id, nom:o.nom, p:parCode() ? "" : prenom(pn.value), c:parCode() ? cd.value : undefined, g:gr.value.trim().replace(/[<>"]/g, "").slice(0, 20), t:Date.now(), s:traits, n:o.etapes.length };
       const deposer = async (id, pub) => { for (let n = 0; n < 400; n++){
           try { await COFFRE.deposer("passeport|" + id + "|" + n, obj, pub); return true; }
           catch(e){ if (!/refus/.test(e.message)) throw e; } } return false; };
@@ -247,7 +256,7 @@ async function vueEleve(){
       /* collègues avec qui l'enseignant partage ce groupe : chacun reçoit sa copie chiffrée */
       for (const id of new Set(INFO.part[obj.g] || [])){ const cc = d.comptes[id];
         if (id !== ens && cc && cc.pub && !cc.eleve){ try { await deposer(id, cc.pub); } catch(e) {} } }
-      try { localStorage.setItem("passPrenom", obj.p); localStorage.setItem("passGroupe", obj.g); } catch(e) {}
+      try { if (obj.p) localStorage.setItem("passPrenom", obj.p); if (obj.c) localStorage.setItem("passCode", obj.c); localStorage.setItem("passGroupe", obj.g); } catch(e) {}
       V.innerHTML = `<div class="top"><img src="${LOGO}" alt="Métier+"></div><div class="fini"><div class="rond">✓</div><h1>C'est signé !</h1>
         <p class="sous">${esc(obj.p)} · ${esc(o.nom)} · ${jour(obj.t)}<br>Ta signature est envoyée à ton enseignant.</p>
         <p class="engage">Rappel : refais les étapes chaque fois que tu utilises l'outil.</p></div>`;
@@ -266,9 +275,13 @@ let D = lireD(), GRP = localStorage.getItem("passeportGroupe") || "";
 const sauver = () => { localStorage.setItem(CLE, JSON.stringify(D)); clearTimeout(sauver.p); sauver.p = setTimeout(publierGrp, 1500); };
 /* liste publique des groupes (pour les boutons de l'élève) + partage, réécrite quand les groupes changent */
 async function publierGrp(){
-  if (!window.__moi) return; const L = groupes().filter(g => g !== "À classer"), k = JSON.stringify([L, PART]);
+  if (!window.__moi) return; const L = groupes().filter(g => g !== "À classer"), C = codesPub(L), k = JSON.stringify([L, PART, C]);
   if (localStorage.getItem("passGrpPub") === k) return;
-  try { await PARTAGE.ecrire(window.__moi, { grp:L, part:PART }); localStorage.setItem("passGrpPub", k); } catch(e) {} }
+  try { await PARTAGE.ecrire(window.__moi, { grp:L, part:PART, codes:C }); localStorage.setItem("passGrpPub", k); } catch(e) {} }
+/* codes à 3 chiffres des élèves (14 nov.) : seuls les numéros sont publics, jamais les prénoms */
+const codesPub = L => { const C = {}; L.forEach(g => C[g] = []); Object.values(D.el).forEach(e => { if (!e.x && e.c && C[e.g]) C[e.g].push(e.c); }); return C; };
+function codeLibre(){ const pris = new Set(Object.values(D.el).filter(e => !e.x && e.c).map(e => e.c));
+  for (let i = 0; i < 2000; i++){ const c = String(100 + Math.floor(Math.random() * 900)); if (!pris.has(c)) return c; } return ""; }
 const nid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 const groupes = () => Object.keys(D.grp).filter(g => D.grp[g] && !D.grp[g].x).sort((a, b) => a.localeCompare(b, "fr"));
 const eleves = g => Object.entries(D.el).filter(([, e]) => !e.x && e.g === g).map(([id, e]) => Object.assign({ id }, e)).sort((a, b) => a.p.localeCompare(b.p, "fr"));
@@ -284,6 +297,7 @@ $("#ov").onclick = e => { if (e.target.id === "ov") fermer(); };
 document.addEventListener("keydown", e => { if (e.key === "Escape") fermer(); });
 
 function dessiner(){
+  let mig = false; Object.values(D.el).forEach(e => { if (!e.x && !e.c){ e.c = codeLibre(); e.t = Date.now(); mig = true; } }); if (mig) sauver();
   const gs = groupes(); if (!gs.includes(GRP)) GRP = gs[0] || "";
   $("#grp").innerHTML = gs.length ? gs.map(g => `<option ${g === GRP ? "selected" : ""}>${esc(g)}</option>`).join("") : `<option value="">Aucun groupe</option>`;
   $("#bEl").disabled = $("#bEffG").disabled = !GRP;
@@ -292,13 +306,13 @@ function dessiner(){
   if (!GRP){ $("#tw").innerHTML = `<div class="vide">Commence par créer un groupe (ex. « 2608 »), puis imprime les codes QR des outils.</div>`; return; }
   if (!L.length){ $("#tw").innerHTML = `<div class="vide">Aucun élève dans ce groupe pour l'instant. Ajoute-les, ou attends leurs premières signatures : ils s'ajoutent tout seuls.</div>`; return; }
   $("#tw").innerHTML = `<table class="g"><thead><tr><th class="nom">Élève</th>${O.map(o => `<th>${esc(o.nom)}</th>`).join("")}</tr></thead><tbody>${
-    L.map(e => `<tr><td class="nom"><button data-el="${e.id}">${esc(e.p)}</button></td>${O.map(o => { const v = D.val[e.id + "|" + o.id];
+    L.map(e => `<tr><td class="nom"><button data-el="${e.id}">${esc(e.p)} <small class="cd">${e.c || ""}</small></button></td>${O.map(o => { const v = D.val[e.id + "|" + o.id];
       return `<td><button class="c" data-e="${e.id}" data-o="${o.id}" aria-label="${esc(e.p + " · " + o.nom)}">${v && v.d ? `<span class="ok ${v.s ? "" : "ens"}"><i>✓</i><small>${new Date(v.d).toLocaleDateString("fr-CA", { day:"numeric", month:"short" })}</small></span>` : ""}</button></td>`; }).join("")}</tr>`).join("")
   }</tbody></table>`;
   /* cellulaire : une carte par élève, une pastille par outil */
   $("#cm").innerHTML = L.map(e => { let n = 0; const ch = O.map(o => { const v = D.val[e.id + "|" + o.id], f = v && v.d; if (f) n++;
       return `<button class="c ${f ? (v.s ? "s" : "v") : ""}" data-e="${e.id}" data-o="${o.id}">${f ? "✓ " : ""}${esc(o.nom.replace(/ \(.*\)$/, ""))}</button>`; }).join("");
-    return `<div class="ce"><div class="t"><button data-el="${e.id}">${esc(e.p)}</button><small>${n} sur ${O.length}</small></div><div class="ch">${ch}</div></div>`; }).join("");
+    return `<div class="ce"><div class="t"><button data-el="${e.id}">${esc(e.p)} <small class="cd">${e.c || ""}</small></button><small>${n} sur ${O.length}</small></div><div class="ch">${ch}</div></div>`; }).join("");
 }
 function caseOuvrir(eid, oid){
   const e = D.el[eid], o = outil(oid), k = eid + "|" + oid, v = D.val[k];
@@ -312,7 +326,7 @@ function caseOuvrir(eid, oid){
 }
 function eleveOuvrir(eid){
   const e = D.el[eid];
-  ouvrir(`<h2>${esc(e.p)}</h2><label>Prénom</label><input type="text" id="aP" value="${esc(e.p)}" maxlength="22">
+  ouvrir(`<h2>${esc(e.p)}</h2><p>Son code : <b style="font-size:24px;letter-spacing:2px">${esc(e.c || "")}</b> (à donner à l'élève; il l'écrit au lieu de son prénom).</p><label>Prénom</label><input type="text" id="aP" value="${esc(e.p)}" maxlength="22">
     <label style="display:block;margin-top:10px">Groupe</label><select id="aG2" class="btn" style="width:100%">${groupes().map(g => `<option ${g === e.g ? "selected" : ""}>${esc(g)}</option>`).join("")}</select>
     <div class="act"><button class="btn" id="aX">Retirer du groupe</button><span style="flex:1"></span><button class="btn" id="aF">Annuler</button><button class="btn p" id="aOk">Enregistrer</button></div>`);
   $("#aF").onclick = fermer;
@@ -327,7 +341,7 @@ function groupeDe(g, p){
   return ou.length === 1 ? ou[0] : "À classer"; }
 function trouverEleve(p, g){
   const k = sansAcc(p); const t = Object.entries(D.el).find(([, e]) => !e.x && e.g === g && sansAcc(e.p) === k);
-  if (t) return t[0]; const id = nid(); D.el[id] = { p, g, t:Date.now() };
+  if (t) return t[0]; const id = nid(); D.el[id] = { p, g, c:codeLibre(), t:Date.now() };
   if (!D.grp[g]) D.grp[g] = { t:Date.now() }; return id; }
 
 /* signatures déposées par les élèves (chiffrées pour ma clé) : places passeport|<moi>|0, 1, 2… */
@@ -341,7 +355,8 @@ async function releve(manuel){
       try { x = await COFFRE.prendre(nom); } catch(e) { x = null; }
       if (!x){ vides++; continue; } vides = 0; n++;
       if (!D.vus[x.uid]){
-        const g = groupeDe(x.g, prenom(x.p)), eid = trouverEleve(prenom(x.p) || "Élève", g), k = eid + "|" + x.o, v = D.val[k];
+        const parCode = x.c && Object.entries(D.el).find(([, e]) => !e.x && e.c === x.c);
+        const g = parCode ? parCode[1].g : groupeDe(x.g, prenom(x.p)), eid = parCode ? parCode[0] : trouverEleve(prenom(x.p) || "Élève " + (x.c || ""), g), k = eid + "|" + x.o, v = D.val[k];
         if (!v || !v.d || v.d < x.t){ D.val[k] = { d:x.t, s:x.s, n:x.n, t:Date.now() }; neufs++; }
         D.vus[x.uid] = Date.now();
         if (!GRP) GRP = g;
