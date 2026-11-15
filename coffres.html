@@ -208,7 +208,7 @@ html.sombre .mq{background:#3a1f1d;color:#f3c2bd}
     <select id="atS" aria-label="Atelier"></select>
     <button class="btn" id="bAtN">+ Atelier</button>
     <button class="btn" id="bCfN">+ Coffre</button>
-    <button class="btn lien" id="bAtX" hidden>Retirer l'atelier</button>
+    <button class="btn lien" id="bAtX" hidden>Renommer l'atelier</button>
     <span class="esp"></span>
     <button class="btn" id="bMaj">Actualiser</button>
     <button class="btn" id="bInv" title="Début ou fin de session : chaque équipe refait l'inventaire de son coffre">Inventaire de l'atelier</button>
@@ -624,10 +624,9 @@ async function vueProf(){
     const id = vieux || "at-" + nid(); K.at[id] = Object.assign({}, K.at[id], { nom:nm, t:Date.now() }); delete K.at[id].x; AT = id;
     const nb = Math.min(40, Math.max(0, parseInt(prompt("Combien de coffres dans cet atelier ? (tu pourras en ajouter plus tard)", "10"), 10) || 0));
     for (let i = 1; i <= nb; i++) if (!coffresDe(id).some(c => c.moi && numCf(c.nom) === String(i))) nouveauCoffre(id, "Coffre " + i); localStorage.setItem("coffresAtelierChoisi", AT); sauver(); dessiner(); majPart(); };
-  { let sur = 0, tm; $("#bAtX").onclick = e => { if (!sur++){ const n = coffresDe(AT).filter(c => c.moi).length; e.target.textContent = n ? "Les codes QR de ses " + n + " coffres seront en pause jusqu'à ce que tu recrées cet atelier. Touche encore" : "Sûr ? Touche encore"; e.target.classList.add("danger"); tm = setTimeout(() => { sur = 0; e.target.textContent = "Retirer l'atelier"; e.target.classList.remove("danger"); }, 4000); return; } clearTimeout(tm); sur = 0; e.target.textContent = "Retirer l'atelier"; e.target.classList.remove("danger");
-    if (!K.at[AT]) return; const t = Date.now();
-    Object.keys(K.cf).forEach(c => { if (K.cf[c].at === AT && !K.cf[c].x) K.cf[c] = Object.assign({}, K.cf[c], { x:1, t }); }); K.at[AT] = Object.assign({}, K.at[AT], { x:1, t });
-    AT = (ateliers()[0] || [""])[0]; localStorage.setItem("coffresAtelierChoisi", AT); sauver(); dessiner(); majPart(); }; }
+  /* 15 nov. (Jeremy) : un atelier ne se retire pas, il se renomme (même code QR) */
+  $("#bAtX").onclick = () => { if (!K.at[AT]) return; const n = prompt("Nouveau nom de l'atelier", K.at[AT].nom || ""); if (!n || !n.trim()) return;
+    K.at[AT] = Object.assign({}, K.at[AT], { nom:n.trim().slice(0, 40), t:Date.now() }); sauver(); dessiner(); majPart(); };
   $("#bCfN").onclick = () => { const n = prompt("Nom du coffre (ex. « Coffre 3 » ou « Cabine 3 »)", "Coffre " + (coffresDe(AT).length + 1)); if (!n || !n.trim()) return;
     const id = nouveauCoffre(AT, n.trim().slice(0, 40)); sauver(); dessiner(); coffreOuvrir(id); };
   $("#cfs").onclick = e => { const b = e.target.closest("[data-cf]"); if (b) coffreOuvrir(b.dataset.cf); };

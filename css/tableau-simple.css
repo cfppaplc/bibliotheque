@@ -106,3 +106,4 @@ body:has(.reader.open:not(.wbon)) .toast{bottom:calc(98px + env(safe-area-inset-
 #wbRegle .rinfo button,#wbRegle .rx{border:0;border-radius:8px;background:#EB6A22;color:#fff;font-weight:700;font-size:14px;min-width:40px;height:32px;padding:0 10px;cursor:pointer}
 #wbRegle .rx{position:absolute;right:54px;bottom:6px}
 #wbRegle .rot{position:absolute;right:-22px;top:50%;width:44px;height:44px;margin-top:-22px;border-radius:50%;background:#EB6A22;border:3px solid #fff;cursor:grab;display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;box-shadow:0 4px 12px rgba(0,0,0,.35)}
+body:has(.reader.wbon.open) .toast{display:none!important}   /* 15 nov. (Jeremy) : aucun petit message sur le tableau blanc, « ça nuit plus que ça aide » */

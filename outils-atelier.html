@@ -192,7 +192,7 @@ main{max-width:1500px}
 <dialog id="partDlg"></dialog>
 <dialog id="locDlg"></dialog>
 <dialog id="gaAide"><h3>Gestion d'atelier</h3>
-<p><b>Élèves</b> : chaque élève, ses formations et son coffre. Touche un élève pour voir sa fiche et choisir son équipe.</p>
+<p><b>Élèves</b> : chaque élève, ses formations et son coffre. Touche un élève pour voir sa fiche (son état). Les équipes et leurs coffres se placent dans Réglages du groupe → Placer les équipes.</p>
 <p><b>Réglages du groupe</b> (bouton à côté du groupe) : placer les équipes, choisir les locaux, partager avec un collègue.</p>
 <p><b>Équipes</b> : Réglages du groupe → « Placer les équipes », puis le numéro de chaque élève. L'équipe 3 a le coffre 3 du local du groupe, comme au ménage. Changer un élève d'équipe fait refaire l'inventaire du coffre.</p>
 <p><b>Locaux</b> : dans Réglages du groupe, coche les locaux où il a des coffres (ex. atelier et local d'électricité). En fin de session, décoche le local : chaque équipe remet son coffre. À la session suivante, coche le nouveau.</p>
@@ -283,13 +283,18 @@ main{max-width:1500px}
     /* 15 nov. (« cliquer-glisser pour créer une équipe », fait à l'ordinateur) : en plaçant, une colonne par équipe */
     if (PLACE){ const T = E.filter(e => e.g === g).sort((a, b) => a.p.localeCompare(b.p, "fr")), carte = e => `<div class="pb-c" draggable="true" data-el="${e.id}"><b>${esc(e.p)}</b>${e.c ? `<small>${esc(e.c)}</small>` : ""}</div>`;
       L.innerHTML = `<div class="pb">${[0, ...Array.from({ length:nbEq() }, (_, i) => i + 1)].map(n => { const M = T.filter(e => (e.eq || 0) === n), cfs = n ? coffresDe(n) : [];
-        return `<div class="pb-col${n ? "" : " sans"}" data-col="${n}"><div class="pb-t">${n ? "Équipe " + n : "Sans équipe"}<span>${M.length}</span></div>${n && cfs.length === 1 ? `<div class="pb-s">${esc(cfs[0].nom)}</div>` : ""}${M.map(carte).join("")}</div>`; }).join("")}</div>`;
+        return `<div class="pb-col${n ? "" : " sans"}" data-col="${n}"><div class="pb-t">${n ? "Équipe " + n : "Sans équipe"}<span>${M.length}</span></div>${n ? cfaSel(n, M) : ""}${M.map(carte).join("")}</div>`; }).join("")}</div>`;
       return; }
     if (q || !(avecCoffres() || R.some(e => e.eq))){ L.innerHTML = R.map(ligne).join(""); return; }   /* en plaçant : liste par nom, les lignes ne sautent pas */
     const eqs = [...new Set(R.map(e => e.eq || 0))].sort((a, b) => (a || 999) - (b || 999));
     L.innerHTML = eqs.map(n => { const cfs = coffresDe(n);
       return `<div class="pe-eq">${n ? "Équipe " + n : "Sans équipe"}${n && cfs.length === 1 ? `<span>· ${esc(cfs[0].nom)}</span>` : ""}</div>` + R.filter(e => (e.eq || 0) === n).map(ligne).join(""); }).join("");
   }
+  /* coffre de l'équipe n dans chaque local (déplacé de la fiche de l'élève, 15 nov.) */
+  function cfaSel(n, M){ if (!avecCoffres()) return ""; const e = M[0] || {};
+    return grpAts().map(a => { const N = [...new Set(COg().filter(c => c.at === a && c.n).map(c => c.n))].sort((x, y) => x - y); if (!N.length) return "";
+      const v = (e.cfa || {})[a] || 0;
+      return `<div class="pb-s">${grpAts().length > 1 ? esc(nomAt(a)) + " : " : ""}<select data-cfa="${esc(a)}" data-n="${n}" ${M.length ? "" : "disabled"} style="font:inherit;font-size:12px;border-radius:6px;max-width:100%"><option value="0">Coffre ${n}</option>${N.filter(x => x !== n).map(x => `<option value="${x}" ${v === x ? "selected" : ""}>Coffre ${x}</option>`).join("")}<option value="-1" ${v === -1 ? "selected" : ""}>Aucun coffre</option></select></div>`; }).join(""); }
   /* fiche de l'élève */
   function fiche(id){
     const e = E.find(x => x.id === id); if (!e) return; const dlg = $("#fiche"), cfs = coffresEl(e), max = nbEq();
@@ -303,18 +308,13 @@ main{max-width:1500px}
     H.sort((a, b) => b[0] - a[0]);
     const ini = (e.p || "?").split(/\s+/).map(m => m[0]).join("").slice(0, 2).toUpperCase();
     dlg.innerHTML = `<div class="fi-t"><div class="fi-av">${esc(ini)}</div><div><h3>${esc(e.p)}</h3><small>${esc(e.g || "")}${e.c ? " · code " + esc(e.c) : ""}</small></div>${ADM() ? `<button data-mod class="fi-imp" style="margin-left:auto;font:inherit;font-size:13px;font-weight:700;color:#EB6A22;background:none;border:0;cursor:pointer;min-height:40px">Modifier</button>` : ""}<button data-x aria-label="Fermer">✕</button></div>
-      <div class="fi-b"><h4>Équipe (coffre et ménage)</h4>${ADM() ? `<div class="fi-eq"><button data-eq="0" class="${e.eq ? "" : "on"}">Aucune</button>${Array.from({ length:max }, (_, i) => `<button data-eq="${i + 1}" class="${e.eq === i + 1 ? "on" : ""}">${i + 1}</button>`).join("")}</div>
-      <p class="fi-note">Changer d'équipe fait refaire l'inventaire des coffres touchés : l'équipe qui quitte le remet, la nouvelle le prend.</p>` : `<div class="fi-l"><div>${e.eq ? "Équipe " + e.eq : "Aucune équipe"}</div></div><p class="fi-note">Seul l'administrateur place les élèves dans les équipes.</p>`}
-      ${ADM() && e.eq && avecCoffres() ? `<h4>Coffre de l'équipe ${e.eq} par local</h4><div class="fi-l">${grpAts().map(a => { const N = [...new Set(COg().filter(c => c.at === a && c.n).map(c => c.n))].sort((x, y) => x - y); if (!N.length) return "";
-        return `<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">${esc(nomAt(a))}<select data-cfa="${esc(a)}" style="margin-left:auto;min-height:40px;border-radius:8px;padding:0 8px;font:inherit"><option value="0">Coffre ${e.eq} (même numéro que l'équipe)</option>${N.filter(x => x !== e.eq).map(x => `<option value="${x}" ${(e.cfa || {})[a] === x ? "selected" : ""}>Coffre ${x}</option>`).join("")}<option value="-1" ${(e.cfa || {})[a] === -1 ? "selected" : ""}>Aucun coffre dans ce local</option></select></div>`; }).join("")}</div><p class="fi-note">S'applique à toute l'équipe ${e.eq}. « Aucun coffre » enlève le lien sans effacer le coffre.</p>` : ""}
+      <div class="fi-b"><h4>Équipe (coffre et ménage)</h4><div class="fi-l"><div>${e.eq ? "Équipe " + e.eq : "Aucune équipe"}</div></div>${ADM() ? `<p class="fi-note">Pour changer l'équipe ou le coffre : Réglages du groupe → Placer les équipes.</p>` : ""}
       <h4>Coffre${cfs.length > 1 ? "s" : ""}</h4><div class="fi-l">${cfs.length ? cfs.map(cf => `<div><span class="s ${cf.s.mq.length ? "r" : "ok"}">${cf.s.mq.length ? "!" : "✓"}</span>${esc(cf.nom)}${grpAts().length > 1 ? " · " + esc(nomAt(cf.at)) : ""}<small>${cf.s.mq.length ? "Manque : " + esc(cf.s.mq.join(", ")) : cf.s.att ? "changement d'équipe en cours" : cf.s.der ? "" : "pas encore scanné"}</small></div>`).join("") : `<div><span class="s">–</span>${e.eq ? "Aucun coffre numéro " + e.eq : "Choisis son équipe pour lui donner un coffre"}</div>`}</div>
       <h4>Formations · ${O.length - reste} sur ${O.length}</h4><div class="fi-l">${fo || `<div><span class="s">–</span>Aucune formation encore</div>`}</div>
       <h4>Historique <button class="fi-imp" data-imp style="float:right;font:inherit;font-size:13px;font-weight:700;color:#EB6A22;background:none;border:0;cursor:pointer;min-height:40px">Imprimer tout</button></h4><div class="fi-l">${H.slice(0, 10).map(([t, x]) => `<div>${esc(x)}<small>${date(t)}</small></div>`).join("") || `<div>Rien encore</div>`}</div></div>`;
     dlg.querySelector("[data-x]").onclick = () => dlg.close();
     { const m = dlg.querySelector("[data-mod]"); if (m) m.onclick = () => { dlg.close(); viaFormations(w => w.eleveOuvrir(e.id)); }; }
     dlg.querySelector("[data-imp]").onclick = () => mpImprimer("Historique · " + e.p, [e.g, e.c ? "code " + e.c : "", e.eq ? "équipe " + e.eq : ""].filter(Boolean).join(" · "), ["Date et heure", "Action"], H.map(([t, x]) => [mpDateHeure(t), x]));
-    dlg.querySelectorAll("[data-eq]").forEach(b => b.onclick = () => { changerEquipe(id, +b.dataset.eq); });
-    dlg.querySelectorAll("[data-cfa]").forEach(sel => sel.onchange = () => changerCoffre(E.filter(z => z.g === e.g && z.eq === e.eq).map(z => z.id), x => { x.cfa = Object.assign({}, x.cfa); const v = +sel.value; if (v) x.cfa[sel.dataset.cfa] = v; else delete x.cfa[sel.dataset.cfa]; if (!Object.keys(x.cfa).length) delete x.cfa; }));
     if (!dlg.open) dlg.showModal();
   }
   /* codes des élèves de l'équipe n dans le local at (même règle que coffres.html) */
@@ -393,6 +393,8 @@ main{max-width:1500px}
     L.addEventListener("dragstart", ev => { const c = ev.target.closest(".pb-c"); if (!c) return; id = c.dataset.el; c.classList.add("glisse"); ev.dataTransfer.effectAllowed = "move"; try { ev.dataTransfer.setData("text/plain", id); } catch(e) {} });
     L.addEventListener("dragend", ev => { const c = ev.target.closest(".pb-c"); if (c) c.classList.remove("glisse"); L.querySelectorAll(".pb-col.sur").forEach(x => x.classList.remove("sur")); });
     L.addEventListener("dragover", ev => { const col = ev.target.closest(".pb-col"); if (!col || !id) return; ev.preventDefault(); L.querySelectorAll(".pb-col.sur").forEach(x => x !== col && x.classList.remove("sur")); col.classList.add("sur"); });
+    L.addEventListener("change", ev => { const sel = ev.target.closest("select[data-cfa]"); if (!sel) return; const n = +sel.dataset.n, g = groupe();
+      changerCoffre(E.filter(z => z.g === g && z.eq === n).map(z => z.id), x => { x.cfa = Object.assign({}, x.cfa); const v = +sel.value; if (v) x.cfa[sel.dataset.cfa] = v; else delete x.cfa[sel.dataset.cfa]; if (!Object.keys(x.cfa).length) delete x.cfa; }); });
     L.addEventListener("drop", ev => { const col = ev.target.closest(".pb-col"); if (!col || !id) return; ev.preventDefault(); const n = +col.dataset.col, e = E.find(z => z.id === id); const i = id; id = null;
       if (e && (e.eq || 0) !== n) changerEquipe(i, n, true); else dessiner(); }); }
   $("#peL").onclick = ev => { const p = ev.target.closest("[data-pl]"), r = ev.target.closest("[data-el]"); if (!r) return;
