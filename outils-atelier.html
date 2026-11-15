@@ -342,7 +342,7 @@ main{max-width:1500px}
       const ids = touches.map(([cid]) => cid).filter(cid => !ann.includes(cid) && (() => { const c = C.K.cf[cid], st = C.etat(Object.assign({ id:cid }, c));
         const dn = Object.values(C.K.ev).filter(e => e.cf === cid && e.k === "nouveau").pop(), pr = Object.values(C.K.ev).filter(e => e.cf === cid && (e.k === "ok" || e.k === "manque") && (!dn || e.d > dn.d));
         return pr.length && !st.att; })());
-      lancer(C, ids, avant); if (ann.length) toast(ann.length > 1 ? "Changements annulés : les coffres reviennent comme avant." : "Changement annulé : le coffre revient comme avant."); setTimeout(() => C.publier(), 300); }
+      if (PLACE) ids.forEach(cid => { if (!PEND[cid]) PEND[cid] = avant[cid]; }); else lancer(C, ids, avant); if (ann.length) toast(ann.length > 1 ? "Changements annulés : les coffres reviennent comme avant." : "Changement annulé : le coffre revient comme avant."); setTimeout(() => C.publier(), 300); }
     charger(); dessiner(); if (!sansFiche) fiche(id);
   }
   function toast(t){ let d = document.querySelector(".ga-toast"); if (!d){ d = document.createElement("div"); d.className = "ga-toast"; document.body.appendChild(d); } d.textContent = t; d.classList.add("on"); clearTimeout(toast.t); toast.t = setTimeout(() => d.classList.remove("on"), 3500); }
@@ -381,10 +381,32 @@ main{max-width:1500px}
     if (!PLACE) fiche(r.dataset.el); };
   /* Placer les équipes : chaque élève a ses numéros sur sa ligne (administrateur) */
   let PLACE = false;
-  $("#pePl").onclick = () => { PLACE = false; dessiner(); };
-  $("#plFin").onclick = () => { PLACE = false; dessiner(); };
-  document.addEventListener("keydown", ev => { if (ev.key === "Escape" && PLACE){ PLACE = false; dessiner(); } });
-  document.querySelector('.ga-ong [data-t="el"]').addEventListener("click", () => { if (PLACE){ PLACE = false; dessiner(); } });
+  /* 15 nov. (« je place mes équipes en début d'année, je ne veux pas que les coffres tombent en changement d'inventaire trop vite ») :
+     pendant « Placer les équipes », rien ne change pour les coffres; à la fin, on choisit quoi faire des coffres touchés. */
+  const PEND = {};
+  function finPlace(){
+    if (!PLACE) return; PLACE = false; dessiner();
+    const C = CF(); if (!C) return;
+    const ids = Object.keys(PEND).filter(cid => { const c = C.K.cf[cid]; if (!c || c.x) return false; const st = C.etat(Object.assign({ id:cid }, c));
+      return !st.att && (codesEq(numC(c.nom), c.at) || []).join() !== (PEND[cid].eqAvant || []).join(); });
+    const avant = Object.assign({}, PEND); Object.keys(PEND).forEach(k => delete PEND[k]); if (!ids.length) return;
+    const dlg = $("#locDlg"), n = ids.length, s2 = n > 1 ? "s" : "";
+    dlg.innerHTML = `<h3>Équipes placées</h3><p>${n} coffre${s2} ${n > 1 ? "ont" : "a"} une nouvelle équipe. Pour l'instant, rien n'a changé pour ${n > 1 ? "ces coffres" : "ce coffre"}.</p>
+      <div style="display:grid;gap:10px;margin:12px 0">
+        <button data-c="prise" class="on" style="text-align:left;min-height:56px;padding:10px 14px"><b>Les nouvelles équipes prennent leur coffre</b><br><small>Début d'année : chaque équipe fait l'inventaire complet à son premier scan.</small></button>
+        <button data-c="rem" style="text-align:left;min-height:56px;padding:10px 14px"><b>Remise par l'ancienne équipe, puis prise</b><br><small>En cours d'année : l'équipe qui quitte vérifie le coffre avant.</small></button>
+        <button data-c="tard" style="text-align:left;min-height:56px;padding:10px 14px"><b>Plus tard</b><br><small>Les coffres restent comme avant. Tu lanceras l'inventaire avec « Inventaire de l'atelier » ou « Changer l'état… ».</small></button>
+      </div>`;
+    dlg.querySelectorAll("[data-c]").forEach(b => b.onclick = () => { const k = b.dataset.c; dlg.close(); if (k === "tard") return;
+      lancer(C, ids, avant); if (k === "prise"){ ids.forEach(cid => { const c = C.K.cf[cid]; if (c){ c.chg = false; c.t = Date.now(); } }); C.sauver(); }
+      setTimeout(() => C.publier(), 300); charger(); dessiner();
+      toast(k === "prise" ? "Les nouvelles équipes peuvent prendre leur coffre." : "Remise à faire par les anciennes équipes."); });
+    dlg.showModal();
+  }
+  $("#pePl").onclick = finPlace;
+  $("#plFin").onclick = finPlace;
+  document.addEventListener("keydown", ev => { if (ev.key === "Escape" && PLACE) finPlace(); });
+  document.querySelector('.ga-ong [data-t="el"]').addEventListener("click", () => { if (PLACE) finPlace(); });
   /* boutons du registre sur la page Élèves : ouvrent la fenêtre dans l'onglet Formations, puis reviennent */
   function viaFormations(id){ const w = fFo.contentWindow, d = w && w.document; if (!d) return;
     const bt = typeof id === "function" ? null : d.getElementById(id); if (!bt && typeof id !== "function") return;
