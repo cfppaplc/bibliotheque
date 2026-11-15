@@ -150,7 +150,10 @@ main{max-width:1500px}
     const q = sansAcc($("#peQ").value), g = $("#peG").value;
     const R = E.filter(e => q ? (sansAcc(e.p).includes(q) || String(e.c || "").includes(q)) : e.g === g).sort((a, b) => a.p.localeCompare(b.p, "fr"));
     L.innerHTML = R.map(e => {
-      let n = 0; const f = O.map(o => { const v = D.val[e.id + "|" + o.id]; if (forme(v)) { n++; return `<span class="ok">✓ ${esc(o.nom)}</span>`; } return aDemo(v) ? `<span class="dm">◐ ${esc(o.nom)}</span>` : ""; }).join("");
+      /* seulement les 3 plus récentes (démos à faire d'abord), le reste en « +N » */
+      let n = 0; const T = [];
+      O.forEach(o => { const v = D.val[e.id + "|" + o.id]; if (forme(v)) { n++; T.push([v.m || v.d, `<span class="ok">✓ ${esc(o.nom)}</span>`]); } else if (aDemo(v)) T.push([9e15, `<span class="dm">◐ ${esc(o.nom)}</span>`]); });
+      T.sort((a, b) => b[0] - a[0]); const f = T.slice(0, 3).map(t => t[1]).join("") + (T.length > 3 ? `<span>+${T.length - 3}</span>` : "");
       const C = resp.filter(r => aLui(e, r.w));
       const c = C.length ? C.map(r => `<div><span class="pt ${r.mq.length ? "r" : ""}"></span><b>${esc(r.nom)}</b><small>${r.mq.length ? "Manque : " + esc(r.mq.join(", ")) : "Tout est là"} · ${quand(r.w.d)}</small></div>`).join("") : `<small>Aucun coffre</small>`;
       return `<div class="pe-r"><div class="pe-n"><b>${esc(e.p)}</b><small>${esc(e.g || "")}${e.c ? " · code " + esc(e.c) : ""}</small></div><div class="pe-f"><em>${n} sur ${O.length}</em>${f}</div><div class="pe-c">${c}</div></div>`; }).join("") || `<div class="pe-vide">Aucun élève trouvé.</div>`; }
