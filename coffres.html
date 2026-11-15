@@ -174,6 +174,8 @@ html.sombre .mq{background:#3a1f1d;color:#f3c2bd}
 .lst .lr .pl.r{margin-left:auto}
 .lst .lr.e{border:0;padding:4px 0}.lst .lr.e input{flex:1;min-height:44px;border-radius:10px;border:1px solid var(--ligne);background:var(--carte2);color:var(--txt);padding:0 12px}
 .stp{display:inline-flex;align-items:center;border:1px solid var(--ligne);border-radius:10px;overflow:hidden}.stp button{border:0;background:var(--carte2);color:var(--txt);width:36px;height:42px;font-size:18px;cursor:pointer}.stp b{min-width:30px;text-align:center}
+.lr.e .ck{display:grid;place-items:center;width:40px;height:42px;cursor:pointer}.lr.e .ck input{width:24px;height:24px;accent-color:#1E8A55}
+.lr.e.off .stp,.lr.e.off input[type=text]{opacity:.45}
 .lr .x{border:0;background:none;color:var(--gris);font-size:16px;width:40px;height:42px;cursor:pointer}
 .ajt{margin-top:8px;min-height:42px}
 .lact{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.lact select{min-height:46px;border-radius:10px;border:1px solid var(--ligne);background:var(--carte);color:var(--txt);padding:0 10px}
@@ -399,21 +401,28 @@ function coffreOuvrir(id){
   const lst = $("#lst"), ed = () => lst.classList.contains("ed");
   const peindre = () => {
     if (!ed()){ lst.innerHTML = L.length ? L.map(x => `<div class="lr"><span class="q">${x.q}</span><span>${esc(x.n)}</span>${s.mq[x.n] ? `<span class="pl r">${s.mq[x.n].e === "b" ? "Brisé" : "Manquant"}</span>` : ""}</div>`).join("") : `<p class="info">Le premier élève qui scanne le coffre écrira son contenu.</p>`; }
-    else { lst.innerHTML = L.map((x, i) => `<div class="lr e"><span class="stp"><button data-m="${i}">−</button><b>${x.q}</b><button data-p="${i}">+</button></span><input type="text" data-n="${i}" value="${esc(x.n)}" placeholder="Nom de l'outil" maxlength="60"><button class="x" data-x="${i}" title="Retirer">✕</button></div>`).join("")
+    else { /* 14 nov. : outils des autres coffres de l'atelier proposés à cocher; on coche ce qui est présent et on ajuste les quantités */
+      if (!peindre.cat){ peindre.cat = 1; const vu = new Set(L.map(x => x.n.toLowerCase())); L.forEach(x => x.on = true);
+        const Q = {}; Object.entries(K.cf).forEach(([i, c]) => { if (i === id || c.x || c.at !== cf.at) return; (c.liste || []).forEach(x => { const k = x.n.toLowerCase(); (Q[k] = Q[k] || { n:x.n, q:{} }).q[x.q] = (Q[k].q[x.q] || 0) + 1; }); });
+        Object.values(Q).sort((a, b) => a.n.localeCompare(b.n, "fr")).forEach(o => { if (vu.has(o.n.toLowerCase())) return; const q = +Object.entries(o.q).sort((a, b) => b[1] - a[1])[0][0]; L.push({ q, n:o.n, on:false }); }); }
+      const nOn = L.filter(x => x.on && String(x.n).trim()).length;
+      lst.innerHTML = (L.some(x => !x.on) ? `<p class="info" style="margin:0 0 6px">Coche les outils présents dans ce coffre et ajuste les quantités. <b>${nOn}</b> coché${nOn > 1 ? "s" : ""}.</p>` : "")
+        + L.map((x, i) => `<div class="lr e${x.on ? "" : " off"}"><label class="ck"><input type="checkbox" data-c="${i}" ${x.on ? "checked" : ""}></label><span class="stp"><button data-m="${i}">−</button><b>${x.q}</b><button data-p="${i}">+</button></span><input type="text" data-n="${i}" value="${esc(x.n)}" placeholder="Nom de l'outil" maxlength="60"><button class="x" data-x="${i}" title="Retirer de la liste">✕</button></div>`).join("")
         + `<button class="btn ajt" id="aAj">+ Ajouter un article</button>`;
-      lst.querySelectorAll("[data-m]").forEach(b => b.onclick = () => { const x = L[+b.dataset.m]; x.q = Math.max(1, x.q - 1); peindre(); });
-      lst.querySelectorAll("[data-p]").forEach(b => b.onclick = () => { const x = L[+b.dataset.p]; x.q = Math.min(99, x.q + 1); peindre(); });
+      lst.querySelectorAll("[data-c]").forEach(c => c.onchange = () => { L[+c.dataset.c].on = c.checked; peindre(); });
+      lst.querySelectorAll("[data-m]").forEach(b => b.onclick = () => { const x = L[+b.dataset.m]; x.q = Math.max(1, x.q - 1); x.on = true; peindre(); });
+      lst.querySelectorAll("[data-p]").forEach(b => b.onclick = () => { const x = L[+b.dataset.p]; x.q = Math.min(99, x.q + 1); x.on = true; peindre(); });
       lst.querySelectorAll("[data-n]").forEach(t => t.oninput = () => { L[+t.dataset.n].n = t.value; });
       lst.querySelectorAll("[data-x]").forEach(b => b.onclick = () => { L.splice(+b.dataset.x, 1); peindre(); });
-      $("#aAj").onclick = () => { L.push({ q:1, n:"" }); peindre(); const t = lst.querySelectorAll("[data-n]"); t[t.length - 1].focus(); };
-      if (!L.length){ L.push({ q:1, n:"" }); peindre(); return; }
+      $("#aAj").onclick = () => { L.push({ q:1, n:"", on:true }); peindre(); const t = lst.querySelectorAll("[data-n]"); t[t.length - 1].focus(); };
+      if (!L.length){ L.push({ q:1, n:"", on:true }); peindre(); return; }
       $("#aOk").hidden = false; if ($("#aMod")) $("#aMod").hidden = true; }
   };
   peindre();
   $("#aF").onclick = fermer;
   if ($("#aMod")){ if (!liste.length) $("#aMod").hidden = true; $("#aMod").onclick = () => { lst.classList.add("ed"); peindre(); }; }
-  if ($("#aCp")) $("#aCp").onchange = e => { const c = K.cf[e.target.value]; if (!c) return; L = c.liste.map(x => ({ q:x.q, n:x.n })); lst.classList.add("ed"); peindre(); };
-  $("#aOk").onclick = () => { const c = K.cf[id]; c.liste = L.map(x => ({ q:x.q, n:String(x.n).trim().slice(0, 60) })).filter(x => x.n); delete c.prop; c.t = Date.now(); sauver(); fermer(); dessiner(); toast(prop ? "Liste approuvée" : "Liste enregistrée"); };
+  if ($("#aCp")) $("#aCp").onchange = e => { const c = K.cf[e.target.value]; if (!c) return; L = c.liste.map(x => ({ q:x.q, n:x.n, on:true })); peindre.cat = 0; lst.classList.add("ed"); peindre(); };
+  $("#aOk").onclick = () => { const c = K.cf[id]; c.liste = L.filter(x => x.on !== false).map(x => ({ q:x.q, n:String(x.n).trim().slice(0, 60) })).filter(x => x.n); delete c.prop; c.t = Date.now(); sauver(); fermer(); dessiner(); toast(prop ? "Liste approuvée" : "Liste enregistrée"); };
   if ($("#aLib")) $("#aLib").onclick = () => { nouvelInventaire([id]); fermer(); toast("L'équipe qui quitte fait la remise en scannant le coffre"); };
   if ($("#aSaut")) $("#aSaut").onclick = () => { const c = K.cf[id]; c.chg = false; c.t = Date.now(); sauver(); fermer(); dessiner(); toast("La nouvelle équipe peut prendre le coffre"); };
   if ($("#aRg")) $("#aRg").onclick = () => { K.ev["r" + nid()] = { cf:id, k:"regle", d:Date.now(), t:Date.now() }; sauver(); fermer(); dessiner(); toast("Coffre remis en ordre"); };
