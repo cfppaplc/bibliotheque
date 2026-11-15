@@ -125,12 +125,13 @@ main{max-width:1500px}
   const $ = q => document.querySelector(q), esc = t => String(t ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
   const sansAcc = t => String(t || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
   const lire = k => { try { return JSON.parse(localStorage.getItem(k) || "null") || {}; } catch(e) { return {}; } };
-  const D = lire("passeportOutils"), K = lire("coffresAtelier"); D.el = D.el || {}; D.val = D.val || {}; K.cf = K.cf || {}; K.ev = K.ev || {};
+  let D, K, resp, E, G, aLui;
   let O = []; try { O = (await (await fetch("protocoles.json", { cache:"no-cache" })).json()).outils || []; } catch(e) {}
   const forme = v => !!(v && v.d && (v.m || !v.s)), aDemo = v => !!(v && v.d && v.s && !v.m);
   const quand = t => { const j = Math.floor((Date.now() - t) / 864e5); return j <= 0 ? "aujourd'hui" : j === 1 ? "hier" : "depuis " + j + " jours"; };
-  /* responsable actuel de chaque coffre (même règle que la page des coffres) */
-  const resp = [];
+  function charger(){
+  D = lire("passeportOutils"); K = lire("coffresAtelier"); D.el = D.el || {}; D.val = D.val || {}; K.cf = K.cf || {}; K.ev = K.ev || {};
+  resp = [];
   for (const [id, cf] of Object.entries(K.cf)){ if (cf.x) continue;
     const E = Object.values(K.ev).filter(e => e.cf === id).sort((a, b) => a.d - b.d);
     let dr = 0; E.forEach(e => { if (e.k === "regle") dr = e.d; });
@@ -138,13 +139,14 @@ main{max-width:1500px}
     const pr = E.filter(e => e.k === "ok" || e.k === "manque"), der = pr[pr.length - 1], dn = E.filter(e => e.k === "nouveau").pop();
     if (!der || (dn && dn.d > der.d)) continue;
     resp.push({ nom:cf.nom, w:der, mq }); }
-  const aLui = (e, w) => [[w.c, w.p], [w.c2, w.p2]].some(([c, p]) => (c && e.c && String(c) === String(e.c)) || (!c && p && sansAcc(p) === sansAcc(e.p)));
-  const E = Object.entries(D.el).filter(([, e]) => !e.x).map(([id, e]) => Object.assign({ id }, e));
-  const G = [...new Set(E.map(e => e.g).filter(Boolean))].sort((a, b) => a.localeCompare(b, "fr", { numeric:true }));
-  let g0 = localStorage.getItem("passeportGroupe") || ""; if (!G.includes(g0)) g0 = G[0] || "";
+  aLui = (e, w) => [[w.c, w.p], [w.c2, w.p2]].some(([c, p]) => (c && e.c && String(c) === String(e.c)) || (!c && p && sansAcc(p) === sansAcc(e.p)));
+  E = Object.entries(D.el).filter(([, e]) => !e.x).map(([id, e]) => Object.assign({ id }, e));
+  G = [...new Set(E.map(e => e.g).filter(Boolean))].sort((a, b) => a.localeCompare(b, "fr", { numeric:true }));
+  let g0 = $("#peG").value || localStorage.getItem("passeportGroupe") || ""; if (!G.includes(g0)) g0 = G[0] || "";
   $("#peG").innerHTML = G.map(g => `<option ${g === g0 ? "selected" : ""}>${esc(g)}</option>`).join("") || "<option>Aucun groupe</option>";
+  }
   function dessiner(){
-    const L = $("#peL"); if (!E.length){ L.innerHTML = `<div class="pe-vide">Aucun élève sur cet appareil pour l'instant. Ouvre le Registre de formation et les coffres une fois : les élèves apparaîtront ici.</div>`; return; }
+    const L = $("#peL"); if (!E.length){ L.innerHTML = `<div class="pe-vide">Chargement du registre et des coffres…</div>`; return; }
     const q = sansAcc($("#peQ").value), g = $("#peG").value;
     const R = E.filter(e => q ? (sansAcc(e.p).includes(q) || String(e.c || "").includes(q)) : e.g === g).sort((a, b) => a.p.localeCompare(b.p, "fr"));
     L.innerHTML = R.map(e => {
@@ -152,7 +154,14 @@ main{max-width:1500px}
       const C = resp.filter(r => aLui(e, r.w));
       const c = C.length ? C.map(r => `<div><span class="pt ${r.mq.length ? "r" : ""}"></span><b>${esc(r.nom)}</b><small>${r.mq.length ? "Manque : " + esc(r.mq.join(", ")) : "Tout est là"} · ${quand(r.w.d)}</small></div>`).join("") : `<small>Aucun coffre</small>`;
       return `<div class="pe-r"><div class="pe-n"><b>${esc(e.p)}</b><small>${esc(e.g || "")}${e.c ? " · code " + esc(e.c) : ""}</small></div><div class="pe-f"><em>${n} sur ${O.length}</em>${f}</div><div class="pe-c">${c}</div></div>`; }).join("") || `<div class="pe-vide">Aucun élève trouvé.</div>`; }
-  $("#peG").onchange = dessiner; $("#peQ").oninput = dessiner; dessiner();
+  $("#peG").onchange = dessiner; $("#peQ").oninput = dessiner; charger(); dessiner();
+  /* toujours à jour, sans manipulation : le registre et les coffres tournent cachés dans la page (mêmes pages que d'habitude :
+     relevé des signatures, coffre en ligne, collègues); la liste se redessine quand leurs données changent */
+  let fin = 0; const maj = () => { clearTimeout(fin); fin = setTimeout(() => { charger(); dessiner(); }, 300); };
+  addEventListener("storage", e => { if (!e.key || e.key === "passeportOutils" || e.key === "coffresAtelier") maj(); });
+  ["passeport.html", "coffres.html"].forEach(u => { const f = document.createElement("iframe"); f.src = u; f.tabIndex = -1; f.setAttribute("aria-hidden", "true");
+    f.style.cssText = "position:absolute;left:-9999px;top:0;width:1200px;height:800px;border:0;visibility:hidden"; document.body.appendChild(f); });
+  setTimeout(() => { if (!E.length) $("#peL").innerHTML = `<div class="pe-vide">Aucun élève pour l'instant. Ils apparaissent ici dès qu'ils signent une formation ou scannent un coffre.</div>`; }, 15000);
 })();
 </script>
 </body>
