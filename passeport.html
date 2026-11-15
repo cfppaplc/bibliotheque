@@ -186,11 +186,11 @@ const PARTAGE = (() => {
   const API = "https://kjlotlhqrgekzohshmbn.supabase.co/rest/v1/rpc/", CLEAPI = "sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY";
   const id = async ens => [...new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode("metier+|partage-passeport|" + ens)))].map(b => b.toString(16).padStart(2, "0")).join("");
   const rpc = async (f, a) => { const r = await fetch(API + f, { method:"POST", headers:{ apikey:CLEAPI, "Content-Type":"application/json" }, body:JSON.stringify(a) }); if (!r.ok) throw new Error("coffre " + r.status); return r.json(); };
-  async function lire(ens){ try { const r = await rpc("coffre_lire", { p_id:await id(ens) }), row = r && r[0]; const v = row && row.data ? JSON.parse(row.data) : {}; return { grp:v.grp || [], part:v.part || {}, codes:v.codes || null }; } catch(e){ return { grp:[], part:{}, codes:null }; } }
+  async function lire(ens){ try { const r = await rpc("coffre_lire", { p_id:await id(ens) }), row = r && r[0]; const v = row && row.data ? JSON.parse(row.data) : {}; return { grp:v.grp || [], part:v.part || {}, codes:v.codes || null, suivi:v.suivi || [] }; } catch(e){ return { grp:[], part:{}, codes:null, suivi:[] }; } }
   async function ecrire(ens, o){
     let j = localStorage.getItem("passPartageJeton");
     if (!j){ j = btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(32)))); localStorage.setItem("passPartageJeton", j); }
-    if (await rpc("coffre_ecrire", { p_id:await id(ens), p_jeton:j, p_env:"public", p_data:JSON.stringify({ grp:o.grp, part:o.part, codes:o.codes || null, t:Date.now() }) }) !== true) throw new Error("refus");
+    if (await rpc("coffre_ecrire", { p_id:await id(ens), p_jeton:j, p_env:"public", p_data:JSON.stringify({ grp:o.grp, part:o.part, codes:o.codes || null, suivi:o.suivi || suivis(), t:Date.now() }) }) !== true) throw new Error("refus");
   }
   return { lire, ecrire };
 })();
@@ -203,11 +203,18 @@ async function vueEleve(){
   if (!o){ V.innerHTML = `<div class="top"><img src="${LOGO}" alt="Métier+"></div><h1>Outil introuvable</h1><p class="sous">Ce code QR ne correspond à aucun outil. Avise ton enseignant.</p>`; return; }
   const ens = Q.get("e") || "", grp = Q.get("g") || "";
   let faits = {}; try { faits = JSON.parse(localStorage.getItem("passFaits") || "{}"); } catch(e) {}
-  if (faits[o.id] && !Q.get("formation") && ens) return sortieVue(o, ens, V);
+  const SUIVI = ens ? (await PARTAGE.lire(ens)).suivi : [], suivi = SUIVI.includes(o.id);
+  if (faits[o.id] && !Q.get("formation") && ens){
+    if (suivi) return sortieVue(o, ens, V);
+    V.innerHTML = `<div class="top"><img src="${LOGO}" alt="Métier+"></div><div class="fini"><div class="rond">✓</div><h1>Tu as ta formation</h1>
+      <p class="sous">${esc(o.nom)} · signée le ${jour(faits[o.id])}</p><p class="engage">Refais les étapes de sécurité chaque fois que tu utilises l'outil.</p>
+      <p><a href="?o=${encodeURIComponent(o.id)}&e=${encodeURIComponent(ens)}&formation=1">Revoir la formation</a></p></div>`;
+    return;
+  }
   const coche = new Set();
   V.innerHTML = `<div class="top"><img src="${LOGO}" alt="Métier+"><span class="esp" style="flex:1"></span><span class="tag">Passeport d'outils</span></div>
     <span class="tag">Formation</span><h1>${esc(o.nom)}</h1>
-    ${ens ? `<button type="button" class="btn" id="dejaF" style="margin:4px 0 10px;min-height:44px">J'ai déjà ma formation : prendre ou rapporter l'outil</button>` : ""}
+    ${ens && suivi ? `<button type="button" class="btn" id="dejaF" style="margin:4px 0 10px;min-height:44px">J'ai déjà ma formation : prendre ou rapporter l'outil</button>` : ""}
     <p class="sous">Lis chaque étape et touche-la pour la cocher. Quand tout est coché, écris ton prénom, ton groupe et signe.</p>
     ${o.epi && o.epi.length ? `<span class="tag">Équipement de protection</span><div class="epi" style="margin-top:8px">${o.epi.map(x => `<span>${esc(x)}</span>`).join("")}</div>` : ""}
     <span class="tag">Les étapes</span><div class="prog"><i id="pg"></i></div>
@@ -274,9 +281,9 @@ async function vueEleve(){
       V.innerHTML = `<div class="top"><img src="${LOGO}" alt="Métier+"></div><div class="fini"><div class="rond">✓</div><h1>C'est signé !</h1>
         <p class="sous">${esc(obj.p)} · ${esc(o.nom)} · ${jour(obj.t)}<br>Ta signature est envoyée à ton enseignant.</p>
         <p class="engage">Rappel : refais les étapes chaque fois que tu utilises l'outil.</p>
-        <button class="btn p" id="bPrend" style="width:100%;min-height:56px;font-size:18px;margin-top:10px">Prendre l'outil maintenant</button></div>`;
+        ${suivi ? `<button class="btn p" id="bPrend" style="width:100%;min-height:56px;font-size:18px;margin-top:10px">Prendre l'outil maintenant</button>` : ""}</div>`;
       try { faits[o.id] = Date.now(); localStorage.setItem("passFaits", JSON.stringify(faits)); } catch(e) {}
-      $("#bPrend").onclick = () => sortieVue(o, ens, V);
+      if ($("#bPrend")) $("#bPrend").onclick = () => sortieVue(o, ens, V);
     } catch(e){
       b.disabled = false; b.textContent = "Signer et envoyer"; er.hidden = false;
       er.textContent = e.message === "ens" ? "Ce code QR ne correspond à aucun enseignant. Avise ton enseignant." : "L'envoi n'a pas fonctionné. Vérifie la connexion Internet et réessaie.";
@@ -340,7 +347,7 @@ let D = lireD(), GRP = localStorage.getItem("passeportGroupe") || "";
 const sauver = () => { localStorage.setItem(CLE, JSON.stringify(D)); clearTimeout(sauver.p); sauver.p = setTimeout(publierGrp, 1500); };
 /* liste publique des groupes (pour les boutons de l'élève) + partage, réécrite quand les groupes changent */
 async function publierGrp(){
-  if (!window.__moi) return; const L = groupes().filter(g => g !== "À classer"), C = codesPub(L), k = JSON.stringify([L, PART, C]);
+  if (!window.__moi) return; const L = groupes().filter(g => g !== "À classer"), C = codesPub(L), k = JSON.stringify([L, PART, C, suivis()]);
   if (localStorage.getItem("passGrpPub") === k) return;
   try { await PARTAGE.ecrire(window.__moi, { grp:L, part:PART, codes:C }); localStorage.setItem("passGrpPub", k); } catch(e) {} }
 /* codes à 3 chiffres des élèves (14 nov.) : seuls les numéros sont publics, jamais les prénoms */
@@ -457,17 +464,21 @@ async function releve(manuel){
 
 /* grandeur de la fiche de chaque outil (gardée avec les données du passeport) */
 const TAILLE_DEF = { "escabeau":"g", "scie-onglets":"g", "fileteuse":"g", "oxyacetylene":"g", "chalumeau-propane":"m", "sertisseuse":"m" };
+/* suivi des sorties : seulement pour les outils choisis (les plus chers); les autres passent par le magasinier */
+const SUIVI_DEF = ["sertisseuse", "fileteuse"];
+const suivis = () => { try { const s = JSON.parse(localStorage.getItem("passSuivi") || "null"); return Array.isArray(s) ? s : SUIVI_DEF; } catch(e){ return SUIVI_DEF; } };
 const tailleDe = id => { try { const T = JSON.parse(localStorage.getItem("passQrTailles") || "{}"); return T[id] || TAILLE_DEF[id] || "p"; } catch(e){ return "p"; } };
 function dlgQr(){
   if (!window.__moi) return toast("Connecte-toi d'abord à la bibliothèque.");
   const seg = o => `<span class="tl" data-id="${esc(o.id)}" style="display:inline-flex;gap:4px">${[["p","Petit"],["m","Moyen"],["g","Grand"]].map(([k, n]) => `<button type="button" class="btn${tailleDe(o.id) === k ? " p" : ""}" data-t="${k}" style="min-height:42px;padding:6px 12px">${n}</button>`).join("")}</span>`;
-  ouvrir(`<h2>Codes QR à imprimer</h2><p>Petit : collé sur l'outil (3 cm). Moyen : sur l'étui ou la boîte (5,5 cm). Grand : au mur près de la machine (12 cm).</p>
-    ${PROT.outils.map(o => `<div class="rq" style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--fil,#e5dac6)"><span style="flex:1;font-weight:650">${esc(o.nom)}</span>${seg(o)}</div>`).join("")}
+  ouvrir(`<h2>Codes QR à imprimer</h2><p>Petit : collé sur l'outil (3 cm). Moyen : sur l'étui ou la boîte (5,5 cm). Grand : au mur près de la machine (12 cm).</p><p>« Suivre les sorties » : pour les outils chers seulement. L'élève formé rescanne pour prendre et rapporter l'outil; les autres outils passent par le magasinier.</p>
+    ${PROT.outils.map(o => `<div class="rq" style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--fil,#e5dac6)"><span style="flex:1;font-weight:650">${esc(o.nom)}</span><label style="display:inline-flex;align-items:center;gap:6px;font-size:14px;color:var(--gris);white-space:nowrap"><input type="checkbox" class="sv" data-id="${esc(o.id)}" ${suivis().includes(o.id) ? "checked" : ""} style="width:22px;height:22px"> Suivre les sorties</label>${seg(o)}</div>`).join("")}
     <div class="act"><button class="btn" id="aF">Annuler</button><button class="btn p" id="aOk">Imprimer</button></div>`);
   $("#bx").querySelectorAll(".tl").forEach(z => z.querySelectorAll("button").forEach(b => b.onclick = () => {
     let T = {}; try { T = JSON.parse(localStorage.getItem("passQrTailles") || "{}"); } catch(e) {}
     T[z.dataset.id] = b.dataset.t; localStorage.setItem("passQrTailles", JSON.stringify(T));
     z.querySelectorAll("button").forEach(x => x.classList.toggle("p", x === b)); }));
+  $("#bx").querySelectorAll(".sv").forEach(c => c.onchange = () => { localStorage.setItem("passSuivi", JSON.stringify([...$("#bx").querySelectorAll(".sv:checked")].map(x => x.dataset.id))); publierGrp(); });
   $("#aF").onclick = fermer; $("#aOk").onclick = () => { fermer(); imprimerQr(); };
 }
 function imprimerQr(){
@@ -566,7 +577,7 @@ async function vueProf(){
   $("#bPart").onclick = dlgPartage; majPart();
   $("#bProt").hidden = !localStorage.ghJeton; $("#bProt").onclick = editerProt;
   const s = await COFFRE.session(); window.__moi = s && s.id; majPart();
-  COFFRE.demarrer("passeport", { cles:[CLE, CLE_J, "passQrTailles"], fusion:{ [CLE]:fusion }, apres:() => { D = lireD(); dessiner(); } });
+  COFFRE.demarrer("passeport", { cles:[CLE, CLE_J, "passQrTailles", "passSuivi"], fusion:{ [CLE]:fusion }, apres:() => { D = lireD(); dessiner(); } });
   releve(); setInterval(() => { if (document.visibilityState === "visible" && $("#ov").hidden) releve(); }, 30000);
 }
 
