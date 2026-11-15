@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<!-- © 2026 Jérémy Raymond. Tous droits réservés. Copie, modification ou revente interdites sans autorisation écrite (voir LICENCE.md). -->
+<meta charset="utf-8"><script src="vieux-navigateur.js"></script><script src="signaler.js"></script><script src="plein-ecran.js"></script>
+<link rel="icon" href="img/metier-plus-icone.svg" type="image/svg+xml">
+<script>
+(function(){ let c = null; try { c = localStorage.getItem("accueilClair"); } catch(e) {}
+  const clair = c === "1" || (c === null && matchMedia("(prefers-color-scheme: light)").matches);
+  document.documentElement.classList.add(clair ? "clair" : "sombre");
+  if (/[?&]c=/.test(location.search)) document.documentElement.classList.add("eleve"); })();
+</script>
+<script src="garde.js"></script>
+<script src="coffre.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Métier+ — Inventaire des coffres</title>
+<style>
+:root{--fond:#141414;--carte:#1F1F1F;--carte2:#2A2A2A;--txt:#F2EFEA;--gris:#A8A29A;--ligne:#333;--or:#EB6A22;--mar:#1E2A44;--vert:#1E8A55}
+html.clair{--fond:#F3F1EC;--carte:#fff;--carte2:#F1EEE8;--txt:#24211E;--gris:#6B665E;--ligne:#E2DDD3}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--fond);color:var(--txt);font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+.lg-c{display:none}html.clair .lg-c{display:block}html.clair .lg-b{display:none}
+main{padding:24px 4vw 60px;max-width:1400px;margin:0 auto}
+button,select,input,textarea{font:inherit}
+.btn{border:1px solid var(--ligne);background:var(--carte);color:var(--txt);border-radius:10px;padding:10px 16px;font-weight:650;min-height:46px;cursor:pointer}
+.btn.p{background:var(--or);border-color:var(--or);color:#fff}
+.btn.m{background:var(--mar);border-color:var(--mar);color:#fff}
+.btn:disabled{opacity:.45;cursor:default}
+.hero{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+.hero h1{margin:0;font-size:28px}.hero p{margin:4px 0 0;color:var(--gris);max-width:720px;line-height:1.45}
+.barre{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:0 0 16px}
+.barre select{min-height:46px;border-radius:10px;border:1px solid var(--ligne);background:var(--carte);color:var(--txt);padding:0 12px;font-weight:650}
+.esp{flex:1}
+.info{color:var(--gris);font-size:14px}
+.tw{overflow:auto;border:1px solid var(--ligne);border-radius:14px;background:var(--carte)}
+table.g{border-collapse:separate;border-spacing:0;min-width:100%}
+.g th,.g td{border-bottom:1px solid var(--ligne);padding:0;text-align:center}
+.g thead th{position:sticky;top:0;background:var(--carte2);font-size:13px;font-weight:700;padding:10px 6px;vertical-align:bottom;min-width:92px;max-width:120px;line-height:1.2}
+.g th.nom,.g td.nom{position:sticky;left:0;background:var(--carte);text-align:left;padding:0 14px;min-width:170px;z-index:1}
+.g thead th.nom{background:var(--carte2);z-index:2}
+.g td.nom button{all:unset;cursor:pointer;font-weight:650;display:block;padding:14px 0}
+.g td button.c{width:100%;height:54px;border:0;background:none;color:var(--txt);cursor:pointer;font-size:12px}
+.g td button.c:hover{background:var(--carte2)}
+.ok{display:inline-flex;flex-direction:column;align-items:center;gap:2px;color:var(--vert);font-weight:800}
+.ok i{font-style:normal;font-size:20px;line-height:1}.ok small{color:var(--gris);font-weight:600}
+.ok.ens{color:#3E7CC9}
+.ok.dem{color:#E08A1E}.ok.dem small{color:#E08A1E}
+.dmx{display:flex;gap:10px;align-items:flex-start;padding:10px 4px;font-size:16px;cursor:pointer;min-height:44px}.dmx input{width:22px;height:22px;flex:none;margin-top:1px}
+.dmE{text-align:left;background:#FFF4E5;border:1px solid #F2C98B;border-radius:12px;padding:12px 14px;margin:14px 0;color:#5a3b10}.dmE ol{margin:8px 0 6px 20px;padding:0}.dmE li{margin:4px 0}.dmE small{color:#7a5a2a}
+.vide{padding:40px;text-align:center;color:var(--gris)}
+/* fenêtres */
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:16px;z-index:50}
+.ov[hidden]{display:none}
+.bx{background:var(--carte);color:var(--txt);border-radius:16px;max-width:620px;width:100%;max-height:92vh;overflow:auto;padding:22px 24px;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.bx h2{margin:0 0 6px;font-size:21px}.bx p{color:var(--gris);line-height:1.45;margin:6px 0 12px}
+.bx textarea,.bx input[type=text]{width:100%;border:1px solid var(--ligne);border-radius:10px;background:var(--carte2);color:var(--txt);padding:10px 12px}
+.bx textarea{min-height:120px}
+.bx .act{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;margin-top:16px}
+.sig{background:#fff;border-radius:10px;border:1px solid var(--ligne);display:block;width:100%;max-width:420px;height:auto}
+.ed-o{border:1px solid var(--ligne);border-radius:12px;padding:12px;margin:10px 0;display:grid;gap:8px}
+.ed-o .r{display:flex;gap:8px}.ed-o .r input{flex:1}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--mar);color:#fff;padding:12px 20px;border-radius:12px;font-weight:650;z-index:60}
+/* cellulaire (14 nov., « tout croche sur cellulaire ») */
+.cartes{display:none}
+@media (max-width:640px){
+  .hero p.long{display:none}.hero p.court{display:block!important}
+  .barre{display:grid!important;grid-template-columns:1fr 1fr;gap:8px}
+  .barre select{grid-column:1/-1;min-height:48px;font-size:17px}
+  .barre .esp{display:none}.barre .btn{width:100%;margin:0}
+  .barre #bQr{grid-column:1/-1;order:-1}
+  .tw{display:none}.cartes{display:grid;gap:10px}
+  .ce{background:var(--carte,#fff);border:1px solid var(--fil,#e5dac6);border-radius:14px;padding:12px}
+  .ce .t{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+  .ce .t button{all:unset;font-weight:750;font-size:17px;cursor:pointer}.cd{color:var(--gris);font-weight:650;font-size:.8em;letter-spacing:1px}.ce .t small{color:var(--gris);font-weight:650}
+  .ce .ch{display:flex;flex-wrap:wrap;gap:6px}
+  .ce .ch button{border:1px solid var(--fil,#e5dac6);background:transparent;border-radius:999px;padding:7px 11px;font:inherit;font-size:13.5px;color:var(--gris);min-height:38px}
+  .ce .ch button.s{background:#1E8A55;border-color:#1E8A55;color:#fff;font-weight:650}
+  .ce .ch button.v{background:#1F5FAD;border-color:#1F5FAD;color:#fff;font-weight:650}
+  .ce .ch button.d{background:#FFF4E5;border-color:#E08A1E;color:#9a5a10;font-weight:650}
+  .rq{flex-direction:column;align-items:stretch!important;gap:6px!important}.rq .tl{display:grid!important;grid-template-columns:repeat(3,1fr)}
+  .el .sigb{flex-direction:column-reverse}.el .sigb .btn{width:100%}.el .sigb .esp{display:none}
+}
+/* codes QR à imprimer */
+#qrs{display:none}
+@media print{
+  body>*:not(#qrs){display:none!important}
+  @page{margin:10mm}
+  /* bloc + cartes inline-block : une carte ne peut jamais être coupée entre deux pages (avec flex, Chrome coupait parfois) */
+  #qrs{display:block!important;padding:0;font-size:0}
+  .qc{display:inline-block;vertical-align:top;margin:0 5mm 5mm 0;border:1.5px solid #1E2A44;border-radius:4mm;padding:5mm;break-inside:avoid;page-break-inside:avoid;text-align:center;color:#1E2A44;font-family:system-ui,sans-serif;box-sizing:border-box}
+  .qc img.l{height:7mm}.qc b{display:block;font-size:15pt;margin:2mm 0;line-height:1.15}.qc .q{display:flex;justify-content:center;margin:2mm 0}
+  .qc .q canvas,.qc .q img:not(.qrLogo){width:var(--q)!important;height:var(--q)!important}
+  .qc small{font-size:9pt;color:#555;display:block}
+  /* trois grandeurs : petit = collé sur l'outil, moyen = sur l'étui, grand = au mur près de la machine */
+  .qc.p{width:48mm;padding:3mm;border-radius:3mm;--q:30mm}.qc.p img.l{height:4mm}.qc.p b{font-size:9pt;margin:1mm 0}.qc.p small{font-size:6.5pt}
+  .qc.m{width:88mm;--q:55mm}
+  .qc.g{width:185mm;padding:9mm;--q:120mm}.qc.g img.l{height:12mm}.qc.g b{font-size:28pt;margin:4mm 0}.qc.g small{font-size:14pt}
+}
+/* ---- vue de l'élève (QR sur l'outil) ---- */
+html.eleve body{background:var(--fond)}
+.el{max-width:720px;margin:0 auto;padding:18px 16px 60px}
+.el .top{display:flex;align-items:center;gap:10px;margin-bottom:14px}.el .top img{height:26px}
+.el .tag{font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--or)}
+.el h1{font-size:30px;margin:4px 0 6px;line-height:1.15}
+.el .sous{color:var(--gris);margin:0 0 18px;line-height:1.45}
+.epi{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 20px}
+.epi span{background:var(--mar);color:#fff;border-radius:99px;padding:8px 14px;font-weight:650;font-size:14px}
+.prog{height:8px;border-radius:99px;background:var(--carte2);overflow:hidden;margin:6px 0 16px}.prog i{display:block;height:100%;width:0;background:var(--or);transition:width .3s}
+.et{display:flex;gap:14px;align-items:flex-start;background:var(--carte);border:2px solid var(--ligne);border-radius:14px;padding:16px;margin:0 0 10px;cursor:pointer;line-height:1.45;font-size:17px;user-select:none}
+.et .n{flex:none;width:34px;height:34px;border-radius:9px;background:var(--carte2);display:grid;place-items:center;font-weight:800}
+.et .bx2{flex:none;margin-left:auto;width:34px;height:34px;border-radius:9px;border:2px solid var(--gris);display:grid;place-items:center;font-weight:900;color:#fff}
+.et.on{border-color:var(--vert)}.et.on .bx2{background:var(--vert);border-color:var(--vert)}.et.on .bx2::after{content:"✓"}
+.signer{margin-top:22px;background:var(--carte);border:2px solid var(--ligne);border-radius:16px;padding:18px}
+.signer[hidden]{display:none}
+.signer h2{margin:0 0 8px;font-size:20px}
+.signer label{display:block;font-weight:650;margin:12px 0 6px}
+.signer input{width:100%;min-height:50px;border-radius:10px;border:1px solid var(--ligne);background:var(--carte2);color:var(--txt);padding:0 14px;font-size:18px}
+.toile{position:relative;background:#fff;border-radius:12px;border:2px dashed #bbb;touch-action:none}
+.toile canvas{display:block;width:100%;height:180px}
+.toile span{position:absolute;left:14px;bottom:10px;color:#999;font-size:13px;pointer-events:none}
+.cd{color:var(--gris);font-weight:650;font-size:.8em;letter-spacing:1px}
+.so{background:var(--carte,#fff);border:1px solid var(--fil,#e5dac6);border-radius:16px;padding:14px 16px;margin:0 0 16px}
+.so h2{margin:0 0 8px;font-size:19px}.so h2 small{color:var(--gris);font-weight:650;font-size:14px;margin-left:6px}
+.so-l{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;padding:9px 0;border-top:1px solid var(--fil,#e5dac6)}
+.so-l b{min-width:150px}.so-l .btn{margin-left:auto;min-height:40px;padding:6px 14px}
+.so .h{color:var(--gris);font-size:14px}.so .pf{background:#D9534F;color:#fff;border-radius:999px;padding:2px 9px;font-size:12.5px;font-weight:700}
+.so details{margin-top:8px}.so summary{cursor:pointer;font-weight:650;color:var(--gris);padding:6px 0}
+.so-h{display:grid;grid-template-columns:110px 84px 1fr 1.4fr;gap:8px;padding:6px 0;border-top:1px solid var(--fil,#e5dac6);font-size:14px;align-items:center}
+.so-h .sortie{color:#C9561A;font-weight:700}.so-h .retour{color:#1E8A55;font-weight:700}
+@media (max-width:640px){.so-h{grid-template-columns:1fr 1fr}.so-l b{min-width:0;width:100%}}
+.engage{color:var(--gris);font-size:14px;line-height:1.45;margin:12px 0}
+.fini{text-align:center;padding:40px 10px}.fini .rond{width:96px;height:96px;border-radius:50%;background:var(--vert);color:#fff;display:grid;place-items:center;font-size:52px;margin:0 auto 18px}
+.err{color:#D9534F;font-weight:650;margin-top:10px}
+</style>
+<style>
+.cfs{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.cf{all:unset;box-sizing:border-box;cursor:pointer;background:var(--carte);border:1px solid var(--ligne);border-left:8px solid var(--gris);border-radius:14px;padding:14px 16px;display:grid;gap:4px;min-height:96px}
+.cf b{font-size:18px}.cf small{color:var(--gris);line-height:1.35}
+.cf.v{border-left-color:var(--vert)}.cf.r{border-left-color:#D9534F}.cf.o{border-left-color:#E08A1E}
+.cf .et2{font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase}.cf.v .et2{color:var(--vert)}.cf.r .et2{color:#D9534F}.cf.o .et2{color:#E08A1E}.cf .et2{color:var(--gris)}
+.mq{background:#FDECEA;color:#8a2620;border-radius:10px;padding:10px 12px;margin:8px 0}.mq li{margin:3px 0}
+html.sombre .mq{background:#3a1f1d;color:#f3c2bd}
+.hist{font-size:14px}.hist div{display:grid;grid-template-columns:120px 1fr;gap:8px;padding:6px 0;border-top:1px solid var(--ligne)}
+.hist .r{color:#D9534F;font-weight:700}.hist .v{color:var(--vert);font-weight:700}
+/* élève */
+.it{display:flex;gap:12px;align-items:center;background:var(--carte);border:2px solid var(--ligne);border-radius:12px;padding:12px 14px;margin:0 0 8px;font-size:17px;user-select:none}
+.it .q{flex:none;min-width:36px;height:36px;border-radius:9px;background:var(--carte2);display:grid;place-items:center;font-weight:800}
+.it .s{margin-left:auto;font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--gris)}
+.choix .it{cursor:pointer;-webkit-tap-highlight-color:transparent}
+.it.m{border-color:#D9534F}.it.m .s{color:#D9534F}.it.b{border-color:#E08A1E}.it.b .s{color:#E08A1E}
+.it.deja{opacity:.6}.it.deja .s{color:#D9534F}
+.gros{width:100%;min-height:64px;font-size:20px;border-radius:14px;margin-top:10px}
+.btn.vert{background:var(--vert);border-color:var(--vert);color:#fff}
+.idt label{display:block;font-weight:650;margin:14px 0 6px}
+.idt input,.el textarea{width:100%;min-height:52px;border-radius:10px;border:1px solid var(--ligne);background:var(--carte2);color:var(--txt);padding:0 14px;font-size:20px}
+.el textarea{min-height:200px;padding:12px 14px;font-size:17px}
+@media print{.qc.cfq{width:88mm;--q:55mm}}
+</style>
+</head>
+<body>
+<div id="vueProf" hidden>
+<div class="mp-tete"><img class="lg-b" src="img/metier-plus-blanc.svg" alt="Métier+"><img class="lg-c" src="img/metier-plus.svg" alt="Métier+"><a class="mp-retour" href="labo.html">‹ Labo</a><h1 class="mp-nom">Coffres</h1><span class="mp-esp"></span></div>
+<main>
+  <div class="hero"><div><h1>Inventaire des coffres</h1><p class="long">Un code QR par coffre. L'élève qui prend un coffre le scanne : « Tout est là » ou ce qui manque. Le coffre passe à son nom, et s'il manque quelque chose plus tard, tu sais qui l'avait juste avant.</p><p class="court" style="display:none">L'élève scanne le coffre en le prenant : « Tout est là » ou ce qui manque.</p></div></div>
+  <div class="barre">
+    <select id="atS" aria-label="Atelier"></select>
+    <button class="btn" id="bAtN">+ Atelier</button>
+    <button class="btn" id="bCfN">+ Coffre</button>
+    <span class="esp"></span>
+    <button class="btn" id="bMaj">Actualiser</button>
+    <button class="btn m" id="bQr">Codes QR à imprimer</button>
+    <button class="btn" id="bPart">Partager</button>
+  </div>
+  <p class="info" id="etat"></p>
+  <div class="cfs" id="cfs"></div>
+  <p class="info" style="margin-top:14px">Vert = complet · rouge = il manque quelque chose · orange = liste à approuver · gris = liste pas encore faite (le premier élève qui scanne l'écrit). Touche un coffre pour voir qui l'a, ce qui manque et l'historique.</p>
+</main>
+</div>
+<div id="vueEleve" class="el" hidden></div>
+<div class="ov" id="ov" hidden><div class="bx" id="bx"></div></div>
+<div id="qrs"></div>
+<script>
+"use strict";
+/* Inventaire des coffres (14 nov.) : QR par coffre, « Tout est là » à la prise, la responsabilité suit d'un élève à l'autre */
+const $ = s => document.querySelector(s);
+const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const Q = new URLSearchParams(location.search);
+const LOGO = document.documentElement.classList.contains("clair") ? "img/metier-plus.svg" : "img/metier-plus-blanc.svg";
+const nid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+function prenom(v){ const m = String(v || "").trim().split(/\s+/); let p = (m[0] || "").replace(/[^\p{L}'-]/gu, "").slice(0, 16);
+  if (m[1] && /^\p{L}\.?$/u.test(m[1])) p += " " + m[1][0].toUpperCase() + "."; return p; }
+const heure = t => { const x = new Date(t), h = x.toLocaleTimeString("fr-CA", { hour:"2-digit", minute:"2-digit" }).replace(":", " h ");
+  return new Date().toDateString() === x.toDateString() ? "aujourd'hui " + h : x.toLocaleDateString("fr-CA", { day:"numeric", month:"short" }) + ", " + h; };
+function toast(t){ const d = document.createElement("div"); d.className = "toast"; d.textContent = t; document.body.appendChild(d); setTimeout(() => d.remove(), 3500); }
+const ouvrir = h => { $("#bx").innerHTML = h; $("#ov").hidden = false; };
+const fermer = () => { $("#ov").hidden = true; };
+$("#ov").onclick = e => { if (e.target.id === "ov") fermer(); };
+/* « 2 x clé à tuyau 14 po » → { q:2, n:"clé à tuyau 14 po" } */
+const lireListe = t => String(t || "").split("\n").map(l => l.trim()).filter(Boolean).slice(0, 80).map(l => { const m = l.match(/^(\d{1,3})\s*[x×]?\s+(.+)$/i); return m ? { q:+m[1], n:m[2].slice(0, 60) } : { q:1, n:l.slice(0, 60) }; });
+const ecrireListe = L => (L || []).map(x => (x.q > 1 ? x.q + " x " : "") + x.n).join("\n");
+
+/* rangées publiques (aucune donnée d'élève) : coffres de l'enseignant + codes à 3 chiffres du passeport */
+const API = "https://kjlotlhqrgekzohshmbn.supabase.co/rest/v1/rpc/", CLEAPI = "sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY";
+const hx = async s => [...new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s)))].map(b => b.toString(16).padStart(2, "0")).join("");
+const rpc = async (f, a) => { const r = await fetch(API + f, { method:"POST", headers:{ apikey:CLEAPI, "Content-Type":"application/json" }, body:JSON.stringify(a) }); if (!r.ok) throw new Error("coffre " + r.status); return r.json(); };
+async function lirePub(cle){ try { const r = await rpc("coffre_lire", { p_id:await hx(cle) }), row = r && r[0]; return row && row.data ? JSON.parse(row.data) : null; } catch(e){ return null; } }
+const PUB = { lire:ens => lirePub("metier+|coffres-pub|" + ens),
+  async ecrire(ens, o){ let j = localStorage.getItem("coffresJeton");
+    if (!j){ j = btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(32)))); localStorage.setItem("coffresJeton", j); }
+    if (await rpc("coffre_ecrire", { p_id:await hx("metier+|coffres-pub|" + ens), p_jeton:j, p_env:"public", p_data:JSON.stringify(o) }) !== true) throw new Error("refus"); } };
+
+/* ================= Élève ================= */
+async function vueEleve(){
+  const V = $("#vueEleve"); V.hidden = false;
+  const cid = Q.get("c"), ens = Q.get("e") || "";
+  V.innerHTML = `<div class="top"><img src="${LOGO}" alt="Métier+"></div><p class="sous">Chargement…</p>`;
+  const [P, PP] = await Promise.all([PUB.lire(ens), lirePub("metier+|partage-passeport|" + ens)]);
+  const cf = P && P.cf && P.cf[cid];
+  if (!cf){ V.innerHTML = `<div class="top"><img src="${LOGO}" alt="Métier+"></div><h1>Coffre introuvable</h1><p class="sous">Ce code QR ne correspond à aucun coffre. Avise ton enseignant.</p>`; return; }
+  const codes = PP && PP.codes ? [].concat(...Object.values(PP.codes)) : [], parCode = codes.length > 0;
+  const nomAt = (P.at && P.at[cf.at]) || "";
+  let mc = "", mp = ""; try { mc = localStorage.getItem("passCode") || ""; mp = localStorage.getItem("passPrenom") || ""; } catch(e) {}
+  const idt = `<div class="idt">${parCode ? `<label for="cd">Ton code (3 chiffres)</label><input id="cd" inputmode="numeric" maxlength="3" value="${esc(mc)}" autocomplete="off">`
+    : `<label for="pn">Ton prénom</label><input id="pn" maxlength="24" value="${esc(mp)}" autocomplete="given-name">`}<p class="err" id="er" hidden></p></div>`;
+  const qui = () => { if (parCode){ const c = $("#cd").value.trim(); return codes.includes(c) ? { c } : null; } const p = prenom($("#pn").value); return p.length >= 2 ? { p } : null; };
+  const envoyer = async (obj, b) => {
+    const w = qui(), er = $("#er"); er.hidden = true;
+    if (!w){ er.hidden = false; er.textContent = parCode ? "Ce code n'existe pas. Demande ton code à ton enseignant." : "Écris ton prénom."; return; }
+    Object.assign(obj, w, { v:1, uid:crypto.getRandomValues(new Uint32Array(2)).join("-"), cf:cid, at:cf.at, nom:cf.nom, t:Date.now() });
+    b.disabled = true; const txt = b.textContent; b.textContent = "Envoi…";
+    try {
+      const d = await (await fetch("comptes.json", { cache:"no-store" })).json(), C = d.comptes || {};
+      const dep = async (id, pub) => { for (let n = 0; n < 400; n++){ try { await COFFRE.deposer("coffres|" + id + "|" + n, obj, pub); return true; } catch(e){ if (!/refus/.test(e.message)) throw e; } } return false; };
+      if (!C[ens] || !(await dep(ens, C[ens].pub))) throw new Error("x");
+      for (const id of ((P.part || {})[cf.at] || [])) if (id !== ens && C[id] && C[id].pub && !C[id].eleve){ try { await dep(id, C[id].pub); } catch(e) {} }
+      try { if (w.c) localStorage.setItem("passCode", w.c); if (w.p) localStorage.setItem("passPrenom", w.p); } catch(e) {}
+      return true;
+    } catch(e){ b.disabled = false; b.textContent = txt; er.hidden = false; er.textContent = "L'envoi n'a pas fonctionné. Vérifie Internet et réessaie."; return false; }
+  };
+  const fini = (titre, txt) => { V.innerHTML = `<div class="top"><img src="${LOGO}" alt="Métier+"></div><div class="fini"><div class="rond">✓</div><h1>${titre}</h1><p class="sous">${txt}</p></div>`; };
+  const tete = `<div class="top"><img src="${LOGO}" alt="Métier+"><span style="flex:1"></span><span class="tag">Inventaire</span></div><span class="tag">${esc(nomAt)}</span><h1>${esc(cf.nom)}</h1>`;
+
+  /* première fois : l'élève écrit le contenu, l'enseignant l'approuve */
+  if (!cf.liste || !cf.liste.length){
+    V.innerHTML = `${tete}<p class="sous">La liste de ce coffre n'est pas encore faite. Écris ce qu'il contient : une ligne par outil, avec la quantité devant (ex. « 2 x clé à tuyau 14 po »). Ton enseignant va l'approuver.</p>
+      <textarea id="li" placeholder="1 x coupe-tube&#10;2 x clé à tuyau 14 po&#10;1 x niveau 24 po"></textarea>${idt}<button class="btn p gros" id="bL">Envoyer la liste</button>`;
+    $("#bL").onclick = async e => { const L = lireListe($("#li").value); if (L.length < 1) return;
+      if (await envoyer({ k:"liste", liste:L }, e.target)) fini("Liste envoyée", "Merci ! Ton enseignant va la vérifier. Ensuite, le coffre se fera en quelques secondes."); };
+    return;
+  }
+  const deja = new Set(cf.mq || []);
+  V.innerHTML = `${tete}<p class="sous">Vérifie le coffre en le prenant. Tu en es responsable jusqu'au prochain élève.</p>
+    <div id="its">${cf.liste.map((x, i) => `<div class="it${deja.has(x.n) ? " deja" : ""}" data-i="${i}"><span class="q">${x.q}</span><span>${esc(x.n)}</span><span class="s">${deja.has(x.n) ? "déjà signalé" : ""}</span></div>`).join("")}</div>
+    ${idt}<button class="btn vert gros" id="bOk">Tout est là</button><button class="btn gros" id="bMq">Il manque quelque chose</button>`;
+  const ok = async e => { if (await envoyer({ k:"ok" }, e.target)) fini("Coffre pris en charge", `${esc(cf.nom)} · ${heure(Date.now())}<br>Il est à ton nom jusqu'au prochain élève.`); };
+  $("#bOk").onclick = ok;
+  $("#bMq").onclick = () => {
+    $("#its").classList.add("choix"); $("#bOk").remove(); $("#er").hidden = true;
+    $("#bMq").outerHTML = `<p class="sous" style="margin:10px 0 0">Touche ce qui manque (1 fois) ou ce qui est brisé (2 fois).</p><input type="text" id="nt" maxlength="120" placeholder="Commentaire (facultatif)" style="width:100%;min-height:50px;border-radius:10px;border:1px solid var(--ligne);background:var(--carte2);color:var(--txt);padding:0 14px;font-size:17px;margin-top:10px"><button class="btn p gros" id="bEnv">Envoyer</button>`;
+    $("#its").onclick = ev => { const d = ev.target.closest(".it"); if (!d || d.classList.contains("deja")) return;
+      const st = d.classList.contains("m") ? "b" : d.classList.contains("b") ? "" : "m"; d.classList.remove("m", "b"); if (st) d.classList.add(st);
+      d.querySelector(".s").textContent = st === "m" ? "manquant" : st === "b" ? "brisé" : ""; };
+    $("#bEnv").onclick = async e => {
+      const items = [...$("#its").querySelectorAll(".it.m,.it.b")].map(d => ({ n:cf.liste[+d.dataset.i].n, e:d.classList.contains("b") ? "b" : "m" }));
+      if (!items.length){ const er = $("#er"); er.hidden = false; er.textContent = "Touche ce qui manque, ou recule si tout est là."; return; }
+      if (await envoyer({ k:"manque", items, note:$("#nt").value.trim().slice(0, 120) }, e.target)) fini("C'est noté", `Ton enseignant est avisé de ce qui manque. Le coffre est à ton nom jusqu'au prochain élève.`);
+    };
+  };
+}
+
+/* ================= Enseignant ================= */
+const CLE = "coffresAtelier";
+const vide = () => ({ at:{}, cf:{}, ev:{}, vus:{}, part:{} });
+function lireK(){ try { const d = JSON.parse(localStorage.getItem(CLE) || "null"); if (d && d.cf) return Object.assign(vide(), d); } catch(e) {} return vide(); }
+let K = lireK(), AT = localStorage.getItem("coffresAtelierChoisi") || "", COMPTES = {}, PARTAGES = {};
+const sauver = () => { localStorage.setItem(CLE, JSON.stringify(K)); clearTimeout(sauver.p); sauver.p = setTimeout(publier, 1200); };
+function fusion(a, b){ const A = Object.assign(vide(), JSON.parse(a || "null") || {}), B = JSON.parse(b || "null") || {};
+  for (const k of ["at", "cf", "ev", "vus", "part"]){ const y = B[k] || {}; for (const i in y){ const x = A[k][i]; if (!x || (typeof y[i] === "object" ? (y[i].t || 0) > (x.t || 0) : y[i] > x)) A[k][i] = y[i]; } }
+  return JSON.stringify(A); }
+const ateliers = () => Object.entries(K.at).filter(([, a]) => !a.x).sort((a, b) => a[1].nom.localeCompare(b[1].nom, "fr"));
+/* coffres affichés : les miens + ceux des ateliers que des collègues partagent avec moi (lecture seule) */
+const coffresDe = at => { const M = Object.entries(K.cf).filter(([, c]) => !c.x && c.at === at).map(([id, c]) => Object.assign({ id, moi:true }, c));
+  const S = PARTAGES[at] ? Object.entries(PARTAGES[at].cf).map(([id, c]) => Object.assign({ id, de:PARTAGES[at].de }, c)) : [];
+  return M.concat(S).sort((a, b) => a.nom.localeCompare(b.nom, "fr", { numeric:true })); };
+const cfDe = id => { if (K.cf[id] && !K.cf[id].x) return Object.assign({ id, moi:true }, K.cf[id]); for (const a in PARTAGES) if (PARTAGES[a].cf[id]) return Object.assign({ id, de:PARTAGES[a].de }, PARTAGES[a].cf[id]); return null; };
+/* nom de l'élève : code → prénom grâce au passeport de cet appareil */
+function nomDe(w){ if (!w) return "?"; if (w.p) return esc(w.p);
+  try { const D = JSON.parse(localStorage.getItem("passeportOutils") || "{}"), e = Object.values(D.el || {}).find(e => !e.x && e.c === w.c); if (e) return `${esc(e.p)} <span class="cd">${esc(w.c)}</span>`; } catch(e) {}
+  return "Code " + esc(w.c); }
+/* état d'un coffre : événements depuis la dernière remise en ordre */
+function etat(cf){
+  const E = Object.values(K.ev).filter(e => e.cf === cf.id).sort((a, b) => a.d - b.d);
+  let dr = 0; E.forEach(e => { if (e.k === "regle") dr = e.d; });
+  const mq = {}; E.filter(e => e.k === "manque" && e.d >= dr).forEach(e => e.items.forEach(x => { if (!mq[x.n]) mq[x.n] = { e:x.e, par:e }; }));
+  const pr = E.filter(e => e.k === "ok" || e.k === "manque"), der = pr[pr.length - 1];
+  const c = !cf.liste || !cf.liste.length ? (cf.prop ? "o" : "") : Object.keys(mq).length ? "r" : "v";
+  return { E, mq, der, c };
+}
+async function publier(){
+  if (!window.__moi) return;
+  const at = {}, cf = {}; ateliers().forEach(([id, a]) => at[id] = a.nom);
+  for (const [id, c] of Object.entries(K.cf)) if (!c.x && at[c.at]) cf[id] = { nom:c.nom, at:c.at, liste:c.liste || [], mq:Object.keys(etat(Object.assign({ id }, c)).mq) };
+  const part = {}; for (const a in K.part) if (at[a] && K.part[a].l && K.part[a].l.length) part[a] = K.part[a].l;
+  const o = { at, cf, part }, k = JSON.stringify(o); if (localStorage.getItem("coffresPub") === k) return;
+  try { await PUB.ecrire(window.__moi, o); localStorage.setItem("coffresPub", k); } catch(e) {}
+}
+function dessiner(){
+  const A = ateliers(); if (!K.at[AT] && !PARTAGES[AT]) AT = (A[0] || [])[0] || Object.keys(PARTAGES)[0] || "";
+  $("#atS").innerHTML = A.map(([id, a]) => `<option value="${id}" ${id === AT ? "selected" : ""}>${esc(a.nom)}</option>`).join("")
+    + Object.entries(PARTAGES).map(([id, p]) => `<option value="${id}" ${id === AT ? "selected" : ""}>${esc(p.nom)} (de ${esc(p.deNom)})</option>`).join("") || `<option value="">Aucun atelier</option>`;
+  const mien = !!K.at[AT]; $("#bCfN").disabled = $("#bQr").disabled = $("#bPart").disabled = !mien;
+  const L = $("#cfs"); if (!AT){ L.innerHTML = `<div class="vide">Commence par créer un atelier.</div>`; return; }
+  const C = coffresDe(AT);
+  if (!C.length){ L.innerHTML = `<div class="vide">Aucun coffre dans cet atelier. Touche « + Coffre ».</div>`; return; }
+  L.innerHTML = C.map(cf => { const s = etat(cf), n = Object.keys(s.mq).length;
+    const et = s.c === "v" ? "Complet" : s.c === "r" ? (n === 1 ? "1 article manque" : n + " articles manquent") : s.c === "o" ? "Liste à approuver" : "Liste à faire";
+    return `<button class="cf ${s.c}" data-cf="${cf.id}"><span class="et2">${et}</span><b>${esc(cf.nom)}</b><small>${s.der ? "À " + nomDe(s.der) + " depuis " + heure(s.der.d) : cf.liste && cf.liste.length ? cf.liste.length + " articles · pas encore scanné" : cf.prop ? "Liste écrite par " + nomDe(cf.prop.w) + " : touche pour l'approuver" : "Le premier élève qui scanne écrit la liste"}</small></button>`; }).join("");
+}
+function coffreOuvrir(id){
+  const cf = cfDe(id); if (!cf) return; const s = etat(cf), mien = !!cf.moi;
+  const prec = e => { const i = s.E.indexOf(e); for (let j = i - 1; j >= 0; j--) if (s.E[j].k === "ok" || s.E[j].k === "manque") return s.E[j]; return null; };
+  const mqH = Object.entries(s.mq).map(([n, x]) => { const p = prec(x.par);
+    return `<li><b>${esc(n)}</b> ${x.e === "b" ? "(brisé)" : "(manquant)"} · signalé par ${nomDe(x.par)} ${heure(x.par.d)}${p ? ` · <b>juste avant : ${nomDe(p)}</b> (${heure(p.d)}${p.k === "ok" ? ", tout était là" : ""})` : ""}${x.par.note ? `<br><i>« ${esc(x.par.note)} »</i>` : ""}</li>`; }).join("");
+  const hist = s.E.slice(-30).reverse().map(e => `<div><span>${heure(e.d)}</span><span>${e.k === "regle" ? `<span class="v">Remis en ordre</span> (par toi)` : e.k === "ok" ? `<span class="v">Tout est là</span> · ${nomDe(e)}` : `<span class="r">Manque : ${e.items.map(x => esc(x.n)).join(", ")}</span> · ${nomDe(e)}`}</span></div>`).join("");
+  const autres = Object.entries(K.cf).filter(([i, c]) => !c.x && i !== id && c.liste && c.liste.length);
+  ouvrir(`<h2>${esc(cf.nom)}</h2>
+    ${s.der ? `<p>En ce moment : <b>${nomDe(s.der)}</b>, depuis ${heure(s.der.d)}.</p>` : ""}
+    ${mqH ? `<ul class="mq">${mqH}</ul>` : ""}
+    ${cf.prop && mien && !(cf.liste || []).length ? `<p><b>Liste écrite par ${nomDe(cf.prop.w)}</b> — corrige-la au besoin, puis approuve.</p>` : `<p>${mien ? "Contenu du coffre : une ligne par outil, quantité devant (ex. « 2 x clé à tuyau 14 po »)." : `Coffre de ${esc(cf.de || "")} (lecture seule).`}</p>`}
+    <textarea id="aL" ${mien ? "" : "readonly"}>${esc(ecrireListe((cf.liste && cf.liste.length) ? cf.liste : cf.prop ? cf.prop.liste : []))}</textarea>
+    ${mien && autres.length ? `<p style="margin-top:8px"><select id="aCp" style="min-height:42px;border-radius:10px;border:1px solid var(--ligne);background:var(--carte2);color:var(--txt);padding:0 10px"><option value="">Copier la liste d'un autre coffre…</option>${autres.map(([i, c]) => `<option value="${i}">${esc(c.nom)}</option>`).join("")}</select></p>` : ""}
+    ${hist ? `<details style="margin-top:10px"><summary style="cursor:pointer;font-weight:650;color:var(--gris)">Historique</summary><div class="hist">${hist}</div></details>` : ""}
+    <div class="act">${mien ? `<button class="btn" id="aX">Retirer le coffre</button><button class="btn" id="aRn">Renommer</button>` : ""}${mqH ? `<button class="btn vert" id="aRg">Remis en ordre</button>` : ""}<button class="btn" id="aF">Fermer</button>${mien ? `<button class="btn p" id="aOk">${cf.prop && !(cf.liste || []).length ? "Approuver la liste" : "Enregistrer"}</button>` : ""}</div>`);
+  $("#aF").onclick = fermer;
+  if ($("#aCp")) $("#aCp").onchange = e => { const c = K.cf[e.target.value]; if (c) $("#aL").value = ecrireListe(c.liste); };
+  if ($("#aOk")) $("#aOk").onclick = () => { const c = K.cf[id]; c.liste = lireListe($("#aL").value); delete c.prop; c.t = Date.now(); sauver(); fermer(); dessiner(); toast("Liste enregistrée"); };
+  if ($("#aRg")) $("#aRg").onclick = () => { K.ev["r" + nid()] = { cf:id, k:"regle", d:Date.now(), t:Date.now() }; sauver(); fermer(); dessiner(); };
+  if ($("#aRn")) $("#aRn").onclick = () => { const n = prompt("Nouveau nom du coffre", K.cf[id].nom); if (n && n.trim()){ K.cf[id].nom = n.trim().slice(0, 40); K.cf[id].t = Date.now(); sauver(); fermer(); dessiner(); } };
+  let sur = 0; if ($("#aX")) $("#aX").onclick = e => { if (!sur++){ e.target.textContent = "Sûr ? Touche encore"; return; } K.cf[id] = { x:1, t:Date.now(), at:"", nom:"" }; sauver(); fermer(); dessiner(); };
+}
+/* dépôts des élèves (chiffrés pour ma clé) : coffres|<moi>|0, 1, 2… */
+let RELEVE = false;
+async function releve(manuel){
+  if (RELEVE) return; RELEVE = true; let vides = 0, neufs = 0;
+  try {
+    const s = await COFFRE.session(); if (!s) return;
+    for (let i = 0; i < 400 && vides < 6; i++){
+      const nom = "coffres|" + s.id + "|" + i; let x = null;
+      try { x = await COFFRE.prendre(nom); } catch(e) { x = null; }
+      if (!x){ vides++; continue; } vides = 0;
+      if (!K.vus[x.uid]){
+        const w = x.c ? { c:x.c } : { p:prenom(x.p) };
+        if (x.k === "liste"){ const c = K.cf[x.cf]; if (c && !c.x && !(c.liste || []).length){ c.prop = { liste:lireListe(ecrireListe(x.liste)), w, t:x.t }; c.t = Date.now(); neufs++; } }
+        else if (x.k === "ok" || x.k === "manque"){ K.ev[x.uid] = Object.assign({ cf:x.cf, k:x.k, d:x.t, t:Date.now(), items:x.k === "manque" ? (x.items || []).slice(0, 80) : undefined, note:x.note || undefined }, w); neufs++; }
+        K.vus[x.uid] = Date.now();
+      }
+      try { await COFFRE.jeter(nom); } catch(e) {}
+    }
+    if (neufs){ sauver(); dessiner(); toast(neufs === 1 ? "1 nouveau scan" : neufs + " nouveaux scans"); } else if (manuel) toast("Rien de nouveau");
+    $("#etat").textContent = "Vérifié à " + new Date().toLocaleTimeString("fr-CA", { hour:"2-digit", minute:"2-digit" });
+  } finally { RELEVE = false; }
+}
+/* ateliers que des collègues partagent avec moi */
+async function lirePartages(){
+  const moi = window.__moi; if (!moi) return; const N = {};
+  await Promise.all(Object.keys(COMPTES).filter(id => id !== moi && !COMPTES[id].eleve).map(async id => { const P = await PUB.lire(id); if (!P || !P.part) return;
+    for (const a in P.part) if (P.part[a].includes(moi) && P.at[a]){ const cf = {}; for (const c in P.cf) if (P.cf[c].at === a) cf[c] = P.cf[c];
+      N[a] = { nom:P.at[a], de:id, deNom:(COMPTES[id].nom || id).split(" ")[0], cf }; } }));
+  PARTAGES = N; dessiner();
+}
+function imprimerQr(){
+  const s = window.__moi; if (!s) return toast("Connecte-toi d'abord à la bibliothèque.");
+  const base = location.href.replace(/[^/]*$/, "") + "coffres.html", Z = $("#qrs"); Z.innerHTML = "";
+  coffresDe(AT).filter(c => c.moi).forEach(cf => {
+    const c = document.createElement("div"); c.className = "qc cfq";
+    c.innerHTML = `<img class="l" src="img/metier-plus.svg" alt=""><b>${esc(cf.nom)}</b><div class="q"></div><small>${esc(K.at[AT].nom)} · scanne en prenant le coffre</small>`;
+    Z.appendChild(c); new QRCode(c.querySelector(".q"), { text:base + "?c=" + encodeURIComponent(cf.id) + "&e=" + encodeURIComponent(s), width:600, height:600, correctLevel:QRCode.CorrectLevel.H }); if (window.qrLogo) qrLogo(c.querySelector(".q"));
+  });
+  setTimeout(() => print(), 400);
+}
+function dlgPartage(){
+  const moi = window.__moi; if (!moi || !K.at[AT]) return;
+  const profs = Object.entries(COMPTES).filter(([id, c]) => id !== moi && !c.eleve), on = (K.part[AT] && K.part[AT].l) || [];
+  ouvrir(`<h2>Partager « ${esc(K.at[AT].nom)} »</h2><p>Les collègues cochés voient les coffres de cet atelier, et les scans faits dans leurs cours arrivent chez toi aussi : la chaîne de responsabilité reste complète d'un groupe à l'autre.</p>
+    ${profs.map(([id, c]) => `<label class="dmx"><input type="checkbox" value="${esc(id)}" ${on.includes(id) ? "checked" : ""}> <span>${esc(c.nom || id)}</span></label>`).join("") || "<p>Aucun autre enseignant n'a de compte.</p>"}
+    <div class="act"><button class="btn" id="aF">Annuler</button><button class="btn p" id="aOk">Enregistrer</button></div>`);
+  $("#aF").onclick = fermer;
+  $("#aOk").onclick = () => { K.part[AT] = { l:[...$("#bx").querySelectorAll("input:checked")].map(x => x.value), t:Date.now() }; sauver(); fermer(); majPart(); toast("Partage enregistré"); };
+}
+const majPart = () => { const l = (K.part[AT] && K.part[AT].l) || []; $("#bPart").textContent = l.length ? "Partagé avec " + (l.length === 1 ? ((COMPTES[l[0]] || {}).nom || l[0]).split(" ")[0] : l.length + " collègues") : "Partager"; };
+async function vueProf(){
+  $("#vueProf").hidden = false;
+  /* premiers ateliers : les locaux déjà créés pour le ménage */
+  if (!Object.keys(K.at).length){ try { const L = (await (await fetch("locaux.json", { cache:"no-store" })).json()).locaux || []; L.forEach(l => K.at[l.id] = { nom:l.nom, t:1 }); } catch(e) {} }
+  dessiner();
+  $("#atS").onchange = e => { AT = e.target.value; localStorage.setItem("coffresAtelierChoisi", AT); dessiner(); majPart(); };
+  $("#bAtN").onclick = () => { const n = prompt("Nom de l'atelier (ex. « Atelier EGI »)"); if (!n || !n.trim()) return; const id = "at-" + nid(); K.at[id] = { nom:n.trim().slice(0, 40), t:Date.now() }; AT = id; localStorage.setItem("coffresAtelierChoisi", AT); sauver(); dessiner(); majPart(); };
+  $("#bCfN").onclick = () => { const n = prompt("Nom du coffre (ex. « Coffre 3 » ou « Cabine 3 »)", "Coffre " + (coffresDe(AT).length + 1)); if (!n || !n.trim()) return;
+    const id = "c" + nid(); K.cf[id] = { at:AT, nom:n.trim().slice(0, 40), liste:[], t:Date.now() }; sauver(); dessiner(); coffreOuvrir(id); };
+  $("#cfs").onclick = e => { const b = e.target.closest("[data-cf]"); if (b) coffreOuvrir(b.dataset.cf); };
+  $("#bQr").onclick = imprimerQr; $("#bMaj").onclick = () => { releve(true); lirePartages(); }; $("#bPart").onclick = dlgPartage;
+  const s = await COFFRE.session(); window.__moi = s && s.id;
+  try { COMPTES = (await (await fetch("comptes.json", { cache:"no-store" })).json()).comptes || {}; } catch(e) {}
+  majPart(); sauver();
+  COFFRE.demarrer("coffres", { cles:[CLE, "coffresJeton"], fusion:{ [CLE]:fusion }, apres:() => { K = lireK(); dessiner(); } });
+  releve(); lirePartages();
+  setInterval(() => { if (document.visibilityState === "visible" && $("#ov").hidden) releve(); }, 30000);
+}
+if (Q.get("c")) vueEleve(); else (window.gardeOk || Promise.resolve(true)).then(ok => { if (ok !== false) vueProf(); });
+</script>
+</body>
+</html>
