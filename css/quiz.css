@@ -430,3 +430,4 @@ body>div:not(.cache):not([hidden]){animation:fenFond .22s ease-out}
 /* transitions douces entre les pages (8 nov.) */
 @view-transition{navigation:auto}
 ::view-transition-old(root),::view-transition-new(root){animation-duration:.22s}
+#tiroir:not(.ouvert) .fermer{display:none}   /* 15 nov. : le › de fermeture dépassait dans le coin, panneau fermé */
