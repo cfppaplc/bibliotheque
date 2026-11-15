@@ -65,3 +65,41 @@ window.mpPiedHTML = () => {
 
 /* Lien « Signaler un problème » du pied de page : ouvre la fenêtre sur place (signaler.js) au lieu de changer de page */
 document.addEventListener("click", function(e){ var a = e.target.closest && e.target.closest('a[data-pied="signal"]'); if (!a || !window.mpSignaler) return; e.preventDefault(); e.stopPropagation(); window.mpSignaler(); }, true);
+
+/* Barre trop pleine (15 nov., « un … serait envisageable ») : les derniers liens qui ne tiennent pas passent dans un menu « … » */
+(function(){
+  const css = document.createElement("style");
+  css.textContent = `.mp-nav .mp-plus{display:inline-flex;align-items:center;justify-content:center;min-width:36px;min-height:32px;border:0;border-radius:9px;background:transparent;color:inherit;font:inherit;font-size:18px;font-weight:700;letter-spacing:1px;cursor:pointer;opacity:.78;padding:0 8px}
+.mp-nav .mp-plus:hover,.mp-nav .mp-plus.on{opacity:1;background:rgba(128,128,128,.14)}.mp-nav .mp-plus.ici{opacity:1;color:#EB6A22;background:rgba(235,106,34,.16)}
+.mp-plusM{position:fixed;z-index:100001;min-width:200px;padding:6px;border-radius:12px;background:#161d2c;color:#eef1f6;box-shadow:0 12px 32px rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.1)}
+html.clair .mp-plusM,body.clair .mp-plusM{background:#fff;color:#1E2A44;border-color:#E5DAC6}
+.mp-plusM a{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:8px;color:inherit;text-decoration:none;font-size:14px;font-weight:600}
+.mp-plusM a:hover{background:rgba(128,128,128,.14)}.mp-plusM a.ici{color:#EB6A22}`;
+  document.head.appendChild(css);
+  let menu = null; const fermer = () => { if (menu){ menu.remove(); menu = null; document.querySelectorAll(".mp-plus.on").forEach(b => b.classList.remove("on")); } };
+  function plier(nav){
+    nav.querySelectorAll(":scope > a").forEach(a => a.style.removeProperty("display")); const b0 = nav.querySelector(".mp-plus"); if (b0) b0.remove();
+    if (!nav.offsetParent) return;
+    const n0 = nav.getBoundingClientRect(), pr = nav.parentElement.getBoundingClientRect();
+    let lim = pr.right - (parseFloat(getComputedStyle(nav.parentElement).paddingRight) || 0);
+    let lim0 = lim; [...nav.parentElement.children].forEach(s => { if (s === nav || s.classList.contains("mp-esp") || !s.offsetParent) return; const r = s.getBoundingClientRect(), w = Math.max(r.width, s.scrollWidth); if (w && r.left > n0.left + 20){ lim0 -= w + 10; lim = Math.min(lim, r.left - 10); } }); lim = Math.min(lim, lim0);
+    if (nav.getBoundingClientRect().right <= lim) return;
+    const btn = document.createElement("button"); btn.type = "button"; btn.className = "mp-plus"; btn.textContent = "…"; btn.title = "Plus d'outils"; btn.setAttribute("aria-label", "Plus d'outils"); nav.appendChild(btn);
+    const liens = [...nav.querySelectorAll(":scope > a")].reverse(), caches = [];
+    for (const a of liens){ if (nav.getBoundingClientRect().right <= lim) break; a.style.setProperty("display", "none", "important"); caches.unshift(a); }
+    if (caches.some(a => a.classList.contains("ici"))) btn.classList.add("ici");
+    btn.onclick = e => { e.preventDefault(); e.stopPropagation(); if (menu){ fermer(); return; }
+      menu = document.createElement("div"); menu.className = "mp-plusM";
+      caches.forEach(a => { const c = a.cloneNode(true); c.style.removeProperty("display"); c.onclick = ev => { ev.preventDefault(); fermer(); a.click(); }; menu.appendChild(c); });
+      document.body.appendChild(menu); const r = btn.getBoundingClientRect();
+      menu.style.top = (r.bottom + 6) + "px"; menu.style.left = Math.max(8, Math.min(innerWidth - menu.offsetWidth - 8, r.right - menu.offsetWidth)) + "px"; btn.classList.add("on"); };
+  }
+  const tout = () => { if (menu) return; document.querySelectorAll(".mp-nav").forEach(plier); };
+  let p = 0; const bientot = () => { cancelAnimationFrame(p); p = requestAnimationFrame(tout); };
+  addEventListener("resize", () => { fermer(); bientot(); }); document.addEventListener("click", e => { if (menu && !menu.contains(e.target)) fermer(); else if (!menu) setTimeout(bientot, 350); });
+  document.addEventListener("keydown", e => { if (e.key === "Escape") fermer(); });
+  const go = () => { bientot(); setTimeout(bientot, 600); setTimeout(bientot, 2000);
+    const mo = new MutationObserver(() => bientot()); mo.observe(document.body, { attributes:true, attributeFilter:["class"] }); mo.observe(document.documentElement, { attributes:true, attributeFilter:["class"] }); };
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", go); else go();
+  window.mpNavPlier = bientot;
+})();

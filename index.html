@@ -400,6 +400,8 @@
   }
   @media (min-width:981px) and (max-width:1300px){body:is(.connecte,.pre-co):not(.eleve):not(.classe) header .search input,body:is(.connecte,.pre-co):not(.eleve):not(.classe) header .search input:focus{width:150px!important}body:is(.connecte,.pre-co):not(.eleve):not(.classe) .mp-nav-tete a{padding:6px 7px!important;gap:4px}body:is(.connecte,.pre-co):not(.eleve):not(.classe) header .search-kbd{display:none}}
 .mp-nav{display:flex;align-items:center;gap:4px;flex:none;margin-left:6px}
+/* 15 nov. (« enlève la barre de recherche ») : pas de recherche dans l'en-tête quand la barre des outils est là */
+@media (min-width:981px){body:is(.connecte,.pre-co):not(.eleve):not(.classe) header .search{display:none!important}}
 .mp-nav a{display:inline-flex!important;align-items:center;gap:6px;min-height:36px!important;padding:6px 10px!important;border:0!important;border-radius:9px;font-size:13.5px!important;font-weight:600!important;color:inherit!important;opacity:.78;text-decoration:none;white-space:nowrap;background:transparent!important}
 .mp-nav a:hover{opacity:1;background:rgba(128,128,128,.14)!important}
 .mp-nav a.ici{opacity:1;background:rgba(235,106,34,.16)!important;color:#EB6A22!important}
