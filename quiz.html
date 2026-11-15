@@ -730,7 +730,7 @@ function telecommande(bord){
   // dans « Animer au tableau », la télécommande est dans un tiroir : elle donne son code à la page
   if (params.get("inclus")) { document.body.classList.add("inclus"); try { parent.postMessage({labo: "code", code, mk: MK}, "*"); } catch(e) {} }
   $("bEcran").onclick = () => window.open(location.href.split(/[?#]/)[0] + "?ecran=" + code, "ecranClasse", "popup,width=1280,height=760");
-  try { new QRCode($("qr"), {text: url, width: 180, height: 180, correctLevel: QRCode.CorrectLevel.M}); } catch(e) { $("qr").innerHTML = '<div class="sous" style="word-break:break-all">' + esc(url) + "</div>"; }
+  try { new QRCode($("qr"), {text: url, width: 180, height: 180, correctLevel: QRCode.CorrectLevel.H}); if (window.qrLogo) qrLogo($("qr")); } catch(e) { $("qr").innerHTML = '<div class="sous" style="word-break:break-all">' + esc(url) + "</div>"; }
 
   const P = {};   // pid → {nom, pts, bons, av, vu, parti}
   const ids = () => Object.keys(P).filter(id => !P[id].parti);
@@ -1592,7 +1592,7 @@ function animer(boutons){
   document.addEventListener("click", e => { const l = e.target.closest && e.target.closest("a[href]"); if (!l || /^#/.test(l.getAttribute("href")) || l.target === "_blank") return; e.preventDefault(); quitter(l.href); }, true);
   $("tirX").onclick = () => T.classList.remove("ouvert");
   $("celB").onclick = () => { if (!animer.code || !animer.mk) return; const u = location.href.split(/[?#]/)[0] + "?manette=" + animer.code + "&k=" + animer.mk;
-    $("celQr").innerHTML = ""; try { new QRCode($("celQr"), {text: u, width: 260, height: 260, correctLevel: QRCode.CorrectLevel.M}); } catch(x) { $("celQr").textContent = u; }
+    $("celQr").innerHTML = ""; try { new QRCode($("celQr"), {text: u, width: 260, height: 260, correctLevel: QRCode.CorrectLevel.H}); if (window.qrLogo) qrLogo($("celQr")); } catch(x) { $("celQr").textContent = u; }
     $("celOv").classList.remove("cache"); };
   $("celX").onclick = () => $("celOv").classList.add("cache");
   /* 9 nov. (« le QR de l'enseignant d'abord, puis celui des élèves ») : à l'ouverture, le QR de l'enseignant couvre l'écran;
@@ -1790,7 +1790,7 @@ function ecran(code){
       else { rendre.lobK = lobK; rendre.nomsH = nomsH;
       E.innerHTML = tete(v.titre) + (cv ? `<div class="banniere" style="--u:url('${esc(cv)}')"><i class="bfond"></i><img src="${esc(cv)}" alt="" onload="if(this.naturalHeight>this.naturalWidth*1.1)this.parentNode.classList.add('port')"><span>${v.sujet ? `<small>${esc(v.sujet)}</small>` : ""}${esc(v.titre)}</span></div>` : "") + `<div class="lob"><div class="qrc"><div class="qr" id="eQr"></div><div class="codeL">Code de la partie</div><div class="code">${code.slice(0, 3)} ${code.slice(3)}</div></div><div><ol class="etapesL"><li><b>1</b>Prends ton cellulaire ou ton iPad</li><li><b>2</b>Scanne le code QR<small>avec l'appareil photo</small></li><li><b>3</b>Pas de caméra ?<small>va sur <u>${esc(location.host)}/quiz</u> et tape le code</small></li><li><b>4</b>Choisis ton personnage<small>et écris ton prénom</small></li></ol><div id="eNb" style="font-size:1.6vw;color:#B5AFA6">${nbT}</div>
         <div class="noms" id="eNoms">${nomsH}</div></div></div>` + bSon();
-      try { const tq = cv ? .16 : .22; new QRCode($("eQr"), {text: url, width: Math.round(innerWidth * tq), height: Math.round(innerWidth * tq), correctLevel: QRCode.CorrectLevel.M}); } catch(e) { $("eQr").textContent = url; } }
+      try { const tq = cv ? .16 : .22; new QRCode($("eQr"), {text: url, width: Math.round(innerWidth * tq), height: Math.round(innerWidth * tq), correctLevel: QRCode.CorrectLevel.H}); if (window.qrLogo) qrLogo($("eQr")); } catch(e) { $("eQr").textContent = url; } }
     } else if (v.etat === "diapo") {
       diapoImg(v);
       if (cle !== dernier || force) E.innerHTML = img[v.i] ? `<div class="ediapo ${v.dmv === "kb" || v.dmv === "focus" ? v.dmv : ""} k${v.i % 2}"><div class="dwrap"><img src="${img[v.i]}" alt="">${v.dlg ? `<div class="dLogo" style="left:${+v.dlg[0]}%;top:${+v.dlg[1]}%;width:${+v.dlg[2]}%;height:${+v.dlg[3]}%">${LOGO_ANIM}</div>` : ""}</div></div>` + bSon() : tete(v.titre) + bSon();

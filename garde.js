@@ -99,3 +99,14 @@ body.inclus .mp-nav{display:none!important}
   const poser = () => window.mpNavHTML && document.querySelectorAll(".mp-tete").forEach(h => { if (h.querySelector(".mp-nav")) return; const e = h.querySelector(".mp-esp"); if (e) e.insertAdjacentHTML("beforebegin", mpNavHTML(ici)); });
   const s = document.createElement("script"); s.src = "garde-nav.js"; s.onload = () => { if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", poser); else poser(); };
   (document.head || document.documentElement).appendChild(s); })();
+
+/* Code QR avec le logo Métier+ au centre (14 nov.) : appeler après new QRCode(el, {…, correctLevel: QRCode.CorrectLevel.H}).
+   La correction H tolère ~30 % de pertes; le logo couvre ~5 % du code. */
+window.qrLogo = function(el){
+  if (!el || el.querySelector(".qrLogo")) return;
+  if (getComputedStyle(el).position === "static") el.style.position = "relative";
+  el.style.display = el.style.display || "inline-block"; el.style.lineHeight = "0";
+  var i = document.createElement("img"); i.className = "qrLogo"; i.alt = ""; i.src = "img/metier-plus-icone.svg";
+  i.style.cssText = "position:absolute;left:50%;top:50%;width:22%;height:22%;transform:translate(-50%,-50%);background:#fff;padding:3%;border-radius:12%;box-sizing:content-box;pointer-events:none";
+  el.appendChild(i);
+};

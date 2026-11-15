@@ -332,7 +332,7 @@ function imprimerQr(){
     const url = base + "?o=" + encodeURIComponent(o.id) + "&e=" + encodeURIComponent(s);
     const c = document.createElement("div"); c.className = "qc";
     c.innerHTML = `<img class="l" src="img/metier-plus.svg" alt=""><b>${esc(o.nom)}</b><div class="q"></div><small>Scanne avant d'utiliser cet outil : formation et signature</small>`;
-    Z.appendChild(c); new QRCode(c.querySelector(".q"), { text:url, width:200, height:200, correctLevel:QRCode.CorrectLevel.M });
+    Z.appendChild(c); new QRCode(c.querySelector(".q"), { text:url, width:200, height:200, correctLevel:QRCode.CorrectLevel.H }); if (window.qrLogo) qrLogo(c.querySelector(".q"));
   });
   setTimeout(() => print(), 400);
 }

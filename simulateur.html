@@ -534,7 +534,7 @@ function telecommande(){
   // dans « Animer au tableau », la télécommande est dans un tiroir : elle donne son code à la page
   if (params.get("inclus")) { document.body.classList.add("inclus"); try { parent.postMessage({labo: "code", code}, "*"); } catch(e) {} }
   $("bEcran").onclick = () => window.open(location.href.split(/[?#]/)[0] + "?ecran=" + code, "ecranClasse", "popup,width=1280,height=760");
-  try { new QRCode($("qr"), {text: url, width: 180, height: 180, correctLevel: QRCode.CorrectLevel.M}); }
+  try { new QRCode($("qr"), {text: url, width: 180, height: 180, correctLevel: QRCode.CorrectLevel.H}); if (window.qrLogo) qrLogo($("qr")); }
   catch(e) { $("qr").innerHTML = '<div class="sous" style="word-break:break-all">' + esc(url) + "</div>"; }
   $("nouv").onclick = () => { try { localStorage.removeItem("simuSession"); } catch(e) {} location.reload(); };
 
@@ -761,7 +761,7 @@ function ecran(code){
       E.innerHTML = tete("Défi panneau d'alarme") + `<div class="banniere"><img src="img/labo/m5-panneau.jpg" alt=""><span><small>Protection incendie · module 5</small>Systèmes d'alarme et panneau</span></div><div class="lob"><div class="qr" id="eQr"></div><div><div style="font-size:2vw;color:#B5AFA6">Scanne le code avec ton iPad</div><div style="font-size:1.4vw;color:#8E897F;margin-top:.3vw">Pas de caméra ? Va sur <b style="color:#F2EFEA">${location.host}/simulateur</b> et entre le code.</div>
         <div class="code">${code.slice(0, 3)} ${code.slice(3)}</div><div style="font-size:1.6vw;color:#B5AFA6">${v.eqs.length} équipe${v.eqs.length > 1 ? "s" : ""} prête${v.eqs.length > 1 ? "s" : ""}</div>
         <div class="eqs">${v.eqs.map(q => `<span>${visage(q.av, "v-e")}${esc(q.n)}</span>`).join("")}</div></div></div>`;
-      try { new QRCode($("eQr"), {text: url, width: Math.round(innerWidth * .17), height: Math.round(innerWidth * .17), correctLevel: QRCode.CorrectLevel.M}); } catch(e) { $("eQr").textContent = url; }
+      try { new QRCode($("eQr"), {text: url, width: Math.round(innerWidth * .17), height: Math.round(innerWidth * .17), correctLevel: QRCode.CorrectLevel.H}); if (window.qrLogo) qrLogo($("eQr")); } catch(e) { $("eQr").textContent = url; }
     } else if (v.etat === "question" || v.etat === "reveal") {
       const r = Math.max(0, Math.ceil((v.t0 + Q_S * 1000 - n) / 1000));
       E.innerHTML = tete("Mission " + (v.i + 1) + " sur " + v.n + " · question éclair") + `<div class="eq-q">${esc(v.mis.q)}</div>
