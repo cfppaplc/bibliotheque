@@ -112,3 +112,24 @@ window.qrLogo = function(el){
   i.style.cssText = "position:absolute;left:50%;top:50%;width:20%;height:20%;padding:3%;transform:translate(-50%,-50%);background:#fff;border-radius:12%;box-sizing:content-box;pointer-events:none";
   w.appendChild(i);
 };
+
+/* Imprimer un historique (15 nov., « des traces si jamais on enquête ») : tableau simple dans un cadre caché, puis impression */
+window.mpImprimer = function(titre, sous, entetes, rangees){
+  const e = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+  const now = new Date().toLocaleString("fr-CA", { dateStyle:"long", timeStyle:"short" });
+  const html = `<!doctype html><html lang="fr"><meta charset="utf-8"><title>${e(titre)}</title><style>
+    @page{margin:14mm}body{font:12px/1.4 "Segoe UI",Roboto,Arial,sans-serif;color:#1E2A44;margin:0}
+    .t{display:flex;align-items:center;gap:12px;border-bottom:2px solid #EB6A22;padding-bottom:8px;margin-bottom:10px}.t img{height:26px}
+    h1{font-size:19px;margin:0}p{margin:2px 0;color:#555}table{width:100%;border-collapse:collapse;margin-top:10px}
+    th{background:#1E2A44;color:#fff;text-align:left;padding:5px 7px;font-size:11px}td{border-bottom:1px solid #ddd;padding:5px 7px;vertical-align:top}
+    tr{break-inside:avoid}.pied{margin-top:14px;font-size:10px;color:#777}</style>
+    <div class="t"><img src="${location.origin}${location.pathname.replace(/[^/]*$/, "")}img/metier-plus.svg" alt=""><div><h1>${e(titre)}</h1>${sous ? `<p>${e(sous)}</p>` : ""}</div></div>
+    <p>Imprimé le ${e(now)} · ${rangees.length} entrée${rangees.length > 1 ? "s" : ""}</p>
+    <table><thead><tr>${entetes.map(h => `<th>${e(h)}</th>`).join("")}</tr></thead><tbody>${rangees.map(r => `<tr>${r.map(c => `<td>${e(c)}</td>`).join("")}</tr>`).join("") || `<tr><td colspan="${entetes.length}">Aucune entrée</td></tr>`}</tbody></table>
+    <p class="pied">Document confidentiel : renseignements sur des élèves (Loi 25). À conserver en lieu sûr.</p></html>`;
+  const f = document.createElement("iframe"); f.style.cssText = "position:fixed;width:0;height:0;border:0;right:0;bottom:0"; document.body.appendChild(f);
+  f.contentDocument.open(); f.contentDocument.write(html); f.contentDocument.close();
+  const go = () => { try { f.contentWindow.focus(); f.contentWindow.print(); } catch (x) {} setTimeout(() => f.remove(), 60000); };
+  const im = f.contentDocument.querySelector("img"); if (im && !im.complete){ im.onload = im.onerror = go; setTimeout(go, 1500); } else go();
+};
+window.mpDateHeure = t => new Date(t).toLocaleString("fr-CA", { year:"numeric", month:"short", day:"numeric", hour:"2-digit", minute:"2-digit" }).replace(/(\d+):(\d+)/, "$1 h $2");

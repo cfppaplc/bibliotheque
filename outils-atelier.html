@@ -291,8 +291,9 @@ main{max-width:1500px}
       <p class="fi-note">Changer d'équipe fait refaire l'inventaire des coffres touchés : l'équipe qui quitte le remet, la nouvelle le prend.</p>` : `<div class="fi-l"><div>${e.eq ? "Équipe " + e.eq : "Aucune équipe"}</div></div><p class="fi-note">Seul l'administrateur place les élèves dans les équipes.</p>`}
       <h4>Coffre${cfs.length > 1 ? "s" : ""}</h4><div class="fi-l">${cfs.length ? cfs.map(cf => `<div><span class="s ${cf.s.mq.length ? "r" : "ok"}">${cf.s.mq.length ? "!" : "✓"}</span>${esc(cf.nom)}${grpAts().length > 1 ? " · " + esc(nomAt(cf.at)) : ""}<small>${cf.s.mq.length ? "Manque : " + esc(cf.s.mq.join(", ")) : cf.s.att ? "changement d'équipe en cours" : cf.s.der ? "" : "pas encore scanné"}</small></div>`).join("") : `<div><span class="s">–</span>${e.eq ? "Aucun coffre numéro " + e.eq : "Choisis son équipe pour lui donner un coffre"}</div>`}</div>
       <h4>Formations · ${O.length - reste} sur ${O.length}</h4><div class="fi-l">${fo || `<div><span class="s">–</span>Aucune formation encore</div>`}</div>
-      <h4>Historique</h4><div class="fi-l">${H.slice(0, 10).map(([t, x]) => `<div>${esc(x)}<small>${date(t)}</small></div>`).join("") || `<div>Rien encore</div>`}</div></div>`;
+      <h4>Historique <button class="fi-imp" data-imp style="float:right;font:inherit;font-size:13px;font-weight:700;color:#EB6A22;background:none;border:0;cursor:pointer;min-height:40px">Imprimer tout</button></h4><div class="fi-l">${H.slice(0, 10).map(([t, x]) => `<div>${esc(x)}<small>${date(t)}</small></div>`).join("") || `<div>Rien encore</div>`}</div></div>`;
     dlg.querySelector("[data-x]").onclick = () => dlg.close();
+    dlg.querySelector("[data-imp]").onclick = () => mpImprimer("Historique · " + e.p, [e.g, e.c ? "code " + e.c : "", e.eq ? "équipe " + e.eq : ""].filter(Boolean).join(" · "), ["Date et heure", "Action"], H.map(([t, x]) => [mpDateHeure(t), x]));
     dlg.querySelectorAll("[data-eq]").forEach(b => b.onclick = () => { changerEquipe(id, +b.dataset.eq); });
     if (!dlg.open) dlg.showModal();
   }

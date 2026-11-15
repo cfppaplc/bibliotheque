@@ -455,7 +455,7 @@ function coffreOuvrir(id){
     ${prop ? `<p class="avis">Liste écrite par ${nomDe(cf.prop.w)}. Vérifie-la, corrige au besoin, puis approuve.</p>` : ""}
     <div id="lst" class="lst${prop || (mien && !liste.length) ? " ed" : ""}"></div>
     ${mien ? `<div class="lact"><button class="btn" id="aMod">${liste.length ? "Modifier la liste" : ""}</button>${autres.length ? `<select id="aCp"><option value="">Copier d'un autre coffre…</option>${autres.map(([i, c]) => `<option value="${i}">${esc(c.nom)}</option>`).join("")}</select>` : ""}</div>` : `<p class="info">Coffre partagé par ${esc(((COMPTES[cf.de] || {}).nom || cf.de || "").split(" ")[0])} : vous voyez le même historique. Seul lui peut changer la liste ou demander un nouvel inventaire.</p>`}
-    ${hist ? `<details class="hd"><summary>Historique</summary>${hist}</details>` : ""}
+    ${hist ? `<details class="hd"><summary>Historique</summary>${hist}<button class="btn lien" id="aImp" style="margin-top:8px">Imprimer tout l'historique</button></details>` : ""}
     <div class="act">${mien ? `<button class="btn lien" id="aX">Retirer le coffre</button><button class="btn lien" id="aRn">Renommer</button><span class="esp"></span>` : ""}${mien && s.der && !s.att ? `<button class="btn" id="aLib" title="L'équipe qui quitte fait la remise, puis la nouvelle équipe vérifie à son tour">Changement d'équipe</button>` : ""}${mien && s.att === "chg" && cf.chg ? `<button class="btn" id="aSaut" title="L'équipe qui quitte est absente : la nouvelle équipe fait directement sa vérification">Passer la remise</button>` : ""}${mqH ? `<button class="btn vert" id="aRg">Remis en ordre</button>` : ""}<button class="btn" id="aF">Fermer</button><button class="btn p" id="aOk" hidden>${prop ? "Approuver la liste" : "Enregistrer"}</button></div>`);
   let L = liste.map(x => ({ q:x.q, n:x.n }));
   const lst = $("#lst"), ed = () => lst.classList.contains("ed");
@@ -480,6 +480,12 @@ function coffreOuvrir(id){
   };
   peindre();
   $("#aF").onclick = fermer;
+  if ($("#aImp")) $("#aImp").onclick = () => { const txt = h => String(h || "").replace(/<[^>]+>/g, "");
+    const R = s.E.map(e => [mpDateHeure(e.d),
+      e.k === "regle" || e.k === "nouveau" ? (parQui(e) === "toi" ? ((COMPTES[window.__moi] || {}).nom || "Enseignant") : txt(parQui(e))) : e.k === "annule" ? "" : txt(nomDe(e)),
+      e.k === "regle" ? "Remis en ordre" : e.k === "nouveau" ? "Nouvel inventaire demandé" : e.k === "annule" ? "Changement d'équipe annulé" : e.k === "liste" ? "Liste écrite" : (e.r ? "Remise" : "Prise ou vérification") + (e.k === "ok" ? " : tout est là" : " : il manque quelque chose"),
+      [(e.items || []).map(x => x.n + (x.e === "b" ? " (brisé)" : " (manquant)")).join(", "), e.note ? "« " + e.note + " »" : ""].filter(Boolean).join(" · ")]);
+    mpImprimer("Historique · " + cf.nom, (K.at[cf.at] || {}).nom || "", ["Date et heure", "Élève ou enseignant", "Action", "Détails"], R); };
   if ($("#aMod")){ if (!liste.length) $("#aMod").hidden = true; $("#aMod").onclick = () => { lst.classList.add("ed"); peindre(); }; }
   if ($("#aCp")) $("#aCp").onchange = e => { const c = K.cf[e.target.value]; if (!c) return; L = c.liste.map(x => ({ q:x.q, n:x.n, on:true })); peindre.cat = 0; lst.classList.add("ed"); peindre(); };
   $("#aOk").onclick = () => { const c = K.cf[id]; c.liste = L.filter(x => x.on !== false).map(x => ({ q:x.q, n:String(x.n).trim().slice(0, 60) })).filter(x => x.n); delete c.prop; c.t = Date.now(); sauver(); fermer(); dessiner(); toast(prop ? "Liste approuvée" : "Liste enregistrée"); };
