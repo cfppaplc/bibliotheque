@@ -83,15 +83,16 @@ table.g{border-collapse:separate;border-spacing:0;min-width:100%}
 @media print{
   body>*:not(#qrs){display:none!important}
   @page{margin:10mm}
-  #qrs{display:flex!important;flex-wrap:wrap;gap:6mm;align-items:flex-start;padding:0}
-  .qc{border:1.5px solid #1E2A44;border-radius:4mm;padding:5mm;break-inside:avoid;text-align:center;color:#1E2A44;font-family:system-ui,sans-serif;box-sizing:border-box}
+  /* bloc + cartes inline-block : une carte ne peut jamais être coupée entre deux pages (avec flex, Chrome coupait parfois) */
+  #qrs{display:block!important;padding:0;font-size:0}
+  .qc{display:inline-block;vertical-align:top;margin:0 5mm 5mm 0;border:1.5px solid #1E2A44;border-radius:4mm;padding:5mm;break-inside:avoid;page-break-inside:avoid;text-align:center;color:#1E2A44;font-family:system-ui,sans-serif;box-sizing:border-box}
   .qc img.l{height:7mm}.qc b{display:block;font-size:15pt;margin:2mm 0;line-height:1.15}.qc .q{display:flex;justify-content:center;margin:2mm 0}
   .qc .q canvas,.qc .q img:not(.qrLogo){width:var(--q)!important;height:var(--q)!important}
   .qc small{font-size:9pt;color:#555;display:block}
   /* trois grandeurs : petit = collé sur l'outil, moyen = sur l'étui, grand = au mur près de la machine */
   .qc.p{width:48mm;padding:3mm;border-radius:3mm;--q:30mm}.qc.p img.l{height:4mm}.qc.p b{font-size:9pt;margin:1mm 0}.qc.p small{font-size:6.5pt}
   .qc.m{width:88mm;--q:55mm}
-  .qc.g{width:190mm;padding:9mm;--q:120mm}.qc.g img.l{height:12mm}.qc.g b{font-size:28pt;margin:4mm 0}.qc.g small{font-size:14pt}
+  .qc.g{width:185mm;padding:9mm;--q:120mm}.qc.g img.l{height:12mm}.qc.g b{font-size:28pt;margin:4mm 0}.qc.g small{font-size:14pt}
 }
 /* ---- vue de l'élève (QR sur l'outil) ---- */
 html.eleve body{background:var(--fond)}
