@@ -61,6 +61,7 @@ window.ADMIN_SITE = (function(){
       + '<p class="sous">Part en ligne avec « Publier ».</p>'
       + '<a class="as-lien" href="accueil.html?menage=1" target="_blank" rel="noopener">Locaux et tâches du ménage<small>Accueil de classe</small></a>'
       + '<a class="as-lien" href="passeport.html?formations=1" target="_blank" rel="noopener">Formations du registre<small>Gestion d\'atelier</small></a>'
+      + '<a class="as-lien" href="tests.html" target="_blank" rel="noopener">Pages d\'essai<small>Navigateur, vitesse, toucher, son, connexion, écran</small></a>'
       + '<button class="as-lien" data-ong-go="livres">Réglages des livres<small>Onglet Livres</small></button></div></div>'
       + '<div class="as-carte"><div class="as-th"><h3>Signalements reçus <span class="as-nb">' + ouverts.length + ' à régler</span></h3>'
       + '<label class="as-cb"><input type="checkbox" id="asTous"' + (VOIR_REGLES ? ' checked' : '') + '> Voir aussi les réglés</label></div>'
