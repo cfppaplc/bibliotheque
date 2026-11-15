@@ -432,3 +432,15 @@ body>div:not(.cache):not([hidden]){animation:fenFond .22s ease-out}
 ::view-transition-old(root),::view-transition-new(root){animation-duration:.22s}
 #tiroir:not(.ouvert) .fermer{display:none}   /* 15 nov. : le › de fermeture dépassait dans le coin, panneau fermé */
 .eMerci{margin:auto;text-align:center;font-size:2.4vw;opacity:.9}.eMerci .gros{font-size:7vw;font-weight:900;color:#EB6A22;line-height:1.1;margin-bottom:.4em}
+/* 15 nov. : aperçu d'une question dans l'éditeur (tableau 16:9 + appareil de l'élève) */
+#apQ{border:0;border-radius:16px;padding:18px;width:min(1180px,96vw);background:#141a26;color:#fff}
+#apQ::backdrop{background:rgba(0,0,0,.6)}
+#apQ .apT{display:flex;gap:12px;align-items:center;margin-bottom:12px}#apQ .apT span{opacity:.6;font-size:14px;flex:1}
+#apQ .apG{display:grid;grid-template-columns:1fr 240px;gap:18px;align-items:start}
+#apQ figure{margin:0}#apQ figcaption{font-size:13px;opacity:.7;margin-bottom:6px}
+#apQ .apE{aspect-ratio:16/9;position:relative;overflow:hidden;border-radius:10px;background:#000}
+#apQ .apE iframe{position:absolute;left:0;top:0;width:1920px;height:1080px;border:0;transform-origin:0 0;transform:scale(var(--k,.45))}
+#apQ .apP{width:240px;height:480px;position:relative;overflow:hidden;border-radius:22px;border:6px solid #2a3245;background:#000}
+#apQ .apP iframe{position:absolute;left:0;top:0;width:390px;height:780px;border:0;transform-origin:0 0;transform:scale(.6)}
+@media (max-width:760px){#apQ .apG{grid-template-columns:1fr}#apQ .apJ{justify-self:center}}
+html.apercuQ #fsBtn,html.apercuQ #mpVersion,html.apercuQ #bSon{display:none!important}

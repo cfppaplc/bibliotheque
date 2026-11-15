@@ -161,7 +161,33 @@ function reglagesDe(id){ return (stock.get("quizReglages", {}) || {})[id] || {};
 function fixerReglage(id, k, v){ const t = stock.get("quizReglages", {}) || {}; t[id] = Object.assign({}, t[id], {[k]: v}); stock.set("quizReglages", t); }
 function tousQuiz(){ return [EXEMPLE].concat(LIVRES_Q, mesQuiz()); }
 
+/* Aperçu d'une question dans l'éditeur : ce que la classe voit au tableau + ce que l'élève voit sur son appareil */
+function apercuQ(Q){
+  let d = document.getElementById("apQ");
+  if (!d) { d = document.createElement("dialog"); d.id = "apQ";
+    d.innerHTML = `<div class="apT"><b>Aperçu de la question</b><span>Rien n'est envoyé aux élèves.</span><button class="btn2" id="apX">Fermer</button></div>
+      <div class="apG"><figure><figcaption>Au tableau</figcaption><div class="apE"><iframe id="apE" title="Tableau"></iframe></div></figure>
+      <figure class="apJ"><figcaption>Sur l'appareil de l'élève</figcaption><div class="apP"><iframe id="apJ" title="Appareil de l'élève"></iframe></div></figure></div>`;
+    document.body.appendChild(d); d.querySelector("#apX").onclick = () => d.close();
+    d.addEventListener("close", () => { d.querySelector("#apE").src = "about:blank"; d.querySelector("#apJ").src = "about:blank"; }); }
+  const t = typeDe(Q), coul = (typeof ed !== "undefined" && ed && ed.reg && ed.reg.coul) || REG_DEF.coul, now = Date.now(), s = +Q.s || 20;
+  const ch = (Q.ch || []).filter(x => x !== "" && x != null), base = location.href.split(/[?#]/)[0];
+  const vue = {m: "vue", sp: false, code: "000000", etat: "question", titre: "Aperçu", i: 0, n: 1, qn: 1, nq: 1, t0: now, now,
+    reg: {coul, son: "non", musique: "non", classement: "oui", points: "vitesse", mode: "ind", lettres: "non"}, couv: "", sujet: "",
+    q: {q: Q.q || "(ta question)", ch, s, t, u: Q.u || "", zoom: Q.zoom || null, img: !!Q.img, expl: "", bonTxt: ""},
+    pres: false, mots: t === "nuage" ? [] : null, dref: "", mains: 0, conn: false, dmv: "", dlg: null, bon: null, cpt: [0, 0, 0, 0, 0, 0], nrep: 0, mises: 0, joueurs: []};
+  const qm = {m: "q", now, pour: null, i: 0, n: 1, qn: 1, nq: 1, q: vue.q.q, ch, t, u: Q.u || "", nb: t === "multi" ? (Q.bon || []).length : 0, t0: now, lec: 0, s, coul, dbl: false, ind: false, ret: null};
+  const charger = (id, url, msgs) => { const f = d.querySelector("#" + id); f.onload = () => { let n = 0; const go = () => { const w = f.contentWindow; if (w && w.__recoit) msgs.forEach(m => w.__recoit(m)); else if (n++ < 40) setTimeout(go, 100); }; go(); }; f.src = url; };
+  charger("apE", base + "?ecran=000000&apercu=1", (Q.img ? [{m: "img", i: 0, data: Q.img}] : []).concat([vue]));
+  charger("apJ", base + "?j=000000&apercu=1", [qm]);
+  d.showModal();
+  const fit = () => { const e = d.querySelector(".apE"); if (e.clientWidth) e.style.setProperty("--k", e.clientWidth / 1920); };
+  fit(); requestAnimationFrame(fit); if (!apercuQ.r) { apercuQ.r = 1; addEventListener("resize", fit); }
+}
 const params = new URLSearchParams(location.search);
+/* 15 nov. (« un petit preview lorsqu'on crée les questions ») : ?apercu=1 = page montrée dans l'aperçu de l'éditeur;
+   rien ne passe par le relais, l'éditeur donne les messages directement (window.__recoit) */
+if (params.get("apercu")) { envoyer = () => {}; ecouter = (t, cb) => { window.__recoit = cb; }; document.documentElement.classList.add("apercuQ"); }
 if (params.get("animer")) animer([["bGo"], ["bSuite"], ["bPause"]]);
 else if (params.get("manette")) manette(params.get("manette").replace(/\D/g, "").slice(0, 6), params.get("k") || "");
 else if (params.get("j")) joueur(params.get("j").replace(/\D/g, "").slice(0, 6));
@@ -653,7 +679,7 @@ function telecommande(bord){
       if (Q.auto) aide = "Question proposée à partir des diapos : vérifie-la et change-la au besoin. " + aide;
       return `<div class="qe" data-t="${t}"><div class="tete"><b>Question ${nQ}${nom ? " · " + nom : ""}</b>${tps}
       <button class="btn2" data-mv="${k},-1" ${k ? "" : "disabled"} aria-label="Monter">↑</button><button class="btn2" data-mv="${k},1" ${k < ed.qs.length - 1 ? "" : "disabled"} aria-label="Descendre">↓</button>
-      <button class="btn2" data-del="${k}" ${ed.qs.length < 2 ? "disabled" : ""}>Retirer</button></div>
+      <button class="btn2" data-del="${k}" ${ed.qs.length < 2 ? "disabled" : ""}>Retirer</button><button class="btn2" data-voir="${k}">Aperçu</button></div>
       <input class="tq" placeholder="${t === "sondage" ? "La question (ex. : Quel sujet veux-tu revoir ?)" : t === "echelle" ? "L'énoncé (ex. : Je suis capable de souder un raccord en cuivre.)" : t === "nuage" ? "La question (ex. : Un mot qui te vient en tête quand tu penses à la sécurité ?)" : t === "nombre" ? "La question (ex. : 2 moteurs de 7,7 VA : combien de VA en tout ?)" : "La question"}" value="${esc(Q.q)}" maxlength="180" style="margin-top:8px">
       ${corps}
       <textarea class="ex" placeholder="Explication affichée après la réponse (facultatif)" maxlength="240">${esc(Q.expl || "")}</textarea>
@@ -662,6 +688,7 @@ function telecommande(bord){
     document.querySelectorAll("[data-del]").forEach(b => b.onclick = () => { lireEd(); ed.qs.splice(+b.dataset.del, 1); dessinerEd(); });
     document.querySelectorAll("[data-apres]").forEach(b => b.onclick = () => { lireEd(); const k = +b.dataset.apres + 1; ed.qs.splice(k, 0, proposer(k - 1) || qVide()); dessinerEd();
       setTimeout(() => { const q = document.querySelectorAll(".qe")[k]; if (q) { q.scrollIntoView({block: "center", behavior: "smooth"}); const f = q.querySelector(".tq"); if (f) f.focus(); } }, 50); });
+    document.querySelectorAll("[data-voir]").forEach(b => b.onclick = () => { lireEd(); apercuQ(ed.qs[+b.dataset.voir]); });
     document.querySelectorAll("[data-mv]").forEach(b => b.onclick = () => { lireEd(); const [k, d] = b.dataset.mv.split(",").map(Number); const t = ed.qs[k]; ed.qs[k] = ed.qs[k + d]; ed.qs[k + d] = t; dessinerEd(); });
     document.querySelectorAll("[data-plus]").forEach(b => b.onclick = () => { lireEd(); ed.qs[+b.dataset.plus].ch.push(""); dessinerEd(); });
     document.querySelectorAll("[data-noimg]").forEach(b => b.onclick = () => { lireEd(); delete ed.qs[+b.dataset.noimg].img; delete ed.qs[+b.dataset.noimg].zoom; dessinerEd(); });
@@ -868,6 +895,8 @@ function joueur(code){
       document.addEventListener("visibilitychange", () => { if (!document.hidden && entre) { envoyer(topic, {m: "vie", pid}); envoyer(topic, {m: "ici", pid, nom, av, prenom}); } }); }
   }
   ecranChoix();
+  if (params.get("apercu")) { av = 0; nomChoisi = "Alex"; entrer(); try { sessionStorage.removeItem("quizJoueur"); localStorage.removeItem("quizDernier"); } catch(e) {} }
+  else
   /* Déjà dans la partie (page rechargée, iPad planté, QR rescanné, nouvel onglet) : on revient tout seul, sans rechoisir;
      la télécommande lui redonne sa fiche et ses points (même prénom) */
   try { const J = JSON.parse(sessionStorage.getItem("quizJoueur") || "null") || JSON.parse(localStorage.getItem("quizDernier") || "null");
