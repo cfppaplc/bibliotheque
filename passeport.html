@@ -63,10 +63,16 @@ table.g{border-collapse:separate;border-spacing:0;min-width:100%}
 #qrs{display:none}
 @media print{
   body>*:not(#qrs){display:none!important}
-  #qrs{display:grid!important;grid-template-columns:1fr 1fr;gap:10mm;padding:0}
-  .qc{border:1.5px solid #1E2A44;border-radius:6mm;padding:7mm;break-inside:avoid;text-align:center;color:#1E2A44;font-family:system-ui,sans-serif}
-  .qc img.l{height:8mm}.qc b{display:block;font-size:17pt;margin:3mm 0}.qc .q{display:flex;justify-content:center;margin:2mm 0}
-  .qc small{font-size:10pt;color:#555}
+  @page{margin:10mm}
+  #qrs{display:flex!important;flex-wrap:wrap;gap:6mm;align-items:flex-start;padding:0}
+  .qc{border:1.5px solid #1E2A44;border-radius:4mm;padding:5mm;break-inside:avoid;text-align:center;color:#1E2A44;font-family:system-ui,sans-serif;box-sizing:border-box}
+  .qc img.l{height:7mm}.qc b{display:block;font-size:15pt;margin:2mm 0;line-height:1.15}.qc .q{display:flex;justify-content:center;margin:2mm 0}
+  .qc .q canvas,.qc .q img:not(.qrLogo){width:var(--q)!important;height:var(--q)!important}
+  .qc small{font-size:9pt;color:#555;display:block}
+  /* trois grandeurs : petit = collé sur l'outil, moyen = sur l'étui, grand = au mur près de la machine */
+  .qc.p{width:48mm;padding:3mm;border-radius:3mm;--q:30mm}.qc.p img.l{height:4mm}.qc.p b{font-size:9pt;margin:1mm 0}.qc.p small{font-size:6.5pt}
+  .qc.m{width:88mm;--q:55mm}
+  .qc.g{width:190mm;padding:9mm;--q:120mm}.qc.g img.l{height:12mm}.qc.g b{font-size:28pt;margin:4mm 0}.qc.g small{font-size:14pt}
 }
 /* ---- vue de l'élève (QR sur l'outil) ---- */
 html.eleve body{background:var(--fond)}
@@ -324,15 +330,30 @@ async function releve(manuel){
   } finally { RELEVE = false; }
 }
 
+/* grandeur de la fiche de chaque outil (gardée avec les données du passeport) */
+const TAILLE_DEF = { "escabeau":"g", "scie-onglets":"g", "fileteuse":"g", "oxyacetylene":"g", "chalumeau-propane":"m", "sertisseuse":"m" };
+const tailleDe = id => { try { const T = JSON.parse(localStorage.getItem("passQrTailles") || "{}"); return T[id] || TAILLE_DEF[id] || "p"; } catch(e){ return "p"; } };
+function dlgQr(){
+  if (!window.__moi) return toast("Connecte-toi d'abord à la bibliothèque.");
+  const seg = o => `<span class="tl" data-id="${esc(o.id)}" style="display:inline-flex;gap:4px">${[["p","Petit"],["m","Moyen"],["g","Grand"]].map(([k, n]) => `<button type="button" class="btn${tailleDe(o.id) === k ? " p" : ""}" data-t="${k}" style="min-height:42px;padding:6px 12px">${n}</button>`).join("")}</span>`;
+  ouvrir(`<h2>Codes QR à imprimer</h2><p>Petit : collé sur l'outil (3 cm). Moyen : sur l'étui ou la boîte (5,5 cm). Grand : au mur près de la machine (12 cm).</p>
+    ${PROT.outils.map(o => `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--fil,#e5dac6)"><span style="flex:1;font-weight:650">${esc(o.nom)}</span>${seg(o)}</div>`).join("")}
+    <div class="act"><button class="btn" id="aF">Annuler</button><button class="btn p" id="aOk">Imprimer</button></div>`);
+  $("#bx").querySelectorAll(".tl").forEach(z => z.querySelectorAll("button").forEach(b => b.onclick = () => {
+    let T = {}; try { T = JSON.parse(localStorage.getItem("passQrTailles") || "{}"); } catch(e) {}
+    T[z.dataset.id] = b.dataset.t; localStorage.setItem("passQrTailles", JSON.stringify(T));
+    z.querySelectorAll("button").forEach(x => x.classList.toggle("p", x === b)); }));
+  $("#aF").onclick = fermer; $("#aOk").onclick = () => { fermer(); imprimerQr(); };
+}
 function imprimerQr(){
   const s = window.__moi; if (!s) return toast("Connecte-toi d'abord à la bibliothèque.");
   const base = location.href.replace(/[^/]*$/, "") + "passeport.html";
   const Z = $("#qrs"); Z.innerHTML = "";
-  PROT.outils.forEach(o => {
+  [...PROT.outils].sort((a, b) => "pmg".indexOf(tailleDe(a.id)) - "pmg".indexOf(tailleDe(b.id))).forEach(o => {
     const url = base + "?o=" + encodeURIComponent(o.id) + "&e=" + encodeURIComponent(s);
-    const c = document.createElement("div"); c.className = "qc";
-    c.innerHTML = `<img class="l" src="img/metier-plus.svg" alt=""><b>${esc(o.nom)}</b><div class="q"></div><small>Scanne avant d'utiliser cet outil : formation et signature</small>`;
-    Z.appendChild(c); new QRCode(c.querySelector(".q"), { text:url, width:200, height:200, correctLevel:QRCode.CorrectLevel.H }); if (window.qrLogo) qrLogo(c.querySelector(".q"));
+    const c = document.createElement("div"); c.className = "qc " + tailleDe(o.id);
+    c.innerHTML = `<img class="l" src="img/metier-plus.svg" alt=""><b>${esc(o.nom)}</b><div class="q"></div><small>${tailleDe(o.id) === "p" ? "Scanne avant d'utiliser" : "Scanne avant d'utiliser cet outil : formation et signature"}</small>`;
+    Z.appendChild(c); new QRCode(c.querySelector(".q"), { text:url, width:600, height:600, correctLevel:QRCode.CorrectLevel.H }); if (window.qrLogo) qrLogo(c.querySelector(".q"));
   });
   setTimeout(() => print(), 400);
 }
@@ -415,12 +436,12 @@ async function vueProf(){
     D.grp[GRP] = { x:1, t }; GRP = ""; sauver(); surG = 0; ev.target.textContent = "Effacer ce groupe"; dessiner(); };
   $("#tw").onclick = e => { const c = e.target.closest("button.c"); if (c) return caseOuvrir(c.dataset.e, c.dataset.o);
     const n = e.target.closest("button[data-el]"); if (n) eleveOuvrir(n.dataset.el); };
-  $("#bQr").onclick = imprimerQr;
+  $("#bQr").onclick = dlgQr;
   $("#bMaj").onclick = () => releve(true);
   $("#bPart").onclick = dlgPartage; majPart();
   $("#bProt").hidden = !localStorage.ghJeton; $("#bProt").onclick = editerProt;
   const s = await COFFRE.session(); window.__moi = s && s.id; majPart();
-  COFFRE.demarrer("passeport", { cles:[CLE, CLE_J], fusion:{ [CLE]:fusion }, apres:() => { D = lireD(); dessiner(); } });
+  COFFRE.demarrer("passeport", { cles:[CLE, CLE_J, "passQrTailles"], fusion:{ [CLE]:fusion }, apres:() => { D = lireD(); dessiner(); } });
   releve(); setInterval(() => { if (document.visibilityState === "visible" && $("#ov").hidden) releve(); }, 30000);
 }
 
