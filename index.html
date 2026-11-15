@@ -163,19 +163,6 @@ document.addEventListener("keydown", e => { if (e.key !== "/" || e.ctrlKey || e.
 <div class="toast" id="toast" hidden></div>
 
 
-<div class="pwbox" id="pw" hidden role="dialog" aria-label="Mot de passe de l'administration">
-  <div class="pwcard"><label for="pwIn">Mot de passe</label><input id="pwIn" type="password" autocomplete="off"><div class="pwerr" id="pwErr" hidden>Mot de passe incorrect.</div>
-    <div class="pwbtns"><button class="sbtn" id="pwCancel">Annuler</button><button class="primary" id="pwOk">Entrer</button></div></div>
-</div>
-<div class="admin" id="admin" hidden role="dialog" aria-label="Administration de la bibliothèque">
-  <div class="admin-box">
-    <div class="admin-head"><h2>Administration de la bibliothèque</h2><button id="adminClose" aria-label="Fermer l'administration">✕</button></div>
-    <div class="admin-tabs" role="tablist">
-      <button data-tab="add" class="on" role="tab">Ajouter des livres</button><button data-tab="mine" role="tab">Mes livres</button><button data-tab="cats" role="tab">Catégories</button><button data-tab="backup" role="tab">Copie de sécurité</button>
-    </div>
-    <div class="admin-body" id="adminBody"></div>
-  </div>
-</div>
 
 <div class="reader" id="reader">
   <div class="reader-bar"><img class="rb-logo" src="img/metier-plus-blanc.svg" alt="Métier+"><button id="readerBack">← Retour</button><button id="readerTdb" type="button" title="Tableau de bord (E) — le livre reste ouvert"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="4" width="17" height="12.5" rx="1.5"/><path d="M8 20h8M12 16.5V20"/></svg>Tableau de bord</button><button id="readerLivre" type="button" title="Revenir au livre (B)">‹ Revenir au livre</button><span id="readerTitle"></span><span id="telePill" hidden title="Ton cellulaire contrôle ce livre"><i></i>Télécommande branchée</span></div>
@@ -257,7 +244,7 @@ document.addEventListener("keydown", e => { if (e.key !== "/" || e.ctrlKey || e.
   <div class="panel" id="panel"></div>
 </div>
 
-<footer><img class="foot-logo" src="img/pavillon-avenir.png" alt="Pavillon de l'Avenir"><div><b>Métier+ · Conçu par Jeremy, enseignant</b></div><div class="foot-s">Né au Pavillon de l'Avenir, centre de formation professionnelle</div><div class="foot-s">Réservé aux enseignants du Pavillon de l'Avenir · Livres interactifs pour la classe et l'atelier</div><div class="foot-s"><a href="presentation.html" style="color:inherit">Découvrir Métier+ (présentation)</a></div><div class="foot-s">© 2026 Jérémy Raymond · Tous droits réservés</div><button class="adm-btn" id="adminBtn" aria-label="Administration" title="Administration" hidden>⚙</button></footer>
+<footer><img class="foot-logo" src="img/pavillon-avenir.png" alt="Pavillon de l'Avenir"><div><b>Métier+ · Conçu par Jeremy, enseignant</b></div><div class="foot-s">Né au Pavillon de l'Avenir, centre de formation professionnelle</div><div class="foot-s">Réservé aux enseignants du Pavillon de l'Avenir · Livres interactifs pour la classe et l'atelier</div><div class="foot-s"><a href="presentation.html" style="color:inherit">Découvrir Métier+ (présentation)</a></div><div class="foot-s">© 2026 Jérémy Raymond · Tous droits réservés</div></footer>
 
 <script>
 window.LIVRES_DATA = {};
@@ -269,7 +256,7 @@ window.LIVRES_EXTERNES = true;   // les livres sont des fichiers du dossier livr
 <script src="js/lecteur-souris.js?v=1"></script>
 <script src="js/tableau-blanc.js?v=1"></script>
 <script src="js/lecteur.js?v=1"></script>
-<script src="js/livres-ajoutes.js?v=1"></script>
+<script src="js/donnees.js?v=1"></script>
 <script src="js/barres.js?v=1"></script>
 
 <style>

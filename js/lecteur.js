@@ -769,7 +769,7 @@ function ouvrirLivre(l, brut){
     $("#cache").style.top = "40%"; $("#tbTot").textContent = ""; $("#tbPg").value = "";
     $("#readerTitle").textContent = l.titre;
     $("#reader").classList.add("open"); initBarres();
-    closeModal(); closeMenu(); closeAdmin();
+    closeModal(); closeMenu();
     document.body.style.overflow = "hidden";
     sizeInner(); refreshTools();
     $("#readerFrame").srcdoc = html;

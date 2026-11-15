@@ -63,7 +63,7 @@ try { if (localStorage.getItem("gros") === "1") setGros(true); } catch(e){}
 function setClasse(on){
   document.body.classList.toggle("classe", on); $("#classeBtn").classList.toggle("on", on);
   try {
-    if (on){ view = "all"; query = ""; $("#search").value = ""; render(); closeAdmin(); const r = document.documentElement.requestFullscreen; if (r) r.call(document.documentElement).catch(() => {}); }
+    if (on){ view = "all"; query = ""; $("#search").value = ""; render(); const r = document.documentElement.requestFullscreen; if (r) r.call(document.documentElement).catch(() => {}); }
     else if (document.fullscreenElement) document.exitFullscreen();
   } catch(e){}
 }
@@ -291,4 +291,4 @@ window.__htmlImpression = htmlImpression;
   document.addEventListener("pointerup", fin); document.addEventListener("pointercancel", fin);
 })();
 
-initAdmin();
+initDonnees();

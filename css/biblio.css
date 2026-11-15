@@ -522,23 +522,7 @@ html.zflou .reader:not(.wbon) #rinner{will-change:transform}
   .comp{margin-top:3px;font-size:.84rem;font-weight:600;color:#a9a9ae;letter-spacing:.01em}
   .adm-btn{background:transparent;border:0;color:#fff;opacity:.28;cursor:pointer;font-size:1rem;padding:6px 10px;margin-left:8px;font-family:inherit}
   .adm-btn:hover,.adm-btn:focus-visible{opacity:.9}
-  .pwbox{position:fixed;inset:0;z-index:160;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;padding:16px}
-  .pwcard{background:#181818;border-radius:10px;padding:20px;width:100%;max-width:320px;display:flex;flex-direction:column;gap:10px;box-shadow:0 20px 60px #000}
-  .pwcard label{font-size:.9rem;color:#ccc}
   @keyframes pulse{50%{opacity:.25}}
-  .pwcard input{background:#111;border:1px solid #555;color:#fff;border-radius:6px;padding:10px 12px;font-size:1rem;font-family:inherit;width:100%}
-  .pwcard input:focus{outline:2px solid #fff;outline-offset:1px}
-  .pwerr{color:#ff8a8a;font-size:.85rem}
-  .pwbtns{display:flex;gap:8px;justify-content:flex-end;margin-top:4px}
-  .admin{position:fixed;inset:0;z-index:150;background:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;padding:16px}
-  .admin-box{background:#181818;border-radius:10px;width:100%;max-width:1000px;max-height:92vh;display:flex;flex-direction:column;box-shadow:0 20px 60px #000;min-width:0}
-  .admin-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 22px 8px}
-  .admin-head h2{font-size:1.3rem}
-  .admin-head button{width:36px;height:36px;border-radius:50%;border:0;background:#333;color:#fff;font-size:1.1rem;cursor:pointer}
-  .admin-tabs{display:flex;flex-wrap:wrap;gap:6px;padding:6px 22px 0;border-bottom:1px solid #333}
-  .admin-tabs button{background:transparent;color:#bbb;border:0;border-bottom:3px solid transparent;padding:10px 12px;cursor:pointer;font-size:.95rem;font-weight:600;font-family:inherit}
-  .admin-tabs button.on{color:#fff;border-bottom-color:var(--accent)}
-  .admin-body{padding:18px 22px 24px;overflow:auto;min-width:0}
   .adm-note{color:#bbb;line-height:1.5;margin-bottom:14px;font-size:.92rem}
   .adm-warn{background:#3a2a00;border:1px solid #8a6500;color:#ffd98a;padding:10px 12px;border-radius:6px;margin-bottom:14px;font-size:.9rem;line-height:1.4}
   .drop{display:flex;align-items:center;justify-content:center;text-align:center;border:2px dashed #666;border-radius:10px;padding:34px 16px;cursor:pointer;color:#ddd;margin-bottom:16px}
@@ -549,8 +533,6 @@ html.zflou .reader:not(.wbon) #rinner{will-change:transform}
   .pend-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 14px}
   .pend-form label,.edit-form label{display:flex;flex-direction:column;gap:4px;font-size:.8rem;color:#bbb;min-width:0}
   .pend-form .wide{grid-column:1/-1}
-  .admin input:not([type=file]),.admin select,.admin textarea{background:#111;border:1px solid #555;color:#fff;border-radius:6px;padding:8px 10px;font-size:.95rem;font-family:inherit;min-width:0;width:100%}
-  .admin input:focus,.admin select:focus,.admin textarea:focus{outline:2px solid #fff;outline-offset:1px}
   .pend-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:flex-end}
   .pend-actions span{margin-right:auto;color:#999;font-size:.8rem;overflow-wrap:anywhere}
   .sbtn,.primary,.danger{border:1px solid #666;background:#2a2a2a;color:#fff;border-radius:6px;padding:8px 12px;cursor:pointer;font-size:.85rem;font-weight:600;font-family:inherit;text-align:center}
@@ -615,8 +597,6 @@ html.zflou .reader:not(.wbon) #rinner{will-change:transform}
   .btn{transition:background .2s,transform .15s}
   .btn:active{transform:scale(.97)}
   .modal.open .panel{animation:pop .3s cubic-bezier(.2,.8,.2,1)}
-  .admin:not([hidden]),.pwbox:not([hidden]){animation:fadeIn .2s ease}
-  .admin:not([hidden]) .admin-box,.pwbox:not([hidden]) .pwcard{animation:pop .28s cubic-bezier(.2,.8,.2,1)}
   .reader.open{animation:fadeIn .3s ease}
   .reader.open .tb{animation:slideUp .35s cubic-bezier(.2,.8,.2,1)}
   .mmenu:not([hidden]){animation:fadeIn .18s ease}
