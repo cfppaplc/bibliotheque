@@ -312,8 +312,9 @@ async function vueEleve(){
     try {
       if (obj.k !== "liste"){ if (MODE === "remise") obj.r = 1; const ses = SES, cle = cid + "|" + ses, M = mesVerrous(); let j = M[cle];
         if (!j){ j = btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(24))));
-          if (!(await VERROU.prendre(cid, ses, j, { c:w.c || "", c2:w.c2 || "", t:Date.now() }))){ pris(await VERROU.lire(cid, ses)); return false; }
-          for (const k in M) if (k.startsWith(cid + "|")) delete M[k]; M[cle] = j; localStorage.setItem("coffresMesVerrous", JSON.stringify(M)); }
+          if (!(await VERROU.prendre(cid, ses, j, { c:w.c || "", c2:w.c2 || "", t:Date.now() }))){
+            if (!(parCode && MODE === "prise" && (cf.eqc || []).includes(w.c))){ pris(await VERROU.lire(cid, ses)); return false; } j = ""; }
+          if (j){ for (const k in M) if (k.startsWith(cid + "|")) delete M[k]; M[cle] = j; localStorage.setItem("coffresMesVerrous", JSON.stringify(M)); } }
         obj.lj = j; obj.ses = ses; }
       const d = await (await fetch("comptes.json", { cache:"no-store" })).json(), C = d.comptes || {};
       const dep = async (id, pub) => { for (let n = 0; n < 400; n++){ try { await COFFRE.deposer("coffres|" + id + "|" + n, obj, pub); return true; } catch(e){ if (!/refus/.test(e.message)) throw e; } } return false; };
@@ -344,10 +345,12 @@ async function vueEleve(){
   /* changement d'équipe : l'équipe qui quitte fait la remise (verrou r<tour>), puis la nouvelle équipe fait la prise (t<tour>) */
   if (cf.chg){ const rk = "r" + (cf.tour || 0); if (mesVerrous()[cid + "|" + rk] || !(await VERROU.lire(cid, rk))){ MODE = "remise"; SES = rk; } }
   if (MODE === "prise" && dormant()) return ferme();
-  if (!mesVerrous()[cid + "|" + SES]){ const v = await VERROU.lire(cid, SES); if (v) return pris(v); }
+  /* 15 nov. (Jeremy) : le coffre est à toute l'équipe : un coéquipier peut faire l'inventaire sur son propre cellulaire; les autres équipes restent bloquées */
+  let EQPRIS = false;
+  if (!mesVerrous()[cid + "|" + SES]){ const v = await VERROU.lire(cid, SES); if (v){ if (parCode && MODE === "prise" && (cf.eqc || []).length) EQPRIS = true; else return pris(v); } }
   const deja = new Set(cf.mq || []);
   /* remise et prise (15 nov., Jeremy) : l'élève doit toucher chaque outil (présent → manquant → brisé) avant d'envoyer; le scan suivant de la même équipe reste rapide */
-  if (MODE === "remise" || !mesVerrous()[cid + "|" + SES]){
+  if (MODE === "remise" || (!mesVerrous()[cid + "|" + SES] && !EQPRIS)){
     V.innerHTML = `${tete}${MODE === "remise" ? `<p class="avisR">Remise du coffre · équipe qui quitte</p>${aide("Tu remets ce coffre. Touche chaque outil pour confirmer qu'il est là.")}` : aide("Tu prends ce coffre. Touche chaque outil pour confirmer qu'il est là. Tu en es responsable jusqu'à la prochaine session.")}
       ${leg([["v", "Présent", 1], ["m", "Manquant", 2], ["b", "Brisé", 3]])}<p class="compte" id="cpt"></p>
       <div id="its" class="choix">${cf.liste.map((x, i) => `<div class="it${deja.has(x.n) ? " deja" : ""}" data-i="${i}"><span class="q">${x.q}</span><span>${esc(x.n)}</span><span class="s">${deja.has(x.n) ? "déjà signalé" : ""}</span></div>`).join("")}</div>
