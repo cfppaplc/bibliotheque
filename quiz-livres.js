@@ -333,6 +333,98 @@ window.QUIZ_LIVRES = [
 "fixe": true
 },
 {
+"id": "gestion-atelier",
+"exemple": true,
+"titre": "Gestion d’atelier : formation des enseignants",
+"sujet": "Présentation",
+"couv": "img/labo/quiz/gestion/ga-01.jpg?v=1",
+"coul": "#EB6A22",
+"fixe": true,
+"reg": {
+"nb": "tout",
+"melange": "non",
+"mode": "ind",
+"temps": "normal",
+"penalite": "non",
+"cache": "non",
+"lettres": "non",
+"double": "non"
+},
+"qs": [
+{
+"t": "diapo",
+"img": "img/labo/quiz/gestion/ga-01.jpg?v=1",
+"q": "",
+"s": 0
+},
+{
+"t": "diapo",
+"img": "img/labo/quiz/gestion/ga-02.jpg?v=1",
+"q": "",
+"s": 0
+},
+{
+"t": "diapo",
+"img": "img/labo/quiz/gestion/ga-03.jpg?v=1",
+"q": "",
+"s": 0
+},
+{
+"t": "diapo",
+"img": "img/labo/quiz/gestion/ga-04.jpg?v=1",
+"q": "",
+"s": 0
+},
+{
+"t": "diapo",
+"img": "img/labo/quiz/gestion/ga-05.jpg?v=1",
+"q": "",
+"s": 0
+},
+{
+"t": "diapo",
+"img": "img/labo/quiz/gestion/ga-06.jpg?v=1",
+"q": "",
+"s": 0
+},
+{
+"t": "diapo",
+"img": "img/labo/quiz/gestion/ga-07.jpg?v=1",
+"q": "",
+"s": 0
+},
+{
+"t": "diapo",
+"img": "img/labo/quiz/gestion/ga-08.jpg?v=1",
+"q": "",
+"s": 0
+},
+{
+"t": "diapo",
+"img": "img/labo/quiz/gestion/ga-09.jpg?v=1",
+"q": "",
+"s": 0
+},
+{
+"t": "sondage",
+"q": "Prêt à l’essayer avec un de tes groupes ?",
+"ch": [
+"Oui, dès cette semaine",
+"Oui, avec un petit groupe d’abord",
+"J’ai encore des questions"
+],
+"bon": null,
+"s": 30
+},
+{
+"t": "diapo",
+"img": "img/labo/quiz/gestion/ga-10.jpg?v=1",
+"q": "",
+"s": 0
+}
+]
+},
+{
 "id": "culture-generale",
 "exemple": true,
 "titre": "Culture générale",
