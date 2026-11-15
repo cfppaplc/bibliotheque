@@ -79,6 +79,22 @@ main{max-width:1500px}
 /* transitions douces entre les pages (8 nov.) */
 @view-transition{navigation:auto}
 ::view-transition-old(root),::view-transition-new(root){animation-duration:.22s}
+
+/* Par élève (15 nov.) : formations + coffre d'un coup d'œil */
+.pe-bar{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 12px}
+.pe-bar select,.pe-bar input{min-height:44px;border-radius:10px;border:1px solid var(--ligne);background:var(--carte);color:var(--txt);padding:0 12px;font-size:15px}
+.pe-bar input{flex:1;min-width:180px}
+.pe-l{display:flex;flex-direction:column;gap:8px}
+.pe-r{display:grid;grid-template-columns:minmax(150px,1.1fr) 2fr minmax(180px,1.3fr);gap:14px;align-items:center;background:var(--carte);border:1px solid var(--ligne);border-radius:12px;padding:12px 16px}
+.pe-n b{font-size:16px}.pe-n small{display:block;color:var(--gris);font-size:13px}
+.pe-f{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.pe-f span{font-size:12px;border-radius:20px;padding:3px 9px;background:var(--carte2);color:var(--gris)}
+.pe-f span.ok{background:#1E8A5526;color:#2FA86C}.pe-f span.dm{background:#EB6A2226;color:#EB6A22}
+.pe-f em{font-style:normal;font-weight:700;font-size:13px;margin-right:4px}
+.pe-c{font-size:14px}.pe-c small{display:block;color:var(--gris);font-size:12px}
+.pe-c .pt{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;background:#2FA86C}.pe-c .pt.r{background:#D9534F}
+.pe-vide{color:var(--gris);font-size:15px;background:var(--carte);border:1px dashed var(--ligne);border-radius:12px;padding:16px}
+@media (max-width:760px){.pe-r{grid-template-columns:1fr;gap:8px}}
 </style>
 <script>
 /* Même thème que la bibliothèque : choix gardé dans localStorage.accueilClair, sinon l'ordinateur */
@@ -98,7 +114,46 @@ main{max-width:1500px}
 <div class="lb-bd"><b>Registre de formation</b><p>Un code QR sur chaque outil : l'élève suit la formation, coche chaque étape et signe. Tu reçois sa signature et la date.</p><div class="lb-tags"><span>Atelier</span><span>Nouveau</span></div></div></a>
 <a class="lb-c" href="coffres.html"><span class="lb-plus">+</span><div class="lb-im"><svg viewBox="0 0 120 90" aria-hidden="true"><rect x="18" y="30" width="84" height="48" rx="6" fill="#ffffff1f" stroke="#fff" stroke-width="2"/><path d="M18 44h84" stroke="#fff" stroke-width="2"/><rect x="50" y="20" width="20" height="12" rx="3" fill="none" stroke="#fff" stroke-width="2"/><circle cx="84" cy="62" r="10" fill="#1E8A55"/><path d="M79 62l3.5 3.5 6-7" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round"/></svg></div><div class="lb-bd"><b>Inventaire des coffres</b><p>Un code QR par coffre : l'élève qui le prend touche « Tout est là » ou ce qui manque. Tu sais qui l'avait juste avant.</p></div></a>
 </div>
+<h2>Par élève</h2>
+<div class="pe-bar"><select id="peG" aria-label="Groupe"></select><input id="peQ" type="search" placeholder="Chercher un élève ou un code"></div>
+<div class="pe-l" id="peL"></div>
 </main>
 <div class="droits" style="text-align:center;font-size:12px;opacity:.6;padding:18px 12px 24px">© 2026 Jérémy Raymond · Tous droits réservés</div>
+<script>
+/* Par élève (15 nov.) : lit le registre et les coffres gardés sur cet appareil (ils suivent le compte par le coffre) */
+(async function(){
+  const $ = q => document.querySelector(q), esc = t => String(t ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+  const sansAcc = t => String(t || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
+  const lire = k => { try { return JSON.parse(localStorage.getItem(k) || "null") || {}; } catch(e) { return {}; } };
+  const D = lire("passeportOutils"), K = lire("coffresAtelier"); D.el = D.el || {}; D.val = D.val || {}; K.cf = K.cf || {}; K.ev = K.ev || {};
+  let O = []; try { O = (await (await fetch("protocoles.json", { cache:"no-cache" })).json()).outils || []; } catch(e) {}
+  const forme = v => !!(v && v.d && (v.m || !v.s)), aDemo = v => !!(v && v.d && v.s && !v.m);
+  const quand = t => { const j = Math.floor((Date.now() - t) / 864e5); return j <= 0 ? "aujourd'hui" : j === 1 ? "hier" : "depuis " + j + " jours"; };
+  /* responsable actuel de chaque coffre (même règle que la page des coffres) */
+  const resp = [];
+  for (const [id, cf] of Object.entries(K.cf)){ if (cf.x) continue;
+    const E = Object.values(K.ev).filter(e => e.cf === id).sort((a, b) => a.d - b.d);
+    let dr = 0; E.forEach(e => { if (e.k === "regle") dr = e.d; });
+    const mq = []; E.filter(e => e.k === "manque" && e.d >= dr).forEach(e => (e.items || []).forEach(x => { if (!mq.includes(x.n)) mq.push(x.n); }));
+    const pr = E.filter(e => e.k === "ok" || e.k === "manque"), der = pr[pr.length - 1], dn = E.filter(e => e.k === "nouveau").pop();
+    if (!der || (dn && dn.d > der.d)) continue;
+    resp.push({ nom:cf.nom, w:der, mq }); }
+  const aLui = (e, w) => [[w.c, w.p], [w.c2, w.p2]].some(([c, p]) => (c && e.c && String(c) === String(e.c)) || (!c && p && sansAcc(p) === sansAcc(e.p)));
+  const E = Object.entries(D.el).filter(([, e]) => !e.x).map(([id, e]) => Object.assign({ id }, e));
+  const G = [...new Set(E.map(e => e.g).filter(Boolean))].sort((a, b) => a.localeCompare(b, "fr", { numeric:true }));
+  let g0 = localStorage.getItem("passeportGroupe") || ""; if (!G.includes(g0)) g0 = G[0] || "";
+  $("#peG").innerHTML = G.map(g => `<option ${g === g0 ? "selected" : ""}>${esc(g)}</option>`).join("") || "<option>Aucun groupe</option>";
+  function dessiner(){
+    const L = $("#peL"); if (!E.length){ L.innerHTML = `<div class="pe-vide">Aucun élève sur cet appareil pour l'instant. Ouvre le Registre de formation et les coffres une fois : les élèves apparaîtront ici.</div>`; return; }
+    const q = sansAcc($("#peQ").value), g = $("#peG").value;
+    const R = E.filter(e => q ? (sansAcc(e.p).includes(q) || String(e.c || "").includes(q)) : e.g === g).sort((a, b) => a.p.localeCompare(b.p, "fr"));
+    L.innerHTML = R.map(e => {
+      let n = 0; const f = O.map(o => { const v = D.val[e.id + "|" + o.id]; if (forme(v)) { n++; return `<span class="ok">✓ ${esc(o.nom)}</span>`; } return aDemo(v) ? `<span class="dm">◐ ${esc(o.nom)}</span>` : ""; }).join("");
+      const C = resp.filter(r => aLui(e, r.w));
+      const c = C.length ? C.map(r => `<div><span class="pt ${r.mq.length ? "r" : ""}"></span><b>${esc(r.nom)}</b><small>${r.mq.length ? "Manque : " + esc(r.mq.join(", ")) : "Tout est là"} · ${quand(r.w.d)}</small></div>`).join("") : `<small>Aucun coffre</small>`;
+      return `<div class="pe-r"><div class="pe-n"><b>${esc(e.p)}</b><small>${esc(e.g || "")}${e.c ? " · code " + esc(e.c) : ""}</small></div><div class="pe-f"><em>${n} sur ${O.length}</em>${f}</div><div class="pe-c">${c}</div></div>`; }).join("") || `<div class="pe-vide">Aucun élève trouvé.</div>`; }
+  $("#peG").onchange = dessiner; $("#peQ").oninput = dessiner; dessiner();
+})();
+</script>
 </body>
 </html>
