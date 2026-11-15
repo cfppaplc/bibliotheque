@@ -446,7 +446,7 @@ function coffreOuvrir(id){
     return `<div class="mqc"><div class="mqt"><span class="ic">!</span><b>${esc(n)}</b><span class="pl">${x.e === "b" ? "Brisé" : "Manquant"}</span></div>
       ${x.par.note ? `<p class="nt">« ${esc(x.par.note)} »</p>` : ""}
       <div class="chaine">${p ? qui(p, "L'avait juste avant · " + heure(p.d) + (p.k === "ok" ? " · a confirmé que tout était là" : ""), "prev") + `<span class="fl">→</span>` : ""}${qui(x.par, "A signalé · " + heure(x.par.d), "sig")}</div></div>`; }).join("");
-  const hist = s.E.slice(-30).reverse().map(e => `<div class="hl"><span class="pt ${e.k === "manque" ? "r" : "v"}"></span><span class="hh">${heure(e.d)}</span><span>${e.k === "regle" ? "<b>Remis en ordre</b> par " + parQui(e) : e.k === "nouveau" ? "<b>Nouvel inventaire demandé</b> par " + parQui(e) : e.k === "annule" ? "<b>Changement d'équipe annulé</b>" : e.k === "ok" ? `${e.r ? "<b>Remise</b> · " : ""}${nomDe(e)} · tout est là` : `${e.r ? "<b>Remise</b> · " : ""}${nomDe(e)} · manque ${e.items.map(x => esc(x.n)).join(", ")}`}</span></div>`).join("");
+  const hist = s.E.slice(-30).reverse().map(e => `<div class="hl"><span class="pt ${e.k === "manque" ? "r" : "v"}"></span><span class="hh">${heure(e.d)}</span><span>${e.k === "regle" ? "<b>Remis en ordre</b> par " + parQui(e) : e.k === "nouveau" ? "<b>Nouvel inventaire demandé</b> par " + parQui(e) : e.k === "annule" ? "<b>Changement d'équipe annulé</b>" : e.k === "ok" && e.conf ? "<b>Inventaire confirmé</b> par " + parQui(e) : e.k === "ok" ? `${e.r ? "<b>Remise</b> · " : ""}${nomDe(e)} · tout est là` : `${e.r ? "<b>Remise</b> · " : ""}${nomDe(e)} · manque ${e.items.map(x => esc(x.n)).join(", ")}`}</span></div>`).join("");
   const autres = Object.entries(K.cf).filter(([i, c]) => !c.x && i !== id && c.liste && c.liste.length);
   ouvrir(`<div class="dt"><h2>${esc(cf.nom)}</h2><span class="pil ${s.c}">${etq}</span></div>
     ${s.der ? qui(s.der, "Responsable depuis " + heure(s.der.d), "resp") : `<p>Personne n'a encore scanné ce coffre.</p>`}
@@ -456,7 +456,7 @@ function coffreOuvrir(id){
     <div id="lst" class="lst${prop || (mien && !liste.length) ? " ed" : ""}"></div>
     ${mien ? `<div class="lact"><button class="btn" id="aMod">${liste.length ? "Modifier la liste" : ""}</button>${autres.length ? `<select id="aCp"><option value="">Copier d'un autre coffre…</option>${autres.map(([i, c]) => `<option value="${i}">${esc(c.nom)}</option>`).join("")}</select>` : ""}</div>` : `<p class="info">Coffre partagé par ${esc(((COMPTES[cf.de] || {}).nom || cf.de || "").split(" ")[0])} : vous voyez le même historique. Seul lui peut changer la liste ou demander un nouvel inventaire.</p>`}
     ${hist ? `<details class="hd"><summary>Historique</summary>${hist}<button class="btn lien" id="aImp" style="margin-top:8px">Imprimer tout l'historique</button></details>` : ""}
-    <div class="act">${mien ? `<button class="btn lien" id="aX">Retirer le coffre</button><button class="btn lien" id="aRn">Renommer</button><span class="esp"></span>` : ""}${mien && s.der && !s.att ? `<button class="btn" id="aLib" title="L'équipe qui quitte fait la remise, puis la nouvelle équipe vérifie à son tour">Changement d'équipe</button>` : ""}${mien && s.att === "chg" && cf.chg ? `<button class="btn" id="aSaut" title="L'équipe qui quitte est absente : la nouvelle équipe fait directement sa vérification">Passer la remise</button>` : ""}${mqH ? `<button class="btn vert" id="aRg">Remis en ordre</button>` : ""}<button class="btn" id="aF">Fermer</button><button class="btn p" id="aOk" hidden>${prop ? "Approuver la liste" : "Enregistrer"}</button></div>`);
+    <div class="act">${mien ? `<button class="btn lien" id="aX">Retirer le coffre</button><button class="btn lien" id="aRn">Renommer</button><span class="esp"></span>` : ""}${mien && s.der && !s.att ? `<button class="btn" id="aLib" title="L'équipe qui quitte fait la remise, puis la nouvelle équipe vérifie à son tour">Changement d'équipe</button>` : ""}${mien && s.att === "chg" && cf.chg ? `<button class="btn" id="aSaut" title="L'équipe qui quitte est absente : la nouvelle équipe fait directement sa vérification">Passer la remise</button>` : ""}${mqH ? `<button class="btn vert" id="aRg">Remis en ordre</button>` : ""}${mien && liste.length ? `<button class="btn" id="aEtat" title="Remettre le coffre dans l'état de ton choix (en cas de bogue)">Changer l'état…</button>` : ""}<button class="btn" id="aF">Fermer</button><button class="btn p" id="aOk" hidden>${prop ? "Approuver la liste" : "Enregistrer"}</button></div>`);
   let L = liste.map(x => ({ q:x.q, n:x.n }));
   const lst = $("#lst"), ed = () => lst.classList.contains("ed");
   const peindre = () => {
@@ -491,6 +491,24 @@ function coffreOuvrir(id){
   $("#aOk").onclick = () => { const c = K.cf[id]; c.liste = L.filter(x => x.on !== false).map(x => ({ q:x.q, n:String(x.n).trim().slice(0, 60) })).filter(x => x.n); delete c.prop; c.t = Date.now(); sauver(); fermer(); dessiner(); toast(prop ? "Liste approuvée" : "Liste enregistrée"); };
   if ($("#aLib")) $("#aLib").onclick = () => { nouvelInventaire([id]); fermer(); toast("L'équipe qui quitte fait la remise en scannant le coffre"); };
   if ($("#aSaut")) $("#aSaut").onclick = () => { const c = K.cf[id]; c.chg = false; c.t = Date.now(); sauver(); fermer(); dessiner(); toast("La nouvelle équipe peut prendre le coffre"); };
+  /* un seul bouton pour régler un bogue (15 nov.) : manques effacés, changement d'équipe terminé, équipe actuelle responsable */
+  const confirmer = () => { const t = Date.now(), q = codesEquipe(cf.nom, cf.at) || [], d0 = s.der || {};
+    K.ev["r" + nid()] = { cf:id, k:"regle", d:t, t, par:window.__moi };
+    K.ev["c" + nid()] = { cf:id, k:"ok", conf:1, d:t + 1, t, par:window.__moi, c:q[0] || d0.c, c2:q[1] || (q.length ? undefined : d0.c2), p:q.length ? undefined : d0.p };
+    const c = K.cf[id]; if (c){ c.chg = false; c.t = t; } };
+  if ($("#aEtat")) $("#aEtat").onclick = () => {
+    ouvrir(`<h2>État du coffre · ${esc(cf.nom)}</h2><p>Pour régler un bogue. Rien n'est effacé : le changement est noté dans l'historique.</p>
+      <div class="etats" style="display:grid;gap:10px;margin:12px 0">
+        <button class="btn" data-et="ok" style="text-align:left;min-height:56px"><b>En fonctionnement normal</b><br><small>Tout est vérifié; les manques signalés sont effacés; l'équipe actuelle en est responsable.</small></button>
+        <button class="btn" data-et="rem" style="text-align:left;min-height:56px" ${s.der ? "" : "disabled"}><b>Remise à faire</b><br><small>L'équipe qui l'avait doit faire la remise, puis la nouvelle équipe le prend.</small></button>
+        <button class="btn" data-et="prise" style="text-align:left;min-height:56px"><b>En attente de la nouvelle équipe</b><br><small>Plus de remise : la prochaine équipe qui scanne fait la vérification complète.</small></button>
+      </div><div class="act"><button class="btn" id="aF">Annuler</button></div>`);
+    $("#aF").onclick = () => { fermer(); coffreOuvrir(id); };
+    document.querySelectorAll("[data-et]").forEach(b => b.onclick = () => { const k = b.dataset.et;
+      if (k === "ok") confirmer();
+      else { nouvelInventaire([id]); const c = K.cf[id]; if (c){ c.chg = k === "rem"; c.t = Date.now(); } }
+      sauver(); setTimeout(() => publier(), 300); fermer(); dessiner();
+      toast(k === "ok" ? "Le coffre est en fonctionnement normal" : k === "rem" ? "Remise à faire par l'équipe qui l'avait" : "En attente de la nouvelle équipe"); }); };
   if ($("#aRg")) $("#aRg").onclick = () => { K.ev["r" + nid()] = { cf:id, k:"regle", d:Date.now(), t:Date.now(), par:window.__moi }; sauver(); fermer(); dessiner(); toast("Coffre remis en ordre"); };
   if ($("#aRn")) $("#aRn").onclick = () => { const n = prompt("Nouveau nom du coffre", K.cf[id].nom); if (n && n.trim()){ K.cf[id].nom = n.trim().slice(0, 40); K.cf[id].t = Date.now(); sauver(); fermer(); dessiner(); } };
   let sur = 0; if ($("#aX")) $("#aX").onclick = e => { if (!sur++){ e.target.textContent = "Sûr ? Touche encore"; return; } K.cf[id] = { x:1, t:Date.now(), at:"", nom:"" }; sauver(); fermer(); dessiner(); };
