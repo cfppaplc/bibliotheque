@@ -282,7 +282,7 @@ const APPAREIL_LEGER = (function(){
 })();
 window.addEventListener("resize", () => { try { majBoutonDbl(); } catch(e){} });
 function setupExtras(){
-  if (APPAREIL_LEGER || document.documentElement.classList.contains("leger")) return;
+  if (APPAREIL_LEGER || document.documentElement.classList.contains("leger") || document.documentElement.classList.contains("sobre")) return;
   [3, 4].forEach(i => {
     const f = $("#readerFrame" + i);
     const go = () => { try { const d = f.contentDocument; if (d && d.body) RD["drv" + i] = buildDriver(f.contentWindow, d); } catch(e){} };

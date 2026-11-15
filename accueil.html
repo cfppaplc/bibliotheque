@@ -57,7 +57,10 @@
   function ecrire(k, v){ try { if (S) S.setItem(k, v); } catch(e){} }
   /* (7 nov.) cellulaire = mode léger d'office (sauf si « Complètes » est choisi) : petit écran tactile */
   function cell(){ try { return matchMedia("(pointer:coarse)").matches && Math.min(screen.width, screen.height) <= 600; } catch(e){ return false; } }   /* 13 nov. : seulement le cellulaire; le TNI est rapide (test perf.html : 60 images/s) */
-  function appliquer(){ var m = lire("modeLeger"); h.classList.toggle("leger", m === "oui" || (m !== "non" && (cell() || lire("modeLegerMesure") === "lent"))); }
+  function appliquer(){ var m = lire("modeLeger"); h.classList.toggle("leger", m === "oui" || (m !== "non" && (cell() || lire("modeLegerMesure") === "lent")));
+    /* interface sobre (15 nov., « 75 pouces, c'est dur à pousser ») : grand écran tactile = pas de flous ni d'animations d'interface; le contenu des livres n'est pas touché. « Complètes » l'enlève. */
+    var gt = false; try { gt = matchMedia("(any-pointer:coarse)").matches && Math.min(screen.width, screen.height) > 600; } catch(e){}
+    h.classList.toggle("sobre", m !== "non" && (gt || lire("interfaceSobre") === "oui")); }
   window.modeLegerChoix = function(){ return lire("modeLeger") || "auto"; };
   window.modeLegerFixer = function(v){ try { if (!S) return; if (v === "auto") S.removeItem("modeLeger"); else S.setItem("modeLeger", v); } catch(e){} appliquer(); if (v === "auto") mesurer(); };
   appliquer();
@@ -485,7 +488,7 @@ if (window.COFFRE && !/[?&]apercu=/.test(location.search)) COFFRE.demarrer("accu
   </div>
 </div>
 <script src="js/accueil-menage.js?v=1"></script>
-<link rel="stylesheet" href="css/accueil-metier.css?v=1">
+<link rel="stylesheet" href="css/accueil-metier.css?v=2">
 <script>/* barre d'avancement de l'activité en cours (copie --pg de la case en cours de la frise) */
 setInterval(() => { const s = document.querySelector("#v-tl .seg.now:not(.p)"), i = document.getElementById("v-nowav"); if (i) i.style.setProperty("--pg", s ? (s.style.getPropertyValue("--pg") || "0%") : "0%"); }, 1000);</script>
 <div id="mpCoin" aria-hidden="true"><img class="lg-blc" src="img/metier-plus-blanc.svg" alt=""><img class="lg-clr" src="img/metier-plus.svg" alt=""></div>

@@ -37,7 +37,7 @@
       + '<div class="lig"><span>Ma couleur</span>' + ronds("couleur", COULEURS, P.couleur || "#EB6A22") + '</div>'
       + '<div class="lig"><span>Accueil<small>Auto : comme ton ordinateur</small></span>' + seg("theme", [["auto","Auto"],["fonce","Foncé"],["clair","Clair"]], theme) + '</div>'
       + '<div class="lig"><span>« Bonjour ' + esc2(S.nom.split(/\s+/)[0]) + ' » en haut</span>' + seg("bonjour", [["oui","Oui"],["non","Non"]], P.bonjour === false ? "non" : "oui") + '</div>'
-      + '<div class="lig"><span>Animations<small>Légères : pour un tableau lent</small></span>' + seg("leger", [["auto","Automatique"],["non","Complètes"],["oui","Légères"]], window.modeLegerChoix ? window.modeLegerChoix() : "auto") + '</div>'
+      + '<div class="lig"><span>Animations<small>Auto : interface allégée sur un grand tableau tactile · Légères : pour un tableau lent</small></span>' + seg("leger", [["auto","Automatique"],["non","Complètes"],["oui","Légères"]], window.modeLegerChoix ? window.modeLegerChoix() : "auto") + '</div>'
       + '<h3>Bibliothèque</h3>'
       + '<div class="lig"><span>Livres affichés au départ</span>' + seg("prog", PROG, P.prog === undefined ? "" : P.prog) + '</div>'
       + '<div class="lig"><span>Livre en plein écran</span>' + seg("plein", [["oui","Oui"],["non","Non"]], P.plein === false ? "non" : "oui") + '</div>'

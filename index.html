@@ -20,7 +20,7 @@
 <meta name="keywords" content="formation professionnelle, DEP, plomberie et chauffage, entretien général d'immeubles, livres animés, tableau interactif, enseignant, Québec">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Métier+","url":"https://metierplus.app/","applicationCategory":"EducationalApplication","operatingSystem":"Navigateur web","inLanguage":"fr-CA","description":"Plateforme des enseignants en formation professionnelle au Québec : livres de cours animés, plans techniques, formatifs, quiz et simulations pour le tableau interactif.","audience":{"@type":"EducationalAudience","educationalRole":"teacher"},"educationalLevel":"Formation professionnelle (DEP)","author":{"@type":"Person","name":"Jérémy Raymond"},"image":"https://metierplus.app/img/apercu-metier.jpg"}</script>
 <title>Métier+ — Livres animés et outils pour la formation professionnelle (DEP)</title>
-<link rel="stylesheet" href="css/biblio.css?v=1"><script>
+<link rel="stylesheet" href="css/biblio.css?v=2"><script>
 /* Mode léger (tableau interactif lent) : localStorage.modeLeger = "oui" | "non"; sans choix = automatique (le site mesure sa fluidité).
    Classe html.leger : plus de flous, transitions ni animations d'ambiance. Même réglage pour la bibliothèque et l'accueil de classe. */
 (function(){
@@ -30,7 +30,10 @@
   function ecrire(k, v){ try { if (S) S.setItem(k, v); } catch(e){} }
   /* (7 nov.) cellulaire = mode léger d'office (sauf si « Complètes » est choisi) : petit écran tactile */
   function cell(){ try { return matchMedia("(pointer:coarse)").matches && Math.min(screen.width, screen.height) <= 600; } catch(e){ return false; } }
-  function appliquer(){ var m = lire("modeLeger"); h.classList.toggle("leger", m === "oui" || (m !== "non" && (cell() || lire("modeLegerMesure") === "lent"))); }
+  function appliquer(){ var m = lire("modeLeger"); h.classList.toggle("leger", m === "oui" || (m !== "non" && (cell() || lire("modeLegerMesure") === "lent")));
+    /* interface sobre (15 nov., « 75 pouces, c'est dur à pousser ») : grand écran tactile = pas de flous ni d'animations d'interface; le contenu des livres n'est pas touché. « Complètes » l'enlève. */
+    var gt = false; try { gt = matchMedia("(any-pointer:coarse)").matches && Math.min(screen.width, screen.height) > 600; } catch(e){}
+    h.classList.toggle("sobre", m !== "non" && (gt || lire("interfaceSobre") === "oui")); }
   window.modeLegerChoix = function(){ return lire("modeLeger") || "auto"; };
   window.modeLegerFixer = function(v){ try { if (!S) return; if (v === "auto") S.removeItem("modeLeger"); else S.setItem("modeLeger", v); } catch(e){} appliquer(); if (v === "auto") mesurer(); };
   appliquer();
@@ -253,7 +256,7 @@ window.LIVRES_EXTERNES = true;   // les livres sont des fichiers du dossier livr
 <script src="js/couvertures.js?v=1"></script>
 <script src="js/livres.js?v=1"></script>
 <script src="js/biblio.js?v=1"></script>
-<script src="js/lecteur-souris.js?v=1"></script>
+<script src="js/lecteur-souris.js?v=2"></script>
 <script src="js/tableau-blanc.js?v=1"></script>
 <script src="js/lecteur.js?v=1"></script>
 <script src="js/donnees.js?v=1"></script>

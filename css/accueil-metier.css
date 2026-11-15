@@ -98,3 +98,9 @@ html.style-pro .hero .quote, html.style-pro .hero .matiere { margin-top: auto; }
 html.force-light #mpCoin .lg-blc{display:none} html.force-light #mpCoin .lg-clr{display:block}
 @media (prefers-color-scheme: light){ html:not(.force-dark) #mpCoin .lg-blc{display:none} html:not(.force-dark) #mpCoin .lg-clr{display:block} }
 html.apercu-mode #mpCoin{display:none}
+
+/* Interface sobre (15 nov.) : grand tableau tactile = pas de grosses lueurs floues ni de flous; le ménage garde son clignotement */
+html.sobre #mpFond{display:none!important}
+html.sobre *,html.sobre *::before,html.sobre *::after{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+html.sobre .sheet,html.sobre .menu,html.sobre #apercuOv{animation:none!important}
+html.sobre::view-transition-old(root),html.sobre::view-transition-new(root){animation:none!important}
