@@ -194,6 +194,7 @@ html.sombre .mq{background:#3a1f1d;color:#f3c2bd}
     <button class="btn" id="bCfN">+ Coffre</button>
     <span class="esp"></span>
     <button class="btn" id="bMaj">Actualiser</button>
+    <button class="btn" id="bInv" title="Début ou fin de session : chaque équipe refait l'inventaire de son coffre">Inventaire de l'atelier</button>
     <button class="btn m" id="bQr">Codes QR à imprimer</button>
     <button class="btn" id="bPart">Partager</button>
   </div>
@@ -238,7 +239,7 @@ const PUB = { lire:ens => lirePub("metier+|coffres-pub|" + ens),
 /* verrou de session (14 nov., « personne ne peut refaire l'inventaire tant qu'une est active, sauf l'enseignant ») :
    rangée publique par coffre et par session (date + matin / après-midi / soir); le 1er qui l'écrit la garde (jeton);
    le jeton est envoyé chiffré à l'enseignant, qui peut libérer le coffre. Contenu : codes à 3 chiffres et heure seulement. */
-const session = (t = Date.now()) => { const d = new Date(t), h = d.getHours(); return d.toLocaleDateString("fr-CA") + "|" + (h < 12 ? "am" : h < 17 ? "pm" : "soir"); };
+/* 14 nov. (soir) : le verrou ne dépend plus de l'heure : un coffre reste à la même équipe toute la session de cours; « tour » = numéro d'inventaire, augmenté par l'enseignant (changement d'équipe, fin de session) */
 const VERROU = { id:(cid, ses) => hx("metier+|coffre-pris|" + cid + "|" + ses),
   async lire(cid, ses){ try { const r = await rpc("coffre_lire", { p_id:await this.id(cid, ses) }), row = r && r[0]; return row ? JSON.parse(row.data || "{}") : null; } catch(e){ return null; } },
   async prendre(cid, ses, jeton, o){ return (await rpc("coffre_ecrire", { p_id:await this.id(cid, ses), p_jeton:jeton, p_env:"public", p_data:JSON.stringify(o) })) === true; },
@@ -268,10 +269,10 @@ async function vueEleve(){
     Object.assign(obj, w, { v:1, uid:crypto.getRandomValues(new Uint32Array(2)).join("-"), cf:cid, at:cf.at, nom:cf.nom, t:Date.now() });
     b.disabled = true; const txt = b.textContent; b.textContent = "Envoi…";
     try {
-      if (obj.k !== "liste"){ const ses = session(), cle = cid + "|" + ses, M = mesVerrous(); let j = M[cle];
+      if (obj.k !== "liste"){ const ses = "t" + (cf.tour || 0), cle = cid + "|" + ses, M = mesVerrous(); let j = M[cle];
         if (!j){ j = btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(24))));
           if (!(await VERROU.prendre(cid, ses, j, { c:w.c || "", c2:w.c2 || "", t:Date.now() }))){ pris(await VERROU.lire(cid, ses)); return false; }
-          M[cle] = j; for (const k in M) if (!k.includes(ses.split("|")[0])) delete M[k]; localStorage.setItem("coffresMesVerrous", JSON.stringify(M)); }
+          for (const k in M) if (k.startsWith(cid + "|")) delete M[k]; M[cle] = j; localStorage.setItem("coffresMesVerrous", JSON.stringify(M)); }
         obj.lj = j; obj.ses = ses; }
       const d = await (await fetch("comptes.json", { cache:"no-store" })).json(), C = d.comptes || {};
       const dep = async (id, pub) => { for (let n = 0; n < 400; n++){ try { await COFFRE.deposer("coffres|" + id + "|" + n, obj, pub); return true; } catch(e){ if (!/refus/.test(e.message)) throw e; } } return false; };
@@ -282,7 +283,7 @@ async function vueEleve(){
     } catch(e){ b.disabled = false; b.textContent = txt; er.hidden = false; er.textContent = "L'envoi n'a pas fonctionné. Vérifie Internet et réessaie."; return false; }
   };
   const pris = v => { V.innerHTML = `<div class="top"><img src="${LOGO}" alt="Métier+"></div><div class="fini"><div class="rond" style="background:#B3261E">✕</div><h1>Coffre déjà pris</h1>
-      <p class="sous">${esc(cf.nom)}${v && v.c ? ` · code ${esc(v.c)}${v.c2 ? " et " + esc(v.c2) : ""}` : ""}${v && v.t ? " · depuis " + heure(v.t) : ""}<br>L'inventaire est déjà fait pour cette session. Seul ton enseignant peut le refaire.</p></div>`; };
+      <p class="sous">${esc(cf.nom)}${v && v.c ? ` · code ${esc(v.c)}${v.c2 ? " et " + esc(v.c2) : ""}` : ""}${v && v.t ? " · depuis " + heure(v.t) : ""}<br>Ce coffre est déjà à une équipe. Seul ton enseignant peut demander un nouvel inventaire (changement d'équipe).</p></div>`; };
   const fini = (titre, txt) => { V.innerHTML = `<div class="top"><img src="${LOGO}" alt="Métier+"></div><div class="fini"><div class="rond">✓</div><h1>${titre}</h1><p class="sous">${txt}</p></div>`; };
   const tete = `<div class="top"><img src="${LOGO}" alt="Métier+"><span style="flex:1"></span><span class="tag">Inventaire</span></div><span class="tag">${esc(nomAt)}</span><h1>${esc(cf.nom)}</h1>`;
 
@@ -294,7 +295,7 @@ async function vueEleve(){
       if (await envoyer({ k:"liste", liste:L }, e.target)) fini("Liste envoyée", "Merci ! Ton enseignant va la vérifier. Ensuite, le coffre se fera en quelques secondes."); };
     return;
   }
-  if (!mesVerrous()[cid + "|" + session()]){ const v = await VERROU.lire(cid, session()); if (v) return pris(v); }
+  const SES = "t" + (cf.tour || 0); if (!mesVerrous()[cid + "|" + SES]){ const v = await VERROU.lire(cid, SES); if (v) return pris(v); }
   const deja = new Set(cf.mq || []);
   V.innerHTML = `${tete}<p class="sous">Vérifie le coffre en le prenant. Tu en es responsable jusqu'à la prochaine session.</p>
     <div id="its">${cf.liste.map((x, i) => `<div class="it${deja.has(x.n) ? " deja" : ""}" data-i="${i}"><span class="q">${x.q}</span><span>${esc(x.n)}</span><span class="s">${deja.has(x.n) ? "déjà signalé" : ""}</span></div>`).join("")}</div>
@@ -340,14 +341,15 @@ function etat(cf){
   const E = Object.values(K.ev).filter(e => e.cf === cf.id).sort((a, b) => a.d - b.d);
   let dr = 0; E.forEach(e => { if (e.k === "regle") dr = e.d; });
   const mq = {}; E.filter(e => e.k === "manque" && e.d >= dr).forEach(e => e.items.forEach(x => { if (!mq[x.n]) mq[x.n] = { e:x.e, par:e }; }));
-  const pr = E.filter(e => e.k === "ok" || e.k === "manque"), der = pr[pr.length - 1];
+  const pr = E.filter(e => e.k === "ok" || e.k === "manque"), der = pr[pr.length - 1], dn = E.filter(e => e.k === "nouveau").pop(), att = !!(dn && (!der || dn.d > der.d));
   const c = !cf.liste || !cf.liste.length ? (cf.prop ? "o" : "") : Object.keys(mq).length ? "r" : "v";
-  return { E, mq, der, c };
+  return { E, mq, der, c, att };
 }
+function nouvelInventaire(ids){ const t = Date.now(); ids.forEach(id => { const c = K.cf[id]; if (!c) return; c.tour = (c.tour || 0) + 1; c.t = t; K.ev["n" + nid()] = { cf:id, k:"nouveau", d:t, t }; }); sauver(); dessiner(); }
 async function publier(){
   if (!window.__moi) return;
   const at = {}, cf = {}; ateliers().forEach(([id, a]) => at[id] = a.nom);
-  for (const [id, c] of Object.entries(K.cf)) if (!c.x && at[c.at]) cf[id] = { nom:c.nom, at:c.at, liste:c.liste || [], mq:Object.keys(etat(Object.assign({ id }, c)).mq) };
+  for (const [id, c] of Object.entries(K.cf)) if (!c.x && at[c.at]) cf[id] = { nom:c.nom, at:c.at, tour:c.tour || 0, liste:c.liste || [], mq:Object.keys(etat(Object.assign({ id }, c)).mq) };
   const part = {}; for (const a in K.part) if (at[a] && K.part[a].l && K.part[a].l.length) part[a] = K.part[a].l;
   const o = { at, cf, part }, k = JSON.stringify(o); if (localStorage.getItem("coffresPub") === k) return;
   try { await PUB.ecrire(window.__moi, o); localStorage.setItem("coffresPub", k); } catch(e) {}
@@ -356,13 +358,13 @@ function dessiner(){
   const A = ateliers(); if (!K.at[AT] && !PARTAGES[AT]) AT = (A[0] || [])[0] || Object.keys(PARTAGES)[0] || "";
   $("#atS").innerHTML = A.map(([id, a]) => `<option value="${id}" ${id === AT ? "selected" : ""}>${esc(a.nom)}</option>`).join("")
     + Object.entries(PARTAGES).map(([id, p]) => `<option value="${id}" ${id === AT ? "selected" : ""}>${esc(p.nom)} (de ${esc(p.deNom)})</option>`).join("") || `<option value="">Aucun atelier</option>`;
-  const mien = !!K.at[AT]; $("#bCfN").disabled = $("#bQr").disabled = $("#bPart").disabled = !mien;
+  const mien = !!K.at[AT]; $("#bCfN").disabled = $("#bInv").disabled = $("#bQr").disabled = $("#bPart").disabled = !mien;
   const L = $("#cfs"); if (!AT){ L.innerHTML = `<div class="vide">Commence par créer un atelier.</div>`; return; }
   const C = coffresDe(AT);
   if (!C.length){ L.innerHTML = `<div class="vide">Aucun coffre dans cet atelier. Touche « + Coffre ».</div>`; return; }
   L.innerHTML = C.map(cf => { const s = etat(cf), n = Object.keys(s.mq).length;
     const et = s.c === "v" ? "Complet" : s.c === "r" ? (n === 1 ? "1 article manque" : n + " articles manquent") : s.c === "o" ? "Liste à approuver" : "Liste à faire";
-    return `<button class="cf ${s.c}" data-cf="${cf.id}"><span class="et2">${et}</span><b>${esc(cf.nom)}</b><small>${s.der ? "À " + nomDe(s.der) + " depuis " + heure(s.der.d) : cf.liste && cf.liste.length ? cf.liste.length + " articles · pas encore scanné" : cf.prop ? "Liste écrite par " + nomDe(cf.prop.w) + " : touche pour l'approuver" : "Le premier élève qui scanne écrit la liste"}</small></button>`; }).join("");
+    return `<button class="cf ${s.c}" data-cf="${cf.id}"><span class="et2">${et}</span><b>${esc(cf.nom)}</b><small>${s.att ? "Nouvel inventaire demandé : en attente du prochain scan" : s.der ? "À " + nomDe(s.der) + " depuis " + heure(s.der.d) : cf.liste && cf.liste.length ? cf.liste.length + " articles · pas encore scanné" : cf.prop ? "Liste écrite par " + nomDe(cf.prop.w) + " : touche pour l'approuver" : "Le premier élève qui scanne écrit la liste"}</small></button>`; }).join("");
 }
 function coffreOuvrir(id){
   const cf = cfDe(id); if (!cf) return; const s = etat(cf), mien = !!cf.moi;
@@ -376,7 +378,7 @@ function coffreOuvrir(id){
     return `<div class="mqc"><div class="mqt"><span class="ic">!</span><b>${esc(n)}</b><span class="pl">${x.e === "b" ? "Brisé" : "Manquant"}</span></div>
       ${x.par.note ? `<p class="nt">« ${esc(x.par.note)} »</p>` : ""}
       <div class="chaine">${p ? qui(p, "L'avait juste avant · " + heure(p.d) + (p.k === "ok" ? " · a confirmé que tout était là" : ""), "prev") + `<span class="fl">→</span>` : ""}${qui(x.par, "A signalé · " + heure(x.par.d), "sig")}</div></div>`; }).join("");
-  const hist = s.E.slice(-30).reverse().map(e => `<div class="hl"><span class="pt ${e.k === "manque" ? "r" : "v"}"></span><span class="hh">${heure(e.d)}</span><span>${e.k === "regle" ? "<b>Remis en ordre</b> par toi" : e.k === "ok" ? `${nomDe(e)} · tout est là` : `${nomDe(e)} · manque ${e.items.map(x => esc(x.n)).join(", ")}`}</span></div>`).join("");
+  const hist = s.E.slice(-30).reverse().map(e => `<div class="hl"><span class="pt ${e.k === "manque" ? "r" : "v"}"></span><span class="hh">${heure(e.d)}</span><span>${e.k === "regle" ? "<b>Remis en ordre</b> par toi" : e.k === "nouveau" ? "<b>Nouvel inventaire demandé</b> par toi" : e.k === "ok" ? `${nomDe(e)} · tout est là` : `${nomDe(e)} · manque ${e.items.map(x => esc(x.n)).join(", ")}`}</span></div>`).join("");
   const autres = Object.entries(K.cf).filter(([i, c]) => !c.x && i !== id && c.liste && c.liste.length);
   ouvrir(`<div class="dt"><h2>${esc(cf.nom)}</h2><span class="pil ${s.c}">${etq}</span></div>
     ${s.der ? qui(s.der, "Responsable depuis " + heure(s.der.d), "resp") : `<p>Personne n'a encore scanné ce coffre.</p>`}
@@ -386,7 +388,7 @@ function coffreOuvrir(id){
     <div id="lst" class="lst${prop || (mien && !liste.length) ? " ed" : ""}"></div>
     ${mien ? `<div class="lact"><button class="btn" id="aMod">${liste.length ? "Modifier la liste" : ""}</button>${autres.length ? `<select id="aCp"><option value="">Copier d'un autre coffre…</option>${autres.map(([i, c]) => `<option value="${i}">${esc(c.nom)}</option>`).join("")}</select>` : ""}</div>` : `<p class="info">Coffre de ${esc(cf.de || "")} (lecture seule).</p>`}
     ${hist ? `<details class="hd"><summary>Historique</summary>${hist}</details>` : ""}
-    <div class="act">${mien ? `<button class="btn lien" id="aX">Retirer le coffre</button><button class="btn lien" id="aRn">Renommer</button><span class="esp"></span>` : ""}${s.der && s.der.lj && s.der.ses === session() ? `<button class="btn" id="aLib" title="Permet à un élève de refaire l'inventaire pendant cette session">Libérer le coffre</button>` : ""}${mqH ? `<button class="btn vert" id="aRg">Remis en ordre</button>` : ""}<button class="btn" id="aF">Fermer</button><button class="btn p" id="aOk" hidden>${prop ? "Approuver la liste" : "Enregistrer"}</button></div>`);
+    <div class="act">${mien ? `<button class="btn lien" id="aX">Retirer le coffre</button><button class="btn lien" id="aRn">Renommer</button><span class="esp"></span>` : ""}${mien && s.der ? `<button class="btn" id="aLib" title="Changement d'équipe ou fin de session : le prochain élève qui scanne fait l'inventaire">Nouvel inventaire</button>` : ""}${mqH ? `<button class="btn vert" id="aRg">Remis en ordre</button>` : ""}<button class="btn" id="aF">Fermer</button><button class="btn p" id="aOk" hidden>${prop ? "Approuver la liste" : "Enregistrer"}</button></div>`);
   let L = liste.map(x => ({ q:x.q, n:x.n }));
   const lst = $("#lst"), ed = () => lst.classList.contains("ed");
   const peindre = () => {
@@ -406,7 +408,7 @@ function coffreOuvrir(id){
   if ($("#aMod")){ if (!liste.length) $("#aMod").hidden = true; $("#aMod").onclick = () => { lst.classList.add("ed"); peindre(); }; }
   if ($("#aCp")) $("#aCp").onchange = e => { const c = K.cf[e.target.value]; if (!c) return; L = c.liste.map(x => ({ q:x.q, n:x.n })); lst.classList.add("ed"); peindre(); };
   $("#aOk").onclick = () => { const c = K.cf[id]; c.liste = L.map(x => ({ q:x.q, n:String(x.n).trim().slice(0, 60) })).filter(x => x.n); delete c.prop; c.t = Date.now(); sauver(); fermer(); dessiner(); toast(prop ? "Liste approuvée" : "Liste enregistrée"); };
-  if ($("#aLib")) $("#aLib").onclick = async () => { const ok = await VERROU.liberer(id, s.der.ses, s.der.lj); toast(ok ? "Coffre libéré : un élève peut refaire l'inventaire" : "Déjà libre"); if (ok) fermer(); };
+  if ($("#aLib")) $("#aLib").onclick = () => { nouvelInventaire([id]); fermer(); toast("Le prochain élève qui scanne fait l'inventaire"); };
   if ($("#aRg")) $("#aRg").onclick = () => { K.ev["r" + nid()] = { cf:id, k:"regle", d:Date.now(), t:Date.now() }; sauver(); fermer(); dessiner(); toast("Coffre remis en ordre"); };
   if ($("#aRn")) $("#aRn").onclick = () => { const n = prompt("Nouveau nom du coffre", K.cf[id].nom); if (n && n.trim()){ K.cf[id].nom = n.trim().slice(0, 40); K.cf[id].t = Date.now(); sauver(); fermer(); dessiner(); } };
   let sur = 0; if ($("#aX")) $("#aX").onclick = e => { if (!sur++){ e.target.textContent = "Sûr ? Touche encore"; return; } K.cf[id] = { x:1, t:Date.now(), at:"", nom:"" }; sauver(); fermer(); dessiner(); };
@@ -471,7 +473,10 @@ async function vueProf(){
   $("#bCfN").onclick = () => { const n = prompt("Nom du coffre (ex. « Coffre 3 » ou « Cabine 3 »)", "Coffre " + (coffresDe(AT).length + 1)); if (!n || !n.trim()) return;
     const id = "c" + nid(); K.cf[id] = { at:AT, nom:n.trim().slice(0, 40), liste:[], t:Date.now() }; sauver(); dessiner(); coffreOuvrir(id); };
   $("#cfs").onclick = e => { const b = e.target.closest("[data-cf]"); if (b) coffreOuvrir(b.dataset.cf); };
-  $("#bQr").onclick = imprimerQr; $("#bMaj").onclick = () => { releve(true); lirePartages(); }; $("#bPart").onclick = dlgPartage;
+  $("#bQr").onclick = imprimerQr;
+  let surI = 0; $("#bInv").onclick = e => { const ids = coffresDe(AT).filter(c => c.moi).map(c => c.id); if (!ids.length) return;
+    if (!surI++){ e.target.textContent = "Sûr ? Touche encore (" + ids.length + " coffres)"; setTimeout(() => { surI = 0; e.target.textContent = "Inventaire de l'atelier"; }, 4000); return; }
+    surI = 0; e.target.textContent = "Inventaire de l'atelier"; nouvelInventaire(ids); toast("Chaque équipe refait l'inventaire de son coffre au prochain scan"); }; $("#bMaj").onclick = () => { releve(true); lirePartages(); }; $("#bPart").onclick = dlgPartage;
   const s = await COFFRE.session(); window.__moi = s && s.id;
   try { COMPTES = (await (await fetch("comptes.json", { cache:"no-store" })).json()).comptes || {}; } catch(e) {}
   majPart(); sauver();
