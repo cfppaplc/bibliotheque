@@ -907,10 +907,15 @@ function openModal(l){
       <p>${esc(l.description)}</p>
       <button class="btn btn-play" id="mRead">▶ Lire</button>
       <button class="btn btn-fav" id="mFav">${isFav(l) ? "✓ Dans ma liste" : "+ Ma liste"}</button>
+      <button class="btn btn-fav" id="mPdf" hidden>PDF pour imprimer</button>
     </div>`;
   $("#modal").classList.add("open");
   $(".close").onclick = closeModal;
   $("#mRead").onclick = () => lire(l);
+  /* 15 nov. (Jeremy) : PDF du livre pour imprimer, administrateur seulement (pdf/<f>.chiffre, clé dans pdf/cles.json) */
+  if (window.ACCES && ACCES.pdfDispo) ACCES.pdfDispo(l.fichier).then(ok => { const b = $("#mPdf"); if (!ok || !b) return; b.hidden = false;
+    b.onclick = async () => { const t = b.textContent; b.disabled = true; b.textContent = "Préparation du PDF…";
+      try { await ACCES.pdfTelecharger(l.fichier, l.titre); b.textContent = t; } catch(e){ b.textContent = "PDF introuvable"; setTimeout(() => b.textContent = t, 3000); } b.disabled = false; }; });
   $("#mFav").onclick = () => {
     favs = isFav(l) ? favs.filter(f => f !== l.fichier) : [...favs, l.fichier];
     saveFavs(); openModal(l); render();

@@ -72,6 +72,17 @@ window.ACCES = (function(){
   }
   /* 12 nov. : les 2 derniers livres ouverts restent déchiffrés en mémoire (pas sur le disque) : les rouvrir ne refait ni le téléchargement ni le déchiffrement */
   const MEMO = new Map();
+  /* PDF des livres pour imprimer (15 nov.) : administrateur seulement; pdf/<f>.chiffre = iv(12) + AES-GCM(pdf), clé enveloppée pour les admins dans pdf/cles.json */
+  let PDFCLES = null;
+  const pdfCles = async () => PDFCLES || (PDFCLES = fetch("pdf/cles.json?t=" + Date.now(), { cache:"no-store" }).then(r => r.ok ? r.json() : {}).catch(() => ({})));
+  const pdfDispo = async f => { if (!SESSION || !SESSION.admin) return false; const C = await pdfCles(); return !!(C[f] && C[f][SESSION.id]); };
+  const pdfTelecharger = async (f, titre) => {
+    const C = await pdfCles(), env = C[f] && C[f][SESSION.id]; if (!env) throw new Error("pas de PDF");
+    const k = await sub.importKey("raw", await ouvrirEnveloppe(env), "AES-GCM", false, ["decrypt"]);
+    const r = await fetch("pdf/" + encodeURIComponent(f) + ".chiffre", { cache:"no-cache" }); if (!r.ok) throw new Error("introuvable");
+    const u = new Uint8Array(await r.arrayBuffer()), pdf = await sub.decrypt({ name:"AES-GCM", iv:u.subarray(0, 12) }, k, u.subarray(12));
+    const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([pdf], { type:"application/pdf" }));
+    a.download = (titre || f).replace(/[\\/:*?"<>|]+/g, "") + ".pdf"; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 4000); };
   const ouvrir = async l => { const f = l.fichier; if (MEMO.has(f)){ const h = MEMO.get(f); MEMO.delete(f); MEMO.set(f, h); return h; }
     const h = await dechiffrer("livres/" + encodeURIComponent(f) + ".chiffre", f); MEMO.set(f, h); while (MEMO.size > 2) MEMO.delete(MEMO.keys().next().value); return h; };
   async function recherche(){            /* pages des livres permis, pour la recherche plein texte */
@@ -625,6 +636,6 @@ window.ACCES = (function(){
     if (SESSION) go(); else dlgConnexion(go);
   }
   setTimeout(() => { const b = document.getElementById("compteBtn"); if (b) b.onclick = menu; charger(); accepterDepuisLien(); invitationDepuisLien(); }, 0);
-  return { pret, get estPret(){ return estPret; }, protege, permis, verrouille, ouvrir, recherche, connexion, deconnexion, demande, lireDemande, dlgConnexion, dlgDemande, menu, get session(){ return SESSION; }, get eleve(){ return !!(SESSION && SESSION.eleve); }, get data(){ return DATA; }, charger, outils:{ enLigne:() => enLigne(), commitGitHub:(...a) => commitGitHub(...a), envelopperPour:(...a) => envelopperPour(...a), BOITE, sansAcc:t => sansAcc(t),
+  return { pret, get estPret(){ return estPret; }, protege, permis, verrouille, ouvrir, pdfDispo, pdfTelecharger, recherche, connexion, deconnexion, demande, lireDemande, dlgConnexion, dlgDemande, menu, get session(){ return SESSION; }, get eleve(){ return !!(SESSION && SESSION.eleve); }, get data(){ return DATA; }, charger, outils:{ enLigne:() => enLigne(), commitGitHub:(...a) => commitGitHub(...a), envelopperPour:(...a) => envelopperPour(...a), BOITE, sansAcc:t => sansAcc(t),
     integrer(f, livre, ajouts){ if (f && livre){ DATA.livres[f] = JSON.parse(JSON.stringify(livre)); if (BROUILLON) BROUILLON.livres[f] = JSON.parse(JSON.stringify(livre)); } if (REGL) REGL.ajouts = JSON.parse(JSON.stringify(ajouts || [])); } } };
 })();
