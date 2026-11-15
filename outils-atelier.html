@@ -270,7 +270,7 @@ main{max-width:1500px}
     const reste = O.filter(o => !D.val[e.id + "|" + o.id] || !D.val[e.id + "|" + o.id].d).length;
     const H = [];
     O.forEach(o => { const v = D.val[e.id + "|" + o.id]; if (v && v.d) H.push([v.d, "Signe la formation " + o.nom]); if (v && v.m) H.push([v.m, "Démonstration réussie : " + o.nom]); });
-    Object.values(K.ev).forEach(x => { if (!aLui(e, x)) return; const cn = (K.cf[x.cf] || {}).nom || "Coffre";
+    Object.values(K.ev).forEach(x => { if (!aLui(e, x)) return; const cn = ((K.cf[x.cf] || {}).nom || "Coffre") + (grpAts().length > 1 && K.cf[x.cf] ? " (" + nomAt(K.cf[x.cf].at) + ")" : "");
       if (x.k === "ok") H.push([x.d, (x.r ? "Remet " : "Prend ") + cn + " : tout est là"]); else if (x.k === "manque") H.push([x.d, cn + " : signale " + (x.items || []).map(i => i.n).join(", ")]); else if (x.k === "liste") H.push([x.d, "Écrit la liste de " + cn]); });
     H.sort((a, b) => b[0] - a[0]);
     const ini = (e.p || "?").split(/\s+/).map(m => m[0]).join("").slice(0, 2).toUpperCase();
