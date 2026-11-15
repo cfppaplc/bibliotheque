@@ -147,6 +147,12 @@ main{max-width:1500px}
 #peLoc{min-height:44px;border-radius:10px;border:1px solid var(--ligne);background:var(--carte);color:var(--txt);padding:0 12px;font-size:15px;font-weight:600}
 .ga-toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,20px);background:#1E2A44;color:#fff;padding:12px 18px;border-radius:12px;font-weight:600;font-size:15px;opacity:0;pointer-events:none;transition:.25s;z-index:9999}
 .ga-toast.on{opacity:1;transform:translate(-50%,0)}
+#locDlg,#partDlg{border:0;border-radius:18px;padding:22px;max-width:520px;width:calc(100% - 28px);background:var(--fond);color:var(--txt)}
+#locDlg::backdrop,#partDlg::backdrop{background:rgba(0,0,0,.5)}#locDlg h3,#partDlg h3{margin:0 0 8px}#locDlg p,#partDlg p{color:var(--gris);margin:0 0 12px;line-height:1.45}
+.pd-l{display:flex;flex-direction:column;gap:6px}.pd-l label{display:flex;align-items:center;gap:12px;background:var(--carte);border:1px solid var(--ligne);border-radius:10px;padding:12px 14px;font-weight:600;cursor:pointer}
+.pd-l input{width:22px;height:22px}.pd-er{color:#D9534F!important}
+.pd-a{display:flex;justify-content:flex-end;gap:8px;margin-top:14px}.pd-a button{min-height:44px;border-radius:10px;border:1px solid var(--ligne);background:var(--carte);color:var(--txt);padding:0 18px;font-weight:700;cursor:pointer}
+.pd-a button.on{background:#EB6A22;border-color:#EB6A22;color:#fff}
 </style>
 <script>
 /* Même thème que la bibliothèque : choix gardé dans localStorage.accueilClair, sinon l'ordinateur */
@@ -159,7 +165,7 @@ main{max-width:1500px}
 <div class="mp-tete"><img class="lg-b" src="img/metier-plus-blanc.svg" alt="Métier+"><img class="lg-c" src="img/metier-plus.svg" alt="Métier+"><a class="mp-retour" href="./">‹ Bibliothèque</a><h1 class="mp-nom">Gestion</h1><span class="mp-sous">Formations et inventaires de l'atelier</span><nav class="mp-nav" aria-label="Outils"><a href="./" data-nav="biblio"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h12v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5"/></svg>Bibliothèque</a><a href="./?ouvrir=plans" data-nav="plans"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3z"/><path d="M9 3v15M15 6v15"/></svg>Plans</a><a href="./?ouvrir=activites" data-nav="activites"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4h6v3H9zM9 12h6M9 16h4"/></svg>Formatifs</a><a href="outils-atelier.html" data-nav="outils" class="ici" aria-current="page"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z"/></svg>Gestion d'atelier</a><a href="labo.html" data-nav="labo"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-9V3"/></svg>Labo</a><a href="./?ouvrir=accueil" data-nav="accueil"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Accueil de classe</a><a href="./?ouvrir=tableau" data-nav="tableau"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>Tableau blanc</a></nav><span class="mp-esp"></span></div>
 <main>
 <div class="ga-hero"><div class="lb-ico"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#EB6A22" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z"/></svg></div><h1>Gestion d'atelier</h1></div>
-<div class="ga-bar"><select id="peG" aria-label="Groupe"></select><select id="peLoc" aria-label="Local du groupe" hidden></select>
+<div class="ga-bar"><select id="peG" aria-label="Groupe"></select><button id="peLoc" class="pe-plb" hidden>Choisir les locaux</button><button id="peShare" class="pe-plb" hidden>Partager</button>
 <div class="ga-ong" role="tablist"><button data-t="el" class="on">Élèves</button><button data-t="fo">Formations</button><button data-t="co">Coffres</button></div>
 <button class="lb-q" id="gaQ" aria-label="Aide">?</button></div>
 <div id="afaire"></div>
@@ -168,10 +174,12 @@ main{max-width:1500px}
 <section class="ga-t" id="t-co" hidden><iframe id="fCo" src="coffres.html" title="Coffres"></iframe></section>
 </main>
 <dialog id="fiche"></dialog>
+<dialog id="partDlg"></dialog>
+<dialog id="locDlg"></dialog>
 <dialog id="gaAide"><h3>Gestion d'atelier</h3>
 <p><b>Élèves</b> : chaque élève, ses formations et son coffre. Touche un élève pour voir sa fiche et choisir son équipe.</p>
 <p><b>Équipes</b> : touche « Placer les équipes », puis le numéro de chaque élève. L'équipe 3 a le coffre 3 du local du groupe, comme au ménage. Changer un élève d'équipe fait refaire l'inventaire du coffre.</p>
-<p><b>Local</b> : à côté du groupe. En fin de session, choisis « Entre deux sessions » : chaque équipe remet son coffre. À la session suivante, choisis le nouveau local.</p>
+<p><b>Locaux</b> : à côté du groupe, coche les locaux où il a des coffres (ex. atelier et local d'électricité). En fin de session, décoche le local : chaque équipe remet son coffre. À la session suivante, coche le nouveau.</p>
 <p><b>Formations</b> : les codes QR des outils, les signatures et les démonstrations à faire.</p>
 <p><b>Coffres</b> : l'état de chaque coffre, ce qui manque et qui l'avait juste avant.</p>
 <p>Tout se met à jour seul quand un élève signe ou scanne un coffre.</p>
@@ -212,9 +220,12 @@ main{max-width:1500px}
     $("#peG").innerHTML = G.map(g => `<option ${g === g0 ? "selected" : ""}>${esc(g)}</option>`).join("") || "<option value=''>Aucun groupe</option>";
   }
   const groupe = () => $("#peG").value;
-  const grpAt = (g = groupe()) => ((D.grp || {})[g] || {}).at || "";
-  const COg = () => { const at = grpAt(); return at ? CO.filter(c => c.at === at) : CO; };
-  const coffreDe = n => n ? COg().find(c => c.n === n) : null;
+  /* locaux du groupe (un groupe peut en avoir plusieurs : atelier, local d'électricité…) */
+  const atsDe = (Gr, g) => { const x = (Gr || {})[g] || {}; return x.ats || (x.at ? [x.at] : []); };
+  const grpAts = (g = groupe()) => atsDe(D.grp, g);
+  const COg = () => { const A = grpAts(); return A.length ? CO.filter(c => A.includes(c.at)) : CO; };
+  const coffresDe = n => n ? COg().filter(c => c.n === n) : [];
+  const nomAt = a => ((K.at || {})[a] || {}).nom || "";
   const aLui = (e, w) => w && [[w.c, w.p], [w.c2, w.p2]].some(([c, p]) => (c && e.c && String(c) === String(e.c)) || (!c && p && sansAcc(p) === sansAcc(e.p)));
   const nbEq = () => Math.max(10, ...CO.map(c => c.n), ...E.map(e => e.eq || 0));
   /* « À faire » : seulement ce qui demande l'attention de l'enseignant */
@@ -234,25 +245,26 @@ main{max-width:1500px}
     let n = 0; const T = [];
     O.forEach(o => { const v = D.val[e.id + "|" + o.id]; if (forme(v)) { n++; T.push([v.m || v.d, `<span class="ok">✓ ${esc(o.nom)}</span>`]); } else if (aDemo(v)) T.push([9e15, `<span class="dm">◐ ${esc(o.nom)}</span>`]); });
     T.sort((a, b) => b[0] - a[0]); const f = T.slice(0, 3).map(t => t[1]).join("") + (T.length > 3 ? `<span>+${T.length - 3}</span>` : "");
-    const cf = coffreDe(e.eq), pt = cf ? (cf.s.mq.length ? "r" : cf.s.att || !cf.s.der ? "g" : "") : "";
-    const c = cf ? `<div><span class="pt ${pt}"></span><b>${esc(cf.nom)}</b><small>${cf.s.mq.length ? "Manque : " + esc(cf.s.mq.join(", ")) : cf.s.att ? "Changement d'équipe en cours" : cf.s.der ? "Tout est là · " + quand(cf.s.der.d) : "Pas encore scanné"}</small></div>` : `<small>${e.eq ? "Pas de coffre " + e.eq : "Aucune équipe"}</small>`;
+    const L2 = coffresDe(e.eq), plus = grpAts().length > 1;
+    const c = L2.length ? L2.map(cf => { const pt = cf.s.mq.length ? "r" : cf.s.att || !cf.s.der ? "g" : "";
+      return `<div><span class="pt ${pt}"></span><b>${esc(cf.nom)}</b>${plus ? ` <small style="display:inline">· ${esc(nomAt(cf.at))}</small>` : ""}<small>${cf.s.mq.length ? "Manque : " + esc(cf.s.mq.join(", ")) : cf.s.att ? "Changement d'équipe en cours" : cf.s.der ? "Tout est là · " + quand(cf.s.der.d) : "Pas encore scanné"}</small></div>`; }).join("") : `<small>${e.eq ? "Pas de coffre " + e.eq : "Aucune équipe"}</small>`;
     const pl = PLACE ? `<div class="pe-pl">${Array.from({ length:nbEq() }, (_, i) => `<button data-pl="${i + 1}" class="${e.eq === i + 1 ? "on" : ""}">${i + 1}</button>`).join("")}</div>` : "";
     return `<div class="pe-r${PLACE ? " place" : ""}" role="button" tabindex="0" data-el="${e.id}"><div class="pe-n"><b>${esc(e.p)}</b><small>${e.c ? "code " + esc(e.c) : ""}</small></div><div class="pe-f"><em>${n} sur ${O.length}</em>${f}</div><div class="pe-c">${c}</div>${pl}</div>`;
   }
   function dessiner(){
-    afaire(); majLoc(); $("#pePl").hidden = !ADM() || !E.some(e => e.g === groupe());
+    afaire(); majLoc(); majShare(); $("#pePl").hidden = !ADM() || !E.some(e => e.g === groupe());
     const L = $("#peL"), q = sansAcc($("#peQ").value), g = groupe();
     if (!E.length){ L.innerHTML = `<div class="pe-vide">${!CHARGE ? "Chargement du registre et des coffres…" : G.length ? "Aucun élève dans ce groupe pour l'instant." : ADM() ? "Aucun élève pour l'instant. Ajoute-les dans l'onglet Formations (+ Élèves), ou ils apparaissent quand ils signent une formation." : "Aucun groupe ne t'est encore assigné. L'administrateur te l'assigne, puis tes élèves apparaissent ici."}</div>`; return; }
     const R = E.filter(e => q ? (sansAcc(e.p).includes(q) || String(e.c || "").includes(q)) : e.g === g).sort((a, b) => a.p.localeCompare(b.p, "fr"));
     if (!R.length){ L.innerHTML = `<div class="pe-vide">Aucun élève trouvé.</div>`; return; }
     if (q || PLACE){ L.innerHTML = R.map(ligne).join(""); return; }   /* en plaçant : liste par nom, les lignes ne sautent pas */
     const eqs = [...new Set(R.map(e => e.eq || 0))].sort((a, b) => (a || 999) - (b || 999));
-    L.innerHTML = eqs.map(n => { const cf = coffreDe(n);
-      return `<div class="pe-eq">${n ? "Équipe " + n : "Sans équipe"}${n && cf ? `<span>· ${esc(cf.nom)}</span>` : ""}</div>` + R.filter(e => (e.eq || 0) === n).map(ligne).join(""); }).join("");
+    L.innerHTML = eqs.map(n => { const cfs = coffresDe(n);
+      return `<div class="pe-eq">${n ? "Équipe " + n : "Sans équipe"}${n && cfs.length === 1 ? `<span>· ${esc(cfs[0].nom)}</span>` : ""}</div>` + R.filter(e => (e.eq || 0) === n).map(ligne).join(""); }).join("");
   }
   /* fiche de l'élève */
   function fiche(id){
-    const e = E.find(x => x.id === id); if (!e) return; const dlg = $("#fiche"), cf = coffreDe(e.eq), max = nbEq();
+    const e = E.find(x => x.id === id); if (!e) return; const dlg = $("#fiche"), cfs = coffresDe(e.eq), max = nbEq();
     const fo = O.map(o => { const v = D.val[e.id + "|" + o.id];
       return forme(v) ? `<div><span class="s ok">✓</span>${esc(o.nom)}<small>${date(v.m || v.d)}</small></div>` : aDemo(v) ? `<div><span class="s dm">◐</span>${esc(o.nom)}<small>démonstration à faire</small></div>` : ""; }).join("");
     const reste = O.filter(o => !D.val[e.id + "|" + o.id] || !D.val[e.id + "|" + o.id].d).length;
@@ -265,7 +277,7 @@ main{max-width:1500px}
     dlg.innerHTML = `<div class="fi-t"><div class="fi-av">${esc(ini)}</div><div><h3>${esc(e.p)}</h3><small>${esc(e.g || "")}${e.c ? " · code " + esc(e.c) : ""}</small></div><button data-x aria-label="Fermer">✕</button></div>
       <div class="fi-b"><h4>Équipe (coffre et ménage)</h4>${ADM() ? `<div class="fi-eq"><button data-eq="0" class="${e.eq ? "" : "on"}">Aucune</button>${Array.from({ length:max }, (_, i) => `<button data-eq="${i + 1}" class="${e.eq === i + 1 ? "on" : ""}">${i + 1}</button>`).join("")}</div>
       <p class="fi-note">Changer d'équipe fait refaire l'inventaire des coffres touchés : l'équipe qui quitte le remet, la nouvelle le prend.</p>` : `<div class="fi-l"><div>${e.eq ? "Équipe " + e.eq : "Aucune équipe"}</div></div><p class="fi-note">Seul l'administrateur place les élèves dans les équipes.</p>`}
-      <h4>Coffre</h4><div class="fi-l">${cf ? `<div><span class="s ${cf.s.mq.length ? "r" : "ok"}">${cf.s.mq.length ? "!" : "✓"}</span>${esc(cf.nom)}<small>${cf.s.mq.length ? "Manque : " + esc(cf.s.mq.join(", ")) : cf.s.att ? "changement d'équipe en cours" : cf.s.der ? "tout est là" : "pas encore scanné"}</small></div>` : `<div><span class="s">–</span>${e.eq ? "Aucun coffre numéro " + e.eq : "Choisis son équipe pour lui donner un coffre"}</div>`}</div>
+      <h4>Coffre${cfs.length > 1 ? "s" : ""}</h4><div class="fi-l">${cfs.length ? cfs.map(cf => `<div><span class="s ${cf.s.mq.length ? "r" : "ok"}">${cf.s.mq.length ? "!" : "✓"}</span>${esc(cf.nom)}${grpAts().length > 1 ? " · " + esc(nomAt(cf.at)) : ""}<small>${cf.s.mq.length ? "Manque : " + esc(cf.s.mq.join(", ")) : cf.s.att ? "changement d'équipe en cours" : cf.s.der ? "tout est là" : "pas encore scanné"}</small></div>`).join("") : `<div><span class="s">–</span>${e.eq ? "Aucun coffre numéro " + e.eq : "Choisis son équipe pour lui donner un coffre"}</div>`}</div>
       <h4>Formations · ${O.length - reste} sur ${O.length}</h4><div class="fi-l">${fo || `<div><span class="s">–</span>Aucune formation encore</div>`}</div>
       <h4>Historique</h4><div class="fi-l">${H.slice(0, 10).map(([t, x]) => `<div>${esc(x)}<small>${date(t)}</small></div>`).join("") || `<div>Rien encore</div>`}</div></div>`;
     dlg.querySelector("[data-x]").onclick = () => dlg.close();
@@ -273,9 +285,9 @@ main{max-width:1500px}
     if (!dlg.open) dlg.showModal();
   }
   /* codes des élèves de l'équipe n dans le local at (même règle que coffres.html) */
-  function codesEq(n, at){ const P = PASS(); if (!P) return []; const ga = g => ((P.D.grp || {})[g] || {}).at || "";
-    return Object.values(P.D.el).filter(e => !e.x && e.eq === n && e.c && (!ga(e.g) || ga(e.g) === at)).map(e => String(e.c)).sort(); }
-  const coffreNum = (C, x, at) => Object.entries(C.K.cf).find(([, c]) => !c.x && numC(c.nom) === x && (!at || c.at === at));
+  function codesEq(n, at){ const P = PASS(); if (!P) return [];
+    return Object.values(P.D.el).filter(e => { if (e.x || e.eq !== n || !e.c) return false; const A = atsDe(P.D.grp, e.g); return !A.length || A.includes(at); }).map(e => String(e.c)).sort(); }
+  const coffresNum = (C, x, A) => Object.entries(C.K.cf).filter(([, c]) => !c.x && numC(c.nom) === x && (!A.length || A.includes(c.at)));
   /* lance la remise et note l'équipe d'avant, pour pouvoir annuler (15 nov.) */
   function lancer(C, ids, avant){
     if (!ids.length) return; C.nouvelInventaire(ids);
@@ -287,17 +299,17 @@ main{max-width:1500px}
     for (const [id, c] of Object.entries(C.K.cf)){ if (c.x) continue;
       const E2 = Object.values(C.K.ev).filter(e => e.cf === id).sort((a, b) => a.d - b.d), dn = E2.filter(e => e.k === "nouveau").pop();
       if (!dn || !dn.eqAvant || E2.some(e => (e.k === "ok" || e.k === "manque") && e.d > dn.d)) continue;
-      const atG = ((P.D.grp || {})[dn.g] || {}).at || "";
-      if (atG !== (dn.atAvant || "") || codesEq(numC(c.nom), c.at).join() !== dn.eqAvant.join()) continue;
+      const A = atsDe(P.D.grp, dn.g);
+      if (!(dn.atAvant ? A.includes(dn.atAvant) : !A.length) || codesEq(numC(c.nom), c.at).join() !== dn.eqAvant.join()) continue;
       dn.k = "annule"; dn.t = Date.now(); c.tour = Math.max(0, (c.tour || 1) - 1); c.chg = false; c.t = Date.now(); faits.push(id); }
     if (faits.length){ C.sauver(); setTimeout(() => C.publier(), 300); }
     return faits; }
   /* changer d'équipe : registre (prénom → équipe) puis inventaire des coffres touchés, ou annulation si on revient en arrière */
   function changerEquipe(id, n, sansFiche){
     const P = PASS(); if (!ADM() || !P || !P.D.el[id]) return; const ancien = P.D.el[id].eq || 0; if (ancien === n) return;
-    const g = P.D.el[id].g, at = grpAt(g), C = CF(), avant = {};
-    const touches = C ? [ancien, n].filter(Boolean).map(x => coffreNum(C, x, at)).filter(Boolean) : [];
-    touches.forEach(([cid, c]) => avant[cid] = { eqAvant:codesEq(numC(c.nom), c.at), atAvant:at, g });
+    const g = P.D.el[id].g, A = atsDe(P.D.grp, g), C = CF(), avant = {};
+    const touches = C ? [ancien, n].filter(Boolean).flatMap(x => coffresNum(C, x, A)) : [];
+    touches.forEach(([cid, c]) => avant[cid] = { eqAvant:codesEq(numC(c.nom), c.at), atAvant:A.length ? c.at : "", g });
     P.D.el[id].eq = n || undefined; P.D.el[id].t = Date.now(); P.sauver();
     if (C){ const ann = annuler(C);
       const ids = touches.map(([cid]) => cid).filter(cid => !ann.includes(cid) && (() => { const c = C.K.cf[cid], st = C.etat(Object.assign({ id:cid }, c));
@@ -307,6 +319,27 @@ main{max-width:1500px}
     charger(); dessiner(); if (!sansFiche) fiche(id);
   }
   function toast(t){ let d = document.querySelector(".ga-toast"); if (!d){ d = document.createElement("div"); d.className = "ga-toast"; document.body.appendChild(d); } d.textContent = t; d.classList.add("on"); clearTimeout(toast.t); toast.t = setTimeout(() => d.classList.remove("on"), 3500); }
+  /* partage (15 nov.) : un seul « Partager » par groupe; les coffres de son local suivent tout seuls
+     (atelier partagé avec tous les collègues des groupes qui ont ce local) */
+  function partagerAteliers(){
+    const P = PASS(), C = CF(); if (!P || !C || !ADM()) return; const part = P.PART || {}, A = {};
+    Object.entries(P.D.grp || {}).forEach(([g, x]) => { if (!x || x.x) return; atsDe(P.D.grp, g).forEach(at => { A[at] = A[at] || new Set(); (part[g] || []).forEach(id => A[at].add(id)); }); });
+    Object.keys(C.K.at || {}).forEach(at => { if (!C.K.at[at].x) C.partager(at, [...(A[at] || [])]); }); }
+  function majShare(){ const P = PASS(), b = $("#peShare"); b.hidden = !ADM() || !groupe() || !P;
+    const L = (P && P.PART && P.PART[groupe()]) || [], C = (P && P.COMPTES) || {};
+    b.textContent = L.length ? "Partagé avec " + (L.length === 1 ? ((C[L[0]] || {}).nom || L[0]).split(" ")[0] : L.length + " collègues") : "Partager"; }
+  $("#peShare").onclick = () => {
+    const P = PASS(), g = groupe(), dlg = $("#partDlg"); if (!P) return; const on = (P.PART || {})[g] || [], moi = fFo.contentWindow.__moi;
+    const profs = Object.entries(P.COMPTES || {}).filter(([id, c]) => !c.eleve && id !== moi && id !== "claude.assistant").sort((a, b) => (a[1].nom || a[0]).localeCompare(b[1].nom || b[0], "fr"));
+    const loc = grpAts().map(nomAt).filter(Boolean).join(" et ");
+    dlg.innerHTML = `<h3>Partager le groupe ${esc(g)}</h3><p>Le collègue coché voit les élèves de ce groupe, leurs formations${loc ? " et les coffres de " + esc(loc) : ""}. Tout ce que l'un fait, l'autre le voit.</p>
+      <div class="pd-l">${profs.map(([id, c]) => `<label><input type="checkbox" value="${esc(id)}" ${on.includes(id) ? "checked" : ""}> ${esc(c.nom || id)}</label>`).join("") || "<p>Aucun autre enseignant n'a de compte pour l'instant.</p>"}</div>
+      <p class="pd-er" hidden></p><div class="pd-a"><button data-x>Annuler</button><button data-ok class="on">Enregistrer</button></div>`;
+    dlg.querySelector("[data-x]").onclick = () => dlg.close();
+    dlg.querySelector("[data-ok]").onclick = async ev => { const L = [...dlg.querySelectorAll("input:checked")].map(i => i.value); ev.target.disabled = true;
+      try { await P.partage(g, L); partagerAteliers(); dlg.close(); majShare(); toast(L.length ? "Partage enregistré" : "Ce groupe n'est plus partagé"); }
+      catch(e){ ev.target.disabled = false; const er = dlg.querySelector(".pd-er"); er.hidden = false; er.textContent = "L'enregistrement n'a pas fonctionné. Vérifie la connexion Internet et réessaie."; } };
+    dlg.showModal(); };
   /* onglets */
   function onglet(t){
     document.querySelectorAll(".ga-ong button").forEach(b => b.classList.toggle("on", b.dataset.t === t));
@@ -324,20 +357,26 @@ main{max-width:1500px}
   $("#pePl").onclick = () => { PLACE = !PLACE; $("#pePl").textContent = PLACE ? "Terminé" : "Placer les équipes"; $("#pePl").classList.toggle("on", PLACE); dessiner(); };
   /* local du groupe : changer de local (ou « Entre deux sessions ») = remise des coffres de ses équipes dans l'ancien local */
   function majLoc(){
-    const sel = $("#peLoc"), A = Object.entries(K.at || {}).filter(([, a]) => !a.x), at = grpAt();
-    sel.hidden = !ADM() || !A.length || !groupe();
-    sel.innerHTML = `<option value="">${at ? "Entre deux sessions" : "Local : aucun"}</option>` + A.map(([id, a]) => `<option value="${id}" ${id === at ? "selected" : ""}>Local : ${esc(a.nom)}</option>`).join("");
-    sel.value = at; }
-  $("#peLoc").onchange = ev => {
-    const P = PASS(), C = CF(), g = groupe(), ancien = grpAt(), neuf = ev.target.value; if (!P || !ADM() || !g) return;
-    const eqs = [...new Set(E.filter(e => e.g === g && e.eq).map(e => e.eq))];
-    const ids = ancien && C ? Object.entries(C.K.cf).filter(([id, c]) => !c.x && c.at === ancien && eqs.includes(numC(c.nom))).filter(([id, c]) => { const st = C.etat(Object.assign({ id }, c)); return st.der && !st.att; }).map(([id]) => id) : [];
-    const nomA = ((K.at || {})[ancien] || {}).nom || "";
-    if (ids.length && !confirm(`Fin de session dans ${nomA} : les ${ids.length} équipes du groupe ${g} feront la remise de leurs coffres. Continuer ?`)){ majLoc(); return; }
-    const avant = {}; ids.forEach(id => { const c = C.K.cf[id]; avant[id] = { eqAvant:codesEq(numC(c.nom), c.at), atAvant:ancien, g }; });
-    P.D.grp[g] = Object.assign({}, P.D.grp[g] || {}, { at:neuf || undefined, t:Date.now() }); P.sauver();
-    if (C){ const ann = annuler(C); lancer(C, ids.filter(id => !ann.includes(id)), avant); if (ann.length) toast("Fin de session annulée : les coffres reviennent comme avant."); setTimeout(() => C.publier(), 300); }
-    charger(); dessiner(); };
+    const b = $("#peLoc"), A = Object.entries(K.at || {}).filter(([, a]) => !a.x), L = grpAts().map(nomAt).filter(Boolean);
+    b.hidden = !ADM() || !A.length || !groupe();
+    b.textContent = L.length ? (L.length > 2 ? L.length + " locaux" : L.join(" + ")) : "Choisir les locaux"; }
+  /* locaux du groupe : retirer un local (ou tous, entre deux sessions) = fin de session dans ce local : remise des coffres de ses équipes */
+  $("#peLoc").onclick = () => {
+    const P = PASS(), g = groupe(), dlg = $("#locDlg"); if (!P || !ADM() || !g) return; const A = Object.entries(K.at || {}).filter(([, a]) => !a.x), on = grpAts();
+    dlg.innerHTML = `<h3>Locaux du groupe ${esc(g)}</h3><p>Coche les locaux où le groupe a des coffres. L'équipe 3 a le coffre 3 de chaque local coché.<br>Fin de session : décoche le local; chaque équipe y fait la remise de son coffre avant de partir.</p>
+      <div class="pd-l">${A.map(([id, a]) => `<label><input type="checkbox" value="${esc(id)}" ${on.includes(id) ? "checked" : ""}> ${esc(a.nom)}</label>`).join("")}</div>
+      <div class="pd-a"><button data-x>Annuler</button><button data-ok class="on">Enregistrer</button></div>`;
+    dlg.querySelector("[data-x]").onclick = () => dlg.close();
+    dlg.querySelector("[data-ok]").onclick = () => {
+      const neuf = [...dlg.querySelectorAll("input:checked")].map(i => i.value), retires = on.filter(a => !neuf.includes(a)), C = CF();
+      const eqs = [...new Set(E.filter(e => e.g === g && e.eq).map(e => e.eq))];
+      const ids = C ? Object.entries(C.K.cf).filter(([id, c]) => !c.x && retires.includes(c.at) && eqs.includes(numC(c.nom))).filter(([id, c]) => { const st = C.etat(Object.assign({ id }, c)); return st.der && !st.att; }).map(([id]) => id) : [];
+      if (ids.length && !confirm(`Fin de session dans ${retires.map(nomAt).join(" et ")} : les équipes du groupe ${g} feront la remise de ${ids.length} coffre${ids.length > 1 ? "s" : ""}. Continuer ?`)) return;
+      const avant = {}; ids.forEach(id => { const c = C.K.cf[id]; avant[id] = { eqAvant:codesEq(numC(c.nom), c.at), atAvant:c.at, g }; });
+      const x = Object.assign({}, P.D.grp[g] || {}, { ats:neuf, t:Date.now() }); delete x.at; P.D.grp[g] = x; P.sauver();
+      if (C){ const ann = annuler(C); lancer(C, ids.filter(id => !ann.includes(id)), avant); if (ann.length) toast("Fin de session annulée : les coffres reviennent comme avant."); partagerAteliers(); setTimeout(() => C.publier(), 300); }
+      dlg.close(); charger(); dessiner(); };
+    dlg.showModal(); };
   $("#gaQ").onclick = () => $("#gaAide").showModal();
   $("#peG").onchange = () => { const g = groupe(); localStorage.setItem("passeportGroupe", g); const P = PASS(); if (P) P.groupe(g); dessiner(); };
   $("#peQ").oninput = dessiner;
