@@ -414,7 +414,8 @@ const codesPub = L => { const C = {}; L.forEach(g => C[g] = []); Object.values(D
 function codeLibre(){ const pris = new Set(Object.values(D.el).filter(e => !e.x && e.c).map(e => e.c));
   for (let i = 0; i < 2000; i++){ const c = String(100 + Math.floor(Math.random() * 900)); if (!pris.has(c)) return c; } return ""; }
 const nid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
-const groupes = () => Object.keys(D.grp).filter(g => D.grp[g] && !D.grp[g].x).sort((a, b) => a.localeCompare(b, "fr"));
+/* enseignant régulier : seulement les groupes qui lui sont assignés (partagés par l'administrateur), 15 nov. */
+const groupes = () => Object.keys(D.grp).filter(g => D.grp[g] && !D.grp[g].x && (window.ADMIN !== false || HOTES[g])).sort((a, b) => a.localeCompare(b, "fr"));
 const eleves = g => Object.entries(D.el).filter(([, e]) => !e.x && e.g === g).map(([id, e]) => Object.assign({ id }, e)).sort((a, b) => a.p.localeCompare(b.p, "fr"));
 /* fusion de deux appareils : élément par élément, le plus récent gagne (t) */
 function fusion(a, b){ const A = JSON.parse(a || "null") || { el:{}, val:{}, grp:{}, vus:{}, mv:{} }, B = JSON.parse(b || "null") || { el:{}, val:{}, grp:{}, vus:{}, mv:{} };
@@ -661,10 +662,12 @@ function appliquerSync(P, de){
 async function lireHotes(){
   const moi = window.__moi; if (!moi) return; const H = {};
   await Promise.all(Object.keys(COMPTES).filter(id => id !== moi && !COMPTES[id].eleve).map(async id => { const P = await PARTAGE.lire(id); for (const g in P.part) if ((P.part[g] || []).includes(moi)) H[g] = id; }));
-  HOTES = H; let n = false; for (const g in H) if (!D.grp[g] || D.grp[g].x){ D.grp[g] = { t:Date.now() }; n = true; } if (n){ sauver(); dessiner(); } else envoyerSync(); }
+  HOTES = H; try { localStorage.setItem("passVisibles", window.ADMIN ? "" : JSON.stringify(Object.keys(H))); } catch(e) {} dessiner(); let n = false; for (const g in H) if (!D.grp[g] || D.grp[g].x){ D.grp[g] = { t:Date.now() }; n = true; } if (n){ sauver(); dessiner(); } else envoyerSync(); }
 let PART = {}, COMPTES = {}; /* PART = { groupe: [comptes des collègues] } */
 async function majPart(){
   try { COMPTES = (await (await fetch("comptes.json", { cache:"no-store" })).json()).comptes || {}; } catch(e) {}
+  /* seul l'administrateur crée ou efface des élèves et des groupes (15 nov.; plus tard : chefs de groupe) */
+  window.ADMIN = !!(window.__moi && COMPTES[window.__moi] && COMPTES[window.__moi].admin); document.body.classList.toggle("lecteur", !window.ADMIN);
   if (window.__moi) PART = (await PARTAGE.lire(window.__moi)).part; publierGrp(); lireHotes();
   const noms = [...new Set(Object.values(PART).flat())].filter(id => COMPTES[id]).map(id => COMPTES[id].nom || id);
   $("#bPart").textContent = noms.length ? "Partagé avec " + (noms.length === 1 ? noms[0] : noms.length + " collègues") : "Partager";
@@ -724,5 +727,13 @@ async function vueProf(){
 
 if (Q.get("o")) vueEleve(); else (window.gardeOk || Promise.resolve(true)).then(ok => { if (ok !== false) vueProf(); });
 </script>
+<script>
+/* Gestion d'atelier (15 nov.) : cette page tourne dans l'onglet Formations; petite porte pour la page parente */
+try { if (window.top !== window && /outils-atelier/.test(parent.location.pathname)) document.documentElement.classList.add("dansGestion"); } catch(e) {}
+window.PASS = { get D(){ return D; }, groupes, sauver(){ sauver(); dessiner(); }, groupe(g){ GRP = g; dessiner(); } };
+</script>
+<style>body.lecteur #bGrpN,body.lecteur #bEl,body.lecteur #bEffG,body.lecteur #bPart{display:none!important}
+html.dansGestion .mp-tete,html.dansGestion .hero,html.dansGestion #grp,html.dansGestion .mp-pied{display:none!important}
+html.dansGestion main{padding-top:6px}</style>
 </body>
 </html>

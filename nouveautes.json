@@ -34,44 +34,29 @@
  {
   "date": "2026-11-15",
   "titre": "Registre de formation",
-  "texte": "Un code QR par outil, pour tous tes groupes. L'élève le scanne, suit la formation de l'outil, coche chaque étape, écrit son prénom et son groupe, puis signe avec son doigt. Tu reçois sa signature et la date dans ton passeport.",
+  "texte": "Gestion d'atelier réunit tes élèves, leurs formations et leurs coffres sur une seule page, toujours à jour.",
   "formation": [
    {
-    "t": "Gestion d'atelier → Registre de formation."
+    "t": "Ouvre Gestion d'atelier dans la barre du haut et choisis ton groupe."
    },
    {
-    "t": "Crée ton groupe (ex. « 2608 »)."
+    "t": "En haut, « À faire » montre seulement ce qui demande ton attention : démonstrations, coffres incomplets, élèves sans équipe. Touche une ligne pour y aller."
    },
    {
-    "t": "Touche « Codes QR à imprimer » et colle chaque code sur son outil (un seul code par outil, pour tous les groupes)."
+    "t": "Onglet Élèves : un élève par ligne avec ses formations et son coffre. Touche-le pour ouvrir sa fiche et son historique."
    },
    {
-    "t": "L'élève scanne le code, coche les étapes, écrit son prénom et son groupe, puis signe."
+    "t": "Dans la fiche, choisis son équipe : l'équipe 3 a le coffre 3, comme au ménage. Changer d'équipe fait refaire l'inventaire du coffre."
    },
    {
-    "t": "La signature arrive dans ton tableau (✓ vert avec la date). Touche la case pour la voir."
-   },
-   {
-    "t": "À la fin de l'année : « Effacer ce groupe »."
-   },
-   {
-    "t": "Crée tes groupes (+ Groupe, ex. 2608PLC1) : l'élève touche le sien au lieu de l'écrire. « Partager » : choisis un collègue et vos groupes communs; leurs signatures arrivent aussi dans son passeport."
-   },
-   {
-    "t": "Chaque élève a un code à 3 chiffres (à côté de son prénom). Donne-le-lui : il l'écrit au lieu de son prénom, et ses signatures arrivent toujours sur sa carte."
-   },
-   {
-    "t": "Démonstration : après la signature, l'élève fait 2 ou 3 manipulations devant toi. Touche sa case orange ◐, coche ce qui est réussi, puis « Compétence démontrée » : la case devient verte."
-   },
-   {
-    "t": "« Partager » : tu choisis le collègue et le groupe. Vous avez alors le même registre : signatures, démonstrations approuvées et validations, même celles d'avant le partage."
+    "t": "Onglet Formations : codes QR des outils, signatures et démonstrations. Onglet Coffres : l'état de chaque coffre."
    }
   ],
   "versions": [
+   "15 nov. : une seule page à onglets, « À faire », fiche de l'élève et équipes (coffre + ménage); le coéquipier est reconnu tout seul au scan du coffre.",
    "15 nov. : Gestion d'atelier → « Par élève » : ses formations et son coffre sur une seule ligne.",
    "15 nov. : nouvel onglet « Gestion d'atelier »; registre identique pour les collègues d'un groupe partagé.",
-   "14 nov. : démonstration devant l'enseignant obligatoire (2 ou 3 manipulations par outil); suivi des sorties d'outils retiré.",
-   "14 nov. : un élève déjà formé n'a plus à refaire la formation sur un autre appareil (« J'ai déjà ma formation » + son code)."
+   "14 nov. : démonstration devant l'enseignant obligatoire (2 ou 3 manipulations par outil); suivi des sorties d'outils retiré."
   ]
  },
  {

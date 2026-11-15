@@ -263,11 +263,11 @@ async function vueEleve(){
   const codes = PP && PP.codes ? [].concat(...Object.values(PP.codes)) : [], parCode = codes.length > 0;
   const nomAt = (P.at && P.at[cf.at]) || "";
   let mc = "", mp = ""; try { mc = localStorage.getItem("passCode") || ""; mp = localStorage.getItem("passPrenom") || ""; } catch(e) {}
-  const idt = `<div class="idt">${parCode ? `<label for="cd">Ton code (3 chiffres)</label><input id="cd" inputmode="numeric" maxlength="3" value="${esc(mc)}" autocomplete="off">`
+  const idt = `<div class="idt">${(cf.eqc || []).length > 1 ? "<style>label[for=c2],#c2{display:none}</style>" : ""}${parCode ? `<label for="cd">Ton code (3 chiffres)</label><input id="cd" inputmode="numeric" maxlength="3" value="${esc(mc)}" autocomplete="off">`
     : `<label for="pn">Ton prénom</label><input id="pn" maxlength="24" value="${esc(mp)}" autocomplete="given-name">`}
     <label for="c2">${parCode ? "Code de ton coéquipier" : "Prénom de ton coéquipier"} <small style="font-weight:500;color:var(--gris)">(si vous êtes deux)</small></label><input id="c2" ${parCode ? 'inputmode="numeric" maxlength="3"' : 'maxlength="24"'} autocomplete="off"><p class="err" id="er" hidden></p></div>`;
   const qui = () => { const v2 = $("#c2").value.trim();
-    if (parCode){ const c = $("#cd").value.trim(); if (!codes.includes(c)) return null; if (!v2) return { c }; return codes.includes(v2) && v2 !== c ? { c, c2:v2 } : "c2"; }
+    if (parCode){ const c = $("#cd").value.trim(); if (!codes.includes(c)) return null; if (!v2){ const eq = cf.eqc || [], o = eq.filter(z => z !== c); return eq.includes(c) && o.length ? { c, c2:o[0] } : { c }; } return codes.includes(v2) && v2 !== c ? { c, c2:v2 } : "c2"; }
     const p = prenom($("#pn").value); if (p.length < 2) return null; const p2 = prenom(v2); return p2.length >= 2 ? { p, p2 } : { p }; };
   const envoyer = async (obj, b) => {
     const w = qui(), er = $("#er"); er.hidden = true;
@@ -375,10 +375,13 @@ function etat(cf){
   return { E, mq, der, c, att, rem };
 }
 function nouvelInventaire(ids){ const t = Date.now(); ids.forEach(id => { const c = K.cf[id]; if (!c) return; c.tour = (c.tour || 0) + 1; c.chg = !!etat(Object.assign({ id }, c)).der; c.t = t; K.ev["n" + nid()] = { cf:id, k:"nouveau", d:t, t, par:window.__moi }; }); sauver(); dessiner(); }
+/* codes des élèves de l'équipe du même numéro que le coffre (Gestion d'atelier, 15 nov.) : numéros seulement */
+function codesEquipe(nom){ const n = +((String(nom || "").match(/\d+/) || [])[0] || 0); if (!n) return undefined;
+  try { const P = JSON.parse(localStorage.getItem("passeportOutils") || "{}"), L = Object.values(P.el || {}).filter(e => !e.x && e.eq === n && e.c).map(e => String(e.c)); return L.length ? L.sort() : undefined; } catch(e) { return undefined; } }
 async function publier(){
   if (!window.__moi) return;
   const at = {}, cf = {}; ateliers().forEach(([id, a]) => at[id] = a.nom);
-  for (const [id, c] of Object.entries(K.cf)) if (!c.x && at[c.at]) cf[id] = { nom:c.nom, at:c.at, tour:c.tour || 0, chg:c.chg ? 1 : 0, liste:c.liste || [], mq:Object.keys(etat(Object.assign({ id }, c)).mq) };
+  for (const [id, c] of Object.entries(K.cf)) if (!c.x && at[c.at]) cf[id] = { nom:c.nom, at:c.at, tour:c.tour || 0, chg:c.chg ? 1 : 0, liste:c.liste || [], eqc:codesEquipe(c.nom), mq:Object.keys(etat(Object.assign({ id }, c)).mq) };
   const part = {}; for (const a in K.part) if (at[a] && K.part[a].l && K.part[a].l.length) part[a] = K.part[a].l;
   const o = { at, cf, part }, k = JSON.stringify(o); if (localStorage.getItem("coffresPub") === k) return;
   try { await PUB.ecrire(window.__moi, o); localStorage.setItem("coffresPub", k); } catch(e) {}
@@ -529,5 +532,12 @@ async function vueProf(){
 }
 if (Q.get("c")) vueEleve(); else (window.gardeOk || Promise.resolve(true)).then(ok => { if (ok !== false) vueProf(); });
 </script>
+<script>
+/* Gestion d'atelier (15 nov.) : cette page tourne dans l'onglet Coffres; petite porte pour la page parente */
+try { if (window.top !== window && /outils-atelier/.test(parent.location.pathname)) document.documentElement.classList.add("dansGestion"); } catch(e) {}
+window.CF = { get K(){ return K; }, etat, nouvelInventaire, publier };
+</script>
+<style>html.dansGestion .mp-tete,html.dansGestion .hero,html.dansGestion .mp-pied{display:none!important}
+html.dansGestion main{padding-top:6px}</style>
 </body>
 </html>

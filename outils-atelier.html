@@ -92,9 +92,52 @@ main{max-width:1500px}
 .pe-f span.ok{background:#1E8A5526;color:#2FA86C}.pe-f span.dm{background:#EB6A2226;color:#EB6A22}
 .pe-f em{font-style:normal;font-weight:700;font-size:13px;margin-right:4px}
 .pe-c{font-size:14px}.pe-c small{display:block;color:var(--gris);font-size:12px}
-.pe-c .pt{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;background:#2FA86C}.pe-c .pt.r{background:#D9534F}
+.pe-c .pt{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;background:#2FA86C}.pe-c .pt.r{background:#D9534F}.pe-c .pt.g{background:#8A93A6}
 .pe-vide{color:var(--gris);font-size:15px;background:var(--carte);border:1px dashed var(--ligne);border-radius:12px;padding:16px}
 @media (max-width:760px){.pe-r{grid-template-columns:1fr;gap:8px}}
+
+/* Gestion d'atelier en une page (15 nov.) : onglets Élèves / Formations / Coffres */
+.ga-hero{display:flex;align-items:center;gap:16px;margin:4px 0 14px}
+.ga-hero h1{margin:0;font-size:30px}.ga-hero .lb-ico{width:48px;height:48px;border-radius:12px}
+.ga-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 12px}
+.ga-bar select{min-height:44px;border-radius:10px;border:1px solid var(--ligne);background:var(--carte);color:var(--txt);padding:0 12px;font-size:15px;font-weight:600}
+.ga-ong{display:flex;gap:4px;background:var(--carte2);border-radius:12px;padding:4px}
+.ga-ong button{border:0;background:none;color:var(--gris);font-weight:700;font-size:15px;padding:0 18px;min-height:40px;border-radius:9px;cursor:pointer}
+.ga-ong button.on{background:var(--carte);color:var(--txt);box-shadow:0 1px 4px rgba(0,0,0,.18)}
+.ga-ong button b{display:inline-block;min-width:20px;padding:1px 6px;margin-left:6px;border-radius:99px;background:#EB6A22;color:#fff;font-size:12px}
+.ga-bar .lb-q{margin-left:auto}
+#afaire{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
+#afaire button{display:flex;align-items:center;gap:8px;border:1px solid var(--ligne);background:var(--carte);color:var(--txt);border-radius:99px;padding:8px 14px;font-size:14px;font-weight:600;cursor:pointer;min-height:40px}
+#afaire button i{width:10px;height:10px;border-radius:50%;background:#EB6A22;flex:none}
+#afaire button i.r{background:#D9534F}#afaire button i.v{background:#2FA86C}#afaire button i.g{background:#8A93A6}
+#afaire .ok{color:var(--gris);font-size:14px;padding:8px 2px}
+.ga-t[hidden]{display:block!important;position:absolute;left:-9999px;top:0;width:1200px;visibility:hidden}
+.ga-t iframe{width:100%;border:0;border-radius:14px;background:var(--fond);display:block}
+.pe-eq{display:flex;align-items:center;gap:10px;margin:14px 2px 6px;font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--gris)}
+.pe-eq span{font-weight:600;letter-spacing:0;text-transform:none;font-size:13px}
+.pe-r{cursor:pointer;width:100%;text-align:left;font:inherit;color:inherit}
+.pe-r:hover{border-color:#EB6A22}
+#fiche{border:0;border-radius:18px;padding:0;max-width:640px;width:calc(100% - 28px);background:var(--fond);color:var(--txt)}
+#fiche::backdrop{background:rgba(0,0,0,.5)}
+.fi-t{display:flex;align-items:center;gap:14px;padding:18px 20px;border-bottom:1px solid var(--ligne)}
+.fi-av{width:48px;height:48px;border-radius:50%;background:#1E2A44;color:#fff;display:grid;place-items:center;font-weight:800;font-size:18px;flex:none}
+.fi-t h3{margin:0;font-size:21px}.fi-t small{color:var(--gris)}
+.fi-t button{margin-left:auto;border:0;background:var(--carte2);color:var(--txt);width:40px;height:40px;border-radius:50%;font-size:18px;cursor:pointer}
+.fi-b{padding:6px 20px 20px;max-height:min(70vh,640px);overflow:auto}
+.fi-b h4{margin:16px 0 8px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--gris)}
+.fi-eq{display:flex;flex-wrap:wrap;gap:6px}
+.fi-eq button{min-width:44px;min-height:44px;border-radius:10px;border:1px solid var(--ligne);background:var(--carte);color:var(--txt);font-weight:700;font-size:15px;cursor:pointer}
+.fi-eq button.on{background:#EB6A22;border-color:#EB6A22;color:#fff}
+.fi-note{color:var(--gris);font-size:12.5px;margin:6px 0 0}
+.fi-l{display:flex;flex-direction:column;gap:4px}
+.fi-l div{display:flex;align-items:center;gap:10px;background:var(--carte);border:1px solid var(--ligne);border-radius:10px;padding:9px 12px;font-size:14px}
+.fi-l div small{margin-left:auto;color:var(--gris);font-size:12.5px;white-space:nowrap}
+.fi-l .s{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:800;flex:none;background:var(--carte2);color:var(--gris)}
+.fi-l .s.ok{background:#1E8A5526;color:#2FA86C}.fi-l .s.dm{background:#EB6A2226;color:#EB6A22}.fi-l .s.r{background:#D9534F26;color:#D9534F}
+#gaAide{border:0;border-radius:18px;padding:22px;max-width:620px;width:calc(100% - 40px);background:var(--fond);color:var(--txt)}
+#gaAide::backdrop{background:rgba(0,0,0,.5)}#gaAide h3{margin:0 0 10px}#gaAide p{margin:8px 0;color:var(--gris);line-height:1.45}#gaAide b{color:var(--txt)}
+#gaAide>button{margin-top:12px;background:#EB6A22;color:#fff;border:0;border-radius:10px;padding:12px 20px;font-weight:700;font-size:15px;cursor:pointer}
+@media (max-width:640px){.ga-hero{display:none}.ga-ong{width:100%}.ga-ong button{flex:1;padding:0 6px}.ga-bar select{flex:1}}
 </style>
 <script>
 /* Même thème que la bibliothèque : choix gardé dans localStorage.accueilClair, sinon l'ordinateur */
@@ -106,65 +149,146 @@ main{max-width:1500px}
 <body>
 <div class="mp-tete"><img class="lg-b" src="img/metier-plus-blanc.svg" alt="Métier+"><img class="lg-c" src="img/metier-plus.svg" alt="Métier+"><a class="mp-retour" href="./">‹ Bibliothèque</a><h1 class="mp-nom">Gestion</h1><span class="mp-sous">Formations et inventaires de l'atelier</span><nav class="mp-nav" aria-label="Outils"><a href="./" data-nav="biblio"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h12v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5"/></svg>Bibliothèque</a><a href="./?ouvrir=plans" data-nav="plans"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3z"/><path d="M9 3v15M15 6v15"/></svg>Plans</a><a href="./?ouvrir=activites" data-nav="activites"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4h6v3H9zM9 12h6M9 16h4"/></svg>Formatifs</a><a href="outils-atelier.html" data-nav="outils" class="ici" aria-current="page"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z"/></svg>Gestion d'atelier</a><a href="labo.html" data-nav="labo"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-9V3"/></svg>Labo</a><a href="./?ouvrir=accueil" data-nav="accueil"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Accueil de classe</a><a href="./?ouvrir=tableau" data-nav="tableau"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>Tableau blanc</a></nav><span class="mp-esp"></span></div>
 <main>
-<div class="lb-hero"><div class="lb-ico"><svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="#EB6A22" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z"/></svg></div>
-<div><h1>Gestion d'atelier</h1><p>Formation à la sécurité des outils et inventaire des coffres : l'élève scanne un code QR, tu as le registre.</p></div></div>
-<h2>Gestion de l'atelier</h2>
-<div class="lb-act">
-<a class="lb-c" href="passeport.html"><span class="lb-plus">+</span><div class="lb-im"><svg viewBox="0 0 120 90" aria-hidden="true"><rect x="26" y="8" width="68" height="76" rx="8" fill="#ffffff1f" stroke="#fff" stroke-width="2"/><rect x="38" y="20" width="18" height="18" rx="2" fill="#fff"/><rect x="64" y="20" width="18" height="18" rx="2" fill="#fff"/><rect x="38" y="44" width="18" height="18" rx="2" fill="#fff"/><path d="M40 74c6-8 10 4 16-4s8 6 14-2" stroke="#EB6A22" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="73" cy="53" r="9" fill="#1E8A55"/><path d="M69 53l3 3 5-6" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg></div>
-<div class="lb-bd"><b>Registre de formation</b><p>Un code QR sur chaque outil : l'élève suit la formation, coche chaque étape et signe. Tu reçois sa signature et la date.</p><div class="lb-tags"><span>Atelier</span><span>Nouveau</span></div></div></a>
-<a class="lb-c" href="coffres.html"><span class="lb-plus">+</span><div class="lb-im"><svg viewBox="0 0 120 90" aria-hidden="true"><rect x="18" y="30" width="84" height="48" rx="6" fill="#ffffff1f" stroke="#fff" stroke-width="2"/><path d="M18 44h84" stroke="#fff" stroke-width="2"/><rect x="50" y="20" width="20" height="12" rx="3" fill="none" stroke="#fff" stroke-width="2"/><circle cx="84" cy="62" r="10" fill="#1E8A55"/><path d="M79 62l3.5 3.5 6-7" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round"/></svg></div><div class="lb-bd"><b>Inventaire des coffres</b><p>Un code QR par coffre : l'élève qui le prend touche « Tout est là » ou ce qui manque. Tu sais qui l'avait juste avant.</p></div></a>
-</div>
-<h2>Par élève</h2>
-<div class="pe-bar"><select id="peG" aria-label="Groupe"></select><input id="peQ" type="search" placeholder="Chercher un élève ou un code"></div>
-<div class="pe-l" id="peL"></div>
+<div class="ga-hero"><div class="lb-ico"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#EB6A22" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z"/></svg></div><h1>Gestion d'atelier</h1></div>
+<div class="ga-bar"><select id="peG" aria-label="Groupe"></select>
+<div class="ga-ong" role="tablist"><button data-t="el" class="on">Élèves</button><button data-t="fo">Formations</button><button data-t="co">Coffres</button></div>
+<button class="lb-q" id="gaQ" aria-label="Aide">?</button></div>
+<div id="afaire"></div>
+<section class="ga-t" id="t-el"><div class="pe-bar"><input id="peQ" type="search" placeholder="Chercher un élève ou un code"></div><div class="pe-l" id="peL"></div></section>
+<section class="ga-t" id="t-fo" hidden><iframe id="fFo" src="passeport.html" title="Formations"></iframe></section>
+<section class="ga-t" id="t-co" hidden><iframe id="fCo" src="coffres.html" title="Coffres"></iframe></section>
 </main>
+<dialog id="fiche"></dialog>
+<dialog id="gaAide"><h3>Gestion d'atelier</h3>
+<p><b>Élèves</b> : chaque élève, ses formations et son coffre. Touche un élève pour voir sa fiche et choisir son équipe.</p>
+<p><b>Équipes</b> : l'équipe 3 a le coffre 3, et c'est la même équipe 3 que le ménage. Changer un élève d'équipe fait refaire l'inventaire du coffre : l'équipe qui quitte le remet, la nouvelle le prend.</p>
+<p><b>Formations</b> : les codes QR des outils, les signatures et les démonstrations à faire.</p>
+<p><b>Coffres</b> : l'état de chaque coffre, ce qui manque et qui l'avait juste avant.</p>
+<p>Tout se met à jour seul quand un élève signe ou scanne un coffre.</p>
+<button onclick="this.parentNode.close()">Compris</button></dialog>
 <div class="droits" style="text-align:center;font-size:12px;opacity:.6;padding:18px 12px 24px">© 2026 Jérémy Raymond · Tous droits réservés</div>
 <script>
-/* Par élève (15 nov.) : lit le registre et les coffres gardés sur cet appareil (ils suivent le compte par le coffre) */
+/* Gestion d'atelier (15 nov.) : une page, trois onglets. Les pages Registre et Coffres tournent dans les onglets
+   Formations / Coffres (elles font tout leur travail : coffre en ligne, signatures, collègues); cette page lit leurs données */
 (async function(){
   const $ = q => document.querySelector(q), esc = t => String(t ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
   const sansAcc = t => String(t || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
   const lire = k => { try { return JSON.parse(localStorage.getItem(k) || "null") || {}; } catch(e) { return {}; } };
-  let D, K, resp, E, G, aLui;
+  const fFo = $("#fFo"), fCo = $("#fCo"), ADM = () => !!(fFo.contentWindow && fFo.contentWindow.ADMIN), PASS = () => fFo.contentWindow && fFo.contentWindow.PASS, CF = () => fCo.contentWindow && fCo.contentWindow.CF;
   let O = []; try { O = (await (await fetch("protocoles.json", { cache:"no-cache" })).json()).outils || []; } catch(e) {}
   const forme = v => !!(v && v.d && (v.m || !v.s)), aDemo = v => !!(v && v.d && v.s && !v.m);
-  const quand = t => { const j = Math.floor((Date.now() - t) / 864e5); return j <= 0 ? "aujourd'hui" : j === 1 ? "hier" : "depuis " + j + " jours"; };
+  const quand = t => { const j = Math.floor((Date.now() - t) / 864e5); return j <= 0 ? "aujourd'hui" : j === 1 ? "hier" : "il y a " + j + " jours"; };
+  const date = t => new Date(t).toLocaleDateString("fr-CA", { day:"numeric", month:"short" });
+  const numC = n => +((String(n || "").match(/\d+/) || [])[0] || 0);
+  let D, K, E, G, CO;
+  /* état d'un coffre : même règle que coffres.html */
+  function etat(id, cf){
+    const Ev = Object.values(K.ev).filter(e => e.cf === id).sort((a, b) => a.d - b.d);
+    let dr = 0; Ev.forEach(e => { if (e.k === "regle") dr = e.d; });
+    const mq = []; Ev.filter(e => e.k === "manque" && e.d >= dr).forEach(e => (e.items || []).forEach(x => { if (!mq.includes(x.n)) mq.push(x.n); }));
+    const pr = Ev.filter(e => e.k === "ok" || e.k === "manque"), der = pr[pr.length - 1], dn = Ev.filter(e => e.k === "nouveau").pop();
+    const apres = dn ? pr.filter(e => e.d > dn.d) : [], att = !!dn && !apres.some(e => !e.r) ? (apres.some(e => e.r) ? "rem" : "chg") : "";
+    return { Ev, mq, der:att ? null : der, att, prop:!!cf.prop && !(cf.liste && cf.liste.length), vide:!(cf.liste && cf.liste.length) && !cf.prop };
+  }
   function charger(){
-  D = lire("passeportOutils"); K = lire("coffresAtelier"); D.el = D.el || {}; D.val = D.val || {}; K.cf = K.cf || {}; K.ev = K.ev || {};
-  resp = [];
-  for (const [id, cf] of Object.entries(K.cf)){ if (cf.x) continue;
-    const E = Object.values(K.ev).filter(e => e.cf === id).sort((a, b) => a.d - b.d);
-    let dr = 0; E.forEach(e => { if (e.k === "regle") dr = e.d; });
-    const mq = []; E.filter(e => e.k === "manque" && e.d >= dr).forEach(e => (e.items || []).forEach(x => { if (!mq.includes(x.n)) mq.push(x.n); }));
-    const pr = E.filter(e => e.k === "ok" || e.k === "manque"), der = pr[pr.length - 1], dn = E.filter(e => e.k === "nouveau").pop();
-    if (!der || (dn && dn.d > der.d)) continue;
-    resp.push({ nom:cf.nom, w:der, mq }); }
-  aLui = (e, w) => [[w.c, w.p], [w.c2, w.p2]].some(([c, p]) => (c && e.c && String(c) === String(e.c)) || (!c && p && sansAcc(p) === sansAcc(e.p)));
-  E = Object.entries(D.el).filter(([, e]) => !e.x).map(([id, e]) => Object.assign({ id }, e));
-  G = [...new Set(E.map(e => e.g).filter(Boolean))].sort((a, b) => a.localeCompare(b, "fr", { numeric:true }));
-  let g0 = $("#peG").value || localStorage.getItem("passeportGroupe") || ""; if (!G.includes(g0)) g0 = G[0] || "";
-  $("#peG").innerHTML = G.map(g => `<option ${g === g0 ? "selected" : ""}>${esc(g)}</option>`).join("") || "<option>Aucun groupe</option>";
+    D = lire("passeportOutils"); K = lire("coffresAtelier"); D.el = D.el || {}; D.val = D.val || {}; K.cf = K.cf || {}; K.ev = K.ev || {};
+    E = Object.entries(D.el).filter(([, e]) => !e.x).map(([id, e]) => Object.assign({ id }, e));
+    G = [...new Set(E.map(e => e.g).filter(Boolean).concat(Object.keys(D.grp || {}).filter(g => !(D.grp[g] || {}).x)))].filter(g => g !== "À classer" || E.some(e => e.g === g)).sort((a, b) => a.localeCompare(b, "fr", { numeric:true }));
+    /* enseignant régulier : seulement ses groupes assignés (liste tenue par le Registre) */
+    let vis = null; try { const v = localStorage.getItem("passVisibles"); vis = v ? JSON.parse(v) : null; } catch(e) {}
+    if (vis){ G = G.filter(g => vis.includes(g)); E = E.filter(e => vis.includes(e.g)); }
+    CO = Object.entries(K.cf).filter(([, c]) => !c.x).map(([id, c]) => Object.assign({ id, n:numC(c.nom), s:etat(id, c) }, c));
+    let g0 = $("#peG").value || localStorage.getItem("passeportGroupe") || ""; if (!G.includes(g0)) g0 = G[0] || "";
+    $("#peG").innerHTML = G.map(g => `<option ${g === g0 ? "selected" : ""}>${esc(g)}</option>`).join("") || "<option value=''>Aucun groupe</option>";
+  }
+  const groupe = () => $("#peG").value;
+  const coffreDe = n => n ? CO.find(c => c.n === n) : null;
+  const aLui = (e, w) => w && [[w.c, w.p], [w.c2, w.p2]].some(([c, p]) => (c && e.c && String(c) === String(e.c)) || (!c && p && sansAcc(p) === sansAcc(e.p)));
+  const nbEq = () => Math.max(10, ...CO.map(c => c.n), ...E.map(e => e.eq || 0));
+  /* « À faire » : seulement ce qui demande l'attention de l'enseignant */
+  function afaire(){
+    const g = groupe(), L = E.filter(e => e.g === g), it = [];
+    const dm = L.filter(e => O.some(o => aDemo(D.val[e.id + "|" + o.id]))).length;
+    if (dm) it.push(["dm", "", `${dm} démonstration${dm > 1 ? "s" : ""} à faire`, "fo"]);
+    CO.filter(c => c.s.mq.length).forEach(c => it.push(["r", "r", `${esc(c.nom)} : il manque ${esc(c.s.mq.slice(0, 2).join(", "))}${c.s.mq.length > 2 ? "…" : ""}`, "co"]));
+    const pr = CO.filter(c => c.s.prop).length; if (pr) it.push(["p", "", `${pr} liste${pr > 1 ? "s" : ""} de coffre à approuver`, "co"]);
+    const at = CO.filter(c => c.s.att).length; if (at) it.push(["a", "g", `${at} coffre${at > 1 ? "s" : ""} en changement d'équipe`, "co"]);
+    const se = L.filter(e => !e.eq).length; if (L.length && se) it.push(["se", "g", `${se} élève${se > 1 ? "s" : ""} sans équipe`, "el"]);
+    $("#afaire").innerHTML = it.length ? it.map(([k, c, t, o]) => `<button data-o="${o}"><i class="${c}"></i>${t}</button>`).join("") : (L.length ? `<span class="ok">✓ Tout est en ordre.</span>` : "");
+    const b = document.querySelector('.ga-ong [data-t="fo"]'); b.innerHTML = "Formations" + (dm ? `<b>${dm}</b>` : "");
+    const nc = CO.filter(c => c.s.mq.length || c.s.prop).length; document.querySelector('.ga-ong [data-t="co"]').innerHTML = "Coffres" + (nc ? `<b>${nc}</b>` : "");
+  }
+  function ligne(e){
+    let n = 0; const T = [];
+    O.forEach(o => { const v = D.val[e.id + "|" + o.id]; if (forme(v)) { n++; T.push([v.m || v.d, `<span class="ok">✓ ${esc(o.nom)}</span>`]); } else if (aDemo(v)) T.push([9e15, `<span class="dm">◐ ${esc(o.nom)}</span>`]); });
+    T.sort((a, b) => b[0] - a[0]); const f = T.slice(0, 3).map(t => t[1]).join("") + (T.length > 3 ? `<span>+${T.length - 3}</span>` : "");
+    const cf = coffreDe(e.eq), pt = cf ? (cf.s.mq.length ? "r" : cf.s.att || !cf.s.der ? "g" : "") : "";
+    const c = cf ? `<div><span class="pt ${pt}"></span><b>${esc(cf.nom)}</b><small>${cf.s.mq.length ? "Manque : " + esc(cf.s.mq.join(", ")) : cf.s.att ? "Changement d'équipe en cours" : cf.s.der ? "Tout est là · " + quand(cf.s.der.d) : "Pas encore scanné"}</small></div>` : `<small>${e.eq ? "Pas de coffre " + e.eq : "Aucune équipe"}</small>`;
+    return `<button class="pe-r" data-el="${e.id}"><div class="pe-n"><b>${esc(e.p)}</b><small>${e.c ? "code " + esc(e.c) : ""}</small></div><div class="pe-f"><em>${n} sur ${O.length}</em>${f}</div><div class="pe-c">${c}</div></button>`;
   }
   function dessiner(){
-    const L = $("#peL"); if (!E.length){ L.innerHTML = `<div class="pe-vide">Chargement du registre et des coffres…</div>`; return; }
-    const q = sansAcc($("#peQ").value), g = $("#peG").value;
+    afaire();
+    const L = $("#peL"), q = sansAcc($("#peQ").value), g = groupe();
+    if (!E.length){ L.innerHTML = `<div class="pe-vide">${!CHARGE ? "Chargement du registre et des coffres…" : G.length ? "Aucun élève dans ce groupe pour l'instant." : ADM() ? "Aucun élève pour l'instant. Ajoute-les dans l'onglet Formations (+ Élèves), ou ils apparaissent quand ils signent une formation." : "Aucun groupe ne t'est encore assigné. L'administrateur te l'assigne, puis tes élèves apparaissent ici."}</div>`; return; }
     const R = E.filter(e => q ? (sansAcc(e.p).includes(q) || String(e.c || "").includes(q)) : e.g === g).sort((a, b) => a.p.localeCompare(b.p, "fr"));
-    L.innerHTML = R.map(e => {
-      /* seulement les 3 plus récentes (démos à faire d'abord), le reste en « +N » */
-      let n = 0; const T = [];
-      O.forEach(o => { const v = D.val[e.id + "|" + o.id]; if (forme(v)) { n++; T.push([v.m || v.d, `<span class="ok">✓ ${esc(o.nom)}</span>`]); } else if (aDemo(v)) T.push([9e15, `<span class="dm">◐ ${esc(o.nom)}</span>`]); });
-      T.sort((a, b) => b[0] - a[0]); const f = T.slice(0, 3).map(t => t[1]).join("") + (T.length > 3 ? `<span>+${T.length - 3}</span>` : "");
-      const C = resp.filter(r => aLui(e, r.w));
-      const c = C.length ? C.map(r => `<div><span class="pt ${r.mq.length ? "r" : ""}"></span><b>${esc(r.nom)}</b><small>${r.mq.length ? "Manque : " + esc(r.mq.join(", ")) : "Tout est là"} · ${quand(r.w.d)}</small></div>`).join("") : `<small>Aucun coffre</small>`;
-      return `<div class="pe-r"><div class="pe-n"><b>${esc(e.p)}</b><small>${esc(e.g || "")}${e.c ? " · code " + esc(e.c) : ""}</small></div><div class="pe-f"><em>${n} sur ${O.length}</em>${f}</div><div class="pe-c">${c}</div></div>`; }).join("") || `<div class="pe-vide">Aucun élève trouvé.</div>`; }
-  $("#peG").onchange = dessiner; $("#peQ").oninput = dessiner; charger(); dessiner();
-  /* toujours à jour, sans manipulation : le registre et les coffres tournent cachés dans la page (mêmes pages que d'habitude :
-     relevé des signatures, coffre en ligne, collègues); la liste se redessine quand leurs données changent */
-  let fin = 0; const maj = () => { clearTimeout(fin); fin = setTimeout(() => { charger(); dessiner(); }, 300); };
-  addEventListener("storage", e => { if (!e.key || e.key === "passeportOutils" || e.key === "coffresAtelier") maj(); });
-  ["passeport.html", "coffres.html"].forEach(u => { const f = document.createElement("iframe"); f.src = u; f.tabIndex = -1; f.setAttribute("aria-hidden", "true");
-    f.style.cssText = "position:absolute;left:-9999px;top:0;width:1200px;height:800px;border:0;visibility:hidden"; document.body.appendChild(f); });
-  setTimeout(() => { if (!E.length) $("#peL").innerHTML = `<div class="pe-vide">Aucun élève pour l'instant. Ils apparaissent ici dès qu'ils signent une formation ou scannent un coffre.</div>`; }, 15000);
+    if (!R.length){ L.innerHTML = `<div class="pe-vide">Aucun élève trouvé.</div>`; return; }
+    if (q){ L.innerHTML = R.map(ligne).join(""); return; }
+    const eqs = [...new Set(R.map(e => e.eq || 0))].sort((a, b) => (a || 999) - (b || 999));
+    L.innerHTML = eqs.map(n => { const cf = coffreDe(n);
+      return `<div class="pe-eq">${n ? "Équipe " + n : "Sans équipe"}${n && cf ? `<span>· ${esc(cf.nom)}</span>` : ""}</div>` + R.filter(e => (e.eq || 0) === n).map(ligne).join(""); }).join("");
+  }
+  /* fiche de l'élève */
+  function fiche(id){
+    const e = E.find(x => x.id === id); if (!e) return; const dlg = $("#fiche"), cf = coffreDe(e.eq), max = nbEq();
+    const fo = O.map(o => { const v = D.val[e.id + "|" + o.id];
+      return forme(v) ? `<div><span class="s ok">✓</span>${esc(o.nom)}<small>${date(v.m || v.d)}</small></div>` : aDemo(v) ? `<div><span class="s dm">◐</span>${esc(o.nom)}<small>démonstration à faire</small></div>` : ""; }).join("");
+    const reste = O.filter(o => !D.val[e.id + "|" + o.id] || !D.val[e.id + "|" + o.id].d).length;
+    const H = [];
+    O.forEach(o => { const v = D.val[e.id + "|" + o.id]; if (v && v.d) H.push([v.d, "Signe la formation " + o.nom]); if (v && v.m) H.push([v.m, "Démonstration réussie : " + o.nom]); });
+    Object.values(K.ev).forEach(x => { if (!aLui(e, x)) return; const cn = (K.cf[x.cf] || {}).nom || "Coffre";
+      if (x.k === "ok") H.push([x.d, (x.r ? "Remet " : "Prend ") + cn + " : tout est là"]); else if (x.k === "manque") H.push([x.d, cn + " : signale " + (x.items || []).map(i => i.n).join(", ")]); else if (x.k === "liste") H.push([x.d, "Écrit la liste de " + cn]); });
+    H.sort((a, b) => b[0] - a[0]);
+    const ini = (e.p || "?").split(/\s+/).map(m => m[0]).join("").slice(0, 2).toUpperCase();
+    dlg.innerHTML = `<div class="fi-t"><div class="fi-av">${esc(ini)}</div><div><h3>${esc(e.p)}</h3><small>${esc(e.g || "")}${e.c ? " · code " + esc(e.c) : ""}</small></div><button data-x aria-label="Fermer">✕</button></div>
+      <div class="fi-b"><h4>Équipe (coffre et ménage)</h4>${ADM() ? `<div class="fi-eq"><button data-eq="0" class="${e.eq ? "" : "on"}">Aucune</button>${Array.from({ length:max }, (_, i) => `<button data-eq="${i + 1}" class="${e.eq === i + 1 ? "on" : ""}">${i + 1}</button>`).join("")}</div>
+      <p class="fi-note">Changer d'équipe fait refaire l'inventaire des coffres touchés : l'équipe qui quitte le remet, la nouvelle le prend.</p>` : `<div class="fi-l"><div>${e.eq ? "Équipe " + e.eq : "Aucune équipe"}</div></div><p class="fi-note">Seul l'administrateur place les élèves dans les équipes.</p>`}
+      <h4>Coffre</h4><div class="fi-l">${cf ? `<div><span class="s ${cf.s.mq.length ? "r" : "ok"}">${cf.s.mq.length ? "!" : "✓"}</span>${esc(cf.nom)}<small>${cf.s.mq.length ? "Manque : " + esc(cf.s.mq.join(", ")) : cf.s.att ? "changement d'équipe en cours" : cf.s.der ? "tout est là" : "pas encore scanné"}</small></div>` : `<div><span class="s">–</span>${e.eq ? "Aucun coffre numéro " + e.eq : "Choisis son équipe pour lui donner un coffre"}</div>`}</div>
+      <h4>Formations · ${O.length - reste} sur ${O.length}</h4><div class="fi-l">${fo || `<div><span class="s">–</span>Aucune formation encore</div>`}</div>
+      <h4>Historique</h4><div class="fi-l">${H.slice(0, 10).map(([t, x]) => `<div>${esc(x)}<small>${date(t)}</small></div>`).join("") || `<div>Rien encore</div>`}</div></div>`;
+    dlg.querySelector("[data-x]").onclick = () => dlg.close();
+    dlg.querySelectorAll("[data-eq]").forEach(b => b.onclick = () => { changerEquipe(id, +b.dataset.eq); });
+    if (!dlg.open) dlg.showModal();
+  }
+  /* changer d'équipe : registre (prénom → équipe) puis inventaire des coffres touchés */
+  function changerEquipe(id, n){
+    const P = PASS(); if (!ADM() || !P || !P.D.el[id]) return; const ancien = P.D.el[id].eq || 0; if (ancien === n) return;
+    P.D.el[id].eq = n || undefined; P.D.el[id].t = Date.now(); P.sauver();
+    const C = CF(); if (C){ const ids = [];
+      [ancien, n].forEach(x => { if (!x) return; const c = Object.entries(C.K.cf).find(([, c]) => !c.x && numC(c.nom) === x); if (!c) return;
+        const st = C.etat(Object.assign({ id:c[0] }, c[1])); const dn = Object.values(C.K.ev).filter(e => e.cf === c[0] && e.k === "nouveau").pop(), pr = Object.values(C.K.ev).filter(e => e.cf === c[0] && (e.k === "ok" || e.k === "manque") && (!dn || e.d > dn.d));
+        if (pr.length && !st.att) ids.push(c[0]); });
+      if (ids.length) C.nouvelInventaire(ids); setTimeout(() => C.publier(), 300); }
+    charger(); dessiner(); fiche(id);
+  }
+  /* onglets */
+  function onglet(t){
+    document.querySelectorAll(".ga-ong button").forEach(b => b.classList.toggle("on", b.dataset.t === t));
+    ["el", "fo", "co"].forEach(x => $("#t-" + x).hidden = x !== t); localStorage.setItem("gestionOnglet", t); taille();
+  }
+  function taille(){ [fFo, fCo].forEach(f => { if (f.parentNode.hidden) return; const top = f.getBoundingClientRect().top; f.style.height = Math.max(420, innerHeight - top - 12) + "px"; }); }
+  addEventListener("resize", taille);
+  document.querySelectorAll(".ga-ong button").forEach(b => b.onclick = () => onglet(b.dataset.t));
+  $("#afaire").onclick = ev => { const b = ev.target.closest("[data-o]"); if (b) onglet(b.dataset.o); };
+  $("#peL").onclick = ev => { const b = ev.target.closest("[data-el]"); if (b) fiche(b.dataset.el); };
+  $("#gaQ").onclick = () => $("#gaAide").showModal();
+  $("#peG").onchange = () => { const g = groupe(); localStorage.setItem("passeportGroupe", g); const P = PASS(); if (P) P.groupe(g); dessiner(); };
+  $("#peQ").oninput = dessiner;
+  let CHARGE = false; setTimeout(() => { CHARGE = true; dessiner(); }, 12000);
+  [fFo, fCo].forEach(f => f.addEventListener("load", () => { CHARGE = true; setTimeout(() => { const P = PASS(); if (P && groupe()) P.groupe(groupe()); }, 400); }));
+  charger(); onglet(localStorage.getItem("gestionOnglet") || "el"); dessiner();
+  let fin = 0; addEventListener("storage", ev => { if (!ev.key || /^(passeportOutils|coffresAtelier|passeportGroupe|passVisibles)$/.test(ev.key)){ clearTimeout(fin); fin = setTimeout(() => { charger(); dessiner(); const dl = $("#fiche"); if (dl.open && dl.dataset.id) fiche(dl.dataset.id); }, 300); } });
+  const fo = fiche; fiche = id => { $("#fiche").dataset.id = id; fo(id); };
+  $("#fiche").addEventListener("close", () => delete $("#fiche").dataset.id);
 })();
 </script>
 </body>
