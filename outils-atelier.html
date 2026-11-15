@@ -234,6 +234,8 @@ main{max-width:1500px}
   const COg = () => { const A = grpAts(); return A.length ? CO.filter(c => A.includes(c.at)) : CO; };
   const coffresDe = n => n ? COg().filter(c => c.n === n) : [];
   const nomAt = a => ((K.at || {})[a] || {}).nom || "";
+  /* groupe sans local coché = formations seulement (15 nov.) : pas d'onglet Coffres, pas d'équipes, pas de colonne coffre */
+  const avecCoffres = () => grpAts().length > 0 && COg().length > 0;
   const aLui = (e, w) => w && [[w.c, w.p], [w.c2, w.p2]].some(([c, p]) => (c && e.c && String(c) === String(e.c)) || (!c && p && sansAcc(p) === sansAcc(e.p)));
   const nbEq = () => Math.max(10, ...CO.map(c => c.n), ...E.map(e => e.eq || 0));
   /* « À faire » : seulement ce qui demande l'attention de l'enseignant */
@@ -241,31 +243,33 @@ main{max-width:1500px}
     const g = groupe(), L = E.filter(e => e.g === g), it = [];
     const dm = L.filter(e => O.some(o => aDemo(D.val[e.id + "|" + o.id]))).length;
     if (dm) it.push(["dm", "", `${dm} démonstration${dm > 1 ? "s" : ""} à faire`, "fo"]);
-    COg().filter(c => c.s.mq.length).forEach(c => it.push(["r", "r", `${esc(c.nom)} : il manque ${esc(c.s.mq.slice(0, 2).join(", "))}${c.s.mq.length > 2 ? "…" : ""}`, "co"]));
-    const pr = COg().filter(c => c.s.prop).length; if (pr) it.push(["p", "", `${pr} liste${pr > 1 ? "s" : ""} de coffre à approuver`, "co"]);
-    const at = COg().filter(c => c.s.att).length; if (at) it.push(["a", "g", `${at} coffre${at > 1 ? "s" : ""} en changement d'équipe`, "co"]);
-    const se = L.filter(e => !e.eq).length; if (L.length && se) it.push(["se", "g", `${se} élève${se > 1 ? "s" : ""} sans équipe`, "el"]);
+    (avecCoffres() ? COg() : []).filter(c => c.s.mq.length).forEach(c => it.push(["r", "r", `${esc(c.nom)} : il manque ${esc(c.s.mq.slice(0, 2).join(", "))}${c.s.mq.length > 2 ? "…" : ""}`, "co"]));
+    const pr = avecCoffres() ? COg().filter(c => c.s.prop).length : 0; if (pr) it.push(["p", "", `${pr} liste${pr > 1 ? "s" : ""} de coffre à approuver`, "co"]);
+    const at = avecCoffres() ? COg().filter(c => c.s.att).length : 0; if (at) it.push(["a", "g", `${at} coffre${at > 1 ? "s" : ""} en changement d'équipe`, "co"]);
+    const se = L.filter(e => !e.eq).length; if (avecCoffres() && L.length && se) it.push(["se", "g", `${se} élève${se > 1 ? "s" : ""} sans équipe`, "el"]);
     $("#afaire").innerHTML = it.length ? it.map(([k, c, t, o]) => `<button data-o="${o}"><i class="${c}"></i>${t}</button>`).join("") : (L.length ? `<span class="ok">✓ Tout est en ordre.</span>` : "");
     const b = document.querySelector('.ga-ong [data-t="fo"]'); b.innerHTML = "Formations" + (dm ? `<b>${dm}</b>` : "");
-    const nc = COg().filter(c => c.s.mq.length || c.s.prop).length; document.querySelector('.ga-ong [data-t="co"]').innerHTML = "Coffres" + (nc ? `<b>${nc}</b>` : "");
+    const nc = avecCoffres() ? COg().filter(c => c.s.mq.length || c.s.prop).length : 0; document.querySelector('.ga-ong [data-t="co"]').innerHTML = "Coffres" + (nc ? `<b>${nc}</b>` : "");
   }
   function ligne(e){
     let n = 0; const T = [];
     O.forEach(o => { const v = D.val[e.id + "|" + o.id]; if (forme(v)) { n++; T.push([v.m || v.d, `<span class="ok">✓ ${esc(o.nom)}</span>`]); } else if (aDemo(v)) T.push([9e15, `<span class="dm">◐ ${esc(o.nom)}</span>`]); });
     T.sort((a, b) => b[0] - a[0]); const f = T.slice(0, 3).map(t => t[1]).join("") + (T.length > 3 ? `<span>+${T.length - 3}</span>` : "");
-    const L2 = coffresDe(e.eq), plus = grpAts().length > 1;
+    const L2 = avecCoffres() ? coffresDe(e.eq) : [], plus = grpAts().length > 1;
     const c = L2.length ? L2.map(cf => { const pt = cf.s.mq.length ? "r" : cf.s.att || !cf.s.der ? "g" : "";
-      return `<div><span class="pt ${pt}"></span><b>${esc(cf.nom)}</b>${plus ? ` <small style="display:inline">· ${esc(nomAt(cf.at))}</small>` : ""}<small>${cf.s.mq.length ? "Manque : " + esc(cf.s.mq.join(", ")) : cf.s.att ? "Changement d'équipe en cours" : cf.s.der ? "" : "Pas encore scanné"}</small></div>`; }).join("") : `<small>${e.eq ? "Pas de coffre " + e.eq : "Aucune équipe"}</small>`;
+      return `<div><span class="pt ${pt}"></span><b>${esc(cf.nom)}</b>${plus ? ` <small style="display:inline">· ${esc(nomAt(cf.at))}</small>` : ""}<small>${cf.s.mq.length ? "Manque : " + esc(cf.s.mq.join(", ")) : cf.s.att ? "Changement d'équipe en cours" : cf.s.der ? "" : "Pas encore scanné"}</small></div>`; }).join("") : (avecCoffres() ? `<small>${e.eq ? "Pas de coffre " + e.eq : "Aucune équipe"}</small>` : "");
     const pl = PLACE ? `<div class="pe-pl">${Array.from({ length:nbEq() }, (_, i) => `<button data-pl="${i + 1}" class="${e.eq === i + 1 ? "on" : ""}">${i + 1}</button>`).join("")}</div>` : "";
     return `<div class="pe-r${PLACE ? " place" : ""}" role="button" tabindex="0" data-el="${e.id}"><div class="pe-n"><b>${esc(e.p)}</b><small>${e.c ? "code " + esc(e.c) : ""}</small></div><div class="pe-f"><em>${n} sur ${O.length}</em>${f}</div><div class="pe-c">${c}</div>${pl}</div>`;
   }
   function dessiner(){
     afaire(); majLoc(); majShare(); $("#pePl").hidden = !PLACE;
+    { const ac = avecCoffres(), bc = document.querySelector('.ga-ong [data-t="co"]'); bc.hidden = !ac && !ADM(); $("#mPl").hidden = !ac;
+      if (bc.hidden && !$("#t-co").hidden){ document.querySelectorAll(".ga-ong button").forEach(x => x.classList.toggle("on", x.dataset.t === "el")); ["el","fo","co"].forEach(x => $("#t-" + x).hidden = x !== "el"); } }
     const L = $("#peL"), q = sansAcc($("#peQ").value), g = groupe();
     if (!E.length){ L.innerHTML = `<div class="pe-vide">${!CHARGE ? "Chargement du registre et des coffres…" : G.length ? "Aucun élève dans ce groupe pour l'instant." : ADM() ? "Aucun élève pour l'instant. Ajoute-les dans l'onglet Formations (+ Élèves), ou ils apparaissent quand ils signent une formation." : "Aucun groupe ne t'est encore assigné. L'administrateur te l'assigne, puis tes élèves apparaissent ici."}</div>`; return; }
     const R = E.filter(e => q ? (sansAcc(e.p).includes(q) || String(e.c || "").includes(q)) : e.g === g).sort((a, b) => a.p.localeCompare(b.p, "fr"));
     if (!R.length){ L.innerHTML = `<div class="pe-vide">Aucun élève trouvé.</div>`; return; }
-    if (q || PLACE){ L.innerHTML = R.map(ligne).join(""); return; }   /* en plaçant : liste par nom, les lignes ne sautent pas */
+    if (q || PLACE || !avecCoffres()){ L.innerHTML = R.map(ligne).join(""); return; }   /* en plaçant : liste par nom, les lignes ne sautent pas */
     const eqs = [...new Set(R.map(e => e.eq || 0))].sort((a, b) => (a || 999) - (b || 999));
     L.innerHTML = eqs.map(n => { const cfs = coffresDe(n);
       return `<div class="pe-eq">${n ? "Équipe " + n : "Sans équipe"}${n && cfs.length === 1 ? `<span>· ${esc(cfs[0].nom)}</span>` : ""}</div>` + R.filter(e => (e.eq || 0) === n).map(ligne).join(""); }).join("");
