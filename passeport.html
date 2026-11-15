@@ -186,11 +186,11 @@ const PARTAGE = (() => {
   const API = "https://kjlotlhqrgekzohshmbn.supabase.co/rest/v1/rpc/", CLEAPI = "sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY";
   const id = async ens => [...new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode("metier+|partage-passeport|" + ens)))].map(b => b.toString(16).padStart(2, "0")).join("");
   const rpc = async (f, a) => { const r = await fetch(API + f, { method:"POST", headers:{ apikey:CLEAPI, "Content-Type":"application/json" }, body:JSON.stringify(a) }); if (!r.ok) throw new Error("coffre " + r.status); return r.json(); };
-  async function lire(ens){ try { const r = await rpc("coffre_lire", { p_id:await id(ens) }), row = r && r[0]; const v = row && row.data ? JSON.parse(row.data) : {}; return { grp:v.grp || [], part:v.part || {}, codes:v.codes || null, suivi:v.suivi || [] }; } catch(e){ return { grp:[], part:{}, codes:null, suivi:[] }; } }
+  async function lire(ens){ try { const r = await rpc("coffre_lire", { p_id:await id(ens) }), row = r && r[0]; const v = row && row.data ? JSON.parse(row.data) : {}; return { grp:v.grp || [], part:v.part || {}, codes:v.codes || null, suivi:v.suivi || [], formes:v.formes || {} }; } catch(e){ return { grp:[], part:{}, codes:null, suivi:[], formes:{} }; } }
   async function ecrire(ens, o){
     let j = localStorage.getItem("passPartageJeton");
     if (!j){ j = btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(32)))); localStorage.setItem("passPartageJeton", j); }
-    if (await rpc("coffre_ecrire", { p_id:await id(ens), p_jeton:j, p_env:"public", p_data:JSON.stringify({ grp:o.grp, part:o.part, codes:o.codes || null, suivi:o.suivi || suivis(), t:Date.now() }) }) !== true) throw new Error("refus");
+    if (await rpc("coffre_ecrire", { p_id:await id(ens), p_jeton:j, p_env:"public", p_data:JSON.stringify({ grp:o.grp, part:o.part, codes:o.codes || null, suivi:o.suivi || suivis(), formes:formesPub(), t:Date.now() }) }) !== true) throw new Error("refus");
   }
   return { lire, ecrire };
 })();
@@ -203,18 +203,20 @@ async function vueEleve(){
   if (!o){ V.innerHTML = `<div class="top"><img src="${LOGO}" alt="Métier+"></div><h1>Outil introuvable</h1><p class="sous">Ce code QR ne correspond à aucun outil. Avise ton enseignant.</p>`; return; }
   const ens = Q.get("e") || "", grp = Q.get("g") || "";
   let faits = {}; try { faits = JSON.parse(localStorage.getItem("passFaits") || "{}"); } catch(e) {}
-  const SUIVI = ens ? (await PARTAGE.lire(ens)).suivi : [], suivi = SUIVI.includes(o.id);
+  const R0 = ens ? await PARTAGE.lire(ens) : { suivi:[], formes:{}, grp:[], codes:null }, suivi = R0.suivi.includes(o.id);
+  let monCode = ""; try { monCode = localStorage.getItem("passCode") || ""; } catch(e) {}
+  if (!faits[o.id] && monCode && (R0.formes[o.id] || []).includes(monCode)) faits[o.id] = 1;
   if (faits[o.id] && !Q.get("formation") && ens){
     if (suivi) return sortieVue(o, ens, V);
     V.innerHTML = `<div class="top"><img src="${LOGO}" alt="Métier+"></div><div class="fini"><div class="rond">✓</div><h1>Tu as ta formation</h1>
-      <p class="sous">${esc(o.nom)} · signée le ${jour(faits[o.id])}</p><p class="engage">Refais les étapes de sécurité chaque fois que tu utilises l'outil.</p>
+      <p class="sous">${esc(o.nom)}${faits[o.id] > 1 ? " · signée le " + jour(faits[o.id]) : ""}</p><p class="engage">Refais les étapes de sécurité chaque fois que tu utilises l'outil.</p>
       <p><a href="?o=${encodeURIComponent(o.id)}&e=${encodeURIComponent(ens)}&formation=1">Revoir la formation</a></p></div>`;
     return;
   }
   const coche = new Set();
   V.innerHTML = `<div class="top"><img src="${LOGO}" alt="Métier+"><span class="esp" style="flex:1"></span><span class="tag">Passeport d'outils</span></div>
     <span class="tag">Formation</span><h1>${esc(o.nom)}</h1>
-    ${ens && suivi ? `<button type="button" class="btn" id="dejaF" style="margin:4px 0 10px;min-height:44px">J'ai déjà ma formation : prendre ou rapporter l'outil</button>` : ""}
+    ${ens ? `<button type="button" class="btn" id="dejaF" style="margin:4px 0 10px;min-height:44px">J'ai déjà ma formation pour cet outil</button>` : ""}
     <p class="sous">Lis chaque étape et touche-la pour la cocher. Quand tout est coché, écris ton prénom, ton groupe et signe.</p>
     ${o.epi && o.epi.length ? `<span class="tag">Équipement de protection</span><div class="epi" style="margin-top:8px">${o.epi.map(x => `<span>${esc(x)}</span>`).join("")}</div>` : ""}
     <span class="tag">Les étapes</span><div class="prog"><i id="pg"></i></div>
@@ -230,7 +232,7 @@ async function vueEleve(){
       <p class="err" id="er" hidden></p>
     </div>
     ${ens ? "" : `<p class="engage" style="margin-top:20px">Ce code ne contient pas le nom de l'enseignant : la signature ne peut pas être envoyée. Avise ton enseignant.</p>`}`;
-  if ($("#dejaF")) $("#dejaF").onclick = () => sortieVue(o, ens, V);
+  if ($("#dejaF")) $("#dejaF").onclick = () => dejaVue(o, ens, V, R0, suivi);
   const maj = () => { $("#pg").style.width = (coche.size / o.etapes.length * 100) + "%"; $("#sg").hidden = !(ens && coche.size === o.etapes.length); pret(); };
   V.querySelectorAll(".et").forEach(el => { const t = () => { const i = +el.dataset.i; coche.has(i) ? coche.delete(i) : coche.add(i);
       el.classList.toggle("on", coche.has(i)); el.setAttribute("aria-checked", coche.has(i)); maj(); };
@@ -292,6 +294,30 @@ async function vueEleve(){
   maj();
 }
 
+/* « J'ai déjà ma formation » (14 nov.) : l'élève entre son groupe et son code; on vérifie dans la liste publique des codes formés */
+function dejaVue(o, ens, V, R0, suivi){
+  V.innerHTML = `<div class="top"><img src="${LOGO}" alt="Métier+"><span class="esp" style="flex:1"></span><span class="tag">Passeport d'outils</span></div>
+    <span class="tag">Déjà formé?</span><h1>${esc(o.nom)}</h1><p class="sous">Entre ton groupe et ton code : si ta formation est déjà signée, tu n'as pas à la refaire.</p>
+    <div class="signer"><label>Ton groupe</label><div id="dgB" class="epi" style="margin:4px 0 10px"></div>
+      <label for="dcd">Ton code (3 chiffres)</label><input id="dcd" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" placeholder="000" style="font-size:28px;letter-spacing:8px;text-align:center;max-width:160px">
+      <button class="btn p" id="dOk" style="width:100%;min-height:56px;font-size:18px;margin-top:14px" disabled>Vérifier</button><p class="err" id="dEr" hidden></p></div>
+    <p style="margin-top:16px"><a href="?o=${encodeURIComponent(o.id)}&e=${encodeURIComponent(ens)}&formation=1">Faire la formation</a></p>`;
+  let g = ""; try { g = localStorage.getItem("passGroupe") || ""; } catch(e) {} if (!R0.grp.includes(g)) g = "";
+  const cd = $("#dcd"); try { cd.value = localStorage.getItem("passCode") || ""; } catch(e) {}
+  const pret = () => { $("#dOk").disabled = !(g && cd.value.length === 3); $("#dEr").hidden = true; };
+  const peindre = () => { $("#dgB").innerHTML = R0.grp.map(x => `<button type="button" class="btn${x === g ? " p" : ""}" data-g="${esc(x)}" style="min-height:52px;min-width:90px;font-size:18px">${esc(x)}</button>`).join("");
+    $("#dgB").querySelectorAll("button").forEach(b => b.onclick = () => { g = b.dataset.g; peindre(); pret(); }); };
+  cd.oninput = () => { cd.value = cd.value.replace(/\D/g, "").slice(0, 3); pret(); }; peindre(); pret();
+  $("#dOk").onclick = () => {
+    const ok = R0.codes && (R0.codes[g] || []).includes(cd.value) && (R0.formes[o.id] || []).includes(cd.value);
+    if (!ok){ $("#dEr").hidden = false; $("#dEr").textContent = R0.codes && (R0.codes[g] || []).includes(cd.value) ? "Aucune formation signée pour ce code. Fais la formation (lien plus bas)." : "Ce code n'existe pas dans ce groupe. Vérifie avec ton enseignant."; return; }
+    try { localStorage.setItem("passGroupe", g); localStorage.setItem("passCode", cd.value); const F = JSON.parse(localStorage.getItem("passFaits") || "{}"); F[o.id] = F[o.id] || 1; localStorage.setItem("passFaits", JSON.stringify(F)); } catch(e) {}
+    if (suivi) return sortieVue(o, ens, V);
+    V.innerHTML = `<div class="top"><img src="${LOGO}" alt="Métier+"></div><div class="fini"><div class="rond">✓</div><h1>Tu as ta formation</h1>
+      <p class="sous">${esc(o.nom)}</p><p class="engage">Refais les étapes de sécurité chaque fois que tu utilises l'outil.</p></div>`;
+  };
+}
+
 /* Prendre ou rapporter un outil (14 nov.) : l'élève déjà formé scanne le même code QR */
 async function sortieVue(o, ens, V){
   let S = {}; try { S = JSON.parse(localStorage.getItem("passSorties") || "{}"); } catch(e) {}
@@ -347,10 +373,13 @@ let D = lireD(), GRP = localStorage.getItem("passeportGroupe") || "";
 const sauver = () => { localStorage.setItem(CLE, JSON.stringify(D)); clearTimeout(sauver.p); sauver.p = setTimeout(publierGrp, 1500); };
 /* liste publique des groupes (pour les boutons de l'élève) + partage, réécrite quand les groupes changent */
 async function publierGrp(){
-  if (!window.__moi) return; const L = groupes().filter(g => g !== "À classer"), C = codesPub(L), k = JSON.stringify([L, PART, C, suivis()]);
+  if (!window.__moi) return; const L = groupes().filter(g => g !== "À classer"), C = codesPub(L), k = JSON.stringify([L, PART, C, suivis(), formesPub()]);
   if (localStorage.getItem("passGrpPub") === k) return;
   try { await PARTAGE.ecrire(window.__moi, { grp:L, part:PART, codes:C }); localStorage.setItem("passGrpPub", k); } catch(e) {} }
 /* codes à 3 chiffres des élèves (14 nov.) : seuls les numéros sont publics, jamais les prénoms */
+/* codes des élèves déjà formés, par outil (numéros seulement) : l'élève formé ne refait pas la formation sur un autre appareil */
+const formesPub = () => { const F = {}; for (const k in D.val){ const v = D.val[k]; if (!v || !v.d) continue; const [eid, oid] = k.split("|"), e = D.el[eid];
+  if (e && !e.x && e.c) (F[oid] = F[oid] || []).push(e.c); } for (const o in F) F[o].sort(); return F; };
 const codesPub = L => { const C = {}; L.forEach(g => C[g] = []); Object.values(D.el).forEach(e => { if (!e.x && e.c && C[e.g]) C[e.g].push(e.c); }); return C; };
 function codeLibre(){ const pris = new Set(Object.values(D.el).filter(e => !e.x && e.c).map(e => e.c));
   for (let i = 0; i < 2000; i++){ const c = String(100 + Math.floor(Math.random() * 900)); if (!pris.has(c)) return c; } return ""; }
