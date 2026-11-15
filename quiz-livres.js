@@ -358,6 +358,26 @@ window.QUIZ_LIVRES = [
 "s": 0
 },
 {
+"t": "echelle",
+"q": "Le suivi des outils et des coffres me prend beaucoup de temps. (1 = pas du tout · 5 = énormément)",
+"ch": [
+"1",
+"2",
+"3",
+"4",
+"5"
+],
+"bon": null,
+"s": 20
+},
+{
+"t": "nuage",
+"q": "En un mot : ton plus gros casse-tête d’atelier ?",
+"ch": [],
+"bon": null,
+"s": 45
+},
+{
 "t": "diapo",
 "img": "img/labo/quiz/gestion/ga-02.jpg?v=1",
 "q": "",
