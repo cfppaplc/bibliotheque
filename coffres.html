@@ -153,6 +153,8 @@ html.sombre .mq{background:#3a1f1d;color:#f3c2bd}
 .choix .it{cursor:pointer;-webkit-tap-highlight-color:transparent}
 .it.m{border-color:#D9534F}.it.m .s{color:#D9534F}.it.b{border-color:#E08A1E}.it.b .s{color:#E08A1E}
 .avisR{display:inline-block;background:#FFF4E5;color:#9a5a10;font-weight:800;border-radius:999px;padding:6px 12px;margin:0 0 8px}
+.it.v{border-color:#1E8A55}.it.v .s{color:#1E8A55}.it.v .q{background:#1E8A55;color:#fff}
+.compte{font-size:15px;font-weight:700;color:var(--gris);margin:4px 0 10px}.compte.fait{color:#1E8A55}
 .it.deja{opacity:.6}.it.deja .s{color:#D9534F}
 .gros{width:100%;min-height:64px;font-size:20px;border-radius:14px;margin-top:10px}
 .btn.vert{background:var(--vert);border-color:var(--vert);color:#fff}
@@ -314,6 +316,29 @@ async function vueEleve(){
   if (MODE === "prise" && dormant()) return ferme();
   if (!mesVerrous()[cid + "|" + SES]){ const v = await VERROU.lire(cid, SES); if (v) return pris(v); }
   const deja = new Set(cf.mq || []);
+  /* remise et prise (15 nov., Jeremy) : l'élève doit toucher chaque outil (présent → manquant → brisé) avant d'envoyer; le scan suivant de la même équipe reste rapide */
+  if (MODE === "remise" || !mesVerrous()[cid + "|" + SES]){
+    V.innerHTML = `${tete}${MODE === "remise" ? `<p class="avisR">Remise du coffre · équipe qui quitte</p><p class="sous">Tu remets ce coffre. Touche chaque outil pour confirmer qu'il est là.</p>` : `<p class="sous">Tu prends ce coffre. Touche chaque outil pour confirmer qu'il est là. Tu en es responsable jusqu'à la prochaine session.</p>`}
+      <p class="sous" style="margin:0 0 4px;font-size:14px">1 toucher = présent · 2 = manquant · 3 = brisé</p><p class="compte" id="cpt"></p>
+      <div id="its" class="choix">${cf.liste.map((x, i) => `<div class="it${deja.has(x.n) ? " deja" : ""}" data-i="${i}"><span class="q">${x.q}</span><span>${esc(x.n)}</span><span class="s">${deja.has(x.n) ? "déjà signalé" : ""}</span></div>`).join("")}</div>
+      ${idt}<input type="text" id="nt" maxlength="120" placeholder="Commentaire (facultatif)" style="width:100%;min-height:50px;border-radius:10px;border:1px solid var(--ligne);background:var(--carte2);color:var(--txt);padding:0 14px;font-size:17px;margin-top:6px"><button class="btn p gros" id="bEnv" disabled>Envoyer</button>`;
+    const tous = () => [...$("#its").querySelectorAll(".it:not(.deja)")];
+    const maj = () => { const T = tous(), f = T.filter(d => /\b(v|m|b)\b/.test(d.className)).length, c = $("#cpt");
+      c.textContent = f < T.length ? `Vérifiés : ${f} sur ${T.length}` : "Tout est vérifié"; c.classList.toggle("fait", f === T.length); $("#bEnv").disabled = f < T.length; };
+    maj();
+    $("#its").onclick = ev => { const d = ev.target.closest(".it"); if (!d || d.classList.contains("deja")) return;
+      const st = d.classList.contains("v") ? "m" : d.classList.contains("m") ? "b" : d.classList.contains("b") ? "" : "v"; d.classList.remove("v", "m", "b"); if (st) d.classList.add(st);
+      d.querySelector(".s").textContent = st === "v" ? "présent" : st === "m" ? "manquant" : st === "b" ? "brisé" : ""; maj(); };
+    $("#bEnv").onclick = async e => {
+      const items = [...$("#its").querySelectorAll(".it.m,.it.b")].map(d => ({ n:cf.liste[+d.dataset.i].n, e:d.classList.contains("b") ? "b" : "m" })), note = $("#nt").value.trim().slice(0, 120);
+      const obj = items.length ? { k:"manque", items, note } : { k:"ok" }; if (!items.length && note) obj.note = note;
+      if (!(await envoyer(obj, e.target))) return;
+      const h = `${esc(cf.nom)} · ${heure(Date.now())}<br>`;
+      if (MODE === "remise") fini("Coffre remis", h + (items.length ? "Ton enseignant est avisé de ce qui manque. " : "Merci ! ") + "La nouvelle équipe va le vérifier à son tour.");
+      else fini("Coffre pris en charge", h + (items.length ? "Ton enseignant est avisé de ce qui manque. " : "") + "Il est à ton nom jusqu'à la prochaine session.");
+    };
+    return;
+  }
   V.innerHTML = `${tete}${MODE === "remise" ? `<p class="avisR">Remise du coffre · équipe qui quitte</p><p class="sous">Tu remets ce coffre : vérifie qu'il est complet. La nouvelle équipe fera ensuite sa propre vérification.</p>` : `<p class="sous">Vérifie le coffre en le prenant. Tu en es responsable jusqu'à la prochaine session.</p>`}
     <div id="its">${cf.liste.map((x, i) => `<div class="it${deja.has(x.n) ? " deja" : ""}" data-i="${i}"><span class="q">${x.q}</span><span>${esc(x.n)}</span><span class="s">${deja.has(x.n) ? "déjà signalé" : ""}</span></div>`).join("")}</div>
     ${idt}<button class="btn vert gros" id="bOk">Tout est là</button><button class="btn gros" id="bMq">Il manque quelque chose</button>`;
