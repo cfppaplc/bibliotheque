@@ -292,8 +292,8 @@ main{max-width:1500px}
     dlg.innerHTML = `<div class="fi-t"><div class="fi-av">${esc(ini)}</div><div><h3>${esc(e.p)}</h3><small>${esc(e.g || "")}${e.c ? " · code " + esc(e.c) : ""}</small></div>${ADM() ? `<button data-mod class="fi-imp" style="margin-left:auto;font:inherit;font-size:13px;font-weight:700;color:#EB6A22;background:none;border:0;cursor:pointer;min-height:40px">Modifier</button>` : ""}<button data-x aria-label="Fermer">✕</button></div>
       <div class="fi-b"><h4>Équipe (coffre et ménage)</h4>${ADM() ? `<div class="fi-eq"><button data-eq="0" class="${e.eq ? "" : "on"}">Aucune</button>${Array.from({ length:max }, (_, i) => `<button data-eq="${i + 1}" class="${e.eq === i + 1 ? "on" : ""}">${i + 1}</button>`).join("")}</div>
       <p class="fi-note">Changer d'équipe fait refaire l'inventaire des coffres touchés : l'équipe qui quitte le remet, la nouvelle le prend.</p>` : `<div class="fi-l"><div>${e.eq ? "Équipe " + e.eq : "Aucune équipe"}</div></div><p class="fi-note">Seul l'administrateur place les élèves dans les équipes.</p>`}
-      ${ADM() && e.eq && grpAts().length > 1 ? `<h4>Coffre par local</h4><div class="fi-l">${grpAts().map(a => { const N = [...new Set(COg().filter(c => c.at === a && c.n).map(c => c.n))].sort((x, y) => x - y); if (!N.length) return "";
-        return `<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">${esc(nomAt(a))}<select data-cfa="${esc(a)}" style="margin-left:auto;min-height:40px;border-radius:8px;padding:0 8px;font:inherit"><option value="0">Même que l'équipe (coffre ${e.eq})</option>${N.filter(x => x !== e.eq).map(x => `<option value="${x}" ${(e.cfa || {})[a] === x ? "selected" : ""}>Coffre ${x}</option>`).join("")}</select></div>`; }).join("")}</div><p class="fi-note">Pour un élève qui n'a pas le même numéro de coffre dans chaque local.</p>` : ""}
+      ${ADM() && e.eq && avecCoffres() ? `<h4>Coffre de l'équipe ${e.eq} par local</h4><div class="fi-l">${grpAts().map(a => { const N = [...new Set(COg().filter(c => c.at === a && c.n).map(c => c.n))].sort((x, y) => x - y); if (!N.length) return "";
+        return `<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">${esc(nomAt(a))}<select data-cfa="${esc(a)}" style="margin-left:auto;min-height:40px;border-radius:8px;padding:0 8px;font:inherit"><option value="0">Coffre ${e.eq} (même numéro que l'équipe)</option>${N.filter(x => x !== e.eq).map(x => `<option value="${x}" ${(e.cfa || {})[a] === x ? "selected" : ""}>Coffre ${x}</option>`).join("")}<option value="-1" ${(e.cfa || {})[a] === -1 ? "selected" : ""}>Aucun coffre dans ce local</option></select></div>`; }).join("")}</div><p class="fi-note">S'applique à toute l'équipe ${e.eq}. « Aucun coffre » enlève le lien sans effacer le coffre.</p>` : ""}
       <h4>Coffre${cfs.length > 1 ? "s" : ""}</h4><div class="fi-l">${cfs.length ? cfs.map(cf => `<div><span class="s ${cf.s.mq.length ? "r" : "ok"}">${cf.s.mq.length ? "!" : "✓"}</span>${esc(cf.nom)}${grpAts().length > 1 ? " · " + esc(nomAt(cf.at)) : ""}<small>${cf.s.mq.length ? "Manque : " + esc(cf.s.mq.join(", ")) : cf.s.att ? "changement d'équipe en cours" : cf.s.der ? "" : "pas encore scanné"}</small></div>`).join("") : `<div><span class="s">–</span>${e.eq ? "Aucun coffre numéro " + e.eq : "Choisis son équipe pour lui donner un coffre"}</div>`}</div>
       <h4>Formations · ${O.length - reste} sur ${O.length}</h4><div class="fi-l">${fo || `<div><span class="s">–</span>Aucune formation encore</div>`}</div>
       <h4>Historique <button class="fi-imp" data-imp style="float:right;font:inherit;font-size:13px;font-weight:700;color:#EB6A22;background:none;border:0;cursor:pointer;min-height:40px">Imprimer tout</button></h4><div class="fi-l">${H.slice(0, 10).map(([t, x]) => `<div>${esc(x)}<small>${date(t)}</small></div>`).join("") || `<div>Rien encore</div>`}</div></div>`;
@@ -301,7 +301,7 @@ main{max-width:1500px}
     { const m = dlg.querySelector("[data-mod]"); if (m) m.onclick = () => { dlg.close(); viaFormations(w => w.eleveOuvrir(e.id)); }; }
     dlg.querySelector("[data-imp]").onclick = () => mpImprimer("Historique · " + e.p, [e.g, e.c ? "code " + e.c : "", e.eq ? "équipe " + e.eq : ""].filter(Boolean).join(" · "), ["Date et heure", "Action"], H.map(([t, x]) => [mpDateHeure(t), x]));
     dlg.querySelectorAll("[data-eq]").forEach(b => b.onclick = () => { changerEquipe(id, +b.dataset.eq); });
-    dlg.querySelectorAll("[data-cfa]").forEach(sel => sel.onchange = () => changerCoffre(id, x => { x.cfa = Object.assign({}, x.cfa); const v = +sel.value; if (v) x.cfa[sel.dataset.cfa] = v; else delete x.cfa[sel.dataset.cfa]; if (!Object.keys(x.cfa).length) delete x.cfa; }));
+    dlg.querySelectorAll("[data-cfa]").forEach(sel => sel.onchange = () => changerCoffre(E.filter(z => z.g === e.g && z.eq === e.eq).map(z => z.id), x => { x.cfa = Object.assign({}, x.cfa); const v = +sel.value; if (v) x.cfa[sel.dataset.cfa] = v; else delete x.cfa[sel.dataset.cfa]; if (!Object.keys(x.cfa).length) delete x.cfa; }));
     if (!dlg.open) dlg.showModal();
   }
   /* codes des élèves de l'équipe n dans le local at (même règle que coffres.html) */
@@ -330,13 +330,14 @@ main{max-width:1500px}
     changerCoffre(id, x => { x.eq = n || undefined; if (!n) delete x.cfa; }, sansFiche);
   }
   /* applique un changement à l'élève (équipe ou coffre d'un local), puis inventaire des coffres dont l'équipe change */
-  function changerCoffre(id, modif, sansFiche){
-    const P = PASS(); if (!ADM() || !P || !P.D.el[id]) return;
-    const el = P.D.el[id], g = el.g, A = atsDe(P.D.grp, g), C = CF(), avant = {};
-    const av = JSON.parse(JSON.stringify(el)), ap = JSON.parse(JSON.stringify(el)); modif(ap);
-    const touches = C ? Object.entries(C.K.cf).filter(([, c]) => { if (c.x || (A.length && !A.includes(c.at))) return false; const x = numC(c.nom), b = cn(av, c.at), a2 = cn(ap, c.at); return b !== a2 && (x === b || x === a2); }) : [];
+  function changerCoffre(ids, modif, sansFiche){
+    const P = PASS(); ids = [].concat(ids).filter(i => P && P.D.el[i]); if (!ADM() || !ids.length) return; const id = ids[0];
+    const g = P.D.el[id].g, A = atsDe(P.D.grp, g), C = CF(), avant = {};
+    const tch = {}; if (C) ids.forEach(i => { const el = P.D.el[i], av = JSON.parse(JSON.stringify(el)), ap = JSON.parse(JSON.stringify(el)); modif(ap);
+      Object.entries(C.K.cf).forEach(([cid, c]) => { if (c.x || (A.length && !A.includes(c.at))) return; const x = numC(c.nom), b = cn(av, c.at), a2 = cn(ap, c.at); if (b !== a2 && (x === b || x === a2)) tch[cid] = c; }); });
+    const touches = Object.entries(tch);
     touches.forEach(([cid, c]) => avant[cid] = { eqAvant:codesEq(numC(c.nom), c.at), atAvant:A.length ? c.at : "", g });
-    modif(el); el.t = Date.now(); P.sauver();
+    ids.forEach(i => { modif(P.D.el[i]); P.D.el[i].t = Date.now(); }); P.sauver();
     if (C){ const ann = annuler(C);
       const ids = touches.map(([cid]) => cid).filter(cid => !ann.includes(cid) && (() => { const c = C.K.cf[cid], st = C.etat(Object.assign({ id:cid }, c));
         const dn = Object.values(C.K.ev).filter(e => e.cf === cid && e.k === "nouveau").pop(), pr = Object.values(C.K.ev).filter(e => e.cf === cid && (e.k === "ok" || e.k === "manque") && (!dn || e.d > dn.d));
