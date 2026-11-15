@@ -99,7 +99,7 @@ html.eleve body{background:var(--fond)}
 <div id="vueProf" hidden>
 <div class="mp-tete"><img class="lg-b" src="img/metier-plus-blanc.svg" alt="Métier+"><img class="lg-c" src="img/metier-plus.svg" alt="Métier+"><a class="mp-retour" href="labo.html">‹ Labo</a><h1 class="mp-nom">Passeport</h1><span class="mp-esp"></span></div>
 <main>
-  <div class="hero"><div><h1>Passeport d'outils</h1><p>Colle le code QR sur chaque outil. L'élève le scanne, suit la formation, coche chaque étape et signe. Sa signature arrive ici, avec la date.</p></div></div>
+  <div class="hero"><div><h1>Passeport d'outils</h1><p>Un code QR par outil, pour tous tes groupes. L'élève le scanne, suit la formation, coche chaque étape, écrit son prénom et son groupe, puis signe. Sa signature arrive ici, dans son groupe, avec la date. Si le groupe n'est pas reconnu, elle va dans « À classer ».</p></div></div>
   <div class="barre">
     <select id="grp" aria-label="Groupe"></select>
     <button class="btn" id="bGrpN">+ Groupe</button>
@@ -152,13 +152,14 @@ async function vueEleve(){
   const coche = new Set();
   V.innerHTML = `<div class="top"><img src="${LOGO}" alt="Métier+"><span class="esp" style="flex:1"></span><span class="tag">Passeport d'outils</span></div>
     <span class="tag">Formation</span><h1>${esc(o.nom)}</h1>
-    <p class="sous">Lis chaque étape et touche-la pour la cocher. Quand tout est coché, écris ton prénom et signe.</p>
+    <p class="sous">Lis chaque étape et touche-la pour la cocher. Quand tout est coché, écris ton prénom, ton groupe et signe.</p>
     ${o.epi && o.epi.length ? `<span class="tag">Équipement de protection</span><div class="epi" style="margin-top:8px">${o.epi.map(x => `<span>${esc(x)}</span>`).join("")}</div>` : ""}
     <span class="tag">Les étapes</span><div class="prog"><i id="pg"></i></div>
     <div id="ets">${o.etapes.map((x, i) => `<div class="et" data-i="${i}" role="checkbox" aria-checked="false" tabindex="0"><span class="n">${i + 1}</span><span>${esc(x)}</span><span class="bx2"></span></div>`).join("")}</div>
     <div class="signer" id="sg" hidden>
       <h2>Ta signature</h2>
       <label for="pn">Ton prénom</label><input id="pn" type="text" autocomplete="off" maxlength="22" placeholder="Prénom (ex. : Marc ou Marc B.)">
+      <label for="gr">Ton groupe</label><input id="gr" type="text" autocomplete="off" maxlength="20" placeholder="Numéro du groupe (ex. : 2608)">
       <label>Signe avec ton doigt</label><div class="toile"><canvas id="cv"></canvas><span>Signe ici</span></div>
       <p class="engage">En signant, je confirme avoir suivi la formation sur l'outil « ${esc(o.nom)} » et je m'engage à respecter ces étapes chaque fois que je l'utilise.</p>
       <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn" id="bEff">Effacer la signature</button><span class="esp" style="flex:1"></span><button class="btn p" id="bEnv" disabled>Signer et envoyer</button></div>
@@ -181,20 +182,22 @@ async function vueEleve(){
   cv.onpointerup = cv.onpointercancel = () => { cur = null; pret(); };
   new ResizeObserver(taille).observe(cv);
   $("#bEff").onclick = () => { traits = []; dessiner(); pret(); };
-  const pn = $("#pn"); pn.oninput = pret;
-  function pret(){ const b = $("#bEnv"); if (b) b.disabled = !(prenom(pn.value).length >= 2 && traits.reduce((n, t) => n + t.length, 0) >= 8 && coche.size === o.etapes.length); }
+  const pn = $("#pn"), gr = $("#gr"); pn.oninput = gr.oninput = pret;
+  try { pn.value = localStorage.getItem("passPrenom") || ""; gr.value = grp || localStorage.getItem("passGroupe") || ""; } catch(e) {}
+  function pret(){ const b = $("#bEnv"); if (b) b.disabled = !(prenom(pn.value).length >= 2 && gr.value.trim().length >= 1 && traits.reduce((n, t) => n + t.length, 0) >= 8 && coche.size === o.etapes.length); }
   $("#bEnv").onclick = async () => {
     const b = $("#bEnv"), er = $("#er"); b.disabled = true; b.textContent = "Envoi…"; er.hidden = true;
     try {
       const d = await (await fetch("comptes.json", { cache:"no-store" })).json(), c = d.comptes && d.comptes[ens];
       if (!c || !c.pub) throw new Error("ens");
-      const obj = { v:1, uid:crypto.getRandomValues(new Uint32Array(2)).join("-"), o:o.id, nom:o.nom, p:prenom(pn.value), g:grp, t:Date.now(), s:traits, n:o.etapes.length };
+      const obj = { v:1, uid:crypto.getRandomValues(new Uint32Array(2)).join("-"), o:o.id, nom:o.nom, p:prenom(pn.value), g:gr.value.trim().replace(/[<>"]/g, "").slice(0, 20), t:Date.now(), s:traits, n:o.etapes.length };
       let fait = false;
       for (let n = 0; n < 400 && !fait; n++){
         try { await COFFRE.deposer("passeport|" + ens + "|" + n, obj, c.pub); fait = true; }
         catch(e){ if (!/refus/.test(e.message)) throw e; }
       }
       if (!fait) throw new Error("plein");
+      try { localStorage.setItem("passPrenom", obj.p); localStorage.setItem("passGroupe", obj.g); } catch(e) {}
       V.innerHTML = `<div class="top"><img src="${LOGO}" alt="Métier+"></div><div class="fini"><div class="rond">✓</div><h1>C'est signé !</h1>
         <p class="sous">${esc(obj.p)} · ${esc(o.nom)} · ${jour(obj.t)}<br>Ta signature est envoyée à ton enseignant.</p>
         <p class="engage">Rappel : refais les étapes chaque fois que tu utilises l'outil.</p></div>`;
@@ -250,11 +253,17 @@ function caseOuvrir(eid, oid){
 function eleveOuvrir(eid){
   const e = D.el[eid];
   ouvrir(`<h2>${esc(e.p)}</h2><label>Prénom</label><input type="text" id="aP" value="${esc(e.p)}" maxlength="22">
+    <label style="display:block;margin-top:10px">Groupe</label><select id="aG2" class="btn" style="width:100%">${groupes().map(g => `<option ${g === e.g ? "selected" : ""}>${esc(g)}</option>`).join("")}</select>
     <div class="act"><button class="btn" id="aX">Retirer du groupe</button><span style="flex:1"></span><button class="btn" id="aF">Annuler</button><button class="btn p" id="aOk">Enregistrer</button></div>`);
   $("#aF").onclick = fermer;
-  $("#aOk").onclick = () => { const p = prenom($("#aP").value); if (p.length >= 2){ e.p = p; e.t = Date.now(); sauver(); } fermer(); dessiner(); };
+  $("#aOk").onclick = () => { const p = prenom($("#aP").value); if (p.length >= 2){ e.p = p; e.g = $("#aG2").value || e.g; e.t = Date.now(); sauver(); } fermer(); dessiner(); };
   let sur = 0; $("#aX").onclick = ev => { if (!sur++){ ev.target.textContent = "Sûr ? Touche encore"; return; } e.x = 1; e.t = Date.now(); sauver(); fermer(); dessiner(); };
 }
+/* groupe d'une signature : celui écrit par l'élève s'il existe; sinon le seul groupe où ce prénom est déjà; sinon « À classer » */
+function groupeDe(g, p){
+  const gs = groupes(), k = sansAcc(g).replace(/\s+/g, ""); const t = gs.find(x => sansAcc(x).replace(/\s+/g, "") === k); if (t) return t;
+  const kp = sansAcc(p), ou = [...new Set(Object.values(D.el).filter(e => !e.x && sansAcc(e.p) === kp).map(e => e.g))];
+  return ou.length === 1 ? ou[0] : "À classer"; }
 function trouverEleve(p, g){
   const k = sansAcc(p); const t = Object.entries(D.el).find(([, e]) => !e.x && e.g === g && sansAcc(e.p) === k);
   if (t) return t[0]; const id = nid(); D.el[id] = { p, g, t:Date.now() };
@@ -271,7 +280,7 @@ async function releve(manuel){
       try { x = await COFFRE.prendre(nom); } catch(e) { x = null; }
       if (!x){ vides++; continue; } vides = 0; n++;
       if (!D.vus[x.uid]){
-        const g = x.g || "Sans groupe", eid = trouverEleve(prenom(x.p) || "Élève", g), k = eid + "|" + x.o, v = D.val[k];
+        const g = groupeDe(x.g, prenom(x.p)), eid = trouverEleve(prenom(x.p) || "Élève", g), k = eid + "|" + x.o, v = D.val[k];
         if (!v || !v.d || v.d < x.t){ D.val[k] = { d:x.t, s:x.s, n:x.n, t:Date.now() }; neufs++; }
         D.vus[x.uid] = Date.now();
         if (!GRP) GRP = g;
@@ -289,9 +298,9 @@ function imprimerQr(){
   const base = location.href.replace(/[^/]*$/, "") + "passeport.html";
   const Z = $("#qrs"); Z.innerHTML = "";
   PROT.outils.forEach(o => {
-    const url = base + "?o=" + encodeURIComponent(o.id) + "&e=" + encodeURIComponent(s) + (GRP ? "&g=" + encodeURIComponent(GRP) : "");
+    const url = base + "?o=" + encodeURIComponent(o.id) + "&e=" + encodeURIComponent(s);
     const c = document.createElement("div"); c.className = "qc";
-    c.innerHTML = `<img class="l" src="img/metier-plus.svg" alt=""><b>${esc(o.nom)}</b><div class="q"></div><small>Scanne avant d'utiliser cet outil : formation et signature${GRP ? " · Groupe " + esc(GRP) : ""}</small>`;
+    c.innerHTML = `<img class="l" src="img/metier-plus.svg" alt=""><b>${esc(o.nom)}</b><div class="q"></div><small>Scanne avant d'utiliser cet outil : formation et signature</small>`;
     Z.appendChild(c); new QRCode(c.querySelector(".q"), { text:url, width:200, height:200, correctLevel:QRCode.CorrectLevel.M });
   });
   setTimeout(() => print(), 400);
