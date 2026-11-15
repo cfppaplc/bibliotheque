@@ -153,7 +153,7 @@ html.eleve body{background:var(--fond)}
   <p class="info" id="etat"></p>
   <div id="sorties"></div>
   <div class="tw" id="tw"></div><div class="cartes" id="cm"></div>
-  <p class="info" style="margin-top:14px"><span style="color:#E08A1E">◐ orange</span> = théorie signée, démonstration à faire · ✓ vert = formé (signé + démonstration) · ✓ bleu = validé par toi. Touche une case pour voir la signature ou valider la démonstration. <button class="btn" id="bEffG" style="min-height:36px;padding:6px 12px;margin-left:8px">Effacer ce groupe</button></p>
+  <p class="info" style="margin-top:14px"><span style="color:#E08A1E">◐ orange</span> = théorie signée, démonstration à faire · ✓ vert = attestation valide (théorie + démonstration) · ✓ bleu = validé par toi. Touche une case pour voir la signature ou valider la démonstration. <button class="btn" id="bEffG" style="min-height:36px;padding:6px 12px;margin-left:8px">Effacer ce groupe</button></p>
 </main>
 </div>
 
@@ -212,15 +212,15 @@ async function vueEleve(){
   let monCode = ""; try { monCode = localStorage.getItem("passCode") || ""; } catch(e) {}
   if (!faits[o.id] && monCode && (R0.formes[o.id] || []).includes(monCode)) faits[o.id] = 1;
   if (faits[o.id] && !Q.get("formation") && ens && monCode && R0.codes && !(R0.formes[o.id] || []).includes(monCode)){
-    V.innerHTML = `<div class="top"><img src="${LOGO}" alt="Métier+"></div><div class="fini"><div class="rond" style="background:#E08A1E">◐</div><h1>Il te reste la démonstration</h1>
-      <p class="sous">${esc(o.nom)} · ta théorie est signée.</p><div class="dmE"><b>Montre à ton enseignant que tu sais faire</b><ol>${demoDe(o).map(x => `<li>${esc(x)}</li>`).join("")}</ol><small>${suivi ? "Tu pourras prendre l'outil quand ton enseignant aura validé ta démonstration." : "Ton enseignant la valide sur son tableau."}</small></div>
+    V.innerHTML = `<div class="top"><img src="${LOGO}" alt="Métier+"></div><div class="fini"><div class="rond" style="background:#E08A1E">◐</div><h1>Démonstration pratique à faire</h1>
+      <p class="sous">${esc(o.nom)} · formation théorique signée.</p><div class="dmE"><b>Montre à ton enseignant que tu sais faire</b><ol>${demoDe(o).map(x => `<li>${esc(x)}</li>`).join("")}</ol><small>${suivi ? "Tu pourras prendre l'outil quand ton enseignant aura validé ta démonstration." : "Ton enseignant la valide sur son tableau."}</small></div>
       <p><a href="?o=${encodeURIComponent(o.id)}&e=${encodeURIComponent(ens)}&formation=1">Revoir la formation</a></p></div>`;
     return;
   }
   if (faits[o.id] && !Q.get("formation") && ens){
     if (suivi) return sortieVue(o, ens, V);
-    V.innerHTML = `<div class="top"><img src="${LOGO}" alt="Métier+"></div><div class="fini"><div class="rond">✓</div><h1>Tu as ta formation</h1>
-      <p class="sous">${esc(o.nom)}${faits[o.id] > 1 ? " · signée le " + jour(faits[o.id]) : ""}</p><p class="engage">Refais les étapes de sécurité chaque fois que tu utilises l'outil.</p>
+    V.innerHTML = `<div class="top"><img src="${LOGO}" alt="Métier+"></div><div class="fini"><div class="rond">✓</div><h1>Attestation valide</h1>
+      <p class="sous">${esc(o.nom)}${faits[o.id] > 1 ? " · signée le " + jour(faits[o.id]) : ""}</p><p class="engage">Applique ces étapes de sécurité à chaque utilisation.</p>
       <p><a href="?o=${encodeURIComponent(o.id)}&e=${encodeURIComponent(ens)}&formation=1">Revoir la formation</a></p></div>`;
     return;
   }
@@ -291,10 +291,10 @@ async function vueEleve(){
       for (const id of new Set(INFO.part[obj.g] || [])){ const cc = d.comptes[id];
         if (id !== ens && cc && cc.pub && !cc.eleve){ try { await deposer(id, cc.pub); } catch(e) {} } }
       try { if (obj.p) localStorage.setItem("passPrenom", obj.p); if (obj.c) localStorage.setItem("passCode", obj.c); localStorage.setItem("passGroupe", obj.g); } catch(e) {}
-      V.innerHTML = `<div class="top"><img src="${LOGO}" alt="Métier+"></div><div class="fini"><div class="rond">✓</div><h1>C'est signé !</h1>
-        <p class="sous">${esc(obj.p || (obj.c ? "Code " + obj.c : ""))} · ${esc(o.nom)} · ${jour(obj.t)}<br>Ta signature est envoyée à ton enseignant.</p>
-        <div class="dmE"><b>Dernière étape : montre à ton enseignant que tu sais faire</b><ol>${demoDe(o).map(x => `<li>${esc(x)}</li>`).join("")}</ol><small>Tu seras formé quand ton enseignant aura vu ta démonstration.</small></div>
-        <p class="engage">Rappel : refais les étapes chaque fois que tu utilises l'outil.</p>
+      V.innerHTML = `<div class="top"><img src="${LOGO}" alt="Métier+"></div><div class="fini"><div class="rond">✓</div><h1>Formation théorique complétée</h1>
+        <p class="sous">${esc(obj.p || (obj.c ? "Code " + obj.c : ""))} · ${esc(o.nom)} · ${jour(obj.t)}<br>Ta signature a été transmise à ton enseignant.</p>
+        <div class="dmE"><b>Démonstration pratique devant ton enseignant</b><ol>${demoDe(o).map(x => `<li>${esc(x)}</li>`).join("")}</ol><small>Ton attestation sera valide quand ton enseignant aura approuvé ta démonstration.</small></div>
+        <p class="engage">Applique ces étapes de sécurité à chaque utilisation.</p>
         ${false ? `<button class="btn p" id="bPrend" style="width:100%;min-height:56px;font-size:18px;margin-top:10px">Prendre l'outil maintenant</button>` : ""}</div>`;
       try { faits[o.id] = Date.now(); localStorage.setItem("passFaits", JSON.stringify(faits)); } catch(e) {}
       if ($("#bPrend")) $("#bPrend").onclick = () => sortieVue(o, ens, V);
@@ -325,8 +325,8 @@ function dejaVue(o, ens, V, R0, suivi){
     if (!ok){ $("#dEr").hidden = false; $("#dEr").textContent = R0.codes && (R0.codes[g] || []).includes(cd.value) ? "Aucune formation signée pour ce code. Fais la formation (lien plus bas)." : "Ce code n'existe pas dans ce groupe. Vérifie avec ton enseignant."; return; }
     try { localStorage.setItem("passGroupe", g); localStorage.setItem("passCode", cd.value); const F = JSON.parse(localStorage.getItem("passFaits") || "{}"); F[o.id] = F[o.id] || 1; localStorage.setItem("passFaits", JSON.stringify(F)); } catch(e) {}
     if (suivi) return sortieVue(o, ens, V);
-    V.innerHTML = `<div class="top"><img src="${LOGO}" alt="Métier+"></div><div class="fini"><div class="rond">✓</div><h1>Tu as ta formation</h1>
-      <p class="sous">${esc(o.nom)}</p><p class="engage">Refais les étapes de sécurité chaque fois que tu utilises l'outil.</p></div>`;
+    V.innerHTML = `<div class="top"><img src="${LOGO}" alt="Métier+"></div><div class="fini"><div class="rond">✓</div><h1>Attestation valide</h1>
+      <p class="sous">${esc(o.nom)}</p><p class="engage">Applique ces étapes de sécurité à chaque utilisation.</p></div>`;
   };
 }
 
@@ -451,8 +451,8 @@ function caseOuvrir(eid, oid){
   const dm = demoDe(o);
   if (aDemo(v)) ouvrir(`<h2>${esc(e.p)} · ${esc(o.nom)}</h2><p>Théorie signée le ${jour(v.d)}. <b>Il reste la démonstration :</b> l'élève fait ces manipulations devant toi. Coche celles qui sont réussies.</p>${sigSvg(v.s)}
     <div id="dmL">${dm.map((x, i) => `<label class="dmx"><input type="checkbox" data-i="${i}"> <span>${esc(x)}</span></label>`).join("")}</div>
-    <div class="act"><button class="btn" id="aRet">Retirer</button><button class="btn" id="aF">Plus tard</button><button class="btn p" id="aDm" disabled>Démonstration réussie</button></div>`);
-  else if (v && v.d) ouvrir(`<h2>${esc(e.p)} · ${esc(o.nom)}</h2><p>${v.s ? "Formation suivie et signée par l'élève" : "Validé par toi"} le ${jour(v.d)}${v.s ? ` (${v.n || o.etapes.length} étapes cochées)` : ""}.${v.m && v.s ? ` Démonstration réussie devant toi le ${jour(v.m)}.` : ""}</p>${sigSvg(v.s)}
+    <div class="act"><button class="btn" id="aRet">Retirer</button><button class="btn" id="aF">Plus tard</button><button class="btn p" id="aDm" disabled>Compétence démontrée</button></div>`);
+  else if (v && v.d) ouvrir(`<h2>${esc(e.p)} · ${esc(o.nom)}</h2><p>${v.s ? "Formation théorique signée par l'élève" : "Validé par toi"} le ${jour(v.d)}${v.s ? ` (${v.n || o.etapes.length} étapes cochées)` : ""}.${v.m && v.s ? ` Compétence démontrée devant toi le ${jour(v.m)}.` : ""}</p>${sigSvg(v.s)}
     <div class="act"><button class="btn" id="aRet">Retirer</button><button class="btn p" id="aF">Fermer</button></div>`);
   else ouvrir(`<h2>${esc(e.p)} · ${esc(o.nom)}</h2><p>Pas encore signé. L'élève scanne le code QR de l'outil, suit la formation et signe. Tu peux aussi le valider toi-même (sans signature).</p>
     <div class="act"><button class="btn" id="aF">Fermer</button><button class="btn m" id="aVal">Valider moi-même</button></div>`);
