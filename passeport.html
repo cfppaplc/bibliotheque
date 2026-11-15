@@ -93,6 +93,11 @@ table.g{border-collapse:separate;border-spacing:0;min-width:100%}
   .qc img.l{height:7mm}.qc b{display:block;font-size:15pt;margin:2mm 0;line-height:1.15}.qc .q{display:flex;justify-content:center;margin:2mm 0}
   .qc .q canvas,.qc .q img:not(.qrLogo){width:var(--q)!important;height:var(--q)!important}
   .qc small{font-size:9pt;color:#555;display:block}
+  /* étiquettes des codes d'élèves (14 nov.) : collées à l'arrière de la carte étudiante (carte 85 x 54 mm) */
+  .ce2{display:inline-block;vertical-align:top;width:60mm;height:26mm;margin:0 3mm 3mm 0;border:1px dashed #999;border-radius:2mm;padding:2.5mm 3mm;break-inside:avoid;page-break-inside:avoid;font-family:system-ui,sans-serif;color:#1E2A44;position:relative}
+  .ce2 img{height:4.5mm;position:absolute;right:3mm;top:2.5mm}.ce2 small{display:block;font-size:7pt;color:#555;text-transform:uppercase;letter-spacing:.06em}
+  .ce2 b{display:block;font-size:10pt;margin-top:.5mm;max-width:38mm;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ce2 .n{position:absolute;left:3mm;bottom:1.5mm;font-size:24pt;font-weight:900;letter-spacing:2mm}
+  .ce2 i{position:absolute;right:3mm;bottom:2.5mm;font-style:normal;font-size:6.5pt;color:#555}
   /* trois grandeurs : petit = collé sur l'outil, moyen = sur l'étui, grand = au mur près de la machine */
   .qc.p{width:48mm;padding:3mm;border-radius:3mm;--q:30mm}.qc.p img.l{height:4mm}.qc.p b{font-size:9pt;margin:1mm 0}.qc.p small{font-size:6.5pt}
   .qc.m{width:88mm;--q:55mm}
@@ -144,6 +149,7 @@ html.eleve body{background:var(--fond)}
     <select id="grp" aria-label="Groupe"></select>
     <button class="btn" id="bGrpN">+ Groupe</button>
     <button class="btn" id="bEl">+ Élèves</button>
+    <button class="btn" id="bCodes">Codes des élèves</button>
     <span class="esp"></span>
     <button class="btn" id="bMaj">Actualiser</button>
     <button class="btn m" id="bQr">Codes QR à imprimer</button>
@@ -417,7 +423,7 @@ function dessiner(){
   dessinerSorties();
   const gs = groupes(); if (!gs.includes(GRP)) GRP = gs[0] || "";
   $("#grp").innerHTML = gs.length ? gs.map(g => `<option ${g === GRP ? "selected" : ""}>${esc(g)}</option>`).join("") : `<option value="">Aucun groupe</option>`;
-  $("#bEl").disabled = $("#bEffG").disabled = !GRP;
+  $("#bEl").disabled = $("#bEffG").disabled = $("#bCodes").disabled = !GRP;
   const L = eleves(GRP), O = PROT.outils;
   $("#cm").innerHTML = "";
   if (!GRP){ $("#tw").innerHTML = `<div class="vide">Commence par créer un groupe (ex. « 2608 »), puis imprime les codes QR des outils.</div>`; return; }
@@ -626,6 +632,9 @@ async function vueProf(){
   $("#cm").onclick = $("#tw").onclick = e => { const c = e.target.closest("button.c"); if (c) return caseOuvrir(c.dataset.e, c.dataset.o);
     const n = e.target.closest("button[data-el]"); if (n) eleveOuvrir(n.dataset.el); };
   $("#bQr").onclick = dlgQr;
+  $("#bCodes").onclick = () => { const L = eleves(GRP).filter(e => e.c); if (!L.length) return toast("Aucun élève dans ce groupe.");
+    $("#qrs").innerHTML = L.map(e => `<div class="ce2"><img src="img/metier-plus.svg" alt=""><small>Code Métier+ · ${esc(GRP)}</small><b>${esc(e.p)}</b><span class="n">${esc(e.c)}</span><i>Registre et coffres</i></div>`).join("");
+    setTimeout(() => print(), 300); };
   $("#bMaj").onclick = () => releve(true);
   $("#bPart").onclick = dlgPartage; majPart();
   $("#bProt").hidden = !localStorage.ghJeton; $("#bProt").onclick = editerProt;
