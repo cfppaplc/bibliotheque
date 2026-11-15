@@ -251,10 +251,10 @@ async function vueEleve(){
     return;
   }
   const deja = new Set(cf.mq || []);
-  V.innerHTML = `${tete}<p class="sous">Vérifie le coffre en le prenant. Tu en es responsable jusqu'au prochain élève.</p>
+  V.innerHTML = `${tete}<p class="sous">Vérifie le coffre en le prenant. Tu en es responsable jusqu'à la prochaine session.</p>
     <div id="its">${cf.liste.map((x, i) => `<div class="it${deja.has(x.n) ? " deja" : ""}" data-i="${i}"><span class="q">${x.q}</span><span>${esc(x.n)}</span><span class="s">${deja.has(x.n) ? "déjà signalé" : ""}</span></div>`).join("")}</div>
     ${idt}<button class="btn vert gros" id="bOk">Tout est là</button><button class="btn gros" id="bMq">Il manque quelque chose</button>`;
-  const ok = async e => { if (await envoyer({ k:"ok" }, e.target)) fini("Coffre pris en charge", `${esc(cf.nom)} · ${heure(Date.now())}<br>Il est à ton nom jusqu'au prochain élève.`); };
+  const ok = async e => { if (await envoyer({ k:"ok" }, e.target)) fini("Coffre pris en charge", `${esc(cf.nom)} · ${heure(Date.now())}<br>Il est à ton nom jusqu'à la prochaine session.`); };
   $("#bOk").onclick = ok;
   $("#bMq").onclick = () => {
     $("#its").classList.add("choix"); $("#bOk").remove(); $("#er").hidden = true;
@@ -265,7 +265,7 @@ async function vueEleve(){
     $("#bEnv").onclick = async e => {
       const items = [...$("#its").querySelectorAll(".it.m,.it.b")].map(d => ({ n:cf.liste[+d.dataset.i].n, e:d.classList.contains("b") ? "b" : "m" }));
       if (!items.length){ const er = $("#er"); er.hidden = false; er.textContent = "Touche ce qui manque, ou recule si tout est là."; return; }
-      if (await envoyer({ k:"manque", items, note:$("#nt").value.trim().slice(0, 120) }, e.target)) fini("C'est noté", `Ton enseignant est avisé de ce qui manque. Le coffre est à ton nom jusqu'au prochain élève.`);
+      if (await envoyer({ k:"manque", items, note:$("#nt").value.trim().slice(0, 120) }, e.target)) fini("C'est noté", `Ton enseignant est avisé de ce qui manque. Le coffre est à ton nom jusqu'à la prochaine session.`);
     };
   };
 }
