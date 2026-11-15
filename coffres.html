@@ -156,6 +156,30 @@ html.sombre .mq{background:#3a1f1d;color:#f3c2bd}
 .idt label{display:block;font-weight:650;margin:14px 0 6px}
 .idt input,.el textarea{width:100%;min-height:52px;border-radius:10px;border:1px solid var(--ligne);background:var(--carte2);color:var(--txt);padding:0 14px;font-size:20px}
 .el textarea{min-height:200px;padding:12px 14px;font-size:17px}
+
+.bx h3{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--gris);margin:18px 0 8px}.bx h3 small{text-transform:none;letter-spacing:0;font-weight:600;margin-left:6px}
+.dt{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}.dt h2{margin:0!important}
+.pil{font-size:12.5px;font-weight:800;border-radius:999px;padding:4px 10px;background:var(--carte2);color:var(--gris)}.pil.v{background:#E3F4EA;color:#1E8A55}.pil.r{background:#FDECEA;color:#B3261E}.pil.o{background:#FFF4E5;color:#9a5a10}
+.pers{display:flex;align-items:center;gap:10px}.pers .av{width:38px;height:38px;border-radius:50%;background:var(--mar);color:#fff;display:grid;place-items:center;font-weight:800;font-size:14px;flex:none}
+.pers b{display:block}.pers small{color:var(--gris);font-size:13px}.pers.resp{background:var(--carte2);border-radius:12px;padding:10px 12px}
+.pers.prev .av{background:#B3261E}.pers.sig .av{background:#8a8378}
+.mqc{border:1px solid #F3C2BD;background:#FFF8F7;border-radius:12px;padding:12px;margin:0 0 8px}html.sombre .mqc{background:#2a1a19;border-color:#5a2a26}
+.mqt{display:flex;align-items:center;gap:8px}.mqt .ic{width:22px;height:22px;border-radius:50%;background:#B3261E;color:#fff;display:grid;place-items:center;font-weight:900;font-size:13px}
+.pl{margin-left:auto;font-size:12px;font-weight:800;color:#B3261E;text-transform:uppercase;letter-spacing:.05em}
+.mqc .nt{margin:6px 0 0 30px!important;font-style:italic}
+.chaine{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:10px 0 0 30px}.chaine .fl{color:var(--gris);font-size:18px}
+.lst .lr{display:flex;align-items:center;gap:12px;padding:9px 4px;border-bottom:1px solid var(--ligne)}.lst .lr .q{min-width:32px;height:30px;border-radius:8px;background:var(--carte2);display:grid;place-items:center;font-weight:800}
+.lst .lr .pl.r{margin-left:auto}
+.lst .lr.e{border:0;padding:4px 0}.lst .lr.e input{flex:1;min-height:44px;border-radius:10px;border:1px solid var(--ligne);background:var(--carte2);color:var(--txt);padding:0 12px}
+.stp{display:inline-flex;align-items:center;border:1px solid var(--ligne);border-radius:10px;overflow:hidden}.stp button{border:0;background:var(--carte2);color:var(--txt);width:36px;height:42px;font-size:18px;cursor:pointer}.stp b{min-width:30px;text-align:center}
+.lr .x{border:0;background:none;color:var(--gris);font-size:16px;width:40px;height:42px;cursor:pointer}
+.ajt{margin-top:8px;min-height:42px}
+.lact{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.lact select{min-height:46px;border-radius:10px;border:1px solid var(--ligne);background:var(--carte);color:var(--txt);padding:0 10px}
+.avis{background:#FFF4E5;color:#5a3b10!important;border-radius:10px;padding:10px 12px}
+.hd{margin-top:14px}.hd summary{cursor:pointer;font-weight:700;color:var(--gris);padding:6px 0}
+.hl{display:flex;gap:10px;align-items:baseline;padding:6px 0;font-size:14px}.hl .pt{width:9px;height:9px;border-radius:50%;flex:none}.pt.v{background:var(--vert)}.pt.r{background:#B3261E}.hl .hh{color:var(--gris);min-width:130px}
+.btn.lien{border:0;background:none;color:var(--gris);padding:10px 8px}
+.bx .act .esp{flex:1}
 @media print{.qc.cfq{width:88mm;--q:55mm}}
 </style>
 </head>
@@ -211,6 +235,16 @@ const PUB = { lire:ens => lirePub("metier+|coffres-pub|" + ens),
     if (!j){ j = btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(32)))); localStorage.setItem("coffresJeton", j); }
     if (await rpc("coffre_ecrire", { p_id:await hx("metier+|coffres-pub|" + ens), p_jeton:j, p_env:"public", p_data:JSON.stringify(o) }) !== true) throw new Error("refus"); } };
 
+/* verrou de session (14 nov., « personne ne peut refaire l'inventaire tant qu'une est active, sauf l'enseignant ») :
+   rangée publique par coffre et par session (date + matin / après-midi / soir); le 1er qui l'écrit la garde (jeton);
+   le jeton est envoyé chiffré à l'enseignant, qui peut libérer le coffre. Contenu : codes à 3 chiffres et heure seulement. */
+const session = (t = Date.now()) => { const d = new Date(t), h = d.getHours(); return d.toLocaleDateString("fr-CA") + "|" + (h < 12 ? "am" : h < 17 ? "pm" : "soir"); };
+const VERROU = { id:(cid, ses) => hx("metier+|coffre-pris|" + cid + "|" + ses),
+  async lire(cid, ses){ try { const r = await rpc("coffre_lire", { p_id:await this.id(cid, ses) }), row = r && r[0]; return row ? JSON.parse(row.data || "{}") : null; } catch(e){ return null; } },
+  async prendre(cid, ses, jeton, o){ return (await rpc("coffre_ecrire", { p_id:await this.id(cid, ses), p_jeton:jeton, p_env:"public", p_data:JSON.stringify(o) })) === true; },
+  async liberer(cid, ses, jeton){ try { return (await rpc("coffre_effacer", { p_id:await this.id(cid, ses), p_jeton:jeton })) === true; } catch(e){ return false; } } };
+const mesVerrous = () => { try { return JSON.parse(localStorage.getItem("coffresMesVerrous") || "{}"); } catch(e){ return {}; } };
+
 /* ================= Élève ================= */
 async function vueEleve(){
   const V = $("#vueEleve"); V.hidden = false;
@@ -223,14 +257,22 @@ async function vueEleve(){
   const nomAt = (P.at && P.at[cf.at]) || "";
   let mc = "", mp = ""; try { mc = localStorage.getItem("passCode") || ""; mp = localStorage.getItem("passPrenom") || ""; } catch(e) {}
   const idt = `<div class="idt">${parCode ? `<label for="cd">Ton code (3 chiffres)</label><input id="cd" inputmode="numeric" maxlength="3" value="${esc(mc)}" autocomplete="off">`
-    : `<label for="pn">Ton prénom</label><input id="pn" maxlength="24" value="${esc(mp)}" autocomplete="given-name">`}<p class="err" id="er" hidden></p></div>`;
-  const qui = () => { if (parCode){ const c = $("#cd").value.trim(); return codes.includes(c) ? { c } : null; } const p = prenom($("#pn").value); return p.length >= 2 ? { p } : null; };
+    : `<label for="pn">Ton prénom</label><input id="pn" maxlength="24" value="${esc(mp)}" autocomplete="given-name">`}
+    <label for="c2">${parCode ? "Code de ton coéquipier" : "Prénom de ton coéquipier"} <small style="font-weight:500;color:var(--gris)">(si vous êtes deux)</small></label><input id="c2" ${parCode ? 'inputmode="numeric" maxlength="3"' : 'maxlength="24"'} autocomplete="off"><p class="err" id="er" hidden></p></div>`;
+  const qui = () => { const v2 = $("#c2").value.trim();
+    if (parCode){ const c = $("#cd").value.trim(); if (!codes.includes(c)) return null; if (!v2) return { c }; return codes.includes(v2) && v2 !== c ? { c, c2:v2 } : "c2"; }
+    const p = prenom($("#pn").value); if (p.length < 2) return null; const p2 = prenom(v2); return p2.length >= 2 ? { p, p2 } : { p }; };
   const envoyer = async (obj, b) => {
     const w = qui(), er = $("#er"); er.hidden = true;
-    if (!w){ er.hidden = false; er.textContent = parCode ? "Ce code n'existe pas. Demande ton code à ton enseignant." : "Écris ton prénom."; return; }
+    if (!w || w === "c2"){ er.hidden = false; er.textContent = w === "c2" ? "Le code de ton coéquipier n'existe pas." : parCode ? "Ce code n'existe pas. Demande ton code à ton enseignant." : "Écris ton prénom."; return; }
     Object.assign(obj, w, { v:1, uid:crypto.getRandomValues(new Uint32Array(2)).join("-"), cf:cid, at:cf.at, nom:cf.nom, t:Date.now() });
     b.disabled = true; const txt = b.textContent; b.textContent = "Envoi…";
     try {
+      if (obj.k !== "liste"){ const ses = session(), cle = cid + "|" + ses, M = mesVerrous(); let j = M[cle];
+        if (!j){ j = btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(24))));
+          if (!(await VERROU.prendre(cid, ses, j, { c:w.c || "", c2:w.c2 || "", t:Date.now() }))){ pris(await VERROU.lire(cid, ses)); return false; }
+          M[cle] = j; for (const k in M) if (!k.includes(ses.split("|")[0])) delete M[k]; localStorage.setItem("coffresMesVerrous", JSON.stringify(M)); }
+        obj.lj = j; obj.ses = ses; }
       const d = await (await fetch("comptes.json", { cache:"no-store" })).json(), C = d.comptes || {};
       const dep = async (id, pub) => { for (let n = 0; n < 400; n++){ try { await COFFRE.deposer("coffres|" + id + "|" + n, obj, pub); return true; } catch(e){ if (!/refus/.test(e.message)) throw e; } } return false; };
       if (!C[ens] || !(await dep(ens, C[ens].pub))) throw new Error("x");
@@ -239,6 +281,8 @@ async function vueEleve(){
       return true;
     } catch(e){ b.disabled = false; b.textContent = txt; er.hidden = false; er.textContent = "L'envoi n'a pas fonctionné. Vérifie Internet et réessaie."; return false; }
   };
+  const pris = v => { V.innerHTML = `<div class="top"><img src="${LOGO}" alt="Métier+"></div><div class="fini"><div class="rond" style="background:#B3261E">✕</div><h1>Coffre déjà pris</h1>
+      <p class="sous">${esc(cf.nom)}${v && v.c ? ` · code ${esc(v.c)}${v.c2 ? " et " + esc(v.c2) : ""}` : ""}${v && v.t ? " · depuis " + heure(v.t) : ""}<br>L'inventaire est déjà fait pour cette session. Seul ton enseignant peut le refaire.</p></div>`; };
   const fini = (titre, txt) => { V.innerHTML = `<div class="top"><img src="${LOGO}" alt="Métier+"></div><div class="fini"><div class="rond">✓</div><h1>${titre}</h1><p class="sous">${txt}</p></div>`; };
   const tete = `<div class="top"><img src="${LOGO}" alt="Métier+"><span style="flex:1"></span><span class="tag">Inventaire</span></div><span class="tag">${esc(nomAt)}</span><h1>${esc(cf.nom)}</h1>`;
 
@@ -250,6 +294,7 @@ async function vueEleve(){
       if (await envoyer({ k:"liste", liste:L }, e.target)) fini("Liste envoyée", "Merci ! Ton enseignant va la vérifier. Ensuite, le coffre se fera en quelques secondes."); };
     return;
   }
+  if (!mesVerrous()[cid + "|" + session()]){ const v = await VERROU.lire(cid, session()); if (v) return pris(v); }
   const deja = new Set(cf.mq || []);
   V.innerHTML = `${tete}<p class="sous">Vérifie le coffre en le prenant. Tu en es responsable jusqu'à la prochaine session.</p>
     <div id="its">${cf.liste.map((x, i) => `<div class="it${deja.has(x.n) ? " deja" : ""}" data-i="${i}"><span class="q">${x.q}</span><span>${esc(x.n)}</span><span class="s">${deja.has(x.n) ? "déjà signalé" : ""}</span></div>`).join("")}</div>
@@ -286,7 +331,8 @@ const coffresDe = at => { const M = Object.entries(K.cf).filter(([, c]) => !c.x 
   return M.concat(S).sort((a, b) => a.nom.localeCompare(b.nom, "fr", { numeric:true })); };
 const cfDe = id => { if (K.cf[id] && !K.cf[id].x) return Object.assign({ id, moi:true }, K.cf[id]); for (const a in PARTAGES) if (PARTAGES[a].cf[id]) return Object.assign({ id, de:PARTAGES[a].de }, PARTAGES[a].cf[id]); return null; };
 /* nom de l'élève : code → prénom grâce au passeport de cet appareil */
-function nomDe(w){ if (!w) return "?"; if (w.p) return esc(w.p);
+function nomDe(w){ if (!w) return "?"; if (w.c2 || w.p2) return nom1({ c:w.c, p:w.p }) + " et " + nom1({ c:w.c2, p:w.p2 }); return nom1(w); }
+function nom1(w){ if (w.p) return esc(w.p);
   try { const D = JSON.parse(localStorage.getItem("passeportOutils") || "{}"), e = Object.values(D.el || {}).find(e => !e.x && e.c === w.c); if (e) return `${esc(e.p)} <span class="cd">${esc(w.c)}</span>`; } catch(e) {}
   return "Code " + esc(w.c); }
 /* état d'un coffre : événements depuis la dernière remise en ordre */
@@ -321,22 +367,47 @@ function dessiner(){
 function coffreOuvrir(id){
   const cf = cfDe(id); if (!cf) return; const s = etat(cf), mien = !!cf.moi;
   const prec = e => { const i = s.E.indexOf(e); for (let j = i - 1; j >= 0; j--) if (s.E[j].k === "ok" || s.E[j].k === "manque") return s.E[j]; return null; };
+  const init = w => { const t = w && (w.p || (nomDe(w).replace(/<[^>]+>/g, "").replace(/^Code /, "#"))) || "?"; return esc(t.slice(0, 2).toUpperCase()); };
+  const qui = (w, sous, cls) => `<div class="pers ${cls || ""}"><span class="av">${init(w)}</span><span><b>${nomDe(w)}</b><small>${sous}</small></span></div>`;
+  const prop = cf.prop && !(cf.liste || []).length;
+  const liste = (cf.liste && cf.liste.length) ? cf.liste : prop ? cf.prop.liste : [];
+  const etq = s.c === "v" ? "Complet" : s.c === "r" ? "Il manque quelque chose" : s.c === "o" ? "Liste à approuver" : "Liste à faire";
   const mqH = Object.entries(s.mq).map(([n, x]) => { const p = prec(x.par);
-    return `<li><b>${esc(n)}</b> ${x.e === "b" ? "(brisé)" : "(manquant)"} · signalé par ${nomDe(x.par)} ${heure(x.par.d)}${p ? ` · <b>juste avant : ${nomDe(p)}</b> (${heure(p.d)}${p.k === "ok" ? ", tout était là" : ""})` : ""}${x.par.note ? `<br><i>« ${esc(x.par.note)} »</i>` : ""}</li>`; }).join("");
-  const hist = s.E.slice(-30).reverse().map(e => `<div><span>${heure(e.d)}</span><span>${e.k === "regle" ? `<span class="v">Remis en ordre</span> (par toi)` : e.k === "ok" ? `<span class="v">Tout est là</span> · ${nomDe(e)}` : `<span class="r">Manque : ${e.items.map(x => esc(x.n)).join(", ")}</span> · ${nomDe(e)}`}</span></div>`).join("");
+    return `<div class="mqc"><div class="mqt"><span class="ic">!</span><b>${esc(n)}</b><span class="pl">${x.e === "b" ? "Brisé" : "Manquant"}</span></div>
+      ${x.par.note ? `<p class="nt">« ${esc(x.par.note)} »</p>` : ""}
+      <div class="chaine">${p ? qui(p, "L'avait juste avant · " + heure(p.d) + (p.k === "ok" ? " · a confirmé que tout était là" : ""), "prev") + `<span class="fl">→</span>` : ""}${qui(x.par, "A signalé · " + heure(x.par.d), "sig")}</div></div>`; }).join("");
+  const hist = s.E.slice(-30).reverse().map(e => `<div class="hl"><span class="pt ${e.k === "manque" ? "r" : "v"}"></span><span class="hh">${heure(e.d)}</span><span>${e.k === "regle" ? "<b>Remis en ordre</b> par toi" : e.k === "ok" ? `${nomDe(e)} · tout est là` : `${nomDe(e)} · manque ${e.items.map(x => esc(x.n)).join(", ")}`}</span></div>`).join("");
   const autres = Object.entries(K.cf).filter(([i, c]) => !c.x && i !== id && c.liste && c.liste.length);
-  ouvrir(`<h2>${esc(cf.nom)}</h2>
-    ${s.der ? `<p>En ce moment : <b>${nomDe(s.der)}</b>, depuis ${heure(s.der.d)}.</p>` : ""}
-    ${mqH ? `<ul class="mq">${mqH}</ul>` : ""}
-    ${cf.prop && mien && !(cf.liste || []).length ? `<p><b>Liste écrite par ${nomDe(cf.prop.w)}</b> — corrige-la au besoin, puis approuve.</p>` : `<p>${mien ? "Contenu du coffre : une ligne par outil, quantité devant (ex. « 2 x clé à tuyau 14 po »)." : `Coffre de ${esc(cf.de || "")} (lecture seule).`}</p>`}
-    <textarea id="aL" ${mien ? "" : "readonly"}>${esc(ecrireListe((cf.liste && cf.liste.length) ? cf.liste : cf.prop ? cf.prop.liste : []))}</textarea>
-    ${mien && autres.length ? `<p style="margin-top:8px"><select id="aCp" style="min-height:42px;border-radius:10px;border:1px solid var(--ligne);background:var(--carte2);color:var(--txt);padding:0 10px"><option value="">Copier la liste d'un autre coffre…</option>${autres.map(([i, c]) => `<option value="${i}">${esc(c.nom)}</option>`).join("")}</select></p>` : ""}
-    ${hist ? `<details style="margin-top:10px"><summary style="cursor:pointer;font-weight:650;color:var(--gris)">Historique</summary><div class="hist">${hist}</div></details>` : ""}
-    <div class="act">${mien ? `<button class="btn" id="aX">Retirer le coffre</button><button class="btn" id="aRn">Renommer</button>` : ""}${mqH ? `<button class="btn vert" id="aRg">Remis en ordre</button>` : ""}<button class="btn" id="aF">Fermer</button>${mien ? `<button class="btn p" id="aOk">${cf.prop && !(cf.liste || []).length ? "Approuver la liste" : "Enregistrer"}</button>` : ""}</div>`);
+  ouvrir(`<div class="dt"><h2>${esc(cf.nom)}</h2><span class="pil ${s.c}">${etq}</span></div>
+    ${s.der ? qui(s.der, "Responsable depuis " + heure(s.der.d), "resp") : `<p>Personne n'a encore scanné ce coffre.</p>`}
+    ${mqH ? `<h3>À régler</h3>${mqH}` : ""}
+    <h3>Contenu ${liste.length ? `<small>${liste.length} article${liste.length > 1 ? "s" : ""}</small>` : ""}</h3>
+    ${prop ? `<p class="avis">Liste écrite par ${nomDe(cf.prop.w)}. Vérifie-la, corrige au besoin, puis approuve.</p>` : ""}
+    <div id="lst" class="lst${prop || (mien && !liste.length) ? " ed" : ""}"></div>
+    ${mien ? `<div class="lact"><button class="btn" id="aMod">${liste.length ? "Modifier la liste" : ""}</button>${autres.length ? `<select id="aCp"><option value="">Copier d'un autre coffre…</option>${autres.map(([i, c]) => `<option value="${i}">${esc(c.nom)}</option>`).join("")}</select>` : ""}</div>` : `<p class="info">Coffre de ${esc(cf.de || "")} (lecture seule).</p>`}
+    ${hist ? `<details class="hd"><summary>Historique</summary>${hist}</details>` : ""}
+    <div class="act">${mien ? `<button class="btn lien" id="aX">Retirer le coffre</button><button class="btn lien" id="aRn">Renommer</button><span class="esp"></span>` : ""}${s.der && s.der.lj && s.der.ses === session() ? `<button class="btn" id="aLib" title="Permet à un élève de refaire l'inventaire pendant cette session">Libérer le coffre</button>` : ""}${mqH ? `<button class="btn vert" id="aRg">Remis en ordre</button>` : ""}<button class="btn" id="aF">Fermer</button><button class="btn p" id="aOk" hidden>${prop ? "Approuver la liste" : "Enregistrer"}</button></div>`);
+  let L = liste.map(x => ({ q:x.q, n:x.n }));
+  const lst = $("#lst"), ed = () => lst.classList.contains("ed");
+  const peindre = () => {
+    if (!ed()){ lst.innerHTML = L.length ? L.map(x => `<div class="lr"><span class="q">${x.q}</span><span>${esc(x.n)}</span>${s.mq[x.n] ? `<span class="pl r">${s.mq[x.n].e === "b" ? "Brisé" : "Manquant"}</span>` : ""}</div>`).join("") : `<p class="info">Le premier élève qui scanne le coffre écrira son contenu.</p>`; }
+    else { lst.innerHTML = L.map((x, i) => `<div class="lr e"><span class="stp"><button data-m="${i}">−</button><b>${x.q}</b><button data-p="${i}">+</button></span><input type="text" data-n="${i}" value="${esc(x.n)}" placeholder="Nom de l'outil" maxlength="60"><button class="x" data-x="${i}" title="Retirer">✕</button></div>`).join("")
+        + `<button class="btn ajt" id="aAj">+ Ajouter un article</button>`;
+      lst.querySelectorAll("[data-m]").forEach(b => b.onclick = () => { const x = L[+b.dataset.m]; x.q = Math.max(1, x.q - 1); peindre(); });
+      lst.querySelectorAll("[data-p]").forEach(b => b.onclick = () => { const x = L[+b.dataset.p]; x.q = Math.min(99, x.q + 1); peindre(); });
+      lst.querySelectorAll("[data-n]").forEach(t => t.oninput = () => { L[+t.dataset.n].n = t.value; });
+      lst.querySelectorAll("[data-x]").forEach(b => b.onclick = () => { L.splice(+b.dataset.x, 1); peindre(); });
+      $("#aAj").onclick = () => { L.push({ q:1, n:"" }); peindre(); const t = lst.querySelectorAll("[data-n]"); t[t.length - 1].focus(); };
+      if (!L.length){ L.push({ q:1, n:"" }); peindre(); return; }
+      $("#aOk").hidden = false; if ($("#aMod")) $("#aMod").hidden = true; }
+  };
+  peindre();
   $("#aF").onclick = fermer;
-  if ($("#aCp")) $("#aCp").onchange = e => { const c = K.cf[e.target.value]; if (c) $("#aL").value = ecrireListe(c.liste); };
-  if ($("#aOk")) $("#aOk").onclick = () => { const c = K.cf[id]; c.liste = lireListe($("#aL").value); delete c.prop; c.t = Date.now(); sauver(); fermer(); dessiner(); toast("Liste enregistrée"); };
-  if ($("#aRg")) $("#aRg").onclick = () => { K.ev["r" + nid()] = { cf:id, k:"regle", d:Date.now(), t:Date.now() }; sauver(); fermer(); dessiner(); };
+  if ($("#aMod")){ if (!liste.length) $("#aMod").hidden = true; $("#aMod").onclick = () => { lst.classList.add("ed"); peindre(); }; }
+  if ($("#aCp")) $("#aCp").onchange = e => { const c = K.cf[e.target.value]; if (!c) return; L = c.liste.map(x => ({ q:x.q, n:x.n })); lst.classList.add("ed"); peindre(); };
+  $("#aOk").onclick = () => { const c = K.cf[id]; c.liste = L.map(x => ({ q:x.q, n:String(x.n).trim().slice(0, 60) })).filter(x => x.n); delete c.prop; c.t = Date.now(); sauver(); fermer(); dessiner(); toast(prop ? "Liste approuvée" : "Liste enregistrée"); };
+  if ($("#aLib")) $("#aLib").onclick = async () => { const ok = await VERROU.liberer(id, s.der.ses, s.der.lj); toast(ok ? "Coffre libéré : un élève peut refaire l'inventaire" : "Déjà libre"); if (ok) fermer(); };
+  if ($("#aRg")) $("#aRg").onclick = () => { K.ev["r" + nid()] = { cf:id, k:"regle", d:Date.now(), t:Date.now() }; sauver(); fermer(); dessiner(); toast("Coffre remis en ordre"); };
   if ($("#aRn")) $("#aRn").onclick = () => { const n = prompt("Nouveau nom du coffre", K.cf[id].nom); if (n && n.trim()){ K.cf[id].nom = n.trim().slice(0, 40); K.cf[id].t = Date.now(); sauver(); fermer(); dessiner(); } };
   let sur = 0; if ($("#aX")) $("#aX").onclick = e => { if (!sur++){ e.target.textContent = "Sûr ? Touche encore"; return; } K.cf[id] = { x:1, t:Date.now(), at:"", nom:"" }; sauver(); fermer(); dessiner(); };
 }
@@ -351,9 +422,9 @@ async function releve(manuel){
       try { x = await COFFRE.prendre(nom); } catch(e) { x = null; }
       if (!x){ vides++; continue; } vides = 0;
       if (!K.vus[x.uid]){
-        const w = x.c ? { c:x.c } : { p:prenom(x.p) };
+        const w = x.c ? { c:x.c } : { p:prenom(x.p) }; if (x.c2) w.c2 = String(x.c2).slice(0, 3); if (x.p2) w.p2 = prenom(x.p2);
         if (x.k === "liste"){ const c = K.cf[x.cf]; if (c && !c.x && !(c.liste || []).length){ c.prop = { liste:lireListe(ecrireListe(x.liste)), w, t:x.t }; c.t = Date.now(); neufs++; } }
-        else if (x.k === "ok" || x.k === "manque"){ K.ev[x.uid] = Object.assign({ cf:x.cf, k:x.k, d:x.t, t:Date.now(), items:x.k === "manque" ? (x.items || []).slice(0, 80) : undefined, note:x.note || undefined }, w); neufs++; }
+        else if (x.k === "ok" || x.k === "manque"){ K.ev[x.uid] = Object.assign({ cf:x.cf, k:x.k, d:x.t, t:Date.now(), items:x.k === "manque" ? (x.items || []).slice(0, 80) : undefined, note:x.note || undefined, lj:x.lj, ses:x.ses }, w); neufs++; }
         K.vus[x.uid] = Date.now();
       }
       try { await COFFRE.jeter(nom); } catch(e) {}
