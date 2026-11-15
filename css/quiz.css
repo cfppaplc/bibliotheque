@@ -431,3 +431,4 @@ body>div:not(.cache):not([hidden]){animation:fenFond .22s ease-out}
 @view-transition{navigation:auto}
 ::view-transition-old(root),::view-transition-new(root){animation-duration:.22s}
 #tiroir:not(.ouvert) .fermer{display:none}   /* 15 nov. : le › de fermeture dépassait dans le coin, panneau fermé */
+.eMerci{margin:auto;text-align:center;font-size:2.4vw;opacity:.9}.eMerci .gros{font-size:7vw;font-weight:900;color:#EB6A22;line-height:1.1;margin-bottom:.4em}
