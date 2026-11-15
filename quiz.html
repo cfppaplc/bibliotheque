@@ -18,7 +18,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.50.0/dist/umd/supabase.min.js"></script>
 <script src="quiz-livres.js?v=1794760600"></script>
-<link rel="stylesheet" href="css/quiz.css?v=4">
+<link rel="stylesheet" href="css/quiz.css?v=5">
 </head>
 <body>
 
@@ -90,7 +90,7 @@ Le propane s'accumule…
 <label>Couleur du quiz<div class="coul" id="eCoul"></div></label>
 </div></details>
 <div id="eQs"></div>
-<div class="edBas"><div class="ajouts"><span>Ajouter une question :</span><button class="btn2" data-aj="choix">Choix</button><button class="btn2" data-aj="vf">Vrai ou faux</button><button class="btn2" data-aj="multi">Plusieurs bonnes</button><button class="btn2" data-aj="ordre">Remettre en ordre</button><button class="btn2" data-aj="nombre">Calcul</button><button class="btn2" data-aj="erreur">Trouve l'erreur</button><button class="btn2" data-aj="nuage">Nuage de mots</button><button class="btn2" data-aj="sondage">Sondage</button><button class="btn2" data-aj="echelle">Échelle de confiance</button><button class="btn2" data-aj="connexion" title="Montre le code QR au tableau à cet endroit de la présentation">Page de connexion</button><button class="btn2" id="ePdf" title="Enregistre ton PowerPoint en PDF, puis choisis-le ici">+ Diapos d'un PowerPoint (PDF)</button></div>
+<div class="edBas"><button class="btn2" id="ajOuv" type="button">+ Ajouter une question</button><div class="ajouts"><span class="ajT">Quel genre de question ?</span><b class="ajG">Avec des points</b><button class="btn2" data-aj="choix">Choix<small>Une seule bonne réponse</small></button><button class="btn2" data-aj="vf">Vrai ou faux<small>Deux choix</small></button><button class="btn2" data-aj="multi">Plusieurs bonnes<small>Cocher toutes les bonnes</small></button><button class="btn2" data-aj="ordre">Remettre en ordre<small>Placer des étapes dans l'ordre</small></button><button class="btn2" data-aj="nombre">Calcul<small>Une réponse en chiffres</small></button><button class="btn2" data-aj="erreur">Trouve l'erreur<small>Trouver le morceau faux</small></button><b class="ajG">Sans points (pour faire parler la classe)</b><button class="btn2" data-aj="nuage">Nuage de mots<small>Chacun écrit un mot</small></button><button class="btn2" data-aj="sondage">Sondage<small>La classe vote</small></button><button class="btn2" data-aj="echelle">Échelle de confiance<small>De 1 à 5, anonyme</small></button><b class="ajG">Présentation</b><button class="btn2" data-aj="connexion" title="Montre le code QR au tableau à cet endroit de la présentation">Page de connexion<small>Le code QR, à cet endroit</small></button><button class="btn2" id="ePdf" title="Enregistre ton PowerPoint en PDF, puis choisis-le ici">+ Diapos d'un PowerPoint (PDF)<small>Tes diapos, avec des questions entre</small></button></div>
 <div class="ctl"><button id="eSauve">Enregistrer</button><button class="btn2" id="eAnnule">Annuler</button></div></div>
 <div class="sous" style="margin-top:8px">Le quiz est enregistré dans ton compte et te suit sur tous tes appareils. « Exporter » (dans la liste) crée un fichier à partager avec un collègue; « Sauvegarder tous mes quiz » en fait une copie complète.</div></div>
 </div>
@@ -134,6 +134,19 @@ if (window.COFFRE && !/[?&](j|ecran|panneau)=/.test(location.search))
     OUV = OUV === i && !q.classList.contains("plie") ? null : i; appliquer(); if (OUV === i){ var f = q.querySelector(".tq"); if (f) f.focus(); } });
   Z.addEventListener("focusin", function(e){ var q = e.target.closest && e.target.closest(".qe"); if (!q || q.classList.contains("plie")) return; OUV = [].indexOf.call(Z.querySelectorAll(".qe"), q); });
   appliquer(); })();
+/* 15 nov. (« l'interface de création de question n'est pas simple ») : un seul bouton « + Ajouter une question » qui ouvre la liste des genres;
+   explication et image rangées dans « Plus d'options »; l'aide va sous la question */
+(function(){ var B = document.querySelector(".edBas"), O = document.getElementById("ajOuv"), Z = document.getElementById("eQs"); if (!B || !O || !Z) return;
+  O.onclick = function(e){ e.stopPropagation(); B.classList.toggle("ajOn"); };
+  B.querySelector(".ajouts").addEventListener("click", function(e){ if (e.target.closest("button")) setTimeout(function(){ B.classList.remove("ajOn"); }, 0); });
+  document.addEventListener("click", function(e){ if (!e.target.closest(".edBas")) B.classList.remove("ajOn"); });
+  document.addEventListener("keydown", function(e){ if (e.key === "Escape") B.classList.remove("ajOn"); });
+  function ranger(){ Z.querySelectorAll(".qe:not(.diapo)").forEach(function(q){ if (q.querySelector(".plusO")) return;
+    var ex = q.querySelector(".ex"), im = q.querySelector(":scope > .img"), so = im && im.querySelector(".sous"), tq = q.querySelector(".tq"); if (!ex || !im) return;
+    if (so && tq) { so.classList.add("aideQ"); tq.after(so); }
+    var d = document.createElement("details"); d.className = "plusO"; d.innerHTML = "<summary>Plus d'options : explication, image</summary>";
+    d.open = !!(ex.value.trim() || im.querySelector("img")); ex.before(d); d.appendChild(ex); d.appendChild(im); }); }
+  new MutationObserver(ranger).observe(Z, { childList:true }); ranger(); })();
 </script>
 </body>
 </html>
