@@ -506,10 +506,11 @@ if ("serviceWorker" in navigator && (location.protocol === "https:" || location.
 window.addEventListener("offline", () => { try { aviser("Pas d'Internet : les livres déjà ouverts sur cet ordinateur restent disponibles."); } catch(e){} });
 window.addEventListener("online", () => { try { aviser("Internet est revenu."); } catch(e){} });
 </script>
-<link rel="stylesheet" href="css/acces.css?v=1">
+<link rel="stylesheet" href="css/acces.css?v=2">
 <div class="acces-ov" id="accesOv" hidden role="dialog" aria-modal="true"><div class="acces-box" id="accesBox"></div></div>
 <div class="acces-menu" id="accesMenu" hidden></div>
-<script src="js/acces.js?v=3"></script>
+<script src="js/acces.js?v=4"></script>
+<script src="js/admin-site.js?v=1"></script>
 
 
 <script src="js/preferences.js?v=1"></script>
@@ -556,7 +557,7 @@ window.addEventListener("online", () => { try { aviser("Internet est revenu."); 
     setTimeout(() => location.reload(), apresConnexion ? 2300 : 0);
   };
   setInterval(() => { if (attente && !document.querySelector("#reader.open") && !document.querySelector("#accueilOv:not([hidden])")){ attente = false; location.reload(); } }, 1500);
-  const B = { cles:["favs", "pos", "marks", "rangsReduits", "filtreProg", "nouvVu", "prefs:{id}", "penPerso", "penLargeur", "gommeTaille", "objCats", "ghJeton", "dernierTableau", "mesDocs", "propsEnAttente"],   /* ghJeton : la clé GitHub de l'admin le suit (chiffrée dans son coffre), retirée de l'appareil à la déconnexion */
+  const B = { cles:["favs", "pos", "marks", "rangsReduits", "filtreProg", "nouvVu", "prefs:{id}", "penPerso", "penLargeur", "gommeTaille", "objCats", "ghJeton", "dernierTableau", "mesDocs", "propsEnAttente", "signalements"],   /* ghJeton : la clé GitHub de l'admin le suit (chiffrée dans son coffre), retirée de l'appareil à la déconnexion */
     vides:{ favs:"[]", pos:"{}", marks:"{}" }, apres:recharger, fusion:{ mesDocs:(a, b) => window.fusionMesDocs ? fusionMesDocs(a, b) : null } };
   const T = { cles:["tableauxSauves", "mesSchemas"], apres:recharger };
   const go = () => { COFFRE.demarrer("biblio", B).then(() => {   /* une fois par jour, un signe de vie (« vu il y a … » dans le panneau d'administration) */

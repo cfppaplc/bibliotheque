@@ -321,6 +321,7 @@ window.ACCES = (function(){
     livres:'<svg viewBox="0 0 24 24"><path d="M4 4.5h6a2 2 0 0 1 2 2V20a2 2 0 0 0-2-2H4z"/><path d="M20 4.5h-6a2 2 0 0 0-2 2V20a2 2 0 0 1 2-2h6z"/></svg>',
     stats:'<svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>',
     props:'<svg viewBox="0 0 24 24"><path d="M12 15V4M7 9l5-5 5 5M4 15v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4"/></svg>',
+    site:'<svg viewBox="0 0 24 24"><path d="M3 12h4l3-7 4 14 3-7h4"/></svg>',
     hist:'<svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 2.6-6.4L3 8"/><path d="M3 3v5h5M12 7v5l3.5 2"/></svg>',
     oeil:'<svg viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>',
     etoile:'<svg viewBox="0 0 24 24"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/></svg>',
@@ -398,7 +399,7 @@ window.ACCES = (function(){
       + '<div class="acces-stats"><div><b>' + nProf + '</b><span>enseignant' + (nProf > 1 ? 's' : '') + '</span></div><div><b>' + nGr + '</b><span>groupe' + (nGr > 1 ? 's' : '') + ' d\'élèves</span></div>'
       + '<div><b>' + livres.length + '</b><span>livres protégés</span></div><div class="dem"><b id="gStatDem">…</b><span>demandes</span></div>'
       + '<div class="' + (aPublier ? 'pub' : 'ok') + '"><b>' + (aPublier ? '!' : '✓') + '</b><span>' + (aPublier ? 'à publier' : 'tout est publié') + '</span></div></div>'
-      + '<div class="acces-onglets">' + ong("profs", "Enseignants") + ong("livres", "Livres") + ong("props", "Propositions") + ong("stats", "Statistiques") + ong("hist", "Historique") + '</div>'
+      + '<div class="acces-onglets">' + ong("profs", "Enseignants") + ong("livres", "Livres") + ong("props", "Propositions") + ong("stats", "Statistiques") + ong("hist", "Historique") + ong("site", "Site") + '</div>'
       + '<div class="acces-pane"' + vol("profs") + '><details class="acces-info"><summary>Comment ça marche</summary><p class="sous">Touche « Choisir les livres » pour cocher les livres d\'un enseignant, ou ses programmes (EGI, Plomberie) pour tout lui donner d\'un coup. Pastille verte : venu dans les 7 derniers jours. Les changements partent en ligne quand tu touches « Publier ».</p></details>'
       + '<div class="acces-outils"><input type="text" id="gQ" enterkeyhint="search" placeholder="Chercher un nom…" value="' + esc(FILTRE.q) + '" autocomplete="off">'
       + '<select id="gTri" title="Trier"><option value="nom"' + (FILTRE.tri === "nom" ? " selected" : "") + '>Trier : nom de famille</option><option value="prog"' + (FILTRE.tri === "prog" ? " selected" : "") + '>Trier : programme</option><option value="peu"' + (FILTRE.tri === "peu" ? " selected" : "") + '>Trier : moins de livres</option></select>'
@@ -417,6 +418,7 @@ window.ACCES = (function(){
       + '<div class="acces-pane"' + vol("props") + '><div id="gProps"><p class="sous">Chargement…</p></div></div>'
       + '<div class="acces-pane"' + vol("stats") + '>' + volStats + '</div>'
       + '<div class="acces-pane"' + vol("hist") + '>' + volHist + '</div>'
+      + '<div class="acces-pane"' + vol("site") + '><div id="gSite"></div></div>'
       + (aRech.length ? '<label class="acces-rech"><input type="checkbox" id="gRech" checked><span><b>Couper vraiment l\'accès</b> : nouvelle clé pour ' + aRech.map(f => '« ' + esc(titreDe(f)) + ' »').join(", ") + '. Une vieille copie gardée par quelqu\'un qui n\'a plus l\'accès ne s\'ouvrira plus (un peu plus long à publier).</span></label>' : '')
       + (jeton   /* clé déjà enregistrée : invisible et impossible à changer dans le panneau (demande de Jeremy, 8 nov.); redemandée seulement si GitHub la refuse */
         ? '<input type="hidden" id="gJeton" value="">'
@@ -528,7 +530,7 @@ window.ACCES = (function(){
         if (JSON.stringify(REGL) !== JSON.stringify(REGLAGES)) fichiers["reglages.json"] = JSON.stringify(REGL, null, 1);
         if (!Object.keys(fichiers).length) return dessinerGerer({ ok:"Rien à publier : tout est déjà en ligne." });
         bt.textContent = "Envoi…";
-        await commitGitHub(jt, fichiers, "Administration : " + [fichiers["comptes.json"] && "accès", fichiers["reglages.json"] && "réglages des livres", rch.length && rch.length + " livre(s) rechiffré(s)"].filter(Boolean).join(", "));
+        await commitGitHub(jt, fichiers, "Administration : " + [fichiers["comptes.json"] && "accès", fichiers["reglages.json"] && "réglages", rch.length && rch.length + " livre(s) rechiffré(s)"].filter(Boolean).join(", "));
         BROUILLON = D2; DATA = clone(D2); rch.forEach(f => delete CLES[f]); FORCER_RECH.clear(); if (fichiers["reglages.json"]){ appliquerReglages(clone(REGL)); }
         try { localStorage.setItem("accesCopie", JSON.stringify(DATA)); } catch(e){}
         box().classList.remove("large", "gestion"); box().innerHTML = succes('Publié !', '<p class="sous">Les changements seront en ligne d\'ici une minute ou deux.</p><div class="acces-btns" style="justify-content:center"><button id="gRet">Retour aux accès</button><button class="prim" id="gFin2">Fermer</button></div>');
@@ -538,7 +540,7 @@ window.ACCES = (function(){
         dessinerGerer({ err:refusee ? "GitHub a refusé la clé enregistrée (elle a peut-être expiré). Demande à Claude de la remplacer." : "Publication impossible : " + e.message}); } };
   }
   let STATS = null, HIST = null;
-  function voletCharge(){ if (ONGLET === "props" && window.MESDOCS) MESDOCS.panneau(document.getElementById("gProps")); if (ONGLET === "stats") chargerStats(); if (ONGLET === "hist") chargerHist(); }
+  function voletCharge(){ if (ONGLET === "props" && window.MESDOCS) MESDOCS.panneau(document.getElementById("gProps")); if (ONGLET === "stats") chargerStats(); if (ONGLET === "hist") chargerHist(); if (ONGLET === "site" && window.ADMIN_SITE) ADMIN_SITE.dessiner(document.getElementById("gSite"), REGL, () => dessinerGerer()); }
   async function chargerStats(){ if (STATS) return dessinerStats();
     try { STATS = await COFFRE.statsLire(); } catch(e){ const z = document.getElementById("gStats"); if (z) z.innerHTML = '<div class="acces-vide">' + ICO.stats + '<p>Les statistiques commencent dès que la table <b>stats</b> existe dans Supabase (commande SQL envoyée par Claude). Elles se remplissent ensuite toutes seules.</p></div>'; return; }
     dessinerStats(); }

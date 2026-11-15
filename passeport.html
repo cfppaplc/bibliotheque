@@ -733,6 +733,7 @@ async function vueProf(){
   $("#bMaj").onclick = () => releve(true);
   $("#bPart").onclick = dlgPartage; majPart();
   $("#bProt").hidden = !localStorage.ghJeton; $("#bProt").onclick = editerProt;
+  if (/[?&]formations=1/.test(location.search) && localStorage.ghJeton) setTimeout(editerProt, 600);
   const s = await COFFRE.session(); window.__moi = s && s.id; majPart();
   COFFRE.demarrer("passeport", { cles:[CLE, CLE_J, "passQrTailles", "passSuivi", SY.cle], fusion:{ [CLE]:fusion }, apres:() => { D = lireD(); dessiner(); } });
   releve(); setInterval(() => { if (document.visibilityState === "visible" && $("#ov").hidden) releve(); }, 30000);

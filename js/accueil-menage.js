@@ -202,6 +202,7 @@
   const lireEd = () => [...document.querySelectorAll("#mnListeEd .mt-r")].map(r => ({t: r.querySelector(".mt-t").value.trim(),
       d: r.querySelector("textarea").value.split("\n").map(l => l.replace(/^[•\-*]\s*/, "").trim()).filter(Boolean).join(" · ")})).filter(x => x.t);
   document.getElementById("mnVoir").onclick = () => { APERCU = {taches: lireEd(), equipes: +document.getElementById("mnEq").value, depart: DEPART}; rendu = ""; if (window.menageReste == null) window.menageReste = 2.5; fermerEd(); force = true; cle = new Date().toISOString().slice(0, 10) + "|manuel"; mini = false; el.classList.remove("mini"); verifier(); };
+  if (/[?&]menage=1/.test(location.search)) setTimeout(() => document.getElementById("b-menage").click(), 800);
   document.getElementById("b-menageReg").onclick = () => { document.getElementById("b-cancel").click(); document.getElementById("b-menage").click(); };
   /* Fermeture secrète (9 nov., Jeremy) : garder le doigt 3 s sur le titre « Ménage de l'atelier » → fermé pour cette fois (onglet en cours) */
   { const h = el.querySelector(".mn-tete h2"); let tm = null;

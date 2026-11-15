@@ -353,3 +353,27 @@
   /* menu Plus du cellulaire */
   body.clair .plus-poignee{background:#d4d0c8}body.clair .plus-sheet button{color:#1d1d1f}
   body.clair .plus-sheet button:active{background:#f3f1ed}body.clair .plus-sheet .plus-x{background:#f3f1ed;color:#3d3d42}
+/* Administration → Site (15 nov.) */
+.as-grille{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+@media (max-width:760px){.as-grille{grid-template-columns:1fr}}
+.as-carte{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:16px 18px}
+.as-carte h3{margin:0 0 12px;font-size:1.02rem}
+.as-l{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.07)}
+.as-l i{width:10px;height:10px;border-radius:50%;background:#7a8195;flex:none}
+.as-l.ok i{background:#2fae6b}.as-l.ko i{background:#e0533d}.as-l.ko b{color:#f08a76}
+.as-l span{flex:1;opacity:.85}.as-l b{font-weight:600}
+#asRe{margin-top:12px}
+.as-reg{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.as-seg{display:flex;gap:6px}
+.as-lien{display:flex;flex-direction:column;align-items:flex-start;width:100%;text-align:left;margin-top:8px;padding:10px 12px;border-radius:10px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);color:inherit;text-decoration:none;font:inherit;font-weight:600;cursor:pointer}
+.as-lien small{font-weight:400;opacity:.65;font-size:.8rem}
+.as-lien:hover{border-color:#EB6A22}
+.as-th{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.as-nb{font-size:.8rem;font-weight:600;background:#EB6A22;color:#fff;border-radius:20px;padding:2px 9px;margin-left:6px}
+.as-cb{font-size:.85rem;opacity:.8;display:flex;align-items:center;gap:6px}
+.as-sig{border-left:4px solid #EB6A22;background:rgba(255,255,255,.03);border-radius:8px;padding:10px 12px;margin-top:10px}
+.as-sig.err{border-left-color:#e0533d}.as-sig.fait{opacity:.5}
+.as-st{display:flex;align-items:center;gap:10px}.as-st b{flex:1}.as-st span{font-size:.8rem;opacity:.65}
+.as-sig pre{white-space:pre-wrap;font:inherit;font-size:.85rem;opacity:.85;margin:8px 0 0}
+body.clair .as-carte{background:#fff;border-color:#e3e6ee}body.clair .as-l{border-color:#eef0f5}
+body.clair .as-lien{background:#f5f6fa;border-color:#e3e6ee}body.clair .as-sig{background:#f7f8fb}

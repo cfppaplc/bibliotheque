@@ -40,13 +40,18 @@ window.mpPiedHTML = () => {
 })();
 /* Mention « ALPHA » collée au coin du logo Métier+ (8 nov., option A choisie par Jeremy). Pour la retirer : ALPHA = false. */
 (function(){
-  const ALPHA = true; if (!ALPHA) return;
+  /* (15 nov.) Étiquette réglée dans Administration → Site (reglages.json : etiquette = "ALPHA" | "BÊTA" | ""); copie locale pour l'affichage immédiat */
+  let ET = "ALPHA"; try { const v = localStorage.getItem("mpEtiquette"); if (v !== null) ET = v; } catch(e){}
+  const poserEt = v => { document.documentElement.style.setProperty("--mp-et", JSON.stringify(v)); document.documentElement.classList.toggle("sansEt", !v); ET = v; document.querySelectorAll(".mp-alpha i").forEach(i => i.textContent = v); };
+  poserEt(ET);
+  fetch("reglages.json", { cache:"no-cache" }).then(r => r.ok ? r.json() : null).then(R => { if (!R || R.etiquette === undefined) return; try { localStorage.setItem("mpEtiquette", R.etiquette); } catch(e){} poserEt(R.etiquette); }).catch(() => {});
   const st = document.createElement("style");
   st.textContent = ".logo-pav{position:relative}"
-    + ".logo-pav::after,.mp-alpha i{content:'ALPHA';position:absolute;top:-9px;font:800 9px/1 system-ui,sans-serif;font-style:normal;letter-spacing:.08em;color:#fff;background:#EB6A22;padding:3px 5px 2px;border-radius:5px;pointer-events:none;white-space:nowrap}"
+    + ".logo-pav::after,.mp-alpha i{content:var(--mp-et,'ALPHA');position:absolute;top:-9px;font:800 9px/1 system-ui,sans-serif;font-style:normal;letter-spacing:.08em;color:#fff;background:#EB6A22;padding:3px 5px 2px;border-radius:5px;pointer-events:none;white-space:nowrap}"
     + ".logo-pav::after{right:-10px}"
     + ".mp-alpha{flex:none;width:0;align-self:center;height:22px;position:relative;overflow:visible!important;min-width:0!important;padding:0!important;border:0!important;background:none!important}.mp-alpha i{right:-6px;top:-10px}"
     + ".reader.wbon .reader-bar>.mp-alpha{order:-2}.reader:not(.wbon) .reader-bar>.mp-alpha{display:none}"
+    + "html.sansEt .logo-pav::after,html.sansEt .mp-alpha{display:none!important}"
     + "@media (max-width:640px){.logo-pav::after,.mp-alpha i{font-size:8px;padding:2px 4px 1px;top:-8px}}";
   document.head.append(st);
   const poser = () => document.querySelectorAll(".mp-tete, .pl-top, .act-top, .reader-bar").forEach(bar => {
@@ -54,7 +59,7 @@ window.mpPiedHTML = () => {
     const imgs = [...bar.children].filter(e => e.tagName === "IMG" && /metier-plus/.test(e.getAttribute("src") || ""));
     if (!imgs.length) return;
     const g = parseFloat(getComputedStyle(bar).columnGap) || 0;   // l'espace ajouté par la pastille est repris : rien ne bouge
-    const s = document.createElement("span"); s.className = "mp-alpha"; s.style.marginLeft = (-g) + "px"; s.innerHTML = "<i>ALPHA</i>"; s.setAttribute("aria-hidden", "true");
+    const s = document.createElement("span"); s.className = "mp-alpha"; s.style.marginLeft = (-g) + "px"; s.innerHTML = "<i></i>"; s.firstChild.textContent = ET; s.setAttribute("aria-hidden", "true");
     const o = getComputedStyle(imgs[imgs.length - 1]).order; if (!bar.classList.contains("reader-bar") && o !== "0") s.style.order = o;   // logo placé en tête par « order »
     imgs[imgs.length - 1].after(s);
   });
