@@ -145,6 +145,8 @@ main{max-width:1500px}
 .pe-pl button{min-width:44px;min-height:44px;border-radius:10px;border:1px solid var(--ligne);background:var(--fond);color:var(--txt);font-weight:700;font-size:15px;cursor:pointer}
 .pe-pl button.on{background:#EB6A22;border-color:#EB6A22;color:#fff}
 #peLoc{min-height:44px;border-radius:10px;border:1px solid var(--ligne);background:var(--carte);color:var(--txt);padding:0 12px;font-size:15px;font-weight:600}
+.ga-toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,20px);background:#1E2A44;color:#fff;padding:12px 18px;border-radius:12px;font-weight:600;font-size:15px;opacity:0;pointer-events:none;transition:.25s;z-index:9999}
+.ga-toast.on{opacity:1;transform:translate(-50%,0)}
 </style>
 <script>
 /* Même thème que la bibliothèque : choix gardé dans localStorage.accueilClair, sinon l'ordinateur */
@@ -270,17 +272,41 @@ main{max-width:1500px}
     dlg.querySelectorAll("[data-eq]").forEach(b => b.onclick = () => { changerEquipe(id, +b.dataset.eq); });
     if (!dlg.open) dlg.showModal();
   }
-  /* changer d'équipe : registre (prénom → équipe) puis inventaire des coffres touchés */
+  /* codes des élèves de l'équipe n dans le local at (même règle que coffres.html) */
+  function codesEq(n, at){ const P = PASS(); if (!P) return []; const ga = g => ((P.D.grp || {})[g] || {}).at || "";
+    return Object.values(P.D.el).filter(e => !e.x && e.eq === n && e.c && (!ga(e.g) || ga(e.g) === at)).map(e => String(e.c)).sort(); }
+  const coffreNum = (C, x, at) => Object.entries(C.K.cf).find(([, c]) => !c.x && numC(c.nom) === x && (!at || c.at === at));
+  /* lance la remise et note l'équipe d'avant, pour pouvoir annuler (15 nov.) */
+  function lancer(C, ids, avant){
+    if (!ids.length) return; C.nouvelInventaire(ids);
+    ids.forEach(id => { const dn = Object.values(C.K.ev).filter(e => e.cf === id && e.k === "nouveau").sort((a, b) => a.d - b.d).pop(); if (dn) Object.assign(dn, avant[id], { t:Date.now() }); });
+    C.sauver(); }
+  /* annulation : un coffre en attente (personne n'a encore scanné) dont l'équipe et le local sont redevenus ceux d'avant revient comme avant */
+  function annuler(C){
+    const faits = [], P = PASS(); if (!C || !P) return faits;
+    for (const [id, c] of Object.entries(C.K.cf)){ if (c.x) continue;
+      const E2 = Object.values(C.K.ev).filter(e => e.cf === id).sort((a, b) => a.d - b.d), dn = E2.filter(e => e.k === "nouveau").pop();
+      if (!dn || !dn.eqAvant || E2.some(e => (e.k === "ok" || e.k === "manque") && e.d > dn.d)) continue;
+      const atG = ((P.D.grp || {})[dn.g] || {}).at || "";
+      if (atG !== (dn.atAvant || "") || codesEq(numC(c.nom), c.at).join() !== dn.eqAvant.join()) continue;
+      dn.k = "annule"; dn.t = Date.now(); c.tour = Math.max(0, (c.tour || 1) - 1); c.chg = false; c.t = Date.now(); faits.push(id); }
+    if (faits.length){ C.sauver(); setTimeout(() => C.publier(), 300); }
+    return faits; }
+  /* changer d'équipe : registre (prénom → équipe) puis inventaire des coffres touchés, ou annulation si on revient en arrière */
   function changerEquipe(id, n, sansFiche){
     const P = PASS(); if (!ADM() || !P || !P.D.el[id]) return; const ancien = P.D.el[id].eq || 0; if (ancien === n) return;
+    const g = P.D.el[id].g, at = grpAt(g), C = CF(), avant = {};
+    const touches = C ? [ancien, n].filter(Boolean).map(x => coffreNum(C, x, at)).filter(Boolean) : [];
+    touches.forEach(([cid, c]) => avant[cid] = { eqAvant:codesEq(numC(c.nom), c.at), atAvant:at, g });
     P.D.el[id].eq = n || undefined; P.D.el[id].t = Date.now(); P.sauver();
-    const C = CF(); if (C){ const ids = [];
-      [ancien, n].forEach(x => { if (!x) return; const c = Object.entries(C.K.cf).find(([, c]) => !c.x && numC(c.nom) === x && (!grpAt(P.D.el[id].g) || c.at === grpAt(P.D.el[id].g))); if (!c) return;
-        const st = C.etat(Object.assign({ id:c[0] }, c[1])); const dn = Object.values(C.K.ev).filter(e => e.cf === c[0] && e.k === "nouveau").pop(), pr = Object.values(C.K.ev).filter(e => e.cf === c[0] && (e.k === "ok" || e.k === "manque") && (!dn || e.d > dn.d));
-        if (pr.length && !st.att) ids.push(c[0]); });
-      if (ids.length) C.nouvelInventaire(ids); setTimeout(() => C.publier(), 300); }
+    if (C){ const ann = annuler(C);
+      const ids = touches.map(([cid]) => cid).filter(cid => !ann.includes(cid) && (() => { const c = C.K.cf[cid], st = C.etat(Object.assign({ id:cid }, c));
+        const dn = Object.values(C.K.ev).filter(e => e.cf === cid && e.k === "nouveau").pop(), pr = Object.values(C.K.ev).filter(e => e.cf === cid && (e.k === "ok" || e.k === "manque") && (!dn || e.d > dn.d));
+        return pr.length && !st.att; })());
+      lancer(C, ids, avant); if (ann.length) toast(ann.length > 1 ? "Changements annulés : les coffres reviennent comme avant." : "Changement annulé : le coffre revient comme avant."); setTimeout(() => C.publier(), 300); }
     charger(); dessiner(); if (!sansFiche) fiche(id);
   }
+  function toast(t){ let d = document.querySelector(".ga-toast"); if (!d){ d = document.createElement("div"); d.className = "ga-toast"; document.body.appendChild(d); } d.textContent = t; d.classList.add("on"); clearTimeout(toast.t); toast.t = setTimeout(() => d.classList.remove("on"), 3500); }
   /* onglets */
   function onglet(t){
     document.querySelectorAll(".ga-ong button").forEach(b => b.classList.toggle("on", b.dataset.t === t));
@@ -308,8 +334,9 @@ main{max-width:1500px}
     const ids = ancien && C ? Object.entries(C.K.cf).filter(([id, c]) => !c.x && c.at === ancien && eqs.includes(numC(c.nom))).filter(([id, c]) => { const st = C.etat(Object.assign({ id }, c)); return st.der && !st.att; }).map(([id]) => id) : [];
     const nomA = ((K.at || {})[ancien] || {}).nom || "";
     if (ids.length && !confirm(`Fin de session dans ${nomA} : les ${ids.length} équipes du groupe ${g} feront la remise de leurs coffres. Continuer ?`)){ majLoc(); return; }
+    const avant = {}; ids.forEach(id => { const c = C.K.cf[id]; avant[id] = { eqAvant:codesEq(numC(c.nom), c.at), atAvant:ancien, g }; });
     P.D.grp[g] = Object.assign({}, P.D.grp[g] || {}, { at:neuf || undefined, t:Date.now() }); P.sauver();
-    if (ids.length) C.nouvelInventaire(ids); if (C) setTimeout(() => C.publier(), 300);
+    if (C){ const ann = annuler(C); lancer(C, ids.filter(id => !ann.includes(id)), avant); if (ann.length) toast("Fin de session annulée : les coffres reviennent comme avant."); setTimeout(() => C.publier(), 300); }
     charger(); dessiner(); };
   $("#gaQ").onclick = () => $("#gaAide").showModal();
   $("#peG").onchange = () => { const g = groupe(); localStorage.setItem("passeportGroupe", g); const P = PASS(); if (P) P.groupe(g); dessiner(); };
