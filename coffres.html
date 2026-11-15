@@ -134,9 +134,10 @@ html.eleve body{background:var(--fond)}
 .engage{color:var(--gris);font-size:14px;line-height:1.45;margin:12px 0}
 .fini{text-align:center;padding:40px 10px}.fini .rond{width:96px;height:96px;border-radius:50%;background:var(--vert);color:#fff;display:grid;place-items:center;font-size:52px;margin:0 auto 18px}
 .err{color:#D9534F;font-weight:650;margin-top:10px}
+.btn.danger{color:#c0392b!important;font-weight:700}
 </style>
 <style>
-body.lecteur #bAtN,body.lecteur #bCfN,body.lecteur #bInv,body.lecteur #bQr,body.lecteur #bPart{display:none}
+body.lecteur #bAtN,body.lecteur #bAtX,body.lecteur #bCfN,body.lecteur #bInv,body.lecteur #bQr,body.lecteur #bPart{display:none}
 .cfs{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
 .cf{all:unset;box-sizing:border-box;cursor:pointer;background:var(--carte);border:1px solid var(--ligne);border-left:8px solid var(--gris);border-radius:14px;padding:14px 16px;display:grid;gap:4px;min-height:96px}
 .cf b{font-size:18px}.cf small{color:var(--gris);line-height:1.35}
@@ -204,6 +205,7 @@ html.sombre .mq{background:#3a1f1d;color:#f3c2bd}
     <select id="atS" aria-label="Atelier"></select>
     <button class="btn" id="bAtN">+ Atelier</button>
     <button class="btn" id="bCfN">+ Coffre</button>
+    <button class="btn lien" id="bAtX" hidden>Retirer l'atelier</button>
     <span class="esp"></span>
     <button class="btn" id="bMaj">Actualiser</button>
     <button class="btn" id="bInv" title="Début ou fin de session : chaque équipe refait l'inventaire de son coffre">Inventaire de l'atelier</button>
@@ -405,6 +407,7 @@ function appliquerSync(P, de){ const E = lireEnv(), e = E[de] = E[de] || {}; let
 function fusion(a, b){ const A = Object.assign(vide(), JSON.parse(a || "null") || {}), B = JSON.parse(b || "null") || {};
   for (const k of ["at", "cf", "ev", "vus", "part"]){ const y = B[k] || {}; for (const i in y){ const x = A[k][i]; if (!x || (typeof y[i] === "object" ? (y[i].t || 0) > (x.t || 0) : y[i] > x)) A[k][i] = y[i]; } }
   return JSON.stringify(A); }
+function majAtX(){ const b = $("#bAtX"); if (b) b.hidden = !(window.ADMIN && K.at[AT] && !K.at[AT].x); }
 const ateliers = () => Object.entries(K.at).filter(([, a]) => !a.x).sort((a, b) => a[1].nom.localeCompare(b[1].nom, "fr"));
 /* coffres affichés : les miens + ceux des ateliers que des collègues partagent avec moi (lecture seule) */
 const coffresDe = at => { const M = Object.entries(K.cf).filter(([, c]) => !c.x && c.at === at).map(([id, c]) => Object.assign({ id, moi:true }, c));
@@ -446,7 +449,7 @@ function dessiner(){
   const A = ateliers(); if (!K.at[AT] && !PARTAGES[AT]) AT = (A[0] || [])[0] || Object.keys(PARTAGES)[0] || "";
   $("#atS").innerHTML = A.map(([id, a]) => `<option value="${id}" ${id === AT ? "selected" : ""}>${esc(a.nom)}</option>`).join("")
     + Object.entries(PARTAGES).map(([id, p]) => `<option value="${id}" ${id === AT ? "selected" : ""}>${esc(p.nom)} (de ${esc(p.deNom)})</option>`).join("") || `<option value="">Aucun atelier</option>`;
-  const mien = !!K.at[AT]; $("#bCfN").disabled = $("#bInv").disabled = $("#bQr").disabled = $("#bPart").disabled = !mien;
+  majAtX(); const mien = !!K.at[AT]; $("#bCfN").disabled = $("#bInv").disabled = $("#bQr").disabled = $("#bPart").disabled = !mien;
   const L = $("#cfs"); if (!AT){ L.innerHTML = `<div class="vide">${window.ADMIN ? "Commence par créer un atelier." : "Aucun coffre partagé avec toi pour l'instant. L'administrateur crée les ateliers et les coffres, puis les partage avec les enseignants qui les utilisent."}</div>`; return; }
   const C = coffresDe(AT);
   if (!C.length){ L.innerHTML = `<div class="vide">Aucun coffre dans cet atelier. Touche « + Coffre ».</div>`; return; }
@@ -477,7 +480,7 @@ function coffreOuvrir(id){
     <div id="lst" class="lst${prop || !liste.length ? " ed" : ""}"></div>
     ${mien ? `<div class="lact"><button class="btn" id="aMod">${liste.length ? "Modifier la liste" : "Écrire la liste"}</button>${autres.length ? `<select id="aCp"><option value="">Copier d'un autre coffre…</option>${autres.map(([i, c]) => `<option value="${i}">${esc(c.nom)}</option>`).join("")}</select>` : ""}</div>` : `<div class="lact"><button class="btn" id="aMod">Modifier la liste</button></div><p class="info">Coffre partagé par ${esc(((COMPTES[cf.de] || {}).nom || cf.de || "").split(" ")[0])} : vous voyez le même historique. Tu peux changer la liste; seul lui peut demander un nouvel inventaire.</p>`}
     ${hist ? `<details class="hd"><summary>Historique</summary>${hist}<button class="btn lien" id="aImp" style="margin-top:8px">Imprimer tout l'historique</button></details>` : ""}
-    <div class="act">${mien ? `<button class="btn lien" id="aRn">Renommer</button><span class="esp"></span>` : ""}${mqH ? `<button class="btn vert" id="aRg">Remis en ordre</button>` : ""}${mien ? `<button class="btn" id="aEtat" title="Remettre le coffre dans l'état de ton choix (en cas de bogue)">Changer l'état…</button>` : ""}<button class="btn" id="aF">Fermer</button><button class="btn p" id="aOk" hidden>${prop ? "Approuver la liste" : "Enregistrer"}</button></div>`);
+    <div class="act">${mien ? `<button class="btn lien" id="aX">Retirer le coffre</button><button class="btn lien" id="aRn">Renommer</button><span class="esp"></span>` : ""}${mqH ? `<button class="btn vert" id="aRg">Remis en ordre</button>` : ""}${mien ? `<button class="btn" id="aEtat" title="Remettre le coffre dans l'état de ton choix (en cas de bogue)">Changer l'état…</button>` : ""}<button class="btn" id="aF">Fermer</button><button class="btn p" id="aOk" hidden>${prop ? "Approuver la liste" : "Enregistrer"}</button></div>`);
   let L = liste.map(x => ({ q:x.q, n:x.n }));
   const lst = $("#lst"), ed = () => lst.classList.contains("ed");
   const peindre = () => {
@@ -534,7 +537,7 @@ function coffreOuvrir(id){
       toast(k === "ok" ? "Le coffre est en fonctionnement normal" : k === "rem" ? "Remise à faire par l'équipe qui l'avait" : "En attente de la nouvelle équipe"); }); };
   if ($("#aRg")) $("#aRg").onclick = () => { K.ev["r" + nid()] = { cf:id, k:"regle", d:Date.now(), t:Date.now(), par:window.__moi }; sauver(); fermer(); dessiner(); toast("Coffre remis en ordre"); };
   if ($("#aRn")) $("#aRn").onclick = () => { const n = prompt("Nouveau nom du coffre", K.cf[id].nom); if (n && n.trim()){ K.cf[id].nom = n.trim().slice(0, 40); K.cf[id].t = Date.now(); sauver(); fermer(); dessiner(); } };
-  let sur = 0; if ($("#aX")) $("#aX").onclick = e => { if (!sur++){ e.target.textContent = "Sûr ? Touche encore"; return; } K.cf[id] = { x:1, t:Date.now(), at:"", nom:"" }; sauver(); fermer(); dessiner(); };
+  let sur = 0; if ($("#aX")) $("#aX").onclick = e => { if (!sur++){ e.target.textContent = "Son code QR ne marchera plus. Touche encore pour retirer"; e.target.classList.add("danger"); return; } K.cf[id] = { x:1, t:Date.now(), at:"", nom:"" }; sauver(); fermer(); dessiner(); };
 }
 /* dépôts des élèves (chiffrés pour ma clé) : coffres|<moi>|0, 1, 2… */
 let RELEVE = false;
@@ -578,13 +581,14 @@ function imprimerQr(){
 function imprimerQrChoix(S){
   const s = window.__moi; if (!s) return toast("Connecte-toi d'abord à la bibliothèque.");
   const base = location.href.replace(/[^/]*$/, "") + "coffres.html", Z = $("#qrs"); Z.innerHTML = "";
-  coffresDe(AT).filter(c => c.moi && S.has(c.id)).forEach(cf => {
+  coffresDe(AT).filter(c => c.moi && S.has(c.id)).forEach(cf => { if (K.cf[cf.id] && !K.cf[cf.id].qr) K.cf[cf.id].qr = Date.now();
     const c = document.createElement("div"); c.className = "qc cfq";
     const nu = (String(cf.nom).match(/\d+/) || [])[0];
     const gros = nu || esc(cf.nom).slice(0, 4);
     c.innerHTML = `<div class="cg"><i>+</i><small>COFFRE</small><b class="${String(gros).length > 2 ? "lg" : ""}">${gros}</b></div><div class="cd"><div class="q"></div><div class="cx"><img class="l" src="img/metier-plus.svg" alt=""><strong>${esc(K.at[AT].nom)}</strong>Scanne en prenant le coffre.</div></div>`;
     Z.appendChild(c); new QRCode(c.querySelector(".q"), { text:base + "?c=" + encodeURIComponent(cf.id) + "&e=" + encodeURIComponent(s), width:360, height:360, correctLevel:QRCode.CorrectLevel.H }); if (window.qrLogo) qrLogo(c.querySelector(".q"));
   });
+  sauver(); majAtX();
   setTimeout(() => { Z.querySelectorAll("canvas").forEach(c => { const i = c.parentNode.querySelector("img:not(.qrLogo)"); if (i && i.src) c.remove(); }); window.mpImprimerQrs ? mpImprimerQrs("metierplus-codes-coffres") : print(); }, 600);
 }
 function dlgPartage(){
@@ -610,6 +614,10 @@ async function vueProf(){
   $("#bAtN").onclick = () => { const n = prompt("Nom de l'atelier (ex. « Atelier EGI »)"); if (!n || !n.trim()) return; const id = "at-" + nid(); K.at[id] = { nom:n.trim().slice(0, 40), t:Date.now() }; AT = id;
     const nb = Math.min(40, Math.max(0, parseInt(prompt("Combien de coffres dans cet atelier ? (tu pourras en ajouter plus tard)", "10"), 10) || 0));
     for (let i = 1; i <= nb; i++) K.cf["c" + nid() + i] = { at:id, nom:"Coffre " + i, liste:[], t:Date.now() }; localStorage.setItem("coffresAtelierChoisi", AT); sauver(); dessiner(); majPart(); };
+  { let sur = 0, tm; $("#bAtX").onclick = e => { if (!sur++){ const n = coffresDe(AT).filter(c => c.moi).length; e.target.textContent = n ? "Les codes QR de ses " + n + " coffres ne marcheront plus. Touche encore" : "Sûr ? Touche encore"; e.target.classList.add("danger"); tm = setTimeout(() => { sur = 0; e.target.textContent = "Retirer l'atelier"; e.target.classList.remove("danger"); }, 4000); return; } clearTimeout(tm); sur = 0; e.target.textContent = "Retirer l'atelier"; e.target.classList.remove("danger");
+    if (!K.at[AT]) return; const t = Date.now();
+    Object.keys(K.cf).forEach(c => { if (K.cf[c].at === AT) K.cf[c] = { x:1, t, at:"", nom:"" }; }); K.at[AT] = { x:1, t, nom:"" };
+    AT = (ateliers()[0] || [""])[0]; localStorage.setItem("coffresAtelierChoisi", AT); sauver(); dessiner(); majPart(); }; }
   $("#bCfN").onclick = () => { const n = prompt("Nom du coffre (ex. « Coffre 3 » ou « Cabine 3 »)", "Coffre " + (coffresDe(AT).length + 1)); if (!n || !n.trim()) return;
     const id = "c" + nid(); K.cf[id] = { at:AT, nom:n.trim().slice(0, 40), liste:[], t:Date.now() }; sauver(); dessiner(); coffreOuvrir(id); };
   $("#cfs").onclick = e => { const b = e.target.closest("[data-cf]"); if (b) coffreOuvrir(b.dataset.cf); };
