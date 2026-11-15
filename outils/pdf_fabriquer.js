@@ -1,15 +1,17 @@
-// PDF d'un livre (15 nov.) : node outils/pdf_fabriquer.js <fichier>  (lit /home/claude/originaux/livres/<fichier>.html, écrit <fichier>.pdf dans le dossier courant)
+// PDF d'un livre (15 nov.; version élève : réponses cachées, pages « Animation » / « Guide animé » retirées) : node outils/pdf_fabriquer.js <fichier>  (lit /home/claude/originaux/livres/<fichier>.html, écrit <fichier>.pdf dans le dossier courant)
 const {chromium}=require('playwright');const fs=require('fs');(async()=>{const b=await chromium.launch();const p=await b.newPage({viewport:{width:816,height:1056}});
 const f=process.argv[2];
 await p.goto('file:///home/claude/originaux/livres/'+f+'.html');await p.waitForTimeout(2000);
 const css=fs.readFileSync('/home/claude/bibliotheque/format/livre-mp.css','utf8');
 const info=await p.evaluate(css=>{const s=document.createElement('style');s.id='mp-commun';s.textContent=css;document.head.appendChild(s);
+ document.querySelectorAll('section.page,div.page').forEach(e=>{const h=((e.querySelector('h1,h2:not(.mod),h3,.ttl')||{}).textContent||'').trim();
+  if(/^\W*Animation(?![a-zà-ÿ])/.test(h)||/Guide animé/.test(e.textContent)||e.querySelector('[class*="dmc-"]'))e.remove();});
  document.querySelectorAll('section.page,div.page').forEach(e=>e.classList.add('hcur','live','vis','cur'));
  const P=[...document.querySelectorAll('section.page,div.page')];const b=P[1].getBoundingClientRect();return [P.length,b.width,b.height]},css);
 console.log(info);
 await p.addStyleTag({content:`@page{size:8.5in 11in;margin:0}html,body{margin:0!important;padding:0!important;background:#fff!important}
 html,body{height:auto!important;overflow:visible!important}#spread,#book,#stage,#desk{display:block!important;position:static!important;height:auto!important;width:auto!important;overflow:visible!important;transform:none!important;left:auto!important;top:auto!important}
-section.page,div.page{display:block!important}section.page[data-aff=flex]{display:flex!important}svg.fx{display:none!important}html body .page.pdfcache.pdfcache.pdfcache[class]{display:none!important}.page.pdfder{break-after:auto!important;page-break-after:auto!important}
+section.page,div.page{display:block!important}section.page[data-aff=flex]{display:flex!important}svg.fx{display:none!important}:is(.reponse,.answer,.solution,.correction,[data-reponse],[data-answer],.ans):not(.exa){visibility:hidden!important}html body .page.pdfcache.pdfcache.pdfcache[class]{display:none!important}.page.pdfder{break-after:auto!important;page-break-after:auto!important}
 section.page,div.page{position:relative!important;max-height:11in!important;break-inside:avoid;break-after:page;page-break-after:always;margin:0!important;box-shadow:none!important;overflow:hidden!important}`});
 await p.waitForTimeout(2500);
 const N=info[0], T=60, parts=[];
