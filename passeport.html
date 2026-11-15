@@ -633,7 +633,7 @@ async function vueProf(){
     const n = e.target.closest("button[data-el]"); if (n) eleveOuvrir(n.dataset.el); };
   $("#bQr").onclick = dlgQr;
   $("#bCodes").onclick = () => { const L = eleves(GRP).filter(e => e.c); if (!L.length) return toast("Aucun élève dans ce groupe.");
-    $("#qrs").innerHTML = L.map(e => `<div class="ce2"><img src="img/metier-plus.svg" alt=""><small>Code Métier+ · ${esc(GRP)}</small><b>${esc(e.p)}</b><span class="n">${esc(e.c)}</span><i>Registre et coffres</i></div>`).join("");
+    $("#qrs").innerHTML = L.map(e => `<div class="ce2"><img src="img/metier-plus.svg" alt=""><small>Code Métier+ · ${esc(GRP)}</small><b>${esc(e.p)}</b><span class="n">${esc(e.c)}</span></div>`).join("");
     setTimeout(() => print(), 300); };
   $("#bMaj").onclick = () => releve(true);
   $("#bPart").onclick = dlgPartage; majPart();
