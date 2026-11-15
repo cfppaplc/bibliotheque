@@ -28,6 +28,8 @@
 
 **Normes des livres : `NORMES_LIVRES.md`** (format, réponses, table des matières, animations fluides). À relire et appliquer **à chaque nouveau livre ou mise à jour**; la mettre à jour quand la bibliothèque change (aussi copiée dans le projet claude.ai « site web bibliotheque » : `claude/normes-livres.md`).
 
+**Livres : modifier directement l'original clair (15 nov., Jeremy : « on n'a plus besoin des conversations des livres, tu vas pouvoir modifier chacun »).** La source de chaque livre est maintenant son original clair `/home/claude/originaux/livres/<f>.html` (pas les anciens scripts de fabrication `/home/claude/egi_men/`, `c6/`, etc., qui écraseraient les corrections faites depuis). Pour toute correction : modifier l'original, tester, `python3 outils/chiffrer.py <original> <f>` (mêmes comptes qu'avant), refaire le PDF (`pdf_fabriquer.js` → `pdf_compresser.py` → `pdf_livres.py`), monter `version` dans `LIVRES`, publier. Garder une copie de sauvegarde des originaux à jour (ce dossier disparaît si la session est recréée).
+
 ## Fichiers
 | Fichier | Rôle |
 |---|---|
