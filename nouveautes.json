@@ -1,11 +1,11 @@
 [
  {
   "titre": "Inventaire des coffres",
-  "date": "2026-11-14",
+  "date": "2026-11-15",
   "texte": "Un code QR par coffre. L'élève qui prend un coffre touche « Tout est là » ou ce qui manque : tu sais toujours qui l'avait juste avant.",
   "formation": [
    {
-    "t": "Labo → « Inventaire des coffres ». Choisis l'atelier en haut (ou « + Atelier »)."
+    "t": "Outils → « Inventaire des coffres ». Choisis l'atelier en haut (ou « + Atelier »)."
    },
    {
     "t": "« + Coffre » pour chaque coffre, puis « Codes QR à imprimer » : colle le code sur le coffre."
@@ -23,20 +23,21 @@
     "t": "Coffre rouge = il manque quelque chose. Touche-le : qui l'a signalé, et qui l'avait juste avant. « Remis en ordre » quand c'est réglé."
    },
    {
-    "t": "« Partager » : les collègues qui utilisent l'atelier voient les coffres, et les scans de leurs cours arrivent chez toi aussi."
+    "t": "« Partager » : les collègues de l'atelier voient les coffres avec le même historique que toi (même ce qui a été fait avant), et leurs « Remis en ordre » arrivent chez toi."
    }
   ],
   "versions": [
+   "15 nov. : nouvel onglet « Outils »; historique partagé avec les collègues.",
    "14 nov. : nouveau."
   ]
  },
  {
-  "date": "2026-11-14",
+  "date": "2026-11-15",
   "titre": "Registre de formation",
   "texte": "Un code QR par outil, pour tous tes groupes. L'élève le scanne, suit la formation de l'outil, coche chaque étape, écrit son prénom et son groupe, puis signe avec son doigt. Tu reçois sa signature et la date dans ton passeport.",
   "formation": [
    {
-    "t": "Labo → Registre de formation."
+    "t": "Outils → Registre de formation."
    },
    {
     "t": "Crée ton groupe (ex. « 2608 »)."
@@ -61,9 +62,13 @@
    },
    {
     "t": "Démonstration : après la signature, l'élève fait 2 ou 3 manipulations devant toi. Touche sa case orange ◐, coche ce qui est réussi, puis « Compétence démontrée » : la case devient verte."
+   },
+   {
+    "t": "« Partager » : tu choisis le collègue et le groupe. Vous avez alors le même registre : signatures, démonstrations approuvées et validations, même celles d'avant le partage."
    }
   ],
   "versions": [
+   "15 nov. : nouvel onglet « Outils »; registre identique pour les collègues d'un groupe partagé.",
    "14 nov. : démonstration devant l'enseignant obligatoire (2 ou 3 manipulations par outil); suivi des sorties d'outils retiré.",
    "14 nov. : un élève déjà formé n'a plus à refaire la formation sur un autre appareil (« J'ai déjà ma formation » + son code).",
    "14 nov. : suivi des sorties pour les outils choisis (les plus chers) + historique de 60 jours.",

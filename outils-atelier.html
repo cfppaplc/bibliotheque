@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<!-- © 2026 Jérémy Raymond. Tous droits réservés. Copie, modification ou revente interdites sans autorisation écrite (voir LICENCE.md). -->
+<meta charset="utf-8"><script src="vieux-navigateur.js"></script><script src="signaler.js"></script><script src="plein-ecran.js"></script>
+<link rel="icon" href="img/metier-plus-icone.svg" type="image/svg+xml">
+<script src="garde.js"></script>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Métier+ — Outils</title>
+<style>
+:root{--fond:#141414;--carte:#1F1F1F;--carte2:#2A2A2A;--txt:#F2EFEA;--gris:#A8A29A;--ligne:#333;--rouge:#EB6A22;--violet:#534AB7}
+html.clair{--fond:#F3F1EC;--carte:#fff;--carte2:#F1EEE8;--txt:#24211E;--gris:#6B665E;--ligne:#E2DDD3}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--fond);color:var(--txt);font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+.haut{display:flex;align-items:center;gap:14px;padding:18px 4vw;border-bottom:1px solid var(--ligne)}
+.haut a{color:var(--txt);text-decoration:none;border:1px solid var(--ligne);border-radius:10px;padding:10px 14px;font-weight:600;font-size:15px;min-height:46px;display:inline-flex;align-items:center}
+.haut h1{margin:0;font-size:22px;flex:1}
+.logo{height:30px}.lg-c{display:none}html.clair .lg-c{display:block}html.clair .lg-b{display:none}
+.haut h1 span{color:var(--gris);font-weight:500;font-size:15px;margin-left:8px}
+main{padding:28px 4vw 60px;max-width:1300px;margin:0 auto}
+.intro{color:var(--gris);font-size:16px;margin:0 0 22px;max-width:760px;line-height:1.5}
+h2{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--gris);margin:28px 0 12px}
+.grille{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.carte{background:var(--carte);border-radius:16px;overflow:hidden;display:flex;flex-direction:column;border:1px solid var(--ligne);text-decoration:none;color:inherit;transition:transform .2s,box-shadow .2s}
+a.carte:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(0,0,0,.35)}
+.vis{height:170px;display:flex;align-items:center;justify-content:center;position:relative}
+.vis svg{width:150px;height:auto}
+.corps{padding:16px 18px 18px;display:flex;flex-direction:column;gap:8px;flex:1}
+.corps b{font-size:18px}
+.corps p{margin:0;color:var(--gris);font-size:14px;line-height:1.45;flex:1}
+.tags{display:flex;gap:6px;flex-wrap:wrap}
+.tags span{font-size:12px;font-weight:700;border-radius:20px;padding:3px 10px;background:var(--carte2);color:var(--gris)}
+.go{margin-top:6px;background:var(--rouge);color:#fff;border-radius:10px;padding:12px;text-align:center;font-weight:700;font-size:15px}
+.bientot{opacity:.6}.bientot .go{background:var(--carte2);color:var(--gris)}
+.etapes{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.etapes div{background:var(--carte);border:1px solid var(--ligne);border-radius:14px;padding:14px 16px;font-size:14px;color:var(--gris);line-height:1.45}
+.etapes b{display:block;color:var(--txt);font-size:15px;margin-bottom:4px}
+.etapes i{font-style:normal;display:inline-flex;width:26px;height:26px;border-radius:50%;background:var(--violet);color:#fff;align-items:center;justify-content:center;font-weight:800;margin-bottom:6px}
+@media (max-width:640px){.haut h1 span{display:none}.grille{grid-template-columns:1fr}}
+@media (max-width:640px){ .haut{display:flex;flex-wrap:wrap;align-items:center;row-gap:10px} .haut .logo{order:1} .haut a{order:2;margin-left:auto;white-space:nowrap}
+  .haut h1{order:3;flex-basis:100%;font-size:1.35rem;margin:0} .haut h1 span{display:block;margin:2px 0 0} }
+
+
+/* Labo refait (9 nov.) */
+main{max-width:1500px}
+.lb-hero{display:flex;align-items:center;gap:22px;margin:8px 0 6px}
+.lb-ico{width:64px;height:64px;border-radius:16px;background:#1E2A44;display:grid;place-items:center;flex:none}
+.lb-hero h1{margin:0;font-size:40px;line-height:1.1}.lb-hero p{margin:4px 0 0;color:var(--gris);font-size:17px}
+.lb-q{margin-left:auto;width:46px;height:46px;border-radius:50%;border:1px solid var(--ligne);background:var(--carte);color:var(--gris);font-weight:800;font-size:18px;cursor:pointer;flex:none}
+.lb-rep{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px}
+.lb-rc{background:var(--carte);border:1px solid var(--ligne);border-radius:16px;padding:14px;display:flex;gap:14px;align-items:center;text-decoration:none;color:inherit}
+.lb-rc img{width:72px;height:72px;object-fit:cover;border-radius:10px;flex:none;background:var(--carte2)}
+.lb-rc b{display:block;font-size:16px}.lb-rc small{color:var(--gris)}
+.lb-btn{margin-left:auto;background:var(--rouge);color:#fff;border-radius:10px;padding:10px 16px;font-weight:700;font-size:14px;white-space:nowrap}
+.lb-btn.m{background:#1E2A44}html:not(.clair) .lb-btn.m{background:#2B3B5E}
+.lb-act{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px}
+.lb-c{background:#1E2A44;color:#fff;border-radius:18px;overflow:hidden;position:relative;text-decoration:none;display:flex;flex-direction:column;transition:transform .2s,box-shadow .2s}
+.lb-c:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(0,0,0,.3)}
+.lb-im{height:150px;display:grid;place-items:center;background:linear-gradient(135deg,#1E2A44,#2B3B5E)}.lb-im svg{width:140px}
+.lb-bd{padding:16px 18px 18px;display:flex;flex-direction:column;gap:8px;flex:1}.lb-bd b{font-size:19px}
+.lb-bd p{margin:0;color:#c9d1e0;font-size:14px;line-height:1.45;flex:1}
+.lb-tags{display:flex;gap:6px;flex-wrap:wrap}.lb-tags span{font-size:12px;font-weight:600;background:#ffffff1a;padding:4px 10px;border-radius:99px}
+.lb-plus{position:absolute;right:14px;top:14px;width:34px;height:34px;border-radius:22%;background:#EB6A22;display:grid;place-items:center;font-weight:900;font-size:24px;line-height:1}
+.lb-2e{color:var(--gris);font-size:13px;margin:6px 2px 20px}.lb-2e a{color:#EB6A22;font-weight:700;text-decoration:none}
+.lb-qz{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:22px 16px;padding:4px 2px 14px}
+.lb-t,.lb-nouv{text-decoration:none;color:inherit;min-width:0}
+.lb-cv{position:relative;height:226px;border-radius:12px;overflow:hidden;background:var(--carte2);box-shadow:0 6px 18px rgba(0,0,0,.15);transition:transform .2s}
+.lb-cv::before{content:"";position:absolute;inset:-20px;background:var(--u) center/cover;filter:blur(18px) brightness(.8)}
+.lb-cv img{position:relative;width:100%;height:100%;object-fit:contain}
+.lb-t:hover .lb-cv{transform:translateY(-3px)}
+.lb-t b{display:block;font-size:14px;margin-top:8px;line-height:1.25}.lb-t small{color:var(--gris);font-size:12.5px}
+.lb-nouv{height:226px;border:2px dashed var(--ligne);border-radius:12px;display:grid;place-items:center;color:var(--gris);font-weight:700;text-align:center;box-sizing:border-box}
+#lbDlg{border:0;border-radius:18px;padding:22px;max-width:860px;width:calc(100% - 40px);background:var(--fond);color:var(--txt)}
+#lbDlg::backdrop{background:rgba(0,0,0,.5)}#lbDlg h3{margin:0 0 14px;font-size:22px}
+#lbDlg>button{margin-top:16px;background:var(--rouge);color:#fff;border:0;border-radius:10px;padding:12px 20px;font-weight:700;font-size:15px;cursor:pointer}
+.etapes i{background:#EB6A22!important}
+@media (max-width:640px){.lb-hero h1{font-size:30px}.lb-ico{width:52px;height:52px}.lb-rep,.lb-act{grid-template-columns:1fr}}
+/* transitions douces entre les pages (8 nov.) */
+@view-transition{navigation:auto}
+::view-transition-old(root),::view-transition-new(root){animation-duration:.22s}
+</style>
+<script>
+/* Même thème que la bibliothèque : choix gardé dans localStorage.accueilClair, sinon l'ordinateur */
+(function(){ let c = null; try { c = localStorage.getItem("accueilClair"); } catch(e) {}
+  const clair = c === "1" || (c === null && matchMedia("(prefers-color-scheme: light)").matches);
+  if (clair) document.documentElement.classList.add("clair"); })();
+</script>
+</head>
+<body>
+<div class="mp-tete"><img class="lg-b" src="img/metier-plus-blanc.svg" alt="Métier+"><img class="lg-c" src="img/metier-plus.svg" alt="Métier+"><a class="mp-retour" href="./">‹ Bibliothèque</a><h1 class="mp-nom">Outils</h1><span class="mp-sous">Formations et inventaires de l'atelier</span><nav class="mp-nav" aria-label="Outils"><a href="./" data-nav="biblio"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h12v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5"/></svg>Bibliothèque</a><a href="./?ouvrir=plans" data-nav="plans"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3z"/><path d="M9 3v15M15 6v15"/></svg>Plans</a><a href="./?ouvrir=activites" data-nav="activites"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4h6v3H9zM9 12h6M9 16h4"/></svg>Formatifs</a><a href="outils-atelier.html" data-nav="outils" class="ici" aria-current="page"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z"/></svg>Outils</a><a href="labo.html" data-nav="labo"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-9V3"/></svg>Labo</a><a href="./?ouvrir=accueil" data-nav="accueil"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Accueil de classe</a><a href="./?ouvrir=tableau" data-nav="tableau"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>Tableau blanc</a></nav><span class="mp-esp"></span></div>
+<main>
+<div class="lb-hero"><div class="lb-ico"><svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="#EB6A22" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z"/></svg></div>
+<div><h1>Outils</h1><p>Formation à la sécurité des outils et inventaire des coffres : l'élève scanne un code QR, tu as le registre.</p></div></div>
+<h2>Gestion de l'atelier</h2>
+<div class="lb-act">
+<a class="lb-c" href="passeport.html"><span class="lb-plus">+</span><div class="lb-im"><svg viewBox="0 0 120 90" aria-hidden="true"><rect x="26" y="8" width="68" height="76" rx="8" fill="#ffffff1f" stroke="#fff" stroke-width="2"/><rect x="38" y="20" width="18" height="18" rx="2" fill="#fff"/><rect x="64" y="20" width="18" height="18" rx="2" fill="#fff"/><rect x="38" y="44" width="18" height="18" rx="2" fill="#fff"/><path d="M40 74c6-8 10 4 16-4s8 6 14-2" stroke="#EB6A22" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="73" cy="53" r="9" fill="#1E8A55"/><path d="M69 53l3 3 5-6" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg></div>
+<div class="lb-bd"><b>Registre de formation</b><p>Un code QR sur chaque outil : l'élève suit la formation, coche chaque étape et signe. Tu reçois sa signature et la date.</p><div class="lb-tags"><span>Atelier</span><span>Nouveau</span></div></div></a>
+<a class="lb-c" href="coffres.html"><span class="lb-plus">+</span><div class="lb-im"><svg viewBox="0 0 120 90" aria-hidden="true"><rect x="18" y="30" width="84" height="48" rx="6" fill="#ffffff1f" stroke="#fff" stroke-width="2"/><path d="M18 44h84" stroke="#fff" stroke-width="2"/><rect x="50" y="20" width="20" height="12" rx="3" fill="none" stroke="#fff" stroke-width="2"/><circle cx="84" cy="62" r="10" fill="#1E8A55"/><path d="M79 62l3.5 3.5 6-7" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round"/></svg></div><div class="lb-bd"><b>Inventaire des coffres</b><p>Un code QR par coffre : l'élève qui le prend touche « Tout est là » ou ce qui manque. Tu sais qui l'avait juste avant.</p></div></a>
+</div>
+</main>
+<div class="droits" style="text-align:center;font-size:12px;opacity:.6;padding:18px 12px 24px">© 2026 Jérémy Raymond · Tous droits réservés</div>
+</body>
+</html>

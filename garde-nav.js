@@ -5,16 +5,17 @@ window.MP_NAV = [
   ["biblio", "Bibliothèque", '<path d="M4 5a2 2 0 0 1 2-2h12v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5"/>'],
   ["plans", "Plans", '<path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3z"/><path d="M9 3v15M15 6v15"/>'],
   ["activites", "Formatifs", '<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4h6v3H9zM9 12h6M9 16h4"/>'],
+  ["outils", "Outils", '<path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z"/>'],
   ["labo", "Labo", '<path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-9V3"/>'],
   ["accueil", "Accueil de classe", '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'],
   ["tableau", "Tableau blanc", '<rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/>']];
-window.mpNavHTML = ici => '<nav class="mp-nav" aria-label="Outils">' + MP_NAV.map(([k, t, d]) => `<a href="${k === "labo" ? "labo.html" : k === "biblio" ? "./" : "./?ouvrir=" + k}" data-nav="${k}"${k === ici ? ' class="ici" aria-current="page"' : ""}><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>${t}</a>`).join("") + "</nav>";
+window.mpNavHTML = ici => '<nav class="mp-nav" aria-label="Outils">' + MP_NAV.map(([k, t, d]) => `<a href="${k === "labo" ? "labo.html" : k === "outils" ? "outils-atelier.html" : k === "biblio" ? "./" : "./?ouvrir=" + k}" data-nav="${k}"${k === ici ? ' class="ici" aria-current="page"' : ""}><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>${t}</a>`).join("") + "</nav>";
 
 
 /* Pied de page commun (8 nov., piste A choisie par Jeremy) : logo + phrase, colonnes Outils et Aide, bande ©, « Né au Pavillon de l'Avenir ».
    Dans la bibliothèque, les liens ouvrent l'outil sans recharger (index.html les intercepte); ailleurs : index.html?ouvrir=… */
 window.mpPiedHTML = () => {
-  const outils = MP_NAV.map(([k, t]) => `<li><a href="${k === "labo" ? "labo.html" : k === "biblio" ? "./" : "./?ouvrir=" + k}" data-pied="${k}">${t}</a></li>`).join("");
+  const outils = MP_NAV.map(([k, t]) => `<li><a href="${k === "labo" ? "labo.html" : k === "outils" ? "outils-atelier.html" : k === "biblio" ? "./" : "./?ouvrir=" + k}" data-pied="${k}">${t}</a></li>`).join("");
   return '<div class="mp-pied-haut"><div class="mp-pied-marque"><img class="lg-b" src="img/metier-plus-blanc.svg" alt="Métier+"><img class="lg-c" src="img/metier-plus.svg" alt="Métier+">'
     + '<p>La plateforme pédagogique des enseignants en formation professionnelle. Livres animés, plans, formatifs, quiz et simulations.</p></div>'
     + '<div><h4>Outils</h4><ul>' + outils + '</ul></div>'

@@ -95,7 +95,7 @@ body.inclus .mp-nav{display:none!important}
 `; (document.head || document.documentElement).appendChild(st); })();
 
 /* barre de navigation commune : définie dans garde-nav.js (aussi chargé par la bibliothèque) */
-(function(){ const ici = "labo";
+(function(){ const ici = /passeport|coffres|outils-atelier/.test(location.pathname) ? "outils" : "labo";
   const poser = () => window.mpNavHTML && document.querySelectorAll(".mp-tete").forEach(h => { if (h.querySelector(".mp-nav")) return; const e = h.querySelector(".mp-esp"); if (e) e.insertAdjacentHTML("beforebegin", mpNavHTML(ici)); });
   const s = document.createElement("script"); s.src = "garde-nav.js"; s.onload = () => { if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", poser); else poser(); };
   (document.head || document.documentElement).appendChild(s); })();
