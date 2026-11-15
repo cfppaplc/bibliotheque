@@ -172,7 +172,7 @@ main{max-width:1500px}
 <main>
 <div class="ga-hero"><div class="lb-ico"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#EB6A22" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z"/></svg></div><h1>Gestion d'atelier</h1></div>
 <div class="ga-bar"><select id="peG" aria-label="Groupe"></select><button id="gaGrpN" class="pe-plb" hidden>+ Groupe</button><div class="ga-reg"><button id="peReg" class="pe-plb" hidden aria-haspopup="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Réglages du groupe</button>
-<div id="peRegM" hidden><button id="mPl"><b>Placer les équipes</b><small>Un toucher par élève</small></button><button id="peLoc"><b>Locaux</b><small>Choisir les locaux</small></button><button id="peShare"><b>Partager</b><small>Avec un collègue</small></button></div></div>
+<div id="peRegM" hidden><button id="mPl"><b>Placer les équipes</b><small>Un toucher par élève</small></button><button id="peLoc"><b>Locaux</b><small>Choisir les locaux</small></button><button id="peShare"><b>Partager</b><small>Avec un collègue</small></button><button id="mEff"><b>Effacer ce groupe</b><small>Fin d'année : signatures du groupe effacées</small></button></div></div>
 <div class="ga-ong" role="tablist"><button data-t="el" class="on">Élèves</button><button data-t="fo">Formations</button><button data-t="co">Coffres</button></div>
 <button class="lb-q" id="gaQ" aria-label="Aide">?</button></div>
 <div id="afaire"></div>
@@ -286,13 +286,14 @@ main{max-width:1500px}
       if (x.k === "ok") H.push([x.d, (x.r ? "Remet " : "Prend ") + cn + " : tout est là"]); else if (x.k === "manque") H.push([x.d, cn + " : signale " + (x.items || []).map(i => i.n).join(", ")]); else if (x.k === "liste") H.push([x.d, "Écrit la liste de " + cn]); });
     H.sort((a, b) => b[0] - a[0]);
     const ini = (e.p || "?").split(/\s+/).map(m => m[0]).join("").slice(0, 2).toUpperCase();
-    dlg.innerHTML = `<div class="fi-t"><div class="fi-av">${esc(ini)}</div><div><h3>${esc(e.p)}</h3><small>${esc(e.g || "")}${e.c ? " · code " + esc(e.c) : ""}</small></div><button data-x aria-label="Fermer">✕</button></div>
+    dlg.innerHTML = `<div class="fi-t"><div class="fi-av">${esc(ini)}</div><div><h3>${esc(e.p)}</h3><small>${esc(e.g || "")}${e.c ? " · code " + esc(e.c) : ""}</small></div>${ADM() ? `<button data-mod class="fi-imp" style="margin-left:auto;font:inherit;font-size:13px;font-weight:700;color:#EB6A22;background:none;border:0;cursor:pointer;min-height:40px">Modifier</button>` : ""}<button data-x aria-label="Fermer">✕</button></div>
       <div class="fi-b"><h4>Équipe (coffre et ménage)</h4>${ADM() ? `<div class="fi-eq"><button data-eq="0" class="${e.eq ? "" : "on"}">Aucune</button>${Array.from({ length:max }, (_, i) => `<button data-eq="${i + 1}" class="${e.eq === i + 1 ? "on" : ""}">${i + 1}</button>`).join("")}</div>
       <p class="fi-note">Changer d'équipe fait refaire l'inventaire des coffres touchés : l'équipe qui quitte le remet, la nouvelle le prend.</p>` : `<div class="fi-l"><div>${e.eq ? "Équipe " + e.eq : "Aucune équipe"}</div></div><p class="fi-note">Seul l'administrateur place les élèves dans les équipes.</p>`}
       <h4>Coffre${cfs.length > 1 ? "s" : ""}</h4><div class="fi-l">${cfs.length ? cfs.map(cf => `<div><span class="s ${cf.s.mq.length ? "r" : "ok"}">${cf.s.mq.length ? "!" : "✓"}</span>${esc(cf.nom)}${grpAts().length > 1 ? " · " + esc(nomAt(cf.at)) : ""}<small>${cf.s.mq.length ? "Manque : " + esc(cf.s.mq.join(", ")) : cf.s.att ? "changement d'équipe en cours" : cf.s.der ? "" : "pas encore scanné"}</small></div>`).join("") : `<div><span class="s">–</span>${e.eq ? "Aucun coffre numéro " + e.eq : "Choisis son équipe pour lui donner un coffre"}</div>`}</div>
       <h4>Formations · ${O.length - reste} sur ${O.length}</h4><div class="fi-l">${fo || `<div><span class="s">–</span>Aucune formation encore</div>`}</div>
       <h4>Historique <button class="fi-imp" data-imp style="float:right;font:inherit;font-size:13px;font-weight:700;color:#EB6A22;background:none;border:0;cursor:pointer;min-height:40px">Imprimer tout</button></h4><div class="fi-l">${H.slice(0, 10).map(([t, x]) => `<div>${esc(x)}<small>${date(t)}</small></div>`).join("") || `<div>Rien encore</div>`}</div></div>`;
     dlg.querySelector("[data-x]").onclick = () => dlg.close();
+    { const m = dlg.querySelector("[data-mod]"); if (m) m.onclick = () => { dlg.close(); viaFormations(w => w.eleveOuvrir(e.id)); }; }
     dlg.querySelector("[data-imp]").onclick = () => mpImprimer("Historique · " + e.p, [e.g, e.c ? "code " + e.c : "", e.eq ? "équipe " + e.eq : ""].filter(Boolean).join(" · "), ["Date et heure", "Action"], H.map(([t, x]) => [mpDateHeure(t), x]));
     dlg.querySelectorAll("[data-eq]").forEach(b => b.onclick = () => { changerEquipe(id, +b.dataset.eq); });
     if (!dlg.open) dlg.showModal();
@@ -369,20 +370,24 @@ main{max-width:1500px}
   let PLACE = false;
   $("#pePl").onclick = () => { PLACE = false; dessiner(); };
   /* boutons du registre sur la page Élèves : ouvrent la fenêtre dans l'onglet Formations, puis reviennent */
-  function viaFormations(id){ const w = fFo.contentWindow, d = w && w.document, bt = d && d.getElementById(id); if (!bt) return;
-    const av = localStorage.getItem("gestionOnglet") || "el"; onglet("fo"); bt.click();
+  function viaFormations(id){ const w = fFo.contentWindow, d = w && w.document; if (!d) return;
+    const bt = typeof id === "function" ? null : d.getElementById(id); if (!bt && typeof id !== "function") return;
+    const av = localStorage.getItem("gestionOnglet") || "el"; onglet("fo"); if (bt) bt.click(); else id(w);
     const ov = d.getElementById("ov"); if (!ov) return;
     const mo = new MutationObserver(() => { if (ov.hidden){ mo.disconnect(); onglet(av); setTimeout(() => { charger(); dessiner(); }, 300); } });
     mo.observe(ov, { attributes:true, attributeFilter:["hidden"] }); }
   $("#gaGrpN").onclick = () => viaFormations("bGrpN");
   $("#gaEl").onclick = () => viaFormations("bEl");
   $("#gaCodes").onclick = () => viaFormations("bCodes");
+  let surEff = 0; $("#mEff").onclick = () => { const B = $("#mEff b"), b = fFo.contentDocument && fFo.contentDocument.getElementById("bEffG"); if (!b || !groupe()) return;
+    if (!surEff++){ B.textContent = "Sûr ? Touche encore"; setTimeout(() => { surEff = 0; B.textContent = "Effacer ce groupe"; }, 4000); return; }
+    surEff = 0; B.textContent = "Effacer ce groupe"; fermerMenu(); b.click(); b.click(); setTimeout(() => { charger(); dessiner(); }, 300); };
   $("#mPl").onclick = () => { PLACE = true; fermerMenu(); onglet("el"); dessiner(); };
   /* menu « Réglages du groupe » (administrateur) : placer les équipes, locaux, partager */
   const fermerMenu = () => { $("#peRegM").hidden = true; };
   $("#peReg").onclick = ev => { ev.stopPropagation(); $("#peRegM").hidden = !$("#peRegM").hidden; };
   document.addEventListener("click", ev => { if (!ev.target.closest(".ga-reg")) fermerMenu(); });
-  $("#peRegM").addEventListener("click", ev => { if (ev.target.closest("button")) fermerMenu(); });
+  $("#peRegM").addEventListener("click", ev => { const b = ev.target.closest("button"); if (b && !(b.id === "mEff" && surEff)) fermerMenu(); });
   /* local du groupe : changer de local (ou « Entre deux sessions ») = remise des coffres de ses équipes dans l'ancien local */
   function majLoc(){
     const b = $("#peLoc"), A = Object.entries(K.at || {}).filter(([, a]) => !a.x), L = grpAts().map(nomAt).filter(Boolean);
