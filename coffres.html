@@ -135,6 +135,7 @@ html.eleve body{background:var(--fond)}
 .err{color:#D9534F;font-weight:650;margin-top:10px}
 </style>
 <style>
+body.lecteur #bAtN,body.lecteur #bCfN,body.lecteur #bInv,body.lecteur #bQr,body.lecteur #bPart{display:none}
 .cfs{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
 .cf{all:unset;box-sizing:border-box;cursor:pointer;background:var(--carte);border:1px solid var(--ligne);border-left:8px solid var(--gris);border-radius:14px;padding:14px 16px;display:grid;gap:4px;min-height:96px}
 .cf b{font-size:18px}.cf small{color:var(--gris);line-height:1.35}
@@ -363,7 +364,7 @@ function dessiner(){
   $("#atS").innerHTML = A.map(([id, a]) => `<option value="${id}" ${id === AT ? "selected" : ""}>${esc(a.nom)}</option>`).join("")
     + Object.entries(PARTAGES).map(([id, p]) => `<option value="${id}" ${id === AT ? "selected" : ""}>${esc(p.nom)} (de ${esc(p.deNom)})</option>`).join("") || `<option value="">Aucun atelier</option>`;
   const mien = !!K.at[AT]; $("#bCfN").disabled = $("#bInv").disabled = $("#bQr").disabled = $("#bPart").disabled = !mien;
-  const L = $("#cfs"); if (!AT){ L.innerHTML = `<div class="vide">Commence par créer un atelier.</div>`; return; }
+  const L = $("#cfs"); if (!AT){ L.innerHTML = `<div class="vide">${window.ADMIN ? "Commence par créer un atelier." : "Aucun coffre partagé avec toi pour l'instant. L'administrateur crée les ateliers et les coffres, puis les partage avec les enseignants qui les utilisent."}</div>`; return; }
   const C = coffresDe(AT);
   if (!C.length){ L.innerHTML = `<div class="vide">Aucun coffre dans cet atelier. Touche « + Coffre ».</div>`; return; }
   L.innerHTML = C.map(cf => { const s = etat(cf), n = Object.keys(s.mq).length;
@@ -472,7 +473,11 @@ const majPart = () => { const l = (K.part[AT] && K.part[AT].l) || []; $("#bPart"
 async function vueProf(){
   $("#vueProf").hidden = false;
   /* premiers ateliers : les locaux déjà créés pour le ménage */
-  if (!Object.keys(K.at).length){ try { const L = (await (await fetch("locaux.json", { cache:"no-store" })).json()).locaux || []; L.forEach(l => K.at[l.id] = { nom:l.nom, t:1 }); } catch(e) {} }
+  /* 14 nov. : seul l'administrateur crée les ateliers et les coffres; les collègues voient ceux qu'il partage avec eux */
+  const s0 = await COFFRE.session(); try { COMPTES = (await (await fetch("comptes.json", { cache:"no-store" })).json()).comptes || {}; } catch(e) {}
+  window.ADMIN = !!(s0 && COMPTES[s0.id] && COMPTES[s0.id].admin);
+  if (!ADMIN) document.body.classList.add("lecteur");
+  if (ADMIN && !Object.keys(K.at).length){ try { const L = (await (await fetch("locaux.json", { cache:"no-store" })).json()).locaux || []; L.forEach(l => K.at[l.id] = { nom:l.nom, t:1 }); } catch(e) {} }
   dessiner();
   $("#atS").onchange = e => { AT = e.target.value; localStorage.setItem("coffresAtelierChoisi", AT); dessiner(); majPart(); };
   $("#bAtN").onclick = () => { const n = prompt("Nom de l'atelier (ex. « Atelier EGI »)"); if (!n || !n.trim()) return; const id = "at-" + nid(); K.at[id] = { nom:n.trim().slice(0, 40), t:Date.now() }; AT = id; localStorage.setItem("coffresAtelierChoisi", AT); sauver(); dessiner(); majPart(); };
