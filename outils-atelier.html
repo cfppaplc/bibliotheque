@@ -141,6 +141,14 @@ main{max-width:1500px}
 .pe-plb{min-height:44px;border-radius:10px;border:1px solid var(--ligne);background:var(--carte);color:var(--txt);padding:0 16px;font-weight:700;font-size:14px;cursor:pointer;white-space:nowrap}
 .pe-plb.on{background:#EB6A22;border-color:#EB6A22;color:#fff}
 .pe-r.place{grid-template-columns:minmax(150px,1fr) 1.4fr 1.2fr;cursor:default}
+.pb{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px;align-items:start}
+.pb-col{background:var(--carte);border:1px solid var(--ligne);border-radius:14px;padding:10px;min-height:120px;transition:border-color .12s,background .12s}
+.pb-col.sans{grid-column:1/-1;min-height:70px;display:flex;flex-wrap:wrap;gap:8px;align-items:flex-start}.pb-col.sans .pb-t{width:100%}.pb-col.sans .pb-c{margin:0}
+.pb-col.sur{border-color:#EB6A22;background:color-mix(in srgb,#EB6A22 10%,var(--carte))}
+.pb-t{display:flex;justify-content:space-between;font-size:13px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--gris);margin-bottom:8px}.pb-t span{font-weight:700;letter-spacing:0}
+.pb-s{font-size:12px;color:var(--gris);margin:-4px 0 8px}
+.pb-c{display:flex;justify-content:space-between;gap:8px;align-items:center;background:var(--fond);border:1px solid var(--ligne);border-radius:10px;padding:9px 11px;margin-bottom:6px;cursor:grab;user-select:none}
+.pb-c:hover{border-color:#EB6A22}.pb-c.glisse{opacity:.4}.pb-c small{color:var(--gris);font-size:12px}
 .pe-pl{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px;border-top:1px dashed var(--ligne);padding-top:10px}
 .pe-pl button{min-width:44px;min-height:44px;border-radius:10px;border:1px solid var(--ligne);background:var(--fond);color:var(--txt);font-weight:700;font-size:15px;cursor:pointer}
 .pe-pl button.on{background:#EB6A22;border-color:#EB6A22;color:#fff}
@@ -175,7 +183,7 @@ main{max-width:1500px}
 <div id="peRegM" hidden><button id="mPl"><b>Placer les équipes</b><small>Un toucher par élève</small></button><button id="peLoc"><b>Locaux</b><small>Choisir les locaux</small></button><button id="peShare"><b>Partager</b><small>Avec un collègue</small></button><button id="mEff"><b>Effacer ce groupe</b><small>Fin d'année : signatures du groupe effacées</small></button></div></div>
 <div class="ga-ong" role="tablist"><button data-t="el" class="on">Élèves</button><button data-t="fo">Formations</button><button data-t="co">Coffres</button></div>
 <button class="lb-q" id="gaQ" aria-label="Aide">?</button></div>
-<div id="afaire"></div><div id="plBan" hidden style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:10px 0;padding:12px 16px;border-radius:12px;background:#FFF1E6;border:1px solid #EB6A22;color:#1E2A44;font-weight:600"><span style="flex:1;min-width:220px">Placement des équipes : touche le numéro de chaque élève.</span><button id="plFin" class="pe-plb on">✓ Terminé, revenir à la liste</button></div>
+<div id="afaire"></div><div id="plBan" hidden style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:10px 0;padding:12px 16px;border-radius:12px;background:#FFF1E6;border:1px solid #EB6A22;color:#1E2A44;font-weight:600"><span style="flex:1;min-width:220px">Placement des équipes : glisse chaque élève dans son équipe.</span><button id="plFin" class="pe-plb on">✓ Terminé, revenir à la liste</button></div>
 <section class="ga-t" id="t-el"><div class="pe-bar"><input id="peQ" type="search" placeholder="Chercher un élève ou un code"><button id="pePl" class="pe-plb on" hidden>Terminé</button><button id="gaEl" class="pe-plb" hidden>+ Élèves</button><button id="gaCodes" class="pe-plb" hidden>Codes des élèves</button></div><div class="pe-l" id="peL"></div></section>
 <section class="ga-t" id="t-fo" hidden><iframe id="fFo" src="passeport.html" title="Formations"></iframe></section>
 <section class="ga-t" id="t-co" hidden><iframe id="fCo" src="coffres.html" title="Coffres"></iframe></section>
@@ -265,14 +273,19 @@ main{max-width:1500px}
     return `<div class="pe-r${PLACE ? " place" : ""}" role="button" tabindex="0" data-el="${e.id}"><div class="pe-n"><b>${esc(e.p)}</b><small>${[e.c ? "code " + esc(e.c) : "", e.eq && ($("#peQ").value.trim() || PLACE) ? "équipe " + e.eq : ""].filter(Boolean).join(" · ")}</small></div><div class="pe-f"><em>${n} sur ${O.length}</em>${f}</div><div class="pe-c">${c}</div>${pl}</div>`;
   }
   function dessiner(){
-    afaire(); majLoc(); majShare(); $("#pePl").hidden = true; $("#plBan").hidden = !PLACE; $("#plBan").style.display = PLACE ? "flex" : "none";
+    afaire(); majLoc(); majShare(); $("#pePl").hidden = true; $("#plBan").hidden = !PLACE; $("#peQ").style.display = PLACE ? "none" : ""; $("#plBan").style.display = PLACE ? "flex" : "none";
     { const ac = avecCoffres(), bc = document.querySelector('.ga-ong [data-t="co"]'); bc.hidden = !ac && !ADM(); $("#mPl").hidden = false; $("#gaGrpN").hidden = !ADM(); $("#gaEl").hidden = !ADM() || !groupe() || PLACE; $("#gaCodes").hidden = !groupe() || PLACE;
       if (bc.hidden && !$("#t-co").hidden){ document.querySelectorAll(".ga-ong button").forEach(x => x.classList.toggle("on", x.dataset.t === "el")); ["el","fo","co"].forEach(x => $("#t-" + x).hidden = x !== "el"); } }
     const L = $("#peL"), q = sansAcc($("#peQ").value), g = groupe();
     if (!E.length){ L.innerHTML = `<div class="pe-vide">${!CHARGE ? "Chargement du registre et des coffres…" : G.length ? "Aucun élève dans ce groupe pour l'instant." : ADM() ? "Aucun élève pour l'instant. Ajoute-les avec « + Élèves », ou ils apparaissent quand ils signent une formation." : "Aucun groupe ne t'est encore assigné. L'administrateur te l'assigne, puis tes élèves apparaissent ici."}</div>`; return; }
     const R = E.filter(e => q ? (sansAcc(e.p).includes(q) || String(e.c || "").includes(q)) : e.g === g).sort((a, b) => a.p.localeCompare(b.p, "fr"));
     if (!R.length){ L.innerHTML = `<div class="pe-vide">Aucun élève trouvé.</div>`; return; }
-    if (q || PLACE || !(avecCoffres() || R.some(e => e.eq))){ L.innerHTML = R.map(ligne).join(""); return; }   /* en plaçant : liste par nom, les lignes ne sautent pas */
+    /* 15 nov. (« cliquer-glisser pour créer une équipe », fait à l'ordinateur) : en plaçant, une colonne par équipe */
+    if (PLACE){ const T = E.filter(e => e.g === g).sort((a, b) => a.p.localeCompare(b.p, "fr")), carte = e => `<div class="pb-c" draggable="true" data-el="${e.id}"><b>${esc(e.p)}</b>${e.c ? `<small>${esc(e.c)}</small>` : ""}</div>`;
+      L.innerHTML = `<div class="pb">${[0, ...Array.from({ length:nbEq() }, (_, i) => i + 1)].map(n => { const M = T.filter(e => (e.eq || 0) === n), cfs = n ? coffresDe(n) : [];
+        return `<div class="pb-col${n ? "" : " sans"}" data-col="${n}"><div class="pb-t">${n ? "Équipe " + n : "Sans équipe"}<span>${M.length}</span></div>${n && cfs.length === 1 ? `<div class="pb-s">${esc(cfs[0].nom)}</div>` : ""}${M.map(carte).join("")}</div>`; }).join("")}</div>`;
+      return; }
+    if (q || !(avecCoffres() || R.some(e => e.eq))){ L.innerHTML = R.map(ligne).join(""); return; }   /* en plaçant : liste par nom, les lignes ne sautent pas */
     const eqs = [...new Set(R.map(e => e.eq || 0))].sort((a, b) => (a || 999) - (b || 999));
     L.innerHTML = eqs.map(n => { const cfs = coffresDe(n);
       return `<div class="pe-eq">${n ? "Équipe " + n : "Sans équipe"}${n && cfs.length === 1 ? `<span>· ${esc(cfs[0].nom)}</span>` : ""}</div>` + R.filter(e => (e.eq || 0) === n).map(ligne).join(""); }).join("");
@@ -376,6 +389,12 @@ main{max-width:1500px}
   addEventListener("resize", taille);
   document.querySelectorAll(".ga-ong button").forEach(b => b.onclick = () => onglet(b.dataset.t));
   $("#afaire").onclick = ev => { const b = ev.target.closest("[data-o]"); if (b) onglet(b.dataset.o); };
+  { const L = $("#peL"); let id = null;
+    L.addEventListener("dragstart", ev => { const c = ev.target.closest(".pb-c"); if (!c) return; id = c.dataset.el; c.classList.add("glisse"); ev.dataTransfer.effectAllowed = "move"; try { ev.dataTransfer.setData("text/plain", id); } catch(e) {} });
+    L.addEventListener("dragend", ev => { const c = ev.target.closest(".pb-c"); if (c) c.classList.remove("glisse"); L.querySelectorAll(".pb-col.sur").forEach(x => x.classList.remove("sur")); });
+    L.addEventListener("dragover", ev => { const col = ev.target.closest(".pb-col"); if (!col || !id) return; ev.preventDefault(); L.querySelectorAll(".pb-col.sur").forEach(x => x !== col && x.classList.remove("sur")); col.classList.add("sur"); });
+    L.addEventListener("drop", ev => { const col = ev.target.closest(".pb-col"); if (!col || !id) return; ev.preventDefault(); const n = +col.dataset.col, e = E.find(z => z.id === id); const i = id; id = null;
+      if (e && (e.eq || 0) !== n) changerEquipe(i, n, true); else dessiner(); }); }
   $("#peL").onclick = ev => { const p = ev.target.closest("[data-pl]"), r = ev.target.closest("[data-el]"); if (!r) return;
     if (p){ const n = +p.dataset.pl, e = E.find(z => z.id === r.dataset.el); changerEquipe(r.dataset.el, e && e.eq === n ? 0 : n, true); return; }
     if (!PLACE) fiche(r.dataset.el); };
