@@ -168,7 +168,7 @@ html.eleve body{background:var(--fond)}
   <p class="info" id="etat"></p>
   <div id="sorties"></div>
   <div class="tw" id="tw"></div><div class="cartes" id="cm"></div>
-  <p class="info" style="margin-top:14px"><span style="color:#E08A1E">◐ orange</span> = théorie signée, démonstration à faire · ✓ vert = attestation valide (théorie + démonstration) · ✓ bleu = validé par toi. Touche une case pour voir la signature ou valider la démonstration. <button class="btn" id="bEffG" style="min-height:36px;padding:6px 12px;margin-left:8px">Effacer ce groupe</button></p>
+  <p class="info lgd" style="margin-top:14px"><span><i style="background:#FFF4E5;border:2px solid #E08A1E"></i>Démonstration à faire</span><span><i style="background:#1E8A55"></i>Formé (signé + démonstration)</span><span><i style="background:#1F5FAD"></i>Validé par toi</span><span>Touche une case pour voir la signature ou valider la démonstration.</span> <button class="btn" id="bEffG" style="min-height:36px;padding:6px 12px;margin-left:8px">Effacer ce groupe</button></p>
 </main>
 </div>
 
@@ -737,6 +737,6 @@ window.PASS = { get D(){ return D; }, groupes, get PART(){ return PART; }, get C
 </script>
 <style>body.lecteur #bGrpN,body.lecteur #bEl,body.lecteur #bEffG,body.lecteur #bPart{display:none!important}
 html.dansGestion #bGrpN,html.dansGestion #bEl,html.dansGestion #bCodes,html.dansGestion #bEffG,html.dansGestion .mp-tete,html.dansGestion .hero,html.dansGestion #grp,html.dansGestion #bPart,html.dansGestion .mp-pied{display:none!important}
-html.dansGestion main{padding-top:6px}</style>
+html.dansGestion main{padding:6px 0 30px;max-width:none}html.dansGestion #bMaj,html.dansGestion #etat{display:none!important}.lgd{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;font-size:13px;color:var(--muted,#6b6b6b)}.lgd span{display:inline-flex;align-items:center;gap:6px}.lgd i{width:14px;height:14px;border-radius:4px;display:inline-block}</style>
 </body>
 </html>
