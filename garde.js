@@ -138,17 +138,80 @@ window.mpDateHeure = t => new Date(t).toLocaleString("fr-CA", { year:"numeric", 
    dans Gestion d'atelier, la page est dans un cadre; imprimer depuis le cadre faisait planter l'aperçu.
    On imprime plutôt #qrs dans une petite fenêtre à part, avec les mêmes styles. */
 window.mpImprimerQrs = function(nom){
-  /* 15 nov. (« on devrait les télécharger avant, ça éviterait le bogue qui plante ») : les feuilles sont
-     enregistrées dans un fichier (page autonome avec ses styles et ses codes), qu'on ouvre ensuite pour imprimer. */
+  /* 15 nov. (« on devrait télécharger les codes QR en PDF ») : les feuilles sont dessinées page par page
+     (à partir de la mise en page d'impression de #qrs) puis enregistrées dans un vrai PDF, format lettre.
+     On l'ouvre et on imprime à 100 %. Rien n'est envoyé ailleurs : tout se fait dans le navigateur. */
   const Z = document.getElementById("qrs"); if (!Z) return print();
-  const styles = [...document.querySelectorAll("style")].map(s => s.outerHTML).join("");
-  const base = location.href.replace(/[?#].*$/, "").replace(/[^/]*$/, "");
-  const d = new Date(), date = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
-  const fichier = (nom || "metierplus-codes") + "-" + date + ".html";
-  const html = `<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"><base href="${base}"><title>Métier+ · ${fichier}</title>${styles}
-<style>#qrs{display:block!important}body{margin:0;background:#fff}.mp-imp{font:600 15px system-ui,sans-serif;display:flex;gap:12px;align-items:center;padding:14px 18px;background:#1E2A44;color:#fff}.mp-imp button{font:inherit;padding:10px 18px;border-radius:10px;border:0;background:#EB6A22;color:#fff;cursor:pointer}@media print{.mp-imp{display:none!important}}</style></head>
-<body><div class="mp-imp"><button onclick="print()">Imprimer</button><span>Imprime à 100 % (taille réelle).</span></div>${Z.outerHTML}</body></html>`;
-  const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([html], { type:"text/html" })); a.download = fichier;
-  document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 4000);
-  try { (window.toast || (t => alert(t)))("Fichier téléchargé : ouvre-le, puis touche « Imprimer »."); } catch(e) {}
+  const toast = window.toast || (t => alert(t));
+  try { toast("Préparation du PDF…"); } catch(e) {}
+  const css = [...document.querySelectorAll("style")].map(s => s.textContent).join("\n").replace(/@media\s+print/g, "@media all");
+  const pg = !!Z.querySelector(".pg"), IN = 96, W = 8.5 * IN, H = 11 * IN, MG = pg ? 0 : 10 / 25.4 * IN;
+  const f = document.createElement("iframe");
+  f.style.cssText = `position:fixed;left:-20000px;top:0;width:${W}px;height:${H}px;border:0;visibility:hidden`;
+  document.body.appendChild(f);
+  const d = f.contentDocument;
+  /* un canevas ne garde pas son dessin dans une copie : on le remplace par son image */
+  const cl = Z.cloneNode(true), ori = Z.querySelectorAll("canvas");
+  cl.querySelectorAll("canvas").forEach((c, i) => { const o = ori[i]; if (!o || getComputedStyle(o).display === "none") { c.remove(); return; }
+    try { const im = document.createElement("img"); im.src = o.toDataURL("image/png"); im.className = c.className; im.setAttribute("style", c.getAttribute("style") || ""); c.replaceWith(im); } catch(e) {} });
+  d.open(); d.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><base href="${location.href}"><style>${css}
+    html,body{margin:0;background:#fff}body{padding:${MG}px;width:${W}px;box-sizing:border-box}#qrs{display:block!important}</style></head><body>${cl.outerHTML}</body></html>`); d.close();
+  const fin = () => setTimeout(() => f.remove(), 500);
+  const attendre = () => Promise.all([...d.images].map(im => im.complete ? 0 : new Promise(r => { im.onload = im.onerror = r; })));
+  setTimeout(() => attendre().then(() => new Promise(r => setTimeout(r, 150))).then(async () => {
+    const Q = d.getElementById("qrs"), K = 200 / IN; /* 200 points par pouce */
+    /* pages : .pg = une page chacune; sinon les cartes coulent et on coupe entre les cartes */
+    const pages = []; /* [haut de la page, cartes de la page] */
+    if (pg) Q.querySelectorAll(".pg").forEach(p => pages.push([p.getBoundingClientRect().top, [p]]));
+    else { const hUtile = H - 2 * MG; let cur = null;
+      [...Q.children].forEach(c => { const r = c.getBoundingClientRect();
+        if (!cur || r.bottom - (cur[0] + MG) > hUtile) { cur = [r.top - MG, []]; pages.push(cur); }
+        cur[1].push(c); }); }
+    const W2 = Math.round(W * K), H2 = Math.round(H * K), jpegs = [];
+    for (const [y0, cartes] of pages) {
+      const cv = document.createElement("canvas"); cv.width = W2; cv.height = H2; const x = cv.getContext("2d");
+      x.fillStyle = "#fff"; x.fillRect(0, 0, W2, H2); x.scale(K, K); x.translate(0, -y0);
+      const tous = cartes.flatMap(c => [c, ...c.querySelectorAll("*")]);
+      for (const el of tous) {
+        const r = el.getBoundingClientRect(); if (!r.width) continue;
+        const cs = d.defaultView.getComputedStyle(el); if (cs.display === "none" || cs.visibility === "hidden") continue;
+        const rad = parseFloat(cs.borderTopLeftRadius) || 0;
+        const boite = () => { x.beginPath(); x.roundRect ? x.roundRect(r.left, r.top, r.width, r.height, rad) : x.rect(r.left, r.top, r.width, r.height); };
+        if (cs.backgroundColor && !/rgba\(.*,\s*0\)|transparent/.test(cs.backgroundColor)) { x.fillStyle = cs.backgroundColor; boite(); x.fill(); }
+        const bw = parseFloat(cs.borderTopWidth) || 0;
+        if (bw && cs.borderTopStyle !== "none") { x.save(); x.strokeStyle = cs.borderTopColor; x.lineWidth = bw; x.setLineDash(cs.borderTopStyle === "dashed" ? [4, 3] : cs.borderTopStyle === "dotted" ? [1, 2] : []);
+          x.beginPath(); x.roundRect ? x.roundRect(r.left + bw / 2, r.top + bw / 2, r.width - bw, r.height - bw, Math.max(0, rad - bw / 2)) : x.rect(r.left, r.top, r.width, r.height); x.stroke(); x.restore(); }
+        if (el.tagName === "IMG" && el.naturalWidth) { try { x.drawImage(el, r.left, r.top, r.width, r.height); } catch(e) {} }
+        if (el.tagName === "CANVAS") { try { x.drawImage(el, r.left, r.top, r.width, r.height); } catch(e) {} }
+        for (const n of el.childNodes) { if (n.nodeType !== 3 || !n.nodeValue.trim()) continue;
+          x.fillStyle = cs.color; x.font = `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`; x.textBaseline = "alphabetic";
+          try { x.letterSpacing = cs.letterSpacing === "normal" ? "0px" : cs.letterSpacing; } catch(e) {}
+          const up = cs.textTransform === "uppercase", txt = n.nodeValue, rg = d.createRange(), re = /\S+/g; let m;
+          while ((m = re.exec(txt))) { rg.setStart(n, m.index); rg.setEnd(n, m.index + m[0].length); const b = rg.getBoundingClientRect(); if (!b.width) continue;
+            const mt = x.measureText("Hg"), asc = mt.fontBoundingBoxAscent || parseFloat(cs.fontSize) * .8, des = mt.fontBoundingBoxDescent || parseFloat(cs.fontSize) * .2;
+            x.fillText(up ? m[0].toUpperCase() : m[0], b.left, b.top + (b.height - asc - des) / 2 + asc); } }
+      }
+      const u = cv.toDataURL("image/jpeg", .92); jpegs.push(Uint8Array.from(atob(u.split(",")[1]), c => c.charCodeAt(0)));
+    }
+    /* PDF fait à la main : une image JPEG par page, format lettre (612 x 792 pt) */
+    const enc = new TextEncoder(), parts = [], offs = []; let pos = 0;
+    const add = b => { const u = typeof b === "string" ? enc.encode(b) : b; parts.push(u); pos += u.length; };
+    const obj = (n, f2) => { offs[n] = pos; add(n + " 0 obj\n"); f2(); add("\nendobj\n"); };
+    add("%PDF-1.4\n%\xE2\xE3\xCF\xD3\n");
+    const np = jpegs.length, kids = []; for (let i = 0; i < np; i++) kids.push((3 + i * 3) + " 0 R");
+    obj(1, () => add("<< /Type /Catalog /Pages 2 0 R >>"));
+    obj(2, () => add(`<< /Type /Pages /Count ${np} /Kids [${kids.join(" ")}] >>`));
+    jpegs.forEach((jp, i) => { const pn = 3 + i * 3, cn = pn + 1, im = pn + 2, cs2 = "q 612 0 0 792 0 0 cm /Im0 Do Q";
+      obj(pn, () => add(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /XObject << /Im0 ${im} 0 R >> >> /Contents ${cn} 0 R >>`));
+      obj(cn, () => add(`<< /Length ${cs2.length} >>\nstream\n${cs2}\nendstream`));
+      obj(im, () => { add(`<< /Type /XObject /Subtype /Image /Width ${W2} /Height ${H2} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${jp.length} >>\nstream\n`); add(jp); add("\nendstream"); }); });
+    const nObj = 3 + np * 3, xref = pos;
+    add(`xref\n0 ${nObj}\n0000000000 65535 f \n` + offs.slice(1, nObj).map(o => String(o).padStart(10, "0") + " 00000 n \n").join(""));
+    add(`trailer\n<< /Size ${nObj} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF`);
+    const dt = new Date(), date = dt.getFullYear() + "-" + String(dt.getMonth() + 1).padStart(2, "0") + "-" + String(dt.getDate()).padStart(2, "0");
+    const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob(parts, { type:"application/pdf" })); a.download = (nom || "metierplus-codes") + "-" + date + ".pdf";
+    document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 4000);
+    try { toast(`PDF téléchargé (${np} page${np > 1 ? "s" : ""}) : ouvre-le et imprime à 100 %.`); } catch(e) {}
+    fin();
+  }).catch(e => { fin(); try { toast("Le PDF n'a pas pu être fait."); } catch(e2) {} }), 300);
 };
