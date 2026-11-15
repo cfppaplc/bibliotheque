@@ -156,6 +156,8 @@ main{max-width:1500px}
 .ga-toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,20px);background:#1E2A44;color:#fff;padding:12px 18px;border-radius:12px;font-weight:600;font-size:15px;opacity:0;pointer-events:none;transition:.25s;z-index:9999}
 .ga-toast.on{opacity:1;transform:translate(-50%,0)}
 #locDlg,#partDlg{border:0;border-radius:18px;padding:22px;max-width:520px;width:calc(100% - 28px);background:var(--fond);color:var(--txt)}
+#locDlg .pd-r{display:flex;align-items:center;gap:8px}#locDlg .pd-r label{flex:1}#locDlg .pd-ren{min-height:40px;border:0;background:transparent;color:var(--gris);text-decoration:underline;font-size:13px;cursor:pointer}
+#locDlg .pd-nv{margin:4px 0 12px;min-height:44px;border-radius:10px;border:1px dashed var(--ligne);background:transparent;color:var(--txt);padding:0 14px;font-weight:600;width:100%}
 #locDlg::backdrop,#partDlg::backdrop{background:rgba(0,0,0,.5)}#locDlg h3,#partDlg h3{margin:0 0 8px}#locDlg p,#partDlg p{color:var(--gris);margin:0 0 12px;line-height:1.45}
 .pd-l{display:flex;flex-direction:column;gap:6px}.pd-l label{display:flex;align-items:center;gap:12px;background:var(--carte);border:1px solid var(--ligne);border-radius:10px;padding:12px 14px;font-weight:600;cursor:pointer}
 .pd-l input{width:22px;height:22px}.pd-er{color:#D9534F!important}
@@ -460,9 +462,16 @@ main{max-width:1500px}
   $("#peLoc").onclick = () => {
     const P = PASS(), g = groupe(), dlg = $("#locDlg"); if (!P || !ADM() || !g) return; const A = Object.entries(K.at || {}).filter(([, a]) => !a.x), on = grpAts();
     dlg.innerHTML = `<h3>Locaux du groupe ${esc(g)}</h3><p>Coche les locaux où le groupe a des coffres. L'équipe 3 a le coffre 3 de chaque local coché.<br>Fin de session : décoche le local; chaque équipe y fait la remise de son coffre avant de partir.</p>
-      <div class="pd-l">${A.map(([id, a]) => `<label><input type="checkbox" value="${esc(id)}" ${on.includes(id) ? "checked" : ""}> ${esc(a.nom)}</label>`).join("")}</div>
+      <div class="pd-l">${A.map(([id, a]) => `<div class="pd-r"><label><input type="checkbox" value="${esc(id)}" ${on.includes(id) ? "checked" : ""}> ${esc(a.nom)}</label><button data-ren="${esc(id)}" class="pd-ren">Renommer</button></div>`).join("")}</div>
+      ${A.length ? "" : "<p>Aucun local pour l'instant.</p>"}<button data-nv class="pd-nv">+ Nouveau local</button>
       <div class="pd-a"><button data-x>Annuler</button><button data-ok class="on">Enregistrer</button></div>`;
     dlg.querySelector("[data-x]").onclick = () => dlg.close();
+    /* 15 nov. (Jeremy) : « + Atelier » est ici, dans Réglages du groupe → Locaux (même code que le bouton de l'onglet Coffres) */
+    /* renommer un local : même identifiant, donc mêmes codes QR des coffres */
+    dlg.querySelectorAll("[data-ren]").forEach(b => b.onclick = () => { const C = CF(), id = b.dataset.ren; if (!C || !C.K.at[id]) return; const n = prompt("Nouveau nom du local", C.K.at[id].nom || ""); if (!n || !n.trim()) return;
+      C.K.at[id] = Object.assign({}, C.K.at[id], { nom:n.trim().slice(0, 40), t:Date.now() }); C.sauver(); dlg.close(); setTimeout(() => { charger(); dessiner(); $("#peLoc").click(); }, 300); });
+    dlg.querySelector("[data-nv]").onclick = () => { const w = fCo.contentWindow, b = w && w.document.getElementById("bAtN"); if (!b) return; dlg.close(); b.click();
+      setTimeout(() => { charger(); dessiner(); $("#peLoc").click(); }, 300); };
     dlg.querySelector("[data-ok]").onclick = () => {
       const neuf = [...dlg.querySelectorAll("input:checked")].map(i => i.value), retires = on.filter(a => !neuf.includes(a)), C = CF();
       const eqs = [...new Set(E.filter(e => e.g === g && e.eq).map(e => e.eq))];
