@@ -264,3 +264,5 @@ body.h-rep .page.mp.adm .reponse-choix,.page.mp.adm .reponse-choix.h-vu{box-shad
 .page.mp.pi .mp-tab th,.page.mp.pi table th{background:#1e2a33!important;color:#fff!important}
 .page.mp.mp-ouv .mp-bande:has(img.mp-photo)~:is(.mp-mod,.mp-dur){background:rgba(20,24,28,.62);padding:5px 10px;border-radius:6px;text-shadow:none}
 .page.mp.em .docu .hand{font-family:MPI6,sans-serif!important;font-style:italic;color:#1d4ed8}
+/* (15 nov.) Livres au moteur d'origine (.ans sans .reponse, ex. Entretien ménager) : réponses cachées tant que le livre n'est pas en mode réponses; en pas à pas, seulement celles déjà montrées (.shown). Les lignes gardent leur place. */
+body:not(.answers) .page.mp .ans:not(.reponse):not(.exa),body.stepans .page.mp .ans:not(.reponse):not(.exa):not(.shown){visibility:hidden!important}
