@@ -187,7 +187,7 @@ html.sombre .mq{background:#3a1f1d;color:#f3c2bd}
 .hl{display:flex;gap:10px;align-items:baseline;padding:6px 0;font-size:14px}.hl .pt{width:9px;height:9px;border-radius:50%;flex:none}.pt.v{background:var(--vert)}.pt.r{background:#B3261E}.hl .hh{color:var(--gris);min-width:130px}
 .btn.lien{border:0;background:none;color:var(--gris);padding:10px 8px}
 .bx .act .esp{flex:1}
-@media print{.qc.cfq{width:88mm;--q:55mm}}
+@media print{.qc.cfq{width:88mm;--q:55mm}.qc.cfq .cfn{font-size:72pt;font-weight:900;line-height:1;margin:2mm auto 1mm;color:#fff;background:#1E2A44;border-radius:4mm;min-width:30mm;display:inline-block;padding:2mm 5mm;-webkit-print-color-adjust:exact;print-color-adjust:exact}}
 </style>
 </head>
 <body>
@@ -531,10 +531,11 @@ function imprimerQr(){
   const base = location.href.replace(/[^/]*$/, "") + "coffres.html", Z = $("#qrs"); Z.innerHTML = "";
   coffresDe(AT).filter(c => c.moi).forEach(cf => {
     const c = document.createElement("div"); c.className = "qc cfq";
-    c.innerHTML = `<img class="l" src="img/metier-plus.svg" alt=""><b>${esc(cf.nom)}</b><div class="q"></div><small>${esc(K.at[AT].nom)} · scanne en prenant le coffre</small>`;
-    Z.appendChild(c); new QRCode(c.querySelector(".q"), { text:base + "?c=" + encodeURIComponent(cf.id) + "&e=" + encodeURIComponent(s), width:600, height:600, correctLevel:QRCode.CorrectLevel.H }); if (window.qrLogo) qrLogo(c.querySelector(".q"));
+    const nu = (String(cf.nom).match(/\d+/) || [])[0];
+    c.innerHTML = `<img class="l" src="img/metier-plus.svg" alt="">${nu ? `<div class="cfn">${esc(nu)}</div>` : ""}<b>${esc(cf.nom)}</b><div class="q"></div><small>${esc(K.at[AT].nom)} · scanne en prenant le coffre</small>`;
+    Z.appendChild(c); new QRCode(c.querySelector(".q"), { text:base + "?c=" + encodeURIComponent(cf.id) + "&e=" + encodeURIComponent(s), width:360, height:360, correctLevel:QRCode.CorrectLevel.H }); if (window.qrLogo) qrLogo(c.querySelector(".q"));
   });
-  setTimeout(() => print(), 400);
+  setTimeout(() => { Z.querySelectorAll("canvas").forEach(c => { const i = c.parentNode.querySelector("img:not(.qrLogo)"); if (i && i.src) c.remove(); }); print(); }, 600);
 }
 function dlgPartage(){
   const moi = window.__moi; if (!moi || !K.at[AT]) return;
@@ -561,9 +562,12 @@ async function vueProf(){
     const id = "c" + nid(); K.cf[id] = { at:AT, nom:n.trim().slice(0, 40), liste:[], t:Date.now() }; sauver(); dessiner(); coffreOuvrir(id); };
   $("#cfs").onclick = e => { const b = e.target.closest("[data-cf]"); if (b) coffreOuvrir(b.dataset.cf); };
   $("#bQr").onclick = imprimerQr;
-  let surI = 0; $("#bInv").onclick = e => { const ids = coffresDe(AT).filter(c => c.moi).map(c => c.id); if (!ids.length) return;
-    if (!surI++){ e.target.textContent = "Sûr ? Touche encore (" + ids.length + " coffres)"; setTimeout(() => { surI = 0; e.target.textContent = "Inventaire de l'atelier"; }, 4000); return; }
-    surI = 0; e.target.textContent = "Inventaire de l'atelier"; nouvelInventaire(ids); toast("Chaque équipe fait la remise de son coffre, puis la nouvelle équipe vérifie"); }; $("#bMaj").onclick = () => { releve(true); lirePartages(); }; $("#bPart").onclick = dlgPartage;
+  $("#bInv").onclick = () => { const ids = coffresDe(AT).filter(c => c.moi).map(c => c.id); if (!ids.length) return;
+    ouvrir(`<h2 style="color:#C0392B">⚠ Inventaire de tout l'atelier</h2><p><b>${ids.length} coffre${ids.length > 1 ? "s" : ""}</b> de « ${esc((K.at[AT] || {}).nom || "l'atelier")} » vont passer en changement d'équipe.</p>
+      <ul style="margin:8px 0 12px 18px;line-height:1.5"><li>Chaque équipe actuelle devra faire la <b>remise</b> de son coffre (tout cocher).</li><li>Ensuite, la nouvelle équipe refera la <b>prise</b> du coffre.</li><li>À faire au début ou à la fin d'une session, ou quand les équipes changent.</li></ul>
+      <p style="font-size:14px;opacity:.8">Rien n'est effacé : l'historique de chaque coffre est gardé.</p>
+      <div class="act"><button class="btn" id="iNon">Annuler</button><button class="btn p" id="iOui" style="background:#C0392B;border-color:#C0392B">Oui, lancer l'inventaire</button></div>`);
+    $("#iNon").onclick = fermer; $("#iOui").onclick = () => { fermer(); nouvelInventaire(ids); toast("Chaque équipe fait la remise de son coffre, puis la nouvelle équipe vérifie"); }; }; $("#bMaj").onclick = () => { releve(true); lirePartages(); }; $("#bPart").onclick = dlgPartage;
   const s = await COFFRE.session(); window.__moi = s && s.id;
   try { COMPTES = (await (await fetch("comptes.json", { cache:"no-store" })).json()).comptes || {}; } catch(e) {}
   majPart(); sauver();

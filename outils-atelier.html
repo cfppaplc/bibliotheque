@@ -257,19 +257,19 @@ main{max-width:1500px}
     T.sort((a, b) => b[0] - a[0]); const f = T.slice(0, 3).map(t => t[1]).join("") + (T.length > 3 ? `<span>+${T.length - 3}</span>` : "");
     const L2 = avecCoffres() ? coffresDe(e.eq) : [], plus = grpAts().length > 1;
     const c = L2.length ? L2.map(cf => { const pt = cf.s.mq.length ? "r" : cf.s.att || !cf.s.der ? "g" : "";
-      return `<div><span class="pt ${pt}"></span><b>${esc(cf.nom)}</b>${plus ? ` <small style="display:inline">· ${esc(nomAt(cf.at))}</small>` : ""}<small>${cf.s.mq.length ? "Manque : " + esc(cf.s.mq.join(", ")) : cf.s.att ? "Changement d'équipe en cours" : cf.s.der ? "" : "Pas encore scanné"}</small></div>`; }).join("") : (avecCoffres() ? `<small>${e.eq ? "Pas de coffre " + e.eq : "Aucune équipe"}</small>` : "");
+      return `<div><span class="pt ${pt}"></span><b>${esc(cf.nom)}</b>${plus ? ` <small style="display:inline">· ${esc(nomAt(cf.at))}</small>` : ""}<small>${cf.s.mq.length ? "Manque : " + esc(cf.s.mq.join(", ")) : cf.s.att ? "Changement d'équipe en cours" : cf.s.der ? "" : "Pas encore scanné"}</small></div>`; }).join("") : (avecCoffres() ? `<small>${e.eq ? "Pas de coffre " + e.eq : "Aucune équipe"}</small>` : `<small>${e.eq ? "Équipe " + e.eq : "Aucune équipe"}</small>`);
     const pl = PLACE ? `<div class="pe-pl">${Array.from({ length:nbEq() }, (_, i) => `<button data-pl="${i + 1}" class="${e.eq === i + 1 ? "on" : ""}">${i + 1}</button>`).join("")}</div>` : "";
-    return `<div class="pe-r${PLACE ? " place" : ""}" role="button" tabindex="0" data-el="${e.id}"><div class="pe-n"><b>${esc(e.p)}</b><small>${e.c ? "code " + esc(e.c) : ""}</small></div><div class="pe-f"><em>${n} sur ${O.length}</em>${f}</div><div class="pe-c">${c}</div>${pl}</div>`;
+    return `<div class="pe-r${PLACE ? " place" : ""}" role="button" tabindex="0" data-el="${e.id}"><div class="pe-n"><b>${esc(e.p)}</b><small>${[e.c ? "code " + esc(e.c) : "", e.eq && ($("#peQ").value.trim() || PLACE) ? "équipe " + e.eq : ""].filter(Boolean).join(" · ")}</small></div><div class="pe-f"><em>${n} sur ${O.length}</em>${f}</div><div class="pe-c">${c}</div>${pl}</div>`;
   }
   function dessiner(){
     afaire(); majLoc(); majShare(); $("#pePl").hidden = !PLACE;
-    { const ac = avecCoffres(), bc = document.querySelector('.ga-ong [data-t="co"]'); bc.hidden = !ac && !ADM(); $("#mPl").hidden = !ac; $("#gaGrpN").hidden = !ADM(); $("#gaEl").hidden = !ADM() || !groupe() || PLACE; $("#gaCodes").hidden = !groupe() || PLACE;
+    { const ac = avecCoffres(), bc = document.querySelector('.ga-ong [data-t="co"]'); bc.hidden = !ac && !ADM(); $("#mPl").hidden = false; $("#gaGrpN").hidden = !ADM(); $("#gaEl").hidden = !ADM() || !groupe() || PLACE; $("#gaCodes").hidden = !groupe() || PLACE;
       if (bc.hidden && !$("#t-co").hidden){ document.querySelectorAll(".ga-ong button").forEach(x => x.classList.toggle("on", x.dataset.t === "el")); ["el","fo","co"].forEach(x => $("#t-" + x).hidden = x !== "el"); } }
     const L = $("#peL"), q = sansAcc($("#peQ").value), g = groupe();
     if (!E.length){ L.innerHTML = `<div class="pe-vide">${!CHARGE ? "Chargement du registre et des coffres…" : G.length ? "Aucun élève dans ce groupe pour l'instant." : ADM() ? "Aucun élève pour l'instant. Ajoute-les avec « + Élèves », ou ils apparaissent quand ils signent une formation." : "Aucun groupe ne t'est encore assigné. L'administrateur te l'assigne, puis tes élèves apparaissent ici."}</div>`; return; }
     const R = E.filter(e => q ? (sansAcc(e.p).includes(q) || String(e.c || "").includes(q)) : e.g === g).sort((a, b) => a.p.localeCompare(b.p, "fr"));
     if (!R.length){ L.innerHTML = `<div class="pe-vide">Aucun élève trouvé.</div>`; return; }
-    if (q || PLACE || !avecCoffres()){ L.innerHTML = R.map(ligne).join(""); return; }   /* en plaçant : liste par nom, les lignes ne sautent pas */
+    if (q || PLACE || !(avecCoffres() || R.some(e => e.eq))){ L.innerHTML = R.map(ligne).join(""); return; }   /* en plaçant : liste par nom, les lignes ne sautent pas */
     const eqs = [...new Set(R.map(e => e.eq || 0))].sort((a, b) => (a || 999) - (b || 999));
     L.innerHTML = eqs.map(n => { const cfs = coffresDe(n);
       return `<div class="pe-eq">${n ? "Équipe " + n : "Sans équipe"}${n && cfs.length === 1 ? `<span>· ${esc(cfs[0].nom)}</span>` : ""}</div>` + R.filter(e => (e.eq || 0) === n).map(ligne).join(""); }).join("");

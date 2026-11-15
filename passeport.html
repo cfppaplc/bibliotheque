@@ -582,9 +582,9 @@ function imprimerQr(){
     const url = base + "?o=" + encodeURIComponent(o.id) + "&e=" + encodeURIComponent(s);
     const c = document.createElement("div"); c.className = "qc " + tailleDe(o.id);
     c.innerHTML = `<img class="l" src="img/metier-plus.svg" alt=""><b>${esc(o.nom)}</b><div class="q"></div><small>${tailleDe(o.id) === "p" ? "Scanne avant d'utiliser" : "Scanne avant d'utiliser cet outil : formation et signature"}</small>`;
-    Z.appendChild(c); new QRCode(c.querySelector(".q"), { text:url, width:600, height:600, correctLevel:QRCode.CorrectLevel.H }); if (window.qrLogo) qrLogo(c.querySelector(".q"));
+    Z.appendChild(c); new QRCode(c.querySelector(".q"), { text:url, width:360, height:360, correctLevel:QRCode.CorrectLevel.H }); if (window.qrLogo) qrLogo(c.querySelector(".q"));
   });
-  setTimeout(() => print(), 400);
+  setTimeout(() => { Z.querySelectorAll("canvas").forEach(c => { const i = c.parentNode.querySelector("img:not(.qrLogo)"); if (i && i.src) c.remove(); }); print(); }, 600);
 }
 
 /* formations : l'administrateur les modifie et les publie (protocoles.json, comme les locaux du ménage) */
