@@ -137,6 +137,10 @@ html.eleve body{background:var(--fond)}
 .btn.danger{color:#c0392b!important;font-weight:700}
 .qAide{margin-left:10px;width:34px;height:34px;border-radius:50%;border:1px solid var(--ligne);background:var(--carte,#fff);color:inherit;font-weight:700;font-size:16px;cursor:pointer}.qAide.on{background:#1E2A44;color:#fff;border-color:#1E2A44}
 .aideEl{background:var(--carte,#fff);border:1px solid var(--ligne);border-radius:12px;padding:12px 14px;margin:0 0 12px;font-size:14.5px;line-height:1.5;color:var(--gris,#555)}
+.leg{display:flex;gap:6px;margin:4px 0 10px}.leg .lg{flex:1 1 0;min-width:0;display:flex;align-items:center;gap:8px;background:var(--carte,#fff);border:2px solid var(--c);border-radius:12px;padding:8px 10px;line-height:1.1}
+.leg .lg i{flex:none;width:26px;height:26px;border-radius:50%;background:var(--c);color:#fff;font-style:normal;font-weight:800;display:grid;place-items:center;font-size:15px}
+.leg .lg b{display:block;font-size:14.5px;color:var(--c)}.leg .lg>span{min-width:0}.leg .lg small{display:block;white-space:nowrap;font-size:11.5px;color:var(--gris,#666);margin-top:2px}.leg .lg span{display:block}
+.leg .v{--c:#1E8A55}.leg .m{--c:#D9534F}.leg .b{--c:#E08A1E}
 </style>
 <style>
 body.lecteur #bAtN,body.lecteur #bAtX,body.lecteur #bCfN,body.lecteur #bInv,body.lecteur #bQr,body.lecteur #bPart{display:none}
@@ -324,6 +328,8 @@ async function vueEleve(){
   const fini = (titre, txt) => { V.innerHTML = `<div class="top"><img src="${LOGO}" alt="Métier+"></div><div class="fini"><div class="rond">✓</div><h1>${titre}</h1><p class="sous">${txt}</p></div>`; };
   const tete = `<div class="top"><img src="${LOGO}" alt="Métier+"><span style="flex:1"></span><span class="tag">Inventaire</span><button class="qAide" type="button" aria-label="Comment ça marche" onclick="var a=document.getElementById('aideEl');a.hidden=!a.hidden;this.classList.toggle('on',!a.hidden)">?</button></div><span class="tag">${esc(nomAt)}</span><h1>${esc(cf.nom)}</h1>`;
   /* 15 nov. (Jeremy) : les explications sont rangées sous le « ? » */
+  /* légende toujours visible (15 nov., Jeremy) : une pastille par état, aux couleurs des outils touchés */
+  const leg = L => `<div class="leg">${L.map(([k, t, n]) => `<span class="lg ${k}"><i>${n}</i><span><b>${t}</b><small>${n === 1 ? "1 toucher" : n + " touchers"}</small></span></span>`).join("")}</div>`;
   const aide = t => `<div id="aideEl" class="aideEl" hidden>${t}</div>`;
 
   /* première fois : l'élève écrit le contenu, l'enseignant l'approuve */
@@ -342,8 +348,8 @@ async function vueEleve(){
   const deja = new Set(cf.mq || []);
   /* remise et prise (15 nov., Jeremy) : l'élève doit toucher chaque outil (présent → manquant → brisé) avant d'envoyer; le scan suivant de la même équipe reste rapide */
   if (MODE === "remise" || !mesVerrous()[cid + "|" + SES]){
-    V.innerHTML = `${tete}${MODE === "remise" ? `<p class="avisR">Remise du coffre · équipe qui quitte</p>${aide("Tu remets ce coffre. Touche chaque outil pour confirmer qu'il est là.<br>1 toucher = présent · 2 = manquant · 3 = brisé")}` : aide("Tu prends ce coffre. Touche chaque outil pour confirmer qu'il est là. Tu en es responsable jusqu'à la prochaine session.<br>1 toucher = présent · 2 = manquant · 3 = brisé")}
-      <p class="compte" id="cpt"></p>
+    V.innerHTML = `${tete}${MODE === "remise" ? `<p class="avisR">Remise du coffre · équipe qui quitte</p>${aide("Tu remets ce coffre. Touche chaque outil pour confirmer qu'il est là.")}` : aide("Tu prends ce coffre. Touche chaque outil pour confirmer qu'il est là. Tu en es responsable jusqu'à la prochaine session.")}
+      ${leg([["v", "Présent", 1], ["m", "Manquant", 2], ["b", "Brisé", 3]])}<p class="compte" id="cpt"></p>
       <div id="its" class="choix">${cf.liste.map((x, i) => `<div class="it${deja.has(x.n) ? " deja" : ""}" data-i="${i}"><span class="q">${x.q}</span><span>${esc(x.n)}</span><span class="s">${deja.has(x.n) ? "déjà signalé" : ""}</span></div>`).join("")}</div>
       ${idt}<input type="text" id="nt" maxlength="120" placeholder="Commentaire (facultatif)" style="width:100%;min-height:50px;border-radius:10px;border:1px solid var(--ligne);background:var(--carte2);color:var(--txt);padding:0 14px;font-size:17px;margin-top:6px"><button class="btn p gros" id="bEnv" disabled>Envoyer</button>`;
     const tous = () => [...$("#its").querySelectorAll(".it:not(.deja)")];
@@ -370,7 +376,7 @@ async function vueEleve(){
   $("#bOk").onclick = ok;
   $("#bMq").onclick = () => {
     $("#its").classList.add("choix"); $("#bOk").remove(); $("#er").hidden = true;
-    $("#bMq").outerHTML = `<p class="sous" style="margin:10px 0 0">Touche ce qui manque (1 fois) ou ce qui est brisé (2 fois).</p><input type="text" id="nt" maxlength="120" placeholder="Commentaire (facultatif)" style="width:100%;min-height:50px;border-radius:10px;border:1px solid var(--ligne);background:var(--carte2);color:var(--txt);padding:0 14px;font-size:17px;margin-top:10px"><button class="btn p gros" id="bEnv">Envoyer</button>`;
+    $("#its").insertAdjacentHTML("beforebegin", leg([["m", "Manquant", 1], ["b", "Brisé", 2]])); $("#bMq").outerHTML = `<input type="text" id="nt" maxlength="120" placeholder="Commentaire (facultatif)" style="width:100%;min-height:50px;border-radius:10px;border:1px solid var(--ligne);background:var(--carte2);color:var(--txt);padding:0 14px;font-size:17px;margin-top:10px"><button class="btn p gros" id="bEnv">Envoyer</button>`;
     $("#its").onclick = ev => { const d = ev.target.closest(".it"); if (!d || d.classList.contains("deja")) return;
       const st = d.classList.contains("m") ? "b" : d.classList.contains("b") ? "" : "m"; d.classList.remove("m", "b"); if (st) d.classList.add(st);
       d.querySelector(".s").textContent = st === "m" ? "manquant" : st === "b" ? "brisé" : ""; };
