@@ -15,7 +15,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex">
-<title>Métier+ — Passeport d'outils</title>
+<title>Métier+ — Registre de formation</title>
 <style>
 :root{--fond:#141414;--carte:#1F1F1F;--carte2:#2A2A2A;--txt:#F2EFEA;--gris:#A8A29A;--ligne:#333;--or:#EB6A22;--mar:#1E2A44;--vert:#1E8A55}
 html.clair{--fond:#F3F1EC;--carte:#fff;--carte2:#F1EEE8;--txt:#24211E;--gris:#6B665E;--ligne:#E2DDD3}
@@ -137,9 +137,9 @@ html.eleve body{background:var(--fond)}
 </head>
 <body>
 <div id="vueProf" hidden>
-<div class="mp-tete"><img class="lg-b" src="img/metier-plus-blanc.svg" alt="Métier+"><img class="lg-c" src="img/metier-plus.svg" alt="Métier+"><a class="mp-retour" href="labo.html">‹ Labo</a><h1 class="mp-nom">Passeport</h1><span class="mp-esp"></span></div>
+<div class="mp-tete"><img class="lg-b" src="img/metier-plus-blanc.svg" alt="Métier+"><img class="lg-c" src="img/metier-plus.svg" alt="Métier+"><a class="mp-retour" href="labo.html">‹ Labo</a><h1 class="mp-nom">Registre</h1><span class="mp-esp"></span></div>
 <main>
-  <div class="hero"><div><h1>Passeport d'outils</h1><p class="long">Un code QR par outil, pour tous tes groupes. L'élève le scanne, suit la formation, coche chaque étape, écrit son prénom et son groupe, puis signe. Sa signature arrive ici, dans son groupe, avec la date. Si le groupe n'est pas reconnu, elle va dans « À classer ».</p><p class="court" style="display:none">Imprime un code QR par outil. L'élève le scanne, suit la formation et signe : sa signature arrive ici.</p></div></div>
+  <div class="hero"><div><h1>Registre de formation</h1><p class="long">Un code QR par outil, pour tous tes groupes. L'élève le scanne, suit la formation, coche chaque étape, écrit son prénom et son groupe, puis signe. Sa signature arrive ici, dans son groupe, avec la date. Si le groupe n'est pas reconnu, elle va dans « À classer ».</p><p class="court" style="display:none">Imprime un code QR par outil. L'élève le scanne, suit la formation et signe : sa signature arrive ici.</p></div></div>
   <div class="barre">
     <select id="grp" aria-label="Groupe"></select>
     <button class="btn" id="bGrpN">+ Groupe</button>
@@ -225,7 +225,7 @@ async function vueEleve(){
     return;
   }
   const coche = new Set();
-  V.innerHTML = `<div class="top"><img src="${LOGO}" alt="Métier+"><span class="esp" style="flex:1"></span><span class="tag">Passeport d'outils</span></div>
+  V.innerHTML = `<div class="top"><img src="${LOGO}" alt="Métier+"><span class="esp" style="flex:1"></span><span class="tag">Registre de formation</span></div>
     <span class="tag">Formation</span><h1>${esc(o.nom)}</h1>
     ${ens ? `<button type="button" class="btn" id="dejaF" style="margin:4px 0 10px;min-height:44px">J'ai déjà ma formation pour cet outil</button>` : ""}
     <p class="sous">Lis chaque étape et touche-la pour la cocher. Quand tout est coché, écris ton prénom, ton groupe et signe.</p>
@@ -308,7 +308,7 @@ async function vueEleve(){
 
 /* « J'ai déjà ma formation » (14 nov.) : l'élève entre son groupe et son code; on vérifie dans la liste publique des codes formés */
 function dejaVue(o, ens, V, R0, suivi){
-  V.innerHTML = `<div class="top"><img src="${LOGO}" alt="Métier+"><span class="esp" style="flex:1"></span><span class="tag">Passeport d'outils</span></div>
+  V.innerHTML = `<div class="top"><img src="${LOGO}" alt="Métier+"><span class="esp" style="flex:1"></span><span class="tag">Registre de formation</span></div>
     <span class="tag">Déjà formé?</span><h1>${esc(o.nom)}</h1><p class="sous">Entre ton groupe et ton code : si ta formation est déjà signée, tu n'as pas à la refaire.</p>
     <div class="signer"><label>Ton groupe</label><div id="dgB" class="epi" style="margin:4px 0 10px"></div>
       <label for="dcd">Ton code (3 chiffres)</label><input id="dcd" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" placeholder="000" style="font-size:28px;letter-spacing:8px;text-align:center;max-width:160px">
@@ -334,7 +334,7 @@ function dejaVue(o, ens, V, R0, suivi){
 async function sortieVue(o, ens, V){
   let S = {}; try { S = JSON.parse(localStorage.getItem("passSorties") || "{}"); } catch(e) {}
   const dehors = !!S[o.id];
-  V.innerHTML = `<div class="top"><img src="${LOGO}" alt="Métier+"><span class="esp" style="flex:1"></span><span class="tag">Passeport d'outils</span></div>
+  V.innerHTML = `<div class="top"><img src="${LOGO}" alt="Métier+"><span class="esp" style="flex:1"></span><span class="tag">Registre de formation</span></div>
     <span class="tag">Sortie d'outil</span><h1>${esc(o.nom)}</h1>
     <p class="sous">${dehors ? "Tu rapportes l'outil? Touche « Je rapporte l'outil »." : "Indique que tu prends l'outil. Ton enseignant voit qui l'a et depuis quand."}</p>
     <div class="signer"><label>Ton groupe</label><div id="sgB" class="epi" style="margin:4px 0 10px"></div><input id="sgr" type="text" maxlength="20" placeholder="Numéro du groupe" hidden>
@@ -568,7 +568,7 @@ function editerProt(){
       const jeton = localStorage.ghJeton, url = "https://api.github.com/repos/cfppaplc/bibliotheque/contents/protocoles.json", h = { Authorization:"Bearer " + jeton, Accept:"application/vnd.github+json" };
       let sha; const g = await fetch(url, { headers:h, cache:"no-store" }); if (g.ok) sha = (await g.json()).sha; else if (g.status !== 404) throw new Error("GitHub " + g.status);
       const p = await fetch(url, { method:"PUT", headers:Object.assign({ "Content-Type":"application/json" }, h),
-        body:JSON.stringify({ message:"Passeport d'outils : formations", content:btoa(unescape(encodeURIComponent(JSON.stringify(N, null, 1) + "\n"))), sha }) });
+        body:JSON.stringify({ message:"Registre de formation : formations", content:btoa(unescape(encodeURIComponent(JSON.stringify(N, null, 1) + "\n"))), sha }) });
       if (!p.ok) throw new Error("GitHub " + p.status);
       PROT = N; localStorage.setItem("protocolesCache", JSON.stringify(N)); fermer(); dessiner(); toast("Publié. Les codes QR déjà imprimés restent bons.");
     } catch(e){ b.disabled = false; b.textContent = "Publier"; $("#eEr").hidden = false; $("#eEr").textContent = "La publication n'a pas fonctionné (" + e.message + ")."; }
