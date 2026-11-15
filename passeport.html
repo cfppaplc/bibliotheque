@@ -425,6 +425,16 @@ function fusion(a, b){ const A = JSON.parse(a || "null") || { el:{}, val:{}, grp
 function toast(t){ const d = document.createElement("div"); d.className = "toast"; d.textContent = t; document.body.appendChild(d); setTimeout(() => d.remove(), 3500); }
 const ouvrir = h => { $("#bx").innerHTML = h; $("#ov").hidden = false; };
 const fermer = () => { $("#ov").hidden = true; };
+/* 15 nov. (« imprimer le code d'un seul élève, d'un seul coffre ou d'un seul outil ») : liste à cocher + Tout / Aucun */
+const listeChoix = items => `<div class="chx" style="display:flex;gap:8px;margin:6px 0"><button type="button" class="btn" data-tout="1" style="min-height:40px">Tout</button><button type="button" class="btn" data-tout="0" style="min-height:40px">Aucun</button></div>
+  <div style="max-height:46vh;overflow:auto;border:1px solid var(--ligne,#e5dac6);border-radius:12px;padding:4px 10px">${items.map(([id, n]) => `<label style="display:flex;align-items:center;gap:10px;min-height:44px;border-bottom:1px solid var(--ligne,#e5dac6)"><input type="checkbox" class="chq" value="${esc(id)}" checked style="width:22px;height:22px"> <span>${n}</span></label>`).join("")}</div>`;
+function brancherChoix(btn, mot){
+  const maj = () => { const n = $("#bx").querySelectorAll(".chq:checked").length; btn.disabled = !n; btn.textContent = "Imprimer " + n + " " + mot + (n > 1 ? "s" : ""); };
+  $("#bx").querySelectorAll("[data-tout]").forEach(b => b.onclick = () => { $("#bx").querySelectorAll(".chq").forEach(c => c.checked = b.dataset.tout === "1"); maj(); });
+  $("#bx").querySelectorAll(".chq").forEach(c => c.onchange = maj); maj();
+}
+const choisis = () => new Set([...$("#bx").querySelectorAll(".chq:checked")].map(c => c.value));
+
 $("#ov").onclick = e => { if (e.target.id === "ov") fermer(); };
 document.addEventListener("keydown", e => { if (e.key === "Escape") fermer(); });
 
@@ -546,12 +556,14 @@ function dlgCodes(){
   const f0 = localStorage.getItem("passEtqFormat") || "5160";
   ouvrir(`<h2>Codes des élèves · ${esc(GRP)}</h2><p>Choisis ta feuille d'étiquettes. À l'impression, garde l'échelle à 100 % (pas « Ajuster à la page »).</p>
     ${Object.entries(FORMATS).map(([k, F]) => `<label class="dmx"><input type="radio" name="fmt" value="${k}" ${k === f0 ? "checked" : ""}> <span>${F.n}</span></label>`).join("")}
+    <p style="margin-bottom:0"><b>Élèves à imprimer</b></p>${listeChoix(L.map(e => [e.id, esc(e.p) + " · " + esc(e.c)]))}
     <p id="dPos">Commencer à l'étiquette n° <input type="number" id="aPos" min="1" max="30" value="1" style="width:80px;min-height:42px;border-radius:10px;border:1px solid var(--ligne);background:var(--carte2);color:var(--txt);padding:0 10px"> (pour finir une feuille déjà entamée)</p>
     <div class="act"><button class="btn" id="aF">Annuler</button><button class="btn p" id="aOk">Imprimer ${L.length} étiquette${L.length > 1 ? "s" : ""}</button></div>`);
   const maj = () => { $("#dPos").style.display = $("#bx").querySelector("[name=fmt]:checked").value === "main" ? "none" : ""; };
   $("#bx").querySelectorAll("[name=fmt]").forEach(x => x.onchange = maj); maj();
-  $("#aF").onclick = fermer;
-  $("#aOk").onclick = () => { const k = $("#bx").querySelector("[name=fmt]:checked").value, F = FORMATS[k]; localStorage.setItem("passEtqFormat", k); fermer();
+  $("#aF").onclick = fermer; brancherChoix($("#aOk"), "étiquette");
+  $("#aOk").onclick = () => { const k = $("#bx").querySelector("[name=fmt]:checked").value, F = FORMATS[k]; localStorage.setItem("passEtqFormat", k);
+    const S = choisis(), L2 = L.filter(e => S.has(e.id)); L.length = 0; L.push(...L2); fermer();
     const etq = e => `<div class="ce2"${e.st || ""}><img src="img/metier-plus.svg" alt=""><small>Code Métier+ · ${esc(GRP)}</small><b>${esc(e.p)}</b><span class="n">${esc(e.c)}</span></div>`;
     const Z = $("#qrs"); Z.className = "f" + k;
     if (k === "main"){ Z.innerHTML = L.map(etq).join(""); }
@@ -559,32 +571,33 @@ function dlgCodes(){
       L.forEach(e => { if (i && i % par === 0){ h += `<div class="pg">${pg}</div>`; pg = ""; } const j = i % par, c = j % F.c, l = Math.floor(j / F.c);
         pg += etq(Object.assign({}, e, { st:` style="left:${F.x0 + c * F.dx}in;top:${F.y0 + l * F.dy}in"` })); i++; });
       Z.innerHTML = h + `<div class="pg">${pg}</div>`; }
-    setTimeout(() => window.mpImprimerQrs ? mpImprimerQrs() : print(), 300); };
+    setTimeout(() => window.mpImprimerQrs ? mpImprimerQrs("metierplus-codes-eleves") : print(), 300); };
 }
 function dlgQr(){
   if (!window.__moi) return toast("Connecte-toi d'abord à la bibliothèque.");
   const seg = o => `<span class="tl" data-id="${esc(o.id)}" style="display:inline-flex;gap:4px">${[["p","Petit"],["m","Moyen"],["g","Grand"]].map(([k, n]) => `<button type="button" class="btn${tailleDe(o.id) === k ? " p" : ""}" data-t="${k}" style="min-height:42px;padding:6px 12px">${n}</button>`).join("")}</span>`;
-  ouvrir(`<h2>Codes QR à imprimer</h2><p>Petit : collé sur l'outil (3 cm). Moyen : sur l'étui ou la boîte (5,5 cm). Grand : au mur près de la machine (12 cm).</p><p>« Suivre les sorties » : pour les outils chers seulement. L'élève formé rescanne pour prendre et rapporter l'outil; les autres outils passent par le magasinier.</p>
-    ${PROT.outils.map(o => `<div class="rq" style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--fil,#e5dac6)"><span style="flex:1;font-weight:650">${esc(o.nom)}</span><label style="display:${SORTIES ? "inline-flex" : "none"};align-items:center;gap:6px;font-size:14px;color:var(--gris);white-space:nowrap"><input type="checkbox" class="sv" data-id="${esc(o.id)}" ${suivis().includes(o.id) ? "checked" : ""} style="width:22px;height:22px"> Suivre les sorties</label>${seg(o)}</div>`).join("")}
+  ouvrir(`<h2>Codes QR à imprimer</h2><p>Petit : collé sur l'outil (3 cm). Moyen : sur l'étui ou la boîte (5,5 cm). Grand : au mur près de la machine (12 cm).</p><div class="chx" style="display:flex;gap:8px;margin:6px 0"><button type="button" class="btn" data-tout="1" style="min-height:40px">Tout</button><button type="button" class="btn" data-tout="0" style="min-height:40px">Aucun</button></div><p style="display:${SORTIES ? "" : "none"}">« Suivre les sorties » : pour les outils chers seulement. L'élève formé rescanne pour prendre et rapporter l'outil; les autres outils passent par le magasinier.</p>
+    ${PROT.outils.map(o => `<div class="rq" style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--fil,#e5dac6)"><label style="flex:1;font-weight:650;display:flex;align-items:center;gap:10px"><input type="checkbox" class="chq" value="${esc(o.id)}" checked style="width:22px;height:22px">${esc(o.nom)}</label><label style="display:${SORTIES ? "inline-flex" : "none"};align-items:center;gap:6px;font-size:14px;color:var(--gris);white-space:nowrap"><input type="checkbox" class="sv" data-id="${esc(o.id)}" ${suivis().includes(o.id) ? "checked" : ""} style="width:22px;height:22px"> Suivre les sorties</label>${seg(o)}</div>`).join("")}
     <div class="act"><button class="btn" id="aF">Annuler</button><button class="btn p" id="aOk">Imprimer</button></div>`);
   $("#bx").querySelectorAll(".tl").forEach(z => z.querySelectorAll("button").forEach(b => b.onclick = () => {
     let T = {}; try { T = JSON.parse(localStorage.getItem("passQrTailles") || "{}"); } catch(e) {}
     T[z.dataset.id] = b.dataset.t; localStorage.setItem("passQrTailles", JSON.stringify(T));
     z.querySelectorAll("button").forEach(x => x.classList.toggle("p", x === b)); }));
   $("#bx").querySelectorAll(".sv").forEach(c => c.onchange = () => { localStorage.setItem("passSuivi", JSON.stringify([...$("#bx").querySelectorAll(".sv:checked")].map(x => x.dataset.id))); publierGrp(); });
-  $("#aF").onclick = fermer; $("#aOk").onclick = () => { fermer(); imprimerQr(); };
+  $("#aF").onclick = fermer; brancherChoix($("#aOk"), "code");
+  $("#aOk").onclick = () => { const S = choisis(); fermer(); imprimerQr(S); };
 }
-function imprimerQr(){
+function imprimerQr(S){
   const s = window.__moi; if (!s) return toast("Connecte-toi d'abord à la bibliothèque.");
   const base = location.href.replace(/[^/]*$/, "") + "passeport.html";
   const Z = $("#qrs"); Z.innerHTML = "";
-  [...PROT.outils].sort((a, b) => "pmg".indexOf(tailleDe(a.id)) - "pmg".indexOf(tailleDe(b.id))).forEach(o => {
+  PROT.outils.filter(o => !S || S.has(o.id)).sort((a, b) => "pmg".indexOf(tailleDe(a.id)) - "pmg".indexOf(tailleDe(b.id))).forEach(o => {
     const url = base + "?o=" + encodeURIComponent(o.id) + "&e=" + encodeURIComponent(s);
     const c = document.createElement("div"); c.className = "qc " + tailleDe(o.id);
     c.innerHTML = `<img class="l" src="img/metier-plus.svg" alt=""><b>${esc(o.nom)}</b><div class="q"></div><small>${tailleDe(o.id) === "p" ? "Scanne avant d'utiliser" : "Scanne avant d'utiliser cet outil : formation et signature"}</small>`;
     Z.appendChild(c); new QRCode(c.querySelector(".q"), { text:url, width:360, height:360, correctLevel:QRCode.CorrectLevel.H }); if (window.qrLogo) qrLogo(c.querySelector(".q"));
   });
-  setTimeout(() => { Z.querySelectorAll("canvas").forEach(c => { const i = c.parentNode.querySelector("img:not(.qrLogo)"); if (i && i.src) c.remove(); }); window.mpImprimerQrs ? mpImprimerQrs() : print(); }, 600);
+  setTimeout(() => { Z.querySelectorAll("canvas").forEach(c => { const i = c.parentNode.querySelector("img:not(.qrLogo)"); if (i && i.src) c.remove(); }); window.mpImprimerQrs ? mpImprimerQrs("metierplus-codes-qr-outils") : print(); }, 600);
 }
 
 /* formations : l'administrateur les modifie et les publie (protocoles.json, comme les locaux du ménage) */

@@ -137,17 +137,18 @@ window.mpDateHeure = t => new Date(t).toLocaleString("fr-CA", { year:"numeric", 
 /* Impression des codes QR et étiquettes (15 nov., « le chargement avant impression plante ») :
    dans Gestion d'atelier, la page est dans un cadre; imprimer depuis le cadre faisait planter l'aperçu.
    On imprime plutôt #qrs dans une petite fenêtre à part, avec les mêmes styles. */
-window.mpImprimerQrs = function(){
-  const Z = document.getElementById("qrs");
-  if (!Z || window.top === window) return print();
-  const w = window.open("", "_blank", "width=900,height=700");
-  if (!w) return print();
-  const styles = [...document.querySelectorAll("style,link[rel=stylesheet]")].map(s => s.outerHTML).join("");
-  w.document.open();
-  w.document.write(`<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"><base href="${location.href.replace(/[^/]*$/, "")}"><title>Impression · Métier+</title>${styles}<style>#qrs{display:block!important}body{margin:0;background:#fff}</style></head><body>${Z.outerHTML}</body></html>`);
-  w.document.close();
-  let fait = false; const go = () => { if (fait) return; fait = true; try { w.focus(); w.print(); } catch(e) {} setTimeout(() => { try { w.close(); } catch(e) {} }, 500); };
-  const imgs = [...w.document.images].filter(i => !i.complete);
-  if (!imgs.length) setTimeout(go, 200);
-  else { let n = imgs.length; const un = () => { if (--n <= 0) setTimeout(go, 200); }; imgs.forEach(i => { i.onload = i.onerror = un; }); setTimeout(go, 4000); }
+window.mpImprimerQrs = function(nom){
+  /* 15 nov. (« on devrait les télécharger avant, ça éviterait le bogue qui plante ») : les feuilles sont
+     enregistrées dans un fichier (page autonome avec ses styles et ses codes), qu'on ouvre ensuite pour imprimer. */
+  const Z = document.getElementById("qrs"); if (!Z) return print();
+  const styles = [...document.querySelectorAll("style")].map(s => s.outerHTML).join("");
+  const base = location.href.replace(/[?#].*$/, "").replace(/[^/]*$/, "");
+  const d = new Date(), date = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+  const fichier = (nom || "metierplus-codes") + "-" + date + ".html";
+  const html = `<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"><base href="${base}"><title>Métier+ · ${fichier}</title>${styles}
+<style>#qrs{display:block!important}body{margin:0;background:#fff}.mp-imp{font:600 15px system-ui,sans-serif;display:flex;gap:12px;align-items:center;padding:14px 18px;background:#1E2A44;color:#fff}.mp-imp button{font:inherit;padding:10px 18px;border-radius:10px;border:0;background:#EB6A22;color:#fff;cursor:pointer}@media print{.mp-imp{display:none!important}}</style></head>
+<body><div class="mp-imp"><button onclick="print()">Imprimer</button><span>Imprime à 100 % (taille réelle).</span></div>${Z.outerHTML}</body></html>`;
+  const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([html], { type:"text/html" })); a.download = fichier;
+  document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 4000);
+  try { (window.toast || (t => alert(t)))("Fichier téléchargé : ouvre-le, puis touche « Imprimer »."); } catch(e) {}
 };

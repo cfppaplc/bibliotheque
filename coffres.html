@@ -228,6 +228,16 @@ const heure = t => { const x = new Date(t), h = x.toLocaleTimeString("fr-CA", { 
 function toast(t){ const d = document.createElement("div"); d.className = "toast"; d.textContent = t; document.body.appendChild(d); setTimeout(() => d.remove(), 3500); }
 const ouvrir = h => { $("#bx").innerHTML = h; $("#ov").hidden = false; };
 const fermer = () => { $("#ov").hidden = true; };
+/* 15 nov. (« imprimer le code d'un seul élève, d'un seul coffre ou d'un seul outil ») : liste à cocher + Tout / Aucun */
+const listeChoix = items => `<div class="chx" style="display:flex;gap:8px;margin:6px 0"><button type="button" class="btn" data-tout="1" style="min-height:40px">Tout</button><button type="button" class="btn" data-tout="0" style="min-height:40px">Aucun</button></div>
+  <div style="max-height:46vh;overflow:auto;border:1px solid var(--ligne,#e5dac6);border-radius:12px;padding:4px 10px">${items.map(([id, n]) => `<label style="display:flex;align-items:center;gap:10px;min-height:44px;border-bottom:1px solid var(--ligne,#e5dac6)"><input type="checkbox" class="chq" value="${esc(id)}" checked style="width:22px;height:22px"> <span>${n}</span></label>`).join("")}</div>`;
+function brancherChoix(btn, mot){
+  const maj = () => { const n = $("#bx").querySelectorAll(".chq:checked").length; btn.disabled = !n; btn.textContent = "Imprimer " + n + " " + mot + (n > 1 ? "s" : ""); };
+  $("#bx").querySelectorAll("[data-tout]").forEach(b => b.onclick = () => { $("#bx").querySelectorAll(".chq").forEach(c => c.checked = b.dataset.tout === "1"); maj(); });
+  $("#bx").querySelectorAll(".chq").forEach(c => c.onchange = maj); maj();
+}
+const choisis = () => new Set([...$("#bx").querySelectorAll(".chq:checked")].map(c => c.value));
+
 $("#ov").onclick = e => { if (e.target.id === "ov") fermer(); };
 /* « 2 x clé à tuyau 14 po » → { q:2, n:"clé à tuyau 14 po" } */
 const lireListe = t => String(t || "").split("\n").map(l => l.trim()).filter(Boolean).slice(0, 80).map(l => { const m = l.match(/^(\d{1,3})\s*[x×]?\s+(.+)$/i); return m ? { q:+m[1], n:m[2].slice(0, 60) } : { q:1, n:l.slice(0, 60) }; });
@@ -384,6 +394,8 @@ async function envoyerSync(){
 }
 function appliquerSync(P, de){ const E = lireEnv(), e = E[de] = E[de] || {}; let n = 0;
   for (const u in P.ev || {}){ const v = P.ev[u], x = K.ev[u]; if (!x || (v.t || 0) > (x.t || 0)){ K.ev[u] = v; if (!x) n++; } e[u] = v.t || 0; }
+  for (const u in P.ev || {}){ const v = P.ev[u], c = K.cf[v.cf]; if (v.k === "liste" && v.lp && c && !c.x && (v.t || 0) > (c.tl || 0) && Array.isArray(v.liste)){
+    c.liste = lireListe(ecrireListe(v.liste)); delete c.prop; c.tl = v.t; c.t = Date.now(); n++; } }
   localStorage.setItem(ENV, JSON.stringify(E)); return n; }
 function fusion(a, b){ const A = Object.assign(vide(), JSON.parse(a || "null") || {}), B = JSON.parse(b || "null") || {};
   for (const k of ["at", "cf", "ev", "vus", "part"]){ const y = B[k] || {}; for (const i in y){ const x = A[k][i]; if (!x || (typeof y[i] === "object" ? (y[i].t || 0) > (x.t || 0) : y[i] > x)) A[k][i] = y[i]; } }
@@ -391,9 +403,13 @@ function fusion(a, b){ const A = Object.assign(vide(), JSON.parse(a || "null") |
 const ateliers = () => Object.entries(K.at).filter(([, a]) => !a.x).sort((a, b) => a[1].nom.localeCompare(b[1].nom, "fr"));
 /* coffres affichés : les miens + ceux des ateliers que des collègues partagent avec moi (lecture seule) */
 const coffresDe = at => { const M = Object.entries(K.cf).filter(([, c]) => !c.x && c.at === at).map(([id, c]) => Object.assign({ id, moi:true }, c));
-  const S = PARTAGES[at] ? Object.entries(PARTAGES[at].cf).map(([id, c]) => Object.assign({ id, de:PARTAGES[at].de }, c)) : [];
+  const S = PARTAGES[at] ? Object.entries(PARTAGES[at].cf).map(([id, c]) => Object.assign({ id, de:PARTAGES[at].de }, avecListe(id, c))) : [];
   return M.concat(S).sort((a, b) => a.nom.localeCompare(b.nom, "fr", { numeric:true })); };
-const cfDe = id => { if (K.cf[id] && !K.cf[id].x) return Object.assign({ id, moi:true }, K.cf[id]); for (const a in PARTAGES) if (PARTAGES[a].cf[id]) return Object.assign({ id, de:PARTAGES[a].de }, PARTAGES[a].cf[id]); return null; };
+/* 15 nov. (« modifier l'inventaire à tout moment est permis à tous les profs ») : un collègue change la liste par un événement
+   { k:"liste", lp:1, liste } envoyé par la synchro; le propriétaire l'applique et republie. */
+const listeProf = (id, cf) => { let m = null; for (const u in K.ev){ const e = K.ev[u]; if (e.cf === id && e.k === "liste" && e.lp && (e.t || 0) > (cf.tl || cf.t || 0) && (!m || e.t > m.t)) m = e; } return m; };
+const avecListe = (id, cf) => { const m = listeProf(id, cf); return m ? Object.assign({}, cf, { liste:m.liste, prop:undefined }) : cf; };
+const cfDe = id => { if (K.cf[id] && !K.cf[id].x) return Object.assign({ id, moi:true }, K.cf[id]); for (const a in PARTAGES) if (PARTAGES[a].cf[id]) return Object.assign({ id, de:PARTAGES[a].de }, avecListe(id, PARTAGES[a].cf[id])); return null; };
 /* nom de l'élève : code → prénom grâce au passeport de cet appareil */
 function nomDe(w){ if (!w) return "?"; if (w.c2 || w.p2) return nom1({ c:w.c, p:w.p }) + " et " + nom1({ c:w.c2, p:w.p2 }); return nom1(w); }
 function nom1(w){ if (w.p) return esc(w.p);
@@ -416,7 +432,7 @@ function codesEquipe(nom, at){ const n = +((String(nom || "").match(/\d+/) || []
 async function publier(){
   if (!window.__moi) return;
   const at = {}, cf = {}; ateliers().forEach(([id, a]) => at[id] = a.nom);
-  for (const [id, c] of Object.entries(K.cf)) if (!c.x && at[c.at]) cf[id] = { nom:c.nom, at:c.at, tour:c.tour || 0, chg:c.chg ? 1 : 0, liste:c.liste || [], eqc:codesEquipe(c.nom, c.at), rc:c.chg ? (d => d ? [d.c, d.c2].filter(Boolean).map(String) : undefined)(etat(Object.assign({ id }, c)).der) : undefined, mq:Object.keys(etat(Object.assign({ id }, c)).mq) };
+  for (const [id, c] of Object.entries(K.cf)) if (!c.x && at[c.at]) cf[id] = { nom:c.nom, at:c.at, tour:c.tour || 0, chg:c.chg ? 1 : 0, liste:c.liste || [], tl:c.tl || 0, eqc:codesEquipe(c.nom, c.at), rc:c.chg ? (d => d ? [d.c, d.c2].filter(Boolean).map(String) : undefined)(etat(Object.assign({ id }, c)).der) : undefined, mq:Object.keys(etat(Object.assign({ id }, c)).mq) };
   const part = {}; for (const a in K.part) if (at[a] && K.part[a].l && K.part[a].l.length) part[a] = K.part[a].l;
   const o = { at, cf, part }, k = JSON.stringify(o); if (localStorage.getItem("coffresPub") === k) return;
   try { await PUB.ecrire(window.__moi, o); localStorage.setItem("coffresPub", k); } catch(e) {}
@@ -446,15 +462,15 @@ function coffreOuvrir(id){
     return `<div class="mqc"><div class="mqt"><span class="ic">!</span><b>${esc(n)}</b><span class="pl">${x.e === "b" ? "Brisé" : "Manquant"}</span></div>
       ${x.par.note ? `<p class="nt">« ${esc(x.par.note)} »</p>` : ""}
       <div class="chaine">${p ? qui(p, "L'avait juste avant · " + heure(p.d) + (p.k === "ok" ? " · a confirmé que tout était là" : ""), "prev") + `<span class="fl">→</span>` : ""}${qui(x.par, "A signalé · " + heure(x.par.d), "sig")}</div></div>`; }).join("");
-  const hist = s.E.slice(-30).reverse().map(e => `<div class="hl"><span class="pt ${e.k === "manque" ? "r" : "v"}"></span><span class="hh">${heure(e.d)}</span><span>${e.k === "regle" ? "<b>Remis en ordre</b> par " + parQui(e) : e.k === "nouveau" ? "<b>Nouvel inventaire demandé</b> par " + parQui(e) : e.k === "annule" ? "<b>Changement d'équipe annulé</b>" : e.k === "ok" && e.conf ? "<b>Inventaire confirmé</b> par " + parQui(e) : e.k === "ok" ? `${e.r ? "<b>Remise</b> · " : ""}${nomDe(e)} · tout est là` : `${e.r ? "<b>Remise</b> · " : ""}${nomDe(e)} · manque ${e.items.map(x => esc(x.n)).join(", ")}`}</span></div>`).join("");
+  const hist = s.E.slice(-30).reverse().map(e => `<div class="hl"><span class="pt ${e.k === "manque" ? "r" : "v"}"></span><span class="hh">${heure(e.d)}</span><span>${e.k === "regle" ? "<b>Remis en ordre</b> par " + parQui(e) : e.k === "nouveau" ? "<b>Nouvel inventaire demandé</b> par " + parQui(e) : e.k === "annule" ? "<b>Changement d'équipe annulé</b>" : e.k === "ok" && e.conf ? "<b>Inventaire confirmé</b> par " + parQui(e) : e.k === "liste" ? "<b>Liste modifiée</b> par " + parQui(e) : e.k === "ok" ? `${e.r ? "<b>Remise</b> · " : ""}${nomDe(e)} · tout est là` : `${e.r ? "<b>Remise</b> · " : ""}${nomDe(e)} · manque ${e.items.map(x => esc(x.n)).join(", ")}`}</span></div>`).join("");
   const autres = Object.entries(K.cf).filter(([i, c]) => !c.x && i !== id && c.liste && c.liste.length);
   ouvrir(`<div class="dt"><h2>${esc(cf.nom)}</h2><span class="pil ${s.c}">${etq}</span></div>
     ${s.der ? qui(s.der, "Responsable depuis " + heure(s.der.d), "resp") : `<p>Personne n'a encore scanné ce coffre.</p>`}
     ${mqH ? `<h3>À régler</h3>${mqH}` : ""}
     <h3>Contenu ${liste.length ? `<small>${liste.length} article${liste.length > 1 ? "s" : ""}</small>` : ""}</h3>
     ${prop ? `<p class="avis">Liste écrite par ${nomDe(cf.prop.w)}. Vérifie-la, corrige au besoin, puis approuve.</p>` : ""}
-    <div id="lst" class="lst${prop || (mien && !liste.length) ? " ed" : ""}"></div>
-    ${mien ? `<div class="lact"><button class="btn" id="aMod">${liste.length ? "Modifier la liste" : ""}</button>${autres.length ? `<select id="aCp"><option value="">Copier d'un autre coffre…</option>${autres.map(([i, c]) => `<option value="${i}">${esc(c.nom)}</option>`).join("")}</select>` : ""}</div>` : `<p class="info">Coffre partagé par ${esc(((COMPTES[cf.de] || {}).nom || cf.de || "").split(" ")[0])} : vous voyez le même historique. Seul lui peut changer la liste ou demander un nouvel inventaire.</p>`}
+    <div id="lst" class="lst${prop || !liste.length ? " ed" : ""}"></div>
+    ${mien ? `<div class="lact"><button class="btn" id="aMod">${liste.length ? "Modifier la liste" : "Écrire la liste"}</button>${autres.length ? `<select id="aCp"><option value="">Copier d'un autre coffre…</option>${autres.map(([i, c]) => `<option value="${i}">${esc(c.nom)}</option>`).join("")}</select>` : ""}</div>` : `<div class="lact"><button class="btn" id="aMod">Modifier la liste</button></div><p class="info">Coffre partagé par ${esc(((COMPTES[cf.de] || {}).nom || cf.de || "").split(" ")[0])} : vous voyez le même historique. Tu peux changer la liste; seul lui peut demander un nouvel inventaire.</p>`}
     ${hist ? `<details class="hd"><summary>Historique</summary>${hist}<button class="btn lien" id="aImp" style="margin-top:8px">Imprimer tout l'historique</button></details>` : ""}
     <div class="act">${mien ? `<button class="btn lien" id="aX">Retirer le coffre</button><button class="btn lien" id="aRn">Renommer</button><span class="esp"></span>` : ""}${mqH ? `<button class="btn vert" id="aRg">Remis en ordre</button>` : ""}${mien ? `<button class="btn" id="aEtat" title="Remettre le coffre dans l'état de ton choix (en cas de bogue)">Changer l'état…</button>` : ""}<button class="btn" id="aF">Fermer</button><button class="btn p" id="aOk" hidden>${prop ? "Approuver la liste" : "Enregistrer"}</button></div>`);
   let L = liste.map(x => ({ q:x.q, n:x.n }));
@@ -483,12 +499,14 @@ function coffreOuvrir(id){
   if ($("#aImp")) $("#aImp").onclick = () => { const txt = h => String(h || "").replace(/<[^>]+>/g, "");
     const R = s.E.map(e => [mpDateHeure(e.d),
       e.k === "regle" || e.k === "nouveau" ? (parQui(e) === "toi" ? ((COMPTES[window.__moi] || {}).nom || "Enseignant") : txt(parQui(e))) : e.k === "annule" ? "" : txt(nomDe(e)),
-      e.k === "regle" ? "Remis en ordre" : e.k === "nouveau" ? "Nouvel inventaire demandé" : e.k === "annule" ? "Changement d'équipe annulé" : e.k === "liste" ? "Liste écrite" : (e.r ? "Remise" : "Prise ou vérification") + (e.k === "ok" ? " : tout est là" : " : il manque quelque chose"),
+      e.k === "regle" ? "Remis en ordre" : e.k === "nouveau" ? "Nouvel inventaire demandé" : e.k === "annule" ? "Changement d'équipe annulé" : e.k === "liste" ? (e.lp ? "<b>Liste modifiée</b> par " + parQui(e) : "Liste écrite") : (e.r ? "Remise" : "Prise ou vérification") + (e.k === "ok" ? " : tout est là" : " : il manque quelque chose"),
       [(e.items || []).map(x => x.n + (x.e === "b" ? " (brisé)" : " (manquant)")).join(", "), e.note ? "« " + e.note + " »" : ""].filter(Boolean).join(" · ")]);
     mpImprimer("Historique · " + cf.nom, (K.at[cf.at] || {}).nom || "", ["Date et heure", "Élève ou enseignant", "Action", "Détails"], R); };
   if ($("#aMod")){ if (!liste.length) $("#aMod").hidden = true; $("#aMod").onclick = () => { lst.classList.add("ed"); peindre(); }; }
   if ($("#aCp")) $("#aCp").onchange = e => { const c = K.cf[e.target.value]; if (!c) return; L = c.liste.map(x => ({ q:x.q, n:x.n, on:true })); peindre.cat = 0; lst.classList.add("ed"); peindre(); };
-  $("#aOk").onclick = () => { const c = K.cf[id]; c.liste = L.filter(x => x.on !== false).map(x => ({ q:x.q, n:String(x.n).trim().slice(0, 60) })).filter(x => x.n); delete c.prop; c.t = Date.now(); sauver(); fermer(); dessiner(); toast(prop ? "Liste approuvée" : "Liste enregistrée"); };
+  $("#aOk").onclick = () => { const nl = L.filter(x => x.on !== false).map(x => ({ q:x.q, n:String(x.n).trim().slice(0, 60) })).filter(x => x.n), c = K.cf[id];
+    if (!c){ const t = Date.now(); K.ev["l" + nid()] = { cf:id, k:"liste", lp:1, liste:nl, d:t, t, par:window.__moi }; sauver(); fermer(); dessiner(); toast("Liste enregistrée"); return; }
+    c.liste = nl; delete c.prop; c.t = c.tl = Date.now(); sauver(); fermer(); dessiner(); toast(prop ? "Liste approuvée" : "Liste enregistrée"); };
   if ($("#aLib")) $("#aLib").onclick = () => { nouvelInventaire([id]); fermer(); toast("L'équipe qui quitte fait la remise en scannant le coffre"); };
   if ($("#aSaut")) $("#aSaut").onclick = () => { const c = K.cf[id]; c.chg = false; c.t = Date.now(); sauver(); fermer(); dessiner(); toast("La nouvelle équipe peut prendre le coffre"); };
   /* un seul bouton pour régler un bogue (15 nov.) : manques effacés, changement d'équipe terminé, équipe actuelle responsable */
@@ -545,15 +563,23 @@ async function lirePartages(){
   PARTAGES = N; dessiner(); envoyerSync();
 }
 function imprimerQr(){
+  if (!window.__moi) return toast("Connecte-toi d'abord à la bibliothèque.");
+  const L = coffresDe(AT).filter(c => c.moi); if (!L.length) return toast("Aucun coffre dans cet atelier.");
+  ouvrir(`<h2>Codes QR à imprimer · ${esc(K.at[AT].nom)}</h2><p>Coche les coffres à imprimer. À l'impression, garde l'échelle à 100 %.</p>${listeChoix(L.map(c => [c.id, esc(c.nom)]))}
+    <div class="act"><button class="btn" id="aF">Annuler</button><button class="btn p" id="aOk">Imprimer</button></div>`);
+  $("#aF").onclick = fermer; brancherChoix($("#aOk"), "code");
+  $("#aOk").onclick = () => { const S = choisis(); fermer(); imprimerQrChoix(S); };
+}
+function imprimerQrChoix(S){
   const s = window.__moi; if (!s) return toast("Connecte-toi d'abord à la bibliothèque.");
   const base = location.href.replace(/[^/]*$/, "") + "coffres.html", Z = $("#qrs"); Z.innerHTML = "";
-  coffresDe(AT).filter(c => c.moi).forEach(cf => {
+  coffresDe(AT).filter(c => c.moi && S.has(c.id)).forEach(cf => {
     const c = document.createElement("div"); c.className = "qc cfq";
     const nu = (String(cf.nom).match(/\d+/) || [])[0];
     c.innerHTML = `<img class="l" src="img/metier-plus.svg" alt="">${nu ? `<div class="cfn">${esc(nu)}</div>` : ""}<b>${esc(cf.nom)}</b><div class="q"></div><small>${esc(K.at[AT].nom)} · scanne en prenant le coffre</small>`;
     Z.appendChild(c); new QRCode(c.querySelector(".q"), { text:base + "?c=" + encodeURIComponent(cf.id) + "&e=" + encodeURIComponent(s), width:360, height:360, correctLevel:QRCode.CorrectLevel.H }); if (window.qrLogo) qrLogo(c.querySelector(".q"));
   });
-  setTimeout(() => { Z.querySelectorAll("canvas").forEach(c => { const i = c.parentNode.querySelector("img:not(.qrLogo)"); if (i && i.src) c.remove(); }); window.mpImprimerQrs ? mpImprimerQrs() : print(); }, 600);
+  setTimeout(() => { Z.querySelectorAll("canvas").forEach(c => { const i = c.parentNode.querySelector("img:not(.qrLogo)"); if (i && i.src) c.remove(); }); window.mpImprimerQrs ? mpImprimerQrs("metierplus-codes-coffres") : print(); }, 600);
 }
 function dlgPartage(){
   const moi = window.__moi; if (!moi || !K.at[AT]) return;
