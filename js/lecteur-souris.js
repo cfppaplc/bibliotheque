@@ -64,7 +64,7 @@ function zoomSourisPas(){
     const s0 = ZS.s, s1 = z / ZS.z0, bx = ZS.mx0 - ZS.sl, by = ZS.my0 - ZS.stp;
     const ux = (px - bx - ZS.tx) / s0, uy = (py - by - ZS.ty) / s0;          /* point du livre sous la souris (unités du zoom de départ) */
     ZS.tx = px - bx - ux * s1; ZS.ty = py - by - uy * s1; ZS.s = s1; ZS.z = z; ZS.px1 = px; ZS.py1 = py;
-    inn.style.willChange = RD.wb ? "" : "transform"; inn.style.transformOrigin = "0 0"; inn.style.transform = "translate(" + ZS.tx + "px," + ZS.ty + "px) scale(" + s1 + ")";
+    inn.style.willChange = "transform"; inn.style.transformOrigin = "0 0"; inn.style.transform = "translate(" + ZS.tx + "px," + ZS.ty + "px) scale(" + s1 + ")";
     const t = Math.round(z * 100) + "%"; $("#tbZv").textContent = t; $("#wbZv").textContent = t;
   }
   clearTimeout(ZS.fin); if (!ZS.tenu) ZS.fin = setTimeout(zoomSourisFin, 140);   /* doigts posés (pincement) : on attend qu'ils se lèvent, sinon une pause de 140 ms refait tout le livre et l'écran clignote */
@@ -511,7 +511,7 @@ function appliquerPad(){
 /* Zoom « photo » (7 nov.) : par défaut; ?zoom=normal sur un appareil = ancien zoom (gardé dans localStorage.zoomPhoto), ?zoom=photo pour revenir.
    Version d'avant ce changement : étiquette git « avant-zoom-photo ». */
 const ZOOM_PHOTO = (() => { try { const q = new URLSearchParams(location.search).get("zoom"); if (q) localStorage.zoomPhoto = q === "photo" ? "oui" : "non"; return localStorage.zoomPhoto !== "non"; } catch(e){ return true; } })();   /* (7 nov.) par défaut pour tous; ?zoom=normal = ancien zoom sur cet appareil */
-function zPhoto(){ return ZOOM_PHOTO && !RD.wb; }
+function zPhoto(){ return ZOOM_PHOTO; }   /* 16 nov. : aussi le tableau blanc (au TNI, le tableau redimensionné devenait noir au zoom) */
 function sizeInner(rapide){   /* rapide = pendant la roulette : on agrandit seulement l'affichage; la toile du crayon est refaite à la fin (sinon 20 ms par cran) */
   appliquerPad(); try { majFond(); } catch(e){}
   const st = $("#rstage"), inn = $("#rinner"), c = $("#inkCanvas");

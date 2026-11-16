@@ -40,7 +40,7 @@ function apresFond(ancienne, nomAncien){
 }
 const nomFond = k => ((WBFONDS.find(f => f.k === k) || {}).n || k).replace(/ \(.*\)$/, "");
 function majFond(){
-  const b = $("#wbBoard"); b.dataset.fond = wbBg(); b.style.setProperty("--u", (34 * RD.z) + "px");
+  const b = $("#wbBoard"); b.dataset.fond = wbBg(); b.style.setProperty("--u", (34 * (zPhoto() ? 1 : RD.z)) + "px");
   const st = wbEtat(); $("#wbLbl").textContent = st.n + " / " + st.count;
   $("#wbP").disabled = st.n <= 1; $("#wbN").disabled = st.n >= st.count; const m = $("#wbMoins"); if (m) m.disabled = st.count <= 1;
 }
