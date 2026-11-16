@@ -1185,7 +1185,10 @@ function ecran(code){
     { /* 9 nov. : les 10 premiers tiennent dans l'écran, au-dessus des boutons du bas */
       const L = $("eLgs"), m = rows[Math.min(N, rows.length) - 1].getBoundingClientRect().bottom - rows[0].getBoundingClientRect().top, dispo = innerHeight - rows[0].getBoundingClientRect().top - ($("animBar") ? 90 : 30);
       if (m > dispo) L.style.setProperty("--k", Math.max(.55, dispo / m * .97).toFixed(3)); }
-    pas = rows.length > 1 ? rows[1].getBoundingClientRect().top - rows[0].getBoundingClientRect().top : 0;
+    /* 16 nov. : toutes les rangées de la même hauteur (une pastille de série la rendait plus haute, et les rangées
+       glissaient de travers : noms, rangs et points décalés au tableau) */
+    { const H = Math.max(...rows.map(el => el.offsetHeight)); rows.forEach(el => el.style.minHeight = H + "px"); }
+    pas = rows.length > 1 ? rows[1].offsetTop - rows[0].offsetTop : 0;
     if (rows.length > N){ const L = $("eLgs"); L.style.height = (rows[N - 1].getBoundingClientRect().bottom - rows[0].getBoundingClientRect().top) + "px"; L.style.overflow = "hidden"; }
     rows.forEach(el => { el.style.opacity = 0; el.style.transform = "translateY(12px)"; });
     rows.forEach((el, k) => setTimeout(() => { el.style.transition = "opacity .4s, transform .4s"; el.style.opacity = 1; el.style.transform = ""; }, 80 * k));
@@ -1194,7 +1197,13 @@ function ecran(code){
       rows.forEach(el => { const b = el.querySelector("b[data-a]"); if (b && b.dataset.de !== b.dataset.a) compter(b, +b.dataset.de, +b.dataset.a, 900); });
       setTimeout(() => {
         const nouv = garde.slice().sort((a, b) => a.r - b.r).map(j => j.k);
-        rows.forEach((el, k) => { const cible = nouv.indexOf(el.dataset.n); el.style.transition = "transform .9s cubic-bezier(.2,.8,.2,1)"; el.style.transform = `translateY(${(cible - k) * pas}px)`; });
+        /* 16 nov. (TNI) : positions mesurées au moment du glissement (hauteurs réelles), puis vraies places dans la page */
+        const L = $("eLgs"), ordre = nouv.map(k => rows.find(el => el.dataset.n === k)).filter(Boolean);
+        const ecart = rows.length > 1 ? rows[1].offsetTop - rows[0].offsetTop - rows[0].offsetHeight : 0, cibleY = new Map();
+        { let y = rows[0].offsetTop; ordre.forEach(el => { cibleY.set(el, y); y += el.offsetHeight + ecart; }); }
+        rows.forEach(el => { el.style.transition = "transform .9s cubic-bezier(.2,.8,.2,1)"; el.style.transform = `translateY(${(cibleY.has(el) ? cibleY.get(el) : el.offsetTop) - el.offsetTop}px)`; });
+        setTimeout(() => { if (!L.isConnected) return; ordre.forEach(el => { el.style.transition = "none"; el.style.transform = ""; L.appendChild(el); });
+          if (ordre.length > N) L.style.height = (ordre[N - 1].offsetTop + ordre[N - 1].offsetHeight - ordre[0].offsetTop) + "px"; }, 950);
         setTimeout(() => rows.forEach(el => el.querySelector(".r").textContent = el.dataset.r), 500);
         /* grosse remontée (3 places et plus) : la rangée brille un instant */
         const gain = el => rows.indexOf(el) - nouv.indexOf(el.dataset.n);
