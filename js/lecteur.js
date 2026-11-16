@@ -932,12 +932,13 @@ document.addEventListener("keydown", e => { if (e.key === "Escape") closeModal()
   const bas = new Map(), ignores = new Set();   /* bas : doigt → dernier mouvement (un doigt oublié depuis 1,5 s ne bloque rien) */
   const surToile = e => e.pointerType === "touch" && e.target && e.target.classList && e.target.classList.contains("ink");
   document.addEventListener("pointerdown", e => {
+    ignores.delete(e.pointerId);   /* (16 nov.) un numéro de doigt resté « ignoré » ne doit jamais bloquer un nouveau contact (le stylet SMART reprend les mêmes numéros) */
     if (e.pointerType !== "touch") return;
     const t = performance.now(); bas.forEach((v, id) => { if (t - v > 1500) bas.delete(id); });
     if (bas.size && surToile(e)){ ignores.add(e.pointerId); e.stopImmediatePropagation(); e.preventDefault(); return; }
     if (surToile(e)) bas.set(e.pointerId, t);
   }, true);
-  document.addEventListener("pointermove", e => { if (ignores.has(e.pointerId)) e.stopImmediatePropagation(); else if (bas.has(e.pointerId)) bas.set(e.pointerId, performance.now()); }, true);
+  document.addEventListener("pointermove", e => { if (e.pointerType === "touch" && ignores.has(e.pointerId)) e.stopImmediatePropagation(); else if (bas.has(e.pointerId)) bas.set(e.pointerId, performance.now()); }, true);
   const fin = e => {
     if (ignores.has(e.pointerId)){ ignores.delete(e.pointerId); e.stopImmediatePropagation(); return; }
     bas.delete(e.pointerId);

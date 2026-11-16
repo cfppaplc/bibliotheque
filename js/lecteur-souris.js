@@ -134,7 +134,7 @@ function brancherPincement(cible, frame){
   cible.addEventListener("pointerdown", e => { if (!estDoigtPen(e) || !garde(e)) return; menage(); [...PZ.pts.keys()].forEach(c => { if (c.endsWith(":p" + e.pointerId)) PZ.pts.delete(c); }); PZ.pts.set(nom + ":p" + e.pointerId, { p:ecran(e), t:Date.now() });
     if (PZ.pts.size === 2){ try { PZ.n0 = Math.min(PZ.n0 == null ? 1e9 : PZ.n0, strokes().length); } catch(x){} evaluer(e); if (PZ.actif) e.preventDefault(); } }, { capture:true });
   cible.addEventListener("pointermove", e => { const c = nom + ":p" + e.pointerId; if (!PZ.pts.has(c)) return; if (!e.buttons){ finPen(e); return; } PZ.pts.set(c, { p:ecran(e), t:Date.now() });
-    if (PZ.actif || PZ.pts.size === 2){ evaluer(e); e.stopImmediatePropagation(); } }, { capture:true });
+    menage(); if (PZ.pts.size < 2){ PZ.actif = false; return; } evaluer(e); e.stopImmediatePropagation(); }, { capture:true });   /* (16 nov.) un stylet seul n'est jamais un pincement */
   function finPen(e){ if (e.pointerType !== "pen") return; let vu = false; [...PZ.pts.keys()].forEach(c => { if (c.endsWith(":p" + e.pointerId)){ PZ.pts.delete(c); vu = true; } }); if (!vu) return;
     if (PZ.actif && PZ.pts.size < 2){ PZ.actif = false; ZS.tenu = false; clearTimeout(ZS.fin); ZS.fin = setTimeout(zoomSourisFin, 60); }
     if (!PZ.pts.size && PZ.apres){ PZ.apres = false; const n0 = PZ.n0; setTimeout(() => { try { if (strokes().length > n0) undoInk(); } catch(x){} }, 350); } }
