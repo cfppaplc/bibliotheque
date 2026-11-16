@@ -749,6 +749,11 @@ function redrawInk(){
   const c = $("#inkCanvas"), g = c.getContext("2d");
   g.clearRect(0, 0, c.width, c.height);
   const k = DPRI() * RD.z;
+  if (RD.wb){ try { const bc = getComputedStyle($("#wbBoard")).backgroundColor;   /* 16 nov. : la toile peint aussi le fond (le TNI montrait du noir sous la toile une fois zoomé) */
+    const f0 = wbBg(), W0 = c.width, H0 = c.height;
+    if (f0 === "noir" || f0 === "vert"){ const gr = g.createRadialGradient(W0 / 2, H0 * .4, 10, W0 / 2, H0 * .4, Math.max(W0, H0) * .75); gr.addColorStop(0, f0 === "noir" ? "#2b3133" : "#2e6b52"); gr.addColorStop(1, f0 === "noir" ? "#1a1f21" : "#1d4a38"); g.fillStyle = gr; g.fillRect(0, 0, W0, H0); }
+    else if (bc && !/rgba\(0, 0, 0, 0\)|transparent/.test(bc)){ g.fillStyle = bc; g.fillRect(0, 0, W0, H0); }
+    if (wbBg() === "lignes"){ g.fillStyle = "#e8a0a0"; g.fillRect(34 * 2.4 * k, 0, 2 * k, c.height); } } catch(e){} }
   if (RD.wb && (/^iso/.test(wbBg()) || wbBg() === "lignes" || wbBg() === "quad")) grilleIso(g, c.width, c.height, k);
   const tous = INKS[inkKey()] || [];                                       /* les objets cachent les traits qui passent derrière ; les textes restent par-dessus */
   [s => s.t !== "objet" && s.t !== "texte" && s.t !== "cote", s => s.t === "objet", s => s.t === "cote", s => s.t === "texte"].forEach((f, i) => { tous.filter(f).forEach(s => drawStroke(g, s, c.width, c.height, k));

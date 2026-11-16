@@ -877,7 +877,7 @@ html.zflou .reader:not(.wbon) #rinner{will-change:transform}
   .reader.pen-side.pen-fold .penbar{flex-wrap:nowrap}
   /* la palette des objets se place où l'on veut (poignée en haut) */
   #objBar.of>*:not(#objF):not(.tete){display:none!important}#objBar.sim>*:not(#objF):not(.tete):not(#objSim):not(.simAide){display:none!important}
-  .wbboard{--u:34px;transition:background .3s ease}
+  .wbboard{--u:34px}
   .wbboard[data-fond="quad"]{background-color:#fff}
   .wbboard[data-fond="lignes"]{background-color:#fffef9;background-image:linear-gradient(to bottom,transparent calc(100% - 1px),#aec3e3 calc(100% - 1px));background-size:100% calc(var(--u) * 1.25)}
   .wbboard[data-fond="lignes"]::before{content:"";position:absolute;top:0;bottom:0;left:calc(var(--u) * 2.4);width:2px;background:#e8a0a0}
