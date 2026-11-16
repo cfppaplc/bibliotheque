@@ -412,6 +412,7 @@ body.clair .act-top #actBack{color:#1E2A44!important}
   .rstage{flex:1;min-height:0;overflow:auto;position:relative;background:#111}
   .reader:not(.wbon) .rstage{scrollbar-width:none}
   .reader.zredess:not(.wbon) .rstage{background:#fff}
+  .reader.wbon .rstage,.reader.wbon #rinner{background:#fff}   /* 16 nov. : tableau blanc zoomé au TNI = noir pendant le redessin; blanc à la place */
   /* (12 nov., essai demandé par Jeremy) zoom « flou » : la page agrandie n'est pas redessinée (image étirée), donc pas d'écran vide au TNI */
   html.zflou .reader:not(.wbon) #rscale{will-change:transform}
 html.zflou .reader:not(.wbon) #rinner{will-change:transform}
