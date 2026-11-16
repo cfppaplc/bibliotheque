@@ -681,6 +681,6 @@ body.visiteur .mp-pied{margin-top:30px}
 <script>/* 16 nov. : au TNI SMART, les livres restaient noirs en mode léger (« Complètes » marchait). Pendant qu'un livre ou le tableau blanc est ouvert, le mode léger est mis de côté : le lecteur est alors pareil à « Complètes ». Il revient à la fermeture. */
 (function(){ var h = document.documentElement, r = document.getElementById("reader"); if (!r) return; var mis = false;
   new MutationObserver(function(){ var o = r.classList.contains("open");
-    if (o && h.classList.contains("leger")){ h.classList.remove("leger"); mis = true; }
+    if (o && (h.classList.contains("leger") || h.classList.contains("sobre"))){ h.classList.remove("leger"); h.classList.remove("sobre"); mis = true; setTimeout(function(){ try { var f3 = document.getElementById("readerFrame3"); if (r.classList.contains("open") && f3 && f3.hidden && window.RD && RD.html && !RD.wb) setupExtras(); } catch(e){} }, 1500); }
     else if (!o && mis){ mis = false; try { if (window.modeLegerChoix && window.modeLegerFixer) window.modeLegerFixer(window.modeLegerChoix()); } catch(e){} } }).observe(r, {attributes:true, attributeFilter:["class"]}); })();</script>
 </body></html>
