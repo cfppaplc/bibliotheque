@@ -147,7 +147,13 @@ html.eleve body{background:var(--fond)}
 .engage{color:var(--gris);font-size:14px;line-height:1.45;margin:12px 0}
 .fini{text-align:center;padding:40px 10px}.fini .rond{width:96px;height:96px;border-radius:50%;background:var(--vert);color:#fff;display:grid;place-items:center;font-size:52px;margin:0 auto 18px}
 .err{color:#D9534F;font-weight:650;margin-top:10px}
-</style>
+
+.lec{background:#fff;border-radius:12px;padding:14px 16px;margin:10px 0;border:1px solid #e6e1d8}
+.lec.al{border-left:5px solid #B3261E;background:#fdf3f2}
+.lec b{display:block;margin-bottom:4px}.lec ul{margin:4px 0;padding-left:20px}.lec li{margin:4px 0}
+.qz{background:#fff;border-radius:12px;padding:12px 16px;margin:10px 0;border:2px solid transparent}
+.qz p{font-weight:700;margin:0 0 6px}.qz label{display:block;padding:8px 0;cursor:pointer}
+.qz.ko{border-color:#B3261E}.qz.ok{border-color:#1e7b45}</style>
 </head>
 <body>
 <div id="vueProf" hidden>
@@ -221,6 +227,37 @@ async function vueEleve(){
   await chargerProt();
   const o = outil(Q.get("o"));
   if (!o){ V.innerHTML = `<div class="top"><img src="${LOGO}" alt="Métier+"></div><h1>Outil introuvable</h1><p class="sous">Ce code QR ne correspond à aucun outil. Avise ton enseignant.</p>`; return; }
+  if (o.acces){
+    let ouv = {}; try { ouv = JSON.parse(localStorage.getItem("passAcces") || "{}"); } catch(e) {}
+    if (ouv[o.id] !== o.acces){
+      V.innerHTML = `<div class="top"><img src="${LOGO}" alt="Métier+"></div><span class="tag">Accès réservé</span><h1>${esc(o.nom)}</h1>
+        <p class="sous">Entre le code d'accès remis par le responsable de l'outil.</p>
+        <input type="password" id="acCode" inputmode="numeric" maxlength="8" autocomplete="off" style="font-size:1.4rem;padding:12px;width:100%;max-width:260px;letter-spacing:.3em">
+        <p><button type="button" class="btn p" id="acOk" style="min-height:44px">Entrer</button></p><p class="err" id="acEr" hidden>Code incorrect.</p>`;
+      const essai = async () => { const v = $("#acCode").value.trim(); let h = "";
+        try { h = [...new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(v)))].map(x => x.toString(16).padStart(2, "0")).join(""); } catch(e) {}
+        if (h === o.acces){ ouv[o.id] = o.acces; try { localStorage.setItem("passAcces", JSON.stringify(ouv)); } catch(e) {} vueEleve(); }
+        else { $("#acEr").hidden = false; $("#acCode").value = ""; } };
+      $("#acOk").onclick = essai; $("#acCode").addEventListener("keydown", e => { if (e.key === "Enter") essai(); }); $("#acCode").focus();
+      return;
+    }
+  }
+  if (o.quiz && o.quiz.length && !Q.get("formation")){
+    let qz = {}; try { qz = JSON.parse(localStorage.getItem("passQuiz") || "{}"); } catch(e) {}
+    if (!qz[o.id]){
+      const lec = (o.lecons || []).map((l, i) => `<div class="lec${l.alerte ? " al" : ""}"><b>${i + 1}. ${esc(l.t)}</b><ul>${l.p.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>`).join("");
+      V.innerHTML = `<div class="top"><img src="${LOGO}" alt="Métier+"><span class="esp" style="flex:1"></span><span class="tag">Formation</span></div>
+        <span class="tag">Étape 1 sur 2 · Lecture et quiz</span><h1>${esc(o.nom)}</h1><p class="sous">Lis chaque section, puis réponds au quiz. Il faut 100 % pour passer aux étapes et à la signature.</p>
+        ${lec}<div id="qzF">${o.quiz.map((q, i) => `<div class="qz" data-i="${i}"><p>${i + 1}. ${esc(q[0])}</p>${q[1].map((c, j) => `<label><input type="radio" name="qz${i}" value="${j}"> ${esc(c)}</label>`).join("")}</div>`).join("")}</div>
+        <p><button type="button" class="btn p" id="qzOk" style="min-height:44px">Corriger</button></p><p class="err" id="qzEr" hidden></p>`;
+      $("#qzOk").onclick = () => { let bon = 0;
+        o.quiz.forEach((q, i) => { const r = V.querySelector(`input[name=qz${i}]:checked`), d = V.querySelector(`.qz[data-i="${i}"]`);
+          const ok = r && +r.value === q[2]; if (ok) bon++; d.classList.toggle("ko", !ok); d.classList.toggle("ok", ok); });
+        if (bon === o.quiz.length){ qz[o.id] = Date.now(); try { localStorage.setItem("passQuiz", JSON.stringify(qz)); } catch(e) {} window.scrollTo(0, 0); vueEleve(); }
+        else { $("#qzEr").hidden = false; $("#qzEr").textContent = bon + " sur " + o.quiz.length + " : relis les questions en rouge et corrige."; } };
+      return;
+    }
+  }
   const ens = Q.get("e") || "", grp = Q.get("g") || "";
   let faits = {}; try { faits = JSON.parse(localStorage.getItem("passFaits") || "{}"); } catch(e) {}
   const R0 = ens ? await PARTAGE.lire(ens) : { suivi:[], formes:{}, grp:[], codes:null }, suivi = R0.suivi.includes(o.id);
@@ -615,8 +652,8 @@ function editerProt(){
   $("#aOk").onclick = async () => {
     const out = [...$("#eL").querySelectorAll(".ed-o")].map(d => { const nom = d.querySelector(".eN").value.trim();
       const id = d.dataset.id || sansAcc(nom).replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 30) || nid();
-      return { id, nom, progs:(outil(d.dataset.id) || {}).progs || ["plc", "egi"], epi:d.querySelector(".eE").value.split(",").map(x => x.trim()).filter(Boolean),
-        etapes:d.querySelector(".eT").value.split("\n").map(x => x.trim()).filter(Boolean), demo:d.querySelector(".eD").value.split("\n").map(x => x.trim()).filter(Boolean) }; }).filter(o => o.nom && o.etapes.length);
+      return Object.assign({}, outil(d.dataset.id) || {}, { id, nom, progs:(outil(d.dataset.id) || {}).progs || ["plc", "egi"], epi:d.querySelector(".eE").value.split(",").map(x => x.trim()).filter(Boolean),
+        etapes:d.querySelector(".eT").value.split("\n").map(x => x.trim()).filter(Boolean), demo:d.querySelector(".eD").value.split("\n").map(x => x.trim()).filter(Boolean) }); }).filter(o => o.nom && o.etapes.length);
     const N = { maj:Date.now(), outils:out }, b = $("#aOk"); b.disabled = true; b.textContent = "Publication…";
     try {
       const jeton = localStorage.ghJeton, url = "https://api.github.com/repos/cfppaplc/bibliotheque/contents/protocoles.json", h = { Authorization:"Bearer " + jeton, Accept:"application/vnd.github+json" };

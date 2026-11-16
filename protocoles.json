@@ -1,5 +1,5 @@
 {
- "maj": 0,
+ "maj": 1794792427058,
  "outils": [
   {
    "id": "meuleuse",
@@ -27,6 +27,90 @@
     "Changer le disque et resserrer le garde-protecteur.",
     "Serrer la pièce dans l'étau avant de couper.",
     "Faire une coupe droite, puis attendre l'arrêt du disque avant de déposer."
+   ],
+   "lecons": [
+    {
+     "t": "À quoi elle sert",
+     "p": [
+      "Couper du métal (tige filetée, tuyau d'acier, ferraille) avec un disque à tronçonner mince.",
+      "Meuler, ébavurer et nettoyer avec un disque à meuler épais ou une brosse.",
+      "Chaque disque a une vitesse maximale écrite dessus : elle doit être plus élevée que celle de la meuleuse."
+     ]
+    },
+    {
+     "t": "Les dangers",
+     "p": [
+      "Un disque qui éclate projette des morceaux à très haute vitesse : garde-protecteur toujours en place, entre toi et le disque.",
+      "Le rebond : si le disque coince, la meuleuse saute vers toi. Tiens-la à deux mains, poignée latérale vissée.",
+      "Les étincelles allument les chiffons, le bois et les solvants.",
+      "Le bruit dépasse la limite sécuritaire : protecteurs auditifs obligatoires."
+     ],
+     "alerte": true
+    },
+    {
+     "t": "Les bonnes pratiques",
+     "p": [
+      "Disque de coupe = on coupe avec la tranche; jamais de meulage avec le côté d'un disque de coupe.",
+      "Laisse le disque prendre sa pleine vitesse avant de toucher la pièce.",
+      "Ne bloque jamais l'interrupteur en marche; ne retire jamais le garde-protecteur."
+     ]
+    }
+   ],
+   "quiz": [
+    [
+     "Quel EPI protège le visage des éclats ?",
+     [
+      "Les gants seulement",
+      "Une casquette",
+      "L'écran facial avec les lunettes"
+     ],
+     2
+    ],
+    [
+     "Pour couper une tige filetée, on prend :",
+     [
+      "Un disque à meuler épais",
+      "Une brosse métallique",
+      "Un disque à tronçonner mince"
+     ],
+     2
+    ],
+    [
+     "Peut-on meuler avec le côté d'un disque de coupe ?",
+     [
+      "Oui, si on appuie doucement",
+      "Non, il peut éclater",
+      "Oui, avec des gants"
+     ],
+     1
+    ],
+    [
+     "Que fait-on avec la pièce à couper ?",
+     [
+      "On la tient avec le pied",
+      "On la tient dans la main",
+      "On la serre dans un étau ou des serre-joints"
+     ],
+     2
+    ],
+    [
+     "Avant de déposer la meuleuse :",
+     [
+      "On la dépose tout de suite",
+      "On la secoue",
+      "On attend l'arrêt complet du disque"
+     ],
+     2
+    ],
+    [
+     "La vitesse maximale du disque doit être :",
+     [
+      "Plus basse que celle de la meuleuse",
+      "Plus élevée que celle de la meuleuse",
+      "Sans importance"
+     ],
+     1
+    ]
    ]
   },
   {
@@ -51,6 +135,90 @@
     "Changer le foret et le serrer dans le mandrin.",
     "Choisir le sens de rotation et la vitesse.",
     "Percer un trou droit dans une pièce bien tenue."
+   ],
+   "lecons": [
+    {
+     "t": "À quoi elle sert",
+     "p": [
+      "Percer des trous dans le bois, le métal, le plastique ou la céramique avec la bonne mèche.",
+      "Visser et dévisser avec un embout; la visseuse à percussion serre plus fort.",
+      "Le sélecteur de sens (avant/arrière) et l'embrayage règlent la force."
+     ]
+    },
+    {
+     "t": "Les dangers",
+     "p": [
+      "Une mèche qui coince fait tourner la perceuse : tiens-la fermement, poignée latérale si elle en a une.",
+      "Les manches, gants amples et cheveux longs peuvent s'enrouler autour de la mèche.",
+      "Percer dans un mur sans vérifier peut toucher un fil électrique ou un tuyau.",
+      "La mèche est chaude et coupante après le perçage."
+     ],
+     "alerte": true
+    },
+    {
+     "t": "Les bonnes pratiques",
+     "p": [
+      "Mèche à bois, à métal ou à béton selon le matériau.",
+      "Pièce serrée, jamais tenue à la main sur une petite pièce.",
+      "Retire la batterie avant de changer la mèche."
+     ]
+    }
+   ],
+   "quiz": [
+    [
+     "Avant de changer de mèche :",
+     [
+      "On met la perceuse en marche arrière",
+      "On retire la batterie",
+      "On garde le doigt sur la gâchette"
+     ],
+     1
+    ],
+    [
+     "Qu'est-ce qui peut s'enrouler dans la mèche ?",
+     [
+      "Une manche large ou des cheveux longs",
+      "Les bottes",
+      "Les lunettes"
+     ],
+     0
+    ],
+    [
+     "Avant de percer un mur, on vérifie :",
+     [
+      "La couleur de la peinture",
+      "Qu'il n'y a ni fil ni tuyau derrière",
+      "L'heure"
+     ],
+     1
+    ],
+    [
+     "Pour percer de l'acier, on prend :",
+     [
+      "N'importe quelle mèche",
+      "Une mèche à bois",
+      "Une mèche à métal"
+     ],
+     2
+    ],
+    [
+     "Une petite pièce à percer est :",
+     [
+      "Serrée dans un étau ou des serre-joints",
+      "Posée sur la cuisse",
+      "Tenue dans la main"
+     ],
+     0
+    ],
+    [
+     "Quel EPI est obligatoire ?",
+     [
+      "Les lunettes de sécurité",
+      "Le casque de soudeur",
+      "Aucun"
+     ],
+     0
+    ]
    ]
   },
   {
@@ -78,6 +246,90 @@
     "Installer et verrouiller le foret SDS.",
     "Choisir le mode (perçage ou percussion).",
     "Percer un trou à la bonne profondeur avec la butée."
+   ],
+   "lecons": [
+    {
+     "t": "À quoi il sert",
+     "p": [
+      "Percer le béton, la brique et la pierre grâce à la percussion.",
+      "Mode perçage seul pour le bois ou le métal; mode percussion pour le béton.",
+      "Le foret SDS s'enclenche sans clé et se verrouille dans le mandrin."
+     ]
+    },
+    {
+     "t": "Les dangers",
+     "p": [
+      "La poussière de béton contient de la silice : elle abîme les poumons. Aspiration ou masque obligatoire.",
+      "Si le foret coince, l'outil tourne avec force : deux mains, poignée latérale, pieds bien appuyés.",
+      "Fils et tuyaux noyés dans le béton : on vérifie avant de percer.",
+      "Le bruit et les vibrations : protecteurs auditifs et gants."
+     ],
+     "alerte": true
+    },
+    {
+     "t": "Les bonnes pratiques",
+     "p": [
+      "Règle la butée de profondeur avant de percer.",
+      "Laisse l'outil travailler, ne force pas.",
+      "Débranche ou retire la batterie avant de changer de foret."
+     ]
+    }
+   ],
+   "quiz": [
+    [
+     "Pourquoi le masque antipoussière ?",
+     [
+      "Ce n'est pas nécessaire",
+      "La poussière de béton contient de la silice",
+      "Pour ne pas sentir l'huile"
+     ],
+     1
+    ],
+    [
+     "Pour percer du béton, on choisit :",
+     [
+      "Le mode percussion",
+      "Le mode vissage",
+      "Le mode perçage seul"
+     ],
+     0
+    ],
+    [
+     "À quoi sert la butée de profondeur ?",
+     [
+      "À percer à la bonne profondeur",
+      "À tenir l'outil",
+      "À refroidir le foret"
+     ],
+     0
+    ],
+    [
+     "Comment tient-on le perforateur ?",
+     [
+      "Avec le genou",
+      "D'une main",
+      "À deux mains, pieds bien appuyés"
+     ],
+     2
+    ],
+    [
+     "Avant de changer de foret :",
+     [
+      "On le laisse tourner lentement",
+      "On le mouille",
+      "On débranche ou on retire la batterie"
+     ],
+     2
+    ],
+    [
+     "Avant de percer le béton, on vérifie :",
+     [
+      "Qu'il n'y a ni fil ni tuyau",
+      "La couleur du béton",
+      "Rien"
+     ],
+     0
+    ]
    ]
   },
   {
@@ -104,6 +356,90 @@
     "Changer la lame et la verrouiller.",
     "Appuyer le sabot contre la pièce avant de démarrer.",
     "Couper un tuyau bien tenu, sans forcer."
+   ],
+   "lecons": [
+    {
+     "t": "À quoi elle sert",
+     "p": [
+      "Couper le bois, le métal, le plastique ou la fonte selon la lame (scie de démolition).",
+      "Les dents fines servent au métal, les grosses dents au bois.",
+      "Le sabot s'appuie contre la pièce pour réduire les vibrations."
+     ]
+    },
+    {
+     "t": "Les dangers",
+     "p": [
+      "La lame peut rebondir si le sabot n'est pas appuyé : la scie saute vers toi.",
+      "Couper dans un mur peut toucher un fil électrique ou un tuyau sous pression.",
+      "La partie coupée peut tomber sur quelqu'un.",
+      "La lame est très chaude après une coupe dans le métal."
+     ],
+     "alerte": true
+    },
+    {
+     "t": "Les bonnes pratiques",
+     "p": [
+      "Sabot appuyé avant de démarrer.",
+      "Deux mains sur la scie, sans forcer : laisse la lame couper.",
+      "Retire la batterie ou débranche avant de changer la lame."
+     ]
+    }
+   ],
+   "quiz": [
+    [
+     "Avant de démarrer la coupe :",
+     [
+      "La lame touche déjà la pièce en marche",
+      "On lève la scie",
+      "Le sabot est appuyé contre la pièce"
+     ],
+     2
+    ],
+    [
+     "Pour couper du tuyau de métal, on prend :",
+     [
+      "Une lame à grosses dents",
+      "Une lame à dents fines pour métal",
+      "Une lame usée"
+     ],
+     1
+    ],
+    [
+     "Avant de couper dans un mur :",
+     [
+      "On mouille le mur",
+      "On vérifie les fils et les tuyaux derrière",
+      "On coupe vite"
+     ],
+     1
+    ],
+    [
+     "La lame après une coupe dans le métal :",
+     [
+      "Est chaude : on attend avant d'y toucher",
+      "Se change à mains nues tout de suite",
+      "Est froide"
+     ],
+     0
+    ],
+    [
+     "Comment tient-on la scie ?",
+     [
+      "À deux mains",
+      "D'une main au-dessus de la tête",
+      "Coincée sous le bras"
+     ],
+     0
+    ],
+    [
+     "La partie coupée :",
+     [
+      "N'a aucune importance",
+      "Ne peut tomber sur personne",
+      "Peut tomber : on vérifie que personne n'est en dessous"
+     ],
+     2
+    ]
    ]
   },
   {
@@ -129,6 +465,90 @@
     "Vérifier le raccord et l'absence de fuite.",
     "Allumer et régler la flamme.",
     "Souder un raccord, puis fermer le robinet et ranger."
+   ],
+   "lecons": [
+    {
+     "t": "À quoi il sert",
+     "p": [
+      "Souder (brasage tendre) les raccords de cuivre avec de la soudure sans plomb et du flux.",
+      "Chauffer le raccord, pas la soudure : la soudure fond au contact du cuivre chaud.",
+      "La bonbonne de propane ou de MAP-Pro se visse sur le chalumeau."
+     ]
+    },
+    {
+     "t": "Les dangers",
+     "p": [
+      "La flamme dépasse 1 900 °C : brûlures et incendie.",
+      "Le bois, l'isolant et la poussière derrière le tuyau peuvent prendre feu, même après le travail (feu qui couve).",
+      "Une fuite au raccord de la bonbonne peut s'enflammer.",
+      "Le cuivre reste brûlant longtemps après la soudure."
+     ],
+     "alerte": true
+    },
+    {
+     "t": "Les bonnes pratiques",
+     "p": [
+      "Écran thermique entre le tuyau et le bois ou le mur.",
+      "Extincteur à portée de main; surveillance de la zone après le travail.",
+      "Bonbonne debout, valve fermée après usage, chalumeau refroidi avant de ranger."
+     ]
+    }
+   ],
+   "quiz": [
+    [
+     "Que chauffe-t-on pour souder ?",
+     [
+      "Le flux seulement",
+      "La soudure directement",
+      "Le raccord de cuivre"
+     ],
+     2
+    ],
+    [
+     "À quoi sert l'écran thermique ?",
+     [
+      "Refroidir la soudure",
+      "Éclairer",
+      "Protéger le bois ou le mur de la flamme"
+     ],
+     2
+    ],
+    [
+     "Comment vérifier une fuite au raccord de la bonbonne ?",
+     [
+      "Avec une flamme",
+      "Avec de l'eau savonneuse",
+      "À l'odeur seulement"
+     ],
+     1
+    ],
+    [
+     "Après le travail, on :",
+     [
+      "Laisse le chalumeau allumé",
+      "Part tout de suite",
+      "Surveille la zone : un feu peut couver"
+     ],
+     2
+    ],
+    [
+     "On allume le chalumeau avec :",
+     [
+      "Un briquet de poche",
+      "Une autre flamme",
+      "Un allumeur ou l'allumage automatique"
+     ],
+     2
+    ],
+    [
+     "Vers où ne pointe-t-on jamais la flamme ?",
+     [
+      "Vers une personne ou une bouteille",
+      "Vers le raccord",
+      "Vers le haut"
+     ],
+     0
+    ]
    ]
   },
   {
@@ -156,6 +576,90 @@
     "Ouvrir les bouteilles et régler les pressions.",
     "Allumer et régler une flamme neutre.",
     "Éteindre dans le bon ordre et purger les boyaux."
+   ],
+   "lecons": [
+    {
+     "t": "À quoi il sert",
+     "p": [
+      "Le brasage fort (brasure à l'argent ou au phosphore) et le chauffage de pièces épaisses.",
+      "Deux bouteilles : oxygène et acétylène, chacune avec son régulateur et son boyau.",
+      "La flamme neutre (cône bleu bien net) est celle qu'on utilise pour braser."
+     ]
+    },
+    {
+     "t": "Les dangers",
+     "p": [
+      "Retour de flamme : les clapets antiretour sont obligatoires.",
+      "L'acétylène est instable au-delà de 15 lb/po² : on respecte les pressions données par l'enseignant.",
+      "L'oxygène fait brûler très fort l'huile et la graisse : jamais d'huile sur les raccords d'oxygène.",
+      "Une bouteille qui tombe peut casser sa valve : bouteilles debout et attachées."
+     ],
+     "alerte": true
+    },
+    {
+     "t": "Les bonnes pratiques",
+     "p": [
+      "Allumer et éteindre dans l'ordre enseigné, avec un allumeur.",
+      "Lunettes teintées obligatoires pour regarder la flamme.",
+      "Après le travail : bouteilles fermées, boyaux purgés, zone surveillée."
+     ]
+    }
+   ],
+   "quiz": [
+    [
+     "À quoi servent les clapets antiretour ?",
+     [
+      "Empêcher le retour de flamme dans les boyaux",
+      "Augmenter la pression",
+      "Allumer la flamme"
+     ],
+     0
+    ],
+    [
+     "Les bouteilles doivent être :",
+     [
+      "Dans un coffre fermé pendant le travail",
+      "Couchées",
+      "Debout et attachées"
+     ],
+     2
+    ],
+    [
+     "Peut-on mettre de l'huile sur un raccord d'oxygène ?",
+     [
+      "Non, l'oxygène fait brûler l'huile très fort",
+      "Seulement l'hiver",
+      "Oui, pour lubrifier"
+     ],
+     0
+    ],
+    [
+     "Pour braser, on règle une flamme :",
+     [
+      "Neutre",
+      "Avec beaucoup d'acétylène, jaune",
+      "Sans oxygène"
+     ],
+     0
+    ],
+    [
+     "Quelles lunettes porte-t-on ?",
+     [
+      "Aucune",
+      "Des lunettes de soleil",
+      "Des lunettes teintées de soudage"
+     ],
+     2
+    ],
+    [
+     "Après le travail :",
+     [
+      "On laisse les bouteilles ouvertes",
+      "On débranche les boyaux sous pression",
+      "On ferme les bouteilles et on purge les boyaux"
+     ],
+     2
+    ]
    ]
   },
   {
@@ -180,6 +684,90 @@
     "Installer la bonne filière et serrer le tuyau dans le mandrin.",
     "Fileter avec l'huile de coupe en gardant la pédale sous contrôle.",
     "Arrêter, ébavurer et nettoyer les copeaux sans les mains nues."
+   ],
+   "lecons": [
+    {
+     "t": "À quoi elle sert",
+     "p": [
+      "Fileter le tuyau d'acier (filet NPT) avec une tête de filière motorisée.",
+      "Elle coupe, alésage et filète; l'huile de coupe refroidit et lubrifie la filière.",
+      "La pédale commande la rotation : on la relâche, ça s'arrête."
+     ]
+    },
+    {
+     "t": "Les dangers",
+     "p": [
+      "Le tuyau qui tourne peut accrocher un gant, une manche ou un bijou et entraîner le bras.",
+      "Un long tuyau mal supporté peut fouetter et frapper quelqu'un.",
+      "Les copeaux sont coupants et chauds.",
+      "L'huile au sol rend le plancher glissant."
+     ],
+     "alerte": true
+    },
+    {
+     "t": "Les bonnes pratiques",
+     "p": [
+      "Pédale à tes pieds et testée avant de commencer.",
+      "Support à rouleaux pour un long tuyau.",
+      "On arrête avant de mesurer ou d'ajuster; copeaux enlevés avec une brosse."
+     ]
+    }
+   ],
+   "quiz": [
+    [
+     "Pourquoi pas de gants près du tuyau qui tourne ?",
+     [
+      "Ils peuvent s'accrocher et entraîner le bras",
+      "Ils salissent le filet",
+      "Ce n'est pas vrai, il en faut"
+     ],
+     0
+    ],
+    [
+     "Comment arrête-t-on la machine ?",
+     [
+      "On débranche en tirant le fil",
+      "On relâche la pédale",
+      "On attrape le tuyau"
+     ],
+     1
+    ],
+    [
+     "À quoi sert l'huile de coupe ?",
+     [
+      "Peindre le tuyau",
+      "Rien",
+      "Refroidir et lubrifier la filière"
+     ],
+     2
+    ],
+    [
+     "Un tuyau long doit être :",
+     [
+      "Tenu par un élève",
+      "Supporté par un support à rouleaux",
+      "Laissé dans le vide"
+     ],
+     1
+    ],
+    [
+     "Les copeaux s'enlèvent :",
+     [
+      "En soufflant dessus",
+      "À la main",
+      "Avec une brosse"
+     ],
+     2
+    ],
+    [
+     "Pour mesurer le filet :",
+     [
+      "On mesure pendant que ça tourne",
+      "On ne mesure jamais",
+      "On arrête la machine d'abord"
+     ],
+     2
+    ]
    ]
   },
   {
@@ -202,6 +790,89 @@
     "Choisir et installer les bonnes mâchoires.",
     "Marquer la profondeur d'insertion sur le tuyau.",
     "Sertir un raccord et vérifier la marque du sertissage."
+   ],
+   "lecons": [
+    {
+     "t": "À quoi elle sert",
+     "p": [
+      "Raccorder le cuivre (ProPress) ou l'acier (MegaPress) sans flamme, en écrasant un joint dans le raccord.",
+      "Chaque diamètre et chaque système a ses mâchoires.",
+      "Un sertissage prend quelques secondes et se fait au complet en un cycle."
+     ]
+    },
+    {
+     "t": "Les dangers",
+     "p": [
+      "La force des mâchoires écrase un doigt sans effort : doigts toujours hors des mâchoires.",
+      "Un tuyau mal enfoncé ou mal préparé donne un raccord qui fuit sous pression.",
+      "La mauvaise mâchoire abîme le raccord et l'outil."
+     ],
+     "alerte": true
+    },
+    {
+     "t": "Les bonnes pratiques",
+     "p": [
+      "Tuyau coupé d'équerre, ébavuré et marqué à la profondeur d'insertion.",
+      "Raccord enfoncé jusqu'à la marque avant de sertir.",
+      "On laisse le cycle se terminer et on vérifie le sertissage."
+     ]
+    }
+   ],
+   "quiz": [
+    [
+     "Où sont tes doigts pendant le sertissage ?",
+     [
+      "Entre les mâchoires",
+      "Hors des mâchoires",
+      "Sur le raccord pour le tenir"
+     ],
+     1
+    ],
+    [
+     "Avant de sertir, le tuyau est :",
+     [
+      "Seulement coupé",
+      "Peint",
+      "Coupé d'équerre, ébavuré et marqué"
+     ],
+     2
+    ],
+    [
+     "À quoi sert la marque sur le tuyau ?",
+     [
+      "Vérifier qu'il est enfoncé à la bonne profondeur",
+      "Décorer",
+      "Indiquer le prix"
+     ],
+     0
+    ],
+    [
+     "Les mâchoires se choisissent selon :",
+     [
+      "N'importe lesquelles",
+      "Le diamètre et le système de raccord",
+      "La couleur de l'outil"
+     ],
+     1
+    ],
+    [
+     "Pendant un sertissage, on :",
+     [
+      "Relâche la gâchette au milieu",
+      "Tourne l'outil",
+      "Laisse le cycle se terminer"
+     ],
+     2
+    ],
+    [
+     "Après le sertissage, on :",
+     [
+      "Vérifie la forme et la marque",
+      "Passe au suivant sans regarder",
+      "Chauffe le raccord"
+     ],
+     0
+    ]
    ]
   },
   {
@@ -226,6 +897,90 @@
     "Régler l'angle de coupe et le bloquer.",
     "Tenir la pièce contre le guide, les mains hors de la zone rouge.",
     "Couper et attendre l'arrêt de la lame avant de la remonter."
+   ],
+   "lecons": [
+    {
+     "t": "À quoi elle sert",
+     "p": [
+      "Couper droit ou en angle le bois, les moulures et certains profilés.",
+      "L'angle se règle et se bloque avant la coupe.",
+      "La pièce s'appuie contre le guide, à plat sur la table."
+     ]
+    },
+    {
+     "t": "Les dangers",
+     "p": [
+      "Les mains trop près de la lame : la zone rouge (15 cm) est interdite.",
+      "Une petite pièce peut être projetée ou attirer la main vers la lame.",
+      "Lever la scie avant l'arrêt de la lame peut lancer des morceaux.",
+      "Le bruit : protecteurs auditifs."
+     ],
+     "alerte": true
+    },
+    {
+     "t": "Les bonnes pratiques",
+     "p": [
+      "Protège-lame libre qui revient en place.",
+      "Lame à pleine vitesse avant de descendre dans la pièce.",
+      "Débrancher avant de changer la lame ou d'ajuster."
+     ]
+    }
+   ],
+   "quiz": [
+    [
+     "Distance minimale entre tes mains et la lame :",
+     [
+      "15 cm",
+      "2 cm",
+      "Aucune"
+     ],
+     0
+    ],
+    [
+     "Quand commence-t-on la coupe ?",
+     [
+      "Lame arrêtée",
+      "Quand la lame a atteint sa pleine vitesse",
+      "Dès qu'on appuie sur la gâchette"
+     ],
+     1
+    ],
+    [
+     "Une pièce trop petite pour être tenue de façon sécuritaire :",
+     [
+      "On la tient du bout des doigts",
+      "On la coupe vite",
+      "On ne la coupe pas à la scie à onglets"
+     ],
+     2
+    ],
+    [
+     "Après la coupe, on remonte la scie :",
+     [
+      "Après l'arrêt complet de la lame",
+      "Pendant que la lame tourne",
+      "N'importe quand"
+     ],
+     0
+    ],
+    [
+     "La pièce est appuyée :",
+     [
+      "Sur la cuisse",
+      "Contre le guide, à plat",
+      "Dans le vide"
+     ],
+     1
+    ],
+    [
+     "Avant de changer la lame :",
+     [
+      "On la laisse branchée",
+      "On la met en marche",
+      "On débranche"
+     ],
+     2
+    ]
    ]
   },
   {
@@ -250,6 +1005,250 @@
     "Inspecter l'escabeau et l'ouvrir au complet, barres verrouillées.",
     "Monter et descendre face à l'escabeau, 3 points d'appui.",
     "Placer une échelle à la bonne pente (1 pour 4) et la fixer."
+   ],
+   "lecons": [
+    {
+     "t": "À quoi il sert",
+     "p": [
+      "L'escabeau est autoportant; l'échelle s'appuie contre un mur ou une structure.",
+      "Chaque escabeau a une charge maximale (classe) écrite sur l'étiquette.",
+      "On choisit la bonne hauteur pour ne pas monter trop haut."
+     ]
+    },
+    {
+     "t": "Les dangers",
+     "p": [
+      "Les chutes de hauteur sont parmi les accidents les plus graves en chantier.",
+      "Un escabeau mal ouvert ou sur un sol inégal bascule.",
+      "S'étirer sur le côté déplace le poids et fait tomber.",
+      "Monter avec les mains pleines empêche de se tenir."
+     ],
+     "alerte": true
+    },
+    {
+     "t": "Les bonnes pratiques",
+     "p": [
+      "Barres d'écartement verrouillées, pieds antidérapants en bon état, sol plat.",
+      "Jamais sur les deux dernières marches; trois points d'appui.",
+      "Échelle : pente de 4 pour 1 et elle dépasse d'un mètre le point d'appui."
+     ]
+    }
+   ],
+   "quiz": [
+    [
+     "Combien de points d'appui garde-t-on ?",
+     [
+      "Aucun",
+      "Trois",
+      "Un"
+     ],
+     1
+    ],
+    [
+     "Peut-on monter sur les deux dernières marches ?",
+     [
+      "Oui, si on fait vite",
+      "Oui, avec des bottes",
+      "Non, jamais"
+     ],
+     2
+    ],
+    [
+     "Si le travail est trop loin sur le côté :",
+     [
+      "On déplace l'escabeau",
+      "On s'étire",
+      "On saute"
+     ],
+     0
+    ],
+    [
+     "La bonne pente d'une échelle :",
+     [
+      "Verticale",
+      "4 pour 1",
+      "1 pour 1"
+     ],
+     1
+    ],
+    [
+     "Une échelle doit dépasser le point d'appui de :",
+     [
+      "10 cm",
+      "Rien",
+      "1 mètre"
+     ],
+     2
+    ],
+    [
+     "Avant de monter dans l'escabeau :",
+     [
+      "Les barres d'écartement sont verrouillées",
+      "On le laisse à moitié ouvert",
+      "On le met sur une boîte"
+     ],
+     0
+    ]
+   ]
+  },
+  {
+   "id": "graveur-laser",
+   "nom": "Graveur laser xTool F2 (personnel seulement)",
+   "progs": [
+    "plc",
+    "egi"
+   ],
+   "acces": "d7c7673ba8ca7b0f04b1af4df026cbea7fed5b8acf59b27d33ef988c60eff054",
+   "epi": [
+    "Couvercle de protection fermé pendant toute la gravure",
+    "Purificateur d'air en marche",
+    "Extincteur CO2 à portée de main"
+   ],
+   "etapes": [
+    "Je suis un membre du personnel formé; aucun élève ne s'en sert seul.",
+    "J'ai pris la clé auprès du responsable et inscrit la sortie au registre.",
+    "Le matériau est permis : jamais de PVC, vinyle, simili-cuir, polycarbonate (Lexan) ou ABS.",
+    "La pièce est propre et posée à plat; le purificateur d'air est en marche.",
+    "J'ai choisi le bon laser : infrarouge pour le métal, diode pour le bois et le cuir.",
+    "J'ai fait un contour de prévisualisation et un essai sur une retaille.",
+    "Je ferme le couvercle et je reste devant l'appareil pendant toute la gravure.",
+    "En cas de flamme : arrêt, couvercle fermé, extincteur CO2 si nécessaire.",
+    "Je laisse refroidir la pièce, je range, je rapporte la clé et j'inscris le retour au registre."
+   ],
+   "demo": [
+    "Choisir le laser et le matériau dans xTool Studio, puis positionner avec la caméra.",
+    "Faire un contour de prévisualisation et un essai sur une retaille.",
+    "Graver un numéro d'inventaire PLB-année-numéro et l'inscrire à l'inventaire."
+   ],
+   "lecons": [
+    {
+     "t": "À quoi sert le graveur",
+     "p": [
+      "Graver un numéro d'inventaire et le nom du centre sur les outils (métal et plastique).",
+      "Graver des étiquettes de vannes et de tuyauterie pour les montages.",
+      "Il est prêté aux autres départements : chaque prêt est inscrit au registre.",
+      "Deux lasers : infrarouge 5 W pour les métaux, diode 15 W pour le bois, le cuir et l'acrylique."
+     ]
+    },
+    {
+     "t": "Sécurité : règles non négociables",
+     "alerte": true,
+     "p": [
+      "Seul un membre du personnel formé l'utilise. Jamais un élève seul.",
+      "Ne jamais regarder le faisceau ni faire fonctionner l'appareil couvercle ouvert ou retiré.",
+      "Ne jamais laisser l'appareil sans surveillance pendant une gravure, même quelques secondes.",
+      "Garder un extincteur CO2 à portée de main. En cas de flamme : arrêt, couvercle fermé, extincteur si nécessaire.",
+      "Le purificateur d'air est en marche pendant toute la gravure."
+     ]
+    },
+    {
+     "t": "Matériaux permis et interdits",
+     "p": [
+      "Permis : acier inoxydable, aluminium, laiton, cuivre, acier peint, boîtiers d'outils en plastique (essai sur une zone cachée), bois, cuir naturel, acrylique, carton.",
+      "Interdits : PVC et vinyle (dégagent du chlore), simili-cuir (souvent du PVC), polycarbonate (Lexan) et ABS (fumées toxiques, risque de flamme), fibre de verre, matériaux ou enduits inconnus.",
+      "En cas de doute sur un matériau : on ne grave pas."
+     ]
+    },
+    {
+     "t": "Numérotation des outils",
+     "p": [
+      "Format : PLB-année-numéro (ex. PLB-2027-0142). Les autres départements utilisent leur propre préfixe.",
+      "Chaque numéro gravé est ajouté à l'inventaire le jour même.",
+      "Gros appareils (chaudières, coffres, dévidoirs) : graver une plaque d'aluminium et la fixer."
+     ]
+    }
+   ],
+   "quiz": [
+    [
+     "Qui peut utiliser le graveur ?",
+     [
+      "N'importe quel élève du DEP",
+      "Seulement un membre du personnel formé",
+      "Tout le monde, si le couvercle est fermé"
+     ],
+     1
+    ],
+    [
+     "Pendant une gravure, on peut s'absenter :",
+     [
+      "Jamais, même quelques secondes",
+      "Si la gravure dure plus de 5 minutes",
+      "Si le purificateur est en marche"
+     ],
+     0
+    ],
+    [
+     "Lequel de ces matériaux est INTERDIT ?",
+     [
+      "Laiton",
+      "Acier inoxydable",
+      "PVC"
+     ],
+     2
+    ],
+    [
+     "Pourquoi le PVC est-il interdit ?",
+     [
+      "Il dégage du chlore, toxique et corrosif",
+      "Il est trop dur à graver",
+      "Il réfléchit le laser"
+     ],
+     0
+    ],
+    [
+     "Quel laser utilise-t-on pour un outil en métal ?",
+     [
+      "La diode 15 W",
+      "L'infrarouge 5 W",
+      "N'importe lequel"
+     ],
+     1
+    ],
+    [
+     "Le purificateur d'air doit être en marche :",
+     [
+      "Seulement pour le bois",
+      "Pendant toute la gravure",
+      "Seulement s'il y a de la fumée visible"
+     ],
+     1
+    ],
+    [
+     "Avant la gravure finale, on fait :",
+     [
+      "Un essai sur une retaille ou une zone cachée",
+      "Rien, la caméra suffit",
+      "Un nettoyage du couvercle"
+     ],
+     0
+    ],
+    [
+     "En cas de flamme dans l'appareil :",
+     [
+      "On ouvre le couvercle pour souffler",
+      "Arrêt, couvercle fermé, extincteur CO2 si nécessaire",
+      "On verse de l'eau"
+     ],
+     1
+    ],
+    [
+     "Quand inscrit-on au registre ?",
+     [
+      "À la sortie et au retour",
+      "Seulement pour un prêt à un autre département",
+      "Une fois par mois"
+     ],
+     0
+    ],
+    [
+     "Pour une chaudière trop grosse pour l'appareil :",
+     [
+      "On ne l'identifie pas",
+      "On grave une plaque d'aluminium qu'on fixe dessus",
+      "On grave en retirant le couvercle"
+     ],
+     1
+    ]
    ]
   }
  ]
