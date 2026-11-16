@@ -53,12 +53,22 @@ function zoomSouris(e, frame){ ZS.t = Date.now();
 }
 /* Zoom à la roulette (4 nov.) : pendant le geste, on agrandit seulement l'image (transform, très léger); le vrai redimensionnement du livre
    (qui fait recalculer toute la page) se fait une seule fois, quand la roulette s'arrête. Le point sous la souris reste sous la souris. */
-function zoomSourisPas(){
-  ZS.raf = 0; const st = $("#rstage"), inn = $("#rinner"), px = ZS.px, py = ZS.py, d = Math.max(-80, Math.min(80, ZS.d)); ZS.d = 0;
+function debutGeste(){ const st = $("#rstage");
   if (!RD.wb) pauseLivre(); if (!ZS.on){ calmePage(); ZS.on = true;
     /* (7 nov.) pendant le geste : pas de flou derrière les barres (le flou est recalculé à chaque image pendant que le livre grossit : très lourd sur le tableau interactif)
        et toile du crayon cachée si la page n'a aucun trait (une image de plus de 8 millions de pixels à agrandir pour rien) */
     $("#reader").classList.add("zg"); try { if (!strokes().length) $("#inkCanvas").style.visibility = "hidden"; } catch(e){} ZS.z0 = RD.z; ZS.z = RD.z; ZS.sl = st.scrollLeft; ZS.stp = st.scrollTop; ZS.mx0 = RD.mx || 0; ZS.my0 = RD.my || 0; ZS.tx = 0; ZS.ty = 0; ZS.s = 1; PAN.alvo = null; }
+}
+/* (16 nov., Jeremy : option 2) deux doigts qui glissent ensemble = l'image suit les doigts, comme sur un cellulaire (en même temps que le zoom) */
+function panGeste(mx, my, dx, dy){
+  if (!dx && !dy) return; debutGeste(); const st = $("#rstage"), sr = st.getBoundingClientRect(), inn = $("#rinner");
+  ZS.tx += dx; ZS.ty += dy; ZS.px1 = mx - sr.left; ZS.py1 = my - sr.top;
+  inn.style.willChange = "transform"; inn.style.transformOrigin = "0 0"; inn.style.transform = "translate(" + ZS.tx + "px," + ZS.ty + "px) scale(" + ZS.s + ")";
+  clearTimeout(ZS.fin); if (!ZS.tenu) ZS.fin = setTimeout(zoomSourisFin, 140);
+}
+function zoomSourisPas(){
+  ZS.raf = 0; const st = $("#rstage"), inn = $("#rinner"), px = ZS.px, py = ZS.py, d = Math.max(-80, Math.min(80, ZS.d)); ZS.d = 0;
+  debutGeste();
   const z = Math.max(zMin(), Math.min(zMax(), ZS.z * Math.exp(-d * .0075)));
   if (Math.abs(z - ZS.z) > .0005){
     const s0 = ZS.s, s1 = z / ZS.z0, bx = ZS.mx0 - ZS.sl, by = ZS.my0 - ZS.stp;
@@ -77,8 +87,8 @@ function zoomSourisFin(){
   /* (12 nov., vidéo du TNI) après un zoom, le tableau met ~2 s à redessiner la page agrandie : on voyait le fond noir (écran noir).
      Pendant ce temps, fond blanc comme la page : on ne voit plus de flash noir. */
   if (!RD.wb){ const R = $("#reader"); R.classList.add("zredess"); clearTimeout(ZS.blanc); ZS.blanc = setTimeout(() => R.classList.remove("zredess"), 3500); }
-  if (Math.abs(z - RD.z) > .002){ setZoom(z, true);
-    st.scrollLeft = cx * RD.z * K + (RD.mx || 0) - px; st.scrollTop = cy * RD.z * K + (RD.my || 0) - py; }
+  if (Math.abs(z - RD.z) > .002) setZoom(z, true);
+  { st.scrollLeft = cx * RD.z * K + (RD.mx || 0) - px; st.scrollTop = cy * RD.z * K + (RD.my || 0) - py; }
   try { sizeInner(); } catch(e){}   /* toile et dessin remis nets */
 }
 /* Pincement à deux doigts = zoom (6 nov., écran tactile) : même zoom que la roulette (zoomSouris), centré entre les deux doigts.
@@ -95,7 +105,7 @@ function brancherPincement(cible, frame){
   const deux = () => { const v = [...PZ.pts.values()]; return v.length === 2 ? v.map(o => o.p) : null; };
   cible.addEventListener("touchstart", e => {
     if (!garde(e)) return; sync(e);
-    const q = deux(); if (q && !PZ.actif){ PZ.d0 = Math.hypot(q[0][0] - q[1][0], q[0][1] - q[1][1]); PZ.actif = PZ.d0 > 12; if (PZ.actif){ PZ.apres = true; ZS.tenu = true; clearTimeout(ZS.fin); } }
+    const q = deux(); if (q && !PZ.actif){ PZ.d0 = Math.hypot(q[0][0] - q[1][0], q[0][1] - q[1][1]); PZ.actif = PZ.d0 > 12; PZ.m = null; if (PZ.actif){ PZ.apres = true; ZS.tenu = true; clearTimeout(ZS.fin); } }
   }, { capture:true, passive:true });
   /* nombre de traits avant que le 1er doigt (pointerdown, qui précède touchstart) ne commence le sien */
   cible.addEventListener("pointerdown", e => { if ((e.pointerType === "touch" || e.pointerType === "pen") && e.isPrimary && !PZ.actif && !PZ.pts.size){ try { PZ.n0 = strokes().length; } catch(x){ PZ.n0 = 0; } } }, { capture:true, passive:true });
@@ -103,15 +113,17 @@ function brancherPincement(cible, frame){
     sync(e);
     if (PZ.apres && !PZ.actif && PZ.pts.size === 1){ e.preventDefault(); return; }   /* un doigt levé avant l'autre : celui qui reste ne fait plus glisser la page */
     const q = deux(); if (!q) return;
-    if (!PZ.actif){ PZ.d0 = Math.hypot(q[0][0] - q[1][0], q[0][1] - q[1][1]); PZ.actif = PZ.d0 > 12; if (PZ.actif){ PZ.apres = true; ZS.tenu = true; clearTimeout(ZS.fin); e.preventDefault(); } return; }   /* le 2e doigt est arrivé ailleurs (autre page, bord de l'écran) : le navigateur ne l'annonce qu'au 1er mouvement */
+    if (!PZ.actif){ PZ.d0 = Math.hypot(q[0][0] - q[1][0], q[0][1] - q[1][1]); PZ.actif = PZ.d0 > 12; PZ.m = null; if (PZ.actif){ PZ.apres = true; ZS.tenu = true; clearTimeout(ZS.fin); e.preventDefault(); } return; }   /* le 2e doigt est arrivé ailleurs (autre page, bord de l'écran) : le navigateur ne l'annonce qu'au 1er mouvement */
     const d = Math.hypot(q[0][0] - q[1][0], q[0][1] - q[1][1]); if (d < 12 || !PZ.d0) return;
     e.preventDefault();
-    zoomSouris({ clientX:(q[0][0] + q[1][0]) / 2, clientY:(q[0][1] + q[1][1]) / 2, deltaY: -Math.log(d / PZ.d0) * 2.2 / .0075, deltaMode:0 }, null);
+    const mx = (q[0][0] + q[1][0]) / 2, my = (q[0][1] + q[1][1]) / 2;
+    if (PZ.m) panGeste(mx, my, mx - PZ.m[0], my - PZ.m[1]); PZ.m = [mx, my];
+    zoomSouris({ clientX:mx, clientY:my, deltaY: -Math.log(d / PZ.d0) * 2.2 / .0075, deltaMode:0 }, null);
     PZ.d0 = d;
   }, { capture:true, passive:false });
   const fin = e => {
     sync(e);
-    if (PZ.actif && PZ.pts.size < 2){ PZ.actif = false; ZS.tenu = false; clearTimeout(ZS.fin); ZS.fin = setTimeout(zoomSourisFin, 60); }   /* le zoom se termine dès qu'un doigt se lève */
+    if (PZ.actif && PZ.pts.size < 2){ PZ.actif = false; PZ.m = null; ZS.tenu = false; clearTimeout(ZS.fin); ZS.fin = setTimeout(zoomSourisFin, 60); }   /* le zoom se termine dès qu'un doigt se lève */
     if (PZ.pts.size || !PZ.apres) return; PZ.apres = false;
     const n0 = PZ.n0; setTimeout(() => { try { if (strokes().length > n0) undoInk(); } catch(x){} }, 350);   /* trait parasite du 1er doigt */
   };
@@ -125,18 +137,20 @@ function brancherPincement(cible, frame){
   const evaluer = e => {
     menage(); const q = deux(); if (!q) return;
     const d = Math.hypot(q[0][0] - q[1][0], q[0][1] - q[1][1]);
-    if (!PZ.actif){ PZ.d0 = d; PZ.actif = d > 12; if (PZ.actif){ PZ.apres = true; ZS.tenu = true; clearTimeout(ZS.fin); if (PAN.on){ PAN.on = false; try { panFin(); } catch(x){} } } return; }
+    if (!PZ.actif){ PZ.d0 = d; PZ.actif = d > 12; PZ.m = null; if (PZ.actif){ PZ.apres = true; ZS.tenu = true; clearTimeout(ZS.fin); if (PAN.on){ PAN.on = false; try { panFin(); } catch(x){} } } return; }
     if (d < 12 || !PZ.d0) return;
     if (e.cancelable) e.preventDefault();
-    zoomSouris({ clientX:(q[0][0] + q[1][0]) / 2, clientY:(q[0][1] + q[1][1]) / 2, deltaY: -Math.log(d / PZ.d0) * 2.2 / .0075, deltaMode:0 }, null);
+    const mx = (q[0][0] + q[1][0]) / 2, my = (q[0][1] + q[1][1]) / 2;
+    if (PZ.m) panGeste(mx, my, mx - PZ.m[0], my - PZ.m[1]); PZ.m = [mx, my];
+    zoomSouris({ clientX:mx, clientY:my, deltaY: -Math.log(d / PZ.d0) * 2.2 / .0075, deltaMode:0 }, null);
     PZ.d0 = d;
   };
   cible.addEventListener("pointerdown", e => { if (!estDoigtPen(e) || !garde(e)) return; menage(); [...PZ.pts.keys()].forEach(c => { if (c.endsWith(":p" + e.pointerId)) PZ.pts.delete(c); }); PZ.pts.set(nom + ":p" + e.pointerId, { p:ecran(e), t:Date.now() });
     if (PZ.pts.size === 2){ try { PZ.n0 = Math.min(PZ.n0 == null ? 1e9 : PZ.n0, strokes().length); } catch(x){} evaluer(e); if (PZ.actif) e.preventDefault(); } }, { capture:true });
   cible.addEventListener("pointermove", e => { const c = nom + ":p" + e.pointerId; if (!PZ.pts.has(c)) return; if (!e.buttons){ finPen(e); return; } PZ.pts.set(c, { p:ecran(e), t:Date.now() });
-    menage(); if (PZ.pts.size < 2){ PZ.actif = false; return; } evaluer(e); e.stopImmediatePropagation(); }, { capture:true });   /* (16 nov.) un stylet seul n'est jamais un pincement */
+    menage(); if (PZ.pts.size < 2){ PZ.actif = false; PZ.m = null; return; } evaluer(e); e.stopImmediatePropagation(); }, { capture:true });   /* (16 nov.) un stylet seul n'est jamais un pincement */
   function finPen(e){ if (e.pointerType !== "pen") return; let vu = false; [...PZ.pts.keys()].forEach(c => { if (c.endsWith(":p" + e.pointerId)){ PZ.pts.delete(c); vu = true; } }); if (!vu) return;
-    if (PZ.actif && PZ.pts.size < 2){ PZ.actif = false; ZS.tenu = false; clearTimeout(ZS.fin); ZS.fin = setTimeout(zoomSourisFin, 60); }
+    if (PZ.actif && PZ.pts.size < 2){ PZ.actif = false; PZ.m = null; ZS.tenu = false; clearTimeout(ZS.fin); ZS.fin = setTimeout(zoomSourisFin, 60); }
     if (!PZ.pts.size && PZ.apres){ PZ.apres = false; const n0 = PZ.n0; setTimeout(() => { try { if (strokes().length > n0) undoInk(); } catch(x){} }, 350); } }
   cible.addEventListener("pointerup", finPen, { capture:true });
   cible.addEventListener("pointercancel", finPen, { capture:true });
