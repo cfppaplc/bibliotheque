@@ -24,7 +24,7 @@
           if (j.d < 30 || envoyes >= 4) return;
           if (!(n1 <= j.n0 || /:1$/.test(pts) || /:0$/.test(pts))) return;   /* le trait est bien là : rien à signaler */
           envoyes++;
-          const txt = "Stylet : trait de " + Math.round(j.d) + " px mais " + (n1 - j.n0) + " trait(s), dernier = " + pts + "\n" + j.etat + "\n" + j.L.join("\n");
+          const txt = "[v2] PZ fin " + (typeof PZ !== "undefined" ? PZ.pts.size + (PZ.actif ? "a" : "") + " " + [...PZ.pts.keys()].join(",") : "?") + "\nStylet : trait de " + Math.round(j.d) + " px mais " + (n1 - j.n0) + " trait(s), dernier = " + pts + "\n" + j.etat + "\n" + j.L.join("\n");
           fetch(SUJET, { method: "POST", body: txt, headers: { Title: "Journal stylet", Tags: "pencil" } }).catch(() => {});
         }, 400);
       }

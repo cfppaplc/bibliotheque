@@ -120,7 +120,7 @@ function brancherPincement(cible, frame){
   /* (12 nov.) TNI SMART : dans un pincement, un des deux doigts arrive souvent en « pen » 1 × 1 px (vidéo de contact.html).
      Un « pen » ne donne aucun événement touch : le pincement ne voyait qu'un doigt, et ce doigt-là faisait glisser la page
      pendant que l'autre défilait = page qui saute / flash. On compte donc aussi ces doigts « pen » (petits, sans gomme). */
-  const estDoigtPen = e => e.pointerType === "pen" && !(e.buttons & 32) && Math.max(e.width || 1, e.height || 1) < 18;
+  const estDoigtPen = e => e.pointerType === "pen" && !(e.buttons & 32) && (e.width || 0) >= 1 && (e.height || 0) >= 1 && Math.max(e.width, e.height) < 18;   /* (16 nov.) 0 × 0 px = la pointe fine du stylet SMART : c'est un crayon, pas un doigt */
   const menage = () => { const n = Date.now(); [...PZ.pts.keys()].forEach(c => { if (c.includes(":p") && n - PZ.pts.get(c).t > 1200) PZ.pts.delete(c); }); };   /* un doigt « pen » dont on n'a pas vu le relâchement (il s'est levé dans l'autre document) ne doit jamais rester compté */
   const evaluer = e => {
     menage(); const q = deux(); if (!q) return;
