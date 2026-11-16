@@ -762,7 +762,7 @@ $("#penX").onclick = () => { const w = RD.wb; RD.pen = false; RD.eraser = false;
 /* ---- Ouvrir et fermer le lecteur ---- */
 function ouvrirLivre(l, brut){
   try {
-    const html = avecFormatMp(injectHead(brut, HOSTCSS + (document.documentElement.classList.contains("leger") ? LEGERCSS : "")));
+    const html = avecFormatMp(injectHead(brut, HOSTCSS   /* 16 nov. : plus de LEGERCSS dans les livres en mode léger (livres noirs au TNI SMART, comme le 13 nov.); même chose que l'interface sobre */));
     killExtras(); RD.html = html; marquerVu(l); $("#readerFrame2").hidden = true; $("#readerFrame2").srcdoc = ""; $("#rinner").classList.remove("dbl"); $("#tbDbl").classList.remove("on"); $("#spine").hidden = true; $("#readerFrame").style.left = $("#readerFrame").style.width = $("#readerFrame").style.clipPath = "";
     RD.t0 = Date.now(); RD.retry = 0; RD.first = undefined; RD.armed = false; RD.offered = false; $("#resume").hidden = true; clearTimeout(RD.resT);
     Object.assign(RD, { single:false, dbl:false, drv2:null, book:l.fichier, drv:null, attached:false, z:1, pen:false, wb:false, spot:false, cache:false, eraser:false, label:"", tot:0 });

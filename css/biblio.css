@@ -993,7 +993,7 @@ html.zflou .reader:not(.wbon) #rinner{will-change:transform}
   .timer-time .tm-edit{width:5.6ch;font:inherit;font-variant-numeric:tabular-nums;text-align:center;color:inherit;background:rgba(255,255,255,.08);border:0;border-bottom:2px solid #f1f1f2;border-radius:6px;padding:0;outline:none}
 
 /* ---------- Mode léger (html.leger) : tableau interactif lent ---------- */
-html.leger *,html.leger *::before,html.leger *::after{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;will-change:auto!important;transition-duration:.01s!important;transition-delay:0s!important}
+html.leger *,html.leger *::before,html.leger *::after{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;transition-duration:.01s!important;transition-delay:0s!important}
 html.leger *:not(.acces-succes *):not(.acces-marque img):not(.cadenas.secoue):not(#compteBtn .cloche svg):not(.sch-gard .ok):not(.charge-r):not(.charge-b i),html.leger *::before,html.leger *::after{animation:none!important}
 html.leger{scroll-behavior:auto}
 html.leger::view-transition-old(root),html.leger::view-transition-new(root){animation:none!important}
