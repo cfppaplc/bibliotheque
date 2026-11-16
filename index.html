@@ -256,7 +256,7 @@ window.LIVRES_EXTERNES = true;   // les livres sont des fichiers du dossier livr
 <script src="js/couvertures.js?v=1"></script>
 <script src="js/livres.js?v=1"></script>
 <script src="js/biblio.js?v=1"></script>
-<script src="js/lecteur-souris.js?v=2"></script>
+<script src="js/lecteur-souris.js?v=3"></script>
 <script src="js/tableau-blanc.js?v=1"></script>
 <script src="js/lecteur.js?v=4"></script>
 <script src="js/donnees.js?v=1"></script>
@@ -678,4 +678,9 @@ body.visiteur .mp-pied{margin-top:30px}
  const maj = () => b.classList.toggle("zcache", b.textContent.trim() === "100%");
  new MutationObserver(maj).observe(b, {childList:true, characterData:true, subtree:true}); maj();
  const st = document.createElement("style"); st.textContent = "#tb>#tbZv.zcache{display:none!important}"; document.head.appendChild(st); })();</script>
+<script>/* 16 nov. : au TNI SMART, les livres restaient noirs en mode léger (« Complètes » marchait). Pendant qu'un livre ou le tableau blanc est ouvert, le mode léger est mis de côté : le lecteur est alors pareil à « Complètes ». Il revient à la fermeture. */
+(function(){ var h = document.documentElement, r = document.getElementById("reader"); if (!r) return; var mis = false;
+  new MutationObserver(function(){ var o = r.classList.contains("open");
+    if (o && h.classList.contains("leger")){ h.classList.remove("leger"); mis = true; }
+    else if (!o && mis){ mis = false; try { if (window.modeLegerChoix && window.modeLegerFixer) window.modeLegerFixer(window.modeLegerChoix()); } catch(e){} } }).observe(r, {attributes:true, attributeFilter:["class"]}); })();</script>
 </body></html>
