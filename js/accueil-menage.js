@@ -105,6 +105,8 @@
       if (cur) { const rows = timeline(cur.start, cfg.steps), z = zoneMenage(rows).find(z => nowMin >= z.start && nowMin < z.end);
         if (z) actif = rows[z.i]; } } catch(e) {}   /* 12 nov. : zones partagées avec la frise (local « Atelier » = fin du cours) */
     const jour = now.toISOString().slice(0, 10);
+    /* 16 nov. : l'heure du ménage arrive pendant qu'un livre, le tableau blanc ou un autre outil est ouvert dans la bibliothèque → on le dit à la bibliothèque, qui ramène l'accueil de classe par-dessus */
+    if (actif && !actifVu && window.parent !== window && !document.documentElement.classList.contains("apercu-mode") && sessionStorage.menageFerme !== jour + "|" + Math.round(actif.start)) { try { window.parent.postMessage({ type:"accueil-menage" }, "*"); } catch(e){} }
     actifVu = !!actif; document.getElementById("mnMini").textContent = force && !actif ? "✕" : "–"; el.classList.toggle("apercu", !!(force && !actif));
     if (actif) { cle = jour + "|" + Math.round(actif.start); force = false;
       if (sessionStorage.menageFerme === cle) { montrer(false); return; } }

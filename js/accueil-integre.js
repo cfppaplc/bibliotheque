@@ -44,6 +44,13 @@
   const peEl = () => document.fullscreenElement || document.webkitFullscreenElement;
   const peSignal = ok => { try { fr.contentWindow.postMessage({ type: "accueil-plein-ecran-etat", on: !!peEl(), ok }, "*"); } catch (e) {} };
   window.ouvrirAccueil = ouvrir;
+  /* 16 nov. (« si je suis sur une autre page et que l'heure du ménage arrive, il devrait apparaître ») : l'accueil de classe est chargé caché dès l'ouverture
+     de la bibliothèque, pour un enseignant qui s'en sert (réglages présents) sur un grand écran; il surveille l'heure du ménage même quand il n'est pas affiché. */
+  function precharger(){ if (loaded) return; try { if (!localStorage.getItem("accueil-atelier-v4")) return; } catch(e){ return; }
+    if (!document.body.classList.contains("connecte") || document.body.classList.contains("eleve") || Math.min(screen.width, screen.height) <= 600) return;
+    fr.src = "accueil.html"; fr.addEventListener("load", () => { try { fr.contentWindow.postMessage({ type: "accueil-biblio" }, "*"); } catch (e) {} signalerLivre(); }); loaded = true; }
+  window.accueilPrecharger = precharger;
+  if (window.ACCES && ACCES.pret) ACCES.pret.then(() => setTimeout(precharger, 4000));
   window.revenirDuTdb = () => { if (livreOuvert()) fermer(true); };   /* télécommande : « Revenir au livre » */
   const catalogue = () => ({ type:"accueil-catalogue",
     livres:LIVRES.filter(l => l.fichier).map(l => ({ f:l.fichier, titre:l.titre, niveau:l.niveau || "", pages:l.pages || 0 })),
@@ -51,6 +58,7 @@
     dossiers:[[1, "Maison unifamiliale"], [2, "Duplex jumelé"], [3, "Bâtiment commercial"], [4, "Centre commercial"], [5, "Ferme laitière"]] });
   window.addEventListener("message", e => {
     if (e.source === fr.contentWindow && e.data && e.data.type === "accueil-fermer") { marquerTdb(false); if (livreOuvert()) closeReader(); fermer(); return; }
+    if (e.source === fr.contentWindow && e.data && e.data.type === "accueil-menage") { if (ov.hidden){ if (livreOuvert()) marquerTdb(true); ouvrir(); } return; }   /* 16 nov. : heure du ménage = l'accueil de classe revient par-dessus tout */
     if (e.source === fr.contentWindow && e.data && e.data.type === "accueil-revenir") { if (livreOuvert()) fermer(true); return; }
     if (e.source === fr.contentWindow && e.data && e.data.type === "accueil-catalogue?") { try { fr.contentWindow.postMessage(catalogue(), "*"); } catch(er){} return; }
     if (e.source === fr.contentWindow && e.data && e.data.type === "accueil-ouvrir") { ouvrirDepuisTdb(e.data.contenu || {}); return; }
