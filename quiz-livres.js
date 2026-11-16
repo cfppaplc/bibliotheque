@@ -827,6 +827,257 @@ window.QUIZ_LIVRES = [
 ]
 },
 {
+"id": "transformateurs",
+"exemple": true,
+"titre": "Les transformateurs",
+"sujet": "Primaire, secondaire, 24 V et sécurité",
+"couv": "img/labo/quiz/transfo-couv.svg",
+"coul": "#E0892B",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
+"q": "À quoi sert un transformateur ?",
+"ch": [
+"Changer la tension (monter ou baisser les volts)",
+"Changer le courant alternatif en continu",
+"Emmagasiner l'électricité",
+"Couper le courant en cas de court-circuit"
+],
+"bon": 0,
+"s": 20,
+"expl": "Il monte ou baisse la tension. Il ne fait pas de courant continu et n'emmagasine rien."
+},
+{
+"q": "Un transformateur fonctionne seulement en courant alternatif (AC).",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15,
+"expl": "Vrai. Il a besoin d'un courant qui change sans arrêt. Sur une pile (courant continu), il ne fait rien et peut chauffer."
+},
+{
+"q": "Le côté où ARRIVE l'alimentation s'appelle…",
+"ch": [
+"Le primaire",
+"Le secondaire",
+"Le neutre",
+"La mise à la terre"
+],
+"bon": 0,
+"s": 20,
+"expl": "Primaire = entrée. Secondaire = sortie, vers la charge."
+},
+{
+"q": "Le côté qui ALIMENTE la charge (thermostat, sonnette…) s'appelle…",
+"ch": [
+"Le secondaire",
+"Le primaire",
+"Le noyau",
+"Le fusible"
+],
+"bon": 0,
+"s": 20,
+"expl": "Secondaire = sortie."
+},
+{
+"q": "Un transformateur abaisseur…",
+"ch": [
+"Donne moins de volts au secondaire qu'au primaire",
+"Donne plus de volts au secondaire",
+"Donne la même tension",
+"Transforme les volts en watts"
+],
+"bon": 0,
+"s": 20,
+"expl": "Abaisseur = il baisse la tension, par exemple 120 V vers 24 V."
+},
+{
+"q": "Un transformateur élévateur…",
+"ch": [
+"Donne plus de volts au secondaire qu'au primaire",
+"Donne moins de volts au secondaire",
+"Fonctionne seulement sur les piles",
+"Sert seulement dans les sonnettes"
+],
+"bon": 0,
+"s": 20,
+"expl": "Élévateur = il monte la tension."
+},
+{
+"q": "Le noyau d'un transformateur est fait de…",
+"ch": [
+"Minces tôles d'acier collées ensemble",
+"Plastique",
+"Cuivre plein",
+"Bois traité"
+],
+"bon": 0,
+"s": 20,
+"expl": "Des tôles d'acier minces (feuilletées) : elles guident le magnétisme et chauffent moins qu'un bloc plein."
+},
+{
+"q": "Les enroulements (bobines) sont faits de…",
+"ch": [
+"Fil de cuivre isolé (vernis)",
+"Fil d'acier nu",
+"Tuyau de cuivre",
+"Fil de nylon"
+],
+"bon": 0,
+"s": 20,
+"expl": "Du fil de cuivre (parfois d'aluminium) recouvert d'un vernis isolant."
+},
+{
+"q": "Le primaire et le secondaire sont branchés ensemble par un fil.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 1,
+"s": 15,
+"expl": "Faux. Il n'y a aucun fil entre les deux : l'énergie passe par le magnétisme dans le noyau. C'est pour ça qu'on dit qu'ils sont isolés."
+},
+{
+"q": "Quelle tension trouve-t-on souvent au secondaire du transformateur d'un thermostat de chauffage ou de climatisation ?",
+"ch": [
+"24 V",
+"120 V",
+"240 V",
+"600 V"
+],
+"bon": 0,
+"s": 20,
+"expl": "24 V : la basse tension de commande des thermostats, chaudières et fournaises."
+},
+{
+"q": "Sur la plaque d'un transformateur, les bornes H1 et H2 sont du côté…",
+"ch": [
+"Haute tension (primaire)",
+"Basse tension (secondaire)",
+"Mise à la terre",
+"Fusible"
+],
+"bon": 0,
+"s": 20,
+"expl": "H = haute tension. X1 et X2 = basse tension."
+},
+{
+"q": "Les bornes X1 et X2 sont du côté…",
+"ch": [
+"Basse tension (secondaire)",
+"Haute tension (primaire)",
+"Neutre seulement",
+"Noyau"
+],
+"bon": 0,
+"s": 20,
+"expl": "X = basse tension, donc le côté de la charge pour un abaisseur."
+},
+{
+"q": "La grosseur (capacité) d'un transformateur est indiquée en…",
+"ch": [
+"VA (volts-ampères)",
+"Ohms",
+"Litres",
+"Degrés"
+],
+"bon": 0,
+"s": 20,
+"expl": "En VA, par exemple 40 VA pour un transformateur de commande. Plus il y a de VA, plus il peut alimenter de choses."
+},
+{
+"q": "Si on branche trop de charges au secondaire, le transformateur peut chauffer et brûler.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15,
+"expl": "Vrai. Il ne faut pas dépasser ses VA. Un fusible ou un disjoncteur au secondaire le protège souvent."
+},
+{
+"q": "Le petit bourdonnement d'un transformateur vient…",
+"ch": [
+"Des vibrations du noyau à 60 Hz",
+"D'une fuite d'eau",
+"D'un fil débranché, toujours",
+"De l'air dans les tuyaux"
+],
+"bon": 0,
+"s": 20,
+"expl": "Normal : le noyau vibre un peu avec le courant alternatif à 60 Hz. Un bruit fort ou une odeur de brûlé, par contre, n'est pas normal."
+},
+{
+"q": "Le gros transformateur sur le poteau, devant la maison, sert à…",
+"ch": [
+"Baisser la haute tension du réseau à 120/240 V pour la maison",
+"Monter la tension pour la maison",
+"Mesurer la consommation",
+"Changer l'alternatif en continu"
+],
+"bon": 0,
+"s": 20,
+"expl": "Il baisse la haute tension d'Hydro à 120/240 V pour le panneau de la maison."
+},
+{
+"q": "Pour vérifier la sortie d'un transformateur de 24 V avec un multimètre, tu choisis…",
+"ch": [
+"V~ (tension alternative)",
+"V⎓ (tension continue)",
+"Ω (ohms)",
+"A (ampères)"
+],
+"bon": 0,
+"s": 20,
+"expl": "La sortie d'un transformateur est en alternatif, donc V~."
+},
+{
+"t": "multi",
+"q": "Avant de remplacer un transformateur, tu dois…",
+"ch": [
+"Couper le disjoncteur et cadenasser",
+"Vérifier l'absence de tension",
+"Noter où va chaque fil (photo)",
+"Le tester en touchant les bornes avec les doigts"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 25,
+"expl": "Couper, cadenasser, vérifier l'absence de tension et noter le branchement. Jamais toucher les bornes."
+},
+{
+"q": "Un transformateur crée de l'énergie : il donne plus de puissance qu'il en reçoit.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 1,
+"s": 15,
+"expl": "Faux. Il change la tension, mais la puissance qui sort est un peu plus petite que celle qui entre (un peu de perte en chaleur)."
+},
+{
+"q": "Une sonnette de porte est souvent alimentée par…",
+"ch": [
+"Un petit transformateur abaisseur (environ 16 V)",
+"Directement en 240 V",
+"Une batterie d'auto",
+"Un transformateur élévateur"
+],
+"bon": 0,
+"s": 20,
+"expl": "Un petit transformateur abaisse le 120 V à une basse tension, souvent autour de 16 V, plus sécuritaire."
+}
+]
+},
+{
 "id": "electricite-base",
 "exemple": true,
 "titre": "L'électricité de base",
