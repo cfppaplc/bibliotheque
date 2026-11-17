@@ -1,6 +1,7 @@
 /* © 2026 Jérémy Raymond. Tous droits réservés. Métier+ — couvertures.js (sorti d'index.html le 15 nov.) */
 /* Couvertures des livres (15 nov. : fichiers dans img/couvertures/, avant : images intégrées dans la page) */
 window.COUVERTURES = {
+  "puits-coupe-feu-sae": "img/couvertures/puits-coupe-feu-sae.jpg?v=1",
   "montages-electriques-c5": "img/couvertures/montages-electriques-c5.jpg?v=2",
   "entretien-menager-egi": "img/couvertures/entretien-menager-egi.jpg?v=2",
   "recherche-emploi-plc": "img/couvertures/recherche-emploi-plc.jpg?v=2",
