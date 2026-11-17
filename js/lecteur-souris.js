@@ -3,7 +3,10 @@
 const PAN = { on:false, x:0, y:0, l:0, t:0, alvo:null, raf:0 };
 /* glisser la page zoomée, avec un petit jeu élastique au-delà des bords (la page revient en place au relâchement) */
 function panVers(sc, l, t){ const mx = sc.scrollWidth - sc.clientWidth, my = sc.scrollHeight - sc.clientHeight, cl = Math.max(0, Math.min(mx, l)), ct = Math.max(0, Math.min(my, t));
-  sc.scrollLeft = cl; sc.scrollTop = ct; const el = $("#rinner"), j = d => Math.sign(d) * Math.min(90, Math.abs(d) * .35), ox = j(cl - l), oy = j(ct - t);
+  sc.scrollLeft = cl; sc.scrollTop = ct;
+  /* 17 nov. (flash au TNI en glissant une page pas zoomée) : pas d'effet élastique sur écran tactile ni quand la page ne défile pas */
+  if (matchMedia("(any-pointer: coarse)").matches || (mx < 2 && my < 2)) return;
+  const el = $("#rinner"), j = d => Math.sign(d) * Math.min(90, Math.abs(d) * .35), ox = j(cl - l), oy = j(ct - t);
   el.style.transition = "none"; el.style.translate = (ox || oy) ? ox + "px " + oy + "px" : ""; }
 function panFin(){ const el = $("#rinner"); if (!el.style.translate) return; el.style.transition = "translate .35s cubic-bezier(.2,.8,.2,1)"; el.style.translate = ""; setTimeout(() => { if (!PAN.on) el.style.transition = ""; }, 400); }
 const outilActif = () => RD.pen || RD.wb;
