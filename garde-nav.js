@@ -55,7 +55,7 @@ window.mpPiedHTML = () => {
     + "@media (max-width:640px){.logo-pav::after,.mp-alpha i{font-size:8px;padding:2px 4px 1px;top:-8px}}";
   document.head.append(st);
   const poser = () => document.querySelectorAll(".mp-tete, .pl-top, .act-top, .reader-bar").forEach(bar => {
-    if (bar.querySelector(":scope>.mp-alpha")) return;
+    if (bar._alpha || bar.querySelector(":scope>.mp-alpha")) { bar._alpha = 1; return; }
     const imgs = [...bar.children].filter(e => e.tagName === "IMG" && /metier-plus/.test(e.getAttribute("src") || ""));
     if (!imgs.length) return;
     const g = parseFloat(getComputedStyle(bar).columnGap) || 0;   // l'espace ajouté par la pastille est repris : rien ne bouge
@@ -64,8 +64,9 @@ window.mpPiedHTML = () => {
     imgs[imgs.length - 1].after(s);
   });
   let f = 0; const plus_tard = () => { if (!f) f = requestAnimationFrame(() => { f = 0; poser(); }); };
-  const go = () => { poser(); new MutationObserver(plus_tard).observe(document.body, { childList:true, subtree:true }); };
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", go); else go();
+  /* 17 nov. (journal du TNI : « go » = 455 ms au chargement) : posé après le chargement, quand la page est déjà affichée */
+  const go = () => { plus_tard(); new MutationObserver(plus_tard).observe(document.body, { childList:true, subtree:true }); };
+  if (document.readyState === "complete") go(); else addEventListener("load", go, { once:true });
 })();
 
 /* Lien « Signaler un problème » du pied de page : ouvre la fenêtre sur place (signaler.js) au lieu de changer de page */
@@ -90,8 +91,11 @@ html.clair .mp-plusM,body.clair .mp-plusM{background:#fff;color:#1E2A44;border-c
     let lim0 = lim; [...nav.parentElement.children].forEach(s => { if (s === nav || s.classList.contains("mp-esp") || !s.offsetParent) return; const r = s.getBoundingClientRect(), w = Math.max(r.width, s.scrollWidth); if (w && r.left > n0.left + 20){ lim0 -= w + 10; lim = Math.min(lim, r.left - 10); } }); lim = Math.min(lim, lim0);
     if (nav.getBoundingClientRect().right <= lim) return;
     const btn = document.createElement("button"); btn.type = "button"; btn.className = "mp-plus"; btn.textContent = "…"; btn.title = "Plus d'outils"; btn.setAttribute("aria-label", "Plus d'outils"); nav.appendChild(btn);
+    /* 17 nov. : toutes les mesures d'abord, puis on cache (avant : une mise en page par lien) */
     const liens = [...nav.querySelectorAll(":scope > a")].reverse(), caches = [];
-    for (const a of liens){ if (nav.getBoundingClientRect().right <= lim) break; a.style.setProperty("display", "none", "important"); caches.unshift(a); }
+    let trop = nav.getBoundingClientRect().right - lim; const larg = liens.map(a => a.getBoundingClientRect().width + (parseFloat(getComputedStyle(nav).columnGap) || 0));
+    for (let i = 0; i < liens.length && trop > 0; i++){ trop -= larg[i]; caches.unshift(liens[i]); }
+    caches.forEach(a => a.style.setProperty("display", "none", "important"));
     if (caches.some(a => a.classList.contains("ici"))) btn.classList.add("ici");
     btn.onclick = e => { e.preventDefault(); e.stopPropagation(); if (menu){ fermer(); return; }
       menu = document.createElement("div"); menu.className = "mp-plusM";
@@ -99,14 +103,15 @@ html.clair .mp-plusM,body.clair .mp-plusM{background:#fff;color:#1E2A44;border-c
       document.body.appendChild(menu); const r = btn.getBoundingClientRect();
       menu.style.top = (r.bottom + 6) + "px"; menu.style.left = Math.max(8, Math.min(innerWidth - menu.offsetWidth - 8, r.right - menu.offsetWidth)) + "px"; btn.classList.add("on"); };
   }
-  const tout = () => { if (menu) return; document.querySelectorAll(".mp-nav").forEach(plier); };
+  /* 17 nov. : refait seulement si la largeur de l'écran ou les classes de la page ont changé */
+  let cle0 = ""; const tout = (force) => { if (menu) return; const cle = innerWidth + "|" + document.documentElement.className + "|" + document.body.className + "|" + document.querySelectorAll(".mp-nav").length; if (force !== true && cle === cle0) return; cle0 = cle; document.querySelectorAll(".mp-nav").forEach(plier); };
   let p = 0; const bientot = () => { cancelAnimationFrame(p); p = requestAnimationFrame(tout); };
-  addEventListener("resize", () => { fermer(); bientot(); }); document.addEventListener("click", e => { if (menu && !menu.contains(e.target)) fermer(); else if (!menu) setTimeout(bientot, 350); });
+  addEventListener("resize", () => { fermer(); bientot(); }); document.addEventListener("click", e => { if (menu && !menu.contains(e.target)) fermer(); });
   document.addEventListener("keydown", e => { if (e.key === "Escape") fermer(); });
-  const go = () => { bientot(); setTimeout(bientot, 600); setTimeout(bientot, 2000);
+  const go = () => { bientot(); setTimeout(() => tout(true), 600); setTimeout(() => tout(true), 2000);
     const mo = new MutationObserver(() => bientot()); mo.observe(document.body, { attributes:true, attributeFilter:["class"] }); mo.observe(document.documentElement, { attributes:true, attributeFilter:["class"] }); };
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", go); else go();
-  window.mpNavPlier = bientot;
+  window.mpNavPlier = () => { cancelAnimationFrame(p); p = requestAnimationFrame(() => tout(true)); };
 })();
 
 /* 15 nov. (Jeremy : « Gestion d'atelier devrait seulement être affiché si tu as un groupe partagé avec toi ») :
