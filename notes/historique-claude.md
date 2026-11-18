@@ -607,3 +607,4 @@
 - 2026-11-18 : vue Semaine — férié/pédago d'un groupe = journée complète (vendredi d'abord); si tout n'entre pas, la plage verte du jeudi est réduite (jusqu'à 2 h, PV[gi], bh()).
 - 2026-11-18 : RÈGLE : fériés, cours de maths, tempêtes (et pédago, fin de session) ont priorité et ne se déplacent pas : cartes « fixe » (pas de glisser ni double-clic).
 - 2026-11-18 : évaluation gardée ensemble : point jaune « séparée sur deux semaines » (fx eval, grouperEval, aussi après remplir); vue Semaine : blocs d'éval qui se suivent, le plus tard possible. Assistant : journées spéciales déjà entrées = réutilisées pour tous les groupes.
+- 2026-11-18 : assistant « Qui enseigne » : cases à cocher par programme (D.progProfs[prog], dansProg) au lieu de retirer; les non cochés sautent leurs étapes et ne reçoivent pas d'heures au bâtissage.
