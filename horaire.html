@@ -601,7 +601,7 @@ function dlgNouveau(){ prepDonnees(); const lun = new Date(D.cal.debut + "T12:00
   <p><button class="prim" id="nOk">Créer l'horaire</button></p>`;
   if (!dlg.open) dlg.showModal();
   $("#nOk").onclick = () => { const nom = $("#nN").value.trim(), P = D.prog[$("#nP").value]; if (!nom){ $("#nN").focus(); return; } if (!P.mods.length){ alert("Ce programme n'a pas encore de modules (Calendrier, programmes et enseignants → Programmes)."); return; }
-    const g = { id:"g" + Date.now(), nom, prog:P.nom, titulaire:$("#nT").value.trim(), sessions:[], taches:JSON.parse(JSON.stringify(D.tacheAS || {})) };
+    const g = { id:"g" + Date.now(), nom, prog:P.nom, titulaire:$("#nT").value.trim(), sessions:[], taches:{} };
     // modules → sessions de 450 h
     let ses = null, cum = 0; P.mods.forEach((m, i) => { if (!ses || cum >= 450){ ses = { nom:"Session " + (g.sessions.length + 1), mods:[], sem:[], g:{} }; g.sessions.push(ses); cum = 0; }
       const k = ses.mods.some(x => x.k === m.code) ? m.code + "-" + i : (m.code || "m" + i);
@@ -616,6 +616,8 @@ function dlgNouveau(){ prepDonnees(); const lun = new Date(D.cal.debut + "T12:00
         s.sem.push({ d:k, h:u + autres }); besoin -= u;
         for (const ty in par){ const kk = "jt:" + ty; if (!s.mods.some(m => m.k === kk)) s.mods.push({ k:kk, code:"", titre:JT[ty].n, num:"", h:0, ev:0, profs:[], autre:true, jt:ty }); fixer(s, wi, kk, "-", par[ty]); } }
       if (besoin > 0) alert(s.nom + " : il manque " + besoin + " h avant la fin du calendrier."); });
+    if (AS.pct && Object.values(AS.pct).some(v => +v)) Object.keys(AS.pct).forEach(p => { const x = (g.taches[p] = g.taches[p] || {}); x.prev = g.sessions.slice(0, 2).map(s => Math.round(s.mods.reduce((a, m) => a + (m.autre ? 0 : +m.h || 0), 0) * (+AS.pct[p] || 0) / 100)); });
+    if (AS.chef){ const x = (g.taches[AS.chef] = g.taches[AS.chef] || {}); x.cg = (AS.cgH || [10, 10]).slice(); }
     D.groupes.push(g); G = D.groupes.length - 1; g.sessions.forEach((s, i) => { S = i; remplir(s); }); S = 0; VUE = "g"; sauver(); dlg.close(); document.body.classList.remove("acc"); $("#accH").hidden = true; dessiner(); };
 }
 if (!D.autresV){ D.groupes.forEach(g => g.sessions.forEach(s => s.sem.forEach((w, wi) => { w.h += s.mods.reduce((a, m) => a + (m.autre ? totalCase(s, wi, m.k) : 0), 0); }))); D.autresV = 1; }
@@ -790,6 +792,7 @@ function calAbs(p){ prepDonnees(); D.abs = D.abs || {}; const A = D.abs[p] = D.a
   h += `</div><p style="display:flex;justify-content:space-between"><button data-rt="ens">‹ Retour aux enseignants</button><span class="mini">${Object.keys(A).length} jour(s) d'absence</span></p>`;
   $("#dlgC").innerHTML = h; if (!dlg.open) dlg.showModal(); }
 $("#dlgC").addEventListener("click", e => { const b = e.target.closest("[data-pa]"); if (b){ calAbs(b.dataset.pa); return; }
+  const ch = e.target.closest("[data-chef]"); if (ch && AS.on){ AS.chef = ch.dataset.chef; if (AS.chef && !(AS.pct && Object.keys(AS.pct).length)) AS.pct = { [AS.chef]:100 }; assistant(); return; }
   const pp = e.target.closest("[data-pp]"); if (pp){ const pr = progAS(), A = (D.progProfs = D.progProfs || {}); let L = A[pr] || Object.keys(D.profs); L = L.includes(pp.dataset.pp) ? L.filter(x => x !== pp.dataset.pp) : [...L, pp.dataset.pp];
     A[pr] = L; sauver(); assistant(); return; }
   const sp = e.target.closest("[data-sp]"); if (sp){ const [p, i] = sp.dataset.sp.split("|"), A = (D.sessProf = D.sessProf || {}); let L = A[p] && A[p].length ? A[p] : [0, 1]; L = L.includes(+i) ? L.filter(x => x !== +i) : [...L, +i].sort();
@@ -808,6 +811,16 @@ function etapesAs(){ const TOUS = Object.keys(D.profs), P = TOUS.filter(p => dan
     E.push({ t:D.profs[p], chk:"p:" + p, q:`Quels modules ${D.profs[p]} peut-il donner ?`, f:() => { const codes = []; Object.values(D.prog).forEach(Pr => Pr.mods.forEach(m => { if (m.code && !codes.some(c => c.code === m.code)) codes.push(m); }));
       return `<p class="mini">Les tâches (heures de chacun) se calculent ensuite dans « Tâches des enseignants ».</p><p><b>Il enseigne en :</b> ${[0, 1].map(i => `<span class="chip ${!((D.sessProf || {})[p] || []).length || D.sessProf[p].includes(i) ? "on" : ""}" data-sp="${p}|${i}" style="padding:8px 12px;font-size:13px">Session ${i + 1}</span>`).join("")} <span class="mini">(les deux cochées = toute l'année)</span></p><p><b>Touche les modules qu'il peut donner :</b></p><p>${codes.map(m => `<span class="chip ${(D.peut[p] || []).includes(m.code) ? "on" : ""}" data-pc="${p}|${m.code}" style="padding:8px 12px;font-size:13px">${m.num} · ${m.titre}</span>`).join("")}</p>`; } });
     E.push({ t:D.profs[p], chk:"p:" + p, q:`Y a-t-il des moments, chaque semaine, où ${D.profs[p]} ne peut jamais enseigner ?`, f:() => `<p class="mini">Exemple : réunion tous les mardis après-midi. Laisse vide s'il est toujours disponible.</p><p>${[1,2,3,4,5].map(wd => ["AM","PM"].map(pm => `<span class="chip ${REC(p).includes(wd + "|" + pm) ? "on" : ""}" data-rec="${p}|${wd}|${pm}" style="padding:8px 12px;font-size:13px">${["","Lundi","Mardi","Mercredi","Jeudi","Vendredi"][wd]} ${pm === "AM" ? "avant-midi" : "après-midi"}</span>`).join("")).join(" ")}</p><p class="mini">Des jours précis (formation, congé) ? Tu pourras les ajouter plus tard dans « Préparer l'année ».</p>` }); });
+  /* chef de groupe et partage des heures (en %) */
+  const ord = P.length ? P : TOUS, sesH = (() => { const pr = D.prog[progAS()]; if (!pr) return [450, 450]; const S = []; let c = 0; pr.mods.forEach(m => { if (!S.length || c >= 450){ S.push(0); c = 0; } S[S.length - 1] += +m.h || 0; c += +m.h || 0; }); return S; })();
+  E.push({ t:"Le chef de groupe", q:"Qui est le chef de groupe ?", f:() => `<p>${ord.map(p => `<span class="chip ${AS.chef === p ? "on" : ""}" data-chef="${p}" style="padding:10px 16px;font-size:15px">${D.profs[p]}</span>`).join("")} <span class="chip ${AS.chef === "" ? "on" : ""}" data-chef="" style="padding:10px 16px;font-size:15px">Aucun</span></p>
+    ${AS.chef ? `<p style="margin-top:16px"><b>Heures de chef de groupe :</b> session 1 <input id="cg1" inputmode="numeric" value="${(AS.cgH || [10, 10])[0]}" style="width:60px"> h · session 2 <input id="cg2" inputmode="numeric" value="${(AS.cgH || [10, 10])[1]}" style="width:60px"> h</p>` : ""}` });
+  E.push({ t:"Le partage", q:"Quel pourcentage de la tâche donne chaque enseignant ?", f:() => { const pc = AS.pct || {}; if (!Object.keys(pc).length && ord.length){ pc[AS.chef || ord[0]] = 100; AS.pct = pc; }
+      const tot = ord.reduce((a, p) => a + (+pc[p] || 0), 0), reg = sesH.reduce((a, b) => a + b, 0);
+      return `<p class="mini">D'habitude, on donne 100 % à un enseignant, puis on divise. Les heures se calculent à partir des ${reg} h de cours du programme (${sesH.join(" + ")}).</p>
+      <table class="t ttache"><tr><th style="text-align:left">Enseignant</th><th>%</th><th>Heures de cours</th></tr>${ord.map(p => `<tr><td style="text-align:left"><i class="av" style="background:${couleur(p)};width:24px;height:24px;font-size:9px;vertical-align:middle;margin-right:6px">${p}</i>${D.profs[p]}</td><td><input data-pct="${p}" inputmode="numeric" value="${pc[p] || ""}" placeholder="0" style="width:60px"> %</td><td><b>${Math.round(reg * (+pc[p] || 0) / 100)} h</b></td></tr>`).join("")}
+      <tr style="font-weight:700"><td style="text-align:left">Total</td><td style="color:var(${tot === 100 ? "--ok" : "--err"})">${tot} %</td><td>${Math.round(reg * tot / 100)} h</td></tr></table>
+      ${tot === 100 ? `<p style="color:var(--ok);font-weight:700;margin-top:10px">Ça fait 100 %.</p>` : `<p style="color:var(--err);font-weight:700;margin-top:10px">Le total doit faire 100 % (${tot > 100 ? "enlève " + (tot - 100) : "il manque " + (100 - tot)} %).</p>`}`; } });
   E.push({ t:"Le groupe", chk:"groupe", q:"Quel groupe veux-tu planifier ? (un 2e groupe en même temps, si tu veux)", f:() => { const lun = new Date(D.cal.debut + "T12:00"); lun.setDate(lun.getDate() - (lun.getDay() + 6) % 7);
     return `<div class="form"><label>Nom du groupe<br><input id="nN" value="${AS.nom || ""}" placeholder="ex. 2026EGI2"></label><label>Programme<br><select id="nP">${Object.keys(D.prog).map(i => `<option value="${i}" ${AS.prog === i ? "selected" : ""}>${D.prog[i].nom}</option>`).join("")}</select></label><label>Première semaine du groupe<br><input type="date" id="nD" value="${AS.deb || iso(lun)}"></label><label>Titulaire (facultatif)<br><input id="nT" value="${AS.tit || ""}"></label></div>
     <p style="margin:16px 0 6px"><b>Deuxième groupe en même temps</b> <span class="mini">(facultatif : les deux se bâtissent ensemble, sans prof à deux places)</span></p>
@@ -853,7 +866,9 @@ function verifAs(e){ const V = [], P = Object.keys(D.profs), quoi = e.chk || "";
 let VAS = [];
 const codesProg = () => { const c = new Set(); Object.values(D.prog).forEach(Pr => Pr.mods.forEach(m => m.code && c.add(m.code))); return [...c]; };
 $("#dlgC").addEventListener("click", e => { const b = e.target.closest("[data-vas]"); if (!b || !AS.on) return; lireAs(); D.cible = D.cible || {}; VAS[+b.dataset.vas].f(); sauver(); assistant(); });
-$("#dlgC").addEventListener("change", e => { const ta = e.target.dataset.tas; if (ta){ const [p, k, i] = ta.split("|"), A = (D.tacheAS = D.tacheAS || {}), X = (A[p] = A[p] || {}); X[k] = X[k] || ["", ""]; const t = e.target.value.trim();
+$("#dlgC").addEventListener("change", e => { if (AS.on && e.target.dataset.pct){ (AS.pct = AS.pct || {})[e.target.dataset.pct] = Math.max(0, Math.min(100, Math.round(+e.target.value.replace(",", ".") || 0))); assistant(); return; }
+  if (AS.on && (e.target.id === "cg1" || e.target.id === "cg2")){ AS.cgH = [+($("#cg1").value) || 0, +($("#cg2").value) || 0]; return; }
+  const ta = e.target.dataset.tas; if (ta){ const [p, k, i] = ta.split("|"), A = (D.tacheAS = D.tacheAS || {}), X = (A[p] = A[p] || {}); X[k] = X[k] || ["", ""]; const t = e.target.value.trim();
     X[k][+i] = t === "" ? "" : Math.round(+t.replace(",", ".").replace("−", "-") || 0); D.cible = D.cible || {}; D.cible[p] = ["prev"].reduce((a, kk) => a + (+(X[kk] || [])[0] || 0) + (+(X[kk] || [])[1] || 0), 0) || D.cible[p]; sauver(); }
   if (AS.on && !e.target.closest("[data-vas]")) setTimeout(() => { if (AS.on && dlg.open){ const z = $("#asVer"); if (z){ lireAs(); z.innerHTML = verifAs(etapesAs()[AS.i]); } } }, 50); });
 const _calAbs = calAbs; calAbs = function(p){ if (AS.on) return assistant(); return _calAbs(p); };
