@@ -488,7 +488,7 @@ if (window.COFFRE && !/[?&]apercu=/.test(location.search)) COFFRE.demarrer("accu
     <div class="sheet-actions"><button type="button" class="btn primary" id="mnOk">Enregistrer</button><button type="button" class="btn" id="mnVoir">Aperçu</button><button type="button" class="btn" id="mnAnn">Annuler</button></div>
   </div>
 </div>
-<script src="js/accueil-menage.js?v=2"></script>
+<script src="js/accueil-menage.js?v=3"></script>
 <link rel="stylesheet" href="css/accueil-metier.css?v=3">
 <script>/* barre d'avancement de l'activité en cours (copie --pg de la case en cours de la frise) */
 setInterval(() => { const s = document.querySelector("#v-tl .seg.now:not(.p)"), i = document.getElementById("v-nowav"); if (i) i.style.setProperty("--pg", s ? (s.style.getPropertyValue("--pg") || "0%") : "0%"); }, 1000);</script>

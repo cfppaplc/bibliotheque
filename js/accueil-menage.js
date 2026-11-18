@@ -78,6 +78,15 @@
       if (T[cle].includes(i) && f < n) { const t = document.getElementById("mnAideT"); t.classList.remove("on"); void t.offsetWidth; t.classList.add("on"); } }
     else if (e.target.closest(".mn-t, .mn-i")) li.classList.toggle("ouvert");
   });
+  /* 18 nov. : alarme du début du ménage (ding-dong répété 3 fois, assez fort pour l'atelier) */
+  function sonDebut(){ try {
+    AC = AC || new (window.AudioContext || window.webkitAudioContext)(); if (AC.state === "suspended") AC.resume();
+    const t0 = AC.currentTime + .05, out = AC.createGain(); out.gain.value = .9; out.connect(AC.destination);
+    const cloche = (f, t) => { [1, 2.76, 5.4].forEach((h, k) => { const o = AC.createOscillator(), g = AC.createGain(); o.type = "sine"; o.frequency.value = f * h;
+      const v = [.6, .18, .08][k]; g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(v, t + .01); g.gain.exponentialRampToValueAtTime(.001, t + 1.4 - k * .4);
+      o.connect(g); g.connect(out); o.start(t); o.stop(t + 1.5); }); };
+    for (let i = 0; i < 3; i++){ cloche(880, t0 + i * 1.6); cloche(698.5, t0 + i * 1.6 + .55); }
+  } catch(x) {} }
   /* 13 nov. (« un son motivant à la fin du ménage ») : marimba quand tout est coché */
   let AC = null;
   function sonMenage(fin){ try {
@@ -107,6 +116,7 @@
     const jour = now.toISOString().slice(0, 10);
     /* 16 nov. : l'heure du ménage arrive pendant qu'un livre, le tableau blanc ou un autre outil est ouvert dans la bibliothèque → on le dit à la bibliothèque, qui ramène l'accueil de classe par-dessus */
     if (actif && !actifVu && window.parent !== window && !document.documentElement.classList.contains("apercu-mode") && sessionStorage.menageFerme !== jour + "|" + Math.round(actif.start)) { try { window.parent.postMessage({ type:"accueil-menage" }, "*"); } catch(e){} }
+    if (actif && !actifVu && sessionStorage.menageSonne !== jour + "|" + Math.round(actif.start)){ sessionStorage.menageSonne = jour + "|" + Math.round(actif.start); sonDebut(); }   /* 18 nov. : l'alarme sonne quand le ménage commence */
     actifVu = !!actif; document.getElementById("mnMini").textContent = force && !actif ? "✕" : "–"; el.classList.toggle("apercu", !!(force && !actif));
     if (actif) { cle = jour + "|" + Math.round(actif.start); force = false;
       if (sessionStorage.menageFerme === cle) { montrer(false); return; } }
