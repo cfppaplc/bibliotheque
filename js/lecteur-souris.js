@@ -128,8 +128,12 @@ function brancherPincement(cible, frame){
     sync(e);
     if (PZ.actif && PZ.pts.size < 2){ PZ.actif = false; PZ.m = null; ZS.tenu = false; clearTimeout(ZS.fin); ZS.fin = setTimeout(zoomSourisFin, 60); }   /* le zoom se termine dès qu'un doigt se lève */
     if (PZ.pts.size || !PZ.apres) return; PZ.apres = false;
-    const n0 = PZ.n0; setTimeout(() => { try { if (strokes().length > n0) undoInk(); } catch(x){} }, 350);   /* trait parasite du 1er doigt */
+    const n0 = PZ.n0; nettoyerPincement(n0);   /* trait parasite du 1er doigt */
   };
+  /* 17 nov. : le trait parasite du 1er doigt est retiré 350 ms après le pincement, ou tout de suite au prochain toucher
+     (avant : un trait commencé moins de 350 ms après était effacé à sa place) */
+  function nettoyerPincement(n0){ const fait = { v:false }; const go = () => { if (fait.v) return; fait.v = true; removeEventListener("pointerdown", go, true); try { if (strokes().length > n0) undoInk(); } catch(x){} };
+    setTimeout(go, 350); addEventListener("pointerdown", go, true); }
   cible.addEventListener("touchend", fin, { capture:true, passive:true });
   cible.addEventListener("touchcancel", fin, { capture:true, passive:true });
   /* (12 nov.) TNI SMART : dans un pincement, un des deux doigts arrive souvent en « pen » 1 × 1 px (vidéo de contact.html).
@@ -154,7 +158,7 @@ function brancherPincement(cible, frame){
     menage(); if (PZ.pts.size < 2){ PZ.actif = false; PZ.m = null; return; } evaluer(e); e.stopImmediatePropagation(); }, { capture:true });   /* (16 nov.) un stylet seul n'est jamais un pincement */
   function finPen(e){ if (e.pointerType !== "pen") return; let vu = false; [...PZ.pts.keys()].forEach(c => { if (c.endsWith(":p" + e.pointerId)){ PZ.pts.delete(c); vu = true; } }); if (!vu) return;
     if (PZ.actif && PZ.pts.size < 2){ PZ.actif = false; PZ.m = null; ZS.tenu = false; clearTimeout(ZS.fin); ZS.fin = setTimeout(zoomSourisFin, 60); }
-    if (!PZ.pts.size && PZ.apres){ PZ.apres = false; const n0 = PZ.n0; setTimeout(() => { try { if (strokes().length > n0) undoInk(); } catch(x){} }, 350); } }
+    if (!PZ.pts.size && PZ.apres){ PZ.apres = false; const n0 = PZ.n0; nettoyerPincement(n0); } }
   cible.addEventListener("pointerup", finPen, { capture:true });
   cible.addEventListener("pointercancel", finPen, { capture:true });
 }

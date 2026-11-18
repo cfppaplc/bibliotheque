@@ -1504,11 +1504,12 @@ function recalerWb(){
 const arrondir = v => typeof v === "number" ? Math.round(v * 1e5) / 1e5 : Array.isArray(v) ? v.map(arrondir) : v;
 const copieTraits = arr => (arr || []).map(s => { const o = {}; for (const k in s) if (k !== "cache") o[k] = (k === "p" || k === "bb" || k === "bw") ? arrondir(s[k]) : s[k]; return o; });
 let sauveT = 0, sauveAvis = false;
-function planifierSauvegarde(){ clearTimeout(sauveT); sauveT = setTimeout(sauverTableaux, 700); }
+function planifierSauvegarde(){ clearTimeout(sauveT); sauveT = setTimeout(() => { if (window.requestIdleCallback) requestIdleCallback(sauverTableaux, { timeout:2500 }); else sauverTableaux(); }, 1800); }   /* 17 nov. : 1,8 s + moment libre (avec beaucoup de tableaux, l'enregistrement prend ~0,1 s sur ordinateur, plus au TNI) */
 function sauverTableaux(){ if (RD.enTrait){ planifierSauvegarde(); return; }   /* jamais pendant un trait : ça le faisait saccader */
   const inks = {}; for (const k in INKS) if (INKS[k] && INKS[k].length) inks[k] = copieTraits(INKS[k]);
   try { localStorage.setItem(CLE_SAUVE, JSON.stringify({ v:1, inks, wb:WB, refs:REFS })); sauveAvis = false; }
-  catch(e){ if (!sauveAvis){ sauveAvis = true; aviser("Mémoire pleine : enregistre tes tableaux dans « Mes schémas » ou exporte-les.", 6000); } }
+  catch(e){ if (!sauveAvis){ sauveAvis = true; const m = "Mémoire pleine : tes derniers traits ne sont plus enregistrés. Supprime de vieux tableaux (menu Plus) ou enregistre-les dans « Mes schémas ».";
+    aviser(m, 6000); try { let d = document.getElementById("wbPlein"); if (!d){ d = document.createElement("div"); d.id = "wbPlein"; d.style.cssText = "position:fixed;left:50%;top:14px;transform:translateX(-50%);z-index:100001;background:#B5574D;color:#fff;padding:12px 18px;border-radius:12px;font:600 15px system-ui;max-width:min(680px,92vw);box-shadow:0 6px 24px rgba(0,0,0,.35);cursor:pointer"; d.onclick = () => d.remove(); document.body.append(d); } d.textContent = m; setTimeout(() => d && d.remove(), 12000); } catch(x){} } }
 }
 (function(){ try { const d = JSON.parse(localStorage.getItem(CLE_SAUVE) || "null"); if (!d) return;
   Object.assign(INKS, d.inks || {}); Object.assign(WB, d.wb || {}); Object.assign(REFS, d.refs || {}); } catch(e){} })();
