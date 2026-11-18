@@ -61,10 +61,10 @@ dialog textarea{width:100%;min-height:200px;font:12px ui-monospace,monospace;bor
 table.t td,table.t th{border:1px solid var(--l);padding:5px 8px;text-align:center;font-size:12px}table.t input{width:52px;text-align:center;border:1px solid var(--l);border-radius:6px}
 
 .ong2{display:flex;gap:6px;margin:0 0 14px}.ong2 button.on{background:var(--mar);color:#fff;border-color:var(--mar)}
-.mois{display:inline-block;vertical-align:top;margin:0 14px 14px 0}.mois h4{margin:0 0 6px;font-size:13px;text-transform:capitalize}
-.mois table td{width:30px;height:28px;text-align:center;font-size:12px;border:0;border-radius:6px;cursor:pointer}
-.mois td.we{color:#ccc;cursor:default}.mois td.off{background:#E7E1D8;color:#9A9083;text-decoration:line-through}.mois td.hors{color:#ddd;cursor:default}
-.mois td.jo:hover{background:#FFE8D9}
+.cmois{display:inline-block;vertical-align:top;margin:0 14px 14px 0}.cmois h4{margin:0 0 6px;font-size:13px;text-transform:capitalize}
+.cmois table td{width:30px;height:28px;text-align:center;font-size:12px;border:0;border-radius:6px;cursor:pointer}
+.cmois td.we{color:#ccc;cursor:default}.cmois td.off{background:#E7E1D8;color:#9A9083;text-decoration:line-through}.cmois td.hors{color:#ddd;cursor:default}
+.cmois td.jo:hover{background:#FFE8D9}
 table.ed td,table.ed th{border-bottom:1px solid var(--l);padding:4px;font-size:12px;text-align:left}table.ed input{border:1px solid var(--l);border-radius:6px;padding:5px;width:100%}
 table.ed .n{width:56px}table.ed .c{width:86px}table.ed .h{width:60px}
 .chip{display:inline-block;border:1px solid var(--l);border-radius:99px;padding:3px 8px;margin:2px;font-size:11px;cursor:pointer;background:#fff}.chip.on{background:var(--or);border-color:var(--or);color:#fff}
@@ -81,12 +81,12 @@ table.ed .n{width:56px}table.ed .c{width:86px}table.ed .h{width:60px}
   <span class="seg" id="vOng"><button data-v="g" class="on">Groupe</button><button data-v="e">Enseignants</button><button data-v="s">Semaine</button></span>
   <span id="etat" class="etat ok"></span>
   <span class="esp"></span>
+  <button class="prim noprint" id="bNouv">+ Nouveau groupe</button>
+  <button class="noprint" id="bAnnee">Préparer l'année</button>
   <span class="menu noprint" id="menu"><button id="bMenu">Plus ▾</button><div class="liste">
     <button data-a="auto">Remplir automatiquement (3 matières à la fois)</button>
     <button data-a="tach">Tâches annuelles des enseignants</button>
-    <button data-a="grp">Nouveau groupe…</button>
-    <button data-a="reg">Calendrier, programmes et enseignants</button>
-    <button data-a="mods">Modifier ce groupe (texte)</button>
+        <button data-a="mods">Modifier ce groupe (texte)</button>
     <button data-a="print">Imprimer</button>
     <button data-a="exp">Sauvegarder dans un fichier</button>
     <button data-a="imp">Ouvrir un fichier</button>
@@ -94,6 +94,13 @@ table.ed .n{width:56px}table.ed .c{width:86px}table.ed .h{width:60px}
   </div></span>
 </div>
 <div class="legende" id="leg"></div>
+<div id="guide" class="noprint" hidden style="background:#fff;border:1px solid var(--l);border-left:5px solid var(--or);border-radius:12px;padding:14px 18px;margin-bottom:12px">
+  <b style="font-size:15px">Comment ça marche</b> <button id="gX" style="float:right;padding:4px 10px">Compris</button>
+  <ol style="margin:8px 0 0;padding-left:20px;line-height:1.7">
+    <li><b>Préparer l'année</b> (une fois) : congés, programmes, qui enseigne quoi.</li>
+    <li><b>+ Nouveau groupe</b> : l'horaire se bâtit tout seul, 3 matières à la fois, sans prof à deux places.</li>
+    <li><b>Ajuste</b> : touche une case pour ajouter ou retirer un bloc de 3 h. La pastille en haut te dit quand tout est correct.</li>
+  </ol></div>
 <div id="alertes"></div>
 <div class="carte" id="vue"></div>
 <p class="mini noprint">Les autres activités (férié, plage verte…) ne comptent pas dans les heures de la semaine. Vue Groupe : touche une case pour ajouter ou retirer un bloc de 3 h. Vue Enseignants : les heures de chaque prof dans tous les groupes. Vue Semaine : l'horaire par bloc, sans mettre un prof à deux places. Touche un enseignant ci-dessus pour voir seulement ses heures. Tout est gardé sur cet ordinateur.</p>
@@ -136,7 +143,7 @@ function dessiner(){ document.querySelectorAll("#vOng button").forEach(b => b.cl
     h += `<th class="${m !== moisAvant ? "mois" : ""} ${conf ? "conf" : ""}" title="${conf ? "Un enseignant a trop d'heures cette semaine" : ""}">${jm(w.d)}</th>`; moisAvant = m; });
   h += `</tr></thead><tbody>`;
   const ligne = m => { const k = m.k, fait = s.sem.reduce((a, w, wi) => a + totalCase(s, wi, k), 0), pct = m.h ? Math.min(100, fait / m.h * 100) : 0, cl = !m.h ? "" : fait > m.h ? "trop" : fait < m.h ? "manque" : "";
-    if (!m.autre && fait !== m.h) prob.push(`${m.titre} : ${fait} h placées sur ${m.h} h`);
+    if (!m.autre && fait !== m.h) prob.push({ t:`${m.titre} : ${fait} h placées sur ${m.h} h (${fait > m.h ? "enlève" : "ajoute"} ${Math.abs(fait - m.h)} h)`, k });
     let r = `<tr class="${m.autre ? "autre" : ""}"><td class="nom"><b>${m.num ? m.num + " · " : ""}${m.titre}</b><small>${m.code ? m.code + " · " : ""}${fait} / ${m.h} h${m.ev ? " · éval " + m.ev + " h" : ""}${cl === "" && m.h && !m.autre ? " ✓" : ""}</small>${m.autre ? "" : `<div class="barre ${cl}"><i style="width:${pct}%"></i></div>`}</td>`;
     s.sem.forEach((w, wi) => { const c = cell(s, wi, k);
       r += `<td class="c" data-w="${wi}" data-k="${k}">` + Object.keys(c).map(p => `<span class="puce ${FILTRE === p ? "vu" : ""}" style="background:${couleur(p)}" title="${D.profs[p] || "Non assigné"}">${c[p]}</span>`).join("") + `</td>`; });
@@ -145,15 +152,15 @@ function dessiner(){ document.querySelectorAll("#vOng button").forEach(b => b.cl
   if (s.mods.some(m => m.autre)) { h += `<tr class="sep"><td class="nom">Autres activités</td><td colspan="${s.sem.length}"></td></tr>`; s.mods.filter(m => m.autre).forEach(m => h += ligne(m)); }
   h += `</tbody><tfoot><tr><td class="nom"><b>Heures de la semaine</b></td>`;
   s.sem.forEach((w, wi) => { const t = s.mods.reduce((a, m) => a + (m.autre ? 0 : totalCase(s, wi, m.k)), 0), cl = t > w.h ? "w-trop" : t < w.h ? "w-manque" : "";
-    if (t > w.h) prob.push(`Semaine du ${jm(w.d)} : ${t} h placées pour ${w.h} h`);
+    if (t > w.h) prob.push({ t:`Semaine du ${jm(w.d)} : ${t} h placées pour ${w.h} h (enlève ${t - w.h} h)`, w:wi });
     h += `<td class="${cl}"><div class="jauge"><i style="height:${Math.min(100, w.h ? t / w.h * 100 : 0)}%"></i></div>${t}/${w.h}</td>`; });
   h += `</tr></tfoot></table>`;
   $("#vue").innerHTML = h;
   // conflits entre groupes
-  Object.keys(C).forEach(p => Object.keys(C[p]).forEach(d => { const e = C[p][d]; if (e.h > e.max && s.sem.some(w => w.d === d)) prob.push(`${D.profs[p] || p} : ${e.h} h la semaine du ${jm(d)} (${[...e.grp].join(", ")})`); }));
-  const P = [...new Set(prob)];
+  Object.keys(C).forEach(p => Object.keys(C[p]).forEach(d => { const e = C[p][d]; if (e.h > e.max && s.sem.some(w => w.d === d)) prob.push({ t:`${D.profs[p] || p} est à deux places la semaine du ${jm(d)} (${[...e.grp].join(" et ")} : ${e.h} h pour ${e.max} h). Donne un de ses blocs à un autre enseignant.`, w:s.sem.findIndex(w => w.d === d) }); }));
+  const vus = new Set(), P = prob.filter(x => !vus.has(x.t) && vus.add(x.t));
   $("#etat").className = "etat " + (P.length ? "err" : "ok"); $("#etat").textContent = P.length ? P.length + " point" + (P.length > 1 ? "s" : "") + " à régler" : "Tout est correct";
-  $("#alertes").innerHTML = $("#alertes").dataset.ouv ? P.map(a => `<div class="alert">${a}</div>`).join("") : "";
+  $("#alertes").innerHTML = $("#alertes").dataset.ouv ? P.slice(0, 5).map(a => `<div class="alert" style="cursor:pointer" data-va="${a.k || ""}|${a.w == null ? "" : a.w}">${a.t} <u style="color:var(--or)">Voir</u></div>`).join("") + (P.length > 5 ? `<div class="mini" style="margin:4px 2px 8px">… et ${P.length - 5} autres. Règle ceux-ci d'abord.</div>` : "") : "";
 }
 
 /* petite fenêtre d'une case : heures de chaque enseignant, − / + */
@@ -309,7 +316,7 @@ function reglages(t){ prepDonnees(); let h = `<h2 style="margin-top:0">Calendrie
     <p>Première journée <input type="date" id="cDeb" value="${D.cal.debut}"> · Dernière journée <input type="date" id="cFin" value="${D.cal.fin}"></p><div>`;
     const d0 = new Date(D.cal.debut + "T12:00"), d1 = new Date(D.cal.fin + "T12:00"); let jours = 0;
     for (let m = new Date(d0.getFullYear(), d0.getMonth(), 1, 12); m <= d1; m.setMonth(m.getMonth() + 1)){
-      h += `<div class="mois"><h4>${m.toLocaleDateString("fr-CA", { month:"long", year:"numeric" })}</h4><table><tr>${["L","M","M","J","V"].map(x => `<th style="font-size:11px;color:#999">${x}</th>`).join("")}</tr><tr>`;
+      h += `<div class="cmois"><h4>${m.toLocaleDateString("fr-CA", { month:"long", year:"numeric" })}</h4><table><tr>${["L","M","M","J","V"].map(x => `<th style="font-size:11px;color:#999">${x}</th>`).join("")}</tr><tr>`;
       const pre = (m.getDay() + 6) % 7; if (pre < 5) h += "<td></td>".repeat(pre);
       for (let d = new Date(m); d.getMonth() === m.getMonth(); d.setDate(d.getDate() + 1)){ const w = d.getDay(); if (w === 0 || w === 6){ if (w === 6) h += "</tr><tr>"; continue; }
         const k = iso(d), hors = k < D.cal.debut || k > D.cal.fin, off = D.cal.off[k]; if (!hors && !off) jours++;
@@ -369,6 +376,21 @@ function dlgNouveau(){ prepDonnees(); const lun = new Date(D.cal.debut + "T12:00
     D.groupes.push(g); G = D.groupes.length - 1; g.sessions.forEach((s, i) => { S = i; remplir(s); }); S = 0; VUE = "g"; sauver(); dlg.close(); dessiner(); };
 }
 prepDonnees(); sauver();
+/* ---- simplicité : guide, préparer l'année en 3 étapes, problèmes cliquables ---- */
+try { if (!localStorage.horaireGuideVu) $("#guide").hidden = false; } catch(e){}
+$("#gX").onclick = () => { $("#guide").hidden = true; try { localStorage.horaireGuideVu = "1"; } catch(e){} };
+$("#bNouv").onclick = () => dlgNouveau();
+$("#bAnnee").onclick = () => { reglages.assist = true; reglages("cal"); };
+const _reg = reglages; reglages = function(t){ _reg(t); reglages.t = t;
+  const etapes = ["cal", "prog", "ens"], i = etapes.indexOf(t), noms = ["1. Congés de l'année", "2. Programmes", "3. Qui enseigne quoi"];
+  const ong = document.querySelector("#dlgC .ong2"); if (ong) ong.querySelectorAll("button").forEach((b, j) => b.textContent = noms[j]);
+  const bas = document.createElement("p"); bas.style.cssText = "display:flex;justify-content:space-between;margin-top:18px";
+  bas.innerHTML = (i > 0 ? `<button data-rt="${etapes[i - 1]}">‹ Étape précédente</button>` : "<span></span>") + (i < 2 ? `<button class="prim" data-rt="${etapes[i + 1]}">Étape suivante ›</button>` : `<button class="prim" id="rFin">Terminé : créer un groupe ›</button>`);
+  $("#dlgC").append(bas); const f = $("#rFin"); if (f) f.onclick = () => { dlg.close(); dlgNouveau(); }; };
+document.addEventListener("click", e => { const a = e.target.closest("[data-va]"); if (!a) return; const [k, w] = a.dataset.va.split("|");
+  const sel = k && w !== "" ? `td.c[data-k="${CSS.escape(k)}"][data-w="${w}"]` : k ? `td.c[data-k="${CSS.escape(k)}"]` : `td.c[data-w="${w}"]`;
+  const els = [...document.querySelectorAll(sel)]; if (!els.length) return; els[0].scrollIntoView({ block:"center", inline:"center", behavior:"smooth" });
+  els.forEach(x => { x.style.transition = "background .3s"; x.style.background = "#FFD9C2"; setTimeout(() => x.style.background = "", 1600); }); });
 dessiner();
 </script>
 </body>
