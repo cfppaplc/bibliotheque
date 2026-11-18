@@ -187,9 +187,9 @@ function dessiner(){ document.querySelectorAll("#vOng button").forEach(b => b.cl
   $("#vue").innerHTML = h;
   // conflits entre groupes
   Object.keys(C).forEach(p => Object.keys(C[p]).forEach(d => { const e = C[p][d]; if (e.h > e.max && s.sem.some(w => w.d === d)) prob.push({ t:`${D.profs[p] || p} a ${e.h} h la semaine du ${jm(d)} (${[...e.grp].join(" et ")}), plus que ${e.max} h. Donne un de ses blocs à un autre enseignant.`, w:s.sem.findIndex(w => w.d === d), fx:"prof", p, d }); }));
-  const vus = new Set(), P = prob.filter(x => !vus.has(x.t) && vus.add(x.t));
-  $("#etat").className = "etat " + (P.length ? "err" : "ok"); $("#etat").textContent = P.length ? P.length + " point" + (P.length > 1 ? "s" : "") + " à régler" : "Tout est correct";
-  $("#alertes").innerHTML = $("#alertes").dataset.ouv ? (PROBS = P).slice(0, 5).map((a, i) => `<div class="alert" style="cursor:pointer;display:flex;gap:10px;align-items:center" data-va="${a.k || ""}|${a.w == null ? "" : a.w}"><span style="flex:1">${a.t} <u style="color:var(--or)">Voir</u></span>${a.fx ? `<button class="prim" data-fx="${i}" style="padding:6px 14px">Régler</button>` : ""}</div>`).join("") + (P.length > 5 ? `<div class="mini" style="margin:4px 2px 8px">… et ${P.length - 5} autres. Règle ceux-ci d'abord.</div>` : "") : "";
+  const vus = new Set(), ACC = (D.acceptes = D.acceptes || {})[grp().id] || [], P0 = prob.filter(x => !vus.has(x.t) && vus.add(x.t)), P = P0.filter(x => !ACC.includes(x.t)), nAcc = P0.length - P.length;
+  $("#etat").className = "etat " + (P.length ? "err" : "ok"); $("#etat").textContent = P.length ? P.length + " point" + (P.length > 1 ? "s" : "") + " à régler" : nAcc ? "Correct (" + nAcc + " accepté" + (nAcc > 1 ? "s" : "") + ")" : "Tout est correct"; if (!P.length && nAcc) $("#etat").className = "etat ok"; if (nAcc) $("#etat").style.cursor = "pointer";
+  $("#alertes").innerHTML = $("#alertes").dataset.ouv ? (PROBS = P).slice(0, 5).map((a, i) => `<div class="alert" style="cursor:pointer;display:flex;gap:10px;align-items:center" data-va="${a.k || ""}|${a.w == null ? "" : a.w}"><span style="flex:1">${a.t} <u style="color:var(--or)">Voir</u></span>${a.fx ? `<button class="prim" data-fx="${i}" style="padding:6px 14px">Régler</button>` : ""}<button data-acc="${i}" style="padding:6px 14px" title="C'est voulu : ne plus le signaler">Accepter</button></div>`).join("") + (P.length > 5 ? `<div class="mini" style="margin:4px 2px 8px">… et ${P.length - 5} autres. Règle ceux-ci d'abord.</div>` : "") + (nAcc ? `<div class="mini" style="margin:4px 2px 8px">${nAcc} point${nAcc > 1 ? "s" : ""} accepté${nAcc > 1 ? "s" : ""} (voulu${nAcc > 1 ? "s" : ""}). <u data-revoir style="cursor:pointer;color:var(--or)">Les revoir</u></div>` : "") : "";
 }
 
 /* petite fenêtre d'une case : heures de chaque enseignant, − / + */
@@ -487,6 +487,8 @@ function regler(a){ const s = ses(); let fait = 0;
     if (e > 0) alert(`${D.profs[a.p]} a encore ${e} h de trop cette semaine. Aucun autre enseignant libre ne peut prendre ses modules : coche d'autres modules pour un enseignant dans Réglages → Enseignants.`); }
   if (!fait && a.fx !== "mod" && a.fx !== "prof") alert("Je n'ai pas trouvé de solution automatique pour ce point. Utilise « Voir » pour le régler à la main.");
   sauver(); dessiner(); }
+document.addEventListener("click", e => { const b = e.target.closest("[data-acc],[data-revoir]"); if (!b) return; e.stopPropagation(); const A = (D.acceptes = D.acceptes || {});
+  if (b.dataset.revoir != null) delete A[grp().id]; else (A[grp().id] = A[grp().id] || []).push(PROBS[+b.dataset.acc].t); sauver(); dessiner(); }, true);
 document.addEventListener("click", e => { const b = e.target.closest("[data-fx]"); if (!b) return; e.stopPropagation(); regler(PROBS[+b.dataset.fx]); }, true);
 document.addEventListener("click", e => { const a = e.target.closest("[data-va]"); if (!a) return; const [k, w] = a.dataset.va.split("|");
   const sel = k && w !== "" ? `td.c[data-k="${CSS.escape(k)}"][data-w="${w}"]` : k ? `td.c[data-k="${CSS.escape(k)}"]` : `td.c[data-w="${w}"]`;
