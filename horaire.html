@@ -50,7 +50,7 @@ thead th.conf{background:#FBE3E0;color:var(--err)}
 #pop{position:fixed;z-index:50;background:#fff;border-radius:14px;box-shadow:0 14px 40px rgba(0,0,0,.25);padding:14px;min-width:270px}
 #pop h3{margin:0 0 2px;font-size:15px}#pop .s{color:var(--gris);font-size:12px;margin-bottom:10px}
 .lg{display:flex;align-items:center;gap:8px;margin:6px 0}.lg i{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;color:#fff;font:700 10px system-ui;font-style:normal}
-.lg .n{flex:1}.lg button{width:38px;height:38px;padding:0;font-size:18px;border-radius:10px}.lg output{width:34px;text-align:center;font-weight:700;font-size:16px}
+.lg .n{flex:1}.lg button{width:42px;height:38px;padding:0;font-size:14px;font-weight:700;border-radius:10px}.lg .hv{width:42px;text-align:center;font-weight:700;font-size:16px;border:1px solid var(--l);border-radius:8px;padding:6px 0}
 #pop .ajout{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}#pop .ajout button{padding:5px 10px;font-size:12px}
 #pop .bas{display:flex;justify-content:space-between;margin-top:12px;font-size:12px;color:var(--gris);align-items:center}
 .menu{position:relative}.menu .liste{position:absolute;right:0;top:44px;background:#fff;border-radius:12px;box-shadow:0 14px 40px rgba(0,0,0,.2);padding:6px;min-width:250px;z-index:30;display:none}
@@ -68,10 +68,11 @@ table.t td,table.t th{border:1px solid var(--l);padding:5px 8px;text-align:cente
 <div class="haut">
   <select id="gSel"></select>
   <span class="seg" id="sOng"></span>
+  <span class="seg" id="vOng"><button data-v="g" class="on">Groupe</button><button data-v="e">Enseignants</button><button data-v="s">Semaine</button></span>
   <span id="etat" class="etat ok"></span>
   <span class="esp"></span>
   <span class="menu noprint" id="menu"><button id="bMenu">Plus ▾</button><div class="liste">
-    <button data-a="auto">Remplir automatiquement cette session</button>
+    <button data-a="auto">Remplir automatiquement (3 matières à la fois)</button>
     <button data-a="tach">Tâches annuelles des enseignants</button>
     <button data-a="mods">Modules, enseignants et semaines</button>
     <button data-a="grp">Nouveau groupe</button>
@@ -84,7 +85,7 @@ table.t td,table.t th{border:1px solid var(--l);padding:5px 8px;text-align:cente
 <div class="legende" id="leg"></div>
 <div id="alertes"></div>
 <div class="carte" id="vue"></div>
-<p class="mini noprint">Les autres activités (férié, plage verte…) ne comptent pas dans les heures de la semaine. Touche une case pour ajouter ou retirer des heures. Touche un enseignant ci-dessus pour voir seulement ses heures. Tout est gardé sur cet ordinateur.</p>
+<p class="mini noprint">Les autres activités (férié, plage verte…) ne comptent pas dans les heures de la semaine. Vue Groupe : touche une case pour ajouter ou retirer un bloc de 3 h. Vue Enseignants : les heures de chaque prof dans tous les groupes. Vue Semaine : l'horaire par bloc, sans mettre un prof à deux places. Touche un enseignant ci-dessus pour voir seulement ses heures. Tout est gardé sur cet ordinateur.</p>
 </main>
 <div id="pop" hidden></div>
 <dialog id="dlg"><div id="dlgC"></div><p style="text-align:right;margin:14px 0 0"><button onclick="dlg.close()">Fermer</button></p></dialog>
@@ -94,7 +95,7 @@ const $ = s => document.querySelector(s), CLE = "horairesMetier2";
 const EXEMPLE = {"profs":{"M.M":"Marc Michaud","J.R":"Jeremy Raymond","J.O":"Jean René Ouellet","S.D":"Simon Dubé"},"groupes":[{"id":"g1","nom":"2026EGI1","prog":"5211 Entretien général d'immeubles","titulaire":"Marc Michaud","sessions":[{"nom":"Session 1","mods":[{"k":"436201","code":"436201","titre":"Métier et formation","num":1,"h":15,"ev":0,"profs":["M.M","S.D"],"autre":false},{"k":"436212","code":"436212","titre":"Santé et sécurité","num":2,"h":30,"ev":0,"profs":["J.O"],"autre":false},{"k":"436222","code":"436222","titre":"Gestion petit entrepôt","num":3,"h":30,"ev":0,"profs":["M.M"],"autre":false},{"k":"436238","code":"436238","titre":"Entretien ménager","num":4,"h":60,"ev":0,"profs":["M.M","J.R","S.D"],"autre":false},{"k":"436255","code":"436255","titre":"Travaux men. et réfect.","num":6,"h":75,"ev":6,"profs":["M.M","S.D"],"autre":false},{"k":"436304","code":"436304","titre":"Ventilation","num":11,"h":60,"ev":0,"profs":["M.M"],"autre":false},{"k":"436295","code":"436295","titre":"Plomberie chauffage","num":10,"h":75,"ev":3,"profs":["M.M","J.R"],"autre":false},{"k":"436274","code":"436274","titre":"Entr. Matériel élect.","num":13,"h":60,"ev":0,"profs":["M.M"],"autre":false},{"k":"436323","code":"436323","titre":"Lecture plans bâtiment","num":14,"h":45,"ev":0,"profs":["M.M","S.D"],"autre":false},{"k":"Mathematique","code":"","titre":"Mathématique","num":null,"h":30,"ev":0,"profs":[],"autre":true},{"k":"Pédago Tempête","code":"","titre":"Pédago Tempête","num":null,"h":6,"ev":0,"profs":[],"autre":true},{"k":"Férier Pedagogique","code":"","titre":"Férié Pedagogique","num":null,"h":84,"ev":0,"profs":[],"autre":true},{"k":"Plage verte","code":"","titre":"Plage verte","num":null,"h":30,"ev":0,"profs":[],"autre":true}],"sem":[{"d":"2026-08-31","h":28},{"d":"2026-09-07","h":16},{"d":"2026-09-14","h":18},{"d":"2026-09-21","h":18},{"d":"2026-09-28","h":28},{"d":"2026-10-05","h":22},{"d":"2026-10-12","h":22},{"d":"2026-10-19","h":28},{"d":"2026-10-26","h":28},{"d":"2026-11-02","h":22},{"d":"2026-11-09","h":28},{"d":"2026-11-16","h":28},{"d":"2026-11-23","h":28},{"d":"2026-11-30","h":28},{"d":"2026-12-07","h":28},{"d":"2026-12-14","h":21},{"d":"2026-12-21","h":12},{"d":"2027-01-04","h":12},{"d":"2027-01-11","h":29},{"d":"2027-01-18","h":6}],"g":{"0":{"436201":{"M.M":6},"436255":{"M.M":9,"S.D":4},"436274":{"M.M":9},"Plage verte":{"-":2}},"1":{"436201":{"M.M":3,"S.D":3},"436255":{"M.M":7},"436274":{"M.M":3},"Mathematique":{"-":6},"Férier Pedagogique":{"-":6},"Plage verte":{"-":2}},"2":{"436201":{"S.D":3},"436222":{"M.M":6},"436255":{"M.M":3},"436274":{"M.M":6},"Mathematique":{"-":12}},"3":{"436222":{"M.M":3},"436255":{"M.M":6,"S.D":6},"436274":{"M.M":3},"Mathematique":{"-":12}},"4":{"436222":{"M.M":6},"436255":{"M.M":6,"S.D":7},"436274":{"M.M":9},"Plage verte":{"-":2}},"5":{"436222":{"M.M":9},"436255":{"M.M":6,"S.D":4},"436274":{"M.M":3},"Férier Pedagogique":{"-":6},"Plage verte":{"-":2}},"6":{"436222":{"M.M":6},"436255":{"M.M":6,"S.D":4},"436274":{"M.M":6},"Férier Pedagogique":{"-":6},"Plage verte":{"-":2}},"7":{"436238":{"M.M":9},"436255":{"M.M":3,"S.D":4},"436304":{"M.M":6},"436274":{"M.M":6},"Plage verte":{"-":2}},"8":{"436238":{"M.M":3,"J.R":1},"436304":{"M.M":9},"436274":{"M.M":15},"Plage verte":{"-":2}},"9":{"436238":{"M.M":3},"436304":{"M.M":6},"436295":{"J.R":9},"436323":{"S.D":4},"Férier Pedagogique":{"-":6},"Plage verte":{"-":2}},"10":{"436238":{"M.M":3},"436304":{"M.M":9},"436295":{"J.R":9},"436323":{"M.M":3,"S.D":4},"Plage verte":{"-":2}},"11":{"436238":{"M.M":6},"436304":{"M.M":9},"436295":{"J.R":6},"436323":{"M.M":3,"S.D":4},"Plage verte":{"-":2}},"12":{"436238":{"M.M":6},"436304":{"M.M":9},"436295":{"J.R":6},"436323":{"M.M":3,"S.D":4},"Plage verte":{"-":2}},"13":{"436212":{"J.O":6},"436238":{"M.M":9},"436304":{"M.M":6},"436323":{"M.M":3,"S.D":4},"Plage verte":{"-":2}},"14":{"436212":{"J.O":6},"436304":{"M.M":6},"436295":{"J.R":9},"436323":{"M.M":3,"S.D":4},"Plage verte":{"-":2}},"15":{"436212":{"J.O":6},"436238":{"M.M":3},"436295":{"J.R":6},"436323":{"M.M":3,"S.D":3},"Pédago Tempête":{"-":6},"Plage verte":{"-":3}},"16":{"436212":{"J.O":6},"436295":{"J.R":3,"-":3},"Férier Pedagogique":{"-":18}},"17":{"436295":{"J.R":9,"-":3},"Férier Pedagogique":{"-":18}},"18":{"436212":{"J.O":6},"436238":{"M.M":9,"S.D":8},"436295":{"J.R":6},"Plage verte":{"-":1}},"19":{"436295":{"J.R":6},"Férier Pedagogique":{"-":24}}}},{"nom":"Session 2","mods":[{"k":"436238","code":"436238","titre":"Entretien ménager","num":4,"h":60,"ev":3,"profs":["M.M"],"autre":false},{"k":"436244","code":"436244","titre":"Travaux min. entretien","num":5,"h":60,"ev":6,"profs":["M.M"],"autre":false},{"k":"436352","code":"436352","titre":"Recherche d'emploi","num":8,"h":30,"ev":0,"profs":["M.M"],"autre":false},{"k":"436266","code":"436266","titre":"Système méc. Bâtiment","num":9,"h":90,"ev":0,"profs":["M.M"],"autre":false},{"k":"436312","code":"436312","titre":"Syst. prot. Incendie","num":12,"h":30,"ev":0,"profs":["M.M"],"autre":false},{"k":"436333","code":"436333","titre":"Micro-ordinateur","num":15,"h":45,"ev":0,"profs":["M.M"],"autre":false},{"k":"436343","code":"436343","titre":"Adm. d'un bâtiment","num":16,"h":45,"ev":0,"profs":["J.R"],"autre":false},{"k":"436364","code":"436364","titre":"Int. au travail","num":17,"h":60,"ev":0,"profs":[],"autre":false},{"k":"436282","code":"436282","titre":"Communication","num":7,"h":30,"ev":0,"profs":["J.R"],"autre":false},{"k":"Pédago Tempête","code":"","titre":"Pédago Tempête","num":null,"h":24,"ev":0,"profs":[],"autre":true},{"k":"Férier Pedagogique","code":"","titre":"Férié Pedagogique","num":null,"h":54,"ev":0,"profs":[],"autre":true},{"k":"Plage verte","code":"","titre":"Plage verte","num":null,"h":42,"ev":0,"profs":[],"autre":true}],"sem":[{"d":"2027-01-25","h":12},{"d":"2027-02-01","h":27},{"d":"2027-02-08","h":27},{"d":"2027-02-15","h":27},{"d":"2027-02-22","h":27},{"d":"2027-03-08","h":21},{"d":"2027-03-15","h":21},{"d":"2027-03-22","h":21},{"d":"2027-03-29","h":21},{"d":"2027-04-05","h":21},{"d":"2027-04-12","h":21},{"d":"2027-04-19","h":27},{"d":"2027-04-26","h":27},{"d":"2027-05-03","h":27},{"d":"2027-05-10","h":27},{"d":"2027-05-17","h":24},{"d":"2027-05-24","h":24},{"d":"2027-05-31","h":30},{"d":"2027-06-07","h":18}],"g":{"0":{"436244":{"M.M":6},"436282":{"J.R":6},"Férier Pedagogique":{"-":18}},"1":{"436244":{"M.M":9},"436352":{"M.M":12},"436282":{"J.R":6},"Plage verte":{"-":3}},"2":{"436244":{"M.M":15},"436343":{"J.R":6},"436282":{"J.R":6},"Plage verte":{"-":3}},"3":{"436244":{"M.M":15},"436343":{"J.R":6},"436282":{"J.R":6},"Plage verte":{"-":3}},"4":{"436244":{"M.M":15},"436343":{"J.R":6},"436282":{"J.R":6},"Plage verte":{"-":3}},"5":{"436238":{"M.M":6},"436266":{"M.M":6},"436343":{"J.R":9},"Férier Pedagogique":{"-":6},"Plage verte":{"-":3}},"6":{"436238":{"M.M":6},"436266":{"M.M":9},"436343":{"J.R":6},"Pédago Tempête":{"-":6},"Plage verte":{"-":3}},"7":{"436238":{"M.M":3},"436266":{"M.M":12},"436343":{"J.R":6},"Férier Pedagogique":{"-":6},"Plage verte":{"-":3}},"8":{"436266":{"M.M":3},"436312":{"M.M":12},"436343":{"J.R":6},"Férier Pedagogique":{"-":6},"Plage verte":{"-":3}},"9":{"436238":{"M.M":6},"436266":{"M.M":9},"436333":{"M.M":6},"Pédago Tempête":{"-":6},"Plage verte":{"-":3}},"10":{"436238":{"M.M":6},"436266":{"M.M":6},"436333":{"M.M":6,"-":3},"Pédago Tempête":{"-":6},"Plage verte":{"-":3}},"11":{"436238":{"M.M":6},"436266":{"M.M":12},"436312":{"M.M":6},"436333":{"-":3},"Plage verte":{"-":3}},"12":{"436238":{"M.M":9},"436352":{"M.M":3},"436266":{"M.M":6},"436333":{"M.M":6,"-":3},"Plage verte":{"-":3}},"13":{"436352":{"M.M":9},"436266":{"M.M":9},"436333":{"M.M":6,"-":3},"Plage verte":{"-":3}},"14":{"436352":{"M.M":6},"436266":{"M.M":12},"436333":{"M.M":8,"-":1},"Plage verte":{"-":3}},"15":{"436238":{"M.M":18},"436266":{"M.M":6},"Pédago Tempête":{"-":6}},"16":{"436364":{"-":24},"Férier Pedagogique":{"-":6}},"17":{"436364":{"-":30}},"18":{"436312":{"M.M":12},"436364":{"-":6},"Férier Pedagogique":{"-":12}}}}]}]};
 const COUL = ["#2F6FB5","#EB6A22","#1E8A55","#8B4FB8","#C2417A","#0E8C8C","#8A6D1E","#4A5568"];
 let D; try { D = JSON.parse(localStorage.getItem(CLE)) || null; } catch(e){} if (!D) D = JSON.parse(JSON.stringify(EXEMPLE));
-let G = 0, S = 0, FILTRE = null;
+let G = 0, S = 0, FILTRE = null, VUE = "g", SW = 0;
 const sauver = () => { try { localStorage.setItem(CLE, JSON.stringify(D)); } catch(e){ alert("Mémoire pleine : sauvegarde dans un fichier."); } };
 const grp = () => D.groupes[G], ses = () => grp().sessions[S];
 const couleur = p => { const L = Object.keys(D.profs); const i = L.indexOf(p); return i < 0 ? "#999" : COUL[i % COUL.length]; };
@@ -110,7 +111,7 @@ function charges(){ const C = {};
     for (const k in W) for (const p in W[k]) { if (p === "-") continue; const c = (C[p] = C[p] || {}), e = (c[w.d] = c[w.d] || { h:0, max:w.h, grp:new Set() }); e.h += W[k][p]; e.grp.add(g.nom); e.max = Math.max(e.max, w.h); } })));
   return C; }
 
-function dessiner(){
+function dessiner(){ document.querySelectorAll("#vOng button").forEach(b => b.classList.toggle("on", b.dataset.v === VUE)); if (VUE === "e") return vueProfs(); if (VUE === "s") return vueSemaine();
   $("#gSel").innerHTML = D.groupes.map((g, i) => `<option value="${i}" ${i === G ? "selected" : ""}>${g.nom}</option>`).join("");
   $("#sOng").innerHTML = grp().sessions.map((s, i) => `<button data-s="${i}" class="${i === S ? "on" : ""}">${s.nom}</button>`).join("");
   const s = ses(), C = charges(), prob = [];
@@ -151,12 +152,13 @@ function ouvrirCase(td){
   if (!liste.length) liste.push(m.autre ? "-" : Object.keys(D.profs)[0]);
   const pop = $("#pop"), place = s.mods.reduce((a, x) => a + (x.autre ? 0 : totalCase(s, wi, x.k)), 0);
   pop.innerHTML = `<h3>${m.titre}</h3><div class="s">Semaine du ${jm(w.d)} · ${place} h placées sur ${w.h}</div>` +
-    liste.map(p => `<div class="lg"><i style="background:${p === "-" ? "#B8AFA2" : couleur(p)}">${p === "-" ? "" : p}</i><span class="n">${p === "-" ? "Heures" : D.profs[p] || p}</span><button data-d="-1" data-p="${p}">−</button><output>${c[p] || 0}</output><button data-d="1" data-p="${p}">+</button></div>`).join("") +
+    liste.map(p => `<div class="lg"><i style="background:${p === "-" ? "#B8AFA2" : couleur(p)}">${p === "-" ? "" : p}</i><span class="n">${p === "-" ? "Heures" : D.profs[p] || p}</span><button data-d="-3" data-p="${p}" title="Retirer un bloc de 3 h">−3</button><input class="hv" data-hv="${p}" inputmode="numeric" value="${c[p] || 0}"><button data-d="3" data-p="${p}" title="Ajouter un bloc de 3 h">+3</button></div>`).join("") +
     (m.autre ? "" : `<div class="ajout">${Object.keys(D.profs).filter(p => !liste.includes(p)).map(p => `<button data-aj="${p}">+ ${D.profs[p]}</button>`).join("")}</div>`) +
     `<div class="bas"><span>Reste à placer : ${Math.max(0, m.h - s.sem.reduce((a, x, i) => a + totalCase(s, i, k), 0))} h</span><button data-fermer>OK</button></div>`;
   pop.hidden = false; const r = td.getBoundingClientRect(), pw = pop.offsetWidth, ph = pop.offsetHeight;
   pop.style.left = Math.max(8, Math.min(innerWidth - pw - 8, r.left + r.width / 2 - pw / 2)) + "px";
   pop.style.top = (r.bottom + ph + 10 < innerHeight ? r.bottom + 6 : Math.max(8, r.top - ph - 6)) + "px";
+  pop.onchange = e => { const p = e.target.dataset.hv; if (p == null) return; fixer(s, wi, k, p, Math.max(0, Math.round(+e.target.value.replace(",", ".") || 0))); sauver(); dessiner(); ouvrirCase(document.querySelector(`td.c[data-w="${wi}"][data-k="${CSS.escape(k)}"]`)); };
   pop.onclick = e => { const b = e.target.closest("button"); if (!b) return; e.stopPropagation();
     if (b.dataset.fermer != null){ pop.hidden = true; return; }
     if (b.dataset.aj){ if (!m.profs.includes(b.dataset.aj)) m.profs.push(b.dataset.aj); sauver(); ouvrirCase(td); return; }
@@ -166,6 +168,8 @@ function ouvrirCase(td){
 document.addEventListener("click", e => {
   const td = e.target.closest("td.c"); if (td){ ouvrirCase(td); return; }
   if (!e.target.closest("#pop")) $("#pop").hidden = true;
+  const vb = e.target.closest("[data-v]"); if (vb){ VUE = vb.dataset.v; dessiner(); }
+  const nw = e.target.closest("[data-nw]"); if (nw){ SW = Math.max(0, Math.min(ses().sem.length - 1, SW + (+nw.dataset.nw))); dessiner(); }
   const sb = e.target.closest("[data-s]"); if (sb){ S = +sb.dataset.s; dessiner(); }
   const f = e.target.closest("[data-f]"); if (f){ FILTRE = FILTRE === f.dataset.f ? null : f.dataset.f; dessiner(); }
   if (e.target.closest("#etat")){ const a = $("#alertes"); a.dataset.ouv = a.dataset.ouv ? "" : "1"; dessiner(); }
@@ -186,10 +190,17 @@ function action(a){ const s = ses();
   if (a === "raz" && confirm("Effacer tout et reprendre l'exemple (2026EGI1) ?")){ D = JSON.parse(JSON.stringify(EXEMPLE)); G = S = 0; sauver(); dessiner(); }
 }
 /* remplissage simple : modules dans l'ordre, au 1er enseignant, en respectant ses heures dans les autres groupes */
-function remplir(s){ s.g = {}; const C = charges(); const L = s.mods.filter(m => !m.autre && m.h); let i = 0, reste = L.length ? L[0].h : 0;
-  s.sem.forEach((w, wi) => { let cap = w.h, garde = 0;
-    while (cap > 0 && i < L.length && garde++ < 50){ const m = L[i], p = m.profs.find(q => !(C[q] && C[q][w.d] && C[q][w.d].h >= C[q][w.d].max)) || m.profs[0] || "-";
-      const v = Math.min(cap, reste); fixer(s, wi, m.k, p, (cell(s, wi, m.k)[p] || 0) + v); cap -= v; reste -= v; if (reste <= 0){ i++; reste = i < L.length ? L[i].h : 0; } } });
+function remplir(s){ s.g = {}; const C = charges(), L = s.mods.filter(m => !m.autre && m.h), OUV = 3;
+  const reste = new Map(L.map(m => [m, m.h])); let suivant = 0; const actifs = [];
+  const ouvrir = () => { while (actifs.length < OUV && suivant < L.length) actifs.push(L[suivant++]); };
+  s.sem.forEach((w, wi) => { let cap = w.h, tour = 0, garde = 0; ouvrir();
+    const charge = p => (((C[p] || {})[w.d] || {}).h || 0);
+    while (cap > 0 && actifs.length && garde++ < 200){ const m = actifs[tour % actifs.length];
+      const u = Math.min(cap, 3, reste.get(m));
+      const p = m.profs.find(q => charge(q) + u <= w.h) || m.profs[0] || "-";
+      fixer(s, wi, m.k, p, (cell(s, wi, m.k)[p] || 0) + u); cap -= u; reste.set(m, reste.get(m) - u);
+      if (p !== "-"){ const c = ((C[p] = C[p] || {})[w.d] = (C[p] || {})[w.d] || { h:0, max:w.h, grp:new Set() }); c.h += u; }
+      if (reste.get(m) <= 0){ actifs.splice(actifs.indexOf(m), 1); ouvrir(); } else tour++; } });
   sauver(); dessiner(); }
 function nouveauGroupe(){ const nom = prompt("Nom du groupe (ex. 2027EGI1) :"); if (!nom) return;
   const debut = prompt("Lundi de la 1re semaine (AAAA-MM-JJ) :", new Date().toISOString().slice(0, 10)); if (!debut) return;
@@ -228,6 +239,47 @@ function editer(){ const s = ses();
     const vieux = s.mods; s.mods = L("#tM").map(x => { const code = x[1] || "", titre = x[2] || "", k = code || (vieux.find(v => v.titre === titre) || {}).k || titre;
       return { k, code, titre, num:+x[0] || 0, h:+x[3] || 0, ev:+x[4] || 0, profs:(x[5] || "").split(",").map(y => y.trim()).filter(Boolean), autre:!code }; });
     s.sem = L("#tS").map(x => ({ d:x[0], h:+x[1] || 0 })); grp().nom = $("#tG").value.trim() || grp().nom; sauver(); dlg.close(); dessiner(); }; }
+/* ---- Vue Enseignants : heures de chaque prof par semaine, tous les groupes (période de la session choisie) ---- */
+function vueProfs(){ const s = ses(), C = charges(), d0 = s.sem[0].d, d1 = s.sem[s.sem.length - 1].d;
+  const GC = {}; D.groupes.forEach((g, i) => GC[g.nom] = ["#2F6FB5","#EB6A22","#1E8A55","#8B4FB8","#C2417A"][i % 5]);
+  const par = {}; D.groupes.forEach(g => g.sessions.forEach(x => x.sem.forEach((w, wi) => { if (w.d < d0 || w.d > d1) return; const W = x.g[wi] || {};
+    for (const k in W){ const m = x.mods.find(y => y.k === k); if (!m || m.autre) continue; for (const p in W[k]){ if (p === "-") continue; const c = ((par[p] = par[p] || {})[w.d] = par[p][w.d] || {}); c[g.nom] = (c[g.nom] || 0) + W[k][p]; } } })));
+  $("#leg").innerHTML = D.groupes.map(g => `<span class="lp"><i style="background:${GC[g.nom]}">${g.nom.slice(-4)}</i><b>${g.nom}</b></span>`).join("");
+  let h = `<table><thead><tr><th class="nom">Enseignants · tous les groupes</th>` + s.sem.map(w => `<th>${jm(w.d)}</th>`).join("") + `</tr></thead><tbody>`; const prob = [];
+  Object.keys(D.profs).forEach(p => { h += `<tr><td class="nom"><b>${D.profs[p]}</b><small>maximum : les heures de la semaine</small></td>`;
+    s.sem.forEach(w => { const c = (par[p] || {})[w.d] || {}, t = Object.values(c).reduce((a, b) => a + b, 0), e = (C[p] || {})[w.d], trop = e && t > e.max;
+      if (trop) prob.push(`${D.profs[p]} : ${t} h la semaine du ${jm(w.d)} (${Object.keys(c).join(" + ")})`);
+      h += `<td class="c" style="${trop ? "background:#FBE3E0" : ""}">` + Object.keys(c).map(g => `<span class="puce" style="background:${GC[g]}" title="${g}">${c[g]}</span>`).join("") + (trop ? `<div style="color:var(--err);font-weight:700;font-size:11px">${t} h</div>` : "") + `</td>`; });
+    h += `</tr>`; });
+  $("#vue").innerHTML = h + `</tbody></table>`;
+  $("#etat").className = "etat " + (prob.length ? "err" : "ok"); $("#etat").textContent = prob.length ? prob.length + " conflit" + (prob.length > 1 ? "s" : "") : "Aucun enseignant à deux places";
+  $("#alertes").innerHTML = $("#alertes").dataset.ouv ? prob.map(a => `<div class="alert">${a}</div>`).join("") : "";
+}
+/* ---- Vue Semaine : horaire par bloc (lundi au vendredi, AM / PM), tous les groupes en même temps.
+   Blocs de 3 h, sauf jeudi PM = 1 h de cours (+ 2 h de plage verte). Placement sans mettre un prof à deux places. ---- */
+const BLOCS = [["Lundi","AM",3],["Lundi","PM",3],["Mardi","AM",3],["Mardi","PM",3],["Mercredi","AM",3],["Mercredi","PM",3],["Jeudi","AM",3],["Jeudi","PM",1],["Vendredi","AM",3],["Vendredi","PM",3]];
+function vueSemaine(){ const s = ses(); SW = Math.min(SW, s.sem.length - 1); const d = s.sem[SW].d;
+  const groupes = [], A = {}; D.groupes.forEach(g => g.sessions.forEach(x => x.sem.forEach((w, wi) => { if (w.d !== d) return;
+    const items = []; const W = x.g[wi] || {}; for (const k in W){ const m = x.mods.find(y => y.k === k); if (!m || m.autre) continue; for (const p in W[k]) items.push({ p, m, h:W[k][p] }); }
+    groupes.push({ nom:g.nom, h:w.h, items }); })));
+  // placement : bloc par bloc, chaque groupe prend l'activité la plus chargée dont le prof est libre dans ce bloc
+  const R = groupes.map(() => []), restes = groupes.map(g => g.items.map(i => Object.assign({}, i))), dispo = groupes.map(g => g.h);
+  BLOCS.forEach((b, bi) => { const pris = new Set();
+    groupes.forEach((g, gi) => { if (dispo[gi] <= 0){ R[gi][bi] = null; return; } const dur = Math.min(b[2], dispo[gi]);
+      const L = restes[gi].filter(i => i.h > 0).sort((x, y) => (y.h >= dur) - (x.h >= dur) || y.h - x.h);
+      const i = L.find(z => z.p === "-" || !pris.has(z.p)) ; if (!i){ R[gi][bi] = { vide:true }; dispo[gi] -= dur; return; }
+      if (i.p !== "-") pris.add(i.p); const u = Math.min(dur, i.h); i.h -= u; dispo[gi] -= dur; R[gi][bi] = { p:i.p, m:i.m, h:u }; }); });
+  const reste = []; restes.forEach((L, gi) => L.forEach(i => { if (i.h > 0) reste.push(`${groupes[gi].nom} : ${i.h} h de ${i.m.titre} (${D.profs[i.p] || "?"}) n'ont pas trouvé de bloc`); }));
+  $("#leg").innerHTML = Object.keys(D.profs).map(p => `<span class="lp"><i style="background:${couleur(p)}">${p}</i><b>${D.profs[p]}</b></span>`).join("");
+  let h = `<div style="display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--l)"><button data-nw="-1">‹</button><b>Semaine du ${dt(d).toLocaleDateString("fr-CA", { day:"numeric", month:"long", year:"numeric" })}</b><button data-nw="1">›</button><span class="mini">Proposition de placement par bloc (les heures viennent de la vue Groupe)</span></div>`;
+  h += `<table style="width:100%"><thead><tr><th class="nom">Bloc</th>` + groupes.map(g => `<th style="min-width:220px">${g.nom} · ${g.h} h</th>`).join("") + `</tr></thead><tbody>`;
+  BLOCS.forEach((b, bi) => { h += `<tr><td class="nom"><b>${b[0]} ${b[1]}</b><small>${b[2]} h${b[0] === "Jeudi" && b[1] === "PM" ? " + plage verte 2 h" : ""}</small></td>` +
+    groupes.map((g, gi) => { const c = R[gi][bi]; if (!c) return `<td class="c" style="color:#bbb">—</td>`; if (c.vide) return `<td class="c" style="background:#FBE3E0;color:var(--err)">Aucun prof libre</td>`;
+      return `<td class="c" style="text-align:left;padding:6px 10px"><span class="puce" style="background:${c.p === "-" ? "#B8AFA2" : couleur(c.p)}">${c.p === "-" ? "?" : c.p}</span> ${c.m.titre} <small style="color:var(--gris)">${c.h} h</small></td>`; }).join("") + `</tr>`; });
+  $("#vue").innerHTML = h + `</tbody></table>`;
+  $("#etat").className = "etat " + (reste.length ? "err" : "ok"); $("#etat").textContent = reste.length ? reste.length + " point" + (reste.length > 1 ? "s" : "") + " à régler" : "Semaine possible sans conflit";
+  $("#alertes").innerHTML = $("#alertes").dataset.ouv ? reste.map(a => `<div class="alert">${a}</div>`).join("") : "";
+}
 dessiner();
 </script>
 </body>
