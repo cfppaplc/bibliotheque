@@ -57,7 +57,7 @@ thead th.conf{background:#FBE3E0;color:var(--err)}
 .menu.ouv .liste{display:block}.menu .liste button{display:block;width:100%;text-align:left;border:0;padding:10px 12px}
 dialog{border:0;border-radius:16px;padding:20px;max-width:980px;width:94vw;max-height:92vh;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)}
 dialog textarea{width:100%;min-height:200px;font:12px ui-monospace,monospace;border:1px solid var(--l);border-radius:8px;padding:8px}
-.mini{font-size:12px;color:var(--gris)}.alert{background:#fff;border-left:4px solid var(--err);border-radius:8px;padding:8px 12px;margin:4px 0;font-size:13px}@keyframes flashR{0%,100%{box-shadow:0 0 0 0 rgba(192,57,43,0);background:#fff}50%{box-shadow:0 0 0 3px rgba(192,57,43,.45);background:#FBE3E0}}.lp.manque{animation:flashR 1.4s ease-in-out infinite;border-color:var(--err)}.av{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;color:#fff;font-style:normal;font-weight:700;font-size:11px;flex:none}@keyframes flashA{0%,100%{box-shadow:0 0 0 0 rgba(192,57,43,0)}50%{box-shadow:0 0 0 5px rgba(192,57,43,.55)}}.av.manque{animation:flashA 1.4s ease-in-out infinite}.tprofs .info{display:block;font-size:12px;color:var(--gris);margin-top:2px;white-space:nowrap}.tprofs td.nom{min-width:260px}.alert.jaune{border-left-color:#D9A400;background:#FFF9E3}.etat.jaune{background:#FFF1C2;color:#8A6500;cursor:pointer}
+.mini{font-size:12px;color:var(--gris)}.alert{background:#fff;border-left:4px solid var(--err);border-radius:8px;padding:8px 12px;margin:4px 0;font-size:13px}@keyframes flashR{0%,100%{box-shadow:0 0 0 0 rgba(192,57,43,0);background:#fff}50%{box-shadow:0 0 0 3px rgba(192,57,43,.45);background:#FBE3E0}}.lp.manque{animation:flashR 1.4s ease-in-out infinite;border-color:var(--err)}.av{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;color:#fff;font-style:normal;font-weight:700;font-size:11px;flex:none}@keyframes flashA{0%,100%{box-shadow:0 0 0 0 rgba(192,57,43,0)}50%{box-shadow:0 0 0 5px rgba(192,57,43,.55)}}.av.manque{animation:flashA 1.4s ease-in-out infinite}.tprofs .info{display:block;font-size:12px;color:var(--gris);margin-top:2px;white-space:nowrap}.tprofs td.nom{min-width:260px}.ttache input{width:52px;text-align:center}.ttache td{text-align:center;padding:4px 6px}.alert.jaune{border-left-color:#D9A400;background:#FFF9E3}.etat.jaune{background:#FFF1C2;color:#8A6500;cursor:pointer}
 table.t td,table.t th{border:1px solid var(--l);padding:5px 8px;text-align:center;font-size:12px}table.t input{width:52px;text-align:center;border:1px solid var(--l);border-radius:6px}
 
 .ong2{display:flex;gap:6px;margin:0 0 14px}.ong2 button.on{background:var(--mar);color:#fff;border-color:var(--mar)}
@@ -269,16 +269,16 @@ function action(a){ const s = ses();
 }
 /* remplissage simple : modules dans l'ordre, au 1er enseignant, en respectant ses heures dans les autres groupes */
 function remplir(s){ const garde = {}; s.sem.forEach((w, wi) => { const W = s.g[wi] || {}; for (const k in W){ const m = s.mods.find(x => x.k === k); if (m && m.autre) (garde[wi] = garde[wi] || {})[k] = W[k]; } });
-  s.g = garde; const TA = totalAnnee(s); const C = charges(), L = s.mods.filter(m => !m.autre && m.h), OUV = 3;
+  s.g = garde; const TA = totalAnnee(s), GR = D.groupes.find(g => g.sessions.includes(s)) || {}, PREV = GR.taches || {}, SI = sesIdx(s), FAIT = {};   /* tâche régulière prévue par session (Tâches annuelles) */ const C = charges(), L = s.mods.filter(m => !m.autre && m.h), OUV = 3;
   const reste = new Map(L.map(m => [m, HT(m)])); const attente = L.slice(), actifs = []; let finSem = "";
   const ouvrir = () => { for (let n = 0; n < attente.length && actifs.length < OUV; ){ const m = attente[n]; if (m.apres && m.apres > finSem){ n++; continue; } actifs.push(m); attente.splice(n, 1); } };   /* « pas avant » : un module attend sa date */
   s.sem.forEach((w, wi) => { finSem = (() => { const z = new Date(w.d + "T12:00"); z.setDate(z.getDate() + 4); return iso(z); })(); let cap = w.h - s.mods.reduce((a, m) => a + (m.autre ? totalCase(s, wi, m.k) : 0), 0), tour = 0, garde = 0; ouvrir();
     const charge = p => (((C[p] || {})[w.d] || {}).h || 0);
     while (cap > 0 && actifs.length && garde++ < 200){ const m = actifs[tour % actifs.length];
       const u = Math.min(cap, 3, reste.get(m));
-      const libres = m.profs.filter(q => sessOk(q, s) && charge(q) + u <= Math.min(w.h, capProf(q, w.d))), resteT = q => (+((D.cible || {})[q]) || 1e6) - (TA[q] || 0);
+      const libres = m.profs.filter(q => sessOk(q, s) && charge(q) + u <= Math.min(w.h, capProf(q, w.d))), resteT = q => { const pv = ((PREV[q] || {}).prev || [])[SI]; return pv !== undefined && pv !== "" ? +pv - (FAIT[q] || 0) : (+((D.cible || {})[q]) || 1e6) - (TA[q] || 0); };
       const p = libres.sort((x, y) => resteT(y) - resteT(x))[0] || m.profs.find(q => sessOk(q, s)) || "-";
-      fixer(s, wi, m.k, p, (cell(s, wi, m.k)[p] || 0) + u); if (p !== "-") TA[p] = (TA[p] || 0) + u; cap -= u; reste.set(m, reste.get(m) - u);
+      fixer(s, wi, m.k, p, (cell(s, wi, m.k)[p] || 0) + u); if (p !== "-"){ TA[p] = (TA[p] || 0) + u; FAIT[p] = (FAIT[p] || 0) + u; } cap -= u; reste.set(m, reste.get(m) - u);
       if (p !== "-"){ const c = ((C[p] = C[p] || {})[w.d] = (C[p] || {})[w.d] || { h:0, max:w.h, grp:new Set() }); c.h += u; }
       if (reste.get(m) <= 0){ actifs.splice(actifs.indexOf(m), 1); ouvrir(); } else tour++; } });
   s.mods.forEach(m => { if (!m.autre) grouperEval(s, m); });
@@ -291,18 +291,32 @@ function nouveauGroupe(){ const nom = prompt("Nom du groupe (ex. 2027EGI1) :"); 
   D.groupes.push(c); G = D.groupes.length - 1; S = 0; remplir(ses()); S = 1; if (ses()) remplir(ses()); S = 0; sauver(); dessiner();
   alert("Groupe créé avec les mêmes modules et semaines décalées. Vérifie les congés dans « Modules, enseignants et semaines »."); }
 
-function taches(){ const g = grp(); g.taches = g.taches || {}; const T = {};
-  g.sessions.slice(0, 2).forEach((s, si) => { s.sem.forEach((w, wi) => { const W = s.g[wi] || {}; for (const k in W){ const m = s.mods.find(x => x.k === k); if (!m || m.autre) continue; for (const p in W[k]) if (p !== "-") ((T[p] = T[p] || { reg:[0,0], ev:[0,0] }).reg[si] += W[k][p]); } });
-    s.mods.forEach(m => { const p = m.profs[0]; if (p && m.ev) (T[p] = T[p] || { reg:[0,0], ev:[0,0] }).ev[si] += m.ev; }); });
-  const M = ["cg|Chef de groupe", "st|Stages", "rep|Examen reprise", "aut|Autres"];
-  let h = `<h2 style="margin-top:0">Tâches annuelles · ${g.nom}</h2><table class="t"><tr><th rowspan="2">Enseignant</th><th colspan="2">Tâche régulière</th><th colspan="2">Évaluation</th>` + M.map(x => `<th colspan="2">${x.split("|")[1]}</th>`).join("") + `<th colspan="2">Total</th><th rowspan="2">Année</th></tr><tr>` + "<th>S1</th><th>S2</th>".repeat(7) + `</tr>`;
-  let tt = 0; Object.keys(D.profs).forEach(p => { const t = T[p] || { reg:[0,0], ev:[0,0] }, x = g.taches[p] = g.taches[p] || {}, s1 = [0, 0];
-    h += `<tr><td style="text-align:left"><b>${D.profs[p]}</b></td>` + ["reg", "ev"].map(k => [0, 1].map(i => { s1[i] += t[k][i]; return `<td>${t[k][i] || ""}</td>`; }).join("")).join("") +
-      M.map(c => { const k = c.split("|")[0]; return [0, 1].map(i => { const v = +((x[k] || [])[i] || 0); s1[i] += v; return `<td><input data-t="${p}|${k}|${i}" value="${v || ""}"></td>`; }).join(""); }).join("") +
-      `<td><b>${s1[0]}</b></td><td><b>${s1[1]}</b></td><td><b>${s1[0] + s1[1]}</b></td></tr>`; tt += s1[0] + s1[1]; });
-  h += `<tr><td colspan="15" style="text-align:right"><b>Total de l'année</b></td><td><b>${tt}</b></td></tr></table><p class="mini">Tâche régulière et évaluation (au 1er enseignant du module) viennent de l'horaire. Les autres colonnes s'écrivent à la main (ex. stage coupé : −30).</p><p><button onclick="print()">Imprimer</button></p>`;
+/* heures d'évaluation de chaque prof dans une session (les dernières heures de chaque module, comme dans la grille) */
+function evalProfs(s){ const E = {}; s.mods.forEach(m => { if (m.autre || !(+m.ev)) return; const EV = evalSem(s, m);
+  for (const wi in EV){ let n = Math.min(EV[wi], +m.ev); const c = cell(s, +wi, m.k); for (const p of Object.keys(c).reverse()){ const x = Math.min(n, c[p]); if (x > 0 && p !== "-") E[p] = (E[p] || 0) + x; n -= x; if (n <= 0) break; } } }); return E; }
+function taches(){ const g = grp(); g.taches = g.taches || {}; const T = {}, NS = Math.min(2, g.sessions.length);
+  g.sessions.slice(0, 2).forEach((s, si) => { const EP = evalProfs(s); s.sem.forEach((w, wi) => { const W = s.g[wi] || {}; for (const k in W){ const m = s.mods.find(x => x.k === k); if (!m || m.autre) continue; for (const p in W[k]) if (p !== "-") ((T[p] = T[p] || { reg:[0,0], ev:[0,0] }).reg[si] += W[k][p]); } });
+    for (const p in EP){ (T[p] = T[p] || { reg:[0,0], ev:[0,0] }).ev[si] += EP[p]; T[p].reg[si] -= EP[p]; } });
+  const M = ["cg|Chef de groupe", "st|Stages", "rep|Examen reprise", "aut|Autres"], col = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+  const attendu = g.sessions.slice(0, 2).reduce((a, s) => a + s.mods.reduce((u, m) => u + (m.autre ? 0 : HT(m)), 0), 0);
+  let h = `<h2 style="margin-top:0">Tâches annuelles · ${g.nom}</h2><p class="mini" style="margin-top:-6px">Commence par la <b>tâche régulière prévue</b> de chaque enseignant (comme dans ton Excel). Sous chaque case : ce qui est placé dans l'horaire (vert = pareil, rouge = différent).</p>
+  <div style="overflow:auto"><table class="t ttache"><tr><th rowspan="2">Enseignant</th><th colspan="2" style="background:#1B2A41;color:#fff">Tâche régulière</th><th colspan="2">Évaluation</th>` + M.map(x => `<th colspan="2">${x.split("|")[1]}</th>`).join("") + `<th colspan="2">Total</th><th rowspan="2">Total annuel</th></tr><tr>` + "<th>S1</th><th>S2</th>".repeat(7) + `</tr>`;
+  let tt = 0; Object.keys(D.profs).forEach(p => { const t = T[p] || { reg:[0,0], ev:[0,0] }, x = g.taches[p] = g.taches[p] || {}, s1 = [0, 0], pv = x.prev || [];
+    h += `<tr><td style="text-align:left;white-space:nowrap"><i class="av" style="background:${couleur(p)};width:24px;height:24px;font-size:9px;vertical-align:middle;margin-right:6px">${p}</i><b>${D.profs[p]}</b></td>` +
+      [0, 1].map(i => { const prev = pv[i] === undefined || pv[i] === "" ? null : +pv[i], pl = t.reg[i], v = prev == null ? pl : prev; s1[i] += v; col[i] += v;
+        return `<td><input data-t="${p}|prev|${i}" value="${prev == null ? "" : prev}" placeholder="${pl || ""}"><div style="font-size:11px;font-weight:700;color:${prev == null ? "var(--gris)" : prev === pl ? "var(--ok)" : "var(--err)"}">placé ${pl}</div></td>`; }).join("") +
+      [0, 1].map(i => { s1[i] += t.ev[i]; col[2 + i] += t.ev[i]; return `<td>${t.ev[i] || ""}</td>`; }).join("") +
+      M.map((c, ci) => { const k = c.split("|")[0]; return [0, 1].map(i => { const v = +((x[k] || [])[i] || 0); s1[i] += v; col[4 + ci * 2 + i] += v; return `<td><input data-t="${p}|${k}|${i}" value="${v || ""}"></td>`; }).join(""); }).join("") +
+      `<td><b>${s1[0]}</b></td><td><b>${s1[1]}</b></td><td><b>${s1[0] + s1[1]}</b></td></tr>`; col[12] += s1[0]; col[13] += s1[1]; tt += s1[0] + s1[1];
+    /* la tâche annuelle sert aux couleurs et au remplissage */
+    if (pv.some(v => v !== undefined && v !== "")){ D.cible = D.cible || {}; D.cible[p] = (+(pv[0] || 0)) + (+(pv[1] || 0)) + t.ev[0] + t.ev[1]; } });
+  const reg = col[0] + col[1] + col[2] + col[3], ok = reg === attendu;
+  h += `<tr style="font-weight:700;border-top:2px solid var(--l)"><td style="text-align:left">Total</td>` + col.slice(0, 14).map(v => `<td>${v}</td>`).join("") + `<td>${tt}</td></tr></table></div>
+  <p style="margin-top:12px;font-size:15px">Tâche régulière + évaluation : <b style="color:var(${ok ? "--ok" : "--err"})">${reg} h</b> · chiffre magique (heures du programme + examens) : <b>${attendu} h</b> ${ok ? "✓ ça balance" : `· ${reg > attendu ? "trop de " + (reg - attendu) : "il manque " + (attendu - reg)} h`}</p>
+  <p class="mini">Évaluation : calculée selon l'enseignant qui donne les dernières heures du module. Les autres colonnes s'écrivent à la main (ex. stage coupé : −30). Une case de tâche régulière vide = ce qui est placé.</p><p><button class="prim" onclick="dlg.close()">Fermer</button></p>`;
   $("#dlgC").innerHTML = h; if (!dlg.open) dlg.showModal();
-  $("#dlgC").onchange = e => { const t = e.target.dataset.t; if (!t) return; const [p, k, i] = t.split("|"), x = g.taches[p]; x[k] = x[k] || [0, 0]; x[k][+i] = Math.round(+e.target.value.replace(",", ".") || 0); sauver(); taches(); };
+  $("#dlgC").onchange = e => { const t = e.target.dataset.t; if (!t) return; const [p, k, i] = t.split("|"), x = g.taches[p]; x[k] = x[k] || [];
+    x[k][+i] = k === "prev" && e.target.value.trim() === "" ? "" : Math.round(+e.target.value.replace(",", ".") || 0); sauver(); taches(); dessiner(); };
 }
 function editer(){ const s = ses();
   $("#dlgC").innerHTML = `<h2 style="margin-top:0">${grp().nom} · ${s.nom}</h2>
@@ -326,7 +340,7 @@ function vueProfs(){ const s = ses(), C = charges(), d0 = s.sem[0].d, d1 = s.sem
   const par = {}; D.groupes.forEach(g => g.sessions.forEach(x => x.sem.forEach((w, wi) => { if (w.d < d0 || w.d > d1) return; const W = x.g[wi] || {};
     for (const k in W){ const m = x.mods.find(y => y.k === k); if (!m || m.autre) continue; for (const p in W[k]){ if (p === "-") continue; const c = ((par[p] = par[p] || {})[w.d] = par[p][w.d] || {}); c[g.nom] = (c[g.nom] || 0) + W[k][p]; } } })));
   $("#leg").innerHTML = (plus ? D.groupes.map(g => `<span class="lp"><i style="background:${GC[g.nom]}">${g.nom.slice(-4)}</i><b>${g.nom}</b></span>`).join("") : "") +
-    `<span class="mini" style="align-self:center">Vert : correct · Jaune : plus de ${maxSem()} h · Rouge : impossible (absent ou deux groupes) · Hachuré : absences cette semaine · Touche un nom pour sa fiche.</span>`;
+    `<button data-a="tach" class="prim" style="padding:6px 14px">Tâches annuelles</button><span class="mini" style="align-self:center">Vert : correct · Jaune : plus de ${maxSem()} h · Rouge : impossible (absent ou deux groupes) · Hachuré : absences cette semaine · Touche un nom pour sa fiche.</span>`;
   let h = `<table class="tprofs"><thead><tr><th class="nom">Enseignants${plus ? " · tous les groupes" : ""}</th>` + s.sem.map(w => `<th>${jm(w.d)}</th>`).join("") + `<th>Session</th></tr></thead><tbody>`; let nR = 0, nJ = 0; const prob = [];
   Object.keys(D.profs).forEach(p => { const c0 = +CI[p] || 0, an = TA[p] || 0, sesT = s.sem.reduce((a, w) => a + Object.values((par[p] || {})[w.d] || {}).reduce((x, y) => x + y, 0), 0), manque = c0 && an < c0;
     const pct = c0 ? Math.min(100, an / c0 * 100) : 0, coul = !c0 ? "#B8AFA2" : an > c0 ? "var(--err)" : an < c0 ? "var(--err)" : "var(--ok)";
