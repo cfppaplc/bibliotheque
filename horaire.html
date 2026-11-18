@@ -168,7 +168,8 @@ function dessiner(){ if (D.groupes.some(g => remplirTrous(g))) sauver();
     $("#vue").innerHTML = `<div style="padding:40px;text-align:center"><h2 style="margin-top:0">Aucun groupe pour l'instant</h2><p>Réponds aux questions une à la fois : l'horaire se bâtit à la fin.</p><button class="prim" id="bVide" style="font-size:16px;padding:10px 20px">Commencer l'assistant</button></div>`;
     $("#bVide").onclick = () => { AS.on = true; AS.i = 0; assistant(); }; return; } document.querySelectorAll("#vOng button").forEach(b => b.classList.toggle("on", b.dataset.v === VUE)); if (VUE === "e") return vueProfs(); if (VUE === "s") return vueSemaine();
   $("#gSel").innerHTML = D.groupes.map((g, i) => `<option value="${i}" ${i === G ? "selected" : ""}>${g.nom}</option>`).join("");
-  $("#sOng").innerHTML = grp().sessions.map((s, i) => `<button data-s="${i}" class="${i === S ? "on" : ""}">${s.nom}</button>`).join("");
+  $("#sOng").innerHTML = grp().sessions.map((s, i) => { const t = s.sem.reduce((a, w, wi) => a + s.mods.reduce((u, m) => u + (m.autre ? 0 : totalCase(s, wi, m.k)), 0), 0), pr = s.mods.reduce((a, m) => a + (m.autre ? 0 : m.h), 0);
+    return `<button data-s="${i}" class="${i === S ? "on" : ""}" title="Heures de cours placées / prévues">${s.nom} <small style="opacity:.75">${t} / ${pr} h</small></button>`; }).join("");
   const s = ses(), C = charges(), prob = [];
   // légende
   const T = {}; s.sem.forEach((w, wi) => { const W = s.g[wi] || {}; for (const k in W) for (const p in W[k]) T[p] = (T[p] || 0) + W[k][p]; });
