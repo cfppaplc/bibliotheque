@@ -82,9 +82,19 @@ table.ed .n{width:56px}table.ed .c{width:86px}table.ed .h{width:60px}
 .cal-b.cible{background:#FFF1E8;outline:2px dashed var(--or);outline-offset:-4px}
 @media print{header,.haut .noprint,.menu,#pop,.noprint{display:none!important}.carte{max-height:none;overflow:visible;border:0}body{background:#fff}thead th,td.nom,tfoot td{position:static}@page{size:landscape;margin:7mm}}
 body.acc .haut,body.acc #leg,body.acc #guide,body.acc #alertes,body.acc #vue,body.acc main>p.mini{display:none !important}
-#accH{max-width:860px;margin:30px auto}#accH h2{font-size:28px;margin:0 0 6px}#accH .sous{color:var(--gris);font-size:16px;margin:0 0 26px}
-.accC{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px}.accB{background:#fff;border:1px solid var(--l);border-radius:16px;padding:22px;text-align:left;cursor:pointer;font:inherit;display:block;width:100%}
-.accB:hover{border-color:var(--or)}.accB b{display:block;font-size:18px;margin-bottom:6px}.accB span{color:var(--gris);font-size:14px;line-height:1.5}.accB.prem{border:2px solid var(--or);background:#FFF6EF}
+#accH{max-width:980px;margin:34px auto;padding:0 8px}
+.accHero{display:grid;grid-template-columns:1.4fr 1fr;gap:22px;align-items:stretch;background:linear-gradient(135deg,#1B2A41 0%,#24395A 100%);color:#fff;border-radius:22px;padding:34px 34px}
+.accHero h2{font-size:34px;margin:4px 0 8px;color:#fff;letter-spacing:-.3px}.accSur{font-size:12px;text-transform:uppercase;letter-spacing:1.4px;color:#F7A66B;font-weight:700}
+.accHero .sous{color:#C9D3E3;font-size:16px;line-height:1.5;margin:0 0 18px}.accStats{display:flex;flex-wrap:wrap;gap:8px}.accStats span{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.09);border-radius:99px;padding:6px 12px;font-size:13px;color:#E3E9F2}.accStats svg{width:16px;height:16px}
+.accGo{background:var(--or);color:#fff;border:0;border-radius:18px;padding:24px;text-align:left;cursor:pointer;font:inherit;display:flex;flex-direction:column;justify-content:center;gap:6px;box-shadow:0 10px 26px rgba(235,106,34,.35);transition:transform .15s}
+.accGo:hover{transform:translateY(-2px)}.accGo b{font-size:21px}.accGo small{font-size:14px;opacity:.92;line-height:1.45}.accIc{width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;margin-bottom:6px}
+.accT{font-size:15px;text-transform:uppercase;letter-spacing:1px;color:var(--gris);margin:30px 2px 12px}
+.accC{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+.accB{background:#fff;border:1px solid var(--l);border-radius:16px;padding:20px 22px;text-align:left;cursor:pointer;font:inherit;display:flex;flex-direction:column;gap:6px;width:100%;transition:border-color .15s,box-shadow .15s,transform .15s}
+.accB:hover{border-color:var(--or);box-shadow:0 8px 22px rgba(27,42,65,.08);transform:translateY(-2px)}.accB>span{color:var(--gris);font-size:14px;line-height:1.45}
+.accL{display:flex;align-items:center;justify-content:space-between}.accL b{font-size:19px}.accFl{color:var(--or);display:flex}.accFl svg{width:20px;height:20px}.accMini{font-size:12.5px !important}
+.accBar{height:7px;background:#EEE9E1;border-radius:9px;overflow:hidden;margin:6px 0 2px}.accBar i{display:block;height:100%;background:var(--ok);border-radius:9px}
+@media (max-width:760px){.accHero{grid-template-columns:1fr;padding:24px}.accHero h2{font-size:27px}}
 </style>
 </head>
 <body>
@@ -814,13 +824,19 @@ dlg.addEventListener("close", () => { if (FICHE){ FICHE = null; dessiner(); } })
 const _calAbs3 = calAbs; calAbs = function(p){ if (FICHE) return fiche(FICHE); return _calAbs3(p); };
 const _reg3 = reglages; reglages = function(t){ if (FICHE) return fiche(FICHE); return _reg3(t); };
 /* page d'accueil : calme, avant la grille */
-function accueilH(){ document.body.classList.add("acc"); const A = $("#accH"); A.hidden = false; const n = D.groupes.length;
-  A.innerHTML = `<h2>Horaires des groupes</h2><p class="sous">${n ? "Choisis par où commencer. Rien n'est final : tout se modifie ensuite." : "On prépare l'horaire ensemble, une question à la fois. Rien n'est final : tu peux revenir en arrière à chaque question."}</p>
-  <div class="accC">
-    <button class="accB prem" id="aAs"><b>${n ? "Préparer un nouveau groupe" : "Commencer"}</b><span>Des questions simples, une à la fois : l'année, les congés, les enseignants et leurs tâches. L'horaire se bâtit à la fin.</span></button>
-    ${D.groupes.map((g, i) => `<button class="accB" data-acg="${i}"><b>${g.nom}</b><span>${g.prog || ""}<br>${g.sessions.length} session${g.sessions.length > 1 ? "s" : ""} · à partir du ${g.sessions[0] && g.sessions[0].sem[0] ? jm(g.sessions[0].sem[0].d) : "?"}<br>Ouvrir l'horaire</span></button>`).join("")}
-    ${n ? `<button class="accB" id="aTa"><b>Tâches des enseignants</b><span>Le tableau des tâches annuelles, comme ta feuille Excel : diviser, équilibrer, chiffre magique.</span></button>` : ""}
-  </div>`;
+function accueilH(){ document.body.classList.add("acc"); const A = $("#accH"); A.hidden = false; const n = D.groupes.length, np = Object.keys(D.profs).length;
+  const ic = d => `<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
+  const I = { go:ic('<path d="M5 12h14M13 6l6 6-6 6"/>'), cal:ic('<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>'), ppl:ic('<circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17" cy="9" r="2.5"/><path d="M15.5 14.3c3 .2 5.5 2.6 5.5 5.7"/>'), plus:ic('<path d="M12 5v14M5 12h14"/>') };
+  const etatG = g => { let pl = 0, pr = 0, na = 0; g.sessions.forEach(x => { x.mods.forEach(m => { if (m.autre) return; pr += +m.h || 0; x.sem.forEach((w, wi) => { const c = cell(x, wi, m.k); for (const p in c){ pl += c[p]; if (p === "-") na += c[p]; } }); }); }); return { pl, pr, na }; };
+  A.innerHTML = `<div class="accHero"><div><div class="accSur">Métier+ · Planification</div><h2>Horaires des groupes</h2>
+    <p class="sous">${n ? "Choisis par où commencer. Rien n'est final : tout se modifie ensuite." : "On prépare l'horaire ensemble, une question à la fois. Tu peux revenir en arrière à chaque question."}</p>
+    <div class="accStats">${D.cal && D.cal.debut ? `<span>${I.cal}Année du ${jm(D.cal.debut)} au ${jm(D.cal.fin)}</span>` : ""}<span>${I.ppl}${np} enseignant${np > 1 ? "s" : ""}</span><span>${n} groupe${n > 1 ? "s" : ""}</span></div></div>
+    <button class="accGo" id="aAs"><span class="accIc">${n ? I.plus : I.go}</span><b>${n ? "Préparer un nouveau groupe" : "Commencer"}</b><small>Des questions simples, une à la fois. L'horaire se bâtit à la fin.</small></button></div>
+  ${n ? `<h3 class="accT">Tes groupes</h3><div class="accC">${D.groupes.map((g, i) => { const e = etatG(g), pct = e.pr ? Math.min(100, Math.round(e.pl / e.pr * 100)) : 0;
+      return `<button class="accB" data-acg="${i}"><div class="accL"><b>${g.nom}</b><span class="accFl">${I.go}</span></div><span>${g.prog || ""}</span>
+        <span class="accMini">${g.sessions.length} session${g.sessions.length > 1 ? "s" : ""} · à partir du ${g.sessions[0] && g.sessions[0].sem[0] ? jm(g.sessions[0].sem[0].d) : "?"}</span>
+        <div class="accBar"><i style="width:${pct}%"></i></div><span class="accMini">${e.pl} / ${e.pr} h placées${e.na ? ` · <b style="color:var(--err)">${e.na} h sans enseignant</b>` : " · <b style=\"color:var(--ok)\">tout est assigné</b>"}</span></button>`; }).join("")}
+    <button class="accB" id="aTa"><div class="accL"><b>Tâches des enseignants</b><span class="accFl">${I.go}</span></div><span>Le tableau des tâches annuelles, comme ta feuille Excel.</span><span class="accMini">Diviser · équilibrer · chiffre magique</span></button></div>` : ""}`;
   $("#aAs").onclick = () => { AS.on = true; AS.i = 0; assistant(); };
   A.querySelectorAll("[data-acg]").forEach(b => b.onclick = () => { G = +b.dataset.acg; S = 0; VUE = "g"; quitterAcc(); });
   if ($("#aTa")) $("#aTa").onclick = () => { quitterAcc(); taches(); }; }
