@@ -173,13 +173,19 @@ const sessOk = (p, s) => { const L = (D.sessProf || {})[p]; return p === "-" || 
 const MAUVE = "#7B3FA0";
 const derSem = (s, k) => { for (let i = s.sem.length - 1; i >= 0; i--) if (totalCase(s, i, k) > 0) return i; return -1; };   /* les 3 dernières heures d'un module = évaluation, en mauve */
 const evalSem = (s, m) => { const E = {}; let n = Math.max(3, +m.ev || 0); for (let i = s.sem.length - 1; i >= 0 && n > 0; i--){ const t = totalCase(s, i, m.k); if (t){ E[i] = Math.min(n, t); n -= E[i]; } } return E; };   /* heures d'évaluation (3 h, ou plus si l'éval est plus longue), à la fin du module */
-const progAS = () => AS.prog && D.prog[AS.prog] ? AS.prog : Object.keys(D.prog)[0];
+const progAS = () => AS.prog && D.prog[AS.prog] ? AS.prog : reglages.p && D.prog[reglages.p] ? reglages.p : Object.keys(D.prog)[0];
 const dansProg = (p, pr) => { const L = (D.progProfs || {})[pr]; return !L || L.includes(p); };   /* enseignants cochés pour ce programme (rien de coché = tous) */
 const HT = m => +m.h || 0;   /* heures du module dans l'horaire (75 h) ; l'examen (6 h) s'ajoute à la tâche de l'enseignant, pas à l'horaire */
 const H100 = () => +((D && D.h100) || 660);   /* tâche à 100 % : 660 h de cours et leçons par année (feuille de tâche individuelle) */
 const contrat = p => +(((D.contrat || {})[p]) ?? 100);
 const hContrat = p => Math.round(H100() * contrat(p) / 100);
 const SESOPT = sel => [[1, "Sessions 1 et 2 (1re année)"], [2, "Session 2 seulement (DEP 2)"], [3, "Sessions 3 et 4 (2e année)"], [4, "Session 4 seulement (DEP 4)"], [5, "Sessions 5 et 6"], [6, "Session 6 seulement"]].map(([v, n]) => `<option value="${v}" ${+(sel || 1) === v ? "selected" : ""}>${n}</option>`).join("");
+/* bandeau « Session N · X h » avant le premier module de chaque session (coupe à 450 h) */
+const SEPPM = (P, i) => { let c = 0, sn = 0, deb = []; P.mods.forEach((m, j) => { if (j === 0 || c >= 450){ sn++; c = 0; deb.push(j); } c += +m.h || 0; }); const k = deb.indexOf(i); if (k < 0) return "";
+  const fin = deb[k + 1] ?? P.mods.length, tot = P.mods.slice(i, fin).reduce((a, m) => a + (+m.h || 0), 0); return `<tr><td colspan="7" style="background:#1B2A41;color:#fff;font-weight:700;padding:6px 10px">Session ${k + 1} · ${tot} h</td></tr>`; };
+/* modules des sessions qu'on bâtit (ex. session 2 seulement) */
+const modsChoisis = (pr, deps) => { const sesDe = []; let c = 0, sn = 0; pr.mods.forEach((m, j) => { if (j === 0 || c >= 450){ sn++; c = 0; } sesDe.push(sn); c += +m.h || 0; });
+  const garde = new Set(); deps.forEach(d => { d = +d || 1; garde.add(d); if (d % 2) garde.add(d + 1); }); return pr.mods.filter((m, j) => garde.has(sesDe[j])); };
 const maxSem = () => +((D && D.maxSem) || 18);
 function charges(){ const C = {};
   D.groupes.forEach(g => g.sessions.forEach(s => s.sem.forEach((w, wi) => { const W = s.g[wi] || {};
@@ -569,7 +575,7 @@ function reglages(t){ prepDonnees(); let h = `<h2 style="margin-top:0">Calendrie
     h += `<p><select id="pSel">${ids.map(i => `<option value="${i}" ${i === pid ? "selected" : ""}>${D.prog[i].nom}</option>`).join("")}</select> <button id="pNouv">+ Programme</button></p>
     <p class="mini">Les modules dans l'ordre où ils sont donnés. Un module donné en deux parties = deux lignes avec le même code. L'horaire coupe en sessions de 450 h.</p>
     <table class="ed"><tr><th class="n">N°</th><th class="c">Code</th><th>Titre</th><th class="h">Heures</th><th class="h">Éval.</th><th style="width:140px">Pas avant le</th><th></th></tr>` +
-    P.mods.map((m, i) => `<tr><td><input class="n" data-pm="${i}|num" value="${m.num}"></td><td><input class="c" data-pm="${i}|code" value="${m.code}"></td><td><input data-pm="${i}|titre" value="${m.titre.replace(/"/g, "&quot;")}"></td><td><input class="h" data-pm="${i}|h" value="${m.h}"></td><td><input class="h" data-pm="${i}|ev" value="${m.ev || 0}"></td><td><input type="date" data-pm="${i}|apres" value="${m.apres || ""}"></td><td style="white-space:nowrap"><button data-pmv="${i}|-1">▲</button><button data-pmv="${i}|1">▼</button><button data-pmx="${i}">✕</button></td></tr>`).join("") +
+    P.mods.map((m, i) => SEPPM(P, i) + `<tr><td><input class="n" data-pm="${i}|num" value="${m.num}"></td><td><input class="c" data-pm="${i}|code" value="${m.code}"></td><td><input data-pm="${i}|titre" value="${m.titre.replace(/"/g, "&quot;")}"></td><td><input class="h" data-pm="${i}|h" value="${m.h}"></td><td><input class="h" data-pm="${i}|ev" value="${m.ev || 0}"></td><td><input type="date" data-pm="${i}|apres" value="${m.apres || ""}"></td><td style="white-space:nowrap"><button data-pmv="${i}|-1">▲</button><button data-pmv="${i}|1">▼</button><button data-pmx="${i}">✕</button></td></tr>`).join("") +
     `</table><p><button id="pAj">+ Module</button> <span class="mini">Total : ${P.mods.reduce((a, m) => a + (+m.h || 0), 0)} h</span></p>`; }
   if (t === "ens"){ const codes = []; Object.values(D.prog).forEach(P => P.mods.forEach(m => { if (m.code && !codes.some(c => c.code === m.code)) codes.push(m); }));
     h += `<p class="mini">Maximum par enseignant : <input class="h" id="mxS" inputmode="numeric" value="${maxSem()}" style="width:60px;border:1px solid var(--l);border-radius:6px;padding:4px"> h par semaine.<br>Commence par la tâche de chaque enseignant (heures de cours prévues dans l'année, tous groupes), puis touche les modules qu'il peut donner. L'horaire donne les blocs en priorité à celui à qui il reste le plus d'heures.</p><table class="ed"><tr><th class="n">Initiales</th><th style="width:170px">Nom</th><th class="h">Tâche prévue (h / an)</th><th>Pas disponible</th><th>Modules qu'il peut donner</th><th></th></tr>` +
@@ -591,7 +597,7 @@ $("#dlgC").addEventListener("click", e => { const t = reglages.t, el = e.target;
 });
 $("#dlgC").addEventListener("change", e => { const el = e.target;
   if (el.id === "cDeb" || el.id === "cFin"){ D.cal[el.id === "cDeb" ? "debut" : "fin"] = el.value; sauver(); reglages("cal"); }
-  if (el.id === "pSel"){ reglages.p = el.value; reglages("prog"); }
+  if (el.id === "pSel"){ reglages.p = el.value; if (AS.on) AS.prog = el.value; reglages("prog"); }
   if (el.dataset.pm){ const [i, k] = el.dataset.pm.split("|"), m = D.prog[reglages.p].mods[+i]; m[k] = (k === "h" || k === "ev") ? (+el.value || 0) : el.value.trim(); if (k === "apres" && m.code) D.groupes.forEach(g => g.sessions.forEach(x => x.mods.forEach(y => { if (y.code === m.code) y.apres = m.apres; }))); sauver(); if (k === "h") reglages("prog"); }
   if (el.id === "mxS"){ D.maxSem = Math.max(3, Math.round(+el.value || 18)); sauver(); dessiner(); }
   if (el.dataset.pt){ D.cible = D.cible || {}; D.cible[el.dataset.pt] = Math.max(0, Math.round(+el.value || 0)); sauver(); dessiner(); }
@@ -814,9 +820,9 @@ $("#dlgC").addEventListener("click", e => { const b = e.target.closest("[data-pa
 const AS = { on:false, i:0 };
 function etapesAs(){ const TOUS = Object.keys(D.profs), P = TOUS.filter(p => dansProg(p, progAS())), E = [
   { t:"Bienvenue", q:"On prépare l'horaire ensemble, une question à la fois.", f:() => `<p style="font-size:16px;line-height:1.6">Tu vas répondre à quelques questions simples : l'année scolaire, les congés, le programme, les enseignants. À la fin, l'horaire se bâtit tout seul et tu pourras l'ajuster.</p><p class="mini">Tes réponses sont gardées : tu peux arrêter et revenir.</p>` },
-  { t:"L'année scolaire", chk:"annee", q:"Quelles sont la première et la dernière journée de cours de l'année ?", f:() => `<div class="form"><label>Première journée<br><input type="date" id="aDeb" value="${D.cal.debut}"></label><label>Dernière journée<br><input type="date" id="aFin" value="${D.cal.fin}"></label></div>` },
+  { t:"L'année scolaire", chk:"annee", q:"Quelle est la première journée de cours de l'année ?", f:() => `<div class="form"><label>Première journée<br><input type="date" id="aDeb" value="${D.cal.debut}"></label></div><p class="mini">Pas besoin de date de fin : elle varie. Les cours peuvent aller jusqu'au 30 juin.</p>` },
   { t:"Les journées spéciales", q:Object.keys(D.cal.off).length ? `Les journées spéciales de l'année sont déjà entrées (${Object.keys(D.cal.off).length} jours). Elles servent à tous les groupes. Veux-tu en changer ?` : "Quels jours n'y a-t-il pas de cours normal ?", reg:"cal" },
-  { t:"Le programme", q:"Voici les modules du programme, dans l'ordre où vous les donnez. Est-ce juste ?", reg:"prog" },
+  { t:"Le programme", q:"Choisis ton programme, puis vérifie ses modules dans l'ordre où vous les donnez.", reg:"prog" },
   { t:"Les enseignants", q:"Qui enseigne dans ce programme ?", f:() => `<p class="mini">Coche ceux qui enseignent dans ${(D.prog[progAS()] || {}).nom || "ce programme"}. Les autres restent dans la liste.</p><div class="form">${TOUS.map(p => `<p style="display:flex;gap:8px;align-items:center"><span class="chip ${dansProg(p, progAS()) ? "on" : ""}" data-pp="${p}" style="padding:8px 14px;font-size:14px;min-width:34px;text-align:center">${dansProg(p, progAS()) ? "✓" : "&nbsp;"}</span><input data-pn="${p}" value="${D.profs[p]}" style="flex:1"></p>`).join("")}<p><button id="eAj" class="prim">+ Ajouter un enseignant</button></p></div><p class="mini">Maximum par enseignant : <input class="h" id="mxS" inputmode="numeric" value="${maxSem()}" style="width:60px;border:1px solid var(--l);border-radius:6px;padding:4px"> h par semaine.</p>` } ];
   P.forEach(p => {
     E.push({ t:D.profs[p], chk:"p:" + p, q:`Quels modules ${D.profs[p]} peut-il donner ?`, f:() => { const codes = []; Object.values(D.prog).forEach(Pr => Pr.mods.forEach(m => { if (m.code && !codes.some(c => c.code === m.code)) codes.push(m); }));
@@ -848,7 +854,7 @@ function assistant(){ const E = etapesAs(); AS.i = Math.max(0, Math.min(AS.i, E.
   <p style="display:flex;justify-content:space-between;margin-top:20px">${AS.i ? `<button data-as="-1">‹ Précédent</button>` : `<span></span>`}${e.fin ? `<button class="prim" id="asCree" style="font-size:16px;padding:10px 20px">Bâtir l'horaire</button>` : `<button class="prim" data-as="1" style="font-size:16px;padding:10px 20px">Suivant ›</button>`}</p>`;
   if (!dlg.open) dlg.showModal(); }
 function lireAs(){ const v = id => { const x = document.getElementById(id); return x ? x.value.trim() : null; };
-  if (v("aDeb")) D.cal.debut = v("aDeb"); if (v("aFin")) D.cal.fin = v("aFin");
+  if (v("aDeb")){ D.cal.debut = v("aDeb"); D.cal.fin = (+D.cal.debut.slice(0, 4) + (+D.cal.debut.slice(5, 7) >= 7 ? 1 : 0)) + "-06-30"; }   /* fin = 30 juin, elle varie */
   if (v("nN") != null){ AS.nom = v("nN"); AS.prog = v("nP"); AS.deb = v("nD"); AS.tit = v("nT"); AS.nom2 = v("nN2") || ""; AS.deb2 = v("nD2") || ""; AS.ses = v("nS") || 1; AS.ses2 = v("nS2") || 1; } sauver(); }
 $("#dlgC").addEventListener("click", e => { const b = e.target.closest("[data-as]"); if (b && AS.on){ lireAs(); if (+b.dataset.as > 0 && document.getElementById("nN") && !AS.nom){ $("#nN").focus(); return; } AS.i += +b.dataset.as; assistant(); return; }
   if (e.target.id === "asCree" && AS.on){ AS.on = false; const faire = (nom, deb, tit, se) => { dlgNouveau(); $("#nN").value = nom; $("#nP").value = AS.prog; $("#nD").value = deb; $("#nT").value = tit || ""; $("#nS").value = se || 1; $("#nOk").click(); };
@@ -868,9 +874,10 @@ function verifAs(e){ const V = [], P = Object.keys(D.profs), quoi = e.chk || "";
   if (quoi === "groupe" || quoi === "fin"){ if (quoi === "fin") P.forEach(parProf);
     const pr = D.prog[AS.prog] || Object.values(D.prog)[0]; if (pr){
       const reste = p => (+(D.cible || {})[p] || 0) - (totalAnnee()[p] || 0);
-      pr.mods.filter(m => m.code && !P.some(p => (D.peut[p] || []).includes(m.code))).forEach(m => { const q = P.slice().sort((x, y) => reste(y) - reste(x))[0]; if (q)
+      const MC = modsChoisis(pr, [AS.ses || 1, ...(AS.nom2 ? [AS.ses2 || 1] : [])]);
+      MC.filter(m => m.code && !P.some(p => (D.peut[p] || []).includes(m.code))).forEach(m => { const q = P.slice().sort((x, y) => reste(y) - reste(x))[0]; if (q)
         V.push({ t:`Personne ne peut donner « ${m.titre} ».`, b:`Le donner à ${D.profs[q]}`, f:() => { (D.peut[q] = D.peut[q] || []).push(m.code); } }); });
-      const besoin = pr.mods.reduce((a, m) => a + (m.code ? HT(m) : 0), 0) + Object.values(totalAnnee()).reduce((a, b) => a + b, 0), offre = P.reduce((a, p) => a + (+(D.cible || {})[p] || 0), 0);
+      const besoin = MC.reduce((a, m) => a + (m.code ? HT(m) : 0), 0) + Object.values(totalAnnee()).reduce((a, b) => a + b, 0), offre = P.reduce((a, p) => a + (+(D.cible || {})[p] || 0), 0);
       if (offre && offre < besoin){ const manque = besoin - offre;
         V.push({ t:`Les tâches des enseignants donnent ${offre} h, mais il faut ${besoin} h pour ce groupe et ceux déjà faits. Il manque ${manque} h.`, b:`Répartir les ${manque} h`, f:() => { let n = manque; const L = P.filter(p => dispoAn(p) > (+D.cible[p] || 0));
           while (n > 0 && L.length){ for (const p of L){ const x = Math.min(3, n, dispoAn(p) - (+D.cible[p] || 0)); if (x <= 0) continue; D.cible[p] = (+D.cible[p] || 0) + x; n -= x; if (n <= 0) break; } if (L.every(p => dispoAn(p) <= (+D.cible[p] || 0))) break; } } }); } }
