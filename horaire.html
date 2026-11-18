@@ -137,9 +137,13 @@ const jm = d => dt(d).toLocaleDateString("fr-CA", { day:"numeric", month:"short"
 /* heures de chaque prof par semaine, tous les groupes */
 
 /* heures possibles d'un prof une semaine : 18 h max, moins ses journées d'absence */
-function capProf(p, lundi){ const A = (D.abs || {})[p]; let mx = maxSem(); if (!A) return mx; const d = new Date(lundi + "T12:00"); let perdu = 0;
-  for (let i = 0; i < 5; i++){ const x = new Date(d); x.setDate(d.getDate() + i); if (A[iso(x)]) perdu += HJOUR[x.getDay()]; } return Math.max(0, mx - perdu); }
-const absent = (p, jour) => !!(((D.abs || {})[p] || {})[jour]);
+const REC = p => ((D.absRec || {})[p] || []);   /* absences de chaque semaine : "2|PM" = mardi après-midi */
+const hBloc = (wd, pm) => pm === "PM" && wd === 4 ? 1 : 3;
+function capProf(p, lundi){ const A = (D.abs || {})[p] || {}, R = REC(p); let mx = maxSem(); if (!R.length && !Object.keys(A).length) return mx; const d = new Date(lundi + "T12:00"); let perdu = 0;
+  for (let i = 0; i < 5; i++){ const x = new Date(d); x.setDate(d.getDate() + i); const k = iso(x), wd = x.getDay(); if (D.cal && D.cal.off && D.cal.off[k]) continue;
+    if (A[k]) perdu += HJOUR[wd]; else ["AM", "PM"].forEach(pm => { if (R.includes(wd + "|" + pm)) perdu += hBloc(wd, pm); }); }
+  return Math.max(0, mx - perdu); }
+const absent = (p, jour, pm) => !!(((D.abs || {})[p] || {})[jour]) || (pm ? REC(p).includes(new Date(jour + "T12:00").getDay() + "|" + pm) : false);
 const maxSem = () => +((D && D.maxSem) || 18);
 function charges(){ const C = {};
   D.groupes.forEach(g => g.sessions.forEach(s => s.sem.forEach((w, wi) => { const W = s.g[wi] || {};
@@ -315,7 +319,7 @@ function vueSemaine(){ const s = ses(); SW = Math.max(0, Math.min(SW, s.sem.leng
   const R = groupes.map(() => []), restes = groupes.map(g => g.items.map(i => Object.assign({}, i)));
   blocs.forEach((b, bi) => { const pris = new Set(); if (!b.h) return;
     groupes.forEach((g, gi) => { const L = restes[gi].filter(i => i.h > 0).sort((x, y) => (x.m.autre - y.m.autre) || ((y.h >= b.h) - (x.h >= b.h)) || y.h - x.h);
-      const i = L.find(z => z.p === "-" || (!pris.has(z.p) && !absent(z.p, dates[b.di]))); if (!i){ if (L.length) R[gi][bi] = { vide:true }; return; }
+      const i = L.find(z => z.p === "-" || (!pris.has(z.p) && !absent(z.p, dates[b.di], b.pm))); if (!i){ if (L.length) R[gi][bi] = { vide:true }; return; }
       if (i.p !== "-") pris.add(i.p); const u = Math.min(b.h, i.h); i.h -= u; R[gi][bi] = { p:i.p, m:i.m, h:u }; }); });
   groupes.forEach((g, gi) => { const E = ((D.echanges || {})[g.nom] || {})[d] || []; E.forEach(([a, b]) => { if (blocs[a].h && blocs[b].h){ const t = R[gi][a]; R[gi][a] = R[gi][b]; R[gi][b] = t; } }); });
   const doubles = new Set(); blocs.forEach((b, bi) => { const vu = {}; groupes.forEach((g, gi) => { const c = R[gi][bi]; if (c && c.p && c.p !== "-"){ if (vu[c.p] != null){ doubles.add(gi + "|" + bi); doubles.add(vu[c.p] + "|" + bi); } else vu[c.p] = gi; } }); });
@@ -367,7 +371,7 @@ function reglages(t){ prepDonnees(); let h = `<h2 style="margin-top:0">Calendrie
     `</table><p><button id="pAj">+ Module</button> <span class="mini">Total : ${P.mods.reduce((a, m) => a + (+m.h || 0), 0)} h</span></p>`; }
   if (t === "ens"){ const codes = []; Object.values(D.prog).forEach(P => P.mods.forEach(m => { if (m.code && !codes.some(c => c.code === m.code)) codes.push(m); }));
     h += `<p class="mini">Maximum par enseignant : <input class="h" id="mxS" inputmode="numeric" value="${maxSem()}" style="width:60px;border:1px solid var(--l);border-radius:6px;padding:4px"> h par semaine.<br>Commence par la tâche de chaque enseignant (heures de cours prévues dans l'année, tous groupes), puis touche les modules qu'il peut donner. L'horaire donne les blocs en priorité à celui à qui il reste le plus d'heures.</p><table class="ed"><tr><th class="n">Initiales</th><th style="width:170px">Nom</th><th class="h">Tâche prévue (h / an)</th><th>Pas disponible</th><th>Modules qu'il peut donner</th><th></th></tr>` +
-    Object.keys(D.profs).map(p => `<tr><td><b>${p}</b></td><td><input data-pn="${p}" value="${D.profs[p]}"></td><td><input class="h" data-pt="${p}" inputmode="numeric" value="${(D.cible || {})[p] || ""}" placeholder="ex. 450"></td><td><button data-pa="${p}" style="padding:5px 10px">Absences${Object.keys((D.abs || {})[p] || {}).length ? " (" + Object.keys(D.abs[p]).length + ")" : ""}</button></td><td>${codes.map(m => `<span class="chip ${(D.peut[p] || []).includes(m.code) ? "on" : ""}" data-pc="${p}|${m.code}" title="${m.titre}">${m.num} ${m.titre.split(" ").slice(0, 2).join(" ")}</span>`).join("")}</td><td><button data-px="${p}">✕</button></td></tr>`).join("") +
+    Object.keys(D.profs).map(p => `<tr><td><b>${p}</b></td><td><input data-pn="${p}" value="${D.profs[p]}"></td><td><input class="h" data-pt="${p}" inputmode="numeric" value="${(D.cible || {})[p] || ""}" placeholder="ex. 450"></td><td><button data-pa="${p}" style="padding:5px 10px">Absences${(Object.keys((D.abs || {})[p] || {}).length + REC(p).length) ? " (" + (Object.keys((D.abs || {})[p] || {}).length + REC(p).length) + ")" : ""}</button></td><td>${codes.map(m => `<span class="chip ${(D.peut[p] || []).includes(m.code) ? "on" : ""}" data-pc="${p}|${m.code}" title="${m.titre}">${m.num} ${m.titre.split(" ").slice(0, 2).join(" ")}</span>`).join("")}</td><td><button data-px="${p}">✕</button></td></tr>`).join("") +
     `</table><p><button id="eAj">+ Enseignant</button></p>`; }
   $("#dlgC").innerHTML = h; if (!dlg.open) dlg.showModal(); reglages.t = t; }
 $("#dlgC").addEventListener("click", e => { const t = reglages.t, el = e.target;
@@ -451,7 +455,9 @@ document.addEventListener("click", e => { const n = e.target.closest("td.nom[dat
   const s0 = ses(), trop = m.apres && s0.sem.some((w, wi) => { const z = new Date(w.d + "T12:00"); z.setDate(z.getDate() + 4); return iso(z) < m.apres && totalCase(s0, wi, m.k) > 0; });
   if (trop && confirm(`${m.titre} a des heures avant cette date.\nRefaire l'horaire de cette session pour la respecter ?\n(Tes ajustements à la main dans cette session seront remplacés.)`)) remplir(s0); else dessiner(); });
 function calAbs(p){ prepDonnees(); D.abs = D.abs || {}; const A = D.abs[p] = D.abs[p] || {};
-  let h = `<h2 style="margin-top:0">Absences de ${D.profs[p]}</h2><p class="mini">Touche les jours où ${D.profs[p]} ne peut pas enseigner (formation, congé, autre tâche…). L'horaire ne lui donnera pas de cours ces jours-là et réduit son maximum de la semaine.</p><div>`;
+  let h = `<h2 style="margin-top:0">Absences de ${D.profs[p]}</h2><p class="mini">Touche les jours où ${D.profs[p]} ne peut pas enseigner (formation, congé, autre tâche…). L'horaire ne lui donnera pas de cours ces jours-là et réduit son maximum de la semaine.</p>
+  <p style="margin:6px 0 4px"><b>Chaque semaine</b> <span class="mini">(ex. réunion tous les mardis après-midi)</span></p><p>${[1,2,3,4,5].map(wd => ["AM","PM"].map(pm => `<span class="chip ${REC(p).includes(wd + "|" + pm) ? "on" : ""}" data-rec="${p}|${wd}|${pm}" style="padding:6px 10px">${["","Lundi","Mardi","Mercredi","Jeudi","Vendredi"][wd]} ${pm}</span>`).join("")).join(" ")}</p>
+  <p style="margin:12px 0 4px"><b>Jours précis</b></p><div>`;
   const d0 = new Date(D.cal.debut + "T12:00"), d1 = new Date(D.cal.fin + "T12:00");
   for (let m = new Date(d0.getFullYear(), d0.getMonth(), 1, 12); m <= d1; m.setMonth(m.getMonth() + 1)){
     h += `<div class="cmois"><h4>${m.toLocaleDateString("fr-CA", { month:"long", year:"numeric" })}</h4><table><tr>${["L","M","M","J","V"].map(x => `<th style="font-size:11px;color:#999">${x}</th>`).join("")}</tr><tr>`;
@@ -463,6 +469,7 @@ function calAbs(p){ prepDonnees(); D.abs = D.abs || {}; const A = D.abs[p] = D.a
   h += `</div><p style="display:flex;justify-content:space-between"><button data-rt="ens">‹ Retour aux enseignants</button><span class="mini">${Object.keys(A).length} jour(s) d'absence</span></p>`;
   $("#dlgC").innerHTML = h; if (!dlg.open) dlg.showModal(); }
 $("#dlgC").addEventListener("click", e => { const b = e.target.closest("[data-pa]"); if (b){ calAbs(b.dataset.pa); return; }
+  const r = e.target.closest("[data-rec]"); if (r){ const [p, wd, pm] = r.dataset.rec.split("|"), L = ((D.absRec = D.absRec || {})[p] = D.absRec[p] || []), k = wd + "|" + pm, i = L.indexOf(k); if (i < 0) L.push(k); else L.splice(i, 1); sauver(); calAbs(p); dessiner(); return; }
   const a = e.target.closest("[data-ab]"); if (a && a.dataset.ab){ const [p, k] = a.dataset.ab.split("|"), A = D.abs[p]; if (A[k]) delete A[k]; else A[k] = 1; sauver(); calAbs(p); dessiner(); } });
 dessiner();
 </script>
