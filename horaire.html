@@ -551,14 +551,18 @@ function regler(a){ const s = ses(); let fait = 0, reste = ""; RAISON = "";
   if (a.fx === "sessprof"){ s.sem.forEach((w, wi) => s.mods.forEach(m => { const x = cell(s, wi, m.k)[a.p]; if (!x) return;
       const q = profsDe(m).filter(q => q !== a.p && sessOk(q, s) && libre(q, w) >= x).sort((u, v) => libre(v, w) - libre(u, w))[0] || "-";
       retirer(s, wi, m.k, x, a.p); ajout(s, wi, m.k, q, x); fait += x; if (q === "-") reste = "Certaines heures n'ont trouvé personne : elles sont marquées « Non assigné »."; })); }
-  if (a.fx === "trou"){ const wi = a.w, w = s.sem[wi]; let n = w.h - totSem(s, wi);
-    /* on ramène des heures des dernières semaines, avec le même enseignant */
-    for (let wj = s.sem.length - 1; wj > wi && n > 0; wj--) for (const m of s.mods){ if (n <= 0) break; if (m.autre || !okDate(m, w)) continue;
-      for (const p of Object.keys(cell(s, wj, m.k))){ if (n <= 0) break; const x = Math.min(n, cell(s, wj, m.k)[p], p === "-" ? 99 : Math.max(0, libre(p, w))); if (x <= 0) continue;
-        retirer(s, wj, m.k, x, p); ajout(s, wi, m.k, p, x); n -= x; fait += x; } }
+  if (a.fx === "trou"){ let n0 = s.sem[a.w].h - totSem(s, a.w), n = 0;
+    /* en cascade : chaque semaine se comble avec la suivante, tout avance d'un cran (même enseignant, ordre des modules gardé) */
+    for (let wi = a.w; wi < s.sem.length - 1; wi++){ const w = s.sem[wi]; if (w.pf) continue; let manque = w.h - totSem(s, wi); if (manque <= 0) continue;
+      const ici = m => totalCase(s, wi, m.k) > 0;
+      for (let wj = wi + 1; wj < s.sem.length && manque > 0; wj++){ if (s.sem[wj].pf) continue;   /* la semaine suivante d'abord; si ses profs ne sont pas libres, celle d'après */
+        const L = s.mods.filter(m => !m.autre && okDate(m, w) && totalCase(s, wj, m.k)).sort((x, y) => ici(y) - ici(x));   /* d'abord les modules déjà commencés */
+        for (const m of L) for (const p of Object.keys(cell(s, wj, m.k))){ if (manque <= 0) break; const x = Math.min(manque, cell(s, wj, m.k)[p], p === "-" ? 99 : Math.max(0, libre(p, w))); if (x <= 0) continue;
+          retirer(s, wj, m.k, x, p); ajout(s, wi, m.k, p, x); manque -= x; fait += x; } }
+      if (wi === a.w) n = manque; }
     /* dernière session : on enlève les semaines du bout qui n'ont plus de cours */
     const L = grp().sessions; if (s === L[L.length - 1]) while (s.sem.length > 1 && !s.mods.some(m => !m.autre && totalCase(s, s.sem.length - 1, m.k))){ delete s.g[s.sem.length - 1]; s.sem.pop(); }
-    if (n > 0) reste = `Il manque encore ${n} h cette semaine : les enseignants des cours suivants ne sont pas libres. Utilise « Voir » pour placer un cours à la main.`; }
+    if (n > 0) reste = `Il manque encore ${n} h cette semaine : les enseignants des cours de la semaine suivante ne sont pas libres. Utilise « Voir » pour placer un cours à la main.`; }
   if (a.fx === "conge"){ s.sem[a.w].h = a.h; fait = 1; let e = totSem(s, a.w) - a.h;
     s.mods.filter(m => m.autre && !m.jt).forEach(m => { if (e > 0){ e -= retirer(s, a.w, m.k, e); } }); if (totSem(s, a.w) > a.h) return regler({ fx:"sem", w:a.w }); }
   if (a.fx === "apres"){ const m = s.mods.find(x => x.k === a.k);
