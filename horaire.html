@@ -135,9 +135,11 @@ const dt = d => new Date(d + "T12:00");
 const jm = d => dt(d).toLocaleDateString("fr-CA", { day:"numeric", month:"short" }).replace(".", "");
 
 /* heures de chaque prof par semaine, tous les groupes */
+const maxSem = () => +((D && D.maxSem) || 18);
 function charges(){ const C = {};
   D.groupes.forEach(g => g.sessions.forEach(s => s.sem.forEach((w, wi) => { const W = s.g[wi] || {};
     for (const k in W) for (const p in W[k]) { if (p === "-") continue; const c = (C[p] = C[p] || {}), e = (c[w.d] = c[w.d] || { h:0, max:w.h, grp:new Set() }); e.h += W[k][p]; e.grp.add(g.nom); e.max = Math.max(e.max, w.h); } })));
+  const mx = maxSem(); for (const p in C) for (const d in C[p]) C[p][d].max = Math.min(C[p][d].max, mx);
   return C; }
 
 
@@ -174,7 +176,7 @@ function dessiner(){ document.querySelectorAll("#vOng button").forEach(b => b.cl
   h += `</tr></tfoot></table>`;
   $("#vue").innerHTML = h;
   // conflits entre groupes
-  Object.keys(C).forEach(p => Object.keys(C[p]).forEach(d => { const e = C[p][d]; if (e.h > e.max && s.sem.some(w => w.d === d)) prob.push({ t:`${D.profs[p] || p} est à deux places la semaine du ${jm(d)} (${[...e.grp].join(" et ")} : ${e.h} h pour ${e.max} h). Donne un de ses blocs à un autre enseignant.`, w:s.sem.findIndex(w => w.d === d) }); }));
+  Object.keys(C).forEach(p => Object.keys(C[p]).forEach(d => { const e = C[p][d]; if (e.h > e.max && s.sem.some(w => w.d === d)) prob.push({ t:`${D.profs[p] || p} a ${e.h} h la semaine du ${jm(d)} (${[...e.grp].join(" et ")}), plus que ${e.max} h. Donne un de ses blocs à un autre enseignant.`, w:s.sem.findIndex(w => w.d === d) }); }));
   const vus = new Set(), P = prob.filter(x => !vus.has(x.t) && vus.add(x.t));
   $("#etat").className = "etat " + (P.length ? "err" : "ok"); $("#etat").textContent = P.length ? P.length + " point" + (P.length > 1 ? "s" : "") + " à régler" : "Tout est correct";
   $("#alertes").innerHTML = $("#alertes").dataset.ouv ? P.slice(0, 5).map(a => `<div class="alert" style="cursor:pointer" data-va="${a.k || ""}|${a.w == null ? "" : a.w}">${a.t} <u style="color:var(--or)">Voir</u></div>`).join("") + (P.length > 5 ? `<div class="mini" style="margin:4px 2px 8px">… et ${P.length - 5} autres. Règle ceux-ci d'abord.</div>` : "") : "";
@@ -234,7 +236,7 @@ function remplir(s){ const garde = {}; s.sem.forEach((w, wi) => { const W = s.g[
     const charge = p => (((C[p] || {})[w.d] || {}).h || 0);
     while (cap > 0 && actifs.length && garde++ < 200){ const m = actifs[tour % actifs.length];
       const u = Math.min(cap, 3, reste.get(m));
-      const libres = m.profs.filter(q => charge(q) + u <= w.h), resteT = q => (+((D.cible || {})[q]) || 1e6) - (TA[q] || 0);
+      const libres = m.profs.filter(q => charge(q) + u <= Math.min(w.h, maxSem())), resteT = q => (+((D.cible || {})[q]) || 1e6) - (TA[q] || 0);
       const p = libres.sort((x, y) => resteT(y) - resteT(x))[0] || m.profs[0] || "-";
       fixer(s, wi, m.k, p, (cell(s, wi, m.k)[p] || 0) + u); if (p !== "-") TA[p] = (TA[p] || 0) + u; cap -= u; reste.set(m, reste.get(m) - u);
       if (p !== "-"){ const c = ((C[p] = C[p] || {})[w.d] = (C[p] || {})[w.d] || { h:0, max:w.h, grp:new Set() }); c.h += u; }
@@ -284,7 +286,7 @@ function vueProfs(){ const s = ses(), C = charges(), d0 = s.sem[0].d, d1 = s.sem
     for (const k in W){ const m = x.mods.find(y => y.k === k); if (!m || m.autre) continue; for (const p in W[k]){ if (p === "-") continue; const c = ((par[p] = par[p] || {})[w.d] = par[p][w.d] || {}); c[g.nom] = (c[g.nom] || 0) + W[k][p]; } } })));
   $("#leg").innerHTML = D.groupes.map(g => `<span class="lp"><i style="background:${GC[g.nom]}">${g.nom.slice(-4)}</i><b>${g.nom}</b></span>`).join("");
   let h = `<table><thead><tr><th class="nom">Enseignants · tous les groupes</th>` + s.sem.map(w => `<th>${jm(w.d)}</th>`).join("") + `</tr></thead><tbody>`; const prob = [];
-  Object.keys(D.profs).forEach(p => { h += `<tr><td class="nom"><b>${D.profs[p]}</b><small>maximum : les heures de la semaine</small></td>`;
+  Object.keys(D.profs).forEach(p => { h += `<tr><td class="nom"><b>${D.profs[p]}</b><small>maximum ${maxSem()} h par semaine</small></td>`;
     s.sem.forEach(w => { const c = (par[p] || {})[w.d] || {}, t = Object.values(c).reduce((a, b) => a + b, 0), e = (C[p] || {})[w.d], trop = e && t > e.max;
       if (trop) prob.push(`${D.profs[p]} : ${t} h la semaine du ${jm(w.d)} (${Object.keys(c).join(" + ")})`);
       h += `<td class="c" style="${trop ? "background:#FBE3E0" : ""}">` + Object.keys(c).map(g => `<span class="puce" style="background:${GC[g]}" title="${g}">${c[g]}</span>`).join("") + (trop ? `<div style="color:var(--err);font-weight:700;font-size:11px">${t} h</div>` : "") + `</td>`; });
@@ -358,7 +360,7 @@ function reglages(t){ prepDonnees(); let h = `<h2 style="margin-top:0">Calendrie
     P.mods.map((m, i) => `<tr><td><input class="n" data-pm="${i}|num" value="${m.num}"></td><td><input class="c" data-pm="${i}|code" value="${m.code}"></td><td><input data-pm="${i}|titre" value="${m.titre.replace(/"/g, "&quot;")}"></td><td><input class="h" data-pm="${i}|h" value="${m.h}"></td><td><input class="h" data-pm="${i}|ev" value="${m.ev || 0}"></td><td style="white-space:nowrap"><button data-pmv="${i}|-1">▲</button><button data-pmv="${i}|1">▼</button><button data-pmx="${i}">✕</button></td></tr>`).join("") +
     `</table><p><button id="pAj">+ Module</button> <span class="mini">Total : ${P.mods.reduce((a, m) => a + (+m.h || 0), 0)} h</span></p>`; }
   if (t === "ens"){ const codes = []; Object.values(D.prog).forEach(P => P.mods.forEach(m => { if (m.code && !codes.some(c => c.code === m.code)) codes.push(m); }));
-    h += `<p class="mini">Commence par la tâche de chaque enseignant (heures de cours prévues dans l'année, tous groupes), puis touche les modules qu'il peut donner. L'horaire donne les blocs en priorité à celui à qui il reste le plus d'heures.</p><table class="ed"><tr><th class="n">Initiales</th><th style="width:170px">Nom</th><th class="h">Tâche prévue (h / an)</th><th>Modules qu'il peut donner</th><th></th></tr>` +
+    h += `<p class="mini">Maximum par enseignant : <input class="h" id="mxS" inputmode="numeric" value="${maxSem()}" style="width:60px;border:1px solid var(--l);border-radius:6px;padding:4px"> h par semaine.<br>Commence par la tâche de chaque enseignant (heures de cours prévues dans l'année, tous groupes), puis touche les modules qu'il peut donner. L'horaire donne les blocs en priorité à celui à qui il reste le plus d'heures.</p><table class="ed"><tr><th class="n">Initiales</th><th style="width:170px">Nom</th><th class="h">Tâche prévue (h / an)</th><th>Modules qu'il peut donner</th><th></th></tr>` +
     Object.keys(D.profs).map(p => `<tr><td><b>${p}</b></td><td><input data-pn="${p}" value="${D.profs[p]}"></td><td><input class="h" data-pt="${p}" inputmode="numeric" value="${(D.cible || {})[p] || ""}" placeholder="ex. 450"></td><td>${codes.map(m => `<span class="chip ${(D.peut[p] || []).includes(m.code) ? "on" : ""}" data-pc="${p}|${m.code}" title="${m.titre}">${m.num} ${m.titre.split(" ").slice(0, 2).join(" ")}</span>`).join("")}</td><td><button data-px="${p}">✕</button></td></tr>`).join("") +
     `</table><p><button id="eAj">+ Enseignant</button></p>`; }
   $("#dlgC").innerHTML = h; if (!dlg.open) dlg.showModal(); reglages.t = t; }
@@ -378,6 +380,7 @@ $("#dlgC").addEventListener("change", e => { const el = e.target;
   if (el.id === "cDeb" || el.id === "cFin"){ D.cal[el.id === "cDeb" ? "debut" : "fin"] = el.value; sauver(); reglages("cal"); }
   if (el.id === "pSel"){ reglages.p = el.value; reglages("prog"); }
   if (el.dataset.pm){ const [i, k] = el.dataset.pm.split("|"), m = D.prog[reglages.p].mods[+i]; m[k] = (k === "h" || k === "ev") ? (+el.value || 0) : el.value.trim(); sauver(); if (k === "h") reglages("prog"); }
+  if (el.id === "mxS"){ D.maxSem = Math.max(3, Math.round(+el.value || 18)); sauver(); dessiner(); }
   if (el.dataset.pt){ D.cible = D.cible || {}; D.cible[el.dataset.pt] = Math.max(0, Math.round(+el.value || 0)); sauver(); dessiner(); }
   if (el.dataset.pn){ D.profs[el.dataset.pn] = el.value.trim() || D.profs[el.dataset.pn]; sauver(); dessiner(); }
 });
