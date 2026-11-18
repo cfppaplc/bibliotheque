@@ -150,7 +150,8 @@ const COUL = ["#2F6FB5","#EB6A22","#1E8A55","#B8860B","#C2417A","#0E8C8C","#4A55
 let D; try { D = JSON.parse(localStorage.getItem(CLE)) || null; } catch(e){} if (!D) D = JSON.parse(JSON.stringify(EXEMPLE));
 let G = 0, S = 0, FILTRE = null, VUE = "g", SW = 0;
 const sauver = () => { try { localStorage.setItem(CLE, JSON.stringify(D)); } catch(e){ alert("Mémoire pleine : sauvegarde dans un fichier."); } };
-const grp = () => D.groupes[G], ses = () => grp().sessions[S];
+const VIDE = { nom:"", sessions:[{ nom:"", mods:[], sem:[], g:{} }], taches:{} };
+const grp = () => D.groupes[G] || D.groupes[0] || VIDE, ses = () => grp().sessions[S] || grp().sessions[0] || VIDE.sessions[0];   /* jamais d'erreur s'il n'y a pas encore de groupe */
 const couleur = p => { const L = Object.keys(D.profs); const i = L.indexOf(p); return i < 0 ? "#999" : COUL[i % COUL.length]; };
 const cell = (s, wi, k) => ((s.g[wi] || {})[k] || {});
 const totalCase = (s, wi, k) => Object.values(cell(s, wi, k)).reduce((a, b) => a + b, 0);
@@ -257,6 +258,7 @@ function dessiner(){ if (D.groupes.some(g => remplirTrous(g))) sauver();
 /* petite fenêtre d'une case : heures de chaque enseignant, − / + */
 function ouvrirCase(td){
   const s = ses(), wi = +td.dataset.w, k = td.dataset.k, m = s.mods.find(x => x.k === k), w = s.sem[wi], c = cell(s, wi, k);
+  if (!m) return;   /* module disparu (groupe changé) */
   const liste = [...new Set([...(m.profs || []), ...Object.keys(c)])];
   if (!liste.length) liste.push(m.autre ? "-" : Object.keys(D.profs)[0]);
   const pop = $("#pop"), place = s.mods.reduce((a, x) => a + totalCase(s, wi, x.k), 0);

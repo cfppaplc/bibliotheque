@@ -690,3 +690,9 @@ html #apercuOv .ap-moments button.on { background: #f1f1f2; color: #111; border-
 html #apercuOv .ap-fermer { background: #f1f1f2; color: #111; border-radius: 10px; }
 html.ui-clair #apercuOv .ap-moments button { background: #fff; border-color: #d4d0c8; color: #3d3d42; }
 html.ui-clair #apercuOv .ap-moments button.on, html.ui-clair #apercuOv .ap-fermer { background: #1d1d1f; color: #fff; border-color: #1d1d1f; }
+
+/* TNI (18 nov.) : les petites animations du décor (eau, flamme, bulles, fenêtres) repeignaient l'écran sans arrêt
+   (≈ 490 accrochages de 117 ms par 5 min sur l'accueil). Au TNI, le décor reste fixe. Ne touche pas les livres. */
+@media (any-pointer: coarse) and (min-width: 601px){
+  .bgx *, .bgx { animation: none !important; }
+}
