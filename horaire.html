@@ -55,10 +55,20 @@ thead th.conf{background:#FBE3E0;color:var(--err)}
 #pop .bas{display:flex;justify-content:space-between;margin-top:12px;font-size:12px;color:var(--gris);align-items:center}
 .menu{position:relative}.menu .liste{position:absolute;right:0;top:44px;background:#fff;border-radius:12px;box-shadow:0 14px 40px rgba(0,0,0,.2);padding:6px;min-width:250px;z-index:30;display:none}
 .menu.ouv .liste{display:block}.menu .liste button{display:block;width:100%;text-align:left;border:0;padding:10px 12px}
-dialog{border:0;border-radius:16px;padding:20px;max-width:760px;width:94vw;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+dialog{border:0;border-radius:16px;padding:20px;max-width:980px;width:94vw;max-height:92vh;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)}
 dialog textarea{width:100%;min-height:200px;font:12px ui-monospace,monospace;border:1px solid var(--l);border-radius:8px;padding:8px}
 .mini{font-size:12px;color:var(--gris)}.alert{background:#fff;border-left:4px solid var(--err);border-radius:8px;padding:8px 12px;margin:4px 0;font-size:13px}
 table.t td,table.t th{border:1px solid var(--l);padding:5px 8px;text-align:center;font-size:12px}table.t input{width:52px;text-align:center;border:1px solid var(--l);border-radius:6px}
+
+.ong2{display:flex;gap:6px;margin:0 0 14px}.ong2 button.on{background:var(--mar);color:#fff;border-color:var(--mar)}
+.mois{display:inline-block;vertical-align:top;margin:0 14px 14px 0}.mois h4{margin:0 0 6px;font-size:13px;text-transform:capitalize}
+.mois table td{width:30px;height:28px;text-align:center;font-size:12px;border:0;border-radius:6px;cursor:pointer}
+.mois td.we{color:#ccc;cursor:default}.mois td.off{background:#E7E1D8;color:#9A9083;text-decoration:line-through}.mois td.hors{color:#ddd;cursor:default}
+.mois td.jo:hover{background:#FFE8D9}
+table.ed td,table.ed th{border-bottom:1px solid var(--l);padding:4px;font-size:12px;text-align:left}table.ed input{border:1px solid var(--l);border-radius:6px;padding:5px;width:100%}
+table.ed .n{width:56px}table.ed .c{width:86px}table.ed .h{width:60px}
+.chip{display:inline-block;border:1px solid var(--l);border-radius:99px;padding:3px 8px;margin:2px;font-size:11px;cursor:pointer;background:#fff}.chip.on{background:var(--or);border-color:var(--or);color:#fff}
+.form label{display:block;margin:10px 0}.form input,.form select{border:1px solid var(--l);border-radius:8px;padding:8px;min-width:260px}
 @media print{header,.haut .noprint,.menu,#pop,.noprint{display:none!important}.carte{max-height:none;overflow:visible;border:0}body{background:#fff}thead th,td.nom,tfoot td{position:static}@page{size:landscape;margin:7mm}}
 </style>
 </head>
@@ -74,8 +84,9 @@ table.t td,table.t th{border:1px solid var(--l);padding:5px 8px;text-align:cente
   <span class="menu noprint" id="menu"><button id="bMenu">Plus ▾</button><div class="liste">
     <button data-a="auto">Remplir automatiquement (3 matières à la fois)</button>
     <button data-a="tach">Tâches annuelles des enseignants</button>
-    <button data-a="mods">Modules, enseignants et semaines</button>
-    <button data-a="grp">Nouveau groupe</button>
+    <button data-a="grp">Nouveau groupe…</button>
+    <button data-a="reg">Calendrier, programmes et enseignants</button>
+    <button data-a="mods">Modifier ce groupe (texte)</button>
     <button data-a="print">Imprimer</button>
     <button data-a="exp">Sauvegarder dans un fichier</button>
     <button data-a="imp">Ouvrir un fichier</button>
@@ -184,7 +195,8 @@ function action(a){ const s = ses();
   if (a === "auto"){ if (Object.keys(s.g).length && !confirm("Remplacer les heures déjà placées dans cette session ?")) return; remplir(s); }
   if (a === "tach") taches();
   if (a === "mods") editer();
-  if (a === "grp") nouveauGroupe();
+  if (a === "grp") dlgNouveau();
+  if (a === "reg") reglages("cal");
   if (a === "exp"){ const l = document.createElement("a"); l.href = URL.createObjectURL(new Blob([JSON.stringify(D)], { type:"application/json" })); l.download = "horaires-" + new Date().toISOString().slice(0, 10) + ".json"; l.click(); }
   if (a === "imp"){ const i = document.createElement("input"); i.type = "file"; i.accept = ".json"; i.onchange = async () => { try { D = JSON.parse(await i.files[0].text()); G = S = 0; sauver(); dessiner(); } catch(x){ alert("Fichier illisible."); } }; i.click(); }
   if (a === "raz" && confirm("Effacer tout et reprendre l'exemple (2026EGI1) ?")){ D = JSON.parse(JSON.stringify(EXEMPLE)); G = S = 0; sauver(); dessiner(); }
@@ -280,6 +292,83 @@ function vueSemaine(){ const s = ses(); SW = Math.min(SW, s.sem.length - 1); con
   $("#etat").className = "etat " + (reste.length ? "err" : "ok"); $("#etat").textContent = reste.length ? reste.length + " point" + (reste.length > 1 ? "s" : "") + " à régler" : "Semaine possible sans conflit";
   $("#alertes").innerHTML = $("#alertes").dataset.ouv ? reste.map(a => `<div class="alert">${a}</div>`).join("") : "";
 }
+/* ===== Calendrier, programmes et enseignants (17 nov.) ===== */
+const ORDRE_EGI = [["1","436201","Métier et formation",15,0],["2","436212","Santé et sécurité",30,0],["3","436222","Gestion d'un petit entrepôt",30,0],["4","436238","Entretien ménager (partie 1)",60,0],["6","436255","Travaux de menuiserie et réfection",75,6],["11","436304","Ventilation et climatisation",60,0],["10","436295","Plomberie et chauffage",75,3],["13","436274","Entretien du matériel électrique",60,0],["14","436323","Lecture de plans de bâtiments",45,0],["4","436238","Entretien ménager (partie 2)",60,3],["5","436244","Travaux mineurs d'entretien",60,6],["8","436352","Recherche d'emploi",30,0],["9","436266","Systèmes de mécanique du bâtiment",90,0],["12","436312","Systèmes de protection incendie",30,0],["15","436333","Micro-ordinateur",45,0],["16","436343","Administration d'un bâtiment",45,0],["17","436364","Intégration au travail (stage)",60,0],["7","436282","Communication en milieu de travail",30,0]];
+function prepDonnees(){
+  D.cal = D.cal || { debut:"2026-08-31", fin:"2027-06-18", off:{ "2026-09-07":"Fête du Travail", "2026-10-12":"Action de grâce", "2027-03-26":"Vendredi saint", "2027-03-29":"Lundi de Pâques", "2027-05-24":"Journée des patriotes" } };
+  if (!D.cal.off["2026-12-21"]) for (let d = new Date("2026-12-21T12:00"); d <= new Date("2027-01-01T12:00"); d.setDate(d.getDate() + 1)) D.cal.off[iso(d)] = "Vacances des Fêtes";
+  D.prog = D.prog || { "EGI": { nom:"5211 Entretien général d'immeubles", mods:ORDRE_EGI.map(x => ({ num:x[0], code:x[1], titre:x[2], h:x[3], ev:x[4] })) }, "PC": { nom:"5333 Plomberie et chauffage", mods:[] } };
+  D.peut = D.peut || {}; Object.keys(D.profs).forEach(p => { if (!D.peut[p]){ const S = new Set(); D.groupes.forEach(g => g.sessions.forEach(s => s.mods.forEach(m => { if (m.code && m.profs.includes(p)) S.add(m.code); }))); D.peut[p] = [...S]; } });
+}
+const iso = d => d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+/* heures d'un jour de classe : 6 h, jeudi 4 h (1 h de cours l'après-midi + plage verte, la plage ne compte pas) */
+const HJOUR = [0, 6, 6, 6, 4, 6, 0];
+function heuresSemaine(lundi){ let h = 0; const d = new Date(lundi + "T12:00"); for (let i = 0; i < 5; i++){ const x = new Date(d); x.setDate(d.getDate() + i); const k = iso(x); if (k >= D.cal.debut && k <= D.cal.fin && !D.cal.off[k]) h += HJOUR[x.getDay()]; } return h; }
+function reglages(t){ prepDonnees(); let h = `<h2 style="margin-top:0">Calendrier, programmes et enseignants</h2><div class="ong2"><button data-rt="cal" class="${t === "cal" ? "on" : ""}">Calendrier scolaire</button><button data-rt="prog" class="${t === "prog" ? "on" : ""}">Programmes</button><button data-rt="ens" class="${t === "ens" ? "on" : ""}">Enseignants</button></div>`;
+  if (t === "cal"){ h += `<p class="mini">Touche un jour pour le mettre en congé (gris), touche encore pour le remettre. Les heures des semaines se calculent toutes seules : 6 h par jour, 4 h le jeudi.</p>
+    <p>Première journée <input type="date" id="cDeb" value="${D.cal.debut}"> · Dernière journée <input type="date" id="cFin" value="${D.cal.fin}"></p><div>`;
+    const d0 = new Date(D.cal.debut + "T12:00"), d1 = new Date(D.cal.fin + "T12:00"); let jours = 0;
+    for (let m = new Date(d0.getFullYear(), d0.getMonth(), 1, 12); m <= d1; m.setMonth(m.getMonth() + 1)){
+      h += `<div class="mois"><h4>${m.toLocaleDateString("fr-CA", { month:"long", year:"numeric" })}</h4><table><tr>${["L","M","M","J","V"].map(x => `<th style="font-size:11px;color:#999">${x}</th>`).join("")}</tr><tr>`;
+      const pre = (m.getDay() + 6) % 7; if (pre < 5) h += "<td></td>".repeat(pre);
+      for (let d = new Date(m); d.getMonth() === m.getMonth(); d.setDate(d.getDate() + 1)){ const w = d.getDay(); if (w === 0 || w === 6){ if (w === 6) h += "</tr><tr>"; continue; }
+        const k = iso(d), hors = k < D.cal.debut || k > D.cal.fin, off = D.cal.off[k]; if (!hors && !off) jours++;
+        h += `<td class="${hors ? "hors" : "jo"} ${off ? "off" : ""}" data-j="${hors ? "" : k}" title="${off || ""}">${d.getDate()}</td>`; }
+      h += `</tr></table></div>`; }
+    h += `</div><p class="mini">${jours} jours de classe.</p>`; }
+  if (t === "prog"){ const ids = Object.keys(D.prog); const pid = reglages.p && D.prog[reglages.p] ? reglages.p : ids[0]; reglages.p = pid; const P = D.prog[pid];
+    h += `<p><select id="pSel">${ids.map(i => `<option value="${i}" ${i === pid ? "selected" : ""}>${D.prog[i].nom}</option>`).join("")}</select> <button id="pNouv">+ Programme</button></p>
+    <p class="mini">Les modules dans l'ordre où ils sont donnés. Un module donné en deux parties = deux lignes avec le même code. L'horaire coupe en sessions de 450 h.</p>
+    <table class="ed"><tr><th class="n">N°</th><th class="c">Code</th><th>Titre</th><th class="h">Heures</th><th class="h">Éval.</th><th></th></tr>` +
+    P.mods.map((m, i) => `<tr><td><input class="n" data-pm="${i}|num" value="${m.num}"></td><td><input class="c" data-pm="${i}|code" value="${m.code}"></td><td><input data-pm="${i}|titre" value="${m.titre.replace(/"/g, "&quot;")}"></td><td><input class="h" data-pm="${i}|h" value="${m.h}"></td><td><input class="h" data-pm="${i}|ev" value="${m.ev || 0}"></td><td style="white-space:nowrap"><button data-pmv="${i}|-1">▲</button><button data-pmv="${i}|1">▼</button><button data-pmx="${i}">✕</button></td></tr>`).join("") +
+    `</table><p><button id="pAj">+ Module</button> <span class="mini">Total : ${P.mods.reduce((a, m) => a + (+m.h || 0), 0)} h</span></p>`; }
+  if (t === "ens"){ const codes = []; Object.values(D.prog).forEach(P => P.mods.forEach(m => { if (m.code && !codes.some(c => c.code === m.code)) codes.push(m); }));
+    h += `<p class="mini">Touche les modules que chaque enseignant peut donner. L'ordre des enseignants compte : le premier libre est choisi.</p><table class="ed"><tr><th class="n">Initiales</th><th style="width:170px">Nom</th><th>Modules</th><th></th></tr>` +
+    Object.keys(D.profs).map(p => `<tr><td><b>${p}</b></td><td><input data-pn="${p}" value="${D.profs[p]}"></td><td>${codes.map(m => `<span class="chip ${(D.peut[p] || []).includes(m.code) ? "on" : ""}" data-pc="${p}|${m.code}" title="${m.titre}">${m.num} ${m.titre.split(" ").slice(0, 2).join(" ")}</span>`).join("")}</td><td><button data-px="${p}">✕</button></td></tr>`).join("") +
+    `</table><p><button id="eAj">+ Enseignant</button></p>`; }
+  $("#dlgC").innerHTML = h; if (!dlg.open) dlg.showModal(); reglages.t = t; }
+$("#dlgC").addEventListener("click", e => { const t = reglages.t, el = e.target;
+  if (el.dataset.rt){ reglages(el.dataset.rt); return; }
+  if (el.dataset.j){ const k = el.dataset.j; if (D.cal.off[k]) delete D.cal.off[k]; else D.cal.off[k] = "Congé"; sauver(); reglages("cal"); return; }
+  const P = D.prog && D.prog[reglages.p];
+  if (el.dataset.pmv){ const [i, d] = el.dataset.pmv.split("|").map(Number), j = i + d; if (j < 0 || j >= P.mods.length) return; [P.mods[i], P.mods[j]] = [P.mods[j], P.mods[i]]; sauver(); reglages("prog"); }
+  if (el.dataset.pmx){ if (confirm("Retirer ce module du programme ?")){ P.mods.splice(+el.dataset.pmx, 1); sauver(); reglages("prog"); } }
+  if (el.id === "pAj"){ P.mods.push({ num:"", code:"", titre:"Nouveau module", h:30, ev:0 }); sauver(); reglages("prog"); }
+  if (el.id === "pNouv"){ const n = prompt("Nom du programme (ex. 5333 Plomberie et chauffage) :"); if (!n) return; const id = "P" + Date.now(); D.prog[id] = { nom:n, mods:[] }; reglages.p = id; sauver(); reglages("prog"); }
+  if (el.dataset.pc){ const [p, c] = el.dataset.pc.split("|"), L = (D.peut[p] = D.peut[p] || []), i = L.indexOf(c); if (i < 0) L.push(c); else L.splice(i, 1); sauver(); reglages("ens"); }
+  if (el.dataset.px){ if (confirm("Retirer " + D.profs[el.dataset.px] + " ?")){ delete D.profs[el.dataset.px]; delete D.peut[el.dataset.px]; sauver(); reglages("ens"); dessiner(); } }
+  if (el.id === "eAj"){ const n = prompt("Nom de l'enseignant :"); if (!n) return; let ini = n.split(/\s+/).map(x => x[0] || "").join(".").toUpperCase().slice(0, 3); while (D.profs[ini]) ini += "2"; D.profs[ini] = n; D.peut[ini] = []; sauver(); reglages("ens"); dessiner(); }
+});
+$("#dlgC").addEventListener("change", e => { const el = e.target;
+  if (el.id === "cDeb" || el.id === "cFin"){ D.cal[el.id === "cDeb" ? "debut" : "fin"] = el.value; sauver(); reglages("cal"); }
+  if (el.id === "pSel"){ reglages.p = el.value; reglages("prog"); }
+  if (el.dataset.pm){ const [i, k] = el.dataset.pm.split("|"), m = D.prog[reglages.p].mods[+i]; m[k] = (k === "h" || k === "ev") ? (+el.value || 0) : el.value.trim(); sauver(); if (k === "h") reglages("prog"); }
+  if (el.dataset.pn){ D.profs[el.dataset.pn] = el.value.trim() || D.profs[el.dataset.pn]; sauver(); dessiner(); }
+});
+/* ---- Nouveau groupe à partir du calendrier et du programme ---- */
+function dlgNouveau(){ prepDonnees(); const lun = new Date(D.cal.debut + "T12:00"); lun.setDate(lun.getDate() - (lun.getDay() + 6) % 7);
+  $("#dlgC").innerHTML = `<h2 style="margin-top:0">Nouveau groupe</h2><div class="form">
+  <label>Nom du groupe<br><input id="nN" placeholder="ex. 2026EGI2"></label>
+  <label>Programme<br><select id="nP">${Object.keys(D.prog).map(i => `<option value="${i}">${D.prog[i].nom} (${D.prog[i].mods.length} modules)</option>`).join("")}</select></label>
+  <label>Première semaine du groupe<br><input type="date" id="nD" value="${iso(lun)}"></label>
+  <label>Titulaire (facultatif)<br><input id="nT"></label></div>
+  <p class="mini">L'horaire se bâtit avec le calendrier scolaire (congés), les modules dans l'ordre (3 à la fois) et les enseignants qui peuvent les donner, sans conflit avec les autres groupes. Tu ajustes ensuite.</p>
+  <p><button class="prim" id="nOk">Créer l'horaire</button></p>`;
+  if (!dlg.open) dlg.showModal();
+  $("#nOk").onclick = () => { const nom = $("#nN").value.trim(), P = D.prog[$("#nP").value]; if (!nom){ $("#nN").focus(); return; } if (!P.mods.length){ alert("Ce programme n'a pas encore de modules (Calendrier, programmes et enseignants → Programmes)."); return; }
+    const g = { id:"g" + Date.now(), nom, prog:P.nom, titulaire:$("#nT").value.trim(), sessions:[] };
+    // modules → sessions de 450 h
+    let ses = null, cum = 0; P.mods.forEach((m, i) => { if (!ses || cum >= 450){ ses = { nom:"Session " + (g.sessions.length + 1), mods:[], sem:[], g:{} }; g.sessions.push(ses); cum = 0; }
+      const k = ses.mods.some(x => x.k === m.code) ? m.code + "-" + i : (m.code || "m" + i);
+      ses.mods.push({ k, code:m.code, titre:m.titre, num:m.num, h:+m.h || 0, ev:+m.ev || 0, profs:Object.keys(D.profs).filter(p => (D.peut[p] || []).includes(m.code)), autre:!m.code }); cum += +m.h || 0; });
+    // semaines selon le calendrier
+    let d = new Date($("#nD").value + "T12:00"); d.setDate(d.getDate() - (d.getDay() + 6) % 7); let garde = 0;
+    g.sessions.forEach(s => { let besoin = s.mods.reduce((a, m) => a + m.h, 0);
+      while (besoin > 0 && garde++ < 120){ const k = iso(d), h = heuresSemaine(k); d.setDate(d.getDate() + 7); if (k > D.cal.fin) break; if (!h) continue; const u = Math.min(h, besoin); s.sem.push({ d:k, h:u }); besoin -= u; }
+      if (besoin > 0) alert(s.nom + " : il manque " + besoin + " h avant la fin du calendrier."); });
+    D.groupes.push(g); G = D.groupes.length - 1; g.sessions.forEach((s, i) => { S = i; remplir(s); }); S = 0; VUE = "g"; sauver(); dlg.close(); dessiner(); };
+}
+prepDonnees(); sauver();
 dessiner();
 </script>
 </body>
