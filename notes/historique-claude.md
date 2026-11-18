@@ -591,3 +591,4 @@
 - 2026-11-17 : horaire.html — bouton « Régler » sur chaque point (regler(), deplacerHors, placer); l'assistant vérifie les réponses (verifAs, dispoAn) et propose une correction.
 - 2026-11-17 : horaire.html — bouton « Accepter » sur chaque point (D.acceptes[groupe] = textes), lien « Les revoir ».
 - 2026-11-17 : horaire.html — RÈGLE : « Régler » ne change jamais les heures d'un enseignant dans la session (déplace ou échange des blocs en gardant le même prof : bouger(), sortir()).
+- 2026-11-17 : horaire.html — fériés/congés absents d'une semaine détectés (fx jt / conge); « Régler » ajoute des semaines au bout et repousse la session suivante jusqu'au 30 juin (finMax, ajouterSemaine, decaler); D.sessProf[p] = sessions où le prof enseigne (vide = toutes), alerte fx sessprof.
