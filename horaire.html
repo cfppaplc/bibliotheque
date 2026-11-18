@@ -174,7 +174,9 @@ function dessiner(){ if (D.groupes.some(g => remplirTrous(g))) sauver();
   // légende
   const T = {}; s.sem.forEach((w, wi) => { const W = s.g[wi] || {}; for (const k in W) for (const p in W[k]) T[p] = (T[p] || 0) + W[k][p]; });
   const TA = totalAnnee(), CI = D.cible || {};
-  $("#leg").innerHTML = Object.keys(D.profs).map(p => { const c = +CI[p] || 0, t = TA[p] || 0, cl = !c ? "" : t > c ? "color:var(--err);font-weight:700" : t < c ? "color:var(--or)" : "color:var(--ok);font-weight:700";
+  let totEns = 0; s.sem.forEach((w, wi) => s.mods.forEach(m => { if (m.autre) return; const c = cell(s, wi, m.k); for (const p in c) if (p !== "-") totEns += c[p]; }));
+  const pre = s.mods.reduce((a, m) => a + (m.autre ? 0 : m.h), 0);
+  $("#leg").innerHTML = `<span class="lp" title="Heures de cours données par un enseignant dans cette session (examens compris)" style="font-weight:700;color:var(${totEns < pre ? "--err" : "--ok"})">Enseignants : ${totEns} / ${pre} h</span>` + Object.keys(D.profs).map(p => { const c = +CI[p] || 0, t = TA[p] || 0, cl = !c ? "" : t > c ? "color:var(--err);font-weight:700" : t < c ? "color:var(--or)" : "color:var(--ok);font-weight:700";
     return `<span class="lp ${FILTRE === p ? "on" : ""}" data-f="${p}" title="Cette session : ${T[p] || 0} h"><i style="background:${couleur(p)}">${p}</i><b>${D.profs[p]}</b><span style="${cl}">${t}${c ? " / " + c : ""} h</span></span>`; }).join("");
   // en-tête : semaines
   let h = `<table class="${FILTRE ? "dim" : ""}"><thead><tr><th class="nom">${grp().nom} · ${s.nom}</th>`;
