@@ -318,7 +318,7 @@ function remplir(s){ const garde = {}; s.sem.forEach((w, wi) => { const W = s.g[
       const libres = m.profs.filter(q => sessOk(q, s) && charge(q) + u <= Math.min(w.h, capProf(q, w.d))), resteT = q => { const pv = ((PREV[q] || {}).prev || [])[SI]; if (pv !== undefined && pv !== "") return +pv - (FAIT[q] || 0);
         const tp = (D.tacheProf || {})[q]; if (tp && (tp.s1 !== undefined || tp.s2 !== undefined)) return (+(PAIR ? tp.s2 : tp.s1) || 0) - (FSEM[q] || 0) - (FAIT[q] || 0);
         return (+((D.cible || {})[q]) || 1e6) - (TA[q] || 0); };
-      const p = libres.sort((x, y) => resteT(y) - resteT(x))[0] || m.profs.find(q => sessOk(q, s)) || "-";
+      const p = libres.filter(q => resteT(q) > 0).sort((x, y) => resteT(y) - resteT(x))[0] || "-";   /* 18 nov. : tâche pleine ou personne de libre → « non assigné », à donner à un autre */
       fixer(s, wi, m.k, p, (cell(s, wi, m.k)[p] || 0) + u); if (p !== "-"){ TA[p] = (TA[p] || 0) + u; FAIT[p] = (FAIT[p] || 0) + u; } cap -= u; reste.set(m, reste.get(m) - u);
       if (p !== "-"){ const c = ((C[p] = C[p] || {})[w.d] = (C[p] || {})[w.d] || { h:0, max:w.h, grp:new Set() }); c.h += u; }
       if (reste.get(m) <= 0){ actifs.splice(actifs.indexOf(m), 1); ouvrir(); } else tour++; } });
