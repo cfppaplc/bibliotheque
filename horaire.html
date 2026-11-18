@@ -385,7 +385,7 @@ $("#dlgC").addEventListener("click", e => { const t = reglages.t, el = e.target;
 $("#dlgC").addEventListener("change", e => { const el = e.target;
   if (el.id === "cDeb" || el.id === "cFin"){ D.cal[el.id === "cDeb" ? "debut" : "fin"] = el.value; sauver(); reglages("cal"); }
   if (el.id === "pSel"){ reglages.p = el.value; reglages("prog"); }
-  if (el.dataset.pm){ const [i, k] = el.dataset.pm.split("|"), m = D.prog[reglages.p].mods[+i]; m[k] = (k === "h" || k === "ev") ? (+el.value || 0) : el.value.trim(); sauver(); if (k === "h") reglages("prog"); }
+  if (el.dataset.pm){ const [i, k] = el.dataset.pm.split("|"), m = D.prog[reglages.p].mods[+i]; m[k] = (k === "h" || k === "ev") ? (+el.value || 0) : el.value.trim(); if (k === "apres" && m.code) D.groupes.forEach(g => g.sessions.forEach(x => x.mods.forEach(y => { if (y.code === m.code) y.apres = m.apres; }))); sauver(); if (k === "h") reglages("prog"); }
   if (el.id === "mxS"){ D.maxSem = Math.max(3, Math.round(+el.value || 18)); sauver(); dessiner(); }
   if (el.dataset.pt){ D.cible = D.cible || {}; D.cible[el.dataset.pt] = Math.max(0, Math.round(+el.value || 0)); sauver(); dessiner(); }
   if (el.dataset.pn){ D.profs[el.dataset.pn] = el.value.trim() || D.profs[el.dataset.pn]; sauver(); dessiner(); }
@@ -447,7 +447,9 @@ document.addEventListener("click", e => { const a = e.target.closest("[data-va]"
 })();
 document.addEventListener("click", e => { const n = e.target.closest("td.nom[data-mk]"); if (!n || VUE !== "g") return; const m = ses().mods.find(x => x.k === n.dataset.mk); if (!m) return;
   const v = prompt(`${m.titre}\nPas avant quelle date ? (AAAA-MM-JJ, vide = aucune)\nEnsuite : Plus → Remplir automatiquement pour replacer.`, m.apres || ""); if (v === null) return;
-  m.apres = /^\d{4}-\d{2}-\d{2}$/.test(v.trim()) ? v.trim() : ""; sauver(); dessiner(); });
+  m.apres = /^\d{4}-\d{2}-\d{2}$/.test(v.trim()) ? v.trim() : ""; sauver();
+  const s0 = ses(), trop = m.apres && s0.sem.some((w, wi) => { const z = new Date(w.d + "T12:00"); z.setDate(z.getDate() + 4); return iso(z) < m.apres && totalCase(s0, wi, m.k) > 0; });
+  if (trop && confirm(`${m.titre} a des heures avant cette date.\nRefaire l'horaire de cette session pour la respecter ?\n(Tes ajustements à la main dans cette session seront remplacés.)`)) remplir(s0); else dessiner(); });
 function calAbs(p){ prepDonnees(); D.abs = D.abs || {}; const A = D.abs[p] = D.abs[p] || {};
   let h = `<h2 style="margin-top:0">Absences de ${D.profs[p]}</h2><p class="mini">Touche les jours où ${D.profs[p]} ne peut pas enseigner (formation, congé, autre tâche…). L'horaire ne lui donnera pas de cours ces jours-là et réduit son maximum de la semaine.</p><div>`;
   const d0 = new Date(D.cal.debut + "T12:00"), d1 = new Date(D.cal.fin + "T12:00");
