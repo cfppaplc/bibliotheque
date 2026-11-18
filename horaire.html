@@ -181,6 +181,7 @@ function dessiner(){ if (D.groupes.some(g => remplirTrous(g))) sauver();
   h += `</tr></thead><tbody>`;
   const ligne = m => { const k = m.k, fait = s.sem.reduce((a, w, wi) => a + totalCase(s, wi, k), 0), pct = m.h ? Math.min(100, fait / m.h * 100) : 0, cl = !m.h ? "" : fait > m.h ? "trop" : fait < m.h ? "manque" : "";
     if (m.apres){ const avant = s.sem.findIndex(w => { const z = new Date(w.d + "T12:00"); z.setDate(z.getDate() + 4); return iso(z) < m.apres && totalCase(s, s.sem.indexOf(w), k) > 0; }); if (avant >= 0) prob.push({ t:`${m.titre} commence avant le ${dt(m.apres).toLocaleDateString("fr-CA", { day:"numeric", month:"long" })}`, k, w:avant, fx:"apres" }); }
+    if (!m.autre && Object.keys(evalSem(s, m)).length > 1) prob.push({ t:`L'évaluation de ${m.titre} (${Math.max(3, +m.ev || 0)} h) est séparée sur deux semaines`, k, fx:"eval", niv:"j" });
     if (!m.autre && fait !== m.h) prob.push({ t:`${m.titre} : ${fait} h placées sur ${m.h} h (${fait > m.h ? "enlève" : "ajoute"} ${Math.abs(fait - m.h)} h)`, k, fx:"mod" });
     let r = `<tr class="${m.autre ? "autre" : ""}"><td class="nom" data-mk="${k}" title="Toucher pour une date « pas avant »" style="cursor:pointer"><b>${m.autre ? `<i style="display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;background:${coulAutre(m)}"></i>` : ""}${m.num ? m.num + " · " : ""}${m.titre}</b><small>${m.code ? m.code + " · " : ""}${m.apres ? "dès le " + jm(m.apres) + " · " : ""}${fait} / ${m.h} h${m.ev ? " · éval " + m.ev + " h" : ""}${cl === "" && m.h && !m.autre ? " ✓" : ""}</small>${m.autre ? "" : `<div class="barre ${cl}"><i style="width:${pct}%"></i></div>`}</td>`;
     const EV = m.autre ? {} : evalSem(s, m);
@@ -273,6 +274,7 @@ function remplir(s){ const garde = {}; s.sem.forEach((w, wi) => { const W = s.g[
       fixer(s, wi, m.k, p, (cell(s, wi, m.k)[p] || 0) + u); if (p !== "-") TA[p] = (TA[p] || 0) + u; cap -= u; reste.set(m, reste.get(m) - u);
       if (p !== "-"){ const c = ((C[p] = C[p] || {})[w.d] = (C[p] || {})[w.d] || { h:0, max:w.h, grp:new Set() }); c.h += u; }
       if (reste.get(m) <= 0){ actifs.splice(actifs.indexOf(m), 1); ouvrir(); } else tour++; } });
+  s.mods.forEach(m => { if (!m.autre) grouperEval(s, m); });
   sauver(); dessiner(); }
 function nouveauGroupe(){ const nom = prompt("Nom du groupe (ex. 2027EGI1) :"); if (!nom) return;
   const debut = prompt("Lundi de la 1re semaine (AAAA-MM-JJ) :", new Date().toISOString().slice(0, 10)); if (!debut) return;
@@ -349,6 +351,14 @@ function vueSemaine(){ const s = ses(); SW = Math.max(0, Math.min(SW, s.sem.leng
   groupes.forEach((g, gi) => restes[gi].forEach(i => { if (!i.m.autre) return; const ty = Object.keys(JT).find(t => JT[t].c === coulAutre(i.m)); if (!["ferie", "planif", "tempete", "finses"].includes(ty)) return;
     for (const di of [4, 0, 2, 1, 3]){ const a = di * 2, b = a + 1, hj = blocs[a].h + blocs[b].h; if (!hj || i.h < hj || R[gi][a] || R[gi][b]) continue;
       R[gi][a] = { p:i.p, m:i.m, h:blocs[a].h }; R[gi][b] = { p:i.p, m:i.m, h:blocs[b].h }; i.h -= hj; } }));
+  /* l'évaluation d'un module : des blocs qui se suivent, le plus tard possible dans la semaine */
+  const evFait = groupes.map(() => new Set());
+  groupes.forEach((g, gi) => Object.keys(g.fin).forEach(k => { let e = g.fin[k]; const it = restes[gi].filter(i => i.m.k === k && i.h > 0); if (!it.length) return;
+    const n = Math.ceil(e / 3), U = blocs.map((b, bi) => bi).filter(bi => blocs[bi].h === 3);
+    for (let st = U.length - n; st >= 0; st--){ const run = U.slice(st, st + n); if (run[n - 1] - run[0] > n - 1 + (run.some(x => x >= 7) && run[0] < 7 ? 1 : 0)) continue;
+      const okP = (p, bi) => p === "-" || (!absent(p, dates[blocs[bi].di], blocs[bi].pm) && !R.some((Ro, og) => og !== gi && Ro[bi] && Ro[bi].p === p));
+      if (run.some(bi => R[gi][bi] || !it.some(i => okP(i.p, bi)))) continue;
+      run.forEach(bi => { const i = it.filter(z => z.h > 0 && okP(z.p, bi)).sort((x, y) => y.h - x.h)[0]; if (!i || e <= 0) return; const u = Math.min(3, e, i.h); R[gi][bi] = { p:i.p, m:i.m, h:u, ev:1 }; i.h -= u; e -= u; }); evFait[gi].add(k); break; } }));
   /* le jeudi PM (1 h) prend d'abord un cours qui a 1 h de trop (ex. 7 h = 3 + 3 + 1) */
   blocs.forEach((b, bi) => { if (b.h !== 1) return; const pris = new Set(); groupes.forEach((g, gi) => { if (PV[gi]) return; const i = restes[gi].find(z => z.h % 3 === 1 && (z.p === "-" || (!pris.has(z.p) && !absent(z.p, dates[b.di], b.pm)))); if (i){ if (i.p !== "-") pris.add(i.p); i.h -= 1; R[gi][bi] = { p:i.p, m:i.m, h:1 }; } }); });
   blocs.map((b, bi) => [b, bi]).sort((x, y) => y[0].h - x[0].h).forEach(([b, bi]) => { const pris = new Set(); if (!b.h) return;   /* blocs de 3 h d'abord; le jeudi PM (1 h) prend ce qui reste */
@@ -356,7 +366,7 @@ function vueSemaine(){ const s = ses(); SW = Math.max(0, Math.min(SW, s.sem.leng
       const i = L.find(z => z.p === "-" || (!pris.has(z.p) && !absent(z.p, dates[b.di], b.pm))); if (!i){ if (L.length) R[gi][bi] = { vide:true }; return; }
       if (i.p !== "-") pris.add(i.p); const u = Math.min(bh(gi, bi), i.h); i.h -= u; R[gi][bi] = { p:i.p, m:i.m, h:u }; }); });
   groupes.forEach((g, gi) => { const E = ((D.echanges || {})[g.nom] || {})[d] || []; E.forEach(([a, b]) => { if (blocs[a].h && blocs[b].h){ const t = R[gi][a]; R[gi][a] = R[gi][b]; R[gi][b] = t; } }); });
-  groupes.forEach((g, gi) => Object.keys(g.fin).forEach(k => { let n = g.fin[k]; for (let bi = blocs.length - 1; bi >= 0 && n > 0; bi--){ const c = R[gi][bi]; if (c && c.m && c.m.k === k){ c.ev = 1; n -= c.h; } } }));
+  groupes.forEach((g, gi) => Object.keys(g.fin).forEach(k => { if (evFait[gi].has(k)) return; let n = g.fin[k]; for (let bi = blocs.length - 1; bi >= 0 && n > 0; bi--){ const c = R[gi][bi]; if (c && c.m && c.m.k === k){ c.ev = 1; n -= c.h; } } }));
   const doubles = new Set(); blocs.forEach((b, bi) => { const vu = {}; groupes.forEach((g, gi) => { const c = R[gi][bi]; if (c && c.p && c.p !== "-"){ if (vu[c.p] != null){ doubles.add(gi + "|" + bi); doubles.add(vu[c.p] + "|" + bi); } else vu[c.p] = gi; } }); });
   const reste = []; restes.forEach((L, gi) => L.forEach(i => { if (i.h > 0) reste.push(`${groupes[gi].nom} : ${i.h} h de ${i.m.titre} n'entrent pas dans les blocs de la semaine`); }));
   if (doubles.size) reste.unshift("Un enseignant est à deux places en même temps (cartes rouges) : déplace une des deux cartes.");
@@ -563,12 +573,22 @@ function sortir(s, m, wi, cond, seulP, combien, sansEchange){ let n = combien ==
   for (const p of Object.keys(cell(s, wi, m.k))){ if (seulP && p !== seulP) continue;
     while (n > 0 && (cell(s, wi, m.k)[p] || 0) > 0){ const x = Math.min(3, n, cell(s, wi, m.k)[p]), r = bouger(s, m, p, wi, x, cond, sansEchange); if (!r) break; n -= r; fait += r; } }
   return fait; }
+/* regroupe les heures d'évaluation d'un module dans sa dernière semaine (échange avec un autre cours, chacun garde son prof) */
+function grouperEval(s, m){ let fait = 0; const EV = evalSem(s, m), W = Object.keys(EV).map(Number).sort((a, b) => a - b); if (W.length < 2) return 0; const L = W[W.length - 1];
+  for (const wi of W.slice(0, -1)){ let n = EV[wi];
+    for (const p of Object.keys(cell(s, wi, m.k)).reverse()){ if (n <= 0) break;
+      for (const m2 of s.mods){ if (n <= 0) break; if (m2 === m || m2.autre || !okDate(m2, s.sem[wi])) continue; const c2 = cell(s, L, m2.k);
+        for (const q of Object.keys(c2)){ if (n <= 0) break; const x = Math.min(n, c2[q], cell(s, wi, m.k)[p] || 0); if (x <= 0) continue;
+          if (q !== p && ((p !== "-" && libre(p, s.sem[L]) < x) || (q !== "-" && libre(q, s.sem[wi]) < x))) continue;
+          retirer(s, wi, m.k, x, p); ajout(s, L, m.k, p, x); retirer(s, L, m2.k, x, q); ajout(s, wi, m2.k, q, x); n -= x; fait += x; } } } }
+  return fait; }
 function regler(a){ const s = ses(); let fait = 0, reste = ""; RAISON = "";
   if (a.fx === "jt"){ const kk = "jt:" + a.ty; if (!s.mods.some(m => m.k === kk)) s.mods.push({ k:kk, code:"", titre:JT[a.ty].n, num:"", h:0, ev:0, profs:[], autre:true, jt:a.ty });
     fixer(s, a.w, kk, "-", totalCase(s, a.w, kk) + a.h); fait = a.h; if (totSem(s, a.w) > s.sem[a.w].h) return regler({ fx:"sem", w:a.w }); }
   if (a.fx === "sessprof"){ s.sem.forEach((w, wi) => s.mods.forEach(m => { const x = cell(s, wi, m.k)[a.p]; if (!x) return;
       const q = profsDe(m).filter(q => q !== a.p && sessOk(q, s) && libre(q, w) >= x).sort((u, v) => libre(v, w) - libre(u, w))[0] || "-";
       retirer(s, wi, m.k, x, a.p); ajout(s, wi, m.k, q, x); fait += x; if (q === "-") reste = "Certaines heures n'ont trouvé personne : elles sont marquées « Non assigné »."; })); }
+  if (a.fx === "eval"){ fait = grouperEval(s, s.mods.find(x => x.k === a.k)); if (!fait) reste = "Je n'ai pas trouvé d'échange possible : les enseignants ne sont pas libres. Utilise « Voir » pour le faire à la main."; }
   if (a.fx === "trou"){ let n0 = s.sem[a.w].h - totSem(s, a.w), n = 0;
     /* en cascade : chaque semaine se comble avec la suivante, tout avance d'un cran (même enseignant, ordre des modules gardé) */
     for (let wi = a.w; wi < s.sem.length - 1; wi++){ const w = s.sem[wi]; if (w.pf) continue; let manque = w.h - totSem(s, wi); if (manque <= 0) continue;
@@ -650,7 +670,7 @@ const AS = { on:false, i:0 };
 function etapesAs(){ const P = Object.keys(D.profs), E = [
   { t:"Bienvenue", q:"On prépare l'horaire ensemble, une question à la fois.", f:() => `<p style="font-size:16px;line-height:1.6">Tu vas répondre à quelques questions simples : l'année scolaire, les congés, le programme, les enseignants. À la fin, l'horaire se bâtit tout seul et tu pourras l'ajuster.</p><p class="mini">Tes réponses sont gardées : tu peux arrêter et revenir.</p>` },
   { t:"L'année scolaire", chk:"annee", q:"Quelles sont la première et la dernière journée de cours de l'année ?", f:() => `<div class="form"><label>Première journée<br><input type="date" id="aDeb" value="${D.cal.debut}"></label><label>Dernière journée<br><input type="date" id="aFin" value="${D.cal.fin}"></label></div>` },
-  { t:"Les journées spéciales", q:"Quels jours n'y a-t-il pas de cours normal ?", reg:"cal" },
+  { t:"Les journées spéciales", q:Object.keys(D.cal.off).length ? `Les journées spéciales de l'année sont déjà entrées (${Object.keys(D.cal.off).length} jours). Elles servent à tous les groupes. Veux-tu en changer ?` : "Quels jours n'y a-t-il pas de cours normal ?", reg:"cal" },
   { t:"Le programme", q:"Voici les modules du programme, dans l'ordre où vous les donnez. Est-ce juste ?", reg:"prog" },
   { t:"Les enseignants", q:"Qui enseigne dans ce programme ?", f:() => `<div class="form">${P.map(p => `<p style="display:flex;gap:8px;align-items:center"><input data-pn="${p}" value="${D.profs[p]}" style="flex:1"><button data-px="${p}">Retirer</button></p>`).join("")}<p><button id="eAj" class="prim">+ Ajouter un enseignant</button></p></div><p class="mini">Maximum par enseignant : <input class="h" id="mxS" inputmode="numeric" value="${maxSem()}" style="width:60px;border:1px solid var(--l);border-radius:6px;padding:4px"> h par semaine.</p>` } ];
   P.forEach(p => {
