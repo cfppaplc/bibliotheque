@@ -3,7 +3,7 @@
 <head>
 <!-- © 2026 Jérémy Raymond. Tous droits réservés. Copie, modification ou revente interdites sans autorisation écrite (voir LICENCE.md). -->
 <meta charset="utf-8">
-<link rel="manifest" href="manifest.webmanifest"><script src="vieux-navigateur.js"></script><script src="signaler.js"></script><script src="plein-ecran.js"></script>
+<link rel="manifest" href="manifest.webmanifest"><script src="vieux-navigateur.js"></script><script src="signaler.js?v=2"></script><script src="plein-ecran.js"></script>
 <link rel="icon" href="img/metier-plus-icone.svg" type="image/svg+xml">
 <script>
 /* Même thème que la bibliothèque (localStorage.accueilClair, sinon l'ordinateur) : tableaux de bord en foncé ou en clair */
@@ -1043,6 +1043,6 @@ function panneau(code){
 /* statistiques anonymes : une ouverture de la télécommande ou de l'animation au tableau */
 if (window.COFFRE && /[?&](tele|animer)=/.test(location.search) && !/inclus=1/.test(location.search)) COFFRE.stat("simu:" + (/[?&]defi=1/.test(location.search) ? "defi" : "libre"));
 </script>
-<script src="js/journal-perf.js?v=3"></script>
+<script src="js/journal-perf.js?v=4"></script>
 </body>
 </html>

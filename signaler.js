@@ -16,6 +16,9 @@
       if (RD && document.querySelector("#reader.open")) {
         var p = ""; try { p = RD.drv && RD.drv.state ? RD.drv.state().label : ""; } catch(e){}
         c.push((RD.wb ? "Tableau blanc" : "Livre : " + ((t && t.textContent) || RD.book)) + (p && !RD.wb ? " · page " + p : ""));
+        try { var o = RD.eraser ? "gomme" : RD.text ? "texte" : (RD.formeK || RD.objK) ? "objet " + (RD.formeK || RD.objK) : RD.crayonOff ? "aucun outil" : "crayon";
+          var nb = 0; try { nb = (typeof INKS !== "undefined" && typeof inkKey === "function") ? (INKS[inkKey()] || []).length : 0; } catch(x){}
+          c.push("Outil : " + o + " · zoom " + (+RD.z || 1).toFixed(2) + " · " + nb + " traits" + (RD.wb && typeof inkKey === "function" ? " · " + inkKey().split("|").pop() : "")); } catch(x){}
       }
     } catch(e){}
     var ua = navigator.userAgent, nav = (ua.match(/(Edg|Chrome|Firefox|Version)\/(\d+)/) || [])[0] || "";

@@ -58,8 +58,16 @@
       if (!(e.scripts || []).length) scripts["dessin (pas de script)"] = (scripts["dessin (pas de script)"] || 0) + Math.round(e.duration);
     })).observe({ type: "long-animation-frame", buffered: false });
   } catch(e){}
+  /* 17 nov. : traits perdus (geste au crayon qui bouge mais ne laisse aucun trait) et mémoire pleine */
+  let perdus = 0, ex = [], G = null;
+  addEventListener("pointerdown", e => { try { const RD = window.RD; if (!RD || !e.target || e.target.id !== "inkCanvas" || RD.crayonOff || RD.eraser || RD.text || RD.formeK || RD.objK) { G = null; return; }
+    G = G ? null : { id: e.pointerId, x: e.clientX, y: e.clientY, d: 0, n: (INKS[inkKey()] || []).length, t: e.pointerType + " " + Math.round(e.width || 0) + "×" + Math.round(e.height || 0) }; } catch(x){ G = null; } }, true);
+  addEventListener("pointermove", e => { if (G && e.pointerId === G.id) G.d = Math.max(G.d, Math.hypot(e.clientX - G.x, e.clientY - G.y)); }, true);
+  addEventListener("pointerup", e => { const g = G; G = null; if (!g || e.pointerId !== g.id || g.d < 30) return;
+    setTimeout(() => { try { if ((INKS[inkKey()] || []).length <= g.n && !(typeof PZ !== "undefined" && PZ.actif)) { perdus++; if (ex.length < 4) ex.push(g.t + ", " + Math.round(g.d) + " px, " + new Date().toLocaleTimeString("fr-CA")); } } catch(x){} }, 500); }, true);
   function rapport(){
-    if (!lentes || envois >= 12) return null;
+    let plein = false; try { plein = typeof sauveAvis !== "undefined" && !!sauveAvis; } catch(x){}
+    if ((!lentes && !perdus && !plein) || envois >= 12) return null;
     const min = Math.round((Date.now() - debut) / 60000);
     const L = ["Sur " + min + " min : " + lentes + " accrochages sur " + images + " images (" + Math.round(perdu / 1000) + " s perdues)",
       "Écran " + screen.width + "×" + screen.height + " ×" + devicePixelRatio + " · " + ((navigator.userAgent.match(/Chrome\/[\d]+/) || [""])[0]) + (/Android/.test(navigator.userAgent) ? " Android" : ""), "", "Où :"];
@@ -68,7 +76,9 @@
     L.push("", "Pires :"); pires.forEach(p => L.push("- " + p[0] + " ms, " + p[1] + ", " + p[2]));
     const S = Object.entries(scripts).sort((a, b) => b[1] - a[1]).slice(0, 8);
     if (S.length) { L.push("", "Code responsable :"); S.forEach(([k, ms]) => L.push("- " + k + " : " + ms + " ms")); }
-    envois++; debut = Date.now(); images = lentes = perdu = 0;
+    if (perdus) { L.push("", "Traits perdus (crayon qui bouge sans laisser de trait) : " + perdus); ex.forEach(x => L.push("- " + x)); }
+    if (plein) L.push("", "Mémoire pleine : les tableaux ne s'enregistrent plus.");
+    envois++; debut = Date.now(); images = lentes = perdu = 0; perdus = 0; ex = [];
     for (const k in parCtx) delete parCtx[k]; for (const k in scripts) delete scripts[k]; pires.length = 0;
     return L.join("\n");
   }

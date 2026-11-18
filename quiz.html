@@ -3,7 +3,7 @@
 <head>
 <!-- © 2026 Jérémy Raymond. Tous droits réservés. Copie, modification ou revente interdites sans autorisation écrite (voir LICENCE.md). -->
 <meta charset="utf-8">
-<link rel="manifest" href="manifest.webmanifest"><script src="vieux-navigateur.js"></script><script src="signaler.js"></script><script src="plein-ecran.js"></script>
+<link rel="manifest" href="manifest.webmanifest"><script src="vieux-navigateur.js"></script><script src="signaler.js?v=2"></script><script src="plein-ecran.js"></script>
 <link rel="icon" href="img/metier-plus-icone.svg" type="image/svg+xml">
 <script>
 /* Même thème que la bibliothèque (localStorage.accueilClair, sinon l'ordinateur) : tableaux de bord en foncé ou en clair */
@@ -149,6 +149,6 @@ if (window.COFFRE && !/[?&](j|ecran|panneau)=/.test(location.search))
     d.open = !!(ex.value.trim() || im.querySelector("img")); ex.before(d); d.appendChild(ex); d.appendChild(im); }); }
   new MutationObserver(ranger).observe(Z, { childList:true }); ranger(); })();
 </script>
-<script src="js/journal-perf.js?v=3"></script>
+<script src="js/journal-perf.js?v=4"></script>
 </body>
 </html>
