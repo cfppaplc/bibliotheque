@@ -69,6 +69,14 @@ table.ed td,table.ed th{border-bottom:1px solid var(--l);padding:4px;font-size:1
 table.ed .n{width:56px}table.ed .c{width:86px}table.ed .h{width:60px}
 .chip{display:inline-block;border:1px solid var(--l);border-radius:99px;padding:3px 8px;margin:2px;font-size:11px;cursor:pointer;background:#fff}.chip.on{background:var(--or);border-color:var(--or);color:#fff}
 .form label{display:block;margin:10px 0}.form input,.form select{border:1px solid var(--l);border-radius:8px;padding:8px;min-width:260px}
+
+.calhaut{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--l)}.calhaut b{font-size:16px}
+.cal{display:grid;grid-template-columns:110px repeat(5,minmax(150px,1fr));min-width:900px}
+.cal-j{padding:10px;border-bottom:1px solid var(--l);border-left:1px solid var(--l);font-size:13px;color:var(--gris)}.cal-j b{color:var(--mar)}.cal-j.off{background:#F3F0EA}
+.cal-h{padding:12px 10px;border-bottom:1px solid var(--l);font-size:13px}.cal-h small{display:block;color:var(--gris)}
+.cal-b{border-left:1px solid var(--l);border-bottom:1px solid var(--l);padding:6px;min-height:150px;display:flex;flex-direction:column;gap:6px}.cal-b.off{background:repeating-linear-gradient(45deg,#F6F3EE,#F6F3EE 8px,#EFEAE2 8px,#EFEAE2 16px)}
+.ev{border-left:5px solid;border-radius:8px;padding:7px 9px;font-size:12px;background:#fff}.ev b{display:block;font-size:13px;margin-bottom:2px}.ev span{color:var(--gris)}
+.ev.conge{border-color:#B8AFA2;background:#fff;font-weight:600;color:var(--gris)}.ev.pv{border-color:#1E8A55;background:#E3F4EA}
 @media print{header,.haut .noprint,.menu,#pop,.noprint{display:none!important}.carte{max-height:none;overflow:visible;border:0}body{background:#fff}thead th,td.nom,tfoot td{position:static}@page{size:landscape;margin:7mm}}
 </style>
 </head>
@@ -285,25 +293,31 @@ function vueProfs(){ const s = ses(), C = charges(), d0 = s.sem[0].d, d1 = s.sem
 /* ---- Vue Semaine : horaire par bloc (lundi au vendredi, AM / PM), tous les groupes en même temps.
    Blocs de 3 h, sauf jeudi PM = 1 h de cours (+ 2 h de plage verte). Placement sans mettre un prof à deux places. ---- */
 const BLOCS = [["Lundi","AM",3],["Lundi","PM",3],["Mardi","AM",3],["Mardi","PM",3],["Mercredi","AM",3],["Mercredi","PM",3],["Jeudi","AM",3],["Jeudi","PM",1],["Vendredi","AM",3],["Vendredi","PM",3]];
-function vueSemaine(){ const s = ses(); SW = Math.min(SW, s.sem.length - 1); const d = s.sem[SW].d;
-  const groupes = [], A = {}; D.groupes.forEach(g => g.sessions.forEach(x => x.sem.forEach((w, wi) => { if (w.d !== d) return;
-    const items = []; const W = x.g[wi] || {}; for (const k in W){ const m = x.mods.find(y => y.k === k); if (!m || m.autre) continue; for (const p in W[k]) items.push({ p, m, h:W[k][p] }); }
-    groupes.push({ nom:g.nom, h:w.h, items }); })));
-  // placement : bloc par bloc, chaque groupe prend l'activité la plus chargée dont le prof est libre dans ce bloc
-  const R = groupes.map(() => []), restes = groupes.map(g => g.items.map(i => Object.assign({}, i))), dispo = groupes.map(g => g.h);
-  BLOCS.forEach((b, bi) => { const pris = new Set();
-    groupes.forEach((g, gi) => { if (dispo[gi] <= 0){ R[gi][bi] = null; return; } const dur = Math.min(b[2], dispo[gi]);
-      const L = restes[gi].filter(i => i.h > 0).sort((x, y) => (y.h >= dur) - (x.h >= dur) || y.h - x.h);
-      const i = L.find(z => z.p === "-" || !pris.has(z.p)) ; if (!i){ R[gi][bi] = { vide:true }; dispo[gi] -= dur; return; }
-      if (i.p !== "-") pris.add(i.p); const u = Math.min(dur, i.h); i.h -= u; dispo[gi] -= dur; R[gi][bi] = { p:i.p, m:i.m, h:u }; }); });
-  const reste = []; restes.forEach((L, gi) => L.forEach(i => { if (i.h > 0) reste.push(`${groupes[gi].nom} : ${i.h} h de ${i.m.titre} (${D.profs[i.p] || "?"}) n'ont pas trouvé de bloc`); }));
+function vueSemaine(){ const s = ses(); SW = Math.max(0, Math.min(SW, s.sem.length - 1)); const d = s.sem[SW].d; prepDonnees();
+  const JOURS = ["Lundi","Mardi","Mercredi","Jeudi","Vendredi"], dates = JOURS.map((x, i) => { const z = new Date(d + "T12:00"); z.setDate(z.getDate() + i); return iso(z); });
+  const congé = dates.map(x => D.cal && D.cal.off ? D.cal.off[x] : "");
+  // groupes présents cette semaine et leurs heures (modules d'abord, autres activités ensuite; la plage verte a sa place fixe le jeudi PM)
+  const groupes = []; D.groupes.forEach(g => g.sessions.forEach(x => x.sem.forEach((w, wi) => { if (w.d !== d) return; const items = [], W = x.g[wi] || {};
+    for (const k in W){ const m = x.mods.find(y => y.k === k); if (!m || /plage verte/i.test(m.titre)) continue; for (const p in W[k]) items.push({ p, m, h:W[k][p] }); }
+    groupes.push({ nom:g.nom, items }); })));
+  const blocs = []; JOURS.forEach((j, di) => ["AM", "PM"].forEach(pm => blocs.push({ di, pm, h: congé[di] ? 0 : (j === "Jeudi" && pm === "PM" ? 1 : 3) })));
+  const R = groupes.map(() => []), restes = groupes.map(g => g.items.map(i => Object.assign({}, i)));
+  blocs.forEach((b, bi) => { const pris = new Set(); if (!b.h) return;
+    groupes.forEach((g, gi) => { const L = restes[gi].filter(i => i.h > 0).sort((x, y) => (x.m.autre - y.m.autre) || ((y.h >= b.h) - (x.h >= b.h)) || y.h - x.h);
+      const i = L.find(z => z.p === "-" || !pris.has(z.p)); if (!i){ if (L.length) R[gi][bi] = { vide:true }; return; }
+      if (i.p !== "-") pris.add(i.p); const u = Math.min(b.h, i.h); i.h -= u; R[gi][bi] = { p:i.p, m:i.m, h:u }; }); });
+  const reste = []; restes.forEach((L, gi) => L.forEach(i => { if (i.h > 0) reste.push(`${groupes[gi].nom} : ${i.h} h de ${i.m.titre} n'entrent pas dans les blocs de la semaine`); }));
   $("#leg").innerHTML = Object.keys(D.profs).map(p => `<span class="lp"><i style="background:${couleur(p)}">${p}</i><b>${D.profs[p]}</b></span>`).join("");
-  let h = `<div style="display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--l)"><button data-nw="-1">‹</button><b>Semaine du ${dt(d).toLocaleDateString("fr-CA", { day:"numeric", month:"long", year:"numeric" })}</b><button data-nw="1">›</button><span class="mini">Proposition de placement par bloc (les heures viennent de la vue Groupe)</span></div>`;
-  h += `<table style="width:100%"><thead><tr><th class="nom">Bloc</th>` + groupes.map(g => `<th style="min-width:220px">${g.nom} · ${g.h} h</th>`).join("") + `</tr></thead><tbody>`;
-  BLOCS.forEach((b, bi) => { h += `<tr><td class="nom"><b>${b[0]} ${b[1]}</b><small>${b[2]} h${b[0] === "Jeudi" && b[1] === "PM" ? " + plage verte 2 h" : ""}</small></td>` +
-    groupes.map((g, gi) => { const c = R[gi][bi]; if (!c) return `<td class="c" style="color:#bbb">—</td>`; if (c.vide) return `<td class="c" style="background:#FBE3E0;color:var(--err)">Aucun prof libre</td>`;
-      return `<td class="c" style="text-align:left;padding:6px 10px"><span class="puce" style="background:${c.p === "-" ? "#B8AFA2" : couleur(c.p)}">${c.p === "-" ? "?" : c.p}</span> ${c.m.titre} <small style="color:var(--gris)">${c.h} h</small></td>`; }).join("") + `</tr>`; });
-  $("#vue").innerHTML = h + `</tbody></table>`;
+  const carte = (c, g) => c.vide ? `<div class="ev" style="border-color:var(--err);background:#FBE3E0;color:var(--err)"><b>${g}</b>Aucun prof libre</div>` :
+    `<div class="ev" style="border-color:${c.p === "-" ? "#B8AFA2" : couleur(c.p)};background:${c.p === "-" ? "#F3F0EA" : couleur(c.p) + "14"}"><b>${groupes.length > 1 ? g + " · " : ""}${c.m.titre}</b><span>${c.p === "-" ? "" : (D.profs[c.p] || c.p) + " · "}${c.h} h</span></div>`;
+  let h = `<div class="calhaut"><button data-nw="-1">‹</button><b>Semaine du ${dt(d).toLocaleDateString("fr-CA", { day:"numeric", month:"long", year:"numeric" })}</b><button data-nw="1">›</button><span class="esp"></span><span class="mini">${groupes.map(g => g.nom).join(" · ") || "Aucun groupe cette semaine"}</span></div>
+  <div class="cal"><div class="cal-c"></div>` + JOURS.map((j, di) => `<div class="cal-j ${congé[di] ? "off" : ""}"><b>${j}</b> ${dt(dates[di]).getDate()}</div>`).join("");
+  ["AM", "PM"].forEach(pm => { h += `<div class="cal-h"><b>${pm === "AM" ? "Avant-midi" : "Après-midi"}</b><small>3 h</small></div>`;
+    JOURS.forEach((j, di) => { const bi = di * 2 + (pm === "PM" ? 1 : 0);
+      if (congé[di]){ h += `<div class="cal-b off"><div class="ev conge">${congé[di]}</div></div>`; return; }
+      h += `<div class="cal-b">` + groupes.map((g, gi) => R[gi][bi] ? carte(R[gi][bi], g.nom) : "").join("") +
+        (j === "Jeudi" && pm === "PM" ? `<div class="ev pv"><b>Plage verte</b><span>2 h · récupération</span></div>` : "") + `</div>`; }); });
+  $("#vue").innerHTML = h + `</div>`;
   $("#etat").className = "etat " + (reste.length ? "err" : "ok"); $("#etat").textContent = reste.length ? reste.length + " point" + (reste.length > 1 ? "s" : "") + " à régler" : "Semaine possible sans conflit";
   $("#alertes").innerHTML = $("#alertes").dataset.ouv ? reste.map(a => `<div class="alert">${a}</div>`).join("") : "";
 }
