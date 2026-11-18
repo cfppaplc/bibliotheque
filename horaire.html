@@ -108,7 +108,7 @@ table.ed .n{width:56px}table.ed .c{width:86px}table.ed .h{width:60px}
 <div id="guide" class="noprint" hidden style="background:#fff;border:1px solid var(--l);border-left:5px solid var(--or);border-radius:12px;padding:14px 18px;margin-bottom:12px">
   <b style="font-size:15px">Comment ça marche</b> <button id="gX" style="float:right;padding:4px 10px">Compris</button>
   <ol style="margin:8px 0 0;padding-left:20px;line-height:1.7">
-    <li><b>Préparer l'année</b> (une fois) : la tâche de chaque enseignant, les congés, les programmes.</li>
+    <li><b>Assistant pas à pas</b> : réponds aux questions (année, congés, programme, enseignants). Une à la fois.</li>
     <li><b>+ Nouveau groupe</b> : l'horaire se bâtit tout seul, 3 matières à la fois, sans prof à deux places.</li>
     <li><b>Ajuste</b> : touche une case pour ajouter ou retirer un bloc de 3 h. La pastille en haut te dit quand tout est correct.</li>
   </ol></div>
@@ -483,6 +483,40 @@ function calAbs(p){ prepDonnees(); D.abs = D.abs || {}; const A = D.abs[p] = D.a
 $("#dlgC").addEventListener("click", e => { const b = e.target.closest("[data-pa]"); if (b){ calAbs(b.dataset.pa); return; }
   const r = e.target.closest("[data-rec]"); if (r){ const [p, wd, pm] = r.dataset.rec.split("|"), L = ((D.absRec = D.absRec || {})[p] = D.absRec[p] || []), k = wd + "|" + pm, i = L.indexOf(k); if (i < 0) L.push(k); else L.splice(i, 1); sauver(); calAbs(p); dessiner(); return; }
   const a = e.target.closest("[data-ab]"); if (a && a.dataset.ab){ const [p, k] = a.dataset.ab.split("|"), A = D.abs[p]; if (A[k]) delete A[k]; else A[k] = 1; sauver(); calAbs(p); dessiner(); } });
+/* ===== Assistant pas à pas (17 nov., « une question à la fois, pour le prof qui n'en a jamais fait ») ===== */
+const AS = { on:false, i:0 };
+function etapesAs(){ const P = Object.keys(D.profs), E = [
+  { t:"Bienvenue", q:"On prépare l'horaire ensemble, une question à la fois.", f:() => `<p style="font-size:16px;line-height:1.6">Tu vas répondre à quelques questions simples : l'année scolaire, les congés, le programme, les enseignants. À la fin, l'horaire se bâtit tout seul et tu pourras l'ajuster.</p><p class="mini">Tes réponses sont gardées : tu peux arrêter et revenir.</p>` },
+  { t:"L'année scolaire", q:"Quelles sont la première et la dernière journée de cours de l'année ?", f:() => `<div class="form"><label>Première journée<br><input type="date" id="aDeb" value="${D.cal.debut}"></label><label>Dernière journée<br><input type="date" id="aFin" value="${D.cal.fin}"></label></div>` },
+  { t:"Les journées spéciales", q:"Quels jours n'y a-t-il pas de cours normal ?", reg:"cal" },
+  { t:"Le programme", q:"Voici les modules du programme, dans l'ordre où vous les donnez. Est-ce juste ?", reg:"prog" },
+  { t:"Les enseignants", q:"Qui enseigne dans ce programme ?", f:() => `<div class="form">${P.map(p => `<p style="display:flex;gap:8px;align-items:center"><input data-pn="${p}" value="${D.profs[p]}" style="flex:1"><button data-px="${p}">Retirer</button></p>`).join("")}<p><button id="eAj" class="prim">+ Ajouter un enseignant</button></p></div><p class="mini">Maximum par enseignant : <input class="h" id="mxS" inputmode="numeric" value="${maxSem()}" style="width:60px;border:1px solid var(--l);border-radius:6px;padding:4px"> h par semaine.</p>` } ];
+  P.forEach(p => {
+    E.push({ t:D.profs[p], q:`Combien d'heures de cours ${D.profs[p]} doit-il donner dans l'année, et quels modules peut-il donner ?`, f:() => { const codes = []; Object.values(D.prog).forEach(Pr => Pr.mods.forEach(m => { if (m.code && !codes.some(c => c.code === m.code)) codes.push(m); }));
+      return `<div class="form"><label>Tâche prévue (heures dans l'année, tous groupes)<br><input data-pt="${p}" inputmode="numeric" value="${(D.cible || {})[p] || ""}" placeholder="ex. 450"></label></div><p><b>Touche les modules qu'il peut donner :</b></p><p>${codes.map(m => `<span class="chip ${(D.peut[p] || []).includes(m.code) ? "on" : ""}" data-pc="${p}|${m.code}" style="padding:8px 12px;font-size:13px">${m.num} · ${m.titre}</span>`).join("")}</p>`; } });
+    E.push({ t:D.profs[p], q:`Y a-t-il des moments, chaque semaine, où ${D.profs[p]} ne peut jamais enseigner ?`, f:() => `<p class="mini">Exemple : réunion tous les mardis après-midi. Laisse vide s'il est toujours disponible.</p><p>${[1,2,3,4,5].map(wd => ["AM","PM"].map(pm => `<span class="chip ${REC(p).includes(wd + "|" + pm) ? "on" : ""}" data-rec="${p}|${wd}|${pm}" style="padding:8px 12px;font-size:13px">${["","Lundi","Mardi","Mercredi","Jeudi","Vendredi"][wd]} ${pm === "AM" ? "avant-midi" : "après-midi"}</span>`).join("")).join(" ")}</p><p class="mini">Des jours précis (formation, congé) ? Tu pourras les ajouter plus tard dans « Préparer l'année ».</p>` }); });
+  E.push({ t:"Le groupe", q:"Quel groupe veux-tu planifier ?", f:() => { const lun = new Date(D.cal.debut + "T12:00"); lun.setDate(lun.getDate() - (lun.getDay() + 6) % 7);
+    return `<div class="form"><label>Nom du groupe<br><input id="nN" value="${AS.nom || ""}" placeholder="ex. 2026EGI2"></label><label>Programme<br><select id="nP">${Object.keys(D.prog).map(i => `<option value="${i}" ${AS.prog === i ? "selected" : ""}>${D.prog[i].nom}</option>`).join("")}</select></label><label>Première semaine du groupe<br><input type="date" id="nD" value="${AS.deb || iso(lun)}"></label><label>Titulaire (facultatif)<br><input id="nT" value="${AS.tit || ""}"></label></div>`; } });
+  E.push({ t:"C'est prêt", q:"Tout est en place. On bâtit l'horaire ?", f:() => `<ul style="font-size:15px;line-height:1.8"><li>Année : du ${jm(D.cal.debut)} au ${jm(D.cal.fin)}, ${Object.keys(D.cal.off).length} journées spéciales</li><li>Programme : ${(D.prog[AS.prog] || {}).nom || ""}</li><li>${Object.keys(D.profs).length} enseignants, ${maxSem()} h par semaine au maximum</li><li>Groupe : <b>${AS.nom || "?"}</b>, à partir du ${AS.deb ? jm(AS.deb) : "?"}</li></ul><p class="mini">L'horaire ouvre 3 matières à la fois, respecte les tâches, les absences et les dates. Tu pourras tout ajuster ensuite.</p>`, fin:true });
+  return E; }
+function assistant(){ const E = etapesAs(); AS.i = Math.max(0, Math.min(AS.i, E.length - 1)); const e = E[AS.i];
+  if (e.reg){ AS.on = false; _reg(e.reg); AS.on = true; const c = $("#dlgC"); c.querySelectorAll("h2,.ong2").forEach(x => x.remove()); const corps = c.innerHTML; c.innerHTML = ""; c.dataset.corps = corps; }
+  const corps = e.reg ? $("#dlgC").dataset.corps : e.f();
+  $("#dlgC").innerHTML = `<div style="height:6px;background:#EEE9E1;border-radius:9px;overflow:hidden;margin-bottom:14px"><i style="display:block;height:100%;width:${(AS.i + 1) / E.length * 100}%;background:var(--or)"></i></div>
+  <div class="mini">Étape ${AS.i + 1} sur ${E.length} · ${e.t}</div><h2 style="margin:6px 0 14px;font-size:22px">${e.q}</h2>${corps}
+  <p style="display:flex;justify-content:space-between;margin-top:20px">${AS.i ? `<button data-as="-1">‹ Précédent</button>` : `<span></span>`}${e.fin ? `<button class="prim" id="asCree" style="font-size:16px;padding:10px 20px">Bâtir l'horaire</button>` : `<button class="prim" data-as="1" style="font-size:16px;padding:10px 20px">Suivant ›</button>`}</p>`;
+  if (!dlg.open) dlg.showModal(); }
+function lireAs(){ const v = id => { const x = document.getElementById(id); return x ? x.value.trim() : null; };
+  if (v("aDeb")) D.cal.debut = v("aDeb"); if (v("aFin")) D.cal.fin = v("aFin");
+  if (v("nN") != null){ AS.nom = v("nN"); AS.prog = v("nP"); AS.deb = v("nD"); AS.tit = v("nT"); } sauver(); }
+$("#dlgC").addEventListener("click", e => { const b = e.target.closest("[data-as]"); if (b && AS.on){ lireAs(); if (+b.dataset.as > 0 && document.getElementById("nN") && !AS.nom){ $("#nN").focus(); return; } AS.i += +b.dataset.as; assistant(); return; }
+  if (e.target.id === "asCree" && AS.on){ AS.on = false; dlgNouveau(); $("#nN").value = AS.nom; $("#nP").value = AS.prog; $("#nD").value = AS.deb; $("#nT").value = AS.tit || ""; D.prepare = 1; $("#nOk").click(); } });
+dlg.addEventListener("close", () => { AS.on = false; });
+const _calAbs = calAbs; calAbs = function(p){ if (AS.on) return assistant(); return _calAbs(p); };
+const _reg2 = reglages; reglages = function(t){ if (AS.on) return assistant(); return _reg2(t); };
+$("#bAnnee").onclick = () => { AS.on = true; AS.i = 0; assistant(); };
+$("#bNouv").onclick = () => { if (!D.prepare){ AS.on = true; AS.i = 0; assistant(); } else dlgNouveau(); };
+$("#bAnnee").textContent = "Assistant pas à pas";
 dessiner();
 </script>
 </body>
