@@ -183,6 +183,7 @@ function dessiner(){ if (D.groupes.some(g => remplirTrous(g))) sauver();
   h += `</tr></thead><tbody>`;
   const ligne = m => { const k = m.k, fait = s.sem.reduce((a, w, wi) => a + totalCase(s, wi, k), 0), pct = m.h ? Math.min(100, fait / m.h * 100) : 0, cl = !m.h ? "" : fait > m.h ? "trop" : fait < m.h ? "manque" : "";
     if (m.apres){ const avant = s.sem.findIndex(w => { const z = new Date(w.d + "T12:00"); z.setDate(z.getDate() + 4); return iso(z) < m.apres && totalCase(s, s.sem.indexOf(w), k) > 0; }); if (avant >= 0) prob.push({ t:`${m.titre} commence avant le ${dt(m.apres).toLocaleDateString("fr-CA", { day:"numeric", month:"long" })}`, k, w:avant, fx:"apres" }); }
+    { const na = m.autre ? 0 : s.sem.reduce((t, w, wi) => t + (cell(s, wi, k)["-"] || 0), 0); if (na) prob.push({ t:`${m.titre} : ${na} h sans enseignant (non assigné)`, k, fx:"na" }); }
     if (!m.autre && Object.keys(evalSem(s, m)).length > 1) prob.push({ t:`L'évaluation de ${m.titre} (${Math.max(3, +m.ev || 0)} h) est séparée sur deux semaines`, k, fx:"eval", niv:"j" });
     if (!m.autre && fait !== m.h) prob.push({ t:`${m.titre} : ${fait} h placées sur ${m.h} h (${fait > m.h ? "enlève" : "ajoute"} ${Math.abs(fait - m.h)} h)`, k, fx:"mod" });
     let r = `<tr class="${m.autre ? "autre" : ""}"><td class="nom" data-mk="${k}" title="Toucher pour une date « pas avant »" style="cursor:pointer"><b>${m.autre ? `<i style="display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;background:${coulAutre(m)}"></i>` : ""}${m.num ? m.num + " · " : ""}${m.titre}</b><small>${m.code ? m.code + " · " : ""}${m.apres ? "dès le " + jm(m.apres) + " · " : ""}${fait} / ${m.h} h${m.ev ? " · éval " + m.ev + " h" : ""}${cl === "" && m.h && !m.autre ? " ✓" : ""}</small>${m.autre ? "" : `<div class="barre ${cl}"><i style="width:${pct}%"></i></div>`}</td>`;
@@ -590,6 +591,12 @@ function regler(a){ const s = ses(); let fait = 0, reste = ""; RAISON = "";
   if (a.fx === "sessprof"){ s.sem.forEach((w, wi) => s.mods.forEach(m => { const x = cell(s, wi, m.k)[a.p]; if (!x) return;
       const q = profsDe(m).filter(q => q !== a.p && sessOk(q, s) && libre(q, w) >= x).sort((u, v) => libre(v, w) - libre(u, w))[0] || "-";
       retirer(s, wi, m.k, x, a.p); ajout(s, wi, m.k, q, x); fait += x; if (q === "-") reste = "Certaines heures n'ont trouvé personne : elles sont marquées « Non assigné »."; })); }
+  if (a.fx === "na"){ const m = s.mods.find(x => x.k === a.k), TA = totalAnnee(), resteT = q => (+((D.cible || {})[q]) || 1e6) - (TA[q] || 0);
+    const P = profsDe(m).filter(q => sessOk(q, s)); let rest = 0;
+    if (!P.length) reste = `Personne n'a « ${m.titre} » de coché. Coche ce module pour un enseignant (Réglages → Enseignants), puis clique encore « Régler ».`;
+    else s.sem.forEach((w, wi) => { let x = cell(s, wi, m.k)["-"] || 0; while (x > 0){ const q = P.filter(q => libre(q, w) > 0).sort((u, v) => resteT(v) - resteT(u))[0]; if (!q) break;
+      const u = Math.min(x, libre(q, w)); retirer(s, wi, m.k, u, "-"); ajout(s, wi, m.k, q, u); TA[q] = (TA[q] || 0) + u; x -= u; fait += u; } rest += x; });
+    if (P.length && rest) reste = `${rest} h restent sans enseignant : ${P.map(q => D.profs[q]).join(", ")} ${P.length > 1 ? "sont pleins" : "est plein"} ces semaines-là. Coche ce module pour un autre enseignant, ou accepte de dépasser ${maxSem()} h.`; }
   if (a.fx === "eval"){ fait = grouperEval(s, s.mods.find(x => x.k === a.k)); if (!fait) reste = "Je n'ai pas trouvé d'échange possible : les enseignants ne sont pas libres. Utilise « Voir » pour le faire à la main."; }
   if (a.fx === "trou"){ let n0 = s.sem[a.w].h - totSem(s, a.w), n = 0;
     /* en cascade : chaque semaine se comble avec la suivante, tout avance d'un cran (même enseignant, ordre des modules gardé) */
