@@ -149,6 +149,7 @@ const sesIdx = s => { const g = D.groupes.find(g => g.sessions.includes(s)); ret
 const sessOk = (p, s) => { const L = (D.sessProf || {})[p]; return p === "-" || !L || !L.length || L.includes(sesIdx(s)); };
 const MAUVE = "#7B3FA0";
 const derSem = (s, k) => { for (let i = s.sem.length - 1; i >= 0; i--) if (totalCase(s, i, k) > 0) return i; return -1; };   /* les 3 dernières heures d'un module = évaluation, en mauve */
+const evalSem = (s, m) => { const E = {}; let n = Math.max(3, +m.ev || 0); for (let i = s.sem.length - 1; i >= 0 && n > 0; i--){ const t = totalCase(s, i, m.k); if (t){ E[i] = Math.min(n, t); n -= E[i]; } } return E; };   /* heures d'évaluation (3 h, ou plus si l'éval est plus longue), à la fin du module */
 const maxSem = () => +((D && D.maxSem) || 18);
 function charges(){ const C = {};
   D.groupes.forEach(g => g.sessions.forEach(s => s.sem.forEach((w, wi) => { const W = s.g[wi] || {};
@@ -182,9 +183,9 @@ function dessiner(){ if (D.groupes.some(g => remplirTrous(g))) sauver();
     if (m.apres){ const avant = s.sem.findIndex(w => { const z = new Date(w.d + "T12:00"); z.setDate(z.getDate() + 4); return iso(z) < m.apres && totalCase(s, s.sem.indexOf(w), k) > 0; }); if (avant >= 0) prob.push({ t:`${m.titre} commence avant le ${dt(m.apres).toLocaleDateString("fr-CA", { day:"numeric", month:"long" })}`, k, w:avant, fx:"apres" }); }
     if (!m.autre && fait !== m.h) prob.push({ t:`${m.titre} : ${fait} h placées sur ${m.h} h (${fait > m.h ? "enlève" : "ajoute"} ${Math.abs(fait - m.h)} h)`, k, fx:"mod" });
     let r = `<tr class="${m.autre ? "autre" : ""}"><td class="nom" data-mk="${k}" title="Toucher pour une date « pas avant »" style="cursor:pointer"><b>${m.autre ? `<i style="display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;background:${coulAutre(m)}"></i>` : ""}${m.num ? m.num + " · " : ""}${m.titre}</b><small>${m.code ? m.code + " · " : ""}${m.apres ? "dès le " + jm(m.apres) + " · " : ""}${fait} / ${m.h} h${m.ev ? " · éval " + m.ev + " h" : ""}${cl === "" && m.h && !m.autre ? " ✓" : ""}</small>${m.autre ? "" : `<div class="barre ${cl}"><i style="width:${pct}%"></i></div>`}</td>`;
-    const der = m.autre ? -1 : derSem(s, k);
-    s.sem.forEach((w, wi) => { const c = cell(s, wi, k), ps = Object.keys(c), ev = wi === der;
-      r += `<td class="c" data-w="${wi}" data-k="${k}">` + ps.map((p, i) => { let v = c[p]; const fin = ev && i === ps.length - 1, e = fin ? Math.min(3, v) : 0; v -= e;
+    const EV = m.autre ? {} : evalSem(s, m);
+    s.sem.forEach((w, wi) => { const c = cell(s, wi, k), ps = Object.keys(c); let resteE = EV[wi] || 0;
+      r += `<td class="c" data-w="${wi}" data-k="${k}">` + ps.slice().reverse().map(p => { let v = c[p]; const e = Math.min(resteE, v); resteE -= e; v -= e; return [p, v, e]; }).reverse().map(([p, v, e]) => {
         return (v ? `<span class="puce ${FILTRE === p ? "vu" : ""}" style="background:${m.autre ? coulAutre(m) : couleur(p)}" title="${D.profs[p] || "Non assigné"}">${v}</span>` : "") + (e ? `<span class="puce ${FILTRE === p ? "vu" : ""}" style="background:${MAUVE}" title="Évaluation (3 dernières heures) · ${D.profs[p] || "Non assigné"}">${e}</span>` : ""); }).join("") + `</td>`; });
     return r + `</tr>`; };
   s.mods.filter(m => !m.autre).forEach(m => h += ligne(m));
@@ -335,7 +336,7 @@ function vueSemaine(){ const s = ses(); SW = Math.max(0, Math.min(SW, s.sem.leng
   // groupes présents cette semaine et leurs heures (modules d'abord, autres activités ensuite; la plage verte a sa place fixe le jeudi PM)
   const groupes = []; D.groupes.forEach(g => g.sessions.forEach(x => x.sem.forEach((w, wi) => { if (w.d !== d) return; const items = [], W = x.g[wi] || {};
     for (const k in W){ const m = x.mods.find(y => y.k === k); if (!m || m.jt || /plage verte/i.test(m.titre)) continue; for (const p in W[k]) items.push({ p, m, h:W[k][p] }); }
-    groupes.push({ nom:g.nom, items, s:x, wi, fin:new Set(x.mods.filter(m => !m.autre && derSem(x, m.k) === wi).map(m => m.k)) }); })));
+    const fin = {}; x.mods.forEach(m => { if (!m.autre){ const e = evalSem(x, m)[wi]; if (e) fin[m.k] = e; } }); groupes.push({ nom:g.nom, items, s:x, wi, fin }); })));
   const blocs = []; JOURS.forEach((j, di) => ["AM", "PM"].forEach(pm => blocs.push({ di, pm, h: congé[di] ? 0 : (j === "Jeudi" && pm === "PM" ? 1 : 3) })));
   const R = groupes.map(() => []), restes = groupes.map(g => g.items.map(i => Object.assign({}, i)));
   blocs.map((b, bi) => [b, bi]).sort((x, y) => y[0].h - x[0].h).forEach(([b, bi]) => { const pris = new Set(); if (!b.h) return;   /* blocs de 3 h d'abord; le jeudi PM (1 h) prend ce qui reste */
@@ -343,7 +344,7 @@ function vueSemaine(){ const s = ses(); SW = Math.max(0, Math.min(SW, s.sem.leng
       const i = L.find(z => z.p === "-" || (!pris.has(z.p) && !absent(z.p, dates[b.di], b.pm))); if (!i){ if (L.length) R[gi][bi] = { vide:true }; return; }
       if (i.p !== "-") pris.add(i.p); const u = Math.min(b.h, i.h); i.h -= u; R[gi][bi] = { p:i.p, m:i.m, h:u }; }); });
   groupes.forEach((g, gi) => { const E = ((D.echanges || {})[g.nom] || {})[d] || []; E.forEach(([a, b]) => { if (blocs[a].h && blocs[b].h){ const t = R[gi][a]; R[gi][a] = R[gi][b]; R[gi][b] = t; } }); });
-  groupes.forEach((g, gi) => g.fin.forEach(k => { for (let bi = blocs.length - 1; bi >= 0; bi--){ const c = R[gi][bi]; if (c && c.m && c.m.k === k){ c.ev = 1; break; } } }));
+  groupes.forEach((g, gi) => Object.keys(g.fin).forEach(k => { let n = g.fin[k]; for (let bi = blocs.length - 1; bi >= 0 && n > 0; bi--){ const c = R[gi][bi]; if (c && c.m && c.m.k === k){ c.ev = 1; n -= c.h; } } }));
   const doubles = new Set(); blocs.forEach((b, bi) => { const vu = {}; groupes.forEach((g, gi) => { const c = R[gi][bi]; if (c && c.p && c.p !== "-"){ if (vu[c.p] != null){ doubles.add(gi + "|" + bi); doubles.add(vu[c.p] + "|" + bi); } else vu[c.p] = gi; } }); });
   const reste = []; restes.forEach((L, gi) => L.forEach(i => { if (i.h > 0) reste.push(`${groupes[gi].nom} : ${i.h} h de ${i.m.titre} n'entrent pas dans les blocs de la semaine`); }));
   if (doubles.size) reste.unshift("Un enseignant est à deux places en même temps (cartes rouges) : déplace une des deux cartes.");

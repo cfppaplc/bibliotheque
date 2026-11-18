@@ -602,3 +602,4 @@
 - 2026-11-18 : RÈGLE Jeremy : on n'étire jamais une session pour rien → point « il manque N h de cours » (fx trou) pour une semaine incomplète (sauf dernière/pédago); Régler ramène des heures des dernières semaines (même prof) et enlève les semaines vides au bout de la dernière session.
 - 2026-11-18 : « trou » réglé en cascade (chaque semaine se comble avec la suivante, modules déjà commencés d'abord, même prof; plus loin si le prof n'est pas libre).
 - 2026-11-18 : les 3 dernières heures de chaque module = évaluation en mauve (MAUVE #7B3FA0, derSem) dans la grille et la vue Semaine; plus de mauve dans les couleurs des profs (COUL).
+- 2026-11-18 : évaluation = max(3, m.ev) dernières heures du module (evalSem), peut couvrir plusieurs semaines.
