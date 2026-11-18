@@ -162,8 +162,9 @@ function dessiner(){ document.querySelectorAll("#vOng button").forEach(b => b.cl
     h += `<th class="${m !== moisAvant ? "mois" : ""} ${conf ? "conf" : ""}" title="${conf ? "Un enseignant a trop d'heures cette semaine" : ""}">${jm(w.d)}</th>`; moisAvant = m; });
   h += `</tr></thead><tbody>`;
   const ligne = m => { const k = m.k, fait = s.sem.reduce((a, w, wi) => a + totalCase(s, wi, k), 0), pct = m.h ? Math.min(100, fait / m.h * 100) : 0, cl = !m.h ? "" : fait > m.h ? "trop" : fait < m.h ? "manque" : "";
+    if (m.apres){ const avant = s.sem.findIndex(w => { const z = new Date(w.d + "T12:00"); z.setDate(z.getDate() + 4); return iso(z) < m.apres && totalCase(s, s.sem.indexOf(w), k) > 0; }); if (avant >= 0) prob.push({ t:`${m.titre} commence avant le ${dt(m.apres).toLocaleDateString("fr-CA", { day:"numeric", month:"long" })}`, k, w:avant }); }
     if (!m.autre && fait !== m.h) prob.push({ t:`${m.titre} : ${fait} h placées sur ${m.h} h (${fait > m.h ? "enlève" : "ajoute"} ${Math.abs(fait - m.h)} h)`, k });
-    let r = `<tr class="${m.autre ? "autre" : ""}"><td class="nom"><b>${m.num ? m.num + " · " : ""}${m.titre}</b><small>${m.code ? m.code + " · " : ""}${fait} / ${m.h} h${m.ev ? " · éval " + m.ev + " h" : ""}${cl === "" && m.h && !m.autre ? " ✓" : ""}</small>${m.autre ? "" : `<div class="barre ${cl}"><i style="width:${pct}%"></i></div>`}</td>`;
+    let r = `<tr class="${m.autre ? "autre" : ""}"><td class="nom" data-mk="${k}" title="Toucher pour une date « pas avant »" style="cursor:pointer"><b>${m.num ? m.num + " · " : ""}${m.titre}</b><small>${m.code ? m.code + " · " : ""}${m.apres ? "dès le " + jm(m.apres) + " · " : ""}${fait} / ${m.h} h${m.ev ? " · éval " + m.ev + " h" : ""}${cl === "" && m.h && !m.autre ? " ✓" : ""}</small>${m.autre ? "" : `<div class="barre ${cl}"><i style="width:${pct}%"></i></div>`}</td>`;
     s.sem.forEach((w, wi) => { const c = cell(s, wi, k);
       r += `<td class="c" data-w="${wi}" data-k="${k}">` + Object.keys(c).map(p => `<span class="puce ${FILTRE === p ? "vu" : ""}" style="background:${couleur(p)}" title="${D.profs[p] || "Non assigné"}">${c[p]}</span>`).join("") + `</td>`; });
     return r + `</tr>`; };
@@ -230,9 +231,9 @@ function action(a){ const s = ses();
 /* remplissage simple : modules dans l'ordre, au 1er enseignant, en respectant ses heures dans les autres groupes */
 function remplir(s){ const garde = {}; s.sem.forEach((w, wi) => { const W = s.g[wi] || {}; for (const k in W){ const m = s.mods.find(x => x.k === k); if (m && m.autre) (garde[wi] = garde[wi] || {})[k] = W[k]; } });
   s.g = garde; const TA = totalAnnee(s); const C = charges(), L = s.mods.filter(m => !m.autre && m.h), OUV = 3;
-  const reste = new Map(L.map(m => [m, m.h])); let suivant = 0; const actifs = [];
-  const ouvrir = () => { while (actifs.length < OUV && suivant < L.length) actifs.push(L[suivant++]); };
-  s.sem.forEach((w, wi) => { let cap = w.h - s.mods.reduce((a, m) => a + (m.autre ? totalCase(s, wi, m.k) : 0), 0), tour = 0, garde = 0; ouvrir();
+  const reste = new Map(L.map(m => [m, m.h])); const attente = L.slice(), actifs = []; let finSem = "";
+  const ouvrir = () => { for (let n = 0; n < attente.length && actifs.length < OUV; ){ const m = attente[n]; if (m.apres && m.apres > finSem){ n++; continue; } actifs.push(m); attente.splice(n, 1); } };   /* « pas avant » : un module attend sa date */
+  s.sem.forEach((w, wi) => { finSem = (() => { const z = new Date(w.d + "T12:00"); z.setDate(z.getDate() + 4); return iso(z); })(); let cap = w.h - s.mods.reduce((a, m) => a + (m.autre ? totalCase(s, wi, m.k) : 0), 0), tour = 0, garde = 0; ouvrir();
     const charge = p => (((C[p] || {})[w.d] || {}).h || 0);
     while (cap > 0 && actifs.length && garde++ < 200){ const m = actifs[tour % actifs.length];
       const u = Math.min(cap, 3, reste.get(m));
@@ -356,8 +357,8 @@ function reglages(t){ prepDonnees(); let h = `<h2 style="margin-top:0">Calendrie
   if (t === "prog"){ const ids = Object.keys(D.prog); const pid = reglages.p && D.prog[reglages.p] ? reglages.p : ids[0]; reglages.p = pid; const P = D.prog[pid];
     h += `<p><select id="pSel">${ids.map(i => `<option value="${i}" ${i === pid ? "selected" : ""}>${D.prog[i].nom}</option>`).join("")}</select> <button id="pNouv">+ Programme</button></p>
     <p class="mini">Les modules dans l'ordre où ils sont donnés. Un module donné en deux parties = deux lignes avec le même code. L'horaire coupe en sessions de 450 h.</p>
-    <table class="ed"><tr><th class="n">N°</th><th class="c">Code</th><th>Titre</th><th class="h">Heures</th><th class="h">Éval.</th><th></th></tr>` +
-    P.mods.map((m, i) => `<tr><td><input class="n" data-pm="${i}|num" value="${m.num}"></td><td><input class="c" data-pm="${i}|code" value="${m.code}"></td><td><input data-pm="${i}|titre" value="${m.titre.replace(/"/g, "&quot;")}"></td><td><input class="h" data-pm="${i}|h" value="${m.h}"></td><td><input class="h" data-pm="${i}|ev" value="${m.ev || 0}"></td><td style="white-space:nowrap"><button data-pmv="${i}|-1">▲</button><button data-pmv="${i}|1">▼</button><button data-pmx="${i}">✕</button></td></tr>`).join("") +
+    <table class="ed"><tr><th class="n">N°</th><th class="c">Code</th><th>Titre</th><th class="h">Heures</th><th class="h">Éval.</th><th style="width:140px">Pas avant le</th><th></th></tr>` +
+    P.mods.map((m, i) => `<tr><td><input class="n" data-pm="${i}|num" value="${m.num}"></td><td><input class="c" data-pm="${i}|code" value="${m.code}"></td><td><input data-pm="${i}|titre" value="${m.titre.replace(/"/g, "&quot;")}"></td><td><input class="h" data-pm="${i}|h" value="${m.h}"></td><td><input class="h" data-pm="${i}|ev" value="${m.ev || 0}"></td><td><input type="date" data-pm="${i}|apres" value="${m.apres || ""}"></td><td style="white-space:nowrap"><button data-pmv="${i}|-1">▲</button><button data-pmv="${i}|1">▼</button><button data-pmx="${i}">✕</button></td></tr>`).join("") +
     `</table><p><button id="pAj">+ Module</button> <span class="mini">Total : ${P.mods.reduce((a, m) => a + (+m.h || 0), 0)} h</span></p>`; }
   if (t === "ens"){ const codes = []; Object.values(D.prog).forEach(P => P.mods.forEach(m => { if (m.code && !codes.some(c => c.code === m.code)) codes.push(m); }));
     h += `<p class="mini">Maximum par enseignant : <input class="h" id="mxS" inputmode="numeric" value="${maxSem()}" style="width:60px;border:1px solid var(--l);border-radius:6px;padding:4px"> h par semaine.<br>Commence par la tâche de chaque enseignant (heures de cours prévues dans l'année, tous groupes), puis touche les modules qu'il peut donner. L'horaire donne les blocs en priorité à celui à qui il reste le plus d'heures.</p><table class="ed"><tr><th class="n">Initiales</th><th style="width:170px">Nom</th><th class="h">Tâche prévue (h / an)</th><th>Modules qu'il peut donner</th><th></th></tr>` +
@@ -399,7 +400,7 @@ function dlgNouveau(){ prepDonnees(); const lun = new Date(D.cal.debut + "T12:00
     // modules → sessions de 450 h
     let ses = null, cum = 0; P.mods.forEach((m, i) => { if (!ses || cum >= 450){ ses = { nom:"Session " + (g.sessions.length + 1), mods:[], sem:[], g:{} }; g.sessions.push(ses); cum = 0; }
       const k = ses.mods.some(x => x.k === m.code) ? m.code + "-" + i : (m.code || "m" + i);
-      ses.mods.push({ k, code:m.code, titre:m.titre, num:m.num, h:+m.h || 0, ev:+m.ev || 0, profs:Object.keys(D.profs).filter(p => (D.peut[p] || []).includes(m.code)), autre:!m.code }); cum += +m.h || 0; });
+      ses.mods.push({ k, code:m.code, titre:m.titre, num:m.num, h:+m.h || 0, ev:+m.ev || 0, apres:m.apres || "", profs:Object.keys(D.profs).filter(p => (D.peut[p] || []).includes(m.code)), autre:!m.code }); cum += +m.h || 0; });
     // semaines selon le calendrier
     let d = new Date($("#nD").value + "T12:00"); d.setDate(d.getDate() - (d.getDay() + 6) % 7); let garde = 0;
     g.sessions.forEach(s => { let besoin = s.mods.reduce((a, m) => a + m.h, 0);
@@ -439,6 +440,9 @@ document.addEventListener("click", e => { const a = e.target.closest("[data-va]"
   document.addEventListener("pointerup", fin); document.addEventListener("pointercancel", fin);
   document.addEventListener("click", e => { const r = e.target.closest("[data-rz]"); if (!r) return; Object.values(D.echanges || {}).forEach(x => delete x[r.dataset.rz]); sauver(); dessiner(); });
 })();
+document.addEventListener("click", e => { const n = e.target.closest("td.nom[data-mk]"); if (!n || VUE !== "g") return; const m = ses().mods.find(x => x.k === n.dataset.mk); if (!m) return;
+  const v = prompt(`${m.titre}\nPas avant quelle date ? (AAAA-MM-JJ, vide = aucune)\nEnsuite : Plus → Remplir automatiquement pour replacer.`, m.apres || ""); if (v === null) return;
+  m.apres = /^\d{4}-\d{2}-\d{2}$/.test(v.trim()) ? v.trim() : ""; sauver(); dessiner(); });
 dessiner();
 </script>
 </body>
