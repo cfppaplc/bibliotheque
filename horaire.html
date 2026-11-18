@@ -103,7 +103,7 @@ table.ed .n{width:56px}table.ed .c{width:86px}table.ed .h{width:60px}
   </ol></div>
 <div id="alertes"></div>
 <div class="carte" id="vue"></div>
-<p class="mini noprint">Les autres activités (férié, plage verte…) ne comptent pas dans les heures de la semaine. Vue Groupe : touche une case pour ajouter ou retirer un bloc de 3 h. Vue Enseignants : les heures de chaque prof dans tous les groupes. Vue Semaine : l'horaire par bloc, sans mettre un prof à deux places. Touche un enseignant ci-dessus pour voir seulement ses heures. Tout est gardé sur cet ordinateur.</p>
+<p class="mini noprint">Les autres activités (férié, pédago, plage verte…) comptent dans les heures de la semaine. Vue Groupe : touche une case pour ajouter ou retirer un bloc de 3 h. Vue Enseignants : les heures de chaque prof dans tous les groupes. Vue Semaine : l'horaire par bloc, sans mettre un prof à deux places. Touche un enseignant ci-dessus pour voir seulement ses heures. Tout est gardé sur cet ordinateur.</p>
 </main>
 <div id="pop" hidden></div>
 <dialog id="dlg"><div id="dlgC"></div><p style="text-align:right;margin:14px 0 0"><button onclick="dlg.close()">Fermer</button></p></dialog>
@@ -157,7 +157,7 @@ function dessiner(){ document.querySelectorAll("#vOng button").forEach(b => b.cl
   s.mods.filter(m => !m.autre).forEach(m => h += ligne(m));
   if (s.mods.some(m => m.autre)) { h += `<tr class="sep"><td class="nom">Autres activités</td><td colspan="${s.sem.length}"></td></tr>`; s.mods.filter(m => m.autre).forEach(m => h += ligne(m)); }
   h += `</tbody><tfoot><tr><td class="nom"><b>Heures de la semaine</b></td>`;
-  s.sem.forEach((w, wi) => { const t = s.mods.reduce((a, m) => a + (m.autre ? 0 : totalCase(s, wi, m.k)), 0), cl = t > w.h ? "w-trop" : t < w.h ? "w-manque" : "";
+  s.sem.forEach((w, wi) => { const t = s.mods.reduce((a, m) => a + totalCase(s, wi, m.k), 0), cl = t > w.h ? "w-trop" : t < w.h ? "w-manque" : "";
     if (t > w.h) prob.push({ t:`Semaine du ${jm(w.d)} : ${t} h placées pour ${w.h} h (enlève ${t - w.h} h)`, w:wi });
     h += `<td class="${cl}"><div class="jauge"><i style="height:${Math.min(100, w.h ? t / w.h * 100 : 0)}%"></i></div>${t}/${w.h}</td>`; });
   h += `</tr></tfoot></table>`;
@@ -174,7 +174,7 @@ function ouvrirCase(td){
   const s = ses(), wi = +td.dataset.w, k = td.dataset.k, m = s.mods.find(x => x.k === k), w = s.sem[wi], c = cell(s, wi, k);
   const liste = [...new Set([...(m.profs || []), ...Object.keys(c)])];
   if (!liste.length) liste.push(m.autre ? "-" : Object.keys(D.profs)[0]);
-  const pop = $("#pop"), place = s.mods.reduce((a, x) => a + (x.autre ? 0 : totalCase(s, wi, x.k)), 0);
+  const pop = $("#pop"), place = s.mods.reduce((a, x) => a + totalCase(s, wi, x.k), 0);
   pop.innerHTML = `<h3>${m.titre}</h3><div class="s">Semaine du ${jm(w.d)} · ${place} h placées sur ${w.h}</div>` +
     liste.map(p => `<div class="lg"><i style="background:${p === "-" ? "#B8AFA2" : couleur(p)}">${p === "-" ? "" : p}</i><span class="n">${p === "-" ? "Heures" : D.profs[p] || p}</span><button data-d="-3" data-p="${p}" title="Retirer un bloc de 3 h">−3</button><input class="hv" data-hv="${p}" inputmode="numeric" value="${c[p] || 0}"><button data-d="3" data-p="${p}" title="Ajouter un bloc de 3 h">+3</button></div>`).join("") +
     (m.autre ? "" : `<div class="ajout">${Object.keys(D.profs).filter(p => !liste.includes(p)).map(p => `<button data-aj="${p}">+ ${D.profs[p]}</button>`).join("")}</div>`) +
@@ -212,13 +212,14 @@ function action(a){ const s = ses();
   if (a === "reg") reglages("cal");
   if (a === "exp"){ const l = document.createElement("a"); l.href = URL.createObjectURL(new Blob([JSON.stringify(D)], { type:"application/json" })); l.download = "horaires-" + new Date().toISOString().slice(0, 10) + ".json"; l.click(); }
   if (a === "imp"){ const i = document.createElement("input"); i.type = "file"; i.accept = ".json"; i.onchange = async () => { try { D = JSON.parse(await i.files[0].text()); G = S = 0; sauver(); dessiner(); } catch(x){ alert("Fichier illisible."); } }; i.click(); }
-  if (a === "raz" && confirm("Effacer tout et reprendre l'exemple (2026EGI1) ?")){ D = JSON.parse(JSON.stringify(EXEMPLE)); G = S = 0; sauver(); dessiner(); }
+  if (a === "raz" && confirm("Effacer tout et reprendre l'exemple (2026EGI1) ?")){ localStorage.removeItem(CLE); location.reload(); }
 }
 /* remplissage simple : modules dans l'ordre, au 1er enseignant, en respectant ses heures dans les autres groupes */
-function remplir(s){ s.g = {}; const TA = totalAnnee(s); const C = charges(), L = s.mods.filter(m => !m.autre && m.h), OUV = 3;
+function remplir(s){ const garde = {}; s.sem.forEach((w, wi) => { const W = s.g[wi] || {}; for (const k in W){ const m = s.mods.find(x => x.k === k); if (m && m.autre) (garde[wi] = garde[wi] || {})[k] = W[k]; } });
+  s.g = garde; const TA = totalAnnee(s); const C = charges(), L = s.mods.filter(m => !m.autre && m.h), OUV = 3;
   const reste = new Map(L.map(m => [m, m.h])); let suivant = 0; const actifs = [];
   const ouvrir = () => { while (actifs.length < OUV && suivant < L.length) actifs.push(L[suivant++]); };
-  s.sem.forEach((w, wi) => { let cap = w.h, tour = 0, garde = 0; ouvrir();
+  s.sem.forEach((w, wi) => { let cap = w.h - s.mods.reduce((a, m) => a + (m.autre ? totalCase(s, wi, m.k) : 0), 0), tour = 0, garde = 0; ouvrir();
     const charge = p => (((C[p] || {})[w.d] || {}).h || 0);
     while (cap > 0 && actifs.length && garde++ < 200){ const m = actifs[tour % actifs.length];
       const u = Math.min(cap, 3, reste.get(m));
@@ -383,6 +384,7 @@ function dlgNouveau(){ prepDonnees(); const lun = new Date(D.cal.debut + "T12:00
       if (besoin > 0) alert(s.nom + " : il manque " + besoin + " h avant la fin du calendrier."); });
     D.groupes.push(g); G = D.groupes.length - 1; g.sessions.forEach((s, i) => { S = i; remplir(s); }); S = 0; VUE = "g"; sauver(); dlg.close(); dessiner(); };
 }
+if (!D.autresV){ D.groupes.forEach(g => g.sessions.forEach(s => s.sem.forEach((w, wi) => { w.h += s.mods.reduce((a, m) => a + (m.autre ? totalCase(s, wi, m.k) : 0), 0); }))); D.autresV = 1; }
 prepDonnees(); sauver();
 /* ---- simplicité : guide, préparer l'année en 3 étapes, problèmes cliquables ---- */
 try { if (!localStorage.horaireGuideVu) $("#guide").hidden = false; } catch(e){}
