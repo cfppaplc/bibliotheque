@@ -179,6 +179,7 @@ const HT = m => +m.h || 0;   /* heures du module dans l'horaire (75 h) ; l'exame
 const H100 = () => +((D && D.h100) || 660);   /* tâche à 100 % : 660 h de cours et leçons par année (feuille de tâche individuelle) */
 const contrat = p => +(((D.contrat || {})[p]) ?? 100);
 const hContrat = p => Math.round(H100() * contrat(p) / 100);
+const SESOPT = sel => [[1, "Sessions 1 et 2 (1re année)"], [2, "Session 2 seulement (DEP 2)"], [3, "Sessions 3 et 4 (2e année)"], [4, "Session 4 seulement (DEP 4)"], [5, "Sessions 5 et 6"], [6, "Session 6 seulement"]].map(([v, n]) => `<option value="${v}" ${+(sel || 1) === v ? "selected" : ""}>${n}</option>`).join("");
 const maxSem = () => +((D && D.maxSem) || 18);
 function charges(){ const C = {};
   D.groupes.forEach(g => g.sessions.forEach(s => s.sem.forEach((w, wi) => { const W = s.g[wi] || {};
@@ -602,7 +603,7 @@ function dlgNouveau(){ prepDonnees(); const lun = new Date(D.cal.debut + "T12:00
   <label>Nom du groupe<br><input id="nN" placeholder="ex. 2026EGI2"></label>
   <label>Programme<br><select id="nP">${Object.keys(D.prog).map(i => `<option value="${i}">${D.prog[i].nom} (${D.prog[i].mods.length} modules)</option>`).join("")}</select></label>
   <label>Première semaine du groupe<br><input type="date" id="nD" value="${iso(lun)}"></label>
-  <label>Ce groupe commence à la<br><select id="nS"><option value="1">Session 1 (1re année)</option><option value="3">Session 3 (2e année)</option><option value="5">Session 5 (3e année)</option></select></label>
+  <label>Ce groupe fait<br><select id="nS">${SESOPT(1)}</select></label>
   <label>Titulaire (facultatif)<br><input id="nT"></label></div>
   <p class="mini">L'horaire se bâtit avec le calendrier scolaire (congés), les modules dans l'ordre (3 à la fois) et les enseignants qui peuvent les donner, sans conflit avec les autres groupes. Tu ajustes ensuite.</p>
   <p><button class="prim" id="nOk">Créer l'horaire</button></p>`;
@@ -614,7 +615,7 @@ function dlgNouveau(){ prepDonnees(); const lun = new Date(D.cal.debut + "T12:00
       const k = ses.mods.some(x => x.k === m.code) ? m.code + "-" + i : (m.code || "m" + i);
       ses.mods.push({ k, code:m.code, titre:m.titre, num:m.num, h:+m.h || 0, ev:+m.ev || 0, apres:m.apres || "", profs:Object.keys(D.profs).filter(p => (D.peut[p] || []).includes(m.code) && dansProg(p, $("#nP").value)), autre:!m.code }); cum += +m.h || 0; });
     /* un groupe fait 2 sessions par année : 1-2 en 1re année, 3-4 en 2e année */
-    { const dep = Math.max(1, +(($("#nS") || {}).value || 1)); g.sessions = g.sessions.slice(dep - 1, dep + 1); if (!g.sessions.length){ alert("Ce programme n'a pas de session " + dep + "."); return; } }
+    { const dep = Math.max(1, +(($("#nS") || {}).value || 1)); g.sessions = g.sessions.slice(dep - 1, dep % 2 ? dep + 1 : dep);   /* impair = 2 sessions (l'année), pair = la 2e session seulement */ if (!g.sessions.length){ alert("Ce programme n'a pas de session " + dep + "."); return; } }
     // semaines selon le calendrier
     let d = new Date($("#nD").value + "T12:00"); d.setDate(d.getDate() - (d.getDay() + 6) % 7); let garde = 0;
     g.sessions.forEach(s => { let besoin = s.mods.reduce((a, m) => a + HT(m), 0);
@@ -834,9 +835,9 @@ function etapesAs(){ const TOUS = Object.keys(D.profs), P = TOUS.filter(p => dan
       <tr style="font-weight:700"><td style="text-align:left">Total</td><td style="color:var(${tot === 100 ? "--ok" : "--err"})">${tot} %</td><td>${Math.round(reg * tot / 100)} h</td></tr></table>
       ${tot === 100 ? `<p style="color:var(--ok);font-weight:700;margin-top:10px">Ça fait 100 %.</p>` : `<p style="color:var(--err);font-weight:700;margin-top:10px">Le total doit faire 100 % (${tot > 100 ? "enlève " + (tot - 100) : "il manque " + (100 - tot)} %).</p>`}`; } });
   E.push({ t:"Le groupe", chk:"groupe", q:"Quel groupe veux-tu planifier ? (un 2e groupe en même temps, si tu veux)", f:() => { const lun = new Date(D.cal.debut + "T12:00"); lun.setDate(lun.getDate() - (lun.getDay() + 6) % 7);
-    return `<div class="form"><label>Nom du groupe<br><input id="nN" value="${AS.nom || ""}" placeholder="ex. 2026EGI2"></label><label>Programme<br><select id="nP">${Object.keys(D.prog).map(i => `<option value="${i}" ${AS.prog === i ? "selected" : ""}>${D.prog[i].nom}</option>`).join("")}</select></label><label>Première semaine du groupe<br><input type="date" id="nD" value="${AS.deb || iso(lun)}"></label><label>Ce groupe commence à la<br><select id="nS">${[1, 3, 5].map(v => `<option value="${v}" ${+(AS.ses || 1) === v ? "selected" : ""}>Session ${v} (${(v + 1) / 2}${v === 1 ? "re" : "e"} année)</option>`).join("")}</select></label><label>Titulaire (facultatif)<br><input id="nT" value="${AS.tit || ""}"></label></div>
+    return `<div class="form"><label>Nom du groupe<br><input id="nN" value="${AS.nom || ""}" placeholder="ex. 2026EGI2"></label><label>Programme<br><select id="nP">${Object.keys(D.prog).map(i => `<option value="${i}" ${AS.prog === i ? "selected" : ""}>${D.prog[i].nom}</option>`).join("")}</select></label><label>Première semaine du groupe<br><input type="date" id="nD" value="${AS.deb || iso(lun)}"></label><label>Ce groupe fait<br><select id="nS">${SESOPT(AS.ses)}</select></label><label>Titulaire (facultatif)<br><input id="nT" value="${AS.tit || ""}"></label></div>
     <p style="margin:16px 0 6px"><b>Deuxième groupe en même temps</b> <span class="mini">(facultatif : les deux se bâtissent ensemble, sans prof à deux places)</span></p>
-    <div class="form"><label>Nom du 2e groupe<br><input id="nN2" value="${AS.nom2 || ""}" placeholder="ex. 2026EGI3"></label><label>Sa première semaine<br><input type="date" id="nD2" value="${AS.deb2 || ""}"></label><label>Il commence à la<br><select id="nS2">${[1, 3, 5].map(v => `<option value="${v}" ${+(AS.ses2 || 1) === v ? "selected" : ""}>Session ${v} (${(v + 1) / 2}${v === 1 ? "re" : "e"} année)</option>`).join("")}</select></label></div>`; } });
+    <div class="form"><label>Nom du 2e groupe<br><input id="nN2" value="${AS.nom2 || ""}" placeholder="ex. 2026EGI3"></label><label>Sa première semaine<br><input type="date" id="nD2" value="${AS.deb2 || ""}"></label><label>Il fait<br><select id="nS2">${SESOPT(AS.ses2)}</select></label></div>`; } });
   E.push({ t:"C'est prêt", chk:"fin", q:"Tout est en place. On bâtit l'horaire ?", f:() => `<ul style="font-size:15px;line-height:1.8"><li>Année : du ${jm(D.cal.debut)} au ${jm(D.cal.fin)}, ${Object.keys(D.cal.off).length} journées spéciales</li><li>Programme : ${(D.prog[AS.prog] || {}).nom || ""}</li><li>${Object.keys(D.profs).length} enseignants, ${maxSem()} h par semaine au maximum</li><li>Groupe : <b>${AS.nom || "?"}</b>, à partir du ${AS.deb ? jm(AS.deb) : "?"}</li>${AS.nom2 ? `<li>2e groupe : <b>${AS.nom2}</b>, à partir du ${AS.deb2 ? jm(AS.deb2) : jm(AS.deb)}</li>` : ""}</ul><p class="mini">L'horaire ouvre 3 matières à la fois, respecte les tâches, les absences et les dates. Tu pourras tout ajuster ensuite.</p>`, fin:true });
   return E; }
 function assistant(){ const E = etapesAs(); AS.i = Math.max(0, Math.min(AS.i, E.length - 1)); const e = E[AS.i];
