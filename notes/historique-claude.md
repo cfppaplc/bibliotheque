@@ -605,3 +605,4 @@
 - 2026-11-18 : évaluation = max(3, m.ev) dernières heures du module (evalSem), peut couvrir plusieurs semaines.
 - 2026-11-18 : vue Semaine — un férié du calendrier n'est plus compté deux fois avec la ligne grise « Férié » du groupe importé; le jeudi PM (1 h) prend d'abord un cours avec 1 h de trop (7 h = 3+3+1).
 - 2026-11-18 : vue Semaine — férié/pédago d'un groupe = journée complète (vendredi d'abord); si tout n'entre pas, la plage verte du jeudi est réduite (jusqu'à 2 h, PV[gi], bh()).
+- 2026-11-18 : RÈGLE : fériés, cours de maths, tempêtes (et pédago, fin de session) ont priorité et ne se déplacent pas : cartes « fixe » (pas de glisser ni double-clic).
