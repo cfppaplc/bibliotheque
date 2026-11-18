@@ -633,3 +633,4 @@
 - 2026-11-18 : horaire suit le compte : COFFRE.demarrer("horaire", clé horairesMetier2). Paquets préparés : horaires/<id>.json = {env,data,t,titre} chiffré pour la clé publique du compte (COFFRE.emballer), ouvert au chargement avec COFFRE.lireLigne + confirmation (horairePaquetVu). Session 2 Plomberie déposée pour jeremy.raymond.
 - 2026-11-18 : remplir : un prof dont la tâche est pleine (resteT ≤ 0) ne reçoit plus d'heures → « non assigné » (gris), à donner à un autre (Régler / Donner les heures sans enseignant).
 - 2026-11-18 : remplir au rythme régulier : chaque prof suit sa tâche de la demi-année au prorata du calendrier (toutes les sessions de même parité, tous les groupes; tolérance max(9 h, 15 %)); au-delà → non assigné, réparti dans la session. Paquet session 2 de Jérémy refait.
+- 2026-11-18 : session 2 de Jérémy : ordre DEP 2 = 7, 8, 12, 11, 21 (Alimentation après Réparation, pour que Sylvain enseigne jusqu'à la fin); paquet refait.
