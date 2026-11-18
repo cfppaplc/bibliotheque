@@ -326,7 +326,7 @@ function vueSemaine(){ const s = ses(); SW = Math.max(0, Math.min(SW, s.sem.leng
     groupes.push({ nom:g.nom, items }); })));
   const blocs = []; JOURS.forEach((j, di) => ["AM", "PM"].forEach(pm => blocs.push({ di, pm, h: congé[di] ? 0 : (j === "Jeudi" && pm === "PM" ? 1 : 3) })));
   const R = groupes.map(() => []), restes = groupes.map(g => g.items.map(i => Object.assign({}, i)));
-  blocs.forEach((b, bi) => { const pris = new Set(); if (!b.h) return;
+  blocs.map((b, bi) => [b, bi]).sort((x, y) => y[0].h - x[0].h).forEach(([b, bi]) => { const pris = new Set(); if (!b.h) return;   /* blocs de 3 h d'abord; le jeudi PM (1 h) prend ce qui reste */
     groupes.forEach((g, gi) => { const L = restes[gi].filter(i => i.h > 0).sort((x, y) => (x.m.autre - y.m.autre) || ((y.h >= b.h) - (x.h >= b.h)) || y.h - x.h);
       const i = L.find(z => z.p === "-" || (!pris.has(z.p) && !absent(z.p, dates[b.di], b.pm))); if (!i){ if (L.length) R[gi][bi] = { vide:true }; return; }
       if (i.p !== "-") pris.add(i.p); const u = Math.min(b.h, i.h); i.h -= u; R[gi][bi] = { p:i.p, m:i.m, h:u }; }); });

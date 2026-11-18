@@ -594,3 +594,4 @@
 - 2026-11-17 : horaire.html — fériés/congés absents d'une semaine détectés (fx jt / conge); « Régler » ajoute des semaines au bout et repousse la session suivante jusqu'au 30 juin (finMax, ajouterSemaine, decaler); D.sessProf[p] = sessions où le prof enseigne (vide = toutes), alerte fx sessprof.
 - 2026-11-17 : horaire.html — dépasser 18 h = alerte jaune « Suggestion » (niv:'j', Régler/Accepter); rouge seulement si impossible (e.dur = dispo réelle : semaine, absences). Pastille « N points à régler · N suggestions ».
 - 2026-11-17 : horaire.html — semaines entre deux sessions = journées pédagogiques au bout de la session qui finit (remplirTrous, w.pf); ajouterSemaine reprend d'abord ces semaines avant de repousser la session suivante.
+- 2026-11-17 : horaire.html vue Semaine — blocs de 3 h remplis d'abord, le jeudi PM (1 h) prend le reste (le vendredi PM affichait 2 h).
