@@ -592,3 +592,4 @@
 - 2026-11-17 : horaire.html — bouton « Accepter » sur chaque point (D.acceptes[groupe] = textes), lien « Les revoir ».
 - 2026-11-17 : horaire.html — RÈGLE : « Régler » ne change jamais les heures d'un enseignant dans la session (déplace ou échange des blocs en gardant le même prof : bouger(), sortir()).
 - 2026-11-17 : horaire.html — fériés/congés absents d'une semaine détectés (fx jt / conge); « Régler » ajoute des semaines au bout et repousse la session suivante jusqu'au 30 juin (finMax, ajouterSemaine, decaler); D.sessProf[p] = sessions où le prof enseigne (vide = toutes), alerte fx sessprof.
+- 2026-11-17 : horaire.html — dépasser 18 h = alerte jaune « Suggestion » (niv:'j', Régler/Accepter); rouge seulement si impossible (e.dur = dispo réelle : semaine, absences). Pastille « N points à régler · N suggestions ».

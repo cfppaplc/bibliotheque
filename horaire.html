@@ -57,7 +57,7 @@ thead th.conf{background:#FBE3E0;color:var(--err)}
 .menu.ouv .liste{display:block}.menu .liste button{display:block;width:100%;text-align:left;border:0;padding:10px 12px}
 dialog{border:0;border-radius:16px;padding:20px;max-width:980px;width:94vw;max-height:92vh;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)}
 dialog textarea{width:100%;min-height:200px;font:12px ui-monospace,monospace;border:1px solid var(--l);border-radius:8px;padding:8px}
-.mini{font-size:12px;color:var(--gris)}.alert{background:#fff;border-left:4px solid var(--err);border-radius:8px;padding:8px 12px;margin:4px 0;font-size:13px}
+.mini{font-size:12px;color:var(--gris)}.alert{background:#fff;border-left:4px solid var(--err);border-radius:8px;padding:8px 12px;margin:4px 0;font-size:13px}.alert.jaune{border-left-color:#D9A400;background:#FFF9E3}.etat.jaune{background:#FFF1C2;color:#8A6500;cursor:pointer}
 table.t td,table.t th{border:1px solid var(--l);padding:5px 8px;text-align:center;font-size:12px}table.t input{width:52px;text-align:center;border:1px solid var(--l);border-radius:6px}
 
 .ong2{display:flex;gap:6px;margin:0 0 14px}.ong2 button.on{background:var(--mar);color:#fff;border-color:var(--mar)}
@@ -139,7 +139,7 @@ const jm = d => dt(d).toLocaleDateString("fr-CA", { day:"numeric", month:"short"
 /* heures possibles d'un prof une semaine : 18 h max, moins ses journées d'absence */
 const REC = p => ((D.absRec || {})[p] || []);   /* absences de chaque semaine : "2|PM" = mardi après-midi */
 const hBloc = (wd, pm) => pm === "PM" && wd === 4 ? 1 : 3;
-function capProf(p, lundi){ const A = (D.abs || {})[p] || {}, R = REC(p); let mx = maxSem(); if (!R.length && !Object.keys(A).length) return mx; const d = new Date(lundi + "T12:00"); let perdu = 0;
+function capProf(p, lundi, mx0){ const A = (D.abs || {})[p] || {}, R = REC(p); let mx = mx0 == null ? maxSem() : mx0; if (!R.length && !Object.keys(A).length) return mx; const d = new Date(lundi + "T12:00"); let perdu = 0;
   for (let i = 0; i < 5; i++){ const x = new Date(d); x.setDate(d.getDate() + i); const k = iso(x), wd = x.getDay(); if (D.cal && D.cal.off && D.cal.off[k]) continue;
     if (A[k]) perdu += HJOUR[wd]; else ["AM", "PM"].forEach(pm => { if (R.includes(wd + "|" + pm)) perdu += hBloc(wd, pm); }); }
   return Math.max(0, mx - perdu); }
@@ -150,7 +150,7 @@ const maxSem = () => +((D && D.maxSem) || 18);
 function charges(){ const C = {};
   D.groupes.forEach(g => g.sessions.forEach(s => s.sem.forEach((w, wi) => { const W = s.g[wi] || {};
     for (const k in W) for (const p in W[k]) { if (p === "-") continue; const c = (C[p] = C[p] || {}), e = (c[w.d] = c[w.d] || { h:0, max:w.h, grp:new Set() }); e.h += W[k][p]; e.grp.add(g.nom); e.max = Math.max(e.max, w.h); } })));
-  for (const p in C) for (const d in C[p]) C[p][d].max = Math.min(C[p][d].max, capProf(p, d));
+  for (const p in C) for (const d in C[p]){ const e = C[p][d]; e.dur = Math.min(e.max, capProf(p, d, e.max)); e.max = Math.min(e.max, capProf(p, d)); }
   return C; }
 
 
@@ -169,7 +169,7 @@ function dessiner(){ document.querySelectorAll("#vOng button").forEach(b => b.cl
   // en-tête : semaines
   let h = `<table class="${FILTRE ? "dim" : ""}"><thead><tr><th class="nom">${grp().nom} · ${s.nom}</th>`;
   let moisAvant = "";
-  s.sem.forEach(w => { const m = dt(w.d).toLocaleDateString("fr-CA", { month:"short" }).replace(".", ""), conf = Object.keys(C).some(p => C[p][w.d] && C[p][w.d].h > C[p][w.d].max);
+  s.sem.forEach(w => { const m = dt(w.d).toLocaleDateString("fr-CA", { month:"short" }).replace(".", ""), conf = Object.keys(C).some(p => C[p][w.d] && C[p][w.d].h > C[p][w.d].dur);
     h += `<th class="${m !== moisAvant ? "mois" : ""} ${conf ? "conf" : ""}" title="${conf ? "Un enseignant a trop d'heures cette semaine" : ""}">${jm(w.d)}</th>`; moisAvant = m; });
   h += `</tr></thead><tbody>`;
   const ligne = m => { const k = m.k, fait = s.sem.reduce((a, w, wi) => a + totalCase(s, wi, k), 0), pct = m.h ? Math.min(100, fait / m.h * 100) : 0, cl = !m.h ? "" : fait > m.h ? "trop" : fait < m.h ? "manque" : "";
@@ -194,10 +194,11 @@ function dessiner(){ document.querySelectorAll("#vOng button").forEach(b => b.cl
   { const vu = new Set(); s.sem.forEach((w, wi) => s.mods.forEach(m => Object.keys(cell(s, wi, m.k)).forEach(p => { if (!sessOk(p, s) && !vu.has(p)){ vu.add(p); prob.push({ t:`${D.profs[p] || p} ne donne pas de cours en ${s.nom}, mais il a des heures ici`, fx:"sessprof", p }); } }))); }
   $("#vue").innerHTML = h;
   // conflits entre groupes
-  Object.keys(C).forEach(p => Object.keys(C[p]).forEach(d => { const e = C[p][d]; if (e.h > e.max && s.sem.some(w => w.d === d)) prob.push({ t:`${D.profs[p] || p} a ${e.h} h la semaine du ${jm(d)} (${[...e.grp].join(" et ")}), plus que ${e.max} h. Donne un de ses blocs à un autre enseignant.`, w:s.sem.findIndex(w => w.d === d), fx:"prof", p, d }); }));
-  const vus = new Set(), ACC = (D.acceptes = D.acceptes || {})[grp().id] || [], P0 = prob.filter(x => !vus.has(x.t) && vus.add(x.t)), P = P0.filter(x => !ACC.includes(x.t)), nAcc = P0.length - P.length;
-  $("#etat").className = "etat " + (P.length ? "err" : "ok"); $("#etat").textContent = P.length ? P.length + " point" + (P.length > 1 ? "s" : "") + " à régler" : nAcc ? "Correct (" + nAcc + " accepté" + (nAcc > 1 ? "s" : "") + ")" : "Tout est correct"; if (!P.length && nAcc) $("#etat").className = "etat ok"; if (nAcc) $("#etat").style.cursor = "pointer";
-  $("#alertes").innerHTML = $("#alertes").dataset.ouv ? (PROBS = P).slice(0, 5).map((a, i) => `<div class="alert" style="cursor:pointer;display:flex;gap:10px;align-items:center" data-va="${a.k || ""}|${a.w == null ? "" : a.w}"><span style="flex:1">${a.t} <u style="color:var(--or)">Voir</u></span>${a.fx ? `<button class="prim" data-fx="${i}" style="padding:6px 14px">Régler</button>` : ""}<button data-acc="${i}" style="padding:6px 14px" title="C'est voulu : ne plus le signaler">Accepter</button></div>`).join("") + (P.length > 5 ? `<div class="mini" style="margin:4px 2px 8px">… et ${P.length - 5} autres. Règle ceux-ci d'abord.</div>` : "") + (nAcc ? `<div class="mini" style="margin:4px 2px 8px">${nAcc} point${nAcc > 1 ? "s" : ""} accepté${nAcc > 1 ? "s" : ""} (voulu${nAcc > 1 ? "s" : ""}). <u data-revoir style="cursor:pointer;color:var(--or)">Les revoir</u></div>` : "") : "";
+  Object.keys(C).forEach(p => Object.keys(C[p]).forEach(d => { const e = C[p][d]; if (e.h > e.max && s.sem.some(w => w.d === d)) prob.push({ t:e.h > e.dur ? `${D.profs[p] || p} a ${e.h} h la semaine du ${jm(d)} (${[...e.grp].join(" et ")}) : impossible, il n'est disponible que ${e.dur} h (absences ou deux groupes).` : `Suggestion : ${D.profs[p] || p} a ${e.h} h la semaine du ${jm(d)}, plus que ${maxSem()} h.`, niv:e.h > e.dur ? "" : "j", w:s.sem.findIndex(w => w.d === d), fx:"prof", p, d }); }));
+  const vus = new Set(), ACC = (D.acceptes = D.acceptes || {})[grp().id] || [], P0 = prob.filter(x => !vus.has(x.t) && vus.add(x.t)), P = P0.filter(x => !ACC.includes(x.t)).sort((a, b) => (a.niv === "j") - (b.niv === "j")), nAcc = P0.length - P.length;
+  $("#etat").className = "etat " + (P.length ? "err" : "ok"); const nR = P.filter(x => x.niv !== "j").length, nJ = P.length - nR;
+  $("#etat").textContent = nR ? nR + " point" + (nR > 1 ? "s" : "") + " à régler" + (nJ ? " · " + nJ + " suggestion" + (nJ > 1 ? "s" : "") : "") : nJ ? nJ + " suggestion" + (nJ > 1 ? "s" : "") : nAcc ? "Correct (" + nAcc + " accepté" + (nAcc > 1 ? "s" : "") + ")" : "Tout est correct"; if (!P.length && nAcc) $("#etat").className = "etat ok"; if (!nR && nJ) $("#etat").className = "etat jaune"; if (nAcc) $("#etat").style.cursor = "pointer";
+  $("#alertes").innerHTML = $("#alertes").dataset.ouv ? (PROBS = P).slice(0, 5).map((a, i) => `<div class="alert ${a.niv === "j" ? "jaune" : ""}" style="cursor:pointer;display:flex;gap:10px;align-items:center" data-va="${a.k || ""}|${a.w == null ? "" : a.w}"><span style="flex:1">${a.t} <u style="color:var(--or)">Voir</u></span>${a.fx ? `<button class="prim" data-fx="${i}" style="padding:6px 14px">Régler</button>` : ""}<button data-acc="${i}" style="padding:6px 14px" title="C'est voulu : ne plus le signaler">Accepter</button></div>`).join("") + (P.length > 5 ? `<div class="mini" style="margin:4px 2px 8px">… et ${P.length - 5} autres. Règle ceux-ci d'abord.</div>` : "") + (nAcc ? `<div class="mini" style="margin:4px 2px 8px">${nAcc} point${nAcc > 1 ? "s" : ""} accepté${nAcc > 1 ? "s" : ""} (voulu${nAcc > 1 ? "s" : ""}). <u data-revoir style="cursor:pointer;color:var(--or)">Les revoir</u></div>` : "") : "";
 }
 
 /* petite fenêtre d'une case : heures de chaque enseignant, − / + */
