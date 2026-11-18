@@ -157,7 +157,7 @@ function charges(){ const C = {};
 /* heures placées d'un prof dans l'année (tous les groupes, modules seulement) */
 function totalAnnee(sauf){ const T = {}; D.groupes.forEach(g => g.sessions.forEach(s => { if (s === sauf) return; s.sem.forEach((w, wi) => { const W = s.g[wi] || {};
   for (const k in W){ const m = s.mods.find(x => x.k === k); if (!m || m.autre) continue; for (const p in W[k]) if (p !== "-") T[p] = (T[p] || 0) + W[k][p]; } }); })); return T; }
-function dessiner(){ document.querySelectorAll("#vOng button").forEach(b => b.classList.toggle("on", b.dataset.v === VUE)); if (VUE === "e") return vueProfs(); if (VUE === "s") return vueSemaine();
+function dessiner(){ if (D.groupes.some(g => remplirTrous(g))) sauver(); document.querySelectorAll("#vOng button").forEach(b => b.classList.toggle("on", b.dataset.v === VUE)); if (VUE === "e") return vueProfs(); if (VUE === "s") return vueSemaine();
   $("#gSel").innerHTML = D.groupes.map((g, i) => `<option value="${i}" ${i === G ? "selected" : ""}>${g.nom}</option>`).join("");
   $("#sOng").innerHTML = grp().sessions.map((s, i) => `<button data-s="${i}" class="${i === S ? "on" : ""}">${s.nom}</button>`).join("");
   const s = ses(), C = charges(), prob = [];
@@ -471,7 +471,22 @@ function placer(s, m, n, sauf){ let garde = 0;
 /* déplace x h de m données par p, de la semaine wi vers une autre semaine. Le prof reste le même :
    les heures de chaque enseignant dans la session ne changent jamais. Sinon, échange avec le bloc d'un autre prof. */
 let RAISON = "";
-function ajouterSemaine(s){ const der = s.sem[s.sem.length - 1]; if (!der) return -1; const d = new Date(der.d + "T12:00");
+/* jours de semaine d'un lundi, par type (sans les congés) */
+function parSemaine(lundi){ const par = {}; let h = 0; for (let i = 0; i < 5; i++){ const x = new Date(lundi + "T12:00"); x.setDate(x.getDate() + i); const j = iso(x); if (j < D.cal.debut || j > finMax()) continue;
+  const ty = jourType(j), hj = HJOUR[x.getDay()]; if (ty === "conge") continue; h += hj; if (ty) par[ty] = (par[ty] || 0) + hj; } return { h, par }; }
+function poserJT(s, wi, par){ s.mods.filter(m => m.jt).forEach(m => fixer(s, wi, m.k, "-", 0));
+  for (const ty in par){ const kk = "jt:" + ty; if (!s.mods.some(m => m.k === kk)) s.mods.push({ k:kk, code:"", titre:JT[ty].n, num:"", h:0, ev:0, profs:[], autre:true, jt:ty }); fixer(s, wi, kk, "-", par[ty]); } }
+/* semaines entre deux sessions : on les met au bout de la session qui finit, en journées pédagogiques */
+function remplirTrous(g){ let chg = false;
+  for (let i = 0; i + 1 < g.sessions.length; i++){ const a = g.sessions[i], b = g.sessions[i + 1]; if (!a.sem.length || !b.sem.length) continue;
+    const d = new Date(a.sem[a.sem.length - 1].d + "T12:00");
+    for (let n = 0; n < 30; n++){ d.setDate(d.getDate() + 7); const k = iso(d); if (k >= b.sem[0].d) break; const { h } = parSemaine(k); if (!h) continue;
+      const wi = a.sem.length; a.sem.push({ d:k, h, pf:1 }); const par = {}; let j = 0; for (let x = 0; x < 5; x++){ const y = new Date(d); y.setDate(d.getDate() + x); const ty = jourType(iso(y)); if (ty !== "conge" && HJOUR[y.getDay()] && iso(y) >= D.cal.debut) par[ty || "planif"] = (par[ty || "planif"] || 0) + HJOUR[y.getDay()]; }
+      poserJT(a, wi, par); chg = true; } }
+  return chg; }
+function ajouterSemaine(s){ const pf = s.sem.findIndex(w => w.pf);
+  if (pf >= 0){ const w = s.sem[pf], { h, par } = parSemaine(w.d); delete w.pf; w.h = h; poserJT(s, pf, par); return pf; }   /* reprend une semaine pédagogique de fin de session */
+  const der = s.sem[s.sem.length - 1]; if (!der) return -1; const d = new Date(der.d + "T12:00");
   for (let n = 0; n < 12; n++){ d.setDate(d.getDate() + 7); const k = iso(d); if (k > finMax()){ RAISON = "On est rendu au " + jm(finMax()) + "."; return -1; }
     const z = grp().sessions.find(z => z !== s && z.sem.some(w => w.d === k)); if (z && !decaler(z)) return -1;
     let h = 0; const par = {}; for (let i = 0; i < 5; i++){ const x = new Date(d); x.setDate(d.getDate() + i); const ty = jourType(iso(x)), hj = HJOUR[x.getDay()]; if (ty === "conge") continue; h += hj; if (ty) par[ty] = (par[ty] || 0) + hj; }
