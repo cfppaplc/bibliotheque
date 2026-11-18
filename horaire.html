@@ -57,7 +57,7 @@ thead th.conf{background:#FBE3E0;color:var(--err)}
 .menu.ouv .liste{display:block}.menu .liste button{display:block;width:100%;text-align:left;border:0;padding:10px 12px}
 dialog{border:0;border-radius:16px;padding:20px;max-width:980px;width:94vw;max-height:92vh;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)}
 dialog textarea{width:100%;min-height:200px;font:12px ui-monospace,monospace;border:1px solid var(--l);border-radius:8px;padding:8px}
-.mini{font-size:12px;color:var(--gris)}.alert{background:#fff;border-left:4px solid var(--err);border-radius:8px;padding:8px 12px;margin:4px 0;font-size:13px}@keyframes flashR{0%,100%{box-shadow:0 0 0 0 rgba(192,57,43,0);background:#fff}50%{box-shadow:0 0 0 3px rgba(192,57,43,.45);background:#FBE3E0}}.lp.manque{animation:flashR 1.4s ease-in-out infinite;border-color:var(--err)}.alert.jaune{border-left-color:#D9A400;background:#FFF9E3}.etat.jaune{background:#FFF1C2;color:#8A6500;cursor:pointer}
+.mini{font-size:12px;color:var(--gris)}.alert{background:#fff;border-left:4px solid var(--err);border-radius:8px;padding:8px 12px;margin:4px 0;font-size:13px}@keyframes flashR{0%,100%{box-shadow:0 0 0 0 rgba(192,57,43,0);background:#fff}50%{box-shadow:0 0 0 3px rgba(192,57,43,.45);background:#FBE3E0}}.lp.manque{animation:flashR 1.4s ease-in-out infinite;border-color:var(--err)}.av{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;color:#fff;font-style:normal;font-weight:700;font-size:11px;flex:none}@keyframes flashA{0%,100%{box-shadow:0 0 0 0 rgba(192,57,43,0)}50%{box-shadow:0 0 0 5px rgba(192,57,43,.55)}}.av.manque{animation:flashA 1.4s ease-in-out infinite}.tprofs .info{display:block;font-size:12px;color:var(--gris);margin-top:2px;white-space:nowrap}.tprofs td.nom{min-width:260px}.alert.jaune{border-left-color:#D9A400;background:#FFF9E3}.etat.jaune{background:#FFF1C2;color:#8A6500;cursor:pointer}
 table.t td,table.t th{border:1px solid var(--l);padding:5px 8px;text-align:center;font-size:12px}table.t input{width:52px;text-align:center;border:1px solid var(--l);border-radius:6px}
 
 .ong2{display:flex;gap:6px;margin:0 0 14px}.ong2 button.on{background:var(--mar);color:#fff;border-color:var(--mar)}
@@ -321,21 +321,28 @@ function editer(){ const s = ses();
       return { k, code, titre, num:+x[0] || 0, h:+x[3] || 0, ev:+x[4] || 0, profs:(x[5] || "").split(",").map(y => y.trim()).filter(Boolean), autre:!code }; });
     s.sem = L("#tS").map(x => ({ d:x[0], h:+x[1] || 0 })); grp().nom = $("#tG").value.trim() || grp().nom; sauver(); dlg.close(); dessiner(); }; }
 /* ---- Vue Enseignants : heures de chaque prof par semaine, tous les groupes (période de la session choisie) ---- */
-function vueProfs(){ const s = ses(), C = charges(), d0 = s.sem[0].d, d1 = s.sem[s.sem.length - 1].d;
-  const GC = {}; D.groupes.forEach((g, i) => GC[g.nom] = ["#2F6FB5","#EB6A22","#1E8A55","#8B4FB8","#C2417A"][i % 5]);
+function vueProfs(){ const s = ses(), C = charges(), d0 = s.sem[0].d, d1 = s.sem[s.sem.length - 1].d, TA = totalAnnee(), CI = D.cible || {}, plus = D.groupes.length > 1;
+  const GC = {}; D.groupes.forEach((g, i) => GC[g.nom] = ["#2F6FB5","#EB6A22","#1E8A55","#C2417A","#0E8C8C"][i % 5]);
   const par = {}; D.groupes.forEach(g => g.sessions.forEach(x => x.sem.forEach((w, wi) => { if (w.d < d0 || w.d > d1) return; const W = x.g[wi] || {};
     for (const k in W){ const m = x.mods.find(y => y.k === k); if (!m || m.autre) continue; for (const p in W[k]){ if (p === "-") continue; const c = ((par[p] = par[p] || {})[w.d] = par[p][w.d] || {}); c[g.nom] = (c[g.nom] || 0) + W[k][p]; } } })));
-  $("#leg").innerHTML = D.groupes.map(g => `<span class="lp"><i style="background:${GC[g.nom]}">${g.nom.slice(-4)}</i><b>${g.nom}</b></span>`).join("");
-  let h = `<table><thead><tr><th class="nom">Enseignants · tous les groupes</th>` + s.sem.map(w => `<th>${jm(w.d)}</th>`).join("") + `</tr></thead><tbody>`; const prob = [];
-  Object.keys(D.profs).forEach(p => { h += `<tr><td class="nom"><b>${D.profs[p]}</b><small>maximum ${maxSem()} h par semaine</small></td>`;
-    s.sem.forEach(w => { const c = (par[p] || {})[w.d] || {}, t = Object.values(c).reduce((a, b) => a + b, 0), e = (C[p] || {})[w.d], trop = e && t > e.max;
-      if (trop) prob.push(`${D.profs[p]} : ${t} h la semaine du ${jm(w.d)} (${Object.keys(c).join(" + ")})`);
-      h += `<td class="c" style="${trop ? "background:#FBE3E0" : ""}">` + Object.keys(c).map(g => `<span class="puce" style="background:${GC[g]}" title="${g}">${c[g]}</span>`).join("") + (trop ? `<div style="color:var(--err);font-weight:700;font-size:11px">${t} h</div>` : "") + `</td>`; });
-    h += `</tr>`; });
+  $("#leg").innerHTML = (plus ? D.groupes.map(g => `<span class="lp"><i style="background:${GC[g.nom]}">${g.nom.slice(-4)}</i><b>${g.nom}</b></span>`).join("") : "") +
+    `<span class="mini" style="align-self:center">Vert : correct · Jaune : plus de ${maxSem()} h · Rouge : impossible (absent ou deux groupes) · Hachuré : absences cette semaine · Touche un nom pour sa fiche.</span>`;
+  let h = `<table class="tprofs"><thead><tr><th class="nom">Enseignants${plus ? " · tous les groupes" : ""}</th>` + s.sem.map(w => `<th>${jm(w.d)}</th>`).join("") + `<th>Session</th></tr></thead><tbody>`; let nR = 0, nJ = 0; const prob = [];
+  Object.keys(D.profs).forEach(p => { const c0 = +CI[p] || 0, an = TA[p] || 0, sesT = s.sem.reduce((a, w) => a + Object.values((par[p] || {})[w.d] || {}).reduce((x, y) => x + y, 0), 0), manque = c0 && an < c0;
+    const pct = c0 ? Math.min(100, an / c0 * 100) : 0, coul = !c0 ? "#B8AFA2" : an > c0 ? "var(--err)" : an < c0 ? "var(--err)" : "var(--ok)";
+    h += `<tr><td class="nom" data-fiche="${p}" style="cursor:pointer" title="Toucher pour sa fiche"><div style="display:flex;gap:10px;align-items:center"><i class="av ${manque ? "manque" : ""}" style="background:${couleur(p)}">${p}</i><div style="flex:1;min-width:0"><b>${D.profs[p]}</b>
+      <span class="info">${c0 ? `Année : <b style="color:${coul}">${an} / ${c0} h</b>${manque ? ` · manque ${c0 - an} h` : ""}` : `Année : ${an} h · <u>tâche à entrer</u>`}${(D.sessProf || {})[p] && D.sessProf[p].length ? " · session " + D.sessProf[p].map(x => x + 1).join(", ") + " seulement" : ""}</span>
+      <div class="barre" style="margin-top:4px"><i style="width:${pct}%;background:${coul}"></i></div></div></div></td>`;
+    s.sem.forEach(w => { const c = (par[p] || {})[w.d] || {}, t = Object.values(c).reduce((a, b) => a + b, 0), e = (C[p] || {})[w.d], cap = Math.min(w.h, capProf(p, w.d)), abs = capProf(p, w.d) < maxSem();
+      const rouge = e && t > e.dur, jaune = !rouge && t > cap; if (rouge){ nR++; prob.push(`<div class="alert">${D.profs[p]} : ${t} h la semaine du ${jm(w.d)}, il n'est disponible que ${e.dur} h${plus ? " (" + Object.keys(c).join(" + ") + ")" : ""}.</div>`); } else if (jaune){ nJ++; prob.push(`<div class="alert jaune">Suggestion : ${D.profs[p]} a ${t} h la semaine du ${jm(w.d)} (plus que ${cap} h).</div>`); }
+      const fond = rouge ? "#FBE3E0" : jaune ? "#FFF6D6" : "", hach = abs ? "background-image:repeating-linear-gradient(45deg,transparent 0 5px,rgba(0,0,0,.06) 5px 7px);" : "", col = rouge ? "var(--err)" : jaune ? "#9A7400" : t ? "var(--ok)" : "#CFC8BD";
+      h += `<td class="c" style="background-color:${fond};${hach}" title="${t} h sur ${cap} h possibles${abs ? " (absences)" : ""}">${t ? `<div style="font-weight:700;font-size:15px;color:${col}">${t}</div><div class="jauge" style="height:5px;width:28px;margin:3px auto 0;display:block"><i style="display:block;height:100%;width:${Math.min(100, t / Math.max(1, cap) * 100)}%;background:${col}"></i></div>${plus ? `<div>${Object.keys(c).map(g => `<i title="${g} : ${c[g]} h" style="display:inline-block;width:7px;height:7px;border-radius:50%;margin:2px 1px 0;background:${GC[g]}"></i>`).join("")}</div>` : ""}` : `<span style="color:#CFC8BD">·</span>`}</td>`; });
+    h += `<td class="c" style="font-weight:700">${sesT} h</td></tr>`; });
   $("#vue").innerHTML = h + `</tbody></table>`;
-  $("#etat").className = "etat " + (prob.length ? "err" : "ok"); $("#etat").textContent = prob.length ? prob.length + " conflit" + (prob.length > 1 ? "s" : "") : "Aucun enseignant à deux places";
-  $("#alertes").innerHTML = $("#alertes").dataset.ouv ? prob.map(a => `<div class="alert">${a}</div>`).join("") : "";
+  $("#etat").className = "etat " + (nR ? "err" : nJ ? "jaune" : "ok"); $("#etat").textContent = nR ? nR + " semaine" + (nR > 1 ? "s" : "") + " impossible" + (nR > 1 ? "s" : "") + (nJ ? " · " + nJ + " suggestion" + (nJ > 1 ? "s" : "") : "") : nJ ? nJ + " suggestion" + (nJ > 1 ? "s" : "") : "Aucun enseignant à deux places";
+  $("#alertes").innerHTML = $("#alertes").dataset.ouv ? prob.join("") : "";
 }
+document.addEventListener("click", e => { const f = e.target.closest("[data-fiche]"); if (f) fiche(f.dataset.fiche); });
 /* ---- Vue Semaine : horaire par bloc (lundi au vendredi, AM / PM), tous les groupes en même temps.
    Blocs de 3 h, sauf jeudi PM = 1 h de cours (+ 2 h de plage verte). Placement sans mettre un prof à deux places. ---- */
 const BLOCS = [["Lundi","AM",3],["Lundi","PM",3],["Mardi","AM",3],["Mardi","PM",3],["Mercredi","AM",3],["Mercredi","PM",3],["Jeudi","AM",3],["Jeudi","PM",1],["Vendredi","AM",3],["Vendredi","PM",3]];
