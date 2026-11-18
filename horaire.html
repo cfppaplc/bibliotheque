@@ -458,35 +458,39 @@ function placer(s, m, n, sauf){ let garde = 0;
     if (wi >= 0){ const u = Math.min(3, n, s.sem[wi].h - totSem(s, wi)); poser(s, wi, m, u); n -= u; continue; }
     break; }
   return n; }
-function deplacerHors(s, m, wi, u, cond, seulP){ /* sort u h de m de la semaine wi vers une semaine qui respecte cond */
-  let n = retirer(s, wi, m.k, u, seulP); const pris = n;
-  for (let wj = 0; wj < s.sem.length && n > 0; wj++){ const w = s.sem[wj]; if (wj === wi || !cond(w)) continue;
-    const place = w.h - totSem(s, wj); if (place > 0){ const x = Math.min(n, place); poser(s, wj, m, x); n -= x; continue; }
-    /* semaine pleine : échange avec un autre module qui peut aller dans la semaine wi */
-    for (const m2 of s.mods){ if (n <= 0) break; if (m2 === m || m2.autre || !okDate(m2, s.sem[wi])) continue; const h2 = totalCase(s, wj, m2.k); if (!h2) continue;
-      const x = Math.min(n, h2, 3); retirer(s, wj, m2.k, x); poser(s, wi, m2, x); poser(s, wj, m, x); n -= x; } }
-  if (n > 0) poser(s, wi, m, n); return pris - n; }
-function regler(a){ const s = ses(); let fait = 0;
+/* déplace x h de m données par p, de la semaine wi vers une autre semaine. Le prof reste le même :
+   les heures de chaque enseignant dans la session ne changent jamais. Sinon, échange avec le bloc d'un autre prof. */
+const ajout = (s, wi, k, p, x) => fixer(s, wi, k, p, (cell(s, wi, k)[p] || 0) + x);
+function bouger(s, m, p, wi, x, cond, sansEchange){
+  for (let wj = 0; wj < s.sem.length; wj++){ const w = s.sem[wj]; if (wj === wi || !cond(w)) continue;
+    if (w.h - totSem(s, wj) >= x && (p === "-" || libre(p, w) >= x)){ retirer(s, wi, m.k, x, p); ajout(s, wj, m.k, p, x); return x; } }
+  if (sansEchange) return 0;
+  for (let wj = 0; wj < s.sem.length; wj++){ const w = s.sem[wj]; if (wj === wi || !cond(w)) continue; if (p !== "-" && libre(p, w) < x) continue;
+    for (const m2 of s.mods){ if (m2.autre || !okDate(m2, s.sem[wi])) continue; const c2 = cell(s, wj, m2.k);
+      for (const q in c2){ if (q === p || c2[q] < x) continue; if (q !== "-" && libre(q, s.sem[wi]) < x) continue;
+        retirer(s, wi, m.k, x, p); ajout(s, wj, m.k, p, x); retirer(s, wj, m2.k, x, q); ajout(s, wi, m2.k, q, x); return x; } } }
+  return 0; }
+function sortir(s, m, wi, cond, seulP, combien, sansEchange){ let n = combien == null ? 1e9 : combien, fait = 0;
+  for (const p of Object.keys(cell(s, wi, m.k))){ if (seulP && p !== seulP) continue;
+    while (n > 0 && (cell(s, wi, m.k)[p] || 0) > 0){ const x = Math.min(3, n, cell(s, wi, m.k)[p]), r = bouger(s, m, p, wi, x, cond, sansEchange); if (!r) break; n -= r; fait += r; } }
+  return fait; }
+function regler(a){ const s = ses(); let fait = 0, reste = "";
   if (a.fx === "apres"){ const m = s.mods.find(x => x.k === a.k);
-    s.sem.forEach((w, wi) => { const h = totalCase(s, wi, m.k); if (h && !okDate(m, w)) fait += deplacerHors(s, m, wi, h, w2 => okDate(m, w2)); }); }
+    s.sem.forEach((w, wi) => { if (!okDate(m, w) && totalCase(s, wi, m.k)) fait += sortir(s, m, wi, w2 => okDate(m, w2)); }); }
   if (a.fx === "mod"){ const m = s.mods.find(x => x.k === a.k); let e = s.sem.reduce((t, w, wi) => t + totalCase(s, wi, m.k), 0) - m.h;
     if (e > 0) for (let wi = s.sem.length - 1; wi >= 0 && e > 0; wi--){ const r = retirer(s, wi, m.k, e); e -= r; fait += r; }
     else if (e < 0){ const n = -e, r = placer(s, m, n); fait = n - r;
-      if (r > 0) alert(`Il reste ${r} h de « ${m.titre} » à placer, mais toutes les semaines sont pleines. Enlève des heures d'un autre module ou ajoute une semaine.`); } }
+      if (r > 0) reste = `Il reste ${r} h de « ${m.titre} » à placer, mais toutes les semaines sont pleines. Enlève des heures d'un autre module ou ajoute une semaine.`; } }
   if (a.fx === "sem"){ const wi = a.w, w = s.sem[wi]; let e = totSem(s, wi) - w.h;
     const tot = m => s.sem.reduce((t, x, i) => t + totalCase(s, i, m.k), 0);
     s.mods.filter(m => !m.autre && tot(m) > m.h).forEach(m => { if (e <= 0) return; const r = retirer(s, wi, m.k, Math.min(e, tot(m) - m.h)); e -= r; fait += r; });
-    s.mods.filter(m => !m.autre).sort((x, y) => totalCase(s, wi, y.k) - totalCase(s, wi, x.k)).forEach(m => { if (e <= 0) return; const h = Math.min(e, totalCase(s, wi, m.k)); if (!h) return;
-      retirer(s, wi, m.k, h); const r = placer(s, m, h, wi); if (r) poser(s, wi, m, r); e -= h - r; fait += h - r; }); }
+    s.mods.filter(m => !m.autre).forEach(m => { if (e <= 0) return; const r = sortir(s, m, wi, w2 => okDate(m, w2), null, e, true); e -= r; fait += r; });
+    if (e > 0) reste = `Il reste ${e} h de trop cette semaine : les autres semaines sont pleines ou les enseignants n'ont plus de place.`; }
   if (a.fx === "prof"){ const wi = a.w, w = s.sem[wi]; let e = -libre(a.p, w);
-    s.mods.filter(m => !m.autre && cell(s, wi, m.k)[a.p]).forEach(m => { if (e <= 0) return;
-      for (const q of profsDe(m)){ if (q === a.p || e <= 0) continue; const x = Math.min(e, cell(s, wi, m.k)[a.p] || 0, Math.max(0, libre(q, w))); if (x <= 0) continue;
-        retirer(s, wi, m.k, x, a.p); fixer(s, wi, m.k, q, (cell(s, wi, m.k)[q] || 0) + x); e -= x; fait += x; } });
-    if (e > 0) s.mods.filter(m => !m.autre && cell(s, wi, m.k)[a.p]).forEach(m => { if (e <= 0) return; const x = Math.min(e, cell(s, wi, m.k)[a.p]);
-      const avant = libre(a.p, w); const d = deplacerHors(s, m, wi, x, w2 => okDate(m, w2) && profsDe(m).some(q => libre(q, w2) >= Math.min(3, x)), a.p); e = -libre(a.p, w); fait += d; });
-    if (e > 0) alert(`${D.profs[a.p]} a encore ${e} h de trop cette semaine. Aucun autre enseignant libre ne peut prendre ses modules : coche d'autres modules pour un enseignant dans Réglages → Enseignants.`); }
-  if (!fait && a.fx !== "mod" && a.fx !== "prof") alert("Je n'ai pas trouvé de solution automatique pour ce point. Utilise « Voir » pour le régler à la main.");
-  sauver(); dessiner(); }
+    s.mods.filter(m => !m.autre && cell(s, wi, m.k)[a.p]).forEach(m => { if (e <= 0) return; fait += sortir(s, m, wi, w2 => okDate(m, w2), a.p, e); e = -libre(a.p, w); });
+    if (e > 0) reste = `${D.profs[a.p]} a encore ${e} h de trop cette semaine. Je n'ai pas trouvé d'échange possible sans changer ses heures de la session.`; }
+  sauver(); dessiner();
+  if (reste) alert(reste); else if (!fait) alert("Je n'ai pas trouvé de solution automatique pour ce point. Utilise « Voir » pour le régler à la main."); }
 document.addEventListener("click", e => { const b = e.target.closest("[data-acc],[data-revoir]"); if (!b) return; e.stopPropagation(); const A = (D.acceptes = D.acceptes || {});
   if (b.dataset.revoir != null) delete A[grp().id]; else (A[grp().id] = A[grp().id] || []).push(PROBS[+b.dataset.acc].t); sauver(); dessiner(); }, true);
 document.addEventListener("click", e => { const b = e.target.closest("[data-fx]"); if (!b) return; e.stopPropagation(); regler(PROBS[+b.dataset.fx]); }, true);
