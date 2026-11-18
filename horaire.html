@@ -323,7 +323,7 @@ function vueSemaine(){ const s = ses(); SW = Math.max(0, Math.min(SW, s.sem.leng
   // groupes présents cette semaine et leurs heures (modules d'abord, autres activités ensuite; la plage verte a sa place fixe le jeudi PM)
   const groupes = []; D.groupes.forEach(g => g.sessions.forEach(x => x.sem.forEach((w, wi) => { if (w.d !== d) return; const items = [], W = x.g[wi] || {};
     for (const k in W){ const m = x.mods.find(y => y.k === k); if (!m || m.jt || /plage verte/i.test(m.titre)) continue; for (const p in W[k]) items.push({ p, m, h:W[k][p] }); }
-    groupes.push({ nom:g.nom, items }); })));
+    groupes.push({ nom:g.nom, items, s:x, wi }); })));
   const blocs = []; JOURS.forEach((j, di) => ["AM", "PM"].forEach(pm => blocs.push({ di, pm, h: congé[di] ? 0 : (j === "Jeudi" && pm === "PM" ? 1 : 3) })));
   const R = groupes.map(() => []), restes = groupes.map(g => g.items.map(i => Object.assign({}, i)));
   blocs.map((b, bi) => [b, bi]).sort((x, y) => y[0].h - x[0].h).forEach(([b, bi]) => { const pris = new Set(); if (!b.h) return;   /* blocs de 3 h d'abord; le jeudi PM (1 h) prend ce qui reste */
@@ -344,10 +344,27 @@ function vueSemaine(){ const s = ses(); SW = Math.max(0, Math.min(SW, s.sem.leng
       if (congé[di]){ const c = JT[typeJ[di]].c; h += `<div class="cal-b off"><div class="ev conge" style="border-color:${c};background:${c}22;color:${c}">${congé[di]}</div></div>`; return; }
       h += `<div class="cal-b" data-bi="${bi}">` + groupes.map((g, gi) => R[gi][bi] ? carte(R[gi][bi], g.nom, gi, bi) : "").join("") +
         (j === "Jeudi" && pm === "PM" ? `<div class="ev pv"><b>Plage verte</b><span>2 h · récupération</span></div>` : "") + `</div>`; }); });
-  $("#vue").innerHTML = h + `</div><p class="mini" style="padding:0 16px 12px">Glisse une carte vers un autre bloc pour échanger les deux cours de ce groupe. <button data-rz="${d}" style="padding:4px 10px">Remettre le placement automatique</button></p>`; vueSemaine.d = d;
+  $("#vue").innerHTML = h + `</div><p class="mini" style="padding:0 16px 12px">Glisse une carte vers un autre bloc pour échanger les deux cours de ce groupe. Double-clique une carte pour la modifier. <button data-rz="${d}" style="padding:4px 10px">Remettre le placement automatique</button></p>`; vueSemaine.d = d; vueSemaine.G = groupes; vueSemaine.R = R;
   $("#etat").className = "etat " + (reste.length ? "err" : "ok"); $("#etat").textContent = reste.length ? reste.length + " point" + (reste.length > 1 ? "s" : "") + " à régler" : "Semaine possible sans conflit";
   $("#alertes").innerHTML = $("#alertes").dataset.ouv ? reste.map(a => `<div class="alert">${a}</div>`).join("") : "";
 }
+/* double-clic sur une carte de la semaine : changer le module, l'enseignant ou retirer le bloc */
+let ED = null;
+function modifierCarte(gi, bi){ const g = vueSemaine.G[gi], c = vueSemaine.R[gi][bi]; if (!g || !c || c.vide) return; const s = g.s, w = s.sem[g.wi];
+  ED = { s, wi:g.wi, m:c.m, p:c.p, h:c.h, nm:c.m.k, np:c.p };
+  const dessin = () => { const m = s.mods.find(x => x.k === ED.nm), P = m.autre ? ["-"] : [...new Set([...profsDe(m), ...Object.keys(D.profs)])];
+    $("#dlgC").innerHTML = `<h2 style="margin-top:0">Modifier ce cours</h2><p class="mini">${g.nom} · semaine du ${jm(w.d)} · ${ED.h} h</p>
+    <div class="form"><label>Module<br><select id="edM">${s.mods.map(x => `<option value="${x.k}" ${x.k === ED.nm ? "selected" : ""}>${x.num ? x.num + " · " : ""}${x.titre}</option>`).join("")}</select></label></div>
+    ${m.autre ? "" : `<p><b>Enseignant :</b></p><p>${P.map(p => { const l = libre(p, w) + (p === ED.p ? ED.h : 0), peut = profsDe(m).includes(p);
+      return `<span class="chip ${p === ED.np ? "on" : ""}" data-edp="${p}" style="padding:8px 12px;font-size:13px;${peut ? "" : "opacity:.55"}" title="${peut ? "" : "Ce module n'est pas coché pour lui"}">${D.profs[p]} <small>(${l >= 0 ? l + " h libres" : -l + " h de trop"})</small></span>`; }).join("")}</p>`}
+    <p style="display:flex;gap:8px;justify-content:space-between;margin-top:18px"><button id="edX" style="color:var(--err)">Retirer ce bloc</button><span style="display:flex;gap:8px"><button id="edA">Annuler</button><button class="prim" id="edOk">Enregistrer</button></span></p>`; };
+  dessin(); modifierCarte.dessin = dessin; if (!dlg.open) dlg.showModal(); }
+$("#dlgC").addEventListener("change", e => { if (ED && e.target.id === "edM"){ ED.nm = e.target.value; const m = ED.s.mods.find(x => x.k === ED.nm); if (m.autre) ED.np = "-"; else if (!profsDe(m).includes(ED.np)) ED.np = profsDe(m)[0] || ED.np; modifierCarte.dessin(); } });
+$("#dlgC").addEventListener("click", e => { if (!ED) return; const c = e.target.closest("[data-edp]"); if (c){ ED.np = c.dataset.edp; modifierCarte.dessin(); return; }
+  if (e.target.id === "edA"){ ED = null; dlg.close(); return; }
+  if (e.target.id === "edX" || e.target.id === "edOk"){ retirer(ED.s, ED.wi, ED.m.k, ED.h, ED.p); if (e.target.id === "edOk") ajout(ED.s, ED.wi, ED.nm, ED.np, ED.h); ED = null; sauver(); dlg.close(); dessiner(); } });
+dlg.addEventListener("close", () => { ED = null; });
+document.addEventListener("dblclick", e => { const c = e.target.closest("#vue .ev.glisse"); if (c) modifierCarte(+c.dataset.gi, +c.dataset.bi); });
 /* ===== Calendrier, programmes et enseignants (17 nov.) ===== */
 const ORDRE_EGI = [["1","436201","Métier et formation",15,0],["2","436212","Santé et sécurité",30,0],["3","436222","Gestion d'un petit entrepôt",30,0],["4","436238","Entretien ménager (partie 1)",60,0],["6","436255","Travaux de menuiserie et réfection",75,6],["11","436304","Ventilation et climatisation",60,0],["10","436295","Plomberie et chauffage",75,3],["13","436274","Entretien du matériel électrique",60,0],["14","436323","Lecture de plans de bâtiments",45,0],["4","436238","Entretien ménager (partie 2)",60,3],["5","436244","Travaux mineurs d'entretien",60,6],["8","436352","Recherche d'emploi",30,0],["9","436266","Systèmes de mécanique du bâtiment",90,0],["12","436312","Systèmes de protection incendie",30,0],["15","436333","Micro-ordinateur",45,0],["16","436343","Administration d'un bâtiment",45,0],["17","436364","Intégration au travail (stage)",60,0],["7","436282","Communication en milieu de travail",30,0]];
 function prepDonnees(){
