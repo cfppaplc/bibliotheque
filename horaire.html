@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="fr-CA">
+<head>
+<meta charset="utf-8">
+<script src="vieux-navigateur.js"></script>
+<script src="garde-admin.js"></script>
+<script src="signaler.js?v=2"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Métier+ — Planification des horaires</title>
+<link rel="icon" href="img/metier-plus-icone.svg">
+<!-- © 2026 Jérémy Raymond. Tous droits réservés. -->
+<style>
+:root{--or:#EB6A22;--mar:#1E2A44;--f:#F6F3EE;--l:#E3DDD2;--ok:#1E8A55;--err:#C0392B}
+*{box-sizing:border-box}body{margin:0;font:14px system-ui,Segoe UI,Roboto,sans-serif;background:var(--f);color:var(--mar)}
+header{display:flex;align-items:center;gap:14px;padding:12px 20px;background:#fff;border-bottom:1px solid var(--l);position:sticky;top:0;z-index:5}
+header img{height:26px}header h1{font-size:17px;margin:0;font-weight:600;color:#6F6656}.esp{flex:1}
+button,select,input{font:inherit}button{background:#fff;border:1px solid var(--l);border-radius:8px;padding:7px 12px;cursor:pointer;color:var(--mar)}
+button.prim{background:var(--or);border-color:var(--or);color:#fff;font-weight:600}button:hover{border-color:var(--or)}
+main{padding:16px 20px}.barre{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
+.onglets button.on{background:var(--mar);color:#fff;border-color:var(--mar)}
+.carte{background:#fff;border:1px solid var(--l);border-radius:12px;padding:14px;margin-bottom:14px;overflow:auto}
+table{border-collapse:collapse}th,td{border:1px solid var(--l);padding:0;text-align:center;font-size:12px}
+th{background:#FBF9F5;font-weight:600;padding:3px 4px}
+.g td input{width:34px;border:0;text-align:center;padding:4px 0;background:transparent}
+.g td.resp{background:#FFF7D6}.g td.vide{background:#F1EEE8}
+.g .sem{white-space:nowrap;padding:3px 8px;text-align:left}.g th.mod{min-width:108px}
+.rot{writing-mode:vertical-rl;transform:rotate(180deg);height:150px;white-space:nowrap;font-weight:600;font-size:11px;padding:4px 2px;overflow:hidden;text-overflow:ellipsis}
+.bad{background:#FBE3E0!important;color:var(--err);font-weight:700}.good{color:var(--ok);font-weight:700}
+.mini{font-size:12px;color:#6F6656}.pill{display:inline-block;padding:2px 8px;border-radius:99px;background:#EEE;margin:2px}
+.pill.bad{background:#FBE3E0}.alert{border-left:4px solid var(--err);padding:8px 12px;background:#fff;border-radius:8px;margin:6px 0}
+dialog{border:0;border-radius:14px;padding:18px;max-width:720px;width:92vw;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+dialog textarea{width:100%;min-height:220px;font:12px ui-monospace,monospace}
+.mods td,.mods th{padding:4px 6px}.mods input{width:100%;border:1px solid var(--l);border-radius:6px;padding:4px}
+@media print{header,.barre,.noprint{display:none!important}body{background:#fff}.carte{border:0;padding:0}@page{size:landscape;margin:8mm}}
+</style>
+</head>
+<body>
+<header><img src="img/metier-plus.svg" alt="Métier+"><h1>Planification des horaires</h1><span class="esp"></span>
+<button onclick="location.href='./'">‹ Bibliothèque</button></header>
+<main>
+<div class="barre">
+  <label>Groupe <select id="gSel"></select></label>
+  <span class="onglets" id="sOng"></span>
+  <span class="esp"></span>
+  <button id="bAuto" class="prim">Remplir automatiquement</button>
+  <button id="bVide">Vider la session</button>
+  <button id="bProfs">Vue des profs</button>
+  <button id="bTach">Tâches annuelles</button>
+  <button id="bMods">Modules et semaines</button>
+  <button id="bGrp">+ Groupe</button>
+  <button onclick="print()">Imprimer</button>
+  <button id="bExp">Sauvegarder (fichier)</button>
+  <button id="bImp">Importer</button>
+</div>
+<div id="alertes"></div>
+<div class="carte" id="vue"></div>
+<p class="mini noprint">Chaque case = heures données par un prof à ce module cette semaine. Jaune = prof responsable du module. Rouge = trop ou pas assez d'heures, ou un prof placé dans deux groupes en même temps. Tout est gardé sur cet ordinateur (bouton « Sauvegarder » pour une copie).</p>
+</main>
+
+<dialog id="dlg"><div id="dlgC"></div><p style="text-align:right;margin:12px 0 0"><button onclick="dlg.close()">Fermer</button></p></dialog>
+
+<script>
+"use strict";
+const $ = s => document.querySelector(s), CLE = "horairesMetier";
+const PROFS0 = { "M.M": "Marc Michaud", "J.R": "Jeremy Raymond", "J.O": "Jean René Ouellet" };
+const S1 = [["436201","Métier et formation",1,15,0],["436212","Santé et sécurité",2,30,0],["436222","Gestion petit entrepôt",3,30,0],["436238","Entretien ménager",4,60,0],["436255","Travaux min. et réfect.",6,75,6],["436304","Ventilation",11,60,0],["436295","Plomberie chauffage",10,75,3],["436274","Entr. matériel élect.",13,60,0],["436323","Lecture plans bâtiment",14,45,0]];
+const S2 = [["436238","Entretien ménager",4,60,3],["436244","Travaux min. entretien",5,60,6],["436352","Recherche d'emploi",8,30,0],["436266","Système méc. bâtiment",9,90,0],["436312","Syst. prot. incendie",12,30,0],["436333","Micro-ordinateur",15,45,0],["436343","Adm. d'un bâtiment",16,45,0],["436364","Int. au travail (stage)",17,60,0],["436282","Communication",7,30,0]];
+const SEM1 = [["2025-08-31",15],["2025-09-07",12],["2025-09-14",21],["2025-09-21",27],["2025-09-28",27],["2025-10-05",27],["2025-10-12",21],["2025-10-19",27],["2025-10-26",27],["2025-11-02",21],["2025-11-09",27],["2025-11-16",27],["2025-11-23",27],["2025-11-30",27],["2025-12-07",27],["2025-12-14",27],["2025-12-21",12],["2026-01-04",12],["2026-01-11",21],["2026-01-18",18]];
+const SEM2 = [["2026-01-26",12],["2026-02-02",27],["2026-02-09",27],["2026-02-16",27],["2026-02-23",27],["2026-03-09",21],["2026-03-16",27],["2026-03-23",27],["2026-03-30",21],["2026-04-06",21],["2026-04-13",27],["2026-04-20",27],["2026-04-27",27],["2026-05-04",27],["2026-05-11",27],["2026-05-18",18],["2026-05-25",30],["2026-06-01",30]];
+const mods = (L, p) => L.map(m => ({ code:m[0], titre:m[1], num:m[2], h:m[3], ev:m[4], profs:p(m) }));
+function depart(){ return { profs: PROFS0, groupes: [{ id:"g1", nom:"2025EGI1", prog:"5211 Entretien général d'immeubles", titulaire:"Marc Michaud", sessions:[
+  { nom:"Session 1", sem:SEM1.map(([d,h]) => ({d,h})), mods:mods(S1, m => m[0] === "436212" ? ["J.O"] : m[0] === "436295" ? ["J.R","M.M"] : ["M.M","J.R"]), g:{} },
+  { nom:"Session 2", sem:SEM2.map(([d,h]) => ({d,h})), mods:mods(S2, () => ["M.M","J.R"]), g:{} } ] }] }; }
+let D; try { D = JSON.parse(localStorage.getItem(CLE)) || depart(); } catch(e){ D = depart(); }
+let G = 0, S = 0;
+const sauver = () => { try { localStorage.setItem(CLE, JSON.stringify(D)); } catch(e){ alert("Mémoire pleine : sauvegarde le fichier."); } };
+const grp = () => D.groupes[G], ses = () => grp().sessions[S];
+const val = (s, w, code, p) => +((s.g[w] || {})[code + "|" + p] || 0);
+const fixer = (s, w, code, p, v) => { const k = code + "|" + p; s.g[w] = s.g[w] || {}; if (v > 0) s.g[w][k] = v; else delete s.g[w][k]; };
+const lun = d => { const x = new Date(d + "T12:00"); return x.toLocaleDateString("fr-CA", { day:"numeric", month:"short", year:"2-digit" }); };
+
+/* heures d'un prof par date de semaine, tous groupes confondus */
+function chargeProfs(){ const C = {};
+  D.groupes.forEach((g, gi) => g.sessions.forEach(s => s.sem.forEach((w, wi) => { for (const k in (s.g[wi] || {})) { const p = k.split("|")[1], v = s.g[wi][k];
+    const c = (C[p] = C[p] || {}); const e = (c[w.d] = c[w.d] || { h:0, max:w.h, grp:new Set() }); e.h += v; e.grp.add(g.nom); e.max = Math.max(e.max, w.h); } })));
+  return C; }
+
+function dessiner(){
+  $("#gSel").innerHTML = D.groupes.map((g, i) => `<option value="${i}" ${i === G ? "selected" : ""}>${g.nom}</option>`).join("");
+  $("#sOng").innerHTML = grp().sessions.map((s, i) => `<button data-s="${i}" class="${i === S ? "on" : ""}">${s.nom}</button>`).join("");
+  const s = ses(), C = chargeProfs(), A = [];
+  let h = `<table class="g"><thead><tr><th rowspan="3">Semaine</th><th rowspan="3">H/sem</th>`;
+  s.mods.forEach(m => h += `<th colspan="${m.profs.length || 1}" class="mod"><div class="rot">${m.num} · ${m.titre}</div></th>`);
+  h += `<th rowspan="3">Placé</th></tr><tr>`;
+  s.mods.forEach(m => h += `<th colspan="${m.profs.length || 1}">${m.code}<br>${m.h} h${m.ev ? " · éval " + m.ev : ""}</th>`);
+  h += `</tr><tr>`; s.mods.forEach(m => (m.profs.length ? m.profs : ["—"]).forEach((p, j) => h += `<th class="${j === 0 ? "resp" : ""}" title="${D.profs[p] || ""}">${p}</th>`));
+  h += `</tr></thead><tbody>`;
+  s.sem.forEach((w, wi) => { let tot = 0; h += `<tr><td class="sem">${lun(w.d)}</td><td>${w.h}</td>`;
+    s.mods.forEach(m => (m.profs.length ? m.profs : [null]).forEach((p, j) => { if (!p){ h += `<td class="vide"></td>`; return; }
+      const v = val(s, wi, m.code, p); tot += v; const ch = (C[p] || {})[w.d], conf = ch && ch.h > ch.max;
+      if (conf && v) A.push(`${D.profs[p] || p} : ${ch.h} h la semaine du ${lun(w.d)} (${[...ch.grp].join(", ")}) pour ${ch.max} h possibles`);
+      h += `<td class="${j === 0 ? "resp" : ""} ${conf && v ? "bad" : ""}"><input inputmode="numeric" data-w="${wi}" data-c="${m.code}" data-p="${p}" value="${v || ""}"></td>`; }));
+    h += `<td class="${tot > w.h ? "bad" : tot === w.h ? "good" : ""}">${tot}</td></tr>`; });
+  h += `</tbody><tfoot><tr><th colspan="2">Placé / prévu</th>`;
+  let ok = true; s.mods.forEach(m => { const t = s.sem.reduce((a, w, wi) => a + m.profs.reduce((b, p) => b + val(s, wi, m.code, p), 0), 0); const d = t - m.h; if (d) ok = false;
+    h += `<th colspan="${m.profs.length || 1}" class="${d ? "bad" : "good"}">${t} / ${m.h}${d ? `<br>${d > 0 ? "+" : ""}${d}` : " ✓"}</th>`; });
+  const ht = s.sem.reduce((a, w) => a + w.h, 0), hm = s.mods.reduce((a, m) => a + m.h, 0);
+  h += `<th class="${ht === hm ? "" : "bad"}">${ht} h dispo<br>${hm} h prévues</th></tr></tfoot></table>`;
+  // totaux par prof dans cette session
+  const T = {}; s.sem.forEach((w, wi) => { for (const k in (s.g[wi] || {})) { const p = k.split("|")[1]; T[p] = (T[p] || 0) + s.g[wi][k]; } });
+  h += `<p style="margin:12px 0 0"><b>Heures par enseignant (${s.nom}) :</b> ` + Object.keys(T).map(p => `<span class="pill">${D.profs[p] || p} : ${T[p]} h</span>`).join("") + `</p>`;
+  $("#vue").innerHTML = h;
+  $("#alertes").innerHTML = [...new Set(A)].slice(0, 8).map(a => `<div class="alert">Conflit : ${a}</div>`).join("") + (ht !== hm ? `<div class="alert">Les semaines donnent ${ht} h, mais les modules demandent ${hm} h.</div>` : "");
+}
+document.addEventListener("change", e => { const i = e.target; if (i.dataset.w == null) return; fixer(ses(), +i.dataset.w, i.dataset.c, i.dataset.p, Math.max(0, Math.round(+i.value.replace(",", ".") || 0))); sauver(); dessiner(); });
+document.addEventListener("click", e => { const b = e.target.closest("[data-s]"); if (b){ S = +b.dataset.s; dessiner(); } });
+$("#gSel").onchange = e => { G = +e.target.value; S = 0; dessiner(); };
+
+/* remplissage dans l'ordre des modules : chaque semaine reçoit ses heures, module après module, au prof responsable,
+   sans dépasser ce que ce prof a déjà dans les autres groupes cette semaine-là */
+$("#bAuto").onclick = () => { const s = ses();
+  if (Object.keys(s.g).length && !confirm("Remplacer ce qui est déjà placé dans cette session ?")) return;
+  s.g = {}; const C = chargeProfs(); let mi = 0, reste = s.mods.length ? s.mods[0].h : 0;
+  s.sem.forEach((w, wi) => { let cap = w.h;
+    while (cap > 0 && mi < s.mods.length){ const m = s.mods[mi];
+      const p = m.profs.find(q => { const ch = (C[q] || {})[w.d]; return !ch || ch.h < ch.max; }) || m.profs[0];
+      if (!p){ mi++; reste = mi < s.mods.length ? s.mods[mi].h : 0; continue; }
+      const deja = ((C[p] || {})[w.d] || { h:0 }).h, libre = Math.max(0, w.h - deja); let v = Math.min(cap, reste, libre || cap);
+      fixer(s, wi, m.code, p, val(s, wi, m.code, p) + v); cap -= v; reste -= v;
+      if (reste <= 0){ mi++; reste = mi < s.mods.length ? s.mods[mi].h : 0; } if (!v) break; } });
+  sauver(); dessiner(); };
+$("#bVide").onclick = () => { if (confirm("Effacer toutes les heures placées de cette session ?")){ ses().g = {}; sauver(); dessiner(); } };
+
+/* vue des profs : heures par semaine, tous groupes */
+$("#bProfs").onclick = () => { const C = chargeProfs(), dates = [...new Set(D.groupes.flatMap(g => g.sessions.flatMap(s => s.sem.map(w => w.d))))].sort();
+  let h = `<h3 style="margin-top:0">Heures des enseignants par semaine (tous les groupes)</h3><div style="overflow:auto;max-height:70vh"><table><tr><th>Semaine</th>` + Object.keys(D.profs).map(p => `<th>${D.profs[p]}</th>`).join("") + `</tr>`;
+  dates.forEach(d => { h += `<tr><td class="sem">${lun(d)}</td>` + Object.keys(D.profs).map(p => { const e = (C[p] || {})[d]; return `<td class="${e && e.h > e.max ? "bad" : ""}" title="${e ? [...e.grp].join(", ") : ""}">${e ? e.h : ""}</td>`; }).join("") + `</tr>`; });
+  $("#dlgC").innerHTML = h + `</table></div>`; dlg.showModal(); };
+
+/* modules, profs et semaines de la session : modifiables en texte simple */
+$("#bMods").onclick = () => { const s = ses();
+  $("#dlgC").innerHTML = `<h3 style="margin-top:0">${grp().nom} · ${s.nom}</h3>
+  <p class="mini">Une ligne par module, dans l'ordre : <b>code ; titre ; numéro ; heures ; heures d'évaluation ; profs</b> (initiales séparées par des virgules, le 1er = responsable).</p>
+  <textarea id="tM">${s.mods.map(m => [m.code, m.titre, m.num, m.h, m.ev, m.profs.join(",")].join(" ; ")).join("\n")}</textarea>
+  <p class="mini">Une ligne par semaine : <b>date du lundi (AAAA-MM-JJ) ; heures</b>. Enlève une semaine de congé ou change ses heures.</p>
+  <textarea id="tS" style="min-height:140px">${s.sem.map(w => w.d + " ; " + w.h).join("\n")}</textarea>
+  <p class="mini">Enseignants : <b>initiales ; nom</b>, une ligne chacun.</p>
+  <textarea id="tP" style="min-height:80px">${Object.entries(D.profs).map(([k, v]) => k + " ; " + v).join("\n")}</textarea>
+  <p><button class="prim" id="okM">Enregistrer</button></p>`;
+  dlg.showModal();
+  $("#okM").onclick = () => { const L = t => $(t).value.split("\n").map(l => l.split(";").map(x => x.trim())).filter(x => x[0]);
+    D.profs = Object.fromEntries(L("#tP").map(x => [x[0], x[1] || x[0]]));
+    s.mods = L("#tM").map(x => ({ code:x[0], titre:x[1] || "", num:+x[2] || 0, h:+x[3] || 0, ev:+x[4] || 0, profs:(x[5] || "").split(",").map(y => y.trim()).filter(Boolean) }));
+    s.sem = L("#tS").map(x => ({ d:x[0], h:+x[1] || 0 })); sauver(); dlg.close(); dessiner(); }; };
+
+$("#bGrp").onclick = () => { const nom = prompt("Nom du nouveau groupe (ex. 2026EGI2) :"); if (!nom) return;
+  const copie = JSON.parse(JSON.stringify(grp())); copie.id = "g" + Date.now(); copie.nom = nom; copie.sessions.forEach(s => s.g = {});
+  D.groupes.push(copie); G = D.groupes.length - 1; S = 0; sauver(); dessiner(); alert("Groupe créé à partir de " + D.groupes[G - 0].nom + " (mêmes modules). Ajuste ses semaines dans « Modules et semaines »."); };
+$("#bExp").onclick = () => { const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([JSON.stringify(D, null, 1)], { type:"application/json" })); a.download = "horaires-" + new Date().toISOString().slice(0, 10) + ".json"; a.click(); };
+$("#bImp").onclick = () => { const i = document.createElement("input"); i.type = "file"; i.accept = ".json"; i.onchange = async () => { try { D = JSON.parse(await i.files[0].text()); G = S = 0; sauver(); dessiner(); } catch(e){ alert("Fichier illisible."); } }; i.click(); };
+/* Tâches annuelles détaillées (comme la feuille « Tâches annuelles » de l'Excel) : tâche régulière et évaluation calculées,
+   chef de groupe, stages, reprise et autres entrés à la main */
+const COLS = [["reg","Tâche régulière",1],["ev","Heures évaluation",1],["cg","Chef de groupe",0],["st","Stages",0],["rep","Examen reprise",0],["aut","Autres",0]];
+function taches(){ const g = grp(), T = {}; g.taches = g.taches || {};
+  Object.keys(D.profs).forEach(p => T[p] = { reg:[0,0], ev:[0,0] });
+  g.sessions.slice(0, 2).forEach((s, si) => { s.sem.forEach((w, wi) => { for (const k in (s.g[wi] || {})) { const p = k.split("|")[1]; (T[p] = T[p] || { reg:[0,0], ev:[0,0] }).reg[si] += s.g[wi][k]; } });
+    s.mods.forEach(m => { const p = m.profs[0]; if (p && m.ev) (T[p] = T[p] || { reg:[0,0], ev:[0,0] }).ev[si] += m.ev; }); });
+  return T; }
+function dessinerTaches(){ const g = grp(), T = taches(), M = g.taches;
+  let h = `<h3 style="margin-top:0">Tâches annuelles détaillées · ${g.nom}</h3><div style="overflow:auto"><table class="mods"><tr><th rowspan="2">Enseignant</th>` + COLS.map(c => `<th colspan="2">${c[1]}${c[2] ? "" : " ✎"}</th>`).join("") + `<th colspan="2">Total</th><th rowspan="2">Annuel</th></tr><tr>` + COLS.concat([["t"]]).map(() => `<th>S1</th><th>S2</th>`).join("") + `</tr>`;
+  const somme = [0, 0];
+  Object.keys(T).forEach(p => { const m = M[p] = M[p] || {}; const tot = [0, 0];
+    h += `<tr><td style="text-align:left">${D.profs[p] || p}</td>`;
+    COLS.forEach(([k,, calc]) => [0, 1].forEach(si => { const v = calc ? T[p][k][si] : +((m[k] || [])[si] || 0); tot[si] += v;
+      h += calc ? `<td>${v || ""}</td>` : `<td><input style="width:52px" data-t="${p}|${k}|${si}" value="${v || ""}"></td>`; }));
+    somme[0] += tot[0]; somme[1] += tot[1];
+    h += `<td><b>${tot[0]}</b></td><td><b>${tot[1]}</b></td><td><b>${tot[0] + tot[1]}</b></td></tr>`; });
+  h += `<tr><th style="text-align:left">Total</th><th colspan="${COLS.length * 2}"></th><th>${somme[0]}</th><th>${somme[1]}</th><th>${somme[0] + somme[1]}</th></tr></table></div>
+  <p class="mini">✎ = à entrer à la main (ex. stage coupé : −30). La tâche régulière et l'évaluation (au prof responsable du module) viennent de la grille.</p>
+  <p><button onclick="print()">Imprimer</button></p>`;
+  $("#dlgC").innerHTML = h; }
+$("#bTach").onclick = () => { dessinerTaches(); dlg.showModal(); };
+$("#dlgC").addEventListener("change", e => { const t = e.target.dataset.t; if (!t) return; const [p, k, si] = t.split("|"), M = grp().taches;
+  const m = M[p] = M[p] || {}; m[k] = m[k] || [0, 0]; m[k][+si] = Math.round(+e.target.value.replace(",", ".") || 0); sauver(); dessinerTaches(); });
+dessiner();
+</script>
+</body>
+</html>
