@@ -61,7 +61,7 @@
   /* le menu de la gomme s'ouvre au-dessus de son bouton */
   bar.addEventListener("click", e => { if (innerWidth < 900 || !e.target.closest || !e.target.closest("#penE")) return;
     setTimeout(() => { const g = Q("#popGom"), b = Q("#penE"); if (g && b){ g.style.left = Math.max(8, Math.min(b.offsetLeft, bar.clientWidth - g.offsetWidth - 8)) + "px"; g.style.transform = "none"; } }, 0); });
-  setInterval(() => { try { const bc = Q("#penCol"), cur = bc && bc.querySelector(".pcur"); if (cur && bc.offsetWidth) bc.style.setProperty("--pcb", cur.style.getPropertyValue("--pc") || "#e2483d"); } catch(e){}
+  setInterval(() => { try { const bc = (RD.wb || RD.book) && document.hidden === false ? Q("#penCol") : null, cur = bc && bc.querySelector(".pcur"); if (cur && bc.offsetWidth) bc.style.setProperty("--pcb", cur.style.getPropertyValue("--pc") || "#e2483d"); } catch(e){}
     if (!RD.wb) return; const actif = !RD.crayonOff && !RD.eraser && !RD.text;
     try {   /* pastille de la couleur en cours sur « Crayon » */
       const zv = Q("#wbZv"), t = Math.round(RD.z / zMin() * 100) + "%"; if (zv && zv.textContent !== t) zv.textContent = t; } catch(e){}   /* 100 % = la vue de départ du tableau */

@@ -35,7 +35,7 @@
   function boucle(t){
     if (avant && !document.hidden) {
       const d = t - avant; images++;
-      if (d > 80) {
+      if (d > 80 && d < 5000) {
         lentes++; perdu += d;
         const c = contexte(), p = parCtx[c] || (parCtx[c] = { n: 0, ms: 0, max: 0 });
         p.n++; p.ms += d; p.max = Math.max(p.max, d);
