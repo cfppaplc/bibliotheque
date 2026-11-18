@@ -101,6 +101,7 @@ table.ed .n{width:56px}table.ed .c{width:86px}table.ed .h{width:60px}
     <button data-a="print">Imprimer</button>
     <button data-a="exp">Sauvegarder dans un fichier</button>
     <button data-a="imp">Ouvrir un fichier</button>
+    <button data-a="zero">Recommencer à zéro (tout vide)</button>
     <button data-a="raz">Recommencer avec l'exemple</button>
   </div></span>
 </div>
@@ -157,7 +158,10 @@ function charges(){ const C = {};
 /* heures placées d'un prof dans l'année (tous les groupes, modules seulement) */
 function totalAnnee(sauf){ const T = {}; D.groupes.forEach(g => g.sessions.forEach(s => { if (s === sauf) return; s.sem.forEach((w, wi) => { const W = s.g[wi] || {};
   for (const k in W){ const m = s.mods.find(x => x.k === k); if (!m || m.autre) continue; for (const p in W[k]) if (p !== "-") T[p] = (T[p] || 0) + W[k][p]; } }); })); return T; }
-function dessiner(){ if (D.groupes.some(g => remplirTrous(g))) sauver(); document.querySelectorAll("#vOng button").forEach(b => b.classList.toggle("on", b.dataset.v === VUE)); if (VUE === "e") return vueProfs(); if (VUE === "s") return vueSemaine();
+function dessiner(){ if (D.groupes.some(g => remplirTrous(g))) sauver();
+  if (!D.groupes.length){ $("#gSel").innerHTML = ""; $("#sOng").innerHTML = ""; $("#leg").innerHTML = ""; $("#alertes").innerHTML = ""; $("#etat").className = "etat"; $("#etat").textContent = "";
+    $("#vue").innerHTML = `<div style="padding:40px;text-align:center"><h2 style="margin-top:0">Aucun groupe pour l'instant</h2><p>Réponds aux questions une à la fois : l'horaire se bâtit à la fin.</p><button class="prim" id="bVide" style="font-size:16px;padding:10px 20px">Commencer l'assistant</button></div>`;
+    $("#bVide").onclick = () => { AS.on = true; AS.i = 0; assistant(); }; return; } document.querySelectorAll("#vOng button").forEach(b => b.classList.toggle("on", b.dataset.v === VUE)); if (VUE === "e") return vueProfs(); if (VUE === "s") return vueSemaine();
   $("#gSel").innerHTML = D.groupes.map((g, i) => `<option value="${i}" ${i === G ? "selected" : ""}>${g.nom}</option>`).join("");
   $("#sOng").innerHTML = grp().sessions.map((s, i) => `<button data-s="${i}" class="${i === S ? "on" : ""}">${s.nom}</button>`).join("");
   const s = ses(), C = charges(), prob = [];
@@ -244,6 +248,9 @@ function action(a){ const s = ses();
   if (a === "reg") reglages("cal");
   if (a === "exp"){ const l = document.createElement("a"); l.href = URL.createObjectURL(new Blob([JSON.stringify(D)], { type:"application/json" })); l.download = "horaires-" + new Date().toISOString().slice(0, 10) + ".json"; l.click(); }
   if (a === "imp"){ const i = document.createElement("input"); i.type = "file"; i.accept = ".json"; i.onchange = async () => { try { D = JSON.parse(await i.files[0].text()); G = S = 0; sauver(); dessiner(); } catch(x){ alert("Fichier illisible."); } }; i.click(); }
+  if (a === "zero" && confirm("Tout effacer (groupes, enseignants, tâches, absences, calendrier) et recommencer à zéro avec l'assistant ?\n\nLa liste des modules du programme est gardée.")){
+    Object.assign(D, { groupes:[], profs:{}, cible:{}, peut:{}, abs:{}, absRec:{}, sessProf:{}, acceptes:{}, echanges:{}, cal:{ debut:D.cal.debut, fin:D.cal.fin, off:{} }, calInit:1 }); delete D.prepare;
+    G = 0; S = 0; VUE = "g"; Object.assign(AS, { nom:"", deb:"", tit:"" }); sauver(); dessiner(); AS.on = true; AS.i = 0; assistant(); return; }
   if (a === "raz" && confirm("Effacer tout et reprendre l'exemple (2026EGI1) ?")){ localStorage.removeItem(CLE); location.reload(); }
 }
 /* remplissage simple : modules dans l'ordre, au 1er enseignant, en respectant ses heures dans les autres groupes */
@@ -372,7 +379,7 @@ document.addEventListener("dblclick", e => { const c = e.target.closest("#vue .e
 const ORDRE_EGI = [["1","436201","Métier et formation",15,0],["2","436212","Santé et sécurité",30,0],["3","436222","Gestion d'un petit entrepôt",30,0],["4","436238","Entretien ménager (partie 1)",60,0],["6","436255","Travaux de menuiserie et réfection",75,6],["11","436304","Ventilation et climatisation",60,0],["10","436295","Plomberie et chauffage",75,3],["13","436274","Entretien du matériel électrique",60,0],["14","436323","Lecture de plans de bâtiments",45,0],["4","436238","Entretien ménager (partie 2)",60,3],["5","436244","Travaux mineurs d'entretien",60,6],["8","436352","Recherche d'emploi",30,0],["9","436266","Systèmes de mécanique du bâtiment",90,0],["12","436312","Systèmes de protection incendie",30,0],["15","436333","Micro-ordinateur",45,0],["16","436343","Administration d'un bâtiment",45,0],["17","436364","Intégration au travail (stage)",60,0],["7","436282","Communication en milieu de travail",30,0]];
 function prepDonnees(){
   D.cal = D.cal || { debut:"2026-08-31", fin:"2027-06-18", off:{ "2026-09-07":"Fête du Travail", "2026-10-12":"Action de grâce", "2027-03-26":"Vendredi saint", "2027-03-29":"Lundi de Pâques", "2027-05-24":"Journée des patriotes" } };
-  if (!D.cal.off["2026-12-21"]) for (let d = new Date("2026-12-21T12:00"); d <= new Date("2027-01-01T12:00"); d.setDate(d.getDate() + 1)) D.cal.off[iso(d)] = "Vacances des Fêtes";
+  if (!D.calInit && !D.cal.off["2026-12-21"]) for (let d = new Date("2026-12-21T12:00"); d <= new Date("2027-01-01T12:00"); d.setDate(d.getDate() + 1)) D.cal.off[iso(d)] = "Vacances des Fêtes";
   D.prog = D.prog || { "EGI": { nom:"5211 Entretien général d'immeubles", mods:ORDRE_EGI.map(x => ({ num:x[0], code:x[1], titre:x[2], h:x[3], ev:x[4] })) }, "PC": { nom:"5333 Plomberie et chauffage", mods:[] } };
   D.peut = D.peut || {}; Object.keys(D.profs).forEach(p => { if (!D.peut[p]){ const S = new Set(); D.groupes.forEach(g => g.sessions.forEach(s => s.mods.forEach(m => { if (m.code && m.profs.includes(p)) S.add(m.code); }))); D.peut[p] = [...S]; } });
 }

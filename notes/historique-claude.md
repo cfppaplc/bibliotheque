@@ -598,3 +598,4 @@
 - 2026-11-17 : RÈGLE Jeremy : une session (sauf la dernière) est calculée pour 450 h et ne manque jamais de semaines → ajouterSemaine refuse sauf pour la dernière session (jusqu'au 30 juin) et explique de vérifier le calendrier.
 - 2026-11-18 : horaire.html vue Semaine — double-clic sur une carte = « Modifier ce cours » (module, enseignant, retirer le bloc; modifierCarte, ED).
 - 2026-11-18 : « Modifier ce cours » : nombre d'heures (− / + / champ).
+- 2026-11-18 : horaire.html — Plus → « Recommencer à zéro (tout vide) » (garde la liste des modules du programme; D.calInit empêche de remettre les vacances devinées); écran « Aucun groupe ».
