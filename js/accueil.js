@@ -574,9 +574,13 @@ function fit() {
   if (innerWidth <= 900 || app.clientHeight < 200) { r.style.setProperty("--fit", 1); compactSteps(0); return; }
   const manual = +cfg.scale > 0;
   const fits = f => { r.style.setProperty("--fit", f); return !overflows(); };
-  const best = (lo, hi) => { if (!fits(lo)) return null; for (let i = 0; i < 9; i++) { const m = (lo + hi) / 2; if (fits(m)) lo = m; else hi = m; } return lo; };
+  const best = (lo, hi) => { if (!fits(lo)) return null; for (let i = 0; i < 7; i++) { const m = (lo + hi) / 2; if (fits(m)) lo = m; else hi = m; } return lo; };
   let level = 0, f;
-  if (manual) {
+  /* 17 nov. (journal du TNI : fit = 2 s en 1 min) : on réessaie d'abord le dernier résultat (2 mesures) au lieu de tout recalculer (≈ 40 mesures) */
+  const DER = fit.der, cle = innerWidth + "x" + innerHeight;
+  if (!manual && DER && DER.cle === cle) { compactSteps(DER.level); if (fits(DER.f) && (DER.f >= 1.78 || !fits(Math.min(1.8, DER.f * 1.04)))) { level = DER.level; f = DER.f; } }
+  if (f) {}
+  else if (manual) {
     f = +cfg.scale;
     for (level = 0; level <= 3; level++) { compactSteps(level); if (fits(f)) break; }
     level = Math.min(level, 3);
@@ -589,6 +593,7 @@ function fit() {
     level = res.findIndex(x => x >= target); f = res[level] * 0.985;
   }
   compactSteps(level); r.style.setProperty("--fit", f.toFixed(4)); fitSegLabels();
+  if (!manual) fit.der = { cle, level, f };
   // Réafficher les étapes cachées une à une tant qu'il reste de la place (les plus proches d'abord)
   if (level > 0) {
     const lis = [...document.querySelectorAll("#v-steps .step")];
