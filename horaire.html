@@ -189,7 +189,7 @@ const modsChoisis = (pr, deps) => { const sesDe = []; let c = 0, sn = 0; pr.mods
   const garde = new Set(); deps.forEach(d => { d = +d || 1; garde.add(d); if (d % 2) garde.add(d + 1); }); return pr.mods.filter((m, j) => garde.has(sesDe[j])); };
 /* sessions d'un programme (coupe à 450 h) : [[modules de la session 1], [session 2], ...] */
 const sessionsProg = pr => { const S = []; let c = 0; (pr ? pr.mods : []).forEach((m, j) => { if (!S.length || c >= 450){ S.push([]); c = 0; } S[S.length - 1].push(m); c += +m.h || 0; }); return S; };
-const maxSem = () => +((D && D.maxSem) || 18);
+const maxSem = () => { if (D && !D.max24){ D.max24 = 1; if (!D.maxSem || +D.maxSem === 18) D.maxSem = 24; } return +((D && D.maxSem) || 24); };   /* 18 nov. : 24 h par semaine (Jeremy) */
 function charges(){ const C = {};
   D.groupes.forEach(g => g.sessions.forEach(s => s.sem.forEach((w, wi) => { const W = s.g[wi] || {};
     for (const k in W) for (const p in W[k]) { if (p === "-") continue; const c = (C[p] = C[p] || {}), e = (c[w.d] = c[w.d] || { h:0, max:w.h, grp:new Set() }); e.h += W[k][p]; e.grp.add(g.nom); e.max = Math.max(e.max, w.h); } })));
