@@ -311,14 +311,24 @@ function remplir(s){ const garde = {}; s.sem.forEach((w, wi) => { const W = s.g[
   D.groupes.forEach(g2 => g2.sessions.forEach(x => { if (x === s || !((parseInt((x.nom || "").replace(/\D/g, "")) || 1) % 2) !== PAIR) return; x.sem.forEach((w, wi) => x.mods.forEach(m => { if (m.autre) return; const c = cell(x, wi, m.k); for (const p in c) if (p !== "-") FSEM[p] = (FSEM[p] || 0) + c[p]; })); }));   /* heures déjà données cette demi-année dans les autres groupes */   /* tâche régulière prévue par session (Tâches annuelles) */ const C = charges(), L = s.mods.filter(m => !m.autre && m.h), OUV = 3;
   const reste = new Map(L.map(m => [m, HT(m)])); const attente = L.slice(), actifs = []; let finSem = "";
   const ouvrir = () => { for (let n = 0; n < attente.length && actifs.length < OUV; ){ const m = attente[n]; if (m.apres && m.apres > finSem){ n++; continue; } actifs.push(m); attente.splice(n, 1); } };   /* « pas avant » : un module attend sa date */
-  s.sem.forEach((w, wi) => { finSem = (() => { const z = new Date(w.d + "T12:00"); z.setDate(z.getDate() + 4); return iso(z); })(); let cap = w.h - s.mods.reduce((a, m) => a + (m.autre ? totalCase(s, wi, m.k) : 0), 0), tour = 0, garde = 0; ouvrir();
+  /* 18 nov. : rythme régulier — chaque prof avance au même rythme que la session (pas 2 mois sans cours à la fin) */
+  const totH = s.sem.reduce((a, w) => a + (+w.h || 0), 0) || 1; let cumH = 0;
+  /* demi-année (toutes les sessions de même parité, tous les groupes) : le rythme suit le calendrier, pas un seul groupe */
+  const SEMS = []; D.groupes.forEach(g2 => g2.sessions.forEach(x => { if (x === s || !((parseInt((x.nom || "").replace(/\D/g, "")) || 1) % 2) === PAIR) SEMS.push(x); }));
+  const d0 = Math.min(...SEMS.filter(x => x.sem.length).map(x => +new Date(x.sem[0].d)), +new Date(s.sem[0] ? s.sem[0].d : Date.now())), d1 = Math.max(...SEMS.filter(x => x.sem.length).map(x => +new Date(x.sem[x.sem.length - 1].d)), +new Date(s.sem.length ? s.sem[s.sem.length - 1].d : Date.now())) + 7 * 864e5;
+  const autresAvant = (q, d) => { let t = 0; SEMS.forEach(x => { if (x === s) return; x.sem.forEach((w2, wj) => { if (w2.d > d) return; x.mods.forEach(m => { if (!m.autre) t += cell(x, wj, m.k)[q] || 0; }); }); }); return t; };
+  const cibleT = q => { const tp = (D.tacheProf || {})[q]; return tp && (tp.s1 !== undefined || tp.s2 !== undefined) ? (+(PAIR ? tp.s2 : tp.s1) || 0) : null; };
+  const cibleS = q => { const pv = ((PREV[q] || {}).prev || [])[SI]; if (pv !== undefined && pv !== "") return +pv; const t = cibleT(q); return t == null ? null : Math.max(0, t - (FSEM[q] || 0)); };
+  s.sem.forEach((w, wi) => { cumH += +w.h || 0; const prog = cumH / totH, progT = Math.min(1, (+new Date(w.d) + 7 * 864e5 - d0) / (d1 - d0)); finSem = (() => { const z = new Date(w.d + "T12:00"); z.setDate(z.getDate() + 4); return iso(z); })(); let cap = w.h - s.mods.reduce((a, m) => a + (m.autre ? totalCase(s, wi, m.k) : 0), 0), tour = 0, garde = 0; ouvrir();
     const charge = p => (((C[p] || {})[w.d] || {}).h || 0);
     while (cap > 0 && actifs.length && garde++ < 200){ const m = actifs[tour % actifs.length];
       const u = Math.min(cap, 3, reste.get(m));
       const libres = m.profs.filter(q => sessOk(q, s) && charge(q) + u <= Math.min(w.h, capProf(q, w.d))), resteT = q => { const pv = ((PREV[q] || {}).prev || [])[SI]; if (pv !== undefined && pv !== "") return +pv - (FAIT[q] || 0);
         const tp = (D.tacheProf || {})[q]; if (tp && (tp.s1 !== undefined || tp.s2 !== undefined)) return (+(PAIR ? tp.s2 : tp.s1) || 0) - (FSEM[q] || 0) - (FAIT[q] || 0);
         return (+((D.cible || {})[q]) || 1e6) - (TA[q] || 0); };
-      const p = libres.filter(q => resteT(q) > 0).sort((x, y) => resteT(y) - resteT(x))[0] || "-";   /* 18 nov. : tâche pleine ou personne de libre → « non assigné », à donner à un autre */
+      const fait = q => { const pv = ((PREV[q] || {}).prev || [])[SI]; return (pv !== undefined && pv !== "") || cibleT(q) == null ? [FAIT[q] || 0, cibleS(q), prog] : [(FAIT[q] || 0) + autresAvant(q, w.d), cibleT(q), progT]; };
+      const avance = q => { const [f, t, pr] = fait(q); return t == null ? 1e5 : t * pr - f; };   /* retard sur son rythme (toute la demi-année) */
+      const p = libres.filter(q => { if (resteT(q) <= 0) return false; const [f, t, pr] = fait(q); return t == null || f + u <= t * pr + Math.max(9, t * .15); }).sort((x, y) => avance(y) - avance(x))[0] || "-";   /* tâche pleine, en avance sur son rythme ou personne de libre → « non assigné », réparti sur toute la session */
       fixer(s, wi, m.k, p, (cell(s, wi, m.k)[p] || 0) + u); if (p !== "-"){ TA[p] = (TA[p] || 0) + u; FAIT[p] = (FAIT[p] || 0) + u; } cap -= u; reste.set(m, reste.get(m) - u);
       if (p !== "-"){ const c = ((C[p] = C[p] || {})[w.d] = (C[p] || {})[w.d] || { h:0, max:w.h, grp:new Set() }); c.h += u; }
       if (reste.get(m) <= 0){ actifs.splice(actifs.indexOf(m), 1); ouvrir(); } else tour++; } });

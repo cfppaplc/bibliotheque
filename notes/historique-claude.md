@@ -632,3 +632,4 @@
 - 2026-11-18 : horaire : maximum par enseignant = 24 h par semaine (défaut, migration de 18 → 24 via D.max24).
 - 2026-11-18 : horaire suit le compte : COFFRE.demarrer("horaire", clé horairesMetier2). Paquets préparés : horaires/<id>.json = {env,data,t,titre} chiffré pour la clé publique du compte (COFFRE.emballer), ouvert au chargement avec COFFRE.lireLigne + confirmation (horairePaquetVu). Session 2 Plomberie déposée pour jeremy.raymond.
 - 2026-11-18 : remplir : un prof dont la tâche est pleine (resteT ≤ 0) ne reçoit plus d'heures → « non assigné » (gris), à donner à un autre (Régler / Donner les heures sans enseignant).
+- 2026-11-18 : remplir au rythme régulier : chaque prof suit sa tâche de la demi-année au prorata du calendrier (toutes les sessions de même parité, tous les groupes; tolérance max(9 h, 15 %)); au-delà → non assigné, réparti dans la session. Paquet session 2 de Jérémy refait.
