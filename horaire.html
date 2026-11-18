@@ -97,7 +97,7 @@ table.ed .n{width:56px}table.ed .c{width:86px}table.ed .h{width:60px}
 <div id="guide" class="noprint" hidden style="background:#fff;border:1px solid var(--l);border-left:5px solid var(--or);border-radius:12px;padding:14px 18px;margin-bottom:12px">
   <b style="font-size:15px">Comment ça marche</b> <button id="gX" style="float:right;padding:4px 10px">Compris</button>
   <ol style="margin:8px 0 0;padding-left:20px;line-height:1.7">
-    <li><b>Préparer l'année</b> (une fois) : congés, programmes, qui enseigne quoi.</li>
+    <li><b>Préparer l'année</b> (une fois) : la tâche de chaque enseignant, les congés, les programmes.</li>
     <li><b>+ Nouveau groupe</b> : l'horaire se bâtit tout seul, 3 matières à la fois, sans prof à deux places.</li>
     <li><b>Ajuste</b> : touche une case pour ajouter ou retirer un bloc de 3 h. La pastille en haut te dit quand tout est correct.</li>
   </ol></div>
@@ -129,13 +129,19 @@ function charges(){ const C = {};
     for (const k in W) for (const p in W[k]) { if (p === "-") continue; const c = (C[p] = C[p] || {}), e = (c[w.d] = c[w.d] || { h:0, max:w.h, grp:new Set() }); e.h += W[k][p]; e.grp.add(g.nom); e.max = Math.max(e.max, w.h); } })));
   return C; }
 
+
+/* heures placées d'un prof dans l'année (tous les groupes, modules seulement) */
+function totalAnnee(sauf){ const T = {}; D.groupes.forEach(g => g.sessions.forEach(s => { if (s === sauf) return; s.sem.forEach((w, wi) => { const W = s.g[wi] || {};
+  for (const k in W){ const m = s.mods.find(x => x.k === k); if (!m || m.autre) continue; for (const p in W[k]) if (p !== "-") T[p] = (T[p] || 0) + W[k][p]; } }); })); return T; }
 function dessiner(){ document.querySelectorAll("#vOng button").forEach(b => b.classList.toggle("on", b.dataset.v === VUE)); if (VUE === "e") return vueProfs(); if (VUE === "s") return vueSemaine();
   $("#gSel").innerHTML = D.groupes.map((g, i) => `<option value="${i}" ${i === G ? "selected" : ""}>${g.nom}</option>`).join("");
   $("#sOng").innerHTML = grp().sessions.map((s, i) => `<button data-s="${i}" class="${i === S ? "on" : ""}">${s.nom}</button>`).join("");
   const s = ses(), C = charges(), prob = [];
   // légende
   const T = {}; s.sem.forEach((w, wi) => { const W = s.g[wi] || {}; for (const k in W) for (const p in W[k]) T[p] = (T[p] || 0) + W[k][p]; });
-  $("#leg").innerHTML = Object.keys(D.profs).map(p => `<span class="lp ${FILTRE === p ? "on" : ""}" data-f="${p}"><i style="background:${couleur(p)}">${p}</i><b>${D.profs[p]}</b><span>${T[p] || 0} h</span></span>`).join("");
+  const TA = totalAnnee(), CI = D.cible || {};
+  $("#leg").innerHTML = Object.keys(D.profs).map(p => { const c = +CI[p] || 0, t = TA[p] || 0, cl = !c ? "" : t > c ? "color:var(--err);font-weight:700" : t < c ? "color:var(--or)" : "color:var(--ok);font-weight:700";
+    return `<span class="lp ${FILTRE === p ? "on" : ""}" data-f="${p}" title="Cette session : ${T[p] || 0} h"><i style="background:${couleur(p)}">${p}</i><b>${D.profs[p]}</b><span style="${cl}">${t}${c ? " / " + c : ""} h</span></span>`; }).join("");
   // en-tête : semaines
   let h = `<table class="${FILTRE ? "dim" : ""}"><thead><tr><th class="nom">${grp().nom} · ${s.nom}</th>`;
   let moisAvant = "";
@@ -209,15 +215,16 @@ function action(a){ const s = ses();
   if (a === "raz" && confirm("Effacer tout et reprendre l'exemple (2026EGI1) ?")){ D = JSON.parse(JSON.stringify(EXEMPLE)); G = S = 0; sauver(); dessiner(); }
 }
 /* remplissage simple : modules dans l'ordre, au 1er enseignant, en respectant ses heures dans les autres groupes */
-function remplir(s){ s.g = {}; const C = charges(), L = s.mods.filter(m => !m.autre && m.h), OUV = 3;
+function remplir(s){ s.g = {}; const TA = totalAnnee(s); const C = charges(), L = s.mods.filter(m => !m.autre && m.h), OUV = 3;
   const reste = new Map(L.map(m => [m, m.h])); let suivant = 0; const actifs = [];
   const ouvrir = () => { while (actifs.length < OUV && suivant < L.length) actifs.push(L[suivant++]); };
   s.sem.forEach((w, wi) => { let cap = w.h, tour = 0, garde = 0; ouvrir();
     const charge = p => (((C[p] || {})[w.d] || {}).h || 0);
     while (cap > 0 && actifs.length && garde++ < 200){ const m = actifs[tour % actifs.length];
       const u = Math.min(cap, 3, reste.get(m));
-      const p = m.profs.find(q => charge(q) + u <= w.h) || m.profs[0] || "-";
-      fixer(s, wi, m.k, p, (cell(s, wi, m.k)[p] || 0) + u); cap -= u; reste.set(m, reste.get(m) - u);
+      const libres = m.profs.filter(q => charge(q) + u <= w.h), resteT = q => (+((D.cible || {})[q]) || 1e6) - (TA[q] || 0);
+      const p = libres.sort((x, y) => resteT(y) - resteT(x))[0] || m.profs[0] || "-";
+      fixer(s, wi, m.k, p, (cell(s, wi, m.k)[p] || 0) + u); if (p !== "-") TA[p] = (TA[p] || 0) + u; cap -= u; reste.set(m, reste.get(m) - u);
       if (p !== "-"){ const c = ((C[p] = C[p] || {})[w.d] = (C[p] || {})[w.d] || { h:0, max:w.h, grp:new Set() }); c.h += u; }
       if (reste.get(m) <= 0){ actifs.splice(actifs.indexOf(m), 1); ouvrir(); } else tour++; } });
   sauver(); dessiner(); }
@@ -330,8 +337,8 @@ function reglages(t){ prepDonnees(); let h = `<h2 style="margin-top:0">Calendrie
     P.mods.map((m, i) => `<tr><td><input class="n" data-pm="${i}|num" value="${m.num}"></td><td><input class="c" data-pm="${i}|code" value="${m.code}"></td><td><input data-pm="${i}|titre" value="${m.titre.replace(/"/g, "&quot;")}"></td><td><input class="h" data-pm="${i}|h" value="${m.h}"></td><td><input class="h" data-pm="${i}|ev" value="${m.ev || 0}"></td><td style="white-space:nowrap"><button data-pmv="${i}|-1">▲</button><button data-pmv="${i}|1">▼</button><button data-pmx="${i}">✕</button></td></tr>`).join("") +
     `</table><p><button id="pAj">+ Module</button> <span class="mini">Total : ${P.mods.reduce((a, m) => a + (+m.h || 0), 0)} h</span></p>`; }
   if (t === "ens"){ const codes = []; Object.values(D.prog).forEach(P => P.mods.forEach(m => { if (m.code && !codes.some(c => c.code === m.code)) codes.push(m); }));
-    h += `<p class="mini">Touche les modules que chaque enseignant peut donner. L'ordre des enseignants compte : le premier libre est choisi.</p><table class="ed"><tr><th class="n">Initiales</th><th style="width:170px">Nom</th><th>Modules</th><th></th></tr>` +
-    Object.keys(D.profs).map(p => `<tr><td><b>${p}</b></td><td><input data-pn="${p}" value="${D.profs[p]}"></td><td>${codes.map(m => `<span class="chip ${(D.peut[p] || []).includes(m.code) ? "on" : ""}" data-pc="${p}|${m.code}" title="${m.titre}">${m.num} ${m.titre.split(" ").slice(0, 2).join(" ")}</span>`).join("")}</td><td><button data-px="${p}">✕</button></td></tr>`).join("") +
+    h += `<p class="mini">Commence par la tâche de chaque enseignant (heures de cours prévues dans l'année, tous groupes), puis touche les modules qu'il peut donner. L'horaire donne les blocs en priorité à celui à qui il reste le plus d'heures.</p><table class="ed"><tr><th class="n">Initiales</th><th style="width:170px">Nom</th><th class="h">Tâche prévue (h / an)</th><th>Modules qu'il peut donner</th><th></th></tr>` +
+    Object.keys(D.profs).map(p => `<tr><td><b>${p}</b></td><td><input data-pn="${p}" value="${D.profs[p]}"></td><td><input class="h" data-pt="${p}" inputmode="numeric" value="${(D.cible || {})[p] || ""}" placeholder="ex. 450"></td><td>${codes.map(m => `<span class="chip ${(D.peut[p] || []).includes(m.code) ? "on" : ""}" data-pc="${p}|${m.code}" title="${m.titre}">${m.num} ${m.titre.split(" ").slice(0, 2).join(" ")}</span>`).join("")}</td><td><button data-px="${p}">✕</button></td></tr>`).join("") +
     `</table><p><button id="eAj">+ Enseignant</button></p>`; }
   $("#dlgC").innerHTML = h; if (!dlg.open) dlg.showModal(); reglages.t = t; }
 $("#dlgC").addEventListener("click", e => { const t = reglages.t, el = e.target;
@@ -350,6 +357,7 @@ $("#dlgC").addEventListener("change", e => { const el = e.target;
   if (el.id === "cDeb" || el.id === "cFin"){ D.cal[el.id === "cDeb" ? "debut" : "fin"] = el.value; sauver(); reglages("cal"); }
   if (el.id === "pSel"){ reglages.p = el.value; reglages("prog"); }
   if (el.dataset.pm){ const [i, k] = el.dataset.pm.split("|"), m = D.prog[reglages.p].mods[+i]; m[k] = (k === "h" || k === "ev") ? (+el.value || 0) : el.value.trim(); sauver(); if (k === "h") reglages("prog"); }
+  if (el.dataset.pt){ D.cible = D.cible || {}; D.cible[el.dataset.pt] = Math.max(0, Math.round(+el.value || 0)); sauver(); dessiner(); }
   if (el.dataset.pn){ D.profs[el.dataset.pn] = el.value.trim() || D.profs[el.dataset.pn]; sauver(); dessiner(); }
 });
 /* ---- Nouveau groupe à partir du calendrier et du programme ---- */
@@ -380,10 +388,10 @@ prepDonnees(); sauver();
 try { if (!localStorage.horaireGuideVu) $("#guide").hidden = false; } catch(e){}
 $("#gX").onclick = () => { $("#guide").hidden = true; try { localStorage.horaireGuideVu = "1"; } catch(e){} };
 $("#bNouv").onclick = () => dlgNouveau();
-$("#bAnnee").onclick = () => { reglages.assist = true; reglages("cal"); };
+$("#bAnnee").onclick = () => { reglages.assist = true; reglages("ens"); };
 const _reg = reglages; reglages = function(t){ _reg(t); reglages.t = t;
-  const etapes = ["cal", "prog", "ens"], i = etapes.indexOf(t), noms = ["1. Congés de l'année", "2. Programmes", "3. Qui enseigne quoi"];
-  const ong = document.querySelector("#dlgC .ong2"); if (ong) ong.querySelectorAll("button").forEach((b, j) => b.textContent = noms[j]);
+  const etapes = ["ens", "cal", "prog"], i = etapes.indexOf(t), noms = ["1. Enseignants et tâches", "2. Congés de l'année", "3. Programmes"];
+  const ong = document.querySelector("#dlgC .ong2"); if (ong){ const B = [...ong.querySelectorAll("button")], par = Object.fromEntries(B.map(b => [b.dataset.rt, b])); ong.innerHTML = ""; etapes.forEach((e, j) => { par[e].textContent = noms[j]; ong.append(par[e]); }); }
   const bas = document.createElement("p"); bas.style.cssText = "display:flex;justify-content:space-between;margin-top:18px";
   bas.innerHTML = (i > 0 ? `<button data-rt="${etapes[i - 1]}">‹ Étape précédente</button>` : "<span></span>") + (i < 2 ? `<button class="prim" data-rt="${etapes[i + 1]}">Étape suivante ›</button>` : `<button class="prim" id="rFin">Terminé : créer un groupe ›</button>`);
   $("#dlgC").append(bas); const f = $("#rFin"); if (f) f.onclick = () => { dlg.close(); dlgNouveau(); }; };
