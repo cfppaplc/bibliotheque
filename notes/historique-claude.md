@@ -599,3 +599,4 @@
 - 2026-11-18 : horaire.html vue Semaine — double-clic sur une carte = « Modifier ce cours » (module, enseignant, retirer le bloc; modifierCarte, ED).
 - 2026-11-18 : « Modifier ce cours » : nombre d'heures (− / + / champ).
 - 2026-11-18 : horaire.html — Plus → « Recommencer à zéro (tout vide) » (garde la liste des modules du programme; D.calInit empêche de remettre les vacances devinées); écran « Aucun groupe ».
+- 2026-11-18 : RÈGLE Jeremy : on n'étire jamais une session pour rien → point « il manque N h de cours » (fx trou) pour une semaine incomplète (sauf dernière/pédago); Régler ramène des heures des dernières semaines (même prof) et enlève les semaines vides au bout de la dernière session.

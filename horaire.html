@@ -188,6 +188,7 @@ function dessiner(){ if (D.groupes.some(g => remplirTrous(g))) sauver();
   h += `</tbody><tfoot><tr><td class="nom"><b>Heures de la semaine</b></td>`;
   s.sem.forEach((w, wi) => { const t = s.mods.reduce((a, m) => a + totalCase(s, wi, m.k), 0), cl = t > w.h ? "w-trop" : t < w.h ? "w-manque" : "";
     if (t > w.h) prob.push({ t:`Semaine du ${jm(w.d)} : ${t} h placées pour ${w.h} h (enlève ${t - w.h} h)`, w:wi, fx:"sem" });
+    if (t < w.h && !w.pf && wi < s.sem.length - 1 && s.sem.slice(wi + 1).some((x, j) => !x.pf && s.mods.some(m => !m.autre && totalCase(s, wi + 1 + j, m.k)))) prob.push({ t:`Semaine du ${jm(w.d)} : ${t} h placées pour ${w.h} h (il manque ${w.h - t} h de cours)`, w:wi, fx:"trou" });
     h += `<td class="${cl}"><div class="jauge"><i style="height:${Math.min(100, w.h ? t / w.h * 100 : 0)}%"></i></div>${t}/${w.h}</td>`; });
   h += `</tr></tfoot></table>`;
   s.sem.forEach((w, wi) => { const par = {}; let hMax = 0, cg = 0; for (let i = 0; i < 5; i++){ const x = new Date(w.d + "T12:00"); x.setDate(x.getDate() + i); const j = iso(x); if (j < D.cal.debut || j > finMax()) continue; const ty = jourType(j), hj = HJOUR[x.getDay()];
@@ -550,6 +551,14 @@ function regler(a){ const s = ses(); let fait = 0, reste = ""; RAISON = "";
   if (a.fx === "sessprof"){ s.sem.forEach((w, wi) => s.mods.forEach(m => { const x = cell(s, wi, m.k)[a.p]; if (!x) return;
       const q = profsDe(m).filter(q => q !== a.p && sessOk(q, s) && libre(q, w) >= x).sort((u, v) => libre(v, w) - libre(u, w))[0] || "-";
       retirer(s, wi, m.k, x, a.p); ajout(s, wi, m.k, q, x); fait += x; if (q === "-") reste = "Certaines heures n'ont trouvé personne : elles sont marquées « Non assigné »."; })); }
+  if (a.fx === "trou"){ const wi = a.w, w = s.sem[wi]; let n = w.h - totSem(s, wi);
+    /* on ramène des heures des dernières semaines, avec le même enseignant */
+    for (let wj = s.sem.length - 1; wj > wi && n > 0; wj--) for (const m of s.mods){ if (n <= 0) break; if (m.autre || !okDate(m, w)) continue;
+      for (const p of Object.keys(cell(s, wj, m.k))){ if (n <= 0) break; const x = Math.min(n, cell(s, wj, m.k)[p], p === "-" ? 99 : Math.max(0, libre(p, w))); if (x <= 0) continue;
+        retirer(s, wj, m.k, x, p); ajout(s, wi, m.k, p, x); n -= x; fait += x; } }
+    /* dernière session : on enlève les semaines du bout qui n'ont plus de cours */
+    const L = grp().sessions; if (s === L[L.length - 1]) while (s.sem.length > 1 && !s.mods.some(m => !m.autre && totalCase(s, s.sem.length - 1, m.k))){ delete s.g[s.sem.length - 1]; s.sem.pop(); }
+    if (n > 0) reste = `Il manque encore ${n} h cette semaine : les enseignants des cours suivants ne sont pas libres. Utilise « Voir » pour placer un cours à la main.`; }
   if (a.fx === "conge"){ s.sem[a.w].h = a.h; fait = 1; let e = totSem(s, a.w) - a.h;
     s.mods.filter(m => m.autre && !m.jt).forEach(m => { if (e > 0){ e -= retirer(s, a.w, m.k, e); } }); if (totSem(s, a.w) > a.h) return regler({ fx:"sem", w:a.w }); }
   if (a.fx === "apres"){ const m = s.mods.find(x => x.k === a.k);
