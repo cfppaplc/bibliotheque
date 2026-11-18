@@ -22,3 +22,9 @@
 @media (prefers-reduced-motion:reduce){.co-col{animation:none!important}.co-form.tremble{animation:none!important}}
 @media (pointer:coarse) and (min-width:641px){#accesBox.co2 input{min-height:52px;font-size:18px}#accesBox.co2 .acces-btns button{min-height:52px;font-size:17px;padding:0 24px}.co-oeil{width:46px;height:46px}}
 @media (max-width:760px){#accesBox.co2{grid-template-columns:1fr;width:min(440px,94vw)}.co-vis{display:none}}
+/* 18 nov. : changer de compte en un toucher (plusieurs enseignants au même TNI) */
+.co-recents{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 14px}
+.co-recents>span{width:100%;font-size:.85rem;opacity:.75;margin-bottom:2px}
+.co-rc{display:inline-flex;align-items:center;gap:8px;padding:8px 14px 8px 8px;border-radius:999px;border:1px solid color-mix(in srgb,currentColor 25%,transparent);background:transparent;color:inherit;font:inherit;font-weight:600;cursor:pointer;min-height:44px}
+.co-rc i{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;background:#EB6A22;color:#fff;font-style:normal;font-size:.78rem;font-weight:800}
+.co-rc.on{border-color:#EB6A22;background:color-mix(in srgb,#EB6A22 14%,transparent)}
