@@ -351,18 +351,21 @@ function vueSemaine(){ const s = ses(); SW = Math.max(0, Math.min(SW, s.sem.leng
 /* double-clic sur une carte de la semaine : changer le module, l'enseignant ou retirer le bloc */
 let ED = null;
 function modifierCarte(gi, bi){ const g = vueSemaine.G[gi], c = vueSemaine.R[gi][bi]; if (!g || !c || c.vide) return; const s = g.s, w = s.sem[g.wi];
-  ED = { s, wi:g.wi, m:c.m, p:c.p, h:c.h, nm:c.m.k, np:c.p };
+  ED = { s, wi:g.wi, m:c.m, p:c.p, h:c.h, nm:c.m.k, np:c.p, nh:c.h };
   const dessin = () => { const m = s.mods.find(x => x.k === ED.nm), P = m.autre ? ["-"] : [...new Set([...profsDe(m), ...Object.keys(D.profs)])];
     $("#dlgC").innerHTML = `<h2 style="margin-top:0">Modifier ce cours</h2><p class="mini">${g.nom} · semaine du ${jm(w.d)} · ${ED.h} h</p>
-    <div class="form"><label>Module<br><select id="edM">${s.mods.map(x => `<option value="${x.k}" ${x.k === ED.nm ? "selected" : ""}>${x.num ? x.num + " · " : ""}${x.titre}</option>`).join("")}</select></label></div>
+    <div class="form"><label>Module<br><select id="edM">${s.mods.map(x => `<option value="${x.k}" ${x.k === ED.nm ? "selected" : ""}>${x.num ? x.num + " · " : ""}${x.titre}</option>`).join("")}</select></label>
+    <label>Heures<br><span style="display:flex;gap:6px;align-items:center"><button data-edh="-1" style="padding:8px 14px">−</button><input id="edH" inputmode="numeric" value="${ED.nh}" style="width:70px;text-align:center"><button data-edh="1" style="padding:8px 14px">+</button></span></label></div>
     ${m.autre ? "" : `<p><b>Enseignant :</b></p><p>${P.map(p => { const l = libre(p, w) + (p === ED.p ? ED.h : 0), peut = profsDe(m).includes(p);
       return `<span class="chip ${p === ED.np ? "on" : ""}" data-edp="${p}" style="padding:8px 12px;font-size:13px;${peut ? "" : "opacity:.55"}" title="${peut ? "" : "Ce module n'est pas coché pour lui"}">${D.profs[p]} <small>(${l >= 0 ? l + " h libres" : -l + " h de trop"})</small></span>`; }).join("")}</p>`}
     <p style="display:flex;gap:8px;justify-content:space-between;margin-top:18px"><button id="edX" style="color:var(--err)">Retirer ce bloc</button><span style="display:flex;gap:8px"><button id="edA">Annuler</button><button class="prim" id="edOk">Enregistrer</button></span></p>`; };
   dessin(); modifierCarte.dessin = dessin; if (!dlg.open) dlg.showModal(); }
-$("#dlgC").addEventListener("change", e => { if (ED && e.target.id === "edM"){ ED.nm = e.target.value; const m = ED.s.mods.find(x => x.k === ED.nm); if (m.autre) ED.np = "-"; else if (!profsDe(m).includes(ED.np)) ED.np = profsDe(m)[0] || ED.np; modifierCarte.dessin(); } });
+$("#dlgC").addEventListener("change", e => { if (ED && e.target.id === "edH"){ ED.nh = Math.max(1, Math.round(+e.target.value.replace(",", ".") || ED.nh)); return; }
+  if (ED && e.target.id === "edM"){ ED.nm = e.target.value; const m = ED.s.mods.find(x => x.k === ED.nm); if (m.autre) ED.np = "-"; else if (!profsDe(m).includes(ED.np)) ED.np = profsDe(m)[0] || ED.np; modifierCarte.dessin(); } });
 $("#dlgC").addEventListener("click", e => { if (!ED) return; const c = e.target.closest("[data-edp]"); if (c){ ED.np = c.dataset.edp; modifierCarte.dessin(); return; }
+  const hb = e.target.closest("[data-edh]"); if (hb){ ED.nh = Math.max(1, ED.nh + (+hb.dataset.edh)); modifierCarte.dessin(); return; }
   if (e.target.id === "edA"){ ED = null; dlg.close(); return; }
-  if (e.target.id === "edX" || e.target.id === "edOk"){ retirer(ED.s, ED.wi, ED.m.k, ED.h, ED.p); if (e.target.id === "edOk") ajout(ED.s, ED.wi, ED.nm, ED.np, ED.h); ED = null; sauver(); dlg.close(); dessiner(); } });
+  if (e.target.id === "edX" || e.target.id === "edOk"){ retirer(ED.s, ED.wi, ED.m.k, ED.h, ED.p); if (e.target.id === "edOk"){ const v = $("#edH"); if (v) ED.nh = Math.max(1, Math.round(+v.value.replace(",", ".") || ED.nh)); ajout(ED.s, ED.wi, ED.nm, ED.np, ED.nh); } ED = null; sauver(); dlg.close(); dessiner(); } });
 dlg.addEventListener("close", () => { ED = null; });
 document.addEventListener("dblclick", e => { const c = e.target.closest("#vue .ev.glisse"); if (c) modifierCarte(+c.dataset.gi, +c.dataset.bi); });
 /* ===== Calendrier, programmes et enseignants (17 nov.) ===== */

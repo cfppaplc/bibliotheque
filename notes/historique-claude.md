@@ -597,3 +597,4 @@
 - 2026-11-17 : horaire.html vue Semaine — blocs de 3 h remplis d'abord, le jeudi PM (1 h) prend le reste (le vendredi PM affichait 2 h).
 - 2026-11-17 : RÈGLE Jeremy : une session (sauf la dernière) est calculée pour 450 h et ne manque jamais de semaines → ajouterSemaine refuse sauf pour la dernière session (jusqu'au 30 juin) et explique de vérifier le calendrier.
 - 2026-11-18 : horaire.html vue Semaine — double-clic sur une carte = « Modifier ce cours » (module, enseignant, retirer le bloc; modifierCarte, ED).
+- 2026-11-18 : « Modifier ce cours » : nombre d'heures (− / + / champ).
