@@ -81,12 +81,18 @@ table.ed .n{width:56px}table.ed .c{width:86px}table.ed .h{width:60px}
 .ev.fantome{position:fixed;z-index:60;pointer-events:none;opacity:.9;box-shadow:0 10px 30px rgba(0,0,0,.25);width:200px}
 .cal-b.cible{background:#FFF1E8;outline:2px dashed var(--or);outline-offset:-4px}
 @media print{header,.haut .noprint,.menu,#pop,.noprint{display:none!important}.carte{max-height:none;overflow:visible;border:0}body{background:#fff}thead th,td.nom,tfoot td{position:static}@page{size:landscape;margin:7mm}}
+body.acc .haut,body.acc #leg,body.acc #guide,body.acc #alertes,body.acc #vue,body.acc main>p.mini{display:none !important}
+#accH{max-width:860px;margin:30px auto}#accH h2{font-size:28px;margin:0 0 6px}#accH .sous{color:var(--gris);font-size:16px;margin:0 0 26px}
+.accC{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px}.accB{background:#fff;border:1px solid var(--l);border-radius:16px;padding:22px;text-align:left;cursor:pointer;font:inherit;display:block;width:100%}
+.accB:hover{border-color:var(--or)}.accB b{display:block;font-size:18px;margin-bottom:6px}.accB span{color:var(--gris);font-size:14px;line-height:1.5}.accB.prem{border:2px solid var(--or);background:#FFF6EF}
 </style>
 </head>
 <body>
 <header><img src="img/metier-plus.svg" alt="Métier+"><h1>Horaires des groupes</h1><span class="esp"></span><button onclick="location.href='./'">‹ Bibliothèque</button></header>
 <main>
+<div id="accH" hidden></div>
 <div class="haut">
+  <button class="noprint" id="bAcc" title="Retour à l'accueil des horaires">‹ Accueil</button>
   <select id="gSel"></select>
   <span class="seg" id="sOng"></span>
   <span class="seg" id="vOng"><button data-v="g" class="on">Groupe</button><button data-v="e">Enseignants</button><button data-v="s">Semaine</button></span>
@@ -548,7 +554,7 @@ function dlgNouveau(){ prepDonnees(); const lun = new Date(D.cal.debut + "T12:00
         s.sem.push({ d:k, h:u + autres }); besoin -= u;
         for (const ty in par){ const kk = "jt:" + ty; if (!s.mods.some(m => m.k === kk)) s.mods.push({ k:kk, code:"", titre:JT[ty].n, num:"", h:0, ev:0, profs:[], autre:true, jt:ty }); fixer(s, wi, kk, "-", par[ty]); } }
       if (besoin > 0) alert(s.nom + " : il manque " + besoin + " h avant la fin du calendrier."); });
-    D.groupes.push(g); G = D.groupes.length - 1; g.sessions.forEach((s, i) => { S = i; remplir(s); }); S = 0; VUE = "g"; sauver(); dlg.close(); dessiner(); };
+    D.groupes.push(g); G = D.groupes.length - 1; g.sessions.forEach((s, i) => { S = i; remplir(s); }); S = 0; VUE = "g"; sauver(); dlg.close(); document.body.classList.remove("acc"); $("#accH").hidden = true; dessiner(); };
 }
 if (!D.autresV){ D.groupes.forEach(g => g.sessions.forEach(s => s.sem.forEach((w, wi) => { w.h += s.mods.reduce((a, m) => a + (m.autre ? totalCase(s, wi, m.k) : 0), 0); }))); D.autresV = 1; }
 prepDonnees(); sauver();
@@ -807,10 +813,23 @@ function fiche(p){ FICHE = p; _calAbs(p); const c = $("#dlgC"), h2 = c.querySele
 dlg.addEventListener("close", () => { if (FICHE){ FICHE = null; dessiner(); } });
 const _calAbs3 = calAbs; calAbs = function(p){ if (FICHE) return fiche(FICHE); return _calAbs3(p); };
 const _reg3 = reglages; reglages = function(t){ if (FICHE) return fiche(FICHE); return _reg3(t); };
+/* page d'accueil : calme, avant la grille */
+function accueilH(){ document.body.classList.add("acc"); const A = $("#accH"); A.hidden = false; const n = D.groupes.length;
+  A.innerHTML = `<h2>Horaires des groupes</h2><p class="sous">${n ? "Choisis par où commencer. Rien n'est final : tout se modifie ensuite." : "On prépare l'horaire ensemble, une question à la fois. Rien n'est final : tu peux revenir en arrière à chaque question."}</p>
+  <div class="accC">
+    <button class="accB prem" id="aAs"><b>${n ? "Préparer un nouveau groupe" : "Commencer"}</b><span>Des questions simples, une à la fois : l'année, les congés, les enseignants et leurs tâches. L'horaire se bâtit à la fin.</span></button>
+    ${D.groupes.map((g, i) => `<button class="accB" data-acg="${i}"><b>${g.nom}</b><span>${g.prog || ""}<br>${g.sessions.length} session${g.sessions.length > 1 ? "s" : ""} · à partir du ${g.sessions[0] && g.sessions[0].sem[0] ? jm(g.sessions[0].sem[0].d) : "?"}<br>Ouvrir l'horaire</span></button>`).join("")}
+    ${n ? `<button class="accB" id="aTa"><b>Tâches des enseignants</b><span>Le tableau des tâches annuelles, comme ta feuille Excel : diviser, équilibrer, chiffre magique.</span></button>` : ""}
+  </div>`;
+  $("#aAs").onclick = () => { AS.on = true; AS.i = 0; assistant(); };
+  A.querySelectorAll("[data-acg]").forEach(b => b.onclick = () => { G = +b.dataset.acg; S = 0; VUE = "g"; quitterAcc(); });
+  if ($("#aTa")) $("#aTa").onclick = () => { quitterAcc(); taches(); }; }
+function quitterAcc(){ document.body.classList.remove("acc"); $("#accH").hidden = true; dessiner(); }
+$("#bAcc").onclick = accueilH;
 $("#bAnnee").onclick = () => { AS.on = true; AS.i = 0; assistant(); };
 $("#bNouv").onclick = () => { if (!D.prepare){ AS.on = true; AS.i = 0; assistant(); } else dlgNouveau(); };
 $("#bAnnee").textContent = "Assistant pas à pas";
-dessiner();
+dessiner(); accueilH();
 </script>
 </body>
 </html>
