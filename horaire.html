@@ -39,7 +39,7 @@ td.nom b{display:block;font-size:13px}td.nom small{color:var(--gris);font-size:1
 td.c{height:46px;text-align:center;cursor:pointer;vertical-align:middle;border-left:1px solid #F5F1EB}
 td.c:hover{background:#FFF6EF}
 .puce{display:inline-block;min-width:24px;padding:3px 5px;margin:1px;border-radius:7px;color:#fff;font:700 12px system-ui}
-tr.autre td.nom b{color:var(--gris);font-weight:600}tr.autre .puce{background:#B8AFA2!important}
+tr.autre td.nom b{color:var(--gris);font-weight:600}
 tr.sep td{background:#FBF9F5;font-size:11px;color:var(--gris);padding:6px 12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
 tfoot td{position:sticky;bottom:0;background:#FBF9F5;z-index:2;border-top:1px solid var(--l);text-align:center;font-size:11px;padding:6px 2px}
 tfoot td.nom{background:#FBF9F5}
@@ -173,9 +173,9 @@ function dessiner(){ document.querySelectorAll("#vOng button").forEach(b => b.cl
   const ligne = m => { const k = m.k, fait = s.sem.reduce((a, w, wi) => a + totalCase(s, wi, k), 0), pct = m.h ? Math.min(100, fait / m.h * 100) : 0, cl = !m.h ? "" : fait > m.h ? "trop" : fait < m.h ? "manque" : "";
     if (m.apres){ const avant = s.sem.findIndex(w => { const z = new Date(w.d + "T12:00"); z.setDate(z.getDate() + 4); return iso(z) < m.apres && totalCase(s, s.sem.indexOf(w), k) > 0; }); if (avant >= 0) prob.push({ t:`${m.titre} commence avant le ${dt(m.apres).toLocaleDateString("fr-CA", { day:"numeric", month:"long" })}`, k, w:avant }); }
     if (!m.autre && fait !== m.h) prob.push({ t:`${m.titre} : ${fait} h placées sur ${m.h} h (${fait > m.h ? "enlève" : "ajoute"} ${Math.abs(fait - m.h)} h)`, k });
-    let r = `<tr class="${m.autre ? "autre" : ""}"><td class="nom" data-mk="${k}" title="Toucher pour une date « pas avant »" style="cursor:pointer"><b>${m.num ? m.num + " · " : ""}${m.titre}</b><small>${m.code ? m.code + " · " : ""}${m.apres ? "dès le " + jm(m.apres) + " · " : ""}${fait} / ${m.h} h${m.ev ? " · éval " + m.ev + " h" : ""}${cl === "" && m.h && !m.autre ? " ✓" : ""}</small>${m.autre ? "" : `<div class="barre ${cl}"><i style="width:${pct}%"></i></div>`}</td>`;
+    let r = `<tr class="${m.autre ? "autre" : ""}"><td class="nom" data-mk="${k}" title="Toucher pour une date « pas avant »" style="cursor:pointer"><b>${m.autre ? `<i style="display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;background:${coulAutre(m)}"></i>` : ""}${m.num ? m.num + " · " : ""}${m.titre}</b><small>${m.code ? m.code + " · " : ""}${m.apres ? "dès le " + jm(m.apres) + " · " : ""}${fait} / ${m.h} h${m.ev ? " · éval " + m.ev + " h" : ""}${cl === "" && m.h && !m.autre ? " ✓" : ""}</small>${m.autre ? "" : `<div class="barre ${cl}"><i style="width:${pct}%"></i></div>`}</td>`;
     s.sem.forEach((w, wi) => { const c = cell(s, wi, k);
-      r += `<td class="c" data-w="${wi}" data-k="${k}">` + Object.keys(c).map(p => `<span class="puce ${FILTRE === p ? "vu" : ""}" style="background:${couleur(p)}" title="${D.profs[p] || "Non assigné"}">${c[p]}</span>`).join("") + `</td>`; });
+      r += `<td class="c" data-w="${wi}" data-k="${k}">` + Object.keys(c).map(p => `<span class="puce ${FILTRE === p ? "vu" : ""}" style="background:${m.autre ? coulAutre(m) : couleur(p)}" title="${D.profs[p] || "Non assigné"}">${c[p]}</span>`).join("") + `</td>`; });
     return r + `</tr>`; };
   s.mods.filter(m => !m.autre).forEach(m => h += ligne(m));
   if (s.mods.some(m => m.autre)) { h += `<tr class="sep"><td class="nom">Autres activités</td><td colspan="${s.sem.length}"></td></tr>`; s.mods.filter(m => m.autre).forEach(m => h += ligne(m)); }
@@ -310,10 +310,10 @@ function vueProfs(){ const s = ses(), C = charges(), d0 = s.sem[0].d, d1 = s.sem
 const BLOCS = [["Lundi","AM",3],["Lundi","PM",3],["Mardi","AM",3],["Mardi","PM",3],["Mercredi","AM",3],["Mercredi","PM",3],["Jeudi","AM",3],["Jeudi","PM",1],["Vendredi","AM",3],["Vendredi","PM",3]];
 function vueSemaine(){ const s = ses(); SW = Math.max(0, Math.min(SW, s.sem.length - 1)); const d = s.sem[SW].d; prepDonnees();
   const JOURS = ["Lundi","Mardi","Mercredi","Jeudi","Vendredi"], dates = JOURS.map((x, i) => { const z = new Date(d + "T12:00"); z.setDate(z.getDate() + i); return iso(z); });
-  const congé = dates.map(x => D.cal && D.cal.off ? D.cal.off[x] : "");
+  const congé = dates.map(x => jourType(x) ? jourNom(x) : ""), typeJ = dates.map(x => jourType(x));
   // groupes présents cette semaine et leurs heures (modules d'abord, autres activités ensuite; la plage verte a sa place fixe le jeudi PM)
   const groupes = []; D.groupes.forEach(g => g.sessions.forEach(x => x.sem.forEach((w, wi) => { if (w.d !== d) return; const items = [], W = x.g[wi] || {};
-    for (const k in W){ const m = x.mods.find(y => y.k === k); if (!m || /plage verte/i.test(m.titre)) continue; for (const p in W[k]) items.push({ p, m, h:W[k][p] }); }
+    for (const k in W){ const m = x.mods.find(y => y.k === k); if (!m || m.jt || /plage verte/i.test(m.titre)) continue; for (const p in W[k]) items.push({ p, m, h:W[k][p] }); }
     groupes.push({ nom:g.nom, items }); })));
   const blocs = []; JOURS.forEach((j, di) => ["AM", "PM"].forEach(pm => blocs.push({ di, pm, h: congé[di] ? 0 : (j === "Jeudi" && pm === "PM" ? 1 : 3) })));
   const R = groupes.map(() => []), restes = groupes.map(g => g.items.map(i => Object.assign({}, i)));
@@ -332,7 +332,7 @@ function vueSemaine(){ const s = ses(); SW = Math.max(0, Math.min(SW, s.sem.leng
   <div class="cal"><div class="cal-c"></div>` + JOURS.map((j, di) => `<div class="cal-j ${congé[di] ? "off" : ""}"><b>${j}</b> ${dt(dates[di]).getDate()}</div>`).join("");
   ["AM", "PM"].forEach(pm => { h += `<div class="cal-h"><b>${pm === "AM" ? "Avant-midi" : "Après-midi"}</b><small>3 h</small></div>`;
     JOURS.forEach((j, di) => { const bi = di * 2 + (pm === "PM" ? 1 : 0);
-      if (congé[di]){ h += `<div class="cal-b off"><div class="ev conge">${congé[di]}</div></div>`; return; }
+      if (congé[di]){ const c = JT[typeJ[di]].c; h += `<div class="cal-b off"><div class="ev conge" style="border-color:${c};background:${c}22;color:${c}">${congé[di]}</div></div>`; return; }
       h += `<div class="cal-b" data-bi="${bi}">` + groupes.map((g, gi) => R[gi][bi] ? carte(R[gi][bi], g.nom, gi, bi) : "").join("") +
         (j === "Jeudi" && pm === "PM" ? `<div class="ev pv"><b>Plage verte</b><span>2 h · récupération</span></div>` : "") + `</div>`; }); });
   $("#vue").innerHTML = h + `</div><p class="mini" style="padding:0 16px 12px">Glisse une carte vers un autre bloc pour échanger les deux cours de ce groupe. <button data-rz="${d}" style="padding:4px 10px">Remettre le placement automatique</button></p>`; vueSemaine.d = d;
@@ -347,20 +347,26 @@ function prepDonnees(){
   D.prog = D.prog || { "EGI": { nom:"5211 Entretien général d'immeubles", mods:ORDRE_EGI.map(x => ({ num:x[0], code:x[1], titre:x[2], h:x[3], ev:x[4] })) }, "PC": { nom:"5333 Plomberie et chauffage", mods:[] } };
   D.peut = D.peut || {}; Object.keys(D.profs).forEach(p => { if (!D.peut[p]){ const S = new Set(); D.groupes.forEach(g => g.sessions.forEach(s => s.mods.forEach(m => { if (m.code && m.profs.includes(p)) S.add(m.code); }))); D.peut[p] = [...S]; } });
 }
+const JT = { ferie:{ n:"Férié", c:"#C0392B" }, planif:{ n:"Planification (pédago)", c:"#2F6FB5" }, tempete:{ n:"Journée tempête", c:"#5B6B82" }, finses:{ n:"Fin de session", c:"#8B4FB8" }, math:{ n:"Cours de maths", c:"#1E8A55" }, conge:{ n:"Congé / vacances", c:"#9A9083" } };
+const jourType = k => { const v = D.cal && D.cal.off && D.cal.off[k]; if (!v) return null; if (typeof v === "object") return v.t; return /vacance|congé/i.test(v) ? "conge" : "ferie"; };
+const jourNom = k => { const v = D.cal.off[k]; return typeof v === "object" ? (v.n || JT[v.t].n) : v; };
+function coulAutre(m){ if (m.jt && JT[m.jt]) return JT[m.jt].c; const t = m.titre || "";
+  return /féri/i.test(t) ? JT.ferie.c : /pédago|planif/i.test(t) ? JT.planif.c : /temp[êe]te/i.test(t) ? JT.tempete.c : /fin de session/i.test(t) ? JT.finses.c : /math/i.test(t) ? JT.math.c : /plage verte|r[ée]cup/i.test(t) ? "#0E8C8C" : "#9A9083"; }
 const iso = d => d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
 /* heures d'un jour de classe : 6 h, jeudi 4 h (1 h de cours l'après-midi + plage verte, la plage ne compte pas) */
 const HJOUR = [0, 6, 6, 6, 4, 6, 0];
 function heuresSemaine(lundi){ let h = 0; const d = new Date(lundi + "T12:00"); for (let i = 0; i < 5; i++){ const x = new Date(d); x.setDate(d.getDate() + i); const k = iso(x); if (k >= D.cal.debut && k <= D.cal.fin && !D.cal.off[k]) h += HJOUR[x.getDay()]; } return h; }
 function reglages(t){ prepDonnees(); let h = `<h2 style="margin-top:0">Calendrier, programmes et enseignants</h2><div class="ong2"><button data-rt="cal" class="${t === "cal" ? "on" : ""}">Calendrier scolaire</button><button data-rt="prog" class="${t === "prog" ? "on" : ""}">Programmes</button><button data-rt="ens" class="${t === "ens" ? "on" : ""}">Enseignants</button></div>`;
-  if (t === "cal"){ h += `<p class="mini">Touche un jour pour le mettre en congé (gris), touche encore pour le remettre. Les heures des semaines se calculent toutes seules : 6 h par jour, 4 h le jeudi.</p>
+  if (t === "cal"){ const sel = reglages.jt || "ferie"; h += `<p class="mini">Choisis un type, puis touche les jours. Touche encore pour enlever. Les journées colorées ne sont pas des cours : elles apparaissent en couleur dans l'horaire des groupes.</p>
+    <p>${Object.keys(JT).map(t => `<span class="chip" data-jt="${t}" style="padding:7px 12px;${t === sel ? `background:${JT[t].c};border-color:${JT[t].c};color:#fff` : `border-color:${JT[t].c}`}">${JT[t].n}</span>`).join("")}</p>
     <p>Première journée <input type="date" id="cDeb" value="${D.cal.debut}"> · Dernière journée <input type="date" id="cFin" value="${D.cal.fin}"></p><div>`;
     const d0 = new Date(D.cal.debut + "T12:00"), d1 = new Date(D.cal.fin + "T12:00"); let jours = 0;
     for (let m = new Date(d0.getFullYear(), d0.getMonth(), 1, 12); m <= d1; m.setMonth(m.getMonth() + 1)){
       h += `<div class="cmois"><h4>${m.toLocaleDateString("fr-CA", { month:"long", year:"numeric" })}</h4><table><tr>${["L","M","M","J","V"].map(x => `<th style="font-size:11px;color:#999">${x}</th>`).join("")}</tr><tr>`;
       const pre = (m.getDay() + 6) % 7; if (pre < 5) h += "<td></td>".repeat(pre);
       for (let d = new Date(m); d.getMonth() === m.getMonth(); d.setDate(d.getDate() + 1)){ const w = d.getDay(); if (w === 0 || w === 6){ if (w === 6) h += "</tr><tr>"; continue; }
-        const k = iso(d), hors = k < D.cal.debut || k > D.cal.fin, off = D.cal.off[k]; if (!hors && !off) jours++;
-        h += `<td class="${hors ? "hors" : "jo"} ${off ? "off" : ""}" data-j="${hors ? "" : k}" title="${off || ""}">${d.getDate()}</td>`; }
+        const k = iso(d), hors = k < D.cal.debut || k > D.cal.fin, ty = jourType(k); if (!hors && !ty) jours++;
+        h += `<td class="${hors ? "hors" : "jo"}" data-j="${hors ? "" : k}" title="${ty ? jourNom(k) : ""}" style="${ty ? `background:${JT[ty].c};color:#fff;font-weight:700` : ""}">${d.getDate()}</td>`; }
       h += `</tr></table></div>`; }
     h += `</div><p class="mini">${jours} jours de classe.</p>`; }
   if (t === "prog"){ const ids = Object.keys(D.prog); const pid = reglages.p && D.prog[reglages.p] ? reglages.p : ids[0]; reglages.p = pid; const P = D.prog[pid];
@@ -376,7 +382,8 @@ function reglages(t){ prepDonnees(); let h = `<h2 style="margin-top:0">Calendrie
   $("#dlgC").innerHTML = h; if (!dlg.open) dlg.showModal(); reglages.t = t; }
 $("#dlgC").addEventListener("click", e => { const t = reglages.t, el = e.target;
   if (el.dataset.rt){ reglages(el.dataset.rt); return; }
-  if (el.dataset.j){ const k = el.dataset.j; if (D.cal.off[k]) delete D.cal.off[k]; else D.cal.off[k] = "Congé"; sauver(); reglages("cal"); return; }
+  if (el.dataset.jt){ reglages.jt = el.dataset.jt; reglages("cal"); return; }
+  if (el.dataset.j){ const k = el.dataset.j, sel = reglages.jt || "ferie"; if (jourType(k) === sel) delete D.cal.off[k]; else D.cal.off[k] = { t:sel, n:JT[sel].n }; sauver(); reglages("cal"); return; }
   const P = D.prog && D.prog[reglages.p];
   if (el.dataset.pmv){ const [i, d] = el.dataset.pmv.split("|").map(Number), j = i + d; if (j < 0 || j >= P.mods.length) return; [P.mods[i], P.mods[j]] = [P.mods[j], P.mods[i]]; sauver(); reglages("prog"); }
   if (el.dataset.pmx){ if (confirm("Retirer ce module du programme ?")){ P.mods.splice(+el.dataset.pmx, 1); sauver(); reglages("prog"); } }
@@ -413,7 +420,12 @@ function dlgNouveau(){ prepDonnees(); const lun = new Date(D.cal.debut + "T12:00
     // semaines selon le calendrier
     let d = new Date($("#nD").value + "T12:00"); d.setDate(d.getDate() - (d.getDay() + 6) % 7); let garde = 0;
     g.sessions.forEach(s => { let besoin = s.mods.reduce((a, m) => a + m.h, 0);
-      while (besoin > 0 && garde++ < 120){ const k = iso(d), h = heuresSemaine(k); d.setDate(d.getDate() + 7); if (k > D.cal.fin) break; if (!h) continue; const u = Math.min(h, besoin); s.sem.push({ d:k, h:u }); besoin -= u; }
+      while (besoin > 0 && garde++ < 120){ const k = iso(d); d.setDate(d.getDate() + 7); if (k > D.cal.fin) break;
+        let h = 0; const par = {}; for (let i = 0; i < 5; i++){ const x = new Date(k + "T12:00"); x.setDate(x.getDate() + i); const j = iso(x); if (j < D.cal.debut || j > D.cal.fin) continue; const ty = jourType(j), hj = HJOUR[x.getDay()];
+          if (ty === "conge") continue; h += hj; if (ty) par[ty] = (par[ty] || 0) + hj; }
+        const autres = Object.values(par).reduce((a, b) => a + b, 0); if (!h) continue; const u = Math.min(h - autres, besoin), wi = s.sem.length;
+        s.sem.push({ d:k, h:u + autres }); besoin -= u;
+        for (const ty in par){ const kk = "jt:" + ty; if (!s.mods.some(m => m.k === kk)) s.mods.push({ k:kk, code:"", titre:JT[ty].n, num:"", h:0, ev:0, profs:[], autre:true, jt:ty }); fixer(s, wi, kk, "-", par[ty]); } }
       if (besoin > 0) alert(s.nom + " : il manque " + besoin + " h avant la fin du calendrier."); });
     D.groupes.push(g); G = D.groupes.length - 1; g.sessions.forEach((s, i) => { S = i; remplir(s); }); S = 0; VUE = "g"; sauver(); dlg.close(); dessiner(); };
 }
