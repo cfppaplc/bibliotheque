@@ -77,6 +77,9 @@ table.ed .n{width:56px}table.ed .c{width:86px}table.ed .h{width:60px}
 .cal-b{border-left:1px solid var(--l);border-bottom:1px solid var(--l);padding:6px;min-height:150px;display:flex;flex-direction:column;gap:6px}.cal-b.off{background:repeating-linear-gradient(45deg,#F6F3EE,#F6F3EE 8px,#EFEAE2 8px,#EFEAE2 16px)}
 .ev{border-left:5px solid;border-radius:8px;padding:7px 9px;font-size:12px;background:#fff}.ev b{display:block;font-size:13px;margin-bottom:2px}.ev span{color:var(--gris)}
 .ev.conge{border-color:#B8AFA2;background:#fff;font-weight:600;color:var(--gris)}.ev.pv{border-color:#1E8A55;background:#E3F4EA}
+.ev.glisse{cursor:grab;touch-action:none;user-select:none}.ev.deux{outline:3px solid var(--err);background:#FBE3E0!important}
+.ev.fantome{position:fixed;z-index:60;pointer-events:none;opacity:.9;box-shadow:0 10px 30px rgba(0,0,0,.25);width:200px}
+.cal-b.cible{background:#FFF1E8;outline:2px dashed var(--or);outline-offset:-4px}
 @media print{header,.haut .noprint,.menu,#pop,.noprint{display:none!important}.carte{max-height:none;overflow:visible;border:0}body{background:#fff}thead th,td.nom,tfoot td{position:static}@page{size:landscape;margin:7mm}}
 </style>
 </head>
@@ -306,18 +309,21 @@ function vueSemaine(){ const s = ses(); SW = Math.max(0, Math.min(SW, s.sem.leng
     groupes.forEach((g, gi) => { const L = restes[gi].filter(i => i.h > 0).sort((x, y) => (x.m.autre - y.m.autre) || ((y.h >= b.h) - (x.h >= b.h)) || y.h - x.h);
       const i = L.find(z => z.p === "-" || !pris.has(z.p)); if (!i){ if (L.length) R[gi][bi] = { vide:true }; return; }
       if (i.p !== "-") pris.add(i.p); const u = Math.min(b.h, i.h); i.h -= u; R[gi][bi] = { p:i.p, m:i.m, h:u }; }); });
+  groupes.forEach((g, gi) => { const E = ((D.echanges || {})[g.nom] || {})[d] || []; E.forEach(([a, b]) => { if (blocs[a].h && blocs[b].h){ const t = R[gi][a]; R[gi][a] = R[gi][b]; R[gi][b] = t; } }); });
+  const doubles = new Set(); blocs.forEach((b, bi) => { const vu = {}; groupes.forEach((g, gi) => { const c = R[gi][bi]; if (c && c.p && c.p !== "-"){ if (vu[c.p] != null){ doubles.add(gi + "|" + bi); doubles.add(vu[c.p] + "|" + bi); } else vu[c.p] = gi; } }); });
   const reste = []; restes.forEach((L, gi) => L.forEach(i => { if (i.h > 0) reste.push(`${groupes[gi].nom} : ${i.h} h de ${i.m.titre} n'entrent pas dans les blocs de la semaine`); }));
+  if (doubles.size) reste.unshift("Un enseignant est à deux places en même temps (cartes rouges) : déplace une des deux cartes.");
   $("#leg").innerHTML = Object.keys(D.profs).map(p => `<span class="lp"><i style="background:${couleur(p)}">${p}</i><b>${D.profs[p]}</b></span>`).join("");
-  const carte = (c, g) => c.vide ? `<div class="ev" style="border-color:var(--err);background:#FBE3E0;color:var(--err)"><b>${g}</b>Aucun prof libre</div>` :
-    `<div class="ev" style="border-color:${c.p === "-" ? "#B8AFA2" : couleur(c.p)};background:${c.p === "-" ? "#F3F0EA" : couleur(c.p) + "14"}"><b>${groupes.length > 1 ? g + " · " : ""}${c.m.titre}</b><span>${c.p === "-" ? "" : (D.profs[c.p] || c.p) + " · "}${c.h} h</span></div>`;
+  const carte = (c, g, gi, bi) => c.vide ? `<div class="ev" style="border-color:var(--err);background:#FBE3E0;color:var(--err)"><b>${g}</b>Aucun prof libre</div>` :
+    `<div class="ev glisse ${doubles.has(gi + "|" + bi) ? "deux" : ""}" data-gi="${gi}" data-bi="${bi}" data-gn="${g}" style="border-color:${c.p === "-" ? "#B8AFA2" : couleur(c.p)};background:${c.p === "-" ? "#F3F0EA" : couleur(c.p) + "14"}"><b>${groupes.length > 1 ? g + " · " : ""}${c.m.titre}</b><span>${c.p === "-" ? "" : (D.profs[c.p] || c.p) + " · "}${c.h} h</span></div>`;
   let h = `<div class="calhaut"><button data-nw="-1">‹</button><b>Semaine du ${dt(d).toLocaleDateString("fr-CA", { day:"numeric", month:"long", year:"numeric" })}</b><button data-nw="1">›</button><span class="esp"></span><span class="mini">${groupes.map(g => g.nom).join(" · ") || "Aucun groupe cette semaine"}</span></div>
   <div class="cal"><div class="cal-c"></div>` + JOURS.map((j, di) => `<div class="cal-j ${congé[di] ? "off" : ""}"><b>${j}</b> ${dt(dates[di]).getDate()}</div>`).join("");
   ["AM", "PM"].forEach(pm => { h += `<div class="cal-h"><b>${pm === "AM" ? "Avant-midi" : "Après-midi"}</b><small>3 h</small></div>`;
     JOURS.forEach((j, di) => { const bi = di * 2 + (pm === "PM" ? 1 : 0);
       if (congé[di]){ h += `<div class="cal-b off"><div class="ev conge">${congé[di]}</div></div>`; return; }
-      h += `<div class="cal-b">` + groupes.map((g, gi) => R[gi][bi] ? carte(R[gi][bi], g.nom) : "").join("") +
+      h += `<div class="cal-b" data-bi="${bi}">` + groupes.map((g, gi) => R[gi][bi] ? carte(R[gi][bi], g.nom, gi, bi) : "").join("") +
         (j === "Jeudi" && pm === "PM" ? `<div class="ev pv"><b>Plage verte</b><span>2 h · récupération</span></div>` : "") + `</div>`; }); });
-  $("#vue").innerHTML = h + `</div>`;
+  $("#vue").innerHTML = h + `</div><p class="mini" style="padding:0 16px 12px">Glisse une carte vers un autre bloc pour échanger les deux cours de ce groupe. <button data-rz="${d}" style="padding:4px 10px">Remettre le placement automatique</button></p>`; vueSemaine.d = d;
   $("#etat").className = "etat " + (reste.length ? "err" : "ok"); $("#etat").textContent = reste.length ? reste.length + " point" + (reste.length > 1 ? "s" : "") + " à régler" : "Semaine possible sans conflit";
   $("#alertes").innerHTML = $("#alertes").dataset.ouv ? reste.map(a => `<div class="alert">${a}</div>`).join("") : "";
 }
@@ -415,6 +421,21 @@ document.addEventListener("click", e => { const a = e.target.closest("[data-va]"
   const sel = k && w !== "" ? `td.c[data-k="${CSS.escape(k)}"][data-w="${w}"]` : k ? `td.c[data-k="${CSS.escape(k)}"]` : `td.c[data-w="${w}"]`;
   const els = [...document.querySelectorAll(sel)]; if (!els.length) return; els[0].scrollIntoView({ block:"center", inline:"center", behavior:"smooth" });
   els.forEach(x => { x.style.transition = "background .3s"; x.style.background = "#FFD9C2"; setTimeout(() => x.style.background = "", 1600); }); });
+/* ---- glisser une carte de la vue Semaine vers un autre bloc (souris et doigt) ---- */
+(function(){ let G0 = null, fant = null, cible = null;
+  document.addEventListener("pointerdown", e => { const c = e.target.closest(".ev.glisse"); if (!c || VUE !== "s") return; e.preventDefault();
+    G0 = { c, gn:c.dataset.gn, bi:+c.dataset.bi, x:e.clientX, y:e.clientY, bouge:false }; });
+  document.addEventListener("pointermove", e => { if (!G0) return; if (!G0.bouge && Math.hypot(e.clientX - G0.x, e.clientY - G0.y) < 6) return;
+    if (!G0.bouge){ G0.bouge = true; fant = G0.c.cloneNode(true); fant.classList.add("fantome"); document.body.append(fant); G0.c.style.opacity = ".35"; }
+    fant.style.left = (e.clientX - 100) + "px"; fant.style.top = (e.clientY - 20) + "px";
+    const b = document.elementsFromPoint(e.clientX, e.clientY).find(x => x.classList && x.classList.contains("cal-b") && x.dataset.bi != null);
+    if (cible && cible !== b) cible.classList.remove("cible"); cible = b || null; if (cible) cible.classList.add("cible"); });
+  const fin = () => { if (!G0) return; const g = G0; G0 = null; if (fant){ fant.remove(); fant = null; } g.c.style.opacity = "";
+    if (cible){ cible.classList.remove("cible"); const b = +cible.dataset.bi; cible = null;
+      if (g.bouge && b !== g.bi){ D.echanges = D.echanges || {}; const E = ((D.echanges[g.gn] = D.echanges[g.gn] || {})[vueSemaine.d] = (D.echanges[g.gn][vueSemaine.d] || [])); E.push([g.bi, b]); sauver(); dessiner(); } } };
+  document.addEventListener("pointerup", fin); document.addEventListener("pointercancel", fin);
+  document.addEventListener("click", e => { const r = e.target.closest("[data-rz]"); if (!r) return; Object.values(D.echanges || {}).forEach(x => delete x[r.dataset.rz]); sauver(); dessiner(); });
+})();
 dessiner();
 </script>
 </body>
