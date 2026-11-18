@@ -27,7 +27,8 @@
     } else if (vis("accueilOv")) c = "accueil de classe";
     else if (vis("planOv")) c = "plans";
     else if (vis("actOv")) c = "formatifs";
-    else c = "bibliothèque";
+    else { const pg = (location.pathname.split("/").pop() || "index.html").replace(/\.html$/, "");
+      c = pg === "index" || pg === "" ? "bibliothèque" : ({ accueil: "accueil de classe (seul)", quiz: "quiz", simulateur: "simulateur", labo: "Labo", passeport: "registre de formation", coffres: "coffres", "outils-atelier": "gestion d'atelier", presentation: "présentation", telecommande: "télécommande" }[pg] || pg); if (pg === "quiz" && location.search) c += " " + (location.search.match(/animer|ecran|tele|manette|j=/) || [""])[0].replace("=", ""); }
     if (performance.now() - dernierGeste < 300) c += doigts >= 2 ? " · 2 doigts" : doigts ? " · doigt" : " · geste";
     return c;
   }

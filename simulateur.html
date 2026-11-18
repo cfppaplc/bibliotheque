@@ -1043,5 +1043,6 @@ function panneau(code){
 /* statistiques anonymes : une ouverture de la télécommande ou de l'animation au tableau */
 if (window.COFFRE && /[?&](tele|animer)=/.test(location.search) && !/inclus=1/.test(location.search)) COFFRE.stat("simu:" + (/[?&]defi=1/.test(location.search) ? "defi" : "libre"));
 </script>
+<script src="js/journal-perf.js?v=3"></script>
 </body>
 </html>
