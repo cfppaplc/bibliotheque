@@ -191,6 +191,14 @@ window.COFFRE = (function(){
   async function prendre(nom){ const D = await ouvrirDepot(nom); if (!D || !D.row.data) return null;
     const u = unb64(D.row.data), k = await sub.importKey("raw", D.brut.subarray(0, 32), "AES-GCM", false, ["decrypt"]);
     return JSON.parse(dec.decode(await gz(new Uint8Array(await sub.decrypt({ name:"AES-GCM", iv:u.subarray(0, 12) }, k, u.subarray(12))), false))); }
+  /* 18 nov. : paquet chiffré pour un compte, livré comme fichier (horaire préparé par Claude) — même format que deposer */
+  async function emballer(obj, pub){ const brut = crypto.getRandomValues(new Uint8Array(64)), env = await envelopper(brut, pub);
+    const k = await sub.importKey("raw", brut.subarray(0, 32), "AES-GCM", false, ["encrypt"]), iv = crypto.getRandomValues(new Uint8Array(12));
+    const c = new Uint8Array(await sub.encrypt({ name:"AES-GCM", iv }, k, await gz(enc.encode(JSON.stringify(obj)), true))), out = new Uint8Array(12 + c.length); out.set(iv); out.set(c, 12);
+    return { env, data:b64(out) }; }
+  async function lireLigne(row){ const s = await session(); if (!s) throw new Error("pas de session"); const brut = new Uint8Array(await ouvrir(row.env, s.priv));
+    const u = unb64(row.data), k = await sub.importKey("raw", brut.subarray(0, 32), "AES-GCM", false, ["decrypt"]);
+    return JSON.parse(dec.decode(await gz(new Uint8Array(await sub.decrypt({ name:"AES-GCM", iv:u.subarray(0, 12) }, k, u.subarray(12))), false))); }
   async function jeter(nom){ const D = await ouvrirDepot(nom); if (!D) return true; return (await rpc("coffre_effacer", { p_id:D.id, p_jeton:b64(D.brut.subarray(32, 64)) })) === true; }
-  return { demarrer, quitter, oublier, pousser, etat:() => ETAT, session, vu, stat, statsLire, envoyer, recevoir, effacer, deposer, prendre, jeter };
+  return { demarrer, quitter, oublier, pousser, etat:() => ETAT, session, vu, stat, statsLire, envoyer, recevoir, effacer, deposer, prendre, jeter, emballer, lireLigne };
 })();

@@ -5,6 +5,7 @@
 <script src="vieux-navigateur.js"></script>
 <script src="garde-admin.js"></script>
 <script src="signaler.js?v=2"></script>
+<script src="coffre.js?v=2"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
 <title>Métier+ — Horaires des groupes</title>
@@ -951,6 +952,15 @@ $("#bAnnee").onclick = () => { AS.on = true; AS.i = 0; assistant(); };
 $("#bNouv").onclick = () => { if (!D.prepare){ AS.on = true; AS.i = 0; assistant(); } else dlgNouveau(); };
 $("#bAnnee").textContent = "Assistant pas à pas";
 dessiner(); accueilH();
+/* 18 nov. : l'horaire suit le compte (copie chiffrée dans le coffre), sur tous les appareils */
+if (window.COFFRE) COFFRE.demarrer("horaire", { cles:[CLE], apres:() => { try { const n = JSON.parse(localStorage.getItem(CLE)); if (n){ D = n; G = S = 0; dessiner(); if (document.body.classList.contains("acc")) accueilH(); } } catch(e){} } }).then(async () => {
+  /* horaire préparé pour ce compte (fichier chiffré : seul ce compte peut l'ouvrir) */
+  try { const s = await COFFRE.session(); if (!s || !s.id) return; const r = await fetch("horaires/" + encodeURIComponent(s.id) + ".json", { cache:"no-store" }); if (!r.ok) return;
+    const P = await r.json(); if (!P || !P.env || localStorage.getItem("horairePaquetVu") === P.t) return;
+    const obj = await COFFRE.lireLigne(P);
+    if (confirm((P.titre || "Un horaire préparé") + " t'attend.\n\nL'ouvrir ? (Ça remplace l'horaire actuel de cet appareil; tu peux d'abord le sauvegarder avec Plus → Sauvegarder dans un fichier.)")){ D = obj; G = S = 0; sauver(); dessiner(); accueilH(); }
+    localStorage.setItem("horairePaquetVu", P.t);
+  } catch(e){} });
 </script>
 </body>
 </html>

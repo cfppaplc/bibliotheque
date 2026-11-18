@@ -630,3 +630,4 @@
 - 2026-11-18 : connexion : « Qui se connecte ? » = boutons des comptes récents de l'appareil (localStorage comptesRecents : id + nom, max 6, jamais de mot de passe) + « Autre »; menu du compte : « Changer de compte » (déconnecte et ouvre le choix). acces.js v5, connexion.css v2.
 - 2026-11-18 : ménage : alarme (cloche ding-dong ×3, sonDebut) quand l'heure du ménage commence, une fois par période (sessionStorage.menageSonne). accueil-menage.js v3.
 - 2026-11-18 : horaire : maximum par enseignant = 24 h par semaine (défaut, migration de 18 → 24 via D.max24).
+- 2026-11-18 : horaire suit le compte : COFFRE.demarrer("horaire", clé horairesMetier2). Paquets préparés : horaires/<id>.json = {env,data,t,titre} chiffré pour la clé publique du compte (COFFRE.emballer), ouvert au chargement avec COFFRE.lireLigne + confirmation (horairePaquetVu). Session 2 Plomberie déposée pour jeremy.raymond.
