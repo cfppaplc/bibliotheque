@@ -486,6 +486,7 @@ function remplirTrous(g){ let chg = false;
   return chg; }
 function ajouterSemaine(s){ const pf = s.sem.findIndex(w => w.pf);
   if (pf >= 0){ const w = s.sem[pf], { h, par } = parSemaine(w.d); delete w.pf; w.h = h; poserJT(s, pf, par); return pf; }   /* reprend une semaine pédagogique de fin de session */
+  const L = grp().sessions; if (L.indexOf(s) < L.length - 1){ RAISON = `${s.nom} est calculée pour ses heures (450 h) : elle ne devrait jamais manquer de semaines. Vérifie le calendrier : une journée spéciale ou un congé de trop dans cette session enlève des heures de cours.`; return -1; }
   const der = s.sem[s.sem.length - 1]; if (!der) return -1; const d = new Date(der.d + "T12:00");
   for (let n = 0; n < 12; n++){ d.setDate(d.getDate() + 7); const k = iso(d); if (k > finMax()){ RAISON = "On est rendu au " + jm(finMax()) + "."; return -1; }
     const z = grp().sessions.find(z => z !== s && z.sem.some(w => w.d === k)); if (z && !decaler(z)) return -1;
