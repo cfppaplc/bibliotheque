@@ -152,6 +152,7 @@ const derSem = (s, k) => { for (let i = s.sem.length - 1; i >= 0; i--) if (total
 const evalSem = (s, m) => { const E = {}; let n = Math.max(3, +m.ev || 0); for (let i = s.sem.length - 1; i >= 0 && n > 0; i--){ const t = totalCase(s, i, m.k); if (t){ E[i] = Math.min(n, t); n -= E[i]; } } return E; };   /* heures d'évaluation (3 h, ou plus si l'éval est plus longue), à la fin du module */
 const progAS = () => AS.prog && D.prog[AS.prog] ? AS.prog : Object.keys(D.prog)[0];
 const dansProg = (p, pr) => { const L = (D.progProfs || {})[pr]; return !L || L.includes(p); };   /* enseignants cochés pour ce programme (rien de coché = tous) */
+const HT = m => (+m.h || 0) + (+m.ev || 0);   /* heures du module + heures d'examen (ex. 75 + 6 = 81 h) */
 const maxSem = () => +((D && D.maxSem) || 18);
 function charges(){ const C = {};
   D.groupes.forEach(g => g.sessions.forEach(s => s.sem.forEach((w, wi) => { const W = s.g[wi] || {};
@@ -168,14 +169,14 @@ function dessiner(){ if (D.groupes.some(g => remplirTrous(g))) sauver();
     $("#vue").innerHTML = `<div style="padding:40px;text-align:center"><h2 style="margin-top:0">Aucun groupe pour l'instant</h2><p>Réponds aux questions une à la fois : l'horaire se bâtit à la fin.</p><button class="prim" id="bVide" style="font-size:16px;padding:10px 20px">Commencer l'assistant</button></div>`;
     $("#bVide").onclick = () => { AS.on = true; AS.i = 0; assistant(); }; return; } document.querySelectorAll("#vOng button").forEach(b => b.classList.toggle("on", b.dataset.v === VUE)); if (VUE === "e") return vueProfs(); if (VUE === "s") return vueSemaine();
   $("#gSel").innerHTML = D.groupes.map((g, i) => `<option value="${i}" ${i === G ? "selected" : ""}>${g.nom}</option>`).join("");
-  $("#sOng").innerHTML = grp().sessions.map((s, i) => { const t = s.sem.reduce((a, w, wi) => a + s.mods.reduce((u, m) => u + (m.autre ? 0 : totalCase(s, wi, m.k)), 0), 0), pr = s.mods.reduce((a, m) => a + (m.autre ? 0 : m.h), 0);
+  $("#sOng").innerHTML = grp().sessions.map((s, i) => { const t = s.sem.reduce((a, w, wi) => a + s.mods.reduce((u, m) => u + (m.autre ? 0 : totalCase(s, wi, m.k)), 0), 0), pr = s.mods.reduce((a, m) => a + (m.autre ? 0 : HT(m)), 0);
     return `<button data-s="${i}" class="${i === S ? "on" : ""}" title="Heures de cours placées / prévues">${s.nom} <small style="opacity:.75">${t} / ${pr} h</small></button>`; }).join("");
   const s = ses(), C = charges(), prob = [];
   // légende
   const T = {}; s.sem.forEach((w, wi) => { const W = s.g[wi] || {}; for (const k in W) for (const p in W[k]) T[p] = (T[p] || 0) + W[k][p]; });
   const TA = totalAnnee(), CI = D.cible || {};
   let totEns = 0; s.sem.forEach((w, wi) => s.mods.forEach(m => { if (m.autre) return; const c = cell(s, wi, m.k); for (const p in c) if (p !== "-") totEns += c[p]; }));
-  const pre = s.mods.reduce((a, m) => a + (m.autre ? 0 : m.h), 0);
+  const pre = s.mods.reduce((a, m) => a + (m.autre ? 0 : HT(m)), 0);
   $("#leg").innerHTML = `<span class="lp" title="Heures de cours données par un enseignant dans cette session (examens compris)" style="font-weight:700;color:var(${totEns < pre ? "--err" : "--ok"})">Enseignants : ${totEns} / ${pre} h</span>` + Object.keys(D.profs).map(p => { const c = +CI[p] || 0, t = TA[p] || 0, cl = !c ? "" : t > c ? "color:var(--err);font-weight:700" : t < c ? "color:var(--or)" : "color:var(--ok);font-weight:700";
     return `<span class="lp ${FILTRE === p ? "on" : ""}" data-f="${p}" title="Cette session : ${T[p] || 0} h"><i style="background:${couleur(p)}">${p}</i><b>${D.profs[p]}</b><span style="${cl}">${t}${c ? " / " + c : ""} h</span></span>`; }).join("");
   // en-tête : semaines
@@ -184,12 +185,12 @@ function dessiner(){ if (D.groupes.some(g => remplirTrous(g))) sauver();
   s.sem.forEach(w => { const m = dt(w.d).toLocaleDateString("fr-CA", { month:"short" }).replace(".", ""), conf = Object.keys(C).some(p => C[p][w.d] && C[p][w.d].h > C[p][w.d].dur);
     h += `<th class="${m !== moisAvant ? "mois" : ""} ${conf ? "conf" : ""}" title="${conf ? "Un enseignant a trop d'heures cette semaine" : ""}">${jm(w.d)}</th>`; moisAvant = m; });
   h += `</tr></thead><tbody>`;
-  const ligne = m => { const k = m.k, fait = s.sem.reduce((a, w, wi) => a + totalCase(s, wi, k), 0), pct = m.h ? Math.min(100, fait / m.h * 100) : 0, cl = !m.h ? "" : fait > m.h ? "trop" : fait < m.h ? "manque" : "";
+  const ligne = m => { const k = m.k, fait = s.sem.reduce((a, w, wi) => a + totalCase(s, wi, k), 0), pct = HT(m) ? Math.min(100, fait / HT(m) * 100) : 0, cl = !m.h ? "" : fait > HT(m) ? "trop" : fait < HT(m) ? "manque" : "";
     if (m.apres){ const avant = s.sem.findIndex(w => { const z = new Date(w.d + "T12:00"); z.setDate(z.getDate() + 4); return iso(z) < m.apres && totalCase(s, s.sem.indexOf(w), k) > 0; }); if (avant >= 0) prob.push({ t:`${m.titre} commence avant le ${dt(m.apres).toLocaleDateString("fr-CA", { day:"numeric", month:"long" })}`, k, w:avant, fx:"apres" }); }
     { const na = m.autre ? 0 : s.sem.reduce((t, w, wi) => t + (cell(s, wi, k)["-"] || 0), 0); if (na) prob.push({ t:`${m.titre} : ${na} h sans enseignant (non assigné)`, k, fx:"na" }); }
     if (!m.autre && Object.keys(evalSem(s, m)).length > 1) prob.push({ t:`L'évaluation de ${m.titre} (${Math.max(3, +m.ev || 0)} h) est séparée sur deux semaines`, k, fx:"eval", niv:"j" });
-    if (!m.autre && fait !== m.h) prob.push({ t:`${m.titre} : ${fait} h placées sur ${m.h} h (${fait > m.h ? "enlève" : "ajoute"} ${Math.abs(fait - m.h)} h)`, k, fx:"mod" });
-    let r = `<tr class="${m.autre ? "autre" : ""}"><td class="nom" data-mk="${k}" title="Toucher pour une date « pas avant »" style="cursor:pointer"><b>${m.autre ? `<i style="display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;background:${coulAutre(m)}"></i>` : ""}${m.num ? m.num + " · " : ""}${m.titre}</b><small>${m.code ? m.code + " · " : ""}${m.apres ? "dès le " + jm(m.apres) + " · " : ""}${fait} / ${m.h} h${m.ev ? " · éval " + m.ev + " h" : ""}${cl === "" && m.h && !m.autre ? " ✓" : ""}</small>${m.autre ? "" : `<div class="barre ${cl}"><i style="width:${pct}%"></i></div>`}</td>`;
+    if (!m.autre && fait !== HT(m)) prob.push({ t:`${m.titre} : ${fait} h placées sur ${HT(m)} h (${fait > HT(m) ? "enlève" : "ajoute"} ${Math.abs(fait - HT(m))} h)`, k, fx:"mod" });
+    let r = `<tr class="${m.autre ? "autre" : ""}"><td class="nom" data-mk="${k}" title="Toucher pour une date « pas avant »" style="cursor:pointer"><b>${m.autre ? `<i style="display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;background:${coulAutre(m)}"></i>` : ""}${m.num ? m.num + " · " : ""}${m.titre}</b><small>${m.code ? m.code + " · " : ""}${m.apres ? "dès le " + jm(m.apres) + " · " : ""}${fait} / ${HT(m)} h${m.ev ? " (dont éval " + m.ev + " h)" : ""}${cl === "" && m.h && !m.autre ? " ✓" : ""}</small>${m.autre ? "" : `<div class="barre ${cl}"><i style="width:${pct}%"></i></div>`}</td>`;
     const EV = m.autre ? {} : evalSem(s, m);
     s.sem.forEach((w, wi) => { const c = cell(s, wi, k), ps = Object.keys(c); let resteE = EV[wi] || 0;
       r += `<td class="c" data-w="${wi}" data-k="${k}">` + ps.slice().reverse().map(p => { let v = c[p]; const e = Math.min(resteE, v); resteE -= e; v -= e; return [p, v, e]; }).reverse().map(([p, v, e]) => {
@@ -227,7 +228,7 @@ function ouvrirCase(td){
   pop.innerHTML = `<h3>${m.titre}</h3><div class="s">Semaine du ${jm(w.d)} · ${place} h placées sur ${w.h}</div>` +
     liste.map(p => `<div class="lg"><i style="background:${p === "-" ? "#B8AFA2" : couleur(p)}">${p === "-" ? "" : p}</i><span class="n">${p === "-" ? "Heures" : D.profs[p] || p}</span><button data-d="-3" data-p="${p}" title="Retirer un bloc de 3 h">−3</button><input class="hv" data-hv="${p}" inputmode="numeric" value="${c[p] || 0}"><button data-d="3" data-p="${p}" title="Ajouter un bloc de 3 h">+3</button></div>`).join("") +
     (m.autre ? "" : `<div class="ajout">${Object.keys(D.profs).filter(p => !liste.includes(p)).map(p => `<button data-aj="${p}">+ ${D.profs[p]}</button>`).join("")}</div>`) +
-    `<div class="bas"><span>Reste à placer : ${Math.max(0, m.h - s.sem.reduce((a, x, i) => a + totalCase(s, i, k), 0))} h</span><button data-fermer>OK</button></div>`;
+    `<div class="bas"><span>Reste à placer : ${Math.max(0, HT(m) - s.sem.reduce((a, x, i) => a + totalCase(s, i, k), 0))} h</span><button data-fermer>OK</button></div>`;
   pop.hidden = false; const r = td.getBoundingClientRect(), pw = pop.offsetWidth, ph = pop.offsetHeight;
   pop.style.left = Math.max(8, Math.min(innerWidth - pw - 8, r.left + r.width / 2 - pw / 2)) + "px";
   pop.style.top = (r.bottom + ph + 10 < innerHeight ? r.bottom + 6 : Math.max(8, r.top - ph - 6)) + "px";
@@ -269,7 +270,7 @@ function action(a){ const s = ses();
 /* remplissage simple : modules dans l'ordre, au 1er enseignant, en respectant ses heures dans les autres groupes */
 function remplir(s){ const garde = {}; s.sem.forEach((w, wi) => { const W = s.g[wi] || {}; for (const k in W){ const m = s.mods.find(x => x.k === k); if (m && m.autre) (garde[wi] = garde[wi] || {})[k] = W[k]; } });
   s.g = garde; const TA = totalAnnee(s); const C = charges(), L = s.mods.filter(m => !m.autre && m.h), OUV = 3;
-  const reste = new Map(L.map(m => [m, m.h])); const attente = L.slice(), actifs = []; let finSem = "";
+  const reste = new Map(L.map(m => [m, HT(m)])); const attente = L.slice(), actifs = []; let finSem = "";
   const ouvrir = () => { for (let n = 0; n < attente.length && actifs.length < OUV; ){ const m = attente[n]; if (m.apres && m.apres > finSem){ n++; continue; } actifs.push(m); attente.splice(n, 1); } };   /* « pas avant » : un module attend sa date */
   s.sem.forEach((w, wi) => { finSem = (() => { const z = new Date(w.d + "T12:00"); z.setDate(z.getDate() + 4); return iso(z); })(); let cap = w.h - s.mods.reduce((a, m) => a + (m.autre ? totalCase(s, wi, m.k) : 0), 0), tour = 0, garde = 0; ouvrir();
     const charge = p => (((C[p] || {})[w.d] || {}).h || 0);
@@ -491,7 +492,7 @@ function dlgNouveau(){ prepDonnees(); const lun = new Date(D.cal.debut + "T12:00
       ses.mods.push({ k, code:m.code, titre:m.titre, num:m.num, h:+m.h || 0, ev:+m.ev || 0, apres:m.apres || "", profs:Object.keys(D.profs).filter(p => (D.peut[p] || []).includes(m.code) && dansProg(p, $("#nP").value)), autre:!m.code }); cum += +m.h || 0; });
     // semaines selon le calendrier
     let d = new Date($("#nD").value + "T12:00"); d.setDate(d.getDate() - (d.getDay() + 6) % 7); let garde = 0;
-    g.sessions.forEach(s => { let besoin = s.mods.reduce((a, m) => a + m.h, 0);
+    g.sessions.forEach(s => { let besoin = s.mods.reduce((a, m) => a + HT(m), 0);
       while (besoin > 0 && garde++ < 120){ const k = iso(d); d.setDate(d.getDate() + 7); if (k > finMax()) break;
         let h = 0; const par = {}; for (let i = 0; i < 5; i++){ const x = new Date(k + "T12:00"); x.setDate(x.getDate() + i); const j = iso(x); if (j < D.cal.debut || j > finMax()) continue; const ty = jourType(j), hj = HJOUR[x.getDay()];
           if (ty === "conge") continue; h += hj; if (ty) par[ty] = (par[ty] || 0) + hj; }
@@ -617,13 +618,13 @@ function regler(a){ const s = ses(); let fait = 0, reste = ""; RAISON = "";
     s.mods.filter(m => m.autre && !m.jt).forEach(m => { if (e > 0){ e -= retirer(s, a.w, m.k, e); } }); if (totSem(s, a.w) > a.h) return regler({ fx:"sem", w:a.w }); }
   if (a.fx === "apres"){ const m = s.mods.find(x => x.k === a.k);
     s.sem.forEach((w, wi) => { if (!okDate(m, w) && totalCase(s, wi, m.k)) fait += sortir(s, m, wi, w2 => okDate(m, w2)); }); }
-  if (a.fx === "mod"){ const m = s.mods.find(x => x.k === a.k); let e = s.sem.reduce((t, w, wi) => t + totalCase(s, wi, m.k), 0) - m.h;
+  if (a.fx === "mod"){ const m = s.mods.find(x => x.k === a.k); let e = s.sem.reduce((t, w, wi) => t + totalCase(s, wi, m.k), 0) - HT(m);
     if (e > 0) for (let wi = s.sem.length - 1; wi >= 0 && e > 0; wi--){ const r = retirer(s, wi, m.k, e); e -= r; fait += r; }
     else if (e < 0){ const n = -e, r = placer(s, m, n); fait = n - r;
       if (r > 0) reste = `Il reste ${r} h de « ${m.titre} » à placer, mais toutes les semaines sont pleines. ${RAISON}`; } }
   if (a.fx === "sem"){ const wi = a.w, w = s.sem[wi]; let e = totSem(s, wi) - w.h;
     const tot = m => s.sem.reduce((t, x, i) => t + totalCase(s, i, m.k), 0);
-    s.mods.filter(m => !m.autre && tot(m) > m.h).forEach(m => { if (e <= 0) return; const r = retirer(s, wi, m.k, Math.min(e, tot(m) - m.h)); e -= r; fait += r; });
+    s.mods.filter(m => !m.autre && tot(m) > HT(m)).forEach(m => { if (e <= 0) return; const r = retirer(s, wi, m.k, Math.min(e, tot(m) - HT(m))); e -= r; fait += r; });
     s.mods.filter(m => !m.autre).forEach(m => { if (e <= 0) return; const r = sortir(s, m, wi, w2 => okDate(m, w2), null, e, true); e -= r; fait += r; });
     if (e > 0) reste = `Il reste ${e} h de trop cette semaine : les autres semaines sont pleines ou les enseignants n'ont plus de place. ${RAISON}`; }
   if (a.fx === "prof"){ const wi = a.w, w = s.sem[wi]; let e = -libre(a.p, w);
@@ -723,7 +724,7 @@ function verifAs(e){ const V = [], P = Object.keys(D.profs), quoi = e.chk || "";
       const reste = p => (+(D.cible || {})[p] || 0) - (totalAnnee()[p] || 0);
       pr.mods.filter(m => m.code && !P.some(p => (D.peut[p] || []).includes(m.code))).forEach(m => { const q = P.slice().sort((x, y) => reste(y) - reste(x))[0]; if (q)
         V.push({ t:`Personne ne peut donner « ${m.titre} ».`, b:`Le donner à ${D.profs[q]}`, f:() => { (D.peut[q] = D.peut[q] || []).push(m.code); } }); });
-      const besoin = pr.mods.reduce((a, m) => a + (m.code ? +m.h || 0 : 0), 0) + Object.values(totalAnnee()).reduce((a, b) => a + b, 0), offre = P.reduce((a, p) => a + (+(D.cible || {})[p] || 0), 0);
+      const besoin = pr.mods.reduce((a, m) => a + (m.code ? HT(m) : 0), 0) + Object.values(totalAnnee()).reduce((a, b) => a + b, 0), offre = P.reduce((a, p) => a + (+(D.cible || {})[p] || 0), 0);
       if (offre && offre < besoin){ const manque = besoin - offre;
         V.push({ t:`Les tâches des enseignants donnent ${offre} h, mais il faut ${besoin} h pour ce groupe et ceux déjà faits. Il manque ${manque} h.`, b:`Répartir les ${manque} h`, f:() => { let n = manque; const L = P.filter(p => dispoAn(p) > (+D.cible[p] || 0));
           while (n > 0 && L.length){ for (const p of L){ const x = Math.min(3, n, dispoAn(p) - (+D.cible[p] || 0)); if (x <= 0) continue; D.cible[p] = (+D.cible[p] || 0) + x; n -= x; if (n <= 0) break; } if (L.every(p => dispoAn(p) <= (+D.cible[p] || 0))) break; } } }); } }

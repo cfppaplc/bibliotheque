@@ -609,3 +609,4 @@
 - 2026-11-18 : évaluation gardée ensemble : point jaune « séparée sur deux semaines » (fx eval, grouperEval, aussi après remplir); vue Semaine : blocs d'éval qui se suivent, le plus tard possible. Assistant : journées spéciales déjà entrées = réutilisées pour tous les groupes.
 - 2026-11-18 : assistant « Qui enseigne » : cases à cocher par programme (D.progProfs[prog], dansProg) au lieu de retirer; les non cochés sautent leurs étapes et ne reçoivent pas d'heures au bâtissage.
 - 2026-11-18 : point « N h sans enseignant (non assigné) » par module (fx na) : Régler donne les heures grises à un prof qui a le module coché et de la place (le plus loin de sa tâche).
+- 2026-11-18 : Jeremy : heures d'un module = heures + examen (ex. charpenterie 75 + 6 = 81 h) → HT(m) partout (ligne, remplir, Régler, session, nouveau groupe). À confirmer : son Excel place 75 h et 450 h/session.
