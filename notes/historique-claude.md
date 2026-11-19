@@ -650,3 +650,4 @@
 - 2026-11-19 : sessOk utilise demiAn(s) (parité du numéro de session : 1,3 = 1re moitié; 2,4 = 2e) au lieu du rang dans le groupe (bug : groupe « Session 4 » seul = rang 0). donnerNA(p, code) : cocher un module dans la fiche donne tout de suite ses heures « non assigné ». Fiche : seulement les modules des sessions où il enseigne (+ déjà cochés).
 - 2026-11-19 : fin de l'assistant horaire : autoRegler(gs) applique « Régler » sur tous les points rouges (6 tours max, sans messages), puis message « X points réglés, il reste Y ».
 - 2026-11-19 : finaliserExamens(s) (fin de remplir et de chaque regler) : examens des cours finSes ramenés dans s._der, rien après; fige() protège ces heures dans trou, bouger, grouperEval; echanger() = déplacement ou échange.
+- 2026-11-19 : moins sensible : TOL() (D.tol, 6 h par défaut, réglable dans Réglages → Enseignants) pour la balance des tâches (jaune jusqu'à 3×TOL), semaine qui manque ≤ 3 h = jaune, examen séparé = jaune.
