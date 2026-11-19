@@ -270,8 +270,11 @@ function dessiner(){ if (D.groupes.some(g => remplirTrous(g))) sauver();
   // conflits entre groupes
   Object.keys(C).forEach(p => Object.keys(C[p]).forEach(d => { const e = C[p][d]; if (e.h > e.max && s.sem.some(w => w.d === d)) prob.push({ t:e.h > e.dur ? `${D.profs[p] || p} a ${e.h} h la semaine du ${jm(d)} (${[...e.grp].join(" et ")}) : impossible, il n'est disponible que ${e.dur} h (absences ou deux groupes).` : `Suggestion : ${D.profs[p] || p} a ${e.h} h la semaine du ${jm(d)}, plus que ${maxSem()} h.`, niv:e.h > e.dur ? "" : "j", w:s.sem.findIndex(w => w.d === d), fx:"prof", p, d }); }));
   /* 19 nov. (Jeremy) : les heures des enseignants doivent balancer avec leur tâche (heures prévues pour la session) */
-  Object.keys(D.profs).forEach(q => { const r0 = resteTache(q); if (r0 == null || Math.abs(r0) <= TOL()) return;   /* 19 nov. : moins sensible (tolérance) */
-    prob.push({ t:`${D.profs[q]} : ${r0 > 0 ? "il manque " + r0 + " h" : (-r0) + " h de trop"} pour balancer sa tâche de la session (${prevTache(q)} h prévues)`, fx:"bal", niv:Math.abs(r0) > 3 * TOL() ? "" : "j" }); });
+  /* 19 nov. : la balance se juge sur toute la demi-année (tous ses groupes), pas groupe par groupe */
+  Object.keys(D.profs).forEach(q => { if (!s.sem.some((w, wi) => s.mods.some(m => !m.autre && cell(s, wi, m.k)[q])) && !sessOk(q, s)) return;
+    const d = resteDemi(q, s), r0 = d != null ? d : resteTache(q); if (r0 == null || Math.abs(r0) <= TOL()) return;
+    const tp = (D.tacheProf || {})[q], cle = demiAn(s) ? "s2" : "s1";
+    prob.push({ t:`${D.profs[q]} : ${r0 > 0 ? "il manque " + r0 + " h" : (-r0) + " h de trop"} pour balancer sa tâche ${d != null ? `de la ${demiAn(s) ? "2e" : "1re"} moitié de l'année, tous ses groupes (${tp[cle]} h prévues)` : `de la session (${prevTache(q)} h prévues)`}`, fx:"bal", niv:Math.abs(r0) > 3 * TOL() ? "" : "j" }); });
   const vus = new Set(), ACC = (D.acceptes = D.acceptes || {})[grp().id] || [], P0 = prob.filter(x => !vus.has(x.t) && vus.add(x.t)), P = P0.filter(x => !ACC.includes(x.t)).sort((a, b) => (a.niv === "j") - (b.niv === "j")), nAcc = P0.length - P.length;
   $("#etat").className = "etat " + (P.length ? "err" : "ok"); const nR = P.filter(x => x.niv !== "j").length, nJ = P.length - nR;
   $("#etat").textContent = nR ? nR + " point" + (nR > 1 ? "s" : "") + " à régler" + (nJ ? " · " + nJ + " suggestion" + (nJ > 1 ? "s" : "") : "") : nJ ? nJ + " suggestion" + (nJ > 1 ? "s" : "") : nAcc ? "Correct (" + nAcc + " accepté" + (nAcc > 1 ? "s" : "") + ")" : "Tout est correct"; if (!P.length && nAcc) $("#etat").className = "etat ok"; if (!nR && nJ) $("#etat").className = "etat jaune"; if (nAcc) $("#etat").style.cursor = "pointer";
@@ -451,7 +454,7 @@ function equilibrer(g){ let bouge = 0; const G0 = G; G = D.groupes.indexOf(g);
     s.mods.forEach(m => { if (!m.autre && s.sem.some((w, wi) => cell(s, wi, m.k)["-"])){ const S0 = S; S = si; const a0 = window.alert; window.alert = () => {}; regler({ fx:"na", k:m.k }); window.alert = a0; S = S0; } });
     const placeP = p => { let t = 0; s.sem.forEach((w, wi) => s.mods.forEach(m => { if (!m.autre) t += cell(s, wi, m.k)[p] || 0; })); return t; };
     const prevP = p => prevDe(g, si, p);
-    for (let tour = 0; tour < 60; tour++){ const P = Object.keys(D.profs).filter(p => prevP(p) != null), haut = P.filter(p => placeP(p) > prevP(p)), bas = P.filter(p => placeP(p) < prevP(p)); if (!haut.length || !bas.length) break; let fait = 0;
+    for (let tour = 0; tour < 60; tour++){ const P = Object.keys(D.profs).filter(p => prevP(p) != null), haut = P.filter(p => placeP(p) > prevP(p) && !(p === PPRIO() && resteDemi(p, s) >= -TOL())),   /* 19 nov. : on ne prend pas d'heures à l'enseignant prioritaire tant que sa tâche (toute la demi-année) n'est pas dépassée */ bas = P.filter(p => placeP(p) < prevP(p)); if (!haut.length || !bas.length) break; let fait = 0;
       for (const p of haut) for (const q of bas){ for (let wi = 0; wi < s.sem.length && !fait; wi++){ const w = s.sem[wi];
         for (const m of s.mods){ if (m.autre || !cell(s, wi, m.k)[p] || !profsDe(m).includes(q) || !sessOk(q, s)) continue; const x = Math.min(3, cell(s, wi, m.k)[p], placeP(p) - prevP(p), prevP(q) - placeP(q), Math.max(0, libre(q, w))); if (x <= 0) continue;
           retirer(s, wi, m.k, x, p); ajout(s, wi, m.k, q, x); bouge += x; fait = 1; break; } } if (fait) break; } if (!fait) break; } });
@@ -921,6 +924,9 @@ document.addEventListener("click", e => { const b = e.target.closest("[data-fxp]
 function prevTache(q){ const g = grp(); if (!g || S > 1) return null; return prevDe(g, S, q); }
 /* 19 nov. (Jeremy) : la tâche entrée dans l'assistant (D.tacheProf : heures de la demi-année, tous groupes) suit jusqu'au tableau des tâches du groupe.
    Heures prévues d'un enseignant dans une session du groupe = ce qui est écrit dans le tableau, sinon sa tâche de la demi-année moins ses heures dans ses autres groupes à la même demi-année. */
+/* heures qui manquent (+) ou de trop (−) à un enseignant pour sa tâche de la demi-année, tous groupes confondus */
+function resteDemi(p, s){ const tp = (D.tacheProf || {})[p]; if (!tp) return null; const pair = x => !((parseInt((x.nom || "").replace(/\D/g, "")) || 1) % 2), cle = pair(s) ? "s2" : "s1"; if (tp[cle] === undefined || tp[cle] === "") return null;
+  let t = 0; D.groupes.forEach(h => h.sessions.forEach(z => { if (pair(z) !== pair(s)) return; z.sem.forEach((w, wi) => z.mods.forEach(m => { if (!m.autre) t += cell(z, wi, m.k)[p] || 0; })); })); return +tp[cle] - t; }
 function prevDe(g, si, p){ const v = (((g.taches || {})[p] || {}).prev || [])[si]; if (v !== undefined && v !== "") return +v;
   const s = g.sessions[si], tp = (D.tacheProf || {})[p]; if (!s || !tp || !sessOk(p, s) || !dansProg(p, g.prog)) return null;
   const pair = x => !((parseInt((x.nom || "").replace(/\D/g, "")) || 1) % 2), cle = pair(s) ? "s2" : "s1"; if (tp[cle] === undefined || tp[cle] === "") return null;
