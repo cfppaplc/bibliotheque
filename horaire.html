@@ -182,7 +182,9 @@ function capProf(p, lundi, mx0){ const A = (D.abs || {})[p] || {}, R = REC(p); l
   return Math.max(0, mx - perdu); }
 const absent = (p, jour, pm) => !!(((D.abs || {})[p] || {})[jour]) || (pm ? REC(p).includes(new Date(jour + "T12:00").getDay() + "|" + pm) : false);
 const sesIdx = s => { const g = D.groupes.find(g => g.sessions.includes(s)); return g ? g.sessions.indexOf(s) : 0; };
-const sessOk = (p, s) => { const L = (D.sessProf || {})[p]; return p === "-" || !L || !L.length || L.includes(sesIdx(s)); };
+/* 19 nov. : « Enseigne en session 1 / 2 » = moitié de l'année (session 1, 3 = 1re moitié; 2, 4 = 2e moitié), pas le rang de la session dans le groupe */
+const demiAn = s => { const n = parseInt(((s && s.nom) || "").replace(/\D/g, "")); return n ? (n % 2 ? 0 : 1) : sesIdx(s); };
+const sessOk = (p, s) => { const L = (D.sessProf || {})[p]; return p === "-" || !L || !L.length || L.includes(demiAn(s)); };
 const MAUVE = "#7B3FA0";
 const derSem = (s, k) => { for (let i = s.sem.length - 1; i >= 0; i--) if (totalCase(s, i, k) > 0) return i; return -1; };   /* les 3 dernières heures d'un module = évaluation, en mauve */
 const evalSem = (s, m) => { const E = {}; let n = Math.max(3, +m.ev || 0); for (let i = s.sem.length - 1; i >= 0 && n > 0; i--){ const t = totalCase(s, i, m.k); if (t){ E[i] = Math.min(n, t); n -= E[i]; } } return E; };   /* heures d'évaluation (3 h, ou plus si l'éval est plus longue), à la fin du module */
@@ -658,7 +660,7 @@ $("#dlgC").addEventListener("click", e => { const t = reglages.t, el = e.target;
   if (el.dataset.pmx){ if (confirm("Retirer ce module du programme ?")){ P.mods.splice(+el.dataset.pmx, 1); sauver(); reglages("prog"); } }
   if (el.id === "pAj"){ P.mods.push({ num:"", code:"", titre:"Nouveau module", h:30, ev:0 }); sauver(); reglages("prog"); }
   if (el.id === "pNouv"){ const n = prompt("Nom du programme (ex. 5333 Plomberie et chauffage) :"); if (!n) return; const id = "P" + Date.now(); D.prog[id] = { nom:n, mods:[] }; reglages.p = id; sauver(); reglages("prog"); }
-  if (el.dataset.pc){ const [p, c] = el.dataset.pc.split("|"), L = (D.peut[p] = D.peut[p] || []), i = L.indexOf(c); if (i < 0) L.push(c); else L.splice(i, 1); sauver(); reglages("ens"); }
+  if (el.dataset.pc){ const [p, c] = el.dataset.pc.split("|"), L = (D.peut[p] = D.peut[p] || []), i = L.indexOf(c); if (i < 0){ L.push(c); donnerNA(p, c); } else L.splice(i, 1); sauver(); reglages("ens"); }
   if (el.dataset.px){ if (confirm("Retirer " + D.profs[el.dataset.px] + " ?")){ delete D.profs[el.dataset.px]; delete D.peut[el.dataset.px]; sauver(); reglages("ens"); dessiner(); } }
   if (el.id === "eAj"){ const n = prompt("Nom de l'enseignant :"); if (!n) return; let ini = n.split(/\s+/).map(x => x[0] || "").join(".").toUpperCase().slice(0, 3); while (D.profs[ini]) ini += "2"; D.profs[ini] = n; D.peut[ini] = []; { const L = (D.progProfs || {})[progAS()]; if (L) L.push(ini); } sauver(); reglages("ens"); dessiner(); }
 });
@@ -1042,10 +1044,20 @@ $("#dlgC").addEventListener("change", e => { if (e.target.dataset.tp){ const [p,
   if (AS.on && !e.target.closest("[data-vas]")) setTimeout(() => { if (AS.on && dlg.open){ const z = $("#asVer"); if (z){ lireAs(); z.innerHTML = verifAs(etapesAs()[AS.i]); } } }, 50); });
 const _calAbs = calAbs; calAbs = function(p){ if (AS.on) return assistant(); return _calAbs(p); };
 const _reg2 = reglages; reglages = function(t){ if (AS.on) return assistant(); return _reg2(t); };
+/* 19 nov. (Jeremy) : un module coché pour un enseignant → ses heures « non assigné » lui sont données tout de suite (selon sa place et sa tâche) */
+function donnerNA(p, code){ let n = 0; const G0 = G, S0 = S;
+  D.groupes.forEach((g, gi) => g.sessions.forEach((s, si) => { if (!sessOk(p, s)) return; s.mods.forEach(m => { if (m.code !== code || m.autre) return;
+    if (!(m.profs || []).includes(p)) (m.profs = m.profs || []).push(p);
+    G = gi; S = si; s.sem.forEach((w, wi) => { const r0 = resteTache(p), x = Math.min(cell(s, wi, m.k)["-"] || 0, Math.max(0, libre(p, w)), r0 == null ? 1e6 : Math.max(0, r0)); if (x > 0){ retirer(s, wi, m.k, x, "-"); ajout(s, wi, m.k, p, x); n += x; } }); }); }));
+  G = G0; S = S0; return n; }
 /* double-clic sur un enseignant : sa fiche (nom, tâche, sessions, modules, absences) */
 let FICHE = null;
 function fiche(p){ FICHE = p; _calAbs(p); const c = $("#dlgC"), h2 = c.querySelector("h2"); if (!h2) return; h2.textContent = D.profs[p];
-  const codes = []; Object.values(D.prog).forEach(Pr => Pr.mods.forEach(m => { if (m.code && !codes.some(x => x.code === m.code)) codes.push(m); }));
+  /* 19 nov. (Jeremy) : seulement les modules des sessions (des groupes) où il enseigne, plus ceux déjà cochés */
+  const codes = [], aj = m => { if (m.code && !codes.some(x => x.code === m.code)) codes.push(m); };
+  D.groupes.forEach(g => g.sessions.forEach(s => { if (sessOk(p, s)) s.mods.forEach(m => { if (!m.autre) aj(m); }); }));
+  if (!codes.length) Object.values(D.prog).forEach(Pr => Pr.mods.forEach(aj));
+  Object.values(D.prog).forEach(Pr => Pr.mods.forEach(m => { if ((D.peut[p] || []).includes(m.code)) aj(m); }));
   const L = (D.sessProf || {})[p] || [];
   h2.insertAdjacentHTML("afterend", `<div class="form"><label>Nom<br><input data-pn="${p}" value="${D.profs[p]}"></label><label>Tâche prévue (heures dans l'année)<br><input data-pt="${p}" inputmode="numeric" value="${(D.cible || {})[p] || ""}" placeholder="ex. 450"></label></div>
     <p style="margin:10px 0 4px"><b>Tâche (contrat)</b> ${[100, 80, 60, 50].map(v => `<span class="chip ${contrat(p) === v ? "on" : ""}" data-ctr="${p}|${v}">${v} %</span>`).join("")} <input data-ctri="${p}" inputmode="numeric" value="${contrat(p)}" style="width:56px"> % <span class="mini">= ${hContrat(p)} h de cours par année</span></p>
