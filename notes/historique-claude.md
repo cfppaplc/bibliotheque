@@ -659,3 +659,4 @@
 - 2026-11-19 : balance jugée sur la demi-année (resteDemi, tous groupes) dans l'alerte bal; equilibrer ne prend pas d'heures à D.profPrio tant que sa tâche de la demi-année n'est pas dépassée de plus que TOL.
 - 2026-11-19 : tâche de l'assistant (D.tacheProf) prioritaire sur les « prévu » du tableau : migration D.prevV1 (efface g.taches[p].prev si tacheProf existe) + effacement à chaque changement dans l'assistant.
 - 2026-11-19 : vue Semaine : réparation après placement des cartes « Aucun prof libre » (échange dans le même groupe, sinon dans le groupe qui occupe l'enseignant).
+- 2026-11-19 : « donner à » (choix de Jeremy) utilise librePhys : peut dépasser le maximum de la semaine (alerte jaune), pas les heures réelles ni les absences.

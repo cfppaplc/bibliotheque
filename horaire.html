@@ -794,6 +794,8 @@ const okDate = (m, w) => !m.apres || finS(w.d) >= m.apres;
 const PPRIO = () => (D && D.profPrio) || "", avantPP = L => { const P = PPRIO(); return P ? L.slice().sort((a, b) => (b === P || (Array.isArray(b) && b[0] === P)) - (a === P || (Array.isArray(a) && a[0] === P))) : L; };
 const prioDe = m => m ? ((D.prio || {})[m.code || m.titre] || "") : "", avantPrio = (m, L) => { const P = prioDe(m); return P ? L.slice().sort((a, b) => (b === P || (Array.isArray(b) && b[0] === P)) - (a === P || (Array.isArray(a) && a[0] === P))) : L; };
 const profsDe = m => [...new Set([...(m.profs || []), ...Object.keys(D.profs).filter(p => m.code && (D.peut[p] || []).includes(m.code))])];
+/* 19 nov. (Jeremy) : quand tu choisis toi-même l'enseignant (« donner à »), on peut dépasser son maximum de la semaine (alerte jaune), pas les heures réelles de la semaine ni ses absences */
+function librePhys(p, w){ const e = (charges()[p] || {})[w.d]; return Math.min(w.h, capProf(p, w.d, 99)) - (e ? e.h : 0); }
 function libre(p, w){ const e = (charges()[p] || {})[w.d]; return Math.min(w.h, capProf(p, w.d)) - (e ? e.h : 0); }
 function poser(s, wi, m, u){ const w = s.sem[wi], L = avantPrio(m, profsDe(m).filter(p => sessOk(p, s)).map(p => [p, libre(p, w)]).sort((a, b) => b[1] - a[1]));
   const p = (L.find(x => x[1] >= u) || L[0] || ["-"])[0]; fixer(s, wi, m.k, p, (cell(s, wi, m.k)[p] || 0) + u); }
@@ -867,16 +869,16 @@ function regler(a){ const s = ses(); let fait = 0, reste = ""; RAISON = "";
   if (a.donner){ const q = a.donner, nom = D.profs[q] || q;
     if (a.fx === "trou"){ const w = s.sem[a.w]; let manque = w.h - totSem(s, a.w);
       for (let wj = a.w + 1; wj < s.sem.length && manque > 0; wj++) for (const m of s.mods){ if (manque <= 0) break; if (m.autre || !okDate(m, w)) continue;
-        const x = Math.min(manque, cell(s, wj, m.k)[q] || 0, capM(s, a.w, m.k), Math.max(0, libre(q, w))); if (x <= 0) continue;
+        const x = Math.min(manque, cell(s, wj, m.k)[q] || 0, capM(s, a.w, m.k), Math.max(0, librePhys(q, w))); if (x <= 0) continue;
         retirer(s, wj, m.k, x, q); ajout(s, a.w, m.k, q, x); manque -= x; fait += x; }
       if (manque > 0) reste = `${nom} n'a plus de place cette semaine (ou plus de cours à avancer) : il manque encore ${manque} h.`; }
     if (a.fx === "na"){ const m = s.mods.find(x => x.k === a.k); let rest = 0;
-      s.sem.forEach((w, wi) => { const x = Math.min(cell(s, wi, m.k)["-"] || 0, Math.max(0, libre(q, w))); if (x > 0){ retirer(s, wi, m.k, x, "-"); ajout(s, wi, m.k, q, x); fait += x; } rest += cell(s, wi, m.k)["-"] || 0; });
+      s.sem.forEach((w, wi) => { const x = Math.min(cell(s, wi, m.k)["-"] || 0, Math.max(0, librePhys(q, w))); if (x > 0){ retirer(s, wi, m.k, x, "-"); ajout(s, wi, m.k, q, x); fait += x; } rest += cell(s, wi, m.k)["-"] || 0; });
       if (rest) reste = `${rest} h restent sans enseignant : ${nom} est plein ces semaines-là.`; }
     if (a.fx === "mod"){ const m = s.mods.find(x => x.k === a.k); let n = HT(m) - s.sem.reduce((t, w, i) => t + totalCase(s, i, m.k), 0), garde = 0;
-      while (n > 0 && garde++ < 200){ const wi = s.sem.findIndex(w => okDate(m, w) && totSem(s, s.sem.indexOf(w)) < w.h && capM(s, s.sem.indexOf(w), m.k) > 0 && libre(q, w) > 0);
+      while (n > 0 && garde++ < 200){ const wi = s.sem.findIndex(w => okDate(m, w) && totSem(s, s.sem.indexOf(w)) < w.h && capM(s, s.sem.indexOf(w), m.k) > 0 && librePhys(q, w) > 0);
         if (wi < 0){ if (ajouterSemaine(s) < 0) break; continue; }
-        const w = s.sem[wi], u = Math.min(3, n, w.h - totSem(s, wi), capM(s, wi, m.k), libre(q, w)); ajout(s, wi, m.k, q, u); n -= u; fait += u; }
+        const w = s.sem[wi], u = Math.min(3, n, w.h - totSem(s, wi), capM(s, wi, m.k), librePhys(q, w)); ajout(s, wi, m.k, q, u); n -= u; fait += u; }
       if (n > 0) reste = `Il reste ${n} h de « ${m.titre} » : ${nom} n'a plus de place dans les semaines où il reste de l'espace. ${RAISON}`; }
     finaliserExamens(s); sauver(); dessiner(); if (reste) alert(reste); else if (!fait) alert(`Je n'ai pas trouvé de place pour ${nom}.`); return; }
   if (a.fx === "jt"){ const kk = "jt:" + a.ty; if (!s.mods.some(m => m.k === kk)) s.mods.push({ k:kk, code:"", titre:JT[a.ty].n, num:"", h:0, ev:0, profs:[], autre:true, jt:a.ty });
