@@ -329,6 +329,23 @@ function action(a){ const s = ses();
 /* 19 nov. (Jeremy) : cours « examen la dernière semaine » : il commence plus tard, juste assez tôt pour finir à la dernière semaine (date « pas avant » calculée) */
 /* dernière vraie semaine de cours (assez d'heures de cours pour les examens, pas une semaine de fériés / pédagogiques) */
 const evH = m => Math.max(3, +m.ev || 0);
+/* heures figées : un cours « examen la dernière semaine » ne sort jamais de la semaine des examens */
+const fige = (s, m, wi) => !!(m && m.finSes && !m.autre && s._der != null && wi === s._der);
+/* déplace x h de m (prof p) de la semaine « de » vers la semaine « a » : place libre, sinon échange avec un autre cours (chacun garde son prof) */
+function echanger(s, m, p, de, a, x){ const W = s.sem[a], place = W.h - totSem(s, a);
+  if (place > 0 && (p === "-" || libre(p, W) > 0)){ const y = Math.min(x, place, p === "-" ? 99 : libre(p, W)); retirer(s, de, m.k, y, p); ajout(s, a, m.k, p, y); return y; }
+  for (const m2 of s.mods){ if (m2 === m || m2.autre || m2.finSes || !okDate(m2, s.sem[de])) continue; const c2 = cell(s, a, m2.k);
+    for (const q of Object.keys(c2)){ const y = Math.min(x, c2[q]); if (y <= 0) continue; if (q !== p && ((p !== "-" && libre(p, W) < y) || (q !== "-" && libre(q, s.sem[de]) < y))) continue;
+      retirer(s, de, m.k, y, p); ajout(s, a, m.k, p, y); retirer(s, a, m2.k, y, q); ajout(s, de, m2.k, q, y); return y; } }
+  return 0; }
+/* 19 nov. (Jeremy) : après chaque réglage, les examens des cours « dernière semaine » retournent tous dans la semaine des examens, et rien de ces cours après */
+function finaliserExamens(s){ const F = s.mods.filter(m => m.finSes && !m.autre); if (!F.length || !s.sem.length) return;
+  if (s._der == null || s._der >= s.sem.length) s._der = derSemFin(s, F.reduce((a, m) => a + evH(m), 0)); const der = s._der;
+  F.forEach(m => {
+    for (let wi = der + 1; wi < s.sem.length; wi++) for (const p of Object.keys(cell(s, wi, m.k))){ let x = cell(s, wi, m.k)[p] || 0, g = 0; while (x > 0 && g++ < 20){ const y = echanger(s, m, p, wi, der, x); if (!y) break; x -= y; } }
+    let manque = evH(m) - totalCase(s, der, m.k);
+    for (let wi = der - 1; wi >= 0 && manque > 0; wi--) for (const p of Object.keys(cell(s, wi, m.k))){ if (manque <= 0) break; let x = Math.min(manque, cell(s, wi, m.k)[p] || 0), g = 0; while (x > 0 && g++ < 20){ const y = echanger(s, m, p, wi, der, x); if (!y) break; x -= y; manque -= y; } } });
+  s.mods.forEach(m => { if (!m.autre && !m.finSes) grouperEval(s, m); }); }
 function derSemFin(s, E){ let der = s.sem.length - 1; const cours = i => (+s.sem[i].h || 0) - (s.sem[i].sansPV ? 2 : 0) - s.mods.reduce((a, m) => a + (m.autre && !/plage verte/i.test(m.titre) ? totalCase(s, i, m.k) : 0), 0);
   while (der > 0 && (s.sem[der].pf || cours(der) + 2 < Math.min(E, 30))) der--; return der; }
 function finSesDates(s){ delete s._der; const F = s.mods.filter(m => m.finSes && !m.autre); if (!F.length || !s.sem.length){ s.sem.forEach(w => { if (w.sansPV){ w.h -= 2; delete w.sansPV; } }); return; }
@@ -383,7 +400,7 @@ function remplir(s){ finSesDates(s); const garde = {}; s.sem.forEach((w, wi) => 
           for (const q of Object.keys(c2)){ if (n <= 0) break; let x = Math.min(n, c2[q], cell(s, L, m.k)[p] || 0); if (m2.finSes) x = Math.min(x, totalCase(s, der, m2.k) - Math.max(3, +m2.ev || 0));   /* on ne touche pas à l'examen de l'autre cours */ if (x <= 0) continue;
             if (q !== p && ((p !== "-" && libre(p, s.sem[der]) < x) || (q !== "-" && libre(q, s.sem[L]) < x))) continue;
             retirer(s, L, m.k, x, p); ajout(s, der, m.k, p, x); retirer(s, der, m2.k, x, q); ajout(s, L, m2.k, q, x); n -= x; } } } });
-    s.mods.filter(m => m.finSes && !m.autre).forEach(m => grouperEval(s, m)); }
+    s.mods.filter(m => m.finSes && !m.autre).forEach(m => grouperEval(s, m)); finaliserExamens(s); }
   sauver(); dessiner(); }
 function nouveauGroupe(){ const nom = prompt("Nom du groupe (ex. 2027EGI1) :"); if (!nom) return;
   const debut = prompt("Lundi de la 1re semaine (AAAA-MM-JJ) :", new Date().toISOString().slice(0, 10)); if (!debut) return;
@@ -769,12 +786,12 @@ function decaler(z){ if (ajouterSemaine(z) < 0) return false; const n = z.sem.le
     for (const ty in par){ const kk = "jt:" + ty; if (!z.mods.some(m => m.k === kk)) z.mods.push({ k:kk, code:"", titre:JT[ty].n, num:"", h:0, ev:0, profs:[], autre:true, jt:ty }); fixer(z, wi, kk, "-", par[ty]); } });
   return true; }
 const ajout = (s, wi, k, p, x) => fixer(s, wi, k, p, (cell(s, wi, k)[p] || 0) + x);
-var bouger = function(s, m, p, wi, x, cond, sansEchange){
+var bouger = function(s, m, p, wi, x, cond, sansEchange){ if (fige(s, m, wi)) return 0;
   for (let wj = 0; wj < s.sem.length; wj++){ const w = s.sem[wj]; if (wj === wi || !cond(w)) continue;
     if (w.h - totSem(s, wj) >= x && capM(s, wj, m.k) >= x && (p === "-" || libre(p, w) >= x)){ retirer(s, wi, m.k, x, p); ajout(s, wj, m.k, p, x); return x; } }
   if (sansEchange) return 0;
   for (let wj = 0; wj < s.sem.length; wj++){ const w = s.sem[wj]; if (wj === wi || !cond(w)) continue; if (p !== "-" && libre(p, w) < x) continue; if (capM(s, wj, m.k) < x) continue;
-    for (const m2 of s.mods){ if (m2.autre || m2 === m || !okDate(m2, s.sem[wi]) || capM(s, wi, m2.k) < x) continue; const c2 = cell(s, wj, m2.k);
+    for (const m2 of s.mods){ if (m2.autre || m2 === m || fige(s, m2, wj) || !okDate(m2, s.sem[wi]) || capM(s, wi, m2.k) < x) continue; const c2 = cell(s, wj, m2.k);
       for (const q in c2){ if (q === p || c2[q] < x) continue; if (q !== "-" && libre(q, s.sem[wi]) < x) continue;
         retirer(s, wi, m.k, x, p); ajout(s, wj, m.k, p, x); retirer(s, wj, m2.k, x, q); ajout(s, wi, m2.k, q, x); return x; } } }
   return 0; };
@@ -788,7 +805,7 @@ function sortir(s, m, wi, cond, seulP, combien, sansEchange){ let n = combien ==
 function grouperEval(s, m){ let fait = 0; const EV = evalSem(s, m), W = Object.keys(EV).map(Number).sort((a, b) => a - b); if (W.length < 2) return 0; const L = W[W.length - 1];
   for (const wi of W.slice(0, -1)){ let n = EV[wi];
     for (const p of Object.keys(cell(s, wi, m.k)).reverse()){ if (n <= 0) break;
-      for (const m2 of s.mods){ if (n <= 0) break; if (m2 === m || m2.autre || !okDate(m2, s.sem[wi])) continue; const c2 = cell(s, L, m2.k);
+      for (const m2 of s.mods){ if (n <= 0) break; if (m2 === m || m2.autre || fige(s, m2, L) || !okDate(m2, s.sem[wi])) continue; const c2 = cell(s, L, m2.k);
         for (const q of Object.keys(c2)){ if (n <= 0) break; const x = Math.min(n, c2[q], cell(s, wi, m.k)[p] || 0); if (x <= 0) continue;
           if (q !== p && ((p !== "-" && libre(p, s.sem[L]) < x) || (q !== "-" && libre(q, s.sem[wi]) < x))) continue;
           retirer(s, wi, m.k, x, p); ajout(s, L, m.k, p, x); retirer(s, L, m2.k, x, q); ajout(s, wi, m2.k, q, x); n -= x; fait += x; } } } }
@@ -808,7 +825,7 @@ function regler(a){ const s = ses(); let fait = 0, reste = ""; RAISON = "";
         if (wi < 0){ if (ajouterSemaine(s) < 0) break; continue; }
         const w = s.sem[wi], u = Math.min(3, n, w.h - totSem(s, wi), capM(s, wi, m.k), libre(q, w)); ajout(s, wi, m.k, q, u); n -= u; fait += u; }
       if (n > 0) reste = `Il reste ${n} h de « ${m.titre} » : ${nom} n'a plus de place dans les semaines où il reste de l'espace. ${RAISON}`; }
-    sauver(); dessiner(); if (reste) alert(reste); else if (!fait) alert(`Je n'ai pas trouvé de place pour ${nom}.`); return; }
+    finaliserExamens(s); sauver(); dessiner(); if (reste) alert(reste); else if (!fait) alert(`Je n'ai pas trouvé de place pour ${nom}.`); return; }
   if (a.fx === "jt"){ const kk = "jt:" + a.ty; if (!s.mods.some(m => m.k === kk)) s.mods.push({ k:kk, code:"", titre:JT[a.ty].n, num:"", h:0, ev:0, profs:[], autre:true, jt:a.ty });
     fixer(s, a.w, kk, "-", totalCase(s, a.w, kk) + a.h); fait = a.h; if (totSem(s, a.w) > s.sem[a.w].h) return regler({ fx:"sem", w:a.w }); }
   if (a.fx === "sessprof"){ s.sem.forEach((w, wi) => s.mods.forEach(m => { const x = cell(s, wi, m.k)[a.p]; if (!x) return;
@@ -830,7 +847,7 @@ function regler(a){ const s = ses(); let fait = 0, reste = ""; RAISON = "";
     for (let wi = a.w; wi < s.sem.length - 1; wi++){ const w = s.sem[wi]; if (w.pf) continue; let manque = w.h - totSem(s, wi); if (manque <= 0) continue;
       const ici = m => totalCase(s, wi, m.k) > 0;
       for (let wj = wi + 1; wj < s.sem.length && manque > 0; wj++){ if (s.sem[wj].pf) continue;   /* la semaine suivante d'abord; si ses profs ne sont pas libres, celle d'après */
-        const L = s.mods.filter(m => !m.autre && okDate(m, w) && totalCase(s, wj, m.k)).sort((x, y) => ici(y) - ici(x));   /* d'abord les modules déjà commencés */
+        const L = s.mods.filter(m => !m.autre && !fige(s, m, wj) && !(m.finSes && s._der != null && wi > s._der) && okDate(m, w) && totalCase(s, wj, m.k)).sort((x, y) => ici(y) - ici(x));   /* d'abord les modules déjà commencés */
         for (const m of L) for (const p of Object.keys(cell(s, wj, m.k))){ if (manque <= 0) break; const x = Math.min(manque, cell(s, wj, m.k)[p], capM(s, wi, m.k), p === "-" ? 99 : Math.max(0, libre(p, w))); if (x <= 0) continue;
           retirer(s, wj, m.k, x, p); ajout(s, wi, m.k, p, x); manque -= x; fait += x; } }
       if (wi === a.w) n = manque; }
@@ -853,7 +870,7 @@ function regler(a){ const s = ses(); let fait = 0, reste = ""; RAISON = "";
   if (a.fx === "prof"){ const wi = a.w, w = s.sem[wi]; let e = -libre(a.p, w);
     s.mods.filter(m => !m.autre && cell(s, wi, m.k)[a.p]).forEach(m => { if (e <= 0) return; fait += sortir(s, m, wi, w2 => okDate(m, w2), a.p, e); e = -libre(a.p, w); });
     if (e > 0) reste = `${D.profs[a.p]} a encore ${e} h de trop cette semaine. Je n'ai pas trouvé d'échange possible sans changer ses heures de la session. ${RAISON}`; }
-  sauver(); dessiner();
+  finaliserExamens(s); sauver(); dessiner();
   if (reste) alert(reste); else if (!fait) alert("Je n'ai pas trouvé de solution automatique pour ce point. Utilise « Voir » pour le régler à la main."); }
 document.addEventListener("click", e => { const b = e.target.closest("[data-acc],[data-revoir]"); if (!b) return; e.stopPropagation(); const A = (D.acceptes = D.acceptes || {});
   if (b.dataset.revoir != null) delete A[grp().id]; else (A[grp().id] = A[grp().id] || []).push(PROBS[+b.dataset.acc].t); sauver(); dessiner(); }, true);
