@@ -758,6 +758,8 @@ function dlgNouveau(){ prepDonnees(); const lun = new Date(D.cal.debut + "T12:00
     if (AS.chef){ const x = (g.taches[AS.chef] = g.taches[AS.chef] || {}); x.cg = (AS.cgH || [10, 10]).slice(); }
     D.groupes.push(g); G = D.groupes.length - 1; g.sessions.forEach((s, i) => { S = i; remplir(s); }); S = 0; VUE = "g"; sauver(); dlg.close(); document.body.classList.remove("acc"); $("#accH").hidden = true; dessiner(); };
 }
+/* 19 nov. (Jeremy : Michel à 330 h dans l'assistant, resté à 303) : une seule fois, les chiffres « prévu » du tableau cèdent la place à la tâche de l'assistant */
+if (!D.prevV1){ D.groupes.forEach(g => Object.keys(g.taches || {}).forEach(p => { const tp = (D.tacheProf || {})[p]; if (tp && (tp.s1 !== undefined || tp.s2 !== undefined)) delete g.taches[p].prev; })); D.prevV1 = 1; }
 if (!D.autresV){ D.groupes.forEach(g => g.sessions.forEach(s => s.sem.forEach((w, wi) => { w.h += s.mods.reduce((a, m) => a + (m.autre ? totalCase(s, wi, m.k) : 0), 0); }))); D.autresV = 1; }
 prepDonnees(); sauver();
 /* ---- simplicité : guide, préparer l'année en 3 étapes, problèmes cliquables ---- */
@@ -1110,7 +1112,7 @@ function verifAs(e){ const V = [], P = Object.keys(D.profs), quoi = e.chk || "";
 let VAS = [];
 const codesProg = () => { const c = new Set(); Object.values(D.prog).forEach(Pr => Pr.mods.forEach(m => m.code && c.add(m.code))); return [...c]; };
 $("#dlgC").addEventListener("click", e => { const b = e.target.closest("[data-vas]"); if (!b || !AS.on) return; lireAs(); D.cible = D.cible || {}; VAS[+b.dataset.vas].f(); sauver(); assistant(); });
-$("#dlgC").addEventListener("change", e => { if (e.target.dataset.tp){ const [p, k] = e.target.dataset.tp.split("|"), T = (D.tacheProf = D.tacheProf || {}), x = (T[p] = T[p] || {}); const v = e.target.value.trim(); x[k] = v === "" ? "" : Math.round(+v.replace(",", ".") || 0);
+$("#dlgC").addEventListener("change", e => { if (e.target.dataset.tp){ const [p, k] = e.target.dataset.tp.split("|"), T = (D.tacheProf = D.tacheProf || {}), x = (T[p] = T[p] || {}); D.groupes.forEach(g => { const t = (g.taches || {})[p]; if (t) delete t.prev; });   /* 19 nov. (Jeremy) : la tâche entrée dans l'assistant remplace les anciens chiffres « prévu » du tableau */ const v = e.target.value.trim(); x[k] = v === "" ? "" : Math.round(+v.replace(",", ".") || 0);
     if (x.an !== undefined && x.an !== "") x.s2 = (+x.an) - (+x.s1 || 0);   /* reste pour la session 2 */
     D.cible = D.cible || {}; D.cible[p] = (+x.s1 || 0) + (+x.s2 || 0); sauver(); if (AS.on) assistant(); return; }
   if (e.target.dataset.ctri){ (D.contrat = D.contrat || {})[e.target.dataset.ctri] = Math.max(0, Math.min(100, Math.round(+e.target.value || 0))); sauver(); if (AS.on) assistant(); else if (FICHE) fiche(FICHE); return; }
