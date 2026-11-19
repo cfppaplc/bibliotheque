@@ -34,7 +34,7 @@ const LIVRES = [
     pages:325, annee:2026, nouveau:true, couverture:"", couleurs:["#2f6aa3","#1d2a36"], lien:"", fichier:"lecture-plans-devis-c6", version:"3", competence:"6",
     description:"Cahier d'apprentissage de 45 heures (307-443) en 8 modules : plans et devis, vues, échelles, cotes et symboles, croquis, plans de plomberie, plans de chauffage, devis et estimation. Comptage des raccords, tuyau sur plusieurs étages, 47 animations pas à pas et un formatif final." },
   { titre:"Plomberie et chauffage", auteur:"Jérémy Raymond", categorie:"Entretien général d'immeubles", niveau:"DEP 5211 · Compétence 10",
-    pages:190, annee:2026, nouveau:false, couverture:"", couleurs:["#1e88e5","#0b2f6b"], lien:"", fichier:"plomberie-chauffage", competence:"10",
+    pages:192, annee:2026, nouveau:false, couverture:"", couleurs:["#1e88e5","#0b2f6b"], lien:"", fichier:"plomberie-chauffage", version:"2", competence:"10",
     description:"Entretien des systèmes de plomberie et de chauffage (75 h) : tuyauterie, raccords, drainage, chauffe-eau, brûleur et pompes. Théorie, activités, quiz et ateliers." },
 
   { titre:"Dispositifs électriques et électroniques", auteur:"Jérémy Raymond", categorie:"Plomberie et chauffage", niveau:"DEP 5333 · Compétence 9",

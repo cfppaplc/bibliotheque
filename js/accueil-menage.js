@@ -27,7 +27,9 @@
   }
   chargerLocaux(); setInterval(chargerLocaux, 10 * 60 * 1000);
   const M = () => { const L = monLocal(); return Object.assign({}, DEF, L ? L.menage : (cfg.menage || {}), APERCU || {}); };
-  window.menageReglages = M;
+  /* 19 nov. : minutes choisies dans « Préparer le cours » (seulement pour la période préparée) ; menageReglages(true) = réglage du local seul */
+  const M2 = () => { const m = M(), n = +cfg.menageMin; if (n && !APERCU && cfg.localSlot && cfg.localSlot === (typeof slotActif === "function" ? slotActif() : cfg.slot)) m.min = n; return m; };
+  window.menageReglages = brut => brut ? M() : M2();
   const norm = x => String(x || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
   /* « atelier » reconnu malgré majuscules, accents, s, lettres doublées ou une petite faute (attelier, atlier, ateleir…) */
   const serre = x => norm(x).replace(/[^a-z0-9]+/g, " ").replace(/(.)\1+/g, "$1").trim();
@@ -108,7 +110,7 @@
     else if (!on && !el.hidden) { el.style.transition = "none"; el.classList.remove("on"); el.hidden = true; void el.offsetHeight; el.style.transition = ""; }   /* fermeture nette : le fondu laissait un fantôme du ménage sur le tableau (vidéo du 10 nov.) */
   }
   function verifier(){
-    const m = M(), now = new Date(), nowMin = now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60;
+    const m = M2(), now = new Date(), nowMin = now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60;
     let actif = null;
     try { const ps = periods(), cur = ps.find(p => nowMin >= p.start && nowMin < p.end);
       if (cur) { const rows = timeline(cur.start, cfg.steps), z = zoneMenage(rows).find(z => nowMin >= z.start && nowMin < z.end);

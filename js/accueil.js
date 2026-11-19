@@ -1192,7 +1192,7 @@ const cleSlot = (jour, per) => (jour || isoJour(new Date())) + "|" + per;
 function slotActif(){ const d = new Date(), m = d.getHours() * 60 + d.getMinutes(), ps = periods();
   const p = ps.find(x => m >= x.start && m < x.end) || ps.find(x => x.start > m); return p ? isoJour(d) + "|" + p.key : null; }
 function perPassee(per){ const d = new Date(), m = d.getHours() * 60 + d.getMinutes(), p = periods().find(x => x.key === per); return !p || m >= p.end; }
-function contenuActuel(){ return { prog: cfg.prog, comp: cfg.comp, module: cfg.module, steps: cfg.steps, liens: cfg.liens || {}, examen: cfg.examen === jourAuj(), duree: +cfg.duree || SPAN, debut: cfg.debut || "", local: cfg.local || "" }; }
+function contenuActuel(){ return { prog: cfg.prog, comp: cfg.comp, module: cfg.module, steps: cfg.steps, liens: cfg.liens || {}, examen: cfg.examen === jourAuj(), duree: +cfg.duree || SPAN, debut: cfg.debut || "", local: cfg.local || "", menageMin: cfg.menageMin || "" }; }
 function contenuDe(k){ if (k === cfg.slot) return contenuActuel(); return (cfg.plans || {})[k] || null; }
 let JOUR_PREP = "", PER_PREP = "am";
 function remplirPrep(jour, per){
@@ -1203,7 +1203,7 @@ function remplirPrep(jour, per){
   $("f-comp").value = P.comp; $("f-module").value = P.module || ""; $("f-steps").value = P.steps || "";
   $("f-amStart").value = cfg.amStart; $("f-pmStart").value = cfg.pmStart;
   $("f-module").hidden = $("f-comp").value !== "autre";
-  $("f-exam").checked = !!P.examen; localChoix(P.local || "");
+  $("f-exam").checked = !!P.examen; MIN_F = +P.menageMin || ""; localChoix(P.local || "");
   $("f-duree").value = String(DUREES.some(d => d[0] === +P.duree) ? +P.duree : SPAN);
   heuresDebut(P.debut || (per === "pm" ? cfg.pmStart : cfg.amStart));
   LIENS_T = JSON.parse(JSON.stringify(P.liens || {}));
@@ -1284,14 +1284,19 @@ function boutonsJours(){
   const d = +$("f-duree").value || SPAN, res = $("f-opts-res"); if (res) res.textContent = (d === SPAN ? "période complète" : (DUREES.find(x => x[0] === d) || [0, d + " min"])[1]) + ($("f-exam").checked ? " · examen" : "");
 }
 /* Local du cours (12 nov., Jeremy) : « atelier » = ménage à la fin du cours; « classe » = pas de ménage; vide = ancienne règle (nom d'activité) */
-let LOCAL_F = "";
+let LOCAL_F = "", MIN_F = "";   /* 19 nov. (Jeremy) : minutes du ménage choisies pour ce cours (vide = réglage du local) */
 /* Choix : « Classe » (pas de ménage) + les locaux de locaux.json (ex. Atelier DEP1 : sa liste de ménage, à la fin du cours); aucun locaux.json → « Atelier » */
 function localChoix(v){ LOCAL_F = v || ""; const box = $("f-local"); if (!box) return;
   const L = (window.locauxListe ? window.locauxListe() : []) || [], opts = [["classe", "Classe"]].concat(L.length ? L.map(l => [l.id, l.nom]) : [["atelier", "Atelier"]]);
   if (LOCAL_F && !opts.some(o => o[0] === LOCAL_F)) opts.push([LOCAL_F, LOCAL_F === "atelier" ? "Atelier" : "Local retiré"]);
   box.innerHTML = '<span>Local</span>'; opts.forEach(([id, nom]) => { const b = document.createElement("button"); b.type = "button"; b.dataset.l = id; b.textContent = nom;
     b.classList.toggle("on", id === LOCAL_F); b.onclick = () => localChoix(LOCAL_F === id ? "" : id); box.append(b); });
-  const r = document.createElement("small"); r.textContent = !LOCAL_F ? "" : LOCAL_F === "classe" ? "Pas de ménage" : "Ménage à la fin du cours"; box.append(r); }
+  const r = document.createElement("small"); r.textContent = !LOCAL_F ? "" : LOCAL_F === "classe" ? "Pas de ménage" : "Ménage à la fin du cours"; box.append(r);
+  if (LOCAL_F && LOCAL_F !== "classe"){ const ln = document.createElement("div"); ln.className = "local-choix mn-minutes"; ln.innerHTML = "<span>Ménage</span>";
+    const def = window.menageReglages ? +(window.menageReglages(true) || {}).min || 10 : 10, cur = +MIN_F || def;
+    [5, 10, 15, 20, 30].concat([5, 10, 15, 20, 30].includes(cur) ? [] : [cur]).sort((a, b) => a - b).forEach(n => { const b = document.createElement("button"); b.type = "button"; b.textContent = n;
+      b.classList.toggle("on", n === cur); b.onclick = () => { MIN_F = n === def ? "" : n; localChoix(LOCAL_F); }; ln.append(b); });
+    const u = document.createElement("small"); u.textContent = "minutes"; ln.append(u); box.append(ln); } }
 /* Zones de ménage d'un déroulement (frise + plein écran du ménage) : [{i, start, end}] */
 function zoneMenage(rows){
   const m = Object.assign({ mot:"atelier", min:10 }, window.menageReglages ? window.menageReglages() : (cfg.menage || {})), Z = [];
@@ -1318,7 +1323,7 @@ function appliquerPlans(){
   const arrives = Object.keys(plans).filter(k => k <= borne).sort();
   if (arrives.length){ const k = arrives[arrives.length - 1], P = plans[k], ici = k === s;
     ["prog", "comp", "module", "steps"].forEach(x => { if (P[x] !== undefined) cfg[x] = P[x]; });
-    cfg.liens = P.liens || {}; cfg.examen = ici && P.examen ? jourAuj() : ""; cfg.duree = ici ? (+P.duree || SPAN) : SPAN; cfg.debut = ici ? (P.debut || "") : ""; cfg.local = P.local || "";
+    cfg.liens = P.liens || {}; cfg.examen = ici && P.examen ? jourAuj() : ""; cfg.duree = ici ? (+P.duree || SPAN) : SPAN; cfg.debut = ici ? (P.debut || "") : ""; cfg.local = P.local || ""; cfg.menageMin = P.menageMin || "";
     cfg.slot = s || cfg.slot; cfg.localSlot = cfg.slot; arrives.forEach(x => delete plans[x]); change = true; }
   else if (s && cfg.slot !== s){         /* nouvelle période sans contenu préparé : même contenu, horaire habituel */
     const vieux = cfg.slot; cfg.slot = s; if (vieux){ cfg.duree = SPAN; cfg.debut = ""; if (vieux.split("|")[0] !== auj) cfg.examen = ""; } change = true; }
@@ -1344,10 +1349,10 @@ $("prepForm").addEventListener("submit", e => {
   const k = cleSlot(JOUR_PREP, PER_PREP), duree = +$("f-duree").value || SPAN, defaut = PER_PREP === "pm" ? cfg.pmStart : cfg.amStart, debut = $("f-debut").value && $("f-debut").value !== defaut ? $("f-debut").value : "";
   if (k !== (slotActif() || cfg.slot)){   /* une autre période : on la garde, le tableau ne change pas */
     cfg.plans = cfg.plans || {};
-    cfg.plans[k] = { local: LOCAL_F, prog: $("f-prog").value, comp: $("f-comp").value, module: $("f-module").value, steps: $("f-steps").value, liens: JSON.parse(JSON.stringify(LIENS_T)), examen: $("f-exam").checked, duree, debut, t: Date.now() }; if (cfg.plansSup) delete cfg.plansSup[k];
+    cfg.plans[k] = { local: LOCAL_F, menageMin: MIN_F, prog: $("f-prog").value, comp: $("f-comp").value, module: $("f-module").value, steps: $("f-steps").value, liens: JSON.parse(JSON.stringify(LIENS_T)), examen: $("f-exam").checked, duree, debut, t: Date.now() }; if (cfg.plansSup) delete cfg.plansSup[k];
     save(); $("prep").hidden = true; peMsg("Cours " + (JOUR_PREP ? "de " + nomJour(JOUR_PREP).toLowerCase() : "d'aujourd'hui") + " " + (PER_PREP === "am" ? "matin" : "après-midi") + " enregistré : il s'affichera tout seul."); return;
   }
-  cfg.slot = k; cfg.duree = duree; cfg.debut = debut; cfg.local = LOCAL_F; cfg.localSlot = k;
+  cfg.slot = k; cfg.duree = duree; cfg.debut = debut; cfg.local = LOCAL_F; cfg.menageMin = MIN_F; cfg.localSlot = k;
   ["comp", "module", "steps", "prog"].forEach(k => cfg[k] = $("f-" + k).value);
   cfg.liens = JSON.parse(JSON.stringify(LIENS_T)); lastStepsKey = ""; setTimeout(menageFichiers, 500);
   cfg.examen = $("f-exam").checked ? jourAuj() : "";

@@ -150,7 +150,17 @@ const EXEMPLE = {"profs":{"M.M":"Marc Michaud","J.R":"Jeremy Raymond","J.O":"Jea
 const COUL = ["#2F6FB5","#EB6A22","#1E8A55","#B8860B","#C2417A","#0E8C8C","#4A5568","#8A6D1E"];   /* pas de mauve : réservé à l'évaluation */
 let D; try { D = JSON.parse(localStorage.getItem(CLE)) || null; } catch(e){} if (!D) D = JSON.parse(JSON.stringify(EXEMPLE));
 let G = 0, S = 0, FILTRE = null, VUE = "g", SW = 0;
-const sauver = () => { try { localStorage.setItem(CLE, JSON.stringify(D)); } catch(e){ alert("Mémoire pleine : sauvegarde dans un fichier."); } };
+/* 19 nov. (Jeremy) : les journées spéciales (fériés, pédagogiques, tempêtes…) sont gardées par année scolaire et reprises dans toute nouvelle planif de la même année */
+const CALC = "horaireCalendriers", anS = k => +k.slice(0, 4) - (+k.slice(5, 7) < 7 ? 1 : 0);
+function calGarder(){ if (!D || !D.cal || !D.cal.off) return; let st = {}; try { st = JSON.parse(localStorage.getItem(CALC)) || {}; } catch(e){}
+  const par = {}; Object.keys(D.cal.off).forEach(k => { (par[anS(k)] = par[anS(k)] || {})[k] = D.cal.off[k]; });
+  if (D.cal.debut){ const a = anS(D.cal.debut); if (par[a]) st[a] = par[a]; }   /* l'année de la planif : la liste remplace l'ancienne (un jour retiré l'est aussi) */
+  Object.keys(par).forEach(a => { if (!st[a]) st[a] = par[a]; });
+  try { localStorage.setItem(CALC, JSON.stringify(st)); } catch(e){} }
+function calReprendre(){ if (!D || !D.cal || !D.cal.debut) return 0; let st = {}; try { st = JSON.parse(localStorage.getItem(CALC)) || {}; } catch(e){}
+  const A = st[anS(D.cal.debut)] || {}; let n = 0; D.cal.off = D.cal.off || {};
+  Object.keys(A).forEach(k => { if (!D.cal.off[k]){ D.cal.off[k] = JSON.parse(JSON.stringify(A[k])); n++; } }); return n; }
+const sauver = () => { try { calGarder(); localStorage.setItem(CLE, JSON.stringify(D)); } catch(e){ alert("Mémoire pleine : sauvegarde dans un fichier."); } };
 const VIDE = { nom:"", sessions:[{ nom:"", mods:[], sem:[], g:{} }], taches:{} };
 const grp = () => D.groupes[G] || D.groupes[0] || VIDE, ses = () => grp().sessions[S] || grp().sessions[0] || VIDE.sessions[0];   /* jamais d'erreur s'il n'y a pas encore de groupe */
 const couleur = p => { const L = Object.keys(D.profs); const i = L.indexOf(p); return i < 0 ? "#999" : COUL[i % COUL.length]; };
@@ -191,6 +201,8 @@ const modsChoisis = (pr, deps) => { const sesDe = []; let c = 0, sn = 0; pr.mods
 /* sessions d'un programme (coupe à 450 h) : [[modules de la session 1], [session 2], ...] */
 const sessionsProg = pr => { const S = []; let c = 0; (pr ? pr.mods : []).forEach((m, j) => { if (!S.length || c >= 450){ S.push([]); c = 0; } S[S.length - 1].push(m); c += +m.h || 0; }); return S; };
 const MAXMOD = () => +((D && D.maxMod) || 15);
+/* 19 nov. (Jeremy) : place libre d'un cours dans une semaine (max 15 h/semaine). Les réglages automatiques ne dépassent jamais ce maximum : ils étirent le cours sur plus de semaines (une semaine peut avoir 4 matières) */
+const capM = (s, wi, k) => { const m = s.mods.find(x => x.k === k); return m && m.autre ? 1e6 : Math.max(0, MAXMOD() - totalCase(s, wi, k)); };
 const maxSem = () => { if (D && !D.max24){ D.max24 = 1; if (!D.maxSem || +D.maxSem === 18) D.maxSem = 24; } return +((D && D.maxSem) || 24); };   /* 18 nov. : 24 h par semaine (Jeremy) */
 function charges(){ const C = {};
   D.groupes.forEach(g => g.sessions.forEach(s => s.sem.forEach((w, wi) => { const W = s.g[wi] || {};
@@ -228,7 +240,8 @@ function dessiner(){ if (D.groupes.some(g => remplirTrous(g))) sauver();
     { const na = m.autre ? 0 : s.sem.reduce((t, w, wi) => t + (cell(s, wi, k)["-"] || 0), 0); if (na) prob.push({ t:`${m.titre} : ${na} h sans enseignant (non assigné)`, k, fx:"na" }); }
     if (!m.autre && Object.keys(evalSem(s, m)).length > 1) prob.push({ t:`L'évaluation de ${m.titre} (${Math.max(3, +m.ev || 0)} h) est séparée sur deux semaines`, k, fx:"eval", niv:"j" });
     if (!m.autre && fait !== HT(m)) prob.push({ t:`${m.titre} : ${fait} h placées sur ${HT(m)} h (${fait > HT(m) ? "enlève" : "ajoute"} ${Math.abs(fait - HT(m))} h)`, k, fx:"mod" });
-    let r = `<tr class="${m.autre ? "autre" : ""}"><td class="nom" data-mk="${k}" title="Toucher pour une date « pas avant »" style="cursor:pointer"><b>${m.autre ? `<i style="display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;background:${coulAutre(m)}"></i>` : ""}${m.num ? m.num + " · " : ""}${m.titre}</b><small>${m.code ? m.code + " · " : ""}${m.apres ? "dès le " + jm(m.apres) + " · " : ""}${fait} / ${HT(m)} h${m.ev ? " · éval " + m.ev + " h" : ""}${cl === "" && m.h && !m.autre ? " ✓" : ""}</small>${m.autre ? "" : `<div class="barre ${cl}"><i style="width:${pct}%"></i></div>`}</td>`;
+    if (!m.autre) s.sem.forEach((w, wi) => { const t = totalCase(s, wi, k); if (t > MAXMOD()) prob.push({ t:`${m.titre} : ${t} h dans la semaine du ${jm(w.d)} (maximum ${MAXMOD()} h) : étaler sur d'autres semaines`, k, w:wi, fx:"max" }); });
+    let r = `<tr class="${m.autre ? "autre" : ""}"><td class="nom" data-mk="${k}" title="Toucher pour régler ce cours : date « pas avant », enseignant prioritaire" style="cursor:pointer"><b>${m.autre ? `<i style="display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;background:${coulAutre(m)}"></i>` : ""}${m.num ? m.num + " · " : ""}${m.titre}</b><small>${m.code ? m.code + " · " : ""}${m.apres ? "dès le " + jm(m.apres) + " · " : ""}${fait} / ${HT(m)} h${m.ev ? " · éval " + m.ev + " h" : ""}${cl === "" && m.h && !m.autre ? " ✓" : ""}</small>${m.autre ? "" : `<div class="barre ${cl}"><i style="width:${pct}%"></i></div>`}</td>`;
     const EV = m.autre ? {} : evalSem(s, m);
     s.sem.forEach((w, wi) => { const c = cell(s, wi, k), ps = Object.keys(c); let resteE = EV[wi] || 0;
       r += `<td class="c" data-w="${wi}" data-k="${k}">` + ps.slice().reverse().map(p => { let v = c[p]; const e = Math.min(resteE, v); resteE -= e; v -= e; return [p, v, e]; }).reverse().map(([p, v, e]) => {
@@ -251,10 +264,13 @@ function dessiner(){ if (D.groupes.some(g => remplirTrous(g))) sauver();
   $("#vue").innerHTML = h;
   // conflits entre groupes
   Object.keys(C).forEach(p => Object.keys(C[p]).forEach(d => { const e = C[p][d]; if (e.h > e.max && s.sem.some(w => w.d === d)) prob.push({ t:e.h > e.dur ? `${D.profs[p] || p} a ${e.h} h la semaine du ${jm(d)} (${[...e.grp].join(" et ")}) : impossible, il n'est disponible que ${e.dur} h (absences ou deux groupes).` : `Suggestion : ${D.profs[p] || p} a ${e.h} h la semaine du ${jm(d)}, plus que ${maxSem()} h.`, niv:e.h > e.dur ? "" : "j", w:s.sem.findIndex(w => w.d === d), fx:"prof", p, d }); }));
+  /* 19 nov. (Jeremy) : les heures des enseignants doivent balancer avec leur tâche (heures prévues pour la session) */
+  Object.keys(D.profs).forEach(q => { const r0 = resteTache(q); if (r0 == null || !r0) return;
+    prob.push({ t:`${D.profs[q]} : ${r0 > 0 ? "il manque " + r0 + " h" : (-r0) + " h de trop"} pour balancer sa tâche de la session (${prevTache(q)} h prévues)`, fx:"bal" }); });
   const vus = new Set(), ACC = (D.acceptes = D.acceptes || {})[grp().id] || [], P0 = prob.filter(x => !vus.has(x.t) && vus.add(x.t)), P = P0.filter(x => !ACC.includes(x.t)).sort((a, b) => (a.niv === "j") - (b.niv === "j")), nAcc = P0.length - P.length;
   $("#etat").className = "etat " + (P.length ? "err" : "ok"); const nR = P.filter(x => x.niv !== "j").length, nJ = P.length - nR;
   $("#etat").textContent = nR ? nR + " point" + (nR > 1 ? "s" : "") + " à régler" + (nJ ? " · " + nJ + " suggestion" + (nJ > 1 ? "s" : "") : "") : nJ ? nJ + " suggestion" + (nJ > 1 ? "s" : "") : nAcc ? "Correct (" + nAcc + " accepté" + (nAcc > 1 ? "s" : "") + ")" : "Tout est correct"; if (!P.length && nAcc) $("#etat").className = "etat ok"; if (!nR && nJ) $("#etat").className = "etat jaune"; if (nAcc) $("#etat").style.cursor = "pointer";
-  $("#alertes").innerHTML = $("#alertes").dataset.ouv ? (PROBS = P).slice(0, 5).map((a, i) => `<div class="alert ${a.niv === "j" ? "jaune" : ""}" style="cursor:pointer;display:flex;gap:10px;align-items:center" data-va="${a.k || ""}|${a.w == null ? "" : a.w}"><span style="flex:1">${a.t} <u style="color:var(--or)">Voir</u></span>${a.fx ? `<button class="prim" data-fx="${i}" style="padding:6px 14px">Régler</button>` : ""}<button data-acc="${i}" style="padding:6px 14px" title="C'est voulu : ne plus le signaler">Accepter</button></div>`).join("") + (P.length > 5 ? `<div class="mini" style="margin:4px 2px 8px">… et ${P.length - 5} autres. Règle ceux-ci d'abord.</div>` : "") + (nAcc ? `<div class="mini" style="margin:4px 2px 8px">${nAcc} point${nAcc > 1 ? "s" : ""} accepté${nAcc > 1 ? "s" : ""} (voulu${nAcc > 1 ? "s" : ""}). <u data-revoir style="cursor:pointer;color:var(--or)">Les revoir</u></div>` : "") : "";
+  $("#alertes").innerHTML = $("#alertes").dataset.ouv ? (PROBS = P).slice(0, 5).map((a, i) => `<div class="alert ${a.niv === "j" ? "jaune" : ""}" style="cursor:pointer;display:flex;gap:10px;align-items:center" data-va="${a.k || ""}|${a.w == null ? "" : a.w}"><span style="flex:1">${a.t} <u style="color:var(--or)">Voir</u></span>${a.fx ? `<button class="prim" data-fx="${i}" style="padding:6px 14px">Régler</button>` : ""}${donnerA(a).length ? `<span class="mini">ou donner à</span>${donnerA(a).map(q => `<button data-fxp="${i}|${q}" style="padding:6px 12px">${nomDonner(q)}</button>`).join("")}` : ""}<button data-acc="${i}" style="padding:6px 14px" title="C'est voulu : ne plus le signaler">Accepter</button></div>`).join("") + (P.length > 5 ? `<div class="mini" style="margin:4px 2px 8px">… et ${P.length - 5} autres. Règle ceux-ci d'abord.</div>` : "") + (nAcc ? `<div class="mini" style="margin:4px 2px 8px">${nAcc} point${nAcc > 1 ? "s" : ""} accepté${nAcc > 1 ? "s" : ""} (voulu${nAcc > 1 ? "s" : ""}). <u data-revoir style="cursor:pointer;color:var(--or)">Les revoir</u></div>` : "") : "";
 }
 
 /* petite fenêtre d'une case : heures de chaque enseignant, − / + */
@@ -301,8 +317,8 @@ function action(a){ const s = ses();
   if (a === "reg") reglages("cal");
   if (a === "exp"){ const l = document.createElement("a"); l.href = URL.createObjectURL(new Blob([JSON.stringify(D)], { type:"application/json" })); l.download = "horaires-" + new Date().toISOString().slice(0, 10) + ".json"; l.click(); }
   if (a === "imp"){ const i = document.createElement("input"); i.type = "file"; i.accept = ".json"; i.onchange = async () => { try { D = JSON.parse(await i.files[0].text()); G = S = 0; sauver(); dessiner(); } catch(x){ alert("Fichier illisible."); } }; i.click(); }
-  if (a === "zero" && confirm("Tout effacer (groupes, enseignants, tâches, absences, calendrier) et recommencer à zéro avec l'assistant ?\n\nLa liste des modules du programme est gardée.")){
-    Object.assign(D, { groupes:[], profs:{}, cible:{}, peut:{}, abs:{}, absRec:{}, sessProf:{}, acceptes:{}, echanges:{}, cal:{ debut:D.cal.debut, fin:D.cal.fin, off:{} }, calInit:1 }); delete D.prepare;
+  if (a === "zero" && confirm("Tout effacer (groupes, enseignants, tâches, absences) et recommencer à zéro avec l'assistant ?\n\nLa liste des modules du programme et les journées spéciales de l'année (fériés, pédagogiques, tempêtes) sont gardées.")){
+    Object.assign(D, { groupes:[], profs:{}, cible:{}, peut:{}, abs:{}, absRec:{}, sessProf:{}, acceptes:{}, echanges:{}, cal:{ debut:D.cal.debut, fin:D.cal.fin, off:{} }, calInit:1 }); delete D.prepare; calReprendre();
     G = 0; S = 0; VUE = "g"; Object.assign(AS, { nom:"", deb:"", tit:"" }); sauver(); dessiner(); AS.on = true; AS.i = 0; assistant(); return; }
   if (a === "raz" && confirm("Effacer tout et reprendre l'exemple (2026EGI1) ?")){ localStorage.removeItem(CLE); location.reload(); }
 }
@@ -332,7 +348,7 @@ function remplir(s){ const garde = {}; s.sem.forEach((w, wi) => { const W = s.g[
         return (+((D.cible || {})[q]) || 1e6) - (TA[q] || 0); };
       const fait = q => { const pv = ((PREV[q] || {}).prev || [])[SI]; return (pv !== undefined && pv !== "") || cibleT(q) == null ? [FAIT[q] || 0, cibleS(q), prog] : [(FAIT[q] || 0) + autresAvant(q, w.d), cibleT(q), progT]; };
       const avance = q => { const [f, t, pr] = fait(q); return t == null ? 1e5 : t * pr - f; };   /* retard sur son rythme (toute la demi-année) */
-      const p = libres.filter(q => { if (resteT(q) <= 0) return false; const [f, t, pr] = fait(q); return t == null || f + u <= t * pr + Math.max(9, t * .15); }).sort((x, y) => avance(y) - avance(x))[0] || "-";   /* tâche pleine, en avance sur son rythme ou personne de libre → « non assigné », réparti sur toute la session */
+      const p = libres.filter(q => { if (resteT(q) <= 0) return false; const [f, t, pr] = fait(q); return t == null || f + u <= t * pr + Math.max(9, t * .15); }).sort((x, y) => ((y === prioDe(m)) - (x === prioDe(m))) || (avance(y) - avance(x)))[0] || "-";   /* tâche pleine, en avance sur son rythme ou personne de libre → « non assigné », réparti sur toute la session */
       fixer(s, wi, m.k, p, (cell(s, wi, m.k)[p] || 0) + u); if (p !== "-"){ TA[p] = (TA[p] || 0) + u; FAIT[p] = (FAIT[p] || 0) + u; } cap -= u; reste.set(m, reste.get(m) - u);
       if (p !== "-"){ const c = ((C[p] = C[p] || {})[w.d] = (C[p] || {})[w.d] || { h:0, max:w.h, grp:new Set() }); c.h += u; }
       if (reste.get(m) <= 0){ actifs.splice(actifs.indexOf(m), 1); ouvrir(); } else tour++; } });
@@ -675,15 +691,17 @@ let PROBS = [];
 const finS = d => { const z = new Date(d + "T12:00"); z.setDate(z.getDate() + 4); return iso(z); };
 const totSem = (s, wi) => s.mods.reduce((a, m) => a + totalCase(s, wi, m.k), 0);
 const okDate = (m, w) => !m.apres || finS(w.d) >= m.apres;
+/* 19 nov. (Jeremy) : enseignant prioritaire d'une matière : il reçoit les heures avant les autres pour combler son horaire (D.prio[code ou titre] = id) */
+const prioDe = m => m ? ((D.prio || {})[m.code || m.titre] || "") : "", avantPrio = (m, L) => { const P = prioDe(m); return P ? L.slice().sort((a, b) => (b === P || (Array.isArray(b) && b[0] === P)) - (a === P || (Array.isArray(a) && a[0] === P))) : L; };
 const profsDe = m => [...new Set([...(m.profs || []), ...Object.keys(D.profs).filter(p => m.code && (D.peut[p] || []).includes(m.code))])];
 function libre(p, w){ const e = (charges()[p] || {})[w.d]; return Math.min(w.h, capProf(p, w.d)) - (e ? e.h : 0); }
-function poser(s, wi, m, u){ const w = s.sem[wi], L = profsDe(m).filter(p => sessOk(p, s)).map(p => [p, libre(p, w)]).sort((a, b) => b[1] - a[1]);
+function poser(s, wi, m, u){ const w = s.sem[wi], L = avantPrio(m, profsDe(m).filter(p => sessOk(p, s)).map(p => [p, libre(p, w)]).sort((a, b) => b[1] - a[1]));
   const p = (L.find(x => x[1] >= u) || L[0] || ["-"])[0]; fixer(s, wi, m.k, p, (cell(s, wi, m.k)[p] || 0) + u); }
 function retirer(s, wi, k, u, seulP){ const c = cell(s, wi, k); let r = 0; for (const p of Object.keys(c)){ if (seulP && p !== seulP) continue; const x = Math.min(c[p], u - r); fixer(s, wi, k, p, c[p] - x); r += x; if (r >= u) break; } return r; }
 /* place n heures de m dans les semaines qui ont de la place; sinon échange avec un autre module */
 function placer(s, m, n, sauf){ let garde = 0;
-  while (n > 0 && garde++ < 100){ const wi = s.sem.findIndex((w, i) => i !== sauf && okDate(m, w) && totSem(s, i) < w.h);
-    if (wi >= 0){ const u = Math.min(3, n, s.sem[wi].h - totSem(s, wi)); poser(s, wi, m, u); n -= u; continue; }
+  while (n > 0 && garde++ < 100){ const wi = s.sem.findIndex((w, i) => i !== sauf && okDate(m, w) && totSem(s, i) < w.h && capM(s, i, m.k) > 0);
+    if (wi >= 0){ const u = Math.min(3, n, s.sem[wi].h - totSem(s, wi), capM(s, wi, m.k)); poser(s, wi, m, u); n -= u; continue; }
     if (ajouterSemaine(s) < 0) break; }
   return n; }
 /* déplace x h de m données par p, de la semaine wi vers une autre semaine. Le prof reste le même :
@@ -722,10 +740,10 @@ function decaler(z){ if (ajouterSemaine(z) < 0) return false; const n = z.sem.le
 const ajout = (s, wi, k, p, x) => fixer(s, wi, k, p, (cell(s, wi, k)[p] || 0) + x);
 var bouger = function(s, m, p, wi, x, cond, sansEchange){
   for (let wj = 0; wj < s.sem.length; wj++){ const w = s.sem[wj]; if (wj === wi || !cond(w)) continue;
-    if (w.h - totSem(s, wj) >= x && (p === "-" || libre(p, w) >= x)){ retirer(s, wi, m.k, x, p); ajout(s, wj, m.k, p, x); return x; } }
+    if (w.h - totSem(s, wj) >= x && capM(s, wj, m.k) >= x && (p === "-" || libre(p, w) >= x)){ retirer(s, wi, m.k, x, p); ajout(s, wj, m.k, p, x); return x; } }
   if (sansEchange) return 0;
-  for (let wj = 0; wj < s.sem.length; wj++){ const w = s.sem[wj]; if (wj === wi || !cond(w)) continue; if (p !== "-" && libre(p, w) < x) continue;
-    for (const m2 of s.mods){ if (m2.autre || !okDate(m2, s.sem[wi])) continue; const c2 = cell(s, wj, m2.k);
+  for (let wj = 0; wj < s.sem.length; wj++){ const w = s.sem[wj]; if (wj === wi || !cond(w)) continue; if (p !== "-" && libre(p, w) < x) continue; if (capM(s, wj, m.k) < x) continue;
+    for (const m2 of s.mods){ if (m2.autre || m2 === m || !okDate(m2, s.sem[wi]) || capM(s, wi, m2.k) < x) continue; const c2 = cell(s, wj, m2.k);
       for (const q in c2){ if (q === p || c2[q] < x) continue; if (q !== "-" && libre(q, s.sem[wi]) < x) continue;
         retirer(s, wi, m.k, x, p); ajout(s, wj, m.k, p, x); retirer(s, wj, m2.k, x, q); ajout(s, wi, m2.k, q, x); return x; } } }
   return 0; };
@@ -745,6 +763,21 @@ function grouperEval(s, m){ let fait = 0; const EV = evalSem(s, m), W = Object.k
           retirer(s, wi, m.k, x, p); ajout(s, L, m.k, p, x); retirer(s, L, m2.k, x, q); ajout(s, wi, m2.k, q, x); n -= x; fait += x; } } } }
   return fait; }
 function regler(a){ const s = ses(); let fait = 0, reste = ""; RAISON = "";
+  if (a.donner){ const q = a.donner, nom = D.profs[q] || q;
+    if (a.fx === "trou"){ const w = s.sem[a.w]; let manque = w.h - totSem(s, a.w);
+      for (let wj = a.w + 1; wj < s.sem.length && manque > 0; wj++) for (const m of s.mods){ if (manque <= 0) break; if (m.autre || !okDate(m, w)) continue;
+        const x = Math.min(manque, cell(s, wj, m.k)[q] || 0, capM(s, a.w, m.k), Math.max(0, libre(q, w))); if (x <= 0) continue;
+        retirer(s, wj, m.k, x, q); ajout(s, a.w, m.k, q, x); manque -= x; fait += x; }
+      if (manque > 0) reste = `${nom} n'a plus de place cette semaine (ou plus de cours à avancer) : il manque encore ${manque} h.`; }
+    if (a.fx === "na"){ const m = s.mods.find(x => x.k === a.k); let rest = 0;
+      s.sem.forEach((w, wi) => { const x = Math.min(cell(s, wi, m.k)["-"] || 0, Math.max(0, libre(q, w))); if (x > 0){ retirer(s, wi, m.k, x, "-"); ajout(s, wi, m.k, q, x); fait += x; } rest += cell(s, wi, m.k)["-"] || 0; });
+      if (rest) reste = `${rest} h restent sans enseignant : ${nom} est plein ces semaines-là.`; }
+    if (a.fx === "mod"){ const m = s.mods.find(x => x.k === a.k); let n = HT(m) - s.sem.reduce((t, w, i) => t + totalCase(s, i, m.k), 0), garde = 0;
+      while (n > 0 && garde++ < 200){ const wi = s.sem.findIndex(w => okDate(m, w) && totSem(s, s.sem.indexOf(w)) < w.h && capM(s, s.sem.indexOf(w), m.k) > 0 && libre(q, w) > 0);
+        if (wi < 0){ if (ajouterSemaine(s) < 0) break; continue; }
+        const w = s.sem[wi], u = Math.min(3, n, w.h - totSem(s, wi), capM(s, wi, m.k), libre(q, w)); ajout(s, wi, m.k, q, u); n -= u; fait += u; }
+      if (n > 0) reste = `Il reste ${n} h de « ${m.titre} » : ${nom} n'a plus de place dans les semaines où il reste de l'espace. ${RAISON}`; }
+    sauver(); dessiner(); if (reste) alert(reste); else if (!fait) alert(`Je n'ai pas trouvé de place pour ${nom}.`); return; }
   if (a.fx === "jt"){ const kk = "jt:" + a.ty; if (!s.mods.some(m => m.k === kk)) s.mods.push({ k:kk, code:"", titre:JT[a.ty].n, num:"", h:0, ev:0, profs:[], autre:true, jt:a.ty });
     fixer(s, a.w, kk, "-", totalCase(s, a.w, kk) + a.h); fait = a.h; if (totSem(s, a.w) > s.sem[a.w].h) return regler({ fx:"sem", w:a.w }); }
   if (a.fx === "sessprof"){ s.sem.forEach((w, wi) => s.mods.forEach(m => { const x = cell(s, wi, m.k)[a.p]; if (!x) return;
@@ -753,9 +786,13 @@ function regler(a){ const s = ses(); let fait = 0, reste = ""; RAISON = "";
   if (a.fx === "na"){ const m = s.mods.find(x => x.k === a.k), TA = totalAnnee(), resteT = q => (+((D.cible || {})[q]) || 1e6) - (TA[q] || 0);
     const P = profsDe(m).filter(q => sessOk(q, s)); let rest = 0;
     if (!P.length) reste = `Personne n'a « ${m.titre} » de coché. Coche ce module pour un enseignant (Réglages → Enseignants), puis clique encore « Régler ».`;
-    else s.sem.forEach((w, wi) => { let x = cell(s, wi, m.k)["-"] || 0; while (x > 0){ const q = P.filter(q => libre(q, w) > 0).sort((u, v) => resteT(v) - resteT(u))[0]; if (!q) break;
+    else s.sem.forEach((w, wi) => { let x = cell(s, wi, m.k)["-"] || 0; while (x > 0){ const q = avantPrio(m, P.filter(q => libre(q, w) > 0).sort((u, v) => resteT(v) - resteT(u)))[0]; if (!q) break;
       const u = Math.min(x, libre(q, w)); retirer(s, wi, m.k, u, "-"); ajout(s, wi, m.k, q, u); TA[q] = (TA[q] || 0) + u; x -= u; fait += u; } rest += x; });
     if (P.length && rest) reste = `${rest} h restent sans enseignant : ${P.map(q => D.profs[q]).join(", ")} ${P.length > 1 ? "sont pleins" : "est plein"} ces semaines-là. Coche ce module pour un autre enseignant, ou accepte de dépasser ${maxSem()} h.`; }
+  if (a.fx === "max"){ const m = s.mods.find(x => x.k === a.k), e = totalCase(s, a.w, m.k) - MAXMOD();
+    if (e > 0){ fait = sortir(s, m, a.w, w2 => okDate(m, w2), null, e); if (fait < e) reste = `Il reste ${e - fait} h de trop pour « ${m.titre} » cette semaine : les autres semaines sont pleines ou ses enseignants n'ont plus de place. ${RAISON}`; } }
+  if (a.fx === "bal"){ fait = equilibrer(grp()); const enc = Object.keys(D.profs).filter(q => resteTache(q));
+    if (enc.length) reste = (fait ? `J'ai déplacé ${fait} h entre les enseignants. ` : "") + `Encore à balancer : ${enc.map(q => nomDonner(q)).join(", ")}. ` + (Object.keys(D.profs).reduce((t, q) => t + (resteTache(q) || 0), 0) ? "Le total des tâches prévues n'égale pas les heures de la session : ajuste les heures prévues (Tâches) ou les heures d'un module." : "Les enseignants restants n'ont pas de module en commun ou plus de place ces semaines-là."); }
   if (a.fx === "eval"){ fait = grouperEval(s, s.mods.find(x => x.k === a.k)); if (!fait) reste = "Je n'ai pas trouvé d'échange possible : les enseignants ne sont pas libres. Utilise « Voir » pour le faire à la main."; }
   if (a.fx === "trou"){ let n0 = s.sem[a.w].h - totSem(s, a.w), n = 0;
     /* en cascade : chaque semaine se comble avec la suivante, tout avance d'un cran (même enseignant, ordre des modules gardé) */
@@ -763,7 +800,7 @@ function regler(a){ const s = ses(); let fait = 0, reste = ""; RAISON = "";
       const ici = m => totalCase(s, wi, m.k) > 0;
       for (let wj = wi + 1; wj < s.sem.length && manque > 0; wj++){ if (s.sem[wj].pf) continue;   /* la semaine suivante d'abord; si ses profs ne sont pas libres, celle d'après */
         const L = s.mods.filter(m => !m.autre && okDate(m, w) && totalCase(s, wj, m.k)).sort((x, y) => ici(y) - ici(x));   /* d'abord les modules déjà commencés */
-        for (const m of L) for (const p of Object.keys(cell(s, wj, m.k))){ if (manque <= 0) break; const x = Math.min(manque, cell(s, wj, m.k)[p], p === "-" ? 99 : Math.max(0, libre(p, w))); if (x <= 0) continue;
+        for (const m of L) for (const p of Object.keys(cell(s, wj, m.k))){ if (manque <= 0) break; const x = Math.min(manque, cell(s, wj, m.k)[p], capM(s, wi, m.k), p === "-" ? 99 : Math.max(0, libre(p, w))); if (x <= 0) continue;
           retirer(s, wj, m.k, x, p); ajout(s, wi, m.k, p, x); manque -= x; fait += x; } }
       if (wi === a.w) n = manque; }
     /* dernière session : on enlève les semaines du bout qui n'ont plus de cours */
@@ -790,6 +827,18 @@ function regler(a){ const s = ses(); let fait = 0, reste = ""; RAISON = "";
 document.addEventListener("click", e => { const b = e.target.closest("[data-acc],[data-revoir]"); if (!b) return; e.stopPropagation(); const A = (D.acceptes = D.acceptes || {});
   if (b.dataset.revoir != null) delete A[grp().id]; else (A[grp().id] = A[grp().id] || []).push(PROBS[+b.dataset.acc].t); sauver(); dessiner(); }, true);
 document.addEventListener("click", e => { const b = e.target.closest("[data-fx]"); if (!b) return; e.stopPropagation(); regler(PROBS[+b.dataset.fx]); }, true);
+document.addEventListener("click", e => { const b = e.target.closest("[data-fxp]"); if (!b) return; e.stopPropagation(); const [i, q] = b.dataset.fxp.split("|"); regler(Object.assign({}, PROBS[+i], { donner:q })); }, true);
+/* 19 nov. (Jeremy) : « il manque des heures » → on choisit à quel enseignant les donner */
+function prevTache(q){ const g = grp(); if (!g || S > 1) return null; const v = (((g.taches || {})[q] || {}).prev || [])[S]; return v === undefined || v === "" ? null : +v; }
+function resteTache(q){ const pv = prevTache(q); if (pv == null) return null; const s = ses(); let t = 0; s.sem.forEach((w, wi) => s.mods.forEach(m => { if (!m.autre) t += cell(s, wi, m.k)[q] || 0; })); return pv - t; }
+function donnerA(a){ const L = donnerA0(a), R = q => { const r0 = resteTache(q); return r0 == null ? -1e6 : r0; }; return avantPrio(ses().mods.find(x => x.k === a.k), L.sort((u, v) => R(v) - R(u))); }
+function nomDonner(q){ const r0 = resteTache(q), n = String(D.profs[q] || q).split(" ")[0]; return r0 == null ? n : n + (r0 > 0 ? ` (manque ${r0} h)` : r0 < 0 ? ` (${-r0} h de trop)` : " (complet)"); }
+function donnerA0(a){ const s = ses(); if (!s) return [];
+  if (a.fx === "mod" || a.fx === "na"){ const m = s.mods.find(x => x.k === a.k); if (!m) return [];
+    if (a.fx === "mod" && s.sem.reduce((t, w, i) => t + totalCase(s, i, m.k), 0) >= HT(m)) return [];
+    const P = profsDe(m).filter(q => sessOk(q, s)); return P.length ? P : Object.keys(D.profs).filter(q => sessOk(q, s) && dansProg(q, grp().prog)); }
+  if (a.fx === "trou") return Object.keys(D.profs).filter(q => sessOk(q, s) && s.sem.some((w, wi) => wi > a.w && s.mods.some(m => !m.autre && cell(s, wi, m.k)[q])));
+  return []; }
 document.addEventListener("click", e => { const a = e.target.closest("[data-va]"); if (!a) return; const [k, w] = a.dataset.va.split("|");
   const sel = k && w !== "" ? `td.c[data-k="${CSS.escape(k)}"][data-w="${w}"]` : k ? `td.c[data-k="${CSS.escape(k)}"]` : `td.c[data-w="${w}"]`;
   const els = [...document.querySelectorAll(sel)]; if (!els.length) return; els[0].scrollIntoView({ block:"center", inline:"center", behavior:"smooth" });
@@ -809,11 +858,22 @@ document.addEventListener("click", e => { const a = e.target.closest("[data-va]"
   document.addEventListener("pointerup", fin); document.addEventListener("pointercancel", fin);
   document.addEventListener("click", e => { const r = e.target.closest("[data-rz]"); if (!r) return; Object.values(D.echanges || {}).forEach(x => delete x[r.dataset.rz]); sauver(); dessiner(); });
 })();
-document.addEventListener("click", e => { const n = e.target.closest("td.nom[data-mk]"); if (!n || VUE !== "g") return; const m = ses().mods.find(x => x.k === n.dataset.mk); if (!m) return;
-  const v = prompt(`${m.titre}\nPas avant quelle date ? (AAAA-MM-JJ, vide = aucune)\nEnsuite : Plus → Remplir automatiquement pour replacer.`, m.apres || ""); if (v === null) return;
-  m.apres = /^\d{4}-\d{2}-\d{2}$/.test(v.trim()) ? v.trim() : ""; sauver();
-  const s0 = ses(), trop = m.apres && s0.sem.some((w, wi) => { const z = new Date(w.d + "T12:00"); z.setDate(z.getDate() + 4); return iso(z) < m.apres && totalCase(s0, wi, m.k) > 0; });
-  if (trop && confirm(`${m.titre} a des heures avant cette date.\nRefaire l'horaire de cette session pour la respecter ?\n(Tes ajustements à la main dans cette session seront remplacés.)`)) remplir(s0); else dessiner(); });
+document.addEventListener("click", e => { const n = e.target.closest("td.nom[data-mk]"); if (!n || VUE !== "g") return; const m = ses().mods.find(x => x.k === n.dataset.mk); if (!m || m.autre) return; coursDlg(m); });
+/* 19 nov. : fenêtre d'un cours (remplace la question « pas avant ») : date « pas avant » + enseignant prioritaire */
+function coursDlg(m){ const P = profsDe(m).filter(q => sessOk(q, ses())); let pr = prioDe(m);
+  const rendu = () => { $("#dlgC").innerHTML = `<h2 style="margin-top:0">${m.titre}</h2>
+    <div class="form"><label>Pas avant le (vide = aucune date)<br><input type="date" id="cdA" value="${m.apres || ""}"></label></div>
+    <p style="margin:14px 0 6px"><b>Enseignant prioritaire</b></p><p class="mini" style="margin-top:0">Il reçoit les heures de ce cours avant les autres, jusqu'à ce que sa tâche soit complète.</p>
+    <p>${[["", "Aucun"]].concat(P.map(q => [q, D.profs[q] || q])).map(([q, n]) => `<span class="chip" data-cpr="${q}" style="padding:7px 12px;cursor:pointer;${q === pr ? "background:var(--or);border-color:var(--or);color:#fff" : ""}">${n}</span>`).join(" ")}</p>
+    <p style="text-align:right"><button class="prim" id="cdOk">Enregistrer</button></p>`;
+    $("#dlgC").onclick = e => { const c = e.target.closest("[data-cpr]"); if (c){ pr = c.dataset.cpr; const a = $("#cdA").value; rendu(); $("#cdA").value = a; return; }
+      if (e.target.id === "cdOk") enregistrer(); }; };
+  const enregistrer = () => { const v = $("#cdA").value, avPr = prioDe(m), avA = m.apres || ""; m.apres = /^\d{4}-\d{2}-\d{2}$/.test(v) ? v : "";
+    D.prio = D.prio || {}; if (pr) D.prio[m.code || m.titre] = pr; else delete D.prio[m.code || m.titre]; sauver(); dlg.close();
+    const s0 = ses(), trop = m.apres && s0.sem.some((w, wi) => { const z = new Date(w.d + "T12:00"); z.setDate(z.getDate() + 4); return iso(z) < m.apres && totalCase(s0, wi, m.k) > 0; });
+    const pourquoi = trop ? `${m.titre} a des heures avant cette date.` : pr !== avPr ? (pr ? `${D.profs[pr]} est maintenant prioritaire en ${m.titre}.` : "") : "";
+    if (pourquoi && confirm(`${pourquoi}\nRefaire l'horaire de cette session pour l'appliquer ?\n(Tes ajustements à la main dans cette session seront remplacés.)`)) remplir(s0); else dessiner(); };
+  rendu(); if (!dlg.open) dlg.showModal(); }
 function calAbs(p){ prepDonnees(); D.abs = D.abs || {}; const A = D.abs[p] = D.abs[p] || {};
   let h = `<h2 style="margin-top:0">Absences de ${D.profs[p]}</h2><p class="mini">Touche les jours où ${D.profs[p]} ne peut pas enseigner (formation, congé, autre tâche…). L'horaire ne lui donnera pas de cours ces jours-là et réduit son maximum de la semaine.</p>
   <p style="margin:6px 0 4px"><b>Chaque semaine</b> <span class="mini">(ex. réunion tous les mardis après-midi)</span></p><p>${[1,2,3,4,5].map(wd => ["AM","PM"].map(pm => `<span class="chip ${REC(p).includes(wd + "|" + pm) ? "on" : ""}" data-rec="${p}|${wd}|${pm}" style="padding:6px 10px">${["","Lundi","Mardi","Mercredi","Jeudi","Vendredi"][wd]} ${pm}</span>`).join("")).join(" ")}</p>
@@ -834,6 +894,7 @@ $("#dlgC").addEventListener("click", e => { const b = e.target.closest("[data-pa
     const grp = []; L.forEach(v => { const der = grp[grp.length - 1]; if (der && der.length === 1 && der[0] % 2 && v === der[0] + 1) der.push(v); else grp.push([v]); });
     AS.ses = grp[0] ? grp[0][0] : 1; AS.ses2 = grp[1] ? grp[1][0] : 1; AS.deux = grp.length > 1; assistant(); return; }
   const ct = e.target.closest("[data-ctr]"); if (ct){ const [p, v] = ct.dataset.ctr.split("|"); (D.contrat = D.contrat || {})[p] = +v; sauver(); if (AS.on) assistant(); else if (FICHE) fiche(FICHE); return; }
+  const apr = e.target.closest("[data-apr]"); if (apr && AS.on){ const [c, q] = apr.dataset.apr.split("|"); D.prio = D.prio || {}; if (q) D.prio[c] = q; else delete D.prio[c]; sauver(); assistant(); return; }
   const ch = e.target.closest("[data-chef]"); if (ch && AS.on){ AS.chef = ch.dataset.chef; assistant(); return; }
   const pp = e.target.closest("[data-pp]"); if (pp){ const pr = progAS(), A = (D.progProfs = D.progProfs || {}); let L = A[pr] || Object.keys(D.profs); L = L.includes(pp.dataset.pp) ? L.filter(x => x !== pp.dataset.pp) : [...L, pp.dataset.pp];
     A[pr] = L; sauver(); assistant(); return; }
@@ -869,6 +930,12 @@ function etapesAs(){ const TOUS = Object.keys(D.profs), P = TOUS.filter(p => dan
       sel.forEach(n => (SP[n - 1] || []).forEach(m => { if (m.code && !codes.some(c => c.code === m.code)) codes.push(Object.assign({ _s:n }, m)); }));
       return `<p class="mini">Modules ${sel.length < SP.length ? "des sessions " + sel.join(" et ") : "du programme"} seulement.</p><p><b>Il enseigne en :</b> ${[0, 1].map(i => `<span class="chip ${!((D.sessProf || {})[p] || []).length || D.sessProf[p].includes(i) ? "on" : ""}" data-sp="${p}|${i}" style="padding:8px 12px;font-size:13px">Session ${i + 1}</span>`).join("")} <span class="mini">(les deux cochées = toute l'année)</span></p><p><b>Touche les modules qu'il peut donner :</b></p><p>${codes.map(m => `<span class="chip ${(D.peut[p] || []).includes(m.code) ? "on" : ""}" data-pc="${p}|${m.code}" style="padding:8px 12px;font-size:13px">${m.num} · ${m.titre}${sel.length > 1 ? ` <small style="opacity:.6">S${m._s}</small>` : ""}</span>`).join("")}</p>`; } });
     E.push({ t:D.profs[p], chk:"p:" + p, q:`Y a-t-il des moments, chaque semaine, où ${D.profs[p]} ne peut jamais enseigner ?`, f:() => `<p class="mini">Exemple : réunion tous les mardis après-midi. Laisse vide s'il est toujours disponible.</p><p>${[1,2,3,4,5].map(wd => ["AM","PM"].map(pm => `<span class="chip ${REC(p).includes(wd + "|" + pm) ? "on" : ""}" data-rec="${p}|${wd}|${pm}" style="padding:8px 12px;font-size:13px">${["","Lundi","Mardi","Mercredi","Jeudi","Vendredi"][wd]} ${pm === "AM" ? "avant-midi" : "après-midi"}</span>`).join("")).join(" ")}</p><p class="mini">Des jours précis (formation, congé) ? Tu pourras les ajouter plus tard dans « Préparer l'année ».</p>` }); });
+  /* 19 nov. (Jeremy) : enseignant prioritaire dans les matières que plusieurs peuvent donner */
+  { const SP = sessionsProg(D.prog[progAS()] || { mods:[] }), sel = (AS.sesSel || []).length ? AS.sesSel : SP.map((x, i) => i + 1), communs = () => { const L = [];
+      sel.forEach(n => (SP[n - 1] || []).forEach(m => { const qui = P.filter(q => m.code && (D.peut[q] || []).includes(m.code)); if (qui.length > 1 && !L.some(x => x.m.code === m.code)) L.push({ m, qui }); })); return L; };
+    E.push({ t:"Enseignant prioritaire", q:"Dans les matières que plusieurs peuvent donner, un enseignant est-il prioritaire ?", f:() => { const L = communs();
+      return L.length ? `<p class="mini">Le prioritaire reçoit les heures de la matière avant les autres, jusqu'à ce que sa tâche soit complète. Laisse « Aucun » pour partager selon les tâches.</p>` + L.map(({ m, qui }) => `<p style="margin:10px 0 4px"><b>${m.num} · ${m.titre}</b></p><p style="margin:0">${[["", "Aucun"]].concat(qui.map(q => [q, D.profs[q]])).map(([q, n]) => `<span class="chip ${((D.prio || {})[m.code] || "") === q ? "on" : ""}" data-apr="${m.code}|${q}" style="padding:8px 12px;font-size:13px">${n}</span>`).join("")}</p>`).join("")
+        : `<p class="mini">Aucune matière n'est partagée entre plusieurs enseignants : rien à choisir ici.</p>`; } }); }
   /* chef de groupe et partage des heures (en %) */
   const ord = P.length ? P : TOUS, sesH = (() => { const pr = D.prog[progAS()]; if (!pr) return [450, 450]; const S = []; let c = 0; pr.mods.forEach(m => { if (!S.length || c >= 450){ S.push(0); c = 0; } S[S.length - 1] += +m.h || 0; c += +m.h || 0; }); return S; })();
   E.push({ t:"Le chef de groupe", q:"Qui est le chef de groupe ?", f:() => `<p>${ord.map(p => `<span class="chip ${AS.chef === p ? "on" : ""}" data-chef="${p}" style="padding:10px 16px;font-size:15px">${D.profs[p]}</span>`).join("")} <span class="chip ${AS.chef === "" ? "on" : ""}" data-chef="" style="padding:10px 16px;font-size:15px">Aucun</span></p>
@@ -887,7 +954,7 @@ function assistant(){ const E = etapesAs(); AS.i = Math.max(0, Math.min(AS.i, E.
   <p style="display:flex;justify-content:space-between;margin-top:20px">${AS.i ? `<button data-as="-1">‹ Précédent</button>` : `<span></span>`}${e.fin ? `<button class="prim" id="asCree" style="font-size:16px;padding:10px 20px">Bâtir l'horaire</button>` : `<button class="prim" data-as="1" style="font-size:16px;padding:10px 20px">Suivant ›</button>`}</p>`;
   if (!dlg.open) dlg.showModal(); }
 function lireAs(){ const v = id => { const x = document.getElementById(id); return x ? x.value.trim() : null; };
-  if (v("aDeb")){ D.cal.debut = v("aDeb"); D.cal.fin = (+D.cal.debut.slice(0, 4) + (+D.cal.debut.slice(5, 7) >= 7 ? 1 : 0)) + "-06-30"; }   /* fin = 30 juin, elle varie */
+  if (v("aDeb")){ D.cal.debut = v("aDeb"); D.cal.fin = (+D.cal.debut.slice(0, 4) + (+D.cal.debut.slice(5, 7) >= 7 ? 1 : 0)) + "-06-30"; calReprendre(); }   /* fin = 30 juin, elle varie; 19 nov. : on reprend les journées spéciales déjà entrées pour cette année */
   if (v("nN") != null){ AS.nom = v("nN"); AS.prog = v("nP"); AS.deb = v("nD"); AS.tit = v("nT"); AS.nom2 = v("nN2") || ""; AS.deb2 = v("nD2") || ""; AS.ses = v("nS") || 1; AS.ses2 = v("nS2") || 1; } sauver(); }
 $("#dlgC").addEventListener("click", e => { const b = e.target.closest("[data-as]"); if (b && AS.on){ lireAs(); if (+b.dataset.as > 0 && document.getElementById("nN") && !AS.nom){ $("#nN").focus(); return; } AS.i += +b.dataset.as; assistant(); return; }
   if (e.target.id === "asCree" && AS.on){ AS.on = false; const faire = (nom, deb, tit, se) => { dlgNouveau(); $("#nN").value = nom; $("#nP").value = AS.prog; $("#nD").value = deb; $("#nT").value = tit || ""; $("#nS").value = se || 1; $("#nOk").click(); };
@@ -967,7 +1034,7 @@ $("#bNouv").onclick = () => { if (!D.prepare){ AS.on = true; AS.i = 0; assistant
 $("#bAnnee").textContent = "Assistant pas à pas";
 dessiner(); accueilH();
 /* 18 nov. : l'horaire suit le compte (copie chiffrée dans le coffre), sur tous les appareils */
-if (window.COFFRE) COFFRE.demarrer("horaire", { cles:[CLE], apres:() => { try { const n = JSON.parse(localStorage.getItem(CLE)); if (n){ D = n; G = S = 0; dessiner(); if (document.body.classList.contains("acc")) accueilH(); } } catch(e){} } }).then(async () => {
+if (window.COFFRE) COFFRE.demarrer("horaire", { cles:[CLE, CALC], apres:() => { try { const n = JSON.parse(localStorage.getItem(CLE)); if (n){ D = n; G = S = 0; dessiner(); if (document.body.classList.contains("acc")) accueilH(); } } catch(e){} } }).then(async () => {
   /* horaire préparé pour ce compte (fichier chiffré : seul ce compte peut l'ouvrir) */
   try { const s = await COFFRE.session(); if (!s || !s.id) return; const r = await fetch("horaires/" + encodeURIComponent(s.id) + ".json", { cache:"no-store" }); if (!r.ok) return;
     const P = await r.json(); if (!P || !P.env || localStorage.getItem("horairePaquetVu") === P.t) return;

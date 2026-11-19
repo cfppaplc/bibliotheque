@@ -292,7 +292,7 @@
   </form>
 </div>
 
-<script src="js/accueil.js?v=6"></script>
+<script src="js/accueil.js?v=8"></script>
 
 <script>
 /* Mode hors ligne : les livres déjà ouverts restent sur l'ordinateur (voir sw.js) */
@@ -488,7 +488,7 @@ if (window.COFFRE && !/[?&]apercu=/.test(location.search)) COFFRE.demarrer("accu
     <div class="sheet-actions"><button type="button" class="btn primary" id="mnOk">Enregistrer</button><button type="button" class="btn" id="mnVoir">Aperçu</button><button type="button" class="btn" id="mnAnn">Annuler</button></div>
   </div>
 </div>
-<script src="js/accueil-menage.js?v=3"></script>
+<script src="js/accueil-menage.js?v=4"></script>
 <link rel="stylesheet" href="css/accueil-metier.css?v=3">
 <script>/* barre d'avancement de l'activité en cours (copie --pg de la case en cours de la frise) */
 setInterval(() => { const s = document.querySelector("#v-tl .seg.now:not(.p)"), i = document.getElementById("v-nowav"); if (i) i.style.setProperty("--pg", s ? (s.style.getPropertyValue("--pg") || "0%") : "0%"); }, 1000);</script>
@@ -541,6 +541,8 @@ html:not(.force-dark) #mnAideT{box-shadow:0 30px 80px #1E2A4440}
 .local-choix button{min-height:40px;padding:0 18px;border-radius:999px;border:1px solid color-mix(in srgb,currentColor 25%,transparent);background:transparent;color:inherit;font:inherit;cursor:pointer}
 .local-choix button.on{background:#EB6A22;border-color:#EB6A22;color:#fff}
 .local-choix small{opacity:.7}
+.local-choix .mn-minutes{flex-basis:100%;margin-top:4px}
+.local-choix .mn-minutes button{min-width:48px;padding:0 12px}
 .seg-mn{position:absolute;top:0;bottom:0;right:0;z-index:1;pointer-events:none;border-left:2px dashed #2FB37A;
   background:repeating-linear-gradient(135deg,rgba(47,179,122,.22) 0 8px,rgba(47,179,122,.08) 8px 16px);
   display:flex;align-items:center;justify-content:center;writing-mode:vertical-rl;
