@@ -326,10 +326,14 @@ function action(a){ const s = ses();
 /* remplissage simple : modules dans l'ordre, au 1er enseignant, en respectant ses heures dans les autres groupes */
 /* 19 nov. (Jeremy) : cours « examen la dernière semaine » : il commence plus tard, juste assez tôt pour finir à la dernière semaine (date « pas avant » calculée) */
 /* dernière vraie semaine de cours (assez d'heures de cours pour les examens, pas une semaine de fériés / pédagogiques) */
-function derSemFin(s, n){ let der = s.sem.length - 1; const cours = i => (+s.sem[i].h || 0) - s.mods.reduce((a, m) => a + (m.autre ? totalCase(s, i, m.k) : 0), 0);
-  while (der > 0 && (s.sem[der].pf || cours(der) < 3 * Math.max(1, n))) der--; return der; }
-function finSesDates(s){ delete s._der; const F = s.mods.filter(m => m.finSes && !m.autre); if (!F.length || !s.sem.length) return;
-  const der = s._der = derSemFin(s, F.length);
+const evH = m => Math.max(3, +m.ev || 0);
+function derSemFin(s, E){ let der = s.sem.length - 1; const cours = i => (+s.sem[i].h || 0) - (s.sem[i].sansPV ? 2 : 0) - s.mods.reduce((a, m) => a + (m.autre && !/plage verte/i.test(m.titre) ? totalCase(s, i, m.k) : 0), 0);
+  while (der > 0 && (s.sem[der].pf || cours(der) + 2 < Math.min(E, 30))) der--; return der; }
+function finSesDates(s){ delete s._der; const F = s.mods.filter(m => m.finSes && !m.autre); if (!F.length || !s.sem.length){ s.sem.forEach(w => { if (w.sansPV){ w.h -= 2; delete w.sansPV; } }); return; }
+  const der = s._der = derSemFin(s, F.reduce((a, m) => a + evH(m), 0));
+  /* semaine des examens : on enlève la plage verte (2 h de plus pour les examens) */
+  s.sem.forEach((w, i) => { if (w.sansPV && i !== der){ w.h -= 2; delete w.sansPV; } });
+  if (!s.sem[der].sansPV){ s.sem[der].h += 2; s.sem[der].sansPV = 1; } s.mods.filter(m => m.autre && /plage verte/i.test(m.titre)).forEach(m => fixer(s, der, m.k, "-", 0));
   const W = s.sem.slice(Math.max(0, der - 5), der + 1).filter(w => !w.pf), moy = W.reduce((a, w) => a + (+w.h || 0), 0) / Math.max(1, W.length);
   const par = Math.max(3, Math.min(MAXMOD(), moy / F.length));   /* heures par semaine de chaque cours quand ils roulent ensemble */
   F.forEach(m => { const n = Math.ceil(HT(m) * 1.1 / par); m.apres = s.sem[Math.max(0, der - n + 1 - (s._finX || 0))].d; }); }   /* chacun commence juste assez tôt pour finir la dernière semaine */
@@ -350,10 +354,11 @@ function remplir(s){ finSesDates(s); const garde = {}; s.sem.forEach((w, wi) => 
     const charge = p => (((C[p] || {})[w.d] || {}).h || 0);
     const dansSem = new Map();   /* 19 nov. : au plus 15 h d'un même module par semaine (D.maxMod) */
     while (cap > 0 && actifs.length && garde++ < 200){ let m = actifs[tour % actifs.length];
-      const bloque = x => (dansSem.get(x) || 0) >= MAXMOD() || (x.finSes && s._der != null && wi > s._der);   /* cours « examen la dernière semaine » : rien après cette semaine */
+      const bloque = x => (dansSem.get(x) || 0) >= MAXMOD() || (s._der != null && (x.finSes ? wi > s._der || (wi < s._der && reste.get(x) <= evH(x))   /* l'examen est gardé pour la semaine des examens */
+        : wi === s._der && [...reste].some(([f, r]) => f.finSes && r > 0)));   /* semaine des examens : les examens d'abord */   /* cours « examen la dernière semaine » : rien après cette semaine */
       if (bloque(m)){ const autre = actifs.find(x => !bloque(x));
         if (autre) m = autre; else { const n = attente.findIndex(x => !(x.apres && x.apres > finSem) && !bloque(x)); if (n < 0) break; actifs.push(attente.splice(n, 1)[0]); continue; } }   /* tous au maximum : on ouvre un module de plus */
-      const u = Math.min(cap, 3, reste.get(m), MAXMOD() - (dansSem.get(m) || 0)); dansSem.set(m, (dansSem.get(m) || 0) + u);
+      const u = Math.min(cap, 3, reste.get(m), MAXMOD() - (dansSem.get(m) || 0), m.finSes && s._der != null && wi < s._der ? reste.get(m) - evH(m) : 99); dansSem.set(m, (dansSem.get(m) || 0) + u);
       const libres = m.profs.filter(q => sessOk(q, s) && charge(q) + u <= Math.min(w.h, capProf(q, w.d))), resteT = q => { const pv = ((PREV[q] || {}).prev || [])[SI]; if (pv !== undefined && pv !== "") return +pv - (FAIT[q] || 0);
         const tp = (D.tacheProf || {})[q]; if (tp && (tp.s1 !== undefined || tp.s2 !== undefined)) return (+(PAIR ? tp.s2 : tp.s1) || 0) - (FSEM[q] || 0) - (FAIT[q] || 0);
         return (+((D.cible || {})[q]) || 1e6) - (TA[q] || 0); };
@@ -368,7 +373,7 @@ function remplir(s){ finSesDates(s); const garde = {}; s.sem.forEach((w, wi) => 
   { const F = s.mods.filter(m => m.finSes && !m.autre), place = m => s.sem.reduce((a, w, i) => a + totalCase(s, i, m.k), 0);
     if (F.length && F.some(m => place(m) < HT(m)) && (s._finX || 0) < s.sem.length){ s._finX = (s._finX || 0) + 1; return remplir(s); } delete s._finX; }
   /* puis l'examen de chacun dans la dernière semaine (échange avec un autre cours de cette semaine, chacun garde son prof) */
-  { const der = derSemFin(s, s.mods.filter(m => m.finSes && !m.autre).length);
+  if (s._der != null) { const der = s._der;
     s.mods.filter(m => m.finSes && !m.autre).forEach(m => { const W = s.sem.map((w, i) => totalCase(s, i, m.k) ? i : -1).filter(i => i >= 0), L = W[W.length - 1]; if (L == null || L >= der) return;
       let n = Math.min(Math.max(3, +m.ev || 0), totalCase(s, L, m.k));
       for (const p of Object.keys(cell(s, L, m.k))){ if (n <= 0) break;
@@ -681,7 +686,7 @@ function dlgNouveau(){ prepDonnees(); const lun = new Date(D.cal.debut + "T12:00
     // modules → sessions de 450 h
     let ses = null, cum = 0; P.mods.forEach((m, i) => { if (!ses || cum >= 450){ ses = { nom:"Session " + (g.sessions.length + 1), mods:[], sem:[], g:{} }; g.sessions.push(ses); cum = 0; }
       const k = ses.mods.some(x => x.k === m.code) ? m.code + "-" + i : (m.code || "m" + i);
-      ses.mods.push({ k, code:m.code, titre:m.titre, num:m.num, h:+m.h || 0, ev:+m.ev || 0, apres:m.apres || "", profs:Object.keys(D.profs).filter(p => (D.peut[p] || []).includes(m.code) && dansProg(p, $("#nP").value)), autre:!m.code }); cum += +m.h || 0; });
+      ses.mods.push({ k, code:m.code, finSes:!!(m.code && (D.finSesCodes || {})[m.code]), titre:m.titre, num:m.num, h:+m.h || 0, ev:+m.ev || 0, apres:m.apres || "", profs:Object.keys(D.profs).filter(p => (D.peut[p] || []).includes(m.code) && dansProg(p, $("#nP").value)), autre:!m.code }); cum += +m.h || 0; });
     /* un groupe fait 2 sessions par année : 1-2 en 1re année, 3-4 en 2e année */
     { const dep = Math.max(1, +(($("#nS") || {}).value || 1)); g.sessions = g.sessions.slice(dep - 1, dep % 2 ? dep + 1 : dep);   /* impair = 2 sessions (l'année), pair = la 2e session seulement */ if (!g.sessions.length){ alert("Ce programme n'a pas de session " + dep + "."); return; } }
     // semaines selon le calendrier
@@ -902,7 +907,7 @@ function coursDlg(m){ const P = profsDe(m).filter(q => sessOk(q, ses())); let pr
     $("#dlgC").onclick = e => { const c = e.target.closest("[data-cpr]"); if (c){ pr = c.dataset.cpr; const a = $("#cdA").value, f = $("#cdF").checked; rendu(); $("#cdA").value = a; $("#cdF").checked = f; $("#cdA").disabled = f; return; }
       if (e.target.id === "cdF"){ $("#cdA").disabled = e.target.checked; return; }
       if (e.target.id === "cdOk") enregistrer(); }; };
-  const enregistrer = () => { const v = $("#cdA").value, avPr = prioDe(m), avF = !!m.finSes; m.finSes = $("#cdF").checked; m.apres = m.finSes ? m.apres : /^\d{4}-\d{2}-\d{2}$/.test(v) ? v : ""; if (!m.finSes && avF) m.apres = "";
+  const enregistrer = () => { const v = $("#cdA").value, avPr = prioDe(m), avF = !!m.finSes; m.finSes = $("#cdF").checked; if (m.code){ D.finSesCodes = D.finSesCodes || {}; if (m.finSes) D.finSesCodes[m.code] = 1; else delete D.finSesCodes[m.code]; } m.apres = m.finSes ? m.apres : /^\d{4}-\d{2}-\d{2}$/.test(v) ? v : ""; if (!m.finSes && avF) m.apres = "";
     D.prio = D.prio || {}; if (pr) D.prio[m.code || m.titre] = pr; else delete D.prio[m.code || m.titre]; sauver(); dlg.close();
     const s0 = ses(), trop = m.apres && s0.sem.some((w, wi) => { const z = new Date(w.d + "T12:00"); z.setDate(z.getDate() + 4); return iso(z) < m.apres && totalCase(s0, wi, m.k) > 0; });
     const pourquoi = m.finSes !== avF ? (m.finSes ? `${m.titre} finira la dernière semaine de la session (il commencera plus tard).` : `${m.titre} n'a plus de date imposée.`) : trop ? `${m.titre} a des heures avant cette date.` : pr !== avPr ? (pr ? `${D.profs[pr]} est maintenant prioritaire en ${m.titre}.` : "") : "";
@@ -928,6 +933,8 @@ $("#dlgC").addEventListener("click", e => { const b = e.target.closest("[data-pa
     const grp = []; L.forEach(v => { const der = grp[grp.length - 1]; if (der && der.length === 1 && der[0] % 2 && v === der[0] + 1) der.push(v); else grp.push([v]); });
     AS.ses = grp[0] ? grp[0][0] : 1; AS.ses2 = grp[1] ? grp[1][0] : 1; AS.deux = grp.length > 1; assistant(); return; }
   const ct = e.target.closest("[data-ctr]"); if (ct){ const [p, v] = ct.dataset.ctr.split("|"); (D.contrat = D.contrat || {})[p] = +v; sauver(); if (AS.on) assistant(); else if (FICHE) fiche(FICHE); return; }
+  const afs = e.target.closest("[data-afs]"); if (afs && AS.on){ const c = afs.dataset.afs, F = (D.finSesCodes = D.finSesCodes || {}); if (F[c]) delete F[c]; else F[c] = 1;
+    D.groupes.forEach(g => g.sessions.forEach(x => x.mods.forEach(m => { if (m.code === c) m.finSes = !!F[c]; }))); sauver(); assistant(); return; }
   const apr = e.target.closest("[data-apr]"); if (apr && AS.on){ const [c, q] = apr.dataset.apr.split("|"); D.prio = D.prio || {}; if (q) D.prio[c] = q; else delete D.prio[c]; sauver(); assistant(); return; }
   const ch = e.target.closest("[data-chef]"); if (ch && AS.on){ AS.chef = ch.dataset.chef; assistant(); return; }
   const pp = e.target.closest("[data-pp]"); if (pp){ const pr = progAS(), A = (D.progProfs = D.progProfs || {}); let L = A[pr] || Object.keys(D.profs); L = L.includes(pp.dataset.pp) ? L.filter(x => x !== pp.dataset.pp) : [...L, pp.dataset.pp];
@@ -969,7 +976,11 @@ function etapesAs(){ const TOUS = Object.keys(D.profs), P = TOUS.filter(p => dan
       sel.forEach(n => (SP[n - 1] || []).forEach(m => { const qui = P.filter(q => m.code && (D.peut[q] || []).includes(m.code)); if (qui.length > 1 && !L.some(x => x.m.code === m.code)) L.push({ m, qui }); })); return L; };
     E.push({ t:"Enseignant prioritaire", q:"Dans les matières que plusieurs peuvent donner, un enseignant est-il prioritaire ?", f:() => { const L = communs();
       return L.length ? `<p class="mini">Le prioritaire reçoit les heures de la matière avant les autres, jusqu'à ce que sa tâche soit complète. Laisse « Aucun » pour partager selon les tâches.</p>` + L.map(({ m, qui }) => `<p style="margin:10px 0 4px"><b>${m.num} · ${m.titre}</b></p><p style="margin:0">${[["", "Aucun"]].concat(qui.map(q => [q, D.profs[q]])).map(([q, n]) => `<span class="chip ${((D.prio || {})[m.code] || "") === q ? "on" : ""}" data-apr="${m.code}|${q}" style="padding:8px 12px;font-size:13px">${n}</span>`).join("")}</p>`).join("")
-        : `<p class="mini">Aucune matière n'est partagée entre plusieurs enseignants : rien à choisir ici.</p>`; } }); }
+        : `<p class="mini">Aucune matière n'est partagée entre plusieurs enseignants : rien à choisir ici.</p>`; } });
+    /* 19 nov. (Jeremy) : cours dont les examens sont ensemble, la dernière semaine (ex. évent, alimentation, drainage : 30 h d'examens = une semaine pleine, sans plage verte) */
+    E.push({ t:"Examens à la fin", q:"Des cours ont-ils leurs examens ensemble, la dernière semaine de la session ?", f:() => { const L = []; sel.forEach(n => (SP[n - 1] || []).forEach(m => { if (m.code && !L.some(x => x.code === m.code)) L.push(Object.assign({ _s:n }, m)); }));
+      const F = D.finSesCodes || {}, tot = L.filter(m => F[m.code]).reduce((a, m) => a + Math.max(3, +m.ev || 0), 0);
+      return `<p class="mini">Touche ces cours. Ils commenceront plus tard pour finir ensemble : leurs examens sont placés dans la même dernière semaine, et la plage verte de cette semaine est enlevée. Laisse vide si aucun.</p><p>${L.map(m => `<span class="chip ${F[m.code] ? "on" : ""}" data-afs="${m.code}" style="padding:8px 12px;font-size:13px">${m.num} · ${m.titre} <small style="opacity:.6">${Math.max(3, +m.ev || 0)} h d'examen${sel.length > 1 ? " · S" + m._s : ""}</small></span>`).join("")}</p>${tot ? `<p><b>${tot} h d'examens</b> la dernière semaine${tot > 30 ? ` : <span style="color:var(--err)">plus qu'une semaine (30 h)</span>` : ""}.</p>` : ""}`; } }); }
   /* chef de groupe et partage des heures (en %) */
   const ord = P.length ? P : TOUS, sesH = (() => { const pr = D.prog[progAS()]; if (!pr) return [450, 450]; const S = []; let c = 0; pr.mods.forEach(m => { if (!S.length || c >= 450){ S.push(0); c = 0; } S[S.length - 1] += +m.h || 0; c += +m.h || 0; }); return S; })();
   E.push({ t:"Le chef de groupe", q:"Qui est le chef de groupe ?", f:() => `<p>${ord.map(p => `<span class="chip ${AS.chef === p ? "on" : ""}" data-chef="${p}" style="padding:10px 16px;font-size:15px">${D.profs[p]}</span>`).join("")} <span class="chip ${AS.chef === "" ? "on" : ""}" data-chef="" style="padding:10px 16px;font-size:15px">Aucun</span></p>
