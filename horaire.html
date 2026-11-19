@@ -385,6 +385,7 @@ function remplir(s){ finSesDates(s); const garde = {}; s.sem.forEach((w, wi) => 
   s.sem.forEach((w, wi) => { cumH += +w.h || 0; const prog = cumH / totH, progT = Math.min(1, (+new Date(w.d) + 7 * 864e5 - d0) / (d1 - d0)); finSem = (() => { const z = new Date(w.d + "T12:00"); z.setDate(z.getDate() + 4); return iso(z); })(); let cap = w.h - s.mods.reduce((a, m) => a + (m.autre ? totalCase(s, wi, m.k) : 0), 0), tour = 0, garde = 0; ouvrir();
     const charge = p => (((C[p] || {})[w.d] || {}).h || 0);
     const dansSem = new Map();   /* 19 nov. : au plus 15 h d'un même module par semaine (D.maxMod) */
+    const semRest = s.sem.slice(wi, s._der != null ? s._der + 1 : s.sem.length).filter(z => !z.pf).length;
     const rythme = x => s._cum && s._cum[s._der - 1] ? Math.ceil((HT(x) - evH(x)) * (s._cum[wi] || 0) / s._cum[s._der - 1]) : 1e9;   /* où il devrait être rendu cette semaine */
     /* 19 nov. (Jeremy) : au plus 3 cours dans la semaine; un 4e seulement si la semaine ne se remplit pas autrement */
     for (const lim of [3, 4, 99]){ if (cap <= 0) break; garde = 0;
@@ -393,7 +394,9 @@ function remplir(s){ finSesDates(s); const garde = {}; s.sem.forEach((w, wi) => 
       const bloque = x => (dansSem.get(x) || 0) >= MAXMOD() || (!(dansSem.get(x) > 0) && nSem() >= lim) || (s._der != null && wi > s._der) || (s._der != null && (x.finSes ? (wi < s._der && (reste.get(x) <= evH(x) || HT(x) - reste.get(x) >= rythme(x)))   /* l'examen est gardé pour la fin; rythme régulier */
         : wi === s._der && [...reste].some(([f, r]) => f.finSes && r > 0)));
       const retard = x => rythme(x) - (HT(x) - reste.get(x));
-      let m = actifs.filter(x => x.finSes && !bloque(x) && retard(x) >= 9).sort((a, b) => retard(b) - retard(a))[0] || actifs[tour % actifs.length];   /* un cours « examen à la fin » en retard de plus de 9 h passe d'abord */   /* semaine des examens : les examens d'abord */   /* cours « examen la dernière semaine » : rien après cette semaine */
+      /* 19 nov. (Jeremy) : un long cours ne doit pas rester seul à la fin (15 h max par semaine → semaine à moitié vide) : s'il risque de ne pas finir, il passe d'abord */
+      const urg = x => reste.get(x) - (semRest - 1) * MAXMOD() * .7;
+      let m = actifs.filter(x => x.finSes && !bloque(x) && retard(x) >= 9).sort((a, b) => retard(b) - retard(a))[0] || actifs.filter(x => !x.finSes && !bloque(x) && urg(x) > 0).sort((a, b) => urg(b) - urg(a))[0] || actifs[tour % actifs.length];   /* un cours « examen à la fin » en retard de plus de 9 h passe d'abord */   /* semaine des examens : les examens d'abord */   /* cours « examen la dernière semaine » : rien après cette semaine */
       if (bloque(m)){ const autre = actifs.find(x => !bloque(x));
         if (autre) m = autre; else { const n = attente.findIndex(x => !(x.apres && x.apres > finSem) && !bloque(x)); if (n < 0) break; actifs.push(attente.splice(n, 1)[0]); continue; } }   /* tous au maximum : on ouvre un module de plus */
       const u = Math.min(cap, 3, reste.get(m), MAXMOD() - (dansSem.get(m) || 0), m.finSes && s._der != null && wi < s._der ? reste.get(m) - evH(m) : 99); dansSem.set(m, (dansSem.get(m) || 0) + u);
