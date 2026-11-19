@@ -347,22 +347,33 @@ function finaliserExamens(s){ const F = s.mods.filter(m => m.finSes && !m.autre)
     for (let wi = der + 1; wi < s.sem.length; wi++) for (const p of Object.keys(cell(s, wi, m.k))){ let x = cell(s, wi, m.k)[p] || 0, g = 0; while (x > 0 && g++ < 20){ const y = echanger(s, m, p, wi, der, x); if (!y) break; x -= y; } }
     let manque = evH(m) - totalCase(s, der, m.k);
     for (let wi = der - 1; wi >= 0 && manque > 0; wi--) for (const p of Object.keys(cell(s, wi, m.k))){ if (manque <= 0) break; let x = Math.min(manque, cell(s, wi, m.k)[p] || 0), g = 0; while (x > 0 && g++ < 20){ const y = echanger(s, m, p, wi, der, x); if (!y) break; x -= y; manque -= y; } } });
+  /* rien après les examens : les autres cours restés après sont ramenés avant, là où il y a de la place */
+  for (let wi = der + 1; wi < s.sem.length; wi++) s.mods.forEach(m => { if (m.autre || m.finSes) return; for (const p of Object.keys(cell(s, wi, m.k))){ let x = cell(s, wi, m.k)[p] || 0;
+    for (let j = der - 1; j >= 0 && x > 0; j--){ const W = s.sem[j]; if (W.pf || !okDate(m, W)) continue; const y = Math.min(x, W.h - totSem(s, j), capM(s, j, m.k), p === "-" ? 99 : Math.max(0, libre(p, W))); if (y <= 0) continue; retirer(s, wi, m.k, y, p); ajout(s, j, m.k, p, y); x -= y; } } });
+  /* il reste des cours après : pas de place avant → la semaine des examens recule à la fin */
+  { let fin = der; for (let wi = s.sem.length - 1; wi > der; wi--) if (s.mods.some(m => !m.autre && totalCase(s, wi, m.k))){ fin = wi; break; }
+    }
+  const L = (D.groupes.find(g => g.sessions.includes(s)) || { sessions:[] }).sessions; if (s === L[L.length - 1]) while (s.sem.length - 1 > der && !s.mods.some(m => !m.autre && totalCase(s, s.sem.length - 1, m.k))){ delete s.g[s.sem.length - 1]; s.sem.pop(); }
   s.mods.forEach(m => { if (!m.autre && !m.finSes) grouperEval(s, m); }); }
 function derSemFin(s, E){ let der = s.sem.length - 1; const cours = i => (+s.sem[i].h || 0) - (s.sem[i].sansPV ? 2 : 0) - s.mods.reduce((a, m) => a + (m.autre && !/plage verte/i.test(m.titre) ? totalCase(s, i, m.k) : 0), 0);
   while (der > 0 && (s.sem[der].pf || cours(der) + 2 < Math.min(E, 30))) der--; return der; }
-function finSesDates(s){ delete s._der; const F = s.mods.filter(m => m.finSes && !m.autre); if (!F.length || !s.sem.length){ s.sem.forEach(w => { if (w.sansPV === 1){ w.h -= 2; delete w.sansPV; } }); return; }
-  const der = s._der = derSemFin(s, F.reduce((a, m) => a + evH(m), 0));
-  /* semaine des examens : on enlève la plage verte (2 h de plus pour les examens) */
+/* 19 nov. (Jeremy) : cours « examen la dernière semaine » (ex. drainage, évent, alimentation) : ils roulent pendant TOUTE la session, à rythme régulier,
+   et leurs examens remplissent la dernière semaine. Rien après les examens : la semaine des examens = la fin de la session (calculée selon les heures). */
+function finSesDates(s){ delete s._der; delete s._cum; const F = s.mods.filter(m => m.finSes && !m.autre); if (!F.length || !s.sem.length){ s.sem.forEach(w => { if (w.sansPV === 1){ w.h -= 2; delete w.sansPV; } }); return; }
+  const cours = i => (+s.sem[i].h || 0) - (s.sem[i].sansPV === 1 ? 2 : 0) - s.mods.reduce((a, m) => a + (m.autre && !/plage verte/i.test(m.titre) ? totalCase(s, i, m.k) : 0), 0);
+  const tot = s.mods.reduce((a, m) => a + (m.autre ? 0 : HT(m)), 0); let cum = 0, der = s.sem.length - 1;
+  for (let i = 0; i < s.sem.length; i++){ if (s.sem[i].pf) continue; cum += cours(i) + 2; if (cum >= tot){ der = i; break; } }
+  der = Math.min(s.sem.length - 1, der + (s._finX || 0)); while (der < s.sem.length - 1 && s.sem[der].pf) der++; s._der = der;
   s.sem.forEach((w, i) => { if (w.sansPV === 1 && i !== der){ w.h -= 2; delete w.sansPV; } });
   if (!s.sem[der].sansPV){ s.sem[der].h += 2; s.sem[der].sansPV = 1; } s.mods.filter(m => m.autre && /plage verte/i.test(m.titre)).forEach(m => fixer(s, der, m.k, "-", 0));
-  const W = s.sem.slice(Math.max(0, der - 5), der + 1).filter(w => !w.pf), moy = W.reduce((a, w) => a + (+w.h || 0), 0) / Math.max(1, W.length);
-  const par = Math.max(3, Math.min(MAXMOD(), moy / F.length));   /* heures par semaine de chaque cours quand ils roulent ensemble */
-  F.forEach(m => { const n = Math.ceil(HT(m) * 1.1 / par); m.apres = s.sem[Math.max(0, der - n + 1 - (s._finX || 0))].d; }); }   /* chacun commence juste assez tôt pour finir la dernière semaine */
+  F.forEach(m => m.apres = "");
+  s._cum = []; let c = 0; for (let i = 0; i < der; i++){ c += s.sem[i].pf ? 0 : Math.max(0, cours(i)); s._cum[i] = c; } }
 function remplir(s){ finSesDates(s); const garde = {}; s.sem.forEach((w, wi) => { const W = s.g[wi] || {}; for (const k in W){ const m = s.mods.find(x => x.k === k); if (m && m.autre) (garde[wi] = garde[wi] || {})[k] = W[k]; } });
   s.g = garde; const TA = totalAnnee(s), GR = D.groupes.find(g => g.sessions.includes(s)) || {}, PREV = GR.taches || {}, SI = sesIdx(s), FAIT = {}, PAIR = !((parseInt((s.nom || "").replace(/\D/g, "")) || 1) % 2), FSEM = {};
   D.groupes.forEach(g2 => g2.sessions.forEach(x => { if (x === s || !((parseInt((x.nom || "").replace(/\D/g, "")) || 1) % 2) !== PAIR) return; x.sem.forEach((w, wi) => x.mods.forEach(m => { if (m.autre) return; const c = cell(x, wi, m.k); for (const p in c) if (p !== "-") FSEM[p] = (FSEM[p] || 0) + c[p]; })); }));   /* heures déjà données cette demi-année dans les autres groupes */   /* tâche régulière prévue par session (Tâches annuelles) */ const C = charges(), L = s.mods.filter(m => !m.autre && m.h), OUV = 3;
   const reste = new Map(L.map(m => [m, HT(m)])); const attente = L.slice(), actifs = []; let finSem = "";
-  const ouvrir = () => { for (let n = 0; n < attente.length && actifs.length < OUV; ){ const m = attente[n]; if (m.apres && m.apres > finSem){ n++; continue; } actifs.push(m); attente.splice(n, 1); } };   /* « pas avant » : un module attend sa date */
+  const nAct = () => actifs.filter(x => !x.finSes).length;
+  const ouvrir = () => { for (let n = 0; n < attente.length; ){ const m = attente[n]; if ((m.apres && m.apres > finSem) || (!m.finSes && nAct() >= OUV)){ n++; continue; } actifs.push(m); attente.splice(n, 1); } };   /* les cours « examen à la fin » roulent toute la session, en plus des autres */   /* « pas avant » : un module attend sa date */
   /* 18 nov. : rythme régulier — chaque prof avance au même rythme que la session (pas 2 mois sans cours à la fin) */
   const totH = s.sem.reduce((a, w) => a + (+w.h || 0), 0) || 1; let cumH = 0;
   /* demi-année (toutes les sessions de même parité, tous les groupes) : le rythme suit le calendrier, pas un seul groupe */
@@ -374,9 +385,15 @@ function remplir(s){ finSesDates(s); const garde = {}; s.sem.forEach((w, wi) => 
   s.sem.forEach((w, wi) => { cumH += +w.h || 0; const prog = cumH / totH, progT = Math.min(1, (+new Date(w.d) + 7 * 864e5 - d0) / (d1 - d0)); finSem = (() => { const z = new Date(w.d + "T12:00"); z.setDate(z.getDate() + 4); return iso(z); })(); let cap = w.h - s.mods.reduce((a, m) => a + (m.autre ? totalCase(s, wi, m.k) : 0), 0), tour = 0, garde = 0; ouvrir();
     const charge = p => (((C[p] || {})[w.d] || {}).h || 0);
     const dansSem = new Map();   /* 19 nov. : au plus 15 h d'un même module par semaine (D.maxMod) */
-    while (cap > 0 && actifs.length && garde++ < 200){ let m = actifs[tour % actifs.length];
-      const bloque = x => (dansSem.get(x) || 0) >= MAXMOD() || (s._der != null && (x.finSes ? wi > s._der || (wi < s._der && reste.get(x) <= evH(x))   /* l'examen est gardé pour la semaine des examens */
-        : wi === s._der && [...reste].some(([f, r]) => f.finSes && r > 0)));   /* semaine des examens : les examens d'abord */   /* cours « examen la dernière semaine » : rien après cette semaine */
+    const rythme = x => s._cum && s._cum[s._der - 1] ? Math.ceil((HT(x) - evH(x)) * (s._cum[wi] || 0) / s._cum[s._der - 1]) : 1e9;   /* où il devrait être rendu cette semaine */
+    /* 19 nov. (Jeremy) : au plus 3 cours dans la semaine; un 4e seulement si la semaine ne se remplit pas autrement */
+    for (const lim of [3, 4, 99]){ if (cap <= 0) break; garde = 0;
+    while (cap > 0 && actifs.length && garde++ < 300){
+      const nSem = () => [...dansSem].filter(([x, h]) => h > 0).length;
+      const bloque = x => (dansSem.get(x) || 0) >= MAXMOD() || (!(dansSem.get(x) > 0) && nSem() >= lim) || (s._der != null && wi > s._der) || (s._der != null && (x.finSes ? (wi < s._der && (reste.get(x) <= evH(x) || HT(x) - reste.get(x) >= rythme(x)))   /* l'examen est gardé pour la fin; rythme régulier */
+        : wi === s._der && [...reste].some(([f, r]) => f.finSes && r > 0)));
+      const retard = x => rythme(x) - (HT(x) - reste.get(x));
+      let m = actifs.filter(x => x.finSes && !bloque(x) && retard(x) >= 9).sort((a, b) => retard(b) - retard(a))[0] || actifs[tour % actifs.length];   /* un cours « examen à la fin » en retard de plus de 9 h passe d'abord */   /* semaine des examens : les examens d'abord */   /* cours « examen la dernière semaine » : rien après cette semaine */
       if (bloque(m)){ const autre = actifs.find(x => !bloque(x));
         if (autre) m = autre; else { const n = attente.findIndex(x => !(x.apres && x.apres > finSem) && !bloque(x)); if (n < 0) break; actifs.push(attente.splice(n, 1)[0]); continue; } }   /* tous au maximum : on ouvre un module de plus */
       const u = Math.min(cap, 3, reste.get(m), MAXMOD() - (dansSem.get(m) || 0), m.finSes && s._der != null && wi < s._der ? reste.get(m) - evH(m) : 99); dansSem.set(m, (dansSem.get(m) || 0) + u);
@@ -385,17 +402,24 @@ function remplir(s){ finSesDates(s); const garde = {}; s.sem.forEach((w, wi) => 
         return (+((D.cible || {})[q]) || 1e6) - (TA[q] || 0); };
       const fait = q => { const pv = ((PREV[q] || {}).prev || [])[SI]; return (pv !== undefined && pv !== "") || cibleT(q) == null ? [FAIT[q] || 0, cibleS(q), prog] : [(FAIT[q] || 0) + autresAvant(q, w.d), cibleT(q), progT]; };
       const avance = q => { const [f, t, pr] = fait(q); return t == null ? 1e5 : t * pr - f; };   /* retard sur son rythme (toute la demi-année) */
-      const p = libres.filter(q => { if (resteT(q) <= 0) return false; const [f, t, pr] = fait(q); return t == null || f + u <= t * pr + Math.max(9, t * .15); }).sort((x, y) => ((y === prioDe(m)) - (x === prioDe(m))) || (avance(y) - avance(x)))[0] || "-";   /* tâche pleine, en avance sur son rythme ou personne de libre → « non assigné », réparti sur toute la session */
+      const p = libres.filter(q => { if (resteT(q) <= 0) return false; const [f, t, pr] = fait(q); return t == null || f + u <= t * pr + Math.max(9, t * .15); }).sort((x, y) => ((y === prioDe(m)) - (x === prioDe(m))) || ((y === PPRIO()) - (x === PPRIO())) || (avance(y) - avance(x)))[0] || "-";   /* tâche pleine, en avance sur son rythme ou personne de libre → « non assigné », réparti sur toute la session */
       /* 19 nov. (Jeremy) : personne de libre pour ce cours → on démarre un 4e cours dont un enseignant est libre, plutôt que de laisser des heures « non assigné » */
-      if (p === "-" && actifs.length < 4){ const n4 = attente.findIndex(x => !(x.apres && x.apres > finSem) && !bloque(x) && (x.profs || []).some(q => sessOk(q, s) && charge(q) + u <= Math.min(w.h, capProf(q, w.d)) && resteT(q) > 0));
+      if (p === "-" && nAct() < OUV + 1){ const n4 = attente.findIndex(x => !(x.apres && x.apres > finSem) && !bloque(x) && (x.profs || []).some(q => sessOk(q, s) && charge(q) + u <= Math.min(w.h, capProf(q, w.d)) && resteT(q) > 0));
         if (n4 >= 0){ dansSem.set(m, (dansSem.get(m) || 0) - u); actifs.push(attente.splice(n4, 1)[0]); tour = actifs.length - 1; continue; } }
       fixer(s, wi, m.k, p, (cell(s, wi, m.k)[p] || 0) + u); if (p !== "-"){ TA[p] = (TA[p] || 0) + u; FAIT[p] = (FAIT[p] || 0) + u; } cap -= u; reste.set(m, reste.get(m) - u);
       if (p !== "-"){ const c = ((C[p] = C[p] || {})[w.d] = (C[p] || {})[w.d] || { h:0, max:w.h, grp:new Set() }); c.h += u; }
-      if (reste.get(m) <= 0){ actifs.splice(actifs.indexOf(m), 1); ouvrir(); } else tour++; } });
+      if (reste.get(m) <= 0){ actifs.splice(actifs.indexOf(m), 1); ouvrir(); } else tour++; } } });
   s.mods.forEach(m => { if (!m.autre) grouperEval(s, m); });
   /* cours « examen la dernière semaine » pas tous placés : on les fait commencer une semaine plus tôt et on recommence */
   { const F = s.mods.filter(m => m.finSes && !m.autre), place = m => s.sem.reduce((a, w, i) => a + totalCase(s, i, m.k), 0);
-    if (F.length && F.some(m => place(m) < HT(m)) && (s._finX || 0) < s.sem.length){ s._finX = (s._finX || 0) + 1; return remplir(s); } delete s._finX; }
+    if (F.length){ const manque = s.mods.reduce((a, m) => a + (m.autre ? 0 : Math.max(0, HT(m) - place(m))), 0) + F.reduce((a, m) => a + Math.max(0, evH(m) - totalCase(s, s._der, m.k)), 0);
+      /* on garde le meilleur essai (le moins d'heures non placées ou d'examen hors de la dernière semaine) */
+      if (!s._best || manque < s._best.n) s._best = { n:manque, g:JSON.stringify(s.g), sem:JSON.stringify(s.sem), der:s._der, cum:s._cum };
+      if (manque > 0 && s._der < s.sem.length - 1 && (s._finX || 0) < 6){ s._finX = (s._finX || 0) + 1; return remplir(s); }   /* il en manque : une semaine de plus avant les examens */
+      const B = s._best; s.g = JSON.parse(B.g); s.sem = JSON.parse(B.sem); s._der = B.der; s._cum = B.cum; delete s._best; }
+    delete s._finX;
+    /* dernière session : rien après les examens, on enlève les semaines du bout */
+    const L = (D.groupes.find(g => g.sessions.includes(s)) || { sessions:[] }).sessions; if (F.length && s._der != null && s === L[L.length - 1]) while (s.sem.length - 1 > s._der && !s.mods.some(m => !m.autre && totalCase(s, s.sem.length - 1, m.k))){ delete s.g[s.sem.length - 1]; s.sem.pop(); } }
   /* puis l'examen de chacun dans la dernière semaine (échange avec un autre cours de cette semaine, chacun garde son prof) */
   if (s._der != null) { const der = s._der;
     s.mods.filter(m => m.finSes && !m.autre).forEach(m => { const W = s.sem.map((w, i) => totalCase(s, i, m.k) ? i : -1).filter(i => i >= 0), L = W[W.length - 1]; if (L == null || L >= der) return;
@@ -682,6 +706,7 @@ $("#dlgC").addEventListener("click", e => { const t = reglages.t, el = e.target;
   if (el.dataset.pmx){ if (confirm("Retirer ce module du programme ?")){ P.mods.splice(+el.dataset.pmx, 1); sauver(); reglages("prog"); } }
   if (el.id === "pAj"){ P.mods.push({ num:"", code:"", titre:"Nouveau module", h:30, ev:0 }); sauver(); reglages("prog"); }
   if (el.id === "pNouv"){ const n = prompt("Nom du programme (ex. 5333 Plomberie et chauffage) :"); if (!n) return; const id = "P" + Date.now(); D.prog[id] = { nom:n, mods:[] }; reglages.p = id; sauver(); reglages("prog"); }
+  if (el.dataset.ppr){ D.profPrio = D.profPrio === el.dataset.ppr ? "" : el.dataset.ppr; sauver(); reglages("ens"); }
   if (el.dataset.pc){ const [p, c] = el.dataset.pc.split("|"), L = (D.peut[p] = D.peut[p] || []), i = L.indexOf(c); if (i < 0){ L.push(c); donnerNA(p, c); } else L.splice(i, 1); sauver(); reglages("ens"); }
   if (el.dataset.px){ if (confirm("Retirer " + D.profs[el.dataset.px] + " ?")){ delete D.profs[el.dataset.px]; delete D.peut[el.dataset.px]; sauver(); reglages("ens"); dessiner(); } }
   if (el.id === "eAj"){ const n = prompt("Nom de l'enseignant :"); if (!n) return; let ini = n.split(/\s+/).map(x => x[0] || "").join(".").toUpperCase().slice(0, 3); while (D.profs[ini]) ini += "2"; D.profs[ini] = n; D.peut[ini] = []; { const L = (D.progProfs || {})[progAS()]; if (L) L.push(ini); } sauver(); reglages("ens"); dessiner(); }
@@ -746,6 +771,8 @@ const finS = d => { const z = new Date(d + "T12:00"); z.setDate(z.getDate() + 4)
 const totSem = (s, wi) => s.mods.reduce((a, m) => a + totalCase(s, wi, m.k), 0);
 const okDate = (m, w) => !m.apres || finS(w.d) >= m.apres;
 /* 19 nov. (Jeremy) : enseignant prioritaire d'une matière : il reçoit les heures avant les autres pour combler son horaire (D.prio[code ou titre] = id) */
+/* 19 nov. (Jeremy) : un enseignant dont la tâche se complète en premier (ex. Michel); les autres se balancent ensuite plus facilement */
+const PPRIO = () => (D && D.profPrio) || "", avantPP = L => { const P = PPRIO(); return P ? L.slice().sort((a, b) => (b === P || (Array.isArray(b) && b[0] === P)) - (a === P || (Array.isArray(a) && a[0] === P))) : L; };
 const prioDe = m => m ? ((D.prio || {})[m.code || m.titre] || "") : "", avantPrio = (m, L) => { const P = prioDe(m); return P ? L.slice().sort((a, b) => (b === P || (Array.isArray(b) && b[0] === P)) - (a === P || (Array.isArray(a) && a[0] === P))) : L; };
 const profsDe = m => [...new Set([...(m.profs || []), ...Object.keys(D.profs).filter(p => m.code && (D.peut[p] || []).includes(m.code))])];
 function libre(p, w){ const e = (charges()[p] || {})[w.d]; return Math.min(w.h, capProf(p, w.d)) - (e ? e.h : 0); }
@@ -774,7 +801,8 @@ function remplirTrous(g){ let chg = false;
       const wi = a.sem.length; a.sem.push({ d:k, h, pf:1 }); const par = {}; let j = 0; for (let x = 0; x < 5; x++){ const y = new Date(d); y.setDate(d.getDate() + x); const ty = jourType(iso(y)); if (ty !== "conge" && HJOUR[y.getDay()] && iso(y) >= D.cal.debut) par[ty || "planif"] = (par[ty || "planif"] || 0) + HJOUR[y.getDay()]; }
       poserJT(a, wi, par); chg = true; } }
   return chg; }
-function ajouterSemaine(s){ const pf = s.sem.findIndex(w => w.pf);
+function ajouterSemaine(s){ if (s._der != null && s.mods.some(m => m.finSes && !m.autre)){ RAISON = "Rien ne peut aller après la semaine des examens."; return -1; }   /* 19 nov. (Jeremy) */
+  const pf = s.sem.findIndex(w => w.pf);
   if (pf >= 0){ const w = s.sem[pf], { h, par } = parSemaine(w.d); delete w.pf; w.h = h; poserJT(s, pf, par); return pf; }   /* reprend une semaine pédagogique de fin de session */
   const L = grp().sessions; if (L.indexOf(s) < L.length - 1){ RAISON = `${s.nom} est calculée pour ses heures (450 h) : elle ne devrait jamais manquer de semaines. Vérifie le calendrier : une journée spéciale ou un congé de trop dans cette session enlève des heures de cours.`; return -1; }
   const der = s.sem[s.sem.length - 1]; if (!der) return -1; const d = new Date(der.d + "T12:00");
@@ -840,7 +868,7 @@ function regler(a){ const s = ses(); let fait = 0, reste = ""; RAISON = "";
   if (a.fx === "na"){ const m = s.mods.find(x => x.k === a.k), TA = totalAnnee(), resteT = q => (+((D.cible || {})[q]) || 1e6) - (TA[q] || 0);
     const P = profsDe(m).filter(q => sessOk(q, s)); let rest = 0;
     if (!P.length) reste = `Personne n'a « ${m.titre} » de coché. Coche ce module pour un enseignant (Réglages → Enseignants), puis clique encore « Régler ».`;
-    else s.sem.forEach((w, wi) => { let x = cell(s, wi, m.k)["-"] || 0; while (x > 0){ const q = avantPrio(m, P.filter(q => libre(q, w) > 0).sort((u, v) => resteT(v) - resteT(u)))[0]; if (!q) break;
+    else s.sem.forEach((w, wi) => { let x = cell(s, wi, m.k)["-"] || 0; while (x > 0){ const q = avantPrio(m, avantPP(P.filter(q => libre(q, w) > 0 && (q !== PPRIO() || resteT(q) > 0)).sort((u, v) => resteT(v) - resteT(u))))[0]; if (!q) break;
       const u = Math.min(x, libre(q, w)); retirer(s, wi, m.k, u, "-"); ajout(s, wi, m.k, q, u); TA[q] = (TA[q] || 0) + u; x -= u; fait += u; } rest += x; });
     /* 19 nov. (Jeremy) : il en reste → on permet un peu plus : jusqu'à 3 h au-dessus du maximum de la semaine et l'écart toléré au-dessus de la tâche */
     if (P.length && rest){ rest = 0; s.sem.forEach((w, wi) => { let x = cell(s, wi, m.k)["-"] || 0; while (x > 0){ const q = avantPrio(m, P.filter(q => libre(q, w) + 3 > 0 && resteT(q) + TOL() > 0).sort((u, v) => resteT(v) - resteT(u)))[0]; if (!q) break;
@@ -897,7 +925,7 @@ function prevDe(g, si, p){ const v = (((g.taches || {})[p] || {}).prev || [])[si
   return Math.max(0, +tp[cle] - autres); }
 const pvDe = (g, p) => [0, 1].map(i => { const v = prevDe(g, i, p); return v == null ? "" : v; });
 function resteTache(q){ const pv = prevTache(q); if (pv == null) return null; const s = ses(); let t = 0; s.sem.forEach((w, wi) => s.mods.forEach(m => { if (!m.autre) t += cell(s, wi, m.k)[q] || 0; })); return pv - t; }
-function donnerA(a){ const L = donnerA0(a), R = q => { const r0 = resteTache(q); return r0 == null ? -1e6 : r0; }; return avantPrio(ses().mods.find(x => x.k === a.k), L.sort((u, v) => R(v) - R(u))); }
+function donnerA(a){ const L = donnerA0(a), R = q => { const r0 = resteTache(q); return r0 == null ? -1e6 : r0; }; return avantPrio(ses().mods.find(x => x.k === a.k), avantPP(L.sort((u, v) => R(v) - R(u)))); }
 function nomDonner(q){ const r0 = resteTache(q), n = String(D.profs[q] || q).split(" ")[0]; return r0 == null ? n : n + (r0 > 0 ? ` (manque ${r0} h)` : r0 < 0 ? ` (${-r0} h de trop)` : " (complet)"); }
 function donnerA0(a){ const s = ses(); if (!s) return [];
   if (a.fx === "mod" || a.fx === "na"){ const m = s.mods.find(x => x.k === a.k); if (!m) return [];
@@ -964,6 +992,7 @@ $("#dlgC").addEventListener("click", e => { const b = e.target.closest("[data-pa
   const ct = e.target.closest("[data-ctr]"); if (ct){ const [p, v] = ct.dataset.ctr.split("|"); (D.contrat = D.contrat || {})[p] = +v; sauver(); if (AS.on) assistant(); else if (FICHE) fiche(FICHE); return; }
   const afs = e.target.closest("[data-afs]"); if (afs && AS.on){ const c = afs.dataset.afs, F = (D.finSesCodes = D.finSesCodes || {}); if (F[c]) delete F[c]; else F[c] = 1;
     D.groupes.forEach(g => g.sessions.forEach(x => x.mods.forEach(m => { if (m.code === c) m.finSes = !!F[c]; }))); sauver(); assistant(); return; }
+  const app = e.target.closest("[data-app]"); if (app && AS.on){ D.profPrio = app.dataset.app; sauver(); assistant(); return; }
   const apr = e.target.closest("[data-apr]"); if (apr && AS.on){ const [c, q] = apr.dataset.apr.split("|"); D.prio = D.prio || {}; if (q) D.prio[c] = q; else delete D.prio[c]; sauver(); assistant(); return; }
   const ch = e.target.closest("[data-chef]"); if (ch && AS.on){ AS.chef = ch.dataset.chef; assistant(); return; }
   const pp = e.target.closest("[data-pp]"); if (pp){ const pr = progAS(), A = (D.progProfs = D.progProfs || {}); let L = A[pr] || Object.keys(D.profs); L = L.includes(pp.dataset.pp) ? L.filter(x => x !== pp.dataset.pp) : [...L, pp.dataset.pp];
@@ -1004,8 +1033,8 @@ function etapesAs(){ const TOUS = Object.keys(D.profs), P = TOUS.filter(p => dan
   { const SP = sessionsProg(D.prog[progAS()] || { mods:[] }), sel = (AS.sesSel || []).length ? AS.sesSel : SP.map((x, i) => i + 1), communs = () => { const L = [];
       sel.forEach(n => (SP[n - 1] || []).forEach(m => { const qui = P.filter(q => m.code && (D.peut[q] || []).includes(m.code)); if (qui.length > 1 && !L.some(x => x.m.code === m.code)) L.push({ m, qui }); })); return L; };
     E.push({ t:"Enseignant prioritaire", q:"Dans les matières que plusieurs peuvent donner, un enseignant est-il prioritaire ?", f:() => { const L = communs();
-      return L.length ? `<p class="mini">Le prioritaire reçoit les heures de la matière avant les autres, jusqu'à ce que sa tâche soit complète. Laisse « Aucun » pour partager selon les tâches.</p>` + L.map(({ m, qui }) => `<p style="margin:10px 0 4px"><b>${m.num} · ${m.titre}</b></p><p style="margin:0">${[["", "Aucun"]].concat(qui.map(q => [q, D.profs[q]])).map(([q, n]) => `<span class="chip ${((D.prio || {})[m.code] || "") === q ? "on" : ""}" data-apr="${m.code}|${q}" style="padding:8px 12px;font-size:13px">${n}</span>`).join("")}</p>`).join("")
-        : `<p class="mini">Aucune matière n'est partagée entre plusieurs enseignants : rien à choisir ici.</p>`; } });
+      return `<p style="margin:0 0 4px"><b>Qui doit avoir sa tâche complète en premier ?</b> <span class="mini">Les autres se balancent ensuite plus facilement.</span></p><p>${[["", "Personne"]].concat(P.map(q => [q, D.profs[q]])).map(([q, n]) => `<span class="chip ${PPRIO() === q ? "on" : ""}" data-app="${q}" style="padding:8px 12px;font-size:13px">${n}</span>`).join("")}</p><hr style="border:0;border-top:1px solid var(--l);margin:12px 0">` + (L.length ? `<p class="mini">Le prioritaire reçoit les heures de la matière avant les autres, jusqu'à ce que sa tâche soit complète. Laisse « Aucun » pour partager selon les tâches.</p>` + L.map(({ m, qui }) => `<p style="margin:10px 0 4px"><b>${m.num} · ${m.titre}</b></p><p style="margin:0">${[["", "Aucun"]].concat(qui.map(q => [q, D.profs[q]])).map(([q, n]) => `<span class="chip ${((D.prio || {})[m.code] || "") === q ? "on" : ""}" data-apr="${m.code}|${q}" style="padding:8px 12px;font-size:13px">${n}</span>`).join("")}</p>`).join("")
+        : `<p class="mini">Aucune matière n'est partagée entre plusieurs enseignants.</p>`); } });
     /* 19 nov. (Jeremy) : cours dont les examens sont ensemble, la dernière semaine (ex. évent, alimentation, drainage : 30 h d'examens = une semaine pleine, sans plage verte) */
     E.push({ t:"Examens à la fin", q:"Des cours ont-ils leurs examens ensemble, la dernière semaine de la session ?", f:() => { const L = []; sel.forEach(n => (SP[n - 1] || []).forEach(m => { if (m.code && !L.some(x => x.code === m.code)) L.push(Object.assign({ _s:n }, m)); }));
       const F = D.finSesCodes || {}, tot = L.filter(m => F[m.code]).reduce((a, m) => a + Math.max(3, +m.ev || 0), 0);
@@ -1100,6 +1129,7 @@ function fiche(p){ FICHE = p; _calAbs(p); const c = $("#dlgC"), h2 = c.querySele
   const L = (D.sessProf || {})[p] || [];
   h2.insertAdjacentHTML("afterend", `<div class="form"><label>Nom<br><input data-pn="${p}" value="${D.profs[p]}"></label><label>Tâche prévue (heures dans l'année)<br><input data-pt="${p}" inputmode="numeric" value="${(D.cible || {})[p] || ""}" placeholder="ex. 450"></label></div>
     <p style="margin:10px 0 4px"><b>Tâche (contrat)</b> ${[100, 80, 60, 50].map(v => `<span class="chip ${contrat(p) === v ? "on" : ""}" data-ctr="${p}|${v}">${v} %</span>`).join("")} <input data-ctri="${p}" inputmode="numeric" value="${contrat(p)}" style="width:56px"> % <span class="mini">= ${hContrat(p)} h de cours par année</span></p>
+    <p style="margin:10px 0 4px"><b>Sa tâche se complète en premier</b> <span class="chip ${PPRIO() === p ? "on" : ""}" data-ppr="${p}">${PPRIO() === p ? "Oui" : "Non"}</span> <span class="mini">(un seul enseignant; les autres se balancent ensuite)</span></p>
     <p style="margin:10px 0 4px"><b>Enseigne en</b> ${[0, 1].map(i => `<span class="chip ${!L.length || L.includes(i) ? "on" : ""}" data-sp="${p}|${i}">Session ${i + 1}</span>`).join("")}</p>
     <p style="margin:10px 0 4px"><b>Modules qu'il peut donner</b></p><p>${codes.map(m => `<span class="chip ${(D.peut[p] || []).includes(m.code) ? "on" : ""}" data-pc="${p}|${m.code}" title="${m.titre}">${m.num} · ${m.titre}</span>`).join("")}</p><hr style="border:0;border-top:1px solid var(--l);margin:14px 0">`);
   if (!dlg.open) dlg.showModal(); }
