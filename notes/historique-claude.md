@@ -648,3 +648,4 @@
 - 2026-11-19 : horaire.html charge plein-ecran.js (numéro de version pour Jeremy + bouton plein écran).
 - 2026-11-19 : examens à la fin : semaine s._der réservée aux examens des cours finSes (les heures d'examen evH gardées pour cette semaine), plage verte enlevée (w.sansPV, h+2); question « Examens à la fin » dans l'assistant (D.finSesCodes, copiée dans ses.mods à la création).
 - 2026-11-19 : sessOk utilise demiAn(s) (parité du numéro de session : 1,3 = 1re moitié; 2,4 = 2e) au lieu du rang dans le groupe (bug : groupe « Session 4 » seul = rang 0). donnerNA(p, code) : cocher un module dans la fiche donne tout de suite ses heures « non assigné ». Fiche : seulement les modules des sessions où il enseigne (+ déjà cochés).
+- 2026-11-19 : fin de l'assistant horaire : autoRegler(gs) applique « Régler » sur tous les points rouges (6 tours max, sans messages), puis message « X points réglés, il reste Y ».

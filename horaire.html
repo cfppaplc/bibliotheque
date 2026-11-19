@@ -1006,7 +1006,19 @@ function lireAs(){ const v = id => { const x = document.getElementById(id); retu
 $("#dlgC").addEventListener("click", e => { const b = e.target.closest("[data-as]"); if (b && AS.on){ lireAs(); if (+b.dataset.as > 0 && document.getElementById("nN") && !AS.nom){ $("#nN").focus(); return; } AS.i += +b.dataset.as; assistant(); return; }
   if (e.target.id === "asCree" && AS.on){ AS.on = false; const faire = (nom, deb, tit, se) => { dlgNouveau(); $("#nN").value = nom; $("#nP").value = AS.prog; $("#nD").value = deb; $("#nT").value = tit || ""; $("#nS").value = se || 1; $("#nOk").click(); };
     D.prepare = 1; faire(AS.nom, AS.deb, AS.tit, AS.ses); const g1 = G;
-    if (AS.nom2){ faire(AS.nom2, AS.deb2 || AS.deb, "", AS.ses2); /* on rebâtit le 1er groupe en tenant compte du 2e, pour partager les profs */ G = g1; D.groupes[g1].sessions.forEach((x, i) => { S = i; remplir(x); }); S = 0; } dessiner(); } });
+    if (AS.nom2){ faire(AS.nom2, AS.deb2 || AS.deb, "", AS.ses2); /* on rebâtit le 1er groupe en tenant compte du 2e, pour partager les profs */ G = g1; D.groupes[g1].sessions.forEach((x, i) => { S = i; remplir(x); }); S = 0; }
+    { const gs = [g1].concat(AS.nom2 ? [D.groupes.length - 1] : []), n = autoRegler(gs); G = g1; S = 0; dessiner();
+      const reste = PROBS ? PROBS.filter(a => a.niv !== "j").length : 0;
+      setTimeout(() => alert(`L'horaire est bâti.${n ? ` ${n} point${n > 1 ? "s ont été réglés" : " a été réglé"} tout seul${n > 1 ? "s" : ""}.` : ""}${reste ? ` Il reste ${reste} point${reste > 1 ? "s" : ""} à voir (en haut).` : " Tout est correct."}`), 300); } } });
+/* 19 nov. (Jeremy : « après le pas à pas, il devrait y avoir presque aucune erreur ») : on applique « Régler » sur chaque point, plusieurs tours, sans message */
+function autoRegler(gs){ const a0 = window.alert, c0 = window.confirm, ouv = $("#alertes").dataset.ouv; window.alert = () => {}; window.confirm = () => false; $("#alertes").dataset.ouv = 1; let n = 0;
+  try { gs.forEach(gi => { const g = D.groupes[gi]; if (!g) return; G = gi;
+    g.sessions.forEach((x, si) => { S = si; let avant = 1e9; const rouges = () => { dessiner(); return (PROBS || []).filter(a => a.niv !== "j").length; }, d0 = rouges();
+      for (let tour = 0; tour < 6; tour++){ dessiner(); const L = (PROBS || []).filter(a => a.fx && a.niv !== "j"); if (!L.length || L.length >= avant) break; avant = L.length;
+        const vus = new Set(); L.forEach(a => { const cle = a.fx + "|" + (a.k || "") + "|" + (a.w == null ? "" : a.w); if (vus.has(cle)) return; vus.add(cle); try { regler(a); } catch(e){} }); }
+      n += Math.max(0, d0 - rouges()); }); }); }
+  finally { window.alert = a0; window.confirm = c0; if (ouv) $("#alertes").dataset.ouv = ouv; else delete $("#alertes").dataset.ouv; }
+  return n; }
 dlg.addEventListener("close", () => { AS.on = false; });
 /* ---- vérifications pendant l'assistant : propose tout de suite une correction ---- */
 function dispoAn(p){ let t = 0; const d = new Date(D.cal.debut + "T12:00"); d.setDate(d.getDate() - (d.getDay() + 6) % 7);
