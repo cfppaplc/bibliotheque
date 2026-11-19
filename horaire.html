@@ -350,10 +350,10 @@ function finaliserExamens(s){ const F = s.mods.filter(m => m.finSes && !m.autre)
   s.mods.forEach(m => { if (!m.autre && !m.finSes) grouperEval(s, m); }); }
 function derSemFin(s, E){ let der = s.sem.length - 1; const cours = i => (+s.sem[i].h || 0) - (s.sem[i].sansPV ? 2 : 0) - s.mods.reduce((a, m) => a + (m.autre && !/plage verte/i.test(m.titre) ? totalCase(s, i, m.k) : 0), 0);
   while (der > 0 && (s.sem[der].pf || cours(der) + 2 < Math.min(E, 30))) der--; return der; }
-function finSesDates(s){ delete s._der; const F = s.mods.filter(m => m.finSes && !m.autre); if (!F.length || !s.sem.length){ s.sem.forEach(w => { if (w.sansPV){ w.h -= 2; delete w.sansPV; } }); return; }
+function finSesDates(s){ delete s._der; const F = s.mods.filter(m => m.finSes && !m.autre); if (!F.length || !s.sem.length){ s.sem.forEach(w => { if (w.sansPV === 1){ w.h -= 2; delete w.sansPV; } }); return; }
   const der = s._der = derSemFin(s, F.reduce((a, m) => a + evH(m), 0));
   /* semaine des examens : on enlève la plage verte (2 h de plus pour les examens) */
-  s.sem.forEach((w, i) => { if (w.sansPV && i !== der){ w.h -= 2; delete w.sansPV; } });
+  s.sem.forEach((w, i) => { if (w.sansPV === 1 && i !== der){ w.h -= 2; delete w.sansPV; } });
   if (!s.sem[der].sansPV){ s.sem[der].h += 2; s.sem[der].sansPV = 1; } s.mods.filter(m => m.autre && /plage verte/i.test(m.titre)).forEach(m => fixer(s, der, m.k, "-", 0));
   const W = s.sem.slice(Math.max(0, der - 5), der + 1).filter(w => !w.pf), moy = W.reduce((a, w) => a + (+w.h || 0), 0) / Math.max(1, W.length);
   const par = Math.max(3, Math.min(MAXMOD(), moy / F.length));   /* heures par semaine de chaque cours quand ils roulent ensemble */
@@ -386,6 +386,9 @@ function remplir(s){ finSesDates(s); const garde = {}; s.sem.forEach((w, wi) => 
       const fait = q => { const pv = ((PREV[q] || {}).prev || [])[SI]; return (pv !== undefined && pv !== "") || cibleT(q) == null ? [FAIT[q] || 0, cibleS(q), prog] : [(FAIT[q] || 0) + autresAvant(q, w.d), cibleT(q), progT]; };
       const avance = q => { const [f, t, pr] = fait(q); return t == null ? 1e5 : t * pr - f; };   /* retard sur son rythme (toute la demi-année) */
       const p = libres.filter(q => { if (resteT(q) <= 0) return false; const [f, t, pr] = fait(q); return t == null || f + u <= t * pr + Math.max(9, t * .15); }).sort((x, y) => ((y === prioDe(m)) - (x === prioDe(m))) || (avance(y) - avance(x)))[0] || "-";   /* tâche pleine, en avance sur son rythme ou personne de libre → « non assigné », réparti sur toute la session */
+      /* 19 nov. (Jeremy) : personne de libre pour ce cours → on démarre un 4e cours dont un enseignant est libre, plutôt que de laisser des heures « non assigné » */
+      if (p === "-" && actifs.length < 4){ const n4 = attente.findIndex(x => !(x.apres && x.apres > finSem) && !bloque(x) && (x.profs || []).some(q => sessOk(q, s) && charge(q) + u <= Math.min(w.h, capProf(q, w.d)) && resteT(q) > 0));
+        if (n4 >= 0){ dansSem.set(m, (dansSem.get(m) || 0) - u); actifs.push(attente.splice(n4, 1)[0]); tour = actifs.length - 1; continue; } }
       fixer(s, wi, m.k, p, (cell(s, wi, m.k)[p] || 0) + u); if (p !== "-"){ TA[p] = (TA[p] || 0) + u; FAIT[p] = (FAIT[p] || 0) + u; } cap -= u; reste.set(m, reste.get(m) - u);
       if (p !== "-"){ const c = ((C[p] = C[p] || {})[w.d] = (C[p] || {})[w.d] || { h:0, max:w.h, grp:new Set() }); c.h += u; }
       if (reste.get(m) <= 0){ actifs.splice(actifs.indexOf(m), 1); ouvrir(); } else tour++; } });
@@ -839,6 +842,9 @@ function regler(a){ const s = ses(); let fait = 0, reste = ""; RAISON = "";
     if (!P.length) reste = `Personne n'a « ${m.titre} » de coché. Coche ce module pour un enseignant (Réglages → Enseignants), puis clique encore « Régler ».`;
     else s.sem.forEach((w, wi) => { let x = cell(s, wi, m.k)["-"] || 0; while (x > 0){ const q = avantPrio(m, P.filter(q => libre(q, w) > 0).sort((u, v) => resteT(v) - resteT(u)))[0]; if (!q) break;
       const u = Math.min(x, libre(q, w)); retirer(s, wi, m.k, u, "-"); ajout(s, wi, m.k, q, u); TA[q] = (TA[q] || 0) + u; x -= u; fait += u; } rest += x; });
+    /* 19 nov. (Jeremy) : il en reste → on permet un peu plus : jusqu'à 3 h au-dessus du maximum de la semaine et l'écart toléré au-dessus de la tâche */
+    if (P.length && rest){ rest = 0; s.sem.forEach((w, wi) => { let x = cell(s, wi, m.k)["-"] || 0; while (x > 0){ const q = avantPrio(m, P.filter(q => libre(q, w) + 3 > 0 && resteT(q) + TOL() > 0).sort((u, v) => resteT(v) - resteT(u)))[0]; if (!q) break;
+        const u = Math.min(x, libre(q, w) + 3, resteT(q) + TOL()); if (u <= 0) break; retirer(s, wi, m.k, u, "-"); ajout(s, wi, m.k, q, u); TA[q] = (TA[q] || 0) + u; x -= u; fait += u; } rest += x; }); }
     if (P.length && rest) reste = `${rest} h restent sans enseignant : ${P.map(q => D.profs[q]).join(", ")} ${P.length > 1 ? "sont pleins" : "est plein"} ces semaines-là. Coche ce module pour un autre enseignant, ou accepte de dépasser ${maxSem()} h.`; }
   if (a.fx === "max"){ const m = s.mods.find(x => x.k === a.k), e = totalCase(s, a.w, m.k) - MAXMOD();
     if (e > 0){ fait = sortir(s, m, a.w, w2 => okDate(m, w2), null, e); if (fait < e) reste = `Il reste ${e - fait} h de trop pour « ${m.titre} » cette semaine : les autres semaines sont pleines ou ses enseignants n'ont plus de place. ${RAISON}`; } }
@@ -865,7 +871,8 @@ function regler(a){ const s = ses(); let fait = 0, reste = ""; RAISON = "";
     if (e > 0) for (let wi = s.sem.length - 1; wi >= 0 && e > 0; wi--){ const r = retirer(s, wi, m.k, e); e -= r; fait += r; }
     else if (e < 0){ const n = -e, r = placer(s, m, n); fait = n - r;
       if (r > 0) reste = `Il reste ${r} h de « ${m.titre} » à placer, mais toutes les semaines sont pleines. ${RAISON}`; } }
-  if (a.fx === "sem"){ const wi = a.w, w = s.sem[wi]; let e = totSem(s, wi) - w.h;
+  if (a.fx === "sem" && !s.sem[a.w].sansPV && totSem(s, a.w) - s.sem[a.w].h <= 2){ s.sem[a.w].h += 2; s.sem[a.w].sansPV = 2; s.mods.filter(m => m.autre && /plage verte/i.test(m.titre)).forEach(m => fixer(s, a.w, m.k, "-", 0)); fait = 1; }   /* 19 nov. : 1 ou 2 h de trop → on enlève la plage verte de cette semaine */
+  else if (a.fx === "sem"){ const wi = a.w, w = s.sem[wi]; let e = totSem(s, wi) - w.h;
     const tot = m => s.sem.reduce((t, x, i) => t + totalCase(s, i, m.k), 0);
     s.mods.filter(m => !m.autre && tot(m) > HT(m)).forEach(m => { if (e <= 0) return; const r = retirer(s, wi, m.k, Math.min(e, tot(m) - HT(m))); e -= r; fait += r; });
     s.mods.filter(m => !m.autre).forEach(m => { if (e <= 0) return; const r = sortir(s, m, wi, w2 => okDate(m, w2), null, e, true); e -= r; fait += r; });

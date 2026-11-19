@@ -651,3 +651,4 @@
 - 2026-11-19 : fin de l'assistant horaire : autoRegler(gs) applique « Régler » sur tous les points rouges (6 tours max, sans messages), puis message « X points réglés, il reste Y ».
 - 2026-11-19 : finaliserExamens(s) (fin de remplir et de chaque regler) : examens des cours finSes ramenés dans s._der, rien après; fige() protège ces heures dans trou, bouger, grouperEval; echanger() = déplacement ou échange.
 - 2026-11-19 : moins sensible : TOL() (D.tol, 6 h par défaut, réglable dans Réglages → Enseignants) pour la balance des tâches (jaune jusqu'à 3×TOL), semaine qui manque ≤ 3 h = jaune, examen séparé = jaune.
+- 2026-11-19 : plus souple : remplir démarre un 4e cours si personne n'est libre pour le cours choisi; regler na = 2e passe (jusqu'à +3 h/semaine et +TOL sur la tâche); regler sem avec 1-2 h de trop = plage verte enlevée (w.sansPV = 2; 1 = semaine des examens).
