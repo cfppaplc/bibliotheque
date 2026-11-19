@@ -619,6 +619,17 @@ function vueSemaine(){ const s = ses(); SW = Math.max(0, Math.min(SW, s.sem.leng
     groupes.forEach((g, gi) => { if (R[gi][bi]) return; const L = restes[gi].filter(i => i.h > 0).sort((x, y) => (x.m.autre - y.m.autre) || ((y.h >= bh(gi, bi)) - (x.h >= bh(gi, bi))) || y.h - x.h);
       const i = L.find(z => z.p === "-" || (!pris.has(z.p) && !absent(z.p, dates[b.di], b.pm))); if (!i){ if (L.length) R[gi][bi] = { vide:true }; return; }
       if (i.p !== "-") pris.add(i.p); const u = Math.min(bh(gi, bi), i.h); i.h -= u; R[gi][bi] = { p:i.p, m:i.m, h:u }; }); });
+  /* 19 nov. (Jeremy : « aucun prof libre, ça ne devrait pas arriver ») : on déplace des cartes pour libérer l'enseignant (échange dans le groupe, ou dans l'autre groupe) */
+  { const occupe = (p, bi, sauf) => p !== "-" && (absent(p, dates[blocs[bi].di], blocs[bi].pm) || R.some((Ro, og) => og !== sauf && Ro[bi] && Ro[bi].p === p));
+    const mobile = c => c && !c.vide && !c.ev && c.m && !c.m.autre;
+    for (let tour = 0; tour < 3; tour++) groupes.forEach((g, gi) => blocs.forEach((b, bi) => { const c = R[gi][bi]; if (!c || !c.vide) return; const L = restes[gi].filter(i => i.h > 0);
+      for (const i of L) for (let bk = 0; bk < blocs.length; bk++){ if (bk === bi || bk === 7 || blocs[bk].h !== blocs[bi].h) continue; const c2 = R[gi][bk]; if (!mobile(c2)) continue;
+        if (occupe(c2.p, bi, gi) || occupe(i.p, bk, gi)) continue;
+        R[gi][bi] = c2; const u = Math.min(bh(gi, bk), i.h); i.h -= u; R[gi][bk] = { p:i.p, m:i.m, h:u }; return; }
+      for (const i of L){ if (i.p === "-") continue; const og = R.findIndex((Ro, o) => o !== gi && Ro[bi] && Ro[bi].p === i.p); if (og < 0) continue; const c3 = R[og][bi]; if (!mobile(c3)) continue;
+        for (let bk = 0; bk < blocs.length; bk++){ if (bk === bi || bk === 7 || blocs[bk].h !== blocs[bi].h) continue; const c4 = R[og][bk]; if (!mobile(c4) || c4.p === i.p) continue;
+          if (occupe(c4.p, bi, og) || occupe(c3.p, bk, og)) continue;
+          R[og][bi] = c4; R[og][bk] = c3; const u = Math.min(bh(gi, bi), i.h); i.h -= u; R[gi][bi] = { p:i.p, m:i.m, h:u }; return; } } })); }
   groupes.forEach((g, gi) => { const E = ((D.echanges || {})[g.nom] || {})[d] || []; E.forEach(([a, b]) => { if (blocs[a].h && blocs[b].h){ const t = R[gi][a]; R[gi][a] = R[gi][b]; R[gi][b] = t; } }); });
   groupes.forEach((g, gi) => Object.keys(g.fin).forEach(k => { if (evFait[gi].has(k)) return; let n = g.fin[k]; for (let bi = blocs.length - 1; bi >= 0 && n > 0; bi--){ const c = R[gi][bi]; if (c && c.m && c.m.k === k){ c.ev = 1; n -= c.h; } } }));
   const doubles = new Set(); blocs.forEach((b, bi) => { const vu = {}; groupes.forEach((g, gi) => { const c = R[gi][bi]; if (c && c.p && c.p !== "-"){ if (vu[c.p] != null){ doubles.add(gi + "|" + bi); doubles.add(vu[c.p] + "|" + bi); } else vu[c.p] = gi; } }); });
