@@ -190,6 +190,7 @@ const modsChoisis = (pr, deps) => { const sesDe = []; let c = 0, sn = 0; pr.mods
   const garde = new Set(); deps.forEach(d => { d = +d || 1; garde.add(d); if (d % 2) garde.add(d + 1); }); return pr.mods.filter((m, j) => garde.has(sesDe[j])); };
 /* sessions d'un programme (coupe à 450 h) : [[modules de la session 1], [session 2], ...] */
 const sessionsProg = pr => { const S = []; let c = 0; (pr ? pr.mods : []).forEach((m, j) => { if (!S.length || c >= 450){ S.push([]); c = 0; } S[S.length - 1].push(m); c += +m.h || 0; }); return S; };
+const MAXMOD = () => +((D && D.maxMod) || 15);
 const maxSem = () => { if (D && !D.max24){ D.max24 = 1; if (!D.maxSem || +D.maxSem === 18) D.maxSem = 24; } return +((D && D.maxSem) || 24); };   /* 18 nov. : 24 h par semaine (Jeremy) */
 function charges(){ const C = {};
   D.groupes.forEach(g => g.sessions.forEach(s => s.sem.forEach((w, wi) => { const W = s.g[wi] || {};
@@ -321,8 +322,11 @@ function remplir(s){ const garde = {}; s.sem.forEach((w, wi) => { const W = s.g[
   const cibleS = q => { const pv = ((PREV[q] || {}).prev || [])[SI]; if (pv !== undefined && pv !== "") return +pv; const t = cibleT(q); return t == null ? null : Math.max(0, t - (FSEM[q] || 0)); };
   s.sem.forEach((w, wi) => { cumH += +w.h || 0; const prog = cumH / totH, progT = Math.min(1, (+new Date(w.d) + 7 * 864e5 - d0) / (d1 - d0)); finSem = (() => { const z = new Date(w.d + "T12:00"); z.setDate(z.getDate() + 4); return iso(z); })(); let cap = w.h - s.mods.reduce((a, m) => a + (m.autre ? totalCase(s, wi, m.k) : 0), 0), tour = 0, garde = 0; ouvrir();
     const charge = p => (((C[p] || {})[w.d] || {}).h || 0);
-    while (cap > 0 && actifs.length && garde++ < 200){ const m = actifs[tour % actifs.length];
-      const u = Math.min(cap, 3, reste.get(m));
+    const dansSem = new Map();   /* 19 nov. : au plus 15 h d'un même module par semaine (D.maxMod) */
+    while (cap > 0 && actifs.length && garde++ < 200){ let m = actifs[tour % actifs.length];
+      if ((dansSem.get(m) || 0) >= MAXMOD()){ const autre = actifs.find(x => (dansSem.get(x) || 0) < MAXMOD());
+        if (autre) m = autre; else { const n = attente.findIndex(x => !(x.apres && x.apres > finSem)); if (n < 0) break; actifs.push(attente.splice(n, 1)[0]); continue; } }   /* tous au maximum : on ouvre un module de plus */
+      const u = Math.min(cap, 3, reste.get(m), MAXMOD() - (dansSem.get(m) || 0)); dansSem.set(m, (dansSem.get(m) || 0) + u);
       const libres = m.profs.filter(q => sessOk(q, s) && charge(q) + u <= Math.min(w.h, capProf(q, w.d))), resteT = q => { const pv = ((PREV[q] || {}).prev || [])[SI]; if (pv !== undefined && pv !== "") return +pv - (FAIT[q] || 0);
         const tp = (D.tacheProf || {})[q]; if (tp && (tp.s1 !== undefined || tp.s2 !== undefined)) return (+(PAIR ? tp.s2 : tp.s1) || 0) - (FSEM[q] || 0) - (FAIT[q] || 0);
         return (+((D.cible || {})[q]) || 1e6) - (TA[q] || 0); };
