@@ -653,3 +653,4 @@
 - 2026-11-19 : moins sensible : TOL() (D.tol, 6 h par défaut, réglable dans Réglages → Enseignants) pour la balance des tâches (jaune jusqu'à 3×TOL), semaine qui manque ≤ 3 h = jaune, examen séparé = jaune.
 - 2026-11-19 : plus souple : remplir démarre un 4e cours si personne n'est libre pour le cours choisi; regler na = 2e passe (jusqu'à +3 h/semaine et +TOL sur la tâche); regler sem avec 1-2 h de trop = plage verte enlevée (w.sansPV = 2; 1 = semaine des examens).
 - 2026-11-19 : trou juste avant la semaine des examens : on avance les heures des cours finSes (examens commencent plus tôt, la session finit plus tôt dans la dernière semaine); finaliserExamens ne ramène pas l'examen si la semaine des examens n'est pas pleine.
+- 2026-11-19 (14 h 17) : retour en arrière sur « examens plus tôt » : la semaine des examens reste pleine; la semaine juste avant (s._der - 1) peut être à moitié vide sans alerte (Jeremy).

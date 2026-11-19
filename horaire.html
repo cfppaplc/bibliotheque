@@ -257,7 +257,7 @@ function dessiner(){ if (D.groupes.some(g => remplirTrous(g))) sauver();
   h += `</tbody><tfoot><tr><td class="nom"><b>Heures de la semaine</b></td>`;
   s.sem.forEach((w, wi) => { const t = s.mods.reduce((a, m) => a + totalCase(s, wi, m.k), 0), cl = t > w.h ? "w-trop" : t < w.h ? "w-manque" : "";
     if (t > w.h) prob.push({ t:`Semaine du ${jm(w.d)} : ${t} h placées pour ${w.h} h (enlève ${t - w.h} h)`, w:wi, fx:"sem" });
-    if (t < w.h && !w.pf && wi < s.sem.length - 1 && s.sem.slice(wi + 1).some((x, j) => !x.pf && s.mods.some(m => !m.autre && totalCase(s, wi + 1 + j, m.k)))) prob.push({ t:`Semaine du ${jm(w.d)} : ${t} h placées pour ${w.h} h (il manque ${w.h - t} h de cours)`, w:wi, fx:"trou", niv:w.h - t <= 3 ? "j" : "" });
+    if (t < w.h && !w.pf && wi < s.sem.length - 1 && !(s._der != null && wi === s._der - 1 && t >= w.h / 2) && s.sem.slice(wi + 1).some((x, j) => !x.pf && s.mods.some(m => !m.autre && totalCase(s, wi + 1 + j, m.k)))) prob.push({ t:`Semaine du ${jm(w.d)} : ${t} h placées pour ${w.h} h (il manque ${w.h - t} h de cours)`, w:wi, fx:"trou", niv:w.h - t <= 3 ? "j" : "" });   /* 19 nov. : la dernière semaine de cours avant celle des examens peut être à moitié vide (voir la condition) */
     h += `<td class="${cl}"><div class="jauge"><i style="height:${Math.min(100, w.h ? t / w.h * 100 : 0)}%"></i></div>${t}/${w.h}</td>`; });
   h += `</tr></tfoot></table>`;
   s.sem.forEach((w, wi) => { const par = {}; let hMax = 0, cg = 0; for (let i = 0; i < 5; i++){ const x = new Date(w.d + "T12:00"); x.setDate(x.getDate() + i); const j = iso(x); if (j < D.cal.debut || j > finMax()) continue; const ty = jourType(j), hj = HJOUR[x.getDay()];
@@ -345,7 +345,7 @@ function finaliserExamens(s){ const F = s.mods.filter(m => m.finSes && !m.autre)
   if (s._der == null || s._der >= s.sem.length) s._der = derSemFin(s, F.reduce((a, m) => a + evH(m), 0)); const der = s._der;
   F.forEach(m => {
     for (let wi = der + 1; wi < s.sem.length; wi++) for (const p of Object.keys(cell(s, wi, m.k))){ let x = cell(s, wi, m.k)[p] || 0, g = 0; while (x > 0 && g++ < 20){ const y = echanger(s, m, p, wi, der, x); if (!y) break; x -= y; } }
-    let manque = totSem(s, der) < s.sem[der].h ? 0 : evH(m) - totalCase(s, der, m.k);   /* semaine des examens pas pleine : les examens ont commencé plus tôt (fin plus tôt), on les laisse */
+    let manque = evH(m) - totalCase(s, der, m.k);
     for (let wi = der - 1; wi >= 0 && manque > 0; wi--) for (const p of Object.keys(cell(s, wi, m.k))){ if (manque <= 0) break; let x = Math.min(manque, cell(s, wi, m.k)[p] || 0), g = 0; while (x > 0 && g++ < 20){ const y = echanger(s, m, p, wi, der, x); if (!y) break; x -= y; manque -= y; } } });
   s.mods.forEach(m => { if (!m.autre && !m.finSes) grouperEval(s, m); }); }
 function derSemFin(s, E){ let der = s.sem.length - 1; const cours = i => (+s.sem[i].h || 0) - (s.sem[i].sansPV ? 2 : 0) - s.mods.reduce((a, m) => a + (m.autre && !/plage verte/i.test(m.titre) ? totalCase(s, i, m.k) : 0), 0);
@@ -859,10 +859,6 @@ function regler(a){ const s = ses(); let fait = 0, reste = ""; RAISON = "";
         const L = s.mods.filter(m => !m.autre && !fige(s, m, wj) && !(m.finSes && s._der != null && wi > s._der) && okDate(m, w) && totalCase(s, wj, m.k)).sort((x, y) => ici(y) - ici(x));   /* d'abord les modules déjà commencés */
         for (const m of L) for (const p of Object.keys(cell(s, wj, m.k))){ if (manque <= 0) break; const x = Math.min(manque, cell(s, wj, m.k)[p], capM(s, wi, m.k), p === "-" ? 99 : Math.max(0, libre(p, w))); if (x <= 0) continue;
           retirer(s, wj, m.k, x, p); ajout(s, wi, m.k, p, x); manque -= x; fait += x; } }
-      /* 19 nov. (Jeremy : « on finit juste plus tôt ») : juste avant la semaine des examens, il n'y a plus rien d'autre à avancer → les examens commencent plus tôt et la session finit plus tôt dans la dernière semaine */
-      if (manque > 0 && s._der != null && wi === s._der - 1){ const de = s._der, w = s.sem[wi];
-        for (const m of s.mods.filter(m => m.finSes && !m.autre)) for (const p of Object.keys(cell(s, de, m.k))){ if (manque <= 0) break; const x = Math.min(manque, cell(s, de, m.k)[p], capM(s, wi, m.k), p === "-" ? 99 : Math.max(0, libre(p, w))); if (x <= 0) continue;
-          retirer(s, de, m.k, x, p); ajout(s, wi, m.k, p, x); manque -= x; fait += x; } }
       if (wi === a.w) n = manque; }
     /* dernière session : on enlève les semaines du bout qui n'ont plus de cours */
     const L = grp().sessions; if (s === L[L.length - 1]) while (s.sem.length > 1 && !s.mods.some(m => !m.autre && totalCase(s, s.sem.length - 1, m.k))){ delete s.g[s.sem.length - 1]; s.sem.pop(); }
