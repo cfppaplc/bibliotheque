@@ -370,7 +370,7 @@ function equilibrer(g){ let bouge = 0; const G0 = G; G = D.groupes.indexOf(g);
   g.sessions.slice(0, 2).forEach((s, si) => {
     s.mods.forEach(m => { if (!m.autre && s.sem.some((w, wi) => cell(s, wi, m.k)["-"])){ const S0 = S; S = si; const a0 = window.alert; window.alert = () => {}; regler({ fx:"na", k:m.k }); window.alert = a0; S = S0; } });
     const placeP = p => { let t = 0; s.sem.forEach((w, wi) => s.mods.forEach(m => { if (!m.autre) t += cell(s, wi, m.k)[p] || 0; })); return t; };
-    const prevP = p => { const v = (((g.taches || {})[p] || {}).prev || [])[si]; return v === undefined || v === "" ? null : +v; };
+    const prevP = p => prevDe(g, si, p);
     for (let tour = 0; tour < 60; tour++){ const P = Object.keys(D.profs).filter(p => prevP(p) != null), haut = P.filter(p => placeP(p) > prevP(p)), bas = P.filter(p => placeP(p) < prevP(p)); if (!haut.length || !bas.length) break; let fait = 0;
       for (const p of haut) for (const q of bas){ for (let wi = 0; wi < s.sem.length && !fait; wi++){ const w = s.sem[wi];
         for (const m of s.mods){ if (m.autre || !cell(s, wi, m.k)[p] || !profsDe(m).includes(q) || !sessOk(q, s)) continue; const x = Math.min(3, cell(s, wi, m.k)[p], placeP(p) - prevP(p), prevP(q) - placeP(q), Math.max(0, libre(q, w))); if (x <= 0) continue;
@@ -384,7 +384,7 @@ function tachesTableau(){ const g = grp(); g.taches = g.taches || {}; const T = 
   const attendu = g.sessions.slice(0, 2).reduce((a, s) => a + s.mods.reduce((u, m) => u + (m.autre ? 0 : HT(m) + (+m.ev || 0)), 0), 0);
   let h = `<h2 style="margin-top:0">Tâches annuelles · ${g.nom}</h2><p class="mini" style="margin-top:-6px">Commence par la <b>tâche régulière prévue</b> de chaque enseignant (comme dans ton Excel). Sous chaque case : ce qui est placé dans l'horaire (vert = pareil, rouge = différent).</p>
   <div style="overflow:auto"><table class="t ttache"><tr><th rowspan="2">Enseignant</th><th colspan="2" style="background:#1B2A41;color:#fff">Tâche régulière</th><th colspan="2">Évaluation</th>` + M.map(x => `<th colspan="2">${x.split("|")[1]}</th>`).join("") + `<th colspan="2">Total</th><th rowspan="2">Total annuel</th></tr><tr>` + "<th>S1</th><th>S2</th>".repeat(7) + `</tr>`;
-  let tt = 0; Object.keys(D.profs).forEach(p => { const t = T[p] || { reg:[0,0], ev:[0,0] }, x = g.taches[p] = g.taches[p] || {}, s1 = [0, 0], pv = x.prev || [];
+  let tt = 0; Object.keys(D.profs).forEach(p => { const t = T[p] || { reg:[0,0], ev:[0,0] }, x = g.taches[p] = g.taches[p] || {}, s1 = [0, 0], pv = pvDe(g, p);
     h += `<tr><td style="text-align:left;white-space:nowrap"><i class="av" style="background:${couleur(p)};width:24px;height:24px;font-size:9px;vertical-align:middle;margin-right:6px">${p}</i><b>${D.profs[p]}</b></td>` +
       [0, 1].map(i => { const prev = pv[i] === undefined || pv[i] === "" ? null : +pv[i], pl = t.reg[i], v = prev == null ? pl : prev; s1[i] += v; col[i] += v;
         return `<td><input data-t="${p}|prev|${i}" value="${prev == null ? "" : prev}" placeholder="${pl || ""}"><div style="font-size:11px;font-weight:700;color:${prev == null ? "var(--gris)" : prev === pl ? "var(--ok)" : "var(--err)"}">placé ${pl}</div></td>`; }).join("") +
@@ -429,7 +429,7 @@ function taches(){ const g = grp(); if (!g) return; g.taches = g.taches || {}; c
     <div style="font-size:15px">${ok ? `<b style="color:var(--ok)">Ça balance.</b>` : donne < magique ? `Il manque <b style="color:var(--err)">${magique - donne} h</b>${na ? ` (dont ${na} h de cours sans enseignant)` : ""}.` : `<b style="color:var(--err)">${donne - magique} h de trop.</b>`} <span class="mini">Le chiffre magique, ${magique} h, = les heures du programme + les examens.</span></div></div>
     <div style="display:flex;flex-direction:column;gap:8px;justify-content:center">${na ? `<button class="prim" id="tEq" style="font-size:15px;padding:10px 16px">Donner les heures sans enseignant</button>` : `<button class="prim" id="tEq" style="font-size:15px;padding:10px 16px">Équilibrer selon les tâches prévues</button>`}<button id="tTab">Voir le tableau complet (comme l'Excel)</button></div></div>
   <p class="mini" style="margin:14px 2px 8px">Pour diviser une tâche : touche un module dans la carte d'un enseignant, puis choisis à qui le passer.</p><div class="tCartes">`;
-  Object.keys(D.profs).forEach(p => { const t = T[p] || { reg:[0,0], ev:[0,0] }, x = g.taches[p] = g.taches[p] || {}, pv = x.prev || [], tot = [0, 1].map(i => t.reg[i] + t.ev[i] + extra(x, i)), an = tot[0] + tot[1];
+  Object.keys(D.profs).forEach(p => { const t = T[p] || { reg:[0,0], ev:[0,0] }, x = g.taches[p] = g.taches[p] || {}, pv = pvDe(g, p), tot = [0, 1].map(i => t.reg[i] + t.ev[i] + extra(x, i)), an = tot[0] + tot[1];
     h += `<div class="tCarte"><div class="tTete"><i class="av" style="background:${couleur(p)}">${p}</i><div style="flex:1"><b style="font-size:17px">${D.profs[p]}</b><div class="mini">Total de l'année ici : <b style="color:var(--encre,#1B2A41);font-size:15px">${an} h</b> · contrat ${contrat(p)} % = ${hContrat(p)} h de cours (tous programmes)</div></div></div>
       <div class="tSes">${[0, 1].slice(0, NS).map(i => { const prev = pv[i] === undefined || pv[i] === "" ? null : +pv[i], ec = prev == null ? 0 : t.reg[i] - prev;
         const mods = g.sessions[i].mods.filter(m => !m.autre).map(m => [m, g.sessions[i].sem.reduce((a, w, wi) => a + (cell(g.sessions[i], wi, m.k)[p] || 0), 0)]).filter(z => z[1]);
@@ -829,7 +829,15 @@ document.addEventListener("click", e => { const b = e.target.closest("[data-acc]
 document.addEventListener("click", e => { const b = e.target.closest("[data-fx]"); if (!b) return; e.stopPropagation(); regler(PROBS[+b.dataset.fx]); }, true);
 document.addEventListener("click", e => { const b = e.target.closest("[data-fxp]"); if (!b) return; e.stopPropagation(); const [i, q] = b.dataset.fxp.split("|"); regler(Object.assign({}, PROBS[+i], { donner:q })); }, true);
 /* 19 nov. (Jeremy) : « il manque des heures » → on choisit à quel enseignant les donner */
-function prevTache(q){ const g = grp(); if (!g || S > 1) return null; const v = (((g.taches || {})[q] || {}).prev || [])[S]; return v === undefined || v === "" ? null : +v; }
+function prevTache(q){ const g = grp(); if (!g || S > 1) return null; return prevDe(g, S, q); }
+/* 19 nov. (Jeremy) : la tâche entrée dans l'assistant (D.tacheProf : heures de la demi-année, tous groupes) suit jusqu'au tableau des tâches du groupe.
+   Heures prévues d'un enseignant dans une session du groupe = ce qui est écrit dans le tableau, sinon sa tâche de la demi-année moins ses heures dans ses autres groupes à la même demi-année. */
+function prevDe(g, si, p){ const v = (((g.taches || {})[p] || {}).prev || [])[si]; if (v !== undefined && v !== "") return +v;
+  const s = g.sessions[si], tp = (D.tacheProf || {})[p]; if (!s || !tp || !sessOk(p, s) || !dansProg(p, g.prog)) return null;
+  const pair = x => !((parseInt((x.nom || "").replace(/\D/g, "")) || 1) % 2), cle = pair(s) ? "s2" : "s1"; if (tp[cle] === undefined || tp[cle] === "") return null;
+  let autres = 0; D.groupes.forEach(h => { if (h === g) return; h.sessions.forEach(z => { if (pair(z) !== pair(s)) return; z.sem.forEach((w, wi) => z.mods.forEach(m => { if (!m.autre) autres += cell(z, wi, m.k)[p] || 0; })); }); });
+  return Math.max(0, +tp[cle] - autres); }
+const pvDe = (g, p) => [0, 1].map(i => { const v = prevDe(g, i, p); return v == null ? "" : v; });
 function resteTache(q){ const pv = prevTache(q); if (pv == null) return null; const s = ses(); let t = 0; s.sem.forEach((w, wi) => s.mods.forEach(m => { if (!m.autre) t += cell(s, wi, m.k)[q] || 0; })); return pv - t; }
 function donnerA(a){ const L = donnerA0(a), R = q => { const r0 = resteTache(q); return r0 == null ? -1e6 : r0; }; return avantPrio(ses().mods.find(x => x.k === a.k), L.sort((u, v) => R(v) - R(u))); }
 function nomDonner(q){ const r0 = resteTache(q), n = String(D.profs[q] || q).split(" ")[0]; return r0 == null ? n : n + (r0 > 0 ? ` (manque ${r0} h)` : r0 < 0 ? ` (${-r0} h de trop)` : " (complet)"); }
