@@ -669,3 +669,4 @@
 - 2026-11-20 : rond de la gomme (#gommeRond) caché au lever du doigt/stylet et quand la gomme n'est plus choisie (gommeRondCacher dans refreshTools); tableau-blanc.js?v=7, lecteur.js?v=9.
 - 2026-11-20 : tableau blanc → élèves par code QR : COFFRE.partager/lirePartage/retirerPartage (coffre.js?v=4, AES-GCM, clé dans le #, env « partage », jeton gardé dans localStorage.wbPartages); wbPartager(pret), capturerZone (zones → CAPT, barre #captBar), imageTableau() extrait de wbEnregistrer; boutons wbCapt et wbQr dans ⋯ (rangée Image); page publique partage.html (PNG à l'enregistrement); confidentialite.html mise à jour; Quoi de neuf.
 - 2026-11-20 : « Aux élèves (QR) » = seulement le tableau affiché (Jeremy).
+- 2026-11-20 : tableau blanc : la poubelle (#penC) supprime le tableau affiché s'il en reste d'autres (sinon vide le dernier); lecteur.js?v=12.

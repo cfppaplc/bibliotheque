@@ -779,7 +779,10 @@ $("#penO").onclick = () => { RD.obj = !RD.obj; if (RD.obj){ RD.text = false; RD.
   if (RD.obj) aviser(modeElec() ? "Échelle L1 / L2 : trace les rails, pose un symbole sur un échelon, relie les points bleus." : RD.objTab === "iso" ? "Touche un objet pour le choisir. Double-clic : le nommer." : "Touche une forme pour la choisir. Double-clic : écrire sa valeur.", modeElec() ? 10000 : 0); };
 $("#penT").onclick = () => { RD.text = !RD.text; if (RD.text){ RD.eraser = false; RD.obj = false; } refreshTools(); if (RD.text) aviser("Touche le tableau (ou dessine un rectangle), puis écris. Entrée = nouvelle ligne; touche à côté pour terminer."); };
 $("#wbZo").onclick = zout; $("#wbZi").onclick = zin; $("#penU").onclick = undoInk; $("#penR").onclick = redoInk;
-$("#penC").onclick = () => { if (!strokes().length) return; snapInk(); INKS[inkKey()] = []; redrawInk(); };
+$("#penC").onclick = () => { const st = RD.wb ? wbEtat() : null;
+  /* 20 nov. (Jeremy) : tableau blanc, la poubelle supprime le tableau lui-même (s'il en reste d'autres) */
+  if (st && st.count > 1){ const n = st.n; retirerTableau(n); try { SELO.s = null; window.SELM = []; } catch(e){} majFond(); redrawInk(); refreshTools(); aviser("Tableau " + n + " supprimé."); return; }
+  if (!strokes().length) return; snapInk(); INKS[inkKey()] = []; redrawInk(); };
 $("#penX").onclick = () => { const w = RD.wb; RD.pen = false; RD.eraser = false; RD.text = false; if (w){ RD.wb = true; toggleWb(); } else { RD.wb = false; refreshTools(); } };
 
 /* ---- Ouvrir et fermer le lecteur ---- */
