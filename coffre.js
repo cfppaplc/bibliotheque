@@ -200,5 +200,17 @@ window.COFFRE = (function(){
     const u = unb64(row.data), k = await sub.importKey("raw", brut.subarray(0, 32), "AES-GCM", false, ["decrypt"]);
     return JSON.parse(dec.decode(await gz(new Uint8Array(await sub.decrypt({ name:"AES-GCM", iv:u.subarray(0, 12) }, k, u.subarray(12))), false))); }
   async function jeter(nom){ const D = await ouvrirDepot(nom); if (!D) return true; return (await rpc("coffre_effacer", { p_id:D.id, p_jeton:b64(D.brut.subarray(32, 64)) })) === true; }
-  return { demarrer, quitter, oublier, pousser, etat:() => ETAT, session, vu, stat, statsLire, envoyer, recevoir, effacer, deposer, prendre, jeter, emballer, lireLigne };
+  /* 20 nov. (Jeremy : envoyer le tableau blanc aux élèves par code QR) : partage chiffré; la clé reste dans le lien (#...), jamais envoyée au serveur.
+     Rien sur les élèves : seulement les dessins de l'enseignant. Le jeton (gardé chez l'enseignant) permet d'arrêter le partage. */
+  const b64u = u => b64(u).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, ""), unb64u = s => unb64(s.replace(/-/g, "+").replace(/_/g, "/") + "===".slice((s.length + 3) % 4));
+  async function partager(obj){ const brut = crypto.getRandomValues(new Uint8Array(64)), id = [...crypto.getRandomValues(new Uint8Array(32))].map(x => x.toString(16).padStart(2, "0")).join("");
+    const k = await sub.importKey("raw", brut.subarray(0, 32), "AES-GCM", false, ["encrypt"]), iv = crypto.getRandomValues(new Uint8Array(12));
+    const c = new Uint8Array(await sub.encrypt({ name:"AES-GCM", iv }, k, await gz(enc.encode(JSON.stringify(obj)), true))), out = new Uint8Array(12 + c.length); out.set(iv); out.set(c, 12);
+    if (await rpc("coffre_ecrire", { p_id:id, p_jeton:b64(brut.subarray(32, 64)), p_env:"partage", p_data:b64(out) }) !== true) throw new Error("partage refusé");
+    return { id, cle:b64u(brut.subarray(0, 32)), jeton:b64(brut.subarray(32, 64)) }; }
+  async function lirePartage(id, cle){ const r = await rpc("coffre_lire", { p_id:id }), row = r && r[0]; if (!row || !row.data) return null;
+    const u = unb64(row.data), k = await sub.importKey("raw", unb64u(cle), "AES-GCM", false, ["decrypt"]);
+    return JSON.parse(dec.decode(await gz(new Uint8Array(await sub.decrypt({ name:"AES-GCM", iv:u.subarray(0, 12) }, k, u.subarray(12))), false))); }
+  const retirerPartage = (id, jeton) => rpc("coffre_effacer", { p_id:id, p_jeton:jeton });
+  return { partager, lirePartage, retirerPartage, demarrer, quitter, oublier, pousser, etat:() => ETAT, session, vu, stat, statsLire, envoyer, recevoir, effacer, deposer, prendre, jeter, emballer, lireLigne };
 })();

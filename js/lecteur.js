@@ -688,7 +688,13 @@ majEpaisseur();
   const bsch = document.createElement("button"); bsch.id = "wbSch"; bsch.dataset.lab = "Mes schémas et modèles"; bsch.title = "Enregistrer, rouvrir, exporter un tableau; circuits prêts à utiliser";
   bsch.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h12l4 4v12H4z"/><path d="M8 4v5h7V4M8 20v-6h8v6"/></svg>';
   bsch.onclick = () => { fermer(); ouvrirSchemas(); };
-  pp.appendChild(rang("Image", [nomme("wbS", "Enregistrer en PNG")], true));
+  { const q = document.createElement("button"); q.id = "wbQr"; q.type = "button"; q.title = "Envoyer les tableaux aux élèves avec un code QR";
+    q.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h2v2h-2zM18 18h2v2h-2zM14 18h2M18 14h2"/></svg>';
+    q.onclick = () => { try { wbPartager(); } catch(e){} }; q.dataset.lab = "Aux élèves (QR)";
+    const z = document.createElement("button"); z.id = "wbCapt"; z.type = "button"; z.title = "Choisir une zone de l'écran à envoyer aux élèves";
+    z.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 8V4h4M16 4h4v4M20 16v4h-4M8 20H4v-4"/><rect x="8" y="8" width="8" height="8" rx="1"/></svg>';
+    z.onclick = () => { try { capturerZone(); } catch(e){} }; z.dataset.lab = "Capturer une zone";
+    pp.appendChild(rang("Image", [nomme("wbS", "Enregistrer en PNG"), z, q], true)); }
   pp.appendChild(rang("Schémas", [bsch], true));
   /* ligne principale */
   bar.querySelectorAll(":scope > .sep").forEach(e => e.remove());
@@ -703,7 +709,7 @@ majEpaisseur();
   bar.addEventListener("click", e => { const t = e.target; if (!t.closest) return;
     if (!pp.hidden && !pp.contains(t) && !t.closest("#penPlus")){ pp.hidden = true; bp.classList.remove("open"); }
     if (!pc.hidden && !pc.contains(t) && !t.closest("#penCol")){ pc.hidden = true; bc.classList.remove("open"); }
-    if (!pp.hidden && t.closest("#penC, #wbPlus, #wbS")) setTimeout(fermer, 60); }, true);   /* Tout effacer, Nouveau, Enregistrer : le menu se ferme; zoom et flèches de tableaux le gardent ouvert */
+    if (!pp.hidden && t.closest("#penC, #wbPlus, #wbS, #wbQr, #wbCapt")) setTimeout(fermer, 60); }, true);   /* Tout effacer, Nouveau, Enregistrer : le menu se ferme; zoom et flèches de tableaux le gardent ouvert */
   const fermer = () => { pc.hidden = pp.hidden = true; bc.classList.remove("open"); bp.classList.remove("open"); };
   const basculer = (p, b) => { const ouvrir = p.hidden; fermer(); if (ouvrir){ p.hidden = false; b.classList.add("open"); } };
   /* toucher « Couleur » ramène toujours au crayon (quitte l'efface, le texte ou les objets) */

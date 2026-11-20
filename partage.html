@@ -1,0 +1,45 @@
+<!doctype html>
+<!-- © 2026 Jérémy Raymond. Tous droits réservés. Métier+ — tableaux blancs partagés aux élèves par code QR (20 nov.).
+     Page publique : la clé est dans le lien (#...) et n'est jamais envoyée au serveur. Aucune donnée d'élève. -->
+<html lang="fr"><head><meta charset="utf-8"><meta name="robots" content="noindex"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Métier+ — Tableau blanc</title>
+<style>
+html,body{margin:0;background:#eef1f5;color:#1E2A44;font:500 16px/1.45 "Segoe UI",Roboto,system-ui,sans-serif}
+header{background:#161d2c;color:#fff;padding:14px 18px;display:flex;align-items:center;gap:12px;border-bottom:3px solid #EB6A22}
+header img{height:30px}
+header h1{font-size:18px;margin:0;font-weight:700}
+header small{display:block;color:#aab3bd;font-weight:500;font-size:13px}
+main{max-width:1100px;margin:0 auto;padding:16px}
+.carte{background:#fff;border-radius:14px;box-shadow:0 4px 16px rgba(20,30,50,.08);margin:0 0 18px;overflow:hidden}
+.carte img{display:block;width:100%;height:auto}
+.pied{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;gap:10px}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 16px;border-radius:10px;border:0;background:#EB6A22;color:#fff;font:700 15px inherit;text-decoration:none;cursor:pointer}
+.btn.sec{background:#1E2A44}
+.msg{background:#fff;border-radius:14px;padding:22px;text-align:center;margin-top:20px}
+.haut{display:flex;justify-content:flex-end;gap:10px;margin-bottom:14px}
+@media print{header,.pied,.haut{display:none}body{background:#fff}.carte{box-shadow:none;break-inside:avoid;margin:0 0 10px}}
+</style></head><body>
+<header><img src="img/metier-plus.png" alt="" onerror="this.remove()"><div><h1 id="titre">Tableau blanc</h1><small id="sous">Chargement…</small></div></header>
+<main id="m"></main>
+<script src="coffre.js?v=4"></script>
+<script>
+(async function(){
+  const m = document.getElementById("m"), q = new URLSearchParams(location.search), id = q.get("i"), cle = location.hash.slice(1);
+  const msg = t => { m.innerHTML = '<div class="msg"></div>'; m.firstChild.textContent = t; document.getElementById("sous").textContent = ""; };
+  if (!id || !cle || !window.COFFRE){ msg("Ce lien n'est pas complet. Scanne de nouveau le code QR de ton enseignant."); return; }
+  let d = null; try { d = await COFFRE.lirePartage(id, cle); } catch(e){ d = undefined; }
+  if (d === undefined){ msg("Impossible d'ouvrir ce partage. Vérifie ta connexion Internet, puis réessaie."); return; }
+  if (!d || !Array.isArray(d.imgs)){ msg("Ce partage n'existe plus : ton enseignant l'a arrêté."); return; }
+  document.getElementById("titre").textContent = d.titre || "Tableau blanc"; document.title = "Métier+ — " + (d.titre || "Tableau blanc");
+  document.getElementById("sous").textContent = d.imgs.length + " tableau" + (d.imgs.length > 1 ? "x" : "");
+  const haut = document.createElement("div"); haut.className = "haut"; haut.innerHTML = '<button class="btn sec" type="button">Imprimer</button>'; haut.firstChild.onclick = () => print(); m.append(haut);
+  d.imgs.forEach((src, i) => { const c = document.createElement("div"); c.className = "carte";
+    c.innerHTML = '<img alt=""><div class="pied"><b></b><a class="btn">Enregistrer l\'image</a></div>';
+    c.querySelector("img").src = src; c.querySelector("img").alt = "Tableau " + (i + 1); c.querySelector("b").textContent = "Tableau " + (i + 1);
+    const nom = (d.titre || "tableau").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/gi, "-").toLowerCase() + "-" + (i + 1) + ".png";
+    const a = c.querySelector("a"); a.href = "#"; a.textContent = "Enregistrer en PNG";
+    a.onclick = e => { e.preventDefault(); const im = c.querySelector("img"), cv = document.createElement("canvas"); cv.width = im.naturalWidth; cv.height = im.naturalHeight; cv.getContext("2d").drawImage(im, 0, 0);
+      cv.toBlob(b => { const l = document.createElement("a"); l.href = URL.createObjectURL(b); l.download = nom; document.body.appendChild(l); l.click(); l.remove(); setTimeout(() => URL.revokeObjectURL(l.href), 5000); }, "image/png"); };
+    m.append(c); });
+})();
+</script></body></html>

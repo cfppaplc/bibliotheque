@@ -2393,6 +2393,43 @@ function aimanterTuyau(q, a, sauf){
 })();
 /* Enregistrer le tableau en image : fond + traits */
 async function wbEnregistrer(){
+  const out = imageTableau();
+  const blob = await new Promise(res => out.toBlob(res, "image/png"));
+  const nom = "tableau-" + wbEtat().n + "-" + new Date().toISOString().slice(0, 10) + ".png";
+  try {
+    const dl = window.claude && claude.use ? await claude.use("downloads") : null;
+    if (dl){ await dl.save({ filename:nom, data:blob }); aviser("Tableau enregistré."); return; }
+  } catch(e){ if (e && e.code === "declined") return; }
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = nom;
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  aviser("Tableau enregistré.");
+}
+/* 20 nov. (Jeremy : « un genre de print screen de ce que je veux envoyer, en sélectionnant sur l'écran ») :
+   « Capturer une zone » : on glisse un rectangle sur le tableau; chaque zone s'ajoute; « Envoyer » les partage par code QR */
+const CAPT = [];
+function majCapt(){ let b = document.getElementById("captBar");
+  if (!CAPT.length){ if (b) b.remove(); return; }
+  if (!b){ b = document.createElement("div"); b.id = "captBar"; b.style.cssText = "position:fixed;left:50%;top:14px;transform:translateX(-50%);z-index:100002;display:flex;gap:8px;align-items:center;background:#161d2c;color:#fff;padding:8px 10px 8px 16px;border-radius:14px;box-shadow:0 8px 26px rgba(0,0,0,.35);font:600 15px system-ui";
+    b.innerHTML = '<span></span><button type="button" data-c="autre">Capturer une autre zone</button><button type="button" data-c="env" style="background:#EB6A22;border-color:#EB6A22">Envoyer aux élèves (QR)</button><button type="button" data-c="x">Annuler</button>';
+    b.querySelectorAll("button").forEach(x => x.style.cssText += ";min-height:42px;padding:0 14px;border-radius:10px;border:1px solid #3a4560;background:#222b3f;color:#fff;font:600 14px system-ui;cursor:pointer");
+    b.onclick = e => { const c = e.target.dataset.c; if (c === "autre") capturerZone(); else if (c === "env") wbPartager(CAPT); else if (c === "x"){ CAPT.length = 0; majCapt(); } };
+    document.body.appendChild(b); }
+  b.firstChild.textContent = CAPT.length + " zone" + (CAPT.length > 1 ? "s" : "") + " choisie" + (CAPT.length > 1 ? "s" : ""); }
+function capturerZone(){ const c = $("#inkCanvas"); if (!c) return; const r = c.getBoundingClientRect();
+  const v = document.createElement("div"); v.style.cssText = "position:fixed;inset:0;z-index:100003;cursor:crosshair;background:rgba(10,15,25,.18);touch-action:none";
+  const t = document.createElement("div"); t.textContent = "Glisse pour choisir la zone à envoyer (Échap pour annuler)"; t.style.cssText = "position:fixed;left:50%;top:16px;transform:translateX(-50%);background:#161d2c;color:#fff;padding:10px 16px;border-radius:12px;font:600 15px system-ui;pointer-events:none";
+  const q = document.createElement("div"); q.style.cssText = "position:fixed;border:3px dashed #EB6A22;background:rgba(235,106,34,.08);display:none;pointer-events:none"; v.append(t, q); document.body.appendChild(v);
+  let a = null; const fin = () => { v.remove(); removeEventListener("keydown", esc, true); }, esc = e => { if (e.key === "Escape"){ e.stopPropagation(); fin(); } }; addEventListener("keydown", esc, true);
+  v.addEventListener("pointerdown", e => { a = [e.clientX, e.clientY]; try { v.setPointerCapture(e.pointerId); } catch(_){} q.style.display = "block"; e.preventDefault(); });
+  v.addEventListener("pointermove", e => { if (!a) return; const x = Math.min(a[0], e.clientX), y = Math.min(a[1], e.clientY); q.style.left = x + "px"; q.style.top = y + "px"; q.style.width = Math.abs(e.clientX - a[0]) + "px"; q.style.height = Math.abs(e.clientY - a[1]) + "px"; });
+  v.addEventListener("pointerup", e => { if (!a) return; const x0 = Math.max(r.left, Math.min(a[0], e.clientX)), y0 = Math.max(r.top, Math.min(a[1], e.clientY)), x1 = Math.min(r.right, Math.max(a[0], e.clientX)), y1 = Math.min(r.bottom, Math.max(a[1], e.clientY)); fin();
+    if (x1 - x0 < 30 || y1 - y0 < 30){ aviser("Zone trop petite : glisse un plus grand rectangle."); return; }
+    const src = imageTableau(), sx = src.width / r.width, sy = src.height / r.height, w = (x1 - x0) * sx, h = (y1 - y0) * sy, k = Math.min(1, 1600 / Math.max(w, h));
+    const o = document.createElement("canvas"); o.width = Math.round(w * k); o.height = Math.round(h * k); o.getContext("2d").drawImage(src, (x0 - r.left) * sx, (y0 - r.top) * sy, w, h, 0, 0, o.width, o.height);
+    CAPT.push(o.toDataURL("image/jpeg", .85)); majCapt(); });
+  v.addEventListener("pointercancel", fin); }
+/* image du tableau affiché : fond + traits (sert à « Enregistrer en PNG » et au partage aux élèves) */
+function imageTableau(){
   const c = $("#inkCanvas"), W = c.width, H = c.height, out = document.createElement("canvas"); out.width = W; out.height = H;
   const g = out.getContext("2d"), f = wbBg(), u = 34 * RD.z * DPRI();
   if (f === "noir" || f === "vert"){ const gr = g.createRadialGradient(W / 2, H * .4, 10, W / 2, H * .4, Math.max(W, H) * .75); gr.addColorStop(0, f === "noir" ? "#2b3133" : "#2e6b52"); gr.addColorStop(1, f === "noir" ? "#1a1f21" : "#1d4a38"); g.fillStyle = gr; }
@@ -2407,13 +2444,34 @@ async function wbEnregistrer(){
   }
   if (f === "lignes"){ g.strokeStyle = "#e8a0a0"; g.lineWidth = 2; g.beginPath(); g.moveTo(u * 2.4, 0); g.lineTo(u * 2.4, H); g.stroke(); }
   g.drawImage(c, 0, 0);
-  const blob = await new Promise(res => out.toBlob(res, "image/png"));
-  const nom = "tableau-" + wbEtat().n + "-" + new Date().toISOString().slice(0, 10) + ".png";
-  try {
-    const dl = window.claude && claude.use ? await claude.use("downloads") : null;
-    if (dl){ await dl.save({ filename:nom, data:blob }); aviser("Tableau enregistré."); return; }
-  } catch(e){ if (e && e.code === "declined") return; }
-  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = nom;
-  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
-  aviser("Tableau enregistré.");
+  return out;
+}
+/* 20 nov. (Jeremy : « après plusieurs dessins, les envoyer à mes élèves, peut-être avec un code QR ») :
+   tous les tableaux non vides → images JPEG (1600 px max) → partage chiffré (coffre) → code QR. Les élèves voient et enregistrent les images, sans compte. */
+async function wbPartager(pret){
+  if (!window.COFFRE || !COFFRE.partager){ aviser("Partage indisponible ici."); return; }
+  const st = wbEtat(), n0 = st.n, imgs = pret ? pret.slice() : [];
+  if (!pret) try { for (let i = 1; i <= st.count; i++){ if (wbVide(i)) continue; st.n = i; majFond(); redrawInk();
+      const src = imageTableau(), k = Math.min(1, 1600 / Math.max(src.width, src.height)), o = document.createElement("canvas"); o.width = Math.round(src.width * k); o.height = Math.round(src.height * k);
+      o.getContext("2d").drawImage(src, 0, 0, o.width, o.height); imgs.push(o.toDataURL("image/jpeg", .82)); } }
+  finally { st.n = n0; majFond(); redrawInk(); try { refreshTools(); } catch(e){} }
+  if (pret) CAPT.length = 0, majCapt();
+  if (!imgs.length){ aviser("Le tableau est vide : rien à partager."); return; }
+  const d = new Date(), titre = "Tableau blanc du " + d.toLocaleDateString("fr-CA", { day:"numeric", month:"long" });
+  aviser("Envoi des " + imgs.length + " tableau" + (imgs.length > 1 ? "x" : "") + "…", 4000);
+  let r; try { r = await COFFRE.partager({ type:"tableau", v:1, titre, date:d.toISOString(), imgs }); }
+  catch(e){ aviser("L'envoi n'a pas marché (Internet ?). Réessaie dans un moment.", 5000); return; }
+  const url = location.origin + "/partage.html?i=" + r.id + "#" + r.cle;
+  try { const L = JSON.parse(localStorage.getItem("wbPartages") || "[]"); L.unshift({ id:r.id, jeton:r.jeton, titre, n:imgs.length, date:d.toISOString() }); localStorage.setItem("wbPartages", JSON.stringify(L.slice(0, 30))); } catch(e){}
+  const ov = $("#qrOv"); ov.classList.remove("tele"); dessinerQr(url);
+  $("#qrTitre").textContent = titre; $("#qrPage").textContent = imgs.length + " tableau" + (imgs.length > 1 ? "x" : "") + " envoyé" + (imgs.length > 1 ? "s" : "");
+  $("#qrOv .qr-aide").textContent = "Les élèves scannent le code avec l'appareil photo de leur téléphone : ils voient les tableaux et peuvent les enregistrer. Aucun compte requis.";
+  $("#qrDebut").hidden = true; let b = $("#qrStop");
+  if (!b){ b = document.createElement("button"); b.type = "button"; b.id = "qrStop"; $("#qrFermer").before(b); }
+  b.hidden = false; b.textContent = "Arrêter le partage";
+  b.onclick = async () => { try { await COFFRE.retirerPartage(r.id, r.jeton); } catch(e){}
+    try { localStorage.setItem("wbPartages", JSON.stringify(JSON.parse(localStorage.getItem("wbPartages") || "[]").filter(x => x.id !== r.id))); } catch(e){}
+    ov.hidden = true; b.hidden = true; aviser("Partage arrêté : le lien ne fonctionne plus."); };
+  const f = $("#qrFermer"), f0 = f.onclick; f.onclick = () => { b.hidden = true; f.onclick = f0; if (f0) f0(); else ov.hidden = true; };
+  ov.hidden = false;
 }
