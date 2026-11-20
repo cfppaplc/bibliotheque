@@ -119,6 +119,7 @@ function refreshTools(){ try { if (window.majPopGomme) majPopGomme(); } catch(e)
 }
 function togglePen(){ RD.pen = !RD.pen; if (RD.pen) RD.spot = false; refreshTools(); }
 function toggleWb(){
+  try { wbSansOutil(); } catch(e){}
   RD.wb = !RD.wb; if (RD.wb){ RD.spot = false; RD.crayonOff = true; RD.eraser = false; RD.text = false; RD.obj = false; RD.formeK = null; RD.objKi = null; RD.objKe = null; try { SELO.s = null; } catch(e){} setTimeout(() => { try { aviser("Aucun outil choisi : touche le crayon pour écrire, ou touche une forme pour la choisir.", 3500); } catch(e){} }, 400); }   /* chaque ouverture : aucun outil choisi */
   const st = $("#rstage"); $("#reader").classList.toggle("wbon", !!RD.wb);
   $("#reader").classList.toggle("wblivre", !!RD.wb && RD.book !== "tableau-blanc");   /* tableau blanc ouvert par-dessus un livre : bouton « Revenir au livre » */

@@ -44,8 +44,10 @@ function majFond(){
   const st = wbEtat(); $("#wbLbl").textContent = st.n + " / " + st.count;
   $("#wbP").disabled = st.n <= 1; $("#wbN").disabled = st.n >= st.count; const m = $("#wbMoins"); if (m) m.disabled = st.count <= 1;
 }
+/* 20 nov. (Jeremy) : en quittant un tableau (‹ ›, + ou fermeture), la main et la gomme se désélectionnent : on revient à « aucun outil » */
+function wbSansOutil(){ RD.hand = false; RD.eraser = false; const h = document.getElementById("wbHand"); if (h) h.classList.remove("on"); const c = document.getElementById("inkCanvas"); if (c) c.style.cursor = ""; try { refreshTools(); } catch(e){} }
 function wbAller(dir){
-  const st = wbEtat();
+  const st = wbEtat(); wbSansOutil();
   if (dir > 0){ if (st.n >= st.count){ aviser("Dernier tableau. Utilise + pour en ajouter un."); return; } st.n++; }
   else { if (st.n <= 1) return; st.n--; }
   /* 20 nov. (Jeremy) : un tableau laissé vide se supprime tout seul quand on le quitte */
@@ -68,7 +70,7 @@ function retirerTableau(n){ const st = wbEtat(), L = RD.book + "|wb", re = new R
   st.bg = bg; st.count--; st.n = Math.min(st.n > n ? st.n - 1 : st.n, st.count); planifierSauvegarde();
 }
 const wbVide = n => { const base = RD.book + "|wb" + n; return !Object.keys(INKS).some(k => (k === base || k.startsWith(base + ":")) && INKS[k] && INKS[k].length); };
-function wbNouveau(){ const st = wbEtat(), P = window.PREF ? window.PREF() : {}; st.count++; st.n = st.count; st.bg[st.n] = (P.fond && WBFONDS.some(f => f.k === P.fond)) ? P.fond : (st.bg[st.n - 1] || "blanc"); majFond(); redrawInk(); refreshTools(); aviser("Tableau " + st.n + " ajouté."); }
+function wbNouveau(){ wbSansOutil(); const st = wbEtat(), P = window.PREF ? window.PREF() : {}; st.count++; st.n = st.count; st.bg[st.n] = (P.fond && WBFONDS.some(f => f.k === P.fond)) ? P.fond : (st.bg[st.n - 1] || "blanc"); majFond(); redrawInk(); refreshTools(); aviser("Tableau " + st.n + " ajouté."); }
 function wbFondSuivant(){
   const st = wbEtat(), i = WBFONDS.findIndex(f => f.k === wbBg()), f = WBFONDS[(i + 1) % WBFONDS.length], av = inkKey(), avn = nomFond(wbBg());
   st.bg[st.n] = f.k; SELO.s = null; window.SELM = []; majFond(); redrawInk(); refreshTools(); aviser(f.n); apresFond(av, avn);
