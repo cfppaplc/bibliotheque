@@ -673,3 +673,4 @@
 - 2026-11-20 : iso décalé : depuis le zoom photo au tableau blanc (16 nov.), r.width/offsetWidth contient RD.z → grille d'accroche RD.z fois trop grande/petite. kEcran(r,c) enlève RD.z quand zPhoto(); utilisé dans pt(), rayonIso, aimant, suivreIso, texte iso, etc. tableau-blanc.js?v=10.
 - 2026-11-20 : partage QR : images en PNG (fonds noir/vert : JPEG 0,92), 2000 px max.
 - 2026-11-20 : accueil au TNI (any-pointer coarse) : backdrop-filter retiré des panneaux (journal : ~400 accrochages/5 min de 117 ms, « dessin »); accueil.css?v=3.
+- 2026-11-20 : sons du ménage en style jeu vidéo 8 bits (ondes carrées, mélodies originales) : sonDebut « départ de niveau » ×2, sonMenage « niveau réussi »; accueil-menage.js?v=5.

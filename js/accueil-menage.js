@@ -81,25 +81,21 @@
     else if (e.target.closest(".mn-t, .mn-i")) li.classList.toggle("ouvert");
   });
   /* 18 nov. : alarme du début du ménage (ding-dong répété 3 fois, assez fort pour l'atelier) */
-  function sonDebut(){ try {
-    AC = AC || new (window.AudioContext || window.webkitAudioContext)(); if (AC.state === "suspended") AC.resume();
-    const t0 = AC.currentTime + .05, out = AC.createGain(); out.gain.value = .9; out.connect(AC.destination);
-    const cloche = (f, t) => { [1, 2.76, 5.4].forEach((h, k) => { const o = AC.createOscillator(), g = AC.createGain(); o.type = "sine"; o.frequency.value = f * h;
-      const v = [.6, .18, .08][k]; g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(v, t + .01); g.gain.exponentialRampToValueAtTime(.001, t + 1.4 - k * .4);
-      o.connect(g); g.connect(out); o.start(t); o.stop(t + 1.5); }); };
-    for (let i = 0; i < 3; i++){ cloche(880, t0 + i * 1.6); cloche(698.5, t0 + i * 1.6 + .55); }
-  } catch(x) {} }
-  /* 13 nov. (« un son motivant à la fin du ménage ») : marimba quand tout est coché */
+  /* 20 nov. (Jeremy : « des bruits comme Mario Bros ») : sons de jeu vidéo rétro (ondes carrées 8 bits), mélodies originales */
   let AC = null;
-  function sonMenage(fin){ try {
-    AC = AC || new (window.AudioContext || window.webkitAudioContext)(); if (AC.state === "suspended") AC.resume();
-    const t0 = AC.currentTime + .02, out = AC.createGain(); out.gain.value = .5; out.connect(AC.destination);
-    const note = (f, t, d, v, type) => { const o = AC.createOscillator(), g = AC.createGain(); o.type = type || "triangle"; o.frequency.value = f;
-      g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(v, t + .015); g.gain.exponentialRampToValueAtTime(.001, t + d);
-      o.connect(g); g.connect(out); o.start(t); o.stop(t + d + .05); };
-    const dl = AC.createDelay(), fb = AC.createGain(), w = AC.createGain(); dl.delayTime.value = .23; fb.gain.value = .32; w.gain.value = .35;   /* léger écho */
-    out.connect(dl); dl.connect(fb); fb.connect(dl); dl.connect(w); w.connect(AC.destination);
-    [[523.3, 0], [659.3, .13], [784, .26], [1046.5, .42]].forEach(([f, d]) => { note(f, t0 + d, .6, .45, "sine"); note(f * 4, t0 + d, .08, .12, "sine"); });   /* marimba (choix 3 de Jeremy) */
+  const puce = (out, f, t, d, v, type) => { const o = AC.createOscillator(), g = AC.createGain(); o.type = type || "square"; o.frequency.value = f;
+    g.gain.setValueAtTime(v, t); g.gain.setValueAtTime(v, t + d * .85); g.gain.linearRampToValueAtTime(0, t + d); o.connect(g); g.connect(out); o.start(t); o.stop(t + d + .02); return o; };
+  const sortie = v => { AC = AC || new (window.AudioContext || window.webkitAudioContext)(); if (AC.state === "suspended") AC.resume(); const out = AC.createGain(); out.gain.value = v; out.connect(AC.destination); return out; };
+  /* début du ménage : « départ de niveau » (arpège qui monte + basse), joué 2 fois */
+  function sonDebut(){ try { const out = sortie(.22), t0 = AC.currentTime + .05, N = [392, 523.3, 659.3, 784, 1046.5, 784, 1046.5];
+    for (let r = 0; r < 2; r++){ const t = t0 + r * 1.5; N.forEach((f, i) => puce(out, f, t + i * .09, i === N.length - 1 ? .45 : .085, .5));
+      [130.8, 196, 261.6].forEach((f, i) => puce(out, f, t + i * .2, .18, .6, "triangle")); }
+  } catch(x) {} }
+  /* tout est coché : « niveau réussi » (fanfare + petite glissade vers le haut) */
+  function sonMenage(fin){ try { const out = sortie(.22), t0 = AC.currentTime + .03;
+    [[523.3,0,.1],[659.3,.1,.1],[784,.2,.1],[1046.5,.3,.22],[784,.55,.1],[1046.5,.66,.5]].forEach(([f, d, l]) => puce(out, f, t0 + d, l, .5));
+    [[261.6,0,.3],[392,.3,.25],[523.3,.66,.5]].forEach(([f, d, l]) => puce(out, f, t0 + d, l, .6, "triangle"));
+    const o = puce(out, 600, t0 + 1.25, .35, .35); o.frequency.setValueAtTime(600, t0 + 1.25); o.frequency.exponentialRampToValueAtTime(2400, t0 + 1.58);
   } catch(x) {} }
   let actifVu = false;
   document.getElementById("mnMini").onclick = e => { e.stopPropagation(); if (force && !actifVu) { force = false; montrer(false); if (APERCU) { APERCU = null; rendu = ""; ed.hidden = false; } return; } mini = true; el.classList.add("mini"); };
