@@ -2451,7 +2451,7 @@ function imageTableau(){
 async function wbPartager(pret){
   if (!window.COFFRE || !COFFRE.partager){ aviser("Partage indisponible ici."); return; }
   const st = wbEtat(), n0 = st.n, imgs = pret ? pret.slice() : [];
-  if (!pret) try { for (let i = 1; i <= st.count; i++){ if (wbVide(i)) continue; st.n = i; majFond(); redrawInk();
+  if (!pret) try { for (let i = n0; i <= n0; i++){ if (wbVide(i)) continue; st.n = i; majFond(); redrawInk();   /* 20 nov. (Jeremy) : seulement le tableau affiché */
       const src = imageTableau(), k = Math.min(1, 1600 / Math.max(src.width, src.height)), o = document.createElement("canvas"); o.width = Math.round(src.width * k); o.height = Math.round(src.height * k);
       o.getContext("2d").drawImage(src, 0, 0, o.width, o.height); imgs.push(o.toDataURL("image/jpeg", .82)); } }
   finally { st.n = n0; majFond(); redrawInk(); try { refreshTools(); } catch(e){} }

@@ -688,7 +688,7 @@ majEpaisseur();
   const bsch = document.createElement("button"); bsch.id = "wbSch"; bsch.dataset.lab = "Mes schémas et modèles"; bsch.title = "Enregistrer, rouvrir, exporter un tableau; circuits prêts à utiliser";
   bsch.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h12l4 4v12H4z"/><path d="M8 4v5h7V4M8 20v-6h8v6"/></svg>';
   bsch.onclick = () => { fermer(); ouvrirSchemas(); };
-  { const q = document.createElement("button"); q.id = "wbQr"; q.type = "button"; q.title = "Envoyer les tableaux aux élèves avec un code QR";
+  { const q = document.createElement("button"); q.id = "wbQr"; q.type = "button"; q.title = "Envoyer le tableau affiché aux élèves avec un code QR";
     q.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h2v2h-2zM18 18h2v2h-2zM14 18h2M18 14h2"/></svg>';
     q.onclick = () => { try { wbPartager(); } catch(e){} }; q.dataset.lab = "Aux élèves (QR)";
     const z = document.createElement("button"); z.id = "wbCapt"; z.type = "button"; z.title = "Choisir une zone de l'écran à envoyer aux élèves";
