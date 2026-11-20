@@ -666,3 +666,4 @@
 - 2026-11-20 : barre du crayon : bouton flèche #penSel (1er) = aucun outil (crayonOff, gomme, texte, objets, main), allumé quand aucun outil; lecteur.js?v=7.
 - 2026-11-20 : crayon : toucher = activer/enlever le crayon; appui long 0,5 s = options (couleurs, épaisseur). Retiré de tableau-simple.js la bulle au 2e toucher (v=3); lecteur.js?v=8.
 - 2026-11-20 : barres uniformisées : plans (plBar) comme la barre du crayon : flèche (pan) = aucun outil, toucher un outil actif l'enlève, appui long crayon/surligneur = bulle des couleurs (#plPop, couleurs retirées de la barre); plans.js?v=2, plans.css?v=2; entrée Quoi de neuf.
+- 2026-11-20 : rond de la gomme (#gommeRond) caché au lever du doigt/stylet et quand la gomme n'est plus choisie (gommeRondCacher dans refreshTools); tableau-blanc.js?v=7, lecteur.js?v=9.

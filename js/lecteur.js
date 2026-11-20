@@ -104,7 +104,7 @@ function refreshTools(){ try { if (window.majPopGomme) majPopGomme(); } catch(e)
   $("#penBar").hidden = !drawing;
   $("#inkCanvas").classList.toggle("live", drawing);
   { const ps = $("#penSel"); if (ps) ps.classList.toggle("on", !!RD.crayonOff && !RD.eraser && !RD.text && !RD.obj && !RD.hand && !RD.formeK); }
-  $("#penE").classList.toggle("on", RD.eraser); $("#penT").classList.toggle("on", !!RD.text && !RD.eraser);
+  $("#penE").classList.toggle("on", RD.eraser); if (!RD.eraser && window.gommeRondCacher) gommeRondCacher(); $("#penT").classList.toggle("on", !!RD.text && !RD.eraser);
   document.querySelectorAll(".wbonly").forEach(e => { e.hidden = !RD.wb; });
   $("#reader").classList.toggle("wbon", !!RD.wb);   /* tableau blanc : la barre du livre (pages, zoom…) est cachée */
   $("#penO").hidden = false;   /* Formes et objets : partout (formes sur les livres; objets isométriques et électriques sur le tableau blanc) */

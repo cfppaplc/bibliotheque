@@ -1139,6 +1139,10 @@ function redrawBientot(){ if (!rafInk) rafInk = requestAnimationFrame(() => { ra
     const r = c.getBoundingClientRect(); if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom){ ring.style.display = "none"; return; }
     att(); const d = Math.max(8, rayonGomme() * r.height * 2); ring.style.cssText += ";display:block;width:" + d + "px;height:" + d + "px;left:" + e.clientX + "px;top:" + e.clientY + "px";
   }, true);
+  /* 20 nov. (photo du TNI : le rond restait affiché) : au doigt ou au stylet, le rond disparaît quand on lève; il disparaît aussi quand la gomme n'est plus choisie */
+  const cacher = e => { if (!e || e.pointerType !== "mouse") ring.style.display = "none"; };
+  document.addEventListener("pointerup", cacher, true); document.addEventListener("pointercancel", cacher, true);
+  window.gommeRondCacher = () => { ring.style.display = "none"; };
 })();
 /* ---- Zones de texte : créer, déplacer, modifier (police, taille, gras, italique, couleur) ---- */
 const TX = { f:TXFONTS[0][1], fs:32, b:true, i:false }, SEL = { s:null };
