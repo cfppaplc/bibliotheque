@@ -546,7 +546,7 @@ function sizeInner(rapide){   /* rapide = pendant la roulette : on agrandit seul
   ["#readerFrame", "#readerFrame2"].forEach(id => { try { $(id).contentDocument.documentElement.style.setProperty("--zb", zPhoto() ? RD.z : 1); } catch(e){} });
   if (!rapide){ const d0 = window.devicePixelRatio || 1, px = (w * RD.z * K) * (h * RD.z * K) * d0 * d0;
     RD.dprInk = d0 * Math.min(1, Math.sqrt((RD.wb ? 16e6 : 24e6) / Math.max(1, px)));   /* 13 nov. : tableau blanc zoomé = lag au TNI, toile plafonnée à 9 millions de pixels */
-    c.width = Math.round(w * RD.z * K * RD.dprInk); c.height = Math.round(h * RD.z * K * RD.dprInk); }
+    const cw = Math.round(w * RD.z * K * RD.dprInk), ch = Math.round(h * RD.z * K * RD.dprInk); if (c.width !== cw || c.height !== ch){ c.width = cw; c.height = ch; } }   /* 20 nov. : même taille = on ne recrée pas la toile */
   c.style.width = (w * S * K) + "px"; c.style.height = (h * S * K) + "px";
   $("#tbZv").textContent = Math.round(RD.z * 100) + "%"; $("#wbZv").textContent = Math.round(RD.z * 100) + "%";
   layoutDbl();

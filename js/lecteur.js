@@ -200,8 +200,12 @@ function uniformiserModules(mods){
     out.unshift({ kind:"couverture", ico:ICO_MOD.couverture, tag:"", text:"Couverture", color:"#6b7280", page:1, run:() => RD.drv.goto(1) });
   return out;
 }
+/* 20 nov. (journal : openMenu = 0,3 s) : la liste des modules d'un livre ne change pas pendant qu'il est ouvert : calculée une fois (à l'avance, dans un moment libre) */
+function modsLivre(){ if (!RD.drv) return []; const cle = RD.book + "|" + (RD.drv.state ? (RD.drv.state().tot || 0) : 0);
+  if (RD._modsCle !== cle || !RD._mods || RD._modsDrv !== RD.drv){ RD._mods = uniformiserModules(RD.drv.modules()); RD._modsCle = cle; RD._modsDrv = RD.drv; } return RD._mods; }
+window.prepMenu = () => { try { const go = () => { try { modsLivre(); } catch(e){} }; window.requestIdleCallback ? requestIdleCallback(go, { timeout:4000 }) : setTimeout(go, 1500); } catch(e){} };
 function openMenu(){
-  const mods = RD.drv ? uniformiserModules(RD.drv.modules()) : [];
+  const mods = modsLivre();
   if (!mods.length && !(MARKS[RD.book] || []).length){ aviser("Ce livre n'a pas de liste de modules ni de signets."); return; }
   RD.modsMenu = mods; RD.editMark = -1; RD.mmVue = ""; $("#mmQ").value = "";
   dessinerMenu(); tdmOutils();
@@ -883,7 +887,7 @@ function ouvrirTableauBlanc(apres){
   ouvrirLivre(l, '<!doctype html><html><head><meta charset="utf-8"><title>Tableau blanc</title></head><body style="margin:0;background:#fff;height:100vh"></body></html>');
   let n = 0; const t = setInterval(() => { n++;
     let pret = false; try { pret = !!(RD.drv && RD.drv.state().tot > 0); } catch(e){}
-    if (pret || n > 60){ clearInterval(t); if (!RD.wb) toggleWb();
+    if (pret || n > 60){ clearInterval(t); RD._lot = true; try { if (!RD.wb) toggleWb();
       try { const P = window.PREF ? window.PREF() : {}, st = wbEtat();   /* préférences du prof : fond et couleur du crayon au départ */
         if (P.fond && WBFONDS.some(f => f.k === P.fond)){
           /* le dessin déjà là n'est jamais touché : on va sur un tableau vide (celui affiché, un autre déjà vide, sinon un nouveau à la fin) avec le fond préféré */
@@ -891,6 +895,7 @@ function ouvrirTableauBlanc(apres){
           if (!v){ st.count++; v = st.count; setTimeout(() => aviser("Nouveau tableau " + v + ". Ton dessin d'avant est au tableau " + (v - 1) + " (flèche ←).", 4500), 600); }
           if (v !== st.n || st.bg[v] !== P.fond){ st.n = v; st.bg[v] = P.fond; majFond(); redrawInk(); refreshTools(); planifierSauvegarde(); } }
         if (P.crayon) { RD.color = P.crayon; refreshTools(); } } catch(e){}
+      } finally { RD._lot = false; if (RD._lotSale){ RD._lotSale = false; redrawInk(true); } }
       if (apres) setTimeout(apres, 120); } }, 100);
 }
 function ouvrirContenu(c){

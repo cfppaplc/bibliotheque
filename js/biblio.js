@@ -307,7 +307,7 @@ function chargement(l, attente){   /* attente : on prépare encore le livre (PDF
     if (pret && !tPret){ tPret = n; const sp = c.querySelector(".charge-c span"); if (sp) sp.textContent = "Préparation des pages et des animations…"; }
     const fini = tPret && n - tPret > 500 && (imagesPretes() || n - tPret > 4000);   /* 12 nov. : plus de minimum de 3 s (on attendait pour rien) */
     if (!tPret && n - t0 > 6000 && !c._lent){ c._lent = 1; const sp = c.querySelector(".charge-c span"); if (sp) sp.textContent = "Téléchargement et déverrouillage du livre… (plus long la première fois)"; }
-    if (fini || !attente && n - t0 > 45000 || !attente && !$("#reader").classList.contains("open") && n - t0 > 4000 || attente && n - t0 > 180000){ clearInterval(chargeT); const bb = c.querySelector(".charge-b"); if (bb && fini){ bb.classList.add("fin"); setTimeout(() => { c.hidden = true; }, 300); } else c.hidden = true; } }, 150);
+    if (fini || !attente && n - t0 > 45000 || !attente && !$("#reader").classList.contains("open") && n - t0 > 4000 || attente && n - t0 > 180000){ clearInterval(chargeT); if (fini && window.prepMenu) setTimeout(prepMenu, 1200); const bb = c.querySelector(".charge-b"); if (bb && fini){ bb.classList.add("fin"); setTimeout(() => { c.hidden = true; }, 300); } else c.hidden = true; } }, 150);
 }
 /* ---- Fenêtre de détails ---- */
 let toastT;

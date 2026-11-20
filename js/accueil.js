@@ -574,10 +574,13 @@ function fit() {
   if (innerWidth <= 900 || app.clientHeight < 200) { r.style.setProperty("--fit", 1); compactSteps(0); return; }
   const manual = +cfg.scale > 0;
   const fits = f => { r.style.setProperty("--fit", f); return !overflows(); };
-  const best = (lo, hi) => { if (!fits(lo)) return null; for (let i = 0; i < 7; i++) { const m = (lo + hi) / 2; if (fits(m)) lo = m; else hi = m; } return lo; };
+  const best = (lo, hi) => { if (!fits(lo)) return null; for (let i = 0; i < 6; i++) { const m = (lo + hi) / 2; if (fits(m)) lo = m; else hi = m; } return lo; };
   let level = 0, f;
   /* 17 nov. (journal du TNI : fit = 2 s en 1 min) : on réessaie d'abord le dernier résultat (2 mesures) au lieu de tout recalculer (≈ 40 mesures) */
-  const DER = fit.der, cle = innerWidth + "x" + innerHeight;
+  /* 20 nov. (journal : fit = 1,8 s à l'ouverture) : le dernier résultat est gardé d'une ouverture à l'autre (même écran, même contenu) */
+  const sig = document.querySelectorAll("#v-steps .step").length + "|" + ((document.getElementById("v-title") || {}).textContent || "").length + "|" + (cfg.comp || "");
+  if (!fit.der){ try { fit.der = JSON.parse(localStorage.getItem("accFit") || "null"); } catch(e){} }
+  const DER = fit.der, cle = innerWidth + "x" + innerHeight + "|" + sig;
   if (!manual && DER && DER.cle === cle) { compactSteps(DER.level); if (fits(DER.f) && (DER.f >= 1.78 || !fits(Math.min(1.8, DER.f * 1.04)))) { level = DER.level; f = DER.f; } }
   if (f) {}
   else if (manual) {
@@ -586,14 +589,14 @@ function fit() {
     level = Math.min(level, 3);
   } else {
     const FLOOR = 0.85, res = [];
-    for (let l = 0; l <= 3; l++) { compactSteps(l); res.push(best(0.6, 1.8) || 0); }
+    for (let l = 0; l <= 3; l++) { compactSteps(l); const v = best(0.6, 1.8) || 0; res.push(v); if (v >= FLOOR + 0.01) break; }   /* 20 nov. : on arrête au premier niveau qui entre bien (avant : les 4 niveaux, ≈ 32 mesures) */
     // Si rien ne semble entrer (mesure impossible), on garde une taille lisible plutôt que minuscule
     if (Math.max(...res) === 0) { compactSteps(3); r.style.setProperty("--fit", FLOOR); return; }
     const target = Math.min(FLOOR, Math.max(...res) - 0.01);
     level = res.findIndex(x => x >= target); f = res[level] * 0.985;
   }
   compactSteps(level); r.style.setProperty("--fit", f.toFixed(4)); fitSegLabels();
-  if (!manual) fit.der = { cle, level, f };
+  if (!manual){ fit.der = { cle, level, f }; try { localStorage.setItem("accFit", JSON.stringify(fit.der)); } catch(e){} }
   // Réafficher les étapes cachées une à une tant qu'il reste de la place (les plus proches d'abord)
   if (level > 0) {
     const lis = [...document.querySelectorAll("#v-steps .step")];

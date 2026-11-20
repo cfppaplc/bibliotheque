@@ -750,7 +750,12 @@ function grilleIso(g, W, H, k){
   }
   g.restore();
 }
-function redrawInk(){
+let dessinT = 0, dessinDer = -1e9;
+function redrawInk(force){
+  if (RD._lot && force !== true){ RD._lotSale = true; return; }   /* 20 nov. : ouverture du tableau blanc = un seul dessin à la fin (avant : 11 dessins de suite) */
+  /* 20 nov. (journal : 1 s à l'ouverture du tableau blanc) : plusieurs dessins dans la même image = un seul (le suivant attend l'image d'après) */
+  const now = performance.now(); if (force !== true && now - dessinDer < 12){ if (!dessinT) dessinT = requestAnimationFrame(() => { dessinT = 0; redrawInk(true); }); return; }
+  dessinDer = now; if (dessinT){ cancelAnimationFrame(dessinT); dessinT = 0; }
   try { recalerWb(); } catch(e){}
   const c = $("#inkCanvas"), g = c.getContext("2d");
   g.clearRect(0, 0, c.width, c.height);
@@ -2456,10 +2461,10 @@ function imageTableau(){
 async function wbPartager(pret){
   if (!window.COFFRE || !COFFRE.partager){ aviser("Partage indisponible ici."); return; }
   const st = wbEtat(), n0 = st.n, imgs = pret ? pret.slice() : [];
-  if (!pret) try { for (let i = n0; i <= n0; i++){ if (wbVide(i)) continue; st.n = i; majFond(); redrawInk();   /* 20 nov. (Jeremy) : seulement le tableau affiché */
+  if (!pret) try { for (let i = n0; i <= n0; i++){ if (wbVide(i)) continue; st.n = i; majFond(); redrawInk(true);   /* 20 nov. (Jeremy) : seulement le tableau affiché */
       const src = imageTableau(), k = Math.min(1, 2000 / Math.max(src.width, src.height)), o = document.createElement("canvas"); o.width = Math.round(src.width * k); o.height = Math.round(src.height * k);
       o.getContext("2d").drawImage(src, 0, 0, o.width, o.height); imgs.push(imgPartage(o)); } }
-  finally { st.n = n0; majFond(); redrawInk(); try { refreshTools(); } catch(e){} }
+  finally { st.n = n0; majFond(); redrawInk(true); try { refreshTools(); } catch(e){} }
   if (pret) CAPT.length = 0, majCapt();
   if (!imgs.length){ aviser("Le tableau est vide : rien à partager."); return; }
   const d = new Date(), titre = "Tableau blanc du " + d.toLocaleDateString("fr-CA", { day:"numeric", month:"long" });
