@@ -48,6 +48,8 @@ function wbAller(dir){
   const st = wbEtat();
   if (dir > 0){ if (st.n >= st.count){ aviser("Dernier tableau. Utilise + pour en ajouter un."); return; } st.n++; }
   else { if (st.n <= 1) return; st.n--; }
+  /* 20 nov. (Jeremy) : un tableau laissé vide se supprime tout seul quand on le quitte */
+  { const quitte = st.n - dir; if (st.count > 1 && wbVide(quitte) && !Object.keys(REFS).some(k => { const b = RD.book + "|wb" + quitte; return (k === b || k.startsWith(b + ":")) && REFS[k]; })){ retirerTableau(quitte); if (dir > 0) st.n = quitte; } }
   majFond(); redrawInk(); refreshTools();
 }
 function wbSupprimer(){   /* supprime le tableau affiché : 1er toucher = « Sûr ? », 2e toucher (dans les 3 s) = supprimé; les tableaux suivants reculent d'un rang */
@@ -55,13 +57,15 @@ function wbSupprimer(){   /* supprime le tableau affiché : 1er toucher = « Sû
   if (st.count <= 1){ aviser("Il reste un seul tableau. Pour le vider : « Tout effacer »."); return; }
   if (!b.classList.contains("sur")){ b.classList.add("sur"); clearTimeout(b._t); b._t = setTimeout(() => b.classList.remove("sur"), 3000); return; }
   clearTimeout(b._t); b.classList.remove("sur");
-  const L = RD.book + "|wb", n = st.n, re = new RegExp("^" + L.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "(\\d+)(:.*)?$");
+  const n = st.n; retirerTableau(n);
+  SELO.s = null; window.SELM = []; majFond(); redrawInk(); refreshTools(); planifierSauvegarde(); aviser("Tableau " + n + " supprimé.");
+}
+function retirerTableau(n){ const st = wbEtat(), L = RD.book + "|wb", re = new RegExp("^" + L.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "(\\d+)(:.*)?$");
   [INKS, UNDO, REDO, REFS].forEach(T => { const neuf = {};
     Object.keys(T).forEach(k => { const m = re.exec(k); if (!m) return; const i = +m[1], v = T[k]; delete T[k]; if (i === n) return; neuf[L + (i > n ? i - 1 : i) + (m[2] || "")] = v; });
     Object.assign(T, neuf); });
   const bg = {}; for (let i = 1; i <= st.count; i++) if (i !== n && st.bg[i]) bg[i > n ? i - 1 : i] = st.bg[i];
-  st.bg = bg; st.count--; st.n = Math.min(n, st.count);
-  SELO.s = null; window.SELM = []; majFond(); redrawInk(); refreshTools(); planifierSauvegarde(); aviser("Tableau " + n + " supprimé.");
+  st.bg = bg; st.count--; st.n = Math.min(st.n > n ? st.n - 1 : st.n, st.count); planifierSauvegarde();
 }
 const wbVide = n => { const base = RD.book + "|wb" + n; return !Object.keys(INKS).some(k => (k === base || k.startsWith(base + ":")) && INKS[k] && INKS[k].length); };
 function wbNouveau(){ const st = wbEtat(), P = window.PREF ? window.PREF() : {}; st.count++; st.n = st.count; st.bg[st.n] = (P.fond && WBFONDS.some(f => f.k === P.fond)) ? P.fond : (st.bg[st.n - 1] || "blanc"); majFond(); redrawInk(); refreshTools(); aviser("Tableau " + st.n + " ajouté."); }
