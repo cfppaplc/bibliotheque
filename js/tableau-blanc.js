@@ -2410,6 +2410,8 @@ async function wbEnregistrer(){
 /* 20 nov. (Jeremy : « un genre de print screen de ce que je veux envoyer, en sélectionnant sur l'écran ») :
    « Capturer une zone » : on glisse un rectangle sur le tableau; chaque zone s'ajoute; « Envoyer » les partage par code QR */
 const CAPT = [];
+/* 20 nov. (Jeremy : « PNG, c'est la meilleure qualité ? ») : les traits sont envoyés en PNG (net, sans flou autour des lignes); seulement les fonds noir et vert (dégradé, fichier lourd) restent en JPEG de haute qualité */
+const imgPartage = cv => /^(noir|vert)$/.test(wbBg()) ? cv.toDataURL("image/jpeg", .92) : cv.toDataURL("image/png");
 function majCapt(){ let b = document.getElementById("captBar");
   if (!CAPT.length){ if (b) b.remove(); return; }
   if (!b){ b = document.createElement("div"); b.id = "captBar"; b.style.cssText = "position:fixed;left:50%;top:14px;transform:translateX(-50%);z-index:100002;display:flex;gap:8px;align-items:center;background:#161d2c;color:#fff;padding:8px 10px 8px 16px;border-radius:14px;box-shadow:0 8px 26px rgba(0,0,0,.35);font:600 15px system-ui";
@@ -2427,9 +2429,9 @@ function capturerZone(){ const c = $("#inkCanvas"); if (!c) return; const r = c.
   v.addEventListener("pointermove", e => { if (!a) return; const x = Math.min(a[0], e.clientX), y = Math.min(a[1], e.clientY); q.style.left = x + "px"; q.style.top = y + "px"; q.style.width = Math.abs(e.clientX - a[0]) + "px"; q.style.height = Math.abs(e.clientY - a[1]) + "px"; });
   v.addEventListener("pointerup", e => { if (!a) return; const x0 = Math.max(r.left, Math.min(a[0], e.clientX)), y0 = Math.max(r.top, Math.min(a[1], e.clientY)), x1 = Math.min(r.right, Math.max(a[0], e.clientX)), y1 = Math.min(r.bottom, Math.max(a[1], e.clientY)); fin();
     if (x1 - x0 < 30 || y1 - y0 < 30){ aviser("Zone trop petite : glisse un plus grand rectangle."); return; }
-    const src = imageTableau(), sx = src.width / r.width, sy = src.height / r.height, w = (x1 - x0) * sx, h = (y1 - y0) * sy, k = Math.min(1, 1600 / Math.max(w, h));
+    const src = imageTableau(), sx = src.width / r.width, sy = src.height / r.height, w = (x1 - x0) * sx, h = (y1 - y0) * sy, k = Math.min(1, 2000 / Math.max(w, h));
     const o = document.createElement("canvas"); o.width = Math.round(w * k); o.height = Math.round(h * k); o.getContext("2d").drawImage(src, (x0 - r.left) * sx, (y0 - r.top) * sy, w, h, 0, 0, o.width, o.height);
-    CAPT.push(o.toDataURL("image/jpeg", .85)); majCapt(); });
+    CAPT.push(imgPartage(o)); majCapt(); });
   v.addEventListener("pointercancel", fin); }
 /* image du tableau affiché : fond + traits (sert à « Enregistrer en PNG » et au partage aux élèves) */
 function imageTableau(){
@@ -2455,8 +2457,8 @@ async function wbPartager(pret){
   if (!window.COFFRE || !COFFRE.partager){ aviser("Partage indisponible ici."); return; }
   const st = wbEtat(), n0 = st.n, imgs = pret ? pret.slice() : [];
   if (!pret) try { for (let i = n0; i <= n0; i++){ if (wbVide(i)) continue; st.n = i; majFond(); redrawInk();   /* 20 nov. (Jeremy) : seulement le tableau affiché */
-      const src = imageTableau(), k = Math.min(1, 1600 / Math.max(src.width, src.height)), o = document.createElement("canvas"); o.width = Math.round(src.width * k); o.height = Math.round(src.height * k);
-      o.getContext("2d").drawImage(src, 0, 0, o.width, o.height); imgs.push(o.toDataURL("image/jpeg", .82)); } }
+      const src = imageTableau(), k = Math.min(1, 2000 / Math.max(src.width, src.height)), o = document.createElement("canvas"); o.width = Math.round(src.width * k); o.height = Math.round(src.height * k);
+      o.getContext("2d").drawImage(src, 0, 0, o.width, o.height); imgs.push(imgPartage(o)); } }
   finally { st.n = n0; majFond(); redrawInk(); try { refreshTools(); } catch(e){} }
   if (pret) CAPT.length = 0, majCapt();
   if (!imgs.length){ aviser("Le tableau est vide : rien à partager."); return; }
