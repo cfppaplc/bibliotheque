@@ -695,4 +695,8 @@ html.ui-clair #apercuOv .ap-moments button.on, html.ui-clair #apercuOv .ap-ferme
    (≈ 490 accrochages de 117 ms par 5 min sur l'accueil). Au TNI, le décor reste fixe. Ne touche pas les livres. */
 @media (any-pointer: coarse) and (min-width: 601px){
   .bgx *, .bgx { animation: none !important; }
+  /* 20 nov. (journal : encore ≈ 400 accrochages de 117 ms par 5 min sur l'accueil, « dessin ») : le flou derrière les panneaux (backdrop-filter)
+     doit être recalculé chaque fois que l'horloge ou la barre du temps change (chaque seconde). Au TNI : pas de flou, fond presque opaque. */
+  .panel, .period, #accAccueil, .dock, .menu, .comppick, .bgpick, .lk-menu, .minu { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+  .panel, .period { background-color: color-mix(in srgb, var(--surface) 97%, transparent) !important; }
 }
