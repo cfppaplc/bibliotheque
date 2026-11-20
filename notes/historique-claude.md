@@ -664,3 +664,4 @@
 - 2026-11-20 : tableau blanc : un tableau vide (aucun trait ni image de référence) est supprimé tout seul quand on le quitte avec ‹ › (retirerTableau extrait de wbSupprimer), tableau-blanc.js?v=5.
 - 2026-11-20 : tableau blanc : wbSansOutil() (main et gomme désélectionnées) en changeant de tableau (‹ ›, +) et en ouvrant/fermant le tableau blanc; lecteur.js?v=6, tableau-blanc.js?v=6.
 - 2026-11-20 : barre du crayon : bouton flèche #penSel (1er) = aucun outil (crayonOff, gomme, texte, objets, main), allumé quand aucun outil; lecteur.js?v=7.
+- 2026-11-20 : crayon : toucher = activer/enlever le crayon; appui long 0,5 s = options (couleurs, épaisseur). Retiré de tableau-simple.js la bulle au 2e toucher (v=3); lecteur.js?v=8.

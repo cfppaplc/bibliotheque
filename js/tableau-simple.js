@@ -26,7 +26,7 @@
     const t = document.querySelector("#popCol .ptrace"); if (t && !t.classList.contains("on")) t.click();
     /* crayon déjà actif : toucher « Crayon » ouvre la bulle des couleurs (un 2e toucher range le crayon) */
     const pc = document.getElementById("popCol"), actif = !RD.eraser && !RD.text && !RD.obj && !RD.crayonOff;
-    if (actif && pc && pc.hidden){ e.stopPropagation(); e.preventDefault(); const pp = document.getElementById("popPlus"); if (pp) pp.hidden = true; pc.hidden = false; e.target.closest("#penCol").classList.add("open"); } }, true);
+    /* 20 nov. (Jeremy) : plus de bulle au toucher; les options du crayon s'ouvrent par un appui long (lecteur.js) */ void pc; void actif; }, true);
   /* Lecteur de livres (9 nov.) : mots sous les icônes de la barre, bouton « Terminé » de la barre du crayon */
   { const M = { tbPen:"Crayon", tbAns:"Réponses", tbAnim:"Animation", tbWb:"Tableau blanc", tbMenu:"Sommaire", tbDbl:"2 pages", tbTele:"Télécommande", tbFs:"Plein écran", tbMore:"Plus", tbTimer:"Minuterie", tbSpot:"Projecteur", tbCache:"Cache", tbLaser:"Laser", tbNoir:"Écran noir", tbMark:"Signet", tbHelp:"Raccourcis", tbPin:"Barres", tbPrint:"Imprimer", tbQr:"Code QR" };
     Object.keys(M).forEach(id => { const b = document.getElementById(id); if (b) b.dataset.mot = M[id]; });

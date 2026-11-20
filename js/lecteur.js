@@ -659,7 +659,7 @@ majEpaisseur();
     r.innerHTML = '<span class="lab">' + lab + '</span>'; els.forEach(e => e && r.appendChild(e)); return r; };
   const nomme = (id, lab) => { const b = X(id); if (b) b.dataset.lab = lab; return b; };
   /* Couleur + épaisseur */
-  const bc = document.createElement("button"); bc.id = "penCol"; bc.title = "Couleur et épaisseur du trait"; bc.setAttribute("aria-label", "Couleur et épaisseur"); bc.innerHTML = '<span class="pcur"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16.5 3.5l3 3L9 17l-4 1 1-4z"/><path d="M14.5 5.5l3 3"/><path class="pointe" stroke="none" d="M6 14l3 3-4 1z"/><path class="trait" stroke-width="2.6" d="M12 21h8"/></svg></span>';   /* symbole de crayon : la pointe et le trait ont la couleur choisie */
+  const bc = document.createElement("button"); bc.id = "penCol"; bc.title = "Crayon : toucher pour l'activer ou l'enlever; appui long pour la couleur et l'épaisseur"; bc.setAttribute("aria-label", "Couleur et épaisseur"); bc.innerHTML = '<span class="pcur"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16.5 3.5l3 3L9 17l-4 1 1-4z"/><path d="M14.5 5.5l3 3"/><path class="pointe" stroke="none" d="M6 14l3 3-4 1z"/><path class="trait" stroke-width="2.6" d="M12 21h8"/></svg></span>';   /* symbole de crayon : la pointe et le trait ont la couleur choisie */
   const pc = pop("popCol");
   /* une seule ligne : couleurs, autre couleur, | surligneurs (ronds = crayon, carrés = surligneur) */
   { const sws = [...bar.querySelectorAll(".sw")], sep = document.createElement("span"); sep.className = "psep";
@@ -710,7 +710,13 @@ majEpaisseur();
   bc.onclick = () => { RD.aRecolorer = SELO.s && strokes().includes(SELO.s) ? SELO.s : null;   /* l'objet choisi pourra prendre la couleur touchée */
     const actif = !RD.eraser && !RD.text && !RD.obj && !RD.crayonOff;
     if (actif){ RD.crayonOff = true; fermer(); refreshTools(); return; }                     /* crayon actif : on le désactive */
-    RD.eraser = false; RD.text = false; RD.obj = false; RD.crayonOff = false; refreshTools(); fermer(); pc.hidden = false; bc.classList.add("open"); majLargeur(); };   /* on l'active et les couleurs s'ouvrent */   /* les formes gardent la palette : on change seulement leur couleur */ bp.onclick = () => basculer(pp, bp);
+    RD.eraser = false; RD.text = false; RD.obj = false; RD.crayonOff = false; refreshTools(); fermer(); };   /* 20 nov. (Jeremy) : un toucher = crayon seulement; les options s'ouvrent par un appui long */
+  /* appui long (0,5 s) sur le crayon : le crayon s'active et ses options (couleurs, épaisseur) s'ouvrent */
+  { let t = 0, long = false; const ouvrirOpt = () => { long = true; RD.eraser = false; RD.text = false; RD.obj = false; RD.crayonOff = false; refreshTools(); fermer(); pc.hidden = false; bc.classList.add("open"); majLargeur(); };
+    bc.addEventListener("pointerdown", () => { long = false; clearTimeout(t); t = setTimeout(ouvrirOpt, 500); });
+    ["pointerup", "pointerleave", "pointercancel"].forEach(ev => bc.addEventListener(ev, () => clearTimeout(t)));
+    bc.addEventListener("click", e => { if (long){ long = false; e.stopImmediatePropagation(); e.preventDefault(); } }, true);
+    bc.addEventListener("contextmenu", e => e.preventDefault()); }   /* on l'active et les couleurs s'ouvrent */   /* les formes gardent la palette : on change seulement leur couleur */ bp.onclick = () => basculer(pp, bp);
   pc.querySelectorAll(".sw").forEach(b => b.addEventListener("click", () => setTimeout(fermer, 120)));
   document.addEventListener("pointerdown", e => { if (bar.contains(e.target) || (pc.hidden && pp.hidden)) return; const couleurs = !pc.hidden && pp.hidden; fermer();
     if (e.target.id === "inkCanvas" && !(couleurs && !RD.crayonOff)){ e.stopPropagation(); e.preventDefault(); } }, true);   /* fermer le menu ⋯ ne dessine pas de point; mais crayon actif + couleurs ouvertes : le premier trait se dessine tout de suite */
