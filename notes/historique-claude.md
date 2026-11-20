@@ -663,3 +663,4 @@
 - 2026-11-20 : Ventilation (EGI 11, permission de Jeremy) : les 105 animations « infinite » jouent 2 fois puis s'arrêtent (journal TNI : gels de 1 s, « dessin » 1,4 s/5 min). Seul changement (octets identiques sinon). Rechiffré mêmes comptes, version 4, livres.js?v=5. Original avant : /tmp/m11-avant.html.
 - 2026-11-20 : tableau blanc : un tableau vide (aucun trait ni image de référence) est supprimé tout seul quand on le quitte avec ‹ › (retirerTableau extrait de wbSupprimer), tableau-blanc.js?v=5.
 - 2026-11-20 : tableau blanc : wbSansOutil() (main et gomme désélectionnées) en changeant de tableau (‹ ›, +) et en ouvrant/fermant le tableau blanc; lecteur.js?v=6, tableau-blanc.js?v=6.
+- 2026-11-20 : barre du crayon : bouton flèche #penSel (1er) = aucun outil (crayonOff, gomme, texte, objets, main), allumé quand aucun outil; lecteur.js?v=7.

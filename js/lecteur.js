@@ -103,6 +103,7 @@ function refreshTools(){ try { if (window.majPopGomme) majPopGomme(); } catch(e)
   $("#cache").hidden = !RD.cache;
   $("#penBar").hidden = !drawing;
   $("#inkCanvas").classList.toggle("live", drawing);
+  { const ps = $("#penSel"); if (ps) ps.classList.toggle("on", !!RD.crayonOff && !RD.eraser && !RD.text && !RD.obj && !RD.hand && !RD.formeK); }
   $("#penE").classList.toggle("on", RD.eraser); $("#penT").classList.toggle("on", !!RD.text && !RD.eraser);
   document.querySelectorAll(".wbonly").forEach(e => { e.hidden = !RD.wb; });
   $("#reader").classList.toggle("wbon", !!RD.wb);   /* tableau blanc : la barre du livre (pages, zoom…) est cachée */
@@ -721,6 +722,15 @@ majEpaisseur();
   const rt = refreshTools; refreshTools = function(){ rt.apply(this, arguments); try { majCouleurCrayon(); } catch(e){} };
   majCouleurCrayon();
 })();
+/* 20 nov. (Jeremy : « difficile de revenir au mode pour sélectionner ») : bouton flèche, toujours en premier dans la barre = aucun outil */
+(function(){ const bar = $("#penBar"); if (!bar || $("#penSel")) return; const b = document.createElement("button"); b.id = "penSel"; b.type = "button";
+  b.setAttribute("aria-label", "Sélectionner (aucun outil)"); b.title = "Sélectionner : aucun outil (toucher pour choisir ou déplacer)";
+  b.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M5 3l14 8-6 1.6L10.5 19z"/><path d="M13 12.6l4.5 6"/></svg>';
+  b.onclick = () => { RD.crayonOff = true; RD.eraser = false; RD.text = false; RD.obj = false; RD.hand = false; RD.formeK = null; RD.objKi = null; RD.objKe = null;
+    const h = $("#wbHand"); if (h) h.classList.remove("on"); const c = $("#inkCanvas"); if (c) c.style.cursor = "";
+    document.querySelectorAll("#penBar .open").forEach(x => x.classList.remove("open")); document.querySelectorAll(".ppop").forEach(x => x.hidden = true);
+    refreshTools(); try { majPopGomme(); } catch(e){} };
+  bar.insertBefore(b, bar.firstChild); })();
 $("#penE").onclick = () => { RD.eraser = !RD.eraser; if (RD.eraser){ RD.text = false; RD.obj = false; } RD.crayonOff = true; refreshTools(); majPopGomme(); };   /* la gomme remplace le crayon : en la rangeant, aucun outil (pas de retour au crayon) */
 /* taille de la gomme : petite fenêtre qui s'ouvre avec la gomme */
 (function(){
