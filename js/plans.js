@@ -310,11 +310,23 @@
     tool = t; stage.className = "pl-stage tool-" + t;
     document.querySelectorAll("#plBar [data-tool]").forEach(b => b.classList.toggle("on", b.dataset.tool === t));
   }
-  document.querySelectorAll("#plBar [data-tool]").forEach(b => b.onclick = () => outil(b.dataset.tool));
-  document.querySelectorAll("#plBar .pl-sw").forEach(b => b.onclick = () => {
-    color = b.dataset.c; document.querySelectorAll("#plBar .pl-sw").forEach(x => x.classList.toggle("on", x === b));
-    if (tool === "pan" || tool === "erase") outil("pen");
+  /* 20 nov. (Jeremy : « les barres gardent leurs outils uniques, mais le crayon, la gomme, etc. fonctionnent pareil partout ») :
+     comme la barre des livres : flèche = aucun outil; toucher un outil actif l'enlève (retour à la flèche); appui long sur le crayon ou le surligneur = couleurs */
+  const pop = $("plPop"); try { ov.appendChild(pop); } catch(e){} let lp = 0, long = false;
+  const fermerPop = () => { pop.hidden = true; document.querySelectorAll("#plBar .pl-btn.open").forEach(x => x.classList.remove("open")); };
+  const ouvrirPop = b => { long = true; if (tool !== b.dataset.tool) outil(b.dataset.tool); pop.hidden = false; b.classList.add("open");
+    const r = b.getBoundingClientRect(), w = pop.offsetWidth, h = pop.offsetHeight; pop.style.left = Math.max(8, Math.min(innerWidth - w - 8, r.left + r.width / 2 - w / 2)) + "px";
+    pop.style.top = (r.top - h - 10 > 8 ? r.top - h - 10 : r.bottom + 10) + "px"; };
+  document.querySelectorAll("#plBar [data-tool]").forEach(b => {
+    const t = b.dataset.tool, couleur = t === "pen" || t === "hl";
+    b.onclick = e => { if (long){ long = false; return; } fermerPop(); outil(tool === t && t !== "pan" ? "pan" : t); };
+    if (couleur){ b.addEventListener("pointerdown", () => { long = false; clearTimeout(lp); lp = setTimeout(() => ouvrirPop(b), 500); });
+      ["pointerup", "pointerleave", "pointercancel"].forEach(ev => b.addEventListener(ev, () => clearTimeout(lp))); b.addEventListener("contextmenu", e => e.preventDefault()); } });
+  document.querySelectorAll("#plPop .pl-sw").forEach(b => b.onclick = () => {
+    color = b.dataset.c; document.querySelectorAll("#plPop .pl-sw").forEach(x => x.classList.toggle("on", x === b));
+    if (tool !== "pen" && tool !== "hl") outil("pen"); setTimeout(fermerPop, 120);
   });
+  document.addEventListener("pointerdown", e => { if (!pop.hidden && !pop.contains(e.target) && !e.target.closest("#plBar [data-tool]")) fermerPop(); }, true);
   $("plUndo").onclick = () => {
     const h = hist.pop(); if (!h) return;
     if (h.op === "add") notes.items.pop(); else notes.items.splice(h.i, 0, h.it);
