@@ -660,3 +660,4 @@
 - 2026-11-19 : tâche de l'assistant (D.tacheProf) prioritaire sur les « prévu » du tableau : migration D.prevV1 (efface g.taches[p].prev si tacheProf existe) + effacement à chaque changement dans l'assistant.
 - 2026-11-19 : vue Semaine : réparation après placement des cartes « Aucun prof libre » (échange dans le même groupe, sinon dans le groupe qui occupe l'enseignant).
 - 2026-11-19 : « donner à » (choix de Jeremy) utilise librePhys : peut dépasser le maximum de la semaine (alerte jaune), pas les heures réelles ni les absences.
+- 2026-11-20 : Ventilation (EGI 11, permission de Jeremy) : les 105 animations « infinite » jouent 2 fois puis s'arrêtent (journal TNI : gels de 1 s, « dessin » 1,4 s/5 min). Seul changement (octets identiques sinon). Rechiffré mêmes comptes, version 4, livres.js?v=5. Original avant : /tmp/m11-avant.html.
