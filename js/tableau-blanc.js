@@ -786,7 +786,7 @@ function redoInk(){ const k = inkKey(), r = REDO[k]; if (!r || !r.length) return
 /* Plan isométrique : un trait le long de la grille est découpé en petits segments (un par côté de triangle) pour que la gomme les efface un à un */
 function decouperIso(cur){
   if (cur.hl || (cur.t && cur.t !== "ligne")) return null;
-  const c = $("#inkCanvas"), r = c.getBoundingClientRect(), k = r.width / (c.offsetWidth || r.width), a = (34 * RD.z) * 1.2 * k, W = r.width, H = r.height;
+  const c = $("#inkCanvas"), r = c.getBoundingClientRect(), k = kEcran(r, c), a = (34 * RD.z) * 1.2 * k, W = r.width, H = r.height;
   const pts = (cur.t ? [cur.p[0], cur.p[cur.p.length - 1]] : cur.p).filter((q, i, v) => !i || q[0] !== v[i - 1][0] || q[1] !== v[i - 1][1]);
   const out = [], g = Date.now() + Math.random();
   for (let i = 0; i + 1 < pts.length; i++){
@@ -1067,7 +1067,10 @@ function pointsTrait(s){
   else { const cx = (a[0] + b[0]) / 2, cy = (a[1] + b[1]) / 2, rx = Math.abs(b[0] - a[0]) / 2, ry = Math.abs(b[1] - a[1]) / 2; for (let i = 0; i < 72; i++){ const t = i / 72 * Math.PI * 2; out.push([cx + rx * Math.cos(t), cy + ry * Math.sin(t)]); } }
   return out;
 }
-function rayonIso(){ const c = $("#inkCanvas"), r = c.getBoundingClientRect(), k = r.width / (c.offsetWidth || r.width); return .3 * (34 * RD.z) * 1.2 * k / r.height; }
+/* 20 nov. (Jeremy : « le dessin isométrique ne s'accroche plus sur les lignes ») : depuis le zoom « photo » au tableau blanc (16 nov.), le zoom est un transform :
+   r.width / offsetWidth contient déjà RD.z. On l'enlève ici, sinon la grille d'accroche est RD.z fois trop grande ou trop petite par rapport à la grille dessinée. */
+function kEcran(r, c){ return (r.width / (c.offsetWidth || r.width)) / (zPhoto() ? (RD.z || 1) : 1); }
+function rayonIso(){ const c = $("#inkCanvas"), r = c.getBoundingClientRect(), k = kEcran(r, c); return .3 * (34 * RD.z) * 1.2 * k / r.height; }
 const rayonGomme = () => ((RD.wb && /^iso/.test(wbBg())) ? rayonIso() * .75 : .012) * (RD.gommeT || 1);   /* RD.gommeT : glissière « Taille de la gomme » */
 function distSeg(p, u, v, a){
   const ux = (v[0] - u[0]) * a, uy = v[1] - u[1], px = (p[0] - u[0]) * a, py = p[1] - u[1], l2 = ux * ux + uy * uy;
@@ -1870,8 +1873,8 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
   $("#objSim").onclick = () => { if (RD.sim) simStop(); else simStart(); };
   const c = $("#inkCanvas"); let mv = null;
   const cur = e => { const r = c.getBoundingClientRect(); let x = e.clientX - r.left, y = e.clientY - r.top;
-    if (modeElec()){ const u = 34 * RD.z * (r.width / (c.offsetWidth || r.width)); return { raw:[x / r.width, y / r.height], snap:[Math.round(x / u) * u / r.width, Math.round(y / u) * u / r.height] }; }
-    const k = r.width / (c.offsetWidth || r.width), a = (34 * RD.z) * 1.2 * k, d = a * .8660254, i0 = Math.round(x / d); let best = null;
+    if (modeElec()){ const u = 34 * RD.z * kEcran(r, c); return { raw:[x / r.width, y / r.height], snap:[Math.round(x / u) * u / r.width, Math.round(y / u) * u / r.height] }; }
+    const k = kEcran(r, c), a = (34 * RD.z) * 1.2 * k, d = a * .8660254, i0 = Math.round(x / d); let best = null;
     for (let i = i0 - 1; i <= i0 + 1; i++){ const yy = (Math.round(y / a - (i & 1 ? .5 : 0)) + (i & 1 ? .5 : 0)) * a, dd = Math.hypot(x - i * d, y - yy); if (!best || dd < best[0]) best = [dd, i * d, yy]; }
     return { raw:[(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height], snap:[best[1] / r.width, best[2] / r.height] }; };
   const majZone = () => { const r = c.getBoundingClientRect(), q1 = mv.q1 || mv.q0;
@@ -1969,7 +1972,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     if (el){ completerObjet(o); if (ELEC[k].nf) o.nf = 0; if (k === "relais") o.k = "bobine"; }
     const fils = strokes().filter(f => f.t === "ligne" && f.fil);
     const branche = p => el ? fils.some(f => surFil(p, f) || bout(p, f)) : surTuyau(p);
-    const pas = el ? elecU() * r.width / c.width : 34 * RD.z * 1.2 * (r.width / (c.offsetWidth || r.width)) * .55, vus = new Set(); let best = null;
+    const pas = el ? elecU() * r.width / c.width : 34 * RD.z * 1.2 * kEcran(r, c) * .55, vus = new Set(); let best = null;
     for (let dx = -3; dx <= 3; dx++) for (let dy = -3; dy <= 3; dy++){ const q = cur({ clientX:cx + dx * pas, clientY:cy + dy * pas }).snap, cle = q.map(v => v.toFixed(5)).join(); if (vus.has(cle)) continue; vus.add(cle);
       for (const ori of [0, 1]) for (const vv of (!el && DEBOUT_OK.test(k) ? [0, 1] : [0])){ const t = { ...o, p:[q], o:ori, v:vv }, P = objGeo(t, c.width, c.height).ports.map(pp => [pp[0] / c.width, pp[1] / c.height]), n = P.filter(branche).length;   /* sur un tuyau vertical, l'objet se pose debout */
         if (!n) continue; const d = Math.hypot(dx, dy) + ori * .01 + vv * .02, sc = n * 10 - d; if (!best || sc > best[0]) best = [sc, q, ori, n, vv]; } }
@@ -2148,7 +2151,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
       if (L){ ouvrirTexte(L.x, L.y - L.hL, [(L.x - r.left) / r.width, (L.y - L.hL - r.top) / r.height], L.w, L.hL, null, L); return; } }
     if (w < 40) w = 260; if (h < 30) h = 90;                                /* simple clic : zone par défaut */
     let q = [(x - r.left) / r.width, (y - r.top) / r.height];
-    if (/^iso/.test(wbBg()) && RD.wb){ const k = r.width / (c.offsetWidth || r.width), a = (34 * RD.z) * 1.2 * k, d = a * .8660254, sx = Math.round((x - r.left) / d), sy = Math.round((y - r.top) / a - (sx & 1 ? .5 : 0)) + (sx & 1 ? .5 : 0); q = [sx * d / r.width, sy * a / r.height]; x = r.left + sx * d; y = r.top + sy * a; }
+    if (/^iso/.test(wbBg()) && RD.wb){ const k = kEcran(r, c), a = (34 * RD.z) * 1.2 * k, d = a * .8660254, sx = Math.round((x - r.left) / d), sy = Math.round((y - r.top) / a - (sx & 1 ? .5 : 0)) + (sx & 1 ? .5 : 0); q = [sx * d / r.width, sy * a / r.height]; x = r.left + sx * d; y = r.top + sy * a; }
     ouvrirTexte(x, y, q, w, h);
   }));
 })();
@@ -2158,12 +2161,12 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
   const pt = e => {
     const r = rectToile(); let x = e.clientX - r.left, y = e.clientY - r.top;
     if (RD.wb && !RD.eraser && /^iso/.test(wbBg())){                      /* plan isométrique : le crayon s'accroche aux croisements de la grille */
-      const k = r.width / (c.offsetWidth || r.width), a = (34 * RD.z) * 1.2 * k, d = a * .8660254, i0 = Math.round(x / d);
+      const k = kEcran(r, c), a = (34 * RD.z) * 1.2 * k, d = a * .8660254, i0 = Math.round(x / d);
       let best = null;
       for (let i = i0 - 1; i <= i0 + 1; i++){ const yy = (Math.round(y / a - (i & 1 ? .5 : 0)) + (i & 1 ? .5 : 0)) * a, dd = Math.hypot(x - i * d, y - yy); if (!best || dd < best[0]) best = [dd, i * d, yy]; }
       x = best[1]; y = best[2];
     } else if (RD.wb && !RD.eraser && RD.shape && wbBg() === "quad"){       /* quadrillé : lignes et formes s'accrochent aux carreaux */
-      const u = 34 * RD.z * (r.width / (c.offsetWidth || r.width)); x = Math.round(x / u) * u; y = Math.round(y / u) * u;
+      const u = 34 * RD.z * kEcran(r, c); x = Math.round(x / u) * u; y = Math.round(y / u) * u;
     }
     return [x / r.width, y / r.height];
   };
@@ -2218,7 +2221,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     if (fond.width !== W || fond.height !== H){ redrawInk(); return; }
     g.clearRect(0, 0, W, H); g.drawImage(fond, 0, 0); drawStroke(g, cur, W, H, k); };
   /* crayon sur plan iso : le trait avance le long d'un axe de la grille et ne tourne (coin net) que lorsque la main quitte cette ligne */
-  const suivreIso = e => { const r = rectToile(), k = r.width / (c.offsetWidth || r.width), a = 34 * RD.z * 1.2 * k, d = a * .8660254, X0 = [e.clientX - r.left, e.clientY - r.top];
+  const suivreIso = e => { const r = rectToile(), k = kEcran(r, c), a = 34 * RD.z * 1.2 * k, d = a * .8660254, X0 = [e.clientX - r.left, e.clientY - r.top];
     const X = cur.fin ? X0 : (cur.lisse = cur.lisse ? [cur.lisse[0] * .35 + X0[0] * .65, cur.lisse[1] * .35 + X0[1] * .65] : X0);   /* (3 nov.) lissage plus léger : moins de retard */ /* main lissée : un tremblement ne fait pas tourner la ligne */
     const AXES = [[d, a / 2], [-d, -a / 2], [-d, a / 2], [d, -a / 2], [0, a], [0, -a]];
     if (!cur.coins) cur.coins = [[cur.p[0][0] * r.width, cur.p[0][1] * r.height]];
