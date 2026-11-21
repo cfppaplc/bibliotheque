@@ -694,3 +694,4 @@
 - 2026-11-21 : logo Défi+ (« Défi » + carré orange « + », animé une fois) sur l'écran d'attente de la partie (quiz.js, css/quiz.css) et sur l'écran élève « Entre le code » de quiz (garde.js); « Mes quiz » → « Mes Défi+ ».
 - 2026-11-21 : anciens quiz de livres (livre-*, 10 livres, dont Matériel électrique) retirés de quiz-livres.js, 79 images img/labo/quiz/livres/ retirées (plus utilisées). Défi+ : couverture = img/couvertures/<livre>.jpg (nouvelles couvertures HD).
 - 2026-11-21 : Défi+ ajoutés : Entretien ménager, 2 Recherche d'emploi, 2 Lecture de plans, Plomberie et chauffage (fichiers originaux/defi-livres/livres/*.py).
+- 2026-11-21 : Défi+ faits pour 15 livres (45 Défi+, 675 questions). Pas de Défi+ : Matériel électrique (à refaire), Puits/coupe-feu SAE (pas d'original clair), essai micro. Données : originaux/defi-livres/donnees.py + livres/*.py; python3 construire.py.

@@ -3887,6 +3887,1686 @@ window.QUIZ_LIVRES = [
 ]
 },
 {
+"id": "defi-montages-electriques-c5-1",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Ateliers de montages électriques (C5) · Défi+ 1 de 3",
+"sujet": "Ateliers 0 à 5 : fiche mâle, montages filaires, série et parallèle",
+"couv": "img/couvertures/montages-electriques-c5.jpg",
+"coul": "#E0892B",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
+"q": "Sur une fiche mâle 120 V, le fil blanc (neutre) va à la lame…",
+"ch": [
+"la plus large",
+"la plus étroite",
+"ronde",
+"n'importe laquelle"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Le fil vert ou dénudé, c'est…",
+"ch": [
+"la mise à la terre",
+"le neutre",
+"le chaud",
+"le retour d'interrupteur"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Un interrupteur se branche sur…",
+"ch": [
+"le fil chaud (noir)",
+"le neutre (blanc)",
+"la terre",
+"n'importe quel fil"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Montage « source à la lampe » : le fil blanc qui va vers l'interrupteur…",
+"ch": [
+"est réidentifié en noir parce qu'il devient un chaud",
+"reste un neutre",
+"est coupé",
+"va à la terre"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Deux lampes en série : si une lampe brûle…",
+"ch": [
+"l'autre s'éteint aussi",
+"l'autre brille plus fort",
+"rien ne change",
+"le disjoncteur saute"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Deux lampes en série reçoivent chacune…",
+"ch": [
+"une partie de la tension : elles éclairent moins",
+"la pleine tension",
+"aucune tension",
+"le double de la tension"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Deux luminaires en parallèle : chacun reçoit…",
+"ch": [
+"la pleine tension (120 V)",
+"la moitié de la tension",
+"aucune tension",
+"24 V"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Dans un circuit en parallèle, si une lampe brûle, les autres restent allumées.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "Un circuit mixte, c'est…",
+"ch": [
+"une partie en série et une partie en parallèle",
+"deux circuits sans lien",
+"un circuit 24 V",
+"un circuit sans charge"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Avant de toucher au montage : dans l'ordre.",
+"ch": [
+"Couper la source",
+"Vérifier l'absence de tension",
+"Faire le montage",
+"Faire vérifier avant de remettre sous tension"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45,
+"t": "ordre"
+},
+{
+"q": "Le capuchon de connexion (marrette) se visse…",
+"ch": [
+"dans le sens horaire, fils bien torsadés",
+"dans le sens antihoraire",
+"sans tourner",
+"sur un seul fil"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Ce que tu mesures avec le multimètre dans ces ateliers :",
+"ch": [
+"La tension",
+"La continuité",
+"La résistance",
+"La pression d'eau"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"t": "multi"
+},
+{
+"q": "Pour vérifier la continuité, le circuit doit être…",
+"ch": [
+"hors tension",
+"sous tension",
+"à moitié branché",
+"mouillé"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "La couleur du fil chaud en 120 V résidentiel :",
+"ch": [
+"noir (ou rouge)",
+"blanc",
+"vert",
+"gris"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "On peut couper le neutre avec l'interrupteur au lieu du chaud.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 1,
+"s": 15,
+"expl": "La lampe resterait sous tension même éteinte."
+}
+]
+},
+{
+"id": "defi-montages-electriques-c5-2",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Ateliers de montages électriques (C5) · Défi+ 2 de 3",
+"sujet": "Ateliers 6 à 12 : prise et lampe, 3 voies et 4 voies, schéma à échelle, dispositifs de contrôle",
+"couv": "img/couvertures/montages-electriques-c5.jpg",
+"coul": "#E0892B",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
+"q": "Une prise toujours alimentée sur le même circuit qu'une lampe commandée : la prise se branche…",
+"ch": [
+"avant l'interrupteur (sur le chaud permanent)",
+"après l'interrupteur",
+"sur la lampe",
+"sur la terre"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Commander une lampe de deux endroits demande…",
+"ch": [
+"deux interrupteurs 3 voies",
+"deux interrupteurs simples",
+"un 4 voies seul",
+"un gradateur"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Commander une lampe de trois endroits demande…",
+"ch": [
+"deux 3 voies et un 4 voies",
+"trois 3 voies",
+"trois interrupteurs simples",
+"un 3 voies et deux simples"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Les deux fils qui relient les interrupteurs 3 voies s'appellent…",
+"ch": [
+"les navettes (voyageurs)",
+"les neutres",
+"les terres",
+"les communs"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Sur un 3 voies, la borne foncée est…",
+"ch": [
+"le commun",
+"une navette",
+"la terre",
+"le neutre"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Le schéma filaire montre…",
+"ch": [
+"où passent les fils",
+"seulement la logique",
+"la pression d'eau",
+"les tuyaux"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Le schéma à échelle montre surtout…",
+"ch": [
+"la logique de fonctionnement, échelon par échelon",
+"la position réelle des boîtes",
+"le prix",
+"la tuyauterie"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Un thermostat à bilame…",
+"ch": [
+"courbe avec la chaleur et ouvre ou ferme un contact",
+"mesure la pression",
+"compte les heures",
+"change la tension"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Un pressostat de pompe à eau : l'enclenchement, c'est…",
+"ch": [
+"la pression basse où la pompe part",
+"la pression haute où elle arrête",
+"la température",
+"le débit"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "L'écart entre l'enclenchement et le déclenchement d'un pressostat s'appelle…",
+"ch": [
+"le différentiel",
+"la consigne",
+"la tension",
+"la charge"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "L'interrupteur à flotteur d'une pompe de relevage…",
+"ch": [
+"démarre la pompe quand l'eau monte",
+"chauffe l'eau",
+"règle la pression",
+"coupe le gaz"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "L'alarme de niveau haut avertit…",
+"ch": [
+"que la pompe n'arrive plus et que l'eau monte trop",
+"que la pompe est neuve",
+"que l'eau est froide",
+"qu'il pleut"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Une commande basse tension utilise…",
+"ch": [
+"un transformateur (120 V → 24 V) et un relais",
+"une prise de 240 V",
+"un fusible seulement",
+"une pile"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Le relais permet au petit circuit 24 V…",
+"ch": [
+"de commander une charge 120 V ou 240 V",
+"de chauffer l'eau",
+"d'augmenter la pression",
+"de remplacer le disjoncteur"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "La bobine du relais est dans le circuit de commande; ses contacts sont dans le circuit de puissance.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+}
+]
+},
+{
+"id": "defi-montages-electriques-c5-3",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Ateliers de montages électriques (C5) · Défi+ 3 de 3",
+"sujet": "Ateliers 13 à 18 : chauffe-eau électriques et pompes",
+"couv": "img/couvertures/montages-electriques-c5.jpg",
+"coul": "#E0892B",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
+"q": "Vérifier un élément chauffant hors tension : à l'ohmmètre, un élément brûlé donne…",
+"ch": [
+"une résistance infinie (circuit ouvert)",
+"environ 10 à 15 ohms",
+"zéro exactement",
+"la tension du réseau"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "L'ECO d'un chauffe-eau, c'est…",
+"ch": [
+"la limite haute de sécurité (coupe si l'eau devient trop chaude)",
+"le mode économie",
+"l'anode",
+"la soupape"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Un chauffe-eau à deux éléments « non simultané » :",
+"ch": [
+"un seul élément chauffe à la fois",
+"les deux chauffent toujours ensemble",
+"il n'a qu'un thermostat",
+"il fonctionne au gaz"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Dans un chauffe-eau à deux éléments, lequel chauffe en premier quand le réservoir est froid?",
+"ch": [
+"L'élément du haut",
+"L'élément du bas",
+"Les deux",
+"Aucun"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Un chauffe-eau électrique résidentiel fonctionne généralement en…",
+"ch": [
+"240 V",
+"24 V",
+"12 V",
+"600 V"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "On peut faire fonctionner un élément chauffant à sec (réservoir vide) pour le tester.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 1,
+"s": 15,
+"expl": "Il brûle en quelques secondes."
+},
+{
+"q": "Une pompe de puits de surface (jet) est souvent alimentée en…",
+"ch": [
+"240 V",
+"24 V",
+"12 V",
+"5 V"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Une pompe de puits artésien submersible « 3 fils » a…",
+"ch": [
+"un boîtier de commande au-dessus du sol",
+"aucun câblage",
+"un moteur au gaz",
+"seulement un neutre"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Le pressostat d'un système de puits commande…",
+"ch": [
+"le départ et l'arrêt de la pompe selon la pression",
+"la température de l'eau",
+"le débit de la douche",
+"la lumière"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "La pompe de relevage (puisard) se trouve…",
+"ch": [
+"dans une fosse au sous-sol",
+"sur le toit",
+"dans le chauffe-eau",
+"dans le panneau"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Remplacer un élément chauffant : dans l'ordre.",
+"ch": [
+"Couper et cadenasser",
+"Vérifier l'absence de tension",
+"Vidanger sous le niveau de l'élément",
+"Remplacer, remplir, purger l'air",
+"Remettre sous tension"
+],
+"bon": [
+0,
+1,
+2,
+3,
+4
+],
+"s": 50,
+"t": "ordre"
+},
+{
+"q": "Avant de remettre un chauffe-eau électrique sous tension après l'avoir vidé :",
+"ch": [
+"le remplir complètement et purger l'air par un robinet d'eau chaude",
+"rien",
+"fermer l'eau froide",
+"enlever l'ECO"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Un fil de mise à la terre sur une pompe sert à…",
+"ch": [
+"protéger contre les chocs si un fil touche la carcasse",
+"faire tourner le moteur",
+"augmenter la pression",
+"rien"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Ce qu'on mesure sur un moteur de pompe, hors tension :",
+"ch": [
+"La résistance des enroulements",
+"La continuité vers la carcasse (ne doit pas y en avoir)",
+"La pression du puits",
+"La couleur du fil"
+],
+"bon": [
+0,
+1
+],
+"s": 30,
+"t": "multi"
+},
+{
+"q": "Le formatif de la compétence 5 vérifie…",
+"ch": [
+"la théorie, le montage réussi et des mesures justes",
+"seulement la vitesse",
+"le nombre de fils utilisés",
+"la propreté du local"
+],
+"bon": 0,
+"s": 20
+}
+]
+},
+{
+"id": "defi-notions-energie-c13-1",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Notions d'énergie (C13) · Défi+ 1 de 3",
+"sujet": "Modules 1 et 2 : sources d'énergie, pertes de chaleur",
+"couv": "img/couvertures/notions-energie-c13.jpg",
+"coul": "#0F6E56",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
+"q": "L'énergie et la puissance : laquelle est une vitesse?",
+"ch": [
+"La puissance",
+"L'énergie",
+"Les deux",
+"Aucune"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "1 kW équivaut à combien de BTU/h (environ)?",
+"t": "nombre",
+"ch": [],
+"bon": 3412,
+"s": 45,
+"u": "BTU/h"
+},
+{
+"q": "1 tonne de climatisation équivaut à combien de BTU/h?",
+"t": "nombre",
+"ch": [],
+"bon": 12000,
+"s": 45,
+"u": "BTU/h"
+},
+{
+"q": "Le mazout utilisé pour le chauffage résidentiel :",
+"ch": [
+"le mazout léger n° 2",
+"l'essence",
+"le diesel marin",
+"le propane"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Lesquelles captent une chaleur gratuite et renouvelable?",
+"ch": [
+"Géothermie",
+"Aérothermie",
+"Solaire",
+"Mazout"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"t": "multi"
+},
+{
+"q": "Le vrai coût de l'énergie tient compte…",
+"ch": [
+"du prix et du rendement de l'appareil",
+"du prix seulement",
+"de la couleur de l'appareil",
+"de la marque"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Un appareil au mazout transforme l'énergie : dans l'ordre.",
+"ch": [
+"Énergie chimique du mazout",
+"Combustion dans le brûleur",
+"Chaleur transmise à l'eau de la chaudière",
+"Chaleur dans la pièce"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45,
+"t": "ordre"
+},
+{
+"q": "Les trois modes de transfert de chaleur :",
+"ch": [
+"Conduction",
+"Convection",
+"Rayonnement",
+"Évaporation"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"t": "multi"
+},
+{
+"q": "Dans une vieille maison, la plus grosse perte de chaleur vient souvent…",
+"ch": [
+"des fuites d'air",
+"du plancher du sous-sol",
+"des lumières",
+"du chauffe-eau"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "L'effet de cheminée :",
+"ch": [
+"l'air chaud monte et sort par le haut, aspirant l'air froid par le bas",
+"la cheminée chauffe la maison",
+"l'air froid monte",
+"l'air ne bouge pas"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Un pont thermique, c'est…",
+"ch": [
+"un endroit où la chaleur passe plus facilement à travers l'enveloppe",
+"un pont chauffé",
+"un isolant de qualité",
+"une fenêtre ouverte"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "La valeur R sur l'emballage d'un isolant, c'est la résistance…",
+"ch": [
+"nominale (la réelle, une fois posé, peut être plus basse)",
+"effective garantie",
+"en BTU",
+"électrique"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "La caméra thermique sert à…",
+"ch": [
+"voir les pertes de chaleur",
+"mesurer la pression",
+"trouver les fils",
+"lire les plans"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Plus il y a de degrés-jours dans une région…",
+"ch": [
+"plus il faut chauffer",
+"moins il faut chauffer",
+"plus il fait chaud",
+"rien ne change"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Perte de 8 460 W pour un ΔT de 47 °C : quel coefficient, en W/°C?",
+"t": "nombre",
+"ch": [],
+"bon": 180,
+"s": 50,
+"u": "W/°C"
+}
+]
+},
+{
+"id": "defi-notions-energie-c13-2",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Notions d'énergie (C13) · Défi+ 2 de 3",
+"sujet": "Modules 3 et 4 : émetteurs, débit, circulateur, fonctionnement des systèmes",
+"couv": "img/couvertures/notions-energie-c13.jpg",
+"coul": "#0F6E56",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
+"q": "Une plinthe électrique de 1 000 W donne combien de BTU/h (environ)?",
+"t": "nombre",
+"ch": [],
+"bon": 3412,
+"s": 45,
+"u": "BTU/h"
+},
+{
+"q": "Une plinthe à eau chaude : plus l'eau est chaude…",
+"ch": [
+"plus chaque pied de plinthe donne de chaleur",
+"moins elle chauffe",
+"rien ne change",
+"plus elle consomme d'électricité"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Le plancher radiant hydronique utilise surtout…",
+"ch": [
+"des tubes de PEX dans la dalle ou sous le plancher",
+"des fils électriques",
+"de l'air pulsé",
+"de la vapeur"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "L'eau d'un réseau de chauffage, c'est comme…",
+"ch": [
+"un camion de livraison de chaleur",
+"un isolant",
+"un combustible",
+"un filtre"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Dans un réseau fermé, le circulateur…",
+"ch": [
+"vainc les pertes de charge, il ne « monte » pas l'eau",
+"monte l'eau au 2e étage",
+"chauffe l'eau",
+"remplit le réseau"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "La perte de charge, c'est…",
+"ch": [
+"le frottement de l'eau sur les parois du tuyau",
+"une fuite",
+"la chaleur perdue",
+"la pression de la ville"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Tout système de chauffage…",
+"ch": [
+"produit, distribue et émet la chaleur",
+"produit seulement",
+"refroidit l'air",
+"filtre l'eau"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Une fournaise à air pulsé chauffe…",
+"ch": [
+"l'air, à travers un échangeur de chaleur",
+"l'eau des plinthes",
+"la vapeur",
+"le sol"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Une fournaise à condensation mal installée (évacuation, air de combustion, drain)…",
+"ch": [
+"ne donne pas son rendement et peut être dangereuse",
+"fonctionne mieux",
+"consomme moins",
+"n'a aucun problème"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "La soupape de sûreté d'une chaudière…",
+"ch": [
+"s'ouvre si la pression dépasse son réglage",
+"règle la température",
+"remplit la chaudière",
+"purge l'air"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Une thermopompe utilise un frigorigène qui…",
+"ch": [
+"bout à très basse température",
+"ne change jamais d'état",
+"brûle",
+"gèle à 0 °C"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "On ajoute du glycol dans une boucle quand…",
+"ch": [
+"elle risque de geler (garage, chalet, géothermie)",
+"l'eau est trop dure",
+"on veut plus de pression",
+"jamais"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Un système combiné utilise la même chaudière pour…",
+"ch": [
+"le chauffage et l'eau chaude domestique",
+"le chauffage et la climatisation",
+"l'eau et le gaz",
+"deux maisons"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Le rendement de combustion, c'est…",
+"ch": [
+"la part de l'énergie du combustible transmise à l'eau ou à l'air",
+"la vitesse du ventilateur",
+"la quantité de mazout",
+"la température extérieure"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Débit d'eau : pour la même puissance, un ΔT plus grand demande…",
+"ch": [
+"moins de débit",
+"plus de débit",
+"le même débit",
+"aucun débit"
+],
+"bon": 0,
+"s": 20
+}
+]
+},
+{
+"id": "defi-notions-energie-c13-3",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Notions d'énergie (C13) · Défi+ 3 de 3",
+"sujet": "Modules 5 à 7 : brûleurs à l'huile, économiser l'énergie, conseiller le client",
+"couv": "img/couvertures/notions-energie-c13.jpg",
+"coul": "#0F6E56",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
+"q": "Le mazout en flaque est difficile à allumer, parce que…",
+"ch": [
+"seule sa vapeur brûle : il faut le pulvériser",
+"il est trop froid",
+"il contient de l'eau",
+"il est trop épais"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Le brûleur à pulvérisation (« à canon »)…",
+"ch": [
+"pulvérise le mazout, le mélange à l'air et l'allume",
+"chauffe le réservoir",
+"pompe l'eau",
+"mesure la flamme"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Le gicleur est en laiton avec…",
+"ch": [
+"un orifice usiné et une chambre de tourbillonnement",
+"un filtre à air",
+"une résistance",
+"un aimant"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "La cellule au CdS a une résistance…",
+"ch": [
+"très élevée dans le noir, faible quand elle voit la flamme",
+"faible dans le noir",
+"toujours la même",
+"nulle"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Avec le mazout, la combustion se vérifie avec…",
+"ch": [
+"un analyseur de combustion et le tirage",
+"un thermomètre de cuisine",
+"un ruban à mesurer",
+"une caméra"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Un bon diagnostic part…",
+"ch": [
+"du symptôme du client, puis des causes les plus probables",
+"du changement de pièces",
+"du prix",
+"de la marque"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Pour économiser l'énergie, on commence par…",
+"ch": [
+"la base : un appareil bien entretenu et l'enveloppe",
+"le gadget le plus cher",
+"remplacer la maison",
+"rien"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Le VRC (ventilateur récupérateur de chaleur)…",
+"ch": [
+"ventile une maison étanche en récupérant la chaleur de l'air sortant",
+"chauffe l'eau",
+"climatise",
+"filtre l'eau"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Le récupérateur de chaleur des eaux de drainage…",
+"ch": [
+"préchauffe l'eau froide avec l'eau tiède de la douche",
+"chauffe l'égout",
+"fait du bruit",
+"remplace le chauffe-eau"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Le différentiel d'un thermostat sert à…",
+"ch": [
+"éviter que le chauffage parte et arrête sans arrêt",
+"augmenter la température",
+"économiser le mazout seulement",
+"rien"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "« La chaleur la moins chère est celle qu'on ne produit pas » : outil?",
+"ch": [
+"Thermostats programmables et zonage",
+"Ouvrir les fenêtres",
+"Augmenter la consigne",
+"Enlever l'isolant"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Expliquer « AFUE de 96 % » à un client :",
+"ch": [
+"« Sur toute la saison, 96 % du gaz devient de la chaleur pour la maison »",
+"« L'appareil a 96 ans »",
+"« Il consomme 96 % de plus »",
+"« C'est 96 °C »"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Avant de conseiller un client, on écoute ses besoins :",
+"ch": [
+"Qu'est-ce qui vous dérange (froid, facture, bruit)?",
+"Quelles pièces sont inconfortables?",
+"Quel est votre budget?",
+"Quel est votre signe astrologique?"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"t": "multi"
+},
+{
+"q": "Structurer une recommandation : dans l'ordre.",
+"ch": [
+"Situation",
+"Options",
+"Recommandation"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "La documentation des fabricants est souvent…",
+"ch": [
+"en anglais : il faut connaître les termes",
+"inexistante",
+"en latin",
+"dessinée seulement"
+],
+"bon": 0,
+"s": 20
+}
+]
+},
+{
+"id": "defi-dispositifs-electriques-c9-1",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Dispositifs électriques et électroniques (C9) · Défi+ 1 de 3",
+"sujet": "Modules 1 à 3 : le courant, les composants, lire un schéma",
+"couv": "img/couvertures/dispositifs-electriques-c9.jpg",
+"coul": "#E0892B",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
+"q": "Lesquels sont des conducteurs?",
+"ch": [
+"Cuivre",
+"Eau du robinet",
+"Corps humain",
+"Caoutchouc"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"t": "multi"
+},
+{
+"q": "Au Québec, l'électricité vient surtout…",
+"ch": [
+"de centrales hydroélectriques",
+"du charbon",
+"du nucléaire",
+"du mazout"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "À partir de combien de mA une prise ou un disjoncteur DDFT déclenche-t-il (environ)?",
+"t": "nombre",
+"ch": [],
+"bon": 5,
+"s": 40,
+"u": "mA"
+},
+{
+"q": "Feu d'origine électrique :",
+"ch": [
+"jamais d'eau; extincteur de classe C (CO₂ ou poudre)",
+"on jette de l'eau",
+"on souffle dessus",
+"on ouvre le panneau"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Vérifier l'absence de tension : la méthode en 3 temps.",
+"ch": [
+"Vérifier le multimètre sur une source connue",
+"Mesurer le circuit coupé",
+"Revérifier le multimètre sur la source connue"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 45,
+"t": "ordre"
+},
+{
+"q": "Le filage d'alimentation 120/240 V, du panneau jusqu'à l'appareil, c'est le travail…",
+"ch": [
+"de l'électricien",
+"du tuyauteur",
+"du préposé",
+"du client"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Un fil de thermostat 24 V typique :",
+"ch": [
+"18 AWG",
+"12 AWG",
+"6 AWG",
+"2 AWG"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "La loi d'Ohm :",
+"ch": [
+"E = R × I",
+"E = R ÷ I",
+"P = R + I",
+"I = E × R"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Un contact ouvert n'a jamais de tension à ses bornes.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 1,
+"s": 15,
+"expl": "Ouvert ≠ sans tension : il a la pleine tension à ses bornes."
+},
+{
+"q": "Un transformateur fonctionne par…",
+"ch": [
+"induction",
+"friction",
+"combustion",
+"pression"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Choisir un transformateur : après avoir additionné les VA des charges, on ajoute une marge d'environ…",
+"ch": [
+"5 %",
+"20 %",
+"100 %",
+"aucune"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Relais ou contacteur : lequel a les plus gros contacts (20, 30, 40 A)?",
+"ch": [
+"Le relais",
+"Le contacteur",
+"Les deux pareils",
+"Aucun"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Un bilame…",
+"ch": [
+"deux métaux qui courbent avec la chaleur et ouvrent ou ferment un contact",
+"un fil de cuivre double",
+"un type de fusible",
+"un moteur"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Sur un thermostat, la borne R est…",
+"ch": [
+"le 24 V du transformateur",
+"le compresseur",
+"le ventilateur",
+"la terre"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Sur un schéma, un relais est toujours dessiné…",
+"ch": [
+"au repos (bobine non alimentée)",
+"en marche",
+"à moitié",
+"en couleur"
+],
+"bon": 0,
+"s": 20
+}
+]
+},
+{
+"id": "defi-dispositifs-electriques-c9-2",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Dispositifs électriques et électroniques (C9) · Défi+ 2 de 3",
+"sujet": "Modules 3 à 6 : schémas, eau chaude (valves, aquastats, réinitialisation), brûleurs, dépannage",
+"couv": "img/couvertures/dispositifs-electriques-c9.jpg",
+"coul": "#E0892B",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
+"q": "Sur un schéma, « 1R1 » et « 2R1 » désignent…",
+"ch": [
+"les contacts 1 et 2 du même relais R1",
+"deux relais différents",
+"deux lampes",
+"deux fusibles"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Valve de zone 2 fils : la séquence.",
+"ch": [
+"Le thermostat ferme : le moteur 24 V est alimenté",
+"La valve s'ouvre lentement",
+"En fin de course, l'interrupteur se ferme",
+"La pompe ou le brûleur part"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 50,
+"t": "ordre"
+},
+{
+"q": "L'interrupteur de fin de course d'une valve de zone prouve…",
+"ch": [
+"que la valve est ouverte",
+"que le thermostat est brisé",
+"que l'eau est froide",
+"que le brûleur est éteint"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Un interrupteur de débit (Johnson F61) : la flèche du boîtier pointe…",
+"ch": [
+"dans le sens du débit",
+"contre le débit",
+"vers le haut",
+"vers le panneau"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "La réinitialisation extérieure (courbe de chauffe) :",
+"ch": [
+"plus il fait froid dehors, plus l'eau de chauffage est chaude",
+"l'eau est toujours à la même température",
+"elle arrête le chauffage l'hiver",
+"elle règle l'eau domestique"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "La température extérieure de conception, c'est…",
+"ch": [
+"la journée la plus froide prévue de l'année",
+"la température moyenne de l'été",
+"0 °C",
+"la température de la chaufferie"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Un circulateur à moteur ECM…",
+"ch": [
+"ajuste sa vitesse au besoin et consomme moins",
+"tourne toujours à fond",
+"fonctionne à la vapeur",
+"n'a pas d'électronique"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Brûleur à l'huile : la cellule ne voit pas de flamme au démarrage. Le protectorelais…",
+"ch": [
+"se met en sécurité (verrouille) après sa temporisation",
+"continue indéfiniment",
+"augmente le mazout",
+"allume la cellule"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Avant de vérifier la cellule CdS :",
+"ch": [
+"couper et cadenasser",
+"laisser le brûleur en marche sans protection",
+"mouiller la cellule",
+"rien de spécial"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "La cellule CdS a une résistance…",
+"ch": [
+"très élevée dans le noir, faible à la lumière",
+"faible dans le noir",
+"toujours la même",
+"nulle"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Le délai d'arrêt du ventilateur d'une fournaise (micro-interrupteurs DIP) est souvent de…",
+"ch": [
+"90 s",
+"5 s",
+"10 min",
+"1 h"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Sur le thermostat d'une thermopompe, la borne O/B commande…",
+"ch": [
+"la vanne d'inversion (chauffage ou climatisation)",
+"le ventilateur",
+"le compresseur",
+"l'alimentation"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Dépannage : par quoi commencer?",
+"ch": [
+"l'alimentation (source et protection)",
+"changer la carte",
+"remplacer le moteur",
+"le thermostat neuf"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Un relais claque sans arrêt : cause possible…",
+"ch": [
+"tension trop basse ou instable à la bobine",
+"trop de lumière",
+"le thermostat est neuf",
+"le fil est trop long"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Lire un schéma en quatre passes : dans l'ordre.",
+"ch": [
+"La légende",
+"L'alimentation",
+"La charge et la commande",
+"Les sécurités"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45,
+"t": "ordre"
+}
+]
+},
+{
+"id": "defi-dispositifs-electriques-c9-3",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Dispositifs électriques et électroniques (C9) · Défi+ 3 de 3",
+"sujet": "Modules 7 à 9 : appareils au gaz, vapeur, automates et GTB",
+"couv": "img/couvertures/dispositifs-electriques-c9.jpg",
+"coul": "#E0892B",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
+"q": "Le courant de flamme d'un appareil au gaz se mesure en…",
+"ch": [
+"microampères (µA)",
+"kilowatts",
+"volts CA",
+"ohms"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Une tige de flamme oxydée se nettoie…",
+"ch": [
+"doucement avec un tampon abrasif fin",
+"avec du papier sablé",
+"avec de l'eau",
+"avec un marteau"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Pendant l'essai d'allumage, pas de 120 V au connecteur de l'allumeur HSI :",
+"ch": [
+"la carte ne l'alimente pas",
+"l'allumeur est trop chaud",
+"le gaz est fermé",
+"c'est normal"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Les sécurités d'un appareil au gaz sont branchées…",
+"ch": [
+"en série : une seule ouverte coupe la valve",
+"en parallèle",
+"au hasard",
+"sur le thermostat seulement"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Un pressuretrol, sur une chaudière à vapeur…",
+"ch": [
+"arrête et repart le brûleur selon la pression de vapeur",
+"mesure la température extérieure",
+"remplit la chaudière",
+"purge l'air"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Le coupe-circuit de bas niveau d'eau…",
+"ch": [
+"arrête le brûleur si l'eau manque dans la chaudière",
+"remplit d'eau",
+"chauffe l'eau",
+"allume la veilleuse"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Un automate (API) lit ses entrées et commande ses sorties selon…",
+"ch": [
+"un cycle de scrutation",
+"le hasard",
+"la météo seulement",
+"le courant de flamme"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Lesquels sont des ENTRÉES d'un automate?",
+"ch": [
+"Thermostat",
+"Interrupteur de débit",
+"Limite de température",
+"Brûleur"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"t": "multi"
+},
+{
+"q": "Une temporisation TON de 10 min sert, par exemple, à…",
+"ch": [
+"faire attendre la 2e chaudière avant de partir",
+"allumer la lumière",
+"arrêter la pompe tout de suite",
+"couper le courant"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Sur un diagramme temporel, le circulateur qui continue après l'arrêt du thermostat, c'est…",
+"ch": [
+"la postcirculation",
+"une panne",
+"un court-circuit",
+"une erreur de dessin"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Avec la GTB, avant de se déplacer, le technicien…",
+"ch": [
+"lit l'alarme et la tendance",
+"redémarre tout",
+"change la sonde",
+"coupe le courant du bâtiment"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Sur place, la valeur affichée par la GTB se compare…",
+"ch": [
+"avec une mesure réelle",
+"avec la météo",
+"avec un autre bâtiment",
+"avec rien"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Field wiring veut dire câblage d'usine.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 1,
+"s": 15,
+"expl": "Field wiring = câblage sur place; factory wiring = câblage d'usine."
+},
+{
+"q": "Le Code qui encadre l'électricité au Québec :",
+"ch": [
+"Code de construction, chapitre V – Électricité",
+"Code civil",
+"Code de la route",
+"Code du logement"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Une veilleuse permanente, un allumage intermittent et un allumeur à surface chaude (HSI) sont…",
+"ch": [
+"les trois familles d'allumage au gaz",
+"trois types de thermostats",
+"trois pompes",
+"trois fusibles"
+],
+"bon": 0,
+"s": 20
+}
+]
+},
+{
 "id": "defi-entretien-menager-egi-1",
 "exemple": true,
 "livre": true,
@@ -4435,6 +6115,2251 @@ window.QUIZ_LIVRES = [
 "bon": 1,
 "s": 20,
 "expl": "Il contient du mercure : pas d'aspirateur ni de balai."
+}
+]
+},
+{
+"id": "defi-protection-incendie-1",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Protection incendie d'un bâtiment · Défi+ 1 de 3",
+"sujet": "Modules 1 à 3 : la combustion, les classes de feu, les extincteurs",
+"couv": "img/couvertures/protection-incendie.jpg",
+"coul": "#C62828",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
+"q": "Les éléments du tétraèdre du feu :",
+"ch": [
+"Combustible",
+"Oxygène (comburant)",
+"Chaleur",
+"Réaction en chaîne"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 35,
+"t": "multi"
+},
+{
+"q": "Pour arrêter une combustion, il suffit de…",
+"ch": [
+"retirer un seul élément du tétraèdre",
+"les retirer tous",
+"ajouter de l'oxygène",
+"attendre"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Pourquoi une grosse poutre de bois massif résiste longtemps au feu?",
+"ch": [
+"La couche carbonisée isole le bois intact",
+"Le bois ne brûle pas",
+"Elle est mouillée",
+"Elle est peinte"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Un gaz combustible plus lourd que l'air qui fuit…",
+"ch": [
+"coule vers le bas : on cherche au sol",
+"monte au plafond",
+"reste sur place",
+"disparaît"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "La seule phase du feu où le préposé peut intervenir avec un extincteur :",
+"ch": [
+"l'éclosion",
+"l'embrasement généralisé",
+"le développement complet",
+"le déclin"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Le monoxyde de carbone (CO) dans la fumée…",
+"ch": [
+"est inodore et prend la place de l'oxygène dans le sang",
+"sent fort",
+"est sans danger",
+"est visible"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Un feu qui manque d'air est un feu éteint.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 1,
+"s": 15,
+"expl": "Risque d'explosion de fumée (backdraft) si on ouvre."
+},
+{
+"q": "Un feu de friteuse de restaurant est un feu de classe…",
+"ch": [
+"A",
+"B",
+"C",
+"K"
+],
+"bon": 3,
+"s": 20
+},
+{
+"q": "Un feu d'équipement électrique sous tension est de classe…",
+"ch": [
+"A",
+"B",
+"C",
+"D"
+],
+"bon": 2,
+"s": 20
+},
+{
+"q": "Un feu de bois, papier, tissu est de classe…",
+"ch": [
+"A",
+"B",
+"C",
+"K"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Un extincteur « 2-A:10-B:C » contient le plus souvent…",
+"ch": [
+"de la poudre ABC",
+"de l'eau",
+"du CO₂ seulement",
+"du sable"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "La méthode PASS : dans l'ordre.",
+"ch": [
+"Tirer la goupille",
+"Viser la base du feu",
+"Serrer la poignée",
+"Balayer"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "Extincteur de 18 kg ou moins : le haut à au plus combien de mètres du plancher?",
+"t": "nombre",
+"ch": [],
+"bon": 1.53,
+"s": 45,
+"u": "m"
+},
+{
+"q": "L'étiquette perforée au col d'un extincteur indique…",
+"ch": [
+"le mois et l'année du dernier entretien annuel",
+"la date d'achat",
+"le prix",
+"le fabricant"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "À l'inspection mensuelle d'un extincteur :",
+"ch": [
+"À sa place et visible",
+"Aiguille dans le vert",
+"Goupille et scellé en place",
+"Peint d'une couleur nouvelle"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"t": "multi"
+}
+]
+},
+{
+"id": "defi-protection-incendie-2",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Protection incendie d'un bâtiment · Défi+ 2 de 3",
+"sujet": "Modules 4 à 7 : détection, réseau avertisseur, hors service, alimentation de secours",
+"couv": "img/couvertures/protection-incendie.jpg",
+"coul": "#C62828",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
+"q": "Le détecteur de fumée à ionisation réagit surtout…",
+"ch": [
+"aux feux vifs à petites particules",
+"aux feux qui couvent",
+"à la chaleur",
+"au CO"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Le déclencheur manuel se place…",
+"ch": [
+"près des portes d'issue et des escaliers",
+"dans les logements",
+"au sous-sol seulement",
+"sur le toit"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Un détecteur de fumée se place…",
+"ch": [
+"loin des bouches de ventilation",
+"devant une bouche de ventilation",
+"dans la douche",
+"derrière une porte"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "En alarme, le panneau peut…",
+"ch": [
+"libérer les portes coupe-feu retenues",
+"arrêter les ventilateurs",
+"appeler la centrale",
+"ouvrir les fenêtres"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"t": "multi"
+},
+{
+"q": "La différence d'un panneau adressable :",
+"ch": [
+"il sait quel appareil précis est en alarme",
+"il sonne plus fort",
+"il n'a pas de batterie",
+"il n'a pas de zones"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Le bouton « Accuser réception » du panneau…",
+"ch": [
+"arrête seulement le bip du panneau",
+"arrête l'alarme dans tout l'immeuble",
+"réarme le système",
+"appelle les pompiers"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Une alarme sonne : la séquence du préposé, dans l'ordre.",
+"ch": [
+"Lire le panneau : quel appareil, quel étage",
+"Accuser réception",
+"Aller vérifier en sécurité",
+"Réarmer seulement quand la cause est connue"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45,
+"t": "ordre"
+},
+{
+"q": "Pendant une mise hors service des gicleurs, il faut…",
+"ch": [
+"une personne de garde qui fait des rondes",
+"fermer l'immeuble",
+"rien de spécial",
+"couper l'électricité"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Avant des travaux de soudure dans l'immeuble :",
+"ch": [
+"un permis de travail à chaud signé",
+"une simple autorisation verbale",
+"rien",
+"couper l'eau"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Plusieurs municipalités facturent les fausses alarmes au propriétaire.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "Les batteries du panneau d'alarme : on vérifie…",
+"ch": [
+"la date, le gonflement, la corrosion et le trouble « LOW BATT »",
+"seulement leur couleur",
+"rien, elles sont éternelles",
+"leur prix"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "L'éclairage de secours se teste…",
+"ch": [
+"chaque mois avec le bouton d'essai",
+"jamais",
+"chaque 10 ans",
+"seulement à l'achat"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Le sélecteur de la génératrice doit être en position…",
+"ch": [
+"AUTO",
+"MANUEL",
+"ARRÊT",
+"TEST"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Le panneau consomme peu en veille et beaucoup…",
+"ch": [
+"en alarme",
+"la nuit",
+"l'été",
+"jamais"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "L'étiquette « hors service » indique…",
+"ch": [
+"le système, la vanne, la zone, depuis quand et la raison",
+"le prix de la réparation",
+"le nom du locataire",
+"rien"
+],
+"bon": 0,
+"s": 20
+}
+]
+},
+{
+"id": "defi-protection-incendie-3",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Protection incendie d'un bâtiment · Défi+ 3 de 3",
+"sujet": "Modules 8 à 10 : gicleurs, codes et registres, plan de sécurité incendie",
+"couv": "img/couvertures/protection-incendie.jpg",
+"coul": "#C62828",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
+"q": "Ampoule de gicleur rouge : température nominale…",
+"ch": [
+"57 °C",
+"68 °C",
+"93 °C",
+"141 °C"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Le type de réseau de gicleurs dépend surtout de…",
+"ch": [
+"la tuyauterie peut-elle geler?",
+"la couleur des murs",
+"le nombre de logements",
+"la marque"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Un stationnement non chauffé est souvent protégé par un réseau…",
+"ch": [
+"sous air (sec)",
+"sous eau",
+"à mousse",
+"sans eau"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Le poste de contrôle des gicleurs se trouve souvent…",
+"ch": [
+"au rez-de-chaussée ou au sous-sol",
+"sur le toit",
+"dans un logement",
+"dehors"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Le raccord pompier sert à…",
+"ch": [
+"permettre aux pompiers d'alimenter le réseau",
+"remplir la piscine",
+"arroser le gazon",
+"laver les camions"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "La colonne montante a un robinet d'incendie…",
+"ch": [
+"à chaque étage, dans l'escalier d'issue",
+"seulement au toit",
+"dans chaque logement",
+"au sous-sol seulement"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Une hotte de restaurant est protégée par un système fixe qui…",
+"ch": [
+"coupe le gaz ou l'électricité et projette un agent",
+"ventile plus fort",
+"arrose d'eau",
+"sonne seulement"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "On peut peindre l'étiquette d'homologation d'une porte coupe-feu.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 1,
+"s": 15
+},
+{
+"q": "Une porte coupe-feu doit…",
+"ch": [
+"se refermer et s'enclencher seule",
+"rester ouverte avec une cale",
+"être verrouillée à clé",
+"être enlevée l'été"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Le responsable légal de l'entretien et des registres incendie :",
+"ch": [
+"le propriétaire",
+"le locataire",
+"le pompier",
+"le voisin"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Un bon registre contient :",
+"ch": [
+"La date et l'heure",
+"L'équipement",
+"Le résultat",
+"L'humeur du préposé"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"t": "multi"
+},
+{
+"q": "Le PSI (plan de sécurité incendie), c'est…",
+"ch": [
+"un plan exigé par le Code de sécurité dans plusieurs bâtiments",
+"un plan de rénovation",
+"une police d'assurance",
+"un plan de stationnement"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Une personne en fauteuil roulant, en évacuation :",
+"ch": [
+"le PSI prévoit un lieu sûr et de l'aide désignée",
+"on la laisse",
+"elle prend l'ascenseur seule en tout temps",
+"on attend la fin"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "L'exercice d'évacuation vérifie…",
+"ch": [
+"que le plan fonctionne dans la vraie vie",
+"la vitesse des occupants seulement",
+"la couleur des enseignes",
+"le chauffage"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Le rôle du personnel en évacuation résidentielle :",
+"ch": [
+"guider et aider, la plupart des occupants évacuent seuls",
+"porter chaque occupant",
+"éteindre le feu",
+"fermer les fenêtres"
+],
+"bon": 0,
+"s": 20
+}
+]
+},
+{
+"id": "defi-ventilation-climatisation-m11-1",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Ventilation et climatisation · Défi+ 1 de 3",
+"sujet": "Modules 1 à 3 : sécurité et cadenassage, l'air et le confort, les systèmes",
+"couv": "img/couvertures/ventilation-climatisation-m11.jpg",
+"coul": "#14A3A3",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
+"q": "Un problème de réfrigérant ou de compresseur se signale…",
+"ch": [
+"au mécanicien en réfrigération (frigoriste)",
+"au plombier",
+"au peintre",
+"au préposé"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Pourquoi l'entretien préventif est payant?",
+"ch": [
+"Moins de pannes imprévues et de réparations d'urgence",
+"Il coûte plus cher",
+"Il ne sert à rien",
+"Il remplace le frigoriste"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Une roue de ventilateur qui tourne encore après l'arrêt, c'est…",
+"ch": [
+"de l'énergie résiduelle à contrôler",
+"normal, on met la main",
+"un bris",
+"un gain d'énergie"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Ton collègue t'aide à changer la courroie. Doit-il poser son propre cadenas?",
+"ch": [
+"Oui, chaque personne pose son cadenas",
+"Non, le tien suffit",
+"Seulement s'il est apprenti",
+"Jamais"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "On ventile d'abord…",
+"ch": [
+"pour les personnes (qualité de l'air)",
+"pour le bruit",
+"pour la décoration",
+"pour chauffer"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Convertis 20 °C en °F.",
+"t": "nombre",
+"ch": [],
+"bon": 68,
+"s": 50,
+"u": "°F",
+"expl": "(20 × 1,8) + 32 = 68."
+},
+{
+"q": "Humidité relative visée dans un bâtiment :",
+"ch": [
+"environ 30 à 50 %",
+"5 à 10 %",
+"70 à 90 %",
+"100 %"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "En hiver au Québec, on garde l'humidité plutôt dans le bas de la plage pour éviter…",
+"ch": [
+"la condensation sur les fenêtres",
+"les maux de dos",
+"la neige",
+"le bruit"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Signes de mauvaise qualité de l'air à rapporter :",
+"ch": [
+"Maux de tête, fatigue",
+"Air « lourd », odeurs persistantes",
+"Condensation",
+"Ciel bleu"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"t": "multi"
+},
+{
+"q": "Un moniteur de CO₂ élevé dans une classe indique surtout…",
+"ch": [
+"une ventilation insuffisante",
+"un feu",
+"trop de chauffage",
+"une fuite de gaz"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Plainte de froid : avant de monter la consigne, on cherche…",
+"ch": [
+"la vitre froide, le courant d'air, la bouche bloquée",
+"un nouveau thermostat",
+"rien",
+"le locataire voisin"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Un ventilo-convecteur, c'est…",
+"ch": [
+"un petit ventilateur et un serpentin à eau",
+"une grosse chaudière",
+"un filtre",
+"un humidificateur"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Une pièce en pression négative…",
+"ch": [
+"aspire l'air des pièces voisines",
+"pousse l'air vers les voisins",
+"n'a pas d'air",
+"est fermée"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Air repris 22 °C, air frais 0 °C, air mélangé 16,5 °C : % d'air frais?",
+"t": "nombre",
+"ch": [],
+"bon": 25,
+"s": 60,
+"u": "%",
+"expl": "(16,5 − 22) ÷ (0 − 22) × 100 = 25 %."
+},
+{
+"q": "Le critère de performance demande de respecter les normes de qualité de l'air du Code national du bâtiment.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+}
+]
+},
+{
+"id": "defi-ventilation-climatisation-m11-2",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Ventilation et climatisation · Défi+ 2 de 3",
+"sujet": "Modules 4 à 6 : composants, VRC et VRE, cycle frigorifique",
+"couv": "img/couvertures/ventilation-climatisation-m11.jpg",
+"coul": "#14A3A3",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
+"q": "Un grincement aigu au démarrage d'un ventilateur à courroie :",
+"ch": [
+"courroie qui glisse : trop lâche ou usée",
+"moteur neuf",
+"filtre propre",
+"normal"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "On mesure le courant d'un moteur avec…",
+"ch": [
+"une pince ampèremétrique, unité en marche",
+"un ruban à mesurer",
+"un thermomètre",
+"un manomètre"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Une courroie « B48 » : le code donne…",
+"ch": [
+"la section et la longueur",
+"le prix",
+"la vitesse",
+"la couleur"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Déflexion visée d'une courroie pour une portée de 16 po :",
+"t": "nombre",
+"ch": [],
+"bon": 0.25,
+"s": 50,
+"u": "po",
+"expl": "1/4 po."
+},
+{
+"q": "Le manomètre différentiel sur un filtre compare…",
+"ch": [
+"la pression avant et après le filtre",
+"la température",
+"l'humidité",
+"le courant"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Nettoyer un serpentin : on commence par…",
+"ch": [
+"cadenasser et protéger les composants électriques de l'eau",
+"arroser tout de suite",
+"démarrer le ventilateur",
+"enlever le moteur"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Ventilateur centrifuge ou axial : lequel ressemble à une hélice?",
+"ch": [
+"L'axial",
+"Le centrifuge",
+"Les deux",
+"Aucun"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Pourquoi un bâtiment étanche a-t-il besoin d'un échangeur d'air?",
+"ch": [
+"Pour évacuer l'humidité et les polluants en récupérant la chaleur",
+"Pour chauffer",
+"Pour faire du bruit",
+"Il n'en a pas besoin"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "VRC ou VRE : lequel récupère aussi de l'humidité?",
+"ch": [
+"Le VRE",
+"Le VRC",
+"Les deux pareils",
+"Aucun"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Les filtres d'un VRC se changent ou se nettoient environ…",
+"ch": [
+"aux 2 ou 3 mois",
+"une fois aux 10 ans",
+"chaque jour",
+"jamais"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Le dégivrage d'un VRC : ton travail…",
+"ch": [
+"vérifier que le volet bouge et que le drain coule",
+"le faire à la main chaque nuit",
+"l'arrêter",
+"rien"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Le réfrigérant d'un climatiseur…",
+"ch": [
+"circule en circuit fermé : s'il en manque, il y a une fuite",
+"s'use comme de l'essence",
+"se recharge chaque année",
+"est de l'eau"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "L'écart de température d'un climatiseur se mesure…",
+"ch": [
+"entre l'air repris et l'air soufflé, après 15 minutes de marche",
+"au démarrage",
+"sur le toit",
+"dans l'eau"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Les quatre composants principaux du cycle frigorifique :",
+"ch": [
+"Compresseur",
+"Condenseur",
+"Détendeur",
+"Évaporateur"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 35,
+"t": "multi"
+},
+{
+"q": "Une unité extérieure bien installée est…",
+"ch": [
+"surélevée, au-dessus du niveau de neige, bien dégagée",
+"au sol dans la neige",
+"sous un balcon fermé",
+"dans le garage"
+],
+"bon": 0,
+"s": 20
+}
+]
+},
+{
+"id": "defi-ventilation-climatisation-m11-3",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Ventilation et climatisation · Défi+ 3 de 3",
+"sujet": "Modules 7 à 10 : thermopompes, régulation, climatisation centrale, intervention",
+"couv": "img/couvertures/ventilation-climatisation-m11.jpg",
+"coul": "#14A3A3",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
+"q": "Le COP d'une thermopompe, c'est…",
+"ch": [
+"chaleur fournie ÷ électricité consommée",
+"le prix ÷ la puissance",
+"le bruit en décibels",
+"la température extérieure"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Un COP de 3 veut dire…",
+"ch": [
+"3 fois plus de chaleur que d'électricité consommée",
+"3 kW",
+"3 ans de garantie",
+"3 °C"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Une thermopompe affiche un code d'erreur. Tu…",
+"ch": [
+"notes le code exact, le modèle, la date et l'heure pour le frigoriste",
+"débranches et rebranches sans noter",
+"ignores le code",
+"ouvres le circuit de réfrigérant"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "La vanne d'inversion d'une thermopompe…",
+"ch": [
+"choisit chauffage ou climatisation",
+"coupe le courant",
+"règle l'humidité",
+"purge l'air"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Régulation tout ou rien : un différentiel sert à…",
+"ch": [
+"éviter les départs et arrêts trop fréquents",
+"chauffer plus",
+"mesurer le CO₂",
+"changer la consigne"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Une boucle de régulation : dans l'ordre.",
+"ch": [
+"Capteur",
+"Contrôleur",
+"Élément final"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "Un thermostat bien placé :",
+"ch": [
+"mur intérieur, environ 1,5 m du sol",
+"près d'une fenêtre ensoleillée",
+"au-dessus d'une plinthe",
+"dans un placard"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "L'écran de la GTB montre une température anormale. Avant de conclure…",
+"ch": [
+"va vérifier sur place : un capteur peut être brisé",
+"change le thermostat",
+"ignore",
+"appelle les pompiers"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Une régulation pneumatique utilise…",
+"ch": [
+"de l'air comprimé comme signal",
+"de l'eau",
+"de la vapeur",
+"des piles"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Variables incontrôlables d'un bâtiment :",
+"ch": [
+"ensoleillement, température extérieure, occupants",
+"la consigne",
+"le débit du ventilateur",
+"la position du volet"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "À l'évaluation, ce qui compte le plus :",
+"ch": [
+"un oubli de sécurité compte plus qu'une erreur de calcul",
+"la vitesse",
+"la propreté seulement",
+"le nombre de pages du rapport"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "La trousse de base CVCA contient :",
+"ch": [
+"Cadenas personnel et étiquettes",
+"Détecteur de tension sans contact",
+"Pince ampèremétrique",
+"Chalumeau au propane"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"t": "multi"
+},
+{
+"q": "Un bon rapport d'intervention contient :",
+"ch": [
+"L'identification (équipement, date, ton nom)",
+"Les travaux effectués",
+"Les mesures et observations",
+"Des opinions sur le client"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"t": "multi"
+},
+{
+"q": "Exemple de rapport : « ΔP filtre 0,9 → 0,3 po CE » veut dire…",
+"ch": [
+"la perte de pression a baissé après le changement des filtres",
+"le filtre est plus sale",
+"le ventilateur est brisé",
+"la courroie a été changée"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Cadenassage, EPI et propreté ne sont jamais facultatifs.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+}
+]
+},
+{
+"id": "defi-micro-ordinateur-1",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Utiliser un micro-ordinateur · Défi+ 1 de 3",
+"sujet": "Modules 1 à 3 : le portable, Windows 11, fichiers et OneDrive",
+"couv": "img/couvertures/micro-ordinateur.jpg",
+"coul": "#185FA5",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
+"q": "Tu t'éloignes de ton portable quelques minutes. Raccourci pour verrouiller :",
+"ch": [
+"⊞ + L",
+"Ctrl + C",
+"Alt + F4",
+"⊞ + E"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Le port qui sert à brancher un écran ou un projecteur :",
+"ch": [
+"HDMI",
+"Prise audio",
+"Lecteur de carte",
+"Prise réseau"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Pourquoi faire les mises à jour de Windows?",
+"ch": [
+"Elles corrigent des failles de sécurité",
+"Pour changer les couleurs",
+"Pour ralentir l'ordinateur",
+"Ce n'est pas utile"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "La batterie au lithium-ion s'use surtout quand elle reste longtemps…",
+"ch": [
+"vide ou pleine à 100 %",
+"à moitié",
+"au frais",
+"éteinte"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Passer d'une fenêtre ouverte à l'autre :",
+"ch": [
+"Alt + Tab",
+"Ctrl + Z",
+"⊞ + L",
+"F2"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Copier :",
+"ch": [
+"Ctrl + C",
+"Ctrl + V",
+"Ctrl + X",
+"Ctrl + Z"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Faire une capture d'une partie de l'écran :",
+"ch": [
+"⊞ + Maj + S",
+"Ctrl + P",
+"Alt + F4",
+"⊞ + D"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Un message d'erreur, c'est…",
+"ch": [
+"un indice : on le lit en entier",
+"une insulte",
+"un virus",
+"à fermer sans lire"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Ouvrir l'Explorateur de fichiers :",
+"ch": [
+"⊞ + E",
+"⊞ + L",
+"Ctrl + F",
+"Alt + Tab"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Renommer un fichier sélectionné :",
+"ch": [
+"F2",
+"F5",
+"Suppr",
+"Échap"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Le chemin d'un fichier, c'est…",
+"ch": [
+"son adresse complète, dossier par dossier",
+"sa taille",
+"sa date",
+"son icône"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "On peut changer l'extension d'un fichier (.pdf, .docx) sans conséquence.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 1,
+"s": 15,
+"expl": "L'extension dit quel programme l'ouvre."
+},
+{
+"q": "Partager un fichier OneDrive : plutôt qu'une pièce jointe, on envoie…",
+"ch": [
+"un lien",
+"une photo de l'écran",
+"une clé USB",
+"un fax"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Clé USB perdue ou brisée :",
+"ch": [
+"tout est perdu, aucune sauvegarde",
+"OneDrive la récupère",
+"Windows la répare",
+"rien n'est perdu"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Un fichier « en ligne seulement » sur OneDrive…",
+"ch": [
+"est dans le nuage, pas sur le portable",
+"est supprimé",
+"est privé",
+"est un virus"
+],
+"bon": 0,
+"s": 20
+}
+]
+},
+{
+"id": "defi-micro-ordinateur-2",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Utiliser un micro-ordinateur · Défi+ 2 de 3",
+"sujet": "Modules 4 à 6 : Internet et cybersécurité, Outlook et Teams, Word",
+"couv": "img/couvertures/micro-ordinateur.jpg",
+"coul": "#185FA5",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
+"q": "Dans https://www.hydroquebec.com/residentiel, le domaine est…",
+"ch": [
+"hydroquebec.com",
+"https",
+"residentiel",
+"www"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Pour juger une source Web, on se demande :",
+"ch": [
+"Qui publie?",
+"Quand est-ce publié?",
+"Est-ce appuyé par des preuves?",
+"Le site a-t-il de belles couleurs?"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"t": "multi"
+},
+{
+"q": "L'hameçonnage, c'est…",
+"ch": [
+"un faux message qui imite une entreprise pour voler tes informations",
+"une pêche",
+"une mise à jour",
+"un antivirus"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Tu as cliqué sur un lien douteux :",
+"ch": [
+"tu avises tout de suite, sans cacher",
+"tu ne dis rien",
+"tu éteins pour toujours",
+"tu cliques encore"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "La double authentification demande…",
+"ch": [
+"deux preuves sur trois (ce que tu sais, ce que tu as, ce que tu es)",
+"deux mots de passe identiques",
+"deux ordinateurs",
+"deux courriels"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Cc ou Cci : lequel cache les destinataires aux autres?",
+"ch": [
+"Cci",
+"Cc",
+"Les deux",
+"Aucun"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Un bon courriel professionnel se comprend en…",
+"ch": [
+"30 secondes",
+"une heure",
+"une journée",
+"jamais"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Dégât d'eau en cours : quel moyen de communication?",
+"ch": [
+"Le téléphone, puis Teams",
+"Un courriel",
+"Une lettre",
+"Un texto la semaine prochaine"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Mettre en gras dans Word :",
+"ch": [
+"Ctrl + G",
+"Ctrl + I",
+"Ctrl + U",
+"Ctrl + B"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Souligné rouge dans Word :",
+"ch": [
+"orthographe",
+"grammaire",
+"lien",
+"commentaire"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Un avis affiché aux locataires doit…",
+"ch": [
+"se comprendre en quelques secondes, parfois de loin",
+"être long et détaillé",
+"être en petits caractères",
+"être écrit à la main"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Avant de prendre ses outils, on lit tout le bon de travail, surtout…",
+"ch": [
+"les directives",
+"le logo",
+"la date d'impression",
+"la police"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "L'habillage d'une image dans Word décide…",
+"ch": [
+"comment le texte se place autour de l'image",
+"la couleur de l'image",
+"la taille de la page",
+"le titre"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Créer un modèle de bon de travail dans Word :",
+"ch": [
+"Fichier → Enregistrer sous → Modèle",
+"Imprimer",
+"Copier-coller chaque fois",
+"Envoyer par courriel"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "La signature de courriel s'ajoute…",
+"ch": [
+"automatiquement à chaque message une fois configurée",
+"à la main chaque fois",
+"jamais",
+"seulement dans Teams"
+],
+"bon": 0,
+"s": 20
+}
+]
+},
+{
+"id": "defi-micro-ordinateur-3",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Utiliser un micro-ordinateur · Défi+ 3 de 3",
+"sujet": "Modules 7 à 10 : Excel, gestion de l'entretien (GMAO), intelligence artificielle",
+"couv": "img/couvertures/micro-ordinateur.jpg",
+"coul": "#185FA5",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
+"q": "Pourquoi écrire « 45 » et non « 45 piasses » dans Excel?",
+"ch": [
+"Excel calcule seulement ce qu'il reconnaît comme nombre",
+"C'est plus joli",
+"Pour économiser l'encre",
+"Ça ne change rien"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Raccourci pour une somme automatique :",
+"ch": [
+"Alt + =",
+"Ctrl + S",
+"F2",
+"⊞ + L"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Recopier une formule sur 30 lignes : on tire…",
+"ch": [
+"la poignée de recopie",
+"la barre des tâches",
+"le titre",
+"la fenêtre"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "$A$1 dans une formule, c'est une référence…",
+"ch": [
+"absolue (elle ne bouge pas quand on recopie)",
+"relative",
+"en couleur",
+"fausse"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "La fonction SI dans un inventaire sert à…",
+"ch": [
+"afficher une réponse selon le cas (ex. « Commander » si le stock est bas)",
+"faire une somme",
+"trier",
+"imprimer"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Un registre d'entretien, c'est…",
+"ch": [
+"une ligne par intervention, toujours les mêmes colonnes",
+"un dessin",
+"une photo",
+"un courriel"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Un graphique sert à…",
+"ch": [
+"voir en une seconde une tendance ou un mois anormal",
+"cacher les chiffres",
+"remplacer le registre",
+"décorer"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "GMAO veut dire…",
+"ch": [
+"gestion de la maintenance assistée par ordinateur",
+"grand magasin d'outils",
+"garantie maximale",
+"grille de mesures"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Entretien préventif ou correctif : lequel se fait avant la panne?",
+"ch": [
+"Préventif",
+"Correctif",
+"Les deux",
+"Aucun"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Un code QR collé sur un équipement peut ouvrir…",
+"ch": [
+"sa fiche ou son manuel",
+"la porte",
+"la machine",
+"un jeu"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Microsoft Forms permet de…",
+"ch": [
+"remplir un bon de travail sur le cellulaire",
+"écrire une lettre",
+"dessiner un plan",
+"jouer de la musique"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Une bonne demande à l'IA contient :",
+"ch": [
+"Un rôle",
+"Le contexte",
+"La tâche",
+"Le format voulu"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 35,
+"t": "multi"
+},
+{
+"q": "Après une réponse de l'IA, tu vérifies…",
+"ch": [
+"les faits : dates, chiffres, modèles, prix",
+"rien, elle a toujours raison",
+"seulement l'orthographe",
+"la couleur"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Avec une IA, on n'écrit jamais…",
+"ch": [
+"des renseignements personnels des locataires",
+"une demande de courriel poli",
+"une question sur un manuel",
+"un plan de travail"
+],
+"bon": 0,
+"s": 20,
+"expl": "Loi 25 : protection des renseignements personnels."
+},
+{
+"q": "Un agent IA, à la différence d'un assistant…",
+"ch": [
+"agit : il fait lui-même plusieurs étapes",
+"répond seulement",
+"n'existe pas",
+"est un humain"
+],
+"bon": 0,
+"s": 20
+}
+]
+},
+{
+"id": "defi-communiquer-1",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Communiquer en milieu de travail · Défi+ 1 de 3",
+"sujet": "Modules 1 à 3 : le préposé au cœur de l'immeuble, les bases, les occupants",
+"couv": "img/couvertures/communiquer.jpg",
+"coul": "#185FA5",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
+"q": "Communiquer, c'est s'assurer que le message est…",
+"ch": [
+"reçu et compris",
+"dit une fois",
+"écrit en majuscules",
+"envoyé vite"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Urgence ou preuve? « Urgence → parle; preuve → … »",
+"ch": [
+"écris (courriel, registre, bon de travail)",
+"parle plus fort",
+"attends",
+"texte un ami"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Le non-verbal, c'est…",
+"ch": [
+"tout sauf les mots : visage, regard, posture",
+"les mots",
+"l'écriture",
+"le téléphone"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Avec un locataire ou le gestionnaire, le niveau de langue :",
+"ch": [
+"correct et poli, pas comme entre amis au chalet",
+"familier avec des sacres",
+"très soutenu et compliqué",
+"anglais seulement"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "À la radio, la rétroaction, c'est répondre…",
+"ch": [
+"« reçu »",
+"rien",
+"« oui oui »",
+"plus tard"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "En service à la clientèle, on écoute…",
+"ch": [
+"au moins deux fois plus qu'on parle",
+"moins qu'on parle",
+"seulement au début",
+"jamais"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Reformuler, c'est…",
+"ch": [
+"redire dans tes mots pour vérifier que tu as compris",
+"répéter mot à mot",
+"changer de sujet",
+"corriger la personne"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "La technique de l'entonnoir pour une fuite :",
+"ch": [
+"des questions ouvertes, puis de plus en plus précises",
+"seulement des questions fermées",
+"aucune question",
+"deviner"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Les 4 temps de l'accueil : dans l'ordre (début).",
+"ch": [
+"Saluer",
+"Se présenter",
+"Écouter la demande",
+"Conclure"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "Le locataire n'est pas là pendant ton intervention. Tu laisses…",
+"ch": [
+"une carte de passage",
+"rien",
+"la porte ouverte",
+"un mot sur Facebook"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Locataire fâché : la méthode en 4 temps.",
+"ch": [
+"Écouter",
+"Reformuler",
+"Expliquer",
+"Proposer une solution"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45,
+"t": "ordre"
+},
+{
+"q": "Dire non à une demande qui ne relève pas de toi :",
+"ch": [
+"expliquer et proposer à qui s'adresser",
+"ignorer la personne",
+"dire oui quand même",
+"raccrocher"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Le logement, même si l'immeuble appartient au propriétaire, c'est…",
+"ch": [
+"le chez-soi du locataire",
+"le bureau du préposé",
+"un espace commun",
+"un entrepôt"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Une personne qui crie après son frigo est fâchée contre toi personnellement.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 1,
+"s": 15,
+"expl": "C'est la situation, pas toi : ne le prends pas personnel."
+},
+{
+"q": "La « bulle » d'une personne :",
+"ch": [
+"la distance à respecter pour ne pas l'envahir",
+"une bulle de savon",
+"son logement",
+"son téléphone"
+],
+"bon": 0,
+"s": 20
+}
+]
+},
+{
+"id": "defi-communiquer-2",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Communiquer en milieu de travail · Défi+ 2 de 3",
+"sujet": "Modules 4 à 6 : l'équipe, l'écrit professionnel, le téléphone",
+"couv": "img/couvertures/communiquer.jpg",
+"coul": "#185FA5",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
+"q": "Une consigne pas claire :",
+"ch": [
+"je pose des questions et je reformule",
+"je devine",
+"je ne fais rien",
+"je demande à un locataire"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Rendre compte, c'est informer ton supérieur de…",
+"ch": [
+"ce que tu as fait, trouvé et ce qui reste",
+"tes vacances",
+"la météo",
+"rien"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "La passation de quart sert à…",
+"ch": [
+"transmettre l'information entre préposés qui se relaient",
+"changer d'uniforme",
+"fermer l'immeuble",
+"rien"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Le message radio type : dans l'ordre.",
+"ch": [
+"L'appel (qui appelle qui)",
+"La réponse « j'écoute »",
+"Le message",
+"La confirmation « reçu »"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45,
+"t": "ordre"
+},
+{
+"q": "Le message « je » sert à…",
+"ch": [
+"régler un irritant sans attaquer",
+"accuser l'autre",
+"se vanter",
+"commander"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Le bon de travail se remplit…",
+"ch": [
+"pendant ou juste après l'intervention",
+"à la fin de la semaine",
+"jamais",
+"par le locataire"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Fait ou opinion? « La locataire était saoule. »",
+"ch": [
+"Opinion : on écrit ce qu'on a observé",
+"Fait",
+"Les deux",
+"Une preuve"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Une bonne photo-preuve :",
+"ch": [
+"une vue d'ensemble pour situer, puis un gros plan",
+"seulement un gros plan flou",
+"un selfie",
+"une photo de nuit sans flash"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Trouve l'erreur dans cette phrase.",
+"t": "erreur",
+"ch": [
+"Il à réparé",
+"le robinet",
+"à 10 h."
+],
+"bon": 0,
+"s": 30,
+"expl": "« Il a réparé » (verbe avoir)."
+},
+{
+"q": "Abréviation acceptée pour l'heure :",
+"ch": [
+"10 h 15",
+"10hr15",
+"10:15hres",
+"10 heurs 15"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Mettre quelqu'un en attente au téléphone :",
+"ch": [
+"« Puis-je vous mettre en attente une minute? » et attendre le oui",
+"appuyer sans rien dire",
+"raccrocher",
+"parler à quelqu'un d'autre"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Quand quelqu'un demande d'être rappelé :",
+"ch": [
+"ne pas promettre d'heure : « Je lui transmets votre message dès maintenant »",
+"promettre dans 5 minutes",
+"ignorer",
+"donner le cellulaire du gestionnaire"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Avant d'appeler pour une pièce, on note…",
+"ch": [
+"les informations de la plaque signalétique",
+"la couleur de l'appareil",
+"le nom du voisin",
+"rien"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Près de chaque téléphone de l'immeuble, on affiche…",
+"ch": [
+"l'adresse exacte, le code postal et les entrées",
+"des blagues",
+"le menu",
+"rien"
+],
+"bon": 0,
+"s": 20,
+"expl": "Sous le stress d'une urgence, on oublie."
+},
+{
+"q": "Ta boîte vocale professionnelle :",
+"ch": [
+"sans musique ni blague, avec ton nom",
+"une chanson",
+"vide",
+"une blague"
+],
+"bon": 0,
+"s": 20
+}
+]
+},
+{
+"id": "defi-communiquer-3",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Communiquer en milieu de travail · Défi+ 3 de 3",
+"sujet": "Modules 7 à 9 : situations difficiles, éthique et image professionnelle",
+"couv": "img/couvertures/communiquer.jpg",
+"coul": "#185FA5",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
+"q": "L'iceberg de la colère : le frigo brisé n'est que…",
+"ch": [
+"la pointe : dessous, la fatigue, l'inquiétude, d'autres soucis",
+"tout le problème",
+"une excuse",
+"un détail"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Plus tu reconnais tôt les signes d'escalade…",
+"ch": [
+"plus il est facile de calmer la situation",
+"plus c'est dangereux",
+"rien ne change",
+"plus il faut crier"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Quand quelqu'un crie contre toi, ton corps réagit. Pour garder ton calme :",
+"ch": [
+"respirer lentement et baisser le ton",
+"crier plus fort",
+"partir en courant sans rien dire",
+"te fâcher"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Le journal des faits sert à noter…",
+"ch": [
+"la date, l'heure, le lieu et les faits, sans opinion",
+"tes émotions seulement",
+"des rumeurs",
+"les loyers"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Se retirer d'une situation dangereuse, c'est…",
+"ch": [
+"un geste professionnel qui protège",
+"abandonner",
+"perdre la face",
+"interdit"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Conflit entre deux locataires :",
+"ch": [
+"tu restes neutre et tu transmets au gestionnaire",
+"tu choisis un camp",
+"tu règles avec une amende",
+"tu changes la serrure"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Tu peux expliquer une règle de l'immeuble, mais…",
+"ch": [
+"tu ne peux pas l'appliquer par la force ou une sanction",
+"tu peux donner des amendes",
+"tu peux expulser",
+"tu peux couper l'eau"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Les clés des logements :",
+"ch": [
+"sous clé, et chaque sortie est notée",
+"sur un crochet dans le hall",
+"dans ta poche à la maison",
+"prêtées aux voisins"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Un locataire t'offre un cadeau pour une réparation :",
+"ch": [
+"refuser poliment, sans froisser",
+"accepter tout de suite",
+"demander plus",
+"le vendre"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Être fiable, c'est…",
+"ch": [
+"que les autres comptent sur toi sans devoir vérifier",
+"arriver quand tu veux",
+"faire seulement ce qui te plaît",
+"promettre beaucoup"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Un code d'éthique regroupe…",
+"ch": [
+"les valeurs et les règles de conduite d'un métier",
+"les prix",
+"les horaires",
+"les outils"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Ce qui fait ton image professionnelle :",
+"ch": [
+"Ta tenue",
+"Ta ponctualité",
+"Ta façon de parler",
+"La marque de ton cellulaire"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"t": "multi"
+},
+{
+"q": "On peut ne pas aimer un collègue et bien travailler avec lui.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "Un renseignement personnel d'un locataire (santé, revenu) :",
+"ch": [
+"reste confidentiel",
+"se partage avec les voisins",
+"se publie sur les réseaux",
+"s'affiche dans le hall"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "« Communiquer, ça s'apprend comme… »",
+"ch": [
+"souder ou déboucher un drain",
+"naître",
+"rien",
+"la chance"
+],
+"bon": 0,
+"s": 20
 }
 ]
 },
