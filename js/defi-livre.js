@@ -1,7 +1,7 @@
 /* Défi+ des livres (21 nov.) : quand on a lu un tiers, deux tiers ou tout le livre, une petite carte propose le Défi+ de ce tiers.
    Données : js/defi-livre-data.js (window.DEFI_LIVRES). Une seule fois par tiers et par session. */
 (() => {
-  let carte = null, cacheT = 0;
+  let carte = null, cacheT = 0, avant = "";
   const vu = k => { try { return sessionStorage.getItem("defiVu:" + k) === "1"; } catch(e){ return false; } };
   const noter = k => { try { sessionStorage.setItem("defiVu:" + k, "1"); } catch(e){} };
   const NOMS = ["", "le premier tiers", "les deux tiers", "tout le livre"];
@@ -25,7 +25,8 @@
       const D = window.DEFI_LIVRES || {}, livre = typeof RD !== "undefined" && RD.drv && RD.book, ids = livre && D[livre];
       if (!ids){ cacher(); return; }
       if (carte) return;
-      const t = totPages(), p = curPage(); if (!t) return;
+      const t = totPages(), p = curPage(); if (t < 12) return;
+      const cle = livre + "|" + t; if (cle !== avant){ avant = cle; return; }   /* attendre que le livre soit bien chargé (nombre de pages stable) */
       const f = p / t, n = f >= 0.97 ? 3 : f >= 2 / 3 ? 2 : f >= 1 / 3 ? 1 : 0;
       if (n && ids[n - 1] && !vu(livre + ":" + n)) montrer(livre, n, ids[n - 1]);
     } catch(e){}
