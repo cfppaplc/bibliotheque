@@ -510,7 +510,7 @@ window.addEventListener("online", () => { try { aviser("Internet est revenu."); 
 <link rel="stylesheet" href="css/acces.css?v=2">
 <div class="acces-ov" id="accesOv" hidden role="dialog" aria-modal="true"><div class="acces-box" id="accesBox"></div></div>
 <div class="acces-menu" id="accesMenu" hidden></div>
-<script src="js/acces.js?v=5"></script>
+<script src="js/acces.js?v=6"></script>
 <script src="js/admin-site.js?v=2"></script>
 
 
@@ -644,7 +644,7 @@ body.visiteur .mp-pied{margin-top:30px}
 /* 10 nov. (Jeremy) : bouton de retour dynamique = revient à la page d'avant.
    Arrivé d'une autre page (Labo, quiz…) par ?ouvrir= : le retour de l'outil ouvert y ramène (MP_RETOUR, posé en tête de page).
    Tableau blanc : « ‹ Accueil de classe » s'il a été ouvert depuis l'accueil de classe, sinon « ‹ Bibliothèque ». */
-(() => { const NOMS = {"labo.html":"Labo","quiz.html":"Quiz","simulateur.html":"Simulateur","accueil.html":"Accueil de classe"};
+(() => { const NOMS = {"labo.html":"Labo","quiz.html":"Défi+","simulateur.html":"Simulateur","accueil.html":"Accueil de classe"};
   const nomRet = () => { try { const f = new URL(window.MP_RETOUR).pathname.split("/").pop(); return NOMS[f] || "Retour"; } catch(x) { return "Retour"; } };
   const rb = document.getElementById("readerBack"), pc = document.getElementById("plClose"), ab = document.getElementById("actBack");
   const ecrire = (b, t) => { if (!b) return; const l = b.querySelector(".pl-lbl"); if (l) l.textContent = t; else { const n = [...b.childNodes].reverse().find(x => x.nodeType === 3); if (n) n.textContent = t; } };

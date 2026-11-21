@@ -285,7 +285,7 @@ function telecommande(bord){
     if (Q && ["ordre", "nombre"].includes(t)) cpt = [Object.values(G.reps).filter(x => juste(Q, x.c)).length, Object.keys(G.reps).length];
     else Object.values(G.reps).forEach(x => [].concat(x.c).forEach(k => { if (k >= 0) cpt[k]++; }));
     const nq = G.jeu.filter(x => !HORS_Q(x)).length, qn = G.jeu.slice(0, G.i + 1).filter(x => !HORS_Q(x)).length;
-    return {m: "vue", sp: sansPoints(G.jeu), code, etat: G.etat === "choix" ? "lobby" : G.etat, titre: G.quiz ? G.quiz.titre : "Quiz maison", i: G.i, n: G.jeu.length, qn, nq, t0: G.t0, now: Date.now(),
+    return {m: "vue", sp: sansPoints(G.jeu), code, etat: G.etat === "choix" ? "lobby" : G.etat, titre: G.quiz ? G.quiz.titre : "Défi+", i: G.i, n: G.jeu.length, qn, nq, t0: G.t0, now: Date.now(),
       reg: {coul: reg.coul, son: reg.son, musique: reg.musique || "oui", classement: reg.classement, points: reg.points, mode: reg.mode, lettres: reg.lettres || "non"},
       couv: G.quiz && G.quiz.couv && !/^data:/.test(G.quiz.couv) ? G.quiz.couv : (G.quiz && G.quiz.couv ? "img" : ""), sujet: G.quiz ? G.quiz.sujet || "" : "",
       q: Q && ["question", "rev"].includes(G.etat) ? {q: Q.q, ch: Q.ch, s: Q.s, t, u: Q.u || "", zoom: Q.zoom || null, img: !!Q.img, expl: G.etat === "rev" ? Q.expl || "" : "", bonTxt: G.etat === "rev" ? texteBon(Q) : ""} : null,
@@ -307,7 +307,7 @@ function telecommande(bord){
     dessinerBilan();
     if (!G.quiz) { listeLob(); vue(); return; }
     const Q = G.jeu[G.i];
-    $("jTitre").textContent = G.quiz.titre; if ($("tTitre")) $("tTitre").textContent = (estPres(G.quiz) ? "Présentation" : "Quiz maison") + " · télécommande";
+    $("jTitre").textContent = G.quiz.titre; if ($("tTitre")) $("tTitre").textContent = (estPres(G.quiz) ? "Présentation" : "Défi+") + " · télécommande";
     $("qCour").textContent = G.etat === "lobby" ? (G.quiz && G.quiz.qs.some(x => x.t === "connexion") ? "Prêt : touche « Commencer » pour lancer la présentation (les élèves se connecteront plus loin)." : "En attente des participants…") : G.etat === "connexion" ? "Connexion des participants : le code est au tableau." : G.etat === "fin" ? "Partie terminée : le classement final est sur chaque iPad." : G.etat === "diapo" ? "Diapo " + (G.jeu.slice(0, G.i + 1).filter(x => typeDe(x) === "diapo").length) : (G.i + 1) + ". " + Q.q;
     $("qInfo").textContent = G.etat === "question" ? Object.keys(G.reps).length + " réponse(s) sur " + ids().length + " · " + Q.s + " s" :
       G.etat === "rev" ? "Bonne réponse : " + texteBon(Q) + (R().classement === "oui" ? " · le rang de chacun est envoyé sur son iPad." : "") :
@@ -406,7 +406,7 @@ function telecommande(bord){
     const r = rangs(), Q = G.jeu[G.i], rev = G.etat === "rev" && Q;
     const j = ids().sort((x, y) => r[x] - r[y]).map(id => { const x = G.reps[id];
       return {id, n: P[id].nom, pts: P[id].pts, r: r[id], a: G.etat === "question" ? !!x : null, txt: rev && x && x.c != null ? texteRep(Q, x.c) : "", ok: rev ? !!(x && x.ok) : null}; });
-    return {m: "mstat", go: b("bGo"), suite: b("bSuite"), cour: $("qCour").textContent, att, n: ids().length, etat: G.etat, titre: G.quiz ? G.quiz.titre || "Quiz" : "",
+    return {m: "mstat", go: b("bGo"), suite: b("bSuite"), cour: $("qCour").textContent, att, n: ids().length, etat: G.etat, titre: G.quiz ? G.quiz.titre || "Défi+" : "",
       j, fin: G.etat === "question" && Q ? G.t0 + Q.s * 1000 : 0, lec: G.etat === "question" ? G.t0 : 0};
   }
   function pousserMan(force){ if (Date.now() - manVu > 90000) return; const o = etatManette(), j = JSON.stringify(o); if (force || j !== manDer) { manDer = j; o.now = Date.now(); envoyer(topic, o); } }
@@ -482,7 +482,7 @@ function telecommande(bord){
     const carte = q => { const c = (q.reg || {}).coul || REG_DEF.coul, pr = estPres(q), d1 = pr && (q.qs.find(x => x.t === "diapo") || {}).img, cv = q.couv || d1;
       const nd = q.qs.filter(x => x.t === "diapo").length, nq = q.qs.filter(x => !HORS_Q(x)).length;
       return `<div class="cq"><div class="im${q.livre && q.couv ? " livre" : ""}" style="--c:${esc(c)};${cv ? (q.livre ? `--u:url('${esc(cv)}')` : `background-image:url('${esc(cv)}')`) : ""}"><span>${pr ? `Présentation · ${nd} diapos · ${nq} question${nq > 1 ? "s" : ""}` : q.qs.length + " questions"}</span></div>
-      <div class="co"><b>${esc(q.titre)}</b><span class="sous">${esc(q.sujet || (q.exemple ? "Quiz d'exemple" : ""))}</span>
+      <div class="co"><b>${esc(q.titre)}</b><span class="sous">${esc(q.sujet || (q.exemple ? "Défi+ d'exemple" : ""))}</span>
       <button class="jouer" data-jouer="${q.id}" style="background:${bord ? "#EB6A22" : esc(c)}">Jouer</button>
       <div class="pt">${q.fixe ? "" : q.exemple ? `<button class="btn2" data-copier="${q.id}">Copier et modifier</button>` : `<button class="btn2" data-modif="${q.id}">Modifier</button><button class="btn2" data-dupl="${q.id}">Dupliquer</button><button class="btn2" data-export="${q.id}">Exporter</button><button class="btn2" data-suppr="${q.id}">Supprimer</button>`}</div></div></div>`; };
     const miens = tousQuiz().filter(q => !q.exemple), prets = tousQuiz().filter(q => q.exemple);
@@ -1032,7 +1032,7 @@ function manette(code, k){
   const topic = PREFIXE + code;
   const IC = {plus:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>', son:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4zM17 9a4 4 0 0 1 0 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>', mus:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V6l11-2v12M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM20 16a3 3 0 1 1-6 0 3 3 0 0 1 6 0z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>'};
   document.body.insertAdjacentHTML("beforeend", `<div id="man" class="m3"><div class="mh"><img src="img/metier-plus-blanc.svg" alt="Métier+"><span id="mEtat"><i></i>Connexion…</span></div>
-    <section class="mcarte"><div class="mt" id="mTitre">Quiz</div><div class="mc" id="mCour">En attente de la partie…</div>
+    <section class="mcarte"><div class="mt" id="mTitre">Défi+</div><div class="mc" id="mCour">En attente de la partie…</div>
       <div class="mchrono" id="mChr"><span id="mT" class="mtmp"></span><div class="mbar"><i id="mBar"></i></div></div>
       <div class="ma" id="mAtt"></div></section>
     <div class="mgrille"><button class="m2 mtuile" id="mPlus" disabled>${IC.plus}<span>+10 s</span></button><button class="m2 mtuile" id="mSon">${IC.son}<span>Son</span></button><button class="m2 mtuile" id="mMus">${IC.mus}<span>Musique</span></button></div>
@@ -1043,7 +1043,7 @@ function manette(code, k){
   let S = null, recu = 0, dec = 0, sur = {};
   const cmd = b => envoyer(topic, {m: "cmd", k, b});
   const dessiner = () => { if (!S) return;
-    $("mTitre").textContent = S.titre || "Quiz"; $("mCour").textContent = S.cour || "";
+    $("mTitre").textContent = S.titre || "Défi+"; $("mCour").textContent = S.cour || "";
     const A = S.att || []; $("mAtt").innerHTML = A.length ? `<b>En attente de ${A.length}</b>` + (A.length <= 16 ? `<div class="mpuces">${A.map(n => `<span>${esc(n)}</span>`).join("")}</div>` : "") : "";
     const go = S.go && !S.go.d, prim = go ? S.go : S.suite, id = go ? "bGo" : "bSuite";
     $("mGo").textContent = prim ? prim.t : "…"; $("mGo").disabled = !prim || prim.d; $("mGo").dataset.b = id;
@@ -1126,7 +1126,7 @@ function animer(boutons){
 function ecran(code){
   const topic = PREFIXE + code, E = $("ecr"); E.classList.remove("cache");
   const url = location.href.split(/[?#]/)[0] + "?j=" + code;
-  let V = {etat: "lobby", joueurs: [], titre: "Quiz maison", reg: {}, i: -1}, decal = 0, img = {}, sonOK = false, ac = null, dernier = "", tic = 0;
+  let V = {etat: "lobby", joueurs: [], titre: "Défi+", reg: {}, i: -1}, decal = 0, img = {}, sonOK = false, ac = null, dernier = "", tic = 0;
   /* nuage de mots : les mots gardent leur place (on ne refait que ce qui change); taille selon le nombre */
   const COUL_N = ["#F28A3C", "#14A3A3", "#8B6CE0", "#E0892B", "#D9488A", "#5BA4E6", "#2EB872", "#F2C94C"];
   function nuage(el, mots){ if (!el) return; mots = mots || [];
@@ -1151,7 +1151,7 @@ function ecran(code){
   function maitre(){ if (MAITRE && MAITRE.context === ac) return MAITRE; const c = ac.createDynamicsCompressor(); c.threshold.value = -18; c.knee.value = 12; c.ratio.value = 4; c.attack.value = .003; c.release.value = .2; const g = ac.createGain(); g.gain.value = 3.2 * VOL(); c.connect(g); g.connect(ac.destination); MAITRE_G = g; return MAITRE = c; }
   function ton(f, d, v, type){ if (!sonOK || V.reg.son === "non") return; try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); const o = ac.createOscillator(), g = ac.createGain(); o.type = type || "sine"; o.frequency.value = f; o.connect(g); g.connect(maitre()); g.gain.setValueAtTime(v, ac.currentTime); g.gain.exponentialRampToValueAtTime(.0001, ac.currentTime + d); o.start(); o.stop(ac.currentTime + d); } catch(e) {} }
   const accord = () => { ton(523, .5, .12); setTimeout(() => ton(659, .5, .1), 120); setTimeout(() => ton(784, .7, .1), 240); };
-  const tete = t => `<div class="liseret"></div><div class="haut"><b><img class="logoE" src="img/metier-plus-blanc.svg" alt="Métier+">${esc(t)}</b><span>${V.pres ? "Présentation" : "Quiz maison"} · code ${code.slice(0, 3)} ${code.slice(3)}</span></div>`;
+  const tete = t => `<div class="liseret"></div><div class="haut"><b><img class="logoE" src="img/metier-plus-blanc.svg" alt="Métier+">${esc(t)}</b><span>${V.pres ? "Présentation" : "Défi+"} · code ${code.slice(0, 3)} ${code.slice(3)}</span></div>`;
   const bSon = () => `<button class="son${sonOK ? " actif" : ""}" id="bSon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="currentColor"/>${sonOK ? '<path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>' : '<path d="M16 9.5l5 5M21 9.5l-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>'}</svg>${sonOK ? "Son activé" : "Activer le son"}</button>`;
   /* le navigateur exige un clic avant de jouer un son : le premier clic sur l'écran de classe (ex. « Commencer » en mode Animer) active le son,
      sauf si l'enseignant l'a coupé lui-même */

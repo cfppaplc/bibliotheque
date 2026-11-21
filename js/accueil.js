@@ -968,8 +968,8 @@ function nomLien(c){
   if (c.type === "tableau") return "Tableau blanc" + (c.fond === "quad" ? " quadrillé" : c.fond === "iso" ? " isométrique" : "");
   if (c.type === "minuterie") return "Minuterie " + c.min + " min";
   if (c.type === "fichier") return c.nom || "Fichier";
-  if (c.type === "quiz") return "Quiz · " + (c.titre || "");
-  if (c.type === "simulateur") return c.defi ? "Défi panneau" : "Simulateur de panneau";
+  if (c.type === "quiz") return "Défi+ · " + (c.titre || "");
+  if (c.type === "simulateur") return c.defi ? "Mission panneau" : "Simulateur de panneau";
   if (c.type === "web") return c.nom || hoteWeb(c.url);
   if (c.type === "video") return "Vidéo" + (c.nom ? " · " + c.nom : "") + (c.start ? " (à " + dureeTxt(c.start) + ")" : "");
   return "";
@@ -1048,7 +1048,7 @@ function choix(row, label){
     + '<button type="button" class="lk-tuile" data-t="tableau"' + (enBiblio ? "" : " disabled") + '><b>' + ico("tableau") + '</b>Tableau blanc</button>'
     + '<button type="button" class="lk-tuile" data-t="minuterie"><b>' + ico("minuterie") + '</b>Minuterie</button>'
     + '<button type="button" class="lk-tuile" data-t="fichier"><b>' + ico("fichier") + '</b>Fichier (PDF, image…)</button>'
-    + '<button type="button" class="lk-tuile" data-t="quiz"><b>' + ico("quiz") + '</b>Quiz</button>'
+    + '<button type="button" class="lk-tuile" data-t="quiz"><b>' + ico("quiz") + '</b>Défi+</button>'
     + '<button type="button" class="lk-tuile" data-t="simulateur"><b>' + ico("simulateur") + '</b>Simulateur</button>'
     + '<button type="button" class="lk-tuile" data-t="web"><b>' + ico("web") + '</b>Lien web</button>'
     + '<button type="button" class="lk-tuile" data-t="video"><b>' + ico("video") + '</b>Vidéo YouTube</button></div>'
@@ -1086,7 +1086,7 @@ function choix(row, label){
       const dessiner = () => { let miens = []; try { miens = JSON.parse(localStorage.getItem("quizMaison") || "[]"); } catch(e){}
         const prets = [{ id:"exemple-incendie", titre:"Protection incendie : révision des modules 1 à 5" }].concat(window.QUIZ_LIVRES || []);
         f.innerHTML = '<select data-q>' + (miens.length ? '<optgroup label="Mes quiz">' + miens.map(opt).join("") + '</optgroup>' : "")
-          + '<optgroup label="Quiz prêts à jouer">' + prets.map(opt).join("") + '</optgroup></select>'
+          + '<optgroup label="Défi+ prêts à jouer">' + prets.map(opt).join("") + '</optgroup></select>'
           + '<small class="lk-aide">Le quiz s\'ouvrira en mode « Animer au tableau » : les élèves scannent le code QR avec leur iPad.</small>'
           + '<div class="lk-ok"><button type="button" class="prim" data-v>Choisir</button>' + annuler + '</div>';
         f.querySelector("[data-v]").onclick = () => { const s = f.querySelector("[data-q]"); fini({ type:"quiz", id:s.value, titre:s.options[s.selectedIndex].textContent }); };
@@ -1095,7 +1095,7 @@ function choix(row, label){
       if (!window.QUIZ_LIVRES){ const sc = document.createElement("script"); sc.src = "quiz-livres.js?v=1794787400"; sc.onload = () => { if (!f.hidden && f.querySelector("[data-q]")) dessiner(); }; document.head.append(sc); }
     }
     if (ty === "simulateur"){
-      f.innerHTML = '<div class="lk-ok"><button type="button" class="prim" data-s="0">Panneau d\'alarme (mode libre)</button><button type="button" class="prim" data-s="1">Défi panneau (8 missions)</button>' + annuler + '</div>'
+      f.innerHTML = '<div class="lk-ok"><button type="button" class="prim" data-s="0">Panneau d\'alarme (mode libre)</button><button type="button" class="prim" data-s="1">Mission panneau (8 missions)</button>' + annuler + '</div>'
         + '<small class="lk-aide">S\'ouvre en mode « Animer au tableau » : chaque équipe scanne le code QR avec son iPad.</small>';
       f.querySelectorAll("[data-s]").forEach(b => b.onclick = () => fini({ type:"simulateur", defi:b.dataset.s === "1" }));
     }

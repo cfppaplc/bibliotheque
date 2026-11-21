@@ -552,14 +552,14 @@ window.ACCES = (function(){
   function dessinerStats(){ const z = document.getElementById("gStats"); if (!z || !STATS) return;
     const mois = new Date().toLocaleDateString("en-CA").slice(0, 7), somme = {};
     STATS.filter(r => !/^test:/.test(r.cle) && (FILTRE.per === "12" || r.mois === mois)).forEach(r => somme[r.cle] = (somme[r.cle] || 0) + r.n);
-    const nomQuiz = id => id.startsWith("livre-") ? titreDe(id.slice(6)) : id === "perso" ? "Quiz faits par les enseignants" : id === "exemple-incendie" ? "Quiz d'exemple (protection incendie)" : id;
+    const nomQuiz = id => id.startsWith("livre-") ? titreDe(id.slice(6)) : id === "perso" ? "Défi+ faits par les enseignants" : id === "exemple-incendie" ? "Quiz d'exemple (protection incendie)" : id;
     const OUT = { tableau:"Tableau blanc", plans:"Plans techniques", activites:"Formatifs", labo:"Labo", accueil:"Accueil de classe", telecommande:"Télécommande des livres" };
     const bloc = (titre, pref, nom, coul) => { const L = Object.keys(somme).filter(k => k.startsWith(pref)).map(k => [nom(k.slice(pref.length)), somme[k]]).sort((a, b) => b[1] - a[1]).slice(0, 10);
       const max = Math.max(1, ...L.map(x => x[1]));
       return '<div class="acces-graph"><h3>' + titre + '</h3>' + (L.length ? L.map(([n, v]) => '<div class="br"><span class="n" title="' + esc(n) + '">' + esc(n) + '</span><span class="b"><i style="width:' + Math.max(3, v / max * 100) + '%;background:' + coul + '"></i></span><b>' + v + '</b></div>').join("") : '<p class="sous" style="margin:0">Rien encore pour cette période.</p>') + '</div>'; };
     const tot = Object.values(somme).reduce((a, b) => a + b, 0);
     z.innerHTML = '<div class="acces-total"><b>' + tot + '</b> ouvertures ' + (FILTRE.per === "12" ? "dans les 12 derniers mois" : "ce mois-ci") + '</div>'
-      + bloc("Livres les plus ouverts", "livre:", titreDe, "var(--accent)") + bloc("Quiz les plus joués", "quiz:", nomQuiz, "#8B6CE0") + bloc("Outils", "outil:", k => OUT[k] || k, "#14A3A3") + bloc("Simulateurs", "simu:", k => k === "defi" ? "Défi panneau" : "Panneau d'alarme (libre)", "#E0892B"); }
+      + bloc("Livres les plus ouverts", "livre:", titreDe, "var(--accent)") + bloc("Défi+ les plus joués", "quiz:", nomQuiz, "#8B6CE0") + bloc("Outils", "outil:", k => OUT[k] || k, "#14A3A3") + bloc("Simulateurs", "simu:", k => k === "defi" ? "Défi panneau" : "Panneau d'alarme (libre)", "#E0892B"); }
   async function chargerHist(){ const z = document.getElementById("gHist"); if (!z) return; if (HIST) return dessinerHist();
     try { let jeton = ""; try { jeton = localStorage.getItem("ghJeton") || ""; } catch(e){}
       const r = await fetch("https://api.github.com/repos/" + DEPOT + "/commits?path=comptes.json&per_page=15", { headers:jeton ? { Authorization:"Bearer " + jeton } : {}, cache:"no-store" });
