@@ -464,3 +464,9 @@ html.apercuQ #fsBtn,html.apercuQ #mpVersion,html.apercuQ #bSon{display:none!impo
 @media (max-width:640px){.edBas.ajOn .ajouts{grid-template-columns:1fr 1fr}}
 html.sombre .edBas.ajOn .ajouts{background:#161d2c;color:#fff}
 html.sombre .qe .ln:has(input:checked) .tc{background:rgba(30,138,85,.15)}
+
+/* Logo Défi+ (21 nov.) : écran d'attente, animé une fois */
+.defiLogo{font:800 6vw/1 var(--display,var(--body,system-ui));color:#fff;display:flex;align-items:center;gap:.6vw;margin:0 0 1.6vw;animation:defiIn .7s cubic-bezier(.2,1.4,.4,1) both}
+.defiLogo span{display:inline-grid;place-items:center;width:5.4vw;height:5.4vw;border-radius:1.2vw;background:#E8641C;color:#fff;font-size:4.8vw;animation:defiTourne .8s ease-out .7s both}
+@keyframes defiIn{from{opacity:0;transform:translateY(3vw) scale(.6)}to{opacity:1;transform:none}}
+@keyframes defiTourne{from{transform:rotate(-180deg) scale(.3)}to{transform:none}}

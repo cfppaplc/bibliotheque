@@ -15,7 +15,7 @@
     if (ok) return;
     /* 10 nov. : metierplus.app/quiz (ou /simulateur) sans compte = l'élève entre le code de la partie (si le code QR ne marche pas) */
     const jeu = /quiz/.test(location.pathname) ? "j" : /simulateur/.test(location.pathname) ? "panneau" : "";
-    const f0 = () => { document.body.insertAdjacentHTML("beforeend", `<div id="gardeOv"><div class="bx"><img src="img/metier-plus-blanc.svg" alt="Métier+"><h1>Entre le code de la partie</h1>
+    const f0 = () => { document.body.insertAdjacentHTML("beforeend", `<div id="gardeOv"><div class="bx">${jeu === "j" ? `<div style="font:800 52px/1 system-ui,sans-serif;display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:6px">Défi<span style="display:inline-grid;place-items:center;width:50px;height:50px;border-radius:12px;background:#E8641C;color:#fff;font-size:44px">+</span></div>` : `<img src="img/metier-plus-blanc.svg" alt="Métier+">`}<h1>Entre le code de la partie</h1>
       <p>Le code est affiché au tableau.</p><input id="gardeCode" inputmode="numeric" autocomplete="off" maxlength="9" placeholder="000 000" style="width:100%;box-sizing:border-box;font:800 40px system-ui,sans-serif;letter-spacing:.15em;text-align:center;padding:14px;border-radius:12px;border:2px solid #444;background:#141414;color:#fff">
       <a href="#" id="gardeGo" style="opacity:.4">Entrer</a><button id="gardeProf">Je suis enseignant</button><small>© 2026 Jérémy Raymond · Tous droits réservés</small></div></div>`);
       const i = document.getElementById("gardeCode"), go = document.getElementById("gardeGo"), val = () => i.value.replace(/\D/g, "");
