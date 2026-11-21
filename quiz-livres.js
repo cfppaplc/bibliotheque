@@ -3885,5 +3885,3341 @@ window.QUIZ_LIVRES = [
 "s": 20
 }
 ]
+},
+{
+"id": "defi-entretien-menager-egi-1",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Entretien ménager d'un bâtiment · Défi+ 1 de 3",
+"sujet": "Modules 1 à 6 : sécurité, microbes, chimie, vert, surfaces et machines, quotidien",
+"couv": "img/couvertures/entretien-menager-egi.jpg",
+"coul": "#2E8B57",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
+"q": "Devant un danger, la règle de prévention : dans l'ordre.",
+"ch": [
+"Éliminer le danger",
+"Le remplacer par moins dangereux",
+"Le contrôler",
+"L'EPI en dernier"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45,
+"t": "ordre"
+},
+{
+"q": "Tu as des motifs raisonnables de croire qu'un travail te met en danger. Tu peux…",
+"ch": [
+"exercer ton droit de refus",
+"partir chez toi sans rien dire",
+"demander une prime",
+"faire le travail plus vite"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Le travailleur doit payer lui-même ses gants et ses lunettes de protection.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 1,
+"s": 15,
+"expl": "L'employeur fournit gratuitement les EPI."
+},
+{
+"q": "Combien de sections compte toujours une fiche de données de sécurité (FDS)?",
+"t": "nombre",
+"ch": [],
+"bon": 16,
+"s": 40,
+"u": "sections"
+},
+{
+"q": "Sur un contenant transvidé, l'étiquette du lieu de travail indique…",
+"ch": [
+"le nom du produit",
+"les précautions à prendre",
+"qu'une FDS est disponible",
+"le prix du produit"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"t": "multi"
+},
+{
+"q": "Tu trouves une seringue dans les toilettes.",
+"ch": [
+"Je la prends avec les doigts et je la jette",
+"Je remets le capuchon",
+"Avec une pince, pointe vers le bas, dans un contenant rigide",
+"Je la laisse là"
+],
+"bon": 2,
+"s": 20
+},
+{
+"q": "Pousser ou tirer un chariot lourd?",
+"ch": [
+"Tirer",
+"Pousser",
+"C'est pareil",
+"Le porter"
+],
+"bon": 1,
+"s": 20,
+"expl": "Tu vois devant toi et ton dos est mieux placé."
+},
+{
+"q": "Un chiffon qui passe de la toilette au comptoir, c'est…",
+"ch": [
+"de la contamination croisée",
+"une désinfection",
+"un gain de temps",
+"une bonne pratique"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Dans le code de couleurs le plus utilisé, le chiffon ROUGE sert…",
+"ch": [
+"aux bureaux",
+"à la cuisine",
+"aux toilettes et urinoirs",
+"aux vitres"
+],
+"bon": 2,
+"s": 20
+},
+{
+"q": "Un chiffon plié en deux, puis encore en deux, donne combien de faces propres?",
+"t": "nombre",
+"ch": [],
+"bon": 8,
+"s": 40,
+"u": "faces"
+},
+{
+"q": "L'erreur la plus fréquente avec un désinfectant :",
+"ch": [
+"l'utiliser sur une surface propre",
+"essuyer tout de suite sans respecter le temps de contact",
+"le diluer avec de l'eau",
+"le ranger fermé"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Nettoyer et désinfecter, c'est la même chose.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 1,
+"s": 15,
+"expl": "On nettoie d'abord : la saleté empêche le désinfectant d'agir."
+},
+{
+"q": "Dilution 1 : 64 dans 1 L (1 000 mL) d'eau : combien de mL de produit (arrondi)?",
+"t": "nombre",
+"ch": [],
+"bon": 15,
+"s": 50,
+"u": "mL",
+"expl": "1 000 ÷ 64 = 15,6 mL, arrondi à 15 mL."
+},
+{
+"q": "Javellisant et nettoyant à l'ammoniaque mélangés :",
+"ch": [
+"nettoient deux fois mieux",
+"dégagent un gaz toxique : jamais",
+"sentent meilleur",
+"sont plus écologiques"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Avant de brancher une machine dans un endroit mouillé, ton garde du corps est…",
+"ch": [
+"le DDFT",
+"le fusible",
+"la rallonge",
+"le cône jaune"
+],
+"bon": 0,
+"s": 20
+}
+]
+},
+{
+"id": "defi-entretien-menager-egi-2",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Entretien ménager d'un bâtiment · Défi+ 2 de 3",
+"sujet": "Modules 7 à 17 : planchers, hôtel, aréna, vitres, extérieur, piscine, urgences, sanitaires, eau chaude",
+"couv": "img/couvertures/entretien-menager-egi.jpg",
+"coul": "#2E8B57",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
+"q": "Un fini à plancher s'applique…",
+"ch": [
+"en une couche épaisse",
+"en plusieurs couches minces et égales",
+"avec la vadrouille du lavage",
+"sans attendre le séchage"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Un plancher brillant est forcément glissant.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 1,
+"s": 15
+},
+{
+"q": "Un tapis d'entrée bien posé :",
+"ch": [
+"bords pliés pour l'épaisseur",
+"à plat, sans bloquer une porte, endos antidérapant",
+"sur le seuil de la porte",
+"roulé le jour"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Pourquoi suivre une séquence fixe pour faire une chambre d'hôtel en 30 minutes?",
+"ch": [
+"Pour ne rien oublier et aller vite",
+"Parce que le client l'exige",
+"Pour ranger le chariot",
+"C'est la loi"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Au-delà de combien de mètres de chute une protection est-elle obligatoire?",
+"t": "nombre",
+"ch": [],
+"bon": 3,
+"s": 40,
+"u": "m"
+},
+{
+"q": "On peut déplacer un échafaudage roulant avec une personne dessus si elle se tient bien.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 1,
+"s": 15,
+"expl": "Personne sur l'échafaudage quand on le déplace."
+},
+{
+"q": "Le sel de déglaçage fondu…",
+"ch": [
+"s'évapore",
+"s'écoule vers le sol et les cours d'eau",
+"disparaît en 24 h",
+"nourrit la pelouse"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Pourquoi tondre le gazon haut?",
+"ch": [
+"Il fait plus de feuilles, donc plus de nourriture et de racines",
+"Pour économiser l'essence",
+"Pour que ça paraisse moins",
+"Parce que la lame s'use"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Dégât d'eau : les premières étapes, dans l'ordre.",
+"ch": [
+"Trouver la source et la couper",
+"Couper l'électricité si c'est sécuritaire",
+"Retirer l'eau",
+"Documenter"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45,
+"t": "ordre"
+},
+{
+"q": "Punaises de lit dans un logement : le matelas…",
+"ch": [
+"on le sort dans le corridor pour l'aérer",
+"on l'emballe sur place avant de le déplacer",
+"on le lave à l'eau froide",
+"on le laisse tel quel"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Vadrouille humide : 250 m² à l'heure. Combien d'heures pour 400 m² (sans préparation)?",
+"t": "nombre",
+"ch": [],
+"bon": 1.6,
+"s": 50,
+"u": "h",
+"expl": "400 ÷ 250 = 1,6 h."
+},
+{
+"q": "Une toilette se remplit seule toutes les 10 minutes. Cause probable :",
+"ch": [
+"le clapet qui fuit",
+"la cuvette fissurée",
+"le siège mal vissé",
+"le drain bouché"
+],
+"bon": 0,
+"s": 20,
+"expl": "Test du colorant."
+},
+{
+"q": "À quoi sert la soupape de sûreté (T et P) d'un chauffe-eau?",
+"ch": [
+"À vider le réservoir",
+"À empêcher une explosion si la pression ou la température monte trop",
+"À régler la température",
+"À ajouter de l'eau"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Pourquoi vidanger un chauffe-eau?",
+"ch": [
+"Pour sortir les sédiments (calcaire, sable)",
+"Pour changer l'eau de couleur",
+"Pour vérifier le thermostat",
+"Ce n'est jamais nécessaire"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Une piscine publique doit respecter un règlement sur la qualité de l'eau.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+}
+]
+},
+{
+"id": "defi-entretien-menager-egi-3",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Entretien ménager d'un bâtiment · Défi+ 3 de 3",
+"sujet": "Modules 17 à 28 : registres, pompes, ventilation, toits, écoles, déversements, portes, électricité, matières",
+"couv": "img/couvertures/entretien-menager-egi.jpg",
+"coul": "#2E8B57",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
+"q": "« Ce qui n'est pas écrit n'existe pas » : à quoi sert le registre de l'eau chaude?",
+"ch": [
+"À prouver que l'entretien a été fait",
+"À décorer la salle mécanique",
+"À calculer le loyer",
+"À rien"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Le drain français autour des fondations…",
+"ch": [
+"amène l'eau potable",
+"ramasse l'eau du sol pour qu'elle ne pousse pas sur les murs",
+"évacue les toilettes",
+"chauffe le sous-sol"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "La pompe de puisard ne part pas et l'eau monte :",
+"ch": [
+"c'est normal",
+"urgence : flotte coincée, disjoncteur ou pompe brûlée",
+"j'attends le lendemain",
+"j'ouvre le robinet"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Lors d'un gros orage, qu'est-ce qui empêche l'égout de la ville de refouler dans le bâtiment?",
+"ch": [
+"le clapet antiretour",
+"le chauffe-eau",
+"le drain de toit",
+"la pompe à chaleur"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Les filtres à chicanes d'une hotte de cuisine non nettoyés :",
+"ch": [
+"risque d'incendie de graisse",
+"économisent l'énergie",
+"font moins de bruit",
+"durent plus longtemps"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "On peut monter seul sur un toit si on fait vite.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 1,
+"s": 15,
+"expl": "Jamais seul : un collègue sait que tu es sur le toit."
+},
+{
+"q": "Les dangereux glaçons au bord du toit viennent souvent…",
+"ch": [
+"de la chaleur du bâtiment qui fait fondre la neige par en dessous",
+"du vent",
+"du sel",
+"des gouttières neuves"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Dans la cuisine d'une école, qui inspecte l'hygiène?",
+"ch": [
+"Le MAPAQ",
+"La SAAQ",
+"La RBQ",
+"Le TAL"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Nettoyer un liquide biologique : le début de la méthode.",
+"ch": [
+"Isoler la zone",
+"Se protéger (gants, lunettes)",
+"Absorber",
+"Nettoyer puis désinfecter"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45,
+"t": "ordre"
+},
+{
+"q": "Pourquoi enlever un graffiti rapidement?",
+"ch": [
+"Un graffiti qui reste en attire d'autres",
+"Pour la peinture qui sèche",
+"Pour l'assurance seulement",
+"Ce n'est pas important"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Un réfrigérateur…",
+"ch": [
+"fabrique du froid",
+"déplace la chaleur",
+"refroidit avec de la glace",
+"fonctionne sans moteur"
+],
+"bon": 1,
+"s": 20,
+"expl": "Le frigorigène transporte la chaleur vers le serpentin."
+},
+{
+"q": "On peut régler soi-même le ressort de torsion d'une porte de garage commerciale.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 1,
+"s": 15,
+"expl": "Énergie cachée énorme : réservé au spécialiste."
+},
+{
+"q": "Cadenassage : les premières étapes, dans l'ordre.",
+"ch": [
+"Aviser",
+"Arrêter l'appareil",
+"Couper à la source",
+"Cadenasser"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45,
+"t": "ordre"
+},
+{
+"q": "Mélange 50:1 : combien de mL d'huile pour 4 L (4 000 mL) d'essence?",
+"t": "nombre",
+"ch": [],
+"bon": 80,
+"s": 50,
+"u": "mL",
+"expl": "4 000 ÷ 50 = 80 mL."
+},
+{
+"q": "Un tube fluorescent se brise dans une classe :",
+"ch": [
+"je passe l'aspirateur",
+"je fais sortir les gens et j'aère avant de ramasser",
+"je balaie tout de suite",
+"je jette les morceaux à la poubelle ordinaire"
+],
+"bon": 1,
+"s": 20,
+"expl": "Il contient du mercure : pas d'aspirateur ni de balai."
+}
+]
+},
+{
+"id": "defi-lecture-plans-batiments-egi-1",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Lecture de plans de bâtiments · Défi+ 1 de 3",
+"sujet": "Modules 1 à 3 : le jeu de plans, les vues, les échelles",
+"couv": "img/couvertures/lecture-plans-batiments-egi.jpg",
+"coul": "#534AB7",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
+"q": "Que veut dire le numéro de feuille E-102?",
+"ch": [
+"Architecture, coupe, feuille 2",
+"Électricité, plan d'étage, feuille 2",
+"Structure, détail 102",
+"Page 102 du devis"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Le cartouche se trouve…",
+"ch": [
+"en haut à gauche",
+"en bas à droite de chaque feuille",
+"au verso",
+"dans le devis seulement"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Les plans « tel que construit » montrent…",
+"ch": [
+"ce qui était prévu",
+"les changements faits sur le chantier",
+"le prix des travaux",
+"les plans de la ville"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Le plan de structure montre…",
+"ch": [
+"ce qui porte le bâtiment : on ne le perce pas sans autorisation",
+"les couleurs de peinture",
+"les prises de courant",
+"le mobilier"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Le devis, c'est…",
+"ch": [
+"les textes qui décrivent la qualité des matériaux et la façon d'exécuter",
+"le dessin du toit",
+"le reçu du fournisseur",
+"la liste des employés"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Plier un plan en accordéon : où doit se retrouver le cartouche?",
+"ch": [
+"À l'intérieur",
+"Visible, sur le dessus",
+"Coupé",
+"Peu importe"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Dans les trois vues d'un objet, la vue de dessus se place…",
+"ch": [
+"au-dessus de la vue de face",
+"à gauche de la vue de face",
+"sous la vue de côté",
+"n'importe où"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Les hauteurs se mesurent à partir…",
+"ch": [
+"du sous-plancher",
+"de la dalle de béton",
+"du plancher fini",
+"du plafond"
+],
+"bon": 2,
+"s": 20
+},
+{
+"q": "Sur une coupe, les flèches au bout du trait de coupe indiquent…",
+"ch": [
+"le sens du regard",
+"la pente",
+"le nord",
+"l'entrée"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Un cercle de détail sur une coupe sert à…",
+"ch": [
+"renvoyer à un zoom d'une petite partie",
+"indiquer une colonne",
+"marquer une sortie",
+"décorer le plan"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Sur le papier isométrique, les longueurs et les profondeurs sont tracées à…",
+"ch": [
+"30°",
+"45°",
+"60°",
+"90°"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Une poutre au-dessus du plan de coupe est dessinée en trait interrompu.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "Qu'est-ce qu'on trouve sur une élévation?",
+"ch": [
+"Hauteurs des planchers et des toits",
+"Portes et fenêtres",
+"Matériaux de revêtement",
+"Les prises de chaque pièce"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"t": "multi"
+},
+{
+"q": "Une différence de combien de mm de hauteur peut empêcher un appareil d'entrer sous un comptoir (exemple du livre)?",
+"t": "nombre",
+"ch": [],
+"bon": 20,
+"s": 40,
+"u": "mm"
+},
+{
+"q": "Le plan d'implantation montre…",
+"ch": [
+"le bâtiment sur son terrain",
+"l'intérieur des murs",
+"le détail d'un raccord",
+"le tableau électrique"
+],
+"bon": 0,
+"s": 20
+}
+]
+},
+{
+"id": "defi-lecture-plans-batiments-egi-2",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Lecture de plans de bâtiments · Défi+ 2 de 3",
+"sujet": "Modules 3 à 6 : échelles, cotes et symboles, croquis, architecture",
+"couv": "img/couvertures/lecture-plans-batiments-egi.jpg",
+"coul": "#534AB7",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
+"q": "À 1:50, une ligne mesure 72 mm sur le plan. Longueur réelle?",
+"t": "nombre",
+"ch": [],
+"bon": 3600,
+"s": 50,
+"u": "mm",
+"expl": "72 × 50 = 3 600 mm."
+},
+{
+"q": "À 1:100, un mur réel de 7 500 mm mesure combien sur le plan?",
+"t": "nombre",
+"ch": [],
+"bon": 75,
+"s": 50,
+"u": "mm",
+"expl": "plan = réel ÷ échelle."
+},
+{
+"q": "Lire un ruban en pouces : du plus long trait au plus court.",
+"ch": [
+"1/2 po",
+"1/4 po",
+"1/8 po",
+"1/16 po"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "Un « 2 × 4 » raboté mesure en vrai environ…",
+"ch": [
+"2 × 4 po",
+"1 1/2 × 3 1/2 po",
+"2 1/2 × 4 1/2 po",
+"1 × 3 po"
+],
+"bon": 1,
+"s": 20,
+"expl": "Taille nominale avant séchage et rabotage."
+},
+{
+"q": "Sur une règle d'architecte, à 1/4 po = 1 pi, chaque grand intervalle vaut…",
+"ch": [
+"1 pouce",
+"1 pied réel",
+"1 mètre",
+"1/4 de pied"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Les dessins d'un exercice « pas à l'échelle » : pour trouver une cote manquante, on…",
+"ch": [
+"mesure avec la règle",
+"calcule à partir des autres cotes",
+"devine",
+"prend la cote voisine"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Les cotes d'un plan métrique sont écrites en…",
+"ch": [
+"centimètres",
+"millimètres, sans le symbole",
+"mètres",
+"pouces"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Un tableau de spécifications (portes, fenêtres, appareils) se lit grâce…",
+"ch": [
+"au repère placé sur le plan (P1, F3…)",
+"à la couleur",
+"à l'échelle",
+"au cartouche seulement"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Un bon croquis à main levée, c'est…",
+"ch": [
+"des traits droits, des angles carrés, des proportions justes",
+"un dessin artistique",
+"un dessin sans mesures",
+"une photo"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "L'erreur classique quand on fait le croquis d'une pièce :",
+"ch": [
+"revenir avec une mesure manquante",
+"utiliser un crayon",
+"dessiner la porte",
+"mesurer deux fois"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "L'ouverture brute d'une porte est plus grande que la porte d'environ…",
+"ch": [
+"5 mm",
+"50 mm",
+"500 mm",
+"aucune différence"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Sur le plan de structure, la flèche à deux pointes indique…",
+"ch": [
+"le sens des solives",
+"la sortie",
+"le nord",
+"une pente de toit"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Les solives et les montants sont souvent espacés de combien de mm?",
+"t": "nombre",
+"ch": [],
+"bon": 400,
+"s": 40,
+"u": "mm"
+},
+{
+"q": "Avant de percer un mur, les plans te disent…",
+"ch": [
+"ce qu'il y a derrière : montants, fils, tuyaux",
+"la couleur de la peinture",
+"l'âge du bâtiment",
+"rien d'utile"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Les hauteurs des prises et des interrupteurs se mesurent depuis la dalle de béton.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 1,
+"s": 15,
+"expl": "Depuis le plancher fini."
+}
+]
+},
+{
+"id": "defi-lecture-plans-batiments-egi-3",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Lecture de plans de bâtiments · Défi+ 3 de 3",
+"sujet": "Modules 7 à 9 : électricité, plomberie et chauffage, sécurité",
+"couv": "img/couvertures/lecture-plans-batiments-egi.jpg",
+"coul": "#534AB7",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
+"q": "Sur le plan E-101, le plan d'architecture apparaît…",
+"ch": [
+"en gris pâle sous les dispositifs",
+"en rouge",
+"il n'apparaît pas",
+"en pointillé bleu"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Le tableau du panneau sert à trouver…",
+"ch": [
+"quel disjoncteur alimente un appareil",
+"le prix des luminaires",
+"la hauteur des prises",
+"le nombre de portes"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Avant de remplacer un luminaire qui grésille :",
+"ch": [
+"je coupe le bon disjoncteur et je vérifie l'absence de tension",
+"je le change sous tension",
+"je coupe le principal du bâtiment sans avertir",
+"je mets du ruban"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Sur un plan de plomberie, l'eau froide est souvent en…",
+"ch": [
+"bleu",
+"rouge",
+"vert",
+"jaune"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Fuite sur une branche d'eau froide : quel robinet fermer d'abord?",
+"ch": [
+"Le principal du bâtiment",
+"Le robinet le plus proche avant la fuite",
+"Celui de l'eau chaude",
+"Aucun"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Un regard de nettoyage (en anglais : cleanout) sert à…",
+"ch": [
+"déboucher le drain",
+"fermer l'eau",
+"purger l'air du chauffage",
+"mesurer la pression"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Sur une boucle de chauffage à eau chaude, le purgeur sert à…",
+"ch": [
+"évacuer l'air",
+"ajouter de l'eau chaude",
+"fermer la plinthe",
+"mesurer la température"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Lire un plan d'évacuation : dans l'ordre.",
+"ch": [
+"Trouver « Vous êtes ici »",
+"Suivre le chemin principal",
+"Repérer la sortie la plus proche",
+"Repérer le point de rassemblement"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45,
+"t": "ordre"
+},
+{
+"q": "Éléments d'un plan d'évacuation :",
+"ch": [
+"Vous êtes ici",
+"Chemins d'évacuation",
+"Sorties",
+"Prix des extincteurs"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"t": "multi"
+},
+{
+"q": "Une séparation coupe-feu sur le plan…",
+"ch": [
+"se reconnaît par un trait spécial et ne doit pas être percée sans la refaire conforme",
+"peut être percée librement",
+"est décorative",
+"n'existe que sur le papier"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Qui tient à jour les plans « tel que construit » d'un bâtiment existant?",
+"ch": [
+"Le préposé, au fil des réparations",
+"Personne",
+"Le locataire",
+"La ville"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Un échangeur ou un conduit de ventilation au plan M se trouve souvent…",
+"ch": [
+"au-dessus du plafond suspendu",
+"dans le plancher",
+"sous la dalle",
+"dans les murs extérieurs"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Un plan de chauffage montre « 3 plinthes » sur une boucle : elles sont…",
+"ch": [
+"reliées l'une après l'autre",
+"indépendantes",
+"électriques",
+"décoratives"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Un dispositif DDFT protège contre les chocs électriques près de l'eau.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "Unifilaire : à quoi sert ce schéma?",
+"ch": [
+"Montrer la distribution électrique du panneau principal aux panneaux",
+"Montrer les tuyaux",
+"Montrer le mobilier",
+"Montrer la toiture"
+],
+"bon": 0,
+"s": 20
+}
+]
+},
+{
+"id": "defi-lecture-plans-devis-c6-1",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Lecture de plans et devis (C6) · Défi+ 1 de 3",
+"sujet": "Modules 1 à 3 : le monde des plans, les vues, les échelles",
+"couv": "img/couvertures/lecture-plans-devis-c6.jpg",
+"coul": "#854F0B",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
+"q": "Que veut dire le numéro de feuille P-102?",
+"ch": [
+"Architecture, coupe, feuille 2",
+"Plomberie, plan d'étage, feuille 2",
+"Structure, détail 102",
+"Page 102 du devis"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Le cartouche se trouve…",
+"ch": [
+"en haut à gauche",
+"en bas à droite de chaque feuille",
+"au verso",
+"dans le devis seulement"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Les plans « tel que construit » montrent…",
+"ch": [
+"ce qui était prévu",
+"les changements faits sur le chantier",
+"le prix des travaux",
+"les plans de la ville"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Le plan de structure montre…",
+"ch": [
+"ce qui porte le bâtiment : on ne le perce pas sans autorisation",
+"les couleurs de peinture",
+"les prises de courant",
+"le mobilier"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Le devis, c'est…",
+"ch": [
+"les textes qui décrivent la qualité des matériaux et la façon d'exécuter",
+"le dessin du toit",
+"le reçu du fournisseur",
+"la liste des employés"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Plier un plan en accordéon : où doit se retrouver le cartouche?",
+"ch": [
+"À l'intérieur",
+"Visible, sur le dessus",
+"Coupé",
+"Peu importe"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Dans les trois vues d'un objet, la vue de dessus se place…",
+"ch": [
+"au-dessus de la vue de face",
+"à gauche de la vue de face",
+"sous la vue de côté",
+"n'importe où"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Les hauteurs se mesurent à partir…",
+"ch": [
+"du sous-plancher",
+"de la dalle de béton",
+"du plancher fini",
+"du plafond"
+],
+"bon": 2,
+"s": 20
+},
+{
+"q": "Sur une coupe, les flèches au bout du trait de coupe indiquent…",
+"ch": [
+"le sens du regard",
+"la pente",
+"le nord",
+"l'entrée"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Un cercle de détail sur une coupe sert à…",
+"ch": [
+"renvoyer à un zoom d'une petite partie",
+"indiquer une colonne",
+"marquer une sortie",
+"décorer le plan"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Sur le papier isométrique, les longueurs et les profondeurs sont tracées à…",
+"ch": [
+"30°",
+"45°",
+"60°",
+"90°"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Une poutre au-dessus du plan de coupe est dessinée en trait interrompu.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "Qu'est-ce qu'on trouve sur une élévation?",
+"ch": [
+"Hauteurs des planchers et des toits",
+"Portes et fenêtres",
+"Matériaux de revêtement",
+"Les prises de chaque pièce"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"t": "multi"
+},
+{
+"q": "Une différence de combien de mm de hauteur peut empêcher un appareil d'entrer sous un comptoir (exemple du livre)?",
+"t": "nombre",
+"ch": [],
+"bon": 20,
+"s": 40,
+"u": "mm"
+},
+{
+"q": "Le plan d'implantation montre…",
+"ch": [
+"le bâtiment sur son terrain",
+"l'intérieur des murs",
+"le détail d'un raccord",
+"le tableau électrique"
+],
+"bon": 0,
+"s": 20
+}
+]
+},
+{
+"id": "defi-lecture-plans-devis-c6-2",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Lecture de plans et devis (C6) · Défi+ 2 de 3",
+"sujet": "Modules 3 à 6 : échelles, cotes et symboles, croquis, plans de plomberie",
+"couv": "img/couvertures/lecture-plans-devis-c6.jpg",
+"coul": "#854F0B",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
+"q": "À 1:50, une ligne mesure 72 mm sur le plan. Longueur réelle?",
+"t": "nombre",
+"ch": [],
+"bon": 3600,
+"s": 50,
+"u": "mm",
+"expl": "72 × 50 = 3 600 mm."
+},
+{
+"q": "À 1:100, un mur réel de 7 500 mm mesure combien sur le plan?",
+"t": "nombre",
+"ch": [],
+"bon": 75,
+"s": 50,
+"u": "mm",
+"expl": "plan = réel ÷ échelle."
+},
+{
+"q": "Lire un ruban en pouces : du plus long trait au plus court.",
+"ch": [
+"1/2 po",
+"1/4 po",
+"1/8 po",
+"1/16 po"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "Un « 2 × 4 » raboté mesure en vrai environ…",
+"ch": [
+"2 × 4 po",
+"1 1/2 × 3 1/2 po",
+"2 1/2 × 4 1/2 po",
+"1 × 3 po"
+],
+"bon": 1,
+"s": 20,
+"expl": "Taille nominale avant séchage et rabotage."
+},
+{
+"q": "Sur une règle d'architecte, à 1/4 po = 1 pi, chaque grand intervalle vaut…",
+"ch": [
+"1 pouce",
+"1 pied réel",
+"1 mètre",
+"1/4 de pied"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Les dessins d'un exercice « pas à l'échelle » : pour trouver une cote manquante, on…",
+"ch": [
+"mesure avec la règle",
+"calcule à partir des autres cotes",
+"devine",
+"prend la cote voisine"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Les cotes d'un plan métrique sont écrites en…",
+"ch": [
+"centimètres",
+"millimètres, sans le symbole",
+"mètres",
+"pouces"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Un tableau de spécifications (portes, fenêtres, appareils) se lit grâce…",
+"ch": [
+"au repère placé sur le plan (P1, F3…)",
+"à la couleur",
+"à l'échelle",
+"au cartouche seulement"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Un drain de 7,5 m avec une pente de 2 % : quelle chute, en cm?",
+"t": "nombre",
+"ch": [],
+"bon": 15,
+"s": 50,
+"u": "cm",
+"expl": "7,5 × 0,02 = 0,15 m."
+},
+{
+"q": "Le schéma de colonne :",
+"ch": [
+"ne respecte pas l'échelle : chaque étage est une ligne",
+"est toujours à 1:50",
+"montre le mobilier",
+"remplace le devis"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Un tuyau mal supporté…",
+"ch": [
+"s'affaisse, fait des points bas et du bruit",
+"dure plus longtemps",
+"se dilate moins",
+"n'a aucun problème"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Contourner un obstacle de 150 mm avec deux coudes de 45° : le tuyau entre les deux est…",
+"ch": [
+"une diagonale",
+"vertical",
+"horizontal",
+"inutile"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Liste de matériel : 3 000 mm de tuyau + 10 % de pertes = combien de mm?",
+"t": "nombre",
+"ch": [],
+"bon": 3300,
+"s": 45,
+"u": "mm"
+},
+{
+"q": "Pendant un gros orage, qu'est-ce qui empêche l'égout de refouler par le drain de plancher?",
+"ch": [
+"le clapet antiretour",
+"le siphon",
+"l'évent",
+"le robinet d'arrêt"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Le tableau des appareils (P-601) donne pour chaque repère…",
+"ch": [
+"les diamètres EF, EC et évacuation",
+"le prix",
+"la couleur",
+"le fournisseur seulement"
+],
+"bon": 0,
+"s": 20
+}
+]
+},
+{
+"id": "defi-lecture-plans-devis-c6-3",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Lecture de plans et devis (C6) · Défi+ 3 de 3",
+"sujet": "Modules 6 à 8 : plomberie, chauffage, devis et estimation",
+"couv": "img/couvertures/lecture-plans-devis-c6.jpg",
+"coul": "#854F0B",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
+"q": "Réseaux sous pression et par gravité : lequel est par gravité?",
+"ch": [
+"L'eau froide",
+"L'eau chaude",
+"L'évacuation",
+"La recirculation"
+],
+"bon": 2,
+"s": 20
+},
+{
+"q": "Où l'eau entre-t-elle et où converge toute l'évacuation d'un bâtiment?",
+"ch": [
+"Au sous-sol",
+"Au toit",
+"Au 2e étage",
+"Dans la cuisine"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Un toit plat se vide par…",
+"ch": [
+"des drains de toit (DT)",
+"des gouttières seulement",
+"l'évent",
+"les murs"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Dans un chauffage à eau chaude, l'eau chauffée sort par le haut : c'est…",
+"ch": [
+"l'alimentation (AL)",
+"le retour (RET)",
+"l'évent",
+"le drain"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Le circulateur…",
+"ch": [
+"pousse l'eau dans la boucle",
+"chauffe l'eau",
+"purge l'air",
+"mesure la pression"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Dans un chauffage à vapeur, la vapeur monte au radiateur…",
+"ch": [
+"toute seule, sans pompe",
+"avec un circulateur",
+"avec un ventilateur",
+"par gravité vers le bas"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Un tuyau de cuivre qui chauffe…",
+"ch": [
+"s'allonge (dilatation)",
+"rapetisse",
+"ne change pas",
+"devient plus mince"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Les divisions du devis : la plomberie est la division…",
+"ch": [
+"01",
+"22",
+"26",
+"09"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Les changements demandés par le client et l'architecte pendant le projet se trouvent dans…",
+"ch": [
+"les addenda et avis de changement",
+"le cartouche",
+"la légende",
+"le schéma de colonne"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Les tuyaux se vendent…",
+"ch": [
+"en longueurs entières",
+"au centimètre exact",
+"au poids",
+"à l'unité de raccord"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Le fournisseur donne une liste de prix, souvent avec…",
+"ch": [
+"un escompte pour l'entrepreneur",
+"une taxe double",
+"un rabais au client seulement",
+"aucun prix"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Sur un plan de chauffage, AL et RET voyagent…",
+"ch": [
+"ensemble, deux tuyaux d'un étage à l'autre",
+"séparément sur des étages différents",
+"dans le même tuyau",
+"dans l'évent"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Le tableau M-601 donne, pour chaque repère de chauffage…",
+"ch": [
+"le modèle et les caractéristiques de l'équipement",
+"le salaire du plombier",
+"le nombre de portes",
+"les heures d'ouverture"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Une estimation de matériel prévoit des pertes (environ 10 %).",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "La chute d'un drain se calcule : longueur × pente.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+}
+]
+},
+{
+"id": "defi-plomberie-chauffage-1",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Plomberie et chauffage (EGI) · Défi+ 1 de 3",
+"sujet": "Modules 1 à 3 : le rôle du préposé, les maths de la tuyauterie, les matériaux",
+"couv": "img/couvertures/plomberie-chauffage.jpg",
+"coul": "#B3261E",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
+"q": "Un problème « rouge » dans la grille du préposé :",
+"ch": [
+"je le règle seul",
+"le superviseur fait appel au spécialiste (plombier, mécanicien)",
+"j'attends la semaine prochaine",
+"je l'ignore"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Un joint étanche commence par…",
+"ch": [
+"une coupe d'équerre et un tuyau propre et ébavuré",
+"beaucoup de soudure",
+"un tuyau sale",
+"une coupe en biais"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "La pince à sertir PEX se vérifie avec…",
+"ch": [
+"le calibre « go / no-go »",
+"un ruban à mesurer",
+"un niveau",
+"un multimètre"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Les premières étapes du brasage tendre : dans l'ordre.",
+"ch": [
+"Couper",
+"Aléser",
+"Nettoyer",
+"Appliquer le flux"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45,
+"t": "ordre"
+},
+{
+"q": "Combien de petites divisions dans un pouce si on lit au 1/16?",
+"t": "nombre",
+"ch": [],
+"bon": 16,
+"s": 40,
+"u": ""
+},
+{
+"q": "Convertir 0,75 po en fraction :",
+"ch": [
+"1/2",
+"3/4",
+"5/8",
+"7/8"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Les tuyaux de drainage horizontaux…",
+"ch": [
+"sont toujours à niveau",
+"descendent légèrement pour que l'eau coule par gravité",
+"montent vers l'égout",
+"sont verticaux"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Plus une colonne d'eau est haute…",
+"ch": [
+"plus la pression au bas est forte",
+"moins il y a de pression",
+"plus l'eau est chaude",
+"rien ne change"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Un tuyau « de 3/4 » : ce 3/4, c'est…",
+"ch": [
+"son diamètre nominal (un nom, pas une mesure exacte)",
+"son diamètre extérieur exact",
+"sa longueur",
+"son épaisseur"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Raccorder de l'acier galvanisé directement à du cuivre :",
+"ch": [
+"aucun problème",
+"crée une pile : corrosion galvanique",
+"rend l'eau plus douce",
+"augmente la pression"
+],
+"bon": 1,
+"s": 20,
+"expl": "On met un raccord diélectrique."
+},
+{
+"q": "Sur le collage de l'ABS, on emboîte complètement et on donne un quart de tour.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "Avant de souder près du bois :",
+"ch": [
+"protéger avec un écran ignifuge",
+"mouiller le bois",
+"souder plus vite",
+"rien de spécial"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Quels équipements de protection pour le préposé en salle mécanique?",
+"ch": [
+"Casque",
+"Lunettes",
+"Gants",
+"Sandales"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"t": "multi"
+},
+{
+"q": "La loi R-20 encadre…",
+"ch": [
+"l'industrie de la construction",
+"les loyers",
+"la santé publique",
+"les écoles"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "À 45°, si le déplacement vertical est de 6 po, le déplacement horizontal est…",
+"ch": [
+"3 po",
+"6 po",
+"12 po",
+"8,5 po"
+],
+"bon": 1,
+"s": 20
+}
+]
+},
+{
+"id": "defi-plomberie-chauffage-2",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Plomberie et chauffage (EGI) · Défi+ 2 de 3",
+"sujet": "Modules 4 à 8 : raccords, alimentation, drainage, appareils, chauffe-eau",
+"couv": "img/couvertures/plomberie-chauffage.jpg",
+"coul": "#B3261E",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
+"q": "Sur un plan, les longueurs sont données…",
+"ch": [
+"centre à centre (CC)",
+"bout à bout",
+"en mètres",
+"au hasard"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Longueur de coupe d'un tuyau :",
+"ch": [
+"CC + prises",
+"CC − prises des raccords",
+"CC × 2",
+"CC ÷ 2"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Un raccord sert à…",
+"ch": [
+"changer de direction",
+"dériver",
+"changer de grosseur",
+"chauffer l'eau"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"t": "multi"
+},
+{
+"q": "Pour le préposé, le plus important avec les robinets :",
+"ch": [
+"savoir lequel fermer et où il est",
+"connaître leur prix",
+"les peindre",
+"les changer chaque année"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Si un clapet empêche l'eau de retourner vers la rue, la dilatation de l'eau chaude…",
+"ch": [
+"fait monter la pression : on installe un réservoir d'expansion",
+"n'a aucun effet",
+"refroidit l'eau",
+"vide le chauffe-eau"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Le siphon sert à…",
+"ch": [
+"garder une garde d'eau qui bloque les gaz d'égout",
+"accélérer l'eau",
+"filtrer l'eau",
+"chauffer l'eau"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "La ventilation (évent) du réseau de drainage sert à…",
+"ch": [
+"laisser entrer l'air pour que les siphons ne se vident pas",
+"évacuer la chaleur",
+"faire du bruit",
+"augmenter la pression d'eau"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Un regard de nettoyage donne accès…",
+"ch": [
+"à l'intérieur du drain pour un furet ou une caméra",
+"à l'eau chaude",
+"au compteur",
+"au chauffe-eau"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Un seul appareil se vide mal; les autres vont bien :",
+"ch": [
+"le problème est dans son renvoi ou son siphon",
+"l'égout de la ville est bouché",
+"le toit fuit",
+"le chauffe-eau est brisé"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "L'appareil qui génère le plus de bons de travail dans un immeuble :",
+"ch": [
+"la toilette",
+"le lavabo",
+"la douche",
+"le chauffe-eau"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Robinet à cartouche : l'eau chaude est…",
+"ch": [
+"à gauche",
+"à droite",
+"au centre",
+"en haut"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Une soupape T&P s'ouvre au-dessus d'environ combien de psi?",
+"t": "nombre",
+"ch": [],
+"bon": 150,
+"s": 40,
+"u": "psi"
+},
+{
+"q": "Tester une soupape T&P :",
+"ch": [
+"lever le levier quelques secondes, un seau sous la sortie",
+"la dévisser",
+"boucher la sortie",
+"la peindre"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "L'anode d'un chauffe-eau…",
+"ch": [
+"se sacrifie pour protéger le réservoir de la corrosion",
+"chauffe l'eau",
+"règle la température",
+"mesure la pression"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Avant de travailler sur un chauffe-eau électrique, on cadenasse le disjoncteur et on vérifie l'absence de tension.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+}
+]
+},
+{
+"id": "defi-plomberie-chauffage-3",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Plomberie et chauffage (EGI) · Défi+ 3 de 3",
+"sujet": "Modules 9 à 13 : chaudière, brûleur à l'huile, autres systèmes, pompes, entretien préventif",
+"couv": "img/couvertures/plomberie-chauffage.jpg",
+"coul": "#B3261E",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
+"q": "Chauffée de 10 °C à 82 °C, l'eau prend environ combien de % de volume?",
+"t": "nombre",
+"ch": [],
+"bon": 3,
+"s": 40,
+"u": "%"
+},
+{
+"q": "Le vase d'expansion d'une chaudière…",
+"ch": [
+"absorbe le surplus de volume de l'eau chaude",
+"chauffe l'eau",
+"purge l'air",
+"alimente le brûleur"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Les radiateurs en fonte…",
+"ch": [
+"chauffent lentement et gardent la chaleur longtemps",
+"chauffent instantanément",
+"ne gardent pas la chaleur",
+"fonctionnent à la vapeur seulement"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Le gicleur d'un brûleur à l'huile…",
+"ch": [
+"transforme le mazout en fin brouillard",
+"allume l'étincelle",
+"pompe l'eau",
+"mesure la flamme"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "La cellule CdS du brûleur…",
+"ch": [
+"voit la flamme : sa résistance baisse à la lumière",
+"mesure la pression",
+"chauffe le mazout",
+"règle la température"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "L'entretien annuel du brûleur se fait…",
+"ch": [
+"avant la saison de chauffage, par un mécanicien certifié",
+"en plein hiver par le préposé",
+"jamais",
+"chaque semaine"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Une thermopompe air-air…",
+"ch": [
+"chauffe l'hiver et climatise l'été en déplaçant la chaleur",
+"brûle du mazout",
+"fonctionne à la vapeur",
+"chauffe seulement l'eau"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Amorcer une pompe centrifuge, c'est…",
+"ch": [
+"remplir d'eau son corps et l'aspiration en chassant l'air",
+"l'allumer à sec",
+"changer son moteur",
+"la vider"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Une pompe qui perd sa charge sans cesse : on cherche surtout…",
+"ch": [
+"du côté aspiration (fuite d'air)",
+"du côté refoulement",
+"dans le panneau électrique",
+"dans le toit"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Test saisonnier de la pompe de puisard : dans l'ordre.",
+"ch": [
+"Retirer le couvercle",
+"Verser lentement un seau d'eau",
+"Le flotteur monte et la pompe part",
+"Vérifier qu'elle s'arrête"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45,
+"t": "ordre"
+},
+{
+"q": "En gelant, l'eau prend environ combien de % de volume?",
+"t": "nombre",
+"ch": [],
+"bon": 9,
+"s": 40,
+"u": "%"
+},
+{
+"q": "Le registre de la salle mécanique sert à…",
+"ch": [
+"noter date, appareil, lecture ou travail, initiales",
+"décorer",
+"afficher les prix",
+"rien"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Lors d'une inspection, les priorités se justifient…",
+"ch": [
+"par la sécurité d'abord",
+"par le coût le plus bas",
+"par l'ordre alphabétique",
+"au hasard"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Un tuyau qui gèle peut fendre ou faire sauter ses raccords.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "Pression normale d'une chaudière à eau chaude, à froid (exemple de registre) :",
+"ch": [
+"environ 12 à 15 psi",
+"150 psi",
+"1 psi",
+"60 psi"
+],
+"bon": 0,
+"s": 20
+}
+]
+},
+{
+"id": "defi-recherche-emploi-plc-1",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Recherche d'emploi (Plomberie et chauffage) · Défi+ 1 de 3",
+"sujet": "Modules 1 à 3 : mon bilan, le marché, le CV",
+"couv": "img/couvertures/recherche-emploi-plc.jpg",
+"coul": "#1F6FB2",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
+"q": "Savoir, savoir-faire, savoir-être : lesquels sont du savoir-être?",
+"ch": [
+"La ponctualité",
+"Le travail d'équipe",
+"Souder un raccord",
+"La politesse avec les clients"
+],
+"bon": [
+0,
+1,
+3
+],
+"s": 30,
+"t": "multi"
+},
+{
+"q": "« Travaillant, ponctuel et fiable » ne vaut rien sans…",
+"ch": [
+"une preuve : un fait précis",
+"un diplôme",
+"une photo",
+"un ton de voix fort"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Tu as « juste été caissier ». Que dis-tu à l'employeur?",
+"ch": [
+"Rien, ça ne compte pas",
+"Ce que l'emploi t'a appris, relié à l'emploi visé",
+"Que tu détestais cet emploi",
+"Que tu as été caissier, sans plus"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Un défi (point à améliorer) se présente avec un moyen concret que tu prends pour t'améliorer.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "L'IA a écrit « Expert en plomberie depuis 10 ans » dans ton bilan. Tu…",
+"ch": [
+"le gardes, ça paraît bien",
+"corriges : il faut que ce soit vrai",
+"ajoutes 5 ans de plus",
+"l'envoies tel quel"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Pour devenir compagnon tuyauteur, combien d'heures faut-il accumuler dans le carnet d'apprentissage?",
+"ch": [
+"2 000",
+"4 000",
+"8 000",
+"12 000"
+],
+"bon": 2,
+"s": 20,
+"expl": "Quatre périodes de 2 000 heures, puis l'examen de qualification."
+},
+{
+"q": "Les chantiers régis par la CCQ, c'est…",
+"ch": [
+"le monde de la construction",
+"l'entretien d'immeubles",
+"la vente au détail",
+"le commerce de pièces"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Le « marché caché », c'est…",
+"ch": [
+"les emplois jamais affichés, comblés par recommandation",
+"les emplois au noir",
+"les sites payants",
+"les emplois à l'étranger"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Quels sont des secteurs de la construction?",
+"ch": [
+"Résidentiel",
+"Institutionnel et commercial",
+"Industriel",
+"Restauration"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"t": "multi"
+},
+{
+"q": "Trouve l'erreur dans cette phrase.",
+"t": "erreur",
+"ch": [
+"Responsable de l'entretient",
+"des chauffe-eau",
+"de l'immeuble."
+],
+"bon": 0,
+"s": 30,
+"expl": "On écrit « entretien », sans t."
+},
+{
+"q": "Construction ou hors construction : laquelle est régie par la CCQ?",
+"ch": [
+"Construction",
+"Hors construction",
+"Les deux",
+"Aucune"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Un chemin (construction ou hors construction) est toujours meilleur que l'autre.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 1,
+"s": 15,
+"expl": "Tout dépend de ce qui compte pour toi."
+},
+{
+"q": "Ton message de boîte vocale idéal :",
+"ch": [
+"de la musique forte",
+"ton nom, clair et poli",
+"aucun message",
+"une blague"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Ton bilan personnel complet, l'employeur…",
+"ch": [
+"ne le voit jamais tel quel : c'est un document de travail",
+"le reçoit avec le CV",
+"le signe",
+"le garde au dossier"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Pour améliorer un profil vague comme « Je suis motivé et j'aime travailler avec mes mains » :",
+"ch": [
+"ajouter un fait précis et chiffré",
+"ajouter des points d'exclamation",
+"l'écrire en majuscules",
+"le raccourcir à un mot"
+],
+"bon": 0,
+"s": 20
+}
+]
+},
+{
+"id": "defi-recherche-emploi-plc-2",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Recherche d'emploi (Plomberie et chauffage) · Défi+ 2 de 3",
+"sujet": "Modules 3 à 6 : CV, recherche en ligne, plan de recherche, lettre",
+"couv": "img/couvertures/recherche-emploi-plc.jpg",
+"coul": "#1F6FB2",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
+"q": "Les références, on…",
+"ch": [
+"les met en bas du CV",
+"écrit « Références sur demande »",
+"les prépare sur une liste séparée",
+"ne les donne jamais"
+],
+"bon": 2,
+"s": 20
+},
+{
+"q": "Une bonne puce de CV commence par…",
+"ch": [
+"« J'aidais… »",
+"un verbe d'action : installé, réparé, inspecté",
+"une date",
+"le nom de l'employeur"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Une adresse courriel pour postuler :",
+"ch": [
+"bigboss_69@…",
+"prenom.nom@…",
+"celle de ton ami",
+"aucune adresse"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Un logiciel de tri de CV cherche surtout…",
+"ch": [
+"les mots-clés de l'offre",
+"les couleurs du CV",
+"la photo",
+"le nombre de pages"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Karine revient après six ans à la maison. Quel type de CV met ses forces en avant?",
+"ch": [
+"Le CV par compétences",
+"Le CV chronologique",
+"Aucun CV",
+"Une lettre seulement"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Une offre te demande de l'argent pour « réserver » le poste.",
+"ch": [
+"Je paie vite",
+"C'est probablement une fausse offre",
+"C'est normal en plomberie",
+"Je donne mon NAS"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Pour tes réseaux personnels, la visibilité des publications devrait être…",
+"ch": [
+"Public",
+"Amis",
+"Tout le monde",
+"Sans importance"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Après le DEP, une recherche d'emploi active demande environ…",
+"ch": [
+"1 heure par mois",
+"10 à 15 heures par semaine",
+"40 heures par jour",
+"aucun horaire"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Quand tu appelles une entreprise, tu notes surtout…",
+"ch": [
+"le nom du responsable, pour ta relance",
+"la couleur des camions",
+"l'adresse du site",
+"le prix des pièces"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Nomme un piège à éviter dans une lettre :",
+"ch": [
+"Commencer toutes les phrases par « Je »",
+"Adresser la lettre à la bonne personne",
+"Donner une preuve de tes qualités",
+"Relire avant d'envoyer"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "On peut envoyer la même lettre générique à tous les employeurs.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 1,
+"s": 15
+},
+{
+"q": "Avant de cliquer sur Envoyer :",
+"ch": [
+"Adresse courriel professionnelle",
+"Pièces jointes vraiment jointes",
+"Nom du destinataire bien écrit",
+"Émojis dans l'objet"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"t": "multi"
+},
+{
+"q": "Créer une alerte d'emploi : dans l'ordre.",
+"ch": [
+"Créer un compte",
+"Faire une recherche avec des mots-clés",
+"Enregistrer l'alerte"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "Sites gouvernementaux pour chercher un emploi :",
+"ch": [
+"Québec emploi et le Guichet-Emplois",
+"Les réseaux de jeux",
+"Les sites de vente usagée",
+"Aucun"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Une recherche d'emploi efficace se traite comme…",
+"ch": [
+"un emploi à temps partiel : heures fixes et objectifs",
+"un passe-temps",
+"une corvée à faire une fois",
+"un loisir du dimanche"
+],
+"bon": 0,
+"s": 20
+}
+]
+},
+{
+"id": "defi-recherche-emploi-plc-3",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Recherche d'emploi (Plomberie et chauffage) · Défi+ 3 de 3",
+"sujet": "Modules 6 à 8 : entrevue, relance et premier emploi",
+"couv": "img/couvertures/recherche-emploi-plc.jpg",
+"coul": "#1F6FB2",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
+"q": "Les quatre parties d'une lettre de présentation : dans l'ordre.",
+"ch": [
+"En-tête",
+"Présentation",
+"Proposition",
+"Conclusion"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "On peut terminer une lettre officielle par « Merci et bonne journée! ».",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 1,
+"s": 15,
+"expl": "La conclusion demande une rencontre et se termine par une formule de politesse."
+},
+{
+"q": "Une lettre de candidature spontanée s'appuie sur…",
+"ch": [
+"les exigences de l'offre",
+"ce que tu sais de l'employeur",
+"ton horaire de la semaine",
+"une lettre type envoyée à tous"
+],
+"bon": 1,
+"s": 20,
+"expl": "Sans offre, tu n'as pas d'exigences à reprendre."
+},
+{
+"q": "La méthode STAR : dans l'ordre.",
+"ch": [
+"Situation",
+"Tâche",
+"Action",
+"Résultat"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "« Parlez-moi de vous » : l'employeur veut surtout savoir…",
+"ch": [
+"toute ta vie",
+"pourquoi tu es ici pour ce poste",
+"ton signe astrologique",
+"tes loisirs du week-end"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Quand parler du salaire?",
+"ch": [
+"Dès la première minute",
+"Quand l'employeur aborde le sujet ou au moment de l'offre",
+"Jamais",
+"Dans la lettre"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Ton message de remerciement après l'entrevue s'envoie…",
+"ch": [
+"le jour même ou le lendemain",
+"un mois plus tard",
+"seulement si on t'engage",
+"jamais"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Un refus veut dire…",
+"ch": [
+"que tu n'es pas bon",
+"qu'un autre candidat correspondait mieux cette fois",
+"que tu dois arrêter de chercher",
+"que l'employeur te déteste"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "La loi qui fixe les conditions minimales de travail au Québec :",
+"ch": [
+"la Loi sur les normes du travail",
+"le Code de construction",
+"la Loi sur la RBQ",
+"le Code de la route"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Premier jour : on te demande d'utiliser un produit que tu ne connais pas.",
+"ch": [
+"Je l'utilise sans rien lire",
+"Je lis l'étiquette et la FDS",
+"Je le mélange avec de l'eau de Javel",
+"Je refuse de travailler"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "L'appel de présélection, c'est…",
+"ch": [
+"déjà une entrevue",
+"une formalité sans importance",
+"un message publicitaire",
+"un test de vitesse"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Entrevue vidéo : le cadrage idéal…",
+"ch": [
+"les yeux au tiers du haut, visage éclairé",
+"le plafond",
+"contre-jour devant la fenêtre",
+"caméra éteinte"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "En entrevue, une mise en situation du métier vérifie surtout…",
+"ch": [
+"si tu penses d'abord à la sécurité et au client",
+"ta vitesse de frappe",
+"ta taille",
+"ton auto"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Ta liste du jour J :",
+"ch": [
+"CV et lettre imprimés",
+"Liste de références",
+"Copies de tes cartes",
+"Téléphone allumé avec sonnerie"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"t": "multi"
+},
+{
+"q": "La garantie d'emploi de stage en plomberie, c'est…",
+"ch": [
+"150 heures chez un employeur",
+"un contrat de 5 ans",
+"une prime de départ",
+"un examen écrit"
+],
+"bon": 0,
+"s": 20
+}
+]
+},
+{
+"id": "defi-recherche-emploi-egi-1",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Moyens de recherche d'emploi (EGI) · Défi+ 1 de 3",
+"sujet": "Modules 1 à 3 : mon bilan, les emplois en entretien, le CV",
+"couv": "img/couvertures/recherche-emploi-egi.jpg",
+"coul": "#2E8B57",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
+"q": "Savoir, savoir-faire, savoir-être : lesquels sont du savoir-être?",
+"ch": [
+"La ponctualité",
+"Le travail d'équipe",
+"Souder un raccord",
+"La politesse avec les clients"
+],
+"bon": [
+0,
+1,
+3
+],
+"s": 30,
+"t": "multi"
+},
+{
+"q": "« Travaillant, ponctuel et fiable » ne vaut rien sans…",
+"ch": [
+"une preuve : un fait précis",
+"un diplôme",
+"une photo",
+"un ton de voix fort"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Tu as « juste été caissier ». Que dis-tu à l'employeur?",
+"ch": [
+"Rien, ça ne compte pas",
+"Ce que l'emploi t'a appris, relié à l'emploi visé",
+"Que tu détestais cet emploi",
+"Que tu as été caissier, sans plus"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Un défi (point à améliorer) se présente avec un moyen concret que tu prends pour t'améliorer.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "L'IA a écrit « Expert en plomberie depuis 10 ans » dans ton bilan. Tu…",
+"ch": [
+"le gardes, ça paraît bien",
+"corriges : il faut que ce soit vrai",
+"ajoutes 5 ans de plus",
+"l'envoies tel quel"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Titres d'emploi accessibles avec un DEP en entretien général d'immeubles :",
+"ch": [
+"Concierge",
+"Ouvrier d'entretien",
+"Préposé à l'entretien",
+"Pharmacien"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"t": "multi"
+},
+{
+"q": "L'information sur le marché du travail (IMT) répond à trois questions :",
+"ch": [
+"combien ça paie, y a-t-il des emplois, que faut-il",
+"quelle couleur, quel camion, quel outil",
+"qui, quand, pourquoi",
+"aucune"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "En entretien, les titres changent d'un employeur à l'autre. Pour chercher, tu…",
+"ch": [
+"utilises plusieurs mots-clés",
+"cherches seulement « concierge »",
+"attends qu'on t'appelle",
+"abandonnes"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Trouve l'erreur dans cette phrase.",
+"t": "erreur",
+"ch": [
+"Je suis une personne",
+"ponctuel",
+"et minutieuse."
+],
+"bon": 1,
+"s": 30,
+"expl": "Accord au féminin : ponctuelle."
+},
+{
+"q": "Ton CV est évalué selon…",
+"ch": [
+"les critères du programme d'études",
+"la couleur du papier",
+"ton nombre d'amis",
+"la police la plus originale"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "« Ouvrier d'entretien classe II », « concierge », « préposé » : ce sont…",
+"ch": [
+"des titres différents pour des emplois proches",
+"des métiers sans lien",
+"des emplois de construction",
+"des stages"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Ton bilan personnel complet, l'employeur…",
+"ch": [
+"ne le voit jamais tel quel : c'est un document de travail",
+"le reçoit avec le CV",
+"le signe",
+"le garde au dossier"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Ton message de boîte vocale idéal :",
+"ch": [
+"de la musique forte",
+"ton nom, clair et poli",
+"aucun message",
+"une blague"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Pour améliorer un profil vague comme « Je suis motivé et j'aime travailler avec mes mains » :",
+"ch": [
+"ajouter un fait précis et chiffré",
+"ajouter des points d'exclamation",
+"l'écrire en majuscules",
+"le raccourcir à un mot"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Une liste des employeurs de la région est un bon point de départ pour ta recherche.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+}
+]
+},
+{
+"id": "defi-recherche-emploi-egi-2",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Moyens de recherche d'emploi (EGI) · Défi+ 2 de 3",
+"sujet": "Modules 3 à 6 : CV, recherche en ligne, moyens de recherche, lettre",
+"couv": "img/couvertures/recherche-emploi-egi.jpg",
+"coul": "#2E8B57",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
+"q": "Les références, on…",
+"ch": [
+"les met en bas du CV",
+"écrit « Références sur demande »",
+"les prépare sur une liste séparée",
+"ne les donne jamais"
+],
+"bon": 2,
+"s": 20
+},
+{
+"q": "Une bonne puce de CV commence par…",
+"ch": [
+"« J'aidais… »",
+"un verbe d'action : installé, réparé, inspecté",
+"une date",
+"le nom de l'employeur"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Une adresse courriel pour postuler :",
+"ch": [
+"bigboss_69@…",
+"prenom.nom@…",
+"celle de ton ami",
+"aucune adresse"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Un logiciel de tri de CV cherche surtout…",
+"ch": [
+"les mots-clés de l'offre",
+"les couleurs du CV",
+"la photo",
+"le nombre de pages"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Karine revient après six ans à la maison. Quel type de CV met ses forces en avant?",
+"ch": [
+"Le CV par compétences",
+"Le CV chronologique",
+"Aucun CV",
+"Une lettre seulement"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Les postes du secteur public (écoles, municipalités) sont souvent affichés…",
+"ch": [
+"seulement sur le site de l'employeur",
+"dans les journaux de 1990",
+"sur les poteaux",
+"jamais"
+],
+"bon": 0,
+"s": 20,
+"expl": "Vérifie-les chaque semaine."
+},
+{
+"q": "Combien de moyens de recherche un bon plan combine-t-il?",
+"ch": [
+"Un seul",
+"Trois ou quatre",
+"Dix",
+"Aucun"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "En région, se présenter en personne pour une candidature spontanée…",
+"ch": [
+"fonctionne encore très bien",
+"est interdit",
+"ne sert à rien",
+"se fait seulement la nuit"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Une offre te demande de l'argent pour « réserver » le poste.",
+"ch": [
+"Je paie vite",
+"C'est probablement une fausse offre",
+"C'est normal",
+"Je donne mon NAS"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Le brouillon de ta lettre de présentation, c'est…",
+"ch": [
+"ton tableau exigences de l'offre / ton bilan",
+"un modèle copié sur Internet",
+"ton CV recopié",
+"un texto"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "On peut envoyer la même lettre générique à tous les employeurs.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 1,
+"s": 15
+},
+{
+"q": "Avant d'envoyer une candidature :",
+"ch": [
+"Adresse courriel professionnelle",
+"Pièces jointes vraiment jointes",
+"Nom du destinataire bien écrit",
+"Émojis dans l'objet"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"t": "multi"
+},
+{
+"q": "Pour tes réseaux personnels, la visibilité des publications devrait être…",
+"ch": [
+"Public",
+"Amis",
+"Tout le monde",
+"Sans importance"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Sites gouvernementaux pour chercher un emploi :",
+"ch": [
+"Québec emploi et le Guichet-Emplois",
+"Les réseaux de jeux",
+"Les sites de vente usagée",
+"Aucun"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Une recherche d'emploi efficace se traite comme…",
+"ch": [
+"un emploi à temps partiel : heures fixes et objectifs",
+"un passe-temps",
+"une corvée à faire une fois",
+"un loisir du dimanche"
+],
+"bon": 0,
+"s": 20
+}
+]
+},
+{
+"id": "defi-recherche-emploi-egi-3",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Moyens de recherche d'emploi (EGI) · Défi+ 3 de 3",
+"sujet": "Modules 7 et 8 : entrevue, relance et premier emploi",
+"couv": "img/couvertures/recherche-emploi-egi.jpg",
+"coul": "#2E8B57",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
+"q": "Les quatre parties d'une lettre de présentation : dans l'ordre.",
+"ch": [
+"En-tête",
+"Présentation",
+"Proposition",
+"Conclusion"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "On peut terminer une lettre officielle par « Merci et bonne journée! ».",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 1,
+"s": 15,
+"expl": "La conclusion demande une rencontre et se termine par une formule de politesse."
+},
+{
+"q": "Une lettre de candidature spontanée s'appuie sur…",
+"ch": [
+"les exigences de l'offre",
+"ce que tu sais de l'employeur",
+"ton horaire de la semaine",
+"une lettre type envoyée à tous"
+],
+"bon": 1,
+"s": 20,
+"expl": "Sans offre, tu n'as pas d'exigences à reprendre."
+},
+{
+"q": "La méthode STAR : dans l'ordre.",
+"ch": [
+"Situation",
+"Tâche",
+"Action",
+"Résultat"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "« Parlez-moi de vous » : l'employeur veut surtout savoir…",
+"ch": [
+"toute ta vie",
+"pourquoi tu es ici pour ce poste",
+"ton signe astrologique",
+"tes loisirs du week-end"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Quand parler du salaire?",
+"ch": [
+"Dès la première minute",
+"Quand l'employeur aborde le sujet ou au moment de l'offre",
+"Jamais",
+"Dans la lettre"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Ton message de remerciement après l'entrevue s'envoie…",
+"ch": [
+"le jour même ou le lendemain",
+"un mois plus tard",
+"seulement si on t'engage",
+"jamais"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Un refus veut dire…",
+"ch": [
+"que tu n'es pas bon",
+"qu'un autre candidat correspondait mieux cette fois",
+"que tu dois arrêter de chercher",
+"que l'employeur te déteste"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "La loi qui fixe les conditions minimales de travail au Québec :",
+"ch": [
+"la Loi sur les normes du travail",
+"le Code de construction",
+"la Loi sur la RBQ",
+"le Code de la route"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Premier jour : on te demande d'utiliser un produit que tu ne connais pas.",
+"ch": [
+"Je l'utilise sans rien lire",
+"Je lis l'étiquette et la FDS",
+"Je le mélange avec de l'eau de Javel",
+"Je refuse de travailler"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Les étapes d'une embauche : dans l'ordre.",
+"ch": [
+"Présélection",
+"Entrevue",
+"Test pratique",
+"Vérification des références",
+"Offre"
+],
+"bon": [
+0,
+1,
+2,
+3,
+4
+],
+"s": 50,
+"t": "ordre"
+},
+{
+"q": "La tenue pour une entrevue en entretien :",
+"ch": [
+"complet-cravate obligatoire",
+"un cran plus habillé que la tenue de travail, propre",
+"survêtement de sport",
+"vêtements de travail sales"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Une fois l'offre acceptée, tu demandes…",
+"ch": [
+"une confirmation écrite : salaire, horaire, statut, date de début",
+"rien du tout",
+"une augmentation",
+"un congé"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "La période de probation, c'est…",
+"ch": [
+"une période d'essai où l'employeur observe ta fiabilité",
+"des vacances payées",
+"une amende",
+"un examen écrit"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Une entrevue est une conversation : tu peux demander de répéter une question.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+}
+]
 }
 ];

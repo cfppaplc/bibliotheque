@@ -693,3 +693,4 @@
 - 2026-11-21 : carte Défi+ v3 : plus grosse (340 px, logo « Défi » + carré orange « + » comme Métier+, bouton 22 px), animée une fois (entrée avec rebond, le + tourne, le bouton pulse 3 fois puis arrête).
 - 2026-11-21 : logo Défi+ (« Défi » + carré orange « + », animé une fois) sur l'écran d'attente de la partie (quiz.js, css/quiz.css) et sur l'écran élève « Entre le code » de quiz (garde.js); « Mes quiz » → « Mes Défi+ ».
 - 2026-11-21 : anciens quiz de livres (livre-*, 10 livres, dont Matériel électrique) retirés de quiz-livres.js, 79 images img/labo/quiz/livres/ retirées (plus utilisées). Défi+ : couverture = img/couvertures/<livre>.jpg (nouvelles couvertures HD).
+- 2026-11-21 : Défi+ ajoutés : Entretien ménager, 2 Recherche d'emploi, 2 Lecture de plans, Plomberie et chauffage (fichiers originaux/defi-livres/livres/*.py).
