@@ -10,15 +10,13 @@
     cacher(); const k = livre + ":" + n; noter(k);
     const r = document.getElementById("reader"); if (!r) return;
     carte = document.createElement("div"); carte.className = "defi-carte";
-    carte.innerHTML = `<button type="button" class="defi-x" aria-label="Fermer">×</button><small>Tu as couvert ${NOMS[n]}.</small><b>Défi+ ${n} de 3</b><button type="button" class="btn primary defi-go">Faire le Défi+</button>`;
+    carte.innerHTML = `<button type="button" class="defi-x" aria-label="Fermer">×</button><div class="defi-logo">Défi<span>+</span></div><div class="defi-n">${n} de 3</div><small>Tu as couvert ${NOMS[n]}.</small><button type="button" class="defi-go">Lancer le Défi+</button>`;
     carte.querySelector(".defi-x").onclick = cacher;
     carte.querySelector(".defi-go").onclick = () => { window.open("quiz.html?animer=1&quiz=" + encodeURIComponent(id), "_blank"); cacher(); };
     r.appendChild(carte); cacheT = setTimeout(cacher, 30000);
   }
   const st = document.createElement("style");
-  st.textContent = ".defi-carte{position:absolute;right:18px;bottom:84px;z-index:60;background:var(--surface,#fff);color:var(--ink,#222);border:1px solid var(--line,#ddd);border-left:5px solid var(--copper,#C8642B);border-radius:12px;padding:14px 16px 14px;box-shadow:0 6px 22px rgba(0,0,0,.18);display:flex;flex-direction:column;gap:6px;min-width:230px;font:15px var(--body,system-ui)}"
-    + ".defi-carte b{font-size:20px}.defi-carte small{opacity:.75}.defi-carte .defi-go{font-size:17px;padding:12px 18px;margin-top:4px}"
-    + ".defi-x{position:absolute;top:4px;right:6px;border:0;background:none;font-size:24px;line-height:1;cursor:pointer;color:inherit;opacity:.6;padding:6px}";
+  st.textContent = ".defi-carte{position:absolute;right:24px;bottom:96px;z-index:60;width:340px;background:var(--surface,#fff);color:var(--ink,#222);border:3px solid #E8641C;border-radius:18px;padding:20px 22px 22px;box-shadow:0 14px 40px rgba(0,0,0,.35);display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;font:16px var(--body,system-ui);animation:defiIn .7s cubic-bezier(.2,1.4,.4,1) both}.defi-logo{font:800 64px/1 var(--display,var(--body,system-ui));letter-spacing:-1px;display:flex;align-items:center;gap:6px}.defi-logo span{display:inline-grid;place-items:center;width:58px;height:58px;border-radius:14px;background:#E8641C;color:#fff;font-size:52px;animation:defiTourne .8s ease-out .7s both}.defi-n{font:700 22px var(--body,system-ui);color:#E8641C}.defi-carte small{font-size:15px;opacity:.8}.defi-go{margin-top:10px;width:100%;font:700 22px var(--body,system-ui);color:#fff;background:#E8641C;border:0;border-radius:12px;padding:16px 18px;cursor:pointer;animation:defiPouls .9s ease-in-out 1.5s 3 both}.defi-go:hover{filter:brightness(1.08)}.defi-x{position:absolute;top:6px;right:8px;border:0;background:none;font-size:28px;line-height:1;cursor:pointer;color:inherit;opacity:.6;padding:6px}@keyframes defiIn{from{opacity:0;transform:translateY(60px) scale(.6)}to{opacity:1;transform:none}}@keyframes defiTourne{from{transform:rotate(-180deg) scale(.3)}to{transform:none}}@keyframes defiPouls{0%,100%{transform:none}50%{transform:scale(1.07)}}@media (max-width:600px){.defi-carte{right:12px;left:12px;width:auto}}";
   document.head.appendChild(st);
   setInterval(() => {
     try {
