@@ -5441,299 +5441,6 @@ window.QUIZ_LIVRES = [
 ]
 },
 {
-"id": "livre-travaux-mineurs-egi",
-"exemple": true,
-"livre": true,
-"titre": "Travaux mineurs d'entretien général",
-"sujet": "Quiz du livre",
-"couv": "img/labo/quiz/livres/travaux-mineurs-egi-couv.jpg",
-"coul": "#D9488A",
-"reg": {
-"nb": "12",
-"melange": "tout"
-},
-"qs": [
-{
-"q": "Passage libre minimal pour un fauteuil roulant autour d'une zone de travail",
-"ch": [
-"1,1 m",
-"2 m",
-"0,6 m",
-"0,8 m"
-],
-"bon": 0,
-"s": 20,
-"expl": "Ton balisage protège les occupants et ton travail."
-},
-{
-"q": "Pendant un travail, les issues et les portes…",
-"ch": [
-"Peuvent être bloquées une heure",
-"Restent toujours libres",
-"Sont couvertes de polythène",
-"Sont fermées à clé"
-],
-"bon": 1,
-"s": 20
-},
-{
-"q": "L'eau des descentes pluviales doit être éloignée de la fondation de…",
-"ch": [
-"1,5 à 2 m",
-"Ça n'a pas d'importance",
-"5 m",
-"30 cm"
-],
-"bon": 0,
-"s": 20
-},
-{
-"q": "Les chantepleures, on…",
-"ch": [
-"Les peint",
-"Les remplit de mortier",
-"Ne les bouche jamais",
-"Les calfeutre avant l'hiver"
-],
-"bon": 2,
-"s": 20,
-"expl": "Elles laissent sortir l'eau derrière le parement."
-},
-{
-"q": "Le composé à prise (en poudre) durcit…",
-"ch": [
-"En séchant à l'air, en 24 h",
-"Jamais complètement",
-"Par réaction chimique, en 5 à 90 minutes",
-"Au soleil"
-],
-"bon": 2,
-"s": 20,
-"expl": "Le prémélangé, lui, sèche à l'air (12 à 24 h par couche)."
-},
-{
-"q": "Le bac de composé à prise devient tiède. Ça veut dire…",
-"ch": [
-"Il faut ajouter de l'eau",
-"Il commence à durcir",
-"Il a gelé",
-"Il est trop mouillé"
-],
-"bon": 1,
-"s": 20,
-"expl": "La prise dégage de la chaleur."
-},
-{
-"q": "Une porcelaine absorbe moins de ___ de son poids en eau.",
-"ch": [
-"50 %",
-"0,5 %",
-"5 %",
-"20 %"
-],
-"bon": 1,
-"s": 20,
-"expl": "Plus la cuisson est chaude, moins la tuile boit l'eau."
-},
-{
-"q": "Une peinture au latex posée trop froide…",
-"ch": [
-"Devient poudreuse : les billes ne fusionnent pas",
-"Sèche plus vite",
-"Ne change rien",
-"Devient plus brillante"
-],
-"bon": 0,
-"s": 25,
-"expl": "Respecte la température minimale de l'étiquette."
-},
-{
-"q": "Une tablette chargée de livres se fixe…",
-"ch": [
-"Avec de la colle de construction",
-"Dans les montants",
-"Dans le gypse seul",
-"Avec du ruban double face"
-],
-"bon": 1,
-"s": 20,
-"expl": "Aile longue de l'équerre contre le mur.",
-"img": "img/labo/quiz/livres/travaux-mineurs-egi-09.jpg"
-},
-{
-"q": "Une porte avec ferme-porte doit se refermer seule en…",
-"ch": [
-"Moins d'une seconde",
-"Une minute",
-"3 à 5 secondes",
-"15 à 20 secondes"
-],
-"bon": 2,
-"s": 20
-},
-{
-"q": "SIMDUT veut dire…",
-"ch": [
-"Service d'information sur les métiers du travail",
-"Système international de mesure",
-"Système d'information sur les matières dangereuses utilisées au travail",
-"Système d'inspection des matériaux du travail"
-],
-"bon": 2,
-"s": 25
-},
-{
-"q": "Le clapet antiretour sur l'égout…",
-"ch": [
-"Empêche l'égout de refouler dans le sous-sol",
-"Empêche le gel",
-"Règle le débit des gouttières",
-"Empêche l'eau de pluie d'entrer dans le puisard"
-],
-"bon": 0,
-"s": 25,
-"expl": "Si un seul élément de la chaîne bloque, l'eau entre au sous-sol.",
-"img": "img/labo/quiz/livres/travaux-mineurs-egi-12.jpg"
-},
-{
-"q": "Pour réparer une fissure de joint dans le gypse, on…",
-"ch": [
-"Peinture par-dessus",
-"Ouvre la fissure en V et pose un ruban",
-"Met du silicone",
-"Remplit seulement de composé"
-],
-"bon": 1,
-"s": 20,
-"expl": "Le ruban relie les deux côtés."
-},
-{
-"q": "Céramique au plancher : couverture de mortier minimale",
-"ch": [
-"75 %",
-"95 %",
-"100 % exigé au mur seulement",
-"50 %"
-],
-"bon": 1,
-"s": 20,
-"expl": "Aucun vide sous les coins : c'est là que la tuile casse."
-},
-{
-"q": "Creux du support au-delà duquel on corrige au mortier",
-"ch": [
-"3 mm",
-"10 mm",
-"6 mm",
-"1 mm"
-],
-"bon": 0,
-"s": 20
-},
-{
-"q": "La double coupe du vinyle, c'est…",
-"ch": [
-"Couper la pièce neuve et le vieux vinyle en même temps",
-"Coller deux couches",
-"Couper deux fois la pièce neuve",
-"Couper d'abord le vieux, puis le neuf"
-],
-"bon": 0,
-"s": 25,
-"expl": "Ça donne un joint parfait."
-},
-{
-"q": "On mesure la hauteur d'une installation à partir…",
-"ch": [
-"D'un meuble",
-"De l'objet voisin",
-"Du plafond suspendu",
-"D'un repère fixe : plancher fini, coin, cadre de porte"
-],
-"bon": 3,
-"s": 25
-},
-{
-"q": "Coupe-froid des portes de patio coulissantes",
-"ch": [
-"Bande de mousse autocollante",
-"Bourrelet à rainure",
-"Brosse (velours)",
-"Silicone"
-],
-"bon": 2,
-"s": 20
-},
-{
-"q": "Réparer une fissure de joint : dans l'ordre.",
-"t": "ordre",
-"ch": [
-"Ouvrir la fissure en V",
-"Dépoussiérer et remplir",
-"Poser le ruban dans le composé"
-],
-"bon": [
-0,
-1,
-2
-],
-"s": 40,
-"expl": "Le ruban relie les deux côtés."
-},
-{
-"q": "La double coupe du vinyle : dans l'ordre.",
-"t": "ordre",
-"ch": [
-"Trouver une retaille du même vinyle",
-"Poser la retaille par-dessus, motifs alignés",
-"Couper les deux épaisseurs en même temps"
-],
-"bon": [
-0,
-1,
-2
-],
-"s": 40
-},
-{
-"q": "Quels pictogrammes du SIMDUT verras-tu souvent dans ce cours ?",
-"t": "multi",
-"ch": [
-"Fragile",
-"Inflammable",
-"Irritant",
-"Recyclable"
-],
-"bon": [
-1,
-2
-],
-"s": 25
-},
-{
-"q": "Une rallonge de descente pluviale éloigne l'eau d'au moins combien de mètres ?",
-"t": "nombre",
-"ch": [],
-"bon": 1.5,
-"s": 45,
-"u": "m",
-"expl": "1,5 à 2 m de la fondation."
-},
-{
-"q": "Trouve l'erreur dans cette phrase.",
-"t": "erreur",
-"ch": [
-"La porcelaine est cuite",
-"entre 1 200 et 1 400 °C",
-"et absorbe plus de 5 % d'eau."
-],
-"bon": 2,
-"s": 30,
-"expl": "Une porcelaine absorbe moins de 0,5 % de son poids en eau."
-}
-]
-},
-{
 "id": "livre-entretien-menager-egi",
 "exemple": true,
 "livre": true,
@@ -6032,6 +5739,1188 @@ window.QUIZ_LIVRES = [
 "x": 55,
 "y": 55
 }
+}
+]
+},
+{
+"id": "defi-administration-batiment-1",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Administration d'un bâtiment · Défi+ 1 de 3",
+"sujet": "Chapitres 1 à 4 : rôle du préposé, lois, location, loyer",
+"couv": "img/couvertures/administration-batiment.jpg",
+"coul": "#2E8B57",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
+"q": "M. Gagnon t'arrête dans le corridor : son robinet coule depuis une semaine. Que fais-tu d'abord?",
+"ch": [
+"Je lui dis d'appeler le propriétaire",
+"J'écris une demande de service avec la date et l'heure",
+"Je répare sans rien noter",
+"J'attends qu'il envoie un courriel"
+],
+"bon": 1,
+"s": 20,
+"expl": "Écrite tout de suite, la demande ne peut plus se perdre."
+},
+{
+"q": "Qu'est-ce qui va dans une bonne entrée de registre?",
+"ch": [
+"La date et l'heure",
+"Les faits observés",
+"Ton opinion sur le locataire",
+"Ce qui a été fait et par qui"
+],
+"bon": [
+0,
+1,
+3
+],
+"s": 30,
+"expl": "Des faits, sans opinion.",
+"t": "multi"
+},
+{
+"q": "Avant d'engager un sous-traitant, on vérifie sa licence auprès de…",
+"ch": [
+"la RBQ",
+"la SAAQ",
+"la CNESST seulement",
+"la municipalité"
+],
+"bon": 0,
+"s": 20,
+"expl": "Registre des détenteurs de licence de la RBQ."
+},
+{
+"q": "Les renseignements personnels des locataires peuvent être montrés aux autres locataires s'ils le demandent.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 1,
+"s": 15,
+"expl": "Ils sont confidentiels."
+},
+{
+"q": "Le bail de logement est encadré principalement par…",
+"ch": [
+"le Code civil du Québec",
+"le Code criminel",
+"le Code de construction",
+"la Loi sur la RBQ"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Quelles sont des fonctions du TAL?",
+"ch": [
+"Informer",
+"Concilier",
+"Décider",
+"Construire des logements"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"expl": "Il informe, concilie, décide et fixe les loyers.",
+"t": "multi"
+},
+{
+"q": "Avant d'aller au TAL : dans l'ordre.",
+"ch": [
+"Discuter avec l'autre partie",
+"Écrire",
+"Envoyer une mise en demeure"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "Au TAL, qu'est-ce qui fait gagner une cause?",
+"ch": [
+"Parler fort",
+"La preuve : photos, registres, écrits",
+"L'ancienneté du propriétaire",
+"Le nombre de plaintes reçues"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Laquelle de ces annonces est discriminatoire?",
+"ch": [
+"« 4 ½ rénové, près du métro »",
+"« Idéal pour couple sans enfant »",
+"« Stationnement inclus »",
+"« Libre le 1er juillet »"
+],
+"bon": 1,
+"s": 20,
+"expl": "L'état familial est un motif protégé par la Charte."
+},
+{
+"q": "Le locateur doit remettre une copie du bail au locataire dans combien de jours suivant la signature?",
+"t": "nombre",
+"ch": [],
+"bon": 10,
+"s": 40,
+"u": "jours"
+},
+{
+"q": "Au Québec, le locateur peut exiger un dépôt de garantie pour les dommages.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 1,
+"s": 15,
+"expl": "Seul le premier mois de loyer peut être demandé d'avance."
+},
+{
+"q": "Pour une enquête de crédit, qu'est-ce que le locateur n'a PAS besoin de demander?",
+"ch": [
+"Le nom",
+"L'adresse",
+"La date de naissance",
+"Le NAS"
+],
+"bon": 3,
+"s": 20,
+"expl": "Selon la CAI, le nom, l'adresse et la date de naissance suffisent."
+},
+{
+"q": "Après un retard de paiement de plus de combien de semaines le locateur peut-il demander la résiliation au TAL?",
+"t": "nombre",
+"ch": [],
+"bon": 3,
+"s": 40,
+"u": "semaines"
+},
+{
+"q": "Un locataire ne paie pas. Que peut faire le locateur?",
+"ch": [
+"Couper le chauffage",
+"Changer la serrure",
+"Faire une demande au TAL",
+"Garder ses meubles"
+],
+"bon": 2,
+"s": 20,
+"expl": "Tout le reste est de la « justice personnelle », interdite."
+},
+{
+"q": "Trouve l'erreur dans cette phrase.",
+"t": "erreur",
+"ch": [
+"Mme Tremblay n'a plus d'eau chaude.",
+"Elle peut retenir son loyer d'elle-même",
+"jusqu'à la réparation."
+],
+"bon": 1,
+"s": 30,
+"expl": "Elle ne peut pas retenir son loyer : son recours, c'est le TAL."
+}
+]
+},
+{
+"id": "defi-administration-batiment-2",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Administration d'un bâtiment · Défi+ 2 de 3",
+"sujet": "Chapitres 5 à 10 : colocation, nuisances, chauffage, travaux, fin du bail, valeur",
+"couv": "img/couvertures/administration-batiment.jpg",
+"coul": "#2E8B57",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
+"q": "Mélanie habite avec deux colocataires mais n'a pas signé le bail. Envers le locateur, elle est…",
+"ch": [
+"colocataire",
+"occupante, sans engagement envers lui",
+"sous-locataire",
+"caution"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Cession ou sous-location : dans laquelle le locataire reste-t-il responsable du bail?",
+"ch": [
+"La cession",
+"La sous-location",
+"Les deux",
+"Aucune"
+],
+"bon": 1,
+"s": 20,
+"expl": "Cession = départ définitif; sous-location = il reste responsable."
+},
+{
+"q": "Le locateur a combien de jours pour répondre à une demande de cession ou de sous-location?",
+"t": "nombre",
+"ch": [],
+"bon": 15,
+"s": 40,
+"u": "jours",
+"expl": "Sans réponse, il est réputé avoir accepté."
+},
+{
+"q": "Quelles preuves sont utiles au TAL pour un trouble de voisinage?",
+"ch": [
+"Un journal de bruit daté",
+"Des témoins",
+"Des enregistrements datés",
+"Une rumeur entendue au dépanneur"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"t": "multi"
+},
+{
+"q": "Les corridors et les escaliers peuvent servir à ranger les vélos s'il n'y a plus de place.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 1,
+"s": 15,
+"expl": "Les issues doivent rester libres."
+},
+{
+"q": "Un locataire demande d'avoir son chien d'assistance. Le règlement interdit les animaux.",
+"ch": [
+"On refuse",
+"On ne peut pas le refuser",
+"On exige un dépôt",
+"On augmente le loyer"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Température de référence pratique dans un logement en hiver :",
+"ch": [
+"16 °C",
+"18 °C",
+"21 °C",
+"25 °C"
+],
+"bon": 2,
+"s": 20
+},
+{
+"q": "Pour un relevé de température fiable…",
+"ch": [
+"Mesurer plusieurs jours à heures fixes",
+"Mesurer au centre de la pièce, à 1 m du sol",
+"Noter la température extérieure",
+"Mesurer collé à la fenêtre"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"t": "multi"
+},
+{
+"q": "Une chaufferette au propane peut chauffer un logement pendant une panne si on laisse une fenêtre entrouverte.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 1,
+"s": 15,
+"expl": "Monoxyde de carbone : jamais d'appareil à combustion à l'intérieur."
+},
+{
+"q": "Menues réparations et réparations nécessaires : qui fait quoi?",
+"ch": [
+"Tout au propriétaire",
+"Tout au locataire",
+"Menues = locataire; nécessaires = propriétaire",
+"Menues = propriétaire; nécessaires = locataire"
+],
+"bon": 2,
+"s": 20
+},
+{
+"q": "Préavis minimal pour visiter ou vérifier un logement (hors urgence) :",
+"t": "nombre",
+"ch": [],
+"bon": 24,
+"s": 40,
+"u": "h",
+"expl": "Visite entre 9 h et 21 h."
+},
+{
+"q": "Bail de 12 mois : l'avis de hausse de loyer s'envoie…",
+"ch": [
+"entre 1 et 2 mois avant la fin",
+"entre 3 et 6 mois avant la fin",
+"n'importe quand",
+"après la fin du bail"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Le locataire ne répond pas à l'avis de hausse dans le délai d'un mois.",
+"ch": [
+"Le bail prend fin",
+"Il accepte la hausse",
+"Il refuse la hausse",
+"Le TAL décide"
+],
+"bon": 1,
+"s": 20,
+"expl": "Le silence vaut acceptation."
+},
+{
+"q": "Valeur d'un immeuble : dans l'ordre du calcul.",
+"ch": [
+"Revenu brut potentiel",
+"Moins l'inoccupation = revenu brut effectif",
+"Moins les dépenses = revenu net d'exploitation"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "Pour se qualifier à une hypothèque, la banque applique…",
+"ch": [
+"le test de résistance",
+"le test de la bille",
+"le test de l'alcool",
+"le test de la feuille"
+],
+"bon": 0,
+"s": 20
+}
+]
+},
+{
+"id": "defi-administration-batiment-3",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Administration d'un bâtiment · Défi+ 3 de 3",
+"sujet": "Chapitres 10 à 13 : achat, copropriété, plan d'urgence, interventions",
+"couv": "img/couvertures/administration-batiment.jpg",
+"coul": "#2E8B57",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
+"q": "Un cash-flow négatif veut dire…",
+"ch": [
+"l'immeuble rapporte plus que prévu",
+"tu paies de ta poche chaque mois pour garder l'immeuble",
+"l'hypothèque est payée",
+"les loyers sont trop bas pour le TAL"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Le ratio de couverture de la dette (RCD), c'est…",
+"ch": [
+"revenu net ÷ paiements hypothécaires",
+"prix ÷ loyers",
+"mise de fonds ÷ prix",
+"taxes ÷ loyers"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Acheter un plex à deux : on signe devant notaire, avant l'achat…",
+"ch": [
+"une convention d'indivision",
+"un bail",
+"une mise en demeure",
+"une soumission"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Dans une copropriété, le fonds de prévoyance paie…",
+"ch": [
+"les réparations majeures des parties communes",
+"le remplacement de la toiture",
+"la cuisine d'un copropriétaire",
+"les meubles d'un locataire"
+],
+"bon": [
+0,
+1
+],
+"s": 30,
+"t": "multi"
+},
+{
+"q": "Un copropriétaire qui loue son condo doit remettre le règlement de l'immeuble à son locataire.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "Le carnet d'entretien d'une copropriété fait des prévisions sur combien d'années?",
+"t": "nombre",
+"ch": [],
+"bon": 25,
+"s": 40,
+"u": "ans"
+},
+{
+"q": "Un plan d'urgence sert à…",
+"ch": [
+"écrire d'avance quoi faire et qui fait quoi",
+"calculer le loyer",
+"choisir un locataire",
+"remplacer l'assurance"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Que doit-on savoir localiser dans l'immeuble?",
+"ch": [
+"Le robinet d'arrêt d'eau principal",
+"L'entrée électrique principale",
+"La valve d'entrée de gaz",
+"La boîte à lunch du concierge"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"expl": "Identifiés, étiquetés et accessibles.",
+"t": "multi"
+},
+{
+"q": "Inspection visuelle d'un extincteur portatif :",
+"ch": [
+"chaque semaine",
+"chaque mois",
+"chaque année seulement",
+"tous les 5 ans"
+],
+"bon": 1,
+"s": 20,
+"expl": "Mensuelle; entretien annuel."
+},
+{
+"q": "La séquence d'intervention en urgence : dans l'ordre.",
+"ch": [
+"Ta sécurité d'abord",
+"Alerter",
+"Protéger les personnes",
+"Limiter les dommages",
+"Documenter"
+],
+"bon": [
+0,
+1,
+2,
+3,
+4
+],
+"s": 45,
+"t": "ordre"
+},
+{
+"q": "Utiliser un extincteur (TVAB) : dans l'ordre.",
+"ch": [
+"Tirer la goupille",
+"Viser la base du feu",
+"Appuyer sur la poignée",
+"Balayer"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "Un feu d'huile dans une casserole :",
+"ch": [
+"On jette de l'eau",
+"On couvre avec un couvercle et on ferme le rond",
+"On transporte la casserole dehors",
+"On souffle dessus"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Odeur de gaz dans le corridor :",
+"ch": [
+"J'allume pour mieux voir",
+"Je sors et j'appelle de l'extérieur",
+"Je cherche la fuite avec un briquet",
+"J'actionne l'alarme électrique"
+],
+"bon": 1,
+"s": 20,
+"expl": "On ne touche à rien d'électrique."
+},
+{
+"q": "Dégât d'eau près du panneau électrique : on marche dans l'eau pour couper le courant au plus vite.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 1,
+"s": 15,
+"expl": "On coupe seulement si on atteint le panneau au sec; sinon on appelle."
+},
+{
+"q": "Que contient un rapport d'incident?",
+"ch": [
+"Date, heures et lieu précis",
+"Les faits en ordre chronologique",
+"Les services d'urgence appelés",
+"Ton opinion sur les coupables"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"t": "multi"
+}
+]
+},
+{
+"id": "defi-travaux-mineurs-egi-1",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Travaux mineurs d'entretien général · Défi+ 1 de 3",
+"sujet": "Modules 1 à 4 : sécurité, inspection, cloisons, fissures et trous",
+"couv": "img/labo/quiz/livres/travaux-mineurs-egi-couv.jpg",
+"coul": "#D9488A",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
+"q": "Les 6 étapes de toute intervention : dans l'ordre.",
+"ch": [
+"Prendre connaissance du travail",
+"Évaluer sur place",
+"Organiser",
+"Préparer les lieux",
+"Exécuter",
+"Compléter"
+],
+"bon": [
+0,
+1,
+2,
+3,
+4,
+5
+],
+"s": 50,
+"t": "ordre"
+},
+{
+"q": "Échelle à coulisse appuyée à 4 m de hauteur : à combien de mètres du mur va le pied?",
+"t": "nombre",
+"ch": [],
+"bon": 1,
+"s": 40,
+"u": "m",
+"expl": "Règle du 4 pour 1."
+},
+{
+"q": "De combien de mètres l'échelle doit-elle dépasser l'appui?",
+"t": "nombre",
+"ch": [],
+"bon": 0.9,
+"s": 40,
+"u": "m"
+},
+{
+"q": "On peut monter sur le dessus d'un escabeau s'il est bien ouvert.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 1,
+"s": 15,
+"expl": "Jamais le dessus ni la marche juste en dessous."
+},
+{
+"q": "Combien de points d'appui en tout temps dans une échelle?",
+"ch": [
+"1",
+"2",
+"3",
+"4"
+],
+"bon": 2,
+"s": 20
+},
+{
+"q": "Quels sont les trois éléments du SIMDUT?",
+"ch": [
+"L'étiquette",
+"La fiche de données de sécurité",
+"La formation",
+"Le permis de conduire"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"t": "multi"
+},
+{
+"q": "Un diluant transvidé dans un petit contenant doit porter…",
+"ch": [
+"une étiquette du lieu de travail",
+"aucune étiquette",
+"le nom de l'élève",
+"un pictogramme dessiné à la main"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Chiffons imbibés d'huile de lin à la fin de la journée :",
+"ch": [
+"dans la poubelle",
+"roulés dans un coin",
+"dans un contenant métallique rempli d'eau",
+"sur le calorifère pour sécher"
+],
+"bon": 2,
+"s": 20,
+"expl": "La réaction avec l'oxygène dégage de la chaleur : risque d'inflammation."
+},
+{
+"q": "Bâtiment d'avant 1990 : avant de poncer un vieux plâtre…",
+"ch": [
+"on porte des gants",
+"on vérifie le registre ou on fait tester (amiante)",
+"on mouille le mur",
+"on ne fait rien de spécial"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Une fissure marquée au crayon avec la date a grandi depuis l'inspection précédente.",
+"ch": [
+"C'est un mouvement actif : je signale",
+"Je la remplis de composé",
+"C'est normal",
+"Je la peins"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "À signaler sans attendre :",
+"ch": [
+"Fissure en escalier dans la brique",
+"Garde-corps qui bouge",
+"Pompe de puisard en panne avant un orage",
+"Petit trou de punaise"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"t": "multi"
+},
+{
+"q": "À partir d'un coin, on trouve souvent un montant aux combien de millimètres?",
+"t": "nombre",
+"ch": [],
+"bon": 406,
+"s": 40,
+"u": "mm",
+"expl": "16 po."
+},
+{
+"q": "On peut réparer un mur coupe-feu avec du gypse ordinaire si on met deux couches.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 1,
+"s": 15,
+"expl": "Même type de panneau : type X pour un coupe-feu."
+},
+{
+"q": "Réparer le gypse : dans l'ordre.",
+"ch": [
+"Régler la cause",
+"Bords propres et ruban si ça bouge",
+"Trois couches minces de plus en plus larges",
+"Ponçage léger et lampe rasante",
+"Apprêt"
+],
+"bon": [
+0,
+1,
+2,
+3,
+4
+],
+"s": 50,
+"t": "ordre"
+},
+{
+"q": "Un composé qui durcit par réaction chimique en 45 minutes est un composé…",
+"ch": [
+"prémélangé",
+"à prise",
+"acrylique",
+"de finition"
+],
+"bon": 1,
+"s": 20
+}
+]
+},
+{
+"id": "defi-travaux-mineurs-egi-2",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Travaux mineurs d'entretien général · Défi+ 2 de 3",
+"sujet": "Modules 4 à 7 : béton, céramique, peinture, planchers",
+"couv": "img/labo/quiz/livres/travaux-mineurs-egi-couv.jpg",
+"coul": "#D9488A",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
+"q": "Béton : la question clé avant de réparer une fissure :",
+"ch": [
+"De quelle couleur est-elle?",
+"Est-ce que ça bouge? Est-ce que l'eau passe?",
+"Quel âge a l'immeuble?",
+"Qui l'a vue en premier?"
+],
+"bon": 1,
+"s": 20,
+"expl": "Stable et sec : je répare. Actif ou mouillé : j'arrête l'eau et je signale."
+},
+{
+"q": "Pour arrêter une infiltration d'eau active dans le béton, on utilise…",
+"ch": [
+"du composé à joints",
+"du ciment hydraulique",
+"du silicone",
+"de l'apprêt"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Une zone mate sur une peinture lustrée, causée par l'absence d'apprêt, s'appelle…",
+"ch": [
+"un embu",
+"une coulure",
+"une cloque",
+"un faïençage"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Les 5 règles de la céramique incluent…",
+"ch": [
+"Même tuile (réserve étiquetée)",
+"Support propre, plat, sain",
+"Coulis dans le coin entre deux murs",
+"Respecter la cure de 24 h"
+],
+"bon": [
+0,
+1,
+3
+],
+"s": 30,
+"expl": "Jamais de coulis au changement de plan.",
+"t": "multi"
+},
+{
+"q": "Couverture de mortier minimale sous une tuile au mouillé (douche) :",
+"t": "nombre",
+"ch": [],
+"bon": 95,
+"s": 40,
+"u": "%",
+"expl": "80 % au sec, 95 % au mouillé."
+},
+{
+"q": "Une tuile qui sonne creux a un vide de mortier dessous.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "Le coulis sans sable sert aux joints de plus de 3 mm.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 1,
+"s": 15
+},
+{
+"q": "Avant de refaire le joint de silicone d'une baignoire, on…",
+"ch": [
+"la vide complètement",
+"la remplit d'eau",
+"la chauffe",
+"la peint"
+],
+"bon": 1,
+"s": 20,
+"expl": "Remplie, elle descend : le joint ne se fissurera pas à l'usage."
+},
+{
+"q": "La peinture en 6 mots : dans l'ordre.",
+"ch": [
+"Choisir",
+"Calculer",
+"Préparer",
+"Découper",
+"Rouler (bord humide)",
+"Vérifier"
+],
+"bon": [
+0,
+1,
+2,
+3,
+4,
+5
+],
+"s": 50,
+"t": "ordre"
+},
+{
+"q": "Pour savoir si une vieille peinture est un latex ou une alkyde :",
+"ch": [
+"le test de l'alcool",
+"le test de la bille",
+"le test du manche",
+"le test de la feuille"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Fini lavable et discret pour les murs d'un corridor :",
+"ch": [
+"mat",
+"velours (ou perle)",
+"lustré",
+"sans fini"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Poncer très légèrement entre deux couches de vernis, c'est…",
+"ch": [
+"égrener",
+"décaper",
+"sabler à fond",
+"apprêter"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Un plancher flottant ne doit jamais être…",
+"ch": [
+"coincé (espace de dilatation)",
+"nettoyé",
+"posé sur une membrane",
+"posé dans un corridor"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "On cloue la moulure quart-de-rond dans le plancher flottant pour le tenir.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 1,
+"s": 15,
+"expl": "On la fixe à la plinthe ou au mur, jamais au plancher."
+},
+{
+"q": "De vieux carreaux de 9 × 9 po à enlever :",
+"ch": [
+"On les arrache au grattoir",
+"On signale (amiante possible)",
+"On les ponce",
+"On les chauffe"
+],
+"bon": 1,
+"s": 20
+}
+]
+},
+{
+"id": "defi-travaux-mineurs-egi-3",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Travaux mineurs d'entretien général · Défi+ 3 de 3",
+"sujet": "Modules 8 à 11 : armoires, fixations, portes, vitres et moustiquaires",
+"couv": "img/labo/quiz/livres/travaux-mineurs-egi-couv.jpg",
+"coul": "#D9488A",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
+"q": "Sous un comptoir de stratifié, le panneau qui gonfle à l'eau est…",
+"ch": [
+"le panneau de particules",
+"le contreplaqué marin",
+"le quartz",
+"l'acier"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Régler une charnière invisible : dans l'ordre.",
+"ch": [
+"Haut-bas",
+"Gauche-droite",
+"Profondeur"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "La distance entre les centres des deux vis d'une poignée s'appelle…",
+"ch": [
+"l'entraxe",
+"le dégagement",
+"la feuillure",
+"le pêne"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Colle qu'on laisse sécher au toucher avant d'assembler les deux surfaces :",
+"ch": [
+"la colle contact",
+"la colle blanche",
+"l'époxy",
+"le silicone"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Fixer solidement : dans l'ordre.",
+"ch": [
+"Trouver le support",
+"Charge × 4",
+"Choisir la fixation",
+"Niveau et mesures",
+"Tester"
+],
+"bon": [
+0,
+1,
+2,
+3,
+4
+],
+"s": 50,
+"t": "ordre"
+},
+{
+"q": "Une barre d'appui peut être fixée avec des ancrages en plastique dans le gypse.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 1,
+"s": 15,
+"expl": "Toujours dans la structure ou un renfort."
+},
+{
+"q": "On perce la céramique avec la percussion pour aller plus vite.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 1,
+"s": 15
+},
+{
+"q": "Dans le gypse creux, l'ancrage le plus fort est…",
+"ch": [
+"l'ancrage en plastique",
+"l'ancrage à bascule",
+"le clou",
+"la vis à bois seule"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "À l'extérieur, on met le scellant au-dessus d'un objet fixé au mur, pas en dessous.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15,
+"expl": "L'eau qui entre par le bas doit pouvoir sortir."
+},
+{
+"q": "Un ferme-porte bien réglé referme la porte en combien de secondes au maximum?",
+"t": "nombre",
+"ch": [],
+"bon": 5,
+"s": 40,
+"u": "s",
+"expl": "Entre 3 et 5 s."
+},
+{
+"q": "Priorité 1 pour les portes :",
+"ch": [
+"Porte d'issue qui ne s'ouvre pas",
+"Porte coupe-feu tenue ouverte",
+"Porte coupe-feu qui ne s'enclenche pas",
+"Porte d'armoire qui grince"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"t": "multi"
+},
+{
+"q": "On lubrifie un cylindre de serrure avec de l'huile à moteur.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 1,
+"s": 15
+},
+{
+"q": "Une porte qui pend : quelle vis aide dans la penture du haut?",
+"ch": [
+"Une vis de 75 mm",
+"Une vis de 12 mm",
+"Un clou",
+"De la colle"
+],
+"bon": 0,
+"s": 20,
+"expl": "Elle va chercher le montant derrière le cadre."
+},
+{
+"q": "Remplacer une vitre simple :",
+"ch": [
+"Mesurer au fond de la feuillure",
+"Laisser environ 3 mm de jeu",
+"Utiliser des cales d'assise",
+"Couper le verre trempé sur place"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"expl": "Le verre trempé ne se coupe jamais.",
+"t": "multi"
+},
+{
+"q": "Après avoir posé une toile de moustiquaire, on vérifie…",
+"ch": [
+"qu'elle est tendue sans avoir plié le cadre",
+"qu'elle touche la vitre",
+"qu'elle est collée au silicone",
+"qu'elle est peinte"
+],
+"bon": 0,
+"s": 20
 }
 ]
 }
