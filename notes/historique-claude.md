@@ -681,3 +681,4 @@
 - 2026-11-21 : images refaites avec ÉPI : LP-06, C6-01, C6-06, TM-08, TM-10 (remplacent les photos d'ouverture; copies d'avant /home/claude/originaux/avant-epi/). Restent TM-11 et MO-09. Versions TM 6, plans EGI 6, C6 5, livres.js?v=7.
 - 2026-11-21 : TM-11 refaite (lunettes) et MO-09 ajoutée : Travaux mineurs et Micro-ordinateur ont toutes leurs photos d'ouverture. livres.js?v=8.
 - 2026-11-21 : lot 3 : Recherche d'emploi PLC, 9 photos d'ouverture (RE-01 à 09; calendrier de RE-08 flouté), Administration partie A (AD-P1). Restent AD-P2, AD-P3. Matériel électrique retiré du lot : Jeremy veut refaire tout le livre (« fait enfantin »).
+- 2026-11-21 : AD-P2 et AD-P3 placées : Administration a ses 3 photos d'ouverture (version 7). Toutes les images des lots 1 à 3 sont placées (sauf Matériel électrique, à refaire).
