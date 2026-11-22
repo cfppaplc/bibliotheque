@@ -358,3 +358,25 @@ body.photo .ciel-j{opacity:0}
 .lg-rev-face.bois b{font-size:24px}
 .j-carte.bois p{padding:0 32px}
 .j-carte.bois .j-info{margin:0 30px 10px}
+/* 22 nov. (« style du jeu classique ») : carte sombre, médaillon rond à double anneau doré, illustration peinte dedans,
+   nom sur un ruban. Remplace le bois (les règles ci-dessous ont le dernier mot). Design original. */
+.j-carte,.lg-rev-face,.j-mort{background:radial-gradient(ellipse at 50% 30%,#2A2F45,#14172A 70%,#0B0D18)!important;color:#EADBB8!important;
+  box-shadow:inset 0 0 0 2px #8C6B2F,inset 0 0 0 5px #14172A,inset 0 0 0 6px rgba(200,160,80,.55),0 18px 40px rgba(0,0,0,.6)!important}
+.cadre{border:1px solid rgba(200,160,80,.5);box-shadow:none;inset:12px;border-radius:10px}
+.coin{filter:invert(.72) sepia(1) saturate(2.4) hue-rotate(5deg) brightness(.95)}
+.j-carte-h::before,.lg-rev-h::before,.j-mort-h::before{border:3px solid #C9A050;box-shadow:0 0 0 4px #14172A,0 0 0 6px #8C6B2F,inset 0 0 18px rgba(0,0,0,.8);background:radial-gradient(circle,#3A4262,#1B2036)}
+.j-carte-h .emb,.lg-rev-h .emb,.j-mort-h .emb{color:#E6C77E!important;filter:drop-shadow(0 2px 6px rgba(0,0,0,.7))!important;position:relative;z-index:1}
+.j-carte-r,.lg-rev-face b,.j-mort b{color:#F2E2B8!important;text-shadow:0 2px 6px rgba(0,0,0,.8)!important;font-family:Georgia,"Times New Roman",serif}
+.j-carte-r{margin:6px 30px 0;padding:6px 0!important;background:linear-gradient(90deg,transparent,rgba(140,107,47,.55) 15%,rgba(140,107,47,.55) 85%,transparent);border-top:1px solid rgba(201,160,80,.7);border-bottom:1px solid rgba(201,160,80,.7)}
+.j-carte p,.j-carte.bois p{color:#D9CBAA!important}
+.j-carte .j-info{background:rgba(201,160,80,.14)!important;color:#F2E2B8!important;border:1px solid rgba(201,160,80,.3)}
+.camp,.lg-rev-face span{color:#C9A050!important;border-color:rgba(201,160,80,.45)!important;text-shadow:none!important}
+.loups .camp,.lg-rev.loups .lg-rev-face span,.j-carte.loups .j-carte-r{color:#FF9A7A!important}
+.j-carte.loups .j-carte-h .emb,.lg-rev.loups .lg-rev-h .emb{color:#FF8E6E!important}
+.j-carte.loups .j-carte-h::before,.lg-rev.loups .lg-rev-h::before{background:radial-gradient(circle,#5A2A2A,#2A1218)}
+.lg-rev-dos,.j-tenir{background:radial-gradient(circle at 50% 45%,#2A2F45,#0B0D18 75%)!important;border:2px solid #8C6B2F!important}
+.lg-rev-dos .emb,.j-dos,.j-tenir{color:#E6C77E!important}
+.brule{mix-blend-mode:normal;filter:none;border-radius:50%;aspect-ratio:1;object-fit:cover;height:100%;max-width:none;position:relative;z-index:1}
+@keyframes lgGris{to{filter:grayscale(.9) brightness(.6)}}
+.j-mort:not(.anim){filter:grayscale(.9) brightness(.6)}
+.lg-rev-h .emb,.j-mort-h .emb{position:absolute!important;z-index:1}
