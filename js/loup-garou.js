@@ -100,6 +100,7 @@ const EMB = {
   idiot: '<path d="M8 44L14 12l18 18 18-18 6 32z" fill="currentColor"/><circle cx="14" cy="10" r="5" fill="currentColor"/><circle cx="50" cy="10" r="5" fill="currentColor"/><path d="M8 46h48v10H8z" fill="currentColor" opacity=".6"/>',
   ancien: '<path d="M18 6h28v8l-10 18 10 18v8H18v-8l10-18-10-18z" fill="currentColor"/><path d="M24 50h16l-8-12z" fill="#0C1322" opacity=".4"/>',
   maire: '<path d="M12 4l20 22L52 4l4 6-20 24v6h-8v-6L8 10z" fill="currentColor" opacity=".7"/><circle cx="32" cy="46" r="14" fill="currentColor"/><path d="M32 37l3 6 6 1-4 4 1 6-6-3-6 3 1-6-4-4 6-1z" fill="#0C1322"/>',
+  mort: '<path d="M32 5C18 5 8 15 8 28c0 8 4 14 10 17v9h28v-9c6-3 10-9 10-17C56 15 46 5 32 5z" fill="currentColor"/><circle cx="23" cy="29" r="6.5" fill="#0C1322"/><circle cx="41" cy="29" r="6.5" fill="#0C1322"/><path d="M32 36l-4 7h8z" fill="#0C1322"/><path d="M26 54v-7M32 54v-7M38 54v-7" stroke="#0C1322" stroke-width="2.5"/>',
   nuit: '<path d="M40 6a26 26 0 1 0 18 40A22 22 0 0 1 40 6z" fill="currentColor"/>',
   jour: '<circle cx="32" cy="32" r="13" fill="currentColor"/><g stroke="currentColor" stroke-width="4" stroke-linecap="round"><path d="M32 4v8M32 52v8M4 32h8M52 32h8M12 12l6 6M46 46l6 6M12 52l6-6M46 18l6-6"/></g>',
   debat: '<path d="M6 10h34v22H20l-8 8v-8H6z" fill="currentColor"/><path d="M26 30h32v20h-6v8l-8-8H26z" fill="currentColor" opacity=".55"/>',
@@ -304,7 +305,7 @@ function animateur(){
   function carteMort(p, i){ const r = ROLES[G.J[p].role]; return `<div class="lg-mortc ${r.camp}" style="animation-delay:${(i || 0) * .25}s">${emb(G.J[p].role)}<b>${esc(nomDe(p))}</b><span>${esc(r.n)}</span></div>`; }
   /* 21 nov. (« la révélation, c'est-tu beau? ») : grande carte qui se retourne au lever du jour, au verdict et au tir du chasseur */
   function carteRev(p, i){ const r = ROLES[G.J[p].role]; return `<div class="lg-rev ${r.camp}" style="--d:${.6 + (i || 0) * .9}s"><div class="lg-rev-in"><div class="lg-rev-dos">${emb("nuit")}</div>
-    <div class="lg-rev-face"><div class="lg-rev-h">${emb(G.J[p].role)}</div><b>${esc(nomDe(p))}</b><span>${esc(r.n)}</span></div></div></div>`; }
+    <div class="lg-rev-face"><div class="lg-rev-h">${emb(G.J[p].role, "emb lg-rev-r")}${emb("mort", "emb lg-rev-m")}</div><b>${esc(nomDe(p))}</b><span>${esc(r.n)}</span></div></div></div>`; }
   function scene(){
     const ph = G.ph, c = compo(), n = Object.keys(G.J).length;
     if (ph === "lobby") {
@@ -436,7 +437,8 @@ function joueur(code){
         <button id="jFin" class="j-gros j-2">Terminer</button>`; break;
       case "res": h = `<h2>${esc(v.t)}</h2><div class="j-res">${esc(v.x)}</div><p class="j-note">Referme les yeux.</p>`; break;
       case "jour": h = `<h2>${esc(v.t || "Le jour")}</h2>${v.regles ? `<ol class="j-regles">${v.regles.map(r => `<li>${esc(r)}</li>`).join("")}</ol>` : `<p>${esc(v.x || "")}</p>`}`; break;
-      case "mort": h = `<div class="j-dort">${emb(v.role || "nuit", "emb j-lune")}</div><h2>Tu es éliminé</h2><p>Reste dans le jeu en silence : tu ne peux plus parler ni voter. Observe le non-verbal des autres.</p>`; break;
+      case "mort": { const anim = !dessiner.mortVu; dessiner.mortVu = true; const r = ROLES[v.role] || ROLES.villageois;
+        h = `<div class="j-mort ${r.camp}${anim ? " anim" : ""}"><div class="j-mort-h">${emb(v.role, "emb j-mort-r")}${emb("mort", "emb j-mort-m")}</div><b>${esc(r.n)}</b></div><h2>Tu es éliminé</h2><p>Reste dans le jeu en silence : tu ne peux plus parler ni voter. Observe le non-verbal des autres.</p>`; break; }
       case "fin": h = `${emb(v.g === "village" ? "villageois" : "loup", "emb j-lune")}<h2>${v.g === "village" ? "Le village a gagné" : "Les loups ont gagné"}</h2><p class="j-res">${v.gagne ? "Ton camp a gagné." : "Ton camp a perdu."}</p>`; break;
       default: h = `<h2>${esc(v.t || "Bienvenue")}</h2><p>${esc(v.txt || "Regarde le tableau.")}</p>`;
     }
