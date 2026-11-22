@@ -65,7 +65,7 @@ const NUIT = ["cupidon", "voyante", "renard", "salvateur", "loups", "sorciere", 
 const NOM_PH = {salvateur: "Le salvateur", election: "L'élection du maire", successeur: "Le successeur du maire", lobby: "Avant la partie", cartes: "Les cartes", nuit: "La nuit tombe", cupidon: "Cupidon", voyante: "La voyante", renard: "Le renard", loups: "Les loups-garous",
   sorciere: "La sorcière", corbeau: "Le corbeau", aube: "Le lever du jour", debat: "Le débat du village", vote: "Le vote", verdict: "Le verdict", chasseur: "Le chasseur", fin: "Fin de la partie"};
 const TXT = {
-  cartes: ["Il était une fois un village tranquille, au bord d'une forêt sombre : Val-des-Brumes. Ses habitants travaillaient le jour et dormaient la nuit… Mais depuis quelque temps, des choses étranges se passent. Des hurlements. Des traces dans la neige. Certains disent que des loups-garous se cachent parmi nous. Ce soir, le village doit découvrir la vérité.",
+  cartes: ["Depuis trois nuits, des habitants de Val-des-Brumes disparaissent. Au matin, on retrouve des traces dans la neige qui mènent à la forêt. Les loups-garous sont parmi vous. Ils vous ressemblent, ils travaillent avec vous, ils mangent à votre table. Ce soir, le village doit trouver la vérité.",
     "Chaque élève garde le doigt sur sa carte pour voir son rôle, sans la montrer."],
   nuit: ["Le soleil se couche sur Val-des-Brumes. Le village s'endort. Fermez les yeux…", "Tamise la lumière, lance la musique. Chacun garde son cellulaire face contre table et n'ouvre les yeux que quand tu appelles son rôle."],
   cupidon: ["Cupidon se réveille. Il désigne deux personnes qui tomberont éperdument amoureuses… Les amoureux découvriront leur secret sur leur écran.", "Attends le signal Prêt, puis passe à l'étape suivante."],
@@ -113,7 +113,7 @@ const FORET = "data:image/svg+xml," + encodeURIComponent('<svg xmlns="http://www
 const VILLAGE = "data:image/svg+xml," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 140" preserveAspectRatio="none"><path fill="#D9C7A8" d="M0 140V90l60-40 60 40v-20l50-36 50 36V90h40l70-54 70 54V70l40-30 40 30v30h60l60-46 60 46v-24l50-36 50 36v34h50l60-50 60 50v-16l40-28 40 28v86z"/><path fill="#E6D8BE" d="M0 140v-26h1200v26z"/></svg>');
 function decor(){ if (document.querySelector(".ciel")) return;
   document.body.insertAdjacentHTML("afterbegin", `<div class="ciel ciel-n" aria-hidden="true"><i class="etoiles"></i><i class="lune"></i><i class="sol" style="background-image:url('${FORET}')"></i></div>
-    <div class="ciel ciel-j" aria-hidden="true"><i class="soleil"></i><i class="sol" style="background-image:url('${VILLAGE}')"></i></div>`); }
+    <div class="ciel ciel-j" aria-hidden="true"><i class="soleil"></i><i class="brume"></i><i class="sol" style="background-image:url('${FORET}')"></i></div>`); }
 
 /* =================================== TNI : l'enseignant narrateur =================================== */
 function animateur(){

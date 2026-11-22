@@ -259,3 +259,12 @@ body.nuit .ciel-j,body.jour .ciel-n{opacity:0}
 .lg-fin .lg-mortc .emb{width:28px;height:28px}
 .lg-obs-l{font-size:15px;margin:2px 0;grid-template-columns:300px 1fr 34px}
 .lg-obs-l i{height:11px}
+
+/* 21 nov. (« trop enfantin pour des gars de DEP? ») : le jour devient un matin gris et brumeux au-dessus de la même forêt */
+body.jour{background:#CFCCC6;color:#1F2328;--carte:rgba(250,249,246,.86);--trait:rgba(40,45,55,.16);--doux:#55595F}
+.ciel-j{background:linear-gradient(#7E8791,#A9AEB2 45%,#C9C8C3 75%,#D6D3CC)}
+.soleil{width:90px!important;height:90px!important;background:#E9E4D6!important;box-shadow:0 0 70px 30px rgba(233,228,214,.35)!important;opacity:.55;bottom:20vh!important}
+.ciel-j .sol{height:24vh!important;opacity:.55!important;filter:brightness(2.6) contrast(.6)}
+.brume{left:0;right:0;bottom:8vh;height:22vh;background:linear-gradient(transparent,rgba(214,211,204,.85) 55%,rgba(214,211,204,.6))}
+.jour .lg-tete,.jour .lg-bas{background:rgba(255,255,255,.25)}
+.jour .lg-emb{color:#3A4048}
