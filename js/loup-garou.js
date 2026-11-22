@@ -18,17 +18,22 @@ function relais(topic, quand, etat){
   const sortie = []; let envoi = () => {}, pompe = null;
   const send = o => { sortie.push(o); if (!pompe) pompe = setInterval(() => { const o2 = sortie.shift(); if (!o2) { clearInterval(pompe); pompe = null; return; } envoi(o2); }, 45); };
   if (window.supabase && window.supabase.createClient) {
-    const sb = window.supabase.createClient(SB_URL, SB_CLE, {realtime: {params: {eventsPerSecond: 40}}});
-    let ch = null, pret = false, gen = 0, attente = [], reT = null, cache = 0;
+    /* 22 nov. (« ça se connecte pas ») : se réabonner en retirant le seul canal ferme la connexion pendant qu'elle se rouvre,
+       et ça tournait en rond (« Relais injoignable »). Maintenant : un client neuf à chaque reprise, l'ancien fermé à part,
+       et jamais de reprise pendant qu'un abonnement est en cours. */
+    let sb = null, ch = null, pret = false, gen = 0, attente = [], reT = null, cache = 0, enCours = false;
     envoi = o => { if (!pret) { attente.push(o); return; } ch.send({type: "broadcast", event: "m", payload: o}).catch(() => {}); };
-    const abonner = () => { const g = ++gen; clearTimeout(reT); reT = null; if (ch) { try { sb.removeChannel(ch); } catch(e) {} } pret = false;
+    const abonner = () => { const g = ++gen; clearTimeout(reT); reT = null; pret = false; enCours = true;
+      const vieux = sb; if (vieux) setTimeout(() => { try { vieux.removeAllChannels(); } catch(e) {} }, 0);
+      sb = window.supabase.createClient(SB_URL, SB_CLE, {auth: {persistSession: false, autoRefreshToken: false, detectSessionInUrl: false}, realtime: {params: {eventsPerSecond: 20}}});
       ch = sb.channel(topic, {config: {broadcast: {self: false}}});
       ch.on("broadcast", {event: "m"}, ({payload}) => { try { quand(payload); } catch(e) { console.error(e); } });
-      ch.subscribe(st => { if (g !== gen) return; pret = st === "SUBSCRIBED";
-        if (pret) { const a = attente; attente = []; a.forEach(envoi); } else if (!reT) reT = setTimeout(abonner, 2000); etat(pret); }); };
-    document.addEventListener("visibilitychange", () => { if (document.hidden) { cache = Date.now(); return; } if (!pret || (cache && Date.now() - cache > 15000)) abonner(); });
-    addEventListener("online", abonner);
-    abonner(); return {send, rebrancher: abonner};
+      ch.subscribe(st => { if (g !== gen) return; enCours = false; pret = st === "SUBSCRIBED";
+        if (pret) { const a = attente; attente = []; a.forEach(envoi); } else if (!reT) reT = setTimeout(abonner, 2500); etat(pret); }); };
+    document.addEventListener("visibilitychange", () => { if (document.hidden) { cache = Date.now(); return; } if (enCours) return;
+      if (!pret || (cache && Date.now() - cache > 15000)) abonner(); });
+    addEventListener("online", () => { if (!enCours) abonner(); });
+    abonner(); return {send, rebrancher: () => { if (!enCours) abonner(); }};
   }
   if (window.BroadcastChannel && /^(localhost|127\.0\.0\.1)$/.test(location.hostname)) {
     const bc = new BroadcastChannel(topic); bc.onmessage = e => { try { quand(e.data); } catch(x) { console.error(x); } };
