@@ -335,6 +335,7 @@ function animateur(){
     if (ph === "aube" || ph === "verdict") { if (G.amour.length && G.annonce.length > 1 && G.annonce.some(p => G.amour.includes(p))) plus.push(`<p class="lg-faire">Un amoureux est mort de chagrin.</p>`); }
     if (ph === "fin" && G.obs && G.obs.some(x => x)) { const mx = Math.max(...G.obs);
       plus.push(`<div class="lg-obs"><h4>Ce que les observateurs ont vu</h4>${OBS.map((o, i) => `<div class="lg-obs-l"><span>${esc(o)}</span><i style="width:${Math.round(G.obs[i] / mx * 100)}%"></i><b>${G.obs[i]}</b></div>`).join("")}</div>`); }
+    if (ph === "cartes") plus.push(`<img class="lg-groupe" src="img/loup-garou/groupe.jpg" alt="">`);   /* photo de groupe : les élèves et l'ombre de leur rôle */
     if (ph === "debat" && G.maireNouv) plus.push(`<div class="lg-maire">${emb("maire")}<span>${esc(nomDe(G.maireNouv))} est le maire de Val-des-Brumes.</span></div>`);
     if (ph === "successeur" && G.ch[G.maire]) plus.push(`<div class="lg-maire">${emb("maire")}<span>${esc(nomDe(G.ch[G.maire]))} reçoit l'écharpe de maire.</span></div>`);
     if (ph === "election") { const a = acteurs("election"); plus.push(`<div class="lg-compte"><b>${a.filter(p => G.ch[p]).length}</b> vote${a.filter(p => G.ch[p]).length > 1 ? "s" : ""} sur ${a.length}</div>`); }
@@ -353,7 +354,6 @@ function animateur(){
   function rendre(){
     const nuit = NUIT.includes(G.ph) || G.ph === "nuit";
     document.body.classList.toggle("nuit", nuit); document.body.classList.toggle("jour", !nuit);
-    document.body.classList.toggle("photo", G.ph === "lobby" || G.ph === "fin");   /* photo de groupe : ombres des rôles */
     const bouton = {lobby: "Distribuer les cartes", cartes: "Commencer la nuit", aube: "Continuer", election: "Proclamer le maire", successeur: "Continuer", debat: "Passer au vote", vote: "Révéler le verdict", verdict: "La nuit suivante", chasseur: "Continuer"}[G.ph] || (G.ph === "corbeau" ? "Lever le jour" : "Étape suivante");
     $("lgApp").innerHTML = `<header class="lg-tete"><img src="img/metier-plus.svg" alt="Métier+"><b>Le Loup-Garou de la communication</b><span id="lgRel" class="ko">…</span>
         <a href="labo.html" class="lg-lien">Labo</a><button id="lgNouv" class="lg-lien">Nouvelle partie</button></header>
