@@ -302,6 +302,9 @@ function animateur(){
   function qr(){ if (qrEl) return qrEl; qrEl = document.createElement("div"); qrEl.className = "lg-qr";
     try { new QRCode(qrEl, {text: URLJ, width: 230, height: 230, correctLevel: QRCode.CorrectLevel.M}); } catch(e) { qrEl.textContent = URLJ; } return qrEl; }
   function carteMort(p, i){ const r = ROLES[G.J[p].role]; return `<div class="lg-mortc ${r.camp}" style="animation-delay:${(i || 0) * .25}s">${emb(G.J[p].role)}<b>${esc(nomDe(p))}</b><span>${esc(r.n)}</span></div>`; }
+  /* 21 nov. (« la révélation, c'est-tu beau? ») : grande carte qui se retourne au lever du jour, au verdict et au tir du chasseur */
+  function carteRev(p, i){ const r = ROLES[G.J[p].role]; return `<div class="lg-rev ${r.camp}" style="--d:${.6 + (i || 0) * .9}s"><div class="lg-rev-in"><div class="lg-rev-dos">${emb("nuit")}</div>
+    <div class="lg-rev-face"><div class="lg-rev-h">${emb(G.J[p].role)}</div><b>${esc(nomDe(p))}</b><span>${esc(r.n)}</span></div></div></div>`; }
   function scene(){
     const ph = G.ph, c = compo(), n = Object.keys(G.J).length;
     if (ph === "lobby") {
@@ -324,7 +327,7 @@ function animateur(){
     else if (ph === "verdict") lire.push(G.egal ? "Le village n'arrive pas à se décider. Personne n'est banni aujourd'hui." : "Le village a parlé. " + nomDe(G.annonce[0]) + ", tu es banni de Val-des-Brumes.");
     if (ph === "fin") lire.push(G.gagnant === "village" ? "Le dernier loup-garou est démasqué. Le soleil se lève sur un village enfin en paix. Bravo, habitants de Val-des-Brumes : votre écoute et vos faits ont sauvé le village!" : "Les loups-garous sont maintenant aussi nombreux que les villageois. Cette nuit, Val-des-Brumes tombe dans l'ombre… Les loups ont gagné. Ils ont menti avec leurs mots… et avec leur visage.");
     if (t) lire.push(t[0]);
-    if ((ph === "aube" || ph === "verdict") && G.annonce.length) plus.push(`<div class="lg-morts">${G.annonce.map(carteMort).join("")}</div>`);
+    if ((ph === "aube" || ph === "verdict") && G.annonce.length) plus.push(`<div class="lg-revs">${G.annonce.map(carteRev).join("")}</div>`);
     if (ph === "aube" || ph === "verdict") { if (G.amour.length && G.annonce.length > 1 && G.annonce.some(p => G.amour.includes(p))) plus.push(`<p class="lg-faire">Un amoureux est mort de chagrin.</p>`); }
     if (ph === "debat" && G.maireNouv) plus.push(`<div class="lg-maire">${emb("maire")}<span>${esc(nomDe(G.maireNouv))} est le maire de Val-des-Brumes.</span></div>`);
     if (ph === "successeur" && G.ch[G.maire]) plus.push(`<div class="lg-maire">${emb("maire")}<span>${esc(nomDe(G.ch[G.maire]))} reçoit l'écharpe de maire.</span></div>`);
@@ -332,7 +335,7 @@ function animateur(){
     if (ph === "debat") plus.push(`<div class="lg-deb"><div class="lg-minut" id="lgMin"></div><ol class="lg-regles">${REGLES.map(r => `<li>${esc(r)}</li>`).join("")}</ol></div>`);
     if (ph === "vote") { const a = acteurs("vote"); plus.push(`<div class="lg-compte"><b>${a.filter(p => G.ch[p]).length}</b> vote${a.filter(p => G.ch[p]).length > 1 ? "s" : ""} sur ${a.length}</div>`); }
     if (ph === "verdict" && G.votes) plus.push(`<div class="lg-votes">${Object.entries(G.votes).sort((a, b) => b[1] - a[1]).map(([p, v]) => `<span>${esc(nomDe(p))} : ${v}</span>`).join("")}</div>`);
-    if (ph === "chasseur" && G.ch[G.chasseur]) plus.push(`<div class="lg-morts">${carteMort(G.ch[G.chasseur])}</div>`);
+    if (ph === "chasseur" && G.ch[G.chasseur]) plus.push(`<div class="lg-revs">${carteRev(G.ch[G.chasseur])}</div>`);
     if (ph === "fin") plus.push(`<div class="lg-morts">${Object.keys(G.J).map(carteMort).join("")}</div><p class="lg-faire">Passe ensuite au retour sur l'atelier (livre Communiquer, annexe D) pendant que tout est frais.</p>`);
     return `<div class="lg-tit">${emb(EMB_PH[ph], "emb lg-emb")}<div class="lg-etape">${esc(NOM_PH[ph])}${G.nuit && ph !== "fin" ? ` <small>· ${NUIT.includes(ph) || ph === "nuit" ? "nuit" : "jour"} ${G.nuit}</small>` : ""}</div></div>
       ${lire.map(x => `<blockquote class="lg-lire">« ${esc(x)} »</blockquote>`).join("")}
@@ -340,7 +343,7 @@ function animateur(){
   }
   function village(){ const ps = Object.keys(G.J);
     return `<h3>Le village <small>${vivants().length} / ${ps.length}</small></h3><ul>${ps.map(p => { const j = G.J[p];
-      return `<li class="${j.vivant ? "" : "mort"}"><span>${esc(j.nom)}${j.bot ? " <small>(fictif)</small>" : ""}</span>${p === G.maire && j.vivant ? `<em class="lg-tm">Maire</em>` : ""}${p === G.idiotRev ? `<em>Idiot</em>` : ""}${!j.vivant && j.role ? `<em>${esc(ROLES[j.role].n)}</em>` : ""}${G.ph === "lobby" ? `<button class="lg-x" data-x="${esc(p)}" aria-label="Retirer">×</button>` : ""}</li>`; }).join("")}</ul>`; }
+      return `<li class="${j.vivant ? "" : "mort"}"><span>${esc(j.nom)}${j.bot ? " <small>(fictif)</small>" : ""}</span>${p === G.maire && j.vivant ? `<em class="lg-tm">Maire</em>` : ""}${p === G.idiotRev ? `<em>Idiot</em>` : ""}${!j.vivant && j.role && !(["aube", "verdict", "chasseur"].includes(G.ph) && (G.annonce || []).includes(p)) ? `<em>${esc(ROLES[j.role].n)}</em>` : ""}${G.ph === "lobby" ? `<button class="lg-x" data-x="${esc(p)}" aria-label="Retirer">×</button>` : ""}</li>`; }).join("")}</ul>`; }
   function rendre(){
     const nuit = NUIT.includes(G.ph) || G.ph === "nuit";
     document.body.classList.toggle("nuit", nuit); document.body.classList.toggle("jour", !nuit);
