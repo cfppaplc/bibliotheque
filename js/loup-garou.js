@@ -107,6 +107,9 @@ const EMB = {
   debat: '<path d="M6 10h34v22H20l-8 8v-8H6z" fill="currentColor"/><path d="M26 30h32v20h-6v8l-8-8H26z" fill="currentColor" opacity=".55"/>',
   vote: '<path d="M8 30h48v26H8z" fill="currentColor"/><path d="M22 34h20" stroke="#0C1322" stroke-width="4"/><path d="M20 8h24v20H20z" fill="currentColor" opacity=".6"/>'
 };
+/* Cartes « affiche de film » (21 nov.) : si l'image du rôle existe (img/loup-garou/<rôle>.jpg), la carte devient une affiche */
+const ROLE_IMG = new Set([]);
+const imgRole = k => ROLE_IMG.has(k) ? `img/loup-garou/${k}.jpg` : "";
 const emb = (k, cls) => `<svg class="${cls || "emb"}" viewBox="0 0 64 64" aria-hidden="true">${EMB[k] || EMB.nuit}</svg>`;
 const EMB_PH = {salvateur: "salvateur", election: "maire", successeur: "maire", lobby: "nuit", cartes: "nuit", nuit: "nuit", cupidon: "cupidon", voyante: "voyante", renard: "renard", loups: "loup", sorciere: "sorciere", corbeau: "corbeau", aube: "jour", debat: "debat", vote: "vote", verdict: "vote", chasseur: "chasseur", fin: "jour"};
 const FORET = "data:image/svg+xml," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 160" preserveAspectRatio="none"><path fill="#05080F" d="M0 160V96l30-50 30 50 22-70 24 70 30-44 28 44 26-80 26 80 30-56 26 56 24-66 28 66 30-40 26 40 28-74 28 74 24-50 30 50 26-84 26 84 30-46 28 46 24-62 28 62 30-52 26 52 28-76 28 76 26-44 30 44 24-66 26 66 28-50 30 50 26-80 28 80 24-48 30 48 26-60 28 60 30-46 26 46 28-72 28 72 24-40 26 40V160z"/></svg>');
@@ -304,15 +307,18 @@ function animateur(){
   const URLJ = location.href.replace(/[?#].*$/, "") + "?lg=" + G.code;
   let qrEl = null;
   function qr(){ if (qrEl) return qrEl; qrEl = document.createElement("div"); qrEl.className = "lg-qr";
-    try { new QRCode(qrEl, {text: URLJ, width: 230, height: 230, correctLevel: QRCode.CorrectLevel.M}); } catch(e) { qrEl.textContent = URLJ; } return qrEl; }
+    try { new QRCode(qrEl, {text: URLJ, width: 160, height: 160, correctLevel: QRCode.CorrectLevel.M}); } catch(e) { qrEl.textContent = URLJ; } return qrEl; }
   function carteMort(p, i){ const r = ROLES[G.J[p].role]; return `<div class="lg-mortc ${r.camp}" style="animation-delay:${(i || 0) * .25}s">${emb(G.J[p].role)}<b>${esc(nomDe(p))}</b><span>${esc(r.n)}</span></div>`; }
   /* 21 nov. (« la révélation, c'est-tu beau? ») : grande carte qui se retourne au lever du jour, au verdict et au tir du chasseur */
-  function carteRev(p, i){ const r = ROLES[G.J[p].role]; return `<div class="lg-rev ${r.camp}" style="--d:${.6 + (i || 0) * .9}s"><div class="lg-rev-in"><div class="lg-rev-dos">${emb("nuit")}</div>
+  function carteRev(p, i){ const r = ROLES[G.J[p].role], im = imgRole(G.J[p].role);
+    if (im) return `<div class="lg-rev lg-film ${r.camp}" style="--d:${.6 + (i || 0) * .9}s"><div class="lg-rev-in"><div class="lg-rev-dos">${emb("nuit")}</div>
+      <div class="lg-rev-face"><div class="lg-film-im" style="background-image:url(${im})"></div>${emb("mort", "emb lg-rev-m")}<div class="lg-film-t"><b>${esc(nomDe(p))}</b><span>${esc(r.n)}</span></div></div></div></div>`;
+    return `<div class="lg-rev ${r.camp}" style="--d:${.6 + (i || 0) * .9}s"><div class="lg-rev-in"><div class="lg-rev-dos">${emb("nuit")}</div>
     <div class="lg-rev-face"><div class="lg-rev-h">${emb(G.J[p].role, "emb lg-rev-r")}${emb("mort", "emb lg-rev-m")}</div><b>${esc(nomDe(p))}</b><span>${esc(r.n)}</span></div></div></div>`; }
   function scene(){
     const ph = G.ph, c = compo(), n = Object.keys(G.J).length;
     if (ph === "lobby") {
-      return `<div class="lg-lobby"><div class="lg-rej"><div class="lg-qrbox"></div><div class="lg-url">Scanne le code QR<br>ou va sur <b>${esc(location.host + location.pathname.replace(/[^/]*$/, ""))}loup-garou.html</b><br>code <b class="lg-code">${G.code.slice(0, 3)} ${G.code.slice(3)}</b></div></div>
+      return `<div class="lg-lobby"><img class="lg-groupe" src="img/loup-garou/groupe.jpg" alt=""><div class="lg-rej"><div class="lg-qrbox"></div><div class="lg-url">Scanne le code QR<br>ou va sur <b>${esc(location.host + location.pathname.replace(/[^/]*$/, ""))}loup-garou.html</b><br>code <b class="lg-code">${G.code.slice(0, 3)} ${G.code.slice(3)}</b></div></div>
         <div class="lg-compo"><h3>Les cartes (${n} joueur${n > 1 ? "s" : ""})</h3>
         <div class="lg-ligne"><span>Loups-garous</span><button class="lg-pm" data-l="-1" aria-label="Un loup de moins">−</button><b>${c.loups}</b><button class="lg-pm" data-l="1" aria-label="Un loup de plus">+</button></div>
         <div class="lg-roles">${SPECIAUX.map(r => `<button class="lg-chip${c.sp.includes(r) ? " on" : ""}" data-r="${r}">${ROLES[r].n}</button>`).join("")}</div>
@@ -320,8 +326,7 @@ function animateur(){
         <div class="lg-ligne"><span>Élire un maire</span><button class="lg-chip${G.maireOn ? " on" : ""}" id="lgMaire">${G.maireOn ? "Oui" : "Non"}</button></div>
         <div class="lg-ligne"><span>Durée du débat</span>${[3, 5, 8].map(d => `<button class="lg-chip${(G.debat || 5) === d ? " on" : ""}" data-d="${d}">${d} min</button>`).join("")}</div>
         <p class="lg-note">${n < 5 ? "Il faut au moins 5 joueurs." : "Touche un rôle pour l'ajouter ou l'enlever."}</p>
-        <button class="lg-lien lg-bots" id="lgMJ">Mon écran de maître du jeu (garder appuyé)</button>
-        <button class="lg-lien lg-bots" id="lgBots">Ajouter 4 joueurs fictifs (pour essayer seul)</button></div></div>`;
+</div></div>`;
     }
     const t = TXT[ph], lire = [], plus = [];
     if (ph === "aube") { if (G.annonce.length) lire.push("Le coq chante sur Val-des-Brumes. Le village se réveille… sauf " + (G.annonce.length > 1 ? G.annonce.length + " personnes" : "une personne") + ". Cette nuit, " + G.annonce.map(nomDe).join(" et ") + (G.annonce.length > 1 ? " ont été retrouvés" : " a été retrouvé") + " au bord de la forêt.");
@@ -335,7 +340,6 @@ function animateur(){
     if (ph === "aube" || ph === "verdict") { if (G.amour.length && G.annonce.length > 1 && G.annonce.some(p => G.amour.includes(p))) plus.push(`<p class="lg-faire">Un amoureux est mort de chagrin.</p>`); }
     if (ph === "fin" && G.obs && G.obs.some(x => x)) { const mx = Math.max(...G.obs);
       plus.push(`<div class="lg-obs"><h4>Ce que les observateurs ont vu</h4>${OBS.map((o, i) => `<div class="lg-obs-l"><span>${esc(o)}</span><i style="width:${Math.round(G.obs[i] / mx * 100)}%"></i><b>${G.obs[i]}</b></div>`).join("")}</div>`); }
-    if (ph === "cartes") plus.push(`<img class="lg-groupe" src="img/loup-garou/groupe.jpg" alt="">`);   /* photo de groupe : les élèves et l'ombre de leur rôle */
     if (ph === "debat" && G.maireNouv) plus.push(`<div class="lg-maire">${emb("maire")}<span>${esc(nomDe(G.maireNouv))} est le maire de Val-des-Brumes.</span></div>`);
     if (ph === "successeur" && G.ch[G.maire]) plus.push(`<div class="lg-maire">${emb("maire")}<span>${esc(nomDe(G.ch[G.maire]))} reçoit l'écharpe de maire.</span></div>`);
     if (ph === "election") { const a = acteurs("election"); plus.push(`<div class="lg-compte"><b>${a.filter(p => G.ch[p]).length}</b> vote${a.filter(p => G.ch[p]).length > 1 ? "s" : ""} sur ${a.length}</div>`); }
@@ -358,7 +362,7 @@ function animateur(){
     $("lgApp").innerHTML = `<header class="lg-tete"><img src="img/metier-plus.svg" alt="Métier+"><b>Le Loup-Garou de la communication</b><span id="lgRel" class="ko">…</span>
         <a href="labo.html" class="lg-lien">Labo</a><button id="lgNouv" class="lg-lien">Nouvelle partie</button></header>
       <main class="lg-corps"><section class="lg-scene">${scene()}</section><aside class="lg-village">${village()}</aside></main>
-      <footer class="lg-bas">${G.ph === "lobby" ? "" : `<button id="lgSecret" class="lg-sec">Rôles (garder appuyé)</button>`}<span id="lgPret"></span>
+      <footer class="lg-bas">${G.ph === "lobby" ? `<button class="lg-sec" id="lgMJ">Mon écran de maître du jeu (garder appuyé)</button><button class="lg-sec" id="lgBots">Ajouter 4 joueurs fictifs</button>` : `<button id="lgSecret" class="lg-sec">Rôles (garder appuyé)</button>`}<span id="lgPret"></span>
         ${G.ph === "fin" ? `<button id="lgEnc" class="lg-go">Rejouer avec les mêmes joueurs</button>` : `<button id="lgSuiv" class="lg-go" ${G.ph === "lobby" && Object.keys(G.J).length < 5 ? "disabled" : ""}>${bouton}</button>`}</footer>
       <div id="lgSecOv" hidden></div>`;
     if (G.ph === "lobby") $("lgApp").querySelector(".lg-qrbox").appendChild(qr());
@@ -425,7 +429,9 @@ function joueur(code){
     document.addEventListener("visibilitychange", () => { ev(); if (!document.hidden) annoncer(); });
     setInterval(() => { if (!document.hidden && Date.now() - dernier > 25000) { dernier = Date.now() - 10000; R.rebrancher(); annoncer(); } }, 5000); }
   const OBSN = [], OBSH = [];
-  function carteHtml(v){ const r = ROLES[v.role]; return `<div class="j-carte ${r.camp}"><div class="j-carte-h">${emb(v.role, "emb j-emb")}</div><div class="j-carte-r">${esc(r.n)}</div><p>${esc(r.d)}</p>${(v.info || []).map(x => `<p class="j-info">${esc(x)}</p>`).join("")}</div>`; }
+  function carteHtml(v){ const r = ROLES[v.role], im = imgRole(v.role);
+    if (im) return `<div class="j-carte j-film ${r.camp}"><div class="j-film-im" style="background-image:url(${im})"><div class="j-film-t">${esc(r.n)}</div></div><p>${esc(r.d)}</p>${(v.info || []).map(x => `<p class="j-info">${esc(x)}</p>`).join("")}</div>`;
+    return `<div class="j-carte ${r.camp}"><div class="j-carte-h">${emb(v.role, "emb j-emb")}</div><div class="j-carte-r">${esc(r.n)}</div><p>${esc(r.d)}</p>${(v.info || []).map(x => `<p class="j-info">${esc(x)}</p>`).join("")}</div>`; }
   function dessiner(){
     const v = derV || {}; const nuit = !(v.e === "jour" || v.e === "fin" || v.e === "attente");
     document.body.classList.toggle("nuit", nuit); document.body.classList.toggle("jour", !nuit);
