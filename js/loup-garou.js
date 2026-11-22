@@ -407,14 +407,17 @@ function animateur(){
         <button id="lgSon" class="lg-lien">${SON.actif ? "Son : oui" : "Son : non"}</button><a href="labo.html" class="lg-lien">Labo</a><button id="lgNouv" class="lg-lien">Nouvelle partie</button></header>
       <main class="lg-corps"><section class="lg-scene">${scene()}</section><aside class="lg-village">${village()}</aside></main>
       <footer class="lg-bas">${G.ph === "lobby" ? `<button class="lg-sec" id="lgMJ">Mon écran de maître du jeu (garder appuyé)</button><button class="lg-sec" id="lgBots">Ajouter 4 joueurs fictifs</button>` : `<button id="lgSecret" class="lg-sec">Rôles (garder appuyé)</button>`}<span id="lgPret"></span>
-        ${G.ph === "fin" ? `<button id="lgEnc" class="lg-go">Rejouer avec les mêmes joueurs</button>` : `<button id="lgSuiv" class="lg-go" ${G.ph === "lobby" && Object.keys(G.J).length < 5 ? "disabled" : ""}>${bouton}</button>`}</footer>
+        ${G.ph === "fin" ? `<button id="lgFin" class="lg-sec">Terminer et déconnecter</button><button id="lgEnc" class="lg-go">Rejouer avec les mêmes joueurs</button>` : `<button id="lgSuiv" class="lg-go" ${G.ph === "lobby" && Object.keys(G.J).length < 5 ? "disabled" : ""}>${bouton}</button>`}</footer>
       <div id="lgSecOv" hidden></div>`;
     if (G.ph === "lobby") $("lgApp").querySelector(".lg-qrbox").appendChild(qr());
     $("lgSuiv") && ($("lgSuiv").onclick = suivante);
     $("lgEnc") && ($("lgEnc").onclick = () => { const J = {}; Object.keys(G.J).forEach(p => J[p] = {nom: G.J[p].nom, role: null, vivant: true}); const old = G; G = nouvelle(J); ["code", "compo", "cle", "mjApp", "maireOn", "debat"].forEach(k => G[k] = old[k]); aller("lobby"); });
     $("lgSon").onclick = () => { SON.reveil(); const a = SON.basculer(); $("lgSon").textContent = a ? "Son : oui" : "Son : non"; if (a) ambianceRepr(); };
     document.body.addEventListener("pointerdown", () => SON.reveil(), {once: true});
-    $("lgNouv").onclick = () => { if (confirm("Commencer une nouvelle partie? La partie en cours sera perdue.")) { localStorage.removeItem("lgPartie"); location.reload(); } };
+    /* 22 nov. (« les joueurs ne sont pas déconnectés ») : terminer prévient chaque cellulaire, qui oublie la partie */
+    const terminer = () => { R.send({m: "termine", code: G.code}); localStorage.removeItem("lgPartie"); setTimeout(() => location.reload(), 900); };
+    $("lgNouv").onclick = () => { if (confirm("Terminer cette partie et en commencer une nouvelle? Les cellulaires seront déconnectés.")) terminer(); };
+    $("lgFin") && ($("lgFin").onclick = () => { if (confirm("Terminer la partie? Les cellulaires seront déconnectés.")) terminer(); });
     document.querySelectorAll(".lg-x").forEach(b => b.onclick = () => { R.send({m: "v", pid: b.dataset.x, v: {e: "attente", txt: "Tu as été retiré de la partie."}}); delete G.J[b.dataset.x]; sauver(); rendre(); });
     const bmj = $("lgMJ"); if (bmj) { const ov = $("lgSecOv"), url = location.href.replace(/[?#].*$/, "") + "?mj=" + G.code + "#k=" + G.cle;
       const voir = e => { e.preventDefault(); ov.innerHTML = `<div class="lg-secb lg-mjb"><h3>Ton écran de maître du jeu</h3><div id="lgMjQr"></div><p>Scanne avec TON cellulaire. Il verra tous les rôles et les choix de la nuit : ne laisse personne d'autre le scanner. Le premier appareil branché garde la main.</p></div>`; ov.hidden = false;
@@ -460,9 +463,13 @@ function joueur(code){
   const cle = "lg:" + code; let moi = null; try { moi = JSON.parse(localStorage.getItem(cle)); } catch(e) {}
   let derV = null, sel = [], dernier = Date.now(), entre = false;
   const app = $("lgApp");
-  const R = relais(PREF + code, m => { dernier = Date.now(); if (m.m === "v" && moi && m.pid === moi.pid) { if (!m.v || JSON.stringify(m.v) !== JSON.stringify(derV)) { sel = (m.v && m.v.sel) || []; } derV = m.v; dessiner(); } },
+  let fini = false;
+  const R = relais(PREF + code, m => { dernier = Date.now(); if (fini) return;
+    if (m.m === "termine") { fini = true; try { localStorage.removeItem(cle); } catch(e) {} document.body.className = "cel jour";
+      app.innerHTML = `<div class="j-acc"><img src="img/metier-plus.svg" alt="Métier+" class="j-logo" style="filter:none"><h1>Partie terminée</h1><p>Merci d'avoir joué. Tu peux fermer cette page.</p></div>`; return; }
+    if (m.m === "v" && moi && m.pid === moi.pid) { if (!m.v || JSON.stringify(m.v) !== JSON.stringify(derV)) { sel = (m.v && m.v.sel) || []; } derV = m.v; dessiner(); } },
     ok => { const e = $("jRel"); if (e) e.hidden = ok; if (ok && entre) annoncer(); });
-  const annoncer = () => R.send({m: "ici", pid: moi.pid, nom: moi.nom});
+  const annoncer = () => { if (!fini) R.send({m: "ici", pid: moi.pid, nom: moi.nom}); };
   function accueil(msg){
     app.innerHTML = `<div class="j-acc"><img src="img/metier-plus.svg" alt="Métier+" class="j-logo"><h1>Le Loup-Garou</h1><p>de la communication</p>
       ${msg ? `<p class="j-ko">${esc(msg)}</p>` : ""}<label for="jPre">Ton prénom ou surnom (pas de nom de famille)</label>
@@ -474,7 +481,7 @@ function joueur(code){
   }
   function veille(){ const ev = () => { try { if (navigator.wakeLock && !document.hidden) navigator.wakeLock.request("screen").catch(() => {}); } catch(e) {} }; ev();
     document.addEventListener("visibilitychange", () => { ev(); if (!document.hidden) annoncer(); });
-    setInterval(() => { if (!document.hidden && Date.now() - dernier > 25000) { dernier = Date.now() - 10000; R.rebrancher(); annoncer(); } }, 5000); }
+    setInterval(() => { if (!fini && !document.hidden && Date.now() - dernier > 25000) { dernier = Date.now() - 10000; R.rebrancher(); annoncer(); } }, 5000); }
   const OBSN = [], OBSH = [];
   function carteHtml(v){ const r = ROLES[v.role], im = imgRole(v.role);
     return `<div class="j-carte bois ${r.camp}">${COINS}<div class="j-carte-h${im ? " a-img" : ""}">${im ? `<img class="brule" src="${im}" alt="">` : emb(v.role, "emb j-emb")}</div><div class="j-carte-r">${esc(r.n)}</div><div class="camp">${r.camp === "loups" ? "Camp des loups" : "Camp du village"}</div><p>${esc(r.d)}</p>${(v.info || []).map(x => `<p class="j-info">${esc(x)}</p>`).join("")}</div>`; }
