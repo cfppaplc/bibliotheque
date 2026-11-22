@@ -4,13 +4,13 @@
   let carte = null, cacheT = 0, avant = "";
   const vu = k => { try { return sessionStorage.getItem("defiVu:" + k) === "1"; } catch(e){ return false; } };
   const noter = k => { try { sessionStorage.setItem("defiVu:" + k, "1"); } catch(e){} };
-  const NOMS = ["", "le premier tiers", "les deux tiers", "tout le livre"];
+  
   function cacher(){ if (carte){ carte.remove(); carte = null; } clearTimeout(cacheT); }
-  function montrer(livre, n, id){
+  function montrer(livre, n, id, N){
     cacher(); const k = livre + ":" + n; noter(k);
     const r = document.getElementById("reader"); if (!r) return;
     carte = document.createElement("div"); carte.className = "defi-carte";
-    carte.innerHTML = `<button type="button" class="defi-x" aria-label="Fermer">×</button><div class="defi-logo">Défi<span>+</span></div><div class="defi-n">${n} de 3</div><small>Tu as couvert ${NOMS[n]}.</small><button type="button" class="defi-go">Lancer le Défi+</button>`;
+    carte.innerHTML = `<button type="button" class="defi-x" aria-label="Fermer">×</button><div class="defi-logo">Défi<span>+</span></div><div class="defi-n">${n} de ${N}</div><small>${n === N ? "Tu as terminé le livre." : "Tu as couvert " + Math.round(n * 100 / N) + " % du livre."}</small><button type="button" class="defi-go">Lancer le Défi+</button>`;
     carte.querySelector(".defi-x").onclick = cacher;
     carte.querySelector(".defi-go").onclick = () => { window.open("quiz.html?animer=1&quiz=" + encodeURIComponent(id), "_blank"); cacher(); };
     r.appendChild(carte); cacheT = setTimeout(cacher, 30000);
@@ -25,8 +25,8 @@
       if (carte) return;
       const t = totPages(), p = curPage(); if (t < 12) return;
       const cle = livre + "|" + t; if (cle !== avant){ avant = cle; return; }   /* attendre que le livre soit bien chargé (nombre de pages stable) */
-      const f = p / t, n = f >= 0.97 ? 3 : f >= 2 / 3 ? 2 : f >= 1 / 3 ? 1 : 0;
-      if (n && ids[n - 1] && !vu(livre + ":" + n)) montrer(livre, n, ids[n - 1]);
+      const N = ids.length, f = p / t; let n = f >= 0.97 ? N : Math.floor(f * N + 1e-9); if (n >= N) n = f >= 0.97 ? N : N - 1;
+      if (n && ids[n - 1] && !vu(livre + ":" + n)) montrer(livre, n, ids[n - 1], N);
     } catch(e){}
   }, 1500);
 })();
