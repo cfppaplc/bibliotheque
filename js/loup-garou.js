@@ -113,6 +113,7 @@ const FORET = "data:image/svg+xml," + encodeURIComponent('<svg xmlns="http://www
 const VILLAGE = "data:image/svg+xml," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 140" preserveAspectRatio="none"><path fill="#D9C7A8" d="M0 140V90l60-40 60 40v-20l50-36 50 36V90h40l70-54 70 54V70l40-30 40 30v30h60l60-46 60 46v-24l50-36 50 36v34h50l60-50 60 50v-16l40-28 40 28v86z"/><path fill="#E6D8BE" d="M0 140v-26h1200v26z"/></svg>');
 function decor(){ if (document.querySelector(".ciel")) return;
   document.body.insertAdjacentHTML("afterbegin", `<div class="ciel ciel-n" aria-hidden="true"><i class="etoiles"></i><i class="lune"></i><i class="sol" style="background-image:url('${FORET}')"></i></div>
+    <div class="ciel ciel-p" aria-hidden="true"></div>
     <div class="ciel ciel-j" aria-hidden="true"><i class="soleil"></i><i class="brume"></i><i class="sol" style="background-image:url('${FORET}')"></i></div>`); }
 
 /* =================================== TNI : l'enseignant narrateur =================================== */
@@ -352,6 +353,7 @@ function animateur(){
   function rendre(){
     const nuit = NUIT.includes(G.ph) || G.ph === "nuit";
     document.body.classList.toggle("nuit", nuit); document.body.classList.toggle("jour", !nuit);
+    document.body.classList.toggle("photo", G.ph === "lobby" || G.ph === "fin");   /* photo de groupe : ombres des rôles */
     const bouton = {lobby: "Distribuer les cartes", cartes: "Commencer la nuit", aube: "Continuer", election: "Proclamer le maire", successeur: "Continuer", debat: "Passer au vote", vote: "Révéler le verdict", verdict: "La nuit suivante", chasseur: "Continuer"}[G.ph] || (G.ph === "corbeau" ? "Lever le jour" : "Étape suivante");
     $("lgApp").innerHTML = `<header class="lg-tete"><img src="img/metier-plus.svg" alt="Métier+"><b>Le Loup-Garou de la communication</b><span id="lgRel" class="ko">…</span>
         <a href="labo.html" class="lg-lien">Labo</a><button id="lgNouv" class="lg-lien">Nouvelle partie</button></header>

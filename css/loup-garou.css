@@ -268,3 +268,13 @@ body.jour{background:#CFCCC6;color:#1F2328;--carte:rgba(250,249,246,.86);--trait
 .brume{left:0;right:0;bottom:8vh;height:22vh;background:linear-gradient(transparent,rgba(214,211,204,.85) 55%,rgba(214,211,204,.6))}
 .jour .lg-tete,.jour .lg-bas{background:rgba(255,255,255,.25)}
 .jour .lg-emb{color:#3A4048}
+
+/* photo de groupe (accueil et fin) : les élèves et l'ombre de leur rôle */
+.ciel-p{background:url(../img/loup-garou/groupe.jpg) center 30%/cover no-repeat;opacity:0}
+.ciel-p::after{content:"";position:absolute;inset:0;background:linear-gradient(rgba(236,234,229,.15),rgba(236,234,229,.45))}
+body.photo .ciel-p{opacity:1}
+body.photo .ciel-j{opacity:0}
+.photo .lg-scene .lg-tit,.photo .lg-scene blockquote,.photo .lg-scene .lg-obs,.photo .lg-scene .lg-faire{background:rgba(250,249,246,.9);border-radius:12px;padding:8px 14px}
+.photo .lg-scene .lg-lire{border-left:4px solid var(--acc)}
+.photo .lg-url{background:rgba(250,249,246,.9);border-radius:12px;padding:8px 12px}
+.photo .lg-tit{display:inline-flex}
