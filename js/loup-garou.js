@@ -110,6 +110,7 @@ const EMB = {
 /* Cartes « affiche de film » (21 nov.) : si l'image du rôle existe (img/loup-garou/<rôle>.jpg), la carte devient une affiche */
 const ROLE_IMG = new Set([]);
 const imgRole = k => ROLE_IMG.has(k) ? `img/loup-garou/${k}.jpg` : "";
+const COINS = '<i class="coin c1"></i><i class="coin c2"></i><i class="coin c3"></i><i class="coin c4"></i><i class="cadre"></i>';
 const emb = (k, cls) => `<svg class="${cls || "emb"}" viewBox="0 0 64 64" aria-hidden="true">${EMB[k] || EMB.nuit}</svg>`;
 const EMB_PH = {salvateur: "salvateur", election: "maire", successeur: "maire", lobby: "nuit", cartes: "nuit", nuit: "nuit", cupidon: "cupidon", voyante: "voyante", renard: "renard", loups: "loup", sorciere: "sorciere", corbeau: "corbeau", aube: "jour", debat: "debat", vote: "vote", verdict: "vote", chasseur: "chasseur", fin: "jour"};
 const FORET = "data:image/svg+xml," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 160" preserveAspectRatio="none"><path fill="#05080F" d="M0 160V96l30-50 30 50 22-70 24 70 30-44 28 44 26-80 26 80 30-56 26 56 24-66 28 66 30-40 26 40 28-74 28 74 24-50 30 50 26-84 26 84 30-46 28 46 24-62 28 62 30-52 26 52 28-76 28 76 26-44 30 44 24-66 26 66 28-50 30 50 26-80 28 80 24-48 30 48 26-60 28 60 30-46 26 46 28-72 28 72 24-40 26 40V160z"/></svg>');
@@ -311,10 +312,8 @@ function animateur(){
   function carteMort(p, i){ const r = ROLES[G.J[p].role]; return `<div class="lg-mortc ${r.camp}" style="animation-delay:${(i || 0) * .25}s">${emb(G.J[p].role)}<b>${esc(nomDe(p))}</b><span>${esc(r.n)}</span></div>`; }
   /* 21 nov. (« la révélation, c'est-tu beau? ») : grande carte qui se retourne au lever du jour, au verdict et au tir du chasseur */
   function carteRev(p, i){ const r = ROLES[G.J[p].role], im = imgRole(G.J[p].role);
-    if (im) return `<div class="lg-rev lg-film ${r.camp}" style="--d:${.6 + (i || 0) * .9}s"><div class="lg-rev-in"><div class="lg-rev-dos">${emb("nuit")}</div>
-      <div class="lg-rev-face"><div class="lg-film-im" style="background-image:url(${im})"></div>${emb("mort", "emb lg-rev-m")}<div class="lg-film-t"><b>${esc(nomDe(p))}</b><span>${esc(r.n)}</span></div></div></div></div>`;
-    return `<div class="lg-rev ${r.camp}" style="--d:${.6 + (i || 0) * .9}s"><div class="lg-rev-in"><div class="lg-rev-dos">${emb("nuit")}</div>
-    <div class="lg-rev-face"><div class="lg-rev-h">${emb(G.J[p].role, "emb lg-rev-r")}${emb("mort", "emb lg-rev-m")}</div><b>${esc(nomDe(p))}</b><span>${esc(r.n)}</span></div></div></div>`; }
+    return `<div class="lg-rev ${r.camp}" style="--d:${.6 + (i || 0) * .9}s"><div class="lg-rev-in"><div class="lg-rev-dos">${COINS}${emb("nuit")}</div>
+    <div class="lg-rev-face bois">${COINS}<div class="lg-rev-h${im ? " a-img" : ""}">${im ? `<img class="brule lg-rev-r" src="${im}" alt="">` : emb(G.J[p].role, "emb lg-rev-r")}${emb("mort", "emb lg-rev-m")}</div><b>${esc(nomDe(p))}</b><span>${esc(r.n)}</span><em class="camp">${r.camp === "loups" ? "Camp des loups" : "Camp du village"}</em></div></div></div>`; }
   function scene(){
     const ph = G.ph, c = compo(), n = Object.keys(G.J).length;
     if (ph === "lobby") {
@@ -430,8 +429,7 @@ function joueur(code){
     setInterval(() => { if (!document.hidden && Date.now() - dernier > 25000) { dernier = Date.now() - 10000; R.rebrancher(); annoncer(); } }, 5000); }
   const OBSN = [], OBSH = [];
   function carteHtml(v){ const r = ROLES[v.role], im = imgRole(v.role);
-    if (im) return `<div class="j-carte j-film ${r.camp}"><div class="j-film-im" style="background-image:url(${im})"><div class="j-film-t">${esc(r.n)}</div></div><p>${esc(r.d)}</p>${(v.info || []).map(x => `<p class="j-info">${esc(x)}</p>`).join("")}</div>`;
-    return `<div class="j-carte ${r.camp}"><div class="j-carte-h">${emb(v.role, "emb j-emb")}</div><div class="j-carte-r">${esc(r.n)}</div><p>${esc(r.d)}</p>${(v.info || []).map(x => `<p class="j-info">${esc(x)}</p>`).join("")}</div>`; }
+    return `<div class="j-carte bois ${r.camp}">${COINS}<div class="j-carte-h${im ? " a-img" : ""}">${im ? `<img class="brule" src="${im}" alt="">` : emb(v.role, "emb j-emb")}</div><div class="j-carte-r">${esc(r.n)}</div><div class="camp">${r.camp === "loups" ? "Camp des loups" : "Camp du village"}</div><p>${esc(r.d)}</p>${(v.info || []).map(x => `<p class="j-info">${esc(x)}</p>`).join("")}</div>`; }
   function dessiner(){
     const v = derV || {}; const nuit = !(v.e === "jour" || v.e === "fin" || v.e === "attente");
     document.body.classList.toggle("nuit", nuit); document.body.classList.toggle("jour", !nuit);

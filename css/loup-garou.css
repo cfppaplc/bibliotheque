@@ -327,3 +327,34 @@ body.photo .ciel-j{opacity:0}
 .lg-rev-face{animation:lgGris 1s ease calc(var(--d) + 2.2s) forwards}
 .j-mort.anim{animation:lgGris 1s ease 1.8s forwards}
 .j-mort:not(.anim){filter:sepia(.6) brightness(.72) contrast(1.15)}
+/* carte en bois développée : double cadre gravé, coins ornés, bandeau du camp, image pyrogravée (si elle existe) */
+.j-carte.bois,.lg-rev-face.bois,.lg-rev-dos{position:relative}
+.cadre{position:absolute;inset:9px;border:2px solid rgba(60,32,10,.45);border-radius:12px;box-shadow:inset 0 0 0 4px rgba(255,235,200,.18),inset 0 0 0 6px rgba(60,32,10,.3);pointer-events:none}
+.coin{position:absolute;width:26px;height:26px;pointer-events:none;background:no-repeat center/contain url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 26 26'%3E%3Cpath d='M2 2h10c0 6-4 10-10 10z' fill='%233B220E' opacity='.55'/%3E%3Ccircle cx='15' cy='15' r='2.4' fill='%233B220E' opacity='.5'/%3E%3Cpath d='M2 18c6 0 10 2 12 6M18 2c0 6 2 10 6 12' stroke='%233B220E' stroke-width='1.4' fill='none' opacity='.45'/%3E%3C/svg%3E")}
+.c1{left:5px;top:5px}.c2{right:5px;top:5px;transform:scaleX(-1)}.c3{left:5px;bottom:5px;transform:scaleY(-1)}.c4{right:5px;bottom:5px;transform:scale(-1)}
+.lg-rev-dos .coin{filter:invert(.85) sepia(1) saturate(.6)}
+.lg-rev-dos .cadre{border-color:rgba(227,194,142,.45);box-shadow:inset 0 0 0 4px rgba(0,0,0,.15),inset 0 0 0 6px rgba(227,194,142,.25)}
+.camp{text-align:center;font-size:12px;font-weight:800;letter-spacing:.22em;text-transform:uppercase;color:#5A3A1A;margin:2px 26px 8px;padding:3px 0;border-top:1px solid rgba(60,32,10,.35);border-bottom:1px solid rgba(60,32,10,.35);font-style:normal;display:block}
+.loups .camp{color:#7A1F10!important}
+.j-carte.bois{padding-bottom:18px}
+.j-carte.bois p{padding:0 26px;font-size:16px}
+.j-carte.bois .j-info{margin:0 26px 10px}
+.j-carte.bois .j-carte-r{padding:8px 22px 2px}
+.j-carte.bois .j-carte-h{height:190px;margin-top:14px}
+.lg-rev{width:210px;height:290px}
+.lg-rev-face.bois{justify-content:flex-start}
+.lg-rev-face.bois .lg-rev-h{height:160px;margin-top:16px}
+.lg-rev-face.bois b{margin-top:4px}
+.lg-rev-face.bois span{font-size:14px}
+.lg-rev-face.bois .camp{font-size:10px;margin:8px 30px 0;letter-spacing:.18em}
+/* image pyrogravée : multipliée sur le bois pour avoir l'air brûlée dans la planche */
+.a-img::before{display:none}
+.brule{display:block;height:100%;max-width:86%;margin:0 auto;object-fit:contain;mix-blend-mode:multiply;filter:sepia(.5) contrast(1.15);border-radius:10px}
+.lg-rev-h.a-img .lg-rev-r{position:static;margin:0 auto;width:auto;height:100%}
+.lg-rev{width:190px;height:262px}
+.lg-rev-face.bois .lg-rev-h{height:128px;margin-top:14px}
+.lg-rev-face.bois .lg-rev-h::before{width:112px;height:112px;margin:-56px 0 0 -56px}
+.lg-rev-face.bois .lg-rev-h .emb{width:80px;height:80px;margin:-40px 0 0 -40px}
+.lg-rev-face.bois b{font-size:24px}
+.j-carte.bois p{padding:0 32px}
+.j-carte.bois .j-info{margin:0 30px 10px}
