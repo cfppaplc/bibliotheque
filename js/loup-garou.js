@@ -141,7 +141,15 @@ const SON = (() => {
       const g = ac.createGain(); g.gain.value = 0; g.gain.linearRampToValueAtTime(.32, ac.currentTime + 3); s.connect(f); f.connect(g); g.connect(maitre); s.start(); vent = {s, g, lfo};
       const grillon = () => { if (!vent) return; const t = ac.currentTime; for (let k = 0; k < 3; k++) { const o = ac.createOscillator(), gg = ac.createGain(); o.frequency.value = 4200 + Math.random() * 500;
         o.connect(gg); gg.connect(maitre); env(gg, t + k * .09, .01, .03, .04, .025); o.start(t + k * .09); o.stop(t + k * .09 + .1); } grillT = setTimeout(grillon, 1200 + Math.random() * 2600); }; grillon(); }
+    nappeOn(on);
     if (!on && vent) { const v = vent; vent = null; clearTimeout(grillT); v.g.gain.linearRampToValueAtTime(0, ac.currentTime + 2.5); setTimeout(() => { try { v.s.stop(); v.lfo.stop(); } catch(e) {} }, 2700); } }
+  /* nappe : accord grave et doux (la mineur) qui respire, sous le vent; « tension » : battement sourd pendant les loups */
+  let nappe = null, coeurT = null;
+  function nappeOn(on){ if (on && !nappe) { const g = ac.createGain(); g.gain.value = 0; g.gain.linearRampToValueAtTime(.06, ac.currentTime + 4); const f = ac.createBiquadFilter(); f.type = "lowpass"; f.frequency.value = 700; f.connect(g); g.connect(maitre);
+      const os = [110, 164.8, 130.8, 220].map((fq, i) => { const o = ac.createOscillator(); o.type = i % 2 ? "triangle" : "sine"; o.frequency.value = fq; o.detune.value = (i - 1.5) * 4; o.connect(f); o.start(); return o; });
+      const lfo = ac.createOscillator(), lg = ac.createGain(); lfo.frequency.value = .05; lg.gain.value = .025; lfo.connect(lg); lg.connect(g.gain); lfo.start(); nappe = {g, os, lfo}; }
+    if (!on && nappe) { const n = nappe; nappe = null; n.g.gain.linearRampToValueAtTime(0, ac.currentTime + 3); setTimeout(() => { n.os.forEach(o => { try { o.stop(); } catch(e) {} }); try { n.lfo.stop(); } catch(e) {} }, 3200); } }
+  function tension(){ if (!actif || !ctx()) return; clearTimeout(coeurT); let k = 0; const bat = () => { if (k++ > 16 || !vent) return; const t = ac.currentTime; [0, .22].forEach((d, i) => { const o = ac.createOscillator(), g = ac.createGain(); o.frequency.setValueAtTime(70, t + d); o.frequency.exponentialRampToValueAtTime(40, t + d + .2); o.connect(g); g.connect(maitre); env(g, t + d, .01, .03, .25, i ? .18 : .28); o.start(t + d); o.stop(t + d + .35); }); coeurT = setTimeout(bat, 1100); }; bat(); }
   function hurlement(){ if (!actif || !ctx()) return; const t = ac.currentTime + .1;
     [0, .35].forEach((d, i) => { const o = ac.createOscillator(), g = ac.createGain(), vib = ac.createOscillator(), vg = ac.createGain(); o.type = "sawtooth";
       const f = ac.createBiquadFilter(); f.type = "bandpass"; f.frequency.value = 900; f.Q.value = 1.2;
@@ -156,7 +164,7 @@ const SON = (() => {
   function coup(t){ const o = ac.createOscillator(), g = ac.createGain(); o.frequency.setValueAtTime(120, t); o.frequency.exponentialRampToValueAtTime(42, t + .5); o.connect(g); g.connect(maitre); env(g, t, .005, .05, .8, .6); o.start(t); o.stop(t + 1); }
   function gong(){ if (!actif || !ctx()) return; const t = ac.currentTime + .05; [110, 164.8, 220.5, 293].forEach((fq, i) => { const o = ac.createOscillator(), g = ac.createGain(); o.frequency.value = fq * (1 + i * .003); o.connect(g); g.connect(maitre); env(g, t, .01, .1, 4.5, .12 / (i + 1)); o.start(t); o.stop(t + 5); }); }
   function tic(){ if (!actif || !ctx()) return; const t = ac.currentTime, o = ac.createOscillator(), g = ac.createGain(); o.frequency.value = 1800; o.connect(g); g.connect(maitre); env(g, t, .002, .01, .05, .12); o.start(t); o.stop(t + .08); }
-  return {nuit, hurlement, aube, roulement, gong, tic, reveil: () => ctx(), get actif(){ return actif; }, basculer(){ actif = !actif; try { localStorage.setItem("lgSon", actif ? "1" : "0"); } catch(e) {} if (!actif) nuit(false); return actif; }};
+  return {nuit, hurlement, tension, aube, roulement, gong, tic, reveil: () => ctx(), get actif(){ return actif; }, basculer(){ actif = !actif; try { localStorage.setItem("lgSon", actif ? "1" : "0"); } catch(e) {} if (!actif) nuit(false); return actif; }};
 })();
 
 /* =================================== TNI : l'enseignant narrateur =================================== */
@@ -183,17 +191,17 @@ function animateur(){
   /* --- étapes --- */
   function acteurs(ph){ const r = ROLE_PH[ph];
     if (r) { let a = vivants().filter(p => G.J[p].role === r); if (ph === "renard" && !G.flair) a = []; if (ph === "loups") return a; if (ph === "sorciere" && !G.potVie && !G.potMort) a = []; return a; }
-    if (ph === "vote") return vivants().filter(p => p !== G.idiotRev); if (ph === "election") return vivants();
+    if (ph === "vote") return vivants().filter(p => p !== G.idiotRev); if (ph === "election") return G.elec === "vote" ? vivants() : null;
     if (ph === "chasseur") return [G.chasseur]; if (ph === "successeur") return [G.maire]; return null; }
   function pret(){ const a = acteurs(G.ph); if (!a) return true; if (!a.length) return Date.now() >= G.faux;
     if (G.ph === "sorciere") return a.every(p => G.ch[p] === "fin"); return a.every(p => G.ch[p] != null); }
   function ambiance(ph){ const n = NUIT.includes(ph) || ph === "nuit"; SON.nuit(n);
     document.body.classList.toggle("ph-loups", ph === "loups");
-    if (ph === "loups") setTimeout(SON.hurlement, 600);
+    if (ph === "loups") SON.tension();
     if (ph === "aube") { SON.aube(); if (G.annonce && G.annonce.length) setTimeout(() => SON.roulement(G.annonce.length), 1200); }
     if (ph === "verdict") { if (G.annonce && G.annonce.length) SON.roulement(1); else SON.gong(); }
     if (ph === "chasseur" || ph === "fin") SON.gong(); }
-  function aller(ph){ ambiance(ph); G.ph = ph; G.ch = {}; G.t0 = Date.now(); G.faux = Date.now() + 5000 + Math.random() * 6000;   /* rôle mort : « Prêt » arrive quand même, pour ne rien trahir */
+  function aller(ph){ ambiance(ph); if (ph === "election") { G.elec = "candidats"; G.cands = []; G.chrono = 0; G.botsCand = 0; } G.ph = ph; G.ch = {}; G.t0 = Date.now(); G.faux = Date.now() + 5000 + Math.random() * 6000;   /* rôle mort : « Prêt » arrive quand même, pour ne rien trahir */
     sauver(); rendre(); pousser(); }
   function prochaineNuit(apres){ const i = apres === "nuit" ? 0 : NUIT.indexOf(apres) + 1;
     for (let k = i; k < NUIT.length; k++) { const ph = NUIT[k], r = ROLE_PH[ph]; if (ph === "cupidon" && G.nuit !== 1) continue; if (r === "loup" || G.enJeu.includes(r)) return ph; }
@@ -223,6 +231,8 @@ function animateur(){
     if (ph === "nuit") return aller(prochaineNuit("nuit"));
     if (NUIT.includes(ph)) { resoudre(ph); const n = prochaineNuit(ph); if (n === "aube") leverJour(); return aller(n); }
     if (ph === "aube") return apresMorts(G.maireOn && !G.maireFait ? "election" : "debat");
+    if (ph === "election" && G.elec !== "vote") { G.cands = (G.cands || []).filter(p => G.J[p] && G.J[p].vivant); if (!G.cands.length) G.cands = vivants();
+      G.elec = "vote"; G.ch = {}; G.t0 = Date.now(); sauver(); rendre(); pousser(); return; }
     if (ph === "election") { const T = {}; vivants().forEach(p => { const t = G.ch[p]; if (t) T[t] = (T[t] || 0) + 1; }); const max = Math.max(0, ...Object.values(T));
       const top = Object.keys(T).filter(t => T[t] === max); G.maire = top.length ? melanger(top)[0] : null; G.maireFait = true; G.maireNouv = G.maire; return aller("debat"); }
     if (ph === "successeur") { const t = G.ch[G.maire]; G.maire = t && G.J[t] && G.J[t].vivant ? t : null; G.maireNouv = G.maire; return speciales(); }
@@ -276,7 +286,9 @@ function animateur(){
         if (m.a === "fin") G.ch[m.pid] = "fin"; } break;
       case "corbeau": if (r === "corbeau" && p.vivant && !G.ch[m.pid]) { G.ch[m.pid] = sel[0] && vit(sel[0]) ? sel[0] : "aucun"; G.plume = sel[0] && vit(sel[0]) ? sel[0] : null; } break;
       case "vote": if (p.vivant && m.pid !== G.idiotRev && sel.length === 1 && vit(sel[0]) && sel[0] !== m.pid) G.ch[m.pid] = sel[0]; break;
-      case "election": if (p.vivant && sel.length === 1 && vit(sel[0])) G.ch[m.pid] = sel[0]; break;
+      case "election":
+        if (G.elec !== "vote" && p.vivant && m.a === "cand") { G.cands = G.cands || []; G.cands = G.cands.includes(m.pid) ? G.cands.filter(x => x !== m.pid) : G.cands.concat(m.pid); }
+        if (G.elec === "vote" && p.vivant && sel.length === 1 && vit(sel[0]) && (G.cands || []).includes(sel[0])) G.ch[m.pid] = sel[0]; break;
       case "successeur": if (m.pid === G.maire && !G.ch[m.pid] && sel.length === 1 && vit(sel[0])) G.ch[m.pid] = sel[0]; break;
       case "salvateur": if (r === "salvateur" && p.vivant && !G.ch[m.pid] && sel.length === 1 && vit(sel[0]) && sel[0] !== G.protPrec) G.ch[m.pid] = sel[0]; break;
       case "chasseur": if (m.pid === G.chasseur && !G.ch[m.pid] && sel.length === 1 && vit(sel[0])) G.ch[m.pid] = sel[0]; break;
@@ -319,7 +331,8 @@ function animateur(){
       if (ph === "corbeau" && r === "corbeau") return G.ch[pid] ? V({e: "res", t: "Ta plume est posée", x: G.plume ? nomDe(G.plume) + " commencera le vote avec 2 voix." : "Personne cette nuit."}) : V({e: "choix", t: "Qui soupçonnes-tu?", x: "Il commencera le vote avec 2 voix contre lui.", o: opts(pid), n: 1, passer: 1});
       return V({e: "nuit"});
     }
-    if (G.ph === "election") return V({e: "choix", t: "Élis ton maire", x: "Tu peux voter pour toi. Tu peux changer d'idée jusqu'à la fin de l'élection.", o: opts(null), n: 1, libre: 1, sel: G.ch[pid] ? [G.ch[pid]] : []});
+    if (G.ph === "election" && G.elec !== "vote") return V({e: "cand", on: (G.cands || []).includes(pid)});
+    if (G.ph === "election") return V({e: "choix", t: "Vote pour ton maire", x: "Choisis parmi les candidats. Tu peux changer d'idée jusqu'à la proclamation.", o: G.cands.filter(x => G.J[x] && G.J[x].vivant).map(x => ({p: x, n: nomDe(x)})), n: 1, libre: 1, sel: G.ch[pid] ? [G.ch[pid]] : []});
     if (G.ph === "vote" && pid === G.idiotRev) return V({e: "jour", t: "Le vote", x: "Tu es l'idiot du village : tu ne votes plus. Regarde le tableau."});
     if (G.ph === "vote") return V({e: "choix", t: "Ton vote", x: "Qui veux-tu chasser du village? Tu peux changer d'idée jusqu'au verdict.", o: opts(pid), n: 1, libre: 1, sel: G.ch[pid] ? [G.ch[pid]] : []});
     if (G.ph === "debat") return V({e: "jour", t: "Le débat", regles: REGLES});
@@ -372,7 +385,8 @@ function animateur(){
         <p class="lg-note">${n < 5 ? "Il faut au moins 5 joueurs." : "Touche un rôle pour l'ajouter ou l'enlever."}</p>
 </div></div>`;
     }
-    const t = TXT[ph], lire = [], plus = [];
+    const t = ph === "election" ? (G.elec === "vote" ? ["Le village vote maintenant pour son maire, sur le cellulaire. Choisissez parmi les candidats. N'oubliez pas : la voix du maire comptera double à chaque vote.", "Quand tout le monde a voté, proclame le maire."]
+      : ["Val-des-Brumes a besoin d'un maire. Qui veut se présenter? Touchez « Je me présente » sur votre cellulaire.", "Chaque candidat a 30 secondes pour convaincre le village. Touche « 30 secondes » pour lancer le chrono, puis passe au vote. Si personne ne se présente, tout le monde est candidat."]) : TXT[ph], lire = [], plus = [];
     if (ph === "aube") { if (G.annonce.length) lire.push("Le coq chante sur Val-des-Brumes. Le village se réveille… sauf " + (G.annonce.length > 1 ? G.annonce.length + " personnes" : "une personne") + ". Cette nuit, " + G.annonce.map(nomDe).join(" et ") + (G.annonce.length > 1 ? " ont été retrouvés" : " a été retrouvé") + " au bord de la forêt.");
       else lire.push(G.sauveCetteNuit ? "Le coq chante sur Val-des-Brumes. Le village se réveille… et tout le monde est là! Une main mystérieuse a sauvé quelqu'un cette nuit." : "Le coq chante sur Val-des-Brumes. Le village se réveille… et tout le monde est là! La nuit a été calme.");
       if (G.plumeJour) lire.push("Une plume noire a été trouvée sur la porte de " + nomDe(G.plumeJour) + " : il commence le vote avec deux voix contre lui."); }
@@ -386,7 +400,9 @@ function animateur(){
       plus.push(`<div class="lg-obs"><h4>Ce que les observateurs ont vu</h4>${OBS.map((o, i) => `<div class="lg-obs-l"><span>${esc(o)}</span><i style="width:${Math.round(G.obs[i] / mx * 100)}%"></i><b>${G.obs[i]}</b></div>`).join("")}</div>`); }
     if (ph === "debat" && G.maireNouv) plus.push(`<div class="lg-maire">${emb("maire")}<span>${esc(nomDe(G.maireNouv))} est le maire de Val-des-Brumes.</span></div>`);
     if (ph === "successeur" && G.ch[G.maire]) plus.push(`<div class="lg-maire">${emb("maire")}<span>${esc(nomDe(G.ch[G.maire]))} reçoit l'écharpe de maire.</span></div>`);
-    if (ph === "election") { const a = acteurs("election"); plus.push(`<div class="lg-compte"><b>${a.filter(p => G.ch[p]).length}</b> vote${a.filter(p => G.ch[p]).length > 1 ? "s" : ""} sur ${a.length}</div>`); }
+    if (ph === "election" && G.elec !== "vote") plus.push(`<div class="lg-cands"><h4>Candidats</h4>${(G.cands || []).length ? G.cands.map(p => `<span>${emb("maire")}${esc(nomDe(p))}</span>`).join("") : `<em>Personne pour l'instant…</em>`}</div>
+      <div class="lg-chrono"><button id="lgChronoB" class="lg-sec">30 secondes</button><b id="lgChrono"></b></div>`);
+    if (ph === "election" && G.elec === "vote") { const a = acteurs("election"); plus.push(`<div class="lg-compte"><b>${a.filter(p => G.ch[p]).length}</b> vote${a.filter(p => G.ch[p]).length > 1 ? "s" : ""} sur ${a.length}</div><div class="lg-cands">${G.cands.map(p => `<span>${emb("maire")}${esc(nomDe(p))}</span>`).join("")}</div>`); }
     if (ph === "debat") plus.push(`<div class="lg-deb"><div class="lg-minut" id="lgMin"></div><ol class="lg-regles">${REGLES.map(r => `<li>${esc(r)}</li>`).join("")}</ol></div>`);
     if (ph === "vote") { const a = acteurs("vote"); plus.push(`<div class="lg-compte"><b>${a.filter(p => G.ch[p]).length}</b> vote${a.filter(p => G.ch[p]).length > 1 ? "s" : ""} sur ${a.length}</div>`); }
     if (ph === "verdict" && G.votes) plus.push(`<div class="lg-votes">${Object.entries(G.votes).sort((a, b) => b[1] - a[1]).map(([p, v]) => `<span>${esc(nomDe(p))} : ${v}</span>`).join("")}</div>`);
@@ -402,7 +418,7 @@ function animateur(){
   function rendre(){
     const nuit = NUIT.includes(G.ph) || G.ph === "nuit";
     document.body.classList.toggle("nuit", nuit); document.body.classList.toggle("jour", !nuit);
-    const bouton = {lobby: "Distribuer les cartes", cartes: "Commencer la nuit", aube: "Continuer", election: "Proclamer le maire", successeur: "Continuer", debat: "Passer au vote", vote: "Révéler le verdict", verdict: "La nuit suivante", chasseur: "Continuer"}[G.ph] || (G.ph === "corbeau" ? "Lever le jour" : "Étape suivante");
+    const bouton = {lobby: "Distribuer les cartes", cartes: "Commencer la nuit", aube: "Continuer", election: G.elec === "vote" ? "Proclamer le maire" : "Passer au vote du maire", successeur: "Continuer", debat: "Passer au vote", vote: "Révéler le verdict", verdict: "La nuit suivante", chasseur: "Continuer"}[G.ph] || (G.ph === "corbeau" ? "Lever le jour" : "Étape suivante");
     $("lgApp").innerHTML = `<header class="lg-tete"><img src="img/metier-plus.svg" alt="Métier+"><b>Le Loup-Garou de la communication</b><span id="lgRel" class="ko">…</span>
         <button id="lgSon" class="lg-lien">${SON.actif ? "Son : oui" : "Son : non"}</button><a href="labo.html" class="lg-lien">Labo</a><button id="lgNouv" class="lg-lien">Nouvelle partie</button></header>
       <main class="lg-corps"><section class="lg-scene">${scene()}</section><aside class="lg-village">${village()}</aside></main>
@@ -416,6 +432,7 @@ function animateur(){
     document.body.addEventListener("pointerdown", () => SON.reveil(), {once: true});
     /* 22 nov. (« les joueurs ne sont pas déconnectés ») : terminer prévient chaque cellulaire, qui oublie la partie */
     const terminer = () => { R.send({m: "termine", code: G.code}); localStorage.removeItem("lgPartie"); setTimeout(() => location.reload(), 900); };
+    $("lgChronoB") && ($("lgChronoB").onclick = () => { G.chrono = Date.now(); tic(); });
     $("lgNouv").onclick = () => { if (confirm("Terminer cette partie et en commencer une nouvelle? Les cellulaires seront déconnectés.")) terminer(); };
     $("lgFin") && ($("lgFin").onclick = () => { if (confirm("Terminer la partie? Les cellulaires seront déconnectés.")) terminer(); });
     document.querySelectorAll(".lg-x").forEach(b => b.onclick = () => { R.send({m: "v", pid: b.dataset.x, v: {e: "attente", txt: "Tu as été retiré de la partie."}}); delete G.J[b.dataset.x]; sauver(); rendre(); });
@@ -437,13 +454,16 @@ function animateur(){
     relAff(); tic();
   }
   /* Joueurs fictifs (21 nov., « jouer avec des bots ») : ils choisissent au hasard, 3 à 9 s après le début de l'étape */
-  function bots(){ const a = acteurs(G.ph); if (!a) return; let fait = false;
+  function bots(){
+    if (G.ph === "election" && G.elec !== "vote" && Date.now() - G.t0 > 4000 && !G.botsCand) { G.botsCand = 1; vivants().filter(p => G.J[p].bot && Math.random() < .3).forEach(p => G.cands.push(p)); sauver(); rendre(); return; }
+    const a = acteurs(G.ph); if (!a) return; let fait = false;
     a.filter(p => G.J[p] && G.J[p].bot).forEach(p => { if (G.ch[p] != null) return;
       const attente = 3000 + (p.charCodeAt(4) * 977 % 6000); if (Date.now() - G.t0 < attente) return;
       const hasard = (n, filtre) => melanger(vivants().filter(x => x !== p && (!filtre || filtre(x)))).slice(0, n);
       const r = G.J[p].role, ph = G.ph, m = {pid: p, ph};
       if (ph === "cupidon") m.sel = melanger(vivants()).slice(0, 2);
       else if (ph === "loups") m.sel = hasard(1, x => G.J[x].role !== "loup");
+      else if (ph === "election") m.sel = melanger(G.cands.filter(x => G.J[x].vivant)).slice(0, 1);
       else if (ph === "salvateur") m.sel = melanger(vivants().filter(x => x !== G.protPrec)).slice(0, 1);
       else if (ph === "renard") m.sel = hasard(3);
       else if (ph === "sorciere") { if (G.potVie && G.vic && Math.random() < .4) choix({pid: p, ph, a: "vie"}); m.a = "fin"; }
@@ -452,7 +472,8 @@ function animateur(){
     if (fait) { sauver(); rendre(); pousser(); } }
   function ambianceRepr(){ SON.nuit(NUIT.includes(G.ph) || G.ph === "nuit"); }
   function tic(){ bots(); const e = $("lgPret"); if (e) { const a = acteurs(G.ph); e.textContent = a ? (pret() ? "Prêt" : "En attente…") : ""; e.className = pret() ? "ok" : ""; }
-    const mi = $("lgMin"); if (mi) { const r = Math.max(0, (G.debat || 5) * 60 - Math.floor((Date.now() - G.t0) / 1000)); mi.textContent = Math.floor(r / 60) + ":" + String(r % 60).padStart(2, "0"); mi.classList.toggle("fini", !r); if (r > 0 && r <= 10) SON.tic(); } }
+    const mi = $("lgMin"); if (mi) { const r = Math.max(0, (G.debat || 5) * 60 - Math.floor((Date.now() - G.t0) / 1000)); mi.textContent = Math.floor(r / 60) + ":" + String(r % 60).padStart(2, "0"); mi.classList.toggle("fini", !r); if (r > 0 && r <= 10) SON.tic(); }
+    const ch = $("lgChrono"); if (ch) { const r = G.chrono ? Math.max(0, 30 - Math.floor((Date.now() - G.chrono) / 1000)) : null; ch.textContent = r == null ? "" : r ? r + " s" : "Temps écoulé"; ch.classList.toggle("fini", r === 0); if (r && r <= 5) SON.tic(); } }
   setInterval(tic, 1000);
   sauver(); rendre(); pousser();
 }
@@ -495,6 +516,8 @@ function joueur(code){
       case "choix": h = `<h2>${esc(v.t)}</h2><p>${esc(v.x || "")}</p>${v.loups ? `<div class="j-loups">${v.loups.map(l => `<span>${esc(l.n)} → ${esc(l.c)}</span>`).join("")}</div>` : ""}
         <div class="j-opts">${(v.o || []).map(o => `<button class="j-opt${sel.includes(o.p) ? " on" : ""}" data-p="${esc(o.p)}">${esc(o.n)}</button>`).join("")}</div>
         <button id="jOk" class="j-gros" ${sel.length !== v.n ? "disabled" : ""}>${v.libre ? "Envoyer mon choix" : "Confirmer"}</button>${v.passer ? `<button id="jPas" class="j-lien">Personne cette nuit</button>` : ""}`; break;
+      case "cand": h = `<div class="j-dort">${emb("maire", "emb j-lune")}</div><h2>L'élection du maire</h2><p>Veux-tu te présenter? Le maire a une voix qui compte double. Tu auras 30 secondes pour convaincre le village.</p>
+        ${v.on ? `<div class="j-res">Tu es candidat. Prépare ton discours!</div><button id="jCand" class="j-lien">Retirer ma candidature</button>` : `<button id="jCand" class="j-gros">Je me présente</button><p class="j-note">Sinon, écoute les candidats : tu voteras ensuite.</p>`}`; break;
       case "espion": h = `<h2>Les loups choisissent…</h2><p>Tu peux entrouvrir les yeux pour voir un loup-garou. Attention : une fois sur trois, tu te fais prendre et tu deviens leur victime.</p>
         <button id="jEsp" class="j-gros">Entrouvrir les yeux</button><p class="j-note">Ou garde les yeux fermés.</p>`; break;
       case "sorc": h = `<h2>La sorcière</h2><p>${v.vic ? "La victime des loups cette nuit : <b>" + esc(v.vic) + "</b>." : "Les loups n'ont pas fait de victime cette nuit."}</p>
@@ -519,6 +542,7 @@ function joueur(code){
       if (v.n === 1) sel = [p]; else sel = sel.includes(p) ? sel.filter(x => x !== p) : sel.length < v.n ? sel.concat(p) : sel; dessiner(); });
     $("jOk") && ($("jOk").onclick = () => { envoyer({sel}); $("jOk").disabled = true; $("jOk").textContent = "Envoyé"; });
     $("jPas") && ($("jPas").onclick = () => envoyer({sel: []}));
+    $("jCand") && ($("jCand").onclick = () => envoyer({a: "cand"}));
     $("jEsp") && ($("jEsp").onclick = () => envoyer({a: "espion"}));
     $("jVie") && ($("jVie").onclick = () => envoyer({a: "vie"}));
     document.querySelectorAll(".j-opt[data-m]").forEach(b => b.onclick = () => { if (confirm("Éliminer " + b.textContent + "?")) envoyer({a: "mort", sel: [b.dataset.m]}); });

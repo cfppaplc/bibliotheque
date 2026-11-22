@@ -387,3 +387,13 @@ body.photo .ciel-j{opacity:0}
 .lune{transition:background 2s,box-shadow 2s}
 body.ph-loups .lune{background:radial-gradient(circle at 38% 38%,#FFD9C2,#E07A55 60%,#9E3B22);box-shadow:0 0 90px 30px rgba(224,122,85,.35)}
 body.ph-loups .ciel-n{filter:saturate(1.2) hue-rotate(-12deg)}
+
+/* élection du maire */
+.lg-cands{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:12px 0}
+.lg-cands h4{width:100%;margin:0;font-size:14px;color:var(--doux);text-transform:uppercase;letter-spacing:.06em}
+.lg-cands span{display:flex;align-items:center;gap:8px;background:var(--carte);border:1px solid var(--trait);border-radius:12px;padding:8px 16px 8px 10px;font-size:20px;font-weight:700;animation:lgMonte .4s both}
+.lg-cands span .emb{width:30px;height:30px;color:var(--acc)}
+.lg-cands em{color:var(--doux)}
+.lg-chrono{display:flex;align-items:center;gap:18px;margin-top:6px}
+.lg-chrono b{font-size:44px;font-variant-numeric:tabular-nums}
+.lg-chrono b.fini{color:#E0574A;font-size:30px}
