@@ -5,7 +5,7 @@
    C'est une barrière d'usage, pas une protection forte : le code des pages reste lisible. */
 (function(){
   const q = new URLSearchParams(location.search);
-  if (q.get("j") || q.get("panneau") || q.get("ecran") || (q.get("o") && /passeport/.test(location.pathname)) || (q.get("c") && /coffres/.test(location.pathname))) return;   /* passeport.html?o= = élève qui suit la formation d'un outil (14 nov.) */
+  if (q.get("j") || q.get("lg") || q.get("panneau") || q.get("ecran") || (q.get("o") && /passeport/.test(location.pathname)) || (q.get("c") && /coffres/.test(location.pathname))) return;   /* passeport.html?o= = élève qui suit la formation d'un outil (14 nov.) */
   const html = document.documentElement; html.classList.add("garde-attente");
   const st = document.createElement("style");
   st.textContent = "html.garde-attente body{visibility:hidden}#gardeOv{position:fixed;inset:0;z-index:99999;background:#141414;color:#F2EFEA;display:flex;align-items:center;justify-content:center;padding:20px;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;visibility:visible}#gardeOv .bx{max-width:460px;background:#1F1F1F;border:1px solid #333;border-radius:18px;padding:26px;text-align:center}#gardeOv img{height:34px;margin-bottom:14px}#gardeOv h1{font-size:21px;margin:0 0 8px}#gardeOv p{color:#A8A29A;line-height:1.5;margin:0 0 18px}#gardeOv a,#gardeOv button{display:block;width:100%;box-sizing:border-box;border:0;border-radius:12px;padding:14px;font:700 16px system-ui,sans-serif;margin-top:10px;cursor:pointer;text-decoration:none}#gardeOv a{background:#EB6A22;color:#fff}#gardeOv button{background:#2A2A2A;color:#F2EFEA}#gardeOv small{display:block;margin-top:16px;color:#777;font-size:12px}";

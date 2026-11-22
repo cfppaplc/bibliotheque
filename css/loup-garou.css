@@ -1,0 +1,115 @@
+/* © 2026 Jérémy Raymond. Tous droits réservés. Métier+ — Le Loup-Garou de la communication (21 nov.)
+   Nuit = bleu nuit; jour = clair. Pas de zone qui défile dans la page (TNI). */
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;--acc:#EB6A22;--loup:#C8452B;--vil:#3E5C9A;transition:background .6s,color .6s}
+body.nuit{background:#0C1322;color:#E9EDF5;--carte:#16213A;--trait:#2A3858;--doux:#9AA8C4}
+body.jour{background:#F4EFE6;color:#24211E;--carte:#fff;--trait:#DDD4C6;--doux:#6B6359}
+button{font:inherit;cursor:pointer}
+button:disabled{opacity:.45;cursor:default}
+
+/* ---------- TNI ---------- */
+.tni #lgApp{display:flex;flex-direction:column;height:100vh}
+.lg-tete{display:flex;align-items:center;gap:14px;padding:10px 22px;border-bottom:1px solid var(--trait)}
+.lg-tete img{height:30px}
+.nuit .lg-tete img{filter:brightness(0) invert(1)}
+.lg-tete b{font-size:19px;flex:1}
+#lgRel{font-size:13px;color:var(--doux)}
+#lgRel.ok{color:#2EB872}
+#lgRel.ko{color:#E0574A}
+.lg-lien{background:none;border:1px solid var(--trait);color:inherit;border-radius:10px;padding:8px 14px;text-decoration:none;font-size:15px}
+.lg-corps{flex:1;display:grid;grid-template-columns:1fr 290px;gap:22px;padding:18px 22px;min-height:0;overflow:hidden}
+.lg-scene{min-height:0;overflow:hidden}
+.lg-etape{font-size:15px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--acc);margin-bottom:10px}
+.lg-etape small{color:var(--doux);font-weight:600;text-transform:none;letter-spacing:0}
+.lg-lire{margin:0 0 14px;font-size:clamp(20px,2.3vw,30px);line-height:1.38;font-weight:500;animation:lgMonte .6s both}
+.lg-faire{font-size:16px;color:var(--doux);margin:8px 0;line-height:1.4}
+.lg-faire b{color:var(--acc)}
+.lg-village{background:var(--carte);border:1px solid var(--trait);border-radius:16px;padding:14px 16px;min-height:0;overflow:hidden}
+.lg-village h3{margin:0 0 8px;font-size:17px;display:flex;justify-content:space-between}
+.lg-village small{color:var(--doux);font-weight:600}
+.lg-village ul{list-style:none;margin:0;padding:0;columns:2;column-gap:10px}
+.lg-village li{display:flex;align-items:center;gap:6px;padding:5px 0;font-size:16px;font-weight:600;break-inside:avoid}
+.lg-village li.mort span{text-decoration:line-through;opacity:.55}
+.lg-village li em{font-style:normal;font-size:12px;color:var(--acc)}
+.lg-x{margin-left:auto;background:none;border:0;color:var(--doux);font-size:20px;line-height:1;padding:0 4px}
+.lg-bas{display:flex;align-items:center;gap:14px;padding:12px 22px;border-top:1px solid var(--trait)}
+#lgPret{flex:1;font-size:16px;font-weight:700;color:var(--doux)}
+#lgPret.ok{color:#2EB872}
+.lg-go{background:var(--acc);color:#fff;border:0;border-radius:14px;padding:18px 34px;font-size:21px;font-weight:800;min-width:260px}
+.lg-sec{background:none;border:1px solid var(--trait);color:var(--doux);border-radius:12px;padding:14px 18px;font-size:15px;user-select:none;-webkit-user-select:none;touch-action:none}
+#lgSecOv{position:fixed;inset:0;background:rgba(5,8,15,.92);display:flex;align-items:center;justify-content:center;z-index:9}
+#lgSecOv[hidden]{display:none}
+.lg-secb{background:#16213A;color:#fff;border-radius:18px;padding:20px 26px;columns:2;column-gap:30px;font-size:17px;line-height:1.7;max-width:900px}
+.lg-secb h3{column-span:all;margin:0 0 8px;color:var(--acc)}
+.lg-lobby{display:grid;grid-template-columns:auto 1fr;gap:26px;align-items:start}
+.lg-rej{display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center}
+.lg-qrbox{background:#fff;padding:12px;border-radius:16px}
+.lg-qr img,.lg-qr canvas{display:block}
+.lg-url{font-size:15px;line-height:1.5;color:var(--doux)}
+.lg-code{font-size:30px;color:inherit;letter-spacing:.06em}
+.nuit .lg-code{color:#fff}
+.lg-compo{background:var(--carte);border:1px solid var(--trait);border-radius:16px;padding:16px 20px}
+.lg-compo h3{margin:0 0 10px}
+.lg-ligne{display:flex;align-items:center;gap:12px;font-size:18px;font-weight:600;margin:8px 0}
+.lg-ligne span{flex:1}
+.lg-ligne b{min-width:28px;text-align:center;font-size:22px}
+.lg-pm{width:48px;height:48px;border-radius:12px;border:1px solid var(--trait);background:none;color:inherit;font-size:24px}
+.lg-roles{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.lg-chip{border:1px solid var(--trait);background:none;color:var(--doux);border-radius:999px;padding:11px 16px;font-size:16px;font-weight:600}
+.lg-chip.on{background:var(--vil);border-color:var(--vil);color:#fff}
+.lg-note{color:var(--doux);font-size:14px;margin:6px 0 0}
+.lg-morts{display:flex;flex-wrap:wrap;gap:12px;margin:12px 0}
+.lg-mortc{background:var(--carte);border:1px solid var(--trait);border-radius:14px;padding:12px 18px;display:flex;flex-direction:column;gap:2px;animation:lgCarte .7s both}
+.lg-mortc b{font-size:21px}
+.lg-mortc span{font-size:15px;font-weight:700;color:var(--vil)}
+.lg-mortc span.loups{color:var(--loup)}
+.lg-minut{font-size:72px;font-weight:800;font-variant-numeric:tabular-nums;margin:6px 0}
+.lg-minut.fini{color:#E0574A}
+.lg-regles{font-size:20px;line-height:1.6;margin:4px 0;padding-left:28px}
+.lg-compte{font-size:22px;margin:14px 0}
+.lg-compte b{font-size:54px;color:var(--acc)}
+.lg-votes{display:flex;flex-wrap:wrap;gap:8px;font-size:16px}
+.lg-votes span{background:var(--carte);border:1px solid var(--trait);border-radius:10px;padding:6px 12px}
+@keyframes lgMonte{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes lgCarte{from{opacity:0;transform:rotateY(80deg)}to{opacity:1;transform:none}}
+
+/* ---------- Cellulaire ---------- */
+.cel #lgApp{min-height:100vh;display:flex;flex-direction:column}
+.j-tete{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--trait);font-size:17px}
+.j-tete b{flex:1}
+.j-ma{background:var(--acc);color:#fff;border:0;border-radius:12px;padding:11px 16px;font-weight:700;user-select:none;-webkit-user-select:none;touch-action:none;-webkit-touch-callout:none}
+.j-rel{font-size:13px;color:var(--acc)}
+.j-corps{padding:18px 16px 30px;flex:1}
+.j-corps h2{margin:4px 0 10px;font-size:24px}
+.j-corps p{font-size:17px;line-height:1.45;margin:0 0 12px}
+.j-acc{padding:34px 22px;display:flex;flex-direction:column;gap:12px;text-align:center}
+.j-logo{height:34px;margin:0 auto;filter:brightness(0) invert(1)}
+.j-acc h1{margin:8px 0 0;font-size:32px}
+.j-acc p{margin:0;color:var(--doux)}
+.j-acc label{text-align:left;font-size:15px;color:var(--doux);margin-top:14px}
+.j-acc input{font:inherit;font-size:22px;padding:14px;border-radius:12px;border:1px solid var(--trait);background:var(--carte);color:inherit}
+.j-ko{color:#E0574A !important}
+.j-gros{display:block;width:100%;background:var(--acc);color:#fff;border:0;border-radius:14px;padding:17px;font-size:19px;font-weight:800;margin:10px 0}
+.j-gros.j-2{background:var(--vil)}
+.j-lien{background:none;border:0;color:var(--doux);text-decoration:underline;font-size:16px;width:100%;padding:10px}
+.j-opts{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:12px 0}
+.j-opt{background:var(--carte);color:inherit;border:2px solid var(--trait);border-radius:12px;padding:15px 8px;font-size:17px;font-weight:600}
+.j-opt.on{border-color:var(--acc);background:var(--acc);color:#fff}
+.j-loups{display:flex;flex-direction:column;gap:4px;background:rgba(200,69,43,.16);border-radius:12px;padding:10px 14px;font-size:16px}
+.j-tenir{height:46vh;border:2px dashed var(--trait);border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:var(--doux);user-select:none;-webkit-user-select:none;touch-action:none;-webkit-touch-callout:none}
+.j-ov{position:fixed;inset:0;background:rgba(5,8,15,.94);display:flex;align-items:center;justify-content:center;padding:24px;z-index:5;pointer-events:none}
+.j-ov[hidden]{display:none}
+.j-carte{width:100%;max-width:360px;background:#fff;color:#24211E;border-radius:22px;padding:26px 22px;border-top:14px solid var(--vil);animation:lgCarte .35s both}
+.j-carte.loups{border-top-color:var(--loup)}
+.j-carte-r{font-size:32px;font-weight:800;margin-bottom:10px}
+.j-carte.loups .j-carte-r{color:var(--loup)}
+.j-carte p{font-size:17px;line-height:1.45;margin:0 0 10px}
+.j-info{background:#F4EFE6;border-radius:10px;padding:10px 12px;font-weight:600}
+.j-res{font-size:21px;font-weight:700;background:var(--carte);border:1px solid var(--trait);border-radius:16px;padding:18px;margin:10px 0}
+.j-note{color:var(--doux)}
+.j-dort{text-align:center;padding-top:16vh}
+.j-dort h2{font-size:28px}
+.j-regles{font-size:18px;line-height:1.7;padding-left:24px}
+.j-det{margin:12px 0;background:var(--carte);border:1px solid var(--trait);border-radius:12px;padding:12px}
+.j-det summary{font-size:17px;font-weight:700}
