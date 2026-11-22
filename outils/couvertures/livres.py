@@ -15,5 +15,8 @@ L=[
 ('lecture-plans-devis-c6','PLANS','ET DEVIS',"Du plan d'ensemble au montage de la tuyauterie",6,'plc','COMPÉTENCE 6 · 307-443','45','#2F6AA3'),
 ('dispositifs-electriques-c9','DISPOSITIFS','ÉLECTRIQUES',"Commandes des systèmes de chauffage",9,'plc','COMPÉTENCE 9 · 307-478','','#E0A800'),
 ('recherche-emploi-plc','RECHERCHE',"D'EMPLOI","Construction ou hors construction : trouve ta place",21,'plc','COMPÉTENCE 21 · 307-581','15','#C4622D'),
+('reseaux-evacuation-c7','RÉSEAUX',"D'ÉVACUATION","Drainage, évacuation et relevage",7,'plc','COMPÉTENCE 7 · 307-458','120','#7D8F2F'),
+('reseaux-ventilation-c8','RÉSEAUX','DE VENTILATION',"Ventiler le réseau d'évacuation",8,'plc','COMPÉTENCE 8 · 307-468','120','#00897B'),
+('eau-chaude-froide-c11','EAU CHAUDE','ET EAU FROIDE',"Distribution, appareils et accessoires",11,'plc','COMPÉTENCE 11 · 307-498','120','#1E9BD7'),
 ('notions-energie-c13','NOTIONS',"D'ÉNERGIE","De la source d'énergie jusqu'au confort du client",13,'plc','COMPÉTENCE 13 · 307-513','45','#E0457B'),
 ]
