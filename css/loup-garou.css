@@ -380,3 +380,10 @@ body.photo .ciel-j{opacity:0}
 @keyframes lgGris{to{filter:grayscale(.9) brightness(.6)}}
 .j-mort:not(.anim){filter:grayscale(.9) brightness(.6)}
 .lg-rev-h .emb,.j-mort-h .emb{position:absolute!important;z-index:1}
+
+/* 22 nov. : ambiance — brume qui dérive la nuit, lune rouge pendant l'étape des loups */
+.ciel-n::after{content:"";position:absolute;left:-20%;right:-20%;bottom:10vh;height:26vh;background:radial-gradient(ellipse 30% 60% at 20% 60%,rgba(170,185,215,.16),transparent 70%),radial-gradient(ellipse 35% 50% at 70% 50%,rgba(170,185,215,.13),transparent 70%);animation:brume 38s ease-in-out infinite alternate}
+@keyframes brume{to{transform:translateX(12%)}}
+.lune{transition:background 2s,box-shadow 2s}
+body.ph-loups .lune{background:radial-gradient(circle at 38% 38%,#FFD9C2,#E07A55 60%,#9E3B22);box-shadow:0 0 90px 30px rgba(224,122,85,.35)}
+body.ph-loups .ciel-n{filter:saturate(1.2) hue-rotate(-12deg)}

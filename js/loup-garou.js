@@ -125,6 +125,40 @@ function decor(){ if (document.querySelector(".ciel")) return;
     <div class="ciel ciel-p" aria-hidden="true"></div>
     <div class="ciel ciel-j" aria-hidden="true"><i class="soleil"></i><i class="brume"></i><i class="sol" style="background-image:url('${FORET}')"></i></div>`); }
 
+/* ---------- Ambiance sonore du TNI (22 nov., « on doit se sentir là ») : tout est synthétisé (Web Audio), rien à télécharger.
+   Nuit : vent et grillons; loups : hurlement; aube : accord qui monte; révélation : roulement puis coup sourd;
+   fin du débat : tic-tac; verdict : gong. Bouton Son dans l'en-tête. ---------- */
+const SON = (() => {
+  let ac = null, maitre = null, vent = null, grillT = null, actif = true; try { actif = localStorage.getItem("lgSon") !== "0"; } catch(e) {}
+  const ctx = () => { if (!ac) { const A = window.AudioContext || window.webkitAudioContext; if (!A) return null; ac = new A(); maitre = ac.createGain(); maitre.gain.value = .7; maitre.connect(ac.destination); }
+    if (ac.state === "suspended") ac.resume(); return ac; };
+  const bruit = sec => { const b = ac.createBuffer(1, ac.sampleRate * sec, ac.sampleRate), d = b.getChannelData(0); let l = 0;
+    for (let i = 0; i < d.length; i++) { const w = Math.random() * 2 - 1; l = (l + .02 * w) / 1.02; d[i] = l * 3.5; } return b; };
+  const env = (g, t, a, h, r, v) => { g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(v, t + a); g.gain.setValueAtTime(v, t + a + h); g.gain.exponentialRampToValueAtTime(.0001, t + a + h + r); };
+  function nuit(on){ if (!actif || !ctx()) return;
+    if (on && !vent) { const s = ac.createBufferSource(); s.buffer = bruit(6); s.loop = true; const f = ac.createBiquadFilter(); f.type = "lowpass"; f.frequency.value = 420;
+      const lfo = ac.createOscillator(), lg = ac.createGain(); lfo.frequency.value = .08; lg.gain.value = 260; lfo.connect(lg); lg.connect(f.frequency); lfo.start();
+      const g = ac.createGain(); g.gain.value = 0; g.gain.linearRampToValueAtTime(.32, ac.currentTime + 3); s.connect(f); f.connect(g); g.connect(maitre); s.start(); vent = {s, g, lfo};
+      const grillon = () => { if (!vent) return; const t = ac.currentTime; for (let k = 0; k < 3; k++) { const o = ac.createOscillator(), gg = ac.createGain(); o.frequency.value = 4200 + Math.random() * 500;
+        o.connect(gg); gg.connect(maitre); env(gg, t + k * .09, .01, .03, .04, .025); o.start(t + k * .09); o.stop(t + k * .09 + .1); } grillT = setTimeout(grillon, 1200 + Math.random() * 2600); }; grillon(); }
+    if (!on && vent) { const v = vent; vent = null; clearTimeout(grillT); v.g.gain.linearRampToValueAtTime(0, ac.currentTime + 2.5); setTimeout(() => { try { v.s.stop(); v.lfo.stop(); } catch(e) {} }, 2700); } }
+  function hurlement(){ if (!actif || !ctx()) return; const t = ac.currentTime + .1;
+    [0, .35].forEach((d, i) => { const o = ac.createOscillator(), g = ac.createGain(), vib = ac.createOscillator(), vg = ac.createGain(); o.type = "sawtooth";
+      const f = ac.createBiquadFilter(); f.type = "bandpass"; f.frequency.value = 900; f.Q.value = 1.2;
+      o.frequency.setValueAtTime(260 + i * 40, t + d); o.frequency.exponentialRampToValueAtTime(560 + i * 50, t + d + .9); o.frequency.setValueAtTime(560 + i * 50, t + d + 2); o.frequency.exponentialRampToValueAtTime(330, t + d + 3.4);
+      vib.frequency.value = 5.5; vg.gain.value = 9; vib.connect(vg); vg.connect(o.frequency); o.connect(f); f.connect(g); g.connect(maitre); env(g, t + d, .5, 1.6, 1.4, i ? .05 : .09);
+      o.start(t + d); vib.start(t + d); o.stop(t + d + 3.8); vib.stop(t + d + 3.8); }); }
+  function aube(){ if (!actif || !ctx()) return; const t = ac.currentTime + .05;
+    [261.6, 329.6, 392, 523.3].forEach((fq, i) => { const o = ac.createOscillator(), g = ac.createGain(); o.type = "triangle"; o.frequency.value = fq; o.connect(g); g.connect(maitre); env(g, t + i * .25, .8, 1.2, 2, .07); o.start(t + i * .25); o.stop(t + i * .25 + 4.5); }); }
+  function roulement(n){ if (!actif || !ctx()) return; const t = ac.currentTime + .05, b = bruit(.2);
+    for (let k = 0; k < 18; k++) { const s = ac.createBufferSource(), g = ac.createGain(), f = ac.createBiquadFilter(); s.buffer = b; f.type = "bandpass"; f.frequency.value = 180; s.connect(f); f.connect(g); g.connect(maitre); env(g, t + k * .035, .005, .01, .05, .25 + k * .02); s.start(t + k * .035); }
+    for (let i = 0; i < (n || 1); i++) coup(t + .7 + i * .9); }
+  function coup(t){ const o = ac.createOscillator(), g = ac.createGain(); o.frequency.setValueAtTime(120, t); o.frequency.exponentialRampToValueAtTime(42, t + .5); o.connect(g); g.connect(maitre); env(g, t, .005, .05, .8, .6); o.start(t); o.stop(t + 1); }
+  function gong(){ if (!actif || !ctx()) return; const t = ac.currentTime + .05; [110, 164.8, 220.5, 293].forEach((fq, i) => { const o = ac.createOscillator(), g = ac.createGain(); o.frequency.value = fq * (1 + i * .003); o.connect(g); g.connect(maitre); env(g, t, .01, .1, 4.5, .12 / (i + 1)); o.start(t); o.stop(t + 5); }); }
+  function tic(){ if (!actif || !ctx()) return; const t = ac.currentTime, o = ac.createOscillator(), g = ac.createGain(); o.frequency.value = 1800; o.connect(g); g.connect(maitre); env(g, t, .002, .01, .05, .12); o.start(t); o.stop(t + .08); }
+  return {nuit, hurlement, aube, roulement, gong, tic, reveil: () => ctx(), get actif(){ return actif; }, basculer(){ actif = !actif; try { localStorage.setItem("lgSon", actif ? "1" : "0"); } catch(e) {} if (!actif) nuit(false); return actif; }};
+})();
+
 /* =================================== TNI : l'enseignant narrateur =================================== */
 function animateur(){
   document.body.className = "tni"; decor();
@@ -153,7 +187,13 @@ function animateur(){
     if (ph === "chasseur") return [G.chasseur]; if (ph === "successeur") return [G.maire]; return null; }
   function pret(){ const a = acteurs(G.ph); if (!a) return true; if (!a.length) return Date.now() >= G.faux;
     if (G.ph === "sorciere") return a.every(p => G.ch[p] === "fin"); return a.every(p => G.ch[p] != null); }
-  function aller(ph){ G.ph = ph; G.ch = {}; G.t0 = Date.now(); G.faux = Date.now() + 5000 + Math.random() * 6000;   /* rôle mort : « Prêt » arrive quand même, pour ne rien trahir */
+  function ambiance(ph){ const n = NUIT.includes(ph) || ph === "nuit"; SON.nuit(n);
+    document.body.classList.toggle("ph-loups", ph === "loups");
+    if (ph === "loups") setTimeout(SON.hurlement, 600);
+    if (ph === "aube") { SON.aube(); if (G.annonce && G.annonce.length) setTimeout(() => SON.roulement(G.annonce.length), 1200); }
+    if (ph === "verdict") { if (G.annonce && G.annonce.length) SON.roulement(1); else SON.gong(); }
+    if (ph === "chasseur" || ph === "fin") SON.gong(); }
+  function aller(ph){ ambiance(ph); G.ph = ph; G.ch = {}; G.t0 = Date.now(); G.faux = Date.now() + 5000 + Math.random() * 6000;   /* rôle mort : « Prêt » arrive quand même, pour ne rien trahir */
     sauver(); rendre(); pousser(); }
   function prochaineNuit(apres){ const i = apres === "nuit" ? 0 : NUIT.indexOf(apres) + 1;
     for (let k = i; k < NUIT.length; k++) { const ph = NUIT[k], r = ROLE_PH[ph]; if (ph === "cupidon" && G.nuit !== 1) continue; if (r === "loup" || G.enJeu.includes(r)) return ph; }
@@ -364,7 +404,7 @@ function animateur(){
     document.body.classList.toggle("nuit", nuit); document.body.classList.toggle("jour", !nuit);
     const bouton = {lobby: "Distribuer les cartes", cartes: "Commencer la nuit", aube: "Continuer", election: "Proclamer le maire", successeur: "Continuer", debat: "Passer au vote", vote: "Révéler le verdict", verdict: "La nuit suivante", chasseur: "Continuer"}[G.ph] || (G.ph === "corbeau" ? "Lever le jour" : "Étape suivante");
     $("lgApp").innerHTML = `<header class="lg-tete"><img src="img/metier-plus.svg" alt="Métier+"><b>Le Loup-Garou de la communication</b><span id="lgRel" class="ko">…</span>
-        <a href="labo.html" class="lg-lien">Labo</a><button id="lgNouv" class="lg-lien">Nouvelle partie</button></header>
+        <button id="lgSon" class="lg-lien">${SON.actif ? "Son : oui" : "Son : non"}</button><a href="labo.html" class="lg-lien">Labo</a><button id="lgNouv" class="lg-lien">Nouvelle partie</button></header>
       <main class="lg-corps"><section class="lg-scene">${scene()}</section><aside class="lg-village">${village()}</aside></main>
       <footer class="lg-bas">${G.ph === "lobby" ? `<button class="lg-sec" id="lgMJ">Mon écran de maître du jeu (garder appuyé)</button><button class="lg-sec" id="lgBots">Ajouter 4 joueurs fictifs</button>` : `<button id="lgSecret" class="lg-sec">Rôles (garder appuyé)</button>`}<span id="lgPret"></span>
         ${G.ph === "fin" ? `<button id="lgEnc" class="lg-go">Rejouer avec les mêmes joueurs</button>` : `<button id="lgSuiv" class="lg-go" ${G.ph === "lobby" && Object.keys(G.J).length < 5 ? "disabled" : ""}>${bouton}</button>`}</footer>
@@ -372,6 +412,8 @@ function animateur(){
     if (G.ph === "lobby") $("lgApp").querySelector(".lg-qrbox").appendChild(qr());
     $("lgSuiv") && ($("lgSuiv").onclick = suivante);
     $("lgEnc") && ($("lgEnc").onclick = () => { const J = {}; Object.keys(G.J).forEach(p => J[p] = {nom: G.J[p].nom, role: null, vivant: true}); const old = G; G = nouvelle(J); ["code", "compo", "cle", "mjApp", "maireOn", "debat"].forEach(k => G[k] = old[k]); aller("lobby"); });
+    $("lgSon").onclick = () => { SON.reveil(); const a = SON.basculer(); $("lgSon").textContent = a ? "Son : oui" : "Son : non"; if (a) ambianceRepr(); };
+    document.body.addEventListener("pointerdown", () => SON.reveil(), {once: true});
     $("lgNouv").onclick = () => { if (confirm("Commencer une nouvelle partie? La partie en cours sera perdue.")) { localStorage.removeItem("lgPartie"); location.reload(); } };
     document.querySelectorAll(".lg-x").forEach(b => b.onclick = () => { R.send({m: "v", pid: b.dataset.x, v: {e: "attente", txt: "Tu as été retiré de la partie."}}); delete G.J[b.dataset.x]; sauver(); rendre(); });
     const bmj = $("lgMJ"); if (bmj) { const ov = $("lgSecOv"), url = location.href.replace(/[?#].*$/, "") + "?mj=" + G.code + "#k=" + G.cle;
@@ -405,8 +447,9 @@ function animateur(){
       else m.sel = hasard(1);
       if (ph === "renard" && m.sel.length < 3) { G.ch[p] = []; } else choix(m); fait = true; });
     if (fait) { sauver(); rendre(); pousser(); } }
+  function ambianceRepr(){ SON.nuit(NUIT.includes(G.ph) || G.ph === "nuit"); }
   function tic(){ bots(); const e = $("lgPret"); if (e) { const a = acteurs(G.ph); e.textContent = a ? (pret() ? "Prêt" : "En attente…") : ""; e.className = pret() ? "ok" : ""; }
-    const mi = $("lgMin"); if (mi) { const r = Math.max(0, (G.debat || 5) * 60 - Math.floor((Date.now() - G.t0) / 1000)); mi.textContent = Math.floor(r / 60) + ":" + String(r % 60).padStart(2, "0"); mi.classList.toggle("fini", !r); } }
+    const mi = $("lgMin"); if (mi) { const r = Math.max(0, (G.debat || 5) * 60 - Math.floor((Date.now() - G.t0) / 1000)); mi.textContent = Math.floor(r / 60) + ":" + String(r % 60).padStart(2, "0"); mi.classList.toggle("fini", !r); if (r > 0 && r <= 10) SON.tic(); } }
   setInterval(tic, 1000);
   sauver(); rendre(); pousser();
 }
