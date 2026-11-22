@@ -71,9 +71,34 @@ const TXT = {
 };
 const REGLES = ["Reformule avant d'accuser", "Un fait, pas une impression", "Le message « je »", "Un à la fois : lève la main", "Accusé? 30 secondes, voix posée"];
 
+
+/* ---------- Emblèmes (SVG simples, couleur du texte) et décor ciel / forêt / village ---------- */
+const EMB = {
+  loup: '<path d="M10 6l13 15h18L54 6l-2 26c0 13-9 24-20 24S12 45 12 32z" fill="currentColor"/><path d="M22 33l7 3-7 2zM42 33l-7 3 7 2z" fill="#0C1322"/><path d="M27 46h10l-5 6z" fill="#0C1322"/>',
+  villageois: '<path d="M8 30L32 10l24 20v26H8z" fill="currentColor"/><path d="M27 56V40h10v16z" fill="#0C1322"/><path d="M14 36h8v7h-8zM42 36h8v7h-8z" fill="#0C1322" opacity=".6"/>',
+  voyante: '<path d="M4 32C14 16 50 16 60 32 50 48 14 48 4 32z" fill="currentColor"/><circle cx="32" cy="32" r="10" fill="#0C1322"/><circle cx="35" cy="29" r="3" fill="currentColor"/>',
+  sorciere: '<path d="M25 6h14v5h-2v12l13 22a8 8 0 0 1-7 12H21a8 8 0 0 1-7-12l13-22V11h-2z" fill="currentColor"/><path d="M19 44h26l3 6a3 3 0 0 1-3 4H19a3 3 0 0 1-3-4z" fill="#0C1322" opacity=".45"/>',
+  chasseur: '<circle cx="32" cy="32" r="24" fill="none" stroke="currentColor" stroke-width="6"/><circle cx="32" cy="32" r="11" fill="none" stroke="currentColor" stroke-width="5"/><path d="M32 2v18M32 44v18M2 32h18M44 32h18" stroke="currentColor" stroke-width="5"/>',
+  cupidon: '<path d="M32 56S8 42 8 24a12 12 0 0 1 24-4 12 12 0 0 1 24 4c0 18-24 32-24 32z" fill="currentColor"/><path d="M6 58L54 10M46 10h8v8" stroke="#0C1322" stroke-width="4" fill="none"/>',
+  corbeau: '<path d="M50 6C24 10 12 30 14 54l8-8c0-8 4-14 10-18-4 6-6 12-6 18 14-4 24-22 24-40z" fill="currentColor"/><path d="M14 54L8 60" stroke="currentColor" stroke-width="4"/>',
+  renard: '<path d="M6 8l16 13h20L58 8l-4 24-22 26L10 32z" fill="currentColor"/><path d="M32 58L22 40h20z" fill="#0C1322" opacity=".35"/><circle cx="24" cy="31" r="3" fill="#0C1322"/><circle cx="40" cy="31" r="3" fill="#0C1322"/>',
+  petite: '<circle cx="32" cy="20" r="12" fill="currentColor"/><path d="M20 18c-6 4-8 12-4 18M44 18c6 4 8 12 4 18" stroke="currentColor" stroke-width="4" fill="none"/><path d="M32 34l16 26H16z" fill="currentColor"/>',
+  nuit: '<path d="M40 6a26 26 0 1 0 18 40A22 22 0 0 1 40 6z" fill="currentColor"/>',
+  jour: '<circle cx="32" cy="32" r="13" fill="currentColor"/><g stroke="currentColor" stroke-width="4" stroke-linecap="round"><path d="M32 4v8M32 52v8M4 32h8M52 32h8M12 12l6 6M46 46l6 6M12 52l6-6M46 18l6-6"/></g>',
+  debat: '<path d="M6 10h34v22H20l-8 8v-8H6z" fill="currentColor"/><path d="M26 30h32v20h-6v8l-8-8H26z" fill="currentColor" opacity=".55"/>',
+  vote: '<path d="M8 30h48v26H8z" fill="currentColor"/><path d="M22 34h20" stroke="#0C1322" stroke-width="4"/><path d="M20 8h24v20H20z" fill="currentColor" opacity=".6"/>'
+};
+const emb = (k, cls) => `<svg class="${cls || "emb"}" viewBox="0 0 64 64" aria-hidden="true">${EMB[k] || EMB.nuit}</svg>`;
+const EMB_PH = {lobby: "nuit", cartes: "nuit", nuit: "nuit", cupidon: "cupidon", voyante: "voyante", renard: "renard", loups: "loup", sorciere: "sorciere", corbeau: "corbeau", aube: "jour", debat: "debat", vote: "vote", verdict: "vote", chasseur: "chasseur", fin: "jour"};
+const FORET = "data:image/svg+xml," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 160" preserveAspectRatio="none"><path fill="#05080F" d="M0 160V96l30-50 30 50 22-70 24 70 30-44 28 44 26-80 26 80 30-56 26 56 24-66 28 66 30-40 26 40 28-74 28 74 24-50 30 50 26-84 26 84 30-46 28 46 24-62 28 62 30-52 26 52 28-76 28 76 26-44 30 44 24-66 26 66 28-50 30 50 26-80 28 80 24-48 30 48 26-60 28 60 30-46 26 46 28-72 28 72 24-40 26 40V160z"/></svg>');
+const VILLAGE = "data:image/svg+xml," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 140" preserveAspectRatio="none"><path fill="#D9C7A8" d="M0 140V90l60-40 60 40v-20l50-36 50 36V90h40l70-54 70 54V70l40-30 40 30v30h60l60-46 60 46v-24l50-36 50 36v34h50l60-50 60 50v-16l40-28 40 28v86z"/><path fill="#E6D8BE" d="M0 140v-26h1200v26z"/></svg>');
+function decor(){ if (document.querySelector(".ciel")) return;
+  document.body.insertAdjacentHTML("afterbegin", `<div class="ciel ciel-n" aria-hidden="true"><i class="etoiles"></i><i class="lune"></i><i class="sol" style="background-image:url('${FORET}')"></i></div>
+    <div class="ciel ciel-j" aria-hidden="true"><i class="soleil"></i><i class="sol" style="background-image:url('${VILLAGE}')"></i></div>`); }
+
 /* =================================== TNI : l'enseignant narrateur =================================== */
 function animateur(){
-  document.body.className = "tni";
+  document.body.className = "tni"; decor();
   let G = null; try { const s = JSON.parse(localStorage.getItem("lgPartie")); if (s && s.code && Date.now() - (s.maj || 0) < 4 * 3600e3) G = s; } catch(e) {}
   if (!G) G = nouvelle();
   function nouvelle(J){ return {code: String(Math.floor(100000 + Math.random() * 900000)), ph: "lobby", J: J || {}, nuit: 0, compo: null, enJeu: [], potVie: true, potMort: true, flair: true,
@@ -212,7 +237,7 @@ function animateur(){
   let qrEl = null;
   function qr(){ if (qrEl) return qrEl; qrEl = document.createElement("div"); qrEl.className = "lg-qr";
     try { new QRCode(qrEl, {text: URLJ, width: 230, height: 230, correctLevel: QRCode.CorrectLevel.M}); } catch(e) { qrEl.textContent = URLJ; } return qrEl; }
-  function carteMort(p){ const r = ROLES[G.J[p].role]; return `<div class="lg-mortc"><b>${esc(nomDe(p))}</b><span class="${r.camp}">${esc(r.n)}</span></div>`; }
+  function carteMort(p, i){ const r = ROLES[G.J[p].role]; return `<div class="lg-mortc ${r.camp}" style="animation-delay:${(i || 0) * .25}s">${emb(G.J[p].role)}<b>${esc(nomDe(p))}</b><span>${esc(r.n)}</span></div>`; }
   function scene(){
     const ph = G.ph, c = compo(), n = Object.keys(G.J).length;
     if (ph === "lobby") {
@@ -237,7 +262,7 @@ function animateur(){
     if (ph === "verdict" && G.votes) plus.push(`<div class="lg-votes">${Object.entries(G.votes).sort((a, b) => b[1] - a[1]).map(([p, v]) => `<span>${esc(nomDe(p))} : ${v}</span>`).join("")}</div>`);
     if (ph === "chasseur" && G.ch[G.chasseur]) plus.push(`<div class="lg-morts">${carteMort(G.ch[G.chasseur])}</div>`);
     if (ph === "fin") plus.push(`<div class="lg-morts">${Object.keys(G.J).map(carteMort).join("")}</div><p class="lg-faire">Passe ensuite au retour sur l'atelier (livre Communiquer, annexe D) pendant que tout est frais.</p>`);
-    return `<div class="lg-etape">${esc(NOM_PH[ph])}${G.nuit && ph !== "fin" ? ` <small>· nuit ${G.nuit}</small>` : ""}</div>
+    return `<div class="lg-tit">${emb(EMB_PH[ph], "emb lg-emb")}<div class="lg-etape">${esc(NOM_PH[ph])}${G.nuit && ph !== "fin" ? ` <small>· nuit ${G.nuit}</small>` : ""}</div></div>
       ${lire.map(x => `<blockquote class="lg-lire">« ${esc(x)} »</blockquote>`).join("")}
       ${t && t[1] ? `<p class="lg-faire"><b>À faire</b> · ${esc(t[1])}</p>` : ""}${plus.join("")}`;
   }
@@ -275,7 +300,7 @@ function animateur(){
 
 /* =================================== Cellulaire de l'élève =================================== */
 function joueur(code){
-  document.body.className = "cel nuit";
+  document.body.className = "cel nuit"; decor();
   const cle = "lg:" + code; let moi = null; try { moi = JSON.parse(localStorage.getItem(cle)); } catch(e) {}
   let derV = null, sel = [], dernier = Date.now(), entre = false;
   const app = $("lgApp");
@@ -294,14 +319,14 @@ function joueur(code){
   function veille(){ const ev = () => { try { if (navigator.wakeLock && !document.hidden) navigator.wakeLock.request("screen").catch(() => {}); } catch(e) {} }; ev();
     document.addEventListener("visibilitychange", () => { ev(); if (!document.hidden) annoncer(); });
     setInterval(() => { if (!document.hidden && Date.now() - dernier > 25000) { dernier = Date.now() - 10000; R.rebrancher(); annoncer(); } }, 5000); }
-  function carteHtml(v){ const r = ROLES[v.role]; return `<div class="j-carte ${r.camp}"><div class="j-carte-r">${esc(r.n)}</div><p>${esc(r.d)}</p>${(v.info || []).map(x => `<p class="j-info">${esc(x)}</p>`).join("")}</div>`; }
+  function carteHtml(v){ const r = ROLES[v.role]; return `<div class="j-carte ${r.camp}"><div class="j-carte-h">${emb(v.role, "emb j-emb")}</div><div class="j-carte-r">${esc(r.n)}</div><p>${esc(r.d)}</p>${(v.info || []).map(x => `<p class="j-info">${esc(x)}</p>`).join("")}</div>`; }
   function dessiner(){
     const v = derV || {}; const nuit = !(v.e === "jour" || v.e === "fin" || v.e === "attente");
     document.body.classList.toggle("nuit", nuit); document.body.classList.toggle("jour", !nuit);
     let h = "";
     switch (v.e) {
-      case "carte": h = `<h2>Ta carte</h2><p>Garde le doigt sur la carte pour voir ton rôle. Ne la montre à personne.</p><div class="j-tenir" id="jTenir"><span>Garder appuyé</span></div>`; break;
-      case "nuit": h = `<div class="j-dort"><h2>Le village dort</h2><p>Garde la tête baissée et ne regarde pas l'écran des autres.</p></div>`; break;
+      case "carte": h = `<h2>Ta carte</h2><p>Garde le doigt sur la carte pour voir ton rôle. Ne la montre à personne.</p><div class="j-tenir" id="jTenir">${emb("nuit", "emb j-dos")}<span>Garder appuyé</span></div>`; break;
+      case "nuit": h = `<div class="j-dort">${emb("nuit", "emb j-lune")}<h2>Le village dort</h2><p>Garde la tête baissée et ne regarde pas l'écran des autres.</p></div>`; break;
       case "choix": h = `<h2>${esc(v.t)}</h2><p>${esc(v.x || "")}</p>${v.loups ? `<div class="j-loups">${v.loups.map(l => `<span>${esc(l.n)} → ${esc(l.c)}</span>`).join("")}</div>` : ""}
         <div class="j-opts">${(v.o || []).map(o => `<button class="j-opt${sel.includes(o.p) ? " on" : ""}" data-p="${esc(o.p)}">${esc(o.n)}</button>`).join("")}</div>
         <button id="jOk" class="j-gros" ${sel.length !== v.n ? "disabled" : ""}>${v.libre ? "Envoyer mon choix" : "Confirmer"}</button>${v.passer ? `<button id="jPas" class="j-lien">Personne cette nuit</button>` : ""}`; break;
@@ -313,8 +338,8 @@ function joueur(code){
         <button id="jFin" class="j-gros j-2">Terminer</button>`; break;
       case "res": h = `<h2>${esc(v.t)}</h2><div class="j-res">${esc(v.x)}</div><p class="j-note">Garde la tête baissée.</p>`; break;
       case "jour": h = `<h2>${esc(v.t || "Le jour")}</h2>${v.regles ? `<ol class="j-regles">${v.regles.map(r => `<li>${esc(r)}</li>`).join("")}</ol>` : `<p>${esc(v.x || "")}</p>`}`; break;
-      case "mort": h = `<h2>Tu es éliminé</h2><p>Reste dans le jeu en silence : tu ne peux plus parler ni voter. Observe le non-verbal des autres.</p>`; break;
-      case "fin": h = `<h2>${v.g === "village" ? "Le village a gagné" : "Les loups ont gagné"}</h2><p class="j-res">${v.gagne ? "Ton camp a gagné." : "Ton camp a perdu."}</p>`; break;
+      case "mort": h = `<div class="j-dort">${emb(v.role || "nuit", "emb j-lune")}</div><h2>Tu es éliminé</h2><p>Reste dans le jeu en silence : tu ne peux plus parler ni voter. Observe le non-verbal des autres.</p>`; break;
+      case "fin": h = `${emb(v.g === "village" ? "villageois" : "loup", "emb j-lune")}<h2>${v.g === "village" ? "Le village a gagné" : "Les loups ont gagné"}</h2><p class="j-res">${v.gagne ? "Ton camp a gagné." : "Ton camp a perdu."}</p>`; break;
       default: h = `<h2>${esc(v.t || "Bienvenue")}</h2><p>${esc(v.txt || "Regarde le tableau.")}</p>`;
     }
     app.innerHTML = `<header class="j-tete"><b>${esc(moi.nom)}</b>${v.role ? `<button id="jMa" class="j-ma">Ma carte</button>` : ""}<span id="jRel" class="j-rel" hidden>Reconnexion…</span></header>
