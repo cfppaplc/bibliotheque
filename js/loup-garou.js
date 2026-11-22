@@ -82,6 +82,7 @@ const TXT = {
   vote: ["Le temps est écoulé. Votez maintenant sur votre cellulaire pour la personne que vous voulez chasser du village.", "Quand tout le monde a voté, passe à l'étape suivante pour révéler le verdict."],
   chasseur: ["Le chasseur, dans un dernier souffle, lève son arme… Qui emportes-tu avec toi?", "Le chasseur choisit sur son cellulaire."]
 };
+const OBS = ["A reformulé avant d'accuser", "A appuyé son accusation sur un fait", "A utilisé un message « je »", "A coupé la parole", "A gardé son calme une fois accusé", "A trahi son rôle par son non-verbal"];   /* grille des observateurs (livre, annexe D) */
 const REGLES = ["Reformule avant d'accuser", "Un fait, pas une impression", "Le message « je »", "Un à la fois : lève la main", "Accusé? 30 secondes, voix posée"];
 
 
@@ -204,6 +205,7 @@ function animateur(){
         else if (G.ph === "lobby") G.J[m.pid] = {nom, role: null, vivant: true};
         else { R.send({m: "v", pid: m.pid, v: {e: "attente", txt: "La partie est déjà commencée. Tu joueras à la prochaine."}}); return; } }
       G.J[m.pid].vu = Date.now(); delete DER[m.pid]; sauver(); rendre(); pousser(m.pid); return; }
+    if (m.m === "obs" && G.J[m.pid] && !G.J[m.pid].vivant && OBS[m.b] && G.ph !== "fin") { G.obs = G.obs || OBS.map(() => 0); G.obs[m.b] = Math.max(0, G.obs[m.b] + (m.d < 0 ? -1 : 1)); sauver(); return; }
     if (m.m === "ch" && m.ph === G.ph) { choix(m); sauver(); rendre(); pousser(); }
   }
   function choix(m){ const p = G.J[m.pid], sel = (m.sel || []).filter(x => G.J[x]); if (!p) return; const r = p.role, vit = x => G.J[x] && G.J[x].vivant;
@@ -250,7 +252,7 @@ function animateur(){
     if (G.ph === "fin") return V({e: "fin", g: G.gagnant, gagne: (ROLES[p.role].camp === "loups") === (G.gagnant === "loups")});
     if (G.ph === "chasseur" && pid === G.chasseur) return G.ch[pid] ? V({e: "res", t: "Tu as tiré", x: "Regarde le tableau."}) : V({e: "choix", t: "Ton dernier tir", x: "Qui emportes-tu avec toi?", o: opts(pid), n: 1});
     if (G.ph === "successeur" && pid === G.maire) return G.ch[pid] ? V({e: "res", t: "L'écharpe est donnée", x: "Regarde le tableau."}) : V({e: "choix", t: "Ton successeur", x: "Qui sera le prochain maire?", o: opts(pid), n: 1});
-    if (!p.vivant) return V({e: "mort"});
+    if (!p.vivant) return V({e: "mort", obs: ["aube", "election", "debat", "vote", "verdict", "chasseur", "successeur"].includes(G.ph)});
     if (G.ph === "cartes") return V({e: "carte"});
     if (NUIT.includes(G.ph) || G.ph === "nuit") {
       const r = p.role, ph = G.ph, res = G.res[pid];
@@ -330,6 +332,8 @@ function animateur(){
     if (t) lire.push(t[0]);
     if ((ph === "aube" || ph === "verdict") && G.annonce.length) plus.push(`<div class="lg-revs">${G.annonce.map(carteRev).join("")}</div>`);
     if (ph === "aube" || ph === "verdict") { if (G.amour.length && G.annonce.length > 1 && G.annonce.some(p => G.amour.includes(p))) plus.push(`<p class="lg-faire">Un amoureux est mort de chagrin.</p>`); }
+    if (ph === "fin" && G.obs && G.obs.some(x => x)) { const mx = Math.max(...G.obs);
+      plus.push(`<div class="lg-obs"><h4>Ce que les observateurs ont vu</h4>${OBS.map((o, i) => `<div class="lg-obs-l"><span>${esc(o)}</span><i style="width:${Math.round(G.obs[i] / mx * 100)}%"></i><b>${G.obs[i]}</b></div>`).join("")}</div>`); }
     if (ph === "debat" && G.maireNouv) plus.push(`<div class="lg-maire">${emb("maire")}<span>${esc(nomDe(G.maireNouv))} est le maire de Val-des-Brumes.</span></div>`);
     if (ph === "successeur" && G.ch[G.maire]) plus.push(`<div class="lg-maire">${emb("maire")}<span>${esc(nomDe(G.ch[G.maire]))} reçoit l'écharpe de maire.</span></div>`);
     if (ph === "election") { const a = acteurs("election"); plus.push(`<div class="lg-compte"><b>${a.filter(p => G.ch[p]).length}</b> vote${a.filter(p => G.ch[p]).length > 1 ? "s" : ""} sur ${a.length}</div>`); }
@@ -337,7 +341,7 @@ function animateur(){
     if (ph === "vote") { const a = acteurs("vote"); plus.push(`<div class="lg-compte"><b>${a.filter(p => G.ch[p]).length}</b> vote${a.filter(p => G.ch[p]).length > 1 ? "s" : ""} sur ${a.length}</div>`); }
     if (ph === "verdict" && G.votes) plus.push(`<div class="lg-votes">${Object.entries(G.votes).sort((a, b) => b[1] - a[1]).map(([p, v]) => `<span>${esc(nomDe(p))} : ${v}</span>`).join("")}</div>`);
     if (ph === "chasseur" && G.ch[G.chasseur]) plus.push(`<div class="lg-revs">${carteRev(G.ch[G.chasseur])}</div>`);
-    if (ph === "fin") plus.push(`<div class="lg-morts">${Object.keys(G.J).map(carteMort).join("")}</div><p class="lg-faire">Passe ensuite au retour sur l'atelier (livre Communiquer, annexe D) pendant que tout est frais.</p>`);
+    if (ph === "fin") plus.push(`<div class="lg-morts lg-fin">${Object.keys(G.J).map(carteMort).join("")}</div><p class="lg-faire">Passe ensuite au retour sur l'atelier (livre Communiquer, annexe D) pendant que tout est frais.</p>`);
     return `<div class="lg-tit">${emb(EMB_PH[ph], "emb lg-emb")}<div class="lg-etape">${esc(NOM_PH[ph])}${G.nuit && ph !== "fin" ? ` <small>· ${NUIT.includes(ph) || ph === "nuit" ? "nuit" : "jour"} ${G.nuit}</small>` : ""}</div></div>
       ${lire.map(x => `<blockquote class="lg-lire">« ${esc(x)} »</blockquote>`).join("")}
       ${t && t[1] ? `<p class="lg-faire"><b>À faire</b> · ${esc(t[1])}</p>` : ""}${plus.join("")}`;
@@ -418,6 +422,7 @@ function joueur(code){
   function veille(){ const ev = () => { try { if (navigator.wakeLock && !document.hidden) navigator.wakeLock.request("screen").catch(() => {}); } catch(e) {} }; ev();
     document.addEventListener("visibilitychange", () => { ev(); if (!document.hidden) annoncer(); });
     setInterval(() => { if (!document.hidden && Date.now() - dernier > 25000) { dernier = Date.now() - 10000; R.rebrancher(); annoncer(); } }, 5000); }
+  const OBSN = [], OBSH = [];
   function carteHtml(v){ const r = ROLES[v.role]; return `<div class="j-carte ${r.camp}"><div class="j-carte-h">${emb(v.role, "emb j-emb")}</div><div class="j-carte-r">${esc(r.n)}</div><p>${esc(r.d)}</p>${(v.info || []).map(x => `<p class="j-info">${esc(x)}</p>`).join("")}</div>`; }
   function dessiner(){
     const v = derV || {}; const nuit = !(v.e === "jour" || v.e === "fin" || v.e === "attente");
@@ -438,7 +443,8 @@ function joueur(code){
       case "res": h = `<h2>${esc(v.t)}</h2><div class="j-res">${esc(v.x)}</div><p class="j-note">Referme les yeux.</p>`; break;
       case "jour": h = `<h2>${esc(v.t || "Le jour")}</h2>${v.regles ? `<ol class="j-regles">${v.regles.map(r => `<li>${esc(r)}</li>`).join("")}</ol>` : `<p>${esc(v.x || "")}</p>`}`; break;
       case "mort": { const anim = !dessiner.mortVu; dessiner.mortVu = true; const r = ROLES[v.role] || ROLES.villageois;
-        h = `<div class="j-mort ${r.camp}${anim ? " anim" : ""}"><div class="j-mort-h">${emb(v.role, "emb j-mort-r")}${emb("mort", "emb j-mort-m")}</div><b>${esc(r.n)}</b></div><h2>Tu es éliminé</h2><p>Reste dans le jeu en silence : tu ne peux plus parler ni voter. Observe le non-verbal des autres.</p>`; break; }
+        h = `<div class="j-mort ${r.camp}${anim ? " anim" : ""}"><div class="j-mort-h">${emb(v.role, "emb j-mort-r")}${emb("mort", "emb j-mort-m")}</div><b>${esc(r.n)}</b></div><h2>Tu es éliminé</h2><p>Reste dans le jeu en silence : tu ne peux plus parler ni voter. Observe le non-verbal des autres.</p>${v.obs ? `<div class="j-obs"><h3>Ta grille d'observateur</h3><p>Touche un comportement chaque fois que tu le vois. Pas de noms : on compte pour le village.</p>
+          ${OBS.map((o, i) => `<button class="j-obs-b" data-o="${i}"><span>${esc(o)}</span><b>${OBSN[i] || 0}</b></button>`).join("")}<button class="j-lien" id="jObsA">Annuler mon dernier toucher</button></div>` : ""}`; break; }
       case "fin": h = `${emb(v.g === "village" ? "villageois" : "loup", "emb j-lune")}<h2>${v.g === "village" ? "Le village a gagné" : "Les loups ont gagné"}</h2><p class="j-res">${v.gagne ? "Ton camp a gagné." : "Ton camp a perdu."}</p>`; break;
       default: h = `<h2>${esc(v.t || "Bienvenue")}</h2><p>${esc(v.txt || "Regarde le tableau.")}</p>`;
     }
@@ -455,6 +461,9 @@ function joueur(code){
     $("jEsp") && ($("jEsp").onclick = () => envoyer({a: "espion"}));
     $("jVie") && ($("jVie").onclick = () => envoyer({a: "vie"}));
     document.querySelectorAll(".j-opt[data-m]").forEach(b => b.onclick = () => { if (confirm("Éliminer " + b.textContent + "?")) envoyer({a: "mort", sel: [b.dataset.m]}); });
+    document.querySelectorAll(".j-obs-b").forEach(b => b.onclick = () => { const i = +b.dataset.o; OBSN[i] = (OBSN[i] || 0) + 1; OBSH.push(i); R.send({m: "obs", pid: moi.pid, b: i, d: 1});
+      b.querySelector("b").textContent = OBSN[i]; b.classList.remove("pop"); void b.offsetWidth; b.classList.add("pop"); });
+    $("jObsA") && ($("jObsA").onclick = () => { const i = OBSH.pop(); if (i == null) return; OBSN[i]--; R.send({m: "obs", pid: moi.pid, b: i, d: -1}); dessiner(); });
     $("jFin") && ($("jFin").onclick = () => envoyer({a: "fin"}));
   }
   const ph = () => (derV && derV.ph) || "";   /* le TNI refuse un choix d'une autre étape */

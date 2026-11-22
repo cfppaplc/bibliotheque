@@ -236,3 +236,26 @@ body.nuit .ciel-j,body.jour .ciel-n{opacity:0}
 .j-mort.anim .j-mort-h{filter:none;animation:lgGris 1s ease 1.8s forwards}
 .j-mort.anim .j-mort-r{opacity:1;animation:lgFond 1.1s ease 1.2s forwards}
 .j-mort.anim .j-mort-m{opacity:0;animation:lgCrane 1.1s ease 1.2s forwards}
+
+/* grille des observateurs (éliminés) */
+.j-obs{margin-top:16px}
+.j-obs h3{margin:0 0 4px;font-size:19px}
+.j-obs p{font-size:15px;color:var(--doux)}
+.j-obs-b{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:var(--carte);color:inherit;border:1px solid var(--trait);border-radius:12px;padding:14px;margin:7px 0;font-size:16px;font-weight:600}
+.j-obs-b span{flex:1}
+.j-obs-b b{min-width:34px;height:34px;border-radius:10px;background:var(--acc);color:#fff;display:flex;align-items:center;justify-content:center;font-size:17px}
+.j-obs-b.pop b{animation:jPop .3s}
+@keyframes jPop{50%{transform:scale(1.35)}}
+.j-mort+h2{margin-top:0}
+.lg-obs{margin:14px 0;max-width:720px}
+.lg-obs h4{margin:0 0 8px;font-size:15px;color:var(--doux);text-transform:uppercase;letter-spacing:.06em}
+.lg-obs-l{display:grid;grid-template-columns:330px 1fr 40px;align-items:center;gap:10px;font-size:16px;margin:5px 0}
+.lg-obs-l i{display:block;height:14px;border-radius:7px;background:var(--acc);min-width:4px}
+.lg-obs-l b{text-align:right}
+.lg-fin{gap:8px;margin:8px 0}
+.lg-fin .lg-mortc{padding:6px 12px 6px 8px;column-gap:8px;border-radius:10px}
+.lg-fin .lg-mortc b{font-size:16px}
+.lg-fin .lg-mortc span{font-size:13px}
+.lg-fin .lg-mortc .emb{width:28px;height:28px}
+.lg-obs-l{font-size:15px;margin:2px 0;grid-template-columns:300px 1fr 34px}
+.lg-obs-l i{height:11px}
