@@ -333,7 +333,7 @@ function animateur(){
     if (ph === "debat" && G.maireNouv) plus.push(`<div class="lg-maire">${emb("maire")}<span>${esc(nomDe(G.maireNouv))} est le maire de Val-des-Brumes.</span></div>`);
     if (ph === "successeur" && G.ch[G.maire]) plus.push(`<div class="lg-maire">${emb("maire")}<span>${esc(nomDe(G.ch[G.maire]))} reçoit l'écharpe de maire.</span></div>`);
     if (ph === "election") { const a = acteurs("election"); plus.push(`<div class="lg-compte"><b>${a.filter(p => G.ch[p]).length}</b> vote${a.filter(p => G.ch[p]).length > 1 ? "s" : ""} sur ${a.length}</div>`); }
-    if (ph === "debat") plus.push(`<div class="lg-minut" id="lgMin"></div><ol class="lg-regles">${REGLES.map(r => `<li>${esc(r)}</li>`).join("")}</ol>`);
+    if (ph === "debat") plus.push(`<div class="lg-deb"><div class="lg-minut" id="lgMin"></div><ol class="lg-regles">${REGLES.map(r => `<li>${esc(r)}</li>`).join("")}</ol></div>`);
     if (ph === "vote") { const a = acteurs("vote"); plus.push(`<div class="lg-compte"><b>${a.filter(p => G.ch[p]).length}</b> vote${a.filter(p => G.ch[p]).length > 1 ? "s" : ""} sur ${a.length}</div>`); }
     if (ph === "verdict" && G.votes) plus.push(`<div class="lg-votes">${Object.entries(G.votes).sort((a, b) => b[1] - a[1]).map(([p, v]) => `<span>${esc(nomDe(p))} : ${v}</span>`).join("")}</div>`);
     if (ph === "chasseur" && G.ch[G.chasseur]) plus.push(`<div class="lg-morts">${carteMort(G.ch[G.chasseur])}</div>`);
