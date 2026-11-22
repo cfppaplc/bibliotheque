@@ -169,3 +169,21 @@ body.nuit .ciel-j,body.jour .ciel-n{opacity:0}
 .j-carte p:last-child{margin-bottom:22px}
 .j-opt{background:var(--carte)}
 .j-res{font-family:Georgia,"Times New Roman",serif}
+
+/* jeu de nuit : étoiles à toucher vite (points) */
+.j-dort2{padding-top:4vh}
+.j-jeu{margin-top:10px}
+.j-pts{text-align:center;font-size:16px;color:#F2E2B3;min-height:24px}
+.j-ciel{position:relative;height:36vh;margin-top:6px;border-radius:18px;background:rgba(255,255,255,.03)}
+.j-etoile{position:absolute;width:72px;height:72px;padding:8px;border:0;border-radius:50%;background:rgba(242,226,179,.12);color:#F2E2B3;animation:jApp .25s both;transition:transform .35s,opacity .35s}
+.j-etoile svg{width:100%;height:100%;display:block}
+.j-etoile.prise{animation:jPris .35s both}
+@keyframes jPris{to{transform:scale(1.8);opacity:0}}
+@keyframes jApp{from{transform:scale(.2);opacity:0}to{transform:none;opacity:1}}
+.lg-vifs{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:16px 0;font-size:17px}
+.lg-vifs h4{width:100%;margin:0;font-size:15px;color:var(--doux);text-transform:uppercase;letter-spacing:.06em}
+.lg-vifs span{background:var(--carte);border:1px solid var(--trait);border-radius:12px;padding:8px 14px}
+.lg-vifs b{color:var(--acc);margin-right:4px}
+.lg-vifs em{font-style:normal;color:var(--doux);margin-left:6px}
+.lg-bots{margin-top:12px;font-size:14px}
+.lg-village small{font-weight:500;color:var(--doux)}

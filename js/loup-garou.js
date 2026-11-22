@@ -169,6 +169,8 @@ function animateur(){
         else if (G.ph === "lobby") G.J[m.pid] = {nom, role: null, vivant: true};
         else { R.send({m: "v", pid: m.pid, v: {e: "attente", txt: "La partie est déjà commencée. Tu joueras à la prochaine."}}); return; } }
       G.J[m.pid].vu = Date.now(); delete DER[m.pid]; sauver(); rendre(); pousser(m.pid); return; }
+    if (m.m === "pts" && G.J[m.pid] && m.ph === G.ph && m.nuit === G.nuit) { G.pts = G.pts || {}; G.ptsVu = G.ptsVu || {}; const k = m.pid + ":" + m.ph + ":" + m.nuit;
+      if (!G.ptsVu[k]) { G.ptsVu[k] = 1; G.pts[m.pid] = (G.pts[m.pid] || 0) + Math.max(0, Math.min(300, +m.p || 0)); sauver(); } return; }
     if (m.m === "ch" && m.ph === G.ph) { choix(m); sauver(); rendre(); pousser(); }
   }
   function choix(m){ const p = G.J[m.pid], sel = (m.sel || []).filter(x => G.J[x]); if (!p) return; const r = p.role, vit = x => G.J[x] && G.J[x].vivant;
@@ -203,7 +205,7 @@ function animateur(){
   const opts = (sauf, filtre) => vivants().filter(x => x !== sauf && (!filtre || filtre(x))).map(x => ({p: x, n: nomDe(x)}));
   function vue(pid){
     const p = G.J[pid]; if (!p) return {e: "attente", txt: "Regarde le tableau."};
-    const b = {ph: G.ph, nom: p.nom, role: G.ph === "lobby" ? null : p.role, info: G.ph === "lobby" ? [] : info(pid), vivant: p.vivant};
+    const b = {ph: G.ph, nuit: G.nuit, nom: p.nom, role: G.ph === "lobby" ? null : p.role, info: G.ph === "lobby" ? [] : info(pid), vivant: p.vivant};
     const V = o => Object.assign(b, o);
     if (G.ph === "lobby") return V({e: "attente", txt: "Tu es dans la partie. Regarde le tableau : les cartes arrivent bientôt."});
     if (G.ph === "fin") return V({e: "fin", g: G.gagnant, gagne: (ROLES[p.role].camp === "loups") === (G.gagnant === "loups")});
@@ -229,7 +231,7 @@ function animateur(){
     return V({e: "jour", t: NOM_PH[G.ph], x: "Regarde le tableau."});
   }
   const DER = {};
-  function pousser(seul){ (seul ? [seul] : Object.keys(G.J)).forEach(p => { const v = vue(p), j = JSON.stringify(v); if (DER[p] !== j || seul) { DER[p] = j; R.send({m: "v", pid: p, v}); } }); }
+  function pousser(seul){ (seul ? [seul] : Object.keys(G.J)).forEach(p => { if (G.J[p] && G.J[p].bot) return; const v = vue(p), j = JSON.stringify(v); if (DER[p] !== j || seul) { DER[p] = j; R.send({m: "v", pid: p, v}); } }); }
   setInterval(() => R.send({m: "pouls"}), 8000);
 
   /* --- dessin du tableau (rien de secret) --- */
@@ -246,7 +248,8 @@ function animateur(){
         <div class="lg-ligne"><span>Loups-garous</span><button class="lg-pm" data-l="-1" aria-label="Un loup de moins">−</button><b>${c.loups}</b><button class="lg-pm" data-l="1" aria-label="Un loup de plus">+</button></div>
         <div class="lg-roles">${SPECIAUX.map(r => `<button class="lg-chip${c.sp.includes(r) ? " on" : ""}" data-r="${r}">${ROLES[r].n}</button>`).join("")}</div>
         <div class="lg-ligne"><span>Villageois</span><b>${Math.max(0, n - c.loups - c.sp.length)}</b></div>
-        <p class="lg-note">${n < 5 ? "Il faut au moins 5 joueurs." : "Touche un rôle pour l'ajouter ou l'enlever."}</p></div></div>`;
+        <p class="lg-note">${n < 5 ? "Il faut au moins 5 joueurs." : "Touche un rôle pour l'ajouter ou l'enlever."}</p>
+        <button class="lg-lien lg-bots" id="lgBots">Ajouter 4 joueurs fictifs (pour essayer seul)</button></div></div>`;
     }
     const t = TXT[ph], lire = [], plus = [];
     if (ph === "aube") { if (G.annonce.length) lire.push("Le coq chante sur Val-des-Brumes. Le village se réveille… sauf " + (G.annonce.length > 1 ? G.annonce.length + " personnes" : "une personne") + ". Cette nuit, " + G.annonce.map(nomDe).join(" et ") + (G.annonce.length > 1 ? " ont été retrouvés" : " a été retrouvé") + " au bord de la forêt.");
@@ -257,6 +260,8 @@ function animateur(){
     if (t) lire.push(t[0]);
     if ((ph === "aube" || ph === "verdict") && G.annonce.length) plus.push(`<div class="lg-morts">${G.annonce.map(carteMort).join("")}</div>`);
     if (ph === "aube" || ph === "verdict") { if (G.amour.length && G.annonce.length > 1 && G.annonce.some(p => G.amour.includes(p))) plus.push(`<p class="lg-faire">Un amoureux est mort de chagrin.</p>`); }
+    if (ph === "fin" && G.pts && Object.keys(G.pts).length) { const top = Object.entries(G.pts).filter(([p]) => G.J[p]).sort((a, b) => b[1] - a[1]).slice(0, 5);
+      plus.push(`<div class="lg-vifs"><h4>Le compte des étoiles : les yeux les plus vifs</h4>${top.map(([p, v], i) => `<span><b>${i + 1}</b> ${esc(nomDe(p))} <em>${v} pts</em></span>`).join("")}</div>`); }
     if (ph === "debat") plus.push(`<div class="lg-minut" id="lgMin"></div><ol class="lg-regles">${REGLES.map(r => `<li>${esc(r)}</li>`).join("")}</ol>`);
     if (ph === "vote") { const a = acteurs("vote"); plus.push(`<div class="lg-compte"><b>${a.filter(p => G.ch[p]).length}</b> vote${a.filter(p => G.ch[p]).length > 1 ? "s" : ""} sur ${a.length}</div>`); }
     if (ph === "verdict" && G.votes) plus.push(`<div class="lg-votes">${Object.entries(G.votes).sort((a, b) => b[1] - a[1]).map(([p, v]) => `<span>${esc(nomDe(p))} : ${v}</span>`).join("")}</div>`);
@@ -268,7 +273,7 @@ function animateur(){
   }
   function village(){ const ps = Object.keys(G.J);
     return `<h3>Le village <small>${vivants().length} / ${ps.length}</small></h3><ul>${ps.map(p => { const j = G.J[p];
-      return `<li class="${j.vivant ? "" : "mort"}"><span>${esc(j.nom)}</span>${!j.vivant && j.role ? `<em>${esc(ROLES[j.role].n)}</em>` : ""}${G.ph === "lobby" ? `<button class="lg-x" data-x="${esc(p)}" aria-label="Retirer">×</button>` : ""}</li>`; }).join("")}</ul>`; }
+      return `<li class="${j.vivant ? "" : "mort"}"><span>${esc(j.nom)}${j.bot ? " <small>(fictif)</small>" : ""}</span>${!j.vivant && j.role ? `<em>${esc(ROLES[j.role].n)}</em>` : ""}${G.ph === "lobby" ? `<button class="lg-x" data-x="${esc(p)}" aria-label="Retirer">×</button>` : ""}</li>`; }).join("")}</ul>`; }
   function rendre(){
     const nuit = NUIT.includes(G.ph) || G.ph === "nuit";
     document.body.classList.toggle("nuit", nuit); document.body.classList.toggle("jour", !nuit);
@@ -284,6 +289,8 @@ function animateur(){
     $("lgEnc") && ($("lgEnc").onclick = () => { const J = {}; Object.keys(G.J).forEach(p => J[p] = {nom: G.J[p].nom, role: null, vivant: true}); const code = G.code, cp = G.compo; G = nouvelle(J); G.code = code; G.compo = cp; aller("lobby"); });
     $("lgNouv").onclick = () => { if (confirm("Commencer une nouvelle partie? La partie en cours sera perdue.")) { localStorage.removeItem("lgPartie"); location.reload(); } };
     document.querySelectorAll(".lg-x").forEach(b => b.onclick = () => { R.send({m: "v", pid: b.dataset.x, v: {e: "attente", txt: "Tu as été retiré de la partie."}}); delete G.J[b.dataset.x]; sauver(); rendre(); });
+    $("lgBots") && ($("lgBots").onclick = () => { const N = ["Brume", "Hibou", "Fougère", "Givre", "Corneille", "Écorce", "Daim", "Lichen", "Sapin", "Grêle", "Ronce", "Mousse"];
+      let k = 0; for (const nm of N) { if (k === 4) break; if (Object.values(G.J).some(j => j.nom === nm)) continue; G.J["bot-" + nm] = {nom: nm, role: null, vivant: true, bot: true}; k++; } sauver(); rendre(); });
     document.querySelectorAll(".lg-pm").forEach(b => b.onclick = () => { const c = compo(); c.auto = false; c.loups += +b.dataset.l; sauver(); rendre(); });
     document.querySelectorAll(".lg-chip").forEach(b => b.onclick = () => { const c = compo(); c.auto = false; const r = b.dataset.r; c.sp = c.sp.includes(r) ? c.sp.filter(x => x !== r) : SPECIAUX.filter(x => x === r || c.sp.includes(x)); sauver(); rendre(); });
     const s = $("lgSecret"); if (s) { const ov = $("lgSecOv");
@@ -292,7 +299,20 @@ function animateur(){
       s.addEventListener("pointerdown", voir); ["pointerup", "pointerleave", "pointercancel"].forEach(t => s.addEventListener(t, cacher)); }
     relAff(); tic();
   }
-  function tic(){ const e = $("lgPret"); if (e) { const a = acteurs(G.ph); e.textContent = a ? (pret() ? "Prêt" : "En attente…") : ""; e.className = pret() ? "ok" : ""; }
+  /* Joueurs fictifs (21 nov., « jouer avec des bots ») : ils choisissent au hasard, 3 à 9 s après le début de l'étape */
+  function bots(){ const a = acteurs(G.ph); if (!a) return; let fait = false;
+    a.filter(p => G.J[p] && G.J[p].bot).forEach(p => { if (G.ch[p] != null) return;
+      const attente = 3000 + (p.charCodeAt(4) * 977 % 6000); if (Date.now() - G.t0 < attente) return;
+      const hasard = (n, filtre) => melanger(vivants().filter(x => x !== p && (!filtre || filtre(x)))).slice(0, n);
+      const r = G.J[p].role, ph = G.ph, m = {pid: p, ph};
+      if (ph === "cupidon") m.sel = melanger(vivants()).slice(0, 2);
+      else if (ph === "loups") m.sel = hasard(1, x => G.J[x].role !== "loup");
+      else if (ph === "renard") m.sel = hasard(3);
+      else if (ph === "sorciere") { if (G.potVie && G.vic && Math.random() < .4) choix({pid: p, ph, a: "vie"}); m.a = "fin"; }
+      else m.sel = hasard(1);
+      if (ph === "renard" && m.sel.length < 3) { G.ch[p] = []; } else choix(m); fait = true; });
+    if (fait) { sauver(); rendre(); pousser(); } }
+  function tic(){ bots(); const e = $("lgPret"); if (e) { const a = acteurs(G.ph); e.textContent = a ? (pret() ? "Prêt" : "En attente…") : ""; e.className = pret() ? "ok" : ""; }
     const mi = $("lgMin"); if (mi) { const r = Math.max(0, 300 - Math.floor((Date.now() - G.t0) / 1000)); mi.textContent = Math.floor(r / 60) + ":" + String(r % 60).padStart(2, "0"); mi.classList.toggle("fini", !r); } }
   setInterval(tic, 1000);
   sauver(); rendre(); pousser();
@@ -319,6 +339,21 @@ function joueur(code){
   function veille(){ const ev = () => { try { if (navigator.wakeLock && !document.hidden) navigator.wakeLock.request("screen").catch(() => {}); } catch(e) {} }; ev();
     document.addEventListener("visibilitychange", () => { ev(); if (!document.hidden) annoncer(); });
     setInterval(() => { if (!document.hidden && Date.now() - dernier > 25000) { dernier = Date.now() - 10000; R.rebrancher(); annoncer(); } }, 5000); }
+  /* 21 nov. (« tu gagnes des points quand t'es le plus vite ») : la nuit, des étoiles apparaissent une à une; plus tu touches vite, plus tu gagnes.
+     Tout le monde a donc les yeux sur son écran : celui qui joue un rôle ne se démarque pas, et personne ne manque son tour.
+     Ceux qui ont un rôle ont leurs étoiles après leur choix. Le TNI garde le total (classement au lever du jour). */
+  const JEU = {cle: "", i: 0, pts: 0, fini: false, t: 0};
+  function nuitJeu(v){ const n = ["nuit", "cupidon", "voyante", "renard", "loups", "sorciere", "corbeau"].includes(v.ph);
+    return n && (["nuit", "mort", "res"].includes(v.e) || (v.e === "choix" && v.loups && v.sel && v.sel.length)); }
+  function etoiles(v){ const c = $("jCiel"); if (!c) return; const cle = v.ph + ":" + v.nuit;
+    if (JEU.cle !== cle) Object.assign(JEU, {cle, i: 0, pts: 0, fini: false});
+    const aff = () => { $("jPts").textContent = JEU.fini ? "Bien joué. Le compte des étoiles sera dévoilé à la fin de la partie." : "Touche les étoiles le plus vite possible. Le plus rapide gagne : résultat à la fin de la partie."; };
+    const une = () => { aff(); if (JEU.fini) { c.innerHTML = ""; return; } c.innerHTML = `<button class="j-etoile" style="left:${5 + Math.random() * 70}%;top:${5 + Math.random() * 70}%" aria-label="Étoile"><svg viewBox="0 0 64 64"><path d="M32 4l8 19 20 2-15 13 5 20-18-11-18 11 5-20L4 25l20-2z" fill="currentColor"/></svg></button>`;
+      JEU.t = performance.now(); const b = c.firstChild;
+      b.onclick = () => { JEU.pts += Math.max(10, Math.round(100 - (performance.now() - JEU.t) / 40)); JEU.i++; b.classList.add("prise"); b.disabled = true;
+        if (JEU.i >= 3) { JEU.fini = true; JEU.envoye = false; R.send({m: "pts", pid: moi.pid, ph: v.ph, nuit: v.nuit, p: JEU.pts}); }
+        setTimeout(une, 350 + Math.random() * 500); }; };
+    une(); }
   function carteHtml(v){ const r = ROLES[v.role]; return `<div class="j-carte ${r.camp}"><div class="j-carte-h">${emb(v.role, "emb j-emb")}</div><div class="j-carte-r">${esc(r.n)}</div><p>${esc(r.d)}</p>${(v.info || []).map(x => `<p class="j-info">${esc(x)}</p>`).join("")}</div>`; }
   function dessiner(){
     const v = derV || {}; const nuit = !(v.e === "jour" || v.e === "fin" || v.e === "attente");
@@ -326,7 +361,7 @@ function joueur(code){
     let h = "";
     switch (v.e) {
       case "carte": h = `<h2>Ta carte</h2><p>Garde le doigt sur la carte pour voir ton rôle. Ne la montre à personne.</p><div class="j-tenir" id="jTenir">${emb("nuit", "emb j-dos")}<span>Garder appuyé</span></div>`; break;
-      case "nuit": h = `<div class="j-dort">${emb("nuit", "emb j-lune")}<h2>Le village dort</h2><p>Garde la tête baissée et ne regarde pas l'écran des autres.</p></div>`; break;
+      case "nuit": h = `<div class="j-dort j-dort2">${emb("nuit", "emb j-lune")}<h2>Le village dort</h2><p>Garde la tête baissée et les yeux sur ton écran.</p></div>`; break;
       case "choix": h = `<h2>${esc(v.t)}</h2><p>${esc(v.x || "")}</p>${v.loups ? `<div class="j-loups">${v.loups.map(l => `<span>${esc(l.n)} → ${esc(l.c)}</span>`).join("")}</div>` : ""}
         <div class="j-opts">${(v.o || []).map(o => `<button class="j-opt${sel.includes(o.p) ? " on" : ""}" data-p="${esc(o.p)}">${esc(o.n)}</button>`).join("")}</div>
         <button id="jOk" class="j-gros" ${sel.length !== v.n ? "disabled" : ""}>${v.libre ? "Envoyer mon choix" : "Confirmer"}</button>${v.passer ? `<button id="jPas" class="j-lien">Personne cette nuit</button>` : ""}`; break;
@@ -343,7 +378,7 @@ function joueur(code){
       default: h = `<h2>${esc(v.t || "Bienvenue")}</h2><p>${esc(v.txt || "Regarde le tableau.")}</p>`;
     }
     app.innerHTML = `<header class="j-tete"><b>${esc(moi.nom)}</b>${v.role ? `<button id="jMa" class="j-ma">Ma carte</button>` : ""}<span id="jRel" class="j-rel" hidden>Reconnexion…</span></header>
-      <main class="j-corps">${h}</main><div id="jOv" class="j-ov" hidden>${v.role ? carteHtml(v) : ""}</div>`;
+      <main class="j-corps">${h}${nuitJeu(v) ? `<div class="j-jeu"><div class="j-pts" id="jPts"></div><div class="j-ciel" id="jCiel"></div></div>` : ""}</main><div id="jOv" class="j-ov" hidden>${v.role ? carteHtml(v) : ""}</div>`;
     const ov = $("jOv"); const tenir = el => { if (!el) return; el.addEventListener("pointerdown", e => { e.preventDefault(); ov.hidden = false; });
       ["pointerup", "pointercancel", "pointerleave"].forEach(t => el.addEventListener(t, () => { ov.hidden = true; })); el.oncontextmenu = e => e.preventDefault(); };
     tenir($("jMa")); tenir($("jTenir"));
@@ -356,6 +391,7 @@ function joueur(code){
     $("jVie") && ($("jVie").onclick = () => envoyer({a: "vie"}));
     document.querySelectorAll(".j-opt[data-m]").forEach(b => b.onclick = () => { if (confirm("Éliminer " + b.textContent + "?")) envoyer({a: "mort", sel: [b.dataset.m]}); });
     $("jFin") && ($("jFin").onclick = () => envoyer({a: "fin"}));
+    etoiles(v);
   }
   const ph = () => (derV && derV.ph) || "";   /* le TNI refuse un choix d'une autre étape */
   if (moi && moi.nom) { entre = true; derV = {e: "attente", txt: "Retour dans le village…"}; dessiner(); annoncer(); veille(); } else accueil();
