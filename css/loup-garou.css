@@ -187,3 +187,22 @@ body.nuit .ciel-j,body.jour .ciel-n{opacity:0}
 .lg-vifs em{font-style:normal;color:var(--doux);margin-left:6px}
 .lg-bots{margin-top:12px;font-size:14px}
 .lg-village small{font-weight:500;color:var(--doux)}
+
+/* maire, maître du jeu */
+.lg-maire{display:flex;align-items:center;gap:14px;font-size:22px;font-weight:700;margin:12px 0}
+.lg-maire .emb{width:54px;height:54px;color:var(--acc)}
+.lg-village em.lg-tm{color:var(--acc);font-weight:800}
+.lg-mjb{columns:auto;text-align:center;max-width:420px}
+.lg-mjb #lgMjQr{background:#fff;padding:10px;border-radius:12px;display:inline-block;margin:8px 0}
+.lg-mjb p{font-size:15px;line-height:1.45}
+.mj-pret{font-weight:700;color:var(--doux)}
+.mj-pret.ok{color:#2EB872}
+.mj-notes{background:var(--carte);border:1px solid var(--trait);border-radius:12px;padding:10px 12px 10px 28px;font-size:15px;line-height:1.5}
+.mj-tab{width:100%;border-collapse:collapse;font-size:15px;margin-top:10px;position:relative}
+.mj-tab td{padding:8px 6px;border-bottom:1px solid var(--trait)}
+.mj-tab td.loup{color:#FF7A5C;font-weight:700}
+.mj-tab tr.mort td{opacity:.45;text-decoration:line-through}
+.mj-tab tr.act td:first-child{border-left:4px solid var(--acc)}
+.mj-tab small{color:var(--acc);font-weight:700}
+.mjp .j-corps{position:relative;z-index:1}
+.mjp .lune,.mjp .soleil,.mjp .sol{display:none}
