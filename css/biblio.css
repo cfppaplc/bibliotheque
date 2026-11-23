@@ -1036,3 +1036,7 @@ body.clair .panel .m-acts .btn-fav:hover{background:#ebe6dc;border-color:#c9c2b5
 body.clair .panel .m-acts #mFav.on{color:#1E8A55;border-color:#a9d8bd;background:#eaf6ef}
 @media (max-width:640px){.m-acts{flex-direction:column}.m-acts .btn{width:100%}}
 @media (pointer:coarse) and (min-width:641px){.m-acts .btn{height:56px}}
+
+/* 22 nov. : le bandeau du haut se cache pendant qu'on dessine (classe posée par tableau-blanc.js) */
+.reader .reader-bar{transition:transform .25s ease,opacity .25s ease}
+.reader.dessine .reader-bar{transform:translateY(-100%);opacity:0;pointer-events:none}

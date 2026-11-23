@@ -2215,12 +2215,16 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
       fond = fond || document.createElement("canvas"); fond.width = c.width; fond.height = c.height;
       const gf = fond.getContext("2d"); gf.clearRect(0, 0, fond.width, fond.height); gf.drawImage(c, 0, 0);
     } else fond = null;
-    deja = 0; strokes().push(cur); RD.enTrait = true; RD.aRecolorer = null; if (!RD.obj && SELO.s){ SELO.s = null; } dessinerEnCours();
+    deja = 0; strokes().push(cur); RD.enTrait = true; bandeau(true); RD.aRecolorer = null; if (!RD.obj && SELO.s){ SELO.s = null; } dessinerEnCours();
   });
   let fond = null, rafTrait = 0, deja = 0;
   /* 22 nov. (« zoomé, le crayon est super lent ») : zoomé, la grande toile est agrandie par un transform; la retoucher à chaque point
      était lent au TNI. Le trait libre en cours est dessiné sur une petite toile posée sur l'écran (#inkLive, sans transform),
      puis la grande toile est redessinée une seule fois au relâchement. */
+  /* 22 nov. (« dès qu'on commence à dessiner, le bandeau du haut devrait disparaître ») : il glisse vers le haut pendant le trait
+     et revient 1,5 s après qu'on lève le crayon (le bandeau est par-dessus la page : rien ne bouge en dessous) */
+  let bandT = 0; const bandeau = on => { const r = document.getElementById("reader"); if (!r) return; clearTimeout(bandT);
+    if (on) r.classList.add("dessine"); else bandT = setTimeout(() => r.classList.remove("dessine"), 1500); };
   let lc = null, lg = null, lr = null;
   const enDirect = () => { try { return zPhoto() && Math.abs(RD.z - 1) > .02; } catch(e) { return false; } };
   const finDirect = () => { if (lc && lr){ lg.clearRect(0, 0, lc.width, lc.height); lc.style.display = "none"; lr = null; } };
@@ -2309,6 +2313,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
   ["pointerup", "pointercancel"].forEach(t => c.addEventListener(t, ev => {
     if (rafTrait){ cancelAnimationFrame(rafTrait); rafTrait = 0; }
     finDirect();   /* la petite toile s'efface; la grande est redessinée plus bas, dans la même image */
+    bandeau(false);
     const tap = ev.type === "pointerup" ? ev : null;
     if (cur && cur.iso && !cur.hl && !cur.t && tap){ cur.fin = true; try { suivreIso(tap); } catch (_) {} delete cur.fin; }   /* dernier calcul avec la vraie position de la main */
     if (cur && cur.iso && cur.pFin){ cur.p = cur.pFin; delete cur.pFin; }   /* plan iso : au relâchement, le bout s'accroche à la grille */
