@@ -22,14 +22,24 @@ function relais(topic, quand, etat){
        et ça tournait en rond (« Relais injoignable »). Maintenant : un client neuf à chaque reprise, l'ancien fermé à part,
        et jamais de reprise pendant qu'un abonnement est en cours. */
     let sb = null, ch = null, pret = false, gen = 0, attente = [], reT = null, cache = 0, enCours = false;
-    envoi = o => { if (!pret) { attente.push(o); return; } ch.send({type: "broadcast", event: "m", payload: o}).catch(() => {}); };
+    /* 22 nov. : relais de secours (ntfy, comme le Défi+). On écoute toujours les deux; on envoie par Supabase quand il est branché,
+       sinon (après 6 s sans lui) par ntfy. Chaque message porte l'appareil d'origine pour ignorer son propre écho. */
+    const moiR = Math.random().toString(36).slice(2, 9), t0 = Date.now(); let secours = false;
+    const parSecours = () => !pret && Date.now() - t0 > 6000;
+    const posterSecours = o => fetch("https://ntfy.sh/" + topic, {method: "POST", body: JSON.stringify(o)}).catch(() => {});
+    try { const es = new EventSource("https://ntfy.sh/" + topic + "/sse");
+      es.onopen = () => { secours = true; if (!pret) etat(Date.now() - t0 > 6000 ? "secours" : false); };
+      es.onerror = () => { secours = false; };
+      es.onmessage = e => { try { const d = JSON.parse(e.data); if (d.event !== "message") return; const o = JSON.parse(d.message); if (o._r === moiR) return; quand(o); } catch(x) {} }; } catch(e) {}
+    setTimeout(() => { if (!pret && secours) { etat("secours"); const a = attente; attente = []; a.forEach(envoi); } }, 6500);
+    envoi = o => { o._r = moiR; if (pret) { ch.send({type: "broadcast", event: "m", payload: o}).catch(() => {}); return; } if (parSecours()) { posterSecours(o); return; } attente.push(o); };
     const abonner = () => { const g = ++gen; clearTimeout(reT); reT = null; pret = false; enCours = true;
       const vieux = sb; if (vieux) setTimeout(() => { try { vieux.removeAllChannels(); } catch(e) {} }, 0);
       sb = window.supabase.createClient(SB_URL, SB_CLE, {auth: {persistSession: false, autoRefreshToken: false, detectSessionInUrl: false}, realtime: {params: {eventsPerSecond: 20}}});
       ch = sb.channel(topic, {config: {broadcast: {self: false}}});
       ch.on("broadcast", {event: "m"}, ({payload}) => { try { quand(payload); } catch(e) { console.error(e); } });
       ch.subscribe(st => { if (g !== gen) return; enCours = false; pret = st === "SUBSCRIBED";
-        if (pret) { const a = attente; attente = []; a.forEach(envoi); } else if (!reT) reT = setTimeout(abonner, 2500); etat(pret); }); };
+        if (pret) { const a = attente; attente = []; a.forEach(envoi); } else if (!reT) reT = setTimeout(abonner, 2500); etat(pret ? true : secours && Date.now() - t0 > 6000 ? "secours" : false); }); };
     document.addEventListener("visibilitychange", () => { if (document.hidden) { cache = Date.now(); return; } if (enCours) return;
       if (!pret || (cache && Date.now() - cache > 15000)) abonner(); });
     addEventListener("online", () => { if (!enCours) abonner(); });
@@ -177,7 +187,7 @@ function animateur(){
   const sauver = () => { G.maj = Date.now(); try { localStorage.setItem("lgPartie", JSON.stringify(G)); } catch(e) {} };
   const nomDe = p => G.J[p] ? G.J[p].nom : "?";
   const vivants = () => Object.keys(G.J).filter(p => G.J[p].vivant);
-  let relOk = null; const relAff = () => { const e = $("lgRel"); if (e) { e.textContent = relOk ? "Relais connecté" : relOk === false ? "Relais injoignable…" : "Connexion…"; e.className = relOk ? "ok" : "ko"; } };
+  let relOk = null; const relAff = () => { const e = $("lgRel"); if (e) { e.textContent = relOk === "secours" ? "Relais de secours" : relOk ? "Relais connecté" : relOk === false ? "Relais injoignable…" : "Connexion…"; e.className = relOk ? "ok" : "ko"; } };
   const R = relais(PREF + G.code, recevoir, ok => { relOk = ok; relAff(); });
 
   /* --- composition : environ 1 loup sur 5, puis des rôles spéciaux (20 joueurs = 4 loups, 7 rôles, 9 villageois) --- */
