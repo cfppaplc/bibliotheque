@@ -1052,6 +1052,13 @@ function boiteDe(s, W, H){
   if (s.t === "texte"){ const k = DPRI() * RD.z; return [xs[0], ys[0], xs[0] + Math.max(40 * k, (s.bw || .1) * W), ys[0] + (s.fs || 28) * k * ((s.lig || [1]).length || 1) * 1.3]; }
   return [Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)]; }
 window.SELM = [];
+/* 22 nov. (« je devrais pouvoir déplacer un dessin fait au crayon ») : trait libre (crayon ou surligneur) le plus proche du doigt */
+function traitSous(q){ const c = $("#inkCanvas"), W = c.width, H = c.height, arr = strokes(), x = q[0] * W, y = q[1] * H; let best = null;
+  for (let i = arr.length - 1; i >= 0; i--){ const s = arr[i]; if (!s || s === "erase" || s.t || !s.p || !s.p.length) continue;
+    const tol = 14 * DPRI() + (s.w || 2) * DPRI() * RD.z * (s.hl ? 2 : .6);
+    for (let j = 0; j < s.p.length; j++){ const a = s.p[Math.max(0, j - 1)], b = s.p[j], d = distSeg([x, y], [a[0] * W, a[1] * H], [b[0] * W, b[1] * H], 1);
+      if (d < tol && (!best || d < best[1])) best = [s, d]; } if (best) break; }   /* le plus récent gagne */
+  return best ? best[0] : null; }
 function objetSous(q){ const c = $("#inkCanvas"), arr = strokes(), x = q[0] * c.width, y = q[1] * c.height;
   for (let i = arr.length - 1; i >= 0; i--){ const s = arr[i]; if (s.t !== "objet" || s.k === "fil") continue; const G = objGeo(s, c.width, c.height); if (x >= G.bbox[0] - 4 && x <= G.bbox[2] + 4 && y >= G.bbox[1] - 4 && y <= G.bbox[3] + 4) return s; } return null; }
 /* points d'un trait (pour la gomme) : les formes sont échantillonnées sur leur contour */
@@ -2374,7 +2381,7 @@ function aimanterTuyau(q, a, sauf){
     return true; };
   const actif = () => RD.wb && !RD.eraser && !RD.sim && !RD.text && (RD.obj ? !RD.formeK && !RD.objK : RD.crayonOff);   /* aucun outil : glisser dans le vide trace un cadre de sélection */
   const brut = e => { const r = c.getBoundingClientRect(); return [(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height]; };
-  const sous = q => objetSous(q) || formeSous(q);
+  const sous = q => objetSous(q) || formeSous(q) || traitSous(q);
   const stop = e => { e.stopImmediatePropagation(); e.preventDefault(); try { c.setPointerCapture(e.pointerId); } catch(er){} };
   c.addEventListener("pointerdown", e => {
     if (e.button > 0) return;
@@ -2385,6 +2392,8 @@ function aimanterTuyau(q, a, sauf){
       if (!actif()){ SELM = []; redrawInk(); } }                                                        /* tout autre clic : la sélection multiple s'efface */
     if (!actif()) return;
     const q = brut(e), hit = sous(q);
+    if (!mod && hit && !hit.t){ stop(e); SELO.s = null; SELM = [hit]; redrawInk(); try { majObjUI(); } catch(er){}   /* trait libre : il est choisi (cadre bleu) et on peut le glisser */
+      mm = { groupe:[hit], q0:q, p0:[hit.p.map(v => v.slice())], snap:false, x0:e.clientX, y0:e.clientY }; return; }
     if (mod && hit){ stop(e); if (!SELM.length && SELO.s && strokes().includes(SELO.s) && SELO.s !== hit) SELM = [SELO.s];
       SELM = SELM.includes(hit) ? SELM.filter(x => x !== hit) : SELM.concat([hit]); SELO.s = null; redrawInk(); try { majObjUI(); } catch(er){} return; }
     if (!mod && hit && SELM.length > 1 && SELM.includes(hit)){ stop(e); mm = { groupe:SELM.slice(), q0:q, p0:SELM.map(o => o.p.map(v => v.slice())), snap:false, x0:e.clientX, y0:e.clientY }; return; }
