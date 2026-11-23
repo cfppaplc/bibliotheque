@@ -2211,7 +2211,27 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
     deja = 0; strokes().push(cur); RD.enTrait = true; RD.aRecolorer = null; if (!RD.obj && SELO.s){ SELO.s = null; } dessinerEnCours();
   });
   let fond = null, rafTrait = 0, deja = 0;
+  /* 22 nov. (« zoomé, le crayon est super lent ») : zoomé, la grande toile est agrandie par un transform; la retoucher à chaque point
+     était lent au TNI. Le trait libre en cours est dessiné sur une petite toile posée sur l'écran (#inkLive, sans transform),
+     puis la grande toile est redessinée une seule fois au relâchement. */
+  let lc = null, lg = null, lr = null;
+  const enDirect = () => { try { return zPhoto() && Math.abs(RD.z - 1) > .02; } catch(e) { return false; } };
+  const finDirect = () => { if (lc && lr){ lg.clearRect(0, 0, lc.width, lc.height); lc.style.display = "none"; lr = null; } };
+  const dessinerDirect = () => { const P = cur.p; if (!P.length) return;
+    if (!lc){ lc = document.createElement("canvas"); lc.id = "inkLive"; lc.style.cssText = "position:fixed;pointer-events:none;z-index:9990;display:none"; document.body.appendChild(lc); lg = lc.getContext("2d"); }
+    if (!lr){ const so = document.querySelector("#rstage").getBoundingClientRect(), d = Math.min(2, window.devicePixelRatio || 1); lr = {so, d};
+      Object.assign(lc.style, {left: so.left + "px", top: so.top + "px", width: so.width + "px", height: so.height + "px", display: "block"});
+      const w = Math.round(so.width * d), h = Math.round(so.height * d); if (lc.width !== w || lc.height !== h){ lc.width = w; lc.height = h; } else lg.clearRect(0, 0, w, h); deja = 0; }
+    const r = rectToile(), {so, d} = lr, X = v => (r.left + v[0] * r.width - so.left) * d, Y = v => (r.top + v[1] * r.height - so.top) * d;
+    lg.save(); lg.lineCap = "round"; lg.lineJoin = "round"; lg.lineWidth = cur.w * DPRI() * RD.z * (r.width / c.width) * d;
+    lg.strokeStyle = (cur.c === "#24282c" && wbSombre()) ? "#f4f1ea" : cur.c; lg.beginPath();
+    const M = i => [(X(P[i]) + X(P[i + 1])) / 2, (Y(P[i]) + Y(P[i + 1])) / 2];
+    if (P.length < 3) { lg.moveTo(X(P[0]), Y(P[0])); for (let i = 1; i < P.length; i++) lg.lineTo(X(P[i]), Y(P[i])); }
+    else { const i0 = Math.max(1, deja - 1); lg.moveTo(...(i0 === 1 ? [X(P[0]), Y(P[0])] : M(i0 - 1))); for (let i = i0; i < P.length - 1; i++){ const m = M(i); lg.quadraticCurveTo(X(P[i]), Y(P[i]), m[0], m[1]); } }
+    if (P.length === 1) lg.lineTo(X(P[0]) + .01, Y(P[0]));
+    lg.stroke(); lg.restore(); deja = P.length; };
   const dessinerEnCours = () => { rafTrait = 0; if (!cur || cur === "erase") return;
+    if (!fond && !cur.t && !cur.hl && !cur.iso && enDirect()) { dessinerDirect(); return; }
     const g = c.getContext("2d"), k = DPRI() * RD.z, W = c.width, H = c.height;
     if (!fond){             /* trait libre opaque : on ajoute seulement les nouveaux bouts (aucun effacement de l'écran) */
       const P = cur.p; if (!P.length) return;
@@ -2281,6 +2301,7 @@ function majObjUI(){ const b = $("#objBar"); if (!b) return; b.hidden = !RD.obj;
   });
   ["pointerup", "pointercancel"].forEach(t => c.addEventListener(t, ev => {
     if (rafTrait){ cancelAnimationFrame(rafTrait); rafTrait = 0; }
+    finDirect();   /* la petite toile s'efface; la grande est redessinée plus bas, dans la même image */
     const tap = ev.type === "pointerup" ? ev : null;
     if (cur && cur.iso && !cur.hl && !cur.t && tap){ cur.fin = true; try { suivreIso(tap); } catch (_) {} delete cur.fin; }   /* dernier calcul avec la vraie position de la main */
     if (cur && cur.iso && cur.pFin){ cur.p = cur.pFin; delete cur.pFin; }   /* plan iso : au relâchement, le bout s'accroche à la grille */
