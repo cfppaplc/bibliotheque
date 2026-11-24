@@ -881,6 +881,7 @@ function marquerTdb(on){
 function allerTableauDeBord(){ marquerTdb(true); try { window.ouvrirAccueil(); } catch(e){} }
 function fermerLivreVraiment(){ const t = window.TDB_ACTIF; marquerTdb(false); window.TDB_ACTIF = t; closeReader(); window.TDB_ACTIF = t; }
 function ouvrirTableauBlanc(apres){
+  try { if (RD.laser) toggleLaser(); } catch(e){}   /* 24 nov. : le pointeur laser du livre ne suit pas dans le tableau blanc */
   try { localStorage.setItem("dernierTableau", String(Date.now())); } catch(e){}
   try { if (window.COFFRE && window.ACCES && ACCES.session && !ACCES.eleve) COFFRE.stat("outil:tableau"); } catch(e){}
   const l = { fichier:"tableau-blanc", titre:"Tableau blanc" };
