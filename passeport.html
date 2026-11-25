@@ -269,7 +269,7 @@ async function vueEleve(){
   const ens = Q.get("e") || "", grp = Q.get("g") || "";
   let faits = {}; try { faits = JSON.parse(localStorage.getItem("passFaits") || "{}"); } catch(e) {}
   const R0 = ens ? await PARTAGE.lire(ens) : { suivi:[], formes:{}, grp:[], codes:null }, suivi = R0.suivi.includes(o.id);
-  let monCode = ""; try { monCode = localStorage.getItem("passCode") || ""; } catch(e) {}
+  let monCode = ""; try { monCode = localStorage.getItem("passCode") || ""; } catch(e) {} if (!monCode) monCode = (() => { try { const K = JSON.parse(localStorage.getItem("mpCarte") || "null"); const m = K && String(K.c || "").match(/^MP-(\d{3})-/); return m ? m[1] : ""; } catch(e){ return ""; } })();   /* 25 nov. : « Ma carte » sur ce cellulaire */
   if (!faits[o.id] && monCode && (R0.formes[o.id] || []).includes(monCode)) faits[o.id] = 1;
   if (faits[o.id] && !Q.get("formation") && ens && monCode && R0.codes && !(R0.formes[o.id] || []).includes(monCode)){
     V.innerHTML = `<div class="top"><img src="${LOGO}" alt="Métier+"></div><div class="fini"><div class="rond" style="background:#E08A1E">◐</div><h1>Démonstration pratique à faire</h1>
@@ -325,7 +325,7 @@ async function vueEleve(){
   /* groupes créés par l'enseignant : l'élève touche le sien (pas de faute de frappe possible) */
   var INFO = { grp:[], part:{}, codes:null };
   const cd = $("#cd"); cd.oninput = () => { cd.value = cd.value.replace(/\D/g, "").slice(0, 3); pret(); };
-  try { cd.value = localStorage.getItem("passCode") || ""; } catch(e) {}
+  try { cd.value = localStorage.getItem("passCode") || (() => { try { const K = JSON.parse(localStorage.getItem("mpCarte") || "null"); const m = K && String(K.c || "").match(/^MP-(\d{3})-/); return m ? m[1] : ""; } catch(e){ return ""; } })(); } catch(e) {}
   function parCode(){ const g = $("#gr"); return !!(INFO && INFO.codes && g && INFO.codes[g.value] && INFO.codes[g.value].length); }
   if (ens) PARTAGE.lire(ens).then(r => { INFO = r; if (!r.grp.length) return;
     const z = $("#grB"); gr.hidden = true; if (!r.grp.includes(gr.value)) gr.value = "";
