@@ -174,10 +174,10 @@ window.ADMIN_PLUS = (function(){
       + (MG.essai ? '<p class="acces-err" style="margin:0 0 8px">Liste d\'essai : remplace-la par la vraie liste du magasin (fichier CSV, un raccord par ligne).</p>' : '')
       + '<div class="ap-pub"><span class="acces-etat' + (mgChange() ? ' pub' : '') + '">' + (mgChange() ? 'Des changements attendent d\'être publiés' : 'Tout est publié') + '</span>' + (MG_MSG ? '<span class="acces-ok">' + esc(MG_MSG) + '</span>' : '') + '<span class="acces-err" id="mgErr" hidden></span>'
       + '<label class="abtn" for="mgCsv" style="margin:0;cursor:pointer">Remplacer par un fichier CSV</label><input type="file" id="mgCsv" accept=".csv,text/csv,.txt" hidden><button class="abtn" id="mgAj">+ Raccord</button><button class="abtn" id="mgAnn"' + (mgChange() ? '' : ' disabled') + '>Annuler</button><button class="abtn prim" id="mgPub"' + (mgChange() ? '' : ' disabled') + '>Publier le catalogue</button></div>'
-      + '<p class="sous" style="font-size:.8rem">CSV : colonnes <b>numéro; nom; matériau; type; diamètre</b> (première ligne = titres). Dans Excel : Fichier → Enregistrer sous → CSV.</p>'
+      + '<p class="sous" style="font-size:.8rem">CSV : colonnes <b>numéro; nom; matériau; type; diamètre; rangée</b> (première ligne = titres). Dans Excel : Fichier → Enregistrer sous → CSV.</p>'
       + '<input type="text" id="mgQ" placeholder="Chercher dans le catalogue…" value="' + esc(MG_Q) + '" style="margin:6px 0 10px">'
-      + '<div class="ap-mg"><div class="ap-mg-l ap-mg-t"><span>N° d\'article</span><span>Nom affiché à l\'élève</span><span>Matériau</span><span>Type</span><span>Diamètre</span><span></span></div>'
-      + R.slice(0, 200).map(([a, i]) => '<div class="ap-mg-l" data-i="' + i + '">' + ["n", "nom", "mat", "type", "d"].map(k => '<input type="text" data-k="' + k + '" value="' + esc(a[k]) + '">').join("") + '<button class="abtn rouge" data-sup title="Retirer">×</button></div>').join("")
+      + '<div class="ap-mg"><div class="ap-mg-l ap-mg-t"><span>N° d\'article</span><span>Nom affiché à l\'élève</span><span>Matériau</span><span>Type</span><span>Diamètre</span><span>Rangée</span><span></span></div>'
+      + R.slice(0, 200).map(([a, i]) => '<div class="ap-mg-l" data-i="' + i + '">' + ["n", "nom", "mat", "type", "d", "r"].map(k => '<input type="text" data-k="' + k + '" value="' + esc(a[k]) + '">').join("") + '<button class="abtn rouge" data-sup title="Retirer">×</button></div>').join("")
       + (R.length > 200 ? '<p class="sous">' + (R.length - 200) + ' autres : précise ta recherche.</p>' : '') + '</div></div>';
     const re = () => magasin(z), etat = () => { const c = mgChange(), e = z.querySelector(".ap-pub .acces-etat"); e.classList.toggle("pub", c); e.textContent = c ? "Des changements attendent d'être publiés" : "Tout est publié"; z.querySelector("#mgPub").disabled = !c; z.querySelector("#mgAnn").disabled = !c; };
     z.querySelectorAll("[data-copie]").forEach(b => b.onclick = () => { try { navigator.clipboard.writeText(b.dataset.copie); b.textContent = "Lien copié"; } catch(e){} });
@@ -185,12 +185,12 @@ window.ADMIN_PLUS = (function(){
     z.querySelector("#mgQ").oninput = e => { MG_Q = e.target.value; const p = e.target.selectionStart; re(); const n = z.querySelector("#mgQ"); n.focus(); n.setSelectionRange(p, p); };
     z.querySelectorAll(".ap-mg-l[data-i] input").forEach(inp => inp.oninput = () => { const a = MG.raccords[+inp.closest("[data-i]").dataset.i]; a[inp.dataset.k] = inp.value; if (inp.dataset.k !== "n" && !a.nom) a.nom = ""; etat(); });
     z.querySelectorAll("[data-sup]").forEach(b => b.onclick = () => { const i = +b.closest("[data-i]").dataset.i; if (!confirm("Retirer « " + MG.raccords[i].nom + " » du catalogue ?")) return; MG.raccords.splice(i, 1); re(); });
-    z.querySelector("#mgAj").onclick = () => { const id = "r" + Date.now().toString(36); MG.raccords.unshift({ id, n:"", nom:"Nouveau raccord", mat:"", type:"", d:"" }); MG_Q = ""; re(); };
+    z.querySelector("#mgAj").onclick = () => { const id = "r" + Date.now().toString(36); MG.raccords.unshift({ id, n:"", nom:"Nouveau raccord", mat:"", type:"", d:"", r:"" }); MG_Q = ""; re(); };
     z.querySelector("#mgAnn").onclick = async () => { await chargerMg(); MG_MSG = ""; re(); };
     z.querySelector("#mgCsv").onchange = async e => { const f = e.target.files[0]; if (!f) return; const t = (await f.text()).replace(/^﻿/, ""), sep = (t.split("\n")[0].match(/;/g) || []).length >= (t.split("\n")[0].match(/,/g) || []).length ? ";" : ",";
       const L = t.split(/\r?\n/).filter(l => l.trim()).map(l => l.split(sep).map(x => x.trim().replace(/^"|"$/g, "")));
       const corps = /num|nom|n°|no\b/i.test(L[0].join(" ")) ? L.slice(1) : L;
-      const N = corps.filter(c => c[1]).map((c, k) => ({ id:"r" + (k + 1).toString(36) + Date.now().toString(36).slice(-3), n:c[0] || "", nom:c[1], mat:c[2] || "", type:c[3] || "", d:c[4] || "" }));
+      const N = corps.filter(c => c[1]).map((c, k) => ({ id:"r" + (k + 1).toString(36) + Date.now().toString(36).slice(-3), n:c[0] || "", nom:c[1], mat:c[2] || "", type:c[3] || "", d:c[4] || "", r:c[5] || "" }));
       if (!N.length) { const er = z.querySelector("#mgErr"); er.textContent = "Aucun raccord trouvé dans ce fichier."; er.hidden = false; return; }
       if (!confirm("Remplacer les " + MG.raccords.length + " raccords du catalogue par les " + N.length + " de ce fichier ?")) return;
       MG.raccords = N; delete MG.essai; delete MG.note; MG.maj = new Date().toLocaleDateString("en-CA"); MG_MSG = ""; re(); };

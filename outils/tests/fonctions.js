@@ -216,6 +216,7 @@ test("Magasin : l'élève (carte scannée) envoie son panier, l'enseignant appro
   vrai(!(await m.$("[data-rem]")), "Code 456 : la commande de 123 s'affiche");
   await m.keyboard.type("MP-123-K7Q9X2"); await m.keyboard.press("Enter"); await attendre(300);
   vrai(!!(await m.$("[data-rem]")), "Code 123 : commande absente");
+  vrai(/^[A-Z]-\d+$/.test((await m.textContent("td.rg")).trim()), "Rangée absente au comptoir");
   await m.click("[data-rem]"); await attendre(400); vrai(P[0].etat === "remis", "Remis : " + P[0].etat);
   vrai(!errs.length, errs.join(" | "));
   await c1.close(); await c2.close(); await c3.close();

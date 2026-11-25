@@ -47,7 +47,7 @@ h1{font-size:1.5rem;margin:6px 0 4px}.sous{color:var(--doux);margin:0 0 16px}
 .cmd .h{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:14px 16px;border-bottom:1px solid var(--ligne)}
 .cmd .h .n{font:800 1.8rem/1 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.1em}.cmd .h .sp{flex:1}
 .cmd table{width:100%;border-collapse:collapse}.cmd td,.cmd th{padding:9px 16px;text-align:left;border-bottom:1px solid var(--ligne)}.cmd th{font-size:.78rem;color:var(--doux);font-weight:600}
-.cmd td.q{font-weight:800;font-size:1.1rem;width:70px}.cmd td.no{font-family:ui-monospace,Menlo,Consolas,monospace;color:var(--doux);white-space:nowrap}
+.cmd td.q{font-weight:800;font-size:1.1rem;width:70px}.cmd td.rg{font-weight:800;font-size:1.25rem;width:90px;color:var(--acc)}.cmd td.no{font-family:ui-monospace,Menlo,Consolas,monospace;color:var(--doux);white-space:nowrap}
 .cmd .act{display:flex;gap:10px;flex-wrap:wrap;padding:12px 16px}
 .cmd.neuf{border-color:var(--acc);box-shadow:0 0 0 3px rgba(235,106,34,.25)}
 .cb{display:block;margin:14px auto 4px;max-width:100%;background:#fff;padding:10px;border-radius:8px}
@@ -161,7 +161,7 @@ function panier(){
   $("#pF").onclick = fermer; $("#pNote").oninput = e => LS.set("magNote", e.target.value);
   brancherQte($("#pL"), () => { if (!nbPanier()) $("#pEnv").disabled = true; });
   $("#pEnv").onclick = async () => { const b = $("#pEnv"); b.disabled = true; b.textContent = "Envoi…";
-    const items = Object.keys(PANIER).map(id => { const a = CAT.find(x => x.id === id); return a && { id, n:a.n, nom:a.nom, q:PANIER[id] }; }).filter(Boolean);
+    const items = Object.keys(PANIER).map(id => { const a = CAT.find(x => x.id === id); return a && { id, n:a.n, nom:a.nom, q:PANIER[id], r:a.r || "" }; }).filter(Boolean);
     try { const r = await rpc("panier_envoyer", { p_ens:MOI.ens, p_groupe:MOI.groupe, p_code:MOI.code, p_items:items, p_note:$("#pNote").value || null });
       if (!r || !r.ok) throw new Error(r && r.err || "refus");
       const E = LS.get("magEnvois", []); E.unshift({ id:r.id, t:Date.now(), code:MOI.code, n:items.reduce((s, i) => s + i.q, 0) }); LS.set("magEnvois", E.slice(0, 20));
@@ -270,15 +270,26 @@ function dessinerMag(){
   const z = $("#mL"); if (!z) return;
   const v = MAG.filter(p => !FILTRE_CODE || p.code === FILTRE_CODE), app = v.filter(p => p.etat === "approuve"), rem = v.filter(p => p.etat === "remis").reverse();
   const carte = p => `<div class="cmd"><div class="h"><span class="n">${esc(p.code)}</span><div><b>${esc(p.groupe)}</b> · ${esc(nomEns(p.ens))}<br><small class="sous">Approuvé ${heure(p.t_app)}</small></div><span class="sp"></span>
-    ${p.etat === "approuve" ? `<button class="btn v" data-rem="${p.id}">Remis à l'élève</button>` : `<span class="etat remis">Remis ${heure(p.t_remis)}</span> <button class="btn" data-ann="${p.id}" style="min-height:38px">Annuler</button>`}</div>
+    <button class="btn" data-imp="${p.id}" style="min-height:42px">Imprimer le bon</button> ${p.etat === "approuve" ? `<button class="btn v" data-rem="${p.id}">Remis à l'élève</button>` : `<span class="etat remis">Remis ${heure(p.t_remis)}</span> <button class="btn" data-ann="${p.id}" style="min-height:38px">Annuler</button>`}</div>
     ${p.note ? `<p style="margin:10px 16px 0"><b>Travail :</b> ${esc(p.note)}</p>` : ""}
-    <table><tr><th>Qté</th><th>Raccord</th><th>N° d'article</th></tr>${(p.items || []).map(i => `<tr><td class="q">${+i.q || 1}</td><td>${esc(i.nom)}</td><td class="no">${esc(i.n)}</td></tr>`).join("")}</table></div>`;
+    ${tableMag(p)}</div>`;
   z.innerHTML = (FILTRE_CODE ? `<p class="sous">Élève <b>${esc(FILTRE_CODE)}</b> : ${app.length ? app.length + " commande" + (app.length > 1 ? "s" : "") + " à préparer" : "aucune commande approuvée"}.</p>` : "")
     + `<div class="sec">À préparer (${app.length})</div>` + (app.length ? app.map(carte).join("") : `<p class="vide">${FILTRE_CODE ? "Rien pour cet élève. Son enseignant doit d'abord approuver son panier." : "Aucune commande approuvée pour l'instant."}</p>`)
     + (rem.length ? `<div class="sec">Remis aujourd'hui (${rem.length})</div>` + rem.map(carte).join("") : "");
+  z.querySelectorAll("[data-imp]").forEach(b => b.onclick = () => imprimerBon(MAG.find(p => p.id === b.dataset.imp)));
   z.querySelectorAll("[data-rem]").forEach(b => b.onclick = () => remettre(b.dataset.rem, true));
   z.querySelectorAll("[data-ann]").forEach(b => b.onclick = () => remettre(b.dataset.ann, false));
 }
+/* rangée de chaque raccord (celle du panier, sinon celle du catalogue actuel); le bon est trié par rangée = un seul tour du magasin */
+const rangee = i => i.r || ((CAT.find(a => a.id === i.id || a.n === i.n) || {}).r) || "";
+const parRangee = L => [...(L || [])].sort((a, b) => rangee(a).localeCompare(rangee(b), "fr", { numeric:true }) || String(a.nom).localeCompare(String(b.nom), "fr"));
+const tableMag = p => `<table><tr><th>Rangée</th><th>Qté</th><th>Raccord</th><th>N° d'article</th></tr>${parRangee(p.items).map(i => `<tr><td class="rg">${esc(rangee(i) || "–")}</td><td class="q">${+i.q || 1}</td><td>${esc(i.nom)}</td><td class="no">${esc(i.n)}</td></tr>`).join("")}</table>`;
+function imprimerBon(p){ if (!p) return;
+  const h = `<!DOCTYPE html><html lang="fr-CA"><head><meta charset="utf-8"><title>Bon ${esc(p.code)}</title><style>body{font:12pt/1.35 system-ui,sans-serif;color:#000;margin:14mm}h1{font-size:18pt;margin:0}.s{color:#444;margin:2pt 0 10pt}table{width:100%;border-collapse:collapse}th,td{border-bottom:1px solid #999;padding:6pt 4pt;text-align:left}th{font-size:9pt;color:#444}td.rg{font-weight:800;font-size:14pt;width:60pt}td.q{font-weight:800;width:40pt}td.no{font-family:monospace}td.ok{width:30pt}.n{font:900 28pt monospace;float:right}</style></head><body>`
+    + `<span class="n">${esc(p.code)}</span><h1>Bon de préparation · Magasin</h1><p class="s">${esc(p.groupe)} · ${esc(nomEns(p.ens))} · approuvé ${heure(p.t_app)}${p.note ? " · " + esc(p.note) : ""}</p>`
+    + `<table><tr><th>Rangée</th><th>Qté</th><th>Raccord</th><th>N° d'article</th><th>✓</th></tr>${parRangee(p.items).map(i => `<tr><td class="rg">${esc(rangee(i) || "–")}</td><td class="q">${+i.q || 1}</td><td>${esc(i.nom)}</td><td class="no">${esc(i.n)}</td><td class="ok">☐</td></tr>`).join("")}</table></body></html>`;
+  const f = document.createElement("iframe"); f.style.cssText = "position:fixed;width:0;height:0;border:0;left:-10px"; document.body.appendChild(f);
+  f.contentDocument.open(); f.contentDocument.write(h); f.contentDocument.close(); setTimeout(() => { try { f.contentWindow.focus(); f.contentWindow.print(); } catch(e){} setTimeout(() => f.remove(), 60000); }, 300); }
 async function remettre(id, oui){ try { await rpc("panier_remettre", { p_id:id, p_remis:oui }); const p = MAG.find(x => x.id === id); if (p) { p.etat = oui ? "remis" : "approuve"; p.t_remis = oui ? new Date().toISOString() : null; } dessinerMag(); $("#mC").focus(); } catch(e){ toast("Impossible : " + e.message); } }
 
 /* =================================================================== départ =================================================================== */
