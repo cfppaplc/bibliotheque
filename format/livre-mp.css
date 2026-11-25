@@ -266,3 +266,14 @@ body.h-rep .page.mp.adm .reponse-choix,.page.mp.adm .reponse-choix.h-vu{box-shad
 .page.mp.em .docu .hand{font-family:MPI6,sans-serif!important;font-style:italic;color:#1d4ed8}
 /* (15 nov.) Livres au moteur d'origine (.ans sans .reponse, ex. Entretien ménager) : réponses cachées tant que le livre n'est pas en mode réponses; en pas à pas, seulement celles déjà montrées (.shown). Les lignes gardent leur place. */
 body:not(.answers) .page.mp .ans:not(.reponse):not(.exa),body.stepans .page.mp .ans:not(.reponse):not(.exa):not(.shown){visibility:hidden!important}
+/* 22 nov. (Jeremy, page test version A) : grande photo pleine largeur. Seulement une .mp-large posée directement dans .body (pas dans une activité ni une colonne) :
+   bord à bord, légende blanche sur le bas de la photo, l'encadré qui suit monte un peu par-dessus. */
+.page.mp .body>.mp-image.mp-large{margin:14px -60px 14px -72px;border-radius:0}
+.page.mp .body>.mp-image.mp-large::after{content:"";position:absolute;left:0;right:0;bottom:0;height:120px;background:linear-gradient(transparent,rgba(0,0,0,.5));pointer-events:none}
+.page.mp .body>.mp-image.mp-large+.mp-cap{position:relative;z-index:2;margin:-62px 0 48px;color:#fff;font:600 12.5px/1.3 MPI5,sans-serif;letter-spacing:0;text-transform:none;text-shadow:0 1px 3px rgba(0,0,0,.5)}
+.page.mp .body>.mp-image.mp-large+.mp-cap+:is(.mp-cmp,.mp-enc),.page.mp .body>.mp-image.mp-large+:is(.mp-cmp,.mp-enc){position:relative;z-index:2;margin-top:-40px;filter:drop-shadow(0 6px 14px rgba(0,0,0,.18))}
+.page.mp .body>.mp-image.mp-large+.mp-cap+.mp-cmp>.mp-enc,.page.mp .body>.mp-image.mp-large+.mp-cmp>.mp-enc{background:#f6f7f8}
+.page.mp .mp-image.mp-large img{object-position:50% 30%}
+/* 23 nov. (Jeremy) : la grande photo monte aussi sous l'encadré qui la précède */
+.page.mp .body>:is(.mp-enc,.mp-cmp)+.mp-image.mp-large{margin-top:-40px}
+.page.mp .body>:is(.mp-enc,.mp-cmp):has(+.mp-image.mp-large){position:relative;z-index:2;filter:drop-shadow(0 6px 14px rgba(0,0,0,.18))}
