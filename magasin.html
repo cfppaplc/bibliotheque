@@ -111,11 +111,13 @@ let COMPTES = {};
 const nomEns = id => (COMPTES[id] && COMPTES[id].nom) || id;
 async function chargerComptes(){ try { COMPTES = (await (await fetch("comptes.json", { cache:"no-cache" })).json()).comptes || {}; } catch(e){ COMPTES = {}; } }
 const idPartage = async ens => [...new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode("metier+|partage-passeport|" + ens)))].map(b => b.toString(16).padStart(2, "0")).join("");
-async function registre(ens){ try { const r = await rpc("coffre_lire", { p_id:await idPartage(ens) }), row = r && r[0]; const v = row && row.data ? JSON.parse(row.data) : {}; return { grp:v.grp || [], codes:v.codes || {} }; } catch(e){ return { grp:[], codes:{} }; } }
+async function registre(ens){ try { const r = await rpc("coffre_lire", { p_id:await idPartage(ens) }), row = r && r[0]; const v = row && row.data ? JSON.parse(row.data) : {}; return { grp:v.grp || [], codes:v.codes || {}, part:v.part || {} }; } catch(e){ return { grp:[], codes:{}, part:{} }; } }
 async function trouverEleve(code){
   const ens = Q.get("e") ? [Q.get("e")] : Object.keys(COMPTES).filter(id => !COMPTES[id].eleve);
-  const R = []; await Promise.all(ens.map(async e => { const g = await registre(e); for (const grp in g.codes) if ((g.codes[grp] || []).includes(code)) R.push({ ens:e, groupe:grp }); }));
-  return R;
+  const R = []; await Promise.all(ens.map(async e => { const g = await registre(e); for (const grp in g.codes) if ((g.codes[grp] || []).includes(code)) R.push({ ens:e, groupe:grp, profs:[e, ...(g.part[grp] || [])] }); }));
+  /* 25 nov. : un groupe partagé paraît chez chaque enseignant du groupe → une seule entrée, avec tous ses enseignants */
+  const U = {}; R.sort((a, b) => a.ens.localeCompare(b.ens)).forEach(x => { const u = U[x.groupe]; if (!u) U[x.groupe] = x; else x.profs.forEach(id => { if (!u.profs.includes(id)) u.profs.push(id); }); });
+  return Object.values(U);
 }
 
 /* ---------- catalogue ---------- */
@@ -148,7 +150,7 @@ function eleveEntree(msg){
     $("#cErr").querySelectorAll("[data-k]").forEach(b => b.onclick = () => connecter(c.code, L[+b.dataset.k])); };
   i.onkeydown = e => { if (e.key === "Enter") go(); }; i.oninput = () => { if (/^\d{3}$/.test(i.value) && $("#cPre").value.trim()) go(); }; $("#cPre").onkeydown = e => { if (e.key === "Enter") go(); }; $("#cOk").onclick = go; i.focus();
 }
-function connecter(code, x){ MOI = { code, ens:x.ens, groupe:x.groupe, prenom:LS.get("magPrenom", "") }; LS.set("magEleve", MOI); eleveCatalogue(); }
+function connecter(code, x){ MOI = { code, ens:x.ens, groupe:x.groupe, profs:(x.profs || []).filter(id => id !== x.ens), prenom:LS.get("magPrenom", "") }; LS.set("magEleve", MOI); eleveCatalogue(); }
 function enTete(){ $("#tQui").innerHTML = `<b>${esc(MOI.prenom || "")}</b> <span class="cg">· ${esc(MOI.code)}</span><span class="gp"> · ${esc(MOI.groupe)}</span>`; $("#tSortir").hidden = false;
   $("#tSortir").onclick = () => { if (nbPanier() && !confirm("Ton panier sera vidé. Changer d'élève ?")) return; MOI = null; PANIER = {}; LS.set("magEleve", null); sauverPanier(); eleveEntree(); }; }
 function eleveCatalogue(){
@@ -188,7 +190,7 @@ function panier(){
   brancherQte($("#pL"), () => { if (!nbPanier()) $("#pEnv").disabled = true; });
   $("#pEnv").onclick = async () => { const b = $("#pEnv"); b.disabled = true; b.textContent = "Envoi…";
     const items = Object.keys(PANIER).map(id => { const a = CAT.find(x => x.id === id); return a && { id, n:a.n, nom:a.nom, q:PANIER[id], r:a.r || "" }; }).filter(Boolean);
-    try { const r = await rpc("panier_envoyer", { p_ens:MOI.ens, p_groupe:MOI.groupe, p_code:MOI.code, p_items:items, p_note:$("#pNote").value || null, p_prenom:MOI.prenom || LS.get("magPrenom", "") || null });
+    try { const r = await rpc("panier_envoyer", { p_ens:MOI.ens, p_groupe:MOI.groupe, p_code:MOI.code, p_items:items, p_note:$("#pNote").value || null, p_prenom:MOI.prenom || LS.get("magPrenom", "") || null, p_profs:MOI.profs && MOI.profs.length ? MOI.profs : null });
       if (!r || !r.ok) throw new Error(r && r.err || "refus");
       const E = LS.get("magEnvois", []); E.unshift({ id:r.id, t:Date.now(), code:MOI.code, n:items.reduce((s, i) => s + i.q, 0) }); LS.set("magEnvois", E.slice(0, 20));
       PANIER = {}; sauverPanier(); LS.set("magNote", ""); toast("Panier envoyé à ton enseignant."); fermer(); }

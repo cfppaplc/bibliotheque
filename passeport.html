@@ -775,10 +775,17 @@ async function vueProf(){
   $("#vueProf").hidden = false;
   await chargerProt(); dessiner();
   $("#grp").onchange = e => { GRP = e.target.value; localStorage.setItem("passeportGroupe", GRP); dessiner(); };
-  $("#bGrpN").onclick = () => { ouvrir(`<h2>Nouveau groupe</h2><p>Un numéro ou un nom court (ex. « 2608 » ou « EGI soir »). Il s'imprime sur les codes QR.</p><input type="text" id="aG" maxlength="20">
+  $("#bGrpN").onclick = () => { const moi = window.__moi;
+    /* 25 nov. (Jeremy) : on dit qui enseigne au groupe dès sa création → avis du magasin, registre et coffres partagés tout seuls */
+    const profs = Object.entries(COMPTES).filter(([id, c]) => id !== moi && !c.eleve && id !== "claude.assistant").sort((a, b) => (a[1].nom || a[0]).localeCompare(b[1].nom || b[0], "fr"));
+    ouvrir(`<h2>Nouveau groupe</h2><p>Un numéro ou un nom court (ex. « 2608 » ou « EGI soir »). Il s'imprime sur les codes QR.</p><input type="text" id="aG" maxlength="20">
+      ${profs.length ? `<p style="margin-top:14px"><b>Qui enseigne à ce groupe ?</b> Toi, et :</p><div id="aP" style="display:flex;flex-direction:column;gap:8px">${profs.map(([id, c]) => `<label style="display:flex;gap:10px;align-items:center"><input type="checkbox" value="${esc(id)}" style="width:22px;height:22px"> ${esc(c.nom || id)}</label>`).join("")}</div>
+      <p class="sous" style="font-size:13px">Ils voient les élèves, les formations et les coffres du groupe, et reçoivent les paniers du magasin.</p>` : ""}
       <div class="act"><button class="btn" id="aF">Annuler</button><button class="btn p" id="aOk">Créer</button></div>`);
     $("#aG").focus(); $("#aF").onclick = fermer;
-    $("#aOk").onclick = () => { const g = $("#aG").value.trim().replace(/[<>"]/g, "").slice(0, 20); if (!g) return; D.grp[g] = { t:Date.now() }; GRP = g; localStorage.setItem("passeportGroupe", g); sauver(); fermer(); dessiner(); }; };
+    $("#aOk").onclick = async () => { const g = $("#aG").value.trim().replace(/[<>"]/g, "").slice(0, 20); if (!g) return; const L = [...document.querySelectorAll("#aP input:checked")].map(i => i.value);
+      D.grp[g] = { t:Date.now() }; GRP = g; localStorage.setItem("passeportGroupe", g); sauver(); fermer(); dessiner();
+      if (L.length) { try { await window.PASS.partage(g, L); toast("Groupe créé et partagé"); } catch(e){ toast("Groupe créé. Le partage n'a pas fonctionné : réessaie avec « Enseignants »."); } } }; };
   $("#bEl").onclick = () => { ouvrir(`<h2>Ajouter des élèves · ${esc(GRP)}</h2><p>Un prénom par ligne (une initiale permise : « Marc B. »). Pas de nom de famille. Les élèves qui signent sont aussi ajoutés tout seuls.</p><textarea id="aT"></textarea>
       <div class="act"><button class="btn" id="aF">Annuler</button><button class="btn p" id="aOk">Ajouter</button></div>`);
     $("#aT").focus(); $("#aF").onclick = fermer;
