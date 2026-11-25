@@ -14,6 +14,7 @@
 <script src="garde.js"></script>
 <script src="coffre.js"></script>
 <script src="sync-partage.js"></script>
+<script src="js/code128.js?v=1"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex">
@@ -104,6 +105,7 @@ table.g{border-collapse:separate;border-spacing:0;min-width:100%}
   #qrs.f5163 .ce2{width:4in;height:2in!important;padding:.2in .3in}
   #qrs.f5163 .ce2 img{height:7mm;right:.3in;top:.2in}#qrs.f5163 .ce2 small{font-size:9pt}#qrs.f5163 .ce2 b{font-size:16pt;max-width:2.6in}#qrs.f5163 .ce2 .n{left:.3in;bottom:.15in;font-size:44pt;letter-spacing:4mm}
   /* étiquettes des codes d'élèves (14 nov.) : collées à l'arrière de la carte étudiante (carte 85 x 54 mm) */
+  .ce2 img.cb{position:absolute;right:3mm;bottom:2.5mm;top:auto;height:8mm;width:30mm;image-rendering:pixelated}#qrs.f5160 .ce2 img.cb{height:.34in;width:1.35in;right:.12in;bottom:.1in}#qrs.f5163 .ce2 img.cb{height:.6in;width:2in;right:.3in;bottom:.2in;top:auto}
   .ce2{display:inline-block;vertical-align:top;width:60mm;height:26mm;margin:0 3mm 3mm 0;border:1px dashed #999;border-radius:2mm;padding:2.5mm 3mm;break-inside:avoid;page-break-inside:avoid;font-family:system-ui,sans-serif;color:#1E2A44;position:relative}
   .ce2 img{height:4.5mm;position:absolute;right:3mm;top:2.5mm}.ce2 small{display:block;font-size:7pt;color:#555;text-transform:uppercase;letter-spacing:.06em}
   .ce2 b{display:block;font-size:10pt;margin-top:.5mm;max-width:38mm;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ce2 .n{position:absolute;left:3mm;bottom:1.5mm;font-size:24pt;font-weight:900;letter-spacing:2mm}
@@ -451,6 +453,8 @@ const formesPub = () => { const F = {}; for (const k in D.val){ const v = D.val[
 const codesPub = L => { const C = {}; L.forEach(g => C[g] = []); Object.values(D.el).forEach(e => { if (!e.x && e.c && C[e.g]) C[e.g].push(e.c); }); return C; };
 function codeLibre(){ const pris = new Set(Object.values(D.el).filter(e => !e.x && e.c).map(e => e.c));
   for (let i = 0; i < 2000; i++){ const c = String(100 + Math.floor(Math.random() * 900)); if (!pris.has(c)) return c; } return ""; }
+/* 25 nov. : clé de la carte étudiante (6 caractères, sans lettres qui se confondent) : collant « MP-123-K7Q9X2 » scanné au magasin, aux coffres et (plus tard) aux livres */
+function cleCarte(){ const A = "ACDEFGHJKLMNPQRTUVWXY3479", r = crypto.getRandomValues(new Uint8Array(6)); return [...r].map(x => A[x % A.length]).join(""); }
 const nid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 /* enseignant régulier : seulement les groupes qui lui sont assignés (partagés par l'administrateur), 15 nov. */
 const groupes = () => Object.keys(D.grp).filter(g => D.grp[g] && !D.grp[g].x && (window.ADMIN !== false || HOTES[g])).sort((a, b) => a.localeCompare(b, "fr"));
@@ -477,7 +481,7 @@ $("#ov").onclick = e => { if (e.target.id === "ov") fermer(); };
 document.addEventListener("keydown", e => { if (e.key === "Escape") fermer(); });
 
 function dessiner(){
-  let mig = false; Object.values(D.el).forEach(e => { if (!e.x && !e.c){ e.c = codeLibre(); e.t = Date.now(); mig = true; } }); if (mig) sauver();
+  let mig = false; Object.values(D.el).forEach(e => { if (!e.x && !e.c){ e.c = codeLibre(); e.t = Date.now(); mig = true; } if (!e.x && !e.k){ e.k = cleCarte(); e.t = Date.now(); mig = true; } }); if (mig) sauver();
   dessinerSorties();
   const gs = groupes(); if (!gs.includes(GRP)) GRP = gs[0] || "";
   $("#grp").innerHTML = gs.length ? gs.map(g => `<option ${g === GRP ? "selected" : ""}>${esc(g)}</option>`).join("") : `<option value="">Aucun groupe</option>`;
@@ -543,7 +547,7 @@ function groupeDe(g, p){
   return ou.length === 1 ? ou[0] : "À classer"; }
 function trouverEleve(p, g){
   const k = sansAcc(p); const t = Object.entries(D.el).find(([, e]) => !e.x && e.g === g && sansAcc(e.p) === k);
-  if (t) return t[0]; const id = nid(); D.el[id] = { p, g, c:codeLibre(), t:Date.now() };
+  if (t) return t[0]; const id = nid(); D.el[id] = { p, g, c:codeLibre(), k:cleCarte(), t:Date.now() };
   if (!D.grp[g]) D.grp[g] = { t:Date.now() }; return id; }
 
 /* signatures déposées par les élèves (chiffrées pour ma clé) : places passeport|<moi>|0, 1, 2… */
@@ -602,7 +606,7 @@ function dlgCodes(){
   $("#aF").onclick = fermer; brancherChoix($("#aOk"), "étiquette");
   $("#aOk").onclick = () => { const k = $("#bx").querySelector("[name=fmt]:checked").value, F = FORMATS[k]; localStorage.setItem("passEtqFormat", k);
     const S = choisis(), L2 = L.filter(e => S.has(e.id)); L.length = 0; L.push(...L2); fermer();
-    const etq = e => `<div class="ce2"${e.st || ""}><img src="img/metier-plus.svg" alt=""><small>Code Métier+ · ${esc(GRP)}</small><b>${esc(e.p)}</b><span class="n">${esc(e.c)}</span></div>`;
+    const etq = e => `<div class="ce2"${e.st || ""}><img src="img/metier-plus.svg" alt=""><small>Code Métier+ · ${esc(GRP)}</small><b>${esc(e.p)}</b><span class="n">${esc(e.c)}</span>${e.k && window.Code128 ? `<img class="cb" src="${Code128.url("MP-" + e.c + "-" + e.k, 40, false)}" alt="">` : ""}</div>`;   /* 25 nov. : code-barres de la carte (magasin, coffres) */
     const Z = $("#qrs"); Z.className = "f" + k;
     if (k === "main"){ Z.innerHTML = L.map(etq).join(""); }
     else { const par = F.c * F.l, pos = Math.max(1, Math.min(par, +$("#aPos").value || 1)) - 1; let h = "", i = pos, pg = "";

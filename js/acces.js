@@ -383,6 +383,7 @@ window.ACCES = (function(){
     diff:'<svg viewBox="0 0 24 24"><path d="M3 11v2a1 1 0 0 0 1 1h2l5 4V6L6 10H4a1 1 0 0 0-1 1z"/><path d="M15 9a4 4 0 0 1 0 6M18 6a8 8 0 0 1 0 12"/></svg>',
     voir:'<svg viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>',
     defi:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14M12 17.5v.01"/></svg>',
+    magasin:'<svg viewBox="0 0 24 24"><path d="M3 4h2l2.4 11.2a1 1 0 0 0 1 .8h9.2a1 1 0 0 0 1-.8L20 8H6.2"/><circle cx="9" cy="20" r="1.4"/><circle cx="17" cy="20" r="1.4"/></svg>',
     ajliv:'<svg viewBox="0 0 24 24"><path d="M4 4.5h6a2 2 0 0 1 2 2V20a2 2 0 0 0-2-2H4z"/><path d="M17 8v6M14 11h6"/></svg>' };
   const constrDe = l => REGL.construction[l.fichier] !== undefined ? !!REGL.construction[l.fichier] : !!l._c0;
   const nouvDe = l => estNouveau(l, REGL);
@@ -459,7 +460,7 @@ window.ACCES = (function(){
       + '<div class="' + (aPublier ? 'pub' : 'ok') + '"><b>' + (aPublier ? '!' : '✓') + '</b><span>' + (aPublier ? 'à publier' : 'tout est publié') + '</span></div></div>'
       + '<nav class="acces-onglets">' + grpT("Vue d'ensemble") + ong("accueil", "Tableau de bord")
         + grpT("Personnes") + ong("profs", "Comptes et accès") + ong("voir", "Voir comme un collègue") + ong("diff", "Message et mise à jour")
-        + grpT("Contenu") + ong("livres", "Livres") + ong("ajliv", "Ajouter un livre") + ong("defi", "Défi+ des livres") + ong("nouv", "Quoi de neuf") + ong("props", "Propositions") + ong("classe", "Classe et atelier")
+        + grpT("Contenu") + ong("livres", "Livres") + ong("ajliv", "Ajouter un livre") + ong("defi", "Défi+ des livres") + ong("nouv", "Quoi de neuf") + ong("props", "Propositions") + ong("magasin", "Magasin") + ong("classe", "Classe et atelier")
         + grpT("Suivi") + ong("stats", "Statistiques") + ong("journaux", "Fluidité") + ong("site", "Signalements et état") + ong("hist", "Historique et copies")
         + grpT("Site") + ong("auto", "Automatisations") + '</nav>'
       + '<div class="acces-pane"' + vol("profs") + '><details class="acces-info"><summary>Comment ça marche</summary><p class="sous">Touche « Choisir les livres » pour cocher les livres d\'un enseignant, ou ses programmes (EGI, Plomberie) pour tout lui donner d\'un coup. Pastille verte : venu dans les 7 derniers jours. Les changements partent en ligne quand tu touches « Publier ».</p></details>'
@@ -481,7 +482,7 @@ window.ACCES = (function(){
       + '<div class="acces-pane"' + vol("stats") + '>' + volStats + '</div>'
       + '<div class="acces-pane"' + vol("hist") + '>' + volHist + '</div>'
       + '<div class="acces-pane"' + vol("site") + '><div id="gSite"></div></div>'
-      + ["accueil", "nouv", "classe", "journaux", "auto", "diff", "voir", "defi", "ajliv"].map(k => '<div class="acces-pane"' + vol(k) + '><div id="gPlus_' + k + '"><p class="sous">Chargement…</p></div></div>').join("")
+      + ["accueil", "nouv", "classe", "journaux", "auto", "diff", "voir", "defi", "ajliv", "magasin"].map(k => '<div class="acces-pane"' + vol(k) + '><div id="gPlus_' + k + '"><p class="sous">Chargement…</p></div></div>').join("")
       + (aRech.length ? '<label class="acces-rech"><input type="checkbox" id="gRech" checked><span><b>Couper vraiment l\'accès</b> : nouvelle clé pour ' + aRech.map(f => '« ' + esc(titreDe(f)) + ' »').join(", ") + '. Une vieille copie gardée par quelqu\'un qui n\'a plus l\'accès ne s\'ouvrira plus (un peu plus long à publier).</span></label>' : '')
       + (jeton   /* clé déjà enregistrée : invisible et impossible à changer dans le panneau (demande de Jeremy, 8 nov.); redemandée seulement si GitHub la refuse */
         ? '<input type="hidden" id="gJeton" value="">'

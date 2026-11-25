@@ -178,6 +178,49 @@ test("Élève : toucher un choix (format commun .mp-ch / .mp-vf) l'encercle, ret
   vrai(!p.errs.length, p.errs.join(" | "));
 });
 
+test("Magasin : l'élève (carte scannée) envoie son panier, l'enseignant approuve, le magasinier filtre par code et remet", async b => {
+  const P = [];
+  const mock = async ctx => ctx.route(/supabase\.co\/rest\/v1\/rpc\/(\w+)/, async r => { const f = r.request().url().match(/rpc\/(\w+)/)[1], a = JSON.parse(r.request().postData() || "{}"); let o = null;
+    if (f === "coffre_lire") o = [{ data: JSON.stringify({ grp: ["2608 EGI"], codes: { "2608 EGI": ["123", "456"] } }) }];
+    else if (f === "panier_envoyer") { P.push({ id: "id" + P.length, etat: "attente", t: new Date().toISOString(), ens: a.p_ens, groupe: a.p_groupe, code: a.p_code, items: a.p_items, note: a.p_note }); o = { ok: true, id: "id" + (P.length - 1) }; }
+    else if (f === "panier_etat") o = { etat: (P.find(p => p.id === a.p_id) || {}).etat };
+    else if (f === "panier_prof_regler") o = true;
+    else if (f === "panier_prof_lire") o = P;
+    else if (f === "panier_decider") { const p = P.find(x => x.id === a.p_id); p.etat = a.p_ok ? "approuve" : "refuse"; p.t_app = new Date().toISOString(); o = true; }
+    else if (f === "panier_magasin") o = P.filter(p => p.etat === "approuve" || p.etat === "remis");
+    else if (f === "panier_remettre") { const p = P.find(x => x.id === a.p_id); p.etat = a.p_remis ? "remis" : "approuve"; p.t_remis = new Date().toISOString(); o = true; }
+    r.fulfill({ body: JSON.stringify(o), contentType: "application/json", headers: { "access-control-allow-origin": "*" } }); });
+  const errs = [];
+  const c1 = await b.newContext({ viewport: { width: 820, height: 1180 }, hasTouch: true, serviceWorkers: "block" }); await mock(c1);
+  const p = await c1.newPage(); p.on("pageerror", e => errs.push(e.message));
+  await p.goto(BASE + "magasin.html?e=jeremy.raymond"); await attendre(800);
+  await p.fill("#cCode", "MP-123-K7Q9X2"); await p.keyboard.press("Enter"); await attendre(1200);
+  vrai(/123/.test(await p.textContent("#tQui")), "Carte scannée : élève pas reconnu");
+  await p.fill("#fQ", "coude 90 abs 2"); await attendre(300);
+  const res = await p.$$eval(".art .tx b", L => L.map(x => x.textContent));
+  vrai(res.length === 1 && /ABS 2 po/.test(res[0]), "Recherche : " + res.join(" | "));
+  await p.fill("#fQ", "té cuivre 3/4"); await attendre(300);
+  const r2 = await p.$$eval(".art .tx b", L => L.map(x => x.textContent)); vrai(r2.length === 1, "« té » trouve aussi : " + r2.join(" | "));
+  await p.click(".art .aj"); await p.click(".art [data-m='1']"); await attendre(200);
+  await p.click("#bVoir"); await attendre(300); await p.click("#pEnv"); await attendre(1200);
+  vrai(P.length === 1 && P[0].code === "123" && P[0].items[0].q === 2, "Panier mal envoyé : " + JSON.stringify(P));
+  const c2 = await b.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true, serviceWorkers: "block" }); await mock(c2);
+  await c2.addInitScript(() => { localStorage.dernierId = "jeremy.raymond"; });
+  const q = await c2.newPage(); q.on("pageerror", e => errs.push(e.message));
+  await q.goto(BASE + "magasin.html?mode=prof"); await attendre(800); await q.click("#aOk"); await attendre(1200); await q.click("[data-ok]"); await attendre(1000);
+  vrai(P[0].etat === "approuve", "Approbation : " + P[0].etat);
+  const c3 = await b.newContext({ viewport: { width: 1366, height: 768 }, serviceWorkers: "block" }); await mock(c3);
+  const m = await c3.newPage(); m.on("pageerror", e => errs.push(e.message));
+  await m.goto(BASE + "magasin.html?mode=magasin"); await attendre(1500);
+  await m.keyboard.type("MP-456-AAAAAA"); await m.keyboard.press("Enter"); await attendre(300);
+  vrai(!(await m.$("[data-rem]")), "Code 456 : la commande de 123 s'affiche");
+  await m.keyboard.type("MP-123-K7Q9X2"); await m.keyboard.press("Enter"); await attendre(300);
+  vrai(!!(await m.$("[data-rem]")), "Code 123 : commande absente");
+  await m.click("[data-rem]"); await attendre(400); vrai(P[0].etat === "remis", "Remis : " + P[0].etat);
+  vrai(!errs.length, errs.join(" | "));
+  await c1.close(); await c2.close(); await c3.close();
+});
+
 (async () => {
   const b = await chromium.launch(); let echecs = 0;
   for (const [nom, f] of tests) {

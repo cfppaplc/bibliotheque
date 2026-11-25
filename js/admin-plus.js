@@ -138,19 +138,67 @@ window.ADMIN_PLUS = (function(){
       + '<div class="as-carte"><h3>Atelier</h3>' + L("outils-atelier.html", "Gestion d'atelier", "Groupes, élèves, équipes, locaux") + L("passeport.html?formations=1", "Formations du registre", "Outils et machines à signer") + L("coffres.html", "Inventaire des coffres", "Coffres, codes QR, listes") + '</div>'
       + '<div class="as-carte"><h3>Classe</h3>' + L("accueil.html?menage=1", "Locaux et tâches du ménage", "Accueil de classe") + L("horaire.html", "Horaires des groupes", "Planification") + '</div>'
       + '<div class="as-carte"><h3>Labo</h3>' + L("labo.html", "Labo interactif", "Simulateurs et Défi+") + L("quiz.html", "Mes Défi+", "Créer et lancer un Défi+") + '</div>'
-      + '<div class="as-carte"><h3>Vérification</h3>' + L("tests.html", "Pages d'essai", "Navigateur, vitesse, toucher, son, écran") + L("confidentialite.html", "Confidentialité (Loi 25)", "Ce que le site recueille") + '</div>'
+      + '<div class="as-carte"><h3>Vérification</h3>' + L("magasin.html?mode=magasin", "Comptoir du magasin", "Écran du magasinier") + L("tests.html", "Pages d'essai", "Navigateur, vitesse, toucher, son, écran") + L("confidentialite.html", "Confidentialité (Loi 25)", "Ce que le site recueille") + '</div>'
       + '</div>';
     z.querySelectorAll("[data-ouvre]").forEach(b => b.onclick = () => ouvrirIci(z, b.dataset.ouvre, b.dataset.t));
   }
-  function ouvrirIci(z, url, titre){
-    z.innerHTML = '<div class="ap-cadre-t"><button class="abtn" id="apRet">‹ Classe et atelier</button><b>' + esc(titre) + '</b></div><iframe class="ap-cadre" title="' + esc(titre) + '" src="' + esc(url) + '"></iframe>';
-    z.querySelector("#apRet").onclick = () => classe(z);
+  function ouvrirIci(z, url, titre, retour, nomRetour){
+    z.innerHTML = '<div class="ap-cadre-t"><button class="abtn" id="apRet">‹ ' + esc(nomRetour || "Classe et atelier") + '</button><b>' + esc(titre) + '</b></div><iframe class="ap-cadre" title="' + esc(titre) + '" src="' + esc(url) + '"></iframe>';
+    z.querySelector("#apRet").onclick = () => (retour || classe)(z);
     const f = z.querySelector("iframe"), haut = () => Math.max(520, innerHeight - 190);
     f.style.height = haut() + "px";
     f.onload = () => { let d; try { d = f.contentDocument; } catch(e){ return; } if (!d) return;
       const st = d.createElement("style"); st.textContent = ".mp-tete,.mp-pied,footer.mp-pied{display:none!important}body{min-height:0!important}"; d.head.appendChild(st);
       const ajuste = () => { try { const h = Math.max(d.documentElement.scrollHeight, d.body ? d.body.scrollHeight : 0); const cur = f.getBoundingClientRect().height; if (h > cur + 8) f.style.height = (h + 4) + "px"; } catch(e){} };   /* une page à hauteur d'écran (accueil) ne grandit pas sans fin */
       ajuste(); try { new f.contentWindow.ResizeObserver(ajuste).observe(d.body); } catch(e){ setInterval(ajuste, 1000); } };
+  }
+
+
+  /* ---------- Magasin de raccords (25 nov.) ---------- */
+  let MG = null, MG_TXT = "", MG_Q = "", MG_MSG = "";
+  async function chargerMg(){ const t = await (await fetch("magasin-catalogue.json?t=" + Date.now(), { cache:"no-store" })).text(); MG = JSON.parse(t); MG_TXT = JSON.stringify(MG); }
+  const mgChange = () => MG && JSON.stringify(MG) !== MG_TXT;
+  async function magasin(z){
+    if (!MG) { try { await chargerMg(); } catch(e){ z.innerHTML = '<p class="acces-err">Catalogue illisible.</p>'; return; } }
+    const base = location.origin + location.pathname.replace(/[^/]*$/, ""), lienE = base + "magasin.html", lienM = base + "magasin.html?mode=magasin";
+    const qr = u => { if (!window.QRLib) return ""; const M = QRLib.matrice(u), k = M.length; return '<svg viewBox="0 0 ' + (k + 8) + ' ' + (k + 8) + '" width="150" height="150"><rect width="' + (k + 8) + '" height="' + (k + 8) + '" fill="#fff"/>' + M.map((r, y) => r.map((v, x) => v ? '<rect x="' + (x + 4) + '" y="' + (y + 4) + '" width="1.02" height="1.02"/>' : "").join("")).join("") + '</svg>'; };
+    const mots = MG_Q.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").split(/\s+/).filter(Boolean);
+    const R = MG.raccords.map((a, i) => [a, i]).filter(([a]) => mots.every(m => (a.nom + " " + a.n + " " + a.mat + " " + a.type + " " + a.d).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").includes(m)));
+    z.innerHTML = '<div class="ap-tete"><h3>Magasin de raccords</h3><p class="sous">L\'élève scanne sa carte, remplit son panier, son enseignant l\'approuve sur son cellulaire, le magasinier le prépare.</p></div>'
+      + '<div class="as-grille ap-g3">'
+      + '<div class="as-carte"><h3>Page des élèves</h3><p class="sous">À ouvrir sur les iPad, ou ce code QR affiché à l\'atelier.</p><div class="ap-qr">' + qr(lienE) + '</div><div class="ap-btns"><a class="abtn" href="magasin.html" target="_blank" rel="noopener">Ouvrir</a><button class="abtn" data-copie="' + esc(lienE) + '">Copier le lien</button></div></div>'
+      + '<div class="as-carte"><h3>Comptoir du magasinier</h3><p class="sous">Sur l\'ordinateur du magasinier, laissé ouvert toute la journée. Le lecteur de codes-barres lit la carte de l\'élève.</p><div class="ap-btns"><a class="abtn prim" href="magasin.html?mode=magasin" target="_blank" rel="noopener">Ouvrir le comptoir</a><button class="abtn" data-copie="' + esc(lienM) + '">Copier le lien</button></div></div>'
+      + '<div class="as-carte"><h3>Approbation et dossiers</h3><button class="as-lien" data-ici="magasin.html?mode=prof" data-t="Commandes à approuver">Commandes à approuver<small>Approuver, refuser, avis sur ton cellulaire</small></button><button class="as-lien" data-ici="outils-atelier.html" data-t="Dossiers des élèves">Dossiers des élèves<small>Touche un élève : formations, coffre, commandes</small></button><button class="as-lien" data-ici="passeport.html" data-t="Collants pour la carte étudiante">Collants pour la carte étudiante<small>Choisis le groupe, puis « Codes des élèves »</small></button></div>'
+      + '</div>'
+      + '<div class="as-carte"><div class="as-th"><h3>Catalogue des raccords · ' + MG.raccords.length + '</h3></div>'
+      + (MG.essai ? '<p class="acces-err" style="margin:0 0 8px">Liste d\'essai : remplace-la par la vraie liste du magasin (fichier CSV, un raccord par ligne).</p>' : '')
+      + '<div class="ap-pub"><span class="acces-etat' + (mgChange() ? ' pub' : '') + '">' + (mgChange() ? 'Des changements attendent d\'être publiés' : 'Tout est publié') + '</span>' + (MG_MSG ? '<span class="acces-ok">' + esc(MG_MSG) + '</span>' : '') + '<span class="acces-err" id="mgErr" hidden></span>'
+      + '<label class="abtn" for="mgCsv" style="margin:0;cursor:pointer">Remplacer par un fichier CSV</label><input type="file" id="mgCsv" accept=".csv,text/csv,.txt" hidden><button class="abtn" id="mgAj">+ Raccord</button><button class="abtn" id="mgAnn"' + (mgChange() ? '' : ' disabled') + '>Annuler</button><button class="abtn prim" id="mgPub"' + (mgChange() ? '' : ' disabled') + '>Publier le catalogue</button></div>'
+      + '<p class="sous" style="font-size:.8rem">CSV : colonnes <b>numéro; nom; matériau; type; diamètre</b> (première ligne = titres). Dans Excel : Fichier → Enregistrer sous → CSV.</p>'
+      + '<input type="text" id="mgQ" placeholder="Chercher dans le catalogue…" value="' + esc(MG_Q) + '" style="margin:6px 0 10px">'
+      + '<div class="ap-mg"><div class="ap-mg-l ap-mg-t"><span>N° d\'article</span><span>Nom affiché à l\'élève</span><span>Matériau</span><span>Type</span><span>Diamètre</span><span></span></div>'
+      + R.slice(0, 200).map(([a, i]) => '<div class="ap-mg-l" data-i="' + i + '">' + ["n", "nom", "mat", "type", "d"].map(k => '<input type="text" data-k="' + k + '" value="' + esc(a[k]) + '">').join("") + '<button class="abtn rouge" data-sup title="Retirer">×</button></div>').join("")
+      + (R.length > 200 ? '<p class="sous">' + (R.length - 200) + ' autres : précise ta recherche.</p>' : '') + '</div></div>';
+    const re = () => magasin(z), etat = () => { const c = mgChange(), e = z.querySelector(".ap-pub .acces-etat"); e.classList.toggle("pub", c); e.textContent = c ? "Des changements attendent d'être publiés" : "Tout est publié"; z.querySelector("#mgPub").disabled = !c; z.querySelector("#mgAnn").disabled = !c; };
+    z.querySelectorAll("[data-copie]").forEach(b => b.onclick = () => { try { navigator.clipboard.writeText(b.dataset.copie); b.textContent = "Lien copié"; } catch(e){} });
+    z.querySelectorAll("[data-ici]").forEach(b => b.onclick = () => ouvrirIci(z, b.dataset.ici, b.dataset.t, magasin, "Magasin"));
+    z.querySelector("#mgQ").oninput = e => { MG_Q = e.target.value; const p = e.target.selectionStart; re(); const n = z.querySelector("#mgQ"); n.focus(); n.setSelectionRange(p, p); };
+    z.querySelectorAll(".ap-mg-l[data-i] input").forEach(inp => inp.oninput = () => { const a = MG.raccords[+inp.closest("[data-i]").dataset.i]; a[inp.dataset.k] = inp.value; if (inp.dataset.k !== "n" && !a.nom) a.nom = ""; etat(); });
+    z.querySelectorAll("[data-sup]").forEach(b => b.onclick = () => { const i = +b.closest("[data-i]").dataset.i; if (!confirm("Retirer « " + MG.raccords[i].nom + " » du catalogue ?")) return; MG.raccords.splice(i, 1); re(); });
+    z.querySelector("#mgAj").onclick = () => { const id = "r" + Date.now().toString(36); MG.raccords.unshift({ id, n:"", nom:"Nouveau raccord", mat:"", type:"", d:"" }); MG_Q = ""; re(); };
+    z.querySelector("#mgAnn").onclick = async () => { await chargerMg(); MG_MSG = ""; re(); };
+    z.querySelector("#mgCsv").onchange = async e => { const f = e.target.files[0]; if (!f) return; const t = (await f.text()).replace(/^﻿/, ""), sep = (t.split("\n")[0].match(/;/g) || []).length >= (t.split("\n")[0].match(/,/g) || []).length ? ";" : ",";
+      const L = t.split(/\r?\n/).filter(l => l.trim()).map(l => l.split(sep).map(x => x.trim().replace(/^"|"$/g, "")));
+      const corps = /num|nom|n°|no\b/i.test(L[0].join(" ")) ? L.slice(1) : L;
+      const N = corps.filter(c => c[1]).map((c, k) => ({ id:"r" + (k + 1).toString(36) + Date.now().toString(36).slice(-3), n:c[0] || "", nom:c[1], mat:c[2] || "", type:c[3] || "", d:c[4] || "" }));
+      if (!N.length) { const er = z.querySelector("#mgErr"); er.textContent = "Aucun raccord trouvé dans ce fichier."; er.hidden = false; return; }
+      if (!confirm("Remplacer les " + MG.raccords.length + " raccords du catalogue par les " + N.length + " de ce fichier ?")) return;
+      MG.raccords = N; delete MG.essai; delete MG.note; MG.maj = new Date().toLocaleDateString("en-CA"); MG_MSG = ""; re(); };
+    z.querySelector("#mgPub").onclick = async () => { const b = z.querySelector("#mgPub"), er = z.querySelector("#mgErr"); er.hidden = true;
+      if (MG.raccords.some(a => !String(a.nom || "").trim())) { er.textContent = "Chaque raccord doit avoir un nom."; er.hidden = false; return; }
+      b.disabled = true; b.textContent = "Publication…";
+      try { MG.maj = new Date().toLocaleDateString("en-CA"); const t = JSON.stringify(MG, null, 1) + "\n"; await A().publier({ "magasin-catalogue.json":t }, "Magasin : catalogue des raccords (Administration)"); MG_TXT = JSON.stringify(MG); MG_MSG = "Publié : en ligne d'ici une ou deux minutes."; re(); }
+      catch(e){ er.textContent = e.message; er.hidden = false; b.disabled = false; b.textContent = "Publier le catalogue"; } };
   }
 
   /* ---------- Quoi de neuf ---------- */
@@ -363,7 +411,7 @@ window.ADMIN_PLUS = (function(){
 
   function dessiner(k, z){
     if (!z) return;
-    try { ({ accueil, auto, journaux:fluidite, classe, nouv, diff, voir, defi, ajliv })[k](z); } catch(e){ z.innerHTML = '<p class="acces-err">' + esc(e.message) + '</p>'; }
+    try { ({ accueil, auto, journaux:fluidite, classe, nouv, diff, voir, defi, ajliv, magasin })[k](z); } catch(e){ z.innerHTML = '<p class="acces-err">' + esc(e.message) + '</p>'; }
   }
   return { dessiner, rapport };
 })();

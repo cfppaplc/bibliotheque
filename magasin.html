@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="fr-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Magasin · Métier+</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#1E2A44">
+<link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="img/metier-plus-icone.svg">
+<script src="vieux-navigateur.js"></script><script src="signaler.js?v=2"></script>
+<style>
+/* © 2026 Jérémy Raymond. Tous droits réservés. Métier+ — Magasin de raccords (25 nov.) */
+:root{--fond:#F4F1EC;--carte:#fff;--carte2:#F8F6F2;--txt:#1E2A44;--doux:#6b7280;--ligne:#E5DAC6;--acc:#EB6A22;--vert:#1E8A55;--rouge:#C9362E;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--fond:#12161f;--carte:#1b2130;--carte2:#232a3b;--txt:#eef1f6;--doux:#9aa3b2;--ligne:#2f3850;color-scheme:dark}}
+[hidden]{display:none!important}*{box-sizing:border-box}html,body{margin:0;background:var(--fond);color:var(--txt);font:16px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-tap-highlight-color:transparent}
+button,input,textarea,select{font:inherit;color:inherit}
+.top{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:12px;padding:12px max(16px,env(safe-area-inset-left));background:var(--txt);color:#fff}
+@media (prefers-color-scheme:dark){.top{background:#0b0f17}}
+.top img{height:28px}.top b{font-size:1.05rem}.top .sp{flex:1}.top .qui{font-size:.85rem;opacity:.85;text-align:right}
+.top button{border:1px solid rgba(255,255,255,.35);background:transparent;color:#fff;border-radius:10px;padding:7px 12px;cursor:pointer}
+main{max-width:1100px;margin:0 auto;padding:18px max(16px,env(safe-area-inset-left)) 120px}
+h1{font-size:1.5rem;margin:6px 0 4px}.sous{color:var(--doux);margin:0 0 16px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 18px;border-radius:12px;border:1px solid var(--ligne);background:var(--carte);cursor:pointer;font-weight:600}
+.btn.p{background:var(--acc);border-color:var(--acc);color:#fff}.btn.v{background:var(--vert);border-color:var(--vert);color:#fff}.btn.r{color:var(--rouge);border-color:var(--rouge)}
+.btn:disabled{opacity:.45;cursor:default}
+.carte{background:var(--carte);border:1px solid var(--ligne);border-radius:16px;padding:16px 18px;margin-bottom:14px}
+.code{display:block;width:100%;max-width:420px;font:800 2.6rem/1 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.25em;text-align:center;padding:16px;border-radius:16px;border:2px solid var(--ligne);background:var(--carte);margin:10px 0}
+.code:focus{outline:none;border-color:var(--acc);box-shadow:0 0 0 4px rgba(235,106,34,.2)}
+.err{color:var(--rouge);font-weight:600;min-height:1.4em}.ok{color:var(--vert);font-weight:600}
+.cherche{position:sticky;top:52px;z-index:10;background:var(--fond);padding:10px 0 8px}
+.cherche input{width:100%;min-height:52px;border-radius:14px;border:1px solid var(--ligne);background:var(--carte);padding:0 16px;font-size:1.05rem}
+.puces{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.puce{min-height:38px;padding:0 13px;border-radius:99px;border:1px solid var(--ligne);background:var(--carte);cursor:pointer;font-size:.9rem}
+.puce.on{background:var(--txt);border-color:var(--txt);color:var(--fond)}
+.art{display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid var(--ligne)}
+.art:last-child{border-bottom:0}.art .tx{flex:1;min-width:0}.art .tx b{display:block;font-weight:600}.art small{color:var(--doux)}
+.qte{display:flex;align-items:center;gap:6px}.qte button{width:44px;height:44px;border-radius:12px;border:1px solid var(--ligne);background:var(--carte2);font-size:1.35rem;font-weight:700;cursor:pointer}
+.qte span{min-width:30px;text-align:center;font-weight:700;font-variant-numeric:tabular-nums}
+.qte .aj{width:auto;padding:0 16px;font-size:1rem;background:var(--acc);border-color:var(--acc);color:#fff}
+.barre{position:fixed;left:0;right:0;bottom:0;z-index:30;display:flex;align-items:center;gap:12px;padding:12px max(16px,env(safe-area-inset-left)) max(12px,env(safe-area-inset-bottom));background:var(--carte);border-top:1px solid var(--ligne);box-shadow:0 -8px 24px rgba(0,0,0,.08)}
+.barre .sp{flex:1}.barre b{font-size:1.05rem}
+.vide{color:var(--doux);text-align:center;padding:24px}
+.etat{display:inline-block;padding:3px 10px;border-radius:99px;font-size:.8rem;font-weight:700}
+.etat.attente{background:#FFF3D6;color:#8a5a00}.etat.approuve{background:#E9F6EF;color:var(--vert)}.etat.refuse{background:#FBE9E7;color:var(--rouge)}.etat.remis{background:#E8ECF4;color:#3b4a6b}
+@media (prefers-color-scheme:dark){.etat.attente{background:#3a2d10;color:#ffd27a}.etat.approuve{background:#123222;color:#7fe0ad}.etat.refuse{background:#3a1715;color:#ff9b93}.etat.remis{background:#24304a;color:#b9c7e6}}
+.cmd{border:1px solid var(--ligne);border-radius:16px;background:var(--carte);margin-bottom:14px;overflow:hidden}
+.cmd .h{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:14px 16px;border-bottom:1px solid var(--ligne)}
+.cmd .h .n{font:800 1.8rem/1 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.1em}.cmd .h .sp{flex:1}
+.cmd table{width:100%;border-collapse:collapse}.cmd td,.cmd th{padding:9px 16px;text-align:left;border-bottom:1px solid var(--ligne)}.cmd th{font-size:.78rem;color:var(--doux);font-weight:600}
+.cmd td.q{font-weight:800;font-size:1.1rem;width:70px}.cmd td.no{font-family:ui-monospace,Menlo,Consolas,monospace;color:var(--doux);white-space:nowrap}
+.cmd .act{display:flex;gap:10px;flex-wrap:wrap;padding:12px 16px}
+.cmd.neuf{border-color:var(--acc);box-shadow:0 0 0 3px rgba(235,106,34,.25)}
+.cb{display:block;margin:14px auto 4px;max-width:100%;background:#fff;padding:10px;border-radius:8px}
+.ov{position:fixed;inset:0;z-index:50;background:var(--fond);overflow:auto;padding:0 0 120px}
+.ov[hidden]{display:none}
+.sec{font-size:.8rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--doux);margin:22px 0 8px}
+textarea{width:100%;min-height:80px;border-radius:12px;border:1px solid var(--ligne);background:var(--carte);padding:10px 12px}
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);z-index:60;background:var(--txt);color:var(--fond);padding:12px 18px;border-radius:12px;font-weight:600}
+.mag-code{position:sticky;top:52px;z-index:10;background:var(--fond);padding:12px 0;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.mag-code input{flex:1;min-width:240px;font:800 2rem/1 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.15em;padding:12px 16px;border-radius:14px;border:2px solid var(--acc);background:var(--carte)}
+.qr{display:inline-block;background:#fff;padding:10px;border-radius:10px}
+@media print{.top,.barre,.btn,.toast{display:none!important}body{background:#fff}}
+</style>
+</head>
+<body>
+<div class="top"><img src="img/metier-plus-blanc.svg" alt="Métier+"><b id="tTitre">Magasin</b><span class="sp"></span><span class="qui" id="tQui"></span><button id="tSortir" hidden>Changer d'élève</button></div>
+<main id="app"><p class="vide">Chargement…</p></main>
+<div class="ov" id="ov" hidden></div>
+<div class="barre" id="barre" hidden></div>
+<script src="js/qrcode.js"></script><script src="js/code128.js?v=1"></script>
+<script>
+"use strict";
+const SUPA = "https://kjlotlhqrgekzohshmbn.supabase.co", CLE = "sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY";
+const $ = s => document.querySelector(s), Q = new URLSearchParams(location.search), MODE = Q.get("mode") || "eleve";
+const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
+const norm = s => String(s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+const LS = { get:(k, d) => { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch(e){ return d; } }, set:(k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} } };
+async function rpc(f, a, get){ const r = await fetch(SUPA + "/rest/v1/rpc/" + f, { method:"POST", headers:{ apikey:CLE, "Content-Type":"application/json" }, body:JSON.stringify(a || {}), cache:"no-store" }); if (!r.ok) throw new Error("Supabase " + r.status); const t = await r.text(); return t ? JSON.parse(t) : null; }
+const heure = t => { const d = new Date(t); return d.toLocaleDateString("fr-CA", { day:"numeric", month:"short" }) + " " + d.getHours() + " h " + String(d.getMinutes()).padStart(2, "0"); };
+function toast(m){ const d = document.createElement("div"); d.className = "toast"; d.textContent = m; document.body.appendChild(d); setTimeout(() => d.remove(), 2600); }
+function bip(){ try { const a = new AudioContext(), o = a.createOscillator(), g = a.createGain(); o.connect(g); g.connect(a.destination); o.frequency.value = 880; g.gain.value = .15; o.start(); setTimeout(() => { o.frequency.value = 1320; }, 140); setTimeout(() => { o.stop(); a.close(); }, 300); } catch(e){} }
+/* carte de l'élève : le lecteur de codes-barres tape « MP-123-K7Q9X2 » puis Entrée; à la main, l'élève tape 123 */
+const lireCarte = v => { const m = String(v || "").toUpperCase().match(/(\d{3})(?:-([A-Z0-9]{4,12}))?\s*$/); return m ? { code:m[1], cle:m[2] || "" } : null; };
+
+/* ---------- comptes et codes des élèves (registres partagés, numéros seulement) ---------- */
+let COMPTES = {};
+const nomEns = id => (COMPTES[id] && COMPTES[id].nom) || id;
+async function chargerComptes(){ try { COMPTES = (await (await fetch("comptes.json", { cache:"no-cache" })).json()).comptes || {}; } catch(e){ COMPTES = {}; } }
+const idPartage = async ens => [...new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode("metier+|partage-passeport|" + ens)))].map(b => b.toString(16).padStart(2, "0")).join("");
+async function registre(ens){ try { const r = await rpc("coffre_lire", { p_id:await idPartage(ens) }), row = r && r[0]; const v = row && row.data ? JSON.parse(row.data) : {}; return { grp:v.grp || [], codes:v.codes || {} }; } catch(e){ return { grp:[], codes:{} }; } }
+async function trouverEleve(code){
+  const ens = Q.get("e") ? [Q.get("e")] : Object.keys(COMPTES).filter(id => !COMPTES[id].eleve);
+  const R = []; await Promise.all(ens.map(async e => { const g = await registre(e); for (const grp in g.codes) if ((g.codes[grp] || []).includes(code)) R.push({ ens:e, groupe:grp }); }));
+  return R;
+}
+
+/* ---------- catalogue ---------- */
+let CAT = [];
+const diam = d => String(d || "").trim().replace(/\s+/g, "-");   /* « 1 1/2 » → « 1-1/2 » : un seul mot */
+async function chargerCatalogue(){ try { CAT = (await (await fetch("magasin-catalogue.json", { cache:"no-cache" })).json()).raccords || []; } catch(e){ CAT = []; }
+  CAT.forEach(a => { a._q = norm([a.nom, a.n, a.mat, a.type].join(" ")); a._m = a._q.split(/[\s°]+/); a._d = diam(a.d); }); }
+/* recherche : les mots doivent tous se trouver; un nombre seul (2, 3/4, 1 1/2) = le diamètre exact, sauf un angle (90, 45, 22,5) */
+const ANGLES = ["90", "45", "22,5", "22.5", "22"];
+function correspond(a, mots){ return mots.every(m => /^\d+([-/.,]\d+)*$/.test(m) && !ANGLES.includes(m) ? a._d === m : a._m.some(w => w.startsWith(m)) || (m.length > 4 && a._q.includes(m))); }   /* début de mot (« té » ne trouve pas « réducteur »); un long mot peut être au milieu */
+
+/* =================================================================== ÉLÈVE =================================================================== */
+const pouces = d => String(d).split(" ").reduce((s, x) => { const [n, m] = x.split("/"); return s + (m ? +n / +m : +n || 0); }, 0);
+let MOI = LS.get("magEleve", null), PANIER = LS.get("magPanier", {}), FILTRE = { q:"", mat:"", d:"" };
+const sauverPanier = () => LS.set("magPanier", PANIER);
+const nbPanier = () => Object.values(PANIER).reduce((s, q) => s + q, 0);
+function eleveEntree(msg){
+  $("#tSortir").hidden = true; $("#tQui").textContent = ""; $("#barre").hidden = true;
+  $("#app").innerHTML = `<h1>Magasin de raccords</h1><p class="sous">Scanne ta carte étudiante, ou tape ton code à 3 chiffres.</p>
+    <div class="carte"><input class="code" id="cCode" inputmode="numeric" autocomplete="off" autocapitalize="characters" placeholder="000" aria-label="Ton code">
+    <p class="err" id="cErr">${esc(msg || "")}</p><button class="btn p" id="cOk">Entrer</button></div>`;
+  const i = $("#cCode"), go = async () => { const c = lireCarte(i.value); if (!c) { $("#cErr").textContent = "Ton code a 3 chiffres."; return; }
+    $("#cOk").disabled = true; $("#cErr").textContent = "Recherche de ton groupe…";
+    const L = await trouverEleve(c.code);
+    if (!L.length) { $("#cOk").disabled = false; $("#cErr").textContent = "Code inconnu. Vérifie avec ton enseignant."; return; }
+    if (L.length === 1) return connecter(c.code, L[0]);
+    $("#cErr").innerHTML = "Quel est ton groupe ? " + L.map((x, k) => `<button class="btn" data-k="${k}" style="margin:6px 6px 0 0">${esc(x.groupe)} · ${esc(nomEns(x.ens))}</button>`).join("");
+    $("#cErr").querySelectorAll("[data-k]").forEach(b => b.onclick = () => connecter(c.code, L[+b.dataset.k])); };
+  i.onkeydown = e => { if (e.key === "Enter") go(); }; i.oninput = () => { if (/^\d{3}$/.test(i.value)) go(); }; $("#cOk").onclick = go; i.focus();
+}
+function connecter(code, x){ MOI = { code, ens:x.ens, groupe:x.groupe }; LS.set("magEleve", MOI); eleveCatalogue(); }
+function enTete(){ $("#tQui").innerHTML = `Code <b>${esc(MOI.code)}</b> · ${esc(MOI.groupe)}`; $("#tSortir").hidden = false;
+  $("#tSortir").onclick = () => { if (nbPanier() && !confirm("Ton panier sera vidé. Changer d'élève ?")) return; MOI = null; PANIER = {}; LS.set("magEleve", null); sauverPanier(); eleveEntree(); }; }
+function eleveCatalogue(){
+  enTete();
+  const mats = [...new Set(CAT.map(a => a.mat))], ds = [...new Set(CAT.map(a => a.d))].sort((a, b) => pouces(a) - pouces(b));
+  $("#app").innerHTML = `<div class="cherche"><input id="fQ" type="search" placeholder="Cherche un raccord : coude 90 ABS 2, té cuivre 3/4…" value="${esc(FILTRE.q)}" autocomplete="off">
+    <div class="puces">${["", ...mats].map(m => `<button class="puce${FILTRE.mat === m ? " on" : ""}" data-mat="${esc(m)}">${m ? esc(m) : "Tous"}</button>`).join("")}</div>
+    <div class="puces">${["", ...ds].map(d => `<button class="puce${FILTRE.d === d ? " on" : ""}" data-d="${esc(d)}">${d ? esc(d) + " po" : "Tous les diamètres"}</button>`).join("")}</div></div>
+    <div class="carte" style="padding:0" id="liste"></div><div id="mesEnvois"></div>`;
+  const q = $("#fQ"); q.oninput = () => { FILTRE.q = q.value; liste(); };
+  document.querySelectorAll("[data-mat]").forEach(b => b.onclick = () => { FILTRE.mat = b.dataset.mat; document.querySelectorAll("[data-mat]").forEach(x => x.classList.toggle("on", x === b)); liste(); });
+  document.querySelectorAll("[data-d]").forEach(b => b.onclick = () => { FILTRE.d = b.dataset.d; document.querySelectorAll("[data-d]").forEach(x => x.classList.toggle("on", x === b)); liste(); });
+  liste(); barre(); suivi();
+}
+const ligneArt = a => { const q = PANIER[a.id] || 0;
+  return `<div class="art" data-id="${esc(a.id)}"><div class="tx"><b>${esc(a.nom)}</b><small>N° ${esc(a.n)}</small></div><div class="qte">${q ? `<button data-m="-1" aria-label="Enlever un">−</button><span>${q}</span><button data-m="1" aria-label="Ajouter un">+</button>` : `<button class="aj" data-m="1">Ajouter</button>`}</div></div>`; };
+function brancherQte(z, apres){ z.querySelectorAll(".art [data-m]").forEach(b => b.onclick = () => { const id = b.closest(".art").dataset.id; PANIER[id] = Math.max(0, Math.min(99, (PANIER[id] || 0) + +b.dataset.m)); if (!PANIER[id]) delete PANIER[id]; sauverPanier();
+  const a = CAT.find(x => x.id === id), el = b.closest(".art"); if (a) { el.outerHTML = ligneArt(a); } brancherQte(z, apres); barre(); if (apres) apres(); }); }
+function liste(){
+  const mots = norm(FILTRE.q).replace(/[°"]/g, " ").replace(/\bpo\b|\bpouces?\b/g, " ").replace(/(\d)\s+(\d+\/\d+)/g, "$1-$2").split(/\s+/).filter(Boolean);
+  const L = CAT.filter(a => (!FILTRE.mat || a.mat === FILTRE.mat) && (!FILTRE.d || a.d === FILTRE.d) && correspond(a, mots));
+  const z = $("#liste"); z.innerHTML = L.length ? L.slice(0, 120).map(ligneArt).join("") + (L.length > 120 ? `<p class="vide">${L.length - 120} autres : précise ta recherche.</p>` : "") : `<p class="vide">Aucun raccord ne correspond. Essaie moins de mots.</p>`;
+  brancherQte(z);
+}
+function barre(){ const n = nbPanier(), b = $("#barre"); b.hidden = !n; if (!n) return;
+  b.innerHTML = `<b>Panier : ${n} article${n > 1 ? "s" : ""}</b><span class="sp"></span><button class="btn p" id="bVoir">Voir le panier et envoyer</button>`; $("#bVoir").onclick = panier; }
+function panier(){
+  const ov = $("#ov"), ids = Object.keys(PANIER).filter(id => CAT.find(a => a.id === id));
+  ov.hidden = false; document.body.style.overflow = "hidden";
+  ov.innerHTML = `<div class="top"><img src="img/metier-plus-blanc.svg" alt=""><b>Mon panier</b><span class="sp"></span><button id="pF">‹ Continuer</button></div><main>
+    <div class="carte" style="padding:0" id="pL">${ids.length ? ids.map(id => ligneArt(CAT.find(a => a.id === id))).join("") : `<p class="vide">Ton panier est vide.</p>`}</div>
+    <label for="pNote"><b>Pour quel travail ?</b> <span class="sous">(facultatif : cabine, projet…)</span></label><textarea id="pNote" maxlength="300">${esc(LS.get("magNote", ""))}</textarea>
+    <p class="sous" style="margin-top:12px">Ton enseignant reçoit ton panier sur son cellulaire. Quand il l'approuve, va au comptoir du magasin avec ta carte étudiante.</p>
+    <p class="err" id="pErr"></p><button class="btn p" id="pEnv" ${ids.length ? "" : "disabled"}>Envoyer à mon enseignant</button></main>`;
+  const fermer = () => { ov.hidden = true; document.body.style.overflow = ""; eleveCatalogue(); };
+  $("#pF").onclick = fermer; $("#pNote").oninput = e => LS.set("magNote", e.target.value);
+  brancherQte($("#pL"), () => { if (!nbPanier()) $("#pEnv").disabled = true; });
+  $("#pEnv").onclick = async () => { const b = $("#pEnv"); b.disabled = true; b.textContent = "Envoi…";
+    const items = Object.keys(PANIER).map(id => { const a = CAT.find(x => x.id === id); return a && { id, n:a.n, nom:a.nom, q:PANIER[id] }; }).filter(Boolean);
+    try { const r = await rpc("panier_envoyer", { p_ens:MOI.ens, p_groupe:MOI.groupe, p_code:MOI.code, p_items:items, p_note:$("#pNote").value || null });
+      if (!r || !r.ok) throw new Error(r && r.err || "refus");
+      const E = LS.get("magEnvois", []); E.unshift({ id:r.id, t:Date.now(), code:MOI.code, n:items.reduce((s, i) => s + i.q, 0) }); LS.set("magEnvois", E.slice(0, 20));
+      PANIER = {}; sauverPanier(); LS.set("magNote", ""); toast("Panier envoyé à ton enseignant."); fermer(); }
+    catch(e){ $("#pErr").textContent = "Envoi impossible : " + (e.message === "trop de paniers en attente" ? "tu as déjà 3 paniers en attente. Attends la réponse de ton enseignant." : e.message); b.disabled = false; b.textContent = "Envoyer à mon enseignant"; } };
+}
+/* suivi des paniers envoyés (sur cet iPad), mis à jour toutes les 10 s */
+let suiviT = 0;
+async function suivi(){
+  clearTimeout(suiviT); const z = $("#mesEnvois"); if (!z || !MOI) return;
+  const E = LS.get("magEnvois", []).filter(x => x.code === MOI.code && Date.now() - x.t < 7 * 864e5); if (!E.length) { z.innerHTML = ""; return; }
+  const S = await Promise.all(E.map(x => rpc("panier_etat", { p_id:x.id }).catch(() => null)));
+  const LBL = { attente:"En attente de ton enseignant", approuve:"Approuvé : va au comptoir avec ta carte", refuse:"Refusé", remis:"Remis" };
+  z.innerHTML = `<div class="sec">Mes paniers envoyés</div>` + E.map((x, k) => { const s = S[k] || { etat:"?" };
+    return `<div class="carte"><span class="etat ${esc(s.etat)}">${esc(LBL[s.etat] || "…")}</span> <small class="sous">${heure(x.t)} · ${x.n} article${x.n > 1 ? "s" : ""}</small>${s.motif ? `<p><b>Motif :</b> ${esc(s.motif)}</p>` : ""}
+      ${s.etat === "approuve" ? `<span data-cb="MP-${esc(x.code)}"></span><p class="sous" style="text-align:center;margin:0">Montre ta carte ou ce code au magasinier.</p>` : ""}</div>`; }).join("");
+  z.querySelectorAll("[data-cb]").forEach(s => codeBarres(s, s.dataset.cb, 70));
+  if (S.some(s => s && (s.etat === "attente" || s.etat === "approuve"))) suiviT = setTimeout(suivi, 10000);
+}
+
+/* code-barres de la carte (js/code128.js) */
+function codeBarres(el, txt, h){ el.outerHTML = '<img class="cb" alt="' + esc(txt) + '" src="' + Code128.url(txt, h, true) + '" style="width:min(420px,90%);image-rendering:pixelated">'; }
+
+/* =================================================================== ENSEIGNANT =================================================================== */
+const ENS = (() => { try { return localStorage.getItem("dernierId") || ""; } catch(e){ return ""; } })();
+const cleJ = () => "magJeton|" + ENS;
+let JETON = LS.get(cleJ(), ""), VUS = new Set(LS.get("magVus", []));
+async function prof(){
+  $("#tTitre").textContent = "Commandes à approuver";
+  if (!ENS || (COMPTES[ENS] && COMPTES[ENS].eleve)) { $("#app").innerHTML = `<h1>Commandes à approuver</h1><p class="sous">Connecte-toi d'abord à Métier+ avec ton compte d'enseignant sur cet appareil, puis reviens ici.</p><a class="btn p" href="./">Ouvrir Métier+</a>`; return; }
+  $("#tQui").textContent = nomEns(ENS);
+  if (Q.get("cle")) { JETON = Q.get("cle"); LS.set(cleJ(), JETON); history.replaceState(null, "", "magasin.html?mode=prof"); }
+  if (!JETON) {
+    $("#app").innerHTML = `<h1>Commandes à approuver</h1><div class="carte"><b>Activer l'approbation sur cet appareil</b><p class="sous">Une clé d'approbation sera créée et gardée sur cet appareil. Pour approuver aussi depuis ton cellulaire, tu pourras l'y ajouter avec un code QR.</p>
+      <p class="err" id="aErr"></p><button class="btn p" id="aOk">Activer</button></div>`;
+    $("#aOk").onclick = async () => { const j = btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(24)))).replace(/[+/=]/g, c => ({ "+":"-", "/":"_", "=":"" }[c]));
+      try { if (await rpc("panier_prof_regler", { p_ens:ENS, p_jeton:j, p_sujet:null }) !== true) throw new Error("déjà activé ailleurs");
+        JETON = j; LS.set(cleJ(), j); prof(); }
+      catch(e){ $("#aErr").innerHTML = e.message === "déjà activé ailleurs" ? "L'approbation est déjà activée sur un autre de tes appareils. Sur cet appareil-là, ouvre « Commandes à approuver » → « Ajouter un appareil » et scanne le code QR avec celui-ci." : esc(e.message); } };
+    return;
+  }
+  await dessinerProf();
+}
+let profT = 0;
+async function dessinerProf(){
+  clearTimeout(profT);
+  let L; try { L = await rpc("panier_prof_lire", { p_ens:ENS, p_jeton:JETON }); } catch(e){ $("#app").innerHTML = `<p class="err">Supabase ne répond pas. Nouvel essai dans 15 s.</p>`; profT = setTimeout(dessinerProf, 15000); return; }
+  const att = L.filter(p => p.etat === "attente"), aut = L.filter(p => p.etat !== "attente");
+  const neufs = att.filter(p => !VUS.has(p.id)); if (neufs.length && VUS.size) bip(); att.forEach(p => VUS.add(p.id)); LS.set("magVus", [...VUS].slice(-300));
+  const avis = "Notification" in window && "serviceWorker" in navigator && "PushManager" in window, perm = avis ? Notification.permission : "non";
+  const ios = /iPhone|iPad|iPod/.test(navigator.userAgent) && !window.navigator.standalone && !matchMedia("(display-mode: standalone)").matches;
+  $("#app").innerHTML = `<h1>Commandes à approuver</h1><p class="sous">${att.length ? att.length + " panier" + (att.length > 1 ? "s" : "") + " en attente." : "Aucun panier en attente."} Mis à jour toutes les 15 secondes.</p>
+    <div class="carte" id="avisZ">${ios ? `<b>Avis sur ton iPhone</b><p class="sous">Apple demande d'abord d'ajouter cette page à l'écran d'accueil : touche <b>Partager</b>, puis <b>« Sur l'écran d'accueil »</b>. Ouvre-la ensuite depuis l'écran d'accueil et reviens ici.</p>`
+      : !avis ? `<p class="sous">Ce navigateur ne peut pas recevoir les avis. Garde cette page ouverte : un son t'avertit des nouveaux paniers.</p>`
+      : perm === "granted" && LS.get("magAbonne|" + ENS, false) ? `<span class="ok">Cet appareil reçoit les avis des nouveaux paniers.</span> <button class="btn" id="avNon" style="min-height:38px;margin-left:8px">Arrêter les avis ici</button>`
+      : `<b>Recevoir un avis sur cet appareil</b><p class="sous">Ton cellulaire sonne quand un élève envoie un panier, même si Métier+ est fermé.</p><button class="btn p" id="avOui">Recevoir les avis ici</button>`}
+      <p class="err" id="avErr"></p><button class="btn" id="apAj" style="margin-top:6px">Ajouter un appareil (cellulaire, autre ordinateur)</button><div id="apQr"></div></div>
+    <div class="sec">En attente</div>${att.length ? att.map(p => cmdHtml(p, true)).join("") : `<p class="vide">Rien à approuver.</p>`}
+    <div class="sec">Déjà traités (7 jours)</div>${aut.length ? aut.map(p => cmdHtml(p, false)).join("") : `<p class="vide">Aucun.</p>`}`;
+  document.querySelectorAll("[data-ok]").forEach(b => b.onclick = () => decider(b.dataset.ok, true));
+  document.querySelectorAll("[data-non]").forEach(b => b.onclick = () => { const m = prompt("Motif du refus (l'élève le verra) :", ""); if (m !== null) decider(b.dataset.non, false, m); });
+  const o = $("#avOui"); if (o) o.onclick = () => abonner(true); const n = $("#avNon"); if (n) n.onclick = () => abonner(false);
+  $("#apAj").onclick = () => { const u = location.origin + location.pathname.replace(/[^/]*$/, "") + "magasin.html?mode=prof&cle=" + encodeURIComponent(JETON), M = QRLib.matrice(u), k = M.length;
+    $("#apQr").innerHTML = `<p class="sous" style="margin-top:12px">Sur l'autre appareil (déjà connecté à Métier+ avec ton compte), scanne ce code avec l'appareil photo. Ne le montre à personne d'autre : il permet d'approuver tes paniers.</p><div class="qr"><svg viewBox="0 0 ${k + 8} ${k + 8}" width="220" height="220"><rect width="${k + 8}" height="${k + 8}" fill="#fff"/>${M.map((r, y) => r.map((v, x) => v ? `<rect x="${x + 4}" y="${y + 4}" width="1.02" height="1.02"/>` : "").join("")).join("")}</svg></div>`; };
+  profT = setTimeout(dessinerProf, 15000);
+}
+const cmdHtml = (p, attente) => `<div class="cmd${attente && !VUS.has(p.id) ? " neuf" : ""}"><div class="h"><span class="n">${esc(p.code)}</span><div><b>${esc(p.groupe)}</b><br><small class="sous">${heure(p.t)}</small></div><span class="sp"></span><span class="etat ${esc(p.etat)}">${{ attente:"En attente", approuve:"Approuvé", refuse:"Refusé", remis:"Remis" }[p.etat] || esc(p.etat)}</span></div>
+  ${p.note ? `<p style="margin:10px 16px 0"><b>Travail :</b> ${esc(p.note)}</p>` : ""}${p.motif ? `<p style="margin:10px 16px 0"><b>Motif :</b> ${esc(p.motif)}</p>` : ""}
+  <table><tr><th>Qté</th><th>Raccord</th><th>N° d'article</th></tr>${(p.items || []).map(i => `<tr><td class="q">${+i.q || 1}</td><td>${esc(i.nom)}</td><td class="no">${esc(i.n)}</td></tr>`).join("")}</table>
+  ${attente ? `<div class="act"><button class="btn v" data-ok="${p.id}">Approuver</button><button class="btn r" data-non="${p.id}">Refuser</button></div>` : ""}</div>`;
+async function decider(id, ok, motif){ try { if (await rpc("panier_decider", { p_ens:ENS, p_jeton:JETON, p_id:id, p_ok:ok, p_motif:motif || null }) !== true) throw new Error("déjà traité"); toast(ok ? "Approuvé : le magasinier le voit maintenant." : "Refusé."); } catch(e){ toast("Impossible : " + e.message); } dessinerProf(); }
+async function abonner(oui){
+  const er = $("#avErr"); er.textContent = "";
+  try {
+    const reg = await navigator.serviceWorker.register("sw.js"); await navigator.serviceWorker.ready;
+    let sub = await reg.pushManager.getSubscription();
+    if (oui) {
+      if (await Notification.requestPermission() !== "granted") throw new Error("avis refusés dans les réglages du navigateur");
+      if (!sub) { const { cle } = await (await fetch(SUPA + "/functions/v1/panier-avis", { headers:{ apikey:CLE } })).json();
+        const raw = Uint8Array.from(atob(cle.replace(/-/g, "+").replace(/_/g, "/")), c => c.charCodeAt(0)); sub = await reg.pushManager.subscribe({ userVisibleOnly:true, applicationServerKey:raw }); }
+      if (await rpc("panier_prof_abonner", { p_ens:ENS, p_jeton:JETON, p_abonnement:sub.toJSON(), p_oui:true }) !== true) throw new Error("refus");
+      LS.set("magAbonne|" + ENS, true); toast("Avis activés sur cet appareil.");
+    } else { if (sub) { await rpc("panier_prof_abonner", { p_ens:ENS, p_jeton:JETON, p_abonnement:sub.toJSON(), p_oui:false }); await sub.unsubscribe(); } LS.set("magAbonne|" + ENS, false); }
+  } catch(e){ er.textContent = "Avis impossibles : " + e.message; return; }
+  dessinerProf();
+}
+
+/* =================================================================== MAGASINIER =================================================================== */
+let MAG = [], FILTRE_CODE = "", magT = 0, MAG_VUS = null;
+function magasinier(){
+  $("#tTitre").textContent = "Comptoir du magasin";
+  $("#app").innerHTML = `<div class="mag-code"><input id="mC" autocomplete="off" placeholder="Scanne la carte ou tape le code" aria-label="Code de l'élève"><button class="btn" id="mTous">Tout voir</button></div><div id="mL"><p class="vide">Chargement…</p></div>`;
+  const i = $("#mC"), appl = () => { const c = lireCarte(i.value); FILTRE_CODE = c ? c.code : ""; dessinerMag(); };
+  i.onkeydown = e => { if (e.key === "Enter") { appl(); i.select(); } if (e.key === "Escape") { i.value = ""; appl(); } };
+  i.oninput = () => { if (/^\d{3}$/.test(i.value.trim()) || i.value.trim() === "") appl(); };
+  $("#mTous").onclick = () => { i.value = ""; appl(); i.focus(); };
+  document.addEventListener("keydown", e => { if (document.activeElement !== i && /^[0-9A-Za-z-]$/.test(e.key) && !e.ctrlKey && !e.metaKey && !e.altKey) { i.value = ""; i.focus(); } });   /* le lecteur tape même si le curseur est ailleurs */
+  i.focus(); charger();
+}
+async function charger(){ clearTimeout(magT);
+  try { MAG = await rpc("panier_magasin", {}) || []; const ids = MAG.filter(p => p.etat === "approuve").map(p => p.id);
+    if (MAG_VUS && ids.some(id => !MAG_VUS.has(id))) bip(); MAG_VUS = MAG_VUS || new Set(); ids.forEach(id => MAG_VUS.add(id)); dessinerMag(); }
+  catch(e){ $("#mL").innerHTML = `<p class="err">Supabase ne répond pas. Nouvel essai dans 10 s.</p>`; }
+  magT = setTimeout(charger, 10000); }
+function dessinerMag(){
+  const z = $("#mL"); if (!z) return;
+  const v = MAG.filter(p => !FILTRE_CODE || p.code === FILTRE_CODE), app = v.filter(p => p.etat === "approuve"), rem = v.filter(p => p.etat === "remis").reverse();
+  const carte = p => `<div class="cmd"><div class="h"><span class="n">${esc(p.code)}</span><div><b>${esc(p.groupe)}</b> · ${esc(nomEns(p.ens))}<br><small class="sous">Approuvé ${heure(p.t_app)}</small></div><span class="sp"></span>
+    ${p.etat === "approuve" ? `<button class="btn v" data-rem="${p.id}">Remis à l'élève</button>` : `<span class="etat remis">Remis ${heure(p.t_remis)}</span> <button class="btn" data-ann="${p.id}" style="min-height:38px">Annuler</button>`}</div>
+    ${p.note ? `<p style="margin:10px 16px 0"><b>Travail :</b> ${esc(p.note)}</p>` : ""}
+    <table><tr><th>Qté</th><th>Raccord</th><th>N° d'article</th></tr>${(p.items || []).map(i => `<tr><td class="q">${+i.q || 1}</td><td>${esc(i.nom)}</td><td class="no">${esc(i.n)}</td></tr>`).join("")}</table></div>`;
+  z.innerHTML = (FILTRE_CODE ? `<p class="sous">Élève <b>${esc(FILTRE_CODE)}</b> : ${app.length ? app.length + " commande" + (app.length > 1 ? "s" : "") + " à préparer" : "aucune commande approuvée"}.</p>` : "")
+    + `<div class="sec">À préparer (${app.length})</div>` + (app.length ? app.map(carte).join("") : `<p class="vide">${FILTRE_CODE ? "Rien pour cet élève. Son enseignant doit d'abord approuver son panier." : "Aucune commande approuvée pour l'instant."}</p>`)
+    + (rem.length ? `<div class="sec">Remis aujourd'hui (${rem.length})</div>` + rem.map(carte).join("") : "");
+  z.querySelectorAll("[data-rem]").forEach(b => b.onclick = () => remettre(b.dataset.rem, true));
+  z.querySelectorAll("[data-ann]").forEach(b => b.onclick = () => remettre(b.dataset.ann, false));
+}
+async function remettre(id, oui){ try { await rpc("panier_remettre", { p_id:id, p_remis:oui }); const p = MAG.find(x => x.id === id); if (p) { p.etat = oui ? "remis" : "approuve"; p.t_remis = oui ? new Date().toISOString() : null; } dessinerMag(); $("#mC").focus(); } catch(e){ toast("Impossible : " + e.message); } }
+
+/* =================================================================== départ =================================================================== */
+(async () => {
+  await Promise.all([chargerComptes(), chargerCatalogue()]);
+  if (MODE === "prof") return prof();
+  if (MODE === "magasin") return magasinier();
+  if (MOI && MOI.code) eleveCatalogue(); else eleveEntree();
+})();
+if ("serviceWorker" in navigator) addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
+</script>
+<script src="js/journal-perf.js?v=7"></script>
+</body>
+</html>
