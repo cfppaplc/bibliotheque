@@ -214,10 +214,10 @@ else {
 /* 25 nov. : le tricheur voit la bonne réponse (bandeau discret + petit point sur le bon choix) */
 document.addEventListener("click", e => { const b = e.target.closest && e.target.closest(".infoB"); if (!b) return; e.preventDefault(); e.stopPropagation();
   const l = b.closest("label"), bu = l && l.nextElementSibling; if (bu && bu.classList.contains("bulleI")) bu.hidden = !bu.hidden; }, true);   /* 25 nov. : bulle d'information des options */
-function trichAppliquer(i){ const t = window.__trich, b = document.getElementById("jBx"); if (!t || t.i !== i || !b || b.querySelector(".trichB") || !b.querySelector("[data-c]")) return;   /* seulement pendant la question */
+function trichAppliquer(i){ const t = window.__trich, b = document.getElementById("jBx"); if (!t || t.i !== i || !b || b.querySelector(".trichB") || !b.querySelector("[data-c], #jNb")) return;   /* 25 nov. : aussi Calcul et Estimation (champ #jNb) */   /* seulement pendant la question */
   if (t.apres && Date.now() < t.apres){ clearTimeout(window.__trichT); window.__trichT = setTimeout(() => trichAppliquer(i), t.apres - Date.now() + 30); return; }
   b.insertAdjacentHTML("afterbegin", `<div class="trichB">Tu es le tricheur (la réponse arrive après 3 s). Bonne réponse : <b>${String(t.txt || "").replace(/[&<>"]/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"})[c])}</b>. Ne te fais pas remarquer!</div>`);
-  [].concat(t.bon == null ? [] : t.bon).forEach(k => { const x = b.querySelector(`[data-c="${k}"]`); if (x) x.classList.add("trichOk"); }); }
+  if (!b.querySelector(".ch4.ordre")) [].concat(t.bon == null ? [] : t.bon).forEach(k => { const x = b.querySelector(`[data-c="${k}"]`); if (x) x.classList.add("trichOk"); }); }
 function telecommande(bord){
   $("tele").classList.remove("cache");
   if (bord) { window.SANS_RELAIS = true; document.body.classList.add("bord"); $("tTitre").textContent = "Mes Défi+"; $("lienEcran").classList.remove("cache"); const rr = document.querySelector("#tele .mp-retour"); if (rr) { rr.textContent = "‹ Labo"; rr.href = "labo.html"; } }
