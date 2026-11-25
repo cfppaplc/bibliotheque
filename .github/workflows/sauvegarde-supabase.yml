@@ -27,7 +27,7 @@ jobs:
           for t in coffre stats journal reveil; do
             : > "sauvegarde/$t.jsonl"; n=0; d=0
             while :; do
-              code=$(curl -s -o page.json -w "%{http_code}" "$URL/$t?select=*&limit=1000&offset=$d" -H "apikey: $CLE" -H "Authorization: Bearer $CLE")
+              code=$(curl -s -o page.json -w "%{http_code}" "$URL/$t?select=*&limit=1000&offset=$d" -H "apikey: $CLE")
               if [ "$code" != "200" ]; then echo "$t : HTTP $code"; [ "$t" = "coffre" ] && exit 1; break; fi
               k=$(jq length page.json); [ "$k" = "0" ] && break
               jq -c '.[]' page.json >> "sauvegarde/$t.jsonl"; n=$((n + k)); d=$((d + 1000))
