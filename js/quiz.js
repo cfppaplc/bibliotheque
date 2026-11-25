@@ -329,6 +329,9 @@ function telecommande(bord){
       if (G.etat === "inter" && G.inter) { av.innerHTML = `<div class="sous">Questions à poser (toi seul les vois) :</div><ol class="avQ">${G.inter.Q.map(q => `<li>${esc(q)}</li>`).join("")}</ol>`; }
       else if (G.etat === "vtr") { av.innerHTML = `<div class="sous">Ton vote d'animateur (tu ne sais pas qui c'est) : si tu te trompes, le tricheur gagne 1000 points.</div><div class="avL">${ids().map(id => `<button data-av="${esc(id)}" class="${G.vtrAnim === id ? "choisi" : ""}">${esc(P[id].nom)}</button>`).join("")}<button data-av="passe" class="${!G.vtrAnim ? "choisi" : ""}">Je ne vote pas</button></div>`;
         av.querySelectorAll("[data-av]").forEach(b => b.onclick = () => { G.vtrAnim = b.dataset.av === "passe" ? null : b.dataset.av; maj(); }); }
+      else if (G.quiz && !estPres(G.quiz) && ["lobby", "question", "rev"].includes(G.etat) && G.i + 1 < G.jeu.length) {   /* 25 nov. : double ou rien à la demande, aussi au tableau de bord */
+        av.innerHTML = `<button class="avDbl ${G.dblProch ? "on" : ""}" id="avDbl">×2 ${G.dblProch ? "Double ou rien à la prochaine question (touche pour annuler)" : "Double ou rien à la prochaine question"}</button>`;
+        $("avDbl").onclick = () => { G.dblProch = !G.dblProch; maj(); }; }
       else av.innerHTML = ""; }
     $("bSuite").textContent = G.etat === "fin" ? (G.stats ? "Revoir le podium" : "Statistiques de la classe") : G.etat === "inter" ? "Passer au vote" : G.etat === "vtr" ? "Démasquer le tricheur" : G.etat === "vtrRes" ? "Voir le podium" : G.etat === "question" ? "Montrer la réponse" : G.etat === "mise" ? "Lancer la question" : G.i + 1 >= G.jeu.length ? (G.quiz && G.quiz.auto ? "Recommencer" : sansPoints(G.jeu) ? "Terminer" : "Voir le podium") : typeDe(G.jeu[G.i + 1]) === "diapo" ? "Diapo suivante" : "Question suivante";
     if (Q && typeDe(Q) === "nuage" && ["question", "rev"].includes(G.etat)) {
