@@ -1,18 +1,22 @@
-/* Journal de fluidité (16 nov.) : seulement pour Jeremy, sur un grand écran tactile (TNI).
+/* Journal de fluidité (16 nov.; 25 nov. : tous les enseignants connectés, tous les appareils).
    Note les images qui prennent plus de 80 ms (l'écran « accroche ») et dans quoi on était
    (livre, page, tableau blanc, zoom, geste), puis envoie un résumé dans les signalements (ntfy).
    À retirer quand le TNI est assez fluide. */
 (function(){
   try {
-    if (localStorage.dernierId !== "jeremy.raymond") return;
-    if (!matchMedia("(any-pointer:coarse)").matches) return;
-    if (Math.min(screen.width, screen.height) <= 600) return;
+    /* 25 nov. (Jeremy : « tous les enseignants », aussi au cellulaire et à l'ordinateur) : tout compte enseignant connecté, sur tout appareil */
+    if (!localStorage.dernierId) return;
     /* 25 nov. : une page dans un cadre de la même fenêtre (télécommande du quiz, accueil dans la bibliothèque) voit les mêmes images :
        un seul journal, celui de la page principale (avant : deux rapports identiques) */
     if (window.top !== window && window.top.__journalPerf) return;
     window.__journalPerf = 1;
   } catch(e){ return; }
   const SUJET = "https://ntfy.sh/metierplus-signal-f3ce60fd2f6c0f46";
+  /* sorte d'appareil (dans le titre) et règles d'envoi : Jeremy = tout, aux 5 min; les autres = seulement les vrais problèmes, aux 15 min, 4 envois au plus
+     (ntfy gratuit : environ 250 messages par jour pour toute l'école, aussi utilisés par les quiz) */
+  const JER = localStorage.dernierId === "jeremy.raymond", tactile = matchMedia("(any-pointer:coarse)").matches, petit = Math.min(screen.width, screen.height);
+  const APP = !tactile ? "ordinateur" : petit <= 600 ? "cellulaire" : (/Android/.test(navigator.userAgent) && !/Mobile/.test(navigator.userAgent) && Math.max(screen.width, screen.height) >= 1280 ? "TNI" : "tablette");
+  const TITRE = "Journal fluidite " + APP, MAXE = JER ? 12 : 4, AUX = (JER ? 5 : 15) * 60000;
   let envois = 0, debut = Date.now(), images = 0, lentes = 0, perdu = 0;
   const parCtx = {}, pires = [], scripts = {};
   let doigts = 0, dernierGeste = 0;
@@ -73,9 +77,11 @@
     setTimeout(() => { try { if ((INKS[inkKey()] || []).length <= g.n && !(typeof PZ !== "undefined" && PZ.actif)) { perdus++; if (ex.length < 4) ex.push(g.t + ", " + Math.round(g.d) + " px, " + new Date().toLocaleTimeString("fr-CA")); } } catch(x){} }, 500); }, true);
   function rapport(){
     let plein = false; try { plein = typeof sauveAvis !== "undefined" && !!sauveAvis; } catch(x){}
-    if ((!lentes && !perdus && !plein) || envois >= 12) return null;
+    if ((!lentes && !perdus && !plein) || envois >= MAXE) return null;
+    if (!JER && !perdus && !plein && lentes < 5 && !pires.some(p => p[0] >= 300)) return null;   /* autres comptes : on garde les petits accrochages pour le prochain envoi */
     const min = Math.round((Date.now() - debut) / 60000);
     const L = ["Sur " + min + " min : " + lentes + " accrochages sur " + images + " images (" + Math.round(perdu / 1000) + " s perdues)",
+      "Compte : " + (JER ? "Jeremy" : "autre enseignant") + " · " + APP + " · page " + (location.pathname.split("/").pop() || "index.html"),
       "Écran " + screen.width + "×" + screen.height + " ×" + devicePixelRatio + " · " + ((navigator.userAgent.match(/Chrome\/[\d]+/) || [""])[0]) + (/Android/.test(navigator.userAgent) ? " Android" : ""), "", "Où :"];
     Object.entries(parCtx).sort((a, b) => b[1].ms - a[1].ms).slice(0, 10)
       .forEach(([c, p]) => L.push("- " + c + " : " + p.n + " fois, pire " + Math.round(p.max) + " ms"));
@@ -90,11 +96,12 @@
   }
   function envoyer(final){
     const m = rapport(); if (!m) return;
-    const opts = { method: "POST", body: m, headers: { Title: "Journal fluidite TNI", Tags: "chart_with_downwards_trend" } };
-    if (final && navigator.sendBeacon) { try { navigator.sendBeacon(SUJET, m); return; } catch(e){} }
+    const opts = { method: "POST", body: m, headers: { Title: TITRE, Tags: "chart_with_downwards_trend" } };
+    /* sendBeacon ne peut pas mettre d'en-tête : le titre passe dans l'adresse (avant : rapports « sans titre ») */
+    if (final && navigator.sendBeacon) { try { if (navigator.sendBeacon(SUJET + "?title=" + encodeURIComponent(TITRE) + "&tags=chart_with_downwards_trend", m)) return; } catch(e){} }
     fetch(SUJET, Object.assign(opts, { keepalive: !!final })).catch(() => {});
   }
-  setInterval(() => envoyer(false), 5 * 60000);
+  setInterval(() => envoyer(false), AUX);
   addEventListener("pagehide", () => envoyer(true));
   document.addEventListener("visibilitychange", () => { if (document.hidden) envoyer(true); });
   window.journalPerf = () => rapport();   // pour les essais

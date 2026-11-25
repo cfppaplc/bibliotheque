@@ -35,5 +35,5 @@
 - `outils/` : publication, chiffrement, PDF, plans (`outils/plans/generer.py`), conversions. Ne jamais commiter `outils/plans/sortie/`.
 
 ## En cours (17 nov.)
-- Fluidité du TNI : `js/journal-perf.js` envoie des rapports « Journal fluidite TNI » (Jeremy les colle, le bac à sable ne joint pas ntfy). À retirer de toutes les pages quand c'est fluide. Semaine du 23 nov. : version ordinateur (élargir le journal).
+- Fluidité : `js/journal-perf.js` tourne pour **tous les enseignants connectés, sur tout appareil** (25 nov.; titre « Journal fluidite TNI / cellulaire / ordinateur / tablette »). Une tâche planifiée (jours de semaine, fin d'après-midi) lit les rapports sur ntfy avec WebFetch (`https://ntfy.sh/metierplus-signal-f3ce60fd2f6c0f46/json?poll=1&since=12h`, gardés 12 h seulement), corrige ce qui est clair, teste, publie et note dans l'historique. Avant de corriger : chercher dans l'historique si c'est déjà fait.
 - Version élève : pas encore lancée (voir l'historique « Version élève » pour la liste des choses à changer au lancement). Étiquette ALPHA réglable dans Administration → Site.
