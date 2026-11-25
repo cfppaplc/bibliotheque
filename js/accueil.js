@@ -260,10 +260,10 @@ function updateClock(now) {
   const h = now.getHours(), m = now.getMinutes(), sec = now.getSeconds();
   if (clockKind === "analog") {
     $("ch").setAttribute("transform", `rotate(${(h % 12) * 30 + m / 2})`); $("cm").setAttribute("transform", `rotate(${m * 6 + sec / 10})`); $("cs").setAttribute("transform", `rotate(${sec * 6})`);
-    $("ca-txt").innerHTML = `${pad(h)} h ${pad(m)}`;
+    tx("ca-txt", `${pad(h)} h ${pad(m)}`);
   } else if (clockKind === "mano") {
     const v = (h % 12) + m / 60; $("mn").setAttribute("transform", `rotate(${-135 + v / 12 * 270})`);
-    $("mano-lcd").textContent = `${pad(h)}:${pad(m)}`; $("ca-txt").innerHTML = `${pad(h)} h ${pad(m)}`;
+    $("mano-lcd").textContent = `${pad(h)}:${pad(m)}`; tx("ca-txt", `${pad(h)} h ${pad(m)}`);
   } else if (clockKind === "led") {
     const ds = pad(h) + pad(m) + pad(sec);
     [...ds].forEach((c, i) => { const g = $("d" + i); if (!g) return; const on = SEG[c]; g.querySelectorAll("polygon").forEach(pg => pg.setAttribute("class", on.includes(pg.dataset.s) ? "led-on" : "led-off")); });
@@ -293,15 +293,18 @@ function renderStatic() {
 }
 
 let lastStepsKey = "";
+/* 25 nov. (journaux du TNI : ≈ 1 accrochage par seconde sur l'accueil de classe) : on n'écrit que ce qui a changé (avant : date, salutation, période… réécrites chaque seconde = page redessinée) */
+function tx(id, v){ const e = $(id); if (e && e.textContent !== String(v)) e.textContent = v; }
+function larg(id, v){ const e = $(id); if (e && e.style.width !== v) e.style.width = v; }
 function tick() {
   if (jourCouleurs && jourCouleurs !== jourAuj()) couleursDuJour();
   const now = new Date();
   const h = now.getHours();
-  $("v-h").textContent = pad(h); $("v-m").textContent = pad(now.getMinutes()); $("v-s").textContent = pad(now.getSeconds());
+  tx("v-h", pad(h)); tx("v-m", pad(now.getMinutes())); tx("v-s", pad(now.getSeconds()));
   updateClock(now);
-  $("v-greet").textContent = h < 12 ? "Bonjour à tous!" : h < 18 ? "Bon après-midi!" : "Bonsoir!";
+  tx("v-greet", h < 12 ? "Bonjour à tous!" : h < 18 ? "Bon après-midi!" : "Bonsoir!");
   const d = now.toLocaleDateString("fr-CA", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
-  $("v-date").textContent = d.charAt(0).toUpperCase() + d.slice(1);
+  tx("v-date", d.charAt(0).toUpperCase() + d.slice(1));
 
   updateQuote(now);
   const nowMin = h * 60 + now.getMinutes() + now.getSeconds() / 60;
@@ -311,21 +314,21 @@ function tick() {
   const ref = cur || next || ps[ps.length - 1];
 
   if (!ref) {
-    $("v-pname").textContent = "Aucune période"; $("v-phours").textContent = "";
-    $("v-status").textContent = "Ajoute ton horaire dans les réglages."; $("v-water").style.width = "0%";
+    tx("v-pname", "Aucune période"); tx("v-phours", "");
+    tx("v-status", "Ajoute ton horaire dans les réglages."); larg("v-water", "0%");
   } else {
-    $("v-pname").textContent = ref.name; $("v-exam").hidden = !ctxDe(ref.start).exam;
-    $("v-phours").textContent = fmt(ref.start) + " à " + fmt(ref.end);
+    tx("v-pname", ref.name); $("v-exam").hidden = !ctxDe(ref.start).exam;
+    tx("v-phours", fmt(ref.start) + " à " + fmt(ref.end));
     if (cur) {
       const pct = (nowMin - cur.start) / (cur.end - cur.start) * 100;
-      $("v-water").style.width = pct.toFixed(2) + "%";
-      $("v-status").textContent = (ctxDe(cur.start).exam ? "Examen en cours · fin dans " : (cur.end - cur.start < SPAN ? "Fin du cours dans " : "Fin de la période dans ")) + dur((cur.end - nowMin) * 60);
+      larg("v-water", pct.toFixed(2) + "%");
+      tx("v-status", (ctxDe(cur.start).exam ? "Examen en cours · fin dans " : (cur.end - cur.start < SPAN ? "Fin du cours dans " : "Fin de la période dans ")) + dur((cur.end - nowMin) * 60));
     } else if (next) {
-      $("v-water").style.width = "0%";
-      $("v-status").textContent = "Le cours commence dans " + dur((next.start - nowMin) * 60);
+      larg("v-water", "0%");
+      tx("v-status", "Le cours commence dans " + dur((next.start - nowMin) * 60));
     } else {
-      $("v-water").style.width = "100%";
-      $("v-status").textContent = "Les périodes sont terminées. Bonne fin de journée!";
+      larg("v-water", "100%");
+      tx("v-status", "Les périodes sont terminées. Bonne fin de journée!");
     }
   }
 
@@ -388,10 +391,10 @@ function tick() {
   if (cur) {
     const inStep = rows[nowIdx];
     if (inStep && inStep.pause) {
-      $("v-status").textContent = "C'est la pause! Retour en classe dans " + dur((inStep.end - nowMin) * 60);
+      tx("v-status", "C'est la pause! Retour en classe dans " + dur((inStep.end - nowMin) * 60));
     } else {
       const np = rows.find(r => r.start > nowMin && r.pause);
-      $("v-status").textContent = np ? "Prochaine pause dans " + dur((np.start - nowMin) * 60) : (cur.end - cur.start < SPAN ? "Fin du cours dans " : "Fin de la période dans ") + dur((cur.end - nowMin) * 60);
+      tx("v-status", np ? "Prochaine pause dans " + dur((np.start - nowMin) * 60) : (cur.end - cur.start < SPAN ? "Fin du cours dans " : "Fin de la période dans ") + dur((cur.end - nowMin) * 60));
     }
   }
   {
@@ -416,10 +419,10 @@ function tick() {
           if (ecart === 0) nextSub = "cet après-midi"; }
         else { nextT = "Prochain cours pas encore préparé"; nextSub = "Touche « Préparer le cours » en haut"; } } catch(x) {} }
     if ($("v-now").textContent !== nowT || $("v-next").textContent !== nextT) {
-      $("v-now").textContent = nowT; $("v-next").textContent = nextT; $("v-nextblk").hidden = !nextT;
+      tx("v-now", nowT); tx("v-next", nextT); $("v-nextblk").hidden = !nextT;
       if (typeof fitSoon === "function") fitSoon();
     }
-    $("v-nowt").textContent = nowSub; $("v-nextt").textContent = nextSub;
+    tx("v-nowt", nowSub); tx("v-nextt", nextSub);
     /* bouton « Ouvrir » : contenu lié à l'activité en cours (et à la suivante) */
     const rA = cur && rows[nowIdx] && !rows[nowIdx].pause ? rows[nowIdx] : null;
     const rB = cur ? rows[nowIdx + 1] : (next && rows.length ? (rows.find(r => !/^Accueil/.test(r.label) && !r.pause) || rows[0]) : null);
@@ -449,7 +452,7 @@ function tick() {
     const r = cur && nowIdx >= 0 ? rows[nowIdx] : null;
     L.classList.toggle("fin", !!r && (r.pause || r.end - nowMin <= 5));
   }
-  if (nowIdx >= 0 && $("v-left")) $("v-left").textContent = "encore " + dur((rows[nowIdx].end - nowMin) * 60);
+  if (nowIdx >= 0 && $("v-left")) tx("v-left", "encore " + dur((rows[nowIdx].end - nowMin) * 60));
 }
 
 // Citations : une nouvelle à chaque cours de 3 heures (matin, après-midi)

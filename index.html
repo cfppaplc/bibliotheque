@@ -258,12 +258,16 @@ window.LIVRES_EXTERNES = true;   // les livres sont des fichiers du dossier livr
 <script src="js/livres.js?v=13"></script>
 <script src="js/biblio.js?v=2"></script>
 <script src="js/lecteur-souris.js?v=12"></script>
+<script>/* 25 nov. (erreurs « zout / DPRI / initDonnees is not defined » sur un cellulaire) : un script n'est pas arrivé (réseau coupé) : on recharge la page une seule fois */
+function mpScriptsOk(...n){ if (n.every(f => typeof window[f] === "function")) return; try { if (sessionStorage.mpRechJs) return; sessionStorage.mpRechJs = "1"; } catch(e){ return; } location.reload(); }
+mpScriptsOk("zout", "DPRI");</script>
 <script src="js/tableau-blanc.js?v=15"></script>
 <script>/* 17 nov. : si le fichier du tableau blanc n'est pas arrivé (réseau coupé), on recharge la page une fois */ if (typeof setIcn === "undefined") { try { if (!sessionStorage.rechTB) { sessionStorage.rechTB = "1"; location.reload(); } } catch(e){} } else { try { sessionStorage.removeItem("rechTB"); } catch(e){} }</script>
 <script src="js/lecteur.js?v=14"></script>
 <script src="js/defi-livre-data.js?v=7"></script>
 <script src="js/defi-livre.js?v=3"></script>
 <script src="js/donnees.js?v=1"></script>
+<script>mpScriptsOk("initDonnees");</script>
 <script src="js/barres.js?v=1"></script>
 
 <style>
