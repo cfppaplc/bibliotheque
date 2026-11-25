@@ -85,6 +85,26 @@ test("Quiz « Animer » : la télécommande du tiroir n'a pas son propre journal
   vrai(!p.errs.length, p.errs.join(" | "));
 });
 
+test("Administration : chaque onglet s'ouvre; Quoi de neuf se modifie et s'annule", async b => {
+  const p = await page(b, {}, "jeremy.raymond");
+  await p.goto(BASE + "index.html"); await attendre(500);
+  await p.evaluate(() => new Promise(ok => { const r = indexedDB.open("acces", 1); r.onupgradeneeded = () => r.result.createObjectStore("s"); r.onsuccess = () => { const t = r.result.transaction("s", "readwrite"); t.objectStore("s").put({ id: "jeremy.raymond", priv: null }, "session"); t.oncomplete = ok; }; }));
+  await p.reload(); await p.waitForFunction(() => window.ACCES && ACCES.session && ACCES.session.admin, null, { timeout: 15000 }); await attendre(2000);
+  await p.evaluate(() => ACCES.menu());
+  await attendre(300); await p.evaluate(() => { const m = document.querySelector("button[data-a=gerer]"); if (m) m.click(); }); await attendre(2500);
+  const tabs = await p.evaluate(() => [...document.querySelectorAll(".acces-onglets [data-ong]")].map(b => b.dataset.ong));
+  vrai(tabs.length >= 11 && tabs[0] === "accueil", "Onglets : " + tabs.join(","));
+  for (const k of tabs) { await p.click('.acces-onglets [data-ong="' + k + '"]'); await attendre(700);
+    const vide = await p.evaluate(k => { const z = document.querySelector('.acces-pane[data-pane="' + k + '"]'); return !z || z.hidden || !z.innerText.trim(); }, k);
+    vrai(!vide, "Onglet vide : " + k); }
+  await p.click('.acces-onglets [data-ong="nouv"]'); await attendre(800);
+  await p.click('.ap-nv[data-i="0"]'); await p.fill("#nvT", "Essai titre"); await attendre(200);
+  vrai(/attendent/.test(await p.textContent(".ap-pub .acces-etat")), "La modification n'est pas signalée");
+  await p.click("#nvAnn"); await attendre(500);
+  vrai(/Tout est publié/.test(await p.textContent(".ap-pub .acces-etat")), "Annuler n'a pas remis la liste");
+  vrai(!p.errs.length, p.errs.join(" | "));
+});
+
 (async () => {
   const b = await chromium.launch(); let echecs = 0;
   for (const [nom, f] of tests) {

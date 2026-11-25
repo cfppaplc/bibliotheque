@@ -78,5 +78,5 @@ window.ADMIN_SITE = (function(){
     z.querySelectorAll("[data-etq]").forEach(b => b.onclick = () => { REGL.etiquette = b.dataset.etq; redessiner(); });
     const go = z.querySelector("[data-ong-go]"); if (go) go.onclick = () => { const b = document.querySelector('[data-ong="livres"]'); if (b) b.click(); };
   }
-  return { dessiner, recolter };
+  return { dessiner, recolter, verifs, lire, genre };
 })();

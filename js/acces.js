@@ -319,7 +319,7 @@ window.ACCES = (function(){
     BROUILLON = JSON.parse(JSON.stringify(DATA)); REGL = clone(REGLAGES); FORCER_RECH.clear(); box().classList.add("large", "gestion"); ov().hidden = false; dessinerGerer();
   }
   const OUVERTS = new Set();
-  let ONGLET = "profs", REGL = null; const FORCER_RECH = new Set(), VU = {};
+  let ONGLET = "accueil", REGL = null; const FORCER_RECH = new Set(), VU = {};
   const clone = o => JSON.parse(JSON.stringify(o));
   const ICO = {
     profs:'<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.2-5.5 6.5-5.5s5.9 1.9 6.5 5.5"/><circle cx="17.5" cy="9" r="2.6"/><path d="M16.5 14.6c2.6.2 4.4 1.9 5 5.4"/></svg>',
@@ -332,7 +332,12 @@ window.ACCES = (function(){
     etoile:'<svg viewBox="0 0 24 24"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/></svg>',
     neuf:'<svg viewBox="0 0 24 24"><path d="M12 2v4M12 18v4M2 12h4M18 12h4M5 5l2.8 2.8M16.2 16.2 19 19M5 19l2.8-2.8M16.2 7.8 19 5"/></svg>',
     cle:'<svg viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="m11 12 9-9M17 6l3 3M14 9l2 2"/></svg>',
-    lien:'<svg viewBox="0 0 24 24"><path d="M10 14a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 10a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>' };
+    lien:'<svg viewBox="0 0 24 24"><path d="M10 14a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 10a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>',
+    accueil:'<svg viewBox="0 0 24 24"><path d="M3 11 12 4l9 7"/><path d="M5 10v10h5v-6h4v6h5V10"/></svg>',
+    nouv:'<svg viewBox="0 0 24 24"><path d="M4 5h16v11H8l-4 4z"/><path d="M8 9h8M8 12h5"/></svg>',
+    journaux:'<svg viewBox="0 0 24 24"><path d="M3 12h3l2-5 4 10 2-5h7"/></svg>',
+    auto:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9 7 7M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></svg>',
+    classe:'<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M8 20h8M12 16v4"/></svg>' };
   const constrDe = l => REGL.construction[l.fichier] !== undefined ? !!REGL.construction[l.fichier] : !!l._c0;
   const nouvDe = l => estNouveau(l, REGL);
   const fraicheur = d => !d ? "jamais" : Date.now() - d < 8 * 864e5 ? "recent" : Date.now() - d < 31 * 864e5 ? "moyen" : "vieux";
@@ -380,6 +385,7 @@ window.ACCES = (function(){
     const aRech = [...new Set([...retires, ...FORCER_RECH])].filter(f => D.livres[f]);
     const aPublier = JSON.stringify(D) !== JSON.stringify(DATA) || JSON.stringify(REGL) !== JSON.stringify(REGLAGES) || FORCER_RECH.size > 0;
     const vol = k => ' data-pane="' + k + '"' + (ONGLET === k ? '' : ' hidden');
+    const grpT = t => '<div class="og-t">' + t + '</div>';
     const ong = (k, lab) => '<button class="' + (ONGLET === k ? 'on' : '') + '" data-ong="' + k + '">' + ICO[k] + '<span>' + lab + '</span></button>';
     const pool = [...LIVRES.filter(l => l.fichier && !l.user && l.fichier !== "tableau-blanc"), ...LIVRES_CACHES];
     const tg = (k, f, on, lab, ic) => '<button class="tg' + (on ? ' on' : '') + '" data-rl="' + k + '" data-f="' + esc(f) + '">' + ic + lab + '</button>';
@@ -404,7 +410,10 @@ window.ACCES = (function(){
       + '<div class="acces-stats"><div><b>' + nProf + '</b><span>enseignant' + (nProf > 1 ? 's' : '') + '</span></div><div><b>' + nGr + '</b><span>groupe' + (nGr > 1 ? 's' : '') + ' d\'élèves</span></div>'
       + '<div><b>' + livres.length + '</b><span>livres protégés</span></div><div class="dem"><b id="gStatDem">…</b><span>demandes</span></div>'
       + '<div class="' + (aPublier ? 'pub' : 'ok') + '"><b>' + (aPublier ? '!' : '✓') + '</b><span>' + (aPublier ? 'à publier' : 'tout est publié') + '</span></div></div>'
-      + '<div class="acces-onglets">' + ong("profs", "Enseignants") + ong("livres", "Livres") + ong("props", "Propositions") + ong("stats", "Statistiques") + ong("hist", "Historique") + ong("site", "Site") + '</div>'
+      + '<nav class="acces-onglets">' + grpT("Vue d'ensemble") + ong("accueil", "Tableau de bord")
+        + grpT("Personnes et contenu") + ong("profs", "Comptes et accès") + ong("livres", "Livres") + ong("nouv", "Quoi de neuf") + ong("props", "Propositions") + ong("classe", "Classe et atelier")
+        + grpT("Suivi") + ong("stats", "Statistiques") + ong("journaux", "Fluidité") + ong("site", "Signalements et état") + ong("hist", "Historique et copies")
+        + grpT("Site") + ong("auto", "Automatisations") + '</nav>'
       + '<div class="acces-pane"' + vol("profs") + '><details class="acces-info"><summary>Comment ça marche</summary><p class="sous">Touche « Choisir les livres » pour cocher les livres d\'un enseignant, ou ses programmes (EGI, Plomberie) pour tout lui donner d\'un coup. Pastille verte : venu dans les 7 derniers jours. Les changements partent en ligne quand tu touches « Publier ».</p></details>'
       + '<div class="acces-outils"><input type="text" id="gQ" enterkeyhint="search" placeholder="Chercher un nom…" value="' + esc(FILTRE.q) + '" autocomplete="off">'
       + '<select id="gTri" title="Trier"><option value="nom"' + (FILTRE.tri === "nom" ? " selected" : "") + '>Trier : nom de famille</option><option value="prog"' + (FILTRE.tri === "prog" ? " selected" : "") + '>Trier : programme</option><option value="peu"' + (FILTRE.tri === "peu" ? " selected" : "") + '>Trier : moins de livres</option></select>'
@@ -424,6 +433,7 @@ window.ACCES = (function(){
       + '<div class="acces-pane"' + vol("stats") + '>' + volStats + '</div>'
       + '<div class="acces-pane"' + vol("hist") + '>' + volHist + '</div>'
       + '<div class="acces-pane"' + vol("site") + '><div id="gSite"></div></div>'
+      + ["accueil", "nouv", "classe", "journaux", "auto"].map(k => '<div class="acces-pane"' + vol(k) + '><div id="gPlus_' + k + '"><p class="sous">Chargement…</p></div></div>').join("")
       + (aRech.length ? '<label class="acces-rech"><input type="checkbox" id="gRech" checked><span><b>Couper vraiment l\'accès</b> : nouvelle clé pour ' + aRech.map(f => '« ' + esc(titreDe(f)) + ' »').join(", ") + '. Une vieille copie gardée par quelqu\'un qui n\'a plus l\'accès ne s\'ouvrira plus (un peu plus long à publier).</span></label>' : '')
       + (jeton   /* clé déjà enregistrée : invisible et impossible à changer dans le panneau (demande de Jeremy, 8 nov.); redemandée seulement si GitHub la refuse */
         ? '<input type="hidden" id="gJeton" value="">'
@@ -545,7 +555,8 @@ window.ACCES = (function(){
         dessinerGerer({ err:refusee ? "GitHub a refusé la clé enregistrée (elle a peut-être expiré). Demande à Claude de la remplacer." : "Publication impossible : " + e.message}); } };
   }
   let STATS = null, HIST = null;
-  function voletCharge(){ if (ONGLET === "props" && window.MESDOCS) MESDOCS.panneau(document.getElementById("gProps")); if (ONGLET === "stats") chargerStats(); if (ONGLET === "hist") chargerHist(); if (ONGLET === "site" && window.ADMIN_SITE) ADMIN_SITE.dessiner(document.getElementById("gSite"), REGL, () => dessinerGerer()); }
+  function voletCharge(){ if (ONGLET === "props" && window.MESDOCS) MESDOCS.panneau(document.getElementById("gProps")); if (ONGLET === "stats") chargerStats(); if (ONGLET === "hist") chargerHist(); if (ONGLET === "site" && window.ADMIN_SITE) ADMIN_SITE.dessiner(document.getElementById("gSite"), REGL, () => dessinerGerer());
+    if (window.ADMIN_PLUS && document.getElementById("gPlus_" + ONGLET)) ADMIN_PLUS.dessiner(ONGLET, document.getElementById("gPlus_" + ONGLET)); }
   async function chargerStats(){ if (STATS) return dessinerStats();
     try { STATS = await COFFRE.statsLire(); } catch(e){ const z = document.getElementById("gStats"); if (z) z.innerHTML = '<div class="acces-vide">' + ICO.stats + '<p>Les statistiques commencent dès que la table <b>stats</b> existe dans Supabase (commande SQL envoyée par Claude). Elles se remplissent ensuite toutes seules.</p></div>'; return; }
     dessinerStats(); }
@@ -609,6 +620,15 @@ window.ACCES = (function(){
       if (ajouter.includes(l.categorie) && !BROUILLON.livres[f].cles[id]) BROUILLON.livres[f].cles[id] = await envelopper(f, BROUILLON.comptes[id].pub);
       if (retirer.includes(l.categorie)) delete BROUILLON.livres[f].cles[id]; } }
   const DEPOT = "cfppaplc/bibliotheque";
+  /* 25 nov. (panneau d'administration complet) : ce dont js/admin-plus.js a besoin */
+  window.ACCES_ADMIN = {
+    jeton: () => { try { return localStorage.getItem("ghJeton") || ""; } catch(e){ return ""; } },
+    publier: (fichiers, message) => { let j = ""; try { j = localStorage.getItem("ghJeton") || ""; } catch(e){} if (!j) return Promise.reject(new Error("Cet appareil n'a pas la clé GitHub (Administration → bas de la page).")); return commitGitHub(j, fichiers, message); },
+    aller: k => { const b = document.querySelector('.acces-onglets [data-ong="' + k + '"]'); if (b) b.click(); },
+    demandes: () => NB_DEM,
+    aPublier: () => { const e = document.querySelector(".acces-etat"); return !!(e && e.classList.contains("pub")); },
+    stats: () => STATS
+  };
   async function commitGitHub(jeton, fichiers, message, essai){   /* plusieurs fichiers en un seul commit (API Git Data) : comptes.json, reglages.json, livres rechiffrés */
     const api = "https://api.github.com/repos/" + DEPOT + "/git/", h = { Authorization:"Bearer " + jeton, Accept:"application/vnd.github+json", "Content-Type":"application/json" };
     const j = async (u, o) => { const r = await fetch(api + u, Object.assign({ headers:h, cache:"no-store" }, o)); if (r.status === 401) throw new Error("clé GitHub refusée"); if (!r.ok) throw new Error("GitHub a répondu " + r.status); return r.json(); };

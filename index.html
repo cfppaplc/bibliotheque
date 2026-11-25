@@ -513,11 +513,12 @@ if ("serviceWorker" in navigator && (location.protocol === "https:" || location.
 window.addEventListener("offline", () => { try { aviser("Pas d'Internet : les livres déjà ouverts sur cet ordinateur restent disponibles."); } catch(e){} });
 window.addEventListener("online", () => { try { aviser("Internet est revenu."); } catch(e){} });
 </script>
-<link rel="stylesheet" href="css/acces.css?v=2">
+<link rel="stylesheet" href="css/acces.css?v=3">
 <div class="acces-ov" id="accesOv" hidden role="dialog" aria-modal="true"><div class="acces-box" id="accesBox"></div></div>
 <div class="acces-menu" id="accesMenu" hidden></div>
-<script src="js/acces.js?v=6"></script>
-<script src="js/admin-site.js?v=2"></script>
+<script src="js/acces.js?v=7"></script>
+<script src="js/admin-site.js?v=3"></script>
+<script src="js/admin-plus.js?v=1"></script>
 
 
 <script src="js/preferences.js?v=1"></script>
