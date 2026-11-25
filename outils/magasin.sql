@@ -1,5 +1,5 @@
 -- Magasin de raccords (25 nov.) : l'élève envoie son panier (code à 3 chiffres + groupe, jamais de nom),
--- l'enseignant l'approuve dans Métier+ (avis ntfy envoyé par la base, sujet secret), le magasinier le voit et le remet.
+-- l'enseignant l'approuve dans Métier+ (avis Web de Métier+ sur son cellulaire, envoyé par la fonction Supabase « panier-avis »), le magasinier le voit et le remet.
 -- À coller une fois dans Supabase → SQL Editor → Run.
 create extension if not exists pg_net;
 create extension if not exists pgcrypto with schema extensions;
@@ -7,7 +7,8 @@ create extension if not exists pgcrypto with schema extensions;
 create table if not exists public.panier_prof (
   ens      text primary key,
   jeton_h  text not null,            -- empreinte du jeton d'approbation (gardé sur les appareils de l'enseignant)
-  sujet    text,                     -- sujet ntfy secret de l'enseignant (avis sur son cellulaire)
+  sujet    text,                     -- (inutilisé)
+  abonnements jsonb not null default '[]',   -- appareils de l'enseignant qui reçoivent les avis (Web Push)
   t        timestamptz not null default now()
 );
 create table if not exists public.panier (
@@ -21,8 +22,14 @@ create table if not exists public.panier (
   etat     text not null default 'attente',   -- attente | approuve | refuse | remis
   t_app    timestamptz,
   t_remis  timestamptz,
-  motif    text
+  motif    text,
+  avise    boolean not null default false
 );
+create table if not exists public.panier_vapid (id int primary key default 1 check (id = 1), cles jsonb not null);   -- clés des avis, lues seulement par la fonction
+alter table public.panier_vapid enable row level security;
+revoke all on public.panier_vapid from anon, authenticated;
+alter table public.panier_prof add column if not exists abonnements jsonb not null default '[]';
+alter table public.panier add column if not exists avise boolean not null default false;
 create index if not exists panier_ens_t on public.panier (ens, t);
 alter table public.panier_prof enable row level security;
 alter table public.panier enable row level security;
@@ -51,7 +58,7 @@ $$;
 -- élève : envoie son panier; la base avertit l'enseignant (ntfy) sans jamais montrer son sujet
 create or replace function public.panier_envoyer(p_ens text, p_groupe text, p_code text, p_items jsonb, p_note text default null)
 returns jsonb language plpgsql security definer set search_path = public, extensions as $$
-declare r public.panier; s text; n int := jsonb_array_length(coalesce(p_items, '[]'::jsonb)); resume text;
+declare r public.panier; n int := jsonb_array_length(coalesce(p_items, '[]'::jsonb));
 begin
   if p_ens !~ '^[a-z0-9._-]{3,60}$' or p_code !~ '^[0-9]{3}$' or length(coalesce(p_groupe, '')) not between 1 and 60 or n < 1 or n > 80 or length(coalesce(p_note, '')) > 300 then
     return jsonb_build_object('ok', false, 'err', 'panier refusé'); end if;
@@ -61,15 +68,21 @@ begin
     return jsonb_build_object('ok', false, 'err', 'magasin trop occupé'); end if;
   insert into public.panier (ens, groupe, code, items, note) values (p_ens, p_groupe, p_code, p_items, nullif(trim(p_note), '')) returning * into r;
   delete from public.panier where t < now() - interval '60 days';
-  select sujet into s from public.panier_prof where ens = p_ens;
-  if s is not null then
-    select string_agg(coalesce(i->>'q', '1') || ' × ' || coalesce(i->>'nom', '?'), ', ') into resume from (select i from jsonb_array_elements(p_items) i limit 6) x;
-    perform net.http_post(url := 'https://ntfy.sh', headers := '{"Content-Type":"application/json"}'::jsonb,
-      body := jsonb_build_object('topic', s, 'title', 'Magasin : panier de l''élève ' || p_code || ' (' || p_groupe || ')',
-        'message', n || ' article(s) : ' || coalesce(resume, '') || case when n > 6 then '…' else '' end,
-        'click', 'https://metierplus.app/magasin.html?mode=prof', 'tags', jsonb_build_array('package'), 'priority', 4));
+  if exists (select 1 from public.panier_prof where ens = p_ens and jsonb_array_length(abonnements) > 0) then   -- avis Web Push par la fonction « panier-avis »
+    perform net.http_post(url := 'https://kjlotlhqrgekzohshmbn.supabase.co/functions/v1/panier-avis', headers := '{"Content-Type":"application/json"}'::jsonb, body := jsonb_build_object('id', r.id));
   end if;
   return jsonb_build_object('ok', true, 'id', r.id);
+end; $$;
+
+-- enseignant : cet appareil reçoit les avis (au plus 6 appareils; le même appareil n'est pas ajouté deux fois)
+create or replace function public.panier_prof_abonner(p_ens text, p_jeton text, p_abonnement jsonb, p_oui boolean default true)
+returns boolean language plpgsql security definer set search_path = public, extensions as $$
+declare a jsonb;
+begin
+  if not public.panier_prof_ok(p_ens, p_jeton) or coalesce(p_abonnement->>'endpoint', '') !~ '^https://' then return false; end if;
+  select coalesce(jsonb_agg(x), '[]'::jsonb) into a from (select x from public.panier_prof, jsonb_array_elements(abonnements) x where ens = p_ens and x->>'endpoint' <> p_abonnement->>'endpoint') y;
+  if p_oui then a := (case when jsonb_array_length(a) >= 6 then a - 0 else a end) || jsonb_build_array(p_abonnement); end if;
+  update public.panier_prof set abonnements = a where ens = p_ens; return true;
 end; $$;
 
 -- élève : où en est mon panier
@@ -108,7 +121,7 @@ begin
   return found;
 end; $$;
 
-revoke all on function public.panier_prof_regler(text, text, text), public.panier_prof_ok(text, text), public.panier_envoyer(text, text, text, jsonb, text),
+revoke all on function public.panier_prof_abonner(text, text, jsonb, boolean), public.panier_prof_regler(text, text, text), public.panier_prof_ok(text, text), public.panier_envoyer(text, text, text, jsonb, text),
   public.panier_etat(uuid), public.panier_prof_lire(text, text), public.panier_decider(text, text, uuid, boolean, text), public.panier_magasin(), public.panier_remettre(uuid, boolean) from public;
-grant execute on function public.panier_prof_regler(text, text, text), public.panier_envoyer(text, text, text, jsonb, text), public.panier_etat(uuid),
+grant execute on function public.panier_prof_abonner(text, text, jsonb, boolean), public.panier_prof_regler(text, text, text), public.panier_envoyer(text, text, text, jsonb, text), public.panier_etat(uuid),
   public.panier_prof_lire(text, text), public.panier_decider(text, text, uuid, boolean, text), public.panier_magasin(), public.panier_remettre(uuid, boolean) to anon, authenticated;
