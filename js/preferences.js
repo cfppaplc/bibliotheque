@@ -52,7 +52,9 @@
       + '<div class="acces-btns" style="justify-content:space-between;align-items:center;margin-top:16px"><button type="button" class="raz" id="pRaz">Remettre comme au départ</button><button class="prim" id="pFin">Terminé</button></div></div>';
     B.querySelectorAll("[data-k]").forEach(b => b.onclick = () => { const k = b.dataset.k, v = b.dataset.v;
       if (k === "leger"){ if (window.modeLegerFixer) window.modeLegerFixer(v); contenu(B); return; }
-      if (k === "avismag"){ b.disabled = true; AvisMag.regler(S.id, v === "oui").then(() => contenu(B)).catch(e => { const er = B.querySelector("#pAvEr"); if (er) er.textContent = "Avis impossibles : " + e.message + "."; b.disabled = false; }); return; }
+      if (k === "avismag"){ b.disabled = true; { const er = B.querySelector("#pAvEr"); if (er) { er.style.color = "#8c8c92"; er.textContent = v === "oui" ? "Activation…" : "Arrêt…"; } }
+        const t = setTimeout(() => { const er = B.querySelector("#pAvEr"); if (er && /…$/.test(er.textContent)) { er.style.color = "#e2483d"; er.textContent = "Rien ne répond. Sur iPhone, ouvre Métier+ depuis l'icône de l'écran d'accueil, puis réessaie."; b.disabled = false; } }, 15000);
+        AvisMag.regler(S.id, v === "oui").then(() => { clearTimeout(t); contenu(B); }).then(() => contenu(B)).catch(e => { clearTimeout(t); const er = B.querySelector("#pAvEr"); if (er) { er.style.color = "#e2483d"; er.textContent = "Avis impossibles : " + e.message + "."; } b.disabled = false; }); return; }
             if (k === "barres"){ if ((localStorage.barresFixes === "1") !== (v === "fixes")) document.getElementById("tbPin").click(); contenu(B); return; }   /* l'ancien bouton « Barres automatiques » de Plus d'outils, maintenant caché */
       ecrire(k, k === "bonjour" || k === "plein" ? (v === "oui" ? null : false) : v); });
     B.querySelector("#pFin").onclick = () => { document.getElementById("accesOv").hidden = true; };

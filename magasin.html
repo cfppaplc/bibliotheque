@@ -225,8 +225,8 @@ const LBL = { attente:"En attente de ton enseignant", approuve:"Approuvé · va 
   z.querySelectorAll("[data-abo]").forEach(b => b.onclick = async () => { b.disabled = true;
     try { const ios = /iPhone|iPad|iPod/.test(navigator.userAgent) && !navigator.standalone && !matchMedia("(display-mode: standalone)").matches;
       if (ios) { toast("Sur iPhone : ajoute d'abord « Ma carte » à ton écran d'accueil, puis ouvre le magasin à partir de là."); b.disabled = false; return; }
+      if (await Notification.requestPermission() !== "granted") throw new Error("avis refusés");   /* iPhone : au toucher, avant toute attente */
       const reg = await navigator.serviceWorker.register("sw.js"); await navigator.serviceWorker.ready;
-      if (await Notification.requestPermission() !== "granted") throw new Error("avis refusés");
       let sub = await reg.pushManager.getSubscription();
       if (!sub) { const { cle } = await (await fetch(SUPA + "/functions/v1/panier-avis", { headers:{ apikey:CLE } })).json(); sub = await reg.pushManager.subscribe({ userVisibleOnly:true, applicationServerKey:Uint8Array.from(atob(cle.replace(/-/g, "+").replace(/_/g, "/")), c => c.charCodeAt(0)) }); }
       if (await rpc("panier_abonner_eleve", { p_id:b.dataset.abo, p_abonnement:sub.toJSON() }) !== true) throw new Error("refus");

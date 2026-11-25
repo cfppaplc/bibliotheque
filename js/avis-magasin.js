@@ -21,11 +21,12 @@ window.AvisMag = (function(){
       throw new Error("ta clé d'approbation n'est pas encore arrivée de ton autre appareil. Attends quelques secondes et réessaie");
     }
     ecrire("magJeton|" + ens, j); return j; }
+  /* iPhone (25 nov.) : la permission doit être demandée tout de suite au toucher, avant toute attente réseau, sinon iOS l'ignore sans rien dire */
   async function regler(ens, oui){
+    if (oui && Notification.permission !== "granted") { const r = await Notification.requestPermission(); if (r !== "granted") throw new Error(r === "denied" ? "les avis sont bloqués : Réglages de l'iPhone (ou du navigateur) → Notifications → Métier+" : "permission non accordée"); }
     const j = await jeton(ens), reg = await navigator.serviceWorker.register("sw.js"); await navigator.serviceWorker.ready;
     let sub = await reg.pushManager.getSubscription();
     if (oui){
-      if (await Notification.requestPermission() !== "granted") throw new Error("les avis sont bloqués dans les réglages du navigateur");
       if (!sub){ const { cle } = await (await fetch(SUPA + "/functions/v1/panier-avis", { headers:{ apikey:CLE } })).json();
         sub = await reg.pushManager.subscribe({ userVisibleOnly:true, applicationServerKey:Uint8Array.from(atob(cle.replace(/-/g, "+").replace(/_/g, "/")), c => c.charCodeAt(0)) }); }
       if (await rpc("panier_prof_abonner", { p_ens:ens, p_jeton:j, p_abonnement:sub.toJSON(), p_oui:true }) !== true) throw new Error("refusé");
