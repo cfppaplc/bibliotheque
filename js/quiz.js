@@ -295,7 +295,8 @@ function telecommande(bord){
       couv: G.quiz && G.quiz.couv && !/^data:/.test(G.quiz.couv) ? G.quiz.couv : (G.quiz && G.quiz.couv ? "img" : ""), sujet: G.quiz ? G.quiz.sujet || "" : "",
       q: Q && ["question", "rev"].includes(G.etat) ? {q: Q.q, ch: Q.ch, s: Q.s, t, u: Q.u || "", zoom: Q.zoom || null, img: !!Q.img, expl: G.etat === "rev" ? Q.expl || "" : "", bonTxt: G.etat === "rev" ? texteBon(Q) : ""} : null,
       pres: estPres(G.quiz), mots: Q && typeDe(Q) === "nuage" ? compterMots(G.reps, G.masques) : null, dref: G.etat === "diapo" && Q ? Q.ref || "" : "", mains: G.mains ? G.mains.size : 0, conn: !!(G.quiz && G.quiz.qs.some(x => x.t === "connexion")), dmv: G.etat === "diapo" && Q ? Q.mv || "" : "", dlg: G.etat === "diapo" && Q && Q.lg ? Q.lg : null,
-      bon: G.etat === "rev" ? Q.bon : null, cpt, nrep: Object.keys(G.reps).length, mises: G.etat === "mise" ? ids().filter(id => P[id].mise).length : 0, vtrN: G.etat === "vtr" ? Object.keys(G.vtr || {}).length : 0, vtrRes: G.etat === "vtrRes" ? G.vtrRes : null,
+      bon: G.etat === "rev" ? Q.bon : null, cpt, nrep: Object.keys(G.reps).length, mises: G.etat === "mise" ? ids().filter(id => P[id].mise).length : 0, vtrN: G.etat === "vtr" ? Object.keys(G.vtr || {}).length : 0, vtrRes: G.etat === "vtrRes" ? G.vtrRes : null, inter: G.etat === "inter" ? G.inter : null, interT: G.interT || 0,
+      stats: G.etat === "fin" && G.stats ? (G.bilan || []).map((b, i) => b && b.n ? {i, q: b.q, p: Math.round(100 * b.ok / b.n), bon: b.bon} : null).filter(Boolean) : null,
       joueurs: ids().map(id => ({n: P[id].nom, av: P[id].av, pts: P[id].pts, r: r[id], g: G.etat === "rev" && G.reps[id] ? G.reps[id].g || 0 : 0, s: P[id].serie || 0, bo: G.etat === "rev" && G.reps[id] ? G.reps[id].bonus || 0 : 0, ra: G.etat === "rev" && G.reps[id] && G.reps[id].ok && id === plusRapide(G) ? 1 : 0})).sort((a, b) => a.r - b.r)};
   }
   function dessinerBilan(){
@@ -316,12 +317,18 @@ function telecommande(bord){
     $("qCour").textContent = G.etat === "lobby" ? (G.quiz && G.quiz.qs.some(x => x.t === "connexion") ? "Prêt : touche « Commencer » pour lancer la présentation (les élèves se connecteront plus loin)." : "En attente des participants…") : G.etat === "connexion" ? "Connexion des participants : le code est au tableau." : G.etat === "fin" ? "Partie terminée : le classement final est sur chaque iPad." : G.etat === "diapo" ? "Diapo " + (G.jeu.slice(0, G.i + 1).filter(x => typeDe(x) === "diapo").length) : (G.i + 1) + ". " + Q.q;
     $("qInfo").textContent = G.etat === "question" ? Object.keys(G.reps).length + " réponse(s) sur " + ids().length + " · " + Q.s + " s" :
       G.etat === "rev" ? "Bonne réponse : " + texteBon(Q) + (R().classement === "oui" ? " · le rang de chacun est envoyé sur son iPad." : "") :
-      G.etat === "vtr" ? "Vote du tricheur : " + Object.keys(G.vtr || {}).length + " vote(s) sur " + ids().length + "." : G.etat === "vtrRes" ? "Le tricheur était " + (G.vtrRes ? G.vtrRes.nom : "") + "." :
+      G.etat === "inter" ? "Interrogatoire : pose les questions au tableau, puis passe au vote." : G.etat === "vtr" ? "Vote du tricheur : " + Object.keys(G.vtr || {}).length + " vote(s) sur " + ids().length + "." : G.etat === "vtrRes" ? "Le tricheur était " + (G.vtrRes ? G.vtrRes.nom : "") + "." :
       G.etat === "mise" ? "Double ou rien : " + ids().filter(id => P[id].mise).length + " joueur(s) misent. Touche « Question suivante » pour commencer." : G.etat === "diapo" ? "Diapo au tableau · les iPad affichent « Regarde le tableau »." : G.quiz.qs.length + " éléments";
     $("bGo").disabled = G.etat !== "lobby";
     { const bp = $("bPause"), au = !!(G.quiz && G.quiz.auto); bp.hidden = !au; bp.disabled = !(au && G.etat === "diapo"); bp.textContent = G.pause ? "▶ Reprendre" : "❚❚ Pause"; }
-    $("bSuite").disabled = !["question", "rev", "mise", "diapo", "connexion", "vtr", "vtrRes"].includes(G.etat);
-    $("bSuite").textContent = G.etat === "vtr" ? "Démasquer le tricheur" : G.etat === "vtrRes" ? "Voir le podium" : G.etat === "question" ? "Montrer la réponse" : G.etat === "mise" ? "Lancer la question" : G.i + 1 >= G.jeu.length ? (G.quiz && G.quiz.auto ? "Recommencer" : sansPoints(G.jeu) ? "Terminer" : "Voir le podium") : typeDe(G.jeu[G.i + 1]) === "diapo" ? "Diapo suivante" : "Question suivante";
+    $("bSuite").disabled = !["question", "rev", "mise", "diapo", "connexion", "vtr", "vtrRes", "inter"].includes(G.etat) && !(G.etat === "fin" && !(G.bilan || []).some(Boolean));
+    if (G.etat === "fin" && (G.bilan || []).some(Boolean)) $("bSuite").disabled = false;
+    { let av = $("animVote"); if (!av) { av = document.createElement("div"); av.id = "animVote"; $("qInfo").insertAdjacentElement("afterend", av); }
+      if (G.etat === "inter" && G.inter) { av.innerHTML = `<div class="sous">Questions à poser (toi seul les vois) :</div><ol class="avQ">${G.inter.Q.map(q => `<li>${esc(q)}</li>`).join("")}</ol>`; }
+      else if (G.etat === "vtr") { av.innerHTML = `<div class="sous">Ton vote d'animateur (tu ne sais pas qui c'est) : si tu te trompes, le tricheur gagne 1000 points.</div><div class="avL">${ids().map(id => `<button data-av="${esc(id)}" class="${G.vtrAnim === id ? "choisi" : ""}">${esc(P[id].nom)}</button>`).join("")}<button data-av="passe" class="${!G.vtrAnim ? "choisi" : ""}">Je ne vote pas</button></div>`;
+        av.querySelectorAll("[data-av]").forEach(b => b.onclick = () => { G.vtrAnim = b.dataset.av === "passe" ? null : b.dataset.av; maj(); }); }
+      else av.innerHTML = ""; }
+    $("bSuite").textContent = G.etat === "fin" ? (G.stats ? "Revoir le podium" : "Statistiques de la classe") : G.etat === "inter" ? "Passer au vote" : G.etat === "vtr" ? "Démasquer le tricheur" : G.etat === "vtrRes" ? "Voir le podium" : G.etat === "question" ? "Montrer la réponse" : G.etat === "mise" ? "Lancer la question" : G.i + 1 >= G.jeu.length ? (G.quiz && G.quiz.auto ? "Recommencer" : sansPoints(G.jeu) ? "Terminer" : "Voir le podium") : typeDe(G.jeu[G.i + 1]) === "diapo" ? "Diapo suivante" : "Question suivante";
     if (Q && typeDe(Q) === "nuage" && ["question", "rev"].includes(G.etat)) {
       const L = compterMots(G.reps, G.masques);
       $("qInfo").innerHTML = (G.etat === "question" ? Object.keys(G.reps).length + " réponse(s) sur " + ids().length + " · " : "") + (L.length ? "Touche un mot pour le cacher du tableau : " + L.map(w => `<button class="btn2 petit" data-masq="${esc(w.k)}">${esc(w.t)} (${w.n}) ✕</button>`).join(" ") : "Aucun mot pour l'instant.");
@@ -340,15 +347,37 @@ function telecommande(bord){
     tr: pour && pour === G.tricheur && !SANS_PTS.includes(typeDe(Q)) && G.trichQ && G.trichQ[G.i] ? {bon: Q.bon, txt: texteBon(Q)} : null}; }
   /* vote du tricheur : après la dernière question, avant le podium */
   const voteAFaire = () => !!(G.tricheur && P[G.tricheur] && !G.vtrFait);
-  function voteTricheur(){ clearTimeout(minut); G.etat = "vtr"; G.vtr = {}; envoyer(topic, {m: "vtr", opts: ids().map(id => ({id, n: P[id].nom}))}); maj(); envoyer(topic, vueObj()); }
+  /* 25 nov. (Jeremy : « l'animateur pose des questions pour créer des soupçons ») : interrogatoire avant le vote.
+     Le tableau montre des suspects (les meilleurs taux de bonnes réponses) et des questions à poser; 2 minutes. */
+  function interrogatoire(){ clearTimeout(minut); G.etat = "inter"; G.interT = Date.now();
+    const B = (G.bilan || []).map((b, i) => b && Object.assign({i}, b)).filter(b => b && b.n), dure = B.slice().sort((a, b) => a.ok / a.n - b.ok / b.n)[0];
+    const st = id => ({id, n: P[id].nom, bons: P[id].bons || 0, max: P[id].max || 0, moy: P[id].nr ? P[id].tt / P[id].nr / 1000 : 0});
+    const S = ids().map(st).sort((a, b) => b.bons - a.bons || b.max - a.max).slice(0, 4), tot = G.jeu.filter(x => !SANS_PTS.includes(typeDe(x))).length;
+    const lent = ids().map(st).filter(x => x.moy).sort((a, b) => b.moy - a.moy)[0], parfait = S.filter(x => x.bons === tot);
+    const Q = [];
+    if (dure && S[0]) Q.push(`${S[0].n}, à la question ${dure.i + 1}, seulement ${Math.round(100 * dure.ok / dure.n)} % de la classe a trouvé. Comment as-tu fait, toi?`);
+    if (parfait.length) Q.push(`${parfait.map(x => x.n).join(" et ")} : aucune erreur. Qui d'autre trouve ça louche?`);
+    if (lent) Q.push(`${lent.n}, tu prends ton temps avant de répondre (${lent.moy.toFixed(1).replace(".", ",")} s en moyenne). Tu attends quoi?`);
+    if (S[1]) Q.push(`${S[1].n}, qui soupçonnes-tu, et pourquoi? Donne un fait.`);
+    Q.push("Le tricheur se trompe peut-être exprès. Qui a raté une question facile?");
+    G.inter = {S: S.map(x => ({n: x.n, bons: x.bons, tot, max: x.max, moy: x.moy ? +x.moy.toFixed(1) : null})), Q};
+    envoyer(topic, {m: "inter"}); maj(); envoyer(topic, vueObj()); }
+  function voteTricheur(){ clearTimeout(minut); G.etat = "vtr"; G.vtr = {}; G.vtrAnim = null; envoyer(topic, {m: "vtr", opts: ids().map(id => ({id, n: P[id].nom}))}); maj(); envoyer(topic, vueObj()); }
   /* 25 nov. (Jeremy) : trouver le tricheur = se partager ses points; se tromper = lui donner le quart des siens; on peut passer */
-  function resultatTricheur(){ const t = G.tricheur, v = G.vtr || {}, d = {};
+  function resultatTricheur(){ const t = G.tricheur, v = G.vtr || {}, d = {}, et = {};   /* et[id] = points à chaque étape : avant, mauvais votes, bons votes, animateur */
+    ids().forEach(id => { et[id] = [P[id].pts]; });
     const bons = ids().filter(id => id !== t && v[id] === t), faux = ids().filter(id => id !== t && v[id] && v[id] !== "passe" && v[id] !== t);
     faux.forEach(id => { const x = Math.round(P[id].pts * .2); P[id].pts -= x; P[t].pts += x; d[id] = -x; });   /* équilibre : 20 % pour un mauvais vote */
+    ids().forEach(id => et[id].push(P[id].pts));
     const recu = faux.reduce((a, id) => a - d[id], 0); let total = 0, part = 0;
     if (bons.length) { total = Math.round(P[t].pts / 2); part = Math.floor(total / bons.length); bons.forEach(id => { P[id].pts += part; d[id] = part; }); P[t].pts -= part * bons.length; d[t] = recu - part * bons.length; }   /* démasqué : il remet la moitié de ses points */
     else d[t] = recu;
-    G.vtrFait = true; G.etat = "vtrRes"; G.vtrRes = {nom: P[t].nom, nb: bons.length, nf: faux.length, total, part, trouve: bons.length > 0};
+    ids().forEach(id => et[id].push(P[id].pts));
+    /* 25 nov. (Jeremy) : l'animateur vote aussi, sans savoir qui c'est : s'il se trompe, le tricheur gagne 1000 points */
+    const animRate = !!(G.vtrAnim && G.vtrAnim !== t); if (animRate) { P[t].pts += 1000; d[t] = (d[t] || 0) + 1000; }
+    ids().forEach(id => et[id].push(P[id].pts));
+    G.vtrFait = true; G.etat = "vtrRes"; G.vtrRes = {nom: P[t].nom, nb: bons.length, nf: faux.length, total, part, trouve: bons.length > 0, anim: G.vtrAnim ? (animRate ? "rate" : "bon") : "",
+      L: ids().map(id => ({n: P[id].nom, av: P[id].av, e: et[id], tr: id === t, k: id === t ? "tr" : bons.includes(id) ? "bon" : faux.includes(id) ? "faux" : "passe"}))};
     envoyer(topic, Object.assign({m: "vtrRes", tr: t, bons, faux, d}, G.vtrRes)); maj(); envoyer(topic, vueObj()); }
   function planAuto(){ clearTimeout(minut); const D = G.jeu && G.jeu[G.i];   /* 11 nov. : présentation qui défile seule, en boucle; Pause l'arrête */
     if (G.quiz && G.quiz.auto && !G.pause && G.etat === "diapo" && D) minut = setTimeout(() => { if (G.etat !== "diapo" || G.pause) return; G.i = G.i + 1 >= G.jeu.length ? 0 : G.i + 1; suivante(); }, (D.d || G.quiz.auto) * 1000); }
@@ -401,7 +430,7 @@ function telecommande(bord){
       if (P[id]) { P[id].serie = bon ? (P[id].serie || 0) + 1 : 0; P[id].max = Math.max(P[id].max || 0, P[id].serie);   /* série de bonnes réponses */
         x.bonus = bon && reg.bonus !== "non" && reg.points !== "aucun" && P[id].serie >= 3 ? 100 * Math.min(3, P[id].serie - 2) : 0; x.g += x.bonus;
         if (!bon && reg.penalite === "oui" && reg.points !== "aucun") x.g = -Math.min(250, P[id].pts);   /* pénalité : jamais sous 0 */
-        P[id].pts += x.g; P[id].bons = (P[id].bons || 0) + (bon ? 1 : 0); }
+        P[id].pts += x.g; P[id].bons = (P[id].bons || 0) + (bon ? 1 : 0); if (x.ms != null) { P[id].tt = (P[id].tt || 0) + Math.max(0, x.ms); P[id].nr = (P[id].nr || 0) + 1; } }
     });
     ids().forEach(id => { if (!G.reps[id]) P[id].serie = 0; });   /* pas répondu = série brisée */
     if (der) ids().forEach(id => { if (!P[id].mise) return; const x = G.reps[id] || (G.reps[id] = {c: null, ms: 0, g: 0, ok: false});
@@ -418,11 +447,12 @@ function telecommande(bord){
     ids().forEach(id => res[id] = {pts: P[id].pts, rang: r[id], bons: P[id].bons || 0, max: P[id].max || 0});
     envoyer(topic, {m: "fin", sp: sansPoints(G.jeu), res, n, total: G.jeu.filter(x => !SANS_PTS.includes(typeDe(x))).length, points: R().points}); maj(); envoyer(topic, vueObj());
   }
-  $("bGo").onclick = () => { if (!G.quiz) return; G.pause = false; G.tricheur = undefined; G.trichQ = {}; G.vtrFait = false; G.vtr = {}; G.vtrRes = null; G.dblProch = false; try { localStorage.setItem("dernierQuiz", JSON.stringify({ id: G.quiz.id, titre: G.quiz.titre || "Quiz", t: Date.now() })); } catch(e){} try { window.COFFRE && COFFRE.stat("quiz:" + (G.quiz.exemple ? G.quiz.id : "perso")); } catch(e){} Object.values(P).forEach(p => { p.pts = 0; p.bons = 0; p.serie = 0; p.max = 0; p.mise = false; }); G.dbl = false; G.masques = {}; G.mains = new Set(); preparer(); (G.jeu || []).forEach(x => { if (x.ref) DIA.obtenir(x.ref); }); G.i = 0; suivante(); };
+  $("bGo").onclick = () => { if (!G.quiz) return; G.pause = false; G.tricheur = undefined; G.trichQ = {}; G.vtrFait = false; G.vtr = {}; G.vtrRes = null; G.dblProch = false; G.stats = false; Object.values(P).forEach(p => { p.tt = 0; p.nr = 0; }); try { localStorage.setItem("dernierQuiz", JSON.stringify({ id: G.quiz.id, titre: G.quiz.titre || "Quiz", t: Date.now() })); } catch(e){} try { window.COFFRE && COFFRE.stat("quiz:" + (G.quiz.exemple ? G.quiz.id : "perso")); } catch(e){} Object.values(P).forEach(p => { p.pts = 0; p.bons = 0; p.serie = 0; p.max = 0; p.mise = false; }); G.dbl = false; G.masques = {}; G.mains = new Set(); preparer(); (G.jeu || []).forEach(x => { if (x.ref) DIA.obtenir(x.ref); }); G.i = 0; suivante(); };
   $("bPause").onclick = () => { G.pause = !G.pause; planAuto(); maj(); };
   $("bSuite").onclick = () => { if (G.etat === "question") { reveler(); return; } if (G.etat === "mise") { question(); return; }
-    if (G.etat === "vtr") { resultatTricheur(); return; } if (G.etat === "vtrRes") { finir(); return; }
-    if (G.i + 1 >= G.jeu.length && !(G.quiz && G.quiz.auto) && voteAFaire()) { voteTricheur(); return; } if (G.i + 1 >= G.jeu.length) { if (G.quiz && G.quiz.auto) { G.i = 0; suivante(); return; } finir(); return; } G.i++; suivante(); };
+    if (G.etat === "vtr") { resultatTricheur(); return; } if (G.etat === "vtrRes") { finir(); return; } if (G.etat === "inter") { voteTricheur(); return; }
+    if (G.etat === "fin") { G.stats = !G.stats; maj(); envoyer(topic, vueObj()); return; }   /* 25 nov. : statistiques de la classe au tableau, quand l'enseignant le décide */
+    if (G.i + 1 >= G.jeu.length && !(G.quiz && G.quiz.auto) && voteAFaire()) { interrogatoire(); return; } if (G.i + 1 >= G.jeu.length) { if (G.quiz && G.quiz.auto) { G.i = 0; suivante(); return; } finir(); return; } G.i++; suivante(); };
   $("bFin").onclick = () => { oublierPartie(); clearTimeout(minut); envoyer(topic, {m: "attente"}); G.quiz = null; G.etat = "choix"; G.i = -1; G.jeu = []; document.documentElement.style.removeProperty("--acc"); montrer("vChoix"); listeQuiz(); vue(); };
 
   /* Manette du cellulaire (9 nov., « contrôler avec mon cell, ça doit être facile ») : le cell envoie {m:"cmd", k, b},
@@ -435,7 +465,9 @@ function telecommande(bord){
     const j = ids().sort((x, y) => r[x] - r[y]).map(id => { const x = G.reps[id];
       return {id, n: P[id].nom, pts: P[id].pts, r: r[id], a: G.etat === "question" ? !!x : null, txt: rev && x && x.c != null ? texteRep(Q, x.c) : "", ok: rev ? !!(x && x.ok) : null}; });
     return {m: "mstat", go: b("bGo"), suite: b("bSuite"), cour: $("qCour").textContent, att, n: ids().length, etat: G.etat, titre: G.quiz ? G.quiz.titre || "Défi+" : "",
-      j, fin: G.etat === "question" && Q ? G.t0 + Q.s * 1000 : 0, lec: G.etat === "question" ? G.t0 : 0, dblP: !!G.dblProch};
+      j, fin: G.etat === "question" && Q ? G.t0 + Q.s * 1000 : 0, lec: G.etat === "question" ? G.t0 : 0, dblP: !!G.dblProch,
+      interQ: G.etat === "inter" && G.inter ? G.inter.Q : null,
+      vanim: G.etat === "vtr" ? {opts: ids().map(id => ({id, n: P[id].nom})), choix: G.vtrAnim || ""} : null};
   }
   function pousserMan(force){ if (Date.now() - manVu > 90000) return; const o = etatManette(), j = JSON.stringify(o); if (force || j !== manDer) { manDer = j; o.now = Date.now(); envoyer(topic, o); } }
   if (!bord) setInterval(pousserMan, 700);
@@ -444,6 +476,7 @@ function telecommande(bord){
     else if (m.b === "plus10" && G.etat === "question" && G.jeu[G.i]) {   /* +10 s à la question en cours (écran, iPad qui n'ont pas répondu, minuterie) */
       const Q = G.jeu[G.i]; Q.s += 10; clearTimeout(minut); minut = setTimeout(reveler, Math.max(500, G.t0 + Q.s * 1000 + 2500 - Date.now()));
       ids().filter(id => !G.reps[id]).forEach(id => envoyer(topic, qMsg(id))); maj(); }
+    else if (m.b === "vanim" && G.etat === "vtr" && (P[m.id] || m.id === "passe")) { G.vtrAnim = m.id === "passe" ? null : m.id; maj(); }
     else if (m.b === "dbl" && G.etat !== "choix" && G.etat !== "fin") { G.dblProch = !G.dblProch; maj(); }
     else if (m.b === "kick" && m.id && P[m.id]) { const k = document.querySelector(`[data-kick="${m.id}"]`); if (k) k.click(); }
     else if (m.b === "fin" && G.etat !== "choix") $("bFin").click();
@@ -966,6 +999,7 @@ function joueur(code){
           <div class="ch4 mise"><button data-mise="1" class="k1"><i>×2</i>Je mise tout</button><button data-mise="0" class="k0"><i>=</i>Je garde mes points</button></div><div id="miseTxt" style="margin-top:12px;opacity:.85">Choisis avant que la question arrive.</div>`);
         document.querySelectorAll("#jBx [data-mise]").forEach(b => b.onclick = () => choisir(b.dataset.mise === "1"));
       } else if (m.m === "trich" && m.pour === pid) { m.apres = Date.now() + Math.max(0, m.t0 + 3000 - m.now); window.__trich = m; trichAppliquer(m.i);
+      } else if (m.m === "inter") { clearInterval(chrono); bx(`<div style="opacity:.75">Avant le vote</div><h2>L'interrogatoire</h2><div class="rang">L'animateur pose des questions. Défends-toi, accuse avec des faits… et observe le non-verbal.</div><div style="margin-top:10px;opacity:.85">Le vote du tricheur arrive bientôt.</div>`);
       } else if (m.m === "vtr") { clearInterval(chrono); const L = (m.opts || []).filter(o => o.id !== pid); let choix = null;   /* le tricheur vote aussi, pour ne pas se trahir */
         bx(`<div style="opacity:.75">Fin de la partie</div><h2>Qui est le tricheur?</h2><div style="opacity:.85;margin-bottom:10px">Un élève voyait les bonnes réponses. Le trouver : tu te partages la moitié de ses points. Te tromper : tu lui donnes 20 % des tiens. Tu peux passer.</div><div class="vtrL">${L.map(o => `<button data-v="${esc(o.id)}">${esc(o.n)}</button>`).join("")}<button data-v="passe" class="passe">Je passe</button></div><div id="vtrT" style="margin-top:10px;opacity:.8"></div>`);
         document.querySelectorAll("#jBx [data-v]").forEach(b => b.onclick = () => { choix = b.dataset.v; envoyer(topic, {m: "vtrv", pid, id: choix}); document.querySelectorAll("#jBx [data-v]").forEach(x => x.classList.toggle("choisi", x === b)); $("vtrT").textContent = "Vote envoyé. Tu peux changer d'idée jusqu'à la révélation."; });
@@ -1081,7 +1115,7 @@ function manette(code, k){
     <button class="m2 mfin" id="mFin">Quitter la partie</button>
     <div class="mbas"><button class="m2 cache" id="mAutre"></button><button class="mbig" id="mGo" disabled>…</button></div></div>`);
   let S = null, recu = 0, dec = 0, sur = {};
-  const cmd = b => envoyer(topic, {m: "cmd", k, b});
+  const cmd = (b, id) => envoyer(topic, {m: "cmd", k, b, id});
   const dessiner = () => { if (!S) return;
     $("mTitre").textContent = S.titre || "Défi+"; $("mCour").textContent = S.cour || "";
     const A = S.att || []; $("mAtt").innerHTML = A.length ? `<b>En attente de ${A.length}</b>` + (A.length <= 16 ? `<div class="mpuces">${A.map(n => `<span>${esc(n)}</span>`).join("")}</div>` : "") : "";
@@ -1091,6 +1125,11 @@ function manette(code, k){
     const autre = go && S.suite && !S.suite.d; $("mAutre").classList.toggle("cache", !autre); if (autre) { $("mAutre").textContent = S.suite.t; $("mAutre").dataset.b = "bSuite"; }
     $("mPlus").disabled = S.etat !== "question"; $("mDbl").disabled = !S.etat || ["choix", "fin", "vtr", "vtrRes"].includes(S.etat); $("mDbl").classList.toggle("on", !!S.dblP); $("mDbl").querySelector("span").textContent = S.dblP ? "Prochaine : ×2" : "Double ou rien"; $("mFin").classList.toggle("cache", !S.etat || S.etat === "choix");
     const L = S.j || []; $("mSum").textContent = (S.etat === "lobby" || S.etat === "choix" ? "Participants" : "Classement et réponses") + " (" + L.length + ")";
+    { let mv = $("mVote"); if (!mv) { mv = document.createElement("div"); mv.id = "mVote"; $("mAtt").insertAdjacentElement("afterend", mv); }
+      if (S.vanim) { mv.innerHTML = `<div class="mvt">Ton vote : si tu te trompes, le tricheur gagne 1000 points.</div><div class="avL">${S.vanim.opts.map(o => `<button data-mv="${esc(o.id)}" class="${S.vanim.choix === o.id ? "choisi" : ""}">${esc(o.n)}</button>`).join("")}<button data-mv="passe" class="${!S.vanim.choix ? "choisi" : ""}">Je ne vote pas</button></div>`;
+        mv.querySelectorAll("[data-mv]").forEach(b => b.onclick = () => cmd("vanim", b.dataset.mv)); }
+      else if (S.interQ) mv.innerHTML = `<div class="mvt">Questions à poser :</div><ol class="avQ">${S.interQ.map(q => `<li>${esc(q)}</li>`).join("")}</ol>`;
+      else mv.innerHTML = ""; }
     $("mJ").innerHTML = L.map(x => `<div class="mj"><b>${x.r || "–"}</b><span class="mn">${esc(x.n)}${x.txt ? `<small class="${x.ok ? "ok" : "ko"}">${esc(x.txt)}</small>` : x.ok === false && S.etat === "rev" ? '<small class="ko">pas répondu</small>' : ""}</span>${x.a === true ? '<i class="ok">✓</i>' : x.a === false ? '<i>…</i>' : ""}<em>${x.pts}</em><button data-k="${esc(x.id)}" class="${sur[x.id] ? "sur" : ""}">${sur[x.id] ? "Retirer ?" : "✕"}</button></div>`).join("") || '<div class="mt">Personne pour l\'instant.</div>'; };
   let finVu = 0, tot = 0;
   const minuterie = () => { const ch = $("mChr"); if (!S || !S.fin || S.etat !== "question") { ch.classList.remove("on"); return; } const n = Date.now() + dec;
@@ -1310,7 +1349,7 @@ function ecran(code){
   }
   if (/[?&]essaiClassement=1/.test(location.search)) { window.__cl = classement; window.__vue = m => { V = m; decal = 0; rendre(true); }; }   // essais seulement
   function rendre(force){
-    const v = V, n = Date.now() + decal, lecture = v.etat === "question" && v.q && n < v.t0 - 150, cle = v.etat + v.i + (lecture ? "L" : "");
+    const v = V, n = Date.now() + decal, lecture = v.etat === "question" && v.q && n < v.t0 - 150, cle = v.etat + v.i + (lecture ? "L" : "") + (v.stats ? "S" : "");
     musique(v, n);
     document.documentElement.style.setProperty("--acc", (v.reg && v.reg.coul) || "#534AB7");
     document.body.classList.toggle("eLobby", v.etat === "lobby" || v.etat === "connexion");
@@ -1334,11 +1373,27 @@ function ecran(code){
     } else if (v.etat === "diapo") {
       diapoImg(v);
       if (cle !== dernier || force) E.innerHTML = img[v.i] ? `<div class="ediapo ${v.dmv === "kb" || v.dmv === "focus" ? v.dmv : ""} k${v.i % 2}"><div class="dwrap"><img src="${img[v.i]}" alt="">${v.dlg ? `<div class="dLogo" style="left:${+v.dlg[0]}%;top:${+v.dlg[1]}%;width:${+v.dlg[2]}%;height:${+v.dlg[3]}%">${LOGO_ANIM}</div>` : ""}</div></div>` + bSon() : tete(v.titre) + bSon();
+    } else if (v.etat === "inter" && v.inter) {
+      if (cle !== dernier || force) { const I = v.inter; E.innerHTML = tete("L'interrogatoire") + `<div class="inter monte"><div class="interS"><h3>Les suspects</h3>${I.S.map(x => `<div class="sus"><b>${esc(x.n)}</b><span>${x.bons} / ${x.tot} bonnes réponses</span><span>série de ${x.max}${x.moy ? " · répond en " + String(x.moy).replace(".", ",") + " s" : ""}</span></div>`).join("")}</div>
+        <div class="interQ"><h3>Le débat</h3><div class="interM">L'animateur pose ses questions. Défends-toi. Accuse avec des faits. Observe le non-verbal.</div><div class="interC" id="eInterC"></div></div></div>` + bSon(); if (cle !== dernier) accord(); }
+      { const r = Math.max(0, 120 - Math.floor((Date.now() - v.interT) / 1000)), c = $("eInterC"); if (c) { c.textContent = Math.floor(r / 60) + ":" + String(r % 60).padStart(2, "0"); c.classList.toggle("fini", !r); } }
+    } else if (v.etat === "fin" && v.stats) {
+      if (cle !== dernier || force) { const S = v.stats, moy = Math.round(S.reduce((a, x) => a + x.p, 0) / Math.max(1, S.length)), dures = S.filter(x => x.p < 60);
+        E.innerHTML = tete("Statistiques de la classe") + `<div class="stats monte"><div class="statsM"><b>${moy} %</b><span>de bonnes réponses en moyenne</span>${dures.length ? `<em>${dures.length} question${dures.length > 1 ? "s" : ""} à revoir (moins de 60 %)</em>` : "<em>Aucune question sous 60 % : bravo!</em>"}</div>
+        <div class="statsL">${S.map(x => `<div class="stq ${x.p < 60 ? "dur" : ""}"><span class="stn">${x.i + 1}</span><span class="stt">${esc(x.q)}${x.p < 60 && S.filter(y => y.p < x.p || (y.p === x.p && y.i < x.i)).length < 5 ? `<small>Réponse : ${esc(x.bon)}</small>` : ""}</span><span class="stb"><i style="width:${x.p}%"></i></span><b>${x.p} %</b></div>`).join("")}</div></div>` + bSon(); }
     } else if (v.etat === "vtr") {
       if (cle !== dernier || force) { E.innerHTML = tete("Le tricheur") + `<div class="dblE monte"><b>Qui est le tricheur?</b><span>Un élève voyait les bonnes réponses.<br>Vote sur ton iPad, ou passe. Ceux qui le trouvent se partagent la moitié de ses points.<br>Ceux qui se trompent lui donnent 20 % des leurs.</span><em id="eVtr"></em></div>` + bSon(); if (cle !== dernier) accord(); }
       $("eVtr").textContent = v.vtrN + " vote" + (v.vtrN > 1 ? "s" : "") + " sur " + v.joueurs.length;
-    } else if (v.etat === "vtrRes" && v.vtrRes) {
-      if (cle !== dernier || force) { const x = v.vtrRes; E.innerHTML = tete("Le tricheur") + `<div class="dblE monte"><b>${esc(x.nom)}</b><span>${x.trouve ? `Démasqué! ${x.nb} élève${x.nb > 1 ? "s se partagent" : " remporte"} la moitié de ses points : ${x.total}${x.nb > 1 ? ", " + x.part + " chacun" : ""}.` : "Personne ne l'a trouvé : il garde ses points."}${x.nf ? `<br>${x.nf} élève${x.nf > 1 ? "s se sont trompés et lui ont" : " s'est trompé et lui a"} donné 20 % de ${x.nf > 1 ? "leurs" : "ses"} points.` : ""}</span></div>` + bSon(); if (cle !== dernier) accord(); }
+    } else if (v.etat === "vtrRes" && v.vtrRes) {   /* 25 nov. (Jeremy : « on veut voir le pointage de l'accusé monter et descendre ») */
+      if (cle !== dernier || force) { const x = v.vtrRes, T = (x.L || []).find(o => o.tr), A = (x.L || []).filter(o => !o.tr);
+        const carte = (o, gros) => `<div class="vr ${gros ? "vrT" : "vr-" + o.k}" data-e="${esc(JSON.stringify(o.e))}">${o.av != null && o.av >= 0 ? `<img src="${persoImg(o.av)}" alt="" onerror="this.remove()">` : ""}<b>${esc(o.n)}</b><span class="vrP">${o.e[0]}</span><em class="vrD"></em></div>`;
+        E.innerHTML = tete("Le tricheur") + `<div class="vrW monte">${T ? carte(T, true) : ""}<div class="vrC" id="vrC">C'était ${esc(x.nom)}!</div><div class="vrL">${A.map(o => carte(o)).join("")}</div></div>` + bSon();
+        if (cle !== dernier) { accord(); const cap = ["Les mauvais votes lui donnent des points…", "Ceux qui l'ont trouvé se partagent la moitié des siens…", x.anim === "rate" ? "L'animateur s'est trompé : +1000 pour le tricheur!" : ""];
+          [1, 2, 3].forEach(k => setTimeout(() => { if (!document.querySelector(".vrW")) return; let bouge = false;
+            document.querySelectorAll(".vr[data-e]").forEach(c => { const e = JSON.parse(c.dataset.e), a = e[k - 1], b = e[k]; if (a === b) return; bouge = true; const P0 = c.querySelector(".vrP"), D = c.querySelector(".vrD");
+              D.textContent = (b > a ? "+" : "−") + Math.abs(b - a); c.classList.remove("monteP", "baisseP"); void c.offsetWidth; c.classList.add(b > a ? "monteP" : "baisseP");
+              const t0 = performance.now(), f = now => { const r = Math.min(1, (now - t0) / 1100); P0.textContent = Math.round(a + (b - a) * (1 - Math.pow(1 - r, 3))); if (r < 1) requestAnimationFrame(f); }; requestAnimationFrame(f); });
+            if (bouge && cap[k - 1]) $("vrC").textContent = cap[k - 1]; }, 900 + (k - 1) * 2200)); } }
     } else if (v.etat === "mise") {
       if (cle !== dernier || force) {
         E.innerHTML = tete("Question spéciale") + `<div class="dblE monte"><b>Double ou rien</b><span>Sur ton iPad : mise tous tes points.<br>Bonne réponse = points doublés. Mauvaise réponse = 0.</span><em id="eMises"></em></div>` + bSon();
@@ -1422,5 +1477,5 @@ function ecran(code){
     if (m.m === "img") { img[m.i] = m.data; if (((V.etat === "question" || V.etat === "diapo") && V.i === m.i) || (m.i === -1 && V.etat === "lobby")) rendre(true); }
     else if (m.m === "vue") { V = m; decal = m.now - Date.now(); rendre(m.etat === "lobby" || m.etat === "connexion"); }
   }, ok => { if (ok) envoyer(topic, {m: "ecran?"}); });
-  rendre(true); setInterval(() => { if (V.etat === "question" || V.etat === "mise") rendre(); }, 400);
+  rendre(true); setInterval(() => { if (V.etat === "question" || V.etat === "mise" || V.etat === "inter") rendre(); }, 400);
 }

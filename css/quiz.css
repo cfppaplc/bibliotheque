@@ -481,3 +481,57 @@ html.sombre .qe .ln:has(input:checked) .tc{background:rgba(30,138,85,.15)}
 .mx2{font-size:1.3rem;font-weight:800;line-height:1}
 #mDbl.on{background:#EB6A22!important;color:#fff!important;border-color:#EB6A22!important}
 .vtrL button.passe{grid-column:1/-1;border-style:dashed;opacity:.85}
+
+/* interrogatoire (tricheur) */
+.inter{display:grid;grid-template-columns:1fr 1.4fr;gap:3vw;width:min(1200px,92vw);margin:2vh auto 0;text-align:left}
+.inter h3{margin:0 0 1.2vh;font-size:clamp(16px,1.6vw,24px);opacity:.75;text-transform:uppercase;letter-spacing:.06em}
+.sus{display:flex;flex-direction:column;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);border-radius:14px;padding:1.2vh 1.4vw;margin-bottom:1.2vh}
+.sus b{font-size:clamp(20px,2.2vw,34px)}
+.sus span{opacity:.8;font-size:clamp(14px,1.3vw,20px)}
+.interQ ol{margin:0;padding-left:1.4em;font-size:clamp(17px,1.7vw,26px);line-height:1.4}
+.interQ li{margin-bottom:1vh}
+.interC{font-size:clamp(34px,3.6vw,60px);font-weight:800;font-variant-numeric:tabular-nums;margin-top:1vh}
+.interC.fini{color:#E0574A}
+/* statistiques de fin */
+.stats{display:grid;grid-template-columns:minmax(220px,.6fr) 2fr;gap:3vw;width:min(1300px,94vw);margin:1.5vh auto 0;text-align:left;align-items:start}
+.statsM b{display:block;font-size:clamp(56px,7vw,110px);line-height:1;color:#FFB15C}
+.statsM span{display:block;opacity:.85;font-size:clamp(16px,1.5vw,22px)}
+.statsM em{display:block;margin-top:2vh;font-style:normal;font-size:clamp(15px,1.4vw,20px);opacity:.9}
+.statsL{max-height:66vh;overflow:hidden;display:flex;flex-direction:column;gap:.8vh}
+.stq{display:grid;grid-template-columns:2.2em 1fr 22% 4em;align-items:center;gap:1vw;font-size:clamp(13px,1.15vw,18px)}
+.stn{font-weight:800;opacity:.7}
+.stt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stt small{display:block;color:#FFB15C;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stb{height:12px;border-radius:6px;background:rgba(255,255,255,.12);overflow:hidden}
+.stb i{display:block;height:100%;background:#2EB872;border-radius:6px}
+.stq.dur .stb i{background:#E0574A}
+.stq b{text-align:right}
+#animVote .avL,#mVote .avL{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+#animVote button,#mVote button{padding:8px 12px;border-radius:10px;border:1px solid rgba(127,127,127,.4);background:transparent;color:inherit;font:inherit}
+#animVote button.choisi,#mVote button.choisi{background:#EB6A22;border-color:#EB6A22;color:#fff}
+.mvt{font-size:.85rem;opacity:.85;margin-top:8px}
+.statsL{gap:.4vh;max-height:70vh}
+.stq{font-size:clamp(12px,1.05vw,17px)}
+
+/* révélation du tricheur : les points bougent */
+.vrW{display:flex;flex-direction:column;align-items:center;gap:2.4vh;margin-top:1vh}
+.vr{display:flex;flex-direction:column;align-items:center;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.16);border-radius:16px;padding:1.2vh 1.4vw;min-width:9vw;position:relative}
+.vr img{width:clamp(40px,4vw,64px);height:clamp(40px,4vw,64px);border-radius:50%;object-fit:cover;margin-bottom:.6vh}
+.vr b{font-size:clamp(15px,1.4vw,22px)}
+.vrP{font-size:clamp(22px,2.4vw,38px);font-weight:800;font-variant-numeric:tabular-nums}
+.vrD{position:absolute;top:-1.2em;right:.4em;font-style:normal;font-weight:800;font-size:clamp(16px,1.6vw,26px);opacity:0}
+.vrT{border-color:#FFB15C;background:rgba(255,177,92,.12);padding:2vh 3vw}
+.vrT img{width:clamp(70px,7vw,110px);height:clamp(70px,7vw,110px)}
+.vrT b{font-size:clamp(28px,3vw,48px);color:#FFB15C}
+.vrT .vrP{font-size:clamp(44px,5vw,80px)}
+.vrL{display:flex;flex-wrap:wrap;justify-content:center;gap:1vw}
+.vrC{font-size:clamp(18px,1.8vw,28px);opacity:.9;min-height:1.4em}
+.monteP .vrP{color:#2EB872}.baisseP .vrP{color:#E0574A}
+.monteP .vrD{color:#2EB872;animation:vrD 2s ease forwards}.baisseP .vrD{color:#E0574A;animation:vrD 2s ease forwards}
+.monteP{animation:vrSaute .5s ease}.baisseP{animation:vrSecoue .5s ease}
+@keyframes vrD{0%{opacity:0;transform:translateY(10px)}20%{opacity:1;transform:none}80%{opacity:1}100%{opacity:0;transform:translateY(-12px)}}
+@keyframes vrSaute{50%{transform:translateY(-8px) scale(1.04)}}
+@keyframes vrSecoue{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.interM{font-size:clamp(18px,1.8vw,28px);opacity:.85;line-height:1.4}
+.avQ{margin:6px 0 8px;padding-left:1.3em;font-size:.95rem;line-height:1.4}
+.avQ li{margin-bottom:4px}
