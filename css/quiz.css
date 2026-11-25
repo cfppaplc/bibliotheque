@@ -561,3 +561,18 @@ html.sombre .qe .ln:has(input:checked) .tc{background:rgba(30,138,85,.15)}
 .eligne span{position:absolute;top:100%;font-size:1.2vw;opacity:.7}.eligne .g{left:0}.eligne .d{right:0}
 .pgL li span{text-align:left;color:#fff}
 .eligne .zone{position:absolute;top:50%;height:3vh;margin-top:-1.5vh;background:rgba(124,240,168,.22);border-radius:.6vw}
+/* 25 nov. (journal du TNI : accrochages « dessin » à chaque question, 83 à 217 ms) */
+/* tiroir de la télécommande fermé : plus dessiné du tout (avant : hors écran mais encore peint et animé) */
+#tiroir:not(.ouvert){visibility:hidden;transition:transform .35s ease,visibility 0s .35s}
+/* halos qui clignotent : animés en opacité (carte graphique) au lieu de redessiner l'ombre à chaque image */
+.son:not(.actif){animation:none}
+.son:not(.actif)::after{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:0 0 0 6px rgba(255,255,255,.12);opacity:0;pointer-events:none;animation:halo 2.4s ease-in-out infinite}
+.podium .c1>.p1{position:relative;animation:leve .9s cubic-bezier(.2,.8,.2,1) 3.6s both}
+.podium .c1>.p1::after{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:0 0 4vw rgba(255,209,102,.55);opacity:0;pointer-events:none;animation:halo 2.4s ease-in-out 5s infinite}
+@keyframes halo{50%{opacity:1}}
+@media (prefers-reduced-motion:reduce){.son::after,.podium .c1>.p1::after{animation:none!important}}
+/* grand écran tactile (TNI, 4K) : pas de fond flou sous les couvertures (très lourd à redessiner à chaque question) */
+@media (any-pointer:coarse) and (min-width:601px){
+  .banniere.port .bfond{filter:none;opacity:.35}
+  .cq .im.livre::before{filter:none;opacity:.35}
+}

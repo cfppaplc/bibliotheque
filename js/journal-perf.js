@@ -7,6 +7,10 @@
     if (localStorage.dernierId !== "jeremy.raymond") return;
     if (!matchMedia("(any-pointer:coarse)").matches) return;
     if (Math.min(screen.width, screen.height) <= 600) return;
+    /* 25 nov. : une page dans un cadre de la même fenêtre (télécommande du quiz, accueil dans la bibliothèque) voit les mêmes images :
+       un seul journal, celui de la page principale (avant : deux rapports identiques) */
+    if (window.top !== window && window.top.__journalPerf) return;
+    window.__journalPerf = 1;
   } catch(e){ return; }
   const SUJET = "https://ntfy.sh/metierplus-signal-f3ce60fd2f6c0f46";
   let envois = 0, debut = Date.now(), images = 0, lentes = 0, perdu = 0;
@@ -29,19 +33,21 @@
     else if (vis("actOv")) c = "formatifs";
     else { const pg = (location.pathname.split("/").pop() || "index.html").replace(/\.html$/, "");
       c = pg === "index" || pg === "" ? "bibliothèque" : ({ accueil: "accueil de classe (seul)", quiz: "quiz", simulateur: "simulateur", labo: "Labo", passeport: "registre de formation", coffres: "coffres", "outils-atelier": "gestion d'atelier", presentation: "présentation", telecommande: "télécommande" }[pg] || pg); if (pg === "quiz" && location.search) c += " " + (location.search.match(/animer|ecran|tele|manette|j=/) || [""])[0].replace("=", ""); }
-    if (performance.now() - dernierGeste < 300) c += doigts >= 2 ? " · 2 doigts" : doigts ? " · doigt" : " · geste";
     return c;
   }
+  let ctxV = "", ctxT = -1e9; const ctxCache = () => { const n = performance.now(); if (n - ctxT > 1000){ ctxV = contexte(); ctxT = n; } return ctxV; };
   let avant = 0;
   function boucle(t){
     if (avant && !document.hidden) {
       const d = t - avant; images++;
       if (d > 80 && d < 5000) {
         lentes++; perdu += d;
-        const c = contexte(), p = parCtx[c] || (parCtx[c] = { n: 0, ms: 0, max: 0 });
-        p.n++; p.ms += d; p.max = Math.max(p.max, d);
-        pires.push([Math.round(d), c, new Date().toLocaleTimeString("fr-CA")]);
-        pires.sort((a, b) => b[0] - a[0]); pires.length = Math.min(pires.length, 6);
+        /* 25 nov. (journal : « journal-perf.js · boucle » 183 ms) : le contexte (getComputedStyle) est lu plus tard, hors de l'image, et gardé 1 s */
+        const geste = performance.now() - dernierGeste < 300 ? (doigts >= 2 ? " · 2 doigts" : doigts ? " · doigt" : " · geste") : "", h = new Date().toLocaleTimeString("fr-CA");
+        setTimeout(() => { const c = ctxCache() + geste, p = parCtx[c] || (parCtx[c] = { n: 0, ms: 0, max: 0 });
+          p.n++; p.ms += d; p.max = Math.max(p.max, d);
+          pires.push([Math.round(d), c, h]);
+          pires.sort((a, b) => b[0] - a[0]); pires.length = Math.min(pires.length, 6); }, 0);
       }
     }
     avant = document.hidden ? 0 : t;

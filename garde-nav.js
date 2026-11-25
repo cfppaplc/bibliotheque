@@ -103,14 +103,19 @@ html.clair .mp-plusM,body.clair .mp-plusM{background:#fff;color:#1E2A44;border-c
       document.body.appendChild(menu); const r = btn.getBoundingClientRect();
       menu.style.top = (r.bottom + 6) + "px"; menu.style.left = Math.max(8, Math.min(innerWidth - menu.offsetWidth - 8, r.right - menu.offsetWidth)) + "px"; btn.classList.add("on"); };
   }
-  /* 17 nov. : refait seulement si la largeur de l'écran ou les classes de la page ont changé */
-  let cle0 = ""; const tout = (force) => { if (menu) return; const cle = innerWidth + "|" + document.documentElement.className + "|" + document.body.className + "|" + document.querySelectorAll(".mp-nav").length; if (force !== true && cle === cle0) return; cle0 = cle; document.querySelectorAll(".mp-nav").forEach(plier); };
+  /* 25 nov. (journal du TNI : 649 ms dans la bibliothèque) : refait seulement quand la place de la barre change vraiment
+     (ResizeObserver, lu après la mise en page) ou quand une barre apparaît; plus à chaque changement de classe de la page */
+  const navs = document.getElementsByClassName("mp-nav"), vues = new WeakSet(), larg0 = new WeakMap();
+  let cle0 = ""; const tout = (force) => { if (menu) return; const cle = innerWidth + "|" + navs.length + "|" + [...navs].map(n => larg0.get(n.parentElement) || 0).join(","); if (force !== true && cle === cle0) return; cle0 = cle; [...navs].forEach(plier); };
   let p = 0; const bientot = () => { cancelAnimationFrame(p); p = requestAnimationFrame(tout); };
+  const ro = typeof ResizeObserver === "function" ? new ResizeObserver(es => { let ch = false; es.forEach(e => { const w = Math.round(e.contentRect.width); if (larg0.get(e.target) !== w){ larg0.set(e.target, w); ch = true; } }); if (ch) bientot(); }) : null;
+  const suivre = () => { [...navs].forEach(n => { const par = n.parentElement; if (par && !vues.has(par)){ vues.add(par); if (ro) ro.observe(par); } }); };
   addEventListener("resize", () => { fermer(); bientot(); }); document.addEventListener("click", e => { if (menu && !menu.contains(e.target)) fermer(); });
   document.addEventListener("keydown", e => { if (e.key === "Escape") fermer(); });
-  const go = () => { bientot(); setTimeout(() => tout(true), 600); setTimeout(() => tout(true), 2000);
-    const mo = new MutationObserver(() => bientot()); mo.observe(document.body, { attributes:true, attributeFilter:["class"] }); mo.observe(document.documentElement, { attributes:true, attributeFilter:["class"] }); };
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", go); else go();
+  const go = () => { suivre(); bientot();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { cle0 = ""; bientot(); });   /* polices arrivées = largeurs changées */
+    let nb = navs.length; new MutationObserver(() => { if (navs.length !== nb){ nb = navs.length; suivre(); bientot(); } }).observe(document.body, { childList:true, subtree:true });
+    if (!ro) new MutationObserver(() => bientot()).observe(document.documentElement, { attributes:true, attributeFilter:["class"] }); };
   window.mpNavPlier = () => { cancelAnimationFrame(p); p = requestAnimationFrame(() => tout(true)); };
 })();
 
