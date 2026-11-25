@@ -228,13 +228,16 @@ test("Magasin : l'élève (carte scannée) envoie son panier, l'enseignant appro
   vrai(/Essai/.test(await m.textContent(".cmd .pr")), "Prénom absent au comptoir");
   if (process.env.CAPTURES) await m.screenshot({ path: process.env.CAPTURES + "/comptoir.png" });
   await m.click("[data-sig$='|2']"); await attendre(400);
-  vrai(A.length === 1 && A[0].regle === 2 && !!(await m.$("[data-sig$='|2'].sig")), "Avis règlement non envoyé : " + JSON.stringify(A));
+  vrai(A.length === 0 && !!(await m.$("[data-sig$='|2'].att")), "Règlement : doit attendre la confirmation « Remis » : " + JSON.stringify(A));
   await m.click("[data-prep]"); await attendre(400);
   if (process.env.CAPTURES) await m.screenshot({ path: process.env.CAPTURES + "/plan.png" });
   vrai(await m.$$eval(".pm-s.actif", L => L.length) > 0, "Plan : aucune rangée ne clignote");
   for (const c of await m.$$("[data-k]")) { await c.click(); await attendre(150); }
   vrai(await m.$$eval(".pm-s.actif", L => L.length) === 0, "Plan : une rangée clignote encore après tout coché");
   await m.click("#prOk"); await attendre(400); vrai(P[0].etat === "remis", "Remis : " + P[0].etat);
+  vrai(A.length === 1 && A[0].regle === 2, "Règlement pas envoyé à la confirmation « Remis » : " + JSON.stringify(A));
+  vrai(!!(await m.$(".cmd.fin.repli")), "Commande remise : pas repliée au comptoir");
+  await m.click(".cmd.fin .fl"); await attendre(200); vrai(!(await m.$(".cmd.fin.repli")), "Flèche : ne rouvre pas la commande");
   /* refus avec commentaire (25 nov.) : deuxième panier, refusé avec motif, l'élève voit le commentaire */
   await p.click(".art .aj"); await attendre(200); await p.click("#bVoir"); await attendre(300); await p.click("#pEnv"); await attendre(1200);
   await q.reload(); await attendre(1500);

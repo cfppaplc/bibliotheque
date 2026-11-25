@@ -51,10 +51,13 @@ h1{font-size:1.5rem;margin:6px 0 4px}.sous{color:var(--doux);margin:0 0 16px}
 .cmd .act{display:flex;gap:10px;flex-wrap:wrap;padding:12px 16px}
 .cmd.neuf{border-color:var(--acc);box-shadow:0 0 0 3px rgba(235,106,34,.25)}
 .cmd .pr{font-size:1.25rem}
+.cmd .fl{display:none}.cmd.fin .fl{display:inline-grid;place-items:center;width:34px;height:34px;border:0;border-radius:8px;background:rgba(128,128,128,.12);cursor:pointer;flex:none}
+.cmd.fin .fl::before{content:"";width:9px;height:9px;border-right:2.5px solid currentColor;border-bottom:2.5px solid currentColor;transform:rotate(45deg) translate(-2px,-2px);transition:transform .15s}
+.cmd.fin.repli .fl::before{transform:rotate(-45deg)}.cmd.fin.repli>:not(.h){display:none}.cmd.fin .h{cursor:pointer}
 .prep-i .pt{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:#EB6A22;color:#fff;font:800 11px system-ui;font-style:normal;margin-right:6px}.prep-i.ok .pt{background:#1E8A55}
 #tQui{white-space:nowrap}@media (max-width:520px){#tTitre,.gp{display:none}}
 .regl{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:10px 16px 14px;border-top:1px solid var(--ligne)}.regl span{font-weight:700;font-size:.9rem;margin-right:4px}
-.regl .btn{min-height:38px;font-size:.9rem}.regl .btn.sig{background:var(--rouge);border-color:var(--rouge);color:#fff}
+.regl .btn{min-height:38px;font-size:.9rem}.regl .btn.att{background:#FFF1E6;border-color:#EB6A22;color:#B2470F}.regl .btn.sig{background:var(--rouge);border-color:var(--rouge);color:#fff}
 .avisMag{border-left:8px solid var(--rouge)}.avisMag>div{padding:8px 0;border-bottom:1px solid var(--ligne)}.avisMag>div:last-child{border:0}
 .refus{margin:0 16px 14px;padding:12px;border:2px solid var(--rouge);border-radius:14px}.refus textarea{width:100%;font:inherit;font-size:1.05rem;border-radius:10px;border:2px solid var(--ligne);padding:10px;margin:8px 0;background:var(--carte);color:inherit}
 .refus .vite{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.refus .vite .btn{min-height:40px;font-size:.95rem}.refus .act{padding:0}.cmd.e-attente{border-left:8px solid #E8A317}.cmd.e-approuve{border-left:8px solid var(--vert)}.cmd.e-refuse{border-left:8px solid var(--rouge)}.cmd.e-remis{border-left:8px solid #8a94a8;opacity:.8}
@@ -288,7 +291,8 @@ async function dessinerProf(){
     $("#apQr").innerHTML = `<p class="sous" style="margin-top:12px">Sur l'autre appareil (déjà connecté à Métier+ avec ton compte), scanne ce code avec l'appareil photo. Ne le montre à personne d'autre : il permet d'approuver tes paniers.</p><div class="qr"><svg viewBox="0 0 ${k + 8} ${k + 8}" width="220" height="220"><rect width="${k + 8}" height="${k + 8}" fill="#fff"/>${M.map((r, y) => r.map((v, x) => v ? `<rect x="${x + 4}" y="${y + 4}" width="1.02" height="1.02"/>` : "").join("")).join("")}</svg></div>`; };
   profT = setTimeout(dessinerProf, 15000);
 }
-const cmdHtml = (p, attente) => `<div class="cmd e-${esc(p.etat)}${attente && !VUS.has(p.id) ? " neuf" : ""}"><div class="h"><span class="n">${esc(p.code)}</span><div><b class="pr">${esc(p.prenom || "")}</b> <b>${esc(p.groupe)}</b><br><small class="sous">${heure(p.t)}</small></div><span class="sp"></span><span class="etat ${esc(p.etat)}">${{ attente:"En attente", approuve:"Approuvé", refuse:"Refusé", remis:"Remis" }[p.etat] || esc(p.etat)}</span></div>
+const fini = p => p.etat === "remis" || p.etat === "refuse" || (p.etat === "approuve" && MODE_PROF);
+const cmdHtml = (p, attente) => `<div class="cmd e-${esc(p.etat)}${attente && !VUS.has(p.id) ? " neuf" : ""}${!attente && fini(p) && !OUV.has(p.id) ? " repli" : ""}${!attente && fini(p) ? " fin" : ""}" data-cid="${esc(p.id)}"><div class="h"><button class="fl" aria-label="Voir le détail"></button><span class="n">${esc(p.code)}</span><div><b class="pr">${esc(p.prenom || "")}</b> <b>${esc(p.groupe)}</b><br><small class="sous">${heure(p.t)}</small></div><span class="sp"></span><span class="etat ${esc(p.etat)}">${{ attente:"En attente", approuve:"Approuvé", refuse:"Refusé", remis:"Remis" }[p.etat] || esc(p.etat)}</span></div>
   ${p.note ? `<p style="margin:10px 16px 0"><b>Travail :</b> ${esc(p.note)}</p>` : ""}${p.motif ? `<p style="margin:10px 16px 0"><b>Motif :</b> ${esc(p.motif)}</p>` : ""}
   <table><tr><th>Qté</th><th>Raccord</th><th>N° d'article</th></tr>${(p.items || []).map(i => `<tr><td class="q">${+i.q || 1}</td><td>${esc(i.nom)}</td><td class="no">${esc(i.n)}</td></tr>`).join("")}</table>
   ${attente ? `<div class="act"><button class="btn v" data-ok="${p.id}">Approuver</button><button class="btn r" data-non="${p.id}">Refuser</button></div>` : ""}</div>`;
@@ -335,17 +339,24 @@ async function charger(){ clearTimeout(magT);
         try { if ("Notification" in window && Notification.permission === "granted") neufs.slice(0, 3).forEach(p => { const n = new Notification("Magasin : nouvelle commande", { body:(p.prenom || "Élève") + " (" + p.code + ", " + p.groupe + ") · " + (p.items || []).length + " raccord(s)", tag:"mag-" + p.id, icon:"img/metier-plus.svg" }); n.onclick = () => { focus(); n.close(); }; }); } catch(e){} } } MAG_VUS = MAG_VUS || new Set(); ids.forEach(id => MAG_VUS.add(id)); dessinerMag(); }
   catch(e){ $("#mL").innerHTML = `<p class="err">Supabase ne répond pas. Nouvel essai dans 10 s.</p>`; }
   magT = setTimeout(charger, 10000); }
+const OUV = new Set();   /* commandes terminées que l'utilisateur a rouvertes */
+const MODE_PROF = /[?&]mode=prof/.test(location.search);
+document.addEventListener("click", e => { const h = e.target.closest(".cmd.fin > .h"); if (!h || (e.target.closest("button,a,select,input") && !e.target.closest(".fl"))) return;
+  const c = h.parentNode, id = c.dataset.cid; c.classList.toggle("repli"); c.classList.contains("repli") ? OUV.delete(id) : OUV.add(id); });
+const REG_ATT = new Map();   /* règles cochées, pas encore envoyées (id du panier → numéros) */
+async function envoyerRegles(id, L){ let n = 0; for (const r of L) { try { const o = await rpc("panier_signaler", { p_id:id, p_regle:r }); if (o && o.ok) { n++; if (!SIG.has(id)) SIG.set(id, new Set()); SIG.get(id).add(r); } } catch(e){} }
+  if (n) toast("Enseignant averti : " + L.map(r => REGLES_L[r]).join(", ") + "."); return n; }
 const REGLES = [null, "Nom exact du raccord", "Carte étudiante", "Consignes d'accès", "Matériel propre", "Feuille de l'enseignant", "Bris / usage perso"];
 const REGLES_L = [null, "Ne connaissait pas le nom exact du raccord", "Sans carte étudiante", "Consignes d'accès non respectées", "Matériel rendu sale", "Sans feuille de l'enseignant", "Bris ou usage personnel"];
 let SIG = new Map();
 function dessinerMag(){
   const z = $("#mL"); if (!z) return;
   const v = MAG.filter(p => !FILTRE_CODE || p.code === FILTRE_CODE), app = v.filter(p => p.etat === "approuve"), rem = v.filter(p => p.etat === "remis").reverse();
-  const carte = p => `<div class="cmd e-${esc(p.etat)}"><div class="h"><span class="n">${esc(p.code)}</span><div><b class="pr">${esc(p.prenom || "")}</b> <b>${esc(p.groupe)}</b> · ${esc(nomEns(p.ens))}<br><small class="sous">Approuvé ${heure(p.t_app)}</small></div><span class="sp"></span>
+  const carte = p => `<div class="cmd e-${esc(p.etat)}${p.etat === "remis" ? " fin" + (OUV.has(p.id) ? "" : " repli") : ""}" data-cid="${esc(p.id)}"><div class="h"><button class="fl" aria-label="Voir le détail"></button><span class="n">${esc(p.code)}</span><div><b class="pr">${esc(p.prenom || "")}</b> <b>${esc(p.groupe)}</b> · ${esc(nomEns(p.ens))}<br><small class="sous">Approuvé ${heure(p.t_app)}</small></div><span class="sp"></span>
     ${p.etat === "approuve" ? `<button class="btn p" data-prep="${p.id}">Préparer</button>` : ""}<button class="btn" data-imp="${p.id}" style="min-height:42px">Imprimer le bon</button> ${p.etat === "approuve" ? `<button class="btn v" data-rem="${p.id}">Remis à l'élève</button>` : `<span class="etat remis">Remis ${heure(p.t_remis)}</span> <button class="btn" data-ann="${p.id}" style="min-height:38px">Annuler</button>`}</div>
     ${p.note ? `<p style="margin:10px 16px 0"><b>Travail :</b> ${esc(p.note)}</p>` : ""}
     ${tableMag(p)}
-    <div class="regl"><span>Règlement non respecté :</span>${REGLES.slice(1).map((t, i) => `<button class="btn${(SIG.get(p.id) || new Set()).has(i + 1) ? " sig" : ""}" data-sig="${p.id}|${i + 1}" title="Avertir l'enseignant">${t}</button>`).join("")}</div></div>`;
+    <div class="regl"><span>Règlement non respecté${p.etat === "approuve" ? " <small>(envoyé à l'enseignant quand tu confirmes « Remis »)</small>" : ""} :</span>${REGLES.slice(1).map((t, i) => `<button class="btn${(SIG.get(p.id) || new Set()).has(i + 1) ? " sig" : (REG_ATT.get(p.id) || new Set()).has(i + 1) ? " att" : ""}" data-sig="${p.id}|${i + 1}" title="Avertir l'enseignant">${t}</button>`).join("")}</div></div>`;
   z.innerHTML = (FILTRE_CODE ? `<p class="sous">Élève <b>${esc(FILTRE_CODE)}</b> : ${app.length ? app.length + " commande" + (app.length > 1 ? "s" : "") + " à préparer" : "aucune commande approuvée"}.</p>` : "")
     + `<div class="sec">À préparer (${app.length})</div>` + (app.length ? app.map(carte).join("") : `<p class="vide">${FILTRE_CODE ? "Rien pour cet élève. Son enseignant doit d'abord approuver son panier." : "Aucune commande approuvée pour l'instant."}</p>`)
     + (rem.length ? `<div class="sec">Remis aujourd'hui (${rem.length})</div>` + rem.map(carte).join("") : "");
@@ -353,9 +364,10 @@ function dessinerMag(){
   z.querySelectorAll("[data-imp]").forEach(b => b.onclick = () => imprimerBon(MAG.find(p => p.id === b.dataset.imp)));
   z.querySelectorAll("[data-rem]").forEach(b => b.onclick = () => remettre(b.dataset.rem, true));
   z.querySelectorAll("[data-ann]").forEach(b => b.onclick = () => remettre(b.dataset.ann, false));
-  z.querySelectorAll("[data-sig]").forEach(b => b.onclick = async () => { if (b.classList.contains("sig")) return; const [id, r] = b.dataset.sig.split("|");
-    b.disabled = true; try { const o = await rpc("panier_signaler", { p_id:id, p_regle:+r }); if (!o || !o.ok) throw new Error((o && o.err) || "refus"); b.classList.add("sig"); if (!SIG.has(id)) SIG.set(id, new Set()); SIG.get(id).add(+r); toast("Enseignant averti : " + REGLES_L[r] + "."); }
-    catch(e){ toast("Impossible : " + e.message); } b.disabled = false; });
+  /* 25 nov. (Jeremy) : la règle est cochée ici, puis envoyée à l'enseignant seulement quand le magasinier confirme « Remis » */
+  z.querySelectorAll("[data-sig]").forEach(b => b.onclick = async () => { if (b.classList.contains("sig")) return; const [id, r] = b.dataset.sig.split("|"), p = MAG.find(x => x.id === id);
+    if (p && p.etat === "remis") { b.disabled = true; await envoyerRegles(id, [+r]); b.disabled = false; dessinerMag(); return; }   /* déjà remis : envoi tout de suite */
+    const P = REG_ATT.get(id) || new Set(); P.has(+r) ? P.delete(+r) : P.add(+r); REG_ATT.set(id, P); b.classList.toggle("att", P.has(+r)); });
 }
 /* rangée de chaque raccord (celle du panier, sinon celle du catalogue actuel); le bon est trié par rangée = un seul tour du magasin */
 const rangee = i => i.r || ((CAT.find(a => a.id === i.id || a.n === i.n) || {}).r) || "";
@@ -388,7 +400,8 @@ function imprimerBon(p){ if (!p) return;
     + `<table><tr><th>Rangée</th><th>Qté</th><th>Raccord</th><th>N° d'article</th><th>✓</th></tr>${parRangee(p.items).map(i => `<tr><td class="rg">${esc(rangee(i) || "–")}</td><td class="q">${+i.q || 1}</td><td>${esc(i.nom)}</td><td class="no">${esc(i.n)}</td><td class="ok">☐</td></tr>`).join("")}</table></body></html>`;
   const f = document.createElement("iframe"); f.style.cssText = "position:fixed;width:0;height:0;border:0;left:-10px"; document.body.appendChild(f);
   f.contentDocument.open(); f.contentDocument.write(h); f.contentDocument.close(); setTimeout(() => { try { f.contentWindow.focus(); f.contentWindow.print(); } catch(e){} setTimeout(() => f.remove(), 60000); }, 300); }
-async function remettre(id, oui){ try { await rpc("panier_remettre", { p_id:id, p_remis:oui }); const p = MAG.find(x => x.id === id); if (p) { p.etat = oui ? "remis" : "approuve"; p.t_remis = oui ? new Date().toISOString() : null; } dessinerMag(); $("#mC").focus(); } catch(e){ toast("Impossible : " + e.message); } }
+async function remettre(id, oui){ try { await rpc("panier_remettre", { p_id:id, p_remis:oui });
+    if (oui && REG_ATT.get(id) && REG_ATT.get(id).size) { await envoyerRegles(id, [...REG_ATT.get(id)]); REG_ATT.delete(id); } const p = MAG.find(x => x.id === id); if (p) { p.etat = oui ? "remis" : "approuve"; p.t_remis = oui ? new Date().toISOString() : null; } dessinerMag(); $("#mC").focus(); } catch(e){ toast("Impossible : " + e.message); } }
 
 /* =================================================================== départ =================================================================== */
 (async () => {
