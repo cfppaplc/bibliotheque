@@ -189,3 +189,47 @@ begin
 end; $$;
 revoke all on function public.panier_abonner_eleve(uuid, jsonb) from public;
 grant execute on function public.panier_abonner_eleve(uuid, jsonb) to anon, authenticated;
+
+-- 25 nov. (Jeremy : « le magasinier pourrait mettre un commentaire rapide sur les élèves qui ne respectent pas le règlement ») :
+-- un clic sur une règle au comptoir avertit l'enseignant de l'élève (gardé 30 jours).
+create table if not exists public.magasin_avis (
+  id uuid primary key default gen_random_uuid(), t timestamptz not null default now(),
+  panier uuid, ens text not null, groupe text, code text, prenom text, regle smallint not null check (regle between 1 and 6)
+);
+alter table public.magasin_avis enable row level security;
+create or replace function public.panier_signaler(p_id uuid, p_regle int)
+returns jsonb language plpgsql security definer set search_path = public, extensions as $$
+declare p public.panier; a uuid;
+begin
+  if p_regle not between 1 and 6 then return jsonb_build_object('ok', false); end if;
+  select * into p from public.panier where id = p_id and etat in ('approuve', 'remis') and t > now() - interval '7 days';
+  if not found then return jsonb_build_object('ok', false, 'err', 'commande introuvable'); end if;
+  if exists (select 1 from public.magasin_avis where panier = p_id and regle = p_regle) then return jsonb_build_object('ok', true, 'deja', true); end if;
+  if (select count(*) from public.magasin_avis where t > now() - interval '1 hour') >= 100 then return jsonb_build_object('ok', false, 'err', 'trop d''avis'); end if;
+  insert into public.magasin_avis (panier, ens, groupe, code, prenom, regle) values (p.id, p.ens, p.groupe, p.code, p.prenom, p_regle) returning id into a;
+  delete from public.magasin_avis where t < now() - interval '30 days';
+  if exists (select 1 from public.panier_prof where ens = p.ens and jsonb_array_length(abonnements) > 0) then
+    perform net.http_post(url := 'https://kjlotlhqrgekzohshmbn.supabase.co/functions/v1/panier-avis', headers := '{"Content-Type":"application/json"}'::jsonb, body := jsonb_build_object('avis', a));
+  end if;
+  return jsonb_build_object('ok', true);
+end; $$;
+create or replace function public.panier_signalements(p_ids uuid[])
+returns table(panier uuid, regle smallint) language sql stable security definer set search_path = public as $$
+  select a.panier, a.regle from public.magasin_avis a where a.panier = any(p_ids) and a.t > now() - interval '7 days';
+$$;
+create or replace function public.panier_prof_avis(p_ens text, p_jeton text)
+returns table(id uuid, t timestamptz, groupe text, code text, prenom text, regle smallint)
+language plpgsql stable security definer set search_path = public as $$
+begin
+  if not public.panier_prof_ok(p_ens, p_jeton) then return; end if;
+  return query select a.id, a.t, a.groupe, a.code, a.prenom, a.regle from public.magasin_avis a where a.ens = p_ens and a.t > now() - interval '30 days' order by a.t desc limit 100;
+end; $$;
+revoke all on function public.panier_signaler(uuid, int), public.panier_signalements(uuid[]), public.panier_prof_avis(text, text) from public;
+grant execute on function public.panier_signaler(uuid, int), public.panier_signalements(uuid[]), public.panier_prof_avis(text, text) to anon, authenticated;
+-- 25 nov. (Jeremy : « la note du magasinier doit paraître dans le dossier de l'élève »)
+create or replace function public.panier_eleve_avis(p_ens text, p_jeton text, p_code text)
+returns table(t timestamptz, regle smallint) language sql stable security definer set search_path = public as $$
+  select a.t, a.regle from public.magasin_avis a where a.ens = p_ens and a.code = p_code and public.panier_prof_ok(p_ens, p_jeton) order by a.t desc limit 50;
+$$;
+revoke all on function public.panier_eleve_avis(text, text, text) from public;
+grant execute on function public.panier_eleve_avis(text, text, text) to anon, authenticated;

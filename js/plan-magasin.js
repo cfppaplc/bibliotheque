@@ -11,12 +11,16 @@ window.PlanMagasin = (function(){
     const W = F.chain.reduce((s, c) => s + c[1], 0), dh = W - F.top, R = Math.sqrt(F.diag ** 2 - dh ** 2), H = F.left + R, X2 = W + F.ext;
     const room = [[0, R], [dh, 0], [W, 0], [W, F.rightDrop], [X2, F.rightDrop], [X2, H], [0, H]];
     const etat = l => faites.has(l) ? "fait" : actives.has(l) ? "actif" : "";
-    const sign = (x, y, l) => `<g class="pm-s ${etat(l)}"><rect x="${x - 10}" y="${y - 10}" width="20" height="20" rx="3"/><text x="${x}" y="${y + 1}">${l}</text></g>`;
+    const sign = (x, y, l) => `<g class="pm-s ${etat(l)}"><rect x="${x - 11}" y="${y - 11}" width="22" height="22" rx="4"/><text x="${x}" y="${y + 1}">${l}</text></g>`;
+    /* face d'étagère : bande le long du côté de la rangée, allumée en même temps que l'affiche */
+    const face = (x, y, h, l) => `<rect class="pm-f ${etat(l)}" x="${x}" y="${y}" width="6" height="${h}" rx="2"/>`;
     let o = `<style>.pm-mur{fill:none;stroke:#14213d;stroke-width:4}.pm-r{fill:#c9d0da;stroke:#14213d;stroke-width:.8}.pm-c{fill:#eef1f5;stroke:#14213d;stroke-width:.8;stroke-dasharray:3 2}
       .pm-s rect{fill:#fff;stroke:#111;stroke-width:1.2}.pm-s text{font:800 13px system-ui,sans-serif;text-anchor:middle;dominant-baseline:middle;fill:#111}
       .pm-s.actif rect{fill:#EB6A22;stroke:#EB6A22;animation:pmFl .8s ease-in-out infinite alternate}.pm-s.actif text{fill:#fff}
       .pm-s.fait rect{fill:#1E8A55;stroke:#1E8A55}.pm-s.fait text{fill:#fff}
       @keyframes pmFl{from{opacity:1}to{opacity:.35}}@media (prefers-reduced-motion:reduce){.pm-s.actif rect{animation:none}}
+      .pm-f{fill:transparent}.pm-f.actif{fill:#EB6A22;animation:pmFl .8s ease-in-out infinite alternate}.pm-f.fait{fill:#1E8A55}
+      @media (prefers-reduced-motion:reduce){.pm-f.actif{animation:none}}
       .pm-l{font:600 11px system-ui,sans-serif;fill:#5b6678;text-anchor:middle}</style>`;
     o += `<polygon points="${room.join(" ")}" fill="#fff"/>`;
     const yK = R * (1 - F.K / dh);
@@ -26,12 +30,13 @@ window.PlanMagasin = (function(){
     let x = 0; const racks = []; for (const [t, w] of F.chain){ if (t === "r") racks.push([x, w]); x += w; }
     const L = [["J", "I"], ["H", "G"], ["F", "E"]];
     racks.forEach(([rx, rw], i) => { for (const [y0, len] of [[V.upY, V.upL], [V.loY, V.loL]]){
-      o += `<rect class="pm-r" x="${rx}" y="${y0}" width="${rw}" height="${len}"/>`; const sy = y0 + Math.min(len / 2, 60);
-      o += sign(rx - 12, sy - 13, L[i][0]) + sign(rx + rw + 12, sy + 13, L[i][1]); } });   /* côtés décalés en hauteur : deux affiches d'une même allée ne se cachent pas */
+      o += `<rect class="pm-r" x="${rx}" y="${y0}" width="${rw}" height="${len}"/>` + face(rx - 7, y0, len, L[i][0]) + face(rx + rw + 1, y0, len, L[i][1]);
+      /* affiches au bout de l'étagère (comme une affiche d'allée), une par côté, collées sur l'étagère */
+      o += sign(rx + rw / 2 - 12, y0 - 14, L[i][0]) + sign(rx + rw / 2 + 12, y0 - 14, L[i][1]); } });
     const r3 = racks[2], r4x = r3[0] + r3[1] + V.r4x;
-    o += `<rect class="pm-r" x="${r4x}" y="${V.loY}" width="${V.r4w}" height="${V.loL}"/>` + sign(r4x + V.r4w + 12, V.loY + Math.min(V.loL / 2, 60) + 13, "D");
+    o += `<rect class="pm-r" x="${r4x}" y="${V.loY}" width="${V.r4w}" height="${V.loL}"/>` + face(r4x + V.r4w + 1, V.loY, V.loL, "D") + sign(r4x + V.r4w / 2, V.loY - 14, "D");
     o += `<polygon class="pm-mur" points="${room.join(" ")}"/>`;
-    o += sign(F.K + 12, (yK + H) / 2, "K");
+    o += face(F.K + 1, yK + 6, H - yK - 12, "K") + sign(F.K + 16, yK + 20, "K");
     const wa = dh + V.winA, wb = wa + V.winW;
     o += `<line x1="${wa}" y1="0" x2="${wb}" y2="0" stroke="#EB6A22" stroke-width="4"/><text class="pm-l" x="${(wa + wb) / 2}" y="16">Fenêtre de service</text>`;
     o += `<text class="pm-l" x="${dh / 2 + 14}" y="${R / 2 + 26}">Porte</text>`;

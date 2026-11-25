@@ -51,6 +51,9 @@ h1{font-size:1.5rem;margin:6px 0 4px}.sous{color:var(--doux);margin:0 0 16px}
 .cmd .act{display:flex;gap:10px;flex-wrap:wrap;padding:12px 16px}
 .cmd.neuf{border-color:var(--acc);box-shadow:0 0 0 3px rgba(235,106,34,.25)}
 .cmd .pr{font-size:1.25rem}
+.regl{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:10px 16px 14px;border-top:1px solid var(--ligne)}.regl span{font-weight:700;font-size:.9rem;margin-right:4px}
+.regl .btn{min-height:38px;font-size:.9rem}.regl .btn.sig{background:var(--rouge);border-color:var(--rouge);color:#fff}
+.avisMag{border-left:8px solid var(--rouge)}.avisMag>div{padding:8px 0;border-bottom:1px solid var(--ligne)}.avisMag>div:last-child{border:0}
 .refus{margin:0 16px 14px;padding:12px;border:2px solid var(--rouge);border-radius:14px}.refus textarea{width:100%;font:inherit;font-size:1.05rem;border-radius:10px;border:2px solid var(--ligne);padding:10px;margin:8px 0;background:var(--carte);color:inherit}
 .refus .vite{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.refus .vite .btn{min-height:40px;font-size:.95rem}.refus .act{padding:0}.cmd.e-attente{border-left:8px solid #E8A317}.cmd.e-approuve{border-left:8px solid var(--vert)}.cmd.e-refuse{border-left:8px solid var(--rouge)}.cmd.e-remis{border-left:8px solid #8a94a8;opacity:.8}
 .cmd.e-attente .h{background:#FFF6E0}.cmd.e-approuve .h{background:#EAF7F0}
@@ -87,7 +90,7 @@ textarea{width:100%;min-height:80px;border-radius:12px;border:1px solid var(--li
 <main id="app"><p class="vide">Chargement…</p></main>
 <div class="ov" id="ov" hidden></div>
 <div class="barre" id="barre" hidden></div>
-<script src="js/qrcode.js"></script><script src="js/code128.js?v=1"></script><script src="js/plan-magasin.js?v=1"></script>
+<script src="js/qrcode.js"></script><script src="js/code128.js?v=1"></script><script src="js/plan-magasin.js?v=2"></script>
 <script>
 "use strict";
 const SUPA = "https://kjlotlhqrgekzohshmbn.supabase.co", CLE = "sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY";
@@ -196,7 +199,7 @@ async function suivi(){
   clearTimeout(suiviT); const z = $("#mesEnvois"); if (!z || !MOI) return;
   const E = LS.get("magEnvois", []).filter(x => x.code === MOI.code && Date.now() - x.t < 7 * 864e5); if (!E.length) { z.innerHTML = ""; return; }
   const S = await Promise.all(E.map(x => rpc("panier_etat", { p_id:x.id }).catch(() => null)));
-  const LBL = { attente:"En attente de ton enseignant", approuve:"Approuvé · va au comptoir avec ta carte", refuse:"Refusé par ton enseignant", remis:"Remis · bon travail" };
+const LBL = { attente:"En attente de ton enseignant", approuve:"Approuvé · va au comptoir avec ta carte", refuse:"Refusé par ton enseignant", remis:"Remis · bon travail" };
   z.innerHTML = `<div class="sec">Mes paniers envoyés</div>` + E.map((x, k) => { const s = S[k] || { etat:"?" };
     return `<div class="carte suivi ${esc(s.etat)}"><div class="bandeau">${esc(LBL[s.etat] || "…")}</div><small class="sous">Envoyé ${heure(x.t)} · ${x.n} article${x.n > 1 ? "s" : ""}</small>${s.motif ? `<p class="motif"><b>Commentaire de ton enseignant :</b> ${esc(s.motif)}</p>` : ""}
       ${s.etat === "attente" && "PushManager" in window && !x.abo ? `<button class="btn p" data-abo="${esc(x.id)}" style="margin:0 18px 14px">Me prévenir sur mon cellulaire</button>` : ""}${s.etat === "attente" && x.abo ? `<small class="sous">Tu seras averti sur ce cellulaire dès que ton enseignant répond.</small>` : ""}
@@ -244,6 +247,7 @@ let profT = 0;
 async function dessinerProf(){
   clearTimeout(profT);
   let L; try { L = await rpc("panier_prof_lire", { p_ens:ENS, p_jeton:JETON }); } catch(e){ $("#app").innerHTML = `<p class="err">Supabase ne répond pas. Nouvel essai dans 15 s.</p>`; profT = setTimeout(dessinerProf, 15000); return; }
+  let AVIS = []; try { AVIS = await rpc("panier_prof_avis", { p_ens:ENS, p_jeton:JETON }) || []; } catch(e){}
   const att = L.filter(p => p.etat === "attente"), aut = L.filter(p => p.etat !== "attente");
   const neufs = att.filter(p => !VUS.has(p.id)); if (neufs.length && VUS.size) bip(); att.forEach(p => VUS.add(p.id)); LS.set("magVus", [...VUS].slice(-300));
   const avis = "Notification" in window && "serviceWorker" in navigator && "PushManager" in window, perm = avis ? Notification.permission : "non";
@@ -254,6 +258,7 @@ async function dessinerProf(){
       : perm === "granted" && LS.get("magAbonne|" + ENS, false) ? `<span class="ok">Cet appareil reçoit les avis des nouveaux paniers.</span> <button class="btn" id="avNon" style="min-height:38px;margin-left:8px">Arrêter les avis ici</button>`
       : `<b>Recevoir un avis sur cet appareil</b><p class="sous">Ton cellulaire sonne quand un élève envoie un panier, même si Métier+ est fermé.</p><button class="btn p" id="avOui">Recevoir les avis ici</button>`}
       <p class="err" id="avErr"></p><button class="btn" id="apAj" style="margin-top:6px">Ajouter un appareil (cellulaire, autre ordinateur)</button><div id="apQr"></div></div>
+    ${AVIS.length ? `<div class="sec">Avis du magasinier (30 jours)</div><div class="carte avisMag">${AVIS.map(a => `<div><b>${esc(a.prenom || "Élève")}</b> <small class="sous">${esc(a.code)} · ${esc(a.groupe)} · ${heure(a.t)}</small><br>${esc(REGLES_L[a.regle] || "?")}</div>`).join("")}</div>` : ""}
     <div class="sec">En attente</div>${att.length ? att.map(p => cmdHtml(p, true)).join("") : `<p class="vide">Rien à approuver.</p>`}
     <div class="sec">Déjà traités (7 jours)</div>${aut.length ? aut.map(p => cmdHtml(p, false)).join("") : `<p class="vide">Aucun.</p>`}`;
   document.querySelectorAll("[data-ok]").forEach(b => b.onclick = () => decider(b.dataset.ok, true));
@@ -303,17 +308,22 @@ function magasinier(){
   i.focus(); charger();
 }
 async function charger(){ clearTimeout(magT);
-  try { MAG = await rpc("panier_magasin", {}) || []; const ids = MAG.filter(p => p.etat === "approuve").map(p => p.id);
+  try { MAG = await rpc("panier_magasin", {}) || [];
+    try { const S2 = new Map(); if (MAG.length) for (const r of await rpc("panier_signalements", { p_ids:MAG.map(p => p.id) }) || []) { if (!S2.has(r.panier)) S2.set(r.panier, new Set()); S2.get(r.panier).add(r.regle); } SIG = S2; } catch(e){} const ids = MAG.filter(p => p.etat === "approuve").map(p => p.id);
     if (MAG_VUS && ids.some(id => !MAG_VUS.has(id))) bip(); MAG_VUS = MAG_VUS || new Set(); ids.forEach(id => MAG_VUS.add(id)); dessinerMag(); }
   catch(e){ $("#mL").innerHTML = `<p class="err">Supabase ne répond pas. Nouvel essai dans 10 s.</p>`; }
   magT = setTimeout(charger, 10000); }
+const REGLES = [null, "Nom exact du raccord", "Carte étudiante", "Consignes d'accès", "Matériel propre", "Feuille de l'enseignant", "Bris / usage perso"];
+const REGLES_L = [null, "Ne connaissait pas le nom exact du raccord", "Sans carte étudiante", "Consignes d'accès non respectées", "Matériel rendu sale", "Sans feuille de l'enseignant", "Bris ou usage personnel"];
+let SIG = new Map();
 function dessinerMag(){
   const z = $("#mL"); if (!z) return;
   const v = MAG.filter(p => !FILTRE_CODE || p.code === FILTRE_CODE), app = v.filter(p => p.etat === "approuve"), rem = v.filter(p => p.etat === "remis").reverse();
   const carte = p => `<div class="cmd e-${esc(p.etat)}"><div class="h"><span class="n">${esc(p.code)}</span><div><b class="pr">${esc(p.prenom || "")}</b> <b>${esc(p.groupe)}</b> · ${esc(nomEns(p.ens))}<br><small class="sous">Approuvé ${heure(p.t_app)}</small></div><span class="sp"></span>
     ${p.etat === "approuve" ? `<button class="btn p" data-prep="${p.id}">Préparer</button>` : ""}<button class="btn" data-imp="${p.id}" style="min-height:42px">Imprimer le bon</button> ${p.etat === "approuve" ? `<button class="btn v" data-rem="${p.id}">Remis à l'élève</button>` : `<span class="etat remis">Remis ${heure(p.t_remis)}</span> <button class="btn" data-ann="${p.id}" style="min-height:38px">Annuler</button>`}</div>
     ${p.note ? `<p style="margin:10px 16px 0"><b>Travail :</b> ${esc(p.note)}</p>` : ""}
-    ${tableMag(p)}</div>`;
+    ${tableMag(p)}
+    <div class="regl"><span>Règlement non respecté :</span>${REGLES.slice(1).map((t, i) => `<button class="btn${(SIG.get(p.id) || new Set()).has(i + 1) ? " sig" : ""}" data-sig="${p.id}|${i + 1}" title="Avertir l'enseignant">${t}</button>`).join("")}</div></div>`;
   z.innerHTML = (FILTRE_CODE ? `<p class="sous">Élève <b>${esc(FILTRE_CODE)}</b> : ${app.length ? app.length + " commande" + (app.length > 1 ? "s" : "") + " à préparer" : "aucune commande approuvée"}.</p>` : "")
     + `<div class="sec">À préparer (${app.length})</div>` + (app.length ? app.map(carte).join("") : `<p class="vide">${FILTRE_CODE ? "Rien pour cet élève. Son enseignant doit d'abord approuver son panier." : "Aucune commande approuvée pour l'instant."}</p>`)
     + (rem.length ? `<div class="sec">Remis aujourd'hui (${rem.length})</div>` + rem.map(carte).join("") : "");
@@ -321,6 +331,9 @@ function dessinerMag(){
   z.querySelectorAll("[data-imp]").forEach(b => b.onclick = () => imprimerBon(MAG.find(p => p.id === b.dataset.imp)));
   z.querySelectorAll("[data-rem]").forEach(b => b.onclick = () => remettre(b.dataset.rem, true));
   z.querySelectorAll("[data-ann]").forEach(b => b.onclick = () => remettre(b.dataset.ann, false));
+  z.querySelectorAll("[data-sig]").forEach(b => b.onclick = async () => { if (b.classList.contains("sig")) return; const [id, r] = b.dataset.sig.split("|");
+    b.disabled = true; try { const o = await rpc("panier_signaler", { p_id:id, p_regle:+r }); if (!o || !o.ok) throw new Error((o && o.err) || "refus"); b.classList.add("sig"); if (!SIG.has(id)) SIG.set(id, new Set()); SIG.get(id).add(+r); toast("Enseignant averti : " + REGLES_L[r] + "."); }
+    catch(e){ toast("Impossible : " + e.message); } b.disabled = false; });
 }
 /* rangée de chaque raccord (celle du panier, sinon celle du catalogue actuel); le bon est trié par rangée = un seul tour du magasin */
 const rangee = i => i.r || ((CAT.find(a => a.id === i.id || a.n === i.n) || {}).r) || "";

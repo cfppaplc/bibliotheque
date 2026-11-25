@@ -1,5 +1,6 @@
 // Fonction Supabase « panier-avis » (25 nov.) : avis Web Push de Métier+ aux enseignants (sans application à installer).
 // GET  → clé publique des avis (créée la première fois, gardée dans panier_vapid, jamais montrée à personne).
+// POST {avis} → appelée par panier_signaler (règlement du magasin). POST {id, eleve} → avis à l'élève.
 // POST {id} → appelée par panier_envoyer : avertit les appareils de l'enseignant du panier (une seule fois, panier de moins de 2 min).
 // À déployer dans Supabase → Edge Functions (nom : panier-avis, « Verify JWT » désactivé).
 import * as webpush from "jsr:@negrel/webpush";
@@ -27,7 +28,17 @@ Deno.serve(async (req) => {
       const raw = new Uint8Array(await crypto.subtle.exportKey("raw", (k as CryptoKeyPair).publicKey));
       return json({ cle: btoa(String.fromCharCode(...raw)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "") });
     }
-    const { id, eleve } = await req.json();
+    const { id, eleve, avis } = await req.json();
+    if (avis) {   /* règlement du magasin non respecté : avis à l'enseignant de l'élève */
+      const REG = ["", "Ne connaissait pas le nom exact du raccord", "Sans carte étudiante", "Consignes d'accès non respectées", "Matériel rendu sale", "Sans feuille de l'enseignant", "Bris ou usage personnel"];
+      const { data: a } = await sb.from("magasin_avis").select("*").eq("id", avis).maybeSingle();
+      if (!a || Date.now() - new Date(a.t).getTime() > 120000) return json({ ok: false });
+      const { data: pr } = await sb.from("panier_prof").select("abonnements").eq("ens", a.ens).maybeSingle();
+      const app = await webpush.ApplicationServer.new({ contactInformation: "https://metierplus.app", vapidKeys: k });
+      const msg = JSON.stringify({ title: `Magasin : ${a.prenom || "élève"} (${a.code}, ${a.groupe})`, body: "Règlement : " + (REG[a.regle] || "?"), url: "/magasin.html?mode=prof", tag: "avis-" + a.id });
+      for (const s of (pr?.abonnements || []) as unknown[]) { try { await app.subscribe(s as never).pushTextMessage(msg, {}); } catch (_) { /* appareil désabonné */ } }
+      return json({ ok: true });
+    }
     const { data: p } = await sb.from("panier").select("*").eq("id", id).maybeSingle();
     if (eleve) {   /* avis à l'élève : son enseignant vient de décider (une seule fois) */
       if (!p || !p.abo || p.avise_eleve || !["approuve", "refuse"].includes(p.etat)) return json({ ok: false });

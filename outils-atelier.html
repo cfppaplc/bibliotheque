@@ -332,9 +332,14 @@ main{max-width:1500px}
     try { const r = await fetch("https://kjlotlhqrgekzohshmbn.supabase.co/rest/v1/rpc/panier_eleve", { method:"POST", headers:{ apikey:"sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY", "Content-Type":"application/json" }, body:JSON.stringify({ p_ens:ens, p_jeton:j, p_code:String(e.c) }) });
       const P = r.ok ? await r.json() : []; const ET = { attente:["…", "en attente"], approuve:["ok", "approuvé"], refuse:["r", "refusé"], remis:["ok", "remis"] };
       L.innerHTML = P.length ? P.map(p => { const et = ET[p.etat] || ["", p.etat], n = (p.items || []).reduce((s, i) => s + (+i.q || 1), 0);
-        return `<div><span class="s ${et[0] === "…" ? "dm" : et[0]}">${et[0] === "ok" ? "✓" : et[0] === "r" ? "✕" : "◐"}</span>${n} article${n > 1 ? "s" : ""} · ${esc(et[1])}${p.note ? " · " + esc(p.note) : ""}<small>${date(new Date(p.t).getTime())}</small></div>`
+        return `<div><span class="s ${et[0] === "…" ? "dm" : et[0]}">${et[0] === "ok" ? "✓" : et[0] === "r" ? "✕" : "◐"}</span>${n} article${n > 1 ? "s" : ""} · ${esc(et[1])}${p.motif ? " (" + esc(p.motif) + ")" : ""}${p.note ? " · " + esc(p.note) : ""}<small>${date(new Date(p.t).getTime())}</small></div>`
           + `<div style="padding-left:34px;font-size:13px;opacity:.75">${(p.items || []).map(i => (+i.q || 1) + " × " + esc(i.nom)).join(", ")}</div>`; }).join("")
         : `<div><span class="s">–</span>Aucune commande</div>`;
+      /* avis du magasinier (règlement du magasin, 30 jours) */
+      const ra = await fetch("https://kjlotlhqrgekzohshmbn.supabase.co/rest/v1/rpc/panier_eleve_avis", { method:"POST", headers:{ apikey:"sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY", "Content-Type":"application/json" }, body:JSON.stringify({ p_ens:ens, p_jeton:j, p_code:String(e.c) }) });
+      const A = ra.ok ? await ra.json() : [], RG = [null, "Ne connaissait pas le nom exact du raccord", "Sans carte étudiante", "Consignes d'accès non respectées", "Matériel rendu sale", "Sans feuille de l'enseignant", "Bris ou usage personnel"];
+      if (A.length){ const h = document.createElement("h4"); h.textContent = "Avis du magasinier (règlement)"; const d = document.createElement("div"); d.className = "fi-l";
+        d.innerHTML = A.map(a => `<div><span class="s r">!</span>${esc(RG[a.regle] || "?")}<small>${date(new Date(a.t).getTime())}</small></div>`).join(""); b.appendChild(h); b.appendChild(d); }
     } catch(x){ L.innerHTML = `<div><span class="s">!</span>Commandes non disponibles</div>`; }
   }
   /* codes des élèves de l'équipe n dans le local at (même règle que coffres.html) */

@@ -179,13 +179,16 @@ test("Élève : toucher un choix (format commun .mp-ch / .mp-vf) l'encercle, ret
 });
 
 test("Magasin : l'élève (carte scannée) envoie son panier, l'enseignant approuve, le magasinier filtre par code et remet", async b => {
-  const P = [];
+  const P = [], A = [];
   const mock = async ctx => ctx.route(/supabase\.co\/rest\/v1\/rpc\/(\w+)/, async r => { const f = r.request().url().match(/rpc\/(\w+)/)[1], a = JSON.parse(r.request().postData() || "{}"); let o = null;
     if (f === "coffre_lire") o = [{ data: JSON.stringify({ grp: ["2608 EGI"], codes: { "2608 EGI": ["123", "456"] } }) }];
     else if (f === "panier_envoyer") { P.push({ id: "id" + P.length, etat: "attente", t: new Date().toISOString(), ens: a.p_ens, groupe: a.p_groupe, code: a.p_code, prenom: a.p_prenom, items: a.p_items, note: a.p_note }); o = { ok: true, id: "id" + (P.length - 1) }; }
     else if (f === "panier_etat") { const x = P.find(p => p.id === a.p_id) || {}; o = { etat: x.etat, motif: x.motif }; }
     else if (f === "panier_prof_regler") o = true;
     else if (f === "panier_prof_lire") o = P;
+    else if (f === "panier_signaler") { const x = P.find(p => p.id === a.p_id); A.push({ id: "a" + A.length, t: new Date().toISOString(), panier: a.p_id, regle: a.p_regle, code: x.code, groupe: x.groupe, prenom: x.prenom }); o = { ok: true }; }
+    else if (f === "panier_signalements") o = A.filter(x => a.p_ids.includes(x.panier));
+    else if (f === "panier_prof_avis") o = A;
     else if (f === "panier_decider") { const p = P.find(x => x.id === a.p_id); p.etat = a.p_ok ? "approuve" : "refuse"; p.motif = a.p_motif; p.t_app = new Date().toISOString(); o = true; }
     else if (f === "panier_magasin") o = P.filter(p => p.etat === "approuve" || p.etat === "remis");
     else if (f === "panier_remettre") { const p = P.find(x => x.id === a.p_id); p.etat = a.p_remis ? "remis" : "approuve"; p.t_remis = new Date().toISOString(); o = true; }
@@ -219,14 +222,19 @@ test("Magasin : l'élève (carte scannée) envoie son panier, l'enseignant appro
   vrai(/^[A-Z]-\d+$/.test((await m.textContent("td.rg")).trim()), "Rangée absente au comptoir");
   vrai(/Essai/.test(await m.textContent(".cmd .pr")), "Prénom absent au comptoir");
   if (process.env.CAPTURES) await m.screenshot({ path: process.env.CAPTURES + "/comptoir.png" });
+  await m.click("[data-sig$='|2']"); await attendre(400);
+  vrai(A.length === 1 && A[0].regle === 2 && !!(await m.$("[data-sig$='|2'].sig")), "Avis règlement non envoyé : " + JSON.stringify(A));
   await m.click("[data-prep]"); await attendre(400);
+  if (process.env.CAPTURES) await m.screenshot({ path: process.env.CAPTURES + "/plan.png" });
   vrai(await m.$$eval(".pm-s.actif", L => L.length) > 0, "Plan : aucune rangée ne clignote");
   for (const c of await m.$$("[data-k]")) { await c.click(); await attendre(150); }
   vrai(await m.$$eval(".pm-s.actif", L => L.length) === 0, "Plan : une rangée clignote encore après tout coché");
   await m.click("#prOk"); await attendre(400); vrai(P[0].etat === "remis", "Remis : " + P[0].etat);
   /* refus avec commentaire (25 nov.) : deuxième panier, refusé avec motif, l'élève voit le commentaire */
   await p.click(".art .aj"); await attendre(200); await p.click("#bVoir"); await attendre(300); await p.click("#pEnv"); await attendre(1200);
-  await q.reload(); await attendre(1500); await q.click("[data-non]"); await attendre(200);
+  await q.reload(); await attendre(1500);
+  vrai(/Sans carte étudiante/.test(await q.textContent(".avisMag")), "L'enseignant ne voit pas l'avis du magasinier");
+  await q.click("[data-non]"); await attendre(200);
   await q.click("[data-env]"); await attendre(300); vrai(P[1].etat === "attente", "Refus envoyé sans commentaire");
   await q.click(".refus .vite .btn"); if (process.env.CAPTURES) await q.screenshot({ path: process.env.CAPTURES + "/prof-refus.png" }); await q.click("[data-env]"); await attendre(1000);
   vrai(P[1].etat === "refuse" && /diamètre/.test(P[1].motif || ""), "Refus : " + P[1].etat + " " + P[1].motif);
