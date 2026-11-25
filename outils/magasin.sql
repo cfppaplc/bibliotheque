@@ -125,3 +125,11 @@ revoke all on function public.panier_prof_abonner(text, text, jsonb, boolean), p
   public.panier_etat(uuid), public.panier_prof_lire(text, text), public.panier_decider(text, text, uuid, boolean, text), public.panier_magasin(), public.panier_remettre(uuid, boolean) from public;
 grant execute on function public.panier_prof_abonner(text, text, jsonb, boolean), public.panier_prof_regler(text, text, text), public.panier_envoyer(text, text, text, jsonb, text), public.panier_etat(uuid),
   public.panier_prof_lire(text, text), public.panier_decider(text, text, uuid, boolean, text), public.panier_magasin(), public.panier_remettre(uuid, boolean) to anon, authenticated;
+
+-- dossier de l'élève (Gestion d'atelier) : tous ses paniers des 60 derniers jours, pour son enseignant
+create or replace function public.panier_eleve(p_ens text, p_jeton text, p_code text)
+returns setof public.panier language sql stable security definer set search_path = public, extensions as $$
+  select p.* from public.panier p where p.ens = p_ens and p.code = p_code and public.panier_prof_ok(p_ens, p_jeton) order by p.t desc limit 100;
+$$;
+revoke all on function public.panier_eleve(text, text, text) from public;
+grant execute on function public.panier_eleve(text, text, text) to anon, authenticated;
