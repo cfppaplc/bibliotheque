@@ -102,11 +102,53 @@ window.ACCES = (function(){
     catch(e){ throw new Error("Mot de passe incorrect."); }
     const priv = c.pub.kty === "EC" ? await sub.importKey("jwk", { kty:"EC", crv:"P-256", x:c.pub.x, y:c.pub.y, d:b64u(new Uint8Array(pk8)), ext:false }, EC, false, ["deriveBits"])
       : await sub.importKey("pkcs8", pk8, { name:"RSA-OAEP", hash:"SHA-256" }, false, ["decrypt", "unwrapKey"]);
+    await ouvrirSession(id, priv);
+    try { const M = (await idbGet("memo")) || {}; M[id] = { priv, emp:empreinte(c) }; await idbSet("memo", M); memoIds(Object.keys(M)); } catch(e){}
+  }
+  /* 25 nov. (Jeremy : « comme sur Facebook, les comptes déjà connectés sur cet appareil, sans redemander le mot de passe ») :
+     la clé déverrouillée de chaque compte reste sur l'appareil (IndexedDB « memo »; le mot de passe, lui, n'est jamais gardé).
+     Un mot de passe changé par l'admin change la clé publique : l'empreinte ne correspond plus et le mot de passe est redemandé une fois. */
+  const empreinte = c => JSON.stringify(c.pub).slice(-32);
+  const memoIds = L => { try { localStorage.setItem("comptesMemo", JSON.stringify(L)); } catch(e){} };
+  const memoListe = () => { try { return JSON.parse(localStorage.getItem("comptesMemo") || "[]") || []; } catch(e){ return []; } };
+  async function ouvrirSession(id, priv){
+    const c = DATA.comptes[id];
     SESSION = { id, nom:c.nom, admin:!!c.admin, eleve:!!c.eleve, priv };
     await idbSet("session", { id, priv });
     for (const k in CLES) delete CLES[k];
     try { INDEX_TEXTE = null; } catch(e){}
+    try { localStorage.setItem("dernierId", id); localStorage.setItem("dernierNom", c.nom || "");
+      const R = (JSON.parse(localStorage.getItem("comptesRecents") || "[]") || []).filter(x => x && x.id !== id); R.unshift({ id, nom:c.nom || "" }); localStorage.setItem("comptesRecents", JSON.stringify(R.slice(0, 8))); } catch(e){}
     majBouton(); try { render(); } catch(e){} compterDemandes();
+  }
+  async function basculer(id){          /* compte déjà ouvert sur cet appareil : vrai si l'ouverture s'est faite sans mot de passe */
+    try { const M = (await idbGet("memo")) || {}, m = M[id], c = DATA && DATA.comptes[id];
+      if (!m || !c || m.emp !== empreinte(c)){ if (m){ delete M[id]; await idbSet("memo", M); memoIds(Object.keys(M)); } return false; }
+      await ouvrirSession(id, m.priv); return true; } catch(e){ return false; }
+  }
+  async function oublierCompte(id){
+    try { const M = (await idbGet("memo")) || {}; delete M[id]; await idbSet("memo", M); memoIds(Object.keys(M));
+      localStorage.setItem("comptesRecents", JSON.stringify((JSON.parse(localStorage.getItem("comptesRecents") || "[]") || []).filter(x => x && x.id !== id)));
+      if (localStorage.getItem("dernierId") === id){ localStorage.removeItem("dernierId"); localStorage.removeItem("dernierNom"); } } catch(e){}
+  }
+  function dlgComptes(){              /* « Changer de compte » : les comptes déjà ouverts sur cet appareil, un toucher */
+    let R = []; try { R = (JSON.parse(localStorage.getItem("comptesRecents") || "[]") || []).filter(x => x && DATA && DATA.comptes[x.id]); } catch(e){}
+    const mem = memoListe(), ini = x => esc(((x.nom || x.id).split(/[\s.]+/).map(w => w[0] || "").join("").slice(0, 2)).toUpperCase());
+    box().classList.remove("co2");
+    box().innerHTML = marque("Changer de compte", R.length ? "Touche un compte déjà utilisé sur cet appareil." : "Aucun autre compte sur cet appareil pour l'instant.")
+      + '<div class="cpt-liste">' + R.map(x => '<div class="cpt' + (SESSION && x.id === SESSION.id ? ' on' : '') + '"><button type="button" class="cpt-go" data-id="' + esc(x.id) + '"><i>' + ini(x) + '</i><span><b>' + esc(x.nom || x.id) + '</b><small>' + (SESSION && x.id === SESSION.id ? 'Connecté en ce moment' : mem.includes(x.id) ? 'Sans mot de passe' : 'Mot de passe demandé') + '</small></span></button><button type="button" class="cpt-x" data-x="' + esc(x.id) + '" title="Retirer de cet appareil" aria-label="Retirer ' + esc(x.nom || x.id) + ' de cet appareil">×</button></div>').join("")
+      + '<button type="button" class="cpt cpt-autre" id="cptAutre"><i>+</i><span><b>Autre compte</b></span></button></div>'
+      + '<div class="acces-btns"><button id="cptNon">Fermer</button></div>';
+    ov().hidden = false;
+    box().querySelectorAll(".cpt-go").forEach(b => b.onclick = async () => { const id = b.dataset.id;
+      if (SESSION && id === SESSION.id){ fermer(); return; }
+      if (await basculer(id)){ bienvenue(); return; }
+      try { localStorage.setItem("dernierId", id); localStorage.setItem("dernierNom", (DATA.comptes[id] || {}).nom || ""); } catch(e){} dlgConnexion(); });
+    box().querySelectorAll(".cpt-x").forEach(b => b.onclick = async () => { const id = b.dataset.x;
+      if (!b.classList.contains("sur")){ b.classList.add("sur"); b.textContent = "Retirer"; b.title = "Toucher encore pour retirer ce compte de cet appareil"; return; }   /* 2e toucher pour confirmer */
+      await oublierCompte(id); if (SESSION && SESSION.id === id){ await deconnexion(); } dlgComptes(); });
+    document.getElementById("cptAutre").onclick = () => { try { localStorage.removeItem("dernierId"); localStorage.removeItem("dernierNom"); } catch(e){} dlgConnexion(); };
+    document.getElementById("cptNon").onclick = fermer;
   }
   async function deconnexion(){ SESSION = null; for (const k in CLES) delete CLES[k]; await idbSet("session", undefined); try { INDEX_TEXTE = null; } catch(e){} majBouton(); try { render(); } catch(e){} }
 
@@ -194,7 +236,7 @@ window.ACCES = (function(){
       + (SESSION.admin ? '<button data-a="gerer">Administration' + (NB_DEM ? ' (' + NB_DEM + ' demande' + (NB_DEM > 1 ? 's' : '') + ')' : '') + '</button>' : '')
       + (window.MESDOCS && document.body.classList.contains("md-permis") ? '<button data-a="ajout">Ajouter un document</button>' : '') + '<button data-a="prefs">Mes préférences</button><button data-a="neuf">Quoi de neuf' + (document.getElementById("qnPoint") && !document.getElementById("qnPoint").hidden ? ' <span class="qn-point"></span>' : '') + '</button><button data-a="aide">Aide</button><button data-a="signal">Signaler un problème</button><button data-a="changer">Changer de compte</button><button data-a="sortir">Se déconnecter</button>';
     const r = b.getBoundingClientRect(); m.style.top = (r.bottom + 8 + scrollY) + "px"; m.style.left = Math.max(8, Math.min(innerWidth - 240, r.right - 230)) + "px"; m.hidden = false;
-    m.onclick = e => { const a = e.target.closest("[data-a]"); if (!a) return; m.hidden = true; if (a.dataset.a === "neuf" || a.dataset.a === "aide"){ document.getElementById(a.dataset.a === "neuf" ? "quoiNeuf" : "lienAide").click(); return; } if (a.dataset.a === "ajout"){ window.MESDOCS.dlgAjout(); return; } if (a.dataset.a === "signal"){ window.mpSignaler(); return; } if (a.dataset.a === "changer"){ deconnexion().then(() => { try { localStorage.removeItem("dernierId"); localStorage.removeItem("dernierNom"); } catch(e){} dlgConnexion(); }); return; } if (a.dataset.a === "sortir") deconnexion().then(() => aviser("Tu es déconnecté sur cet ordinateur.")); else if (a.dataset.a === "prefs") window.dlgPrefs(); else dlgGerer(); };
+    m.onclick = e => { const a = e.target.closest("[data-a]"); if (!a) return; m.hidden = true; if (a.dataset.a === "neuf" || a.dataset.a === "aide"){ document.getElementById(a.dataset.a === "neuf" ? "quoiNeuf" : "lienAide").click(); return; } if (a.dataset.a === "ajout"){ window.MESDOCS.dlgAjout(); return; } if (a.dataset.a === "signal"){ window.mpSignaler(); return; } if (a.dataset.a === "changer"){ dlgComptes(); return; } if (a.dataset.a === "sortir") deconnexion().then(() => aviser("Tu es déconnecté sur cet ordinateur.")); else if (a.dataset.a === "prefs") window.dlgPrefs(); else dlgGerer(); };
   }
   document.addEventListener("pointerdown", e => { const m = document.getElementById("accesMenu"); if (m && !m.hidden && !m.contains(e.target) && !e.target.closest("#compteBtn")) m.hidden = true; });
 
@@ -250,12 +292,11 @@ window.ACCES = (function(){
     document.getElementById("acOeil").onclick = () => { const v = mdp.type === "password"; mdp.type = v ? "text" : "password"; const b = document.getElementById("acOeil"); b.innerHTML = v ? OEIL_X : OEIL; b.setAttribute("aria-label", v ? "Cacher le mot de passe" : "Voir le mot de passe"); mdp.focus(); };
     const verifMaj = e => { try { maj.hidden = !(e.getModifierState && e.getModifierState("CapsLock")); } catch(x){} };
     mdp.addEventListener("keydown", verifMaj); mdp.addEventListener("keyup", verifMaj);
-    box().querySelectorAll("[data-rid]").forEach(b => b.onclick = () => { try { if (b.dataset.rid){ localStorage.setItem("dernierId", b.dataset.rid); localStorage.setItem("dernierNom", b.dataset.rnom || ""); } else { localStorage.removeItem("dernierId"); localStorage.removeItem("dernierNom"); } } catch(e){} dlgConnexion(apres); });
+    box().querySelectorAll("[data-rid]").forEach(b => b.onclick = async () => { if (b.dataset.rid && await basculer(b.dataset.rid)){ box().classList.remove("co2"); bienvenue(apres); return; } try { if (b.dataset.rid){ localStorage.setItem("dernierId", b.dataset.rid); localStorage.setItem("dernierNom", b.dataset.rnom || ""); } else { localStorage.removeItem("dernierId"); localStorage.removeItem("dernierNom"); } } catch(e){} dlgConnexion(apres); });
     const pm = document.getElementById("acPasMoi"); if (pm) pm.onclick = () => { try { localStorage.removeItem("dernierId"); localStorage.removeItem("dernierNom"); } catch(e){} dlgConnexion(apres); };
     const go = async () => { const bt = document.getElementById("acOui"), er = document.getElementById("acErr"), pr = document.getElementById("acProg"); bt.disabled = true; bt.textContent = "Vérification…"; er.hidden = true; pr.hidden = false;
       try { const id = document.getElementById("acId").value; await connexion(id, mdp.value);
-        try { const i2 = id.trim().toLowerCase(), n2 = (DATA.comptes[i2] || {}).nom || ""; localStorage.setItem("dernierId", i2); localStorage.setItem("dernierNom", n2);
-          const R = (JSON.parse(localStorage.getItem("comptesRecents") || "[]") || []).filter(x => x && x.id !== i2); R.unshift({ id:i2, nom:n2 }); localStorage.setItem("comptesRecents", JSON.stringify(R.slice(0, 6))); } catch(e){}   /* 18 nov. : changer de compte en un toucher au TNI (jamais de mot de passe gardé) */
+        /* comptes récents : enregistrés dans ouvrirSession */
         box().classList.remove("co2"); bienvenue(apres); compterDemandes().catch(() => {}); }
       catch(e){ pr.hidden = true; er.textContent = e.message; er.hidden = false; bt.disabled = false; bt.textContent = "Se connecter";
         const f = box().querySelector(".co-form"); f.classList.remove("tremble"); void f.offsetWidth; f.classList.add("tremble"); mdp.select(); } };

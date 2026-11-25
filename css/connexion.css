@@ -28,3 +28,14 @@
 .co-rc{display:inline-flex;align-items:center;gap:8px;padding:8px 14px 8px 8px;border-radius:999px;border:1px solid color-mix(in srgb,currentColor 25%,transparent);background:transparent;color:inherit;font:inherit;font-weight:600;cursor:pointer;min-height:44px}
 .co-rc i{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;background:#EB6A22;color:#fff;font-style:normal;font-size:.78rem;font-weight:800}
 .co-rc.on{border-color:#EB6A22;background:color-mix(in srgb,#EB6A22 14%,transparent)}
+/* 25 nov. : Changer de compte (comptes déjà ouverts sur cet appareil) */
+.cpt-liste{display:flex;flex-direction:column;gap:8px;margin:4px 0 16px}
+.cpt{display:flex;align-items:center;gap:6px;border:1px solid color-mix(in srgb,currentColor 18%,transparent);border-radius:14px;background:transparent;color:inherit;font:inherit;padding:0}
+.cpt.on{border-color:#EB6A22;background:color-mix(in srgb,#EB6A22 10%,transparent)}
+.cpt-go,.cpt-autre{flex:1;display:flex;align-items:center;gap:12px;padding:10px 12px;background:none;border:0;color:inherit;font:inherit;text-align:left;cursor:pointer;min-height:60px}
+.cpt-autre{width:100%}
+.cpt i{display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;flex:none;border-radius:50%;background:#EB6A22;color:#fff;font-style:normal;font-weight:800}
+.cpt-autre i{background:color-mix(in srgb,currentColor 18%,transparent);color:inherit;font-size:1.3rem}
+.cpt span{display:flex;flex-direction:column}.cpt small{opacity:.7;font-size:.8rem}
+.cpt-x{min-width:44px;min-height:44px;margin-right:6px;border-radius:10px;border:0;background:none;color:inherit;opacity:.55;font-size:1.3rem;cursor:pointer}
+.cpt-x.sur{opacity:1;background:#B3261E;color:#fff;font-size:.85rem;font-weight:700;padding:0 10px}
