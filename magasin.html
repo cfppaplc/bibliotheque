@@ -51,6 +51,7 @@ h1{font-size:1.5rem;margin:6px 0 4px}.sous{color:var(--doux);margin:0 0 16px}
 .cmd .act{display:flex;gap:10px;flex-wrap:wrap;padding:12px 16px}
 .cmd.neuf{border-color:var(--acc);box-shadow:0 0 0 3px rgba(235,106,34,.25)}
 .cmd .pr{font-size:1.25rem}
+.prep-i .pt{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:#EB6A22;color:#fff;font:800 11px system-ui;font-style:normal;margin-right:6px}.prep-i.ok .pt{background:#1E8A55}
 #tQui{white-space:nowrap}@media (max-width:520px){#tTitre,.gp{display:none}}
 .regl{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:10px 16px 14px;border-top:1px solid var(--ligne)}.regl span{font-weight:700;font-size:.9rem;margin-right:4px}
 .regl .btn{min-height:38px;font-size:.9rem}.regl .btn.sig{background:var(--rouge);border-color:var(--rouge);color:#fff}
@@ -91,7 +92,7 @@ textarea{width:100%;min-height:80px;border-radius:12px;border:1px solid var(--li
 <main id="app"><p class="vide">Chargement…</p></main>
 <div class="ov" id="ov" hidden></div>
 <div class="barre" id="barre" hidden></div>
-<script src="js/qrcode.js"></script><script src="js/code128.js?v=1"></script><script src="js/plan-magasin.js?v=2"></script>
+<script src="js/qrcode.js"></script><script src="js/code128.js?v=1"></script><script src="js/plan-magasin.js?v=3"></script>
 <script>
 "use strict";
 const SUPA = "https://kjlotlhqrgekzohshmbn.supabase.co", CLE = "sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY";
@@ -111,10 +112,14 @@ let COMPTES = {};
 const nomEns = id => (COMPTES[id] && COMPTES[id].nom) || id;
 async function chargerComptes(){ try { COMPTES = (await (await fetch("comptes.json", { cache:"no-cache" })).json()).comptes || {}; } catch(e){ COMPTES = {}; } }
 const idPartage = async ens => [...new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode("metier+|partage-passeport|" + ens)))].map(b => b.toString(16).padStart(2, "0")).join("");
-async function registre(ens){ try { const r = await rpc("coffre_lire", { p_id:await idPartage(ens) }), row = r && r[0]; const v = row && row.data ? JSON.parse(row.data) : {}; return { grp:v.grp || [], codes:v.codes || {}, part:v.part || {} }; } catch(e){ return { grp:[], codes:{}, part:{} }; } }
+async function registre(ens){ try { const r = await rpc("coffre_lire", { p_id:await idPartage(ens) }), row = r && r[0]; const v = row && row.data ? JSON.parse(row.data) : {}; return { grp:v.grp || [], codes:v.codes || {}, part:v.part || {}, noms:v.noms || {} }; } catch(e){ return { grp:[], codes:{}, part:{}, noms:{} }; } }
+/* prénom chiffré avec la clé de la carte (publié par le registre) : lisible seulement avec la carte scannée */
+async function prenomDeCarte(code, cle, enc){ if (!cle || !enc) return ""; try { const te = new TextEncoder(), b = Uint8Array.from(atob(enc), c => c.charCodeAt(0));
+  const k = await crypto.subtle.importKey("raw", await crypto.subtle.digest("SHA-256", te.encode("metier+|carte|" + code + "|" + cle)), "AES-GCM", false, ["decrypt"]);
+  return new TextDecoder().decode(await crypto.subtle.decrypt({ name:"AES-GCM", iv:b.slice(0, 12) }, k, b.slice(12))); } catch(e){ return ""; } }
 async function trouverEleve(code){
   const ens = Q.get("e") ? [Q.get("e")] : Object.keys(COMPTES).filter(id => !COMPTES[id].eleve);
-  const R = []; await Promise.all(ens.map(async e => { const g = await registre(e); for (const grp in g.codes) if ((g.codes[grp] || []).includes(code)) R.push({ ens:e, groupe:grp, profs:[e, ...(g.part[grp] || [])] }); }));
+  const R = []; await Promise.all(ens.map(async e => { const g = await registre(e); for (const grp in g.codes) if ((g.codes[grp] || []).includes(code)) R.push({ ens:e, groupe:grp, profs:[e, ...(g.part[grp] || [])], enc:g.noms[code] || "" }); }));
   /* 25 nov. : un groupe partagé paraît chez chaque enseignant du groupe → une seule entrée, avec tous ses enseignants */
   const U = {}; R.sort((a, b) => a.ens.localeCompare(b.ens)).forEach(x => { const u = U[x.groupe]; if (!u) U[x.groupe] = x; else x.profs.forEach(id => { if (!u.profs.includes(id)) u.profs.push(id); }); });
   return Object.values(U);
@@ -138,20 +143,24 @@ function eleveEntree(msg){
   $("#tSortir").hidden = true; $("#tQui").textContent = ""; $("#barre").hidden = true;
   $("#app").innerHTML = `<h1>Magasin de raccords</h1><p class="sous">Scanne ta carte étudiante, ou tape ton code à 5 chiffres.</p>
     <div class="carte"><input class="code" id="cCode" inputmode="numeric" autocomplete="off" autocapitalize="characters" placeholder="00000" aria-label="Ton code">
-    <label for="cPre" style="display:block;font-weight:600;margin-top:6px">Ton prénom</label><input id="cPre" class="pre" autocomplete="given-name" maxlength="20" placeholder="Prénom seulement" value="${esc((LS.get("mpCarte", null) || {}).p || LS.get("magPrenom", ""))}">
+    <div id="preZ" hidden><label for="cPre" style="display:block;font-weight:600;margin-top:6px">Ton prénom</label><input id="cPre" class="pre" autocomplete="given-name" maxlength="20" placeholder="Prénom seulement"></div>
     <p class="err" id="cErr">${esc(msg || "")}</p><button class="btn p" id="cOk">Entrer</button></div>`;
   const i = $("#cCode"), go = async () => { const c = lireCarte(i.value); if (!c) { $("#cErr").textContent = "Ton code a 5 chiffres."; return; }
-    const pre = ($("#cPre").value || "").trim().split(/\s+/)[0]; if (!pre) { $("#cErr").textContent = "Écris ton prénom (le magasinier le verra)."; $("#cPre").focus(); return; } LS.set("magPrenom", pre);
+    let pre = ($("#cPre").value || "").trim().split(/\s+/)[0];
     $("#cOk").disabled = true; $("#cErr").textContent = "Recherche de ton groupe…";
     const L = await trouverEleve(c.code);
     if (!L.length) { $("#cOk").disabled = false; $("#cErr").textContent = "Code inconnu. Vérifie avec ton enseignant."; return; }
+    if (!pre) for (const x of L) { pre = await prenomDeCarte(c.code, c.cle, x.enc); if (pre) break; }   /* carte scannée : le prénom vient du registre */
+    if (!pre) { const K = LS.get("mpCarte", null); if (K && K.p && String(K.c || "").includes("-" + c.code + "-")) pre = String(K.p).split(/\s+/)[0]; }
+    if (!pre) { $("#cOk").disabled = false; $("#preZ").hidden = false; $("#cErr").textContent = "Écris ton prénom (le magasinier le verra)."; $("#cPre").focus(); return; }
+    LS.set("magPrenom", pre);
     if (L.length === 1) return connecter(c.code, L[0]);
     $("#cErr").innerHTML = "Quel est ton groupe ? " + L.map((x, k) => `<button class="btn" data-k="${k}" style="margin:6px 6px 0 0">${esc(x.groupe)} · ${esc(nomEns(x.ens))}</button>`).join("");
     $("#cErr").querySelectorAll("[data-k]").forEach(b => b.onclick = () => connecter(c.code, L[+b.dataset.k])); };
-  i.onkeydown = e => { if (e.key === "Enter") go(); }; i.oninput = () => { if (/^\d{5}$/.test(i.value) && $("#cPre").value.trim()) go(); }; $("#cPre").onkeydown = e => { if (e.key === "Enter") go(); }; $("#cOk").onclick = go; i.focus();
+  i.onkeydown = e => { if (e.key === "Enter") go(); }; i.oninput = () => { if (/^\d{5}$/.test(i.value)) go(); }; $("#cPre").onkeydown = e => { if (e.key === "Enter") go(); }; $("#cOk").onclick = go; i.focus();
 }
 function connecter(code, x){ MOI = { code, ens:x.ens, groupe:x.groupe, profs:(x.profs || []).filter(id => id !== x.ens), prenom:LS.get("magPrenom", "") }; LS.set("magEleve", MOI); eleveCatalogue(); }
-function enTete(){ $("#tQui").innerHTML = `<b>${esc(MOI.prenom || "")}</b> <span class="cg">· ${esc(MOI.code)}</span><span class="gp"> · ${esc(MOI.groupe)}</span>`; $("#tSortir").hidden = false;
+function enTete(){ $("#tQui").innerHTML = `<b>${MOI.prenom ? "Bonjour " + esc(MOI.prenom) : ""}</b> <span class="cg">· ${esc(MOI.code)}</span><span class="gp"> · ${esc(MOI.groupe)}</span>`; $("#tSortir").hidden = false;
   $("#tSortir").onclick = () => { if (nbPanier() && !confirm("Ton panier sera vidé. Changer d'élève ?")) return; MOI = null; PANIER = {}; LS.set("magEleve", null); sauverPanier(); eleveEntree(); }; }
 function eleveCatalogue(){
   enTete();
@@ -260,7 +269,8 @@ async function dessinerProf(){
       <p class="err" id="avErr"></p><button class="btn" id="apAj" style="margin-top:6px">Ajouter un appareil (cellulaire, autre ordinateur)</button><div id="apQr"></div></div>
     ${AVIS.length ? `<div class="sec">Avis du magasinier (30 jours)</div><div class="carte avisMag">${AVIS.map(a => `<div><b>${esc(a.prenom || "Élève")}</b> <small class="sous">${esc(a.code)} · ${esc(a.groupe)} · ${heure(a.t)}</small><br>${esc(REGLES_L[a.regle] || "?")}</div>`).join("")}</div>` : ""}
     <div class="sec">En attente</div>${att.length ? att.map(p => cmdHtml(p, true)).join("") : `<p class="vide">Rien à approuver.</p>`}
-    <div class="sec">Déjà traités (7 jours)</div>${aut.length ? aut.map(p => cmdHtml(p, false)).join("") : `<p class="vide">Aucun.</p>`}`;
+    <div class="sec">Déjà traités (7 jours)</div>${aut.length ? aut.map(p => cmdHtml(p, false)).join("") : `<p class="vide">Aucun.</p>`}
+    <div class="sec">Archives (1 an)</div><div class="carte"><label for="arM">Mois</label> <select id="arM">${(() => { const o = []; for (let i = 0; i < 12; i++){ const d = new Date(); d.setDate(1); d.setMonth(d.getMonth() - i); o.push(`<option value="${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}">${d.toLocaleDateString("fr-CA", { month:"long", year:"numeric" })}</option>`); } return o.join(""); })()}</select> <button class="btn" id="arVoir" style="min-height:40px">Voir</button><div id="arL"></div></div>`;
   document.querySelectorAll("[data-ok]").forEach(b => b.onclick = () => decider(b.dataset.ok, true));
   document.querySelectorAll("[data-non]").forEach(b => b.onclick = () => { const act = b.parentNode; if (act.nextElementSibling && act.nextElementSibling.classList.contains("refus")) return;
     const z = document.createElement("div"); z.className = "refus";
@@ -269,6 +279,10 @@ async function dessinerProf(){
     z.querySelectorAll(".vite .btn").forEach(c => c.onclick = () => { ta.value = ta.value.trim() ? ta.value.trim() + " · " + c.textContent : c.textContent; ta.focus(); });
     z.querySelector("[data-ann]").onclick = () => z.remove();
     z.querySelector("[data-env]").onclick = () => { const m = ta.value.trim(); if (!m) { toast("Écris un commentaire pour l'élève."); ta.focus(); return; } decider(b.dataset.non, false, m); }; });
+  $("#arVoir").onclick = async () => { const m = $("#arM").value, [a, mo] = m.split("-").map(Number), fin = new Date(a, mo, 0), z = $("#arL"); z.innerHTML = `<p class="sous">Chargement…</p>`;   /* 25 nov. : archives des commandes traitées */
+    try { const A = await rpc("panier_prof_archives", { p_ens:ENS, p_jeton:JETON, p_depuis:m + "-01", p_jusqua:m + "-" + String(fin.getDate()).padStart(2, "0") }) || [];
+      z.innerHTML = A.length ? `<p class="sous">${A.length} commande${A.length > 1 ? "s" : ""}</p>` + A.map(p => cmdHtml(p, false)).join("") : `<p class="vide">Aucune commande ce mois-là.</p>`; }
+    catch(e){ z.innerHTML = `<p class="err">${esc(e.message)}</p>`; } };
   const o = $("#avOui"); if (o) o.onclick = () => abonner(true); const n = $("#avNon"); if (n) n.onclick = () => abonner(false);
   $("#apAj").onclick = () => { const u = location.origin + location.pathname.replace(/[^/]*$/, "") + "magasin.html?mode=prof&cle=" + encodeURIComponent(JETON), M = QRLib.matrice(u), k = M.length;
     $("#apQr").innerHTML = `<p class="sous" style="margin-top:12px">Sur l'autre appareil (déjà connecté à Métier+ avec ton compte), scanne ce code avec l'appareil photo. Ne le montre à personne d'autre : il permet d'approuver tes paniers.</p><div class="qr"><svg viewBox="0 0 ${k + 8} ${k + 8}" width="220" height="220"><rect width="${k + 8}" height="${k + 8}" fill="#fff"/>${M.map((r, y) => r.map((v, x) => v ? `<rect x="${x + 4}" y="${y + 4}" width="1.02" height="1.02"/>` : "").join("")).join("")}</svg></div>`; };
@@ -356,11 +370,11 @@ function preparer(p){ if (!p) return;
     const finies = new Set([...lettres].filter(l => L.filter(i => PlanMagasin.lettre(rangee(i)) === l).every(i => faits.has(i.id || i.n))));
     const tout = L.every(i => faits.has(i.id || i.n));
     ov.innerHTML = `<div class="top"><img src="img/metier-plus-blanc.svg" alt=""><b>Préparer · ${esc(p.prenom || "élève")} (${esc(p.code)})</b><span class="sp"></span><button id="prF">‹ Comptoir</button></div>
-      <main class="prep"><div class="prep-plan">${PlanMagasin.svg(lettres, finies)}</div><div class="prep-l">
+      <main class="prep"><div class="prep-plan">${PlanMagasin.svg(lettres, finies, L.map(i => ({ r:rangee(i), fait:faits.has(i.id || i.n) })))}</div><div class="prep-l">
       <p class="sous">${esc(p.groupe)} · ${esc(nomEns(p.ens))}${p.note ? " · " + esc(p.note) : ""}</p>
       ${[...lettres, ""].map(l => { const G = L.filter(i => PlanMagasin.lettre(rangee(i)) === l); if (!G.length) return "";
         return `<div class="prep-g${finies.has(l) ? " fini" : ""}"><div class="prep-t">${l ? "Rangée " + esc(l) : "Sans rangée"}</div>${G.map(i => { const k = i.id || i.n, ok = faits.has(k);
-          return `<label class="prep-i${ok ? " ok" : ""}"><input type="checkbox" data-k="${esc(k)}"${ok ? " checked" : ""}><span class="rg">${esc(rangee(i) || "–")}</span><span class="q">${+i.q || 1} ×</span><span class="nm">${esc(i.nom)}<small>${esc(i.n)}</small></span></label>`; }).join("")}</div>`; }).join("")}
+          return `<label class="prep-i${ok ? " ok" : ""}"><input type="checkbox" data-k="${esc(k)}"${ok ? " checked" : ""}><span class="rg"><i class="pt">${L.indexOf(i) + 1}</i>${esc(rangee(i) || "–")}</span><span class="q">${+i.q || 1} ×</span><span class="nm">${esc(i.nom)}<small>${esc(i.n)}</small></span></label>`; }).join("")}</div>`; }).join("")}
       <button class="btn ${tout ? "v" : ""}" id="prOk" ${tout ? "" : "disabled"} style="width:100%;margin-top:10px">${tout ? "Tout est prêt · remis à l'élève" : "Coche chaque raccord en le prenant"}</button></div></main>`;
     $("#prF").onclick = () => { ov.hidden = true; document.body.style.overflow = ""; dessinerMag(); $("#mC").focus(); };
     ov.querySelectorAll("[data-k]").forEach(c => c.onchange = () => { c.checked ? faits.add(c.dataset.k) : faits.delete(c.dataset.k); LS.set(cle, [...faits]); dessiner(); });

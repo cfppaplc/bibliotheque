@@ -445,9 +445,19 @@ let D = lireD(), GRP = localStorage.getItem("passeportGroupe") || "";
 const sauver = () => { localStorage.setItem(CLE, JSON.stringify(D)); clearTimeout(sauver.p); sauver.p = setTimeout(() => { publierGrp(); envoyerSync(); }, 1500); };
 /* liste publique des groupes (pour les boutons de l'élève) + partage, réécrite quand les groupes changent */
 async function publierGrp(){
-  if (!window.__moi) return; const L = groupes().filter(g => g !== "À classer"), C = codesPub(L), k = JSON.stringify([L, PART, C, suivis(), formesPub()]);
+  if (!window.__moi) return; const L = groupes().filter(g => g !== "À classer"), C = codesPub(L), sig = Object.values(D.el).filter(e => !e.x && e.c && e.k).map(e => e.c + e.k + prenomCarte(e.p)).sort().join(),
+    k = JSON.stringify([L, PART, C, suivis(), formesPub(), sig]);
   if (localStorage.getItem("passGrpPub") === k) return;
-  try { await PARTAGE.ecrire(window.__moi, { grp:L, part:PART, codes:C }); localStorage.setItem("passGrpPub", k); } catch(e) {} }
+  try { await PARTAGE.ecrire(window.__moi, { grp:L, part:PART, codes:C, noms:await nomsPub() }); localStorage.setItem("passGrpPub", k); } catch(e) {} }
+/* 25 nov. (Jeremy : « son nom est déjà sur son compte, ça pourrait dire bonjour ») : le prénom est publié CHIFFRÉ avec la clé de la carte
+   de l'élève (code + clé du collant) : seul celui qui scanne la carte peut le lire. Le code seul ne donne pas le prénom. */
+const prenomCarte = p => String(p || "").trim().split(/\s+/)[0].slice(0, 20);
+async function nomsPub(){ const N = {}, te = new TextEncoder();
+  for (const e of Object.values(D.el)) { if (e.x || !e.c || !e.k || !prenomCarte(e.p)) continue;
+    try { const cle = await crypto.subtle.importKey("raw", await crypto.subtle.digest("SHA-256", te.encode("metier+|carte|" + e.c + "|" + e.k)), "AES-GCM", false, ["encrypt"]);
+      const iv = crypto.getRandomValues(new Uint8Array(12)), ct = new Uint8Array(await crypto.subtle.encrypt({ name:"AES-GCM", iv }, cle, te.encode(prenomCarte(e.p))));
+      N[e.c] = btoa(String.fromCharCode(...iv, ...ct)); } catch(x) {} }
+  return N; }
 /* codes des élèves (14 nov.; 5 chiffres depuis le 25 nov.) : seuls les numéros sont publics, jamais les prénoms */
 /* codes des élèves déjà formés, par outil (numéros seulement) : l'élève formé ne refait pas la formation sur un autre appareil */
 /* démonstration (14 nov.) : une signature d'élève devient « formé » seulement quand l'enseignant a vu les manipulations */

@@ -181,8 +181,11 @@ test("Élève : toucher un choix (format commun .mp-ch / .mp-vf) l'encercle, ret
 
 test("Magasin : l'élève (carte scannée) envoie son panier, l'enseignant approuve, le magasinier filtre par code et remet", async b => {
   const P = [], A = [];
+  /* 25 nov. : prénom publié chiffré avec la clé de la carte (comme passeport.html nomsPub) */
+  const te = new TextEncoder(), cle = await crypto.subtle.importKey("raw", await crypto.subtle.digest("SHA-256", te.encode("metier+|carte|12345|K7Q9X2")), "AES-GCM", false, ["encrypt"]);
+  const iv = crypto.getRandomValues(new Uint8Array(12)), ENC = Buffer.from([...iv, ...new Uint8Array(await crypto.subtle.encrypt({ name: "AES-GCM", iv }, cle, te.encode("Essai")))]).toString("base64");
   const mock = async ctx => ctx.route(/supabase\.co\/rest\/v1\/rpc\/(\w+)/, async r => { const f = r.request().url().match(/rpc\/(\w+)/)[1], a = JSON.parse(r.request().postData() || "{}"); let o = null;
-    if (f === "coffre_lire") o = [{ data: JSON.stringify({ grp: ["2608 EGI"], codes: { "2608 EGI": ["12345", "45678"] } }) }];
+    if (f === "coffre_lire") o = [{ data: JSON.stringify({ grp: ["2608 EGI"], codes: { "2608 EGI": ["12345", "45678"] }, noms: { "12345": ENC } }) }];
     else if (f === "panier_envoyer") { P.push({ id: "id" + P.length, etat: "attente", t: new Date().toISOString(), ens: a.p_ens, groupe: a.p_groupe, code: a.p_code, prenom: a.p_prenom, items: a.p_items, note: a.p_note }); o = { ok: true, id: "id" + (P.length - 1) }; }
     else if (f === "panier_etat") { const x = P.find(p => p.id === a.p_id) || {}; o = { etat: x.etat, motif: x.motif }; }
     else if (f === "panier_prof_regler") o = true;
@@ -198,8 +201,9 @@ test("Magasin : l'élève (carte scannée) envoie son panier, l'enseignant appro
   const c1 = await b.newContext({ viewport: { width: 820, height: 1180 }, hasTouch: true, serviceWorkers: "block" }); await mock(c1);
   const p = await c1.newPage(); p.on("pageerror", e => errs.push(e.message));
   await p.goto(BASE + "magasin.html?e=jeremy.raymond"); await attendre(800);
-  await p.fill("#cPre", "Essai"); await p.fill("#cCode", "MP-12345-K7Q9X2"); await p.keyboard.press("Enter"); await attendre(1200);
+  await p.fill("#cCode", "MP-12345-K7Q9X2"); await p.keyboard.press("Enter"); await attendre(1200);
   vrai(/12345/.test(await p.textContent("#tQui")), "Carte scannée : élève pas reconnu");
+  vrai(/Bonjour Essai/.test(await p.textContent("#tQui")), "Carte scannée : le prénom ne vient pas de la carte (" + await p.textContent("#tQui") + ")");
   await p.fill("#fQ", "coude 90 abs 2"); await attendre(300);
   const res = await p.$$eval(".art .tx b", L => L.map(x => x.textContent));
   vrai(res.length === 1 && /ABS 2 po/.test(res[0]), "Recherche : " + res.join(" | "));

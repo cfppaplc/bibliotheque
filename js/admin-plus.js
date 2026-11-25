@@ -149,6 +149,26 @@ window.ADMIN_PLUS = (function(){
   }
   /* 25 nov. (Jeremy : « cette page devrait être en plein écran, dans le panneau c'est comme une page coupée ») :
      l'outil s'ouvre par-dessus tout l'écran, avec une barre « ‹ Retour »; le panneau reste ouvert derrière */
+  /* 25 nov. (Jeremy : « une statistique des raccords sortis ») : raccords remis aux élèves, par période et par groupe (données anonymes) */
+  let ST_P = "30", ST_G = "";
+  async function statsMg(c){ if (!c) return;
+    const jour = d => d.toISOString().slice(0, 10), auj = new Date(), an = auj.getMonth() >= 7 ? auj.getFullYear() : auj.getFullYear() - 1;
+    const P = { "7":["7 jours", jour(new Date(Date.now() - 6 * 864e5))], "30":["30 jours", jour(new Date(Date.now() - 29 * 864e5))], "an":["Depuis le 1er août", an + "-08-01"], "tout":["Tout", "2026-01-01"] };
+    const rq = (f, a) => fetch("https://kjlotlhqrgekzohshmbn.supabase.co/rest/v1/rpc/" + f, { method:"POST", headers:{ apikey:"sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY", "Content-Type":"application/json" }, body:JSON.stringify(a || {}), cache:"no-store" }).then(r => { if (!r.ok) throw new Error("Supabase ne répond pas"); return r.json(); });
+    let L, G; try { [L, G] = await Promise.all([rq("panier_stats", { p_depuis:P[ST_P][1], p_groupe:ST_G || null }), rq("panier_stats_groupes")]); } catch(e){ c.innerHTML = '<h3>Raccords sortis</h3><p class="acces-err">' + esc(e.message) + '</p>'; return; }
+    const tot = L.reduce((x, r) => x + +r.q, 0);
+    c.innerHTML = '<div class="as-th"><h3>Raccords sortis · ' + tot + ' pièce' + (tot > 1 ? 's' : '') + '</h3></div>'
+      + '<div class="acces-per">' + Object.entries(P).map(([k, [t]]) => '<button class="abtn' + (k === ST_P ? ' prim' : '') + '" data-stp="' + k + '">' + t + '</button>').join("")
+      + '<select id="stG" style="margin-left:8px"><option value="">Tous les groupes</option>' + G.map(g => '<option' + (g.groupe === ST_G ? ' selected' : '') + '>' + esc(g.groupe) + '</option>').join("") + '</select>'
+      + (L.length ? '<button class="abtn" id="stCsv" style="margin-left:auto">Exporter (CSV)</button>' : '') + '</div>'
+      + (L.length ? '<table class="ap-st"><thead><tr><th>Raccord</th><th>N° d\'article</th><th>Quantité</th><th>Commandes</th></tr></thead><tbody>'
+        + L.map(r => '<tr><td>' + esc(r.nom) + '</td><td>' + esc(r.n) + '</td><td><b>' + r.q + '</b></td><td>' + r.fois + '</td></tr>').join("") + '</tbody></table>'
+        : '<p class="sous">Aucun raccord remis pour cette période. Les raccords comptent quand le magasinier touche « Remis à l\'élève ».</p>');
+    c.querySelectorAll("[data-stp]").forEach(b => b.onclick = () => { ST_P = b.dataset.stp; statsMg(c); });
+    c.querySelector("#stG").onchange = e => { ST_G = e.target.value; statsMg(c); };
+    const x = c.querySelector("#stCsv"); if (x) x.onclick = () => { const csv = "Raccord;N° d'article;Quantité;Commandes\n" + L.map(r => [r.nom, r.n, r.q, r.fois].map(v => '"' + String(v ?? "").replace(/"/g, '""') + '"').join(";")).join("\n");
+      const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob(["\ufeff" + csv], { type:"text/csv" })); a.download = "raccords-sortis-" + P[ST_P][1] + (ST_G ? "-" + ST_G : "") + ".csv"; a.click(); };
+  }
   function ouvrirIci(z, url, titre, retour, nomRetour){
     const vieux = document.querySelector(".ap-plein"); if (vieux) vieux.remove();
     const o = document.createElement("div"); o.className = "ap-plein";
@@ -180,6 +200,7 @@ window.ADMIN_PLUS = (function(){
       + '<div class="as-carte"><h3>Comptoir du magasinier</h3><p class="sous">Sur l\'ordinateur du magasinier, laissé ouvert toute la journée. Le lecteur de codes-barres lit la carte de l\'élève.</p><div class="ap-btns"><a class="abtn prim" href="magasin.html?mode=magasin" target="_blank" rel="noopener">Ouvrir le comptoir</a><button class="abtn" data-copie="' + esc(lienM) + '">Copier le lien</button></div></div>'
       + '<div class="as-carte"><h3>Approbation et dossiers</h3><button class="as-lien" data-ici="magasin.html?mode=prof" data-t="Commandes à approuver">Commandes à approuver<small>Approuver, refuser, avis sur ton cellulaire</small></button><button class="as-lien" data-ici="outils-atelier.html" data-t="Dossiers des élèves">Dossiers des élèves<small>Touche un élève : formations, coffre, commandes</small></button><button class="as-lien" data-ici="passeport.html" data-t="Collants pour la carte étudiante">Collants pour la carte étudiante<small>Choisis le groupe, puis « Codes des élèves »</small></button></div>'
       + '</div>'
+      + '<div class="as-carte" id="mgSt"><h3>Raccords sortis</h3><p class="sous">Chargement…</p></div>'
       + '<div class="as-carte"><div class="as-th"><h3>Catalogue des raccords · ' + MG.raccords.length + '</h3></div>'
       + (MG.essai ? '<p class="acces-err" style="margin:0 0 8px">Liste d\'essai : remplace-la par la vraie liste du magasin (fichier CSV, un raccord par ligne).</p>' : '')
       + '<div class="ap-pub"><span class="acces-etat' + (mgChange() ? ' pub' : '') + '">' + (mgChange() ? 'Des changements attendent d\'être publiés' : 'Tout est publié') + '</span>' + (MG_MSG ? '<span class="acces-ok">' + esc(MG_MSG) + '</span>' : '') + '<span class="acces-err" id="mgErr" hidden></span>'
@@ -190,6 +211,7 @@ window.ADMIN_PLUS = (function(){
       + R.slice(0, 200).map(([a, i]) => '<div class="ap-mg-l" data-i="' + i + '">' + ["n", "nom", "mat", "type", "d", "r"].map(k => '<input type="text" data-k="' + k + '" value="' + esc(a[k]) + '">').join("") + '<button class="abtn rouge" data-sup title="Retirer">×</button></div>').join("")
       + (R.length > 200 ? '<p class="sous">' + (R.length - 200) + ' autres : précise ta recherche.</p>' : '') + '</div></div>';
     const re = () => magasin(z), etat = () => { const c = mgChange(), e = z.querySelector(".ap-pub .acces-etat"); e.classList.toggle("pub", c); e.textContent = c ? "Des changements attendent d'être publiés" : "Tout est publié"; z.querySelector("#mgPub").disabled = !c; z.querySelector("#mgAnn").disabled = !c; };
+    statsMg(z.querySelector("#mgSt"));
     z.querySelectorAll("[data-copie]").forEach(b => b.onclick = () => { try { navigator.clipboard.writeText(b.dataset.copie); b.textContent = "Lien copié"; } catch(e){} });
     z.querySelectorAll("[data-ici]").forEach(b => b.onclick = () => ouvrirIci(z, b.dataset.ici, b.dataset.t, magasin, "Magasin"));
     z.querySelector("#mgQ").oninput = e => { MG_Q = e.target.value; const p = e.target.selectionStart; re(); const n = z.querySelector("#mgQ"); n.focus(); n.setSelectionRange(p, p); };
