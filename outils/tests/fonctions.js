@@ -182,11 +182,11 @@ test("Magasin : l'élève (carte scannée) envoie son panier, l'enseignant appro
   const P = [];
   const mock = async ctx => ctx.route(/supabase\.co\/rest\/v1\/rpc\/(\w+)/, async r => { const f = r.request().url().match(/rpc\/(\w+)/)[1], a = JSON.parse(r.request().postData() || "{}"); let o = null;
     if (f === "coffre_lire") o = [{ data: JSON.stringify({ grp: ["2608 EGI"], codes: { "2608 EGI": ["123", "456"] } }) }];
-    else if (f === "panier_envoyer") { P.push({ id: "id" + P.length, etat: "attente", t: new Date().toISOString(), ens: a.p_ens, groupe: a.p_groupe, code: a.p_code, items: a.p_items, note: a.p_note }); o = { ok: true, id: "id" + (P.length - 1) }; }
-    else if (f === "panier_etat") o = { etat: (P.find(p => p.id === a.p_id) || {}).etat };
+    else if (f === "panier_envoyer") { P.push({ id: "id" + P.length, etat: "attente", t: new Date().toISOString(), ens: a.p_ens, groupe: a.p_groupe, code: a.p_code, prenom: a.p_prenom, items: a.p_items, note: a.p_note }); o = { ok: true, id: "id" + (P.length - 1) }; }
+    else if (f === "panier_etat") { const x = P.find(p => p.id === a.p_id) || {}; o = { etat: x.etat, motif: x.motif }; }
     else if (f === "panier_prof_regler") o = true;
     else if (f === "panier_prof_lire") o = P;
-    else if (f === "panier_decider") { const p = P.find(x => x.id === a.p_id); p.etat = a.p_ok ? "approuve" : "refuse"; p.t_app = new Date().toISOString(); o = true; }
+    else if (f === "panier_decider") { const p = P.find(x => x.id === a.p_id); p.etat = a.p_ok ? "approuve" : "refuse"; p.motif = a.p_motif; p.t_app = new Date().toISOString(); o = true; }
     else if (f === "panier_magasin") o = P.filter(p => p.etat === "approuve" || p.etat === "remis");
     else if (f === "panier_remettre") { const p = P.find(x => x.id === a.p_id); p.etat = a.p_remis ? "remis" : "approuve"; p.t_remis = new Date().toISOString(); o = true; }
     r.fulfill({ body: JSON.stringify(o), contentType: "application/json", headers: { "access-control-allow-origin": "*" } }); });
@@ -194,7 +194,7 @@ test("Magasin : l'élève (carte scannée) envoie son panier, l'enseignant appro
   const c1 = await b.newContext({ viewport: { width: 820, height: 1180 }, hasTouch: true, serviceWorkers: "block" }); await mock(c1);
   const p = await c1.newPage(); p.on("pageerror", e => errs.push(e.message));
   await p.goto(BASE + "magasin.html?e=jeremy.raymond"); await attendre(800);
-  await p.fill("#cCode", "MP-123-K7Q9X2"); await p.keyboard.press("Enter"); await attendre(1200);
+  await p.fill("#cPre", "Essai"); await p.fill("#cCode", "MP-123-K7Q9X2"); await p.keyboard.press("Enter"); await attendre(1200);
   vrai(/123/.test(await p.textContent("#tQui")), "Carte scannée : élève pas reconnu");
   await p.fill("#fQ", "coude 90 abs 2"); await attendre(300);
   const res = await p.$$eval(".art .tx b", L => L.map(x => x.textContent));
@@ -217,11 +217,22 @@ test("Magasin : l'élève (carte scannée) envoie son panier, l'enseignant appro
   await m.keyboard.type("MP-123-K7Q9X2"); await m.keyboard.press("Enter"); await attendre(300);
   vrai(!!(await m.$("[data-rem]")), "Code 123 : commande absente");
   vrai(/^[A-Z]-\d+$/.test((await m.textContent("td.rg")).trim()), "Rangée absente au comptoir");
+  vrai(/Essai/.test(await m.textContent(".cmd .pr")), "Prénom absent au comptoir");
+  if (process.env.CAPTURES) await m.screenshot({ path: process.env.CAPTURES + "/comptoir.png" });
   await m.click("[data-prep]"); await attendre(400);
   vrai(await m.$$eval(".pm-s.actif", L => L.length) > 0, "Plan : aucune rangée ne clignote");
   for (const c of await m.$$("[data-k]")) { await c.click(); await attendre(150); }
   vrai(await m.$$eval(".pm-s.actif", L => L.length) === 0, "Plan : une rangée clignote encore après tout coché");
   await m.click("#prOk"); await attendre(400); vrai(P[0].etat === "remis", "Remis : " + P[0].etat);
+  /* refus avec commentaire (25 nov.) : deuxième panier, refusé avec motif, l'élève voit le commentaire */
+  await p.click(".art .aj"); await attendre(200); await p.click("#bVoir"); await attendre(300); await p.click("#pEnv"); await attendre(1200);
+  await q.reload(); await attendre(1500); await q.click("[data-non]"); await attendre(200);
+  await q.click("[data-env]"); await attendre(300); vrai(P[1].etat === "attente", "Refus envoyé sans commentaire");
+  await q.click(".refus .vite .btn"); if (process.env.CAPTURES) await q.screenshot({ path: process.env.CAPTURES + "/prof-refus.png" }); await q.click("[data-env]"); await attendre(1000);
+  vrai(P[1].etat === "refuse" && /diamètre/.test(P[1].motif || ""), "Refus : " + P[1].etat + " " + P[1].motif);
+  await p.reload(); await attendre(1500); const sv = await p.evaluate(() => document.body.innerText);
+  if (process.env.CAPTURES) await p.screenshot({ path: process.env.CAPTURES + "/eleve-suivi.png" });
+  vrai(/Refusé par ton enseignant/.test(sv) && /Mauvais diamètre/.test(sv), "L'élève ne voit pas le refus et le commentaire");
   vrai(!errs.length, errs.join(" | "));
   await c1.close(); await c2.close(); await c3.close();
 });
