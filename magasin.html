@@ -59,6 +59,14 @@ textarea{width:100%;min-height:80px;border-radius:12px;border:1px solid var(--li
 .mag-code{position:sticky;top:52px;z-index:10;background:var(--fond);padding:12px 0;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
 .mag-code input{flex:1;min-width:240px;font:800 2rem/1 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.15em;padding:12px 16px;border-radius:14px;border:2px solid var(--acc);background:var(--carte)}
 .qr{display:inline-block;background:#fff;padding:10px;border-radius:10px}
+.prep{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(320px,1fr);gap:18px;max-width:1400px;align-items:start}
+@media (max-width:900px){.prep{grid-template-columns:1fr}}
+.prep-plan{background:#fff;border:1px solid var(--ligne);border-radius:16px;padding:8px;position:sticky;top:64px}.prep-plan svg{display:block;width:100%;height:auto;max-height:calc(100vh - 100px)}
+.prep-g{background:var(--carte);border:1px solid var(--ligne);border-radius:14px;margin-bottom:10px;overflow:hidden}.prep-g.fini{border-color:var(--vert)}
+.prep-t{padding:8px 14px;font-weight:800;background:var(--carte2)}.prep-g.fini .prep-t{color:var(--vert)}
+.prep-i{display:flex;align-items:center;gap:12px;padding:12px 14px;border-top:1px solid var(--ligne);cursor:pointer}
+.prep-i input{width:28px;height:28px;accent-color:var(--vert);flex:none}.prep-i .rg{font-weight:800;color:var(--acc);min-width:44px}.prep-i .q{font-weight:800;min-width:36px}
+.prep-i .nm{flex:1}.prep-i small{display:block;color:var(--doux);font-family:ui-monospace,Menlo,Consolas,monospace}.prep-i.ok{opacity:.55}.prep-i.ok .nm{text-decoration:line-through}
 @media print{.top,.barre,.btn,.toast{display:none!important}body{background:#fff}}
 </style>
 </head>
@@ -67,7 +75,7 @@ textarea{width:100%;min-height:80px;border-radius:12px;border:1px solid var(--li
 <main id="app"><p class="vide">Chargement…</p></main>
 <div class="ov" id="ov" hidden></div>
 <div class="barre" id="barre" hidden></div>
-<script src="js/qrcode.js"></script><script src="js/code128.js?v=1"></script>
+<script src="js/qrcode.js"></script><script src="js/code128.js?v=1"></script><script src="js/plan-magasin.js?v=1"></script>
 <script>
 "use strict";
 const SUPA = "https://kjlotlhqrgekzohshmbn.supabase.co", CLE = "sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY";
@@ -270,12 +278,13 @@ function dessinerMag(){
   const z = $("#mL"); if (!z) return;
   const v = MAG.filter(p => !FILTRE_CODE || p.code === FILTRE_CODE), app = v.filter(p => p.etat === "approuve"), rem = v.filter(p => p.etat === "remis").reverse();
   const carte = p => `<div class="cmd"><div class="h"><span class="n">${esc(p.code)}</span><div><b>${esc(p.groupe)}</b> · ${esc(nomEns(p.ens))}<br><small class="sous">Approuvé ${heure(p.t_app)}</small></div><span class="sp"></span>
-    <button class="btn" data-imp="${p.id}" style="min-height:42px">Imprimer le bon</button> ${p.etat === "approuve" ? `<button class="btn v" data-rem="${p.id}">Remis à l'élève</button>` : `<span class="etat remis">Remis ${heure(p.t_remis)}</span> <button class="btn" data-ann="${p.id}" style="min-height:38px">Annuler</button>`}</div>
+    ${p.etat === "approuve" ? `<button class="btn p" data-prep="${p.id}">Préparer</button>` : ""}<button class="btn" data-imp="${p.id}" style="min-height:42px">Imprimer le bon</button> ${p.etat === "approuve" ? `<button class="btn v" data-rem="${p.id}">Remis à l'élève</button>` : `<span class="etat remis">Remis ${heure(p.t_remis)}</span> <button class="btn" data-ann="${p.id}" style="min-height:38px">Annuler</button>`}</div>
     ${p.note ? `<p style="margin:10px 16px 0"><b>Travail :</b> ${esc(p.note)}</p>` : ""}
     ${tableMag(p)}</div>`;
   z.innerHTML = (FILTRE_CODE ? `<p class="sous">Élève <b>${esc(FILTRE_CODE)}</b> : ${app.length ? app.length + " commande" + (app.length > 1 ? "s" : "") + " à préparer" : "aucune commande approuvée"}.</p>` : "")
     + `<div class="sec">À préparer (${app.length})</div>` + (app.length ? app.map(carte).join("") : `<p class="vide">${FILTRE_CODE ? "Rien pour cet élève. Son enseignant doit d'abord approuver son panier." : "Aucune commande approuvée pour l'instant."}</p>`)
     + (rem.length ? `<div class="sec">Remis aujourd'hui (${rem.length})</div>` + rem.map(carte).join("") : "");
+  z.querySelectorAll("[data-prep]").forEach(b => b.onclick = () => preparer(MAG.find(p => p.id === b.dataset.prep)));
   z.querySelectorAll("[data-imp]").forEach(b => b.onclick = () => imprimerBon(MAG.find(p => p.id === b.dataset.imp)));
   z.querySelectorAll("[data-rem]").forEach(b => b.onclick = () => remettre(b.dataset.rem, true));
   z.querySelectorAll("[data-ann]").forEach(b => b.onclick = () => remettre(b.dataset.ann, false));
@@ -284,6 +293,27 @@ function dessinerMag(){
 const rangee = i => i.r || ((CAT.find(a => a.id === i.id || a.n === i.n) || {}).r) || "";
 const parRangee = L => [...(L || [])].sort((a, b) => rangee(a).localeCompare(rangee(b), "fr", { numeric:true }) || String(a.nom).localeCompare(String(b.nom), "fr"));
 const tableMag = p => `<table><tr><th>Rangée</th><th>Qté</th><th>Raccord</th><th>N° d'article</th></tr>${parRangee(p.items).map(i => `<tr><td class="rg">${esc(rangee(i) || "–")}</td><td class="q">${+i.q || 1}</td><td>${esc(i.nom)}</td><td class="no">${esc(i.n)}</td></tr>`).join("")}</table>`;
+/* préparation (25 nov., Jeremy : « les rangées pourraient flasher sur son iPad et quand il coche, ça cesse ») */
+function preparer(p){ if (!p) return;
+  const cle = "magPrep|" + p.id, faits = new Set(LS.get(cle, [])), L = parRangee(p.items), ov = $("#ov");
+  ov.hidden = false; document.body.style.overflow = "hidden";
+  const dessiner = () => {
+    const lettres = new Set(L.map(i => PlanMagasin.lettre(rangee(i))).filter(Boolean));
+    const finies = new Set([...lettres].filter(l => L.filter(i => PlanMagasin.lettre(rangee(i)) === l).every(i => faits.has(i.id || i.n))));
+    const tout = L.every(i => faits.has(i.id || i.n));
+    ov.innerHTML = `<div class="top"><img src="img/metier-plus-blanc.svg" alt=""><b>Préparer · élève ${esc(p.code)}</b><span class="sp"></span><button id="prF">‹ Comptoir</button></div>
+      <main class="prep"><div class="prep-plan">${PlanMagasin.svg(lettres, finies)}</div><div class="prep-l">
+      <p class="sous">${esc(p.groupe)} · ${esc(nomEns(p.ens))}${p.note ? " · " + esc(p.note) : ""}</p>
+      ${[...lettres, ""].map(l => { const G = L.filter(i => PlanMagasin.lettre(rangee(i)) === l); if (!G.length) return "";
+        return `<div class="prep-g${finies.has(l) ? " fini" : ""}"><div class="prep-t">${l ? "Rangée " + esc(l) : "Sans rangée"}</div>${G.map(i => { const k = i.id || i.n, ok = faits.has(k);
+          return `<label class="prep-i${ok ? " ok" : ""}"><input type="checkbox" data-k="${esc(k)}"${ok ? " checked" : ""}><span class="rg">${esc(rangee(i) || "–")}</span><span class="q">${+i.q || 1} ×</span><span class="nm">${esc(i.nom)}<small>${esc(i.n)}</small></span></label>`; }).join("")}</div>`; }).join("")}
+      <button class="btn ${tout ? "v" : ""}" id="prOk" ${tout ? "" : "disabled"} style="width:100%;margin-top:10px">${tout ? "Tout est prêt · remis à l'élève" : "Coche chaque raccord en le prenant"}</button></div></main>`;
+    $("#prF").onclick = () => { ov.hidden = true; document.body.style.overflow = ""; dessinerMag(); $("#mC").focus(); };
+    ov.querySelectorAll("[data-k]").forEach(c => c.onchange = () => { c.checked ? faits.add(c.dataset.k) : faits.delete(c.dataset.k); LS.set(cle, [...faits]); dessiner(); });
+    $("#prOk").onclick = async () => { await remettre(p.id, true); try { localStorage.removeItem(cle); } catch(e){} ov.hidden = true; document.body.style.overflow = ""; };
+  };
+  dessiner();
+}
 function imprimerBon(p){ if (!p) return;
   const h = `<!DOCTYPE html><html lang="fr-CA"><head><meta charset="utf-8"><title>Bon ${esc(p.code)}</title><style>body{font:12pt/1.35 system-ui,sans-serif;color:#000;margin:14mm}h1{font-size:18pt;margin:0}.s{color:#444;margin:2pt 0 10pt}table{width:100%;border-collapse:collapse}th,td{border-bottom:1px solid #999;padding:6pt 4pt;text-align:left}th{font-size:9pt;color:#444}td.rg{font-weight:800;font-size:14pt;width:60pt}td.q{font-weight:800;width:40pt}td.no{font-family:monospace}td.ok{width:30pt}.n{font:900 28pt monospace;float:right}</style></head><body>`
     + `<span class="n">${esc(p.code)}</span><h1>Bon de préparation · Magasin</h1><p class="s">${esc(p.groupe)} · ${esc(nomEns(p.ens))} · approuvé ${heure(p.t_app)}${p.note ? " · " + esc(p.note) : ""}</p>`

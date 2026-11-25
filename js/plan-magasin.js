@@ -1,0 +1,42 @@
+/* © 2026 Jérémy Raymond. Tous droits réservés. Métier+ — plan du magasin (25 nov.)
+   Tiré de l'artefact « Plan du magasin » de Jeremy (cotes en pouces, d'après son croquis). Les affiches de rangée (D à K)
+   des raccords à préparer clignotent; une rangée dont tout est coché devient verte et arrête de clignoter. */
+window.PlanMagasin = (function(){
+  const F = { left:450, diag:118, top:198, rightDrop:240, ext:149, K:20, chain:[["K",20],["a",49],["r",28],["a",49],["r",32],["a",36.5],["r",38],["a",47]] };
+  const V = { upY:78, upL:192, loY:318, loL:180, r4x:34, r4w:30, c1:48, c2:36, winA:48, winW:82 };
+  try { Object.assign(V, JSON.parse(localStorage.getItem("planMag2") || "{}")); } catch(e){}   /* mêmes réglages que l'artefact */
+  /* svg(actives, faites) : chaîne SVG; actives et faites = ensembles de lettres de rangée */
+  function svg(actives, faites){
+    actives = actives || new Set(); faites = faites || new Set();
+    const W = F.chain.reduce((s, c) => s + c[1], 0), dh = W - F.top, R = Math.sqrt(F.diag ** 2 - dh ** 2), H = F.left + R, X2 = W + F.ext;
+    const room = [[0, R], [dh, 0], [W, 0], [W, F.rightDrop], [X2, F.rightDrop], [X2, H], [0, H]];
+    const etat = l => faites.has(l) ? "fait" : actives.has(l) ? "actif" : "";
+    const sign = (x, y, l) => `<g class="pm-s ${etat(l)}"><rect x="${x - 10}" y="${y - 10}" width="20" height="20" rx="3"/><text x="${x}" y="${y + 1}">${l}</text></g>`;
+    let o = `<style>.pm-mur{fill:none;stroke:#14213d;stroke-width:4}.pm-r{fill:#c9d0da;stroke:#14213d;stroke-width:.8}.pm-c{fill:#eef1f5;stroke:#14213d;stroke-width:.8;stroke-dasharray:3 2}
+      .pm-s rect{fill:#fff;stroke:#111;stroke-width:1.2}.pm-s text{font:800 13px system-ui,sans-serif;text-anchor:middle;dominant-baseline:middle;fill:#111}
+      .pm-s.actif rect{fill:#EB6A22;stroke:#EB6A22;animation:pmFl .8s ease-in-out infinite alternate}.pm-s.actif text{fill:#fff}
+      .pm-s.fait rect{fill:#1E8A55;stroke:#1E8A55}.pm-s.fait text{fill:#fff}
+      @keyframes pmFl{from{opacity:1}to{opacity:.35}}@media (prefers-reduced-motion:reduce){.pm-s.actif rect{animation:none}}
+      .pm-l{font:600 11px system-ui,sans-serif;fill:#5b6678;text-anchor:middle}</style>`;
+    o += `<polygon points="${room.join(" ")}" fill="#fff"/>`;
+    const yK = R * (1 - F.K / dh);
+    o += `<polygon class="pm-r" points="0,${R} ${F.K},${yK} ${F.K},${H} 0,${H}"/>`;
+    const c = [[W, F.rightDrop], [X2, F.rightDrop], [X2, H], [X2 - V.c2, H], [X2 - V.c2, F.rightDrop + V.c1], [W, F.rightDrop + V.c1]];
+    o += `<polygon class="pm-c" points="${c.join(" ")}"/><text class="pm-l" x="${(W + X2 - V.c2) / 2}" y="${F.rightDrop + V.c1 / 2 + 4}">Comptoir</text>`;
+    let x = 0; const racks = []; for (const [t, w] of F.chain){ if (t === "r") racks.push([x, w]); x += w; }
+    const L = [["J", "I"], ["H", "G"], ["F", "E"]];
+    racks.forEach(([rx, rw], i) => { for (const [y0, len] of [[V.upY, V.upL], [V.loY, V.loL]]){
+      o += `<rect class="pm-r" x="${rx}" y="${y0}" width="${rw}" height="${len}"/>`; const sy = y0 + Math.min(len / 2, 60);
+      o += sign(rx - 12, sy - 13, L[i][0]) + sign(rx + rw + 12, sy + 13, L[i][1]); } });   /* côtés décalés en hauteur : deux affiches d'une même allée ne se cachent pas */
+    const r3 = racks[2], r4x = r3[0] + r3[1] + V.r4x;
+    o += `<rect class="pm-r" x="${r4x}" y="${V.loY}" width="${V.r4w}" height="${V.loL}"/>` + sign(r4x + V.r4w + 12, V.loY + Math.min(V.loL / 2, 60) + 13, "D");
+    o += `<polygon class="pm-mur" points="${room.join(" ")}"/>`;
+    o += sign(F.K + 12, (yK + H) / 2, "K");
+    const wa = dh + V.winA, wb = wa + V.winW;
+    o += `<line x1="${wa}" y1="0" x2="${wb}" y2="0" stroke="#EB6A22" stroke-width="4"/><text class="pm-l" x="${(wa + wb) / 2}" y="16">Fenêtre de service</text>`;
+    o += `<text class="pm-l" x="${dh / 2 + 14}" y="${R / 2 + 26}">Porte</text>`;
+    return `<svg viewBox="-30 -20 ${X2 + 60} ${H + 40}" role="img" aria-label="Plan du magasin">${o}</svg>`;
+  }
+  const lettre = r => (String(r || "").trim().match(/^[A-Za-z]/) || [""])[0].toUpperCase();
+  return { svg, lettre };
+})();

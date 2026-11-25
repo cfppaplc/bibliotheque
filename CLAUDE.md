@@ -21,6 +21,8 @@
 10. Commits : finir par `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>` (et la ligne Claude-Session si fournie). Une autre session peut pousser : `git pull` avant.
 11. **Tests automatiques** (25 nov.) : chaque bogue corrigé = un test ajouté dans `outils/tests/fonctions.js` (et toute nouvelle page dans `PAGES` de `outils/tests/pages.js`). GitHub les relance à chaque envoi (`test-pages.yml`); vérifier qu'ils passent après publication (`gh api repos/cfppaplc/bibliotheque/actions/runs?per_page=3`). Surveillance du site aux 30 min (`surveillance.yml`), sauvegarde Supabase le dimanche (`sauvegarde-supabase.yml`).
 
+12. **Toute la gestion se fait dans le panneau d'administration** (25 nov., Jeremy : « on a dédoublé des fonctionnalités admin sur des pages; à partir de maintenant tout est géré par la page admin »). Les pages du site restent légères (utilisation); un nouveau réglage ou outil de gestion va dans Administration, jamais dans une page.
+
 ## Livres
 - Normes : `NORMES_LIVRES.md` (à relire pour tout livre). Source de chaque livre = original clair `/home/claude/originaux/livres/<f>.html` (perdu si la session est recréée : garder une copie).
 - Correction : modifier l'original → tester → `python3 outils/chiffrer.py <original> <f> --comptes <mêmes comptes>` (`git pull` avant; donner les comptes du programme à la main) → refaire le PDF (`node outils/pdf_fabriquer.js` → `pdf_compresser.py` → `pdf_livres.py`) → monter `version` dans `js/livres.js` → publier.
