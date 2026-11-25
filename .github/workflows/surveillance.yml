@@ -1,0 +1,50 @@
+# Surveillance (25 nov.) : toutes les 30 minutes, le site et Supabase répondent-ils ?
+# En cas de panne : avis « Panne Métier+ » dans les signalements (ntfy) + exécution en rouge dans Actions.
+# Au plus un avis par panne : l'avis n'est pas renvoyé tant que la panne dure (fichier gardé en cache).
+name: Surveillance du site
+on:
+  schedule:
+    - cron: "7,37 * * * *"
+  workflow_dispatch: {}
+permissions:
+  contents: read
+jobs:
+  verifier:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/cache/restore@v4
+        with:
+          path: etat-panne.txt
+          key: etat-panne-${{ github.run_id }}
+          restore-keys: etat-panne-
+      - name: Vérifier
+        run: |
+          pannes=""
+          for i in 1 2 3; do   # 3 essais espacés : une seconde de lenteur n'est pas une panne
+            pannes=""
+            c=$(curl -s -o site.html -w "%{http_code}" -m 20 https://metierplus.app/)
+            if [ "$c" != "200" ] || ! grep -q "Métier" site.html; then pannes="$pannes site (HTTP $c);"; fi
+            c=$(curl -s -o /dev/null -w "%{http_code}" -m 20 "https://kjlotlhqrgekzohshmbn.supabase.co/rest/v1/rpc/journal_lire?p_heures=1" -H "apikey: sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY")
+            if [ "$c" != "200" ]; then pannes="$pannes Supabase (HTTP $c);"; fi
+            [ -z "$pannes" ] && break; sleep 60
+          done
+          avant=$(cat etat-panne.txt 2>/dev/null || echo "ok")
+          if [ -n "$pannes" ]; then
+            echo "Panne :$pannes"
+            if [ "$avant" = "ok" ]; then
+              curl -s -H "Title: Panne Metier+" -H "Priority: high" -H "Tags: warning" -d "Ne répond pas :$pannes Vérifié 3 fois en 2 minutes à $(TZ=America/Toronto date '+%H h %M')." https://ntfy.sh/metierplus-signal-f3ce60fd2f6c0f46 >/dev/null
+            fi
+            echo "panne" > etat-panne.txt; echo "PANNE=1" >> $GITHUB_ENV
+          else
+            if [ "$avant" = "panne" ]; then curl -s -H "Title: Metier+ fonctionne de nouveau" -H "Tags: white_check_mark" -d "Le site et Supabase répondent de nouveau ($(TZ=America/Toronto date '+%H h %M'))." https://ntfy.sh/metierplus-signal-f3ce60fd2f6c0f46 >/dev/null; fi
+            echo "ok" > etat-panne.txt; echo "Tout répond."
+          fi
+      - uses: actions/cache/save@v4
+        if: always()
+        with:
+          path: etat-panne.txt
+          key: etat-panne-${{ github.run_id }}
+      - name: Marquer la panne en rouge
+        if: env.PANNE == '1'
+        run: exit 1

@@ -1,4 +1,4 @@
-# Test après chaque publication (25 nov.) : les pages principales s'ouvrent-elles sans erreur, à l'ordinateur et au cellulaire ?
+# Test après chaque publication (25 nov.) : les pages principales s'ouvrent-elles sans erreur (ordinateur et cellulaire), et les fonctions importantes marchent-elles (outils/tests/fonctions.js) ?
 # Un échec envoie un courriel de GitHub à Jeremy. Détails : Actions → Test des pages → l'exécution en rouge.
 name: Test des pages
 on:
@@ -13,7 +13,7 @@ concurrency:
 jobs:
   test:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -27,3 +27,9 @@ jobs:
           python3 -m http.server 8791 >/dev/null 2>&1 &
           sleep 1
           NODE_PATH=/tmp/node_modules node outils/tests/pages.js
+      - name: Tester les fonctions importantes
+        if: always()
+        run: |
+          python3 -m http.server 8791 >/dev/null 2>&1 &
+          sleep 1
+          NODE_PATH=/tmp/node_modules node outils/tests/fonctions.js

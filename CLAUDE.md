@@ -19,6 +19,7 @@
 8. Ne jamais mettre le mode léger / sobre d'une façon qui touche les livres (écrans noirs au TNI). Pas de zone qui défile dans une fenêtre qui défile (blanche au TNI).
 9. Pas d'émojis dans l'interface; pas de style « Kahoot » (blocs de couleur + formes), ni le mot.
 10. Commits : finir par `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>` (et la ligne Claude-Session si fournie). Une autre session peut pousser : `git pull` avant.
+11. **Tests automatiques** (25 nov.) : chaque bogue corrigé = un test ajouté dans `outils/tests/fonctions.js` (et toute nouvelle page dans `PAGES` de `outils/tests/pages.js`). GitHub les relance à chaque envoi (`test-pages.yml`); vérifier qu'ils passent après publication (`gh api repos/cfppaplc/bibliotheque/actions/runs?per_page=3`). Surveillance du site aux 30 min (`surveillance.yml`), sauvegarde Supabase le dimanche (`sauvegarde-supabase.yml`).
 
 ## Livres
 - Normes : `NORMES_LIVRES.md` (à relire pour tout livre). Source de chaque livre = original clair `/home/claude/originaux/livres/<f>.html` (perdu si la session est recréée : garder une copie).
