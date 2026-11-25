@@ -22,6 +22,7 @@ jobs:
           MDP: ${{ secrets.SAUVEGARDE_MDP }}
         run: |
           if [ -z "$CLE" ] || [ -z "$MDP" ]; then echo "Il manque le secret SUPABASE_SECRET ou SAUVEGARDE_MDP (voir le haut de ce fichier)."; exit 1; fi
+          case "$CLE" in sb_secret_*) echo "Sorte de clé : secrète (bon)";; sb_publishable_*) echo "Sorte de clé : publique (mauvaise clé copiée)";; eyJ*) echo "Sorte de clé : ancienne clé (JWT)";; *) echo "Sorte de clé : inconnue (espace ou caractère en trop ?)";; esac
           URL="https://kjlotlhqrgekzohshmbn.supabase.co/rest/v1"
           mkdir -p sauvegarde
           for t in coffre stats journal reveil; do
