@@ -48,6 +48,8 @@ input{width:100%;min-height:52px;border-radius:14px;border:0;padding:0 14px;font
 <script>
 "use strict";
 const $ = s => document.querySelector(s), LS = { get:k => { try { return JSON.parse(localStorage.getItem(k) || "null"); } catch(e){ return null; } }, set:(k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} } };
+/* Chrome, Samsung Internet, Edge… proposent l'installation directe : on garde l'occasion pour un bouton */
+let INSTALLER = null; addEventListener("beforeinstallprompt", e => { e.preventDefault(); INSTALLER = e; try { afficher(); } catch(x){} });
 const valide = c => /^MP-\d{3}-[A-Z0-9]{4,12}$/.test(c);
 /* carte reçue par le code QR (#c=…&g=…&p=…) : gardée, puis le # est effacé de l'adresse */
 (() => { const h = new URLSearchParams(location.hash.slice(1)), c = (h.get("c") || "").toUpperCase();
@@ -62,7 +64,8 @@ function afficher(){
   const ios = /iPhone|iPad|iPod/.test(navigator.userAgent), installe = navigator.standalone || matchMedia("(display-mode: standalone)").matches;
   $("#aide").innerHTML = installe ? `<b>Astuce :</b> monte la luminosité de ton écran si le lecteur a de la difficulté à lire ta carte.`
     : ios ? `<b>Garde ta carte sur ton cellulaire :</b> touche <b>Partager</b> (le carré avec la flèche), puis <b>« Sur l'écran d'accueil »</b>. Elle s'ouvrira même sans Internet.`
-    : `<b>Garde ta carte sur ton cellulaire :</b> menu ⋮ de Chrome, puis <b>« Ajouter à l'écran d'accueil »</b>. Elle s'ouvrira même sans Internet.`;
+    : `<b>Garde ta carte sur ton cellulaire :</b> ouvre le menu de ton navigateur (⋮ ou ≡, en haut ou en bas de l'écran), puis <b>« Ajouter à l'écran d'accueil »</b> ou <b>« Installer »</b>. Elle s'ouvrira même sans Internet.` + (INSTALLER ? `<button class="btn" id="inst">Installer « Ma carte » maintenant</button>` : "");
+  const ib = $("#inst"); if (ib) ib.onclick = async () => { const ev = INSTALLER; INSTALLER = null; ev.prompt(); try { await ev.userChoice; } catch(e){} afficher(); };
   try { navigator.wakeLock && navigator.wakeLock.request("screen").catch(() => {}); } catch(e){}   /* l'écran ne s'éteint pas pendant qu'on scanne */
 }
 $("#ok").onclick = () => { const c = $("#cle").value.trim().toUpperCase().replace(/\s+/g, ""); if (!valide(c)) { $("#err").textContent = "La clé ressemble à MP-123-ABC123."; return; } LS.set("mpCarte", { c, g:"", p:"", t:Date.now() }); afficher(); };
