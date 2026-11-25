@@ -96,7 +96,8 @@ test("Administration : chaque onglet s'ouvre; Quoi de neuf se modifie et s'annul
   vrai(tabs.length >= 11 && tabs[0] === "accueil", "Onglets : " + tabs.join(","));
   for (const k of tabs) { await p.click('.acces-onglets [data-ong="' + k + '"]'); await attendre(700);
     const vide = await p.evaluate(k => { const z = document.querySelector('.acces-pane[data-pane="' + k + '"]'); return !z || z.hidden || !z.innerText.trim(); }, k);
-    vrai(!vide, "Onglet vide : " + k); }
+    vrai(!vide, "Onglet vide : " + k);
+    if (await p.$(".ap-plein")) { await p.click("#apRet"); await attendre(300); vrai(!(await p.$(".ap-plein")), "Plein écran : « Retour » ne ferme pas"); } }   /* 25 nov. : outils d'administration en plein écran */
   await p.click('.acces-onglets [data-ong="nouv"]'); await attendre(800);
   await p.click('.ap-nv[data-i="0"]'); await p.fill("#nvT", "Essai titre"); await attendre(200);
   vrai(/attendent/.test(await p.textContent(".ap-pub .acces-etat")), "La modification n'est pas signalée");

@@ -131,7 +131,10 @@ window.ADMIN_PLUS = (function(){
   }
 
   /* ---------- Groupes et élèves (25 nov.) : la gestion des groupes, élèves, codes et collants se fait seulement ici ---------- */
-  function groupes(z){ ouvrirIci(z, "outils-atelier.html?gestion=1", "Groupes et élèves", z2 => classe(z2), "Classe et atelier"); }
+  function groupes(z){
+    const ouvre = () => ouvrirIci(z, "outils-atelier.html?gestion=1", "Groupes et élèves");
+    z.innerHTML = '<div class="ap-tete"><h3>Groupes et élèves</h3><p class="sous">Groupes, enseignants, locaux, élèves, codes et étiquettes. S\'ouvre en plein écran.</p></div><button class="abtn prim" id="agOuv">Ouvrir Groupes et élèves</button>';
+    z.querySelector("#agOuv").onclick = ouvre; ouvre(); }
   /* ---------- Classe et atelier ---------- */
   function classe(z){
     /* 25 nov. (Jeremy : « ça ne devrait pas s'ouvrir dans un nouveau lien ») : l'outil s'ouvre dans le panneau, dans un cadre à la hauteur de la page (pas de 2e défilement) */
@@ -144,16 +147,21 @@ window.ADMIN_PLUS = (function(){
       + '</div>';
     z.querySelectorAll("[data-ouvre]").forEach(b => b.onclick = () => ouvrirIci(z, b.dataset.ouvre, b.dataset.t));
   }
+  /* 25 nov. (Jeremy : « cette page devrait être en plein écran, dans le panneau c'est comme une page coupée ») :
+     l'outil s'ouvre par-dessus tout l'écran, avec une barre « ‹ Retour »; le panneau reste ouvert derrière */
   function ouvrirIci(z, url, titre, retour, nomRetour){
-    z.innerHTML = '<div class="ap-cadre-t"><button class="abtn" id="apRet">‹ ' + esc(nomRetour || "Classe et atelier") + '</button><b>' + esc(titre) + '</b></div><iframe class="ap-cadre" title="' + esc(titre) + '" src="' + esc(url) + '"></iframe>';
-    z.querySelector("#apRet").onclick = () => (retour || classe)(z);
-    const f = z.querySelector("iframe"), haut = () => Math.max(520, innerHeight - 190);
-    f.style.height = haut() + "px";
+    const vieux = document.querySelector(".ap-plein"); if (vieux) vieux.remove();
+    const o = document.createElement("div"); o.className = "ap-plein";
+    o.innerHTML = '<div class="ap-plein-t"><button class="abtn" id="apRet">‹ Retour à l\'administration</button><b>' + esc(titre) + '</b></div><iframe title="' + esc(titre) + '" src="' + esc(url) + '"></iframe>';
+    document.body.appendChild(o); const avant = document.documentElement.style.overflow; document.documentElement.style.overflow = "hidden";
+    const fermer = () => { o.remove(); document.documentElement.style.overflow = avant; removeEventListener("keydown", esc2); if (retour) retour(z); };
+    const esc2 = e => { if (e.key === "Escape" && !document.querySelector("dialog[open]")) fermer(); }; addEventListener("keydown", esc2);
+    o.querySelector("#apRet").onclick = fermer;
+    const f = o.querySelector("iframe");
     f.onload = () => { let d; try { d = f.contentDocument; } catch(e){ return; } if (!d) return;
-      const st = d.createElement("style"); st.textContent = ".mp-tete,.mp-pied,footer.mp-pied{display:none!important}body{min-height:0!important}"; d.head.appendChild(st);
-      const ajuste = () => { try { const h = Math.max(d.documentElement.scrollHeight, d.body ? d.body.scrollHeight : 0); const cur = f.getBoundingClientRect().height; if (h > cur + 8) f.style.height = (h + 4) + "px"; } catch(e){} };   /* une page à hauteur d'écran (accueil) ne grandit pas sans fin */
-      ajuste(); try { new f.contentWindow.ResizeObserver(ajuste).observe(d.body); } catch(e){ setInterval(ajuste, 1000); } };
+      const st = d.createElement("style"); st.textContent = ".mp-tete,.mp-pied,footer.mp-pied{display:none!important}"; d.head.appendChild(st); };
   }
+
 
 
   /* ---------- Magasin de raccords (25 nov.) ---------- */
