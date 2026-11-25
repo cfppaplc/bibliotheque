@@ -50,7 +50,7 @@ input{width:100%;min-height:52px;border-radius:14px;border:0;padding:0 14px;font
 const $ = s => document.querySelector(s), LS = { get:k => { try { return JSON.parse(localStorage.getItem(k) || "null"); } catch(e){ return null; } }, set:(k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} } };
 /* Chrome, Samsung Internet, Edge… proposent l'installation directe : on garde l'occasion pour un bouton */
 let INSTALLER = null; addEventListener("beforeinstallprompt", e => { e.preventDefault(); INSTALLER = e; try { afficher(); } catch(x){} });
-const valide = c => /^MP-\d{3}-[A-Z0-9]{4,12}$/.test(c);
+const valide = c => /^MP-\d{3,5}-[A-Z0-9]{4,12}$/.test(c);
 /* carte reçue par le code QR (#c=…&g=…&p=…) : gardée, puis le # est effacé de l'adresse */
 (() => { const h = new URLSearchParams(location.hash.slice(1)), c = (h.get("c") || "").toUpperCase();
   if (valide(c)) { LS.set("mpCarte", { c, g:h.get("g") || "", p:(h.get("p") || "").split(/\s+/)[0].slice(0, 30), t:Date.now() }); history.replaceState(null, "", location.pathname); } })();

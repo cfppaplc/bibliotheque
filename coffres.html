@@ -261,7 +261,7 @@ $("#ov").onclick = e => { if (e.target.id === "ov") fermer(); };
 const lireListe = t => String(t || "").split("\n").map(l => l.trim()).filter(Boolean).slice(0, 80).map(l => { const m = l.match(/^(\d{1,3})\s*[x×]?\s+(.+)$/i); return m ? { q:+m[1], n:m[2].slice(0, 60) } : { q:1, n:l.slice(0, 60) }; });
 const ecrireListe = L => (L || []).map(x => (x.q > 1 ? x.q + " x " : "") + x.n).join("\n");
 
-/* rangées publiques (aucune donnée d'élève) : coffres de l'enseignant + codes à 3 chiffres du passeport */
+/* rangées publiques (aucune donnée d'élève) : coffres de l'enseignant + codes des élèves du passeport */
 const API = "https://kjlotlhqrgekzohshmbn.supabase.co/rest/v1/rpc/", CLEAPI = "sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY";
 const hx = async s => [...new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s)))].map(b => b.toString(16).padStart(2, "0")).join("");
 const rpc = async (f, a) => { const r = await fetch(API + f, { method:"POST", headers:{ apikey:CLEAPI, "Content-Type":"application/json" }, body:JSON.stringify(a) }); if (!r.ok) throw new Error("coffre " + r.status); return r.json(); };
@@ -273,7 +273,7 @@ const PUB = { lire:ens => lirePub("metier+|coffres-pub|" + ens),
 
 /* verrou de session (14 nov., « personne ne peut refaire l'inventaire tant qu'une est active, sauf l'enseignant ») :
    rangée publique par coffre et par session (date + matin / après-midi / soir); le 1er qui l'écrit la garde (jeton);
-   le jeton est envoyé chiffré à l'enseignant, qui peut libérer le coffre. Contenu : codes à 3 chiffres et heure seulement. */
+   le jeton est envoyé chiffré à l'enseignant, qui peut libérer le coffre. Contenu : codes des élèves et heure seulement. */
 /* 14 nov. (soir) : le verrou ne dépend plus de l'heure : un coffre reste à la même équipe toute la session de cours; « tour » = numéro d'inventaire, augmenté par l'enseignant (changement d'équipe, fin de session) */
 const VERROU = { id:(cid, ses) => hx("metier+|coffre-pris|" + cid + "|" + ses),
   async lire(cid, ses){ try { const r = await rpc("coffre_lire", { p_id:await this.id(cid, ses) }), row = r && r[0]; return row ? JSON.parse(row.data || "{}") : null; } catch(e){ return null; } },
@@ -297,10 +297,10 @@ async function vueEleve(){
   const ferme = () => { V.innerHTML = `<div class="top"><img src="${LOGO}" alt="Métier+"></div><h1>${esc(cf.nom)}</h1><p class="sous">Ce coffre n'est assigné à aucune équipe pour l'instant. Avise ton enseignant.</p>`; };
   let mc = "", mp = ""; try { mc = localStorage.getItem("passCode") || ""; mp = localStorage.getItem("passPrenom") || ""; } catch(e) {}
   /* 25 nov. : « Ma carte » installée sur ce cellulaire → code et prénom déjà remplis */
-  try { const K = JSON.parse(localStorage.getItem("mpCarte") || "null"); const m = K && String(K.c || "").match(/^MP-(\d{3})-/); if (m && !mc) mc = m[1]; if (K && K.p && !mp) mp = K.p; } catch(e) {}
-  const idt = `<div class="idt">${parCode && (cf.eqc || []).length ? "<style>label[for=c2],#c2{display:none}</style>" : ""}${parCode ? `<label for="cd">Ton code (3 chiffres)</label><input id="cd" inputmode="numeric" maxlength="3" value="${esc(mc)}" autocomplete="off">`
+  try { const K = JSON.parse(localStorage.getItem("mpCarte") || "null"); const m = K && String(K.c || "").match(/^MP-(\d{3,5})-/); if (m && !mc) mc = m[1]; if (K && K.p && !mp) mp = K.p; } catch(e) {}
+  const idt = `<div class="idt">${parCode && (cf.eqc || []).length ? "<style>label[for=c2],#c2{display:none}</style>" : ""}${parCode ? `<label for="cd">Ton code (5 chiffres)</label><input id="cd" inputmode="numeric" maxlength="5" value="${esc(mc)}" autocomplete="off">`
     : `<label for="pn">Ton prénom</label><input id="pn" maxlength="24" value="${esc(mp)}" autocomplete="given-name">`}
-    <label for="c2">${parCode ? "Code de ton coéquipier" : "Prénom de ton coéquipier"} <small style="font-weight:500;color:var(--gris)">(si vous êtes deux)</small></label><input id="c2" ${parCode ? 'inputmode="numeric" maxlength="3"' : 'maxlength="24"'} autocomplete="off"><p class="err" id="er" hidden></p></div>`;
+    <label for="c2">${parCode ? "Code de ton coéquipier" : "Prénom de ton coéquipier"} <small style="font-weight:500;color:var(--gris)">(si vous êtes deux)</small></label><input id="c2" ${parCode ? 'inputmode="numeric" maxlength="5"' : 'maxlength="24"'} autocomplete="off"><p class="err" id="er" hidden></p></div>`;
   const qui = () => { const v2 = $("#c2").value.trim();
     if (parCode){ const c = $("#cd").value.trim(); if (!codes.includes(c)) return null; if (!v2){ const eq = cf.eqc || [], o = eq.filter(z => z !== c); return eq.includes(c) && o.length ? { c, c2:o[0] } : { c }; } return codes.includes(v2) && v2 !== c ? { c, c2:v2 } : "c2"; }
     const p = prenom($("#pn").value); if (p.length < 2) return null; const p2 = prenom(v2); return p2.length >= 2 ? { p, p2 } : { p }; };
@@ -580,7 +580,7 @@ async function releve(manuel){
       if (!x){ vides++; continue; } vides = 0;
       if (x.k === "cle" || x.k === "sync"){ const R = await SY.recevoir(s.id, x); if (R.garder) continue; if (R.ok) neufs += appliquerSync(R.ok, x.de); try { await COFFRE.jeter(nom); } catch(e) {} continue; }
       if (!K.vus[x.uid]){
-        const w = x.c ? { c:x.c } : { p:prenom(x.p) }; if (x.c2) w.c2 = String(x.c2).slice(0, 3); if (x.p2) w.p2 = prenom(x.p2);
+        const w = x.c ? { c:x.c } : { p:prenom(x.p) }; if (x.c2) w.c2 = String(x.c2).slice(0, 5); if (x.p2) w.p2 = prenom(x.p2);
         if (x.k === "liste"){ const c = K.cf[x.cf]; if (c && !c.x && !(c.liste || []).length){ c.prop = { liste:lireListe(ecrireListe(x.liste)), w, t:x.t }; c.t = Date.now(); neufs++; } }
         else if (x.k === "ok" || x.k === "manque"){ K.ev[x.uid] = Object.assign({ cf:x.cf, k:x.k, d:x.t, t:Date.now(), items:x.k === "manque" ? (x.items || []).slice(0, 80) : undefined, r:x.r ? 1 : undefined, note:x.note || undefined, lj:x.lj, ses:x.ses }, w); neufs++; }
         K.vus[x.uid] = Date.now();

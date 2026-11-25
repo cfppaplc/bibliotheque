@@ -104,7 +104,7 @@ const heure = t => { const d = new Date(t); return d.toLocaleDateString("fr-CA",
 function toast(m){ const d = document.createElement("div"); d.className = "toast"; d.textContent = m; document.body.appendChild(d); setTimeout(() => d.remove(), 2600); }
 function bip(){ try { const a = new AudioContext(), o = a.createOscillator(), g = a.createGain(); o.connect(g); g.connect(a.destination); o.frequency.value = 880; g.gain.value = .15; o.start(); setTimeout(() => { o.frequency.value = 1320; }, 140); setTimeout(() => { o.stop(); a.close(); }, 300); } catch(e){} }
 /* carte de l'élève : le lecteur de codes-barres tape « MP-123-K7Q9X2 » puis Entrée; à la main, l'élève tape 123 */
-const lireCarte = v => { const m = String(v || "").toUpperCase().match(/(\d{3})(?:-([A-Z0-9]{4,12}))?\s*$/); return m ? { code:m[1], cle:m[2] || "" } : null; };
+const lireCarte = v => { const m = String(v || "").toUpperCase().match(/(\d{5}|\d{3})(?:-([A-Z0-9]{4,12}))?\s*$/); return m ? { code:m[1], cle:m[2] || "" } : null; };
 
 /* ---------- comptes et codes des élèves (registres partagés, numéros seulement) ---------- */
 let COMPTES = {};
@@ -136,11 +136,11 @@ const sauverPanier = () => LS.set("magPanier", PANIER);
 const nbPanier = () => Object.values(PANIER).reduce((s, q) => s + q, 0);
 function eleveEntree(msg){
   $("#tSortir").hidden = true; $("#tQui").textContent = ""; $("#barre").hidden = true;
-  $("#app").innerHTML = `<h1>Magasin de raccords</h1><p class="sous">Scanne ta carte étudiante, ou tape ton code à 3 chiffres.</p>
-    <div class="carte"><input class="code" id="cCode" inputmode="numeric" autocomplete="off" autocapitalize="characters" placeholder="000" aria-label="Ton code">
+  $("#app").innerHTML = `<h1>Magasin de raccords</h1><p class="sous">Scanne ta carte étudiante, ou tape ton code à 5 chiffres.</p>
+    <div class="carte"><input class="code" id="cCode" inputmode="numeric" autocomplete="off" autocapitalize="characters" placeholder="00000" aria-label="Ton code">
     <label for="cPre" style="display:block;font-weight:600;margin-top:6px">Ton prénom</label><input id="cPre" class="pre" autocomplete="given-name" maxlength="20" placeholder="Prénom seulement" value="${esc((LS.get("mpCarte", null) || {}).p || LS.get("magPrenom", ""))}">
     <p class="err" id="cErr">${esc(msg || "")}</p><button class="btn p" id="cOk">Entrer</button></div>`;
-  const i = $("#cCode"), go = async () => { const c = lireCarte(i.value); if (!c) { $("#cErr").textContent = "Ton code a 3 chiffres."; return; }
+  const i = $("#cCode"), go = async () => { const c = lireCarte(i.value); if (!c) { $("#cErr").textContent = "Ton code a 5 chiffres."; return; }
     const pre = ($("#cPre").value || "").trim().split(/\s+/)[0]; if (!pre) { $("#cErr").textContent = "Écris ton prénom (le magasinier le verra)."; $("#cPre").focus(); return; } LS.set("magPrenom", pre);
     $("#cOk").disabled = true; $("#cErr").textContent = "Recherche de ton groupe…";
     const L = await trouverEleve(c.code);
@@ -148,7 +148,7 @@ function eleveEntree(msg){
     if (L.length === 1) return connecter(c.code, L[0]);
     $("#cErr").innerHTML = "Quel est ton groupe ? " + L.map((x, k) => `<button class="btn" data-k="${k}" style="margin:6px 6px 0 0">${esc(x.groupe)} · ${esc(nomEns(x.ens))}</button>`).join("");
     $("#cErr").querySelectorAll("[data-k]").forEach(b => b.onclick = () => connecter(c.code, L[+b.dataset.k])); };
-  i.onkeydown = e => { if (e.key === "Enter") go(); }; i.oninput = () => { if (/^\d{3}$/.test(i.value) && $("#cPre").value.trim()) go(); }; $("#cPre").onkeydown = e => { if (e.key === "Enter") go(); }; $("#cOk").onclick = go; i.focus();
+  i.onkeydown = e => { if (e.key === "Enter") go(); }; i.oninput = () => { if (/^\d{5}$/.test(i.value) && $("#cPre").value.trim()) go(); }; $("#cPre").onkeydown = e => { if (e.key === "Enter") go(); }; $("#cOk").onclick = go; i.focus();
 }
 function connecter(code, x){ MOI = { code, ens:x.ens, groupe:x.groupe, profs:(x.profs || []).filter(id => id !== x.ens), prenom:LS.get("magPrenom", "") }; LS.set("magEleve", MOI); eleveCatalogue(); }
 function enTete(){ $("#tQui").innerHTML = `<b>${esc(MOI.prenom || "")}</b> <span class="cg">· ${esc(MOI.code)}</span><span class="gp"> · ${esc(MOI.groupe)}</span>`; $("#tSortir").hidden = false;
@@ -305,7 +305,7 @@ function magasinier(){
   $("#app").innerHTML = `<div class="mag-code"><input id="mC" autocomplete="off" placeholder="Scanne la carte ou tape le code" aria-label="Code de l'élève"><button class="btn" id="mTous">Tout voir</button></div><div id="mL"><p class="vide">Chargement…</p></div>`;
   const i = $("#mC"), appl = () => { const c = lireCarte(i.value); FILTRE_CODE = c ? c.code : ""; dessinerMag(); };
   i.onkeydown = e => { if (e.key === "Enter") { appl(); i.select(); } if (e.key === "Escape") { i.value = ""; appl(); } };
-  i.oninput = () => { if (/^\d{3}$/.test(i.value.trim()) || i.value.trim() === "") appl(); };
+  i.oninput = () => { if (/^\d{5}$/.test(i.value.trim()) || i.value.trim() === "") appl(); };
   $("#mTous").onclick = () => { i.value = ""; appl(); i.focus(); };
   document.addEventListener("keydown", e => { if (document.activeElement !== i && /^[0-9A-Za-z-]$/.test(e.key) && !e.ctrlKey && !e.metaKey && !e.altKey) { i.value = ""; i.focus(); } });   /* le lecteur tape même si le curseur est ailleurs */
   i.focus(); charger();

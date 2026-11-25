@@ -269,7 +269,7 @@ async function vueEleve(){
   const ens = Q.get("e") || "", grp = Q.get("g") || "";
   let faits = {}; try { faits = JSON.parse(localStorage.getItem("passFaits") || "{}"); } catch(e) {}
   const R0 = ens ? await PARTAGE.lire(ens) : { suivi:[], formes:{}, grp:[], codes:null }, suivi = R0.suivi.includes(o.id);
-  let monCode = ""; try { monCode = localStorage.getItem("passCode") || ""; } catch(e) {} if (!monCode) monCode = (() => { try { const K = JSON.parse(localStorage.getItem("mpCarte") || "null"); const m = K && String(K.c || "").match(/^MP-(\d{3})-/); return m ? m[1] : ""; } catch(e){ return ""; } })();   /* 25 nov. : « Ma carte » sur ce cellulaire */
+  let monCode = ""; try { monCode = localStorage.getItem("passCode") || ""; } catch(e) {} if (!monCode) monCode = (() => { try { const K = JSON.parse(localStorage.getItem("mpCarte") || "null"); const m = K && String(K.c || "").match(/^MP-(\d{3,5})-/); return m ? m[1] : ""; } catch(e){ return ""; } })();   /* 25 nov. : « Ma carte » sur ce cellulaire */
   if (!faits[o.id] && monCode && (R0.formes[o.id] || []).includes(monCode)) faits[o.id] = 1;
   if (faits[o.id] && !Q.get("formation") && ens && monCode && R0.codes && !(R0.formes[o.id] || []).includes(monCode)){
     V.innerHTML = `<div class="top"><img src="${LOGO}" alt="Métier+"></div><div class="fini"><div class="rond" style="background:#E08A1E">◐</div><h1>Démonstration pratique à faire</h1>
@@ -295,7 +295,7 @@ async function vueEleve(){
     <div class="signer" id="sg" hidden>
       <h2>Ta signature</h2>
       <label for="pn" id="pnL">Ton prénom</label><input id="pn" type="text" autocomplete="off" maxlength="22" placeholder="Prénom (ex. : Marc ou Marc B.)">
-      <div id="cdZ" hidden><label for="cd">Ton code (3 chiffres, donné par ton enseignant)</label><input id="cd" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" maxlength="3" placeholder="000" style="font-size:28px;letter-spacing:8px;text-align:center;max-width:160px"><p class="err" id="cdEr" hidden>Ce code n'existe pas dans ce groupe. Vérifie avec ton enseignant.</p></div>
+      <div id="cdZ" hidden><label for="cd">Ton code (5 chiffres, donné par ton enseignant)</label><input id="cd" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" maxlength="5" placeholder="00000" style="font-size:28px;letter-spacing:8px;text-align:center;max-width:160px"><p class="err" id="cdEr" hidden>Ce code n'existe pas dans ce groupe. Vérifie avec ton enseignant.</p></div>
       <label for="gr">Ton groupe</label><div id="grB" class="epi" style="margin:4px 0 10px"></div><input id="gr" type="text" autocomplete="off" maxlength="20" placeholder="Numéro du groupe (ex. : 2608)">
       <label>Signe avec ton doigt</label><div class="toile"><canvas id="cv"></canvas><span>Signe ici</span></div>
       <p class="engage">En signant, je confirme avoir suivi la formation sur l'outil « ${esc(o.nom)} » et je m'engage à respecter ces étapes chaque fois que je l'utilise.</p>
@@ -324,8 +324,8 @@ async function vueEleve(){
   try { pn.value = localStorage.getItem("passPrenom") || ""; gr.value = grp || localStorage.getItem("passGroupe") || ""; } catch(e) {}
   /* groupes créés par l'enseignant : l'élève touche le sien (pas de faute de frappe possible) */
   var INFO = { grp:[], part:{}, codes:null };
-  const cd = $("#cd"); cd.oninput = () => { cd.value = cd.value.replace(/\D/g, "").slice(0, 3); pret(); };
-  try { cd.value = localStorage.getItem("passCode") || (() => { try { const K = JSON.parse(localStorage.getItem("mpCarte") || "null"); const m = K && String(K.c || "").match(/^MP-(\d{3})-/); return m ? m[1] : ""; } catch(e){ return ""; } })(); } catch(e) {}
+  const cd = $("#cd"); cd.oninput = () => { cd.value = cd.value.replace(/\D/g, "").slice(0, 5); pret(); };
+  try { cd.value = localStorage.getItem("passCode") || (() => { try { const K = JSON.parse(localStorage.getItem("mpCarte") || "null"); const m = K && String(K.c || "").match(/^MP-(\d{3,5})-/); return m ? m[1] : ""; } catch(e){ return ""; } })(); } catch(e) {}
   function parCode(){ const g = $("#gr"); return !!(INFO && INFO.codes && g && INFO.codes[g.value] && INFO.codes[g.value].length); }
   if (ens) PARTAGE.lire(ens).then(r => { INFO = r; if (!r.grp.length) return;
     const z = $("#grB"); gr.hidden = true; if (!r.grp.includes(gr.value)) gr.value = "";
@@ -334,8 +334,8 @@ async function vueEleve(){
     peindre(); pret(); });
   function pret(){ const b = $("#bEnv"); if (!b) return; const pc = parCode(), cd = $("#cd"), gr = $("#gr");
     $("#cdZ").hidden = !pc; $("#pnL").hidden = pn.hidden = pc;
-    const cOk = pc && cd.value.length === 3 && INFO.codes[gr.value].includes(cd.value);
-    $("#cdEr").hidden = !(pc && cd.value.length === 3 && !cOk);
+    const cOk = pc && cd.value.length === 5 && INFO.codes[gr.value].includes(cd.value);
+    $("#cdEr").hidden = !(pc && cd.value.length === 5 && !cOk);
     b.disabled = !((pc ? cOk : prenom(pn.value).length >= 2) && gr.value.trim().length >= 1 && traits.reduce((n, t) => n + t.length, 0) >= 8 && coche.size === o.etapes.length); }
   $("#bEnv").onclick = async () => {
     const b = $("#bEnv"), er = $("#er"); b.disabled = true; b.textContent = "Envoi…"; er.hidden = true;
@@ -371,15 +371,15 @@ function dejaVue(o, ens, V, R0, suivi){
   V.innerHTML = `<div class="top"><img src="${LOGO}" alt="Métier+"><span class="esp" style="flex:1"></span><span class="tag">Registre de formation</span></div>
     <span class="tag">Déjà formé?</span><h1>${esc(o.nom)}</h1><p class="sous">Entre ton groupe et ton code : si ta formation est déjà signée, tu n'as pas à la refaire.</p>
     <div class="signer"><label>Ton groupe</label><div id="dgB" class="epi" style="margin:4px 0 10px"></div>
-      <label for="dcd">Ton code (3 chiffres)</label><input id="dcd" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" placeholder="000" style="font-size:28px;letter-spacing:8px;text-align:center;max-width:160px">
+      <label for="dcd">Ton code (5 chiffres)</label><input id="dcd" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="5" placeholder="00000" style="font-size:28px;letter-spacing:8px;text-align:center;max-width:160px">
       <button class="btn p" id="dOk" style="width:100%;min-height:56px;font-size:18px;margin-top:14px" disabled>Vérifier</button><p class="err" id="dEr" hidden></p></div>
     <p style="margin-top:16px"><a href="?o=${encodeURIComponent(o.id)}&e=${encodeURIComponent(ens)}&formation=1">Faire la formation</a></p>`;
   let g = ""; try { g = localStorage.getItem("passGroupe") || ""; } catch(e) {} if (!R0.grp.includes(g)) g = "";
   const cd = $("#dcd"); try { cd.value = localStorage.getItem("passCode") || ""; } catch(e) {}
-  const pret = () => { $("#dOk").disabled = !(g && cd.value.length === 3); $("#dEr").hidden = true; };
+  const pret = () => { $("#dOk").disabled = !(g && cd.value.length === 5); $("#dEr").hidden = true; };
   const peindre = () => { $("#dgB").innerHTML = R0.grp.map(x => `<button type="button" class="btn${x === g ? " p" : ""}" data-g="${esc(x)}" style="min-height:52px;min-width:90px;font-size:18px">${esc(x)}</button>`).join("");
     $("#dgB").querySelectorAll("button").forEach(b => b.onclick = () => { g = b.dataset.g; peindre(); pret(); }); };
-  cd.oninput = () => { cd.value = cd.value.replace(/\D/g, "").slice(0, 3); pret(); }; peindre(); pret();
+  cd.oninput = () => { cd.value = cd.value.replace(/\D/g, "").slice(0, 5); pret(); }; peindre(); pret();
   $("#dOk").onclick = () => {
     const ok = R0.codes && (R0.codes[g] || []).includes(cd.value) && (R0.formes[o.id] || []).includes(cd.value);
     if (!ok){ $("#dEr").hidden = false; $("#dEr").textContent = R0.codes && (R0.codes[g] || []).includes(cd.value) ? "Aucune formation signée pour ce code. Fais la formation (lien plus bas)." : "Ce code n'existe pas dans ce groupe. Vérifie avec ton enseignant."; return; }
@@ -398,7 +398,7 @@ async function sortieVue(o, ens, V){
     <span class="tag">Sortie d'outil</span><h1>${esc(o.nom)}</h1>
     <p class="sous">${dehors ? "Tu rapportes l'outil? Touche « Je rapporte l'outil »." : "Indique que tu prends l'outil. Ton enseignant voit qui l'a et depuis quand."}</p>
     <div class="signer"><label>Ton groupe</label><div id="sgB" class="epi" style="margin:4px 0 10px"></div><input id="sgr" type="text" maxlength="20" placeholder="Numéro du groupe" hidden>
-      <div id="scZ" hidden><label for="scd">Ton code (3 chiffres)</label><input id="scd" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" placeholder="000" style="font-size:28px;letter-spacing:8px;text-align:center;max-width:160px"><p class="err" id="scEr" hidden>Ce code n'existe pas dans ce groupe.</p></div>
+      <div id="scZ" hidden><label for="scd">Ton code (5 chiffres)</label><input id="scd" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="5" placeholder="00000" style="font-size:28px;letter-spacing:8px;text-align:center;max-width:160px"><p class="err" id="scEr" hidden>Ce code n'existe pas dans ce groupe.</p></div>
       <div id="spZ" hidden><label for="spn">Ton prénom</label><input id="spn" type="text" maxlength="22" placeholder="Prénom (ex. : Marc ou Marc B.)"></div>
       <div style="display:grid;gap:10px;margin-top:14px">
         <button class="btn ${dehors ? "" : "p"}" id="sPrend" style="min-height:58px;font-size:19px" disabled>Je prends l'outil</button>
@@ -413,10 +413,10 @@ async function sortieVue(o, ens, V){
   const peindre = () => { $("#sgB").innerHTML = INFO.grp.map(g => `<button type="button" class="btn${g === gr.value ? " p" : ""}" data-g="${esc(g)}" style="min-height:52px;min-width:90px;font-size:18px">${esc(g)}</button>`).join("");
     $("#sgB").querySelectorAll("button").forEach(b => b.onclick = () => { gr.value = b.dataset.g; peindre(); pret(); }); };
   function pret(){ const pc = parCode(); $("#scZ").hidden = !pc; $("#spZ").hidden = pc || !gr.value;
-    const cOk = pc && cd.value.length === 3 && INFO.codes[gr.value].includes(cd.value);
-    $("#scEr").hidden = !(pc && cd.value.length === 3 && !cOk);
+    const cOk = pc && cd.value.length === 5 && INFO.codes[gr.value].includes(cd.value);
+    $("#scEr").hidden = !(pc && cd.value.length === 5 && !cOk);
     const ok = gr.value.trim() && (pc ? cOk : prenom(pn.value).length >= 2); $("#sPrend").disabled = $("#sRap").disabled = !ok; }
-  cd.oninput = () => { cd.value = cd.value.replace(/\D/g, "").slice(0, 3); pret(); }; pn.oninput = gr.oninput = pret;
+  cd.oninput = () => { cd.value = cd.value.replace(/\D/g, "").slice(0, 5); pret(); }; pn.oninput = gr.oninput = pret;
   peindre(); pret();
   const envoyer = async k => {
     const er = $("#sEr"); er.hidden = true; $("#sPrend").disabled = $("#sRap").disabled = true;
@@ -448,7 +448,7 @@ async function publierGrp(){
   if (!window.__moi) return; const L = groupes().filter(g => g !== "À classer"), C = codesPub(L), k = JSON.stringify([L, PART, C, suivis(), formesPub()]);
   if (localStorage.getItem("passGrpPub") === k) return;
   try { await PARTAGE.ecrire(window.__moi, { grp:L, part:PART, codes:C }); localStorage.setItem("passGrpPub", k); } catch(e) {} }
-/* codes à 3 chiffres des élèves (14 nov.) : seuls les numéros sont publics, jamais les prénoms */
+/* codes des élèves (14 nov.; 5 chiffres depuis le 25 nov.) : seuls les numéros sont publics, jamais les prénoms */
 /* codes des élèves déjà formés, par outil (numéros seulement) : l'élève formé ne refait pas la formation sur un autre appareil */
 /* démonstration (14 nov.) : une signature d'élève devient « formé » seulement quand l'enseignant a vu les manipulations */
 const forme = v => !!(v && v.d && (v.m || !v.s)), aDemo = v => !!(v && v.d && v.s && !v.m);
@@ -457,7 +457,14 @@ const formesPub = () => { const F = {}; for (const k in D.val){ const v = D.val[
   if (e && !e.x && e.c) (F[oid] = F[oid] || []).push(e.c); } for (const o in F) F[o].sort(); return F; };
 const codesPub = L => { const C = {}; L.forEach(g => C[g] = []); Object.values(D.el).forEach(e => { if (!e.x && e.c && C[e.g]) C[e.g].push(e.c); }); return C; };
 function codeLibre(){ const pris = new Set(Object.values(D.el).filter(e => !e.x && e.c).map(e => e.c));
-  for (let i = 0; i < 2000; i++){ const c = String(100 + Math.floor(Math.random() * 900)); if (!pris.has(c)) return c; } return ""; }
+  for (let i = 0; i < 5000; i++){ const c = String(10000 + Math.floor(Math.random() * 90000)); if (!pris.has(c)) return c; } return ""; }
+/* 25 nov. (Jeremy : « des codes à 5 chiffres », tout changer) : passage des codes à 3 chiffres à 5 chiffres.
+   Le nouveau code se calcule à partir de l'identifiant de l'élève : chaque appareil obtient le même code, sans conflit de synchronisation. */
+function codes5(){ const L = Object.entries(D.el).filter(([, e]) => !e.x && e.c && String(e.c).length < 5).sort((a, b) => a[0].localeCompare(b[0])); if (!L.length) return false;
+  const pris = new Set(Object.values(D.el).filter(e => !e.x && e.c && String(e.c).length === 5).map(e => e.c));
+  for (const [id, e] of L){ let h = 2166136261; for (const ch of id) h = Math.imul(h ^ ch.charCodeAt(0), 16777619) >>> 0;
+    let n = h % 90000; while (pris.has(String(10000 + n))) n = (n + 7919) % 90000; e.c = String(10000 + n); pris.add(e.c); e.t = Date.now(); }
+  return true; }
 /* 25 nov. : clé de la carte étudiante (6 caractères, sans lettres qui se confondent) : collant « MP-123-K7Q9X2 » scanné au magasin, aux coffres et (plus tard) aux livres */
 function cleCarte(){ const A = "ACDEFGHJKLMNPQRTUVWXY3479", r = crypto.getRandomValues(new Uint8Array(6)); return [...r].map(x => A[x % A.length]).join(""); }
 const nid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
@@ -486,7 +493,7 @@ $("#ov").onclick = e => { if (e.target.id === "ov") fermer(); };
 document.addEventListener("keydown", e => { if (e.key === "Escape") fermer(); });
 
 function dessiner(){
-  let mig = false; Object.values(D.el).forEach(e => { if (!e.x && !e.c){ e.c = codeLibre(); e.t = Date.now(); mig = true; } if (!e.x && !e.k){ e.k = cleCarte(); e.t = Date.now(); mig = true; } }); if (mig) sauver();
+  let mig = window.ADMIN ? codes5() : false; Object.values(D.el).forEach(e => { if (!e.x && !e.c){ e.c = codeLibre(); e.t = Date.now(); mig = true; } if (!e.x && !e.k){ e.k = cleCarte(); e.t = Date.now(); mig = true; } }); if (mig) sauver();
   dessinerSorties();
   const gs = groupes(); if (!gs.includes(GRP)) GRP = gs[0] || "";
   $("#grp").innerHTML = gs.length ? gs.map(g => `<option ${g === GRP ? "selected" : ""}>${esc(g)}</option>`).join("") : `<option value="">Aucun groupe</option>`;
