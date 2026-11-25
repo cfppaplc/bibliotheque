@@ -2709,8 +2709,8 @@ window.QUIZ_LIVRES = [
 "exemple": true,
 "livre": true,
 "defi": true,
-"titre": "Administration d'un bâtiment · Défi+ 1 de 4",
-"sujet": "Chapitres 1 à 3 : le préposé, les lois et le TAL, louer un logement",
+"titre": "Administration d'un bâtiment · Défi+ 1 de 6",
+"sujet": "Chapitres 1 et 2 : le préposé, les lois et le TAL",
 "couv": "img/couvertures/administration-batiment.jpg",
 "coul": "#2E8B57",
 "reg": {
@@ -2844,6 +2844,93 @@ window.QUIZ_LIVRES = [
 "u": "jours"
 },
 {
+"q": "Associe l'organisme à son rôle.",
+"t": "paires",
+"g": [
+"TAL",
+"CNESST",
+"Régie du bâtiment",
+"Municipalité"
+],
+"ch": [
+"Règle les litiges entre locateur et locataire",
+"Santé et sécurité au travail",
+"Normes de construction et de sécurité des bâtiments",
+"Règlements de salubrité et permis"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Le bail d'un logement au Québec se fait sur…",
+"ch": [
+"aucun papier : la parole suffit",
+"une feuille écrite à la main",
+"le formulaire obligatoire du TAL",
+"un contrat fait par le locateur"
+],
+"bon": 2,
+"s": 20
+},
+{
+"q": "Le préposé peut entrer dans un logement sans avis pour une urgence.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15,
+"expl": "En cas d'urgence (fuite, feu), l'accès est permis sans avis."
+},
+{
+"q": "Pour une visite non urgente, le locataire doit recevoir un avis d'au moins…",
+"ch": [
+"24 heures",
+"1 mois",
+"1 semaine",
+"1 heure"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Que garde-t-on au dossier d'un logement?",
+"ch": [
+"Le bail",
+"Les avis remis",
+"Les bons de travail",
+"Les opinions sur le locataire"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"t": "multi"
+}
+]
+},
+{
+"id": "defi-administration-batiment-2",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Administration d'un bâtiment · Défi+ 2 de 6",
+"sujet": "Chapitres 2 à 4 : louer un logement, le crédit",
+"couv": "img/couvertures/administration-batiment.jpg",
+"coul": "#2E8B57",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
 "q": "Au Québec, le locateur peut exiger un dépôt de garantie pour les dommages.",
 "ch": [
 "Vrai",
@@ -2895,23 +2982,7 @@ window.QUIZ_LIVRES = [
 "bon": 1,
 "s": 15,
 "expl": "Elle ne l'oblige pas, mais c'est la meilleure protection."
-}
-]
 },
-{
-"id": "defi-administration-batiment-2",
-"exemple": true,
-"livre": true,
-"defi": true,
-"titre": "Administration d'un bâtiment · Défi+ 2 de 4",
-"sujet": "Chapitres 3 à 8 : crédit, loyer, colocation, nuisances, chauffage, entretien",
-"couv": "img/couvertures/administration-batiment.jpg",
-"coul": "#2E8B57",
-"reg": {
-"nb": "tout",
-"melange": "tout"
-},
-"qs": [
 {
 "q": "Pour une enquête de crédit, qu'est-ce que le locateur n'a PAS besoin de demander?",
 "ch": [
@@ -2967,6 +3038,81 @@ window.QUIZ_LIVRES = [
 "bon": 1,
 "s": 20
 },
+{
+"q": "Remets dans l'ordre la location d'un logement.",
+"ch": [
+"Annonce et visite",
+"Demande de location et vérifications",
+"Signature du bail",
+"Inspection d'entrée et remise des clés"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "Au Québec, un dépôt de sécurité exigé au locataire est…",
+"ch": [
+"permis s'il est remboursé au départ",
+"interdit, sauf le premier mois de loyer",
+"obligatoire et égal à deux mois",
+"laissé au choix du locateur"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Une cote de crédit élevée veut dire que la personne…",
+"ch": [
+"a payé ses dettes à temps",
+"n'a jamais emprunté",
+"gagne un gros salaire",
+"a beaucoup de cartes de crédit"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "On peut refuser un locataire parce qu'il a des enfants.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 1,
+"s": 15,
+"expl": "C'est de la discrimination interdite par la Charte."
+},
+{
+"q": "Une personne gagne 3 000 $ par mois. Le loyer conseillé est d'environ 30 % : combien de $?",
+"t": "estim",
+"ch": [],
+"bon": 900,
+"tol": 10,
+"u": "$",
+"s": 30,
+"expl": "30 % de 3 000 $ = 900 $."
+}
+]
+},
+{
+"id": "defi-administration-batiment-3",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Administration d'un bâtiment · Défi+ 3 de 6",
+"sujet": "Chapitres 5 à 8 : loyer, colocation, nuisances, chauffage, entretien",
+"couv": "img/couvertures/administration-batiment.jpg",
+"coul": "#2E8B57",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
 {
 "q": "Cession ou sous-location : dans laquelle le locataire reste-t-il responsable du bail?",
 "ch": [
@@ -3076,16 +3222,78 @@ window.QUIZ_LIVRES = [
 ],
 "bon": 1,
 "s": 20
+},
+{
+"q": "Associe la situation au bon document.",
+"t": "paires",
+"g": [
+"Hausse de loyer",
+"Sous-location",
+"Travaux majeurs",
+"Retard de loyer"
+],
+"ch": [
+"Avis de modification du bail",
+"Avis au locateur du locataire",
+"Avis de travaux au locataire",
+"Rappel écrit, puis TAL au besoin"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Le locataire qui reçoit un avis de hausse a combien de temps pour la refuser?",
+"ch": [
+"aucun : il doit accepter",
+"1 semaine après l'avis",
+"jusqu'à la fin du bail",
+"1 mois après l'avis"
+],
+"bon": 3,
+"s": 20
+},
+{
+"q": "Une plainte de bruit entre voisins : le préposé…",
+"ch": [
+"ignore : ce n'est pas son travail",
+"coupe l'électricité du logement",
+"note les faits et transmet au gestionnaire",
+"va crier chez le voisin"
+],
+"bon": 2,
+"s": 20
+},
+{
+"q": "Le locateur doit garder le logement en bon état d'habitabilité.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "Loyer de 950 $, hausse de 4,5 %. Nouveau loyer en $ (arrondi à l'unité)?",
+"t": "nombre",
+"ch": [],
+"bon": 993,
+"s": 45,
+"u": "$"
 }
 ]
 },
 {
-"id": "defi-administration-batiment-3",
+"id": "defi-administration-batiment-4",
 "exemple": true,
 "livre": true,
 "defi": true,
-"titre": "Administration d'un bâtiment · Défi+ 3 de 4",
-"sujet": "Chapitres 9 et 10 : fin du bail, budget, hypothèque, épargne",
+"titre": "Administration d'un bâtiment · Défi+ 4 de 6",
+"sujet": "Chapitres 9 et 10 : fin du bail et budget",
 "couv": "img/couvertures/administration-batiment.jpg",
 "coul": "#2E8B57",
 "reg": {
@@ -3211,6 +3419,86 @@ window.QUIZ_LIVRES = [
 "s": 20
 },
 {
+"q": "Associe le poste du budget de l'immeuble.",
+"t": "paires",
+"g": [
+"Taxes municipales",
+"Assurances",
+"Entretien préventif",
+"Réserve"
+],
+"ch": [
+"Payées à la ville",
+"Protègent contre les sinistres",
+"Évite les grosses réparations",
+"Prévue pour l'imprévu"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Un bail de 12 mois se renouvelle…",
+"ch": [
+"automatiquement, sauf avis contraire",
+"seulement si on signe un nouveau bail",
+"si le locateur le décide seul",
+"jamais : il faut tout recommencer"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "L'inspection de sortie se fait…",
+"ch": [
+"par téléphone avec le locataire",
+"seulement si le logement est sale",
+"après que le nouveau locataire est entré",
+"avec le locataire, si possible, en notant tout"
+],
+"bon": 3,
+"s": 20
+},
+{
+"q": "Le revenu net, c'est ce qui reste après les dépenses.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "Un immeuble de 12 logements à 1 000 $ par mois rapporte environ combien de $ par année?",
+"t": "estim",
+"ch": [],
+"bon": 144000,
+"tol": 5,
+"u": "$",
+"s": 30,
+"expl": "12 × 1 000 × 12 = 144 000 $."
+}
+]
+},
+{
+"id": "defi-administration-batiment-5",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Administration d'un bâtiment · Défi+ 5 de 6",
+"sujet": "Chapitres 10 et 11 : hypothèque, épargne, copropriété",
+"couv": "img/couvertures/administration-batiment.jpg",
+"coul": "#2E8B57",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
 "q": "Acheter un plex à deux : on signe devant notaire, avant l'achat…",
 "ch": [
 "un bail commun signé par les deux acheteurs",
@@ -3264,23 +3552,7 @@ window.QUIZ_LIVRES = [
 ],
 "bon": 3,
 "s": 20
-}
-]
 },
-{
-"id": "defi-administration-batiment-4",
-"exemple": true,
-"livre": true,
-"defi": true,
-"titre": "Administration d'un bâtiment · Défi+ 4 de 4",
-"sujet": "Chapitres 11 à 13 : copropriété, plan d'urgence, interventions",
-"couv": "img/couvertures/administration-batiment.jpg",
-"coul": "#2E8B57",
-"reg": {
-"nb": "tout",
-"melange": "tout"
-},
-"qs": [
 {
 "q": "Dans une copropriété, le fonds de prévoyance paie…",
 "ch": [
@@ -3341,6 +3613,86 @@ window.QUIZ_LIVRES = [
 "expl": "Identifiés, étiquetés et accessibles.",
 "t": "multi"
 },
+{
+"q": "Associe le mot à sa définition.",
+"t": "paires",
+"g": [
+"Mise de fonds",
+"Amortissement",
+"Taux d'intérêt",
+"Fonds de prévoyance"
+],
+"ch": [
+"Argent versé à l'achat",
+"Durée pour rembourser le prêt",
+"Prix payé pour emprunter",
+"Épargne pour les grosses réparations d'une copropriété"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "En copropriété, les parties communes sont gérées par…",
+"ch": [
+"la municipalité",
+"le syndicat de copropriété",
+"le premier acheteur",
+"chaque propriétaire seul"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Un REER sert surtout à…",
+"ch": [
+"épargner pour la retraite avec une déduction d'impôt",
+"payer son loyer chaque mois",
+"rembourser ses cartes de crédit",
+"acheter une voiture neuve"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Plus l'amortissement est long, plus on paie d'intérêts au total.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "Une maison de 400 000 $ avec une mise de fonds de 10 % : la mise de fonds est de combien de $?",
+"t": "estim",
+"ch": [],
+"bon": 40000,
+"tol": 5,
+"u": "$",
+"s": 25,
+"expl": "10 % de 400 000 $ = 40 000 $."
+}
+]
+},
+{
+"id": "defi-administration-batiment-6",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Administration d'un bâtiment · Défi+ 6 de 6",
+"sujet": "Chapitres 12 et 13 : plan d'urgence et interventions",
+"couv": "img/couvertures/administration-batiment.jpg",
+"coul": "#2E8B57",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
 {
 "q": "Inspection visuelle d'un extincteur portatif :",
 "ch": [
@@ -3470,6 +3822,82 @@ window.QUIZ_LIVRES = [
 ],
 "bon": 0,
 "s": 20
+},
+{
+"q": "Remets dans l'ordre une intervention lors d'un dégât d'eau.",
+"ch": [
+"Couper l'eau",
+"Couper l'électricité de la zone si nécessaire",
+"Aviser le gestionnaire",
+"Prendre des photos et noter"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "Le plan d'urgence de l'immeuble indique…",
+"ch": [
+"les règlements du stationnement",
+"les horaires de ménage",
+"le prix des loyers",
+"qui fait quoi et qui appeler"
+],
+"bon": 3,
+"s": 20
+},
+{
+"q": "Associe l'urgence au premier appel.",
+"t": "paires",
+"g": [
+"Feu",
+"Fuite de gaz",
+"Panne électrique générale",
+"Refoulement d'égout"
+],
+"ch": [
+"911",
+"Fournisseur de gaz (ou 911)",
+"Hydro-Québec",
+"Plombier ou municipalité"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Après une urgence, on écrit un rapport d'incident.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "Que contient une trousse d'urgence de l'immeuble?",
+"ch": [
+"Lampe de poche",
+"Liste des numéros",
+"Clés maîtresses",
+"Les baux originaux"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"t": "multi"
 }
 ]
 },
@@ -4704,8 +5132,8 @@ window.QUIZ_LIVRES = [
 "exemple": true,
 "livre": true,
 "defi": true,
-"titre": "Ateliers de montages électriques (C5) · Défi+ 1 de 3",
-"sujet": "Ateliers 0 à 5 : fiche mâle, montages filaires, série et parallèle",
+"titre": "Ateliers de montages électriques (C5) · Défi+ 1 de 6",
+"sujet": "Ateliers 0 à 2 : fiche mâle et montages filaires",
 "couv": "img/couvertures/montages-electriques-c5.jpg",
 "coul": "#E0892B",
 "reg": {
@@ -4790,6 +5218,124 @@ window.QUIZ_LIVRES = [
 "bon": 3,
 "s": 20
 },
+{
+"q": "Associe la couleur du fil à son rôle (120 V).",
+"t": "paires",
+"g": [
+"Noir",
+"Blanc",
+"Vert ou nu",
+"Rouge"
+],
+"ch": [
+"Phase (sous tension)",
+"Neutre",
+"Mise à la terre",
+"Deuxième phase ou retour d'interrupteur"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Sur une fiche mâle, la lame la plus large est…",
+"ch": [
+"la phase",
+"le neutre",
+"la terre",
+"sans importance"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "La broche ronde d'une fiche sert à…",
+"ch": [
+"tenir la fiche",
+"la mise à la terre",
+"le neutre",
+"la phase"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "On dénude le fil juste assez pour qu'il entre sous la vis.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15,
+"expl": "Pas de cuivre qui dépasse."
+},
+{
+"q": "Remets dans l'ordre le raccord d'un fil sous une vis.",
+"ch": [
+"Dénuder environ 2 cm",
+"Faire une boucle",
+"Placer la boucle dans le sens du serrage",
+"Serrer la vis"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "La boucle du fil s'enroule autour de la vis…",
+"ch": [
+"dans le sens antihoraire",
+"on ne fait pas de boucle",
+"dans le sens horaire",
+"dans n'importe quel sens"
+],
+"bon": 2,
+"s": 20
+},
+{
+"q": "Un fil de calibre 14 protège un circuit de combien d'ampères (disjoncteur)?",
+"t": "nombre",
+"ch": [],
+"bon": 15,
+"s": 40,
+"u": "A"
+},
+{
+"q": "Avant de travailler sur un montage, on vérifie l'absence de tension avec…",
+"ch": [
+"le disjoncteur seulement",
+"les doigts mouillés",
+"un vérificateur de tension testé avant et après",
+"une ampoule au hasard"
+],
+"bon": 2,
+"s": 20
+}
+]
+},
+{
+"id": "defi-montages-electriques-c5-2",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Ateliers de montages électriques (C5) · Défi+ 2 de 6",
+"sujet": "Ateliers 3 à 5 : série et parallèle",
+"couv": "img/couvertures/montages-electriques-c5.jpg",
+"coul": "#E0892B",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
 {
 "q": "Dans un circuit en parallèle, si une lampe brûle, les autres restent allumées.",
 "ch": [
@@ -4885,16 +5431,96 @@ window.QUIZ_LIVRES = [
 "bon": 1,
 "s": 15,
 "expl": "La lampe resterait sous tension même éteinte."
+},
+{
+"q": "Associe le montage à son comportement.",
+"t": "paires",
+"g": [
+"Série",
+"Parallèle",
+"Une lampe brûle en série",
+"Une lampe brûle en parallèle"
+],
+"ch": [
+"Le courant passe par un seul chemin",
+"Chaque lampe a sa tension complète",
+"Tout s'éteint",
+"Les autres restent allumées"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "En série, la résistance totale…",
+"ch": [
+"est toujours zéro",
+"est égale à la plus grande",
+"est plus petite que la plus petite",
+"est la somme des résistances"
+],
+"bon": 3,
+"s": 20
+},
+{
+"q": "Les prises d'une maison sont branchées…",
+"ch": [
+"en une seule boucle fermée",
+"en parallèle",
+"chacune sur son disjoncteur",
+"en série"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "En parallèle, la tension est la même aux bornes de chaque lampe.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "Deux résistances de 60 Ω en série : résistance totale en Ω?",
+"t": "nombre",
+"ch": [],
+"bon": 120,
+"s": 40,
+"u": "Ω"
+},
+{
+"q": "Deux résistances de 60 Ω en parallèle : résistance totale en Ω?",
+"t": "nombre",
+"ch": [],
+"bon": 30,
+"s": 45,
+"u": "Ω"
+},
+{
+"q": "Une ampoule de 60 W sur 120 V tire environ combien d'ampères?",
+"t": "estim",
+"ch": [],
+"bon": 0.5,
+"tol": 10,
+"u": "A",
+"s": 30,
+"expl": "60 ÷ 120 = 0,5 A."
 }
 ]
 },
 {
-"id": "defi-montages-electriques-c5-2",
+"id": "defi-montages-electriques-c5-3",
 "exemple": true,
 "livre": true,
 "defi": true,
-"titre": "Ateliers de montages électriques (C5) · Défi+ 2 de 3",
-"sujet": "Ateliers 6 à 12 : prise et lampe, 3 voies et 4 voies, schéma à échelle, dispositifs de contrôle",
+"titre": "Ateliers de montages électriques (C5) · Défi+ 3 de 6",
+"sujet": "Ateliers 6 à 9 : prise, lampe, 3 voies et 4 voies",
 "couv": "img/couvertures/montages-electriques-c5.jpg",
 "coul": "#E0892B",
 "reg": {
@@ -4980,6 +5606,131 @@ window.QUIZ_LIVRES = [
 "s": 20
 },
 {
+"q": "Associe l'interrupteur à son usage.",
+"t": "paires",
+"g": [
+"Unipolaire",
+"3 voies",
+"4 voies",
+"Gradateur"
+],
+"ch": [
+"Une lumière, un endroit",
+"Une lumière, deux endroits",
+"Ajouté entre deux 3 voies",
+"Varier l'intensité"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Un interrupteur 3 voies a…",
+"ch": [
+"une borne commune et deux bornes de liaison",
+"une borne de neutre",
+"deux bornes seulement",
+"quatre bornes pareilles"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "L'interrupteur coupe toujours…",
+"ch": [
+"les deux fils",
+"la phase",
+"la terre",
+"le neutre"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Pour commander une lumière de trois endroits, il faut deux 3 voies et un 4 voies.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "Remets dans l'ordre un circuit à 3 voies.",
+"ch": [
+"Phase au commun du 1er 3 voies",
+"Deux liaisons entre les interrupteurs",
+"Commun du 2e 3 voies vers la lampe",
+"Neutre directement à la lampe"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "Une prise commandée par un interrupteur sert souvent à…",
+"ch": [
+"allumer une lampe sur pied à l'entrée",
+"alimenter le chauffe-eau",
+"protéger contre la foudre",
+"brancher le réfrigérateur"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Que faut-il pour un montage de prise sécuritaire?",
+"ch": [
+"Mise à la terre raccordée",
+"Boîte bien fixée",
+"Plaque installée",
+"Fils dénudés hors de la boîte"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"t": "multi"
+},
+{
+"q": "Le fil nu dans la boîte se raccorde…",
+"ch": [
+"à la vis laiton de la phase",
+"à la vis argent du neutre",
+"nulle part : on le coupe",
+"à la vis verte et à la boîte métallique"
+],
+"bon": 3,
+"s": 20
+}
+]
+},
+{
+"id": "defi-montages-electriques-c5-4",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Ateliers de montages électriques (C5) · Défi+ 4 de 6",
+"sujet": "Ateliers 10 à 12 : schéma à échelle et dispositifs de contrôle",
+"couv": "img/couvertures/montages-electriques-c5.jpg",
+"coul": "#E0892B",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
 "q": "Un thermostat à bilame…",
 "ch": [
 "change la tension de 120 V à 24 V",
@@ -5064,16 +5815,108 @@ window.QUIZ_LIVRES = [
 ],
 "bon": 0,
 "s": 15
+},
+{
+"q": "Associe le symbole du schéma à échelle.",
+"t": "paires",
+"g": [
+"Deux traits parallèles",
+"Deux traits avec une barre",
+"Cercle",
+"Rectangle ou cercle avec lettres (M)"
+],
+"ch": [
+"Contact normalement ouvert",
+"Contact normalement fermé",
+"Bobine de relais",
+"Moteur"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Dans un schéma à échelle, chaque barreau est…",
+"ch": [
+"un étage du bâtiment",
+"un circuit entre L1 et L2",
+"un disjoncteur différent",
+"un fil de mise à la terre"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Le contact de maintien (auto-alimentation) sert à…",
+"ch": [
+"inverser le sens du moteur",
+"arrêter le moteur en cas de surcharge",
+"baisser la tension de commande",
+"garder le relais alimenté après avoir relâché « marche »"
+],
+"bon": 3,
+"s": 20
+},
+{
+"q": "Le bouton « arrêt » est un contact normalement fermé.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "Remets dans l'ordre : marche-arrêt avec maintien.",
+"ch": [
+"On appuie sur « marche »",
+"La bobine est alimentée",
+"Le contact de maintien se ferme",
+"Le moteur reste en marche"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "Un pressostat est un dispositif qui réagit à…",
+"ch": [
+"la pression",
+"la lumière",
+"le niveau d'eau",
+"la température"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "La tension de commande d'un circuit de relais est souvent de combien de volts?",
+"t": "estim",
+"ch": [],
+"bon": 24,
+"tol": 10,
+"u": "V",
+"s": 25,
+"expl": "Souvent 24 V (parfois 120 V)."
 }
 ]
 },
 {
-"id": "defi-montages-electriques-c5-3",
+"id": "defi-montages-electriques-c5-5",
 "exemple": true,
 "livre": true,
 "defi": true,
-"titre": "Ateliers de montages électriques (C5) · Défi+ 3 de 3",
-"sujet": "Ateliers 13 à 18 : chauffe-eau électriques et pompes",
+"titre": "Ateliers de montages électriques (C5) · Défi+ 5 de 6",
+"sujet": "Ateliers 13 à 15 : chauffe-eau électriques",
 "couv": "img/couvertures/montages-electriques-c5.jpg",
 "coul": "#E0892B",
 "reg": {
@@ -5157,6 +6000,123 @@ window.QUIZ_LIVRES = [
 "bon": 0,
 "s": 20
 },
+{
+"q": "Associe la pièce du chauffe-eau électrique.",
+"t": "paires",
+"g": [
+"Élément du haut",
+"Élément du bas",
+"Thermostat du haut",
+"ECO (limite haute)"
+],
+"ch": [
+"Chauffe l'eau en premier, en haut",
+"Chauffe la plus grande partie de l'eau",
+"Choisit quel élément chauffe",
+"Coupe tout si l'eau devient trop chaude"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Dans un chauffe-eau à deux éléments, les éléments chauffent…",
+"ch": [
+"un à la fois (non simultané)",
+"seulement la nuit",
+"toujours en même temps",
+"selon la pression d'eau"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Avant de mesurer un élément à l'ohmmètre, on…",
+"ch": [
+"coupe le courant et débranche un fil",
+"remplit le réservoir d'eau chaude",
+"vide la moitié du réservoir",
+"laisse le disjoncteur ouvert"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "On peut alimenter un élément quand le réservoir est vide.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 1,
+"s": 15,
+"expl": "L'élément brûle en quelques secondes."
+},
+{
+"q": "Élément de 3 800 W à 240 V : résistance en Ω (arrondi à l'unité)?",
+"t": "nombre",
+"ch": [],
+"bon": 15,
+"s": 45,
+"u": "Ω"
+},
+{
+"q": "Remets dans l'ordre le remplacement d'un élément.",
+"ch": [
+"Couper le courant et vérifier",
+"Vider le réservoir sous l'élément",
+"Changer l'élément et son joint",
+"Remplir, purger l'air, puis remettre le courant"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "Un chauffe-eau de 60 gallons (US) contient environ combien de litres?",
+"t": "estim",
+"ch": [],
+"bon": 227,
+"tol": 10,
+"u": "L",
+"s": 30,
+"expl": "60 × 3,785 ≈ 227 L."
+},
+{
+"q": "L'ECO déclenche souvent. Cause probable :",
+"ch": [
+"une soupape trop neuve",
+"un réservoir trop grand",
+"une eau trop froide à l'entrée",
+"un thermostat collé qui ne coupe plus"
+],
+"bon": 3,
+"s": 20
+}
+]
+},
+{
+"id": "defi-montages-electriques-c5-6",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Ateliers de montages électriques (C5) · Défi+ 6 de 6",
+"sujet": "Ateliers 16 à 18 : pompes",
+"couv": "img/couvertures/montages-electriques-c5.jpg",
+"coul": "#E0892B",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
 {
 "q": "Une pompe de puits artésien submersible « 3 fils » a…",
 "ch": [
@@ -5256,6 +6216,103 @@ window.QUIZ_LIVRES = [
 ],
 "bon": 0,
 "s": 20
+},
+{
+"q": "Associe la pièce de la pompe à son rôle.",
+"t": "paires",
+"g": [
+"Pressostat",
+"Réservoir sous pression",
+"Clapet de pied",
+"Flotteur"
+],
+"ch": [
+"Part et arrête selon la pression",
+"Évite que la pompe parte trop souvent",
+"Garde la conduite pleine d'eau",
+"Part la pompe de puisard"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Le pressostat d'une pompe de puits réglé 40/60 veut dire…",
+"ch": [
+"pression maximale de 100 psi",
+"départ à 60 psi, arrêt à 40 psi",
+"40 secondes de marche sur 60",
+"départ à 40 psi, arrêt à 60 psi"
+],
+"bon": 3,
+"s": 20
+},
+{
+"q": "Une pompe qui part et arrête très souvent (cycle court) : on vérifie…",
+"ch": [
+"la pression d'air du réservoir",
+"le disjoncteur de la cuisine",
+"le diamètre du drain",
+"la couleur de l'eau"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "On vérifie la pression d'air d'un réservoir quand la pompe est arrêtée et le réservoir vide d'eau.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "Remets dans l'ordre le fonctionnement d'une pompe de puisard.",
+"ch": [
+"L'eau monte dans la fosse",
+"Le flotteur se soulève",
+"La pompe part",
+"L'eau sort et le flotteur redescend"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "Que vérifie-t-on sur une pompe de puisard au printemps?",
+"ch": [
+"Le flotteur",
+"Le clapet antiretour",
+"La sortie extérieure",
+"Le thermostat"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"t": "multi"
+},
+{
+"q": "La pression d'air d'un réservoir pour un pressostat 40/60 se règle à environ combien de psi?",
+"t": "estim",
+"ch": [],
+"bon": 38,
+"tol": 10,
+"u": "psi",
+"s": 30,
+"expl": "Environ 2 psi sous le départ : 38 psi."
 }
 ]
 },
@@ -5264,8 +6321,8 @@ window.QUIZ_LIVRES = [
 "exemple": true,
 "livre": true,
 "defi": true,
-"titre": "Notions d'énergie (C13) · Défi+ 1 de 3",
-"sujet": "Modules 1 et 2 : sources d'énergie, pertes de chaleur",
+"titre": "Notions d'énergie (C13) · Défi+ 1 de 6",
+"sujet": "Module 1 : les sources d'énergie",
 "couv": "img/couvertures/notions-energie-c13.jpg",
 "coul": "#0F6E56",
 "reg": {
@@ -5356,6 +6413,122 @@ window.QUIZ_LIVRES = [
 "t": "ordre"
 },
 {
+"q": "Associe la source d'énergie.",
+"t": "paires",
+"g": [
+"Électricité au Québec",
+"Mazout",
+"Gaz naturel",
+"Géothermie"
+],
+"ch": [
+"Surtout hydroélectrique",
+"Livré par camion et gardé dans un réservoir",
+"Arrive par une conduite de distribution",
+"Chaleur prise dans le sol"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Une énergie renouvelable…",
+"ch": [
+"coûte toujours moins cher",
+"se refait naturellement (eau, vent, soleil)",
+"vient du pétrole",
+"ne pollue jamais du tout"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Le BTU mesure…",
+"ch": [
+"une quantité de chaleur",
+"une pression",
+"une tension électrique",
+"un débit d'eau"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "1 kW équivaut à environ 3 412 BTU/h.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "Une plinthe de 2 kW donne combien de BTU/h (arrondi)? (1 kW = 3 412 BTU/h)",
+"t": "nombre",
+"ch": [],
+"bon": 6824,
+"s": 45,
+"u": "BTU/h"
+},
+{
+"q": "Remets ces énergies de la plus chère à la moins chère au Québec (en général, pour chauffer).",
+"ch": [
+"Mazout",
+"Électricité (plinthes)",
+"Thermopompe",
+"Géothermie"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 50,
+"t": "ordre"
+},
+{
+"q": "Un litre de mazout contient environ combien de kWh d'énergie?",
+"t": "estim",
+"ch": [],
+"bon": 10.7,
+"tol": 15,
+"u": "kWh",
+"s": 30,
+"expl": "Environ 10,7 kWh par litre."
+},
+{
+"q": "La biénergie, c'est…",
+"ch": [
+"deux thermostats dans une pièce",
+"un appareil qui produit de l'électricité",
+"deux chaudières électriques",
+"deux sources : électricité et un combustible d'appoint"
+],
+"bon": 3,
+"s": 20
+}
+]
+},
+{
+"id": "defi-notions-energie-c13-2",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Notions d'énergie (C13) · Défi+ 2 de 6",
+"sujet": "Module 2 : les pertes de chaleur",
+"couv": "img/couvertures/notions-energie-c13.jpg",
+"coul": "#0F6E56",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
 "q": "Les trois modes de transfert de chaleur :",
 "ch": [
 "Conduction",
@@ -5444,16 +6617,107 @@ window.QUIZ_LIVRES = [
 "bon": 180,
 "s": 50,
 "u": "W/°C"
+},
+{
+"q": "Associe la perte de chaleur à sa cause.",
+"t": "paires",
+"g": [
+"Conduction",
+"Convection (fuites d'air)",
+"Rayonnement",
+"Ponts thermiques"
+],
+"ch": [
+"La chaleur traverse le mur",
+"L'air chaud s'échappe par les fissures",
+"Chaleur émise par les vitres",
+"Montants et dalles qui transmettent le froid"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "La valeur R d'un isolant indique…",
+"ch": [
+"son poids par panneau",
+"son prix par mètre carré",
+"sa résistance au feu",
+"sa résistance au passage de la chaleur"
+],
+"bon": 3,
+"s": 20
+},
+{
+"q": "Plus l'écart de température dehors-dedans est grand…",
+"ch": [
+"moins les pertes sont grandes",
+"les pertes restent pareilles",
+"plus les pertes sont grandes",
+"plus l'air est sec"
+],
+"bon": 2,
+"s": 20
+},
+{
+"q": "Une fenêtre perd plus de chaleur qu'un mur isolé de même surface.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "Où l'air s'échappe-t-il souvent dans une maison?",
+"ch": [
+"Autour des fenêtres",
+"Prises sur les murs extérieurs",
+"Trappe du grenier",
+"Au milieu d'un plancher de béton"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"t": "multi"
+},
+{
+"q": "Le « degré-jour » sert à…",
+"ch": [
+"régler le thermostat",
+"mesurer la vitesse du vent",
+"calculer le débit d'eau",
+"comparer les besoins de chauffage d'une année à l'autre"
+],
+"bon": 3,
+"s": 20
+},
+{
+"q": "Un mur de 2 × 6 rempli de laine minérale a une valeur R d'environ…",
+"t": "estim",
+"ch": [],
+"bon": 20,
+"tol": 15,
+"u": "R",
+"s": 25,
+"expl": "Environ R-19 à R-22."
 }
 ]
 },
 {
-"id": "defi-notions-energie-c13-2",
+"id": "defi-notions-energie-c13-3",
 "exemple": true,
 "livre": true,
 "defi": true,
-"titre": "Notions d'énergie (C13) · Défi+ 2 de 3",
-"sujet": "Modules 3 et 4 : émetteurs, débit, circulateur, fonctionnement des systèmes",
+"titre": "Notions d'énergie (C13) · Défi+ 3 de 6",
+"sujet": "Module 3 : émetteurs et débit",
 "couv": "img/couvertures/notions-energie-c13.jpg",
 "coul": "#0F6E56",
 "reg": {
@@ -5535,6 +6799,128 @@ window.QUIZ_LIVRES = [
 "bon": 2,
 "s": 20
 },
+{
+"q": "Associe l'émetteur à sa façon de chauffer.",
+"t": "paires",
+"g": [
+"Plinthe à eau chaude",
+"Radiateur en fonte",
+"Plancher radiant",
+"Aérotherme"
+],
+"ch": [
+"Convection entre les ailettes",
+"Chauffe lentement et garde la chaleur",
+"Rayonnement du plancher",
+"Ventilateur qui souffle sur un serpentin"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Le débit d'eau se mesure souvent en…",
+"ch": [
+"livres par pouce carré",
+"BTU par litre",
+"gallons US par minute (GPM)",
+"kilowatts-heures"
+],
+"bon": 2,
+"s": 20
+},
+{
+"q": "Avec un écart de 20 °F, un GPM transporte environ…",
+"ch": [
+"1 000 BTU/h",
+"500 BTU/h",
+"10 000 BTU/h",
+"100 000 BTU/h"
+],
+"bon": 2,
+"s": 20
+},
+{
+"q": "Un plancher radiant fonctionne avec de l'eau moins chaude que des plinthes.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "Une maison a besoin de 40 000 BTU/h avec un écart de 20 °F. Combien de GPM? (BTU/h ÷ 10 000)",
+"t": "nombre",
+"ch": [],
+"bon": 4,
+"s": 45,
+"u": "GPM"
+},
+{
+"q": "Remets dans l'ordre le chemin de l'eau dans une boucle de chauffage.",
+"ch": [
+"Chaudière",
+"Circulateur",
+"Émetteurs",
+"Retour à la chaudière"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "Qu'est-ce qui réduit le débit dans une boucle?",
+"ch": [
+"De l'air dans le réseau",
+"Une valve à moitié fermée",
+"Un tuyau trop petit",
+"Un thermomètre neuf"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"t": "multi"
+},
+{
+"q": "Un émetteur qui chauffe en bas mais pas en haut a souvent…",
+"ch": [
+"trop de débit",
+"une soupape ouverte",
+"une eau trop chaude",
+"de l'air à purger"
+],
+"bon": 3,
+"s": 20
+}
+]
+},
+{
+"id": "defi-notions-energie-c13-4",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Notions d'énergie (C13) · Défi+ 4 de 6",
+"sujet": "Module 4 : circulateur et fonctionnement des systèmes",
+"couv": "img/couvertures/notions-energie-c13.jpg",
+"coul": "#0F6E56",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
 {
 "q": "Une fournaise à air pulsé chauffe…",
 "ch": [
@@ -5622,16 +7008,108 @@ window.QUIZ_LIVRES = [
 ],
 "bon": 0,
 "s": 20
+},
+{
+"q": "Associe la pièce au fonctionnement du système.",
+"t": "paires",
+"g": [
+"Circulateur",
+"Vase d'expansion",
+"Purgeur",
+"Soupape de sûreté"
+],
+"ch": [
+"Pousse l'eau",
+"Absorbe la dilatation",
+"Sort l'air",
+"Évacue la surpression"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Le circulateur se place souvent « en pompant en s'éloignant » du vase d'expansion pour…",
+"ch": [
+"éviter de faire baisser la pression à l'aspiration",
+"chauffer l'eau plus vite",
+"faire plus de bruit",
+"remplir la chaudière"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Un circulateur qui tourne mais ne fait pas circuler peut avoir…",
+"ch": [
+"un tuyau neuf",
+"un accouplement brisé ou de l'air",
+"un thermostat trop bas",
+"trop de pression d'eau"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Le vase d'expansion à membrane a une précharge d'air réglée avant le remplissage.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "Remets dans l'ordre le fonctionnement d'un système à eau chaude.",
+"ch": [
+"Le thermostat demande de la chaleur",
+"Le brûleur et le circulateur partent",
+"L'eau chaude circule dans les émetteurs",
+"Le thermostat est satisfait et tout s'arrête"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "Pression d'une chaudière résidentielle à eau chaude, à chaud : environ combien de psi?",
+"t": "estim",
+"ch": [],
+"bon": 20,
+"tol": 25,
+"u": "psi",
+"s": 30,
+"expl": "Environ 15 à 25 psi à chaud, sous la soupape de 30 psi."
+},
+{
+"q": "Le mot « zone » dans un système de chauffage veut dire…",
+"ch": [
+"une partie du bâtiment avec son propre thermostat",
+"un étage sans chauffage",
+"une chaudière de secours",
+"un tuyau de retour"
+],
+"bon": 0,
+"s": 20
 }
 ]
 },
 {
-"id": "defi-notions-energie-c13-3",
+"id": "defi-notions-energie-c13-5",
 "exemple": true,
 "livre": true,
 "defi": true,
-"titre": "Notions d'énergie (C13) · Défi+ 3 de 3",
-"sujet": "Modules 5 à 7 : brûleurs à l'huile, économiser l'énergie, conseiller le client",
+"titre": "Notions d'énergie (C13) · Défi+ 5 de 6",
+"sujet": "Module 5 : les brûleurs à l'huile",
 "couv": "img/couvertures/notions-energie-c13.jpg",
 "coul": "#0F6E56",
 "reg": {
@@ -5716,6 +7194,130 @@ window.QUIZ_LIVRES = [
 "bon": 0,
 "s": 20
 },
+{
+"q": "Associe la pièce du brûleur à l'huile.",
+"t": "paires",
+"g": [
+"Pompe à mazout",
+"Gicleur",
+"Électrodes",
+"Volet d'air"
+],
+"ch": [
+"Pousse le mazout sous pression",
+"Pulvérise en fin brouillard",
+"Font l'étincelle d'allumage",
+"Règle l'air de combustion"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Une flamme de brûleur bien réglée est…",
+"ch": [
+"jaune avec de la fumée noire",
+"bleue et très petite",
+"rouge foncé avec de la suie",
+"orange vif, sans fumée"
+],
+"bon": 3,
+"s": 20
+},
+{
+"q": "Trop peu d'air de combustion cause…",
+"ch": [
+"une flamme plus économique",
+"rien de particulier",
+"une meilleure efficacité",
+"de la suie et du monoxyde de carbone"
+],
+"bon": 3,
+"s": 20
+},
+{
+"q": "Le gicleur se change à chaque entretien annuel.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "L'entretien annuel d'un brûleur comprend…",
+"ch": [
+"Changer le gicleur et le filtre",
+"Vérifier les électrodes",
+"Analyser la combustion",
+"Repeindre la chaudière"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"t": "multi"
+},
+{
+"q": "Remets dans l'ordre le démarrage d'un brûleur à l'huile.",
+"ch": [
+"Appel de chaleur",
+"Moteur et allumage partent",
+"Le mazout est pulvérisé et s'allume",
+"La cellule voit la flamme"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "La pression de pompe d'un brûleur résidentiel est souvent d'environ combien de psi?",
+"t": "estim",
+"ch": [],
+"bon": 100,
+"tol": 20,
+"u": "psi",
+"s": 30,
+"expl": "Souvent 100 psi (parfois plus, selon le fabricant)."
+},
+{
+"q": "Un gicleur de 0,75 USGPH brûle environ…",
+"ch": [
+"0,75 kW",
+"0,75 litre par jour",
+"75 gallons par semaine",
+"0,75 gallon US de mazout par heure"
+],
+"bon": 3,
+"s": 20
+}
+]
+},
+{
+"id": "defi-notions-energie-c13-6",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Notions d'énergie (C13) · Défi+ 6 de 6",
+"sujet": "Modules 6 et 7 : économiser l'énergie et conseiller le client",
+"couv": "img/couvertures/notions-energie-c13.jpg",
+"coul": "#0F6E56",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
 {
 "q": "Le VRC (ventilateur récupérateur de chaleur)…",
 "ch": [
@@ -5812,6 +7414,95 @@ window.QUIZ_LIVRES = [
 ],
 "bon": 3,
 "s": 20
+},
+{
+"q": "Associe le conseil d'économie au gain.",
+"t": "paires",
+"g": [
+"Thermostat programmable",
+"Coupe-froid neuf",
+"Isolation des tuyaux",
+"Entretien du brûleur"
+],
+"ch": [
+"Baisse la nuit et le jour quand on est absent",
+"Moins de fuites d'air",
+"Moins de chaleur perdue en route",
+"Meilleure combustion"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Baisser le thermostat de 3 °C la nuit permet d'économiser…",
+"ch": [
+"quelques pour cent sur le chauffage",
+"la moitié de la facture",
+"seulement en été",
+"rien du tout"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Pour conseiller un client, on commence par…",
+"ch": [
+"parler du prix du mazout",
+"critiquer son vieux système",
+"lui vendre l'appareil le plus cher",
+"écouter ses besoins et regarder ses factures"
+],
+"bon": 3,
+"s": 20
+},
+{
+"q": "Un appareil plus efficace coûte parfois plus cher à l'achat, mais moins à utiliser.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "Une facture de chauffage de 2 000 $ par an baisse de 15 %. Économie en $ par année?",
+"t": "nombre",
+"ch": [],
+"bon": 300,
+"s": 45,
+"u": "$"
+},
+{
+"q": "Remets dans l'ordre une visite-conseil chez un client.",
+"ch": [
+"Écouter et poser des questions",
+"Inspecter le système",
+"Expliquer les choix, simplement",
+"Laisser un résumé écrit"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "Une thermopompe a un COP d'environ 3 : pour 1 kWh d'électricité, combien de kWh de chaleur?",
+"t": "estim",
+"ch": [],
+"bon": 3,
+"tol": 10,
+"u": "kWh",
+"s": 25,
+"expl": "Le COP de 3 donne 3 kWh de chaleur pour 1 kWh."
 }
 ]
 },
@@ -8197,8 +9888,8 @@ window.QUIZ_LIVRES = [
 "exemple": true,
 "livre": true,
 "defi": true,
-"titre": "Protection incendie d'un bâtiment · Défi+ 1 de 4",
-"sujet": "Modules 1 à 3 : la combustion, les classes de feu, les extincteurs",
+"titre": "Protection incendie d'un bâtiment · Défi+ 1 de 6",
+"sujet": "Modules 1 et 2 : la combustion et les classes de feu",
 "couv": "img/couvertures/protection-incendie.jpg",
 "coul": "#C62828",
 "reg": {
@@ -8322,6 +10013,92 @@ window.QUIZ_LIVRES = [
 "s": 20
 },
 {
+"q": "Associe la classe de feu au combustible.",
+"t": "paires",
+"g": [
+"A",
+"B",
+"C",
+"K"
+],
+"ch": [
+"Bois, papier, tissu",
+"Liquides inflammables",
+"Appareils électriques sous tension",
+"Huiles de cuisson"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Remets dans l'ordre l'évolution d'un incendie.",
+"ch": [
+"Éclosion",
+"Croissance",
+"Embrasement généralisé",
+"Déclin"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "Le monoxyde de carbone est invisible et sans odeur.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "Le triangle du feu : chaleur, combustible et…",
+"ch": [
+"eau",
+"oxygène",
+"fumée",
+"azote"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "L'air contient environ combien de % d'oxygène?",
+"t": "estim",
+"ch": [],
+"bon": 21,
+"tol": 10,
+"u": "%",
+"s": 25,
+"expl": "Environ 21 %."
+}
+]
+},
+{
+"id": "defi-protection-incendie-2",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Protection incendie d'un bâtiment · Défi+ 2 de 6",
+"sujet": "Modules 2 et 3 : les extincteurs",
+"couv": "img/couvertures/protection-incendie.jpg",
+"coul": "#C62828",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
 "q": "Un extincteur « 2-A:10-B:C » contient le plus souvent…",
 "ch": [
 "du CO₂ seulement",
@@ -8372,23 +10149,7 @@ window.QUIZ_LIVRES = [
 ],
 "bon": 3,
 "s": 20
-}
-]
 },
-{
-"id": "defi-protection-incendie-2",
-"exemple": true,
-"livre": true,
-"defi": true,
-"titre": "Protection incendie d'un bâtiment · Défi+ 2 de 4",
-"sujet": "Modules 3 à 5 : utiliser un extincteur, détection, réseau avertisseur",
-"couv": "img/couvertures/protection-incendie.jpg",
-"coul": "#C62828",
-"reg": {
-"nb": "tout",
-"melange": "tout"
-},
-"qs": [
 {
 "q": "La méthode PASS : dans l'ordre.",
 "ch": [
@@ -8452,6 +10213,92 @@ window.QUIZ_LIVRES = [
 "bon": 3,
 "s": 20
 },
+{
+"q": "Associe l'agent à l'extincteur.",
+"t": "paires",
+"g": [
+"Poudre ABC",
+"CO₂",
+"Eau sous pression",
+"Acétate de potassium"
+],
+"ch": [
+"Feux A, B et C",
+"Feux B et C, sans résidu",
+"Feux A seulement",
+"Feux de friteuse (K)"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "L'inspection mensuelle d'un extincteur vérifie…",
+"ch": [
+"l'aiguille, la goupille et l'accès",
+"le poids exact de la poudre",
+"l'intérieur de la bonbonne",
+"la date d'achat seulement"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Qu'est-ce qui rend un extincteur hors d'usage?",
+"ch": [
+"Aiguille dans le rouge",
+"Goupille absente",
+"Boyau fissuré",
+"Étiquette un peu décolorée"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"t": "multi"
+},
+{
+"q": "On peut utiliser un extincteur à eau sur un feu électrique.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 1,
+"s": 15,
+"expl": "Risque d'électrocution."
+},
+{
+"q": "Un extincteur portatif de 5 lb se vide en environ combien de secondes?",
+"t": "estim",
+"ch": [],
+"bon": 13,
+"tol": 40,
+"u": "s",
+"s": 30,
+"expl": "Environ 8 à 15 secondes : il faut viser juste."
+}
+]
+},
+{
+"id": "defi-protection-incendie-3",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Protection incendie d'un bâtiment · Défi+ 3 de 6",
+"sujet": "Modules 3 à 5 : utiliser un extincteur, détection, réseau avertisseur",
+"couv": "img/couvertures/protection-incendie.jpg",
+"coul": "#C62828",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
 {
 "q": "Le déclencheur manuel se place…",
 "ch": [
@@ -8572,16 +10419,92 @@ window.QUIZ_LIVRES = [
 ],
 "bon": 1,
 "s": 20
+},
+{
+"q": "Remets dans l'ordre la méthode pour utiliser un extincteur.",
+"ch": [
+"Tirer la goupille",
+"Viser la base du feu",
+"Presser la poignée",
+"Balayer de gauche à droite"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "Associe l'appareil au réseau avertisseur.",
+"t": "paires",
+"g": [
+"Déclencheur manuel",
+"Détecteur de fumée",
+"Détecteur thermique",
+"Avertisseur sonore"
+],
+"ch": [
+"On le tire à la main",
+"Réagit aux particules de fumée",
+"Réagit à la chaleur",
+"Fait évacuer les occupants"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Le détecteur thermique se place plutôt…",
+"ch": [
+"dans un corridor de logements",
+"dans une cuisine ou un garage",
+"dans une chambre à coucher",
+"à côté d'une sortie"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Le panneau d'alarme affiche la zone qui a déclenché.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "Après une alarme, avant de réarmer, on…",
+"ch": [
+"Trouve la cause",
+"Attend l'accord des pompiers",
+"Note l'événement",
+"Coupe l'électricité de l'immeuble"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"t": "multi"
 }
 ]
 },
 {
-"id": "defi-protection-incendie-3",
+"id": "defi-protection-incendie-4",
 "exemple": true,
 "livre": true,
 "defi": true,
-"titre": "Protection incendie d'un bâtiment · Défi+ 3 de 4",
-"sujet": "Modules 6 à 9 : hors service, alimentation de secours, gicleurs, codes",
+"titre": "Protection incendie d'un bâtiment · Défi+ 4 de 6",
+"sujet": "Modules 6 et 7 : hors service et alimentation de secours",
 "couv": "img/couvertures/protection-incendie.jpg",
 "coul": "#C62828",
 "reg": {
@@ -8698,6 +10621,92 @@ window.QUIZ_LIVRES = [
 "s": 20
 },
 {
+"q": "Associe l'équipement de secours.",
+"t": "paires",
+"g": [
+"Éclairage de secours",
+"Enseigne de sortie",
+"Génératrice",
+"Batteries du panneau"
+],
+"ch": [
+"Éclaire les sorties en panne",
+"Montre le chemin vers la sortie",
+"Alimente les systèmes essentiels",
+"Gardent l'alarme en marche"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Quand un système de protection est hors service, on…",
+"ch": [
+"avise, surveille et note jusqu'au retour",
+"attend le prochain entretien",
+"n'en parle pas aux occupants",
+"ferme l'immeuble à clé"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Remets dans l'ordre la mise hors service des gicleurs.",
+"ch": [
+"Aviser le service incendie et l'assureur",
+"Afficher l'avis",
+"Fermer la vanne et noter",
+"Faire des rondes de surveillance"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "L'éclairage de secours se teste en coupant l'alimentation normale.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "L'éclairage de secours doit durer au moins combien de minutes (bâtiment courant)?",
+"t": "estim",
+"ch": [],
+"bon": 30,
+"tol": 20,
+"u": "min",
+"s": 30,
+"expl": "Au moins 30 minutes dans la plupart des bâtiments."
+}
+]
+},
+{
+"id": "defi-protection-incendie-5",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Protection incendie d'un bâtiment · Défi+ 5 de 6",
+"sujet": "Modules 8 et 9 : gicleurs et codes",
+"couv": "img/couvertures/protection-incendie.jpg",
+"coul": "#C62828",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
 "q": "Un stationnement non chauffé est souvent protégé par un réseau…",
 "ch": [
 "sous air (sec)",
@@ -8751,23 +10760,7 @@ window.QUIZ_LIVRES = [
 ],
 "bon": 1,
 "s": 20
-}
-]
 },
-{
-"id": "defi-protection-incendie-4",
-"exemple": true,
-"livre": true,
-"defi": true,
-"titre": "Protection incendie d'un bâtiment · Défi+ 4 de 4",
-"sujet": "Modules 9 et 10 : coupe-feu, plan de sécurité incendie, évacuation",
-"couv": "img/couvertures/protection-incendie.jpg",
-"coul": "#C62828",
-"reg": {
-"nb": "tout",
-"melange": "tout"
-},
-"qs": [
 {
 "q": "Le poste de contrôle des gicleurs se trouve souvent…",
 "ch": [
@@ -8821,6 +10814,86 @@ window.QUIZ_LIVRES = [
 "bon": 1,
 "s": 15
 },
+{
+"q": "Associe le type de réseau de gicleurs.",
+"t": "paires",
+"g": [
+"Sous eau",
+"Sous air",
+"Préaction",
+"Déluge"
+],
+"ch": [
+"Tuyaux pleins d'eau, local chauffé",
+"Pour les zones qui gèlent",
+"Détection avant de remplir les tuyaux",
+"Toutes les têtes ouvertes"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Une tête de gicleur s'ouvre…",
+"ch": [
+"toutes en même temps dans l'immeuble",
+"quand on tire le déclencheur manuel",
+"seule, quand elle est chauffée",
+"quand le détecteur de fumée sonne"
+],
+"bon": 2,
+"s": 20
+},
+{
+"q": "Les codes de sécurité incendie au Québec viennent surtout…",
+"ch": [
+"du règlement de l'immeuble",
+"du Code de construction et du Code de sécurité",
+"des recommandations de l'assureur",
+"du Code civil seulement"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "On peut suspendre un objet à un tuyau de gicleur.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 1,
+"s": 15
+},
+{
+"q": "Une ampoule de gicleur rouge éclate vers combien de °C?",
+"t": "estim",
+"ch": [],
+"bon": 68,
+"tol": 10,
+"u": "°C",
+"s": 30,
+"expl": "L'ampoule rouge : environ 68 °C."
+}
+]
+},
+{
+"id": "defi-protection-incendie-6",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Protection incendie d'un bâtiment · Défi+ 6 de 6",
+"sujet": "Modules 9 et 10 : coupe-feu, plan de sécurité, évacuation",
+"couv": "img/couvertures/protection-incendie.jpg",
+"coul": "#C62828",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
 {
 "q": "Une porte coupe-feu doit…",
 "ch": [
@@ -8935,6 +11008,82 @@ window.QUIZ_LIVRES = [
 ],
 "bon": 2,
 "s": 20
+},
+{
+"q": "Associe l'élément au rôle dans l'évacuation.",
+"t": "paires",
+"g": [
+"Porte coupe-feu",
+"Escalier d'issue",
+"Point de rassemblement",
+"Responsable d'étage"
+],
+"ch": [
+"Ralentit le feu et la fumée",
+"Chemin protégé vers l'extérieur",
+"Lieu pour compter les gens",
+"Vérifie que l'étage est vide"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Une ouverture dans un mur coupe-feu doit être…",
+"ch": [
+"bouchée avec de la laine",
+"laissée ouverte pour l'air",
+"scellée avec un produit coupe-feu homologué",
+"fermée avec du gypse ordinaire"
+],
+"bon": 2,
+"s": 20
+},
+{
+"q": "Remets dans l'ordre l'évacuation d'un étage.",
+"ch": [
+"Donner l'alerte",
+"Faire sortir par l'issue la plus proche",
+"Fermer les portes derrière soi",
+"Se rendre au point de rassemblement"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "On utilise l'ascenseur pour évacuer pendant un incendie.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 1,
+"s": 15
+},
+{
+"q": "Un plan de sécurité incendie contient…",
+"ch": [
+"Les rôles du personnel",
+"Les plans des étages",
+"Les personnes qui ont besoin d'aide",
+"Les loyers des logements"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"t": "multi"
 }
 ]
 },
@@ -8943,8 +11092,8 @@ window.QUIZ_LIVRES = [
 "exemple": true,
 "livre": true,
 "defi": true,
-"titre": "Ventilation et climatisation · Défi+ 1 de 4",
-"sujet": "Modules 1 à 3 : sécurité, l'air et le confort, les systèmes",
+"titre": "Ventilation et climatisation · Défi+ 1 de 6",
+"sujet": "Modules 1 et 2 : sécurité, l'air et le confort",
 "couv": "img/couvertures/ventilation-climatisation-m11.jpg",
 "coul": "#14A3A3",
 "reg": {
@@ -9066,6 +11215,83 @@ window.QUIZ_LIVRES = [
 "s": 20
 },
 {
+"q": "Associe la mesure de confort.",
+"t": "paires",
+"g": [
+"Température",
+"Humidité relative",
+"CO₂",
+"Vitesse de l'air"
+],
+"ch": [
+"Chaud ou froid",
+"Eau dans l'air",
+"Air vicié par les occupants",
+"Courant d'air"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "L'humidité relative confortable l'hiver est environ…",
+"ch": [
+"30 à 40 %",
+"70 à 80 %",
+"5 à 10 %",
+"90 à 100 %"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Un taux de CO₂ élevé dans une classe indique une ventilation insuffisante.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "Convertis 77 °F en °C.",
+"t": "nombre",
+"ch": [],
+"bon": 25,
+"s": 45,
+"u": "°C"
+},
+{
+"q": "Dehors, l'air contient environ combien de ppm de CO₂?",
+"t": "estim",
+"ch": [],
+"bon": 420,
+"tol": 15,
+"u": "ppm",
+"s": 30,
+"expl": "Environ 420 ppm."
+}
+]
+},
+{
+"id": "defi-ventilation-climatisation-m11-2",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Ventilation et climatisation · Défi+ 2 de 6",
+"sujet": "Modules 3 et 4 : les systèmes et les composants",
+"couv": "img/couvertures/ventilation-climatisation-m11.jpg",
+"coul": "#14A3A3",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
 "q": "Plainte de froid : avant de monter la consigne, on cherche…",
 "ch": [
 "le locataire voisin qui baisse son chauffage",
@@ -9125,23 +11351,7 @@ window.QUIZ_LIVRES = [
 ],
 "bon": 0,
 "s": 20
-}
-]
 },
-{
-"id": "defi-ventilation-climatisation-m11-2",
-"exemple": true,
-"livre": true,
-"defi": true,
-"titre": "Ventilation et climatisation · Défi+ 2 de 4",
-"sujet": "Modules 4 à 6 : composants, VRC et VRE, cycle frigorifique",
-"couv": "img/couvertures/ventilation-climatisation-m11.jpg",
-"coul": "#14A3A3",
-"reg": {
-"nb": "tout",
-"melange": "tout"
-},
-"qs": [
 {
 "q": "Un ventilo-convecteur, c'est…",
 "ch": [
@@ -9193,6 +11403,92 @@ window.QUIZ_LIVRES = [
 "bon": 2,
 "s": 20
 },
+{
+"q": "Associe le composant à son rôle.",
+"t": "paires",
+"g": [
+"Volet",
+"Filtre",
+"Serpentin",
+"Diffuseur"
+],
+"ch": [
+"Règle l'air qui passe",
+"Retient les poussières",
+"Chauffe ou refroidit l'air",
+"Répand l'air dans la pièce"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Un filtre MERV 13 retient…",
+"ch": [
+"seulement les grosses poussières",
+"moins de particules qu'un MERV 8",
+"plus de fines particules qu'un MERV 8",
+"les odeurs et les gaz"
+],
+"bon": 2,
+"s": 20
+},
+{
+"q": "Remets dans l'ordre l'air dans une unité de toit.",
+"ch": [
+"Prise d'air extérieur",
+"Filtres",
+"Serpentin",
+"Ventilateur vers les conduits"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "Une courroie trop lâche fait patiner la poulie.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "Une courroie bien tendue fléchit d'environ combien de cm au centre (pour 1 m de portée)?",
+"t": "estim",
+"ch": [],
+"bon": 1.6,
+"tol": 30,
+"u": "cm",
+"s": 30,
+"expl": "Environ 1/64 de la portée : 1,6 cm pour 1 m."
+}
+]
+},
+{
+"id": "defi-ventilation-climatisation-m11-3",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Ventilation et climatisation · Défi+ 3 de 6",
+"sujet": "Modules 5 et 6 : VRC, VRE et cycle frigorifique",
+"couv": "img/couvertures/ventilation-climatisation-m11.jpg",
+"coul": "#14A3A3",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
 {
 "q": "On mesure le courant d'un moteur avec…",
 "ch": [
@@ -9300,16 +11596,86 @@ window.QUIZ_LIVRES = [
 ],
 "bon": 1,
 "s": 20
+},
+{
+"q": "Associe l'étape du cycle frigorifique.",
+"t": "paires",
+"g": [
+"Compresseur",
+"Condenseur",
+"Détendeur",
+"Évaporateur"
+],
+"ch": [
+"Comprime le gaz",
+"Rejette la chaleur dehors",
+"Fait baisser la pression",
+"Prend la chaleur de la pièce"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Un VRE, contrairement à un VRC, échange aussi…",
+"ch": [
+"du réfrigérant",
+"de l'humidité",
+"de l'eau chaude",
+"de l'électricité"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Remets dans l'ordre le trajet du réfrigérant.",
+"ch": [
+"Compresseur",
+"Condenseur",
+"Détendeur",
+"Évaporateur"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "Le réfrigérant se manipule seulement par une personne qualifiée.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "Un VRC récupère environ combien de % de la chaleur de l'air évacué?",
+"t": "estim",
+"ch": [],
+"bon": 70,
+"tol": 20,
+"u": "%",
+"s": 30,
+"expl": "Souvent 60 à 80 %."
 }
 ]
 },
 {
-"id": "defi-ventilation-climatisation-m11-3",
+"id": "defi-ventilation-climatisation-m11-4",
 "exemple": true,
 "livre": true,
 "defi": true,
-"titre": "Ventilation et climatisation · Défi+ 3 de 4",
-"sujet": "Modules 7 et 8 : thermopompes, régulation",
+"titre": "Ventilation et climatisation · Défi+ 4 de 6",
+"sujet": "Module 7 : les thermopompes",
 "couv": "img/couvertures/ventilation-climatisation-m11.jpg",
 "coul": "#14A3A3",
 "reg": {
@@ -9434,6 +11800,86 @@ window.QUIZ_LIVRES = [
 "s": 20
 },
 {
+"q": "Associe le mode de la thermopompe.",
+"t": "paires",
+"g": [
+"Chauffage",
+"Climatisation",
+"Dégivrage",
+"Appoint"
+],
+"ch": [
+"Prend la chaleur dehors, la donne dedans",
+"Prend la chaleur dedans, la rejette dehors",
+"Inverse un moment pour enlever la glace",
+"Plinthes ou éléments quand il fait très froid"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "La vanne d'inversion d'une thermopompe sert à…",
+"ch": [
+"vider l'eau de condensation",
+"couper le courant du compresseur",
+"passer du chauffage à la climatisation",
+"régler la vitesse du ventilateur"
+],
+"bon": 2,
+"s": 20
+},
+{
+"q": "L'unité extérieure doit être…",
+"ch": [
+"dégagée, surélevée de la neige",
+"couverte d'une bâche l'hiver",
+"entourée d'une haie dense",
+"collée au mur sous une gouttière"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "En dégivrage, de la vapeur qui sort de l'unité extérieure est normale.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "Une thermopompe moderne chauffe encore jusqu'à environ combien de °C dehors?",
+"t": "estim",
+"ch": [],
+"bon": -25,
+"tol": 20,
+"u": "°C",
+"s": 30,
+"expl": "Les modèles grand froid chauffent jusque vers −25 °C ou moins."
+}
+]
+},
+{
+"id": "defi-ventilation-climatisation-m11-5",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Ventilation et climatisation · Défi+ 5 de 6",
+"sujet": "Module 8 : la régulation",
+"couv": "img/couvertures/ventilation-climatisation-m11.jpg",
+"coul": "#14A3A3",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
 "q": "Une thermopompe affiche un code d'erreur. Tu…",
 "ch": [
 "ignores le code",
@@ -9487,23 +11933,7 @@ window.QUIZ_LIVRES = [
 ],
 "bon": 0,
 "s": 20
-}
-]
 },
-{
-"id": "defi-ventilation-climatisation-m11-4",
-"exemple": true,
-"livre": true,
-"defi": true,
-"titre": "Ventilation et climatisation · Défi+ 4 de 4",
-"sujet": "Modules 9 à 11 : climatisation centrale, intervention, formatif",
-"couv": "img/couvertures/ventilation-climatisation-m11.jpg",
-"coul": "#14A3A3",
-"reg": {
-"nb": "tout",
-"melange": "tout"
-},
-"qs": [
 {
 "q": "La vanne d'inversion d'une thermopompe…",
 "ch": [
@@ -9563,6 +11993,92 @@ window.QUIZ_LIVRES = [
 "bon": 3,
 "s": 20
 },
+{
+"q": "Associe le mot de régulation.",
+"t": "paires",
+"g": [
+"Consigne",
+"Capteur",
+"Actionneur",
+"Différentiel"
+],
+"ch": [
+"Valeur voulue",
+"Mesure la valeur réelle",
+"Agit sur l'équipement",
+"Écart entre arrêt et départ"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Une régulation « modulante » ouvre la vanne…",
+"ch": [
+"selon une minuterie fixe",
+"un peu, beaucoup, selon le besoin",
+"toujours à fond ou fermée",
+"seulement la nuit"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Remets dans l'ordre une boucle de régulation.",
+"ch": [
+"Le capteur mesure",
+"Le contrôleur compare à la consigne",
+"Il envoie un signal",
+"L'actionneur bouge la vanne"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "Un capteur mal placé (au soleil) donne une fausse lecture.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "La consigne de chauffage d'un bureau occupé est souvent d'environ combien de °C?",
+"t": "estim",
+"ch": [],
+"bon": 21,
+"tol": 8,
+"u": "°C",
+"s": 25,
+"expl": "Environ 20 à 22 °C."
+}
+]
+},
+{
+"id": "defi-ventilation-climatisation-m11-6",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Ventilation et climatisation · Défi+ 6 de 6",
+"sujet": "Modules 9 à 11 : climatisation centrale et intervention",
+"couv": "img/couvertures/ventilation-climatisation-m11.jpg",
+"coul": "#14A3A3",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
 {
 "q": "Une régulation pneumatique utilise…",
 "ch": [
@@ -9680,6 +12196,76 @@ window.QUIZ_LIVRES = [
 ],
 "bon": 1,
 "s": 20
+},
+{
+"q": "Associe le symptôme de climatisation à la cause probable.",
+"t": "paires",
+"g": [
+"Serpentin gelé",
+"Unité extérieure arrêtée, intérieure en marche",
+"Eau sous l'unité intérieure",
+"Air peu froid, filtre noir"
+],
+"ch": [
+"Débit d'air trop faible",
+"Compresseur ou contacteur à vérifier",
+"Drain de condensat bouché",
+"Filtre à changer"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "En climatisation, la conduite d'aspiration (la plus grosse) est…",
+"ch": [
+"sans réfrigérant",
+"chaude au toucher",
+"froide et isolée",
+"pleine d'eau"
+],
+"bon": 2,
+"s": 20
+},
+{
+"q": "Remets dans l'ordre une intervention sur un climatiseur.",
+"ch": [
+"Écouter la plainte",
+"Vérifier thermostat et filtre",
+"Observer les unités",
+"Noter et aviser le frigoriste au besoin"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "Le préposé peut vérifier le filtre et le drain de condensat.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "L'air soufflé par un climatiseur est environ combien de °C plus froid que l'air de retour?",
+"t": "estim",
+"ch": [],
+"bon": 10,
+"tol": 30,
+"u": "°C",
+"s": 30,
+"expl": "Environ 8 à 12 °C plus froid."
 }
 ]
 },
@@ -9688,8 +12274,8 @@ window.QUIZ_LIVRES = [
 "exemple": true,
 "livre": true,
 "defi": true,
-"titre": "Utiliser un micro-ordinateur · Défi+ 1 de 4",
-"sujet": "Modules 1 à 3 : le portable, Windows 11, fichiers",
+"titre": "Utiliser un micro-ordinateur · Défi+ 1 de 6",
+"sujet": "Modules 1 et 2 : le portable et Windows 11",
 "couv": "img/couvertures/micro-ordinateur.jpg",
 "coul": "#185FA5",
 "reg": {
@@ -9808,6 +12394,92 @@ window.QUIZ_LIVRES = [
 "s": 20
 },
 {
+"q": "Associe le raccourci à l'action.",
+"t": "paires",
+"g": [
+"Ctrl + C",
+"Ctrl + V",
+"Ctrl + Z",
+"Windows + L"
+],
+"ch": [
+"Copier",
+"Coller",
+"Annuler",
+"Verrouiller l'ordinateur"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Pour fermer un programme qui ne répond plus, on ouvre…",
+"ch": [
+"le Panneau de configuration",
+"l'Explorateur de fichiers",
+"le Gestionnaire des tâches (Ctrl + Maj + Échap)",
+"le Microsoft Store"
+],
+"bon": 2,
+"s": 20
+},
+{
+"q": "Verrouiller l'écran quand on s'éloigne protège ses données.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "Remets dans l'ordre l'arrêt propre du portable.",
+"ch": [
+"Enregistrer ses fichiers",
+"Fermer les programmes",
+"Menu Démarrer, Arrêter",
+"Fermer l'écran une fois éteint"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "Une batterie de portable dure environ combien de cycles de charge complets?",
+"t": "estim",
+"ch": [],
+"bon": 500,
+"tol": 40,
+"u": "cycles",
+"s": 30,
+"expl": "Souvent 300 à 1 000 cycles."
+}
+]
+},
+{
+"id": "defi-micro-ordinateur-2",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Utiliser un micro-ordinateur · Défi+ 2 de 6",
+"sujet": "Modules 2 et 3 : les fichiers et OneDrive",
+"couv": "img/couvertures/micro-ordinateur.jpg",
+"coul": "#185FA5",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
 "q": "Le chemin d'un fichier, c'est…",
 "ch": [
 "son adresse complète, dossier par dossier",
@@ -9861,23 +12533,7 @@ window.QUIZ_LIVRES = [
 ],
 "bon": 3,
 "s": 20
-}
-]
 },
-{
-"id": "defi-micro-ordinateur-2",
-"exemple": true,
-"livre": true,
-"defi": true,
-"titre": "Utiliser un micro-ordinateur · Défi+ 2 de 4",
-"sujet": "Modules 3 à 6 : OneDrive, Internet, Outlook et Teams, Word",
-"couv": "img/couvertures/micro-ordinateur.jpg",
-"coul": "#185FA5",
-"reg": {
-"nb": "tout",
-"melange": "tout"
-},
-"qs": [
 {
 "q": "On peut changer l'extension d'un fichier (.pdf, .docx) sans conséquence.",
 "ch": [
@@ -9932,6 +12588,92 @@ window.QUIZ_LIVRES = [
 "bon": 2,
 "s": 20
 },
+{
+"q": "Associe l'extension au type de fichier.",
+"t": "paires",
+"g": [
+".docx",
+".xlsx",
+".pdf",
+".jpg"
+],
+"ch": [
+"Document Word",
+"Classeur Excel",
+"Document à lire ou imprimer",
+"Photo"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Un fichier « en ligne seulement » dans OneDrive…",
+"ch": [
+"s'ouvre seulement avec Internet",
+"est visible par tout le monde",
+"est supprimé du compte",
+"ne peut pas être renommé"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Remets dans l'ordre le classement d'un document.",
+"ch": [
+"Choisir le bon dossier",
+"Donner un nom clair",
+"Enregistrer",
+"Vérifier qu'il est synchronisé"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "Un bon nom de fichier comprend la date et le sujet.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "Une photo de cellulaire pèse environ combien de Mo?",
+"t": "estim",
+"ch": [],
+"bon": 3,
+"tol": 50,
+"u": "Mo",
+"s": 30,
+"expl": "Souvent 2 à 5 Mo."
+}
+]
+},
+{
+"id": "defi-micro-ordinateur-3",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Utiliser un micro-ordinateur · Défi+ 3 de 6",
+"sujet": "Modules 4 et 5 : Internet, Outlook et Teams",
+"couv": "img/couvertures/micro-ordinateur.jpg",
+"coul": "#185FA5",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
 {
 "q": "Pour juger une source Web, on se demande :",
 "ch": [
@@ -10046,16 +12788,92 @@ window.QUIZ_LIVRES = [
 ],
 "bon": 1,
 "s": 20
+},
+{
+"q": "Associe l'outil à son usage.",
+"t": "paires",
+"g": [
+"Outlook",
+"Teams",
+"Navigateur",
+"OneDrive"
+],
+"ch": [
+"Courriels et calendrier",
+"Clavardage et réunions",
+"Naviguer sur Internet",
+"Ranger et partager des fichiers"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "« Cc » dans un courriel, c'est pour…",
+"ch": [
+"demander un accusé de lecture",
+"envoyer plus tard",
+"cacher un destinataire",
+"informer une personne en copie"
+],
+"bon": 3,
+"s": 20
+},
+{
+"q": "Signes d'un courriel d'hameçonnage :",
+"ch": [
+"Urgence inhabituelle",
+"Lien vers une adresse bizarre",
+"Fautes et logo flou",
+"Ton nom écrit correctement"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"t": "multi"
+},
+{
+"q": "On peut partager un fichier OneDrive dans Teams sans l'envoyer en pièce jointe.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "Remets dans l'ordre un bon courriel de travail.",
+"ch": [
+"Objet clair",
+"Salutation",
+"Message court avec la demande",
+"Signature"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"t": "ordre"
 }
 ]
 },
 {
-"id": "defi-micro-ordinateur-3",
+"id": "defi-micro-ordinateur-4",
 "exemple": true,
 "livre": true,
 "defi": true,
-"titre": "Utiliser un micro-ordinateur · Défi+ 3 de 4",
-"sujet": "Modules 6 à 8 : Word, Excel, gestion de l'entretien",
+"titre": "Utiliser un micro-ordinateur · Défi+ 4 de 6",
+"sujet": "Modules 6 et 7 : Word",
 "couv": "img/couvertures/micro-ordinateur.jpg",
 "coul": "#185FA5",
 "reg": {
@@ -10174,6 +12992,92 @@ window.QUIZ_LIVRES = [
 "s": 20
 },
 {
+"q": "Associe l'outil Word à son usage.",
+"t": "paires",
+"g": [
+"Styles de titre",
+"Table des matières",
+"Tableau",
+"Saut de page"
+],
+"ch": [
+"Donner une structure au document",
+"Liste des sections, faite toute seule",
+"Aligner des informations en colonnes",
+"Commencer une nouvelle page proprement"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Pour qu'une table des matières se fasse toute seule, il faut…",
+"ch": [
+"numéroter les pages à la main",
+"appliquer les styles Titre 1, Titre 2",
+"écrire les titres en gras",
+"souligner chaque titre"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Remets dans l'ordre la création d'un avis aux locataires.",
+"ch": [
+"Titre clair",
+"Date et heure des travaux",
+"Ce que le locataire doit faire",
+"Coordonnées pour joindre le préposé"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "On peut enregistrer un document Word en PDF.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "Un avis affiché se lit bien à 2 mètres avec un titre d'environ combien de points?",
+"t": "estim",
+"ch": [],
+"bon": 48,
+"tol": 40,
+"u": "pt",
+"s": 30,
+"expl": "Souvent 36 à 72 points pour un titre d'affiche."
+}
+]
+},
+{
+"id": "defi-micro-ordinateur-5",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Utiliser un micro-ordinateur · Défi+ 5 de 6",
+"sujet": "Modules 7 et 8 : Excel et gestion de l'entretien",
+"couv": "img/couvertures/micro-ordinateur.jpg",
+"coul": "#185FA5",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
 "q": "Recopier une formule sur 30 lignes : on tire…",
 "ch": [
 "la fenêtre",
@@ -10227,23 +13131,7 @@ window.QUIZ_LIVRES = [
 ],
 "bon": 3,
 "s": 20
-}
-]
 },
-{
-"id": "defi-micro-ordinateur-4",
-"exemple": true,
-"livre": true,
-"defi": true,
-"titre": "Utiliser un micro-ordinateur · Défi+ 4 de 4",
-"sujet": "Modules 8 à 10 : GMAO, intelligence artificielle, bilan",
-"couv": "img/couvertures/micro-ordinateur.jpg",
-"coul": "#185FA5",
-"reg": {
-"nb": "tout",
-"melange": "tout"
-},
-"qs": [
 {
 "q": "$A$1 dans une formule, c'est une référence…",
 "ch": [
@@ -10299,6 +13187,90 @@ window.QUIZ_LIVRES = [
 "bon": 2,
 "s": 20
 },
+{
+"q": "Associe la fonction Excel.",
+"t": "paires",
+"g": [
+"=SOMME()",
+"=MOYENNE()",
+"=SI()",
+"=AUJOURDHUI()"
+],
+"ch": [
+"Additionne une plage",
+"Calcule la moyenne",
+"Affiche selon une condition",
+"Donne la date du jour"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Pour figer la ligne des titres en haut, on utilise…",
+"ch": [
+"Insertion, Tableau croisé",
+"Accueil, Fusionner",
+"Affichage, Figer les volets",
+"Données, Trier"
+],
+"bon": 2,
+"s": 20
+},
+{
+"q": "Dans Excel, =SOMME(4;6;10) donne combien?",
+"t": "nombre",
+"ch": [],
+"bon": 20,
+"s": 40,
+"u": ""
+},
+{
+"q": "Un filtre cache les lignes sans les supprimer.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "Remets dans l'ordre la création d'un registre d'entretien.",
+"ch": [
+"Écrire les titres de colonnes",
+"Mettre sous forme de tableau",
+"Entrer une ligne par intervention",
+"Filtrer ou trier au besoin"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"t": "ordre"
+}
+]
+},
+{
+"id": "defi-micro-ordinateur-6",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Utiliser un micro-ordinateur · Défi+ 6 de 6",
+"sujet": "Modules 8 à 10 : GMAO, intelligence artificielle, bilan",
+"couv": "img/couvertures/micro-ordinateur.jpg",
+"coul": "#185FA5",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
 {
 "q": "Entretien préventif ou correctif : lequel se fait avant la panne?",
 "ch": [
@@ -10415,6 +13387,82 @@ window.QUIZ_LIVRES = [
 ],
 "bon": 1,
 "s": 20
+},
+{
+"q": "Associe le mot de GMAO.",
+"t": "paires",
+"g": [
+"Bon de travail",
+"Préventif",
+"Correctif",
+"Historique"
+],
+"ch": [
+"Demande d'intervention à faire",
+"Planifié à l'avance",
+"Réparation après un bris",
+"Tout ce qui a été fait sur un équipement"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Une bonne demande à une IA (« prompt ») est…",
+"ch": [
+"copiée d'un autre site",
+"écrite en majuscules",
+"précise, avec le contexte et le format voulu",
+"un seul mot pour aller vite"
+],
+"bon": 2,
+"s": 20
+},
+{
+"q": "Que vérifie-t-on dans une réponse d'IA?",
+"ch": [
+"Les chiffres",
+"Les noms de modèles",
+"Les dates",
+"La police de caractères"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"t": "multi"
+},
+{
+"q": "On peut coller le nom et l'adresse d'un locataire dans une IA publique.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 1,
+"s": 15
+},
+{
+"q": "Remets dans l'ordre le traitement d'un bon de travail.",
+"ch": [
+"Recevoir la demande",
+"Planifier et faire le travail",
+"Noter ce qui a été fait",
+"Fermer le bon"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"t": "ordre"
 }
 ]
 },
@@ -10423,7 +13471,7 @@ window.QUIZ_LIVRES = [
 "exemple": true,
 "livre": true,
 "defi": true,
-"titre": "Communiquer en milieu de travail · Défi+ 1 de 4",
+"titre": "Communiquer en milieu de travail · Défi+ 1 de 6",
 "sujet": "Modules 1 et 2 : le préposé au cœur de l'immeuble, les bases",
 "couv": "img/couvertures/communiquer.jpg",
 "coul": "#185FA5",
@@ -10549,6 +13597,98 @@ window.QUIZ_LIVRES = [
 "s": 20
 },
 {
+"q": "Associe l'élément de communication.",
+"t": "paires",
+"g": [
+"Émetteur",
+"Message",
+"Récepteur",
+"Rétroaction"
+],
+"ch": [
+"Celui qui parle",
+"Ce qu'on veut dire",
+"Celui qui reçoit",
+"La réponse qui confirme"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Le bruit, en communication, c'est…",
+"ch": [
+"le téléphone qui sonne",
+"un mot mal écrit",
+"tout ce qui brouille le message",
+"seulement le son trop fort"
+],
+"bon": 2,
+"s": 20
+},
+{
+"q": "Le ton de la voix change le sens d'un message.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "Remets dans l'ordre l'accueil d'une demande d'un locataire.",
+"ch": [
+"Saluer et écouter",
+"Poser des questions",
+"Reformuler",
+"Dire ce qui va se passer"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "Qu'est-ce qui fait partie du non-verbal?",
+"ch": [
+"Le regard",
+"La posture",
+"Les gestes",
+"Les mots choisis"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"t": "multi"
+}
+]
+},
+{
+"id": "defi-communiquer-2",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Communiquer en milieu de travail · Défi+ 2 de 6",
+"sujet": "Module 3 : les occupants",
+"couv": "img/couvertures/communiquer.jpg",
+"coul": "#185FA5",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
 "q": "Locataire fâché : la méthode en 4 temps.",
 "ch": [
 "Écouter",
@@ -10608,23 +13748,7 @@ window.QUIZ_LIVRES = [
 ],
 "bon": 2,
 "s": 20
-}
-]
 },
-{
-"id": "defi-communiquer-2",
-"exemple": true,
-"livre": true,
-"defi": true,
-"titre": "Communiquer en milieu de travail · Défi+ 2 de 4",
-"sujet": "Modules 3 à 5 : les occupants, l'équipe, l'écrit",
-"couv": "img/couvertures/communiquer.jpg",
-"coul": "#185FA5",
-"reg": {
-"nb": "tout",
-"melange": "tout"
-},
-"qs": [
 {
 "q": "Dire non à une demande qui ne relève pas de toi :",
 "ch": [
@@ -10679,6 +13803,92 @@ window.QUIZ_LIVRES = [
 "bon": 2,
 "s": 20
 },
+{
+"q": "Associe l'occupant au bon ajustement.",
+"t": "paires",
+"g": [
+"Personne âgée",
+"Personne qui parle peu français",
+"Personne pressée",
+"Personne inquiète"
+],
+"ch": [
+"Parler lentement, face à elle",
+"Mots simples, gestes, écrit",
+"Aller droit au but",
+"Rassurer avec des faits"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Une question fermée sert à…",
+"ch": [
+"changer de sujet",
+"terminer la conversation",
+"confirmer un détail (oui ou non)",
+"laisser la personne tout raconter"
+],
+"bon": 2,
+"s": 20
+},
+{
+"q": "Remets dans l'ordre l'entrée dans un logement.",
+"ch": [
+"Frapper et attendre",
+"Se présenter",
+"Expliquer la raison",
+"Demander la permission d'entrer"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "On parle de la vie d'un locataire à un autre locataire.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 1,
+"s": 15
+},
+{
+"q": "Dans une bonne écoute, on écoute environ combien de % du temps?",
+"t": "estim",
+"ch": [],
+"bon": 70,
+"tol": 20,
+"u": "%",
+"s": 30,
+"expl": "Écouter au moins deux fois plus qu'on parle."
+}
+]
+},
+{
+"id": "defi-communiquer-3",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Communiquer en milieu de travail · Défi+ 3 de 6",
+"sujet": "Modules 4 et 5 : l'équipe et l'écrit",
+"couv": "img/couvertures/communiquer.jpg",
+"coul": "#185FA5",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
 {
 "q": "Rendre compte, c'est informer ton supérieur de…",
 "ch": [
@@ -10794,16 +14004,88 @@ window.QUIZ_LIVRES = [
 ],
 "bon": 3,
 "s": 20
+},
+{
+"q": "Associe l'écrit à son usage.",
+"t": "paires",
+"g": [
+"Bon de travail",
+"Avis aux locataires",
+"Rapport d'incident",
+"Courriel au gestionnaire"
+],
+"ch": [
+"Ce qui a été fait",
+"Informer avant des travaux",
+"Les faits d'un événement",
+"Demande ou suivi rapide"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Une passation de quart réussie contient…",
+"ch": [
+"la météo du lendemain",
+"les potins de la journée",
+"ce qui est fait, ce qui reste et les urgences",
+"seulement l'heure de départ"
+],
+"bon": 2,
+"s": 20
+},
+{
+"q": "Trouve l'erreur dans cette phrase.",
+"t": "erreur",
+"ch": [
+"Le rapport décrit",
+"les faits observés",
+"et l'opinion du préposé sur la locataire",
+"en ordre chronologique."
+],
+"bon": 2,
+"s": 30,
+"expl": "Un rapport garde seulement les faits."
+},
+{
+"q": "Un message « je » commence par ce que je ressens ou observe.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "Un bon avis aux locataires est…",
+"ch": [
+"Court",
+"Daté",
+"Clair dès le titre",
+"Écrit en petits caractères"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"t": "multi"
 }
 ]
 },
 {
-"id": "defi-communiquer-3",
+"id": "defi-communiquer-4",
 "exemple": true,
 "livre": true,
 "defi": true,
-"titre": "Communiquer en milieu de travail · Défi+ 3 de 4",
-"sujet": "Modules 6 à 8 : téléphone, situations difficiles, éthique",
+"titre": "Communiquer en milieu de travail · Défi+ 4 de 6",
+"sujet": "Module 6 : le téléphone",
 "couv": "img/couvertures/communiquer.jpg",
 "coul": "#185FA5",
 "reg": {
@@ -10924,6 +14206,92 @@ window.QUIZ_LIVRES = [
 "s": 20
 },
 {
+"q": "Associe le moment de l'appel à la bonne phrase.",
+"t": "paires",
+"g": [
+"Répondre",
+"Mettre en attente",
+"Transférer",
+"Terminer"
+],
+"ch": [
+"Saluer et dire son nom",
+"Demander la permission",
+"Expliquer à qui on transfère",
+"Résumer et remercier"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Un message laissé dans une boîte vocale contient…",
+"ch": [
+"ton nom, ton numéro et la raison",
+"une longue explication",
+"seulement « rappelle-moi »",
+"ton adresse personnelle"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Remets dans l'ordre la prise d'un message.",
+"ch": [
+"Nom de la personne",
+"Numéro pour la rappeler",
+"Raison de l'appel",
+"Date et heure"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "On peut répondre au téléphone en mangeant si on est discret.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 1,
+"s": 15
+},
+{
+"q": "Au téléphone, on se fait une idée de quelqu'un en environ combien de secondes?",
+"t": "estim",
+"ch": [],
+"bon": 7,
+"tol": 50,
+"u": "s",
+"s": 25,
+"expl": "Quelques secondes à peine."
+}
+]
+},
+{
+"id": "defi-communiquer-5",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Communiquer en milieu de travail · Défi+ 5 de 6",
+"sujet": "Modules 7 et 8 : situations difficiles et éthique",
+"couv": "img/couvertures/communiquer.jpg",
+"coul": "#185FA5",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
 "q": "Quand quelqu'un crie contre toi, ton corps réagit. Pour garder ton calme :",
 "ch": [
 "partir en courant sans rien dire",
@@ -10977,23 +14345,7 @@ window.QUIZ_LIVRES = [
 ],
 "bon": 0,
 "s": 20
-}
-]
 },
-{
-"id": "defi-communiquer-4",
-"exemple": true,
-"livre": true,
-"defi": true,
-"titre": "Communiquer en milieu de travail · Défi+ 4 de 4",
-"sujet": "Module 8 et bilan : image professionnelle, révision",
-"couv": "img/couvertures/communiquer.jpg",
-"coul": "#185FA5",
-"reg": {
-"nb": "tout",
-"melange": "tout"
-},
-"qs": [
 {
 "q": "Le journal des faits sert à noter…",
 "ch": [
@@ -11049,6 +14401,98 @@ window.QUIZ_LIVRES = [
 "bon": 1,
 "s": 20
 },
+{
+"q": "Associe la situation à la bonne réaction.",
+"t": "paires",
+"g": [
+"Locataire en colère",
+"Menace",
+"Cadeau offert",
+"Demande hors de ton rôle"
+],
+"ch": [
+"Écouter et garder son calme",
+"Se retirer et aviser",
+"Refuser poliment",
+"Diriger vers la bonne personne"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Remets dans l'ordre la désescalade.",
+"ch": [
+"Garder une distance sécuritaire",
+"Parler calmement",
+"Reconnaître l'émotion",
+"Proposer une solution ou un suivi"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "La confidentialité veut dire que…",
+"ch": [
+"tu peux en parler à tes amis",
+"ce que tu vois chez les locataires reste privé",
+"tu dois tout écrire dans Teams",
+"seul le gestionnaire peut parler"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Se retirer d'une situation dangereuse, c'est professionnel.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "Qu'est-ce qui fait partie de l'éthique du préposé?",
+"ch": [
+"Honnêteté",
+"Respect",
+"Confidentialité",
+"Favoritisme"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"t": "multi"
+}
+]
+},
+{
+"id": "defi-communiquer-6",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Communiquer en milieu de travail · Défi+ 6 de 6",
+"sujet": "Module 8 et bilan : image professionnelle, révision",
+"couv": "img/couvertures/communiquer.jpg",
+"coul": "#185FA5",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
 {
 "q": "Un locataire t'offre un cadeau pour une réparation :",
 "ch": [
@@ -11161,6 +14605,76 @@ window.QUIZ_LIVRES = [
 ],
 "bon": 0,
 "s": 20
+},
+{
+"q": "Associe la qualité à un geste concret.",
+"t": "paires",
+"g": [
+"Ponctualité",
+"Fiabilité",
+"Courtoisie",
+"Propreté"
+],
+"ch": [
+"Arriver à l'heure",
+"Faire ce qu'on a promis",
+"Saluer et remercier",
+"Laisser l'endroit propre"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Une tenue professionnelle, c'est…",
+"ch": [
+"propre, sécuritaire et adaptée au travail",
+"un complet-cravate",
+"la même qu'au chalet",
+"la plus chère possible"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Remets dans l'ordre la fin d'une intervention chez un locataire.",
+"ch": [
+"Ranger et nettoyer",
+"Expliquer ce qui a été fait",
+"Vérifier qu'il n'a plus de question",
+"Remplir le bon de travail"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "Admettre une erreur rapidement aide la confiance.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "Une première impression se forme en environ combien de secondes?",
+"t": "estim",
+"ch": [],
+"bon": 7,
+"tol": 50,
+"u": "s",
+"s": 25,
+"expl": "En quelques secondes."
 }
 ]
 },
@@ -13511,8 +17025,8 @@ window.QUIZ_LIVRES = [
 "exemple": true,
 "livre": true,
 "defi": true,
-"titre": "Plomberie et chauffage (EGI) · Défi+ 1 de 5",
-"sujet": "Modules 1 à 3 : rôle du préposé, maths de la tuyauterie, matériaux",
+"titre": "Plomberie et chauffage (EGI) · Défi+ 1 de 6",
+"sujet": "Modules 1 et 2 : rôle du préposé et maths de la tuyauterie",
 "couv": "img/couvertures/plomberie-chauffage.jpg",
 "coul": "#B3261E",
 "reg": {
@@ -13656,6 +17170,63 @@ window.QUIZ_LIVRES = [
 "s": 20
 },
 {
+"q": "Associe la couleur de la grille du préposé.",
+"t": "paires",
+"g": [
+"Vert",
+"Jaune",
+"Rouge",
+"Noir (urgence)"
+],
+"ch": [
+"Je le fais seul",
+"Je vérifie, je sécurise et j'avise",
+"Le spécialiste intervient",
+"J'appelle les secours"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "3/8 po + 5/8 po = combien de pouces?",
+"t": "nombre",
+"ch": [],
+"bon": 1,
+"s": 40,
+"u": "po"
+},
+{
+"q": "Un pied mesure environ combien de mm?",
+"t": "estim",
+"ch": [],
+"bon": 305,
+"tol": 5,
+"u": "mm",
+"s": 25,
+"expl": "1 pi = 304,8 mm."
+}
+]
+},
+{
+"id": "defi-plomberie-chauffage-2",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Plomberie et chauffage (EGI) · Défi+ 2 de 6",
+"sujet": "Modules 3 et 4 : matériaux et soudure",
+"couv": "img/couvertures/plomberie-chauffage.jpg",
+"coul": "#B3261E",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
 "q": "Le PEX se raccorde avec…",
 "ch": [
 "une pince à sertir ou un expandeur",
@@ -13687,23 +17258,7 @@ window.QUIZ_LIVRES = [
 ],
 "bon": 2,
 "s": 20
-}
-]
 },
-{
-"id": "defi-plomberie-chauffage-2",
-"exemple": true,
-"livre": true,
-"defi": true,
-"titre": "Plomberie et chauffage (EGI) · Défi+ 2 de 5",
-"sujet": "Modules 3 et 4 : souder, raccords et coupes",
-"couv": "img/couvertures/plomberie-chauffage.jpg",
-"coul": "#B3261E",
-"reg": {
-"nb": "tout",
-"melange": "tout"
-},
-"qs": [
 {
 "q": "Raccorder de l'acier galvanisé directement à du cuivre :",
 "ch": [
@@ -13824,6 +17379,62 @@ window.QUIZ_LIVRES = [
 "s": 20
 },
 {
+"q": "Associe le matériau au raccord.",
+"t": "paires",
+"g": [
+"Cuivre",
+"PEX",
+"ABS",
+"Acier"
+],
+"ch": [
+"Brasage",
+"Sertissage ou expansion",
+"Colle à solvant",
+"Filetage"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Remets dans l'ordre un brasage tendre.",
+"ch": [
+"Couper et ébavurer",
+"Nettoyer et poser le flux",
+"Chauffer le raccord",
+"Faire couler la soudure"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"t": "ordre"
+}
+]
+},
+{
+"id": "defi-plomberie-chauffage-3",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Plomberie et chauffage (EGI) · Défi+ 3 de 6",
+"sujet": "Module 4 : raccords et coupes",
+"couv": "img/couvertures/plomberie-chauffage.jpg",
+"coul": "#B3261E",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
 "q": "Après une soudure, on laisse refroidir le joint…",
 "ch": [
 "sans le bouger",
@@ -13877,23 +17488,7 @@ window.QUIZ_LIVRES = [
 ],
 "bon": 3,
 "s": 20
-}
-]
 },
-{
-"id": "defi-plomberie-chauffage-3",
-"exemple": true,
-"livre": true,
-"defi": true,
-"titre": "Plomberie et chauffage (EGI) · Défi+ 3 de 5",
-"sujet": "Modules 5 à 8 : alimentation, drainage, appareils, chauffe-eau",
-"couv": "img/couvertures/plomberie-chauffage.jpg",
-"coul": "#B3261E",
-"reg": {
-"nb": "tout",
-"melange": "tout"
-},
-"qs": [
 {
 "q": "Pour le préposé, le plus important avec les robinets :",
 "ch": [
@@ -13971,6 +17566,63 @@ window.QUIZ_LIVRES = [
 "bon": 0,
 "s": 20
 },
+{
+"q": "Associe le raccord à son usage.",
+"t": "paires",
+"g": [
+"Coude 90°",
+"Té",
+"Union",
+"Réduit"
+],
+"ch": [
+"Changer de direction",
+"Faire une branche",
+"Démonter facilement",
+"Changer de diamètre"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Longueur de coupe : 36 po centre à centre, deux prises de 1/2 po. Combien de pouces?",
+"t": "nombre",
+"ch": [],
+"bon": 35,
+"s": 45,
+"u": "po"
+},
+{
+"q": "Une coupe en biais fait un joint plus étanche.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 1,
+"s": 15,
+"expl": "La coupe doit être d'équerre."
+}
+]
+},
+{
+"id": "defi-plomberie-chauffage-4",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Plomberie et chauffage (EGI) · Défi+ 4 de 6",
+"sujet": "Modules 5 à 7 : alimentation, drainage et appareils",
+"couv": "img/couvertures/plomberie-chauffage.jpg",
+"coul": "#B3261E",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
 {
 "q": "Robinet à cartouche : l'eau chaude est…",
 "ch": [
@@ -14055,23 +17707,7 @@ window.QUIZ_LIVRES = [
 ],
 "bon": 3,
 "s": 20
-}
-]
 },
-{
-"id": "defi-plomberie-chauffage-4",
-"exemple": true,
-"livre": true,
-"defi": true,
-"titre": "Plomberie et chauffage (EGI) · Défi+ 4 de 5",
-"sujet": "Modules 8 à 11 : chauffe-eau, chaudière, brûleur, autres systèmes",
-"couv": "img/couvertures/plomberie-chauffage.jpg",
-"coul": "#B3261E",
-"reg": {
-"nb": "tout",
-"melange": "tout"
-},
-"qs": [
 {
 "q": "Tester une soupape T&P :",
 "ch": [
@@ -14122,6 +17758,55 @@ window.QUIZ_LIVRES = [
 "bon": 1,
 "s": 20
 },
+{
+"q": "Associe l'appareil à son siphon (diamètre courant).",
+"t": "paires",
+"g": [
+"Lavabo",
+"Baignoire",
+"Toilette",
+"Douche"
+],
+"ch": [
+"Siphon de 1 1/4 po",
+"Siphon de 1 1/2 po",
+"Siphon intégré à la cuvette",
+"Siphon de 2 po"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Une toilette récente utilise environ combien de litres par chasse?",
+"t": "estim",
+"ch": [],
+"bon": 4.8,
+"tol": 25,
+"u": "L",
+"s": 30,
+"expl": "Environ 4,8 L (6 L pour les modèles un peu plus vieux)."
+}
+]
+},
+{
+"id": "defi-plomberie-chauffage-5",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Plomberie et chauffage (EGI) · Défi+ 5 de 6",
+"sujet": "Modules 8 à 10 : chauffe-eau, chaudière et brûleur",
+"couv": "img/couvertures/plomberie-chauffage.jpg",
+"coul": "#B3261E",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
 {
 "q": "Les radiateurs en fonte…",
 "ch": [
@@ -14231,23 +17916,7 @@ window.QUIZ_LIVRES = [
 ],
 "bon": 3,
 "s": 20
-}
-]
 },
-{
-"id": "defi-plomberie-chauffage-5",
-"exemple": true,
-"livre": true,
-"defi": true,
-"titre": "Plomberie et chauffage (EGI) · Défi+ 5 de 5",
-"sujet": "Modules 12 et 13 : pompes, diagnostic et entretien préventif",
-"couv": "img/couvertures/plomberie-chauffage.jpg",
-"coul": "#B3261E",
-"reg": {
-"nb": "tout",
-"melange": "tout"
-},
-"qs": [
 {
 "q": "Une thermopompe air-air…",
 "ch": [
@@ -14270,6 +17939,72 @@ window.QUIZ_LIVRES = [
 "bon": 0,
 "s": 20
 },
+{
+"q": "Associe la pièce du chauffe-eau.",
+"t": "paires",
+"g": [
+"Anode",
+"Soupape T et P",
+"Tube plongeur",
+"Robinet de vidange"
+],
+"ch": [
+"Se sacrifie contre la corrosion",
+"Évacue la surpression ou la surchauffe",
+"Amène l'eau froide au fond",
+"Sert à vider le réservoir"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Remets dans l'ordre la vidange partielle d'un chauffe-eau.",
+"ch": [
+"Couper l'alimentation (courant ou gaz)",
+"Brancher un boyau au robinet de vidange",
+"Ouvrir et laisser couler jusqu'à l'eau claire",
+"Refermer et remettre en marche"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "Un chauffe-eau électrique résidentiel dure en moyenne environ combien d'années?",
+"t": "estim",
+"ch": [],
+"bon": 12,
+"tol": 30,
+"u": "ans",
+"s": 25,
+"expl": "Souvent 10 à 15 ans."
+}
+]
+},
+{
+"id": "defi-plomberie-chauffage-6",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Plomberie et chauffage (EGI) · Défi+ 6 de 6",
+"sujet": "Modules 11 à 13 : autres systèmes, pompes et entretien préventif",
+"couv": "img/couvertures/plomberie-chauffage.jpg",
+"coul": "#B3261E",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
 {
 "q": "Une pompe qui perd sa charge sans cesse : on cherche surtout…",
 "ch": [
@@ -14411,6 +18146,45 @@ window.QUIZ_LIVRES = [
 ],
 "bon": 0,
 "s": 15
+},
+{
+"q": "Associe la tâche préventive à sa fréquence courante.",
+"t": "paires",
+"g": [
+"Regarder le manomètre de la chaudière",
+"Tester la soupape T et P",
+"Entretien du brûleur",
+"Nettoyer la crépine de la pompe"
+],
+"ch": [
+"Chaque ronde",
+"Une fois par année",
+"Avant la saison de chauffage",
+"Selon le registre (souvent aux mois)"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Signes qu'une pompe centrifuge a un problème :",
+"ch": [
+"Bruit de gravier (cavitation)",
+"Fuite au joint",
+"Moteur très chaud",
+"Plaque signalétique propre"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"t": "multi"
 }
 ]
 },
@@ -14419,8 +18193,8 @@ window.QUIZ_LIVRES = [
 "exemple": true,
 "livre": true,
 "defi": true,
-"titre": "Recherche d'emploi (Plomberie et chauffage) · Défi+ 1 de 4",
-"sujet": "Modules 1 et 2 : mon bilan, construction ou hors construction",
+"titre": "Recherche d'emploi (Plomberie et chauffage) · Défi+ 1 de 6",
+"sujet": "Module 1 : mon bilan",
 "couv": "img/couvertures/recherche-emploi-plc.jpg",
 "coul": "#1F6FB2",
 "reg": {
@@ -14549,6 +18323,92 @@ window.QUIZ_LIVRES = [
 "expl": "On écrit « entretien », sans t."
 },
 {
+"q": "Associe la qualité à une preuve concrète.",
+"t": "paires",
+"g": [
+"Fiable",
+"Débrouillard",
+"Travail d'équipe",
+"Minutieux"
+],
+"ch": [
+"Jamais absent en stage",
+"A réparé seul la fuite de la cabine",
+"Coéquipier de hockey depuis 5 ans",
+"Joints soudés sans fuite au test"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Un bilan personnel sert d'abord à…",
+"ch": [
+"être envoyé à l'employeur",
+"savoir ce que tu as à offrir",
+"calculer ton salaire",
+"remplacer le CV"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Une expérience hors du domaine peut montrer des qualités utiles en plomberie.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "Remets dans l'ordre la préparation de ton bilan.",
+"ch": [
+"Lister tes expériences",
+"Trouver ce que chacune t'a appris",
+"Choisir des preuves",
+"Relier à l'emploi visé"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "Combien d'heures compte une période d'apprentissage en plomberie (carnet CCQ)?",
+"t": "estim",
+"ch": [],
+"bon": 2000,
+"tol": 5,
+"u": "h",
+"s": 30,
+"expl": "2 000 heures par période."
+}
+]
+},
+{
+"id": "defi-recherche-emploi-plc-2",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Recherche d'emploi (Plomberie et chauffage) · Défi+ 2 de 6",
+"sujet": "Modules 2 et 3 : construction ou hors construction, le CV",
+"couv": "img/couvertures/recherche-emploi-plc.jpg",
+"coul": "#1F6FB2",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
 "q": "Construction ou hors construction : laquelle est régie par la CCQ?",
 "ch": [
 "Hors construction",
@@ -14600,23 +18460,7 @@ window.QUIZ_LIVRES = [
 ],
 "bon": 3,
 "s": 20
-}
-]
 },
-{
-"id": "defi-recherche-emploi-plc-2",
-"exemple": true,
-"livre": true,
-"defi": true,
-"titre": "Recherche d'emploi (Plomberie et chauffage) · Défi+ 2 de 4",
-"sujet": "Modules 3 et 4 : le CV, chercher et postuler en ligne",
-"couv": "img/couvertures/recherche-emploi-plc.jpg",
-"coul": "#1F6FB2",
-"reg": {
-"nb": "tout",
-"melange": "tout"
-},
-"qs": [
 {
 "q": "Un chemin (construction ou hors construction) est toujours meilleur que l'autre.",
 "ch": [
@@ -14671,6 +18515,88 @@ window.QUIZ_LIVRES = [
 "bon": 0,
 "s": 20
 },
+{
+"q": "Associe la section du CV.",
+"t": "paires",
+"g": [
+"Coordonnées",
+"Profil",
+"Expérience",
+"Formation"
+],
+"ch": [
+"Comment te joindre",
+"Qui tu es en 2 ou 3 lignes",
+"Ce que tu as fait, avec des verbes d'action",
+"Ton DEP et tes cartes"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Pour travailler sur un chantier de la construction, il faut…",
+"ch": [
+"seulement un permis de conduire",
+"un diplôme universitaire",
+"une lettre de ton enseignant",
+"un certificat de compétence de la CCQ"
+],
+"bon": 3,
+"s": 20
+},
+{
+"q": "Trouve l'erreur dans cette phrase.",
+"t": "erreur",
+"ch": [
+"Mon CV fait deux pages,",
+"avec des puces claires,",
+"ma photo et mon numéro d'assurance sociale,",
+"et mes cartes de sécurité."
+],
+"bon": 2,
+"s": 30,
+"expl": "On ne met jamais son NAS dans un CV."
+},
+{
+"q": "Un CV doit être adapté à chaque offre.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "Un employeur regarde un CV en moyenne environ combien de secondes au premier tri?",
+"t": "estim",
+"ch": [],
+"bon": 10,
+"tol": 50,
+"u": "s",
+"s": 25,
+"expl": "Quelques secondes : le haut du CV compte beaucoup."
+}
+]
+},
+{
+"id": "defi-recherche-emploi-plc-3",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Recherche d'emploi (Plomberie et chauffage) · Défi+ 3 de 6",
+"sujet": "Modules 3 et 4 : chercher et postuler en ligne",
+"couv": "img/couvertures/recherche-emploi-plc.jpg",
+"coul": "#1F6FB2",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
 {
 "q": "Une bonne puce de CV commence par…",
 "ch": [
@@ -14780,16 +18706,92 @@ window.QUIZ_LIVRES = [
 ],
 "bon": 0,
 "s": 20
+},
+{
+"q": "Associe le site ou le lieu de recherche.",
+"t": "paires",
+"g": [
+"Québec emploi",
+"Site de l'entreprise",
+"Carrefour jeunesse-emploi",
+"Syndicat ou CCQ"
+],
+"ch": [
+"Offres publiques du gouvernement",
+"Postes souvent affichés là seulement",
+"Aide pour le CV et l'entrevue",
+"Bassin de main-d'œuvre de la construction"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Postuler en ligne : le fichier du CV s'envoie de préférence en…",
+"ch": [
+"photo prise au cellulaire",
+"fichier .zip compressé",
+"texte copié dans le courriel",
+"PDF, avec ton nom dans le titre"
+],
+"bon": 3,
+"s": 20
+},
+{
+"q": "Remets dans l'ordre une candidature en ligne.",
+"ch": [
+"Lire l'offre au complet",
+"Adapter le CV",
+"Écrire un court message",
+"Noter la date dans ton suivi"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "Une offre qui demande de l'argent pour réserver un poste est suspecte.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "Que noter dans ton tableau de suivi?",
+"ch": [
+"L'entreprise",
+"La date d'envoi",
+"La date de relance",
+"La couleur du logo"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"t": "multi"
 }
 ]
 },
 {
-"id": "defi-recherche-emploi-plc-3",
+"id": "defi-recherche-emploi-plc-4",
 "exemple": true,
 "livre": true,
 "defi": true,
-"titre": "Recherche d'emploi (Plomberie et chauffage) · Défi+ 3 de 4",
-"sujet": "Modules 5 et 6 : plan de recherche, réseau, lettre",
+"titre": "Recherche d'emploi (Plomberie et chauffage) · Défi+ 4 de 6",
+"sujet": "Modules 5 et 6 : plan de recherche et réseau",
 "couv": "img/couvertures/recherche-emploi-plc.jpg",
 "coul": "#1F6FB2",
 "reg": {
@@ -14920,6 +18922,92 @@ window.QUIZ_LIVRES = [
 "expl": "La conclusion demande une rencontre et se termine par une formule de politesse."
 },
 {
+"q": "Associe le moyen de recherche.",
+"t": "paires",
+"g": [
+"Candidature spontanée",
+"Réseau",
+"Salon de l'emploi",
+"Stage"
+],
+"ch": [
+"Envoyer son CV sans offre affichée",
+"Parler aux gens qui te connaissent",
+"Rencontrer plusieurs employeurs en une journée",
+"Se faire connaître en travaillant"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Une recherche d'emploi efficace se planifie…",
+"ch": [
+"une seule journée par mois",
+"avec des heures fixes et des objectifs",
+"quand on a le temps",
+"seulement le dimanche"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Remets dans l'ordre un appel à un employeur.",
+"ch": [
+"Se présenter",
+"Dire le poste visé",
+"Demander le nom du responsable",
+"Remercier et noter"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "Le marché caché comprend les emplois comblés par recommandation.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "Selon le livre, une recherche active demande environ combien d'heures par semaine?",
+"t": "estim",
+"ch": [],
+"bon": 12,
+"tol": 30,
+"u": "h",
+"s": 25,
+"expl": "Environ 10 à 15 heures par semaine."
+}
+]
+},
+{
+"id": "defi-recherche-emploi-plc-5",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Recherche d'emploi (Plomberie et chauffage) · Défi+ 5 de 6",
+"sujet": "Modules 6 et 7 : la lettre et l'entrevue",
+"couv": "img/couvertures/recherche-emploi-plc.jpg",
+"coul": "#1F6FB2",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
 "q": "Une lettre de candidature spontanée s'appuie sur…",
 "ch": [
 "ton horaire de la semaine",
@@ -14974,23 +19062,7 @@ window.QUIZ_LIVRES = [
 ],
 "bon": 1,
 "s": 20
-}
-]
 },
-{
-"id": "defi-recherche-emploi-plc-4",
-"exemple": true,
-"livre": true,
-"defi": true,
-"titre": "Recherche d'emploi (Plomberie et chauffage) · Défi+ 4 de 4",
-"sujet": "Modules 7 et 8 : entrevue, relance, premier emploi",
-"couv": "img/couvertures/recherche-emploi-plc.jpg",
-"coul": "#1F6FB2",
-"reg": {
-"nb": "tout",
-"melange": "tout"
-},
-"qs": [
 {
 "q": "La méthode STAR : dans l'ordre.",
 "ch": [
@@ -15052,6 +19124,98 @@ window.QUIZ_LIVRES = [
 "bon": 2,
 "s": 20
 },
+{
+"q": "Associe le paragraphe de la lettre.",
+"t": "paires",
+"g": [
+"Premier",
+"Deuxième",
+"Troisième",
+"Conclusion"
+],
+"ch": [
+"Qui tu es et le poste visé",
+"Ce que tu apportes, avec des preuves",
+"Pourquoi cette entreprise",
+"Demander une rencontre"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "En entrevue, la méthode STAR sert à…",
+"ch": [
+"choisir sa tenue",
+"raconter un exemple : situation, tâche, action, résultat",
+"poser des questions à l'employeur",
+"parler du salaire au bon moment"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Remets dans l'ordre le jour de l'entrevue.",
+"ch": [
+"Arriver 10 minutes d'avance",
+"Saluer et se présenter",
+"Répondre avec des exemples",
+"Remercier et demander la suite"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "Poser une question à la fin de l'entrevue montre de l'intérêt.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "Que faut-il apporter à une entrevue?",
+"ch": [
+"Copies du CV",
+"Cartes de compétence",
+"Un crayon et des notes",
+"Son lunch"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"t": "multi"
+}
+]
+},
+{
+"id": "defi-recherche-emploi-plc-6",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Recherche d'emploi (Plomberie et chauffage) · Défi+ 6 de 6",
+"sujet": "Module 8 : relance et premier emploi",
+"couv": "img/couvertures/recherche-emploi-plc.jpg",
+"coul": "#1F6FB2",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
 {
 "q": "La loi qui fixe les conditions minimales de travail au Québec :",
 "ch": [
@@ -15166,6 +19330,76 @@ window.QUIZ_LIVRES = [
 ],
 "bon": 1,
 "s": 20
+},
+{
+"q": "Associe la situation à la bonne action.",
+"t": "paires",
+"g": [
+"Aucune nouvelle après une semaine",
+"Refus",
+"Offre reçue",
+"Premier jour"
+],
+"ch": [
+"Relancer poliment",
+"Remercier et demander des conseils",
+"Demander une confirmation écrite",
+"Arriver tôt, écouter, poser des questions"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Pendant la probation, l'employeur regarde surtout…",
+"ch": [
+"tes réseaux sociaux",
+"ton nombre d'amis au travail",
+"ta voiture",
+"ta fiabilité et ta sécurité"
+],
+"bon": 3,
+"s": 20
+},
+{
+"q": "Remets dans l'ordre une relance par téléphone.",
+"ch": [
+"Se présenter",
+"Rappeler le poste et la date d'envoi",
+"Demander où en est le processus",
+"Remercier"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "Une relance se fait environ une semaine après l'envoi ou l'entrevue.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "La période de probation dure souvent environ combien de mois?",
+"t": "estim",
+"ch": [],
+"bon": 3,
+"tol": 34,
+"u": "mois",
+"s": 25,
+"expl": "Souvent 3 mois (parfois 6)."
 }
 ]
 },
@@ -15174,8 +19408,8 @@ window.QUIZ_LIVRES = [
 "exemple": true,
 "livre": true,
 "defi": true,
-"titre": "Moyens de recherche d'emploi (EGI) · Défi+ 1 de 4",
-"sujet": "Modules 1 à 3 : mon bilan, les emplois en entretien, le CV",
+"titre": "Moyens de recherche d'emploi (EGI) · Défi+ 1 de 6",
+"sujet": "Modules 1 et 2 : mon bilan et les emplois en entretien",
 "couv": "img/couvertures/recherche-emploi-egi.jpg",
 "coul": "#2E8B57",
 "reg": {
@@ -15303,6 +19537,90 @@ window.QUIZ_LIVRES = [
 "s": 20
 },
 {
+"q": "Associe le titre d'emploi au milieu de travail.",
+"t": "paires",
+"g": [
+"Concierge résident",
+"Ouvrier d'entretien",
+"Préposé à l'entretien",
+"Technicien en bâtiment"
+],
+"ch": [
+"Vit dans l'immeuble locatif",
+"Municipalité ou école",
+"Hôpital, hôtel, CHSLD",
+"Grand immeuble de bureaux"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Ton bilan personnel complet est…",
+"ch": [
+"un document de travail pour toi",
+"signé par l'employeur",
+"affiché à l'école",
+"envoyé avec ton CV"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Les mêmes tâches peuvent porter des titres différents selon l'employeur.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "Remets dans l'ordre la préparation de ta recherche.",
+"ch": [
+"Faire ton bilan",
+"Choisir les emplois visés",
+"Faire ton CV",
+"Trouver les employeurs"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "Un immeuble de 48 logements sur 4 étages : combien de logements par étage?",
+"t": "nombre",
+"ch": [],
+"bon": 12,
+"s": 40,
+"u": "logements"
+}
+]
+},
+{
+"id": "defi-recherche-emploi-egi-2",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Moyens de recherche d'emploi (EGI) · Défi+ 2 de 6",
+"sujet": "Module 3 : le CV",
+"couv": "img/couvertures/recherche-emploi-egi.jpg",
+"coul": "#2E8B57",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
 "q": "« Ouvrier d'entretien classe II », « concierge », « préposé » : ce sont…",
 "ch": [
 "des métiers sans aucun lien entre eux",
@@ -15354,23 +19672,7 @@ window.QUIZ_LIVRES = [
 ],
 "bon": 0,
 "s": 20
-}
-]
 },
-{
-"id": "defi-recherche-emploi-egi-2",
-"exemple": true,
-"livre": true,
-"defi": true,
-"titre": "Moyens de recherche d'emploi (EGI) · Défi+ 2 de 4",
-"sujet": "Modules 3 et 4 : le CV, chercher et postuler en ligne",
-"couv": "img/couvertures/recherche-emploi-egi.jpg",
-"coul": "#2E8B57",
-"reg": {
-"nb": "tout",
-"melange": "tout"
-},
-"qs": [
 {
 "q": "Ton bilan personnel complet, l'employeur…",
 "ch": [
@@ -15424,6 +19726,94 @@ window.QUIZ_LIVRES = [
 "bon": 0,
 "s": 20
 },
+{
+"q": "Associe le verbe d'action à la tâche.",
+"t": "paires",
+"g": [
+"Réparé",
+"Inspecté",
+"Entretenu",
+"Accueilli"
+],
+"ch": [
+"Une porte qui ne fermait plus",
+"Les extincteurs chaque mois",
+"Les planchers d'une école",
+"Les nouveaux locataires"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Une puce de CV forte commence par…",
+"ch": [
+"la date de l'emploi",
+"« J'étais responsable de… »",
+"un verbe d'action au passé",
+"le nom de l'entreprise"
+],
+"bon": 2,
+"s": 20
+},
+{
+"q": "Trouve l'erreur dans cette phrase.",
+"t": "erreur",
+"ch": [
+"Mon CV présente",
+"mes expériences récentes en premier,",
+"mes cartes et attestations,",
+"et ma date de naissance en haut."
+],
+"bon": 3,
+"s": 30,
+"expl": "On ne met pas sa date de naissance."
+},
+{
+"q": "La section Formation commence par le diplôme le plus récent.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "Quelles attestations sont utiles en entretien?",
+"ch": [
+"SIMDUT",
+"Secourisme",
+"Travail en hauteur",
+"Permis de bateau"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"t": "multi"
+}
+]
+},
+{
+"id": "defi-recherche-emploi-egi-3",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Moyens de recherche d'emploi (EGI) · Défi+ 3 de 6",
+"sujet": "Modules 3 et 4 : chercher et postuler en ligne",
+"couv": "img/couvertures/recherche-emploi-egi.jpg",
+"coul": "#2E8B57",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
 {
 "q": "Une bonne puce de CV commence par…",
 "ch": [
@@ -15534,16 +19924,86 @@ window.QUIZ_LIVRES = [
 ],
 "bon": 0,
 "s": 20
+},
+{
+"q": "Associe le type d'employeur à l'endroit où il affiche.",
+"t": "paires",
+"g": [
+"Centre de services scolaire",
+"Municipalité",
+"Gestionnaire immobilier",
+"Hôpital (CISSS)"
+],
+"ch": [
+"Son site, section carrières",
+"Son site et le journal local",
+"Sites d'emploi et réseaux",
+"Site du CISSS, concours"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Un concours de la fonction publique demande souvent…",
+"ch": [
+"une lettre écrite à la main",
+"seulement un appel au directeur",
+"de se présenter sans CV",
+"de répondre à des questions de sélection en ligne"
+],
+"bon": 3,
+"s": 20
+},
+{
+"q": "Remets dans l'ordre une candidature à une municipalité.",
+"ch": [
+"Trouver l'affichage",
+"Vérifier les exigences",
+"Remplir le formulaire en ligne",
+"Noter la date limite et le suivi"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "Il faut respecter la date limite de l'affichage.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "Un affichage de poste dans le secteur public reste ouvert environ combien de jours?",
+"t": "estim",
+"ch": [],
+"bon": 14,
+"tol": 50,
+"u": "jours",
+"s": 25,
+"expl": "Souvent 1 à 3 semaines."
 }
 ]
 },
 {
-"id": "defi-recherche-emploi-egi-3",
+"id": "defi-recherche-emploi-egi-4",
 "exemple": true,
 "livre": true,
 "defi": true,
-"titre": "Moyens de recherche d'emploi (EGI) · Défi+ 3 de 4",
-"sujet": "Modules 4 à 7 : mises en situation, lettre, entrevue",
+"titre": "Moyens de recherche d'emploi (EGI) · Défi+ 4 de 6",
+"sujet": "Modules 4 et 5 : mises en situation et lettre",
 "couv": "img/couvertures/recherche-emploi-egi.jpg",
 "coul": "#2E8B57",
 "reg": {
@@ -15670,6 +20130,98 @@ window.QUIZ_LIVRES = [
 "expl": "La conclusion demande une rencontre et se termine par une formule de politesse."
 },
 {
+"q": "Associe la mise en situation à la priorité.",
+"t": "paires",
+"g": [
+"Fuite d'eau au plafond",
+"Locataire fâché",
+"Alarme incendie",
+"Bris non urgent"
+],
+"ch": [
+"Couper l'eau et protéger",
+"Écouter et rester calme",
+"Évacuer et suivre le plan",
+"Bon de travail et planifier"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Dans une mise en situation d'entrevue, on parle d'abord…",
+"ch": [
+"de l'heure du dîner",
+"de la sécurité",
+"du prix des réparations",
+"de ses vacances"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Remets dans l'ordre la lettre de présentation.",
+"ch": [
+"Le poste visé",
+"Ce que tu apportes",
+"Pourquoi cet employeur",
+"La demande de rencontre"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "Une lettre de présentation tient sur une page.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "Une bonne lettre est…",
+"ch": [
+"Adaptée à l'offre",
+"Sans fautes",
+"Signée",
+"Copiée d'Internet"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"t": "multi"
+}
+]
+},
+{
+"id": "defi-recherche-emploi-egi-5",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Moyens de recherche d'emploi (EGI) · Défi+ 5 de 6",
+"sujet": "Modules 6 et 7 : l'entrevue",
+"couv": "img/couvertures/recherche-emploi-egi.jpg",
+"coul": "#2E8B57",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
 "q": "Une lettre de candidature spontanée s'appuie sur…",
 "ch": [
 "ton horaire de la semaine",
@@ -15724,23 +20276,7 @@ window.QUIZ_LIVRES = [
 ],
 "bon": 2,
 "s": 20
-}
-]
 },
-{
-"id": "defi-recherche-emploi-egi-4",
-"exemple": true,
-"livre": true,
-"defi": true,
-"titre": "Moyens de recherche d'emploi (EGI) · Défi+ 4 de 4",
-"sujet": "Modules 7 et 8 : entrevue, relance, premier emploi",
-"couv": "img/couvertures/recherche-emploi-egi.jpg",
-"coul": "#2E8B57",
-"reg": {
-"nb": "tout",
-"melange": "tout"
-},
-"qs": [
 {
 "q": "La méthode STAR : dans l'ordre.",
 "ch": [
@@ -15802,6 +20338,92 @@ window.QUIZ_LIVRES = [
 "bon": 2,
 "s": 20
 },
+{
+"q": "Associe la question d'entrevue au bon réflexe.",
+"t": "paires",
+"g": [
+"Parle-moi de toi",
+"Ton plus grand défaut?",
+"Pourquoi nous?",
+"As-tu des questions?"
+],
+"ch": [
+"Résumé lié au poste",
+"Vrai défaut et ce que tu fais pour t'améliorer",
+"Ce que tu sais de l'entreprise",
+"Poser une question préparée"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "La tenue pour une entrevue en entretien est…",
+"ch": [
+"le survêtement de sport",
+"un cran plus habillée que la tenue de travail",
+"un complet-cravate obligatoire",
+"les vêtements de travail sales"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Remets dans l'ordre la préparation d'une entrevue.",
+"ch": [
+"Relire l'offre",
+"Préparer 3 exemples",
+"Préparer tes questions",
+"Planifier le trajet"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "En entrevue vidéo, on regarde la caméra pour donner l'impression de regarder la personne.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "Une entrevue d'embauche dure souvent environ combien de minutes?",
+"t": "estim",
+"ch": [],
+"bon": 40,
+"tol": 40,
+"u": "min",
+"s": 25,
+"expl": "Souvent 30 à 60 minutes."
+}
+]
+},
+{
+"id": "defi-recherche-emploi-egi-6",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Moyens de recherche d'emploi (EGI) · Défi+ 6 de 6",
+"sujet": "Modules 7 et 8 : relance et premier emploi",
+"couv": "img/couvertures/recherche-emploi-egi.jpg",
+"coul": "#2E8B57",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
 {
 "q": "La loi qui fixe les conditions minimales de travail au Québec :",
 "ch": [
@@ -15917,6 +20539,82 @@ window.QUIZ_LIVRES = [
 ],
 "bon": 2,
 "s": 20
+},
+{
+"q": "Associe l'étape à son but.",
+"t": "paires",
+"g": [
+"Relance",
+"Remerciement",
+"Confirmation écrite",
+"Probation"
+],
+"ch": [
+"Montrer ton intérêt",
+"Laisser une bonne impression",
+"Éviter les malentendus sur les conditions",
+"Prouver ta fiabilité"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Après un refus, la bonne attitude est…",
+"ch": [
+"arrêter de chercher",
+"rappeler tous les jours",
+"écrire une plainte",
+"remercier et continuer ta recherche"
+],
+"bon": 3,
+"s": 20
+},
+{
+"q": "Remets dans l'ordre le premier jour de travail.",
+"ch": [
+"Arriver en avance",
+"Rencontrer l'équipe",
+"Visite et consignes de sécurité",
+"Poser des questions et noter"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "Garder ton dossier de recherche à jour aide pour le prochain emploi.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "Que demande-t-on dans la confirmation écrite de l'offre?",
+"ch": [
+"Le salaire",
+"L'horaire",
+"La date de début",
+"Le nom des collègues"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"t": "multi"
 }
 ]
 }

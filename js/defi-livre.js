@@ -1,4 +1,4 @@
-/* Défi+ des livres (21 nov.) : quand on a lu un tiers, deux tiers ou tout le livre, une petite carte propose le Défi+ de ce tiers.
+/* Défi+ des livres (21 nov.) : à chaque sixième du livre (6 Défi+ par livre depuis le 25 nov.), une petite carte propose le Défi+ de ce tiers.
    Données : js/defi-livre-data.js (window.DEFI_LIVRES). Une seule fois par tiers et par session. */
 (() => {
   let carte = null, cacheT = 0, avant = "";
