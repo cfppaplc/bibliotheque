@@ -123,8 +123,10 @@ test("Administration : message, mise à jour forcée, voir comme, Défi+, ajoute
   await p.onglet("voir"); const av = await p.evaluate(() => LIVRES.filter(l => ACCES.verrouille(l.fichier)).length);
   await p.click("[data-voir]"); await attendre(600);
   vrai(await p.evaluate(() => !!document.getElementById("mpVoir")), "Pas de bandeau « Voir comme »");
+  vrai(await p.evaluate(() => ACCES.session.voir === true && LIVRES.some(l => ACCES.verrouille(l.fichier))), "« Voir comme » ne change pas la session ou les cadenas");
   await p.click("#mpVoir button"); await attendre(400);
   vrai(await p.evaluate(() => LIVRES.filter(l => ACCES.verrouille(l.fichier)).length) === av, "Retour au compte incomplet");
+  vrai(await p.evaluate(() => !ACCES.session.voir && ACCES.session.admin && !document.body.classList.contains("eleve")), "Retour : session ou mode élève pas remis");
   await p.evaluate(() => ACCES.menu()); await attendre(300); await p.evaluate(() => document.querySelector("button[data-a=gerer]").click()); await attendre(1500);
   await p.onglet("defi"); await p.click('[data-ql="5"]'); await attendre(300); await p.click('[data-q="0"]'); await attendre(300); await p.fill("#qQ", "Question modifiée"); await attendre(200);
   vrai(/attendent/.test(await p.textContent(".ap-pub .acces-etat")), "Défi+ : modification non signalée");

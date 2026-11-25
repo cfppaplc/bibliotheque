@@ -132,13 +132,25 @@ window.ADMIN_PLUS = (function(){
 
   /* ---------- Classe et atelier ---------- */
   function classe(z){
-    const L = (h, t, s) => '<a class="as-lien" href="' + h + '" target="_blank" rel="noopener">' + esc(t) + '<small>' + esc(s) + '</small></a>';
-    z.innerHTML = '<div class="ap-tete"><h3>Classe et atelier</h3><p class="sous">Les réglages de chaque outil s\'ouvrent dans un nouvel onglet.</p></div><div class="as-grille ap-g3">'
+    /* 25 nov. (Jeremy : « ça ne devrait pas s'ouvrir dans un nouveau lien ») : l'outil s'ouvre dans le panneau, dans un cadre à la hauteur de la page (pas de 2e défilement) */
+    const L = (h, t, s) => '<button class="as-lien" data-ouvre="' + h + '" data-t="' + esc(t) + '">' + esc(t) + '<small>' + esc(s) + '</small></button>';
+    z.innerHTML = '<div class="ap-tete"><h3>Classe et atelier</h3><p class="sous">Les réglages de chaque outil, ouverts ici même.</p></div><div class="as-grille ap-g3">'
       + '<div class="as-carte"><h3>Atelier</h3>' + L("outils-atelier.html", "Gestion d'atelier", "Groupes, élèves, équipes, locaux") + L("passeport.html?formations=1", "Formations du registre", "Outils et machines à signer") + L("coffres.html", "Inventaire des coffres", "Coffres, codes QR, listes") + '</div>'
-      + '<div class="as-carte"><h3>Classe</h3>' + L("accueil.html?menage=1", "Locaux et tâches du ménage", "Accueil de classe") + L("accueil.html", "Accueil de classe", "Horaire, citations, ménage") + L("horaire.html", "Horaires des groupes", "Planification") + '</div>'
-      + '<div class="as-carte"><h3>Labo</h3>' + L("labo.html", "Labo interactif", "Simulateurs et Défi+") + L("quiz.html", "Mes Défi+", "Créer et lancer un Défi+") + L("simulateur.html", "Simulateur de panneau", "") + '</div>'
-      + '<div class="as-carte"><h3>Outils de vérification</h3>' + L("tests.html", "Pages d'essai", "Navigateur, vitesse, toucher, son, écran") + L("presentation.html", "Présentation de Métier+", "Pour l'école et les collègues") + L("confidentialite.html", "Confidentialité (Loi 25)", "Ce que le site recueille") + '</div>'
+      + '<div class="as-carte"><h3>Classe</h3>' + L("accueil.html?menage=1", "Locaux et tâches du ménage", "Accueil de classe") + L("horaire.html", "Horaires des groupes", "Planification") + '</div>'
+      + '<div class="as-carte"><h3>Labo</h3>' + L("labo.html", "Labo interactif", "Simulateurs et Défi+") + L("quiz.html", "Mes Défi+", "Créer et lancer un Défi+") + '</div>'
+      + '<div class="as-carte"><h3>Vérification</h3>' + L("tests.html", "Pages d'essai", "Navigateur, vitesse, toucher, son, écran") + L("confidentialite.html", "Confidentialité (Loi 25)", "Ce que le site recueille") + '</div>'
       + '</div>';
+    z.querySelectorAll("[data-ouvre]").forEach(b => b.onclick = () => ouvrirIci(z, b.dataset.ouvre, b.dataset.t));
+  }
+  function ouvrirIci(z, url, titre){
+    z.innerHTML = '<div class="ap-cadre-t"><button class="abtn" id="apRet">‹ Classe et atelier</button><b>' + esc(titre) + '</b></div><iframe class="ap-cadre" title="' + esc(titre) + '" src="' + esc(url) + '"></iframe>';
+    z.querySelector("#apRet").onclick = () => classe(z);
+    const f = z.querySelector("iframe"), haut = () => Math.max(520, innerHeight - 190);
+    f.style.height = haut() + "px";
+    f.onload = () => { let d; try { d = f.contentDocument; } catch(e){ return; } if (!d) return;
+      const st = d.createElement("style"); st.textContent = ".mp-tete,.mp-pied,footer.mp-pied{display:none!important}body{min-height:0!important}"; d.head.appendChild(st);
+      const ajuste = () => { try { const h = Math.max(d.documentElement.scrollHeight, d.body ? d.body.scrollHeight : 0); const cur = f.getBoundingClientRect().height; if (h > cur + 8) f.style.height = (h + 4) + "px"; } catch(e){} };   /* une page à hauteur d'écran (accueil) ne grandit pas sans fin */
+      ajuste(); try { new f.contentWindow.ResizeObserver(ajuste).observe(d.body); } catch(e){ setInterval(ajuste, 1000); } };
   }
 
   /* ---------- Quoi de neuf ---------- */

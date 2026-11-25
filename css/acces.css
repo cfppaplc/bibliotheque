@@ -442,3 +442,7 @@ body.clair .as-lien{background:#f5f6fa;border-color:#e3e6ee}body.clair .as-sig{b
   }
   /* écran bas (TNI 1280 × 720) : le menu défile avec la page au lieu d'avoir sa propre zone de défilement */
   @media (min-width:1000px) and (max-height:820px){.acces-box.gestion .acces-onglets{position:absolute;max-height:none}}
+  body.voir-comme .book .cadenas{transform:scale(1.4)}
+  body.voir-comme .book:has(.cadenas) .cover,body.voir-comme .book:has(.cadenas) img{filter:grayscale(.85) brightness(.75)}
+  .ap-cadre-t{display:flex;align-items:center;gap:14px;margin-bottom:10px}.ap-cadre-t b{font-size:1.05rem}
+  .ap-cadre{display:block;width:100%;border:1px solid rgba(128,128,128,.25);border-radius:12px;background:#fff}

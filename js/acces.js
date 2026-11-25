@@ -643,11 +643,15 @@ window.ACCES = (function(){
     progs: () => PROGS(),
     livresProteges: () => Object.keys((BROUILLON || DATA).livres),
     extra: () => Object.keys(EXTRA),
-    voirComme: id => { VOIR = id || null; const b = document.getElementById("mpVoir"); if (b) b.remove();
-      if (VOIR){ const c = DATA.comptes[VOIR] || {}; const d = document.createElement("div"); d.id = "mpVoir";
-        d.innerHTML = '<span>Tu vois Métier+ comme <b></b> : ses livres ouverts et fermés.</span><button type="button">Revenir à mon compte</button>'; d.querySelector("b").textContent = c.nom || VOIR;
-        d.querySelector("button").onclick = () => ACCES_ADMIN.voirComme(null); document.body.appendChild(d); fermer(); }
-      try { render(); renderHero(); } catch(e){} },
+    voirComme: id => { VOIR = id && DATA.comptes[id] ? id : null; const b0 = document.getElementById("mpVoir"); if (b0) b0.remove();
+      const c = VOIR ? DATA.comptes[VOIR] : null;
+      document.body.classList.toggle("eleve", c ? !!c.eleve : !!(SESSION && SESSION.eleve));   /* groupe d'élèves : mode élève comme sur son iPad */
+      document.body.classList.toggle("voir-comme", !!c);
+      if (c){ const prot = Object.keys(DATA.livres), ouv = prot.filter(f => DATA.livres[f].cles[VOIR]).length;
+        const d = document.createElement("div"); d.id = "mpVoir";
+        d.innerHTML = '<span>Aperçu comme <b></b>' + (c.eleve ? ' (groupe d\'élèves)' : '') + ' : ' + ouv + ' livre' + (ouv > 1 ? 's' : '') + ' protégé' + (ouv > 1 ? 's' : '') + ' ouvert' + (ouv > 1 ? 's' : '') + ' sur ' + prot.length + '. Les autres ont un cadenas.</span><button type="button">Revenir à mon compte</button>';
+        d.querySelector("b").textContent = c.nom || VOIR; d.querySelector("button").onclick = () => ACCES_ADMIN.voirComme(null); document.body.appendChild(d); fermer(); scrollTo(0, 0); }
+      try { render(); renderHero(); } catch(e){ console.error(e); } },
     /* Ajouter ou remplacer un livre (même format que outils/chiffrer.py) : livre et recherche chiffrés (gzip + AES-GCM), clés pour les comptes */
     preparerLivre: async o => {
       const f = o.f, D = BROUILLON, existe = !!D.livres[f];
@@ -702,6 +706,6 @@ window.ACCES = (function(){
     if (SESSION) go(); else dlgConnexion(go);
   }
   setTimeout(() => { const b = document.getElementById("compteBtn"); if (b) b.onclick = menu; charger(); accepterDepuisLien(); invitationDepuisLien(); }, 0);
-  return { pret, get estPret(){ return estPret; }, protege, permis, verrouille, ouvrir, pdfDispo, pdfTelecharger, recherche, connexion, deconnexion, demande, lireDemande, dlgConnexion, dlgDemande, menu, get session(){ return SESSION; }, get eleve(){ return !!(SESSION && SESSION.eleve); }, get data(){ return DATA; }, charger, outils:{ enLigne:() => enLigne(), commitGitHub:(...a) => commitGitHub(...a), envelopperPour:(...a) => envelopperPour(...a), BOITE, sansAcc:t => sansAcc(t),
+  return { pret, get estPret(){ return estPret; }, protege, permis, verrouille, ouvrir, pdfDispo, pdfTelecharger, recherche, connexion, deconnexion, demande, lireDemande, dlgConnexion, dlgDemande, menu, get session(){ return VOIR && SESSION && DATA.comptes[VOIR] ? Object.assign({}, SESSION, { id:VOIR, nom:DATA.comptes[VOIR].nom, admin:false, eleve:!!DATA.comptes[VOIR].eleve, voir:true }) : SESSION; }, get eleve(){ return VOIR && DATA.comptes[VOIR] ? !!DATA.comptes[VOIR].eleve : !!(SESSION && SESSION.eleve); }, get data(){ return DATA; }, charger, outils:{ enLigne:() => enLigne(), commitGitHub:(...a) => commitGitHub(...a), envelopperPour:(...a) => envelopperPour(...a), BOITE, sansAcc:t => sansAcc(t),
     integrer(f, livre, ajouts){ if (f && livre){ DATA.livres[f] = JSON.parse(JSON.stringify(livre)); if (BROUILLON) BROUILLON.livres[f] = JSON.parse(JSON.stringify(livre)); } if (REGL) REGL.ajouts = JSON.parse(JSON.stringify(ajouts || [])); } } };
 })();
