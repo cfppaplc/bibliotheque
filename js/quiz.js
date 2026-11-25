@@ -322,11 +322,11 @@ function telecommande(bord){
     if (!G.quiz) { listeLob(); vue(); return; }
     const Q = G.jeu[G.i];
     $("jTitre").textContent = G.quiz.titre; if ($("tTitre")) $("tTitre").textContent = (estPres(G.quiz) ? "Présentation" : "Défi+") + " · télécommande";
-    $("qCour").textContent = G.etat === "lobby" ? (G.quiz && G.quiz.qs.some(x => x.t === "connexion") ? "Prêt : touche « Commencer » pour lancer la présentation (les élèves se connecteront plus loin)." : "En attente des participants…") : G.etat === "connexion" ? "Connexion des participants : le code est au tableau." : G.etat === "fin" ? "Partie terminée : le classement final est sur chaque iPad." : G.etat === "diapo" ? "Diapo " + (G.jeu.slice(0, G.i + 1).filter(x => typeDe(x) === "diapo").length) : (G.i + 1) + ". " + Q.q;
+    $("qCour").textContent = G.etat === "lobby" ? (G.quiz && G.quiz.qs.some(x => x.t === "connexion") ? "Prêt : touche « Commencer » pour lancer la présentation (les élèves se connecteront plus loin)." : "En attente des participants…") : G.etat === "connexion" ? "Connexion des participants : le code est au tableau." : G.etat === "fin" ? "Partie terminée : le classement final est sur chaque cellulaire." : G.etat === "diapo" ? "Diapo " + (G.jeu.slice(0, G.i + 1).filter(x => typeDe(x) === "diapo").length) : (G.i + 1) + ". " + Q.q;
     $("qInfo").textContent = G.etat === "question" ? Object.keys(G.reps).length + " réponse(s) sur " + ids().length + " · " + Q.s + " s" :
-      G.etat === "rev" ? "Bonne réponse : " + texteBon(Q) + (R().classement === "oui" ? " · le rang de chacun est envoyé sur son iPad." : "") :
+      G.etat === "rev" ? "Bonne réponse : " + texteBon(Q) + (R().classement === "oui" ? " · le rang de chacun est envoyé sur son cellulaire." : "") :
       G.etat === "inter" ? "Interrogatoire : pose les questions au tableau, puis passe au vote." : G.etat === "vtr" ? "Vote du tricheur : " + Object.keys(G.vtr || {}).length + " vote(s) sur " + ids().length + "." : G.etat === "vtrRes" ? "Le tricheur était " + (G.vtrRes ? G.vtrRes.nom : "") + "." :
-      G.etat === "mise" ? "Double ou rien : " + ids().filter(id => P[id].mise).length + " joueur(s) misent. Touche « Question suivante » pour commencer." : G.etat === "diapo" ? "Diapo au tableau · les iPad affichent « Regarde le tableau »." : G.quiz.qs.length + " éléments";
+      G.etat === "mise" ? "Double ou rien : " + ids().filter(id => P[id].mise).length + " joueur(s) misent. Touche « Question suivante » pour commencer." : G.etat === "diapo" ? "Diapo au tableau · les cellulaires affichent « Regarde le tableau »." : G.quiz.qs.length + " éléments";
     $("bGo").disabled = G.etat !== "lobby";
     { const bp = $("bPause"), au = !!(G.quiz && G.quiz.auto); bp.hidden = !au; bp.disabled = !(au && G.etat === "diapo"); bp.textContent = G.pause ? "▶ Reprendre" : "❚❚ Pause"; }
     $("bSuite").disabled = !["question", "rev", "mise", "diapo", "connexion", "vtr", "vtrRes", "inter"].includes(G.etat) && !(G.etat === "fin" && !(G.bilan || []).some(Boolean));
@@ -778,7 +778,7 @@ function telecommande(bord){
   }
   $("bNouveau").onclick = () => editer(null);
   /* Présentation avec questions (10 nov., idée de Jeremy) : les pages d'un PowerPoint enregistré en PDF deviennent des diapos (t:"diapo", img);
-     l'enseignant ajoute des questions entre les diapos (« + Question ici »). En partie : diapo au tableau, iPad « Regarde le tableau », rien à répondre. */
+     l'enseignant ajoute des questions entre les diapos (« + Question ici »). En partie : diapo au tableau, cellulaires « Regarde le tableau », rien à répondre. */
   async function pdfjsPret(){ if (window.pdfjsLib && window.pdfjsLib.getDocument) return;
     const base = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/";
     await new Promise((ok, ko) => { const sc = document.createElement("script"); sc.src = base + "pdf.min.js"; sc.onload = ok; sc.onerror = ko; document.head.append(sc); });
@@ -865,13 +865,13 @@ function telecommande(bord){
         <h3>Pour les corser <button id="mExpert" class="btn2" title="Temps court + pénalité + choix cachés">Mode expert</button></h3>
         <label><span>Pénalité</span>${seg("penalite", [["non", "Non"], ["oui", "−250 si faux"]])}</label>
         <label><span>Choix cachés</span>${seg("cache", [["non", "Non"], ["oui", "5 s pour lire"]])}</label>
-        <label><span>Texte des choix</span>${seg("lettres", [["non", "Au tableau"], ["oui", "iPad seulement"]])}</label>
+        <label><span>Texte des choix</span>${seg("lettres", [["non", "Au tableau"], ["oui", "Cellulaire seulement"]])}</label>
         <label><span>Indice<small>l'élève paie 500 points pour enlever des mauvais choix</small></span>${seg("indice", [["non", "Non"], ["oui", "Oui (−500)"]])}</label>
         <label><span>Double ou rien</span>${seg("double", [["non", "Non"], ["oui", "Vers 40 % et à la fin"]])}</label>
         <label><span>Tricheur <i class="infoB" role="button" tabindex="0" aria-label="Comment marche le tricheur">i</i><small>un élève secret voit les bonnes réponses; à la fin, tout le monde vote</small></span>${seg("tricheur", [["non", "Non"], ["oui", "Oui"]])}</label>
         <div class="bulleI" hidden><b>Le tricheur, c'est quoi?</b>
           <p>Un seul élève, tiré au hasard, est le tricheur. Personne ne sait qui c'est, même pas toi.</p>
-          <p><b>Pendant la partie :</b> son iPad lui montre la bonne réponse. Il doit gagner sans que les autres s'en aperçoivent.</p>
+          <p><b>Pendant la partie :</b> son cellulaire lui montre la bonne réponse. Il doit gagner sans que les autres s'en aperçoivent.</p>
           <p><b>À la fin :</b> 2 minutes pour discuter et accuser. Ensuite, chacun vote pour celui qu'il croit être le tricheur.</p>
           <p><b>Les points :</b></p>
           <ul><li>Tu trouves le tricheur : tu lui prends des points.</li>
@@ -943,7 +943,7 @@ function telecommande(bord){
   { const c = params.get("choisir"); if (bord && c && tousQuiz().some(x => x.id === c)) modes(c); }
 }
 
-/* ================================ JOUEUR (iPad de l'élève) ================================ */
+/* ================================ JOUEUR (cellulaire de l'élève) ================================ */
 function joueur(code){
   const topic = PREFIXE + code;
   $("joueur").classList.remove("cache");
@@ -1016,7 +1016,7 @@ function joueur(code){
       if (!entre || !pour(m)) return;
       if (m.coul) teinte(m.coul);
       if (m.m === "bienvenue") bx(`<div class="gros monte">Tu es dans la partie.</div><div>${esc(m.titre || "")}</div><div style="opacity:.7;margin-top:8px">Regarde le tableau : ça commence bientôt.</div>`);
-      else if (m.m === "diapo") { clearInterval(chrono); bx('<div class="gros monte">Regarde le tableau</div><div style="opacity:.75">Garde ton iPad près de toi.</div><button id="jMain" class="jMain">✋ J\'ai une question</button><div class="sous" style="opacity:.6;margin-top:8px">Anonyme : l\'enseignant voit seulement le nombre de mains levées.</div>');
+      else if (m.m === "diapo") { clearInterval(chrono); bx('<div class="gros monte">Regarde le tableau</div><div style="opacity:.75">Garde ton cellulaire près de toi.</div><button id="jMain" class="jMain">✋ J\'ai une question</button><div class="sous" style="opacity:.6;margin-top:8px">Anonyme : l\'enseignant voit seulement le nombre de mains levées.</div>');
         $("jMain").onclick = () => { const b = $("jMain"); envoyer(topic, {m: "main", pid}); b.disabled = true; b.textContent = "✋ Main levée"; setTimeout(() => { if (b.isConnected) { b.disabled = false; b.textContent = "✋ J'ai une question"; } }, 30000); }; }
       else if (m.m === "attente") bx('<div class="gros">Pause</div><div>L\'enseignant prépare la suite.</div>');
       else if (m.m === "mise") {
@@ -1397,7 +1397,7 @@ function ecran(code){
       const lobK = cle + "|" + (cv || "") + "|" + v.titre + "|" + innerWidth + "|" + sonOK, nbT = `${nj} participant${nj > 1 ? "s" : ""}`, nomsH = v.joueurs.map(j => `<span>${visage(j.av, "v-e")}${esc(j.n)}</span>`).join("");
       if (rendre.lobK === lobK && $("eNoms")) { if ($("eNb").textContent !== nbT) $("eNb").textContent = nbT; if (rendre.nomsH !== nomsH) { $("eNoms").innerHTML = nomsH; rendre.nomsH = nomsH; } }
       else { rendre.lobK = lobK; rendre.nomsH = nomsH;
-      E.innerHTML = tete(v.titre) + (cv ? `<div class="banniere" style="--u:url('${esc(cv)}')"><i class="bfond"></i><img src="${esc(cv)}" alt="" onload="if(this.naturalHeight>this.naturalWidth*1.1)this.parentNode.classList.add('port')"><span>${v.sujet ? `<small>${esc(v.sujet)}</small>` : ""}${esc(v.titre)}</span></div>` : "") + `<div class="lob"><div class="qrc"><div class="qr" id="eQr"></div><div class="codeL">Code de la partie</div><div class="code">${code.slice(0, 3)} ${code.slice(3)}</div></div><div>${V.pres ? "" : `<div class="defiLogo">Défi<span>+</span></div>`}<ol class="etapesL"><li><b>1</b>Prends ton cellulaire ou ton iPad</li><li><b>2</b>Scanne le code QR<small>avec l'appareil photo</small></li><li><b>3</b>Pas de caméra ?<small>va sur <u>${esc(location.host)}/quiz</u> et tape le code</small></li><li><b>4</b>Choisis ton personnage<small>et écris ton prénom</small></li></ol><div id="eNb" style="font-size:1.6vw;color:#B5AFA6">${nbT}</div>
+      E.innerHTML = tete(v.titre) + (cv ? `<div class="banniere" style="--u:url('${esc(cv)}')"><i class="bfond"></i><img src="${esc(cv)}" alt="" onload="if(this.naturalHeight>this.naturalWidth*1.1)this.parentNode.classList.add('port')"><span>${v.sujet ? `<small>${esc(v.sujet)}</small>` : ""}${esc(v.titre)}</span></div>` : "") + `<div class="lob"><div class="qrc"><div class="qr" id="eQr"></div><div class="codeL">Code de la partie</div><div class="code">${code.slice(0, 3)} ${code.slice(3)}</div></div><div>${V.pres ? "" : `<div class="defiLogo">Défi<span>+</span></div>`}<ol class="etapesL"><li><b>1</b>Prends ton cellulaire</li><li><b>2</b>Scanne le code QR<small>avec l'appareil photo</small></li><li><b>3</b>Pas de caméra ?<small>va sur <u>${esc(location.host)}/quiz</u> et tape le code</small></li><li><b>4</b>Choisis ton personnage<small>et écris ton prénom</small></li></ol><div id="eNb" style="font-size:1.6vw;color:#B5AFA6">${nbT}</div>
         <div class="noms" id="eNoms">${nomsH}</div></div></div>` + bSon();
       try { const tq = cv ? .16 : .22; new QRCode($("eQr"), {text: url, width: Math.round(innerWidth * tq), height: Math.round(innerWidth * tq), correctLevel: QRCode.CorrectLevel.H}); if (window.qrLogo) qrLogo($("eQr")); } catch(e) { $("eQr").textContent = url; } }
     } else if (v.etat === "diapo") {
@@ -1412,7 +1412,7 @@ function ecran(code){
         E.innerHTML = tete("Statistiques de la classe") + `<div class="stats monte"><div class="statsM"><b>${moy} %</b><span>de bonnes réponses en moyenne</span>${dures.length ? `<em>${dures.length} question${dures.length > 1 ? "s" : ""} à revoir (moins de 60 %)</em>` : "<em>Aucune question sous 60 % : bravo!</em>"}</div>
         <div class="statsL">${S.map(x => `<div class="stq ${x.p < 60 ? "dur" : ""}"><span class="stn">${x.i + 1}</span><span class="stt">${esc(x.q)}${x.p < 60 && S.filter(y => y.p < x.p || (y.p === x.p && y.i < x.i)).length < 5 ? `<small>Réponse : ${esc(x.bon)}</small>` : ""}</span><span class="stb"><i style="width:${x.p}%"></i></span><b>${x.p} %</b></div>`).join("")}</div></div>` + bSon(); }
     } else if (v.etat === "vtr") {
-      if (cle !== dernier || force) { E.innerHTML = tete("Le tricheur") + `<div class="dblE monte"><b>Qui est le tricheur?</b><span>Un élève voyait les bonnes réponses.<br>Vote sur ton iPad, ou passe. Ceux qui le trouvent se partagent la moitié de ses points.<br>Ceux qui se trompent lui donnent 20 % des leurs.</span><em id="eVtr"></em></div>` + bSon(); if (cle !== dernier) accord(); }
+      if (cle !== dernier || force) { E.innerHTML = tete("Le tricheur") + `<div class="dblE monte"><b>Qui est le tricheur?</b><span>Un élève voyait les bonnes réponses.<br>Vote sur ton cellulaire, ou passe. Ceux qui le trouvent se partagent la moitié de ses points.<br>Ceux qui se trompent lui donnent 20 % des leurs.</span><em id="eVtr"></em></div>` + bSon(); if (cle !== dernier) accord(); }
       $("eVtr").textContent = v.vtrN + " vote" + (v.vtrN > 1 ? "s" : "") + " sur " + v.joueurs.length;
     } else if (v.etat === "vtrRes" && v.vtrRes) {   /* 25 nov. (Jeremy : « on veut voir le pointage de l'accusé monter et descendre ») */
       if (cle !== dernier || force) { const x = v.vtrRes, T = (x.L || []).find(o => o.tr), A = (x.L || []).filter(o => !o.tr);
@@ -1426,7 +1426,7 @@ function ecran(code){
             if (bouge && cap[k - 1]) $("vrC").textContent = cap[k - 1]; }, 900 + (k - 1) * 2200)); } }
     } else if (v.etat === "mise") {
       if (cle !== dernier || force) {
-        E.innerHTML = tete("Question spéciale") + `<div class="dblE monte"><b>Double ou rien</b><span>Sur ton iPad : mise tous tes points.<br>Bonne réponse = points doublés. Mauvaise réponse = 0.</span><em id="eMises"></em></div>` + bSon();
+        E.innerHTML = tete("Question spéciale") + `<div class="dblE monte"><b>Double ou rien</b><span>Sur ton cellulaire : mise tous tes points.<br>Bonne réponse = points doublés. Mauvaise réponse = 0.</span><em id="eMises"></em></div>` + bSon();
         if (cle !== dernier) accord();
       }
       $("eMises").textContent = v.mises + " joueur" + (v.mises > 1 ? "s misent" : " mise") + " tout";
@@ -1442,10 +1442,10 @@ function ecran(code){
         else if (t === "nuage") corps = `<div class="enuage" id="eNuage"></div>`;
         else if (t === "echelle") corps = `<div class="eech monte">${["Pas du tout", "Un peu", "Moyen", "Assez", "Tout à fait"].map((l, k) => `<div><b>${k + 1}</b><span>${l}</span></div>`).join("")}</div>`;
         else if (t === "paires") corps = `<div class="epair"><div>${(v.q.g || []).map((x, j) => `<div class="monte" style="animation-delay:${.1 + j * .06}s"><span><i class="let">${j + 1}</i>${esc(x)}</span></div>`).join("")}</div><div>${v.q.ch.map((c, k) => `<div class="k${k} monte" style="animation-delay:${.3 + k * .06}s"><span><i class="let">${SYMB[k]}</i>${esc(c)}</span></div>`).join("")}</div></div>`;
-        else if (t === "estim") corps = `<div class="enb monte">Estime et tape ta réponse sur ton iPad${v.q.u ? ` <small>(en ${esc(v.q.u)})</small>` : ""}</div>`;
-        else if (t === "nombre") corps = `<div class="enb monte">Calcule et tape ta réponse sur ton iPad${v.q.u ? ` <small>(en ${esc(v.q.u)})</small>` : ""}</div>`;
-        else corps = `<div class="ech${lettresSeul ? " lettres" : ""}">${v.q.ch.map((c, k) => `<div class="k${k} monte" style="animation-delay:${.1 + k * .08}s"><span><i class="let">${SYMB[k]}</i>${lettresSeul ? "" : esc(c)}</span></div>`).join("")}</div>${lettresSeul ? '<div class="enb" style="font-size:1.6vw">Lis les choix sur ton iPad</div>' : ""}`;
-        const sous = {sondage: "Sondage · vote sur ton iPad", echelle: "Échelle de confiance · réponds de 1 à 5, c'est anonyme", nuage: "Nuage de mots · écris un mot sur ton iPad", multi: "Plusieurs bonnes réponses", ordre: "Remets dans le bon ordre", nombre: "Calcul", paires: "Associe les paires", estim: "Estimation · le plus proche gagne", erreur: "Trouve l'erreur"}[t];
+        else if (t === "estim") corps = `<div class="enb monte">Estime et tape ta réponse sur ton cellulaire${v.q.u ? ` <small>(en ${esc(v.q.u)})</small>` : ""}</div>`;
+        else if (t === "nombre") corps = `<div class="enb monte">Calcule et tape ta réponse sur ton cellulaire${v.q.u ? ` <small>(en ${esc(v.q.u)})</small>` : ""}</div>`;
+        else corps = `<div class="ech${lettresSeul ? " lettres" : ""}">${v.q.ch.map((c, k) => `<div class="k${k} monte" style="animation-delay:${.1 + k * .08}s"><span><i class="let">${SYMB[k]}</i>${lettresSeul ? "" : esc(c)}</span></div>`).join("")}</div>${lettresSeul ? '<div class="enb" style="font-size:1.6vw">Lis les choix sur ton cellulaire</div>' : ""}`;
+        const sous = {sondage: "Sondage · vote sur ton cellulaire", echelle: "Échelle de confiance · réponds de 1 à 5, c'est anonyme", nuage: "Nuage de mots · écris un mot sur ton cellulaire", multi: "Plusieurs bonnes réponses", ordre: "Remets dans le bon ordre", nombre: "Calcul", paires: "Associe les paires", estim: "Estimation · le plus proche gagne", erreur: "Trouve l'erreur"}[t];
         E.innerHTML = tete((v.sp ? "Activité " : "Question ") + (v.qn || v.i + 1) + " sur " + (v.nq || v.n)) + (sous ? `<div class="etype">${sous}</div>` : "") + `<div class="eq monte">${esc(v.q.q)}</div>${im}${corps}
           <div class="cpt"><span id="eRep"></span><b id="eT"></b></div>` + bSon();
         if (cle !== dernier && !cle.endsWith("L")) ton(440, .25, .08);

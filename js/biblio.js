@@ -142,7 +142,7 @@ function estVisiteur(){ const b = document.body; const v = !(window.ACCES && ACC
   b.classList.toggle("visiteur", v); return v; }
 const VIS_OUTILS = [["Plans techniques", "Des dossiers de plans complets, à mettre à l'échelle et à mesurer directement au tableau.", '<path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3z"/><path d="M9 3v15M15 6v15"/>'],
   ["Formatifs", "Cahiers d'activités et questionnaires à projeter, imprimer ou télécharger.", '<path d="M8 3h8l3 3v15H5V3z"/><path d="M9 11l2 2 4-4M9 17h6"/>'],
-  ["Labo", "Quiz et simulations joués avec les iPad de la classe, sans compte élève.", '<path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-9V3"/>']];
+  ["Labo", "Quiz et simulations joués avec les cellulaires des élèves, sans compte élève.", '<path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-9V3"/>']];
 function render(){
   let list = LIVRES.filter(l => !l.essai);   /* l'essai gratuit est pour les visiteurs seulement */
   if (estVisiteur() && !query){

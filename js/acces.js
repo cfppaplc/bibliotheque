@@ -468,7 +468,7 @@ window.ACCES = (function(){
       + '<select id="gTri" title="Trier"><option value="nom"' + (FILTRE.tri === "nom" ? " selected" : "") + '>Trier : nom de famille</option><option value="prog"' + (FILTRE.tri === "prog" ? " selected" : "") + '>Trier : programme</option><option value="peu"' + (FILTRE.tri === "peu" ? " selected" : "") + '>Trier : moins de livres</option></select>'
       + '<div class="acces-puces">' + puce("tous", "Tous") + puce("prof", "Enseignants") + progs.map(pg => puce(pg, court(pg))).join("") + puce("eleve", "Groupes") + '</div></div>'
       + (livres.length ? '<div class="acces-fiches">' + lignes + '<p class="sous" id="gRien" hidden>Personne ne correspond à ta recherche.</p></div>' : '<p class="sous">Aucun livre protégé pour l\'instant.</p>')
-      + '<div class="acces-sec"><h3>Groupes d\'élèves</h3><p class="sous">Un compte partagé par un groupe (ex. sur les iPad de la classe) : les livres cochés en lecture, crayon et texte, <b>sans les réponses</b> ni les outils du prof.</p>'
+      + '<div class="acces-sec"><h3>Groupes d\'élèves</h3><p class="sous">Un compte partagé par un groupe (ex. sur les cellulaires des élèves) : les livres cochés en lecture, crayon et texte, <b>sans les réponses</b> ni les outils du prof.</p>'
       + '<details id="gGrp"' + (OUVERTS.has("#grp") ? ' open' : '') + ' style="margin-top:6px"><summary style="cursor:pointer;color:#a9a9ae;font-size:.88rem">+ Créer un groupe</summary>'
       + '<label for="grNom">Nom du groupe</label><input type="text" id="grNom" placeholder="ex. EGI Groupe A">'
       + '<label for="grMdp">Mot de passe à donner aux élèves (au moins 6 caractères)</label><input type="text" id="grMdp" autocomplete="off" placeholder="ex. pavillon2026">'
@@ -687,7 +687,7 @@ window.ACCES = (function(){
     extra: () => Object.keys(EXTRA),
     voirComme: id => { VOIR = id && DATA.comptes[id] ? id : null; const b0 = document.getElementById("mpVoir"); if (b0) b0.remove();
       const c = VOIR ? DATA.comptes[VOIR] : null;
-      document.body.classList.toggle("eleve", c ? !!c.eleve : !!(SESSION && SESSION.eleve));   /* groupe d'élèves : mode élève comme sur son iPad */
+      document.body.classList.toggle("eleve", c ? !!c.eleve : !!(SESSION && SESSION.eleve));   /* groupe d'élèves : mode élève comme sur son cellulaire */
       document.body.classList.toggle("voir-comme", !!c);
       if (c){ const prot = Object.keys(DATA.livres), ouv = prot.filter(f => DATA.livres[f].cles[VOIR]).length;
         const d = document.createElement("div"); d.id = "mpVoir";

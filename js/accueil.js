@@ -1090,7 +1090,7 @@ function choix(row, label){
         const prets = [{ id:"exemple-incendie", titre:"Protection incendie : révision des modules 1 à 5" }].concat(window.QUIZ_LIVRES || []);
         f.innerHTML = '<select data-q>' + (miens.length ? '<optgroup label="Mes quiz">' + miens.map(opt).join("") + '</optgroup>' : "")
           + '<optgroup label="Défi+ prêts à jouer">' + prets.map(opt).join("") + '</optgroup></select>'
-          + '<small class="lk-aide">Le quiz s\'ouvrira en mode « Animer au tableau » : les élèves scannent le code QR avec leur iPad.</small>'
+          + '<small class="lk-aide">Le quiz s\'ouvrira en mode « Animer au tableau » : les élèves scannent le code QR avec leur cellulaire.</small>'
           + '<div class="lk-ok"><button type="button" class="prim" data-v>Choisir</button>' + annuler + '</div>';
         f.querySelector("[data-v]").onclick = () => { const s = f.querySelector("[data-q]"); fini({ type:"quiz", id:s.value, titre:s.options[s.selectedIndex].textContent }); };
         const x = f.querySelector("[data-x]"); if (x) x.onclick = () => z.remove(); };
@@ -1099,7 +1099,7 @@ function choix(row, label){
     }
     if (ty === "simulateur"){
       f.innerHTML = '<div class="lk-ok"><button type="button" class="prim" data-s="0">Panneau d\'alarme (mode libre)</button><button type="button" class="prim" data-s="1">Mission panneau (8 missions)</button>' + annuler + '</div>'
-        + '<small class="lk-aide">S\'ouvre en mode « Animer au tableau » : chaque équipe scanne le code QR avec son iPad.</small>';
+        + '<small class="lk-aide">S\'ouvre en mode « Animer au tableau » : chaque équipe scanne le code QR avec son cellulaire.</small>';
       f.querySelectorAll("[data-s]").forEach(b => b.onclick = () => fini({ type:"simulateur", defi:b.dataset.s === "1" }));
     }
     if (ty === "minuterie"){

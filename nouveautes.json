@@ -3,13 +3,13 @@
   "date": "2026-11-25",
   "type": "ajout",
   "titre": "Magasin de raccords : panier des élèves, approbation sur ton cellulaire",
-  "texte": "L'élève scanne sa carte étudiante (ou tape son code), cherche ses raccords et envoie son panier. Tu reçois un avis sur ton cellulaire et tu approuves en un toucher; le magasinier voit la commande à son comptoir et la prépare. Tout se règle dans Administration → Magasin.",
+  "texte": "L'élève montre sa carte Métier+ (collant sur sa carte étudiante ou « Ma carte » sur son cellulaire), cherche ses raccords et envoie son panier. Tu reçois un avis sur ton cellulaire et tu approuves en un toucher; le magasinier voit la commande à son comptoir et la prépare. Tout se règle dans Administration → Magasin.",
   "formation": [
    {
     "t": "Administration → Magasin : affiche le code QR de la page des élèves à l'atelier et ouvre le comptoir sur l'ordinateur du magasinier."
    },
    "Commandes à approuver → « Activer », puis « Recevoir les avis ici » sur ton cellulaire (iPhone : ajoute d'abord la page à l'écran d'accueil).",
-   "Collants pour la carte étudiante : Gestion d'atelier → ton groupe → « Codes des élèves ». Le code-barres sert au magasin.",
+   "Cartes des élèves : Gestion d'atelier → ton groupe → « Codes des élèves » : collants à code-barres, ou fiches « Ma carte » (l'élève scanne le code QR avec son cellulaire).",
    "Le dossier de chaque élève (Gestion d'atelier → toucher l'élève) montre aussi ses commandes."
   ]
  },
@@ -22,14 +22,14 @@
  {
   "date": "2026-11-25",
   "type": "ajout",
-  "titre": "Version élève : les livres sur l'iPad des élèves",
-  "texte": "Un compte par groupe d'élèves (Administration → Comptes et accès → Groupes d'élèves). L'élève lit les livres de son programme sur l'iPad, sans les réponses. Il touche une ligne pour écrire, une case ou un choix pour répondre; ses réponses restent sur son iPad.",
+  "titre": "Version élève : les livres sur le cellulaire des élèves",
+  "texte": "Un compte par groupe d'élèves (Administration → Comptes et accès → Groupes d'élèves). L'élève lit les livres de son programme sur son cellulaire, sans les réponses. Il touche une ligne pour écrire, une case ou un choix pour répondre; ses réponses restent sur son cellulaire.",
   "formation": [
    {
     "t": "Ton menu (initiales) → Administration → « Groupes d'élèves » → + Créer un groupe : nom, mot de passe, programme. Puis « Publier ».",
     "img": "nouveautes/eleves-groupe.jpg"
    },
-   "Sur l'iPad : « Se connecter » avec l'identifiant du groupe (ex. egi.groupe.a) et son mot de passe.",
+   "Sur le cellulaire : « Se connecter » avec l'identifiant du groupe (ex. egi.groupe.a) et son mot de passe.",
    {
     "t": "Côté élève, barre réduite : flèches, page, table des matières et Crayon (crayon, Texte, Annuler). Pas de réponses, de tableau blanc, de plans ni de tableau de bord.",
     "img": "nouveautes/eleves-barre.jpg"
@@ -42,7 +42,7 @@
     "t": "Outil Texte : touche une ligne de réponse, la case se place sur la ligne. Entrée = ligne suivante. Ça marche aussi pour toi.",
     "img": "nouveautes/eleves-ligne.jpg"
    },
-   "Ce que l'élève écrit reste sur cet iPad. Mot de passe à changer : bouton « Mot de passe » du groupe dans ton panneau."
+   "Ce que l'élève écrit reste sur ce cellulaire. Mot de passe à changer : bouton « Mot de passe » du groupe dans ton panneau."
   ],
   "versions": [
    {
@@ -268,10 +268,10 @@
     "t": "Sous une diapo, touche « + Question ici » : une question est proposée à partir du texte des diapos. Vérifie-la et change-la au besoin.",
     "img": "nouveautes/pres-editeur.jpg"
    },
-   "« Nuage de mots » : chaque élève écrit un mot sur son iPad; les mots apparaissent au tableau, plus gros quand ils reviennent. Pas de points.",
+   "« Nuage de mots » : chaque élève écrit un mot sur son cellulaire; les mots apparaissent au tableau, plus gros quand ils reviennent. Pas de points.",
    "Donne un titre et touche Enregistrer. Ta présentation est dans « Mes quiz et présentations ».",
    {
-    "t": "En classe : « Diapo suivante » fait avancer. Pendant une diapo, les iPad affichent « Regarde le tableau ». Points et classement après chaque question, podium à la fin.",
+    "t": "En classe : « Diapo suivante » fait avancer. Pendant une diapo, les cellulaires affichent « Regarde le tableau ». Points et classement après chaque question, podium à la fin.",
     "img": "nouveautes/pres-diapo.jpg"
    }
   ],
@@ -373,7 +373,7 @@
    "Lance un quiz en « Animer au tableau » : un code QR « Enseignant seulement » apparaît. Scanne-le avec ton cellulaire (connecté à Métier+).",
    "Sur le cellulaire : un gros bouton pour l'étape suivante, la minuterie, « +10 s », le son, qui a répondu, et retirer un joueur.",
    "Avant la partie, la fenêtre des réglages est plus claire : qui joue, nombre de questions, ordre, temps, musique, et « Pour les corser ».",
-   "Le classement montre les 10 premiers. Un élève qui revient (iPad rechargé) garde ses points.",
+   "Le classement montre les 10 premiers. Un élève qui revient (page rechargée) garde ses points.",
    "Cinq secondes avant la fin, l'écran de l'élève qui n'a pas répondu clignote en rouge (et vibre sur Android)."
   ],
   "versions": [
@@ -540,8 +540,8 @@
  {
   "date": "2026-11-07",
   "type": "outil",
-  "titre": "Labo interactif : simulateur de panneau, Mission panneau et Défi+ avec les iPad",
-  "texte": "Nouveau bouton « Labo » : des outils à faire en classe avec les iPad. Premier outil : un vrai panneau d'alarme incendie sur l'iPad de chaque équipe, piloté par ton iPad, et le « Mission panneau » (8 missions, questions éclair, classement au tableau).",
+  "titre": "Labo interactif : simulateur de panneau, Mission panneau et Défi+ avec les cellulaires",
+  "texte": "Nouveau bouton « Labo » : des outils à faire en classe avec les cellulaires. Premier outil : un vrai panneau d'alarme incendie sur le cellulaire de chaque équipe, piloté par ton cellulaire, et le « Mission panneau » (8 missions, questions éclair, classement au tableau).",
   "formation": [
    {
     "t": "Bouton « Labo » en haut à droite (une fois connecté). S'il y a trop de boutons, touche › pour voir les autres.",
@@ -551,7 +551,7 @@
     "t": "Sur l'ordinateur du tableau : ouvre le simulateur ou le quiz et choisis « Animer au tableau ». La barre du bas fait avancer la partie; « Télécommande » ouvre le détail. Avec deux écrans : « Télécommande » puis « Ouvrir l'écran de classe »."
    },
    {
-    "t": "Les élèves scannent le code QR avec leur iPad et choisissent un personnage de chantier : son nom fictif est proposé, et ils peuvent le changer. Un personnage choisi n'est plus offert aux autres.",
+    "t": "Les élèves scannent le code QR avec leur cellulaire et choisissent un personnage de chantier : son nom fictif est proposé, et ils peuvent le changer. Un personnage choisi n'est plus offert aux autres.",
     "img": "nouveautes/sim-ecran.jpg"
    },
    {
@@ -569,7 +569,7 @@
     "img": "nouveautes/sim-mission.jpg"
    },
    {
-    "t": "Défi+ : « + Créer un quiz » ou « Coller des questions » (une * devant la bonne réponse). Réglages : image du module au tableau, couleur, points, classement, ordre mêlé, sons, explications. Tu vois qui a répondu; chaque élève voit son rang sur son iPad.",
+    "t": "Défi+ : « + Créer un quiz » ou « Coller des questions » (une * devant la bonne réponse). Réglages : image du module au tableau, couleur, points, classement, ordre mêlé, sons, explications. Tu vois qui a répondu; chaque élève voit son rang sur son cellulaire.",
     "img": "nouveautes/quiz-ecran.jpg"
    }
   ],
@@ -584,7 +584,7 @@
    },
    {
     "date": "2026-11-07",
-    "texte": "Quiz : nouveaux types (plusieurs bonnes réponses, remettre en ordre, calcul, trouve l'erreur, zoom mystère) et réglages pour les caler (pénalité, choix cachés 5 s, texte des choix sur l'iPad seulement, double ou rien, mode expert). Les quiz des livres en contiennent."
+    "texte": "Quiz : nouveaux types (plusieurs bonnes réponses, remettre en ordre, calcul, trouve l'erreur, zoom mystère) et réglages pour les caler (pénalité, choix cachés 5 s, texte des choix sur le cellulaire seulement, double ou rien, mode expert). Les quiz des livres en contiennent."
    },
    {
     "date": "2026-11-07",

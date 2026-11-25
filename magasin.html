@@ -286,7 +286,10 @@ async function remettre(id, oui){ try { await rpc("panier_remettre", { p_id:id, 
   await Promise.all([chargerComptes(), chargerCatalogue()]);
   if (MODE === "prof") return prof();
   if (MODE === "magasin") return magasinier();
-  if (MOI && MOI.code) eleveCatalogue(); else eleveEntree();
+  if (MOI && MOI.code) return eleveCatalogue();
+  const K = LS.get("mpCarte", null);   /* « Ma carte Métier+ » sur ce cellulaire : entrée directe */
+  if (K && K.c) { eleveEntree(); $("#cCode").value = K.c; $("#cOk").click(); return; }
+  eleveEntree();
 })();
 if ("serviceWorker" in navigator) addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
 </script>

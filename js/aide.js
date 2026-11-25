@@ -38,9 +38,9 @@
       ["Ajouter mes propres documents", "Glisse un PDF n'importe où dans la bibliothèque, ou utilise « Ajouter un document » dans le menu de ton compte. Choisis ensuite Livre, Formatif ou Plan. L'administrateur doit d'abord t'en donner la permission.", "Ajoute tes propres livres, formatifs et plans"],
       ["Partager un document avec tous les enseignants", "Dans la fiche de ton document, touche « Proposer à tous ». L'administrateur le vérifie avant de le publier."]]},
     { k:"labo", t:"Labo", qn:"Labo interactif", items:[
-      ["Lancer un quiz avec les iPad", "Ouvre Labo, puis Quiz. Choisis un quiz et « Animer au tableau ». Les élèves scannent le code QR et choisissent un personnage; aucun compte élève n'est nécessaire."],
+      ["Lancer un quiz avec les cellulaires", "Ouvre Labo, puis Quiz. Choisis un quiz et « Animer au tableau ». Les élèves scannent le code QR et choisissent un personnage; aucun compte élève n'est nécessaire."],
       ["Créer mon propre quiz", "Dans Quiz, touche « Nouveau quiz ». Tu peux aussi coller des questions toutes prêtes. Sauvegarde-les de temps en temps avec « Sauvegarder tous mes quiz »."],
-      ["Utiliser le simulateur de panneau d'alarme", "Ouvre Labo, puis Simulateurs. Chaque équipe a un panneau sur son iPad; tu déclenches les événements depuis la télécommande."]]},
+      ["Utiliser le simulateur de panneau d'alarme", "Ouvre Labo, puis Simulateurs. Chaque équipe a un panneau sur son cellulaire; tu déclenches les événements depuis la télécommande."]]},
     { k:"accueil", t:"Accueil de classe", qn:"Accueil de classe", items:[
       ["Projeter l'horaire de la période", "Ouvre « Accueil de classe » : l'horloge, la ligne du temps et l'activité en cours s'affichent pour la classe."],
       ["Préparer un cours d'avance", "Touche « Préparer le cours », choisis le jour et la période dans la semaine, la compétence, puis les activités et leurs durées."],
