@@ -1,9 +1,8 @@
 # Copie de sauvegarde de la base Supabase (25 nov.) : le forfait gratuit n'en fait aucune.
 # Chaque dimanche, toutes les tables sont copiées, chiffrées avec le mot de passe de Jeremy, puis gardées 90 jours
 # dans les « Artifacts » de cette tâche (Actions → Sauvegarde Supabase → une exécution → sauvegarde-…).
-# Deux secrets à créer une fois (Settings → Secrets and variables → Actions → New repository secret) :
-#   SUPABASE_SECRET = clé secrète du projet (Supabase → Project Settings → API Keys → Secret keys)
-#   SAUVEGARDE_MDP  = un mot de passe choisi par Jeremy (le garder : il sert à ouvrir la sauvegarde)
+# Un seul secret (Settings → Secrets and variables → Actions) : SAUVEGARDE_MDP = mot de passe de Jeremy (le garder : il ouvre la sauvegarde).
+# La base vérifie ce mot de passe (fonction sauvegarde_lire, outils/sauvegarde.sql : seule son empreinte est gardée dans Supabase).
 # Ouvrir une sauvegarde : openssl enc -d -aes-256-cbc -pbkdf2 -in sauvegarde.tar.gz.enc -out sauvegarde.tar.gz
 name: Sauvegarde Supabase
 on:
@@ -18,29 +17,27 @@ jobs:
     steps:
       - name: Copier les tables
         env:
-          CLE: ${{ secrets.SUPABASE_SECRET }}
           MDP: ${{ secrets.SAUVEGARDE_MDP }}
         run: |
-          if [ -z "$CLE" ] || [ -z "$MDP" ]; then echo "Il manque le secret SUPABASE_SECRET ou SAUVEGARDE_MDP (voir le haut de ce fichier)."; exit 1; fi
-          CLE=$(printf %s "$CLE" | tr -d '[:space:]'); MDP_LONG=${#MDP}   # espaces ou retours de ligne collés par erreur
-          case "$CLE" in sb_secret_*) echo "Sorte de clé : secrète (bon)";; sb_publishable_*) echo "Sorte de clé : publique (mauvaise clé copiée)";; eyJ*) echo "Sorte de clé : ancienne clé (JWT)";; *) echo "Sorte de clé : inconnue (espace ou caractère en trop ?)";; esac
-          URL="https://kjlotlhqrgekzohshmbn.supabase.co/rest/v1"
+          if [ -z "$MDP" ]; then echo "Il manque le secret SAUVEGARDE_MDP (voir le haut de ce fichier)."; exit 1; fi
+          URL="https://kjlotlhqrgekzohshmbn.supabase.co/rest/v1/rpc/sauvegarde_lire"
+          PUB="sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY"
           mkdir -p sauvegarde
-          for t in coffre stats journal reveil; do
+          for t in coffre stats journal; do
             : > "sauvegarde/$t.jsonl"; n=0; d=0
             while :; do
-              code=$(curl -s -o page.json -w "%{http_code}" "$URL/$t?select=*&limit=1000&offset=$d" -H "apikey: $CLE")
-              if [ "$code" != "200" ]; then echo "$t : HTTP $code"; [ "$t" = "coffre" ] && exit 1; break; fi
+              jq -n --arg m "$MDP" --arg t "$t" --argjson d "$d" '{p_mdp:$m, p_table:$t, p_depart:$d}' > req.json
+              code=$(curl -s -o page.json -w "%{http_code}" -X POST "$URL" -H "apikey: $PUB" -H "Content-Type: application/json" --data @req.json)
+              if [ "$code" != "200" ] || [ "$(jq -r 'type' page.json)" != "array" ]; then echo "$t : refusé (HTTP $code; mot de passe ou fonction sauvegarde_lire)"; exit 1; fi
               k=$(jq length page.json); [ "$k" = "0" ] && break
-              jq -c '.[]' page.json >> "sauvegarde/$t.jsonl"; n=$((n + k)); d=$((d + 1000))
-              [ "$k" -lt 1000 ] && break
+              jq -c '.[]' page.json >> "sauvegarde/$t.jsonl"; n=$((n + k)); d=$((d + k))
             done
             echo "$t : $n rangées"
           done
           date -u +"%Y-%m-%dT%H:%MZ" > sauvegarde/date.txt
           tar czf sauvegarde.tar.gz sauvegarde
           openssl enc -aes-256-cbc -pbkdf2 -salt -in sauvegarde.tar.gz -out sauvegarde.tar.gz.enc -pass env:MDP
-          rm -rf sauvegarde sauvegarde.tar.gz page.json
+          rm -rf sauvegarde sauvegarde.tar.gz page.json req.json
       - uses: actions/upload-artifact@v4
         with:
           name: sauvegarde-${{ github.run_number }}
