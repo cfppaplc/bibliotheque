@@ -20,6 +20,21 @@ async function cles() {
   return await webpush.importVapidKeys(data!.cles, { extractable: true });
 }
 
+/* avis à tous les appareils des enseignants nommés (propriétaire du groupe + collègues du partage) */
+async function envoyer(ids: string[], msg: string, k: unknown) {
+  const app = await webpush.ApplicationServer.new({ contactInformation: "https://metierplus.app", vapidKeys: k as never }); let n = 0;
+  for (const ens of [...new Set(ids)]) {
+    const { data: pr } = await sb.from("panier_prof").select("abonnements").eq("ens", ens).maybeSingle(); if (!pr) continue;
+    const gardes: unknown[] = [];
+    for (const s of (pr.abonnements || []) as unknown[]) {
+      try { await app.subscribe(s as never).pushTextMessage(msg, {}); gardes.push(s); n++; }
+      catch (e) { if (!/\b(404|410)\b|gone|expired/i.test(String(e))) gardes.push(s); }   // appareil désabonné : on l'oublie
+    }
+    await sb.from("panier_prof").update({ abonnements: gardes }).eq("ens", ens);
+  }
+  return n;
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: cors });
   try {
@@ -33,11 +48,8 @@ Deno.serve(async (req) => {
       const REG = ["", "Ne connaissait pas le nom exact du raccord", "Sans carte étudiante", "Consignes d'accès non respectées", "Matériel rendu sale", "Sans feuille de l'enseignant", "Bris ou usage personnel"];
       const { data: a } = await sb.from("magasin_avis").select("*").eq("id", avis).maybeSingle();
       if (!a || Date.now() - new Date(a.t).getTime() > 120000) return json({ ok: false });
-      const { data: pr } = await sb.from("panier_prof").select("abonnements").eq("ens", a.ens).maybeSingle();
-      const app = await webpush.ApplicationServer.new({ contactInformation: "https://metierplus.app", vapidKeys: k });
       const msg = JSON.stringify({ title: `Magasin : ${a.prenom || "élève"} (${a.code}, ${a.groupe})`, body: "Règlement : " + (REG[a.regle] || "?"), url: "/magasin.html?mode=prof", tag: "avis-" + a.id });
-      for (const s of (pr?.abonnements || []) as unknown[]) { try { await app.subscribe(s as never).pushTextMessage(msg, {}); } catch (_) { /* appareil désabonné */ } }
-      return json({ ok: true });
+      return json({ ok: true, n: await envoyer([a.ens, ...(a.profs || [])], msg, k) });
     }
     const { data: p } = await sb.from("panier").select("*").eq("id", id).maybeSingle();
     if (eleve) {   /* avis à l'élève : son enseignant vient de décider (une seule fois) */
@@ -51,20 +63,12 @@ Deno.serve(async (req) => {
     }
     if (!p || p.avise || p.etat !== "attente" || Date.now() - new Date(p.t).getTime() > 120000) return json({ ok: false });
     await sb.from("panier").update({ avise: true }).eq("id", id);
-    const { data: pr } = await sb.from("panier_prof").select("abonnements").eq("ens", p.ens).maybeSingle();
-    const app = await webpush.ApplicationServer.new({ contactInformation: "https://metierplus.app", vapidKeys: k });
     const items = (p.items || []) as { q?: number; nom?: string }[];
     const msg = JSON.stringify({
       title: `Magasin : panier de l'élève ${p.code} (${p.groupe})`,
       body: items.slice(0, 5).map((i) => `${i.q || 1} × ${i.nom || "?"}`).join(", ") + (items.length > 5 ? "…" : ""),
       url: "/magasin.html?mode=prof", tag: "panier-" + p.id,
     });
-    const gardes: unknown[] = []; let n = 0;
-    for (const s of (pr?.abonnements || []) as unknown[]) {
-      try { await app.subscribe(s as never).pushTextMessage(msg, {}); gardes.push(s); n++; }
-      catch (e) { if (!/\b(404|410)\b|gone|expired/i.test(String(e))) gardes.push(s); }   // appareil désabonné : on l'oublie
-    }
-    await sb.from("panier_prof").update({ abonnements: gardes }).eq("ens", p.ens);
-    return json({ ok: true, n });
+    return json({ ok: true, n: await envoyer([p.ens, ...(p.profs || [])], msg, k) });
   } catch (e) { return json({ ok: false, err: String(e) }, 500); }
 });

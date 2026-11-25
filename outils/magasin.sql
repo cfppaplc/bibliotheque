@@ -233,3 +233,77 @@ returns table(t timestamptz, regle smallint) language sql stable security define
 $$;
 revoke all on function public.panier_eleve_avis(text, text, text) from public;
 grant execute on function public.panier_eleve_avis(text, text, text) to anon, authenticated;
+
+-- 25 nov. (Jeremy : « quand on crée les groupes, on pourrait dire qui enseigne ») : les enseignants du groupe (propriétaire + collègues du partage)
+-- reçoivent tous l'avis du panier et peuvent tous l'approuver; même chose pour les avis du magasinier.
+alter table public.panier add column if not exists profs text[] not null default '{}';
+alter table public.magasin_avis add column if not exists profs text[] not null default '{}';
+drop function if exists public.panier_envoyer(text, text, text, jsonb, text, text);
+create or replace function public.panier_envoyer(p_ens text, p_groupe text, p_code text, p_items jsonb, p_note text default null, p_prenom text default null, p_profs text[] default null)
+returns jsonb language plpgsql security definer set search_path = public, extensions as $$
+declare r public.panier; n int := jsonb_array_length(coalesce(p_items, '[]'::jsonb)); pr text := left(split_part(trim(coalesce(p_prenom, '')), ' ', 1), 20);
+  pf text[] := array(select distinct x from unnest(coalesce(p_profs, '{}')) x where x ~ '^[a-z0-9._-]{3,60}$' and x <> p_ens limit 8);
+begin
+  if p_ens !~ '^[a-z0-9._-]{3,60}$' or p_code !~ '^[0-9]{3}$' or length(coalesce(p_groupe, '')) not between 1 and 60 or n < 1 or n > 80 or length(coalesce(p_note, '')) > 300 then
+    return jsonb_build_object('ok', false, 'err', 'panier refusé'); end if;
+  if (select count(*) from public.panier where ens = p_ens and code = p_code and etat = 'attente') >= 3 then
+    return jsonb_build_object('ok', false, 'err', 'trop de paniers en attente'); end if;
+  if (select count(*) from public.panier where t > now() - interval '1 hour') >= 300 then
+    return jsonb_build_object('ok', false, 'err', 'magasin trop occupé'); end if;
+  insert into public.panier (ens, groupe, code, items, note, prenom, profs) values (p_ens, p_groupe, p_code, p_items, nullif(trim(p_note), ''), nullif(pr, ''), pf) returning * into r;
+  delete from public.panier where t < now() - interval '60 days';
+  if exists (select 1 from public.panier_prof where (ens = p_ens or ens = any(pf)) and jsonb_array_length(abonnements) > 0) then
+    perform net.http_post(url := 'https://kjlotlhqrgekzohshmbn.supabase.co/functions/v1/panier-avis', headers := '{"Content-Type":"application/json"}'::jsonb, body := jsonb_build_object('id', r.id));
+  end if;
+  return jsonb_build_object('ok', true, 'id', r.id);
+end; $$;
+create or replace function public.panier_prof_lire(p_ens text, p_jeton text)
+returns setof public.panier language sql stable security definer set search_path = public, extensions as $$
+  select p.* from public.panier p where (p.ens = p_ens or p_ens = any(p.profs)) and public.panier_prof_ok(p_ens, p_jeton) and p.t > now() - interval '7 days' order by p.t desc limit 200;
+$$;
+create or replace function public.panier_decider(p_ens text, p_jeton text, p_id uuid, p_ok boolean, p_motif text default null)
+returns boolean language plpgsql security definer set search_path = public, extensions as $$
+declare a jsonb;
+begin
+  if not public.panier_prof_ok(p_ens, p_jeton) then return false; end if;
+  update public.panier set etat = case when p_ok then 'approuve' else 'refuse' end, t_app = now(), motif = left(nullif(trim(p_motif), ''), 200)
+    where id = p_id and (ens = p_ens or p_ens = any(profs)) and etat = 'attente' returning abo into a;
+  if not found then return false; end if;
+  if a is not null then
+    perform net.http_post(url := 'https://kjlotlhqrgekzohshmbn.supabase.co/functions/v1/panier-avis', headers := '{"Content-Type":"application/json"}'::jsonb, body := jsonb_build_object('id', p_id, 'eleve', true));
+  end if;
+  return true;
+end; $$;
+create or replace function public.panier_eleve(p_ens text, p_jeton text, p_code text)
+returns setof public.panier language sql stable security definer set search_path = public, extensions as $$
+  select p.* from public.panier p where (p.ens = p_ens or p_ens = any(p.profs)) and p.code = p_code and public.panier_prof_ok(p_ens, p_jeton) order by p.t desc limit 100;
+$$;
+create or replace function public.panier_signaler(p_id uuid, p_regle int)
+returns jsonb language plpgsql security definer set search_path = public, extensions as $$
+declare p public.panier; a uuid;
+begin
+  if p_regle not between 1 and 6 then return jsonb_build_object('ok', false); end if;
+  select * into p from public.panier where id = p_id and etat in ('approuve', 'remis') and t > now() - interval '7 days';
+  if not found then return jsonb_build_object('ok', false, 'err', 'commande introuvable'); end if;
+  if exists (select 1 from public.magasin_avis where panier = p_id and regle = p_regle) then return jsonb_build_object('ok', true, 'deja', true); end if;
+  if (select count(*) from public.magasin_avis where t > now() - interval '1 hour') >= 100 then return jsonb_build_object('ok', false, 'err', 'trop d''avis'); end if;
+  insert into public.magasin_avis (panier, ens, groupe, code, prenom, regle, profs) values (p.id, p.ens, p.groupe, p.code, p.prenom, p_regle, p.profs) returning id into a;
+  delete from public.magasin_avis where t < now() - interval '30 days';
+  if exists (select 1 from public.panier_prof where (ens = p.ens or ens = any(p.profs)) and jsonb_array_length(abonnements) > 0) then
+    perform net.http_post(url := 'https://kjlotlhqrgekzohshmbn.supabase.co/functions/v1/panier-avis', headers := '{"Content-Type":"application/json"}'::jsonb, body := jsonb_build_object('avis', a));
+  end if;
+  return jsonb_build_object('ok', true);
+end; $$;
+create or replace function public.panier_prof_avis(p_ens text, p_jeton text)
+returns table(id uuid, t timestamptz, groupe text, code text, prenom text, regle smallint)
+language plpgsql stable security definer set search_path = public as $$
+begin
+  if not public.panier_prof_ok(p_ens, p_jeton) then return; end if;
+  return query select a.id, a.t, a.groupe, a.code, a.prenom, a.regle from public.magasin_avis a where (a.ens = p_ens or p_ens = any(a.profs)) and a.t > now() - interval '30 days' order by a.t desc limit 100;
+end; $$;
+create or replace function public.panier_eleve_avis(p_ens text, p_jeton text, p_code text)
+returns table(t timestamptz, regle smallint) language sql stable security definer set search_path = public as $$
+  select a.t, a.regle from public.magasin_avis a where (a.ens = p_ens or p_ens = any(a.profs)) and a.code = p_code and public.panier_prof_ok(p_ens, p_jeton) order by a.t desc limit 50;
+$$;
+revoke all on function public.panier_envoyer(text, text, text, jsonb, text, text, text[]) from public;
+grant execute on function public.panier_envoyer(text, text, text, jsonb, text, text, text[]) to anon, authenticated;
