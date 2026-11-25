@@ -43,7 +43,16 @@ Deno.serve(async (req) => {
       const raw = new Uint8Array(await crypto.subtle.exportKey("raw", (k as CryptoKeyPair).publicKey));
       return json({ cle: btoa(String.fromCharCode(...raw)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "") });
     }
-    const { id, eleve, avis } = await req.json();
+    const { id, eleve, avis, comptoir } = await req.json();
+    if (comptoir) {   /* iPad du comptoir : nouvelle commande approuvée (code et nombre de raccords seulement) */
+      const { data: p } = await sb.from("panier").select("id,code,items,etat,t_app").eq("id", id).maybeSingle();
+      if (!p || p.etat !== "approuve" || Date.now() - new Date(p.t_app).getTime() > 120000) return json({ ok: false });
+      const app = await webpush.ApplicationServer.new({ contactInformation: "https://metierplus.app", vapidKeys: k });
+      const msg = JSON.stringify({ title: "Magasin : nouvelle commande", body: `Élève ${p.code} · ${(p.items || []).length} raccord(s) à préparer`, url: "/magasin.html?mode=magasin", tag: "comptoir-" + p.id });
+      const { data: L } = await sb.from("magasin_abo").select("endpoint,abo"); let n = 0;
+      for (const x of (L || [])) { try { await app.subscribe(x.abo).pushTextMessage(msg, {}); n++; } catch (e) { if (/\b(404|410)\b|gone|expired/i.test(String(e))) await sb.from("magasin_abo").delete().eq("endpoint", x.endpoint); } }
+      return json({ ok: true, n });
+    }
     if (avis) {   /* règlement du magasin non respecté : avis à l'enseignant de l'élève */
       const REG = ["", "Ne connaissait pas le nom exact du raccord", "Sans carte étudiante", "Consignes d'accès non respectées", "Matériel rendu sale", "Sans feuille de l'enseignant", "Bris ou usage personnel"];
       const { data: a } = await sb.from("magasin_avis").select("*").eq("id", avis).maybeSingle();

@@ -389,3 +389,35 @@ begin
 end; $$;
 revoke all on function public.panier_stats(date, date, text), public.panier_stats_groupes(), public.panier_prof_archives(text, text, date, date) from public;
 grant execute on function public.panier_stats(date, date, text), public.panier_stats_groupes(), public.panier_prof_archives(text, text, date, date) to anon, authenticated;
+
+-- 25 nov. (Jeremy : « ils vont utiliser un iPad ») : l'iPad du comptoir reçoit un avis quand une commande est approuvée
+create table if not exists public.magasin_abo (endpoint text primary key, abo jsonb not null, t timestamptz not null default now());
+alter table public.magasin_abo enable row level security;
+create or replace function public.magasin_abonner(p_abonnement jsonb, p_oui boolean default true)
+returns boolean language plpgsql security definer set search_path = public as $$
+declare e text := p_abonnement->>'endpoint';
+begin
+  if coalesce(e, '') !~ '^https://' or length(e) > 1000 then return false; end if;
+  if not p_oui then delete from public.magasin_abo where endpoint = e; return true; end if;
+  if (select count(*) from public.magasin_abo) >= 20 and not exists (select 1 from public.magasin_abo where endpoint = e) then return false; end if;
+  insert into public.magasin_abo (endpoint, abo) values (e, p_abonnement) on conflict (endpoint) do update set abo = excluded.abo, t = now();
+  return true;
+end; $$;
+create or replace function public.panier_decider(p_ens text, p_jeton text, p_id uuid, p_ok boolean, p_motif text default null)
+returns boolean language plpgsql security definer set search_path = public, extensions as $$
+declare a jsonb;
+begin
+  if not public.panier_prof_ok(p_ens, p_jeton) then return false; end if;
+  update public.panier set etat = case when p_ok then 'approuve' else 'refuse' end, t_app = now(), motif = left(nullif(trim(p_motif), ''), 200)
+    where id = p_id and (ens = p_ens or p_ens = any(profs)) and etat = 'attente' returning abo into a;
+  if not found then return false; end if;
+  if a is not null then
+    perform net.http_post(url := 'https://kjlotlhqrgekzohshmbn.supabase.co/functions/v1/panier-avis', headers := '{"Content-Type":"application/json"}'::jsonb, body := jsonb_build_object('id', p_id, 'eleve', true));
+  end if;
+  if p_ok and exists (select 1 from public.magasin_abo) then
+    perform net.http_post(url := 'https://kjlotlhqrgekzohshmbn.supabase.co/functions/v1/panier-avis', headers := '{"Content-Type":"application/json"}'::jsonb, body := jsonb_build_object('id', p_id, 'comptoir', true));
+  end if;
+  return true;
+end; $$;
+revoke all on function public.magasin_abonner(jsonb, boolean) from public;
+grant execute on function public.magasin_abonner(jsonb, boolean) to anon, authenticated;
