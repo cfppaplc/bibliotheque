@@ -94,12 +94,19 @@
     for (const k in parCtx) delete parCtx[k]; for (const k in scripts) delete scripts[k]; pires.length = 0;
     return L.join("\n");
   }
-  function envoyer(final){
-    const m = rapport(); if (!m) return;
+  /* 25 nov. (Jeremy : « pourquoi pas l'envoyer là ») : rapports gardés 30 jours dans Supabase (table journal, outils/journal.sql);
+     si Supabase ne répond pas (table pas encore créée, réseau), le rapport part sur ntfy comme avant */
+  const SB = "https://kjlotlhqrgekzohshmbn.supabase.co/rest/v1/rpc/journal_ecrire", SBCLE = "sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY";
+  function parNtfy(m, final){
     const opts = { method: "POST", body: m, headers: { Title: TITRE, Tags: "chart_with_downwards_trend" } };
     /* sendBeacon ne peut pas mettre d'en-tête : le titre passe dans l'adresse (avant : rapports « sans titre ») */
     if (final && navigator.sendBeacon) { try { if (navigator.sendBeacon(SUJET + "?title=" + encodeURIComponent(TITRE) + "&tags=chart_with_downwards_trend", m)) return; } catch(e){} }
     fetch(SUJET, Object.assign(opts, { keepalive: !!final })).catch(() => {});
+  }
+  function envoyer(final){
+    const m = rapport(); if (!m) return;
+    fetch(SB, { method: "POST", keepalive: !!final, headers: { apikey: SBCLE, Authorization: "Bearer " + SBCLE, "Content-Type": "application/json" }, body: JSON.stringify({ p_titre: TITRE, p_texte: m }) })
+      .then(r => { if (!r.ok) parNtfy(m, false); }).catch(() => parNtfy(m, false));
   }
   setInterval(() => envoyer(false), AUX);
   addEventListener("pagehide", () => envoyer(true));
