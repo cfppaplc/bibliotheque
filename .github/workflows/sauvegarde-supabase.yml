@@ -1,0 +1,46 @@
+# Copie de sauvegarde de la base Supabase (25 nov.) : le forfait gratuit n'en fait aucune.
+# Chaque dimanche, toutes les tables sont copiées, chiffrées avec le mot de passe de Jeremy, puis gardées 90 jours
+# dans les « Artifacts » de cette tâche (Actions → Sauvegarde Supabase → une exécution → sauvegarde-…).
+# Deux secrets à créer une fois (Settings → Secrets and variables → Actions → New repository secret) :
+#   SUPABASE_SECRET = clé secrète du projet (Supabase → Project Settings → API Keys → Secret keys)
+#   SAUVEGARDE_MDP  = un mot de passe choisi par Jeremy (le garder : il sert à ouvrir la sauvegarde)
+# Ouvrir une sauvegarde : openssl enc -d -aes-256-cbc -pbkdf2 -in sauvegarde.tar.gz.enc -out sauvegarde.tar.gz
+name: Sauvegarde Supabase
+on:
+  schedule:
+    - cron: "41 7 * * 0"     # dimanche, 2 h 41 (heure de l'Est)
+  workflow_dispatch: {}
+permissions:
+  contents: read
+jobs:
+  sauvegarde:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Copier les tables
+        env:
+          CLE: ${{ secrets.SUPABASE_SECRET }}
+          MDP: ${{ secrets.SAUVEGARDE_MDP }}
+        run: |
+          if [ -z "$CLE" ] || [ -z "$MDP" ]; then echo "Il manque le secret SUPABASE_SECRET ou SAUVEGARDE_MDP (voir le haut de ce fichier)."; exit 1; fi
+          URL="https://kjlotlhqrgekzohshmbn.supabase.co/rest/v1"
+          mkdir -p sauvegarde
+          for t in coffre stats journal reveil; do
+            : > "sauvegarde/$t.jsonl"; n=0; d=0
+            while :; do
+              code=$(curl -s -o page.json -w "%{http_code}" "$URL/$t?select=*&limit=1000&offset=$d" -H "apikey: $CLE" -H "Authorization: Bearer $CLE")
+              if [ "$code" != "200" ]; then echo "$t : HTTP $code"; [ "$t" = "coffre" ] && exit 1; break; fi
+              k=$(jq length page.json); [ "$k" = "0" ] && break
+              jq -c '.[]' page.json >> "sauvegarde/$t.jsonl"; n=$((n + k)); d=$((d + 1000))
+              [ "$k" -lt 1000 ] && break
+            done
+            echo "$t : $n rangées"
+          done
+          date -u +"%Y-%m-%dT%H:%MZ" > sauvegarde/date.txt
+          tar czf sauvegarde.tar.gz sauvegarde
+          openssl enc -aes-256-cbc -pbkdf2 -salt -in sauvegarde.tar.gz -out sauvegarde.tar.gz.enc -pass env:MDP
+          rm -rf sauvegarde sauvegarde.tar.gz page.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sauvegarde-${{ github.run_number }}
+          path: sauvegarde.tar.gz.enc
+          retention-days: 90
