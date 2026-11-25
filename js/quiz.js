@@ -208,7 +208,7 @@ else {
 /* 25 nov. : le tricheur voit la bonne réponse (bandeau discret + petit point sur le bon choix) */
 function trichAppliquer(i){ const t = window.__trich, b = document.getElementById("jBx"); if (!t || t.i !== i || !b || b.querySelector(".trichB") || !b.querySelector("[data-c]")) return;   /* seulement pendant la question */
   if (t.apres && Date.now() < t.apres){ clearTimeout(window.__trichT); window.__trichT = setTimeout(() => trichAppliquer(i), t.apres - Date.now() + 30); return; }
-  b.insertAdjacentHTML("afterbegin", `<div class="trichB">Tu es le tricheur (la réponse arrive après 3 s, pas à chaque question). Bonne réponse : <b>${String(t.txt || "").replace(/[&<>"]/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"})[c])}</b>. Ne te fais pas remarquer!</div>`);
+  b.insertAdjacentHTML("afterbegin", `<div class="trichB">Tu es le tricheur (la réponse arrive après 3 s). Bonne réponse : <b>${String(t.txt || "").replace(/[&<>"]/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"})[c])}</b>. Ne te fais pas remarquer!</div>`);
   [].concat(t.bon == null ? [] : t.bon).forEach(k => { const x = b.querySelector(`[data-c="${k}"]`); if (x) x.classList.add("trichOk"); }); }
 function telecommande(bord){
   $("tele").classList.remove("cache");
@@ -368,8 +368,8 @@ function telecommande(bord){
     ids().forEach(id => { if (G.dbl && P[id].mise) envoyer(topic, {m: "dblrap", pour: id}); });
     /* 25 nov. (« un tricheur avec un vote à la fin ») : un élève secret reçoit la bonne réponse */
     if (R().tricheur === "oui" && G.tricheur === undefined && ids().length >= 3 && !estPres(G.quiz)) { const L = ids(); G.tricheur = L[Math.floor(Math.random() * L.length)]; }
-    /* équilibre (25 nov.) : la réponse seulement 2 questions sur 3, et 3 s après l'arrivée des choix (il ne gagne pas tous les points de vitesse) */
-    if (G.tricheur && P[G.tricheur] && !SANS_PTS.includes(typeDe(Q))) { G.trichQ = G.trichQ || {}; if (G.trichQ[G.i] === undefined) G.trichQ[G.i] = Math.random() < 2 / 3;
+    /* équilibre (25 nov.) : la réponse à chaque question, mais 3 s après l'arrivée des choix (il ne gagne pas tous les points de vitesse) */
+    if (G.tricheur && P[G.tricheur] && !SANS_PTS.includes(typeDe(Q))) { G.trichQ = G.trichQ || {}; if (G.trichQ[G.i] === undefined) G.trichQ[G.i] = true;   /* 25 nov. (Jeremy) : à chaque question, pour que les autres puissent repérer un modèle */
       if (G.trichQ[G.i]) envoyer(topic, {m: "trich", pour: G.tricheur, i: G.i, bon: Q.bon, txt: texteBon(Q), t0: G.t0, now: Date.now()}); }
     minut = setTimeout(reveler, lec + Q.s * 1000 + 2500); maj();
   }
@@ -1335,7 +1335,7 @@ function ecran(code){
       diapoImg(v);
       if (cle !== dernier || force) E.innerHTML = img[v.i] ? `<div class="ediapo ${v.dmv === "kb" || v.dmv === "focus" ? v.dmv : ""} k${v.i % 2}"><div class="dwrap"><img src="${img[v.i]}" alt="">${v.dlg ? `<div class="dLogo" style="left:${+v.dlg[0]}%;top:${+v.dlg[1]}%;width:${+v.dlg[2]}%;height:${+v.dlg[3]}%">${LOGO_ANIM}</div>` : ""}</div></div>` + bSon() : tete(v.titre) + bSon();
     } else if (v.etat === "vtr") {
-      if (cle !== dernier || force) { E.innerHTML = tete("Le tricheur") + `<div class="dblE monte"><b>Qui est le tricheur?</b><span>Un élève voyait souvent les bonnes réponses.<br>Vote sur ton iPad, ou passe. Ceux qui le trouvent se partagent la moitié de ses points.<br>Ceux qui se trompent lui donnent 20 % des leurs.</span><em id="eVtr"></em></div>` + bSon(); if (cle !== dernier) accord(); }
+      if (cle !== dernier || force) { E.innerHTML = tete("Le tricheur") + `<div class="dblE monte"><b>Qui est le tricheur?</b><span>Un élève voyait les bonnes réponses.<br>Vote sur ton iPad, ou passe. Ceux qui le trouvent se partagent la moitié de ses points.<br>Ceux qui se trompent lui donnent 20 % des leurs.</span><em id="eVtr"></em></div>` + bSon(); if (cle !== dernier) accord(); }
       $("eVtr").textContent = v.vtrN + " vote" + (v.vtrN > 1 ? "s" : "") + " sur " + v.joueurs.length;
     } else if (v.etat === "vtrRes" && v.vtrRes) {
       if (cle !== dernier || force) { const x = v.vtrRes; E.innerHTML = tete("Le tricheur") + `<div class="dblE monte"><b>${esc(x.nom)}</b><span>${x.trouve ? `Démasqué! ${x.nb} élève${x.nb > 1 ? "s se partagent" : " remporte"} la moitié de ses points : ${x.total}${x.nb > 1 ? ", " + x.part + " chacun" : ""}.` : "Personne ne l'a trouvé : il garde ses points."}${x.nf ? `<br>${x.nf} élève${x.nf > 1 ? "s se sont trompés et lui ont" : " s'est trompé et lui a"} donné 20 % de ${x.nf > 1 ? "leurs" : "ses"} points.` : ""}</span></div>` + bSon(); if (cle !== dernier) accord(); }
