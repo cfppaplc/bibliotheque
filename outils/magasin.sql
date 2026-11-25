@@ -133,3 +133,34 @@ returns setof public.panier language sql stable security definer set search_path
 $$;
 revoke all on function public.panier_eleve(text, text, text) from public;
 grant execute on function public.panier_eleve(text, text, text) to anon, authenticated;
+
+-- 25 nov. (Jeremy : « il devrait voir le nom de l'élève qui a commandé ») : prénom de l'élève (un seul mot, jamais de nom de famille)
+alter table public.panier add column if not exists prenom text;
+drop function if exists public.panier_envoyer(text, text, text, jsonb, text);
+create or replace function public.panier_envoyer(p_ens text, p_groupe text, p_code text, p_items jsonb, p_note text default null, p_prenom text default null)
+returns jsonb language plpgsql security definer set search_path = public, extensions as $$
+declare r public.panier; n int := jsonb_array_length(coalesce(p_items, '[]'::jsonb)); pr text := left(split_part(trim(coalesce(p_prenom, '')), ' ', 1), 20);
+begin
+  if p_ens !~ '^[a-z0-9._-]{3,60}$' or p_code !~ '^[0-9]{3}$' or length(coalesce(p_groupe, '')) not between 1 and 60 or n < 1 or n > 80 or length(coalesce(p_note, '')) > 300 then
+    return jsonb_build_object('ok', false, 'err', 'panier refusé'); end if;
+  if (select count(*) from public.panier where ens = p_ens and code = p_code and etat = 'attente') >= 3 then
+    return jsonb_build_object('ok', false, 'err', 'trop de paniers en attente'); end if;
+  if (select count(*) from public.panier where t > now() - interval '1 hour') >= 300 then
+    return jsonb_build_object('ok', false, 'err', 'magasin trop occupé'); end if;
+  insert into public.panier (ens, groupe, code, items, note, prenom) values (p_ens, p_groupe, p_code, p_items, nullif(trim(p_note), ''), nullif(pr, '')) returning * into r;
+  delete from public.panier where t < now() - interval '60 days';
+  if exists (select 1 from public.panier_prof where ens = p_ens and jsonb_array_length(abonnements) > 0) then
+    perform net.http_post(url := 'https://kjlotlhqrgekzohshmbn.supabase.co/functions/v1/panier-avis', headers := '{"Content-Type":"application/json"}'::jsonb, body := jsonb_build_object('id', r.id));
+  end if;
+  return jsonb_build_object('ok', true, 'id', r.id);
+end; $$;
+drop function if exists public.panier_magasin();
+create or replace function public.panier_magasin()
+returns table(id uuid, t timestamptz, ens text, groupe text, code text, prenom text, items jsonb, note text, etat text, t_app timestamptz, t_remis timestamptz)
+language sql stable security definer set search_path = public as $$
+  select p.id, p.t, p.ens, p.groupe, p.code, p.prenom, p.items, p.note, p.etat, p.t_app, p.t_remis from public.panier p
+  where (p.etat = 'approuve' and p.t > now() - interval '7 days') or (p.etat = 'remis' and p.t_remis > now() - interval '16 hours')
+  order by p.t_app asc limit 200;
+$$;
+revoke all on function public.panier_envoyer(text, text, text, jsonb, text, text), public.panier_magasin() from public;
+grant execute on function public.panier_envoyer(text, text, text, jsonb, text, text), public.panier_magasin() to anon, authenticated;
