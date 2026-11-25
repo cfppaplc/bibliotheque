@@ -164,3 +164,28 @@ language sql stable security definer set search_path = public as $$
 $$;
 revoke all on function public.panier_envoyer(text, text, text, jsonb, text, text), public.panier_magasin() from public;
 grant execute on function public.panier_envoyer(text, text, text, jsonb, text, text), public.panier_magasin() to anon, authenticated;
+
+-- 25 nov. (Jeremy : « comment l'élève va savoir si c'est approuvé ? ») : avis à l'élève quand son enseignant décide
+alter table public.panier add column if not exists abo jsonb;
+alter table public.panier add column if not exists avise_eleve boolean not null default false;
+create or replace function public.panier_abonner_eleve(p_id uuid, p_abonnement jsonb)
+returns boolean language plpgsql security definer set search_path = public as $$
+begin
+  if coalesce(p_abonnement->>'endpoint', '') !~ '^https://' then return false; end if;
+  update public.panier set abo = p_abonnement where id = p_id and etat = 'attente'; return found;
+end; $$;
+create or replace function public.panier_decider(p_ens text, p_jeton text, p_id uuid, p_ok boolean, p_motif text default null)
+returns boolean language plpgsql security definer set search_path = public, extensions as $$
+declare a jsonb;
+begin
+  if not public.panier_prof_ok(p_ens, p_jeton) then return false; end if;
+  update public.panier set etat = case when p_ok then 'approuve' else 'refuse' end, t_app = now(), motif = left(nullif(trim(p_motif), ''), 200)
+    where id = p_id and ens = p_ens and etat = 'attente' returning abo into a;
+  if not found then return false; end if;
+  if a is not null then
+    perform net.http_post(url := 'https://kjlotlhqrgekzohshmbn.supabase.co/functions/v1/panier-avis', headers := '{"Content-Type":"application/json"}'::jsonb, body := jsonb_build_object('id', p_id, 'eleve', true));
+  end if;
+  return true;
+end; $$;
+revoke all on function public.panier_abonner_eleve(uuid, jsonb) from public;
+grant execute on function public.panier_abonner_eleve(uuid, jsonb) to anon, authenticated;

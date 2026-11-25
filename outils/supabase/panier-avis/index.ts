@@ -27,8 +27,17 @@ Deno.serve(async (req) => {
       const raw = new Uint8Array(await crypto.subtle.exportKey("raw", (k as CryptoKeyPair).publicKey));
       return json({ cle: btoa(String.fromCharCode(...raw)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "") });
     }
-    const { id } = await req.json();
+    const { id, eleve } = await req.json();
     const { data: p } = await sb.from("panier").select("*").eq("id", id).maybeSingle();
+    if (eleve) {   /* avis à l'élève : son enseignant vient de décider (une seule fois) */
+      if (!p || !p.abo || p.avise_eleve || !["approuve", "refuse"].includes(p.etat)) return json({ ok: false });
+      await sb.from("panier").update({ avise_eleve: true }).eq("id", id);
+      const app = await webpush.ApplicationServer.new({ contactInformation: "https://metierplus.app", vapidKeys: k });
+      const ok = p.etat === "approuve";
+      const msg = JSON.stringify({ title: ok ? "Ton panier est approuvé" : "Ton panier est refusé", body: ok ? "Va au comptoir du magasin avec ta carte Métier+." : (p.motif ? "Motif : " + p.motif : "Parle à ton enseignant."), url: "/magasin.html", tag: "panier-eleve-" + p.id });
+      try { await app.subscribe(p.abo).pushTextMessage(msg, {}); } catch (_) { /* appareil désabonné */ }
+      return json({ ok: true });
+    }
     if (!p || p.avise || p.etat !== "attente" || Date.now() - new Date(p.t).getTime() > 120000) return json({ ok: false });
     await sb.from("panier").update({ avise: true }).eq("id", id);
     const { data: pr } = await sb.from("panier_prof").select("abonnements").eq("ens", p.ens).maybeSingle();
