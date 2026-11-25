@@ -327,3 +327,65 @@ begin
   end if;
   return jsonb_build_object('ok', true, 'id', r.id);
 end; $$;
+
+-- 25 nov. (Jeremy : « les commandes traitées restent la période et tombent en archive; statistiques des raccords sortis »)
+-- Commandes gardées 1 an (archives par période). Raccords sortis : table anonyme (aucun code ni prénom), gardée pour les statistiques.
+create table if not exists public.magasin_sorties (
+  id bigserial primary key, panier uuid not null, jour date not null default current_date, ens text, groupe text, n text, nom text, r text, q int not null default 1
+);
+create index if not exists magasin_sorties_jour on public.magasin_sorties (jour);
+alter table public.magasin_sorties enable row level security;
+create or replace function public.panier_sorties_maj() returns trigger language plpgsql security definer set search_path = public as $$
+begin
+  if new.etat = 'remis' and old.etat is distinct from 'remis' then
+    insert into public.magasin_sorties (panier, jour, ens, groupe, n, nom, r, q)
+      select new.id, (coalesce(new.t_remis, now()) at time zone 'America/Toronto')::date, new.ens, new.groupe, i->>'n', i->>'nom', i->>'r', greatest(1, coalesce((i->>'q')::int, 1))
+      from jsonb_array_elements(coalesce(new.items, '[]'::jsonb)) i;
+  elsif old.etat = 'remis' and new.etat is distinct from 'remis' then
+    delete from public.magasin_sorties where panier = new.id;   -- « Annuler » au comptoir
+  end if;
+  return new;
+end; $$;
+drop trigger if exists panier_sorties on public.panier;
+create trigger panier_sorties after update of etat on public.panier for each row execute function public.panier_sorties_maj();
+insert into public.magasin_sorties (panier, jour, ens, groupe, n, nom, r, q)
+  select p.id, (coalesce(p.t_remis, p.t) at time zone 'America/Toronto')::date, p.ens, p.groupe, i->>'n', i->>'nom', i->>'r', greatest(1, coalesce((i->>'q')::int, 1))
+  from public.panier p, jsonb_array_elements(coalesce(p.items, '[]'::jsonb)) i
+  where p.etat = 'remis' and not exists (select 1 from public.magasin_sorties s where s.panier = p.id);
+
+create or replace function public.panier_stats(p_depuis date, p_jusqua date default null, p_groupe text default null)
+returns table(n text, nom text, q bigint, fois bigint) language sql stable security definer set search_path = public as $$
+  select s.n, max(s.nom), sum(s.q)::bigint, count(distinct s.panier)::bigint from public.magasin_sorties s
+  where s.jour >= p_depuis and s.jour <= coalesce(p_jusqua, current_date) and (p_groupe is null or s.groupe = p_groupe)
+  group by s.n order by 3 desc, 2 limit 500;
+$$;
+create or replace function public.panier_stats_groupes()
+returns table(groupe text, commandes bigint) language sql stable security definer set search_path = public as $$
+  select s.groupe, count(distinct s.panier)::bigint from public.magasin_sorties s where s.jour > current_date - 400 group by 1 order by 1;
+$$;
+create or replace function public.panier_prof_archives(p_ens text, p_jeton text, p_depuis date, p_jusqua date default null)
+returns setof public.panier language sql stable security definer set search_path = public, extensions as $$
+  select p.* from public.panier p where (p.ens = p_ens or p_ens = any(p.profs)) and public.panier_prof_ok(p_ens, p_jeton)
+    and p.etat <> 'attente' and (p.t at time zone 'America/Toronto')::date between p_depuis and coalesce(p_jusqua, current_date) order by p.t desc limit 500;
+$$;
+-- rétention : 1 an (au lieu de 60 jours)
+create or replace function public.panier_envoyer(p_ens text, p_groupe text, p_code text, p_items jsonb, p_note text default null, p_prenom text default null, p_profs text[] default null)
+returns jsonb language plpgsql security definer set search_path = public, extensions as $$
+declare r public.panier; n int := jsonb_array_length(coalesce(p_items, '[]'::jsonb)); pr text := left(split_part(trim(coalesce(p_prenom, '')), ' ', 1), 20);
+  pf text[] := array(select distinct x from unnest(coalesce(p_profs, '{}')) x where x ~ '^[a-z0-9._-]{3,60}$' and x <> p_ens limit 8);
+begin
+  if p_ens !~ '^[a-z0-9._-]{3,60}$' or p_code !~ '^[0-9]{5}$' or length(coalesce(p_groupe, '')) not between 1 and 60 or n < 1 or n > 80 or length(coalesce(p_note, '')) > 300 then
+    return jsonb_build_object('ok', false, 'err', 'panier refusé'); end if;
+  if (select count(*) from public.panier where ens = p_ens and code = p_code and etat = 'attente') >= 3 then
+    return jsonb_build_object('ok', false, 'err', 'trop de paniers en attente'); end if;
+  if (select count(*) from public.panier where t > now() - interval '1 hour') >= 300 then
+    return jsonb_build_object('ok', false, 'err', 'magasin trop occupé'); end if;
+  insert into public.panier (ens, groupe, code, items, note, prenom, profs) values (p_ens, p_groupe, p_code, p_items, nullif(trim(p_note), ''), nullif(pr, ''), pf) returning * into r;
+  delete from public.panier where t < now() - interval '365 days';
+  if exists (select 1 from public.panier_prof where (ens = p_ens or ens = any(pf)) and jsonb_array_length(abonnements) > 0) then
+    perform net.http_post(url := 'https://kjlotlhqrgekzohshmbn.supabase.co/functions/v1/panier-avis', headers := '{"Content-Type":"application/json"}'::jsonb, body := jsonb_build_object('id', r.id));
+  end if;
+  return jsonb_build_object('ok', true, 'id', r.id);
+end; $$;
+revoke all on function public.panier_stats(date, date, text), public.panier_stats_groupes(), public.panier_prof_archives(text, text, date, date) from public;
+grant execute on function public.panier_stats(date, date, text), public.panier_stats_groupes(), public.panier_prof_archives(text, text, date, date) to anon, authenticated;
