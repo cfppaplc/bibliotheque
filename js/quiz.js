@@ -14,7 +14,7 @@ const SYMB = ["A", "B", "C", "D", "E", "F"];
 /* ---- Types de questions (7 nov., « pour les caler ») : choix (défaut, aussi vrai ou faux), multi (plusieurs bonnes),
    ordre (remettre en ordre), nombre (calcul tapé), erreur (trouve le morceau faux d'une phrase); une question à choix avec image
    peut montrer son image en « zoom mystère » (Q.zoom = {x, y} en %, agrandie ×3; l'image entière apparaît à la réponse). ---- */
-const TYPES = {choix: "Choix", vf: "Vrai ou faux", multi: "Plusieurs bonnes réponses", ordre: "Remettre en ordre", nombre: "Calcul", erreur: "Trouve l'erreur", nuage: "Nuage de mots", sondage: "Sondage", echelle: "Échelle de confiance"};
+const TYPES = {choix: "Choix", vf: "Vrai ou faux", multi: "Plusieurs bonnes réponses", ordre: "Remettre en ordre", nombre: "Calcul", erreur: "Trouve l'erreur", paires: "Associer", estim: "Estimation", nuage: "Nuage de mots", sondage: "Sondage", echelle: "Échelle de confiance"};
 const LOGO_ANIM = '<svg viewBox="0 -4 273.5 72"><defs><linearGradient id="lgG" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".9"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient><clipPath id="lgC"><path d="M2.5 51.2H15.25V33.2C15.25 30.200000000000003 15.0 24.231250000000003 14.84375 18.481250000000003C16.34375 24.168750000000003 17.90625 30.043750000000003 18.875 33.2L24.375 51.2H34.875L40.28125 33.2C41.25 29.918750000000003 42.875 23.762500000000003 44.34375 17.918750000000003C44.21875 23.825000000000003 43.9375 30.075000000000003 43.9375 33.2V51.2H56.6875V4.637500000000003H37.21875L33.09375 19.200000000000003C32.1875 22.356250000000003 30.8125 27.762500000000003 29.625 32.54375C28.4375 27.762500000000003 27.03125 22.356250000000003 26.125 19.200000000000003L21.9375 4.637500000000003H2.5Z M76.23625 51.95C84.92375 51.95 91.92375 47.16875 93.1425 40.41875H82.08C81.3925 42.2 79.3925 43.2625 76.73625 43.2625C73.11125 43.2625 70.92375 41.2 70.83 37.7H93.2675V34.35625C93.2675 24.450000000000003 86.11125 17.450000000000003 75.98625 17.450000000000003C65.86125 17.450000000000003 58.705 24.606250000000003 58.705 34.7C58.705 44.79375 65.955 51.95 76.23625 51.95ZM71.17375 14.293750000000003H79.42375L88.98625 4.106250000000003H77.48625ZM70.92375 30.700000000000003C71.36125 27.981250000000003 73.29875 26.387500000000003 76.33 26.387500000000003C79.36125 26.387500000000003 81.29875 27.981250000000003 81.73625 30.700000000000003Z M118.16 18.200000000000003H111.3475V9.200000000000003H98.8475V18.200000000000003H93.285V27.700000000000003H98.8475V41.325C98.8475 48.2 102.62875 51.2 111.285 51.2H118.16V41.7H114.2225C111.94125 41.7 111.3475 41.10625 111.3475 39.1375V27.700000000000003H118.16Z M120.1775 51.2H132.6775V18.200000000000003H120.1775ZM126.39625 16.012500000000003C130.3025 16.012500000000003 133.0525 13.512500000000003 133.0525 9.981250000000003C133.0525 6.481250000000003 130.3025 4.012500000000003 126.39625 4.012500000000003C122.49 4.012500000000003 119.74 6.481250000000003 119.74 9.981250000000003C119.74 13.512500000000003 122.49 16.012500000000003 126.39625 16.012500000000003Z M152.41375 51.95C161.10125 51.95 168.10125 47.16875 169.32 40.41875H158.2575C157.57 42.2 155.57 43.2625 152.91375 43.2625C149.28875 43.2625 147.10125 41.2 147.0075 37.7H169.445V34.35625C169.445 24.450000000000003 162.28875 17.450000000000003 152.16375 17.450000000000003C142.03875 17.450000000000003 134.8825 24.606250000000003 134.8825 34.7C134.8825 44.79375 142.1325 51.95 152.41375 51.95ZM147.10125 30.700000000000003C147.53875 27.981250000000003 149.47625 26.387500000000003 152.5075 26.387500000000003C155.53875 26.387500000000003 157.47625 27.981250000000003 157.91375 30.700000000000003Z M171.52499999999998 51.2H184.02499999999998V35.3875C184.02499999999998 30.981250000000003 186.49374999999998 28.200000000000003 190.39999999999998 28.200000000000003H194.96249999999998V18.200000000000003H191.83749999999998C187.30624999999998 18.200000000000003 184.89999999999998 19.762500000000003 183.71249999999998 24.200000000000003H183.64999999999998V18.200000000000003H171.52499999999998Z" fill="#FFFFFF"/></clipPath></defs><g class="lt"><path d="M2.5 51.2H15.25V33.2C15.25 30.200000000000003 15.0 24.231250000000003 14.84375 18.481250000000003C16.34375 24.168750000000003 17.90625 30.043750000000003 18.875 33.2L24.375 51.2H34.875L40.28125 33.2C41.25 29.918750000000003 42.875 23.762500000000003 44.34375 17.918750000000003C44.21875 23.825000000000003 43.9375 30.075000000000003 43.9375 33.2V51.2H56.6875V4.637500000000003H37.21875L33.09375 19.200000000000003C32.1875 22.356250000000003 30.8125 27.762500000000003 29.625 32.54375C28.4375 27.762500000000003 27.03125 22.356250000000003 26.125 19.200000000000003L21.9375 4.637500000000003H2.5Z M76.23625 51.95C84.92375 51.95 91.92375 47.16875 93.1425 40.41875H82.08C81.3925 42.2 79.3925 43.2625 76.73625 43.2625C73.11125 43.2625 70.92375 41.2 70.83 37.7H93.2675V34.35625C93.2675 24.450000000000003 86.11125 17.450000000000003 75.98625 17.450000000000003C65.86125 17.450000000000003 58.705 24.606250000000003 58.705 34.7C58.705 44.79375 65.955 51.95 76.23625 51.95ZM71.17375 14.293750000000003H79.42375L88.98625 4.106250000000003H77.48625ZM70.92375 30.700000000000003C71.36125 27.981250000000003 73.29875 26.387500000000003 76.33 26.387500000000003C79.36125 26.387500000000003 81.29875 27.981250000000003 81.73625 30.700000000000003Z M118.16 18.200000000000003H111.3475V9.200000000000003H98.8475V18.200000000000003H93.285V27.700000000000003H98.8475V41.325C98.8475 48.2 102.62875 51.2 111.285 51.2H118.16V41.7H114.2225C111.94125 41.7 111.3475 41.10625 111.3475 39.1375V27.700000000000003H118.16Z M120.1775 51.2H132.6775V18.200000000000003H120.1775ZM126.39625 16.012500000000003C130.3025 16.012500000000003 133.0525 13.512500000000003 133.0525 9.981250000000003C133.0525 6.481250000000003 130.3025 4.012500000000003 126.39625 4.012500000000003C122.49 4.012500000000003 119.74 6.481250000000003 119.74 9.981250000000003C119.74 13.512500000000003 122.49 16.012500000000003 126.39625 16.012500000000003Z M152.41375 51.95C161.10125 51.95 168.10125 47.16875 169.32 40.41875H158.2575C157.57 42.2 155.57 43.2625 152.91375 43.2625C149.28875 43.2625 147.10125 41.2 147.0075 37.7H169.445V34.35625C169.445 24.450000000000003 162.28875 17.450000000000003 152.16375 17.450000000000003C142.03875 17.450000000000003 134.8825 24.606250000000003 134.8825 34.7C134.8825 44.79375 142.1325 51.95 152.41375 51.95ZM147.10125 30.700000000000003C147.53875 27.981250000000003 149.47625 26.387500000000003 152.5075 26.387500000000003C155.53875 26.387500000000003 157.47625 27.981250000000003 157.91375 30.700000000000003Z M171.52499999999998 51.2H184.02499999999998V35.3875C184.02499999999998 30.981250000000003 186.49374999999998 28.200000000000003 190.39999999999998 28.200000000000003H194.96249999999998V18.200000000000003H191.83749999999998C187.30624999999998 18.200000000000003 184.89999999999998 19.762500000000003 183.71249999999998 24.200000000000003H183.64999999999998V18.200000000000003H171.52499999999998Z" fill="#FFFFFF"/><rect class="ls" x="0" y="-4" width="40" height="72" fill="url(#lgG)" clip-path="url(#lgC)"/></g><g transform="translate(209.5 0)"><g class="lp"><rect width="64" height="64" rx="15" fill="#F2762E"/><path class="lx" d="M32 16v32M16 32h32" stroke="#fff" stroke-width="9" stroke-linecap="round"/></g></g></svg>';
 const SANS_PTS = ["diapo", "nuage", "sondage", "echelle", "connexion"];
 const sansPoints = jeu => !!(jeu && jeu.length) && !jeu.some(x => !SANS_PTS.includes(typeDe(x)));   /* 15 nov. : présentation de formation, pas de podium */
@@ -43,18 +43,23 @@ function juste(Q, c){
   const t = typeDe(Q);
   if (c == null || c === -1) return false;
   if (t === "multi") return Array.isArray(c) && c.length === Q.bon.length && c.every(x => Q.bon.includes(x));
-  if (t === "ordre") return Array.isArray(c) && c.join() === Q.bon.join();
+  if (t === "ordre" || t === "paires") return Array.isArray(c) && c.join() === Q.bon.join();
+  if (t === "estim") { const x = lireNb(c); return !isNaN(x) && Math.abs(x - Q.bon) <= Math.abs(Q.bon) * (+Q.tol || 10) / 100 + 1e-9; }
   if (t === "nombre") {   /* (13 nov.) point ou virgule acceptés partout; « 1.250 » / « 1,250 » / « 1 250,5 » : on essaie aussi la lecture en milliers */
     const s = String(c).replace(/\s/g, ""), essais = [num(s), parseFloat(s.replace(/[.,](?=\d{3}(\D|$))/g, "").replace(",", ".")), parseFloat(s.replace(/[.,](?=.*[.,])/g, "").replace(",", "."))];
     return essais.some(x => !isNaN(x) && Math.abs(x - Q.bon) <= (+Q.tol || 0) + 1e-9); }
   return c === Q.bon;
 }
+/* 25 nov. : lecture d'un nombre tapé (virgule, point, espaces) pour l'estimation */
+function lireNb(c){ const s = String(c).replace(/\s/g, ""); return [num(s), parseFloat(s.replace(/[.,](?=\d{3}(\D|$))/g, "").replace(",", "."))].find(x => !isNaN(x)) ?? NaN; }
 function texteBon(Q){ const t = typeDe(Q);
   if (t === "nuage") return "(nuage de mots)";
   if (t === "sondage") return "(sondage)";
   if (t === "echelle") return "(échelle de confiance)";
   if (t === "multi") return Q.bon.map(k => SYMB[k] + ". " + Q.ch[k]).join("  ·  ");
   if (t === "ordre") return Q.bon.map((k, j) => (j + 1) + ". " + Q.ch[k]).join("   ");
+  if (t === "paires") return Q.bon.map((k, j) => (Q.g || [])[j] + " → " + Q.ch[k]).join("  ·  ");
+  if (t === "estim") return fmtN(Q.bon) + (Q.u ? " " + Q.u : "") + " (± " + (+Q.tol || 10) + " %)";
   if (t === "nombre") return fmtN(Q.bon) + (Q.u ? " " + Q.u : "") + (+Q.tol ? " (± " + fmtN(+Q.tol) + ")" : "");
   return Q.ch[Q.bon]; }
 function texteRep(Q, c){ const t = typeDe(Q);
@@ -63,7 +68,8 @@ function texteRep(Q, c){ const t = typeDe(Q);
   if (t === "echelle") return String(c + 1) + " sur 5";
   if (t === "multi") return (c || []).map(k => SYMB[k]).join(", ") || "rien";
   if (t === "ordre") return (c || []).map(k => SYMB[k]).join(" → ");
-  if (t === "nombre") return String(c) + (Q.u ? " " + Q.u : "");
+  if (t === "paires") return (c || []).map((k, j) => (j + 1) + SYMB[k]).join(" ");
+  if (t === "nombre" || t === "estim") return String(c) + (Q.u ? " " + Q.u : "");
   return SYMB[c] + ". " + (Q.ch[c] || ""); }
 const FLAMME = '<svg class="flamme" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5c.6 3.2-1.4 4.9-2.9 6.6C7.6 10.8 6.5 12.6 6.5 15a5.5 5.5 0 0 0 11 0c0-2.3-1-4.1-2.2-5.6-.3 1.2-.9 2.1-1.9 2.6.4-3.4-.4-6.8-1.4-9.5z" fill="currentColor"/><path d="M12 13.2c-1.3 1.3-2 2.3-2 3.6a2 2 0 0 0 4 0c0-1.2-.7-2.3-2-3.6z" fill="#FFE7A3"/></svg>';
 const COULEURS = ["#534AB7", "#B3261E", "#185FA5", "#0F6E56", "#854F0B", "#3A3936"];
@@ -176,7 +182,7 @@ function apercuQ(Q){
     reg: {coul, son: "non", musique: "non", classement: "oui", points: "vitesse", mode: "ind", lettres: "non"}, couv: "", sujet: "",
     q: {q: Q.q || "(ta question)", ch, s, t, u: Q.u || "", zoom: Q.zoom || null, img: !!Q.img, expl: "", bonTxt: ""},
     pres: false, mots: t === "nuage" ? [] : null, dref: "", mains: 0, conn: false, dmv: "", dlg: null, bon: null, cpt: [0, 0, 0, 0, 0, 0], nrep: 0, mises: 0, joueurs: []};
-  const qm = {m: "q", now, pour: null, i: 0, n: 1, qn: 1, nq: 1, q: vue.q.q, ch, t, u: Q.u || "", nb: t === "multi" ? (Q.bon || []).length : 0, t0: now, lec: 0, s, coul, dbl: false, ind: false, ret: null};
+  const qm = {m: "q", now, pour: null, i: 0, n: 1, qn: 1, nq: 1, q: vue.q.q, ch, g: Q.g || null, t, u: Q.u || "", nb: t === "multi" ? (Q.bon || []).length : 0, t0: now, lec: 0, s, coul, dbl: false, ind: false, ret: null};
   const charger = (id, url, msgs) => { const f = d.querySelector("#" + id); f.onload = () => { let n = 0; const go = () => { const w = f.contentWindow; if (w && w.__recoit) msgs.forEach(m => w.__recoit(m)); else if (n++ < 40) setTimeout(go, 100); }; go(); }; f.src = url; };
   charger("apE", base + "?ecran=000000&apercu=1", (Q.img ? [{m: "img", i: 0, data: Q.img}] : []).concat([vue]));
   charger("apJ", base + "?j=000000&apercu=1", [qm]);
@@ -247,17 +253,17 @@ function telecommande(bord){
     if (nb > 0 && qs.length > nb){
       /* tirage varié : d'abord une question de chaque type spécial (plusieurs bonnes, ordre, calcul, erreur, zoom), puis le reste au hasard */
       const sorte = Q => Q.zoom ? "zoom" : typeDe(Q), garde = new Set(), idx = melanger(qs.map((_, k) => k));
-      ["multi", "ordre", "nombre", "erreur", "zoom"].forEach(s => { const k = idx.find(j => sorte(qs[j]) === s); if (k != null && garde.size < Math.ceil(nb / 2)) garde.add(k); });
+      ["multi", "ordre", "nombre", "erreur", "zoom", "paires", "estim"].forEach(s => { const k = idx.find(j => sorte(qs[j]) === s); if (k != null && garde.size < Math.ceil(nb / 2)) garde.add(k); });
       idx.forEach(k => { if (garde.size < nb) garde.add(k); });
       qs = qs.filter((_, k) => garde.has(k)); if (r.melange !== "non") qs = melanger(qs); }
     if (r.temps === "plus") qs.forEach(Q => Q.s = Math.round((Q.s || 20) * 1.5));
     if (r.temps === "moins") qs.forEach(Q => Q.s = Math.max(10, Math.round((Q.s || 20) * .7)));
     qs.forEach(Q => {
       const t = typeDe(Q);
-      if (t === "ordre") {   /* les étapes sont toujours mêlées (jamais dans le bon ordre au départ) */
+      if (t === "ordre" || t === "paires") {   /* les étapes (ou les réponses à associer) sont toujours mêlées (jamais dans le bon ordre au départ) */
         const L = Q.ch, idx = L.map((_, k) => k); let p = melanger(idx); for (let e = 0; e < 8 && p.join() === idx.join(); e++) p = melanger(idx);
         Q.ch = p.map(k => L[k]); Q.bon = idx.map(j => p.indexOf(j)); return; }
-      if (r.melange !== "tout" || t === "nombre" || t === "erreur" || (Q.ch.length === 2 && /^vrai$/i.test(Q.ch[0]))) return;
+      if (r.melange !== "tout" || t === "nombre" || t === "estim" || t === "erreur" || (Q.ch.length === 2 && /^vrai$/i.test(Q.ch[0]))) return;
       const p = melanger(Q.ch.map((_, k) => k)); Q.ch = p.map(k => Q.ch[k]);
       Q.bon = t === "multi" ? Q.bon.map(b => p.indexOf(b)).sort((a, b) => a - b) : p.indexOf(Q.bon); });
     G.jeu = qs;
@@ -289,14 +295,14 @@ function telecommande(bord){
   function vueObj(){
     const Q = G.jeu[G.i], r = rangs(), reg = R(), t = Q ? typeDe(Q) : "choix";
     let cpt = [0, 0, 0, 0, 0, 0];
-    if (Q && ["ordre", "nombre"].includes(t)) cpt = [Object.values(G.reps).filter(x => juste(Q, x.c)).length, Object.keys(G.reps).length];
+    if (Q && ["ordre", "nombre", "paires", "estim"].includes(t)) cpt = [Object.values(G.reps).filter(x => juste(Q, x.c)).length, Object.keys(G.reps).length];
     else Object.values(G.reps).forEach(x => [].concat(x.c).forEach(k => { if (k >= 0) cpt[k]++; }));
     const nq = G.jeu.filter(x => !HORS_Q(x)).length, qn = G.jeu.slice(0, G.i + 1).filter(x => !HORS_Q(x)).length;
     return {m: "vue", sp: sansPoints(G.jeu), code, etat: G.etat === "choix" ? "lobby" : G.etat, titre: G.quiz ? G.quiz.titre : "Défi+", i: G.i, n: G.jeu.length, qn, nq, t0: G.t0, now: Date.now(),
       reg: {coul: reg.coul, son: reg.son, musique: reg.musique || "oui", classement: reg.classement, points: reg.points, mode: reg.mode, lettres: reg.lettres || "non"},
       couv: G.quiz && G.quiz.couv && !/^data:/.test(G.quiz.couv) ? G.quiz.couv : (G.quiz && G.quiz.couv ? "img" : ""), sujet: G.quiz ? G.quiz.sujet || "" : "",
-      q: Q && ["question", "rev"].includes(G.etat) ? {q: Q.q, ch: Q.ch, s: Q.s, t, u: Q.u || "", zoom: Q.zoom || null, img: !!Q.img, expl: G.etat === "rev" ? Q.expl || "" : "", bonTxt: G.etat === "rev" ? texteBon(Q) : ""} : null,
-      pres: estPres(G.quiz), mots: Q && typeDe(Q) === "nuage" ? compterMots(G.reps, G.masques) : null, dref: G.etat === "diapo" && Q ? Q.ref || "" : "", mains: G.mains ? G.mains.size : 0, conn: !!(G.quiz && G.quiz.qs.some(x => x.t === "connexion")), dmv: G.etat === "diapo" && Q ? Q.mv || "" : "", dlg: G.etat === "diapo" && Q && Q.lg ? Q.lg : null,
+      q: Q && ["question", "rev"].includes(G.etat) ? {q: Q.q, ch: Q.ch, g: Q.g || null, tol: +Q.tol || 0, s: Q.s, t, u: Q.u || "", zoom: Q.zoom || null, img: !!Q.img, expl: G.etat === "rev" ? Q.expl || "" : "", bonTxt: G.etat === "rev" ? texteBon(Q) : ""} : null,
+      pres: estPres(G.quiz), mots: Q && typeDe(Q) === "nuage" ? compterMots(G.reps, G.masques) : null, vals: G.etat === "rev" && Q && typeDe(Q) === "estim" ? Object.values(G.reps).map(x => lireNb(x.c)).filter(x => !isNaN(x)) : null, dref: G.etat === "diapo" && Q ? Q.ref || "" : "", mains: G.mains ? G.mains.size : 0, conn: !!(G.quiz && G.quiz.qs.some(x => x.t === "connexion")), dmv: G.etat === "diapo" && Q ? Q.mv || "" : "", dlg: G.etat === "diapo" && Q && Q.lg ? Q.lg : null,
       bon: G.etat === "rev" ? Q.bon : null, cpt, nrep: Object.keys(G.reps).length, mises: G.etat === "mise" ? ids().filter(id => P[id].mise).length : 0, vtrN: G.etat === "vtr" ? Object.keys(G.vtr || {}).length : 0, vtrRes: G.etat === "vtrRes" ? G.vtrRes : null, inter: G.etat === "inter" ? G.inter : null, interT: G.interT || 0,
       stats: G.etat === "fin" && G.stats ? (G.bilan || []).map((b, i) => b && b.n ? {i, q: b.q, p: Math.round(100 * b.ok / b.n), bon: b.bon} : null).filter(Boolean) : null,
       joueurs: ids().map(id => ({n: P[id].nom, av: P[id].av, pts: P[id].pts, r: r[id], g: G.etat === "rev" && G.reps[id] ? G.reps[id].g || 0 : 0, s: P[id].serie || 0, bo: G.etat === "rev" && G.reps[id] ? G.reps[id].bonus || 0 : 0, ra: G.etat === "rev" && G.reps[id] && G.reps[id].ok && id === plusRapide(G) ? 1 : 0})).sort((a, b) => a.r - b.r)};
@@ -347,7 +353,7 @@ function telecommande(bord){
   setInterval(() => { let ch = false; Object.values(P).forEach(p => { if (!p.parti && Date.now() - (p.vu || 0) > 40000) { p.parti = true; ch = true; } }); if (ch) { envoyerPersos(); maj(); if (G.etat === "question" && ids().length && ids().every(id => G.reps[id])) setTimeout(reveler, 300); } }, 5000);
   function envoyerPersos(){ envoyer(topic, {m: "persos", pris: ids().map(id => P[id].av).filter(v => v != null)}); }
   let minut = null;
-  function qMsg(pour){ const Q = G.jeu[G.i]; return {m: "q", now: Date.now(), pour, i: G.i, n: G.jeu.length, qn: G.jeu.slice(0, G.i + 1).filter(x => !HORS_Q(x)).length, nq: G.jeu.filter(x => !HORS_Q(x)).length, q: Q.q, ch: Q.ch, t: typeDe(Q), u: Q.u || "", nb: typeDe(Q) === "multi" ? Q.bon.length : 0,
+  function qMsg(pour){ const Q = G.jeu[G.i]; return {m: "q", now: Date.now(), pour, i: G.i, n: G.jeu.length, qn: G.jeu.slice(0, G.i + 1).filter(x => !HORS_Q(x)).length, nq: G.jeu.filter(x => !HORS_Q(x)).length, q: Q.q, ch: Q.ch, g: Q.g || null, t: typeDe(Q), u: Q.u || "", nb: typeDe(Q) === "multi" ? Q.bon.length : 0,
     t0: G.t0, lec: Math.max(0, G.t0 - Date.now()), s: Q.s, coul: R().coul, dbl: !!(G.dbl && pour && P[pour] && P[pour].mise), ind: R().indice === "oui" && typeDe(Q) === "choix" && (Q.ch || []).length >= 3, ret: pour && P[pour] && P[pour].ind === G.i ? P[pour].indR : null,
     tr: pour && pour === G.tricheur && !SANS_PTS.includes(typeDe(Q)) && G.trichQ && G.trichQ[G.i] ? {bon: Q.bon, txt: texteBon(Q)} : null}; }
   /* vote du tricheur : après la dernière question, avant le podium */
@@ -644,6 +650,8 @@ function telecommande(bord){
     if (t === "multi") return {t, q: "", ch: ["", "", "", ""], bon: [], s: 25, expl: ""};
     if (t === "ordre") return {t, q: "Place ces étapes dans le bon ordre.", ch: ["", "", "", ""], bon: [0, 1, 2, 3], s: 40, expl: ""};
     if (t === "nombre") return {t, q: "", ch: [], bon: "", tol: 0, u: "", s: 45, expl: ""};
+    if (t === "estim") return {t, q: "", ch: [], bon: "", tol: 10, u: "", s: 30, expl: ""};
+    if (t === "paires") return {t, q: "Associe chaque élément à ce qui va avec.", g: ["", "", "", ""], ch: ["", "", "", ""], bon: [0, 1, 2, 3], s: 45, expl: ""};
     if (t === "erreur") return {t, q: "Trouve l'erreur dans cette phrase.", ch: ["", "", "", ""], bon: 0, s: 30, expl: ""};
     if (t === "nuage") return {t, q: "", ch: [], bon: null, s: 45, expl: ""};
     if (t === "connexion") return {t, q: "", s: 0};
@@ -706,10 +714,11 @@ function telecommande(bord){
       if (t === "nuage") { Q.ch = []; Q.bon = null; return; }
       if (t === "echelle") { Q.ch = ["1", "2", "3", "4", "5"]; Q.bon = null; return; }
       if (t === "sondage") { Q.ch = [...d.querySelectorAll(".tc")].map(x => x.value.trim()); Q.bon = null; return; }
-      if (t === "nombre") { Q.bon = num(d.querySelector(".nbR").value); Q.tol = num(d.querySelector(".nbT").value) || 0; Q.u = d.querySelector(".nbU").value.trim(); Q.ch = []; return; }
+      if (t === "paires") Q.g = [...d.querySelectorAll(".tg")].map(x => x.value.trim());
+      if (t === "nombre" || t === "estim") { Q.bon = num(d.querySelector(".nbR").value); Q.tol = num(d.querySelector(".nbT").value) || (t === "estim" ? 10 : 0); Q.u = d.querySelector(".nbU").value.trim(); Q.ch = []; return; }
       Q.ch = [...d.querySelectorAll(".tc")].map(x => x.value.trim());
       if (t === "multi") Q.bon = [...d.querySelectorAll("input[type=checkbox]:checked")].map(x => +x.value);
-      else if (t === "ordre") Q.bon = Q.ch.map((_, j) => j);
+      else if (t === "ordre" || t === "paires") Q.bon = Q.ch.map((_, j) => j);
       else Q.bon = +((d.querySelector("input[type=radio]:checked") || {}).value || 0);
       const z = d.querySelector(".zsel"); if (z) { if (z.value === "zoom") Q.zoom = Q.zoom || {x: 50, y: 50}; else delete Q.zoom; }
     });
@@ -736,6 +745,8 @@ function telecommande(bord){
       else if (t === "sondage") { corps = Array.from({length: 4}, (_, c) => `<div class="ln"><b class="num">${SYMB[c]}</b><input class="tc" placeholder="Choix ${c + 1}${c >= 2 ? " (facultatif)" : ""}" value="${esc(Q.ch[c] || "")}" maxlength="80"></div>`).join(""); aide = "Pas de bonne réponse ni de points : la classe vote et le tableau montre les résultats en barres."; }
       else if (t === "nuage") { corps = ""; aide = "Pas de bonne réponse ni de points : chaque élève écrit un mot ou deux, et les mots apparaissent au tableau. Plus un mot revient, plus il est gros."; }
       else if (t === "nombre") { corps = `<div class="nbE"><label>Bonne réponse<input class="nbR" inputmode="decimal" value="${Q.bon === "" || Q.bon == null || isNaN(Q.bon) ? "" : esc(fmtN(Q.bon))}" placeholder="ex. 15,4"></label><label>Marge acceptée (±)<input class="nbT" inputmode="decimal" value="${+Q.tol ? esc(fmtN(+Q.tol)) : ""}" placeholder="0"></label><label>Unité<input class="nbU" value="${esc(Q.u || "")}" placeholder="ex. VA, GPM, m" maxlength="12"></label></div>`; aide = "L'élève tape un nombre; la virgule ou le point sont acceptés."; }
+      else if (t === "paires") { corps = Array.from({length: 4}, (_, c) => `<div class="ln"><b class="num">${c + 1}</b><input class="tg" placeholder="Élément ${c + 1}${c >= 3 ? " (facultatif)" : ""}" value="${esc((Q.g || [])[c] || "")}" maxlength="60"><input class="tc" placeholder="Ce qui va avec" value="${esc(Q.ch[c] || "")}" maxlength="60"></div>`).join(""); aide = "Écris chaque paire sur la même ligne. Les réponses de droite seront mêlées au tableau."; }
+      else if (t === "estim") { corps = `<div class="nbE"><label>Bonne réponse<input class="nbR" inputmode="decimal" value="${Q.bon === "" || Q.bon == null || isNaN(Q.bon) ? "" : esc(fmtN(Q.bon))}" placeholder="ex. 1200"></label><label>Marge acceptée (%)<input class="nbT" inputmode="decimal" value="${esc(fmtN(+Q.tol || 10))}" placeholder="10"></label><label>Unité<input class="nbU" value="${esc(Q.u || "")}" placeholder="ex. $, kg, L" maxlength="12"></label></div>`; aide = "L'élève estime sans calculer. Bonne réponse s'il est dans la marge (ex. 10 % de 1200 = entre 1080 et 1320). Au tableau, on voit toutes les estimations sur une ligne."; }
       else if (t === "ordre") { const n = Math.max(3, Math.min(6, Q.ch.length)); corps = Array.from({length: n}, (_, c) => `<div class="ln"><b class="num">${c + 1}</b><input class="tc" placeholder="Étape ${c + 1}${c >= 3 ? " (facultatif)" : ""}" value="${esc(Q.ch[c] || "")}" maxlength="80"></div>`).join("") + (n < 6 ? `<button class="btn2 petit" data-plus="${k}">+ Une étape</button>` : ""); aide = "Écris les étapes dans le bon ordre : elles seront mêlées pendant la partie."; }
       else if (t === "multi") { corps = Array.from({length: 4}, (_, c) => `<div class="ln"><input type="checkbox" value="${c}" ${(Q.bon || []).includes(c) ? "checked" : ""} title="Bonne réponse"><input class="tc" placeholder="Choix ${c + 1}${c >= 2 ? " (facultatif)" : ""}" value="${esc(Q.ch[c] || "")}" maxlength="80"></div>`).join(""); aide = "Coche toutes les bonnes réponses (au moins une). L'élève doit les trouver toutes."; }
       else if (t === "erreur") { corps = Array.from({length: 4}, (_, c) => `<div class="ln"><input type="radio" name="b${k}" value="${c}" ${Q.bon === c ? "checked" : ""} title="Le morceau faux"><input class="tc" placeholder="Morceau ${c + 1} de la phrase${c >= 2 ? " (facultatif)" : ""}" value="${esc(Q.ch[c] || "")}" maxlength="90"></div>`).join(""); aide = "Coupe la phrase en morceaux, dans l'ordre. Coche le morceau qui contient l'erreur."; }
@@ -822,6 +833,8 @@ function telecommande(bord){
       else if (t === "echelle") { o.ch = ["1", "2", "3", "4", "5"]; o.bon = null; }
       else if (t === "sondage") { o.ch = Q.ch.filter(Boolean); o.bon = null; if (o.ch.length < 2 && !err) err = "Question " + (k + 1) + " : il faut au moins 2 choix."; }
       else if (t === "nombre") { o.ch = []; o.bon = Q.bon; if (+Q.tol) o.tol = +Q.tol; if (Q.u) o.u = Q.u; if ((isNaN(Q.bon) || Q.bon === "") && !err) err = "Question " + (k + 1) + " : écris la bonne réponse (un nombre)."; }
+      else if (t === "estim") { o.ch = []; o.bon = Q.bon; o.tol = +Q.tol || 10; if (Q.u) o.u = Q.u; if ((isNaN(Q.bon) || Q.bon === "") && !err) err = "Question " + (k + 1) + " : écris la bonne réponse (un nombre)."; }
+      else if (t === "paires") { const L = (Q.g || []).map((x, j) => [x, Q.ch[j]]).filter(([a, b]) => a && b); o.g = L.map(x => x[0]); o.ch = L.map(x => x[1]); o.bon = o.ch.map((_, j) => j); if (o.ch.length < 3 && !err) err = "Question " + (k + 1) + " : il faut au moins 3 paires complètes."; }
       else if (t === "ordre") { o.ch = Q.ch.filter(Boolean); o.bon = o.ch.map((_, j) => j); if (o.ch.length < 3 && !err) err = "Question " + (k + 1) + " : il faut au moins 3 étapes."; }
       else { const garde = Q.ch.map((x, c) => [x, c]).filter(([x]) => x); o.ch = garde.map(g => g[0]);
         if (t === "multi") { o.bon = garde.map((g, j) => Q.bon.includes(g[1]) ? j : -1).filter(j => j >= 0); if (!o.bon.length && !err) err = "Question " + (k + 1) + " : coche au moins une bonne réponse."; }
@@ -1033,6 +1046,8 @@ function joueur(code){
         let corps = "";
         if (t === "multi") corps = `<div class="aideT">Plusieurs bonnes réponses : touche toutes celles qui sont bonnes, puis Valider.</div>${btns("multi")}<button id="jOk" class="valider" disabled>Valider</button>`;
         else if (t === "ordre") corps = `<div class="aideT">Touche les étapes dans le bon ordre (1, 2, 3…), puis Valider.</div>${btns("ordre")}<div class="duoB"><button id="jRaz" class="btn2">Recommencer</button><button id="jOk" class="valider" disabled>Valider</button></div>`;
+        else if (t === "paires") corps = `<div class="aideT">Pour chaque numéro, touche la réponse qui va avec (1, puis 2, puis 3…), puis Valider.</div><ol class="pgL">${(m.g || []).map(x => `<li><span>${esc(x)}</span><b>?</b></li>`).join("")}</ol>${btns("ordre")}<div class="duoB"><button id="jRaz" class="btn2">Recommencer</button><button id="jOk" class="valider" disabled>Valider</button></div>`;
+        else if (t === "estim") corps = `<div class="aideT">Estime sans calculer : vise le plus proche possible${m.u ? " (en " + esc(m.u) + ")" : ""}.</div><div class="nbx"><input id="jNb" inputmode="decimal" autocomplete="off" placeholder="Ton estimation">${m.u ? `<span>${esc(m.u)}</span>` : ""}</div><button id="jOk" class="valider" disabled>Valider</button>`;
         else if (t === "sondage") corps = '<div class="aideT">Vote : pas de bonne ou de mauvaise réponse.</div>' + btns();
         else if (t === "echelle") corps = `<div class="aideT">De 1 (pas du tout) à 5 (tout à fait). Personne ne voit ta réponse.</div><div class="ech5">${[1, 2, 3, 4, 5].map((n, k) => `<button data-c="${k}"><b>${n}</b><small>${["Pas du tout", "Un peu", "Moyen", "Assez", "Tout à fait"][k]}</small></button>`).join("")}</div>`;
         else if (t === "nuage") corps = `<div class="aideT">Écris un mot ou deux. Pas de bonne ou de mauvaise réponse.</div><div class="nbx"><input id="jNb" maxlength="30" autocomplete="off" autocapitalize="off" placeholder="Ton mot"></div><button id="jOk" class="valider" disabled>Envoyer</button>`;
@@ -1063,8 +1078,9 @@ function joueur(code){
         if (t === "multi") { const sel = new Set();
           B.forEach(b => b.onclick = () => { if (repI !== -1) return; const k = +b.dataset.c; sel.has(k) ? sel.delete(k) : sel.add(k); b.classList.toggle("choisi", sel.has(k)); b.querySelector("i").textContent = sel.has(k) ? "✓" : SYMB[k]; $("jOk").disabled = !sel.size; });
           $("jOk").onclick = () => envoi([...sel].sort((a, b) => a - b));
-        } else if (t === "ordre") { let L = [];
-          const peindre = () => { B.forEach(b => { const p = L.indexOf(+b.dataset.c); b.classList.toggle("choisi", p >= 0); b.querySelector("i").textContent = p >= 0 ? p + 1 : SYMB[+b.dataset.c]; }); $("jOk").disabled = L.length !== B.length; };
+        } else if (t === "ordre" || t === "paires") { let L = [];
+          const peindre = () => { B.forEach(b => { const p = L.indexOf(+b.dataset.c); b.classList.toggle("choisi", p >= 0); b.querySelector("i").textContent = p >= 0 ? p + 1 : SYMB[+b.dataset.c]; }); $("jOk").disabled = L.length !== B.length;
+            document.querySelectorAll(".pgL li").forEach((li, j) => { li.classList.toggle("ok", L[j] != null); li.querySelector("b").textContent = L[j] != null ? SYMB[L[j]] : "?"; }); };
           B.forEach(b => b.onclick = () => { if (repI !== -1) return; const k = +b.dataset.c; if (L.includes(k)) L = L.slice(0, L.indexOf(k)); else L.push(k); peindre(); });
           $("jRaz").onclick = () => { if (repI !== -1) return; L = []; peindre(); };
           $("jOk").onclick = () => envoi(L.slice());
@@ -1072,7 +1088,7 @@ function joueur(code){
           inp.oninput = () => { $("jOk").disabled = !inp.value.trim(); };
           inp.onkeydown = e => { if (e.key === "Enter" && !$("jOk").disabled) $("jOk").click(); };
           $("jOk").onclick = () => { inp.blur(); envoi(inp.value.trim().slice(0, 30)); };
-        } else if (t === "nombre") { const inp = $("jNb");
+        } else if (t === "nombre" || t === "estim") { const inp = $("jNb");
           inp.oninput = () => { inp.value = inp.value.replace(/[^0-9,.\- ]/g, ""); $("jOk").disabled = isNaN(num(inp.value)); };
           inp.onkeydown = e => { if (e.key === "Enter" && !$("jOk").disabled) $("jOk").click(); };
           $("jOk").onclick = () => { inp.blur(); envoi(inp.value.trim()); };
@@ -1425,9 +1441,11 @@ function ecran(code){
         else if (t === "ordre") corps = `<div class="eord">${v.q.ch.map((c, k) => `<div class="k${k} monte" style="animation-delay:${.1 + k * .06}s"><span><i class="let">${SYMB[k]}</i>${esc(c)}</span></div>`).join("")}</div>`;
         else if (t === "nuage") corps = `<div class="enuage" id="eNuage"></div>`;
         else if (t === "echelle") corps = `<div class="eech monte">${["Pas du tout", "Un peu", "Moyen", "Assez", "Tout à fait"].map((l, k) => `<div><b>${k + 1}</b><span>${l}</span></div>`).join("")}</div>`;
+        else if (t === "paires") corps = `<div class="epair"><div>${(v.q.g || []).map((x, j) => `<div class="monte" style="animation-delay:${.1 + j * .06}s"><span><i class="let">${j + 1}</i>${esc(x)}</span></div>`).join("")}</div><div>${v.q.ch.map((c, k) => `<div class="k${k} monte" style="animation-delay:${.3 + k * .06}s"><span><i class="let">${SYMB[k]}</i>${esc(c)}</span></div>`).join("")}</div></div>`;
+        else if (t === "estim") corps = `<div class="enb monte">Estime et tape ta réponse sur ton iPad${v.q.u ? ` <small>(en ${esc(v.q.u)})</small>` : ""}</div>`;
         else if (t === "nombre") corps = `<div class="enb monte">Calcule et tape ta réponse sur ton iPad${v.q.u ? ` <small>(en ${esc(v.q.u)})</small>` : ""}</div>`;
         else corps = `<div class="ech${lettresSeul ? " lettres" : ""}">${v.q.ch.map((c, k) => `<div class="k${k} monte" style="animation-delay:${.1 + k * .08}s"><span><i class="let">${SYMB[k]}</i>${lettresSeul ? "" : esc(c)}</span></div>`).join("")}</div>${lettresSeul ? '<div class="enb" style="font-size:1.6vw">Lis les choix sur ton iPad</div>' : ""}`;
-        const sous = {sondage: "Sondage · vote sur ton iPad", echelle: "Échelle de confiance · réponds de 1 à 5, c'est anonyme", nuage: "Nuage de mots · écris un mot sur ton iPad", multi: "Plusieurs bonnes réponses", ordre: "Remets dans le bon ordre", nombre: "Calcul", erreur: "Trouve l'erreur"}[t];
+        const sous = {sondage: "Sondage · vote sur ton iPad", echelle: "Échelle de confiance · réponds de 1 à 5, c'est anonyme", nuage: "Nuage de mots · écris un mot sur ton iPad", multi: "Plusieurs bonnes réponses", ordre: "Remets dans le bon ordre", nombre: "Calcul", paires: "Associe les paires", estim: "Estimation · le plus proche gagne", erreur: "Trouve l'erreur"}[t];
         E.innerHTML = tete((v.sp ? "Activité " : "Question ") + (v.qn || v.i + 1) + " sur " + (v.nq || v.n)) + (sous ? `<div class="etype">${sous}</div>` : "") + `<div class="eq monte">${esc(v.q.q)}</div>${im}${corps}
           <div class="cpt"><span id="eRep"></span><b id="eT"></b></div>` + bSon();
         if (cle !== dernier && !cle.endsWith("L")) ton(440, .25, .08);
@@ -1453,6 +1471,9 @@ function ecran(code){
         const t = v.q.t || "choix", tot = Math.max(1, v.nrep), estBon = k => t === "multi" && Array.isArray(v.bon) ? v.bon.includes(k) : k === v.bon;
         let corps;
         if (t === "ordre") corps = `<div class="eord rev">${v.bon.map((k, j) => `<div class="bon monte" style="animation-delay:${j * .08}s"><span><i class="let">${j + 1}</i>${esc(v.q.ch[k])}</span></div>`).join("")}</div><div class="enb">${v.cpt[0]} sur ${v.cpt[1]} ont le bon ordre</div>`;
+        else if (t === "paires") corps = `<div class="eord rev">${v.bon.map((k, j) => `<div class="bon monte" style="animation-delay:${j * .08}s"><span><i class="let">${j + 1}</i>${esc((v.q.g || [])[j])} <b class="pfl">→</b> ${esc(v.q.ch[k])}</span></div>`).join("")}</div><div class="enb">${v.cpt[0]} sur ${v.cpt[1]} ont tout associé</div>`;
+        else if (t === "estim") { const V = (v.vals || []).slice(0, 60), b = +v.bon, mg = Math.abs(b) * (v.q.tol || 10) / 100, mn = Math.min(b - mg, ...V), mx = Math.max(b + mg, ...V), w = (mx - mn) || 1, X = x => (4 + 92 * (x - mn) / w).toFixed(1);
+          corps = `<div class="enbR monte">${esc(v.q.bonTxt)}</div><div class="eligne monte"><i class="axe"></i>${V.map((x, k) => `<i class="pt" style="left:${X(x)}%;animation-delay:${.2 + k * .03}s"></i>`).join("")}<i class="zone" style="left:${X(b - mg)}%;width:${(X(b + mg) - X(b - mg)).toFixed(1)}%"></i><b class="cible" style="left:${X(b)}%"></b><span class="g">${esc(fmtN(mn))}</span><span class="d">${esc(fmtN(mx))}</span></div><div class="enb">${v.cpt[0]} sur ${v.cpt[1]} dans la marge</div>`; }
         else if (t === "nombre") corps = `<div class="enbR monte">${esc(v.q.bonTxt)}</div><div class="enb">${v.cpt[0]} sur ${v.cpt[1]} ont trouvé</div>`;
         else if (t === "erreur") corps = `<div class="ephr rev">${v.q.ch.map((c, k) => `<span class="k${k} ${k === v.bon ? "faux" : "pas"}"><i class="let">${SYMB[k]}</i>${esc(c)}<em>${v.cpt[k]}</em></span>`).join(" ")}</div>`;
         else corps = `<div class="ech">${v.q.ch.map((c, k) => `<div class="k${k} ${estBon(k) ? "bon" : "pas"}"><span><i class="let">${estBon(k) ? "✓" : SYMB[k]}</i>${esc(c)}</span><em>${v.cpt[k]}</em><i class="bar" data-w="${100 * v.cpt[k] / tot}"></i></div>`).join("")}</div>`;

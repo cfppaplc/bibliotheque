@@ -3478,8 +3478,8 @@ window.QUIZ_LIVRES = [
 "exemple": true,
 "livre": true,
 "defi": true,
-"titre": "Travaux mineurs d'entretien général · Défi+ 1 de 3",
-"sujet": "Modules 1 à 4 : sécurité, inspection, cloisons, fissures et trous",
+"titre": "Travaux mineurs d'entretien général · Défi+ 1 de 6",
+"sujet": "Modules 1 et 2 : sécurité et inspection",
 "couv": "img/couvertures/travaux-mineurs-egi.jpg",
 "coul": "#D9488A",
 "reg": {
@@ -3573,6 +3573,125 @@ window.QUIZ_LIVRES = [
 "bon": 2,
 "s": 20
 },
+{
+"q": "Associe chaque protection au danger.",
+"t": "paires",
+"g": [
+"Lunettes de sécurité",
+"Masque N95",
+"Bouchons d'oreilles",
+"Gants de nitrile"
+],
+"ch": [
+"Éclats et poussières aux yeux",
+"Poussière de gypse respirée",
+"Bruit de la scie",
+"Produits chimiques sur la peau"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Avant de percer un mur d'un vieil immeuble, tu penses d'abord…",
+"ch": [
+"à la couleur de la peinture du mur",
+"au nombre de vis dans la boîte",
+"à l'amiante possible dans les matériaux",
+"à l'heure de la pause du dîner"
+],
+"bon": 2,
+"s": 20
+},
+{
+"q": "L'escabeau : la marche du haut sert…",
+"ch": [
+"à déposer un seau de peinture plein",
+"à rien : on ne monte jamais dessus",
+"à poser les pieds pour les petits travaux",
+"à s'asseoir pendant les travaux en hauteur"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Une inspection de logement se fait…",
+"ch": [
+"au hasard, là où on voit un problème",
+"pièce par pièce, avec une grille",
+"de l'extérieur, par les fenêtres",
+"seulement dans la cuisine et la salle de bain"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Un outil électrique au fil abîmé peut servir si on met du ruban dessus.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 1,
+"s": 15,
+"expl": "On le retire du service et on le fait réparer."
+},
+{
+"q": "Que note-t-on dans un rapport d'inspection?",
+"ch": [
+"Le lieu précis du problème",
+"Une photo",
+"La gravité",
+"Ce que pense le voisin"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"t": "multi"
+},
+{
+"q": "Hauteur d'une échelle appuyée : pour 4 m de hauteur, le pied s'éloigne du mur d'environ combien de mètres?",
+"t": "estim",
+"ch": [],
+"bon": 1,
+"tol": 15,
+"u": "m",
+"s": 30,
+"expl": "Règle du 4 pour 1 : 1 m de recul pour 4 m de hauteur."
+},
+{
+"q": "Le cadenas de consignation, c'est…",
+"ch": [
+"ton cadenas à toi, avec ta clé",
+"un cadenas partagé par l'équipe",
+"un cadenas qu'on laisse ouvert",
+"le cadenas du concierge de l'école"
+],
+"bon": 0,
+"s": 20
+}
+]
+},
+{
+"id": "defi-travaux-mineurs-egi-2",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Travaux mineurs d'entretien général · Défi+ 2 de 6",
+"sujet": "Modules 3 et 4 : cloisons, fissures et trous",
+"couv": "img/couvertures/travaux-mineurs-egi.jpg",
+"coul": "#D9488A",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
 {
 "q": "Chiffons imbibés d'huile de lin à la fin de la journée :",
 "ch": [
@@ -3671,16 +3790,109 @@ window.QUIZ_LIVRES = [
 ],
 "bon": 0,
 "s": 20
+},
+{
+"q": "Associe le trou à la bonne réparation.",
+"t": "paires",
+"g": [
+"Trou de clou",
+"Trou de poignée (10 cm)",
+"Grand trou (30 cm)",
+"Fissure au joint"
+],
+"ch": [
+"Un peu de pâte, puis sabler",
+"Pièce autocollante en treillis",
+"Morceau de gypse vissé sur des fourrures",
+"Ruban à joints et 3 couches de pâte"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "La pâte à joints se pose en…",
+"ch": [
+"deux couches de même largeur, sans sabler",
+"plusieurs couches minces, de plus en plus larges",
+"une seule couche très épaisse pour aller vite",
+"couches épaisses, puis on sable beaucoup"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Une vis de gypse bien posée est…",
+"ch": [
+"enfoncée loin pour bien tenir le panneau",
+"juste sous la surface, sans déchirer le papier",
+"posée en biais pour mieux mordre le montant",
+"à égalité, la tête qui dépasse un peu"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "On peut peindre la pâte à joints sans apprêt.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 1,
+"s": 15,
+"expl": "L'apprêt évite les taches mates (« flashing »)."
+},
+{
+"q": "Remets dans l'ordre la réparation d'un trou moyen.",
+"ch": [
+"Couper un carré net autour du trou",
+"Poser des fourrures derrière",
+"Visser la pièce de gypse",
+"Tirer les joints et sabler"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "Une feuille de gypse 4 × 8 de 1/2 po pèse environ combien de livres?",
+"t": "estim",
+"ch": [],
+"bon": 50,
+"tol": 20,
+"u": "lb",
+"s": 30,
+"expl": "Environ 50 à 55 lb : on la porte à deux."
+},
+{
+"q": "Pour trouver un montant derrière le gypse, on utilise…",
+"ch": [
+"un détecteur de montants",
+"un cordeau à craie bleue",
+"un niveau de 4 pieds",
+"une équerre de charpentier"
+],
+"bon": 0,
+"s": 20
 }
 ]
 },
 {
-"id": "defi-travaux-mineurs-egi-2",
+"id": "defi-travaux-mineurs-egi-3",
 "exemple": true,
 "livre": true,
 "defi": true,
-"titre": "Travaux mineurs d'entretien général · Défi+ 2 de 3",
-"sujet": "Modules 4 à 7 : béton, céramique, peinture, planchers",
+"titre": "Travaux mineurs d'entretien général · Défi+ 3 de 6",
+"sujet": "Modules 4 et 5 : béton et céramique",
 "couv": "img/couvertures/travaux-mineurs-egi.jpg",
 "coul": "#D9488A",
 "reg": {
@@ -3766,6 +3978,126 @@ window.QUIZ_LIVRES = [
 "bon": 1,
 "s": 15
 },
+{
+"q": "Associe le problème du béton à sa cause.",
+"t": "paires",
+"g": [
+"Fissure fine en surface",
+"Écaillage l'hiver",
+"Efflorescence blanche",
+"Fissure qui s'ouvre"
+],
+"ch": [
+"Retrait au séchage",
+"Gel et sel de déglaçage",
+"Sels sortis avec l'eau",
+"Mouvement de structure à signaler"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Avant de colmater une fissure de béton, on…",
+"ch": [
+"nettoie et enlève les morceaux qui bougent",
+"mouille et pose le produit sur la poussière",
+"peint la fissure pour voir sa longueur",
+"attend le printemps, peu importe la saison"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Le coulis de céramique sert à…",
+"ch": [
+"rendre les carreaux plus brillants",
+"remplir les joints entre les carreaux",
+"coller les carreaux sur le plancher",
+"niveler le plancher avant la pose"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Un carreau qui sonne creux quand on le frappe est mal collé.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15,
+"expl": "L'adhésif ne touche pas tout le dessous."
+},
+{
+"q": "Remets dans l'ordre le remplacement d'un carreau brisé.",
+"ch": [
+"Gratter le coulis autour",
+"Casser et retirer le carreau",
+"Coller le nouveau carreau",
+"Refaire le coulis"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "Le scellant à coulis, on l'applique…",
+"ch": [
+"seulement sur les murs",
+"quand le coulis a bien séché",
+"dans le coulis encore mouillé",
+"avant de poser le coulis"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Un sac de 30 kg de béton prémélangé donne environ combien de litres de béton?",
+"t": "estim",
+"ch": [],
+"bon": 14,
+"tol": 25,
+"u": "L",
+"s": 30,
+"expl": "Environ 14 litres : il en faut beaucoup pour une petite dalle."
+},
+{
+"q": "Dans une douche, le joint entre le bain et la céramique se fait avec…",
+"ch": [
+"de la pâte à joints de gypse",
+"du ciment-colle, très dur",
+"du silicone, qui reste souple",
+"du coulis, comme les autres joints"
+],
+"bon": 2,
+"s": 20
+}
+]
+},
+{
+"id": "defi-travaux-mineurs-egi-4",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Travaux mineurs d'entretien général · Défi+ 4 de 6",
+"sujet": "Modules 6 et 7 : peinture et planchers",
+"couv": "img/couvertures/travaux-mineurs-egi.jpg",
+"coul": "#D9488A",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
 {
 "q": "Avant de refaire le joint de silicone d'une baignoire, on…",
 "ch": [
@@ -3863,16 +4195,109 @@ window.QUIZ_LIVRES = [
 ],
 "bon": 3,
 "s": 20
+},
+{
+"q": "Associe l'outil de peinture à son usage.",
+"t": "paires",
+"g": [
+"Pinceau à angle",
+"Rouleau 3/8 po",
+"Rouleau 3/4 po",
+"Ruban de peintre"
+],
+"ch": [
+"Découper les coins",
+"Mur lisse",
+"Surface rugueuse",
+"Protéger les bordures"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Le fini « coquille d'œuf » convient à…",
+"ch": [
+"un plafond qu'on veut cacher",
+"un plancher de béton extérieur",
+"un salon ou une chambre",
+"un garage qui reçoit de l'huile"
+],
+"bon": 2,
+"s": 20
+},
+{
+"q": "Une peinture qui pèle sur un vieux mur à l'huile : la cause probable…",
+"ch": [
+"latex posé sans apprêt adhérent",
+"un rouleau trop neuf et trop épais",
+"une pièce trop chaude pendant la pose",
+"deux couches de latex au lieu d'une"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "On peint le plafond avant les murs.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15,
+"expl": "Les gouttes tombent sur les murs pas encore faits."
+},
+{
+"q": "Remets dans l'ordre la pose d'un plancher flottant.",
+"ch": [
+"Pose de la sous-couche",
+"Première rangée avec cales",
+"Rangées suivantes décalées",
+"Moulures pour cacher le jeu"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "Un gallon de peinture (3,78 L) couvre environ combien de pi² en une couche?",
+"t": "estim",
+"ch": [],
+"bon": 400,
+"tol": 20,
+"u": "pi²",
+"s": 30,
+"expl": "Environ 350 à 400 pi² selon la surface."
+},
+{
+"q": "On laisse un espace au bord d'un plancher flottant pour…",
+"ch": [
+"cacher les fils sous la moulure",
+"ventiler la sous-couche l'été",
+"laisser le bois gonfler et rétrécir",
+"faciliter le ménage du plancher"
+],
+"bon": 2,
+"s": 20
 }
 ]
 },
 {
-"id": "defi-travaux-mineurs-egi-3",
+"id": "defi-travaux-mineurs-egi-5",
 "exemple": true,
 "livre": true,
 "defi": true,
-"titre": "Travaux mineurs d'entretien général · Défi+ 3 de 3",
-"sujet": "Modules 8 à 11 : armoires, fixations, portes, vitres et moustiquaires",
+"titre": "Travaux mineurs d'entretien général · Défi+ 5 de 6",
+"sujet": "Modules 8 et 9 : armoires et fixations",
 "couv": "img/couvertures/travaux-mineurs-egi.jpg",
 "coul": "#D9488A",
 "reg": {
@@ -3967,6 +4392,124 @@ window.QUIZ_LIVRES = [
 "s": 15
 },
 {
+"q": "Associe la fixation au matériau.",
+"t": "paires",
+"g": [
+"Ancrage à expansion",
+"Boulon à ailettes",
+"Vis à bois",
+"Ancrage à béton (Tapcon)"
+],
+"ch": [
+"Gypse, charge légère",
+"Gypse, charge plus lourde",
+"Montant de bois",
+"Béton ou bloc"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Une porte d'armoire qui ne ferme pas droit : on ajuste…",
+"ch": [
+"le comptoir au-dessus",
+"la tablette à l'intérieur",
+"les vis de la charnière européenne",
+"la poignée de la porte de travers"
+],
+"bon": 2,
+"s": 20
+},
+{
+"q": "Une tablette lourde sur un mur de gypse se fixe…",
+"ch": [
+"avec des clous de finition dans le gypse",
+"dans les montants quand c'est possible",
+"avec de la colle à construction seulement",
+"avec du ruban double face très fort"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Un tiroir qui frotte peut venir d'une glissière mal vissée.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "Avant de percer, qu'est-ce qui peut se cacher dans le mur?",
+"ch": [
+"Des fils électriques",
+"Des tuyaux",
+"Des montants",
+"Le plan du bâtiment"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"t": "multi"
+},
+{
+"q": "Une mèche à béton se reconnaît à…",
+"ch": [
+"sa couleur dorée sur toute la mèche",
+"sa pointe très fine en spirale",
+"sa forme plate avec une pointe",
+"sa pointe au carbure plus large"
+],
+"bon": 3,
+"s": 20
+},
+{
+"q": "Une main courante d'escalier se pose à environ combien de mm du nez des marches?",
+"t": "estim",
+"ch": [],
+"bon": 900,
+"tol": 10,
+"u": "mm",
+"s": 30,
+"expl": "Environ 865 à 965 mm selon le code."
+},
+{
+"q": "Avant de visser une charnière dans du bois dur, on…",
+"ch": [
+"graisse la charnière",
+"frappe la vis au marteau",
+"mouille le bois",
+"perce un avant-trou"
+],
+"bon": 3,
+"s": 20
+}
+]
+},
+{
+"id": "defi-travaux-mineurs-egi-6",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Travaux mineurs d'entretien général · Défi+ 6 de 6",
+"sujet": "Modules 10 et 11 : portes, vitres et moustiquaires",
+"couv": "img/couvertures/travaux-mineurs-egi.jpg",
+"coul": "#D9488A",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
 "q": "Dans le gypse creux, l'ancrage le plus fort est…",
 "ch": [
 "le clou",
@@ -4060,6 +4603,99 @@ window.QUIZ_LIVRES = [
 ],
 "bon": 1,
 "s": 20
+},
+{
+"q": "Associe le problème de porte à la solution.",
+"t": "paires",
+"g": [
+"Porte qui frotte en haut",
+"Pêne qui n'entre pas",
+"Porte qui claque",
+"Courant d'air au bas"
+],
+"ch": [
+"Serrer les vis de la charnière du haut",
+"Ajuster la gâche",
+"Régler le ferme-porte",
+"Changer le coupe-froid du bas"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Une moustiquaire déchirée se répare en…",
+"ch": [
+"changeant la toile et la baguette (cordon)",
+"agrafant un morceau sur le cadre",
+"collant du ruban adhésif sur le trou",
+"peignant la toile pour la boucher"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Une vitre thermos embuée entre les deux verres veut dire…",
+"ch": [
+"il faut nettoyer les deux faces",
+"le scellant est brisé : on change l'unité",
+"la vitre est trop froide",
+"la pièce est trop humide"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Une porte coupe-feu peut rester ouverte avec une cale de bois.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 1,
+"s": 15,
+"expl": "Elle doit se fermer seule et s'enclencher."
+},
+{
+"q": "Remets dans l'ordre le changement d'un cylindre de serrure.",
+"ch": [
+"Ouvrir la porte et la bloquer",
+"Dévisser la plaque intérieure",
+"Sortir l'ancien cylindre",
+"Poser le nouveau et tester les clés"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "Le calfeutrant extérieur autour d'une fenêtre sert à…",
+"ch": [
+"isoler du bruit seulement",
+"coller la fenêtre au mur",
+"décorer le cadrage",
+"bloquer l'eau et l'air"
+],
+"bon": 3,
+"s": 20
+},
+{
+"q": "Une porte intérieure standard fait environ combien de mm de haut?",
+"t": "estim",
+"ch": [],
+"bon": 2032,
+"tol": 5,
+"u": "mm",
+"s": 25,
+"expl": "80 po (6 pi 8 po), soit environ 2032 mm."
 }
 ]
 },
@@ -5184,8 +5820,8 @@ window.QUIZ_LIVRES = [
 "exemple": true,
 "livre": true,
 "defi": true,
-"titre": "Dispositifs électriques et électroniques (C9) · Défi+ 1 de 3",
-"sujet": "Modules 1 à 3 : le courant, les composants, lire un schéma",
+"titre": "Dispositifs électriques et électroniques (C9) · Défi+ 1 de 6",
+"sujet": "Modules 1 et 2 : le courant et les composants",
 "couv": "img/couvertures/dispositifs-electriques-c9.jpg",
 "coul": "#E0892B",
 "reg": {
@@ -5277,6 +5913,121 @@ window.QUIZ_LIVRES = [
 "s": 20
 },
 {
+"q": "Associe la grandeur électrique à son unité.",
+"t": "paires",
+"g": [
+"Tension",
+"Courant",
+"Résistance",
+"Puissance"
+],
+"ch": [
+"Volt (V)",
+"Ampère (A)",
+"Ohm (Ω)",
+"Watt (W)"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "La loi d'Ohm s'écrit…",
+"ch": [
+"R = U × I",
+"U = R ÷ I",
+"I = R × U",
+"U = R × I"
+],
+"bon": 3,
+"s": 20
+},
+{
+"q": "Pour mesurer un courant, le multimètre se branche…",
+"ch": [
+"entre deux circuits différents",
+"en série, ou avec une pince ampèremétrique",
+"en parallèle sur l'appareil",
+"sur la mise à la terre seulement"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "On mesure une résistance hors tension.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "Quels composants sont des charges?",
+"ch": [
+"Un moteur",
+"Un élément chauffant",
+"Une bobine de relais",
+"Un interrupteur"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"t": "multi"
+},
+{
+"q": "Un fusible sert à…",
+"ch": [
+"augmenter la tension au moteur",
+"garder la chaleur dans l'appareil",
+"couper le circuit si le courant est trop fort",
+"allumer la flamme du brûleur"
+],
+"bon": 2,
+"s": 20
+},
+{
+"q": "Un élément de 240 V tire 12,5 A. Quelle puissance en W?",
+"t": "nombre",
+"ch": [],
+"bon": 3000,
+"s": 45,
+"u": "W"
+},
+{
+"q": "Une plinthe de 1500 W sur 240 V tire environ combien d'ampères?",
+"t": "estim",
+"ch": [],
+"bon": 6.25,
+"tol": 10,
+"u": "A",
+"s": 30,
+"expl": "1500 ÷ 240 = 6,25 A."
+}
+]
+},
+{
+"id": "defi-dispositifs-electriques-c9-2",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Dispositifs électriques et électroniques (C9) · Défi+ 2 de 6",
+"sujet": "Modules 2 et 3 : composants et lecture de schémas",
+"couv": "img/couvertures/dispositifs-electriques-c9.jpg",
+"coul": "#E0892B",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
 "q": "La loi d'Ohm :",
 "ch": [
 "I = E × R",
@@ -5362,16 +6113,108 @@ window.QUIZ_LIVRES = [
 ],
 "bon": 2,
 "s": 20
+},
+{
+"q": "Associe le composant à son rôle.",
+"t": "paires",
+"g": [
+"Relais",
+"Transformateur",
+"Thermostat",
+"Contacteur"
+],
+"ch": [
+"Un petit courant commande un autre circuit",
+"Baisse la tension (ex. 120 V à 24 V)",
+"Ouvre ou ferme selon la température",
+"Commande une grosse charge, comme un compresseur"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Un contact « NO » est…",
+"ch": [
+"fermé au repos",
+"sans bobine",
+"toujours fermé",
+"ouvert au repos"
+],
+"bon": 3,
+"s": 20
+},
+{
+"q": "Dans un schéma, les composants sont dessinés…",
+"ch": [
+"au repos, sans courant",
+"en marche, sous tension",
+"comme ils étaient au dernier essai",
+"selon la saison"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Le transformateur de commande d'une chaudière donne souvent 24 V.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "Remets dans l'ordre la lecture d'un schéma en échelle.",
+"ch": [
+"Trouver l'alimentation (L1, L2)",
+"Suivre chaque ligne de gauche à droite",
+"Repérer les contacts et leur bobine",
+"Trouver la charge au bout de la ligne"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "Les lettres « R » et « W » sur un thermostat 24 V, c'est…",
+"ch": [
+"relais et ventilateur",
+"retour et eau chaude",
+"l'alimentation et l'appel de chaleur",
+"rouge et blanc, sans importance"
+],
+"bon": 2,
+"s": 20
+},
+{
+"q": "Un transformateur de 40 VA à 24 V peut fournir environ combien d'ampères?",
+"t": "estim",
+"ch": [],
+"bon": 1.67,
+"tol": 10,
+"u": "A",
+"s": 30,
+"expl": "40 ÷ 24 ≈ 1,67 A."
 }
 ]
 },
 {
-"id": "defi-dispositifs-electriques-c9-2",
+"id": "defi-dispositifs-electriques-c9-3",
 "exemple": true,
 "livre": true,
 "defi": true,
-"titre": "Dispositifs électriques et électroniques (C9) · Défi+ 2 de 3",
-"sujet": "Modules 3 à 6 : schémas, eau chaude (valves, aquastats, réinitialisation), brûleurs, dépannage",
+"titre": "Dispositifs électriques et électroniques (C9) · Défi+ 3 de 6",
+"sujet": "Modules 3 et 4 : schémas, valves et aquastats",
 "couv": "img/couvertures/dispositifs-electriques-c9.jpg",
 "coul": "#E0892B",
 "reg": {
@@ -5462,6 +6305,123 @@ window.QUIZ_LIVRES = [
 "bon": 3,
 "s": 20
 },
+{
+"q": "Associe la commande à son action.",
+"t": "paires",
+"g": [
+"Aquastat haut (limite)",
+"Aquastat bas",
+"Valve de zone",
+"Interrupteur de fin de course"
+],
+"ch": [
+"Coupe le brûleur si l'eau est trop chaude",
+"Garde l'eau chaude pour l'eau domestique",
+"Ouvre l'eau d'une zone",
+"Dit à la chaudière que la valve est ouverte"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "La valve de zone à moteur s'ouvre quand…",
+"ch": [
+"la pression de l'eau baisse",
+"la chaudière atteint sa limite haute",
+"le thermostat de sa zone demande de la chaleur",
+"le circulateur s'arrête"
+],
+"bon": 2,
+"s": 20
+},
+{
+"q": "Le différentiel d'un aquastat, c'est…",
+"ch": [
+"la pression de la chaudière",
+"le temps avant l'allumage",
+"la température maximale de sécurité",
+"l'écart entre l'arrêt et le redémarrage"
+],
+"bon": 3,
+"s": 20
+},
+{
+"q": "Un bouton de réarmement manuel doit être réarmé sans chercher la cause.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 1,
+"s": 15,
+"expl": "On cherche toujours pourquoi il a coupé."
+},
+{
+"q": "Une chaudière ne part pas. Tu vérifies…",
+"ch": [
+"L'alimentation électrique",
+"L'appel du thermostat",
+"Les limites de sécurité",
+"La couleur du tuyau"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"t": "multi"
+},
+{
+"q": "Le circulateur démarre souvent par…",
+"ch": [
+"un relais commandé par l'aquastat ou le thermostat",
+"une minuterie fixe de 24 heures",
+"un interrupteur manuel seulement",
+"la pression de l'eau dans le réseau"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Aquastat réglé à 82 °C, différentiel 10 °C. À quelle température le brûleur repart-il?",
+"t": "nombre",
+"ch": [],
+"bon": 72,
+"s": 45,
+"u": "°C"
+},
+{
+"q": "Le coupe-bas niveau d'eau protège…",
+"ch": [
+"la chaudière contre le manque d'eau",
+"le circulateur contre l'air",
+"le brûleur contre le vent",
+"le thermostat contre le gel"
+],
+"bon": 0,
+"s": 20
+}
+]
+},
+{
+"id": "defi-dispositifs-electriques-c9-4",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Dispositifs électriques et électroniques (C9) · Défi+ 4 de 6",
+"sujet": "Modules 5 et 6 : brûleurs et dépannage",
+"couv": "img/couvertures/dispositifs-electriques-c9.jpg",
+"coul": "#E0892B",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
 {
 "q": "Brûleur à l'huile : la cellule ne voit pas de flamme au démarrage. Le protectorelais…",
 "ch": [
@@ -5555,16 +6515,109 @@ window.QUIZ_LIVRES = [
 ],
 "s": 45,
 "t": "ordre"
+},
+{
+"q": "Associe la pièce du brûleur à l'huile à son rôle.",
+"t": "paires",
+"g": [
+"Gicleur",
+"Transformateur d'allumage",
+"Cellule CdS",
+"Contrôle primaire"
+],
+"ch": [
+"Pulvérise le mazout",
+"Fait l'étincelle",
+"Voit la flamme",
+"Gère le démarrage et la sécurité"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "La cellule CdS « voit » la flamme parce que sa résistance…",
+"ch": [
+"reste toujours la même",
+"baisse à la lumière",
+"monte à la lumière",
+"dépend de la pression"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Le contrôle primaire coupe le brûleur si…",
+"ch": [
+"la pompe à mazout est neuve",
+"le thermostat demande de la chaleur",
+"la pièce est trop froide",
+"la flamme n'est pas vue après quelques secondes"
+],
+"bon": 3,
+"s": 20
+},
+{
+"q": "On peut réarmer un brûleur à l'huile plusieurs fois de suite sans danger.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 1,
+"s": 15,
+"expl": "Le mazout s'accumule : risque d'explosion."
+},
+{
+"q": "Remets dans l'ordre un dépannage méthodique.",
+"ch": [
+"Écouter le client",
+"Vérifier l'alimentation",
+"Suivre le schéma, mesure par mesure",
+"Réparer et faire un essai complet"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "Une mesure de 0 V aux bornes d'un contact fermé veut dire…",
+"ch": [
+"il n'y a pas de courant ailleurs",
+"le contact est brûlé",
+"le multimètre est brisé",
+"le contact est bon"
+],
+"bon": 3,
+"s": 20
+},
+{
+"q": "La tension d'allumage d'un transformateur de brûleur à l'huile est environ combien de volts?",
+"t": "estim",
+"ch": [],
+"bon": 10000,
+"tol": 25,
+"u": "V",
+"s": 30,
+"expl": "Environ 10 000 V (10 kV)."
 }
 ]
 },
 {
-"id": "defi-dispositifs-electriques-c9-3",
+"id": "defi-dispositifs-electriques-c9-5",
 "exemple": true,
 "livre": true,
 "defi": true,
-"titre": "Dispositifs électriques et électroniques (C9) · Défi+ 3 de 3",
-"sujet": "Modules 7 à 9 : appareils au gaz, vapeur, automates et GTB",
+"titre": "Dispositifs électriques et électroniques (C9) · Défi+ 5 de 6",
+"sujet": "Module 7 : appareils au gaz",
 "couv": "img/couvertures/dispositifs-electriques-c9.jpg",
 "coul": "#E0892B",
 "reg": {
@@ -5649,6 +6702,125 @@ window.QUIZ_LIVRES = [
 "bon": 1,
 "s": 20
 },
+{
+"q": "Associe la pièce d'un appareil au gaz.",
+"t": "paires",
+"g": [
+"Thermocouple",
+"Allumeur à surface chaude",
+"Pressostat",
+"Valve de gaz"
+],
+"ch": [
+"Prouve la veilleuse (millivolts)",
+"Allume le gaz sans flamme",
+"Prouve le tirage du ventilateur",
+"Ouvre le gaz sur commande"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "La séquence d'un appareil moderne commence par…",
+"ch": [
+"l'étincelle",
+"l'ouverture du gaz",
+"l'arrêt du circulateur",
+"la pré-purge du ventilateur"
+],
+"bon": 3,
+"s": 20
+},
+{
+"q": "La détection de flamme par ionisation mesure…",
+"ch": [
+"un petit courant à travers la flamme",
+"la couleur de la flamme",
+"la chaleur de la flamme",
+"la pression du gaz"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Une odeur de gaz : on actionne l'interrupteur pour mieux voir.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 1,
+"s": 15,
+"expl": "Une étincelle peut allumer le gaz."
+},
+{
+"q": "Le pressostat d'air ne ferme pas. Causes possibles?",
+"ch": [
+"Tuyau du pressostat bouché",
+"Évent obstrué",
+"Ventilateur faible",
+"Thermostat trop haut"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"t": "multi"
+},
+{
+"q": "Un thermocouple en bon état donne environ…",
+"ch": [
+"24 volts",
+"20 à 30 millivolts",
+"120 volts",
+"1 ampère"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Le courant de flamme par ionisation est de l'ordre de combien de microampères?",
+"t": "estim",
+"ch": [],
+"bon": 3,
+"tol": 50,
+"u": "µA",
+"s": 30,
+"expl": "Quelques microampères (souvent 1 à 6 µA)."
+},
+{
+"q": "Après une réparation sur un appareil au gaz, on…",
+"ch": [
+"augmente la pression du gaz",
+"laisse l'appareil fermé une journée",
+"vérifie l'étanchéité des raccords",
+"débranche le pressostat"
+],
+"bon": 2,
+"s": 20
+}
+]
+},
+{
+"id": "defi-dispositifs-electriques-c9-6",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Dispositifs électriques et électroniques (C9) · Défi+ 6 de 6",
+"sujet": "Modules 8 et 9 : vapeur, automates et GTB",
+"couv": "img/couvertures/dispositifs-electriques-c9.jpg",
+"coul": "#E0892B",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
 {
 "q": "Lesquels sont des ENTRÉES d'un automate?",
 "ch": [
@@ -5740,6 +6912,98 @@ window.QUIZ_LIVRES = [
 ],
 "bon": 2,
 "s": 20
+},
+{
+"q": "Associe l'élément de GTB ou d'automate.",
+"t": "paires",
+"g": [
+"Capteur",
+"Actionneur",
+"Automate (contrôleur)",
+"Poste de supervision"
+],
+"ch": [
+"Mesure (température, pression)",
+"Agit (valve, volet, moteur)",
+"Décide selon le programme",
+"Écran pour voir et régler"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Dans une chaudière à vapeur, le niveau d'eau se lit…",
+"ch": [
+"dans le verre de niveau",
+"sur le thermostat",
+"sur le manomètre de gaz",
+"au toit, sur l'évent"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Une entrée « TOR » d'automate, c'est…",
+"ch": [
+"une pression variable",
+"tout ou rien : ouvert ou fermé",
+"un signal de 0 à 10 V",
+"une température en degrés"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Sur une GTB, on note tout changement de consigne.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "Remets dans l'ordre une alarme reçue sur la GTB.",
+"ch": [
+"Lire l'alarme au complet",
+"Aller voir l'équipement",
+"Corriger ou aviser",
+"Acquitter et noter"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "Un signal 4-20 mA à 4 mA veut souvent dire…",
+"ch": [
+"le bas de l'échelle (0 %)",
+"un fil coupé, toujours",
+"le maximum (100 %)",
+"la moitié de l'échelle"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Un signal 4-20 mA lit 12 mA. Environ quel % de l'échelle?",
+"t": "estim",
+"ch": [],
+"bon": 50,
+"tol": 10,
+"u": "%",
+"s": 30,
+"expl": "(12 − 4) ÷ 16 = 50 %."
 }
 ]
 },
@@ -5748,8 +7012,8 @@ window.QUIZ_LIVRES = [
 "exemple": true,
 "livre": true,
 "defi": true,
-"titre": "Entretien ménager d'un bâtiment · Défi+ 1 de 3",
-"sujet": "Modules 1 à 6 : sécurité, microbes, chimie, vert, surfaces et machines, quotidien",
+"titre": "Entretien ménager d'un bâtiment · Défi+ 1 de 6",
+"sujet": "Modules 1 à 3 : sécurité, microbes et chimie",
 "couv": "img/couvertures/entretien-menager-egi.jpg",
 "coul": "#2E8B57",
 "reg": {
@@ -5843,6 +7107,125 @@ window.QUIZ_LIVRES = [
 "expl": "Tu vois devant toi et ton dos est mieux placé."
 },
 {
+"q": "Associe le pictogramme SIMDUT au danger.",
+"t": "paires",
+"g": [
+"Flamme",
+"Tête de mort",
+"Corrosion",
+"Point d'exclamation"
+],
+"ch": [
+"Inflammable",
+"Toxicité aiguë",
+"Brûle la peau et le métal",
+"Irritant ou nocif"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Nettoyer et désinfecter, la différence :",
+"ch": [
+"c'est la même chose avec deux produits",
+"nettoyer enlève la saleté, désinfecter tue les microbes",
+"nettoyer se fait seulement à l'eau chaude",
+"désinfecter enlève la saleté, nettoyer tue les microbes"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Le temps de contact d'un désinfectant, c'est…",
+"ch": [
+"le temps où la surface doit rester mouillée",
+"le temps pour que le produit sèche à l'air",
+"le temps maximal pour l'ouvrir et l'utiliser",
+"le temps de pause du préposé après"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Mélanger de l'eau de Javel et de l'ammoniaque est dangereux.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15,
+"expl": "Ça dégage un gaz toxique."
+},
+{
+"q": "Où trouves-tu les dangers d'un produit?",
+"ch": [
+"L'étiquette",
+"La fiche de données de sécurité",
+"Le pictogramme",
+"Le prix sur la facture"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"t": "multi"
+},
+{
+"q": "Un pH de 13, c'est un produit…",
+"ch": [
+"très alcalin, comme un dégraissant fort",
+"sans danger pour la peau",
+"très acide, comme un détartrant",
+"neutre, comme l'eau du robinet"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Lavage des mains : combien de secondes au minimum avec du savon?",
+"t": "estim",
+"ch": [],
+"bon": 20,
+"tol": 25,
+"u": "s",
+"s": 25,
+"expl": "Au moins 20 secondes."
+},
+{
+"q": "On travaille du plus propre au plus sale pour…",
+"ch": [
+"finir plus vite la tournée",
+"ne pas étendre les microbes",
+"user moins le chiffon",
+"économiser le produit"
+],
+"bon": 1,
+"s": 20
+}
+]
+},
+{
+"id": "defi-entretien-menager-egi-2",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Entretien ménager d'un bâtiment · Défi+ 2 de 6",
+"sujet": "Modules 4 à 6 : produits verts, surfaces, machines et quotidien",
+"couv": "img/couvertures/entretien-menager-egi.jpg",
+"coul": "#2E8B57",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
 "q": "Un chiffon qui passe de la toilette au comptoir, c'est…",
 "ch": [
 "de la contamination croisée",
@@ -5923,16 +7306,108 @@ window.QUIZ_LIVRES = [
 ],
 "bon": 3,
 "s": 20
+},
+{
+"q": "Associe la couleur du chiffon à l'endroit (code courant).",
+"t": "paires",
+"g": [
+"Rouge",
+"Jaune",
+"Bleu",
+"Vert"
+],
+"ch": [
+"Toilettes et urinoirs",
+"Lavabos et salle de bain",
+"Surfaces générales, bureaux",
+"Cuisine et aires de repas"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Un produit « écologique » certifié a…",
+"ch": [
+"le mot « naturel » sur l'étiquette",
+"une odeur de citron très forte",
+"un logo de certification reconnu",
+"une bouteille verte et un dessin de feuille"
+],
+"bon": 2,
+"s": 20
+},
+{
+"q": "La microfibre nettoie bien parce qu'elle…",
+"ch": [
+"se lave à l'eau froide seulement",
+"contient déjà un désinfectant dans le tissu",
+"est plus épaisse qu'un chiffon de coton",
+"capte la poussière dans ses fibres très fines"
+],
+"bon": 3,
+"s": 20
+},
+{
+"q": "On peut utiliser le même chiffon pour la toilette et le comptoir.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 1,
+"s": 15
+},
+{
+"q": "Remets dans l'ordre l'entretien quotidien d'une salle de bain.",
+"ch": [
+"Vider les poubelles",
+"Nettoyer lavabo et miroir",
+"Nettoyer la toilette",
+"Laver le plancher en reculant"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "L'autorécureuse, en fin de journée, on…",
+"ch": [
+"remplit le réservoir sale d'eau propre",
+"vide et rince les deux réservoirs",
+"laisse l'eau sale pour le lendemain",
+"met la batterie à vide pour la protéger"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Une dilution de 1:64, c'est combien de mL de produit pour 4 litres d'eau?",
+"t": "estim",
+"ch": [],
+"bon": 62,
+"tol": 15,
+"u": "mL",
+"s": 35,
+"expl": "4000 ÷ 64 = 62,5 mL."
 }
 ]
 },
 {
-"id": "defi-entretien-menager-egi-2",
+"id": "defi-entretien-menager-egi-3",
 "exemple": true,
 "livre": true,
 "defi": true,
-"titre": "Entretien ménager d'un bâtiment · Défi+ 2 de 3",
-"sujet": "Modules 7 à 17 : planchers, hôtel, aréna, vitres, extérieur, piscine, urgences, sanitaires, eau chaude",
+"titre": "Entretien ménager d'un bâtiment · Défi+ 3 de 6",
+"sujet": "Modules 7 à 11 : planchers, hôtel, aréna, vitres et extérieur",
 "couv": "img/couvertures/entretien-menager-egi.jpg",
 "coul": "#2E8B57",
 "reg": {
@@ -6011,6 +7486,125 @@ window.QUIZ_LIVRES = [
 "bon": 1,
 "s": 20
 },
+{
+"q": "Associe le plancher au bon soin.",
+"t": "paires",
+"g": [
+"Vinyle (VCT)",
+"Bois verni",
+"Céramique",
+"Tapis"
+],
+"ch": [
+"Cire et polissage",
+"Linge humide, peu d'eau",
+"Lavage et brossage des joints",
+"Aspirateur et extraction"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Un tapis d'entrée bien entretenu retient…",
+"ch": [
+"seulement l'eau de la neige l'hiver",
+"une grande partie de la saleté qui entre",
+"rien : il sert à décorer",
+"les microbes des souliers"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Dans une chambre d'hôtel, on commence par…",
+"ch": [
+"passer l'aspirateur sous le lit",
+"laver le plancher de la salle de bain",
+"aérer, enlever la literie et les déchets",
+"remplir le minibar et les savons"
+],
+"bon": 2,
+"s": 20
+},
+{
+"q": "On lave les vitres en plein soleil pour qu'elles sèchent vite.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 1,
+"s": 15,
+"expl": "Elles sèchent trop vite et laissent des traces."
+},
+{
+"q": "Avant de laver le plancher d'un corridor, il faut…",
+"ch": [
+"Poser les affiches « plancher mouillé »",
+"Balayer ou passer la vadrouille sèche",
+"Prévoir un passage",
+"Ouvrir toutes les portes"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"t": "multi"
+},
+{
+"q": "Le raclette à vitre se passe…",
+"ch": [
+"en « S » ou de haut en bas, en essuyant la lame",
+"en cercles, sans essuyer la lame",
+"de bas en haut, d'un seul coup",
+"seulement à l'horizontale"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "L'eau d'une surfaceuse de glace est chauffée à environ combien de °C?",
+"t": "estim",
+"ch": [],
+"bon": 60,
+"tol": 25,
+"u": "°C",
+"s": 30,
+"expl": "Souvent entre 50 et 70 °C : l'eau chaude fait une glace plus lisse."
+},
+{
+"q": "Le sel de déglaçage abîme surtout…",
+"ch": [
+"le gazon de l'été suivant seulement",
+"le béton et les tapis de l'entrée",
+"rien s'il est bien étendu",
+"les vitres de la porte"
+],
+"bon": 1,
+"s": 20
+}
+]
+},
+{
+"id": "defi-entretien-menager-egi-4",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Entretien ménager d'un bâtiment · Défi+ 4 de 6",
+"sujet": "Modules 12 à 17 : piscine, urgences, sanitaires et eau chaude",
+"couv": "img/couvertures/entretien-menager-egi.jpg",
+"coul": "#2E8B57",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
 {
 "q": "Pourquoi tondre le gazon haut?",
 "ch": [
@@ -6101,16 +7695,108 @@ window.QUIZ_LIVRES = [
 ],
 "bon": 0,
 "s": 15
+},
+{
+"q": "Associe la mesure d'eau de piscine à son rôle.",
+"t": "paires",
+"g": [
+"Chlore libre",
+"pH",
+"Alcalinité",
+"Clarté"
+],
+"ch": [
+"Désinfecte l'eau",
+"Confort et efficacité du chlore",
+"Stabilise le pH",
+"Voir le fond (sécurité)"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Le pH idéal d'une piscine est environ…",
+"ch": [
+"8,5 à 9,0",
+"5,0 à 5,5",
+"7,2 à 7,8",
+"6,0 à 6,4"
+],
+"bon": 2,
+"s": 20
+},
+{
+"q": "Une toilette qui déborde : premier geste…",
+"ch": [
+"appeler la ville tout de suite",
+"fermer le robinet d'arrêt derrière",
+"verser un produit débouchant",
+"tirer la chasse encore une fois"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Un chauffe-eau réglé trop bas (sous 60 °C) favorise la légionellose.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "Remets dans l'ordre : déversement de vomi dans un corridor.",
+"ch": [
+"Isoler la zone",
+"Mettre gants et protections",
+"Absorber et ramasser",
+"Nettoyer puis désinfecter"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "La soupape de sûreté du chauffe-eau (T et P) protège contre…",
+"ch": [
+"le manque d'eau dans le réservoir",
+"une pression ou une chaleur trop fortes",
+"l'eau trop froide le matin",
+"la rouille au fond du réservoir"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "L'eau chaude au robinet ne devrait pas dépasser environ combien de °C (brûlures)?",
+"t": "estim",
+"ch": [],
+"bon": 49,
+"tol": 10,
+"u": "°C",
+"s": 30,
+"expl": "Au robinet, environ 49 °C pour éviter les brûlures."
 }
 ]
 },
 {
-"id": "defi-entretien-menager-egi-3",
+"id": "defi-entretien-menager-egi-5",
 "exemple": true,
 "livre": true,
 "defi": true,
-"titre": "Entretien ménager d'un bâtiment · Défi+ 3 de 3",
-"sujet": "Modules 17 à 28 : registres, pompes, ventilation, toits, écoles, déversements, portes, électricité, matières",
+"titre": "Entretien ménager d'un bâtiment · Défi+ 5 de 6",
+"sujet": "Modules 17 à 22 : registres, pompes, ventilation et toits",
 "couv": "img/couvertures/entretien-menager-egi.jpg",
 "coul": "#2E8B57",
 "reg": {
@@ -6194,6 +7880,124 @@ window.QUIZ_LIVRES = [
 "bon": 3,
 "s": 20
 },
+{
+"q": "Associe l'appareil à ce qu'on vérifie.",
+"t": "paires",
+"g": [
+"Pompe de puisard",
+"Échangeur d'air",
+"Drain de toit",
+"Extincteur"
+],
+"ch": [
+"Le flotteur et la sortie",
+"Les filtres",
+"Les débris et la crépine",
+"L'aiguille dans le vert"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Un registre d'entretien sert surtout à…",
+"ch": [
+"remplacer le bon de travail",
+"prouver ce qui a été fait, et quand",
+"noter les absences du personnel",
+"décorer le local mécanique"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Une pompe de puisard qui tourne sans arrêt : on vérifie d'abord…",
+"ch": [
+"le flotteur, qui peut être coincé",
+"le disjoncteur de la cuisine",
+"le thermostat du sous-sol",
+"la couleur de l'eau du puisard"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Un filtre de ventilation bouché fait travailler le moteur plus fort.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "Sur un toit plat, au printemps, on vérifie…",
+"ch": [
+"Les drains",
+"Les solins",
+"L'accumulation d'eau",
+"La couleur des voitures"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"t": "multi"
+},
+{
+"q": "Pour monter sur un toit, il faut d'abord…",
+"ch": [
+"attendre la pluie",
+"une protection contre les chutes",
+"un balai et une pelle",
+"l'accord d'un locataire"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Un filtre de fournaise de 1 po se change environ aux combien de mois?",
+"t": "estim",
+"ch": [],
+"bon": 3,
+"tol": 34,
+"u": "mois",
+"s": 25,
+"expl": "Environ aux 3 mois (1 à 3 selon l'usage)."
+},
+{
+"q": "Une odeur d'égout au sous-sol vient souvent…",
+"ch": [
+"d'un siphon de drain de plancher asséché",
+"d'un filtre de fournaise sale",
+"d'une fenêtre restée ouverte",
+"du chauffe-eau qui est trop chaud"
+],
+"bon": 0,
+"s": 20
+}
+]
+},
+{
+"id": "defi-entretien-menager-egi-6",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Entretien ménager d'un bâtiment · Défi+ 6 de 6",
+"sujet": "Modules 23 à 28 : écoles, déversements, portes, électricité et matières",
+"couv": "img/couvertures/entretien-menager-egi.jpg",
+"coul": "#2E8B57",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
 {
 "q": "Dans la cuisine d'une école, qui inspecte l'hygiène?",
 "ch": [
@@ -6292,6 +8096,99 @@ window.QUIZ_LIVRES = [
 "bon": 3,
 "s": 20,
 "expl": "Il contient du mercure : pas d'aspirateur ni de balai."
+},
+{
+"q": "Associe la matière au bon bac.",
+"t": "paires",
+"g": [
+"Canette d'aluminium",
+"Pelure de pomme",
+"Pile usagée",
+"Pot de peinture"
+],
+"ch": [
+"Recyclage",
+"Compost",
+"Point de dépôt (dangereux)",
+"Écocentre"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Un déversement d'huile sur le plancher : on utilise…",
+"ch": [
+"du sable de la cour",
+"un séchoir pour l'évaporer",
+"de l'eau chaude et une vadrouille",
+"un absorbant de la trousse de déversement"
+],
+"bon": 3,
+"s": 20
+},
+{
+"q": "Une prise électrique chaude au toucher, c'est…",
+"ch": [
+"un problème seulement l'hiver",
+"normal quand un appareil fonctionne",
+"réglé en la couvrant de ruban",
+"un signe de danger : on avise"
+],
+"bon": 3,
+"s": 20
+},
+{
+"q": "Le préposé peut changer lui-même un disjoncteur dans le panneau.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 1,
+"s": 15,
+"expl": "C'est un travail d'électricien."
+},
+{
+"q": "Remets dans l'ordre la fermeture d'une école le soir.",
+"ch": [
+"Faire la tournée des locaux",
+"Fermer les fenêtres",
+"Éteindre les lumières",
+"Armer le système d'alarme"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "Une porte qui ne se verrouille plus le soir : tu…",
+"ch": [
+"la bloques avec une chaise",
+"attends que quelqu'un se plaigne",
+"sécurises et avises tout de suite",
+"la laisses et notes pour la semaine"
+],
+"bon": 2,
+"s": 20
+},
+{
+"q": "Un néon T8 de 4 pieds consomme environ combien de watts?",
+"t": "estim",
+"ch": [],
+"bon": 32,
+"tol": 20,
+"u": "W",
+"s": 25,
+"expl": "Environ 32 W (et 15 à 18 W en DEL)."
 }
 ]
 },
@@ -9272,8 +11169,8 @@ window.QUIZ_LIVRES = [
 "exemple": true,
 "livre": true,
 "defi": true,
-"titre": "Lecture de plans de bâtiments · Défi+ 1 de 3",
-"sujet": "Modules 1 à 3 : le jeu de plans, les vues, les échelles",
+"titre": "Lecture de plans de bâtiments · Défi+ 1 de 6",
+"sujet": "Modules 1 et 2 : le jeu de plans et les vues",
 "couv": "img/couvertures/lecture-plans-batiments-egi.jpg",
 "coul": "#534AB7",
 "reg": {
@@ -9358,6 +11255,124 @@ window.QUIZ_LIVRES = [
 "bon": 1,
 "s": 20
 },
+{
+"q": "Associe la lettre de la feuille à la discipline.",
+"t": "paires",
+"g": [
+"A",
+"S",
+"M",
+"E"
+],
+"ch": [
+"Architecture",
+"Structure",
+"Mécanique (plomberie, chauffage, ventilation)",
+"Électricité"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "La vue en plan, c'est…",
+"ch": [
+"le bâtiment coupé à environ 1,2 m et vu d'en haut",
+"le bâtiment coupé de haut en bas",
+"le toit vu d'un avion, sans les murs",
+"le bâtiment vu de face, du trottoir"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Une élévation montre…",
+"ch": [
+"le terrain et les arbres",
+"l'intérieur d'un mur coupé",
+"une façade vue de face",
+"le plancher vu d'en haut"
+],
+"bon": 2,
+"s": 20
+},
+{
+"q": "Le numéro de feuille se trouve dans le cartouche.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "Que trouve-t-on dans un cartouche?",
+"ch": [
+"Le titre du projet",
+"L'échelle",
+"La date et les révisions",
+"Le prix des matériaux"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"t": "multi"
+},
+{
+"q": "La flèche du nord sert à…",
+"ch": [
+"orienter le plan par rapport au terrain",
+"montrer la pente du toit",
+"montrer d'où vient le vent dominant",
+"indiquer l'entrée principale"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Une feuille de plan grand format (ARCH D) mesure environ combien de pouces de large?",
+"t": "estim",
+"ch": [],
+"bon": 36,
+"tol": 10,
+"u": "po",
+"s": 25,
+"expl": "24 × 36 po."
+},
+{
+"q": "Une ligne pointillée sur un plan montre souvent…",
+"ch": [
+"la limite du terrain",
+"un mur à démolir pour sûr",
+"ce qui est caché ou au-dessus",
+"une erreur du dessinateur"
+],
+"bon": 2,
+"s": 20
+}
+]
+},
+{
+"id": "defi-lecture-plans-batiments-egi-2",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Lecture de plans de bâtiments · Défi+ 2 de 6",
+"sujet": "Modules 2 et 3 : les vues et les échelles",
+"couv": "img/couvertures/lecture-plans-batiments-egi.jpg",
+"coul": "#534AB7",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
 {
 "q": "Les hauteurs se mesurent à partir…",
 "ch": [
@@ -9445,16 +11460,106 @@ window.QUIZ_LIVRES = [
 ],
 "bon": 1,
 "s": 20
+},
+{
+"q": "Associe l'échelle à son usage courant.",
+"t": "paires",
+"g": [
+"1:500",
+"1:100",
+"1:50",
+"1:5"
+],
+"ch": [
+"Plan d'implantation du terrain",
+"Plan d'étage d'un grand bâtiment",
+"Plan d'un logement",
+"Détail de construction"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "À l'échelle 1:50, 1 cm sur le plan égale…",
+"ch": [
+"50 cm en réalité",
+"5 m en réalité",
+"50 m en réalité",
+"5 cm en réalité"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Le règle d'architecte (scalimètre) sert à…",
+"ch": [
+"tracer des cercles parfaits",
+"mesurer les angles d'un toit",
+"trouver le nord du plan",
+"lire les mesures selon l'échelle"
+],
+"bon": 3,
+"s": 20
+},
+{
+"q": "Un plan photocopié et agrandi garde la bonne échelle.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 1,
+"s": 15,
+"expl": "On se fie aux cotes écrites."
+},
+{
+"q": "Remets dans l'ordre pour mesurer une pièce sur un plan.",
+"ch": [
+"Lire l'échelle dans le cartouche",
+"Choisir la bonne face du scalimètre",
+"Mesurer d'un mur à l'autre",
+"Vérifier avec une cote écrite"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "Sur un plan au 1:100, un mur mesure 45 mm. Combien de mètres en réalité?",
+"t": "nombre",
+"ch": [],
+"bon": 4.5,
+"s": 45,
+"u": "m"
+},
+{
+"q": "Une feuille au 1:50 montre un logement de 8 m de long. Il prend environ combien de cm sur le papier?",
+"t": "estim",
+"ch": [],
+"bon": 16,
+"tol": 10,
+"u": "cm",
+"s": 30,
+"expl": "800 cm ÷ 50 = 16 cm."
 }
 ]
 },
 {
-"id": "defi-lecture-plans-batiments-egi-2",
+"id": "defi-lecture-plans-batiments-egi-3",
 "exemple": true,
 "livre": true,
 "defi": true,
-"titre": "Lecture de plans de bâtiments · Défi+ 2 de 3",
-"sujet": "Modules 3 à 6 : échelles, cotes et symboles, croquis, architecture",
+"titre": "Lecture de plans de bâtiments · Défi+ 3 de 6",
+"sujet": "Modules 3 et 4 : échelles, cotes et symboles",
 "couv": "img/couvertures/lecture-plans-batiments-egi.jpg",
 "coul": "#534AB7",
 "reg": {
@@ -9543,6 +11648,122 @@ window.QUIZ_LIVRES = [
 "s": 20
 },
 {
+"q": "Associe le symbole à ce qu'il représente.",
+"t": "paires",
+"g": [
+"Arc de cercle sur une ouverture",
+"Deux traits fins dans un mur",
+"Hachures en diagonale",
+"Cercle avec un numéro"
+],
+"ch": [
+"Sens d'ouverture de la porte",
+"Fenêtre",
+"Mur coupé (matériau)",
+"Renvoi à un détail"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Une cote se lit de…",
+"ch": [
+"le bord de la feuille au mur",
+"la ligne de rappel à l'autre ligne de rappel",
+"n'importe quel point du mur",
+"l'extrémité de la flèche au texte"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "La légende d'un plan sert à…",
+"ch": [
+"montrer l'échelle de chaque vue",
+"donner le prix de chaque pièce",
+"expliquer les symboles utilisés",
+"remplacer le devis du projet"
+],
+"bon": 2,
+"s": 20
+},
+{
+"q": "Les cotes écrites ont priorité sur une mesure prise à la règle.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "Que trouve-t-on dans un tableau de portes?",
+"ch": [
+"Le repère (P1, P2…)",
+"Les dimensions",
+"Le type de quincaillerie",
+"Le nom du locataire"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"t": "multi"
+},
+{
+"q": "« CC » à côté d'une cote veut dire…",
+"ch": [
+"cote corrigée",
+"centre à centre",
+"coin à coin",
+"calcul complet"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Trois pièces de suite : 3200 mm, 2850 mm et 4100 mm. Longueur totale en mm?",
+"t": "nombre",
+"ch": [],
+"bon": 10150,
+"s": 45,
+"u": "mm"
+},
+{
+"q": "Une cote en mm sur un plan métrique s'écrit…",
+"ch": [
+"en centimètres, avec « cm »",
+"toujours avec « mm »",
+"en mètres, avec trois décimales",
+"sans le symbole « mm »"
+],
+"bon": 3,
+"s": 20
+}
+]
+},
+{
+"id": "defi-lecture-plans-batiments-egi-4",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Lecture de plans de bâtiments · Défi+ 4 de 6",
+"sujet": "Modules 5 et 6 : croquis et architecture",
+"couv": "img/couvertures/lecture-plans-batiments-egi.jpg",
+"coul": "#534AB7",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
 "q": "Un tableau de spécifications (portes, fenêtres, appareils) se lit grâce…",
 "ch": [
 "au repère placé sur le plan (P1, F3…)",
@@ -9625,16 +11846,109 @@ window.QUIZ_LIVRES = [
 "bon": 1,
 "s": 15,
 "expl": "Depuis le plancher fini."
+},
+{
+"q": "Associe la partie du croquis à la règle.",
+"t": "paires",
+"g": [
+"Les murs",
+"Les mesures",
+"Le nord ou un repère",
+"Le titre"
+],
+"ch": [
+"Traits doubles, épaisseur constante",
+"Prises deux fois, sur place",
+"Pour s'orienter plus tard",
+"Lieu, date, ton nom"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Dans un croquis de pièce, on mesure d'abord…",
+"ch": [
+"les prises de courant",
+"le tour complet de la pièce",
+"le plafond",
+"la hauteur des fenêtres"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Une coupe de mur montre…",
+"ch": [
+"le terrain autour",
+"la façade avec les fenêtres",
+"les couches du mur, de l'intérieur à l'extérieur",
+"le plan d'étage au complet"
+],
+"bon": 2,
+"s": 20
+},
+{
+"q": "Un croquis à main levée doit être à l'échelle exacte.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 1,
+"s": 15,
+"expl": "Il doit être proportionné, avec les cotes écrites."
+},
+{
+"q": "Remets dans l'ordre les couches d'un mur extérieur, de l'intérieur vers l'extérieur.",
+"ch": [
+"Gypse",
+"Pare-vapeur",
+"Isolant entre les montants",
+"Revêtement extérieur"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "Le pare-vapeur se place…",
+"ch": [
+"du côté froid, sous le revêtement",
+"au milieu de l'isolant",
+"seulement au plafond",
+"du côté chaud du mur (l'intérieur)"
+],
+"bon": 3,
+"s": 20
+},
+{
+"q": "Un montant de 2 × 6 mesure réellement environ combien de pouces de profondeur?",
+"t": "estim",
+"ch": [],
+"bon": 5.5,
+"tol": 5,
+"u": "po",
+"s": 25,
+"expl": "Un 2 × 6 fait 1 1/2 × 5 1/2 po."
 }
 ]
 },
 {
-"id": "defi-lecture-plans-batiments-egi-3",
+"id": "defi-lecture-plans-batiments-egi-5",
 "exemple": true,
 "livre": true,
 "defi": true,
-"titre": "Lecture de plans de bâtiments · Défi+ 3 de 3",
-"sujet": "Modules 7 à 9 : électricité, plomberie et chauffage, sécurité",
+"titre": "Lecture de plans de bâtiments · Défi+ 5 de 6",
+"sujet": "Module 7 : électricité",
 "couv": "img/couvertures/lecture-plans-batiments-egi.jpg",
 "coul": "#534AB7",
 "reg": {
@@ -9719,6 +12033,125 @@ window.QUIZ_LIVRES = [
 "bon": 2,
 "s": 20
 },
+{
+"q": "Associe le symbole électrique à l'appareil (légende courante).",
+"t": "paires",
+"g": [
+"Cercle avec deux traits",
+"S",
+"S3",
+"Cercle avec X"
+],
+"ch": [
+"Prise de courant double",
+"Interrupteur simple",
+"Interrupteur trois voies",
+"Sortie de luminaire"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Une ligne courbe entre un interrupteur et un luminaire montre…",
+"ch": [
+"le trajet exact du fil dans le mur",
+"la distance entre les deux",
+"une prise à installer plus tard",
+"quel interrupteur commande la lumière"
+],
+"bon": 3,
+"s": 20
+},
+{
+"q": "Le tableau de panneau indique…",
+"ch": [
+"quel disjoncteur alimente chaque circuit",
+"le prix de l'électricité",
+"la marque des luminaires",
+"la couleur des fils"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Le « S3 » est un interrupteur trois voies.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15,
+"expl": "Deux interrupteurs commandent la même lumière."
+},
+{
+"q": "Avant de toucher un circuit trouvé sur le plan, tu…",
+"ch": [
+"Coupes le disjoncteur",
+"Vérifies l'absence de tension",
+"Cadenasses si possible",
+"Te fies seulement au plan"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"t": "multi"
+},
+{
+"q": "« GFCI » (DDFT) sur le plan, c'est une prise qui…",
+"ch": [
+"donne plus de puissance",
+"s'allume la nuit",
+"coupe en cas de fuite vers la terre",
+"se commande à distance"
+],
+"bon": 2,
+"s": 20
+},
+{
+"q": "Une prise de courant ordinaire est posée à environ combien de mm du plancher?",
+"t": "estim",
+"ch": [],
+"bon": 300,
+"tol": 25,
+"u": "mm",
+"s": 30,
+"expl": "Souvent environ 300 à 400 mm."
+},
+{
+"q": "Le plan E montre le gris pâle de l'architecture pour…",
+"ch": [
+"montrer les murs coupe-feu",
+"indiquer les murs à démolir",
+"décorer la feuille",
+"situer les appareils dans les pièces"
+],
+"bon": 3,
+"s": 20
+}
+]
+},
+{
+"id": "defi-lecture-plans-batiments-egi-6",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Lecture de plans de bâtiments · Défi+ 6 de 6",
+"sujet": "Modules 8 et 9 : plomberie, chauffage et sécurité",
+"couv": "img/couvertures/lecture-plans-batiments-egi.jpg",
+"coul": "#534AB7",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
 {
 "q": "Lire un plan d'évacuation : dans l'ordre.",
 "ch": [
@@ -9815,6 +12248,98 @@ window.QUIZ_LIVRES = [
 ],
 "bon": 1,
 "s": 20
+},
+{
+"q": "Associe l'abréviation de plomberie.",
+"t": "paires",
+"g": [
+"EF",
+"EC",
+"D",
+"V"
+],
+"ch": [
+"Eau froide",
+"Eau chaude",
+"Drain (évacuation)",
+"Ventilation (évent)"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Sur un plan de plomberie, la flèche sur un drain montre…",
+"ch": [
+"le robinet à fermer",
+"la position du compteur",
+"l'entrée d'eau de la ville",
+"le sens de l'écoulement"
+],
+"bon": 3,
+"s": 20
+},
+{
+"q": "Le plan d'évacuation d'incendie affiché montre…",
+"ch": [
+"le prix des extincteurs",
+"les plans de la tuyauterie",
+"« Vous êtes ici » et les sorties",
+"l'horaire du concierge"
+],
+"bon": 2,
+"s": 20
+},
+{
+"q": "Un clapet coupe-feu se trouve dans un conduit qui traverse un mur coupe-feu.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "Remets dans l'ordre pour trouver un robinet d'arrêt sur les plans.",
+"ch": [
+"Trouver la pièce sur le plan d'étage",
+"Ouvrir le plan de plomberie",
+"Suivre la conduite vers l'amont",
+"Repérer le symbole de robinet"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "Sur un plan de chauffage, « R » à côté d'une conduite veut dire…",
+"ch": [
+"réservoir d'eau chaude",
+"radiateur électrique",
+"robinet à fermer",
+"retour vers la chaudière"
+],
+"bon": 3,
+"s": 20
+},
+{
+"q": "La pente d'un drain horizontal de 3 po : environ combien de % (1/4 po par pied)?",
+"t": "estim",
+"ch": [],
+"bon": 2,
+"tol": 15,
+"u": "%",
+"s": 30,
+"expl": "1/4 po par pied, c'est environ 2 %."
 }
 ]
 },
@@ -9823,8 +12348,8 @@ window.QUIZ_LIVRES = [
 "exemple": true,
 "livre": true,
 "defi": true,
-"titre": "Lecture de plans et devis (C6) · Défi+ 1 de 3",
-"sujet": "Modules 1 à 3 : le monde des plans, les vues, les échelles",
+"titre": "Lecture de plans et devis (C6) · Défi+ 1 de 6",
+"sujet": "Modules 1 et 2 : le monde des plans et les vues",
 "couv": "img/couvertures/lecture-plans-devis-c6.jpg",
 "coul": "#854F0B",
 "reg": {
@@ -9909,6 +12434,125 @@ window.QUIZ_LIVRES = [
 "bon": 1,
 "s": 20
 },
+{
+"q": "Associe le document au contenu.",
+"t": "paires",
+"g": [
+"Plans",
+"Devis",
+"Addenda",
+"Plans tel que construit"
+],
+"ch": [
+"Le dessin de l'ouvrage",
+"La qualité des matériaux et l'exécution",
+"Les changements avant la soumission",
+"Ce qui a été vraiment installé"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Le plombier consulte surtout les feuilles…",
+"ch": [
+"E (électricité) d'abord",
+"A (architecture) seulement",
+"S (structure) seulement",
+"P (plomberie) et M (mécanique)"
+],
+"bon": 3,
+"s": 20
+},
+{
+"q": "La vue isométrique montre la tuyauterie…",
+"ch": [
+"coupée en deux",
+"de face, sans profondeur",
+"vue d'en haut, à plat",
+"en 3 dimensions, à 30°"
+],
+"bon": 3,
+"s": 20
+},
+{
+"q": "En cas de conflit, le devis a souvent priorité sur le plan.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15,
+"expl": "Les documents précisent l'ordre de priorité."
+},
+{
+"q": "Avant de couper, le plombier vérifie sur les plans…",
+"ch": [
+"Les cotes",
+"Les diamètres",
+"Les pentes",
+"La couleur des murs"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"t": "multi"
+},
+{
+"q": "Le schéma de colonne montre…",
+"ch": [
+"le plan d'étage au 1:50",
+"la façade du bâtiment",
+"le terrain et les égouts de la ville",
+"chaque étage sur une ligne, sans échelle"
+],
+"bon": 3,
+"s": 20
+},
+{
+"q": "Un projet de 4 étages : combien de feuilles P environ, si chaque étage a sa feuille plus 2 feuilles de détails?",
+"t": "estim",
+"ch": [],
+"bon": 6,
+"tol": 20,
+"u": "feuilles",
+"s": 25,
+"expl": "4 + 2 = 6."
+},
+{
+"q": "Le numéro de révision dans le cartouche sert à…",
+"ch": [
+"savoir si on a la dernière version",
+"connaître l'échelle du dessin",
+"compter les pages du devis",
+"classer par ordre alphabétique"
+],
+"bon": 0,
+"s": 20
+}
+]
+},
+{
+"id": "defi-lecture-plans-devis-c6-2",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Lecture de plans et devis (C6) · Défi+ 2 de 6",
+"sujet": "Modules 2 et 3 : les vues et les échelles",
+"couv": "img/couvertures/lecture-plans-devis-c6.jpg",
+"coul": "#854F0B",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
 {
 "q": "Les hauteurs se mesurent à partir…",
 "ch": [
@@ -9996,16 +12640,106 @@ window.QUIZ_LIVRES = [
 ],
 "bon": 1,
 "s": 20
+},
+{
+"q": "Associe la vue à ce qu'elle montre.",
+"t": "paires",
+"g": [
+"Plan",
+"Élévation",
+"Coupe",
+"Isométrie"
+],
+"ch": [
+"Vu d'en haut",
+"Vu de face",
+"Vu de l'intérieur, tranché",
+"En 3D, à 30°"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "À l'échelle 1/4 po = 1 pi, 2 po sur le plan égalent…",
+"ch": [
+"8 pieds",
+"16 pieds",
+"4 pieds",
+"2 pieds"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Une échelle impériale courante en plomberie est…",
+"ch": [
+"1/16 po = 1 pi",
+"1/4 po = 1 pi",
+"1 po = 100 pi",
+"1 po = 1 pi"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "L'isométrie respecte toujours l'échelle des longueurs.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 1,
+"s": 15,
+"expl": "On s'y fie pour le trajet, pas pour mesurer."
+},
+{
+"q": "Remets dans l'ordre pour faire l'isométrie d'une salle de bain.",
+"ch": [
+"Tracer le drain principal",
+"Ajouter les branchements d'appareils",
+"Ajouter les évents",
+"Écrire diamètres et pentes"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "Au 1/4 po = 1 pi, une conduite mesure 3 1/2 po sur le plan. Combien de pieds?",
+"t": "nombre",
+"ch": [],
+"bon": 14,
+"s": 45,
+"u": "pi"
+},
+{
+"q": "Au 1:50, une salle de bain de 2,4 m prend environ combien de mm sur le plan?",
+"t": "estim",
+"ch": [],
+"bon": 48,
+"tol": 10,
+"u": "mm",
+"s": 30,
+"expl": "2400 ÷ 50 = 48 mm."
 }
 ]
 },
 {
-"id": "defi-lecture-plans-devis-c6-2",
+"id": "defi-lecture-plans-devis-c6-3",
 "exemple": true,
 "livre": true,
 "defi": true,
-"titre": "Lecture de plans et devis (C6) · Défi+ 2 de 3",
-"sujet": "Modules 3 à 6 : échelles, cotes et symboles, croquis, plans de plomberie",
+"titre": "Lecture de plans et devis (C6) · Défi+ 3 de 6",
+"sujet": "Modules 3 et 4 : échelles, cotes et symboles",
 "couv": "img/couvertures/lecture-plans-devis-c6.jpg",
 "coul": "#854F0B",
 "reg": {
@@ -10094,6 +12828,123 @@ window.QUIZ_LIVRES = [
 "s": 20
 },
 {
+"q": "Associe l'abréviation au plan de plomberie.",
+"t": "paires",
+"g": [
+"RN (CO)",
+"DP",
+"WC",
+"LAV"
+],
+"ch": [
+"Regard de nettoyage",
+"Drain de plancher",
+"Toilette",
+"Lavabo"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "La cote d'élévation d'un drain indique…",
+"ch": [
+"sa hauteur par rapport à un repère",
+"son diamètre",
+"sa longueur totale",
+"sa pente en %"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Le repère « P-3 » sur le plan renvoie…",
+"ch": [
+"à la page 3 du devis",
+"au 3e étage",
+"au tableau des appareils",
+"à une pente de 3 %"
+],
+"bon": 2,
+"s": 20
+},
+{
+"q": "Une ligne pleine épaisse en plomberie montre souvent le drain.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15,
+"expl": "Toujours vérifier la légende du projet."
+},
+{
+"q": "Le tableau des appareils donne pour chaque appareil…",
+"ch": [
+"Le modèle",
+"Les diamètres EF et EC",
+"Le diamètre d'évacuation",
+"Le nom de l'installateur"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"t": "multi"
+},
+{
+"q": "Le « DN » d'un tuyau, c'est…",
+"ch": [
+"son épaisseur de paroi",
+"son diamètre nominal (un nom, pas une mesure)",
+"son diamètre extérieur exact",
+"sa longueur standard"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Longueur de coupe : 1200 mm centre à centre, deux prises de 20 mm. Combien de mm?",
+"t": "nombre",
+"ch": [],
+"bon": 1160,
+"s": 45,
+"u": "mm"
+},
+{
+"q": "Une cote « ± » sur un plan veut dire…",
+"ch": [
+"une erreur à corriger",
+"à vérifier sur le chantier",
+"une pièce optionnelle",
+"une cote exacte au mm"
+],
+"bon": 1,
+"s": 20
+}
+]
+},
+{
+"id": "defi-lecture-plans-devis-c6-4",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Lecture de plans et devis (C6) · Défi+ 4 de 6",
+"sujet": "Modules 5 et 6 : croquis et plans de plomberie",
+"couv": "img/couvertures/lecture-plans-devis-c6.jpg",
+"coul": "#854F0B",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
 "q": "Un tableau de spécifications (portes, fenêtres, appareils) se lit grâce…",
 "ch": [
 "au repère placé sur le plan (P1, F3…)",
@@ -10175,16 +13026,109 @@ window.QUIZ_LIVRES = [
 ],
 "bon": 2,
 "s": 20
+},
+{
+"q": "Associe l'élément de croquis de plomberie.",
+"t": "paires",
+"g": [
+"Drain",
+"Évent",
+"Eau froide",
+"Eau chaude"
+],
+"ch": [
+"Trait plein épais",
+"Trait pointillé",
+"Trait plein fin avec « EF »",
+"Trait plein fin avec « EC »"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Un bon croquis de tuyauterie sur le chantier indique…",
+"ch": [
+"les diamètres, les pentes et les cotes",
+"la couleur des tuyaux",
+"seulement le trajet, sans mesures",
+"le nom des locataires"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Un siphon doit apparaître sur le plan pour…",
+"ch": [
+"le compteur d'eau seulement",
+"chaque colonne d'eau chaude",
+"chaque appareil sanitaire",
+"chaque robinet d'eau froide"
+],
+"bon": 2,
+"s": 20
+},
+{
+"q": "Le diamètre d'un drain peut diminuer en descendant.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 1,
+"s": 15,
+"expl": "Dans le sens de l'écoulement, il ne diminue jamais."
+},
+{
+"q": "Remets dans l'ordre l'eau d'un lavabo vers l'égout.",
+"ch": [
+"Lavabo",
+"Siphon",
+"Branchement d'évacuation",
+"Colonne de chute"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "Le collecteur principal se trouve…",
+"ch": [
+"au plus bas, vers la sortie du bâtiment",
+"à côté du chauffe-eau",
+"dans chaque logement",
+"au toit, près des évents"
+],
+"bon": 0,
+"s": 20
+},
+{
+"q": "Un lavabo a un siphon de combien de pouces (diamètre courant)?",
+"t": "estim",
+"ch": [],
+"bon": 1.25,
+"tol": 10,
+"u": "po",
+"s": 25,
+"expl": "1 1/4 po."
 }
 ]
 },
 {
-"id": "defi-lecture-plans-devis-c6-3",
+"id": "defi-lecture-plans-devis-c6-5",
 "exemple": true,
 "livre": true,
 "defi": true,
-"titre": "Lecture de plans et devis (C6) · Défi+ 3 de 3",
-"sujet": "Modules 6 à 8 : plomberie, chauffage, devis et estimation",
+"titre": "Lecture de plans et devis (C6) · Défi+ 5 de 6",
+"sujet": "Modules 6 et 7 : plomberie et chauffage",
 "couv": "img/couvertures/lecture-plans-devis-c6.jpg",
 "coul": "#854F0B",
 "reg": {
@@ -10270,6 +13214,124 @@ window.QUIZ_LIVRES = [
 "s": 20
 },
 {
+"q": "Associe l'élément de chauffage au plan.",
+"t": "paires",
+"g": [
+"Chaudière",
+"Circulateur",
+"Vase d'expansion",
+"Purgeur d'air"
+],
+"ch": [
+"Chauffe l'eau",
+"Fait circuler l'eau",
+"Absorbe la dilatation",
+"Enlève l'air au point haut"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Un réseau de chauffage « bitube » a…",
+"ch": [
+"deux chaudières en parallèle",
+"un seul tuyau en boucle",
+"deux circulateurs obligatoires",
+"un tuyau d'aller et un tuyau de retour"
+],
+"bon": 3,
+"s": 20
+},
+{
+"q": "Le purgeur d'air automatique se place…",
+"ch": [
+"à la sortie du chauffe-eau",
+"aux points hauts du réseau",
+"sur l'entrée d'eau de la ville",
+"aux points bas, près du drain"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Sur un plan de chauffage, les plinthes sont souvent numérotées par zone.",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "Que trouve-t-on dans le tableau M de chauffage?",
+"ch": [
+"Le modèle de chaudière",
+"Le débit",
+"La puissance",
+"Le salaire du plombier"
+],
+"bon": [
+0,
+1,
+2
+],
+"s": 30,
+"t": "multi"
+},
+{
+"q": "Une soupape de sûreté de chaudière résidentielle est souvent réglée à…",
+"ch": [
+"5 psi",
+"30 psi",
+"75 psi",
+"150 psi"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Pression d'une chaudière à eau chaude résidentielle à froid : environ combien de psi?",
+"t": "estim",
+"ch": [],
+"bon": 12,
+"tol": 25,
+"u": "psi",
+"s": 30,
+"expl": "Environ 12 à 15 psi."
+},
+{
+"q": "Un clapet antiretour sur le réseau de chauffage sert à…",
+"ch": [
+"remplir la chaudière",
+"purger l'air",
+"empêcher l'eau de circuler à l'envers",
+"augmenter la pression"
+],
+"bon": 2,
+"s": 20
+}
+]
+},
+{
+"id": "defi-lecture-plans-devis-c6-6",
+"exemple": true,
+"livre": true,
+"defi": true,
+"titre": "Lecture de plans et devis (C6) · Défi+ 6 de 6",
+"sujet": "Module 8 : devis et estimation",
+"couv": "img/couvertures/lecture-plans-devis-c6.jpg",
+"coul": "#854F0B",
+"reg": {
+"nb": "tout",
+"melange": "tout"
+},
+"qs": [
+{
 "q": "Les divisions du devis : la plomberie est la division…",
 "ch": [
 "01",
@@ -10352,6 +13414,95 @@ window.QUIZ_LIVRES = [
 ],
 "bon": 0,
 "s": 15
+},
+{
+"q": "Associe la section du devis.",
+"t": "paires",
+"g": [
+"Division 22",
+"Division 23",
+"Division 26",
+"Division 21"
+],
+"ch": [
+"Plomberie",
+"Chauffage, ventilation, climatisation",
+"Électricité",
+"Protection incendie (gicleurs)"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 45
+},
+{
+"q": "Le relevé des quantités (« take-off »), c'est…",
+"ch": [
+"écrire le devis à la place de l'ingénieur",
+"lire seulement le cartouche",
+"visiter le chantier fini",
+"compter tous les tuyaux et raccords sur les plans"
+],
+"bon": 3,
+"s": 20
+},
+{
+"q": "Dans une estimation, on ajoute un pourcentage de pertes pour…",
+"ch": [
+"payer les vacances de l'équipe",
+"le profit de l'entrepreneur seulement",
+"les coupes, les erreurs et les retailles",
+"les taxes du gouvernement"
+],
+"bon": 2,
+"s": 20
+},
+{
+"q": "Le devis peut exiger une marque précise « ou l'équivalent approuvé ».",
+"ch": [
+"Vrai",
+"Faux"
+],
+"bon": 0,
+"s": 15
+},
+{
+"q": "Remets dans l'ordre une estimation.",
+"ch": [
+"Lire plans et devis",
+"Faire le relevé des quantités",
+"Mettre les prix et la main-d'œuvre",
+"Ajouter pertes, frais et profit"
+],
+"bon": [
+0,
+1,
+2,
+3
+],
+"s": 40,
+"t": "ordre"
+},
+{
+"q": "120 pieds de cuivre + 10 % de pertes. Combien de pieds commander?",
+"t": "nombre",
+"ch": [],
+"bon": 132,
+"s": 45,
+"u": "pi"
+},
+{
+"q": "Un plombier compagnon gagne environ combien de $ l'heure au Québec (taux de la CCQ)?",
+"t": "estim",
+"ch": [],
+"bon": 45,
+"tol": 20,
+"u": "$",
+"s": 30,
+"expl": "Environ 45 à 50 $ l'heure selon le secteur et l'année."
 }
 ]
 },
