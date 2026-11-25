@@ -2,7 +2,7 @@
 // GET  → clé publique des avis (créée la première fois, gardée dans panier_vapid, jamais montrée à personne).
 // POST {id} → appelée par panier_envoyer : avertit les appareils de l'enseignant du panier (une seule fois, panier de moins de 2 min).
 // À déployer dans Supabase → Edge Functions (nom : panier-avis, « Verify JWT » désactivé).
-import * as webpush from "jsr:@negrel/webpush@0.3";
+import * as webpush from "jsr:@negrel/webpush";
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
 const sb = createClient(Deno.env.get("SUPABASE_URL")!, (Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || Deno.env.get("SUPABASE_SECRET_KEY"))!);
@@ -23,7 +23,10 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: cors });
   try {
     const k = await cles();
-    if (req.method === "GET") return json({ cle: await webpush.exportApplicationServerKey(k) });
+    if (req.method === "GET") {   /* clé publique en base64url (format attendu par PushManager.subscribe) */
+      const raw = new Uint8Array(await crypto.subtle.exportKey("raw", (k as CryptoKeyPair).publicKey));
+      return json({ cle: btoa(String.fromCharCode(...raw)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "") });
+    }
     const { id } = await req.json();
     const { data: p } = await sb.from("panier").select("*").eq("id", id).maybeSingle();
     if (!p || p.avise || p.etat !== "attente" || Date.now() - new Date(p.t).getTime() > 120000) return json({ ok: false });
