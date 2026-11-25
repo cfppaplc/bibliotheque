@@ -14,8 +14,12 @@ window.AvisMag = (function(){
     return Notification.permission === "granted" && lire("magAbonne|" + ens, false) ? "actif" : "inactif"; }
   async function jeton(ens){ let j = lire("magJeton|" + ens, ""); if (j) return j;
     j = btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(24)))).replace(/[+/=]/g, c => ({ "+":"-", "/":"_", "=":"" }[c]));
-    if (await rpc("panier_prof_regler", { p_ens:ens, p_jeton:j, p_sujet:null }) !== true)
-      throw new Error("l'approbation est déjà activée sur un autre de tes appareils. Sur celui-là, ouvre « Commandes à approuver » → « Ajouter un appareil » et scanne le code QR avec celui-ci");
+    if (await rpc("panier_prof_regler", { p_ens:ens, p_jeton:j, p_sujet:null }) !== true) {
+      /* 25 nov. (Jeremy : « plus facile sur deux appareils ») : la clé suit le compte (coffre « biblio », clé magJeton|{id});
+         elle arrive de l'autre appareil en quelques secondes */
+      for (let i = 0; i < 20; i++) { await new Promise(r => setTimeout(r, 500)); const k = lire("magJeton|" + ens, ""); if (k) return k; }
+      throw new Error("ta clé d'approbation n'est pas encore arrivée de ton autre appareil. Attends quelques secondes et réessaie");
+    }
     ecrire("magJeton|" + ens, j); return j; }
   async function regler(ens, oui){
     const j = await jeton(ens), reg = await navigator.serviceWorker.register("sw.js"); await navigator.serviceWorker.ready;
