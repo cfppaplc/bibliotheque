@@ -1,0 +1,35 @@
+/* © 2026 Jérémy Raymond. Tous droits réservés. Métier+ — avis des paniers du magasin sur l'appareil de l'enseignant (25 nov.)
+   Jeremy : « mets dans les réglages des profs activer les notifications ». Utilisé par Mes préférences (preferences.js).
+   La clé d'approbation (magJeton|<id>) est créée la première fois; l'appareil s'abonne aux avis Web Push (fonction Supabase panier-avis). */
+window.AvisMag = (function(){
+  const SUPA = "https://kjlotlhqrgekzohshmbn.supabase.co", CLE = "sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY";
+  const lire = (k, d) => { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch(e){ return d; } };
+  const ecrire = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} };
+  async function rpc(f, a){ const r = await fetch(SUPA + "/rest/v1/rpc/" + f, { method:"POST", headers:{ apikey:CLE, "Content-Type":"application/json" }, body:JSON.stringify(a || {}), cache:"no-store" });
+    if (!r.ok) throw new Error("Supabase ne répond pas"); return r.json(); }
+  const possible = () => "Notification" in window && "serviceWorker" in navigator && "PushManager" in window;
+  const iosSansAccueil = () => /iPhone|iPad|iPod/.test(navigator.userAgent) && !navigator.standalone && !matchMedia("(display-mode: standalone)").matches;
+  /* état : "actif", "inactif", "ios" (ajouter d'abord à l'écran d'accueil) ou "impossible" (navigateur sans avis) */
+  function etat(ens){ if (iosSansAccueil()) return "ios"; if (!possible()) return "impossible";
+    return Notification.permission === "granted" && lire("magAbonne|" + ens, false) ? "actif" : "inactif"; }
+  async function jeton(ens){ let j = lire("magJeton|" + ens, ""); if (j) return j;
+    j = btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(24)))).replace(/[+/=]/g, c => ({ "+":"-", "/":"_", "=":"" }[c]));
+    if (await rpc("panier_prof_regler", { p_ens:ens, p_jeton:j, p_sujet:null }) !== true)
+      throw new Error("l'approbation est déjà activée sur un autre de tes appareils. Sur celui-là, ouvre « Commandes à approuver » → « Ajouter un appareil » et scanne le code QR avec celui-ci");
+    ecrire("magJeton|" + ens, j); return j; }
+  async function regler(ens, oui){
+    const j = await jeton(ens), reg = await navigator.serviceWorker.register("sw.js"); await navigator.serviceWorker.ready;
+    let sub = await reg.pushManager.getSubscription();
+    if (oui){
+      if (await Notification.requestPermission() !== "granted") throw new Error("les avis sont bloqués dans les réglages du navigateur");
+      if (!sub){ const { cle } = await (await fetch(SUPA + "/functions/v1/panier-avis", { headers:{ apikey:CLE } })).json();
+        sub = await reg.pushManager.subscribe({ userVisibleOnly:true, applicationServerKey:Uint8Array.from(atob(cle.replace(/-/g, "+").replace(/_/g, "/")), c => c.charCodeAt(0)) }); }
+      if (await rpc("panier_prof_abonner", { p_ens:ens, p_jeton:j, p_abonnement:sub.toJSON(), p_oui:true }) !== true) throw new Error("refusé");
+      ecrire("magAbonne|" + ens, true);
+    } else {
+      if (sub){ await rpc("panier_prof_abonner", { p_ens:ens, p_jeton:j, p_abonnement:sub.toJSON(), p_oui:false }); await sub.unsubscribe(); }
+      ecrire("magAbonne|" + ens, false);
+    }
+  }
+  return { etat, regler };
+})();

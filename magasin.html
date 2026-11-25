@@ -256,10 +256,7 @@ async function dessinerProf(){
   const avis = "Notification" in window && "serviceWorker" in navigator && "PushManager" in window, perm = avis ? Notification.permission : "non";
   const ios = /iPhone|iPad|iPod/.test(navigator.userAgent) && !window.navigator.standalone && !matchMedia("(display-mode: standalone)").matches;
   $("#app").innerHTML = `<h1>Commandes à approuver</h1><p class="sous">${att.length ? att.length + " panier" + (att.length > 1 ? "s" : "") + " en attente." : "Aucun panier en attente."} Mis à jour toutes les 15 secondes.</p>
-    <div class="carte" id="avisZ">${ios ? `<b>Avis sur ton iPhone</b><p class="sous">Apple demande d'abord d'ajouter cette page à l'écran d'accueil : touche <b>Partager</b>, puis <b>« Sur l'écran d'accueil »</b>. Ouvre-la ensuite depuis l'écran d'accueil et reviens ici.</p>`
-      : !avis ? `<p class="sous">Ce navigateur ne peut pas recevoir les avis. Garde cette page ouverte : un son t'avertit des nouveaux paniers.</p>`
-      : perm === "granted" && LS.get("magAbonne|" + ENS, false) ? `<span class="ok">Cet appareil reçoit les avis des nouveaux paniers.</span> <button class="btn" id="avNon" style="min-height:38px;margin-left:8px">Arrêter les avis ici</button>`
-      : `<b>Recevoir un avis sur cet appareil</b><p class="sous">Ton cellulaire sonne quand un élève envoie un panier, même si Métier+ est fermé.</p><button class="btn p" id="avOui">Recevoir les avis ici</button>`}
+    <div class="carte" id="avisZ">${perm === "granted" && LS.get("magAbonne|" + ENS, false) ? `<span class="ok">Cet appareil reçoit les avis des paniers.</span>` : `<b>Avis sur ton cellulaire</b><p class="sous">Active-les dans Métier+ → ton menu → <b>Mes préférences</b> → Magasin de raccords. Sans avis, garde cette page ouverte : un son t'avertit des nouveaux paniers.</p>`}
       <p class="err" id="avErr"></p><button class="btn" id="apAj" style="margin-top:6px">Ajouter un appareil (cellulaire, autre ordinateur)</button><div id="apQr"></div></div>
     ${AVIS.length ? `<div class="sec">Avis du magasinier (30 jours)</div><div class="carte avisMag">${AVIS.map(a => `<div><b>${esc(a.prenom || "Élève")}</b> <small class="sous">${esc(a.code)} · ${esc(a.groupe)} · ${heure(a.t)}</small><br>${esc(REGLES_L[a.regle] || "?")}</div>`).join("")}</div>` : ""}
     <div class="sec">En attente</div>${att.length ? att.map(p => cmdHtml(p, true)).join("") : `<p class="vide">Rien à approuver.</p>`}
@@ -308,12 +305,20 @@ function magasinier(){
   i.oninput = () => { if (/^\d{5}$/.test(i.value.trim()) || i.value.trim() === "") appl(); };
   $("#mTous").onclick = () => { i.value = ""; appl(); i.focus(); };
   document.addEventListener("keydown", e => { if (document.activeElement !== i && /^[0-9A-Za-z-]$/.test(e.key) && !e.ctrlKey && !e.metaKey && !e.altKey) { i.value = ""; i.focus(); } });   /* le lecteur tape même si le curseur est ailleurs */
-  i.focus(); charger();
+  i.focus(); charger(); avisComptoir();
 }
+/* avis du comptoir : notification de l'ordinateur ou de la tablette (page ouverte), son et titre qui clignote */
+function avisComptoir(){ if (!("Notification" in window) || Notification.permission !== "default") return;
+  const b = document.createElement("button"); b.className = "btn p"; b.textContent = "Activer les avis des nouvelles commandes"; b.style.margin = "0 0 12px";
+  b.onclick = async () => { try { await Notification.requestPermission(); } catch(e){} b.remove(); $("#mC").focus(); }; $("#app").prepend(b); }
+let titreT = 0; function clignoterTitre(n){ clearInterval(titreT); const t0 = "Métier+ — Comptoir du magasin", msg = "(" + n + ") Nouvelle commande"; let k = 0;
+  titreT = setInterval(() => { document.title = k++ % 2 ? t0 : msg; if (k > 20 || document.hasFocus()) { clearInterval(titreT); document.title = t0; } }, 800); }
 async function charger(){ clearTimeout(magT);
   try { MAG = await rpc("panier_magasin", {}) || [];
     try { const S2 = new Map(); if (MAG.length) for (const r of await rpc("panier_signalements", { p_ids:MAG.map(p => p.id) }) || []) { if (!S2.has(r.panier)) S2.set(r.panier, new Set()); S2.get(r.panier).add(r.regle); } SIG = S2; } catch(e){} const ids = MAG.filter(p => p.etat === "approuve").map(p => p.id);
-    if (MAG_VUS && ids.some(id => !MAG_VUS.has(id))) bip(); MAG_VUS = MAG_VUS || new Set(); ids.forEach(id => MAG_VUS.add(id)); dessinerMag(); }
+    { const neufs = MAG_VUS ? MAG.filter(p => p.etat === "approuve" && !MAG_VUS.has(p.id)) : [];   /* 25 nov. (Jeremy) : le magasinier est averti d'une commande qui entre */
+      if (neufs.length) { bip(); setTimeout(bip, 350); clignoterTitre(neufs.length);
+        try { if ("Notification" in window && Notification.permission === "granted") neufs.slice(0, 3).forEach(p => { const n = new Notification("Magasin : nouvelle commande", { body:(p.prenom || "Élève") + " (" + p.code + ", " + p.groupe + ") · " + (p.items || []).length + " raccord(s)", tag:"mag-" + p.id, icon:"img/metier-plus.svg" }); n.onclick = () => { focus(); n.close(); }; }); } catch(e){} } } MAG_VUS = MAG_VUS || new Set(); ids.forEach(id => MAG_VUS.add(id)); dessinerMag(); }
   catch(e){ $("#mL").innerHTML = `<p class="err">Supabase ne répond pas. Nouvel essai dans 10 s.</p>`; }
   magT = setTimeout(charger, 10000); }
 const REGLES = [null, "Nom exact du raccord", "Carte étudiante", "Consignes d'accès", "Matériel propre", "Feuille de l'enseignant", "Bris / usage perso"];

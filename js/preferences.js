@@ -46,10 +46,14 @@
       + (ACCES.eleve ? '' : '<h3>Tableau blanc</h3>'
       + '<div class="lig"><span>Fond au départ</span>' + seg("fond", FONDS, P.fond || "blanc") + '</div>'
       + '<div class="lig"><span>Couleur du crayon</span>' + ronds("crayon", CRAYONS, P.crayon || "#e2483d") + '</div>')
+      + (ACCES.eleve || !window.AvisMag ? '' : (() => { const e = AvisMag.etat(S.id);   /* 25 nov. : avis des paniers du magasin (Jeremy : « dans les réglages des profs ») */
+          return '<h3>Magasin de raccords</h3><div class="lig"><span>Avis des paniers sur cet appareil<small>' + (e === "ios" ? "iPhone : ajoute d'abord Métier+ à l'écran d'accueil (Partager → Sur l'écran d'accueil), puis ouvre-le de là." : e === "impossible" ? "Ce navigateur ne reçoit pas les avis." : "L'appareil sonne quand un élève envoie un panier ou que le magasinier t'avertit.") + '</small></span>'
+            + (e === "ios" || e === "impossible" ? '' : seg("avismag", [["oui","Oui"],["non","Non"]], e === "actif" ? "oui" : "non")) + '</div><p id="pAvEr" style="color:#e2483d;font-size:13px;margin:4px 0 0"></p>'; })())
       + '<div class="acces-btns" style="justify-content:space-between;align-items:center;margin-top:16px"><button type="button" class="raz" id="pRaz">Remettre comme au départ</button><button class="prim" id="pFin">Terminé</button></div></div>';
     B.querySelectorAll("[data-k]").forEach(b => b.onclick = () => { const k = b.dataset.k, v = b.dataset.v;
       if (k === "leger"){ if (window.modeLegerFixer) window.modeLegerFixer(v); contenu(B); return; }
-      if (k === "barres"){ if ((localStorage.barresFixes === "1") !== (v === "fixes")) document.getElementById("tbPin").click(); contenu(B); return; }   /* l'ancien bouton « Barres automatiques » de Plus d'outils, maintenant caché */
+      if (k === "avismag"){ b.disabled = true; AvisMag.regler(S.id, v === "oui").then(() => contenu(B)).catch(e => { const er = B.querySelector("#pAvEr"); if (er) er.textContent = "Avis impossibles : " + e.message + "."; b.disabled = false; }); return; }
+            if (k === "barres"){ if ((localStorage.barresFixes === "1") !== (v === "fixes")) document.getElementById("tbPin").click(); contenu(B); return; }   /* l'ancien bouton « Barres automatiques » de Plus d'outils, maintenant caché */
       ecrire(k, k === "bonjour" || k === "plein" ? (v === "oui" ? null : false) : v); });
     B.querySelector("#pFin").onclick = () => { document.getElementById("accesOv").hidden = true; };
     B.querySelector("#pRaz").onclick = () => { try { localStorage.removeItem(cle()); } catch(e){} dejaProg = ""; window.appliquerPrefs(); dessiner(); };
