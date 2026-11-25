@@ -2721,10 +2721,10 @@ window.QUIZ_LIVRES = [
 {
 "q": "M. Gagnon t'arrête dans le corridor : son robinet coule depuis une semaine. Que fais-tu d'abord?",
 "ch": [
-"Je lui dis d'appeler le propriétaire",
+"J'attends qu'il envoie un courriel",
 "J'écris une demande de service avec la date et l'heure",
-"Je répare sans rien noter",
-"J'attends qu'il envoie un courriel"
+"Je lui dis d'appeler lui-même le propriétaire",
+"Je répare tout de suite, sans perdre de temps à noter"
 ],
 "bon": 1,
 "s": 20,
@@ -2750,12 +2750,12 @@ window.QUIZ_LIVRES = [
 {
 "q": "Avant d'engager un sous-traitant, on vérifie sa licence auprès de…",
 "ch": [
-"la RBQ",
-"la SAAQ",
+"la municipalité",
 "la CNESST seulement",
-"la municipalité"
+"la RBQ",
+"la SAAQ"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20,
 "expl": "Registre des détenteurs de licence de la RBQ."
 },
@@ -2772,12 +2772,12 @@ window.QUIZ_LIVRES = [
 {
 "q": "Le bail de logement est encadré principalement par…",
 "ch": [
-"le Code civil du Québec",
-"le Code criminel",
 "le Code de construction",
-"la Loi sur la RBQ"
+"le Code civil du Québec",
+"la Loi sur la RBQ",
+"le Code criminel"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
@@ -2826,12 +2826,12 @@ window.QUIZ_LIVRES = [
 {
 "q": "Laquelle de ces annonces est discriminatoire?",
 "ch": [
-"« 4 ½ rénové, près du métro »",
 "« Idéal pour couple sans enfant »",
-"« Stationnement inclus »",
-"« Libre le 1er juillet »"
+"« 4 ½ rénové, près du métro »",
+"« Libre le 1er juillet »",
+"« Stationnement inclus »"
 ],
-"bon": 1,
+"bon": 0,
 "s": 20,
 "expl": "L'état familial est un motif protégé par la Charte."
 },
@@ -2856,21 +2856,21 @@ window.QUIZ_LIVRES = [
 {
 "q": "Une clé est identifiée par…",
 "ch": [
-"un code, jamais par le numéro du logement",
 "le numéro du logement écrit dessus",
+"un code, jamais par le numéro du logement",
 "le nom du locataire",
 "sa couleur"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
 "q": "Au TAL, qui doit prouver ce qu'il avance?",
 "ch": [
 "Celui qui fait la demande",
-"Le Tribunal",
-"Le voisin",
-"Personne"
+"Personne",
+"Le Tribunal, qui fait sa propre enquête",
+"Celui qui est poursuivi doit prouver qu'il a raison"
 ],
 "bon": 0,
 "s": 20
@@ -2878,12 +2878,12 @@ window.QUIZ_LIVRES = [
 {
 "q": "Dès qu'un logement se libère, le préposé fait d'abord…",
 "ch": [
-"une inspection de sortie",
 "une fête",
+"une inspection de sortie",
 "un changement de loyer",
 "rien"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
@@ -2915,12 +2915,12 @@ window.QUIZ_LIVRES = [
 {
 "q": "Pour une enquête de crédit, qu'est-ce que le locateur n'a PAS besoin de demander?",
 "ch": [
-"Le nom",
-"L'adresse",
 "La date de naissance",
-"Le NAS"
+"Le nom",
+"Le NAS",
+"L'adresse"
 ],
-"bon": 3,
+"bon": 2,
 "s": 20,
 "expl": "Selon la CAI, le nom, l'adresse et la date de naissance suffisent."
 },
@@ -2935,12 +2935,12 @@ window.QUIZ_LIVRES = [
 {
 "q": "Un locataire ne paie pas. Que peut faire le locateur?",
 "ch": [
-"Couper le chauffage",
-"Changer la serrure",
 "Faire une demande au TAL",
-"Garder ses meubles"
+"Couper le chauffage",
+"Garder ses meubles",
+"Changer la serrure"
 ],
-"bon": 2,
+"bon": 0,
 "s": 20,
 "expl": "Tout le reste est de la « justice personnelle », interdite."
 },
@@ -2959,10 +2959,10 @@ window.QUIZ_LIVRES = [
 {
 "q": "Mélanie habite avec deux colocataires mais n'a pas signé le bail. Envers le locateur, elle est…",
 "ch": [
-"colocataire",
+"colocataire, avec les mêmes obligations que les autres",
 "occupante, sans engagement envers lui",
-"sous-locataire",
-"caution"
+"caution",
+"sous-locataire, responsable envers le locateur"
 ],
 "bon": 1,
 "s": 20
@@ -2970,12 +2970,12 @@ window.QUIZ_LIVRES = [
 {
 "q": "Cession ou sous-location : dans laquelle le locataire reste-t-il responsable du bail?",
 "ch": [
-"La cession",
 "La sous-location",
-"Les deux",
-"Aucune"
+"La cession",
+"Aucune",
+"Les deux"
 ],
-"bon": 1,
+"bon": 0,
 "s": 20,
 "expl": "Cession = départ définitif; sous-location = il reste responsable."
 },
@@ -3017,23 +3017,23 @@ window.QUIZ_LIVRES = [
 {
 "q": "Un locataire demande d'avoir son chien d'assistance. Le règlement interdit les animaux.",
 "ch": [
-"On refuse",
 "On ne peut pas le refuser",
 "On exige un dépôt",
+"On refuse",
 "On augmente le loyer"
 ],
-"bon": 1,
+"bon": 0,
 "s": 20
 },
 {
 "q": "Température de référence pratique dans un logement en hiver :",
 "ch": [
-"16 °C",
 "18 °C",
-"21 °C",
-"25 °C"
+"16 °C",
+"25 °C",
+"21 °C"
 ],
-"bon": 2,
+"bon": 3,
 "s": 20
 },
 {
@@ -3047,34 +3047,34 @@ window.QUIZ_LIVRES = [
 {
 "q": "Le loyer se paie…",
 "ch": [
+"en argent seulement",
 "en versements égaux, au début de chaque période",
-"quand le locataire le veut",
-"en fin d'année",
-"en argent seulement"
+"quand le locataire le veut, s'il paie le total de l'année",
+"en un seul versement, à la fin de chaque année"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
 "q": "Un retard de paiement : le gestionnaire réagit…",
 "ch": [
-"de façon graduelle et documentée",
 "en coupant l'eau",
-"en criant",
-"en changeant la serrure"
+"de façon graduelle et documentée",
+"en changeant la serrure",
+"en criant"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
 "q": "Une clause du bail qui interdit les animaux est…",
 "ch": [
+"toujours illégale, même si le locataire a signé",
 "généralement valide (sauf chien d'assistance)",
-"toujours illégale",
-"jamais applicable",
-"interdite par la Charte"
+"interdite par la Charte",
+"valide seulement pour les chiens de grande taille"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 }
 ]
@@ -3123,9 +3123,9 @@ window.QUIZ_LIVRES = [
 "q": "Menues réparations et réparations nécessaires : qui fait quoi?",
 "ch": [
 "Tout au propriétaire",
-"Tout au locataire",
+"Menues = propriétaire; nécessaires = locataire",
 "Menues = locataire; nécessaires = propriétaire",
-"Menues = propriétaire; nécessaires = locataire"
+"Tout au locataire"
 ],
 "bon": 2,
 "s": 20
@@ -3142,12 +3142,12 @@ window.QUIZ_LIVRES = [
 {
 "q": "Bail de 12 mois : l'avis de hausse de loyer s'envoie…",
 "ch": [
-"entre 1 et 2 mois avant la fin",
 "entre 3 et 6 mois avant la fin",
-"n'importe quand",
-"après la fin du bail"
+"entre 1 et 2 mois avant la fin",
+"après la fin du bail",
+"n'importe quand"
 ],
-"bon": 1,
+"bon": 0,
 "s": 20
 },
 {
@@ -3155,8 +3155,8 @@ window.QUIZ_LIVRES = [
 "ch": [
 "Le bail prend fin",
 "Il accepte la hausse",
-"Il refuse la hausse",
-"Le TAL décide"
+"Le TAL décide",
+"Il refuse la hausse"
 ],
 "bon": 1,
 "s": 20,
@@ -3180,21 +3180,21 @@ window.QUIZ_LIVRES = [
 {
 "q": "Pour se qualifier à une hypothèque, la banque applique…",
 "ch": [
-"le test de résistance",
-"le test de la bille",
 "le test de l'alcool",
-"le test de la feuille"
+"le test de la feuille",
+"le test de la bille",
+"le test de résistance"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Un cash-flow négatif veut dire…",
 "ch": [
-"l'immeuble rapporte plus que prévu",
-"tu paies de ta poche chaque mois pour garder l'immeuble",
 "l'hypothèque est payée",
-"les loyers sont trop bas pour le TAL"
+"tu paies de ta poche chaque mois pour garder l'immeuble",
+"les loyers sont trop bas pour être acceptés au TAL",
+"l'immeuble rapporte plus que prévu chaque mois"
 ],
 "bon": 1,
 "s": 20
@@ -3202,42 +3202,42 @@ window.QUIZ_LIVRES = [
 {
 "q": "Le ratio de couverture de la dette (RCD), c'est…",
 "ch": [
-"revenu net ÷ paiements hypothécaires",
-"prix ÷ loyers",
-"mise de fonds ÷ prix",
-"taxes ÷ loyers"
+"taxes ÷ loyers",
+"mise de fonds ÷ prix d'achat de l'immeuble",
+"prix d'achat ÷ total des loyers annuels",
+"revenu net ÷ paiements hypothécaires"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Acheter un plex à deux : on signe devant notaire, avant l'achat…",
 "ch": [
+"un bail commun signé par les deux acheteurs",
 "une convention d'indivision",
-"un bail",
 "une mise en demeure",
-"une soumission"
+"une soumission conjointe faite au vendeur"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
 "q": "Une personne habite le logement sans avoir signé le bail. Elle peut…",
 "ch": [
-"dans certains cas devenir locataire",
-"jamais rester",
 "être expulsée sans avis",
-"payer le double"
+"dans certains cas devenir locataire",
+"rester, mais en payant le double du loyer",
+"jamais rester une fois que le locataire est parti"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
 "q": "Le budget d'exploitation compare…",
 "ch": [
 "ce que l'immeuble rapporte en un an avec ce qu'il coûte",
-"deux immeubles",
-"les loyers de la ville",
+"deux immeubles du même quartier, côte à côte",
+"les loyers de l'immeuble avec ceux de la ville",
 "les salaires"
 ],
 "bon": 0,
@@ -3246,23 +3246,23 @@ window.QUIZ_LIVRES = [
 {
 "q": "La prime d'assurance prêt est un pourcentage…",
 "ch": [
-"du montant emprunté",
-"du loyer",
 "de ton salaire",
-"des taxes"
+"du montant emprunté",
+"des taxes",
+"du loyer"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
 "q": "Au Québec, le vendeur d'un immeuble doit une garantie…",
 "ch": [
-"de qualité contre les vices cachés",
-"de prix",
-"de loyer",
-"aucune"
+"de prix : il rembourse si l'immeuble vaut moins",
+"de loyer : il garantit les revenus pendant un an",
+"aucune",
+"de qualité contre les vices cachés"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 }
 ]
@@ -3316,12 +3316,12 @@ window.QUIZ_LIVRES = [
 {
 "q": "Un plan d'urgence sert à…",
 "ch": [
+"choisir quel locataire quitte en premier",
 "écrire d'avance quoi faire et qui fait quoi",
-"calculer le loyer",
-"choisir un locataire",
+"calculer combien coûte un sinistre au loyer",
 "remplacer l'assurance"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
@@ -3344,12 +3344,12 @@ window.QUIZ_LIVRES = [
 {
 "q": "Inspection visuelle d'un extincteur portatif :",
 "ch": [
+"chaque année seulement",
 "chaque semaine",
 "chaque mois",
-"chaque année seulement",
 "tous les 5 ans"
 ],
-"bon": 1,
+"bon": 2,
 "s": 20,
 "expl": "Mensuelle; entretien annuel."
 },
@@ -3392,10 +3392,10 @@ window.QUIZ_LIVRES = [
 {
 "q": "Un feu d'huile dans une casserole :",
 "ch": [
-"On jette de l'eau",
+"On souffle dessus",
 "On couvre avec un couvercle et on ferme le rond",
-"On transporte la casserole dehors",
-"On souffle dessus"
+"On jette un peu d'eau pour refroidir l'huile",
+"On transporte la casserole dehors rapidement"
 ],
 "bon": 1,
 "s": 20
@@ -3403,9 +3403,9 @@ window.QUIZ_LIVRES = [
 {
 "q": "Odeur de gaz dans le corridor :",
 "ch": [
-"J'allume pour mieux voir",
-"Je sors et j'appelle de l'extérieur",
 "Je cherche la fuite avec un briquet",
+"Je sors et j'appelle de l'extérieur",
+"J'allume pour mieux voir",
 "J'actionne l'alarme électrique"
 ],
 "bon": 1,
@@ -3442,9 +3442,9 @@ window.QUIZ_LIVRES = [
 "q": "Le gaz naturel n'a pas d'odeur : on lui ajoute…",
 "ch": [
 "une odeur d'œufs pourris",
-"une couleur",
-"un son",
-"rien"
+"rien",
+"une couleur bleue pour qu'on la voie",
+"un sifflement pour qu'on l'entende"
 ],
 "bon": 0,
 "s": 20
@@ -3452,21 +3452,21 @@ window.QUIZ_LIVRES = [
 {
 "q": "Le plan d'évacuation est affiché…",
 "ch": [
+"seulement au sous-sol, près de la chambre mécanique",
 "à chaque étage, près des escaliers et des ascenseurs",
-"seulement au sous-sol",
-"dans les logements seulement",
-"sur le toit"
+"sur le toit",
+"dans chaque logement, sur la porte d'entrée"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
 "q": "Un occupant fait un malaise :",
 "ch": [
 "appeler le 9-1-1 et suivre les consignes du répartiteur",
-"le laisser se reposer seul",
-"lui donner un médicament",
-"attendre la fin de ton quart"
+"le laisser se reposer seul dans un endroit calme",
+"attendre la fin de ton quart",
+"lui donner un médicament de la trousse de premiers soins"
 ],
 "bon": 0,
 "s": 20
@@ -3538,12 +3538,12 @@ window.QUIZ_LIVRES = [
 {
 "q": "Combien de points d'appui en tout temps dans une échelle?",
 "ch": [
-"1",
-"2",
 "3",
-"4"
+"4",
+"1",
+"2"
 ],
-"bon": 2,
+"bon": 0,
 "s": 20
 },
 {
@@ -3565,21 +3565,21 @@ window.QUIZ_LIVRES = [
 {
 "q": "Un diluant transvidé dans un petit contenant doit porter…",
 "ch": [
-"une étiquette du lieu de travail",
 "aucune étiquette",
 "le nom de l'élève",
+"une étiquette du lieu de travail",
 "un pictogramme dessiné à la main"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Chiffons imbibés d'huile de lin à la fin de la journée :",
 "ch": [
-"dans la poubelle",
+"sur le calorifère, pour qu'ils sèchent avant de les jeter",
 "roulés dans un coin",
 "dans un contenant métallique rempli d'eau",
-"sur le calorifère pour sécher"
+"dans la poubelle de la salle des déchets"
 ],
 "bon": 2,
 "s": 20,
@@ -3588,10 +3588,10 @@ window.QUIZ_LIVRES = [
 {
 "q": "Bâtiment d'avant 1990 : avant de poncer un vieux plâtre…",
 "ch": [
-"on porte des gants",
+"on ne fait rien de spécial",
 "on vérifie le registre ou on fait tester (amiante)",
-"on mouille le mur",
-"on ne fait rien de spécial"
+"on mouille le mur pour éviter la poussière",
+"on porte des gants et des lunettes de sécurité"
 ],
 "bon": 1,
 "s": 20
@@ -3599,12 +3599,12 @@ window.QUIZ_LIVRES = [
 {
 "q": "Une fissure marquée au crayon avec la date a grandi depuis l'inspection précédente.",
 "ch": [
-"C'est un mouvement actif : je signale",
-"Je la remplis de composé",
 "C'est normal",
-"Je la peins"
+"Je la remplis de composé avant qu'elle grandisse",
+"C'est normal : un bâtiment travaille avec le temps",
+"C'est un mouvement actif : je signale"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
@@ -3664,12 +3664,12 @@ window.QUIZ_LIVRES = [
 {
 "q": "Un composé qui durcit par réaction chimique en 45 minutes est un composé…",
 "ch": [
-"prémélangé",
 "à prise",
+"prémélangé",
 "acrylique",
 "de finition"
 ],
-"bon": 1,
+"bon": 0,
 "s": 20
 }
 ]
@@ -3691,10 +3691,10 @@ window.QUIZ_LIVRES = [
 {
 "q": "Béton : la question clé avant de réparer une fissure :",
 "ch": [
-"De quelle couleur est-elle?",
+"De quelle couleur est-elle? Est-elle propre?",
 "Est-ce que ça bouge? Est-ce que l'eau passe?",
-"Quel âge a l'immeuble?",
-"Qui l'a vue en premier?"
+"Qui l'a vue en premier?",
+"Quel âge a l'immeuble? Qui l'a construit?"
 ],
 "bon": 1,
 "s": 20,
@@ -3703,12 +3703,12 @@ window.QUIZ_LIVRES = [
 {
 "q": "Pour arrêter une infiltration d'eau active dans le béton, on utilise…",
 "ch": [
-"du composé à joints",
 "du ciment hydraulique",
-"du silicone",
-"de l'apprêt"
+"du composé à joints",
+"de l'apprêt",
+"du silicone"
 ],
-"bon": 1,
+"bon": 0,
 "s": 20
 },
 {
@@ -3771,8 +3771,8 @@ window.QUIZ_LIVRES = [
 "ch": [
 "la vide complètement",
 "la remplit d'eau",
-"la chauffe",
-"la peint"
+"la peint",
+"la chauffe"
 ],
 "bon": 1,
 "s": 20,
@@ -3802,45 +3802,45 @@ window.QUIZ_LIVRES = [
 {
 "q": "Pour savoir si une vieille peinture est un latex ou une alkyde :",
 "ch": [
-"le test de l'alcool",
-"le test de la bille",
 "le test du manche",
-"le test de la feuille"
-],
-"bon": 0,
-"s": 20
-},
-{
-"q": "Fini lavable et discret pour les murs d'un corridor :",
-"ch": [
-"mat",
-"velours (ou perle)",
-"lustré",
-"sans fini"
+"le test de l'alcool",
+"le test de la feuille",
+"le test de la bille"
 ],
 "bon": 1,
 "s": 20
 },
 {
-"q": "Poncer très légèrement entre deux couches de vernis, c'est…",
+"q": "Fini lavable et discret pour les murs d'un corridor :",
 "ch": [
-"égrener",
-"décaper",
-"sabler à fond",
-"apprêter"
+"velours (ou perle)",
+"lustré",
+"mat (plat)",
+"sans fini"
 ],
 "bon": 0,
 "s": 20
 },
 {
+"q": "Poncer très légèrement entre deux couches de vernis, c'est…",
+"ch": [
+"décaper",
+"sabler à fond",
+"égrener",
+"apprêter"
+],
+"bon": 2,
+"s": 20
+},
+{
 "q": "Un plancher flottant ne doit jamais être…",
 "ch": [
-"coincé (espace de dilatation)",
-"nettoyé",
 "posé sur une membrane",
-"posé dans un corridor"
+"coincé (espace de dilatation)",
+"posé dans un corridor",
+"nettoyé"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
@@ -3856,12 +3856,12 @@ window.QUIZ_LIVRES = [
 {
 "q": "De vieux carreaux de 9 × 9 po à enlever :",
 "ch": [
+"On les chauffe",
 "On les arrache au grattoir",
-"On signale (amiante possible)",
 "On les ponce",
-"On les chauffe"
+"On signale (amiante possible)"
 ],
-"bon": 1,
+"bon": 3,
 "s": 20
 }
 ]
@@ -3883,12 +3883,12 @@ window.QUIZ_LIVRES = [
 {
 "q": "Sous un comptoir de stratifié, le panneau qui gonfle à l'eau est…",
 "ch": [
-"le panneau de particules",
-"le contreplaqué marin",
 "le quartz",
-"l'acier"
+"le contreplaqué marin",
+"l'acier",
+"le panneau de particules"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
@@ -3909,23 +3909,23 @@ window.QUIZ_LIVRES = [
 {
 "q": "La distance entre les centres des deux vis d'une poignée s'appelle…",
 "ch": [
-"l'entraxe",
-"le dégagement",
 "la feuillure",
-"le pêne"
+"le pêne",
+"le dégagement",
+"l'entraxe"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Colle qu'on laisse sécher au toucher avant d'assembler les deux surfaces :",
 "ch": [
-"la colle contact",
+"le silicone",
 "la colle blanche",
-"l'époxy",
-"le silicone"
+"la colle contact",
+"l'époxy"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
@@ -3969,9 +3969,9 @@ window.QUIZ_LIVRES = [
 {
 "q": "Dans le gypse creux, l'ancrage le plus fort est…",
 "ch": [
-"l'ancrage en plastique",
-"l'ancrage à bascule",
 "le clou",
+"l'ancrage à bascule",
+"l'ancrage en plastique",
 "la vis à bois seule"
 ],
 "bon": 1,
@@ -4024,12 +4024,12 @@ window.QUIZ_LIVRES = [
 {
 "q": "Une porte qui pend : quelle vis aide dans la penture du haut?",
 "ch": [
-"Une vis de 75 mm",
 "Une vis de 12 mm",
-"Un clou",
-"De la colle"
+"Une vis de 75 mm",
+"De la colle",
+"Un clou"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20,
 "expl": "Elle va chercher le montant derrière le cadre."
 },
@@ -4053,12 +4053,12 @@ window.QUIZ_LIVRES = [
 {
 "q": "Après avoir posé une toile de moustiquaire, on vérifie…",
 "ch": [
+"qu'elle est collée au silicone tout autour du cadre",
 "qu'elle est tendue sans avoir plié le cadre",
-"qu'elle touche la vitre",
-"qu'elle est collée au silicone",
+"qu'elle touche la vitre sur toute la surface",
 "qu'elle est peinte"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 }
 ]
@@ -4081,9 +4081,9 @@ window.QUIZ_LIVRES = [
 "q": "Sur une fiche mâle 120 V, le fil blanc (neutre) va à la lame…",
 "ch": [
 "la plus large",
+"n'importe laquelle",
 "la plus étroite",
-"ronde",
-"n'importe laquelle"
+"ronde"
 ],
 "bon": 0,
 "s": 20
@@ -4091,67 +4091,67 @@ window.QUIZ_LIVRES = [
 {
 "q": "Le fil vert ou dénudé, c'est…",
 "ch": [
-"la mise à la terre",
 "le neutre",
+"le retour d'interrupteur",
 "le chaud",
-"le retour d'interrupteur"
+"la mise à la terre"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Un interrupteur se branche sur…",
 "ch": [
-"le fil chaud (noir)",
 "le neutre (blanc)",
 "la terre",
-"n'importe quel fil"
+"n'importe quel fil",
+"le fil chaud (noir)"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Montage « source à la lampe » : le fil blanc qui va vers l'interrupteur…",
 "ch": [
-"est réidentifié en noir parce qu'il devient un chaud",
-"reste un neutre",
 "est coupé",
-"va à la terre"
+"reste un neutre et ne change pas de couleur",
+"va à la borne de terre de l'interrupteur",
+"est réidentifié en noir parce qu'il devient un chaud"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Deux lampes en série : si une lampe brûle…",
 "ch": [
-"l'autre s'éteint aussi",
-"l'autre brille plus fort",
 "rien ne change",
-"le disjoncteur saute"
+"le disjoncteur saute",
+"l'autre s'éteint aussi",
+"l'autre brille plus fort"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Deux lampes en série reçoivent chacune…",
 "ch": [
-"une partie de la tension : elles éclairent moins",
-"la pleine tension",
+"la pleine tension : elles éclairent normalement",
+"le double de la tension : elles éclairent plus fort",
 "aucune tension",
-"le double de la tension"
+"une partie de la tension : elles éclairent moins"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Deux luminaires en parallèle : chacun reçoit…",
 "ch": [
-"la pleine tension (120 V)",
-"la moitié de la tension",
 "aucune tension",
-"24 V"
+"la moitié de la tension",
+"24 V",
+"la pleine tension (120 V)"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
@@ -4166,12 +4166,12 @@ window.QUIZ_LIVRES = [
 {
 "q": "Un circuit mixte, c'est…",
 "ch": [
+"un circuit 24 V commandé par un circuit 120 V",
+"deux circuits sans lien dans la même boîte",
 "une partie en série et une partie en parallèle",
-"deux circuits sans lien",
-"un circuit 24 V",
 "un circuit sans charge"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
@@ -4194,12 +4194,12 @@ window.QUIZ_LIVRES = [
 {
 "q": "Le capuchon de connexion (marrette) se visse…",
 "ch": [
+"dans le sens antihoraire, fils bien torsadés",
 "dans le sens horaire, fils bien torsadés",
-"dans le sens antihoraire",
-"sans tourner",
-"sur un seul fil"
+"sur un seul fil, l'autre glissé à côté",
+"sans tourner"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
@@ -4221,23 +4221,23 @@ window.QUIZ_LIVRES = [
 {
 "q": "Pour vérifier la continuité, le circuit doit être…",
 "ch": [
-"hors tension",
-"sous tension",
+"mouillé",
 "à moitié branché",
-"mouillé"
+"hors tension",
+"sous tension"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "La couleur du fil chaud en 120 V résidentiel :",
 "ch": [
-"noir (ou rouge)",
-"blanc",
-"vert",
-"gris"
+"vert (ou nu)",
+"gris",
+"blanc (ou gris)",
+"noir (ou rouge)"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
@@ -4269,43 +4269,43 @@ window.QUIZ_LIVRES = [
 {
 "q": "Une prise toujours alimentée sur le même circuit qu'une lampe commandée : la prise se branche…",
 "ch": [
-"avant l'interrupteur (sur le chaud permanent)",
-"après l'interrupteur",
+"après l'interrupteur (sur le fil commandé)",
+"sur la borne de terre de la lampe",
 "sur la lampe",
-"sur la terre"
+"avant l'interrupteur (sur le chaud permanent)"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Commander une lampe de deux endroits demande…",
 "ch": [
-"deux interrupteurs 3 voies",
 "deux interrupteurs simples",
 "un 4 voies seul",
+"deux interrupteurs 3 voies",
 "un gradateur"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Commander une lampe de trois endroits demande…",
 "ch": [
-"deux 3 voies et un 4 voies",
 "trois 3 voies",
 "trois interrupteurs simples",
+"deux 3 voies et un 4 voies",
 "un 3 voies et deux simples"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Les deux fils qui relient les interrupteurs 3 voies s'appellent…",
 "ch": [
 "les navettes (voyageurs)",
-"les neutres",
 "les terres",
-"les communs"
+"les neutres (fils de retour)",
+"les communs (fils de départ)"
 ],
 "bon": 0,
 "s": 20
@@ -4313,109 +4313,109 @@ window.QUIZ_LIVRES = [
 {
 "q": "Sur un 3 voies, la borne foncée est…",
 "ch": [
-"le commun",
-"une navette",
 "la terre",
-"le neutre"
+"le neutre",
+"une navette",
+"le commun"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Le schéma filaire montre…",
 "ch": [
-"où passent les fils",
-"seulement la logique",
 "la pression d'eau",
-"les tuyaux"
+"seulement la logique",
+"les tuyaux",
+"où passent les fils"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Le schéma à échelle montre surtout…",
 "ch": [
+"la position réelle des boîtes dans le bâtiment",
 "la logique de fonctionnement, échelon par échelon",
-"la position réelle des boîtes",
-"le prix",
-"la tuyauterie"
+"la tuyauterie",
+"le trajet des fils dans les murs, à l'échelle"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
 "q": "Un thermostat à bilame…",
 "ch": [
+"change la tension de 120 V à 24 V",
 "courbe avec la chaleur et ouvre ou ferme un contact",
-"mesure la pression",
 "compte les heures",
-"change la tension"
+"mesure la pression et ouvre une soupape"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
 "q": "Un pressostat de pompe à eau : l'enclenchement, c'est…",
 "ch": [
-"la pression basse où la pompe part",
-"la pression haute où elle arrête",
 "la température",
-"le débit"
+"la pression haute où elle arrête",
+"le débit",
+"la pression basse où la pompe part"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "L'écart entre l'enclenchement et le déclenchement d'un pressostat s'appelle…",
 "ch": [
-"le différentiel",
-"la consigne",
 "la tension",
-"la charge"
+"le différentiel",
+"la charge",
+"la consigne"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
 "q": "L'interrupteur à flotteur d'une pompe de relevage…",
 "ch": [
+"arrête la pompe quand l'eau monte trop",
+"coupe le gaz",
 "démarre la pompe quand l'eau monte",
-"chauffe l'eau",
-"règle la pression",
-"coupe le gaz"
+"règle la pression dans la colonne de sortie"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "L'alarme de niveau haut avertit…",
 "ch": [
+"qu'il pleut",
 "que la pompe n'arrive plus et que l'eau monte trop",
-"que la pompe est neuve",
-"que l'eau est froide",
-"qu'il pleut"
+"que l'eau de la fosse est trop froide",
+"que la pompe neuve doit être purgée"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
 "q": "Une commande basse tension utilise…",
 "ch": [
-"un transformateur (120 V → 24 V) et un relais",
-"une prise de 240 V",
-"un fusible seulement",
-"une pile"
+"une prise de 240 V et un disjoncteur double",
+"un fusible seulement, sans transformateur",
+"une pile",
+"un transformateur (120 V → 24 V) et un relais"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Le relais permet au petit circuit 24 V…",
 "ch": [
 "de commander une charge 120 V ou 240 V",
-"de chauffer l'eau",
 "d'augmenter la pression",
-"de remplacer le disjoncteur"
+"de remplacer le disjoncteur du circuit",
+"de chauffer l'eau sans passer par le panneau"
 ],
 "bon": 0,
 "s": 20
@@ -4448,56 +4448,56 @@ window.QUIZ_LIVRES = [
 {
 "q": "Vérifier un élément chauffant hors tension : à l'ohmmètre, un élément brûlé donne…",
 "ch": [
+"environ 10 à 15 ohms, comme un élément neuf",
+"zéro ohm exactement, comme un fil",
 "une résistance infinie (circuit ouvert)",
-"environ 10 à 15 ohms",
-"zéro exactement",
 "la tension du réseau"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "L'ECO d'un chauffe-eau, c'est…",
 "ch": [
+"l'anode qui protège la cuve contre la rouille",
+"la soupape",
 "la limite haute de sécurité (coupe si l'eau devient trop chaude)",
-"le mode économie",
-"l'anode",
-"la soupape"
+"le mode économie qui baisse la température la nuit"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Un chauffe-eau à deux éléments « non simultané » :",
 "ch": [
-"un seul élément chauffe à la fois",
-"les deux chauffent toujours ensemble",
+"il fonctionne au gaz",
 "il n'a qu'un thermostat",
-"il fonctionne au gaz"
+"les deux chauffent toujours ensemble",
+"un seul élément chauffe à la fois"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Dans un chauffe-eau à deux éléments, lequel chauffe en premier quand le réservoir est froid?",
 "ch": [
-"L'élément du haut",
-"L'élément du bas",
+"Aucun",
 "Les deux",
-"Aucun"
+"L'élément du bas",
+"L'élément du haut"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Un chauffe-eau électrique résidentiel fonctionne généralement en…",
 "ch": [
-"240 V",
-"24 V",
+"600 V",
 "12 V",
-"600 V"
+"240 V",
+"24 V"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
@@ -4514,9 +4514,9 @@ window.QUIZ_LIVRES = [
 "q": "Une pompe de puits de surface (jet) est souvent alimentée en…",
 "ch": [
 "240 V",
-"24 V",
 "12 V",
-"5 V"
+"5 V",
+"24 V"
 ],
 "bon": 0,
 "s": 20
@@ -4524,32 +4524,32 @@ window.QUIZ_LIVRES = [
 {
 "q": "Une pompe de puits artésien submersible « 3 fils » a…",
 "ch": [
+"seulement un neutre",
+"un moteur au gaz installé au fond du puits",
 "un boîtier de commande au-dessus du sol",
-"aucun câblage",
-"un moteur au gaz",
-"seulement un neutre"
+"aucun câblage : elle part avec la pression"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Le pressostat d'un système de puits commande…",
 "ch": [
-"le départ et l'arrêt de la pompe selon la pression",
-"la température de l'eau",
-"le débit de la douche",
-"la lumière"
+"la lumière",
+"la température de l'eau qui sort du réservoir",
+"le débit maximal de la douche et des robinets",
+"le départ et l'arrêt de la pompe selon la pression"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "La pompe de relevage (puisard) se trouve…",
 "ch": [
 "dans une fosse au sous-sol",
+"dans le panneau",
 "sur le toit",
-"dans le chauffe-eau",
-"dans le panneau"
+"dans le chauffe-eau"
 ],
 "bon": 0,
 "s": 20
@@ -4576,23 +4576,23 @@ window.QUIZ_LIVRES = [
 {
 "q": "Avant de remettre un chauffe-eau électrique sous tension après l'avoir vidé :",
 "ch": [
-"le remplir complètement et purger l'air par un robinet d'eau chaude",
-"rien",
-"fermer l'eau froide",
-"enlever l'ECO"
+"fermer l'eau froide pour garder le réservoir vide",
+"rien : on remet le disjoncteur tout de suite",
+"enlever l'ECO",
+"le remplir complètement et purger l'air par un robinet d'eau chaude"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Un fil de mise à la terre sur une pompe sert à…",
 "ch": [
+"rien",
+"faire tourner le moteur plus vite au démarrage",
 "protéger contre les chocs si un fil touche la carcasse",
-"faire tourner le moteur",
-"augmenter la pression",
-"rien"
+"augmenter la pression dans le réservoir"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
@@ -4614,9 +4614,9 @@ window.QUIZ_LIVRES = [
 "q": "Le formatif de la compétence 5 vérifie…",
 "ch": [
 "la théorie, le montage réussi et des mesures justes",
-"seulement la vitesse",
-"le nombre de fils utilisés",
-"la propreté du local"
+"la propreté du local",
+"seulement la vitesse à laquelle tu montes le circuit",
+"le nombre de fils utilisés pour chaque montage"
 ],
 "bon": 0,
 "s": 20
@@ -4640,12 +4640,12 @@ window.QUIZ_LIVRES = [
 {
 "q": "L'énergie et la puissance : laquelle est une vitesse?",
 "ch": [
-"La puissance",
+"Aucune",
 "L'énergie",
 "Les deux",
-"Aucune"
+"La puissance"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
@@ -4667,12 +4667,12 @@ window.QUIZ_LIVRES = [
 {
 "q": "Le mazout utilisé pour le chauffage résidentiel :",
 "ch": [
-"le mazout léger n° 2",
+"le propane",
 "l'essence",
-"le diesel marin",
-"le propane"
+"le mazout léger n° 2",
+"le diesel marin"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
@@ -4694,12 +4694,12 @@ window.QUIZ_LIVRES = [
 {
 "q": "Le vrai coût de l'énergie tient compte…",
 "ch": [
+"de la couleur de l'appareil",
 "du prix et du rendement de l'appareil",
 "du prix seulement",
-"de la couleur de l'appareil",
 "de la marque"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
@@ -4739,8 +4739,8 @@ window.QUIZ_LIVRES = [
 "q": "Dans une vieille maison, la plus grosse perte de chaleur vient souvent…",
 "ch": [
 "des fuites d'air",
-"du plancher du sous-sol",
 "des lumières",
+"du plancher du sous-sol",
 "du chauffe-eau"
 ],
 "bon": 0,
@@ -4750,8 +4750,8 @@ window.QUIZ_LIVRES = [
 "q": "L'effet de cheminée :",
 "ch": [
 "l'air chaud monte et sort par le haut, aspirant l'air froid par le bas",
-"la cheminée chauffe la maison",
-"l'air froid monte",
+"l'air froid monte et sort par le haut de la maison",
+"la cheminée réchauffe toute la maison par rayonnement",
 "l'air ne bouge pas"
 ],
 "bon": 0,
@@ -4760,45 +4760,45 @@ window.QUIZ_LIVRES = [
 {
 "q": "Un pont thermique, c'est…",
 "ch": [
+"une fenêtre ouverte",
+"un isolant de très bonne qualité posé entre deux murs",
 "un endroit où la chaleur passe plus facilement à travers l'enveloppe",
-"un pont chauffé",
-"un isolant de qualité",
-"une fenêtre ouverte"
+"un pont chauffé pour éviter la glace l'hiver"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "La valeur R sur l'emballage d'un isolant, c'est la résistance…",
 "ch": [
-"nominale (la réelle, une fois posé, peut être plus basse)",
-"effective garantie",
-"en BTU",
-"électrique"
+"électrique",
+"en BTU par heure et par pied carré",
+"effective, garantie une fois l'isolant posé",
+"nominale (la réelle, une fois posé, peut être plus basse)"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "La caméra thermique sert à…",
 "ch": [
-"voir les pertes de chaleur",
 "mesurer la pression",
+"lire les plans",
 "trouver les fils",
-"lire les plans"
+"voir les pertes de chaleur"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Plus il y a de degrés-jours dans une région…",
 "ch": [
-"plus il faut chauffer",
+"rien ne change",
 "moins il faut chauffer",
 "plus il fait chaud",
-"rien ne change"
+"plus il faut chauffer"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
@@ -4836,20 +4836,20 @@ window.QUIZ_LIVRES = [
 {
 "q": "Une plinthe à eau chaude : plus l'eau est chaude…",
 "ch": [
-"plus chaque pied de plinthe donne de chaleur",
 "moins elle chauffe",
 "rien ne change",
+"plus chaque pied de plinthe donne de chaleur",
 "plus elle consomme d'électricité"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Le plancher radiant hydronique utilise surtout…",
 "ch": [
 "des tubes de PEX dans la dalle ou sous le plancher",
-"des fils électriques",
-"de l'air pulsé",
+"de l'air chaud pulsé sous le plancher",
+"des fils électriques noyés dans la dalle",
 "de la vapeur"
 ],
 "bon": 0,
@@ -4859,9 +4859,9 @@ window.QUIZ_LIVRES = [
 "q": "L'eau d'un réseau de chauffage, c'est comme…",
 "ch": [
 "un camion de livraison de chaleur",
-"un isolant",
-"un combustible",
-"un filtre"
+"un isolant qui garde la chaleur dans les murs",
+"un filtre",
+"un combustible qui brûle dans la chaudière"
 ],
 "bon": 0,
 "s": 20
@@ -4869,43 +4869,43 @@ window.QUIZ_LIVRES = [
 {
 "q": "Dans un réseau fermé, le circulateur…",
 "ch": [
+"chauffe l'eau en la faisant tourner vite",
 "vainc les pertes de charge, il ne « monte » pas l'eau",
-"monte l'eau au 2e étage",
-"chauffe l'eau",
-"remplit le réseau"
+"remplit le réseau",
+"monte l'eau jusqu'au 2e étage comme une pompe de puits"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
 "q": "La perte de charge, c'est…",
 "ch": [
+"la pression de la ville",
 "le frottement de l'eau sur les parois du tuyau",
-"une fuite",
-"la chaleur perdue",
-"la pression de la ville"
+"la chaleur perdue par les tuyaux dans le sous-sol",
+"une fuite d'eau dans le réseau de chauffage"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
 "q": "Tout système de chauffage…",
 "ch": [
+"filtre l'eau",
+"produit la chaleur, sans avoir besoin de la distribuer",
 "produit, distribue et émet la chaleur",
-"produit seulement",
-"refroidit l'air",
-"filtre l'eau"
+"refroidit l'air l'été et le chauffe l'hiver"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Une fournaise à air pulsé chauffe…",
 "ch": [
 "l'air, à travers un échangeur de chaleur",
-"l'eau des plinthes",
-"la vapeur",
-"le sol"
+"le sol",
+"le sol, avec des tubes de PEX dans la dalle",
+"l'eau des plinthes, à travers un serpentin"
 ],
 "bon": 0,
 "s": 20
@@ -4914,9 +4914,9 @@ window.QUIZ_LIVRES = [
 "q": "Une fournaise à condensation mal installée (évacuation, air de combustion, drain)…",
 "ch": [
 "ne donne pas son rendement et peut être dangereuse",
-"fonctionne mieux",
-"consomme moins",
-"n'a aucun problème"
+"fonctionne mieux, parce que le drain est facultatif",
+"n'a aucun problème",
+"consomme moins, même sans air de combustion"
 ],
 "bon": 0,
 "s": 20
@@ -4925,9 +4925,9 @@ window.QUIZ_LIVRES = [
 "q": "La soupape de sûreté d'une chaudière…",
 "ch": [
 "s'ouvre si la pression dépasse son réglage",
-"règle la température",
-"remplit la chaudière",
-"purge l'air"
+"remplit la chaudière quand la pression baisse",
+"purge l'air",
+"règle la température de l'eau de chauffage"
 ],
 "bon": 0,
 "s": 20
@@ -4936,9 +4936,9 @@ window.QUIZ_LIVRES = [
 "q": "Une thermopompe utilise un frigorigène qui…",
 "ch": [
 "bout à très basse température",
+"gèle à 0 °C",
 "ne change jamais d'état",
-"brûle",
-"gèle à 0 °C"
+"brûle"
 ],
 "bon": 0,
 "s": 20
@@ -4946,32 +4946,32 @@ window.QUIZ_LIVRES = [
 {
 "q": "On ajoute du glycol dans une boucle quand…",
 "ch": [
+"l'eau est trop dure et laisse du calcaire",
+"on veut plus de pression dans la boucle",
 "elle risque de geler (garage, chalet, géothermie)",
-"l'eau est trop dure",
-"on veut plus de pression",
 "jamais"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Un système combiné utilise la même chaudière pour…",
 "ch": [
-"le chauffage et l'eau chaude domestique",
 "le chauffage et la climatisation",
 "l'eau et le gaz",
-"deux maisons"
+"deux maisons",
+"le chauffage et l'eau chaude domestique"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Le rendement de combustion, c'est…",
 "ch": [
 "la part de l'énergie du combustible transmise à l'eau ou à l'air",
-"la vitesse du ventilateur",
-"la quantité de mazout",
-"la température extérieure"
+"la quantité de mazout brûlée en une heure",
+"la température extérieure",
+"la vitesse du ventilateur du brûleur au démarrage"
 ],
 "bon": 0,
 "s": 20
@@ -4980,9 +4980,9 @@ window.QUIZ_LIVRES = [
 "q": "Débit d'eau : pour la même puissance, un ΔT plus grand demande…",
 "ch": [
 "moins de débit",
-"plus de débit",
 "le même débit",
-"aucun débit"
+"aucun débit",
+"plus de débit"
 ],
 "bon": 0,
 "s": 20
@@ -5007,9 +5007,9 @@ window.QUIZ_LIVRES = [
 "q": "Le mazout en flaque est difficile à allumer, parce que…",
 "ch": [
 "seule sa vapeur brûle : il faut le pulvériser",
-"il est trop froid",
-"il contient de l'eau",
-"il est trop épais"
+"il est trop épais pour couler dans la buse",
+"il est trop froid et doit être réchauffé",
+"il contient de l'eau"
 ],
 "bon": 0,
 "s": 20
@@ -5018,9 +5018,9 @@ window.QUIZ_LIVRES = [
 "q": "Le brûleur à pulvérisation (« à canon »)…",
 "ch": [
 "pulvérise le mazout, le mélange à l'air et l'allume",
-"chauffe le réservoir",
-"pompe l'eau",
-"mesure la flamme"
+"mesure la flamme",
+"pompe l'eau de la chaudière vers les radiateurs",
+"chauffe le réservoir de mazout avant l'allumage"
 ],
 "bon": 0,
 "s": 20
@@ -5029,9 +5029,9 @@ window.QUIZ_LIVRES = [
 "q": "Le gicleur est en laiton avec…",
 "ch": [
 "un orifice usiné et une chambre de tourbillonnement",
-"un filtre à air",
-"une résistance",
-"un aimant"
+"un filtre à air et une petite hélice",
+"un aimant",
+"une résistance qui chauffe le mazout"
 ],
 "bon": 0,
 "s": 20
@@ -5039,21 +5039,21 @@ window.QUIZ_LIVRES = [
 {
 "q": "La cellule au CdS a une résistance…",
 "ch": [
+"nulle",
+"toujours la même, flamme ou pas",
 "très élevée dans le noir, faible quand elle voit la flamme",
-"faible dans le noir",
-"toujours la même",
-"nulle"
+"faible dans le noir, très élevée avec la flamme"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Avec le mazout, la combustion se vérifie avec…",
 "ch": [
 "un analyseur de combustion et le tirage",
-"un thermomètre de cuisine",
+"un thermomètre de cuisine dans la cheminée",
 "un ruban à mesurer",
-"une caméra"
+"une caméra thermique pointée sur la flamme"
 ],
 "bon": 0,
 "s": 20
@@ -5061,21 +5061,21 @@ window.QUIZ_LIVRES = [
 {
 "q": "Un bon diagnostic part…",
 "ch": [
+"du changement des pièces les plus souvent brisées",
 "du symptôme du client, puis des causes les plus probables",
-"du changement de pièces",
-"du prix",
-"de la marque"
+"de la marque et de l'âge de l'appareil",
+"du prix"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
 "q": "Pour économiser l'énergie, on commence par…",
 "ch": [
 "la base : un appareil bien entretenu et l'enveloppe",
-"le gadget le plus cher",
-"remplacer la maison",
-"rien"
+"rien",
+"le gadget le plus cher et le plus récent",
+"remplacer tout l'appareil, même s'il fonctionne"
 ],
 "bon": 0,
 "s": 20
@@ -5083,21 +5083,21 @@ window.QUIZ_LIVRES = [
 {
 "q": "Le VRC (ventilateur récupérateur de chaleur)…",
 "ch": [
+"chauffe l'eau avec la chaleur de l'air sortant",
+"filtre l'eau",
 "ventile une maison étanche en récupérant la chaleur de l'air sortant",
-"chauffe l'eau",
-"climatise",
-"filtre l'eau"
+"climatise la maison en récupérant l'humidité"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Le récupérateur de chaleur des eaux de drainage…",
 "ch": [
 "préchauffe l'eau froide avec l'eau tiède de la douche",
-"chauffe l'égout",
-"fait du bruit",
-"remplace le chauffe-eau"
+"chauffe l'égout pour éviter qu'il gèle",
+"remplace le chauffe-eau dans les petits logements",
+"fait du bruit"
 ],
 "bon": 0,
 "s": 20
@@ -5105,34 +5105,34 @@ window.QUIZ_LIVRES = [
 {
 "q": "Le différentiel d'un thermostat sert à…",
 "ch": [
-"éviter que le chauffage parte et arrête sans arrêt",
-"augmenter la température",
-"économiser le mazout seulement",
-"rien"
+"économiser le mazout, mais seulement la nuit",
+"rien",
+"augmenter la température quand il fait très froid",
+"éviter que le chauffage parte et arrête sans arrêt"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "« La chaleur la moins chère est celle qu'on ne produit pas » : outil?",
 "ch": [
-"Thermostats programmables et zonage",
-"Ouvrir les fenêtres",
-"Augmenter la consigne",
-"Enlever l'isolant"
+"Enlever l'isolant",
+"Ouvrir les fenêtres pour aérer chaque jour",
+"Augmenter la consigne pour chauffer plus vite",
+"Thermostats programmables et zonage"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Expliquer « AFUE de 96 % » à un client :",
 "ch": [
+"« Il consomme 96 % de plus qu'un vieil appareil »",
+"« L'appareil devrait durer environ 96 ans »",
 "« Sur toute la saison, 96 % du gaz devient de la chaleur pour la maison »",
-"« L'appareil a 96 ans »",
-"« Il consomme 96 % de plus »",
 "« C'est 96 °C »"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
@@ -5169,12 +5169,12 @@ window.QUIZ_LIVRES = [
 {
 "q": "La documentation des fabricants est souvent…",
 "ch": [
-"en anglais : il faut connaître les termes",
-"inexistante",
+"inexistante : on apprend tout sur le terrain",
+"dessinée seulement, sans aucun texte",
 "en latin",
-"dessinée seulement"
+"en anglais : il faut connaître les termes"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 }
 ]
@@ -5212,12 +5212,12 @@ window.QUIZ_LIVRES = [
 {
 "q": "Au Québec, l'électricité vient surtout…",
 "ch": [
-"de centrales hydroélectriques",
-"du charbon",
-"du nucléaire",
-"du mazout"
+"de centrales au charbon et au gaz naturel",
+"de centrales nucléaires comme Gentilly-2",
+"du mazout",
+"de centrales hydroélectriques"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
@@ -5231,12 +5231,12 @@ window.QUIZ_LIVRES = [
 {
 "q": "Feu d'origine électrique :",
 "ch": [
-"jamais d'eau; extincteur de classe C (CO₂ ou poudre)",
-"on jette de l'eau",
+"on jette de l'eau pour refroidir rapidement",
 "on souffle dessus",
-"on ouvre le panneau"
+"on ouvre le panneau pour voir d'où ça vient",
+"jamais d'eau; extincteur de classe C (CO₂ ou poudre)"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
@@ -5257,34 +5257,34 @@ window.QUIZ_LIVRES = [
 {
 "q": "Le filage d'alimentation 120/240 V, du panneau jusqu'à l'appareil, c'est le travail…",
 "ch": [
-"de l'électricien",
+"du client",
 "du tuyauteur",
-"du préposé",
-"du client"
+"de l'électricien",
+"du préposé"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Un fil de thermostat 24 V typique :",
 "ch": [
-"18 AWG",
+"2 AWG",
 "12 AWG",
 "6 AWG",
-"2 AWG"
+"18 AWG"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "La loi d'Ohm :",
 "ch": [
-"E = R × I",
-"E = R ÷ I",
+"I = E × R",
 "P = R + I",
-"I = E × R"
+"E = R ÷ I",
+"E = R × I"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
@@ -5301,9 +5301,9 @@ window.QUIZ_LIVRES = [
 "q": "Un transformateur fonctionne par…",
 "ch": [
 "induction",
-"friction",
 "combustion",
-"pression"
+"pression",
+"friction"
 ],
 "bon": 0,
 "s": 20
@@ -5312,42 +5312,42 @@ window.QUIZ_LIVRES = [
 "q": "Choisir un transformateur : après avoir additionné les VA des charges, on ajoute une marge d'environ…",
 "ch": [
 "5 %",
+"aucune",
 "20 %",
-"100 %",
-"aucune"
+"100 %"
 ],
-"bon": 1,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Relais ou contacteur : lequel a les plus gros contacts (20, 30, 40 A)?",
 "ch": [
-"Le relais",
 "Le contacteur",
 "Les deux pareils",
-"Aucun"
+"Aucun",
+"Le relais"
 ],
-"bon": 1,
+"bon": 0,
 "s": 20
 },
 {
 "q": "Un bilame…",
 "ch": [
-"deux métaux qui courbent avec la chaleur et ouvrent ou ferment un contact",
-"un fil de cuivre double",
-"un type de fusible",
-"un moteur"
+"un moteur",
+"un fil de cuivre double qui chauffe et coupe le courant comme un fusible",
+"un fusible à deux lames qui fond si l'appareil surchauffe",
+"deux métaux qui courbent avec la chaleur et ouvrent ou ferment un contact"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Sur un thermostat, la borne R est…",
 "ch": [
 "le 24 V du transformateur",
-"le compresseur",
-"le ventilateur",
-"la terre"
+"la terre",
+"le ventilateur intérieur, qui part en même temps que le chauffage",
+"le retour du compresseur (fil rouge vers l'unité extérieure)"
 ],
 "bon": 0,
 "s": 20
@@ -5355,12 +5355,12 @@ window.QUIZ_LIVRES = [
 {
 "q": "Sur un schéma, un relais est toujours dessiné…",
 "ch": [
+"en marche (bobine alimentée, contacts fermés)",
+"en couleur",
 "au repos (bobine non alimentée)",
-"en marche",
-"à moitié",
-"en couleur"
+"dans la position du dernier essai fait par le technicien"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 }
 ]
@@ -5383,9 +5383,9 @@ window.QUIZ_LIVRES = [
 "q": "Sur un schéma, « 1R1 » et « 2R1 » désignent…",
 "ch": [
 "les contacts 1 et 2 du même relais R1",
-"deux relais différents",
-"deux lampes",
-"deux fusibles"
+"deux fusibles",
+"deux lampes témoins branchées sur le relais R1",
+"deux relais différents, montés dans le même panneau"
 ],
 "bon": 0,
 "s": 20
@@ -5410,133 +5410,133 @@ window.QUIZ_LIVRES = [
 {
 "q": "L'interrupteur de fin de course d'une valve de zone prouve…",
 "ch": [
-"que la valve est ouverte",
-"que le thermostat est brisé",
+"que le brûleur est éteint",
 "que l'eau est froide",
-"que le brûleur est éteint"
+"que le thermostat est brisé",
+"que la valve est ouverte"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Un interrupteur de débit (Johnson F61) : la flèche du boîtier pointe…",
 "ch": [
-"dans le sens du débit",
-"contre le débit",
 "vers le haut",
-"vers le panneau"
+"contre le débit",
+"vers le panneau",
+"dans le sens du débit"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "La réinitialisation extérieure (courbe de chauffe) :",
 "ch": [
+"l'eau de chauffage reste toujours à la même température, peu importe la météo",
+"plus il fait froid dehors, plus l'eau domestique est chaude",
 "plus il fait froid dehors, plus l'eau de chauffage est chaude",
-"l'eau est toujours à la même température",
-"elle arrête le chauffage l'hiver",
 "elle règle l'eau domestique"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "La température extérieure de conception, c'est…",
 "ch": [
-"la journée la plus froide prévue de l'année",
-"la température moyenne de l'été",
 "0 °C",
+"la température moyenne de l'été",
+"la journée la plus froide prévue de l'année",
 "la température de la chaufferie"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Un circulateur à moteur ECM…",
 "ch": [
-"ajuste sa vitesse au besoin et consomme moins",
-"tourne toujours à fond",
 "fonctionne à la vapeur",
-"n'a pas d'électronique"
+"tourne toujours à pleine vitesse pour garder la pression stable",
+"n'a aucune électronique : il démarre seulement avec un relais",
+"ajuste sa vitesse au besoin et consomme moins"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Brûleur à l'huile : la cellule ne voit pas de flamme au démarrage. Le protectorelais…",
 "ch": [
+"allume la cellule",
 "se met en sécurité (verrouille) après sa temporisation",
-"continue indéfiniment",
-"augmente le mazout",
-"allume la cellule"
+"continue d'envoyer du mazout jusqu'à ce que la flamme apparaisse",
+"augmente la pression de mazout pour forcer l'allumage"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
 "q": "Avant de vérifier la cellule CdS :",
 "ch": [
-"couper et cadenasser",
-"laisser le brûleur en marche sans protection",
 "mouiller la cellule",
-"rien de spécial"
+"laisser le brûleur en marche sans protection",
+"rien de spécial",
+"couper et cadenasser"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "La cellule CdS a une résistance…",
 "ch": [
+"faible dans le noir, très élevée à la lumière",
+"toujours la même, flamme ou pas",
 "très élevée dans le noir, faible à la lumière",
-"faible dans le noir",
-"toujours la même",
 "nulle"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Le délai d'arrêt du ventilateur d'une fournaise (micro-interrupteurs DIP) est souvent de…",
 "ch": [
-"90 s",
-"5 s",
 "10 min",
+"5 s",
+"90 s",
 "1 h"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Sur le thermostat d'une thermopompe, la borne O/B commande…",
 "ch": [
+"l'alimentation",
+"le compresseur, qui part seulement en climatisation",
 "la vanne d'inversion (chauffage ou climatisation)",
-"le ventilateur",
-"le compresseur",
-"l'alimentation"
+"le ventilateur intérieur (marche continue ou automatique)"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Dépannage : par quoi commencer?",
 "ch": [
+"le thermostat neuf",
+"remplacer le moteur, puis vérifier si ça repart",
 "l'alimentation (source et protection)",
-"changer la carte",
-"remplacer le moteur",
-"le thermostat neuf"
+"changer la carte électronique, la pièce qui brise le plus"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Un relais claque sans arrêt : cause possible…",
 "ch": [
-"tension trop basse ou instable à la bobine",
-"trop de lumière",
-"le thermostat est neuf",
-"le fil est trop long"
+"trop de lumière sur la bobine qui dérègle le contact",
+"le thermostat est neuf et n'est pas encore calibré",
+"le fil est trop long",
+"tension trop basse ou instable à la bobine"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
@@ -5575,21 +5575,21 @@ window.QUIZ_LIVRES = [
 {
 "q": "Le courant de flamme d'un appareil au gaz se mesure en…",
 "ch": [
-"microampères (µA)",
-"kilowatts",
-"volts CA",
-"ohms"
+"kilowatts (kW), comme la puissance du brûleur",
+"ohms",
+"volts CA (V~), entre la tige et la masse",
+"microampères (µA)"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Une tige de flamme oxydée se nettoie…",
 "ch": [
 "doucement avec un tampon abrasif fin",
-"avec du papier sablé",
-"avec de l'eau",
-"avec un marteau"
+"avec un marteau",
+"avec de l'eau savonneuse, puis on la laisse sécher",
+"avec du papier sablé grossier jusqu'au métal brillant"
 ],
 "bon": 0,
 "s": 20
@@ -5597,21 +5597,21 @@ window.QUIZ_LIVRES = [
 {
 "q": "Pendant l'essai d'allumage, pas de 120 V au connecteur de l'allumeur HSI :",
 "ch": [
-"la carte ne l'alimente pas",
 "l'allumeur est trop chaud",
-"le gaz est fermé",
-"c'est normal"
+"c'est normal",
+"la carte ne l'alimente pas",
+"le gaz est fermé"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Les sécurités d'un appareil au gaz sont branchées…",
 "ch": [
 "en série : une seule ouverte coupe la valve",
-"en parallèle",
-"au hasard",
-"sur le thermostat seulement"
+"en parallèle : il faut qu'elles s'ouvrent toutes pour couper",
+"sur le thermostat seulement, qui coupe la valve",
+"au hasard"
 ],
 "bon": 0,
 "s": 20
@@ -5619,21 +5619,21 @@ window.QUIZ_LIVRES = [
 {
 "q": "Un pressuretrol, sur une chaudière à vapeur…",
 "ch": [
-"arrête et repart le brûleur selon la pression de vapeur",
-"mesure la température extérieure",
-"remplit la chaudière",
-"purge l'air"
+"purge l'air",
+"mesure la température extérieure pour régler la chaudière",
+"remplit la chaudière d'eau quand la pression baisse",
+"arrête et repart le brûleur selon la pression de vapeur"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Le coupe-circuit de bas niveau d'eau…",
 "ch": [
 "arrête le brûleur si l'eau manque dans la chaudière",
-"remplit d'eau",
-"chauffe l'eau",
-"allume la veilleuse"
+"remplit automatiquement la chaudière quand l'eau baisse",
+"allume la veilleuse quand le niveau d'eau est bon",
+"chauffe l'eau"
 ],
 "bon": 0,
 "s": 20
@@ -5641,12 +5641,12 @@ window.QUIZ_LIVRES = [
 {
 "q": "Un automate (API) lit ses entrées et commande ses sorties selon…",
 "ch": [
+"le courant de flamme",
 "un cycle de scrutation",
-"le hasard",
 "la météo seulement",
-"le courant de flamme"
+"le hasard"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
@@ -5668,21 +5668,21 @@ window.QUIZ_LIVRES = [
 {
 "q": "Une temporisation TON de 10 min sert, par exemple, à…",
 "ch": [
+"couper le courant",
+"allumer la lumière du local pendant 10 minutes",
 "faire attendre la 2e chaudière avant de partir",
-"allumer la lumière",
-"arrêter la pompe tout de suite",
-"couper le courant"
+"arrêter la pompe tout de suite quand le thermostat est satisfait"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Sur un diagramme temporel, le circulateur qui continue après l'arrêt du thermostat, c'est…",
 "ch": [
 "la postcirculation",
-"une panne",
+"une erreur de dessin",
 "un court-circuit",
-"une erreur de dessin"
+"une panne"
 ],
 "bon": 0,
 "s": 20
@@ -5690,23 +5690,23 @@ window.QUIZ_LIVRES = [
 {
 "q": "Avec la GTB, avant de se déplacer, le technicien…",
 "ch": [
-"lit l'alarme et la tendance",
-"redémarre tout",
 "change la sonde",
-"coupe le courant du bâtiment"
+"coupe le courant du bâtiment",
+"redémarre tout",
+"lit l'alarme et la tendance"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Sur place, la valeur affichée par la GTB se compare…",
 "ch": [
-"avec une mesure réelle",
-"avec la météo",
 "avec un autre bâtiment",
+"avec la météo",
+"avec une mesure réelle",
 "avec rien"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
@@ -5722,23 +5722,23 @@ window.QUIZ_LIVRES = [
 {
 "q": "Le Code qui encadre l'électricité au Québec :",
 "ch": [
+"Code civil du Québec, livre sur les biens",
+"Code du logement, partie sur les installations",
 "Code de construction, chapitre V – Électricité",
-"Code civil",
-"Code de la route",
-"Code du logement"
+"Code de la route"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Une veilleuse permanente, un allumage intermittent et un allumeur à surface chaude (HSI) sont…",
 "ch": [
-"les trois familles d'allumage au gaz",
-"trois types de thermostats",
 "trois pompes",
-"trois fusibles"
+"trois fusibles",
+"les trois familles d'allumage au gaz",
+"trois types de thermostats"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 }
 ]
@@ -5777,12 +5777,12 @@ window.QUIZ_LIVRES = [
 {
 "q": "Tu as des motifs raisonnables de croire qu'un travail te met en danger. Tu peux…",
 "ch": [
-"exercer ton droit de refus",
 "partir chez toi sans rien dire",
+"faire le travail plus vite",
 "demander une prime",
-"faire le travail plus vite"
+"exercer ton droit de refus"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
@@ -5823,9 +5823,9 @@ window.QUIZ_LIVRES = [
 "q": "Tu trouves une seringue dans les toilettes.",
 "ch": [
 "Je la prends avec les doigts et je la jette",
-"Je remets le capuchon",
+"Je la laisse là",
 "Avec une pince, pointe vers le bas, dans un contenant rigide",
-"Je la laisse là"
+"Je remets le capuchon"
 ],
 "bon": 2,
 "s": 20
@@ -5833,12 +5833,12 @@ window.QUIZ_LIVRES = [
 {
 "q": "Pousser ou tirer un chariot lourd?",
 "ch": [
-"Tirer",
-"Pousser",
 "C'est pareil",
-"Le porter"
+"Tirer",
+"Le porter",
+"Pousser"
 ],
-"bon": 1,
+"bon": 3,
 "s": 20,
 "expl": "Tu vois devant toi et ton dos est mieux placé."
 },
@@ -5846,8 +5846,8 @@ window.QUIZ_LIVRES = [
 "q": "Un chiffon qui passe de la toilette au comptoir, c'est…",
 "ch": [
 "de la contamination croisée",
-"une désinfection",
-"un gain de temps",
+"un gain de temps accepté si le chiffon est propre",
+"une désinfection en deux étapes",
 "une bonne pratique"
 ],
 "bon": 0,
@@ -5856,12 +5856,12 @@ window.QUIZ_LIVRES = [
 {
 "q": "Dans le code de couleurs le plus utilisé, le chiffon ROUGE sert…",
 "ch": [
-"aux bureaux",
-"à la cuisine",
 "aux toilettes et urinoirs",
-"aux vitres"
+"aux vitres",
+"à la cuisine et aux comptoirs",
+"aux bureaux et aux surfaces de travail"
 ],
-"bon": 2,
+"bon": 0,
 "s": 20
 },
 {
@@ -5875,12 +5875,12 @@ window.QUIZ_LIVRES = [
 {
 "q": "L'erreur la plus fréquente avec un désinfectant :",
 "ch": [
-"l'utiliser sur une surface propre",
-"essuyer tout de suite sans respecter le temps de contact",
-"le diluer avec de l'eau",
-"le ranger fermé"
+"le diluer avec de l'eau, même si l'étiquette le permet",
+"l'utiliser sur une surface déjà propre, sans la laver avant",
+"le ranger fermé",
+"essuyer tout de suite sans respecter le temps de contact"
 ],
-"bon": 1,
+"bon": 3,
 "s": 20
 },
 {
@@ -5905,23 +5905,23 @@ window.QUIZ_LIVRES = [
 {
 "q": "Javellisant et nettoyant à l'ammoniaque mélangés :",
 "ch": [
-"nettoient deux fois mieux",
 "dégagent un gaz toxique : jamais",
 "sentent meilleur",
-"sont plus écologiques"
+"sont plus écologiques",
+"nettoient deux fois mieux"
 ],
-"bon": 1,
+"bon": 0,
 "s": 20
 },
 {
 "q": "Avant de brancher une machine dans un endroit mouillé, ton garde du corps est…",
 "ch": [
-"le DDFT",
-"le fusible",
 "la rallonge",
-"le cône jaune"
+"le cône jaune",
+"le fusible",
+"le DDFT"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 }
 ]
@@ -5943,9 +5943,9 @@ window.QUIZ_LIVRES = [
 {
 "q": "Un fini à plancher s'applique…",
 "ch": [
-"en une couche épaisse",
-"en plusieurs couches minces et égales",
 "avec la vadrouille du lavage",
+"en plusieurs couches minces et égales",
+"en une couche épaisse",
 "sans attendre le séchage"
 ],
 "bon": 1,
@@ -5963,23 +5963,23 @@ window.QUIZ_LIVRES = [
 {
 "q": "Un tapis d'entrée bien posé :",
 "ch": [
-"bords pliés pour l'épaisseur",
 "à plat, sans bloquer une porte, endos antidérapant",
-"sur le seuil de la porte",
-"roulé le jour"
+"roulé le jour",
+"bords pliés vers le dessous pour qu'il soit plus épais",
+"posé sur le seuil, pour qu'il dépasse sous la porte"
 ],
-"bon": 1,
+"bon": 0,
 "s": 20
 },
 {
 "q": "Pourquoi suivre une séquence fixe pour faire une chambre d'hôtel en 30 minutes?",
 "ch": [
-"Pour ne rien oublier et aller vite",
 "Parce que le client l'exige",
-"Pour ranger le chariot",
-"C'est la loi"
+"Pour ne rien oublier et aller vite",
+"C'est la loi",
+"Pour ranger le chariot"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
@@ -6003,9 +6003,9 @@ window.QUIZ_LIVRES = [
 {
 "q": "Le sel de déglaçage fondu…",
 "ch": [
-"s'évapore",
+"disparaît dans le sol en 24 heures, sans effet",
 "s'écoule vers le sol et les cours d'eau",
-"disparaît en 24 h",
+"s'évapore au soleil sans laisser de trace",
 "nourrit la pelouse"
 ],
 "bon": 1,
@@ -6014,12 +6014,12 @@ window.QUIZ_LIVRES = [
 {
 "q": "Pourquoi tondre le gazon haut?",
 "ch": [
-"Il fait plus de feuilles, donc plus de nourriture et de racines",
-"Pour économiser l'essence",
-"Pour que ça paraisse moins",
-"Parce que la lame s'use"
+"Pour que les mauvaises herbes paraissent moins",
+"Parce que la lame s'use",
+"Pour économiser l'essence et le temps de tonte",
+"Il fait plus de feuilles, donc plus de nourriture et de racines"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
@@ -6042,12 +6042,12 @@ window.QUIZ_LIVRES = [
 {
 "q": "Punaises de lit dans un logement : le matelas…",
 "ch": [
-"on le sort dans le corridor pour l'aérer",
 "on l'emballe sur place avant de le déplacer",
-"on le lave à l'eau froide",
-"on le laisse tel quel"
+"on le laisse tel quel",
+"on le sort dans le corridor pour l'aérer",
+"on le lave à l'eau froide"
 ],
-"bon": 1,
+"bon": 0,
 "s": 20
 },
 {
@@ -6062,22 +6062,22 @@ window.QUIZ_LIVRES = [
 {
 "q": "Une toilette se remplit seule toutes les 10 minutes. Cause probable :",
 "ch": [
-"le clapet qui fuit",
 "la cuvette fissurée",
 "le siège mal vissé",
-"le drain bouché"
+"le drain bouché",
+"le clapet qui fuit"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20,
 "expl": "Test du colorant."
 },
 {
 "q": "À quoi sert la soupape de sûreté (T et P) d'un chauffe-eau?",
 "ch": [
-"À vider le réservoir",
+"À ajouter de l'eau",
 "À empêcher une explosion si la pression ou la température monte trop",
-"À régler la température",
-"À ajouter de l'eau"
+"À régler la température de l'eau envoyée aux logements",
+"À vider le réservoir quand on fait l'entretien annuel"
 ],
 "bon": 1,
 "s": 20
@@ -6085,12 +6085,12 @@ window.QUIZ_LIVRES = [
 {
 "q": "Pourquoi vidanger un chauffe-eau?",
 "ch": [
+"Pour changer l'eau qui a pris une couleur rouille",
 "Pour sortir les sédiments (calcaire, sable)",
-"Pour changer l'eau de couleur",
-"Pour vérifier le thermostat",
+"Pour vérifier le thermostat et l'élément du bas",
 "Ce n'est jamais nécessaire"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
@@ -6121,34 +6121,34 @@ window.QUIZ_LIVRES = [
 {
 "q": "« Ce qui n'est pas écrit n'existe pas » : à quoi sert le registre de l'eau chaude?",
 "ch": [
-"À prouver que l'entretien a été fait",
+"À rien",
 "À décorer la salle mécanique",
-"À calculer le loyer",
-"À rien"
+"À prouver que l'entretien a été fait",
+"À calculer le loyer"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Le drain français autour des fondations…",
 "ch": [
-"amène l'eau potable",
-"ramasse l'eau du sol pour qu'elle ne pousse pas sur les murs",
-"évacue les toilettes",
-"chauffe le sous-sol"
+"évacue les eaux des toilettes vers l'égout municipal",
+"amène l'eau potable de la rue jusqu'au sous-sol",
+"chauffe le sous-sol",
+"ramasse l'eau du sol pour qu'elle ne pousse pas sur les murs"
 ],
-"bon": 1,
+"bon": 3,
 "s": 20
 },
 {
 "q": "La pompe de puisard ne part pas et l'eau monte :",
 "ch": [
-"c'est normal",
+"j'ouvre le robinet",
+"c'est normal : la pompe attend que la fosse soit pleine",
 "urgence : flotte coincée, disjoncteur ou pompe brûlée",
-"j'attends le lendemain",
-"j'ouvre le robinet"
+"j'attends le lendemain et je remplis une demande"
 ],
-"bon": 1,
+"bon": 2,
 "s": 20
 },
 {
@@ -6165,12 +6165,12 @@ window.QUIZ_LIVRES = [
 {
 "q": "Les filtres à chicanes d'une hotte de cuisine non nettoyés :",
 "ch": [
-"risque d'incendie de graisse",
 "économisent l'énergie",
-"font moins de bruit",
-"durent plus longtemps"
+"risque d'incendie de graisse",
+"durent plus longtemps",
+"font moins de bruit"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
@@ -6186,23 +6186,23 @@ window.QUIZ_LIVRES = [
 {
 "q": "Les dangereux glaçons au bord du toit viennent souvent…",
 "ch": [
-"de la chaleur du bâtiment qui fait fondre la neige par en dessous",
-"du vent",
+"du vent qui pousse la neige contre le bord du toit",
 "du sel",
-"des gouttières neuves"
+"des gouttières neuves qui gardent l'eau trop longtemps",
+"de la chaleur du bâtiment qui fait fondre la neige par en dessous"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Dans la cuisine d'une école, qui inspecte l'hygiène?",
 "ch": [
-"Le MAPAQ",
 "La SAAQ",
 "La RBQ",
+"Le MAPAQ",
 "Le TAL"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
@@ -6226,8 +6226,8 @@ window.QUIZ_LIVRES = [
 "q": "Pourquoi enlever un graffiti rapidement?",
 "ch": [
 "Un graffiti qui reste en attire d'autres",
-"Pour la peinture qui sèche",
-"Pour l'assurance seulement",
+"Pour l'assurance seulement, qui l'exige dans les 24 h",
+"Pour que la peinture du graffiti n'ait pas le temps de sécher",
 "Ce n'est pas important"
 ],
 "bon": 0,
@@ -6236,12 +6236,12 @@ window.QUIZ_LIVRES = [
 {
 "q": "Un réfrigérateur…",
 "ch": [
-"fabrique du froid",
 "déplace la chaleur",
 "refroidit avec de la glace",
+"fabrique du froid",
 "fonctionne sans moteur"
 ],
-"bon": 1,
+"bon": 0,
 "s": 20,
 "expl": "Le frigorigène transporte la chaleur vers le serpentin."
 },
@@ -6285,11 +6285,11 @@ window.QUIZ_LIVRES = [
 "q": "Un tube fluorescent se brise dans une classe :",
 "ch": [
 "je passe l'aspirateur",
-"je fais sortir les gens et j'aère avant de ramasser",
+"je jette les morceaux à la poubelle ordinaire",
 "je balaie tout de suite",
-"je jette les morceaux à la poubelle ordinaire"
+"je fais sortir les gens et j'aère avant de ramasser"
 ],
-"bon": 1,
+"bon": 3,
 "s": 20,
 "expl": "Il contient du mercure : pas d'aspirateur ni de balai."
 }
@@ -6329,56 +6329,56 @@ window.QUIZ_LIVRES = [
 {
 "q": "Pour arrêter une combustion, il suffit de…",
 "ch": [
+"attendre",
 "retirer un seul élément du tétraèdre",
-"les retirer tous",
-"ajouter de l'oxygène",
-"attendre"
+"ajouter de l'oxygène pour que le feu brûle plus vite",
+"retirer les quatre éléments en même temps"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
 "q": "Pourquoi une grosse poutre de bois massif résiste longtemps au feu?",
 "ch": [
+"Le bois massif ne brûle pas, seulement sa peinture",
 "La couche carbonisée isole le bois intact",
-"Le bois ne brûle pas",
-"Elle est mouillée",
-"Elle est peinte"
+"Elle est peinte",
+"Elle est traitée et garde toujours son humidité"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
 "q": "Un gaz combustible plus lourd que l'air qui fuit…",
 "ch": [
+"reste sur place, près de l'appareil qui fuit",
+"disparaît",
 "coule vers le bas : on cherche au sol",
-"monte au plafond",
-"reste sur place",
-"disparaît"
+"monte au plafond : on cherche près des luminaires"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "La seule phase du feu où le préposé peut intervenir avec un extincteur :",
 "ch": [
+"le développement complet",
 "l'éclosion",
 "l'embrasement généralisé",
-"le développement complet",
 "le déclin"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
 "q": "Le monoxyde de carbone (CO) dans la fumée…",
 "ch": [
+"sent fort et fait tousser, ce qui nous avertit",
 "est inodore et prend la place de l'oxygène dans le sang",
-"sent fort",
-"est sans danger",
+"est visible : c'est la fumée noire qui sort du feu",
 "est visible"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
@@ -6394,9 +6394,9 @@ window.QUIZ_LIVRES = [
 {
 "q": "Un feu de friteuse de restaurant est un feu de classe…",
 "ch": [
+"C",
 "A",
 "B",
-"C",
 "K"
 ],
 "bon": 3,
@@ -6406,20 +6406,20 @@ window.QUIZ_LIVRES = [
 "q": "Un feu d'équipement électrique sous tension est de classe…",
 "ch": [
 "A",
-"B",
 "C",
+"B",
 "D"
 ],
-"bon": 2,
+"bon": 1,
 "s": 20
 },
 {
 "q": "Un feu de bois, papier, tissu est de classe…",
 "ch": [
 "A",
-"B",
+"K",
 "C",
-"K"
+"B"
 ],
 "bon": 0,
 "s": 20
@@ -6427,23 +6427,23 @@ window.QUIZ_LIVRES = [
 {
 "q": "Un extincteur « 2-A:10-B:C » contient le plus souvent…",
 "ch": [
-"de la poudre ABC",
-"de l'eau",
 "du CO₂ seulement",
+"de l'eau",
+"de la poudre ABC",
 "du sable"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Une cigarette dans un divan peut couver pendant…",
 "ch": [
-"des heures",
-"une seconde",
 "jamais",
-"une minute au plus"
+"une seconde",
+"une minute au plus",
+"des heures"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
@@ -6459,21 +6459,21 @@ window.QUIZ_LIVRES = [
 "ch": [
 "2 fois",
 "20 fois",
-"200 fois",
-"2 000 fois"
+"2 000 fois",
+"200 fois"
 ],
-"bon": 2,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Un extincteur « à pression permanente » contient…",
 "ch": [
-"l'agent et un gaz propulseur (azote)",
-"de l'air seulement",
+"de l'air comprimé seulement, sans agent extincteur",
+"de l'eau chaude sous pression qui ne gèle pas",
 "un moteur",
-"de l'eau chaude"
+"l'agent et un gaz propulseur (azote)"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 }
 ]
@@ -6520,12 +6520,12 @@ window.QUIZ_LIVRES = [
 {
 "q": "L'étiquette perforée au col d'un extincteur indique…",
 "ch": [
-"le mois et l'année du dernier entretien annuel",
-"la date d'achat",
 "le prix",
-"le fabricant"
+"le mois et l'année du dernier entretien annuel",
+"la date d'achat et le magasin où il a été acheté",
+"le nom du fabricant et le numéro du modèle"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
@@ -6547,34 +6547,34 @@ window.QUIZ_LIVRES = [
 {
 "q": "Le détecteur de fumée à ionisation réagit surtout…",
 "ch": [
-"aux feux vifs à petites particules",
-"aux feux qui couvent",
-"à la chaleur",
-"au CO"
+"aux feux qui couvent, avec beaucoup de grosse fumée",
+"au CO",
+"à la chaleur seulement, quand la pièce dépasse 57 °C",
+"aux feux vifs à petites particules"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Le déclencheur manuel se place…",
 "ch": [
+"dans chaque logement, près de la porte d'entrée",
 "près des portes d'issue et des escaliers",
-"dans les logements",
-"au sous-sol seulement",
-"sur le toit"
+"sur le toit",
+"au sous-sol seulement, près du panneau d'alarme"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
 "q": "Un détecteur de fumée se place…",
 "ch": [
-"loin des bouches de ventilation",
-"devant une bouche de ventilation",
 "dans la douche",
-"derrière une porte"
+"loin des bouches de ventilation",
+"derrière une porte",
+"devant une bouche de ventilation"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
@@ -6597,9 +6597,9 @@ window.QUIZ_LIVRES = [
 "q": "La différence d'un panneau adressable :",
 "ch": [
 "il sait quel appareil précis est en alarme",
-"il sonne plus fort",
-"il n'a pas de batterie",
-"il n'a pas de zones"
+"il n'a pas de zones",
+"il n'a pas besoin de batterie, même en panne de courant",
+"il sonne plus fort et plus longtemps dans tout l'immeuble"
 ],
 "bon": 0,
 "s": 20
@@ -6607,12 +6607,12 @@ window.QUIZ_LIVRES = [
 {
 "q": "Le bouton « Accuser réception » du panneau…",
 "ch": [
+"réarme le système",
 "arrête seulement le bip du panneau",
 "arrête l'alarme dans tout l'immeuble",
-"réarme le système",
 "appelle les pompiers"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
@@ -6635,45 +6635,45 @@ window.QUIZ_LIVRES = [
 {
 "q": "Avant d'utiliser un extincteur, tu t'assures d'avoir…",
 "ch": [
+"personne autour pour t'aider",
 "une sortie dans ton dos",
-"le dos au mur",
 "les fenêtres fermées",
-"personne autour pour t'aider"
+"le dos au mur"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
 "q": "Le détecteur photoélectrique réagit surtout…",
 "ch": [
-"aux feux qui couvent (grosses particules de fumée)",
-"aux feux vifs seulement",
-"au CO",
-"à la chaleur"
+"à la chaleur",
+"au monoxyde de carbone (CO) qui s'accumule",
+"aux feux vifs seulement, avec de petites particules",
+"aux feux qui couvent (grosses particules de fumée)"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Le bouton « Silence signal » du panneau…",
 "ch": [
-"arrête les avertisseurs, sans réarmer",
-"réarme tout",
-"appelle les pompiers",
-"teste les batteries"
+"teste les batteries",
+"appelle automatiquement les pompiers de la ville",
+"réarme tout le système et remet les zones en service",
+"arrête les avertisseurs, sans réarmer"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Un réseau avertisseur se lit comme une chaîne :",
 "ch": [
+"sorties → panneau → entrées, dans le sens du courant",
 "entrées → panneau → sorties",
-"sorties → entrées",
-"panneau seulement",
-"aucun ordre"
+"aucun ordre",
+"le panneau seulement : il décide de tout sans entrées"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 }
 ]
@@ -6695,23 +6695,23 @@ window.QUIZ_LIVRES = [
 {
 "q": "Pendant une mise hors service des gicleurs, il faut…",
 "ch": [
+"couper l'électricité",
+"rien de spécial si le panneau d'alarme fonctionne",
 "une personne de garde qui fait des rondes",
-"fermer l'immeuble",
-"rien de spécial",
-"couper l'électricité"
+"fermer l'immeuble jusqu'à ce que les gicleurs reviennent"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Avant des travaux de soudure dans l'immeuble :",
 "ch": [
-"un permis de travail à chaud signé",
 "une simple autorisation verbale",
+"couper l'eau",
 "rien",
-"couper l'eau"
+"un permis de travail à chaud signé"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
@@ -6727,9 +6727,9 @@ window.QUIZ_LIVRES = [
 "q": "Les batteries du panneau d'alarme : on vérifie…",
 "ch": [
 "la date, le gonflement, la corrosion et le trouble « LOW BATT »",
-"seulement leur couleur",
-"rien, elles sont éternelles",
-"leur prix"
+"leur prix",
+"rien : elles se rechargent toutes seules pour toujours",
+"seulement leur couleur et l'autocollant du fabricant"
 ],
 "bon": 0,
 "s": 20
@@ -6737,76 +6737,76 @@ window.QUIZ_LIVRES = [
 {
 "q": "L'éclairage de secours se teste…",
 "ch": [
-"chaque mois avec le bouton d'essai",
-"jamais",
-"chaque 10 ans",
-"seulement à l'achat"
+"aux 10 ans, lors de l'inspection complète du bâtiment",
+"seulement à l'achat",
+"jamais : il s'allume seul en cas de panne",
+"chaque mois avec le bouton d'essai"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Le sélecteur de la génératrice doit être en position…",
 "ch": [
-"AUTO",
-"MANUEL",
 "ARRÊT",
+"MANUEL",
+"AUTO",
 "TEST"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Le panneau consomme peu en veille et beaucoup…",
 "ch": [
-"en alarme",
 "la nuit",
 "l'été",
+"en alarme",
 "jamais"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "L'étiquette « hors service » indique…",
 "ch": [
+"le prix de la réparation et le nom de l'entrepreneur",
 "le système, la vanne, la zone, depuis quand et la raison",
-"le prix de la réparation",
-"le nom du locataire",
-"rien"
-],
-"bon": 0,
-"s": 20
-},
-{
-"q": "Ampoule de gicleur rouge : température nominale…",
-"ch": [
-"57 °C",
-"68 °C",
-"93 °C",
-"141 °C"
+"rien",
+"le nom du locataire qui a signalé le problème"
 ],
 "bon": 1,
 "s": 20
 },
 {
+"q": "Ampoule de gicleur rouge : température nominale…",
+"ch": [
+"93 °C",
+"141 °C",
+"57 °C",
+"68 °C"
+],
+"bon": 3,
+"s": 20
+},
+{
 "q": "Le type de réseau de gicleurs dépend surtout de…",
 "ch": [
+"le nombre de logements",
 "la tuyauterie peut-elle geler?",
 "la couleur des murs",
-"le nombre de logements",
 "la marque"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
 "q": "Un stationnement non chauffé est souvent protégé par un réseau…",
 "ch": [
 "sous air (sec)",
-"sous eau",
-"à mousse",
-"sans eau"
+"sans eau",
+"à mousse, comme dans un garage de camions",
+"sous eau, avec des têtes chauffées l'hiver"
 ],
 "bon": 0,
 "s": 20
@@ -6814,45 +6814,45 @@ window.QUIZ_LIVRES = [
 {
 "q": "Le réarmement du panneau se fait…",
 "ch": [
+"par un locataire",
 "une fois la cause connue",
-"dès que l'alarme sonne",
 "jamais",
-"par un locataire"
+"dès que l'alarme sonne"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
 "q": "Quand le courant manque, la génératrice…",
 "ch": [
+"sonne l'alarme incendie pour faire évacuer",
+"s'arrête pour ne pas surcharger le réseau d'Hydro",
 "démarre et le commutateur de transfert bascule la charge",
-"s'arrête",
-"chauffe l'eau",
 "sonne l'alarme"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Un gicleur s'ouvre…",
 "ch": [
-"seul, quand son ampoule éclate à la chaleur",
 "tous en même temps dans l'immeuble",
 "avec un bouton",
-"à la fumée seulement"
+"à la fumée seulement",
+"seul, quand son ampoule éclate à la chaleur"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Les deux grands codes de la sécurité incendie au Québec :",
 "ch": [
-"le Code de construction et le Code de sécurité",
-"le Code civil et le Code criminel",
 "le Code de la route et le Code du travail",
-"aucun"
+"le Code de construction et le Code de sécurité",
+"aucun",
+"le Code civil et le Code criminel"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 }
 ]
@@ -6875,8 +6875,8 @@ window.QUIZ_LIVRES = [
 "q": "Le poste de contrôle des gicleurs se trouve souvent…",
 "ch": [
 "au rez-de-chaussée ou au sous-sol",
-"sur le toit",
-"dans un logement",
+"sur le toit, près de la réserve d'eau",
+"dans un logement, au dernier étage",
 "dehors"
 ],
 "bon": 0,
@@ -6885,34 +6885,34 @@ window.QUIZ_LIVRES = [
 {
 "q": "Le raccord pompier sert à…",
 "ch": [
+"permettre aux pompiers de vider le réseau après un feu",
+"remplir la piscine de l'immeuble au printemps",
 "permettre aux pompiers d'alimenter le réseau",
-"remplir la piscine",
-"arroser le gazon",
 "laver les camions"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "La colonne montante a un robinet d'incendie…",
 "ch": [
+"dans chaque logement, près de la porte d'entrée",
+"au sous-sol seulement",
 "à chaque étage, dans l'escalier d'issue",
-"seulement au toit",
-"dans chaque logement",
-"au sous-sol seulement"
+"seulement au toit, pour arroser les immeubles voisins"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Une hotte de restaurant est protégée par un système fixe qui…",
 "ch": [
+"arrose d'eau toute la cuisine, y compris les friteuses",
+"sonne seulement",
 "coupe le gaz ou l'électricité et projette un agent",
-"ventile plus fort",
-"arrose d'eau",
-"sonne seulement"
+"ventile plus fort pour sortir la fumée de la cuisine"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
@@ -6927,23 +6927,23 @@ window.QUIZ_LIVRES = [
 {
 "q": "Une porte coupe-feu doit…",
 "ch": [
-"se refermer et s'enclencher seule",
-"rester ouverte avec une cale",
 "être verrouillée à clé",
-"être enlevée l'été"
+"être enlevée l'été",
+"se refermer et s'enclencher seule",
+"rester ouverte avec une cale"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Le responsable légal de l'entretien et des registres incendie :",
 "ch": [
-"le propriétaire",
 "le locataire",
 "le pompier",
+"le propriétaire",
 "le voisin"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
@@ -6965,12 +6965,12 @@ window.QUIZ_LIVRES = [
 {
 "q": "Le PSI (plan de sécurité incendie), c'est…",
 "ch": [
+"un plan de stationnement",
+"un plan de rénovation pour mettre l'immeuble aux normes",
 "un plan exigé par le Code de sécurité dans plusieurs bâtiments",
-"un plan de rénovation",
-"une police d'assurance",
-"un plan de stationnement"
+"une police d'assurance contre l'incendie exigée par la banque"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
@@ -6987,32 +6987,32 @@ window.QUIZ_LIVRES = [
 {
 "q": "L'exercice d'évacuation vérifie…",
 "ch": [
-"que le plan fonctionne dans la vraie vie",
 "la vitesse des occupants seulement",
-"la couleur des enseignes",
-"le chauffage"
+"que le plan fonctionne dans la vraie vie",
+"le chauffage",
+"la couleur des enseignes"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
 "q": "Le rôle du personnel en évacuation résidentielle :",
 "ch": [
+"fermer les fenêtres",
+"éteindre le feu avant que les pompiers arrivent",
 "guider et aider, la plupart des occupants évacuent seuls",
-"porter chaque occupant",
-"éteindre le feu",
-"fermer les fenêtres"
+"porter chaque occupant jusqu'à la sortie, un à la fois"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Une porte coupe-feu tenue ouverte par une cale :",
 "ch": [
 "priorité : on enlève la cale",
-"c'est permis l'été",
+"on la verrouille ouverte pour la journée",
 "c'est normal",
-"on la verrouille"
+"c'est permis l'été, pour aérer les corridors"
 ],
 "bon": 0,
 "s": 20
@@ -7020,23 +7020,23 @@ window.QUIZ_LIVRES = [
 {
 "q": "Où se rassemblent les occupants après l'évacuation?",
 "ch": [
-"au point de rassemblement prévu",
-"dans le hall",
+"au sous-sol",
 "dans leur auto au garage",
-"au sous-sol"
+"au point de rassemblement prévu",
+"dans le hall"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Le rapport d'exercice d'évacuation note…",
 "ch": [
-"date, durée, personnes évacuées et ce qui a fonctionné ou non",
-"la météo",
 "le menu",
-"rien"
+"la météo, le nom du préposé et l'heure du dîner",
+"date, durée, personnes évacuées et ce qui a fonctionné ou non",
+"seulement la date, pour l'afficher dans le hall"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 }
 ]
@@ -7058,54 +7058,54 @@ window.QUIZ_LIVRES = [
 {
 "q": "Un problème de réfrigérant ou de compresseur se signale…",
 "ch": [
+"au préposé, qui recharge lui-même le réfrigérant",
+"au plombier, parce qu'il y a des tuyaux de cuivre",
 "au mécanicien en réfrigération (frigoriste)",
-"au plombier",
-"au peintre",
-"au préposé"
+"au peintre"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Pourquoi l'entretien préventif est payant?",
 "ch": [
-"Moins de pannes imprévues et de réparations d'urgence",
-"Il coûte plus cher",
 "Il ne sert à rien",
-"Il remplace le frigoriste"
+"Il coûte plus cher, mais l'assurance le rembourse",
+"Moins de pannes imprévues et de réparations d'urgence",
+"Il remplace le frigoriste pour les petites réparations"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Une roue de ventilateur qui tourne encore après l'arrêt, c'est…",
 "ch": [
+"un bris de moteur qui doit être signalé tout de suite",
+"normal : on l'arrête avec la main protégée d'un gant",
 "de l'énergie résiduelle à contrôler",
-"normal, on met la main",
-"un bris",
 "un gain d'énergie"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Ton collègue t'aide à changer la courroie. Doit-il poser son propre cadenas?",
 "ch": [
-"Oui, chaque personne pose son cadenas",
-"Non, le tien suffit",
+"Jamais",
 "Seulement s'il est apprenti",
-"Jamais"
+"Non, le tien suffit",
+"Oui, chaque personne pose son cadenas"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "On ventile d'abord…",
 "ch": [
 "pour les personnes (qualité de l'air)",
-"pour le bruit",
 "pour la décoration",
-"pour chauffer"
+"pour chauffer, avec l'air chaud qui entre",
+"pour le bruit, qui couvre les sons des logements"
 ],
 "bon": 0,
 "s": 20
@@ -7122,23 +7122,23 @@ window.QUIZ_LIVRES = [
 {
 "q": "Humidité relative visée dans un bâtiment :",
 "ch": [
-"environ 30 à 50 %",
-"5 à 10 %",
-"70 à 90 %",
-"100 %"
+"100 %",
+"environ 5 à 10 %, pour éviter toute moisissure",
+"environ 70 à 90 %, pour protéger le bois",
+"environ 30 à 50 %"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "En hiver au Québec, on garde l'humidité plutôt dans le bas de la plage pour éviter…",
 "ch": [
-"la condensation sur les fenêtres",
-"les maux de dos",
+"les maux de dos et les douleurs articulaires",
+"le bruit de l'humidificateur la nuit",
 "la neige",
-"le bruit"
+"la condensation sur les fenêtres"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
@@ -7160,23 +7160,23 @@ window.QUIZ_LIVRES = [
 {
 "q": "Un moniteur de CO₂ élevé dans une classe indique surtout…",
 "ch": [
-"une ventilation insuffisante",
-"un feu",
+"un début de feu dans un appareil électrique",
+"une fuite de gaz naturel dans le local",
 "trop de chauffage",
-"une fuite de gaz"
+"une ventilation insuffisante"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Plainte de froid : avant de monter la consigne, on cherche…",
 "ch": [
+"le locataire voisin qui baisse son chauffage",
+"un nouveau thermostat plus précis à installer",
 "la vitre froide, le courant d'air, la bouche bloquée",
-"un nouveau thermostat",
-"rien",
-"le locataire voisin"
+"rien"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
@@ -7199,32 +7199,32 @@ window.QUIZ_LIVRES = [
 {
 "q": "Les fiches de cadenassage des équipements se trouvent…",
 "ch": [
-"à la station de cadenas",
 "dans ta voiture",
+"nulle part",
 "chez le locataire",
-"nulle part"
+"à la station de cadenas"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "°C = ?",
 "ch": [
+"(°F + 32) × 1,8",
 "(°F − 32) ÷ 1,8",
-"°F × 1,8",
-"°F + 32",
+"°F × 1,8 + 32",
 "°F ÷ 2"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
 "q": "Les quatre rôles d'un système CVCA :",
 "ch": [
 "chauffer, refroidir, ventiler, contrôler l'humidité",
-"laver, sécher, plier, ranger",
-"éclairer, chauffer, arroser, peindre",
-"aucun"
+"aucun",
+"chauffer, refroidir, éclairer, contrôler le bruit",
+"chauffer, filtrer l'eau, ventiler, contrôler la pression"
 ],
 "bon": 0,
 "s": 20
@@ -7248,23 +7248,23 @@ window.QUIZ_LIVRES = [
 {
 "q": "Un ventilo-convecteur, c'est…",
 "ch": [
+"un filtre à air électronique installé dans le conduit",
+"une grosse chaudière avec un ventilateur intégré",
 "un petit ventilateur et un serpentin à eau",
-"une grosse chaudière",
-"un filtre",
 "un humidificateur"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Une pièce en pression négative…",
 "ch": [
+"est fermée",
 "aspire l'air des pièces voisines",
 "pousse l'air vers les voisins",
-"n'a pas d'air",
-"est fermée"
+"n'a pas d'air"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
@@ -7288,34 +7288,34 @@ window.QUIZ_LIVRES = [
 {
 "q": "Un grincement aigu au démarrage d'un ventilateur à courroie :",
 "ch": [
+"normal",
+"moteur neuf qui s'use encore, c'est temporaire",
 "courroie qui glisse : trop lâche ou usée",
-"moteur neuf",
-"filtre propre",
-"normal"
+"filtre propre qui laisse passer trop d'air"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "On mesure le courant d'un moteur avec…",
 "ch": [
+"un manomètre",
 "une pince ampèremétrique, unité en marche",
-"un ruban à mesurer",
-"un thermomètre",
-"un manomètre"
+"un manomètre branché sur la sortie du ventilateur",
+"un multimètre sur ohms, unité arrêtée"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
 "q": "Une courroie « B48 » : le code donne…",
 "ch": [
+"la vitesse maximale en tours par minute",
 "la section et la longueur",
-"le prix",
-"la vitesse",
-"la couleur"
+"la couleur",
+"le prix et le fournisseur"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
@@ -7331,9 +7331,9 @@ window.QUIZ_LIVRES = [
 "q": "Le manomètre différentiel sur un filtre compare…",
 "ch": [
 "la pression avant et après le filtre",
-"la température",
-"l'humidité",
-"le courant"
+"le courant",
+"l'humidité de l'air qui entre et qui sort",
+"la température de l'air avant et après le filtre"
 ],
 "bon": 0,
 "s": 20
@@ -7341,31 +7341,31 @@ window.QUIZ_LIVRES = [
 {
 "q": "Nettoyer un serpentin : on commence par…",
 "ch": [
+"démarrer le ventilateur pour sécher pendant le lavage",
+"arroser tout de suite à haute pression pour gagner du temps",
 "cadenasser et protéger les composants électriques de l'eau",
-"arroser tout de suite",
-"démarrer le ventilateur",
 "enlever le moteur"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Ventilateur centrifuge ou axial : lequel ressemble à une hélice?",
 "ch": [
-"L'axial",
-"Le centrifuge",
 "Les deux",
-"Aucun"
+"L'axial",
+"Aucun",
+"Le centrifuge"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
 "q": "Entraînement direct ou par courroie : lequel a une poulie?",
 "ch": [
 "Par courroie",
-"Direct",
-"Les deux",
+"Les deux, une de chaque côté",
+"Direct, sur l'arbre du moteur",
 "Aucun"
 ],
 "bon": 0,
@@ -7374,34 +7374,34 @@ window.QUIZ_LIVRES = [
 {
 "q": "Un courant moteur plus élevé que la plaque signalétique indique…",
 "ch": [
+"rien",
 "une surcharge ou un problème",
-"un moteur en santé",
-"un filtre propre",
-"rien"
+"un moteur en santé qui travaille fort",
+"un filtre propre qui laisse passer plus d'air"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
 "q": "Le noyau d'un VRC se nettoie environ…",
 "ch": [
-"une fois par année",
-"chaque jour",
+"chaque jour, à la fin du quart de travail",
+"aux 10 ans, quand on change le moteur",
 "jamais",
-"aux 10 ans"
+"une fois par année"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Le compresseur d'un climatiseur…",
 "ch": [
+"filtre l'air et enlève l'humidité de la pièce",
 "comprime le réfrigérant et le fait circuler",
-"filtre l'air",
 "chauffe l'eau",
-"souffle l'air dans la pièce"
+"souffle l'air froid dans la pièce avec son ventilateur"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 }
 ]
@@ -7423,32 +7423,32 @@ window.QUIZ_LIVRES = [
 {
 "q": "Pourquoi un bâtiment étanche a-t-il besoin d'un échangeur d'air?",
 "ch": [
-"Pour évacuer l'humidité et les polluants en récupérant la chaleur",
-"Pour chauffer",
+"Il n'en a pas besoin : l'air passe par les murs",
+"Pour chauffer l'air froid qui entre par les fenêtres",
 "Pour faire du bruit",
-"Il n'en a pas besoin"
+"Pour évacuer l'humidité et les polluants en récupérant la chaleur"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "VRC ou VRE : lequel récupère aussi de l'humidité?",
 "ch": [
-"Le VRE",
-"Le VRC",
 "Les deux pareils",
-"Aucun"
+"Aucun",
+"Le VRC",
+"Le VRE"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Les filtres d'un VRC se changent ou se nettoient environ…",
 "ch": [
 "aux 2 ou 3 mois",
-"une fois aux 10 ans",
 "chaque jour",
-"jamais"
+"jamais",
+"une fois aux 10 ans"
 ],
 "bon": 0,
 "s": 20
@@ -7456,32 +7456,32 @@ window.QUIZ_LIVRES = [
 {
 "q": "Le dégivrage d'un VRC : ton travail…",
 "ch": [
-"vérifier que le volet bouge et que le drain coule",
-"le faire à la main chaque nuit",
-"l'arrêter",
-"rien"
+"le faire à la main chaque nuit avec un séchoir",
+"l'arrêter complètement pendant tout l'hiver",
+"rien",
+"vérifier que le volet bouge et que le drain coule"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Le réfrigérant d'un climatiseur…",
 "ch": [
-"circule en circuit fermé : s'il en manque, il y a une fuite",
-"s'use comme de l'essence",
 "se recharge chaque année",
-"est de l'eau"
+"circule en circuit fermé : s'il en manque, il y a une fuite",
+"s'use comme de l'essence et se remplit chaque année",
+"est de l'eau glacée qui circule dans les tuyaux"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
 "q": "L'écart de température d'un climatiseur se mesure…",
 "ch": [
 "entre l'air repris et l'air soufflé, après 15 minutes de marche",
-"au démarrage",
-"sur le toit",
-"dans l'eau"
+"sur le toit, entre l'air extérieur et l'air soufflé",
+"dans l'eau",
+"au démarrage, sur le tuyau de cuivre extérieur"
 ],
 "bon": 0,
 "s": 20
@@ -7506,54 +7506,54 @@ window.QUIZ_LIVRES = [
 {
 "q": "Une unité extérieure bien installée est…",
 "ch": [
+"dans le garage",
+"sous un balcon fermé pour la cacher du soleil",
 "surélevée, au-dessus du niveau de neige, bien dégagée",
-"au sol dans la neige",
-"sous un balcon fermé",
-"dans le garage"
+"au sol, collée au mur, protégée par la neige"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Le COP d'une thermopompe, c'est…",
 "ch": [
+"prix d'achat ÷ puissance en kilowatts",
+"chaleur fournie ÷ température extérieure",
 "chaleur fournie ÷ électricité consommée",
-"le prix ÷ la puissance",
-"le bruit en décibels",
 "la température extérieure"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Un COP de 3 veut dire…",
 "ch": [
+"3 fois moins d'électricité que de chaleur la nuit seulement",
+"3 °C",
 "3 fois plus de chaleur que d'électricité consommée",
-"3 kW",
-"3 ans de garantie",
-"3 °C"
+"3 kW de puissance de chauffage"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Une thermopompe affiche un code d'erreur. Tu…",
 "ch": [
-"notes le code exact, le modèle, la date et l'heure pour le frigoriste",
-"débranches et rebranches sans noter",
 "ignores le code",
-"ouvres le circuit de réfrigérant"
+"notes le code exact, le modèle, la date et l'heure pour le frigoriste",
+"ouvres le circuit de réfrigérant pour vérifier la pression",
+"débranches et rebranches pour effacer le code, sans noter"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
 "q": "Une thermopompe géothermique capte la chaleur…",
 "ch": [
 "du sol",
-"de l'air seulement",
+"du gaz",
 "du soleil directement",
-"du gaz"
+"de l'air seulement"
 ],
 "bon": 0,
 "s": 20
@@ -7561,32 +7561,32 @@ window.QUIZ_LIVRES = [
 {
 "q": "Le mode « Climatisation » d'une thermopompe murale…",
 "ch": [
-"refroidit et assèche l'air",
 "chauffe seulement",
+"humidifie",
 "ventile sans refroidir",
-"humidifie"
+"refroidit et assèche l'air"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Régulation modulante :",
 "ch": [
-"l'élément final varie (ex. vanne ouverte à 40 %)",
-"tout ou rien",
+"sans capteur : la vanne suit une minuterie",
 "manuelle seulement",
-"sans capteur"
+"tout ou rien : la vanne est ouverte ou fermée",
+"l'élément final varie (ex. vanne ouverte à 40 %)"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Un local trop chaud : on cherche où la boucle est brisée…",
 "ch": [
 "capteur, contrôleur ou élément final",
-"au toit seulement",
-"chez le voisin",
-"nulle part"
+"chez le voisin, qui a peut-être monté sa consigne",
+"nulle part",
+"au toit seulement, dans l'unité de toiture"
 ],
 "bon": 0,
 "s": 20
@@ -7611,9 +7611,9 @@ window.QUIZ_LIVRES = [
 "q": "La vanne d'inversion d'une thermopompe…",
 "ch": [
 "choisit chauffage ou climatisation",
-"coupe le courant",
-"règle l'humidité",
-"purge l'air"
+"purge l'air",
+"coupe le courant du compresseur en cas de surchauffe",
+"règle l'humidité de l'air soufflé dans la maison"
 ],
 "bon": 0,
 "s": 20
@@ -7621,12 +7621,12 @@ window.QUIZ_LIVRES = [
 {
 "q": "Régulation tout ou rien : un différentiel sert à…",
 "ch": [
-"éviter les départs et arrêts trop fréquents",
-"chauffer plus",
-"mesurer le CO₂",
-"changer la consigne"
+"mesurer le CO₂ et partir la ventilation",
+"chauffer plus quand il fait très froid dehors",
+"changer la consigne",
+"éviter les départs et arrêts trop fréquents"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
@@ -7648,9 +7648,9 @@ window.QUIZ_LIVRES = [
 "q": "Un thermostat bien placé :",
 "ch": [
 "mur intérieur, environ 1,5 m du sol",
-"près d'une fenêtre ensoleillée",
 "au-dessus d'une plinthe",
-"dans un placard"
+"dans un placard",
+"près d'une fenêtre ensoleillée"
 ],
 "bon": 0,
 "s": 20
@@ -7658,45 +7658,45 @@ window.QUIZ_LIVRES = [
 {
 "q": "L'écran de la GTB montre une température anormale. Avant de conclure…",
 "ch": [
-"va vérifier sur place : un capteur peut être brisé",
-"change le thermostat",
-"ignore",
-"appelle les pompiers"
+"ignore : l'écran se trompe souvent",
+"change le thermostat du local tout de suite",
+"appelle les pompiers",
+"va vérifier sur place : un capteur peut être brisé"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Une régulation pneumatique utilise…",
 "ch": [
-"de l'air comprimé comme signal",
-"de l'eau",
 "de la vapeur",
-"des piles"
+"de l'eau glacée comme signal entre les appareils",
+"de l'air comprimé comme signal",
+"des piles dans chaque capteur et chaque vanne"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Variables incontrôlables d'un bâtiment :",
 "ch": [
+"le débit du ventilateur et la position du volet",
+"la position du volet",
 "ensoleillement, température extérieure, occupants",
-"la consigne",
-"le débit du ventilateur",
-"la position du volet"
+"la consigne et l'horaire du thermostat"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "À l'évaluation, ce qui compte le plus :",
 "ch": [
+"la vitesse : finir avant les autres compte le plus",
+"le nombre de pages du rapport",
 "un oubli de sécurité compte plus qu'une erreur de calcul",
-"la vitesse",
-"la propreté seulement",
-"le nombre de pages du rapport"
+"la propreté du rapport et la belle écriture"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
@@ -7734,12 +7734,12 @@ window.QUIZ_LIVRES = [
 {
 "q": "Exemple de rapport : « ΔP filtre 0,9 → 0,3 po CE » veut dire…",
 "ch": [
-"la perte de pression a baissé après le changement des filtres",
-"le filtre est plus sale",
-"le ventilateur est brisé",
-"la courroie a été changée"
+"le ventilateur est brisé et tourne moins vite",
+"la courroie a été changée",
+"le filtre est plus sale après le changement",
+"la perte de pression a baissé après le changement des filtres"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
@@ -7754,34 +7754,34 @@ window.QUIZ_LIVRES = [
 {
 "q": "Le système réagit aux variables incontrôlables en ajustant…",
 "ch": [
-"les variables contrôlables (débits, températures, volets)",
-"la météo",
-"les occupants",
-"le soleil"
+"le soleil",
+"le nombre d'occupants permis dans chaque local",
+"la météo, avec les prévisions du lendemain",
+"les variables contrôlables (débits, températures, volets)"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Un problème de circuit de réfrigérant :",
 "ch": [
+"plombier, parce que le circuit est en cuivre",
 "mécanicien en réfrigération",
-"plombier",
 "électricien",
-"préposé seul"
+"préposé seul, avec une bonbonne de recharge"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
 "q": "Avant de retirer ton cadenas après l'entretien, tu vérifies…",
 "ch": [
+"le prix des filtres",
 "que tout est remonté, outils retirés, personne dans l'unité",
-"rien",
-"la météo",
-"le prix des filtres"
+"que le gestionnaire a signé le bon avant de rouvrir",
+"que le voyant de l'unité est éteint, sans ouvrir les panneaux"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 }
 ]
@@ -7803,67 +7803,67 @@ window.QUIZ_LIVRES = [
 {
 "q": "Tu t'éloignes de ton portable quelques minutes. Raccourci pour verrouiller :",
 "ch": [
-"⊞ + L",
 "Ctrl + C",
 "Alt + F4",
+"⊞ + L",
 "⊞ + E"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Le port qui sert à brancher un écran ou un projecteur :",
 "ch": [
-"HDMI",
-"Prise audio",
 "Lecteur de carte",
+"Prise audio",
+"HDMI",
 "Prise réseau"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Pourquoi faire les mises à jour de Windows?",
 "ch": [
+"Ce n'est pas utile",
+"Pour libérer de l'espace sur le disque dur",
 "Elles corrigent des failles de sécurité",
-"Pour changer les couleurs",
-"Pour ralentir l'ordinateur",
-"Ce n'est pas utile"
+"Pour changer les couleurs et le fond d'écran"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "La batterie au lithium-ion s'use surtout quand elle reste longtemps…",
 "ch": [
+"éteinte",
 "vide ou pleine à 100 %",
-"à moitié",
-"au frais",
-"éteinte"
+"au frais, dans un local sous 20 °C",
+"à moitié chargée, entre 40 et 60 %"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
 "q": "Passer d'une fenêtre ouverte à l'autre :",
 "ch": [
-"Alt + Tab",
-"Ctrl + Z",
 "⊞ + L",
-"F2"
+"Ctrl + Z",
+"F2",
+"Alt + Tab"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Copier :",
 "ch": [
-"Ctrl + C",
 "Ctrl + V",
 "Ctrl + X",
-"Ctrl + Z"
+"Ctrl + Z",
+"Ctrl + C"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
@@ -7881,9 +7881,9 @@ window.QUIZ_LIVRES = [
 "q": "Un message d'erreur, c'est…",
 "ch": [
 "un indice : on le lit en entier",
-"une insulte",
+"une fenêtre à fermer rapidement sans la lire",
 "un virus",
-"à fermer sans lire"
+"un signe que l'ordinateur est brisé pour de bon"
 ],
 "bon": 0,
 "s": 20
@@ -7892,9 +7892,9 @@ window.QUIZ_LIVRES = [
 "q": "Ouvrir l'Explorateur de fichiers :",
 "ch": [
 "⊞ + E",
+"Alt + Tab",
 "⊞ + L",
-"Ctrl + F",
-"Alt + Tab"
+"Ctrl + F"
 ],
 "bon": 0,
 "s": 20
@@ -7902,21 +7902,21 @@ window.QUIZ_LIVRES = [
 {
 "q": "Renommer un fichier sélectionné :",
 "ch": [
-"F2",
+"Échap",
 "F5",
-"Suppr",
-"Échap"
+"F2",
+"Suppr"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Le chemin d'un fichier, c'est…",
 "ch": [
 "son adresse complète, dossier par dossier",
-"sa taille",
-"sa date",
-"son icône"
+"sa taille et la date de sa dernière modification",
+"son icône",
+"le nom du programme qui sert à l'ouvrir"
 ],
 "bon": 0,
 "s": 20
@@ -7924,45 +7924,45 @@ window.QUIZ_LIVRES = [
 {
 "q": "Le poste de travail du portable :",
 "ch": [
-"une surface dure, propre et sèche, loin de l'eau",
-"sur un lit",
-"sur l'établi à côté de la soudure",
-"par terre"
+"par terre",
+"sur un lit ou un sofa, pour être à l'aise",
+"sur l'établi, à côté du poste de soudure",
+"une surface dure, propre et sèche, loin de l'eau"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Coller :",
 "ch": [
-"Ctrl + V",
-"Ctrl + C",
 "Ctrl + X",
+"Ctrl + C",
+"Ctrl + V",
 "Ctrl + Z"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Annuler la dernière action :",
 "ch": [
-"Ctrl + Z",
 "Ctrl + Y",
 "Ctrl + P",
+"Ctrl + Z",
 "Alt + F4"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Épingler une application à la barre des tâches sert à…",
 "ch": [
-"l'ouvrir plus vite",
-"la supprimer",
 "la cacher",
-"la mettre à jour"
+"la mettre à jour",
+"la supprimer",
+"l'ouvrir plus vite"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 }
 ]
@@ -7995,8 +7995,8 @@ window.QUIZ_LIVRES = [
 "q": "Partager un fichier OneDrive : plutôt qu'une pièce jointe, on envoie…",
 "ch": [
 "un lien",
-"une photo de l'écran",
 "une clé USB",
+"une photo de l'écran",
 "un fax"
 ],
 "bon": 0,
@@ -8005,34 +8005,34 @@ window.QUIZ_LIVRES = [
 {
 "q": "Clé USB perdue ou brisée :",
 "ch": [
+"OneDrive la récupère automatiquement en tout temps",
 "tout est perdu, aucune sauvegarde",
-"OneDrive la récupère",
-"Windows la répare",
+"Windows la répare quand on la rebranche",
 "rien n'est perdu"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
 "q": "Un fichier « en ligne seulement » sur OneDrive…",
 "ch": [
+"est supprimé du portable et de la corbeille",
 "est dans le nuage, pas sur le portable",
-"est supprimé",
-"est privé",
-"est un virus"
+"est un virus",
+"est privé et ne peut pas être partagé"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
 "q": "Dans https://www.hydroquebec.com/residentiel, le domaine est…",
 "ch": [
-"hydroquebec.com",
 "https",
 "residentiel",
+"hydroquebec.com",
 "www"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
@@ -8054,34 +8054,34 @@ window.QUIZ_LIVRES = [
 {
 "q": "L'hameçonnage, c'est…",
 "ch": [
+"une technique de pêche sportive en eau douce",
 "un faux message qui imite une entreprise pour voler tes informations",
-"une pêche",
-"une mise à jour",
+"une mise à jour de sécurité envoyée par courriel",
 "un antivirus"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
 "q": "Tu as cliqué sur un lien douteux :",
 "ch": [
+"tu cliques encore",
+"tu éteins l'ordinateur et tu ne l'utilises plus",
 "tu avises tout de suite, sans cacher",
-"tu ne dis rien",
-"tu éteins pour toujours",
-"tu cliques encore"
+"tu ne dis rien et tu effaces le message"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "La double authentification demande…",
 "ch": [
+"deux courriels",
 "deux preuves sur trois (ce que tu sais, ce que tu as, ce que tu es)",
-"deux mots de passe identiques",
-"deux ordinateurs",
-"deux courriels"
+"deux mots de passe identiques, tapés deux fois",
+"deux ordinateurs branchés sur le même compte"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
@@ -8089,8 +8089,8 @@ window.QUIZ_LIVRES = [
 "ch": [
 "Cci",
 "Cc",
-"Les deux",
-"Aucun"
+"Aucun",
+"Les deux"
 ],
 "bon": 0,
 "s": 20
@@ -8098,56 +8098,56 @@ window.QUIZ_LIVRES = [
 {
 "q": "Un bon courriel professionnel se comprend en…",
 "ch": [
-"30 secondes",
-"une heure",
 "une journée",
-"jamais"
+"jamais",
+"une heure",
+"30 secondes"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Le cadenas dans la barre d'adresse (HTTPS) veut dire…",
 "ch": [
-"la connexion est chiffrée",
+"rien",
 "le site est forcément honnête",
-"le site est gratuit",
-"rien"
+"la connexion est chiffrée",
+"le site est gratuit"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Un rançongiciel…",
 "ch": [
-"bloque tes fichiers et demande une rançon",
-"accélère l'ordinateur",
-"est un antivirus",
-"est une mise à jour"
+"accélère l'ordinateur en effaçant les vieux fichiers",
+"un antivirus gratuit installé avec Windows",
+"est une mise à jour",
+"bloque tes fichiers et demande une rançon"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Ajouter une page aux favoris :",
 "ch": [
+"Ctrl + S",
 "Ctrl + D",
 "Ctrl + F",
-"Ctrl + S",
 "Ctrl + T"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
 "q": "Envoyer un courriel rapidement :",
 "ch": [
+"F2",
 "Ctrl + Entrée",
-"Ctrl + E",
-"Alt + Tab",
-"F2"
+"Ctrl + E (envoyer)",
+"Alt + Tab (changer de fenêtre)"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 }
 ]
@@ -8169,129 +8169,19 @@ window.QUIZ_LIVRES = [
 {
 "q": "Dégât d'eau en cours : quel moyen de communication?",
 "ch": [
-"Le téléphone, puis Teams",
 "Un courriel",
 "Une lettre",
+"Le téléphone, puis Teams",
 "Un texto la semaine prochaine"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Mettre en gras dans Word :",
 "ch": [
 "Ctrl + G",
-"Ctrl + I",
-"Ctrl + U",
-"Ctrl + B"
-],
-"bon": 0,
-"s": 20
-},
-{
-"q": "Souligné rouge dans Word :",
-"ch": [
-"orthographe",
-"grammaire",
-"lien",
-"commentaire"
-],
-"bon": 0,
-"s": 20
-},
-{
-"q": "Un avis affiché aux locataires doit…",
-"ch": [
-"se comprendre en quelques secondes, parfois de loin",
-"être long et détaillé",
-"être en petits caractères",
-"être écrit à la main"
-],
-"bon": 0,
-"s": 20
-},
-{
-"q": "Avant de prendre ses outils, on lit tout le bon de travail, surtout…",
-"ch": [
-"les directives",
-"le logo",
-"la date d'impression",
-"la police"
-],
-"bon": 0,
-"s": 20
-},
-{
-"q": "L'habillage d'une image dans Word décide…",
-"ch": [
-"comment le texte se place autour de l'image",
-"la couleur de l'image",
-"la taille de la page",
-"le titre"
-],
-"bon": 0,
-"s": 20
-},
-{
-"q": "Créer un modèle de bon de travail dans Word :",
-"ch": [
-"Fichier → Enregistrer sous → Modèle",
-"Imprimer",
-"Copier-coller chaque fois",
-"Envoyer par courriel"
-],
-"bon": 0,
-"s": 20
-},
-{
-"q": "La signature de courriel s'ajoute…",
-"ch": [
-"automatiquement à chaque message une fois configurée",
-"à la main chaque fois",
-"jamais",
-"seulement dans Teams"
-],
-"bon": 0,
-"s": 20
-},
-{
-"q": "Pourquoi écrire « 45 » et non « 45 piasses » dans Excel?",
-"ch": [
-"Excel calcule seulement ce qu'il reconnaît comme nombre",
-"C'est plus joli",
-"Pour économiser l'encre",
-"Ça ne change rien"
-],
-"bon": 0,
-"s": 20
-},
-{
-"q": "Raccourci pour une somme automatique :",
-"ch": [
-"Alt + =",
-"Ctrl + S",
-"F2",
-"⊞ + L"
-],
-"bon": 0,
-"s": 20
-},
-{
-"q": "Recopier une formule sur 30 lignes : on tire…",
-"ch": [
-"la poignée de recopie",
-"la barre des tâches",
-"le titre",
-"la fenêtre"
-],
-"bon": 0,
-"s": 20
-},
-{
-"q": "Chercher et remplacer un mot dans Word :",
-"ch": [
-"Ctrl + H",
-"Ctrl + G",
+"Ctrl + B",
 "Ctrl + I",
 "Ctrl + U"
 ],
@@ -8299,36 +8189,146 @@ window.QUIZ_LIVRES = [
 "s": 20
 },
 {
-"q": "Une date écrite « 3 sept. » dans Excel…",
+"q": "Souligné rouge dans Word :",
 "ch": [
-"peut ne pas être reconnue comme une date",
-"est parfaite",
-"fait une somme",
-"devient un graphique"
+"lien",
+"grammaire",
+"orthographe",
+"commentaire"
+],
+"bon": 2,
+"s": 20
+},
+{
+"q": "Un avis affiché aux locataires doit…",
+"ch": [
+"être long et détaillé pour couvrir tous les cas",
+"être en petits caractères pour tenir sur une page",
+"se comprendre en quelques secondes, parfois de loin",
+"être écrit à la main"
+],
+"bon": 2,
+"s": 20
+},
+{
+"q": "Avant de prendre ses outils, on lit tout le bon de travail, surtout…",
+"ch": [
+"les directives",
+"le logo",
+"la police",
+"la date d'impression"
 ],
 "bon": 0,
+"s": 20
+},
+{
+"q": "L'habillage d'une image dans Word décide…",
+"ch": [
+"la taille de la page autour de l'image",
+"le titre",
+"la couleur et la luminosité de l'image",
+"comment le texte se place autour de l'image"
+],
+"bon": 3,
+"s": 20
+},
+{
+"q": "Créer un modèle de bon de travail dans Word :",
+"ch": [
+"Imprimer",
+"Fichier → Enregistrer sous → Modèle",
+"Envoyer par courriel",
+"Copier-coller chaque fois"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "La signature de courriel s'ajoute…",
+"ch": [
+"seulement dans Teams",
+"automatiquement à chaque message une fois configurée",
+"à la main chaque fois, en bas du message",
+"seulement dans Teams, pas dans Outlook"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Pourquoi écrire « 45 » et non « 45 piasses » dans Excel?",
+"ch": [
+"C'est plus joli et plus facile à lire",
+"Ça ne change rien : Excel enlève le mot tout seul",
+"Pour économiser l'encre",
+"Excel calcule seulement ce qu'il reconnaît comme nombre"
+],
+"bon": 3,
+"s": 20
+},
+{
+"q": "Raccourci pour une somme automatique :",
+"ch": [
+"Ctrl + S",
+"F2",
+"⊞ + L",
+"Alt + ="
+],
+"bon": 3,
+"s": 20
+},
+{
+"q": "Recopier une formule sur 30 lignes : on tire…",
+"ch": [
+"la fenêtre",
+"la poignée de recopie",
+"la barre des tâches",
+"le titre"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Chercher et remplacer un mot dans Word :",
+"ch": [
+"Ctrl + U",
+"Ctrl + H",
+"Ctrl + I",
+"Ctrl + G"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Une date écrite « 3 sept. » dans Excel…",
+"ch": [
+"est parfaite : Excel comprend toutes les dates",
+"devient un graphique",
+"fait une somme avec les autres dates de la colonne",
+"peut ne pas être reconnue comme une date"
+],
+"bon": 3,
 "s": 20
 },
 {
 "q": "Transformer une plage en tableau Excel :",
 "ch": [
-"Ctrl + T",
 "Ctrl + B",
-"Alt + =",
-"F5"
+"F5",
+"Ctrl + T",
+"Alt + ="
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Le cycle de la gestion de l'entretien va…",
 "ch": [
-"du correctif au préventif",
-"du préventif au rien",
 "de la paie au congé",
-"du plan au bail"
+"du préventif au rien",
+"du plan au bail",
+"du correctif au préventif"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 }
 ]
@@ -8350,42 +8350,42 @@ window.QUIZ_LIVRES = [
 {
 "q": "$A$1 dans une formule, c'est une référence…",
 "ch": [
+"fausse",
+"relative (elle change quand on recopie)",
 "absolue (elle ne bouge pas quand on recopie)",
-"relative",
-"en couleur",
-"fausse"
+"fausse : Excel l'affiche en rouge"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "La fonction SI dans un inventaire sert à…",
 "ch": [
+"imprimer",
+"trier la liste en ordre alphabétique",
 "afficher une réponse selon le cas (ex. « Commander » si le stock est bas)",
-"faire une somme",
-"trier",
-"imprimer"
+"faire la somme de tous les articles du stock"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Un registre d'entretien, c'est…",
 "ch": [
-"une ligne par intervention, toujours les mêmes colonnes",
-"un dessin",
-"une photo",
-"un courriel"
+"une photo de chaque appareil avec sa date",
+"un dessin du bâtiment avec les pannes marquées",
+"un courriel",
+"une ligne par intervention, toujours les mêmes colonnes"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Un graphique sert à…",
 "ch": [
 "voir en une seconde une tendance ou un mois anormal",
-"cacher les chiffres",
-"remplacer le registre",
+"cacher les chiffres qui sont mauvais",
+"remplacer le registre d'entretien au complet",
 "décorer"
 ],
 "bon": 0,
@@ -8394,45 +8394,45 @@ window.QUIZ_LIVRES = [
 {
 "q": "GMAO veut dire…",
 "ch": [
+"grille de mesures",
+"garantie maximale offerte par le fabricant",
 "gestion de la maintenance assistée par ordinateur",
-"grand magasin d'outils",
-"garantie maximale",
-"grille de mesures"
+"grand magasin d'outils et d'achats en ligne"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Entretien préventif ou correctif : lequel se fait avant la panne?",
 "ch": [
+"Aucun",
 "Préventif",
 "Correctif",
-"Les deux",
-"Aucun"
+"Les deux"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
 "q": "Un code QR collé sur un équipement peut ouvrir…",
 "ch": [
-"sa fiche ou son manuel",
-"la porte",
-"la machine",
-"un jeu"
+"la machine à distance, pour la démarrer",
+"un jeu",
+"la porte du local mécanique, sans clé",
+"sa fiche ou son manuel"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Microsoft Forms permet de…",
 "ch": [
+"jouer de la musique",
 "remplir un bon de travail sur le cellulaire",
-"écrire une lettre",
-"dessiner un plan",
-"jouer de la musique"
+"dessiner un plan du bâtiment à l'échelle",
+"écrire une lettre officielle avec un en-tête"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
@@ -8455,21 +8455,21 @@ window.QUIZ_LIVRES = [
 {
 "q": "Après une réponse de l'IA, tu vérifies…",
 "ch": [
+"rien : elle a toujours raison sur les faits",
 "les faits : dates, chiffres, modèles, prix",
-"rien, elle a toujours raison",
-"seulement l'orthographe",
+"seulement l'orthographe et la ponctuation",
 "la couleur"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
 "q": "Avec une IA, on n'écrit jamais…",
 "ch": [
 "des renseignements personnels des locataires",
-"une demande de courriel poli",
-"une question sur un manuel",
-"un plan de travail"
+"un plan de travail",
+"une question sur un manuel d'appareil",
+"une demande de courriel poli au gestionnaire"
 ],
 "bon": 0,
 "s": 20,
@@ -8478,20 +8478,20 @@ window.QUIZ_LIVRES = [
 {
 "q": "Un agent IA, à la différence d'un assistant…",
 "ch": [
+"répond seulement aux questions, une à la fois",
 "agit : il fait lui-même plusieurs étapes",
-"répond seulement",
 "n'existe pas",
-"est un humain"
+"est un humain qui travaille à distance"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
 "q": "La fonction =AUJOURDHUI() dans un plan préventif sert à…",
 "ch": [
 "calculer si une tâche est due ou en retard",
-"afficher la météo",
-"trier les noms",
+"afficher la météo du jour dans la feuille",
+"trier les noms des préposés par ordre",
 "faire un graphique"
 ],
 "bon": 0,
@@ -8500,23 +8500,23 @@ window.QUIZ_LIVRES = [
 {
 "q": "Interfaces des systèmes du bâtiment : règle d'or…",
 "ch": [
-"lire tout l'écran avant de toucher et noter chaque changement",
-"tout essayer au hasard",
-"changer les consignes sans noter",
-"redémarrer tout"
+"redémarrer tout",
+"changer les consignes sans noter, puis revenir",
+"tout essayer au hasard pour trouver plus vite",
+"lire tout l'écran avant de toucher et noter chaque changement"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Pour un courriel de travail avec l'IA, le bon choix :",
 "ch": [
+"aucun",
 "Copilot avec le compte de l'école ou de l'employeur",
-"un site inconnu",
-"le compte d'un ami",
-"aucun"
+"le compte personnel d'un ami qui paie l'abonnement",
+"un site inconnu gratuit trouvé sur Internet"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 }
 ]
@@ -8538,21 +8538,21 @@ window.QUIZ_LIVRES = [
 {
 "q": "Communiquer, c'est s'assurer que le message est…",
 "ch": [
-"reçu et compris",
-"dit une fois",
 "écrit en majuscules",
-"envoyé vite"
+"dit une fois",
+"envoyé vite",
+"reçu et compris"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Urgence ou preuve? « Urgence → parle; preuve → … »",
 "ch": [
 "écris (courriel, registre, bon de travail)",
-"parle plus fort",
-"attends",
-"texte un ami"
+"parle plus fort pour qu'on s'en souvienne",
+"texte un ami",
+"attends que quelqu'un te le demande"
 ],
 "bon": 0,
 "s": 20
@@ -8560,23 +8560,23 @@ window.QUIZ_LIVRES = [
 {
 "q": "Le non-verbal, c'est…",
 "ch": [
+"le téléphone",
 "tout sauf les mots : visage, regard, posture",
-"les mots",
-"l'écriture",
-"le téléphone"
+"l'écriture des courriels et des avis",
+"les mots qu'on choisit pour parler poliment"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
 "q": "Avec un locataire ou le gestionnaire, le niveau de langue :",
 "ch": [
-"correct et poli, pas comme entre amis au chalet",
-"familier avec des sacres",
-"très soutenu et compliqué",
-"anglais seulement"
+"anglais seulement",
+"familier, avec des sacres pour avoir l'air proche",
+"très soutenu, avec des mots compliqués",
+"correct et poli, pas comme entre amis au chalet"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
@@ -8584,8 +8584,8 @@ window.QUIZ_LIVRES = [
 "ch": [
 "« reçu »",
 "rien",
-"« oui oui »",
-"plus tard"
+"plus tard",
+"« oui oui »"
 ],
 "bon": 0,
 "s": 20
@@ -8593,21 +8593,21 @@ window.QUIZ_LIVRES = [
 {
 "q": "En service à la clientèle, on écoute…",
 "ch": [
+"moins qu'on parle, pour bien expliquer",
 "au moins deux fois plus qu'on parle",
-"moins qu'on parle",
-"seulement au début",
-"jamais"
+"jamais",
+"seulement au début, puis on propose la solution"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
 "q": "Reformuler, c'est…",
 "ch": [
 "redire dans tes mots pour vérifier que tu as compris",
-"répéter mot à mot",
+"corriger la personne quand elle se trompe",
 "changer de sujet",
-"corriger la personne"
+"répéter mot à mot ce que la personne a dit"
 ],
 "bon": 0,
 "s": 20
@@ -8615,12 +8615,12 @@ window.QUIZ_LIVRES = [
 {
 "q": "La technique de l'entonnoir pour une fuite :",
 "ch": [
-"des questions ouvertes, puis de plus en plus précises",
-"seulement des questions fermées",
 "aucune question",
-"deviner"
+"des questions ouvertes, puis de plus en plus précises",
+"seulement des questions fermées, oui ou non",
+"deviner la cause et aller réparer"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
@@ -8643,12 +8643,12 @@ window.QUIZ_LIVRES = [
 {
 "q": "Le locataire n'est pas là pendant ton intervention. Tu laisses…",
 "ch": [
-"une carte de passage",
 "rien",
+"une carte de passage",
 "la porte ouverte",
 "un mot sur Facebook"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
@@ -8671,23 +8671,23 @@ window.QUIZ_LIVRES = [
 {
 "q": "Les Habitations du Parc comptent…",
 "ch": [
+"1 logement",
+"6 logements sur 2 étages",
 "48 logements sur 4 étages",
-"6 logements",
-"200 logements",
-"1 logement"
+"200 logements sur 12 étages"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Une demande mal transmise peut devenir…",
 "ch": [
-"un dégât d'eau",
-"une bonne nouvelle",
 "un congé",
-"rien"
+"rien",
+"un dégât d'eau",
+"une bonne nouvelle"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
@@ -8695,8 +8695,8 @@ window.QUIZ_LIVRES = [
 "ch": [
 "parlent avant toi",
 "n'ont aucune importance",
-"sont privés",
-"changent le loyer"
+"changent le loyer",
+"sont privés"
 ],
 "bon": 0,
 "s": 20
@@ -8704,12 +8704,12 @@ window.QUIZ_LIVRES = [
 {
 "q": "Une question ouverte commence souvent par…",
 "ch": [
-"« Pouvez-vous me décrire… »",
 "« Est-ce que oui ou non… »",
 "« Vous êtes sûr? »",
+"« Pouvez-vous me décrire… »",
 "« Non? »"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 }
 ]
@@ -8732,8 +8732,8 @@ window.QUIZ_LIVRES = [
 "q": "Dire non à une demande qui ne relève pas de toi :",
 "ch": [
 "expliquer et proposer à qui s'adresser",
-"ignorer la personne",
-"dire oui quand même",
+"ignorer la personne pour ne pas perdre de temps",
+"dire oui quand même, puis ne rien faire",
 "raccrocher"
 ],
 "bon": 0,
@@ -8742,12 +8742,12 @@ window.QUIZ_LIVRES = [
 {
 "q": "Le logement, même si l'immeuble appartient au propriétaire, c'est…",
 "ch": [
-"le chez-soi du locataire",
 "le bureau du préposé",
-"un espace commun",
-"un entrepôt"
+"le chez-soi du locataire",
+"un entrepôt",
+"un espace commun"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
@@ -8763,45 +8763,45 @@ window.QUIZ_LIVRES = [
 {
 "q": "La « bulle » d'une personne :",
 "ch": [
+"son espace personnel sur son téléphone",
 "la distance à respecter pour ne pas l'envahir",
-"une bulle de savon",
 "son logement",
-"son téléphone"
+"la pièce où elle se sent bien chez elle"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
 "q": "Une consigne pas claire :",
 "ch": [
+"je devine ce que le gestionnaire veut dire",
+"je demande à un locataire ce qu'il en pense",
 "je pose des questions et je reformule",
-"je devine",
-"je ne fais rien",
-"je demande à un locataire"
+"je ne fais rien"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Rendre compte, c'est informer ton supérieur de…",
 "ch": [
+"la météo et l'état des stationnements",
+"tes vacances et tes congés de la semaine",
 "ce que tu as fait, trouvé et ce qui reste",
-"tes vacances",
-"la météo",
 "rien"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "La passation de quart sert à…",
 "ch": [
-"transmettre l'information entre préposés qui se relaient",
-"changer d'uniforme",
-"fermer l'immeuble",
-"rien"
+"changer d'uniforme entre deux quarts",
+"rien",
+"fermer l'immeuble pendant la nuit",
+"transmettre l'information entre préposés qui se relaient"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
@@ -8824,21 +8824,21 @@ window.QUIZ_LIVRES = [
 {
 "q": "Le message « je » sert à…",
 "ch": [
+"accuser l'autre de façon claire et directe",
 "régler un irritant sans attaquer",
-"accuser l'autre",
 "se vanter",
-"commander"
+"commander sans avoir à expliquer"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
 "q": "Le bon de travail se remplit…",
 "ch": [
 "pendant ou juste après l'intervention",
-"à la fin de la semaine",
 "jamais",
-"par le locataire"
+"à la fin de la semaine, tous en même temps",
+"par le locataire, qui le signe à la fin"
 ],
 "bon": 0,
 "s": 20
@@ -8847,9 +8847,9 @@ window.QUIZ_LIVRES = [
 "q": "Fait ou opinion? « La locataire était saoule. »",
 "ch": [
 "Opinion : on écrit ce qu'on a observé",
-"Fait",
-"Les deux",
-"Une preuve"
+"Une preuve",
+"Les deux : un fait et une opinion à la fois",
+"Fait : c'est ce que tout le monde a vu"
 ],
 "bon": 0,
 "s": 20
@@ -8857,21 +8857,21 @@ window.QUIZ_LIVRES = [
 {
 "q": "Avant d'entrer chez quelqu'un :",
 "ch": [
-"frapper, se présenter et expliquer la raison",
-"entrer avec ta clé sans frapper",
 "attendre dans le corridor sans rien dire",
+"entrer avec ta clé sans frapper",
+"frapper, se présenter et expliquer la raison",
 "appeler la police"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Une personne âgée qui entend mal :",
 "ch": [
 "parler face à elle, lentement et clairement",
-"crier",
-"parler vite",
-"ignorer"
+"parler vite pour ne pas la retenir",
+"ignorer",
+"crier fort pour être sûr qu'elle entende"
 ],
 "bon": 0,
 "s": 20
@@ -8879,23 +8879,23 @@ window.QUIZ_LIVRES = [
 {
 "q": "Admettre une erreur à ton supérieur :",
 "ch": [
-"tout de suite, avec les faits",
+"en accusant un collègue",
 "jamais",
 "à la fin de l'année",
-"en accusant un collègue"
+"tout de suite, avec les faits"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Le rapport d'incident contient…",
 "ch": [
-"des faits, en ordre chronologique",
-"des opinions",
-"des rumeurs",
-"rien"
+"des rumeurs entendues dans le corridor",
+"rien",
+"des opinions sur ce qui s'est passé",
+"des faits, en ordre chronologique"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 }
 ]
@@ -8917,12 +8917,12 @@ window.QUIZ_LIVRES = [
 {
 "q": "Une bonne photo-preuve :",
 "ch": [
-"une vue d'ensemble pour situer, puis un gros plan",
-"seulement un gros plan flou",
+"une photo de nuit, sans flash, de loin",
 "un selfie",
-"une photo de nuit sans flash"
+"une vue d'ensemble pour situer, puis un gros plan",
+"seulement un gros plan, même un peu flou"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
@@ -8940,32 +8940,32 @@ window.QUIZ_LIVRES = [
 {
 "q": "Abréviation acceptée pour l'heure :",
 "ch": [
-"10 h 15",
-"10hr15",
+"10 heurs 15",
 "10:15hres",
-"10 heurs 15"
+"10hr15",
+"10 h 15"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Mettre quelqu'un en attente au téléphone :",
 "ch": [
+"parler à quelqu'un d'autre",
+"raccrocher et rappeler quand tu as le temps",
 "« Puis-je vous mettre en attente une minute? » et attendre le oui",
-"appuyer sans rien dire",
-"raccrocher",
-"parler à quelqu'un d'autre"
+"appuyer sur le bouton d'attente sans rien dire"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Quand quelqu'un demande d'être rappelé :",
 "ch": [
 "ne pas promettre d'heure : « Je lui transmets votre message dès maintenant »",
-"promettre dans 5 minutes",
+"donner le numéro de cellulaire du gestionnaire",
 "ignorer",
-"donner le cellulaire du gestionnaire"
+"promettre un rappel dans 5 minutes pour la rassurer"
 ],
 "bon": 0,
 "s": 20
@@ -8973,21 +8973,21 @@ window.QUIZ_LIVRES = [
 {
 "q": "Avant d'appeler pour une pièce, on note…",
 "ch": [
-"les informations de la plaque signalétique",
-"la couleur de l'appareil",
-"le nom du voisin",
-"rien"
+"la couleur et la marque peintes sur l'appareil",
+"le nom du locataire qui a fait la demande",
+"rien",
+"les informations de la plaque signalétique"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Près de chaque téléphone de l'immeuble, on affiche…",
 "ch": [
 "l'adresse exacte, le code postal et les entrées",
-"des blagues",
-"le menu",
-"rien"
+"rien",
+"des blagues et des messages pour le personnel",
+"le menu du restaurant le plus proche"
 ],
 "bon": 0,
 "s": 20,
@@ -8996,65 +8996,65 @@ window.QUIZ_LIVRES = [
 {
 "q": "Ta boîte vocale professionnelle :",
 "ch": [
-"sans musique ni blague, avec ton nom",
-"une chanson",
 "vide",
-"une blague"
+"une blague pour mettre les gens de bonne humeur",
+"sans musique ni blague, avec ton nom",
+"une chanson populaire avec ton prénom à la fin"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "L'iceberg de la colère : le frigo brisé n'est que…",
 "ch": [
+"tout le problème : on le répare et c'est réglé",
+"un détail",
 "la pointe : dessous, la fatigue, l'inquiétude, d'autres soucis",
-"tout le problème",
-"une excuse",
-"un détail"
+"une excuse pour se plaindre du loyer"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Plus tu reconnais tôt les signes d'escalade…",
 "ch": [
-"plus il est facile de calmer la situation",
-"plus c'est dangereux",
 "rien ne change",
-"plus il faut crier"
+"plus il faut parler fort pour reprendre le contrôle",
+"plus c'est dangereux d'intervenir",
+"plus il est facile de calmer la situation"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Quand quelqu'un crie contre toi, ton corps réagit. Pour garder ton calme :",
 "ch": [
-"respirer lentement et baisser le ton",
-"crier plus fort",
 "partir en courant sans rien dire",
-"te fâcher"
+"te fâcher",
+"respirer lentement et baisser le ton",
+"crier plus fort"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Ta voix au téléphone :",
 "ch": [
+"très rapide, pour montrer que tu es efficace",
+"sans importance : seuls les mots comptent",
 "souriante et claire : on se fait une idée en quelques secondes",
-"sans importance",
-"fâchée",
-"très rapide"
+"fâchée"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Signe d'escalade de la colère :",
 "ch": [
 "la voix monte et les gestes deviennent brusques",
-"la personne sourit",
-"la personne s'assoit",
-"la personne dit merci"
+"la personne dit merci",
+"la personne s'assoit et croise les bras",
+"la personne sourit et baisse le ton"
 ],
 "bon": 0,
 "s": 20
@@ -9062,20 +9062,20 @@ window.QUIZ_LIVRES = [
 {
 "q": "Ton journal des faits est…",
 "ch": [
-"personnel et confidentiel",
-"affiché dans le hall",
+"remis aux locataires",
 "publié en ligne",
-"remis aux locataires"
+"personnel et confidentiel",
+"affiché dans le hall"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Une demande que tu ne peux pas accepter (ex. un cadeau) :",
 "ch": [
 "refuser poliment en expliquant la règle",
-"accepter en cachette",
-"te fâcher",
+"te fâcher et lui dire qu'elle n'a pas le droit",
+"accepter en cachette pour ne pas la vexer",
 "ignorer"
 ],
 "bon": 0,
@@ -9101,9 +9101,9 @@ window.QUIZ_LIVRES = [
 "q": "Le journal des faits sert à noter…",
 "ch": [
 "la date, l'heure, le lieu et les faits, sans opinion",
-"tes émotions seulement",
-"des rumeurs",
-"les loyers"
+"tes émotions et ce que tu as ressenti",
+"les loyers",
+"les rumeurs entendues sur les locataires"
 ],
 "bon": 0,
 "s": 20
@@ -9112,9 +9112,9 @@ window.QUIZ_LIVRES = [
 "q": "Se retirer d'une situation dangereuse, c'est…",
 "ch": [
 "un geste professionnel qui protège",
-"abandonner",
-"perdre la face",
-"interdit"
+"interdit : le préposé doit toujours régler la situation",
+"abandonner son travail et ses collègues",
+"perdre la face"
 ],
 "bon": 0,
 "s": 20
@@ -9122,43 +9122,43 @@ window.QUIZ_LIVRES = [
 {
 "q": "Conflit entre deux locataires :",
 "ch": [
+"tu changes la serrure",
+"tu choisis le camp de celui qui a raison",
 "tu restes neutre et tu transmets au gestionnaire",
-"tu choisis un camp",
-"tu règles avec une amende",
-"tu changes la serrure"
+"tu règles avec une amende sur le loyer"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Tu peux expliquer une règle de l'immeuble, mais…",
 "ch": [
+"tu peux couper l'eau",
+"tu peux expulser un locataire qui la brise",
 "tu ne peux pas l'appliquer par la force ou une sanction",
-"tu peux donner des amendes",
-"tu peux expulser",
-"tu peux couper l'eau"
+"tu peux donner des amendes si on ne la respecte pas"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Les clés des logements :",
 "ch": [
-"sous clé, et chaque sortie est notée",
-"sur un crochet dans le hall",
 "dans ta poche à la maison",
-"prêtées aux voisins"
+"sous clé, et chaque sortie est notée",
+"prêtées aux voisins",
+"sur un crochet dans le hall"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
 "q": "Un locataire t'offre un cadeau pour une réparation :",
 "ch": [
 "refuser poliment, sans froisser",
-"accepter tout de suite",
-"demander plus",
-"le vendre"
+"accepter tout de suite pour ne pas le vexer",
+"le vendre",
+"demander plus pour les prochaines réparations"
 ],
 "bon": 0,
 "s": 20
@@ -9167,9 +9167,9 @@ window.QUIZ_LIVRES = [
 "q": "Être fiable, c'est…",
 "ch": [
 "que les autres comptent sur toi sans devoir vérifier",
-"arriver quand tu veux",
+"promettre beaucoup pour faire plaisir à tout le monde",
 "faire seulement ce qui te plaît",
-"promettre beaucoup"
+"arriver quand tu veux si le travail est fait"
 ],
 "bon": 0,
 "s": 20
@@ -9177,12 +9177,12 @@ window.QUIZ_LIVRES = [
 {
 "q": "Un code d'éthique regroupe…",
 "ch": [
+"les outils",
+"les prix à demander pour chaque service",
 "les valeurs et les règles de conduite d'un métier",
-"les prix",
-"les horaires",
-"les outils"
+"les horaires de travail de l'équipe"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
@@ -9215,8 +9215,8 @@ window.QUIZ_LIVRES = [
 "ch": [
 "reste confidentiel",
 "se partage avec les voisins",
-"se publie sur les réseaux",
-"s'affiche dans le hall"
+"s'affiche dans le hall",
+"se publie sur les réseaux"
 ],
 "bon": 0,
 "s": 20
@@ -9224,42 +9224,42 @@ window.QUIZ_LIVRES = [
 {
 "q": "« Communiquer, ça s'apprend comme… »",
 "ch": [
-"souder ou déboucher un drain",
-"naître",
 "rien",
-"la chance"
+"souder ou déboucher un drain",
+"un talent : on naît bon communicateur ou non",
+"la chance : ça dépend des gens qu'on rencontre"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
 "q": "La ponctualité, c'est…",
 "ch": [
+"arriver quand tu peux, si tu finis tes tâches",
 "arriver à l'heure et prévenir si tu es en retard",
-"arriver quand tu peux",
-"partir tôt",
-"rien d'important"
+"rien d'important",
+"partir tôt quand le travail est terminé"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
 "q": "Les loups-garous et Naufragés! sont des ateliers pour pratiquer…",
 "ch": [
-"la communication et le consensus",
-"la soudure",
-"le ménage",
-"les mathématiques"
+"le ménage et l'organisation du local",
+"la soudure et le travail en équipe sur un montage",
+"les mathématiques",
+"la communication et le consensus"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Après une activité en atelier, le retour sert à…",
 "ch": [
 "transformer l'activité en apprentissage",
-"ranger seulement",
-"noter les gagnants",
+"noter les gagnants et donner les points",
+"ranger le matériel et remettre le local en ordre",
 "rien"
 ],
 "bon": 0,
@@ -9284,53 +9284,53 @@ window.QUIZ_LIVRES = [
 {
 "q": "Que veut dire le numéro de feuille E-102?",
 "ch": [
-"Architecture, coupe, feuille 2",
 "Électricité, plan d'étage, feuille 2",
+"Architecture, coupe, feuille 2",
 "Structure, détail 102",
 "Page 102 du devis"
 ],
-"bon": 1,
+"bon": 0,
 "s": 20
 },
 {
 "q": "Le cartouche se trouve…",
 "ch": [
-"en haut à gauche",
 "en bas à droite de chaque feuille",
-"au verso",
-"dans le devis seulement"
+"en haut à gauche de la première feuille",
+"dans le devis seulement",
+"au verso de la dernière feuille"
 ],
-"bon": 1,
+"bon": 0,
 "s": 20
 },
 {
 "q": "Les plans « tel que construit » montrent…",
 "ch": [
-"ce qui était prévu",
-"les changements faits sur le chantier",
-"le prix des travaux",
-"les plans de la ville"
+"ce qui était prévu au départ par l'architecte",
+"le prix final des travaux, poste par poste",
+"les plans de la ville",
+"les changements faits sur le chantier"
 ],
-"bon": 1,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Le plan de structure montre…",
 "ch": [
+"les prises de courant et les luminaires",
+"le mobilier",
 "ce qui porte le bâtiment : on ne le perce pas sans autorisation",
-"les couleurs de peinture",
-"les prises de courant",
-"le mobilier"
+"les couleurs de peinture et les finis des murs"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Le devis, c'est…",
 "ch": [
 "les textes qui décrivent la qualité des matériaux et la façon d'exécuter",
-"le dessin du toit",
-"le reçu du fournisseur",
+"le reçu du fournisseur avec la liste des matériaux",
+"le dessin du toit et des pentes",
 "la liste des employés"
 ],
 "bon": 0,
@@ -9339,67 +9339,67 @@ window.QUIZ_LIVRES = [
 {
 "q": "Plier un plan en accordéon : où doit se retrouver le cartouche?",
 "ch": [
-"À l'intérieur",
+"Peu importe",
+"À l'intérieur, pour le protéger",
 "Visible, sur le dessus",
-"Coupé",
-"Peu importe"
-],
-"bon": 1,
-"s": 20
-},
-{
-"q": "Dans les trois vues d'un objet, la vue de dessus se place…",
-"ch": [
-"au-dessus de la vue de face",
-"à gauche de la vue de face",
-"sous la vue de côté",
-"n'importe où"
-],
-"bon": 0,
-"s": 20
-},
-{
-"q": "Les hauteurs se mesurent à partir…",
-"ch": [
-"du sous-plancher",
-"de la dalle de béton",
-"du plancher fini",
-"du plafond"
+"Coupé, pour gagner de la place"
 ],
 "bon": 2,
 "s": 20
 },
 {
-"q": "Sur une coupe, les flèches au bout du trait de coupe indiquent…",
+"q": "Dans les trois vues d'un objet, la vue de dessus se place…",
 "ch": [
-"le sens du regard",
-"la pente",
-"le nord",
-"l'entrée"
+"à gauche de la vue de face",
+"au-dessus de la vue de face",
+"n'importe où",
+"sous la vue de côté"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Les hauteurs se mesurent à partir…",
+"ch": [
+"du plancher fini",
+"de la dalle de béton",
+"du plafond",
+"du sous-plancher"
 ],
 "bon": 0,
+"s": 20
+},
+{
+"q": "Sur une coupe, les flèches au bout du trait de coupe indiquent…",
+"ch": [
+"l'entrée",
+"la direction du nord géographique",
+"le sens du regard",
+"la pente du terrain sous le bâtiment"
+],
+"bon": 2,
 "s": 20
 },
 {
 "q": "Un cercle de détail sur une coupe sert à…",
 "ch": [
-"renvoyer à un zoom d'une petite partie",
-"indiquer une colonne",
-"marquer une sortie",
-"décorer le plan"
+"indiquer une colonne de structure à cet endroit",
+"marquer une sortie de secours dans le mur",
+"décorer le plan",
+"renvoyer à un zoom d'une petite partie"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Sur le papier isométrique, les longueurs et les profondeurs sont tracées à…",
 "ch": [
-"30°",
-"45°",
 "60°",
-"90°"
+"30°",
+"90°",
+"45°"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
@@ -9438,12 +9438,12 @@ window.QUIZ_LIVRES = [
 {
 "q": "Le plan d'implantation montre…",
 "ch": [
+"le tableau électrique",
 "le bâtiment sur son terrain",
-"l'intérieur des murs",
 "le détail d'un raccord",
-"le tableau électrique"
+"l'intérieur des murs"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 }
 ]
@@ -9500,32 +9500,32 @@ window.QUIZ_LIVRES = [
 {
 "q": "Un « 2 × 4 » raboté mesure en vrai environ…",
 "ch": [
-"2 × 4 po",
 "1 1/2 × 3 1/2 po",
-"2 1/2 × 4 1/2 po",
-"1 × 3 po"
+"2 × 4 po",
+"1 × 3 po",
+"2 1/2 × 4 1/2 po"
 ],
-"bon": 1,
+"bon": 0,
 "s": 20,
 "expl": "Taille nominale avant séchage et rabotage."
 },
 {
 "q": "Sur une règle d'architecte, à 1/4 po = 1 pi, chaque grand intervalle vaut…",
 "ch": [
-"1 pouce",
 "1 pied réel",
+"1 pouce",
 "1 mètre",
 "1/4 de pied"
 ],
-"bon": 1,
+"bon": 0,
 "s": 20
 },
 {
 "q": "Les dessins d'un exercice « pas à l'échelle » : pour trouver une cote manquante, on…",
 "ch": [
-"mesure avec la règle",
+"devine la cote à partir de la photo",
 "calcule à partir des autres cotes",
-"devine",
+"mesure le dessin avec la règle",
 "prend la cote voisine"
 ],
 "bon": 1,
@@ -9534,10 +9534,10 @@ window.QUIZ_LIVRES = [
 {
 "q": "Les cotes d'un plan métrique sont écrites en…",
 "ch": [
-"centimètres",
+"mètres, avec deux décimales",
 "millimètres, sans le symbole",
-"mètres",
-"pouces"
+"pouces",
+"centimètres, avec le symbole cm"
 ],
 "bon": 1,
 "s": 20
@@ -9546,8 +9546,8 @@ window.QUIZ_LIVRES = [
 "q": "Un tableau de spécifications (portes, fenêtres, appareils) se lit grâce…",
 "ch": [
 "au repère placé sur le plan (P1, F3…)",
-"à la couleur",
-"à l'échelle",
+"à la couleur de chaque élément sur le plan",
+"à l'échelle indiquée sous le dessin",
 "au cartouche seulement"
 ],
 "bon": 0,
@@ -9556,23 +9556,23 @@ window.QUIZ_LIVRES = [
 {
 "q": "Un bon croquis à main levée, c'est…",
 "ch": [
+"une photo",
 "des traits droits, des angles carrés, des proportions justes",
-"un dessin artistique",
-"un dessin sans mesures",
-"une photo"
+"un dessin artistique avec des ombres",
+"un dessin sans mesures, pour aller vite"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
 "q": "L'erreur classique quand on fait le croquis d'une pièce :",
 "ch": [
+"dessiner la porte du mauvais côté du mur",
 "revenir avec une mesure manquante",
-"utiliser un crayon",
-"dessiner la porte",
-"mesurer deux fois"
+"mesurer deux fois",
+"utiliser un crayon au lieu d'un stylo"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
@@ -9589,12 +9589,12 @@ window.QUIZ_LIVRES = [
 {
 "q": "Sur le plan de structure, la flèche à deux pointes indique…",
 "ch": [
-"le sens des solives",
-"la sortie",
+"une pente de toit",
 "le nord",
-"une pente de toit"
+"le sens des solives",
+"la sortie"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
@@ -9608,12 +9608,12 @@ window.QUIZ_LIVRES = [
 {
 "q": "Avant de percer un mur, les plans te disent…",
 "ch": [
+"la couleur de la peinture et le fini du mur",
 "ce qu'il y a derrière : montants, fils, tuyaux",
-"la couleur de la peinture",
-"l'âge du bâtiment",
+"l'âge du bâtiment et le nom de l'architecte",
 "rien d'utile"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
@@ -9645,20 +9645,20 @@ window.QUIZ_LIVRES = [
 {
 "q": "Sur le plan E-101, le plan d'architecture apparaît…",
 "ch": [
-"en gris pâle sous les dispositifs",
-"en rouge",
 "il n'apparaît pas",
-"en pointillé bleu"
+"en rouge, par-dessus les dispositifs",
+"en pointillé bleu, seulement pour les murs",
+"en gris pâle sous les dispositifs"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Le tableau du panneau sert à trouver…",
 "ch": [
 "quel disjoncteur alimente un appareil",
-"le prix des luminaires",
-"la hauteur des prises",
+"le prix des luminaires installés",
+"la hauteur des prises dans chaque pièce",
 "le nombre de portes"
 ],
 "bon": 0,
@@ -9667,56 +9667,56 @@ window.QUIZ_LIVRES = [
 {
 "q": "Avant de remplacer un luminaire qui grésille :",
 "ch": [
-"je coupe le bon disjoncteur et je vérifie l'absence de tension",
-"je le change sous tension",
 "je coupe le principal du bâtiment sans avertir",
-"je mets du ruban"
+"je mets du ruban",
+"je coupe le bon disjoncteur et je vérifie l'absence de tension",
+"je le change sous tension"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Sur un plan de plomberie, l'eau froide est souvent en…",
 "ch": [
-"bleu",
 "rouge",
 "vert",
-"jaune"
+"jaune",
+"bleu"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Fuite sur une branche d'eau froide : quel robinet fermer d'abord?",
 "ch": [
-"Le principal du bâtiment",
+"Celui de l'eau chaude, au chauffe-eau",
+"Aucun",
 "Le robinet le plus proche avant la fuite",
-"Celui de l'eau chaude",
-"Aucun"
+"Le robinet principal du bâtiment, à l'entrée d'eau"
 ],
-"bon": 1,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Un regard de nettoyage (en anglais : cleanout) sert à…",
 "ch": [
-"déboucher le drain",
 "fermer l'eau",
+"déboucher le drain",
 "purger l'air du chauffage",
 "mesurer la pression"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
 "q": "Sur une boucle de chauffage à eau chaude, le purgeur sert à…",
 "ch": [
-"évacuer l'air",
-"ajouter de l'eau chaude",
 "fermer la plinthe",
+"ajouter de l'eau chaude",
+"évacuer l'air",
 "mesurer la température"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
@@ -9755,23 +9755,23 @@ window.QUIZ_LIVRES = [
 {
 "q": "Une séparation coupe-feu sur le plan…",
 "ch": [
+"peut être percée librement si on rebouche au plâtre",
 "se reconnaît par un trait spécial et ne doit pas être percée sans la refaire conforme",
-"peut être percée librement",
-"est décorative",
-"n'existe que sur le papier"
+"n'existe que sur le papier",
+"est seulement décorative, pour séparer les pièces"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
 "q": "Qui tient à jour les plans « tel que construit » d'un bâtiment existant?",
 "ch": [
+"Le locataire de chaque logement",
 "Le préposé, au fil des réparations",
-"Personne",
-"Le locataire",
+"Personne : les plans ne changent plus après la construction",
 "La ville"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
@@ -9779,8 +9779,8 @@ window.QUIZ_LIVRES = [
 "ch": [
 "au-dessus du plafond suspendu",
 "dans le plancher",
-"sous la dalle",
-"dans les murs extérieurs"
+"dans les murs extérieurs",
+"sous la dalle"
 ],
 "bon": 0,
 "s": 20
@@ -9789,8 +9789,8 @@ window.QUIZ_LIVRES = [
 "q": "Un plan de chauffage montre « 3 plinthes » sur une boucle : elles sont…",
 "ch": [
 "reliées l'une après l'autre",
-"indépendantes",
-"électriques",
+"électriques, branchées sur un thermostat",
+"indépendantes, chacune avec sa propre boucle",
 "décoratives"
 ],
 "bon": 0,
@@ -9808,12 +9808,12 @@ window.QUIZ_LIVRES = [
 {
 "q": "Unifilaire : à quoi sert ce schéma?",
 "ch": [
+"Montrer le trajet des tuyaux de chauffage",
 "Montrer la distribution électrique du panneau principal aux panneaux",
-"Montrer les tuyaux",
 "Montrer le mobilier",
-"Montrer la toiture"
+"Montrer les pentes de la toiture"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 }
 ]
@@ -9835,53 +9835,53 @@ window.QUIZ_LIVRES = [
 {
 "q": "Que veut dire le numéro de feuille P-102?",
 "ch": [
+"Page 102 du devis",
 "Architecture, coupe, feuille 2",
 "Plomberie, plan d'étage, feuille 2",
-"Structure, détail 102",
-"Page 102 du devis"
+"Structure, détail 102"
 ],
-"bon": 1,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Le cartouche se trouve…",
 "ch": [
-"en haut à gauche",
 "en bas à droite de chaque feuille",
-"au verso",
-"dans le devis seulement"
+"en haut à gauche de la première feuille",
+"dans le devis seulement",
+"au verso de la dernière feuille"
 ],
-"bon": 1,
+"bon": 0,
 "s": 20
 },
 {
 "q": "Les plans « tel que construit » montrent…",
 "ch": [
-"ce qui était prévu",
-"les changements faits sur le chantier",
-"le prix des travaux",
-"les plans de la ville"
+"ce qui était prévu au départ par l'architecte",
+"le prix final des travaux, poste par poste",
+"les plans de la ville",
+"les changements faits sur le chantier"
 ],
-"bon": 1,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Le plan de structure montre…",
 "ch": [
+"les prises de courant et les luminaires",
+"le mobilier",
 "ce qui porte le bâtiment : on ne le perce pas sans autorisation",
-"les couleurs de peinture",
-"les prises de courant",
-"le mobilier"
+"les couleurs de peinture et les finis des murs"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Le devis, c'est…",
 "ch": [
 "les textes qui décrivent la qualité des matériaux et la façon d'exécuter",
-"le dessin du toit",
-"le reçu du fournisseur",
+"le reçu du fournisseur avec la liste des matériaux",
+"le dessin du toit et des pentes",
 "la liste des employés"
 ],
 "bon": 0,
@@ -9890,67 +9890,67 @@ window.QUIZ_LIVRES = [
 {
 "q": "Plier un plan en accordéon : où doit se retrouver le cartouche?",
 "ch": [
-"À l'intérieur",
+"Peu importe",
+"À l'intérieur, pour le protéger",
 "Visible, sur le dessus",
-"Coupé",
-"Peu importe"
-],
-"bon": 1,
-"s": 20
-},
-{
-"q": "Dans les trois vues d'un objet, la vue de dessus se place…",
-"ch": [
-"au-dessus de la vue de face",
-"à gauche de la vue de face",
-"sous la vue de côté",
-"n'importe où"
-],
-"bon": 0,
-"s": 20
-},
-{
-"q": "Les hauteurs se mesurent à partir…",
-"ch": [
-"du sous-plancher",
-"de la dalle de béton",
-"du plancher fini",
-"du plafond"
+"Coupé, pour gagner de la place"
 ],
 "bon": 2,
 "s": 20
 },
 {
-"q": "Sur une coupe, les flèches au bout du trait de coupe indiquent…",
+"q": "Dans les trois vues d'un objet, la vue de dessus se place…",
 "ch": [
-"le sens du regard",
-"la pente",
-"le nord",
-"l'entrée"
+"à gauche de la vue de face",
+"au-dessus de la vue de face",
+"n'importe où",
+"sous la vue de côté"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Les hauteurs se mesurent à partir…",
+"ch": [
+"du plancher fini",
+"de la dalle de béton",
+"du plafond",
+"du sous-plancher"
 ],
 "bon": 0,
+"s": 20
+},
+{
+"q": "Sur une coupe, les flèches au bout du trait de coupe indiquent…",
+"ch": [
+"l'entrée",
+"la direction du nord géographique",
+"le sens du regard",
+"la pente du terrain sous le bâtiment"
+],
+"bon": 2,
 "s": 20
 },
 {
 "q": "Un cercle de détail sur une coupe sert à…",
 "ch": [
-"renvoyer à un zoom d'une petite partie",
-"indiquer une colonne",
-"marquer une sortie",
-"décorer le plan"
+"indiquer une colonne de structure à cet endroit",
+"marquer une sortie de secours dans le mur",
+"décorer le plan",
+"renvoyer à un zoom d'une petite partie"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Sur le papier isométrique, les longueurs et les profondeurs sont tracées à…",
 "ch": [
-"30°",
-"45°",
 "60°",
-"90°"
+"30°",
+"90°",
+"45°"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
@@ -9989,12 +9989,12 @@ window.QUIZ_LIVRES = [
 {
 "q": "Le plan d'implantation montre…",
 "ch": [
+"le tableau électrique",
 "le bâtiment sur son terrain",
-"l'intérieur des murs",
 "le détail d'un raccord",
-"le tableau électrique"
+"l'intérieur des murs"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 }
 ]
@@ -10051,32 +10051,32 @@ window.QUIZ_LIVRES = [
 {
 "q": "Un « 2 × 4 » raboté mesure en vrai environ…",
 "ch": [
-"2 × 4 po",
 "1 1/2 × 3 1/2 po",
-"2 1/2 × 4 1/2 po",
-"1 × 3 po"
+"2 × 4 po",
+"1 × 3 po",
+"2 1/2 × 4 1/2 po"
 ],
-"bon": 1,
+"bon": 0,
 "s": 20,
 "expl": "Taille nominale avant séchage et rabotage."
 },
 {
 "q": "Sur une règle d'architecte, à 1/4 po = 1 pi, chaque grand intervalle vaut…",
 "ch": [
-"1 pouce",
 "1 pied réel",
+"1 pouce",
 "1 mètre",
 "1/4 de pied"
 ],
-"bon": 1,
+"bon": 0,
 "s": 20
 },
 {
 "q": "Les dessins d'un exercice « pas à l'échelle » : pour trouver une cote manquante, on…",
 "ch": [
-"mesure avec la règle",
+"devine la cote à partir de la photo",
 "calcule à partir des autres cotes",
-"devine",
+"mesure le dessin avec la règle",
 "prend la cote voisine"
 ],
 "bon": 1,
@@ -10085,10 +10085,10 @@ window.QUIZ_LIVRES = [
 {
 "q": "Les cotes d'un plan métrique sont écrites en…",
 "ch": [
-"centimètres",
+"mètres, avec deux décimales",
 "millimètres, sans le symbole",
-"mètres",
-"pouces"
+"pouces",
+"centimètres, avec le symbole cm"
 ],
 "bon": 1,
 "s": 20
@@ -10097,8 +10097,8 @@ window.QUIZ_LIVRES = [
 "q": "Un tableau de spécifications (portes, fenêtres, appareils) se lit grâce…",
 "ch": [
 "au repère placé sur le plan (P1, F3…)",
-"à la couleur",
-"à l'échelle",
+"à la couleur de chaque élément sur le plan",
+"à l'échelle indiquée sous le dessin",
 "au cartouche seulement"
 ],
 "bon": 0,
@@ -10116,21 +10116,21 @@ window.QUIZ_LIVRES = [
 {
 "q": "Le schéma de colonne :",
 "ch": [
-"ne respecte pas l'échelle : chaque étage est une ligne",
-"est toujours à 1:50",
-"montre le mobilier",
-"remplace le devis"
+"montre le mobilier et les appareils de chaque étage",
+"est toujours dessiné à 1:50, comme le plan d'étage",
+"remplace le devis",
+"ne respecte pas l'échelle : chaque étage est une ligne"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Un tuyau mal supporté…",
 "ch": [
 "s'affaisse, fait des points bas et du bruit",
-"dure plus longtemps",
-"se dilate moins",
-"n'a aucun problème"
+"n'a aucun problème",
+"dure plus longtemps parce qu'il bouge librement",
+"se dilate moins, car il n'est pas retenu"
 ],
 "bon": 0,
 "s": 20
@@ -10138,12 +10138,12 @@ window.QUIZ_LIVRES = [
 {
 "q": "Contourner un obstacle de 150 mm avec deux coudes de 45° : le tuyau entre les deux est…",
 "ch": [
-"une diagonale",
-"vertical",
 "horizontal",
-"inutile"
+"vertical",
+"inutile",
+"une diagonale"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
@@ -10157,23 +10157,23 @@ window.QUIZ_LIVRES = [
 {
 "q": "Pendant un gros orage, qu'est-ce qui empêche l'égout de refouler par le drain de plancher?",
 "ch": [
-"le clapet antiretour",
-"le siphon",
 "l'évent",
-"le robinet d'arrêt"
+"le clapet antiretour",
+"le robinet d'arrêt",
+"le siphon"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
 "q": "Le tableau des appareils (P-601) donne pour chaque repère…",
 "ch": [
+"la couleur et le fini de chaque appareil",
+"le prix et le fournisseur de chaque appareil",
 "les diamètres EF, EC et évacuation",
-"le prix",
-"la couleur",
 "le fournisseur seulement"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 }
 ]
@@ -10197,51 +10197,51 @@ window.QUIZ_LIVRES = [
 "ch": [
 "L'eau froide",
 "L'eau chaude",
-"L'évacuation",
-"La recirculation"
+"La recirculation",
+"L'évacuation"
 ],
-"bon": 2,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Où l'eau entre-t-elle et où converge toute l'évacuation d'un bâtiment?",
 "ch": [
+"Au 2e étage",
 "Au sous-sol",
 "Au toit",
-"Au 2e étage",
 "Dans la cuisine"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
 "q": "Un toit plat se vide par…",
 "ch": [
-"des drains de toit (DT)",
-"des gouttières seulement",
+"les murs",
 "l'évent",
-"les murs"
+"des gouttières seulement",
+"des drains de toit (DT)"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Dans un chauffage à eau chaude, l'eau chauffée sort par le haut : c'est…",
 "ch": [
-"l'alimentation (AL)",
-"le retour (RET)",
 "l'évent",
-"le drain"
+"le drain",
+"l'alimentation (AL)",
+"le retour (RET)"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Le circulateur…",
 "ch": [
 "pousse l'eau dans la boucle",
-"chauffe l'eau",
-"purge l'air",
+"purge l'air du réseau par le haut",
+"chauffe l'eau en la faisant tourner dans la boucle",
 "mesure la pression"
 ],
 "bon": 0,
@@ -10251,8 +10251,8 @@ window.QUIZ_LIVRES = [
 "q": "Dans un chauffage à vapeur, la vapeur monte au radiateur…",
 "ch": [
 "toute seule, sans pompe",
-"avec un circulateur",
 "avec un ventilateur",
+"avec un circulateur",
 "par gravité vers le bas"
 ],
 "bon": 0,
@@ -10261,43 +10261,43 @@ window.QUIZ_LIVRES = [
 {
 "q": "Un tuyau de cuivre qui chauffe…",
 "ch": [
-"s'allonge (dilatation)",
 "rapetisse",
+"devient plus mince",
 "ne change pas",
-"devient plus mince"
+"s'allonge (dilatation)"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Les divisions du devis : la plomberie est la division…",
 "ch": [
 "01",
-"22",
 "26",
-"09"
+"09",
+"22"
 ],
-"bon": 1,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Les changements demandés par le client et l'architecte pendant le projet se trouvent dans…",
 "ch": [
-"les addenda et avis de changement",
-"le cartouche",
 "la légende",
-"le schéma de colonne"
+"le cartouche de la première feuille",
+"les addenda et avis de changement",
+"le schéma de colonne de chaque étage"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Les tuyaux se vendent…",
 "ch": [
 "en longueurs entières",
-"au centimètre exact",
 "au poids",
-"à l'unité de raccord"
+"à l'unité de raccord",
+"au centimètre exact"
 ],
 "bon": 0,
 "s": 20
@@ -10305,34 +10305,34 @@ window.QUIZ_LIVRES = [
 {
 "q": "Le fournisseur donne une liste de prix, souvent avec…",
 "ch": [
-"un escompte pour l'entrepreneur",
+"aucun prix",
 "une taxe double",
 "un rabais au client seulement",
-"aucun prix"
+"un escompte pour l'entrepreneur"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Sur un plan de chauffage, AL et RET voyagent…",
 "ch": [
-"ensemble, deux tuyaux d'un étage à l'autre",
-"séparément sur des étages différents",
 "dans le même tuyau",
-"dans l'évent"
+"séparément sur des étages différents",
+"dans l'évent",
+"ensemble, deux tuyaux d'un étage à l'autre"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Le tableau M-601 donne, pour chaque repère de chauffage…",
 "ch": [
+"le nombre de portes à franchir pour y accéder",
 "le modèle et les caractéristiques de l'équipement",
-"le salaire du plombier",
-"le nombre de portes",
+"le salaire du plombier qui fait l'installation",
 "les heures d'ouverture"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
@@ -10372,34 +10372,34 @@ window.QUIZ_LIVRES = [
 {
 "q": "Un problème « rouge » dans la grille du préposé :",
 "ch": [
-"je le règle seul",
-"le superviseur fait appel au spécialiste (plombier, mécanicien)",
-"j'attends la semaine prochaine",
-"je l'ignore"
+"j'attends la semaine prochaine pour voir si ça empire",
+"je le règle seul, sans déranger personne",
+"je l'ignore",
+"le superviseur fait appel au spécialiste (plombier, mécanicien)"
 ],
-"bon": 1,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Un joint étanche commence par…",
 "ch": [
-"une coupe d'équerre et un tuyau propre et ébavuré",
-"beaucoup de soudure",
+"beaucoup de soudure pour boucher les trous",
 "un tuyau sale",
-"une coupe en biais"
+"une coupe d'équerre et un tuyau propre et ébavuré",
+"une coupe en biais pour que le tuyau entre mieux"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "La pince à sertir PEX se vérifie avec…",
 "ch": [
-"le calibre « go / no-go »",
-"un ruban à mesurer",
 "un niveau",
-"un multimètre"
+"un multimètre",
+"le calibre « go / no-go »",
+"un ruban à mesurer"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
@@ -10430,43 +10430,43 @@ window.QUIZ_LIVRES = [
 {
 "q": "Convertir 0,75 po en fraction :",
 "ch": [
-"1/2",
-"3/4",
 "5/8",
-"7/8"
+"7/8",
+"3/4",
+"1/2"
 ],
-"bon": 1,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Les tuyaux de drainage horizontaux…",
 "ch": [
-"sont toujours à niveau",
+"montent légèrement vers l'égout de la rue",
+"sont verticaux",
 "descendent légèrement pour que l'eau coule par gravité",
-"montent vers l'égout",
-"sont verticaux"
+"sont toujours à niveau, pour ne pas forcer la pompe"
 ],
-"bon": 1,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Plus une colonne d'eau est haute…",
 "ch": [
-"plus la pression au bas est forte",
-"moins il y a de pression",
 "plus l'eau est chaude",
-"rien ne change"
+"rien ne change",
+"moins il y a de pression",
+"plus la pression au bas est forte"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Un tuyau « de 3/4 » : ce 3/4, c'est…",
 "ch": [
 "son diamètre nominal (un nom, pas une mesure exacte)",
-"son diamètre extérieur exact",
-"sa longueur",
-"son épaisseur"
+"son épaisseur",
+"son diamètre extérieur exact, en pouces",
+"sa longueur standard, en pieds"
 ],
 "bon": 0,
 "s": 20
@@ -10474,42 +10474,42 @@ window.QUIZ_LIVRES = [
 {
 "q": "Un problème « jaune » dans la grille du préposé :",
 "ch": [
+"j'appelle les pompiers pour qu'ils vérifient",
 "je vérifie, je sécurise et j'avise mon superviseur",
-"je l'ignore",
-"j'appelle les pompiers",
-"je le règle sans le dire"
+"je le règle sans le dire",
+"je l'ignore : il n'y a pas d'urgence"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
 "q": "1/2 + 1/4 de pouce =",
 "ch": [
-"3/4 po",
 "2/6 po",
 "1/6 po",
-"1 po"
+"1 po",
+"3/4 po"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "La bavure laissée à l'intérieur du tuyau…",
 "ch": [
-"freine l'eau et use le tuyau",
-"aide le joint",
 "n'a aucun effet",
-"augmente la pression"
+"freine l'eau et use le tuyau",
+"augmente la pression",
+"aide le joint"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
 "q": "Le PEX se raccorde avec…",
 "ch": [
 "une pince à sertir ou un expandeur",
-"de la soudure",
-"de la colle ABS",
+"de la colle ABS appliquée sur le tuyau",
+"de la soudure à l'étain, comme le cuivre",
 "du filetage"
 ],
 "bon": 0,
@@ -10518,23 +10518,23 @@ window.QUIZ_LIVRES = [
 {
 "q": "Pourquoi les tuyaux de drainage ne sont jamais à niveau?",
 "ch": [
-"Pour que l'eau et les solides coulent par gravité",
-"Pour l'esthétique",
-"Pour économiser du tuyau",
-"C'est une erreur"
+"Pour l'esthétique : ça suit la pente du plafond",
+"Pour économiser du tuyau sur les longues distances",
+"C'est une erreur",
+"Pour que l'eau et les solides coulent par gravité"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Dans un immeuble, la pression est plus forte…",
 "ch": [
-"aux étages du bas",
-"au dernier étage",
 "pareille partout",
-"au toit"
+"au toit",
+"aux étages du bas",
+"au dernier étage"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 }
 ]
@@ -10556,12 +10556,12 @@ window.QUIZ_LIVRES = [
 {
 "q": "Raccorder de l'acier galvanisé directement à du cuivre :",
 "ch": [
-"aucun problème",
+"augmente la pression",
+"rend l'eau plus douce pour les appareils",
 "crée une pile : corrosion galvanique",
-"rend l'eau plus douce",
-"augmente la pression"
+"aucun problème si les filets sont bien serrés"
 ],
-"bon": 1,
+"bon": 2,
 "s": 20,
 "expl": "On met un raccord diélectrique."
 },
@@ -10577,12 +10577,12 @@ window.QUIZ_LIVRES = [
 {
 "q": "Avant de souder près du bois :",
 "ch": [
+"souder plus vite pour que le bois chauffe moins",
 "protéger avec un écran ignifuge",
-"mouiller le bois",
-"souder plus vite",
+"mouiller le bois avec un vaporisateur",
 "rien de spécial"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
@@ -10604,45 +10604,45 @@ window.QUIZ_LIVRES = [
 {
 "q": "La loi R-20 encadre…",
 "ch": [
+"les écoles",
+"la santé et la sécurité dans les écoles",
 "l'industrie de la construction",
-"les loyers",
-"la santé publique",
-"les écoles"
+"les loyers et les baux résidentiels"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "À 45°, si le déplacement vertical est de 6 po, le déplacement horizontal est…",
 "ch": [
-"3 po",
-"6 po",
+"8,5 po",
 "12 po",
-"8,5 po"
+"3 po",
+"6 po"
 ],
-"bon": 1,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Sur un plan, les longueurs sont données…",
 "ch": [
+"bout à bout, d'une extrémité à l'autre",
+"au hasard",
 "centre à centre (CC)",
-"bout à bout",
-"en mètres",
-"au hasard"
+"en mètres, arrondis au plus près"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Longueur de coupe d'un tuyau :",
 "ch": [
-"CC + prises",
-"CC − prises des raccords",
-"CC × 2",
-"CC ÷ 2"
+"CC ÷ 2",
+"CC + prises des raccords",
+"CC × 2, pour les deux raccords",
+"CC − prises des raccords"
 ],
-"bon": 1,
+"bon": 3,
 "s": 20
 },
 {
@@ -10665,9 +10665,9 @@ window.QUIZ_LIVRES = [
 "q": "Brasage tendre : le flux sert à…",
 "ch": [
 "nettoyer et protéger le cuivre pour que la soudure coule",
-"refroidir le joint",
-"colorer le cuivre",
-"remplacer la soudure"
+"colorer le cuivre pour voir où on a soudé",
+"remplacer la soudure",
+"refroidir le joint plus vite après le brasage"
 ],
 "bon": 0,
 "s": 20
@@ -10677,8 +10677,8 @@ window.QUIZ_LIVRES = [
 "ch": [
 "sans le bouger",
 "en le tordant",
-"dans la glace tout de suite",
-"en le frappant"
+"en le frappant",
+"dans la glace tout de suite"
 ],
 "bon": 0,
 "s": 20
@@ -10686,32 +10686,32 @@ window.QUIZ_LIVRES = [
 {
 "q": "Le té sanitaire sert à…",
 "ch": [
-"raccorder un renvoi dans un drain en guidant l'eau vers le bas",
-"fermer l'eau",
+"fermer l'eau d'une branche sans robinet",
+"mesurer la pression dans la colonne",
 "chauffer l'eau",
-"mesurer la pression"
+"raccorder un renvoi dans un drain en guidant l'eau vers le bas"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Un raccord fileté se scelle avec…",
 "ch": [
-"du ruban ou de la pâte à filets",
-"de la colle ABS",
-"de la soudure",
-"rien"
+"rien",
+"de la colle ABS sur les filets",
+"de la soudure tendre, comme le cuivre",
+"du ruban ou de la pâte à filets"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "La prise d'un raccord, c'est…",
 "ch": [
 "la longueur où le tuyau entre dans le raccord",
-"le prix",
-"le diamètre",
-"la couleur"
+"le diamètre intérieur du raccord",
+"la couleur",
+"le prix du raccord selon sa grosseur"
 ],
 "bon": 0,
 "s": 20
@@ -10719,12 +10719,12 @@ window.QUIZ_LIVRES = [
 {
 "q": "Ton montage dans une ossature de bois : avant de souder près du bois…",
 "ch": [
-"protection ignifuge et extincteur à portée",
-"rien",
-"mouiller les murs",
-"fermer la lumière"
+"mouiller les murs et le plancher autour",
+"fermer la lumière",
+"rien : la flamme est trop petite pour enflammer le bois",
+"protection ignifuge et extincteur à portée"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 }
 ]
@@ -10747,8 +10747,8 @@ window.QUIZ_LIVRES = [
 "q": "Pour le préposé, le plus important avec les robinets :",
 "ch": [
 "savoir lequel fermer et où il est",
-"connaître leur prix",
 "les peindre",
+"connaître leur prix",
 "les changer chaque année"
 ],
 "bon": 0,
@@ -10757,65 +10757,65 @@ window.QUIZ_LIVRES = [
 {
 "q": "Si un clapet empêche l'eau de retourner vers la rue, la dilatation de l'eau chaude…",
 "ch": [
+"refroidit l'eau dans le réservoir",
+"n'a aucun effet, l'eau ne se dilate presque pas",
 "fait monter la pression : on installe un réservoir d'expansion",
-"n'a aucun effet",
-"refroidit l'eau",
 "vide le chauffe-eau"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Le siphon sert à…",
 "ch": [
-"garder une garde d'eau qui bloque les gaz d'égout",
-"accélérer l'eau",
-"filtrer l'eau",
-"chauffer l'eau"
+"chauffer l'eau",
+"accélérer l'eau dans le renvoi",
+"filtrer l'eau avant qu'elle aille à l'égout",
+"garder une garde d'eau qui bloque les gaz d'égout"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "La ventilation (évent) du réseau de drainage sert à…",
 "ch": [
-"laisser entrer l'air pour que les siphons ne se vident pas",
-"évacuer la chaleur",
+"évacuer la chaleur des eaux chaudes",
 "faire du bruit",
-"augmenter la pression d'eau"
+"laisser entrer l'air pour que les siphons ne se vident pas",
+"augmenter la pression d'eau aux robinets"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Un regard de nettoyage donne accès…",
 "ch": [
+"au chauffe-eau",
 "à l'intérieur du drain pour un furet ou une caméra",
-"à l'eau chaude",
-"au compteur",
-"au chauffe-eau"
+"à l'eau chaude du bâtiment pour la purger",
+"au compteur d'eau pour le lire"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
 "q": "Un seul appareil se vide mal; les autres vont bien :",
 "ch": [
-"le problème est dans son renvoi ou son siphon",
-"l'égout de la ville est bouché",
-"le toit fuit",
-"le chauffe-eau est brisé"
+"l'égout de la ville est bouché devant l'immeuble",
+"le toit fuit et remplit le drain",
+"le chauffe-eau est brisé",
+"le problème est dans son renvoi ou son siphon"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "L'appareil qui génère le plus de bons de travail dans un immeuble :",
 "ch": [
 "la toilette",
+"le chauffe-eau",
 "le lavabo",
-"la douche",
-"le chauffe-eau"
+"la douche"
 ],
 "bon": 0,
 "s": 20
@@ -10823,12 +10823,12 @@ window.QUIZ_LIVRES = [
 {
 "q": "Robinet à cartouche : l'eau chaude est…",
 "ch": [
-"à gauche",
 "à droite",
 "au centre",
+"à gauche",
 "en haut"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
@@ -10842,67 +10842,67 @@ window.QUIZ_LIVRES = [
 {
 "q": "Un coup de bélier, c'est…",
 "ch": [
-"un claquement quand l'eau s'arrête net",
-"une fuite lente",
-"une eau trop chaude",
-"un drain bouché"
+"une fuite lente qui fait un bruit de goutte",
+"une eau trop chaude qui fait vibrer les tuyaux",
+"un drain bouché",
+"un claquement quand l'eau s'arrête net"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Un siphon qui perd sa garde d'eau laisse passer…",
 "ch": [
-"les gaz d'égout",
 "l'eau chaude",
+"rien",
 "la pression",
-"rien"
+"les gaz d'égout"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Une toilette coule sans arrêt : test simple…",
 "ch": [
+"ajouter du sel dans le réservoir",
+"fermer l'évent de la toilette",
 "le colorant dans le réservoir",
-"ajouter du sel",
-"fermer l'évent",
 "changer le siège"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Plusieurs appareils d'un étage se vident mal en même temps :",
 "ch": [
+"c'est normal quand plusieurs appareils coulent",
+"c'est chaque siphon, un à la fois",
 "le problème est plus loin, dans la colonne ou le collecteur",
-"c'est chaque siphon",
-"c'est normal",
 "c'est l'eau chaude"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Robinet qui coule : on coupe d'abord…",
 "ch": [
-"l'eau et on purge la pression",
-"l'électricité",
-"le chauffage",
-"rien"
+"rien",
+"le chauffage de la pièce",
+"l'électricité du logement au panneau",
+"l'eau et on purge la pression"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Le chauffe-eau au gaz évacue ses gaz…",
 "ch": [
-"par un tube central avec une chicane, vers la cheminée",
-"dans la pièce",
-"par l'égout",
-"par l'eau chaude"
+"par l'eau chaude",
+"dans la pièce, par une grille au bas du réservoir",
+"par l'égout, avec l'eau de condensation",
+"par un tube central avec une chicane, vers la cheminée"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 }
 ]
@@ -10924,23 +10924,23 @@ window.QUIZ_LIVRES = [
 {
 "q": "Tester une soupape T&P :",
 "ch": [
+"la dévisser pour voir si elle est rouillée",
 "lever le levier quelques secondes, un seau sous la sortie",
-"la dévisser",
-"boucher la sortie",
-"la peindre"
+"la peindre",
+"boucher la sortie et monter la température"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
 "q": "L'anode d'un chauffe-eau…",
 "ch": [
+"règle la température maximale de l'eau",
+"chauffe l'eau au fond du réservoir",
 "se sacrifie pour protéger le réservoir de la corrosion",
-"chauffe l'eau",
-"règle la température",
 "mesure la pression"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
@@ -10963,54 +10963,54 @@ window.QUIZ_LIVRES = [
 {
 "q": "Le vase d'expansion d'une chaudière…",
 "ch": [
+"purge l'air du réseau automatiquement",
 "absorbe le surplus de volume de l'eau chaude",
-"chauffe l'eau",
-"purge l'air",
+"chauffe l'eau avant qu'elle entre dans la chaudière",
 "alimente le brûleur"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
 "q": "Les radiateurs en fonte…",
 "ch": [
+"fonctionnent seulement à la vapeur basse pression",
 "chauffent lentement et gardent la chaleur longtemps",
-"chauffent instantanément",
 "ne gardent pas la chaleur",
-"fonctionnent à la vapeur seulement"
+"chauffent instantanément et refroidissent aussi vite"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
 "q": "Le gicleur d'un brûleur à l'huile…",
 "ch": [
+"mesure la flamme et coupe si elle s'éteint",
 "transforme le mazout en fin brouillard",
-"allume l'étincelle",
 "pompe l'eau",
-"mesure la flamme"
+"allume l'étincelle qui enflamme le mazout"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
 "q": "La cellule CdS du brûleur…",
 "ch": [
-"voit la flamme : sa résistance baisse à la lumière",
-"mesure la pression",
 "chauffe le mazout",
-"règle la température"
+"règle la température de l'eau de la chaudière",
+"voit la flamme : sa résistance baisse à la lumière",
+"mesure la pression du mazout à la pompe"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "L'entretien annuel du brûleur se fait…",
 "ch": [
 "avant la saison de chauffage, par un mécanicien certifié",
-"en plein hiver par le préposé",
 "jamais",
-"chaque semaine"
+"en plein hiver, par le préposé, quand ça brise",
+"chaque semaine, en changeant le gicleur"
 ],
 "bon": 0,
 "s": 20
@@ -11019,8 +11019,8 @@ window.QUIZ_LIVRES = [
 "q": "Chauffe-eau électrique qui ne chauffe plus : on vérifie…",
 "ch": [
 "le disjoncteur, l'ECO et les éléments (hors tension)",
-"la couleur",
-"le siphon",
+"la couleur de l'eau et le bruit du réservoir",
+"le siphon du drain sous la soupape",
 "le drain"
 ],
 "bon": 0,
@@ -11029,43 +11029,43 @@ window.QUIZ_LIVRES = [
 {
 "q": "Purger l'air d'un radiateur se fait…",
 "ch": [
-"par le purgeur en haut",
 "par le robinet du bas",
-"par la chaudière",
-"jamais"
+"par le purgeur en haut",
+"jamais",
+"par la chaudière"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
 "q": "Une plinthe à eau chaude chauffe surtout par…",
 "ch": [
-"convection : l'air chaud monte entre les ailettes",
-"rayonnement seulement",
-"conduction au plancher",
-"ventilateur"
+"conduction : la chaleur passe dans le plancher",
+"ventilateur",
+"rayonnement seulement, comme un poêle",
+"convection : l'air chaud monte entre les ailettes"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "La pompe à mazout du brûleur…",
 "ch": [
+"vide la chaudière",
+"allume la flamme avec une étincelle",
 "aspire le mazout et le pousse sous pression vers le gicleur",
-"chauffe l'eau",
-"allume la flamme",
-"vide la chaudière"
+"chauffe le mazout avant qu'il arrive au gicleur"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Une fournaise à air pulsé chauffe…",
 "ch": [
 "de l'air",
-"de l'eau",
+"le sol",
 "de la vapeur",
-"le sol"
+"de l'eau"
 ],
 "bon": 0,
 "s": 20
@@ -11073,12 +11073,12 @@ window.QUIZ_LIVRES = [
 {
 "q": "Une thermopompe consomme moins qu'une plinthe électrique parce qu'elle…",
 "ch": [
-"déplace la chaleur au lieu de la produire",
-"brûle du gaz",
-"chauffe moins",
-"fonctionne la nuit seulement"
+"brûle du gaz naturel plus efficacement",
+"fonctionne la nuit seulement",
+"chauffe moins, mais plus longtemps",
+"déplace la chaleur au lieu de la produire"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 }
 ]
@@ -11101,9 +11101,9 @@ window.QUIZ_LIVRES = [
 "q": "Une thermopompe air-air…",
 "ch": [
 "chauffe l'hiver et climatise l'été en déplaçant la chaleur",
-"brûle du mazout",
 "fonctionne à la vapeur",
-"chauffe seulement l'eau"
+"brûle du mazout l'hiver et climatise l'été",
+"chauffe seulement l'eau domestique"
 ],
 "bon": 0,
 "s": 20
@@ -11112,9 +11112,9 @@ window.QUIZ_LIVRES = [
 "q": "Amorcer une pompe centrifuge, c'est…",
 "ch": [
 "remplir d'eau son corps et l'aspiration en chassant l'air",
-"l'allumer à sec",
-"changer son moteur",
-"la vider"
+"la vider",
+"la démarrer à sec quelques secondes pour l'essai",
+"changer son moteur avant la saison"
 ],
 "bon": 0,
 "s": 20
@@ -11122,12 +11122,12 @@ window.QUIZ_LIVRES = [
 {
 "q": "Une pompe qui perd sa charge sans cesse : on cherche surtout…",
 "ch": [
-"du côté aspiration (fuite d'air)",
+"dans le toit",
 "du côté refoulement",
-"dans le panneau électrique",
-"dans le toit"
+"du côté aspiration (fuite d'air)",
+"dans le panneau électrique"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
@@ -11159,9 +11159,9 @@ window.QUIZ_LIVRES = [
 "q": "Le registre de la salle mécanique sert à…",
 "ch": [
 "noter date, appareil, lecture ou travail, initiales",
-"décorer",
+"décorer le local et accueillir les visiteurs",
 "afficher les prix",
-"rien"
+"afficher les prix des réparations de l'année"
 ],
 "bon": 0,
 "s": 20
@@ -11169,12 +11169,12 @@ window.QUIZ_LIVRES = [
 {
 "q": "Lors d'une inspection, les priorités se justifient…",
 "ch": [
-"par la sécurité d'abord",
-"par le coût le plus bas",
 "par l'ordre alphabétique",
-"au hasard"
+"au hasard",
+"par le coût le plus bas",
+"par la sécurité d'abord"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
@@ -11189,21 +11189,21 @@ window.QUIZ_LIVRES = [
 {
 "q": "Pression normale d'une chaudière à eau chaude, à froid (exemple de registre) :",
 "ch": [
+"environ 1 psi",
+"environ 150 psi",
 "environ 12 à 15 psi",
-"150 psi",
-"1 psi",
 "60 psi"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Une pompe centrifuge transforme…",
 "ch": [
 "la vitesse donnée à l'eau en pression",
-"l'eau en vapeur",
-"le courant en chaleur",
-"rien"
+"l'eau en vapeur dans la volute",
+"rien",
+"le courant électrique en chaleur"
 ],
 "bon": 0,
 "s": 20
@@ -11211,32 +11211,32 @@ window.QUIZ_LIVRES = [
 {
 "q": "Une pompe ne doit jamais tourner…",
 "ch": [
-"à sec",
 "avec de l'eau",
 "le jour",
-"en hiver"
+"en hiver",
+"à sec"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Prévenir le gel des tuyaux :",
 "ch": [
-"garder les zones froides chauffées et isoler les tuyaux exposés",
-"fermer le chauffage",
-"ouvrir les fenêtres",
-"rien"
+"fermer le chauffage des locaux inutilisés",
+"ouvrir les fenêtres pour faire circuler l'air",
+"rien",
+"garder les zones froides chauffées et isoler les tuyaux exposés"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Une inspection méthodique se fait…",
 "ch": [
 "toujours dans le même ordre, avec une fiche",
-"au hasard",
-"seulement quand ça brise",
-"sans noter"
+"seulement quand quelque chose brise",
+"sans noter",
+"au hasard, là où on passe dans la journée"
 ],
 "bon": 0,
 "s": 20
@@ -11245,9 +11245,9 @@ window.QUIZ_LIVRES = [
 "q": "Avant de couper l'eau d'un étage, on…",
 "ch": [
 "avise les occupants",
+"appelle les pompiers",
 "ne dit rien",
-"attend la nuit",
-"appelle les pompiers"
+"attend la nuit"
 ],
 "bon": 0,
 "s": 20
@@ -11296,23 +11296,23 @@ window.QUIZ_LIVRES = [
 {
 "q": "« Travaillant, ponctuel et fiable » ne vaut rien sans…",
 "ch": [
-"une preuve : un fait précis",
-"un diplôme",
-"une photo",
-"un ton de voix fort"
+"un diplôme encadré qui le prouve",
+"une photo professionnelle sur le CV",
+"un ton de voix fort",
+"une preuve : un fait précis"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Tu as « juste été caissier ». Que dis-tu à l'employeur?",
 "ch": [
-"Rien, ça ne compte pas",
-"Ce que l'emploi t'a appris, relié à l'emploi visé",
-"Que tu détestais cet emploi",
-"Que tu as été caissier, sans plus"
+"Rien : ça ne compte pas pour un emploi en construction",
+"Que tu as été caissier, sans plus",
+"Que tu as été caissier, sans parler du reste",
+"Ce que l'emploi t'a appris, relié à l'emploi visé"
 ],
-"bon": 1,
+"bon": 3,
 "s": 20
 },
 {
@@ -11327,23 +11327,23 @@ window.QUIZ_LIVRES = [
 {
 "q": "L'IA a écrit « Expert en plomberie depuis 10 ans » dans ton bilan. Tu…",
 "ch": [
+"ajoutes 5 ans de plus",
 "le gardes, ça paraît bien",
 "corriges : il faut que ce soit vrai",
-"ajoutes 5 ans de plus",
 "l'envoies tel quel"
 ],
-"bon": 1,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Pour devenir compagnon tuyauteur, combien d'heures faut-il accumuler dans le carnet d'apprentissage?",
 "ch": [
-"2 000",
-"4 000",
 "8 000",
-"12 000"
+"12 000",
+"2 000",
+"4 000"
 ],
-"bon": 2,
+"bon": 0,
 "s": 20,
 "expl": "Quatre périodes de 2 000 heures, puis l'examen de qualification."
 },
@@ -11351,9 +11351,9 @@ window.QUIZ_LIVRES = [
 "q": "Les chantiers régis par la CCQ, c'est…",
 "ch": [
 "le monde de la construction",
-"l'entretien d'immeubles",
+"le commerce de pièces",
 "la vente au détail",
-"le commerce de pièces"
+"l'entretien d'immeubles"
 ],
 "bon": 0,
 "s": 20
@@ -11362,9 +11362,9 @@ window.QUIZ_LIVRES = [
 "q": "Le « marché caché », c'est…",
 "ch": [
 "les emplois jamais affichés, comblés par recommandation",
-"les emplois au noir",
-"les sites payants",
-"les emplois à l'étranger"
+"les sites d'emplois payants pour les candidats",
+"les emplois à l'étranger",
+"les emplois au noir, payés comptant"
 ],
 "bon": 0,
 "s": 20
@@ -11400,34 +11400,34 @@ window.QUIZ_LIVRES = [
 {
 "q": "Construction ou hors construction : laquelle est régie par la CCQ?",
 "ch": [
-"Construction",
 "Hors construction",
 "Les deux",
+"Construction",
 "Aucune"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Le carnet d'apprentissage compte combien de périodes de 2 000 heures?",
 "ch": [
-"2",
 "4",
+"2",
 "6",
 "8"
 ],
-"bon": 1,
+"bon": 0,
 "s": 20
 },
 {
 "q": "La CCQ, c'est…",
 "ch": [
-"la Commission de la construction du Québec",
-"la Chambre de commerce",
-"une banque",
-"un syndicat de locataires"
+"un syndicat de locataires",
+"la Chambre de commerce du Québec",
+"la Caisse centrale du Québec",
+"la Commission de la construction du Québec"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
@@ -11442,12 +11442,12 @@ window.QUIZ_LIVRES = [
 {
 "q": "Un emploi de livreur montre surtout que tu es…",
 "ch": [
-"fiable avec un horaire",
-"bon en soudure",
+"rien d'utile",
 "expert en plomberie",
-"rien d'utile"
+"bon en soudure",
+"fiable avec un horaire"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 }
 ]
@@ -11480,52 +11480,52 @@ window.QUIZ_LIVRES = [
 "q": "Ton message de boîte vocale idéal :",
 "ch": [
 "de la musique forte",
-"ton nom, clair et poli",
 "aucun message",
+"ton nom, clair et poli",
 "une blague"
-],
-"bon": 1,
-"s": 20
-},
-{
-"q": "Ton bilan personnel complet, l'employeur…",
-"ch": [
-"ne le voit jamais tel quel : c'est un document de travail",
-"le reçoit avec le CV",
-"le signe",
-"le garde au dossier"
-],
-"bon": 0,
-"s": 20
-},
-{
-"q": "Pour améliorer un profil vague comme « Je suis motivé et j'aime travailler avec mes mains » :",
-"ch": [
-"ajouter un fait précis et chiffré",
-"ajouter des points d'exclamation",
-"l'écrire en majuscules",
-"le raccourcir à un mot"
-],
-"bon": 0,
-"s": 20
-},
-{
-"q": "Les références, on…",
-"ch": [
-"les met en bas du CV",
-"écrit « Références sur demande »",
-"les prépare sur une liste séparée",
-"ne les donne jamais"
 ],
 "bon": 2,
 "s": 20
 },
 {
+"q": "Ton bilan personnel complet, l'employeur…",
+"ch": [
+"le signe pour confirmer ton embauche",
+"le reçoit avec ton CV et ta lettre",
+"le garde au dossier",
+"ne le voit jamais tel quel : c'est un document de travail"
+],
+"bon": 3,
+"s": 20
+},
+{
+"q": "Pour améliorer un profil vague comme « Je suis motivé et j'aime travailler avec mes mains » :",
+"ch": [
+"le raccourcir à un mot",
+"ajouter un fait précis et chiffré",
+"ajouter des points d'exclamation",
+"l'écrire en majuscules"
+],
+"bon": 1,
+"s": 20
+},
+{
+"q": "Les références, on…",
+"ch": [
+"les prépare sur une liste séparée",
+"les met en bas du CV",
+"écrit « Références sur demande »",
+"ne les donne jamais"
+],
+"bon": 0,
+"s": 20
+},
+{
 "q": "Une bonne puce de CV commence par…",
 "ch": [
-"« J'aidais… »",
+"« J'aidais à… » ou « J'étais responsable de… »",
 "un verbe d'action : installé, réparé, inspecté",
-"une date",
+"la date de début et de fin de l'emploi",
 "le nom de l'employeur"
 ],
 "bon": 1,
@@ -11534,65 +11534,65 @@ window.QUIZ_LIVRES = [
 {
 "q": "Une adresse courriel pour postuler :",
 "ch": [
-"bigboss_69@…",
-"prenom.nom@…",
+"aucune adresse",
 "celle de ton ami",
-"aucune adresse"
+"bigboss_69@…",
+"prenom.nom@…"
 ],
-"bon": 1,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Un logiciel de tri de CV cherche surtout…",
 "ch": [
-"les mots-clés de l'offre",
-"les couleurs du CV",
 "la photo",
+"les couleurs du CV",
+"les mots-clés de l'offre",
 "le nombre de pages"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Karine revient après six ans à la maison. Quel type de CV met ses forces en avant?",
 "ch": [
-"Le CV par compétences",
 "Le CV chronologique",
-"Aucun CV",
-"Une lettre seulement"
+"Une lettre seulement",
+"Le CV par compétences",
+"Aucun CV"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Une offre te demande de l'argent pour « réserver » le poste.",
 "ch": [
-"Je paie vite",
 "C'est probablement une fausse offre",
+"Je paie vite pour ne pas perdre le poste",
 "C'est normal en plomberie",
 "Je donne mon NAS"
 ],
-"bon": 1,
+"bon": 0,
 "s": 20
 },
 {
 "q": "Pour tes réseaux personnels, la visibilité des publications devrait être…",
 "ch": [
 "Public",
-"Amis",
+"Sans importance",
 "Tout le monde",
-"Sans importance"
+"Amis"
 ],
-"bon": 1,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Dans la section Formation du CV, on commence par…",
 "ch": [
 "le diplôme le plus récent",
-"l'école primaire",
+"les loisirs",
 "le diplôme le plus ancien",
-"les loisirs"
+"l'école primaire"
 ],
 "bon": 0,
 "s": 20
@@ -11600,31 +11600,31 @@ window.QUIZ_LIVRES = [
 {
 "q": "Un trou de deux ans dans ton parcours :",
 "ch": [
-"le nommer simplement (ex. proche aidant)",
+"laisser l'employeur deviner",
 "le cacher en inventant un emploi",
-"mentir sur les dates",
-"laisser l'employeur deviner"
+"changer les dates pour qu'il ne paraisse pas",
+"le nommer simplement (ex. proche aidant)"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "L'IA peut t'aider à…",
 "ch": [
+"écrire des diplômes que tu auras bientôt",
 "trouver des verbes et raccourcir une phrase, mais tout doit être vrai",
-"inventer de l'expérience",
-"écrire de faux diplômes",
-"rien"
+"rien",
+"inventer de l'expérience pour remplir le CV"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
 "q": "Le CV combiné convient à…",
 "ch": [
 "un finissant avec beaucoup d'expérience hors du domaine",
-"personne",
-"un compagnon de 30 ans seulement",
+"un élève sans aucune expérience de travail",
+"un compagnon de 30 ans d'expérience seulement",
 "un enfant"
 ],
 "bon": 0,
@@ -11649,21 +11649,21 @@ window.QUIZ_LIVRES = [
 {
 "q": "Après le DEP, une recherche d'emploi active demande environ…",
 "ch": [
-"1 heure par mois",
+"1 heure par mois, quand une offre arrive",
+"40 heures par semaine, sans arrêt",
 "10 à 15 heures par semaine",
-"40 heures par jour",
 "aucun horaire"
 ],
-"bon": 1,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Quand tu appelles une entreprise, tu notes surtout…",
 "ch": [
 "le nom du responsable, pour ta relance",
-"la couleur des camions",
-"l'adresse du site",
-"le prix des pièces"
+"le prix des pièces",
+"le prix des pièces qu'ils vendent",
+"la couleur des camions et le logo de l'entreprise"
 ],
 "bon": 0,
 "s": 20
@@ -11671,12 +11671,12 @@ window.QUIZ_LIVRES = [
 {
 "q": "Nomme un piège à éviter dans une lettre :",
 "ch": [
+"Relire avant d'envoyer",
 "Commencer toutes les phrases par « Je »",
-"Adresser la lettre à la bonne personne",
 "Donner une preuve de tes qualités",
-"Relire avant d'envoyer"
+"Adresser la lettre à la bonne personne"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
@@ -11723,8 +11723,8 @@ window.QUIZ_LIVRES = [
 "q": "Sites gouvernementaux pour chercher un emploi :",
 "ch": [
 "Québec emploi et le Guichet-Emplois",
-"Les réseaux de jeux",
 "Les sites de vente usagée",
+"Les réseaux de jeux",
 "Aucun"
 ],
 "bon": 0,
@@ -11734,8 +11734,8 @@ window.QUIZ_LIVRES = [
 "q": "Une recherche d'emploi efficace se traite comme…",
 "ch": [
 "un emploi à temps partiel : heures fixes et objectifs",
-"un passe-temps",
-"une corvée à faire une fois",
+"une corvée à faire une seule fois, en une journée",
+"un passe-temps, quand tu as le temps",
 "un loisir du dimanche"
 ],
 "bon": 0,
@@ -11771,10 +11771,10 @@ window.QUIZ_LIVRES = [
 {
 "q": "Une lettre de candidature spontanée s'appuie sur…",
 "ch": [
-"les exigences de l'offre",
-"ce que tu sais de l'employeur",
 "ton horaire de la semaine",
-"une lettre type envoyée à tous"
+"ce que tu sais de l'employeur",
+"une lettre type envoyée à tous",
+"les exigences de l'offre"
 ],
 "bon": 1,
 "s": 20,
@@ -11783,21 +11783,21 @@ window.QUIZ_LIVRES = [
 {
 "q": "Ton réseau, ce sont…",
 "ch": [
+"les journaux",
 "les personnes qui te connaissent et peuvent parler de toi",
-"tes abonnés en ligne seulement",
-"les employeurs inconnus",
-"les journaux"
+"les employeurs inconnus de ta région",
+"tes abonnés sur les réseaux sociaux seulement"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
 "q": "Sans suivi de ta recherche, tu oublies…",
 "ch": [
 "à qui tu as écrit et quand relancer",
-"ton nom",
-"ton métier",
-"rien"
+"rien",
+"le nom de ton métier dans les courriels",
+"rien : tout reste dans ta tête"
 ],
 "bon": 0,
 "s": 20
@@ -11805,23 +11805,23 @@ window.QUIZ_LIVRES = [
 {
 "q": "La conclusion d'une lettre fait une seule chose :",
 "ch": [
+"raconter ton parcours depuis le secondaire",
 "demander la rencontre, avec assurance",
-"raconter ta vie",
-"parler du salaire",
+"parler du salaire et des avantages voulus",
 "répéter le CV"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
 "q": "Une lettre de présentation tient en…",
 "ch": [
+"dix pages",
 "une page",
-"trois pages",
 "une ligne",
-"dix pages"
+"trois pages"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 }
 ]
@@ -11860,87 +11860,87 @@ window.QUIZ_LIVRES = [
 {
 "q": "« Parlez-moi de vous » : l'employeur veut surtout savoir…",
 "ch": [
-"toute ta vie",
 "pourquoi tu es ici pour ce poste",
 "ton signe astrologique",
-"tes loisirs du week-end"
+"tes loisirs du week-end",
+"toute ta vie"
 ],
-"bon": 1,
+"bon": 0,
 "s": 20
 },
 {
 "q": "Quand parler du salaire?",
 "ch": [
-"Dès la première minute",
-"Quand l'employeur aborde le sujet ou au moment de l'offre",
+"Dans la lettre de présentation, avant l'entrevue",
+"Dès la première minute de l'entrevue",
 "Jamais",
-"Dans la lettre"
+"Quand l'employeur aborde le sujet ou au moment de l'offre"
 ],
-"bon": 1,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Ton message de remerciement après l'entrevue s'envoie…",
 "ch": [
-"le jour même ou le lendemain",
 "un mois plus tard",
+"le jour même ou le lendemain",
 "seulement si on t'engage",
 "jamais"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
 "q": "Un refus veut dire…",
 "ch": [
-"que tu n'es pas bon",
+"que l'employeur te déteste",
+"que tu n'es pas bon dans ton métier",
 "qu'un autre candidat correspondait mieux cette fois",
-"que tu dois arrêter de chercher",
-"que l'employeur te déteste"
+"que tu dois arrêter de chercher dans ce domaine"
 ],
-"bon": 1,
+"bon": 2,
 "s": 20
 },
 {
 "q": "La loi qui fixe les conditions minimales de travail au Québec :",
 "ch": [
-"la Loi sur les normes du travail",
-"le Code de construction",
+"le Code de la route",
 "la Loi sur la RBQ",
-"le Code de la route"
+"la Loi sur les normes du travail",
+"le Code de construction"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Premier jour : on te demande d'utiliser un produit que tu ne connais pas.",
 "ch": [
-"Je l'utilise sans rien lire",
 "Je lis l'étiquette et la FDS",
 "Je le mélange avec de l'eau de Javel",
-"Je refuse de travailler"
+"Je refuse de travailler",
+"Je l'utilise sans rien lire"
 ],
-"bon": 1,
+"bon": 0,
 "s": 20
 },
 {
 "q": "L'appel de présélection, c'est…",
 "ch": [
-"déjà une entrevue",
 "une formalité sans importance",
+"un test de vitesse",
 "un message publicitaire",
-"un test de vitesse"
+"déjà une entrevue"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Entrevue vidéo : le cadrage idéal…",
 "ch": [
 "les yeux au tiers du haut, visage éclairé",
-"le plafond",
-"contre-jour devant la fenêtre",
-"caméra éteinte"
+"caméra éteinte",
+"la caméra pointée vers le plafond",
+"à contre-jour, devant une grande fenêtre"
 ],
 "bon": 0,
 "s": 20
@@ -11948,12 +11948,12 @@ window.QUIZ_LIVRES = [
 {
 "q": "En entrevue, une mise en situation du métier vérifie surtout…",
 "ch": [
+"ta vitesse de frappe au clavier",
 "si tu penses d'abord à la sécurité et au client",
-"ta vitesse de frappe",
-"ta taille",
-"ton auto"
+"ton auto",
+"ta taille et ta force physique"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
@@ -11975,45 +11975,45 @@ window.QUIZ_LIVRES = [
 {
 "q": "La garantie d'emploi de stage en plomberie, c'est…",
 "ch": [
-"150 heures chez un employeur",
-"un contrat de 5 ans",
-"une prime de départ",
-"un examen écrit"
+"un contrat de 5 ans avec le même employeur",
+"un examen écrit",
+"une prime de départ payée par l'école",
+"150 heures chez un employeur"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Au téléphone, l'employeur n'a que…",
 "ch": [
-"ta voix et tes mots",
-"ta photo",
 "ton CV imprimé",
-"ta tenue"
+"ta photo",
+"ta tenue",
+"ta voix et tes mots"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Juste après l'entrevue, prends cinq minutes pour…",
 "ch": [
-"noter ce qui s'est passé",
-"publier sur les réseaux",
+"oublier",
 "appeler l'employeur",
-"oublier"
+"publier sur les réseaux",
+"noter ce qui s'est passé"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Les conditions minimales de travail sont surveillées par…",
 "ch": [
+"le TAL",
 "la CNESST",
-"la SAAQ",
 "la RBQ",
-"le TAL"
+"la SAAQ"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 }
 ]
@@ -12051,23 +12051,23 @@ window.QUIZ_LIVRES = [
 {
 "q": "« Travaillant, ponctuel et fiable » ne vaut rien sans…",
 "ch": [
-"une preuve : un fait précis",
-"un diplôme",
-"une photo",
-"un ton de voix fort"
+"un diplôme encadré qui le prouve",
+"une photo professionnelle sur le CV",
+"un ton de voix fort",
+"une preuve : un fait précis"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Tu as « juste été caissier ». Que dis-tu à l'employeur?",
 "ch": [
-"Rien, ça ne compte pas",
-"Ce que l'emploi t'a appris, relié à l'emploi visé",
-"Que tu détestais cet emploi",
-"Que tu as été caissier, sans plus"
+"Rien : ça ne compte pas pour un emploi en construction",
+"Que tu as été caissier, sans plus",
+"Que tu as été caissier, sans parler du reste",
+"Ce que l'emploi t'a appris, relié à l'emploi visé"
 ],
-"bon": 1,
+"bon": 3,
 "s": 20
 },
 {
@@ -12082,12 +12082,12 @@ window.QUIZ_LIVRES = [
 {
 "q": "L'IA a écrit « Expert en plomberie depuis 10 ans » dans ton bilan. Tu…",
 "ch": [
+"ajoutes 5 ans de plus",
 "le gardes, ça paraît bien",
 "corriges : il faut que ce soit vrai",
-"ajoutes 5 ans de plus",
 "l'envoies tel quel"
 ],
-"bon": 1,
+"bon": 2,
 "s": 20
 },
 {
@@ -12110,9 +12110,9 @@ window.QUIZ_LIVRES = [
 "q": "L'information sur le marché du travail (IMT) répond à trois questions :",
 "ch": [
 "combien ça paie, y a-t-il des emplois, que faut-il",
+"aucune",
 "quelle couleur, quel camion, quel outil",
-"qui, quand, pourquoi",
-"aucune"
+"qui, quand, pourquoi"
 ],
 "bon": 0,
 "s": 20
@@ -12120,12 +12120,12 @@ window.QUIZ_LIVRES = [
 {
 "q": "En entretien, les titres changent d'un employeur à l'autre. Pour chercher, tu…",
 "ch": [
-"utilises plusieurs mots-clés",
 "cherches seulement « concierge »",
 "attends qu'on t'appelle",
+"utilises plusieurs mots-clés",
 "abandonnes"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
@@ -12143,45 +12143,45 @@ window.QUIZ_LIVRES = [
 {
 "q": "Ton CV est évalué selon…",
 "ch": [
-"les critères du programme d'études",
 "la couleur du papier",
-"ton nombre d'amis",
-"la police la plus originale"
+"les critères du programme d'études",
+"la police la plus originale",
+"ton nombre d'amis"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
 "q": "« Ouvrier d'entretien classe II », « concierge », « préposé » : ce sont…",
 "ch": [
+"des métiers sans aucun lien entre eux",
+"des emplois de la construction, cartes CCQ exigées",
 "des titres différents pour des emplois proches",
-"des métiers sans lien",
-"des emplois de construction",
 "des stages"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Un emploi de livreur montre surtout que tu es…",
 "ch": [
-"fiable avec un horaire",
-"bon en plomberie",
+"rien d'utile",
 "expert en ménage",
-"rien d'utile"
+"bon en plomberie",
+"fiable avec un horaire"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Une banque de verbes d'action sert à…",
 "ch": [
-"écrire des puces de CV fortes",
+"rien",
 "écrire une lettre d'amour",
-"remplir un bon de travail",
-"rien"
+"écrire des puces de CV fortes",
+"remplir un bon de travail"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
@@ -12197,9 +12197,9 @@ window.QUIZ_LIVRES = [
 "q": "Une liste d'employeurs de la région sert de…",
 "ch": [
 "point de départ pour ta recherche",
-"liste finale",
-"liste noire",
-"décoration"
+"liste finale : tu n'en contactes pas d'autres",
+"décoration",
+"liste noire des employeurs à éviter"
 ],
 "bon": 0,
 "s": 20
@@ -12223,34 +12223,34 @@ window.QUIZ_LIVRES = [
 {
 "q": "Ton bilan personnel complet, l'employeur…",
 "ch": [
-"ne le voit jamais tel quel : c'est un document de travail",
-"le reçoit avec le CV",
-"le signe",
-"le garde au dossier"
+"le signe pour confirmer ton embauche",
+"le reçoit avec ton CV et ta lettre",
+"le garde au dossier",
+"ne le voit jamais tel quel : c'est un document de travail"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Ton message de boîte vocale idéal :",
 "ch": [
 "de la musique forte",
-"ton nom, clair et poli",
 "aucun message",
+"ton nom, clair et poli",
 "une blague"
 ],
-"bon": 1,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Pour améliorer un profil vague comme « Je suis motivé et j'aime travailler avec mes mains » :",
 "ch": [
+"le raccourcir à un mot",
 "ajouter un fait précis et chiffré",
 "ajouter des points d'exclamation",
-"l'écrire en majuscules",
-"le raccourcir à un mot"
+"l'écrire en majuscules"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
@@ -12265,20 +12265,20 @@ window.QUIZ_LIVRES = [
 {
 "q": "Les références, on…",
 "ch": [
+"les prépare sur une liste séparée",
 "les met en bas du CV",
 "écrit « Références sur demande »",
-"les prépare sur une liste séparée",
 "ne les donne jamais"
 ],
-"bon": 2,
+"bon": 0,
 "s": 20
 },
 {
 "q": "Une bonne puce de CV commence par…",
 "ch": [
-"« J'aidais… »",
+"« J'aidais à… » ou « J'étais responsable de… »",
 "un verbe d'action : installé, réparé, inspecté",
-"une date",
+"la date de début et de fin de l'emploi",
 "le nom de l'employeur"
 ],
 "bon": 1,
@@ -12287,43 +12287,43 @@ window.QUIZ_LIVRES = [
 {
 "q": "Une adresse courriel pour postuler :",
 "ch": [
-"bigboss_69@…",
-"prenom.nom@…",
+"aucune adresse",
 "celle de ton ami",
-"aucune adresse"
+"bigboss_69@…",
+"prenom.nom@…"
 ],
-"bon": 1,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Un logiciel de tri de CV cherche surtout…",
 "ch": [
-"les mots-clés de l'offre",
-"les couleurs du CV",
 "la photo",
+"les couleurs du CV",
+"les mots-clés de l'offre",
 "le nombre de pages"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Karine revient après six ans à la maison. Quel type de CV met ses forces en avant?",
 "ch": [
-"Le CV par compétences",
 "Le CV chronologique",
-"Aucun CV",
-"Une lettre seulement"
+"Une lettre seulement",
+"Le CV par compétences",
+"Aucun CV"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Les postes du secteur public (écoles, municipalités) sont souvent affichés…",
 "ch": [
 "seulement sur le site de l'employeur",
-"dans les journaux de 1990",
-"sur les poteaux",
-"jamais"
+"jamais",
+"sur les poteaux et les babillards de la ville",
+"dans les journaux imprimés seulement"
 ],
 "bon": 0,
 "s": 20,
@@ -12332,53 +12332,53 @@ window.QUIZ_LIVRES = [
 {
 "q": "Combien de moyens de recherche un bon plan combine-t-il?",
 "ch": [
-"Un seul",
+"Un seul, le plus efficace",
+"Aucun",
 "Trois ou quatre",
-"Dix",
-"Aucun"
+"Dix ou plus, tous en même temps"
 ],
-"bon": 1,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Un trou de deux ans dans ton parcours :",
 "ch": [
-"le nommer simplement (ex. proche aidant)",
-"inventer un emploi",
-"mentir sur les dates",
-"laisser deviner"
+"laisser deviner",
+"inventer un emploi pour combler le trou",
+"changer les dates pour qu'il ne paraisse pas",
+"le nommer simplement (ex. proche aidant)"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "L'IA peut t'aider à…",
 "ch": [
+"écrire des diplômes que tu auras bientôt",
 "trouver des verbes et raccourcir une phrase, mais tout doit être vrai",
-"inventer de l'expérience",
-"écrire de faux diplômes",
-"rien"
+"rien",
+"inventer de l'expérience pour remplir le CV"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
 "q": "La section « Autres activités » du CV : le mot important est…",
 "ch": [
-"pertinentes",
-"nombreuses",
 "drôles",
+"nombreuses",
+"pertinentes",
 "anciennes"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Le CV combiné convient à…",
 "ch": [
 "un finissant avec beaucoup d'expérience hors du domaine",
-"personne",
 "un expert seulement",
+"un compagnon de 30 ans d'expérience seulement",
 "un enfant"
 ],
 "bon": 0,
@@ -12403,34 +12403,34 @@ window.QUIZ_LIVRES = [
 {
 "q": "En région, se présenter en personne pour une candidature spontanée…",
 "ch": [
-"fonctionne encore très bien",
-"est interdit",
+"se fait seulement la nuit",
 "ne sert à rien",
-"se fait seulement la nuit"
+"fonctionne encore très bien",
+"est interdit"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Une offre te demande de l'argent pour « réserver » le poste.",
 "ch": [
-"Je paie vite",
 "C'est probablement une fausse offre",
-"C'est normal",
+"Je paie vite pour ne pas perdre le poste",
+"C'est normal pour les emplois très demandés",
 "Je donne mon NAS"
 ],
-"bon": 1,
+"bon": 0,
 "s": 20
 },
 {
 "q": "Le brouillon de ta lettre de présentation, c'est…",
 "ch": [
+"un modèle de lettre copié sur Internet",
+"un texto",
 "ton tableau exigences de l'offre / ton bilan",
-"un modèle copié sur Internet",
-"ton CV recopié",
-"un texto"
+"ton CV recopié"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
@@ -12462,19 +12462,19 @@ window.QUIZ_LIVRES = [
 "q": "Pour tes réseaux personnels, la visibilité des publications devrait être…",
 "ch": [
 "Public",
-"Amis",
+"Sans importance",
 "Tout le monde",
-"Sans importance"
+"Amis"
 ],
-"bon": 1,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Sites gouvernementaux pour chercher un emploi :",
 "ch": [
 "Québec emploi et le Guichet-Emplois",
-"Les réseaux de jeux",
 "Les sites de vente usagée",
+"Les réseaux de jeux",
 "Aucun"
 ],
 "bon": 0,
@@ -12484,8 +12484,8 @@ window.QUIZ_LIVRES = [
 "q": "Une recherche d'emploi efficace se traite comme…",
 "ch": [
 "un emploi à temps partiel : heures fixes et objectifs",
-"un passe-temps",
-"une corvée à faire une fois",
+"une corvée à faire une seule fois, en une journée",
+"un passe-temps, quand tu as le temps",
 "un loisir du dimanche"
 ],
 "bon": 0,
@@ -12521,10 +12521,10 @@ window.QUIZ_LIVRES = [
 {
 "q": "Une lettre de candidature spontanée s'appuie sur…",
 "ch": [
-"les exigences de l'offre",
-"ce que tu sais de l'employeur",
 "ton horaire de la semaine",
-"une lettre type envoyée à tous"
+"ce que tu sais de l'employeur",
+"une lettre type envoyée à tous",
+"les exigences de l'offre"
 ],
 "bon": 1,
 "s": 20,
@@ -12533,45 +12533,45 @@ window.QUIZ_LIVRES = [
 {
 "q": "La lettre de présentation fait le pont entre…",
 "ch": [
-"l'offre et ton bilan",
-"deux employeurs",
+"toi et ta famille",
 "le CV et la photo",
-"toi et ta famille"
+"l'offre et ton bilan",
+"deux employeurs"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Le premier paragraphe de la lettre dit…",
 "ch": [
-"qui tu es, quel poste tu vises et comment tu l'as connu",
-"ton salaire voulu",
-"tes loisirs",
-"tes défauts"
+"tes défauts",
+"tes loisirs et tes passe-temps",
+"ton salaire voulu et tes disponibilités",
+"qui tu es, quel poste tu vises et comment tu l'as connu"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Le courriel de candidature doit être…",
 "ch": [
-"court, poli et complet",
-"long et détaillé",
 "en majuscules",
-"sans objet"
+"sans objet",
+"court, poli et complet",
+"long et détaillé"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Une question délicate en entrevue : la règle…",
 "ch": [
+"se fâcher",
+"mentir pour donner la meilleure image",
 "honnête, bref, puis revenir au positif",
-"mentir",
-"refuser de répondre",
-"se fâcher"
+"refuser poliment de répondre"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 }
 ]
@@ -12610,67 +12610,67 @@ window.QUIZ_LIVRES = [
 {
 "q": "« Parlez-moi de vous » : l'employeur veut surtout savoir…",
 "ch": [
-"toute ta vie",
 "pourquoi tu es ici pour ce poste",
 "ton signe astrologique",
-"tes loisirs du week-end"
+"tes loisirs du week-end",
+"toute ta vie"
 ],
-"bon": 1,
+"bon": 0,
 "s": 20
 },
 {
 "q": "Quand parler du salaire?",
 "ch": [
-"Dès la première minute",
-"Quand l'employeur aborde le sujet ou au moment de l'offre",
+"Dans la lettre de présentation, avant l'entrevue",
+"Dès la première minute de l'entrevue",
 "Jamais",
-"Dans la lettre"
+"Quand l'employeur aborde le sujet ou au moment de l'offre"
 ],
-"bon": 1,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Ton message de remerciement après l'entrevue s'envoie…",
 "ch": [
-"le jour même ou le lendemain",
 "un mois plus tard",
+"le jour même ou le lendemain",
 "seulement si on t'engage",
 "jamais"
 ],
-"bon": 0,
+"bon": 1,
 "s": 20
 },
 {
 "q": "Un refus veut dire…",
 "ch": [
-"que tu n'es pas bon",
+"que l'employeur te déteste",
+"que tu n'es pas bon dans ton métier",
 "qu'un autre candidat correspondait mieux cette fois",
-"que tu dois arrêter de chercher",
-"que l'employeur te déteste"
+"que tu dois arrêter de chercher dans ce domaine"
 ],
-"bon": 1,
+"bon": 2,
 "s": 20
 },
 {
 "q": "La loi qui fixe les conditions minimales de travail au Québec :",
 "ch": [
-"la Loi sur les normes du travail",
-"le Code de construction",
+"le Code de la route",
 "la Loi sur la RBQ",
-"le Code de la route"
+"la Loi sur les normes du travail",
+"le Code de construction"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 },
 {
 "q": "Premier jour : on te demande d'utiliser un produit que tu ne connais pas.",
 "ch": [
-"Je l'utilise sans rien lire",
 "Je lis l'étiquette et la FDS",
 "Je le mélange avec de l'eau de Javel",
-"Je refuse de travailler"
+"Je refuse de travailler",
+"Je l'utilise sans rien lire"
 ],
-"bon": 1,
+"bon": 0,
 "s": 20
 },
 {
@@ -12695,9 +12695,9 @@ window.QUIZ_LIVRES = [
 {
 "q": "La tenue pour une entrevue en entretien :",
 "ch": [
-"complet-cravate obligatoire",
+"complet-cravate, obligatoire partout",
 "un cran plus habillé que la tenue de travail, propre",
-"survêtement de sport",
+"survêtement de sport, pour être à l'aise",
 "vêtements de travail sales"
 ],
 "bon": 1,
@@ -12707,9 +12707,9 @@ window.QUIZ_LIVRES = [
 "q": "Une fois l'offre acceptée, tu demandes…",
 "ch": [
 "une confirmation écrite : salaire, horaire, statut, date de début",
-"rien du tout",
-"une augmentation",
-"un congé"
+"un congé",
+"rien du tout : une poignée de main suffit",
+"une augmentation avant même de commencer"
 ],
 "bon": 0,
 "s": 20
@@ -12718,9 +12718,9 @@ window.QUIZ_LIVRES = [
 "q": "La période de probation, c'est…",
 "ch": [
 "une période d'essai où l'employeur observe ta fiabilité",
-"des vacances payées",
-"une amende",
-"un examen écrit"
+"des vacances payées avant de commencer",
+"un examen écrit",
+"une amende si tu arrives en retard"
 ],
 "bon": 0,
 "s": 20
@@ -12737,34 +12737,34 @@ window.QUIZ_LIVRES = [
 {
 "q": "Au téléphone, l'employeur n'a que…",
 "ch": [
-"ta voix et tes mots",
-"ta photo",
 "ton CV imprimé",
-"ta tenue"
+"ta photo",
+"ta tenue",
+"ta voix et tes mots"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Juste après l'entrevue, prends cinq minutes pour…",
 "ch": [
-"noter ce qui s'est passé",
-"publier sur les réseaux",
+"oublier",
 "rappeler l'employeur",
-"oublier"
+"publier sur les réseaux",
+"noter ce qui s'est passé"
 ],
-"bon": 0,
+"bon": 3,
 "s": 20
 },
 {
 "q": "Après le cours, ton dossier est prêt : il faut maintenant…",
 "ch": [
+"attendre qu'on t'appelle avec ce que tu as envoyé",
+"le ranger jusqu'à la prochaine fois",
 "l'utiliser et continuer ta recherche",
-"le ranger",
-"le jeter",
-"attendre qu'on t'appelle"
+"le jeter"
 ],
-"bon": 0,
+"bon": 2,
 "s": 20
 }
 ]
