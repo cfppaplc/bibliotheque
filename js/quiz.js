@@ -206,6 +206,8 @@ else {
 
 /* ================================ TÉLÉCOMMANDE ================================ */
 /* 25 nov. : le tricheur voit la bonne réponse (bandeau discret + petit point sur le bon choix) */
+document.addEventListener("click", e => { const b = e.target.closest && e.target.closest(".infoB"); if (!b) return; e.preventDefault(); e.stopPropagation();
+  const l = b.closest("label"), bu = l && l.nextElementSibling; if (bu && bu.classList.contains("bulleI")) bu.hidden = !bu.hidden; }, true);   /* 25 nov. : bulle d'information des options */
 function trichAppliquer(i){ const t = window.__trich, b = document.getElementById("jBx"); if (!t || t.i !== i || !b || b.querySelector(".trichB") || !b.querySelector("[data-c]")) return;   /* seulement pendant la question */
   if (t.apres && Date.now() < t.apres){ clearTimeout(window.__trichT); window.__trichT = setTimeout(() => trichAppliquer(i), t.apres - Date.now() + 30); return; }
   b.insertAdjacentHTML("afterbegin", `<div class="trichB">Tu es le tricheur (la réponse arrive après 3 s). Bonne réponse : <b>${String(t.txt || "").replace(/[&<>"]/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"})[c])}</b>. Ne te fais pas remarquer!</div>`);
@@ -850,7 +852,13 @@ function telecommande(bord){
         <label><span>Texte des choix</span>${seg("lettres", [["non", "Au tableau"], ["oui", "iPad seulement"]])}</label>
         <label><span>Indice<small>l'élève paie 500 points pour enlever des mauvais choix</small></span>${seg("indice", [["non", "Non"], ["oui", "Oui (−500)"]])}</label>
         <label><span>Double ou rien</span>${seg("double", [["non", "Non"], ["oui", "Vers 40 % et à la fin"]])}</label>
-        <label><span>Tricheur<small>un élève secret voit les bonnes réponses; à la fin, tout le monde vote. Le trouver : +1000 points</small></span>${seg("tricheur", [["non", "Non"], ["oui", "Oui"]])}</label>
+        <label><span>Tricheur <i class="infoB" role="button" tabindex="0" aria-label="Comment marche le tricheur">i</i><small>un élève secret voit les bonnes réponses; à la fin, tout le monde vote</small></span>${seg("tricheur", [["non", "Non"], ["oui", "Oui"]])}</label>
+        <div class="bulleI" hidden><b>Le rôle du tricheur</b>
+          <ul><li>Au début, un élève est choisi au hasard (3 joueurs ou plus). Personne ne le sait, pas même toi.</li>
+          <li>Sur son iPad seulement, il voit la bonne réponse 3 secondes après les choix. Il doit répondre sans se faire remarquer.</li>
+          <li>Après la dernière question : l'interrogatoire (2 min). Les suspects s'affichent au tableau; tes questions, sur ta télécommande.</li>
+          <li>Vote sur les iPad (on peut passer). Le trouver : on se partage la moitié de ses points. Se tromper : on lui donne 20 % des siens.</li>
+          <li>Tu votes aussi : si tu te trompes, il gagne 1000 points.</li></ul></div>
       </div>
       <div class="sous">Comment veux-tu afficher la partie ?</div>
       <div class="duo"><button id="mAnim">Animer au tableau<small>Un seul ordinateur : l'écran de classe avec ses commandes en bas.</small></button>
