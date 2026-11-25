@@ -853,12 +853,15 @@ function telecommande(bord){
         <label><span>Indice<small>l'élève paie 500 points pour enlever des mauvais choix</small></span>${seg("indice", [["non", "Non"], ["oui", "Oui (−500)"]])}</label>
         <label><span>Double ou rien</span>${seg("double", [["non", "Non"], ["oui", "Vers 40 % et à la fin"]])}</label>
         <label><span>Tricheur <i class="infoB" role="button" tabindex="0" aria-label="Comment marche le tricheur">i</i><small>un élève secret voit les bonnes réponses; à la fin, tout le monde vote</small></span>${seg("tricheur", [["non", "Non"], ["oui", "Oui"]])}</label>
-        <div class="bulleI" hidden><b>Le rôle du tricheur</b>
-          <ul><li>Au début, un élève est choisi au hasard (3 joueurs ou plus). Personne ne le sait, pas même toi.</li>
-          <li>Sur son iPad seulement, il voit la bonne réponse 3 secondes après les choix. Il doit répondre sans se faire remarquer.</li>
-          <li>Après la dernière question : l'interrogatoire (2 min). Les suspects s'affichent au tableau; tes questions, sur ta télécommande.</li>
-          <li>Vote sur les iPad (on peut passer). Le trouver : on se partage la moitié de ses points. Se tromper : on lui donne 20 % des siens.</li>
-          <li>Tu votes aussi : si tu te trompes, il gagne 1000 points.</li></ul></div>
+        <div class="bulleI" hidden><b>Le tricheur, c'est quoi?</b>
+          <p>Un seul élève, tiré au hasard, est le tricheur. Personne ne sait qui c'est, même pas toi.</p>
+          <p><b>Pendant la partie :</b> son iPad lui montre la bonne réponse. Il doit gagner sans que les autres s'en aperçoivent.</p>
+          <p><b>À la fin :</b> 2 minutes pour discuter et accuser. Ensuite, chacun vote pour celui qu'il croit être le tricheur.</p>
+          <p><b>Les points :</b></p>
+          <ul><li>Tu trouves le tricheur : tu lui prends des points.</li>
+          <li>Tu te trompes : tu lui donnes des points.</li>
+          <li>Tu passes : rien ne change.</li>
+          <li>L'animateur vote aussi : s'il se trompe, le tricheur gagne 1000 points.</li></ul></div>
       </div>
       <div class="sous">Comment veux-tu afficher la partie ?</div>
       <div class="duo"><button id="mAnim">Animer au tableau<small>Un seul ordinateur : l'écran de classe avec ses commandes en bas.</small></button>
