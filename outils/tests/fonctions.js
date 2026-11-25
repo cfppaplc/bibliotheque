@@ -152,6 +152,30 @@ test("Message de l'administrateur et mise à jour forcée chez un enseignant", a
   await ctx.close();
 });
 
+test("Élève : toucher un choix (format commun .mp-ch / .mp-vf) l'encercle, retoucher l'enlève", async b => {
+  const p = await page(b, { viewport: { width: 1280, height: 800 }, hasTouch: true, serviceWorkers: "block" }, "2608egi1");
+  const fs = require("fs"); let h = fs.readFileSync("livres/essai-micro-ordinateur.html", "utf8");
+  h = h.replace(/<section class="page cover"/, '<section class="page mp"><div class="mp-q"><p class="mp-qq">Question ?</p><div class="mp-ch" id="tch"><span>Choix un</span><span class="reponse-choix">Choix deux</span><span>Choix trois</span></div><p>Vrai ou faux <span class="mp-vf" id="tvf"><span>Vrai</span><span>Faux</span></span></p></div></section><section class="page cover"');
+  await p.route(/livres\/essai-micro-ordinateur\.html/, r => r.fulfill({ body: h, contentType: "text/html" }));
+  await p.goto(BASE + "index.html"); await attendre(400);
+  await p.evaluate(() => new Promise(ok => { const r = indexedDB.open("acces", 1); r.onupgradeneeded = () => r.result.createObjectStore("s"); r.onsuccess = () => { const t = r.result.transaction("s", "readwrite"); t.objectStore("s").put({ id: "2608egi1", priv: null }, "session"); t.oncomplete = ok; }; }));
+  await p.reload(); await p.waitForFunction(() => window.ACCES && ACCES.eleve, null, { timeout: 15000 }); await attendre(1500);
+  await p.evaluate(() => lire(LIVRES.find(l => l.fichier === "essai-micro-ordinateur")));
+  await p.waitForFunction(() => { const f = document.getElementById("readerFrame"); return f && f.contentDocument && f.contentDocument.getElementById("tch"); }, null, { timeout: 15000 }); await attendre(1500);
+  const centre = sel => p.evaluate(sel => { const f = document.getElementById("readerFrame"), fr = f.getBoundingClientRect(), d = f.contentDocument, e = d.querySelector(sel); e.scrollIntoView({ block: "center" });
+    const r = e.getBoundingClientRect(), k = fr.width / (f.contentWindow.innerWidth || fr.width); return [fr.left + (r.left + r.width / 2) * k, fr.top + (r.top + r.height / 2) * k]; }, sel);
+  const n = () => p.evaluate(() => (INKS[inkKey()] || []).filter(o => o.coche).length);
+  let [x, y] = await centre("#tch>span:nth-child(3)"); await attendre(400); [x, y] = await centre("#tch>span:nth-child(3)");
+  await p.evaluate(([x, y]) => ecrireIci(x, y), [x, y]); await attendre(400);
+  vrai(await n() === 1, "Le choix n'est pas encerclé (" + await n() + ")");
+  [x, y] = await centre("#tvf>span:nth-child(2)"); await p.evaluate(([x, y]) => ecrireIci(x, y), [x, y]); await attendre(400);
+  vrai(await n() === 2, "Le V/F n'est pas encerclé (" + await n() + ")");
+  await p.evaluate(([x, y]) => ecrireIci(x, y), [x, y]); await attendre(400);
+  vrai(await n() === 1, "Retoucher n'enlève pas le rond");
+  vrai(!(await p.evaluate(() => document.getElementById("readerFrame").contentDocument.body.classList.contains("answers"))), "Les réponses sont visibles pour l'élève");
+  vrai(!p.errs.length, p.errs.join(" | "));
+});
+
 (async () => {
   const b = await chromium.launch(); let echecs = 0;
   for (const [nom, f] of tests) {

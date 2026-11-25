@@ -343,7 +343,7 @@ function verrouEleve(win, doc){
     if (!estEleve() || RD.wb || (RD.pen && !RD.crayonOff)) return;
     if (e.target.closest && e.target.closest("a[href],button,input,select,textarea,summary,[contenteditable],[onclick],.nav,.toc,nav")) return;
     for (let el = e.target, k = 0; el && el !== doc.body && k < 5; el = el.parentElement, k++)          /* élément cliquable du livre (simulateur, bouton dessiné) : le livre garde la main */
-      if (win.getComputedStyle(el).cursor === "pointer" && !el.closest(".opts,.choix,.vf,.options,.qcm,.choices,td,th,.blk")) return;   /* .blk (Administration) : « rejouer l'animation » d'un schéma, la réponse de l'élève passe avant */   /* une case de tableau cliquable (révèle le corrigé) : l'élève y écrit plutôt sa réponse */
+      if (win.getComputedStyle(el).cursor === "pointer" && !el.closest(".opts,.choix,.vf,.options,.qcm,.choices,.mp-ch,.mp-vf,.ch,.vfb,td,th,.blk")) return;   /* .blk (Administration) : « rejouer l'animation » d'un schéma, la réponse de l'élève passe avant */   /* une case de tableau cliquable (révèle le corrigé) : l'élève y écrit plutôt sa réponse */
     const f = [$("#readerFrame"), $("#readerFrame2")].find(x => x && x.contentDocument === doc); if (!f) return;
     const fr = f.getBoundingClientRect(), k = fr.width / (win.innerWidth || fr.width), X = fr.left + e.clientX * k, Y = fr.top + e.clientY * k;
     if (ecrireIci(X, Y)){ e.preventDefault(); e.stopImmediatePropagation(); }

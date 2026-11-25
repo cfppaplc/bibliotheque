@@ -718,7 +718,7 @@ let PART = {}, COMPTES = {}; /* PART = { groupe: [comptes des collègues] } */
 async function majPart(){
   try { COMPTES = (await (await fetch("comptes.json", { cache:"no-store" })).json()).comptes || {}; } catch(e) {}
   /* seul l'administrateur crée ou efface des élèves et des groupes (15 nov.; plus tard : chefs de groupe) */
-  window.ADMIN = !!(window.__moi && COMPTES[window.__moi] && COMPTES[window.__moi].admin); document.body.classList.toggle("lecteur", !window.ADMIN);
+  window.ADMIN = !!(window.__moi && COMPTES[window.__moi] && (COMPTES[window.__moi].admin || COMPTES[window.__moi].chef));   /* 25 nov. : chef de groupe = mêmes droits dans la Gestion d'atelier */ document.body.classList.toggle("lecteur", !window.ADMIN);
   if (window.__moi) PART = (await PARTAGE.lire(window.__moi)).part; publierGrp(); lireHotes();
   const noms = [...new Set(Object.values(PART).flat())].filter(id => COMPTES[id]).map(id => COMPTES[id].nom || id);
   $("#bPart").textContent = noms.length ? "Partagé avec " + (noms.length === 1 ? noms[0] : noms.length + " collègues") : "Partager";

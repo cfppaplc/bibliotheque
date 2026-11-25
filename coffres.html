@@ -629,7 +629,7 @@ async function vueProf(){
   /* premiers ateliers : les locaux déjà créés pour le ménage */
   /* 14 nov. : seul l'administrateur crée les ateliers et les coffres; les collègues voient ceux qu'il partage avec eux */
   const s0 = await COFFRE.session(); try { COMPTES = (await (await fetch("comptes.json", { cache:"no-store" })).json()).comptes || {}; } catch(e) {}
-  window.ADMIN = !!(s0 && COMPTES[s0.id] && COMPTES[s0.id].admin);
+  window.ADMIN = !!(s0 && COMPTES[s0.id] && (COMPTES[s0.id].admin || COMPTES[s0.id].chef));   /* 25 nov. : chef de groupe */
   if (!ADMIN) document.body.classList.add("lecteur");
   if (ADMIN && !Object.keys(K.at).length){ try { const L = (await (await fetch("locaux.json", { cache:"no-store" })).json()).locaux || []; L.forEach(l => K.at[l.id] = { nom:l.nom, t:1 }); } catch(e) {} }
   dessiner();

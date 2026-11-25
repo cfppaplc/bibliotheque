@@ -2,6 +2,50 @@
  {
   "date": "2026-11-25",
   "type": "ajout",
+  "titre": "Version élève : les livres sur l'iPad des élèves",
+  "texte": "Un compte par groupe d'élèves (Administration → Comptes et accès → Groupes d'élèves). L'élève lit les livres de son programme sur l'iPad, sans les réponses. Il touche une ligne pour écrire, une case ou un choix pour répondre; ses réponses restent sur son iPad.",
+  "formation": [
+   {
+    "t": "Ton menu (initiales) → Administration → « Groupes d'élèves » → + Créer un groupe : nom, mot de passe, programme. Puis « Publier ».",
+    "img": "nouveautes/eleves-groupe.jpg"
+   },
+   "Sur l'iPad : « Se connecter » avec l'identifiant du groupe (ex. egi.groupe.a) et son mot de passe.",
+   {
+    "t": "Côté élève, barre réduite : flèches, page, table des matières et Crayon (crayon, Texte, Annuler). Pas de réponses, de tableau blanc, de plans ni de tableau de bord.",
+    "img": "nouveautes/eleves-barre.jpg"
+   },
+   {
+    "t": "L'élève touche directement le livre, sans outil : sur une ligne ou dans une case d'un tableau, il écrit (en bleu, aligné, la réponse reste dans sa case); sur V, F ou une réponse, elle s'encercle; sur une case ☐, elle se coche. Il retouche sa réponse pour la modifier ou l'enlever.",
+    "img": "nouveautes/eleves-cocher.jpg"
+   },
+   {
+    "t": "Outil Texte : touche une ligne de réponse, la case se place sur la ligne. Entrée = ligne suivante. Ça marche aussi pour toi.",
+    "img": "nouveautes/eleves-ligne.jpg"
+   },
+   "Ce que l'élève écrit reste sur cet iPad. Mot de passe à changer : bouton « Mot de passe » du groupe dans ton panneau."
+  ],
+  "versions": [
+   {
+    "date": "2026-10-29",
+    "texte": "Administration : le rond se place pile sur la lettre (ou sur Vrai / Faux), jamais sur un titre; deux touchers rapides ne font plus zoomer le livre."
+   },
+   {
+    "date": "2026-10-29",
+    "texte": "Testé dans les 8 livres : texte toujours sur la bonne ligne, Administration (pages en image) répond aussi aux touchers, simulateurs et animations des livres restent cliquables."
+   },
+   {
+    "date": "2026-10-29",
+    "texte": "Tableaux à remplir : la réponse s'écrit dans la bonne case et rapetisse au besoin pour y rester."
+   },
+   {
+    "date": "2026-10-29",
+    "texte": "Réponses directement dans le livre : toucher une ligne pour écrire, une case pour la cocher, V/F ou un choix pour l'encercler (sans choisir d'outil)."
+   }
+  ]
+ },
+ {
+  "date": "2026-11-25",
+  "type": "ajout",
   "titre": "Défi+ : 90 Défi+ prêts à jouer, avec deux nouveaux types de questions",
   "texte": "Chaque livre a maintenant 6 Défi+, et la carte « Lancer le Défi+ » apparaît à chaque sixième du livre. Nouveaux types : Associer (relier des paires) et Estimation (le plus proche gagne; toutes les estimations s'affichent sur une ligne au tableau). Chaque Défi+ mélange plusieurs types. Les deux nouveaux types s'ajoutent aussi dans tes propres quiz. La bonne réponse n'est plus souvent la plus longue."
  },
@@ -652,51 +696,6 @@
     "texte": "Nouvelle section Activités avec le cahier Montages en circuit fermé (66 pages)."
    }
   ]
- },
- {
-  "date": "2026-10-29",
-  "type": "outil",
-  "titre": "Version élève (iPad)",
-  "texte": "Un compte par groupe d'élèves : les livres en lecture, crayon et texte sur les lignes, sans les réponses.",
-  "formation": [
-   {
-    "t": "Ton menu (initiales) → Administration → « Groupes d'élèves » → + Créer un groupe : nom, mot de passe, programme. Puis « Publier ».",
-    "img": "nouveautes/eleves-groupe.jpg"
-   },
-   "Sur l'iPad : « Se connecter » avec l'identifiant du groupe (ex. egi.groupe.a) et son mot de passe.",
-   {
-    "t": "Côté élève, barre réduite : flèches, page, table des matières et Crayon (crayon, Texte, Annuler). Pas de réponses, de tableau blanc, de plans ni de tableau de bord.",
-    "img": "nouveautes/eleves-barre.jpg"
-   },
-   {
-    "t": "L'élève touche directement le livre, sans outil : sur une ligne ou dans une case d'un tableau, il écrit (en bleu, aligné, la réponse reste dans sa case); sur V, F ou une réponse, elle s'encercle; sur une case ☐, elle se coche. Il retouche sa réponse pour la modifier ou l'enlever.",
-    "img": "nouveautes/eleves-cocher.jpg"
-   },
-   {
-    "t": "Outil Texte : touche une ligne de réponse, la case se place sur la ligne. Entrée = ligne suivante. Ça marche aussi pour toi.",
-    "img": "nouveautes/eleves-ligne.jpg"
-   },
-   "Ce que l'élève écrit reste sur cet iPad. Mot de passe à changer : bouton « Mot de passe » du groupe dans ton panneau."
-  ],
-  "versions": [
-   {
-    "date": "2026-10-29",
-    "texte": "Administration : le rond se place pile sur la lettre (ou sur Vrai / Faux), jamais sur un titre; deux touchers rapides ne font plus zoomer le livre."
-   },
-   {
-    "date": "2026-10-29",
-    "texte": "Testé dans les 8 livres : texte toujours sur la bonne ligne, Administration (pages en image) répond aussi aux touchers, simulateurs et animations des livres restent cliquables."
-   },
-   {
-    "date": "2026-10-29",
-    "texte": "Tableaux à remplir : la réponse s'écrit dans la bonne case et rapetisse au besoin pour y rester."
-   },
-   {
-    "date": "2026-10-29",
-    "texte": "Réponses directement dans le livre : toucher une ligne pour écrire, une case pour la cocher, V/F ou un choix pour l'encercler (sans choisir d'outil)."
-   }
-  ],
-  "cache": true
  },
  {
   "date": "2026-11-11",

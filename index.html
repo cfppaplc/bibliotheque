@@ -248,7 +248,7 @@ document.addEventListener("keydown", e => { if (e.key !== "/" || e.ctrlKey || e.
   <div class="panel" id="panel"></div>
 </div>
 
-<footer><img class="foot-logo" src="img/pavillon-avenir.png" alt="Pavillon de l'Avenir"><div><b>Métier+ · Conçu par Jeremy, enseignant</b></div><div class="foot-s">Né au Pavillon de l'Avenir, centre de formation professionnelle</div><div class="foot-s">Réservé aux enseignants du Pavillon de l'Avenir · Livres interactifs pour la classe et l'atelier</div><div class="foot-s"><a href="presentation.html" style="color:inherit">Découvrir Métier+ (présentation)</a></div><div class="foot-s">© 2026 Jérémy Raymond · Tous droits réservés</div></footer>
+<footer><img class="foot-logo" src="img/pavillon-avenir.png" alt="Pavillon de l'Avenir"><div><b>Métier+ · Conçu par Jeremy, enseignant</b></div><div class="foot-s">Né au Pavillon de l'Avenir, centre de formation professionnelle</div><div class="foot-s">Réservé aux élèves et enseignants du Pavillon de l'Avenir · Livres interactifs pour la classe et l'atelier</div><div class="foot-s"><a href="presentation.html" style="color:inherit">Découvrir Métier+ (présentation)</a></div><div class="foot-s">© 2026 Jérémy Raymond · Tous droits réservés</div></footer>
 
 <script>
 window.LIVRES_DATA = {};
@@ -261,9 +261,9 @@ window.LIVRES_EXTERNES = true;   // les livres sont des fichiers du dossier livr
 <script>/* 25 nov. (erreurs « zout / DPRI / initDonnees is not defined » sur un cellulaire) : un script n'est pas arrivé (réseau coupé) : on recharge la page une seule fois */
 function mpScriptsOk(...n){ if (n.every(f => typeof window[f] === "function")) return; try { if (sessionStorage.mpRechJs) return; sessionStorage.mpRechJs = "1"; } catch(e){ return; } location.reload(); }
 mpScriptsOk("zout", "DPRI");</script>
-<script src="js/tableau-blanc.js?v=15"></script>
+<script src="js/tableau-blanc.js?v=16"></script>
 <script>/* 17 nov. : si le fichier du tableau blanc n'est pas arrivé (réseau coupé), on recharge la page une fois */ if (typeof setIcn === "undefined") { try { if (!sessionStorage.rechTB) { sessionStorage.rechTB = "1"; location.reload(); } } catch(e){} } else { try { sessionStorage.removeItem("rechTB"); } catch(e){} }</script>
-<script src="js/lecteur.js?v=14"></script>
+<script src="js/lecteur.js?v=15"></script>
 <script src="js/defi-livre-data.js?v=7"></script>
 <script src="js/defi-livre.js?v=3"></script>
 <script src="js/donnees.js?v=1"></script>
@@ -412,9 +412,9 @@ document.addEventListener("click", e => {
 <script src="js/qrcode.js?v=1"></script>
 
 <div class="bv-ov" id="bienOv" hidden role="dialog" aria-label="Bienvenue"><div class="bien-box">
-  <div class="bien-tete"><img class="lg-blc" src="img/metier-plus-blanc.svg" alt="Métier+"><img class="lg-clr" src="img/metier-plus.svg" alt=""><h2>Bienvenue !</h2><p>La plateforme pédagogique des enseignants en formation professionnelle. Accès réservé aux enseignants du Pavillon de l'Avenir.</p></div>
+  <div class="bien-tete"><img class="lg-blc" src="img/metier-plus-blanc.svg" alt="Métier+"><img class="lg-clr" src="img/metier-plus.svg" alt=""><h2>Bienvenue !</h2><p>La plateforme pédagogique des enseignants en formation professionnelle. Accès réservé aux élèves et enseignants du Pavillon de l'Avenir.</p></div>
   <ol class="bien-et">
-    <li><span class="bi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 20c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg></span><div><b>Connecte-toi</b>Utilise ton identifiant (prenom.nom). Pas encore de compte&nbsp;? Touche «&nbsp;Demander un accès&nbsp;» dans la fenêtre de connexion.</div></li>
+    <li><span class="bi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 20c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg></span><div><b>Connecte-toi</b>Utilise ton identifiant (prenom.nom). Pas encore de compte&nbsp;? Touche «&nbsp;Demander un accès&nbsp;» dans la fenêtre de connexion. Élève&nbsp;: ton enseignant te donne l'identifiant de ton groupe.</div></li>
     <li><span class="bi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5z"/><path d="M4 19V5.5M8 7h8M8 11h6"/></svg></span><div><b>Choisis un livre</b>Touche une couverture, puis «&nbsp;Lire&nbsp;» : le livre s'ouvre en plein écran, prêt à projeter.</div></li>
     <li><span class="bi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 6h7a3 3 0 0 1 3 3v11a2 2 0 0 0-2-2H2z"/><path d="M22 6h-7a3 3 0 0 0-3 3v11a2 2 0 0 1 2-2h8z"/></svg></span><div><b>Présente</b>Les flèches tournent les pages; le menu ☰ ouvre la table des matières et la recherche.</div></li>
   </ol>
@@ -516,7 +516,7 @@ window.addEventListener("online", () => { try { aviser("Internet est revenu."); 
 <link rel="stylesheet" href="css/acces.css?v=4">
 <div class="acces-ov" id="accesOv" hidden role="dialog" aria-modal="true"><div class="acces-box" id="accesBox"></div></div>
 <div class="acces-menu" id="accesMenu" hidden></div>
-<script src="js/acces.js?v=8"></script>
+<script src="js/acces.js?v=9"></script>
 <script src="js/admin-site.js?v=3"></script>
 <script src="js/admin-plus.js?v=2"></script>
 

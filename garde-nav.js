@@ -20,7 +20,7 @@ window.mpPiedHTML = () => {
     + '<p>La plateforme pédagogique des enseignants en formation professionnelle. Livres animés, plans, formatifs, quiz et simulations.</p></div>'
     + '<div><h4>Outils</h4><ul>' + outils + '</ul></div>'
     + '<div><h4>Aide</h4><ul><li><a href="./?ouvrir=neuf" data-pied="neuf">Quoi de neuf</a></li><li><a href="./?ouvrir=aide" data-pied="aide">Aide</a></li><li><a href="presentation.html">Présentation de Métier+</a></li><li><a href="./?ouvrir=signal" data-pied="signal">Signaler un problème</a></li><li><a href="confidentialite.html">Confidentialité</a></li><li class="mp-pied-acces"><a href="./?ouvrir=compte" data-pied="compte">Demander un accès</a></li></ul></div></div>'
-    + '<div class="mp-pied-bas"><span>© 2026 Jérémy Raymond · Tous droits réservés · Réservé aux enseignants du Pavillon de l\'Avenir</span><span class="mp-pied-pav">Né au Pavillon de l\'Avenir <img src="img/pavillon-avenir.png" alt="Pavillon de l\'Avenir"></span></div>';
+    + '<div class="mp-pied-bas"><span>© 2026 Jérémy Raymond · Tous droits réservés · Réservé aux élèves et enseignants du Pavillon de l\'Avenir</span><span class="mp-pied-pav">Né au Pavillon de l\'Avenir <img src="img/pavillon-avenir.png" alt="Pavillon de l\'Avenir"></span></div>';
 };
 (function(){
   if (!document.getElementById("mpPiedCss")){ const st = document.createElement("style"); st.id = "mpPiedCss"; st.textContent =
@@ -162,7 +162,7 @@ html.clair .mp-plusM,body.clair .mp-plusM{background:#fff;color:#1E2A44;border-c
   const hache = async s => [...new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s)))].map(b => b.toString(16).padStart(2, "0")).join("");
   (async () => { try {
     const C = (await (await fetch("comptes.json", {cache: "no-store"})).json()).comptes || {};
-    let v = !!(C[moi] && C[moi].admin);
+    let v = !!(C[moi] && (C[moi].admin || C[moi].chef));
     if (!v) await Promise.all(Object.keys(C).filter(id => id !== moi && !C[id].eleve).map(async id => {
       const r = await fetch(API, {method: "POST", headers: {apikey: CLE, "Content-Type": "application/json"}, body: JSON.stringify({p_id: await hache("metier+|partage-passeport|" + id)})});
       if (!r.ok) return; const row = (await r.json() || [])[0], d = row && row.data ? JSON.parse(row.data) : {};

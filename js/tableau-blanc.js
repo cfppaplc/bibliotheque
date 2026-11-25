@@ -1223,7 +1223,7 @@ function caseDuLivre(X, Y){
     if (best && best.d * s > 3){ const L = ligneDuLivre(X, Y); if (L && X >= L.x - 2 && X <= L.x + L.w + 2 && Math.abs(Y - L.y) < 26) best = null; }   /* doigt à côté de la case, sur une ligne : c'est la ligne qui gagne */
     if (best) return { kind:best.kind, x:fr.left + best.r.left * s, y:fr.top + best.r.top * s, w:best.r.width * s, h:best.r.height * s };
     /* 3. choix à encercler : un enfant d'un groupe .opts / .choix / .vf (ou options, choices, qcm) */
-    const CH = /(^|\s)(opts?|options?|choix|choices?|vf|qcm)(\s|$)/;
+    const CH = /(^|\s)(opts?|options?|choix|choices?|vf|qcm|mp-ch|mp-vf|ch|vfb)(\s|$)/;   /* 25 nov. : + format commun des livres (.mp-ch, .mp-vf; .ch, .vfb) */
     for (const e of sous){ const p = e.parentElement; if (!p || !CH.test(p.className || "") || !vis(e) || !texteVisible(e, win) || e.textContent.trim().length > 120) continue;   /* un choix a des mots (une ligne de réponse vide n'est pas un choix) */
       let r = e.getBoundingClientRect(); try { const rg = doc.createRange(); rg.selectNodeContents(e); const rt = rg.getBoundingClientRect(); if (rt.width && rt.width < r.width) r = rt; } catch(x){}   /* le rond suit les mots, pas toute la largeur du bloc */
       if (r.width && r.height < 120) return { kind:"rond", x:fr.left + r.left * s, y:fr.top + r.top * s, w:r.width * s, h:r.height * s }; }

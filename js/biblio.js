@@ -275,7 +275,7 @@ function renderHero(){
   h.style.cssText = "background:linear-gradient(120deg,#1b2540 0%,#141414 68%)";
   if (estVisiteur()){   /* visiteur (pas connecté) : accueil simplifié, 8 nov. */
     h.innerHTML = `<div class="hero-content"><h1>Enseigner un métier, simplement.</h1>
-      <p>Métier+ réunit les livres de cours animés, les plans techniques, les formatifs, les quiz et les simulations des enseignants en formation professionnelle. <span class="hero-tag">Réservé aux enseignants du Pavillon de l'Avenir</span></p>
+      <p>Métier+ réunit les livres de cours animés, les plans techniques, les formatifs, les quiz et les simulations des enseignants en formation professionnelle. <span class="hero-tag">Réservé aux élèves et enseignants du Pavillon de l'Avenir</span></p>
       <div class="vis-btns"><button class="vis-co" id="visCo" type="button">Se connecter</button><button class="vis-dem" id="visDem" type="button">Demander un accès</button><a class="vis-dec" href="presentation.html">Découvrir Métier+ ›</a></div></div>
       <div class="hero-stack">${vedettes().map(l => `<img src="${esc(couv(l))}" alt="">`).join("")}</div>`;
     $("#visCo").onclick = () => window.ACCES && ACCES.dlgConnexion();
@@ -283,7 +283,7 @@ function renderHero(){
     return; }
   h.innerHTML = `<div class="hero-content">
     <h1>${(window.titreAccueil && window.titreAccueil()) || "La plateforme des enseignants en formation professionnelle"}</h1>
-    <p>Livres de cours animés, plans techniques, formatifs et simulateurs, réunis pour enseigner un métier en classe comme à l'atelier. <span class="hero-tag">Réservé aux enseignants du Pavillon de l'Avenir</span></p>
+    <p>Livres de cours animés, plans techniques, formatifs et simulateurs, réunis pour enseigner un métier en classe comme à l'atelier. <span class="hero-tag">Réservé aux élèves et enseignants du Pavillon de l'Avenir</span></p>
     <button class="hero-aide" id="heroAide" type="button">❔ Aide</button>
   </div>
   <div class="hero-stack">${vedettes().map(l => `<img src="${esc(couv(l))}" alt="">`).join("")}</div>`;
