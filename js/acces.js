@@ -364,6 +364,7 @@ window.ACCES = (function(){
   let ONGLET = "accueil", REGL = null; const FORCER_RECH = new Set(), VU = {}, EXTRA = {}, EXTRA_LIV = new Set();   /* EXTRA : fichiers à joindre à la publication (livre ajouté ou remplacé) */
   const clone = o => JSON.parse(JSON.stringify(o));
   const ICO = {
+    groupes:'<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9h4M7 13h10M7 17h7"/></svg>',
     profs:'<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.2-5.5 6.5-5.5s5.9 1.9 6.5 5.5"/><circle cx="17.5" cy="9" r="2.6"/><path d="M16.5 14.6c2.6.2 4.4 1.9 5 5.4"/></svg>',
     livres:'<svg viewBox="0 0 24 24"><path d="M4 4.5h6a2 2 0 0 1 2 2V20a2 2 0 0 0-2-2H4z"/><path d="M20 4.5h-6a2 2 0 0 0-2 2V20a2 2 0 0 1 2-2h6z"/></svg>',
     stats:'<svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>',
@@ -459,7 +460,7 @@ window.ACCES = (function(){
       + '<div><b>' + livres.length + '</b><span>livres protégés</span></div><div class="dem"><b id="gStatDem">…</b><span>demandes</span></div>'
       + '<div class="' + (aPublier ? 'pub' : 'ok') + '"><b>' + (aPublier ? '!' : '✓') + '</b><span>' + (aPublier ? 'à publier' : 'tout est publié') + '</span></div></div>'
       + '<nav class="acces-onglets">' + grpT("Vue d'ensemble") + ong("accueil", "Tableau de bord")
-        + grpT("Personnes") + ong("profs", "Comptes et accès") + ong("voir", "Voir comme un collègue") + ong("diff", "Message et mise à jour")
+        + grpT("Personnes") + ong("profs", "Comptes et accès") + ong("groupes", "Groupes et élèves") + ong("voir", "Voir comme un collègue") + ong("diff", "Message et mise à jour")
         + grpT("Contenu") + ong("livres", "Livres") + ong("ajliv", "Ajouter un livre") + ong("defi", "Défi+ des livres") + ong("nouv", "Quoi de neuf") + ong("props", "Propositions") + ong("magasin", "Magasin") + ong("classe", "Classe et atelier")
         + grpT("Suivi") + ong("stats", "Statistiques") + ong("journaux", "Fluidité") + ong("site", "Signalements et état") + ong("hist", "Historique et copies")
         + grpT("Site") + ong("auto", "Automatisations") + '</nav>'
@@ -482,7 +483,7 @@ window.ACCES = (function(){
       + '<div class="acces-pane"' + vol("stats") + '>' + volStats + '</div>'
       + '<div class="acces-pane"' + vol("hist") + '>' + volHist + '</div>'
       + '<div class="acces-pane"' + vol("site") + '><div id="gSite"></div></div>'
-      + ["accueil", "nouv", "classe", "journaux", "auto", "diff", "voir", "defi", "ajliv", "magasin"].map(k => '<div class="acces-pane"' + vol(k) + '><div id="gPlus_' + k + '"><p class="sous">Chargement…</p></div></div>').join("")
+      + ["accueil", "nouv", "classe", "groupes", "journaux", "auto", "diff", "voir", "defi", "ajliv", "magasin"].map(k => '<div class="acces-pane"' + vol(k) + '><div id="gPlus_' + k + '"><p class="sous">Chargement…</p></div></div>').join("")
       + (aRech.length ? '<label class="acces-rech"><input type="checkbox" id="gRech" checked><span><b>Couper vraiment l\'accès</b> : nouvelle clé pour ' + aRech.map(f => '« ' + esc(titreDe(f)) + ' »').join(", ") + '. Une vieille copie gardée par quelqu\'un qui n\'a plus l\'accès ne s\'ouvrira plus (un peu plus long à publier).</span></label>' : '')
       + (jeton   /* clé déjà enregistrée : invisible et impossible à changer dans le panneau (demande de Jeremy, 8 nov.); redemandée seulement si GitHub la refuse */
         ? '<input type="hidden" id="gJeton" value="">'

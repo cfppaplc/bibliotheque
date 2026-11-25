@@ -211,7 +211,7 @@ main{max-width:1500px}
   const $ = q => document.querySelector(q), esc = t => String(t ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
   const sansAcc = t => String(t || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
   const lire = k => { try { return JSON.parse(localStorage.getItem(k) || "null") || {}; } catch(e) { return {}; } };
-  const fFo = $("#fFo"), fCo = $("#fCo"), ADM = () => !!(fFo.contentWindow && fFo.contentWindow.ADMIN), PASS = () => fFo.contentWindow && fFo.contentWindow.PASS, CF = () => fCo.contentWindow && fCo.contentWindow.CF;
+  const fFo = $("#fFo"), fCo = $("#fCo"), ADM = () => !!(fFo.contentWindow && fFo.contentWindow.ADMIN && fFo.contentWindow.GERE !== false), PASS = () => fFo.contentWindow && fFo.contentWindow.PASS, CF = () => fCo.contentWindow && fCo.contentWindow.CF;
   let O = []; try { O = (await (await fetch("protocoles.json", { cache:"no-cache" })).json()).outils || []; } catch(e) {}
   const forme = v => !!(v && v.d && (v.m || !v.s)), aDemo = v => !!(v && v.d && v.s && !v.m);
   const quand = t => { const j = Math.floor((Date.now() - t) / 864e5); return j <= 0 ? "aujourd'hui" : j === 1 ? "hier" : "il y a " + j + " jours"; };

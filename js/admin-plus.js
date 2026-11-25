@@ -130,12 +130,14 @@ window.ADMIN_PLUS = (function(){
     zj.querySelectorAll("[data-app]").forEach(b => b.onclick = () => { J_APP = b.dataset.app; fluidite(z); });
   }
 
+  /* ---------- Groupes et élèves (25 nov.) : la gestion des groupes, élèves, codes et collants se fait seulement ici ---------- */
+  function groupes(z){ ouvrirIci(z, "outils-atelier.html?gestion=1", "Groupes et élèves", z2 => classe(z2), "Classe et atelier"); }
   /* ---------- Classe et atelier ---------- */
   function classe(z){
     /* 25 nov. (Jeremy : « ça ne devrait pas s'ouvrir dans un nouveau lien ») : l'outil s'ouvre dans le panneau, dans un cadre à la hauteur de la page (pas de 2e défilement) */
     const L = (h, t, s) => '<button class="as-lien" data-ouvre="' + h + '" data-t="' + esc(t) + '">' + esc(t) + '<small>' + esc(s) + '</small></button>';
     z.innerHTML = '<div class="ap-tete"><h3>Classe et atelier</h3><p class="sous">Les réglages de chaque outil, ouverts ici même.</p></div><div class="as-grille ap-g3">'
-      + '<div class="as-carte"><h3>Atelier</h3>' + L("outils-atelier.html", "Gestion d'atelier", "Groupes, élèves, équipes, locaux") + L("passeport.html?formations=1", "Formations du registre", "Outils et machines à signer") + L("coffres.html", "Inventaire des coffres", "Coffres, codes QR, listes") + '</div>'
+      + '<div class="as-carte"><h3>Atelier</h3>' + L("outils-atelier.html?gestion=1", "Gestion d'atelier", "Groupes, élèves, équipes, locaux") + L("passeport.html?formations=1&gestion=1", "Formations du registre", "Outils et machines à signer") + L("coffres.html?gestion=1", "Inventaire des coffres", "Coffres, codes QR, listes") + '</div>'
       + '<div class="as-carte"><h3>Classe</h3>' + L("accueil.html?menage=1", "Locaux et tâches du ménage", "Accueil de classe") + L("horaire.html", "Horaires des groupes", "Planification") + '</div>'
       + '<div class="as-carte"><h3>Labo</h3>' + L("labo.html", "Labo interactif", "Simulateurs et Défi+") + L("quiz.html", "Mes Défi+", "Créer et lancer un Défi+") + '</div>'
       + '<div class="as-carte"><h3>Vérification</h3>' + L("magasin.html?mode=magasin", "Comptoir du magasin", "Écran du magasinier") + L("tests.html", "Pages d'essai", "Navigateur, vitesse, toucher, son, écran") + L("confidentialite.html", "Confidentialité (Loi 25)", "Ce que le site recueille") + '</div>'
@@ -411,7 +413,7 @@ window.ADMIN_PLUS = (function(){
 
   function dessiner(k, z){
     if (!z) return;
-    try { ({ accueil, auto, journaux:fluidite, classe, nouv, diff, voir, defi, ajliv, magasin })[k](z); } catch(e){ z.innerHTML = '<p class="acces-err">' + esc(e.message) + '</p>'; }
+    try { ({ accueil, auto, journaux:fluidite, classe, groupes, nouv, diff, voir, defi, ajliv, magasin })[k](z); } catch(e){ z.innerHTML = '<p class="acces-err">' + esc(e.message) + '</p>'; }
   }
   return { dessiner, rapport };
 })();

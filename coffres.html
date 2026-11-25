@@ -144,6 +144,7 @@ html.eleve body{background:var(--fond)}
 .leg .v{--c:#1E8A55}.leg .m{--c:#D9534F}.leg .b{--c:#E08A1E}
 </style>
 <style>
+body.sansgestion #bAtN,body.sansgestion #bAtX,body.sansgestion #bCfN,body.sansgestion #bInv,body.sansgestion #bQr,body.sansgestion #bPart{display:none!important}
 body.lecteur #bAtN,body.lecteur #bAtX,body.lecteur #bCfN,body.lecteur #bInv,body.lecteur #bQr,body.lecteur #bPart{display:none}
 .cfs{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
 .cf{all:unset;box-sizing:border-box;cursor:pointer;background:var(--carte);border:1px solid var(--ligne);border-left:8px solid var(--gris);border-radius:14px;padding:14px 16px;display:grid;gap:4px;min-height:96px}
@@ -429,7 +430,11 @@ const numCf = n => (String(n || "").match(/\d+/) || [""])[0];
 function nouveauCoffre(at, nom){ const k = numCf(nom), bas = nom.toLowerCase();
   const id = Object.keys(K.cf).find(c => K.cf[c].x && K.cf[c].at === at && (k ? numCf(K.cf[c].nom) === k : (K.cf[c].nom || "").toLowerCase() === bas)) || "c" + nid();
   K.cf[id] = Object.assign({ liste:[] }, K.cf[id], { at, nom, t:Date.now() }); delete K.cf[id].x; return id; }
-function majAtX(){ const b = $("#bAtX"); if (b) b.hidden = !(window.ADMIN && K.at[AT] && !K.at[AT].x); }
+/* 25 nov. (Jeremy : « tout ce qui est administratif se gère dans le panneau d'administration ») : les boutons de gestion
+   (groupes, élèves, codes, partage, ateliers, coffres) paraissent seulement quand la page est ouverte depuis Administration (?gestion=1).
+   Un chef de groupe n'a pas de panneau d'administration : il garde la gestion ici. */
+function pageGestion(){ try { for (let w = window; ; w = w.parent){ if (/[?&]gestion=1/.test(w.location.search)) return true; if (w === w.parent) return false; } } catch(e){ return false; } }
+function majAtX(){ const b = $("#bAtX"); if (b) b.hidden = !(window.ADMIN && window.GERE !== false && K.at[AT] && !K.at[AT].x); }
 const ateliers = () => Object.entries(K.at).filter(([, a]) => !a.x).sort((a, b) => a[1].nom.localeCompare(b[1].nom, "fr"));
 /* coffres affichés : les miens + ceux des ateliers que des collègues partagent avec moi (lecture seule) */
 const coffresDe = at => { const M = Object.entries(K.cf).filter(([, c]) => !c.x && c.at === at).map(([id, c]) => Object.assign({ id, moi:true }, c));
@@ -631,6 +636,7 @@ async function vueProf(){
   const s0 = await COFFRE.session(); try { COMPTES = (await (await fetch("comptes.json", { cache:"no-store" })).json()).comptes || {}; } catch(e) {}
   window.ADMIN = !!(s0 && COMPTES[s0.id] && (COMPTES[s0.id].admin || COMPTES[s0.id].chef));   /* 25 nov. : chef de groupe */
   if (!ADMIN) document.body.classList.add("lecteur");
+  { const c = COMPTES[s0 && s0.id] || {}; window.GERE = !!ADMIN && (pageGestion() || !c.admin); if (!window.GERE) document.body.classList.add("sansgestion"); majAtX(); }
   if (ADMIN && !Object.keys(K.at).length){ try { const L = (await (await fetch("locaux.json", { cache:"no-store" })).json()).locaux || []; L.forEach(l => K.at[l.id] = { nom:l.nom, t:1 }); } catch(e) {} }
   dessiner();
   $("#atS").onchange = e => { AT = e.target.value; localStorage.setItem("coffresAtelierChoisi", AT); dessiner(); majPart(); };

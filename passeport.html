@@ -535,7 +535,12 @@ function caseOuvrir(eid, oid){
   if ($("#aRet")) $("#aRet").onclick = () => { D.val[k] = { d:0, t:Date.now() }; sauver(); fermer(); dessiner(); };
   if ($("#aVal")) $("#aVal").onclick = () => { D.val[k] = { d:Date.now(), m:Date.now(), t:Date.now() }; sauver(); fermer(); dessiner(); };
 }
+/* 25 nov. (Jeremy : « tout ce qui est administratif se gère dans le panneau d'administration ») : les boutons de gestion
+   (groupes, élèves, codes, partage, ateliers, coffres) paraissent seulement quand la page est ouverte depuis Administration (?gestion=1).
+   Un chef de groupe n'a pas de panneau d'administration : il garde la gestion ici. */
+function pageGestion(){ try { for (let w = window; ; w = w.parent){ if (/[?&]gestion=1/.test(w.location.search)) return true; if (w === w.parent) return false; } } catch(e){ return false; } }
 function eleveOuvrir(eid){
+  if (window.GERE === false) return;
   const e = D.el[eid];
   ouvrir(`<h2>${esc(e.p)}</h2><p>Son code : <b style="font-size:24px;letter-spacing:2px">${esc(e.c || "")}</b> (à donner à l'élève; il l'écrit au lieu de son prénom).</p><label>Prénom</label><input type="text" id="aP" value="${esc(e.p)}" maxlength="22">
     <label style="display:block;margin-top:10px">Groupe</label><select id="aG2" class="btn" style="width:100%">${groupes().map(g => `<option ${g === e.g ? "selected" : ""}>${esc(g)}</option>`).join("")}</select>
@@ -735,6 +740,7 @@ async function majPart(){
   try { COMPTES = (await (await fetch("comptes.json", { cache:"no-store" })).json()).comptes || {}; } catch(e) {}
   /* seul l'administrateur crée ou efface des élèves et des groupes (15 nov.; plus tard : chefs de groupe) */
   window.ADMIN = !!(window.__moi && COMPTES[window.__moi] && (COMPTES[window.__moi].admin || COMPTES[window.__moi].chef));   /* 25 nov. : chef de groupe = mêmes droits dans la Gestion d'atelier */ document.body.classList.toggle("lecteur", !window.ADMIN);
+  { const c = COMPTES[window.__moi] || {}; window.GERE = !!window.ADMIN && (pageGestion() || !c.admin); document.body.classList.toggle("sansgestion", !window.GERE); }
   if (window.__moi) PART = (await PARTAGE.lire(window.__moi)).part; publierGrp(); lireHotes();
   const noms = [...new Set(Object.values(PART).flat())].filter(id => COMPTES[id]).map(id => COMPTES[id].nom || id);
   $("#bPart").textContent = noms.length ? "Partagé avec " + (noms.length === 1 ? noms[0] : noms.length + " collègues") : "Partager";
@@ -803,7 +809,8 @@ window.PASS = { get D(){ return D; }, groupes, get PART(){ return PART; }, get C
   async partage(g, L){ const N = JSON.parse(JSON.stringify(PART || {})); if (L.length) N[g] = L; else delete N[g];
     await PARTAGE.ecrire(window.__moi, { grp:groupes().filter(x => x !== "À classer"), part:N }); PART = N; localStorage.removeItem("passGrpPub"); publierGrp(); envoyerSync(); }, sauver(){ sauver(); dessiner(); }, groupe(g){ GRP = g; dessiner(); } };
 </script>
-<style>body.lecteur #bGrpN,body.lecteur #bEl,body.lecteur #bEffG,body.lecteur #bPart{display:none!important}
+<style>body.sansgestion #bGrpN,body.sansgestion #bEl,body.sansgestion #bCodes,body.sansgestion #bEffG,body.sansgestion #bPart,body.sansgestion #bProt,body.sansgestion #bQr{display:none!important}
+body.lecteur #bGrpN,body.lecteur #bEl,body.lecteur #bEffG,body.lecteur #bPart{display:none!important}
 html.dansGestion #bGrpN,html.dansGestion #bEl,html.dansGestion #bCodes,html.dansGestion #bEffG,html.dansGestion .mp-tete,html.dansGestion .hero,html.dansGestion #grp,html.dansGestion #bPart,html.dansGestion .mp-pied{display:none!important}
 html.dansGestion main{padding:6px 0 30px;max-width:none}html.dansGestion #bMaj,html.dansGestion #etat{display:none!important}.lgd{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;font-size:13px;color:var(--muted,#6b6b6b)}.lgd span{display:inline-flex;align-items:center;gap:6px}.lgd i{width:14px;height:14px;border-radius:4px;display:inline-block}</style>
 <script src="js/journal-perf.js?v=7"></script>
