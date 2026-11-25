@@ -60,11 +60,12 @@ window.ADMIN_PLUS = (function(){
       + '<button class="abtn" data-go="auto">Automatisations</button></div>'
       + '<div class="as-carte"><h3>Fluidité (24 h)</h3><div id="apFlu"><p class="sous">Chargement…</p></div><button class="abtn" data-go="journaux">Voir les journaux</button></div>'
       + '</div><div class="as-grille">'
-      + '<div class="as-carte"><h3>Les plus utilisés ce mois-ci</h3><div id="apUtil"><p class="sous">Chargement…</p></div><button class="abtn" data-go="stats">Toutes les statistiques</button></div>'
+      + '<div class="as-carte"><h3>Les plus utilisés ce mois-ci</h3><div id="apUtil"><p class="sous">Chargement…</p></div><div class="ap-btns"><button class="abtn" data-go="stats">Toutes les statistiques</button><button class="abtn" id="apRap">Rapport à imprimer (direction)</button></div></div>'
       + '<div class="as-carte"><h3>Raccourcis</h3><div class="ap-rac">'
       + [["nouv", "Ajouter une nouveauté", "Quoi de neuf"], ["livres", "Cacher, mettre en vedette, « Nouveau »", "Livres"], ["profs", "Donner des livres, inviter un enseignant", "Comptes et accès"], ["classe", "Ménage, formations, coffres, horaires", "Classe et atelier"]]
           .map(r => '<button class="as-lien" data-go="' + r[0] + '">' + esc(r[1]) + '<small>' + esc(r[2]) + '</small></button>').join("")
       + '</div></div></div>';
+    z.querySelector("#apRap").onclick = () => rapport().catch(e => alert("Rapport impossible : " + e.message));
     z.querySelectorAll("[data-go]").forEach(b => b.onclick = () => { if (b.dataset.go) A().aller(b.dataset.go); else { const p = document.getElementById("gPub"); if (p) p.scrollIntoView({ block:"center" }); } });
     const pose = (id, e, txt) => { const el = z.querySelector("#" + id); if (!el) return; el.className = "as-l " + (e === true ? "ok" : e === false ? "ko" : "neutre"); el.querySelector("b").textContent = txt; };
     try { const R = await ADMIN_SITE.verifs(); pose("apVer", R.version.ok, R.version.txt); pose("apSupa", R.supa.ok, R.supa.txt); } catch(e){}
@@ -196,9 +197,161 @@ window.ADMIN_PLUS = (function(){
       catch(e){ er.textContent = e.message; er.hidden = false; b.disabled = false; b.textContent = "Publier les nouveautés"; } };
   }
 
+
+  /* ---------- Message à tous + forcer la mise à jour ---------- */
+  function diff(z){
+    const R = A().regl ? A().regl() : null; if (!R) { z.innerHTML = '<p class="acces-err">Réglages non chargés.</p>'; return; }
+    const a = R.annonce || {}, actif = !!(a.texte && (!a.jusqu || a.jusqu >= new Date().toLocaleDateString("en-CA")));
+    const dans7 = new Date(Date.now() + 7 * 864e5).toLocaleDateString("en-CA");
+    z.innerHTML = '<div class="ap-tete"><h3>Message et mise à jour</h3><p class="sous">Les deux partent en ligne avec le bouton « Publier » en bas.</p></div><div class="as-grille">'
+      + '<div class="as-carte"><h3>Message à tous les enseignants</h3><p class="sous">Affiché en bas de l\'écran à l\'ouverture de Métier+ (pas sur les écrans projetés aux élèves), jusqu\'à ce que l\'enseignant touche « Compris » ou jusqu\'à la date choisie.</p>'
+      + ligne(actif, "En ce moment", actif ? "affiché" + (a.jusqu ? " jusqu'au " + esc(a.jusqu) : "") : "aucun message")
+      + '<label>Message</label><textarea id="anT" class="ap-txt" maxlength="400" placeholder="Ex. : Le livre C7 Évacuation est maintenant disponible.">' + esc(a.texte || "") + '</textarea>'
+      + '<label>Affiché jusqu\'au</label><input type="date" id="anD" value="' + esc(a.jusqu || dans7) + '">'
+      + '<div class="ap-btns"><button class="abtn prim" id="anOk">Préparer le message</button>' + (a.texte ? '<button class="abtn rouge" id="anNon">Retirer le message</button>' : '') + '</div></div>'
+      + '<div class="as-carte"><h3>Forcer la mise à jour</h3><p class="sous">Tous les appareils (TNI, portables, iPad) oublient leur copie hors ligne et rechargent la dernière version à leur prochaine ouverture de Métier+. À utiliser si un appareil garde une vieille version.</p>'
+      + ligne(null, "Dernière fois", R.forcer ? dateH(R.forcer) : "jamais")
+      + '<div class="ap-btns"><button class="abtn prim" id="fmOk">Forcer la mise à jour</button></div></div></div>';
+    z.querySelector("#anOk").onclick = () => { const t = z.querySelector("#anT").value.trim(); if (!t) return;
+      R.annonce = { id:Date.now().toString(36), texte:t, jusqu:z.querySelector("#anD").value || dans7 }; A().redessiner({ ok:"Message prêt : touche « Publier » pour l'envoyer." }); };
+    const non = z.querySelector("#anNon"); if (non) non.onclick = () => { delete R.annonce; A().redessiner({ ok:"Message retiré : touche « Publier »." }); };
+    z.querySelector("#fmOk").onclick = () => { R.forcer = new Date().toISOString(); A().redessiner({ ok:"Mise à jour forcée prête : touche « Publier »." }); };
+  }
+
+  /* ---------- Voir comme un collègue ---------- */
+  function voir(z){
+    const C = (A().comptes ? A().comptes() : []).filter(c => !c.admin).sort((a, b) => a.nom.localeCompare(b.nom, "fr"));
+    z.innerHTML = '<div class="ap-tete"><h3>Voir comme un collègue</h3><p class="sous">La bibliothèque montre les livres ouverts et fermés de ce compte, pour l\'aider ou vérifier ses accès. Rien n\'est changé; un bandeau en haut te ramène à ton compte.</p></div>'
+      + '<div class="as-carte">' + (C.length ? C.map(c => '<div class="ap-wf"><div><b>' + esc(c.nom) + '</b><small>' + esc(c.id) + (c.eleve ? ' · groupe d\'élèves' : '') + (c.prog.length ? ' · ' + esc(c.prog.map(p => /plomberie/i.test(p) ? "Plomberie" : /entretien/i.test(p) ? "EGI" : p).join(", ")) : '') + '</small></div><div class="ap-btns" style="margin:0;align-items:center;justify-content:flex-end"><button class="abtn" data-voir="' + esc(c.id) + '">Voir comme</button></div></div>').join("") : '<p class="sous">Aucun autre compte.</p>') + '</div>';
+    z.querySelectorAll("[data-voir]").forEach(b => b.onclick = () => A().voirComme(b.dataset.voir));
+  }
+
+  /* ---------- Rapport imprimable ---------- */
+  async function rapport(){
+    const S = (A().stats && A().stats()) || await COFFRE.statsLire(), C = A().comptes ? A().comptes() : [];
+    const mois = new Date().toISOString().slice(0, 7), an = new Date(Date.now() - 365 * 864e5).toISOString().slice(0, 7);
+    const L = window.LIVRES || (typeof LIVRES !== "undefined" ? LIVRES : []), nom = c => { const [k, v] = c.split(":"); const l = L.find(x => x.fichier === v); return (l ? l.titre : v.replace(/[-_]/g, " ")) + ({ livre:"", quiz:" (Défi+)", outil:" (outil)" }[k] || ""); };
+    const tot = per => { const o = {}; (S || []).filter(r => per(r.mois) && !/^test:/.test(r.cle)).forEach(r => o[r.cle] = (o[r.cle] || 0) + r.n); return Object.entries(o).sort((a, b) => b[1] - a[1]); };
+    const m = tot(x => x === mois), a = tot(x => x >= an), som = t => t.reduce((s, x) => s + x[1], 0);
+    const tab = (t, titre) => '<h2>' + titre + '</h2><table><tr><th>Livre, Défi+ ou outil</th><th>Ouvertures</th></tr>' + (t.length ? t.slice(0, 25).map(r => '<tr><td>' + esc(nom(r[0])) + '</td><td>' + r[1] + '</td></tr>').join("") : '<tr><td colspan="2">Aucune donnée</td></tr>') + '</table>';
+    const html = '<!DOCTYPE html><html lang="fr-CA"><head><meta charset="utf-8"><title>Rapport d\'utilisation Métier+</title><style>body{font:12pt/1.4 system-ui,sans-serif;color:#1E2A44;margin:18mm}h1{margin:0;font-size:20pt}h2{font-size:13pt;margin:18pt 0 6pt;color:#EB6A22}.s{color:#5f6068;margin:2pt 0 14pt}.k{display:flex;gap:10pt}.k div{flex:1;border:1px solid #E5DAC6;border-radius:8pt;padding:8pt;text-align:center}.k b{display:block;font-size:18pt}table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:4pt 6pt;border-bottom:1px solid #e3e6ee}td:last-child,th:last-child{text-align:right}.p{margin-top:18pt;font-size:9pt;color:#5f6068}</style></head><body>'
+      + '<h1>Métier+ · Rapport d\'utilisation</h1><p class="s">Pavillon de l\'Avenir · imprimé le ' + new Date().toLocaleDateString("fr-CA", { day:"numeric", month:"long", year:"numeric" }) + '</p>'
+      + '<div class="k"><div><b>' + C.filter(c => !c.eleve).length + '</b>enseignants</div><div><b>' + C.filter(c => c.eleve).length + '</b>groupes d\'élèves</div><div><b>' + L.filter(l => l.fichier && !l.user).length + '</b>livres</div><div><b>' + som(m) + '</b>ouvertures ce mois-ci</div><div><b>' + som(a) + '</b>ouvertures en 12 mois</div></div>'
+      + tab(m, "Ce mois-ci") + tab(a, "12 derniers mois")
+      + '<p class="p">Statistiques anonymes : Métier+ compte seulement combien de fois chaque livre, Défi+ ou outil est ouvert, jamais par qui (Loi 25).</p></body></html>';
+    const f = document.createElement("iframe"); f.style.cssText = "position:fixed;width:0;height:0;border:0;left:-10px"; document.body.appendChild(f);
+    f.contentDocument.open(); f.contentDocument.write(html); f.contentDocument.close();
+    setTimeout(() => { try { f.contentWindow.focus(); f.contentWindow.print(); } catch(e){} setTimeout(() => f.remove(), 60000); }, 300);
+  }
+
+  /* ---------- Défi+ des livres (quiz-livres.js) ---------- */
+  let QL = null, QL_TXT = "", QL_SEL = -1, QL_Q = -1, QL_MSG = "";
+  const TQ = { choix:"Choix de réponses", multi:"Plusieurs bonnes réponses", ordre:"Remettre en ordre", paires:"Associer", nombre:"Calcul", estim:"Estimation", diapo:"Diapo", erreur:"Trouve l'erreur", nuage:"Nuage de mots", sondage:"Sondage", echelle:"Échelle", connexion:"Connexion" };
+  async function chargerQL(){ const t = await (await fetch("quiz-livres.js?t=" + Date.now(), { cache:"no-store" })).text(); const i = t.indexOf("window.QUIZ_LIVRES = ") + 21, j = t.lastIndexOf("];") + 1; QL = JSON.parse(t.slice(i, j)); QL_TXT = t; }
+  const qlTexte = () => { const i = QL_TXT.indexOf("window.QUIZ_LIVRES = ") + 21, j = QL_TXT.lastIndexOf("];") + 1; return QL_TXT.slice(0, i) + JSON.stringify(QL, null, 1).replace(/\n +/g, "\n") + QL_TXT.slice(j); };
+  const qlChange = () => QL && qlTexte() !== QL_TXT;
+  async function defi(z){
+    if (!QL) { try { await chargerQL(); } catch(e){ z.innerHTML = '<p class="acces-err">Impossible de lire les Défi+.</p>'; return; } }
+    const L = window.LIVRES || (typeof LIVRES !== "undefined" ? LIVRES : []), tl = f => (L.find(x => x.fichier === f) || {}).titre || f || "Autres";
+    const grp = {}; QL.forEach((x, i) => { const k = tl(x.livre); (grp[k] = grp[k] || []).push(i); });
+    const liste = Object.keys(grp).sort((a, b) => a.localeCompare(b, "fr")).map(k => '<div class="ap-ql-g">' + esc(k) + '</div>' + grp[k].map(i => '<button class="ap-nv' + (i === QL_SEL ? ' on' : '') + '" data-ql="' + i + '"><span class="ap-nv-t">' + esc(QL[i].titre) + '</span><small>' + QL[i].qs.length + ' questions</small></button>').join("")).join("");
+    let ed = '<p class="sous">Choisis un Défi+ à gauche.</p>';
+    if (QL_SEL >= 0) { const X = QL[QL_SEL];
+      ed = '<label>Titre du Défi+</label><input type="text" id="qlT" value="' + esc(X.titre) + '">'
+        + '<div class="ap-qs">' + X.qs.map((q, i) => '<button class="ap-q' + (i === QL_Q ? ' on' : '') + '" data-q="' + i + '"><b>' + (i + 1) + '.</b> ' + esc((q.q || "(image)").slice(0, 90)) + '<small>' + esc(TQ[q.t || "choix"] || q.t) + '</small></button>').join("") + '</div>'
+        + '<div class="ap-btns"><button class="abtn" id="qlAj">+ Question (choix de réponses)</button></div>';
+      if (QL_Q >= 0 && X.qs[QL_Q]) { const q = X.qs[QL_Q], t = q.t || "choix", simple = t === "choix" || t === "multi", bons = Array.isArray(q.bon) ? q.bon : [q.bon];
+        ed += '<div class="ap-qed"><h3>Question ' + (QL_Q + 1) + ' · ' + esc(TQ[t] || t) + '</h3><label>Question</label><textarea id="qQ" class="ap-txt">' + esc(q.q || "") + '</textarea>'
+          + (simple ? '<label>Réponses (coche la ou les bonnes)</label>' + (q.ch || []).map((c, k) => '<div class="ap-ch"><input type="checkbox" data-bon="' + k + '"' + (bons.includes(k) ? " checked" : "") + '><input type="text" data-ch="' + k + '" value="' + esc(c) + '"><button class="abtn rouge" data-chx="' + k + '" title="Retirer cette réponse">×</button></div>').join("")
+            + ((q.ch || []).length < 6 ? '<button class="abtn" id="qChAj">+ Réponse</button>' : '')
+            : '<p class="sous">Pour ce type, seuls la question et le temps se modifient ici. Pour le reste, demande à Claude.</p>')
+          + '<div class="ap-2"><div><label>Temps (secondes)</label><input type="text" id="qS" inputmode="numeric" value="' + esc(q.s == null ? "" : q.s) + '"></div><div></div></div>'
+          + '<div class="ap-btns"><button class="abtn" id="qHaut"' + (QL_Q === 0 ? " disabled" : "") + '>Monter</button><button class="abtn" id="qBas"' + (QL_Q === X.qs.length - 1 ? " disabled" : "") + '>Descendre</button><button class="abtn" id="qDup">Dupliquer</button><button class="abtn rouge" id="qSup">Retirer</button></div></div>'; } }
+    z.innerHTML = '<div class="ap-tete"><h3>Défi+ des livres</h3><p class="sous">Corrige une question, une réponse, ou ajoutes-en. Les changements sont en ligne quelques minutes après « Publier les Défi+ ».</p></div>'
+      + '<div class="ap-pub"><span class="acces-etat' + (qlChange() ? ' pub' : '') + '">' + (qlChange() ? 'Des changements attendent d\'être publiés' : 'Tout est publié') + '</span>' + (QL_MSG ? '<span class="acces-ok">' + esc(QL_MSG) + '</span>' : '') + '<span class="acces-err" id="qlErr" hidden></span>'
+      + '<button class="abtn" id="qlAnn"' + (qlChange() ? '' : ' disabled') + '>Annuler les changements</button><button class="abtn prim" id="qlPub"' + (qlChange() ? '' : ' disabled') + '>Publier les Défi+</button></div>'
+      + '<div class="ap-nvg"><div class="as-carte ap-nvl">' + liste + '</div><div class="as-carte">' + ed + '</div></div>';
+    const re = () => defi(z), etat = () => { const c = qlChange(), e = z.querySelector(".ap-pub .acces-etat"); e.classList.toggle("pub", c); e.textContent = c ? "Des changements attendent d'être publiés" : "Tout est publié"; z.querySelector("#qlPub").disabled = !c; z.querySelector("#qlAnn").disabled = !c; };
+    z.querySelectorAll("[data-ql]").forEach(b => b.onclick = () => { QL_SEL = +b.dataset.ql; QL_Q = -1; QL_MSG = ""; re(); });
+    if (QL_SEL >= 0) { const X = QL[QL_SEL];
+      z.querySelector("#qlT").oninput = e => { X.titre = e.target.value; etat(); };
+      z.querySelectorAll("[data-q]").forEach(b => b.onclick = () => { QL_Q = +b.dataset.q; re(); });
+      z.querySelector("#qlAj").onclick = () => { X.qs.push({ q:"Nouvelle question", ch:["Réponse A", "Réponse B", "Réponse C", "Réponse D"], bon:0, s:20 }); QL_Q = X.qs.length - 1; re(); };
+      const q = X.qs[QL_Q];
+      if (q) {
+        z.querySelector("#qQ").oninput = e => { q.q = e.target.value; etat(); };
+        z.querySelector("#qS").oninput = e => { const v = parseInt(e.target.value, 10); if (v > 0) q.s = v; etat(); };
+        z.querySelectorAll("[data-ch]").forEach(i => i.oninput = () => { q.ch[+i.dataset.ch] = i.value; etat(); });
+        z.querySelectorAll("[data-bon]").forEach(c => c.onchange = () => { const B = [...z.querySelectorAll("[data-bon]")].filter(x => x.checked).map(x => +x.dataset.bon);
+          if (!B.length) { c.checked = true; return; } if ((q.t || "choix") === "choix" && B.length > 1) { q.t = "multi"; } if (q.t === "multi" && B.length === 1) delete q.t; q.bon = B.length === 1 ? B[0] : B; re(); });
+        z.querySelectorAll("[data-chx]").forEach(b => b.onclick = () => { const k = +b.dataset.chx; if (q.ch.length <= 2) return; q.ch.splice(k, 1); const B = (Array.isArray(q.bon) ? q.bon : [q.bon]).filter(x => x !== k).map(x => x > k ? x - 1 : x); q.bon = B.length > 1 ? B : (B[0] || 0); if (!Array.isArray(q.bon) && q.t === "multi") delete q.t; re(); });
+        const aj = z.querySelector("#qChAj"); if (aj) aj.onclick = () => { q.ch.push("Nouvelle réponse"); re(); };
+        z.querySelector("#qHaut").onclick = () => { [X.qs[QL_Q - 1], X.qs[QL_Q]] = [X.qs[QL_Q], X.qs[QL_Q - 1]]; QL_Q--; re(); };
+        z.querySelector("#qBas").onclick = () => { [X.qs[QL_Q + 1], X.qs[QL_Q]] = [X.qs[QL_Q], X.qs[QL_Q + 1]]; QL_Q++; re(); };
+        z.querySelector("#qDup").onclick = () => { X.qs.splice(QL_Q + 1, 0, JSON.parse(JSON.stringify(q))); QL_Q++; re(); };
+        z.querySelector("#qSup").onclick = () => { if (!confirm("Retirer la question " + (QL_Q + 1) + " de ce Défi+ ?")) return; X.qs.splice(QL_Q, 1); QL_Q = -1; re(); };
+      } }
+    z.querySelector("#qlAnn").onclick = async () => { await chargerQL(); QL_Q = -1; QL_MSG = ""; re(); };
+    z.querySelector("#qlPub").onclick = async () => { const b = z.querySelector("#qlPub"), er = z.querySelector("#qlErr"); er.hidden = true; b.disabled = true; b.textContent = "Publication…";
+      try { const t = qlTexte(); await A().publier({ "quiz-livres.js":t }, "Défi+ des livres (Administration)"); QL_TXT = t; QL_MSG = "Publié : en ligne d'ici quelques minutes."; re(); }
+      catch(e){ er.textContent = e.message; er.hidden = false; b.disabled = false; b.textContent = "Publier les Défi+"; } };
+  }
+
+  /* ---------- Ajouter ou remplacer un livre ---------- */
+  async function ajliv(z){
+    const L = window.LIVRES || (typeof LIVRES !== "undefined" ? LIVRES : []), prot = A().livresProteges ? A().livresProteges() : [], progs = A().progs ? A().progs() : [];
+    const enAttente = (A().extra ? A().extra() : []).filter(k => /^livres\//.test(k)).map(k => k.slice(7).replace(/\.chiffre$/, ""));
+    z.innerHTML = '<div class="ap-tete"><h3>Ajouter ou remplacer un livre</h3><p class="sous">Le livre est chiffré ici, sur ton appareil, comme avec les outils de Claude, puis part en ligne avec « Publier » en bas.</p></div>'
+      + (enAttente.length ? '<p class="acces-ok">Prêt à publier : ' + enAttente.map(esc).join(", ") + '</p>' : '')
+      + '<div class="as-carte"><label>Que veux-tu faire ?</label><select id="lvM"><option value="">Ajouter un nouveau livre</option>' + prot.map(f => '<option value="' + esc(f) + '">Remplacer : ' + esc((L.find(l => l.fichier === f) || {}).titre || f) + '</option>').join("") + '</select>'
+      + '<label>Fichier du livre (HTML, aux normes des livres Métier+)</label><input type="file" id="lvF" accept=".html,text/html">'
+      + '<div id="lvNeuf"><div class="ap-2"><div><label>Titre</label><input type="text" id="lvT"></div><div><label>Programme</label><select id="lvC">' + progs.map(p => '<option>' + esc(p) + '</option>').join("") + '</select></div></div>'
+      + '<div class="ap-2"><div><label>Niveau (ex. DEP 5333 · Compétence 7 · 307-...)</label><input type="text" id="lvN"></div><div><label>Compétence (numéro)</label><input type="text" id="lvK" inputmode="numeric"></div></div>'
+      + '<label>Description</label><textarea id="lvD" class="ap-txt" maxlength="600"></textarea>'
+      + '<div class="ap-2"><div><label>Couleur principale</label><input type="color" id="lvC1" value="#c4622d"></div><div><label>Couleur foncée</label><input type="color" id="lvC2" value="#24282c"></div></div>'
+      + '<label class="as-cb"><input type="checkbox" id="lvE" checked> En construction</label></div>'
+      + '<label>Couverture (facultatif : image JPEG ou PNG, mise au format 1020 × 1320)</label><input type="file" id="lvV" accept="image/*">'
+      + '<p class="sous" style="margin-top:12px">Accès : un nouveau livre est donné à l\'administrateur et aux enseignants du programme choisi; un livre remplacé garde les mêmes accès (nouvelle clé). Le PDF n\'est pas refait ici : demande-le à Claude.</p>'
+      + '<div class="ap-btns"><button class="abtn prim" id="lvOk">Préparer le livre</button></div><p class="acces-err" id="lvErr" hidden></p></div>';
+    const M = z.querySelector("#lvM"), neuf = z.querySelector("#lvNeuf"); M.onchange = () => neuf.hidden = !!M.value;
+    z.querySelector("#lvOk").onclick = async () => { const er = z.querySelector("#lvErr"), b = z.querySelector("#lvOk"); er.hidden = true;
+      const fic = z.querySelector("#lvF").files[0], rem = M.value; const err = m => { er.textContent = m; er.hidden = false; b.disabled = false; b.textContent = "Préparer le livre"; };
+      if (!fic) return err("Choisis le fichier HTML du livre.");
+      const titre = z.querySelector("#lvT").value.trim(); if (!rem && !titre) return err("Donne un titre au livre.");
+      b.disabled = true; b.textContent = "Chiffrement…";
+      try {
+        const html = await fic.text(); if (!/<html|<body|class="page/i.test(html)) return err("Ce fichier ne ressemble pas à un livre HTML.");
+        const f = rem || slug(titre).slice(0, 40), autres = {};
+        const txt = async u => (await fetch(u + "?t=" + Date.now(), { cache:"no-store" })).text();
+        let livres = await txt("js/livres.js"), couv = await txt("js/couvertures.js");
+        if (!rem) { if (L.some(l => l.fichier === f)) return err("Un livre porte déjà ce nom de fichier (" + f + ").");
+          const J = v => JSON.stringify(v), cat = z.querySelector("#lvC").value, k = z.querySelector("#lvK").value.trim();
+          const ent = '  { titre:' + J(titre) + ', auteur:"Jérémy Raymond", categorie:' + J(cat) + ', niveau:' + J(z.querySelector("#lvN").value.trim()) + (k ? ', competence:' + J(k) : '')
+            + ',\n    pages:PAGES, annee:' + new Date().getFullYear() + ', nouveau:true, couverture:"", couleurs:[' + J(z.querySelector("#lvC1").value) + ',' + J(z.querySelector("#lvC2").value) + '], lien:"", fichier:' + J(f) + ', version:"1"' + (z.querySelector("#lvE").checked ? ', enConstruction:true' : '')
+            + ',\n    description:' + J(z.querySelector("#lvD").value.trim()) + ' },\n';
+          const fin = livres.indexOf("\n];"); if (fin < 0) return err("js/livres.js : fin de liste introuvable.");
+          livres = livres.slice(0, fin + 1) + ent + livres.slice(fin + 1);
+        } else { const re = new RegExp('(fichier:"' + f.replace(/[-]/g, "\\-") + '", version:")(\\d+)(")'); if (!re.test(livres)) return err("Version du livre introuvable dans js/livres.js.");
+          livres = livres.replace(re, (m, a, v, c) => a + (+v + 1) + c); }
+        const cv = z.querySelector("#lvV").files[0];
+        if (cv) { const im = await createImageBitmap(cv), c = document.createElement("canvas"); c.width = 1020; c.height = 1320; const g = c.getContext("2d"), k = Math.max(1020 / im.width, 1320 / im.height);
+          g.drawImage(im, (1020 - im.width * k) / 2, (1320 - im.height * k) / 2, im.width * k, im.height * k);
+          autres["img/couvertures/" + f + ".jpg"] = new Uint8Array(await (await new Promise(r => c.toBlob(r, "image/jpeg", .85))).arrayBuffer());
+          const v = Date.now().toString(36), lig = '  "' + f + '": "img/couvertures/' + f + '.jpg?v=' + v + '",';
+          const reC = new RegExp('^\\s*"' + f.replace(/[-]/g, "\\-") + '":.*$', "m"); couv = reC.test(couv) ? couv.replace(reC, lig) : couv.replace("window.COUVERTURES = {", "window.COUVERTURES = {\n" + lig);
+          autres["js/couvertures.js"] = couv; }
+        b.textContent = "Chiffrement du livre…";
+        const nPages = [...new DOMParser().parseFromString(html.replace(/data:[^"')\s]+/g, ""), "text/html").querySelectorAll(".page")].filter(p => !p.parentElement.closest(".page")).length;
+        if (!nPages && !confirm("Aucune page « .page » trouvée dans ce fichier : la recherche dans le livre ne marchera pas. Continuer quand même ?")) return err("Préparation annulée.");
+        autres["js/livres.js"] = livres.replace("pages:PAGES", "pages:" + nPages);
+        const r = await A().preparerLivre({ f, html, categorie:rem ? "" : z.querySelector("#lvC").value, autres });
+        A().redessiner({ ok:"« " + (titre || f) + " » est prêt (" + r.pages + " pages, " + r.comptes + " accès). Touche « Publier » pour le mettre en ligne." });
+      } catch(e){ err(e.message); } };
+  }
+
   function dessiner(k, z){
     if (!z) return;
-    try { ({ accueil, auto, journaux:fluidite, classe, nouv })[k](z); } catch(e){ z.innerHTML = '<p class="acces-err">' + esc(e.message) + '</p>'; }
+    try { ({ accueil, auto, journaux:fluidite, classe, nouv, diff, voir, defi, ajliv })[k](z); } catch(e){ z.innerHTML = '<p class="acces-err">' + esc(e.message) + '</p>'; }
   }
-  return { dessiner };
+  return { dessiner, rapport };
 })();

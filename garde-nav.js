@@ -44,7 +44,26 @@ window.mpPiedHTML = () => {
   let ET = "ALPHA"; try { const v = localStorage.getItem("mpEtiquette"); if (v !== null) ET = v; } catch(e){}
   const poserEt = v => { document.documentElement.style.setProperty("--mp-et", JSON.stringify(v)); document.documentElement.classList.toggle("sansEt", !v); ET = v; document.querySelectorAll(".mp-alpha i").forEach(i => i.textContent = v); };
   poserEt(ET);
-  fetch("reglages.json", { cache:"no-cache" }).then(r => r.ok ? r.json() : null).then(R => { if (!R || R.etiquette === undefined) return; try { localStorage.setItem("mpEtiquette", R.etiquette); } catch(e){} poserEt(R.etiquette); }).catch(() => {});
+  fetch("reglages.json", { cache:"no-cache" }).then(r => r.ok ? r.json() : null).then(R => { if (!R) return; try { mpForcer(R.forcer); mpAnnonce(R.annonce); } catch(e){}
+    if (R.etiquette === undefined) return; try { localStorage.setItem("mpEtiquette", R.etiquette); } catch(e){} poserEt(R.etiquette); }).catch(() => {});
+  /* 25 nov. (Administration → Message et mise à jour) : « Forcer la mise à jour » = reglages.forcer (date). Un appareil qui voit une nouvelle date
+     vide sa copie hors ligne et recharge une seule fois; un appareil qui n'avait encore rien noté garde simplement la date. */
+  function mpForcer(v){ if (!v) return; let vu = null; try { vu = localStorage.getItem("mpForce"); localStorage.setItem("mpForce", v); } catch(e){ return; }
+    if (vu === null || vu === v) return;
+    Promise.resolve().then(() => window.caches ? caches.keys().then(k => Promise.all(k.map(n => caches.delete(n)))) : 0)
+      .then(() => navigator.serviceWorker ? navigator.serviceWorker.getRegistrations().then(L => Promise.all(L.map(r => r.update().catch(() => {})))) : 0)
+      .catch(() => {}).then(() => location.reload()); }
+  /* 25 nov. : message de l'administrateur à tous les enseignants (reglages.annonce = {id, texte, jusqu}), une fois « Compris » il ne revient plus */
+  function mpAnnonce(a){
+    if (!a || !a.texte || !a.id) return; let vu = ""; try { if (!localStorage.dernierId) return; vu = localStorage.getItem("mpAnnVue") || ""; } catch(e){ return; }
+    if (vu === a.id || (a.jusqu && new Date().toLocaleDateString("en-CA") > a.jusqu)) return;
+    if (/accueil|quiz|simulateur|telecommande|loup-garou|ecran/.test(location.pathname) || window !== window.top) return;   /* pas sur les écrans projetés aux élèves */
+    const poser = () => { if (document.getElementById("mpAnn")) return; const d = document.createElement("div"); d.id = "mpAnn"; d.setAttribute("role", "status");
+      d.innerHTML = '<div><b>Message de l\'administrateur</b><p></p></div><button type="button">Compris</button>'; d.querySelector("p").textContent = a.texte;
+      d.querySelector("button").onclick = () => { try { localStorage.setItem("mpAnnVue", a.id); } catch(e){} d.remove(); };
+      const css = document.createElement("style"); css.textContent = "#mpAnn{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:100002;width:min(620px,calc(100vw - 24px));display:flex;gap:14px;align-items:center;padding:14px 16px;border-radius:14px;background:#161d2c;color:#eef1f6;border:1px solid rgba(235,106,34,.6);box-shadow:0 12px 32px rgba(0,0,0,.35);font:15px/1.4 system-ui,sans-serif}#mpAnn div{flex:1}#mpAnn b{color:#EB6A22;font-size:.8rem;text-transform:uppercase;letter-spacing:.06em}#mpAnn p{margin:3px 0 0;white-space:pre-line}#mpAnn button{flex:none;min-height:42px;padding:0 18px;border-radius:10px;border:0;background:#EB6A22;color:#fff;font:inherit;font-weight:700;cursor:pointer}html.clair #mpAnn,body.clair #mpAnn{background:#fff;color:#1E2A44}";
+      document.head.appendChild(css); document.body.appendChild(d); };
+    if (document.body) poser(); else addEventListener("DOMContentLoaded", poser, { once:true }); }
   const st = document.createElement("style");
   st.textContent = ".logo-pav{position:relative}"
     + ".logo-pav::after,.mp-alpha i{content:var(--mp-et,'ALPHA');position:absolute;top:-9px;font:800 9px/1 system-ui,sans-serif;font-style:normal;letter-spacing:.08em;color:#fff;background:#EB6A22;padding:3px 5px 2px;border-radius:5px;pointer-events:none;white-space:nowrap}"

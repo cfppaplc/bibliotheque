@@ -105,6 +105,53 @@ test("Administration : chaque onglet s'ouvre; Quoi de neuf se modifie et s'annul
   vrai(!p.errs.length, p.errs.join(" | "));
 });
 
+async function pageAdmin(b) {
+  const p = await page(b, {}, "jeremy.raymond");
+  await p.goto(BASE + "index.html"); await attendre(400);
+  await p.evaluate(() => new Promise(ok => { const r = indexedDB.open("acces", 1); r.onupgradeneeded = () => r.result.createObjectStore("s"); r.onsuccess = () => { const t = r.result.transaction("s", "readwrite"); t.objectStore("s").put({ id: "jeremy.raymond", priv: null }, "session"); t.oncomplete = ok; }; }));
+  await p.reload(); await p.waitForFunction(() => window.ACCES && ACCES.session && ACCES.session.admin, null, { timeout: 15000 }); await attendre(2000);
+  await p.evaluate(() => ACCES.menu()); await attendre(300); await p.evaluate(() => document.querySelector("button[data-a=gerer]").click()); await attendre(2000);
+  p.onglet = async k => { await p.click('.acces-onglets [data-ong="' + k + '"]'); await attendre(800); };
+  return p;
+}
+
+test("Administration : message, mise à jour forcée, voir comme, Défi+, ajouter un livre", async b => {
+  const p = await pageAdmin(b);
+  await p.onglet("diff"); await p.fill("#anT", "Essai"); await p.click("#anOk"); await attendre(400);
+  vrai(await p.evaluate(() => ACCES_ADMIN.regl().annonce && ACCES_ADMIN.aPublier()), "Message pas prêt à publier");
+  await p.onglet("diff"); await p.click("#fmOk"); await attendre(300); vrai(await p.evaluate(() => !!ACCES_ADMIN.regl().forcer), "Mise à jour forcée pas notée");
+  await p.onglet("voir"); const av = await p.evaluate(() => LIVRES.filter(l => ACCES.verrouille(l.fichier)).length);
+  await p.click("[data-voir]"); await attendre(600);
+  vrai(await p.evaluate(() => !!document.getElementById("mpVoir")), "Pas de bandeau « Voir comme »");
+  await p.click("#mpVoir button"); await attendre(400);
+  vrai(await p.evaluate(() => LIVRES.filter(l => ACCES.verrouille(l.fichier)).length) === av, "Retour au compte incomplet");
+  await p.evaluate(() => ACCES.menu()); await attendre(300); await p.evaluate(() => document.querySelector("button[data-a=gerer]").click()); await attendre(1500);
+  await p.onglet("defi"); await p.click('[data-ql="5"]'); await attendre(300); await p.click('[data-q="0"]'); await attendre(300); await p.fill("#qQ", "Question modifiée"); await attendre(200);
+  vrai(/attendent/.test(await p.textContent(".ap-pub .acces-etat")), "Défi+ : modification non signalée");
+  await p.click("#qlAnn"); await attendre(800); vrai(/Tout est publié/.test(await p.textContent(".ap-pub .acces-etat")), "Défi+ : Annuler");
+  await p.onglet("ajliv");
+  require("fs").writeFileSync("/tmp/livre-essai.html", '<!DOCTYPE html><html><body><div class="page">Un</div><div class="page">Deux</div></body></html>');
+  await p.setInputFiles("#lvF", "/tmp/livre-essai.html"); await p.fill("#lvT", "Livre essai test"); await p.click("#lvOk"); await attendre(2500);
+  const ex = await p.evaluate(() => ACCES_ADMIN.extra());
+  vrai(["livres/livre-essai-test.chiffre", "recherche/livre-essai-test.chiffre", "js/livres.js"].every(k => ex.includes(k)), "Livre pas préparé : " + ex.join(","));
+  vrai(!p.errs.length, p.errs.join(" | "));
+});
+
+test("Message de l'administrateur et mise à jour forcée chez un enseignant", async b => {
+  const ctx = await b.newContext({ serviceWorkers: "block" }); await ctx.addInitScript(() => { localStorage.bienvenueVu = "1"; localStorage.dernierId = "prof.essai"; });
+  const q = await ctx.newPage(), R = JSON.parse(require("fs").readFileSync("reglages.json", "utf8"));
+  let regl = Object.assign({}, R, { annonce: { id: "x1", texte: "Bonjour", jusqu: "2099-01-01" }, forcer: "2026-01-01T10:00:00Z" });
+  await q.route(/reglages\.json/, r => r.fulfill({ body: JSON.stringify(regl), contentType: "application/json" })); await q.route(/supabase\.co|ntfy\.sh/, r => r.fulfill({ status: 204, body: "" }));
+  let nav = 0; q.on("framenavigated", f => { if (f === q.mainFrame()) nav++; });
+  await q.goto(BASE + "index.html"); await attendre(2500);
+  vrai(nav === 1 && await q.evaluate(() => !!document.getElementById("mpAnn")), "Message absent ou rechargement en trop (" + nav + ")");
+  await q.click("#mpAnn button"); await q.reload(); await attendre(2000);
+  vrai(!(await q.evaluate(() => !!document.getElementById("mpAnn"))), "Le message revient après « Compris »");
+  regl.forcer = "2026-01-02T10:00:00Z"; nav = 0; await q.reload(); await attendre(4000);
+  vrai(nav === 2, "Mise à jour forcée : " + nav + " chargements (attendu 2)");
+  await ctx.close();
+});
+
 (async () => {
   const b = await chromium.launch(); let echecs = 0;
   for (const [nom, f] of tests) {

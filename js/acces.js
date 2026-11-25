@@ -52,7 +52,8 @@ window.ACCES = (function(){
   async function compterDemandes(){ if (!SESSION || !SESSION.admin) return; const v = await lireBoite(); NB_DEM = Object.keys(v || {}).filter(id => !DATA.comptes[id]).length;
     majBouton(); }
   const protege = f => !!(DATA && DATA.livres && DATA.livres[f]);
-  const permis = f => !!(SESSION && protege(f) && DATA.livres[f].cles[SESSION.id]);
+  let VOIR = null;   /* 25 nov. : « Voir comme » (admin) : la bibliothèque montre les accès de ce compte */
+  const permis = f => !!(SESSION && protege(f) && DATA.livres[f].cles[VOIR || SESSION.id]);
   const verrouille = f => protege(f) && !permis(f);
 
   async function cleLivre(f){
@@ -319,7 +320,7 @@ window.ACCES = (function(){
     BROUILLON = JSON.parse(JSON.stringify(DATA)); REGL = clone(REGLAGES); FORCER_RECH.clear(); box().classList.add("large", "gestion"); ov().hidden = false; dessinerGerer();
   }
   const OUVERTS = new Set();
-  let ONGLET = "accueil", REGL = null; const FORCER_RECH = new Set(), VU = {};
+  let ONGLET = "accueil", REGL = null; const FORCER_RECH = new Set(), VU = {}, EXTRA = {}, EXTRA_LIV = new Set();   /* EXTRA : fichiers à joindre à la publication (livre ajouté ou remplacé) */
   const clone = o => JSON.parse(JSON.stringify(o));
   const ICO = {
     profs:'<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.2-5.5 6.5-5.5s5.9 1.9 6.5 5.5"/><circle cx="17.5" cy="9" r="2.6"/><path d="M16.5 14.6c2.6.2 4.4 1.9 5 5.4"/></svg>',
@@ -337,7 +338,11 @@ window.ACCES = (function(){
     nouv:'<svg viewBox="0 0 24 24"><path d="M4 5h16v11H8l-4 4z"/><path d="M8 9h8M8 12h5"/></svg>',
     journaux:'<svg viewBox="0 0 24 24"><path d="M3 12h3l2-5 4 10 2-5h7"/></svg>',
     auto:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9 7 7M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></svg>',
-    classe:'<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M8 20h8M12 16v4"/></svg>' };
+    classe:'<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M8 20h8M12 16v4"/></svg>',
+    diff:'<svg viewBox="0 0 24 24"><path d="M3 11v2a1 1 0 0 0 1 1h2l5 4V6L6 10H4a1 1 0 0 0-1 1z"/><path d="M15 9a4 4 0 0 1 0 6M18 6a8 8 0 0 1 0 12"/></svg>',
+    voir:'<svg viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>',
+    defi:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14M12 17.5v.01"/></svg>',
+    ajliv:'<svg viewBox="0 0 24 24"><path d="M4 4.5h6a2 2 0 0 1 2 2V20a2 2 0 0 0-2-2H4z"/><path d="M17 8v6M14 11h6"/></svg>' };
   const constrDe = l => REGL.construction[l.fichier] !== undefined ? !!REGL.construction[l.fichier] : !!l._c0;
   const nouvDe = l => estNouveau(l, REGL);
   const fraicheur = d => !d ? "jamais" : Date.now() - d < 8 * 864e5 ? "recent" : Date.now() - d < 31 * 864e5 ? "moyen" : "vieux";
@@ -383,7 +388,7 @@ window.ACCES = (function(){
     const nProf = ids.filter(id => !D.comptes[id].eleve).length, nGr = ids.length - nProf;
     const retires = Object.keys(D.livres).filter(f => DATA.livres[f] && Object.keys(DATA.livres[f].cles).some(id => !D.livres[f].cles[id]));
     const aRech = [...new Set([...retires, ...FORCER_RECH])].filter(f => D.livres[f]);
-    const aPublier = JSON.stringify(D) !== JSON.stringify(DATA) || JSON.stringify(REGL) !== JSON.stringify(REGLAGES) || FORCER_RECH.size > 0;
+    const aPublier = JSON.stringify(D) !== JSON.stringify(DATA) || JSON.stringify(REGL) !== JSON.stringify(REGLAGES) || FORCER_RECH.size > 0 || Object.keys(EXTRA).length > 0;
     const vol = k => ' data-pane="' + k + '"' + (ONGLET === k ? '' : ' hidden');
     const grpT = t => '<div class="og-t">' + t + '</div>';
     const ong = (k, lab) => '<button class="' + (ONGLET === k ? 'on' : '') + '" data-ong="' + k + '">' + ICO[k] + '<span>' + lab + '</span></button>';
@@ -411,7 +416,8 @@ window.ACCES = (function(){
       + '<div><b>' + livres.length + '</b><span>livres protégés</span></div><div class="dem"><b id="gStatDem">…</b><span>demandes</span></div>'
       + '<div class="' + (aPublier ? 'pub' : 'ok') + '"><b>' + (aPublier ? '!' : '✓') + '</b><span>' + (aPublier ? 'à publier' : 'tout est publié') + '</span></div></div>'
       + '<nav class="acces-onglets">' + grpT("Vue d'ensemble") + ong("accueil", "Tableau de bord")
-        + grpT("Personnes et contenu") + ong("profs", "Comptes et accès") + ong("livres", "Livres") + ong("nouv", "Quoi de neuf") + ong("props", "Propositions") + ong("classe", "Classe et atelier")
+        + grpT("Personnes") + ong("profs", "Comptes et accès") + ong("voir", "Voir comme un collègue") + ong("diff", "Message et mise à jour")
+        + grpT("Contenu") + ong("livres", "Livres") + ong("ajliv", "Ajouter un livre") + ong("defi", "Défi+ des livres") + ong("nouv", "Quoi de neuf") + ong("props", "Propositions") + ong("classe", "Classe et atelier")
         + grpT("Suivi") + ong("stats", "Statistiques") + ong("journaux", "Fluidité") + ong("site", "Signalements et état") + ong("hist", "Historique et copies")
         + grpT("Site") + ong("auto", "Automatisations") + '</nav>'
       + '<div class="acces-pane"' + vol("profs") + '><details class="acces-info"><summary>Comment ça marche</summary><p class="sous">Touche « Choisir les livres » pour cocher les livres d\'un enseignant, ou ses programmes (EGI, Plomberie) pour tout lui donner d\'un coup. Pastille verte : venu dans les 7 derniers jours. Les changements partent en ligne quand tu touches « Publier ».</p></details>'
@@ -433,7 +439,7 @@ window.ACCES = (function(){
       + '<div class="acces-pane"' + vol("stats") + '>' + volStats + '</div>'
       + '<div class="acces-pane"' + vol("hist") + '>' + volHist + '</div>'
       + '<div class="acces-pane"' + vol("site") + '><div id="gSite"></div></div>'
-      + ["accueil", "nouv", "classe", "journaux", "auto"].map(k => '<div class="acces-pane"' + vol(k) + '><div id="gPlus_' + k + '"><p class="sous">Chargement…</p></div></div>').join("")
+      + ["accueil", "nouv", "classe", "journaux", "auto", "diff", "voir", "defi", "ajliv"].map(k => '<div class="acces-pane"' + vol(k) + '><div id="gPlus_' + k + '"><p class="sous">Chargement…</p></div></div>').join("")
       + (aRech.length ? '<label class="acces-rech"><input type="checkbox" id="gRech" checked><span><b>Couper vraiment l\'accès</b> : nouvelle clé pour ' + aRech.map(f => '« ' + esc(titreDe(f)) + ' »').join(", ") + '. Une vieille copie gardée par quelqu\'un qui n\'a plus l\'accès ne s\'ouvrira plus (un peu plus long à publier).</span></label>' : '')
       + (jeton   /* clé déjà enregistrée : invisible et impossible à changer dans le panneau (demande de Jeremy, 8 nov.); redemandée seulement si GitHub la refuse */
         ? '<input type="hidden" id="gJeton" value="">'
@@ -543,10 +549,11 @@ window.ACCES = (function(){
         for (const f of rch){ bt.textContent = "Nouvelle clé : « " + titreDe(f) + " »…"; Object.assign(fichiers, await rechiffrer(f, D2)); }
         if (JSON.stringify(D2) !== JSON.stringify(DATA)) fichiers["comptes.json"] = JSON.stringify(D2, null, 1);
         if (JSON.stringify(REGL) !== JSON.stringify(REGLAGES)) fichiers["reglages.json"] = JSON.stringify(REGL, null, 1);
+        Object.assign(fichiers, EXTRA);
         if (!Object.keys(fichiers).length) return dessinerGerer({ ok:"Rien à publier : tout est déjà en ligne." });
         bt.textContent = "Envoi…";
-        await commitGitHub(jt, fichiers, "Administration : " + [fichiers["comptes.json"] && "accès", fichiers["reglages.json"] && "réglages", rch.length && rch.length + " livre(s) rechiffré(s)"].filter(Boolean).join(", "));
-        BROUILLON = D2; DATA = clone(D2); rch.forEach(f => delete CLES[f]); FORCER_RECH.clear(); if (fichiers["reglages.json"]){ appliquerReglages(clone(REGL)); }
+        await commitGitHub(jt, fichiers, "Administration : " + [fichiers["comptes.json"] && "accès", fichiers["reglages.json"] && "réglages", rch.length && rch.length + " livre(s) rechiffré(s)", EXTRA_LIV.size && [...EXTRA_LIV].join(", ") + " (livre ajouté ou remplacé)"].filter(Boolean).join(", "));
+        BROUILLON = D2; DATA = clone(D2); rch.forEach(f => delete CLES[f]); EXTRA_LIV.forEach(f => delete CLES[f]); FORCER_RECH.clear(); for (const k in EXTRA) delete EXTRA[k]; EXTRA_LIV.clear(); if (fichiers["reglages.json"]){ appliquerReglages(clone(REGL)); }
         try { localStorage.setItem("accesCopie", JSON.stringify(DATA)); } catch(e){}
         box().classList.remove("large", "gestion"); box().innerHTML = succes('Publié !', '<p class="sous">Les changements seront en ligne d\'ici une minute ou deux.</p><div class="acces-btns" style="justify-content:center"><button id="gRet">Retour aux accès</button><button class="prim" id="gFin2">Fermer</button></div>');
         document.getElementById("gRet").onclick = () => { box().classList.add("large", "gestion"); dessinerGerer(); }; document.getElementById("gFin2").onclick = fermer;
@@ -627,7 +634,37 @@ window.ACCES = (function(){
     aller: k => { const b = document.querySelector('.acces-onglets [data-ong="' + k + '"]'); if (b) b.click(); },
     demandes: () => NB_DEM,
     aPublier: () => { const e = document.querySelector(".acces-etat"); return !!(e && e.classList.contains("pub")); },
-    stats: () => STATS
+    stats: () => STATS,
+    regl: () => REGL,
+    redessiner: m => dessinerGerer(m),
+    comptes: () => Object.entries(DATA.comptes).map(([id, c]) => ({ id, nom:c.nom, admin:!!c.admin, eleve:!!c.eleve, prog:c.prog || [] })),
+    progs: () => PROGS(),
+    livresProteges: () => Object.keys((BROUILLON || DATA).livres),
+    extra: () => Object.keys(EXTRA),
+    voirComme: id => { VOIR = id || null; const b = document.getElementById("mpVoir"); if (b) b.remove();
+      if (VOIR){ const c = DATA.comptes[VOIR] || {}; const d = document.createElement("div"); d.id = "mpVoir";
+        d.innerHTML = '<span>Tu vois Métier+ comme <b></b> : ses livres ouverts et fermés.</span><button type="button">Revenir à mon compte</button>'; d.querySelector("b").textContent = c.nom || VOIR;
+        d.querySelector("button").onclick = () => ACCES_ADMIN.voirComme(null); document.body.appendChild(d); fermer(); }
+      try { render(); renderHero(); } catch(e){} },
+    /* Ajouter ou remplacer un livre (même format que outils/chiffrer.py) : livre et recherche chiffrés (gzip + AES-GCM), clés pour les comptes */
+    preparerLivre: async o => {
+      const f = o.f, D = BROUILLON, existe = !!D.livres[f];
+      const gz = async u8 => new Uint8Array(await new Response(new Blob([u8]).stream().pipeThrough(new CompressionStream("gzip"))).arrayBuffer());
+      const brut = crypto.getRandomValues(new Uint8Array(32)), cle = await sub.importKey("raw", brut, "AES-GCM", false, ["encrypt"]);
+      const chiffrer = async u8 => { const iv = crypto.getRandomValues(new Uint8Array(12)), c = new Uint8Array(await sub.encrypt({ name:"AES-GCM", iv }, cle, await gz(u8))), out = new Uint8Array(12 + c.length); out.set(iv); out.set(c, 12); return out; };
+      const doc = new DOMParser().parseFromString(o.html.replace(/data:[a-z/+.-]+;base64,[A-Za-z0-9+/=]+/g, ""), "text/html");
+      doc.querySelectorAll("script,style,noscript").forEach(e => e.remove());
+      const pages = [...doc.querySelectorAll(".page")].filter(p => !p.parentElement.closest(".page"));
+      const textes = pages.map(p => { p.querySelectorAll(".ans,.reponse,.answer,.solution,.correction,[data-reponse]").forEach(a => a.remove()); return p.textContent.replace(/\s+/g, " ").trim().slice(0, 4000); });
+      EXTRA["livres/" + f + ".chiffre"] = await chiffrer(enc.encode(o.html));
+      EXTRA["recherche/" + f + ".chiffre"] = await chiffrer(enc.encode(JSON.stringify(textes)));
+      const ids = existe ? Object.keys(D.livres[f].cles) : Object.keys(D.comptes).filter(id => D.comptes[id].admin || (o.categorie && (D.comptes[id].prog || []).includes(o.categorie)));
+      if (!ids.includes(SESSION.id)) ids.push(SESSION.id);
+      const cles = {}; for (const id of ids) if (D.comptes[id]) cles[id] = await envelopperPour(brut, D.comptes[id].pub);
+      D.livres[f] = { cles }; EXTRA_LIV.add(f);
+      Object.assign(EXTRA, o.autres || {});
+      return { pages:pages.length, comptes:Object.keys(cles).length, existe };
+    }
   };
   async function commitGitHub(jeton, fichiers, message, essai){   /* plusieurs fichiers en un seul commit (API Git Data) : comptes.json, reglages.json, livres rechiffrés */
     const api = "https://api.github.com/repos/" + DEPOT + "/git/", h = { Authorization:"Bearer " + jeton, Accept:"application/vnd.github+json", "Content-Type":"application/json" };

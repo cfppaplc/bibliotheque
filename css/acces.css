@@ -424,3 +424,21 @@ body.clair .as-lien{background:#f5f6fa;border-color:#e3e6ee}body.clair .as-sig{b
   .acces-box .as-cb{display:flex;align-items:center;gap:8px;font-weight:500}
   body.clair .acces-box select,body.clair .acces-box input[type=date]{background:#fff;border-color:#d9d5cd;color:#1d1d1f}
   body.clair .acces-onglets .og-t{color:#8a8a90}
+  #mpVoir{position:fixed;left:50%;top:10px;transform:translateX(-50%);z-index:100001;display:flex;gap:12px;align-items:center;padding:10px 12px 10px 16px;border-radius:12px;background:#EB6A22;color:#fff;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,.3)}
+  #mpVoir button{border:0;border-radius:8px;padding:8px 12px;background:#fff;color:#b4481a;font:inherit;font-weight:700;cursor:pointer}
+  .ap-ql-g{font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;opacity:.6;padding:12px 10px 4px}
+  .ap-qs{display:flex;flex-direction:column;gap:2px;margin:10px 0}
+  .ap-q{display:flex;gap:6px;align-items:baseline;flex-wrap:wrap;text-align:left;padding:7px 10px;border-radius:8px;border:0;background:transparent;color:inherit;font:inherit;font-size:.86rem;cursor:pointer}
+  .ap-q:hover{background:rgba(128,128,128,.12)}.ap-q.on{background:rgba(235,106,34,.16)}.ap-q small{margin-left:auto;opacity:.6;font-size:.74rem}
+  .ap-qed{border-top:1px solid rgba(128,128,128,.25);margin-top:12px;padding-top:12px}.ap-qed h3{margin:0 0 4px;font-size:.95rem}
+  .ap-ch{display:flex;gap:8px;align-items:center;margin-bottom:6px}.ap-ch input[type=text]{flex:1}.ap-ch input[type=checkbox]{width:22px;height:22px;flex:none;accent-color:#22a35a}
+  .acces-box input[type=color]{width:100%;height:42px;border-radius:10px;border:1px solid #34343a;background:transparent;padding:2px}
+  .acces-box input[type=file]{font:inherit;font-size:.88rem}
+  @media (min-width:1000px){
+    .acces-box.gestion{position:relative}
+    .acces-box.gestion .acces-onglets button{padding:7px 10px}
+    .acces-box.gestion .acces-onglets button span{text-align:left}
+    .acces-box.gestion .acces-onglets .og-t{padding:10px 10px 3px}
+  }
+  /* écran bas (TNI 1280 × 720) : le menu défile avec la page au lieu d'avoir sa propre zone de défilement */
+  @media (min-width:1000px) and (max-height:820px){.acces-box.gestion .acces-onglets{position:absolute;max-height:none}}
