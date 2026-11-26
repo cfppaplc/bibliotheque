@@ -178,7 +178,7 @@ function eleveEntree(msg){
   i.onkeydown = e => { if (e.key === "Enter") go(); }; i.oninput = () => { if (/^\d{5}$/.test(i.value)) go(); }; $("#cPre").onkeydown = e => { if (e.key === "Enter") go(); }; $("#cOk").onclick = go; i.focus();
 }
 function connecter(code, x){ MOI = { code, ens:x.ens, groupe:x.groupe, profs:(x.profs || []).filter(id => id !== x.ens), prenom:LS.get("magPrenom", "") }; LS.set("magEleve", MOI); eleveCatalogue(); }
-function enTete(){ $("#tQui").innerHTML = `<b>${MOI.prenom ? "Bonjour " + esc(MOI.prenom) : ""}</b> <span class="cg">· ${esc(MOI.code)}</span><span class="gp"> · ${esc(MOI.groupe)}</span>`; $("#tSortir").hidden = false;
+function enTete(){ $("#tQui").innerHTML = `<b>${MOI.prenom ? "Bonjour " + esc(MOI.prenom) : ""}</b> <span class="cg">· ${MOI.groupe === "ESSAI" ? "•••••" : esc(MOI.code)}</span><span class="gp"> · ${esc(MOI.groupe)}</span>`; $("#tSortir").hidden = false;
   $("#tSortir").onclick = () => { if (nbPanier() && !confirm("Ton panier sera vidé. Changer d'élève ?")) return; MOI = null; PANIER = {}; LS.set("magEleve", null); sauverPanier(); eleveEntree(); }; }
 function eleveCatalogue(){
   enTete();

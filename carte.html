@@ -73,6 +73,8 @@ function afficher(){
   const K = LS.get("mpCarte"); $("#vide").hidden = !!K; $("#vue").hidden = !K; if (!K) { $("#cle").focus(); return; }
   const code = K.c.split("-")[1];
   $("#vG").textContent = K.g || "Métier+"; $("#vP").textContent = K.p || ""; completerPrenom(K); factureOuverte(K.g).then(ok => { $("#bFac").hidden = !ok; $("#bBoutons").style.gridTemplateColumns = ok ? "1fr 1fr" : "1fr"; }); $("#vN").textContent = code;
+  /* carte d'essai (Jeremy : « cache le numéro de ma carte, les élèves sont sneaky ») : ni code, ni code-barres, ni QR */
+  const essai = K.g === "ESSAI"; $("#vCb").hidden = $("#vQr").hidden = essai; if (essai) { $("#vN").textContent = "• • • • •"; return; }
   $("#vCb").src = Code128.url(K.c, 60, false); $("#vCb").alt = K.c;
   const M = QRLib.matrice(K.c), k = M.length;
   $("#vQr").innerHTML = `<svg viewBox="0 0 ${k + 8} ${k + 8}" width="150" height="150"><rect width="${k + 8}" height="${k + 8}" fill="#fff"/>${M.map((r, y) => r.map((v, x) => v ? `<rect x="${x + 4}" y="${y + 4}" width="1.02" height="1.02"/>` : "").join("")).join("")}</svg>`;
