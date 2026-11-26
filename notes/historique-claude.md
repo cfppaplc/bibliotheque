@@ -779,3 +779,4 @@
 - 26 nov. : plan du magasin découpé en 56 parties (4 par côté d'étagère, ordre J,I,H,G,F,E,D,K à partir de la fenêtre). Cases par partie dans magasin-catalogue.json → plan.parties, modifiables dans Administration → Magasin (carte « Plan du magasin : cases par partie »). Le point va au centre de sa partie; une case placée nulle part n'a plus de point. Données de Jeremy : J partie 1 = 2-5,12-15,23-26,34-37,45-48,57-60,69-72,81-84,91-94; partie 2 = 6-9,…,95-98. 9 étages par côté, petits numéros en haut, pas de 1re colonne (1,11,22,33…). Idée de Jeremy pour plus tard : glisser-déposer.
 - 26 nov. : plan du magasin, côté J du haut : parties 1-3 publiées (étage 4 = 35-37/38-40/41-44; 88-90 en partie 3; 90 et 99-101 supposés présents, à la demande de Jeremy).
 - 26 nov. : partie 4 (côté J du haut, gros casiers, 1 par étage, 7 étages) = 104-110. Case 103 non placée.
+- 26 nov. : case 37 → partie 2 (étage 4 : 35-36 / 37-40 / 41-44).
