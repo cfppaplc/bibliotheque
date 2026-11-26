@@ -340,6 +340,32 @@ test("Magasin : l'élève (carte scannée) envoie son panier, l'enseignant appro
   await c1.close(); await c2.close(); await c3.close(); await c4.close();
 });
 
+test("Carte : l'élève retrouve sa carte avec son code à 5 chiffres + son prénom; 5 mauvais essais = bloqué", async b => {
+  const c = await b.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: "block" }), R = {}, E = {}, errs = [];
+  await c.route(/rpc\/carte_code_(ecrire|lire)/, r => { const a = JSON.parse(r.request().postData()), u = r.request().url(); let out;
+    if (/ecrire/.test(u)) { const x = R[a.p_code]; out = !x || x.jeton === a.p_jeton; if (out) R[a.p_code] = { pch: a.p_pch, jeton: a.p_nouveau || a.p_jeton, data: a.p_data }; }
+    else if ((E[a.p_code] || 0) >= 5) out = { etat: "bloque" };
+    else if (R[a.p_code] && R[a.p_code].pch === a.p_pch) { delete E[a.p_code]; out = { etat: "ok", data: R[a.p_code].data }; }
+    else { E[a.p_code] = (E[a.p_code] || 0) + 1; out = { etat: "non" }; }
+    r.fulfill({ body: JSON.stringify(out), contentType: "application/json", headers: { "access-control-allow-origin": "*" } }); });
+  const p = await c.newPage(); p.on("pageerror", e => errs.push(e.message)); await p.goto(BASE + "carte.html"); await attendre(600);
+  await p.addScriptTag({ url: "js/eleve-cartes.js" });
+  vrai(await p.evaluate(() => ELEVE_CARTES.publierCode({ c: "48213", k: "K7Q9X2", p: "Marc Tremblay", g: "5333" })), "Publication refusée");
+  await p.fill("#cle", "48213"); await p.fill("#pre", "Marcus"); await p.click("#ok"); await attendre(500);
+  vrai(/introuvable/.test(await p.textContent("#err")), "Mauvais prénom accepté");
+  await p.fill("#pre", "Marc"); await p.click("#ok"); await attendre(900);
+  vrai(/MP-48213-K7Q9X2/.test(await p.evaluate(() => localStorage.getItem("mpCarte"))), "Bon code + prénom : la carte ne s'ouvre pas");
+  vrai((await p.textContent("#vP")).trim() === "Marc", "Le prénom n'est pas sur la carte");
+  /* carte perdue : la recherche suit la nouvelle clé */
+  vrai(await p.evaluate(() => ELEVE_CARTES.publierCode({ c: "48213", k: "NEWK44", p: "Marc", g: "5333" }, "K7Q9X2")), "Nouvelle carte : recherche non mise à jour");
+  vrai(!(await p.evaluate(() => ELEVE_CARTES.publierCode({ c: "48213", k: "PIRATE", p: "Marc" }))), "N'importe qui peut remplacer la carte");
+  await p.evaluate(() => localStorage.removeItem("mpCarte")); await p.reload(); await attendre(600);
+  for (let i = 0; i < 5; i++) { await p.fill("#cle", "48213"); await p.fill("#pre", "Luc"); await p.click("#ok"); await attendre(300); }
+  await p.fill("#pre", "Marc"); await p.click("#ok"); await attendre(500);
+  vrai(/Trop d'essais/.test(await p.textContent("#err")), "Pas bloqué après 5 mauvais essais");
+  vrai(!errs.length, errs.join(" | ")); await c.close();
+});
+
 (async () => {
   const b = await chromium.launch(); let echecs = 0;
   for (const [nom, f] of tests) {

@@ -33,8 +33,9 @@ input{width:100%;min-height:52px;border-radius:14px;border:0;padding:0 14px;font
   <div id="vide" hidden>
     <h1 style="font-size:1.4rem">Ma carte Métier+</h1>
     <p>Scanne le code QR de ta fiche « Ma carte » avec l'appareil photo de ton cellulaire. Ta carte s'affiche ici et reste sur ton cellulaire.</p>
-    <p style="opacity:.8;font-size:.9rem">Ou entre la clé écrite sur ta fiche :</p>
-    <input id="cle" placeholder="MP-123-ABC123" autocomplete="off" autocapitalize="characters"><p class="err" id="err"></p>
+    <p style="opacity:.8;font-size:.9rem">Ou entre ton code et ton prénom :</p>
+    <input id="cle" placeholder="Ton code (5 chiffres)" inputmode="numeric" autocomplete="off" autocapitalize="characters">
+    <input id="pre" placeholder="Ton prénom" autocomplete="given-name" style="margin-top:8px"><p class="err" id="err"></p>
     <button class="btn" id="ok">Afficher ma carte</button>
   </div>
   <div id="vue" hidden>
@@ -68,8 +69,21 @@ function afficher(){
   const ib = $("#inst"); if (ib) ib.onclick = async () => { const ev = INSTALLER; INSTALLER = null; ev.prompt(); try { await ev.userChoice; } catch(e){} afficher(); };
   try { navigator.wakeLock && navigator.wakeLock.request("screen").catch(() => {}); } catch(e){}   /* l'écran ne s'éteint pas pendant qu'on scanne */
 }
-$("#ok").onclick = () => { const c = $("#cle").value.trim().toUpperCase().replace(/\s+/g, ""); if (!valide(c)) { $("#err").textContent = "La clé ressemble à MP-123-ABC123."; return; } LS.set("mpCarte", { c, g:"", p:"", t:Date.now() }); afficher(); };
-$("#cle").onkeydown = e => { if (e.key === "Enter") $("#ok").click(); };
+$("#ok").onclick = async () => { const c = $("#cle").value.trim().toUpperCase().replace(/\s+/g, "");
+  if (valide(c)) { LS.set("mpCarte", { c, g:"", p:"", t:Date.now() }); afficher(); return; }   /* clé complète (ancienne façon) */
+  const pr = String($("#pre").value || "").trim().split(/\s+/)[0].normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  if (!/^\d{5}$/.test(c) || !pr) { $("#err").textContent = "Écris ton code à 5 chiffres et ton prénom."; return; }
+  $("#err").textContent = "Recherche…";
+  try { const te = new TextEncoder(), base = "metier+|carte-code|" + c + "|" + pr, hx = [...new Uint8Array(await crypto.subtle.digest("SHA-256", te.encode(base)))].map(b => b.toString(16).padStart(2, "0")).join("");
+    const r = await (await fetch("https://kjlotlhqrgekzohshmbn.supabase.co/rest/v1/rpc/carte_code_lire", { method:"POST", headers:{ apikey:"sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY", "Content-Type":"application/json" }, body:JSON.stringify({ p_code:c, p_pch:hx }) })).json();
+    if (r && r.etat === "bloque") { $("#err").textContent = "Trop d'essais. Attends 15 minutes ou demande à ton enseignant."; return; }
+    if (!r || r.etat !== "ok") { $("#err").textContent = "Code ou prénom introuvable. Vérifie avec ton enseignant."; return; }
+    const b = Uint8Array.from(atob(JSON.parse(r.data).d), x => x.charCodeAt(0)), cle = await crypto.subtle.importKey("raw", await crypto.subtle.digest("SHA-256", te.encode(base + "|cle")), "AES-GCM", false, ["decrypt"]);
+    const o = JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({ name:"AES-GCM", iv:b.slice(0, 12) }, cle, b.slice(12))));
+    $("#err").textContent = ""; LS.set("mpCarte", { c:o.c, g:o.g || "", p:o.p || "", t:Date.now() }); afficher(); }
+  catch(e){ $("#err").textContent = "Internet ne répond pas. Réessaie."; } };
+$("#pre").onkeydown = e => { if (e.key === "Enter") $("#ok").click(); };
+$("#cle").onkeydown = e => { if (e.key === "Enter") $("#pre").focus(); };
 $("#oublier").onclick = () => { if (!confirm("Retirer cette carte de ce cellulaire ?")) return; try { localStorage.removeItem("mpCarte"); } catch(e){} afficher(); };
 afficher();
 if ("serviceWorker" in navigator) addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));

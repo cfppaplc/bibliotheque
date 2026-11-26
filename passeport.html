@@ -447,8 +447,17 @@ const sauver = () => { localStorage.setItem(CLE, JSON.stringify(D)); clearTimeou
 async function publierGrp(){
   if (!window.__moi) return; const L = groupes().filter(g => g !== "À classer"), C = codesPub(L), sig = Object.values(D.el).filter(e => !e.x && e.c && e.k).map(e => e.c + e.k + prenomCarte(e.p)).sort().join(),
     k = JSON.stringify([L, PART, C, suivis(), formesPub(), sig]);
+  if (window.ADMIN) cartesPub().catch(() => {});   /* a sa propre mémoire : seulement les cartes nouvelles ou changées */
   if (localStorage.getItem("passGrpPub") === k) return;
-  try { await PARTAGE.ecrire(window.__moi, { grp:L, part:PART, codes:C, noms:await nomsPub() }); localStorage.setItem("passGrpPub", k); } catch(e) {} }
+  try { await PARTAGE.ecrire(window.__moi, { grp:L, part:PART, codes:C, noms:await nomsPub() }); localStorage.setItem("passGrpPub", k); } catch(e) {}
+}
+/* 25 nov. (Jeremy : « les élèves écrivent leur code pour voir leur carte ») : code à 5 chiffres + prénom → sa carte.
+   Une rangée par élève, trouvée et déchiffrée seulement avec son code ET son prénom (jamais de liste). */
+async function cartesPub(){ if (!window.ELEVE_CARTES) return;
+  const faits = (() => { try { return JSON.parse(localStorage.getItem("passCartesPub") || "{}"); } catch(e){ return {}; } })();
+  for (const e of Object.values(D.el)) { if (e.x || !e.c || !e.k || !ELEVE_CARTES.prenomN(e.p)) continue; const sig = e.k + "|" + ELEVE_CARTES.prenomN(e.p) + "|" + (e.g || ""); if (faits[e.c] === sig) continue;
+    if (await ELEVE_CARTES.publierCode(e).catch(() => false)) faits[e.c] = sig; }
+  try { localStorage.setItem("passCartesPub", JSON.stringify(faits)); } catch(e){} }
 /* 25 nov. (Jeremy : « son nom est déjà sur son compte, ça pourrait dire bonjour ») : le prénom est publié CHIFFRÉ avec la clé de la carte
    de l'élève (code + clé du collant) : seul celui qui scanne la carte peut le lire. Le code seul ne donne pas le prénom. */
 const prenomCarte = p => String(p || "").trim().split(/\s+/)[0].slice(0, 20);
@@ -838,5 +847,6 @@ body.lecteur #bGrpN,body.lecteur #bEl,body.lecteur #bEffG,body.lecteur #bPart{di
 html.dansGestion #bGrpN,html.dansGestion #bEl,html.dansGestion #bCodes,html.dansGestion #bEffG,html.dansGestion .mp-tete,html.dansGestion .hero,html.dansGestion #grp,html.dansGestion #bPart,html.dansGestion .mp-pied{display:none!important}
 html.dansGestion main{padding:6px 0 30px;max-width:none}html.dansGestion #bMaj,html.dansGestion #etat{display:none!important}.lgd{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;font-size:13px;color:var(--muted,#6b6b6b)}.lgd span{display:inline-flex;align-items:center;gap:6px}.lgd i{width:14px;height:14px;border-radius:4px;display:inline-block}</style>
 <script src="js/journal-perf.js?v=7"></script>
+<script src="js/eleve-cartes.js?v=3"></script>
 </body>
 </html>

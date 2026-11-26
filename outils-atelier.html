@@ -402,7 +402,7 @@ try { for (let w = window; ; w = w.parent){ if (/[?&]gestion=1/.test(w.location.
     dlg.querySelector("[data-nouv]").onclick = async ev => { const bt = ev.target;
       if (!bt.dataset.sur) { bt.dataset.sur = "1"; bt.textContent = "Confirmer : l'ancienne carte ne marchera plus"; return; }
       bt.disabled = true; bt.textContent = "Transfert de ses réponses…";
-      try { const k1 = fFo.contentWindow.cleCarte(), n = await ELEVE_CARTES.transferer(x.c, x.k, k1); x.k = k1; x.t = Date.now(); P.sauver();
+      try { const k1 = fFo.contentWindow.cleCarte(), k0 = x.k, n = await ELEVE_CARTES.transferer(x.c, x.k, k1); x.k = k1; x.t = Date.now(); P.sauver(); ELEVE_CARTES.publierCode(x, k0).catch(() => {});
         dlg.querySelector("[data-cle]").textContent = "MP-" + x.c + "-" + k1; bt.textContent = "Nouvelle carte faite";
         toast("Nouvelle carte : " + n + " livre" + (n > 1 ? "s" : "") + " transféré" + (n > 1 ? "s" : "") + ". Imprime-la : Étiquettes et fiches « Ma carte », coche seulement cet élève."); }
       catch(er){ bt.disabled = false; delete bt.dataset.sur; bt.textContent = "Carte perdue ou volée : nouvelle carte"; toast("Impossible : " + er.message); } };
@@ -600,6 +600,6 @@ try { for (let w = window; ; w = w.parent){ if (/[?&]gestion=1/.test(w.location.
   $("#fiche").addEventListener("close", () => delete $("#fiche").dataset.id);
 })();
 </script>
-<script src="js/eleve-cartes.js?v=2"></script><script src="js/journal-perf.js?v=7"></script>
+<script src="js/eleve-cartes.js?v=3"></script><script src="js/journal-perf.js?v=7"></script>
 </body>
 </html>
