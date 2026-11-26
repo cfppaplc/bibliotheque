@@ -95,6 +95,8 @@ textarea{width:100%;min-height:80px;border-radius:12px;border:1px solid var(--li
 .prep-i input{width:28px;height:28px;accent-color:var(--vert);flex:none}.prep-i .rg{font-weight:800;color:var(--acc);min-width:44px}.prep-i .q{font-weight:800;min-width:36px}
 .prep-i .nm{flex:1}.prep-i small{display:block;color:var(--doux);font-family:ui-monospace,Menlo,Consolas,monospace}.prep-i.ok{opacity:.55}.prep-i.ok .nm{text-decoration:line-through}
 @media print{.top,.barre,.btn,.toast{display:none!important}body{background:#fff}}
+/* 26 nov. (Jeremy : « on ne devrait pas voir les chiffres quand on les écrit, comme un mot de passe ») */
+input.cache-code:not(:placeholder-shown){-webkit-text-security:disc;text-security:disc}
 </style>
 </head>
 <body>
@@ -158,7 +160,7 @@ const nbPanier = () => Object.values(PANIER).reduce((s, q) => s + q, 0);
 function eleveEntree(msg){
   $("#tSortir").hidden = true; $("#tQui").textContent = ""; $("#barre").hidden = true;
   $("#app").innerHTML = `<h1>Magasin de raccords</h1><p class="sous">Scanne ta carte étudiante, ou tape ton code à 5 chiffres.</p>
-    <div class="carte"><input class="code" id="cCode" inputmode="numeric" autocomplete="off" autocapitalize="characters" placeholder="00000" aria-label="Ton code">
+    <div class="carte"><input class="cache-code code" id="cCode" inputmode="numeric" autocomplete="off" autocapitalize="characters" placeholder="00000" aria-label="Ton code">
     <div id="preZ" hidden><label for="cPre" style="display:block;font-weight:600;margin-top:6px">Ton prénom</label><input id="cPre" class="pre" autocomplete="given-name" maxlength="20" placeholder="Prénom seulement"></div>
     <p class="err" id="cErr">${esc(msg || "")}</p><button class="btn p" id="cOk">Entrer</button></div>`;
   const i = $("#cCode"), go = async () => { const c = lireCarte(i.value); if (!c) { $("#cErr").textContent = "Ton code a 5 chiffres."; return; }

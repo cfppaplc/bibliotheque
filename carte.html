@@ -31,6 +31,8 @@ input.code{display:block;font:800 2.6rem/1 ui-monospace,Menlo,Consolas,monospace
 input.pre{border:2px solid #d5dae3;font:400 1.15rem system-ui,-apple-system,sans-serif;text-transform:none;padding:0 16px}
 .carte.cachee{cursor:pointer}.carte.cachee img.cb,.carte.cachee .qr{filter:blur(14px);opacity:.35}
 .carte.cachee small::before{content:"Touche la carte pour l'afficher 10 secondes. ";display:block;font-weight:700;color:#EB6A22;margin-bottom:4px}
+/* 26 nov. (Jeremy : « on ne devrait pas voir les chiffres quand on les écrit, comme un mot de passe ») */
+input.cache-code:not(:placeholder-shown){-webkit-text-security:disc;text-security:disc}
 </style>
 <script src="js/session-dep.js?v=5"></script>
 </head>
@@ -40,7 +42,7 @@ input.pre{border:2px solid #d5dae3;font:400 1.15rem system-ui,-apple-system,sans
   <div id="vide" hidden>
     <h1 style="font-size:1.4rem">Ma carte Métier+</h1>
     <p class="sous">Tape ton code à 5 chiffres. Ta carte reste ensuite sur ton cellulaire.</p>
-    <div class="boite"><input class="code" id="cle" inputmode="numeric" autocomplete="off" autocapitalize="characters" placeholder="00000" aria-label="Ton code">
+    <div class="boite"><input class="cache-code code" id="cle" inputmode="numeric" autocomplete="off" autocapitalize="characters" placeholder="00000" aria-label="Ton code">
     <p class="err" id="err"></p>
     <button class="btn" id="ok">Afficher ma carte</button></div>
     <p style="opacity:.75;font-size:.85rem;margin-top:14px">Tu peux aussi scanner le code QR de ta fiche « Ma carte » avec l'appareil photo.</p>
