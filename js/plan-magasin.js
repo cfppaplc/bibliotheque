@@ -28,7 +28,7 @@ window.PlanMagasin = (function(){
     const W = F.chain.reduce((s, c) => s + c[1], 0), dh = W - F.top, R = Math.sqrt(F.diag ** 2 - dh ** 2), H = F.left + R, X2 = W + F.ext;
     const room = [[0, R], [dh, 0], [W, 0], [W, F.rightDrop], [X2, F.rightDrop], [X2, H], [0, H]];
     const etat = l => faites.has(l) ? "fait" : actives.has(l) ? "actif" : "";
-    const sign = (x, y, l) => `<g class="pm-s ${etat(l)}"><rect x="${x - 11}" y="${y - 11}" width="22" height="22" rx="4"/><text x="${x}" y="${y + 1}">${l}</text></g>`;
+    const sign = (x, y, l) => `<g class="pm-s ${etat(l)}" data-l="${l}" style="cursor:pointer"><rect x="${x - 11}" y="${y - 11}" width="22" height="22" rx="4"/><text x="${x}" y="${y + 1}">${l}</text></g>`;
     /* face d'étagère : bande le long du côté de la rangée, allumée en même temps que l'affiche */
     const face = (x, y, h, l) => { (faces[l] = faces[l] || []).push([x + 3, y, h]); return `<rect class="pm-f ${etat(l)}" x="${x}" y="${y}" width="6" height="${h}" rx="2"/>`; };
     let o = `<style>.pm-mur{fill:none;stroke:#14213d;stroke-width:4}.pm-r{fill:#c9d0da;stroke:#14213d;stroke-width:.8}.pm-c{fill:#eef1f5;stroke:#14213d;stroke-width:.8;stroke-dasharray:3 2}
@@ -80,5 +80,15 @@ window.PlanMagasin = (function(){
   }
   const lettre = r => (String(r || "").trim().match(/^[A-Za-z]/) || [""])[0].toUpperCase();
   const parties = () => { const L = []; let k = 0; [["J", 2], ["I", 2], ["H", 2], ["G", 2], ["F", 2], ["E", 2], ["D", 1], ["K", 1]].forEach(([l, s]) => { for (let i = 0; i < s * NPART; i++) L.push({ n:++k, l }); }); return L; };
-  return { svg, lettre, parties, lireCases, set cases(c){ CASES = c || {}; }, get cases(){ return CASES; }, set tailles(t){ TAILLES = t || {}; } };
+  /* 26 nov. (Jeremy) : vue de face d'une rangée (clic sur sa lettre dans Administration). Un groupe = un étage, du haut vers le bas; largeur de chaque partie = sa longueur */
+  function vueFace(l, aTrouver){ const T = new Set([...(aTrouver || [])].map(Number)); const P = parties().filter(p => p.l === l), segs = []; for (let i = 0; i < P.length; i += NPART) segs.push(P.slice(i, i + NPART));
+    const COUL = ["#EB6A22", "#1F5F8B", "#2E8B57", "#7A4FA0"], nums = (a, b) => Array.from({ length:Math.min(b - a + 1, 60) }, (_, i) => a + i);
+    const NOM = segs.length > 1 ? ["Étagère du haut (fenêtre de service à gauche)", "Étagère du bas (allée du centre à gauche)"] : ["Fenêtre de service à gauche"];
+    return `<div class="pm-face"><style>@keyframes pmCl{from{background:#EB6A22;transform:scale(1)}to{background:#FFD25A;transform:scale(1.12)}}.pm-cl{animation:pmCl .7s ease-in-out infinite alternate;outline:3px solid #14213d;z-index:1;position:relative;color:#14213d!important}</style><h4 style="margin:0 0 8px">Rangée ${l}, vue de face</h4>` + segs.map((S, si) => `<div style="font:600 .8rem system-ui;color:#5b6678;margin:10px 0 4px">${NOM[si] || ""}</div><div style="display:flex;gap:8px;align-items:flex-start">`
+      + S.filter(p => taille(p.n) > 0).map((p, k) => { const G = String(CASES[p.n] || "").split(/[,;]/).map(g => g.trim()).filter(Boolean), c = COUL[k % 4];
+        return `<div style="flex:${taille(p.n)};min-width:0"><div style="font:700 .75rem system-ui;color:${c};margin-bottom:3px">Partie ${p.n}</div>`
+          + (G.length ? G.map(g => `<div style="display:flex;gap:2px;margin-bottom:2px">` + g.split("+").flatMap(x => { const m = x.trim().toUpperCase().match(/^([A-Z])?\s*-?\s*(\d+)\s*(?:-\s*(\d+))?$/); return m ? nums(+m[2], m[3] ? +m[3] : +m[2]) : []; })
+              .map(n => `<span${T.has(n) ? ' class="pm-cl"' : ""} style="flex:1;min-width:0;height:22px;display:flex;align-items:center;justify-content:center;background:${c};color:#fff;font:700 9px system-ui;border-radius:3px;overflow:hidden">${n}</span>`).join("") + `</div>`).join("")
+            : `<div style="height:22px;border:2px dashed #c9d0da;border-radius:4px;display:flex;align-items:center;justify-content:center;font:700 .75rem system-ui;color:#8a94a6">à remplir</div>`) + `</div>`; }).join("") + `</div>`).join("") + `</div>`; }
+  return { svg, lettre, parties, vueFace, lireCases, set cases(c){ CASES = c || {}; }, get cases(){ return CASES; }, set tailles(t){ TAILLES = t || {}; } };
 })();

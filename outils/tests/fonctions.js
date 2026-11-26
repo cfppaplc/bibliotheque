@@ -349,6 +349,8 @@ test("Magasin : l'élève (carte scannée) envoie son panier, l'enseignant appro
   if (process.env.CAPTURES) await m.screenshot({ path: process.env.CAPTURES + "/plan.png" });
   vrai(await m.$$eval(".pm-s.actif", L => L.length) > 0, "Plan : aucune rangée ne clignote");
   vrai(await m.$$eval(".prep-i.proch", L => L.length) === 1 && await m.$$eval(".prep-plan circle.pm-p:not(.fait)", L => L.length) <= 1, "Plan : seul le prochain raccord doit être montré");
+  await m.click(".prep-plan svg [data-l]"); await attendre(300); vrai(!!(await m.$(".prep-face .pm-face")), "Plan : la lettre n'ouvre pas la vue de face");
+  await m.click("#prFace"); await attendre(200); vrai(!(await m.$(".prep-face")), "Vue de face : « Fermer » ne ferme pas");
   for (const c of await m.$$("[data-k]")) { await c.click(); await attendre(150); }
   vrai(await m.$$eval(".pm-s.actif", L => L.length) === 0, "Plan : une rangée clignote encore après tout coché");
   await m.click("#prOk"); await attendre(400); vrai(P[0].etat === "remis", "Remis : " + P[0].etat);
