@@ -457,3 +457,4 @@ begin
 end; $$;
 revoke all on function public.panier_avis_vu(text, text, uuid) from public;
 grant execute on function public.panier_avis_vu(text, text, uuid) to anon, authenticated;
+-- suite : outils/magasin-modifier.sql (modifier / annuler par l'élève, 25 nov.)

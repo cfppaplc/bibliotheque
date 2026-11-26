@@ -262,7 +262,9 @@ test("Magasin : l'élève (carte scannée) envoie son panier, l'enseignant appro
   const mock = async ctx => ctx.route(/supabase\.co\/rest\/v1\/rpc\/(\w+)/, async r => { const f = r.request().url().match(/rpc\/(\w+)/)[1], a = JSON.parse(r.request().postData() || "{}"); let o = null;
     if (f === "coffre_lire") o = [{ data: JSON.stringify({ grp: ["2608 EGI"], codes: { "2608 EGI": ["12345", "45678"] }, noms: { "12345": ENC } }) }];
     else if (f === "panier_envoyer") { P.push({ id: "id" + P.length, etat: "attente", t: new Date().toISOString(), ens: a.p_ens, groupe: a.p_groupe, code: a.p_code, prenom: a.p_prenom, items: a.p_items, note: a.p_note }); o = { ok: true, id: "id" + (P.length - 1) }; }
-    else if (f === "panier_etat") { const x = P.find(p => p.id === a.p_id) || {}; o = { etat: x.etat, motif: x.motif }; }
+    else if (f === "panier_etat") { const x = P.find(p => p.id === a.p_id) || {}; o = { etat: x.etat, motif: x.motif, items: x.etat === "attente" ? x.items : null, note: x.etat === "attente" ? x.note : null }; }
+    else if (f === "panier_modifier") { const x = P.find(p => p.id === a.p_id && p.code === a.p_code && p.etat === "attente"); if (x) { x.items = a.p_items; x.note = a.p_note; } o = x ? { ok: true } : { ok: false, err: "déjà traité" }; }
+    else if (f === "panier_annuler") { const k = P.findIndex(p => p.id === a.p_id && p.code === a.p_code && (p.etat === "attente" || p.etat === "approuve")); if (k >= 0) P.splice(k, 1); o = k >= 0; }
     else if (f === "panier_prof_regler") o = true;
     else if (f === "panier_prof_lire") o = P;
     else if (f === "panier_signaler") { const x = P.find(p => p.id === a.p_id); A.push({ id: "a" + A.length, t: new Date().toISOString(), panier: a.p_id, regle: a.p_regle, code: x.code, groupe: x.groupe, prenom: x.prenom }); o = { ok: true }; }
@@ -288,6 +290,16 @@ test("Magasin : l'élève (carte scannée) envoie son panier, l'enseignant appro
   await p.click(".art .aj"); await p.click(".art [data-m='1']"); await attendre(200);
   await p.click("#bVoir"); await attendre(300); await p.click("#pEnv"); await attendre(1200);
   vrai(P.length === 1 && P[0].code === "12345" && P[0].items[0].q === 2, "Panier mal envoyé : " + JSON.stringify(P));
+  /* 25 nov. (Jeremy) : l'élève modifie son panier tant qu'il est en attente, ou l'annule */
+  p.on("dialog", d => d.accept());
+  await p.waitForSelector("[data-mod]", { timeout: 4000 }); await p.click("[data-mod]"); await attendre(400);
+  vrai(/Enregistrer les changements/.test(await p.textContent("#pEnv")), "Modifier : le panier ne s'ouvre pas en modification");
+  await p.fill("#pNote", "Cabine 4"); await p.click("#pEnv"); await attendre(1000);
+  vrai(P.length === 1 && P[0].note === "Cabine 4" && P[0].items[0].q === 2, "Modification non enregistrée : " + JSON.stringify(P));
+  await p.click(".art .aj"); await p.click("#bVoir"); await attendre(300); await p.click("#pEnv"); await attendre(1200);
+  vrai(P.length === 2, "Deuxième panier non envoyé"); await p.evaluate(() => suivi()); await attendre(800);
+  await p.click(`[data-ann="${P[1].id}"]`); await attendre(1000);
+  vrai(P.length === 1 && !(await p.$(`[data-ann="id1"]`)), "Annulation : le panier reste");
   const c2 = await b.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true, serviceWorkers: "block" }); await mock(c2);
   await c2.addInitScript(() => { localStorage.dernierId = "jeremy.raymond"; });
   const q = await c2.newPage(); q.on("pageerror", e => errs.push(e.message));
