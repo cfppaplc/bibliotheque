@@ -281,7 +281,7 @@ async function dessinerProf(){
   const avis = "Notification" in window && "serviceWorker" in navigator && "PushManager" in window, perm = avis ? Notification.permission : "non";
   const ios = /iPhone|iPad|iPod/.test(navigator.userAgent) && !window.navigator.standalone && !matchMedia("(display-mode: standalone)").matches;
   $("#app").innerHTML = `<h1>Commandes à approuver</h1><p class="sous">${att.length ? att.length + " panier" + (att.length > 1 ? "s" : "") + " en attente." : "Aucun panier en attente."} Mis à jour toutes les 15 secondes.</p>
-    <div class="carte" id="avisZ" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:12px 14px">${perm === "granted" && LS.get("magAbonne|" + ENS, false) ? `<span class="ok">Cet appareil reçoit les avis des paniers.</span>` : (`<button class="btn p" id="avOui">Recevoir les avis ici</button>`)}
+    <div class="carte" id="avisZ" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:12px 14px">${perm === "granted" && LS.get("magAbonne|" + ENS, false) ? `<span class="ok">Cet appareil reçoit les avis des paniers.</span> <button class="btn" id="avTest" style="min-height:38px">Tester</button>` : (`<button class="btn p" id="avOui">Recevoir les avis ici</button>`)}
       <button class="btn" id="apAj">Ajouter un appareil</button><p class="err" id="avErr" style="min-height:0;margin:0;width:100%"></p><div id="apQr" style="width:100%"></div></div>
     ${AVIS.length ? `<div class="sec">Avis du magasinier</div><div class="carte avisMag">${AVIS.map(a => `<div class="av"><span><b>${esc(a.prenom || "Élève")}</b> <small class="sous">${esc(a.code)} · ${esc(a.groupe)} · ${heure(a.t)}</small><br>${esc(REGLES_L[a.regle] || "?")}</span><button class="btn" data-vu="${esc(a.id)}" title="Retirer de cette page (reste dans le dossier de l'élève)">Vu</button></div>`).join("")}<p class="sous" style="margin:8px 0 0">« Vu » retire l'avis d'ici; il reste dans le dossier de l'élève.</p></div>` : ""}
     <div class="sec">En attente</div>${att.length ? att.map(p => cmdHtml(p, true)).join("") : `<p class="vide">Rien à approuver.</p>`}
@@ -300,6 +300,13 @@ async function dessinerProf(){
     try { const A = await rpc("panier_prof_archives", { p_ens:ENS, p_jeton:JETON, p_depuis:m + "-01", p_jusqua:m + "-" + String(fin.getDate()).padStart(2, "0") }) || [];
       z.innerHTML = A.length ? `<p class="sous">${A.length} commande${A.length > 1 ? "s" : ""}</p>` + A.map(p => cmdHtml(p, false)).join("") : `<p class="vide">Aucune commande ce mois-là.</p>`; }
     catch(e){ z.innerHTML = `<p class="err">${esc(e.message)}</p>`; } };
+  const t = $("#avTest"); if (t) t.onclick = async () => {   /* 25 nov. : un avis tout de suite sur cet appareil + inscription refaite */
+    const er = $("#avErr"); er.textContent = "";
+    try { const reg = await navigator.serviceWorker.register("sw.js"); await navigator.serviceWorker.ready;
+      if (Notification.permission !== "granted") throw new Error("le navigateur bloque les avis de metierplus.app");
+      await reg.showNotification("Métier+ · Essai", { body:"Si tu vois ceci, les avis s'affichent sur cet appareil.", tag:"essai", icon:"img/magasin-prof-192.png" });
+      await abonner(true); $("#avErr").textContent = "Avis d'essai envoyé. Rien en bas à droite ? Regarde Windows + N : s'il y est, c'est « Ne pas déranger »; sinon, c'est le navigateur.";
+    } catch(e){ er.textContent = "Essai impossible : " + e.message; } };
   const o = $("#avOui"); if (o) o.onclick = () => {
     if (/iPhone|iPad|iPod|Macintosh/.test(navigator.userAgent) && "ontouchend" in document && !navigator.standalone) { $("#avErr").textContent = "Sur iPhone et iPad, Apple exige d'ouvrir la page depuis l'écran d'accueil : Partager → Sur l'écran d'accueil, puis ouvre l'icône « Commandes » et touche ce bouton."; return; }
     if (!("PushManager" in window) || !("Notification" in window)) { $("#avErr").textContent = "Ce navigateur ne reçoit pas d'avis. Garde la page ouverte : un son t'avertit."; return; }
