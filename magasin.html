@@ -124,6 +124,26 @@ input.cache-code:not(:placeholder-shown){-webkit-text-security:disc;text-securit
 .suivi.remis,.suivi.refuse{background:transparent}.suivi.remis .bandeau,.suivi.refuse .bandeau{padding:8px 14px}
 .refus .vite .btn{min-height:34px;font-size:.88rem;padding:0 12px}.refus .act .btn{min-height:40px}.cmd td.rg{white-space:nowrap}
 .suivi .motif{font-size:.95rem;margin:0 14px 10px;padding:8px 10px}
+
+/* 26 nov. (Jeremy : « rends-les plus belles ») */
+.cmd{border:1px solid var(--ligne);box-shadow:0 1px 2px rgba(20,33,61,.05),0 6px 18px rgba(20,33,61,.06);border-radius:16px;overflow:hidden}
+.cmd .h{padding:14px 16px;gap:12px}
+.av{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;font:800 1.1rem system-ui;background:#EEF1F6;color:#3b4a6b;flex:none}
+.cmd.e-attente .av{background:#FFF3D6;color:#8a5a00}.cmd.e-approuve .av{background:#E3F4EA;color:var(--vert)}.cmd.e-refuse .av{background:#FBE9E7;color:var(--rouge)}
+.cmd .pr{font-size:1.08rem;font-weight:800}.cmd .cd{font:600 .8rem ui-monospace,Menlo,Consolas,monospace;color:var(--doux);background:rgba(128,128,128,.1);padding:2px 7px;border-radius:6px;margin-left:4px;letter-spacing:.06em}
+.cmd.e-attente,.cmd.e-approuve{box-shadow:inset 4px 0 0 var(--k),0 1px 2px rgba(20,33,61,.05),0 6px 18px rgba(20,33,61,.06)}
+.cmd table{margin:2px 0 6px}.cmd tr+tr td{border-top:1px solid var(--ligne)}.cmd td{border-bottom:0;padding:9px 16px;vertical-align:middle}
+.cmd .rgp{display:inline-block;padding:4px 10px;border-radius:8px;background:#FFF1E6;color:#B2470F;font:800 .95rem ui-monospace,Menlo,Consolas,monospace;white-space:nowrap}
+.cmd .qb{display:inline-grid;place-items:center;min-width:30px;height:30px;padding:0 6px;border-radius:99px;background:#14213d;color:#fff;font:800 .92rem system-ui}
+.cmd td.q{width:48px}.cmd td.rg{width:96px}.cmd td small.no{display:block;font:500 .75rem ui-monospace,Menlo,Consolas,monospace;color:var(--doux);margin-top:2px}
+.cmd .h .btn.p,.cmd .h .btn.v{box-shadow:0 2px 6px rgba(0,0,0,.12)}
+.cmd.fin{box-shadow:none;background:var(--carte)}.cmd.fin .av{width:32px;height:32px;font-size:.9rem}
+.suivi{background:var(--carte);border:1px solid var(--ligne);box-shadow:0 1px 2px rgba(20,33,61,.05),0 4px 14px rgba(20,33,61,.05)}
+.suivi .bandeau{padding:14px 16px}.suivi .bandeau i{width:12px;height:12px;box-shadow:0 0 0 4px rgba(128,128,128,.12)}
+.suivi.attente .bandeau i{box-shadow:0 0 0 4px rgba(232,163,23,.2)}.suivi.approuve .bandeau i{box-shadow:0 0 0 4px rgba(30,138,85,.18)}.suivi.refuse .bandeau i{box-shadow:0 0 0 4px rgba(200,40,40,.15)}
+.suivi.remis,.suivi.refuse{background:var(--carte);opacity:.92}
+.suivi .motif{border-left:3px solid var(--rouge);border-radius:6px;background:rgba(200,40,40,.06)}
+@media (prefers-color-scheme:dark){.av{background:#24304a;color:#b9c7e6}.cmd .rgp{background:#3a2412;color:#ffb27a}.cmd .qb{background:#e8ecf4;color:#14213d}}
 </style>
 </head>
 <body>
@@ -366,9 +386,9 @@ async function dessinerProf(){
   profT = setTimeout(dessinerProf, 15000);
 }
 const fini = p => p.etat === "remis" || p.etat === "refuse" || (p.etat === "approuve" && MODE_PROF);
-const cmdHtml = (p, attente) => `<div class="cmd e-${esc(p.etat)}${attente && !VUS.has(p.id) ? " neuf" : ""}${!attente && fini(p) && !OUV.has(p.id) ? " repli" : ""}${!attente && fini(p) ? " fin" : ""}" data-cid="${esc(p.id)}"><div class="h"><button class="fl" aria-label="Voir le détail"></button><span class="n">${esc(p.code)}</span><div><b class="pr">${esc(p.prenom || "")}</b> <b>${esc(p.groupe)}</b><br><small class="sous">${heure(p.t)}</small></div><span class="sp"></span><span class="etat ${esc(p.etat)}">${{ attente:"En attente", approuve:"Approuvé", refuse:"Refusé", remis:"Remis" }[p.etat] || esc(p.etat)}</span></div>
+const cmdHtml = (p, attente) => `<div class="cmd e-${esc(p.etat)}${attente && !VUS.has(p.id) ? " neuf" : ""}${!attente && fini(p) && !OUV.has(p.id) ? " repli" : ""}${!attente && fini(p) ? " fin" : ""}" data-cid="${esc(p.id)}"><div class="h"><button class="fl" aria-label="Voir le détail"></button><span class="av">${esc((p.prenom || "É").trim().charAt(0).toUpperCase())}</span><div><b class="pr">${esc(p.prenom || "Élève")}</b> <span class="cd">${esc(p.code)}</span><br><small class="sous">${esc(p.groupe)} · ${heure(p.t)}</small></div><span class="sp"></span><span class="etat ${esc(p.etat)}">${{ attente:"En attente", approuve:"Approuvé", refuse:"Refusé", remis:"Remis" }[p.etat] || esc(p.etat)}</span></div>
   ${p.note ? `<p style="margin:10px 16px 0"><b>Travail :</b> ${esc(p.note)}</p>` : ""}${p.motif ? `<p style="margin:10px 16px 0"><b>Motif :</b> ${esc(p.motif)}</p>` : ""}
-  <table><tr><th>Qté</th><th>Raccord</th><th>N° d'article</th></tr>${(p.items || []).map(i => `<tr><td class="q">${+i.q || 1}</td><td>${esc(i.nom)}</td><td class="no">${esc(i.n)}</td></tr>`).join("")}</table>
+  <table>${(p.items || []).map(i => `<tr><td class="q"><span class="qb">${+i.q || 1}</span></td><td>${esc(i.nom)}<small class="no">${esc(i.n)}</small></td></tr>`).join("")}</table>
   ${attente ? `<div class="act"><button class="btn v" data-ok="${p.id}">Approuver</button><button class="btn r" data-non="${p.id}">Refuser</button></div>` : ""}</div>`;
 async function decider(id, ok, motif){ try { if (await rpc("panier_decider", { p_ens:ENS, p_jeton:JETON, p_id:id, p_ok:ok, p_motif:motif || null }) !== true) throw new Error("déjà traité"); toast(ok ? "Approuvé : le magasinier le voit maintenant." : "Refusé."); } catch(e){ toast("Impossible : " + e.message); } dessinerProf(); }
 async function abonner(oui){
@@ -482,7 +502,7 @@ function rassembler(L){ const M = new Map();
 function dessinerMag(){
   const z = $("#mL"); if (!z) return;
   const v = MAG.filter(p => !FILTRE_CODE || p.code === FILTRE_CODE), app = v.filter(p => p.etat === "approuve"), rem = v.filter(p => p.etat === "remis").reverse();
-  const carte = p => `<div class="cmd e-${esc(p.etat)}${p.etat === "remis" ? " fin" + (OUV.has(p.id) ? "" : " repli") : ""}" data-cid="${esc(p.id)}"><div class="h"><button class="fl" aria-label="Voir le détail"></button><span class="n">${esc(p.code)}</span><div><b class="pr">${esc(p.prenom || "Élève")}</b> <small class="sous">${esc(p.groupe)} · ${esc(nomEns(p.ens))}</small><br><small class="sous">${p.etat === "remis" ? "Remis " + heure(p.t_remis) : (p.items || []).length + " raccord" + ((p.items || []).length > 1 ? "s" : "") + " · approuvé " + heure(p.t_app)}</small></div><span class="sp"></span>
+  const carte = p => `<div class="cmd e-${esc(p.etat)}${p.etat === "remis" ? " fin" + (OUV.has(p.id) ? "" : " repli") : ""}" data-cid="${esc(p.id)}"><div class="h"><button class="fl" aria-label="Voir le détail"></button><span class="av">${esc((p.prenom || "É").trim().charAt(0).toUpperCase())}</span><div><b class="pr">${esc(p.prenom || "Élève")}</b> <span class="cd">${esc(p.code)}</span><br><small class="sous">${esc(p.groupe)} · ${esc(nomEns(p.ens))}</small><br><small class="sous">${p.etat === "remis" ? "Remis " + heure(p.t_remis) : (p.items || []).length + " raccord" + ((p.items || []).length > 1 ? "s" : "") + " · approuvé " + heure(p.t_app)}</small></div><span class="sp"></span>
     ${p.etat === "approuve" ? `<button class="btn p" data-prep="${p.id}">Préparer</button><button class="btn v" data-rem="${p.id}">Remis</button>` : `<button class="lien" data-ann="${p.id}">Annuler la remise</button>`}</div>
     ${p.note ? `<p style="margin:10px 16px 0"><b>Travail :</b> ${esc(p.note)}</p>` : ""}
     ${tableMag(p)}
@@ -507,7 +527,7 @@ function dessinerMag(){
 /* rangée de chaque raccord (celle du panier, sinon celle du catalogue actuel); le bon est trié par rangée = un seul tour du magasin */
 const rangee = i => i.r || ((CAT.find(a => a.id === i.id || a.n === i.n) || {}).r) || "";
 const parRangee = L => [...(L || [])].sort((a, b) => rangee(a).localeCompare(rangee(b), "fr", { numeric:true }) || String(a.nom).localeCompare(String(b.nom), "fr"));
-const tableMag = p => `<table><tr><th>Rangée</th><th>Qté</th><th>Raccord</th></tr>${parRangee(p.items).map(i => `<tr><td class="rg">${esc(rangee(i) || "–")}</td><td class="q">${+i.q || 1}</td><td>${esc(i.nom)}</td></tr>`).join("")}</table>`;   /* 26 nov. : sans n° d'article (inutile au comptoir) */
+const tableMag = p => `<table>${parRangee(p.items).map(i => `<tr><td class="rg"><span class="rgp">${esc(rangee(i) || "–")}</span></td><td class="q"><span class="qb">${+i.q || 1}</span></td><td>${esc(i.nom)}</td></tr>`).join("")}</table>`;   /* 26 nov. : sans n° d'article (inutile au comptoir) */
 /* préparation (25 nov., Jeremy : « les rangées pourraient flasher sur son iPad et quand il coche, ça cesse ») */
 function preparer(p){ if (!p) return;
   let faceL = ""; const cle = "magPrep|" + p.id, faits = new Set(LS.get(cle, [])), L = parRangee(p.items), ov = $("#ov");
