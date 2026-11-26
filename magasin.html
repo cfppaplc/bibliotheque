@@ -7,8 +7,8 @@
 <meta name="robots" content="noindex">
 <meta name="theme-color" content="#1E2A44">
 <link rel="manifest" href="manifest.webmanifest" id="mf"><script>/* 25 nov. : « Sur l'écran d'accueil » ouvre le bon écran (comptoir ou poste de commande) */
-{ const m = new URLSearchParams(location.search); if (m.get("mode") === "magasin") { document.getElementById("mf").href = "magasin-comptoir.webmanifest"; document.write('<link rel="apple-touch-icon" href="img/magasin-comptoir-180.png"><meta name="apple-mobile-web-app-title" content="Comptoir">'); } else if (m.get("poste")) document.getElementById("mf").href = "magasin-poste.webmanifest";
-  else if (m.get("mode") === "prof") { document.getElementById("mf").href = "magasin-prof.webmanifest"; document.write('<link rel="apple-touch-icon" href="img/magasin-prof-180.png"><meta name="apple-mobile-web-app-title" content="Commandes">'); } }</script><link rel="apple-touch-icon" href="img/metier-plus-icone.svg">
+{ const m = new URLSearchParams(location.search); if (m.get("mode") === "magasin") { document.getElementById("mf").href = "magasin-comptoir.webmanifest"; document.write('<link rel="apple-touch-icon" href="img/magasin-comptoir-180.png"><meta name="apple-mobile-web-app-title" content="Comptoir">'); document.title = "Comptoir"; } else if (m.get("poste")) document.getElementById("mf").href = "magasin-poste.webmanifest";
+  else if (m.get("mode") === "prof") { document.getElementById("mf").href = "magasin-prof.webmanifest"; document.write('<link rel="apple-touch-icon" href="img/magasin-prof-180.png"><meta name="apple-mobile-web-app-title" content="Commandes">'); document.title = "Commandes"; } }</script><link rel="apple-touch-icon" href="img/metier-plus-icone.svg">
 <script src="vieux-navigateur.js"></script><script src="signaler.js?v=2"></script>
 <style>
 /* © 2026 Jérémy Raymond. Tous droits réservés. Métier+ — Magasin de raccords (25 nov.) */
@@ -354,7 +354,7 @@ function avisComptoir(){
       LS.set("magComptoirAbo", true); z.remove(); toast("Avis activés : cet appareil sonne à chaque commande approuvée."); $("#mC").focus();
     } catch(e){ $("#acEr").textContent = "Avis impossibles : " + e.message; } };
 }
-let titreT = 0; function clignoterTitre(n){ clearInterval(titreT); const t0 = "Métier+ — Comptoir du magasin", msg = "(" + n + ") Nouvelle commande"; let k = 0;
+let titreT = 0; function clignoterTitre(n){ clearInterval(titreT); const t0 = "Comptoir", msg = "(" + n + ") Nouvelle commande"; let k = 0;
   titreT = setInterval(() => { document.title = k++ % 2 ? t0 : msg; if (k > 20 || document.hasFocus()) { clearInterval(titreT); document.title = t0; } }, 800); }
 async function charger(){ clearTimeout(magT);
   try { MAG = await rpc("panier_magasin", {}) || [];
