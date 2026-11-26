@@ -460,3 +460,9 @@ body.clair .as-lien{background:#f5f6fa;border-color:#e3e6ee}body.clair .as-sig{b
 .ap-st{width:100%;border-collapse:collapse;margin-top:10px;font-size:14px}.ap-st th{text-align:left;font-size:12px;opacity:.7;padding:6px 8px;border-bottom:1px solid rgba(128,128,128,.3)}.ap-st td{padding:7px 8px;border-bottom:1px solid rgba(128,128,128,.15)}
 .co-carte{margin-top:14px;padding-top:12px;border-top:1px solid rgba(128,128,128,.25);display:flex;flex-wrap:wrap;gap:8px;align-items:center}.co-carte span{font-weight:700;font-size:.9rem}
 .co-carte input{flex:1;min-width:200px;font-family:ui-monospace,monospace;text-transform:uppercase;letter-spacing:.04em}.co-carte .prim{width:100%}
+/* 25 nov. : graphiques d'achalandage du magasin (Administration → Magasin) */
+.ap-tus{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin:12px 0}
+.ap-tu{border:1px solid var(--ligne,#d5dae3);border-radius:12px;padding:10px 14px}.ap-tu b{display:block;font-size:1.8rem;line-height:1.1}.ap-tu span{font-size:.85rem;opacity:.75}
+.ap-grs{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px;margin:6px 0 10px}.ap-grs h4{margin:4px 0 2px;font-size:.95rem}
+.ap-gr{width:100%;height:auto;display:block}.ap-gr .br{fill:#D9601C}.ap-gr g:hover .br{fill:#B84E14}.ap-gr .ax{stroke:currentColor;opacity:.35}.ap-gr .gr{stroke:currentColor;opacity:.12}.ap-gr .tk{font-size:10px;fill:currentColor;opacity:.7}
+.ap-top>div{display:grid;grid-template-columns:minmax(0,13em) 1fr auto;align-items:center;gap:8px;font-size:.88rem;margin:5px 0}.ap-top span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ap-top i{display:block;height:12px;background:#D9601C;border-radius:0 4px 4px 0}.ap-top b{min-width:2ch;text-align:right}

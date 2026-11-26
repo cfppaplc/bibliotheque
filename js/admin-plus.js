@@ -151,16 +151,40 @@ window.ADMIN_PLUS = (function(){
      l'outil s'ouvre par-dessus tout l'écran, avec une barre « ‹ Retour »; le panneau reste ouvert derrière */
   /* 25 nov. (Jeremy : « une statistique des raccords sortis ») : raccords remis aux élèves, par période et par groupe (données anonymes) */
   let ST_P = "30", ST_G = "";
+  /* 25 nov. (Jeremy : « de beaux graphiques pour l'achalandage ») : barres SVG simples, une seule couleur, valeur au survol (title) */
+  function barres(D, o){ o = o || {}; const W = 360, H = o.h || 160, g = 24, b = 18, max = Math.max(1, ...D.map(d => d.v)), pas = (W - g) / Math.max(1, D.length), lb = Math.max(2, Math.min(pas - 3, 30));
+    const y = v => H - b - (H - b - 8) * v / max, tick = Math.max(1, Math.ceil(D.length / 12));
+    return '<svg viewBox="0 0 ' + W + ' ' + H + '" class="ap-gr" role="img" aria-label="' + esc(o.titre || "") + '"><line x1="' + g + '" x2="' + W + '" y1="' + (H - b) + '" y2="' + (H - b) + '" class="ax"/>'
+      + '<text x="' + (g - 6) + '" y="' + (y(max) + 4) + '" text-anchor="end" class="tk">' + max + '</text><line x1="' + g + '" x2="' + W + '" y1="' + y(max) + '" y2="' + y(max) + '" class="gr"/>'
+      + D.map((d, i) => { const x = g + i * pas + (pas - lb) / 2, h = Math.max(d.v ? 3 : 0, H - b - y(d.v));
+        return '<g><title>' + esc(d.tip || (d.l + " : " + d.v)) + '</title><rect x="' + (g + i * pas) + '" y="0" width="' + pas + '" height="' + (H - b) + '" fill="transparent"/>'
+          + (d.v ? '<path d="M' + x + ' ' + (H - b) + 'v-' + Math.max(0, h - 3) + 'q0-3 3-3h' + (lb - 6) + 'q3 0 3 3v' + Math.max(0, h - 3) + 'z" class="br"/>' : "")
+          + (i % tick === 0 ? '<text x="' + (x + lb / 2) + '" y="' + (H - 4) + '" text-anchor="middle" class="tk">' + esc(d.l) + '</text>' : "") + '</g>'; }).join("") + '</svg>'; }
+  function achalandage(A, L, depuis){ if (!A || !A.envoyes) return "";
+    const tuile = (n, t) => '<div class="ap-tu"><b>' + n + '</b><span>' + t + '</span></div>';
+    const jours = [], m = new Map((A.jours || []).map(x => [x.j, x.n])), d0 = new Date(depuis + "T12:00:00"), d1 = new Date(), J = ["dim.", "lun.", "mar.", "mer.", "jeu.", "ven.", "sam."];
+    const premier = A.jours.length ? new Date(A.jours[0].j + "T12:00:00") : d1; for (let d = new Date(Math.max(d0, premier)); d <= d1; d = new Date(+d + 864e5)) { if (d.getDay() % 6 === 0) continue; const k = d.toISOString().slice(0, 10);
+      jours.push({ l:d.getDate() + "/" + (d.getMonth() + 1), v:+(m.get(k) || 0), tip:J[d.getDay()] + " " + d.getDate() + "/" + (d.getMonth() + 1) + " : " + (m.get(k) || 0) + " panier(s)" }); }
+    const hm = new Map((A.heures || []).map(x => [x.h, x.n])), heures = []; for (let h = 7; h <= 17; h++) heures.push({ l:h + " h", v:+(hm.get(h) || 0), tip:h + " h à " + (h + 1) + " h : " + (hm.get(h) || 0) + " passage(s) au comptoir" });
+    const sm = new Map((A.semaine || []).map(x => [x.d, x.n])), sem = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi"].map((t, i) => ({ l:t, v:+(sm.get(i + 1) || 0), tip:t + " : " + (sm.get(i + 1) || 0) + " passage(s)" }));
+    const top = L.slice(0, 8), mx = Math.max(1, ...top.map(r => +r.q));
+    return '<div class="ap-tus">' + tuile(A.envoyes, "paniers envoyés") + tuile(A.remis, "remis au comptoir") + tuile(A.refuses, "refusés") + tuile(L.reduce((x, r) => x + +r.q, 0), "raccords sortis") + '</div>'
+      + '<div class="ap-grs"><div><h4>Paniers par jour</h4>' + barres(jours.slice(-60), { titre:"Paniers par jour" }) + '</div>'
+      + '<div><h4>Heures de pointe au comptoir</h4>' + barres(heures, { titre:"Heures de pointe" }) + '</div>'
+      + '<div><h4>Jours les plus achalandés</h4>' + barres(sem, { titre:"Jours de la semaine" }) + '</div>'
+      + (top.length ? '<div><h4>Raccords les plus demandés</h4><div class="ap-top">' + top.map(r => '<div title="' + esc(r.nom + " : " + r.q) + '"><span>' + esc(r.nom) + '</span><i style="width:' + Math.max(2, 100 * r.q / mx) + '%"></i><b>' + r.q + '</b></div>').join("") + '</div></div>' : "")
+      + '</div>'; }
   async function statsMg(c){ if (!c) return;
     const jour = d => d.toISOString().slice(0, 10), auj = new Date(), an = auj.getMonth() >= 7 ? auj.getFullYear() : auj.getFullYear() - 1;
     const P = { "7":["7 jours", jour(new Date(Date.now() - 6 * 864e5))], "30":["30 jours", jour(new Date(Date.now() - 29 * 864e5))], "an":["Depuis le 1er août", an + "-08-01"], "tout":["Tout", "2026-01-01"] };
     const rq = (f, a) => fetch("https://kjlotlhqrgekzohshmbn.supabase.co/rest/v1/rpc/" + f, { method:"POST", headers:{ apikey:"sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY", "Content-Type":"application/json" }, body:JSON.stringify(a || {}), cache:"no-store" }).then(r => { if (!r.ok) throw new Error("Supabase ne répond pas"); return r.json(); });
-    let L, G; try { [L, G] = await Promise.all([rq("panier_stats", { p_depuis:P[ST_P][1], p_groupe:ST_G || null }), rq("panier_stats_groupes")]); } catch(e){ c.innerHTML = '<h3>Raccords sortis</h3><p class="acces-err">' + esc(e.message) + '</p>'; return; }
+    let L, G, A = null; try { [L, G, A] = await Promise.all([rq("panier_stats", { p_depuis:P[ST_P][1], p_groupe:ST_G || null }), rq("panier_stats_groupes"), rq("panier_achalandage", { p_depuis:P[ST_P][1], p_groupe:ST_G || null }).catch(() => null)]); } catch(e){ c.innerHTML = '<h3>Raccords sortis</h3><p class="acces-err">' + esc(e.message) + '</p>'; return; }
     const tot = L.reduce((x, r) => x + +r.q, 0);
     c.innerHTML = '<div class="as-th"><h3>Raccords sortis · ' + tot + ' pièce' + (tot > 1 ? 's' : '') + '</h3></div>'
       + '<div class="acces-per">' + Object.entries(P).map(([k, [t]]) => '<button class="abtn' + (k === ST_P ? ' prim' : '') + '" data-stp="' + k + '">' + t + '</button>').join("")
       + '<select id="stG" style="margin-left:8px"><option value="">Tous les groupes</option>' + G.map(g => '<option' + (g.groupe === ST_G ? ' selected' : '') + '>' + esc(g.groupe) + '</option>').join("") + '</select>'
       + (L.length ? '<button class="abtn" id="stCsv" style="margin-left:auto">Exporter (CSV)</button>' : '') + '</div>'
+      + achalandage(A, L, P[ST_P][1])
       + (L.length ? '<table class="ap-st"><thead><tr><th>Raccord</th><th>N° d\'article</th><th>Quantité</th><th>Commandes</th></tr></thead><tbody>'
         + L.map(r => '<tr><td>' + esc(r.nom) + '</td><td>' + esc(r.n) + '</td><td><b>' + r.q + '</b></td><td>' + r.fois + '</td></tr>').join("") + '</tbody></table>'
         : '<p class="sous">Aucun raccord remis pour cette période. Les raccords comptent quand le magasinier touche « Remis à l\'élève ».</p>');

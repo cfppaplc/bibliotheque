@@ -43,3 +43,16 @@ begin
   end if;
   return jsonb_build_object('ok', true, 'id', r.id);
 end; $$;
+
+-- 25 nov. (Jeremy : « de beaux graphiques pour l'achalandage ») : paniers par jour, heures et jours de pointe au comptoir (anonyme)
+create or replace function public.panier_achalandage(p_depuis date, p_groupe text default null)
+returns jsonb language sql stable security definer set search_path = public as $$
+  with p as (select etat, (t at time zone 'America/Toronto') lt, (t_remis at time zone 'America/Toronto') lr from public.panier
+             where t >= p_depuis and (p_groupe is null or groupe = p_groupe))
+  select jsonb_build_object(
+    'envoyes', (select count(*) from p), 'remis', (select count(*) from p where etat = 'remis'), 'refuses', (select count(*) from p where etat = 'refuse'),
+    'jours', coalesce((select jsonb_agg(jsonb_build_object('j', j, 'n', n) order by j) from (select lt::date j, count(*) n from p group by 1) x), '[]'::jsonb),
+    'heures', coalesce((select jsonb_agg(jsonb_build_object('h', h, 'n', n) order by h) from (select extract(hour from lr)::int h, count(*) n from p where lr is not null group by 1) x), '[]'::jsonb),
+    'semaine', coalesce((select jsonb_agg(jsonb_build_object('d', d, 'n', n) order by d) from (select extract(isodow from lr)::int d, count(*) n from p where lr is not null group by 1) x), '[]'::jsonb));
+$$;
+grant execute on function public.panier_achalandage(date, text) to anon, authenticated;
