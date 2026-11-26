@@ -794,3 +794,4 @@
 - 26 nov. : photos lot 3 (8 agents, 96 types) : 88 trouvées, 87 affichées, 5 retirées après examen → ~255 types avec photo.
 - 26 nov. : photos lot 4 (8 agents, 184 derniers types) : 128 trouvées et affichées, 5 retirées (image absente, dessin, mauvaise pièce).
 - 26 nov. : photos lot 5 (5 agents, 102 derniers articles, recherche par nom) : 57 photos propres à l'article (champ img), toutes affichées et vérifiées.
+- 26 nov. : 28 articles sans photo reçoivent la photo d'un équivalent déjà au catalogue (ex. joint d'expansion cuivre → manchon cuivre). Restent 17 : noms invalides (0, Null, codes P2…), pièces sans équivalent.
