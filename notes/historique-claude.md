@@ -797,3 +797,4 @@
 - 26 nov. : 28 articles sans photo reçoivent la photo d'un équivalent déjà au catalogue (ex. joint d'expansion cuivre → manchon cuivre). Restent 17 : noms invalides (0, Null, codes P2…), pièces sans équivalent.
 - 26 nov. : recherche du magasin flexible : anglicismes et synonymes (SYN dans magasin.html : elbow→coude, tee→té, nipple→mamelon, valve→robinet/clapet, copper→cuivre, black→acier…), pluriels; test ajouté.
 - 26 nov. : vérification des photos par 10 agents (lecture nom ↔ photo) : 166 articles reçoivent une photo plus juste (img = photo d'un autre type), 235 photos retirées (img = « - » : aucune ne convient). Reste 2 104 articles sur 2 356 avec photo.
+- 26 nov. : recherche profonde (10 agents, 246 articles sans photo) : 154 trouvées, 149 affichées, 4 retirées après examen → 145 photos propres à l'article.
