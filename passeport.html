@@ -451,11 +451,10 @@ async function publierGrp(){
   if (localStorage.getItem("passGrpPub") === k) return;
   try { await PARTAGE.ecrire(window.__moi, { grp:L, part:PART, codes:C, noms:await nomsPub() }); localStorage.setItem("passGrpPub", k); } catch(e) {}
 }
-/* 25 nov. (Jeremy : « les élèves écrivent leur code pour voir leur carte ») : code à 5 chiffres + prénom → sa carte.
-   Une rangée par élève, trouvée et déchiffrée seulement avec son code ET son prénom (jamais de liste). */
+/* 25 nov. (Jeremy : « les élèves écrivent leur code pour voir leur carte ») : code à 5 chiffres → sa carte (une rangée par élève, jamais de liste). */
 async function cartesPub(){ if (!window.ELEVE_CARTES) return;
   const faits = (() => { try { return JSON.parse(localStorage.getItem("passCartesPub") || "{}"); } catch(e){ return {}; } })();
-  for (const e of Object.values(D.el)) { if (e.x || !e.c || !e.k || !ELEVE_CARTES.prenomN(e.p)) continue; const sig = e.k + "|" + ELEVE_CARTES.prenomN(e.p) + "|" + (e.g || ""); if (faits[e.c] === sig) continue;
+  for (const e of Object.values(D.el)) { if (e.x || !e.c || !e.k) continue; const sig = e.k + "|" + ELEVE_CARTES.prenomN(e.p) + "|" + (e.g || ""); if (faits[e.c] === sig) continue;
     if (await ELEVE_CARTES.publierCode(e).catch(() => false)) faits[e.c] = sig; }
   try { localStorage.setItem("passCartesPub", JSON.stringify(faits)); } catch(e){} }
 /* 25 nov. (Jeremy : « son nom est déjà sur son compte, ça pourrait dire bonjour ») : le prénom est publié CHIFFRÉ avec la clé de la carte

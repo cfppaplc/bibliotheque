@@ -163,6 +163,7 @@ function eleveEntree(msg){
     if (!pre && !POSTE) { const K = LS.get("mpCarte", null); if (K && K.p && String(K.c || "").includes("-" + c.code + "-")) pre = String(K.p).split(/\s+/)[0]; }
     if (!pre) { $("#cOk").disabled = false; $("#preZ").hidden = false; $("#cErr").textContent = "Écris ton prénom (le magasinier le verra)."; $("#cPre").focus(); return; }
     LS.set("magPrenom", pre);
+    if (!POSTE) { const K = LS.get("mpCarte", null); if (K && K.c && String(K.c).includes("-" + c.code + "-") && !K.p) { K.p = pre; LS.set("mpCarte", K); } }   /* une seule fois : la carte de ce cellulaire garde le prénom */
     if (L.length === 1) return connecter(c.code, L[0]);
     $("#cErr").innerHTML = "Quel est ton groupe ? " + L.map((x, k) => `<button class="btn" data-k="${k}" style="margin:6px 6px 0 0">${esc(x.groupe)} · ${esc(nomEns(x.ens))}</button>`).join("");
     $("#cErr").querySelectorAll("[data-k]").forEach(b => b.onclick = () => connecter(c.code, L[+b.dataset.k])); };
