@@ -810,6 +810,7 @@ function ouvrirLivre(l, brut){
   }
 }
 function lire(l){
+  if (window.ELEVE_REP && l && l.fichier !== "tableau-blanc" && ELEVE_REP.avantLire(l, () => lire(l))) return;   /* 25 nov. : l'élève dit qui il est; ses réponses arrivent */
   try { if (window.COFFRE && window.ACCES && ACCES.session && !ACCES.eleve) COFFRE.stat(l.fichier === "tableau-blanc" ? "outil:tableau" : "livre:" + (l.fichier || "ajoute")); } catch(e){}   /* statistiques anonymes */
   /* « Lire » ouvre le livre en plein écran (réglage Mes préférences → Livre en plein écran); demandé tout de suite, pendant le geste de l'enseignant */
   try { if (!document.fullscreenElement && !document.body.classList.contains("classe") && !(window.PREF && window.PREF().plein === false)){ window.FS_PAR = "livre"; document.documentElement.requestFullscreen().catch(() => { window.FS_PAR = ""; }); } } catch(e){}

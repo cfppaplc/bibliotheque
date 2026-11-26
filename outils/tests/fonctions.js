@@ -160,10 +160,16 @@ test("Élève : toucher un choix (format commun .mp-ch / .mp-vf) l'encercle, ret
   const fs = require("fs"); let h = fs.readFileSync("livres/essai-micro-ordinateur.html", "utf8");
   h = h.replace(/<section class="page cover"/, '<section class="page mp"><div class="mp-q"><p class="mp-qq">Question ?</p><div class="mp-ch" id="tch"><span>Choix un</span><span class="reponse-choix">Choix deux</span><span>Choix trois</span></div><p>Vrai ou faux <span class="mp-vf" id="tvf"><span>Vrai</span><span>Faux</span></span></p></div></section><section class="page cover"');
   await p.route(/livres\/essai-micro-ordinateur\.html/, r => r.fulfill({ body: h, contentType: "text/html" }));
+  /* 25 nov. : réponses de l'élève chiffrées dans Supabase (coffre) avec la clé de sa carte */
+  const SAV = {}; const coffre = async pg => pg.route(/supabase\.co\/rest\/v1\/rpc\/coffre_(lire|ecrire)/, r => { const f = r.request().url().match(/coffre_(\w+)/)[1], a = JSON.parse(r.request().postData() || "{}");
+    let o = true; if (f === "lire") o = SAV[a.p_id] ? [{ data: SAV[a.p_id] }] : []; else SAV[a.p_id] = a.p_data; r.fulfill({ body: JSON.stringify(o), contentType: "application/json", headers: { "access-control-allow-origin": "*" } }); });
+  await coffre(p);
   await p.goto(BASE + "index.html"); await attendre(400);
   await p.evaluate(() => new Promise(ok => { const r = indexedDB.open("acces", 1); r.onupgradeneeded = () => r.result.createObjectStore("s"); r.onsuccess = () => { const t = r.result.transaction("s", "readwrite"); t.objectStore("s").put({ id: "2608egi1", priv: null }, "session"); t.oncomplete = ok; }; }));
   await p.reload(); await p.waitForFunction(() => window.ACCES && ACCES.eleve, null, { timeout: 15000 }); await attendre(1500);
-  await p.evaluate(() => lire(LIVRES.find(l => l.fichier === "essai-micro-ordinateur")));
+  await p.evaluate(() => lire(LIVRES.find(l => l.fichier === "essai-micro-ordinateur"))); await attendre(600);
+  vrai(!!(await p.$("#elQui")), "Élève : « Qui es-tu ? » ne paraît pas avant le livre");
+  await p.fill("#elC", "MP-12345-K7Q9X2"); await p.press("#elC", "Enter");
   await p.waitForFunction(() => { const f = document.getElementById("readerFrame"); return f && f.contentDocument && f.contentDocument.getElementById("tch"); }, null, { timeout: 15000 }); await attendre(1500);
   const centre = sel => p.evaluate(sel => { const f = document.getElementById("readerFrame"), fr = f.getBoundingClientRect(), d = f.contentDocument, e = d.querySelector(sel); e.scrollIntoView({ block: "center" });
     const r = e.getBoundingClientRect(), k = fr.width / (f.contentWindow.innerWidth || fr.width); return [fr.left + (r.left + r.width / 2) * k, fr.top + (r.top + r.height / 2) * k]; }, sel);
@@ -176,6 +182,42 @@ test("Élève : toucher un choix (format commun .mp-ch / .mp-vf) l'encercle, ret
   await p.evaluate(([x, y]) => ecrireIci(x, y), [x, y]); await attendre(400);
   vrai(await n() === 1, "Retoucher n'enlève pas le rond");
   vrai(!(await p.evaluate(() => document.getElementById("readerFrame").contentDocument.body.classList.contains("answers"))), "Les réponses sont visibles pour l'élève");
+  /* sa réponse est chiffrée dans son coffre; sur un autre appareil (à la maison), avec sa carte, il la retrouve */
+  await attendre(3500); const ids = Object.keys(SAV); vrai(ids.length === 1 && !/Choix|coche/.test(SAV[ids[0]]), "Réponses pas envoyées, ou envoyées en clair : " + JSON.stringify(SAV).slice(0, 120));
+  vrai(await p.evaluate(() => Object.keys(INKS).some(k => k.startsWith("e12345|"))), "Les réponses ne sont pas rangées au nom de l'élève");
+  await p.evaluate(() => document.getElementById("readerEleve").click()); await attendre(800);
+  vrai(await p.evaluate(() => !Object.keys(INKS).some(k => k.startsWith("e12345|") && INKS[k].length)), "« Changer d'élève » laisse ses réponses sur l'appareil");
+  const p2 = await page(b, { viewport: { width: 1280, height: 800 }, hasTouch: true, serviceWorkers: "block" }, "2608egi1");
+  await p2.route(/livres\/essai-micro-ordinateur\.html/, r => r.fulfill({ body: h, contentType: "text/html" })); await coffre(p2);
+  await p2.goto(BASE + "index.html"); await attendre(400);
+  await p2.evaluate(() => new Promise(ok => { const r = indexedDB.open("acces", 1); r.onupgradeneeded = () => r.result.createObjectStore("s"); r.onsuccess = () => { const t = r.result.transaction("s", "readwrite"); t.objectStore("s").put({ id: "2608egi1", priv: null }, "session"); t.oncomplete = ok; }; }));
+  await p2.reload(); await p2.waitForFunction(() => window.ACCES && ACCES.eleve, null, { timeout: 15000 }); await attendre(1200);
+  await p2.evaluate(() => lire(LIVRES.find(l => l.fichier === "essai-micro-ordinateur"))); await attendre(600); await p2.fill("#elC", "MP-12345-K7Q9X2"); await p2.press("#elC", "Enter");
+  await p2.waitForFunction(() => { const f = document.getElementById("readerFrame"); return f && f.contentDocument && f.contentDocument.getElementById("tch"); }, null, { timeout: 15000 }); await attendre(1500);
+  vrai(await p2.evaluate(() => (INKS[inkKey()] || []).filter(o => o.coche).length) === 1, "Autre appareil : l'élève ne retrouve pas sa réponse");
+  vrai(!p2.errs.length, p2.errs.join(" | ")); await p2.context().close();
+  vrai(!p.errs.length, p.errs.join(" | "));
+});
+
+test("Élève : écrire sur une ligne, dans une case de tableau, dans une zone de développement, cocher une liste (.mp-coche)", async b => {
+  const p = await page(b, { viewport: { width: 1280, height: 800 }, hasTouch: true, serviceWorkers: "block" }, "2608egi1");
+  await p.context().addInitScript(() => sessionStorage.setItem("eleveMoi", JSON.stringify({ c: "12345", k: "K7Q9X2" })));
+  await p.route(/supabase\.co/, r => r.fulfill({ body: "[]", contentType: "application/json", headers: { "access-control-allow-origin": "*" } }));
+  let h = require("fs").readFileSync("livres/essai-micro-ordinateur.html", "utf8");
+  h = h.replace(/<section class="page cover"/, '<style>.mp-coche{list-style:none;padding-left:4px}.mp-coche li::before{content:"";display:inline-block;width:11px;height:11px;border:1.5px solid #8a96a0;border-radius:3px;margin-right:8px}</style><section class="page mp"><div class="mp-lig" id="tlig" style="height:93px"></div><table class="mp-tab"><tr><th>A</th><th>B</th></tr><tr><td>Tuyau</td><td id="tcell"></td></tr></table><ul class="mp-coche"><li id="tco">Item</li></ul><div id="tzone" style="height:140px;border:1px solid #999"></div></section><section class="page cover"');
+  await p.route(/livres\/essai-micro-ordinateur\.html/, r => r.fulfill({ body: h, contentType: "text/html" }));
+  await p.goto(BASE + "index.html"); await attendre(400);
+  await p.evaluate(() => new Promise(ok => { const r = indexedDB.open("acces", 1); r.onupgradeneeded = () => r.result.createObjectStore("s"); r.onsuccess = () => { const t = r.result.transaction("s", "readwrite"); t.objectStore("s").put({ id: "2608egi1", priv: null }, "session"); t.oncomplete = ok; }; }));
+  await p.reload(); await p.waitForFunction(() => window.ACCES && ACCES.eleve, null, { timeout: 15000 }); await attendre(1200);
+  await p.evaluate(() => lire(LIVRES.find(l => l.fichier === "essai-micro-ordinateur")));
+  await p.waitForFunction(() => { const f = document.getElementById("readerFrame"); return f && f.contentDocument && f.contentDocument.getElementById("tlig"); }, null, { timeout: 15000 }); await attendre(1500);
+  const centre = sel => p.evaluate(sel => { const f = document.getElementById("readerFrame"), fr = f.getBoundingClientRect(), e = f.contentDocument.querySelector(sel); e.scrollIntoView({ block: "center" });
+    const r = e.getBoundingClientRect(), k = fr.width / (f.contentWindow.innerWidth || fr.width); return [fr.left + (r.left + Math.min(r.width / 2, 60)) * k, fr.top + (r.top + Math.min(r.height / 2, 14)) * k]; }, sel);
+  const n = () => p.evaluate(() => (INKS[inkKey()] || []).length);
+  for (const sel of ["#tlig", "#tcell", "#tco", "#tzone"]) { let [x, y] = await centre(sel); await attendre(300); [x, y] = await centre(sel); const a = await n();
+    await p.evaluate(([x, y]) => ecrireIci(x, y), [x, y]); await attendre(300);
+    if (sel !== "#tco") { await p.keyboard.type("Rep", { delay: 10 }); await attendre(150); await p.mouse.click(1250, 60); await attendre(500); }
+    vrai(await n() === a + 1, "Élève : rien d'enregistré pour " + sel); }
   vrai(!p.errs.length, p.errs.join(" | "));
 });
 

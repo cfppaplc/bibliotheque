@@ -24,7 +24,7 @@ const WB = {};
 const wbEtat = () => WB[RD.book] || (WB[RD.book] = { n:1, count:1, bg:{} });
 const wbBg = () => wbEtat().bg[wbEtat().n] || "blanc";
 const wbSombre = () => !!RD.wb && !!(WBFONDS.find(f => f.k === wbBg()) || {}).dark;
-const inkKey = () => RD.book + "|" + (RD.wb ? "wb" + wbEtat().n + (wbBg() === "blanc" ? "" : ":" + wbBg()) : RD.label + (RD.dbl ? "|d" : ""));   /* chaque fond a son propre dessin */
+const inkKey = () => (window.ELEVE_REP ? ELEVE_REP.pfx() : "") + RD.book + "|" + (RD.wb ? "wb" + wbEtat().n + (wbBg() === "blanc" ? "" : ":" + wbBg()) : RD.label + (RD.dbl ? "|d" : ""));   /* chaque fond a son propre dessin */
 /* après un changement de fond : le dessin reste sur l'ancien fond; un bouton permet de l'apporter */
 function apresFond(ancienne, nomAncien){
   const nouv = inkKey(); if (ancienne === nouv) return;
@@ -1220,6 +1220,11 @@ function caseDuLivre(X, Y){
       const r = e.getBoundingClientRect(); if (dist(r) > tol) continue;
       if (r.width < 7 || r.width > 46 || r.height < 7 || r.height > 46 || Math.abs(r.width - r.height) > Math.max(r.width, r.height) * .35 || e.textContent.trim() || e.children.length) continue;
       const cs = win.getComputedStyle(e); if (!vis(e)) continue; if ((parseFloat(cs.borderTopWidth) || 0) >= .5 && cs.borderTopStyle !== "none" || (parseFloat(cs.borderBottomWidth) || 0) >= .5 && (parseFloat(cs.borderLeftWidth) || 0) >= .5) prendre("case", r, dist(r)); }
+    /* 2b. 25 nov. : liste à cocher du format commun (.mp-coche li : la case est dessinée en ::before) — toucher la ligne coche sa case */
+    if (!best) for (const li of boite.querySelectorAll(".mp-coche > li")){ const lr = li.getBoundingClientRect(); if (dist(lr) > tol / 2) continue;
+      const pb = win.getComputedStyle(li, "::before"), w = parseFloat(pb.width) || 11, h = parseFloat(pb.height) || 11, ml = parseFloat(win.getComputedStyle(li).paddingLeft) || 0;
+      const lh = parseFloat(win.getComputedStyle(li).lineHeight) || lr.height; const r = { left:lr.left + ml, top:lr.top + Math.max(0, (Math.min(lh, lr.height) - h) / 2), width:w, height:h };
+      r.right = r.left + w; r.bottom = r.top + h; prendre("case", r, 0); }
     if (best && best.d * s > 3){ const L = ligneDuLivre(X, Y); if (L && X >= L.x - 2 && X <= L.x + L.w + 2 && Math.abs(Y - L.y) < 26) best = null; }   /* doigt à côté de la case, sur une ligne : c'est la ligne qui gagne */
     if (best) return { kind:best.kind, x:fr.left + best.r.left * s, y:fr.top + best.r.top * s, w:best.r.width * s, h:best.r.height * s };
     /* 3. choix à encercler : un enfant d'un groupe .opts / .choix / .vf (ou options, choices, qcm) */
@@ -1529,7 +1534,7 @@ function recalerWb(){
 const arrondir = v => typeof v === "number" ? Math.round(v * 1e5) / 1e5 : Array.isArray(v) ? v.map(arrondir) : v;
 const copieTraits = arr => (arr || []).map(s => { const o = {}; for (const k in s) if (k !== "cache") o[k] = (k === "p" || k === "bb" || k === "bw") ? arrondir(s[k]) : s[k]; return o; });
 let sauveT = 0, sauveAvis = false;
-function planifierSauvegarde(){ clearTimeout(sauveT); sauveT = setTimeout(() => { if (window.requestIdleCallback) requestIdleCallback(sauverTableaux, { timeout:2500 }); else sauverTableaux(); }, 1800); }   /* 17 nov. : 1,8 s + moment libre (avec beaucoup de tableaux, l'enregistrement prend ~0,1 s sur ordinateur, plus au TNI) */
+function planifierSauvegarde(){ try { if (window.ELEVE_REP) ELEVE_REP.planifier(); } catch(e){} clearTimeout(sauveT); sauveT = setTimeout(() => { if (window.requestIdleCallback) requestIdleCallback(sauverTableaux, { timeout:2500 }); else sauverTableaux(); }, 1800); }   /* 17 nov. : 1,8 s + moment libre (avec beaucoup de tableaux, l'enregistrement prend ~0,1 s sur ordinateur, plus au TNI) */
 function sauverTableaux(){ if (RD.enTrait){ planifierSauvegarde(); return; }   /* jamais pendant un trait : ça le faisait saccader */
   const inks = {}; for (const k in INKS) if (INKS[k] && INKS[k].length) inks[k] = copieTraits(INKS[k]);
   try { localStorage.setItem(CLE_SAUVE, JSON.stringify({ v:1, inks, wb:WB, refs:REFS })); sauveAvis = false; }

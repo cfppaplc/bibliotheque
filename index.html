@@ -169,7 +169,7 @@ document.addEventListener("keydown", e => { if (e.key !== "/" || e.ctrlKey || e.
 
 
 <div class="reader" id="reader">
-  <div class="reader-bar"><img class="rb-logo" src="img/metier-plus-blanc.svg" alt="Métier+"><button id="readerBack">← Retour</button><button id="readerTdb" type="button" title="Tableau de bord (E) — le livre reste ouvert"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="4" width="17" height="12.5" rx="1.5"/><path d="M8 20h8M12 16.5V20"/></svg>Tableau de bord</button><button id="readerLivre" type="button" title="Revenir au livre (B)">‹ Revenir au livre</button><span id="readerTitle"></span><span id="telePill" hidden title="Ton cellulaire contrôle ce livre"><i></i>Télécommande branchée</span></div>
+  <div class="reader-bar"><img class="rb-logo" src="img/metier-plus-blanc.svg" alt="Métier+"><button id="readerBack">← Retour</button><button id="readerEleve" type="button" hidden>Qui es-tu ?</button><button id="readerTdb" type="button" title="Tableau de bord (E) — le livre reste ouvert"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="4" width="17" height="12.5" rx="1.5"/><path d="M8 20h8M12 16.5V20"/></svg>Tableau de bord</button><button id="readerLivre" type="button" title="Revenir au livre (B)">‹ Revenir au livre</button><span id="readerTitle"></span><span id="telePill" hidden title="Ton cellulaire contrôle ce livre"><i></i>Télécommande branchée</span></div>
   <button class="tdb-pill" id="tdbPill" type="button" title="Retour au tableau de bord (E)"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="4" width="17" height="12.5" rx="1.5"/><path d="M8 20h8M12 16.5V20"/></svg>Tableau de bord</button>
   <div class="rstage" id="rstage">
     <div class="rinner" id="rinner"><div class="rscale" id="rscale">
@@ -261,9 +261,9 @@ window.LIVRES_EXTERNES = true;   // les livres sont des fichiers du dossier livr
 <script>/* 25 nov. (erreurs « zout / DPRI / initDonnees is not defined » sur un cellulaire) : un script n'est pas arrivé (réseau coupé) : on recharge la page une seule fois */
 function mpScriptsOk(...n){ if (n.every(f => typeof window[f] === "function")) return; try { if (sessionStorage.mpRechJs) return; sessionStorage.mpRechJs = "1"; } catch(e){ return; } location.reload(); }
 mpScriptsOk("zout", "DPRI");</script>
-<script src="js/tableau-blanc.js?v=16"></script>
+<script src="js/eleve-reponses.js?v=1"></script><script src="js/tableau-blanc.js?v=17"></script>
 <script>/* 17 nov. : si le fichier du tableau blanc n'est pas arrivé (réseau coupé), on recharge la page une fois */ if (typeof setIcn === "undefined") { try { if (!sessionStorage.rechTB) { sessionStorage.rechTB = "1"; location.reload(); } } catch(e){} } else { try { sessionStorage.removeItem("rechTB"); } catch(e){} }</script>
-<script src="js/lecteur.js?v=15"></script>
+<script src="js/lecteur.js?v=16"></script>
 <script src="js/defi-livre-data.js?v=7"></script>
 <script src="js/defi-livre.js?v=3"></script>
 <script src="js/donnees.js?v=1"></script>
