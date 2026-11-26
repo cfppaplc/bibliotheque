@@ -389,7 +389,9 @@ test("Carte : l'élève affiche sa carte avec son code à 5 chiffres seulement; 
 
 test("Facture : l'élève (sa carte) fait une facture, importe ses raccords du magasin, le client signe, PDF", async b => {
   const c = await b.newContext({ viewport: { width: 820, height: 1180 }, hasTouch: true, serviceWorkers: "block", acceptDownloads: true }), S = {}, errs = [];
-  await c.addInitScript(() => { localStorage.mpCarte = JSON.stringify({ c: "MP-48213-K7Q9X2", g: "5333", p: "Marc", t: 1 }); });
+  /* groupe en DEP 2 aujourd'hui (début il y a 6 mois) : seule session où la facture est permise (reglages.json) */
+  await c.addInitScript(() => { const d = new Date(); d.setMonth(d.getMonth() - 6); const g = String(d.getFullYear() % 100) + String(d.getMonth() + 1).padStart(2, "0") + "PLCA1";
+    localStorage.mpCarte = JSON.stringify({ c: "MP-48213-K7Q9X2", g, p: "Marc", t: 1 }); });
   await c.route(/rpc\/(\w+)/, r => { const f = r.request().url().match(/rpc\/(\w+)/)[1], a = JSON.parse(r.request().postData() || "{}"); let o = null;
     if (f === "coffre_lire") o = S[a.p_id] ? [{ data: S[a.p_id] }] : []; else if (f === "coffre_ecrire") { S[a.p_id] = a.p_data; o = true; }
     else if (f === "panier_materiel_eleve") o = a.p_code === "48213" ? [{ n: "ABS-C90-2", nom: "Coude 90° ABS 2 po", q: 6, dernier: "2026-11-25" }, { n: "CU-T-34", nom: "Té cuivre 3/4 po", q: 2, dernier: "2026-11-24" }] : [];
@@ -414,13 +416,16 @@ test("Facture : l'élève (sa carte) fait une facture, importe ses raccords du m
   if (process.env.CAPTURES) await p.screenshot({ path: process.env.CAPTURES + "/facture.png", fullPage: true });
   await attendre(1800); vrai(Object.keys(S).length === 3, "Copies chiffrées non enregistrées (" + Object.keys(S).length + ")");
   /* autre appareil (à la maison) : la facture revient avec la carte */
-  const c2 = await b.newContext({ serviceWorkers: "block" }); await c2.addInitScript(() => { localStorage.mpCarte = JSON.stringify({ c: "MP-48213-K7Q9X2", p: "Marc", t: 1 }); });
+  const c2 = await b.newContext({ serviceWorkers: "block" }); await c2.addInitScript(() => { const d = new Date(); d.setMonth(d.getMonth() - 6); localStorage.mpCarte = JSON.stringify({ c: "MP-48213-K7Q9X2", g: String(d.getFullYear() % 100) + String(d.getMonth() + 1).padStart(2, "0") + "PLCA1", p: "Marc", t: 1 }); });
   await c2.route(/rpc\/(\w+)/, r => { const a = JSON.parse(r.request().postData() || "{}"); r.fulfill({ body: JSON.stringify(S[a.p_id] ? [{ data: S[a.p_id] }] : []), contentType: "application/json", headers: { "access-control-allow-origin": "*" } }); });
   const p2 = await c2.newPage(); await p2.goto(BASE + "facture.html"); await attendre(1200); vrai(/Mme Gagnon/.test(await p2.textContent("#app")), "Facture non retrouvée sur un autre appareil");
   /* l'équipier (51234) retrouve la même entreprise; au changement d'équipe (nouveau tour), elle recommence */
-  const p3 = await c2.newPage(); await p3.addInitScript(() => { localStorage.mpCarte = JSON.stringify({ c: "MP-51234-ZZZZ99", p: "Léa", t: 1 }); }); await p3.goto(BASE + "facture.html"); await attendre(1500);
+  const p3 = await c2.newPage(); await p3.addInitScript(() => { const d = new Date(); d.setMonth(d.getMonth() - 6); localStorage.mpCarte = JSON.stringify({ c: "MP-51234-ZZZZ99", g: String(d.getFullYear() % 100) + String(d.getMonth() + 1).padStart(2, "0") + "PLCA1", p: "Léa", t: 1 }); }); await p3.goto(BASE + "facture.html"); await attendre(1500);
   vrai(/Plomberie Marc inc\./.test(await p3.textContent("#app")), "L'équipier ne voit pas l'entreprise de l'équipe");
   S[pub] = PUBC(3); await p3.reload(); await attendre(1500); vrai(/Notre entreprise/.test(await p3.textContent("#app")), "Nouveau tour du coffre : l'entreprise ne recommence pas");
+  /* DEP 1 (groupe commencé ce mois-ci) : facture fermée */
+  const p4 = await c2.newPage(); await p4.addInitScript(() => { const d = new Date(); localStorage.mpCarte = JSON.stringify({ c: "MP-51234-ZZZZ99", g: String(d.getFullYear() % 100) + String(d.getMonth() + 1).padStart(2, "0") + "PLCA1", p: "Léa", t: 1 }); });
+  await p4.goto(BASE + "facture.html"); await attendre(900); vrai(/s'ouvre plus tard dans ton DEP \(tu es en DEP 1\)/.test(await p4.textContent("#app")), "Facture ouverte en DEP 1");
   vrai(!errs.length, errs.join(" | ")); await c.close(); await c2.close();
 });
 

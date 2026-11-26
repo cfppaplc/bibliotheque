@@ -58,6 +58,7 @@ window.ADMIN_SITE = (function(){
       + '<button class="abtn" id="asRe">Vérifier encore</button></div>'
       + '<div class="as-carte"><h3>Réglages du site</h3>'
       + '<div class="as-reg"><span>Étiquette du logo</span><div class="as-seg">' + seg("ALPHA", "ALPHA") + seg("BÊTA", "BÊTA") + seg("", "Aucune") + '</div></div>'
+      + '<div class="as-reg"><span>Facture des élèves (sessions du DEP)</span><div class="as-seg">' + [1, 2, 3, 4].map(n => '<button class="abtn' + ((REGL.facture || [2]).includes(n) ? ' prim' : '') + '" data-fac="' + n + '">DEP ' + n + '</button>').join("") + '</div></div>'
       + '<p class="sous">Part en ligne avec « Publier ».</p>'
       + '<a class="as-lien" href="accueil.html?menage=1" target="_blank" rel="noopener">Locaux et tâches du ménage<small>Accueil de classe</small></a>'
       + '<a class="as-lien" href="passeport.html?formations=1" target="_blank" rel="noopener">Formations du registre<small>Gestion d\'atelier</small></a>'
@@ -76,6 +77,8 @@ window.ADMIN_SITE = (function(){
     z.querySelector("#asTous").onchange = e => { VOIR_REGLES = e.target.checked; dessiner(z, REGL, redessiner); };
     z.querySelectorAll("[data-ok]").forEach(b => b.onclick = () => { const o2 = lire(), x = o2.L.find(y => y.id === b.dataset.ok); if (x){ x.ok = !x.ok; ecrire(o2); } dessiner(z, REGL, redessiner); });
     z.querySelectorAll("[data-etq]").forEach(b => b.onclick = () => { REGL.etiquette = b.dataset.etq; redessiner(); });
+    /* 26 nov. (Jeremy : « les factures pour le moment seulement en DEP 2 ») : session calculée du code du groupe (2608 = août 2026) */
+    z.querySelectorAll("[data-fac]").forEach(b => b.onclick = () => { const n = +b.dataset.fac, L = REGL.facture || [2]; REGL.facture = L.includes(n) ? L.filter(x => x !== n) : L.concat(n).sort(); redessiner(); });
     const go = z.querySelector("[data-ong-go]"); if (go) go.onclick = () => { const b = document.querySelector('[data-ong="livres"]'); if (b) b.click(); };
   }
   return { dessiner, recolter, verifs, lire, genre };

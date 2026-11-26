@@ -42,6 +42,7 @@ table.l td.n{width:90px}table.l td.x{width:44px}table.l input{min-height:40px}
 .barre{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--ligne);padding:10px 16px;padding-bottom:max(10px,env(safe-area-inset-bottom));display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;z-index:5}
 .toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--nuit);color:#fff;padding:10px 16px;border-radius:12px;z-index:9}
 </style>
+<script src="js/session-dep.js?v=1"></script>
 </head>
 <body>
 <div class="top"><img src="img/metier-plus-blanc.svg" alt="Métier+"><b>Facture</b><span class="sp"></span><span id="qui" style="font-size:.9rem;opacity:.85"></span><a href="carte.html">Ma carte</a></div>
@@ -274,7 +275,8 @@ async function pdf(f, courriel){ try { const { PDFDocument, StandardFonts, rgb }
   if (courriel) { location.href = "mailto:" + encodeURIComponent(f.client.courriel || "") + "?subject=" + encodeURIComponent("Facture " + f.no + (f.ent.nom ? " - " + f.ent.nom : "")) + "&body=" + encodeURIComponent("Bonjour,\n\nVoici la facture " + f.no + " pour les travaux effectués (total : " + argent(T.tot) + ").\nLe PDF est joint à ce courriel.\n\nMerci de votre confiance !\n" + (f.ent.nom || "")); toast("PDF téléchargé : joins-le au courriel."); }
   } catch(e){ toast("PDF impossible : " + e.message); } }
 
-async function demarrer(){ if (!C) return entree(); $("#app").innerHTML = `<p class="sous">Chargement…</p>`; await Promise.all([charger(), trouverCoffre()]); await entSync(); liste(); }
+async function demarrer(){ if (!C) return entree();
+  if (!(await factureOuverte(K.g))) { const n = sessionDEP(K.g); $("#app").innerHTML = `<h1>Facture au client</h1><div class="carte"><p>La facture s'ouvre plus tard dans ton DEP${n ? " (tu es en DEP " + n + ")" : ""}. Ton enseignant te dira quand.</p><a class="btn" href="carte.html">Retour à ma carte</a></div>`; return; } $("#app").innerHTML = `<p class="sous">Chargement…</p>`; await Promise.all([charger(), trouverCoffre()]); await entSync(); liste(); }
 lireK(); demarrer();
 </script>
 <script src="js/journal-perf.js?v=7"></script>
