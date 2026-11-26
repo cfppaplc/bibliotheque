@@ -161,8 +161,8 @@ test("Élève : toucher un choix (format commun .mp-ch / .mp-vf) l'encercle, ret
   h = h.replace(/<section class="page cover"/, '<section class="page mp"><div class="mp-q"><p class="mp-qq">Question ?</p><div class="mp-ch" id="tch"><span>Choix un</span><span class="reponse-choix">Choix deux</span><span>Choix trois</span></div><p>Vrai ou faux <span class="mp-vf" id="tvf"><span>Vrai</span><span>Faux</span></span></p></div></section><section class="page cover"');
   await p.route(/livres\/essai-micro-ordinateur\.html/, r => r.fulfill({ body: h, contentType: "text/html" }));
   /* 25 nov. : réponses de l'élève chiffrées dans Supabase (coffre) avec la clé de sa carte */
-  const SAV = {}; const coffre = async pg => pg.route(/supabase\.co\/rest\/v1\/rpc\/coffre_(lire|ecrire)/, r => { const f = r.request().url().match(/coffre_(\w+)/)[1], a = JSON.parse(r.request().postData() || "{}");
-    let o = true; if (f === "lire") o = SAV[a.p_id] ? [{ data: SAV[a.p_id] }] : []; else SAV[a.p_id] = a.p_data; r.fulfill({ body: JSON.stringify(o), contentType: "application/json", headers: { "access-control-allow-origin": "*" } }); });
+  const SAV = {}; const coffre = async pg => pg.route(/supabase\.co\/rest\/v1\/rpc\/coffre_(lire|ecrire|effacer)/, r => { const f = r.request().url().match(/coffre_(\w+)/)[1], a = JSON.parse(r.request().postData() || "{}");
+    let o = true; if (f === "lire") o = SAV[a.p_id] ? [{ data: SAV[a.p_id] }] : []; else if (f === "effacer") delete SAV[a.p_id]; else SAV[a.p_id] = a.p_data; r.fulfill({ body: JSON.stringify(o), contentType: "application/json", headers: { "access-control-allow-origin": "*" } }); });
   await coffre(p);
   await p.goto(BASE + "index.html"); await attendre(400);
   await p.evaluate(() => new Promise(ok => { const r = indexedDB.open("acces", 1); r.onupgradeneeded = () => r.result.createObjectStore("s"); r.onsuccess = () => { const t = r.result.transaction("s", "readwrite"); t.objectStore("s").put({ id: "2608egi1", priv: null }, "session"); t.oncomplete = ok; }; }));
@@ -183,7 +183,7 @@ test("Élève : toucher un choix (format commun .mp-ch / .mp-vf) l'encercle, ret
   vrai(await n() === 1, "Retoucher n'enlève pas le rond");
   vrai(!(await p.evaluate(() => document.getElementById("readerFrame").contentDocument.body.classList.contains("answers"))), "Les réponses sont visibles pour l'élève");
   /* sa réponse est chiffrée dans son coffre; sur un autre appareil (à la maison), avec sa carte, il la retrouve */
-  await attendre(3500); const ids = Object.keys(SAV); vrai(ids.length === 1 && !/Choix|coche/.test(SAV[ids[0]]), "Réponses pas envoyées, ou envoyées en clair : " + JSON.stringify(SAV).slice(0, 120));
+  await attendre(3500); const ids = Object.keys(SAV); vrai(ids.length === 2 && ids.every(i => !/Choix|coche|essai/.test(SAV[i])), "Réponses pas envoyées, ou envoyées en clair : " + JSON.stringify(SAV).slice(0, 120));
   vrai(await p.evaluate(() => Object.keys(INKS).some(k => k.startsWith("e12345|"))), "Les réponses ne sont pas rangées au nom de l'élève");
   await p.evaluate(() => document.getElementById("readerEleve").click()); await attendre(800);
   vrai(await p.evaluate(() => !Object.keys(INKS).some(k => k.startsWith("e12345|") && INKS[k].length)), "« Changer d'élève » laisse ses réponses sur l'appareil");
@@ -195,6 +195,10 @@ test("Élève : toucher un choix (format commun .mp-ch / .mp-vf) l'encercle, ret
   await p2.evaluate(() => lire(LIVRES.find(l => l.fichier === "essai-micro-ordinateur"))); await attendre(600); await p2.fill("#elC", "MP-12345-K7Q9X2"); await p2.press("#elC", "Enter");
   await p2.waitForFunction(() => { const f = document.getElementById("readerFrame"); return f && f.contentDocument && f.contentDocument.getElementById("tch"); }, null, { timeout: 15000 }); await attendre(1500);
   vrai(await p2.evaluate(() => (INKS[inkKey()] || []).filter(o => o.coche).length) === 1, "Autre appareil : l'élève ne retrouve pas sa réponse");
+  /* carte perdue (25 nov.) : l'administrateur donne une nouvelle clé; les réponses suivent, l'ancienne clé ne donne plus rien */
+  await attendre(3000); await p2.addScriptTag({ url: BASE + "js/eleve-cartes.js" });
+  const tr = await p2.evaluate(async () => { const n = await ELEVE_CARTES.transferer("12345", "K7Q9X2", "NOUV23"); return { n, nouv: await ELEVE_CARTES.livres("12345", "NOUV23"), vieux: await ELEVE_CARTES.livres("12345", "K7Q9X2") }; });
+  vrai(tr.n === 1 && tr.nouv.includes("essai-micro-ordinateur") && !tr.vieux.length, "Nouvelle carte : transfert raté " + JSON.stringify(tr));
   vrai(!p2.errs.length, p2.errs.join(" | ")); await p2.context().close();
   vrai(!p.errs.length, p.errs.join(" | "));
 });

@@ -361,10 +361,35 @@ try { for (let w = window; ; w = w.parent){ if (/[?&]gestion=1/.test(w.location.
     { const m = dlg.querySelector("[data-mod]"); if (m) m.onclick = () => { dlg.close(); viaFormations(w => w.eleveOuvrir(e.id)); }; }
     dlg.querySelector("[data-imp]").onclick = () => mpImprimer("Historique · " + e.p, [e.g, e.c ? "code " + e.c : "", e.eq ? "équipe " + e.eq : ""].filter(Boolean).join(" · "), ["Date et heure", "Action"], H.map(([t, x]) => [mpDateHeure(t), x]));
     if (!dlg.open) dlg.showModal();
+    carteFiche(dlg, e);
     commandesFiche(dlg, e);
   }
   /* 25 nov. (Jeremy : « tout voir sur le dossier de l'élève : compte, coffre, commandes ») : paniers du magasin de l'élève (60 jours),
      lus avec la clé d'approbation du magasin gardée sur cet appareil */
+  /* 25 nov. (Jeremy : « je dois être capable de gérer les comptes s'il y a des pertes ») : carte de l'élève (administrateur seulement) */
+  async function carteFiche(dlg, e){
+    const P = PASS(), x = P && P.D.el[e.id]; if (!ADM() || !x || !x.c || !x.k) return; const b = dlg.querySelector(".fi-b"); if (!b) return;
+    const z = document.createElement("div"); z.innerHTML = `<h4>Carte de l'élève</h4><div class="fi-l"><div><span class="s">▦</span>Clé : <b data-cle style="font-family:ui-monospace,monospace;letter-spacing:.05em">MP-${esc(x.c)}-••••••</b>
+      <button data-voircle class="fi-imp" style="margin-left:8px;font:inherit;font-size:13px;font-weight:700;color:#EB6A22;background:none;border:0;cursor:pointer">Afficher</button></div>
+      <div><button data-rep class="fi-imp" style="font:inherit;font-weight:700;color:#EB6A22;background:none;border:0;cursor:pointer;padding:0;min-height:36px">Voir ses réponses dans ses livres</button></div><div data-repl></div>
+      <div><button data-nouv class="fi-imp" style="font:inherit;font-weight:700;color:#B3261E;background:none;border:0;cursor:pointer;padding:0;min-height:36px">Carte perdue ou volée : nouvelle carte</button></div></div>`;
+    b.prepend(...z.childNodes);
+    dlg.querySelector("[data-voircle]").onclick = ev => { dlg.querySelector("[data-cle]").textContent = "MP-" + x.c + "-" + x.k; ev.target.remove(); };
+    dlg.querySelector("[data-rep]").onclick = async ev => { const L = dlg.querySelector("[data-repl]"); L.innerHTML = `<small>Chargement…</small>`;
+      const T = window.top, livres = await ELEVE_CARTES.livres(x.c, x.k), nom = f => { try { const l = T.LIVRES.find(y => y.fichier === f); return l ? l.titre : f; } catch(er){ return f; } };
+      L.innerHTML = livres.length ? livres.map(f => `<button data-ouv="${esc(f)}" style="display:block;font:inherit;background:none;border:0;color:inherit;text-decoration:underline;cursor:pointer;padding:4px 0">${esc(nom(f))}</button>`).join("")
+        + `<small>Ce que tu écris dans son livre (corrections) va dans le sien.</small>` : `<small>Aucune réponse enregistrée pour l'instant.</small>`;
+      L.querySelectorAll("[data-ouv]").forEach(o => o.onclick = async () => { const T = window.top; if (!T.ELEVE_REP) { toast("Ouvre Groupes et élèves depuis l'Administration pour voir ses réponses."); return; }
+        dlg.close(); try { const pl = T.document.querySelector(".ap-plein"); if (pl) pl.remove(); T.document.documentElement.style.overflow = ""; const ov = T.document.getElementById("accesOv"); if (ov) ov.hidden = true; } catch(er){}
+        await T.ELEVE_REP.voir(x.c, x.k, o.dataset.ouv); }); };
+    dlg.querySelector("[data-nouv]").onclick = async ev => { const bt = ev.target;
+      if (!bt.dataset.sur) { bt.dataset.sur = "1"; bt.textContent = "Confirmer : l'ancienne carte ne marchera plus"; return; }
+      bt.disabled = true; bt.textContent = "Transfert de ses réponses…";
+      try { const k1 = fFo.contentWindow.cleCarte(), n = await ELEVE_CARTES.transferer(x.c, x.k, k1); x.k = k1; x.t = Date.now(); P.sauver();
+        dlg.querySelector("[data-cle]").textContent = "MP-" + x.c + "-" + k1; bt.textContent = "Nouvelle carte faite";
+        toast("Nouvelle carte : " + n + " livre" + (n > 1 ? "s" : "") + " transféré" + (n > 1 ? "s" : "") + ". Imprime-la : Étiquettes et fiches « Ma carte », coche seulement cet élève."); }
+      catch(er){ bt.disabled = false; delete bt.dataset.sur; bt.textContent = "Carte perdue ou volée : nouvelle carte"; toast("Impossible : " + er.message); } };
+  }
   async function commandesFiche(dlg, e){
     if (!e.c) return; let ens = "", j = ""; try { ens = localStorage.getItem("dernierId") || ""; j = JSON.parse(localStorage.getItem("magJeton|" + ens) || '""'); } catch(x){}
     const z = document.createElement("div"); z.className = "fi-b"; z.innerHTML = `<h4>Commandes au magasin</h4><div class="fi-l"><div><span class="s">…</span>Chargement…</div></div>`;
@@ -558,6 +583,6 @@ try { for (let w = window; ; w = w.parent){ if (/[?&]gestion=1/.test(w.location.
   $("#fiche").addEventListener("close", () => delete $("#fiche").dataset.id);
 })();
 </script>
-<script src="js/journal-perf.js?v=7"></script>
+<script src="js/eleve-cartes.js?v=1"></script><script src="js/journal-perf.js?v=7"></script>
 </body>
 </html>

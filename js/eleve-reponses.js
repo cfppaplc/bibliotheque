@@ -29,7 +29,7 @@ window.ELEVE_REP = (function(){
       <p class="pt">Scanne ta carte, ou tape ce qui est écrit sous le code-barres.</p><p class="er" id="elEr"></p>
       <div class="bt"><button id="elAnn">Annuler</button><button class="go" id="elOk">Entrer</button></div></div>`;
     document.body.appendChild(d);
-    const fin = c => { MOI = c; try { sessionStorage.setItem("eleveMoi", JSON.stringify(c)); } catch(e){} d.remove(); majBarre(); suite && suite(); };
+    const fin = c => { MOI = c; IDX = null; try { sessionStorage.setItem("eleveMoi", JSON.stringify(c)); } catch(e){} d.remove(); majBarre(); suite && suite(); };
     const ok = () => { const c = lireCarte(d.querySelector("#elC").value); if (!c) { d.querySelector("#elEr").textContent = "Ça ressemble à MP-12345-ABC123 (sous le code-barres de ta carte)."; return; } fin(c); };
     d.querySelector("#elOk").onclick = ok; d.querySelector("#elC").onkeydown = e => { if (e.key === "Enter") ok(); };
     d.querySelector("#elAnn").onclick = () => d.remove();
@@ -54,18 +54,26 @@ window.ELEVE_REP = (function(){
     const p = pfx() + livre + "|", inks = {}; for (const k in INKS) if (k.startsWith(p) && INKS[k] && INKS[k].length) inks[k] = INKS[k];
     const iv = crypto.getRandomValues(new Uint8Array(12)), ct = new Uint8Array(await crypto.subtle.encrypt({ name:"AES-GCM", iv }, await cleAes(), te.encode(JSON.stringify({ t:Date.now(), inks }))));
     const u = new Uint8Array(12 + ct.length); u.set(iv); u.set(ct, 12);
-    try { await rpc("coffre_ecrire", { p_id:await idLivre(livre), p_jeton:await jeton(), p_env:"public", p_data:JSON.stringify({ v:1, d:b64(u) }) }); } catch(e){}
+    try { await rpc("coffre_ecrire", { p_id:await idLivre(livre), p_jeton:await jeton(), p_env:"public", p_data:JSON.stringify({ v:1, d:b64(u) }) }); await indexer(livre); } catch(e){}
   }
+  /* index (chiffré) des livres où l'élève a répondu : sert à l'enseignant pour transférer ses réponses sur une nouvelle carte (carte perdue) */
+  let IDX = null;
+  async function indexer(livre){ const id = await hex("metier+|reponses-index|" + MOI.c + "|" + MOI.k);
+    if (!IDX) { IDX = []; try { const r = await rpc("coffre_lire", { p_id:id }), row = r && r[0]; if (row && row.data) { const b = Uint8Array.from(atob(JSON.parse(row.data).d), c => c.charCodeAt(0)); IDX = JSON.parse(td.decode(await crypto.subtle.decrypt({ name:"AES-GCM", iv:b.slice(0, 12) }, await cleAes(), b.slice(12)))); } } catch(e){} }
+    if (IDX.includes(livre)) return; IDX.push(livre);
+    const iv = crypto.getRandomValues(new Uint8Array(12)), ct = new Uint8Array(await crypto.subtle.encrypt({ name:"AES-GCM", iv }, await cleAes(), te.encode(JSON.stringify(IDX)))), u = new Uint8Array(12 + ct.length); u.set(iv); u.set(ct, 12);
+    await rpc("coffre_ecrire", { p_id:id, p_jeton:await jeton(), p_env:"public", p_data:JSON.stringify({ v:1, d:b64(u) }) }); }
   /* « Changer d'élève » : ses réponses quittent l'appareil (elles restent dans son coffre chiffré) */
   async function changer(){
     if (MOI && typeof RD !== "undefined" && RD.book) { clearTimeout(T); await sauver(RD.book); }
     const p = pfx(); if (p) for (const k in INKS) if (k.startsWith(p)) delete INKS[k];
     try { if (typeof sauverTableaux === "function") sauverTableaux(); } catch(e){}
-    MOI = null; charges.clear(); try { sessionStorage.removeItem("eleveMoi"); } catch(e){}
-    majBarre(); try { document.getElementById("readerBack").click(); } catch(e){}
+    MOI = null; IDX = null; charges.clear(); try { sessionStorage.removeItem("eleveMoi"); } catch(e){}
+    majBarre(); if (!changer.retour) { changer.retour = true; try { document.getElementById("readerBack").click(); } catch(e){} changer.retour = false; }
   }
   function majBarre(){ const b = document.getElementById("readerEleve"); if (!b) return;
-    const el = !!(window.ACCES && ACCES.eleve); b.hidden = !el; b.textContent = MOI ? "Changer d'élève (" + MOI.c + ")" : "Qui es-tu ?"; }
+    const el = !!(window.ACCES && ACCES.eleve); b.hidden = !el && !(MOI && MOI.voir);
+    b.textContent = MOI && MOI.voir ? "Fermer les réponses de l'élève " + MOI.c : MOI ? "Changer d'élève (" + MOI.c + ")" : "Qui es-tu ?"; }
   /* l'élève ouvre un livre : il dit d'abord qui il est, puis ses réponses arrivent */
   function avantLire(l, suite){
     if (!(window.ACCES && ACCES.eleve)) return false;
@@ -82,6 +90,11 @@ window.ELEVE_REP = (function(){
   document.head.appendChild(st);
   addEventListener("pagehide", () => { if (MOI && typeof RD !== "undefined" && RD.book) sauver(RD.book); });
   document.addEventListener("DOMContentLoaded", () => { const b = document.getElementById("readerEleve"); if (b) b.onclick = () => MOI ? changer() : demander(); majBarre();
+    const r = document.getElementById("readerBack"); if (r) r.addEventListener("click", () => { if (MOI && MOI.voir && !changer.retour) changer(); }, true);   /* l'enseignant quitte le livre : ses propres traits reviennent */
     if (window.ACCES && ACCES.pret) ACCES.pret.then(majBarre).catch(() => {}); });
-  return { pfx, avantLire, planifier, changer, demander, get moi(){ return MOI; } };
+  /* l'enseignant (administrateur) ouvre le livre avec les réponses d'un élève; ce qu'il y écrit (corrections) va dans le livre de l'élève */
+  async function voir(c, k, livre){ if (typeof LIVRES === "undefined") return false; const l = LIVRES.find(x => x.fichier === livre); if (!l) return false;
+    MOI = { c, k, voir:true }; IDX = null; charges.delete(livre); try { sessionStorage.setItem("eleveMoi", JSON.stringify(MOI)); } catch(e){}
+    await charger(livre); majBarre(); lire(l); return true; }
+  return { pfx, avantLire, planifier, changer, demander, voir, get moi(){ return MOI; } };
 })();
