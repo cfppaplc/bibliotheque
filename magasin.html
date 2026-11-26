@@ -14,7 +14,7 @@
       : m.get("poste") ? ["magasin-poste.webmanifest", "img/icone-180.png", "Magasin"] : ["manifest.webmanifest", "img/icone-180.png", "Magasin"];
   document.write('<link rel="manifest" href="' + v[0] + '"><link rel="apple-touch-icon" href="' + v[1] + '"><meta name="apple-mobile-web-app-title" content="' + v[2] + '"><meta name="apple-mobile-web-app-capable" content="yes">');
   document.title = v[2]; }</script>
-<script src="vieux-navigateur.js"></script><script src="signaler.js?v=2"></script>
+<script src="vieux-navigateur.js"></script><script src="js/session-dep.js?v=3"></script><script src="signaler.js?v=2"></script>
 <style>
 /* © 2026 Jérémy Raymond. Tous droits réservés. Métier+ — Magasin de raccords (25 nov.) */
 :root{--fond:#F4F1EC;--carte:#fff;--carte2:#F8F6F2;--txt:#1E2A44;--doux:#6b7280;--ligne:#E5DAC6;--acc:#EB6A22;--vert:#1E8A55;--rouge:#C9362E;color-scheme:light}
@@ -133,7 +133,7 @@ async function prenomDeCarte(code, cle, enc){ if (!cle || !enc) return ""; try {
   const k = await crypto.subtle.importKey("raw", await crypto.subtle.digest("SHA-256", te.encode("metier+|carte|" + code + "|" + cle)), "AES-GCM", false, ["decrypt"]);
   return new TextDecoder().decode(await crypto.subtle.decrypt({ name:"AES-GCM", iv:b.slice(0, 12) }, k, b.slice(12))); } catch(e){ return ""; } }
 async function trouverEleve(code){
-  if (code === "69696") return [{ ens:"jeremy.raymond", groupe:"ESSAI", profs:["jeremy.raymond"], enc:"" }];   /* code d'essai (Jeremy, 26 nov.) : commandes vers la page de Jeremy */
+  { const e = window.codeEssai && await codeEssai(code); if (e) return [{ ens:e.ens, groupe:"ESSAI", profs:[e.ens], enc:"" }]; }   /* code d'essai (administrateur connecté sur cet appareil) : commandes vers sa page */
   const ens = Q.get("e") ? [Q.get("e")] : Object.keys(COMPTES).filter(id => !COMPTES[id].eleve);
   const R = []; await Promise.all(ens.map(async e => { const g = await registre(e); for (const grp in g.codes) if ((g.codes[grp] || []).includes(code)) R.push({ ens:e, groupe:grp, profs:[e, ...(g.part[grp] || [])], enc:g.noms[code] || "" }); }));
   /* 25 nov. : un groupe partagé paraît chez chaque enseignant du groupe → une seule entrée, avec tous ses enseignants */
@@ -166,7 +166,7 @@ function eleveEntree(msg){
     $("#cOk").disabled = true; $("#cErr").textContent = "Recherche de ton groupe…";
     const L = await trouverEleve(c.code);
     if (!L.length) { $("#cOk").disabled = false; $("#cErr").textContent = "Code inconnu. Vérifie avec ton enseignant."; return; }
-    if (!pre && c.code === "69696") pre = "Essai";
+    if (!pre && L[0] && L[0].groupe === "ESSAI") pre = "Essai";
     if (!pre) for (const x of L) { pre = await prenomDeCarte(c.code, c.cle, x.enc); if (pre) break; }   /* carte scannée : le prénom vient du registre */
     if (!pre && !POSTE) { const K = LS.get("mpCarte", null); if (K && K.p && String(K.c || "").includes("-" + c.code + "-")) pre = String(K.p).split(/\s+/)[0]; }
     if (!pre) { $("#cOk").disabled = false; $("#preZ").hidden = false; $("#cErr").textContent = "Écris ton prénom (le magasinier le verra)."; $("#cPre").focus(); return; }
