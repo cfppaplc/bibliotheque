@@ -256,7 +256,7 @@ test("Magasin : l'élève (carte scannée) envoie son panier, l'enseignant appro
   const po = await c4.newPage(); po.on("pageerror", e => errs.push(e.message)); await po.goto(BASE + "magasin.html?poste=1&e=jeremy.raymond"); await attendre(800);
   await po.fill("#cCode", "MP-12345-K7Q9X2"); await po.keyboard.press("Enter"); await attendre(1200);
   await po.click(".art .aj"); await po.click("#bVoir", { force: true }); await attendre(300); await po.click("#pEnv"); await attendre(5200);
-  vrai(!!(await po.$("#cCode")) && !(await po.evaluate(() => localStorage.getItem("magEleve") && JSON.parse(localStorage.getItem("magEleve")))), "Poste partagé : l'élève reste connecté après l'envoi");
+  vrai(!(await po.$("#cCode")) && /12345/.test(await po.textContent("#tQui")), "iPad du coffre : l'élève doit rester connecté après l'envoi (vidé seulement après 2 min sans toucher)");
   vrai(!errs.length, errs.join(" | "));
   await c1.close(); await c2.close(); await c3.close(); await c4.close();
 });

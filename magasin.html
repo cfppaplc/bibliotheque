@@ -211,8 +211,7 @@ function panier(){
     try { const r = await rpc("panier_envoyer", { p_ens:MOI.ens, p_groupe:MOI.groupe, p_code:MOI.code, p_items:items, p_note:$("#pNote").value || null, p_prenom:MOI.prenom || LS.get("magPrenom", "") || null, p_profs:MOI.profs && MOI.profs.length ? MOI.profs : null });
       if (!r || !r.ok) throw new Error(r && r.err || "refus");
       const E = LS.get("magEnvois", []); E.unshift({ id:r.id, t:Date.now(), code:MOI.code, n:items.reduce((s, i) => s + i.q, 0) }); LS.set("magEnvois", E.slice(0, 20));
-      PANIER = {}; sauverPanier(); LS.set("magNote", ""); toast("Panier envoyé à ton enseignant."); fermer();
-      if (POSTE) setTimeout(() => finPoste("Panier envoyé. Au suivant ! Scanne ta carte pour voir où en est ton panier."), 4000); }
+      PANIER = {}; sauverPanier(); LS.set("magNote", ""); toast("Panier envoyé à ton enseignant."); fermer(); }   /* 25 nov. : les iPad sont rangés dans les coffres (un par équipe) : on ne vide plus l'écran après l'envoi, seulement après 2 minutes sans toucher */
     catch(e){ $("#pErr").textContent = "Envoi impossible : " + (e.message === "trop de paniers en attente" ? "tu as déjà 3 paniers en attente. Attends la réponse de ton enseignant." : e.message); b.disabled = false; b.textContent = "Envoyer à mon enseignant"; } };
 }
 /* suivi des paniers envoyés (sur cet iPad), mis à jour toutes les 10 s */
