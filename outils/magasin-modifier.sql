@@ -56,3 +56,34 @@ returns jsonb language sql stable security definer set search_path = public as $
     'semaine', coalesce((select jsonb_agg(jsonb_build_object('d', d, 'n', n) order by d) from (select extract(isodow from lr)::int d, count(*) n from p where lr is not null group by 1) x), '[]'::jsonb));
 $$;
 grant execute on function public.panier_achalandage(date, text) to anon, authenticated;
+
+-- 25 nov. (Jeremy : « le magasinier pourrait déclarer les pièces à commander; une feuille prête à soumissionner ») : liste d'achats du magasin
+create table if not exists public.magasin_acommander (
+  id bigserial primary key, t timestamptz not null default now(), n text, nom text not null, q int not null check (q between 1 and 9999),
+  note text, fait boolean not null default false, t_fait timestamptz);
+alter table public.magasin_acommander enable row level security;
+create or replace function public.magasin_acommander_ajouter(p_n text, p_nom text, p_q int, p_note text default null)
+returns boolean language plpgsql security definer set search_path = public as $$
+begin
+  if length(coalesce(trim(p_nom), '')) not between 2 and 120 or p_q not between 1 and 9999 or length(coalesce(p_note, '')) > 200 or length(coalesce(p_n, '')) > 40 then return false; end if;
+  if (select count(*) from public.magasin_acommander where t > now() - interval '1 day') >= 300 then return false; end if;
+  -- même pièce encore à commander : on additionne
+  update public.magasin_acommander set q = least(9999, q + p_q), note = coalesce(nullif(trim(p_note), ''), note), t = now()
+    where not fait and coalesce(n, '') = coalesce(nullif(trim(p_n), ''), '') and lower(nom) = lower(trim(p_nom));
+  if not found then insert into public.magasin_acommander(n, nom, q, note) values (nullif(trim(p_n), ''), trim(p_nom), p_q, nullif(trim(p_note), '')); end if;
+  delete from public.magasin_acommander where fait and t_fait < now() - interval '365 days';
+  return true;
+end $$;
+create or replace function public.magasin_acommander_liste()
+returns setof public.magasin_acommander language sql stable security definer set search_path = public as $$
+  select * from public.magasin_acommander where not fait or t_fait > now() - interval '60 days' order by fait, t desc limit 500;
+$$;
+-- commandé (case cochée) ou retiré (p_retirer : erreur de saisie, seulement si pas encore commandé)
+create or replace function public.magasin_acommander_maj(p_id bigint, p_fait boolean, p_retirer boolean default false)
+returns boolean language plpgsql security definer set search_path = public as $$
+begin
+  if p_retirer then delete from public.magasin_acommander where id = p_id and not fait; return found; end if;
+  update public.magasin_acommander set fait = p_fait, t_fait = case when p_fait then now() end where id = p_id; return found;
+end $$;
+revoke all on table public.magasin_acommander from anon, authenticated;
+grant execute on function public.magasin_acommander_ajouter(text, text, int, text), public.magasin_acommander_liste(), public.magasin_acommander_maj(bigint, boolean, boolean) to anon, authenticated;

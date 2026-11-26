@@ -357,13 +357,40 @@ async function abonner(oui){
 let MAG = [], FILTRE_CODE = "", magT = 0, MAG_VUS = null;
 function magasinier(){
   $("#tTitre").textContent = "Comptoir du magasin";
-  $("#app").innerHTML = `<div class="mag-code"><input id="mC" autocomplete="off" placeholder="Scanne la carte ou tape le code" aria-label="Code de l'élève"><button class="btn" id="mTous">Tout voir</button></div><div id="mL"><p class="vide">Chargement…</p></div>`;
+  $("#app").innerHTML = `<div class="mag-code"><input id="mC" autocomplete="off" placeholder="Scanne la carte ou tape le code" aria-label="Code de l'élève"><button class="btn" id="mTous">Tout voir</button><button class="btn" id="mAc">Pièces à commander</button></div><div id="mL"><p class="vide">Chargement…</p></div>`;
   const i = $("#mC"), appl = () => { const c = lireCarte(i.value); FILTRE_CODE = c ? c.code : ""; dessinerMag(); };
   i.onkeydown = e => { if (e.key === "Enter") { appl(); i.select(); } if (e.key === "Escape") { i.value = ""; appl(); } };
   i.oninput = () => { if (/^\d{5}$/.test(i.value.trim()) || i.value.trim() === "") appl(); };
-  $("#mTous").onclick = () => { i.value = ""; appl(); i.focus(); };
-  document.addEventListener("keydown", e => { if (document.activeElement !== i && /^[0-9A-Za-z-]$/.test(e.key) && !e.ctrlKey && !e.metaKey && !e.altKey) { i.value = ""; i.focus(); } });   /* le lecteur tape même si le curseur est ailleurs */
+  $("#mTous").onclick = () => { i.value = ""; appl(); i.focus(); }; $("#mAc").onclick = aCommander;
+  document.addEventListener("keydown", e => { if ($("#ov").hidden && document.activeElement !== i && /^[0-9A-Za-z-]$/.test(e.key) && !e.ctrlKey && !e.metaKey && !e.altKey) { i.value = ""; i.focus(); } });   /* le lecteur tape même si le curseur est ailleurs */
   i.focus(); charger(); avisComptoir();
+}
+/* 25 nov. (Jeremy : « le magasinier déclare les pièces à commander ») : liste d'achats; l'administration l'imprime en feuille de soumission */
+async function aCommander(){
+  const ov = $("#ov"); ov.hidden = false; document.body.style.overflow = "hidden"; let choix = null;
+  ov.innerHTML = `<div class="top"><img src="img/metier-plus-blanc.svg" alt=""><b>Pièces à commander</b><span class="sp"></span><button id="acF">‹ Retour au comptoir</button></div><main>
+    <div class="carte"><label for="acQ"><b>Pièce</b> <span class="sous">(cherche dans le catalogue, ou écris-la)</span></label><input id="acQ" class="pre" autocomplete="off" placeholder="ex. coude 90 ABS 2">
+    <div id="acS"></div><div style="display:flex;gap:8px;margin-top:10px;align-items:end"><label style="flex:0 0 110px"><b>Quantité</b><input id="acN" class="pre" type="number" min="1" max="9999" value="10" inputmode="numeric"></label>
+    <label style="flex:1"><b>Note</b> <span class="sous">(facultatif)</span><input id="acNo" class="pre" maxlength="200" placeholder="ex. bac vide, urgent"></label></div>
+    <p class="err" id="acE"></p><button class="btn p" id="acAj">Ajouter à la liste</button></div>
+    <div class="sec">Liste en cours</div><div id="acL" class="carte" style="padding:0"><p class="vide">Chargement…</p></div></main>`;
+  const fermer = () => { ov.hidden = true; document.body.style.overflow = ""; $("#mC") && $("#mC").focus(); };
+  $("#acF").onclick = fermer;
+  const q = $("#acQ"), sug = () => { choix = null; const mots = norm(q.value).split(/\s+/).filter(Boolean); const L = mots.length ? CAT.filter(a => correspond(a, mots)).slice(0, 6) : [];
+    $("#acS").innerHTML = L.map(a => `<button class="btn" data-ac="${esc(a.id)}" style="display:block;width:100%;text-align:left;margin-top:6px;min-height:42px">${esc(a.nom)} <small class="sous">${esc(a.n)}</small></button>`).join("");
+    $("#acS").querySelectorAll("[data-ac]").forEach(b => b.onclick = () => { choix = CAT.find(a => a.id === b.dataset.ac); q.value = choix.nom; $("#acS").innerHTML = ""; $("#acN").select(); }); };
+  q.oninput = sug;
+  const liste = async () => { const z = $("#acL"); let L; try { L = (await rpc("magasin_acommander_liste", {})).filter(x => !x.fait); } catch(e){ z.innerHTML = `<p class="vide">Liste indisponible.</p>`; return; }
+    z.innerHTML = L.length ? `<table><tr><th>Qté</th><th>Pièce</th><th></th></tr>${L.map(x => `<tr><td class="q">${x.q}</td><td>${esc(x.nom)}${x.n ? ` <small class="sous">${esc(x.n)}</small>` : ""}${x.note ? `<br><small class="sous">${esc(x.note)}</small>` : ""}</td><td><button class="btn" data-acr="${x.id}" style="min-height:38px">Retirer</button></td></tr>`).join("")}</table>` : `<p class="vide">Rien à commander pour l'instant.</p>`;
+    z.querySelectorAll("[data-acr]").forEach(b => b.onclick = async () => { b.disabled = true; try { await rpc("magasin_acommander_maj", { p_id:+b.dataset.acr, p_fait:false, p_retirer:true }); } catch(e){} liste(); }); };
+  $("#acAj").onclick = async () => { const nom = (choix ? choix.nom : q.value).trim(), n = +$("#acN").value;
+    if (nom.length < 2 || !(n >= 1)) { $("#acE").textContent = "Écris la pièce et la quantité."; return; }
+    $("#acAj").disabled = true; $("#acE").textContent = "";
+    try { if (await rpc("magasin_acommander_ajouter", { p_n:choix ? choix.n : null, p_nom:nom, p_q:n, p_note:$("#acNo").value || null }) !== true) throw new Error("refusé");
+      toast("Ajouté : " + n + " × " + nom); q.value = ""; $("#acNo").value = ""; choix = null; $("#acS").innerHTML = ""; q.focus(); liste(); }
+    catch(e){ $("#acE").textContent = "Impossible d'ajouter : " + e.message; }
+    $("#acAj").disabled = false; };
+  q.focus(); liste();
 }
 /* avis du comptoir : notification de l'ordinateur ou de la tablette (page ouverte), son et titre qui clignote */
 function avisComptoir(){

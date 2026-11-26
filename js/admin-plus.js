@@ -150,6 +150,28 @@ window.ADMIN_PLUS = (function(){
   /* 25 nov. (Jeremy : « cette page devrait être en plein écran, dans le panneau c'est comme une page coupée ») :
      l'outil s'ouvre par-dessus tout l'écran, avec une barre « ‹ Retour »; le panneau reste ouvert derrière */
   /* 25 nov. (Jeremy : « une statistique des raccords sortis ») : raccords remis aux élèves, par période et par groupe (données anonymes) */
+  /* 25 nov. (Jeremy : « le magasinier déclare les pièces à commander; une feuille prête à soumissionner ») */
+  async function aCommanderMg(c){ if (!c) return;
+    const rq = (f, a) => fetch("https://kjlotlhqrgekzohshmbn.supabase.co/rest/v1/rpc/" + f, { method:"POST", headers:{ apikey:"sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY", "Content-Type":"application/json" }, body:JSON.stringify(a || {}), cache:"no-store" }).then(r => { if (!r.ok) throw new Error("Supabase ne répond pas"); return r.json(); });
+    let L; try { L = await rq("magasin_acommander_liste"); } catch(e){ c.innerHTML = '<h3>Pièces à commander</h3><p class="sous">Liste indisponible pour l\'instant.</p>'; return; }
+    const A = L.filter(x => !x.fait), F = L.filter(x => x.fait), d = t => new Date(t).toLocaleDateString("fr-CA", { day:"numeric", month:"short" });
+    const ligne = x => '<tr><td><input type="checkbox" data-acf="' + x.id + '"' + (x.fait ? " checked" : "") + ' aria-label="Commandé"></td><td><b>' + x.q + '</b></td><td>' + esc(x.nom) + (x.note ? '<br><small class="sous">' + esc(x.note) + '</small>' : "") + '</td><td>' + esc(x.n || "") + '</td><td class="sous">' + d(x.fait ? x.t_fait : x.t) + '</td></tr>';
+    c.innerHTML = '<div class="as-th"><h3>Pièces à commander · ' + A.length + '</h3></div><p class="sous">Le magasinier les ajoute au comptoir (« Pièces à commander »). Coche une pièce quand elle est commandée.</p>'
+      + (A.length ? '<div class="acces-per"><button class="abtn prim" id="acImp">Feuille de soumission</button><button class="abtn" id="acCsv">Exporter (CSV)</button></div>'
+        + '<table class="ap-st"><thead><tr><th>Commandé</th><th>Qté</th><th>Pièce</th><th>N° d\'article</th><th>Demandé</th></tr></thead><tbody>' + A.map(ligne).join("") + '</tbody></table>' : '<p class="sous">Rien à commander pour l\'instant.</p>')
+      + (F.length ? '<details style="margin-top:10px"><summary>Déjà commandées (60 jours) · ' + F.length + '</summary><table class="ap-st"><tbody>' + F.map(ligne).join("") + '</tbody></table></details>' : "");
+    c.querySelectorAll("[data-acf]").forEach(b => b.onchange = async () => { try { await rq("magasin_acommander_maj", { p_id:+b.dataset.acf, p_fait:b.checked }); } catch(e){} aCommanderMg(c); });
+    const csv = c.querySelector("#acCsv"); if (csv) csv.onclick = () => { const t = "N° d'article;Description;Quantité;Note;Prix unitaire;Total\n" + A.map(x => [x.n || "", x.nom, x.q, x.note || "", "", ""].map(v => '"' + String(v).replace(/"/g, '""') + '"').join(";")).join("\n");
+      const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob(["\ufeff" + t], { type:"text/csv" })); a.download = "pieces-a-commander-" + new Date().toISOString().slice(0, 10) + ".csv"; a.click(); };
+    const imp = c.querySelector("#acImp"); if (imp) imp.onclick = () => { const w = window.open("", "_blank"); if (!w) return;
+      w.document.write('<!DOCTYPE html><html lang="fr-CA"><head><meta charset="utf-8"><title>Demande de soumission</title><style>body{font:11pt/1.35 system-ui,sans-serif;color:#000;margin:14mm}h1{font-size:17pt;margin:0}.s{color:#444;margin:2pt 0 12pt}.c{display:grid;grid-template-columns:1fr 1fr;gap:6pt 18pt;margin-bottom:12pt}.c div{border-bottom:1px solid #999;padding:10pt 0 2pt;font-size:9pt;color:#444}table{width:100%;border-collapse:collapse}th,td{border:1px solid #999;padding:5pt 6pt;text-align:left;vertical-align:top}th{background:#eee;font-size:9pt}td.q,td.m{text-align:right;width:62pt}td.q{font-weight:700;width:40pt}td.no{font-family:monospace;width:90pt}small{color:#555}@media print{button{display:none}}</style></head><body>'
+        + '<button onclick="print()" style="float:right;padding:8px 16px">Imprimer</button><h1>Demande de soumission</h1><p class="s">Pavillon de l\'Avenir · Magasin de l\'atelier de plomberie-chauffage · ' + new Date().toLocaleDateString("fr-CA", { day:"numeric", month:"long", year:"numeric" }) + '</p>'
+        + '<div class="c"><div>Fournisseur</div><div>N° de soumission</div><div>Représentant</div><div>Date de livraison prévue</div></div>'
+        + '<table><thead><tr><th>N° d\'article</th><th>Description</th><th>Qté</th><th>Prix unitaire</th><th>Total</th></tr></thead><tbody>'
+        + A.map(x => '<tr><td class="no">' + esc(x.n || "") + '</td><td>' + esc(x.nom) + (x.note ? '<br><small>' + esc(x.note) + '</small>' : "") + '</td><td class="q">' + x.q + '</td><td class="m"></td><td class="m"></td></tr>').join("")
+        + '<tr><td colspan="4" style="text-align:right"><b>Sous-total</b></td><td class="m"></td></tr><tr><td colspan="4" style="text-align:right">TPS + TVQ</td><td class="m"></td></tr><tr><td colspan="4" style="text-align:right"><b>Total</b></td><td class="m"></td></tr></tbody></table></body></html>');
+      w.document.close(); };
+  }
   let ST_P = "30", ST_G = "";
   /* 25 nov. (Jeremy : « de beaux graphiques pour l'achalandage ») : barres SVG simples, une seule couleur, valeur au survol (title) */
   function barres(D, o){ o = o || {}; const W = 360, H = o.h || 160, g = 24, b = 18, max = Math.max(1, ...D.map(d => d.v)), pas = (W - g) / Math.max(1, D.length), lb = Math.max(2, Math.min(pas - 3, 30));
@@ -225,6 +247,7 @@ window.ADMIN_PLUS = (function(){
       + '<div class="as-carte"><h3>Comptoir du magasinier</h3><p class="sous">Sur l\'iPad du magasinier, ouvert toute la journée (Partager → « Sur l\'écran d\'accueil », puis « Recevoir les avis »). Le lecteur de codes-barres lit la carte de l\'élève.</p><div class="ap-btns"><a class="abtn prim" href="magasin.html?mode=magasin" target="_blank" rel="noopener">Ouvrir le comptoir</a><button class="abtn" data-copie="' + esc(lienM) + '">Copier le lien</button></div></div>'
       + '<div class="as-carte"><h3>Approbation et dossiers</h3><button class="as-lien" data-ici="magasin.html?mode=prof" data-t="Commandes à approuver">Commandes à approuver<small>Approuver, refuser, avis sur ton cellulaire</small></button><button class="as-lien" data-ici="outils-atelier.html" data-t="Dossiers des élèves">Dossiers des élèves<small>Touche un élève : formations, coffre, commandes</small></button><button class="as-lien" data-ici="passeport.html" data-t="Collants pour la carte étudiante">Collants pour la carte étudiante<small>Choisis le groupe, puis « Codes des élèves »</small></button></div>'
       + '</div>'
+      + '<div class="as-carte" id="mgAc"><h3>Pièces à commander</h3><p class="sous">Chargement…</p></div>'
       + '<div class="as-carte" id="mgSt"><h3>Raccords sortis</h3><p class="sous">Chargement…</p></div>'
       + '<div class="as-carte"><div class="as-th"><h3>Catalogue des raccords · ' + MG.raccords.length + '</h3></div>'
       + (MG.essai ? '<p class="acces-err" style="margin:0 0 8px">Liste d\'essai : remplace-la par la vraie liste du magasin (fichier CSV, un raccord par ligne).</p>' : '')
@@ -236,7 +259,7 @@ window.ADMIN_PLUS = (function(){
       + R.slice(0, 200).map(([a, i]) => '<div class="ap-mg-l" data-i="' + i + '">' + ["n", "nom", "mat", "type", "d", "r"].map(k => '<input type="text" data-k="' + k + '" value="' + esc(a[k]) + '">').join("") + '<button class="abtn rouge" data-sup title="Retirer">×</button></div>').join("")
       + (R.length > 200 ? '<p class="sous">' + (R.length - 200) + ' autres : précise ta recherche.</p>' : '') + '</div></div>';
     const re = () => magasin(z), etat = () => { const c = mgChange(), e = z.querySelector(".ap-pub .acces-etat"); e.classList.toggle("pub", c); e.textContent = c ? "Des changements attendent d'être publiés" : "Tout est publié"; z.querySelector("#mgPub").disabled = !c; z.querySelector("#mgAnn").disabled = !c; };
-    statsMg(z.querySelector("#mgSt"));
+    statsMg(z.querySelector("#mgSt")); aCommanderMg(z.querySelector("#mgAc"));
     z.querySelectorAll("[data-copie]").forEach(b => b.onclick = () => { try { navigator.clipboard.writeText(b.dataset.copie); b.textContent = "Lien copié"; } catch(e){} });
     z.querySelectorAll("[data-ici]").forEach(b => b.onclick = () => ouvrirIci(z, b.dataset.ici, b.dataset.t, magasin, "Magasin"));
     z.querySelector("#mgQ").oninput = e => { MG_Q = e.target.value; const p = e.target.selectionStart; re(); const n = z.querySelector("#mgQ"); n.focus(); n.setSelectionRange(p, p); };

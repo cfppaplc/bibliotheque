@@ -259,10 +259,14 @@ test("Magasin : l'élève (carte scannée) envoie son panier, l'enseignant appro
   /* 25 nov. : prénom publié chiffré avec la clé de la carte (comme passeport.html nomsPub) */
   const te = new TextEncoder(), cle = await crypto.subtle.importKey("raw", await crypto.subtle.digest("SHA-256", te.encode("metier+|carte|12345|K7Q9X2")), "AES-GCM", false, ["encrypt"]);
   const iv = crypto.getRandomValues(new Uint8Array(12)), ENC = Buffer.from([...iv, ...new Uint8Array(await crypto.subtle.encrypt({ name: "AES-GCM", iv }, cle, te.encode("Essai")))]).toString("base64");
+  const AC = [];
   const mock = async ctx => ctx.route(/supabase\.co\/rest\/v1\/rpc\/(\w+)/, async r => { const f = r.request().url().match(/rpc\/(\w+)/)[1], a = JSON.parse(r.request().postData() || "{}"); let o = null;
     if (f === "coffre_lire") o = [{ data: JSON.stringify({ grp: ["2608 EGI"], codes: { "2608 EGI": ["12345", "45678"] }, noms: { "12345": ENC } }) }];
     else if (f === "panier_envoyer") { P.push({ id: "id" + P.length, etat: "attente", t: new Date().toISOString(), ens: a.p_ens, groupe: a.p_groupe, code: a.p_code, prenom: a.p_prenom, items: a.p_items, note: a.p_note }); o = { ok: true, id: "id" + (P.length - 1) }; }
     else if (f === "panier_etat") { const x = P.find(p => p.id === a.p_id) || {}; o = { etat: x.etat, motif: x.motif, items: x.etat === "attente" ? x.items : null, note: x.etat === "attente" ? x.note : null }; }
+    else if (f === "magasin_acommander_ajouter") { AC.push({ id: AC.length + 1, n: a.p_n, nom: a.p_nom, q: a.p_q, note: a.p_note, fait: false, t: new Date().toISOString() }); o = true; }
+    else if (f === "magasin_acommander_liste") o = AC;
+    else if (f === "magasin_acommander_maj") { const k = AC.findIndex(x => x.id === a.p_id); if (a.p_retirer) AC.splice(k, 1); else AC[k].fait = a.p_fait; o = true; }
     else if (f === "panier_modifier") { const x = P.find(p => p.id === a.p_id && p.code === a.p_code && p.etat === "attente"); if (x) { x.items = a.p_items; x.note = a.p_note; } o = x ? { ok: true } : { ok: false, err: "déjà traité" }; }
     else if (f === "panier_annuler") { const k = P.findIndex(p => p.id === a.p_id && p.code === a.p_code && p.etat === "attente"); if (k >= 0) P.splice(k, 1); o = k >= 0; }
     else if (f === "panier_prof_regler") o = true;
@@ -308,6 +312,11 @@ test("Magasin : l'élève (carte scannée) envoie son panier, l'enseignant appro
   const c3 = await b.newContext({ viewport: { width: 1366, height: 768 }, serviceWorkers: "block" }); await mock(c3);
   const m = await c3.newPage(); m.on("pageerror", e => errs.push(e.message));
   await m.goto(BASE + "magasin.html?mode=magasin"); await attendre(1500);
+  /* 25 nov. (Jeremy) : le magasinier déclare une pièce à commander (catalogue), elle s'additionne dans la liste */
+  await m.click("#mAc"); await attendre(400); await m.fill("#acQ", "coude 90 abs 2"); await attendre(300); await m.click("[data-ac]"); await m.fill("#acN", "25"); await m.click("#acAj"); await attendre(800);
+  vrai(AC.length === 1 && AC[0].q === 25 && /ABS/.test(AC[0].nom) && AC[0].n, "Pièce à commander mal enregistrée : " + JSON.stringify(AC));
+  vrai(/25/.test(await m.textContent("#acL")), "La liste du comptoir n'affiche pas la pièce");
+  await m.click("#acF"); await attendre(300);
   await m.keyboard.type("MP-45678-AAAAAA"); await m.keyboard.press("Enter"); await attendre(300);
   vrai(!(await m.$("[data-rem]")), "Code 45678 : la commande de 12345 s'affiche");
   await m.keyboard.type("MP-12345-K7Q9X2"); await m.keyboard.press("Enter"); await attendre(300);
