@@ -490,7 +490,7 @@ window.ACCES = (function(){
       + '<div class="acces-btns" style="justify-content:flex-start"><button class="abtn prim" id="gInv">' + ICO.lien + ' Copier le lien d\'invitation</button><span class="acces-ok" id="gInvOk" hidden style="margin:0">Lien copié !</span></div></div>';
     const puce = (v, l) => '<button class="abtn' + (FILTRE.type === v ? ' prim' : '') + '" data-ftype="' + esc(v) + '">' + esc(l) + '</button>';
     const st0 = box().scrollTop;
-    box().innerHTML = '<div class="acces-tete"><div><h2>Administration</h2><p class="sous" style="margin:0">Métier+ · comptes, livres et suivi</p></div></div>'
+    box().innerHTML = '<div class="acces-tete"><img class="ad-logo lg-blc" src="img/metier-plus-blanc.svg" alt="Métier+"><img class="ad-logo lg-clr" src="img/metier-plus.svg" alt=""><div><h2>Administration</h2><p class="sous" style="margin:0">Comptes, livres et suivi</p></div></div>'
       + '<div class="acces-stats"><div><b>' + nProf + '</b><span>enseignant' + (nProf > 1 ? 's' : '') + '</span></div><div><b>' + nGr + '</b><span>groupe' + (nGr > 1 ? 's' : '') + ' d\'élèves</span></div>'
       + '<div><b>' + livres.length + '</b><span>livres protégés</span></div><div class="dem"><b id="gStatDem">…</b><span>demandes</span></div>'
       + '<div class="' + (aPublier ? 'pub' : 'ok') + '"><b>' + (aPublier ? '!' : '✓') + '</b><span>' + (aPublier ? 'à publier' : 'tout est publié') + '</span></div></div>'
