@@ -29,6 +29,8 @@ input{width:100%;min-height:52px;border-radius:14px;border:0;padding:0 14px;font
 .sous{opacity:.85}.boite{background:#fff;color:#1E2A44;border-radius:16px;padding:16px 18px}.boite label{display:block;font-weight:600;margin-top:6px}.boite .err{color:#b42318}
 input.code{display:block;font:800 2.6rem/1 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.25em;text-align:center;padding:16px;border-radius:16px;border:2px solid #d5dae3;margin:4px 0 10px;min-height:0}
 input.pre{border:2px solid #d5dae3;font:400 1.15rem system-ui,-apple-system,sans-serif;text-transform:none;padding:0 16px}
+.carte.cachee{cursor:pointer}.carte.cachee img.cb,.carte.cachee .qr{filter:blur(14px);opacity:.35}
+.carte.cachee small::before{content:"Touche la carte pour l'afficher 10 secondes. ";display:block;font-weight:700;color:#EB6A22;margin-bottom:4px}
 </style>
 <script src="js/session-dep.js?v=5"></script>
 </head>
@@ -69,15 +71,18 @@ async function chercherCode(c){ const te = new TextEncoder(), base = "metier+|ca
 let PRENOM_FAIT = false;
 async function completerPrenom(K){ if (PRENOM_FAIT || !K || !K.c || K.p) return; PRENOM_FAIT = true; const m = K.c.match(/^MP-(\d{5})-/); if (!m) return;
   try { const o = await chercherCode(m[1]); if (o && o.c === K.c && o.p) { K.p = o.p; K.g = K.g || o.g || ""; LS.set("mpCarte", K); afficher(); } } catch(e){} }
+let montreT = 0;
+function cacher(code){ clearTimeout(montreT); const v = $("#vue .carte"); v.classList.add("cachee"); $("#vN").textContent = "•••••";
+  v.onclick = () => { if (!v.classList.contains("cachee")) return; v.classList.remove("cachee"); $("#vN").textContent = code; montreT = setTimeout(() => cacher(code), 10000); }; }
 function afficher(){
   const K = LS.get("mpCarte"); $("#vide").hidden = !!K; $("#vue").hidden = !K; if (!K) { $("#cle").focus(); return; }
   const code = K.c.split("-")[1];
   $("#vG").textContent = K.g || "Métier+"; $("#vP").textContent = K.p || ""; completerPrenom(K); factureOuverte(K.g).then(ok => { $("#bFac").hidden = !ok; $("#bBoutons").style.gridTemplateColumns = ok ? "1fr 1fr" : "1fr"; }); $("#vN").textContent = code;
-  /* carte d'essai (Jeremy : « cache le numéro de ma carte, les élèves sont sneaky ») : ni code, ni code-barres, ni QR */
-  const essai = K.g === "ESSAI"; $("#vCb").hidden = $("#vQr").hidden = essai; if (essai) { $("#vN").textContent = "• • • • •"; return; }
   $("#vCb").src = Code128.url(K.c, 60, false); $("#vCb").alt = K.c;
   const M = QRLib.matrice(K.c), k = M.length;
   $("#vQr").innerHTML = `<svg viewBox="0 0 ${k + 8} ${k + 8}" width="150" height="150"><rect width="${k + 8}" height="${k + 8}" fill="#fff"/>${M.map((r, y) => r.map((v, x) => v ? `<rect x="${x + 4}" y="${y + 4}" width="1.02" height="1.02"/>` : "").join("")).join("")}</svg>`;
+  /* 26 nov. (Jeremy : « caché pour tous; quand on clique, ça le montre 10 s ») : numéro, code-barres et QR masqués; un toucher les montre 10 secondes */
+  cacher(code);
   const ios = /iPhone|iPad|iPod/.test(navigator.userAgent), installe = navigator.standalone || matchMedia("(display-mode: standalone)").matches;
   $("#aide").innerHTML = installe ? `<b>Astuce :</b> monte la luminosité de ton écran si le lecteur a de la difficulté à lire ta carte.`
     : ios ? `<b>Garde ta carte sur ton cellulaire :</b> touche <b>Partager</b> (le carré avec la flèche), puis <b>« Sur l'écran d'accueil »</b>. Elle s'ouvrira même sans Internet.`
