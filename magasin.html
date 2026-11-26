@@ -279,7 +279,7 @@ function eleveCatalogue(){
 }
 /* 26 nov. (Jeremy : « les élèves doivent confirmer leur choix ») : photo réelle par type de raccord (catalogue.photos « type|matériau »), ou propre à l'article (a.img) */
 let PHOTOS = {};
-const photoDe = a => a && (a.img || PHOTOS[String(a.type || "").toLowerCase() + "|" + (a.mat || "")]) || "";
+const photoDe = a => !a || a.img === "-" ? "" : (a.img || PHOTOS[String(a.type || "").toLowerCase() + "|" + (a.mat || "")] || "");   /* « - » = photo retirée (aucune ne convient) */
 const vignette = a => { const u = photoDe(a); return u ? `<button class="ph" data-ph="${esc(u)}" data-t="${esc(a.nom)}" aria-label="Voir la photo"><img src="${esc(u)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.remove()"></button>` : `<span class="ph vide"></span>`; };
 document.addEventListener("click", e => { const b = e.target.closest("[data-ph]"); if (!b) return; e.preventDefault();
   const d = document.createElement("div"); d.className = "phz"; d.innerHTML = `<figure><img src="${esc(b.dataset.ph)}" alt="" referrerpolicy="no-referrer"><figcaption>${esc(b.dataset.t)}<small>Photo d'exemple : la couleur ou la marque peut varier.</small></figcaption></figure>`;
