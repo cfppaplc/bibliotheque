@@ -227,7 +227,7 @@ function panier(){
       if (!r || !r.ok) throw new Error(r && r.err || "refus");
       const E = LS.get("magEnvois", []); E.unshift({ id:r.id, t:Date.now(), code:MOI.code, n:items.reduce((s, i) => s + i.q, 0) }); LS.set("magEnvois", E.slice(0, 20));
       PANIER = {}; sauverPanier(); LS.set("magNote", ""); toast("Panier envoyé à ton enseignant."); fermer(); }   /* 25 nov. : les iPad sont rangés dans les coffres (un par équipe) : on ne vide plus l'écran après l'envoi, seulement après 2 minutes sans toucher */
-    catch(e){ $("#pErr").textContent = "Envoi impossible : " + (e.message === "trop de paniers en attente" ? "tu as déjà 3 paniers en attente. Touche « Modifier » sur un panier en attente pour y ajouter des raccords." : e.message); b.disabled = false; b.textContent = "Envoyer à mon enseignant"; } };
+    catch(e){ $("#pErr").textContent = "Envoi impossible : " + (e.message === "trop de paniers en attente" ? "tu as déjà 2 paniers en attente. Touche « Modifier » sur un panier en attente pour y ajouter des raccords." : e.message); b.disabled = false; b.textContent = "Envoyer à mon enseignant"; } };
 }
 /* suivi des paniers envoyés (sur cet iPad), mis à jour toutes les 10 s */
 let suiviT = 0;
@@ -239,13 +239,13 @@ const LBL = { attente:"En attente de ton enseignant", approuve:"Approuvé · va 
   z.innerHTML = `<div class="sec">Mes paniers envoyés</div>` + E.map((x, k) => { const s = S[k] || { etat:"?" };
     return `<div class="carte suivi ${esc(s.etat)}"><div class="bandeau">${esc(LBL[s.etat] || "…")}</div><small class="sous">Envoyé ${heure(x.t)} · ${x.n} article${x.n > 1 ? "s" : ""}</small>${s.motif ? `<p class="motif"><b>Commentaire de ton enseignant :</b> ${esc(s.motif)}</p>` : ""}
       ${s.etat === "attente" && !POSTE && "PushManager" in window && !x.abo ? `<button class="btn p" data-abo="${esc(x.id)}" style="margin:0 18px 14px">Me prévenir sur mon cellulaire</button>` : ""}${s.etat === "attente" && x.abo ? `<small class="sous">Tu seras averti sur ce cellulaire dès que ton enseignant répond.</small>` : ""}
-      ${s.etat === "attente" || s.etat === "approuve" ? `<div class="act" style="margin:0 18px 14px;display:flex;gap:8px">${s.etat === "attente" && s.items ? `<button class="btn" data-mod="${esc(x.id)}">Modifier</button>` : ""}<button class="btn r" data-ann="${esc(x.id)}">Annuler ce panier</button></div>` : ""}
+      ${s.etat === "attente" ? `<div class="act" style="margin:0 18px 14px;display:flex;gap:8px">${s.items ? `<button class="btn" data-mod="${esc(x.id)}">Modifier</button>` : ""}<button class="btn r" data-ann="${esc(x.id)}">Annuler ce panier</button></div>` : ""}
       ${s.etat === "approuve" ? `<span data-cb="MP-${esc(x.code)}"></span><p class="sous" style="text-align:center;margin:0">Montre ta carte ou ce code au magasinier.</p>` : ""}</div>`; }).join("");
   z.querySelectorAll("[data-cb]").forEach(s => codeBarres(s, s.dataset.cb, 70));
   z.querySelectorAll("[data-mod]").forEach(b => b.onclick = () => { const k = E.findIndex(y => y.id === b.dataset.mod), st = S[k]; if (!st || !st.items) return;
     PANIER = {}; st.items.forEach(i => { PANIER[i.id] = (PANIER[i.id] || 0) + (+i.q || 1); }); sauverPanier(); LS.set("magNote", st.note || ""); LS.set("magEdit", b.dataset.mod); panier(); });
-  z.querySelectorAll("[data-ann]").forEach(b => b.onclick = async () => { if (!confirm("Annuler ce panier ? Ton enseignant et le magasinier ne le verront plus.")) return; b.disabled = true;
-    try { if (await rpc("panier_annuler", { p_id:b.dataset.ann, p_code:MOI.code }) !== true) throw new Error("déjà remis");
+  z.querySelectorAll("[data-ann]").forEach(b => b.onclick = async () => { if (!confirm("Annuler ce panier ? Ton enseignant ne le verra plus.")) return; b.disabled = true;
+    try { if (await rpc("panier_annuler", { p_id:b.dataset.ann, p_code:MOI.code }) !== true) throw new Error("déjà traité par ton enseignant");
       LS.set("magEnvois", LS.get("magEnvois", []).filter(y => y.id !== b.dataset.ann)); if (LS.get("magEdit", "") === b.dataset.ann) LS.set("magEdit", ""); toast("Panier annulé."); suivi(); }
     catch(e){ toast("Annulation impossible : " + e.message); b.disabled = false; } });
   /* changement d'état pendant que la page est ouverte : son + vibration + message */

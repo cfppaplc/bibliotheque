@@ -264,7 +264,7 @@ test("Magasin : l'élève (carte scannée) envoie son panier, l'enseignant appro
     else if (f === "panier_envoyer") { P.push({ id: "id" + P.length, etat: "attente", t: new Date().toISOString(), ens: a.p_ens, groupe: a.p_groupe, code: a.p_code, prenom: a.p_prenom, items: a.p_items, note: a.p_note }); o = { ok: true, id: "id" + (P.length - 1) }; }
     else if (f === "panier_etat") { const x = P.find(p => p.id === a.p_id) || {}; o = { etat: x.etat, motif: x.motif, items: x.etat === "attente" ? x.items : null, note: x.etat === "attente" ? x.note : null }; }
     else if (f === "panier_modifier") { const x = P.find(p => p.id === a.p_id && p.code === a.p_code && p.etat === "attente"); if (x) { x.items = a.p_items; x.note = a.p_note; } o = x ? { ok: true } : { ok: false, err: "déjà traité" }; }
-    else if (f === "panier_annuler") { const k = P.findIndex(p => p.id === a.p_id && p.code === a.p_code && (p.etat === "attente" || p.etat === "approuve")); if (k >= 0) P.splice(k, 1); o = k >= 0; }
+    else if (f === "panier_annuler") { const k = P.findIndex(p => p.id === a.p_id && p.code === a.p_code && p.etat === "attente"); if (k >= 0) P.splice(k, 1); o = k >= 0; }
     else if (f === "panier_prof_regler") o = true;
     else if (f === "panier_prof_lire") o = P;
     else if (f === "panier_signaler") { const x = P.find(p => p.id === a.p_id); A.push({ id: "a" + A.length, t: new Date().toISOString(), panier: a.p_id, regle: a.p_regle, code: x.code, groupe: x.groupe, prenom: x.prenom }); o = { ok: true }; }
