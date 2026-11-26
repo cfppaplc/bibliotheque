@@ -216,7 +216,24 @@ async function chargerCatalogue(){ try { const J = await (await fetch("magasin-c
   CAT.forEach(a => { a._q = norm([a.nom, a.n, a.mat, a.type].join(" ")); a._m = a._q.split(/[\s°]+/); a._d = diam(a.d); }); }
 /* recherche : les mots doivent tous se trouver; un nombre seul (2, 3/4, 1 1/2) = le diamètre exact, sauf un angle (90, 45, 22,5) */
 const ANGLES = ["90", "45", "22,5", "22.5", "22"];
-function correspond(a, mots){ return mots.every(m => /^\d+([-/.,]\d+)*$/.test(m) && !ANGLES.includes(m) ? a._d === m : a._m.some(w => w.startsWith(m)) || (m.length > 4 && a._q.includes(m))); }   /* début de mot (« té » ne trouve pas « réducteur »); un long mot peut être au milieu */
+/* 26 nov. (Jeremy : « la recherche doit être flexible, accepter les anglicismes et les synonymes ») : chaque mot cherché peut valoir plusieurs termes du catalogue */
+const SYN = (() => { const S = {}, ajoute = (cles, vers) => cles.split(" ").forEach(k => { S[k] = (S[k] || []).concat(vers.split(" ")); });
+  [["elbow elb ell coudes", "coude"], ["tee ty tees", "te"], ["wye wyes", "y"], ["coupling coupler sleeve sleave manchons bagues", "bague manchon"],
+   ["reducer reducing bushing bushings reduit reduits reduc reducteurs", "reducteur bague"], ["adapter adapteur adapt adaptor adaptateurs", "adaptateur"],
+   ["cap caps plug plugs bouchons", "bouchon"], ["nipple nipples nipp", "mamelon"], ["flange flanges", "bride"], ["unions", "union"],
+   ["valve valves", "robinet clapet soupape vanne"], ["ball", "bille robinet"], ["check", "clapet antiretour"], ["gate", "robinet-vanne vanne"], ["globe", "soupape"],
+   ["strainer", "filtre"], ["nozzle nozel nozzel noz", "gicleur"], ["copper cu", "cuivre"], ["black noir", "acier"], ["iron", "acier fonte"],
+   ["galv galvanized galvanize", "galvanise"], ["brass bronze", "laiton"], ["cast castiron", "fonte"], ["stainless inoxydable", "inox inoxydable"],
+   ["sweat soude soudure ss", "souder"], ["trap ptrap", "siphon"], ["cleanout", "regard"], ["hanger strap clamp", "support attache collier sangle"],
+   ["tape", "ruban"], ["teflon", "ruban teflon"], ["pipe", "tuyau tube"], ["screw screws", "vis"], ["bolt bolts", "boulon"], ["nut nuts", "ecrou"],
+   ["washer washers", "rondelle"], ["heater", "rechauffeur"], ["pump", "pompe"], ["gauge gage", "manometre"], ["thermometer", "thermometre"],
+   ["torch", "torche chalumeau"], ["tip tips", "tube-contact buse"], ["rod rods", "baguette"], ["wire", "fil bobine"], ["gasket seal", "joint"],
+   ["vent", "purgeur aerateur"], ["backflow", "antiretour clapet"], ["toilet", "toilette"], ["faucet", "robinet"], ["stop", "arret robinet"],
+   ["pex", "pex uponor"], ["drain", "drain renvoi avaloir"], ["spud", "spud raccord"], ["hose", "boyau"], ["fitting fittings", "raccord"]].forEach(([a, b]) => ajoute(a, b));
+  return S; })();
+const variantes = m => { const v = [m]; if (m.length > 3 && /[sx]$/.test(m)) v.push(m.slice(0, -1)); (SYN[m] || []).forEach(x => v.push(x)); return v; };
+const motOk = (a, m) => a._m.some(w => w.startsWith(m)) || (m.length > 4 && a._q.includes(m));
+function correspond(a, mots){ return mots.every(m => /^\d+([-/.,]\d+)*$/.test(m) && !ANGLES.includes(m) ? a._d === m : variantes(m).some(x => motOk(a, x))); }   /* début de mot (« té » ne trouve pas « réducteur »); un long mot peut être au milieu */
 
 /* =================================================================== ÉLÈVE =================================================================== */
 const pouces = d => String(d).split(" ").reduce((s, x) => { const [n, m] = x.split("/"); return s + (m ? +n / +m : +n || 0); }, 0);
