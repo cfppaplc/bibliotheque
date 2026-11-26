@@ -7,7 +7,7 @@
 <meta name="robots" content="noindex">
 <meta name="theme-color" content="#1E2A44">
 <link rel="manifest" href="manifest.webmanifest" id="mf"><script>/* 25 nov. : « Sur l'écran d'accueil » ouvre le bon écran (comptoir ou poste de commande) */
-{ const m = new URLSearchParams(location.search); if (m.get("mode") === "magasin") document.getElementById("mf").href = "magasin-comptoir.webmanifest"; else if (m.get("poste")) document.getElementById("mf").href = "magasin-poste.webmanifest";
+{ const m = new URLSearchParams(location.search); if (m.get("mode") === "magasin") { document.getElementById("mf").href = "magasin-comptoir.webmanifest"; document.write('<link rel="apple-touch-icon" href="img/magasin-comptoir-180.png"><meta name="apple-mobile-web-app-title" content="Comptoir">'); } else if (m.get("poste")) document.getElementById("mf").href = "magasin-poste.webmanifest";
   else if (m.get("mode") === "prof") { document.getElementById("mf").href = "magasin-prof.webmanifest"; document.write('<link rel="apple-touch-icon" href="img/magasin-prof-180.png"><meta name="apple-mobile-web-app-title" content="Commandes">'); } }</script><link rel="apple-touch-icon" href="img/metier-plus-icone.svg">
 <script src="vieux-navigateur.js"></script><script src="signaler.js?v=2"></script>
 <style>
