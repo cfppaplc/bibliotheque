@@ -260,7 +260,7 @@ test("Magasin : l'élève (carte scannée) envoie son panier, l'enseignant appro
   const te = new TextEncoder(), cle = await crypto.subtle.importKey("raw", await crypto.subtle.digest("SHA-256", te.encode("metier+|carte|12345|K7Q9X2")), "AES-GCM", false, ["encrypt"]);
   const iv = crypto.getRandomValues(new Uint8Array(12)), ENC = Buffer.from([...iv, ...new Uint8Array(await crypto.subtle.encrypt({ name: "AES-GCM", iv }, cle, te.encode("Essai")))]).toString("base64");
   const AC = [];
-  const mock = async ctx => ctx.route(/supabase\.co\/rest\/v1\/rpc\/(\w+)/, async r => { const f = r.request().url().match(/rpc\/(\w+)/)[1], a = JSON.parse(r.request().postData() || "{}"); let o = null;
+  const mock = async ctx => ctx.route(/supabase\.co\/rest\/v1\/rpc\/(\w+)/, async r => { const f = r.request().url().match(/rpc\/(\w+)/)[1].replace(/_c$/, ""), a = JSON.parse(r.request().postData() || "{}"); let o = f === "magasin_cle_verifier" ? true : null;
     if (f === "coffre_lire") o = [{ data: JSON.stringify({ grp: ["2608 EGI"], codes: { "2608 EGI": ["12345", "45678"] }, noms: { "12345": ENC } }) }];
     else if (f === "panier_envoyer") { P.push({ id: "id" + P.length, etat: "attente", t: new Date().toISOString(), ens: a.p_ens, groupe: a.p_groupe, code: a.p_code, prenom: a.p_prenom, items: a.p_items, note: a.p_note }); o = { ok: true, id: "id" + (P.length - 1) }; }
     else if (f === "panier_etat") { const x = P.find(p => p.id === a.p_id) || {}; o = { etat: x.etat, motif: x.motif, items: x.etat === "attente" ? x.items : null, note: x.etat === "attente" ? x.note : null }; }
@@ -311,6 +311,9 @@ test("Magasin : l'élève (carte scannée) envoie son panier, l'enseignant appro
   vrai(P[0].etat === "approuve", "Approbation : " + P[0].etat);
   const c3 = await b.newContext({ viewport: { width: 1366, height: 768 }, serviceWorkers: "block" }); await mock(c3);
   const m = await c3.newPage(); m.on("pageerror", e => errs.push(e.message));
+  { const n = await m.context().newPage(); await n.goto(BASE + "magasin.html?mode=magasin"); await attendre(900);   /* sans NIP : le comptoir le demande */
+    vrai(!!(await n.$("#nip")) && !(await n.$("#mC")), "Comptoir ouvert sans NIP"); await n.fill("#nip", "123456"); await attendre(900); vrai(!!(await n.$("#mC")), "Bon NIP : le comptoir ne s'ouvre pas"); await n.close(); }
+  await m.addInitScript(() => { localStorage.magCle = JSON.stringify("e".repeat(64)); });   /* NIP du comptoir déjà entré sur cet appareil */
   await m.goto(BASE + "magasin.html?mode=magasin"); await attendre(1500);
   /* 25 nov. (Jeremy) : le magasinier déclare une pièce à commander (catalogue), elle s'additionne dans la liste */
   await m.click("#mAc"); await attendre(400); await m.fill("#acQ", "coude 90 abs 2"); await attendre(300); await m.click("[data-ac]"); await m.fill("#acN", "25"); await m.click("#acAj"); await attendre(800);

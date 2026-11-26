@@ -97,3 +97,47 @@ returns table(panier uuid, jour date, n text, nom text, q bigint) language sql s
   where p.code = p_code and p_code ~ '^[0-9]{5}$' and s.jour >= coalesce(p_depuis, current_date - 120) group by s.panier, s.n order by 2 desc, 4 limit 400;
 $$;
 grant execute on function public.panier_materiel_eleve(text, date) to anon, authenticated;
+
+-- 26 nov. (Jeremy : « un p'tit comique qui trouve le comptoir… le magasinier doit avoir un compte ») :
+-- le comptoir demande le NIP du magasinier (défini par un enseignant dans Administration → Magasin).
+-- Le navigateur envoie sha256("metier+|magasin|" + NIP); la base garde seulement cette empreinte.
+create table if not exists public.magasin_cle (id int primary key default 1 check (id = 1), empreinte text not null, maj timestamptz default now());
+alter table public.magasin_cle enable row level security;
+create or replace function public.magasin_cle_definir(p_ens text, p_jeton text, p_empreinte text)
+returns boolean language plpgsql security definer set search_path = public as $$
+begin
+  if not public.panier_prof_ok(p_ens, p_jeton) or p_empreinte !~ '^[0-9a-f]{64}$' then return false; end if;
+  insert into public.magasin_cle(id, empreinte) values (1, p_empreinte) on conflict (id) do update set empreinte = excluded.empreinte, maj = now();
+  return true;
+end $$;
+-- p_cle : empreinte du NIP du comptoir, ou « prof:<compte>:<jeton> » (un enseignant, depuis l'Administration)
+create or replace function public.magasin_cle_ok(p_cle text) returns boolean language plpgsql stable security definer set search_path = public as $$
+declare a text[];
+begin
+  if p_cle like 'prof:%' then a := regexp_split_to_array(p_cle, ':'); return array_length(a, 1) >= 3 and public.panier_prof_ok(a[2], array_to_string(a[3:], ':')); end if;
+  return exists (select 1 from public.magasin_cle where empreinte = p_cle);
+end $$;
+create or replace function public.magasin_cle_verifier(p_cle text) returns boolean language sql stable security definer set search_path = public as $$ select public.magasin_cle_ok(p_cle); $$;
+create or replace function public.panier_magasin_c(p_cle text)
+returns table(id uuid, t timestamptz, ens text, groupe text, code text, prenom text, items jsonb, note text, etat text, t_app timestamptz, t_remis timestamptz)
+language plpgsql stable security definer set search_path = public as $$
+begin if not public.magasin_cle_ok(p_cle) then return; end if; return query select * from public.panier_magasin(); end $$;
+create or replace function public.panier_remettre_c(p_cle text, p_id uuid, p_remis boolean default true) returns boolean language plpgsql security definer set search_path = public as $$
+begin if not public.magasin_cle_ok(p_cle) then return false; end if; return public.panier_remettre(p_id, p_remis); end $$;
+create or replace function public.panier_signaler_c(p_cle text, p_id uuid, p_regle int) returns jsonb language plpgsql security definer set search_path = public as $$
+begin if not public.magasin_cle_ok(p_cle) then return jsonb_build_object('ok', false, 'err', 'comptoir non autorisé'); end if; return public.panier_signaler(p_id, p_regle); end $$;
+create or replace function public.panier_signalements_c(p_cle text, p_ids uuid[]) returns table(panier uuid, regle smallint) language plpgsql stable security definer set search_path = public as $$
+begin if not public.magasin_cle_ok(p_cle) then return; end if; return query select * from public.panier_signalements(p_ids); end $$;
+create or replace function public.magasin_abonner_c(p_cle text, p_abonnement jsonb, p_oui boolean default true) returns boolean language plpgsql security definer set search_path = public as $$
+begin if not public.magasin_cle_ok(p_cle) then return false; end if; return public.magasin_abonner(p_abonnement, p_oui); end $$;
+create or replace function public.magasin_acommander_ajouter_c(p_cle text, p_n text, p_nom text, p_q int, p_note text default null) returns boolean language plpgsql security definer set search_path = public as $$
+begin if not public.magasin_cle_ok(p_cle) then return false; end if; return public.magasin_acommander_ajouter(p_n, p_nom, p_q, p_note); end $$;
+create or replace function public.magasin_acommander_maj_c(p_cle text, p_id bigint, p_fait boolean, p_retirer boolean default false) returns boolean language plpgsql security definer set search_path = public as $$
+begin if not public.magasin_cle_ok(p_cle) then return false; end if; return public.magasin_acommander_maj(p_id, p_fait, p_retirer); end $$;
+-- les anciennes portes sans clé sont fermées au public
+revoke execute on function public.panier_magasin(), public.panier_remettre(uuid, boolean), public.panier_signaler(uuid, int), public.panier_signalements(uuid[]),
+  public.magasin_abonner(jsonb, boolean), public.magasin_acommander_ajouter(text, text, int, text), public.magasin_acommander_maj(bigint, boolean, boolean) from anon, authenticated, public;
+revoke all on table public.magasin_cle from anon, authenticated;
+grant execute on function public.magasin_cle_definir(text, text, text), public.magasin_cle_verifier(text), public.panier_magasin_c(text), public.panier_remettre_c(text, uuid, boolean),
+  public.panier_signaler_c(text, uuid, int), public.panier_signalements_c(text, uuid[]), public.magasin_abonner_c(text, jsonb, boolean),
+  public.magasin_acommander_ajouter_c(text, text, text, int, text), public.magasin_acommander_maj_c(text, bigint, boolean, boolean) to anon, authenticated;
