@@ -103,7 +103,7 @@ const SUPA = "https://kjlotlhqrgekzohshmbn.supabase.co", CLE = "sb_publishable_1
 const $ = s => document.querySelector(s), Q = new URLSearchParams(location.search), MODE = Q.get("mode") || "eleve";
 /* 25 nov. (Jeremy : « ils vont utiliser un iPad ») : poste de commande partagé (?poste=1) : rien ne reste d'un élève à l'autre */
 const POSTE = !!Q.get("poste");
-function finPoste(msg){ MOI = null; PANIER = {}; LS.set("magEleve", null); LS.set("magPrenom", ""); LS.set("magNote", ""); sauverPanier(); eleveEntree(msg); }
+function finPoste(msg){ MOI = null; PANIER = {}; LS.set("magEleve", null); LS.set("magPrenom", ""); LS.set("magNote", ""); sauverPanier(); eleveEntree(msg); const e = $("#cErr"); if (e) { e.style.color = "var(--vert)"; e.style.fontWeight = "700"; } }
 if (POSTE) { let t = 0; const rearmer = () => { clearTimeout(t); t = setTimeout(() => { if (MOI) finPoste("Session terminée (2 minutes sans toucher)."); }, 120000); };
   ["pointerdown", "keydown", "input"].forEach(e => addEventListener(e, rearmer, true)); rearmer(); }
 const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
