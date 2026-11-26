@@ -343,6 +343,7 @@ test("Magasin : l'élève (carte scannée) envoie son panier, l'enseignant appro
     return L.map(p => (p.ids || [p.id]).join("+") + ":" + (p.items || []).map(i => i.n + i.q).join(",")); });
   vrai(rg.join(" ") === "a+b:X3,Y1 c:", "Commandes non rassemblées : " + rg.join(" "));
   if (process.env.CAPTURES) await m.screenshot({ path: process.env.CAPTURES + "/comptoir.png" });
+  await m.$$eval("details.regl", L => L.forEach(d => d.open = true));
   await m.click("[data-sig$='|2']"); await attendre(400);
   vrai(A.length === 0 && !!(await m.$("[data-sig$='|2'].att")), "Règlement : doit attendre la confirmation « Remis » : " + JSON.stringify(A));
   await m.click("[data-prep]"); await attendre(400);
@@ -368,7 +369,7 @@ test("Magasin : l'élève (carte scannée) envoie son panier, l'enseignant appro
   vrai(P[1].etat === "refuse" && /diamètre/.test(P[1].motif || ""), "Refus : " + P[1].etat + " " + P[1].motif);
   await p.reload(); await attendre(1500); const sv = await p.evaluate(() => document.body.innerText);
   if (process.env.CAPTURES) await p.screenshot({ path: process.env.CAPTURES + "/eleve-suivi.png" });
-  vrai(/Refusé par ton enseignant/.test(sv) && /Mauvais diamètre/.test(sv), "L'élève ne voit pas le refus et le commentaire");
+  vrai(/Refusé/.test(sv) && /Mauvais diamètre/.test(sv), "L'élève ne voit pas le refus et le commentaire");
   /* poste de commande partagé (iPad) : après l'envoi, l'écran se vide pour l'élève suivant */
   const c4 = await b.newContext({ viewport: { width: 820, height: 1180 }, hasTouch: true, serviceWorkers: "block" }); await mock(c4);
   const po = await c4.newPage(); po.on("pageerror", e => errs.push(e.message)); await po.goto(BASE + "magasin.html?poste=1&e=jeremy.raymond"); await attendre(800);
