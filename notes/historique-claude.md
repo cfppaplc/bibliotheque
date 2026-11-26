@@ -793,3 +793,4 @@
 - 26 nov. : photos lot 2 : 10 agents (limite de 200 recherches web partagée atteinte) → 140 candidates, 139 affichées dans le navigateur de Jeremy, 5 retirées après examen (réducteur générique, joint ABS, brise, séparateur fonte, adaptateur chromé). Total : ~172 types. Aucune image Deschênes (site:deschenes.qc.ca ne sort pas dans les recherches). Types restants à chercher : listés comme null dans /tmp/res*.json (perdu si session recréée).
 - 26 nov. : photos lot 3 (8 agents, 96 types) : 88 trouvées, 87 affichées, 5 retirées après examen → ~255 types avec photo.
 - 26 nov. : photos lot 4 (8 agents, 184 derniers types) : 128 trouvées et affichées, 5 retirées (image absente, dessin, mauvaise pièce).
+- 26 nov. : photos lot 5 (5 agents, 102 derniers articles, recherche par nom) : 57 photos propres à l'article (champ img), toutes affichées et vérifiées.
