@@ -799,3 +799,4 @@
 - 26 nov. : vérification des photos par 10 agents (lecture nom ↔ photo) : 166 articles reçoivent une photo plus juste (img = photo d'un autre type), 235 photos retirées (img = « - » : aucune ne convient). Reste 2 104 articles sur 2 356 avec photo.
 - 26 nov. : recherche profonde (10 agents, 246 articles sans photo) : 154 trouvées, 149 affichées, 4 retirées après examen → 145 photos propres à l'article.
 - 26 nov. : photos répétées (15 groupes hétérogènes, 395 articles) : sous-groupes avec leur propre photo (boulons de carrosserie/toilette/poêle, adaptateurs femelles cuivre, joints coulissants, Fernco, aquastats triples, etc.); + recherche des articles restants. 128 photos ajoutées, 7 retraits.
+- 26 nov. : 2e passe photos partagées (supports, BNQ égout PVC, DWV cuivre, vis, robinets, purgeurs, Victaulic, thermostats…) : ~220 articles avec leur propre photo, vérifiées à l'écran (3 rejetées). « can trust » traité comme clevis (à confirmer).
