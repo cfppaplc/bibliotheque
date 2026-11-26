@@ -38,6 +38,7 @@ h1{font-size:1.5rem;margin:6px 0 4px}.sous{color:var(--doux);margin:0 0 16px}
 .cherche input{width:100%;min-height:52px;border-radius:14px;border:1px solid var(--ligne);background:var(--carte);padding:0 16px;font-size:1.05rem}
 .puces{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .puce{min-height:38px;padding:0 13px;border-radius:99px;border:1px solid var(--ligne);background:var(--carte);cursor:pointer;font-size:.9rem}
+.filtres{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:6px;margin-top:8px}.filtres select{min-height:44px;padding:0 10px;border-radius:10px;border:1px solid var(--ligne);background:var(--carte);color:inherit;font:inherit;font-size:.95rem}
 .puce.on{background:var(--txt);border-color:var(--txt);color:var(--fond)}
 .art{display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid var(--ligne)}
 .art:last-child{border-bottom:0}.art .tx{flex:1;min-width:0}.art .tx b{display:block;font-weight:600}.art small{color:var(--doux)}
@@ -158,7 +159,7 @@ function correspond(a, mots){ return mots.every(m => /^\d+([-/.,]\d+)*$/.test(m)
 
 /* =================================================================== ÉLÈVE =================================================================== */
 const pouces = d => String(d).split(" ").reduce((s, x) => { const [n, m] = x.split("/"); return s + (m ? +n / +m : +n || 0); }, 0);
-let MOI = LS.get("magEleve", null), PANIER = LS.get("magPanier", {}), FILTRE = { q:"", mat:"", d:"" };
+let MOI = LS.get("magEleve", null), PANIER = LS.get("magPanier", {}), FILTRE = { q:"", cat:"", mat:"", d:"" };
 const sauverPanier = () => LS.set("magPanier", PANIER);
 const nbPanier = () => Object.values(PANIER).reduce((s, q) => s + q, 0);
 function eleveEntree(msg){
@@ -188,14 +189,14 @@ function enTete(){ $("#tQui").innerHTML = `<b>${MOI.prenom ? "Bonjour " + esc(MO
   $("#tSortir").onclick = () => { if (nbPanier() && !confirm("Ton panier sera vidé. Changer d'élève ?")) return; MOI = null; PANIER = {}; LS.set("magEleve", null); sauverPanier(); eleveEntree(); }; }
 function eleveCatalogue(){
   enTete();
-  const mats = [...new Set(CAT.map(a => a.mat))], ds = [...new Set(CAT.map(a => a.d))].sort((a, b) => pouces(a) - pouces(b));
+  const cats = [...new Set(CAT.map(a => a.cat).filter(Boolean))], mats = [...new Set(CAT.map(a => a.mat).filter(Boolean))].sort((a, b) => a.localeCompare(b, "fr")), ds = [...new Set(CAT.map(a => a.d).filter(Boolean))].sort((a, b) => pouces(a) - pouces(b));
   $("#app").innerHTML = `<div id="mesEnvois"></div><div class="cherche"><input id="fQ" type="search" placeholder="Cherche un raccord : coude 90 ABS 2, té cuivre 3/4…" value="${esc(FILTRE.q)}" autocomplete="off">
-    <div class="puces">${["", ...mats].map(m => `<button class="puce${FILTRE.mat === m ? " on" : ""}" data-mat="${esc(m)}">${m ? esc(m) : "Tous"}</button>`).join("")}</div>
-    <div class="puces">${["", ...ds].map(d => `<button class="puce${FILTRE.d === d ? " on" : ""}" data-d="${esc(d)}">${d ? esc(d) + " po" : "Tous les diamètres"}</button>`).join("")}</div></div>
+    <div class="filtres">${cats.length > 1 ? `<select id="fC" aria-label="Section"><option value="">Toutes les sections</option>${cats.map(c => `<option${FILTRE.cat === c ? " selected" : ""}>${esc(c)}</option>`).join("")}</select>` : ""}
+    <select id="fM" aria-label="Matériau"><option value="">Tous les matériaux</option>${mats.map(m => `<option${FILTRE.mat === m ? " selected" : ""}>${esc(m)}</option>`).join("")}</select>
+    <select id="fD" aria-label="Diamètre"><option value="">Tous les diamètres</option>${ds.map(d => `<option value="${esc(d)}"${FILTRE.d === d ? " selected" : ""}>${esc(d)} po</option>`).join("")}</select></div></div>
     <div class="carte" style="padding:0" id="liste"></div>`;
   const q = $("#fQ"); q.oninput = () => { FILTRE.q = q.value; liste(); };
-  document.querySelectorAll("[data-mat]").forEach(b => b.onclick = () => { FILTRE.mat = b.dataset.mat; document.querySelectorAll("[data-mat]").forEach(x => x.classList.toggle("on", x === b)); liste(); });
-  document.querySelectorAll("[data-d]").forEach(b => b.onclick = () => { FILTRE.d = b.dataset.d; document.querySelectorAll("[data-d]").forEach(x => x.classList.toggle("on", x === b)); liste(); });
+  [["#fC", "cat"], ["#fM", "mat"], ["#fD", "d"]].forEach(([id, k]) => { const el = $(id); if (el) el.onchange = () => { FILTRE[k] = el.value; liste(); }; });
   liste(); barre(); suivi();
 }
 const ligneArt = a => { const q = PANIER[a.id] || 0;
@@ -204,7 +205,7 @@ function brancherQte(z, apres){ z.querySelectorAll(".art [data-m]").forEach(b =>
   const a = CAT.find(x => x.id === id), el = b.closest(".art"); if (a) { el.outerHTML = ligneArt(a); } brancherQte(z, apres); barre(); if (apres) apres(); }); }
 function liste(){
   const mots = norm(FILTRE.q).replace(/[°"]/g, " ").replace(/\bpo\b|\bpouces?\b/g, " ").replace(/(\d)\s+(\d+\/\d+)/g, "$1-$2").split(/\s+/).filter(Boolean);
-  const L = CAT.filter(a => (!FILTRE.mat || a.mat === FILTRE.mat) && (!FILTRE.d || a.d === FILTRE.d) && correspond(a, mots));
+  const L = CAT.filter(a => (!FILTRE.cat || a.cat === FILTRE.cat) && (!FILTRE.mat || a.mat === FILTRE.mat) && (!FILTRE.d || a.d === FILTRE.d) && correspond(a, mots));
   const z = $("#liste"); z.innerHTML = L.length ? L.slice(0, 120).map(ligneArt).join("") + (L.length > 120 ? `<p class="vide">${L.length - 120} autres : précise ta recherche.</p>` : "") : `<p class="vide">Aucun raccord ne correspond. Essaie moins de mots.</p>`;
   brancherQte(z);
 }

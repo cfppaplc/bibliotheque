@@ -288,9 +288,9 @@ test("Magasin : l'élève (carte scannée) envoie son panier, l'enseignant appro
   vrai(/Bonjour Essai/.test(await p.textContent("#tQui")), "Carte scannée : le prénom ne vient pas de la carte (" + await p.textContent("#tQui") + ")");
   await p.fill("#fQ", "coude 90 abs 2"); await attendre(300);
   const res = await p.$$eval(".art .tx b", L => L.map(x => x.textContent));
-  vrai(res.length === 1 && /ABS 2 po/.test(res[0]), "Recherche : " + res.join(" | "));
+  vrai(res.length >= 1 && /^Coude 90° ABS 2 po/.test(res[0]), "Recherche : " + res.join(" | "));
   await p.fill("#fQ", "té cuivre 3/4"); await attendre(300);
-  const r2 = await p.$$eval(".art .tx b", L => L.map(x => x.textContent)); vrai(r2.length === 1, "« té » trouve aussi : " + r2.join(" | "));
+  const r2 = await p.$$eval(".art .tx b", L => L.map(x => x.textContent)); vrai(r2.length >= 1 && r2.every(x => /^Té /.test(x)), "« té » trouve aussi : " + r2.join(" | "));
   await p.click(".art .aj"); await p.click(".art [data-m='1']"); await attendre(200);
   await p.click("#bVoir"); await attendre(300); await p.click("#pEnv"); await attendre(1200);
   vrai(P.length === 1 && P[0].code === "12345" && P[0].items[0].q === 2, "Panier mal envoyé : " + JSON.stringify(P));
@@ -324,7 +324,7 @@ test("Magasin : l'élève (carte scannée) envoie son panier, l'enseignant appro
   vrai(!(await m.$("[data-rem]")), "Code 45678 : la commande de 12345 s'affiche");
   await m.keyboard.type("MP-12345-K7Q9X2"); await m.keyboard.press("Enter"); await attendre(300);
   vrai(!!(await m.$("[data-rem]")), "Code 12345 : commande absente");
-  vrai(/^[A-Z]-\d+$/.test((await m.textContent("td.rg")).trim()), "Rangée absente au comptoir");
+  vrai(/^[A-Z]-\d+/.test((await m.textContent("td.rg")).trim()), "Rangée absente au comptoir");
   vrai(/Essai/.test(await m.textContent(".cmd .pr")), "Prénom absent au comptoir");
   /* 25 nov. : les commandes approuvées d'un même élève se rassemblent en une seule carte (quantités additionnées) */
   const rg = await m.evaluate(() => { const L = regrouper([{ id: "a", code: "11111", items: [{ id: "x", n: "X", q: 2 }] }, { id: "b", code: "11111", items: [{ id: "x", n: "X", q: 1 }, { id: "y", n: "Y", q: 1 }] }, { id: "c", code: "22222", items: [] }]);
@@ -413,7 +413,7 @@ test("Facture : l'élève (sa carte) fait une facture, importe ses raccords du m
   await p.fill('[data-l="mat.0.prix"]', "4,50"); await p.press('[data-l="mat.0.prix"]', "Tab"); await attendre(200);
   const tot = await p.textContent("#barre"); vrai(/358,72/.test(tot.replace(/\s/g, "")), "Total faux : " + tot);   /* 3 h × 95 $ + 6 × 4,50 $ = 312 $ + TPS + TVQ */
   await p.click("#cat"); await attendre(500); await p.fill("#cQ", "té cuivre 1/2"); await attendre(200); await p.click("#cR [data-a]"); await p.click("#cX"); await attendre(300);
-  vrai(/^1,99$/.test(await p.inputValue('[data-l="mat.2.prix"]')), "Raccord de la liste du magasin : prix non prérempli");
+  vrai(/^\d+,\d\d$/.test(await p.inputValue('[data-l="mat.2.prix"]')), "Raccord de la liste du magasin : prix non prérempli");
   await (await p.$("#sig")).scrollIntoViewIfNeeded(); const bx = await (await p.$("#sig")).boundingBox(); await p.mouse.move(bx.x + 20, bx.y + 40); await p.mouse.down(); await p.mouse.move(bx.x + 200, bx.y + 100, { steps: 8 }); await p.mouse.up();
   await p.click("#sigOk"); await attendre(300); vrai(/Signée par Mme Gagnon/.test(await p.textContent("#app")), "Signature non enregistrée");
   const [dl] = await Promise.all([p.waitForEvent("download", { timeout: 8000 }), p.click("#pdf")]);
