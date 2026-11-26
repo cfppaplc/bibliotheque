@@ -421,3 +421,39 @@ begin
 end; $$;
 revoke all on function public.magasin_abonner(jsonb, boolean) from public;
 grant execute on function public.magasin_abonner(jsonb, boolean) to anon, authenticated;
+
+-- 25 nov. (Jeremy : « cliquer sur Vu : la note disparaît de notre page mais reste en archive dans le dossier de l'élève ») — avis gardés 1 an
+alter table public.magasin_avis add column if not exists vu text[] not null default '{}';
+create or replace function public.panier_avis_vu(p_ens text, p_jeton text, p_id uuid)
+returns boolean language plpgsql security definer set search_path = public as $$
+begin
+  if not public.panier_prof_ok(p_ens, p_jeton) then return false; end if;
+  update public.magasin_avis set vu = array_append(vu, p_ens) where id = p_id and (ens = p_ens or p_ens = any(profs)) and not (p_ens = any(vu));
+  return true;
+end; $$;
+create or replace function public.panier_prof_avis(p_ens text, p_jeton text)
+returns table(id uuid, t timestamptz, groupe text, code text, prenom text, regle smallint)
+language plpgsql stable security definer set search_path = public as $$
+begin
+  if not public.panier_prof_ok(p_ens, p_jeton) then return; end if;
+  return query select a.id, a.t, a.groupe, a.code, a.prenom, a.regle from public.magasin_avis a
+    where (a.ens = p_ens or p_ens = any(a.profs)) and not (p_ens = any(a.vu)) and a.t > now() - interval '365 days' order by a.t desc limit 100;
+end; $$;
+create or replace function public.panier_signaler(p_id uuid, p_regle int)
+returns jsonb language plpgsql security definer set search_path = public, extensions as $$
+declare p public.panier; a uuid;
+begin
+  if p_regle not between 1 and 6 then return jsonb_build_object('ok', false); end if;
+  select * into p from public.panier where id = p_id and etat in ('approuve', 'remis') and t > now() - interval '7 days';
+  if not found then return jsonb_build_object('ok', false, 'err', 'commande introuvable'); end if;
+  if exists (select 1 from public.magasin_avis where panier = p_id and regle = p_regle) then return jsonb_build_object('ok', true, 'deja', true); end if;
+  if (select count(*) from public.magasin_avis where t > now() - interval '1 hour') >= 100 then return jsonb_build_object('ok', false, 'err', 'trop d''avis'); end if;
+  insert into public.magasin_avis (panier, ens, groupe, code, prenom, regle, profs) values (p.id, p.ens, p.groupe, p.code, p.prenom, p_regle, p.profs) returning id into a;
+  delete from public.magasin_avis where t < now() - interval '365 days';
+  if exists (select 1 from public.panier_prof where (ens = p.ens or ens = any(p.profs)) and jsonb_array_length(abonnements) > 0) then
+    perform net.http_post(url := 'https://kjlotlhqrgekzohshmbn.supabase.co/functions/v1/panier-avis', headers := '{"Content-Type":"application/json"}'::jsonb, body := jsonb_build_object('avis', a));
+  end if;
+  return jsonb_build_object('ok', true);
+end; $$;
+revoke all on function public.panier_avis_vu(text, text, uuid) from public;
+grant execute on function public.panier_avis_vu(text, text, uuid) to anon, authenticated;
