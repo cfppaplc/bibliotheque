@@ -8,6 +8,9 @@ window.sessionDEP = function(g, d){ const m = String(g || "").match(/^(\d{2})(\d
 window.codeEssai = async function(c){ if (!/^\d{5}$/.test(String(c))) return null;
   const h = [...new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode("metier+|essai|" + c)))].map(b => b.toString(16).padStart(2, "0")).join("");
   if (h !== "8f2f917e3d5ac0a9e8f455e8448e41577d02c10718efa3099c8e396e5bf0ca5a") return null;
-  try { const id = localStorage.getItem("dernierId") || "", C = (await (await fetch("comptes.json", { cache:"no-cache" })).json()).comptes || {}; if (!C[id] || !C[id].admin) return null;
-    return { c:"MP-" + c + "-ESSAI0", g:"ESSAI", p:"Essai", ens:id }; } catch(e){ return null; } };
+  try { const id = localStorage.getItem("dernierId") || "", C = (await (await fetch("comptes.json", { cache:"no-cache" })).json()).comptes || {};
+    /* carte d'essai déjà ouverte sur cet appareil par un administrateur : elle suit au magasin et à la facture */
+    const k = (() => { try { return JSON.parse(localStorage.getItem("mpCarte") || "null"); } catch(e){ return null; } })(), dejaOuverte = k && k.c === "MP-" + c + "-ESSAI0";
+    const adm = C[id] && C[id].admin ? id : dejaOuverte ? Object.keys(C).find(x => C[x].admin) : null; if (!adm) return null;
+    return { c:"MP-" + c + "-ESSAI0", g:"ESSAI", p:"Essai", ens:adm }; } catch(e){ return null; } };
 window.factureOuverte = async function(g){ if (g === "ESSAI") return true; const n = sessionDEP(g); if (!n) return false; try { const r = await (await fetch("reglages.json", { cache:"no-cache" })).json(); return (r.facture || [2]).includes(n); } catch(e){ return false; } };

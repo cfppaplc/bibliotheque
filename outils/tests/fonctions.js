@@ -394,7 +394,7 @@ test("Facture : l'élève (sa carte) fait une facture, importe ses raccords du m
     localStorage.mpCarte = JSON.stringify({ c: "MP-48213-K7Q9X2", g, p: "Marc", t: 1 }); });
   await c.route(/rpc\/(\w+)/, r => { const f = r.request().url().match(/rpc\/(\w+)/)[1], a = JSON.parse(r.request().postData() || "{}"); let o = null;
     if (f === "coffre_lire") o = S[a.p_id] ? [{ data: S[a.p_id] }] : []; else if (f === "coffre_ecrire") { S[a.p_id] = a.p_data; o = true; }
-    else if (f === "panier_materiel_eleve") o = a.p_code === "48213" ? [{ n: "ABS-C90-2", nom: "Coude 90° ABS 2 po", q: 6, dernier: "2026-11-25" }, { n: "CU-T-34", nom: "Té cuivre 3/4 po", q: 2, dernier: "2026-11-24" }] : [];
+    else if (f === "panier_materiel_eleve") o = a.p_code === "48213" ? [{ panier: "a1", jour: "2026-11-25", n: "ABS-C90-2", nom: "Coude 90° ABS 2 po", q: 6 }, { panier: "a1", jour: "2026-11-25", n: "CU-T-34", nom: "Té cuivre 3/4 po", q: 2 }, { panier: "b2", jour: "2026-11-20", n: "PEX-12", nom: "Tuyau PEX 1/2 po", q: 3 }] : [];
     r.fulfill({ body: JSON.stringify(o), contentType: "application/json", headers: { "access-control-allow-origin": "*" } }); });
   const pub = require("crypto").createHash("sha256").update("metier+|coffres-pub|jeremy.raymond").digest("hex"), PUBC = t => JSON.stringify({ at:{}, cf:{ c1:{ nom:"Coffre 4", tour:t, eqc:["48213", "51234"] } } }); S[pub] = PUBC(2);
   const p = await c.newPage(); p.on("pageerror", e => errs.push(e.message)); await p.goto(BASE + "facture.html"); await attendre(1200);
@@ -405,10 +405,12 @@ test("Facture : l'élève (sa carte) fait une facture, importe ses raccords du m
   vrai(/@exemple\.com$/.test(await p.inputValue('[data-c="client.courriel"]')) && /418 555-/.test(await p.inputValue('[data-c="client.tel"]')), "Client fictif non tiré au hasard");
   await p.fill('[data-c="client.nom"]', "Mme Gagnon"); await p.press('[data-c="client.nom"]', "Tab");
   await p.fill('[data-l="mo.0.h"]', "3"); await p.press('[data-l="mo.0.h"]', "Tab"); await p.fill('[data-l="mo.0.taux"]', "95"); await p.press('[data-l="mo.0.taux"]', "Tab"); await attendre(200);
-  await p.click("#imp"); await attendre(800);
-  vrai((await p.$$('[data-l^="mat."][data-l$=".d"]')).length === 2, "Raccords du magasin non importés");
+  await p.click("#imp"); await attendre(800); await p.check('[data-tout="0"]'); await p.click("#impOk"); await attendre(300);   /* coche la commande du 25 nov. seulement */
+  vrai((await p.$$('[data-l^="mat."][data-l$=".d"]')).length === 2, "Raccords cochés non importés");
   await p.fill('[data-l="mat.0.prix"]', "4,50"); await p.press('[data-l="mat.0.prix"]', "Tab"); await attendre(200);
   const tot = await p.textContent("#barre"); vrai(/358,72/.test(tot.replace(/\s/g, "")), "Total faux : " + tot);   /* 3 h × 95 $ + 6 × 4,50 $ = 312 $ + TPS + TVQ */
+  await p.click("#cat"); await attendre(500); await p.fill("#cQ", "té cuivre 1/2"); await attendre(200); await p.click("#cR [data-a]"); await p.click("#cX"); await attendre(300);
+  vrai(/^1,99$/.test(await p.inputValue('[data-l="mat.2.prix"]')), "Raccord de la liste du magasin : prix non prérempli");
   await (await p.$("#sig")).scrollIntoViewIfNeeded(); const bx = await (await p.$("#sig")).boundingBox(); await p.mouse.move(bx.x + 20, bx.y + 40); await p.mouse.down(); await p.mouse.move(bx.x + 200, bx.y + 100, { steps: 8 }); await p.mouse.up();
   await p.click("#sigOk"); await attendre(300); vrai(/Signée par Mme Gagnon/.test(await p.textContent("#app")), "Signature non enregistrée");
   const [dl] = await Promise.all([p.waitForEvent("download", { timeout: 8000 }), p.click("#pdf")]);

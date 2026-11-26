@@ -42,7 +42,7 @@ table.l td.n{width:90px}table.l td.x{width:44px}table.l input{min-height:40px}
 .barre{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--ligne);padding:10px 16px;padding-bottom:max(10px,env(safe-area-inset-bottom));display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;z-index:5}
 .toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--nuit);color:#fff;padding:10px 16px;border-radius:12px;z-index:9}
 </style>
-<script src="js/session-dep.js?v=3"></script>
+<script src="js/session-dep.js?v=4"></script>
 </head>
 <body>
 <div class="top"><img src="img/metier-plus-blanc.svg" alt="Métier+"><b>Facture</b><span class="sp"></span><span id="qui" style="font-size:.9rem;opacity:.85"></span><a href="carte.html">Ma carte</a></div>
@@ -194,7 +194,7 @@ function dessiner(){ const f = FA, T = totaux(f), L = (t, arr, cols) => arr.map(
   <div class="carte"><h2>Travaux effectués</h2><textarea data-c="travaux" placeholder="ex. Remplacement du chauffe-eau 40 gal, raccordement eau chaude et froide, essai d'étanchéité.">${esc(f.travaux)}</textarea></div>
   <div class="carte"><h2>Main-d'œuvre</h2><table class="l"><tr><th>Description</th><th>Heures</th><th>Taux ($/h)</th><th></th></tr>${L("mo", f.mo, [["d", "Description"], ["h", "0", "n", 1], ["taux", "0,00", "n", 1]])}</table>
     <button class="btn" data-plus="mo" style="margin-top:6px">+ Ligne</button><p class="sous" style="text-align:right">Main-d'œuvre : <b>${argent(T.mo)}</b></p></div>
-  <div class="carte"><h2>Matériel</h2><p><button class="btn b" id="imp">Ajouter les raccords pris au magasin</button></p><table class="l"><tr><th>Pièce</th><th>Qté</th><th>Prix unitaire</th><th></th></tr>${L("mat", f.mat, [["d", "Pièce"], ["q", "1", "n", 1], ["prix", "0,00", "n", 1]])}</table>
+  <div class="carte"><h2>Matériel</h2><p style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn b" id="imp">Raccords pris au magasin</button><button class="btn" id="cat">Ajouter depuis la liste du magasin</button></p><table class="l"><tr><th>Pièce</th><th>Qté</th><th>Prix unitaire</th><th></th></tr>${L("mat", f.mat, [["d", "Pièce"], ["q", "1", "n", 1], ["prix", "0,00", "n", 1]])}</table>
     <button class="btn" data-plus="mat" style="margin-top:6px">+ Ligne</button><div class="g2" style="margin-top:10px;align-items:end"><div><label>Majoration sur le matériel (%)</label><input data-c="maj" inputmode="decimal" value="${esc(f.maj || "")}" placeholder="ex. 20"></div><p class="sous" style="text-align:right;margin:0">Matériel (avec majoration) : <b>${argent(T.mat)}</b></p></div></div>
   <div class="carte"><h2>Autres frais</h2><table class="l"><tr><th>Description</th><th>Montant</th><th></th></tr>${L("autres", f.autres, [["d", "ex. Déplacement, permis, disposition"], ["m", "0,00", "n", 1]])}</table><button class="btn" data-plus="autres" style="margin-top:6px">+ Ligne</button></div>
   <div class="carte"><div class="tot"><span>Sous-total</span><span>${argent(T.st)}</span><span>TPS (5 %)</span><span>${argent(T.tps)}</span><span>TVQ (9,975 %)</span><span>${argent(T.tvq)}</span><span class="g">Total</span><span class="g">${argent(T.tot)}</span></div>
@@ -211,10 +211,33 @@ function brancher(){ const f = FA, maj = () => { f.modif = Date.now(); sauver();
   document.querySelectorAll("[data-l]").forEach(i => i.onchange = () => { const [t, n, k] = i.dataset.l.split("."); f[t][+n][k] = i.value; maj(); dessiner(); });
   document.querySelectorAll("[data-del]").forEach(b => b.onclick = () => { const [t, n] = b.dataset.del.split("."); f[t].splice(+n, 1); maj(); dessiner(); });
   document.querySelectorAll("[data-plus]").forEach(b => b.onclick = () => { const t = b.dataset.plus; f[t].push(t === "mo" ? { d:"", h:"", taux:"" } : t === "mat" ? { d:"", q:"1", prix:"" } : { d:"", m:"" }); maj(); dessiner(); });
-  $("#imp").onclick = async () => { const b = $("#imp"); b.disabled = true; b.textContent = "Recherche au magasin…";
-    try { const L = await rpc("panier_materiel_eleve", { p_code:C.c }); if (!L || !L.length) { toast("Aucun raccord remis au magasin pour ton code (120 derniers jours)."); dessiner(); return; }
-      let n = 0; L.forEach(r => { const d = r.nom + (r.n ? " (" + r.n + ")" : ""); const x = f.mat.find(l => l.d === d); if (x) return; f.mat.push({ d, q:String(r.q), prix:"" }); n++; });
-      maj(); dessiner(); toast(n ? n + " pièce(s) ajoutée(s). Inscris le prix de chacune." : "Ces raccords sont déjà dans ta facture."); } catch(e){ toast(e.message); dessiner(); } };
+  /* 26 nov. (Jeremy : « ils vont pouvoir cocher les raccords qu'ils ont été chercher au magasin ») : commandes remises, par date, à cocher */
+  $("#imp").onclick = async () => { const b = $("#imp"); b.disabled = true; b.textContent = "Recherche au magasin…"; let L; await catalogue();
+    try { L = await rpc("panier_materiel_eleve", { p_code:C.c }); } catch(e){ toast(e.message); dessiner(); return; }
+    if (!L || !L.length) { toast("Aucun raccord remis au magasin pour ton code (120 derniers jours)."); dessiner(); return; }
+    const G = {}; L.forEach(r => (G[r.panier] = G[r.panier] || { jour:r.jour, l:[] }).l.push(r));
+    const ov = document.createElement("div"); ov.style.cssText = "position:fixed;inset:0;background:rgba(30,42,68,.55);z-index:20;display:flex;align-items:flex-start;justify-content:center;overflow:auto;padding:30px 12px";
+    ov.innerHTML = `<div class="carte" style="max-width:620px;width:100%;margin:0"><h2>Raccords pris au magasin</h2><p class="sous" style="margin-top:0">Coche ceux que tu as utilisés pour ce projet. Tu peux changer la quantité.</p>
+      ${Object.entries(G).map(([pid, g], k) => `<div style="border-top:1px solid var(--ligne);padding:10px 0"><label style="display:flex;gap:10px;align-items:center;font-size:1rem"><input type="checkbox" data-tout="${k}" style="width:24px;height:24px;min-height:0"> Commande du ${esc(new Date(g.jour + "T12:00:00").toLocaleDateString("fr-CA", { day:"numeric", month:"long" }))}</label>
+        ${g.l.map(r => `<label style="display:flex;gap:10px;align-items:center;font-weight:400;margin:6px 0 0 30px"><input type="checkbox" data-g="${k}" data-d="${esc(r.nom + (r.n ? " (" + r.n + ")" : ""))}" style="width:22px;height:22px;min-height:0"><span style="flex:1">${esc(r.nom)}</span><input type="number" min="1" value="${+r.q}" style="width:70px;min-height:38px" data-qte></label>`).join("")}</div>`).join("")}
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px"><button class="btn" id="impX">Annuler</button><button class="btn p" id="impOk">Ajouter à la facture</button></div></div>`;
+    document.body.appendChild(ov); dessiner();
+    ov.querySelectorAll("[data-tout]").forEach(t => t.onchange = () => ov.querySelectorAll(`[data-g="${t.dataset.tout}"]`).forEach(c => c.checked = t.checked));
+    ov.querySelector("#impX").onclick = () => ov.remove();
+    ov.querySelector("#impOk").onclick = () => { let n = 0; ov.querySelectorAll("[data-g]:checked").forEach(c => { const q = +c.parentNode.querySelector("[data-qte]").value || 1, x = f.mat.find(l => l.d === c.dataset.d);
+        if (x) x.q = String(num(x.q) + q); else { const a = (CAT || []).find(z => z.n && c.dataset.d.endsWith("(" + z.n + ")")); f.mat.push({ d:c.dataset.d, q:String(q), prix:a && a.prix ? String(a.prix).replace(".", ",") : "" }); } n++; });
+      ov.remove(); if (!n) return; maj(); dessiner(); toast(n + " pièce(s) ajoutée(s). Vérifie les prix."); }; };
+  /* 26 nov. (Jeremy : « ajouter des raccords selon la liste du magasin, avec des prix réalistes ») */
+  $("#cat").onclick = async () => { const L = await catalogue(), ov = document.createElement("div");
+    ov.style.cssText = "position:fixed;inset:0;background:rgba(30,42,68,.55);z-index:20;display:flex;align-items:flex-start;justify-content:center;overflow:auto;padding:30px 12px";
+    ov.innerHTML = `<div class="carte" style="max-width:620px;width:100%;margin:0"><h2>Liste du magasin</h2><input id="cQ" placeholder="Cherche : coude 90 ABS 2, té cuivre 3/4…" autocomplete="off"><div id="cR" style="max-height:52vh;overflow:auto;margin-top:8px"></div>
+      <div style="display:flex;justify-content:flex-end;margin-top:10px"><button class="btn p" id="cX">Terminé</button></div><p class="sous">Prix de détail approximatifs (exercice). Tu peux les modifier dans ta facture.</p></div>`;
+    document.body.appendChild(ov); const sans = t => String(t).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    const voir = () => { const m = sans(ov.querySelector("#cQ").value).split(/\s+/).filter(Boolean), R = L.filter(a => m.every(w => sans(a.nom + " " + a.n).includes(w))).slice(0, 40);
+      ov.querySelector("#cR").innerHTML = R.map(a => `<div style="display:flex;gap:10px;align-items:center;padding:8px 2px;border-bottom:1px solid var(--ligne)"><span style="flex:1">${esc(a.nom)}<br><small class="sous">${esc(a.n)}</small></span><b>${a.prix ? argent(a.prix) : ""}</b><button class="btn" data-a="${esc(a.id)}" style="min-height:40px">+ Ajouter</button></div>`).join("") || `<p class="sous">Aucun raccord.</p>`;
+      ov.querySelectorAll("[data-a]").forEach(b => b.onclick = () => { const a = L.find(z => z.id === b.dataset.a), d = a.nom + " (" + a.n + ")", x = f.mat.find(l => l.d === d);
+        if (x) x.q = String(num(x.q) + 1); else f.mat.push({ d, q:"1", prix:a.prix ? String(a.prix).replace(".", ",") : "" }); maj(); b.textContent = "Ajouté ✓"; }); };
+    ov.querySelector("#cQ").oninput = voir; voir(); ov.querySelector("#cQ").focus(); ov.querySelector("#cX").onclick = () => { ov.remove(); dessiner(); }; };
   $("#supp").onclick = () => { if (!confirm("Supprimer la facture " + f.no + " ?")) return; F = F.filter(x => x !== f); sauver(); liste(); };
   $("#pdf").onclick = () => pdf(f, false); $("#mel").onclick = () => pdf(f, true);
   if (f.signee) { $("#sigX").onclick = () => { if (confirm("Effacer la signature du client ?")) { f.signee = null; maj(); dessiner(); } }; return; }
@@ -275,6 +298,7 @@ async function pdf(f, courriel){ try { const { PDFDocument, StandardFonts, rgb }
   if (courriel) { location.href = "mailto:" + encodeURIComponent(f.client.courriel || "") + "?subject=" + encodeURIComponent("Facture " + f.no + (f.ent.nom ? " - " + f.ent.nom : "")) + "&body=" + encodeURIComponent("Bonjour,\n\nVoici la facture " + f.no + " pour les travaux effectués (total : " + argent(T.tot) + ").\nLe PDF est joint à ce courriel.\n\nMerci de votre confiance !\n" + (f.ent.nom || "")); toast("PDF téléchargé : joins-le au courriel."); }
   } catch(e){ toast("PDF impossible : " + e.message); } }
 
+let CAT = null; const catalogue = async () => CAT || (CAT = await fetch("magasin-catalogue.json", { cache:"no-cache" }).then(r => r.json()).then(d => d.raccords || []).catch(() => []));
 async function demarrer(){ if (!C) return entree();
   if (!(await factureOuverte(K.g))) { const n = sessionDEP(K.g); $("#app").innerHTML = `<h1>Facture au client</h1><div class="carte"><p>La facture s'ouvre plus tard dans ton DEP${n ? " (tu es en DEP " + n + ")" : ""}. Ton enseignant te dira quand.</p><a class="btn" href="carte.html">Retour à ma carte</a></div>`; return; } $("#app").innerHTML = `<p class="sous">Chargement…</p>`; await Promise.all([charger(), trouverCoffre()]); await entSync(); liste(); }
 lireK(); demarrer();
