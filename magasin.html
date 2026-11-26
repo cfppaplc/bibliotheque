@@ -152,6 +152,13 @@ input.cache-code:not(:placeholder-shown){-webkit-text-security:disc;text-securit
 .mesP[open]>summary::after{transform:rotate(-135deg)}.mesP[open]>summary{margin-bottom:10px}
 .rp{display:inline-flex;align-items:center;gap:6px;font-size:.85rem;font-weight:600;padding:3px 10px;border-radius:99px;background:rgba(128,128,128,.1)}.rp i{width:8px;height:8px;border-radius:50%;background:#8a94a8}
 .rp.attente i{background:#E8A317}.rp.approuve{background:#E3F4EA;color:var(--vert)}.rp.approuve i{background:var(--vert)}.rp.refuse i{background:var(--rouge)}
+
+/* 26 nov. : photos des raccords */
+.art .ph{flex:none;width:54px;height:54px;border-radius:10px;border:1px solid var(--ligne);background:#fff;padding:3px;cursor:zoom-in;display:grid;place-items:center;overflow:hidden}
+.art .ph img{max-width:100%;max-height:100%;object-fit:contain}.art .ph.vide{background:transparent;border-style:dashed;cursor:default;opacity:.5}
+.phz{position:fixed;inset:0;z-index:200;background:rgba(10,15,30,.78);display:grid;place-items:center;padding:20px;cursor:zoom-out}
+.phz figure{margin:0;background:#fff;border-radius:18px;padding:16px;max-width:min(520px,92vw);text-align:center;color:#14213d}
+.phz img{width:100%;max-height:60vh;object-fit:contain}.phz figcaption{font-weight:700;margin-top:8px}.phz small{display:block;font-weight:400;color:#667;margin-top:4px}
 </style>
 </head>
 <body>
@@ -205,7 +212,7 @@ async function trouverEleve(code){
 /* ---------- catalogue ---------- */
 let CAT = [];
 const diam = d => String(d || "").trim().replace(/\s+/g, "-");   /* « 1 1/2 » → « 1-1/2 » : un seul mot */
-async function chargerCatalogue(){ try { const J = await (await fetch("magasin-catalogue.json", { cache:"no-cache" })).json(); CAT = J.raccords || []; if (window.PlanMagasin) PlanMagasin.cases = (J.plan || {}).parties || {}; PlanMagasin.tailles = (J.plan || {}).tailles || {}; } catch(e){ CAT = []; }
+async function chargerCatalogue(){ try { const J = await (await fetch("magasin-catalogue.json", { cache:"no-cache" })).json(); CAT = J.raccords || []; PHOTOS = J.photos || {}; if (window.PlanMagasin) PlanMagasin.cases = (J.plan || {}).parties || {}; PlanMagasin.tailles = (J.plan || {}).tailles || {}; } catch(e){ CAT = []; }
   CAT.forEach(a => { a._q = norm([a.nom, a.n, a.mat, a.type].join(" ")); a._m = a._q.split(/[\s°]+/); a._d = diam(a.d); }); }
 /* recherche : les mots doivent tous se trouver; un nombre seul (2, 3/4, 1 1/2) = le diamètre exact, sauf un angle (90, 45, 22,5) */
 const ANGLES = ["90", "45", "22,5", "22.5", "22"];
@@ -253,8 +260,15 @@ function eleveCatalogue(){
   [["#fC", "cat"], ["#fM", "mat"], ["#fD", "d"]].forEach(([id, k]) => { const el = $(id); if (el) el.onchange = () => { FILTRE[k] = el.value; liste(); }; });
   liste(); barre(); suivi();
 }
+/* 26 nov. (Jeremy : « les élèves doivent confirmer leur choix ») : photo réelle par type de raccord (catalogue.photos « type|matériau »), ou propre à l'article (a.img) */
+let PHOTOS = {};
+const photoDe = a => a && (a.img || PHOTOS[String(a.type || "").toLowerCase() + "|" + (a.mat || "")]) || "";
+const vignette = a => { const u = photoDe(a); return u ? `<button class="ph" data-ph="${esc(u)}" data-t="${esc(a.nom)}" aria-label="Voir la photo"><img src="${esc(u)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.remove()"></button>` : `<span class="ph vide"></span>`; };
+document.addEventListener("click", e => { const b = e.target.closest("[data-ph]"); if (!b) return; e.preventDefault();
+  const d = document.createElement("div"); d.className = "phz"; d.innerHTML = `<figure><img src="${esc(b.dataset.ph)}" alt="" referrerpolicy="no-referrer"><figcaption>${esc(b.dataset.t)}<small>Photo d'exemple : la couleur ou la marque peut varier.</small></figcaption></figure>`;
+  d.onclick = () => d.remove(); document.body.appendChild(d); });
 const ligneArt = a => { const q = PANIER[a.id] || 0;
-  return `<div class="art" data-id="${esc(a.id)}"><div class="tx"><b>${esc(a.nom)}</b><small>N° ${esc(a.n)}</small></div><div class="qte">${q ? `<button data-m="-1" aria-label="Enlever un">−</button><span>${q}</span><button data-m="1" aria-label="Ajouter un">+</button>` : `<button class="aj" data-m="1">Ajouter</button>`}</div></div>`; };
+  return `<div class="art" data-id="${esc(a.id)}">${vignette(a)}<div class="tx"><b>${esc(a.nom)}</b><small>N° ${esc(a.n)}</small></div><div class="qte">${q ? `<button data-m="-1" aria-label="Enlever un">−</button><span>${q}</span><button data-m="1" aria-label="Ajouter un">+</button>` : `<button class="aj" data-m="1">Ajouter</button>`}</div></div>`; };
 function brancherQte(z, apres){ z.querySelectorAll(".art [data-m]").forEach(b => b.onclick = () => { const id = b.closest(".art").dataset.id; PANIER[id] = Math.max(0, Math.min(99, (PANIER[id] || 0) + +b.dataset.m)); if (!PANIER[id]) delete PANIER[id]; sauverPanier();
   const a = CAT.find(x => x.id === id), el = b.closest(".art"); if (a) { el.outerHTML = ligneArt(a); } brancherQte(z, apres); barre(); if (apres) apres(); }); }
 function liste(){
