@@ -87,3 +87,12 @@ begin
 end $$;
 revoke all on table public.magasin_acommander from anon, authenticated;
 grant execute on function public.magasin_acommander_ajouter(text, text, int, text), public.magasin_acommander_liste(), public.magasin_acommander_maj(bigint, boolean, boolean) to anon, authenticated;
+
+-- 26 nov. (Jeremy : « à la fin du projet, l'élève fait une facture au client; ça part de sa carte ») :
+-- raccords remis à l'élève (son code), pour préremplir le matériel de sa facture. Aucun nom : seulement les pièces.
+create or replace function public.panier_materiel_eleve(p_code text, p_depuis date default null)
+returns table(n text, nom text, q bigint, dernier date) language sql stable security definer set search_path = public as $$
+  select s.n, max(s.nom), sum(s.q)::bigint, max(s.jour) from public.magasin_sorties s join public.panier p on p.id = s.panier
+  where p.code = p_code and p_code ~ '^[0-9]{5}$' and s.jour >= coalesce(p_depuis, current_date - 120) group by s.n order by max(s.jour) desc, 2 limit 200;
+$$;
+grant execute on function public.panier_materiel_eleve(text, date) to anon, authenticated;

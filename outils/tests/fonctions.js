@@ -387,6 +387,35 @@ test("Carte : l'élève affiche sa carte avec son code à 5 chiffres seulement; 
   vrai(!errs.length, errs.join(" | ")); await c.close();
 });
 
+test("Facture : l'élève (sa carte) fait une facture, importe ses raccords du magasin, le client signe, PDF", async b => {
+  const c = await b.newContext({ viewport: { width: 820, height: 1180 }, hasTouch: true, serviceWorkers: "block", acceptDownloads: true }), S = {}, errs = [];
+  await c.addInitScript(() => { localStorage.mpCarte = JSON.stringify({ c: "MP-48213-K7Q9X2", g: "5333", p: "Marc", t: 1 }); });
+  await c.route(/rpc\/(\w+)/, r => { const f = r.request().url().match(/rpc\/(\w+)/)[1], a = JSON.parse(r.request().postData() || "{}"); let o = null;
+    if (f === "coffre_lire") o = S[a.p_id] ? [{ data: S[a.p_id] }] : []; else if (f === "coffre_ecrire") { S[a.p_id] = a.p_data; o = true; }
+    else if (f === "panier_materiel_eleve") o = a.p_code === "48213" ? [{ n: "ABS-C90-2", nom: "Coude 90° ABS 2 po", q: 6, dernier: "2026-11-25" }, { n: "CU-T-34", nom: "Té cuivre 3/4 po", q: 2, dernier: "2026-11-24" }] : [];
+    r.fulfill({ body: JSON.stringify(o), contentType: "application/json", headers: { "access-control-allow-origin": "*" } }); });
+  const p = await c.newPage(); p.on("pageerror", e => errs.push(e.message)); await p.goto(BASE + "facture.html"); await attendre(800);
+  await p.click("#nv"); await attendre(300);
+  await p.fill('[data-c="ent.nom"]', "Plomberie Marc inc."); await p.press('[data-c="ent.nom"]', "Tab");
+  await p.fill('[data-c="client.nom"]', "Mme Gagnon"); await p.press('[data-c="client.nom"]', "Tab");
+  await p.fill('[data-l="mo.0.h"]', "3"); await p.press('[data-l="mo.0.h"]', "Tab"); await p.fill('[data-l="mo.0.taux"]', "95"); await p.press('[data-l="mo.0.taux"]', "Tab"); await attendre(200);
+  await p.click("#imp"); await attendre(800);
+  vrai((await p.$$('[data-l^="mat."][data-l$=".d"]')).length === 2, "Raccords du magasin non importés");
+  await p.fill('[data-l="mat.0.prix"]', "4,50"); await p.press('[data-l="mat.0.prix"]', "Tab"); await attendre(200);
+  const tot = await p.textContent("#barre"); vrai(/358,72/.test(tot.replace(/\s/g, "")), "Total faux : " + tot);   /* 3 h × 95 $ + 6 × 4,50 $ = 312 $ + TPS + TVQ */
+  await (await p.$("#sig")).scrollIntoViewIfNeeded(); const bx = await (await p.$("#sig")).boundingBox(); await p.mouse.move(bx.x + 20, bx.y + 40); await p.mouse.down(); await p.mouse.move(bx.x + 200, bx.y + 100, { steps: 8 }); await p.mouse.up();
+  await p.click("#sigOk"); await attendre(300); vrai(/Signée par Mme Gagnon/.test(await p.textContent("#app")), "Signature non enregistrée");
+  const [dl] = await Promise.all([p.waitForEvent("download", { timeout: 8000 }), p.click("#pdf")]);
+  vrai(/Facture-F-\d{4}-001\.pdf/.test(dl.suggestedFilename()), "PDF : " + dl.suggestedFilename());
+  if (process.env.CAPTURES) await p.screenshot({ path: process.env.CAPTURES + "/facture.png", fullPage: true });
+  await attendre(1800); vrai(Object.keys(S).length === 1, "Copie chiffrée non enregistrée");
+  /* autre appareil (à la maison) : la facture revient avec la carte */
+  const c2 = await b.newContext({ serviceWorkers: "block" }); await c2.addInitScript(() => { localStorage.mpCarte = JSON.stringify({ c: "MP-48213-K7Q9X2", p: "Marc", t: 1 }); });
+  await c2.route(/rpc\/(\w+)/, r => { const a = JSON.parse(r.request().postData() || "{}"); r.fulfill({ body: JSON.stringify(S[a.p_id] ? [{ data: S[a.p_id] }] : []), contentType: "application/json", headers: { "access-control-allow-origin": "*" } }); });
+  const p2 = await c2.newPage(); await p2.goto(BASE + "facture.html"); await attendre(1200); vrai(/Mme Gagnon/.test(await p2.textContent("#app")), "Facture non retrouvée sur un autre appareil");
+  vrai(!errs.length, errs.join(" | ")); await c.close(); await c2.close();
+});
+
 (async () => {
   const b = await chromium.launch(); let echecs = 0;
   for (const [nom, f] of tests) {

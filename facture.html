@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="fr-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Facture · Métier+</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#1E2A44">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Facture">
+<link rel="apple-touch-icon" href="img/carte-180.png">
+<script src="vieux-navigateur.js"></script><script src="signaler.js?v=2"></script>
+<style>
+/* © 2026 Jérémy Raymond. Tous droits réservés. Métier+ — facture au client (26 nov.)
+   Jeremy : « à la fin de leur projet, les élèves font une facture au client, comme sur les chantiers; ça part de leur carte ».
+   Modèle : applications de chantier (Jobber, Sercom) : client, travaux, main-d'œuvre, matériel, taxes, signature du client, PDF.
+   Les factures restent sur l'appareil et une copie chiffrée avec la clé de la carte est gardée en ligne (retrouvée chez soi). */
+[hidden]{display:none!important}*{box-sizing:border-box}
+:root{--bleu:#1F5F8B;--nuit:#1E2A44;--acc:#EB6A22;--ligne:#D5DAE3;--fond:#F3F5F8;--gris:#6B7280;--vert:#1E8E4E}
+html,body{margin:0;background:var(--fond);color:var(--nuit);font:16px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif}
+.top{position:sticky;top:0;z-index:5;background:var(--nuit);color:#fff;display:flex;align-items:center;gap:10px;padding:10px 16px;padding-top:max(10px,env(safe-area-inset-top))}
+.top img{height:26px}.top b{font-size:1.05rem}.top .sp{flex:1}.top a,.top button{color:#fff;background:transparent;border:1px solid rgba(255,255,255,.35);border-radius:10px;padding:8px 12px;font:inherit;text-decoration:none;cursor:pointer}
+main{max-width:860px;margin:0 auto;padding:16px 16px 120px}
+h1{font-size:1.4rem;margin:6px 0 4px}.sous{color:var(--gris);font-size:.92rem}
+.carte{background:#fff;border:1px solid var(--ligne);border-radius:16px;padding:16px 18px;margin:12px 0}
+.carte h2{font-size:1rem;margin:0 0 10px;color:var(--bleu);text-transform:uppercase;letter-spacing:.04em}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}@media (max-width:620px){.g2{grid-template-columns:1fr}}
+label{display:block;font-size:.85rem;font-weight:600;margin:0 0 3px}
+input,textarea,select{width:100%;min-height:44px;border:1.5px solid var(--ligne);border-radius:10px;padding:8px 10px;font:inherit;background:#fff;color:inherit}
+textarea{min-height:70px;resize:vertical}
+input:focus,textarea:focus{outline:2px solid var(--bleu);border-color:transparent}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:0 16px;border-radius:12px;border:1.5px solid var(--ligne);background:#fff;color:var(--nuit);font:inherit;font-weight:700;cursor:pointer}
+.btn.p{background:var(--acc);border-color:var(--acc);color:#fff}.btn.b{background:var(--bleu);border-color:var(--bleu);color:#fff}
+table.l{width:100%;border-collapse:collapse}table.l th{text-align:left;font-size:.8rem;color:var(--gris);padding:4px 4px}table.l td{padding:4px}
+table.l td.n{width:90px}table.l td.x{width:44px}table.l input{min-height:40px}
+.x button{width:40px;height:40px;border-radius:10px;border:1px solid var(--ligne);background:#fff;font-size:1.2rem;cursor:pointer;color:var(--gris)}
+.tot{display:grid;grid-template-columns:1fr auto;gap:4px 18px;max-width:340px;margin-left:auto}.tot span{text-align:right}.tot .g{font-weight:800;font-size:1.15rem;border-top:2px solid var(--nuit);padding-top:6px}
+.code{display:block;width:100%;max-width:420px;font:800 2.6rem/1 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.25em;text-align:center;padding:16px;border-radius:16px;border:2px solid var(--ligne);margin:10px 0}
+.err{color:#B42318;min-height:1.2em;margin:6px 0}
+.liste .f{display:flex;align-items:center;gap:12px;padding:12px 4px;border-bottom:1px solid var(--ligne);cursor:pointer}.liste .f:last-child{border:0}.liste .f b{flex:1}
+.pastille{font-size:.78rem;padding:3px 10px;border-radius:999px;background:#EEF2F7;color:var(--gris);font-weight:700}.pastille.ok{background:#E6F4EC;color:var(--vert)}
+#sig{width:100%;height:170px;border:1.5px dashed var(--ligne);border-radius:12px;background:#fff;touch-action:none;display:block}
+.barre{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--ligne);padding:10px 16px;padding-bottom:max(10px,env(safe-area-inset-bottom));display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;z-index:5}
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--nuit);color:#fff;padding:10px 16px;border-radius:12px;z-index:9}
+</style>
+</head>
+<body>
+<div class="top"><img src="img/metier-plus-blanc.svg" alt="Métier+"><b>Facture</b><span class="sp"></span><span id="qui" style="font-size:.9rem;opacity:.85"></span><a href="carte.html">Ma carte</a></div>
+<main id="app"></main>
+<div class="barre" id="barre" hidden></div>
+<script>
+const $ = s => document.querySelector(s), esc = t => String(t ?? "").replace(/[&<>"]/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" }[c]));
+const LS = { get:(k, d) => { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch(e){ return d; } }, set:(k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} } };
+const API = "https://kjlotlhqrgekzohshmbn.supabase.co/rest/v1/rpc/", CLE = "sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY", te = new TextEncoder(), td = new TextDecoder();
+const rpc = async (f, a) => { const r = await fetch(API + f, { method:"POST", headers:{ apikey:CLE, "Content-Type":"application/json" }, body:JSON.stringify(a || {}), cache:"no-store" }); if (!r.ok) throw new Error("Internet ne répond pas"); return r.json(); };
+const hex = async s => [...new Uint8Array(await crypto.subtle.digest("SHA-256", te.encode(s)))].map(b => b.toString(16).padStart(2, "0")).join("");
+const toast = t => { const d = document.createElement("div"); d.className = "toast"; d.textContent = t; document.body.appendChild(d); setTimeout(() => d.remove(), 2600); };
+const argent = n => (Math.round((+n || 0) * 100) / 100).toLocaleString("fr-CA", { minimumFractionDigits:2, maximumFractionDigits:2 }) + " $";
+const num = v => { const n = parseFloat(String(v ?? "").replace(/\s/g, "").replace(",", ".")); return isFinite(n) ? n : 0; };
+const TPS = 0.05, TVQ = 0.09975;
+
+/* ---------- la carte de l'élève (même entrée que le magasin) ---------- */
+let K = LS.get("mpCarte", null), C = null;   /* C = { c:code, k:clé } */
+function lireK(){ const m = K && String(K.c || "").match(/^MP-(\d{5})-([A-Z0-9]{4,12})$/); C = m ? { c:m[1], k:m[2] } : null; }
+async function chercherCode(c){ const r = await rpc("carte_code_lire", { p_code:c }); if (!r || r.etat !== "ok") return r && r.etat === "bloque" ? "bloque" : null;
+  const b = Uint8Array.from(atob(JSON.parse(r.data).d), x => x.charCodeAt(0)), k = await crypto.subtle.importKey("raw", await crypto.subtle.digest("SHA-256", te.encode("metier+|carte-code|" + c + "|cle")), "AES-GCM", false, ["decrypt"]);
+  return JSON.parse(td.decode(await crypto.subtle.decrypt({ name:"AES-GCM", iv:b.slice(0, 12) }, k, b.slice(12)))); }
+function entree(){ $("#barre").hidden = true; $("#qui").textContent = "";
+  $("#app").innerHTML = `<h1>Facture au client</h1><p class="sous">Tape ton code à 5 chiffres (celui de ta carte).</p><div class="carte"><input class="code" id="cCode" inputmode="numeric" autocomplete="off" placeholder="00000" aria-label="Ton code"><p class="err" id="cErr"></p><button class="btn p" id="cOk">Entrer</button></div>`;
+  const i = $("#cCode"), go = async () => { const c = i.value.trim(); if (!/^\d{5}$/.test(c)) { $("#cErr").textContent = "Écris ton code à 5 chiffres."; return; }
+    $("#cErr").textContent = "Recherche…"; try { const o = await chercherCode(c);
+      if (o === "bloque") { $("#cErr").textContent = "Trop d'essais en ce moment. Réessaie dans 10 minutes."; return; }
+      if (!o) { $("#cErr").textContent = "Code inconnu. Vérifie avec ton enseignant."; return; }
+      K = { c:o.c, g:o.g || "", p:o.p || "", t:Date.now() }; LS.set("mpCarte", K); lireK(); demarrer(); } catch(e){ $("#cErr").textContent = e.message; } };
+  i.oninput = () => { if (/^\d{5}$/.test(i.value.trim())) go(); }; i.onkeydown = e => { if (e.key === "Enter") go(); }; $("#cOk").onclick = go; i.focus(); }
+
+/* ---------- sauvegarde : sur l'appareil + copie chiffrée avec la clé de la carte ---------- */
+let F = [];   /* factures */
+const cleLocale = () => "factures|" + C.c;
+async function cleAES(){ return crypto.subtle.importKey("raw", await crypto.subtle.digest("SHA-256", te.encode("metier+|factures-cle|" + C.c + "|" + C.k)), "AES-GCM", false, ["encrypt", "decrypt"]); }
+async function charger(){ F = LS.get(cleLocale(), []);
+  try { const r = await rpc("coffre_lire", { p_id:await hex("metier+|factures|" + C.c + "|" + C.k) }), row = r && r[0]; if (!row || !row.data) return;
+    const b = Uint8Array.from(atob(JSON.parse(row.data).d), x => x.charCodeAt(0)), L = JSON.parse(td.decode(await crypto.subtle.decrypt({ name:"AES-GCM", iv:b.slice(0, 12) }, await cleAES(), b.slice(12))));
+    const M = new Map(F.map(f => [f.id, f])); L.forEach(f => { const a = M.get(f.id); if (!a || (f.modif || 0) > (a.modif || 0)) M.set(f.id, f); }); F = [...M.values()].sort((a, b) => (b.modif || 0) - (a.modif || 0)); LS.set(cleLocale(), F); } catch(e){} }
+let sauvT = 0;
+function sauver(){ LS.set(cleLocale(), F); clearTimeout(sauvT); sauvT = setTimeout(async () => { try {
+    const iv = crypto.getRandomValues(new Uint8Array(12)), ct = new Uint8Array(await crypto.subtle.encrypt({ name:"AES-GCM", iv }, await cleAES(), te.encode(JSON.stringify(F)))), u = new Uint8Array(12 + ct.length); u.set(iv); u.set(ct, 12);
+    let s = ""; for (let i = 0; i < u.length; i += 32768) s += String.fromCharCode.apply(null, u.subarray(i, i + 32768));
+    await rpc("coffre_ecrire", { p_id:await hex("metier+|factures|" + C.c + "|" + C.k), p_jeton:await hex("metier+|factures-jeton|" + C.c + "|" + C.k), p_env:"public", p_data:JSON.stringify({ v:1, d:btoa(s) }) }); } catch(e){} }, 1500); }
+
+/* ---------- liste des factures ---------- */
+function totaux(f){ const mo = (f.mo || []).reduce((s, l) => s + num(l.h) * num(l.taux), 0), mat = (f.mat || []).reduce((s, l) => s + num(l.q) * num(l.prix), 0) * (1 + num(f.maj) / 100);
+  const st = mo + mat + (f.autres || []).reduce((s, l) => s + num(l.m), 0), tps = st * TPS, tvq = st * TVQ; return { mo, mat, st, tps, tvq, tot:st + tps + tvq }; }
+function liste(){ $("#barre").hidden = true; $("#qui").textContent = (K.p ? K.p + " · " : "") + C.c;
+  $("#app").innerHTML = `<h1>Mes factures</h1><p class="sous">À la fin d'un projet, fais la facture de ton client comme sur un chantier : travaux, heures, matériel, taxes et signature.</p>
+    <p><button class="btn p" id="nv">+ Nouvelle facture</button></p>
+    <div class="carte liste">${F.length ? F.map(f => `<div class="f" data-id="${esc(f.id)}"><b>${esc(f.no)} · ${esc(f.client && f.client.nom || "Client à préciser")}</b><span class="sous">${esc(f.date)}</span><span>${argent(totaux(f).tot)}</span><span class="pastille${f.signee ? " ok" : ""}">${f.signee ? "Signée" : "Brouillon"}</span></div>`).join("") : `<p class="sous">Aucune facture pour l'instant.</p>`}</div>`;
+  $("#nv").onclick = nouvelle; document.querySelectorAll("[data-id]").forEach(d => d.onclick = () => ouvrir(d.dataset.id)); }
+function nouvelle(){ const prec = F[0] || {}, a = new Date().getFullYear(), n = F.filter(f => String(f.no).startsWith("F-" + a)).length + 1;
+  const f = { id:Date.now().toString(36) + Math.random().toString(36).slice(2, 6), no:"F-" + a + "-" + String(n).padStart(3, "0"), date:new Date().toLocaleDateString("en-CA"), modif:Date.now(),
+    ent:prec.ent || { nom:"", rbq:"", tps:"", tvq:"", tel:"", courriel:"" }, client:{ nom:"", adresse:"", tel:"", courriel:"" }, travaux:"", mo:[{ d:"Main-d'œuvre — plombier", h:"", taux:"" }], mat:[], maj:"", autres:[], cond:"Payable sur réception. Merci de votre confiance !", signee:null };
+  F.unshift(f); sauver(); ouvrir(f.id); }
+
+/* ---------- la facture ---------- */
+let FA = null;
+function ouvrir(id){ FA = F.find(f => f.id === id); if (!FA) return liste(); window.scrollTo(0, 0); dessiner(); }
+function champ(lbl, chemin, opt){ const v = chemin.split(".").reduce((o, k) => o && o[k], FA) ?? ""; return `<div><label>${lbl}</label><input data-c="${chemin}" value="${esc(v)}"${opt || ""}></div>`; }
+function dessiner(){ const f = FA, T = totaux(f), L = (t, arr, cols) => arr.map((l, i) => `<tr>${cols.map(([k, ph, cls, im]) => `<td class="${cls || ""}"><input data-l="${t}.${i}.${k}" value="${esc(l[k] ?? "")}" placeholder="${ph}"${im ? ' inputmode="decimal"' : ""}></td>`).join("")}<td class="x"><button data-del="${t}.${i}" aria-label="Retirer">×</button></td></tr>`).join("");
+  $("#qui").textContent = (K.p ? K.p + " · " : "") + C.c;
+  $("#app").innerHTML = `<p><button class="btn" id="ret">‹ Mes factures</button></p><h1>Facture ${esc(f.no)}</h1>
+  <div class="carte"><h2>Mon entreprise</h2><div class="g2">${champ("Nom de l'entreprise", "ent.nom", ' placeholder="ex. Plomberie Tremblay inc."')}${champ("N° de licence RBQ", "ent.rbq", ' placeholder="ex. 5678-1234-01"')}${champ("N° de TPS", "ent.tps")}${champ("N° de TVQ", "ent.tvq")}${champ("Téléphone", "ent.tel", ' inputmode="tel"')}${champ("Courriel", "ent.courriel", ' inputmode="email"')}</div></div>
+  <div class="carte"><h2>Client</h2><div class="g2">${champ("Nom du client", "client.nom")}${champ("Téléphone", "client.tel", ' inputmode="tel"')}${champ("Adresse des travaux", "client.adresse")}${champ("Courriel", "client.courriel", ' inputmode="email"')}</div>
+    <div class="g2" style="margin-top:10px">${champ("N° de facture", "no")}<div><label>Date</label><input type="date" data-c="date" value="${esc(f.date)}"></div></div></div>
+  <div class="carte"><h2>Travaux effectués</h2><textarea data-c="travaux" placeholder="ex. Remplacement du chauffe-eau 40 gal, raccordement eau chaude et froide, essai d'étanchéité.">${esc(f.travaux)}</textarea></div>
+  <div class="carte"><h2>Main-d'œuvre</h2><table class="l"><tr><th>Description</th><th>Heures</th><th>Taux ($/h)</th><th></th></tr>${L("mo", f.mo, [["d", "Description"], ["h", "0", "n", 1], ["taux", "0,00", "n", 1]])}</table>
+    <button class="btn" data-plus="mo" style="margin-top:6px">+ Ligne</button><p class="sous" style="text-align:right">Main-d'œuvre : <b>${argent(T.mo)}</b></p></div>
+  <div class="carte"><h2>Matériel</h2><p><button class="btn b" id="imp">Ajouter les raccords pris au magasin</button></p><table class="l"><tr><th>Pièce</th><th>Qté</th><th>Prix unitaire</th><th></th></tr>${L("mat", f.mat, [["d", "Pièce"], ["q", "1", "n", 1], ["prix", "0,00", "n", 1]])}</table>
+    <button class="btn" data-plus="mat" style="margin-top:6px">+ Ligne</button><div class="g2" style="margin-top:10px;align-items:end"><div><label>Majoration sur le matériel (%)</label><input data-c="maj" inputmode="decimal" value="${esc(f.maj || "")}" placeholder="ex. 20"></div><p class="sous" style="text-align:right;margin:0">Matériel (avec majoration) : <b>${argent(T.mat)}</b></p></div></div>
+  <div class="carte"><h2>Autres frais</h2><table class="l"><tr><th>Description</th><th>Montant</th><th></th></tr>${L("autres", f.autres, [["d", "ex. Déplacement, permis, disposition"], ["m", "0,00", "n", 1]])}</table><button class="btn" data-plus="autres" style="margin-top:6px">+ Ligne</button></div>
+  <div class="carte"><div class="tot"><span>Sous-total</span><span>${argent(T.st)}</span><span>TPS (5 %)</span><span>${argent(T.tps)}</span><span>TVQ (9,975 %)</span><span>${argent(T.tvq)}</span><span class="g">Total</span><span class="g">${argent(T.tot)}</span></div>
+    <label style="margin-top:12px">Conditions de paiement</label><input data-c="cond" value="${esc(f.cond)}"></div>
+  <div class="carte"><h2>Signature du client</h2>${f.signee ? `<img src="${f.signee.img}" alt="Signature" style="max-width:100%;height:120px;object-fit:contain;background:#fff;border:1px solid var(--ligne);border-radius:12px"><p class="sous">Signée par ${esc(f.signee.nom)} le ${esc(f.signee.date)}.</p><button class="btn" id="sigX">Effacer la signature</button>`
+    : `<p class="sous">Le client signe avec le doigt pour accepter les travaux et la facture.</p><canvas id="sig"></canvas><div class="g2" style="margin-top:8px;align-items:end"><div><label>Nom du client (en lettres moulées)</label><input id="sigN" value="${esc(f.client.nom)}"></div><div style="display:flex;gap:8px"><button class="btn" id="sigE">Recommencer</button><button class="btn b" id="sigOk">Accepter et signer</button></div></div>`}</div>
+  <p style="text-align:center"><button class="btn" id="supp" style="color:#B42318">Supprimer cette facture</button></p>`;
+  $("#barre").hidden = false; $("#barre").innerHTML = `<b style="margin-right:auto;align-self:center">Total : ${argent(T.tot)}</b><button class="btn" id="mel">Envoyer par courriel</button><button class="btn p" id="pdf">PDF de la facture</button>`;
+  brancher(); }
+function brancher(){ const f = FA, maj = () => { f.modif = Date.now(); sauver(); };
+  $("#ret").onclick = liste;
+  document.querySelectorAll("[data-c]").forEach(i => i.onchange = () => { const k = i.dataset.c.split("."); let o = f; while (k.length > 1) o = o[k.shift()]; o[k[0]] = i.value; maj(); dessiner(); });
+  document.querySelectorAll("[data-l]").forEach(i => i.onchange = () => { const [t, n, k] = i.dataset.l.split("."); f[t][+n][k] = i.value; maj(); dessiner(); });
+  document.querySelectorAll("[data-del]").forEach(b => b.onclick = () => { const [t, n] = b.dataset.del.split("."); f[t].splice(+n, 1); maj(); dessiner(); });
+  document.querySelectorAll("[data-plus]").forEach(b => b.onclick = () => { const t = b.dataset.plus; f[t].push(t === "mo" ? { d:"", h:"", taux:"" } : t === "mat" ? { d:"", q:"1", prix:"" } : { d:"", m:"" }); maj(); dessiner(); });
+  $("#imp").onclick = async () => { const b = $("#imp"); b.disabled = true; b.textContent = "Recherche au magasin…";
+    try { const L = await rpc("panier_materiel_eleve", { p_code:C.c }); if (!L || !L.length) { toast("Aucun raccord remis au magasin pour ton code (120 derniers jours)."); dessiner(); return; }
+      let n = 0; L.forEach(r => { const d = r.nom + (r.n ? " (" + r.n + ")" : ""); const x = f.mat.find(l => l.d === d); if (x) return; f.mat.push({ d, q:String(r.q), prix:"" }); n++; });
+      maj(); dessiner(); toast(n ? n + " pièce(s) ajoutée(s). Inscris le prix de chacune." : "Ces raccords sont déjà dans ta facture."); } catch(e){ toast(e.message); dessiner(); } };
+  $("#supp").onclick = () => { if (!confirm("Supprimer la facture " + f.no + " ?")) return; F = F.filter(x => x !== f); sauver(); liste(); };
+  $("#pdf").onclick = () => pdf(f, false); $("#mel").onclick = () => pdf(f, true);
+  if (f.signee) { $("#sigX").onclick = () => { if (confirm("Effacer la signature du client ?")) { f.signee = null; maj(); dessiner(); } }; return; }
+  const cv = $("#sig"), r = window.devicePixelRatio || 1; cv.width = cv.clientWidth * r; cv.height = cv.clientHeight * r; const x = cv.getContext("2d"); x.scale(r, r); x.lineWidth = 2.4; x.lineCap = "round"; x.strokeStyle = "#1E2A44";
+  let dessine = false, vide = true; const pt = e => { const b = cv.getBoundingClientRect(); return [e.clientX - b.left, e.clientY - b.top]; };
+  cv.onpointerdown = e => { dessine = true; vide = false; cv.setPointerCapture(e.pointerId); x.beginPath(); x.moveTo(...pt(e)); };
+  cv.onpointermove = e => { if (!dessine) return; x.lineTo(...pt(e)); x.stroke(); }; cv.onpointerup = cv.onpointercancel = () => dessine = false;
+  $("#sigE").onclick = () => { x.clearRect(0, 0, cv.width, cv.height); vide = true; };
+  $("#sigOk").onclick = () => { const nom = $("#sigN").value.trim(); if (vide || !nom) { toast("Le client doit signer et écrire son nom."); return; }
+    f.signee = { img:cv.toDataURL("image/png"), nom, date:new Date().toLocaleDateString("fr-CA", { day:"numeric", month:"long", year:"numeric" }) }; if (!f.client.nom) f.client.nom = nom; maj(); dessiner(); toast("Facture signée."); }; }
+
+/* ---------- PDF (pdf-lib, licence MIT) ---------- */
+let LIB = null; const lib = () => LIB || (LIB = new Promise((ok, non) => { if (window.PDFLib) return ok(window.PDFLib); const s = document.createElement("script"); s.src = "js/vendor/pdf-lib.min.js"; s.onload = () => ok(window.PDFLib); s.onerror = () => non(new Error("bibliothèque PDF introuvable")); document.head.appendChild(s); }));
+async function pdf(f, courriel){ try { const { PDFDocument, StandardFonts, rgb } = await lib(), T = totaux(f);
+  const doc = await PDFDocument.create(), R = await doc.embedFont(StandardFonts.Helvetica), B = await doc.embedFont(StandardFonts.HelveticaBold);
+  const W = 612, H = 792, M = 46, fin = W - M, bleu = rgb(0.122, 0.373, 0.545), encre = rgb(0.118, 0.165, 0.267), gris = rgb(0.42, 0.45, 0.5), pale = rgb(0.957, 0.969, 0.98), ligne = rgb(0.87, 0.89, 0.92);
+  const propre = t => String(t ?? "").replace(/[^\u0000-ÿ–—…«»’“”•€]/g, "");
+  let p = doc.addPage([W, H]), y = H - M; const t = (s, x, yy, z, fo, c) => p.drawText(propre(s), { x, y:yy, size:z || 10, font:fo || R, color:c || encre });
+  const droite = (s, x, yy, z, fo, c) => t(s, x - (fo || R).widthOfTextAtSize(propre(s), z || 10), yy, z, fo, c);
+  const coupe = (s, w, z, fo) => { const mots = propre(s).split(/\s+/), L = []; let l = ""; mots.forEach(m => { const e = l ? l + " " + m : m; if ((fo || R).widthOfTextAtSize(e, z) > w && l) { L.push(l); l = m; } else l = e; }); if (l) L.push(l); return L; };
+  const page = () => { if (y < M + 90) { p = doc.addPage([W, H]); y = H - M; } };
+  /* en-tête : l'entreprise de l'élève */
+  t(f.ent.nom || "Mon entreprise", M, y - 16, 18, B, bleu); t("FACTURE", fin - B.widthOfTextAtSize("FACTURE", 22), y - 18, 22, B, encre);
+  let yy = y - 34; [f.ent.tel, f.ent.courriel, f.ent.rbq ? "Licence RBQ : " + f.ent.rbq : ""].filter(Boolean).forEach(s => { t(s, M, yy, 9, R, gris); yy -= 12; });
+  droite("N° " + f.no, fin, y - 36, 10, B); droite("Date : " + f.date, fin, y - 49, 10); y = Math.min(yy, y - 60) - 8;
+  p.drawRectangle({ x:M, y, width:fin - M, height:3, color:bleu }); y -= 20;
+  t("FACTURÉ À", M, y, 8, B, gris); y -= 14; [f.client.nom, f.client.adresse, f.client.tel, f.client.courriel].filter(Boolean).forEach(s => { t(s, M, y, 10, s === f.client.nom ? B : R); y -= 13; });
+  if (f.travaux) { y -= 8; t("TRAVAUX EFFECTUÉS", M, y, 8, B, gris); y -= 14; coupe(f.travaux, fin - M, 10).forEach(l => { page(); t(l, M, y, 10); y -= 13; }); }
+  y -= 10;
+  const table = (titre, cols, lignes) => { if (!lignes.length) return; page(); p.drawRectangle({ x:M, y:y - 20, width:fin - M, height:20, color:bleu });
+    cols.forEach(([n, x, dr]) => dr ? droite(n, x, y - 14, 9, B, rgb(1, 1, 1)) : t(n, x, y - 14, 9, B, rgb(1, 1, 1))); y -= 20;
+    lignes.forEach((l, i) => { page(); if (i % 2) p.drawRectangle({ x:M, y:y - 18, width:fin - M, height:18, color:pale });
+      l.forEach((v, k) => { const [, x, dr] = cols[k]; let s = propre(v); if (!dr) while (R.widthOfTextAtSize(s, 10) > (cols[k + 1] ? cols[k + 1][1] - 70 - x : 200) && s.length > 4) s = s.slice(0, -2); dr ? droite(s, x, y - 13, 10) : t(s, x, y - 13, 10); });
+      p.drawLine({ start:{ x:M, y:y - 18 }, end:{ x:fin, y:y - 18 }, thickness:0.5, color:ligne }); y -= 18; }); y -= 12; };
+  table("", [["Main-d'œuvre", M + 6], ["Heures", 400, 1], ["Taux", 480, 1], ["Montant", fin - 6, 1]], f.mo.filter(l => l.d || num(l.h)).map(l => [l.d, String(num(l.h)).replace(".", ","), argent(num(l.taux)), argent(num(l.h) * num(l.taux))]));
+  const mj = 1 + num(f.maj) / 100;
+  table("", [["Matériel", M + 6], ["Qté", 400, 1], ["Prix unitaire", 480, 1], ["Montant", fin - 6, 1]], f.mat.filter(l => l.d).map(l => [l.d, String(num(l.q)), argent(num(l.prix) * mj), argent(num(l.q) * num(l.prix) * mj)]));
+  table("", [["Autres frais", M + 6], ["Montant", fin - 6, 1]], f.autres.filter(l => l.d || num(l.m)).map(l => [l.d, argent(num(l.m))]));
+  page(); [["Sous-total", T.st], ["TPS (5 %)" + (f.ent.tps ? "  " + f.ent.tps : ""), T.tps], ["TVQ (9,975 %)" + (f.ent.tvq ? "  " + f.ent.tvq : ""), T.tvq], ["Total", T.tot]].forEach(([l, v], i) => {
+    const g = i === 3; if (g) p.drawRectangle({ x:330, y:y - 22, width:fin - 330, height:22, color:pale }); droite(l, 480, y - 15, g ? 12 : 10, g ? B : R); droite(argent(v), fin - 6, y - 15, g ? 12 : 10, g ? B : R); y -= g ? 24 : 18; });
+  y -= 10; if (f.cond) { t(f.cond, M, y, 9, R, gris); y -= 18; }
+  if (f.signee) { if (y < M + 110) { p = doc.addPage([W, H]); y = H - M; } y -= 6; t("Travaux acceptés par le client", M, y, 8, B, gris);
+    const im = await doc.embedPng(f.signee.img), h = 60, w = Math.min(220, im.width * h / im.height); p.drawImage(im, { x:M, y:y - h - 4, width:w, height:h });
+    y -= h + 10; p.drawLine({ start:{ x:M, y }, end:{ x:M + 240, y }, thickness:0.7, color:gris }); t(f.signee.nom + " · " + f.signee.date, M, y - 12, 9); }
+  /* pied : exercice scolaire */
+  doc.getPages().forEach(pg => pg.drawText("Facture produite dans le cadre d'un projet d'élève - Pavillon de l'Avenir (Métier+)", { x:M, y:24, size:7, font:R, color:gris }));
+  const blob = new Blob([await doc.save()], { type:"application/pdf" }), nom = "Facture-" + f.no + ".pdf", a = document.createElement("a");
+  const fichier = new File([blob], nom, { type:"application/pdf" });
+  if (courriel && navigator.canShare && navigator.canShare({ files:[fichier] })) { try { await navigator.share({ files:[fichier], title:"Facture " + f.no, text:"Bonjour, voici la facture " + f.no + " pour les travaux effectués. Merci !" }); return; } catch(e){ if (e.name === "AbortError") return; } }
+  a.href = URL.createObjectURL(blob); a.download = nom; a.click();
+  if (courriel) { location.href = "mailto:" + encodeURIComponent(f.client.courriel || "") + "?subject=" + encodeURIComponent("Facture " + f.no + (f.ent.nom ? " - " + f.ent.nom : "")) + "&body=" + encodeURIComponent("Bonjour,\n\nVoici la facture " + f.no + " pour les travaux effectués (total : " + argent(T.tot) + ").\nLe PDF est joint à ce courriel.\n\nMerci de votre confiance !\n" + (f.ent.nom || "")); toast("PDF téléchargé : joins-le au courriel."); }
+  } catch(e){ toast("PDF impossible : " + e.message); } }
+
+async function demarrer(){ if (!C) return entree(); $("#app").innerHTML = `<p class="sous">Chargement…</p>`; await charger(); liste(); }
+lireK(); demarrer();
+</script>
+<script src="js/journal-perf.js?v=7"></script>
+</body>
+</html>
