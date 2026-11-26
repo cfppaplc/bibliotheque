@@ -25,7 +25,6 @@ window.PlanMagasin = (function(){
       @media (prefers-reduced-motion:reduce){.pm-f.actif{animation:none}}
       .pm-p{fill:#EB6A22;stroke:#fff;stroke-width:2;animation:pmFl .6s ease-in-out infinite alternate}.pm-p.fait{fill:#1E8A55;animation:none}
       .pm-pt{font:800 9px system-ui,sans-serif;fill:#fff;text-anchor:middle;dominant-baseline:middle;pointer-events:none}
-      @media (prefers-reduced-motion:reduce){.pm-p{animation:none}}
       .pm-l{font:600 11px system-ui,sans-serif;fill:#5b6678;text-anchor:middle}</style>`;
     o += `<polygon points="${room.join(" ")}" fill="#fff"/>`;
     const yK = R * (1 - F.K / dh);
@@ -48,7 +47,8 @@ window.PlanMagasin = (function(){
     /* points : un par raccord, à sa case */
     points.forEach((pt, i) => { const m = String(pt.r || "").trim().toUpperCase().match(/^([A-Z])\s*-?\s*(\d+)/); if (!m || !faces[m[1]]) return;
       const F2 = faces[m[1]], tot = F2.reduce((a, f) => a + f[2], 0), n = Math.max(1, Math.min(V.sec, +m[2])); let d = (n - .5) / V.sec * tot;
-      for (const [x, y, h] of F2){ if (d <= h){ o += `<circle class="pm-p${pt.fait ? " fait" : ""}" cx="${x}" cy="${y + d}" r="8"/><text class="pm-pt" x="${x}" y="${y + d + .5}">${i + 1}</text>`; break; } d -= h; } });
+      for (const [x, y, h] of F2){ if (d <= h){ o += pt.fait ? `<circle class="pm-p fait" cx="${x}" cy="${y + d}" r="8"/>` : `<circle cx="${x}" cy="${y + d}" r="8" fill="none" stroke="#EB6A22" stroke-width="3"><animate attributeName="r" values="8;20" dur="1s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;0" dur="1s" repeatCount="indefinite"/></circle><circle class="pm-p" cx="${x}" cy="${y + d}" r="8"><animate attributeName="fill" values="#EB6A22;#FFD25A;#EB6A22" dur=".8s" repeatCount="indefinite"/></circle>`;
+          o += `<text class="pm-pt" x="${x}" y="${y + d + .5}">${i + 1}</text>`; break; } d -= h; } });
     return `<svg viewBox="-30 -20 ${X2 + 60} ${H + 40}" role="img" aria-label="Plan du magasin">${o}</svg>`;
   }
   const lettre = r => (String(r || "").trim().match(/^[A-Za-z]/) || [""])[0].toUpperCase();
