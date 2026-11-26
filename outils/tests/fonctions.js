@@ -308,6 +308,7 @@ test("Magasin : l'élève (carte scannée) envoie son panier, l'enseignant appro
   vrai(P.length === 1 && P[0].code === "12345" && P[0].items[0].q === 2, "Panier mal envoyé : " + JSON.stringify(P));
   /* 25 nov. (Jeremy) : l'élève modifie son panier tant qu'il est en attente, ou l'annule */
   p.on("dialog", d => d.accept());
+  await p.waitForSelector("details.mesP", { timeout: 4000 }); await p.$eval("details.mesP", d => d.open = true);
   await p.waitForSelector("[data-mod]", { timeout: 4000 }); await p.click("[data-mod]"); await attendre(400);
   vrai(/Enregistrer les changements/.test(await p.textContent("#pEnv")), "Modifier : le panier ne s'ouvre pas en modification");
   await p.fill("#pNote", "Cabine 4"); await p.click("#pEnv"); await attendre(1000);
@@ -370,6 +371,8 @@ test("Magasin : l'élève (carte scannée) envoie son panier, l'enseignant appro
   await p.reload(); await attendre(1500); const sv = await p.evaluate(() => document.body.innerText);
   if (process.env.CAPTURES) await p.screenshot({ path: process.env.CAPTURES + "/eleve-suivi.png" });
   vrai(/Refusé/.test(sv) && /Mauvais diamètre/.test(sv), "L'élève ne voit pas le refus et le commentaire");
+  await p.$eval("details.mesP", d => d.open = true); await p.click("[data-cor]"); await attendre(400);   /* 26 nov. : corriger un panier refusé */
+  vrai(/Mauvais diamètre/.test(await p.textContent(".corrige")) && (await p.$$("#pL .art")).length > 0, "Corriger : le panier refusé ne revient pas avec le commentaire"); await p.click("#pF"); await attendre(200);
   /* poste de commande partagé (iPad) : après l'envoi, l'écran se vide pour l'élève suivant */
   const c4 = await b.newContext({ viewport: { width: 820, height: 1180 }, hasTouch: true, serviceWorkers: "block" }); await mock(c4);
   const po = await c4.newPage(); po.on("pageerror", e => errs.push(e.message)); await po.goto(BASE + "magasin.html?poste=1&e=jeremy.raymond"); await attendre(800);

@@ -144,6 +144,14 @@ input.cache-code:not(:placeholder-shown){-webkit-text-security:disc;text-securit
 .suivi.remis,.suivi.refuse{background:var(--carte);opacity:.92}
 .suivi .motif{border-left:3px solid var(--rouge);border-radius:6px;background:rgba(200,40,40,.06)}
 @media (prefers-color-scheme:dark){.av{background:#24304a;color:#b9c7e6}.cmd .rgp{background:#3a2412;color:#ffb27a}.cmd .qb{background:#e8ecf4;color:#14213d}}
+
+.corrige{margin:0 0 12px;padding:10px 14px;border-radius:12px;border-left:4px solid var(--rouge);background:rgba(200,40,40,.06)}
+/* 26 nov. : barre « Mes paniers envoyés » repliable */
+.mesP{margin:14px 0 6px}.mesP>summary{list-style:none;display:flex;align-items:center;gap:8px;flex-wrap:wrap;cursor:pointer;padding:12px 16px;border-radius:14px;background:var(--carte);border:1px solid var(--ligne);box-shadow:0 1px 2px rgba(20,33,61,.05)}
+.mesP>summary::-webkit-details-marker{display:none}.mesP>summary::after{content:"";margin-left:auto;width:9px;height:9px;border-right:2.5px solid currentColor;border-bottom:2.5px solid currentColor;transform:rotate(45deg);transition:transform .15s}
+.mesP[open]>summary::after{transform:rotate(-135deg)}.mesP[open]>summary{margin-bottom:10px}
+.rp{display:inline-flex;align-items:center;gap:6px;font-size:.85rem;font-weight:600;padding:3px 10px;border-radius:99px;background:rgba(128,128,128,.1)}.rp i{width:8px;height:8px;border-radius:50%;background:#8a94a8}
+.rp.attente i{background:#E8A317}.rp.approuve{background:#E3F4EA;color:var(--vert)}.rp.approuve i{background:var(--vert)}.rp.refuse i{background:var(--rouge)}
 </style>
 </head>
 <body>
@@ -261,6 +269,7 @@ function panier(){
   const EDIT = LS.get("magEdit", ""), ov = $("#ov"), ids = Object.keys(PANIER).filter(id => CAT.find(a => a.id === id));
   ov.hidden = false; document.body.style.overflow = "hidden";
   ov.innerHTML = `<div class="top"><img src="img/metier-plus-blanc.svg" alt=""><b>Mon panier</b><span class="sp"></span><button id="pF">‹ Continuer</button></div><main>
+    ${!EDIT && LS.get("magCorrige", null) ? `<div class="corrige"><b>Corrige ton panier selon ton enseignant :</b> ${esc(LS.get("magCorrige", {}).motif || "")}</div>` : ""}
     <div class="carte" style="padding:0" id="pL">${ids.length ? ids.map(id => ligneArt(CAT.find(a => a.id === id))).join("") : `<p class="vide">Ton panier est vide.</p>`}</div>
     <label for="pNote"><b>Pour quel travail ?</b> <span class="sous">(facultatif : cabine, projet…)</span></label><textarea id="pNote" maxlength="300">${esc(LS.get("magNote", ""))}</textarea>
     <p class="sous" style="margin-top:12px">Ton enseignant reçoit ton panier sur son cellulaire. Quand il l'approuve, va au comptoir du magasin avec ta carte étudiante.</p>
@@ -274,13 +283,14 @@ function panier(){
     const items = Object.keys(PANIER).map(id => { const a = CAT.find(x => x.id === id); return a && { id, n:a.n, nom:a.nom, q:PANIER[id], r:a.r || "" }; }).filter(Boolean);
     if (EDIT) { try { const r = await rpc("panier_modifier", { p_id:EDIT, p_code:MOI.code, p_items:items, p_note:$("#pNote").value || null });   /* 25 nov. : modifier jusqu'à l'approbation */
         if (!r || !r.ok) throw new Error(r && r.err || "refus");
-        const E = LS.get("magEnvois", []), x = E.find(y => y.id === EDIT); if (x) x.n = items.reduce((s, i) => s + i.q, 0); LS.set("magEnvois", E);
+        const E = LS.get("magEnvois", []), x = E.find(y => y.id === EDIT); if (x) { x.n = items.reduce((s, i) => s + i.q, 0); x.items = items.map(i => ({ id:i.id, q:i.q })); } LS.set("magEnvois", E);
         LS.set("magEdit", ""); PANIER = {}; sauverPanier(); LS.set("magNote", ""); toast("Panier modifié."); fermer(); }
       catch(e){ $("#pErr").textContent = "Modification impossible : " + e.message; b.disabled = false; b.textContent = "Enregistrer les changements"; }
       return; }
     try { const r = await rpc("panier_envoyer", { p_ens:MOI.ens, p_groupe:MOI.groupe, p_code:MOI.code, p_items:items, p_note:$("#pNote").value || null, p_prenom:MOI.prenom || LS.get("magPrenom", "") || null, p_profs:MOI.profs && MOI.profs.length ? MOI.profs : null });
       if (!r || !r.ok) throw new Error(r && r.err || "refus");
-      const E = LS.get("magEnvois", []); E.unshift({ id:r.id, t:Date.now(), code:MOI.code, n:items.reduce((s, i) => s + i.q, 0) }); LS.set("magEnvois", E.slice(0, 20));
+      const COR = LS.get("magCorrige", null); let E = LS.get("magEnvois", []); if (COR) E = E.filter(y => y.id !== COR.id); LS.set("magCorrige", null);   /* 26 nov. : le panier corrigé remplace le refusé */
+      E.unshift({ id:r.id, t:Date.now(), code:MOI.code, n:items.reduce((s, i) => s + i.q, 0), items:items.map(i => ({ id:i.id, q:i.q })) }); LS.set("magEnvois", E.slice(0, 20));
       PANIER = {}; sauverPanier(); LS.set("magNote", ""); toast("Panier envoyé à ton enseignant."); fermer(); }   /* 25 nov. : les iPad sont rangés dans les coffres (un par équipe) : on ne vide plus l'écran après l'envoi, seulement après 2 minutes sans toucher */
     catch(e){ $("#pErr").textContent = "Envoi impossible : " + (e.message === "trop de paniers en attente" ? "tu as déjà 2 paniers en attente. Touche « Modifier » sur un panier en attente pour y ajouter des raccords." : e.message); b.disabled = false; b.textContent = "Envoyer à mon enseignant"; } };
 }
@@ -291,14 +301,19 @@ async function suivi(){
   const E = LS.get("magEnvois", []).filter(x => x.code === MOI.code && Date.now() - x.t < 7 * 864e5); if (!E.length) { z.innerHTML = ""; return; }
   const S = await Promise.all(E.map(x => rpc("panier_etat", { p_id:x.id }).catch(() => null)));
 const LBL = { attente:"En attente de ton enseignant", approuve:"Approuvé · va au comptoir avec ta carte", refuse:"Refusé", remis:"Remis" };
-  z.innerHTML = `<div class="sec">Mes paniers envoyés</div>` + E.map((x, k) => { const s = S[k] || { etat:"?" };
-    return `<div class="carte suivi ${esc(s.etat)}"><div class="bandeau"><i></i><b>${esc(LBL[s.etat] || "…")}</b><small>${heure(x.t)} · ${x.n} article${x.n > 1 ? "s" : ""}</small></div>${s.motif ? `<p class="motif">${esc(s.motif)}</p>` : ""}
+  const cpt = {}; S.forEach(s => { if (s) cpt[s.etat] = (cpt[s.etat] || 0) + 1; });   /* 26 nov. (Jeremy) : paniers envoyés repliés dans une barre */
+  const resume = [["approuve", "approuvé"], ["attente", "en attente"], ["refuse", "refusé"], ["remis", "remis"]].filter(([k]) => cpt[k]).map(([k, t]) => `<span class="rp ${k}"><i></i>${cpt[k]} ${t}${cpt[k] > 1 ? "s" : ""}</span>`).join("");
+  z.innerHTML = `<details class="mesP"${LS.get("magSuiviOuv", false) ? " open" : ""}><summary><b>Mes paniers envoyés</b>${resume}</summary>` + E.map((x, k) => { const s = S[k] || { etat:"?" };
+    return `<div class="carte suivi ${esc(s.etat)}"><div class="bandeau"><i></i><b>${esc(LBL[s.etat] || "…")}</b><small>${heure(x.t)} · ${x.n} article${x.n > 1 ? "s" : ""}</small></div>${s.motif ? `<p class="motif">${esc(s.motif)}</p>` : ""}${s.etat === "refuse" && x.items && x.items.length ? `<div class="act" style="margin:0 14px 12px"><button class="btn p petit" data-cor="${esc(x.id)}">Corriger et renvoyer</button></div>` : ""}
       ${s.etat === "attente" && !POSTE && "PushManager" in window && !x.abo ? `<button class="btn p" data-abo="${esc(x.id)}" style="margin:0 18px 14px">Me prévenir sur mon cellulaire</button>` : ""}${s.etat === "attente" && x.abo ? `<small class="sous">Tu seras averti sur ce cellulaire dès que ton enseignant répond.</small>` : ""}
       ${s.etat === "attente" ? `<div class="act" style="margin:0 18px 14px;display:flex;gap:8px">${s.items ? `<button class="btn" data-mod="${esc(x.id)}">Modifier</button>` : ""}<button class="btn r" data-ann="${esc(x.id)}">Annuler ce panier</button></div>` : ""}
-      ${s.etat === "approuve" ? `<span data-cb="MP-${esc(x.code)}"></span><p class="sous" style="text-align:center;margin:0">Montre ta carte ou ce code au magasinier.</p>` : ""}</div>`; }).join("");
+      ${s.etat === "approuve" ? `<span data-cb="MP-${esc(x.code)}"></span><p class="sous" style="text-align:center;margin:0">Montre ta carte ou ce code au magasinier.</p>` : ""}</div>`; }).join("") + `</details>`;
+  z.querySelector("details.mesP").ontoggle = e => LS.set("magSuiviOuv", e.target.open);
   z.querySelectorAll("[data-cb]").forEach(s => codeBarres(s, s.dataset.cb, 70));
   z.querySelectorAll("[data-mod]").forEach(b => b.onclick = () => { const k = E.findIndex(y => y.id === b.dataset.mod), st = S[k]; if (!st || !st.items) return;
     PANIER = {}; st.items.forEach(i => { PANIER[i.id] = (PANIER[i.id] || 0) + (+i.q || 1); }); sauverPanier(); LS.set("magNote", st.note || ""); LS.set("magEdit", b.dataset.mod); panier(); });
+  z.querySelectorAll("[data-cor]").forEach(b => b.onclick = () => { const k = E.findIndex(y => y.id === b.dataset.cor), x = E[k], st = S[k]; if (!x || !x.items) return;   /* 26 nov. (Jeremy) : après un refus, l'élève corrige selon le commentaire */
+    PANIER = {}; x.items.forEach(i => { if (CAT.find(a => a.id === i.id)) PANIER[i.id] = (PANIER[i.id] || 0) + (+i.q || 1); }); sauverPanier(); LS.set("magEdit", ""); LS.set("magCorrige", { id:x.id, motif:(st && st.motif) || "" }); panier(); });
   z.querySelectorAll("[data-ann]").forEach(b => b.onclick = async () => { if (!confirm("Annuler ce panier ? Ton enseignant ne le verra plus.")) return; b.disabled = true;
     try { if (await rpc("panier_annuler", { p_id:b.dataset.ann, p_code:MOI.code }) !== true) throw new Error("déjà traité par ton enseignant");
       LS.set("magEnvois", LS.get("magEnvois", []).filter(y => y.id !== b.dataset.ann)); if (LS.get("magEdit", "") === b.dataset.ann) LS.set("magEdit", ""); toast("Panier annulé."); suivi(); }
