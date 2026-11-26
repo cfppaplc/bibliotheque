@@ -6,9 +6,14 @@
 <title>Magasin · Métier+</title>
 <meta name="robots" content="noindex">
 <meta name="theme-color" content="#1E2A44">
-<link rel="manifest" href="manifest.webmanifest" id="mf"><script>/* 25 nov. : « Sur l'écran d'accueil » ouvre le bon écran (comptoir ou poste de commande) */
-{ const m = new URLSearchParams(location.search); if (m.get("mode") === "magasin") { document.getElementById("mf").href = "magasin-comptoir.webmanifest"; document.write('<link rel="apple-touch-icon" href="img/magasin-comptoir-180.png"><meta name="apple-mobile-web-app-title" content="Comptoir">'); document.title = "Comptoir"; } else if (m.get("poste")) document.getElementById("mf").href = "magasin-poste.webmanifest";
-  else if (m.get("mode") === "prof") { document.getElementById("mf").href = "magasin-prof.webmanifest"; document.write('<link rel="apple-touch-icon" href="img/magasin-prof-180.png"><meta name="apple-mobile-web-app-title" content="Commandes">'); document.title = "Commandes"; } }</script><link rel="apple-touch-icon" href="img/metier-plus-icone.svg">
+<script>/* 25 nov. : « Sur l'écran d'accueil » : bon écran, bonne icône et bon nom selon le mode. Un seul lien manifest, écrit ici
+   (un manifest par défaut chargé avant faisait proposer « Métier+ » par l'iPhone). */
+{ const m = new URLSearchParams(location.search), mo = m.get("mode"),
+    v = mo === "magasin" ? ["magasin-comptoir.webmanifest", "img/magasin-comptoir-180.png", "Comptoir"]
+      : mo === "prof" ? ["magasin-prof.webmanifest", "img/magasin-prof-180.png", "Commandes"]
+      : m.get("poste") ? ["magasin-poste.webmanifest", "img/icone-180.png", "Magasin"] : ["manifest.webmanifest", "img/icone-180.png", "Magasin"];
+  document.write('<link rel="manifest" href="' + v[0] + '"><link rel="apple-touch-icon" href="' + v[1] + '"><meta name="apple-mobile-web-app-title" content="' + v[2] + '"><meta name="apple-mobile-web-app-capable" content="yes">');
+  document.title = v[2]; }</script>
 <script src="vieux-navigateur.js"></script><script src="signaler.js?v=2"></script>
 <style>
 /* © 2026 Jérémy Raymond. Tous droits réservés. Métier+ — Magasin de raccords (25 nov.) */
