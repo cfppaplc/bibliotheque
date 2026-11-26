@@ -112,6 +112,9 @@ test("Administration : chaque onglet s'ouvre; Quoi de neuf se modifie et s'annul
   const cy = await p.evaluate(() => { PlanMagasin.cases = { "2": "6-9, 27-30", "53": "A 1-30" }; const d = document.createElement("div");
     d.innerHTML = PlanMagasin.svg(new Set(["J"]), new Set(), [{ r: "J-28" }, { r: "A-12" }, { r: "J-200" }]); return [...d.querySelectorAll("circle.pm-p")].map(c => +c.getAttribute("cy")); });
   vrai(cy.length === 2 && cy[0] > 126 && cy[0] < 174, "Plan : J-28 hors de la partie 2 (" + cy.join(",") + ")");
+  const cy2 = await p.evaluate(() => { PlanMagasin.cases = { "5": "139-165", "6": "215-221", "7": "222-228" }; PlanMagasin.tailles = { "5": 4, "6": 1, "7": 1, "8": 0 }; const d = document.createElement("div");
+    d.innerHTML = PlanMagasin.svg(new Set(["J"]), new Set(), [{ r: "J-140" }, { r: "J-164" }, { r: "J-218" }, { r: "J-225" }]); PlanMagasin.tailles = {}; return [...d.querySelectorAll("circle.pm-p")].map(c => +c.getAttribute("cy")); });
+  vrai(cy2.length === 4 && cy2[0] < cy2[1] && cy2[1] < cy2[2] && cy2[2] < cy2[3], "Plan : grande étagère puis petites, dans l'ordre (" + cy2.join(",") + ")");
   vrai(!p.errs.length, p.errs.join(" | "));
 });
 

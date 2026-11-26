@@ -472,3 +472,4 @@ body.clair .as-lien{background:#f5f6fa;border-color:#e3e6ee}body.clair .as-sig{b
 .ap-plan{display:grid;grid-template-columns:minmax(220px,380px) 1fr;gap:14px;align-items:start}.ap-plan-svg svg{width:100%;height:auto;display:block;position:sticky;top:8px}
 .ap-plan-l{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:4px 10px}.ap-plan-l label{display:flex;align-items:center;gap:6px}.ap-plan-l b{min-width:22px;text-align:right}.ap-plan-l i{font-style:normal;color:var(--gris,#667);min-width:12px}.ap-plan-l input{flex:1;min-width:0;padding:5px 8px}
 @media (max-width:760px){.ap-plan{grid-template-columns:1fr}}
+.ap-plan-l input.ap-taille{flex:none;width:52px;text-align:center}

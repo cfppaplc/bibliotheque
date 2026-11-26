@@ -780,3 +780,5 @@
 - 26 nov. : plan du magasin, côté J du haut : parties 1-3 publiées (étage 4 = 35-37/38-40/41-44; 88-90 en partie 3; 90 et 99-101 supposés présents, à la demande de Jeremy).
 - 26 nov. : partie 4 (côté J du haut, gros casiers, 1 par étage, 7 étages) = 104-110. Case 103 non placée.
 - 26 nov. : case 37 → partie 2 (étage 4 : 35-36 / 37-40 / 41-44).
+- 26 nov. : rangée J du haut, vue de face : 10 et 11 (partie 3, étage 1) , 35-36 (partie 1, étage 4) , 89 (partie 3, étage 8) et 22 (partie 3, étage 2) sont de grosses cases (2 largeurs). Aucun effet sur le plan vu de haut.
+- 26 nov. : rangée J complète. Plan : longueur par partie (plan.tailles, champ dans Administration), point placé selon la position de la case dans son étage (groupe = étage; « a-b + c-d » = un étage en deux suites). J bas : partie 5 = grande étagère (taille 4) 143-152 (bacs jaunes dessus), 139-142+154-165, 166-183, 184-192, 193-200, 201-208; partie 6 = petite 1 215-221; partie 7 = petite 2 222-228; partie 8 = 0. Non placées : 103, 153, 209-214.
