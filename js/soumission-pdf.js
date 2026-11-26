@@ -35,24 +35,27 @@ window.SoumissionPDF = (function(){
     entete(false);
     texte(p, "Bonjour,", M, y, 11); y -= 15;
     texte(p, "Pourriez-vous nous faire parvenir vos prix et votre délai de livraison pour les pièces suivantes ? Merci !", M, y, 11); y -= 15;
-    texte(p, "Vous pouvez inscrire vos prix directement dans ce PDF : les totaux se calculent seuls.", M, y, 9, fi, gris); y -= 24;
+    texte(p, "Inscrivez vos prix dans les cases jaunes de ce PDF : les totaux se calculent seuls. Lignes vides : pièces à ajouter.", M, y, 9, fi, gris); y -= 24;
     /* coordonnées à remplir par le fournisseur */
     [["Fournisseur", "fournisseur", "N° de soumission", "no_soumission"], ["Représentant", "representant", "Délai de livraison", "delai"]].forEach(r => {
       [[r[0], r[1], M], [r[2], r[3], M + (fin - M) / 2 + 8]].forEach(([l, n, x]) => { const w = (fin - M) / 2 - 8; texte(p, l, x, y, 8, f, gris);
         champ(p, n, x, y - 20, w, 16); p.drawLine({ start:{ x, y:y - 21 }, end:{ x:x + w, y:y - 21 }, thickness:0.7, color:gris }); });
       y -= 34; });
     y -= 6; titres();
-    A.forEach((a, i) => { if (y < M + 140) { p = doc.addPage([W, H]); entete(true); titres(); }
+    const V = o.vides == null ? 4 : o.vides, B = A.concat(Array.from({ length:V }, () => ({ vide:true })));
+    B.forEach((a, i) => { if (y < M + 140) { p = doc.addPage([W, H]); entete(true); titres(); }
       const k = i + 1; if (i % 2) p.drawRectangle({ x:M, y:y - hL, width:fin - M, height:hL, color:pale });
       texte(p, String(k), M + 6, y - 15, 10, f, gris);
-      let nom = String(a.nom); while (f.widthOfTextAtSize(nom, 10) > cQ - cD - 10 && nom.length > 4) nom = nom.slice(0, -2); if (nom !== String(a.nom)) nom = nom.trim() + "…";
-      texte(p, nom, cD + 4, y - 15, 10); const q = String(+a.q || 1); texte(p, q, cP - 6 - fb.widthOfTextAtSize(q, 10), y - 15, 10, fb);
+      if (a.vide) { champ(p, "d" + k, cD + 2, y - hL + 3, cQ - cD - 2, hL - 6, { fond:rgb(1, 0.98, 0.9) }); const cq = champ(p, "q" + k, cQ + 6, y - hL + 3, cP - cQ - 10, hL - 6, { droite:true, fond:rgb(1, 0.98, 0.9) }); actions(cq, { K:"AFNumber_Keystroke(0, 3, 0, 0, \"\", false);" }); }
+      else { let nom = String(a.nom); while (f.widthOfTextAtSize(nom, 10) > cQ - cD - 10 && nom.length > 4) nom = nom.slice(0, -2); if (nom !== String(a.nom)) nom = nom.trim() + "…";
+        texte(p, nom, cD + 4, y - 15, 10); const q = String(+a.q || 1); texte(p, q, cP - 6 - fb.widthOfTextAtSize(q, 10), y - 15, 10, fb); }
       const cp = champ(p, "p" + k, cP + 3, y - hL + 3, cT - cP - 6, hL - 6, { droite:true, fond:rgb(1, 0.98, 0.9) }); actions(cp, argent);
       const ct = champ(p, "t" + k, cT + 3, y - hL + 3, fin - cT - 6, hL - 6, { droite:true, lecture:true, fond:i % 2 ? pale : rgb(1, 1, 1) });
-      actions(ct, { C:'var v = this.getField("p' + k + '").value; event.value = (v === "" ? "" : ' + (+a.q || 1) + ' * Number(v));', F:argent.F }); ordre.push(ct);
+      const qte = a.vide ? 'Number(this.getField("q' + k + '").value)' : String(+a.q || 1);
+      actions(ct, { C:'var v = this.getField("p' + k + '").value; event.value = (v === "" ? "" : ' + qte + ' * Number(v));', F:argent.F }); ordre.push(ct);
       p.drawLine({ start:{ x:M, y:y - hL }, end:{ x:fin, y:y - hL }, thickness:0.5, color:ligne }); y -= hL; });
     /* totaux */
-    const n = A.length, somme = 'var s = 0; for (var i = 1; i <= ' + n + '; i++) { var v = this.getField("t" + i).value; if (v !== "") s += Number(v); } event.value = s;';
+    const n = A.length, somme = 'var s = 0; for (var i = 1; i <= ' + B.length + '; i++) { var v = this.getField("t" + i).value; if (v !== "") s += Number(v); } event.value = s;';
     [["Sous-total", "st", somme, false], ["TPS (5 %)", "tps", 'event.value = Number(this.getField("st").value) * 0.05;', false],
      ["TVQ (9,975 %)", "tvq", 'event.value = Number(this.getField("st").value) * 0.09975;', false],
      ["Total", "tot", 'event.value = Number(this.getField("st").value) + Number(this.getField("tps").value) + Number(this.getField("tvq").value);', true]].forEach(([l, nom, js, gras]) => {
