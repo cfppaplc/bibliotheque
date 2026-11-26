@@ -59,10 +59,19 @@ const valide = c => /^MP-\d{3,5}-[A-Z0-9]{4,12}$/.test(c);
 /* carte reçue par le code QR (#c=…&g=…&p=…) : gardée, puis le # est effacé de l'adresse */
 (() => { const h = new URLSearchParams(location.hash.slice(1)), c = (h.get("c") || "").toUpperCase();
   if (valide(c)) { LS.set("mpCarte", { c, g:h.get("g") || "", p:(h.get("p") || "").split(/\s+/)[0].slice(0, 30), t:Date.now() }); history.replaceState(null, "", location.pathname); } })();
+/* carte sans prénom (entrée avec l'ancienne clé complète) : le prénom vient de la fiche de l'élève, publiée par le registre */
+async function chercherCode(c){ const te = new TextEncoder(), base = "metier+|carte-code|" + c;
+  const r = await (await fetch("https://kjlotlhqrgekzohshmbn.supabase.co/rest/v1/rpc/carte_code_lire", { method:"POST", headers:{ apikey:"sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY", "Content-Type":"application/json" }, body:JSON.stringify({ p_code:c }) })).json();
+  if (!r || r.etat !== "ok") return r && r.etat === "bloque" ? "bloque" : null;
+  const b = Uint8Array.from(atob(JSON.parse(r.data).d), x => x.charCodeAt(0)), cle = await crypto.subtle.importKey("raw", await crypto.subtle.digest("SHA-256", te.encode(base + "|cle")), "AES-GCM", false, ["decrypt"]);
+  return JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({ name:"AES-GCM", iv:b.slice(0, 12) }, cle, b.slice(12)))); }
+let PRENOM_FAIT = false;
+async function completerPrenom(K){ if (PRENOM_FAIT || !K || !K.c || K.p) return; PRENOM_FAIT = true; const m = K.c.match(/^MP-(\d{5})-/); if (!m) return;
+  try { const o = await chercherCode(m[1]); if (o && o.c === K.c && o.p) { K.p = o.p; K.g = K.g || o.g || ""; LS.set("mpCarte", K); afficher(); } } catch(e){} }
 function afficher(){
   const K = LS.get("mpCarte"); $("#vide").hidden = !!K; $("#vue").hidden = !K; if (!K) { $("#cle").focus(); return; }
   const code = K.c.split("-")[1];
-  $("#vG").textContent = K.g || "Métier+"; $("#vP").textContent = K.p || ""; $("#vN").textContent = code;
+  $("#vG").textContent = K.g || "Métier+"; $("#vP").textContent = K.p || ""; completerPrenom(K); $("#vN").textContent = code;
   $("#vCb").src = Code128.url(K.c, 60, false); $("#vCb").alt = K.c;
   const M = QRLib.matrice(K.c), k = M.length;
   $("#vQr").innerHTML = `<svg viewBox="0 0 ${k + 8} ${k + 8}" width="150" height="150"><rect width="${k + 8}" height="${k + 8}" fill="#fff"/>${M.map((r, y) => r.map((v, x) => v ? `<rect x="${x + 4}" y="${y + 4}" width="1.02" height="1.02"/>` : "").join("")).join("")}</svg>`;
@@ -77,12 +86,9 @@ $("#ok").onclick = async () => { const c = $("#cle").value.trim().toUpperCase().
   if (valide(c)) { LS.set("mpCarte", { c, g:"", p:"", t:Date.now() }); afficher(); return; }   /* clé complète (ancienne façon) */
   if (!/^\d{5}$/.test(c)) { $("#err").textContent = "Écris ton code à 5 chiffres."; return; }
   $("#err").textContent = "Recherche…";
-  try { const te = new TextEncoder(), base = "metier+|carte-code|" + c;
-    const r = await (await fetch("https://kjlotlhqrgekzohshmbn.supabase.co/rest/v1/rpc/carte_code_lire", { method:"POST", headers:{ apikey:"sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY", "Content-Type":"application/json" }, body:JSON.stringify({ p_code:c }) })).json();
-    if (r && r.etat === "bloque") { $("#err").textContent = "Trop d'essais en ce moment. Réessaie dans 10 minutes."; return; }
-    if (!r || r.etat !== "ok") { $("#err").textContent = "Code inconnu. Vérifie avec ton enseignant."; return; }
-    const b = Uint8Array.from(atob(JSON.parse(r.data).d), x => x.charCodeAt(0)), cle = await crypto.subtle.importKey("raw", await crypto.subtle.digest("SHA-256", te.encode(base + "|cle")), "AES-GCM", false, ["decrypt"]);
-    const o = JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({ name:"AES-GCM", iv:b.slice(0, 12) }, cle, b.slice(12))));
+  try { const o = await chercherCode(c);
+    if (o === "bloque") { $("#err").textContent = "Trop d'essais en ce moment. Réessaie dans 10 minutes."; return; }
+    if (!o) { $("#err").textContent = "Code inconnu. Vérifie avec ton enseignant."; return; }
     $("#err").textContent = ""; LS.set("mpCarte", { c:o.c, g:o.g || "", p:o.p || "", t:Date.now() }); afficher(); }
   catch(e){ $("#err").textContent = "Internet ne répond pas. Réessaie."; } };
 $("#cle").onkeydown = e => { if (e.key === "Enter") $("#ok").click(); }; $("#cle").oninput = () => { if (/^\d{5}$/.test($("#cle").value.trim())) $("#ok").click(); };

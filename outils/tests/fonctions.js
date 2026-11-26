@@ -358,6 +358,9 @@ test("Carte : l'élève affiche sa carte avec son code à 5 chiffres seulement; 
   /* carte perdue : la recherche suit la nouvelle clé; personne d'autre ne peut la remplacer */
   vrai(await p.evaluate(() => ELEVE_CARTES.publierCode({ c: "48213", k: "NEWK44", p: "Marc" }, "K7Q9X2")), "Nouvelle carte : recherche non mise à jour");
   vrai(!(await p.evaluate(() => ELEVE_CARTES.publierCode({ c: "48213", k: "PIRATE", p: "Marc" }))), "N'importe qui peut remplacer la carte");
+  /* ancienne carte entrée avec la clé complète (sans prénom) : le prénom s'ajoute tout seul */
+  await p.evaluate(() => localStorage.setItem("mpCarte", JSON.stringify({ c: "MP-48213-NEWK44", g: "", p: "", t: 1 }))); await p.reload(); await attendre(1200);
+  vrai((await p.textContent("#vP")).trim() === "Marc", "Ancienne carte : le prénom ne s'ajoute pas");
   E = 30; await p.evaluate(() => localStorage.removeItem("mpCarte")); await p.reload(); await attendre(600);
   await p.fill("#cle", "48213"); await attendre(500); vrai(/Trop d'essais/.test(await p.textContent("#err")), "Pas de pause après trop de codes inconnus");
   vrai(!errs.length, errs.join(" | ")); await c.close();
