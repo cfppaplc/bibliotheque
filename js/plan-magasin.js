@@ -8,7 +8,17 @@ window.PlanMagasin = (function(){
   /* svg(actives, faites) : chaîne SVG; actives et faites = ensembles de lettres de rangée */
   /* 25 nov. (Jeremy : « un point pour chaque raccord, à la Amazon ») : rangée « H-4 » (ou « H-4-B ») = côté H, case 4.
      Les cases d'un côté se comptent de la fenêtre vers le fond : l'étagère du haut, puis celle du bas. */
-  function svg(actives, faites, points){
+  /* 26 nov. (Jeremy) : chaque côté d'étagère est coupé en 4 parties numérotées (1 à 56, à partir de la fenêtre de service);
+     Administration → Magasin dit quelles cases sont dans chaque partie (plan.parties du catalogue), modifiable si les cases changent.
+     Texte d'une partie : « 2-5, 12-15 » (lettre du plan) ou « A 1-30, B 1-7 » (autre lettre). */
+  const ORDRE = ["J", "I", "H", "G", "F", "E", "D", "K"], NPART = 4;
+  let CASES = {};
+  function lireCases(t, lettreDefaut){ const L = []; let l = lettreDefaut;
+    String(t || "").toUpperCase().split(/[,;]/).forEach(x => { const m = x.trim().match(/^([A-Z])?\s*-?\s*(\d+)\s*(?:-\s*(\d+))?$/); if (!m) return; if (m[1]) l = m[1];
+      const a = +m[2], b = m[3] ? +m[3] : a; L.push([l, Math.min(a, b), Math.max(a, b)]); }); return L; }
+  function partieDe(r, parts){ const m = String(r || "").trim().toUpperCase().match(/^([A-Z])\s*-?\s*(\d+)/); if (!m) return null; const n = +m[2];
+    return parts.find(p => lireCases(CASES[p.n], p.l).some(([l, a, b]) => l === m[1] && n >= a && n <= b)) || null; }
+  function svg(actives, faites, points, opts){ opts = opts || {};
     actives = actives || new Set(); faites = faites || new Set(); points = points || []; const faces = {};
     const W = F.chain.reduce((s, c) => s + c[1], 0), dh = W - F.top, R = Math.sqrt(F.diag ** 2 - dh ** 2), H = F.left + R, X2 = W + F.ext;
     const room = [[0, R], [dh, 0], [W, 0], [W, F.rightDrop], [X2, F.rightDrop], [X2, H], [0, H]];
@@ -44,13 +54,25 @@ window.PlanMagasin = (function(){
     const wa = dh + V.winA, wb = wa + V.winW;
     o += `<line x1="${wa}" y1="0" x2="${wb}" y2="0" stroke="#EB6A22" stroke-width="4"/><text class="pm-l" x="${(wa + wb) / 2}" y="16">Fenêtre de service</text>`;
     o += `<text class="pm-l" x="${dh / 2 + 14}" y="${R / 2 + 26}">Porte</text>`;
-    /* points : un par raccord, à sa case */
-    points.forEach((pt, i) => { const m = String(pt.r || "").trim().toUpperCase().match(/^([A-Z])\s*-?\s*(\d+)/); if (!m || !faces[m[1]]) return;
+    /* parties numérotées (même ordre que l'image envoyée à Jeremy) */
+    const parts = []; let k = 0;
+    ORDRE.forEach(l => (faces[l] || []).forEach(([x, y, h]) => { for (let i = 0; i < NPART; i++){ k++; parts.push({ n:k, l, x, y0:y + i * h / NPART, h:h / NPART }); } }));
+    if (opts.numeros){ const DX = { K:-13, J:-10, I:10, H:-10, G:-15, F:15, E:10, D:10 };
+      parts.forEach(p => { const on = opts.numeros === true || opts.numeros === p.n, cy = p.y0 + p.h / 2;
+        o += `<rect x="${p.x - 4}" y="${p.y0 + 1}" width="8" height="${p.h - 2}" rx="2" fill="${on ? (p.n % 2 ? "#EB6A22" : "#1F5F8B") : "#d5dbe3"}"/><rect x="${p.x + DX[p.l] - 9}" y="${cy - 8}" width="18" height="16" rx="8" fill="#fff" stroke="#14213d"/><text class="pm-pt" style="fill:#14213d;font-size:8.5px" x="${p.x + DX[p.l]}" y="${cy + .5}">${p.n}</text>`; }); }
+    /* points : un par raccord, dans sa partie si Administration l'a placée, sinon à sa case (ancienne règle) */
+    const dejaP = {};
+    points.forEach((pt, i) => { const P = Object.keys(CASES).length ? partieDe(pt.r, parts) : null;
+      if (P){ const j = dejaP[P.n] = (dejaP[P.n] || 0) + 1, cy = P.y0 + Math.min(P.h - 8, 8 + (j - 1) * 14 % Math.max(14, P.h - 8));
+        o += pt.fait ? `<circle class="pm-p fait" cx="${P.x}" cy="${cy}" r="8"/>` : `<circle cx="${P.x}" cy="${cy}" r="8" fill="none" stroke="#EB6A22" stroke-width="3"><animate attributeName="r" values="8;20" dur="1s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;0" dur="1s" repeatCount="indefinite"/></circle><circle class="pm-p" cx="${P.x}" cy="${cy}" r="8"><animate attributeName="fill" values="#EB6A22;#FFD25A;#EB6A22" dur=".8s" repeatCount="indefinite"/></circle>`;
+        o += `<text class="pm-pt" x="${P.x}" y="${cy + .5}">${i + 1}</text>`; return; }
+      if (Object.keys(CASES).length) return;   /* case placée nulle part : pas de point plutôt qu'un point au mauvais endroit */ const m = String(pt.r || "").trim().toUpperCase().match(/^([A-Z])\s*-?\s*(\d+)/); if (!m || !faces[m[1]]) return;
       const F2 = faces[m[1]], tot = F2.reduce((a, f) => a + f[2], 0), n = Math.max(1, Math.min(V.sec, +m[2])); let d = (n - .5) / V.sec * tot;
       for (const [x, y, h] of F2){ if (d <= h){ o += pt.fait ? `<circle class="pm-p fait" cx="${x}" cy="${y + d}" r="8"/>` : `<circle cx="${x}" cy="${y + d}" r="8" fill="none" stroke="#EB6A22" stroke-width="3"><animate attributeName="r" values="8;20" dur="1s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;0" dur="1s" repeatCount="indefinite"/></circle><circle class="pm-p" cx="${x}" cy="${y + d}" r="8"><animate attributeName="fill" values="#EB6A22;#FFD25A;#EB6A22" dur=".8s" repeatCount="indefinite"/></circle>`;
           o += `<text class="pm-pt" x="${x}" y="${y + d + .5}">${i + 1}</text>`; break; } d -= h; } });
     return `<svg viewBox="-30 -20 ${X2 + 60} ${H + 40}" role="img" aria-label="Plan du magasin">${o}</svg>`;
   }
   const lettre = r => (String(r || "").trim().match(/^[A-Za-z]/) || [""])[0].toUpperCase();
-  return { svg, lettre };
+  const parties = () => { const L = []; let k = 0; [["J", 2], ["I", 2], ["H", 2], ["G", 2], ["F", 2], ["E", 2], ["D", 1], ["K", 1]].forEach(([l, s]) => { for (let i = 0; i < s * NPART; i++) L.push({ n:++k, l }); }); return L; };
+  return { svg, lettre, parties, lireCases, set cases(c){ CASES = c || {}; }, get cases(){ return CASES; } };
 })();
