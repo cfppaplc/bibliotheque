@@ -90,5 +90,6 @@ window.PlanMagasin = (function(){
           + (G.length ? G.map(g => `<div style="display:flex;gap:2px;margin-bottom:2px">` + g.split("+").flatMap(x => { const m = x.trim().toUpperCase().match(/^([A-Z])?\s*-?\s*(\d+)\s*(?:-\s*(\d+))?$/); return m ? nums(+m[2], m[3] ? +m[3] : +m[2]) : []; })
               .map(n => `<span${T.has(n) ? ' class="pm-cl"' : ""} style="flex:1;min-width:0;height:22px;display:flex;align-items:center;justify-content:center;background:${c};color:#fff;font:700 9px system-ui;border-radius:3px;overflow:hidden">${n}</span>`).join("") + `</div>`).join("")
             : `<div style="height:22px;border:2px dashed #c9d0da;border-radius:4px;display:flex;align-items:center;justify-content:center;font:700 .75rem system-ui;color:#8a94a6">à remplir</div>`) + `</div>`; }).join("") + `</div>`).join("") + `</div>`; }
-  return { svg, lettre, parties, vueFace, lireCases, set cases(c){ CASES = c || {}; }, get cases(){ return CASES; }, set tailles(t){ TAILLES = t || {}; } };
+  const place = r => Object.keys(CASES).length > 0 && !!partieDe(r, parties().filter(p => taille(p.n) > 0));   /* la case est-elle placée sur le plan ? */
+  return { svg, lettre, parties, vueFace, place, lireCases, set cases(c){ CASES = c || {}; }, get cases(){ return CASES; }, set tailles(t){ TAILLES = t || {}; } };
 })();

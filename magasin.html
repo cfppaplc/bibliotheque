@@ -106,7 +106,7 @@ input.cache-code:not(:placeholder-shown){-webkit-text-security:disc;text-securit
 <main id="app"><p class="vide">Chargement…</p></main>
 <div class="ov" id="ov" hidden></div>
 <div class="barre" id="barre" hidden></div>
-<script src="js/qrcode.js"></script><script src="js/code128.js?v=1"></script><script src="js/plan-magasin.js?v=7"></script>
+<script src="js/qrcode.js"></script><script src="js/code128.js?v=1"></script><script src="js/plan-magasin.js?v=8"></script>
 <script>
 "use strict";
 const SUPA = "https://kjlotlhqrgekzohshmbn.supabase.co", CLE = "sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY";
@@ -490,7 +490,7 @@ function preparer(p){ if (!p) return;
   const dessiner = () => {
     const lettres = new Set(L.map(i => PlanMagasin.lettre(rangee(i))).filter(Boolean));
     const finies = new Set([...lettres].filter(l => L.filter(i => PlanMagasin.lettre(rangee(i)) === l).every(i => faits.has(i.id || i.n))));
-    const tout = L.every(i => faits.has(i.id || i.n)), prochain = L.find(i => !faits.has(i.id || i.n));   /* 26 nov. (Jeremy) : seulement le prochain raccord à trouver clignote sur le plan */
+    const tout = L.every(i => faits.has(i.id || i.n)), prochain = L.find(i => !faits.has(i.id || i.n) && PlanMagasin.place(rangee(i))) || L.find(i => !faits.has(i.id || i.n));   /* d'abord un raccord placé sur le plan (les rangées pas encore entrées n'ont pas de point) */   /* 26 nov. (Jeremy) : seulement le prochain raccord à trouver clignote sur le plan */
     ov.innerHTML = `<div class="top"><img src="img/metier-plus-blanc.svg" alt=""><b>Préparer · ${esc(p.prenom || "élève")} (${esc(p.code)})${p.ids ? " · " + p.ids.length + " commandes" : ""}</b><span class="sp"></span><button id="prF">‹ Comptoir</button></div>
       <main class="prep"><div class="prep-plan">${PlanMagasin.svg(lettres, finies, L.map(i => ({ r:i === prochain ? rangee(i) : "" })))}<p class="sous" style="text-align:center;margin:4px 0">Touche une lettre pour voir la rangée de face.</p>${faceL ? `<div class="prep-face">${PlanMagasin.vueFace(faceL, L.filter(i => !faits.has(i.id || i.n) && PlanMagasin.lettre(rangee(i)) === faceL).map(i => (String(rangee(i)).match(/(\d+)/) || [])[1]))}<button class="btn" id="prFace" style="width:100%;margin-top:8px">Fermer la vue de face</button></div>` : ""}</div><div class="prep-l">
       <p class="sous">${esc(p.groupe)} · ${esc(nomEns(p.ens))}${p.note ? " · " + esc(p.note) : ""}</p>
