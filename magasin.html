@@ -14,7 +14,7 @@
 /* © 2026 Jérémy Raymond. Tous droits réservés. Métier+ — Magasin de raccords (25 nov.) */
 :root{--fond:#F4F1EC;--carte:#fff;--carte2:#F8F6F2;--txt:#1E2A44;--doux:#6b7280;--ligne:#E5DAC6;--acc:#EB6A22;--vert:#1E8A55;--rouge:#C9362E;color-scheme:light}
 @media (prefers-color-scheme:dark){:root{--fond:#12161f;--carte:#1b2130;--carte2:#232a3b;--txt:#eef1f6;--doux:#9aa3b2;--ligne:#2f3850;color-scheme:dark}}
-[hidden]{display:none!important}*{box-sizing:border-box}html,body{margin:0;background:var(--fond);color:var(--txt);font:16px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-tap-highlight-color:transparent}
+#avisZ>:empty{display:none}[hidden]{display:none!important}*{box-sizing:border-box}html,body{margin:0;background:var(--fond);color:var(--txt);font:16px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-tap-highlight-color:transparent}
 button,input,textarea,select{font:inherit;color:inherit}
 .top{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:12px;padding:12px max(16px,env(safe-area-inset-left));background:var(--txt);color:#fff}
 @media (prefers-color-scheme:dark){.top{background:#0b0f17}}
@@ -276,10 +276,10 @@ async function dessinerProf(){
   const avis = "Notification" in window && "serviceWorker" in navigator && "PushManager" in window, perm = avis ? Notification.permission : "non";
   const ios = /iPhone|iPad|iPod/.test(navigator.userAgent) && !window.navigator.standalone && !matchMedia("(display-mode: standalone)").matches;
   $("#app").innerHTML = `<h1>Commandes à approuver</h1><p class="sous">${att.length ? att.length + " panier" + (att.length > 1 ? "s" : "") + " en attente." : "Aucun panier en attente."} Mis à jour toutes les 15 secondes.</p>
-    <div class="carte" id="avisZ">${perm === "granted" && LS.get("magAbonne|" + ENS, false) ? `<span class="ok">Cet appareil reçoit les avis des paniers.</span>` : (/iPhone|iPad|iPod|Macintosh/.test(navigator.userAgent) && "ontouchend" in document && !navigator.standalone ? `<span class="sous">Avis sur cet appareil : ajoute d'abord cette page à l'écran d'accueil (Partager → Sur l'écran d'accueil).</span>`
+    <div class="carte" id="avisZ" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:12px 14px">${perm === "granted" && LS.get("magAbonne|" + ENS, false) ? `<span class="ok">Cet appareil reçoit les avis des paniers.</span>` : (/iPhone|iPad|iPod|Macintosh/.test(navigator.userAgent) && "ontouchend" in document && !navigator.standalone ? `<span class="sous">Avis sur cet appareil : ajoute d'abord cette page à l'écran d'accueil (Partager → Sur l'écran d'accueil).</span>`
       : !("PushManager" in window) ? `<span class="sous">Cet appareil ne peut pas recevoir d'avis. Garde la page ouverte : un son t'avertit.</span>`
-      : `<button class="btn p" id="avOui">Recevoir les avis sur cet appareil</button><p class="err" id="avErr"></p>`)}
-      <p class="err" id="avErr"></p><button class="btn" id="apAj" style="margin-top:6px">Ajouter un appareil (cellulaire, autre ordinateur)</button><div id="apQr"></div></div>
+      : `<button class="btn p" id="avOui">Recevoir les avis ici</button>`)}
+      <button class="btn" id="apAj">Ajouter un appareil</button><p class="err" id="avErr" style="min-height:0;margin:0;width:100%"></p><div id="apQr" style="width:100%"></div></div>
     ${AVIS.length ? `<div class="sec">Avis du magasinier</div><div class="carte avisMag">${AVIS.map(a => `<div class="av"><span><b>${esc(a.prenom || "Élève")}</b> <small class="sous">${esc(a.code)} · ${esc(a.groupe)} · ${heure(a.t)}</small><br>${esc(REGLES_L[a.regle] || "?")}</span><button class="btn" data-vu="${esc(a.id)}" title="Retirer de cette page (reste dans le dossier de l'élève)">Vu</button></div>`).join("")}<p class="sous" style="margin:8px 0 0">« Vu » retire l'avis d'ici; il reste dans le dossier de l'élève.</p></div>` : ""}
     <div class="sec">En attente</div>${att.length ? att.map(p => cmdHtml(p, true)).join("") : `<p class="vide">Rien à approuver.</p>`}
     <div class="sec">Traités (24 dernières heures)</div>${aut.length ? aut.map(p => cmdHtml(p, false)).join("") : `<p class="vide">Aucun.</p>`}
