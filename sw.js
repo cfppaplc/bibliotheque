@@ -2,7 +2,7 @@
    - Les pages du site (bibliothèque, accueil, index de recherche) : réseau d'abord, copie gardée si Internet manque.
    - Les livres : copie gardée sur l'ordinateur, ouverte tout de suite; on vérifie en arrière-plan s'il existe une nouvelle version.
    - Les plans et les activités (PDF) : réseau d'abord (version à jour), copie gardée si Internet manque. */
-const CACHE = "biblio-v98";
+const CACHE = "biblio-v99";
 const BASE = ["./", "index.html", "accueil.html", "recherche.json", "nouveautes.json", "carte.html", "js/code128.js?v=1", "js/qrcode.js", "img/metier-plus-blanc.svg"];
 
 self.addEventListener("install", e => {
@@ -88,6 +88,6 @@ self.addEventListener("push", e => {
   e.waitUntil(self.registration.showNotification(d.title || "Métier+ · Magasin", { body: d.body || "", tag: d.tag || "magasin", icon: "img/metier-plus-icone.svg", badge: "img/metier-plus-icone.svg", data: { url: d.url || "/magasin.html?mode=prof" }, renotify: true }));
 });
 self.addEventListener("notificationclick", e => {
-  e.notification.close(); const url = new URL((e.notification.data && e.notification.data.url) || "/magasin.html?mode=prof", self.location.origin).href, voulu = url.includes("mode=prof") ? "mode=prof" : "magasin.html";
+  e.notification.close(); const url = new URL((e.notification.data && e.notification.data.url) || "/magasin.html?mode=prof", self.location.origin).href, voulu = url.includes("mode=prof") ? "mode=prof" : url.includes("mode=magasin") ? "mode=magasin" : "magasin.html";
   e.waitUntil(clients.matchAll({ type: "window", includeUncontrolled: true }).then(L => { const c = L.find(w => w.url.includes("magasin.html") && (voulu !== "magasin.html" || !w.url.includes("mode=")) && w.url.includes(voulu)); if (c) { c.navigate(url).catch(() => {}); return c.focus(); } return clients.openWindow(url); }));
 });

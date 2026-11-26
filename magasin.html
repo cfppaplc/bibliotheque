@@ -6,7 +6,8 @@
 <title>Magasin · Métier+</title>
 <meta name="robots" content="noindex">
 <meta name="theme-color" content="#1E2A44">
-<link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="img/metier-plus-icone.svg">
+<link rel="manifest" href="manifest.webmanifest" id="mf"><script>/* 25 nov. : « Sur l'écran d'accueil » ouvre le bon écran (comptoir ou poste de commande) */
+{ const m = new URLSearchParams(location.search); if (m.get("mode") === "magasin") document.getElementById("mf").href = "magasin-comptoir.webmanifest"; else if (m.get("poste")) document.getElementById("mf").href = "magasin-poste.webmanifest"; }</script><link rel="apple-touch-icon" href="img/metier-plus-icone.svg">
 <script src="vieux-navigateur.js"></script><script src="signaler.js?v=2"></script>
 <style>
 /* © 2026 Jérémy Raymond. Tous droits réservés. Métier+ — Magasin de raccords (25 nov.) */
@@ -100,6 +101,11 @@ textarea{width:100%;min-height:80px;border-radius:12px;border:1px solid var(--li
 "use strict";
 const SUPA = "https://kjlotlhqrgekzohshmbn.supabase.co", CLE = "sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY";
 const $ = s => document.querySelector(s), Q = new URLSearchParams(location.search), MODE = Q.get("mode") || "eleve";
+/* 25 nov. (Jeremy : « ils vont utiliser un iPad ») : poste de commande partagé (?poste=1) : rien ne reste d'un élève à l'autre */
+const POSTE = !!Q.get("poste");
+function finPoste(msg){ MOI = null; PANIER = {}; LS.set("magEleve", null); LS.set("magPrenom", ""); LS.set("magNote", ""); sauverPanier(); eleveEntree(msg); }
+if (POSTE) { let t = 0; const rearmer = () => { clearTimeout(t); t = setTimeout(() => { if (MOI) finPoste("Session terminée (2 minutes sans toucher)."); }, 120000); };
+  ["pointerdown", "keydown", "input"].forEach(e => addEventListener(e, rearmer, true)); rearmer(); }
 const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
 const norm = s => String(s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
 const LS = { get:(k, d) => { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch(e){ return d; } }, set:(k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} } };
@@ -154,7 +160,7 @@ function eleveEntree(msg){
     const L = await trouverEleve(c.code);
     if (!L.length) { $("#cOk").disabled = false; $("#cErr").textContent = "Code inconnu. Vérifie avec ton enseignant."; return; }
     if (!pre) for (const x of L) { pre = await prenomDeCarte(c.code, c.cle, x.enc); if (pre) break; }   /* carte scannée : le prénom vient du registre */
-    if (!pre) { const K = LS.get("mpCarte", null); if (K && K.p && String(K.c || "").includes("-" + c.code + "-")) pre = String(K.p).split(/\s+/)[0]; }
+    if (!pre && !POSTE) { const K = LS.get("mpCarte", null); if (K && K.p && String(K.c || "").includes("-" + c.code + "-")) pre = String(K.p).split(/\s+/)[0]; }
     if (!pre) { $("#cOk").disabled = false; $("#preZ").hidden = false; $("#cErr").textContent = "Écris ton prénom (le magasinier le verra)."; $("#cPre").focus(); return; }
     LS.set("magPrenom", pre);
     if (L.length === 1) return connecter(c.code, L[0]);
@@ -205,7 +211,8 @@ function panier(){
     try { const r = await rpc("panier_envoyer", { p_ens:MOI.ens, p_groupe:MOI.groupe, p_code:MOI.code, p_items:items, p_note:$("#pNote").value || null, p_prenom:MOI.prenom || LS.get("magPrenom", "") || null, p_profs:MOI.profs && MOI.profs.length ? MOI.profs : null });
       if (!r || !r.ok) throw new Error(r && r.err || "refus");
       const E = LS.get("magEnvois", []); E.unshift({ id:r.id, t:Date.now(), code:MOI.code, n:items.reduce((s, i) => s + i.q, 0) }); LS.set("magEnvois", E.slice(0, 20));
-      PANIER = {}; sauverPanier(); LS.set("magNote", ""); toast("Panier envoyé à ton enseignant."); fermer(); }
+      PANIER = {}; sauverPanier(); LS.set("magNote", ""); toast("Panier envoyé à ton enseignant."); fermer();
+      if (POSTE) setTimeout(() => finPoste("Panier envoyé. Au suivant ! Scanne ta carte pour voir où en est ton panier."), 4000); }
     catch(e){ $("#pErr").textContent = "Envoi impossible : " + (e.message === "trop de paniers en attente" ? "tu as déjà 3 paniers en attente. Attends la réponse de ton enseignant." : e.message); b.disabled = false; b.textContent = "Envoyer à mon enseignant"; } };
 }
 /* suivi des paniers envoyés (sur cet iPad), mis à jour toutes les 10 s */
@@ -217,7 +224,7 @@ async function suivi(){
 const LBL = { attente:"En attente de ton enseignant", approuve:"Approuvé · va au comptoir avec ta carte", refuse:"Refusé par ton enseignant", remis:"Remis · bon travail" };
   z.innerHTML = `<div class="sec">Mes paniers envoyés</div>` + E.map((x, k) => { const s = S[k] || { etat:"?" };
     return `<div class="carte suivi ${esc(s.etat)}"><div class="bandeau">${esc(LBL[s.etat] || "…")}</div><small class="sous">Envoyé ${heure(x.t)} · ${x.n} article${x.n > 1 ? "s" : ""}</small>${s.motif ? `<p class="motif"><b>Commentaire de ton enseignant :</b> ${esc(s.motif)}</p>` : ""}
-      ${s.etat === "attente" && "PushManager" in window && !x.abo ? `<button class="btn p" data-abo="${esc(x.id)}" style="margin:0 18px 14px">Me prévenir sur mon cellulaire</button>` : ""}${s.etat === "attente" && x.abo ? `<small class="sous">Tu seras averti sur ce cellulaire dès que ton enseignant répond.</small>` : ""}
+      ${s.etat === "attente" && !POSTE && "PushManager" in window && !x.abo ? `<button class="btn p" data-abo="${esc(x.id)}" style="margin:0 18px 14px">Me prévenir sur mon cellulaire</button>` : ""}${s.etat === "attente" && x.abo ? `<small class="sous">Tu seras averti sur ce cellulaire dès que ton enseignant répond.</small>` : ""}
       ${s.etat === "approuve" ? `<span data-cb="MP-${esc(x.code)}"></span><p class="sous" style="text-align:center;margin:0">Montre ta carte ou ce code au magasinier.</p>` : ""}</div>`; }).join("");
   z.querySelectorAll("[data-cb]").forEach(s => codeBarres(s, s.dataset.cb, 70));
   /* changement d'état pendant que la page est ouverte : son + vibration + message */
@@ -326,9 +333,22 @@ function magasinier(){
   i.focus(); charger(); avisComptoir();
 }
 /* avis du comptoir : notification de l'ordinateur ou de la tablette (page ouverte), son et titre qui clignote */
-function avisComptoir(){ if (!("Notification" in window) || Notification.permission !== "default") return;
-  const b = document.createElement("button"); b.className = "btn p"; b.textContent = "Activer les avis des nouvelles commandes"; b.style.margin = "0 0 12px";
-  b.onclick = async () => { try { await Notification.requestPermission(); } catch(e){} b.remove(); $("#mC").focus(); }; $("#app").prepend(b); }
+function avisComptoir(){
+  const ios = /iPhone|iPad|iPod|Macintosh/.test(navigator.userAgent) && "ontouchend" in document, app = navigator.standalone || matchMedia("(display-mode: standalone)").matches;
+  if (LS.get("magComptoirAbo", false) && "Notification" in window && Notification.permission === "granted") return;
+  const z = document.createElement("div"); z.className = "carte"; z.style.marginBottom = "12px";
+  if (ios && !app) { z.innerHTML = `<b>Avis des nouvelles commandes sur cet iPad</b><p class="sous">Touche <b>Partager</b> puis <b>« Sur l'écran d'accueil »</b>, ouvre le comptoir depuis cette icône, puis active les avis.</p>`; $("#app").prepend(z); return; }
+  if (!("Notification" in window)) return;
+  z.innerHTML = `<button class="btn p" id="acOui">Recevoir les avis des nouvelles commandes ici</button><p class="err" id="acEr"></p>`; $("#app").prepend(z);
+  $("#acOui").onclick = async () => { try {
+      if (await Notification.requestPermission() !== "granted") throw new Error("avis refusés");   /* au toucher, avant toute attente (iPad) */
+      if ("PushManager" in window && "serviceWorker" in navigator) { const reg = await navigator.serviceWorker.register("sw.js"); await navigator.serviceWorker.ready;
+        let sub = await reg.pushManager.getSubscription();
+        if (!sub) { const { cle } = await (await fetch(SUPA + "/functions/v1/panier-avis", { headers:{ apikey:CLE } })).json(); sub = await reg.pushManager.subscribe({ userVisibleOnly:true, applicationServerKey:Uint8Array.from(atob(cle.replace(/-/g, "+").replace(/_/g, "/")), c => c.charCodeAt(0)) }); }
+        if (await rpc("magasin_abonner", { p_abonnement:sub.toJSON(), p_oui:true }) !== true) throw new Error("refus"); }
+      LS.set("magComptoirAbo", true); z.remove(); toast("Avis activés : cet appareil sonne à chaque commande approuvée."); $("#mC").focus();
+    } catch(e){ $("#acEr").textContent = "Avis impossibles : " + e.message; } };
+}
 let titreT = 0; function clignoterTitre(n){ clearInterval(titreT); const t0 = "Métier+ — Comptoir du magasin", msg = "(" + n + ") Nouvelle commande"; let k = 0;
   titreT = setInterval(() => { document.title = k++ % 2 ? t0 : msg; if (k > 20 || document.hasFocus()) { clearInterval(titreT); document.title = t0; } }, 800); }
 async function charger(){ clearTimeout(magT);
@@ -408,6 +428,7 @@ async function remettre(id, oui){ try { await rpc("panier_remettre", { p_id:id, 
   await Promise.all([chargerComptes(), chargerCatalogue()]);
   if (MODE === "prof") return prof();
   if (MODE === "magasin") return magasinier();
+  if (POSTE) { LS.set("magEleve", null); MOI = null; return eleveEntree(); }
   if (MOI && MOI.code) return eleveCatalogue();
   const K = LS.get("mpCarte", null);   /* « Ma carte Métier+ » sur ce cellulaire : entrée directe */
   if (K && K.c) { eleveEntree(); $("#cCode").value = K.c; $("#cOk").click(); return; }

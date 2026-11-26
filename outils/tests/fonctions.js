@@ -249,8 +249,14 @@ test("Magasin : l'élève (carte scannée) envoie son panier, l'enseignant appro
   await p.reload(); await attendre(1500); const sv = await p.evaluate(() => document.body.innerText);
   if (process.env.CAPTURES) await p.screenshot({ path: process.env.CAPTURES + "/eleve-suivi.png" });
   vrai(/Refusé par ton enseignant/.test(sv) && /Mauvais diamètre/.test(sv), "L'élève ne voit pas le refus et le commentaire");
+  /* poste de commande partagé (iPad) : après l'envoi, l'écran se vide pour l'élève suivant */
+  const c4 = await b.newContext({ viewport: { width: 820, height: 1180 }, hasTouch: true, serviceWorkers: "block" }); await mock(c4);
+  const po = await c4.newPage(); po.on("pageerror", e => errs.push(e.message)); await po.goto(BASE + "magasin.html?poste=1&e=jeremy.raymond"); await attendre(800);
+  await po.fill("#cCode", "MP-12345-K7Q9X2"); await po.keyboard.press("Enter"); await attendre(1200);
+  await po.click(".art .aj"); await po.click("#bVoir", { force: true }); await attendre(300); await po.click("#pEnv"); await attendre(5200);
+  vrai(!!(await po.$("#cCode")) && !(await po.evaluate(() => localStorage.getItem("magEleve") && JSON.parse(localStorage.getItem("magEleve")))), "Poste partagé : l'élève reste connecté après l'envoi");
   vrai(!errs.length, errs.join(" | "));
-  await c1.close(); await c2.close(); await c3.close();
+  await c1.close(); await c2.close(); await c3.close(); await c4.close();
 });
 
 (async () => {
