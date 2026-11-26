@@ -261,7 +261,7 @@ window.LIVRES_EXTERNES = true;   // les livres sont des fichiers du dossier livr
 <script>/* 25 nov. (erreurs « zout / DPRI / initDonnees is not defined » sur un cellulaire) : un script n'est pas arrivé (réseau coupé) : on recharge la page une seule fois */
 function mpScriptsOk(...n){ if (n.every(f => typeof window[f] === "function")) return; try { if (sessionStorage.mpRechJs) return; sessionStorage.mpRechJs = "1"; } catch(e){ return; } location.reload(); }
 mpScriptsOk("zout", "DPRI");</script>
-<script src="js/eleve-reponses.js?v=2"></script><script src="js/tableau-blanc.js?v=17"></script>
+<script src="js/eleve-reponses.js?v=3"></script><script src="js/tableau-blanc.js?v=17"></script>
 <script>/* 17 nov. : si le fichier du tableau blanc n'est pas arrivé (réseau coupé), on recharge la page une fois */ if (typeof setIcn === "undefined") { try { if (!sessionStorage.rechTB) { sessionStorage.rechTB = "1"; location.reload(); } } catch(e){} } else { try { sessionStorage.removeItem("rechTB"); } catch(e){} }</script>
 <script src="js/lecteur.js?v=16"></script>
 <script src="js/defi-livre-data.js?v=7"></script>
@@ -513,10 +513,10 @@ if ("serviceWorker" in navigator && (location.protocol === "https:" || location.
 window.addEventListener("offline", () => { try { aviser("Pas d'Internet : les livres déjà ouverts sur cet ordinateur restent disponibles."); } catch(e){} });
 window.addEventListener("online", () => { try { aviser("Internet est revenu."); } catch(e){} });
 </script>
-<link rel="stylesheet" href="css/acces.css?v=9">
+<link rel="stylesheet" href="css/acces.css?v=10">
 <div class="acces-ov" id="accesOv" hidden role="dialog" aria-modal="true"><div class="acces-box" id="accesBox"></div></div>
 <div class="acces-menu" id="accesMenu" hidden></div>
-<script src="js/acces.js?v=12"></script>
+<script src="js/acces.js?v=13"></script>
 <script src="js/admin-site.js?v=3"></script>
 <script src="js/admin-plus.js?v=9"></script>
 

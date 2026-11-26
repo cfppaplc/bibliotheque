@@ -313,9 +313,26 @@ try { for (let w = window; ; w = w.parent){ if (/[?&]gestion=1/.test(w.location.
       <div class="agR"><b>Enseignants</b><span>${esc(txt("#peShare"))}</span><button data-c="#peShare">Modifier</button></div>
       <div class="agR"><b>Locaux</b><span>${esc(txt("#peLoc"))}</span><button data-c="#peLoc">Modifier</button></div>
       <div class="agR"><b>Élèves</b><span>${nb(g)} élève${nb(g) > 1 ? "s" : ""} · touche un élève pour sa fiche (code, équipe, retirer)</span></div>
+      <div class="agR"><b>Cartes</b><span>Les élèves entrent dans Métier+ avec leur carte, sans mot de passe</span><button data-cartes>Activer</button></div>
       <div class="agA"><button class="p" data-c="#gaEl">+ Ajouter des élèves</button><button data-c="#gaCodes">Étiquettes et fiches « Ma carte »</button><button data-c="#mPl">Placer les équipes</button></div>`;
     $("#agT").querySelectorAll("[data-c]").forEach(b => b.onclick = ev => { ev.stopPropagation(); $(b.dataset.c).click(); });
+    $("#agT").querySelector("[data-cartes]").onclick = () => activerCartes(g);
   }
+  /* 25 nov. : chaque carte du groupe reçoit la clé du compte de groupe (chiffrée avec la clé de la carte) */
+  async function activerCartes(g){
+    const T = window.top, P = PASS(); if (!T.ACCES || !T.ACCES.activerCartes) { toast("Ouvre Groupes et élèves depuis l'Administration."); return; }
+    let C = {}; try { C = (await (await fetch("comptes.json?t=" + Date.now(), { cache:"no-store" })).json()).comptes || {}; } catch(e){}
+    const grp = Object.entries(C).filter(([, c]) => c.eleve), el = Object.values(P.D.el).filter(e => !e.x && e.g === g && e.c && e.k);
+    const dlg = $("#partDlg");
+    dlg.innerHTML = `<h3>Cartes du groupe ${esc(g)}</h3><p>Les ${el.length} élèves de ce groupe pourront entrer dans Métier+ en scannant leur carte (ou avec « Ma carte » sur leur cellulaire), sans mot de passe. Ils auront les livres du compte choisi.</p>
+      <label>Compte de groupe</label><select id="acG" style="width:100%;min-height:44px;margin:6px 0 10px">${grp.map(([id, c]) => `<option value="${esc(id)}">${esc(c.nom || id)}</option>`).join("")}</select>
+      <label>Mot de passe de ce compte</label><input id="acM" type="password" style="width:100%;min-height:44px;margin-top:6px" autocomplete="off">
+      <p class="pd-er" hidden></p><div class="pd-a"><button data-x>Annuler</button><button data-ok class="on">Activer les cartes</button></div>`;
+    dlg.querySelector("[data-x]").onclick = () => dlg.close();
+    dlg.querySelector("[data-ok]").onclick = async ev => { const er = dlg.querySelector(".pd-er"); er.hidden = true; ev.target.disabled = true; ev.target.textContent = "Activation…";
+      try { const n = await T.ACCES.activerCartes($("#acG").value, $("#acM").value, el.map(e => ({ c:String(e.c), k:e.k }))); dlg.close(); toast(n + " carte" + (n > 1 ? "s" : "") + " activée" + (n > 1 ? "s" : "") + ". Refais-le quand tu ajoutes des élèves ou changes le mot de passe du groupe."); }
+      catch(e){ er.hidden = false; er.textContent = e.message; ev.target.disabled = false; ev.target.textContent = "Activer les cartes"; } };
+    dlg.showModal(); }
   function dessiner(){
     afaire(); majLoc(); majShare(); $("#pePl").hidden = true; $("#plBan").hidden = !PLACE; $("#peQ").style.display = PLACE ? "none" : ""; $("#plBan").style.display = PLACE ? "flex" : "none";
     { const ac = avecCoffres(), bc = document.querySelector('.ga-ong [data-t="co"]'); bc.hidden = !ac && !ADM(); $("#mPl").hidden = false; $("#gaGrpN").hidden = !ADM(); $("#gaEl").hidden = !ADM() || !groupe() || PLACE; $("#gaCodes").hidden = !groupe() || PLACE;
@@ -583,6 +600,6 @@ try { for (let w = window; ; w = w.parent){ if (/[?&]gestion=1/.test(w.location.
   $("#fiche").addEventListener("close", () => delete $("#fiche").dataset.id);
 })();
 </script>
-<script src="js/eleve-cartes.js?v=1"></script><script src="js/journal-perf.js?v=7"></script>
+<script src="js/eleve-cartes.js?v=2"></script><script src="js/journal-perf.js?v=7"></script>
 </body>
 </html>

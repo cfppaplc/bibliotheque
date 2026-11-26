@@ -96,5 +96,7 @@ window.ELEVE_REP = (function(){
   async function voir(c, k, livre){ if (typeof LIVRES === "undefined") return false; const l = LIVRES.find(x => x.fichier === livre); if (!l) return false;
     MOI = { c, k, voir:true }; IDX = null; charges.delete(livre); try { sessionStorage.setItem("eleveMoi", JSON.stringify(MOI)); } catch(e){}
     await charger(livre); majBarre(); lire(l); return true; }
-  return { pfx, avantLire, planifier, changer, demander, voir, get moi(){ return MOI; } };
+  /* connexion par la carte (acces.js) : l'élève est déjà identifié */
+  function definir(c, k){ MOI = { c, k }; IDX = null; charges.clear(); try { sessionStorage.setItem("eleveMoi", JSON.stringify(MOI)); } catch(e){} majBarre(); }
+  return { pfx, avantLire, planifier, changer, demander, voir, definir, get moi(){ return MOI; } };
 })();

@@ -369,6 +369,12 @@ async function envoyerRegles(id, L){ let n = 0; for (const r of L) { try { const
 const REGLES = [null, "Nom exact du raccord", "Carte étudiante", "Consignes d'accès", "Matériel propre", "Feuille de l'enseignant", "Bris / usage perso"];
 const REGLES_L = [null, "Ne connaissait pas le nom exact du raccord", "Sans carte étudiante", "Consignes d'accès non respectées", "Matériel rendu sale", "Sans feuille de l'enseignant", "Bris ou usage personnel"];
 let SIG = new Map();
+/* commandes d'un même élève réunies : quantités additionnées par raccord; « Remis » remet toutes les commandes */
+let MULTI = new Map();
+function regrouper(L){ const G = new Map(); L.forEach(p => { const k = p.code; if (!G.has(k)) G.set(k, []); G.get(k).push(p); }); return [...G.values()].map(g => g.length > 1 ? rassembler(g) : g[0]); }
+function rassembler(L){ const M = new Map();
+  L.forEach(p => (p.items || []).forEach(i => { const k = i.id || i.n, x = M.get(k); if (x) x.q = (+x.q || 1) + (+i.q || 1); else M.set(k, Object.assign({}, i, { q:+i.q || 1 })); }));
+  const p0 = L[0]; return Object.assign({}, p0, { id:"multi-" + L.map(p => p.id).join("-"), ids:L.map(p => p.id), items:[...M.values()], note:L.map(p => p.note).filter(Boolean).join(" · ") || null }); }
 function dessinerMag(){
   const z = $("#mL"); if (!z) return;
   const v = MAG.filter(p => !FILTRE_CODE || p.code === FILTRE_CODE), app = v.filter(p => p.etat === "approuve"), rem = v.filter(p => p.etat === "remis").reverse();
@@ -376,16 +382,21 @@ function dessinerMag(){
     ${p.etat === "approuve" ? `<button class="btn p" data-prep="${p.id}">Préparer</button>` : ""}<button class="btn" data-imp="${p.id}" style="min-height:42px">Imprimer le bon</button> ${p.etat === "approuve" ? `<button class="btn v" data-rem="${p.id}">Remis à l'élève</button>` : `<span class="etat remis">Remis ${heure(p.t_remis)}</span> <button class="btn" data-ann="${p.id}" style="min-height:38px">Annuler</button>`}</div>
     ${p.note ? `<p style="margin:10px 16px 0"><b>Travail :</b> ${esc(p.note)}</p>` : ""}
     ${tableMag(p)}
-    <div class="regl"><span>Règlement non respecté${p.etat === "approuve" ? " <small>(envoyé à l'enseignant quand tu confirmes « Remis »)</small>" : ""} :</span>${REGLES.slice(1).map((t, i) => `<button class="btn${(SIG.get(p.id) || new Set()).has(i + 1) ? " sig" : (REG_ATT.get(p.id) || new Set()).has(i + 1) ? " att" : ""}" data-sig="${p.id}|${i + 1}" title="Avertir l'enseignant">${t}</button>`).join("")}</div></div>`;
+    <div class="regl"><span>Règlement non respecté${p.etat === "approuve" ? " <small>(envoyé à l'enseignant quand tu confirmes « Remis »)</small>" : ""} :</span>${REGLES.slice(1).map((t, i) => `<button class="btn${(SIG.get(p.ids ? p.ids[0] : p.id) || new Set()).has(i + 1) ? " sig" : (REG_ATT.get(p.ids ? p.ids[0] : p.id) || new Set()).has(i + 1) ? " att" : ""}" data-sig="${p.id}|${i + 1}" title="Avertir l'enseignant">${t}</button>`).join("")}</div></div>`;
+  /* 25 nov. (Jeremy : « s'il en a fait 3, ça les rassemble pour éviter les allers-retours ») : toutes les commandes de l'élève en une seule préparation */
+  /* 25 nov. (Jeremy : « pas de bouton : si c'est accepté, elles se rassemblent toutes seules ») : une seule carte par élève */
+  const AP = regrouper(app); MULTI = new Map(AP.filter(p => p.ids).map(p => [p.id, p]));
   z.innerHTML = (FILTRE_CODE ? `<p class="sous">Élève <b>${esc(FILTRE_CODE)}</b> : ${app.length ? app.length + " commande" + (app.length > 1 ? "s" : "") + " à préparer" : "aucune commande approuvée"}.</p>` : "")
-    + `<div class="sec">À préparer (${app.length})</div>` + (app.length ? app.map(carte).join("") : `<p class="vide">${FILTRE_CODE ? "Rien pour cet élève. Son enseignant doit d'abord approuver son panier." : "Aucune commande approuvée pour l'instant."}</p>`)
+
+    + `<div class="sec">À préparer (${AP.length})</div>` + (AP.length ? AP.map(carte).join("") : `<p class="vide">${FILTRE_CODE ? "Rien pour cet élève. Son enseignant doit d'abord approuver son panier." : "Aucune commande approuvée pour l'instant."}</p>`)
     + (rem.length ? `<div class="sec">Remis aujourd'hui (${rem.length})</div>` + rem.map(carte).join("") : "");
-  z.querySelectorAll("[data-prep]").forEach(b => b.onclick = () => preparer(MAG.find(p => p.id === b.dataset.prep)));
-  z.querySelectorAll("[data-imp]").forEach(b => b.onclick = () => imprimerBon(MAG.find(p => p.id === b.dataset.imp)));
-  z.querySelectorAll("[data-rem]").forEach(b => b.onclick = () => remettre(b.dataset.rem, true));
+  const trouve = id => MULTI.get(id) || MAG.find(p => p.id === id);
+  z.querySelectorAll("[data-prep]").forEach(b => b.onclick = () => preparer(trouve(b.dataset.prep)));
+  z.querySelectorAll("[data-imp]").forEach(b => b.onclick = () => imprimerBon(trouve(b.dataset.imp)));
+  z.querySelectorAll("[data-rem]").forEach(b => b.onclick = async () => { const m = MULTI.get(b.dataset.rem); if (!m) return remettre(b.dataset.rem, true); for (const id of m.ids) await remettre(id, true); });
   z.querySelectorAll("[data-ann]").forEach(b => b.onclick = () => remettre(b.dataset.ann, false));
   /* 25 nov. (Jeremy) : la règle est cochée ici, puis envoyée à l'enseignant seulement quand le magasinier confirme « Remis » */
-  z.querySelectorAll("[data-sig]").forEach(b => b.onclick = async () => { if (b.classList.contains("sig")) return; const [id, r] = b.dataset.sig.split("|"), p = MAG.find(x => x.id === id);
+  z.querySelectorAll("[data-sig]").forEach(b => b.onclick = async () => { if (b.classList.contains("sig")) return; let [id, r] = b.dataset.sig.split("|"); if (MULTI.get(id)) id = MULTI.get(id).ids[0]; const p = MAG.find(x => x.id === id);
     if (p && p.etat === "remis") { b.disabled = true; await envoyerRegles(id, [+r]); b.disabled = false; dessinerMag(); return; }   /* déjà remis : envoi tout de suite */
     const P = REG_ATT.get(id) || new Set(); P.has(+r) ? P.delete(+r) : P.add(+r); REG_ATT.set(id, P); b.classList.toggle("att", P.has(+r)); });
 }
@@ -401,7 +412,7 @@ function preparer(p){ if (!p) return;
     const lettres = new Set(L.map(i => PlanMagasin.lettre(rangee(i))).filter(Boolean));
     const finies = new Set([...lettres].filter(l => L.filter(i => PlanMagasin.lettre(rangee(i)) === l).every(i => faits.has(i.id || i.n))));
     const tout = L.every(i => faits.has(i.id || i.n));
-    ov.innerHTML = `<div class="top"><img src="img/metier-plus-blanc.svg" alt=""><b>Préparer · ${esc(p.prenom || "élève")} (${esc(p.code)})</b><span class="sp"></span><button id="prF">‹ Comptoir</button></div>
+    ov.innerHTML = `<div class="top"><img src="img/metier-plus-blanc.svg" alt=""><b>Préparer · ${esc(p.prenom || "élève")} (${esc(p.code)})${p.ids ? " · " + p.ids.length + " commandes" : ""}</b><span class="sp"></span><button id="prF">‹ Comptoir</button></div>
       <main class="prep"><div class="prep-plan">${PlanMagasin.svg(lettres, finies, L.map(i => ({ r:rangee(i), fait:faits.has(i.id || i.n) })))}</div><div class="prep-l">
       <p class="sous">${esc(p.groupe)} · ${esc(nomEns(p.ens))}${p.note ? " · " + esc(p.note) : ""}</p>
       ${[...lettres, ""].map(l => { const G = L.filter(i => PlanMagasin.lettre(rangee(i)) === l); if (!G.length) return "";
@@ -410,7 +421,7 @@ function preparer(p){ if (!p) return;
       <button class="btn ${tout ? "v" : ""}" id="prOk" ${tout ? "" : "disabled"} style="width:100%;margin-top:10px">${tout ? "Tout est prêt · remis à l'élève" : "Coche chaque raccord en le prenant"}</button></div></main>`;
     $("#prF").onclick = () => { ov.hidden = true; document.body.style.overflow = ""; dessinerMag(); $("#mC").focus(); };
     ov.querySelectorAll("[data-k]").forEach(c => c.onchange = () => { c.checked ? faits.add(c.dataset.k) : faits.delete(c.dataset.k); LS.set(cle, [...faits]); dessiner(); });
-    $("#prOk").onclick = async () => { await remettre(p.id, true); try { localStorage.removeItem(cle); } catch(e){} ov.hidden = true; document.body.style.overflow = ""; };
+    $("#prOk").onclick = async () => { for (const id of (p.ids || [p.id])) await remettre(id, true); try { localStorage.removeItem(cle); } catch(e){} ov.hidden = true; document.body.style.overflow = ""; };
   };
   dessiner();
 }

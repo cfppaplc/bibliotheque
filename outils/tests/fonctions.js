@@ -225,6 +225,35 @@ test("Élève : écrire sur une ligne, dans une case de tableau, dans une zone d
   vrai(!p.errs.length, p.errs.join(" | "));
 });
 
+test("Élève : entrer avec sa carte (sans mot de passe) une fois les cartes du groupe activées par l'administrateur", async b => {
+  const sub = crypto.subtle, enc = new TextEncoder();
+  const kp = await sub.generateKey({ name: "ECDH", namedCurve: "P-256" }, true, ["deriveBits"]), jwk = await sub.exportKey("jwk", kp.privateKey);
+  const sel = crypto.getRandomValues(new Uint8Array(16)), iv = crypto.getRandomValues(new Uint8Array(12));
+  const cm = await sub.deriveKey({ name: "PBKDF2", salt: sel, iterations: 250000, hash: "SHA-256" }, await sub.importKey("raw", enc.encode("motdepasse1"), "PBKDF2", false, ["deriveKey"]), { name: "AES-GCM", length: 256 }, false, ["encrypt"]);
+  const d = Buffer.from(jwk.d, "base64url"), ct = new Uint8Array(await sub.encrypt({ name: "AES-GCM", iv }, cm, d)), B = x => Buffer.from(x).toString("base64");
+  const C = JSON.parse(require("fs").readFileSync("comptes.json", "utf8"));
+  C.comptes["essai.groupe"] = { nom: "Essai groupe", eleve: true, pub: { kty: "EC", crv: "P-256", x: jwk.x, y: jwk.y }, priv: { s: B(sel), i: B(iv), c: B(ct) }, prog: [] };
+  const SAV = {}, prep = async pg => { await pg.route(/comptes\.json/, r => r.fulfill({ body: JSON.stringify(C), contentType: "application/json" }));
+    await pg.route(/supabase\.co\/rest\/v1\/rpc\/coffre_(lire|ecrire|effacer)/, r => { const f = r.request().url().match(/coffre_(\w+)/)[1], a = JSON.parse(r.request().postData() || "{}");
+      let o = true; if (f === "lire") o = SAV[a.p_id] ? [{ data: SAV[a.p_id] }] : []; else if (f === "effacer") delete SAV[a.p_id]; else SAV[a.p_id] = a.p_data; r.fulfill({ body: JSON.stringify(o), contentType: "application/json", headers: { "access-control-allow-origin": "*" } }); }); };
+  const p = await page(b, { serviceWorkers: "block" }, "jeremy.raymond"); await prep(p);
+  await p.goto(BASE + "index.html"); await attendre(400);
+  await p.evaluate(() => new Promise(ok => { const r = indexedDB.open("acces", 1); r.onupgradeneeded = () => r.result.createObjectStore("s"); r.onsuccess = () => { const t = r.result.transaction("s", "readwrite"); t.objectStore("s").put({ id: "jeremy.raymond", priv: null }, "session"); t.oncomplete = ok; }; }));
+  await p.reload(); await p.waitForFunction(() => window.ACCES && ACCES.session, null, { timeout: 15000 }); await attendre(800);
+  let n = await p.evaluate(async () => { try { return await ACCES.activerCartes("essai.groupe", "mauvais", [{ c: "12345", k: "K7Q9X2" }]); } catch(e){ return e.message; } });
+  vrai(/incorrect/.test(n), "Mauvais mot de passe accepté : " + n);
+  n = await p.evaluate(() => ACCES.activerCartes("essai.groupe", "motdepasse1", [{ c: "12345", k: "K7Q9X2" }]));
+  vrai(n === 1 && Object.keys(SAV).length === 1 && !/essai\.groupe/.test(Object.values(SAV)[0]), "Activation : " + n + " " + JSON.stringify(SAV).slice(0, 100));
+  const q = await page(b, { serviceWorkers: "block" }); await prep(q);
+  await q.goto(BASE + "index.html"); await q.waitForFunction(() => window.ACCES && ACCES.estPret, null, { timeout: 15000 }); await attendre(600);
+  await q.evaluate(() => ACCES.dlgConnexion()); await attendre(400);
+  await q.fill("#acCarte", "MP-12345-K7Q9X2"); await q.waitForFunction(() => window.ACCES && ACCES.session && ACCES.session.id === "essai.groupe", null, { timeout: 15000 });
+  vrai(await q.evaluate(() => ACCES.eleve && ELEVE_REP.moi && ELEVE_REP.moi.c === "12345"), "Carte : session ou identité de l'élève manquante");
+  q.ctx = q.context(); await q.evaluate(() => {}); const r2 = await q.evaluate(async () => { try { await ACCES.connexionCarte("MP-12345-ZZZZZZ"); return "ok"; } catch(e){ return e.message; } });
+  vrai(r2 !== "ok", "Une mauvaise carte ouvre le compte");
+  vrai(!p.errs.length && !q.errs.length, p.errs.concat(q.errs).join(" | ")); await p.context().close(); await q.context().close();
+});
+
 test("Magasin : l'élève (carte scannée) envoie son panier, l'enseignant approuve, le magasinier filtre par code et remet", async b => {
   const P = [], A = [];
   /* 25 nov. : prénom publié chiffré avec la clé de la carte (comme passeport.html nomsPub) */
@@ -273,6 +302,10 @@ test("Magasin : l'élève (carte scannée) envoie son panier, l'enseignant appro
   vrai(!!(await m.$("[data-rem]")), "Code 12345 : commande absente");
   vrai(/^[A-Z]-\d+$/.test((await m.textContent("td.rg")).trim()), "Rangée absente au comptoir");
   vrai(/Essai/.test(await m.textContent(".cmd .pr")), "Prénom absent au comptoir");
+  /* 25 nov. : les commandes approuvées d'un même élève se rassemblent en une seule carte (quantités additionnées) */
+  const rg = await m.evaluate(() => { const L = regrouper([{ id: "a", code: "11111", items: [{ id: "x", n: "X", q: 2 }] }, { id: "b", code: "11111", items: [{ id: "x", n: "X", q: 1 }, { id: "y", n: "Y", q: 1 }] }, { id: "c", code: "22222", items: [] }]);
+    return L.map(p => (p.ids || [p.id]).join("+") + ":" + (p.items || []).map(i => i.n + i.q).join(",")); });
+  vrai(rg.join(" ") === "a+b:X3,Y1 c:", "Commandes non rassemblées : " + rg.join(" "));
   if (process.env.CAPTURES) await m.screenshot({ path: process.env.CAPTURES + "/comptoir.png" });
   await m.click("[data-sig$='|2']"); await attendre(400);
   vrai(A.length === 0 && !!(await m.$("[data-sig$='|2'].att")), "Règlement : doit attendre la confirmation « Remis » : " + JSON.stringify(A));

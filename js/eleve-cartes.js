@@ -21,6 +21,11 @@ window.ELEVE_CARTES = (function(){
       await ecrire(await hex("metier+|reponses|" + c + "|" + k1 + "|" + livre), K1, j1, { t:Date.now(), inks }); n++;
       try { await rpc("coffre_effacer", { p_id:a, p_jeton:j0 }); } catch(e){} }
     if (idx.length) { await ecrire(await hex("metier+|reponses-index|" + c + "|" + k1), K1, j1, idx); try { await rpc("coffre_effacer", { p_id:i0, p_jeton:j0 }); } catch(e){} }
+    /* la copie de la clé du groupe (connexion par la carte) passe aussi sur la nouvelle carte; l'ancienne carte n'ouvre plus rien */
+    try { const kc = c2 => crypto.subtle.digest("SHA-256", te.encode("metier+|carte-livres-cle|" + c + "|" + c2)).then(h => crypto.subtle.importKey("raw", h, "AES-GCM", false, ["encrypt", "decrypt"]));
+      const a0 = await hex("metier+|carte-livres|" + c + "|" + k0), o = await lire(a0, await kc(k0));
+      if (o) { await ecrire(await hex("metier+|carte-livres|" + c + "|" + k1), await kc(k1), await hex("metier+|carte-livres-jeton|" + c + "|" + k1), o);
+        await rpc("coffre_effacer", { p_id:a0, p_jeton:await hex("metier+|carte-livres-jeton|" + c + "|" + k0) }); } } catch(e){}
     return n; }
   /* livres où l'élève a répondu (pour « Voir ses réponses ») */
   async function livres(c, k){ try { return (await lire(await hex("metier+|reponses-index|" + c + "|" + k), await cle(c, k))) || []; } catch(e){ return []; } }

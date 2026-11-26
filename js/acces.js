@@ -121,6 +121,35 @@ window.ACCES = (function(){
       const R = (JSON.parse(localStorage.getItem("comptesRecents") || "[]") || []).filter(x => x && x.id !== id); R.unshift({ id, nom:c.nom || "" }); localStorage.setItem("comptesRecents", JSON.stringify(R.slice(0, 8))); } catch(e){}
     majBouton(); try { render(); } catch(e){} compterDemandes();
   }
+  /* ---- 25 nov. (Jeremy : « l'élève entre avec sa carte ») : la carte MP-<code>-<clé> ouvre le compte de son groupe ----
+     L'administrateur remet à chaque carte une copie de la clé du compte de groupe, chiffrée avec la clé de la carte (table coffre).
+     Seul celui qui a la carte peut l'ouvrir; une nouvelle carte efface l'ancienne copie. */
+  const hexC = async t => [...new Uint8Array(await sub.digest("SHA-256", enc.encode(t)))].map(b => b.toString(16).padStart(2, "0")).join("");
+  const cleCarteL = (c, k) => sub.digest("SHA-256", enc.encode("metier+|carte-livres-cle|" + c + "|" + k)).then(h => sub.importKey("raw", h, "AES-GCM", false, ["encrypt", "decrypt"]));
+  const RPC = "https://kjlotlhqrgekzohshmbn.supabase.co/rest/v1/rpc/", RPCK = "sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY";
+  const rpcC = async (f, a) => { const r = await fetch(RPC + f, { method:"POST", headers:{ apikey:RPCK, "Content-Type":"application/json" }, body:JSON.stringify(a), cache:"no-store" }); if (!r.ok) throw new Error("Internet ne répond pas"); return r.json(); };
+  const lireCarteTxt = v => { const m = String(v || "").toUpperCase().replace(/\s+/g, "").match(/MP-?(\d{5})-?([A-Z0-9]{6})/); return m ? { c:m[1], k:m[2] } : null; };
+  async function connexionCarte(txt){
+    const ca = typeof txt === "string" ? lireCarteTxt(txt) : txt; if (!ca) throw new Error("Ça ressemble à MP-12345-ABC123 (sous le code-barres de ta carte).");
+    const r = await rpcC("coffre_lire", { p_id:await hexC("metier+|carte-livres|" + ca.c + "|" + ca.k) }), row = r && r[0];
+    if (!row || !row.data) throw new Error("Cette carte n'ouvre pas encore les livres. Demande à ton enseignant.");
+    let o; try { const b = unb64(JSON.parse(row.data).d); o = JSON.parse(new TextDecoder().decode(await sub.decrypt({ name:"AES-GCM", iv:b.subarray(0, 12) }, await cleCarteL(ca.c, ca.k), b.subarray(12)))); }
+    catch(e){ throw new Error("Carte non reconnue."); }
+    try { const rr = await fetch("comptes.json?t=" + Date.now(), { cache:"no-store" }); if (rr.ok) DATA = await rr.json(); } catch(e){}
+    const c = DATA && DATA.comptes[o.id]; if (!c || !c.eleve) throw new Error("Le compte de ton groupe a changé. Demande à ton enseignant de réactiver les cartes.");
+    let priv; try { priv = await sub.importKey("jwk", { kty:"EC", crv:"P-256", x:c.pub.x, y:c.pub.y, d:o.d, ext:false }, EC, false, ["deriveBits"]); } catch(e){ throw new Error("Le mot de passe du groupe a changé. Demande à ton enseignant de réactiver les cartes."); }
+    try { sessionStorage.setItem("eleveMoi", JSON.stringify({ c:ca.c, k:ca.k })); if (window.ELEVE_REP) ELEVE_REP.definir(ca.c, ca.k); } catch(e){}
+    await ouvrirSession(o.id, priv); return o.id; }
+  /* administrateur : avec le mot de passe du compte de groupe, chaque carte reçoit sa copie (cartes = [{ c, k }]) */
+  async function activerCartes(id, mdp, cartes){
+    if (!SESSION || !SESSION.admin) throw new Error("Réservé à l'administrateur.");
+    const c = DATA.comptes[id]; if (!c || !c.eleve) throw new Error("Choisis un compte de groupe d'élèves."); if (c.pub.kty !== "EC") throw new Error("Ce compte est trop ancien : refais-le dans Comptes et accès.");
+    let pk8; try { pk8 = await sub.decrypt({ name:"AES-GCM", iv:unb64(c.priv.i) }, await cleMdp(mdp, unb64(c.priv.s)), unb64(c.priv.c)); } catch(e){ throw new Error("Mot de passe du groupe incorrect."); }
+    const d = b64u(new Uint8Array(pk8)); let n = 0;
+    for (const ca of cartes){ if (!ca || !/^\d{5}$/.test(ca.c) || !ca.k) continue;
+      const iv = crypto.getRandomValues(new Uint8Array(12)), ct = new Uint8Array(await sub.encrypt({ name:"AES-GCM", iv }, await cleCarteL(ca.c, ca.k), enc.encode(JSON.stringify({ id, d })))), u = new Uint8Array(12 + ct.length); u.set(iv); u.set(ct, 12);
+      if (await rpcC("coffre_ecrire", { p_id:await hexC("metier+|carte-livres|" + ca.c + "|" + ca.k), p_jeton:await hexC("metier+|carte-livres-jeton|" + ca.c + "|" + ca.k), p_env:"public", p_data:JSON.stringify({ v:1, d:b64(u) }) }) === true) n++; }
+    return n; }
   async function basculer(id){          /* compte déjà ouvert sur cet appareil : vrai si l'ouverture s'est faite sans mot de passe */
     try { const M = (await idbGet("memo")) || {}, m = M[id], c = DATA && DATA.comptes[id];
       if (!m || !c || m.emp !== empreinte(c)){ if (m){ delete M[id]; await idbSet("memo", M); memoIds(Object.keys(M)); } return false; }
@@ -286,6 +315,8 @@ window.ACCES = (function(){
       + '<div class="acces-err" id="acErr" hidden></div>'
       + '<div class="co-prog" id="acProg" hidden><i></i><span>Déverrouillage de tes livres…</span></div>'
       + '<div class="acces-btns"><button id="acNon">Annuler</button><button class="prim" id="acOui">Se connecter</button></div>'
+      + '<div class="co-carte"><span>Élève ?</span><input type="text" id="acCarte" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Scanne ta carte : MP-12345-ABC123" aria-label="Ta carte d\'élève">'
+      + (() => { try { const K = JSON.parse(localStorage.getItem("mpCarte") || "null"); return K && K.c ? '<button type="button" class="prim" id="acMaCarte" data-c="' + esc(K.c) + '">Entrer avec Ma carte' + (K.p ? ' (' + esc(String(K.p).split(/\s+/)[0]) + ')' : '') + '</button>' : ''; } catch(e){ return ""; } })() + '</div>'
       + '<button class="acces-lien" id="acDem">Pas encore de compte ? Demander un accès</button><br><button class="acces-lien" id="acOubli" style="margin-top:8px">Mot de passe oublié ?</button></div>';
     ov().hidden = false; setTimeout(() => document.getElementById(id0 ? "acMdp" : "acId")?.focus(), 50);
     const mdp = document.getElementById("acMdp"), maj = document.getElementById("acMaj");
@@ -301,6 +332,10 @@ window.ACCES = (function(){
       catch(e){ pr.hidden = true; er.textContent = e.message; er.hidden = false; bt.disabled = false; bt.textContent = "Se connecter";
         const f = box().querySelector(".co-form"); f.classList.remove("tremble"); void f.offsetWidth; f.classList.add("tremble"); mdp.select(); } };
     document.getElementById("acOui").onclick = go; mdp.onkeydown = e => { if (e.key === "Enter") go(); };
+    { const carte = async v => { const er = document.getElementById("acErr"), pr = document.getElementById("acProg"); er.hidden = true; pr.hidden = false;
+        try { await connexionCarte(v); box().classList.remove("co2"); bienvenue(apres); } catch(e){ pr.hidden = true; er.textContent = e.message; er.hidden = false; } };
+      const ic = document.getElementById("acCarte"); ic.onkeydown = e => { if (e.key === "Enter") carte(ic.value); }; ic.oninput = () => { if (/MP-?\d{5}-?[A-Z0-9]{6}$/i.test(ic.value.trim())) carte(ic.value); };
+      const mc = document.getElementById("acMaCarte"); if (mc) mc.onclick = () => carte(mc.dataset.c); }
     document.getElementById("acId").onkeydown = e => { if (e.key === "Enter") mdp.focus(); };
     document.getElementById("acNon").onclick = fermer; document.getElementById("acDem").onclick = () => { box().classList.remove("co2"); dlgDemande(false); }; document.getElementById("acOubli").onclick = () => { box().classList.remove("co2"); dlgDemande(true); };
   }
@@ -749,6 +784,6 @@ window.ACCES = (function(){
     if (SESSION) go(); else dlgConnexion(go);
   }
   setTimeout(() => { const b = document.getElementById("compteBtn"); if (b) b.onclick = menu; charger(); accepterDepuisLien(); invitationDepuisLien(); }, 0);
-  return { pret, get estPret(){ return estPret; }, protege, permis, verrouille, ouvrir, pdfDispo, pdfTelecharger, recherche, connexion, deconnexion, demande, lireDemande, dlgConnexion, dlgDemande, menu, get session(){ return VOIR && SESSION && DATA.comptes[VOIR] ? Object.assign({}, SESSION, { id:VOIR, nom:DATA.comptes[VOIR].nom, admin:false, eleve:!!DATA.comptes[VOIR].eleve, voir:true }) : SESSION; }, get eleve(){ return VOIR && DATA.comptes[VOIR] ? !!DATA.comptes[VOIR].eleve : !!(SESSION && SESSION.eleve); }, get data(){ return DATA; }, charger, outils:{ enLigne:() => enLigne(), commitGitHub:(...a) => commitGitHub(...a), envelopperPour:(...a) => envelopperPour(...a), BOITE, sansAcc:t => sansAcc(t),
+  return { pret, get estPret(){ return estPret; }, protege, permis, verrouille, ouvrir, pdfDispo, pdfTelecharger, recherche, connexion, connexionCarte, activerCartes, deconnexion, demande, lireDemande, dlgConnexion, dlgDemande, menu, get session(){ return VOIR && SESSION && DATA.comptes[VOIR] ? Object.assign({}, SESSION, { id:VOIR, nom:DATA.comptes[VOIR].nom, admin:false, eleve:!!DATA.comptes[VOIR].eleve, voir:true }) : SESSION; }, get eleve(){ return VOIR && DATA.comptes[VOIR] ? !!DATA.comptes[VOIR].eleve : !!(SESSION && SESSION.eleve); }, get data(){ return DATA; }, charger, outils:{ enLigne:() => enLigne(), commitGitHub:(...a) => commitGitHub(...a), envelopperPour:(...a) => envelopperPour(...a), BOITE, sansAcc:t => sansAcc(t),
     integrer(f, livre, ajouts){ if (f && livre){ DATA.livres[f] = JSON.parse(JSON.stringify(livre)); if (BROUILLON) BROUILLON.livres[f] = JSON.parse(JSON.stringify(livre)); } if (REGL) REGL.ajouts = JSON.parse(JSON.stringify(ajouts || [])); } } };
 })();
