@@ -380,7 +380,7 @@ try { for (let w = window; ; w = w.parent){ if (/[?&]gestion=1/.test(w.location.
       /* avis du magasinier (règlement du magasin, 30 jours) */
       const ra = await fetch("https://kjlotlhqrgekzohshmbn.supabase.co/rest/v1/rpc/panier_eleve_avis", { method:"POST", headers:{ apikey:"sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY", "Content-Type":"application/json" }, body:JSON.stringify({ p_ens:ens, p_jeton:j, p_code:String(e.c) }) });
       const A = ra.ok ? await ra.json() : [], RG = [null, "Ne connaissait pas le nom exact du raccord", "Sans carte étudiante", "Consignes d'accès non respectées", "Matériel rendu sale", "Sans feuille de l'enseignant", "Bris ou usage personnel"];
-      if (A.length){ const h = document.createElement("h4"); h.textContent = "Avis du magasinier (règlement)"; const d = document.createElement("div"); d.className = "fi-l";
+      if (A.length){ const h = document.createElement("h4"); h.textContent = "Avis du magasinier (règlement, 1 an)"; const d = document.createElement("div"); d.className = "fi-l";
         d.innerHTML = A.map(a => `<div><span class="s r">!</span>${esc(RG[a.regle] || "?")}<small>${date(new Date(a.t).getTime())}</small></div>`).join(""); b.appendChild(h); b.appendChild(d); }
     } catch(x){ L.innerHTML = `<div><span class="s">!</span>Commandes non disponibles</div>`; }
   }
