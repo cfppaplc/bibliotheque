@@ -142,6 +142,11 @@ function logoPNG(ent, z){ return new Promise(ok => { const im = new Image(), cv 
 
 /* 26 nov. (Jeremy : « au début de la session il choisit et ça reste ») : l'équipe crée son entreprise une fois; ses factures la reprennent */
 const ENT_VIDE = { nom:"", rbq:"", tps:"", tvq:"", tel:"", courriel:"", icone:"goutte", coul:0 };
+/* 26 nov. (Jeremy : « licence, TPS et TVQ s'ajoutent tout seuls, le courriel fitte avec le nom ») : numéros fictifs au bon format,
+   toujours les mêmes pour l'équipe (tirés de sa clé); courriel en .exemple.ca (jamais une vraie entreprise) */
+function chiffres(graine, n){ let h = 2166136261, o = ""; for (let i = 0; o.length < n; i++) { h = Math.imul(h ^ (graine.charCodeAt(i % graine.length) + i), 16777619) >>> 0; o += String(h % 10); } return o; }
+function auto(e){ const g = paire() || C.c, d = chiffres(g + "|ent", 28), sl = String(e.nom || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/\b(inc|enr|ltee|senc)\b/g, "").replace(/[^a-z0-9]+/g, "");
+  return { rbq:"5" + d.slice(0, 3) + "-" + d.slice(3, 7) + "-" + d.slice(7, 9), tps:d.slice(9, 18) + " RT0001", tvq:"1" + d.slice(18, 27) + " TQ0001", tel:"418 555-" + d.slice(20, 24), courriel:sl ? "info@" + sl + ".exemple.ca" : "" }; }
 function entreprise(retour){ const e = Object.assign({}, ENT_VIDE, ENT || {}); $("#barre").hidden = true; window.scrollTo(0, 0);
   const ch = (l, k, ph, im) => `<div><label>${l}</label><input data-e="${k}" value="${esc(e[k])}" placeholder="${ph || ""}"${im ? ` inputmode="${im}"` : ""}></div>`;
   const vue = () => { $("#app").innerHTML = `${ENT && ENT.nom ? `<p><button class="btn" id="eRet">‹ Retour</button></p>` : ""}<h1>Notre entreprise</h1><p class="sous">Avec ton équipier de coffre, choisissez le nom et le logo de votre entreprise de plomberie. Ils restent pour toutes vos factures.</p>
@@ -149,16 +154,16 @@ function entreprise(retour){ const e = Object.assign({}, ENT_VIDE, ENT || {}); $
       <p class="sous">${EQ ? "Votre entreprise suit votre coffre : elle recommence quand votre enseignant change les équipes." : paire() ? "Entreprise partagée avec ton équipier." : "Entrez chacun le code de l'autre : votre entreprise sera la même sur vos deux appareils."}</p></div>
     <div class="carte"><h2>Logo</h2><div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px">${ICONES.map(i => `<button data-ic="${i}" title="${NOMS_LOGO[i]}" style="width:92px;height:92px;padding:6px;border-radius:18px;background:#fff;cursor:pointer;border:${e.icone === i ? "3px solid var(--nuit)" : "1.5px solid var(--ligne)"}">${logoSVG(Object.assign({}, e, { icone:i })).replace('width="100" height="100"', 'width="76" height="76"')}</button>`).join("")}</div>
       <div style="display:flex;gap:10px">${COULEURS.map((c, k) => `<button data-co="${k}" aria-label="Couleur ${k + 1}" style="width:38px;height:38px;border-radius:50%;border:${(+e.coul || 0) === k ? "3px solid var(--nuit)" : "2px solid #fff"};box-shadow:0 0 0 1px var(--ligne);background:${c};cursor:pointer"></button>`).join("")}</div></div>
-    <div class="carte"><h2>Coordonnées (sur vos factures)</h2><div class="g2">${ch("N° de licence RBQ", "rbq", "ex. 5678-1234-01")}${ch("Téléphone", "tel", "ex. 418 555-0123", "tel")}${ch("N° de TPS", "tps", "ex. 123456789 RT0001")}${ch("N° de TVQ", "tvq", "ex. 1234567890 TQ0001")}${ch("Courriel", "courriel", "ex. info@plomberieberube.ca", "email")}</div></div>
+    <div class="carte"><h2>Coordonnées (sur vos factures)</h2><p class="sous" style="margin-top:0">Numéros fictifs générés pour votre entreprise (exercice).</p><div class="g2" id="eAuto">${(a => [["Licence RBQ", a.rbq], ["Téléphone", a.tel], ["N° de TPS", a.tps], ["N° de TVQ", a.tvq], ["Courriel", a.courriel || "—"]].map(([l, v]) => `<div><label>${l}</label><p style="margin:4px 0 8px;font-family:ui-monospace,Menlo,Consolas,monospace">${esc(v)}</p></div>`).join(""))(auto(e))}</div></div>
     <p><button class="btn p" id="eOk">${ENT && ENT.nom ? "Enregistrer" : "Créer notre entreprise"}</button></p>`;
-    document.querySelectorAll("[data-e]").forEach(i => i.oninput = () => { e[i.dataset.e] = i.value; if (i.dataset.e === "nom") document.querySelectorAll("[data-ic]").forEach(b => b.innerHTML = logoSVG(Object.assign({}, e, { icone:b.dataset.ic })).replace('width="100" height="100"', 'width="76" height="76"')); });
+    document.querySelectorAll("[data-e]").forEach(i => i.oninput = () => { e[i.dataset.e] = i.value; if (i.dataset.e === "nom") { const a = auto(e), z = $("#eAuto"); if (z) z.querySelectorAll("p")[4].textContent = a.courriel || "—"; } if (i.dataset.e === "nom") document.querySelectorAll("[data-ic]").forEach(b => b.innerHTML = logoSVG(Object.assign({}, e, { icone:b.dataset.ic })).replace('width="100" height="100"', 'width="76" height="76"')); });
     document.querySelectorAll("[data-ic]").forEach(b => b.onclick = () => { e.icone = b.dataset.ic; vue(); });
     document.querySelectorAll("[data-co]").forEach(b => b.onclick = () => { e.coul = +b.dataset.co; vue(); });
     if ($("#eq")) $("#eq").onchange = async () => { const v = $("#eq").value.trim(); if (v && (!/^\d{5}$/.test(v) || v === C.c)) { toast("Écris le code à 5 chiffres de ton équipier."); return; }
       LS.set("equipier|" + C.c, v); const t = v && await entLire(); if (t && t.nom) { Object.assign(e, t); delete e.t; ENT = Object.assign({}, e); toast("Entreprise de ton équipe : " + t.nom); } vue(); };
     if ($("#eRet")) $("#eRet").onclick = retour || liste;
     $("#eOk").onclick = async () => { if (String(e.nom).trim().length < 3) { toast("Donnez un nom à votre entreprise."); return; }
-      ENT = Object.assign({}, e); await entEcrire(ENT); F.forEach(f => { if (!f.signee) f.ent = Object.assign({}, ENT); }); sauver(); toast("Entreprise enregistrée."); (retour || liste)(); }; };
+      Object.assign(e, auto(e)); ENT = Object.assign({}, e); await entEcrire(ENT); F.forEach(f => { if (!f.signee) f.ent = Object.assign({}, ENT); }); sauver(); toast("Entreprise enregistrée."); (retour || liste)(); }; };
   vue(); }
 
 /* ---------- liste des factures ---------- */
@@ -181,7 +186,7 @@ function ouvrir(id){ FA = F.find(f => f.id === id); if (!FA) return liste(); if 
 function champ(lbl, chemin, opt){ const v = chemin.split(".").reduce((o, k) => o && o[k], FA) ?? ""; return `<div><label>${lbl}</label><input data-c="${chemin}" value="${esc(v)}"${opt || ""}></div>`; }
 function dessiner(){ const f = FA, T = totaux(f), L = (t, arr, cols) => arr.map((l, i) => `<tr>${cols.map(([k, ph, cls, im]) => `<td class="${cls || ""}"><input data-l="${t}.${i}.${k}" value="${esc(l[k] ?? "")}" placeholder="${ph}"${im ? ' inputmode="decimal"' : ""}></td>`).join("")}<td class="x"><button data-del="${t}.${i}" aria-label="Retirer">×</button></td></tr>`).join("");
   $("#qui").textContent = (K.p ? K.p + " · " : "") + C.c;
-  $("#app").innerHTML = `<p><button class="btn" id="ret">‹ Mes factures</button></p><h1>Facture ${esc(f.no)}</h1>
+  $("#app").innerHTML = `<p><button class="btn" id="ret">‹ Mes factures</button></p><h1 style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">Facture ${esc(f.no)} <span style="border:2.5px solid #B83227;color:#B83227;border-radius:8px;padding:2px 10px;font-size:.85rem;letter-spacing:.12em;transform:rotate(-4deg);display:inline-block">SIMULATION</span></h1>
   <div class="carte" style="display:flex;gap:14px;align-items:center">${logoSVG(f.ent).replace('width="100" height="100"', 'width="56" height="56"')}<div style="flex:1"><b>${esc(f.ent.nom)}</b><div class="sous">${esc([f.ent.tel, f.ent.rbq ? "RBQ " + f.ent.rbq : ""].filter(Boolean).join(" · "))}</div></div>${f.signee ? "" : `<button class="btn" id="eMod2">Modifier l'entreprise</button>`}</div>
   <div class="carte"><h2 style="display:flex;align-items:center;gap:10px">Client <span class="sous" style="text-transform:none;letter-spacing:0;font-weight:400">(fictif)</span><span style="flex:1"></span><button class="btn" id="autreCl" style="min-height:38px;text-transform:none;letter-spacing:0">Autre client</button></h2><div class="g2">${champ("Nom du client", "client.nom")}${champ("Téléphone", "client.tel", ' inputmode="tel"')}${champ("Adresse des travaux", "client.adresse")}${champ("Courriel", "client.courriel", ' inputmode="email"')}</div>
     <div class="g2" style="margin-top:10px">${champ("N° de facture", "no")}<div><label>Date</label><input type="date" data-c="date" value="${esc(f.date)}"></div></div></div>
@@ -255,8 +260,13 @@ async function pdf(f, courriel){ try { const { PDFDocument, StandardFonts, rgb }
   if (f.signee) { if (y < M + 110) { p = doc.addPage([W, H]); y = H - M; } y -= 6; t("Travaux acceptés par le client", M, y, 8, B, gris);
     const im = await doc.embedPng(f.signee.img), h = 60, w = Math.min(220, im.width * h / im.height); p.drawImage(im, { x:M, y:y - h - 4, width:w, height:h });
     y -= h + 10; p.drawLine({ start:{ x:M, y }, end:{ x:M + 240, y }, thickness:0.7, color:gris }); t(f.signee.nom + " · " + f.signee.date, M, y - 12, 9); }
+  /* 26 nov. (Jeremy : un cachet pour signifier que c'est une simulation) : filigrane en diagonale + tampon en haut */
+  const { degrees } = await lib(), rouge = rgb(0.72, 0.2, 0.15);
+  doc.getPages().forEach(pg => { const w = B.widthOfTextAtSize("SIMULATION", 90); pg.drawText("SIMULATION", { x:W / 2 - w * 0.707 / 2 + 10, y:H / 2 - w * 0.707 / 2, size:90, font:B, color:rouge, opacity:0.07, rotate:degrees(45) });
+    pg.drawRectangle({ x:W / 2 - 92, y:H - 40, width:184, height:26, borderColor:rouge, borderWidth:2, opacity:0, borderOpacity:0.85, rotate:degrees(-3) });
+    pg.drawText("SIMULATION · PROJET D'ÉLÈVE", { x:W / 2 - 84, y:H - 31, size:10, font:B, color:rouge, opacity:0.85, rotate:degrees(-3) }); });
   /* pied : exercice scolaire */
-  doc.getPages().forEach(pg => pg.drawText("Facture produite dans le cadre d'un projet d'élève - Pavillon de l'Avenir (Métier+)", { x:M, y:24, size:7, font:R, color:gris }));
+  doc.getPages().forEach(pg => pg.drawText("Document fictif - aucune valeur légale. Facture produite dans le cadre d'un projet d'élève - Pavillon de l'Avenir (Métier+)", { x:M, y:24, size:7, font:R, color:gris }));
   const blob = new Blob([await doc.save()], { type:"application/pdf" }), nom = "Facture-" + f.no + ".pdf", a = document.createElement("a");
   const fichier = new File([blob], nom, { type:"application/pdf" });
   if (courriel && navigator.canShare && navigator.canShare({ files:[fichier] })) { try { await navigator.share({ files:[fichier], title:"Facture " + f.no, text:"Bonjour, voici la facture " + f.no + " pour les travaux effectués. Merci !" }); return; } catch(e){ if (e.name === "AbortError") return; } }
