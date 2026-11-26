@@ -133,6 +133,7 @@ async function prenomDeCarte(code, cle, enc){ if (!cle || !enc) return ""; try {
   const k = await crypto.subtle.importKey("raw", await crypto.subtle.digest("SHA-256", te.encode("metier+|carte|" + code + "|" + cle)), "AES-GCM", false, ["decrypt"]);
   return new TextDecoder().decode(await crypto.subtle.decrypt({ name:"AES-GCM", iv:b.slice(0, 12) }, k, b.slice(12))); } catch(e){ return ""; } }
 async function trouverEleve(code){
+  if (code === "69696") return [{ ens:"jeremy.raymond", groupe:"ESSAI", profs:["jeremy.raymond"], enc:"" }];   /* code d'essai (Jeremy, 26 nov.) : commandes vers la page de Jeremy */
   const ens = Q.get("e") ? [Q.get("e")] : Object.keys(COMPTES).filter(id => !COMPTES[id].eleve);
   const R = []; await Promise.all(ens.map(async e => { const g = await registre(e); for (const grp in g.codes) if ((g.codes[grp] || []).includes(code)) R.push({ ens:e, groupe:grp, profs:[e, ...(g.part[grp] || [])], enc:g.noms[code] || "" }); }));
   /* 25 nov. : un groupe partagé paraît chez chaque enseignant du groupe → une seule entrée, avec tous ses enseignants */
@@ -165,6 +166,7 @@ function eleveEntree(msg){
     $("#cOk").disabled = true; $("#cErr").textContent = "Recherche de ton groupe…";
     const L = await trouverEleve(c.code);
     if (!L.length) { $("#cOk").disabled = false; $("#cErr").textContent = "Code inconnu. Vérifie avec ton enseignant."; return; }
+    if (!pre && c.code === "69696") pre = "Essai";
     if (!pre) for (const x of L) { pre = await prenomDeCarte(c.code, c.cle, x.enc); if (pre) break; }   /* carte scannée : le prénom vient du registre */
     if (!pre && !POSTE) { const K = LS.get("mpCarte", null); if (K && K.p && String(K.c || "").includes("-" + c.code + "-")) pre = String(K.p).split(/\s+/)[0]; }
     if (!pre) { $("#cOk").disabled = false; $("#preZ").hidden = false; $("#cErr").textContent = "Écris ton prénom (le magasinier le verra)."; $("#cPre").focus(); return; }

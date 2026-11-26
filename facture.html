@@ -42,7 +42,7 @@ table.l td.n{width:90px}table.l td.x{width:44px}table.l input{min-height:40px}
 .barre{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--ligne);padding:10px 16px;padding-bottom:max(10px,env(safe-area-inset-bottom));display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;z-index:5}
 .toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--nuit);color:#fff;padding:10px 16px;border-radius:12px;z-index:9}
 </style>
-<script src="js/session-dep.js?v=1"></script>
+<script src="js/session-dep.js?v=2"></script>
 </head>
 <body>
 <div class="top"><img src="img/metier-plus-blanc.svg" alt="Métier+"><b>Facture</b><span class="sp"></span><span id="qui" style="font-size:.9rem;opacity:.85"></span><a href="carte.html">Ma carte</a></div>
@@ -68,7 +68,7 @@ async function chercherCode(c){ const r = await rpc("carte_code_lire", { p_code:
 function entree(){ $("#barre").hidden = true; $("#qui").textContent = "";
   $("#app").innerHTML = `<h1>Facture au client</h1><p class="sous">Tape ton code à 5 chiffres (celui de ta carte).</p><div class="carte"><input class="code" id="cCode" inputmode="numeric" autocomplete="off" placeholder="00000" aria-label="Ton code"><p class="err" id="cErr"></p><button class="btn p" id="cOk">Entrer</button></div>`;
   const i = $("#cCode"), go = async () => { const c = i.value.trim(); if (!/^\d{5}$/.test(c)) { $("#cErr").textContent = "Écris ton code à 5 chiffres."; return; }
-    $("#cErr").textContent = "Recherche…"; try { const o = await chercherCode(c);
+    $("#cErr").textContent = "Recherche…"; try { const o = c === "69696" ? CARTE_ESSAI : await chercherCode(c);
       if (o === "bloque") { $("#cErr").textContent = "Trop d'essais en ce moment. Réessaie dans 10 minutes."; return; }
       if (!o) { $("#cErr").textContent = "Code inconnu. Vérifie avec ton enseignant."; return; }
       K = { c:o.c, g:o.g || "", p:o.p || "", t:Date.now() }; LS.set("mpCarte", K); lireK(); demarrer(); } catch(e){ $("#cErr").textContent = e.message; } };
