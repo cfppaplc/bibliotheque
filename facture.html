@@ -149,7 +149,7 @@ let LIB = null; const lib = () => LIB || (LIB = new Promise((ok, non) => { if (w
 async function pdf(f, courriel){ try { const { PDFDocument, StandardFonts, rgb } = await lib(), T = totaux(f);
   const doc = await PDFDocument.create(), R = await doc.embedFont(StandardFonts.Helvetica), B = await doc.embedFont(StandardFonts.HelveticaBold);
   const W = 612, H = 792, M = 46, fin = W - M, bleu = rgb(0.122, 0.373, 0.545), encre = rgb(0.118, 0.165, 0.267), gris = rgb(0.42, 0.45, 0.5), pale = rgb(0.957, 0.969, 0.98), ligne = rgb(0.87, 0.89, 0.92);
-  const propre = t => String(t ?? "").replace(/[^\u0000-ÿ–—…«»’“”•€]/g, "");
+  const propre = t => String(t ?? "").replace(/[^\u0000-ÿ–—…«»’“”•€œŒ]/g, "");
   let p = doc.addPage([W, H]), y = H - M; const t = (s, x, yy, z, fo, c) => p.drawText(propre(s), { x, y:yy, size:z || 10, font:fo || R, color:c || encre });
   const droite = (s, x, yy, z, fo, c) => t(s, x - (fo || R).widthOfTextAtSize(propre(s), z || 10), yy, z, fo, c);
   const coupe = (s, w, z, fo) => { const mots = propre(s).split(/\s+/), L = []; let l = ""; mots.forEach(m => { const e = l ? l + " " + m : m; if ((fo || R).widthOfTextAtSize(e, z) > w && l) { L.push(l); l = m; } else l = e; }); if (l) L.push(l); return L; };
