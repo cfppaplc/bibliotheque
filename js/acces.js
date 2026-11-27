@@ -192,7 +192,7 @@ window.ACCES = (function(){
      et le panneau garde sur l'ordinateur de l'admin les demandes déjà vues. Jeremy peut aussi s'abonner à ce sujet dans l'appli ntfy (avis sur son cellulaire). */
   const BOITE = "https://ntfy.sh/biblio-pavillon-5edf93926a704efe";
   async function envoyerDemande(code, nom){
-    const r = await fetch(BOITE, { method:"POST", body:code, headers:{ Title:"Demande d'acces : " + sansAcc(nom), Tags:"books" } });
+    const r = await fetch(BOITE, { method:"POST", body:code, headers:{ Title:"Demande d'acces", Tags:"books" }   /* 27 nov. (Loi 25) : plus de nom dans le titre public */ });
     if (!r.ok) throw new Error("réponse " + r.status);
     try { localStorage.setItem("demandeEnAttente", JSON.stringify({ code, id:idDe(nom), nom, x:lireDemande(code).pub.x, envoi:Date.now() })); } catch(e){}
   }
@@ -268,7 +268,10 @@ window.ACCES = (function(){
       + (SESSION.admin ? '<button data-a="gerer">Administration' + (NB_DEM ? ' (' + NB_DEM + ' demande' + (NB_DEM > 1 ? 's' : '') + ')' : '') + '</button>' : '')
       + (window.MESDOCS && document.body.classList.contains("md-permis") ? '<button data-a="ajout">Ajouter un document</button>' : '') + '<button data-a="prefs">Mes préférences</button><button data-a="neuf">Quoi de neuf' + (document.getElementById("qnPoint") && !document.getElementById("qnPoint").hidden ? ' <span class="qn-point"></span>' : '') + '</button><button data-a="aide">Aide</button><button data-a="signal">Signaler un problème</button><button data-a="changer">Changer de compte</button><button data-a="sortir">Se déconnecter</button>';
     const r = b.getBoundingClientRect(); m.style.top = (r.bottom + 8 + scrollY) + "px"; m.style.left = Math.max(8, Math.min(innerWidth - 240, r.right - 230)) + "px"; m.hidden = false;
-    m.onclick = e => { const a = e.target.closest("[data-a]"); if (!a) return; m.hidden = true; if (a.dataset.a === "neuf" || a.dataset.a === "aide"){ document.getElementById(a.dataset.a === "neuf" ? "quoiNeuf" : "lienAide").click(); return; } if (a.dataset.a === "ajout"){ window.MESDOCS.dlgAjout(); return; } if (a.dataset.a === "signal"){ window.mpSignaler(); return; } if (a.dataset.a === "changer"){ dlgComptes(); return; } if (a.dataset.a === "sortir") deconnexion().then(() => aviser("Tu es déconnecté sur cet ordinateur.")); else if (a.dataset.a === "prefs") window.dlgPrefs(); else dlgGerer(); };
+    m.onclick = e => { const a = e.target.closest("[data-a]"); if (!a) return; m.hidden = true; if (a.dataset.a === "neuf" || a.dataset.a === "aide"){ document.getElementById(a.dataset.a === "neuf" ? "quoiNeuf" : "lienAide").click(); return; } if (a.dataset.a === "ajout"){ window.MESDOCS.dlgAjout(); return; } if (a.dataset.a === "signal"){ window.mpSignaler(); return; } if (a.dataset.a === "changer"){ dlgComptes(); return; } if (a.dataset.a === "sortir") (async () => {   /* 27 nov. (Loi 25) : se déconnecter vide l'appareil : clé du compte, registre, jeton du magasin (seulement ce qui est déjà envoyé) */
+        const id = SESSION && SESSION.id; try { if (window.COFFRE && COFFRE.quitter) await COFFRE.quitter(); } catch(e){}
+        if (id) { try { await oublierCompte(id); localStorage.removeItem("magJeton|" + id); } catch(e){} }
+        await deconnexion(); })().then(() => aviser("Tu es déconnecté sur cet ordinateur.")); else if (a.dataset.a === "prefs") window.dlgPrefs(); else dlgGerer(); };
   }
   document.addEventListener("pointerdown", e => { const m = document.getElementById("accesMenu"); if (m && !m.hidden && !m.contains(e.target) && !e.target.closest("#compteBtn")) m.hidden = true; });
 

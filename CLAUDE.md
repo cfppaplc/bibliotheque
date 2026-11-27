@@ -6,7 +6,7 @@
 - Site https://metierplus.app (GitHub Pages, branche `main`, racine, `.nojekyll`). Le dépôt *est* le site : pas de build. HTML + `js/` + `css/` (scripts classiques, variables globales partagées, chargés dans l'ordre de la page; monter `?v=N` après chaque changement).
 - Auteur : Jeremy (Jérémy Raymond), enseignant au Pavillon de l'Avenir. DEP 5211 EGI et DEP 5333 Plomberie et chauffage. Public : enseignants (élèves plus tard, comptes de groupe).
 - Usage : TNI SMART GX Plus V4 (Android, Chrome 157, 1280×720 ×3), ordinateur, cellulaire, iPad des élèves. Au TNI, fluide quand le portable est branché; le navigateur Android du TNI est lent.
-- Scripts communs versionnés `?v=271` dans toutes les pages (garde, garde-nav, plein-ecran, coffre, mesdocs, vieux-navigateur, signaler) : monter le numéro partout quand on en change un. Livres : cache à part `biblio-livres` dans sw.js (ne pas l'effacer).
+- Scripts communs versionnés `?v=272` dans toutes les pages (garde, garde-nav, plein-ecran, coffre, mesdocs, vieux-navigateur, signaler) : monter le numéro partout quand on en change un. Livres : cache à part `biblio-livres` dans sw.js (ne pas l'effacer).
 - Tout en français du Québec (interface, commentaires, commits). Tutoiement. Ton professionnel, pas de familiarités.
 
 ## Règles permanentes de Jeremy

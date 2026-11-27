@@ -480,3 +480,16 @@ begin
 end; $$;
 revoke all on function public.panier_decider(text, text, uuid, boolean, text, text) from public;
 grant execute on function public.panier_decider(text, text, uuid, boolean, text, text) to anon, authenticated;
+
+-- 27 nov. (vérification Loi 25, point 10) : paniers et avis du magasin gardés 120 jours (une session), plus 1 an.
+-- Déclencheur indépendant des versions de panier_envoyer : le ménage se fait à chaque nouveau panier.
+create or replace function public.magasin_menage() returns trigger language plpgsql security definer set search_path = public as $$
+begin
+  delete from public.panier where t < now() - interval '120 days';
+  delete from public.magasin_avis where t < now() - interval '120 days';
+  return null;
+end $$;
+drop trigger if exists panier_menage on public.panier;
+create trigger panier_menage after insert on public.panier for each statement execute function public.magasin_menage();
+delete from public.panier where t < now() - interval '120 days';
+delete from public.magasin_avis where t < now() - interval '120 days';

@@ -15,7 +15,7 @@
       : m.get("poste") ? ["magasin-poste.webmanifest", "img/icone-180.png", "Magasin"] : ["manifest.webmanifest", "img/icone-180.png", "Magasin"];
   document.write('<link rel="manifest" href="' + v[0] + '"><link rel="apple-touch-icon" href="' + v[1] + '"><meta name="apple-mobile-web-app-title" content="' + v[2] + '"><meta name="apple-mobile-web-app-capable" content="yes">');
   document.title = v[2]; }</script>
-<script src="vieux-navigateur.js?v=271"></script><script src="js/session-dep.js?v=5"></script><script src="signaler.js?v=271"></script>
+<script src="vieux-navigateur.js?v=272"></script><script src="js/session-dep.js?v=5"></script><script src="signaler.js?v=272"></script>
 <style>
 /* © 2026 Jérémy Raymond. Tous droits réservés. Métier+ — Magasin de raccords (25 nov.) */
 :root{--fond:#F4F1EC;--carte:#fff;--carte2:#F8F6F2;--txt:#1E2A44;--doux:#6b7280;--ligne:#E5DAC6;--acc:#EB6A22;--vert:#1E8A55;--rouge:#C9362E;color-scheme:light}
@@ -467,8 +467,10 @@ setInterval(() => { if (document.querySelector(".mgEtat, #pEnv")) majEtat(); }, 
 /* =================================================================== absences (27 nov.) =====================================================
    Jeremy : « sur la carte, l'élève pourrait signaler une absence, déjà faite ou future; choix des motifs, avertissements »; « l'élève choisit avec qui il était
    à l'horaire »; « pas besoin d'appeler ». Motifs et avertissements : Règles de fonctionnement 2025-2026 du Pavillon (section 14). outils/absences.sql. */
-const MOTIFS = [null, "Maladie (hospitalisation, accident)", "Rendez-vous médical", "Décès d'un proche", "Rendez-vous aux services aux élèves", "Activité autorisée par un enseignant", "Autre"];
-const MOTIFS_C = [null, "Maladie", "Rendez-vous médical", "Décès d'un proche", "Services aux élèves", "Activité autorisée", "Autre"];
+/* 27 nov. (Loi 25, vérification) : aucun motif de santé. « Raison personnelle » couvre maladie, famille, deuil, sans détail.
+   Le motif 3 (ancien « décès d'un proche ») n'est plus offert; les anciens 1-2-3 ont été convertis dans la base. */
+const MOTIFS = [null, "Raison personnelle", "Rendez-vous", "Raison personnelle", "Rendez-vous aux services aux élèves", "Activité autorisée par un enseignant", "Autre"];
+const MOTIFS_C = [null, "Raison personnelle", "Rendez-vous", "Raison personnelle", "Services aux élèves", "Activité autorisée", "Autre"];
 const GENRES = { absence:"Absence", retard:"Retard", depart:"Départ hâtif" };
 const jourTxt = d => new Date(d + "T12:00:00").toLocaleDateString("fr-CA", { weekday:"short", day:"numeric", month:"short" });
 const quandTxt = a => (a.du === a.au ? jourTxt(a.du) : jourTxt(a.du) + " au " + jourTxt(a.au)) + (a.part === "am" ? " · avant-midi" : a.part === "pm" ? " · après-midi" : a.genre === "absence" ? " · journée" : "") + (a.heure ? " · " + hTxt(a.heure) : "");
@@ -496,7 +498,7 @@ async function absences(){
       <div class="carte abC"><div class="abS">Quoi ?</div><div class="abSeg">${Object.entries(GENRES).map(([k, t]) => `<button data-g="${k}" class="${S.genre === k ? "on" : ""}">${t}</button>`).join("")}</div>
         <div class="abS">Quand ?</div><div class="abD"><label>${S.genre === "absence" ? "Du" : "Le"}<input type="date" id="abDu" value="${S.du}"></label>${S.genre === "absence" ? `<label>Au<input type="date" id="abAu" value="${S.au}" min="${S.du}"></label>` : `<label>${S.genre === "retard" ? "J'arrive à" : "Je pars à"}<input type="time" id="abH" value="${S.heure}"></label>`}</div>
         ${S.genre === "absence" ? `<div class="abSeg" style="margin-top:8px">${[["j", "Journée"], ["am", "Avant-midi"], ["pm", "Après-midi"]].map(([k, t]) => `<button data-p="${k}" class="${S.part === k ? "on" : ""}">${t}</button>`).join("")}</div>` : ""}</div>
-      <div class="carte abC"><div class="abS">Motif</div><div class="abM">${MOTIFS.slice(1).map((t, i) => `<button data-m="${i + 1}" class="${S.motif === i + 1 ? "on" : ""}"><i></i>${t}</button>`).join("")}</div></div>
+      <div class="carte abC"><div class="abS">Motif</div><div class="abM">${[1, 2, 4, 5, 6].map(i => `<button data-m="${i}" class="${S.motif === i ? "on" : ""}"><i></i>${MOTIFS[i]}</button>`).join("")}</div><p class="sous" style="margin:8px 0 0;font-size:.85rem">N'écris aucun détail sur ta santé : le billet se remet directement au centre.</p></div>
       <div class="carte abC"><div class="abS">Ton enseignant à l'horaire</div><p class="sous" style="margin:0 0 8px">Avec qui étais-tu (ou seras-tu) pendant cette absence ?</p><div class="abP">${PROFS.map(id => `<button data-e="${esc(id)}" class="${S.profs.includes(id) ? "on" : ""}"><span class="av">${esc(nomEns(id).charAt(0))}</span>${esc(nomEns(id))}</button>`).join("")}</div></div>
       <div class="carte abC"><div class="abS">À savoir</div>${avert()}</div>
       <p class="err" id="abE"></p><button class="btn p" id="abOk" style="width:100%">Signaler à mon enseignant</button>
@@ -578,7 +580,7 @@ function panier(){
     ${!EDIT && LS.get("magCorrige", null) ? `<div class="corrige"><b>Corrige ton panier selon ton enseignant :</b> ${esc(LS.get("magCorrige", {}).motif || "")}</div>` : ""}
     <div class="carte" style="padding:0" id="pL">${ids.length ? ids.map(id => ligneArt(CAT.find(a => a.id === id))).join("") : `<p class="vide">Ton panier est vide.</p>`}</div>
     ${ids.length && !EDIT ? `<button class="lien vider" id="pVid">Vider le panier</button>` : ""}
-    <label for="pNote"><b>Pour quel travail ?</b> <span class="sous">(facultatif : cabine, projet…)</span></label><textarea id="pNote" maxlength="300">${esc(LS.get("magNote", ""))}</textarea>
+    <label for="pNote"><b>Pour quel travail ?</b> <span class="sous">(facultatif : cabine, projet… Aucun nom ni renseignement personnel.)</span></label><textarea id="pNote" maxlength="120">${esc(LS.get("magNote", ""))}</textarea>
     <p class="sous" style="margin-top:12px">Ton enseignant reçoit ton panier sur son cellulaire. Quand il l'approuve, va au comptoir du magasin avec ta carte étudiante.</p>
     ${!EDIT && etatMag().bientot ? `<p class="fermeN bientotN">Le magasin ferme dans ${etatMag().reste} min. Envoie ton panier maintenant.</p>` : ""}${!EDIT && !etatMag().ouvert ? `<p class="fermeN">Le magasin est fermé. Ton panier reste gardé : tu pourras l'envoyer quand il rouvre.</p>` : ""}<p class="err" id="pErr"></p><button class="btn p" id="pEnv" ${ids.length ? "" : "disabled"}>${EDIT ? "Enregistrer les changements" : "Envoyer à mon enseignant"}</button>
     ${EDIT ? `<button class="btn" id="pEdX" style="margin-top:10px">Laisser mon panier comme il était</button>` : ""}</main>`;
@@ -685,7 +687,7 @@ async function dessinerProf(){
   clearTimeout(profT);
   /* 27 nov. : la liste des codes des élèves se republie toute seule (js/registre-auto.js), aussi depuis le raccourci Commandes */
   if (!window.__regAuto) { window.__regAuto = 1; const charge = src => new Promise(ok => { const sc = document.createElement("script"); sc.src = src; sc.onload = sc.onerror = ok; document.head.appendChild(sc); });
-    (window.COFFRE ? Promise.resolve() : charge("coffre.js?v=271")).then(() => charge("js/registre-auto.js?v=2")); }
+    (window.COFFRE ? Promise.resolve() : charge("coffre.js?v=272")).then(() => charge("js/registre-auto.js?v=2")); }
   let L; try { L = await rpc("panier_prof_lire", { p_ens:ENS, p_jeton:JETON }); } catch(e){ $("#app").innerHTML = `<p class="err">Pas de connexion pour l'instant. On réessaie tout seul.</p>`; profT = setTimeout(dessinerProf, 15000); return; }
   { const N = await prenomsDossier(); (L || []).forEach(p => { if (N[p.code]) p.prenom = N[p.code]; }); PRENOMS_CMD = Object.fromEntries((L || []).map(p => [p.id, p.prenom || ""])); }   /* le prénom vient du dossier, jamais de ce que l'élève a tapé */
   let AVIS = []; try { AVIS = await rpc("panier_prof_avis", { p_ens:ENS, p_jeton:JETON }) || []; } catch(e){}
@@ -780,7 +782,7 @@ async function prenomsDossier(){
   if (PRD && Date.now() - PRD_T < 3e5) return PRD;
   const N = {}, ajoute = el => { for (const id in (el || {})) { const e = el[id]; if (e && e.c && e.p && !e.x) N[e.c] = String(e.p).trim().split(/\s+/)[0].slice(0, 20); } };
   try { ajoute((JSON.parse(localStorage.getItem("passeportOutils") || "null") || {}).el); } catch(e){}
-  if (!Object.keys(N).length) { try { await new Promise((ok, ko) => { if (window.COFFRE) return ok(); const sc = document.createElement("script"); sc.src = "coffre.js?v=271"; sc.onload = ok; sc.onerror = ko; document.head.appendChild(sc); });
+  if (!Object.keys(N).length) { try { await new Promise((ok, ko) => { if (window.COFFRE) return ok(); const sc = document.createElement("script"); sc.src = "coffre.js?v=272"; sc.onload = ok; sc.onerror = ko; document.head.appendChild(sc); });
     const r = await COFFRE.recevoir("passeport"); ajoute((JSON.parse((r && r.v && r.v.passeportOutils) || "null") || {}).el); } catch(e){} }
   PRD = N; PRD_T = Date.now(); return N;
 }

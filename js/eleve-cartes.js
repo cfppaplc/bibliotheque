@@ -32,9 +32,10 @@ window.ELEVE_CARTES = (function(){
   /* carte retrouvée avec le code à 5 chiffres (carte.html). kAncien : clé de la carte remplacée (carte perdue). */
   const prenomN = p => String(p || "").trim().split(/\s+/)[0].normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
   async function publierCode(e, kAncien){ if (!/^\d{5}$/.test(e.c) || !e.k) return false;
-    const K = await crypto.subtle.importKey("raw", await crypto.subtle.digest("SHA-256", te.encode("metier+|carte-code|" + e.c + "|cle")), "AES-GCM", false, ["encrypt"]);
+    const pn = prenomN(e.p); if (!pn) return false;   /* 27 nov. (Loi 25) : v2 = clé tirée du code ET du prénom; le serveur exige l'empreinte (ph) */
+    const K = await crypto.subtle.importKey("raw", await crypto.subtle.digest("SHA-256", te.encode("metier+|carte-code|" + e.c + "|" + pn + "|cle")), "AES-GCM", false, ["encrypt"]);
     const iv = crypto.getRandomValues(new Uint8Array(12)), ct = new Uint8Array(await crypto.subtle.encrypt({ name:"AES-GCM", iv }, K, te.encode(JSON.stringify({ c:"MP-" + e.c + "-" + e.k, g:e.g || "", p:String(e.p || "").trim().split(/\s+/)[0].slice(0, 20) })))), u = new Uint8Array(12 + ct.length); u.set(iv); u.set(ct, 12);
     const j = c2 => hex("metier+|carte-code-jeton|" + e.c + "|" + c2);
-    return (await rpc("carte_code_ecrire", { p_code:e.c, p_jeton:await j(kAncien || e.k), p_nouveau:kAncien ? await j(e.k) : null, p_data:JSON.stringify({ v:1, d:b64(u) }) })) === true; }
+    return (await rpc("carte_code_ecrire", { p_code:e.c, p_jeton:await j(kAncien || e.k), p_nouveau:kAncien ? await j(e.k) : null, p_data:JSON.stringify({ v:2, d:b64(u) }), p_ph:await hex("metier+|carte-code-ph|" + e.c + "|" + pn) })) === true; }
   return { transferer, livres, publierCode, prenomN };
 })();

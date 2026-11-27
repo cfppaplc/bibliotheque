@@ -134,6 +134,7 @@ window.COFFRE = (function(){
 
   async function demarrer(so, cfg){
     const c = SORTES[so] = Object.assign(SORTES[so] || {}, cfg);
+    try { if (c.cles) lsSet(meta(so, "cles"), JSON.stringify(c.cles)); } catch(e){}   /* 27 nov. (Loi 25) : pour vider l'appareil à la déconnexion, même d'une autre page */
     const s = await session(); c.s = s;
     if (!s || s.eleve){ c.id = null; return false; }   /* invité ou compte de groupe d'élèves : rien ne part */
     let change = false;
@@ -161,6 +162,14 @@ window.COFFRE = (function(){
       if (lsGet(meta(so, "sale"))) await pousser(so);
       if (lsGet(meta(so, "sale"))) lsSet(meta(so, "reste:" + c.id), JSON.stringify({ t:+lsGet(meta(so, "t")) || Date.now(), v:paquet(c, c.id) }));
       poser(c, c.id, {}); lsDel(meta(so, "t")); lsDel(meta(so, "sale")); lsDel(meta(so, "compte")); c.id = null; c.s = null; }
+    /* 27 nov. (vérification Loi 25 : copies en clair sur les appareils partagés, ex. TNI) : les données des autres sortes
+       (registre de formation, coffres…) ouvertes sur une autre page sont aussi retirées de l'appareil, si elles sont déjà envoyées.
+       Une sorte pas encore envoyée (« sale ») est gardée : rien n'est perdu, elle partira à la prochaine connexion. */
+    const PAR_DEFAUT = { passeport:["passeportOutils", "passPartageJeton", "passQrTailles", "passSuivi", "syncSec:passeport"], coffres:["coffresAtelier", "coffresJeton", "syncSec:coffres"] };
+    const sortes = new Set(Object.keys(PAR_DEFAUT)); try { for (let i = 0; i < localStorage.length; i++){ const m = /^coffre:([^:]+):cles$/.exec(localStorage.key(i)); if (m) sortes.add(m[1]); } } catch(e){}
+    for (const so of sortes){ if (lsGet(meta(so, "sale"))) continue;
+      let cles = PAR_DEFAUT[so] || []; try { cles = cles.concat(JSON.parse(lsGet(meta(so, "cles")) || "[]")); } catch(e){}
+      cles.forEach(k => { try { localStorage.removeItem(k); } catch(e){} }); ["t", "compte", "cles"].forEach(k => lsDel(meta(so, k))); }
     SESS = null;
   }
   function oublier(){ SESS = null; }

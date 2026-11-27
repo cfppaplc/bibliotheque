@@ -71,7 +71,7 @@ window.MESDOCS = (function(){
   /* ---- aperçu (couverture + nombre de pages) ---- */
   async function pdfjs(){
     if (window.pdfjsLib && window.pdfjsLib.getDocument) return;
-    const base = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/";
+    const base = "lib/pdfjs/";   /* 27 nov. (Loi 25) : pdf.js 3.11.174 copié dans le site, plus de CDN externe */
     await new Promise((ok, ko) => { const s = document.createElement("script"); s.src = base + "pdf.min.js"; s.onload = ok; s.onerror = ko; document.head.append(s); });
     window.pdfjsLib.GlobalWorkerOptions.workerSrc = base + "pdf.worker.min.js"; }
   async function apercu(bl, ext){

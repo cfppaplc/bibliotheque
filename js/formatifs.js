@@ -65,7 +65,7 @@
      dans le fichier (livre autonome, pour la publication). */
   async function pdfjsPret(){
     if (window.pdfjsLib && window.pdfjsLib.getDocument) return;
-    const base = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/";
+    const base = "lib/pdfjs/";   /* 27 nov. (Loi 25) : pdf.js 3.11.174 copié dans le site, plus de CDN externe */
     const load = src => new Promise((ok, ko) => { const sc = document.createElement("script"); sc.src = src; sc.onload = ok; sc.onerror = ko; document.head.append(sc); });
     await load(base + "pdf.min.js"); window.pdfjsLib.GlobalWorkerOptions.workerSrc = base + "pdf.worker.min.js";
   }

@@ -622,32 +622,41 @@ test("Comptoir : une nouvelle commande approuvée fait apparaître un gros bande
   await p.click("#mgBan"); await attendre(400); vrai(!(await p.$("#mgBan.on")), "Comptoir : le bandeau ne se ferme pas au toucher");
   vrai(!errs.length, "Erreurs : " + errs.join(" | ")); await ctx.close();
 });
-test("Carte : l'élève affiche sa carte avec son code à 5 chiffres seulement; trop de codes inconnus = pause", async b => {
+test("Déconnexion (Loi 25) : le registre et les coffres sont retirés de l'appareil, sauf ce qui n'est pas encore envoyé", async b => {   /* 27 nov. */
+  const ctx = await b.newContext({ serviceWorkers: "block" }); const p = await ctx.newPage(); await p.goto(BASE + "confidentialite.html"); await attendre(400);
+  if (!(await p.evaluate(() => !!window.COFFRE))) await p.addScriptTag({ url: "coffre.js?v=272" });
+  const r = await p.evaluate(async () => { localStorage.setItem("passeportOutils", JSON.stringify({ el: {} })); localStorage.setItem("passPartageJeton", "j"); localStorage.setItem("coffresAtelier", "{}");
+    localStorage.setItem("coffre:coffres:sale", "1"); localStorage.setItem("quizMaison", "[]"); localStorage.setItem("coffre:quiz:cles", JSON.stringify(["quizMaison"]));
+    await COFFRE.quitter(); return [localStorage.getItem("passeportOutils"), localStorage.getItem("passPartageJeton"), localStorage.getItem("coffresAtelier"), localStorage.getItem("quizMaison")]; });
+  vrai(r[0] === null && r[1] === null, "Déconnexion : le registre de formation reste sur l'appareil");
+  vrai(r[2] === "{}", "Déconnexion : des coffres pas encore envoyés ont été effacés (perte de données)");
+  vrai(r[3] === null, "Déconnexion : les données d'une autre page (quiz) restent sur l'appareil");
+  await ctx.close();
+});
+test("Carte : l'élève affiche sa carte avec son code ET son prénom (Loi 25); le code seul ne suffit pas; trop d'essais = pause", async b => {
   const c = await b.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: "block" }), R = {}, errs = []; let E = 0;
   await c.route(/rpc\/carte_code_(ecrire|lire)/, r => { const a = JSON.parse(r.request().postData()), u = r.request().url(); let out;
-    if (/ecrire/.test(u)) { const x = R[a.p_code]; out = !x || x.jeton === a.p_jeton; if (out) R[a.p_code] = { jeton: a.p_nouveau || a.p_jeton, data: a.p_data }; }
+    if (/ecrire/.test(u)) { const x = R[a.p_code]; out = !x || x.jeton === a.p_jeton; if (out) R[a.p_code] = { jeton: a.p_nouveau || a.p_jeton, data: a.p_data, ph: a.p_ph || null }; }
     else if (E >= 30) out = { etat: "bloque" };
-    else if (R[a.p_code]) out = { etat: "ok", data: R[a.p_code].data };
+    else if (R[a.p_code] && R[a.p_code].ph && a.p_ph === R[a.p_code].ph) out = { etat: "ok", data: R[a.p_code].data };
     else { E++; out = { etat: "non" }; }
     r.fulfill({ body: JSON.stringify(out), contentType: "application/json", headers: { "access-control-allow-origin": "*" } }); });
   const p = await c.newPage(); p.on("pageerror", e => errs.push(e.message)); await p.goto(BASE + "carte.html"); await attendre(600);
   await p.addScriptTag({ url: "js/eleve-cartes.js" });
   vrai(await p.evaluate(() => ELEVE_CARTES.publierCode({ c: "48213", k: "K7Q9X2", p: "Marc Tremblay", g: "5333" })), "Publication refusée");
-  await p.fill("#cle", "48214"); await attendre(500); vrai(/inconnu/.test(await p.textContent("#err")), "Code inconnu accepté");
-  await p.fill("#cle", "48213"); await attendre(900);   /* 5 chiffres : la carte s'ouvre seule */
-  vrai(/MP-48213-K7Q9X2/.test(await p.evaluate(() => localStorage.getItem("mpCarte"))), "Le code seul n'ouvre pas la carte");
+  await p.fill("#cle", "48213"); await attendre(500);
+  vrai(!(await p.evaluate(() => localStorage.getItem("mpCarte"))), "Le code seul ouvre encore la carte");
+  await p.fill("#pre", "Luc"); await p.click("#ok"); await attendre(700); vrai(/inconnu/.test(await p.textContent("#err")), "Un mauvais prénom ouvre la carte");
+  await p.fill("#pre", "marc"); await p.click("#ok"); await attendre(900);
+  vrai(/MP-48213-K7Q9X2/.test(await p.evaluate(() => localStorage.getItem("mpCarte"))), "Code + prénom n'ouvrent pas la carte");
   vrai((await p.textContent("#vP")).trim() === "Marc", "Le prénom n'est pas sur la carte");
   /* carte perdue : la recherche suit la nouvelle clé; personne d'autre ne peut la remplacer */
   vrai(await p.evaluate(() => ELEVE_CARTES.publierCode({ c: "48213", k: "NEWK44", p: "Marc" }, "K7Q9X2")), "Nouvelle carte : recherche non mise à jour");
   vrai(!(await p.evaluate(() => ELEVE_CARTES.publierCode({ c: "48213", k: "PIRATE", p: "Marc" }))), "N'importe qui peut remplacer la carte");
-  /* ancienne carte entrée avec la clé complète (sans prénom) : le prénom s'ajoute tout seul */
-  await p.evaluate(() => localStorage.setItem("mpCarte", JSON.stringify({ c: "MP-48213-NEWK44", g: "", p: "", t: 1 }))); await p.reload(); await attendre(1200);
-  vrai((await p.textContent("#vP")).trim() === "Marc", "Ancienne carte : le prénom ne s'ajoute pas");
   E = 30; await p.evaluate(() => localStorage.removeItem("mpCarte")); await p.reload(); await attendre(600);
-  await p.fill("#cle", "48213"); await attendre(500); vrai(/Trop d'essais/.test(await p.textContent("#err")), "Pas de pause après trop de codes inconnus");
+  await p.fill("#cle", "48213"); await p.fill("#pre", "Marc"); await p.click("#ok"); await attendre(500); vrai(/Trop d'essais/.test(await p.textContent("#err")), "Pas de pause après trop d'essais");
   vrai(!errs.length, errs.join(" | ")); await c.close();
 });
-
 test("Plein écran : reste actif en changeant de page (coquille)", async b => {   /* 27 nov. (Jeremy : « je veux que ça reste en plein écran sur tout le site ») */
   const c = await b.newContext({ viewport: { width: 1280, height: 720 } }); await c.addInitScript(() => { localStorage.bienvenueVu = "1"; });
   const p = await c.newPage(); const errs = []; p.on("pageerror", e => errs.push(e.message));

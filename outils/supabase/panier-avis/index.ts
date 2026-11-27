@@ -54,7 +54,7 @@ Deno.serve(async (req) => {
       return json({ ok: true, n });
     }
     if (absence) {   /* 27 nov. : absence signalée par l'élève (Ma carte) → enseignants qu'il a choisis */
-      const MOT = ["", "Maladie", "Rendez-vous médical", "Décès d'un proche", "Services aux élèves", "Activité autorisée", "Autre"], G: Record<string, string> = { absence: "Absence", retard: "Retard", depart: "Départ hâtif" };
+      const MOT = ["", "Raison personnelle", "Rendez-vous", "Raison personnelle", "Services aux élèves", "Activité autorisée", "Autre"], G: Record<string, string> = { absence: "Absence", retard: "Retard", depart: "Départ hâtif" };
       const { data: a } = await sb.from("absence").select("*").eq("id", absence).maybeSingle();
       if (!a || Date.now() - new Date(a.t).getTime() > 120000) return json({ ok: false });
       const j = (d: string) => new Date(d + "T12:00:00").toLocaleDateString("fr-CA", { weekday: "short", day: "numeric", month: "short" });

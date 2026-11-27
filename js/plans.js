@@ -93,7 +93,7 @@
   function pdfjs() {
     if (window.pdfjsLib && window.pdfjsWorker) return Promise.resolve();
     const load = src => new Promise((ok, ko) => { const sc = document.createElement("script"); sc.src = src; sc.onload = ok; sc.onerror = ko; document.head.append(sc); });
-    const base = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/";
+    const base = "lib/pdfjs/";   /* 27 nov. (Loi 25) : pdf.js 3.11.174 copié dans le site, plus de CDN externe */
     return load(base + "pdf.min.js").then(() => load(base + "pdf.worker.min.js")).then(() => {
       window.pdfjsLib.GlobalWorkerOptions.workerSrc = base + "pdf.worker.min.js";
     });

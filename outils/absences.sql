@@ -77,3 +77,7 @@ end; $$;
 grant execute on function public.absence_signaler(text, text, text, text, text[], text, date, date, text, text, int), public.absence_eleve(text, text),
   public.absence_annuler(text, text, uuid), public.absence_prof_lire(text, text), public.absence_vu(text, text, uuid) to anon, authenticated;
 revoke execute on function public.absence_carte_ok(text, text) from anon, authenticated;
+
+-- 27 nov. (vérification Loi 25) : plus aucun motif de santé. 1 = raison personnelle, 2 = rendez-vous, 3 (ancien deuil) → 1.
+update public.absence set motif = 1 where motif = 3;
+comment on column public.absence.motif is '1 raison personnelle, 2 rendez-vous, 4 services aux élèves, 5 activité autorisée, 6 autre (3 retiré le 27 nov. 2026)';

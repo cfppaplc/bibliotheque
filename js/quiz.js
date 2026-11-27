@@ -785,7 +785,7 @@ function telecommande(bord){
   /* Présentation avec questions (10 nov., idée de Jeremy) : les pages d'un PowerPoint enregistré en PDF deviennent des diapos (t:"diapo", img);
      l'enseignant ajoute des questions entre les diapos (« + Question ici »). En partie : diapo au tableau, cellulaires « Regarde le tableau », rien à répondre. */
   async function pdfjsPret(){ if (window.pdfjsLib && window.pdfjsLib.getDocument) return;
-    const base = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/";
+    const base = "lib/pdfjs/";   /* 27 nov. (Loi 25) : pdf.js 3.11.174 copié dans le site, plus de CDN externe */
     await new Promise((ok, ko) => { const sc = document.createElement("script"); sc.src = base + "pdf.min.js"; sc.onload = ok; sc.onerror = ko; document.head.append(sc); });
     window.pdfjsLib.GlobalWorkerOptions.workerSrc = base + "pdf.worker.min.js"; }
   async function importerPdf(fi){
