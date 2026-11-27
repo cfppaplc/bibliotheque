@@ -425,6 +425,7 @@ test("Magasin : l'élève (carte scannée) envoie son panier, l'enseignant appro
   vrai(/Sans carte étudiante/.test(await q.textContent(".avisMag")), "L'enseignant ne voit pas l'avis du magasinier");
   vrai(await q.$eval(".avisMag .avm", e => e.getBoundingClientRect().width > 250 && getComputedStyle(e).borderRadius === "0px"), "Avis du magasinier : la ligne est écrasée (style d'avatar)");   /* 26 nov., capture de Jeremy */
   if (process.env.CAPTURES) await q.screenshot({ path: process.env.CAPTURES + "/prof-avis.png" });
+  vrai(!!(await q.$(".cmd td.vg img, .cmd td.vg svg, .cmd td.vg .vig")), "Enseignant : pas de photo dans la commande à approuver");   /* 26 nov. */
   await q.click("[data-vu]"); await attendre(900); vrai(!(await q.$(".avisMag")) && A.length === 1, "« Vu » : l'avis reste affiché ou est effacé");
   await q.click("[data-non]"); await attendre(200);
   await q.click("[data-env]"); await attendre(300); vrai(P[1].etat === "attente", "Refus envoyé sans commentaire");

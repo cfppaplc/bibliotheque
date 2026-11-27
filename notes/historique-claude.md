@@ -840,3 +840,4 @@
 - 26 nov. : barre d'étapes (etapes, fonction de page) aussi sur les cartes de l'enseignant et du comptoir. Test ajouté.
 - 26 nov. : écran « Magasin en direct » (magasin.html?mode=ecran, fonction ecranDirect) : compteurs, commandes prêtes (prénom), plan, heure, mise à jour 10 s. Jeremy : « c'est pour moi » → ouvert par le bouton « Magasin en direct » de la page enseignant (sa clé, ses groupes, sans NIP); sinon NIP du comptoir. Test dans « Magasin : l'élève (carte scannée)… ».
 - 26 nov. : avis du magasinier écrasé sur la page enseignant (classe .av partagée avec les avatars) → .avm; bouton « Magasin en direct » affiché en lien bleu → a.btn sans soulignement. Test ajouté.
+- 26 nov. : photos des raccords dans les commandes de la page enseignant (td.vg + vigCmd). Test ajouté.
