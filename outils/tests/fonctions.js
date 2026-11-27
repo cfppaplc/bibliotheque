@@ -372,6 +372,7 @@ test("Magasin : l'élève (carte scannée) envoie son panier, l'enseignant appro
   vrai(!!(await m.$("[data-rem]")), "Code 12345 : commande absente");
   vrai(/^[A-Z]-\d+/.test((await m.textContent("td.rg")).trim()), "Rangée absente au comptoir");
   vrai(!!(await m.$(".cmd td.vg .ph")), "Comptoir : la photo du raccord ne s'affiche pas");
+  vrai(!!(await m.$(".cmd .etapes .et.cours")), "Comptoir : la barre d'étapes est absente");
   vrai(!!(await m.$("#app .avis-l .cloche svg")) && !/Activer sur cet appareil/.test(await m.textContent("#app")), "Comptoir : la cloche des avis remplace le bouton");
   vrai(/Essai/.test(await m.textContent(".cmd .pr")), "Prénom absent au comptoir");
   /* 26 nov. : un article rangé dans plusieurs cases montre toutes ses cases (ex. coude 90° acier 3/4 : F-90, F-91, F-104) */

@@ -837,3 +837,4 @@
 - 26 nov. : plan : affiche K à l'extérieur du mur de gauche (dans les jambes sinon). plan-magasin v17.
 - 26 nov. : 41 cases mal écrites corrigées sans ambiguïté (F125→F-125, J--57→J-57, 0-06→O-06, J-62&J-91→J-62 + J-91, G-77,78,79→3 cases, K-24-Q-42→K-24 + Q-42, (MUR)/(E-F)/ACÔTÉ retirés…). Restent à demander : HAUT…/HautdeG…, PORTEU, ENTREPÔTSOUDURE, -LABORATOIRE, numéros sans lettre (24, 41, 42, 151), 46-G/46FF/46RRR/E-46BBB, E-12-13-C-D, I-67-0-68.
 - 26 nov. : 9 photos de plus (articles sans photo, 2 agents, vérifiées à l'écran); 37 restent sans photo (noms vagues ou pièces introuvables).
+- 26 nov. : barre d'étapes (etapes, fonction de page) aussi sur les cartes de l'enseignant et du comptoir. Test ajouté.
