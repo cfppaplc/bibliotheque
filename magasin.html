@@ -620,7 +620,7 @@ async function suivi(){
   clearTimeout(suiviT); notifEleve(); const z = $("#mesEnvois"); if (!z || !MOI) return;
   const E = LS.get("magEnvois", []).filter(x => x.code === MOI.code && Date.now() - x.t < 7 * 864e5).sort((a, b) => b.t - a.t).slice(0, 3); if (!E.length)   /* 27 nov. (Jeremy) : seulement les 3 dernières commandes */ { z.innerHTML = ""; return; }
   const S = await Promise.all(E.map(x => rpc("panier_etat", { p_id:x.id }).catch(() => null)));
-const LBL = { attente:"En attente de ton enseignant", approuve:"Approuvé · va au comptoir avec ta carte", refuse:"Refusé", remis:"Remis" };
+const LBL = { attente:"En attente de ton enseignant", approuve:"Accepté · viens chercher ta commande", refuse:"Refusé", remis:"Remis" };
   const cpt = {}; S.forEach(s => { if (s) cpt[s.etat] = (cpt[s.etat] || 0) + 1; });   /* 26 nov. (Jeremy) : paniers envoyés repliés dans une barre */
   const resume = [["approuve", "approuvé"], ["attente", "en attente"], ["refuse", "refusé"], ["remis", "remis"]].filter(([k]) => cpt[k]).map(([k, t]) => `<span class="rp ${k}"><i></i>${cpt[k]} ${t}${cpt[k] > 1 && !/s$/.test(t) ? "s" : ""}</span>`).join("");
   z.innerHTML = `<details class="mesP"${LS.get("magSuiviOuv", false) ? " open" : ""}><summary><b>Mes paniers envoyés</b>${resume}</summary>` + E.map((x, k) => { const s = S[k] || { etat:"?" };
@@ -639,7 +639,7 @@ const LBL = { attente:"En attente de ton enseignant", approuve:"Approuvé · va 
       LS.set("magEnvois", LS.get("magEnvois", []).filter(y => y.id !== b.dataset.ann)); if (LS.get("magEdit", "") === b.dataset.ann) LS.set("magEdit", ""); toast("Panier annulé."); suivi(); }
     catch(e){ toast("Annulation impossible : " + e.message); b.disabled = false; } });
   /* changement d'état pendant que la page est ouverte : son + vibration + message */
-  const avant = LS.get("magEtats", {}); S.forEach((st, k) => { if (!st) return; const id = E[k].id; if (avant[id] && avant[id] !== st.etat && (st.etat === "approuve" || st.etat === "refuse")) { bip(); try { navigator.vibrate && navigator.vibrate([200, 100, 200]); } catch(e){} toast(st.etat === "approuve" ? "Ton panier est approuvé : va au comptoir." : "Ton panier est refusé."); } avant[id] = st.etat; }); LS.set("magEtats", avant);
+  const avant = LS.get("magEtats", {}); S.forEach((st, k) => { if (!st) return; const id = E[k].id; if (avant[id] && avant[id] !== st.etat && (st.etat === "approuve" || st.etat === "refuse")) { bip(); try { navigator.vibrate && navigator.vibrate([200, 100, 200]); } catch(e){} toast(st.etat === "approuve" ? "Accepté : viens chercher ta commande au comptoir." : "Ton panier est refusé."); } avant[id] = st.etat; }); LS.set("magEtats", avant);
   if (S.some(s => s && (s.etat === "attente" || s.etat === "approuve"))) suiviT = setTimeout(suivi, 10000);
 }
 

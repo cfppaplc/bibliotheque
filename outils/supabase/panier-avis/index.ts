@@ -75,7 +75,7 @@ Deno.serve(async (req) => {
       await sb.from("panier").update({ avise_eleve: true }).eq("id", id);
       const app = await webpush.ApplicationServer.new({ contactInformation: "https://metierplus.app", vapidKeys: k });
       const ok = p.etat === "approuve";
-      const msg = JSON.stringify({ title: ok ? "Ton panier est approuvé" : "Ton panier est refusé", body: ok ? "Va au comptoir du magasin avec ta carte Métier+." : (p.motif ? "Motif : " + p.motif : "Parle à ton enseignant."), url: "/magasin.html", tag: "panier-eleve-" + p.id });
+      const msg = JSON.stringify({ title: ok ? "Accepté · viens chercher ta commande" : "Ton panier est refusé", body: ok ? "Va au comptoir du magasin avec ta carte."   /* 27 nov. (Jeremy) */ : (p.motif ? "Motif : " + p.motif : "Parle à ton enseignant."), url: "/magasin.html", tag: "panier-eleve-" + p.id });
       try { await app.subscribe(p.abo).pushTextMessage(msg, {}); } catch (_) { /* appareil désabonné */ }
       return json({ ok: true });
     }
@@ -83,7 +83,7 @@ Deno.serve(async (req) => {
     await sb.from("panier").update({ avise: true }).eq("id", id);
     const items = (p.items || []) as { q?: number; nom?: string }[];
     const msg = JSON.stringify({
-      title: `Magasin : panier de l'élève ${p.code} (${p.groupe})`,
+      title: `${p.prenom || "L'élève " + p.code} a fait une commande`,   /* 27 nov. (Jeremy) */
       body: items.slice(0, 5).map((i) => `${i.q || 1} × ${i.nom || "?"}`).join(", ") + (items.length > 5 ? "…" : ""),
       url: "/magasin.html?mode=prof", tag: "panier-" + p.id,
     });
