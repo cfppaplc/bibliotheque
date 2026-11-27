@@ -265,7 +265,7 @@ window.ADMIN_PLUS = (function(){
 
 
   /* ---------- Magasin de raccords (25 nov.) ---------- */
-  let MG = null, MG_TXT = "", MG_Q = "", MG_MSG = "";
+  let MG = null, MG_TXT = "", MG_Q = "", MG_MSG = "", MG_MOD = -1;
   async function chargerMg(){ const t = await (await fetch("magasin-catalogue.json?t=" + Date.now(), { cache:"no-store" })).text(); MG = JSON.parse(t); MG_TXT = JSON.stringify(MG); }
   const mgChange = () => MG && JSON.stringify(MG) !== MG_TXT;
   /* contenu d'une case : articles dont la case principale ou une autre case est celle-là (« F-27 » trouve aussi « F-27-A ») */
@@ -288,6 +288,14 @@ window.ADMIN_PLUS = (function(){
       a.r = L1[0] || ""; if (L1.length > 1) a.r2 = L1.slice(1); else delete a.r2; mgEtat(); mgCase(z, c); }; }
   /* 26 nov. (Jeremy : « je veux toucher et pouvoir administrer la case ») : retirer / ajouter un raccord dans la case touchée, puis Publier le catalogue */
   let mgEtat = () => {};
+  function mgSituer(z, a){ const P = window.PlanMagasin; if (!P || !a) return; P.cases = (MG.plan || {}).parties || {}; P.tailles = (MG.plan || {}).tailles || {};
+    const C = [a.r, ...(a.r2 || [])].filter(Boolean), c = C.find(x => P.place(x)) || C[0] || "", l = P.lettre(c), num = +((String(c).match(/(\d+)/) || [])[1] || 0);
+    let seg = 0; if (P.place(c)) { const L = P.parties().filter(p => p.l === l); L.forEach((p, k) => P.lireCases(P.cases[p.n], p.l).forEach(([ll, x, y]) => { if (ll === l && num >= x && num <= y) seg = Math.floor(k / 4); })); }
+    const zs = z.querySelector(".ap-plan-svg"); if (!zs || !l) return;
+    zs.innerHTML = P.svg(new Set([l]), new Set(), [{ r:c }]).replace("<svg ", '<svg style="width:100%;max-width:640px;height:auto;display:block;margin:0 auto" ');
+    const face = z.querySelector(".ap-face"); face.innerHTML = P.vueFace(l, num ? [num] : [], seg) + mgHaut(l) + '<div class="ap-case"></div>';
+    const cel = face.querySelector('[data-c="' + l + "-" + num + '"]'); if (cel) cel.classList.add("ap-sel");
+    mgCase(face.querySelector(".ap-case"), num ? l + "-" + num : c); z.querySelector("#mgPlan").scrollIntoView({ block:"start", behavior:"smooth" }); }
   const mgNorm = t => String(t || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
   /* 26 nov. (Jeremy : « j'aimerais voir les photos ») : même photo que l'élève */
   const mgPhoto = a => !a || a.img === "-" ? "" : (a.img || (MG.photos || {})[String(a.type || "").toLowerCase() + "|" + (a.mat || "")] || "");
@@ -316,9 +324,13 @@ window.ADMIN_PLUS = (function(){
       + '<label class="abtn" for="mgCsv" style="margin:0;cursor:pointer">Remplacer par un fichier CSV</label><input type="file" id="mgCsv" accept=".csv,text/csv,.txt" hidden><button class="abtn" id="mgAj">+ Raccord</button><button class="abtn" id="mgAnn"' + (mgChange() ? '' : ' disabled') + '>Annuler</button><button class="abtn prim" id="mgPub"' + (mgChange() ? '' : ' disabled') + '>Publier le catalogue</button></div>'
       + '<p class="sous" style="font-size:.8rem">CSV : colonnes <b>numéro; nom; matériau; type; diamètre; rangée</b> (première ligne = titres). Dans Excel : Fichier → Enregistrer sous → CSV.</p>'
       + '<input type="text" id="mgQ" placeholder="Chercher dans le catalogue…" value="' + esc(MG_Q) + '" style="margin:6px 0 10px">'
-      + '<div class="ap-mg"><div class="ap-mg-l ap-mg-t"><span>N° d\'article</span><span>Nom affiché à l\'élève</span><span>Matériau</span><span>Type</span><span>Diamètre</span><span>Rangée</span><span></span></div>'
-      + R.slice(0, 200).map(([a, i]) => '<div class="ap-mg-l" data-i="' + i + '">' + ["n", "nom", "mat", "type", "d", "r"].map(k => '<input type="text" data-k="' + k + '" value="' + esc(a[k]) + '">').join("") + '<button class="abtn rouge" data-sup title="Retirer">×</button></div>').join("")
-      + (R.length > 200 ? '<p class="sous">' + (R.length - 200) + ' autres : précise ta recherche.</p>' : '') + '</div></div>';
+      /* 26 nov. (Jeremy : « simplifie le catalogue; on devrait avoir le bouton Situer sur le plan ») : une ligne lisible par raccord, Modifier ouvre les champs */
+      + '<div class="ap-mg">' + R.slice(0, 60).map(([a, i]) => { const u = mgPhoto(a), C = [a.r, ...(a.r2 || [])].filter(Boolean);
+          return '<div class="ap-mg-r" data-i="' + i + '">' + (u ? '<img src="' + esc(u) + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.outerHTML=\'<span class=ap-ci-v></span>\'">' : '<span class="ap-ci-v"></span>')
+            + '<div class="t"><b>' + esc(a.nom) + '</b><small>' + esc([a.n, a.mat, C.length ? "case " + C.join(", ") : "sans case"].filter(Boolean).join(" · ")) + '</small></div>'
+            + (C.length ? '<button class="abtn" data-sit>Situer</button>' : '') + '<button class="abtn" data-mod>' + (MG_MOD === i ? 'Fermer' : 'Modifier') + '</button></div>'
+            + (MG_MOD === i ? '<div class="ap-mg-ed" data-i="' + i + '">' + [["n", "N° d'article"], ["nom", "Nom affiché à l'élève"], ["mat", "Matériau"], ["type", "Type"], ["d", "Diamètre"], ["r", "Case principale"]].map(([k, t]) => '<label>' + t + '<input type="text" data-k="' + k + '" value="' + esc(a[k]) + '"></label>').join("") + '<button class="abtn rouge" data-sup>Retirer du catalogue</button></div>' : ''); }).join("")
+      + (R.length > 60 ? '<p class="sous">' + (R.length - 60) + ' autres : précise ta recherche.</p>' : '') + '</div></div>';
     const re = () => magasin(z), etat = mgEtat = () => { const c = mgChange(), e = z.querySelector(".ap-pub .acces-etat"); e.classList.toggle("pub", c); e.textContent = c ? "Des changements attendent d'être publiés" : "Tout est publié"; z.querySelector("#mgPub").disabled = !c; z.querySelector("#mgAnn").disabled = !c; };
     statsMg(z.querySelector("#mgSt")); aCommanderMg(z.querySelector("#mgAc"));
     { const zs = z.querySelector(".ap-plan-svg"); if (zs) { let face = z.querySelector(".ap-face"); if (!face) { face = document.createElement("div"); face.className = "ap-face"; zs.after(face); }
@@ -334,9 +346,11 @@ window.ADMIN_PLUS = (function(){
     z.querySelectorAll("[data-copie]").forEach(b => b.onclick = () => { try { navigator.clipboard.writeText(b.dataset.copie); b.textContent = "Lien copié"; } catch(e){} });
     z.querySelectorAll("[data-ici]").forEach(b => b.onclick = () => ouvrirIci(z, b.dataset.ici, b.dataset.t, magasin, "Magasin"));
     z.querySelector("#mgQ").oninput = e => { MG_Q = e.target.value; const p = e.target.selectionStart; re(); const n = z.querySelector("#mgQ"); n.focus(); n.setSelectionRange(p, p); };
-    z.querySelectorAll(".ap-mg-l[data-i] input").forEach(inp => inp.oninput = () => { const a = MG.raccords[+inp.closest("[data-i]").dataset.i]; a[inp.dataset.k] = inp.value; if (inp.dataset.k !== "n" && !a.nom) a.nom = ""; etat(); });
+    z.querySelectorAll(".ap-mg-ed[data-i] input").forEach(inp => inp.oninput = () => { const a = MG.raccords[+inp.closest("[data-i]").dataset.i]; a[inp.dataset.k] = inp.value; if (inp.dataset.k !== "n" && !a.nom) a.nom = ""; etat(); });
     z.querySelectorAll("[data-sup]").forEach(b => b.onclick = () => { const i = +b.closest("[data-i]").dataset.i; if (!confirm("Retirer « " + MG.raccords[i].nom + " » du catalogue ?")) return; MG.raccords.splice(i, 1); re(); });
-    z.querySelector("#mgAj").onclick = () => { const id = "r" + Date.now().toString(36); MG.raccords.unshift({ id, n:"", nom:"Nouveau raccord", mat:"", type:"", d:"", r:"" }); MG_Q = ""; re(); };
+    z.querySelectorAll("[data-mod]").forEach(b => b.onclick = () => { const i = +b.closest("[data-i]").dataset.i; MG_MOD = MG_MOD === i ? -1 : i; re(); });
+    z.querySelectorAll("[data-sit]").forEach(b => b.onclick = () => mgSituer(z, MG.raccords[+b.closest("[data-i]").dataset.i]));
+    z.querySelector("#mgAj").onclick = () => { const id = "r" + Date.now().toString(36); MG.raccords.unshift({ id, n:"", nom:"Nouveau raccord", mat:"", type:"", d:"", r:"" }); MG_Q = ""; MG_MOD = 0; re(); };
     z.querySelector("#mgAnn").onclick = async () => { await chargerMg(); MG_MSG = ""; re(); };
     z.querySelector("#mgCsv").onchange = async e => { const f = e.target.files[0]; if (!f) return; const t = (await f.text()).replace(/^﻿/, ""), sep = (t.split("\n")[0].match(/;/g) || []).length >= (t.split("\n")[0].match(/,/g) || []).length ? ";" : ",";
       const L = t.split(/\r?\n/).filter(l => l.trim()).map(l => l.split(sep).map(x => x.trim().replace(/^"|"$/g, "")));

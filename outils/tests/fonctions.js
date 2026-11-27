@@ -121,7 +121,14 @@ test("Administration : chaque onglet s'ouvre; Quoi de neuf se modifie et s'annul
     vrai(await p.$$eval("#mgPlan .ap-ci", L => L.length) === nb0 - 1 && await p.$eval("#mgPub", b => !b.disabled), "Case : « Retirer » ne retire pas le raccord ou Publier reste grisé");
     await p.fill("#mgPlan .ap-aj", nom0.split(" ").slice(0, 3).join(" ")); await attendre(200); await p.click("#mgPlan [data-aj]"); await attendre(200);
     vrai(await p.$$eval("#mgPlan .ap-ci", L => L.length) === nb0, "Case : « Ajouter » ne remet pas le raccord dans la case");
-    await p.click("#mgAnn"); await attendre(400); }
+    await p.click("#mgAnn"); await attendre(400);
+    /* 26 nov. : catalogue simplifié; « Situer » ouvre l'étagère de face avec la case du raccord */
+    await p.fill("#mgQ", "clapet antiretour 1 po F laiton"); await attendre(500);
+    vrai(!(await p.$(".ap-mg-l input")), "Catalogue : les champs doivent être fermés (bouton Modifier)");
+    await p.evaluate(() => [...document.querySelectorAll(".ap-mg-r")].find(r => r.querySelector("b").textContent.trim() === "Clapet antiretour 1 po F laiton").querySelector("[data-sit]").click()); await attendre(400);
+    vrai(/J-5|J-05/.test(await p.textContent("#mgPlan .ap-case")) && !!(await p.$("#mgPlan .ap-face .pm-cl")), "Catalogue : « Situer » ne montre pas la case sur le plan");
+    await p.click(".ap-mg-r [data-mod]"); await attendre(300); vrai(!!(await p.$('.ap-mg-ed [data-k="nom"]')), "Catalogue : « Modifier » n'ouvre pas les champs");
+    await p.fill("#mgQ", ""); await attendre(300); }
   const cy = await p.evaluate(() => { PlanMagasin.cases = { "2": "6-9, 27-30", "53": "A 1-30" }; const d = document.createElement("div");
     d.innerHTML = PlanMagasin.svg(new Set(["J"]), new Set(), [{ r: "J-28" }, { r: "A-12" }, { r: "J-200" }]); return [...d.querySelectorAll("circle.pm-p")].map(c => +c.getAttribute("cy")); });
   vrai(cy.length === 2 && cy[0] > 126 && cy[0] < 174, "Plan : J-28 hors de la partie 2 (" + cy.join(",") + ")");

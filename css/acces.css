@@ -482,3 +482,9 @@ body.clair .as-lien{background:#f5f6fa;border-color:#e3e6ee}body.clair .as-sig{b
 .ap-ci-v{display:block;border-style:dashed;cursor:default}.ap-ci img.gros{width:240px;height:240px;cursor:zoom-out}
 .ap-ajc{margin-top:10px}.ap-ajc input{width:100%}.ap-ajl{display:grid;gap:4px;margin-top:6px}
 .ap-ajb{display:block;text-align:left;padding:8px 10px;border:1px solid var(--ligne,#e3e6eb);border-radius:8px;background:var(--carte,#fff);color:inherit;font:inherit;cursor:pointer}.ap-ajb b{display:block;font-weight:600}.ap-ajb small{color:var(--doux,#6b7280)}
+/* 26 nov. : catalogue simplifié (une ligne par raccord, Modifier ouvre les champs) */
+.ap-mg-r{display:flex;align-items:center;gap:10px;padding:8px 4px;border-top:1px solid var(--ligne,#e3e6eb)}
+.ap-mg-r img,.ap-mg-r .ap-ci-v{flex:none;width:44px;height:44px;object-fit:contain;background:#fff;border:1px solid var(--ligne,#e3e6eb);border-radius:8px;padding:2px}
+.ap-mg-r .t{flex:1;min-width:0}.ap-mg-r .t b{display:block;font-weight:600}.ap-mg-r .t small{color:var(--doux,#6b7280)}
+.ap-mg-ed{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;padding:10px;margin:0 0 8px;background:var(--fond2,#f6f7f9);border-radius:10px}
+.ap-mg-ed label{display:grid;gap:3px;font-size:.8rem;color:var(--doux,#6b7280)}.ap-mg-ed .rouge{align-self:end}
