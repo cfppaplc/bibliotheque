@@ -829,3 +829,4 @@
 - 26 nov. : notifications : une fois activées, lien « Désactiver les notifications » à côté de la cloche verte (enseignant : abonner(false); comptoir : comptoirActif, magasin_abonner p_oui=false). Mot « notifications » au lieu d'« avis » sur les cloches. Élève : pas de désabonnement (pas de fonction au serveur; l'avis est lié à un seul panier).
 - 26 nov. : élève : une seule cloche « Activer les notifications » en haut du magasin (cellulaire seulement, pas les iPad des coffres = POSTE) : LS magNotifE; chaque panier envoyé est abonné tout seul (aboEleve), « Désactiver les notifications » arrête pour les prochains. Cloche par panier retirée. Test ajouté.
 - 26 nov. : enseignant (magasin) : lien « Recevoir aussi sur mon cellulaire » et son code QR retirés (Jeremy : pas utile). Le lien ?cle= reste accepté par la page.
+- 26 nov. : cloche des notifications élève aussi sur les iPad (Jeremy : un iPad = 2 élèves pour la formation, pas grave).

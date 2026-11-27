@@ -385,14 +385,14 @@ function panier(){
 }
 /* suivi des paniers envoyés (sur cet iPad), mis à jour toutes les 10 s */
 let suiviT = 0;
-/* 26 nov. (Jeremy : « les élèves aussi : activer les notifications ») : une seule cloche pour l'élève (sur son cellulaire, pas sur les iPad des coffres);
+/* 26 nov. (Jeremy : « les élèves aussi : activer les notifications ») : une seule cloche pour l'élève (cellulaire ou iPad);
    une fois activée, chaque panier envoyé l'avertira de la réponse de son enseignant. « Désactiver » arrête pour les prochains paniers. */
 async function pushSub(){ const reg = await navigator.serviceWorker.register("sw.js"); await navigator.serviceWorker.ready; let sub = await reg.pushManager.getSubscription();
   if (!sub) { const { cle } = await (await fetch(SUPA + "/functions/v1/panier-avis", { headers:{ apikey:CLE } })).json(); sub = await reg.pushManager.subscribe({ userVisibleOnly:true, applicationServerKey:Uint8Array.from(atob(cle.replace(/-/g, "+").replace(/_/g, "/")), c => c.charCodeAt(0)) }); }
   return sub; }
 async function aboEleve(id){ const sub = await pushSub(); if (await rpc("panier_abonner_eleve", { p_id:id, p_abonnement:sub.toJSON() }) !== true) return false;
   const E2 = LS.get("magEnvois", []); const x = E2.find(y => y.id === id); if (x) x.abo = 1; LS.set("magEnvois", E2); return true; }
-function notifEleve(){ const z = $("#notifE"); if (!z) return; if (POSTE || !("PushManager" in window) || !("Notification" in window)) { z.innerHTML = ""; return; }
+function notifEleve(){ const z = $("#notifE"); if (!z) return; if (!("PushManager" in window) || !("Notification" in window)) { z.innerHTML = ""; return; }   /* 26 nov. (Jeremy) : aussi sur les iPad (2 élèves par iPad, pas grave) */
   const on = LS.get("magNotifE", false) && Notification.permission === "granted";
   z.innerHTML = on ? `<span class="cloche on" role="img" aria-label="Notifications activées">${CLOCHE}</span><button class="lien" id="neNon">Désactiver les notifications</button>`
     : `<button class="cloche" id="neOui" aria-label="Activer les notifications">${CLOCHE}</button><button class="lien" id="neOui2">Activer les notifications</button>`;
