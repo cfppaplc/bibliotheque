@@ -266,6 +266,8 @@ h1{font-size:1.75rem;font-weight:800;margin-bottom:2px}
 .barre .btn{min-height:56px;padding:0 28px;font-size:1.1rem}.barre .btn:not(.p){background:transparent;color:#fff;border-color:rgba(255,255,255,.4)}
 .mag-code input{border-radius:18px;border-width:3px;min-height:64px}
 .cmd .h{padding:16px 18px}.cmd td{padding:12px 18px}
+/* 27 nov. (Jeremy : « même sans commande, l'espace doit être plus gros ») */
+#mL .videAP{display:flex;align-items:center;justify-content:center;min-height:180px;margin:4px 0 18px;padding:24px;border:3px dashed #E9C4AA;border-radius:20px;background:#fff;font-size:1.35rem;font-weight:700;color:#6b7280;text-align:center}
 #mgBan{position:fixed;left:50%;top:14px;z-index:70;transform:translate(-50%,-160%);display:flex;align-items:center;gap:16px;width:min(720px,calc(100% - 24px));padding:18px 22px;border:0;border-radius:20px;background:#EB6A22;color:#fff;font:inherit;text-align:left;box-shadow:0 18px 40px rgba(20,33,61,.35);cursor:pointer;transition:transform .35s cubic-bezier(.2,.9,.3,1.2)}
 #mgBan.on{transform:translate(-50%,0)}#mgBan b{display:block;font-size:1.35rem}#mgBan span:nth-child(2){flex:1;font-size:1.05rem}#mgBan em{font-style:normal;font-weight:800;background:#fff;color:#EB6A22;border-radius:12px;padding:10px 16px}
 #mgBan .mgBi{width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.2);display:grid;place-items:center;flex:none}#mgBan .mgBi svg{width:28px;height:28px}
@@ -939,7 +941,7 @@ function dessinerMag(){
   const AP = regrouper(app); MULTI = new Map(AP.filter(p => p.ids).map(p => [p.id, p]));
   z.innerHTML = (FILTRE_CODE ? `<p class="sous">Élève <b>${esc(FILTRE_CODE)}</b> : ${app.length ? app.length + " commande" + (app.length > 1 ? "s" : "") + " à préparer" : "aucune commande approuvée"}.</p>` : "")
 
-    + `<div class="sec">À préparer (${AP.length})</div>` + (AP.length ? AP.map(carte).join("") : `<p class="vide">${FILTRE_CODE ? "Rien pour cet élève. Son enseignant doit d'abord approuver son panier." : "Aucune commande approuvée pour l'instant."}</p>`)
+    + `<div class="sec">À préparer (${AP.length})</div>` + (AP.length ? AP.map(carte).join("") : `<p class="vide videAP">${FILTRE_CODE ? "Rien pour cet élève. Son enseignant doit d'abord approuver son panier." : "Aucune commande approuvée pour l'instant."}</p>`)
     + (rem.length ? `<div class="sec">Remis aujourd'hui (${rem.length})</div>` + rem.map(carte).join("") : "");
   const trouve = id => MULTI.get(id) || MAG.find(p => p.id === id);
   z.querySelectorAll("[data-prep]").forEach(b => b.onclick = () => preparer(trouve(b.dataset.prep)));

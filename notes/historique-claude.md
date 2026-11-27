@@ -881,3 +881,4 @@
 - 27 nov. 15 h (Jeremy : « au comptoir, la case des commandes à préparer plus grosse ») : #mL .cmd.e-approuve : bordure orange 3 px, prénom 1,6rem, code 1,25rem, avatar 60 px, boutons Préparer/Remis 64 px. sw v242.
 - 27 nov. 15 h (Jeremy : « notification temporaire au comptoir, l'iPad est bloqué par le SRI ») : bandeauMag() = gros bandeau orange en haut (15 s ou jusqu'au toucher → va à la commande), en plus du bip et du titre qui clignote; pas besoin des notifications de l'appareil. Test ajouté. sw v243.
 - 27 nov. 15 h : avisComptoir() n'affiche plus « Avis des nouvelles commandes sur cet iPad » (iPad hors raccourci); le bandeau dans la page suffit. sw v244.
+- 27 nov. 15 h 05 : comptoir, « Aucune commande approuvée » dans une grande case pointillée (.videAP, 180 px, 1,35rem). sw v245.
