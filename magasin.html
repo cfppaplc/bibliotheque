@@ -179,6 +179,24 @@ input.cache-code:not(:placeholder-shown){-webkit-text-security:disc;text-securit
 .etapes .et.non{color:var(--rouge)}.etapes .et.non i{background:var(--rouge);border-color:var(--rouge)}.etapes .et.non i::before,.etapes .et.non i::after{content:"";position:absolute;left:9px;top:3px;width:3px;height:14px;background:#fff;transform:rotate(45deg);border:0}.etapes .et.non i::after{transform:rotate(-45deg)}
 .etapes .et.cours{color:#B2470F}.etapes .et.cours i{border-color:var(--acc);animation:etP 1.2s ease-in-out infinite}@keyframes etP{0%,100%{box-shadow:0 0 0 0 rgba(235,106,34,.45)}50%{box-shadow:0 0 0 8px rgba(235,106,34,0)}}
 .etapes .bar{flex:1;height:4px;border-radius:2px;background:#d5dae3;margin-top:11px}.etapes .bar.ok{background:var(--vert)}
+/* 26 nov. (Jeremy : « il manque d'animation légère ») : apparition douce au premier affichage seulement (pas à chaque mise à jour), boutons qui répondent au toucher, nouvelle commande qui glisse, message qui monte. */
+@media (prefers-reduced-motion:no-preference){
+body:not(.anim-ok) main .carte,body:not(.anim-ok) .cmd,body:not(.anim-ok) .ed-k>div,body:not(.anim-ok) main h1{animation:mpIn .4s cubic-bezier(.2,.8,.2,1) both}
+body:not(.anim-ok) .cmd:nth-of-type(2),body:not(.anim-ok) .carte:nth-of-type(2),body:not(.anim-ok) .ed-k>div:nth-child(2){animation-delay:.06s}
+body:not(.anim-ok) .cmd:nth-of-type(3),body:not(.anim-ok) .carte:nth-of-type(3),body:not(.anim-ok) .ed-k>div:nth-child(3){animation-delay:.12s}
+body:not(.anim-ok) .cmd:nth-of-type(n+4),body:not(.anim-ok) .carte:nth-of-type(n+4){animation-delay:.18s}
+body:not(.anim-ok) .etapes .bar.ok{animation:mpBar .7s .25s ease both;transform-origin:left}
+.cmd.neuf{animation:mpIn .45s cubic-bezier(.2,.8,.2,1) both}
+.btn,.cloche,.ac-p,.lien,button{transition:transform .12s ease,box-shadow .2s ease,background-color .2s ease}
+.btn:active,.cloche:active,.ac-p:active,[data-dq]:active,[data-nq]:active{transform:scale(.96)}
+.cloche.on svg{animation:mpCloche .8s ease 1}
+.toast{animation:mpToast .3s cubic-bezier(.2,.8,.2,1) both}
+.cmd .fl{transition:transform .2s ease}
+}
+@keyframes mpIn{from{opacity:0;transform:translateY(10px)}}
+@keyframes mpBar{from{transform:scaleX(0)}}
+@keyframes mpCloche{0%,100%{transform:rotate(0)}20%{transform:rotate(14deg)}40%{transform:rotate(-12deg)}60%{transform:rotate(8deg)}80%{transform:rotate(-4deg)}}
+@keyframes mpToast{from{opacity:0;transform:translate(-50%,14px)}}
 /* écran « Magasin en direct » */
 body.ecranD main{max-width:1500px}a.btn{text-decoration:none;color:inherit;display:inline-flex;align-items:center;justify-content:center}.edB{margin:4px 0 6px;color:var(--acc);font-weight:700}.ed{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px;align-items:start}@media (max-width:900px){.ed{grid-template-columns:1fr}}
 .ed-k{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.ed-k>div{background:#fff;border-radius:18px;box-shadow:var(--ombre);padding:16px;text-align:center}.ed-k b{display:block;font-size:2.6rem;line-height:1;color:var(--acc)}.ed-k span{color:var(--doux);font-weight:600}
@@ -757,6 +775,7 @@ async function remettre(id, oui){ try { await rpcM("panier_remettre", { p_id:id,
 /* =================================================================== départ =================================================================== */
 (async () => {
   await Promise.all([chargerComptes(), chargerCatalogue()]);
+  setTimeout(() => document.body.classList.add("anim-ok"), 1500);   /* animations d'apparition : premier affichage seulement */
   if (MODE === "prof") return prof();
   if (MODE === "magasin") return magasinier();
   if (MODE === "ecran") return ecranDirect();
