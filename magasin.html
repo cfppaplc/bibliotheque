@@ -205,6 +205,7 @@ body:not(.anim-ok) .etapes .bar.ok{animation:mpBar .7s .25s ease both;transform-
 @keyframes mpQte{from{opacity:.25;transform:scale(.94)}}
 @keyframes mpNum{0%{transform:scale(1)}40%{transform:scale(1.18)}100%{transform:scale(1)}}
 @keyframes mpBarreIn{from{opacity:0;transform:translateY(24px)}}
+.vider{display:block;margin:10px 0 4px auto;color:var(--rouge);font-weight:700}.vider.sur{background:#FBE9E7;border-radius:10px;padding:8px 12px}
 /* écran « Magasin en direct » */
 body.ecranD main{max-width:1500px}a.btn{text-decoration:none;color:inherit;display:inline-flex;align-items:center;justify-content:center}.edB{margin:4px 0 6px;color:var(--acc);font-weight:700}.ed{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px;align-items:start}@media (max-width:900px){.ed{grid-template-columns:1fr}}
 .ed-k{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.ed-k>div{background:#fff;border-radius:18px;box-shadow:var(--ombre);padding:16px;text-align:center}.ed-k b{display:block;font-size:2.6rem;line-height:1;color:var(--acc)}.ed-k span{color:var(--doux);font-weight:600}
@@ -410,12 +411,16 @@ function panier(){
   ov.innerHTML = `<div class="top"><img src="img/metier-plus-blanc.svg" alt=""><b>Mon panier</b><span class="sp"></span><button id="pF">‹ Continuer</button></div><main>
     ${!EDIT && LS.get("magCorrige", null) ? `<div class="corrige"><b>Corrige ton panier selon ton enseignant :</b> ${esc(LS.get("magCorrige", {}).motif || "")}</div>` : ""}
     <div class="carte" style="padding:0" id="pL">${ids.length ? ids.map(id => ligneArt(CAT.find(a => a.id === id))).join("") : `<p class="vide">Ton panier est vide.</p>`}</div>
+    ${ids.length && !EDIT ? `<button class="lien vider" id="pVid">Vider le panier</button>` : ""}
     <label for="pNote"><b>Pour quel travail ?</b> <span class="sous">(facultatif : cabine, projet…)</span></label><textarea id="pNote" maxlength="300">${esc(LS.get("magNote", ""))}</textarea>
     <p class="sous" style="margin-top:12px">Ton enseignant reçoit ton panier sur son cellulaire. Quand il l'approuve, va au comptoir du magasin avec ta carte étudiante.</p>
     <p class="err" id="pErr"></p><button class="btn p" id="pEnv" ${ids.length ? "" : "disabled"}>${EDIT ? "Enregistrer les changements" : "Envoyer à mon enseignant"}</button>
     ${EDIT ? `<button class="btn" id="pEdX" style="margin-top:10px">Laisser mon panier comme il était</button>` : ""}</main>`;
   if (EDIT) $("#pEdX").onclick = () => { LS.set("magEdit", ""); PANIER = {}; sauverPanier(); LS.set("magNote", ""); fermer(); };
   const fermer = () => { ov.hidden = true; document.body.style.overflow = ""; eleveCatalogue(); };
+  /* 26 nov. (Jeremy : « supprimer son panier rapidement ») : deux touches pour éviter un accident */
+  if ($("#pVid")) $("#pVid").onclick = e => { const b = e.currentTarget; if (!b.classList.contains("sur")) { b.classList.add("sur"); b.textContent = "Toucher encore pour tout enlever"; setTimeout(() => { if (b.isConnected) { b.classList.remove("sur"); b.textContent = "Vider le panier"; } }, 4000); return; }
+    PANIER = {}; sauverPanier(); LS.set("magNote", ""); LS.set("magCorrige", null); fermer(); toast("Panier vidé."); };
   $("#pF").onclick = fermer; $("#pNote").oninput = e => LS.set("magNote", e.target.value);
   brancherQte($("#pL"), () => { if (!nbPanier()) $("#pEnv").disabled = true; });
   $("#pEnv").onclick = async () => { const b = $("#pEnv"); b.disabled = true; b.textContent = "Envoi…";

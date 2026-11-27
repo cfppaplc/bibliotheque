@@ -420,6 +420,9 @@ test("Magasin : l'élève (carte scannée) envoie son panier, l'enseignant appro
   vrai(!!(await m.$(".cmd.fin.repli")), "Commande remise : pas repliée au comptoir");
   await m.click(".cmd.fin .fl"); await attendre(200); vrai(!(await m.$(".cmd.fin.repli")), "Flèche : ne rouvre pas la commande");
   /* refus avec commentaire (25 nov.) : deuxième panier, refusé avec motif, l'élève voit le commentaire */
+  await p.click(".art .aj"); await attendre(200); await p.click("#bVoir"); await attendre(300);   /* 26 nov. : vider le panier en deux touches */
+  await p.click("#pVid"); vrai(/encore/.test(await p.textContent("#pVid")), "Vider le panier : pas de confirmation"); await p.click("#pVid"); await attendre(400);
+  vrai(await p.$eval("#barre", b => b.hidden) && await p.$eval("#ov", o => o.hidden), "Vider le panier : le panier n'est pas vidé");
   await p.click(".art .aj"); await attendre(200); await p.click("#bVoir"); await attendre(300); await p.click("#pEnv"); await attendre(1200);
   await q.reload(); await attendre(1500);
   vrai(/Sans carte étudiante/.test(await q.textContent(".avisMag")), "L'enseignant ne voit pas l'avis du magasinier");

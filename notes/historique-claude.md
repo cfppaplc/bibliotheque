@@ -844,3 +844,4 @@
 - 26 nov. : page enseignant, « Traités » = 3 dernières heures (avant 24 h), le reste dans les archives.
 - 26 nov. : animations légères dans magasin.html (apparition au 1er affichage seulement via body.anim-ok après 1,5 s, barre d'étapes qui se remplit, boutons qui s'enfoncent, cloche qui sonne, nouvelle commande qui glisse, message qui monte; respecte « réduire les animations »).
 - 26 nov. : « Ajouter » au panier plus doux (Jeremy : « moins rough ») : .qte.doux (fondu + léger zoom, chiffre qui gonfle), barre du panier qui monte (#barre.entre) ou dont le compte rebondit (#barre.bump).
+- 26 nov. : bouton « Vider le panier » (#pVid) dans Mon panier, deux touches (« Toucher encore pour tout enlever », 4 s). Pas affiché en modification d'un panier envoyé. Test ajouté.
