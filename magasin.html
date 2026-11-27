@@ -383,7 +383,10 @@ function eleveEntree(msg){
     if (L.length === 1) return connecter(c.code, L[0]);
     $("#cErr").innerHTML = "Quel est ton groupe ? " + L.map((x, k) => `<button class="btn" data-k="${k}" style="margin:6px 6px 0 0">${esc(x.groupe)} · ${esc(nomEns(x.ens))}</button>`).join("");
     $("#cErr").querySelectorAll("[data-k]").forEach(b => b.onclick = () => connecter(c.code, L[+b.dataset.k])); };
-  i.onkeydown = e => { if (e.key === "Enter") go(); }; i.oninput = () => { if (/^\d{5}$/.test(i.value)) go(); }; $("#cPre").onkeydown = e => { if (e.key === "Enter") go(); }; $("#cOk").onclick = go; i.focus();
+  i.onkeydown = e => { if (e.key === "Enter") go(); }; i.oninput = () => { if (/^\d{5}$/.test(i.value)) go(); }; $("#cPre").onkeydown = e => { if (e.key === "Enter") go(); }; $("#cOk").onclick = go;
+  /* 27 nov. (Jeremy : « sur iPhone, après Changer, le clavier ne s'ouvre plus ») : sur un écran tactile, la case placée d'avance par la page
+     bloquait le clavier d'iOS au toucher. Focus automatique seulement au poste (lecteur de codes-barres) ou à la souris. */
+  if (POSTE || !matchMedia("(pointer:coarse)").matches) i.focus();
 }
 function connecter(code, x){ MOI = { code, ens:x.ens, groupe:x.groupe, profs:(x.profs || []).filter(id => id !== x.ens), prenom:LS.get("magPrenom", "") }; LS.set("magEleve", MOI); eleveCatalogue(); }
 function enTete(){ $("#tQui").innerHTML = `<b>${MOI.prenom ? "Bonjour " + esc(MOI.prenom) : ""}</b> <span class="cg">· ${MOI.groupe === "ESSAI" ? "•••••" : esc(MOI.code)}</span><span class="gp"> · ${esc(MOI.groupe)}</span>`; $("#tSortir").hidden = false;

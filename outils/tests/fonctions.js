@@ -521,6 +521,16 @@ test("Registre automatique : la liste des codes se republie seule depuis le coff
   vrai(r2 === "vide" && W.length === 1, "Registre automatique : un registre vide a été publié");
   await ctx.close();
 });
+test("Magasin (iPhone) : après « Changer d'élève », la case du code n'est pas placée d'avance (le clavier d'iOS s'ouvre au toucher)", async b => {   /* 27 nov. */
+  const ctx = await b.newContext({ viewport: { width: 390, height: 800 }, hasTouch: true, isMobile: true, serviceWorkers: "block" });
+  await ctx.addInitScript(() => { localStorage.setItem("bienvenueVu", "1"); localStorage.setItem("magEleve", JSON.stringify({ code: "12345", ens: "jeremy.raymond", groupe: "2608 EGI", profs: [], prenom: "Alex" })); });
+  await ctx.route(/supabase\.co/, r => r.fulfill({ body: "null", contentType: "application/json", headers: { "access-control-allow-origin": "*" } }));
+  const p = await ctx.newPage(); await p.goto(BASE + "magasin.html"); await attendre(1500);
+  await p.click("#tSortir"); await attendre(500);
+  vrai(!!(await p.$("#cCode")), "Changer d'élève : la case du code n'apparaît pas");
+  vrai(await p.evaluate(() => document.activeElement.id !== "cCode"), "Changer d'élève (tactile) : la case est placée d'avance par la page (clavier iOS bloqué)");
+  await ctx.close();
+});
 test("Carte : l'élève affiche sa carte avec son code à 5 chiffres seulement; trop de codes inconnus = pause", async b => {
   const c = await b.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: "block" }), R = {}, errs = []; let E = 0;
   await c.route(/rpc\/carte_code_(ecrire|lire)/, r => { const a = JSON.parse(r.request().postData()), u = r.request().url(); let out;

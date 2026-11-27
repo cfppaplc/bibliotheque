@@ -78,7 +78,7 @@ let montreT = 0;
 function cacher(code){ clearTimeout(montreT); const v = $("#vue .carte"); v.classList.add("cachee"); $("#vN").textContent = "•••••";
   v.onclick = () => { if (!v.classList.contains("cachee")) return; v.classList.remove("cachee"); $("#vN").textContent = code; montreT = setTimeout(() => cacher(code), 10000); }; }
 function afficher(){
-  const K = LS.get("mpCarte"); $("#vide").hidden = !!K; $("#vue").hidden = !K; if (!K) { $("#cle").focus(); return; }
+  const K = LS.get("mpCarte"); $("#vide").hidden = !!K; $("#vue").hidden = !K; if (!K) { if (!matchMedia("(pointer:coarse)").matches) $("#cle").focus(); return; }   /* 27 nov. : sur iPhone, le focus placé par la page bloquait le clavier */
   const code = K.c.split("-")[1];
   $("#vG").textContent = K.g || "Métier+"; $("#vP").textContent = K.p || ""; completerPrenom(K); factureOuverte(K.g).then(ok => { $("#bFac").hidden = !ok; $("#bBoutons").style.gridTemplateColumns = ok ? "1fr 1fr" : "1fr"; }); $("#vN").textContent = code;
   $("#vCb").src = Code128.url(K.c, 60, false); $("#vCb").alt = K.c;
