@@ -106,6 +106,11 @@ test("Administration : chaque onglet s'ouvre; Quoi de neuf se modifie et s'annul
   vrai(/attendent/.test(await p.textContent(".ap-pub .acces-etat")), "La modification n'est pas signalée");
   await p.click("#nvAnn"); await attendre(500);
   vrai(/Tout est publié/.test(await p.textContent(".ap-pub .acces-etat")), "Annuler n'a pas remis la liste");
+  { const ongS = tabs.find(k => /site/.test(k)); if (ongS) { await p.click('.acces-onglets [data-ong="' + ongS + '"]'); await attendre(800);   /* 26 nov. : heures du magasin */
+    vrai((await p.$$(".as-hm .as-hpl")).length === 6, "Heures du magasin : les 6 périodes ne sont pas affichées");
+    await p.click("#hFa"); await attendre(300); vrai(/Rouvrir/.test(await p.textContent("#hFa")), "Heures du magasin : « Fermer aujourd'hui » ne fonctionne pas");
+    if (process.env.CAPTURES) await (await p.$(".as-hm")).screenshot({ path: process.env.CAPTURES + "/heures-admin.png" });
+    await p.click("#hFa"); await attendre(300); } }
   /* 26 nov. (Jeremy) : Administration → Magasin : même plan que le magasinier; une lettre → l'étagère de face; une case → ce qu'elle contient */
   const ongMg = tabs.find(k => /mag/.test(k));
   if (ongMg) { await p.click('.acces-onglets [data-ong="' + ongMg + '"]'); await attendre(1500);
@@ -424,6 +429,14 @@ test("Magasin : l'élève (carte scannée) envoie son panier, l'enseignant appro
   await p.click(".art .aj"); await attendre(200); vrai(await p.evaluate(() => !document.querySelector(".art img") || !!document.querySelector(".art img[data-garde]")), "Ajouter au panier : la photo est recréée (flash)"); await p.click("#bVoir"); await attendre(300);   /* 26 nov. : vider le panier en deux touches */
   await p.click("#pVid"); vrai(/encore/.test(await p.textContent("#pVid")), "Vider le panier : pas de confirmation"); await p.click("#pVid"); await attendre(400);
   vrai(await p.$eval("#barre", b => b.hidden) && await p.$eval("#ov", o => o.hidden), "Vider le panier : le panier n'est pas vidé");
+  { const h = await p.context().newPage(); await h.goto(BASE + "magasin.html"); await h.evaluate(() => localStorage.magHeuresTest = "true");   /* 26 nov. : heures du magasin — fermé = pas d'envoi */
+    await h.route(/reglages\.json/, r => r.fulfill({ body: JSON.stringify({ magasinHeures: { jours: [], plages: [["08:00", "09:00"]], fermes: [] } }), contentType: "application/json" }));
+    await h.goto(BASE + "magasin.html"); await attendre(1500); vrai(/Magasin fermé/.test(await h.textContent(".mgEtat")), "Heures : l'état « fermé » n'est pas affiché");
+    await h.click(".art .aj"); await attendre(200); await h.click("#bVoir"); await attendre(300);
+    vrai(await h.$eval("#pEnv", b => b.disabled && /fermé/.test(b.textContent)) && !!(await h.$(".fermeN")), "Heures : le panier part même quand le magasin est fermé");
+    if (process.env.CAPTURES) await h.screenshot({ path: process.env.CAPTURES + "/ferme.png" }); { const e = await h.evaluate(() => { HEURES = HEURES_DEF; return [etatMag(new Date(2026, 10, 26, 11, 45)), etatMag(new Date(2026, 10, 26, 9, 32)), etatMag(new Date(2026, 10, 26, 12, 10)), etatMag(new Date(2026, 10, 27, 17, 0)), etatMag(new Date(2026, 10, 26, 9, 25))].map(etatTxt); });
+      vrai(/ferme bientôt.*11 h 50.*5 min/.test(e[0]) && /^Magasin ouvert · ferme à 9 h 30/.test(e[4]) && /fermé · rouvre à 9 h 35/.test(e[1]) && /rouvre à 13 h 00/.test(e[2]) && /rouvre lundi à 8 h 00/.test(e[3]), "Heures : états faux : " + e.join(" | ")); }
+    await h.evaluate(() => localStorage.removeItem("magHeuresTest")); await h.close(); }
   await p.click(".art .aj"); await attendre(200); await p.click("#bVoir"); await attendre(300); await p.click("#pEnv"); await attendre(1200);
   await q.reload(); await attendre(1500);
   vrai(/Sans carte étudiante/.test(await q.textContent(".avisMag")), "L'enseignant ne voit pas l'avis du magasinier");

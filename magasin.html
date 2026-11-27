@@ -206,6 +206,10 @@ body:not(.anim-ok) .etapes .bar.ok{animation:mpBar .7s .25s ease both;transform-
 @keyframes mpNum{0%{transform:scale(1)}40%{transform:scale(1.18)}100%{transform:scale(1)}}
 @keyframes mpBarreIn{from{opacity:0;transform:translateY(24px)}}
 .vider{display:block;margin:10px 0 4px auto;color:var(--rouge);font-weight:700}.vider.sur{background:#FBE9E7;border-radius:10px;padding:8px 12px}
+/* heures du magasin */
+.mgEtat{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:7px 14px;font-size:.92rem;margin:2px 0 10px;font-weight:700}.mgEtat i{width:10px;height:10px;border-radius:50%;background:currentColor}
+.mgEtat.on{background:#E3F4EA;color:var(--vert)}.mgEtat.on i{animation:etP 1.6s ease-in-out infinite;box-shadow:0 0 0 0 rgba(30,138,85,.4)}.mgEtat.off{background:#FBE9E7;color:var(--rouge)}.mgEtat.bientot{background:#FFF1E0;color:#B2470F}.mgEtat.bientot i{animation:etP 1s ease-in-out infinite}
+.bientotN{background:#FFF1E0!important;color:#8a4a0f!important}.fermeN{background:#FBE9E7;color:#8f2a22;border-radius:12px;padding:10px 12px;font-weight:600;margin:12px 0 0}
 /* écran « Magasin en direct » */
 body.ecranD main{max-width:1500px}a.btn{text-decoration:none;color:inherit;display:inline-flex;align-items:center;justify-content:center}.edB{margin:4px 0 6px;color:var(--acc);font-weight:700}.ed{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px;align-items:start}@media (max-width:900px){.ed{grid-template-columns:1fr}}
 .ed-k{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.ed-k>div{background:#fff;border-radius:18px;box-shadow:var(--ombre);padding:16px;text-align:center}.ed-k b{display:block;font-size:2.6rem;line-height:1;color:var(--acc)}.ed-k span{color:var(--doux);font-weight:600}
@@ -368,10 +372,31 @@ function eleveEntree(msg){
 function connecter(code, x){ MOI = { code, ens:x.ens, groupe:x.groupe, profs:(x.profs || []).filter(id => id !== x.ens), prenom:LS.get("magPrenom", "") }; LS.set("magEleve", MOI); eleveCatalogue(); }
 function enTete(){ $("#tQui").innerHTML = `<b>${MOI.prenom ? "Bonjour " + esc(MOI.prenom) : ""}</b> <span class="cg">· ${MOI.groupe === "ESSAI" ? "•••••" : esc(MOI.code)}</span><span class="gp"> · ${esc(MOI.groupe)}</span>`; $("#tSortir").hidden = false;
   $("#tSortir").onclick = () => { if (nbPanier() && !confirm("Ton panier sera vidé. Changer d'élève ?")) return; MOI = null; PANIER = {}; LS.set("magEleve", null); sauverPanier(); eleveEntree(); }; }
+/* 26 nov. (Jeremy : « l'horaire pourrait rendre notre système dynamique ») : heures du magasin (reglages.json → magasinHeures, réglées dans Administration → Site).
+   Hors des heures : l'élève remplit son panier mais ne peut pas l'envoyer; état « ouvert / fermé · rouvre à … » partout. */
+const HEURES_DEF = { jours:[1, 2, 3, 4, 5], plages:[["08:00", "09:30"], ["09:35", "10:35"], ["10:50", "11:50"], ["13:00", "14:00"], ["14:05", "15:05"], ["15:20", "16:20"]], fermes:[] };
+let HEURES = HEURES_DEF;
+async function chargerHeures(){ try { const r = await (await fetch("reglages.json", { cache:"no-cache" })).json(); if (r.magasinHeures) HEURES = r.magasinHeures; } catch(e){} }
+const hm = t => { const [h, m] = String(t).split(":").map(Number); return h * 60 + (m || 0); }, hTxt = t => { const [h, m] = String(t).split(":"); return (+h) + " h " + (m || "00"); };
+const jourCle = d => d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+function etatMag(d){ d = d || new Date(); const H = HEURES || HEURES_DEF;
+  if (navigator.webdriver && !LS.get("magHeuresTest", false)) return { ouvert:true };   /* tests automatiques : toujours ouvert, sauf le test des heures */
+  const P = (H.plages || []).slice().sort((a, b) => hm(a[0]) - hm(b[0])); if (!P.length) return { ouvert:true };
+  const ouvJ = x => (H.jours || []).includes(x.getDay()) && !(H.fermes || []).includes(jourCle(x)), m = d.getHours() * 60 + d.getMinutes();
+  if (ouvJ(d)) { const p = P.find(([a, b]) => m >= hm(a) && m < hm(b)); if (p) { const r = hm(p[1]) - m, nx = P.find(([a]) => hm(a) >= hm(p[1])), coupe = !nx || hm(nx[0]) - hm(p[1]) > 20;   /* Jeremy : « pas pour les pauses », seulement dîner et fin de journée */
+    return { ouvert:true, fin:p[1], bientot:coupe && r <= 10, reste:r }; }
+    const n = P.find(([a]) => hm(a) > m); if (n) return { ouvert:false, quand:"à " + hTxt(n[0]) }; }
+  for (let i = 1; i <= 21; i++) { const x = new Date(d); x.setDate(d.getDate() + i); if (ouvJ(x)) return { ouvert:false, quand:(i === 1 ? "demain" : x.toLocaleDateString("fr-CA", { weekday:"long" })) + " à " + hTxt(P[0][0]) }; }
+  return { ouvert:false, quand:"" }; }
+const etatTxt = e => e.ouvert ? (e.bientot ? "Le magasin ferme bientôt · à " + hTxt(e.fin) + " (dans " + e.reste + " min)" : "Magasin ouvert" + (e.fin ? " · ferme à " + hTxt(e.fin) : "")) : "Magasin fermé" + (e.quand ? " · rouvre " + e.quand : "");
+const etatPill = () => { const e = etatMag(); return `<span class="mgEtat ${e.bientot ? "bientot" : e.ouvert ? "on" : "off"}"><i></i><b>${etatTxt(e)}</b></span>`; };
+function majEtat(){ const e = etatMag(); document.querySelectorAll(".mgEtat").forEach(el => { el.className = "mgEtat " + (e.bientot ? "bientot" : e.ouvert ? "on" : "off"); el.querySelector("b").textContent = etatTxt(e); });
+  const b = $("#pEnv"); if (b && !b.dataset.envoi) { const ferme = !e.ouvert; if (ferme !== !!b.dataset.ferme) { if (ferme) { b.dataset.txt = b.textContent; b.textContent = "Magasin fermé · rouvre " + (e.quand || "bientôt"); b.disabled = true; b.dataset.ferme = "1"; } else { b.textContent = b.dataset.txt || "Envoyer à mon enseignant"; delete b.dataset.ferme; b.disabled = !nbPanier(); } } } }
+setInterval(() => { if (document.querySelector(".mgEtat, #pEnv")) majEtat(); }, 20000);
 function eleveCatalogue(){
   enTete();
   const cats = [...new Set(CAT.map(a => a.cat).filter(Boolean))], mats = [...new Set(CAT.map(a => a.mat).filter(Boolean))].sort((a, b) => a.localeCompare(b, "fr")), ds = [...new Set(CAT.map(a => a.d).filter(Boolean))].sort((a, b) => pouces(a) - pouces(b));
-  $("#app").innerHTML = `<div class="avis-l" id="notifE"></div><div id="mesEnvois"></div><div class="cherche"><input id="fQ" type="search" placeholder="Cherche un raccord : coude 90 ABS 2, té cuivre 3/4…" value="${esc(FILTRE.q)}" autocomplete="off">
+  $("#app").innerHTML = `${etatPill()}<div class="avis-l" id="notifE"></div><div id="mesEnvois"></div><div class="cherche"><input id="fQ" type="search" placeholder="Cherche un raccord : coude 90 ABS 2, té cuivre 3/4…" value="${esc(FILTRE.q)}" autocomplete="off">
     <div class="filtres">${cats.length > 1 ? `<select id="fC" aria-label="Section"><option value="">Section</option>${cats.map(c => `<option${FILTRE.cat === c ? " selected" : ""}>${esc(c)}</option>`).join("")}</select>` : ""}
     <select id="fM" aria-label="Matériau"><option value="">Matériau</option>${mats.map(m => `<option${FILTRE.mat === m ? " selected" : ""}>${esc(m)}</option>`).join("")}</select>
     <select id="fD" aria-label="Diamètre"><option value="">Diamètre</option>${ds.map(d => `<option value="${esc(d)}"${FILTRE.d === d ? " selected" : ""}>${esc(d)} po</option>`).join("")}</select></div></div>
@@ -414,16 +439,17 @@ function panier(){
     ${ids.length && !EDIT ? `<button class="lien vider" id="pVid">Vider le panier</button>` : ""}
     <label for="pNote"><b>Pour quel travail ?</b> <span class="sous">(facultatif : cabine, projet…)</span></label><textarea id="pNote" maxlength="300">${esc(LS.get("magNote", ""))}</textarea>
     <p class="sous" style="margin-top:12px">Ton enseignant reçoit ton panier sur son cellulaire. Quand il l'approuve, va au comptoir du magasin avec ta carte étudiante.</p>
-    <p class="err" id="pErr"></p><button class="btn p" id="pEnv" ${ids.length ? "" : "disabled"}>${EDIT ? "Enregistrer les changements" : "Envoyer à mon enseignant"}</button>
+    ${!EDIT && etatMag().bientot ? `<p class="fermeN bientotN">Le magasin ferme dans ${etatMag().reste} min. Envoie ton panier maintenant.</p>` : ""}${!EDIT && !etatMag().ouvert ? `<p class="fermeN">Le magasin est fermé. Ton panier reste gardé : tu pourras l'envoyer quand il rouvre.</p>` : ""}<p class="err" id="pErr"></p><button class="btn p" id="pEnv" ${ids.length ? "" : "disabled"}>${EDIT ? "Enregistrer les changements" : "Envoyer à mon enseignant"}</button>
     ${EDIT ? `<button class="btn" id="pEdX" style="margin-top:10px">Laisser mon panier comme il était</button>` : ""}</main>`;
   if (EDIT) $("#pEdX").onclick = () => { LS.set("magEdit", ""); PANIER = {}; sauverPanier(); LS.set("magNote", ""); fermer(); };
   const fermer = () => { ov.hidden = true; document.body.style.overflow = ""; eleveCatalogue(); };
   /* 26 nov. (Jeremy : « supprimer son panier rapidement ») : deux touches pour éviter un accident */
   if ($("#pVid")) $("#pVid").onclick = e => { const b = e.currentTarget; if (!b.classList.contains("sur")) { b.classList.add("sur"); b.textContent = "Toucher encore pour tout enlever"; setTimeout(() => { if (b.isConnected) { b.classList.remove("sur"); b.textContent = "Vider le panier"; } }, 4000); return; }
     PANIER = {}; sauverPanier(); LS.set("magNote", ""); LS.set("magCorrige", null); fermer(); toast("Panier vidé."); };
+  if (!EDIT) majEtat();
   $("#pF").onclick = fermer; $("#pNote").oninput = e => LS.set("magNote", e.target.value);
   brancherQte($("#pL"), () => { if (!nbPanier()) $("#pEnv").disabled = true; });
-  $("#pEnv").onclick = async () => { const b = $("#pEnv"); b.disabled = true; b.textContent = "Envoi…";
+  $("#pEnv").onclick = async () => { const b = $("#pEnv"); if (!EDIT && !etatMag().ouvert) { majEtat(); return; } b.dataset.envoi = "1"; b.disabled = true; b.textContent = "Envoi…";
     const items = Object.keys(PANIER).map(id => { const a = CAT.find(x => x.id === id); return a && { id, n:a.n, nom:a.nom, q:PANIER[id], r:a.r || "" }; }).filter(Boolean);
     if (EDIT) { try { const r = await rpc("panier_modifier", { p_id:EDIT, p_code:MOI.code, p_items:items, p_note:$("#pNote").value || null });   /* 25 nov. : modifier jusqu'à l'approbation */
         if (!r || !r.ok) throw new Error(r && r.err || "refus");
@@ -600,11 +626,11 @@ async function ecranDirect(){ document.body.classList.add("ecranD");
   const auj = new Date().toDateString();
   $("#tTitre").textContent = "Magasin · en direct"; let vus = null;
   const min = t => { const m = Math.max(0, Math.round((Date.now() - new Date(t)) / 60000)); return m < 1 ? "à l'instant" : m < 60 ? "depuis " + m + " min" : "depuis " + Math.floor(m / 60) + " h " + String(m % 60).padStart(2, "0"); };
-  const tour = async () => { let L; try { L = await lire() || []; } catch(e){ $("#app").innerHTML = `<p class="vide">Pas de connexion pour l'instant. On réessaie tout seul.</p>`; setTimeout(tour, 10000); return; }
+  const tour = async () => { majEtat(); let L; try { L = await lire() || []; } catch(e){ $("#app").innerHTML = `<p class="vide">Pas de connexion pour l'instant. On réessaie tout seul.</p>`; setTimeout(tour, 10000); return; }
     const A = regrouper(L.filter(p => p.etat === "approuve")), R = L.filter(p => p.etat === "remis" && (!p.t_remis || new Date(p.t_remis).toDateString() === auj)), it = A.flatMap(p => p.items || []);
     const lettres = new Set(it.map(i => PlanMagasin.lettre(rangee(i))).filter(Boolean));
     if (vus && A.some(p => !vus.has(p.id))) { bip(); setTimeout(bip, 350); } vus = new Set(A.map(p => p.id));
-    $("#app").innerHTML = `${PROF ? `<a class="lien" href="magasin.html?mode=prof">‹ Retour aux commandes</a>` : ""}<div class="ed"><div class="ed-g"><div class="ed-k"><div><b>${A.length}</b><span>à préparer</span></div><div><b>${it.reduce((n, i) => n + (+i.q || 1), 0)}</b><span>pièces à sortir</span></div><div><b>${R.length}</b><span>remis aujourd'hui</span></div></div>
+    $("#app").innerHTML = `${PROF ? `<a class="lien" href="magasin.html?mode=prof">‹ Retour aux commandes</a>` : ""}${etatPill()}<div class="ed"><div class="ed-g"><div class="ed-k"><div><b>${A.length}</b><span>à préparer</span></div><div><b>${it.reduce((n, i) => n + (+i.q || 1), 0)}</b><span>pièces à sortir</span></div><div><b>${R.length}</b><span>remis aujourd'hui</span></div></div>
       <div class="sec">Prêtes à venir chercher</div>${A.length ? A.map(p => `<div class="carte ed-c"><span class="av">${esc((p.prenom || "É").charAt(0).toUpperCase())}</span><div class="ed-t"><b>${esc(p.prenom || "Élève")}</b><small>${esc(p.groupe)} · ${(p.items || []).length} raccord${(p.items || []).length > 1 ? "s" : ""} · ${min(p.t_app)}</small></div>${etapes(p.etat)}</div>`).join("") : `<p class="vide">Aucune commande en attente. Tout est remis !</p>`}</div>
       <div class="ed-p"><div class="prep-plan">${PlanMagasin.svg(lettres, new Set(), [])}</div><p class="ed-h" id="edH"></p></div></div>`;
     setTimeout(tour, 10000); };
@@ -612,7 +638,7 @@ async function ecranDirect(){ document.body.classList.add("ecranD");
   await tour(); h(); }
 async function magasinier(){ await nipComptoir();
   $("#tTitre").textContent = "Comptoir du magasin";
-  $("#app").innerHTML = `<div class="mag-code"><input id="mC" autocomplete="off" placeholder="Scanne la carte ou tape le code" aria-label="Code de l'élève"><button class="btn" id="mTous">Tout voir</button><button class="btn" id="mAc">Pièces à commander</button></div><div id="mL"><p class="vide">Chargement…</p></div>`;
+  $("#app").innerHTML = `${etatPill()}<div class="mag-code"><input id="mC" autocomplete="off" placeholder="Scanne la carte ou tape le code" aria-label="Code de l'élève"><button class="btn" id="mTous">Tout voir</button><button class="btn" id="mAc">Pièces à commander</button></div><div id="mL"><p class="vide">Chargement…</p></div>`;
   const i = $("#mC"), appl = () => { const c = lireCarte(i.value); FILTRE_CODE = c ? c.code : ""; dessinerMag(); };
   i.onkeydown = e => { if (e.key === "Enter") { appl(); if (FILTRE_CODE) { i.value = ""; i.placeholder = "Élève " + FILTRE_CODE + " · scanne une autre carte"; } else i.select(); } if (e.key === "Escape") { i.value = ""; appl(); } };
   i.oninput = () => { if (/^\d{5}$/.test(i.value.trim()) || i.value.trim() === "") appl(); };
@@ -788,7 +814,7 @@ async function remettre(id, oui){ try { await rpcM("panier_remettre", { p_id:id,
 
 /* =================================================================== départ =================================================================== */
 (async () => {
-  await Promise.all([chargerComptes(), chargerCatalogue()]);
+  await Promise.all([chargerComptes(), chargerCatalogue(), chargerHeures()]);
   setTimeout(() => document.body.classList.add("anim-ok"), 1500);   /* animations d'apparition : premier affichage seulement */
   if (MODE === "prof") return prof();
   if (MODE === "magasin") return magasinier();
