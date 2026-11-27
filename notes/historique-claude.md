@@ -811,3 +811,4 @@
 - 26 nov. : case « X-00 » = tablette du haut de la rangée, souvent le surplus (Jeremy) : affichée « G (tablette du haut, surplus) » au comptoir et sur le bon (caseTxt); test ajouté.
 - 26 nov. : « surplus » retiré du libellé (Jeremy : pas toujours du surplus) → « G (tablette du haut) ».
 - 26 nov. : comptoir et préparation : vignette photo de chaque raccord (vigCmd, même zoom que l'élève; le bon imprimé reste sans photo). Tests ajoutés.
+- 26 nov. : bogue (Jeremy) : 2e commande approuvée du même élève « n'apparaît jamais » : elle était fusionnée sans signe dans la carte, et la préparation ouverte gardait l'ancienne liste (Remis ne remettait que la 1re). Correctif : préparation mise à jour à chaque chargement (PREP_MAJ, avis + bip), Remis = toutes les commandes de l'élève, coches gardées par code élève, mention « N commandes réunies » sur la carte. Test ajouté.

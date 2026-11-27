@@ -134,7 +134,7 @@ input.cache-code:not(:placeholder-shown){-webkit-text-security:disc;text-securit
 .cmd.e-attente,.cmd.e-approuve{box-shadow:inset 4px 0 0 var(--k),0 1px 2px rgba(20,33,61,.05),0 6px 18px rgba(20,33,61,.06)}
 .cmd table{margin:2px 0 6px}.cmd tr+tr td{border-top:1px solid var(--ligne)}.cmd td{border-bottom:0;padding:9px 16px;vertical-align:middle}
 .cmd .rgp{display:inline-block;padding:4px 10px;border-radius:8px;background:#FFF1E6;color:#B2470F;font:800 .95rem ui-monospace,Menlo,Consolas,monospace;white-space:nowrap}
-.aussi{display:block;margin-top:3px;font:600 .78rem system-ui,sans-serif;color:var(--doux,#6b7280);white-space:nowrap}
+.cmd .multi{color:var(--acc)}.aussi{display:block;margin-top:3px;font:600 .78rem system-ui,sans-serif;color:var(--doux,#6b7280);white-space:nowrap}
 .cmd .qb{display:inline-grid;place-items:center;min-width:30px;height:30px;padding:0 6px;border-radius:99px;background:#14213d;color:#fff;font:800 .92rem system-ui}
 .cmd td.q{width:48px}.cmd td.rg{width:96px}.cmd td small.no{display:block;font:500 .75rem ui-monospace,Menlo,Consolas,monospace;color:var(--doux);margin-top:2px}
 .cmd .h .btn.p,.cmd .h .btn.v{box-shadow:0 2px 6px rgba(0,0,0,.12)}
@@ -540,7 +540,7 @@ async function charger(){ clearTimeout(magT);
     try { const S2 = new Map(); if (MAG.length) for (const r of await rpcM("panier_signalements", { p_ids:MAG.map(p => p.id) }) || []) { if (!S2.has(r.panier)) S2.set(r.panier, new Set()); S2.get(r.panier).add(r.regle); } SIG = S2; } catch(e){} const ids = MAG.filter(p => p.etat === "approuve").map(p => p.id);
     { const neufs = MAG_VUS ? MAG.filter(p => p.etat === "approuve" && !MAG_VUS.has(p.id)) : [];   /* 25 nov. (Jeremy) : le magasinier est averti d'une commande qui entre */
       if (neufs.length) { bip(); setTimeout(bip, 350); clignoterTitre(neufs.length);
-        try { if ("Notification" in window && Notification.permission === "granted") neufs.slice(0, 3).forEach(p => { const n = new Notification("Magasin : nouvelle commande", { body:(p.prenom || "Élève") + " (" + p.code + ", " + p.groupe + ") · " + (p.items || []).length + " raccord(s)", tag:"mag-" + p.id, icon:"img/metier-plus.svg" }); n.onclick = () => { focus(); n.close(); }; }); } catch(e){} } } MAG_VUS = MAG_VUS || new Set(); ids.forEach(id => MAG_VUS.add(id)); dessinerMag(); }
+        try { if ("Notification" in window && Notification.permission === "granted") neufs.slice(0, 3).forEach(p => { const n = new Notification("Magasin : nouvelle commande", { body:(p.prenom || "Élève") + " (" + p.code + ", " + p.groupe + ") · " + (p.items || []).length + " raccord(s)", tag:"mag-" + p.id, icon:"img/metier-plus.svg" }); n.onclick = () => { focus(); n.close(); }; }); } catch(e){} } } MAG_VUS = MAG_VUS || new Set(); ids.forEach(id => MAG_VUS.add(id)); dessinerMag(); if (PREP_MAJ && !$("#ov").hidden) PREP_MAJ(); }
   catch(e){ $("#mL").innerHTML = `<p class="err">Supabase ne répond pas. Nouvel essai dans 10 s.</p>`; }
   magT = setTimeout(charger, 10000); }
 const OUV = new Set();   /* commandes terminées que l'utilisateur a rouvertes */
@@ -562,7 +562,7 @@ function rassembler(L){ const M = new Map();
 function dessinerMag(){
   const z = $("#mL"); if (!z) return;
   const v = MAG.filter(p => !FILTRE_CODE || p.code === FILTRE_CODE), app = v.filter(p => p.etat === "approuve"), rem = v.filter(p => p.etat === "remis").reverse();
-  const carte = p => `<div class="cmd e-${esc(p.etat)}${p.etat === "remis" ? " fin" + (OUV.has(p.id) ? "" : " repli") : ""}" data-cid="${esc(p.id)}"><div class="h"><button class="fl" aria-label="Voir le détail"></button><span class="av">${esc((p.prenom || "É").trim().charAt(0).toUpperCase())}</span><div><b class="pr">${esc(p.prenom || "Élève")}</b> <span class="cd">${esc(p.code)}</span><br><small class="sous">${esc(p.groupe)} · ${esc(nomEns(p.ens))}</small><br><small class="sous">${p.etat === "remis" ? "Remis " + heure(p.t_remis) : (p.items || []).length + " raccord" + ((p.items || []).length > 1 ? "s" : "") + " · approuvé " + heure(p.t_app)}</small></div><span class="sp"></span>
+  const carte = p => `<div class="cmd e-${esc(p.etat)}${p.etat === "remis" ? " fin" + (OUV.has(p.id) ? "" : " repli") : ""}" data-cid="${esc(p.id)}"><div class="h"><button class="fl" aria-label="Voir le détail"></button><span class="av">${esc((p.prenom || "É").trim().charAt(0).toUpperCase())}</span><div><b class="pr">${esc(p.prenom || "Élève")}</b> <span class="cd">${esc(p.code)}</span><br><small class="sous">${esc(p.groupe)} · ${esc(nomEns(p.ens))}</small><br><small class="sous">${p.etat === "remis" ? "Remis " + heure(p.t_remis) : (p.items || []).length + " raccord" + ((p.items || []).length > 1 ? "s" : "") + " · approuvé " + heure(p.t_app)}${p.ids ? ` · <b class="multi">${p.ids.length} commandes réunies</b>` : ""}</small></div><span class="sp"></span>
     ${p.etat === "approuve" ? `<button class="btn p" data-prep="${p.id}">Préparer</button><button class="btn v" data-rem="${p.id}">Remis</button>` : `<button class="lien" data-ann="${p.id}">Annuler la remise</button>`}</div>
     ${p.note ? `<p style="margin:10px 16px 0"><b>Travail :</b> ${esc(p.note)}</p>` : ""}
     ${tableMag(p)}
@@ -597,10 +597,16 @@ const aussi = i => { const A = autresCases(i); return A.length ? `<small class="
 const parRangee = L => [...(L || [])].sort((a, b) => rangee(a).localeCompare(rangee(b), "fr", { numeric:true }) || String(a.nom).localeCompare(String(b.nom), "fr"));
 const tableMag = p => `<table>${parRangee(p.items).map(i => `<tr><td class="rg"><span class="rgp">${esc(caseTxt(rangee(i)) || "–")}</span>${aussi(i)}</td><td class="vg">${vigCmd(i)}</td><td class="q"><span class="qb">${+i.q || 1}</span></td><td>${esc(i.nom)}</td></tr>`).join("")}</table>`;   /* 26 nov. : sans n° d'article (inutile au comptoir) */
 /* préparation (25 nov., Jeremy : « les rangées pourraient flasher sur son iPad et quand il coche, ça cesse ») */
+/* 26 nov. (Jeremy : « une 2e commande approuvée du même élève n'apparaît jamais ») : la préparation ouverte se met à jour quand une autre commande
+   du même élève est approuvée (elle s'ajoute, avec un avis); « Remis » remet alors toutes ses commandes, et les coches restent (clé = code de l'élève) */
+let PREP_MAJ = null;
 function preparer(p){ if (!p) return;
-  let faceL = ""; const cle = "magPrep|" + p.id, faits = new Set(LS.get(cle, [])), L = parRangee(p.items), ov = $("#ov");
+  const code = p.code; let nb = (p.ids || [p.id]).length, L = [];
+  let faceL = ""; const cle = "magPrep|" + code, faits = new Set(LS.get(cle, [])), ov = $("#ov");
   ov.hidden = false; document.body.style.overflow = "hidden";
   const dessiner = () => {
+    const q = regrouper(MAG.filter(x => x.etat === "approuve" && x.code === code))[0]; if (q) p = q;
+    const n = (p.ids || [p.id]).length; if (n > nb) { toast("Nouvelle commande de cet élève : ajoutée à la préparation."); bip(); } nb = n; L = parRangee(p.items);
     const lettres = new Set(L.map(i => PlanMagasin.lettre(rangee(i))).filter(Boolean));
     const finies = new Set([...lettres].filter(l => L.filter(i => PlanMagasin.lettre(rangee(i)) === l).every(i => faits.has(i.id || i.n))));
     const tout = L.every(i => faits.has(i.id || i.n)), prochain = L.find(i => !faits.has(i.id || i.n) && PlanMagasin.place(rangee(i))) || L.find(i => !faits.has(i.id || i.n));   /* d'abord un raccord placé sur le plan (les rangées pas encore entrées n'ont pas de point) */   /* 26 nov. (Jeremy) : seulement le prochain raccord à trouver clignote sur le plan */
@@ -613,11 +619,11 @@ function preparer(p){ if (!p) return;
       <button class="btn ${tout ? "v" : ""}" id="prOk" ${tout ? "" : "disabled"} style="width:100%;margin-top:10px">${tout ? "Tout est prêt · remis à l'élève" : "Coche chaque raccord en le prenant"}</button></div></main>`;
     ov.querySelector(".prep-plan svg").onclick = e => { const g = e.target.closest("[data-l]"); if (g) { faceL = g.dataset.l; dessiner(); } };
     if ($("#prFace")) $("#prFace").onclick = () => { faceL = ""; dessiner(); };
-    $("#prF").onclick = () => { ov.hidden = true; document.body.style.overflow = ""; dessinerMag(); $("#mC").focus(); };
+    $("#prF").onclick = () => { PREP_MAJ = null; ov.hidden = true; document.body.style.overflow = ""; dessinerMag(); $("#mC").focus(); };
     ov.querySelectorAll("[data-k]").forEach(c => c.onchange = () => { c.checked ? faits.add(c.dataset.k) : faits.delete(c.dataset.k); LS.set(cle, [...faits]); dessiner(); });
-    $("#prOk").onclick = async () => { for (const id of (p.ids || [p.id])) await remettre(id, true); try { localStorage.removeItem(cle); } catch(e){} ov.hidden = true; document.body.style.overflow = ""; };
+    $("#prOk").onclick = async () => { for (const id of (p.ids || [p.id])) await remettre(id, true); try { localStorage.removeItem(cle); } catch(e){} PREP_MAJ = null; ov.hidden = true; document.body.style.overflow = ""; };
   };
-  dessiner();
+  PREP_MAJ = dessiner; dessiner();
 }
 function imprimerBon(p){ if (!p) return;
   const h = `<!DOCTYPE html><html lang="fr-CA"><head><meta charset="utf-8"><title>Bon ${esc(p.code)}</title><style>body{font:12pt/1.35 system-ui,sans-serif;color:#000;margin:14mm}h1{font-size:18pt;margin:0}.s{color:#444;margin:2pt 0 10pt}table{width:100%;border-collapse:collapse}th,td{border-bottom:1px solid #999;padding:6pt 4pt;text-align:left}th{font-size:9pt;color:#444}td.rg{font-weight:800;font-size:14pt;width:60pt}td.q{font-weight:800;width:40pt}td.no{font-family:monospace}td.ok{width:30pt}.n{font:900 28pt monospace;float:right}</style></head><body>`

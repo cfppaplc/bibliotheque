@@ -363,6 +363,13 @@ test("Magasin : l'élève (carte scannée) envoie son panier, l'enseignant appro
   if (process.env.CAPTURES) await m.screenshot({ path: process.env.CAPTURES + "/plan.png" });
   vrai(await m.$$eval(".pm-s.actif", L => L.length) > 0, "Plan : aucune rangée ne clignote");
   vrai(await m.$$eval(".prep-i .ph", L => L.length) > 0, "Préparation : pas de photo à côté des raccords");
+  /* 26 nov. : une 2e commande approuvée du même élève s'ajoute à la préparation ouverte */
+  const avant = await m.$$eval(".prep-i", L => L.length);
+  await m.evaluate(() => { const a = MAG.find(x => x.etat === "approuve" && x.code === "12345"), c = CAT.find(x => !a.items.some(i => i.id === x.id));
+    MAG.push(Object.assign({}, a, { id: "essai-2e", items: [{ id: c.id, n: c.n, nom: c.nom, q: 1, r: c.r }], t_app: new Date().toISOString() })); PREP_MAJ(); });
+  await attendre(200);
+  vrai(await m.$$eval(".prep-i", L => L.length) === avant + 1, "2e commande du même élève : pas ajoutée à la préparation ouverte");
+  await m.evaluate(() => { MAG = MAG.filter(x => x.id !== "essai-2e"); PREP_MAJ(); }); await attendre(200);
   vrai(await m.$$eval(".prep-i.proch", L => L.length) === 1 && await m.$$eval(".prep-plan circle.pm-p:not(.fait)", L => L.length) <= 1, "Plan : seul le prochain raccord doit être montré");
   await m.click(".prep-plan svg [data-l]"); await attendre(300); vrai(!!(await m.$(".prep-face .pm-face")), "Plan : la lettre n'ouvre pas la vue de face");
   await m.click("#prFace"); await attendre(200); vrai(!(await m.$(".prep-face")), "Vue de face : « Fermer » ne ferme pas");
