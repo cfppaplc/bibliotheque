@@ -57,7 +57,7 @@ window.mpPiedHTML = () => {
   function mpAnnonce(a){
     if (!a || !a.texte || !a.id) return; let vu = ""; try { if (!localStorage.dernierId) return; vu = localStorage.getItem("mpAnnVue") || ""; } catch(e){ return; }
     if (vu === a.id || (a.jusqu && new Date().toLocaleDateString("en-CA") > a.jusqu)) return;
-    if (/accueil|quiz|simulateur|telecommande|loup-garou|ecran/.test(location.pathname) || window !== window.top) return;   /* pas sur les écrans projetés aux élèves */
+    if (/accueil|quiz|simulateur|telecommande|loup-garou|ecran/.test(location.pathname) || (window !== window.top && window.name !== "mpCoquille")) return;   /* pas sur les écrans projetés aux élèves */
     const poser = () => { if (document.getElementById("mpAnn")) return; const d = document.createElement("div"); d.id = "mpAnn"; d.setAttribute("role", "status");
       d.innerHTML = '<div><b>Message de l\'administrateur</b><p></p></div><button type="button">Compris</button>'; d.querySelector("p").textContent = a.texte;
       d.querySelector("button").onclick = () => { try { localStorage.setItem("mpAnnVue", a.id); } catch(e){} d.remove(); };

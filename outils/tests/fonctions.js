@@ -491,6 +491,17 @@ test("Carte : l'élève affiche sa carte avec son code à 5 chiffres seulement; 
   vrai(!errs.length, errs.join(" | ")); await c.close();
 });
 
+test("Plein écran : reste actif en changeant de page (coquille)", async b => {   /* 27 nov. (Jeremy : « je veux que ça reste en plein écran sur tout le site ») */
+  const c = await b.newContext({ viewport: { width: 1280, height: 720 } }); await c.addInitScript(() => { localStorage.bienvenueVu = "1"; });
+  const p = await c.newPage(); const errs = []; p.on("pageerror", e => errs.push(e.message));
+  await p.goto(BASE + "labo.html"); await attendre(1200); await p.click("#fsBtn"); await attendre(400);
+  vrai(await p.evaluate(() => !!document.fullscreenElement), "Plein écran : le bouton ne fonctionne pas");
+  await p.evaluate(() => { const a = [...document.querySelectorAll("a[href]")].find(a => /\.html/.test(a.getAttribute("href")) && !a.target); a.click(); }); await attendre(2000);
+  vrai(await p.evaluate(() => !!document.fullscreenElement && !!document.getElementById("mpCoquille")), "Plein écran : perdu en changeant de page");
+  await p.goBack(); await attendre(1200); vrai(await p.evaluate(() => !document.getElementById("mpCoquille")), "Plein écran : le retour ne ferme pas la page ouverte");
+  vrai(!errs.length, errs.join(" | ")); await c.close();
+});
+
 test("Absences : l'élève signale une absence depuis Ma carte (motif, enseignant, avertissements)", async b => {   /* 27 nov. */
   const c = await b.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: "block" }); let sent = null; const errs = [];
   await c.addInitScript(() => { localStorage.mpCarte = JSON.stringify({ c: "MP-48213-K7Q9X2", g: "2602PLCA1", p: "Marc", t: 1 }); });
