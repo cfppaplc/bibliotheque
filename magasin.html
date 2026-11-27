@@ -226,7 +226,8 @@ body:not(.anim-ok) .etapes .bar.ok{animation:mpBar .7s .25s ease both;transform-
 .abOk{width:76px;height:76px;border-radius:50%;background:var(--vert);margin:0 auto 12px;display:grid;place-items:center}.pastN{background:var(--acc);color:#fff;border-radius:999px;padding:1px 8px;font-size:.8rem;margin-left:6px}
 .inst{display:flex;align-items:center;gap:12px;background:#fff;border-radius:16px;box-shadow:var(--ombre);padding:12px 14px;margin:0 0 12px;flex-wrap:wrap}.inst img{width:42px;height:42px;border-radius:10px}.inst>div{flex:1;min-width:200px}.inst b{display:block}.inst small{color:var(--doux)}
 /* écran « Magasin en direct » */
-body.ecranD main{max-width:1500px}a.btn{text-decoration:none;color:inherit;display:inline-flex;align-items:center;justify-content:center}.edB{margin:4px 0 6px;color:var(--acc);font-weight:700}.ed{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px;align-items:start}@media (max-width:900px){.ed{grid-template-columns:1fr}}
+.cdC{padding:4px 16px}.cdR{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--ligne);font-size:1.05rem}.cdR:last-child{border-bottom:0}.cdR b{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:1.25rem;letter-spacing:.06em;color:var(--txt)}
+body.ecranD main{max-width:1500px}a.btn{text-decoration:none;color:inherit;display:inline-flex;align-items:center;justify-content:center}.edBs{display:flex;flex-wrap:wrap;gap:8px}.edB{margin:4px 0 6px;color:var(--acc);font-weight:700}.ed{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px;align-items:start}@media (max-width:900px){.ed{grid-template-columns:1fr}}
 .ed-k{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.ed-k>div{background:#fff;border-radius:18px;box-shadow:var(--ombre);padding:16px;text-align:center}.ed-k b{display:block;font-size:2.6rem;line-height:1;color:var(--acc)}.ed-k span{color:var(--doux);font-weight:600}
 .ed-c{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:center;padding:14px 16px}.ed-c .etapes{grid-column:1/-1;padding:4px 0 0}.ed-t b{display:block;font-size:1.35rem}.ed-t small{color:var(--doux)}
 .ed-c .av{width:54px;height:54px;font-size:1.4rem;background:#E3F4EA;color:var(--vert)}.ed-h{text-align:center;font:800 3rem/1 system-ui;color:var(--txt);margin:14px 0 0}
@@ -649,7 +650,7 @@ async function dessinerProf(){
   $("#app").innerHTML = `<h1>Commandes à approuver</h1>${etatPill()}${instZone("Commandes")}<p class="sous">${att.length ? att.length + " panier" + (att.length > 1 ? "s" : "") + " en attente." : "Aucun panier en attente."}</p>
     <div class="avis-l" id="avisZ">${perm === "granted" && LS.get("magAbonne|" + ENS, false) ? `<button class="cloche on" id="avTest" title="Notifications activées · toucher pour essayer" aria-label="Notifications activées, essayer">${CLOCHE}</button><button class="lien" id="avNon">Désactiver les notifications</button>` : (`<button class="cloche" id="avOui" title="Activer les notifications" aria-label="Activer les notifications">${CLOCHE}</button>`)}<p class="err" id="avErr" style="min-height:0;margin:0;width:100%"></p></div>
     ${AVIS.length ? `<div class="sec">Avis du magasinier</div><div class="carte avisMag">${AVIS.map(a => `<div class="avm"><span><b>${esc(a.prenom || "Élève")}</b> <small class="sous">${esc(a.code)} · ${esc(a.groupe)} · ${heure(a.t)}</small><br>${esc(REGLES_L[a.regle] || "?")}</span><button class="btn" data-vu="${esc(a.id)}" title="Retirer de cette page (reste dans le dossier de l'élève)">Vu</button></div>`).join("")}<p class="sous" style="margin:8px 0 0">« Vu » retire l'avis d'ici; il reste dans le dossier de l'élève.</p></div>` : ""}
-    <a class="btn edB" href="magasin.html?mode=ecran">Magasin en direct</a>
+    <div class="edBs"><a class="btn edB" href="magasin.html?mode=ecran">Magasin en direct</a><a class="btn edB" href="magasin.html?mode=codes">Codes des élèves</a></div>
     <div id="absZ"></div>
     <div class="sec">En attente</div>${att.length ? att.map(p => cmdHtml(p, true)).join("") : `<p class="vide">Rien à approuver.</p>`}
     <div class="sec">Traités (3 dernières heures)</div>${aut.length ? aut.map(p => cmdHtml(p, false)).join("") : `<p class="vide">Aucun.</p>`}
@@ -721,6 +722,31 @@ async function nipComptoir(){ const k = LS.get("magCle", ""); if (k) { try { con
     $("#nip").oninput = () => { if (/^\d{6}$/.test($("#nip").value.trim())) go(); }; $("#nip").onkeydown = e => { if (e.key === "Enter") go(); }; $("#nOk").onclick = go; $("#nip").focus(); }); }
 /* 26 nov. (Jeremy : wow « écran Magasin en direct ») : magasin.html?mode=ecran, pour un écran à la fenêtre ou au comptoir.
    Commandes prêtes à venir chercher (prénom seulement), plan avec les rangées qui clignotent, compteurs. Mis à jour toutes les 10 s. */
+/* 27 nov. (Jeremy : « moyen de voir le code des élèves rapidement, pour mes profs, sur leur cell dans le raccourci Commandes ») :
+   magasin.html?mode=codes. Codes = registres partagés (groupes de l'enseignant ou partagés avec lui). Prénoms = son registre de formation
+   (sur cet appareil, sinon son coffre s'il est connecté à Métier+ ici), sinon les prénoms vus dans ses commandes. Rien n'est envoyé. */
+async function codesEleves(){
+  const PROF = !!(ENS && JETON && !(COMPTES[ENS] && COMPTES[ENS].eleve));
+  $("#tTitre").textContent = "Codes des élèves";
+  if (!PROF) { $("#app").innerHTML = `<h1>Codes des élèves</h1><p class="sous">Ouvre d'abord la page Commandes de ton compte.</p><a class="btn" href="magasin.html?mode=prof">Commandes</a>`; return; }
+  $("#app").innerHTML = `<a class="lien" href="magasin.html?mode=prof">‹ Commandes</a><h1>Codes des élèves</h1><p class="sous">Chargement…</p>`;
+  const N = {}, ajoute = el => { for (const id in (el || {})) { const e = el[id]; if (e && e.c && e.p && !e.x) N[e.c] = e.p; } };
+  try { ajoute((JSON.parse(localStorage.getItem("passeportOutils") || "null") || {}).el); } catch(e){}
+  if (!Object.keys(N).length) { try { await new Promise((ok, ko) => { if (window.COFFRE) return ok(); const sc = document.createElement("script"); sc.src = "coffre.js?v=271"; sc.onload = ok; sc.onerror = ko; document.head.appendChild(sc); });
+    const r = await COFFRE.recevoir("passeport"); ajoute((JSON.parse((r && r.v && r.v.passeportOutils) || "null") || {}).el); } catch(e){} }
+  const deCoffre = Object.keys(N).length > 0;
+  try { (await rpc("panier_prof_lire", { p_ens:ENS, p_jeton:JETON }) || []).forEach(p => { if (p.code && p.prenom && !N[p.code]) N[p.code] = p.prenom; }); } catch(e){}
+  const G = {}, ens = Object.keys(COMPTES).filter(id => !COMPTES[id].eleve);
+  await Promise.all(ens.map(async e => { const g = await registre(e); for (const grp in g.codes) if (e === ENS || (g.part[grp] || []).includes(ENS)) (g.codes[grp] || []).forEach(c => { (G[grp] = G[grp] || new Set()).add(c); }); }));
+  const grps = Object.keys(G).sort((a, b) => a.localeCompare(b, "fr", { numeric:true }));
+  const dessiner = () => { const q = norm($("#cdQ").value.trim()); let n = 0;
+    $("#cdL").innerHTML = grps.map(g => { const L = [...G[g]].map(c => ({ c, p:N[c] || "" })).filter(x => !q || x.c.includes(q) || norm(x.p).includes(q)).sort((a, b) => (a.p || "~").localeCompare(b.p || "~", "fr") || a.c.localeCompare(b.c));
+      n += L.length; return L.length ? `<div class="sec">${esc(g)}</div><div class="carte cdC">${L.map(x => `<div class="cdR"><span>${x.p ? esc(x.p) : `<span class="sous">Prénom inconnu</span>`}</span><b>${esc(x.c)}</b></div>`).join("")}</div>` : ""; }).join("") || `<p class="vide">${grps.length ? "Aucun élève trouvé." : "Aucun groupe avec des codes. Les codes se créent dans Gestion d'atelier → Élèves."}</p>`; };
+  $("#app").innerHTML = `<a class="lien" href="magasin.html?mode=prof">‹ Commandes</a><h1>Codes des élèves</h1>
+    <input id="cdQ" type="search" placeholder="Prénom ou code" autocomplete="off" style="width:100%;font-size:1.1rem;padding:12px 14px;border:1px solid var(--ligne);border-radius:12px;margin:6px 0 4px">
+    ${deCoffre ? "" : `<p class="sous" style="font-size:.85rem">Pour voir tous les prénoms ici, connecte-toi une fois à <a href="index.html">Métier+</a> sur cet appareil.</p>`}<div id="cdL"></div>`;
+  $("#cdQ").oninput = dessiner; dessiner();
+}
 async function ecranDirect(){ document.body.classList.add("ecranD");
   /* 26 nov. (Jeremy : « c'est pour moi ») : ouvert depuis la page enseignant, avec sa clé d'approbation (ses groupes), sans NIP. Sinon, NIP du comptoir. */
   const PROF = !!(ENS && JETON && !(COMPTES[ENS] && COMPTES[ENS].eleve));
@@ -923,6 +949,7 @@ async function remettre(id, oui){ try { await rpcM("panier_remettre", { p_id:id,
   if (MODE === "magasin") return magasinier();
   if (MODE === "ecran") return ecranDirect();
   if (MODE === "absence") return absences();
+  if (MODE === "codes") return codesEleves();
   /* 26 nov. 23 h 20 (Jeremy : « bloque les fonctions de panier pour le moment, écris en construction, juste moi qui peut tester ») :
      reglages.json → magasinPublic:true pour ouvrir à tous. Sinon, seul jeremy.raymond (connecté sur l'appareil) passe; les tests automatiques aussi. */
   if (!MAG_PUBLIC && ENS !== "jeremy.raymond" && !LS.get("magEssai", false) && !navigator.webdriver) { $("#app").innerHTML = `<div class="constr"><img src="img/metier-plus-icone.svg" alt=""><h1>Magasin en construction</h1><p class="sous">Le magasin de raccords en ligne arrive bientôt. D'ici là, continue de faire tes demandes comme d'habitude au comptoir, avec ta feuille signée par ton enseignant.</p><button class="lien" id="essaiP" style="margin-top:14px;font-size:.85rem;color:var(--doux)">Accès du personnel</button></div>`;

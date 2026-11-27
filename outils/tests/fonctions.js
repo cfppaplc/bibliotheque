@@ -467,6 +467,24 @@ test("Magasin : l'élève (carte scannée) envoie son panier, l'enseignant appro
   await c1.close(); await c2.close(); await c3.close(); await c4.close();
 });
 
+test("Magasin : page Codes des élèves (raccourci Commandes, cellulaire) : prénoms + codes, recherche", async b => {
+  const ctx = await b.newContext({ viewport: { width: 390, height: 800 }, hasTouch: true, serviceWorkers: "block" }), errs = [];
+  await ctx.route(/supabase\.co\/rest\/v1\/rpc\/(\w+)/, r => { const f = r.request().url().match(/rpc\/(\w+)/)[1]; let o = null;
+    if (f === "coffre_lire") o = [{ data: JSON.stringify({ grp: ["2608 EGI"], codes: { "2608 EGI": ["12345", "45678"] } }) }];
+    else if (f === "panier_prof_lire") o = [{ code: "45678", prenom: "Zoé", etat: "remis", t: new Date().toISOString() }];
+    r.fulfill({ body: JSON.stringify(o), contentType: "application/json", headers: { "access-control-allow-origin": "*" } }); });
+  await ctx.addInitScript(() => { localStorage.setItem("bienvenueVu", "1"); localStorage.setItem("dernierId", "jeremy.raymond"); localStorage.setItem("magJeton|jeremy.raymond", JSON.stringify("j")); localStorage.setItem("passeportOutils", JSON.stringify({ el: { a: { p: "Alex", c: "12345", g: "2608 EGI" } } })); });
+  const p = await ctx.newPage(); p.on("pageerror", e => errs.push(e.message));
+  await p.goto(BASE + "magasin.html?mode=prof"); await attendre(1500);
+  vrai(/Codes des élèves/.test(await p.textContent("#app")), "Page Commandes : bouton « Codes des élèves » absent");
+  await p.click("text=Codes des élèves"); await attendre(1800);
+  const t = await p.textContent("#cdL");
+  vrai(/Alex/.test(t) && /12345/.test(t) && /Zoé/.test(t) && /45678/.test(t), "Codes des élèves : prénoms ou codes manquants (" + t + ")");
+  await p.fill("#cdQ", "zoe"); await attendre(300); const t2 = await p.textContent("#cdL");
+  vrai(/45678/.test(t2) && !/12345/.test(t2), "Codes des élèves : la recherche ne filtre pas (" + t2 + ")");
+  if (process.env.CAPTURES) await p.screenshot({ path: process.env.CAPTURES + "/codes-eleves.png" });
+  vrai(!errs.length, "Codes des élèves : erreurs " + errs.join(" | ")); await ctx.close();
+});
 test("Carte : l'élève affiche sa carte avec son code à 5 chiffres seulement; trop de codes inconnus = pause", async b => {
   const c = await b.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: "block" }), R = {}, errs = []; let E = 0;
   await c.route(/rpc\/carte_code_(ecrire|lire)/, r => { const a = JSON.parse(r.request().postData()), u = r.request().url(); let out;
