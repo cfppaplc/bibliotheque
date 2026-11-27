@@ -269,11 +269,14 @@ window.ADMIN_PLUS = (function(){
   async function chargerMg(){ const t = await (await fetch("magasin-catalogue.json?t=" + Date.now(), { cache:"no-store" })).text(); MG = JSON.parse(t); MG_TXT = JSON.stringify(MG); }
   const mgChange = () => MG && JSON.stringify(MG) !== MG_TXT;
   /* contenu d'une case : articles dont la case principale ou une autre case est celle-là (« F-27 » trouve aussi « F-27-A ») */
-  const mgDans = c => MG.raccords.filter(a => [a.r, ...(a.r2 || [])].some(x => x && (x === c || x.startsWith(c + "-"))));
+  /* 26 nov. (Jeremy : « J5 est vraiment vide ? ») : « J-05 » = « J-5 » (zéros devant ignorés) */
+  const mgN = x => { const m = String(x || "").toUpperCase().replace(/\s+/g, "").match(/^([A-Z]+)-?0*(\d+)(.*)$/); return m ? m[1] + "-" + (+m[2]) + m[3] : String(x || "").toUpperCase(); };
+  const mgMeme = (x, c) => { const a = mgN(x), b = mgN(c); return a === b || a.startsWith(b + "-") || (a.startsWith(b) && /^[A-Z]/.test(a.slice(b.length))); };   /* « E-15B » est dans la case 15 */
+  const mgDans = c => MG.raccords.filter(a => [a.r, ...(a.r2 || [])].some(x => x && mgMeme(x, c)));
   const mgHaut = l => { const n = mgDans(l + "-00").length; return n ? '<button class="abtn" data-c="' + l + '-00" style="margin-top:8px">Tablette du haut · ' + n + ' article' + (n > 1 ? 's' : '') + '</button>' : ''; };
   function mgCase(z, c){ const L = mgDans(c), t = /-0+$/.test(c) ? c.replace(/-0+$/, "") + " · tablette du haut" : "Case " + c;
     z.innerHTML = '<h4 style="margin:12px 0 6px">' + esc(t) + ' · ' + (L.length ? L.length + ' article' + (L.length > 1 ? 's' : '') : 'vide dans le catalogue') + '</h4>'
-      + L.map(a => { const A = [a.r, ...(a.r2 || [])].filter(x => x && x !== c && !(x.startsWith(c + "-"))); const u = mgPhoto(a); return '<div class="ap-ci">' + (u ? '<img src="' + esc(u) + '" alt="" loading="lazy" referrerpolicy="no-referrer" title="Toucher pour agrandir" onerror="this.outerHTML=\'<span class=ap-ci-v></span>\'">' : '<span class="ap-ci-v"></span>') + '<div style="flex:1;min-width:0"><b>' + esc(a.nom) + '</b><small>' + esc(a.n || "") + (A.length ? ' · aussi ' + esc(A.join(", ")) : '') + '</small></div><button class="abtn rouge" data-ret="' + MG.raccords.indexOf(a) + '" title="Retirer ce raccord de la case">Retirer</button></div>'; }).join("")
+      + L.map(a => { const A = [a.r, ...(a.r2 || [])].filter(x => x && !mgMeme(x, c)); const u = mgPhoto(a); return '<div class="ap-ci">' + (u ? '<img src="' + esc(u) + '" alt="" loading="lazy" referrerpolicy="no-referrer" title="Toucher pour agrandir" onerror="this.outerHTML=\'<span class=ap-ci-v></span>\'">' : '<span class="ap-ci-v"></span>') + '<div style="flex:1;min-width:0"><b>' + esc(a.nom) + '</b><small>' + esc(a.n || "") + (A.length ? ' · aussi ' + esc(A.join(", ")) : '') + '</small></div><button class="abtn rouge" data-ret="' + MG.raccords.indexOf(a) + '" title="Retirer ce raccord de la case">Retirer</button></div>'; }).join("")
       + '<div class="ap-ajc"><input type="text" class="ap-aj" placeholder="Ajouter un raccord à cette case : chercher par nom ou numéro…"><div class="ap-ajl"></div></div>'
       + (mgChange() ? '<p class="sous" style="margin-top:8px">N\'oublie pas « Publier le catalogue » plus bas pour que le comptoir voie les changements.</p>' : '');
     const q = z.querySelector(".ap-aj"), ql = z.querySelector(".ap-ajl");
@@ -281,7 +284,7 @@ window.ADMIN_PLUS = (function(){
       const R = MG.raccords.map((a, i) => [a, i]).filter(([a]) => { const t = mgNorm(a.nom + " " + (a.n || "") + " " + (a.mat || "")); return m.every(w => t.includes(w)) && !mgDans(c).includes(a); }).slice(0, 8);
       ql.innerHTML = R.length ? R.map(([a, i]) => '<button class="ap-ajb" data-aj="' + i + '"><b>' + esc(a.nom) + '</b><small>' + esc(a.n || "") + (a.r ? ' · ' + esc(a.r) : ' · sans case') + '</small></button>').join("") : '<p class="sous">Aucun raccord trouvé.</p>'; };
     z.onclick = e => { const b = e.target.closest("[data-ret],[data-aj]"); if (!b) return; e.stopPropagation(); const a = MG.raccords[+(b.dataset.ret || b.dataset.aj)]; if (!a) return;
-      const L0 = [a.r, ...(a.r2 || [])].filter(Boolean), L1 = b.dataset.ret != null ? L0.filter(x => !(x === c || x.startsWith(c + "-"))) : L0.concat(c);
+      const L0 = [a.r, ...(a.r2 || [])].filter(Boolean), L1 = b.dataset.ret != null ? L0.filter(x => !mgMeme(x, c)) : L0.concat(c);
       a.r = L1[0] || ""; if (L1.length > 1) a.r2 = L1.slice(1); else delete a.r2; mgEtat(); mgCase(z, c); }; }
   /* 26 nov. (Jeremy : « je veux toucher et pouvoir administrer la case ») : retirer / ajouter un raccord dans la case touchée, puis Publier le catalogue */
   let mgEtat = () => {};

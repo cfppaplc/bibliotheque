@@ -112,6 +112,9 @@ test("Administration : chaque onglet s'ouvre; Quoi de neuf se modifie et s'annul
     await p.click('#mgPlan [data-c="J-28"]'); await attendre(300);
     vrai(/J-28/.test(await p.textContent("#mgPlan .ap-case")), "Plan : toucher une case ne montre pas son contenu");
     vrai(await p.$$eval("#mgPlan .ap-ci img, #mgPlan .ap-ci .ap-ci-v", L => L.length) > 0, "Plan : pas de photo dans le contenu de la case");
+    await p.click('#mgPlan [data-c="J-5"]'); await attendre(300);
+    vrai(/Clapet antiretour/.test(await p.textContent("#mgPlan .ap-case")), "Case J-5 : le raccord écrit « J-05 » n'est pas trouvé");
+    await p.click('#mgPlan [data-c="J-28"]'); await attendre(300);
     /* 26 nov. : administrer la case : retirer puis rajouter un raccord, Publier devient actif */
     const nb0 = await p.$$eval("#mgPlan .ap-ci", L => L.length), nom0 = await p.textContent("#mgPlan .ap-ci b");
     await p.click("#mgPlan [data-ret]"); await attendre(200);
