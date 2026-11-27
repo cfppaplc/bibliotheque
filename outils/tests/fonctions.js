@@ -501,6 +501,26 @@ test("Registre : les codes des élèves ne sont publiés qu'après la synchronis
   vrai(W[0].noms && W[0].noms["12345"], "Registre : le prénom chiffré (noms) n'est pas publié");
   await ctx.close();
 });
+test("Registre automatique : la liste des codes se republie seule depuis le coffre, en gardant partages et suivi", async b => {   /* 27 nov. */
+  const ctx = await b.newContext({ serviceWorkers: "block" }), W = [];
+  await ctx.route(/supabase\.co\/rest\/v1\/rpc\/(\w+)/, r => { const f = r.request().url().match(/rpc\/(\w+)/)[1]; let o = null;
+    if (f === "coffre_lire") o = [{ data: JSON.stringify({ grp: ["2608 EGI"], part: { "2608 EGI": ["michel.beauchesne"] }, codes: { "2608 EGI": ["11111"] }, suivi: ["x"] }) }];
+    if (f === "coffre_ecrire") { W.push(JSON.parse(r.request().postData())); o = true; }
+    r.fulfill({ body: JSON.stringify(o), contentType: "application/json", headers: { "access-control-allow-origin": "*" } }); });
+  const p = await ctx.newPage(); await p.goto(BASE + "confidentialite.html"); await attendre(500);
+  await p.evaluate(() => { const D = { el: { a: { p: "Alex Tremblay", c: "11111", k: "AAAA11", g: "2608 EGI" }, b: { p: "Zoé", c: "22222", k: "BBBB22", g: "2608 EGI" }, z: { p: "Vieux", c: "33333", g: "2608 EGI", x: 1 } }, grp: {} };
+    window.COFFRE = { session: async () => ({ id: "jeremy.raymond" }), recevoir: async () => ({ t: 1, v: { passeportOutils: JSON.stringify(D), passPartageJeton: "jet" } }) }; });
+  await p.addScriptTag({ url: BASE + "js/registre-auto.js?v=1" });
+  const r1 = await p.evaluate(() => REGISTRE_AUTO.maj(true));
+  vrai(r1 === "publié" && W.length === 1, "Registre automatique : rien publié (" + r1 + ")");
+  const d = JSON.parse(W[0].p_data);
+  vrai(JSON.stringify(d.codes["2608 EGI"].sort()) === '["11111","22222"]', "Registre automatique : codes faux " + JSON.stringify(d.codes));
+  vrai(d.part["2608 EGI"][0] === "michel.beauchesne" && d.suivi[0] === "x" && W[0].p_jeton === "jet" && d.noms["22222"], "Registre automatique : partages, suivi, jeton ou prénoms perdus");
+  await p.evaluate(() => { window.COFFRE.recevoir = async () => ({ t: 1, v: { passeportOutils: JSON.stringify({ el: {} }), passPartageJeton: "jet" } }); });
+  const r2 = await p.evaluate(() => REGISTRE_AUTO.maj(true));
+  vrai(r2 === "vide" && W.length === 1, "Registre automatique : un registre vide a été publié");
+  await ctx.close();
+});
 test("Carte : l'élève affiche sa carte avec son code à 5 chiffres seulement; trop de codes inconnus = pause", async b => {
   const c = await b.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: "block" }), R = {}, errs = []; let E = 0;
   await c.route(/rpc\/carte_code_(ecrire|lire)/, r => { const a = JSON.parse(r.request().postData()), u = r.request().url(); let out;
