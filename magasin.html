@@ -197,6 +197,14 @@ body:not(.anim-ok) .etapes .bar.ok{animation:mpBar .7s .25s ease both;transform-
 @keyframes mpBar{from{transform:scaleX(0)}}
 @keyframes mpCloche{0%,100%{transform:rotate(0)}20%{transform:rotate(14deg)}40%{transform:rotate(-12deg)}60%{transform:rotate(8deg)}80%{transform:rotate(-4deg)}}
 @keyframes mpToast{from{opacity:0;transform:translate(-50%,14px)}}
+/* 26 nov. : « Ajouter » → − n + en douceur, barre du panier qui monte ou rebondit doucement */
+@media (prefers-reduced-motion:no-preference){
+.qte.doux{animation:mpQte .32s cubic-bezier(.2,.8,.2,1) both}.qte.doux span{animation:mpNum .35s cubic-bezier(.2,.8,.2,1) both}.qte.doux-m span{animation:mpNum .3s ease both}
+#barre.entre{animation:mpBarreIn .38s cubic-bezier(.2,.8,.2,1) both}#barre.bump b{display:inline-block;animation:mpNum .35s cubic-bezier(.2,.8,.2,1) both}
+}
+@keyframes mpQte{from{opacity:.25;transform:scale(.94)}}
+@keyframes mpNum{0%{transform:scale(1)}40%{transform:scale(1.18)}100%{transform:scale(1)}}
+@keyframes mpBarreIn{from{opacity:0;transform:translateY(24px)}}
 /* écran « Magasin en direct » */
 body.ecranD main{max-width:1500px}a.btn{text-decoration:none;color:inherit;display:inline-flex;align-items:center;justify-content:center}.edB{margin:4px 0 6px;color:var(--acc);font-weight:700}.ed{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px;align-items:start}@media (max-width:900px){.ed{grid-template-columns:1fr}}
 .ed-k{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.ed-k>div{background:#fff;border-radius:18px;box-shadow:var(--ombre);padding:16px;text-align:center}.ed-k b{display:block;font-size:2.6rem;line-height:1;color:var(--acc)}.ed-k span{color:var(--doux);font-weight:600}
@@ -383,7 +391,8 @@ document.addEventListener("click", e => { const b = e.target.closest("[data-ph]"
 const ligneArt = a => { const q = PANIER[a.id] || 0;
   return `<div class="art" data-id="${esc(a.id)}">${vignette(a)}<div class="tx"><b>${esc(a.nom)}</b></div><div class="qte">${q ? `<button data-m="-1" aria-label="Enlever un">−</button><span>${q}</span><button data-m="1" aria-label="Ajouter un">+</button>` : `<button class="aj" data-m="1">Ajouter</button>`}</div></div>`; };
 function brancherQte(z, apres){ z.querySelectorAll(".art [data-m]").forEach(b => b.onclick = () => { const id = b.closest(".art").dataset.id; PANIER[id] = Math.max(0, Math.min(99, (PANIER[id] || 0) + +b.dataset.m)); if (!PANIER[id]) delete PANIER[id]; sauverPanier();
-  const a = CAT.find(x => x.id === id), el = b.closest(".art"); if (a) { el.outerHTML = ligneArt(a); } brancherQte(z, apres); barre(); if (apres) apres(); }); }
+  const a = CAT.find(x => x.id === id), el = b.closest(".art"); const vis = $("#barre").hidden; if (a) { el.outerHTML = ligneArt(a); const q = z.querySelector(`.art[data-id="${CSS.escape(id)}"] .qte`); if (q) q.classList.add(+b.dataset.m > 0 ? "doux" : "doux-m"); } brancherQte(z, apres); barre();
+  { const br = $("#barre"); if (!br.hidden) { br.classList.remove("bump", "entre"); void br.offsetWidth; br.classList.add(vis ? "entre" : "bump"); } }   /* 26 nov. (Jeremy : « moins rough ») : transition douce du bouton et de la barre du panier */ if (apres) apres(); }); }
 function liste(){
   /* 26 nov. (Jeremy : « la recherche doit comprendre ce que l'élève veut ») : js/magasin-recherche.js (synonymes, mesures, fautes de frappe, meilleurs résultats d'abord) */
   const filtre = a => (!FILTRE.cat || a.cat === FILTRE.cat) && (!FILTRE.mat || a.mat === FILTRE.mat) && (!FILTRE.d || a.d === FILTRE.d);
