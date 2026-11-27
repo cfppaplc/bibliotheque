@@ -210,6 +210,12 @@ body:not(.anim-ok) .etapes .bar.ok{animation:mpBar .7s .25s ease both;transform-
 /* heures du magasin */
 .mgEtat{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:7px 14px;font:inherit;font-size:.92rem;margin:2px 0 10px;font-weight:700;border:0;cursor:pointer;text-align:left}.mgEtat .mgH{font-weight:600;opacity:.75;font-size:.82rem;margin-left:4px}
 .hOv{position:fixed;inset:0;z-index:60;background:rgba(22,35,63,.5);display:flex;align-items:center;justify-content:center;padding:16px;animation:mpIn .25s ease both}.hBo{background:#fff;border-radius:20px;box-shadow:0 20px 50px rgba(0,0,0,.25);padding:18px;width:100%;max-width:420px;max-height:90vh;overflow:auto}.hT{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}.hT b{font-size:1.2rem}
+.hSem{max-width:560px}.hNav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:2px 0 8px}.hNav span{font-weight:800}.hNav .btn{min-height:40px;min-width:44px;padding:0 12px}
+.hAv{margin:0 0 8px;padding:8px 12px;border-radius:10px;background:#FBE3E1;color:#C9362E;font-weight:700;font-size:.9rem}
+.hG{width:100%;border-collapse:separate;border-spacing:3px;table-layout:fixed;font-variant-numeric:tabular-nums}.hG th{font-size:.78rem;font-weight:800;color:#1E2A44;padding:4px 2px}.hG th.hh{white-space:nowrap;font-size:.7rem;width:52px;text-align:left}.hG tr:first-child th:first-child{width:52px}.hG th small{display:block;font-weight:600;color:#6b7280;font-size:.7rem}
+.hG tr:first-child th:not(:first-child){background:#EEF1F5;border-radius:10px}.hG th.auj{background:#1E2A44!important;color:#fff}.hG th.auj small{color:#F7B88F}.hG th.jf{background:#FBE3E1!important;color:#C9362E}
+.hG td{border-radius:8px;text-align:center;font-size:.68rem;font-weight:800;padding:6px 2px;line-height:1.15}.hG td.ho{background:#1E8A55;color:#fff}.hG td.hx{background:#FBE3E1;color:#C9362E}.hG td.hp{background:#E3F4EA;color:#145c39;box-shadow:inset 0 0 0 2px #E9A49E}.hG td.hp b{display:block;color:#C9362E}
+.hG td.cour{outline:3px solid #EB6A22;outline-offset:1px}.hG tr.hd td{background:#1E2A44;color:#fff;font-size:.7rem}
 .hL{display:flex;justify-content:space-between;align-items:center;border-radius:12px;padding:10px 14px;margin:5px 0;font-weight:700;font-variant-numeric:tabular-nums}.hL em{font-style:normal;font-size:.8rem;text-transform:uppercase;letter-spacing:.05em}.hL.o{background:#E3F4EA;color:#145c39}.hL.o.cour{background:var(--vert);color:#fff}.hL.f{background:#F1F3F6;color:#7b8494;padding:5px 14px;font-size:.88rem}.mgEtat i{width:10px;height:10px;border-radius:50%;background:currentColor}
 .mgEtat.on{background:#E3F4EA;color:var(--vert)}.mgEtat.on i{animation:etP 1.6s ease-in-out infinite;box-shadow:0 0 0 0 rgba(30,138,85,.4)}.mgEtat.off{background:#FBE9E7;color:var(--rouge)}.mgEtat.bientot{background:#FFF1E0;color:#B2470F}.mgEtat.bientot i{animation:etP 1s ease-in-out infinite}
 .bientotN{background:#FFF1E0!important;color:#8a4a0f!important}.fermeN{background:#FBE9E7;color:#8f2a22;border-radius:12px;padding:10px 12px;font-weight:600;margin:12px 0 0}
@@ -415,16 +421,31 @@ function etatMag(d){ d = d || new Date(); const H = HEURES || HEURES_DEF;
 const etatTxt = e => e.ouvert ? (e.bientot ? "Le magasin ferme bientôt · à " + hTxt(e.fin) + " (dans " + e.reste + " min)" : "Magasin ouvert" + (e.fin ? " · ferme à " + hTxt(e.fin) : "")) : "Magasin fermé" + (e.quand ? " · rouvre " + e.quand : "");
 const etatPill = () => { const e = etatMag(); return `<button type="button" class="mgEtat ${e.bientot ? "bientot" : e.ouvert ? "on" : "off"}" onclick="voirHoraire()" title="Voir l'horaire du magasin"><i></i><b>${etatTxt(e)}</b><span class="mgH">Horaire ›</span></button>`; };
 /* 26 nov. (Jeremy : « quand on clique dessus, on devrait voir l'horaire ») */
-function voirHoraire(){ const H = HEURES || HEURES_DEF, J = ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"], auj = new Date(), P = plagesDu(H, auj.getDay()), m = auj.getHours() * 60 + auj.getMinutes();
-  const jours = J.map((j, k) => ({ j, k })).filter(x => (H.jours || []).includes(x.k)).map(x => x.j), fa = (H.fermes || []).includes(jourCle(auj));
-  const ov = document.createElement("div"); ov.className = "hOv"; ov.onclick = e => { if (e.target === ov || e.target.closest("[data-hf]")) ov.remove(); };
-  ov.innerHTML = `<div class="hBo" role="dialog" aria-label="Horaire du magasin"><div class="hT"><b>Horaire du magasin · aujourd'hui</b><button class="lien" data-hf>Fermer</button></div>
-    <p class="sous" style="margin:0 0 10px">${jours.length ? esc(jours[0] + (jours.length > 1 ? " au " + jours[jours.length - 1].toLowerCase() : "")) : "Aucun jour d'ouverture"}${fa ? " · <b style='color:var(--rouge)'>fermé aujourd'hui</b>" : ""}</p>
-    ${P.map((p, i) => { const n = P[i + 1], cour = !fa && (H.jours || []).includes(auj.getDay()) && m >= hm(p[0]) && m < hm(p[1]);
-      return `<div class="hL o${cour ? " cour" : ""}"><span>${hTxt(p[0])} – ${hTxt(p[1])}</span><em>${cour ? "En ce moment" : "Ouvert"}</em></div>` + (n ? `<div class="hL f"><span>${hTxt(p[1])} – ${hTxt(n[0])}</span><em>${hm(n[0]) - hm(p[1]) <= 20 ? "Pause" : hm(p[1]) <= 720 && hm(n[0]) >= 780 ? "Dîner · fermé" : "Fermé"}</em></div>` : ""); }).join("")}
-    ${(H.coupures || []).length ? `<p style="margin:12px 0 0;font-weight:700">Fermetures chaque semaine</p>${H.coupures.map(c => `<div class="hL f"><span>${esc((c.j || []).map(k => J[k]).join(", "))}</span><em>${hTxt(c.de)} – ${hTxt(c.a)}</em></div>`).join("")}` : ""}
-    <p class="sous" style="margin:10px 0 0">Fermé les fins de semaine, les jours fériés et les journées pédagogiques.</p></div>`;
-  document.body.appendChild(ov); }
+/* 27 nov. (Jeremy : « l'horaire pourrait être dynamique et montrer la journée où il est fermé ») : la semaine complète (lundi au vendredi),
+   aujourd'hui et la période en cours en évidence, fermetures de la semaine et jours fermés (pédagogiques, congés) entrés dans l'Administration. */
+let HSEM = 0;
+function voirHoraire(dec){ if (typeof dec === "number") HSEM += dec; else HSEM = 0;
+  const H = HEURES || HEURES_DEF, J = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"], auj = new Date(), m = auj.getHours() * 60 + auj.getMinutes();
+  const base = (H.plages || []).slice().sort((a, b) => hm(a[0]) - hm(b[0])), lun = new Date(auj); lun.setHours(12, 0, 0, 0);
+  lun.setDate(lun.getDate() - ((lun.getDay() + 6) % 7) + (auj.getDay() === 6 || auj.getDay() === 0 ? 7 : 0) + 7 * HSEM);
+  const jours = [0, 1, 2, 3, 4].map(k => { const d = new Date(lun); d.setDate(lun.getDate() + k); return d; });
+  const ferme = d => !(H.jours || []).includes(d.getDay()) || (H.fermes || []).includes(jourCle(d)), memeJ = (a, b) => jourCle(a) === jourCle(b);
+  const cell = (d, [a, b]) => { if (ferme(d)) return `<td class="hx">Fermé</td>`;
+    const D = plagesDu(H, d.getDay()).filter(([x, y]) => hm(y) > hm(a) && hm(x) < hm(b)), cour = memeJ(d, auj) && m >= hm(a) && m < hm(b);
+    if (!D.length) return `<td class="hx${cour ? " cour" : ""}">Fermé</td>`;
+    const de = D[0][0], jusq = D[D.length - 1][1];
+    const nb = x => hTxt(x).replace(/ /g, "\u00a0"), t = hm(de) > hm(a) ? "<b>Fermé</b>jusqu’à " + nb(de) : hm(jusq) < hm(b) ? "<b>Ouvert</b>jusqu’à " + nb(jusq) : "";
+    return `<td class="${t ? "hp" : "ho"}${cour ? " cour" : ""}">${t || (cour ? "En ce moment" : "Ouvert")}</td>`; };
+  let rows = ""; base.forEach((p, i) => { rows += `<tr><th class="hh">${hTxt(p[0])}<small>${hTxt(p[1])}</small></th>${jours.map(d => cell(d, p)).join("")}</tr>`;
+    const n = base[i + 1]; if (n && hm(p[1]) <= 720 && hm(n[0]) >= 780) rows += `<tr class="hd"><th></th><td colspan="5">Dîner · fermé</td></tr>`; });
+  const fermesSem = jours.filter(d => (H.jours || []).includes(d.getDay()) && (H.fermes || []).includes(jourCle(d)));
+  const titre = HSEM === 0 && !(auj.getDay() === 6 || auj.getDay() === 0) ? "Cette semaine" : "Semaine du " + lun.getDate() + " " + lun.toLocaleDateString("fr-CA", { month:"long" });
+  let ov = document.querySelector(".hOv"); if (!ov) { ov = document.createElement("div"); ov.className = "hOv"; ov.onclick = e => { if (e.target === ov || e.target.closest("[data-hf]")) ov.remove(); }; document.body.appendChild(ov); }
+  ov.innerHTML = `<div class="hBo hSem" role="dialog" aria-label="Horaire du magasin"><div class="hT"><b>Horaire du magasin</b><button class="lien" data-hf>Fermer</button></div>
+    <div class="hNav"><button class="btn" onclick="voirHoraire(-1)" aria-label="Semaine précédente">‹</button><span>${esc(titre)}</span><button class="btn" onclick="voirHoraire(1)" aria-label="Semaine suivante">›</button></div>
+    ${fermesSem.length ? `<p class="hAv">Fermé toute la journée : ${fermesSem.map(d => esc(d.toLocaleDateString("fr-CA", { weekday:"long", day:"numeric", month:"long" }))).join(", ")}</p>` : ""}
+    <table class="hG"><tr><th></th>${jours.map(d => `<th class="${memeJ(d, auj) ? "auj" : ""}${ferme(d) ? " jf" : ""}">${J[d.getDay()]}<small>${d.getDate()}</small></th>`).join("")}</tr>${rows}</table>
+    <p class="sous" style="margin:10px 0 0">Fermé pendant les pauses, les fins de semaine, les congés et les journées pédagogiques.</p></div>`; }
 
 function majEtat(){ const e = etatMag(); document.querySelectorAll(".mgEtat").forEach(el => { el.className = "mgEtat " + (e.bientot ? "bientot" : e.ouvert ? "on" : "off"); el.querySelector("b").textContent = etatTxt(e); });
   const b = $("#pEnv"); if (b && !b.dataset.envoi) { const ferme = !e.ouvert; if (ferme !== !!b.dataset.ferme) { if (ferme) { b.dataset.txt = b.textContent; b.textContent = "Magasin fermé · rouvre " + (e.quand || "bientôt"); b.disabled = true; b.dataset.ferme = "1"; } else { b.textContent = b.dataset.txt || "Envoyer à mon enseignant"; delete b.dataset.ferme; b.disabled = !nbPanier(); } } } }
