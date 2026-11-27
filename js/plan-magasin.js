@@ -61,7 +61,9 @@ window.PlanMagasin = (function(){
     o += face(F.K + 1, yK + 6, H - yK - 12, "K") + sign(F.K + 16, yK + 60, "K");
     const wa = dh + V.winA, wb = wa + V.winW;
     o += `<line x1="${wa}" y1="0" x2="${wb}" y2="0" stroke="#EB6A22" stroke-width="4"/><text class="pm-l" x="${(wa + wb) / 2}" y="16">Fenêtre de service</text>`;
-    o += `<text class="pm-l" x="${dh / 2 + 14}" y="${R / 2 + 26}">Porte</text>`;
+    /* 26 nov. (Jeremy : « le mot Porte est mal placé ») : écrit le long du mur en biais, côté intérieur, loin des affiches */
+    { const dl = Math.hypot(dh, R), t = .32, px = dh * t + R / dl * 11, py = R * (1 - t) + dh / dl * 11, ang = -Math.atan2(R, dh) * 180 / Math.PI;
+      o += `<text class="pm-l" x="${px.toFixed(1)}" y="${py.toFixed(1)}" transform="rotate(${ang.toFixed(1)} ${px.toFixed(1)} ${py.toFixed(1)})">Porte</text>`; }
     /* parties numérotées (même ordre que l'image envoyée à Jeremy) */
     const parts = []; let k = 0;
     ORDRE.forEach(l => (faces[l] || []).forEach(([x, y, h]) => { const ns = Array.from({ length:NPART }, (_, i) => k + 1 + i), tot = ns.reduce((s, n) => s + taille(n), 0) || 1; let yy = y; k += NPART;
