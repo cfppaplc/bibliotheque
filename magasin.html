@@ -586,8 +586,8 @@ function dessinerMag(){
 const casesDe = i => { const a = CAT.find(x => x.id === i.id || x.n === i.n) || {}; return [...new Set([i.r || a.r, ...(a.r2 || [])].filter(Boolean))]; };
 const rangee = i => { const C = casesDe(i); return C.find(c => window.PlanMagasin && PlanMagasin.place(c)) || C[0] || ""; };
 const autresCases = i => { const r = rangee(i); return casesDe(i).filter(c => c !== r); };
-/* 26 nov. (Jeremy) : « -00 » = sur la tablette du haut de la rangée, souvent le surplus (overstock) */
-const caseTxt = c => /^([A-Z]+)-0+$/.test(c || "") ? c.replace(/-0+$/, "") + " (tablette du haut, surplus)" : (c || "");
+/* 26 nov. (Jeremy) : « -00 » = sur la tablette du haut de la rangée, parfois du surplus */
+const caseTxt = c => /^([A-Z]+)-0+$/.test(c || "") ? c.replace(/-0+$/, "") + " (tablette du haut)" : (c || "");
 const aussi = i => { const A = autresCases(i); return A.length ? `<small class="aussi">aussi ${A.map(c => esc(caseTxt(c))).join(", ")}</small>` : ""; };
 const parRangee = L => [...(L || [])].sort((a, b) => rangee(a).localeCompare(rangee(b), "fr", { numeric:true }) || String(a.nom).localeCompare(String(b.nom), "fr"));
 const tableMag = p => `<table>${parRangee(p.items).map(i => `<tr><td class="rg"><span class="rgp">${esc(caseTxt(rangee(i)) || "–")}</span>${aussi(i)}</td><td class="q"><span class="qb">${+i.q || 1}</span></td><td>${esc(i.nom)}</td></tr>`).join("")}</table>`;   /* 26 nov. : sans n° d'article (inutile au comptoir) */

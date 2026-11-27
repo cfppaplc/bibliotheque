@@ -809,3 +809,4 @@
 - 26 nov. : comptoir : articles dans plusieurs cases (r2, 342 articles) : case principale = une case placée sur le plan, « aussi … » sous la case, toutes les cases dans le bon imprimé et dans la vue de face (00 = case inconnue, ignorée). Test ajouté.
 - 26 nov. : Jeremy : « un réducteur ça réduit, ça doit pas ressembler à une bague » : réducteurs cuivre/DWV à souder (7) → réducteur FTG × C; ABS (7, anneau) → manchon réducteur ABS. Vérifiés à l'écran.
 - 26 nov. : case « X-00 » = tablette du haut de la rangée, souvent le surplus (Jeremy) : affichée « G (tablette du haut, surplus) » au comptoir et sur le bon (caseTxt); test ajouté.
+- 26 nov. : « surplus » retiré du libellé (Jeremy : pas toujours du surplus) → « G (tablette du haut) ».
