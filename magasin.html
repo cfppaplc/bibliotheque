@@ -283,9 +283,9 @@ function eleveCatalogue(){
   enTete();
   const cats = [...new Set(CAT.map(a => a.cat).filter(Boolean))], mats = [...new Set(CAT.map(a => a.mat).filter(Boolean))].sort((a, b) => a.localeCompare(b, "fr")), ds = [...new Set(CAT.map(a => a.d).filter(Boolean))].sort((a, b) => pouces(a) - pouces(b));
   $("#app").innerHTML = `<div id="mesEnvois"></div><div class="cherche"><input id="fQ" type="search" placeholder="Cherche un raccord : coude 90 ABS 2, té cuivre 3/4…" value="${esc(FILTRE.q)}" autocomplete="off">
-    <div class="filtres">${cats.length > 1 ? `<select id="fC" aria-label="Section"><option value="">Toutes les sections</option>${cats.map(c => `<option${FILTRE.cat === c ? " selected" : ""}>${esc(c)}</option>`).join("")}</select>` : ""}
-    <select id="fM" aria-label="Matériau"><option value="">Tous les matériaux</option>${mats.map(m => `<option${FILTRE.mat === m ? " selected" : ""}>${esc(m)}</option>`).join("")}</select>
-    <select id="fD" aria-label="Diamètre"><option value="">Tous les diamètres</option>${ds.map(d => `<option value="${esc(d)}"${FILTRE.d === d ? " selected" : ""}>${esc(d)} po</option>`).join("")}</select></div></div>
+    <div class="filtres">${cats.length > 1 ? `<select id="fC" aria-label="Section"><option value="">Section</option>${cats.map(c => `<option${FILTRE.cat === c ? " selected" : ""}>${esc(c)}</option>`).join("")}</select>` : ""}
+    <select id="fM" aria-label="Matériau"><option value="">Matériau</option>${mats.map(m => `<option${FILTRE.mat === m ? " selected" : ""}>${esc(m)}</option>`).join("")}</select>
+    <select id="fD" aria-label="Diamètre"><option value="">Diamètre</option>${ds.map(d => `<option value="${esc(d)}"${FILTRE.d === d ? " selected" : ""}>${esc(d)} po</option>`).join("")}</select></div></div>
     <div class="carte" style="padding:0" id="liste"></div>`;
   const q = $("#fQ"); q.oninput = () => { FILTRE.q = q.value; liste(); };
   [["#fC", "cat"], ["#fM", "mat"], ["#fD", "d"]].forEach(([id, k]) => { const el = $(id); if (el) el.onchange = () => { FILTRE[k] = el.value; liste(); }; });
@@ -294,14 +294,14 @@ function eleveCatalogue(){
 /* 26 nov. (Jeremy : « les élèves doivent confirmer leur choix ») : photo réelle par type de raccord (catalogue.photos « type|matériau »), ou propre à l'article (a.img) */
 let PHOTOS = {};
 const photoDe = a => !a || a.img === "-" ? "" : (a.img || PHOTOS[String(a.type || "").toLowerCase() + "|" + (a.mat || "")] || "");   /* « - » = photo retirée (aucune ne convient) */
-const vignette = a => { const u = photoDe(a); return u ? `<button class="ph" data-ph="${esc(u)}" data-t="${esc(a.nom)}" aria-label="Voir la photo"><img src="${esc(u)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.outerHTML=SANS_PHOTO"></button>` : SANS_PHOTO; };
+const vignette = a => { const u = photoDe(a); return u ? `<button class="ph" data-ph="${esc(u)}" data-t="${esc(a.nom + (a.n ? " · N° " + a.n : ""))}" aria-label="Voir la photo"><img src="${esc(u)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.outerHTML=SANS_PHOTO"></button>` : SANS_PHOTO; };
 /* 26 nov. (Jeremy) : article sans photo = logo Métier+ pâle au lieu d'un carré vide */
 const SANS_PHOTO = `<span class="ph vide" title="Photo à venir"><img src="img/metier-plus-icone.svg" alt=""></span>`;
 document.addEventListener("click", e => { const b = e.target.closest("[data-ph]"); if (!b) return; e.preventDefault();
   const d = document.createElement("div"); d.className = "phz"; d.innerHTML = `<figure><img src="${esc(b.dataset.ph)}" alt="" referrerpolicy="no-referrer"><figcaption>${esc(b.dataset.t)}<small>Photo d'exemple : la couleur ou la marque peut varier.</small></figcaption></figure>`;
   d.onclick = () => d.remove(); document.body.appendChild(d); });
 const ligneArt = a => { const q = PANIER[a.id] || 0;
-  return `<div class="art" data-id="${esc(a.id)}">${vignette(a)}<div class="tx"><b>${esc(a.nom)}</b><small>N° ${esc(a.n)}</small></div><div class="qte">${q ? `<button data-m="-1" aria-label="Enlever un">−</button><span>${q}</span><button data-m="1" aria-label="Ajouter un">+</button>` : `<button class="aj" data-m="1">Ajouter</button>`}</div></div>`; };
+  return `<div class="art" data-id="${esc(a.id)}">${vignette(a)}<div class="tx"><b>${esc(a.nom)}</b></div><div class="qte">${q ? `<button data-m="-1" aria-label="Enlever un">−</button><span>${q}</span><button data-m="1" aria-label="Ajouter un">+</button>` : `<button class="aj" data-m="1">Ajouter</button>`}</div></div>`; };
 function brancherQte(z, apres){ z.querySelectorAll(".art [data-m]").forEach(b => b.onclick = () => { const id = b.closest(".art").dataset.id; PANIER[id] = Math.max(0, Math.min(99, (PANIER[id] || 0) + +b.dataset.m)); if (!PANIER[id]) delete PANIER[id]; sauverPanier();
   const a = CAT.find(x => x.id === id), el = b.closest(".art"); if (a) { el.outerHTML = ligneArt(a); } brancherQte(z, apres); barre(); if (apres) apres(); }); }
 function liste(){
@@ -376,7 +376,7 @@ const LBL = { attente:"En attente de ton enseignant", approuve:"Approuvé · va 
       if (!sub) { const { cle } = await (await fetch(SUPA + "/functions/v1/panier-avis", { headers:{ apikey:CLE } })).json(); sub = await reg.pushManager.subscribe({ userVisibleOnly:true, applicationServerKey:Uint8Array.from(atob(cle.replace(/-/g, "+").replace(/_/g, "/")), c => c.charCodeAt(0)) }); }
       if (await rpc("panier_abonner_eleve", { p_id:b.dataset.abo, p_abonnement:sub.toJSON() }) !== true) throw new Error("refus");
       const E2 = LS.get("magEnvois", []); const x = E2.find(y => y.id === b.dataset.abo); if (x) x.abo = 1; LS.set("magEnvois", E2); toast("Tu seras averti sur ce cellulaire."); suivi(); }
-    catch(e){ toast("Avis impossibles : " + e.message); b.disabled = false; } });
+    catch(e){ toast("Les avis n'ont pas pu être activés. Réessaie, ou demande à ton enseignant."); b.disabled = false; } });
   if (S.some(s => s && (s.etat === "attente" || s.etat === "approuve"))) suiviT = setTimeout(suivi, 10000);
 }
 
@@ -406,19 +406,19 @@ async function prof(){
 let profT = 0;
 async function dessinerProf(){
   clearTimeout(profT);
-  let L; try { L = await rpc("panier_prof_lire", { p_ens:ENS, p_jeton:JETON }); } catch(e){ $("#app").innerHTML = `<p class="err">Supabase ne répond pas. Nouvel essai dans 15 s.</p>`; profT = setTimeout(dessinerProf, 15000); return; }
+  let L; try { L = await rpc("panier_prof_lire", { p_ens:ENS, p_jeton:JETON }); } catch(e){ $("#app").innerHTML = `<p class="err">Pas de connexion pour l'instant. On réessaie tout seul.</p>`; profT = setTimeout(dessinerProf, 15000); return; }
   let AVIS = []; try { AVIS = await rpc("panier_prof_avis", { p_ens:ENS, p_jeton:JETON }) || []; } catch(e){}
   const att = L.filter(p => p.etat === "attente"), aut = L.filter(p => p.etat !== "attente" && Date.now() - Date.parse(p.t_remis || p.t_app || p.t) < 864e5);   /* 25 nov. (Jeremy) : traités = 24 h; le reste est dans les archives */
   const neufs = att.filter(p => !VUS.has(p.id)); if (neufs.length && VUS.size) bip(); att.forEach(p => VUS.add(p.id)); LS.set("magVus", [...VUS].slice(-300));
   const avis = "Notification" in window && "serviceWorker" in navigator && "PushManager" in window, perm = avis ? Notification.permission : "non";
   const ios = /iPhone|iPad|iPod/.test(navigator.userAgent) && !window.navigator.standalone && !matchMedia("(display-mode: standalone)").matches;
-  $("#app").innerHTML = `<h1>Commandes à approuver</h1><p class="sous">${att.length ? att.length + " panier" + (att.length > 1 ? "s" : "") + " en attente." : "Aucun panier en attente."} Mis à jour toutes les 15 secondes.</p>
+  $("#app").innerHTML = `<h1>Commandes à approuver</h1><p class="sous">${att.length ? att.length + " panier" + (att.length > 1 ? "s" : "") + " en attente." : "Aucun panier en attente."}</p>
     <div class="avis-l" id="avisZ">${perm === "granted" && LS.get("magAbonne|" + ENS, false) ? `<button class="cloche on" id="avTest" title="Avis activés sur cet appareil · toucher pour tester" aria-label="Avis activés, tester">${CLOCHE}</button>` : (`<button class="cloche" id="avOui" title="Recevoir les avis sur cet appareil" aria-label="Recevoir les avis sur cet appareil">${CLOCHE}</button>`)}
-      <button class="lien" id="apAj">Ajouter un appareil</button><p class="err" id="avErr" style="min-height:0;margin:0;width:100%"></p><div id="apQr" style="width:100%"></div></div>
+      <button class="lien" id="apAj">Recevoir aussi sur mon cellulaire</button><p class="err" id="avErr" style="min-height:0;margin:0;width:100%"></p><div id="apQr" style="width:100%"></div></div>
     ${AVIS.length ? `<div class="sec">Avis du magasinier</div><div class="carte avisMag">${AVIS.map(a => `<div class="av"><span><b>${esc(a.prenom || "Élève")}</b> <small class="sous">${esc(a.code)} · ${esc(a.groupe)} · ${heure(a.t)}</small><br>${esc(REGLES_L[a.regle] || "?")}</span><button class="btn" data-vu="${esc(a.id)}" title="Retirer de cette page (reste dans le dossier de l'élève)">Vu</button></div>`).join("")}<p class="sous" style="margin:8px 0 0">« Vu » retire l'avis d'ici; il reste dans le dossier de l'élève.</p></div>` : ""}
     <div class="sec">En attente</div>${att.length ? att.map(p => cmdHtml(p, true)).join("") : `<p class="vide">Rien à approuver.</p>`}
     <div class="sec">Traités (24 dernières heures)</div>${aut.length ? aut.map(p => cmdHtml(p, false)).join("") : `<p class="vide">Aucun.</p>`}
-    <div class="sec">Archives (1 an)</div><div class="carte"><label for="arM">Mois</label> <select id="arM">${(() => { const o = []; for (let i = 0; i < 12; i++){ const d = new Date(); d.setDate(1); d.setMonth(d.getMonth() - i); o.push(`<option value="${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}">${d.toLocaleDateString("fr-CA", { month:"long", year:"numeric" })}</option>`); } return o.join(""); })()}</select> <button class="btn" id="arVoir" style="min-height:40px">Voir</button><div id="arL"></div></div>`;
+    <details class="arch"><summary>Archives de l'année</summary><div class="carte" style="margin-top:10px"><label for="arM">Mois</label> <select id="arM">${(() => { const o = []; for (let i = 0; i < 12; i++){ const d = new Date(); d.setDate(1); d.setMonth(d.getMonth() - i); o.push(`<option value="${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}">${d.toLocaleDateString("fr-CA", { month:"long", year:"numeric" })}</option>`); } return o.join(""); })()}</select> <button class="btn" id="arVoir" style="min-height:40px">Voir</button><div id="arL"></div></div></details>`;
   document.querySelectorAll("[data-ok]").forEach(b => b.onclick = () => decider(b.dataset.ok, true));
   document.querySelectorAll("[data-non]").forEach(b => b.onclick = () => { const act = b.parentNode; if (act.nextElementSibling && act.nextElementSibling.classList.contains("refus")) return;
     const z = document.createElement("div"); z.className = "refus";
@@ -464,9 +464,9 @@ async function abonner(oui){
       if (!sub) { const { cle } = await (await fetch(SUPA + "/functions/v1/panier-avis", { headers:{ apikey:CLE } })).json();
         const raw = Uint8Array.from(atob(cle.replace(/-/g, "+").replace(/_/g, "/")), c => c.charCodeAt(0)); sub = await reg.pushManager.subscribe({ userVisibleOnly:true, applicationServerKey:raw }); }
       if (await rpc("panier_prof_abonner", { p_ens:ENS, p_jeton:JETON, p_abonnement:sub.toJSON(), p_oui:true }) !== true) throw new Error("refus");
-      LS.set("magAbonne|" + ENS, true); toast("Avis activés sur cet appareil.");
+      LS.set("magAbonne|" + ENS, true); toast("C'est fait : tu seras averti ici.");
     } else { if (sub) { await rpc("panier_prof_abonner", { p_ens:ENS, p_jeton:JETON, p_abonnement:sub.toJSON(), p_oui:false }); await sub.unsubscribe(); } LS.set("magAbonne|" + ENS, false); }
-  } catch(e){ er.textContent = "Avis impossibles : " + e.message; return; }
+  } catch(e){ er.textContent = "Les avis n'ont pas pu être activés. Réessaie, ou demande à ton enseignant."; return; }
   dessinerProf();
 }
 
@@ -485,9 +485,9 @@ async function magasinier(){ await nipComptoir();
   $("#tTitre").textContent = "Comptoir du magasin";
   $("#app").innerHTML = `<div class="mag-code"><input id="mC" autocomplete="off" placeholder="Scanne la carte ou tape le code" aria-label="Code de l'élève"><button class="btn" id="mTous">Tout voir</button><button class="btn" id="mAc">Pièces à commander</button></div><div id="mL"><p class="vide">Chargement…</p></div>`;
   const i = $("#mC"), appl = () => { const c = lireCarte(i.value); FILTRE_CODE = c ? c.code : ""; dessinerMag(); };
-  i.onkeydown = e => { if (e.key === "Enter") { appl(); i.select(); } if (e.key === "Escape") { i.value = ""; appl(); } };
+  i.onkeydown = e => { if (e.key === "Enter") { appl(); if (FILTRE_CODE) { i.value = ""; i.placeholder = "Élève " + FILTRE_CODE + " · scanne une autre carte"; } else i.select(); } if (e.key === "Escape") { i.value = ""; appl(); } };
   i.oninput = () => { if (/^\d{5}$/.test(i.value.trim()) || i.value.trim() === "") appl(); };
-  $("#mTous").onclick = () => { i.value = ""; appl(); i.focus(); }; $("#mAc").onclick = aCommander;
+  $("#mTous").onclick = () => { i.value = ""; i.placeholder = "Scanne la carte ou tape le code"; appl(); i.focus(); }; $("#mAc").onclick = aCommander;
   document.addEventListener("keydown", e => { if ($("#ov").hidden && document.activeElement !== i && /^[0-9A-Za-z-]$/.test(e.key) && !e.ctrlKey && !e.metaKey && !e.altKey) { i.value = ""; i.focus(); } });   /* le lecteur tape même si le curseur est ailleurs */
   i.focus(); charger(); avisComptoir();
 }
@@ -534,8 +534,8 @@ function avisComptoir(){
         let sub = await reg.pushManager.getSubscription();
         if (!sub) { const { cle } = await (await fetch(SUPA + "/functions/v1/panier-avis", { headers:{ apikey:CLE } })).json(); sub = await reg.pushManager.subscribe({ userVisibleOnly:true, applicationServerKey:Uint8Array.from(atob(cle.replace(/-/g, "+").replace(/_/g, "/")), c => c.charCodeAt(0)) }); }
         if (await rpcM("magasin_abonner", { p_abonnement:sub.toJSON(), p_oui:true }) !== true) throw new Error("refus"); }
-      LS.set("magComptoirAbo", true); z.innerHTML = `<span class="cloche on" title="Avis des nouvelles commandes activés sur cet appareil" role="img" aria-label="Avis activés">${CLOCHE}</span>`; toast("Avis activés : cet appareil sonne à chaque commande approuvée."); $("#mC").focus();
-    } catch(e){ $("#acEr").textContent = "Avis impossibles : " + e.message; } };
+      LS.set("magComptoirAbo", true); z.innerHTML = `<span class="cloche on" title="Avis des nouvelles commandes activés sur cet appareil" role="img" aria-label="Avis activés">${CLOCHE}</span>`; toast("C'est fait : cette tablette sonnera à chaque nouvelle commande."); $("#mC").focus();
+    } catch(e){ $("#acEr").textContent = "Les avis n'ont pas pu être activés. Réessaie, ou demande à ton enseignant."; } };
 }
 let titreT = 0; function clignoterTitre(n){ clearInterval(titreT); const t0 = "Comptoir", msg = "(" + n + ") Nouvelle commande"; let k = 0;
   titreT = setInterval(() => { document.title = k++ % 2 ? t0 : msg; if (k > 20 || document.hasFocus()) { clearInterval(titreT); document.title = t0; } }, 800); }
@@ -545,7 +545,7 @@ async function charger(){ clearTimeout(magT);
     { const neufs = MAG_VUS ? MAG.filter(p => p.etat === "approuve" && !MAG_VUS.has(p.id)) : [];   /* 25 nov. (Jeremy) : le magasinier est averti d'une commande qui entre */
       if (neufs.length) { bip(); setTimeout(bip, 350); clignoterTitre(neufs.length);
         try { if ("Notification" in window && Notification.permission === "granted") neufs.slice(0, 3).forEach(p => { const n = new Notification("Magasin : nouvelle commande", { body:(p.prenom || "Élève") + " (" + p.code + ", " + p.groupe + ") · " + (p.items || []).length + " raccord(s)", tag:"mag-" + p.id, icon:"img/metier-plus.svg" }); n.onclick = () => { focus(); n.close(); }; }); } catch(e){} } } MAG_VUS = MAG_VUS || new Set(); ids.forEach(id => MAG_VUS.add(id)); dessinerMag(); if (PREP_MAJ && !$("#ov").hidden) PREP_MAJ(); }
-  catch(e){ $("#mL").innerHTML = `<p class="err">Supabase ne répond pas. Nouvel essai dans 10 s.</p>`; }
+  catch(e){ $("#mL").innerHTML = `<p class="err">Pas de connexion pour l'instant. On réessaie tout seul.</p>`; }
   magT = setTimeout(charger, 10000); }
 const OUV = new Set();   /* commandes terminées que l'utilisateur a rouvertes */
 const MODE_PROF = /[?&]mode=prof/.test(location.search);
@@ -630,7 +630,49 @@ function preparer(p){ if (!p) return;
   PREP_MAJ = dessiner; dessiner();
 }
 function imprimerBon(p){ if (!p) return;
-  const h = `<!DOCTYPE html><html lang="fr-CA"><head><meta charset="utf-8"><title>Bon ${esc(p.code)}</title><style>body{font:12pt/1.35 system-ui,sans-serif;color:#000;margin:14mm}h1{font-size:18pt;margin:0}.s{color:#444;margin:2pt 0 10pt}table{width:100%;border-collapse:collapse}th,td{border-bottom:1px solid #999;padding:6pt 4pt;text-align:left}th{font-size:9pt;color:#444}td.rg{font-weight:800;font-size:14pt;width:60pt}td.q{font-weight:800;width:40pt}td.no{font-family:monospace}td.ok{width:30pt}.n{font:900 28pt monospace;float:right}</style></head><body>`
+  const h = `<!DOCTYPE html><html lang="fr-CA"><head><meta charset="utf-8"><title>Bon ${esc(p.code)}</title><style>body{font:12pt/1.35 system-ui,sans-serif;color:#000;margin:14mm}h1{font-size:18pt;margin:0}.s{color:#444;margin:2pt 0 10pt}table{width:100%;border-collapse:collapse}th,td{border-bottom:1px solid #999;padding:6pt 4pt;text-align:left}th{font-size:9pt;color:#444}td.rg{font-weight:800;font-size:14pt;width:60pt}td.q{font-weight:800;width:40pt}td.no{font-family:monospace}td.ok{width:30pt}.n{font:900 28pt monospace;float:right}/* 26 nov. (Jeremy : « on retravaille les interfaces, ça doit être beau »; fluide et facile pour élèves et profs, iPad et cellulaire) : look « propre et pro » */
+:root{--fond:#EEF0F4;--ligne:#DDE1E8;--txt:#16233F;--ombre:0 2px 8px rgba(22,35,63,.10)}
+body{background:var(--fond)}
+.top{background:#16233F;padding-top:14px;padding-bottom:14px;border-bottom:4px solid var(--acc)}
+.top b{font-weight:800;font-size:1.15rem}.top .qui{opacity:.95}
+.top button{border-radius:99px;padding:9px 18px;min-height:44px;font-weight:600}
+main{padding-top:22px}
+h1{font-size:1.75rem;font-weight:800;margin-bottom:2px}
+.sec{display:flex;align-items:center;gap:8px;color:var(--txt);font-size:.9rem;letter-spacing:.06em;margin:24px 0 10px}
+.sec::before{content:"";width:5px;height:18px;border-radius:3px;background:var(--acc)}
+.carte,.cmd,.suivi,.mesP>summary{border:0;box-shadow:var(--ombre);border-radius:18px}
+.btn{min-height:52px;border-radius:14px;font-size:1.02rem;font-weight:700}
+.btn.p{background:var(--acc)}.btn.v{background:var(--vert)}
+.cherche{padding:14px 0 12px}
+.cherche input{min-height:62px;border-radius:18px;border:2px solid transparent;box-shadow:var(--ombre);padding-left:54px;font-size:1.15rem;
+  background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23EB6A22' stroke-width='2.4' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m20 20-3.5-3.5'/%3E%3C/svg%3E") no-repeat 18px 50%/24px}
+.cherche input:focus{outline:none;border-color:var(--acc)}
+.filtres select{min-height:48px;border-radius:14px;border:0;box-shadow:var(--ombre);background-color:#fff;font-weight:600}
+#liste{background:none;border:0;box-shadow:none;padding:0;display:grid;gap:10px}
+.art{background:#fff;border:0!important;border-radius:16px;box-shadow:var(--ombre);padding:12px 16px;gap:16px}
+.art .tx b{font-size:1.1rem;font-weight:700}
+.art .ph{width:76px;height:76px;border-radius:14px;border:1px solid #EEF0F4}
+.qte button{width:50px;height:50px;border-radius:14px;border:0;background:#EEF0F4;font-size:1.4rem}
+.qte span{font-size:1.2rem}
+.qte .aj{min-height:50px;border-radius:14px;padding:0 22px;font-weight:800;background:var(--acc);color:#fff}
+.barre{background:#16233F;color:#fff;border-top:0;padding-top:14px;padding-bottom:max(14px,env(safe-area-inset-bottom))}
+.barre .btn{min-height:56px;padding:0 28px;font-size:1.1rem}.barre .btn:not(.p){background:transparent;color:#fff;border-color:rgba(255,255,255,.4)}
+.mag-code input{border-radius:18px;border-width:3px;min-height:64px}
+.cmd .h{padding:16px 18px}.cmd td{padding:12px 18px}
+.cmd.e-attente,.cmd.e-approuve{box-shadow:inset 6px 0 0 var(--k),var(--ombre)}
+.cmd .pr{font-size:1.2rem}.av{width:48px;height:48px;font-size:1.2rem}
+.cmd .h .btn,.cmd .act .btn{min-height:54px;padding:0 24px;font-size:1.05rem}
+.prep-plan,.prep-g{box-shadow:var(--ombre);border:0;border-radius:18px}
+.prep-t{background:#16233F;color:#fff}
+.prep-i{padding:14px 16px}.prep-i input{width:34px;height:34px}
+details.arch>summary{cursor:pointer;font-weight:700;padding:14px 18px;background:#fff;border-radius:18px;box-shadow:var(--ombre);list-style:none}
+@media (prefers-color-scheme:dark){:root{--fond:#12161f;--ligne:#2f3850}.art,.cherche input,.filtres select,details.arch>summary{background-color:var(--carte)}.qte button{background:#2a3246}}
+.mag-code input::placeholder{font:600 1.05rem system-ui,sans-serif;letter-spacing:0}
+.btn,.qte button,.art{transition:transform .12s ease,box-shadow .12s ease}.btn:active,.qte button:active{transform:scale(.97)}
+@media (max-width:520px){.art{padding:10px 12px;gap:12px}.art .ph{width:64px;height:64px}.art .tx b{font-size:1.02rem}.qte .aj{padding:0 16px}.filtres{grid-template-columns:1fr 1fr}.cherche input{min-height:56px}}
+@media (max-width:520px){.top{gap:8px;padding-left:12px;padding-right:12px}.top img{height:24px}.top .qui{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;font-size:.85rem}
+  .top button{padding:6px 12px;min-height:40px;font-size:.85rem;flex:none}.filtres{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.filtres select{font-size:.8rem;padding:0 6px;min-height:46px}}
+</style></head><body>`
     + `<span class="n">${esc(p.code)}</span><h1>Bon de préparation · ${esc(p.prenom || "Magasin")}</h1><p class="s">${esc(p.groupe)} · ${esc(nomEns(p.ens))} · approuvé ${heure(p.t_app)}${p.note ? " · " + esc(p.note) : ""}</p>`
     + `<table><tr><th>Rangée</th><th>Qté</th><th>Raccord</th><th>N° d'article</th><th>✓</th></tr>${parRangee(p.items).map(i => `<tr><td class="rg">${esc([rangee(i), ...autresCases(i)].filter(Boolean).map(caseTxt).join(" / ") || "–")}</td><td class="q">${+i.q || 1}</td><td>${esc(i.nom)}</td><td class="no">${esc(i.n)}</td><td class="ok">☐</td></tr>`).join("")}</table></body></html>`;
   const f = document.createElement("iframe"); f.style.cssText = "position:fixed;width:0;height:0;border:0;left:-10px"; document.body.appendChild(f);
