@@ -230,6 +230,14 @@ const SYN = (() => { const S = {}, ajoute = (cles, vers) => cles.split(" ").forE
    ["torch", "torche chalumeau"], ["tip tips", "tube-contact buse"], ["rod rods", "baguette"], ["wire", "fil bobine"], ["gasket seal", "joint"],
    ["vent", "purgeur aerateur"], ["backflow", "antiretour clapet"], ["toilet", "toilette"], ["faucet", "robinet"], ["stop", "arret robinet"],
    ["pex", "pex uponor"], ["uponor propex", "pex-a pex radiant plancher"], ["drain", "drain renvoi avaloir"], ["spud", "spud raccord"], ["hose", "boyau"], ["fitting fittings", "raccord"]].forEach(([a, b]) => ajoute(a, b));
+  /* 26 nov. (Jeremy : « ajoute des synonymes comme valve et robinet ») : groupes dans les deux sens */
+  ["robinet valve vanne", "coude elbow", "te tee", "bague manchon coupling", "reducteur reduit bushing", "bouchon cap plug", "mamelon nipple",
+   "clapet check antiretour anti-retour", "soupape relief", "siphon trap", "regard cleanout nettoyage", "support attache collier crochet hanger",
+   "tuyau tube pipe", "joint garniture seal gasket", "boyau flexible hose", "purgeur aerateur vent", "manometre jauge gauge", "toilette cabinet toilet",
+   "evier lavabo", "ecrou nut", "rondelle washer", "vis screw", "boulon bolt", "ruban tape", "pate dope scellant", "gicleur buse nozzle",
+   "fondant flux", "brasure solder", "chalumeau torche torch", "acier noir black", "cuivre copper", "laiton brass", "galvanise galv",
+   "inox stainless", "pompe circulateur circulatrice pump", "filtre crepine strainer", "adaptateur adapter", "bride flange", "y wye",
+   "drain renvoi avaloir", "chauffe-eau reservoir", "union raccord-union", "electrode baguette", "meule disque"].forEach(g => { const L = g.split(" "); L.forEach(k => ajoute(k, L.filter(x => x !== k).join(" "))); });
   return S; })();
 const variantes = m => { const v = [m]; if (m.length > 3 && /[sx]$/.test(m)) v.push(m.slice(0, -1)); (SYN[m] || []).forEach(x => v.push(x)); return v; };
 const motOk = (a, m) => a._m.some(w => w.startsWith(m)) || (m.length > 4 && a._q.includes(m));
