@@ -224,7 +224,7 @@ const PARTAGE = (() => {
   async function ecrire(ens, o){
     let j = localStorage.getItem("passPartageJeton");
     if (!j){ j = btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(32)))); localStorage.setItem("passPartageJeton", j); }
-    if (await rpc("coffre_ecrire", { p_id:await id(ens), p_jeton:j, p_env:"public", p_data:JSON.stringify({ grp:o.grp, part:o.part, codes:o.codes || null, suivi:o.suivi || suivis(), formes:formesPub(), t:Date.now() }) }) !== true) throw new Error("refus");
+    if (await rpc("coffre_ecrire", { p_id:await id(ens), p_jeton:j, p_env:"public", p_data:JSON.stringify({ grp:o.grp, part:o.part, codes:o.codes || null, noms:o.noms || {}, suivi:o.suivi || suivis(), formes:formesPub(), t:Date.now() }) }) !== true) throw new Error("refus");
   }
   return { lire, ecrire };
 })();
@@ -445,8 +445,10 @@ let D = lireD(), GRP = localStorage.getItem("passeportGroupe") || "";
 const sauver = () => { localStorage.setItem(CLE, JSON.stringify(D)); clearTimeout(sauver.p); sauver.p = setTimeout(() => { publierGrp(); envoyerSync(); }, 1500); };
 /* liste publique des groupes (pour les boutons de l'élève) + partage, réécrite quand les groupes changent */
 async function publierGrp(){
-  if (!window.__moi) return; const L = groupes().filter(g => g !== "À classer"), C = codesPub(L), sig = Object.values(D.el).filter(e => !e.x && e.c && e.k).map(e => e.c + e.k + prenomCarte(e.p)).sort().join(),
-    k = JSON.stringify([L, PART, C, suivis(), formesPub(), sig]);
+  /* 27 nov. (élève : « Code inconnu » au magasin) : on publiait les codes AVANT d'avoir reçu le registre du coffre. Un appareil en retard
+     (ou vide) effaçait alors les codes des élèves ajoutés ailleurs. On attend la première synchronisation, et jamais un registre vide. */
+  if (!window.__moi || !window.__syncOk || !Object.values(D.el).some(e => !e.x && e.c)) return; const L = groupes().filter(g => g !== "À classer"), C = codesPub(L), sig = Object.values(D.el).filter(e => !e.x && e.c && e.k).map(e => e.c + e.k + prenomCarte(e.p)).sort().join(),
+    k = JSON.stringify(["n1", L, PART, C, suivis(), formesPub(), sig]);   /* 27 nov. : « n1 » = republier une fois avec les prénoms chiffrés (noms), oubliés à l'écriture */
   if (window.ADMIN) cartesPub().catch(() => {});   /* a sa propre mémoire : seulement les cartes nouvelles ou changées */
   if (localStorage.getItem("passGrpPub") === k) return;
   try { await PARTAGE.ecrire(window.__moi, { grp:L, part:PART, codes:C, noms:await nomsPub() }); localStorage.setItem("passGrpPub", k); } catch(e) {}
@@ -827,7 +829,7 @@ async function vueProf(){
   $("#bProt").hidden = !localStorage.ghJeton; $("#bProt").onclick = editerProt;
   if (/[?&]formations=1/.test(location.search) && localStorage.ghJeton) setTimeout(editerProt, 600);
   const s = await COFFRE.session(); window.__moi = s && s.id; majPart();
-  COFFRE.demarrer("passeport", { cles:[CLE, CLE_J, "passQrTailles", "passSuivi", SY.cle], fusion:{ [CLE]:fusion }, apres:() => { D = lireD(); dessiner(); } });
+  COFFRE.demarrer("passeport", { cles:[CLE, CLE_J, "passQrTailles", "passSuivi", SY.cle], fusion:{ [CLE]:fusion }, apres:() => { D = lireD(); dessiner(); } }).then(() => { window.__syncOk = true; D = lireD(); publierGrp(); }).catch(() => {});   /* hors ligne : l'envoi échoue aussi, rien n'est écrasé */
   releve(); setInterval(() => { if (document.visibilityState === "visible" && $("#ov").hidden) releve(); }, 30000);
 }
 

@@ -485,6 +485,22 @@ test("Magasin : page Codes des élèves (raccourci Commandes, cellulaire) : pré
   if (process.env.CAPTURES) await p.screenshot({ path: process.env.CAPTURES + "/codes-eleves.png" });
   vrai(!errs.length, "Codes des élèves : erreurs " + errs.join(" | ")); await ctx.close();
 });
+test("Registre : les codes des élèves ne sont publiés qu'après la synchronisation du coffre, jamais vides, avec les prénoms chiffrés", async b => {   /* 27 nov. : « Code inconnu » au magasin */
+  const ctx = await b.newContext({ serviceWorkers: "block" }), W = [];
+  await ctx.route(/supabase\.co\/rest\/v1\/rpc\/(\w+)/, r => { const f = r.request().url().match(/rpc\/(\w+)/)[1]; if (f === "coffre_ecrire") W.push(JSON.parse(JSON.parse(r.request().postData()).p_data));
+    r.fulfill({ body: f === "coffre_ecrire" ? "true" : "null", contentType: "application/json", headers: { "access-control-allow-origin": "*" } }); });
+  await ctx.addInitScript(() => localStorage.setItem("bienvenueVu", "1"));
+  const p = await ctx.newPage(); await p.goto(BASE + "passeport.html"); await attendre(1200);
+  await p.evaluate(() => { window.__moi = "jeremy.raymond"; window.__syncOk = false; localStorage.removeItem("passGrpPub"); D.el = {}; });
+  await p.evaluate(() => publierGrp()); await attendre(400);
+  vrai(!W.length, "Registre : publié avant la synchronisation du coffre");
+  await p.evaluate(() => { window.__syncOk = true; return publierGrp(); }); await attendre(400);
+  vrai(!W.length, "Registre : un registre vide a été publié (efface les codes des élèves)");
+  await p.evaluate(() => { D.el = { a: { p: "Alex Tremblay", c: "12345", k: "K7Q9X2", g: "2608 EGI" } }; D.grp = { "2608 EGI": {} }; return publierGrp(); }); await attendre(600);
+  vrai(W.length === 1 && W[0].codes && (W[0].codes["2608 EGI"] || []).includes("12345"), "Registre : le code de l'élève n'est pas publié (" + JSON.stringify(W) + ")");
+  vrai(W[0].noms && W[0].noms["12345"], "Registre : le prénom chiffré (noms) n'est pas publié");
+  await ctx.close();
+});
 test("Carte : l'élève affiche sa carte avec son code à 5 chiffres seulement; trop de codes inconnus = pause", async b => {
   const c = await b.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: "block" }), R = {}, errs = []; let E = 0;
   await c.route(/rpc\/carte_code_(ecrire|lire)/, r => { const a = JSON.parse(r.request().postData()), u = r.request().url(); let out;
