@@ -224,6 +224,7 @@ body:not(.anim-ok) .etapes .bar.ok{animation:mpBar .7s .25s ease both;transform-
 .abA{background:#FFF1E0;color:#8a4a0f;border-radius:12px;padding:10px 12px;font-size:.88rem;font-weight:600;margin-top:8px}.abA.r{background:#FBE9E7;color:#8f2a22}
 .abR{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--ligne)}.abR:last-child{border:0}.abR.nv{background:linear-gradient(90deg,#FFF6EC,transparent);margin:0 -16px;padding:10px 16px}
 .abOk{width:76px;height:76px;border-radius:50%;background:var(--vert);margin:0 auto 12px;display:grid;place-items:center}.pastN{background:var(--acc);color:#fff;border-radius:999px;padding:1px 8px;font-size:.8rem;margin-left:6px}
+.inst{display:flex;align-items:center;gap:12px;background:#fff;border-radius:16px;box-shadow:var(--ombre);padding:12px 14px;margin:0 0 12px;flex-wrap:wrap}.inst img{width:42px;height:42px;border-radius:10px}.inst>div{flex:1;min-width:200px}.inst b{display:block}.inst small{color:var(--doux)}
 /* écran « Magasin en direct » */
 body.ecranD main{max-width:1500px}a.btn{text-decoration:none;color:inherit;display:inline-flex;align-items:center;justify-content:center}.edB{margin:4px 0 6px;color:var(--acc);font-weight:700}.ed{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px;align-items:start}@media (max-width:900px){.ed{grid-template-columns:1fr}}
 .ed-k{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.ed-k>div{background:#fff;border-radius:18px;box-shadow:var(--ombre);padding:16px;text-align:center}.ed-k b{display:block;font-size:2.6rem;line-height:1;color:var(--acc)}.ed-k span{color:var(--doux);font-weight:600}
@@ -480,6 +481,15 @@ async function absences(){
     z.querySelectorAll("[data-x]").forEach(b => b.onclick = async () => { if (!confirm("Annuler ce signalement ?")) return; try { await rpc("absence_annuler", { p_code:code, p_cle:cle, p_id:b.dataset.x }); } catch(e){} liste(); }); };
   dessiner(); }
 
+/* 27 nov. (Jeremy : « installer l'app sur la carte de l'élève, c'est wow; ça sur le panneau enseignant et sur le comptoir ») */
+let INSTALLER = null; addEventListener("beforeinstallprompt", e => { e.preventDefault(); INSTALLER = e; document.querySelectorAll(".instZ").forEach(z => z.innerHTML = instHtml(z.dataset.nom)); brancherInst(); });
+const instFait = () => navigator.standalone || matchMedia("(display-mode: standalone)").matches;
+function instHtml(nom){ if (instFait() || LS.get("magInstNon_" + MODE, false)) return "";
+  const ios = /iPhone|iPad|iPod|Macintosh/.test(navigator.userAgent) && "ontouchend" in document;
+  return `<div class="inst"><img src="img/metier-plus-icone.svg" alt=""><div><b>Installe « ${esc(nom)} » sur cet appareil</b><small>${INSTALLER ? "Il s'ouvre d'une touche, comme une application, sans barre de navigateur." : ios ? "Touche <b>Partager</b> (le carré avec la flèche), puis <b>« Sur l'écran d'accueil »</b>." : "Menu du navigateur (⋮), puis <b>« Installer »</b> ou <b>« Ajouter à l'écran d'accueil »</b>."}</small></div>${INSTALLER ? `<button class="btn p" data-inst>Installer</button>` : ""}<button class="lien" data-instx aria-label="Plus tard">Plus tard</button></div>`; }
+function brancherInst(){ document.querySelectorAll("[data-inst]").forEach(b => b.onclick = async () => { const ev = INSTALLER; INSTALLER = null; if (!ev) return; ev.prompt(); try { await ev.userChoice; } catch(e){} document.querySelectorAll(".instZ").forEach(z => z.innerHTML = instHtml(z.dataset.nom)); brancherInst(); });
+  document.querySelectorAll("[data-instx]").forEach(b => b.onclick = () => { LS.set("magInstNon_" + MODE, true); document.querySelectorAll(".instZ").forEach(z => z.innerHTML = ""); }); }
+const instZone = nom => { setTimeout(brancherInst, 0); return `<div class="instZ" data-nom="${esc(nom)}">${instHtml(nom)}</div>`; };
 function eleveCatalogue(){
   enTete();
   const cats = [...new Set(CAT.map(a => a.cat).filter(Boolean))], mats = [...new Set(CAT.map(a => a.mat).filter(Boolean))].sort((a, b) => a.localeCompare(b, "fr")), ds = [...new Set(CAT.map(a => a.d).filter(Boolean))].sort((a, b) => pouces(a) - pouces(b));
@@ -636,7 +646,7 @@ async function dessinerProf(){
   const neufs = att.filter(p => !VUS.has(p.id)); if (neufs.length && VUS.size) bip(); att.forEach(p => VUS.add(p.id)); LS.set("magVus", [...VUS].slice(-300));
   const avis = "Notification" in window && "serviceWorker" in navigator && "PushManager" in window, perm = avis ? Notification.permission : "non";
   const ios = /iPhone|iPad|iPod/.test(navigator.userAgent) && !window.navigator.standalone && !matchMedia("(display-mode: standalone)").matches;
-  $("#app").innerHTML = `<h1>Commandes à approuver</h1>${etatPill()}<p class="sous">${att.length ? att.length + " panier" + (att.length > 1 ? "s" : "") + " en attente." : "Aucun panier en attente."}</p>
+  $("#app").innerHTML = `<h1>Commandes à approuver</h1>${etatPill()}${instZone("Commandes")}<p class="sous">${att.length ? att.length + " panier" + (att.length > 1 ? "s" : "") + " en attente." : "Aucun panier en attente."}</p>
     <div class="avis-l" id="avisZ">${perm === "granted" && LS.get("magAbonne|" + ENS, false) ? `<button class="cloche on" id="avTest" title="Notifications activées · toucher pour essayer" aria-label="Notifications activées, essayer">${CLOCHE}</button><button class="lien" id="avNon">Désactiver les notifications</button>` : (`<button class="cloche" id="avOui" title="Activer les notifications" aria-label="Activer les notifications">${CLOCHE}</button>`)}<p class="err" id="avErr" style="min-height:0;margin:0;width:100%"></p></div>
     ${AVIS.length ? `<div class="sec">Avis du magasinier</div><div class="carte avisMag">${AVIS.map(a => `<div class="avm"><span><b>${esc(a.prenom || "Élève")}</b> <small class="sous">${esc(a.code)} · ${esc(a.groupe)} · ${heure(a.t)}</small><br>${esc(REGLES_L[a.regle] || "?")}</span><button class="btn" data-vu="${esc(a.id)}" title="Retirer de cette page (reste dans le dossier de l'élève)">Vu</button></div>`).join("")}<p class="sous" style="margin:8px 0 0">« Vu » retire l'avis d'ici; il reste dans le dossier de l'élève.</p></div>` : ""}
     <a class="btn edB" href="magasin.html?mode=ecran">Magasin en direct</a>
@@ -731,7 +741,7 @@ async function ecranDirect(){ document.body.classList.add("ecranD");
   await tour(); h(); }
 async function magasinier(){ await nipComptoir();
   $("#tTitre").textContent = "Comptoir du magasin";
-  $("#app").innerHTML = `${etatPill()}<div class="mag-code"><input id="mC" autocomplete="off" placeholder="Scanne la carte ou tape le code" aria-label="Code de l'élève"><button class="btn" id="mTous">Tout voir</button><button class="btn" id="mAc">Pièces à commander</button></div><div id="mL"><p class="vide">Chargement…</p></div>`;
+  $("#app").innerHTML = `${etatPill()}${instZone("Comptoir")}<div class="mag-code"><input id="mC" autocomplete="off" placeholder="Scanne la carte ou tape le code" aria-label="Code de l'élève"><button class="btn" id="mTous">Tout voir</button><button class="btn" id="mAc">Pièces à commander</button></div><div id="mL"><p class="vide">Chargement…</p></div>`;
   const i = $("#mC"), appl = () => { const c = lireCarte(i.value); FILTRE_CODE = c ? c.code : ""; dessinerMag(); };
   i.onkeydown = e => { if (e.key === "Enter") { appl(); if (FILTRE_CODE) { i.value = ""; i.placeholder = "Élève " + FILTRE_CODE + " · scanne une autre carte"; } else i.select(); } if (e.key === "Escape") { i.value = ""; appl(); } };
   i.oninput = () => { if (/^\d{5}$/.test(i.value.trim()) || i.value.trim() === "") appl(); };

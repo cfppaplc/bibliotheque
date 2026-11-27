@@ -442,6 +442,8 @@ test("Magasin : l'élève (carte scannée) envoie son panier, l'enseignant appro
   await q.reload(); await attendre(1500);
   vrai(/Sans carte étudiante/.test(await q.textContent(".avisMag")), "L'enseignant ne voit pas l'avis du magasinier");
   vrai(!!(await q.$(".mgEtat")), "Enseignant : pas de bandeau ouvert / fermé du magasin");   /* 26 nov. */
+  vrai(!!(await q.$(".instZ .inst")), "Enseignant : pas de carte « Installe Commandes »");   /* 27 nov. */
+  if (process.env.CAPTURES) await q.screenshot({ path: process.env.CAPTURES + "/prof-inst.png" });
   vrai(await q.$eval(".avisMag .avm", e => e.getBoundingClientRect().width > 250 && getComputedStyle(e).borderRadius === "0px"), "Avis du magasinier : la ligne est écrasée (style d'avatar)");   /* 26 nov., capture de Jeremy */
   if (process.env.CAPTURES) await q.screenshot({ path: process.env.CAPTURES + "/prof-avis.png" });
   vrai(!!(await q.$(".cmd td.vg img, .cmd td.vg svg, .cmd td.vg .vig")), "Enseignant : pas de photo dans la commande à approuver");   /* 26 nov. */
