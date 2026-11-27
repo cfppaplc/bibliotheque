@@ -345,6 +345,7 @@ test("Magasin : l'élève (carte scannée) envoie son panier, l'enseignant appro
   await m.keyboard.type("MP-12345-K7Q9X2"); await m.keyboard.press("Enter"); await attendre(300);
   vrai(!!(await m.$("[data-rem]")), "Code 12345 : commande absente");
   vrai(/^[A-Z]-\d+/.test((await m.textContent("td.rg")).trim()), "Rangée absente au comptoir");
+  vrai(!!(await m.$(".cmd td.vg .ph")), "Comptoir : la photo du raccord ne s'affiche pas");
   vrai(/Essai/.test(await m.textContent(".cmd .pr")), "Prénom absent au comptoir");
   /* 26 nov. : un article rangé dans plusieurs cases montre toutes ses cases (ex. coude 90° acier 3/4 : F-90, F-91, F-104) */
   const mc = await m.evaluate(() => { const a = CAT.find(x => (x.r2 || []).length); return a ? [rangee({ id: a.id }), autresCases({ id: a.id }).length, aussi({ id: a.id })] : null; });
@@ -361,6 +362,7 @@ test("Magasin : l'élève (carte scannée) envoie son panier, l'enseignant appro
   await m.click("[data-prep]"); await attendre(400);
   if (process.env.CAPTURES) await m.screenshot({ path: process.env.CAPTURES + "/plan.png" });
   vrai(await m.$$eval(".pm-s.actif", L => L.length) > 0, "Plan : aucune rangée ne clignote");
+  vrai(await m.$$eval(".prep-i .ph", L => L.length) > 0, "Préparation : pas de photo à côté des raccords");
   vrai(await m.$$eval(".prep-i.proch", L => L.length) === 1 && await m.$$eval(".prep-plan circle.pm-p:not(.fait)", L => L.length) <= 1, "Plan : seul le prochain raccord doit être montré");
   await m.click(".prep-plan svg [data-l]"); await attendre(300); vrai(!!(await m.$(".prep-face .pm-face")), "Plan : la lettre n'ouvre pas la vue de face");
   await m.click("#prFace"); await attendre(200); vrai(!(await m.$(".prep-face")), "Vue de face : « Fermer » ne ferme pas");

@@ -157,6 +157,9 @@ input.cache-code:not(:placeholder-shown){-webkit-text-security:disc;text-securit
 /* 26 nov. : photos des raccords */
 .art .ph{flex:none;width:54px;height:54px;border-radius:10px;border:1px solid var(--ligne);background:#fff;padding:3px;cursor:zoom-in;display:grid;place-items:center;overflow:hidden}
 .art .ph img{max-width:100%;max-height:100%;object-fit:contain}.art .ph.vide{border-style:dashed;cursor:default}.art .ph.vide img{width:70%;opacity:.3;filter:grayscale(1)}
+.cmd .ph,.prep-i .ph{flex:none;width:48px;height:48px;border-radius:9px;border:1px solid var(--ligne);background:#fff;padding:3px;cursor:zoom-in;display:grid;place-items:center;overflow:hidden}
+.cmd .ph img,.prep-i .ph img{max-width:100%;max-height:100%;object-fit:contain}.cmd .ph.vide,.prep-i .ph.vide{border-style:dashed;cursor:default}
+.cmd .ph.vide img,.prep-i .ph.vide img{width:70%;opacity:.3;filter:grayscale(1)}.cmd td.vg{width:56px;padding-right:4px}
 .phz{position:fixed;inset:0;z-index:200;background:rgba(10,15,30,.78);display:grid;place-items:center;padding:20px;cursor:zoom-out}
 .phz figure{margin:0;background:#fff;border-radius:18px;padding:16px;max-width:min(520px,92vw);text-align:center;color:#14213d}
 .phz img{width:100%;max-height:60vh;object-fit:contain}.phz figcaption{font-weight:700;margin-top:8px}.phz small{display:block;font-weight:400;color:#667;margin-top:4px}
@@ -588,9 +591,11 @@ const rangee = i => { const C = casesDe(i); return C.find(c => window.PlanMagasi
 const autresCases = i => { const r = rangee(i); return casesDe(i).filter(c => c !== r); };
 /* 26 nov. (Jeremy) : « -00 » = sur la tablette du haut de la rangée, parfois du surplus */
 const caseTxt = c => /^([A-Z]+)-0+$/.test(c || "") ? c.replace(/-0+$/, "") + " (tablette du haut)" : (c || "");
+/* 26 nov. (Jeremy) : le magasinier voit aussi la photo de chaque raccord */
+const vigCmd = i => vignette(CAT.find(x => x.id === i.id || x.n === i.n) || { nom: i.nom });
 const aussi = i => { const A = autresCases(i); return A.length ? `<small class="aussi">aussi ${A.map(c => esc(caseTxt(c))).join(", ")}</small>` : ""; };
 const parRangee = L => [...(L || [])].sort((a, b) => rangee(a).localeCompare(rangee(b), "fr", { numeric:true }) || String(a.nom).localeCompare(String(b.nom), "fr"));
-const tableMag = p => `<table>${parRangee(p.items).map(i => `<tr><td class="rg"><span class="rgp">${esc(caseTxt(rangee(i)) || "–")}</span>${aussi(i)}</td><td class="q"><span class="qb">${+i.q || 1}</span></td><td>${esc(i.nom)}</td></tr>`).join("")}</table>`;   /* 26 nov. : sans n° d'article (inutile au comptoir) */
+const tableMag = p => `<table>${parRangee(p.items).map(i => `<tr><td class="rg"><span class="rgp">${esc(caseTxt(rangee(i)) || "–")}</span>${aussi(i)}</td><td class="vg">${vigCmd(i)}</td><td class="q"><span class="qb">${+i.q || 1}</span></td><td>${esc(i.nom)}</td></tr>`).join("")}</table>`;   /* 26 nov. : sans n° d'article (inutile au comptoir) */
 /* préparation (25 nov., Jeremy : « les rangées pourraient flasher sur son iPad et quand il coche, ça cesse ») */
 function preparer(p){ if (!p) return;
   let faceL = ""; const cle = "magPrep|" + p.id, faits = new Set(LS.get(cle, [])), L = parRangee(p.items), ov = $("#ov");
@@ -604,7 +609,7 @@ function preparer(p){ if (!p) return;
       <p class="sous">${esc(p.groupe)} · ${esc(nomEns(p.ens))}${p.note ? " · " + esc(p.note) : ""}</p>
       ${[...lettres, ""].map(l => { const G = L.filter(i => PlanMagasin.lettre(rangee(i)) === l); if (!G.length) return "";
         return `<div class="prep-g${finies.has(l) ? " fini" : ""}"><div class="prep-t">${l ? "Rangée " + esc(l) : "Sans rangée"}</div>${G.map(i => { const k = i.id || i.n, ok = faits.has(k);
-          return `<label class="prep-i${ok ? " ok" : ""}${i === prochain ? " proch" : ""}"><input type="checkbox" data-k="${esc(k)}"${ok ? " checked" : ""}><span class="rg"><i class="pt">${L.indexOf(i) + 1}</i>${esc(caseTxt(rangee(i)) || "–")}</span><span class="q">${+i.q || 1} ×</span><span class="nm">${esc(i.nom)}<small>${esc(i.n)}</small>${aussi(i)}</span></label>`; }).join("")}</div>`; }).join("")}
+          return `<label class="prep-i${ok ? " ok" : ""}${i === prochain ? " proch" : ""}"><input type="checkbox" data-k="${esc(k)}"${ok ? " checked" : ""}><span class="rg"><i class="pt">${L.indexOf(i) + 1}</i>${esc(caseTxt(rangee(i)) || "–")}</span><span class="q">${+i.q || 1} ×</span>${vigCmd(i)}<span class="nm">${esc(i.nom)}<small>${esc(i.n)}</small>${aussi(i)}</span></label>`; }).join("")}</div>`; }).join("")}
       <button class="btn ${tout ? "v" : ""}" id="prOk" ${tout ? "" : "disabled"} style="width:100%;margin-top:10px">${tout ? "Tout est prêt · remis à l'élève" : "Coche chaque raccord en le prenant"}</button></div></main>`;
     ov.querySelector(".prep-plan svg").onclick = e => { const g = e.target.closest("[data-l]"); if (g) { faceL = g.dataset.l; dessiner(); } };
     if ($("#prFace")) $("#prFace").onclick = () => { faceL = ""; dessiner(); };

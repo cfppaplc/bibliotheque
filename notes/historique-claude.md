@@ -810,3 +810,4 @@
 - 26 nov. : Jeremy : « un réducteur ça réduit, ça doit pas ressembler à une bague » : réducteurs cuivre/DWV à souder (7) → réducteur FTG × C; ABS (7, anneau) → manchon réducteur ABS. Vérifiés à l'écran.
 - 26 nov. : case « X-00 » = tablette du haut de la rangée, souvent le surplus (Jeremy) : affichée « G (tablette du haut, surplus) » au comptoir et sur le bon (caseTxt); test ajouté.
 - 26 nov. : « surplus » retiré du libellé (Jeremy : pas toujours du surplus) → « G (tablette du haut) ».
+- 26 nov. : comptoir et préparation : vignette photo de chaque raccord (vigCmd, même zoom que l'élève; le bon imprimé reste sans photo). Tests ajoutés.
