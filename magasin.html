@@ -586,9 +586,11 @@ function dessinerMag(){
 const casesDe = i => { const a = CAT.find(x => x.id === i.id || x.n === i.n) || {}; return [...new Set([i.r || a.r, ...(a.r2 || [])].filter(Boolean))]; };
 const rangee = i => { const C = casesDe(i); return C.find(c => window.PlanMagasin && PlanMagasin.place(c)) || C[0] || ""; };
 const autresCases = i => { const r = rangee(i); return casesDe(i).filter(c => c !== r); };
-const aussi = i => { const A = autresCases(i); return A.length ? `<small class="aussi">aussi ${A.map(esc).join(", ")}</small>` : ""; };
+/* 26 nov. (Jeremy) : « -00 » = sur la tablette du haut de la rangée, souvent le surplus (overstock) */
+const caseTxt = c => /^([A-Z]+)-0+$/.test(c || "") ? c.replace(/-0+$/, "") + " (tablette du haut, surplus)" : (c || "");
+const aussi = i => { const A = autresCases(i); return A.length ? `<small class="aussi">aussi ${A.map(c => esc(caseTxt(c))).join(", ")}</small>` : ""; };
 const parRangee = L => [...(L || [])].sort((a, b) => rangee(a).localeCompare(rangee(b), "fr", { numeric:true }) || String(a.nom).localeCompare(String(b.nom), "fr"));
-const tableMag = p => `<table>${parRangee(p.items).map(i => `<tr><td class="rg"><span class="rgp">${esc(rangee(i) || "–")}</span>${aussi(i)}</td><td class="q"><span class="qb">${+i.q || 1}</span></td><td>${esc(i.nom)}</td></tr>`).join("")}</table>`;   /* 26 nov. : sans n° d'article (inutile au comptoir) */
+const tableMag = p => `<table>${parRangee(p.items).map(i => `<tr><td class="rg"><span class="rgp">${esc(caseTxt(rangee(i)) || "–")}</span>${aussi(i)}</td><td class="q"><span class="qb">${+i.q || 1}</span></td><td>${esc(i.nom)}</td></tr>`).join("")}</table>`;   /* 26 nov. : sans n° d'article (inutile au comptoir) */
 /* préparation (25 nov., Jeremy : « les rangées pourraient flasher sur son iPad et quand il coche, ça cesse ») */
 function preparer(p){ if (!p) return;
   let faceL = ""; const cle = "magPrep|" + p.id, faits = new Set(LS.get(cle, [])), L = parRangee(p.items), ov = $("#ov");
@@ -602,7 +604,7 @@ function preparer(p){ if (!p) return;
       <p class="sous">${esc(p.groupe)} · ${esc(nomEns(p.ens))}${p.note ? " · " + esc(p.note) : ""}</p>
       ${[...lettres, ""].map(l => { const G = L.filter(i => PlanMagasin.lettre(rangee(i)) === l); if (!G.length) return "";
         return `<div class="prep-g${finies.has(l) ? " fini" : ""}"><div class="prep-t">${l ? "Rangée " + esc(l) : "Sans rangée"}</div>${G.map(i => { const k = i.id || i.n, ok = faits.has(k);
-          return `<label class="prep-i${ok ? " ok" : ""}${i === prochain ? " proch" : ""}"><input type="checkbox" data-k="${esc(k)}"${ok ? " checked" : ""}><span class="rg"><i class="pt">${L.indexOf(i) + 1}</i>${esc(rangee(i) || "–")}</span><span class="q">${+i.q || 1} ×</span><span class="nm">${esc(i.nom)}<small>${esc(i.n)}</small>${aussi(i)}</span></label>`; }).join("")}</div>`; }).join("")}
+          return `<label class="prep-i${ok ? " ok" : ""}${i === prochain ? " proch" : ""}"><input type="checkbox" data-k="${esc(k)}"${ok ? " checked" : ""}><span class="rg"><i class="pt">${L.indexOf(i) + 1}</i>${esc(caseTxt(rangee(i)) || "–")}</span><span class="q">${+i.q || 1} ×</span><span class="nm">${esc(i.nom)}<small>${esc(i.n)}</small>${aussi(i)}</span></label>`; }).join("")}</div>`; }).join("")}
       <button class="btn ${tout ? "v" : ""}" id="prOk" ${tout ? "" : "disabled"} style="width:100%;margin-top:10px">${tout ? "Tout est prêt · remis à l'élève" : "Coche chaque raccord en le prenant"}</button></div></main>`;
     ov.querySelector(".prep-plan svg").onclick = e => { const g = e.target.closest("[data-l]"); if (g) { faceL = g.dataset.l; dessiner(); } };
     if ($("#prFace")) $("#prFace").onclick = () => { faceL = ""; dessiner(); };
@@ -615,7 +617,7 @@ function preparer(p){ if (!p) return;
 function imprimerBon(p){ if (!p) return;
   const h = `<!DOCTYPE html><html lang="fr-CA"><head><meta charset="utf-8"><title>Bon ${esc(p.code)}</title><style>body{font:12pt/1.35 system-ui,sans-serif;color:#000;margin:14mm}h1{font-size:18pt;margin:0}.s{color:#444;margin:2pt 0 10pt}table{width:100%;border-collapse:collapse}th,td{border-bottom:1px solid #999;padding:6pt 4pt;text-align:left}th{font-size:9pt;color:#444}td.rg{font-weight:800;font-size:14pt;width:60pt}td.q{font-weight:800;width:40pt}td.no{font-family:monospace}td.ok{width:30pt}.n{font:900 28pt monospace;float:right}</style></head><body>`
     + `<span class="n">${esc(p.code)}</span><h1>Bon de préparation · ${esc(p.prenom || "Magasin")}</h1><p class="s">${esc(p.groupe)} · ${esc(nomEns(p.ens))} · approuvé ${heure(p.t_app)}${p.note ? " · " + esc(p.note) : ""}</p>`
-    + `<table><tr><th>Rangée</th><th>Qté</th><th>Raccord</th><th>N° d'article</th><th>✓</th></tr>${parRangee(p.items).map(i => `<tr><td class="rg">${esc([rangee(i), ...autresCases(i)].filter(Boolean).join(" / ") || "–")}</td><td class="q">${+i.q || 1}</td><td>${esc(i.nom)}</td><td class="no">${esc(i.n)}</td><td class="ok">☐</td></tr>`).join("")}</table></body></html>`;
+    + `<table><tr><th>Rangée</th><th>Qté</th><th>Raccord</th><th>N° d'article</th><th>✓</th></tr>${parRangee(p.items).map(i => `<tr><td class="rg">${esc([rangee(i), ...autresCases(i)].filter(Boolean).map(caseTxt).join(" / ") || "–")}</td><td class="q">${+i.q || 1}</td><td>${esc(i.nom)}</td><td class="no">${esc(i.n)}</td><td class="ok">☐</td></tr>`).join("")}</table></body></html>`;
   const f = document.createElement("iframe"); f.style.cssText = "position:fixed;width:0;height:0;border:0;left:-10px"; document.body.appendChild(f);
   f.contentDocument.open(); f.contentDocument.write(h); f.contentDocument.close(); setTimeout(() => { try { f.contentWindow.focus(); f.contentWindow.print(); } catch(e){} setTimeout(() => f.remove(), 60000); }, 300); }
 async function remettre(id, oui){ try { await rpcM("panier_remettre", { p_id:id, p_remis:oui });
