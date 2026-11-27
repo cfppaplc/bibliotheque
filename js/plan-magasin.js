@@ -89,11 +89,13 @@ window.PlanMagasin = (function(){
     const COUL = ["#EB6A22", "#1F5F8B", "#2E8B57", "#7A4FA0"], nums = (a, b) => Array.from({ length:Math.min(b - a + 1, 60) }, (_, i) => a + i);
     const NOM = NOMS;
     return `<div class="pm-face"><style>@keyframes pmCl{from{background:#EB6A22;transform:scale(1)}to{background:#FFD25A;transform:scale(1.12)}}.pm-cl{animation:pmCl .7s ease-in-out infinite alternate;outline:3px solid #14213d;z-index:1;position:relative;color:#14213d!important}</style><h4 style="margin:0 0 8px">Rangée ${l}, vue de face</h4>` + segs.map((S, si) => `<div style="font:600 .8rem system-ui;color:#5b6678;margin:10px 0 4px">${NOM[si] || ""}</div><div style="display:flex;gap:8px;align-items:flex-start">`
-      + S.filter(p => taille(p.n) > 0).map((p, k) => { const G = String(CASES[p.n] || "").split(/[,;]/).map(g => g.trim()).filter(Boolean), c = COUL[k % 4];
+      + (() => { const grp = p => String(CASES[p.n] || "").split(/[,;]/).map(g => g.trim()).filter(Boolean), maxR = Math.max(1, ...S.map(p => grp(p).length));
+      /* 26 nov. (Jeremy : « l'étagère mauve flotte ») : une partie qui a moins d'étages (gros casiers) prend toute la hauteur de l'étagère */
+      return S.filter(p => taille(p.n) > 0).map((p, k) => { const G = grp(p), c = COUL[k % 4], hR = G.length ? ((maxR * 24 - 2) - (G.length - 1) * 2) / G.length : 22;
         return `<div style="flex:${taille(p.n)};min-width:0"><div style="font:700 .75rem system-ui;color:${c};margin-bottom:3px">Partie ${p.n}</div>`
-          + (G.length ? G.map(g => `<div style="display:flex;gap:2px;margin-bottom:2px">` + g.split("+").flatMap(x => { const m = x.trim().toUpperCase().match(/^([A-Z])?\s*-?\s*(\d+)\s*(?:-\s*(\d+))?$/); return m ? nums(+m[2], m[3] ? +m[3] : +m[2]) : []; })
-              .map(n => `<span${T.has(n) ? ' class="pm-cl"' : ""} style="flex:1;min-width:0;height:22px;display:flex;align-items:center;justify-content:center;background:${c};color:#fff;font:700 9px system-ui;border-radius:3px;overflow:hidden">${n}</span>`).join("") + `</div>`).join("")
-            : `<div style="height:22px;border:2px dashed #c9d0da;border-radius:4px;display:flex;align-items:center;justify-content:center;font:700 .75rem system-ui;color:#8a94a6">à remplir</div>`) + `</div>`; }).join("") + `</div>`).join("") + `</div>`; }
+          + (G.length ? G.map(g => `<div style="display:flex;gap:2px;margin-bottom:2px;height:${hR}px">` + g.split("+").flatMap(x => { const m = x.trim().toUpperCase().match(/^([A-Z])?\s*-?\s*(\d+)\s*(?:-\s*(\d+))?$/); return m ? nums(+m[2], m[3] ? +m[3] : +m[2]) : []; })
+              .map(n => `<span${T.has(n) ? ' class="pm-cl"' : ""} style="flex:1;min-width:0;height:100%;display:flex;align-items:center;justify-content:center;background:${c};color:#fff;font:700 9px system-ui;border-radius:3px;overflow:hidden">${n}</span>`).join("") + `</div>`).join("")
+            : `<div style="height:22px;border:2px dashed #c9d0da;border-radius:4px;display:flex;align-items:center;justify-content:center;font:700 .75rem system-ui;color:#8a94a6">à remplir</div>`) + `</div>`; }).join(""); })() + `</div>`).join("") + `</div>`; }
   const place = r => Object.keys(CASES).length > 0 && !!partieDe(r, parties().filter(p => taille(p.n) > 0));   /* la case est-elle placée sur le plan ? */
   return { svg, lettre, parties, vueFace, place, lireCases, set cases(c){ CASES = c || {}; }, get cases(){ return CASES; }, set tailles(t){ TAILLES = t || {}; } };
 })();
