@@ -2,7 +2,7 @@
    Lancé par .github/workflows/test-pages.yml (serveur local sur le port 8791). Les erreurs de sites externes (réseau) sont ignorées. */
 const { chromium } = require("playwright");
 const PAGES = ["index.html", "accueil.html", "labo.html", "quiz.html", "quiz.html?animer=1", "simulateur.html", "telecommande.html",
-  "outils-atelier.html", "passeport.html", "coffres.html", "presentation.html", "confidentialite.html", "magasin.html", "magasin.html?mode=prof", "magasin.html?mode=magasin", "magasin.html?poste=1", "facture.html", "carte.html", "carte.html#c=MP-12345-K7Q9X2&g=Essai&p=Marc"];
+  "outils-atelier.html", "passeport.html", "coffres.html", "presentation.html", "confidentialite.html", "magasin.html", "magasin.html?mode=prof", "magasin.html?mode=magasin", "magasin.html?poste=1", "recuperer.html", "facture.html", "carte.html", "carte.html#c=MP-12345-K7Q9X2&g=Essai&p=Marc"];
 (async () => {
   const b = await chromium.launch(); let echecs = 0;
   for (const [nom, opt] of [["ordinateur", { viewport: { width: 1440, height: 900 } }], ["cellulaire", { viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true }]]) {

@@ -550,6 +550,22 @@ test("Magasin : sans carte, l'élève entre sans écrire son prénom; l'enseigna
   vrai(DEC.length === 1 && DEC[0].p_prenom === "Alex", "Approbation : le prénom du dossier n'est pas envoyé au magasinier (" + JSON.stringify(DEC) + ")");
   vrai(!errs.length, "Erreurs : " + errs.join(" | ")); await ctx.close();
 });
+test("Récupérer mes groupes : les élèves effacés aujourd'hui reviennent à partir de la copie d'un autre appareil", async b => {   /* 27 nov. */
+  const ctx = await b.newContext({ serviceWorkers: "block" }), errs = [];
+  await ctx.route(/coffre\.js/, r => r.fulfill({ contentType: "application/javascript", body: `window.__ENV = null; const t0 = Date.now() - 3600e3;
+    const C = { el: { a: { x: 1, t: t0, g: "2606PLC1", p: "" }, b: { x: 1, t: t0, g: "2508PLC1", p: "" }, v: { x: 1, t: Date.now() - 5 * 86400e3, g: "VIEUX", p: "" }, c: { p: "Zoé", c: "33333", g: "2608PLC1", t: 1 } },
+      val: { "a|o1": { d: 0, t: t0 } }, grp: { "2606PLC1": { x: 1, t: t0 }, "2508PLC1": { x: 1, t: t0 } } };
+    window.COFFRE = { session: async () => ({ id: "jeremy.raymond" }), recevoir: async () => ({ t: 1, v: { passeportOutils: JSON.stringify(C), passPartageJeton: "j" } }), envoyer: async (so, o) => { window.__ENV = o; } };` }));
+  await ctx.addInitScript(() => { localStorage.setItem("passeportOutils", JSON.stringify({ el: { a: { p: "Alex Tremblay", c: "59564", k: "AAAA11", g: "2606PLC1", t: 5 }, b: { p: "Léa", c: "44444", g: "2508PLC1", t: 5 }, v: { p: "Vieux", c: "11111", g: "VIEUX", t: 5 } },
+    val: { "a|o1": { d: 123, s: "sig", t: 5 } }, grp: { "2606PLC1": { t: 1 }, "2508PLC1": { t: 1 } } })); });
+  const p = await ctx.newPage(); p.on("pageerror", e => errs.push(e.message)); await p.goto(BASE + "recuperer.html"); await attendre(800);
+  const t = await p.textContent("#z");
+  vrai(/2 élèves/.test(t) && /2606PLC1/.test(t) && /2508PLC1/.test(t) && !/VIEUX/.test(t), "Récupérer : mauvais aperçu (" + t + ")");
+  await p.click("#go"); await attendre(600);
+  const D = JSON.parse(await p.evaluate(() => window.__ENV.v.passeportOutils));
+  vrai(!D.el.a.x && D.el.a.c === "59564" && D.el.a.t > 1e12 && !D.el.b.x && D.el.v.x && D.val["a|o1"].d === 123 && !D.grp["2606PLC1"].x && D.el.c.c === "33333", "Récupérer : élèves, signatures ou groupes mal remis " + JSON.stringify(D));
+  vrai(!errs.length, "Erreurs : " + errs.join(" | ")); await ctx.close();
+});
 test("Carte : l'élève affiche sa carte avec son code à 5 chiffres seulement; trop de codes inconnus = pause", async b => {
   const c = await b.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: "block" }), R = {}, errs = []; let E = 0;
   await c.route(/rpc\/carte_code_(ecrire|lire)/, r => { const a = JSON.parse(r.request().postData()), u = r.request().url(); let out;

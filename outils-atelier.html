@@ -557,7 +557,12 @@ try { for (let w = window; ; w = w.parent){ if (/[?&]gestion=1/.test(w.location.
   $("#gaCodes").onclick = () => viaFormations("bCodes");
   let surEff = 0; $("#mEff").onclick = () => { const B = $("#mEff b"), b = fFo.contentDocument && fFo.contentDocument.getElementById("bEffG"); if (!b || !groupe()) return;
     if (!surEff++){ B.textContent = "Sûr ? Touche encore"; setTimeout(() => { surEff = 0; B.textContent = "Effacer ce groupe"; }, 4000); return; }
-    surEff = 0; B.textContent = "Effacer ce groupe"; fermerMenu(); b.click(); b.click(); setTimeout(() => { charger(); dessiner(); }, 300); };
+    surEff = 0; B.textContent = "Effacer ce groupe"; fermerMenu();
+    /* 27 nov. (bogue : « Effacer ce groupe a effacé les mauvais groupes ») : le registre caché gardait un autre groupe ouvert et effaçait celui-là.
+       On lui donne d'abord le groupe affiché, et on vérifie avant d'effacer. */
+    const g = groupe(), P = PASS(); if (P) P.groupe(g);
+    if (!P || !P.groupeActuel || P.groupeActuel() !== g) { toast("Impossible d'effacer : recharge la page et réessaie."); return; }
+    b.click(); b.click(); setTimeout(() => { charger(); dessiner(); }, 300); };
   $("#mPl").onclick = () => { PLACE = true; fermerMenu(); onglet("el"); dessiner(); };
   /* menu « Réglages du groupe » (administrateur) : placer les équipes, locaux, partager */
   const fermerMenu = () => { $("#peRegM").hidden = true; };

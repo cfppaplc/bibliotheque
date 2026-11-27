@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="fr-CA">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
+<title>Récupérer mes groupes · Métier+</title><link rel="icon" href="img/metier-plus-icone.svg"><meta name="theme-color" content="#1E2A44">
+<style>
+:root{--fond:#F4F1EC;--carte:#fff;--txt:#1E2A44;--doux:#6b7280;--ligne:#E5DAC6;--acc:#EB6A22;--vert:#1E8A55;--rouge:#C9362E;color-scheme:light}
+*{box-sizing:border-box}body{margin:0;background:var(--fond);color:var(--txt);font:16px/1.5 "Segoe UI",Roboto,system-ui,sans-serif}
+.top{background:#1E2A44;border-bottom:3px solid var(--acc);padding:12px 18px}.top img{height:26px;display:block}
+main{max-width:640px;margin:0 auto;padding:22px 18px}h1{margin:0 0 6px;font-size:1.5rem}.sous{color:var(--doux)}
+.carte{background:var(--carte);border:1px solid var(--ligne);border-radius:16px;padding:16px 18px;margin:14px 0}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:52px;padding:0 22px;border-radius:12px;border:0;background:var(--acc);color:#fff;font:700 1.05rem inherit;cursor:pointer}
+.btn:disabled{opacity:.5}.ok{color:var(--vert);font-weight:700}.err{color:var(--rouge);font-weight:700}
+</style>
+</head>
+<body>
+<div class="top"><img src="img/metier-plus-blanc.svg" alt="Métier+"></div>
+<main><h1>Récupérer mes groupes</h1><p class="sous">Cette page compare la copie de tes groupes gardée sur cet appareil avec ton compte, et remet les élèves effacés aujourd'hui.</p><div id="z" class="carte">Vérification…</div></main>
+<script src="coffre.js?v=271"></script>
+<script>
+/* 27 nov. (Jeremy : « remets-moi mes groupes ») : le bouton « Effacer ce groupe » de la Gestion d'atelier a effacé les mauvais groupes.
+   Un autre appareil qui n'a pas rouvert la Gestion d'atelier garde l'ancienne copie (localStorage passeportOutils).
+   On remet dans le coffre chaque élève (et ses signatures) effacé depuis moins de 12 h et encore présent dans la copie de cet appareil.
+   Cette page ne lance PAS la synchronisation du registre : la copie de l'appareil reste intacte tant qu'on n'a pas récupéré. */
+const $ = s => document.querySelector(s), esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" })[c]);
+(async () => {
+  const Z = $("#z"); let s; try { s = await COFFRE.session(); } catch(e){}
+  if (!s || s.eleve) { Z.innerHTML = `<p class="err">Connecte-toi d'abord à <a href="index.html">Métier+</a> sur cet appareil, puis reviens ici.</p>`; return; }
+  let L; try { L = JSON.parse(localStorage.getItem("passeportOutils") || "null"); } catch(e){}
+  if (!L || !L.el || !Object.keys(L.el).length) { Z.innerHTML = `<p class="err">Cet appareil n'a pas de copie de tes groupes. Essaie sur un autre appareil où tu as déjà ouvert la Gestion d'atelier.</p>`; return; }
+  let cloud; try { cloud = await COFFRE.recevoir("passeport"); } catch(e){ Z.innerHTML = `<p class="err">Pas de connexion pour l'instant. Recharge la page.</p>`; return; }
+  const C = JSON.parse((cloud && cloud.v && cloud.v.passeportOutils) || "null") || { el:{}, val:{}, grp:{} }; ["el", "val", "grp", "vus", "mv"].forEach(k => C[k] = C[k] || {});
+  const depuis = Date.now() - 12 * 3600e3, rem = [], grp = {};
+  for (const id in C.el) { const c = C.el[id], l = L.el[id]; if (c.x && (c.t || 0) > depuis && l && !l.x && l.c) { rem.push(id); grp[l.g] = (grp[l.g] || 0) + 1; } }
+  if (!rem.length) { Z.innerHTML = `<p>Rien à récupérer avec la copie de cet appareil (elle est peut-être déjà à jour avec l'effacement). Essaie un autre appareil.</p>`; return; }
+  Z.innerHTML = `<p>La copie de cet appareil permet de remettre <b>${rem.length} élève${rem.length > 1 ? "s" : ""}</b> :</p><ul>${Object.entries(grp).map(([g, n]) => `<li><b>${esc(g)}</b> : ${n} élève${n > 1 ? "s" : ""}</li>`).join("")}</ul><button class="btn" id="go">Remettre ces groupes</button><p id="m"></p>`;
+  $("#go").onclick = async () => { $("#go").disabled = true; $("#m").textContent = "Récupération…";
+    try { const c2 = await COFFRE.recevoir("passeport"), D = JSON.parse(c2.v.passeportOutils); ["el", "val", "grp"].forEach(k => D[k] = D[k] || {});
+      const t = Date.now(), G = new Set(); let n = 0, sig = 0;
+      for (const id of rem) { const l = L.el[id]; if (!D.el[id] || !D.el[id].x) continue; D.el[id] = Object.assign({}, l, { t }); G.add(l.g); n++;
+        for (const k in (L.val || {})) if (k.startsWith(id + "|") && L.val[k] && L.val[k].d) { D.val[k] = Object.assign({}, L.val[k], { t }); sig++; } }
+      for (const g of G) D.grp[g] = Object.assign({}, (L.grp || {})[g] || {}, { t }), delete D.grp[g].x;
+      const v = Object.assign({}, c2.v, { passeportOutils: JSON.stringify(D) });
+      await COFFRE.envoyer("passeport", { t, v });
+      try { localStorage.setItem("passeportOutils", v.passeportOutils); localStorage.setItem("coffre:passeport:t", String(t)); localStorage.removeItem("passGrpPub"); localStorage.removeItem("registreAutoT"); } catch(e){}
+      $("#m").innerHTML = `<span class="ok">C'est fait : ${n} élève${n > 1 ? "s" : ""} et ${sig} signature${sig > 1 ? "s" : ""} remis (${[...G].map(esc).join(", ")}).</span> Tu peux rouvrir la <a href="outils-atelier.html">Gestion d'atelier</a>.`;
+    } catch(e){ $("#go").disabled = false; $("#m").innerHTML = `<span class="err">Ça n'a pas marché (${esc(e.message)}). Réessaie.</span>`; } };
+})();
+</script>
+</body>
+</html>

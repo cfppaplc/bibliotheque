@@ -841,7 +841,7 @@ try { if (window.top !== window && /outils-atelier/.test(parent.location.pathnam
 window.PASS = { get D(){ return D; }, groupes, get PART(){ return PART; }, get COMPTES(){ return COMPTES; },
   /* partage d'un groupe depuis Gestion d'atelier (même enregistrement que la fenêtre Partager) */
   async partage(g, L){ const N = JSON.parse(JSON.stringify(PART || {})); if (L.length) N[g] = L; else delete N[g];
-    await PARTAGE.ecrire(window.__moi, { grp:groupes().filter(x => x !== "À classer"), part:N }); PART = N; localStorage.removeItem("passGrpPub"); publierGrp(); envoyerSync(); }, sauver(){ sauver(); dessiner(); }, groupe(g){ GRP = g; dessiner(); } };
+    await PARTAGE.ecrire(window.__moi, { grp:groupes().filter(x => x !== "À classer"), part:N }); PART = N; localStorage.removeItem("passGrpPub"); publierGrp(); envoyerSync(); }, sauver(){ sauver(); dessiner(); }, groupeActuel(){ return GRP; }, groupe(g){ GRP = g; dessiner(); } };
 </script>
 <style>body.sansgestion #bGrpN,body.sansgestion #bEl,body.sansgestion #bCodes,body.sansgestion #bEffG,body.sansgestion #bPart,body.sansgestion #bProt,body.sansgestion #bQr{display:none!important}
 body.lecteur #bGrpN,body.lecteur #bEl,body.lecteur #bEffG,body.lecteur #bPart{display:none!important}
