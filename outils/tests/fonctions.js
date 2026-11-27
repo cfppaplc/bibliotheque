@@ -346,6 +346,9 @@ test("Magasin : l'élève (carte scannée) envoie son panier, l'enseignant appro
   vrai(!!(await m.$("[data-rem]")), "Code 12345 : commande absente");
   vrai(/^[A-Z]-\d+/.test((await m.textContent("td.rg")).trim()), "Rangée absente au comptoir");
   vrai(/Essai/.test(await m.textContent(".cmd .pr")), "Prénom absent au comptoir");
+  /* 26 nov. : un article rangé dans plusieurs cases montre toutes ses cases (ex. coude 90° acier 3/4 : F-90, F-91, F-104) */
+  const mc = await m.evaluate(() => { const a = CAT.find(x => (x.r2 || []).length); return a ? [rangee({ id: a.id }), autresCases({ id: a.id }).length, aussi({ id: a.id })] : null; });
+  vrai(mc && mc[0] && mc[1] >= 1 && /aussi/.test(mc[2]), "Cases multiples non affichées : " + JSON.stringify(mc));
   /* 25 nov. : les commandes approuvées d'un même élève se rassemblent en une seule carte (quantités additionnées) */
   const rg = await m.evaluate(() => { const L = regrouper([{ id: "a", code: "11111", items: [{ id: "x", n: "X", q: 2 }] }, { id: "b", code: "11111", items: [{ id: "x", n: "X", q: 1 }, { id: "y", n: "Y", q: 1 }] }, { id: "c", code: "22222", items: [] }]);
     return L.map(p => (p.ids || [p.id]).join("+") + ":" + (p.items || []).map(i => i.n + i.q).join(",")); });
