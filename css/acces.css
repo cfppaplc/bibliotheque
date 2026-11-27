@@ -474,3 +474,7 @@ body.clair .as-lien{background:#f5f6fa;border-color:#e3e6ee}body.clair .as-sig{b
 @media (max-width:760px){.ap-plan{grid-template-columns:1fr}}
 .ap-plan-l input.ap-taille{flex:none;width:52px;text-align:center}
 .ap-ico{display:flex;align-items:center;gap:10px}.ap-ico img{width:36px;height:36px;border-radius:9px;flex:none}
+/* 26 nov. : plan du magasin dans Administration : case touchée et son contenu */
+.ap-face [data-c].ap-sel{outline:3px solid #14213d;position:relative;z-index:1}
+.ap-ci{padding:8px 10px;border-top:1px solid var(--ligne,#e3e6eb)}.ap-ci b{display:block;font-weight:600}.ap-ci small{color:var(--doux,#6b7280)}
+.ap-plan-svg text{stroke:none;paint-order:normal}

@@ -103,12 +103,14 @@ test("Administration : chaque onglet s'ouvre; Quoi de neuf se modifie et s'annul
   vrai(/attendent/.test(await p.textContent(".ap-pub .acces-etat")), "La modification n'est pas signalée");
   await p.click("#nvAnn"); await attendre(500);
   vrai(/Tout est publié/.test(await p.textContent(".ap-pub .acces-etat")), "Annuler n'a pas remis la liste");
-  /* 26 nov. (Jeremy) : plan du magasin, cases par partie modifiables dans Administration → Magasin; le point va dans sa partie */
+  /* 26 nov. (Jeremy) : Administration → Magasin : même plan que le magasinier; une lettre → l'étagère de face; une case → ce qu'elle contient */
   const ongMg = tabs.find(k => /mag/.test(k));
-  if (ongMg) { await p.click('.acces-onglets [data-ong="' + ongMg + '"]'); await attendre(1500); if (await p.$("#apRet") && !(await p.$("[data-pc]"))) {}
-    vrai((await p.$$("[data-pc]")).length === 56, "Plan : 56 parties attendues dans Administration → Magasin");
-    vrai(/23-26/.test(await p.inputValue('[data-pc="1"]')), "Plan : cases de la partie 1 absentes");
-    await p.fill('[data-pc="3"]', "A 1-30"); await attendre(200); vrai(await p.$eval("#mgPub", b => !b.disabled), "Plan : la modification n'est pas signalée (Publier reste grisé)"); await p.click("#mgAnn"); await attendre(400); }
+  if (ongMg) { await p.click('.acces-onglets [data-ong="' + ongMg + '"]'); await attendre(1500);
+    vrai(!(await p.$("[data-pc]")), "Plan : les anciens champs de cases sont encore là");
+    await p.click('#mgPlan [data-l="J"][data-s="0"]'); await attendre(300);
+    vrai(!!(await p.$("#mgPlan .ap-face .pm-face")) && !/du bas/.test(await p.textContent("#mgPlan .ap-face")), "Plan : la lettre J n'ouvre pas son étagère de face");
+    await p.click('#mgPlan [data-c="J-28"]'); await attendre(300);
+    vrai(/J-28/.test(await p.textContent("#mgPlan .ap-case")), "Plan : toucher une case ne montre pas son contenu"); }
   const cy = await p.evaluate(() => { PlanMagasin.cases = { "2": "6-9, 27-30", "53": "A 1-30" }; const d = document.createElement("div");
     d.innerHTML = PlanMagasin.svg(new Set(["J"]), new Set(), [{ r: "J-28" }, { r: "A-12" }, { r: "J-200" }]); return [...d.querySelectorAll("circle.pm-p")].map(c => +c.getAttribute("cy")); });
   vrai(cy.length === 2 && cy[0] > 126 && cy[0] < 174, "Plan : J-28 hors de la partie 2 (" + cy.join(",") + ")");
