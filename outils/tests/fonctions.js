@@ -510,7 +510,7 @@ test("Registre automatique : la liste des codes se republie seule depuis le coff
   const p = await ctx.newPage(); await p.goto(BASE + "confidentialite.html"); await attendre(500);
   await p.evaluate(() => { const D = { el: { a: { p: "Alex Tremblay", c: "11111", k: "AAAA11", g: "2608 EGI" }, b: { p: "Zoé", c: "22222", k: "BBBB22", g: "2608 EGI" }, z: { p: "Vieux", c: "33333", g: "2608 EGI", x: 1 } }, grp: {} };
     window.COFFRE = { session: async () => ({ id: "jeremy.raymond" }), recevoir: async () => ({ t: 1, v: { passeportOutils: JSON.stringify(D), passPartageJeton: "jet" } }) }; });
-  await p.addScriptTag({ url: BASE + "js/registre-auto.js?v=1" });
+  await p.addScriptTag({ url: BASE + "js/registre-auto.js?v=2" });
   const r1 = await p.evaluate(() => REGISTRE_AUTO.maj(true));
   vrai(r1 === "publié" && W.length === 1, "Registre automatique : rien publié (" + r1 + ")");
   const d = JSON.parse(W[0].p_data);

@@ -26,7 +26,7 @@
     const efface = g => D.grp && D.grp[g] && D.grp[g].x;
     const grp = [...new Set([...(pub.grp || []), ...E.map(e => e.g)])].filter(g => g !== "À classer" && !efface(g));
     const codes = {}; grp.forEach(g => codes[g] = []); E.forEach(e => { if (codes[e.g] && !codes[e.g].includes(e.c)) codes[e.g].push(e.c); });
-    const noms = {}; for (const e of E) if (e.k && prenom(e.p)) { try { noms[e.c] = await nomChiffre(e); } catch(x){} }
+    const noms = {}; for (const e of E) if (codes[e.g] && e.k && prenom(e.p)) { try { noms[e.c] = await nomChiffre(e); } catch(x){} }
     const sig = JSON.stringify([grp, codes, Object.keys(noms).sort()]), avant = JSON.stringify([pub.grp || [], pub.codes || {}, Object.keys(pub.noms || {}).sort()]);
     try { localStorage.setItem("registreAutoT", String(Date.now())); } catch(e){}
     if (sig === avant) return "à jour";
