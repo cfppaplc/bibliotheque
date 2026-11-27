@@ -228,7 +228,7 @@ details.arch>summary{cursor:pointer;font-weight:700;padding:14px 18px;background
 <main id="app"><p class="vide">Chargement…</p></main>
 <div class="ov" id="ov" hidden></div>
 <div class="barre" id="barre" hidden></div>
-<script src="js/qrcode.js"></script><script src="js/code128.js?v=1"></script><script src="js/plan-magasin.js?v=14"></script>
+<script src="js/qrcode.js"></script><script src="js/code128.js?v=1"></script><script src="js/plan-magasin.js?v=16"></script>
 <script src="js/magasin-recherche.js?v=1"></script>
 <script>
 "use strict";
@@ -276,7 +276,7 @@ async function trouverEleve(code){
 let CAT = [];
 const diam = d => String(d || "").trim().replace(/\s+/g, "-");   /* « 1 1/2 » → « 1-1/2 » : un seul mot */
 async function chargerCatalogue(){ try { const J = await (await fetch("magasin-catalogue.json", { cache:"no-cache" })).json(); CAT = J.raccords || []; PHOTOS = J.photos || {}; if (window.PlanMagasin) PlanMagasin.cases = (J.plan || {}).parties || {}; PlanMagasin.tailles = (J.plan || {}).tailles || {}; } catch(e){ CAT = []; }
-  if (window.RechercheMag) RechercheMag.preparer(CAT); CAT.forEach(a => { a._q = norm([a.nom, a.n, a.mat, a.type].join(" ")); a._m = a._q.split(/[\s°]+/); a._d = diam(a.d); }); }
+  if (window.RechercheMag) RechercheMag.preparer(CAT); if (window.PlanMagasin) { const M = {}; CAT.forEach(a => [a.r, ...(a.r2 || [])].forEach(c => { const m = String(c || "").toUpperCase().match(/^([A-Z])-?0*(\d+)/); if (m && +m[2] < 1000) M[m[1]] = Math.max(M[m[1]] || 0, +m[2]); })); PlanMagasin.maxCases = M; } CAT.forEach(a => { a._q = norm([a.nom, a.n, a.mat, a.type].join(" ")); a._m = a._q.split(/[\s°]+/); a._d = diam(a.d); }); }
 /* recherche : les mots doivent tous se trouver; un nombre seul (2, 3/4, 1 1/2) = le diamètre exact, sauf un angle (90, 45, 22,5) */
 const ANGLES = ["90", "45", "22,5", "22.5", "22"];
 /* 26 nov. (Jeremy : « la recherche doit être flexible, accepter les anglicismes et les synonymes ») : chaque mot cherché peut valoir plusieurs termes du catalogue */

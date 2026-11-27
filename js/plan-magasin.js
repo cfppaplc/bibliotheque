@@ -12,7 +12,7 @@ window.PlanMagasin = (function(){
      Administration → Magasin dit quelles cases sont dans chaque partie (plan.parties du catalogue), modifiable si les cases changent.
      Texte d'une partie : « 2-5, 12-15 » (lettre du plan) ou « A 1-30, B 1-7 » (autre lettre). */
   const ORDRE = ["J", "I", "H", "G", "F", "E", "D", "K"], NPART = 4;
-  let CASES = {}, TAILLES = {};   /* TAILLES : longueur relative de chaque partie (1 par défaut; 0 = pas de partie), ex. grande étagère = 4, petite = 1 */
+  let CASES = {}, TAILLES = {}, MAXC = {};   /* MAXC : plus grand numéro de case de chaque rangée (catalogue), pour placer à peu près */   /* TAILLES : longueur relative de chaque partie (1 par défaut; 0 = pas de partie), ex. grande étagère = 4, petite = 1 */
   /* un étage = un groupe entre virgules; « 139-142 + 154-165 » = un même étage fait de deux suites (la place de la case suit l'ordre écrit) */
   /* 26 nov. (Jeremy : « il y avait des cases jaunes sur la partie 5 ») : un étage peut avoir sa couleur réelle, écrite après ses cases (« 143-152 jaune ») */
   const COUL_ETAGE = { JAUNE:["#F2C230", "#14213d"], ROUGE:["#C8372D", "#fff"], BLEU:["#2F6FB0", "#fff"], VERT:["#2E8B57", "#fff"], GRIS:["#8a94a6", "#fff"], NOIR:["#222", "#fff"], BLANC:["#fff", "#14213d"] };
@@ -54,9 +54,10 @@ window.PlanMagasin = (function(){
     racks.forEach(([rx, rw], i) => { for (const [y0, len, sg] of [[V.upY, V.upL, 0], [V.loY, V.loL, 1]]){
       o += `<rect class="pm-r" x="${rx}" y="${y0}" width="${rw}" height="${len}"/>` + face(rx - 7, y0, len, L[i][0]) + face(rx + rw + 1, y0, len, L[i][1]);
       /* affiches au bout de l'étagère (comme une affiche d'allée), une par côté, collées sur l'étagère */
-      o += sign(rx + rw / 2 - 12, y0 - 14, L[i][0], sg) + sign(rx + rw / 2 + 12, y0 - 14, L[i][1], sg); } });
+      const ys = sg ? H + 17 : y0 - 14;   /* 26 nov. (Jeremy : « les lettres moins dans les jambes ») : en haut des étagères du haut, en bas des étagères du bas (l'allée du milieu reste libre) */
+      o += sign(rx + rw / 2 - 12, ys, L[i][0], sg) + sign(rx + rw / 2 + 12, ys, L[i][1], sg); } });
     const r3 = racks[2], r4x = r3[0] + r3[1] + V.r4x;
-    o += `<rect class="pm-r" x="${r4x}" y="${V.loY}" width="${V.r4w}" height="${V.loL}"/>` + face(r4x + V.r4w + 1, V.loY, V.loL, "D") + sign(r4x + V.r4w / 2, V.loY - 14, "D");
+    o += `<rect class="pm-r" x="${r4x}" y="${V.loY}" width="${V.r4w}" height="${V.loL}"/>` + face(r4x + V.r4w + 1, V.loY, V.loL, "D") + sign(r4x + V.r4w / 2, H + 17, "D");
     o += `<polygon class="pm-mur" points="${room.join(" ")}"/>`;
     o += face(F.K + 1, yK + 6, H - yK - 12, "K") + sign(F.K + 16, yK + 60, "K");
     const wa = dh + V.winA, wb = wa + V.winW;
@@ -73,11 +74,18 @@ window.PlanMagasin = (function(){
         o += `<rect x="${p.x - 4}" y="${p.y0 + 1}" width="8" height="${p.h - 2}" rx="2" fill="${on ? (p.n % 2 ? "#EB6A22" : "#1F5F8B") : "#d5dbe3"}"/><rect x="${p.x + DX[p.l] - 9}" y="${cy - 8}" width="18" height="16" rx="8" fill="#fff" stroke="#14213d"/><text class="pm-pt" style="fill:#14213d;font-size:8.5px" x="${p.x + DX[p.l]}" y="${cy + .5}">${p.n}</text>`; }); }
     /* points : un par raccord, dans sa partie si Administration l'a placée, sinon à sa case (ancienne règle) */
     const dejaP = {};
+    /* 26 nov. (Jeremy : « temporairement, les items se placent quand même, à peu près ? ») : rangée dont les cases ne sont pas encore entrées :
+       point à peu près, d'après le numéro de case sur le plus grand numéro de cette rangée au catalogue (cercle pointillé) */
+    const entre = new Set(parts.filter(p => String(CASES[p.n] || "").trim()).map(p => p.l));
+    const ou = r => { const Q = Object.keys(CASES).length ? partieDe(r, parts) : null, P = Q && Q.P; if (P) return [P.x, P.y0 + Math.max(8, Math.min(P.h - 8, Q.f * P.h)), false];
+      const m = String(r || "").trim().toUpperCase().match(/^([A-Z])\s*-?\s*0*(\d+)/); if (!m || entre.has(m[1]) || !faces[m[1]]) return null;
+      const F2 = faces[m[1]], tot = F2.reduce((a, f) => a + f[2], 0), mx = MAXC[m[1]] || V.sec, n = +m[2]; let d = n < 1 ? 8 : Math.max(8, Math.min(tot - 8, (Math.min(n, mx) - .5) / mx * tot));
+      for (const [x, y, h] of F2){ if (d <= h) return [x, y + d, true]; d -= h; } return null; };
     const pos = [], ym = (V.upY + V.upL + V.loY) / 2, yh = 42, dep = [dh + V.winA + V.winW / 2, 6];   /* 26 nov. (Jeremy : « départ à la fenêtre ») : départ à la fenêtre de service; allées de passage : en haut (yh) et au milieu (ym) */
     /* 26 nov. (Jeremy : « les lignes n'ont pas à suivre les tablettes, ce sont des arrêts ») : le chemin passe au milieu de l'allée */
     const AL = {}; [["K", "J"], ["I", "H"], ["G", "F"], ["E", "D"]].forEach(([a, b]) => { const xa = faces[a] && faces[a][0][0], xb = faces[b] && faces[b][0][0]; if (xa != null && xb != null) AL[a] = AL[b] = (xa + xb) / 2; });
     const posA = [];
-    if (opts.trajet || opts.coords) points.forEach((pt, i) => { const Q = Object.keys(CASES).length ? partieDe(pt.r, parts) : null, P = Q && Q.P; if (P) { pos[i] = [P.x, P.y0 + Math.max(8, Math.min(P.h - 8, Q.f * P.h))]; const l = lettre(pt.r); posA[i] = [AL[l] != null ? AL[l] : P.x, pos[i][1]]; } });
+    if (opts.trajet || opts.coords) points.forEach((pt, i) => { const xy = ou(pt.r); if (xy) { pos[i] = [xy[0], xy[1]]; const l = lettre(pt.r); posA[i] = [AL[l] != null ? AL[l] : xy[0], xy[1]]; } });
     if (opts.coords) return { pos:posA, dep, ym, yh };
     /* 26 nov. (Jeremy : trajet « GPS » du magasinier) : le chemin passe par l'allée du milieu pour changer de rangée */
     if (opts.trajet){ const seg = (a, b) => { if (Math.abs(a[0] - b[0]) < 4) return ` L${b[0]} ${b[1]}`; const c = Math.abs(a[1] - yh) + Math.abs(b[1] - yh) <= Math.abs(a[1] - ym) + Math.abs(b[1] - ym) ? yh : ym; return ` L${a[0]} ${c} L${b[0]} ${c} L${b[0]} ${b[1]}`; };
@@ -87,16 +95,11 @@ window.PlanMagasin = (function(){
       const chemin = `<path d="${d}" fill="none" stroke="#1F5F8B" stroke-width="4" stroke-dasharray="2 7" stroke-linecap="round" stroke-linejoin="round" opacity=".85"/><path d="${dF}" fill="none" stroke="#1E8A55" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>${tics}`
         + `<circle cx="${dep[0]}" cy="${dep[1]}" r="7" fill="#1F5F8B"/><text class="pm-l" x="${dep[0] + 8}" y="${yh - 6}" style="text-anchor:start;fill:#1F5F8B;font-weight:800">Départ</text>`;
       const k = o.indexOf('fill="#fff"/>', o.indexOf("</style>")) + 13; o = o.slice(0, k) + `<g class="pm-trajet">${chemin}</g>` + o.slice(k); }   /* sous les étagères et les textes */
-    points.forEach((pt, i) => { const Q = Object.keys(CASES).length ? partieDe(pt.r, parts) : null, P = Q && Q.P;
-      if (P && (pt.calme || (opts.trajet && !pt.proch && !pt.fait))){ const cy = P.y0 + Math.max(8, Math.min(P.h - 8, Q.f * P.h)); o += `<circle cx="${P.x}" cy="${cy}" r="9" fill="#fff" stroke="#EB6A22" stroke-width="3"/><text class="pm-pt" x="${P.x}" y="${cy + .5}" style="fill:#B2470F">${pt.n || i + 1}</text>`; return; }
-      if (P){ const cy = P.y0 + Math.max(8, Math.min(P.h - 8, Q.f * P.h));
-        o += pt.fait ? `<circle class="pm-p fait" cx="${P.x}" cy="${cy}" r="8"/>` : `<circle cx="${P.x}" cy="${cy}" r="8" fill="none" stroke="#EB6A22" stroke-width="3"><animate attributeName="r" values="8;20" dur="1s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;0" dur="1s" repeatCount="indefinite"/></circle><circle class="pm-p" cx="${P.x}" cy="${cy}" r="8"><animate attributeName="fill" values="#EB6A22;#FFD25A;#EB6A22" dur=".8s" repeatCount="indefinite"/></circle>`;
-        o += `<text class="pm-pt" x="${P.x}" y="${cy + .5}">${pt.n || i + 1}</text>`; return; }
-      if (Object.keys(CASES).length) return;   /* case placée nulle part : pas de point plutôt qu'un point au mauvais endroit */ const m = String(pt.r || "").trim().toUpperCase().match(/^([A-Z])\s*-?\s*(\d+)/); if (!m || !faces[m[1]]) return;
-      const F2 = faces[m[1]], tot = F2.reduce((a, f) => a + f[2], 0), n = Math.max(1, Math.min(V.sec, +m[2])); let d = (n - .5) / V.sec * tot;
-      for (const [x, y, h] of F2){ if (d <= h){ o += pt.fait ? `<circle class="pm-p fait" cx="${x}" cy="${y + d}" r="8"/>` : `<circle cx="${x}" cy="${y + d}" r="8" fill="none" stroke="#EB6A22" stroke-width="3"><animate attributeName="r" values="8;20" dur="1s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;0" dur="1s" repeatCount="indefinite"/></circle><circle class="pm-p" cx="${x}" cy="${y + d}" r="8"><animate attributeName="fill" values="#EB6A22;#FFD25A;#EB6A22" dur=".8s" repeatCount="indefinite"/></circle>`;
-          o += `<text class="pm-pt" x="${x}" y="${y + d + .5}">${i + 1}</text>`; break; } d -= h; } });
-    return `<svg viewBox="-30 -20 ${X2 + 60} ${H + 40}" role="img" aria-label="Plan du magasin">${o}</svg>`;
+    points.forEach((pt, i) => { const xy = ou(pt.r); if (!xy) return; const [x, y, app] = xy, num = pt.n || i + 1, tir = app ? ' stroke-dasharray="4 3"' : "";
+      if (pt.fait) { o += `<circle class="pm-p fait" cx="${x}" cy="${y}" r="8"/><text class="pm-pt" x="${x}" y="${y + .5}">${num}</text>`; return; }
+      if (pt.calme || (opts.trajet && !pt.proch)) { o += `<circle cx="${x}" cy="${y}" r="9" fill="#fff" stroke="#EB6A22" stroke-width="3"${tir}/><text class="pm-pt" x="${x}" y="${y + .5}" style="fill:#B2470F">${num}</text>`; return; }
+      o += `<circle cx="${x}" cy="${y}" r="8" fill="none" stroke="#EB6A22" stroke-width="3"><animate attributeName="r" values="8;20" dur="1s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;0" dur="1s" repeatCount="indefinite"/></circle><circle class="pm-p" cx="${x}" cy="${y}" r="8"${tir}/><text class="pm-pt" x="${x}" y="${y + .5}">${num}</text>`; });
+    return `<svg viewBox="-30 -20 ${X2 + 60} ${H + 52}" role="img" aria-label="Plan du magasin">${o}</svg>`;
   }
   const lettre = r => (String(r || "").trim().match(/^[A-Za-z]/) || [""])[0].toUpperCase();
   const parties = () => { const L = []; let k = 0; [["J", 2], ["I", 2], ["H", 2], ["G", 2], ["F", 2], ["E", 2], ["D", 1], ["K", 1]].forEach(([l, s]) => { for (let i = 0; i < s * NPART; i++) L.push({ n:++k, l }); }); return L; };
@@ -121,5 +124,5 @@ window.PlanMagasin = (function(){
     let cur = dep; while (reste.length){ let k = 0; reste.forEach((i, j) => { if (cout(cur, pos[i]) < cout(cur, pos[reste[k]])) k = j; }); const i = reste.splice(k, 1)[0]; out.push(i); cur = pos[i]; }
     return out.concat(rs.map((r, i) => i).filter(i => !pos[i])); }   /* les cases pas encore placées à la fin */
   const place = r => Object.keys(CASES).length > 0 && !!partieDe(r, parties().filter(p => taille(p.n) > 0));   /* la case est-elle placée sur le plan ? */
-  return { svg, lettre, parties, vueFace, place, lireCases, ordre, set cases(c){ CASES = c || {}; }, get cases(){ return CASES; }, set tailles(t){ TAILLES = t || {}; } };
+  return { svg, lettre, parties, vueFace, place, lireCases, ordre, set cases(c){ CASES = c || {}; }, get cases(){ return CASES; }, set tailles(t){ TAILLES = t || {}; }, set maxCases(m){ MAXC = m || {}; } };
 })();

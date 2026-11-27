@@ -287,6 +287,7 @@ window.ADMIN_PLUS = (function(){
   /* contenu d'une case : articles dont la case principale ou une autre case est celle-là (« F-27 » trouve aussi « F-27-A ») */
   /* 26 nov. (Jeremy : « J5 est vraiment vide ? ») : « J-05 » = « J-5 » (zéros devant ignorés) */
   const mgN = x => { const m = String(x || "").toUpperCase().replace(/\s+/g, "").match(/^([A-Z]+)-?0*(\d+)(.*)$/); return m ? m[1] + "-" + (+m[2]) + m[3] : String(x || "").toUpperCase(); };
+  const mgMax = () => { const M = {}; MG.raccords.forEach(a => [a.r, ...(a.r2 || [])].forEach(c => { const m = String(c || "").toUpperCase().match(/^([A-Z])-?0*(\d+)/); if (m && +m[2] < 1000) M[m[1]] = Math.max(M[m[1]] || 0, +m[2]); })); return M; };
   const mgMeme = (x, c) => { const a = mgN(x), b = mgN(c); return a === b || a.startsWith(b + "-") || (a.startsWith(b) && /^[A-Z]/.test(a.slice(b.length))); };   /* « E-15B » est dans la case 15 */
   const mgDans = c => MG.raccords.filter(a => [a.r, ...(a.r2 || [])].some(x => x && mgMeme(x, c)));
   const mgHaut = l => { const n = mgDans(l + "-00").length; return n ? '<button class="abtn" data-c="' + l + '-00" style="margin-top:8px">Tablette du haut · ' + n + ' article' + (n > 1 ? 's' : '') + '</button>' : ''; };
@@ -306,7 +307,7 @@ window.ADMIN_PLUS = (function(){
   /* 26 nov. (Jeremy) : 5 raccords par défaut, 60 quand on cherche */
   const MG_LIM = () => MG_Q.trim() ? 60 : 5;
   let mgEtat = () => {};
-  function mgSituer(z, a){ const P = window.PlanMagasin; if (!P || !a) return; P.cases = (MG.plan || {}).parties || {}; P.tailles = (MG.plan || {}).tailles || {};
+  function mgSituer(z, a){ const P = window.PlanMagasin; if (!P || !a) return; P.cases = (MG.plan || {}).parties || {}; P.tailles = (MG.plan || {}).tailles || {}; P.maxCases = mgMax();
     const C = [a.r, ...(a.r2 || [])].filter(Boolean), c = C.find(x => P.place(x)) || C[0] || "", l = P.lettre(c), num = +((String(c).match(/(\d+)/) || [])[1] || 0);
     let seg = 0; if (P.place(c)) { const L = P.parties().filter(p => p.l === l); L.forEach((p, k) => P.lireCases(P.cases[p.n], p.l).forEach(([ll, x, y]) => { if (ll === l && num >= x && num <= y) seg = Math.floor(k / 4); })); }
     const zs = z.querySelector(".ap-plan-svg"); if (!zs || !l) return;
