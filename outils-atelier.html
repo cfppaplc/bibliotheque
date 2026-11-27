@@ -327,10 +327,15 @@ try { for (let w = window; ; w = w.parent){ if (/[?&]gestion=1/.test(w.location.
     dlg.innerHTML = `<h3>Cartes du groupe ${esc(g)}</h3><p>Les ${el.length} élèves de ce groupe pourront entrer dans Métier+ en scannant leur carte (ou avec « Ma carte » sur leur cellulaire), sans mot de passe. Ils auront les livres du compte choisi.</p>
       <label>Compte de groupe</label><select id="acG" style="width:100%;min-height:44px;margin:6px 0 10px">${grp.map(([id, c]) => `<option value="${esc(id)}">${esc(c.nom || id)}</option>`).join("")}</select>
       <label>Mot de passe de ce compte</label><input id="acM" type="password" style="width:100%;min-height:44px;margin-top:6px" autocomplete="off">
+      <label style="margin-top:10px;display:block">Ajouter aussi une carte d'essai <span style="font-weight:400;opacity:.7">(facultatif)</span></label><input id="acX" class="cache-code" style="width:100%;min-height:44px;margin-top:6px" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Scanne la carte : MP-12345-ABC123">
       <p class="pd-er" hidden></p><div class="pd-a"><button data-x>Annuler</button><button data-ok class="on">Activer les cartes</button></div>`;
     dlg.querySelector("[data-x]").onclick = () => dlg.close();
     dlg.querySelector("[data-ok]").onclick = async ev => { const er = dlg.querySelector(".pd-er"); er.hidden = true; ev.target.disabled = true; ev.target.textContent = "Activation…";
-      try { const n = await T.ACCES.activerCartes($("#acG").value, $("#acM").value, el.map(e => ({ c:String(e.c), k:e.k }))); dlg.close(); toast(n + " carte" + (n > 1 ? "s" : "") + " activée" + (n > 1 ? "s" : "") + ". Refais-le quand tu ajoutes des élèves ou changes le mot de passe du groupe."); }
+      /* 26 nov. (Jeremy : « ajoute mon compte 69696 ») : une carte hors du groupe (carte d'essai de l'enseignant) */
+      const L = el.map(e => ({ c:String(e.c), k:e.k })), x = ($("#acX").value || "").trim().toUpperCase().replace(/\s/g, ""), mx = x.match(/^MP-?(\d{5})-?([A-Z0-9]{4,12})$/);
+      if (x && !mx) { er.hidden = false; er.textContent = "Carte d'essai : ça ressemble à MP-12345-ABC123 (sous le code-barres)."; ev.target.disabled = false; ev.target.textContent = "Activer les cartes"; return; }
+      if (mx && !L.some(e => e.c === mx[1])) L.push({ c:mx[1], k:mx[2] });
+      try { const n = await T.ACCES.activerCartes($("#acG").value, $("#acM").value, L); dlg.close(); toast(n + " carte" + (n > 1 ? "s" : "") + " activée" + (n > 1 ? "s" : "") + ". Refais-le quand tu ajoutes des élèves ou changes le mot de passe du groupe."); }
       catch(e){ er.hidden = false; er.textContent = e.message; ev.target.disabled = false; ev.target.textContent = "Activer les cartes"; } };
     dlg.showModal(); }
   function dessiner(){

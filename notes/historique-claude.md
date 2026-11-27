@@ -854,3 +854,4 @@
 - 26 nov. 23 h 30 : magasin en construction — « Accès du personnel » (NIP du comptoir → localStorage magEssai) pour le raccourci iPhone (mémoire séparée, pas de dernierId).
 - 26 nov. 23 h 40 : bandeau ouvert / fermé aussi sur la page enseignant; toucher le bandeau ouvre l'horaire (voirHoraire, .hOv). Tests ajoutés.
 - 26 nov. 23 h 45 : carte.html bouton « Mes livres » → index.html?macarte (acces.js : ouvre la connexion et clique « Entrer avec Ma carte » si pas de session).
+- 26 nov. 23 h 50 : activation des cartes (outils-atelier, Groupes et élèves → Cartes → Activer) : champ « Ajouter aussi une carte d'essai » (#acX, MP-xxxxx-CLE) pour la carte d'essai de Jeremy (69696) hors du groupe.
