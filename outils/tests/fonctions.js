@@ -606,6 +606,22 @@ test("Magasin : l'élève voit seulement ses 3 dernières commandes", async b =>
   vrai(/3 remis/.test(txt), "Mes paniers : plus de 3 commandes affichées (" + txt.slice(0, 120) + ")");
   await ctx.close();
 });
+test("Comptoir : une nouvelle commande approuvée fait apparaître un gros bandeau (sans notifications de l'iPad)", async b => {   /* 27 nov. */
+  const ctx = await b.newContext({ viewport: { width: 1180, height: 820 }, serviceWorkers: "block" }), errs = []; let n = 1;
+  await ctx.route(/supabase\.co\/rest\/v1\/rpc\/(\w+)/, r => { const f = r.request().url().match(/rpc\/(\w+)/)[1]; let o = null; const t = new Date().toISOString();
+    if (f === "magasin_cle_verifier") o = true;
+    else if (f === "panier_magasin_c") o = [{ id: "c1", etat: "approuve", t, t_app: t, ens: "jeremy.raymond", groupe: "2606PLC1", code: "20221", prenom: "Zach", items: [{ id: "x1", nom: "Coude", q: 4 }] }]
+      .concat(n > 1 ? [{ id: "c2", etat: "approuve", t, t_app: t, ens: "jeremy.raymond", groupe: "2606PLC1", code: "59564", prenom: "Alex", items: [{ id: "x1", nom: "Coude", q: 1 }, { id: "x2", nom: "Té", q: 1 }] }] : []);
+    r.fulfill({ body: JSON.stringify(o), contentType: "application/json", headers: { "access-control-allow-origin": "*" } }); });
+  await ctx.addInitScript(() => { localStorage.setItem("bienvenueVu", "1"); localStorage.setItem("magCle", JSON.stringify("k")); localStorage.setItem("magHeuresTest", "false"); localStorage.setItem("magInstNon_magasin", "1"); });
+  const p = await ctx.newPage(); p.on("pageerror", e => errs.push(e.message)); await p.goto(BASE + "magasin.html?mode=magasin"); await attendre(2500);
+  vrai(!(await p.$("#mgBan.on")), "Comptoir : bandeau affiché au premier chargement (il ne doit annoncer que les nouvelles)");
+  n = 2; await p.evaluate(() => { clearTimeout(magT); return charger(); }); await attendre(700);
+  const t = await p.textContent("#mgBan.on").catch(() => "");
+  vrai(/Nouvelle commande/.test(t) && /Alex/.test(t) && /59564/.test(t) && /2 raccords/.test(t), "Comptoir : pas de bandeau pour la nouvelle commande (" + t + ")");
+  await p.click("#mgBan"); await attendre(400); vrai(!(await p.$("#mgBan.on")), "Comptoir : le bandeau ne se ferme pas au toucher");
+  vrai(!errs.length, "Erreurs : " + errs.join(" | ")); await ctx.close();
+});
 test("Carte : l'élève affiche sa carte avec son code à 5 chiffres seulement; trop de codes inconnus = pause", async b => {
   const c = await b.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: "block" }), R = {}, errs = []; let E = 0;
   await c.route(/rpc\/carte_code_(ecrire|lire)/, r => { const a = JSON.parse(r.request().postData()), u = r.request().url(); let out;
