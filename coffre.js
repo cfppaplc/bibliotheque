@@ -51,7 +51,7 @@ window.COFFRE = (function(){
 
   const hex = async t => [...new Uint8Array(await sub.digest("SHA-256", enc.encode(t)))].map(b => b.toString(16).padStart(2, "0")).join("");
   const gz = async (u, comp) => new Uint8Array(await new Response(new Blob([u]).stream().pipeThrough(comp ? new CompressionStream("gzip") : new DecompressionStream("gzip"))).arrayBuffer());
-  async function rpc(f, a){ const r = await fetch(API + f, { method:"POST", headers:{ apikey:CLE_API, "Content-Type":"application/json" }, body:JSON.stringify(a) });
+  async function rpc(f, a){ const r = await fetch(API + f, { method:"POST", signal:(self.AbortSignal && AbortSignal.timeout) ? AbortSignal.timeout(30000) : undefined, headers:{ apikey:CLE_API, "Content-Type":"application/json" }, body:JSON.stringify(a) });
     if (!r.ok) throw new Error("coffre " + r.status); return r.json(); }
 
   /* ---- rangée du compte pour une sorte (id = empreinte : personne ne peut deviner ni lister) ---- */

@@ -61,7 +61,7 @@
   /* le menu de la gomme s'ouvre au-dessus de son bouton */
   bar.addEventListener("click", e => { if (innerWidth < 900 || !e.target.closest || !e.target.closest("#penE")) return;
     setTimeout(() => { const g = Q("#popGom"), b = Q("#penE"); if (g && b){ g.style.left = Math.max(8, Math.min(b.offsetLeft, bar.clientWidth - g.offsetWidth - 8)) + "px"; g.style.transform = "none"; } }, 0); });
-  setInterval(() => { try { const bc = (RD.wb || RD.book) && document.hidden === false ? Q("#penCol") : null, cur = bc && bc.querySelector(".pcur"); if (cur && bc.offsetWidth) bc.style.setProperty("--pcb", cur.style.getPropertyValue("--pc") || "#e2483d"); } catch(e){}
+  setInterval(() => { if (!RD.wb && !RD.book) return; try { const bc = (RD.wb || RD.book) && document.hidden === false ? Q("#penCol") : null, cur = bc && bc.querySelector(".pcur"); if (cur && bc.offsetWidth) bc.style.setProperty("--pcb", cur.style.getPropertyValue("--pc") || "#e2483d"); } catch(e){}
     if (!RD.wb) return; const actif = !RD.crayonOff && !RD.eraser && !RD.text;
     try {   /* pastille de la couleur en cours sur « Crayon » */
       const zv = Q("#wbZv"), t = Math.round(RD.z / zMin() * 100) + "%"; if (zv && zv.textContent !== t) zv.textContent = t; } catch(e){}   /* 100 % = la vue de départ du tableau */
@@ -177,5 +177,5 @@
     const plus = Q("#penPlus"); const nav = bar.querySelector(".wbq.nav"); bar.insertBefore(b, nav || plus); b.hidden = !RD.wb; return b; };
   const bC = bouton("wbCalcB", "Calcul", '<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8.5 12h.01M12 12h.01M15.5 12h.01M8.5 16h.01M12 16h.01M15.5 16h.01"/>', () => { calc.hidden = !calc.hidden; });
   const bR = bouton("wbRegB", "Règle", '<path d="M3 16L16 3l5 5L8 21z"/><path d="M7 12l2 2M10 9l2 2M13 6l2 2"/>', () => { if (reg.hidden){ RG.x = Math.round(innerWidth * .22); RG.y = Math.round(innerHeight * .45); RG.a = 0; reg.hidden = false; poser(); } else reg.hidden = true; });
-  setInterval(() => { bC.hidden = bR.hidden = !RD.wb; bC.classList.toggle("on", !calc.hidden); bR.classList.toggle("on", !reg.hidden); }, 400);
+  setInterval(() => { if (!RD.wb && bC.hidden) return; bC.hidden = bR.hidden = !RD.wb; bC.classList.toggle("on", !calc.hidden); bR.classList.toggle("on", !reg.hidden); }, 400);
 })();

@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#1E2A44">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Facture">
 <link rel="apple-touch-icon" href="img/carte-180.png">
-<script src="vieux-navigateur.js"></script><script src="signaler.js?v=2"></script>
+<script src="vieux-navigateur.js?v=271"></script><script src="signaler.js?v=271"></script>
 <style>
 /* © 2026 Jérémy Raymond. Tous droits réservés. Métier+ — facture au client (26 nov.)
    Jeremy : « à la fin de leur projet, les élèves font une facture au client, comme sur les chantiers; ça part de leur carte ».
@@ -358,6 +358,6 @@ async function demarrer(){ if (!C) return entree();
   if (!(await factureOuverte(K.g))) { const n = sessionDEP(K.g); $("#app").innerHTML = `<h1>Facture au client</h1><div class="carte"><p>La facture s'ouvre plus tard dans ton DEP${n ? " (tu es en DEP " + n + ")" : ""}. Ton enseignant te dira quand.</p><a class="btn" href="carte.html">Retour à ma carte</a></div>`; return; } $("#app").innerHTML = `<p class="sous">Chargement…</p>`; await Promise.all([charger(), trouverCoffre()]); await entSync(); liste(); }
 lireK(); demarrer();
 </script>
-<script src="js/journal-perf.js?v=7"></script>
+<script src="js/journal-perf.js?v=8"></script>
 </body>
 </html>

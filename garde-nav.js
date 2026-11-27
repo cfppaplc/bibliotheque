@@ -50,7 +50,7 @@ window.mpPiedHTML = () => {
      vide sa copie hors ligne et recharge une seule fois; un appareil qui n'avait encore rien noté garde simplement la date. */
   function mpForcer(v){ if (!v) return; let vu = null; try { vu = localStorage.getItem("mpForce"); localStorage.setItem("mpForce", v); } catch(e){ return; }
     if (vu === null || vu === v) return;
-    Promise.resolve().then(() => window.caches ? caches.keys().then(k => Promise.all(k.map(n => caches.delete(n)))) : 0)
+    Promise.resolve().then(() => window.caches ? caches.keys().then(k => Promise.all(k.filter(n => n !== "biblio-livres").map(n => caches.delete(n)))) : 0)
       .then(() => navigator.serviceWorker ? navigator.serviceWorker.getRegistrations().then(L => Promise.all(L.map(r => r.update().catch(() => {})))) : 0)
       .catch(() => {}).then(() => location.reload()); }
   /* 25 nov. : message de l'administrateur à tous les enseignants (reglages.annonce = {id, texte, jusqu}), une fois « Compris » il ne revient plus */

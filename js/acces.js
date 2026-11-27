@@ -130,7 +130,7 @@ window.ACCES = (function(){
   const hexC = async t => [...new Uint8Array(await sub.digest("SHA-256", enc.encode(t)))].map(b => b.toString(16).padStart(2, "0")).join("");
   const cleCarteL = (c, k) => sub.digest("SHA-256", enc.encode("metier+|carte-livres-cle|" + c + "|" + k)).then(h => sub.importKey("raw", h, "AES-GCM", false, ["encrypt", "decrypt"]));
   const RPC = "https://kjlotlhqrgekzohshmbn.supabase.co/rest/v1/rpc/", RPCK = "sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY";
-  const rpcC = async (f, a) => { const r = await fetch(RPC + f, { method:"POST", headers:{ apikey:RPCK, "Content-Type":"application/json" }, body:JSON.stringify(a), cache:"no-store" }); if (!r.ok) throw new Error("Internet ne répond pas"); return r.json(); };
+  const rpcC = async (f, a) => { const r = await fetch(RPC + f, { method:"POST", signal:(self.AbortSignal && AbortSignal.timeout) ? AbortSignal.timeout(15000) : undefined, headers:{ apikey:RPCK, "Content-Type":"application/json" }, body:JSON.stringify(a), cache:"no-store" }); if (!r.ok) throw new Error("Internet ne répond pas"); return r.json(); };
   const lireCarteTxt = v => { const m = String(v || "").toUpperCase().replace(/\s+/g, "").match(/MP-?(\d{5})-?([A-Z0-9]{6})/); return m ? { c:m[1], k:m[2] } : null; };
   async function connexionCarte(txt){
     const ca = typeof txt === "string" ? lireCarteTxt(txt) : txt; if (!ca) throw new Error("Ça ressemble à MP-12345-ABC123 (sous le code-barres de ta carte).");

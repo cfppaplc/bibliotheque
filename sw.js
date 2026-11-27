@@ -2,14 +2,22 @@
    - Les pages du site (bibliothèque, accueil, index de recherche) : réseau d'abord, copie gardée si Internet manque.
    - Les livres : copie gardée sur l'ordinateur, ouverte tout de suite; on vérifie en arrière-plan s'il existe une nouvelle version.
    - Les plans et les activités (PDF) : réseau d'abord (version à jour), copie gardée si Internet manque. */
-const CACHE = "biblio-v222";
+const CACHE = "biblio-v223";
+/* 27 nov. (audit de stabilité) : les livres ont leur propre cache, gardée d'une version à l'autre (avant : 62 Mo retéléchargés sur chaque appareil à chaque publication) */
+const LIVRES = "biblio-livres";
 const BASE = ["./", "index.html", "accueil.html", "recherche.json", "nouveautes.json", "carte.html", "js/code128.js?v=1", "js/qrcode.js", "img/metier-plus-blanc.svg"];
 
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(BASE).catch(() => {})).then(() => self.skipWaiting()));
 });
 self.addEventListener("activate", e => {
-  e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim()));
+  e.waitUntil((async () => {
+    const ks = await caches.keys(), L = await caches.open(LIVRES);
+    for (const k of ks) { if (k === CACHE || k === LIVRES) continue;   /* on garde les livres des anciennes versions avant d'effacer */
+      try { const c = await caches.open(k); for (const r of await c.keys()) if (/\/livres\//.test(new URL(r.url).pathname) && !(await L.match(r))) { const m = await c.match(r); if (m) await L.put(r, m); } } catch(x){}
+      await caches.delete(k); }
+    await self.clients.claim();
+  })());
 });
 
 const estFichierLourd = u => /\/(livres|plans|activites)\//.test(u.pathname);
@@ -17,30 +25,35 @@ const estExterne = u => /(^|\.)(cdnjs\.cloudflare\.com|cdn\.jsdelivr\.net|unpkg\
 
 function avecDelai(p, ms) { return Promise.race([p, new Promise((_, r) => setTimeout(() => r(new Error("délai")), ms))]); }
 
-/* Réseau d'abord (4 s), sinon la copie */
+/* Réseau d'abord (4 s), sinon la copie.
+   27 nov. (audit) : « ?t= / ?r= / ?frais= » (anti-cache) ne sont pas gardés (la cache grossissait sans fin);
+   un script ou une feuille avec « ?v= » ne reçoit jamais une autre version gardée tant que le réseau peut répondre (mélange vieux/neuf);
+   la réponse arrivée après les 4 s est quand même gardée. */
+const anti = u => /[?&](t|r|frais|_)=/.test(u.search);
 async function reseauDabord(req) {
-  const c = await caches.open(CACHE);
-  try {
-    const r = await avecDelai(fetch(req, { cache: "no-cache" }), 4000);
-    if (r && r.ok) c.put(req, r.clone());
-    return r;
-  } catch (e) {
+  const c = await caches.open(CACHE), u = new URL(req.url), versionne = /[?&]v=/.test(u.search) && /\.(js|css)$/.test(u.pathname);
+  const net = fetch(req, { cache: "no-cache" }).then(r => { if (r && r.ok && !anti(u)) c.put(req, r.clone()).catch(() => {}); return r; });
+  try { return await avecDelai(net, 4000); }
+  catch (e) {
+    const exact = await c.match(req); if (exact) return exact;
+    if (versionne) { try { return await avecDelai(net, 15000); } catch(x){} }   /* pas la bonne version gardée : on attend encore le réseau */
     const m = await c.match(req, { ignoreSearch: true });
     if (m) return m;
     if (req.mode === "navigate") { const i = await c.match("index.html"); if (i) return i; }
-    throw e;
+    return net;
   }
 }
 
 /* Copie d'abord; mise à jour discrète si le fichier a changé sur le site */
 async function copieDabord(req, evt) {
-  const c = await caches.open(CACHE);
+  const c = await caches.open(LIVRES);
   const url = req.url.split("?")[0];
   /* « ?frais=… » : la copie gardée est périmée (ex. livre rechiffré) → on prend le fichier du site et on remplace la copie */
   if (new URL(req.url).searchParams.has("frais")) {
-    const r = await fetch(url, { cache: "no-store" });
-    if (r.status === 200) await c.put(url, r.clone());
-    return r;
+    try { const r = await fetch(url, { cache: "no-store" });
+      if (r.status === 200) await c.put(url, r.clone());
+      return r; }
+    catch (e) { const g = await c.match(url); if (g) return g; throw e; }   /* hors ligne : la copie gardée plutôt qu'une erreur */
   }
   const m = await c.match(url);
   const verifier = async () => {

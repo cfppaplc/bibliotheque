@@ -31,7 +31,8 @@
   };
   let okRes; window.gardeOk = new Promise(r => okRes = r);
   let fini = false; const fin = ok => { if (!fini) { fini = true; okRes(ok); ouvrir(ok); } };
-  setTimeout(() => fin(false), 4000);
+  let aSession = false;   /* 27 nov. (audit) : réseau lent (TNI) → un enseignant connecté n'est plus refusé au bout de 4 s */
+  setTimeout(() => fin(aSession), 4000);
   try {
     const r = indexedDB.open("acces", 1);
     r.onupgradeneeded = () => r.result.createObjectStore("s");
@@ -39,7 +40,7 @@
     r.onsuccess = () => { try {
       const t = r.result.transaction("s").objectStore("s").get("session");
       t.onerror = () => fin(false);
-      t.onsuccess = () => { const s = t.result; if (!s || !s.id) return fin(false);
+      t.onsuccess = () => { const s = t.result; if (!s || !s.id) return fin(false); aSession = true;
         fetch("comptes.json", {cache: "no-store"}).then(x => x.json()).then(d => { const c = d && d.comptes && d.comptes[s.id]; fin(!!c && !c.eleve); }).catch(() => fin(true)); };
     } catch(e) { fin(false); } };
   } catch(e) { fin(false); }

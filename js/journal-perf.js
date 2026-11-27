@@ -55,9 +55,14 @@
       }
     }
     avant = document.hidden ? 0 : t;
-    requestAnimationFrame(boucle);
+    if (performance.now() < actifJ) requestAnimationFrame(boucle); else { enCours = false; avant = 0; }
   }
-  requestAnimationFrame(boucle);
+  /* 27 nov. (audit de stabilité : « la mesure coûte elle-même ») : on mesure seulement pendant que quelqu'un utilise l'écran
+     (4 s après chaque geste, touche, défilement); au repos, plus aucune boucle à chaque image. */
+  let actifJ = 0, enCours = false;
+  const reveil = () => { actifJ = performance.now() + 4000; if (!enCours) { enCours = true; avant = 0; requestAnimationFrame(boucle); } };
+  ["pointerdown", "pointermove", "keydown", "wheel", "scroll", "touchstart"].forEach(ev => addEventListener(ev, reveil, { capture:true, passive:true }));
+  reveil();
   try {
     new PerformanceObserver(l => l.getEntries().forEach(e => {
       if (e.duration < 150) return;
