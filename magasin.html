@@ -272,6 +272,10 @@ h1{font-size:1.75rem;font-weight:800;margin-bottom:2px}
 .prep-plan,.prep-g{box-shadow:var(--ombre);border:0;border-radius:18px}
 .prep-t{background:#1E2A44;color:#fff}
 .prep-i{padding:14px 16px}.prep-i input{width:34px;height:34px}
+/* 27 nov. (Jeremy : « la case à préparer devrait être plus grosse, éviter les erreurs ») : grosse case carrée, coche blanche sur vert, ligne plus haute */
+.prep-i{min-height:76px}.prep-i input{-webkit-appearance:none;appearance:none;width:52px;height:52px;margin:0;border:3px solid #9AA3B2;border-radius:12px;background:#fff;cursor:pointer;flex:none;display:grid;place-items:center;transition:background .15s,border-color .15s}
+.prep-i input:checked{background:#1E8A55 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5' fill='none' stroke='%23fff' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/36px no-repeat;border-color:#1E8A55}
+.prep-i input:focus-visible{outline:3px solid #EB6A22;outline-offset:2px}.prep-i .q{font-size:1.25rem}
 details.arch>summary{cursor:pointer;font-weight:700;padding:14px 18px;background:#fff;border-radius:18px;box-shadow:var(--ombre);list-style:none}
 
 .mag-code input::placeholder{font:600 1.05rem system-ui,sans-serif;letter-spacing:0}
