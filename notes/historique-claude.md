@@ -878,3 +878,4 @@
 - 27 nov. 14 h 35 (Jeremy : « les élèves ont trop d'historique ») : « Mes paniers envoyés » = seulement les 3 dernières commandes (suivi()). Test ajouté. sw v239.
 - 27 nov. 14 h 50 (Jeremy) : notifications : élève approuvé = « Accepté · viens chercher ta commande » (push + suivi + toast); enseignant = « <prénom ou L'élève code> a fait une commande ». panier-avis redéployée dans le tableau de bord (modif ciblée par executeEdits; le clic « Deploy » par coordonnées avait raté la 1re fois). sw v240.
 - 27 nov. 14 h 55 (Jeremy : « la case à préparer plus grosse, éviter les erreurs ») : .prep-i input = case 52 px (appearance:none, coche blanche sur vert), ligne 76 px, quantité plus grosse. sw v241.
+- 27 nov. 15 h (Jeremy : « au comptoir, la case des commandes à préparer plus grosse ») : #mL .cmd.e-approuve : bordure orange 3 px, prénom 1,6rem, code 1,25rem, avatar 60 px, boutons Préparer/Remis 64 px. sw v242.
