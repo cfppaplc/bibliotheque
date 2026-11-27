@@ -818,3 +818,4 @@
 - 26 nov. : Administration → plan : photos (64 px, toucher = agrandir) dans le contenu d'une case (mgPhoto). Test ajouté.
 - 26 nov. : Administration → plan → case touchée : « Retirer » par raccord (enlève la case de r/r2), recherche « Ajouter un raccord à cette case » (case principale si aucune, sinon ajoutée aux autres cases), rappel de Publier le catalogue. Test ajouté. admin-plus v29, acces.css v18.
 - 26 nov. : bogue (Jeremy : « J5 vide ? ») : 529 cases écrites avec un zéro devant (J-05) n'étaient pas trouvées dans le plan d'Administration. mgN/mgMeme : zéros ignorés, « E-15B » = case 15. Test J-5 ajouté. admin-plus v30. (Comptoir/plan déjà OK : nombre lu avec +.)
+- 26 nov. : vue de face : couleur réelle d'un étage écrite après ses cases (« 143-152 jaune »; jaune/rouge/bleu/vert/gris/noir/blanc), ignorée pour placer le point. J partie 5 : 143-152 en jaune. plan-magasin v12. Test ajouté.

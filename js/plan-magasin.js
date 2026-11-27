@@ -14,8 +14,11 @@ window.PlanMagasin = (function(){
   const ORDRE = ["J", "I", "H", "G", "F", "E", "D", "K"], NPART = 4;
   let CASES = {}, TAILLES = {};   /* TAILLES : longueur relative de chaque partie (1 par défaut; 0 = pas de partie), ex. grande étagère = 4, petite = 1 */
   /* un étage = un groupe entre virgules; « 139-142 + 154-165 » = un même étage fait de deux suites (la place de la case suit l'ordre écrit) */
+  /* 26 nov. (Jeremy : « il y avait des cases jaunes sur la partie 5 ») : un étage peut avoir sa couleur réelle, écrite après ses cases (« 143-152 jaune ») */
+  const COUL_ETAGE = { JAUNE:["#F2C230", "#14213d"], ROUGE:["#C8372D", "#fff"], BLEU:["#2F6FB0", "#fff"], VERT:["#2E8B57", "#fff"], GRIS:["#8a94a6", "#fff"], NOIR:["#222", "#fff"], BLANC:["#fff", "#14213d"] };
+  const COUL_RE = /\s*\b(JAUNE|ROUGE|BLEU|VERT|GRIS|NOIR|BLANC)\b\s*/gi;
   function lireCases(t, lettreDefaut){ const L = []; let l = lettreDefaut;
-    String(t || "").toUpperCase().split(/[,;]/).forEach(g => { const S = [];
+    String(t || "").toUpperCase().split(/[,;]/).forEach(g => { const S = []; g = g.replace(COUL_RE, "");
       g.split("+").forEach(x => { const m = x.trim().match(/^([A-Z])?\s*-?\s*(\d+)\s*(?:-\s*(\d+))?$/); if (!m) return; if (m[1]) l = m[1];
         const a = +m[2], b = m[3] ? +m[3] : a; S.push([l, Math.min(a, b), Math.max(a, b)]); });
       const tot = S.reduce((s, x) => s + x[2] - x[1] + 1, 0); let off = 0; S.forEach(x => { L.push([x[0], x[1], x[2], off, tot]); off += x[2] - x[1] + 1; }); }); return L; }
@@ -93,8 +96,8 @@ window.PlanMagasin = (function(){
       /* 26 nov. (Jeremy : « l'étagère mauve flotte ») : une partie qui a moins d'étages (gros casiers) prend toute la hauteur de l'étagère */
       return S.filter(p => taille(p.n) > 0).map((p, k) => { const G = grp(p), c = COUL[k % 4], hR = G.length ? ((maxR * 24 - 2) - (G.length - 1) * 2) / G.length : 22;
         return `<div style="flex:${taille(p.n)};min-width:0"><div style="font:700 .75rem system-ui;color:${c};margin-bottom:3px">Partie ${p.n}</div>`
-          + (G.length ? G.map(g => `<div style="display:flex;gap:2px;margin-bottom:2px;height:${hR}px">` + g.split("+").flatMap(x => { const m = x.trim().toUpperCase().match(/^([A-Z])?\s*-?\s*(\d+)\s*(?:-\s*(\d+))?$/); return m ? nums(+m[2], m[3] ? +m[3] : +m[2]) : []; })
-              .map(n => `<span data-c="${l}-${n}"${T.has(n) ? ' class="pm-cl"' : ""} style="flex:1;min-width:0;height:100%;cursor:pointer;display:flex;align-items:center;justify-content:center;background:${c};color:#fff;font:700 9px system-ui;border-radius:3px;overflow:hidden">${n}</span>`).join("") + `</div>`).join("")
+          + (G.length ? G.map(g => { const cg = (g.match(COUL_RE) || [""])[0].trim().toUpperCase(), cc = COUL_ETAGE[cg]; g = g.replace(COUL_RE, ""); return `<div style="display:flex;gap:2px;margin-bottom:2px;height:${hR}px">` + g.split("+").flatMap(x => { const m = x.trim().toUpperCase().match(/^([A-Z])?\s*-?\s*(\d+)\s*(?:-\s*(\d+))?$/); return m ? nums(+m[2], m[3] ? +m[3] : +m[2]) : []; })
+              .map(n => `<span data-c="${l}-${n}"${T.has(n) ? ' class="pm-cl"' : ""} style="flex:1;min-width:0;height:100%;cursor:pointer;display:flex;align-items:center;justify-content:center;background:${cc ? cc[0] : c};color:${cc ? cc[1] : "#fff"};${cc && cg === "BLANC" ? "border:1px solid #c9d0da;" : ""}font:700 9px system-ui;border-radius:3px;overflow:hidden">${n}</span>`).join("") + `</div>`; }).join("")
             : `<div style="height:22px;border:2px dashed #c9d0da;border-radius:4px;display:flex;align-items:center;justify-content:center;font:700 .75rem system-ui;color:#8a94a6">à remplir</div>`) + `</div>`; }).join(""); })() + `</div>`).join("") + `</div>`; }
   const place = r => Object.keys(CASES).length > 0 && !!partieDe(r, parties().filter(p => taille(p.n) > 0));   /* la case est-elle placée sur le plan ? */
   return { svg, lettre, parties, vueFace, place, lireCases, set cases(c){ CASES = c || {}; }, get cases(){ return CASES; }, set tailles(t){ TAILLES = t || {}; } };

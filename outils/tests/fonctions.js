@@ -390,6 +390,7 @@ test("Magasin : l'élève (carte scannée) envoie son panier, l'enseignant appro
   const vf = await m.evaluate(() => [PlanMagasin.vueFace("J", [], 0), PlanMagasin.vueFace("J", [], 1), PlanMagasin.vueFace("H", [], 0)]);
   vrai(/haut/.test(vf[0]) && !/du bas/.test(vf[0]) && /du bas/.test(vf[1]) && !/du haut/.test(vf[1]), "Vue de face : les deux étagères J s'affichent au lieu d'une");
   vrai(/à venir/.test(vf[2]), "Vue de face : une rangée sans cases devrait dire « à venir »");
+  vrai(await m.evaluate(() => /#F2C230/.test(PlanMagasin.vueFace("J", [], 1)) && PlanMagasin.place("J-145")), "Vue de face : les cases jaunes 143-152 (partie 5) ne sont pas jaunes ou plus placées");
   for (const c of await m.$$("[data-k]")) { await c.click(); await attendre(150); }
   vrai(await m.$$eval(".pm-s.actif", L => L.length) === 0, "Plan : une rangée clignote encore après tout coché");
   await m.click("#prOk"); await attendre(400); vrai(P[0].etat === "remis", "Remis : " + P[0].etat);
