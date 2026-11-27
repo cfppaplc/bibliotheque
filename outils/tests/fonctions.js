@@ -566,6 +566,15 @@ test("Récupérer mes groupes : les élèves effacés aujourd'hui reviennent à 
   vrai(!D.el.a.x && D.el.a.c === "59564" && D.el.a.t > 1e12 && !D.el.b.x && D.el.v.x && D.val["a|o1"].d === 123 && !D.grp["2606PLC1"].x && D.el.c.c === "33333", "Récupérer : élèves, signatures ou groupes mal remis " + JSON.stringify(D));
   vrai(!errs.length, "Erreurs : " + errs.join(" | ")); await ctx.close();
 });
+test("Magasin : le trajet du magasinier fait une rangée au complet avant la suivante", async b => {   /* 27 nov. */
+  const p = await (await b.newContext({ serviceWorkers: "block" })).newPage(); await p.goto(BASE + "magasin.html"); await attendre(2500);
+  const o = await p.evaluate(async () => { if (!CAT.length) await chargerCatalogue(); const parL = {}; CAT.forEach(a => { if (a.r) (parL[PlanMagasin.lettre(a.r)] = parL[PlanMagasin.lettre(a.r)] || []).push(a.r); });
+    const L = Object.keys(parL).filter(Boolean).slice(0, 5), rs = []; for (let k = 0; k < 3; k++) L.forEach(l => parL[l][k * 5] && rs.push(parL[l][k * 5]));
+    return PlanMagasin.ordre(rs).map(i => PlanMagasin.lettre(rs[i])); });
+  const changements = o.filter((l, k) => k && o[k - 1] !== l).length;
+  vrai(o.length > 6 && changements === new Set(o).size - 1, "Trajet : on revient dans une rangée déjà faite (" + o.join(" ") + ")");
+  await p.context().close();
+});
 test("Carte : l'élève affiche sa carte avec son code à 5 chiffres seulement; trop de codes inconnus = pause", async b => {
   const c = await b.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: "block" }), R = {}, errs = []; let E = 0;
   await c.route(/rpc\/carte_code_(ecrire|lire)/, r => { const a = JSON.parse(r.request().postData()), u = r.request().url(); let out;

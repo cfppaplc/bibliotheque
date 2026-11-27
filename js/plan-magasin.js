@@ -121,8 +121,17 @@ window.PlanMagasin = (function(){
             : `<div style="height:22px;border:2px dashed #c9d0da;border-radius:4px;display:flex;align-items:center;justify-content:center;font:700 .75rem system-ui;color:#8a94a6">à remplir</div>`) + `</div>`; }).join(""); })() + `</div>`).join("") + `</div>`; }
   function ordre(rs){ const { pos, dep, ym, yh } = svg(new Set(), new Set(), rs.map(r => ({ r })), { coords:true }), reste = rs.map((r, i) => i).filter(i => pos[i]), out = [];
     const cout = (a, b) => Math.abs(a[0] - b[0]) < 4 ? Math.abs(a[1] - b[1]) : Math.abs(a[0] - b[0]) + Math.min(Math.abs(a[1] - yh) + Math.abs(b[1] - yh), Math.abs(a[1] - ym) + Math.abs(b[1] - ym));
-    let cur = dep; while (reste.length){ let k = 0; reste.forEach((i, j) => { if (cout(cur, pos[i]) < cout(cur, pos[reste[k]])) k = j; }); const i = reste.splice(k, 1)[0]; out.push(i); cur = pos[i]; }
-    return out.concat(rs.map((r, i) => i).filter(i => !pos[i])); }   /* les cases pas encore placées à la fin */
+    /* 27 nov. (Jeremy : « le magasinier marche rangée par rangée ») : on finit une rangée avant de passer à la suivante.
+       Rangée suivante = la plus proche; dans la rangée, on part du bout le plus proche et on va jusqu'à l'autre bout. */
+    const G = {}; reste.forEach(i => (G[lettre(rs[i]) || "?"] = G[lettre(rs[i]) || "?"] || []).push(i));
+    const sans = {}; rs.forEach((r, i) => { if (!pos[i]) (sans[lettre(r) || "?"] = sans[lettre(r) || "?"] || []).push(i); });   /* cases pas encore placées : avec leur rangée */
+    let cur = dep; while (Object.keys(G).length){
+      let lg = null, dm = Infinity; for (const l in G) for (const i of G[l]) { const d = cout(cur, pos[i]); if (d < dm) { dm = d; lg = l; } }
+      const I = G[lg].sort((a, b) => pos[a][1] - pos[b][1]); delete G[lg];
+      if (cout(cur, pos[I[I.length - 1]]) < cout(cur, pos[I[0]])) I.reverse();
+      I.forEach(i => { out.push(i); cur = pos[i]; }); (sans[lg] || []).forEach(i => out.push(i)); delete sans[lg]; }
+    Object.keys(sans).forEach(l => sans[l].forEach(i => out.push(i)));   /* rangées pas encore sur le plan : dans l'ordre des rangées */
+    return out; }   /* les cases pas encore placées à la fin */
   const place = r => Object.keys(CASES).length > 0 && !!partieDe(r, parties().filter(p => taille(p.n) > 0));   /* la case est-elle placée sur le plan ? */
   return { svg, lettre, parties, vueFace, place, lireCases, ordre, set cases(c){ CASES = c || {}; }, get cases(){ return CASES; }, set tailles(t){ TAILLES = t || {}; }, set maxCases(m){ MAXC = m || {}; } };
 })();
