@@ -1231,6 +1231,11 @@ function animer(boutons){
   setInterval(() => {
     let d = null; try { d = F.contentDocument; } catch(x) {}
     { const sv = d && d.getElementById("bSuite"); finDefi(finForce || !!(sv && /podium|Statistiques de la classe/i.test(sv.textContent))); }
+    /* 26 nov. (Jeremy) : « Quitter la partie » sur la télécommande ou le cellulaire (la télécommande revient au choix des Défi+)
+       ramène aussi l'écran au livre quand le Défi+ a été ouvert depuis un livre */
+    { const vj = d && d.getElementById("vJeu"), enJeu = !!(vj && !vj.classList.contains("cache"));
+      if (enJeu) animer.jeu = true; else if (animer.jeu && d && d.getElementById("vChoix") && !d.getElementById("vChoix").classList.contains("cache")) { animer.jeu = false;
+        if (window.opener && !window.opener.closed) { const b = $("finDefi"); if (b) b.textContent = "Retour au livre…"; setTimeout(() => window.close(), 300); } } }
     document.querySelectorAll("#animBar [data-b]").forEach(b => {
       const v = d && d.getElementById(b.dataset.b);
       if (!v) { b.disabled = true; return; }
