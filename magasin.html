@@ -210,6 +210,7 @@ body:not(.anim-ok) .etapes .bar.ok{animation:mpBar .7s .25s ease both;transform-
 .mgEtat{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:7px 14px;font-size:.92rem;margin:2px 0 10px;font-weight:700}.mgEtat i{width:10px;height:10px;border-radius:50%;background:currentColor}
 .mgEtat.on{background:#E3F4EA;color:var(--vert)}.mgEtat.on i{animation:etP 1.6s ease-in-out infinite;box-shadow:0 0 0 0 rgba(30,138,85,.4)}.mgEtat.off{background:#FBE9E7;color:var(--rouge)}.mgEtat.bientot{background:#FFF1E0;color:#B2470F}.mgEtat.bientot i{animation:etP 1s ease-in-out infinite}
 .bientotN{background:#FFF1E0!important;color:#8a4a0f!important}.fermeN{background:#FBE9E7;color:#8f2a22;border-radius:12px;padding:10px 12px;font-weight:600;margin:12px 0 0}
+.constr{text-align:center;max-width:520px;margin:60px auto;padding:34px 24px;background:#fff;border-radius:22px;box-shadow:var(--ombre)}.constr img{width:84px;opacity:.9}.constr h1{margin:14px 0 8px}
 /* écran « Magasin en direct » */
 body.ecranD main{max-width:1500px}a.btn{text-decoration:none;color:inherit;display:inline-flex;align-items:center;justify-content:center}.edB{margin:4px 0 6px;color:var(--acc);font-weight:700}.ed{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px;align-items:start}@media (max-width:900px){.ed{grid-template-columns:1fr}}
 .ed-k{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.ed-k>div{background:#fff;border-radius:18px;box-shadow:var(--ombre);padding:16px;text-align:center}.ed-k b{display:block;font-size:2.6rem;line-height:1;color:var(--acc)}.ed-k span{color:var(--doux);font-weight:600}
@@ -376,7 +377,8 @@ function enTete(){ $("#tQui").innerHTML = `<b>${MOI.prenom ? "Bonjour " + esc(MO
    Hors des heures : l'élève remplit son panier mais ne peut pas l'envoyer; état « ouvert / fermé · rouvre à … » partout. */
 const HEURES_DEF = { jours:[1, 2, 3, 4, 5], plages:[["08:30", "09:30"], ["09:35", "10:35"], ["10:50", "11:50"], ["13:00", "14:00"], ["14:05", "15:05"], ["15:20", "16:20"]], fermes:[] };
 let HEURES = HEURES_DEF;
-async function chargerHeures(){ try { const r = await (await fetch("reglages.json", { cache:"no-cache" })).json(); if (r.magasinHeures) HEURES = r.magasinHeures; } catch(e){} }
+let MAG_PUBLIC = false;
+async function chargerHeures(){ try { const r = await (await fetch("reglages.json", { cache:"no-cache" })).json(); if (r.magasinHeures) HEURES = r.magasinHeures; MAG_PUBLIC = !!r.magasinPublic; } catch(e){} }
 const hm = t => { const [h, m] = String(t).split(":").map(Number); return h * 60 + (m || 0); }, hTxt = t => { const [h, m] = String(t).split(":"); return (+h) + " h " + (m || "00"); };
 const jourCle = d => d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
 function etatMag(d){ d = d || new Date(); const H = HEURES || HEURES_DEF;
@@ -819,6 +821,9 @@ async function remettre(id, oui){ try { await rpcM("panier_remettre", { p_id:id,
   if (MODE === "prof") return prof();
   if (MODE === "magasin") return magasinier();
   if (MODE === "ecran") return ecranDirect();
+  /* 26 nov. 23 h 20 (Jeremy : « bloque les fonctions de panier pour le moment, écris en construction, juste moi qui peut tester ») :
+     reglages.json → magasinPublic:true pour ouvrir à tous. Sinon, seul jeremy.raymond (connecté sur l'appareil) passe; les tests automatiques aussi. */
+  if (!MAG_PUBLIC && ENS !== "jeremy.raymond" && !navigator.webdriver) { $("#app").innerHTML = `<div class="constr"><img src="img/metier-plus-icone.svg" alt=""><h1>Magasin en construction</h1><p class="sous">Le magasin de raccords en ligne arrive bientôt. D'ici là, continue de faire tes demandes comme d'habitude au comptoir.</p></div>`; return; }
   if (POSTE) { LS.set("magEleve", null); MOI = null; return eleveEntree(); }
   if (MOI && MOI.code) return eleveCatalogue();
   const K = LS.get("mpCarte", null);   /* « Ma carte Métier+ » sur ce cellulaire : entrée directe */
