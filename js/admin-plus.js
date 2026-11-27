@@ -273,7 +273,19 @@ window.ADMIN_PLUS = (function(){
   const mgHaut = l => { const n = mgDans(l + "-00").length; return n ? '<button class="abtn" data-c="' + l + '-00" style="margin-top:8px">Tablette du haut · ' + n + ' article' + (n > 1 ? 's' : '') + '</button>' : ''; };
   function mgCase(z, c){ const L = mgDans(c), t = /-0+$/.test(c) ? c.replace(/-0+$/, "") + " · tablette du haut" : "Case " + c;
     z.innerHTML = '<h4 style="margin:12px 0 6px">' + esc(t) + ' · ' + (L.length ? L.length + ' article' + (L.length > 1 ? 's' : '') : 'vide dans le catalogue') + '</h4>'
-      + L.map(a => { const A = [a.r, ...(a.r2 || [])].filter(x => x && x !== c && !(x.startsWith(c + "-"))); const u = mgPhoto(a); return '<div class="ap-ci">' + (u ? '<img src="' + esc(u) + '" alt="" loading="lazy" referrerpolicy="no-referrer" title="Toucher pour agrandir" onerror="this.outerHTML=\'<span class=ap-ci-v></span>\'">' : '<span class="ap-ci-v"></span>') + '<div><b>' + esc(a.nom) + '</b><small>' + esc(a.n || "") + (A.length ? ' · aussi ' + esc(A.join(", ")) : '') + '</small></div></div>'; }).join(""); }
+      + L.map(a => { const A = [a.r, ...(a.r2 || [])].filter(x => x && x !== c && !(x.startsWith(c + "-"))); const u = mgPhoto(a); return '<div class="ap-ci">' + (u ? '<img src="' + esc(u) + '" alt="" loading="lazy" referrerpolicy="no-referrer" title="Toucher pour agrandir" onerror="this.outerHTML=\'<span class=ap-ci-v></span>\'">' : '<span class="ap-ci-v"></span>') + '<div style="flex:1;min-width:0"><b>' + esc(a.nom) + '</b><small>' + esc(a.n || "") + (A.length ? ' · aussi ' + esc(A.join(", ")) : '') + '</small></div><button class="abtn rouge" data-ret="' + MG.raccords.indexOf(a) + '" title="Retirer ce raccord de la case">Retirer</button></div>'; }).join("")
+      + '<div class="ap-ajc"><input type="text" class="ap-aj" placeholder="Ajouter un raccord à cette case : chercher par nom ou numéro…"><div class="ap-ajl"></div></div>'
+      + (mgChange() ? '<p class="sous" style="margin-top:8px">N\'oublie pas « Publier le catalogue » plus bas pour que le comptoir voie les changements.</p>' : '');
+    const q = z.querySelector(".ap-aj"), ql = z.querySelector(".ap-ajl");
+    q.oninput = () => { const m = mgNorm(q.value).split(/\s+/).filter(Boolean); if (!m.length) { ql.innerHTML = ""; return; }
+      const R = MG.raccords.map((a, i) => [a, i]).filter(([a]) => { const t = mgNorm(a.nom + " " + (a.n || "") + " " + (a.mat || "")); return m.every(w => t.includes(w)) && !mgDans(c).includes(a); }).slice(0, 8);
+      ql.innerHTML = R.length ? R.map(([a, i]) => '<button class="ap-ajb" data-aj="' + i + '"><b>' + esc(a.nom) + '</b><small>' + esc(a.n || "") + (a.r ? ' · ' + esc(a.r) : ' · sans case') + '</small></button>').join("") : '<p class="sous">Aucun raccord trouvé.</p>'; };
+    z.onclick = e => { const b = e.target.closest("[data-ret],[data-aj]"); if (!b) return; e.stopPropagation(); const a = MG.raccords[+(b.dataset.ret || b.dataset.aj)]; if (!a) return;
+      const L0 = [a.r, ...(a.r2 || [])].filter(Boolean), L1 = b.dataset.ret != null ? L0.filter(x => !(x === c || x.startsWith(c + "-"))) : L0.concat(c);
+      a.r = L1[0] || ""; if (L1.length > 1) a.r2 = L1.slice(1); else delete a.r2; mgEtat(); mgCase(z, c); }; }
+  /* 26 nov. (Jeremy : « je veux toucher et pouvoir administrer la case ») : retirer / ajouter un raccord dans la case touchée, puis Publier le catalogue */
+  let mgEtat = () => {};
+  const mgNorm = t => String(t || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
   /* 26 nov. (Jeremy : « j'aimerais voir les photos ») : même photo que l'élève */
   const mgPhoto = a => !a || a.img === "-" ? "" : (a.img || (MG.photos || {})[String(a.type || "").toLowerCase() + "|" + (a.mat || "")] || "");
   async function magasin(z){
@@ -304,7 +316,7 @@ window.ADMIN_PLUS = (function(){
       + '<div class="ap-mg"><div class="ap-mg-l ap-mg-t"><span>N° d\'article</span><span>Nom affiché à l\'élève</span><span>Matériau</span><span>Type</span><span>Diamètre</span><span>Rangée</span><span></span></div>'
       + R.slice(0, 200).map(([a, i]) => '<div class="ap-mg-l" data-i="' + i + '">' + ["n", "nom", "mat", "type", "d", "r"].map(k => '<input type="text" data-k="' + k + '" value="' + esc(a[k]) + '">').join("") + '<button class="abtn rouge" data-sup title="Retirer">×</button></div>').join("")
       + (R.length > 200 ? '<p class="sous">' + (R.length - 200) + ' autres : précise ta recherche.</p>' : '') + '</div></div>';
-    const re = () => magasin(z), etat = () => { const c = mgChange(), e = z.querySelector(".ap-pub .acces-etat"); e.classList.toggle("pub", c); e.textContent = c ? "Des changements attendent d'être publiés" : "Tout est publié"; z.querySelector("#mgPub").disabled = !c; z.querySelector("#mgAnn").disabled = !c; };
+    const re = () => magasin(z), etat = mgEtat = () => { const c = mgChange(), e = z.querySelector(".ap-pub .acces-etat"); e.classList.toggle("pub", c); e.textContent = c ? "Des changements attendent d'être publiés" : "Tout est publié"; z.querySelector("#mgPub").disabled = !c; z.querySelector("#mgAnn").disabled = !c; };
     statsMg(z.querySelector("#mgSt")); aCommanderMg(z.querySelector("#mgAc"));
     { const zs = z.querySelector(".ap-plan-svg"); if (zs) { let face = z.querySelector(".ap-face"); if (!face) { face = document.createElement("div"); face.className = "ap-face"; zs.after(face); }
         zs.onclick = e => { const g = e.target.closest("[data-l]"); if (!g) return; PlanMagasin.cases = (MG.plan || {}).parties || {}; PlanMagasin.tailles = (MG.plan || {}).tailles || {}; face.innerHTML = PlanMagasin.vueFace(g.dataset.l, [], g.dataset.s) + mgHaut(g.dataset.l) + '<div class="ap-case"></div>'; face.scrollIntoView({ block:"nearest" }); };
