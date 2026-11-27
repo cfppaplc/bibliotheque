@@ -136,7 +136,7 @@ input.cache-code:not(:placeholder-shown){-webkit-text-security:disc;text-securit
 .cmd.e-attente,.cmd.e-approuve{box-shadow:inset 4px 0 0 var(--k),0 1px 2px rgba(20,33,61,.05),0 6px 18px rgba(20,33,61,.06)}
 .cmd table{margin:2px 0 6px}.cmd tr+tr td{border-top:1px solid var(--ligne)}.cmd td{border-bottom:0;padding:9px 16px;vertical-align:middle}
 .cmd .rgp{display:inline-block;padding:4px 10px;border-radius:8px;background:#FFF1E6;color:#B2470F;font:800 .95rem ui-monospace,Menlo,Consolas,monospace;white-space:nowrap}
-.cmd .multi{color:var(--acc)}.aussi{display:block;margin-top:3px;font:600 .78rem system-ui,sans-serif;color:var(--doux,#6b7280);white-space:nowrap}
+.cmd .multi{color:var(--acc)}.rinfo{margin:2px 4px 8px;color:var(--doux);font-size:.9rem}.aussi{display:block;margin-top:3px;font:600 .78rem system-ui,sans-serif;color:var(--doux,#6b7280);white-space:nowrap}
 .cmd .qb{display:inline-grid;place-items:center;min-width:30px;height:30px;padding:0 6px;border-radius:99px;background:#14213d;color:#fff;font:800 .92rem system-ui}
 .cmd td.q{width:48px}.cmd td.rg{width:96px}.cmd td small.no{display:block;font:500 .75rem ui-monospace,Menlo,Consolas,monospace;color:var(--doux);margin-top:2px}
 .cmd .h .btn.p,.cmd .h .btn.v{box-shadow:0 2px 6px rgba(0,0,0,.12)}
@@ -165,6 +165,14 @@ input.cache-code:not(:placeholder-shown){-webkit-text-security:disc;text-securit
 .phz{position:fixed;inset:0;z-index:200;background:rgba(10,15,30,.78);display:grid;place-items:center;padding:20px;cursor:zoom-out}
 .phz figure{margin:0;background:#fff;border-radius:18px;padding:16px;max-width:min(520px,92vw);text-align:center;color:#14213d}
 .phz img{width:100%;max-height:60vh;object-fit:contain}.phz figcaption{font-weight:700;margin-top:8px}.phz small{display:block;font-weight:400;color:#667;margin-top:4px}
+.acm .carte{padding:18px}.ac-t{font-size:1.05rem;margin:4px 0 10px}.ac-t+.cherche{margin-bottom:6px}
+.ac-s{display:grid;gap:6px;margin:6px 0 4px}.ac-p,.ac-c,.ac-l{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:8px 10px;border-radius:14px;border:1px solid var(--ligne);background:var(--carte);color:inherit;font:inherit;cursor:pointer}
+.ac-c{border:2px solid var(--vert);background:rgba(30,138,85,.06);margin:8px 0 14px;cursor:default}.ac-libre{border-style:dashed}
+.ac-n{flex:1;min-width:0}.ac-n b{display:block;font-weight:700}.ac-n small{color:var(--doux)}
+.ac-p .ph,.ac-c .ph,.ac-l .ph{flex:none;width:56px;height:56px;border-radius:10px;border:1px solid var(--ligne);background:#fff;padding:3px;display:grid;place-items:center;overflow:hidden;cursor:zoom-in}
+.ac-p .ph img,.ac-c .ph img,.ac-l .ph img{max-width:100%;max-height:100%;object-fit:contain}.ac-p .ph.vide img,.ac-c .ph.vide img,.ac-l .ph.vide img{width:70%;opacity:.3;filter:grayscale(1)}
+.ac-q{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.ac-q [data-dq]{width:56px;font-size:1.5rem}.ac-q #acN{min-width:56px;text-align:center;font-size:1.6rem}
+.ac-l{cursor:default;margin-bottom:8px;border:0}.ac-l .qb{display:inline-grid;place-items:center;min-width:38px;height:38px;padding:0 8px;border-radius:99px;background:#14213d;color:#fff;font-weight:800}
 /* 26 nov. (Jeremy : « on retravaille les interfaces, ça doit être beau »; fluide et facile pour élèves et profs, iPad et cellulaire) : look « propre et pro » */
 :root{--fond:#EEF0F4;--ligne:#DDE1E8;--txt:#16233F;--ombre:0 2px 8px rgba(22,35,63,.10)}
 body{background:var(--fond)}
@@ -215,6 +223,7 @@ details.arch>summary{cursor:pointer;font-weight:700;padding:14px 18px;background
 <div class="ov" id="ov" hidden></div>
 <div class="barre" id="barre" hidden></div>
 <script src="js/qrcode.js"></script><script src="js/code128.js?v=1"></script><script src="js/plan-magasin.js?v=13"></script>
+<script src="js/magasin-recherche.js?v=1"></script>
 <script>
 "use strict";
 const SUPA = "https://kjlotlhqrgekzohshmbn.supabase.co", CLE = "sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY";
@@ -261,7 +270,7 @@ async function trouverEleve(code){
 let CAT = [];
 const diam = d => String(d || "").trim().replace(/\s+/g, "-");   /* « 1 1/2 » → « 1-1/2 » : un seul mot */
 async function chargerCatalogue(){ try { const J = await (await fetch("magasin-catalogue.json", { cache:"no-cache" })).json(); CAT = J.raccords || []; PHOTOS = J.photos || {}; if (window.PlanMagasin) PlanMagasin.cases = (J.plan || {}).parties || {}; PlanMagasin.tailles = (J.plan || {}).tailles || {}; } catch(e){ CAT = []; }
-  CAT.forEach(a => { a._q = norm([a.nom, a.n, a.mat, a.type].join(" ")); a._m = a._q.split(/[\s°]+/); a._d = diam(a.d); }); }
+  if (window.RechercheMag) RechercheMag.preparer(CAT); CAT.forEach(a => { a._q = norm([a.nom, a.n, a.mat, a.type].join(" ")); a._m = a._q.split(/[\s°]+/); a._d = diam(a.d); }); }
 /* recherche : les mots doivent tous se trouver; un nombre seul (2, 3/4, 1 1/2) = le diamètre exact, sauf un angle (90, 45, 22,5) */
 const ANGLES = ["90", "45", "22,5", "22.5", "22"];
 /* 26 nov. (Jeremy : « la recherche doit être flexible, accepter les anglicismes et les synonymes ») : chaque mot cherché peut valoir plusieurs termes du catalogue */
@@ -347,9 +356,12 @@ const ligneArt = a => { const q = PANIER[a.id] || 0;
 function brancherQte(z, apres){ z.querySelectorAll(".art [data-m]").forEach(b => b.onclick = () => { const id = b.closest(".art").dataset.id; PANIER[id] = Math.max(0, Math.min(99, (PANIER[id] || 0) + +b.dataset.m)); if (!PANIER[id]) delete PANIER[id]; sauverPanier();
   const a = CAT.find(x => x.id === id), el = b.closest(".art"); if (a) { el.outerHTML = ligneArt(a); } brancherQte(z, apres); barre(); if (apres) apres(); }); }
 function liste(){
-  const mots = norm(FILTRE.q).replace(/[°"]/g, " ").replace(/\bpo\b|\bpouces?\b/g, " ").replace(/(\d)\s+(\d+\/\d+)/g, "$1-$2").split(/\s+/).filter(Boolean);
-  const L = CAT.filter(a => (!FILTRE.cat || a.cat === FILTRE.cat) && (!FILTRE.mat || a.mat === FILTRE.mat) && (!FILTRE.d || a.d === FILTRE.d) && correspond(a, mots));
-  const z = $("#liste"); z.innerHTML = L.length ? L.slice(0, 120).map(ligneArt).join("") + (L.length > 120 ? `<p class="vide">${L.length - 120} autres : précise ta recherche.</p>` : "") : `<p class="vide">Aucun raccord ne correspond. Essaie moins de mots.</p>`;
+  /* 26 nov. (Jeremy : « la recherche doit comprendre ce que l'élève veut ») : js/magasin-recherche.js (synonymes, mesures, fautes de frappe, meilleurs résultats d'abord) */
+  const filtre = a => (!FILTRE.cat || a.cat === FILTRE.cat) && (!FILTRE.mat || a.mat === FILTRE.mat) && (!FILTRE.d || a.d === FILTRE.d);
+  const r = window.RechercheMag ? RechercheMag.chercher(FILTRE.q, filtre) : { L:CAT.filter(filtre), proche:false, corr:[] }, L = r.L;
+  const aide = (r.corr.length ? `<p class="rinfo">Recherche comprise : ${r.corr.map(([a, b]) => `« ${esc(b)} » pour « ${esc(a)} »`).join(", ")}</p>` : "")
+    + (r.proche && L.length ? `<p class="rinfo">Aucun raccord n'a tous ces mots. Voici les plus proches :</p>` : "");
+  const z = $("#liste"); z.innerHTML = aide + (L.length ? L.slice(0, 120).map(ligneArt).join("") + (L.length > 120 ? `<p class="vide">${L.length - 120} autres : précise ta recherche.</p>` : "") : `<p class="vide">Aucun raccord trouvé. Essaie un autre mot, par exemple « coude », « té » ou « adaptateur ».</p>`);
   brancherQte(z);
 }
 function barre(){ const n = nbPanier(), b = $("#barre"); b.hidden = !n; if (!n) return;
@@ -541,29 +553,43 @@ async function magasinier(){ await nipComptoir();
   i.focus(); charger(); avisComptoir();
 }
 /* 25 nov. (Jeremy : « le magasinier déclare les pièces à commander ») : liste d'achats; l'administration l'imprime en feuille de soumission */
+/* 26 nov. (Jeremy : « pièces à commander : améliore ça, ça doit être facile et on veut voir les photos ») */
 async function aCommander(){
-  const ov = $("#ov"); ov.hidden = false; document.body.style.overflow = "hidden"; let choix = null;
-  ov.innerHTML = `<div class="top"><img src="img/metier-plus-blanc.svg" alt=""><b>Pièces à commander</b><span class="sp"></span><button id="acF">‹ Retour au comptoir</button></div><main>
-    <div class="carte"><label for="acQ"><b>Pièce</b> <span class="sous">(cherche dans le catalogue, ou écris-la)</span></label><input id="acQ" class="pre" autocomplete="off" placeholder="ex. coude 90 ABS 2">
-    <div id="acS"></div><div style="display:flex;gap:8px;margin-top:10px;align-items:end"><label style="flex:0 0 110px"><b>Quantité</b><input id="acN" class="pre" type="number" min="1" max="9999" value="10" inputmode="numeric"></label>
-    <label style="flex:1"><b>Note</b> <span class="sous">(facultatif)</span><input id="acNo" class="pre" maxlength="200" placeholder="ex. bac vide, urgent"></label></div>
-    <p class="err" id="acE"></p><button class="btn p" id="acAj">Ajouter à la liste</button></div>
-    <div class="sec">Liste en cours</div><div id="acL" class="carte" style="padding:0"><p class="vide">Chargement…</p></div></main>`;
+  const ov = $("#ov"); ov.hidden = false; document.body.style.overflow = "hidden"; let choix = null, qte = 1;
+  ov.innerHTML = `<div class="top"><img src="img/metier-plus-blanc.svg" alt=""><b>Pièces à commander</b><span class="sp"></span><button id="acF">‹ Retour au comptoir</button></div><main class="acm">
+    <div class="carte"><h2 class="ac-t">1. Quelle pièce manque ?</h2><div class="cherche" style="position:static;padding:0"><input id="acQ" type="search" autocomplete="off" placeholder="Cherche : coude 90 ABS 2, té cuivre 3/4…"></div>
+      <div id="acS" class="ac-s"></div><div id="acC" class="ac-c" hidden></div>
+      <h2 class="ac-t">2. Combien ?</h2><div class="ac-q"><button class="btn" data-dq="-1" aria-label="Moins">−</button><b id="acN">1</b><button class="btn" data-dq="1" aria-label="Plus">+</button>
+        ${[5, 10, 25, 50].map(n => `<button class="btn petit" data-nq="${n}">${n}</button>`).join("")}</div>
+      <input id="acNo" class="pre" maxlength="200" placeholder="Note (facultatif) : bac vide, urgent…" style="max-width:none;margin-top:12px">
+      <p class="err" id="acE"></p><button class="btn p" id="acAj" style="width:100%">Ajouter à la liste</button></div>
+    <div class="sec">À commander</div><div id="acL"><p class="vide">Chargement…</p></div></main>`;
   const fermer = () => { ov.hidden = true; document.body.style.overflow = ""; $("#mC") && $("#mC").focus(); };
   $("#acF").onclick = fermer;
-  const q = $("#acQ"), sug = () => { choix = null; const mots = norm(q.value).split(/\s+/).filter(Boolean); const L = mots.length ? CAT.filter(a => correspond(a, mots)).slice(0, 6) : [];
-    $("#acS").innerHTML = L.map(a => `<button class="btn" data-ac="${esc(a.id)}" style="display:block;width:100%;text-align:left;margin-top:6px;min-height:42px">${esc(a.nom)} <small class="sous">${esc(a.n)}</small></button>`).join("");
-    $("#acS").querySelectorAll("[data-ac]").forEach(b => b.onclick = () => { choix = CAT.find(a => a.id === b.dataset.ac); q.value = choix.nom; $("#acS").innerHTML = ""; $("#acN").select(); }); };
+  const majQ = () => { $("#acN").textContent = qte; };
+  ov.querySelectorAll("[data-dq]").forEach(b => b.onclick = () => { qte = Math.max(1, Math.min(9999, qte + +b.dataset.dq)); majQ(); });
+  ov.querySelectorAll("[data-nq]").forEach(b => b.onclick = () => { qte = +b.dataset.nq; majQ(); });
+  const carteP = a => `${vignette(a)}<span class="ac-n"><b>${esc(a.nom)}</b><small>${esc([a.n, casesDe({ id:a.id }).map(caseTxt).join(", ")].filter(Boolean).join(" · "))}</small></span>`;
+  const montrerChoix = () => { const c = $("#acC"); if (!choix) { c.hidden = true; return; } c.hidden = false;
+    c.innerHTML = carteP(choix) + `<button class="lien" id="acX">Changer</button>`; $("#acX").onclick = () => { choix = null; montrerChoix(); q.value = ""; q.focus(); }; };
+  const q = $("#acQ"), sug = () => { const t = q.value.trim(); if (!t) { $("#acS").innerHTML = ""; return; }
+    const r = window.RechercheMag ? RechercheMag.chercher(t) : { L:[] }, L = r.L.slice(0, 6);
+    $("#acS").innerHTML = L.map(a => `<div class="ac-p" role="button" tabindex="0" data-ac="${esc(a.id)}">${carteP(a)}</div>`).join("")
+      + `<div class="ac-p ac-libre" role="button" tabindex="0" data-libre="1"><span class="ac-n"><b>« ${esc(t)} »</b><small>Pas dans la liste ? Ajouter ce nom tel quel</small></span></div>`;
+    $("#acS").querySelectorAll("[data-ac]").forEach(b => b.onclick = e => { if (e.target.closest("[data-ph]")) return; choix = CAT.find(a => a.id === b.dataset.ac); $("#acS").innerHTML = ""; q.value = ""; montrerChoix(); });
+    $("#acS").querySelector("[data-libre]").onclick = () => { choix = { id:"", n:"", nom:t }; $("#acS").innerHTML = ""; q.value = ""; montrerChoix(); }; };
   q.oninput = sug;
-  const liste = async () => { const z = $("#acL"); let L; try { L = (await rpc("magasin_acommander_liste", {})).filter(x => !x.fait); } catch(e){ z.innerHTML = `<p class="vide">Liste indisponible.</p>`; return; }
-    z.innerHTML = L.length ? `<table><tr><th>Qté</th><th>Pièce</th><th></th></tr>${L.map(x => `<tr><td class="q">${x.q}</td><td>${esc(x.nom)}${x.n ? ` <small class="sous">${esc(x.n)}</small>` : ""}${x.note ? `<br><small class="sous">${esc(x.note)}</small>` : ""}</td><td><button class="btn" data-acr="${x.id}" style="min-height:38px">Retirer</button></td></tr>`).join("")}</table>` : `<p class="vide">Rien à commander pour l'instant.</p>`;
+  const liste = async () => { const z = $("#acL"); let L; try { L = (await rpc("magasin_acommander_liste", {})).filter(x => !x.fait); } catch(e){ z.innerHTML = `<p class="vide">Pas de connexion pour l'instant. On réessaie tout seul.</p>`; return; }
+    z.innerHTML = L.length ? L.map(x => { const a = CAT.find(c => x.n && c.n === x.n) || { nom:x.nom };
+        return `<div class="ac-l carte">${vignette(a)}<span class="ac-n"><b>${esc(x.nom)}</b><small>${esc([x.n, x.note].filter(Boolean).join(" · "))}</small></span><span class="qb">${x.q}</span><button class="btn petit" data-acr="${x.id}">Retirer</button></div>`; }).join("")
+      : `<p class="vide">Rien à commander pour l'instant.</p>`;
     z.querySelectorAll("[data-acr]").forEach(b => b.onclick = async () => { b.disabled = true; try { await rpcM("magasin_acommander_maj", { p_id:+b.dataset.acr, p_fait:false, p_retirer:true }); } catch(e){} liste(); }); };
-  $("#acAj").onclick = async () => { const nom = (choix ? choix.nom : q.value).trim(), n = +$("#acN").value;
-    if (nom.length < 2 || !(n >= 1)) { $("#acE").textContent = "Écris la pièce et la quantité."; return; }
+  $("#acAj").onclick = async () => { const t = q.value.trim(); if (!choix && t.length >= 2) choix = { id:"", n:"", nom:t };
+    if (!choix) { $("#acE").textContent = "Choisis d'abord la pièce."; q.focus(); return; }
     $("#acAj").disabled = true; $("#acE").textContent = "";
-    try { if (await rpcM("magasin_acommander_ajouter", { p_n:choix ? choix.n : null, p_nom:nom, p_q:n, p_note:$("#acNo").value || null }) !== true) throw new Error("refusé");
-      toast("Ajouté : " + n + " × " + nom); q.value = ""; $("#acNo").value = ""; choix = null; $("#acS").innerHTML = ""; q.focus(); liste(); }
-    catch(e){ $("#acE").textContent = "Impossible d'ajouter : " + e.message; }
+    try { if (await rpcM("magasin_acommander_ajouter", { p_n:choix.n || null, p_nom:choix.nom, p_q:qte, p_note:$("#acNo").value || null }) !== true) throw new Error("refusé");
+      toast("Ajouté : " + qte + " × " + choix.nom); $("#acNo").value = ""; choix = null; qte = 1; majQ(); montrerChoix(); q.value = ""; $("#acS").innerHTML = ""; q.focus(); liste(); }
+    catch(e){ $("#acE").textContent = "Pas pu ajouter. Réessaie dans un instant."; }
     $("#acAj").disabled = false; };
   q.focus(); liste();
 }

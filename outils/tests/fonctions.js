@@ -327,7 +327,7 @@ test("Magasin : l'élève (carte scannée) envoie son panier, l'enseignant appro
   const res = await p.$$eval(".art .tx b", L => L.map(x => x.textContent));
   vrai(res.length >= 1 && /^Coude 90° ABS 2 po/.test(res[0]), "Recherche : " + res.join(" | "));
   /* 26 nov. : recherche flexible (anglicismes, synonymes, pluriels) */
-  for (const [q, re] of [["copper elbow", /coude/i], ["ball valve", /robinet/i], ["nipple noir", /mamelon/i], ["coudes ABS", /coude.*abs/i], ["uponor", /PEX-A/], ["valve 1/2", /robinet|clapet|soupape|vanne/i], ["check valve", /clapet/i]]) {
+  for (const [q, re] of [["cuode 3/4 cuivre", /^coude.*cuivre 3\/4/i], ["je cherche un té de 3/4 en cuivre", /^té cuivre 3\/4/i], ["coude ¾ cuivre", /coude.*3\/4/i], ["copper elbow", /coude/i], ["ball valve", /robinet/i], ["nipple noir", /mamelon/i], ["coudes ABS", /coude.*abs/i], ["uponor", /PEX-A/], ["valve 1/2", /robinet|clapet|soupape|vanne/i], ["check valve", /clapet/i]]) {
     await p.fill("#fQ", q); await attendre(250); const r1 = await p.$$eval("#liste .art b", L => L.map(x => x.textContent));
     vrai(r1.length > 0 && re.test(r1[0]), "Recherche « " + q + " » : " + (r1[0] || "rien")); }
   await p.fill("#fQ", "raccord purge"); await attendre(300);
@@ -361,9 +361,10 @@ test("Magasin : l'élève (carte scannée) envoie son panier, l'enseignant appro
   await m.addInitScript(() => { localStorage.magCle = JSON.stringify("e".repeat(64)); });   /* NIP du comptoir déjà entré sur cet appareil */
   await m.goto(BASE + "magasin.html?mode=magasin"); await attendre(1500);
   /* 25 nov. (Jeremy) : le magasinier déclare une pièce à commander (catalogue), elle s'additionne dans la liste */
-  await m.click("#mAc"); await attendre(400); await m.fill("#acQ", "coude 90 abs 2"); await attendre(300); await m.click("[data-ac]"); await m.fill("#acN", "25"); await m.click("#acAj"); await attendre(800);
+  await m.click("#mAc"); await attendre(400); await m.fill("#acQ", "coude 90 abs 2"); await attendre(300); await m.click("[data-ac]"); await m.click('[data-nq="25"]'); await m.click("#acAj"); await attendre(800);
   vrai(AC.length === 1 && AC[0].q === 25 && /ABS/.test(AC[0].nom) && AC[0].n, "Pièce à commander mal enregistrée : " + JSON.stringify(AC));
   vrai(/25/.test(await m.textContent("#acL")), "La liste du comptoir n'affiche pas la pièce");
+  vrai(!!(await m.$("#acL .ac-l .ph")), "Pièces à commander : pas de photo dans la liste");
   await m.click("#acF"); await attendre(300);
   await m.keyboard.type("MP-45678-AAAAAA"); await m.keyboard.press("Enter"); await attendre(300);
   vrai(!(await m.$("[data-rem]")), "Code 45678 : la commande de 12345 s'affiche");
