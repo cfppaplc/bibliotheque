@@ -458,3 +458,25 @@ end; $$;
 revoke all on function public.panier_avis_vu(text, text, uuid) from public;
 grant execute on function public.panier_avis_vu(text, text, uuid) to anon, authenticated;
 -- suite : outils/magasin-modifier.sql (modifier / annuler par l'élève, 25 nov.)
+
+-- 27 nov. (Jeremy : « sans sa carte, le magasinier doit voir le prénom », qui vient du dossier de l'élève) :
+-- en approuvant, la page de l'enseignant envoie le prénom tiré de SON dossier; il remplace celui de la commande.
+drop function if exists public.panier_decider(text, text, uuid, boolean, text);
+create or replace function public.panier_decider(p_ens text, p_jeton text, p_id uuid, p_ok boolean, p_motif text default null, p_prenom text default null)
+returns boolean language plpgsql security definer set search_path = public, extensions as $$
+declare a jsonb; pr text := nullif(left(split_part(trim(coalesce(p_prenom, '')), ' ', 1), 20), '');
+begin
+  if not public.panier_prof_ok(p_ens, p_jeton) then return false; end if;
+  update public.panier set etat = case when p_ok then 'approuve' else 'refuse' end, t_app = now(), motif = left(nullif(trim(p_motif), ''), 200), prenom = coalesce(pr, prenom)
+    where id = p_id and (ens = p_ens or p_ens = any(profs)) and etat = 'attente' returning abo into a;
+  if not found then return false; end if;
+  if a is not null then
+    perform net.http_post(url := 'https://kjlotlhqrgekzohshmbn.supabase.co/functions/v1/panier-avis', headers := '{"Content-Type":"application/json"}'::jsonb, body := jsonb_build_object('id', p_id, 'eleve', true));
+  end if;
+  if p_ok and exists (select 1 from public.magasin_abo) then
+    perform net.http_post(url := 'https://kjlotlhqrgekzohshmbn.supabase.co/functions/v1/panier-avis', headers := '{"Content-Type":"application/json"}'::jsonb, body := jsonb_build_object('id', p_id, 'comptoir', true));
+  end if;
+  return true;
+end; $$;
+revoke all on function public.panier_decider(text, text, uuid, boolean, text, text) from public;
+grant execute on function public.panier_decider(text, text, uuid, boolean, text, text) to anon, authenticated;

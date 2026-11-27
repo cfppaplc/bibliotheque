@@ -531,6 +531,25 @@ test("Magasin (iPhone) : après « Changer d'élève », la case du code n'est p
   vrai(await p.evaluate(() => document.activeElement.id !== "cCode"), "Changer d'élève (tactile) : la case est placée d'avance par la page (clavier iOS bloqué)");
   await ctx.close();
 });
+test("Magasin : sans carte, l'élève entre sans écrire son prénom; l'enseignant approuve avec le prénom de son dossier", async b => {   /* 27 nov. */
+  const ctx = await b.newContext({ viewport: { width: 390, height: 800 }, hasTouch: true, serviceWorkers: "block" }), DEC = [], errs = [];
+  await ctx.route(/supabase\.co\/rest\/v1\/rpc\/(\w+)/, r => { const f = r.request().url().match(/rpc\/(\w+)/)[1], a = JSON.parse(r.request().postData() || "{}"); let o = null;
+    if (f === "coffre_lire") o = [{ data: JSON.stringify({ grp: ["2606PLC1"], codes: { "2606PLC1": ["59564"] } }) }];
+    else if (f === "panier_prof_lire") o = [{ id: "c1", etat: "attente", t: new Date().toISOString(), ens: "jeremy.raymond", groupe: "2606PLC1", code: "59564", prenom: null, items: [{ n: "X", nom: "Coude", q: 1 }] }];
+    else if (f === "panier_decider") { DEC.push(a); o = true; }
+    r.fulfill({ body: JSON.stringify(o), contentType: "application/json", headers: { "access-control-allow-origin": "*" } }); });
+  await ctx.addInitScript(() => { localStorage.setItem("bienvenueVu", "1"); });
+  const e = await ctx.newPage(); e.on("pageerror", x => errs.push(x.message)); await e.goto(BASE + "magasin.html"); await attendre(1200);
+  await e.fill("#cCode", "59564"); await attendre(1800);
+  vrai(/59564/.test(await e.textContent("#tQui")), "Sans carte : l'élève n'entre pas (prénom encore demandé ?) " + (await e.textContent("#app")).slice(0, 120));
+  await e.evaluate(() => { localStorage.setItem("dernierId", "jeremy.raymond"); localStorage.setItem("magJeton|jeremy.raymond", JSON.stringify("j")); localStorage.setItem("passeportOutils", JSON.stringify({ el: { a: { p: "Alex Tremblay", c: "59564", g: "2606PLC1" } } })); });
+  const q = await ctx.newPage(); q.on("pageerror", x => errs.push(x.message)); await q.goto(BASE + "magasin.html?mode=prof"); await attendre(1800);
+  const tx = await q.textContent("#app");
+  vrai(/Alex/.test(tx) && !/Tremblay/.test(tx), "Page Commandes : le prénom du dossier n'est pas affiché (ou le nom de famille l'est)");
+  await q.click("[data-ok]"); await attendre(1000);
+  vrai(DEC.length === 1 && DEC[0].p_prenom === "Alex", "Approbation : le prénom du dossier n'est pas envoyé au magasinier (" + JSON.stringify(DEC) + ")");
+  vrai(!errs.length, "Erreurs : " + errs.join(" | ")); await ctx.close();
+});
 test("Carte : l'élève affiche sa carte avec son code à 5 chiffres seulement; trop de codes inconnus = pause", async b => {
   const c = await b.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: "block" }), R = {}, errs = []; let E = 0;
   await c.route(/rpc\/carte_code_(ecrire|lire)/, r => { const a = JSON.parse(r.request().postData()), u = r.request().url(); let out;
