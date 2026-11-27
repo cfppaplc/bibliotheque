@@ -618,7 +618,7 @@ const etapes = e => { if (!["attente", "approuve", "remis", "refuse"].includes(e
   return `<div class="etapes">${T.map((t, k) => `${k ? `<span class="bar${k < n || (k === n && e !== "refuse" && e !== "attente") ? " ok" : ""}"></span>` : ""}<span class="et${k < n ? " ok" : ""}${k === n - 1 && e === "refuse" ? " non" : ""}${(e === "attente" && k === 1) || (e === "approuve" && k === 2) ? " cours" : ""}"><i></i>${t}</span>`).join("")}</div>`; };
 async function suivi(){
   clearTimeout(suiviT); notifEleve(); const z = $("#mesEnvois"); if (!z || !MOI) return;
-  const E = LS.get("magEnvois", []).filter(x => x.code === MOI.code && Date.now() - x.t < 7 * 864e5); if (!E.length) { z.innerHTML = ""; return; }
+  const E = LS.get("magEnvois", []).filter(x => x.code === MOI.code && Date.now() - x.t < 7 * 864e5).sort((a, b) => b.t - a.t).slice(0, 3); if (!E.length)   /* 27 nov. (Jeremy) : seulement les 3 dernières commandes */ { z.innerHTML = ""; return; }
   const S = await Promise.all(E.map(x => rpc("panier_etat", { p_id:x.id }).catch(() => null)));
 const LBL = { attente:"En attente de ton enseignant", approuve:"Approuvé · va au comptoir avec ta carte", refuse:"Refusé", remis:"Remis" };
   const cpt = {}; S.forEach(s => { if (s) cpt[s.etat] = (cpt[s.etat] || 0) + 1; });   /* 26 nov. (Jeremy) : paniers envoyés repliés dans une barre */

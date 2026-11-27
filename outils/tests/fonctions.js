@@ -592,6 +592,20 @@ test("Défi+ : le tricheur peut masquer sa bulle (bonne réponse), et elle reste
   await p.evaluate(() => document.querySelector(".trichM").click()); await attendre(150); vrai(await p.isVisible(".trichB .trichT"), "Tricheur : impossible de revoir la bulle");
   vrai(!errs.length, "Erreurs : " + errs.join(" | ")); await ctx.close();
 });
+test("Magasin : l'élève voit seulement ses 3 dernières commandes", async b => {   /* 27 nov. */
+  const ctx = await b.newContext({ viewport: { width: 390, height: 800 }, serviceWorkers: "block" });
+  await ctx.route(/supabase\.co\/rest\/v1\/rpc\/(\w+)/, r => { const f = r.request().url().match(/rpc\/(\w+)/)[1];
+    r.fulfill({ body: JSON.stringify(f === "panier_etat" ? { etat: "remis" } : null), contentType: "application/json", headers: { "access-control-allow-origin": "*" } }); });
+  await ctx.addInitScript(() => { localStorage.setItem("bienvenueVu", "1"); localStorage.setItem("magHeuresTest", "false");
+    localStorage.setItem("magEleve", JSON.stringify({ code: "12345", ens: "jeremy.raymond", groupe: "2606PLC1", profs: [], prenom: "Alex" }));
+    localStorage.setItem("magEnvois", JSON.stringify([1, 2, 3, 4, 5, 6].map(k => ({ id: "c" + k, t: Date.now() - k * 6e4, code: "12345", n: k, items: [] })))); });
+  const p = await ctx.newPage(); await p.goto(BASE + "magasin.html"); await attendre(2500);
+  const n = await p.evaluate(() => (document.querySelector("#mesEnvois .mesP summary b") ? document.querySelectorAll("#mesEnvois [data-ann], #mesEnvois .suivi, #mesEnvois .env").length : -1));
+  const ids = await p.evaluate(() => [...document.querySelectorAll("#mesEnvois [data-sid], #mesEnvois [data-id]")].map(x => x.dataset.sid || x.dataset.id));
+  const txt = await p.textContent("#mesEnvois");
+  vrai(/3 remis/.test(txt), "Mes paniers : plus de 3 commandes affichées (" + txt.slice(0, 120) + ")");
+  await ctx.close();
+});
 test("Carte : l'élève affiche sa carte avec son code à 5 chiffres seulement; trop de codes inconnus = pause", async b => {
   const c = await b.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: "block" }), R = {}, errs = []; let E = 0;
   await c.route(/rpc\/carte_code_(ecrire|lire)/, r => { const a = JSON.parse(r.request().postData()), u = r.request().url(); let out;
