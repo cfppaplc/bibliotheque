@@ -302,9 +302,11 @@ test("Magasin : l'élève (carte scannée) envoie son panier, l'enseignant appro
   const res = await p.$$eval(".art .tx b", L => L.map(x => x.textContent));
   vrai(res.length >= 1 && /^Coude 90° ABS 2 po/.test(res[0]), "Recherche : " + res.join(" | "));
   /* 26 nov. : recherche flexible (anglicismes, synonymes, pluriels) */
-  for (const [q, re] of [["copper elbow", /coude/i], ["ball valve", /robinet/i], ["nipple noir", /mamelon/i], ["coudes ABS", /coude.*abs/i], ["uponor", /PEX-A/], ["valve 1/2", /robinet|clapet|soupape|vanne/i], ["robinet check", /clapet|robinet/i]]) {
+  for (const [q, re] of [["copper elbow", /coude/i], ["ball valve", /robinet/i], ["nipple noir", /mamelon/i], ["coudes ABS", /coude.*abs/i], ["uponor", /PEX-A/], ["valve 1/2", /robinet|clapet|soupape|vanne/i], ["check valve", /clapet/i]]) {
     await p.fill("#fQ", q); await attendre(250); const r1 = await p.$$eval("#liste .art b", L => L.map(x => x.textContent));
     vrai(r1.length > 0 && re.test(r1[0]), "Recherche « " + q + " » : " + (r1[0] || "rien")); }
+  await p.fill("#fQ", "raccord purge"); await attendre(300);
+  vrai(await p.$("#liste .art .ph.vide img[src*=metier-plus]"), "Article sans photo : le logo Métier+ ne s'affiche pas");
   await p.fill("#fQ", ""); await attendre(200);
   await p.fill("#fQ", "té cuivre 3/4"); await attendre(300);
   const r2 = await p.$$eval(".art .tx b", L => L.map(x => x.textContent)); vrai(r2.length >= 1 && r2.every(x => /^Té /.test(x)), "« té » trouve aussi : " + r2.join(" | "));

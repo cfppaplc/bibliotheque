@@ -155,7 +155,7 @@ input.cache-code:not(:placeholder-shown){-webkit-text-security:disc;text-securit
 
 /* 26 nov. : photos des raccords */
 .art .ph{flex:none;width:54px;height:54px;border-radius:10px;border:1px solid var(--ligne);background:#fff;padding:3px;cursor:zoom-in;display:grid;place-items:center;overflow:hidden}
-.art .ph img{max-width:100%;max-height:100%;object-fit:contain}.art .ph.vide{background:transparent;border-style:dashed;cursor:default;opacity:.5}
+.art .ph img{max-width:100%;max-height:100%;object-fit:contain}.art .ph.vide{border-style:dashed;cursor:default}.art .ph.vide img{width:70%;opacity:.3;filter:grayscale(1)}
 .phz{position:fixed;inset:0;z-index:200;background:rgba(10,15,30,.78);display:grid;place-items:center;padding:20px;cursor:zoom-out}
 .phz figure{margin:0;background:#fff;border-radius:18px;padding:16px;max-width:min(520px,92vw);text-align:center;color:#14213d}
 .phz img{width:100%;max-height:60vh;object-fit:contain}.phz figcaption{font-weight:700;margin-top:8px}.phz small{display:block;font-weight:400;color:#667;margin-top:4px}
@@ -288,7 +288,9 @@ function eleveCatalogue(){
 /* 26 nov. (Jeremy : « les élèves doivent confirmer leur choix ») : photo réelle par type de raccord (catalogue.photos « type|matériau »), ou propre à l'article (a.img) */
 let PHOTOS = {};
 const photoDe = a => !a || a.img === "-" ? "" : (a.img || PHOTOS[String(a.type || "").toLowerCase() + "|" + (a.mat || "")] || "");   /* « - » = photo retirée (aucune ne convient) */
-const vignette = a => { const u = photoDe(a); return u ? `<button class="ph" data-ph="${esc(u)}" data-t="${esc(a.nom)}" aria-label="Voir la photo"><img src="${esc(u)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.remove()"></button>` : `<span class="ph vide"></span>`; };
+const vignette = a => { const u = photoDe(a); return u ? `<button class="ph" data-ph="${esc(u)}" data-t="${esc(a.nom)}" aria-label="Voir la photo"><img src="${esc(u)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.outerHTML=SANS_PHOTO"></button>` : SANS_PHOTO; };
+/* 26 nov. (Jeremy) : article sans photo = logo Métier+ pâle au lieu d'un carré vide */
+const SANS_PHOTO = `<span class="ph vide" title="Photo à venir"><img src="img/metier-plus-icone.svg" alt=""></span>`;
 document.addEventListener("click", e => { const b = e.target.closest("[data-ph]"); if (!b) return; e.preventDefault();
   const d = document.createElement("div"); d.className = "phz"; d.innerHTML = `<figure><img src="${esc(b.dataset.ph)}" alt="" referrerpolicy="no-referrer"><figcaption>${esc(b.dataset.t)}<small>Photo d'exemple : la couleur ou la marque peut varier.</small></figcaption></figure>`;
   d.onclick = () => d.remove(); document.body.appendChild(d); });
