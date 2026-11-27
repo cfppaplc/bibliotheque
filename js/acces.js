@@ -46,6 +46,9 @@ window.ACCES = (function(){
     else try { localStorage.setItem("accesCopie", JSON.stringify(DATA)); } catch(e){}
     try { const s = await idbGet("session"); if (s && DATA && DATA.comptes[s.id]) SESSION = Object.assign(s, { nom:DATA.comptes[s.id].nom, admin:!!DATA.comptes[s.id].admin, eleve:!!DATA.comptes[s.id].eleve }); } catch(e){}
     estPret = true; finPret(); majBouton(); try { render(); } catch(e){}
+    /* 26 nov. (Jeremy : « sur la carte, un bouton Mes livres pourrait donner accès à ses livres ») : index.html?macarte → entrée avec Ma carte */
+    if (/[?&]macarte\b/.test(location.search)) { try { history.replaceState(null, "", location.pathname); } catch(e){}
+      if (!SESSION) setTimeout(() => { dlgConnexion(); setTimeout(() => { const mc = document.getElementById("acMaCarte"); if (mc) mc.click(); }, 120); }, 300); }
     relancerDemande(); compterDemandes();
   }
   let NB_DEM = 0;

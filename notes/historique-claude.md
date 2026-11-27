@@ -853,3 +853,4 @@
 - 26 nov. 23 h 25 : magasin élève « en construction » pour tous sauf jeremy.raymond (localStorage dernierId) et les tests (navigator.webdriver). Ouvrir à tous : reglages.json magasinPublic:true. Comptoir, enseignant et écran en direct non touchés.
 - 26 nov. 23 h 30 : magasin en construction — « Accès du personnel » (NIP du comptoir → localStorage magEssai) pour le raccourci iPhone (mémoire séparée, pas de dernierId).
 - 26 nov. 23 h 40 : bandeau ouvert / fermé aussi sur la page enseignant; toucher le bandeau ouvre l'horaire (voirHoraire, .hOv). Tests ajoutés.
+- 26 nov. 23 h 45 : carte.html bouton « Mes livres » → index.html?macarte (acces.js : ouvre la connexion et clique « Entrer avec Ma carte » si pas de session).
