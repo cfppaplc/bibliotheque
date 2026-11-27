@@ -432,6 +432,7 @@ test("Magasin : l'élève (carte scannée) envoie son panier, l'enseignant appro
   { const h = await p.context().newPage(); await h.goto(BASE + "magasin.html"); await h.evaluate(() => localStorage.magHeuresTest = "true");   /* 26 nov. : heures du magasin — fermé = pas d'envoi */
     await h.route(/reglages\.json/, r => r.fulfill({ body: JSON.stringify({ magasinHeures: { jours: [], plages: [["08:00", "09:00"]], fermes: [] } }), contentType: "application/json" }));
     await h.goto(BASE + "magasin.html"); await attendre(1500); vrai(/Magasin fermé/.test(await h.textContent(".mgEtat")), "Heures : l'état « fermé » n'est pas affiché");
+    await h.click(".mgEtat"); await attendre(300); vrai((await h.$$(".hOv .hL.o")).length === 1, "Heures : toucher le bandeau n'ouvre pas l'horaire"); await h.click(".hOv [data-hf]"); await attendre(200);
     await h.click(".art .aj"); await attendre(200); await h.click("#bVoir"); await attendre(300);
     vrai(await h.$eval("#pEnv", b => b.disabled && /fermé/.test(b.textContent)) && !!(await h.$(".fermeN")), "Heures : le panier part même quand le magasin est fermé");
     if (process.env.CAPTURES) await h.screenshot({ path: process.env.CAPTURES + "/ferme.png" }); { const e = await h.evaluate(() => { HEURES = HEURES_DEF; return [etatMag(new Date(2026, 10, 26, 11, 45)), etatMag(new Date(2026, 10, 26, 9, 32)), etatMag(new Date(2026, 10, 26, 12, 10)), etatMag(new Date(2026, 10, 27, 17, 0)), etatMag(new Date(2026, 10, 26, 9, 25))].map(etatTxt); });
@@ -440,6 +441,7 @@ test("Magasin : l'élève (carte scannée) envoie son panier, l'enseignant appro
   await p.click(".art .aj"); await attendre(200); await p.click("#bVoir"); await attendre(300); await p.click("#pEnv"); await attendre(1200);
   await q.reload(); await attendre(1500);
   vrai(/Sans carte étudiante/.test(await q.textContent(".avisMag")), "L'enseignant ne voit pas l'avis du magasinier");
+  vrai(!!(await q.$(".mgEtat")), "Enseignant : pas de bandeau ouvert / fermé du magasin");   /* 26 nov. */
   vrai(await q.$eval(".avisMag .avm", e => e.getBoundingClientRect().width > 250 && getComputedStyle(e).borderRadius === "0px"), "Avis du magasinier : la ligne est écrasée (style d'avatar)");   /* 26 nov., capture de Jeremy */
   if (process.env.CAPTURES) await q.screenshot({ path: process.env.CAPTURES + "/prof-avis.png" });
   vrai(!!(await q.$(".cmd td.vg img, .cmd td.vg svg, .cmd td.vg .vig")), "Enseignant : pas de photo dans la commande à approuver");   /* 26 nov. */

@@ -207,7 +207,9 @@ body:not(.anim-ok) .etapes .bar.ok{animation:mpBar .7s .25s ease both;transform-
 @keyframes mpBarreIn{from{opacity:0;transform:translateY(24px)}}
 .vider{display:block;margin:10px 0 4px auto;color:var(--rouge);font-weight:700}.vider.sur{background:#FBE9E7;border-radius:10px;padding:8px 12px}
 /* heures du magasin */
-.mgEtat{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:7px 14px;font-size:.92rem;margin:2px 0 10px;font-weight:700}.mgEtat i{width:10px;height:10px;border-radius:50%;background:currentColor}
+.mgEtat{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:7px 14px;font:inherit;font-size:.92rem;margin:2px 0 10px;font-weight:700;border:0;cursor:pointer;text-align:left}.mgEtat .mgH{font-weight:600;opacity:.75;font-size:.82rem;margin-left:4px}
+.hOv{position:fixed;inset:0;z-index:60;background:rgba(22,35,63,.5);display:flex;align-items:center;justify-content:center;padding:16px;animation:mpIn .25s ease both}.hBo{background:#fff;border-radius:20px;box-shadow:0 20px 50px rgba(0,0,0,.25);padding:18px;width:100%;max-width:420px;max-height:90vh;overflow:auto}.hT{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}.hT b{font-size:1.2rem}
+.hL{display:flex;justify-content:space-between;align-items:center;border-radius:12px;padding:10px 14px;margin:5px 0;font-weight:700;font-variant-numeric:tabular-nums}.hL em{font-style:normal;font-size:.8rem;text-transform:uppercase;letter-spacing:.05em}.hL.o{background:#E3F4EA;color:#145c39}.hL.o.cour{background:var(--vert);color:#fff}.hL.f{background:#F1F3F6;color:#7b8494;padding:5px 14px;font-size:.88rem}.mgEtat i{width:10px;height:10px;border-radius:50%;background:currentColor}
 .mgEtat.on{background:#E3F4EA;color:var(--vert)}.mgEtat.on i{animation:etP 1.6s ease-in-out infinite;box-shadow:0 0 0 0 rgba(30,138,85,.4)}.mgEtat.off{background:#FBE9E7;color:var(--rouge)}.mgEtat.bientot{background:#FFF1E0;color:#B2470F}.mgEtat.bientot i{animation:etP 1s ease-in-out infinite}
 .bientotN{background:#FFF1E0!important;color:#8a4a0f!important}.fermeN{background:#FBE9E7;color:#8f2a22;border-radius:12px;padding:10px 12px;font-weight:600;margin:12px 0 0}
 .constr{text-align:center;max-width:520px;margin:60px auto;padding:34px 24px;background:#fff;border-radius:22px;box-shadow:var(--ombre)}.constr img{width:84px;opacity:.9}.constr h1{margin:14px 0 8px}
@@ -391,7 +393,18 @@ function etatMag(d){ d = d || new Date(); const H = HEURES || HEURES_DEF;
   for (let i = 1; i <= 21; i++) { const x = new Date(d); x.setDate(d.getDate() + i); if (ouvJ(x)) return { ouvert:false, quand:(i === 1 ? "demain" : x.toLocaleDateString("fr-CA", { weekday:"long" })) + " à " + hTxt(P[0][0]) }; }
   return { ouvert:false, quand:"" }; }
 const etatTxt = e => e.ouvert ? (e.bientot ? "Le magasin ferme bientôt · à " + hTxt(e.fin) + " (dans " + e.reste + " min)" : "Magasin ouvert" + (e.fin ? " · ferme à " + hTxt(e.fin) : "")) : "Magasin fermé" + (e.quand ? " · rouvre " + e.quand : "");
-const etatPill = () => { const e = etatMag(); return `<span class="mgEtat ${e.bientot ? "bientot" : e.ouvert ? "on" : "off"}"><i></i><b>${etatTxt(e)}</b></span>`; };
+const etatPill = () => { const e = etatMag(); return `<button type="button" class="mgEtat ${e.bientot ? "bientot" : e.ouvert ? "on" : "off"}" onclick="voirHoraire()" title="Voir l'horaire du magasin"><i></i><b>${etatTxt(e)}</b><span class="mgH">Horaire ›</span></button>`; };
+/* 26 nov. (Jeremy : « quand on clique dessus, on devrait voir l'horaire ») */
+function voirHoraire(){ const H = HEURES || HEURES_DEF, J = ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"], P = (H.plages || []).slice().sort((a, b) => hm(a[0]) - hm(b[0])), auj = new Date(), m = auj.getHours() * 60 + auj.getMinutes();
+  const jours = J.map((j, k) => ({ j, k })).filter(x => (H.jours || []).includes(x.k)).map(x => x.j), fa = (H.fermes || []).includes(jourCle(auj));
+  const ov = document.createElement("div"); ov.className = "hOv"; ov.onclick = e => { if (e.target === ov || e.target.closest("[data-hf]")) ov.remove(); };
+  ov.innerHTML = `<div class="hBo" role="dialog" aria-label="Horaire du magasin"><div class="hT"><b>Horaire du magasin</b><button class="lien" data-hf>Fermer</button></div>
+    <p class="sous" style="margin:0 0 10px">${jours.length ? esc(jours[0] + (jours.length > 1 ? " au " + jours[jours.length - 1].toLowerCase() : "")) : "Aucun jour d'ouverture"}${fa ? " · <b style='color:var(--rouge)'>fermé aujourd'hui</b>" : ""}</p>
+    ${P.map((p, i) => { const n = P[i + 1], cour = !fa && (H.jours || []).includes(auj.getDay()) && m >= hm(p[0]) && m < hm(p[1]);
+      return `<div class="hL o${cour ? " cour" : ""}"><span>${hTxt(p[0])} – ${hTxt(p[1])}</span><em>${cour ? "En ce moment" : "Ouvert"}</em></div>` + (n ? `<div class="hL f"><span>${hTxt(p[1])} – ${hTxt(n[0])}</span><em>${hm(n[0]) - hm(p[1]) > 20 ? "Dîner · fermé" : "Pause"}</em></div>` : ""); }).join("")}
+    <p class="sous" style="margin:10px 0 0">Fermé les fins de semaine, les jours fériés et les journées pédagogiques.</p></div>`;
+  document.body.appendChild(ov); }
+
 function majEtat(){ const e = etatMag(); document.querySelectorAll(".mgEtat").forEach(el => { el.className = "mgEtat " + (e.bientot ? "bientot" : e.ouvert ? "on" : "off"); el.querySelector("b").textContent = etatTxt(e); });
   const b = $("#pEnv"); if (b && !b.dataset.envoi) { const ferme = !e.ouvert; if (ferme !== !!b.dataset.ferme) { if (ferme) { b.dataset.txt = b.textContent; b.textContent = "Magasin fermé · rouvre " + (e.quand || "bientôt"); b.disabled = true; b.dataset.ferme = "1"; } else { b.textContent = b.dataset.txt || "Envoyer à mon enseignant"; delete b.dataset.ferme; b.disabled = !nbPanier(); } } } }
 setInterval(() => { if (document.querySelector(".mgEtat, #pEnv")) majEtat(); }, 20000);
@@ -550,7 +563,7 @@ async function dessinerProf(){
   const neufs = att.filter(p => !VUS.has(p.id)); if (neufs.length && VUS.size) bip(); att.forEach(p => VUS.add(p.id)); LS.set("magVus", [...VUS].slice(-300));
   const avis = "Notification" in window && "serviceWorker" in navigator && "PushManager" in window, perm = avis ? Notification.permission : "non";
   const ios = /iPhone|iPad|iPod/.test(navigator.userAgent) && !window.navigator.standalone && !matchMedia("(display-mode: standalone)").matches;
-  $("#app").innerHTML = `<h1>Commandes à approuver</h1><p class="sous">${att.length ? att.length + " panier" + (att.length > 1 ? "s" : "") + " en attente." : "Aucun panier en attente."}</p>
+  $("#app").innerHTML = `<h1>Commandes à approuver</h1>${etatPill()}<p class="sous">${att.length ? att.length + " panier" + (att.length > 1 ? "s" : "") + " en attente." : "Aucun panier en attente."}</p>
     <div class="avis-l" id="avisZ">${perm === "granted" && LS.get("magAbonne|" + ENS, false) ? `<button class="cloche on" id="avTest" title="Notifications activées · toucher pour essayer" aria-label="Notifications activées, essayer">${CLOCHE}</button><button class="lien" id="avNon">Désactiver les notifications</button>` : (`<button class="cloche" id="avOui" title="Activer les notifications" aria-label="Activer les notifications">${CLOCHE}</button>`)}<p class="err" id="avErr" style="min-height:0;margin:0;width:100%"></p></div>
     ${AVIS.length ? `<div class="sec">Avis du magasinier</div><div class="carte avisMag">${AVIS.map(a => `<div class="avm"><span><b>${esc(a.prenom || "Élève")}</b> <small class="sous">${esc(a.code)} · ${esc(a.groupe)} · ${heure(a.t)}</small><br>${esc(REGLES_L[a.regle] || "?")}</span><button class="btn" data-vu="${esc(a.id)}" title="Retirer de cette page (reste dans le dossier de l'élève)">Vu</button></div>`).join("")}<p class="sous" style="margin:8px 0 0">« Vu » retire l'avis d'ici; il reste dans le dossier de l'élève.</p></div>` : ""}
     <a class="btn edB" href="magasin.html?mode=ecran">Magasin en direct</a>
