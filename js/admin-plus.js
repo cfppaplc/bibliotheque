@@ -230,6 +230,7 @@ window.ADMIN_PLUS = (function(){
       + '<div><h4>Jours les plus achalandés</h4>' + barres(sem, { titre:"Jours de la semaine" }) + '</div>'
       + (top.length ? '<div><h4>Raccords les plus demandés</h4><div class="ap-top">' + top.map(r => '<div title="' + esc(r.nom + " : " + r.q) + '"><span>' + esc(r.nom) + '</span><i style="width:' + Math.max(2, 100 * r.q / mx) + '%"></i><b>' + r.q + '</b></div>').join("") + '</div></div>' : "")
       + '</div>'; }
+  let ST_TOUT = false;
   async function statsMg(c){ if (!c) return;
     const jour = d => d.toISOString().slice(0, 10), auj = new Date(), an = auj.getMonth() >= 7 ? auj.getFullYear() : auj.getFullYear() - 1;
     const P = { "7":["7 jours", jour(new Date(Date.now() - 6 * 864e5))], "30":["30 jours", jour(new Date(Date.now() - 29 * 864e5))], "an":["Depuis le 1er août", an + "-08-01"], "tout":["Tout", "2026-01-01"] };
@@ -242,10 +243,13 @@ window.ADMIN_PLUS = (function(){
       + (L.length ? '<button class="abtn" id="stCsv" style="margin-left:auto">Exporter (CSV)</button>' : '') + '</div>'
       + achalandage(A, L, P[ST_P][1])
       + (L.length ? '<table class="ap-st"><thead><tr><th>Raccord</th><th>N° d\'article</th><th>Quantité</th><th>Commandes</th></tr></thead><tbody>'
-        + L.map(r => '<tr><td>' + esc(r.nom) + '</td><td>' + esc(r.n) + '</td><td><b>' + r.q + '</b></td><td>' + r.fois + '</td></tr>').join("") + '</tbody></table>'
+        + L.map((r, k) => '<tr' + (k >= 5 && !ST_TOUT ? ' hidden' : '') + '><td>' + esc(r.nom) + '</td><td>' + esc(r.n) + '</td><td><b>' + r.q + '</b></td><td>' + r.fois + '</td></tr>').join("") + '</tbody></table>'
+        /* 26 nov. (Jeremy : « pas besoin de voir toute la liste par défaut ») : les 5 plus sortis, puis « Voir les N » */
+        + (L.length > 5 ? '<button class="abtn" id="stTout" style="margin-top:6px">' + (ST_TOUT ? 'Voir seulement les 5 plus sortis' : 'Voir les ' + L.length + ' raccords') + '</button>' : '')
         : '<p class="sous">Aucun raccord remis pour cette période. Les raccords comptent quand le magasinier touche « Remis à l\'élève ».</p>');
     c.querySelectorAll("[data-stp]").forEach(b => b.onclick = () => { ST_P = b.dataset.stp; statsMg(c); });
     c.querySelector("#stG").onchange = e => { ST_G = e.target.value; statsMg(c); };
+    const vt = c.querySelector("#stTout"); if (vt) vt.onclick = () => { ST_TOUT = !ST_TOUT; c.querySelectorAll(".ap-st tbody tr").forEach((tr, k) => tr.hidden = k >= 5 && !ST_TOUT); vt.textContent = ST_TOUT ? "Voir seulement les 5 plus sortis" : "Voir les " + L.length + " raccords"; };
     const x = c.querySelector("#stCsv"); if (x) x.onclick = () => { const csv = "Raccord;N° d'article;Quantité;Commandes\n" + L.map(r => [r.nom, r.n, r.q, r.fois].map(v => '"' + String(v ?? "").replace(/"/g, '""') + '"').join(";")).join("\n");
       const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob(["\ufeff" + csv], { type:"text/csv" })); a.download = "raccords-sortis-" + P[ST_P][1] + (ST_G ? "-" + ST_G : "") + ".csv"; a.click(); };
   }
@@ -287,6 +291,8 @@ window.ADMIN_PLUS = (function(){
       const L0 = [a.r, ...(a.r2 || [])].filter(Boolean), L1 = b.dataset.ret != null ? L0.filter(x => !mgMeme(x, c)) : L0.concat(c);
       a.r = L1[0] || ""; if (L1.length > 1) a.r2 = L1.slice(1); else delete a.r2; mgEtat(); mgCase(z, c); }; }
   /* 26 nov. (Jeremy : « je veux toucher et pouvoir administrer la case ») : retirer / ajouter un raccord dans la case touchée, puis Publier le catalogue */
+  /* 26 nov. (Jeremy) : 5 raccords par défaut, 60 quand on cherche */
+  const MG_LIM = () => MG_Q.trim() ? 60 : 5;
   let mgEtat = () => {};
   function mgSituer(z, a){ const P = window.PlanMagasin; if (!P || !a) return; P.cases = (MG.plan || {}).parties || {}; P.tailles = (MG.plan || {}).tailles || {};
     const C = [a.r, ...(a.r2 || [])].filter(Boolean), c = C.find(x => P.place(x)) || C[0] || "", l = P.lettre(c), num = +((String(c).match(/(\d+)/) || [])[1] || 0);
@@ -325,12 +331,12 @@ window.ADMIN_PLUS = (function(){
       + '<p class="sous" style="font-size:.8rem">CSV : colonnes <b>numéro; nom; matériau; type; diamètre; rangée</b> (première ligne = titres). Dans Excel : Fichier → Enregistrer sous → CSV.</p>'
       + '<input type="text" id="mgQ" placeholder="Chercher dans le catalogue…" value="' + esc(MG_Q) + '" style="margin:6px 0 10px">'
       /* 26 nov. (Jeremy : « simplifie le catalogue; on devrait avoir le bouton Situer sur le plan ») : une ligne lisible par raccord, Modifier ouvre les champs */
-      + '<div class="ap-mg">' + R.slice(0, 60).map(([a, i]) => { const u = mgPhoto(a), C = [a.r, ...(a.r2 || [])].filter(Boolean);
+      + '<div class="ap-mg">' + R.slice(0, MG_LIM()).map(([a, i]) => { const u = mgPhoto(a), C = [a.r, ...(a.r2 || [])].filter(Boolean);
           return '<div class="ap-mg-r" data-i="' + i + '">' + (u ? '<img src="' + esc(u) + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.outerHTML=\'<span class=ap-ci-v></span>\'">' : '<span class="ap-ci-v"></span>')
             + '<div class="t"><b>' + esc(a.nom) + '</b><small>' + esc([a.n, a.mat, C.length ? "case " + C.join(", ") : "sans case"].filter(Boolean).join(" · ")) + '</small></div>'
             + (C.length ? '<button class="abtn" data-sit>Situer</button>' : '') + '<button class="abtn" data-mod>' + (MG_MOD === i ? 'Fermer' : 'Modifier') + '</button></div>'
             + (MG_MOD === i ? '<div class="ap-mg-ed" data-i="' + i + '">' + [["n", "N° d'article"], ["nom", "Nom affiché à l'élève"], ["mat", "Matériau"], ["type", "Type"], ["d", "Diamètre"], ["r", "Case principale"]].map(([k, t]) => '<label>' + t + '<input type="text" data-k="' + k + '" value="' + esc(a[k]) + '"></label>').join("") + '<button class="abtn rouge" data-sup>Retirer du catalogue</button></div>' : ''); }).join("")
-      + (R.length > 60 ? '<p class="sous">' + (R.length - 60) + ' autres : précise ta recherche.</p>' : '') + '</div></div>';
+      + (R.length > MG_LIM() ? '<p class="sous">' + (R.length - MG_LIM()) + ' autres : cherche un raccord pour les voir.</p>' : '') + '</div></div>';
     const re = () => magasin(z), etat = mgEtat = () => { const c = mgChange(), e = z.querySelector(".ap-pub .acces-etat"); e.classList.toggle("pub", c); e.textContent = c ? "Des changements attendent d'être publiés" : "Tout est publié"; z.querySelector("#mgPub").disabled = !c; z.querySelector("#mgAnn").disabled = !c; };
     statsMg(z.querySelector("#mgSt")); aCommanderMg(z.querySelector("#mgAc"));
     { const zs = z.querySelector(".ap-plan-svg"); if (zs) { let face = z.querySelector(".ap-face"); if (!face) { face = document.createElement("div"); face.className = "ap-face"; zs.after(face); }

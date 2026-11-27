@@ -123,6 +123,7 @@ test("Administration : chaque onglet s'ouvre; Quoi de neuf se modifie et s'annul
     vrai(await p.$$eval("#mgPlan .ap-ci", L => L.length) === nb0, "Case : « Ajouter » ne remet pas le raccord dans la case");
     await p.click("#mgAnn"); await attendre(400);
     /* 26 nov. : catalogue simplifié; « Situer » ouvre l'étagère de face avec la case du raccord */
+    vrai(await p.$$eval(".ap-mg-r", L => L.length) === 5, "Catalogue : 5 raccords attendus sans recherche");
     await p.fill("#mgQ", "clapet antiretour 1 po F laiton"); await attendre(500);
     vrai(!(await p.$(".ap-mg-l input")), "Catalogue : les champs doivent être fermés (bouton Modifier)");
     await p.evaluate(() => [...document.querySelectorAll(".ap-mg-r")].find(r => r.querySelector("b").textContent.trim() === "Clapet antiretour 1 po F laiton").querySelector("[data-sit]").click()); await attendre(400);
