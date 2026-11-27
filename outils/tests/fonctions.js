@@ -493,13 +493,20 @@ test("Facture : l'élève (sa carte) fait une facture, importe ses raccords du m
   await p.click("#nv"); await attendre(300);
   vrai(/@exemple\.com$/.test(await p.inputValue('[data-c="client.courriel"]')) && /418 555-/.test(await p.inputValue('[data-c="client.tel"]')), "Client fictif non tiré au hasard");
   await p.fill('[data-c="client.nom"]', "Mme Gagnon"); await p.press('[data-c="client.nom"]', "Tab");
+  vrai(!!(await p.$(".fst.ok")), "Facture : l'étape Client n'est pas cochée");   /* 26 nov. : facture en 4 étapes */
+  await p.click('.fnav [data-et="2"]'); await attendre(200);
   await p.fill('[data-l="mo.0.h"]', "3"); await p.press('[data-l="mo.0.h"]', "Tab"); await p.fill('[data-l="mo.0.taux"]', "95"); await p.press('[data-l="mo.0.taux"]', "Tab"); await attendre(200);
+  await p.click('.fnav [data-et="3"]'); await attendre(200);
   await p.click("#imp"); await attendre(800); await p.check('[data-tout="0"]'); await p.click("#impOk"); await attendre(300);   /* coche la commande du 25 nov. seulement */
   vrai((await p.$$('[data-l^="mat."][data-l$=".d"]')).length === 2, "Raccords cochés non importés");
+  vrai((await p.$$(".fm .fph")).length === 2 && !!(await p.$(".fm.sansprix")) && !!(await p.$(".avisP")), "Matériel : photos ou avis « prix manquant » absents");
+  await p.click('[data-mq="1|1"]'); await attendre(200); vrai(await p.inputValue('[data-l="mat.1.q"]') === "3", "Matériel : le bouton + ne change pas la quantité"); await p.click('[data-mq="1|-1"]'); await attendre(200);
   await p.fill('[data-l="mat.0.prix"]', "4,50"); await p.press('[data-l="mat.0.prix"]', "Tab"); await attendre(200);
   const tot = await p.textContent("#barre"); vrai(/358,72/.test(tot.replace(/\s/g, "")), "Total faux : " + tot);   /* 3 h × 95 $ + 6 × 4,50 $ = 312 $ + TPS + TVQ */
   await p.click("#cat"); await attendre(500); await p.fill("#cQ", "té cuivre 1/2"); await attendre(200); await p.click("#cR [data-a]"); await p.click("#cX"); await attendre(300);
   vrai(/^\d+,\d\d$/.test(await p.inputValue('[data-l="mat.2.prix"]')), "Raccord de la liste du magasin : prix non prérempli");
+  if (process.env.CAPTURES) await p.screenshot({ path: process.env.CAPTURES + "/facture-materiel.png" });
+  await p.click('.fnav [data-et="4"]'); await attendre(300);
   await (await p.$("#sig")).scrollIntoViewIfNeeded(); const bx = await (await p.$("#sig")).boundingBox(); await p.mouse.move(bx.x + 20, bx.y + 40); await p.mouse.down(); await p.mouse.move(bx.x + 200, bx.y + 100, { steps: 8 }); await p.mouse.up();
   await p.click("#sigOk"); await attendre(300); vrai(/Signée par Mme Gagnon/.test(await p.textContent("#app")), "Signature non enregistrée");
   const [dl] = await Promise.all([p.waitForEvent("download", { timeout: 8000 }), p.click("#pdf")]);

@@ -43,6 +43,35 @@ table.l td.n{width:90px}table.l td.x{width:44px}table.l input{min-height:40px}
 .toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--nuit);color:#fff;padding:10px 16px;border-radius:12px;z-index:9}
 /* 26 nov. (Jeremy : « on ne devrait pas voir les chiffres quand on les écrit, comme un mot de passe ») */
 input.cache-code:not(:placeholder-shown){-webkit-text-security:disc;text-security:disc}
+/* 26 nov. (Jeremy : « 1-2-6 ») : même look que le magasin, facture en 4 étapes, matériel avec photos */
+:root{--fond:#EEF0F4;--ligne:#DDE1E8;--nuit:#16233F;--ombre:0 2px 8px rgba(22,35,63,.10)}
+.carte{border:0;border-radius:18px;box-shadow:var(--ombre);padding:18px 20px}
+.btn{border-radius:14px;transition:transform .12s ease,background-color .2s ease}.btn:active{transform:scale(.96)}.btn.petit{min-height:40px;padding:0 14px}
+.lien{background:none;border:0;padding:8px 0;font:inherit;font-weight:700;color:var(--bleu);cursor:pointer}
+input,textarea,select{border-radius:12px;border-color:var(--ligne)}
+.fh{display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-size:1.6rem;margin:2px 0 10px}.cachet{border:2.5px solid #B83227;color:#B83227;border-radius:8px;padding:2px 10px;font-size:.8rem;letter-spacing:.12em;transform:rotate(-4deg);display:inline-block}
+.carte .fh2{display:flex;align-items:center;gap:10px;font-size:1.05rem;color:var(--nuit);text-transform:none;letter-spacing:0;margin:0 0 12px}.fh2 .sous{font-weight:400}
+.fsteps{display:flex;align-items:flex-start;background:#fff;border-radius:18px;box-shadow:var(--ombre);padding:14px 12px 10px;margin:0 0 4px;position:sticky;top:58px;z-index:4}
+.fst{flex:none;display:flex;flex-direction:column;align-items:center;gap:5px;background:none;border:0;font:inherit;font-size:.85rem;font-weight:700;color:var(--gris);cursor:pointer;min-width:64px;padding:0}
+.fst i{font-style:normal;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;border:2.5px solid #C8CED9;background:#fff;color:var(--gris);font-weight:800;transition:all .25s ease}
+.fst.ok i{background:var(--vert);border-color:var(--vert);color:#fff}.fst.ok{color:var(--vert)}
+.fst.cours i{border-color:var(--acc);color:var(--acc);box-shadow:0 0 0 5px rgba(235,106,34,.15)}.fst.cours.ok i{background:var(--acc);border-color:var(--acc);color:#fff}.fst.cours{color:#B2470F}
+.fbar{flex:1;height:3px;border-radius:3px;background:#DDE1E8;margin:16px 2px 0;transition:background .3s ease}.fbar.ok{background:var(--vert)}
+.fnav{display:flex;justify-content:space-between;gap:10px;margin:14px 0 6px}.fnav .btn{min-height:52px}.fnav .btn.p{flex:1;max-width:340px;margin-left:auto}
+.fent{display:flex;gap:14px;align-items:center}
+.fpied{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px;color:var(--gris)}.fpied b{color:var(--nuit)}
+.fimp{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}.vide{color:var(--gris);text-align:center;padding:14px 6px;margin:0}
+.fms{display:flex;flex-direction:column;gap:8px}
+.fm{display:grid;grid-template-columns:52px minmax(0,1fr) auto 104px 44px;gap:10px;align-items:center;padding:10px;border-radius:14px;background:#F6F7FA;transition:background .2s ease}
+.fm.sansprix{background:#FFF4E5;box-shadow:inset 0 0 0 1.5px #F5B971}
+.fph{width:52px;height:52px;border-radius:10px;background:#fff;border:1px solid var(--ligne);display:grid;place-items:center;overflow:hidden;padding:3px}.fph img{max-width:100%;max-height:100%;object-fit:contain}.fph.vide{border-style:dashed}.fph.vide img{width:70%;opacity:.3;filter:grayscale(1)}
+.fm-n input{min-height:40px;background:#fff}.fm-n small{display:block;margin-top:3px}.np{color:#B2470F;font-weight:700}
+.fm-q{display:flex;align-items:center;gap:4px}.fm-q button{width:38px;height:40px;border-radius:10px;border:0;background:#E3E7EE;font-size:1.25rem;font-weight:700;cursor:pointer;color:var(--nuit)}.fm-q button:active{transform:scale(.94)}.fm-q input{width:52px;min-height:40px;text-align:center;padding:4px;background:#fff}
+.fm-p{position:relative}.fm-p input{min-height:40px;padding-right:22px;text-align:right;background:#fff}.fm-p span{position:absolute;right:9px;top:50%;transform:translateY(-50%);color:var(--gris)}
+.avisP{background:#FFF4E5;color:#8a4a0f;border-radius:12px;padding:10px 12px;margin:10px 0 0;font-weight:600}
+@media (max-width:620px){.fm{grid-template-columns:52px minmax(0,1fr) 44px;grid-template-areas:"ph n x" "q q p"}.fm>.fph{grid-area:ph}.fm-n{grid-area:n}.fm>.x{grid-area:x}.fm-q{grid-area:q}.fm-p{grid-area:p;width:110px;justify-self:end}.fst{min-width:54px;font-size:.78rem}}
+@media (prefers-reduced-motion:no-preference){#app.anim .carte,#app.anim .fnav{animation:mpIn .4s cubic-bezier(.2,.8,.2,1) both}#app.anim .carte:nth-of-type(2){animation-delay:.06s}#app.anim .carte:nth-of-type(3){animation-delay:.12s}.toast{animation:mpToast .3s cubic-bezier(.2,.8,.2,1) both}}
+@keyframes mpIn{from{opacity:0;transform:translateY(10px)}}@keyframes mpToast{from{opacity:0;transform:translate(-50%,14px)}}
 </style>
 <script src="js/session-dep.js?v=5"></script>
 </head>
@@ -56,7 +85,7 @@ const LS = { get:(k, d) => { try { const v = localStorage.getItem(k); return v =
 const API = "https://kjlotlhqrgekzohshmbn.supabase.co/rest/v1/rpc/", CLE = "sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY", te = new TextEncoder(), td = new TextDecoder();
 const rpc = async (f, a) => { const r = await fetch(API + f, { method:"POST", headers:{ apikey:CLE, "Content-Type":"application/json" }, body:JSON.stringify(a || {}), cache:"no-store" }); if (!r.ok) throw new Error("Internet ne répond pas"); return r.json(); };
 const hex = async s => [...new Uint8Array(await crypto.subtle.digest("SHA-256", te.encode(s)))].map(b => b.toString(16).padStart(2, "0")).join("");
-const toast = t => { const d = document.createElement("div"); d.className = "toast"; d.textContent = t; document.body.appendChild(d); setTimeout(() => d.remove(), 2600); };
+const toast = t => { document.querySelectorAll(".toast").forEach(x => x.remove()); const d = document.createElement("div"); d.className = "toast"; d.textContent = t; document.body.appendChild(d); setTimeout(() => d.remove(), 2600); };
 const argent = n => (Math.round((+n || 0) * 100) / 100).toLocaleString("fr-CA", { minimumFractionDigits:2, maximumFractionDigits:2 }) + " $";
 const num = v => { const n = parseFloat(String(v ?? "").replace(/\s/g, "").replace(",", ".")); return isFinite(n) ? n : 0; };
 const TPS = 0.05, TVQ = 0.09975;
@@ -185,25 +214,47 @@ function nouvelle(){ const prec = F[0] || {}, a = new Date().getFullYear(), n = 
 
 /* ---------- la facture ---------- */
 let FA = null;
-function ouvrir(id){ FA = F.find(f => f.id === id); if (!FA) return liste(); if (!FA.signee && ENT) FA.ent = Object.assign({}, ENT); window.scrollTo(0, 0); dessiner(); }
+let ET = 1, ET_VU = 0;   /* 26 nov. (Jeremy : « 1-2-6 ») : la facture en 4 étapes */
+async function ouvrir(id){ FA = F.find(f => f.id === id); if (!FA) return liste(); if (!FA.signee && ENT) FA.ent = Object.assign({}, ENT); ET = FA.signee ? 4 : 1; ET_VU = 0; window.scrollTo(0, 0); await catalogue(); if (FA && FA.id === id) dessiner(); }
 function champ(lbl, chemin, opt){ const v = chemin.split(".").reduce((o, k) => o && o[k], FA) ?? ""; return `<div><label>${lbl}</label><input data-c="${chemin}" value="${esc(v)}"${opt || ""}></div>`; }
+const ETAPES = ["Client", "Travaux", "Matériel", "Signature"];
+const artDe = d => { const m = String(d || "").match(/\(([^()]+)\)\s*$/); return m && CAT ? CAT.find(z => z.n === m[1]) : null; };
+const photoMat = d => { const a = artDe(d), u = !a || a.img === "-" ? "" : (a.img || PHOTOS[String(a.type || "").toLowerCase() + "|" + (a.mat || "")] || "");
+  return u ? `<span class="fph"><img src="${esc(u)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.src='img/metier-plus-icone.svg';this.parentNode.classList.add('vide')"></span>` : `<span class="fph vide"><img src="img/metier-plus-icone.svg" alt=""></span>`; };
 function dessiner(){ const f = FA, T = totaux(f), L = (t, arr, cols) => arr.map((l, i) => `<tr>${cols.map(([k, ph, cls, im]) => `<td class="${cls || ""}"><input data-l="${t}.${i}.${k}" value="${esc(l[k] ?? "")}" placeholder="${ph}"${im ? ' inputmode="decimal"' : ""}></td>`).join("")}<td class="x"><button data-del="${t}.${i}" aria-label="Retirer">×</button></td></tr>`).join("");
+  const fait = [!!String(f.client.nom || "").trim(), !!(String(f.travaux || "").trim() || f.mo.some(l => num(l.h))), f.mat.some(l => l.d), !!f.signee];
+  const anim = ET !== ET_VU; ET_VU = ET;
+  const suite = n => `<div class="fnav">${n > 1 ? `<button class="btn" data-et="${n - 1}">‹ ${ETAPES[n - 2]}</button>` : "<span></span>"}${n < 4 ? `<button class="btn p" data-et="${n + 1}">Suivant : ${ETAPES[n]} ›</button>` : ""}</div>`;
+  const mats = f.mat.map((l, i) => { const sp = l.d && !num(l.prix); return `<div class="fm${sp ? " sansprix" : ""}">${photoMat(l.d)}
+      <div class="fm-n"><input data-l="mat.${i}.d" value="${esc(l.d ?? "")}" placeholder="Pièce">${sp ? `<small class="np">Prix à entrer</small>` : num(l.q) && num(l.prix) ? `<small class="sous">${esc(l.q)} × ${argent(num(l.prix))} = <b>${argent(num(l.q) * num(l.prix))}</b></small>` : ""}</div>
+      <div class="fm-q"><button data-mq="${i}|-1" aria-label="Un de moins">−</button><input data-l="mat.${i}.q" value="${esc(l.q ?? "")}" inputmode="decimal" aria-label="Quantité"><button data-mq="${i}|1" aria-label="Un de plus">+</button></div>
+      <div class="fm-p"><input data-l="mat.${i}.prix" value="${esc(l.prix ?? "")}" placeholder="0,00" inputmode="decimal" aria-label="Prix unitaire"><span>$</span></div>
+      <div class="x"><button data-del="mat.${i}" aria-label="Retirer">×</button></div></div>`; }).join("");
   $("#qui").textContent = (K.p ? K.p + " · " : "") + (K.g === "ESSAI" ? "•••••" : C.c);
-  $("#app").innerHTML = `<p><button class="btn" id="ret">‹ Mes factures</button></p><h1 style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">Facture ${esc(f.no)} <span style="border:2.5px solid #B83227;color:#B83227;border-radius:8px;padding:2px 10px;font-size:.85rem;letter-spacing:.12em;transform:rotate(-4deg);display:inline-block">SIMULATION</span></h1>
-  <div class="carte" style="display:flex;gap:14px;align-items:center">${logoSVG(f.ent).replace('width="100" height="100"', 'width="56" height="56"')}<div style="flex:1"><b>${esc(f.ent.nom)}</b><div class="sous">${esc([f.ent.tel, f.ent.rbq ? "RBQ " + f.ent.rbq : ""].filter(Boolean).join(" · "))}</div></div>${f.signee ? "" : `<button class="btn" id="eMod2">Modifier l'entreprise</button>`}</div>
-  <div class="carte"><h2 style="display:flex;align-items:center;gap:10px">Client <span class="sous" style="text-transform:none;letter-spacing:0;font-weight:400">(fictif)</span><span style="flex:1"></span><button class="btn" id="autreCl" style="min-height:38px;text-transform:none;letter-spacing:0">Autre client</button></h2><div class="g2">${champ("Nom du client", "client.nom")}${champ("Téléphone", "client.tel", ' inputmode="tel"')}${champ("Adresse des travaux", "client.adresse")}${champ("Courriel", "client.courriel", ' inputmode="email"')}</div>
-    <div class="g2" style="margin-top:10px">${champ("N° de facture", "no")}<div><label>Date</label><input type="date" data-c="date" value="${esc(f.date)}"></div></div></div>
-  <div class="carte"><h2>Travaux effectués</h2><textarea data-c="travaux" placeholder="ex. Remplacement du chauffe-eau 40 gal, raccordement eau chaude et froide, essai d'étanchéité.">${esc(f.travaux)}</textarea></div>
-  <div class="carte"><h2>Main-d'œuvre</h2><table class="l"><tr><th>Description</th><th>Heures</th><th>Taux ($/h)</th><th></th></tr>${L("mo", f.mo, [["d", "Description"], ["h", "0", "n", 1], ["taux", "0,00", "n", 1]])}</table>
-    <button class="btn" data-plus="mo" style="margin-top:6px">+ Ligne</button><p class="sous" style="text-align:right">Main-d'œuvre : <b>${argent(T.mo)}</b></p></div>
-  <div class="carte"><h2>Matériel</h2><p style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn b" id="imp">Raccords pris au magasin</button><button class="btn" id="cat">Ajouter depuis la liste du magasin</button></p><table class="l"><tr><th>Pièce</th><th>Qté</th><th>Prix unitaire</th><th></th></tr>${L("mat", f.mat, [["d", "Pièce"], ["q", "1", "n", 1], ["prix", "0,00", "n", 1]])}</table>
-    <button class="btn" data-plus="mat" style="margin-top:6px">+ Ligne</button><div class="g2" style="margin-top:10px;align-items:end"><div><label>Majoration sur le matériel (%)</label><input data-c="maj" inputmode="decimal" value="${esc(f.maj || "")}" placeholder="ex. 20"></div><p class="sous" style="text-align:right;margin:0">Matériel (avec majoration) : <b>${argent(T.mat)}</b></p></div></div>
-  <div class="carte"><h2>Autres frais</h2><table class="l"><tr><th>Description</th><th>Montant</th><th></th></tr>${L("autres", f.autres, [["d", "ex. Déplacement, permis, disposition"], ["m", "0,00", "n", 1]])}</table><button class="btn" data-plus="autres" style="margin-top:6px">+ Ligne</button></div>
+  $("#app").className = anim ? "anim" : "";
+  $("#app").innerHTML = `<p style="margin:0"><button class="lien" id="ret">‹ Mes factures</button></p><h1 class="fh">Facture ${esc(f.no)} <span class="cachet">SIMULATION</span></h1>
+  <nav class="fsteps">${ETAPES.map((t, k) => `${k ? `<span class="fbar${fait[k - 1] || ET > k ? " ok" : ""}"></span>` : ""}<button class="fst${ET === k + 1 ? " cours" : ""}${fait[k] ? " ok" : ""}" data-et="${k + 1}"><i>${fait[k] ? `<svg viewBox="0 0 24 24" width="16" height="16"><path d="M5 12.5l4.2 4.2L19 7" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>` : k + 1}</i><span>${t}</span></button>`).join("")}</nav>
+  <section ${ET === 1 ? "" : "hidden"}>
+  <div class="carte fent">${logoSVG(f.ent).replace('width="100" height="100"', 'width="52" height="52"')}<div style="flex:1"><b>${esc(f.ent.nom)}</b><div class="sous">${esc([f.ent.tel, f.ent.rbq ? "RBQ " + f.ent.rbq : ""].filter(Boolean).join(" · "))}</div></div>${f.signee ? "" : `<button class="btn" id="eMod2">Modifier</button>`}</div>
+  <div class="carte"><h2 class="fh2">Client <span class="sous">(fictif)</span><span style="flex:1"></span><button class="btn petit" id="autreCl">Autre client</button></h2><div class="g2">${champ("Nom du client", "client.nom")}${champ("Téléphone", "client.tel", ' inputmode="tel"')}${champ("Adresse des travaux", "client.adresse")}${champ("Courriel", "client.courriel", ' inputmode="email"')}</div>
+    <div class="g2" style="margin-top:10px">${champ("N° de facture", "no")}<div><label>Date</label><input type="date" data-c="date" value="${esc(f.date)}"></div></div></div>${suite(1)}</section>
+  <section ${ET === 2 ? "" : "hidden"}>
+  <div class="carte"><h2 class="fh2">Travaux effectués</h2><textarea data-c="travaux" placeholder="ex. Remplacement du chauffe-eau 40 gal, raccordement eau chaude et froide, essai d'étanchéité.">${esc(f.travaux)}</textarea></div>
+  <div class="carte"><h2 class="fh2">Main-d'œuvre</h2><table class="l"><tr><th>Description</th><th>Heures</th><th>Taux ($/h)</th><th></th></tr>${L("mo", f.mo, [["d", "Description"], ["h", "0", "n", 1], ["taux", "0,00", "n", 1]])}</table>
+    <div class="fpied"><button class="btn petit" data-plus="mo">+ Ligne</button><span>Main-d'œuvre : <b>${argent(T.mo)}</b></span></div></div>${suite(2)}</section>
+  <section ${ET === 3 ? "" : "hidden"}>
+  <div class="carte"><h2 class="fh2">Matériel</h2><div class="fimp"><button class="btn b" id="imp">Raccords pris au magasin</button><button class="btn" id="cat">Ajouter depuis la liste du magasin</button></div>
+    ${f.mat.length ? `<div class="fms">${mats}</div>` : `<p class="vide">Aucune pièce pour l'instant. Ajoute les raccords que tu as pris au magasin.</p>`}
+    ${f.mat.some(l => l.d && !num(l.prix)) ? `<p class="avisP">Il manque des prix. Écris le prix de chaque pièce pour que la facture soit juste.</p>` : ""}
+    <div class="fpied"><button class="btn petit" data-plus="mat">+ Ligne</button><span>Matériel : <b>${argent(T.mat)}</b></span></div>
+    <div class="g2" style="margin-top:12px;align-items:end"><div><label>Majoration sur le matériel (%)</label><input data-c="maj" inputmode="decimal" value="${esc(f.maj || "")}" placeholder="ex. 20"></div><p class="sous" style="margin:0">Le profit ajouté au prix des pièces.</p></div></div>
+  <div class="carte"><h2 class="fh2">Autres frais</h2><table class="l"><tr><th>Description</th><th>Montant</th><th></th></tr>${L("autres", f.autres, [["d", "ex. Déplacement, permis, disposition"], ["m", "0,00", "n", 1]])}</table><div class="fpied"><button class="btn petit" data-plus="autres">+ Ligne</button></div></div>${suite(3)}</section>
+  <section ${ET === 4 ? "" : "hidden"}>
   <div class="carte"><div class="tot"><span>Sous-total</span><span>${argent(T.st)}</span><span>TPS (5 %)</span><span>${argent(T.tps)}</span><span>TVQ (9,975 %)</span><span>${argent(T.tvq)}</span><span class="g">Total</span><span class="g">${argent(T.tot)}</span></div>
     <label style="margin-top:12px">Conditions de paiement</label><input data-c="cond" value="${esc(f.cond)}"></div>
-  <div class="carte"><h2>Signature du client</h2>${f.signee ? `<img src="${f.signee.img}" alt="Signature" style="max-width:100%;height:120px;object-fit:contain;background:#fff;border:1px solid var(--ligne);border-radius:12px"><p class="sous">Signée par ${esc(f.signee.nom)} le ${esc(f.signee.date)}.</p><button class="btn" id="sigX">Effacer la signature</button>`
+  <div class="carte"><h2 class="fh2">Signature du client</h2>${f.signee ? `<img src="${f.signee.img}" alt="Signature" style="max-width:100%;height:120px;object-fit:contain;background:#fff;border:1px solid var(--ligne);border-radius:12px"><p class="sous">Signée par ${esc(f.signee.nom)} le ${esc(f.signee.date)}.</p><button class="btn" id="sigX">Effacer la signature</button>`
     : `<p class="sous">Le client signe avec le doigt pour accepter les travaux et la facture.</p><canvas id="sig"></canvas><div class="g2" style="margin-top:8px;align-items:end"><div><label>Nom du client (en lettres moulées)</label><input id="sigN" value="${esc(f.client.nom)}"></div><div style="display:flex;gap:8px"><button class="btn" id="sigE">Recommencer</button><button class="btn b" id="sigOk">Accepter et signer</button></div></div>`}</div>
-  <p style="text-align:center"><button class="btn" id="supp" style="color:#B42318">Supprimer cette facture</button></p>`;
+  ${suite(4)}<p style="text-align:center"><button class="lien" id="supp" style="color:#B42318">Supprimer cette facture</button></p></section>`;
   $("#barre").hidden = false; $("#barre").innerHTML = `<b style="margin-right:auto;align-self:center">Total : ${argent(T.tot)}</b><button class="btn" id="mel">Envoyer par courriel</button><button class="btn p" id="pdf">PDF de la facture</button>`;
   brancher(); }
 function brancher(){ const f = FA, maj = () => { f.modif = Date.now(); sauver(); };
@@ -211,6 +262,8 @@ function brancher(){ const f = FA, maj = () => { f.modif = Date.now(); sauver();
   document.querySelectorAll("[data-c]").forEach(i => i.onchange = () => { const k = i.dataset.c.split("."); let o = f; while (k.length > 1) o = o[k.shift()]; o[k[0]] = i.value; maj(); dessiner(); });
   if ($("#eMod2")) $("#eMod2").onclick = () => entreprise(() => ouvrir(f.id));
   document.querySelectorAll("[data-l]").forEach(i => i.onchange = () => { const [t, n, k] = i.dataset.l.split("."); f[t][+n][k] = i.value; maj(); dessiner(); });
+  document.querySelectorAll("[data-et]").forEach(b => b.onclick = () => { ET = +b.dataset.et; window.scrollTo(0, 0); dessiner(); });
+  document.querySelectorAll("[data-mq]").forEach(b => b.onclick = () => { const [n, d] = b.dataset.mq.split("|"), l = f.mat[+n]; l.q = String(Math.max(1, (num(l.q) || 0) + +d)); maj(); dessiner(); });
   document.querySelectorAll("[data-del]").forEach(b => b.onclick = () => { const [t, n] = b.dataset.del.split("."); f[t].splice(+n, 1); maj(); dessiner(); });
   document.querySelectorAll("[data-plus]").forEach(b => b.onclick = () => { const t = b.dataset.plus; f[t].push(t === "mo" ? { d:"", h:"", taux:"" } : t === "mat" ? { d:"", q:"1", prix:"" } : { d:"", m:"" }); maj(); dessiner(); });
   /* 26 nov. (Jeremy : « ils vont pouvoir cocher les raccords qu'ils ont été chercher au magasin ») : commandes remises, par date, à cocher */
@@ -300,7 +353,7 @@ async function pdf(f, courriel){ try { const { PDFDocument, StandardFonts, rgb }
   if (courriel) { location.href = "mailto:" + encodeURIComponent(f.client.courriel || "") + "?subject=" + encodeURIComponent("Facture " + f.no + (f.ent.nom ? " - " + f.ent.nom : "")) + "&body=" + encodeURIComponent("Bonjour,\n\nVoici la facture " + f.no + " pour les travaux effectués (total : " + argent(T.tot) + ").\nLe PDF est joint à ce courriel.\n\nMerci de votre confiance !\n" + (f.ent.nom || "")); toast("PDF téléchargé : joins-le au courriel."); }
   } catch(e){ toast("PDF impossible : " + e.message); } }
 
-let CAT = null; const catalogue = async () => CAT || (CAT = await fetch("magasin-catalogue.json", { cache:"no-cache" }).then(r => r.json()).then(d => d.raccords || []).catch(() => []));
+let CAT = null, PHOTOS = {}; const catalogue = async () => CAT || (CAT = await fetch("magasin-catalogue.json", { cache:"no-cache" }).then(r => r.json()).then(d => { PHOTOS = d.photos || {}; return d.raccords || []; }).catch(() => []));
 async function demarrer(){ if (!C) return entree();
   if (!(await factureOuverte(K.g))) { const n = sessionDEP(K.g); $("#app").innerHTML = `<h1>Facture au client</h1><div class="carte"><p>La facture s'ouvre plus tard dans ton DEP${n ? " (tu es en DEP " + n + ")" : ""}. Ton enseignant te dira quand.</p><a class="btn" href="carte.html">Retour à ma carte</a></div>`; return; } $("#app").innerHTML = `<p class="sous">Chargement…</p>`; await Promise.all([charger(), trouverCoffre()]); await entSync(); liste(); }
 lireK(); demarrer();

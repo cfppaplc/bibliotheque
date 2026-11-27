@@ -846,3 +846,4 @@
 - 26 nov. : « Ajouter » au panier plus doux (Jeremy : « moins rough ») : .qte.doux (fondu + léger zoom, chiffre qui gonfle), barre du panier qui monte (#barre.entre) ou dont le compte rebondit (#barre.bump).
 - 26 nov. : bouton « Vider le panier » (#pVid) dans Mon panier, deux touches (« Toucher encore pour tout enlever », 4 s). Pas affiché en modification d'un panier envoyé. Test ajouté.
 - 26 nov. : la photo du raccord clignotait à chaque ajout / changement de quantité (ligne recréée) → brancherQte ne remplace plus que .qte. Test ajouté.
+- 26 nov. : facture.html refaite (Jeremy « 1-2-6 ») : 4 étapes (ET, .fsteps, data-et, Suivant), matériel en lignes .fm avec photo (photoMat via catalogue + PHOTOS), boutons −/+ (data-mq), avis prix manquant (.sansprix, .avisP), look du magasin, toasts qui ne se chevauchent plus. Test Facture mis à jour.
