@@ -229,7 +229,7 @@ const SYN = (() => { const S = {}, ajoute = (cles, vers) => cles.split(" ").forE
    ["washer washers", "rondelle"], ["heater", "rechauffeur"], ["pump", "pompe"], ["gauge gage", "manometre"], ["thermometer", "thermometre"],
    ["torch", "torche chalumeau"], ["tip tips", "tube-contact buse"], ["rod rods", "baguette"], ["wire", "fil bobine"], ["gasket seal", "joint"],
    ["vent", "purgeur aerateur"], ["backflow", "antiretour clapet"], ["toilet", "toilette"], ["faucet", "robinet"], ["stop", "arret robinet"],
-   ["pex", "pex uponor"], ["drain", "drain renvoi avaloir"], ["spud", "spud raccord"], ["hose", "boyau"], ["fitting fittings", "raccord"]].forEach(([a, b]) => ajoute(a, b));
+   ["pex", "pex uponor"], ["uponor propex", "pex-a pex radiant plancher"], ["drain", "drain renvoi avaloir"], ["spud", "spud raccord"], ["hose", "boyau"], ["fitting fittings", "raccord"]].forEach(([a, b]) => ajoute(a, b));
   return S; })();
 const variantes = m => { const v = [m]; if (m.length > 3 && /[sx]$/.test(m)) v.push(m.slice(0, -1)); (SYN[m] || []).forEach(x => v.push(x)); return v; };
 const motOk = (a, m) => a._m.some(w => w.startsWith(m)) || (m.length > 4 && a._q.includes(m));
