@@ -43,7 +43,7 @@ window.PlanMagasin = (function(){
       @media (prefers-reduced-motion:reduce){.pm-f.actif{animation:none}}
       .pm-p{fill:#EB6A22;stroke:#fff;stroke-width:2;animation:pmFl .6s ease-in-out infinite alternate}.pm-p.fait{fill:#1E8A55;animation:none}
       .pm-pt{font:800 9px system-ui,sans-serif;fill:#fff;text-anchor:middle;dominant-baseline:middle;pointer-events:none}
-      .pm-l{font:600 11px system-ui,sans-serif;fill:#5b6678;text-anchor:middle}</style>`;
+      .pm-l{font:600 11px system-ui,sans-serif;fill:#5b6678;text-anchor:middle;paint-order:stroke;stroke:#fff;stroke-width:3px}</style>`;
     o += `<polygon points="${room.join(" ")}" fill="#fff"/>`;
     const yK = R * (1 - F.K / dh);
     o += `<polygon class="pm-r" points="0,${R} ${F.K},${yK} ${F.K},${H} 0,${H}"/>`;
@@ -60,9 +60,9 @@ window.PlanMagasin = (function(){
     o += `<polygon class="pm-mur" points="${room.join(" ")}"/>`;
     o += face(F.K + 1, yK + 6, H - yK - 12, "K") + sign(F.K + 16, yK + 60, "K");
     const wa = dh + V.winA, wb = wa + V.winW;
-    o += `<line x1="${wa}" y1="0" x2="${wb}" y2="0" stroke="#EB6A22" stroke-width="4"/><text class="pm-l" x="${(wa + wb) / 2}" y="16">Fenêtre de service</text>`;
+    o += `<line x1="${wa}" y1="0" x2="${wb}" y2="0" stroke="#EB6A22" stroke-width="4"/><text class="pm-l" x="${(wa + wb) / 2}" y="-8">Fenêtre de service</text>`;
     /* 26 nov. (Jeremy : « le mot Porte est mal placé ») : écrit le long du mur en biais, côté intérieur, loin des affiches */
-    { const dl = Math.hypot(dh, R), t = .32, px = dh * t + R / dl * 11, py = R * (1 - t) + dh / dl * 11, ang = -Math.atan2(R, dh) * 180 / Math.PI;
+    { const dl = Math.hypot(dh, R), t = .32, px = dh * t - R / dl * 9, py = R * (1 - t) - dh / dl * 9, ang = -Math.atan2(R, dh) * 180 / Math.PI;
       o += `<text class="pm-l" x="${px.toFixed(1)}" y="${py.toFixed(1)}" transform="rotate(${ang.toFixed(1)} ${px.toFixed(1)} ${py.toFixed(1)})">Porte</text>`; }
     /* parties numérotées (même ordre que l'image envoyée à Jeremy) */
     const parts = []; let k = 0;
@@ -73,10 +73,25 @@ window.PlanMagasin = (function(){
         o += `<rect x="${p.x - 4}" y="${p.y0 + 1}" width="8" height="${p.h - 2}" rx="2" fill="${on ? (p.n % 2 ? "#EB6A22" : "#1F5F8B") : "#d5dbe3"}"/><rect x="${p.x + DX[p.l] - 9}" y="${cy - 8}" width="18" height="16" rx="8" fill="#fff" stroke="#14213d"/><text class="pm-pt" style="fill:#14213d;font-size:8.5px" x="${p.x + DX[p.l]}" y="${cy + .5}">${p.n}</text>`; }); }
     /* points : un par raccord, dans sa partie si Administration l'a placée, sinon à sa case (ancienne règle) */
     const dejaP = {};
+    const pos = [], ym = (V.upY + V.upL + V.loY) / 2, yh = 42, dep = [dh + V.winA + V.winW / 2, 6];   /* 26 nov. (Jeremy : « départ à la fenêtre ») : départ à la fenêtre de service; allées de passage : en haut (yh) et au milieu (ym) */
+    /* 26 nov. (Jeremy : « les lignes n'ont pas à suivre les tablettes, ce sont des arrêts ») : le chemin passe au milieu de l'allée */
+    const AL = {}; [["K", "J"], ["I", "H"], ["G", "F"], ["E", "D"]].forEach(([a, b]) => { const xa = faces[a] && faces[a][0][0], xb = faces[b] && faces[b][0][0]; if (xa != null && xb != null) AL[a] = AL[b] = (xa + xb) / 2; });
+    const posA = [];
+    if (opts.trajet || opts.coords) points.forEach((pt, i) => { const Q = Object.keys(CASES).length ? partieDe(pt.r, parts) : null, P = Q && Q.P; if (P) { pos[i] = [P.x, P.y0 + Math.max(8, Math.min(P.h - 8, Q.f * P.h))]; const l = lettre(pt.r); posA[i] = [AL[l] != null ? AL[l] : P.x, pos[i][1]]; } });
+    if (opts.coords) return { pos:posA, dep, ym, yh };
+    /* 26 nov. (Jeremy : trajet « GPS » du magasinier) : le chemin passe par l'allée du milieu pour changer de rangée */
+    if (opts.trajet){ const seg = (a, b) => { if (Math.abs(a[0] - b[0]) < 4) return ` L${b[0]} ${b[1]}`; const c = Math.abs(a[1] - yh) + Math.abs(b[1] - yh) <= Math.abs(a[1] - ym) + Math.abs(b[1] - ym) ? yh : ym; return ` L${a[0]} ${c} L${b[0]} ${c} L${b[0]} ${b[1]}`; };
+      let prev = dep, d = `M${dep[0]} ${dep[1]}`, dF = d, faitFin = true;
+      let tics = ""; points.forEach((pt, i) => { if (!posA[i]) return; const s2 = seg(prev, posA[i]); if (pt.fait && faitFin) dF += s2; else faitFin = false; d += s2; prev = posA[i];
+        tics += `<line x1="${posA[i][0]}" y1="${posA[i][1]}" x2="${pos[i][0]}" y2="${pos[i][1]}" stroke="${pt.fait ? "#1E8A55" : "#1F5F8B"}" stroke-width="2"/>`; });
+      const chemin = `<path d="${d}" fill="none" stroke="#1F5F8B" stroke-width="4" stroke-dasharray="2 7" stroke-linecap="round" stroke-linejoin="round" opacity=".85"/><path d="${dF}" fill="none" stroke="#1E8A55" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>${tics}`
+        + `<circle cx="${dep[0]}" cy="${dep[1]}" r="7" fill="#1F5F8B"/><text class="pm-l" x="${dep[0] + 8}" y="${yh - 6}" style="text-anchor:start;fill:#1F5F8B;font-weight:800">Départ</text>`;
+      const k = o.indexOf('fill="#fff"/>', o.indexOf("</style>")) + 13; o = o.slice(0, k) + `<g class="pm-trajet">${chemin}</g>` + o.slice(k); }   /* sous les étagères et les textes */
     points.forEach((pt, i) => { const Q = Object.keys(CASES).length ? partieDe(pt.r, parts) : null, P = Q && Q.P;
+      if (P && (pt.calme || (opts.trajet && !pt.proch && !pt.fait))){ const cy = P.y0 + Math.max(8, Math.min(P.h - 8, Q.f * P.h)); o += `<circle cx="${P.x}" cy="${cy}" r="9" fill="#fff" stroke="#EB6A22" stroke-width="3"/><text class="pm-pt" x="${P.x}" y="${cy + .5}" style="fill:#B2470F">${pt.n || i + 1}</text>`; return; }
       if (P){ const cy = P.y0 + Math.max(8, Math.min(P.h - 8, Q.f * P.h));
         o += pt.fait ? `<circle class="pm-p fait" cx="${P.x}" cy="${cy}" r="8"/>` : `<circle cx="${P.x}" cy="${cy}" r="8" fill="none" stroke="#EB6A22" stroke-width="3"><animate attributeName="r" values="8;20" dur="1s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;0" dur="1s" repeatCount="indefinite"/></circle><circle class="pm-p" cx="${P.x}" cy="${cy}" r="8"><animate attributeName="fill" values="#EB6A22;#FFD25A;#EB6A22" dur=".8s" repeatCount="indefinite"/></circle>`;
-        o += `<text class="pm-pt" x="${P.x}" y="${cy + .5}">${i + 1}</text>`; return; }
+        o += `<text class="pm-pt" x="${P.x}" y="${cy + .5}">${pt.n || i + 1}</text>`; return; }
       if (Object.keys(CASES).length) return;   /* case placée nulle part : pas de point plutôt qu'un point au mauvais endroit */ const m = String(pt.r || "").trim().toUpperCase().match(/^([A-Z])\s*-?\s*(\d+)/); if (!m || !faces[m[1]]) return;
       const F2 = faces[m[1]], tot = F2.reduce((a, f) => a + f[2], 0), n = Math.max(1, Math.min(V.sec, +m[2])); let d = (n - .5) / V.sec * tot;
       for (const [x, y, h] of F2){ if (d <= h){ o += pt.fait ? `<circle class="pm-p fait" cx="${x}" cy="${y + d}" r="8"/>` : `<circle cx="${x}" cy="${y + d}" r="8" fill="none" stroke="#EB6A22" stroke-width="3"><animate attributeName="r" values="8;20" dur="1s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;0" dur="1s" repeatCount="indefinite"/></circle><circle class="pm-p" cx="${x}" cy="${y + d}" r="8"><animate attributeName="fill" values="#EB6A22;#FFD25A;#EB6A22" dur=".8s" repeatCount="indefinite"/></circle>`;
@@ -101,6 +116,10 @@ window.PlanMagasin = (function(){
           + (G.length ? G.map(g => { const cg = (g.match(COUL_RE) || [""])[0].trim().toUpperCase(), cc = COUL_ETAGE[cg]; g = g.replace(COUL_RE, ""); return `<div style="display:flex;gap:2px;margin-bottom:2px;height:${hR}px">` + g.split("+").flatMap(x => { const m = x.trim().toUpperCase().match(/^([A-Z])?\s*-?\s*(\d+)\s*(?:-\s*(\d+))?$/); return m ? nums(+m[2], m[3] ? +m[3] : +m[2]) : []; })
               .map(n => `<span data-c="${l}-${n}"${T.has(n) ? ' class="pm-cl"' : ""} style="flex:1;min-width:0;height:100%;cursor:pointer;display:flex;align-items:center;justify-content:center;background:${cc ? cc[0] : c};color:${cc ? cc[1] : "#fff"};${cc && cg === "BLANC" ? "border:1px solid #c9d0da;" : ""}font:700 9px system-ui;border-radius:3px;overflow:hidden">${n}</span>`).join("") + `</div>`; }).join("")
             : `<div style="height:22px;border:2px dashed #c9d0da;border-radius:4px;display:flex;align-items:center;justify-content:center;font:700 .75rem system-ui;color:#8a94a6">à remplir</div>`) + `</div>`; }).join(""); })() + `</div>`).join("") + `</div>`; }
+  function ordre(rs){ const { pos, dep, ym, yh } = svg(new Set(), new Set(), rs.map(r => ({ r })), { coords:true }), reste = rs.map((r, i) => i).filter(i => pos[i]), out = [];
+    const cout = (a, b) => Math.abs(a[0] - b[0]) < 4 ? Math.abs(a[1] - b[1]) : Math.abs(a[0] - b[0]) + Math.min(Math.abs(a[1] - yh) + Math.abs(b[1] - yh), Math.abs(a[1] - ym) + Math.abs(b[1] - ym));
+    let cur = dep; while (reste.length){ let k = 0; reste.forEach((i, j) => { if (cout(cur, pos[i]) < cout(cur, pos[reste[k]])) k = j; }); const i = reste.splice(k, 1)[0]; out.push(i); cur = pos[i]; }
+    return out.concat(rs.map((r, i) => i).filter(i => !pos[i])); }   /* les cases pas encore placées à la fin */
   const place = r => Object.keys(CASES).length > 0 && !!partieDe(r, parties().filter(p => taille(p.n) > 0));   /* la case est-elle placée sur le plan ? */
-  return { svg, lettre, parties, vueFace, place, lireCases, set cases(c){ CASES = c || {}; }, get cases(){ return CASES; }, set tailles(t){ TAILLES = t || {}; } };
+  return { svg, lettre, parties, vueFace, place, lireCases, ordre, set cases(c){ CASES = c || {}; }, get cases(){ return CASES; }, set tailles(t){ TAILLES = t || {}; } };
 })();

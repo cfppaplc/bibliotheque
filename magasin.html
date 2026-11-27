@@ -173,6 +173,12 @@ input.cache-code:not(:placeholder-shown){-webkit-text-security:disc;text-securit
 .ac-p .ph img,.ac-c .ph img,.ac-l .ph img{max-width:100%;max-height:100%;object-fit:contain}.ac-p .ph.vide img,.ac-c .ph.vide img,.ac-l .ph.vide img{width:70%;opacity:.3;filter:grayscale(1)}
 .ac-q{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.ac-q [data-dq]{width:56px;font-size:1.5rem}.ac-q #acN{min-width:56px;text-align:center;font-size:1.6rem}
 .ac-l{cursor:default;margin-bottom:8px;border:0}.ac-l .qb{display:inline-grid;place-items:center;min-width:38px;height:38px;padding:0 8px;border-radius:99px;background:#14213d;color:#fff;font-weight:800}
+.etapes{display:flex;align-items:flex-start;padding:4px 16px 14px}.etapes .et{display:flex;flex-direction:column;align-items:center;gap:5px;font-size:.78rem;font-weight:700;color:#9aa3b2;min-width:64px;text-align:center}
+.etapes .et i{width:26px;height:26px;border-radius:50%;border:3px solid #d5dae3;background:#fff;position:relative;box-sizing:border-box}
+.etapes .et.ok{color:var(--vert)}.etapes .et.ok i{background:var(--vert);border-color:var(--vert)}.etapes .et.ok i::after{content:"";position:absolute;left:6px;top:2px;width:6px;height:11px;border:solid #fff;border-width:0 3px 3px 0;transform:rotate(45deg)}
+.etapes .et.non{color:var(--rouge)}.etapes .et.non i{background:var(--rouge);border-color:var(--rouge)}.etapes .et.non i::before,.etapes .et.non i::after{content:"";position:absolute;left:9px;top:3px;width:3px;height:14px;background:#fff;transform:rotate(45deg);border:0}.etapes .et.non i::after{transform:rotate(-45deg)}
+.etapes .et.cours{color:#B2470F}.etapes .et.cours i{border-color:var(--acc);animation:etP 1.2s ease-in-out infinite}@keyframes etP{0%,100%{box-shadow:0 0 0 0 rgba(235,106,34,.45)}50%{box-shadow:0 0 0 8px rgba(235,106,34,0)}}
+.etapes .bar{flex:1;height:4px;border-radius:2px;background:#d5dae3;margin-top:11px}.etapes .bar.ok{background:var(--vert)}
 /* 26 nov. (Jeremy : « on retravaille les interfaces, ça doit être beau »; fluide et facile pour élèves et profs, iPad et cellulaire) : look « propre et pro » */
 :root{--fond:#EEF0F4;--ligne:#DDE1E8;--txt:#16233F;--ombre:0 2px 8px rgba(22,35,63,.10)}
 body{background:var(--fond)}
@@ -222,7 +228,7 @@ details.arch>summary{cursor:pointer;font-weight:700;padding:14px 18px;background
 <main id="app"><p class="vide">Chargement…</p></main>
 <div class="ov" id="ov" hidden></div>
 <div class="barre" id="barre" hidden></div>
-<script src="js/qrcode.js"></script><script src="js/code128.js?v=1"></script><script src="js/plan-magasin.js?v=13"></script>
+<script src="js/qrcode.js"></script><script src="js/code128.js?v=1"></script><script src="js/plan-magasin.js?v=14"></script>
 <script src="js/magasin-recherche.js?v=1"></script>
 <script>
 "use strict";
@@ -420,11 +426,15 @@ async function suivi(){
   clearTimeout(suiviT); notifEleve(); const z = $("#mesEnvois"); if (!z || !MOI) return;
   const E = LS.get("magEnvois", []).filter(x => x.code === MOI.code && Date.now() - x.t < 7 * 864e5); if (!E.length) { z.innerHTML = ""; return; }
   const S = await Promise.all(E.map(x => rpc("panier_etat", { p_id:x.id }).catch(() => null)));
+/* 26 nov. (Jeremy : « suivi en direct » wow) : barre d'étapes Envoyé → Approuvé → Remis, l'étape en cours bat doucement */
+const etapes = e => { if (!["attente", "approuve", "remis", "refuse"].includes(e)) return "";
+  const n = { attente:1, approuve:2, remis:3, refuse:2 }[e], T = ["Envoyé", e === "refuse" ? "Refusé" : "Approuvé", "Remis"];
+  return `<div class="etapes">${T.map((t, k) => `${k ? `<span class="bar${k < n || (k === n && e !== "refuse" && e !== "attente") ? " ok" : ""}"></span>` : ""}<span class="et${k < n ? " ok" : ""}${k === n - 1 && e === "refuse" ? " non" : ""}${(e === "attente" && k === 1) || (e === "approuve" && k === 2) ? " cours" : ""}"><i></i>${t}</span>`).join("")}</div>`; };
 const LBL = { attente:"En attente de ton enseignant", approuve:"Approuvé · va au comptoir avec ta carte", refuse:"Refusé", remis:"Remis" };
   const cpt = {}; S.forEach(s => { if (s) cpt[s.etat] = (cpt[s.etat] || 0) + 1; });   /* 26 nov. (Jeremy) : paniers envoyés repliés dans une barre */
   const resume = [["approuve", "approuvé"], ["attente", "en attente"], ["refuse", "refusé"], ["remis", "remis"]].filter(([k]) => cpt[k]).map(([k, t]) => `<span class="rp ${k}"><i></i>${cpt[k]} ${t}${cpt[k] > 1 && !/s$/.test(t) ? "s" : ""}</span>`).join("");
   z.innerHTML = `<details class="mesP"${LS.get("magSuiviOuv", false) ? " open" : ""}><summary><b>Mes paniers envoyés</b>${resume}</summary>` + E.map((x, k) => { const s = S[k] || { etat:"?" };
-    return `<div class="carte suivi ${esc(s.etat)}"><div class="bandeau"><i></i><b>${esc(LBL[s.etat] || "…")}</b><small>${heure(x.t)} · ${x.n} article${x.n > 1 ? "s" : ""}</small></div>${s.motif ? `<p class="motif">${esc(s.motif)}</p>` : ""}${s.etat === "refuse" && x.items && x.items.length ? `<div class="act" style="margin:0 14px 12px"><button class="btn p petit" data-cor="${esc(x.id)}">Corriger et renvoyer</button></div>` : ""}
+    return `<div class="carte suivi ${esc(s.etat)}"><div class="bandeau"><i></i><b>${esc(LBL[s.etat] || "…")}</b><small>${heure(x.t)} · ${x.n} article${x.n > 1 ? "s" : ""}</small></div>${etapes(s.etat)}${s.motif ? `<p class="motif">${esc(s.motif)}</p>` : ""}${s.etat === "refuse" && x.items && x.items.length ? `<div class="act" style="margin:0 14px 12px"><button class="btn p petit" data-cor="${esc(x.id)}">Corriger et renvoyer</button></div>` : ""}
       ${s.etat === "attente" && x.abo ? `<small class="sous">Tu seras averti sur ce cellulaire dès que ton enseignant répond.</small>` : ""}
       ${s.etat === "attente" ? `<div class="act" style="margin:0 18px 14px;display:flex;gap:8px">${s.items ? `<button class="btn" data-mod="${esc(x.id)}">Modifier</button>` : ""}<button class="btn r" data-ann="${esc(x.id)}">Annuler ce panier</button></div>` : ""}
       ${s.etat === "approuve" ? `<span data-cb="MP-${esc(x.code)}"></span><p class="sous" style="text-align:center;margin:0">Montre ta carte ou ce code au magasinier.</p>` : ""}</div>`; }).join("") + `</details>`;
@@ -689,14 +699,14 @@ function preparer(p){ if (!p) return;
   ov.hidden = false; document.body.style.overflow = "hidden";
   const dessiner = () => {
     const q = regrouper(MAG.filter(x => x.etat === "approuve" && x.code === code))[0]; if (q) p = q;
-    const n = (p.ids || [p.id]).length; if (n > nb) { toast("Nouvelle commande de cet élève : ajoutée à la préparation."); bip(); } nb = n; L = parRangee(p.items);
+    const n = (p.ids || [p.id]).length; if (n > nb) { toast("Nouvelle commande de cet élève : ajoutée à la préparation."); bip(); } nb = n; { const L0 = parRangee(p.items); L = PlanMagasin.ordre ? PlanMagasin.ordre(L0.map(rangee)).map(k => L0[k]) : L0; }   /* 26 nov. (Jeremy) : trajet « GPS » : ordre de cueillette le plus court, depuis la fenêtre */
     const lettres = new Set(L.map(i => PlanMagasin.lettre(rangee(i))).filter(Boolean));
     const finies = new Set([...lettres].filter(l => L.filter(i => PlanMagasin.lettre(rangee(i)) === l).every(i => faits.has(i.id || i.n))));
     const tout = L.every(i => faits.has(i.id || i.n)), prochain = L.find(i => !faits.has(i.id || i.n) && PlanMagasin.place(rangee(i))) || L.find(i => !faits.has(i.id || i.n));   /* d'abord un raccord placé sur le plan (les rangées pas encore entrées n'ont pas de point) */   /* 26 nov. (Jeremy) : seulement le prochain raccord à trouver clignote sur le plan */
     ov.innerHTML = `<div class="top"><img src="img/metier-plus-blanc.svg" alt=""><b>Préparer · ${esc(p.prenom || "élève")} (${esc(p.code)})${p.ids ? " · " + p.ids.length + " commandes" : ""}</b><span class="sp"></span><button id="prF">‹ Comptoir</button></div>
-      <main class="prep"><div class="prep-plan">${PlanMagasin.svg(lettres, finies, L.map(i => ({ r:i === prochain ? rangee(i) : "" })))}<p class="sous" style="text-align:center;margin:4px 0">Touche une lettre pour voir la rangée de face.</p>${faceL ? `<div class="prep-face">${PlanMagasin.vueFace(faceL, L.filter(i => !faits.has(i.id || i.n) && true).flatMap(i => casesDe(i).filter(c => PlanMagasin.lettre(c) === faceL).map(c => (String(c).match(/(\d+)/) || [])[1]).filter(x => x && +x > 0)), faceS)}<button class="btn" id="prFace" style="width:100%;margin-top:8px">Fermer la vue de face</button></div>` : ""}</div><div class="prep-l">
+      <main class="prep"><div class="prep-plan">${PlanMagasin.svg(lettres, finies, L.map((i, k) => ({ r:rangee(i), n:k + 1, fait:faits.has(i.id || i.n), proch:i === prochain })), { trajet:true })}<p class="sous" style="text-align:center;margin:4px 0">Touche une lettre pour voir la rangée de face.</p>${faceL ? `<div class="prep-face">${PlanMagasin.vueFace(faceL, L.filter(i => !faits.has(i.id || i.n) && true).flatMap(i => casesDe(i).filter(c => PlanMagasin.lettre(c) === faceL).map(c => (String(c).match(/(\d+)/) || [])[1]).filter(x => x && +x > 0)), faceS)}<button class="btn" id="prFace" style="width:100%;margin-top:8px">Fermer la vue de face</button></div>` : ""}</div><div class="prep-l">
       <p class="sous">${esc(p.groupe)} · ${esc(nomEns(p.ens))}${p.note ? " · " + esc(p.note) : ""}</p>
-      ${[...lettres, ""].map(l => { const G = L.filter(i => PlanMagasin.lettre(rangee(i)) === l); if (!G.length) return "";
+      ${L.reduce((R, i) => { const l = PlanMagasin.lettre(rangee(i)) || ""; if (!R.length || R[R.length - 1].l !== l) R.push({ l, G:[] }); R[R.length - 1].G.push(i); return R; }, []).map(({ l, G }) => {   /* rangées dans l'ordre du trajet */
         return `<div class="prep-g${finies.has(l) ? " fini" : ""}"><div class="prep-t">${l ? "Rangée " + esc(l) : "Sans rangée"}</div>${G.map(i => { const k = i.id || i.n, ok = faits.has(k);
           return `<label class="prep-i${ok ? " ok" : ""}${i === prochain ? " proch" : ""}"><input type="checkbox" data-k="${esc(k)}"${ok ? " checked" : ""}><span class="rg"><i class="pt">${L.indexOf(i) + 1}</i>${esc(caseTxt(rangee(i)) || "–")}</span><span class="q">${+i.q || 1} ×</span>${vigCmd(i)}<span class="nm">${esc(i.nom)}<small>${esc(i.n)}</small>${aussi(i)}</span></label>`; }).join("")}</div>`; }).join("")}
       <button class="btn ${tout ? "v" : ""}" id="prOk" ${tout ? "" : "disabled"} style="width:100%;margin-top:10px">${tout ? "Tout est prêt · remis à l'élève" : "Coche chaque raccord en le prenant"}</button></div></main>`;

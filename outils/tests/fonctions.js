@@ -390,6 +390,9 @@ test("Magasin : l'élève (carte scannée) envoie son panier, l'enseignant appro
   if (process.env.CAPTURES) await m.screenshot({ path: process.env.CAPTURES + "/plan.png" });
   vrai(await m.$$eval(".pm-s.actif", L => L.length) > 0, "Plan : aucune rangée ne clignote");
   vrai(await m.$$eval(".prep-i .ph", L => L.length) > 0, "Préparation : pas de photo à côté des raccords");
+  /* 26 nov. : trajet « GPS » depuis la fenêtre : ordre de cueillette, départ dessiné */
+  const tr = await m.evaluate(() => { const rs = ["J-145", "J-28", "J-216"], o = PlanMagasin.ordre(rs), svg = PlanMagasin.svg(new Set(["J"]), new Set(), o.map((i, k) => ({ r: rs[i], n: k + 1, proch: !k })), { trajet: true }); return [o.length, /Départ/.test(svg), /pm-trajet/.test(svg)]; });
+  vrai(tr[0] === 3 && tr[1] && tr[2], "Trajet : ordre ou chemin absent (" + tr.join(",") + ")");
   /* 26 nov. : une 2e commande approuvée du même élève s'ajoute à la préparation ouverte */
   const avant = await m.$$eval(".prep-i", L => L.length);
   await m.evaluate(() => { const a = MAG.find(x => x.etat === "approuve" && x.code === "12345"), c = CAT.find(x => !a.items.some(i => i.id === x.id));
