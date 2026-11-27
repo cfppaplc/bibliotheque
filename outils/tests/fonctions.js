@@ -491,6 +491,22 @@ test("Carte : l'élève affiche sa carte avec son code à 5 chiffres seulement; 
   vrai(!errs.length, errs.join(" | ")); await c.close();
 });
 
+test("Absences : l'élève signale une absence depuis Ma carte (motif, enseignant, avertissements)", async b => {   /* 27 nov. */
+  const c = await b.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: "block" }); let sent = null; const errs = [];
+  await c.addInitScript(() => { localStorage.mpCarte = JSON.stringify({ c: "MP-48213-K7Q9X2", g: "2602PLCA1", p: "Marc", t: 1 }); });
+  await c.route(/rpc\/(\w+)/, r => { const f = r.request().url().match(/rpc\/(\w+)/)[1], a = JSON.parse(r.request().postData() || "{}"); let o = [];
+    if (f === "absence_signaler") { sent = a; o = { ok: true, id: "x1" }; } else if (f === "absence_eleve") o = [{ id: "a", genre: "absence", du: "2099-12-01", au: "2099-12-01", part: "j", motif: 2, vu: true }];
+    r.fulfill({ body: JSON.stringify(o), contentType: "application/json", headers: { "access-control-allow-origin": "*" } }); });
+  const p = await c.newPage(); p.on("pageerror", e => errs.push(e.message)); await p.goto(BASE + "magasin.html?mode=absence"); await attendre(1200);
+  await p.evaluate(() => { window.trouverEleve = async () => [{ ens: "jeremy.raymond", groupe: "2602PLCA1", profs: ["jeremy.raymond", "autre.prof"] }]; return absences(); }); await attendre(600);
+  await p.click("#abOk"); await attendre(150); vrai(/motif/.test(await p.textContent("#abE")), "Absences : pas d'erreur sans motif");
+  await p.click('[data-m="6"]'); await attendre(150); vrai(/non justifiée/.test(await p.textContent(".abC:nth-of-type(4)") + await p.textContent("#app")), "Absences : pas d'avertissement pour « Autre »");
+  await p.click('[data-e="jeremy.raymond"]'); await attendre(150); await p.click("#abOk"); await attendre(500);
+  vrai(sent && sent.p_code === "48213" && sent.p_cle === "K7Q9X2" && sent.p_motif === 6 && sent.p_profs.join() === "jeremy.raymond", "Absences : signalement mal envoyé " + JSON.stringify(sent));
+  vrai(/signalée/.test(await p.textContent("#app")), "Absences : pas de confirmation");
+  vrai(!errs.length, errs.join(" | ")); await c.close();
+});
+
 test("Facture : l'élève (sa carte) fait une facture, importe ses raccords du magasin, le client signe, PDF", async b => {
   const c = await b.newContext({ viewport: { width: 820, height: 1180 }, hasTouch: true, serviceWorkers: "block", acceptDownloads: true }), S = {}, errs = [];
   /* groupe en DEP 2 aujourd'hui (début il y a 6 mois) : seule session où la facture est permise (reglages.json) */

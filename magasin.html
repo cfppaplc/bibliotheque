@@ -213,6 +213,16 @@ body:not(.anim-ok) .etapes .bar.ok{animation:mpBar .7s .25s ease both;transform-
 .mgEtat.on{background:#E3F4EA;color:var(--vert)}.mgEtat.on i{animation:etP 1.6s ease-in-out infinite;box-shadow:0 0 0 0 rgba(30,138,85,.4)}.mgEtat.off{background:#FBE9E7;color:var(--rouge)}.mgEtat.bientot{background:#FFF1E0;color:#B2470F}.mgEtat.bientot i{animation:etP 1s ease-in-out infinite}
 .bientotN{background:#FFF1E0!important;color:#8a4a0f!important}.fermeN{background:#FBE9E7;color:#8f2a22;border-radius:12px;padding:10px 12px;font-weight:600;margin:12px 0 0}
 .constr{text-align:center;max-width:520px;margin:60px auto;padding:34px 24px;background:#fff;border-radius:22px;box-shadow:var(--ombre)}.constr img{width:84px;opacity:.9}.constr h1{margin:14px 0 8px}
+/* absences (27 nov.) */
+.abC{padding:14px 16px}.abS{font-size:.78rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#1F5F8B;margin:4px 0 8px}
+.abSeg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.abSeg button{border:0;border-radius:12px;background:#EEF0F4;padding:11px 4px;font:inherit;font-weight:700;font-size:.9rem;cursor:pointer;color:var(--txt)}.abSeg button.on{background:#16233F;color:#fff}
+.abD{display:flex;gap:8px}.abD label{flex:1;font-size:.8rem;color:var(--doux);font-weight:600}.abD input{display:block;width:100%;margin-top:3px;min-height:46px;border:1.5px solid var(--ligne);border-radius:12px;padding:6px 10px;font:inherit;font-weight:700;background:#fff;color:var(--txt)}
+.abM{display:flex;flex-direction:column;gap:6px}.abM button,.abP button{display:flex;align-items:center;gap:10px;text-align:left;border:1.5px solid var(--ligne);background:#fff;border-radius:12px;padding:11px 12px;font:inherit;font-weight:600;cursor:pointer;color:var(--txt)}
+.abM i{width:18px;height:18px;border-radius:50%;border:2px solid #b8bfcc;flex:none}.abM button.on,.abP button.on{border-color:var(--vert);background:#E3F4EA}.abM button.on i{border:5px solid var(--vert)}
+.abP{display:flex;flex-wrap:wrap;gap:8px}.abP .av{width:30px;height:30px;font-size:.9rem;background:#16233F;color:#fff}
+.abA{background:#FFF1E0;color:#8a4a0f;border-radius:12px;padding:10px 12px;font-size:.88rem;font-weight:600;margin-top:8px}.abA.r{background:#FBE9E7;color:#8f2a22}
+.abR{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--ligne)}.abR:last-child{border:0}.abR.nv{background:linear-gradient(90deg,#FFF6EC,transparent);margin:0 -16px;padding:10px 16px}
+.abOk{width:76px;height:76px;border-radius:50%;background:var(--vert);margin:0 auto 12px;display:grid;place-items:center}.pastN{background:var(--acc);color:#fff;border-radius:999px;padding:1px 8px;font-size:.8rem;margin-left:6px}
 /* écran « Magasin en direct » */
 body.ecranD main{max-width:1500px}a.btn{text-decoration:none;color:inherit;display:inline-flex;align-items:center;justify-content:center}.edB{margin:4px 0 6px;color:var(--acc);font-weight:700}.ed{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px;align-items:start}@media (max-width:900px){.ed{grid-template-columns:1fr}}
 .ed-k{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.ed-k>div{background:#fff;border-radius:18px;box-shadow:var(--ombre);padding:16px;text-align:center}.ed-k b{display:block;font-size:2.6rem;line-height:1;color:var(--acc)}.ed-k span{color:var(--doux);font-weight:600}
@@ -408,6 +418,67 @@ function voirHoraire(){ const H = HEURES || HEURES_DEF, J = ["Dimanche", "Lundi"
 function majEtat(){ const e = etatMag(); document.querySelectorAll(".mgEtat").forEach(el => { el.className = "mgEtat " + (e.bientot ? "bientot" : e.ouvert ? "on" : "off"); el.querySelector("b").textContent = etatTxt(e); });
   const b = $("#pEnv"); if (b && !b.dataset.envoi) { const ferme = !e.ouvert; if (ferme !== !!b.dataset.ferme) { if (ferme) { b.dataset.txt = b.textContent; b.textContent = "Magasin fermé · rouvre " + (e.quand || "bientôt"); b.disabled = true; b.dataset.ferme = "1"; } else { b.textContent = b.dataset.txt || "Envoyer à mon enseignant"; delete b.dataset.ferme; b.disabled = !nbPanier(); } } } }
 setInterval(() => { if (document.querySelector(".mgEtat, #pEnv")) majEtat(); }, 20000);
+/* =================================================================== absences (27 nov.) =====================================================
+   Jeremy : « sur la carte, l'élève pourrait signaler une absence, déjà faite ou future; choix des motifs, avertissements »; « l'élève choisit avec qui il était
+   à l'horaire »; « pas besoin d'appeler ». Motifs et avertissements : Règles de fonctionnement 2025-2026 du Pavillon (section 14). outils/absences.sql. */
+const MOTIFS = [null, "Maladie (hospitalisation, accident)", "Rendez-vous médical", "Décès d'un proche", "Rendez-vous aux services aux élèves", "Activité autorisée par un enseignant", "Autre"];
+const MOTIFS_C = [null, "Maladie", "Rendez-vous médical", "Décès d'un proche", "Services aux élèves", "Activité autorisée", "Autre"];
+const GENRES = { absence:"Absence", retard:"Retard", depart:"Départ hâtif" };
+const jourTxt = d => new Date(d + "T12:00:00").toLocaleDateString("fr-CA", { weekday:"short", day:"numeric", month:"short" });
+const quandTxt = a => (a.du === a.au ? jourTxt(a.du) : jourTxt(a.du) + " au " + jourTxt(a.au)) + (a.part === "am" ? " · avant-midi" : a.part === "pm" ? " · après-midi" : a.genre === "absence" ? " · journée" : "") + (a.heure ? " · " + hTxt(a.heure) : "");
+async function absences(){
+  $("#tTitre").textContent = "Signaler une absence";
+  const K = LS.get("mpCarte", null), m = K && String(K.c || "").toUpperCase().match(/^MP-(\d{5})-([A-Z0-9]{4,12})$/);
+  if (!m) { $("#app").innerHTML = `<div class="constr"><h1>Ouvre d'abord Ma carte</h1><p class="sous">Pour signaler une absence, ta carte étudiante doit être sur ce cellulaire.</p><a class="btn p" href="carte.html" style="margin-top:12px">Ma carte</a></div>`; return; }
+  const code = m[1], cle = m[2], auj = jourCle(new Date());
+  $("#app").innerHTML = `<p class="vide">Recherche de ton groupe…</p>`;
+  let L = []; try { L = await trouverEleve(code); } catch(e){}
+  if (!L.length) { $("#app").innerHTML = `<div class="constr"><h1>Groupe introuvable</h1><p class="sous">Ta carte n'est dans aucun groupe pour l'instant. Demande à ton enseignant.</p><a class="btn" href="carte.html" style="margin-top:12px">‹ Ma carte</a></div>`; return; }
+  const G = L[0], PROFS = [...new Set([G.ens, ...(G.profs || [])])].filter(Boolean), prenom = String((K && K.p) || LS.get("magPrenom", "") || "").split(/\s+/)[0];
+  const der = (LS.get("absProfs", []) || []).filter(x => PROFS.includes(x));
+  const S = { genre:"absence", du:auj, au:auj, part:"j", heure:"", motif:0, profs:der.length ? der : (PROFS.length === 1 ? [PROFS[0]] : []) };
+  const avert = () => { const A = [`<div class="abA">Garde ton billet : une absence justifiée exige un billet.</div>`];
+    if (S.genre !== "absence") A.push(`<div class="abA">Un retard ou un départ hâtif peut être considéré comme une absence non justifiée.</div>`);
+    if (S.motif === 5) A.push(`<div class="abA">L'activité doit être autorisée à l'avance par ton enseignant.</div>`);
+    if (S.motif === 6) A.push(`<div class="abA r">Ce motif n'est pas reconnu : c'est une absence non justifiée (avertissement inscrit au dossier). Plus de 10 % d'absences non motivées dans une compétence = pas d'épreuve de reprise.</div>`);
+    A.push(`<div class="abA${S.motif && S.motif <= 3 ? "" : " r"}">Si tu manques un examen : seuls la maladie, un rendez-vous médical ou le décès d'un proche peuvent justifier ton absence.</div>`);
+    if (S.genre === "absence") { let n = 0; for (let d = new Date(S.du + "T12:00:00"); jourCle(d) <= S.au; d.setDate(d.getDate() + 1)) if (d.getDay() % 6) n++;
+      if (n >= 5) A.push(`<div class="abA r">5 jours d'absence de suite = abandon présumé de ta formation. Parles-en à ton enseignant.</div>`); }
+    return A.join(""); };
+  const dessiner = () => {
+    $("#app").innerHTML = `<a class="lien" href="carte.html">‹ Ma carte</a><h1 style="margin-top:6px">Signaler une absence</h1><p class="sous">${esc(prenom || "Élève")} · ${esc(G.groupe)}</p>
+      <div class="carte abC"><div class="abS">Quoi ?</div><div class="abSeg">${Object.entries(GENRES).map(([k, t]) => `<button data-g="${k}" class="${S.genre === k ? "on" : ""}">${t}</button>`).join("")}</div>
+        <div class="abS">Quand ?</div><div class="abD"><label>${S.genre === "absence" ? "Du" : "Le"}<input type="date" id="abDu" value="${S.du}"></label>${S.genre === "absence" ? `<label>Au<input type="date" id="abAu" value="${S.au}" min="${S.du}"></label>` : `<label>${S.genre === "retard" ? "J'arrive à" : "Je pars à"}<input type="time" id="abH" value="${S.heure}"></label>`}</div>
+        ${S.genre === "absence" ? `<div class="abSeg" style="margin-top:8px">${[["j", "Journée"], ["am", "Avant-midi"], ["pm", "Après-midi"]].map(([k, t]) => `<button data-p="${k}" class="${S.part === k ? "on" : ""}">${t}</button>`).join("")}</div>` : ""}</div>
+      <div class="carte abC"><div class="abS">Motif</div><div class="abM">${MOTIFS.slice(1).map((t, i) => `<button data-m="${i + 1}" class="${S.motif === i + 1 ? "on" : ""}"><i></i>${t}</button>`).join("")}</div></div>
+      <div class="carte abC"><div class="abS">Ton enseignant à l'horaire</div><p class="sous" style="margin:0 0 8px">Avec qui étais-tu (ou seras-tu) pendant cette absence ?</p><div class="abP">${PROFS.map(id => `<button data-e="${esc(id)}" class="${S.profs.includes(id) ? "on" : ""}"><span class="av">${esc(nomEns(id).charAt(0))}</span>${esc(nomEns(id))}</button>`).join("")}</div></div>
+      <div class="carte abC"><div class="abS">À savoir</div>${avert()}</div>
+      <p class="err" id="abE"></p><button class="btn p" id="abOk" style="width:100%">Signaler à mon enseignant</button>
+      <div class="sec" style="margin-top:22px">Mes signalements</div><div id="abL"><p class="vide">Chargement…</p></div>`;
+    document.querySelectorAll("[data-g]").forEach(b => b.onclick = () => { S.genre = b.dataset.g; if (S.genre !== "absence") { S.au = S.du; S.part = "j"; } dessiner(); });
+    document.querySelectorAll("[data-p]").forEach(b => b.onclick = () => { S.part = b.dataset.p; dessiner(); });
+    document.querySelectorAll("[data-m]").forEach(b => b.onclick = () => { S.motif = +b.dataset.m; dessiner(); });
+    document.querySelectorAll("[data-e]").forEach(b => b.onclick = () => { const id = b.dataset.e; S.profs = S.profs.includes(id) ? S.profs.filter(x => x !== id) : S.profs.concat(id); dessiner(); });
+    $("#abDu").onchange = e => { S.du = e.target.value || auj; if (S.au < S.du || S.genre !== "absence") S.au = S.du; dessiner(); };
+    if ($("#abAu")) $("#abAu").onchange = e => { S.au = e.target.value < S.du ? S.du : e.target.value; dessiner(); };
+    if ($("#abH")) $("#abH").onchange = e => { S.heure = e.target.value; };
+    $("#abOk").onclick = async () => { const er = $("#abE"); er.textContent = "";
+      if (!S.motif) { er.textContent = "Choisis un motif."; return; } if (!S.profs.length) { er.textContent = "Choisis ton enseignant."; return; }
+      if (S.genre !== "absence" && !S.heure) { er.textContent = S.genre === "retard" ? "Écris l'heure de ton arrivée." : "Écris l'heure de ton départ."; return; }
+      const b = $("#abOk"); b.disabled = true; b.textContent = "Envoi…";
+      try { const r = await rpc("absence_signaler", { p_code:code, p_cle:cle, p_groupe:G.groupe, p_prenom:prenom, p_profs:S.profs, p_genre:S.genre, p_du:S.du, p_au:S.genre === "absence" ? S.au : S.du, p_part:S.genre === "absence" ? S.part : "j", p_heure:S.genre === "absence" ? "" : S.heure, p_motif:S.motif });
+        if (!r || !r.ok) throw new Error(r && r.err === "trop" ? "Trop de signalements aujourd'hui." : r && r.err === "carte" ? "Ta carte n'est pas reconnue. Demande à ton enseignant." : "Signalement refusé. Vérifie les dates.");
+        LS.set("absProfs", S.profs);
+        $("#app").innerHTML = `<div class="constr"><div class="abOk"><svg viewBox="0 0 24 24" width="40" height="40"><path d="M5 12.5l4.2 4.2L19 7" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div><h1>${GENRES[S.genre]} signalé${S.genre === "absence" ? "e" : ""}</h1>
+          <p class="sous">${esc(S.profs.map(nomEns).join(" et "))} ${S.profs.length > 1 ? "ont" : "a"} reçu l'avis. ${S.motif <= 5 ? "N'oublie pas ton billet." : ""}</p><a class="btn p" href="carte.html" style="margin-top:14px">‹ Ma carte</a><button class="btn" id="abAutre" style="margin-top:8px">Signaler autre chose</button></div>`;
+        $("#abAutre").onclick = () => { S.motif = 0; dessiner(); }; }
+      catch(e){ er.textContent = /Failed|fetch|404/.test(e.message) ? "Pas de connexion pour l'instant. Réessaie dans un moment." : e.message; b.disabled = false; b.textContent = "Signaler à mon enseignant"; } };
+    liste(); };
+  const liste = async () => { const z = $("#abL"); if (!z) return; let R = []; try { R = await rpc("absence_eleve", { p_code:code, p_cle:cle }) || []; } catch(e){ z.innerHTML = `<p class="vide">Liste indisponible pour l'instant.</p>`; return; }
+    z.innerHTML = R.length ? `<div class="carte" style="padding:6px 16px">${R.map(a => `<div class="abR"><div><b>${GENRES[a.genre] || "Absence"}</b> · ${esc(quandTxt(a))}<br><small class="sous">${esc(MOTIFS_C[a.motif] || "")}${a.vu ? " · vu par l'enseignant" : ""}</small></div>${a.du >= auj ? `<button class="lien" data-x="${esc(a.id)}" style="color:var(--rouge)">Annuler</button>` : ""}</div>`).join("")}</div>` : `<p class="vide">Aucun signalement.</p>`;
+    z.querySelectorAll("[data-x]").forEach(b => b.onclick = async () => { if (!confirm("Annuler ce signalement ?")) return; try { await rpc("absence_annuler", { p_code:code, p_cle:cle, p_id:b.dataset.x }); } catch(e){} liste(); }); };
+  dessiner(); }
+
 function eleveCatalogue(){
   enTete();
   const cats = [...new Set(CAT.map(a => a.cat).filter(Boolean))], mats = [...new Set(CAT.map(a => a.mat).filter(Boolean))].sort((a, b) => a.localeCompare(b, "fr")), ds = [...new Set(CAT.map(a => a.d).filter(Boolean))].sort((a, b) => pouces(a) - pouces(b));
@@ -559,6 +630,7 @@ async function dessinerProf(){
   clearTimeout(profT);
   let L; try { L = await rpc("panier_prof_lire", { p_ens:ENS, p_jeton:JETON }); } catch(e){ $("#app").innerHTML = `<p class="err">Pas de connexion pour l'instant. On réessaie tout seul.</p>`; profT = setTimeout(dessinerProf, 15000); return; }
   let AVIS = []; try { AVIS = await rpc("panier_prof_avis", { p_ens:ENS, p_jeton:JETON }) || []; } catch(e){}
+  let ABS = []; try { ABS = await rpc("absence_prof_lire", { p_ens:ENS, p_jeton:JETON }) || []; } catch(e){}   /* 27 nov. : absences signalées par les élèves */
   const att = L.filter(p => p.etat === "attente"), aut = L.filter(p => p.etat !== "attente" && Date.now() - Date.parse(p.t_remis || p.t_app || p.t) < 108e5);   /* 26 nov. (Jeremy) : traités = 3 dernières heures (avant : 24 h); le reste est dans les archives */
   const neufs = att.filter(p => !VUS.has(p.id)); if (neufs.length && VUS.size) bip(); att.forEach(p => VUS.add(p.id)); LS.set("magVus", [...VUS].slice(-300));
   const avis = "Notification" in window && "serviceWorker" in navigator && "PushManager" in window, perm = avis ? Notification.permission : "non";
@@ -567,9 +639,14 @@ async function dessinerProf(){
     <div class="avis-l" id="avisZ">${perm === "granted" && LS.get("magAbonne|" + ENS, false) ? `<button class="cloche on" id="avTest" title="Notifications activées · toucher pour essayer" aria-label="Notifications activées, essayer">${CLOCHE}</button><button class="lien" id="avNon">Désactiver les notifications</button>` : (`<button class="cloche" id="avOui" title="Activer les notifications" aria-label="Activer les notifications">${CLOCHE}</button>`)}<p class="err" id="avErr" style="min-height:0;margin:0;width:100%"></p></div>
     ${AVIS.length ? `<div class="sec">Avis du magasinier</div><div class="carte avisMag">${AVIS.map(a => `<div class="avm"><span><b>${esc(a.prenom || "Élève")}</b> <small class="sous">${esc(a.code)} · ${esc(a.groupe)} · ${heure(a.t)}</small><br>${esc(REGLES_L[a.regle] || "?")}</span><button class="btn" data-vu="${esc(a.id)}" title="Retirer de cette page (reste dans le dossier de l'élève)">Vu</button></div>`).join("")}<p class="sous" style="margin:8px 0 0">« Vu » retire l'avis d'ici; il reste dans le dossier de l'élève.</p></div>` : ""}
     <a class="btn edB" href="magasin.html?mode=ecran">Magasin en direct</a>
+    <div id="absZ"></div>
     <div class="sec">En attente</div>${att.length ? att.map(p => cmdHtml(p, true)).join("") : `<p class="vide">Rien à approuver.</p>`}
     <div class="sec">Traités (3 dernières heures)</div>${aut.length ? aut.map(p => cmdHtml(p, false)).join("") : `<p class="vide">Aucun.</p>`}
     <details class="arch"><summary>Archives de l'année</summary><div class="carte" style="margin-top:10px"><label for="arM">Mois</label> <select id="arM">${(() => { const o = []; for (let i = 0; i < 12; i++){ const d = new Date(); d.setDate(1); d.setMonth(d.getMonth() - i); o.push(`<option value="${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}">${d.toLocaleDateString("fr-CA", { month:"long", year:"numeric" })}</option>`); } return o.join(""); })()}</select> <button class="btn" id="arVoir" style="min-height:40px">Voir</button><div id="arL"></div></div></details>`;
+  { const z = $("#absZ"), auj = jourCle(new Date()), nv = ABS.filter(a => !a.vu), V = ABS.filter(a => a.vu && a.au >= auj).slice(0, 10);
+    if (z && (nv.length || V.length)) { const l = a => `<div class="abR${a.vu ? "" : " nv"}"><div><b>${esc(a.prenom || "Élève")}</b> <small class="sous">${esc(a.code)} · ${esc(a.groupe)}</small><br>${GENRES[a.genre] || "Absence"} · ${esc(quandTxt(a))}<br><small class="sous">${esc(MOTIFS_C[a.motif] || "")}</small></div>${a.vu ? "" : `<button class="btn" data-av="${esc(a.id)}">Vu</button>`}</div>`;
+      z.innerHTML = `<div class="sec">Absences signalées${nv.length ? ` <span class="pastN">${nv.length}</span>` : ""}</div><div class="carte" style="padding:6px 16px">${nv.map(l).join("")}${V.length ? `<details${nv.length ? "" : " open"}><summary class="sous" style="padding:8px 0;cursor:pointer">Déjà vues, à venir (${V.length})</summary>${V.map(l).join("")}</details>` : ""}</div>`;
+      z.querySelectorAll("[data-av]").forEach(b => b.onclick = async () => { b.disabled = true; try { await rpc("absence_vu", { p_ens:ENS, p_jeton:JETON, p_id:b.dataset.av }); } catch(e){} dessinerProf(); }); } }
   document.querySelectorAll("[data-ok]").forEach(b => b.onclick = () => decider(b.dataset.ok, true));
   document.querySelectorAll("[data-non]").forEach(b => b.onclick = () => { const act = b.parentNode; if (act.nextElementSibling && act.nextElementSibling.classList.contains("refus")) return;
     const z = document.createElement("div"); z.className = "refus";
@@ -834,6 +911,7 @@ async function remettre(id, oui){ try { await rpcM("panier_remettre", { p_id:id,
   if (MODE === "prof") return prof();
   if (MODE === "magasin") return magasinier();
   if (MODE === "ecran") return ecranDirect();
+  if (MODE === "absence") return absences();
   /* 26 nov. 23 h 20 (Jeremy : « bloque les fonctions de panier pour le moment, écris en construction, juste moi qui peut tester ») :
      reglages.json → magasinPublic:true pour ouvrir à tous. Sinon, seul jeremy.raymond (connecté sur l'appareil) passe; les tests automatiques aussi. */
   if (!MAG_PUBLIC && ENS !== "jeremy.raymond" && !LS.get("magEssai", false) && !navigator.webdriver) { $("#app").innerHTML = `<div class="constr"><img src="img/metier-plus-icone.svg" alt=""><h1>Magasin en construction</h1><p class="sous">Le magasin de raccords en ligne arrive bientôt. D'ici là, continue de faire tes demandes comme d'habitude au comptoir, avec ta feuille signée par ton enseignant.</p><button class="lien" id="essaiP" style="margin-top:14px;font-size:.85rem;color:var(--doux)">Accès du personnel</button></div>`;

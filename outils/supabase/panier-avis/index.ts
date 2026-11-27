@@ -1,6 +1,6 @@
 // Fonction Supabase « panier-avis » (25 nov.) : avis Web Push de Métier+ aux enseignants (sans application à installer).
 // GET  → clé publique des avis (créée la première fois, gardée dans panier_vapid, jamais montrée à personne).
-// POST {avis} → appelée par panier_signaler (règlement du magasin). POST {id, eleve} → avis à l'élève.
+// POST {avis} → appelée par panier_signaler (règlement du magasin). POST {absence} → absence_signaler (27 nov.). POST {id, eleve} → avis à l'élève.
 // POST {id} → appelée par panier_envoyer : avertit les appareils de l'enseignant du panier (une seule fois, panier de moins de 2 min).
 // À déployer dans Supabase → Edge Functions (nom : panier-avis, « Verify JWT » désactivé).
 import * as webpush from "jsr:@negrel/webpush";
@@ -43,7 +43,7 @@ Deno.serve(async (req) => {
       const raw = new Uint8Array(await crypto.subtle.exportKey("raw", (k as CryptoKeyPair).publicKey));
       return json({ cle: btoa(String.fromCharCode(...raw)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "") });
     }
-    const { id, eleve, avis, comptoir } = await req.json();
+    const { id, eleve, avis, comptoir, absence } = await req.json();
     if (comptoir) {   /* iPad du comptoir : nouvelle commande approuvée (code et nombre de raccords seulement) */
       const { data: p } = await sb.from("panier").select("id,code,items,etat,t_app").eq("id", id).maybeSingle();
       if (!p || p.etat !== "approuve" || Date.now() - new Date(p.t_app).getTime() > 120000) return json({ ok: false });
@@ -52,6 +52,15 @@ Deno.serve(async (req) => {
       const { data: L } = await sb.from("magasin_abo").select("endpoint,abo"); let n = 0;
       for (const x of (L || [])) { try { await app.subscribe(x.abo).pushTextMessage(msg, {}); n++; } catch (e) { if (/\b(404|410)\b|gone|expired/i.test(String(e))) await sb.from("magasin_abo").delete().eq("endpoint", x.endpoint); } }
       return json({ ok: true, n });
+    }
+    if (absence) {   /* 27 nov. : absence signalée par l'élève (Ma carte) → enseignants qu'il a choisis */
+      const MOT = ["", "Maladie", "Rendez-vous médical", "Décès d'un proche", "Services aux élèves", "Activité autorisée", "Autre"], G: Record<string, string> = { absence: "Absence", retard: "Retard", depart: "Départ hâtif" };
+      const { data: a } = await sb.from("absence").select("*").eq("id", absence).maybeSingle();
+      if (!a || Date.now() - new Date(a.t).getTime() > 120000) return json({ ok: false });
+      const j = (d: string) => new Date(d + "T12:00:00").toLocaleDateString("fr-CA", { weekday: "short", day: "numeric", month: "short" });
+      const quand = a.du === a.au ? j(a.du) : j(a.du) + " au " + j(a.au), part = a.part === "am" ? " (avant-midi)" : a.part === "pm" ? " (après-midi)" : "";
+      const msg = JSON.stringify({ title: `${G[a.genre] || "Absence"} : ${a.prenom || "élève"} (${a.groupe})`, body: `${quand}${part}${a.heure ? " · " + a.heure.replace(":", " h ") : ""} · ${MOT[a.motif] || "?"}`, url: "/magasin.html?mode=prof", tag: "abs-" + a.id });
+      return json({ ok: true, n: await envoyer(a.profs || [], msg, k) });
     }
     if (avis) {   /* règlement du magasin non respecté : avis à l'enseignant de l'élève */
       const REG = ["", "Ne connaissait pas le nom exact du raccord", "Sans carte étudiante", "Consignes d'accès non respectées", "Matériel rendu sale", "Sans feuille de l'enseignant", "Bris ou usage personnel"];
