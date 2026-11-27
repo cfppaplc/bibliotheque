@@ -374,7 +374,7 @@ function enTete(){ $("#tQui").innerHTML = `<b>${MOI.prenom ? "Bonjour " + esc(MO
   $("#tSortir").onclick = () => { if (nbPanier() && !confirm("Ton panier sera vidé. Changer d'élève ?")) return; MOI = null; PANIER = {}; LS.set("magEleve", null); sauverPanier(); eleveEntree(); }; }
 /* 26 nov. (Jeremy : « l'horaire pourrait rendre notre système dynamique ») : heures du magasin (reglages.json → magasinHeures, réglées dans Administration → Site).
    Hors des heures : l'élève remplit son panier mais ne peut pas l'envoyer; état « ouvert / fermé · rouvre à … » partout. */
-const HEURES_DEF = { jours:[1, 2, 3, 4, 5], plages:[["08:00", "09:30"], ["09:35", "10:35"], ["10:50", "11:50"], ["13:00", "14:00"], ["14:05", "15:05"], ["15:20", "16:20"]], fermes:[] };
+const HEURES_DEF = { jours:[1, 2, 3, 4, 5], plages:[["08:30", "09:30"], ["09:35", "10:35"], ["10:50", "11:50"], ["13:00", "14:00"], ["14:05", "15:05"], ["15:20", "16:20"]], fermes:[] };
 let HEURES = HEURES_DEF;
 async function chargerHeures(){ try { const r = await (await fetch("reglages.json", { cache:"no-cache" })).json(); if (r.magasinHeures) HEURES = r.magasinHeures; } catch(e){} }
 const hm = t => { const [h, m] = String(t).split(":").map(Number); return h * 60 + (m || 0); }, hTxt = t => { const [h, m] = String(t).split(":"); return (+h) + " h " + (m || "00"); };

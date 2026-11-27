@@ -435,7 +435,7 @@ test("Magasin : l'élève (carte scannée) envoie son panier, l'enseignant appro
     await h.click(".art .aj"); await attendre(200); await h.click("#bVoir"); await attendre(300);
     vrai(await h.$eval("#pEnv", b => b.disabled && /fermé/.test(b.textContent)) && !!(await h.$(".fermeN")), "Heures : le panier part même quand le magasin est fermé");
     if (process.env.CAPTURES) await h.screenshot({ path: process.env.CAPTURES + "/ferme.png" }); { const e = await h.evaluate(() => { HEURES = HEURES_DEF; return [etatMag(new Date(2026, 10, 26, 11, 45)), etatMag(new Date(2026, 10, 26, 9, 32)), etatMag(new Date(2026, 10, 26, 12, 10)), etatMag(new Date(2026, 10, 27, 17, 0)), etatMag(new Date(2026, 10, 26, 9, 25))].map(etatTxt); });
-      vrai(/ferme bientôt.*11 h 50.*5 min/.test(e[0]) && /^Magasin ouvert · ferme à 9 h 30/.test(e[4]) && /fermé · rouvre à 9 h 35/.test(e[1]) && /rouvre à 13 h 00/.test(e[2]) && /rouvre lundi à 8 h 00/.test(e[3]), "Heures : états faux : " + e.join(" | ")); }
+      vrai(/ferme bientôt.*11 h 50.*5 min/.test(e[0]) && /^Magasin ouvert · ferme à 9 h 30/.test(e[4]) && /fermé · rouvre à 9 h 35/.test(e[1]) && /rouvre à 13 h 00/.test(e[2]) && /rouvre lundi à 8 h 30/.test(e[3]), "Heures : états faux : " + e.join(" | ")); }
     await h.evaluate(() => localStorage.removeItem("magHeuresTest")); await h.close(); }
   await p.click(".art .aj"); await attendre(200); await p.click("#bVoir"); await attendre(300); await p.click("#pEnv"); await attendre(1200);
   await q.reload(); await attendre(1500);

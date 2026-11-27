@@ -1,5 +1,5 @@
 /* heures du magasin par défaut (Jeremy, 26 nov.) : 8 h – 11 h 50 et 13 h – 16 h 20, fermé aux pauses */
-const HEURES_MAG_DEF = { jours:[1, 2, 3, 4, 5], plages:[["08:00", "09:30"], ["09:35", "10:35"], ["10:50", "11:50"], ["13:00", "14:00"], ["14:05", "15:05"], ["15:20", "16:20"]], fermes:[] };
+const HEURES_MAG_DEF = { jours:[1, 2, 3, 4, 5], plages:[["08:30", "09:30"], ["09:35", "10:35"], ["10:50", "11:50"], ["13:00", "14:00"], ["14:05", "15:05"], ["15:20", "16:20"]], fermes:[] };
 /* © 2026 Jérémy Raymond. Tous droits réservés.
    Administration → onglet « Site » (15 nov.) : état du site, signalements reçus, réglages du site.
    Signalements : le sujet ntfy ne garde les messages que 12 h; l'ordinateur de l'administrateur les recopie
