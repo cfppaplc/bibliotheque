@@ -823,7 +823,7 @@ async function remettre(id, oui){ try { await rpcM("panier_remettre", { p_id:id,
   if (MODE === "ecran") return ecranDirect();
   /* 26 nov. 23 h 20 (Jeremy : « bloque les fonctions de panier pour le moment, écris en construction, juste moi qui peut tester ») :
      reglages.json → magasinPublic:true pour ouvrir à tous. Sinon, seul jeremy.raymond (connecté sur l'appareil) passe; les tests automatiques aussi. */
-  if (!MAG_PUBLIC && ENS !== "jeremy.raymond" && !navigator.webdriver) { $("#app").innerHTML = `<div class="constr"><img src="img/metier-plus-icone.svg" alt=""><h1>Magasin en construction</h1><p class="sous">Le magasin de raccords en ligne arrive bientôt. D'ici là, continue de faire tes demandes comme d'habitude au comptoir.</p></div>`; return; }
+  if (!MAG_PUBLIC && ENS !== "jeremy.raymond" && !navigator.webdriver) { $("#app").innerHTML = `<div class="constr"><img src="img/metier-plus-icone.svg" alt=""><h1>Magasin en construction</h1><p class="sous">Le magasin de raccords en ligne arrive bientôt. D'ici là, continue de faire tes demandes comme d'habitude au comptoir, avec ta feuille signée par ton enseignant.</p></div>`; return; }
   if (POSTE) { LS.set("magEleve", null); MOI = null; return eleveEntree(); }
   if (MOI && MOI.code) return eleveCatalogue();
   const K = LS.get("mpCarte", null);   /* « Ma carte Métier+ » sur ce cellulaire : entrée directe */
