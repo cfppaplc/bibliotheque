@@ -389,7 +389,8 @@ function eleveEntree(msg){
   if (POSTE || !matchMedia("(pointer:coarse)").matches) i.focus();
 }
 function connecter(code, x){ MOI = { code, ens:x.ens, groupe:x.groupe, profs:(x.profs || []).filter(id => id !== x.ens), prenom:LS.get("magPrenom", "") }; LS.set("magEleve", MOI); eleveCatalogue(); }
-function enTete(){ $("#tQui").innerHTML = `<b>${MOI.prenom ? "Bonjour " + esc(MOI.prenom) : ""}</b> <span class="cg">· ${MOI.groupe === "ESSAI" ? "•••••" : esc(MOI.code)}</span><span class="gp"> · ${esc(MOI.groupe)}</span>`; $("#tSortir").hidden = false;
+function enTete(){ $("#tQui").innerHTML = MOI.prenom ? `<b>Bonjour ${esc(MOI.prenom)}</b><span class="gp"> · ${esc(MOI.groupe)}</span>`   /* 27 nov. (Jeremy) : le prénom en haut, pas le numéro */
+    : `<b>${MOI.groupe === "ESSAI" ? "Essai" : "Élève " + esc(MOI.code)}</b><span class="gp"> · ${esc(MOI.groupe)}</span>`; $("#tSortir").hidden = false;
   $("#tSortir").onclick = () => { if (nbPanier() && !confirm("Ton panier sera vidé. Changer d'élève ?")) return; MOI = null; PANIER = {}; LS.set("magEleve", null); sauverPanier(); eleveEntree(); }; }
 /* 26 nov. (Jeremy : « l'horaire pourrait rendre notre système dynamique ») : heures du magasin (reglages.json → magasinHeures, réglées dans Administration → Site).
    Hors des heures : l'élève remplit son panier mais ne peut pas l'envoyer; état « ouvert / fermé · rouvre à … » partout. */

@@ -325,7 +325,7 @@ test("Magasin : l'élève (carte scannée) envoie son panier, l'enseignant appro
   const p = await c1.newPage(); p.on("pageerror", e => errs.push(e.message));
   await p.goto(BASE + "magasin.html?e=jeremy.raymond"); await attendre(800);
   await p.fill("#cCode", "MP-12345-K7Q9X2"); await p.keyboard.press("Enter"); await attendre(1200);
-  vrai(/12345/.test(await p.textContent("#tQui")), "Carte scannée : élève pas reconnu");
+  vrai(/Essai/.test(await p.textContent("#tQui")) && !/12345/.test(await p.textContent("#tQui")), "Carte scannée : élève pas reconnu, ou le numéro est affiché en haut au lieu du prénom");
   vrai(/Bonjour Essai/.test(await p.textContent("#tQui")), "Carte scannée : le prénom ne vient pas de la carte (" + await p.textContent("#tQui") + ")");
   await attendre(500); vrai(/Activer les notifications/.test(await p.textContent("#notifE")) && !!(await p.$("#notifE .cloche")), "Élève : la cloche « Activer les notifications » est absente");
   await p.fill("#fQ", "coude 90 abs 2"); await attendre(300);
@@ -462,7 +462,7 @@ test("Magasin : l'élève (carte scannée) envoie son panier, l'enseignant appro
   const po = await c4.newPage(); po.on("pageerror", e => errs.push(e.message)); await po.goto(BASE + "magasin.html?poste=1&e=jeremy.raymond"); await attendre(800);
   await po.fill("#cCode", "MP-12345-K7Q9X2"); await po.keyboard.press("Enter"); await attendre(1200);
   await po.click(".art .aj"); await po.click("#bVoir", { force: true }); await attendre(300); await po.click("#pEnv"); await attendre(5200);
-  vrai(!(await po.$("#cCode")) && /12345/.test(await po.textContent("#tQui")), "iPad du coffre : l'élève doit rester connecté après l'envoi (vidé seulement après 2 min sans toucher)");
+  vrai(!(await po.$("#cCode")) && /Essai/.test(await po.textContent("#tQui")), "iPad du coffre : l'élève doit rester connecté après l'envoi (vidé seulement après 2 min sans toucher)");
   vrai(!errs.length, errs.join(" | "));
   await c1.close(); await c2.close(); await c3.close(); await c4.close();
 });
