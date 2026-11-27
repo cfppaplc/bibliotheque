@@ -2,7 +2,7 @@
    Nuit = bleu nuit; jour = clair. Pas de zone qui défile dans la page (TNI). */
 *{box-sizing:border-box}
 html,body{margin:0;height:100%}
-body{font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;--acc:#EB6A22;--loup:#C8452B;--vil:#3E5C9A;transition:background .6s,color .6s}
+body{font-family:"Segoe UI",Roboto,system-ui,-apple-system,sans-serif;--acc:#EB6A22;--loup:#C8452B;--vil:#3E5C9A;transition:background .6s,color .6s}
 body.nuit{background:#0A1020;color:#E9EDF5;--carte:rgba(22,33,58,.78);--trait:rgba(140,165,215,.22);--doux:#A9B6D0}
 body.jour{background:#F6E9D2;color:#24211E;--carte:rgba(255,255,255,.82);--trait:rgba(120,95,60,.2);--doux:#6B6359}
 button{font:inherit;cursor:pointer}
