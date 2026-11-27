@@ -107,7 +107,7 @@ test("Administration : chaque onglet s'ouvre; Quoi de neuf se modifie et s'annul
   await p.click("#nvAnn"); await attendre(500);
   vrai(/Tout est publié/.test(await p.textContent(".ap-pub .acces-etat")), "Annuler n'a pas remis la liste");
   { const ongS = tabs.find(k => /site/.test(k)); if (ongS) { await p.click('.acces-onglets [data-ong="' + ongS + '"]'); await attendre(800);   /* 26 nov. : heures du magasin */
-    vrai((await p.$$(".as-hm .as-hpl")).length === 6, "Heures du magasin : les 6 périodes ne sont pas affichées");
+    vrai((await p.$$(".as-hm [data-hp$=\"|0\"]")).length === 6 && (await p.$$(".as-hm [data-cx]")).length === 2, "Heures du magasin : les 6 périodes ou les 2 fermetures de la semaine ne sont pas affichées");
     await p.click("#hFa"); await attendre(300); vrai(/Rouvrir/.test(await p.textContent("#hFa")), "Heures du magasin : « Fermer aujourd'hui » ne fonctionne pas");
     if (process.env.CAPTURES) await (await p.$(".as-hm")).screenshot({ path: process.env.CAPTURES + "/heures-admin.png" });
     await p.click("#hFa"); await attendre(300); } }
