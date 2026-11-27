@@ -216,7 +216,12 @@ document.addEventListener("click", e => { const b = e.target.closest && e.target
   const l = b.closest("label"), bu = l && l.nextElementSibling; if (bu && bu.classList.contains("bulleI")) bu.hidden = !bu.hidden; }, true);   /* 25 nov. : bulle d'information des options */
 function trichAppliquer(i){ const t = window.__trich, b = document.getElementById("jBx"); if (!t || t.i !== i || !b || b.querySelector(".trichB") || !b.querySelector("[data-c], #jNb")) return;   /* 25 nov. : aussi Calcul et Estimation (champ #jNb) */   /* seulement pendant la question */
   if (t.apres && Date.now() < t.apres){ clearTimeout(window.__trichT); window.__trichT = setTimeout(() => trichAppliquer(i), t.apres - Date.now() + 30); return; }
-  b.insertAdjacentHTML("afterbegin", `<div class="trichB">Tu es le tricheur (la réponse arrive après 3 s). Bonne réponse : <b>${String(t.txt || "").replace(/[&<>"]/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"})[c])}</b>. Ne te fais pas remarquer!</div>`);
+  /* 27 nov. (Jeremy : « le tricheur devrait pouvoir masquer la petite bulle ») : bouton Masquer; masquée, il reste un petit bouton gris
+     discret pour la revoir. Le choix est gardé pour toute la partie. */
+  let m = false; try { m = sessionStorage.getItem("trichMasque") === "1"; } catch(e){}
+  b.insertAdjacentHTML("afterbegin", `<div class="trichB${m ? " masq" : ""}"><span class="trichT">Tu es le tricheur (la réponse arrive après 3 s). Bonne réponse : <b>${String(t.txt || "").replace(/[&<>"]/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"})[c])}</b>. Ne te fais pas remarquer!</span><button type="button" class="trichM" aria-label="${m ? "Montrer" : "Masquer"}">${m ? "•••" : "Masquer"}</button></div>`);
+  const tb = b.querySelector(".trichB"); tb.querySelector(".trichM").onclick = e => { e.stopPropagation(); const v = !tb.classList.contains("masq"); tb.classList.toggle("masq", v);
+    e.currentTarget.textContent = v ? "•••" : "Masquer"; e.currentTarget.setAttribute("aria-label", v ? "Montrer" : "Masquer"); try { sessionStorage.setItem("trichMasque", v ? "1" : "0"); } catch(x){} };
   if (!b.querySelector(".ch4.ordre")) [].concat(t.bon == null ? [] : t.bon).forEach(k => { const x = b.querySelector(`[data-c="${k}"]`); if (x) x.classList.add("trichOk"); }); }
 function telecommande(bord){
   $("tele").classList.remove("cache");

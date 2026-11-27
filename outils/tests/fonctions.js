@@ -579,6 +579,19 @@ test("Magasin : le trajet du magasinier fait une rangée au complet avant la sui
   vrai(o.length > 6 && changements === new Set(o).size - 1, "Trajet : on revient dans une rangée déjà faite (" + o.join(" ") + ")");
   await p.context().close();
 });
+test("Défi+ : le tricheur peut masquer sa bulle (bonne réponse), et elle reste masquée à la question suivante", async b => {   /* 27 nov. */
+  const ctx = await b.newContext({ viewport: { width: 390, height: 800 }, serviceWorkers: "block" }), errs = [];
+  await ctx.addInitScript(() => localStorage.setItem("bienvenueVu", "1"));
+  const p = await ctx.newPage(); p.on("pageerror", e => errs.push(e.message)); await p.goto(BASE + "quiz.html"); await attendre(1200);
+  const pose = i => p.evaluate(i => { let b = document.getElementById("jBx"); if (!b) b = document.createElement("div"); b.id = "jBx"; document.body.prepend(b); b.hidden = false; b.style.cssText = "display:block;position:fixed;top:0;left:0;right:0;z-index:9999;background:#fff";
+    b.innerHTML = '<button data-c="0">A</button><button data-c="1">B</button>'; window.__trich = { i, txt: "Coude 90°", bon: 1 }; trichAppliquer(i); }, i);
+  await pose(1); vrai(await p.isVisible(".trichB .trichT"), "Tricheur : la bulle n'apparaît pas");
+  await p.evaluate(() => document.querySelector(".trichM").click()); await attendre(150);
+  vrai(!(await p.isVisible(".trichB .trichT")) && /•••/.test(await p.textContent(".trichM")), "Tricheur : la bulle ne se masque pas");
+  await pose(2); vrai(!(await p.isVisible(".trichB .trichT")), "Tricheur : la bulle réapparaît à la question suivante");
+  await p.evaluate(() => document.querySelector(".trichM").click()); await attendre(150); vrai(await p.isVisible(".trichB .trichT"), "Tricheur : impossible de revoir la bulle");
+  vrai(!errs.length, "Erreurs : " + errs.join(" | ")); await ctx.close();
+});
 test("Carte : l'élève affiche sa carte avec son code à 5 chiffres seulement; trop de codes inconnus = pause", async b => {
   const c = await b.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: "block" }), R = {}, errs = []; let E = 0;
   await c.route(/rpc\/carte_code_(ecrire|lire)/, r => { const a = JSON.parse(r.request().postData()), u = r.request().url(); let out;
