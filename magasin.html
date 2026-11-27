@@ -394,31 +394,35 @@ function enTete(){ $("#tQui").innerHTML = MOI.prenom ? `<b>Bonjour ${esc(MOI.pre
   $("#tSortir").onclick = () => { if (nbPanier() && !confirm("Ton panier sera vidé. Changer d'élève ?")) return; MOI = null; PANIER = {}; LS.set("magEleve", null); sauverPanier(); eleveEntree(); }; }
 /* 26 nov. (Jeremy : « l'horaire pourrait rendre notre système dynamique ») : heures du magasin (reglages.json → magasinHeures, réglées dans Administration → Site).
    Hors des heures : l'élève remplit son panier mais ne peut pas l'envoyer; état « ouvert / fermé · rouvre à … » partout. */
-const HEURES_DEF = { jours:[1, 2, 3, 4, 5], plages:[["08:30", "09:30"], ["09:35", "10:35"], ["10:50", "11:50"], ["13:00", "14:00"], ["14:05", "15:05"], ["15:20", "16:20"]], fermes:[] };
+const HEURES_DEF = { jours:[1, 2, 3, 4, 5], plages:[["08:30", "09:30"], ["09:35", "10:35"], ["10:50", "11:50"], ["13:00", "14:00"], ["14:05", "15:05"], ["15:20", "16:20"]], fermes:[], coupures:[{ j:[1, 3], de:"09:30", a:"10:15" }, { j:[2, 5], de:"09:30", a:"11:30" }] };   /* 27 nov. : fermetures de la photo de Jeremy */
 let HEURES = HEURES_DEF;
 let MAG_PUBLIC = false;
 async function chargerHeures(){ try { const r = await (await fetch("reglages.json", { cache:"no-cache" })).json(); if (r.magasinHeures) HEURES = r.magasinHeures; MAG_PUBLIC = !!r.magasinPublic; } catch(e){} }
 const hm = t => { const [h, m] = String(t).split(":").map(Number); return h * 60 + (m || 0); }, hTxt = t => { const [h, m] = String(t).split(":"); return (+h) + " h " + (m || "00"); };
+/* 27 nov. (photo de l'horaire du magasin) : fermetures fixes par jour de semaine (coupures), retirées des périodes de cours */
+const plagesDu = (H, wd) => (H.coupures || []).filter(c => (c.j || []).includes(wd)).reduce((P, c) => P.flatMap(([a, b]) => { const A = hm(a), B = hm(b), C = hm(c.de), E = hm(c.a);
+  if (E <= A || C >= B) return [[a, b]]; const o = []; if (C > A) o.push([a, c.de]); if (E < B) o.push([c.a, b]); return o; }), (H.plages || []).slice().sort((a, b) => hm(a[0]) - hm(b[0])));
 const jourCle = d => d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
 function etatMag(d){ d = d || new Date(); const H = HEURES || HEURES_DEF;
   if (navigator.webdriver && !LS.get("magHeuresTest", false)) return { ouvert:true };   /* tests automatiques : toujours ouvert, sauf le test des heures */
-  const P = (H.plages || []).slice().sort((a, b) => hm(a[0]) - hm(b[0])); if (!P.length) return { ouvert:true };
+  if (!(H.plages || []).length) return { ouvert:true }; const P = plagesDu(H, d.getDay());
   const ouvJ = x => (H.jours || []).includes(x.getDay()) && !(H.fermes || []).includes(jourCle(x)), m = d.getHours() * 60 + d.getMinutes();
   if (ouvJ(d)) { const p = P.find(([a, b]) => m >= hm(a) && m < hm(b)); if (p) { const r = hm(p[1]) - m, nx = P.find(([a]) => hm(a) >= hm(p[1])), coupe = !nx || hm(nx[0]) - hm(p[1]) > 20;   /* Jeremy : « pas pour les pauses », seulement dîner et fin de journée */
     return { ouvert:true, fin:p[1], bientot:coupe && r <= 10, reste:r }; }
     const n = P.find(([a]) => hm(a) > m); if (n) return { ouvert:false, quand:"à " + hTxt(n[0]) }; }
-  for (let i = 1; i <= 21; i++) { const x = new Date(d); x.setDate(d.getDate() + i); if (ouvJ(x)) return { ouvert:false, quand:(i === 1 ? "demain" : x.toLocaleDateString("fr-CA", { weekday:"long" })) + " à " + hTxt(P[0][0]) }; }
+  for (let i = 1; i <= 21; i++) { const x = new Date(d); x.setDate(d.getDate() + i); const Px = plagesDu(H, x.getDay()); if (ouvJ(x) && Px.length) return { ouvert:false, quand:(i === 1 ? "demain" : x.toLocaleDateString("fr-CA", { weekday:"long" })) + " à " + hTxt(Px[0][0]) }; }
   return { ouvert:false, quand:"" }; }
 const etatTxt = e => e.ouvert ? (e.bientot ? "Le magasin ferme bientôt · à " + hTxt(e.fin) + " (dans " + e.reste + " min)" : "Magasin ouvert" + (e.fin ? " · ferme à " + hTxt(e.fin) : "")) : "Magasin fermé" + (e.quand ? " · rouvre " + e.quand : "");
 const etatPill = () => { const e = etatMag(); return `<button type="button" class="mgEtat ${e.bientot ? "bientot" : e.ouvert ? "on" : "off"}" onclick="voirHoraire()" title="Voir l'horaire du magasin"><i></i><b>${etatTxt(e)}</b><span class="mgH">Horaire ›</span></button>`; };
 /* 26 nov. (Jeremy : « quand on clique dessus, on devrait voir l'horaire ») */
-function voirHoraire(){ const H = HEURES || HEURES_DEF, J = ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"], P = (H.plages || []).slice().sort((a, b) => hm(a[0]) - hm(b[0])), auj = new Date(), m = auj.getHours() * 60 + auj.getMinutes();
+function voirHoraire(){ const H = HEURES || HEURES_DEF, J = ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"], auj = new Date(), P = plagesDu(H, auj.getDay()), m = auj.getHours() * 60 + auj.getMinutes();
   const jours = J.map((j, k) => ({ j, k })).filter(x => (H.jours || []).includes(x.k)).map(x => x.j), fa = (H.fermes || []).includes(jourCle(auj));
   const ov = document.createElement("div"); ov.className = "hOv"; ov.onclick = e => { if (e.target === ov || e.target.closest("[data-hf]")) ov.remove(); };
-  ov.innerHTML = `<div class="hBo" role="dialog" aria-label="Horaire du magasin"><div class="hT"><b>Horaire du magasin</b><button class="lien" data-hf>Fermer</button></div>
+  ov.innerHTML = `<div class="hBo" role="dialog" aria-label="Horaire du magasin"><div class="hT"><b>Horaire du magasin · aujourd'hui</b><button class="lien" data-hf>Fermer</button></div>
     <p class="sous" style="margin:0 0 10px">${jours.length ? esc(jours[0] + (jours.length > 1 ? " au " + jours[jours.length - 1].toLowerCase() : "")) : "Aucun jour d'ouverture"}${fa ? " · <b style='color:var(--rouge)'>fermé aujourd'hui</b>" : ""}</p>
     ${P.map((p, i) => { const n = P[i + 1], cour = !fa && (H.jours || []).includes(auj.getDay()) && m >= hm(p[0]) && m < hm(p[1]);
-      return `<div class="hL o${cour ? " cour" : ""}"><span>${hTxt(p[0])} – ${hTxt(p[1])}</span><em>${cour ? "En ce moment" : "Ouvert"}</em></div>` + (n ? `<div class="hL f"><span>${hTxt(p[1])} – ${hTxt(n[0])}</span><em>${hm(n[0]) - hm(p[1]) > 20 ? "Dîner · fermé" : "Pause"}</em></div>` : ""); }).join("")}
+      return `<div class="hL o${cour ? " cour" : ""}"><span>${hTxt(p[0])} – ${hTxt(p[1])}</span><em>${cour ? "En ce moment" : "Ouvert"}</em></div>` + (n ? `<div class="hL f"><span>${hTxt(p[1])} – ${hTxt(n[0])}</span><em>${hm(n[0]) - hm(p[1]) <= 20 ? "Pause" : hm(p[1]) <= 720 && hm(n[0]) >= 780 ? "Dîner · fermé" : "Fermé"}</em></div>` : ""); }).join("")}
+    ${(H.coupures || []).length ? `<p style="margin:12px 0 0;font-weight:700">Fermetures chaque semaine</p>${H.coupures.map(c => `<div class="hL f"><span>${esc((c.j || []).map(k => J[k]).join(", "))}</span><em>${hTxt(c.de)} – ${hTxt(c.a)}</em></div>`).join("")}` : ""}
     <p class="sous" style="margin:10px 0 0">Fermé les fins de semaine, les jours fériés et les journées pédagogiques.</p></div>`;
   document.body.appendChild(ov); }
 

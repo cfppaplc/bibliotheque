@@ -1,5 +1,5 @@
 /* heures du magasin par défaut (Jeremy, 26 nov.) : 8 h – 11 h 50 et 13 h – 16 h 20, fermé aux pauses */
-const HEURES_MAG_DEF = { jours:[1, 2, 3, 4, 5], plages:[["08:30", "09:30"], ["09:35", "10:35"], ["10:50", "11:50"], ["13:00", "14:00"], ["14:05", "15:05"], ["15:20", "16:20"]], fermes:[] };
+const HEURES_MAG_DEF = { jours:[1, 2, 3, 4, 5], plages:[["08:30", "09:30"], ["09:35", "10:35"], ["10:50", "11:50"], ["13:00", "14:00"], ["14:05", "15:05"], ["15:20", "16:20"]], fermes:[], coupures:[{ j:[1, 3], de:"09:30", a:"10:15" }, { j:[2, 5], de:"09:30", a:"11:30" }] };
 /* © 2026 Jérémy Raymond. Tous droits réservés.
    Administration → onglet « Site » (15 nov.) : état du site, signalements reçus, réglages du site.
    Signalements : le sujet ntfy ne garde les messages que 12 h; l'ordinateur de l'administrateur les recopie
@@ -65,6 +65,8 @@ window.ADMIN_SITE = (function(){
       + (() => { const H = REGL.magasinHeures || HEURES_MAG_DEF, auj = new Date(), cle = auj.getFullYear() + "-" + String(auj.getMonth() + 1).padStart(2, "0") + "-" + String(auj.getDate()).padStart(2, "0"), fa = (H.fermes || []).includes(cle);
           return '<div class="as-hm"><div class="as-reg"><span>Heures du magasin</span><div class="as-seg">' + ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"].map((j, k) => '<button class="abtn' + (H.jours.includes(k) ? ' prim' : '') + '" data-hj="' + k + '">' + j + '</button>').join("") + '</div></div>'
             + '<div class="as-hp">' + H.plages.map((p, i) => '<span class="as-hpl"><input type="time" value="' + p[0] + '" data-hp="' + i + '|0" aria-label="Ouverture"> à <input type="time" value="' + p[1] + '" data-hp="' + i + '|1" aria-label="Fermeture"><button class="abtn" data-hx="' + i + '" aria-label="Retirer cette période">×</button></span>').join("") + '<button class="abtn" id="hpPlus">+ Période</button></div>'
+            /* 27 nov. : fermetures fixes chaque semaine (photo de l'horaire du magasin) */
+            + '<div class="as-reg"><span>Fermetures chaque semaine</span></div><div class="as-hp">' + (H.coupures || []).map((c, i) => '<span class="as-hpl" style="flex-wrap:wrap"><span class="as-seg">' + ["Lun", "Mar", "Mer", "Jeu", "Ven"].map((j, k) => '<button class="abtn' + ((c.j || []).includes(k + 1) ? ' prim' : '') + '" data-cj="' + i + '|' + (k + 1) + '">' + j + '</button>').join("") + '</span><input type="time" value="' + c.de + '" data-cp="' + i + '|de" aria-label="Fermé de"> à <input type="time" value="' + c.a + '" data-cp="' + i + '|a" aria-label="Fermé jusqu\'à"><button class="abtn" data-cx="' + i + '" aria-label="Retirer cette fermeture">×</button></span>').join("") + '<button class="abtn" id="cpPlus">+ Fermeture</button></div>'
             + '<div class="as-reg"><span>' + (fa ? 'Fermé aujourd\'hui (pédago, congé)' : 'Ouvert aujourd\'hui selon l\'horaire') + '</span><button class="abtn' + (fa ? ' prim' : '') + '" id="hFa">' + (fa ? 'Rouvrir aujourd\'hui' : 'Fermer aujourd\'hui') + '</button></div></div>'; })()
       + '<p class="sous">Part en ligne avec « Publier ».</p>'
       + '<a class="as-lien" href="accueil.html?menage=1" target="_blank" rel="noopener">Locaux et tâches du ménage<small>Accueil de classe</small></a>'
@@ -89,6 +91,10 @@ window.ADMIN_SITE = (function(){
       z.querySelectorAll("[data-hj]").forEach(b => b.onclick = () => { const h = H(), k = +b.dataset.hj; h.jours = h.jours.includes(k) ? h.jours.filter(x => x !== k) : h.jours.concat(k).sort(); redessiner(); });
       z.querySelectorAll("[data-hp]").forEach(i => i.onchange = () => { const h = H(), [n, k] = i.dataset.hp.split("|"); if (i.value) h.plages[+n][+k] = i.value; h.plages.sort((a, b) => a[0].localeCompare(b[0])); redessiner(); });
       z.querySelectorAll("[data-hx]").forEach(b => b.onclick = () => { H().plages.splice(+b.dataset.hx, 1); redessiner(); });
+      z.querySelectorAll("[data-cj]").forEach(b => b.onclick = () => { const h = H(), [n, k] = b.dataset.cj.split("|").map(Number), c = h.coupures[n]; c.j = c.j.includes(k) ? c.j.filter(x => x !== k) : c.j.concat(k).sort(); redessiner(); });
+      z.querySelectorAll("[data-cp]").forEach(i => i.onchange = () => { const [n, k] = i.dataset.cp.split("|"); if (i.value) H().coupures[+n][k] = i.value; redessiner(); });
+      z.querySelectorAll("[data-cx]").forEach(b => b.onclick = () => { H().coupures.splice(+b.dataset.cx, 1); redessiner(); });
+      if (z.querySelector("#cpPlus")) z.querySelector("#cpPlus").onclick = () => { const h = H(); (h.coupures = h.coupures || []).push({ j:[1], de:"09:30", a:"10:15" }); redessiner(); };
       if (z.querySelector("#hpPlus")) z.querySelector("#hpPlus").onclick = () => { const h = H(), d = h.plages[h.plages.length - 1]; h.plages.push([d ? d[1] : "08:00", "16:20"]); redessiner(); };
       if (z.querySelector("#hFa")) z.querySelector("#hFa").onclick = () => { const h = H(), a = new Date(), c = a.getFullYear() + "-" + String(a.getMonth() + 1).padStart(2, "0") + "-" + String(a.getDate()).padStart(2, "0");
         h.fermes = (h.fermes || []).filter(x => x >= c.slice(0, 8) + "01"); h.fermes = h.fermes.includes(c) ? h.fermes.filter(x => x !== c) : h.fermes.concat(c); redessiner(); }; }
