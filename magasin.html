@@ -823,7 +823,9 @@ async function remettre(id, oui){ try { await rpcM("panier_remettre", { p_id:id,
   if (MODE === "ecran") return ecranDirect();
   /* 26 nov. 23 h 20 (Jeremy : « bloque les fonctions de panier pour le moment, écris en construction, juste moi qui peut tester ») :
      reglages.json → magasinPublic:true pour ouvrir à tous. Sinon, seul jeremy.raymond (connecté sur l'appareil) passe; les tests automatiques aussi. */
-  if (!MAG_PUBLIC && ENS !== "jeremy.raymond" && !navigator.webdriver) { $("#app").innerHTML = `<div class="constr"><img src="img/metier-plus-icone.svg" alt=""><h1>Magasin en construction</h1><p class="sous">Le magasin de raccords en ligne arrive bientôt. D'ici là, continue de faire tes demandes comme d'habitude au comptoir, avec ta feuille signée par ton enseignant.</p></div>`; return; }
+  if (!MAG_PUBLIC && ENS !== "jeremy.raymond" && !LS.get("magEssai", false) && !navigator.webdriver) { $("#app").innerHTML = `<div class="constr"><img src="img/metier-plus-icone.svg" alt=""><h1>Magasin en construction</h1><p class="sous">Le magasin de raccords en ligne arrive bientôt. D'ici là, continue de faire tes demandes comme d'habitude au comptoir, avec ta feuille signée par ton enseignant.</p><button class="lien" id="essaiP" style="margin-top:14px;font-size:.85rem;color:var(--doux)">Accès du personnel</button></div>`;
+    /* raccourci de l'écran d'accueil (iPhone) : mémoire séparée du navigateur → l'enseignant entre le NIP du comptoir une fois */
+    $("#essaiP").onclick = async () => { if (await nipComptoir()) { LS.set("magEssai", true); location.reload(); } }; return; }
   if (POSTE) { LS.set("magEleve", null); MOI = null; return eleveEntree(); }
   if (MOI && MOI.code) return eleveCatalogue();
   const K = LS.get("mpCarte", null);   /* « Ma carte Métier+ » sur ce cellulaire : entrée directe */
