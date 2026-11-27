@@ -59,7 +59,7 @@ window.PlanMagasin = (function(){
     const r3 = racks[2], r4x = r3[0] + r3[1] + V.r4x;
     o += `<rect class="pm-r" x="${r4x}" y="${V.loY}" width="${V.r4w}" height="${V.loL}"/>` + face(r4x + V.r4w + 1, V.loY, V.loL, "D") + sign(r4x + V.r4w / 2, H + 17, "D");
     o += `<polygon class="pm-mur" points="${room.join(" ")}"/>`;
-    o += face(F.K + 1, yK + 6, H - yK - 12, "K") + sign(F.K + 16, yK + 60, "K");
+    o += face(F.K + 1, yK + 6, H - yK - 12, "K") + sign(-16, (yK + H) / 2, "K");
     const wa = dh + V.winA, wb = wa + V.winW;
     o += `<line x1="${wa}" y1="0" x2="${wb}" y2="0" stroke="#EB6A22" stroke-width="4"/><text class="pm-l" x="${(wa + wb) / 2}" y="-8">Fenêtre de service</text>`;
     /* 26 nov. (Jeremy : « le mot Porte est mal placé ») : écrit le long du mur en biais, côté intérieur, loin des affiches */
