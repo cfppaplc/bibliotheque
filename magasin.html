@@ -881,7 +881,7 @@ function avisComptoir(){
   const ios = /iPhone|iPad|iPod|Macintosh/.test(navigator.userAgent) && "ontouchend" in document, app = navigator.standalone || matchMedia("(display-mode: standalone)").matches;
   if (LS.get("magComptoirAbo", false) && "Notification" in window && Notification.permission === "granted") { const z = document.createElement("div"); z.className = "avis-l"; $("#app").prepend(z); comptoirActif(z); return; }
   const z = document.createElement("div"); z.className = "carte"; z.style.marginBottom = "12px";
-  if (ios && !app) { z.innerHTML = `<b>Avis des nouvelles commandes sur cet iPad</b><p class="sous">Touche <b>Partager</b> puis <b>« Sur l'écran d'accueil »</b>, ouvre le comptoir depuis cette icône, puis active les avis.</p>`; $("#app").prepend(z); return; }
+  if (ios && !app) return;   /* 27 nov. (Jeremy : « enlève l'avis ») : iPad bloqué par le SRI; le bandeau dans la page (bandeauMag) suffit */
   if (!("Notification" in window)) return;
   z.className = "avis-l"; z.innerHTML = `<button class="cloche" id="acOui" title="Activer les notifications des nouvelles commandes" aria-label="Activer les notifications">${CLOCHE}</button><p class="err" id="acEr"></p>`; $("#app").prepend(z);
   $("#acOui").onclick = async () => { try {
