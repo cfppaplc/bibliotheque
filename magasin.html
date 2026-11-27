@@ -113,6 +113,8 @@ input.cache-code:not(:placeholder-shown){-webkit-text-security:disc;text-securit
 .cmd .h .btn{min-height:44px;padding:0 18px}
 .lien{background:none;border:0;padding:6px 4px;color:var(--acc);font:inherit;font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
 .btn.petit{min-height:38px;padding:0 14px;font-size:.92rem}
+.cloche{flex:none;width:42px;height:42px;border-radius:50%;border:2px solid var(--acc);background:transparent;color:var(--acc);display:inline-grid;place-items:center;cursor:pointer;padding:0}
+.cloche svg{width:22px;height:22px}.cloche.on{background:var(--vert);border-color:var(--vert);color:#fff}.cloche:disabled{opacity:.5}
 .avis-l{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;margin:0 0 6px;font-size:.92rem}.avis-l .ok{color:var(--vert);font-weight:600}.avis-l .err{width:100%;margin:0;min-height:0}
 .regl{display:block;padding:8px 14px 10px;border-top:1px solid var(--ligne)}.regl summary{cursor:pointer;color:var(--doux);font-size:.88rem;font-weight:600}
 .regl[open] summary{margin-bottom:6px}.regl>div{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}.regl p{margin:0}
@@ -350,7 +352,7 @@ const LBL = { attente:"En attente de ton enseignant", approuve:"Approuvé · va 
   const resume = [["approuve", "approuvé"], ["attente", "en attente"], ["refuse", "refusé"], ["remis", "remis"]].filter(([k]) => cpt[k]).map(([k, t]) => `<span class="rp ${k}"><i></i>${cpt[k]} ${t}${cpt[k] > 1 ? "s" : ""}</span>`).join("");
   z.innerHTML = `<details class="mesP"${LS.get("magSuiviOuv", false) ? " open" : ""}><summary><b>Mes paniers envoyés</b>${resume}</summary>` + E.map((x, k) => { const s = S[k] || { etat:"?" };
     return `<div class="carte suivi ${esc(s.etat)}"><div class="bandeau"><i></i><b>${esc(LBL[s.etat] || "…")}</b><small>${heure(x.t)} · ${x.n} article${x.n > 1 ? "s" : ""}</small></div>${s.motif ? `<p class="motif">${esc(s.motif)}</p>` : ""}${s.etat === "refuse" && x.items && x.items.length ? `<div class="act" style="margin:0 14px 12px"><button class="btn p petit" data-cor="${esc(x.id)}">Corriger et renvoyer</button></div>` : ""}
-      ${s.etat === "attente" && !POSTE && "PushManager" in window && !x.abo ? `<button class="btn p" data-abo="${esc(x.id)}" style="margin:0 18px 14px">Me prévenir sur mon cellulaire</button>` : ""}${s.etat === "attente" && x.abo ? `<small class="sous">Tu seras averti sur ce cellulaire dès que ton enseignant répond.</small>` : ""}
+      ${s.etat === "attente" && !POSTE && "PushManager" in window && !x.abo ? `<button class="cloche" data-abo="${esc(x.id)}" style="margin:0 18px 14px" title="Me prévenir sur mon cellulaire" aria-label="Me prévenir sur mon cellulaire">${CLOCHE}</button>` : ""}${s.etat === "attente" && x.abo ? `<small class="sous">Tu seras averti sur ce cellulaire dès que ton enseignant répond.</small>` : ""}
       ${s.etat === "attente" ? `<div class="act" style="margin:0 18px 14px;display:flex;gap:8px">${s.items ? `<button class="btn" data-mod="${esc(x.id)}">Modifier</button>` : ""}<button class="btn r" data-ann="${esc(x.id)}">Annuler ce panier</button></div>` : ""}
       ${s.etat === "approuve" ? `<span data-cb="MP-${esc(x.code)}"></span><p class="sous" style="text-align:center;margin:0">Montre ta carte ou ce code au magasinier.</p>` : ""}</div>`; }).join("") + `</details>`;
   z.querySelector("details.mesP").ontoggle = e => LS.set("magSuiviOuv", e.target.open);
@@ -411,7 +413,7 @@ async function dessinerProf(){
   const avis = "Notification" in window && "serviceWorker" in navigator && "PushManager" in window, perm = avis ? Notification.permission : "non";
   const ios = /iPhone|iPad|iPod/.test(navigator.userAgent) && !window.navigator.standalone && !matchMedia("(display-mode: standalone)").matches;
   $("#app").innerHTML = `<h1>Commandes à approuver</h1><p class="sous">${att.length ? att.length + " panier" + (att.length > 1 ? "s" : "") + " en attente." : "Aucun panier en attente."} Mis à jour toutes les 15 secondes.</p>
-    <div class="avis-l" id="avisZ">${perm === "granted" && LS.get("magAbonne|" + ENS, false) ? `<span class="ok">Avis activés sur cet appareil</span><button class="lien" id="avTest">Tester</button>` : (`<button class="btn p petit" id="avOui">Recevoir les avis ici</button>`)}
+    <div class="avis-l" id="avisZ">${perm === "granted" && LS.get("magAbonne|" + ENS, false) ? `<button class="cloche on" id="avTest" title="Avis activés sur cet appareil · toucher pour tester" aria-label="Avis activés, tester">${CLOCHE}</button>` : (`<button class="cloche" id="avOui" title="Recevoir les avis sur cet appareil" aria-label="Recevoir les avis sur cet appareil">${CLOCHE}</button>`)}
       <button class="lien" id="apAj">Ajouter un appareil</button><p class="err" id="avErr" style="min-height:0;margin:0;width:100%"></p><div id="apQr" style="width:100%"></div></div>
     ${AVIS.length ? `<div class="sec">Avis du magasinier</div><div class="carte avisMag">${AVIS.map(a => `<div class="av"><span><b>${esc(a.prenom || "Élève")}</b> <small class="sous">${esc(a.code)} · ${esc(a.groupe)} · ${heure(a.t)}</small><br>${esc(REGLES_L[a.regle] || "?")}</span><button class="btn" data-vu="${esc(a.id)}" title="Retirer de cette page (reste dans le dossier de l'élève)">Vu</button></div>`).join("")}<p class="sous" style="margin:8px 0 0">« Vu » retire l'avis d'ici; il reste dans le dossier de l'élève.</p></div>` : ""}
     <div class="sec">En attente</div>${att.length ? att.map(p => cmdHtml(p, true)).join("") : `<p class="vide">Rien à approuver.</p>`}
@@ -516,21 +518,23 @@ async function aCommander(){
     $("#acAj").disabled = false; };
   q.focus(); liste();
 }
+/* 26 nov. (Jeremy : « activer les notifications : crée une icône, une cloche, à la place ») */
+const CLOCHE = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>`;
 /* avis du comptoir : notification de l'ordinateur ou de la tablette (page ouverte), son et titre qui clignote */
 function avisComptoir(){
   const ios = /iPhone|iPad|iPod|Macintosh/.test(navigator.userAgent) && "ontouchend" in document, app = navigator.standalone || matchMedia("(display-mode: standalone)").matches;
-  if (LS.get("magComptoirAbo", false) && "Notification" in window && Notification.permission === "granted") return;
+  if (LS.get("magComptoirAbo", false) && "Notification" in window && Notification.permission === "granted") { const z = document.createElement("div"); z.className = "avis-l"; z.innerHTML = `<span class="cloche on" title="Avis des nouvelles commandes activés sur cet appareil" role="img" aria-label="Avis activés">${CLOCHE}</span>`; $("#app").prepend(z); return; }
   const z = document.createElement("div"); z.className = "carte"; z.style.marginBottom = "12px";
   if (ios && !app) { z.innerHTML = `<b>Avis des nouvelles commandes sur cet iPad</b><p class="sous">Touche <b>Partager</b> puis <b>« Sur l'écran d'accueil »</b>, ouvre le comptoir depuis cette icône, puis active les avis.</p>`; $("#app").prepend(z); return; }
   if (!("Notification" in window)) return;
-  z.className = "avis-l"; z.innerHTML = `<span class="sous">Avis des nouvelles commandes :</span><button class="btn p petit" id="acOui">Activer sur cet appareil</button><p class="err" id="acEr"></p>`; $("#app").prepend(z);
+  z.className = "avis-l"; z.innerHTML = `<button class="cloche" id="acOui" title="Activer les avis des nouvelles commandes sur cet appareil" aria-label="Activer les avis des nouvelles commandes">${CLOCHE}</button><p class="err" id="acEr"></p>`; $("#app").prepend(z);
   $("#acOui").onclick = async () => { try {
       if (await Notification.requestPermission() !== "granted") throw new Error("avis refusés");   /* au toucher, avant toute attente (iPad) */
       if ("PushManager" in window && "serviceWorker" in navigator) { const reg = await navigator.serviceWorker.register("sw.js"); await navigator.serviceWorker.ready;
         let sub = await reg.pushManager.getSubscription();
         if (!sub) { const { cle } = await (await fetch(SUPA + "/functions/v1/panier-avis", { headers:{ apikey:CLE } })).json(); sub = await reg.pushManager.subscribe({ userVisibleOnly:true, applicationServerKey:Uint8Array.from(atob(cle.replace(/-/g, "+").replace(/_/g, "/")), c => c.charCodeAt(0)) }); }
         if (await rpcM("magasin_abonner", { p_abonnement:sub.toJSON(), p_oui:true }) !== true) throw new Error("refus"); }
-      LS.set("magComptoirAbo", true); z.remove(); toast("Avis activés : cet appareil sonne à chaque commande approuvée."); $("#mC").focus();
+      LS.set("magComptoirAbo", true); z.innerHTML = `<span class="cloche on" title="Avis des nouvelles commandes activés sur cet appareil" role="img" aria-label="Avis activés">${CLOCHE}</span>`; toast("Avis activés : cet appareil sonne à chaque commande approuvée."); $("#mC").focus();
     } catch(e){ $("#acEr").textContent = "Avis impossibles : " + e.message; } };
 }
 let titreT = 0; function clignoterTitre(n){ clearInterval(titreT); const t0 = "Comptoir", msg = "(" + n + ") Nouvelle commande"; let k = 0;

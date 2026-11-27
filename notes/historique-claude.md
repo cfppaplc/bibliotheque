@@ -822,3 +822,4 @@
 - 26 nov. : Administration → catalogue simplifié : une ligne par raccord (photo, nom, n°, matériau, cases), boutons « Situer » (lettre qui clignote, étagère de face avec la case, son contenu; mgSituer) et « Modifier » (champs ouverts pour un seul raccord, Retirer du catalogue dedans); 60 lignes max. Test ajouté. admin-plus v31, acces.css v19.
 - 26 nov. : plan : « Porte » écrit le long du mur en biais (rotation, côté intérieur, 32 % depuis le coin), plus collé à l'affiche J. plan-magasin v13.
 - 26 nov. : Administration → Magasin : catalogue = 5 raccords par défaut (60 en cherchant; test ajouté); Raccords sortis = 5 plus sortis par défaut, bouton « Voir les N raccords » (ST_TOUT; CSV garde tout). admin-plus v32.
+- 26 nov. : magasin : boutons d'avis remplacés par une cloche (CLOCHE, .cloche; orange = à activer, verte = activée) : élève (Me prévenir, par panier), enseignant (Recevoir les avis / tester), comptoir (Activer; cloche verte une fois active). Test ajouté.
