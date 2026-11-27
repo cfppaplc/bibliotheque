@@ -273,7 +273,9 @@ window.ADMIN_PLUS = (function(){
   const mgHaut = l => { const n = mgDans(l + "-00").length; return n ? '<button class="abtn" data-c="' + l + '-00" style="margin-top:8px">Tablette du haut · ' + n + ' article' + (n > 1 ? 's' : '') + '</button>' : ''; };
   function mgCase(z, c){ const L = mgDans(c), t = /-0+$/.test(c) ? c.replace(/-0+$/, "") + " · tablette du haut" : "Case " + c;
     z.innerHTML = '<h4 style="margin:12px 0 6px">' + esc(t) + ' · ' + (L.length ? L.length + ' article' + (L.length > 1 ? 's' : '') : 'vide dans le catalogue') + '</h4>'
-      + L.map(a => { const A = [a.r, ...(a.r2 || [])].filter(x => x && x !== c && !(x.startsWith(c + "-"))); return '<div class="ap-ci"><b>' + esc(a.nom) + '</b><small>' + esc(a.n || "") + (A.length ? ' · aussi ' + esc(A.join(", ")) : '') + '</small></div>'; }).join(""); }
+      + L.map(a => { const A = [a.r, ...(a.r2 || [])].filter(x => x && x !== c && !(x.startsWith(c + "-"))); const u = mgPhoto(a); return '<div class="ap-ci">' + (u ? '<img src="' + esc(u) + '" alt="" loading="lazy" referrerpolicy="no-referrer" title="Toucher pour agrandir" onerror="this.outerHTML=\'<span class=ap-ci-v></span>\'">' : '<span class="ap-ci-v"></span>') + '<div><b>' + esc(a.nom) + '</b><small>' + esc(a.n || "") + (A.length ? ' · aussi ' + esc(A.join(", ")) : '') + '</small></div></div>'; }).join(""); }
+  /* 26 nov. (Jeremy : « j'aimerais voir les photos ») : même photo que l'élève */
+  const mgPhoto = a => !a || a.img === "-" ? "" : (a.img || (MG.photos || {})[String(a.type || "").toLowerCase() + "|" + (a.mat || "")] || "");
   async function magasin(z){
     if (!MG) { try { await chargerMg(); } catch(e){ z.innerHTML = '<p class="acces-err">Catalogue illisible.</p>'; return; } }
     const base = location.origin + location.pathname.replace(/[^/]*$/, ""), lienE = base + "magasin.html", lienM = base + "magasin.html?mode=magasin";
@@ -306,7 +308,7 @@ window.ADMIN_PLUS = (function(){
     statsMg(z.querySelector("#mgSt")); aCommanderMg(z.querySelector("#mgAc"));
     { const zs = z.querySelector(".ap-plan-svg"); if (zs) { let face = z.querySelector(".ap-face"); if (!face) { face = document.createElement("div"); face.className = "ap-face"; zs.after(face); }
         zs.onclick = e => { const g = e.target.closest("[data-l]"); if (!g) return; PlanMagasin.cases = (MG.plan || {}).parties || {}; PlanMagasin.tailles = (MG.plan || {}).tailles || {}; face.innerHTML = PlanMagasin.vueFace(g.dataset.l, [], g.dataset.s) + mgHaut(g.dataset.l) + '<div class="ap-case"></div>'; face.scrollIntoView({ block:"nearest" }); };
-        face.onclick = e => { const c = e.target.closest("[data-c]"); if (!c) return; face.querySelectorAll(".ap-sel").forEach(x => x.classList.remove("ap-sel")); c.classList.add("ap-sel"); mgCase(face.querySelector(".ap-case"), c.dataset.c); }; } }
+        face.onclick = e => { const im = e.target.closest(".ap-ci img"); if (im) { im.classList.toggle("gros"); return; } const c = e.target.closest("[data-c]"); if (!c) return; face.querySelectorAll(".ap-sel").forEach(x => x.classList.remove("ap-sel")); c.classList.add("ap-sel"); mgCase(face.querySelector(".ap-case"), c.dataset.c); }; } }
     { const b = z.querySelector("#nipOk"); if (b) b.onclick = async () => { const v = z.querySelector("#nipV").value.trim(), m = z.querySelector("#nipM");
         if (!/^\d{6}$/.test(v)) { m.textContent = "Le NIP a 6 chiffres."; return; }
         const id = localStorage.getItem("dernierId") || "", j = (() => { try { return JSON.parse(localStorage.getItem("magJeton|" + id) || "\"\""); } catch(e){ return ""; } })(); if (!j) { m.textContent = "Ouvre d'abord « Commandes à approuver » sur cet appareil (clé d'approbation), puis reviens."; return; }

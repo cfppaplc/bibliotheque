@@ -815,3 +815,4 @@
 - 26 nov. : vue de face : seulement l'étagère touchée (data-s sur les affiches : 0 haut, 1 bas; vueFace(l, cases, seg)), au comptoir et dans Administration; étagère sans cases = « Vue de face à venir ». plan-magasin v9, admin-plus v26. Test ajouté.
 - 26 nov. : vue de face : une partie à moins d'étages (gros casiers, ex. J partie 4 : 104-110) occupe toute la hauteur de l'étagère (rangées étirées). plan-magasin v10.
 - 26 nov. : Administration → Magasin : carte « Plan du magasin » = même plan que le magasinier (lettre → étagère de face, case → articles qu'elle contient, bouton « Tablette du haut · N »). Anciens champs de cases par partie retirés à la demande de Jeremy (« on décide tout par ici ») : les cases se changent dans magasin-catalogue.json (plan.parties). Test admin réécrit. admin-plus v27, acces.css v16, plan-magasin v11.
+- 26 nov. : Administration → plan : photos (64 px, toucher = agrandir) dans le contenu d'une case (mgPhoto). Test ajouté.

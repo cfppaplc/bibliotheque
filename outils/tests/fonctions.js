@@ -110,7 +110,8 @@ test("Administration : chaque onglet s'ouvre; Quoi de neuf se modifie et s'annul
     await p.click('#mgPlan [data-l="J"][data-s="0"]'); await attendre(300);
     vrai(!!(await p.$("#mgPlan .ap-face .pm-face")) && !/du bas/.test(await p.textContent("#mgPlan .ap-face")), "Plan : la lettre J n'ouvre pas son étagère de face");
     await p.click('#mgPlan [data-c="J-28"]'); await attendre(300);
-    vrai(/J-28/.test(await p.textContent("#mgPlan .ap-case")), "Plan : toucher une case ne montre pas son contenu"); }
+    vrai(/J-28/.test(await p.textContent("#mgPlan .ap-case")), "Plan : toucher une case ne montre pas son contenu");
+    vrai(await p.$$eval("#mgPlan .ap-ci img, #mgPlan .ap-ci .ap-ci-v", L => L.length) > 0, "Plan : pas de photo dans le contenu de la case"); }
   const cy = await p.evaluate(() => { PlanMagasin.cases = { "2": "6-9, 27-30", "53": "A 1-30" }; const d = document.createElement("div");
     d.innerHTML = PlanMagasin.svg(new Set(["J"]), new Set(), [{ r: "J-28" }, { r: "A-12" }, { r: "J-200" }]); return [...d.querySelectorAll("circle.pm-p")].map(c => +c.getAttribute("cy")); });
   vrai(cy.length === 2 && cy[0] > 126 && cy[0] < 174, "Plan : J-28 hors de la partie 2 (" + cy.join(",") + ")");
