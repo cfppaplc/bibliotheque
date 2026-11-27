@@ -847,3 +847,4 @@
 - 26 nov. : bouton « Vider le panier » (#pVid) dans Mon panier, deux touches (« Toucher encore pour tout enlever », 4 s). Pas affiché en modification d'un panier envoyé. Test ajouté.
 - 26 nov. : la photo du raccord clignotait à chaque ajout / changement de quantité (ligne recréée) → brancherQte ne remplace plus que .qte. Test ajouté.
 - 26 nov. : facture.html refaite (Jeremy « 1-2-6 ») : 4 étapes (ET, .fsteps, data-et, Suivant), matériel en lignes .fm avec photo (photoMat via catalogue + PHOTOS), boutons −/+ (data-mq), avis prix manquant (.sansprix, .avisP), look du magasin, toasts qui ne se chevauchent plus. Test Facture mis à jour.
+- 26 nov. : 1450 prix fictifs ajoutés au catalogue (5 agents, estimations calées sur les prix existants; recherches web sans prix utilisables). Tous les 2356 articles ont maintenant un prix. Moins sûrs : contrôles de chauffage, purgeurs vapeur, soudage, noms vagues (m0819, m1386 « 0 »).
