@@ -324,7 +324,7 @@ function enTete(){ $("#tQui").innerHTML = `<b>${MOI.prenom ? "Bonjour " + esc(MO
 function eleveCatalogue(){
   enTete();
   const cats = [...new Set(CAT.map(a => a.cat).filter(Boolean))], mats = [...new Set(CAT.map(a => a.mat).filter(Boolean))].sort((a, b) => a.localeCompare(b, "fr")), ds = [...new Set(CAT.map(a => a.d).filter(Boolean))].sort((a, b) => pouces(a) - pouces(b));
-  $("#app").innerHTML = `<div id="mesEnvois"></div><div class="cherche"><input id="fQ" type="search" placeholder="Cherche un raccord : coude 90 ABS 2, té cuivre 3/4…" value="${esc(FILTRE.q)}" autocomplete="off">
+  $("#app").innerHTML = `<div class="avis-l" id="notifE"></div><div id="mesEnvois"></div><div class="cherche"><input id="fQ" type="search" placeholder="Cherche un raccord : coude 90 ABS 2, té cuivre 3/4…" value="${esc(FILTRE.q)}" autocomplete="off">
     <div class="filtres">${cats.length > 1 ? `<select id="fC" aria-label="Section"><option value="">Section</option>${cats.map(c => `<option${FILTRE.cat === c ? " selected" : ""}>${esc(c)}</option>`).join("")}</select>` : ""}
     <select id="fM" aria-label="Matériau"><option value="">Matériau</option>${mats.map(m => `<option${FILTRE.mat === m ? " selected" : ""}>${esc(m)}</option>`).join("")}</select>
     <select id="fD" aria-label="Diamètre"><option value="">Diamètre</option>${ds.map(d => `<option value="${esc(d)}"${FILTRE.d === d ? " selected" : ""}>${esc(d)} po</option>`).join("")}</select></div></div>
@@ -379,14 +379,33 @@ function panier(){
     try { const r = await rpc("panier_envoyer", { p_ens:MOI.ens, p_groupe:MOI.groupe, p_code:MOI.code, p_items:items, p_note:$("#pNote").value || null, p_prenom:MOI.prenom || LS.get("magPrenom", "") || null, p_profs:MOI.profs && MOI.profs.length ? MOI.profs : null });
       if (!r || !r.ok) throw new Error(r && r.err || "refus");
       const COR = LS.get("magCorrige", null); let E = LS.get("magEnvois", []); if (COR) E = E.filter(y => y.id !== COR.id); LS.set("magCorrige", null);   /* 26 nov. : le panier corrigé remplace le refusé */
-      E.unshift({ id:r.id, t:Date.now(), code:MOI.code, n:items.reduce((s, i) => s + i.q, 0), items:items.map(i => ({ id:i.id, q:i.q })) }); LS.set("magEnvois", E.slice(0, 20));
+      E.unshift({ id:r.id, t:Date.now(), code:MOI.code, n:items.reduce((s, i) => s + i.q, 0), items:items.map(i => ({ id:i.id, q:i.q })) }); LS.set("magEnvois", E.slice(0, 20)); if (LS.get("magNotifE", false)) aboEleve(r.id).catch(() => {});
       PANIER = {}; sauverPanier(); LS.set("magNote", ""); toast("Panier envoyé à ton enseignant."); fermer(); }   /* 25 nov. : les iPad sont rangés dans les coffres (un par équipe) : on ne vide plus l'écran après l'envoi, seulement après 2 minutes sans toucher */
     catch(e){ $("#pErr").textContent = "Envoi impossible : " + (e.message === "trop de paniers en attente" ? "tu as déjà 2 paniers en attente. Touche « Modifier » sur un panier en attente pour y ajouter des raccords." : e.message); b.disabled = false; b.textContent = "Envoyer à mon enseignant"; } };
 }
 /* suivi des paniers envoyés (sur cet iPad), mis à jour toutes les 10 s */
 let suiviT = 0;
+/* 26 nov. (Jeremy : « les élèves aussi : activer les notifications ») : une seule cloche pour l'élève (sur son cellulaire, pas sur les iPad des coffres);
+   une fois activée, chaque panier envoyé l'avertira de la réponse de son enseignant. « Désactiver » arrête pour les prochains paniers. */
+async function pushSub(){ const reg = await navigator.serviceWorker.register("sw.js"); await navigator.serviceWorker.ready; let sub = await reg.pushManager.getSubscription();
+  if (!sub) { const { cle } = await (await fetch(SUPA + "/functions/v1/panier-avis", { headers:{ apikey:CLE } })).json(); sub = await reg.pushManager.subscribe({ userVisibleOnly:true, applicationServerKey:Uint8Array.from(atob(cle.replace(/-/g, "+").replace(/_/g, "/")), c => c.charCodeAt(0)) }); }
+  return sub; }
+async function aboEleve(id){ const sub = await pushSub(); if (await rpc("panier_abonner_eleve", { p_id:id, p_abonnement:sub.toJSON() }) !== true) return false;
+  const E2 = LS.get("magEnvois", []); const x = E2.find(y => y.id === id); if (x) x.abo = 1; LS.set("magEnvois", E2); return true; }
+function notifEleve(){ const z = $("#notifE"); if (!z) return; if (POSTE || !("PushManager" in window) || !("Notification" in window)) { z.innerHTML = ""; return; }
+  const on = LS.get("magNotifE", false) && Notification.permission === "granted";
+  z.innerHTML = on ? `<span class="cloche on" role="img" aria-label="Notifications activées">${CLOCHE}</span><button class="lien" id="neNon">Désactiver les notifications</button>`
+    : `<button class="cloche" id="neOui" aria-label="Activer les notifications">${CLOCHE}</button><button class="lien" id="neOui2">Activer les notifications</button>`;
+  const oui = async () => { try { const ios = /iPhone|iPad|iPod/.test(navigator.userAgent) && !navigator.standalone && !matchMedia("(display-mode: standalone)").matches;
+      if (ios) { toast("Sur iPhone : ajoute d'abord « Ma carte » à ton écran d'accueil, puis ouvre le magasin à partir de là."); return; }
+      if (await Notification.requestPermission() !== "granted") throw new Error("refus");   /* iPhone : au toucher, avant toute attente */
+      LS.set("magNotifE", true); for (const x of LS.get("magEnvois", []).filter(y => MOI && y.code === MOI.code && !y.abo).slice(0, 5)) { try { await aboEleve(x.id); } catch(e){} }
+      toast("C'est fait : ce cellulaire t'avertira quand ton enseignant répond."); notifEleve(); suivi(); }
+    catch(e){ toast("Les notifications n'ont pas pu être activées. Réessaie, ou demande à ton enseignant."); } };
+  if ($("#neOui")) { $("#neOui").onclick = oui; $("#neOui2").onclick = oui; }
+  if ($("#neNon")) $("#neNon").onclick = () => { LS.set("magNotifE", false); toast("C'est fait : plus de notifications pour tes prochains paniers."); notifEleve(); }; }
 async function suivi(){
-  clearTimeout(suiviT); const z = $("#mesEnvois"); if (!z || !MOI) return;
+  clearTimeout(suiviT); notifEleve(); const z = $("#mesEnvois"); if (!z || !MOI) return;
   const E = LS.get("magEnvois", []).filter(x => x.code === MOI.code && Date.now() - x.t < 7 * 864e5); if (!E.length) { z.innerHTML = ""; return; }
   const S = await Promise.all(E.map(x => rpc("panier_etat", { p_id:x.id }).catch(() => null)));
 const LBL = { attente:"En attente de ton enseignant", approuve:"Approuvé · va au comptoir avec ta carte", refuse:"Refusé", remis:"Remis" };
@@ -394,7 +413,7 @@ const LBL = { attente:"En attente de ton enseignant", approuve:"Approuvé · va 
   const resume = [["approuve", "approuvé"], ["attente", "en attente"], ["refuse", "refusé"], ["remis", "remis"]].filter(([k]) => cpt[k]).map(([k, t]) => `<span class="rp ${k}"><i></i>${cpt[k]} ${t}${cpt[k] > 1 && !/s$/.test(t) ? "s" : ""}</span>`).join("");
   z.innerHTML = `<details class="mesP"${LS.get("magSuiviOuv", false) ? " open" : ""}><summary><b>Mes paniers envoyés</b>${resume}</summary>` + E.map((x, k) => { const s = S[k] || { etat:"?" };
     return `<div class="carte suivi ${esc(s.etat)}"><div class="bandeau"><i></i><b>${esc(LBL[s.etat] || "…")}</b><small>${heure(x.t)} · ${x.n} article${x.n > 1 ? "s" : ""}</small></div>${s.motif ? `<p class="motif">${esc(s.motif)}</p>` : ""}${s.etat === "refuse" && x.items && x.items.length ? `<div class="act" style="margin:0 14px 12px"><button class="btn p petit" data-cor="${esc(x.id)}">Corriger et renvoyer</button></div>` : ""}
-      ${s.etat === "attente" && !POSTE && "PushManager" in window && !x.abo ? `<button class="cloche" data-abo="${esc(x.id)}" style="margin:0 18px 14px" title="Me prévenir sur mon cellulaire" aria-label="Me prévenir sur mon cellulaire">${CLOCHE}</button>` : ""}${s.etat === "attente" && x.abo ? `<small class="sous">Tu seras averti sur ce cellulaire dès que ton enseignant répond.</small>` : ""}
+      ${s.etat === "attente" && x.abo ? `<small class="sous">Tu seras averti sur ce cellulaire dès que ton enseignant répond.</small>` : ""}
       ${s.etat === "attente" ? `<div class="act" style="margin:0 18px 14px;display:flex;gap:8px">${s.items ? `<button class="btn" data-mod="${esc(x.id)}">Modifier</button>` : ""}<button class="btn r" data-ann="${esc(x.id)}">Annuler ce panier</button></div>` : ""}
       ${s.etat === "approuve" ? `<span data-cb="MP-${esc(x.code)}"></span><p class="sous" style="text-align:center;margin:0">Montre ta carte ou ce code au magasinier.</p>` : ""}</div>`; }).join("") + `</details>`;
   z.querySelector("details.mesP").ontoggle = e => LS.set("magSuiviOuv", e.target.open);
@@ -409,16 +428,6 @@ const LBL = { attente:"En attente de ton enseignant", approuve:"Approuvé · va 
     catch(e){ toast("Annulation impossible : " + e.message); b.disabled = false; } });
   /* changement d'état pendant que la page est ouverte : son + vibration + message */
   const avant = LS.get("magEtats", {}); S.forEach((st, k) => { if (!st) return; const id = E[k].id; if (avant[id] && avant[id] !== st.etat && (st.etat === "approuve" || st.etat === "refuse")) { bip(); try { navigator.vibrate && navigator.vibrate([200, 100, 200]); } catch(e){} toast(st.etat === "approuve" ? "Ton panier est approuvé : va au comptoir." : "Ton panier est refusé."); } avant[id] = st.etat; }); LS.set("magEtats", avant);
-  z.querySelectorAll("[data-abo]").forEach(b => b.onclick = async () => { b.disabled = true;
-    try { const ios = /iPhone|iPad|iPod/.test(navigator.userAgent) && !navigator.standalone && !matchMedia("(display-mode: standalone)").matches;
-      if (ios) { toast("Sur iPhone : ajoute d'abord « Ma carte » à ton écran d'accueil, puis ouvre le magasin à partir de là."); b.disabled = false; return; }
-      if (await Notification.requestPermission() !== "granted") throw new Error("avis refusés");   /* iPhone : au toucher, avant toute attente */
-      const reg = await navigator.serviceWorker.register("sw.js"); await navigator.serviceWorker.ready;
-      let sub = await reg.pushManager.getSubscription();
-      if (!sub) { const { cle } = await (await fetch(SUPA + "/functions/v1/panier-avis", { headers:{ apikey:CLE } })).json(); sub = await reg.pushManager.subscribe({ userVisibleOnly:true, applicationServerKey:Uint8Array.from(atob(cle.replace(/-/g, "+").replace(/_/g, "/")), c => c.charCodeAt(0)) }); }
-      if (await rpc("panier_abonner_eleve", { p_id:b.dataset.abo, p_abonnement:sub.toJSON() }) !== true) throw new Error("refus");
-      const E2 = LS.get("magEnvois", []); const x = E2.find(y => y.id === b.dataset.abo); if (x) x.abo = 1; LS.set("magEnvois", E2); toast("Tu seras averti sur ce cellulaire."); suivi(); }
-    catch(e){ toast("Les avis n'ont pas pu être activés. Réessaie, ou demande à ton enseignant."); b.disabled = false; } });
   if (S.some(s => s && (s.etat === "attente" || s.etat === "approuve"))) suiviT = setTimeout(suivi, 10000);
 }
 

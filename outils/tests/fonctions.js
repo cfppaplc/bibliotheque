@@ -322,6 +322,7 @@ test("Magasin : l'élève (carte scannée) envoie son panier, l'enseignant appro
   await p.fill("#cCode", "MP-12345-K7Q9X2"); await p.keyboard.press("Enter"); await attendre(1200);
   vrai(/12345/.test(await p.textContent("#tQui")), "Carte scannée : élève pas reconnu");
   vrai(/Bonjour Essai/.test(await p.textContent("#tQui")), "Carte scannée : le prénom ne vient pas de la carte (" + await p.textContent("#tQui") + ")");
+  await attendre(500); vrai(/Activer les notifications/.test(await p.textContent("#notifE")) && !!(await p.$("#notifE .cloche")), "Élève : la cloche « Activer les notifications » est absente");
   await p.fill("#fQ", "coude 90 abs 2"); await attendre(300);
   const res = await p.$$eval(".art .tx b", L => L.map(x => x.textContent));
   vrai(res.length >= 1 && /^Coude 90° ABS 2 po/.test(res[0]), "Recherche : " + res.join(" | "));
