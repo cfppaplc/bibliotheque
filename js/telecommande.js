@@ -7,7 +7,7 @@
   const LIB = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.50.0/dist/umd/supabase.min.js";
   const T = window.TELE = {jeton: "", canal: null, pret: false, branche: false, dernier: "", modsDe: "", mods: []};
   function jeton(){ const a = new Uint8Array(12); crypto.getRandomValues(a); return [...a].map(x => "abcdefghijkmnpqrstuvwxyz23456789"[x % 32]).join("").slice(0, 16); }
-  function charger(){ return window.supabase ? Promise.resolve() : new Promise((ok, ko) => { const s = document.createElement("script"); s.src = LIB; s.onload = ok; s.onerror = ko; document.head.appendChild(s); }); }
+  function charger(){ return window.supabase ? Promise.resolve() : new Promise((ok, ko) => { const s = document.createElement("script"); s.src = LIB; s.integrity = "sha384-jP+y6mxch/vbLrNpx4basfv6ciZQuHwdRHgZGa6Mhja0Xm4p87ok2OQavTrRIGxH"; s.crossOrigin = "anonymous";   /* 27 nov. (Loi 25) : contrôle d intégrité */ s.onload = ok; s.onerror = ko; document.head.appendChild(s); }); }
   function envoyer(o){ if (T.canal && T.pret) T.canal.send({type: "broadcast", event: "m", payload: o}).catch(() => {}); }
   function mods(){
     if (!RD.drv) return [];
