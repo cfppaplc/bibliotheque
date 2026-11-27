@@ -488,3 +488,12 @@ body.clair .as-lien{background:#f5f6fa;border-color:#e3e6ee}body.clair .as-sig{b
 .ap-mg-r .t{flex:1;min-width:0}.ap-mg-r .t b{display:block;font-weight:600}.ap-mg-r .t small{color:var(--doux,#6b7280)}
 .ap-mg-ed{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;padding:10px;margin:0 0 8px;background:var(--fond2,#f6f7f9);border-radius:10px}
 .ap-mg-ed label{display:grid;gap:3px;font-size:.8rem;color:var(--doux,#6b7280)}.ap-mg-ed .rouge{align-self:end}
+/* 26 nov. : pièces à commander dans Administration, même look que le comptoir */
+.ac2{display:grid;gap:8px;margin:8px 0 14px;padding:14px;border-radius:14px;background:var(--fond2,#f6f7f9)}.ac2>input{width:100%;min-height:46px}
+.ac2-s{display:grid;gap:6px}.ac2-p,.ac2-ch,.ac2-l{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:8px 10px;border-radius:12px;border:1px solid var(--ligne,#e3e6eb);background:var(--carte,#fff);color:inherit;font:inherit;cursor:pointer}
+.ac2-p.libre{border-style:dashed}.ac2-ch{border:2px solid #1E8A55;cursor:default}
+.ac2-p img,.ac2-ch img,.ac2-l img,.ac2-p .ap-ci-v,.ac2-ch .ap-ci-v,.ac2-l .ap-ci-v{flex:none;width:52px;height:52px;object-fit:contain;background:#fff;border:1px solid var(--ligne,#e3e6eb);border-radius:10px;padding:2px}
+.ac2-p .t,.ac2-ch .t,.ac2-l .t{flex:1;min-width:0}.ac2-p b,.ac2-ch b,.ac2-l .t b{display:block;font-weight:600}.ac2-p small,.ac2-ch small,.ac2-l small{color:var(--doux,#6b7280)}
+.ac2-n{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.ac2-n #acQte{min-width:44px;text-align:center;font-size:1.4rem}.ac2-n [data-dq]{min-width:44px;font-size:1.2rem}
+.ac2-liste{display:grid;gap:6px;margin:6px 0}.ac2-l{cursor:default}.ac2-q{display:inline-grid;place-items:center;min-width:36px;height:36px;padding:0 8px;border-radius:99px;background:#14213d;color:#fff;font-weight:800}
+.ac2-c{display:flex;align-items:center;gap:6px;font-size:.85rem;white-space:nowrap;cursor:pointer}.ac2-c input{width:22px;height:22px}
