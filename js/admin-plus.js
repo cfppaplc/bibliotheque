@@ -299,7 +299,7 @@ window.ADMIN_PLUS = (function(){
     const re = () => magasin(z), etat = () => { const c = mgChange(), e = z.querySelector(".ap-pub .acces-etat"); e.classList.toggle("pub", c); e.textContent = c ? "Des changements attendent d'être publiés" : "Tout est publié"; z.querySelector("#mgPub").disabled = !c; z.querySelector("#mgAnn").disabled = !c; };
     statsMg(z.querySelector("#mgSt")); aCommanderMg(z.querySelector("#mgAc"));
     { const zs = z.querySelector(".ap-plan-svg"); if (zs) { let face = z.querySelector(".ap-face"); if (!face) { face = document.createElement("div"); face.className = "ap-face"; zs.after(face); }
-        zs.onclick = e => { const g = e.target.closest("[data-l]"); if (!g) return; PlanMagasin.cases = (MG.plan || {}).parties || {}; PlanMagasin.tailles = (MG.plan || {}).tailles || {}; face.innerHTML = PlanMagasin.vueFace(g.dataset.l); face.scrollIntoView({ block:"nearest" }); }; } }
+        zs.onclick = e => { const g = e.target.closest("[data-l]"); if (!g) return; PlanMagasin.cases = (MG.plan || {}).parties || {}; PlanMagasin.tailles = (MG.plan || {}).tailles || {}; face.innerHTML = PlanMagasin.vueFace(g.dataset.l, [], g.dataset.s); face.scrollIntoView({ block:"nearest" }); }; } }
     z.querySelectorAll("[data-pt]").forEach(i => i.oninput = () => { MG.plan = MG.plan || {}; MG.plan.tailles = MG.plan.tailles || {}; const v = parseFloat(i.value);
       if (isFinite(v) && v !== 1) MG.plan.tailles[i.dataset.pt] = v; else delete MG.plan.tailles[i.dataset.pt]; PlanMagasin.tailles = MG.plan.tailles;
       z.querySelector(".ap-plan-svg").innerHTML = PlanMagasin.svg(new Set(), new Set(), [], { numeros:+i.dataset.pt }).replace("<svg ", '<svg style="width:100%;height:auto;display:block" '); etat(); });

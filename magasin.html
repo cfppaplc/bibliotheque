@@ -170,7 +170,7 @@ input.cache-code:not(:placeholder-shown){-webkit-text-security:disc;text-securit
 <main id="app"><p class="vide">Chargement…</p></main>
 <div class="ov" id="ov" hidden></div>
 <div class="barre" id="barre" hidden></div>
-<script src="js/qrcode.js"></script><script src="js/code128.js?v=1"></script><script src="js/plan-magasin.js?v=8"></script>
+<script src="js/qrcode.js"></script><script src="js/code128.js?v=1"></script><script src="js/plan-magasin.js?v=9"></script>
 <script>
 "use strict";
 const SUPA = "https://kjlotlhqrgekzohshmbn.supabase.co", CLE = "sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY";
@@ -602,7 +602,7 @@ const tableMag = p => `<table>${parRangee(p.items).map(i => `<tr><td class="rg">
 let PREP_MAJ = null;
 function preparer(p){ if (!p) return;
   const code = p.code; let nb = (p.ids || [p.id]).length, L = [];
-  let faceL = ""; const cle = "magPrep|" + code, faits = new Set(LS.get(cle, [])), ov = $("#ov");
+  let faceL = "", faceS = null; const cle = "magPrep|" + code, faits = new Set(LS.get(cle, [])), ov = $("#ov");
   ov.hidden = false; document.body.style.overflow = "hidden";
   const dessiner = () => {
     const q = regrouper(MAG.filter(x => x.etat === "approuve" && x.code === code))[0]; if (q) p = q;
@@ -611,14 +611,14 @@ function preparer(p){ if (!p) return;
     const finies = new Set([...lettres].filter(l => L.filter(i => PlanMagasin.lettre(rangee(i)) === l).every(i => faits.has(i.id || i.n))));
     const tout = L.every(i => faits.has(i.id || i.n)), prochain = L.find(i => !faits.has(i.id || i.n) && PlanMagasin.place(rangee(i))) || L.find(i => !faits.has(i.id || i.n));   /* d'abord un raccord placé sur le plan (les rangées pas encore entrées n'ont pas de point) */   /* 26 nov. (Jeremy) : seulement le prochain raccord à trouver clignote sur le plan */
     ov.innerHTML = `<div class="top"><img src="img/metier-plus-blanc.svg" alt=""><b>Préparer · ${esc(p.prenom || "élève")} (${esc(p.code)})${p.ids ? " · " + p.ids.length + " commandes" : ""}</b><span class="sp"></span><button id="prF">‹ Comptoir</button></div>
-      <main class="prep"><div class="prep-plan">${PlanMagasin.svg(lettres, finies, L.map(i => ({ r:i === prochain ? rangee(i) : "" })))}<p class="sous" style="text-align:center;margin:4px 0">Touche une lettre pour voir la rangée de face.</p>${faceL ? `<div class="prep-face">${PlanMagasin.vueFace(faceL, L.filter(i => !faits.has(i.id || i.n) && true).flatMap(i => casesDe(i).filter(c => PlanMagasin.lettre(c) === faceL).map(c => (String(c).match(/(\d+)/) || [])[1]).filter(x => x && +x > 0)))}<button class="btn" id="prFace" style="width:100%;margin-top:8px">Fermer la vue de face</button></div>` : ""}</div><div class="prep-l">
+      <main class="prep"><div class="prep-plan">${PlanMagasin.svg(lettres, finies, L.map(i => ({ r:i === prochain ? rangee(i) : "" })))}<p class="sous" style="text-align:center;margin:4px 0">Touche une lettre pour voir la rangée de face.</p>${faceL ? `<div class="prep-face">${PlanMagasin.vueFace(faceL, L.filter(i => !faits.has(i.id || i.n) && true).flatMap(i => casesDe(i).filter(c => PlanMagasin.lettre(c) === faceL).map(c => (String(c).match(/(\d+)/) || [])[1]).filter(x => x && +x > 0)), faceS)}<button class="btn" id="prFace" style="width:100%;margin-top:8px">Fermer la vue de face</button></div>` : ""}</div><div class="prep-l">
       <p class="sous">${esc(p.groupe)} · ${esc(nomEns(p.ens))}${p.note ? " · " + esc(p.note) : ""}</p>
       ${[...lettres, ""].map(l => { const G = L.filter(i => PlanMagasin.lettre(rangee(i)) === l); if (!G.length) return "";
         return `<div class="prep-g${finies.has(l) ? " fini" : ""}"><div class="prep-t">${l ? "Rangée " + esc(l) : "Sans rangée"}</div>${G.map(i => { const k = i.id || i.n, ok = faits.has(k);
           return `<label class="prep-i${ok ? " ok" : ""}${i === prochain ? " proch" : ""}"><input type="checkbox" data-k="${esc(k)}"${ok ? " checked" : ""}><span class="rg"><i class="pt">${L.indexOf(i) + 1}</i>${esc(caseTxt(rangee(i)) || "–")}</span><span class="q">${+i.q || 1} ×</span>${vigCmd(i)}<span class="nm">${esc(i.nom)}<small>${esc(i.n)}</small>${aussi(i)}</span></label>`; }).join("")}</div>`; }).join("")}
       <button class="btn ${tout ? "v" : ""}" id="prOk" ${tout ? "" : "disabled"} style="width:100%;margin-top:10px">${tout ? "Tout est prêt · remis à l'élève" : "Coche chaque raccord en le prenant"}</button></div></main>`;
-    ov.querySelector(".prep-plan svg").onclick = e => { const g = e.target.closest("[data-l]"); if (g) { faceL = g.dataset.l; dessiner(); } };
-    if ($("#prFace")) $("#prFace").onclick = () => { faceL = ""; dessiner(); };
+    ov.querySelector(".prep-plan svg").onclick = e => { const g = e.target.closest("[data-l]"); if (g) { faceL = g.dataset.l; faceS = g.dataset.s; dessiner(); } };
+    if ($("#prFace")) $("#prFace").onclick = () => { faceL = ""; faceS = null; dessiner(); };
     $("#prF").onclick = () => { PREP_MAJ = null; ov.hidden = true; document.body.style.overflow = ""; dessinerMag(); $("#mC").focus(); };
     ov.querySelectorAll("[data-k]").forEach(c => c.onchange = () => { c.checked ? faits.add(c.dataset.k) : faits.delete(c.dataset.k); LS.set(cle, [...faits]); dessiner(); });
     $("#prOk").onclick = async () => { for (const id of (p.ids || [p.id])) await remettre(id, true); try { localStorage.removeItem(cle); } catch(e){} PREP_MAJ = null; ov.hidden = true; document.body.style.overflow = ""; };

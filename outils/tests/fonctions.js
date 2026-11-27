@@ -373,6 +373,10 @@ test("Magasin : l'élève (carte scannée) envoie son panier, l'enseignant appro
   vrai(await m.$$eval(".prep-i.proch", L => L.length) === 1 && await m.$$eval(".prep-plan circle.pm-p:not(.fait)", L => L.length) <= 1, "Plan : seul le prochain raccord doit être montré");
   await m.click(".prep-plan svg [data-l]"); await attendre(300); vrai(!!(await m.$(".prep-face .pm-face")), "Plan : la lettre n'ouvre pas la vue de face");
   await m.click("#prFace"); await attendre(200); vrai(!(await m.$(".prep-face")), "Vue de face : « Fermer » ne ferme pas");
+  /* 26 nov. : vue de face = seulement l'étagère touchée; rangée pas encore entrée = « Vue de face à venir » */
+  const vf = await m.evaluate(() => [PlanMagasin.vueFace("J", [], 0), PlanMagasin.vueFace("J", [], 1), PlanMagasin.vueFace("H", [], 0)]);
+  vrai(/haut/.test(vf[0]) && !/du bas/.test(vf[0]) && /du bas/.test(vf[1]) && !/du haut/.test(vf[1]), "Vue de face : les deux étagères J s'affichent au lieu d'une");
+  vrai(/à venir/.test(vf[2]), "Vue de face : une rangée sans cases devrait dire « à venir »");
   for (const c of await m.$$("[data-k]")) { await c.click(); await attendre(150); }
   vrai(await m.$$eval(".pm-s.actif", L => L.length) === 0, "Plan : une rangée clignote encore après tout coché");
   await m.click("#prOk"); await attendre(400); vrai(P[0].etat === "remis", "Remis : " + P[0].etat);
