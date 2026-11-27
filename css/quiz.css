@@ -576,3 +576,6 @@ html.sombre .qe .ln:has(input:checked) .tc{background:rgba(30,138,85,.15)}
   .banniere.port .bfond{filter:none;opacity:.35}
   .cq .im.livre::before{filter:none;opacity:.35}
 }
+/* 26 nov. : bouton « Terminer » à la fin d'un Défi+ (toujours visible) */
+#finDefi{position:fixed;right:24px;bottom:96px;z-index:9000;min-height:64px;padding:0 30px;border:0;border-radius:18px;background:#EB6A22;color:#fff;font:800 1.25rem system-ui,sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.3);cursor:pointer}
+#finDefi[hidden]{display:none}

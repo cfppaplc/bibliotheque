@@ -1217,9 +1217,20 @@ function animer(boutons){
     let deja = false; try { deja = sessionStorage.getItem("celPropose") === animer.code; sessionStorage.setItem("celPropose", animer.code); } catch(x) {}
     if (!deja && !animer.cell) $("celB").click(); }, 300);
   addEventListener("message", e => { if (e.data && e.data.labo === "code" && e.data.mk) animer.mk = e.data.mk; if (e.data && e.data.labo === "code" && !animer.code) { animer.code = e.data.code; ecran(e.data.code); } });
+  /* 26 nov. (Jeremy : « à la fin d'un Défi+, j'ai de la difficulté à quitter ») : à la fin, un gros bouton « Terminer » toujours visible
+     (même quand la barre du bas est cachée par le cellulaire). Ouvert depuis un livre : ferme l'onglet et revient au livre. */
+  const finDefi = fini => { let b = $("finDefi");
+    if (!fini) { if (b) b.hidden = true; return; }
+    if (!b) { const livre = !!(window.opener && !window.opener.closed);
+      document.body.insertAdjacentHTML("beforeend", `<button id="finDefi" type="button">${livre ? "Terminer et revenir au livre" : "Terminer"}</button>`); b = $("finDefi");
+      b.onclick = () => { let q = false; try { q = F.contentWindow.quitterPartie && F.contentWindow.quitterPartie(); } catch(x) {}
+        setTimeout(() => { if (window.opener && !window.opener.closed) window.close(); location.href = "quiz.html"; }, q ? 400 : 0); }; }
+    b.hidden = false; };
+  let finForce = false; window.__finDefi = () => { finForce = true; finDefi(true); };   /* pour les tests */
   // les boutons de la barre reprennent l'état des vrais boutons de la télécommande
   setInterval(() => {
     let d = null; try { d = F.contentDocument; } catch(x) {}
+    { const sv = d && d.getElementById("bSuite"); finDefi(finForce || !!(sv && /podium|Statistiques de la classe/i.test(sv.textContent))); }
     document.querySelectorAll("#animBar [data-b]").forEach(b => {
       const v = d && d.getElementById(b.dataset.b);
       if (!v) { b.disabled = true; return; }

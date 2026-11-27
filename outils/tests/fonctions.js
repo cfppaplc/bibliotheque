@@ -82,6 +82,9 @@ test("Quiz « Animer » : la télécommande du tiroir n'a pas son propre journal
   await p.goto(BASE + "quiz.html?animer=1"); await attendre(3000);
   const r = await p.evaluate(() => [...document.querySelectorAll("iframe")].map(f => { try { return !!f.contentWindow.__journalPerf; } catch (e) { return false; } }));
   vrai(!r.some(Boolean), "Un cadre a son propre journal");
+  /* 26 nov. (Jeremy : « à la fin d'un Défi+, difficile de quitter ») : gros bouton « Terminer » visible à la fin */
+  await p.evaluate(() => window.__finDefi(true)); await attendre(200);
+  vrai(await p.$eval("#finDefi", b => !b.hidden && /Terminer/.test(b.textContent) && getComputedStyle(b).position === "fixed"), "Fin du Défi+ : pas de bouton « Terminer »");
   vrai(!p.errs.length, p.errs.join(" | "));
 });
 
