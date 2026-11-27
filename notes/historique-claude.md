@@ -804,3 +804,4 @@
 - 26 nov. : recherche du magasin : groupes de synonymes dans les deux sens (robinet/valve/vanne, coude/elbow, joint/garniture, pompe/circulatrice…); tests valve et robinet check ajoutés. Revue générale des photos lancée (8 agents par section).
 - 26 nov. : revue générale des photos (8 agents par section) : 471 articles corrigés (194 boulons NC/NF en boulon hexagonal, bouchons M/F séparés, tés fonte MJ/filetés, robinets-vannes/bille/clapets séparés, filières NC vs NPT, thermostats…), vérifiées à l'écran (6 rejetées), 3 retraits.
 - 26 nov. : magasin : article sans photo (ou lien brisé) = logo Métier+ pâle (SANS_PHOTO) au lieu d'un carré vide; test ajouté. Test « robinet check » remplacé par « check valve » (un clapet ne contient pas « robinet »).
+- 26 nov. : plombs de toilette : cuivre (4) avaient une photo ABS → coude DWV cuivre 4 po; MJ → plomb fonte sans emboîtement × bout uni. ABS et brides vérifiés à l'écran (bons).
