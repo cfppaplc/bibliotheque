@@ -396,7 +396,7 @@ function eleveEntree(msg){
     $("#cOk").disabled = true; $("#cErr").textContent = "Recherche de ton groupe…";
     const L = await trouverEleve(c.code);
     if (!L.length) { $("#cOk").disabled = false; $("#cErr").textContent = "Code inconnu. Vérifie avec ton enseignant."; return; }
-    if (!pre && L[0] && L[0].groupe === "ESSAI") pre = "Essai";
+    if (!pre && L[0] && L[0].groupe === "ESSAI") pre = "Kaleb";
     if (!pre) for (const x of L) { pre = await prenomDeCarte(c.code, c.cle, x.enc); if (pre) break; }   /* carte scannée : le prénom vient du registre */
     if (!pre && !POSTE) { const K = LS.get("mpCarte", null); if (K && K.p && String(K.c || "").includes("-" + c.code + "-")) pre = String(K.p).split(/\s+/)[0]; }
     /* 27 nov. (Jeremy) : on ne demande plus le prénom. Sans carte, l'enseignant met le prénom de son dossier en approuvant; le magasinier le voit. */
@@ -412,7 +412,7 @@ function eleveEntree(msg){
 }
 function connecter(code, x){ MOI = { code, ens:x.ens, groupe:x.groupe, profs:(x.profs || []).filter(id => id !== x.ens), prenom:LS.get("magPrenom", "") }; LS.set("magEleve", MOI); eleveCatalogue(); }
 function enTete(){ $("#tQui").innerHTML = MOI.prenom ? `<b>Bonjour ${esc(MOI.prenom)}</b><span class="gp"> · ${esc(MOI.groupe)}</span>`   /* 27 nov. (Jeremy) : le prénom en haut, pas le numéro */
-    : `<b>${MOI.groupe === "ESSAI" ? "Essai" : "Élève " + esc(MOI.code)}</b><span class="gp"> · ${esc(MOI.groupe)}</span>`; $("#tSortir").hidden = false;
+    : `<b>${MOI.groupe === "ESSAI" ? "Kaleb" : "Élève " + esc(MOI.code)}</b><span class="gp"> · ${esc(MOI.groupe)}</span>`; $("#tSortir").hidden = false;
   $("#tSortir").onclick = () => { if (nbPanier() && !confirm("Ton panier sera vidé. Changer d'élève ?")) return; MOI = null; PANIER = {}; LS.set("magEleve", null); sauverPanier(); eleveEntree(); }; }
 /* 26 nov. (Jeremy : « l'horaire pourrait rendre notre système dynamique ») : heures du magasin (reglages.json → magasinHeures, réglées dans Administration → Site).
    Hors des heures : l'élève remplit son panier mais ne peut pas l'envoyer; état « ouvert / fermé · rouvre à … » partout. */
@@ -699,7 +699,7 @@ async function dessinerProf(){
   let AVIS = []; try { AVIS = await rpc("panier_prof_avis", { p_ens:ENS, p_jeton:JETON }) || []; } catch(e){}
   let ABS = []; try { ABS = await rpc("absence_prof_lire", { p_ens:ENS, p_jeton:JETON }) || []; } catch(e){}
   { const N = await prenomsDossier(); AVIS.forEach(a => a.prenom = N[a.code] || ""); ABS.forEach(a => a.prenom = N[a.code] || "");
-    for (const a of AVIS.concat(ABS)) if (!a.prenom && window.codeEssai && await codeEssai(a.code)) a.prenom = "Essai"; }
+    for (const a of AVIS.concat(ABS)) if (!a.prenom && window.codeEssai && await codeEssai(a.code)) a.prenom = "Kaleb"; }
   await ouvrirAbs(ABS, ENS);   /* 27 nov. (Loi 25) : le serveur ne garde aucun prénom */   /* 27 nov. : absences signalées par les élèves */
   const att = L.filter(p => p.etat === "attente"), aut = L.filter(p => p.etat !== "attente" && Date.now() - Date.parse(p.t_remis || p.t_app || p.t) < 108e5);   /* 26 nov. (Jeremy) : traités = 3 dernières heures (avant : 24 h); le reste est dans les archives */
   const neufs = att.filter(p => !VUS.has(p.id)); if (neufs.length && VUS.size) bip(); att.forEach(p => VUS.add(p.id)); LS.set("magVus", [...VUS].slice(-300));
