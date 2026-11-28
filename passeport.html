@@ -645,7 +645,7 @@ function dlgCodes(){
   $("#aF").onclick = fermer; brancherChoix($("#aOk"), "étiquette");
   $("#aOk").onclick = () => { const k = $("#bx").querySelector("[name=fmt]:checked").value, F = FORMATS[k]; localStorage.setItem("passEtqFormat", k);
     const S = choisis(), L2 = L.filter(e => S.has(e.id)); L.length = 0; L.push(...L2); fermer();
-    const etq = e => `<div class="ce2"${e.st || ""}><img src="img/metier-plus.svg" alt=""><small>Code Métier+ · ${esc(GRP)}</small><b>${esc(e.p)}</b><span class="n">${esc(e.c)}</span>${e.k && window.Code128 ? `<img class="cb" src="${Code128.url("MP-" + e.c + "-" + e.k, 40, false)}" alt="">` : ""}</div>`;   /* 25 nov. : code-barres de la carte (magasin, coffres) */
+    const etq = e => `<div class="ce2"${e.st || ""}><img src="img/metier-plus.svg" alt=""><small>Code Métier+ · ${esc(GRP)}</small><b>${esc(e.p)}</b><span class="n">${esc(e.c)}</span></div>`;   /* 25 nov. : code-barres de la carte (magasin, coffres) */
     const Z = $("#qrs"); Z.className = "f" + k;
     /* 25 nov. : fiche « Ma carte » : code QR vers carte.html#c=MP-…&g=…&p=… (le # reste sur le cellulaire de l'élève) */
     const qrUrl = t => { if (!window.QRLib) return ""; const M = QRLib.matrice(t), n = M.length; return "data:image/svg+xml;charset=utf-8," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + (n + 8) + ' ' + (n + 8) + '"><rect width="' + (n + 8) + '" height="' + (n + 8) + '" fill="#fff"/>' + M.map((r, y) => r.map((v, x) => v ? '<rect x="' + (x + 4) + '" y="' + (y + 4) + '" width="1.02" height="1.02"/>' : "").join("")).join("") + '</svg>'); };

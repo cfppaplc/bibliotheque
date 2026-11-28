@@ -584,3 +584,24 @@ begin
   if not public.carte_ou_poste_ok(p_code, p_cle) then return false; end if;
   return public.panier_annuler(p_id, p_code);
 end; $$;
+
+-- 27 nov., 23 h 55 (Jeremy : « pas besoin de NIP, la commande est approuvée; je voulais seulement enlever les codes-barres ») :
+-- retour en arrière : la carte est exigée partout (absence_carte_ok); carte_ou_poste_ok retirée.
+create or replace function public.panier_envoyer(p_ens text, p_groupe text, p_code text, p_cle text, p_items jsonb, p_note text default null, p_prenom text default null, p_profs text[] default null)
+returns jsonb language plpgsql security definer set search_path = public, extensions as $$
+begin
+  if not public.absence_carte_ok(p_code, p_cle) then return jsonb_build_object('ok', false, 'err', 'carte'); end if;
+  return public.panier_envoyer(p_ens, p_groupe, p_code, p_items, p_note, p_prenom, p_profs);
+end; $$;
+create or replace function public.panier_modifier(p_id uuid, p_code text, p_cle text, p_items jsonb, p_note text default null)
+returns jsonb language plpgsql security definer set search_path = public, extensions as $$
+begin
+  if not public.absence_carte_ok(p_code, p_cle) then return jsonb_build_object('ok', false, 'err', 'carte'); end if;
+  return public.panier_modifier(p_id, p_code, p_items, p_note);
+end; $$;
+create or replace function public.panier_annuler(p_id uuid, p_code text, p_cle text) returns boolean language plpgsql security definer set search_path = public, extensions as $$
+begin
+  if not public.absence_carte_ok(p_code, p_cle) then return false; end if;
+  return public.panier_annuler(p_id, p_code);
+end; $$;
+drop function if exists public.carte_ou_poste_ok(text, text);
