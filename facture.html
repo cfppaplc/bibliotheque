@@ -265,7 +265,7 @@ function brancher(){ const f = FA, maj = () => { f.modif = Date.now(); sauver();
   document.querySelectorAll("[data-plus]").forEach(b => b.onclick = () => { const t = b.dataset.plus; f[t].push(t === "mo" ? { d:"", h:"", taux:"" } : t === "mat" ? { d:"", q:"1", prix:"" } : { d:"", m:"" }); maj(); dessiner(); });
   /* 26 nov. (Jeremy : « ils vont pouvoir cocher les raccords qu'ils ont été chercher au magasin ») : commandes remises, par date, à cocher */
   $("#imp").onclick = async () => { const b = $("#imp"); b.disabled = true; b.textContent = "Recherche au magasin…"; let L; await catalogue();
-    try { L = await rpc("panier_materiel_eleve", { p_code:C.c }); } catch(e){ toast(e.message); dessiner(); return; }
+    try { L = await rpc("panier_materiel_eleve", { p_code:C.c, p_cle:C.k || "" }); } catch(e){ toast(e.message); dessiner(); return; }
     if (!L || !L.length) { toast("Aucun raccord remis au magasin pour ton code (120 derniers jours)."); dessiner(); return; }
     const G = {}; L.forEach(r => (G[r.panier] = G[r.panier] || { jour:r.jour, l:[] }).l.push(r));
     const ov = document.createElement("div"); ov.style.cssText = "position:fixed;inset:0;background:rgba(30,42,68,.55);z-index:20;display:flex;align-items:flex-start;justify-content:center;overflow:auto;padding:30px 12px";

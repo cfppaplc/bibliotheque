@@ -527,3 +527,36 @@ begin
   end if;
   return true;
 end; $$;
+
+-- 27 nov. (Loi 25, Jeremy : « on règle le 2 ») : le code à 5 chiffres seul ne permet plus d'agir au nom d'un élève.
+-- Il faut la carte (code + clé secrète, scannée ou sur le cellulaire), vérifiée par absence_carte_ok. Les anciennes versions restent
+-- pour usage interne seulement (plus appelables par le site).
+create or replace function public.panier_envoyer(p_ens text, p_groupe text, p_code text, p_cle text, p_items jsonb, p_note text default null, p_prenom text default null, p_profs text[] default null)
+returns jsonb language plpgsql security definer set search_path = public, extensions as $$
+begin
+  if not public.absence_carte_ok(p_code, p_cle) then return jsonb_build_object('ok', false, 'err', 'carte'); end if;
+  return public.panier_envoyer(p_ens, p_groupe, p_code, p_items, p_note, p_prenom, p_profs);
+end; $$;
+create or replace function public.panier_modifier(p_id uuid, p_code text, p_cle text, p_items jsonb, p_note text default null)
+returns jsonb language plpgsql security definer set search_path = public, extensions as $$
+begin
+  if not public.absence_carte_ok(p_code, p_cle) then return jsonb_build_object('ok', false, 'err', 'carte'); end if;
+  return public.panier_modifier(p_id, p_code, p_items, p_note);
+end; $$;
+create or replace function public.panier_annuler(p_id uuid, p_code text, p_cle text) returns boolean language plpgsql security definer set search_path = public, extensions as $$
+begin
+  if not public.absence_carte_ok(p_code, p_cle) then return false; end if;
+  return public.panier_annuler(p_id, p_code);
+end; $$;
+create or replace function public.panier_materiel_eleve(p_code text, p_cle text, p_depuis date default null) returns table(panier uuid, jour date, n text, nom text, q bigint)
+language plpgsql stable security definer set search_path = public, extensions as $$
+begin
+  if not public.absence_carte_ok(p_code, p_cle) then return; end if;
+  return query select * from public.panier_materiel_eleve(p_code, p_depuis);
+end; $$;
+revoke all on function public.panier_envoyer(text, text, text, jsonb, text, text, text[]), public.panier_modifier(uuid, text, jsonb, text),
+  public.panier_annuler(uuid, text), public.panier_materiel_eleve(text, date) from public, anon, authenticated;
+revoke all on function public.panier_envoyer(text, text, text, text, jsonb, text, text, text[]), public.panier_modifier(uuid, text, text, jsonb, text),
+  public.panier_annuler(uuid, text, text), public.panier_materiel_eleve(text, text, date) from public;
+grant execute on function public.panier_envoyer(text, text, text, text, jsonb, text, text, text[]), public.panier_modifier(uuid, text, text, jsonb, text),
+  public.panier_annuler(uuid, text, text), public.panier_materiel_eleve(text, text, date) to anon, authenticated;

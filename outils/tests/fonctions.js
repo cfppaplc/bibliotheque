@@ -527,7 +527,7 @@ test("Registre automatique : la liste des codes se republie seule depuis le coff
 });
 test("Magasin (iPhone) : après « Changer d'élève », la case du code n'est pas placée d'avance (le clavier d'iOS s'ouvre au toucher)", async b => {   /* 27 nov. */
   const ctx = await b.newContext({ viewport: { width: 390, height: 800 }, hasTouch: true, isMobile: true, serviceWorkers: "block" });
-  await ctx.addInitScript(() => { localStorage.setItem("bienvenueVu", "1"); localStorage.setItem("magEleve", JSON.stringify({ code: "12345", ens: "jeremy.raymond", groupe: "2608 EGI", profs: [], prenom: "Alex" })); });
+  await ctx.addInitScript(() => { localStorage.setItem("bienvenueVu", "1"); localStorage.setItem("magEleve", JSON.stringify({ code: "12345", cle: "K7Q9X2", ens: "jeremy.raymond", groupe: "2608 EGI", profs: [], prenom: "Alex" })); });
   await ctx.route(/supabase\.co/, r => r.fulfill({ body: "null", contentType: "application/json", headers: { "access-control-allow-origin": "*" } }));
   const p = await ctx.newPage(); await p.goto(BASE + "magasin.html"); await attendre(1500);
   await p.click("#tSortir"); await attendre(500);
@@ -544,8 +544,12 @@ test("Magasin : sans carte, l'élève entre sans écrire son prénom; l'enseigna
     r.fulfill({ body: JSON.stringify(o), contentType: "application/json", headers: { "access-control-allow-origin": "*" } }); });
   await ctx.addInitScript(() => { localStorage.setItem("bienvenueVu", "1"); });
   const e = await ctx.newPage(); e.on("pageerror", x => errs.push(x.message)); await e.goto(BASE + "magasin.html"); await attendre(1200);
-  await e.fill("#cCode", "59564"); await attendre(1800);
+  /* 27 nov. (Loi 25) : le code seul ne suffit plus; sur son cellulaire, l'élève entre avec son code si sa carte est dans « Ma carte » */
+  await e.fill("#cCode", "59564"); await attendre(1500);
+  vrai(!(await e.evaluate(() => localStorage.getItem("magEleve") && JSON.parse(localStorage.getItem("magEleve")))) && /Ma carte/.test(await e.textContent("#cErr")), "Le code seul ouvre encore le magasin");
+  await e.evaluate(() => localStorage.setItem("mpCarte", JSON.stringify({ c: "MP-59564-ABCD12", g: "", p: "", t: 1 }))); await e.reload(); await attendre(2500);   /* « Ma carte » sur ce cellulaire : entrée directe */
   vrai(/59564/.test(await e.textContent("#tQui")), "Sans carte : l'élève n'entre pas (prénom encore demandé ?) " + (await e.textContent("#app")).slice(0, 120));
+  vrai(await e.evaluate(() => JSON.parse(localStorage.getItem("magEleve")).cle === "ABCD12"), "La clé de « Ma carte » n'est pas reprise");
   await e.evaluate(() => { localStorage.setItem("dernierId", "jeremy.raymond"); localStorage.setItem("magJeton|jeremy.raymond", JSON.stringify("j")); localStorage.setItem("passeportOutils", JSON.stringify({ el: { a: { p: "Alex Tremblay", c: "59564", g: "2606PLC1" } } })); });
   const q = await ctx.newPage(); q.on("pageerror", x => errs.push(x.message)); await q.goto(BASE + "magasin.html?mode=prof"); await attendre(1800);
   const tx = await q.textContent("#app");
@@ -602,7 +606,7 @@ test("Magasin : l'élève voit seulement ses 3 dernières commandes", async b =>
   await ctx.route(/supabase\.co\/rest\/v1\/rpc\/(\w+)/, r => { const f = r.request().url().match(/rpc\/(\w+)/)[1];
     r.fulfill({ body: JSON.stringify(f === "panier_etat" ? { etat: "remis" } : null), contentType: "application/json", headers: { "access-control-allow-origin": "*" } }); });
   await ctx.addInitScript(() => { localStorage.setItem("bienvenueVu", "1"); localStorage.setItem("magHeuresTest", "false");
-    localStorage.setItem("magEleve", JSON.stringify({ code: "12345", ens: "jeremy.raymond", groupe: "2606PLC1", profs: [], prenom: "Alex" }));
+    localStorage.setItem("magEleve", JSON.stringify({ code: "12345", cle: "K7Q9X2", ens: "jeremy.raymond", groupe: "2606PLC1", profs: [], prenom: "Alex" }));
     localStorage.setItem("magEnvois", JSON.stringify([1, 2, 3, 4, 5, 6].map(k => ({ id: "c" + k, t: Date.now() - k * 6e4, code: "12345", n: k, items: [] })))); });
   const p = await ctx.newPage(); await p.goto(BASE + "magasin.html"); await attendre(2500);
   const n = await p.evaluate(() => (document.querySelector("#mesEnvois .mesP summary b") ? document.querySelectorAll("#mesEnvois [data-ann], #mesEnvois .suivi, #mesEnvois .env").length : -1));

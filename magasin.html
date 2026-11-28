@@ -381,17 +381,25 @@ function correspond(a, mots){ return mots.every(m => /^\d+([-/.,]\d+)*$/.test(m)
 /* =================================================================== ÉLÈVE =================================================================== */
 const pouces = d => String(d).split(" ").reduce((s, x) => { const [n, m] = x.split("/"); return s + (m ? +n / +m : +n || 0); }, 0);
 let MOI = LS.get("magEleve", null), PANIER = LS.get("magPanier", {}), FILTRE = { q:"", cat:"", mat:"", d:"" };
+/* 27 nov. (Loi 25) : un élève resté branché d'avant (sans la clé de sa carte) la reprend de « Ma carte », sinon il rescanne sa carte */
+if (MOI && !MOI.cle && MOI.groupe !== "ESSAI") { const K = LS.get("mpCarte", null), m = K && String(K.c || "").toUpperCase().match(/^MP-(\d{5})-([A-Z0-9]{4,12})$/);
+  if (m && m[1] === MOI.code) { MOI.cle = m[2]; LS.set("magEleve", MOI); } else { MOI = null; LS.set("magEleve", null); } }
 /* 27 nov. (Jeremy : « mon compte 69696 doit pouvoir envoyer des commandes test ») : la carte d'essai ignore les heures du magasin */
 function essai(){ return !!(MOI && MOI.groupe === "ESSAI"); }
 const sauverPanier = () => LS.set("magPanier", PANIER);
 const nbPanier = () => Object.values(PANIER).reduce((s, q) => s + q, 0);
 function eleveEntree(msg){
   $("#tSortir").hidden = true; $("#tQui").textContent = ""; $("#barre").hidden = true;
-  $("#app").innerHTML = `<h1>Magasin de raccords</h1><p class="sous">Scanne ta carte étudiante, ou tape ton code à 5 chiffres.</p>
+  $("#app").innerHTML = `<h1>Magasin de raccords</h1><p class="sous">Scanne ta carte étudiante${POSTE ? "" : ", ou tape ton code si ta carte est déjà dans « Ma carte » sur ce cellulaire"}.</p>
     <div class="carte"><input class="cache-code code" id="cCode" inputmode="numeric" autocomplete="off" autocapitalize="characters" placeholder="00000" aria-label="Ton code">
     <div id="preZ" hidden><label for="cPre" style="display:block;font-weight:600;margin-top:6px">Ton prénom</label><input id="cPre" class="pre" autocomplete="given-name" maxlength="20" placeholder="Prénom seulement"></div>
     <p class="err" id="cErr">${esc(msg || "")}</p><button class="btn p" id="cOk">Entrer</button></div>`;
-  const i = $("#cCode"), go = async () => { const c = lireCarte(i.value); if (!c) { $("#cErr").textContent = "Ton code a 5 chiffres."; return; }
+  const i = $("#cCode"), go = async () => { const c = lireCarte(i.value); if (!c) { $("#cErr").textContent = "Scanne ta carte étudiante."; return; }
+    /* 27 nov. (Loi 25, Jeremy : « on règle le 2 ») : le code seul ne suffit plus; il faut la carte (code + clé secrète).
+       Sur le cellulaire de l'élève, la clé vient de « Ma carte »; au poste, du lecteur de codes-barres. La carte d'essai passe. */
+    if (!c.cle && !POSTE) { const K = LS.get("mpCarte", null), m = K && String(K.c || "").toUpperCase().match(/^MP-(\d{5})-([A-Z0-9]{4,12})$/); if (m && m[1] === c.code) c.cle = m[2]; }
+    if (!c.cle && !(window.codeEssai && await codeEssai(c.code))) { $("#cErr").innerHTML = POSTE ? "Scanne ta carte étudiante (le code seul ne suffit plus)." : 'Le code seul ne suffit plus : scanne ta carte, ou ouvre d\'abord <a href="carte.html">Ma carte</a> sur ce cellulaire.'; return; }
+    CLE_ENTREE = c.cle;
     let pre = ($("#cPre").value || "").trim().split(/\s+/)[0];
     $("#cOk").disabled = true; $("#cErr").textContent = "Recherche de ton groupe…";
     const L = await trouverEleve(c.code);
@@ -410,7 +418,8 @@ function eleveEntree(msg){
      bloquait le clavier d'iOS au toucher. Focus automatique seulement au poste (lecteur de codes-barres) ou à la souris. */
   if (POSTE || !matchMedia("(pointer:coarse)").matches) i.focus();
 }
-function connecter(code, x){ MOI = { code, ens:x.ens, groupe:x.groupe, profs:(x.profs || []).filter(id => id !== x.ens), prenom:LS.get("magPrenom", "") }; LS.set("magEleve", MOI); eleveCatalogue(); }
+let CLE_ENTREE = "";
+function connecter(code, x){ MOI = { code, cle:CLE_ENTREE, ens:x.ens, groupe:x.groupe, profs:(x.profs || []).filter(id => id !== x.ens), prenom:LS.get("magPrenom", "") }; LS.set("magEleve", MOI); eleveCatalogue(); }
 function enTete(){ $("#tQui").innerHTML = MOI.prenom ? `<b>Bonjour ${esc(MOI.prenom)}</b><span class="gp"> · ${esc(MOI.groupe)}</span>`   /* 27 nov. (Jeremy) : le prénom en haut, pas le numéro */
     : `<b>${MOI.groupe === "ESSAI" ? "Kaleb" : "Élève " + esc(MOI.code)}</b><span class="gp"> · ${esc(MOI.groupe)}</span>`; $("#tSortir").hidden = false;
   $("#tSortir").onclick = () => { if (nbPanier() && !confirm("Ton panier sera vidé. Changer d'élève ?")) return; MOI = null; PANIER = {}; LS.set("magEleve", null); sauverPanier(); eleveEntree(); }; }
@@ -600,13 +609,13 @@ function panier(){
   brancherQte($("#pL"), () => { if (!nbPanier()) $("#pEnv").disabled = true; });
   $("#pEnv").onclick = async () => { const b = $("#pEnv"); if (!EDIT && !etatMag().ouvert && !essai()) { majEtat(); return; } b.dataset.envoi = "1"; b.disabled = true; b.textContent = "Envoi…";
     const items = Object.keys(PANIER).map(id => { const a = CAT.find(x => x.id === id); return a && { id, n:a.n, nom:a.nom, q:PANIER[id], r:a.r || "" }; }).filter(Boolean);
-    if (EDIT) { try { const r = await rpc("panier_modifier", { p_id:EDIT, p_code:MOI.code, p_items:items, p_note:$("#pNote").value || null });   /* 25 nov. : modifier jusqu'à l'approbation */
+    if (EDIT) { try { const r = await rpc("panier_modifier", { p_id:EDIT, p_code:MOI.code, p_cle:MOI.cle || "", p_items:items, p_note:$("#pNote").value || null });   /* 25 nov. : modifier jusqu'à l'approbation */
         if (!r || !r.ok) throw new Error(r && r.err || "refus");
         const E = LS.get("magEnvois", []), x = E.find(y => y.id === EDIT); if (x) { x.n = items.reduce((s, i) => s + i.q, 0); x.items = items.map(i => ({ id:i.id, q:i.q })); } LS.set("magEnvois", E);
         LS.set("magEdit", ""); PANIER = {}; sauverPanier(); LS.set("magNote", ""); toast("Panier modifié."); fermer(); }
       catch(e){ $("#pErr").textContent = "Modification impossible : " + e.message; b.disabled = false; b.textContent = "Enregistrer les changements"; }
       return; }
-    try { const r = await rpc("panier_envoyer", { p_ens:MOI.ens, p_groupe:MOI.groupe, p_code:MOI.code, p_items:items, p_note:$("#pNote").value || null, p_prenom:null,   /* 27 nov. (Loi 25) : aucun prénom sur le serveur */ p_profs:MOI.profs && MOI.profs.length ? MOI.profs : null });
+    try { const r = await rpc("panier_envoyer", { p_ens:MOI.ens, p_groupe:MOI.groupe, p_code:MOI.code, p_cle:MOI.cle || "", p_items:items, p_note:$("#pNote").value || null, p_prenom:null,   /* 27 nov. (Loi 25) : aucun prénom sur le serveur */ p_profs:MOI.profs && MOI.profs.length ? MOI.profs : null });
       if (!r || !r.ok) throw new Error(r && r.err || "refus");
       const COR = LS.get("magCorrige", null); let E = LS.get("magEnvois", []); if (COR) E = E.filter(y => y.id !== COR.id); LS.set("magCorrige", null);   /* 26 nov. : le panier corrigé remplace le refusé */
       E.unshift({ id:r.id, t:Date.now(), code:MOI.code, n:items.reduce((s, i) => s + i.q, 0), items:items.map(i => ({ id:i.id, q:i.q })) }); LS.set("magEnvois", E.slice(0, 20)); if (LS.get("magNotifE", false)) aboEleve(r.id).catch(() => {});
@@ -657,7 +666,7 @@ const LBL = { attente:"En attente de ton enseignant", approuve:"Accepté · vien
   z.querySelectorAll("[data-cor]").forEach(b => b.onclick = () => { const k = E.findIndex(y => y.id === b.dataset.cor), x = E[k], st = S[k]; if (!x || !x.items) return;   /* 26 nov. (Jeremy) : après un refus, l'élève corrige selon le commentaire */
     PANIER = {}; x.items.forEach(i => { if (CAT.find(a => a.id === i.id)) PANIER[i.id] = (PANIER[i.id] || 0) + (+i.q || 1); }); sauverPanier(); LS.set("magEdit", ""); LS.set("magCorrige", { id:x.id, motif:(st && st.motif) || "" }); panier(); });
   z.querySelectorAll("[data-ann]").forEach(b => b.onclick = async () => { if (!confirm("Annuler ce panier ? Ton enseignant ne le verra plus.")) return; b.disabled = true;
-    try { if (await rpc("panier_annuler", { p_id:b.dataset.ann, p_code:MOI.code }) !== true) throw new Error("déjà traité par ton enseignant");
+    try { if (await rpc("panier_annuler", { p_id:b.dataset.ann, p_code:MOI.code, p_cle:MOI.cle || "" }) !== true) throw new Error("déjà traité par ton enseignant");
       LS.set("magEnvois", LS.get("magEnvois", []).filter(y => y.id !== b.dataset.ann)); if (LS.get("magEdit", "") === b.dataset.ann) LS.set("magEdit", ""); toast("Panier annulé."); suivi(); }
     catch(e){ toast("Annulation impossible : " + e.message); b.disabled = false; } });
   /* changement d'état pendant que la page est ouverte : son + vibration + message */
