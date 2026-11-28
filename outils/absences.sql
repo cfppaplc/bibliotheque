@@ -81,3 +81,38 @@ revoke execute on function public.absence_carte_ok(text, text) from anon, authen
 -- 27 nov. (vérification Loi 25) : plus aucun motif de santé. 1 = raison personnelle, 2 = rendez-vous, 3 (ancien deuil) → 1.
 update public.absence set motif = 1 where motif = 3;
 comment on column public.absence.motif is '1 raison personnelle, 2 rendez-vous, 4 services aux élèves, 5 activité autorisée, 6 autre (3 retiré le 27 nov. 2026)';
+
+-- 27 nov. (Jeremy : « on devrait chiffrer les absences ») : le genre, le motif et le moment sont chiffrés sur le cellulaire de l'élève,
+-- une enveloppe par enseignant choisi (sa clé publique de compte) et une pour l'élève (clé tirée du secret de sa carte).
+-- Le serveur ne garde en clair que le code, le groupe, les enseignants à aviser et les dates (pour le tri et le ménage).
+alter table public.absence add column if not exists data jsonb;
+drop function if exists public.absence_signaler(text, text, text, text, text[], text, date, date, text, text, int);
+create or replace function public.absence_signaler(p_code text, p_cle text, p_groupe text, p_profs text[], p_du date, p_au date, p_data jsonb)
+returns jsonb language plpgsql security definer set search_path = public, extensions as $$
+declare r public.absence; pf text[] := array(select distinct x from unnest(coalesce(p_profs, '{}')) x where x ~ '^[a-z0-9._-]{3,60}$' limit 4);
+begin
+  if not public.absence_carte_ok(p_code, p_cle) then return jsonb_build_object('ok', false, 'err', 'carte'); end if;
+  if array_length(pf, 1) is null or p_du is null or p_au is null or p_au < p_du or p_au - p_du > 30 or p_du < current_date - 30 or p_du > current_date + 120
+     or length(coalesce(p_groupe, '')) not between 1 and 60 or jsonb_typeof(p_data) is distinct from 'object'
+     or exists (select 1 from jsonb_each(p_data) e where not (e.key = '_e' or e.key = any(pf)) or jsonb_typeof(e.value) <> 'string' or length(e.value #>> '{}') not between 20 and 1500)
+     or exists (select 1 from unnest(pf) x where not (p_data ? x)) or not (p_data ? '_e') then
+    return jsonb_build_object('ok', false, 'err', 'refusé'); end if;
+  if (select count(*) from public.absence where code = p_code and t > now() - interval '1 day') >= 10 then return jsonb_build_object('ok', false, 'err', 'trop'); end if;
+  insert into public.absence (code, groupe, profs, genre, du, au, part, motif, data)
+    values (p_code, p_groupe, pf, 'chiffre', p_du, p_au, 'j', 0, p_data) returning * into r;
+  delete from public.absence where t < now() - interval '1 year';
+  if exists (select 1 from public.panier_prof where ens = any(pf) and jsonb_array_length(abonnements) > 0) then
+    perform net.http_post(url := 'https://nhxhfiaznuifcbobjuuv.supabase.co/functions/v1/panier-avis', headers := '{"Content-Type":"application/json"}'::jsonb, body := jsonb_build_object('absence', r.id));
+  end if;
+  return jsonb_build_object('ok', true, 'id', r.id);
+end; $$;
+create or replace function public.absence_eleve(p_code text, p_cle text) returns setof jsonb language sql stable security definer set search_path = public, extensions as $$
+  select jsonb_build_object('id', id, 't', t, 'genre', genre, 'du', du, 'au', au, 'part', part, 'heure', heure, 'motif', motif, 'profs', profs, 'vu', array_length(vu, 1) is not null, 'data', data ->> '_e')
+  from public.absence where public.absence_carte_ok(p_code, p_cle) and code = p_code and au >= current_date - 90 order by du desc limit 50;
+$$;
+create or replace function public.absence_prof_lire(p_ens text, p_jeton text) returns setof jsonb language sql stable security definer set search_path = public, extensions as $$
+  select jsonb_build_object('id', id, 't', t, 'code', code, 'groupe', groupe, 'genre', genre, 'du', du, 'au', au, 'part', part, 'heure', heure, 'motif', motif, 'vu', p_ens = any(vu), 'data', data ->> p_ens)
+  from public.absence where public.panier_prof_ok(p_ens, p_jeton) and p_ens = any(profs) and au >= current_date - 60 order by du desc, t desc limit 200;
+$$;
+revoke all on function public.absence_signaler(text, text, text, text[], date, date, jsonb) from public;
+grant execute on function public.absence_signaler(text, text, text, text[], date, date, jsonb) to anon, authenticated;

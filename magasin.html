@@ -516,7 +516,10 @@ async function absences(){
       if (!S.motif) { er.textContent = "Choisis un motif."; return; } if (!S.profs.length) { er.textContent = "Choisis ton enseignant."; return; }
       if (S.genre !== "absence" && !S.heure) { er.textContent = S.genre === "retard" ? "Écris l'heure de ton arrivée." : "Écris l'heure de ton départ."; return; }
       const b = $("#abOk"); b.disabled = true; b.textContent = "Envoi…";
-      try { const r = await rpc("absence_signaler", { p_code:code, p_cle:cle, p_groupe:G.groupe, p_prenom:null, p_profs:S.profs, p_genre:S.genre, p_du:S.du, p_au:S.genre === "absence" ? S.au : S.du, p_part:S.genre === "absence" ? S.part : "j", p_heure:S.genre === "absence" ? "" : S.heure, p_motif:S.motif });
+      try { const txt = JSON.stringify({ g:S.genre, m:S.motif, p:S.genre === "absence" ? S.part : "j", h:S.genre === "absence" ? "" : S.heure }), D = {};
+        for (const id of S.profs) { const e = await envPour((COMPTES[id] || {}).pub, txt); if (!e) throw new Error(nomEns(id) + " ne peut pas encore recevoir de signalement chiffré. Avise-le de vive voix."); D[id] = e; }
+        { const iv = crypto.getRandomValues(new Uint8Array(12)), ct = new Uint8Array(await crypto.subtle.encrypt({ name:"AES-GCM", iv }, await cleAbs(code, cle), new TextEncoder().encode(txt))), u = new Uint8Array(12 + ct.length); u.set(iv); u.set(ct, 12); D._e = b64e(u); }
+        const r = await rpc("absence_signaler", { p_code:code, p_cle:cle, p_groupe:G.groupe, p_profs:S.profs, p_du:S.du, p_au:S.genre === "absence" ? S.au : S.du, p_data:D });
         if (!r || !r.ok) throw new Error(r && r.err === "trop" ? "Trop de signalements aujourd'hui." : r && r.err === "carte" ? "Ta carte n'est pas reconnue. Demande à ton enseignant." : "Signalement refusé. Vérifie les dates.");
         LS.set("absProfs", S.profs);
         $("#app").innerHTML = `<div class="constr"><div class="abOk"><svg viewBox="0 0 24 24" width="40" height="40"><path d="M5 12.5l4.2 4.2L19 7" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div><h1>${GENRES[S.genre]} signalé${S.genre === "absence" ? "e" : ""}</h1>
@@ -525,6 +528,7 @@ async function absences(){
       catch(e){ er.textContent = /Failed|fetch|404/.test(e.message) ? "Pas de connexion pour l'instant. Réessaie dans un moment." : e.message; b.disabled = false; b.textContent = "Signaler à mon enseignant"; } };
     liste(); };
   const liste = async () => { const z = $("#abL"); if (!z) return; let R = []; try { R = await rpc("absence_eleve", { p_code:code, p_cle:cle }) || []; } catch(e){ z.innerHTML = `<p class="vide">Liste indisponible pour l'instant.</p>`; return; }
+    if (R.some(a => a.data)) { const K = await cleAbs(code, cle); for (const a of R) { if (!a.data) continue; try { const u = b64d(a.data), o = JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({ name:"AES-GCM", iv:u.subarray(0, 12) }, K, u.subarray(12)))); Object.assign(a, { genre:o.g, motif:o.m, part:o.p || "j", heure:o.h || "" }); } catch(e){} } }
     z.innerHTML = R.length ? `<div class="carte" style="padding:6px 16px">${R.map(a => `<div class="abR"><div><b>${GENRES[a.genre] || "Absence"}</b> · ${esc(quandTxt(a))}<br><small class="sous">${esc(MOTIFS_C[a.motif] || "")}${a.vu ? " · vu par l'enseignant" : ""}</small></div>${a.du >= auj ? `<button class="lien" data-x="${esc(a.id)}" style="color:var(--rouge)">Annuler</button>` : ""}</div>`).join("")}</div>` : `<p class="vide">Aucun signalement.</p>`;
     z.querySelectorAll("[data-x]").forEach(b => b.onclick = async () => { if (!confirm("Annuler ce signalement ?")) return; try { await rpc("absence_annuler", { p_code:code, p_cle:cle, p_id:b.dataset.x }); } catch(e){} liste(); }); };
   dessiner(); }
@@ -694,7 +698,8 @@ async function dessinerProf(){
   { const N = await prenomsDossier(); (L || []).forEach(p => { p.prenom = N[p.code] || ""; }); PRENOMS_CMD = Object.fromEntries((L || []).map(p => [p.id, p.prenom || ""])); }   /* le prénom vient du dossier, jamais de ce que l'élève a tapé */
   let AVIS = []; try { AVIS = await rpc("panier_prof_avis", { p_ens:ENS, p_jeton:JETON }) || []; } catch(e){}
   let ABS = []; try { ABS = await rpc("absence_prof_lire", { p_ens:ENS, p_jeton:JETON }) || []; } catch(e){}
-  { const N = await prenomsDossier(); AVIS.forEach(a => a.prenom = N[a.code] || ""); ABS.forEach(a => a.prenom = N[a.code] || ""); }   /* 27 nov. (Loi 25) : le serveur ne garde aucun prénom */   /* 27 nov. : absences signalées par les élèves */
+  { const N = await prenomsDossier(); AVIS.forEach(a => a.prenom = N[a.code] || ""); ABS.forEach(a => a.prenom = N[a.code] || ""); }
+  await ouvrirAbs(ABS, ENS);   /* 27 nov. (Loi 25) : le serveur ne garde aucun prénom */   /* 27 nov. : absences signalées par les élèves */
   const att = L.filter(p => p.etat === "attente"), aut = L.filter(p => p.etat !== "attente" && Date.now() - Date.parse(p.t_remis || p.t_app || p.t) < 108e5);   /* 26 nov. (Jeremy) : traités = 3 dernières heures (avant : 24 h); le reste est dans les archives */
   const neufs = att.filter(p => !VUS.has(p.id)); if (neufs.length && VUS.size) bip(); att.forEach(p => VUS.add(p.id)); LS.set("magVus", [...VUS].slice(-300));
   const avis = "Notification" in window && "serviceWorker" in navigator && "PushManager" in window, perm = avis ? Notification.permission : "non";
@@ -708,7 +713,7 @@ async function dessinerProf(){
     <div class="sec">Traités (3 dernières heures)</div>${aut.length ? aut.map(p => cmdHtml(p, false)).join("") : `<p class="vide">Aucun.</p>`}
     <details class="arch"><summary>Archives de l'année</summary><div class="carte" style="margin-top:10px"><label for="arM">Mois</label> <select id="arM">${(() => { const o = []; for (let i = 0; i < 12; i++){ const d = new Date(); d.setDate(1); d.setMonth(d.getMonth() - i); o.push(`<option value="${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}">${d.toLocaleDateString("fr-CA", { month:"long", year:"numeric" })}</option>`); } return o.join(""); })()}</select> <button class="btn" id="arVoir" style="min-height:40px">Voir</button><div id="arL"></div></div></details>`;
   { const z = $("#absZ"), auj = jourCle(new Date()), nv = ABS.filter(a => !a.vu), V = ABS.filter(a => a.vu && a.au >= auj).slice(0, 10);
-    if (z && (nv.length || V.length)) { const l = a => `<div class="abR${a.vu ? "" : " nv"}"><div><b>${esc(a.prenom || "Élève")}</b> <small class="sous">${esc(a.code)} · ${esc(a.groupe)}</small><br>${GENRES[a.genre] || "Absence"} · ${esc(quandTxt(a))}<br><small class="sous">${esc(MOTIFS_C[a.motif] || "")}</small></div>${a.vu ? "" : `<button class="btn" data-av="${esc(a.id)}">Vu</button>`}</div>`;
+    if (z && (nv.length || V.length)) { const l = a => `<div class="abR${a.vu ? "" : " nv"}"><div><b>${esc(a.prenom || "Élève")}</b> <small class="sous">${esc(a.code)} · ${esc(a.groupe)}</small><br>${GENRES[a.genre] || "Absence"} · ${esc(quandTxt(a))}<br><small class="sous">${a.illisible ? "Détails chiffrés : connecte-toi à Métier+ sur cet appareil pour les lire" : esc(MOTIFS_C[a.motif] || "")}</small></div>${a.vu ? "" : `<button class="btn" data-av="${esc(a.id)}">Vu</button>`}</div>`;
       z.innerHTML = `<div class="sec">Absences signalées${nv.length ? ` <span class="pastN">${nv.length}</span>` : ""}</div><div class="carte" style="padding:6px 16px">${nv.map(l).join("")}${V.length ? `<details${nv.length ? "" : " open"}><summary class="sous" style="padding:8px 0;cursor:pointer">Déjà vues, à venir (${V.length})</summary>${V.map(l).join("")}</details>` : ""}</div>`;
       z.querySelectorAll("[data-av]").forEach(b => b.onclick = async () => { b.disabled = true; try { await rpc("absence_vu", { p_ens:ENS, p_jeton:JETON, p_id:b.dataset.av }); } catch(e){} dessinerProf(); }); } }
   document.querySelectorAll("[data-ok]").forEach(b => b.onclick = () => decider(b.dataset.ok, true));
@@ -785,16 +790,29 @@ const COMPTOIR = "comptoir.magasin", chiffre = x => /^E[A-Za-z0-9+/=]{60,}$/.tes
 const b64e = u => btoa(String.fromCharCode(...u)), b64d = t => Uint8Array.from(atob(t), c => c.charCodeAt(0));
 async function cleEC2(prive, pubBrute){ const bits = await crypto.subtle.deriveBits({ name:"ECDH", public:await crypto.subtle.importKey("raw", pubBrute, { name:"ECDH", namedCurve:"P-256" }, false, []) }, prive, 256);
   return crypto.subtle.importKey("raw", await crypto.subtle.digest("SHA-256", bits), "AES-GCM", false, ["encrypt", "decrypt"]); }
-async function pourComptoir(prenom){ try { const c = COMPTES[COMPTOIR], pub = c && c.pub; if (!prenom || !pub || pub.kty !== "EC") return null;
+/* 27 nov. (Jeremy : « on devrait chiffrer les absences ») : enveloppe pour la clé publique d'un compte (EC : ECDH P-256 + AES-256-GCM, « E… »; RSA : RSA-OAEP-256, « R… ») */
+async function envPour(pub, txt){ const brut = new TextEncoder().encode(txt); if (!pub) return null;
+  if (pub.kty === "RSA"){ const pk = await crypto.subtle.importKey("jwk", { kty:"RSA", n:pub.n, e:pub.e, alg:"RSA-OAEP-256", ext:true }, { name:"RSA-OAEP", hash:"SHA-256" }, false, ["encrypt"]);
+    return "R" + b64e(new Uint8Array(await crypto.subtle.encrypt({ name:"RSA-OAEP" }, pk, brut))); }
+  if (pub.kty !== "EC") return null;
   const EC = { name:"ECDH", namedCurve:"P-256" }, eph = await crypto.subtle.generateKey(EC, true, ["deriveBits"]), pubC = await crypto.subtle.importKey("jwk", { kty:"EC", crv:"P-256", x:pub.x, y:pub.y, ext:true }, EC, true, []);
   const k = await cleEC2(eph.privateKey, new Uint8Array(await crypto.subtle.exportKey("raw", pubC))), iv = crypto.getRandomValues(new Uint8Array(12));
-  const ct = new Uint8Array(await crypto.subtle.encrypt({ name:"AES-GCM", iv }, k, new TextEncoder().encode(String(prenom).split(/\s+/)[0].slice(0, 20)))), e = new Uint8Array(await crypto.subtle.exportKey("raw", eph.publicKey));
-  const out = new Uint8Array(77 + ct.length); out.set(e); out.set(iv, 65); out.set(ct, 77); return "E" + b64e(out); } catch(e){ return null; } }
+  const ct = new Uint8Array(await crypto.subtle.encrypt({ name:"AES-GCM", iv }, k, brut)), e = new Uint8Array(await crypto.subtle.exportKey("raw", eph.publicKey));
+  const out = new Uint8Array(77 + ct.length); out.set(e); out.set(iv, 65); out.set(ct, 77); return "E" + b64e(out); }
+async function ouvrirEnv(env, priv){ const u = b64d(String(env).slice(1));
+  if (env[0] === "E"){ const k = await cleEC2(priv, u.subarray(0, 65)); return new TextDecoder().decode(await crypto.subtle.decrypt({ name:"AES-GCM", iv:u.subarray(65, 77) }, k, u.subarray(77))); }
+  return new TextDecoder().decode(await crypto.subtle.decrypt({ name:"RSA-OAEP" }, priv, u)); }
+async function pourComptoir(prenom){ try { const c = COMPTES[COMPTOIR], pub = c && c.pub; if (!prenom || !pub || pub.kty !== "EC") return null;
+  return await envPour(pub, String(prenom).split(/\s+/)[0].slice(0, 20)); } catch(e){ return null; } }
 let SESS_C;
 async function prenomsComptoir(L){ if (!L.some(p => chiffre(p.prenom))) { L.forEach(p => { if (chiffre(p.prenom)) p.prenom = ""; }); return; }
-  if (SESS_C === undefined) { SESS_C = null; try { await new Promise((ok, ko) => { if (window.COFFRE) return ok(); const sc = document.createElement("script"); sc.src = "coffre.js?v=273"; sc.onload = ok; sc.onerror = ko; document.head.appendChild(sc); }); SESS_C = await COFFRE.session(); } catch(e){} }
-  for (const p of L) { if (!chiffre(p.prenom)) continue; let t = ""; try { if (SESS_C && SESS_C.priv) { const u = b64d(p.prenom.slice(1)), k = await cleEC2(SESS_C.priv, u.subarray(0, 65));
-      t = new TextDecoder().decode(await crypto.subtle.decrypt({ name:"AES-GCM", iv:u.subarray(65, 77) }, k, u.subarray(77))); } } catch(e){} p.prenom = t; } }
+  await sessionCoffre();
+  for (const p of L) { if (!chiffre(p.prenom)) continue; let t = ""; try { if (SESS_C && SESS_C.priv) t = await ouvrirEnv(p.prenom, SESS_C.priv); } catch(e){} p.prenom = t; } }
+async function sessionCoffre(){ if (SESS_C === undefined) { SESS_C = null; try { await new Promise((ok, ko) => { if (window.COFFRE) return ok(); const sc = document.createElement("script"); sc.src = "coffre.js?v=273"; sc.onload = ok; sc.onerror = ko; document.head.appendChild(sc); }); SESS_C = await COFFRE.session(); } catch(e){} } return SESS_C; }
+/* absences chiffrées : l'enseignant ouvre la partie qui lui est destinée (genre, motif, moment) */
+async function ouvrirAbs(L, ens){ if (!L.some(a => a.data)) return; const S = await sessionCoffre();
+  for (const a of L) { if (!a.data) continue; try { const o = JSON.parse(await ouvrirEnv(a.data, S.priv)); Object.assign(a, { genre:o.g, motif:o.m, part:o.p || "j", heure:o.h || "" }); } catch(e){ a.genre = ""; a.motif = 0; a.illisible = true; } } }
+const cleAbs = async (code, cle) => crypto.subtle.importKey("raw", await crypto.subtle.digest("SHA-256", new TextEncoder().encode("metier+|absence|" + code + "|" + String(cle).toUpperCase())), "AES-GCM", false, ["encrypt", "decrypt"]);
 /* 27 nov. (Jeremy : « le prénom doit venir du dossier de l'élève ») : prénoms du registre de formation de l'enseignant
    (cet appareil, sinon son coffre). Seulement le prénom (premier mot). Gardé en mémoire 5 min. */
 let PRD = null, PRD_T = 0;

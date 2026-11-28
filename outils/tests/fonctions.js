@@ -698,7 +698,10 @@ test("Absences : l'élève signale une absence depuis Ma carte (motif, enseignan
   await p.click("#abOk"); await attendre(150); vrai(/motif/.test(await p.textContent("#abE")), "Absences : pas d'erreur sans motif");
   await p.click('[data-m="6"]'); await attendre(150); vrai(/non justifiée/.test(await p.textContent(".abC:nth-of-type(4)") + await p.textContent("#app")), "Absences : pas d'avertissement pour « Autre »");
   await p.click('[data-e="jeremy.raymond"]'); await attendre(150); await p.click("#abOk"); await attendre(500);
-  vrai(sent && sent.p_code === "48213" && sent.p_cle === "K7Q9X2" && sent.p_motif === 6 && sent.p_profs.join() === "jeremy.raymond", "Absences : signalement mal envoyé " + JSON.stringify(sent));
+  vrai(sent && sent.p_code === "48213" && sent.p_cle === "K7Q9X2" && sent.p_profs.join() === "jeremy.raymond" && sent.p_motif === undefined && sent.p_genre === undefined
+    && /^[ER]/.test(sent.p_data["jeremy.raymond"] || "") && sent.p_data._e, "Absences : signalement mal envoyé (doit être chiffré) " + JSON.stringify(sent));
+  /* 27 nov. : le motif est chiffré; l'élève le relit avec la clé de sa carte */
+  vrai(await p.evaluate(async d => { const u = b64d(d), o = JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({ name:"AES-GCM", iv:u.subarray(0, 12) }, await cleAbs("48213", "K7Q9X2"), u.subarray(12)))); return o.m === 6 && o.g === "absence"; }, sent.p_data._e), "Absences : la copie de l'élève ne se déchiffre pas");
   vrai(/signalée/.test(await p.textContent("#app")), "Absences : pas de confirmation");
   vrai(!errs.length, errs.join(" | ")); await c.close();
 });
