@@ -1,6 +1,6 @@
 /* © 2026 Jérémy Raymond. Tous droits réservés. Métier+ — réponses de l'élève dans ses livres (25 nov.)
    Jeremy : « chaque élève voit seulement ses réponses (iPad partagé) » et « il doit pouvoir étudier chez lui ».
-   - L'élève (compte de groupe) dit qui il est avec sa carte : MP-<code>-<clé> (collant, ou « Ma carte » sur son cellulaire).
+   - L'élève (compte de groupe) dit qui il est avec sa carte : MP-<code>-<clé> (collant, ou « Mon accès » sur son cellulaire).
    - Ses traits et réponses sont rangés à part (préfixe « e<code>| » dans INKS) : le suivant sur l'iPad ne les voit pas.
    - Ils sont chiffrés sur l'appareil avec la clé de sa carte, puis gardés dans Supabase (table coffre) :
      le site ne peut pas les lire; avec sa carte, il les retrouve sur n'importe quel appareil (à la maison aussi). */

@@ -546,7 +546,7 @@ test("Magasin : sans carte, l'élève entre sans écrire son prénom; l'enseigna
   const e = await ctx.newPage(); e.on("pageerror", x => errs.push(x.message)); await e.goto(BASE + "magasin.html"); await attendre(1200);
   /* 27 nov. (Loi 25) : le code seul ne suffit plus; sur son cellulaire, l'élève entre avec son code si sa carte est dans « Ma carte » */
   await e.fill("#cCode", "59564"); await attendre(1500);
-  vrai(!(await e.evaluate(() => localStorage.getItem("magEleve") && JSON.parse(localStorage.getItem("magEleve")))) && /Ma carte/.test(await e.textContent("#cErr")), "Le code seul ouvre encore le magasin");
+  vrai(!(await e.evaluate(() => localStorage.getItem("magEleve") && JSON.parse(localStorage.getItem("magEleve")))) && /Mon accès/.test(await e.textContent("#cErr")), "Le code seul ouvre encore le magasin");
   await e.evaluate(() => localStorage.setItem("mpCarte", JSON.stringify({ c: "MP-59564-ABCD12", g: "", p: "", t: 1 }))); await e.reload(); await attendre(2500);   /* « Ma carte » sur ce cellulaire : entrée directe */
   vrai(/59564/.test(await e.textContent("#tQui")), "Sans carte : l'élève n'entre pas (prénom encore demandé ?) " + (await e.textContent("#app")).slice(0, 120));
   vrai(await e.evaluate(() => JSON.parse(localStorage.getItem("magEleve")).cle === "ABCD12"), "La clé de « Ma carte » n'est pas reprise");

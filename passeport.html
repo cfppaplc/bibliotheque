@@ -105,7 +105,7 @@ table.g{border-collapse:separate;border-spacing:0;min-width:100%}
   #qrs.f5160 .ce2 .n{bottom:.09in;font-size:20pt}#qrs.f5160 .ce2 b{font-size:9.5pt}
   #qrs.f5163 .ce2{width:4in;height:2in!important;padding:.2in .3in}
   #qrs.f5163 .ce2 img{height:7mm;right:.3in;top:.2in}#qrs.f5163 .ce2 small{font-size:9pt}#qrs.f5163 .ce2 b{font-size:16pt;max-width:2.6in}#qrs.f5163 .ce2 .n{left:.3in;bottom:.15in;font-size:44pt;letter-spacing:4mm}
-  /* 25 nov. : fiches « Ma carte » (4 par page) */
+  /* 25 nov. : fiches « Mon accès » (4 par page) */
   .ce3{display:inline-block;vertical-align:top;width:90mm;height:120mm;margin:0 4mm 4mm 0;border:1px dashed #999;border-radius:3mm;padding:6mm;break-inside:avoid;page-break-inside:avoid;font-family:system-ui,sans-serif;color:#1E2A44;position:relative;text-align:center}
   .ce3 img.l{height:7mm;display:block;margin:0 auto 2mm}.ce3 small{display:block;font-size:8pt;color:#555;text-transform:uppercase;letter-spacing:.06em}.ce3 b{display:block;font-size:14pt;margin:1mm 0 3mm}
   .ce3 img.q{width:52mm;height:52mm;display:block;margin:0 auto}.ce3 p{font-size:8.5pt;margin:3mm 0 0;line-height:1.3}.ce3 .n{display:block;font:900 22pt ui-monospace,monospace;letter-spacing:2mm;margin-top:2mm;color:#EB6A22}.ce3 i{display:block;font-style:normal;font-size:8pt;color:#555;font-family:ui-monospace,monospace}
@@ -269,7 +269,7 @@ async function vueEleve(){
   const ens = Q.get("e") || "", grp = Q.get("g") || "";
   let faits = {}; try { faits = JSON.parse(localStorage.getItem("passFaits") || "{}"); } catch(e) {}
   const R0 = ens ? await PARTAGE.lire(ens) : { suivi:[], formes:{}, grp:[], codes:null }, suivi = R0.suivi.includes(o.id);
-  let monCode = ""; try { monCode = localStorage.getItem("passCode") || ""; } catch(e) {} if (!monCode) monCode = (() => { try { const K = JSON.parse(localStorage.getItem("mpCarte") || "null"); const m = K && String(K.c || "").match(/^MP-(\d{3,5})-/); return m ? m[1] : ""; } catch(e){ return ""; } })();   /* 25 nov. : « Ma carte » sur ce cellulaire */
+  let monCode = ""; try { monCode = localStorage.getItem("passCode") || ""; } catch(e) {} if (!monCode) monCode = (() => { try { const K = JSON.parse(localStorage.getItem("mpCarte") || "null"); const m = K && String(K.c || "").match(/^MP-(\d{3,5})-/); return m ? m[1] : ""; } catch(e){ return ""; } })();   /* 25 nov. : « Mon accès » sur ce cellulaire */
   if (!faits[o.id] && monCode && (R0.formes[o.id] || []).includes(monCode)) faits[o.id] = 1;
   if (faits[o.id] && !Q.get("formation") && ens && monCode && R0.codes && !(R0.formes[o.id] || []).includes(monCode)){
     V.innerHTML = `<div class="top"><img src="${LOGO}" alt="Métier+"></div><div class="fini"><div class="rond" style="background:#E08A1E">◐</div><h1>Démonstration pratique à faire</h1>
@@ -630,7 +630,7 @@ const tailleDe = id => { try { const T = JSON.parse(localStorage.getItem("passQr
 const FORMATS = { "5160":{ n:"Avery 5160 / 8160 · 30 par feuille (2⅝ x 1 po)", c:3, l:10, w:2.625, h:1, x0:.1875, y0:.5, dx:2.75, dy:1 },
   "5163":{ n:"Avery 5163 / 8163 · 10 par feuille (4 x 2 po)", c:2, l:5, w:4, h:2, x0:.15625, y0:.5, dx:4.1875, dy:2 },
   "main":{ n:"Feuille ordinaire · à découper" },
-  "tel":{ n:"Fiches « Ma carte » pour le cellulaire (l'élève scanne le code QR)" },
+  "tel":{ n:"Fiches « Mon accès » pour le cellulaire (l'élève scanne le code QR)" },
   "ecran":{ n:"À l'écran, un code QR à la fois (les élèves viennent le scanner)" } };
 function dlgCodes(){
   const L = eleves(GRP).filter(e => e.c); if (!L.length) return toast("Aucun élève dans ce groupe.");
@@ -647,11 +647,11 @@ function dlgCodes(){
     const S = choisis(), L2 = L.filter(e => S.has(e.id)); L.length = 0; L.push(...L2); fermer();
     const etq = e => `<div class="ce2"${e.st || ""}><img src="img/metier-plus.svg" alt=""><small>Code Métier+ · ${esc(GRP)}</small><b>${esc(e.p)}</b><span class="n">${esc(e.c)}</span></div>`;   /* 25 nov. : code-barres de la carte (magasin, coffres) */
     const Z = $("#qrs"); Z.className = "f" + k;
-    /* 25 nov. : fiche « Ma carte » : code QR vers carte.html#c=MP-…&g=…&p=… (le # reste sur le cellulaire de l'élève) */
+    /* 25 nov. : fiche « Mon accès » : code QR vers carte.html#c=MP-…&g=…&p=… (le # reste sur le cellulaire de l'élève) */
     const qrUrl = t => { if (!window.QRLib) return ""; const M = QRLib.matrice(t), n = M.length; return "data:image/svg+xml;charset=utf-8," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + (n + 8) + ' ' + (n + 8) + '"><rect width="' + (n + 8) + '" height="' + (n + 8) + '" fill="#fff"/>' + M.map((r, y) => r.map((v, x) => v ? '<rect x="' + (x + 4) + '" y="' + (y + 4) + '" width="1.02" height="1.02"/>' : "").join("")).join("") + '</svg>'); };
     const base = location.origin + location.pathname.replace(/[^/]*$/, "");
     const fiche = e => { const c = "MP-" + e.c + "-" + e.k, u = base + "carte.html#c=" + encodeURIComponent(c) + "&g=" + encodeURIComponent(GRP) + "&p=" + encodeURIComponent((e.p || "").split(/\s+/)[0]);
-      return `<div class="ce3"><img class="l" src="img/metier-plus.svg" alt=""><small>Ma carte Métier+ · ${esc(GRP)}</small><b>${esc(e.p)}</b><img class="q" src="${qrUrl(u)}" alt=""><p>Scanne ce code avec l'appareil photo de ton cellulaire, puis ajoute « Ma carte » à ton écran d'accueil.</p><span class="n">${esc(e.c)}</span><i>Clé : ${esc(c)}</i></div>`; };
+      return `<div class="ce3"><img class="l" src="img/metier-plus.svg" alt=""><small>Mon accès Métier+ · ${esc(GRP)}</small><b>${esc(e.p)}</b><img class="q" src="${qrUrl(u)}" alt=""><p>Scanne ce code avec l'appareil photo de ton cellulaire, puis ajoute « Mon accès » à ton écran d'accueil.</p><span class="n">${esc(e.c)}</span><i>Clé : ${esc(c)}</i></div>`; };
     if (k === "ecran"){ distribuer(L.filter(e => e.k), e => qrUrl(base + "carte.html#c=" + encodeURIComponent("MP-" + e.c + "-" + e.k) + "&g=" + encodeURIComponent(GRP) + "&p=" + encodeURIComponent((e.p || "").split(/\s+/)[0]))); return; }
     if (k === "tel"){ Z.innerHTML = L.filter(e => e.k).map(fiche).join(""); }
     else if (k === "main"){ Z.innerHTML = L.map(etq).join(""); }

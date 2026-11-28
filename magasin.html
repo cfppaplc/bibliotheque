@@ -381,7 +381,7 @@ function correspond(a, mots){ return mots.every(m => /^\d+([-/.,]\d+)*$/.test(m)
 /* =================================================================== ÉLÈVE =================================================================== */
 const pouces = d => String(d).split(" ").reduce((s, x) => { const [n, m] = x.split("/"); return s + (m ? +n / +m : +n || 0); }, 0);
 let MOI = LS.get("magEleve", null), PANIER = LS.get("magPanier", {}), FILTRE = { q:"", cat:"", mat:"", d:"" };
-/* 27 nov. (Loi 25) : un élève resté branché d'avant (sans la clé de sa carte) la reprend de « Ma carte », sinon il rescanne sa carte */
+/* 27 nov. (Loi 25) : un élève resté branché d'avant (sans la clé de sa carte) la reprend de « Mon accès », sinon il rescanne sa carte */
 if (MOI && !MOI.cle && MOI.groupe !== "ESSAI") { const K = LS.get("mpCarte", null), m = K && String(K.c || "").toUpperCase().match(/^MP-(\d{5})-([A-Z0-9]{4,12})$/);
   if (m && m[1] === MOI.code) { MOI.cle = m[2]; LS.set("magEleve", MOI); } else { MOI = null; LS.set("magEleve", null); } }
 /* 27 nov. (Jeremy : « mon compte 69696 doit pouvoir envoyer des commandes test ») : la carte d'essai ignore les heures du magasin */
@@ -390,15 +390,15 @@ const sauverPanier = () => LS.set("magPanier", PANIER);
 const nbPanier = () => Object.values(PANIER).reduce((s, q) => s + q, 0);
 function eleveEntree(msg){
   $("#tSortir").hidden = true; $("#tQui").textContent = ""; $("#barre").hidden = true;
-  $("#app").innerHTML = `<h1>Magasin de raccords</h1><p class="sous">${POSTE ? "Tape ton code à 5 chiffres." : "Tape ton code à 5 chiffres (ta carte doit être dans « Ma carte » sur ce cellulaire)."}</p>
+  $("#app").innerHTML = `<h1>Magasin de raccords</h1><p class="sous">${POSTE ? "Tape ton code à 5 chiffres." : "Tape ton code à 5 chiffres (ton accès doit être dans « Mon accès » sur ce cellulaire)."}</p>
     <div class="carte"><input class="cache-code code" id="cCode" inputmode="numeric" autocomplete="off" autocapitalize="characters" placeholder="00000" aria-label="Ton code">
     <div id="preZ" hidden><label for="cPre" style="display:block;font-weight:600;margin-top:6px">Ton prénom</label><input id="cPre" class="pre" autocomplete="given-name" maxlength="20" placeholder="Prénom seulement"></div>
     <p class="err" id="cErr">${esc(msg || "")}</p><button class="btn p" id="cOk">Entrer</button></div>`;
   const i = $("#cCode"), go = async () => { const c = lireCarte(i.value); if (!c) { $("#cErr").textContent = "Tape ton code à 5 chiffres."; return; }
     /* 27 nov. (Loi 25, Jeremy : « on règle le 2 ») : le code seul ne suffit plus; il faut la carte (code + clé secrète).
-       Sur le cellulaire de l'élève, la clé vient de « Ma carte »; au poste, du lecteur de codes-barres. La carte d'essai passe. */
+       Sur le cellulaire de l'élève, la clé vient de « Mon accès »; au poste, du lecteur de codes-barres. La carte d'essai passe. */
     if (!c.cle && !POSTE) { const K = LS.get("mpCarte", null), m = K && String(K.c || "").toUpperCase().match(/^MP-(\d{5})-([A-Z0-9]{4,12})$/); if (m && m[1] === c.code) c.cle = m[2]; }
-    if (!c.cle && !(window.codeEssai && await codeEssai(c.code))) { $("#cErr").innerHTML = POSTE ? "Commande depuis ton cellulaire, avec « Ma carte »." : 'Ouvre d\'abord <a href="carte.html">Ma carte</a> sur ce cellulaire (code QR de ta fiche).'; return; }
+    if (!c.cle && !(window.codeEssai && await codeEssai(c.code))) { $("#cErr").innerHTML = POSTE ? "Commande depuis ton cellulaire, avec « Mon accès »." : 'Ouvre d\'abord <a href="carte.html">Mon accès</a> sur ce cellulaire (code QR de ta fiche).'; return; }
     CLE_ENTREE = c.cle;
     let pre = ($("#cPre").value || "").trim().split(/\s+/)[0];
     $("#cOk").disabled = true; $("#cErr").textContent = "Recherche de ton groupe…";
@@ -488,11 +488,11 @@ const quandTxt = a => (a.du === a.au ? jourTxt(a.du) : jourTxt(a.du) + " au " + 
 async function absences(){
   $("#tTitre").textContent = "Signaler une absence";
   const K = LS.get("mpCarte", null), m = K && String(K.c || "").toUpperCase().match(/^MP-(\d{5})-([A-Z0-9]{4,12})$/);
-  if (!m) { $("#app").innerHTML = `<div class="constr"><h1>Ouvre d'abord Ma carte</h1><p class="sous">Pour signaler une absence, ta carte étudiante doit être sur ce cellulaire.</p><a class="btn p" href="carte.html" style="margin-top:12px">Ma carte</a></div>`; return; }
+  if (!m) { $("#app").innerHTML = `<div class="constr"><h1>Ouvre d'abord Mon accès</h1><p class="sous">Pour signaler une absence, ton accès Métier+ doit être sur ce cellulaire.</p><a class="btn p" href="carte.html" style="margin-top:12px">Mon accès</a></div>`; return; }
   const code = m[1], cle = m[2], auj = jourCle(new Date());
   $("#app").innerHTML = `<p class="vide">Recherche de ton groupe…</p>`;
   let L = []; try { L = await trouverEleve(code); } catch(e){}
-  if (!L.length) { $("#app").innerHTML = `<div class="constr"><h1>Groupe introuvable</h1><p class="sous">Ta carte n'est dans aucun groupe pour l'instant. Demande à ton enseignant.</p><a class="btn" href="carte.html" style="margin-top:12px">‹ Ma carte</a></div>`; return; }
+  if (!L.length) { $("#app").innerHTML = `<div class="constr"><h1>Groupe introuvable</h1><p class="sous">Ton accès n'est dans aucun groupe pour l'instant. Demande à ton enseignant.</p><a class="btn" href="carte.html" style="margin-top:12px">‹ Mon accès</a></div>`; return; }
   const G = L[0], PROFS = [...new Set([G.ens, ...(G.profs || [])])].filter(Boolean), prenom = String((K && K.p) || LS.get("magPrenom", "") || "").split(/\s+/)[0];
   const der = (LS.get("absProfs", []) || []).filter(x => PROFS.includes(x));
   const S = { genre:"absence", du:auj, au:auj, part:"j", heure:"", motif:0, profs:der.length ? der : (PROFS.length === 1 ? [PROFS[0]] : []) };
@@ -505,7 +505,7 @@ async function absences(){
       if (n >= 5) A.push(`<div class="abA r">5 jours d'absence de suite = abandon présumé de ta formation. Parles-en à ton enseignant.</div>`); }
     return A.join(""); };
   const dessiner = () => {
-    $("#app").innerHTML = `<a class="lien" href="carte.html">‹ Ma carte</a><h1 style="margin-top:6px">Signaler une absence</h1><p class="sous">${esc(prenom || "Élève")} · ${esc(G.groupe)}</p>
+    $("#app").innerHTML = `<a class="lien" href="carte.html">‹ Mon accès</a><h1 style="margin-top:6px">Signaler une absence</h1><p class="sous">${esc(prenom || "Élève")} · ${esc(G.groupe)}</p>
       <div class="carte abC"><div class="abS">Quoi ?</div><div class="abSeg">${Object.entries(GENRES).map(([k, t]) => `<button data-g="${k}" class="${S.genre === k ? "on" : ""}">${t}</button>`).join("")}</div>
         <div class="abS">Quand ?</div><div class="abD"><label>${S.genre === "absence" ? "Du" : "Le"}<input type="date" id="abDu" value="${S.du}"></label>${S.genre === "absence" ? `<label>Au<input type="date" id="abAu" value="${S.au}" min="${S.du}"></label>` : `<label>${S.genre === "retard" ? "J'arrive à" : "Je pars à"}<input type="time" id="abH" value="${S.heure}"></label>`}</div>
         ${S.genre === "absence" ? `<div class="abSeg" style="margin-top:8px">${[["j", "Journée"], ["am", "Avant-midi"], ["pm", "Après-midi"]].map(([k, t]) => `<button data-p="${k}" class="${S.part === k ? "on" : ""}">${t}</button>`).join("")}</div>` : ""}</div>
@@ -529,10 +529,10 @@ async function absences(){
         for (const id of S.profs) { const e = await envPour((COMPTES[id] || {}).pub, txt); if (!e) throw new Error(nomEns(id) + " ne peut pas encore recevoir de signalement chiffré. Avise-le de vive voix."); D[id] = e; }
         { const iv = crypto.getRandomValues(new Uint8Array(12)), ct = new Uint8Array(await crypto.subtle.encrypt({ name:"AES-GCM", iv }, await cleAbs(code, cle), new TextEncoder().encode(txt))), u = new Uint8Array(12 + ct.length); u.set(iv); u.set(ct, 12); D._e = b64e(u); }
         const r = await rpc("absence_signaler", { p_code:code, p_cle:cle, p_groupe:G.groupe, p_profs:S.profs, p_du:S.du, p_au:S.genre === "absence" ? S.au : S.du, p_data:D });
-        if (!r || !r.ok) throw new Error(r && r.err === "trop" ? "Trop de signalements aujourd'hui." : r && r.err === "carte" ? "Ta carte n'est pas reconnue. Demande à ton enseignant." : "Signalement refusé. Vérifie les dates.");
+        if (!r || !r.ok) throw new Error(r && r.err === "trop" ? "Trop de signalements aujourd'hui." : r && r.err === "carte" ? "Ton accès n'est pas reconnu. Demande à ton enseignant." : "Signalement refusé. Vérifie les dates.");
         LS.set("absProfs", S.profs);
         $("#app").innerHTML = `<div class="constr"><div class="abOk"><svg viewBox="0 0 24 24" width="40" height="40"><path d="M5 12.5l4.2 4.2L19 7" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div><h1>${GENRES[S.genre]} signalé${S.genre === "absence" ? "e" : ""}</h1>
-          <p class="sous">${esc(S.profs.map(nomEns).join(" et "))} ${S.profs.length > 1 ? "ont" : "a"} reçu l'avis. ${S.motif <= 5 ? "N'oublie pas ton billet." : ""}</p><a class="btn p" href="carte.html" style="margin-top:14px">‹ Ma carte</a><button class="btn" id="abAutre" style="margin-top:8px">Signaler autre chose</button></div>`;
+          <p class="sous">${esc(S.profs.map(nomEns).join(" et "))} ${S.profs.length > 1 ? "ont" : "a"} reçu l'avis. ${S.motif <= 5 ? "N'oublie pas ton billet." : ""}</p><a class="btn p" href="carte.html" style="margin-top:14px">‹ Mon accès</a><button class="btn" id="abAutre" style="margin-top:8px">Signaler autre chose</button></div>`;
         $("#abAutre").onclick = () => { S.motif = 0; dessiner(); }; }
       catch(e){ er.textContent = /Failed|fetch|404/.test(e.message) ? "Pas de connexion pour l'instant. Réessaie dans un moment." : e.message; b.disabled = false; b.textContent = "Signaler à mon enseignant"; } };
     liste(); };
@@ -636,7 +636,7 @@ function notifEleve(){ const z = $("#notifE"); if (!z) return; if (!("PushManage
   z.innerHTML = on ? `<span class="cloche on" role="img" aria-label="Notifications activées">${CLOCHE}</span><button class="lien" id="neNon">Désactiver les notifications</button>`
     : `<button class="cloche" id="neOui" aria-label="Activer les notifications">${CLOCHE}</button><button class="lien" id="neOui2">Activer les notifications</button>`;
   const oui = async () => { try { const ios = /iPhone|iPad|iPod/.test(navigator.userAgent) && !navigator.standalone && !matchMedia("(display-mode: standalone)").matches;
-      if (ios) { toast("Sur iPhone : ajoute d'abord « Ma carte » à ton écran d'accueil, puis ouvre le magasin à partir de là."); return; }
+      if (ios) { toast("Sur iPhone : ajoute d'abord « Mon accès » à ton écran d'accueil, puis ouvre le magasin à partir de là."); return; }
       if (await Notification.requestPermission() !== "granted") throw new Error("refus");   /* iPhone : au toucher, avant toute attente */
       LS.set("magNotifE", true); for (const x of LS.get("magEnvois", []).filter(y => MOI && y.code === MOI.code && !y.abo).slice(0, 5)) { try { await aboEleve(x.id); } catch(e){} }
       toast("C'est fait : ce cellulaire t'avertira quand ton enseignant répond."); notifEleve(); suivi(); }
@@ -1071,7 +1071,7 @@ async function remettre(id, oui){ try { await rpcM("panier_remettre", { p_id:id,
     $("#essaiP").onclick = async () => { if (await nipComptoir()) { LS.set("magEssai", true); location.reload(); } }; return; }
   if (POSTE) { LS.set("magEleve", null); MOI = null; return eleveEntree(); }
   if (MOI && MOI.code) return eleveCatalogue();
-  const K = LS.get("mpCarte", null);   /* « Ma carte Métier+ » sur ce cellulaire : entrée directe */
+  const K = LS.get("mpCarte", null);   /* « Mon accès Métier+ » sur ce cellulaire : entrée directe */
   if (K && K.c) { eleveEntree(); $("#cCode").value = K.c; $("#cOk").click(); return; }
   eleveEntree();
 })();

@@ -320,7 +320,7 @@ window.ACCES = (function(){
       + '<div class="co-prog" id="acProg" hidden><i></i><span>Déverrouillage de tes livres…</span></div>'
       + '<div class="acces-btns"><button id="acNon">Annuler</button><button class="prim" id="acOui">Se connecter</button></div>'
       + '<div class="co-carte"><span>Élève ?</span><input type="text" id="acCarte" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Scanne ta carte : MP-12345-ABC123" aria-label="Ta carte d\'élève">'
-      + (() => { try { const K = JSON.parse(localStorage.getItem("mpCarte") || "null"); return K && K.c ? '<button type="button" class="prim" id="acMaCarte" data-c="' + esc(K.c) + '">Entrer avec Ma carte' + (K.p ? ' (' + esc(String(K.p).split(/\s+/)[0]) + ')' : '') + '</button>' : ''; } catch(e){ return ""; } })() + '</div>'
+      + (() => { try { const K = JSON.parse(localStorage.getItem("mpCarte") || "null"); return K && K.c ? '<button type="button" class="prim" id="acMaCarte" data-c="' + esc(K.c) + '">Entrer avec Mon accès' + (K.p ? ' (' + esc(String(K.p).split(/\s+/)[0]) + ')' : '') + '</button>' : ''; } catch(e){ return ""; } })() + '</div>'
       + '<button class="acces-lien" id="acDem">Pas encore de compte ? Demander un accès</button><br><button class="acces-lien" id="acOubli" style="margin-top:8px">Mot de passe oublié ?</button></div>';
     ov().hidden = false; setTimeout(() => document.getElementById(id0 ? "acMdp" : "acId")?.focus(), 50);
     const mdp = document.getElementById("acMdp"), maj = document.getElementById("acMaj");

@@ -314,7 +314,7 @@ try { for (let w = window; ; w = w.parent){ if (/[?&]gestion=1/.test(w.location.
       <div class="agR"><b>Locaux</b><span>${esc(txt("#peLoc"))}</span><button data-c="#peLoc">Modifier</button></div>
       <div class="agR"><b>Élèves</b><span>${nb(g)} élève${nb(g) > 1 ? "s" : ""} · touche un élève pour sa fiche (code, équipe, retirer)</span></div>
       <div class="agR"><b>Cartes</b><span>Les élèves entrent dans Métier+ avec leur carte, sans mot de passe</span><button data-cartes>Activer</button></div>
-      <div class="agA"><button class="p" data-c="#gaEl">+ Ajouter des élèves</button><button data-c="#gaCodes">Étiquettes et fiches « Ma carte »</button><button data-c="#mPl">Placer les équipes</button></div>`;
+      <div class="agA"><button class="p" data-c="#gaEl">+ Ajouter des élèves</button><button data-c="#gaCodes">Étiquettes et fiches « Mon accès »</button><button data-c="#mPl">Placer les équipes</button></div>`;
     $("#agT").querySelectorAll("[data-c]").forEach(b => b.onclick = ev => { ev.stopPropagation(); $(b.dataset.c).click(); });
     $("#agT").querySelector("[data-cartes]").onclick = () => activerCartes(g);
   }
@@ -324,7 +324,7 @@ try { for (let w = window; ; w = w.parent){ if (/[?&]gestion=1/.test(w.location.
     let C = {}; try { C = (await (await fetch("comptes.json?t=" + Date.now(), { cache:"no-store" })).json()).comptes || {}; } catch(e){}
     const grp = Object.entries(C).filter(([, c]) => c.eleve), el = Object.values(P.D.el).filter(e => !e.x && e.g === g && e.c && e.k);
     const dlg = $("#partDlg");
-    dlg.innerHTML = `<h3>Cartes du groupe ${esc(g)}</h3><p>Les ${el.length} élèves de ce groupe pourront entrer dans Métier+ en scannant leur carte (ou avec « Ma carte » sur leur cellulaire), sans mot de passe. Ils auront les livres du compte choisi.</p>
+    dlg.innerHTML = `<h3>Cartes du groupe ${esc(g)}</h3><p>Les ${el.length} élèves de ce groupe pourront entrer dans Métier+ en scannant leur carte (ou avec « Mon accès » sur leur cellulaire), sans mot de passe. Ils auront les livres du compte choisi.</p>
       <label>Compte de groupe</label><select id="acG" style="width:100%;min-height:44px;margin:6px 0 10px">${grp.map(([id, c]) => `<option value="${esc(id)}">${esc(c.nom || id)}</option>`).join("")}</select>
       <label>Mot de passe de ce compte</label><input id="acM" type="password" style="width:100%;min-height:44px;margin-top:6px" autocomplete="off">
       <label style="margin-top:10px;display:block">Ajouter aussi une carte d'essai <span style="font-weight:400;opacity:.7">(facultatif)</span></label><input id="acX" class="cache-code" style="width:100%;min-height:44px;margin-top:6px" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Scanne la carte : MP-12345-ABC123">
@@ -395,7 +395,7 @@ try { for (let w = window; ; w = w.parent){ if (/[?&]gestion=1/.test(w.location.
   /* 25 nov. (Jeremy : « je dois être capable de gérer les comptes s'il y a des pertes ») : carte de l'élève (administrateur seulement) */
   async function carteFiche(dlg, e){
     const P = PASS(), x = P && P.D.el[e.id]; if (!ADM() || !x || !x.c || !x.k) return; const b = dlg.querySelector(".fi-b"); if (!b) return;
-    const z = document.createElement("div"); z.innerHTML = `<h4>Carte de l'élève</h4><div class="fi-l"><div><span class="s">▦</span>Clé : <b data-cle style="font-family:ui-monospace,monospace;letter-spacing:.05em">MP-${esc(x.c)}-••••••</b>
+    const z = document.createElement("div"); z.innerHTML = `<h4>Accès de l'élève</h4><div class="fi-l"><div><span class="s">▦</span>Clé : <b data-cle style="font-family:ui-monospace,monospace;letter-spacing:.05em">MP-${esc(x.c)}-••••••</b>
       <button data-voircle class="fi-imp" style="margin-left:8px;font:inherit;font-size:13px;font-weight:700;color:#EB6A22;background:none;border:0;cursor:pointer">Afficher</button></div>
       <div><button data-rep class="fi-imp" style="font:inherit;font-weight:700;color:#EB6A22;background:none;border:0;cursor:pointer;padding:0;min-height:36px">Voir ses réponses dans ses livres</button></div><div data-repl></div>
       <div><button data-nouv class="fi-imp" style="font:inherit;font-weight:700;color:#B3261E;background:none;border:0;cursor:pointer;padding:0;min-height:36px">Carte perdue ou volée : nouvelle carte</button></div></div>`;
@@ -413,7 +413,7 @@ try { for (let w = window; ; w = w.parent){ if (/[?&]gestion=1/.test(w.location.
       bt.disabled = true; bt.textContent = "Transfert de ses réponses…";
       try { const k1 = fFo.contentWindow.cleCarte(), k0 = x.k, n = await ELEVE_CARTES.transferer(x.c, x.k, k1); x.k = k1; x.t = Date.now(); P.sauver(); ELEVE_CARTES.publierCode(x, k0).catch(() => {});
         dlg.querySelector("[data-cle]").textContent = "MP-" + x.c + "-" + k1; bt.textContent = "Nouvelle carte faite";
-        toast("Nouvelle carte : " + n + " livre" + (n > 1 ? "s" : "") + " transféré" + (n > 1 ? "s" : "") + ". Imprime-la : Étiquettes et fiches « Ma carte », coche seulement cet élève."); }
+        toast("Nouvelle carte : " + n + " livre" + (n > 1 ? "s" : "") + " transféré" + (n > 1 ? "s" : "") + ". Imprime-la : Étiquettes et fiches « Mon accès », coche seulement cet élève."); }
       catch(er){ bt.disabled = false; delete bt.dataset.sur; bt.textContent = "Carte perdue ou volée : nouvelle carte"; toast("Impossible : " + er.message); } };
   }
   async function commandesFiche(dlg, e){

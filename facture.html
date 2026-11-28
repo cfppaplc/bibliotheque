@@ -77,7 +77,7 @@ input,textarea,select{border-radius:12px;border-color:var(--ligne)}
 <script src="js/session-dep.js?v=6"></script>
 </head>
 <body>
-<div class="top"><img src="img/metier-plus-blanc.svg" alt="Métier+"><b>Facture</b><span class="sp"></span><span id="qui" style="font-size:.9rem;opacity:.85"></span><a href="carte.html">Ma carte</a></div>
+<div class="top"><img src="img/metier-plus-blanc.svg" alt="Métier+"><b>Facture</b><span class="sp"></span><span id="qui" style="font-size:.9rem;opacity:.85"></span><a href="carte.html">Mon accès</a></div>
 <main id="app"></main>
 <div class="barre" id="barre" hidden></div>
 <script>
@@ -95,10 +95,10 @@ const TPS = 0.05, TVQ = 0.09975;
 let K = LS.get("mpCarte", null), C = null;   /* C = { c:code, k:clé } */
 function lireK(){ const m = K && String(K.c || "").match(/^MP-(\d{5})-([A-Z0-9]{4,12})$/); C = m ? { c:m[1], k:m[2] } : null; }
 function entree(){ $("#barre").hidden = true; $("#qui").textContent = "";
-  $("#app").innerHTML = `<h1>Facture au client</h1><p class="sous">Ta carte doit être sur ce cellulaire : ouvre <a href="carte.html">Ma carte</a> et scanne le code QR de ta fiche.</p><div class="carte"><input class="cache-code code" id="cCode" inputmode="numeric" autocomplete="off" placeholder="00000" aria-label="Ton code"><p class="err" id="cErr"></p><button class="btn p" id="cOk">Entrer</button></div>`;
+  $("#app").innerHTML = `<h1>Facture au client</h1><p class="sous">Ton accès doit être sur ce cellulaire : ouvre <a href="carte.html">Mon accès</a> et scanne le code QR de ta fiche.</p><div class="carte"><input class="cache-code code" id="cCode" inputmode="numeric" autocomplete="off" placeholder="00000" aria-label="Ton code"><p class="err" id="cErr"></p><button class="btn p" id="cOk">Entrer</button></div>`;
   const i = $("#cCode"), go = async () => { const c = i.value.trim(); if (!/^\d{5}$/.test(c)) { $("#cErr").textContent = "Écris ton code à 5 chiffres."; return; }
     $("#cErr").textContent = "Recherche…"; try { const o = await codeEssai(c);   /* 27 nov. (Loi 25) : seul le code d'essai s'ouvre ici; un élève ouvre d'abord Ma carte (code QR de sa fiche) */
-      if (!o) { $("#cErr").innerHTML = 'Ouvre d\'abord <a href="carte.html">Ma carte</a> sur ce cellulaire (code QR de ta fiche).'; return; }
+      if (!o) { $("#cErr").innerHTML = 'Ouvre d\'abord <a href="carte.html">Mon accès</a> sur ce cellulaire (code QR de ta fiche).'; return; }
       K = { c:o.c, g:o.g || "", p:o.p || "", t:Date.now() }; LS.set("mpCarte", K); lireK(); demarrer(); } catch(e){ $("#cErr").textContent = e.message; } };
   i.oninput = () => { if (/^\d{5}$/.test(i.value.trim())) go(); }; i.onkeydown = e => { if (e.key === "Enter") go(); }; $("#cOk").onclick = go; i.focus(); }
 
