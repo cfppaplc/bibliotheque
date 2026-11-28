@@ -676,6 +676,21 @@ test("Carte : s'ouvre seulement par le code QR de la fiche ou le code complet; l
   vrai(/MP-51234-ZZZZ99/.test(await q.evaluate(() => localStorage.getItem("mpCarte"))) && (await q.textContent("#vP")).trim() === "Lucas", "Le code QR de la fiche n'ouvre pas la carte");
   vrai(!errs.length, errs.join(" | ")); await c.close();
 });
+test("Magasin : à l'iPad du magasin (déverrouillé par le NIP), le numéro seul suffit; sans NIP, refusé", async b => {   /* 27 nov. (pas de lecteur de codes-barres) */
+  const ctx = await b.newContext({ viewport: { width: 820, height: 1180 }, serviceWorkers: "block" }), errs = [];
+  await ctx.route(/supabase\.co\/rest\/v1\/rpc\/(\w+)/, r => { const f = r.request().url().match(/rpc\/(\w+)/)[1]; let o = null;
+    if (f === "coffre_lire") o = [{ data: JSON.stringify({ grp: ["2606PLC1"], codes: { "2606PLC1": ["59564"] } }) }];
+    r.fulfill({ body: JSON.stringify(o), contentType: "application/json", headers: { "access-control-allow-origin": "*" } }); });
+  await ctx.addInitScript(() => { localStorage.setItem("bienvenueVu", "1"); });
+  const e = await ctx.newPage(); e.on("pageerror", x => errs.push(x.message)); await e.goto(BASE + "magasin.html?poste=1"); await attendre(1200);
+  await e.fill("#cCode", "59564"); await attendre(1500);
+  vrai(/NIP/.test(await e.textContent("#cErr")), "Poste sans NIP : le numéro seul passe");
+  await ctx.addInitScript(() => { localStorage.setItem("magCle", JSON.stringify("a".repeat(64))); });
+  const f = await ctx.newPage(); f.on("pageerror", x => errs.push(x.message)); await f.goto(BASE + "magasin.html?poste=1"); await attendre(1200);
+  await f.fill("#cCode", "59564"); await attendre(1800);
+  vrai(/59564/.test(await f.textContent("#tQui")) && await f.evaluate(() => JSON.parse(localStorage.getItem("magEleve")).cle === "a".repeat(64)), "Poste déverrouillé : le numéro seul n'entre pas");
+  vrai(!errs.length, errs.join(" | ")); await ctx.close();
+});
 test("Distribuer les cartes à l'écran : un code QR à la fois, prénom seulement, liste cochée", async b => {   /* 27 nov. */
   const p = await (await b.newContext({ viewport: { width: 1280, height: 720 } })).newPage(), errs = []; p.on("pageerror", e => errs.push(e.message));
   await p.goto(BASE + "passeport.html"); await attendre(1500);

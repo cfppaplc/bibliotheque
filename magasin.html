@@ -390,7 +390,7 @@ const sauverPanier = () => LS.set("magPanier", PANIER);
 const nbPanier = () => Object.values(PANIER).reduce((s, q) => s + q, 0);
 function eleveEntree(msg){
   $("#tSortir").hidden = true; $("#tQui").textContent = ""; $("#barre").hidden = true;
-  $("#app").innerHTML = `<h1>Magasin de raccords</h1><p class="sous">Scanne ta carte étudiante${POSTE ? "" : ", ou tape ton code si ta carte est déjà dans « Ma carte » sur ce cellulaire"}.</p>
+  $("#app").innerHTML = `<h1>Magasin de raccords</h1><p class="sous">${POSTE ? "Tape ton code à 5 chiffres." : "Tape ton code à 5 chiffres (ta carte doit être dans « Ma carte » sur ce cellulaire)."}</p>
     <div class="carte"><input class="cache-code code" id="cCode" inputmode="numeric" autocomplete="off" autocapitalize="characters" placeholder="00000" aria-label="Ton code">
     <div id="preZ" hidden><label for="cPre" style="display:block;font-weight:600;margin-top:6px">Ton prénom</label><input id="cPre" class="pre" autocomplete="given-name" maxlength="20" placeholder="Prénom seulement"></div>
     <p class="err" id="cErr">${esc(msg || "")}</p><button class="btn p" id="cOk">Entrer</button></div>`;
@@ -398,6 +398,10 @@ function eleveEntree(msg){
     /* 27 nov. (Loi 25, Jeremy : « on règle le 2 ») : le code seul ne suffit plus; il faut la carte (code + clé secrète).
        Sur le cellulaire de l'élève, la clé vient de « Ma carte »; au poste, du lecteur de codes-barres. La carte d'essai passe. */
     if (!c.cle && !POSTE) { const K = LS.get("mpCarte", null), m = K && String(K.c || "").toUpperCase().match(/^MP-(\d{5})-([A-Z0-9]{4,12})$/); if (m && m[1] === c.code) c.cle = m[2]; }
+    /* 27 nov. (Jeremy : « on n'a pas de lecteur; l'iPad est géré par le magasinier ») : au poste du magasin, déverrouillé par le NIP
+       du magasinier (mode comptoir sur le même iPad), le numéro seul suffit; le serveur vérifie l'empreinte du NIP */
+    if (!c.cle && POSTE && LS.get("magCle", "")) c.cle = LS.get("magCle", "");
+    if (!c.cle && POSTE && !(window.codeEssai && await codeEssai(c.code))) { $("#cErr").textContent = "Ce poste n'est pas déverrouillé : le magasinier doit d'abord entrer son NIP (mode comptoir sur cet iPad)."; return; }
     if (!c.cle && !(window.codeEssai && await codeEssai(c.code))) { $("#cErr").innerHTML = POSTE ? "Scanne ta carte étudiante (le code seul ne suffit plus)." : 'Le code seul ne suffit plus : scanne ta carte, ou ouvre d\'abord <a href="carte.html">Ma carte</a> sur ce cellulaire.'; return; }
     CLE_ENTREE = c.cle;
     let pre = ($("#cPre").value || "").trim().split(/\s+/)[0];

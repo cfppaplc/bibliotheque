@@ -560,3 +560,27 @@ revoke all on function public.panier_envoyer(text, text, text, text, jsonb, text
   public.panier_annuler(uuid, text, text), public.panier_materiel_eleve(text, text, date) from public;
 grant execute on function public.panier_envoyer(text, text, text, text, jsonb, text, text, text[]), public.panier_modifier(uuid, text, text, jsonb, text),
   public.panier_annuler(uuid, text, text), public.panier_materiel_eleve(text, text, date) to anon, authenticated;
+
+-- 27 nov. (Jeremy : « on n'a pas de lecteur; l'iPad est géré par le magasinier ») : à l'iPad du magasin (déverrouillé avec le NIP
+-- du magasinier, ou par un enseignant), le numéro seul suffit : p_cle = empreinte du NIP (magasin_cle_ok) au lieu de la clé de la carte.
+create or replace function public.carte_ou_poste_ok(p_code text, p_cle text) returns boolean language sql stable security definer set search_path = public as $$
+  select public.absence_carte_ok(p_code, p_cle) or (length(coalesce(p_cle, '')) > 12 and p_code ~ '^[0-9]{5}$' and public.magasin_cle_ok(p_cle));
+$$;
+revoke all on function public.carte_ou_poste_ok(text, text) from public, anon, authenticated;
+create or replace function public.panier_envoyer(p_ens text, p_groupe text, p_code text, p_cle text, p_items jsonb, p_note text default null, p_prenom text default null, p_profs text[] default null)
+returns jsonb language plpgsql security definer set search_path = public, extensions as $$
+begin
+  if not public.carte_ou_poste_ok(p_code, p_cle) then return jsonb_build_object('ok', false, 'err', 'carte'); end if;
+  return public.panier_envoyer(p_ens, p_groupe, p_code, p_items, p_note, p_prenom, p_profs);
+end; $$;
+create or replace function public.panier_modifier(p_id uuid, p_code text, p_cle text, p_items jsonb, p_note text default null)
+returns jsonb language plpgsql security definer set search_path = public, extensions as $$
+begin
+  if not public.carte_ou_poste_ok(p_code, p_cle) then return jsonb_build_object('ok', false, 'err', 'carte'); end if;
+  return public.panier_modifier(p_id, p_code, p_items, p_note);
+end; $$;
+create or replace function public.panier_annuler(p_id uuid, p_code text, p_cle text) returns boolean language plpgsql security definer set search_path = public, extensions as $$
+begin
+  if not public.carte_ou_poste_ok(p_code, p_cle) then return false; end if;
+  return public.panier_annuler(p_id, p_code);
+end; $$;
