@@ -893,3 +893,4 @@
 - 2026-11-27 : avis d'absence = « Absence : <prénom> » + date (panier-avis). Carte d'essai nommée « Essai » dans les avis (sw.js, empreinte) et sur la page enseignant (codeEssai).
 - 2026-11-27 : avis d'absence = « Absence : <prénom> DEP<n> » (DEP calculé du code de groupe comme session-dep.js; carte d'essai = Kaleb DEP1).
 - 2026-11-27 : dossier de l'élève (fiche, outils-atelier.html) : DEP affiché après le groupe, calculé selon le mois courant (depDe, même calcul que session-dep.js).
+- 2026-11-27 22 h 40 : ancien projet Supabase (kjlotlhqrgekzohshmbn, us-east-1) SUPPRIMÉ avec l'accord de Jeremy, après comparaison ligne par ligne (14 tables identiques; écarts = nos changements; 1 coffre écrit à 22 h 11 par un appareil à l'ancienne version, recopié dans la nouvelle base). Seul projet restant : metierplus-canada (ca-central-1). Copies locales lib/supabase (2.50.0) et lib/qrcode (1.0.0) ajoutées par le workflow ponctuel vendre-libs.yml (empreintes SRI vérifiées).
