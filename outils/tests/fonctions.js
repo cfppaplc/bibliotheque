@@ -671,6 +671,7 @@ test("Carte : s'ouvre seulement par le code QR de la fiche ou le code complet; l
   vrai(!(await p.evaluate(() => localStorage.getItem("mpCarte"))) && /code QR/.test(await p.textContent("#err")) && lu === 0, "Le code seul ouvre encore la carte");
   await p.fill("#cle", "MP-48213-K7Q9X2"); await p.click("#ok"); await attendre(600);
   vrai(/MP-48213-K7Q9X2/.test(await p.evaluate(() => localStorage.getItem("mpCarte"))), "Le code complet n'ouvre pas la carte");
+  vrai(await p.evaluate(() => typeof garderPourDeBon === "function"), "La carte ne demande pas le stockage permanent");
   await p.evaluate(() => localStorage.removeItem("mpCarte")); const q = await c.newPage(); await q.goto(BASE + "carte.html#c=MP-51234-ZZZZ99&g=2608PLCA1&p=Lucas"); await attendre(700);
   vrai(/MP-51234-ZZZZ99/.test(await q.evaluate(() => localStorage.getItem("mpCarte"))) && (await q.textContent("#vP")).trim() === "Lucas", "Le code QR de la fiche n'ouvre pas la carte");
   vrai(!errs.length, errs.join(" | ")); await c.close();

@@ -2,7 +2,7 @@
    - Les pages du site (bibliothèque, accueil, index de recherche) : réseau d'abord, copie gardée si Internet manque.
    - Les livres : copie gardée sur l'ordinateur, ouverte tout de suite; on vérifie en arrière-plan s'il existe une nouvelle version.
    - Les plans et les activités (PDF) : réseau d'abord (version à jour), copie gardée si Internet manque. */
-const CACHE = "biblio-v256";
+const CACHE = "biblio-v257";
 /* 27 nov. (audit de stabilité) : les livres ont leur propre cache, gardée d'une version à l'autre (avant : 62 Mo retéléchargés sur chaque appareil à chaque publication) */
 const LIVRES = "biblio-livres";
 const BASE = ["./", "index.html", "accueil.html", "recherche.json", "nouveautes.json", "carte.html", "js/code128.js?v=1", "js/qrcode.js", "img/metier-plus-blanc.svg"];
