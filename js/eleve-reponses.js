@@ -5,7 +5,7 @@
    - Ils sont chiffrés sur l'appareil avec la clé de sa carte, puis gardés dans Supabase (table coffre) :
      le site ne peut pas les lire; avec sa carte, il les retrouve sur n'importe quel appareil (à la maison aussi). */
 window.ELEVE_REP = (function(){
-  const API = "https://kjlotlhqrgekzohshmbn.supabase.co/rest/v1/rpc/", CLE = "sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY";
+  const API = "https://nhxhfiaznuifcbobjuuv.supabase.co/rest/v1/rpc/", CLE = "sb_publishable_GwzHRE-rG-rVafG7QcTOxg_S68OQHXh";
   const te = new TextEncoder(), td = new TextDecoder();
   const hex = async s => [...new Uint8Array(await crypto.subtle.digest("SHA-256", te.encode(s)))].map(b => b.toString(16).padStart(2, "0")).join("");
   const b64 = u => { let s = ""; for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000)); return btoa(s); };

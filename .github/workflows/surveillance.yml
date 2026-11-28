@@ -25,7 +25,7 @@ jobs:
             pannes=""
             c=$(curl -s -o site.html -w "%{http_code}" -m 20 https://metierplus.app/)
             if [ "$c" != "200" ] || ! grep -q "Métier" site.html; then pannes="$pannes site (HTTP $c);"; fi
-            c=$(curl -s -o /dev/null -w "%{http_code}" -m 20 "https://kjlotlhqrgekzohshmbn.supabase.co/rest/v1/rpc/journal_lire?p_heures=1" -H "apikey: sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY")
+            c=$(curl -s -o /dev/null -w "%{http_code}" -m 20 "https://nhxhfiaznuifcbobjuuv.supabase.co/rest/v1/rpc/journal_lire?p_heures=1" -H "apikey: sb_publishable_GwzHRE-rG-rVafG7QcTOxg_S68OQHXh")
             if [ "$c" != "200" ]; then pannes="$pannes Supabase (HTTP $c);"; fi
             [ -z "$pannes" ] && break; sleep 60
           done

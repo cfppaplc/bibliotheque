@@ -2,7 +2,7 @@
    L'administrateur donne une nouvelle clé de carte à l'élève : ses réponses chiffrées avec l'ancienne clé sont lues, chiffrées avec la nouvelle,
    puis l'ancienne copie est effacée (l'ancienne carte ne donne plus accès à rien). Même format que js/eleve-reponses.js. */
 window.ELEVE_CARTES = (function(){
-  const API = "https://kjlotlhqrgekzohshmbn.supabase.co/rest/v1/rpc/", CLE = "sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY", te = new TextEncoder(), td = new TextDecoder();
+  const API = "https://nhxhfiaznuifcbobjuuv.supabase.co/rest/v1/rpc/", CLE = "sb_publishable_GwzHRE-rG-rVafG7QcTOxg_S68OQHXh", te = new TextEncoder(), td = new TextDecoder();
   const hex = async s => [...new Uint8Array(await crypto.subtle.digest("SHA-256", te.encode(s)))].map(b => b.toString(16).padStart(2, "0")).join("");
   const b64 = u => { let s = ""; for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000)); return btoa(s); };
   const rpc = async (f, a) => { const r = await fetch(API + f, { method:"POST", headers:{ apikey:CLE, "Content-Type":"application/json" }, body:JSON.stringify(a), cache:"no-store" }); if (!r.ok) throw new Error("Supabase " + r.status); return r.json(); };

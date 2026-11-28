@@ -5,7 +5,7 @@
    On ne change que les codes, les groupes et les prénoms chiffrés; le reste du registre public (partages, suivi, formes) est gardé.
    Rien n'est publié si le coffre ne répond pas ou si le registre reçu n'a aucun élève. */
 (function(){
-  const API = "https://kjlotlhqrgekzohshmbn.supabase.co/rest/v1/rpc/", CLE = "sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY", te = new TextEncoder();
+  const API = "https://nhxhfiaznuifcbobjuuv.supabase.co/rest/v1/rpc/", CLE = "sb_publishable_GwzHRE-rG-rVafG7QcTOxg_S68OQHXh", te = new TextEncoder();
   const hex = async s => [...new Uint8Array(await crypto.subtle.digest("SHA-256", te.encode(s)))].map(b => b.toString(16).padStart(2, "0")).join("");
   const rpc = async (f, a) => { const r = await fetch(API + f, { method:"POST", signal:(self.AbortSignal && AbortSignal.timeout) ? AbortSignal.timeout(20000) : undefined, headers:{ apikey:CLE, "Content-Type":"application/json" }, body:JSON.stringify(a) }); if (!r.ok) throw new Error("registre " + r.status); const t = await r.text(); return t ? JSON.parse(t) : null; };
   const prenom = p => String(p || "").trim().split(/\s+/)[0].slice(0, 20);

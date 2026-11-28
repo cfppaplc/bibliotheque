@@ -69,7 +69,7 @@ begin
   insert into public.panier (ens, groupe, code, items, note) values (p_ens, p_groupe, p_code, p_items, nullif(trim(p_note), '')) returning * into r;
   delete from public.panier where t < now() - interval '60 days';
   if exists (select 1 from public.panier_prof where ens = p_ens and jsonb_array_length(abonnements) > 0) then   -- avis Web Push par la fonction « panier-avis »
-    perform net.http_post(url := 'https://kjlotlhqrgekzohshmbn.supabase.co/functions/v1/panier-avis', headers := '{"Content-Type":"application/json"}'::jsonb, body := jsonb_build_object('id', r.id));
+    perform net.http_post(url := 'https://nhxhfiaznuifcbobjuuv.supabase.co/functions/v1/panier-avis', headers := '{"Content-Type":"application/json"}'::jsonb, body := jsonb_build_object('id', r.id));
   end if;
   return jsonb_build_object('ok', true, 'id', r.id);
 end; $$;
@@ -150,7 +150,7 @@ begin
   insert into public.panier (ens, groupe, code, items, note, prenom) values (p_ens, p_groupe, p_code, p_items, nullif(trim(p_note), ''), nullif(pr, '')) returning * into r;
   delete from public.panier where t < now() - interval '60 days';
   if exists (select 1 from public.panier_prof where ens = p_ens and jsonb_array_length(abonnements) > 0) then
-    perform net.http_post(url := 'https://kjlotlhqrgekzohshmbn.supabase.co/functions/v1/panier-avis', headers := '{"Content-Type":"application/json"}'::jsonb, body := jsonb_build_object('id', r.id));
+    perform net.http_post(url := 'https://nhxhfiaznuifcbobjuuv.supabase.co/functions/v1/panier-avis', headers := '{"Content-Type":"application/json"}'::jsonb, body := jsonb_build_object('id', r.id));
   end if;
   return jsonb_build_object('ok', true, 'id', r.id);
 end; $$;
@@ -183,7 +183,7 @@ begin
     where id = p_id and ens = p_ens and etat = 'attente' returning abo into a;
   if not found then return false; end if;
   if a is not null then
-    perform net.http_post(url := 'https://kjlotlhqrgekzohshmbn.supabase.co/functions/v1/panier-avis', headers := '{"Content-Type":"application/json"}'::jsonb, body := jsonb_build_object('id', p_id, 'eleve', true));
+    perform net.http_post(url := 'https://nhxhfiaznuifcbobjuuv.supabase.co/functions/v1/panier-avis', headers := '{"Content-Type":"application/json"}'::jsonb, body := jsonb_build_object('id', p_id, 'eleve', true));
   end if;
   return true;
 end; $$;
@@ -209,7 +209,7 @@ begin
   insert into public.magasin_avis (panier, ens, groupe, code, prenom, regle) values (p.id, p.ens, p.groupe, p.code, p.prenom, p_regle) returning id into a;
   delete from public.magasin_avis where t < now() - interval '30 days';
   if exists (select 1 from public.panier_prof where ens = p.ens and jsonb_array_length(abonnements) > 0) then
-    perform net.http_post(url := 'https://kjlotlhqrgekzohshmbn.supabase.co/functions/v1/panier-avis', headers := '{"Content-Type":"application/json"}'::jsonb, body := jsonb_build_object('avis', a));
+    perform net.http_post(url := 'https://nhxhfiaznuifcbobjuuv.supabase.co/functions/v1/panier-avis', headers := '{"Content-Type":"application/json"}'::jsonb, body := jsonb_build_object('avis', a));
   end if;
   return jsonb_build_object('ok', true);
 end; $$;
@@ -253,7 +253,7 @@ begin
   insert into public.panier (ens, groupe, code, items, note, prenom, profs) values (p_ens, p_groupe, p_code, p_items, nullif(trim(p_note), ''), nullif(pr, ''), pf) returning * into r;
   delete from public.panier where t < now() - interval '60 days';
   if exists (select 1 from public.panier_prof where (ens = p_ens or ens = any(pf)) and jsonb_array_length(abonnements) > 0) then
-    perform net.http_post(url := 'https://kjlotlhqrgekzohshmbn.supabase.co/functions/v1/panier-avis', headers := '{"Content-Type":"application/json"}'::jsonb, body := jsonb_build_object('id', r.id));
+    perform net.http_post(url := 'https://nhxhfiaznuifcbobjuuv.supabase.co/functions/v1/panier-avis', headers := '{"Content-Type":"application/json"}'::jsonb, body := jsonb_build_object('id', r.id));
   end if;
   return jsonb_build_object('ok', true, 'id', r.id);
 end; $$;
@@ -270,7 +270,7 @@ begin
     where id = p_id and (ens = p_ens or p_ens = any(profs)) and etat = 'attente' returning abo into a;
   if not found then return false; end if;
   if a is not null then
-    perform net.http_post(url := 'https://kjlotlhqrgekzohshmbn.supabase.co/functions/v1/panier-avis', headers := '{"Content-Type":"application/json"}'::jsonb, body := jsonb_build_object('id', p_id, 'eleve', true));
+    perform net.http_post(url := 'https://nhxhfiaznuifcbobjuuv.supabase.co/functions/v1/panier-avis', headers := '{"Content-Type":"application/json"}'::jsonb, body := jsonb_build_object('id', p_id, 'eleve', true));
   end if;
   return true;
 end; $$;
@@ -290,7 +290,7 @@ begin
   insert into public.magasin_avis (panier, ens, groupe, code, prenom, regle, profs) values (p.id, p.ens, p.groupe, p.code, p.prenom, p_regle, p.profs) returning id into a;
   delete from public.magasin_avis where t < now() - interval '30 days';
   if exists (select 1 from public.panier_prof where (ens = p.ens or ens = any(p.profs)) and jsonb_array_length(abonnements) > 0) then
-    perform net.http_post(url := 'https://kjlotlhqrgekzohshmbn.supabase.co/functions/v1/panier-avis', headers := '{"Content-Type":"application/json"}'::jsonb, body := jsonb_build_object('avis', a));
+    perform net.http_post(url := 'https://nhxhfiaznuifcbobjuuv.supabase.co/functions/v1/panier-avis', headers := '{"Content-Type":"application/json"}'::jsonb, body := jsonb_build_object('avis', a));
   end if;
   return jsonb_build_object('ok', true);
 end; $$;
@@ -323,7 +323,7 @@ begin
   insert into public.panier (ens, groupe, code, items, note, prenom, profs) values (p_ens, p_groupe, p_code, p_items, nullif(trim(p_note), ''), nullif(pr, ''), pf) returning * into r;
   delete from public.panier where t < now() - interval '60 days';
   if exists (select 1 from public.panier_prof where (ens = p_ens or ens = any(pf)) and jsonb_array_length(abonnements) > 0) then
-    perform net.http_post(url := 'https://kjlotlhqrgekzohshmbn.supabase.co/functions/v1/panier-avis', headers := '{"Content-Type":"application/json"}'::jsonb, body := jsonb_build_object('id', r.id));
+    perform net.http_post(url := 'https://nhxhfiaznuifcbobjuuv.supabase.co/functions/v1/panier-avis', headers := '{"Content-Type":"application/json"}'::jsonb, body := jsonb_build_object('id', r.id));
   end if;
   return jsonb_build_object('ok', true, 'id', r.id);
 end; $$;
@@ -383,7 +383,7 @@ begin
   insert into public.panier (ens, groupe, code, items, note, prenom, profs) values (p_ens, p_groupe, p_code, p_items, nullif(trim(p_note), ''), nullif(pr, ''), pf) returning * into r;
   delete from public.panier where t < now() - interval '365 days';
   if exists (select 1 from public.panier_prof where (ens = p_ens or ens = any(pf)) and jsonb_array_length(abonnements) > 0) then
-    perform net.http_post(url := 'https://kjlotlhqrgekzohshmbn.supabase.co/functions/v1/panier-avis', headers := '{"Content-Type":"application/json"}'::jsonb, body := jsonb_build_object('id', r.id));
+    perform net.http_post(url := 'https://nhxhfiaznuifcbobjuuv.supabase.co/functions/v1/panier-avis', headers := '{"Content-Type":"application/json"}'::jsonb, body := jsonb_build_object('id', r.id));
   end if;
   return jsonb_build_object('ok', true, 'id', r.id);
 end; $$;
@@ -412,10 +412,10 @@ begin
     where id = p_id and (ens = p_ens or p_ens = any(profs)) and etat = 'attente' returning abo into a;
   if not found then return false; end if;
   if a is not null then
-    perform net.http_post(url := 'https://kjlotlhqrgekzohshmbn.supabase.co/functions/v1/panier-avis', headers := '{"Content-Type":"application/json"}'::jsonb, body := jsonb_build_object('id', p_id, 'eleve', true));
+    perform net.http_post(url := 'https://nhxhfiaznuifcbobjuuv.supabase.co/functions/v1/panier-avis', headers := '{"Content-Type":"application/json"}'::jsonb, body := jsonb_build_object('id', p_id, 'eleve', true));
   end if;
   if p_ok and exists (select 1 from public.magasin_abo) then
-    perform net.http_post(url := 'https://kjlotlhqrgekzohshmbn.supabase.co/functions/v1/panier-avis', headers := '{"Content-Type":"application/json"}'::jsonb, body := jsonb_build_object('id', p_id, 'comptoir', true));
+    perform net.http_post(url := 'https://nhxhfiaznuifcbobjuuv.supabase.co/functions/v1/panier-avis', headers := '{"Content-Type":"application/json"}'::jsonb, body := jsonb_build_object('id', p_id, 'comptoir', true));
   end if;
   return true;
 end; $$;
@@ -451,7 +451,7 @@ begin
   insert into public.magasin_avis (panier, ens, groupe, code, prenom, regle, profs) values (p.id, p.ens, p.groupe, p.code, p.prenom, p_regle, p.profs) returning id into a;
   delete from public.magasin_avis where t < now() - interval '365 days';
   if exists (select 1 from public.panier_prof where (ens = p.ens or ens = any(p.profs)) and jsonb_array_length(abonnements) > 0) then
-    perform net.http_post(url := 'https://kjlotlhqrgekzohshmbn.supabase.co/functions/v1/panier-avis', headers := '{"Content-Type":"application/json"}'::jsonb, body := jsonb_build_object('avis', a));
+    perform net.http_post(url := 'https://nhxhfiaznuifcbobjuuv.supabase.co/functions/v1/panier-avis', headers := '{"Content-Type":"application/json"}'::jsonb, body := jsonb_build_object('avis', a));
   end if;
   return jsonb_build_object('ok', true);
 end; $$;
@@ -471,10 +471,10 @@ begin
     where id = p_id and (ens = p_ens or p_ens = any(profs)) and etat = 'attente' returning abo into a;
   if not found then return false; end if;
   if a is not null then
-    perform net.http_post(url := 'https://kjlotlhqrgekzohshmbn.supabase.co/functions/v1/panier-avis', headers := '{"Content-Type":"application/json"}'::jsonb, body := jsonb_build_object('id', p_id, 'eleve', true));
+    perform net.http_post(url := 'https://nhxhfiaznuifcbobjuuv.supabase.co/functions/v1/panier-avis', headers := '{"Content-Type":"application/json"}'::jsonb, body := jsonb_build_object('id', p_id, 'eleve', true));
   end if;
   if p_ok and exists (select 1 from public.magasin_abo) then
-    perform net.http_post(url := 'https://kjlotlhqrgekzohshmbn.supabase.co/functions/v1/panier-avis', headers := '{"Content-Type":"application/json"}'::jsonb, body := jsonb_build_object('id', p_id, 'comptoir', true));
+    perform net.http_post(url := 'https://nhxhfiaznuifcbobjuuv.supabase.co/functions/v1/panier-avis', headers := '{"Content-Type":"application/json"}'::jsonb, body := jsonb_build_object('id', p_id, 'comptoir', true));
   end if;
   return true;
 end; $$;
@@ -520,10 +520,10 @@ begin
     where id = p_id and (ens = p_ens or p_ens = any(profs)) and etat = 'attente' returning abo into a;
   if not found then return false; end if;
   if a is not null then
-    perform net.http_post(url := 'https://kjlotlhqrgekzohshmbn.supabase.co/functions/v1/panier-avis', headers := '{"Content-Type":"application/json"}'::jsonb, body := jsonb_build_object('id', p_id, 'eleve', true));
+    perform net.http_post(url := 'https://nhxhfiaznuifcbobjuuv.supabase.co/functions/v1/panier-avis', headers := '{"Content-Type":"application/json"}'::jsonb, body := jsonb_build_object('id', p_id, 'eleve', true));
   end if;
   if p_ok and exists (select 1 from public.magasin_abo) then
-    perform net.http_post(url := 'https://kjlotlhqrgekzohshmbn.supabase.co/functions/v1/panier-avis', headers := '{"Content-Type":"application/json"}'::jsonb, body := jsonb_build_object('id', p_id, 'comptoir', true));
+    perform net.http_post(url := 'https://nhxhfiaznuifcbobjuuv.supabase.co/functions/v1/panier-avis', headers := '{"Content-Type":"application/json"}'::jsonb, body := jsonb_build_object('id', p_id, 'comptoir', true));
   end if;
   return true;
 end; $$;

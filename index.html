@@ -12,7 +12,7 @@
   d.style.background = c ? "#f5f3ef" : "#141414"; setTimeout(function(){ d.classList.add("pret"); }, 4000); })();</script>
 <style>html:not(.pret)>body{visibility:hidden}</style>
 <!-- © 2026 Jérémy Raymond. Tous droits réservés. Copie, modification ou revente interdites sans autorisation écrite (voir LICENCE.md). --><meta charset="utf-8">
-<link rel="manifest" href="manifest.webmanifest"><script src="vieux-navigateur.js?v=272"></script><script src="signaler.js?v=272"></script><script src="plein-ecran.js?v=272"></script><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="icon" href="img/metier-plus-icone.svg" type="image/svg+xml"><link rel="icon" type="image/png" sizes="32x32" href="img/icone-32.png"><link rel="icon" type="image/png" sizes="192x192" href="img/icone-192.png"><link rel="apple-touch-icon" href="img/icone-180.png"><meta name="theme-color" content="#1E2A44">
+<link rel="manifest" href="manifest.webmanifest"><script src="vieux-navigateur.js?v=273"></script><script src="signaler.js?v=273"></script><script src="plein-ecran.js?v=273"></script><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="icon" href="img/metier-plus-icone.svg" type="image/svg+xml"><link rel="icon" type="image/png" sizes="32x32" href="img/icone-32.png"><link rel="icon" type="image/png" sizes="192x192" href="img/icone-192.png"><link rel="apple-touch-icon" href="img/icone-180.png"><meta name="theme-color" content="#1E2A44">
 <meta name="description" content="Métier+ : la plateforme des enseignants en formation professionnelle. Livres animés, plans, quiz et simulateurs pour la classe et l'atelier.">
 <meta property="og:type" content="website"><meta property="og:locale" content="fr_CA"><meta property="og:site_name" content="Métier+">
 <meta property="og:title" content="Métier+ — La plateforme des enseignants en formation professionnelle"><meta property="og:description" content="Livres animés, plans, quiz et simulateurs pour la classe et l'atelier. Conçu par Jeremy, enseignant en formation professionnelle.">
@@ -66,7 +66,7 @@
   addEventListener("load", function(){ setTimeout(mesurer, 3000); });
 })();
 </script>
-<script src="coffre.js?v=272"></script><script src="js/registre-auto.js?v=2"></script>
+<script src="coffre.js?v=273"></script><script src="js/registre-auto.js?v=3"></script>
 <style>
 #rbFold,#rbOpen{display:none}
 .reader.wbon #rbFold{display:inline-flex;align-items:center;justify-content:center;order:99;flex:none;width:38px;height:38px;padding:0!important;border-radius:10px;border:1px solid #333;background:transparent;color:#ddd;cursor:pointer}
@@ -261,7 +261,7 @@ window.LIVRES_EXTERNES = true;   // les livres sont des fichiers du dossier livr
 <script>/* 25 nov. (erreurs « zout / DPRI / initDonnees is not defined » sur un cellulaire) : un script n'est pas arrivé (réseau coupé) : on recharge la page une seule fois */
 function mpScriptsOk(...n){ if (n.every(f => typeof window[f] === "function")) { try { sessionStorage.removeItem("mpRechJs"); } catch(e){} return; } try { if (sessionStorage.mpRechJs) return; sessionStorage.mpRechJs = "1"; } catch(e){ return; } location.reload(); }
 mpScriptsOk("zout", "DPRI");</script>
-<script src="js/eleve-reponses.js?v=3"></script><script src="js/tableau-blanc.js?v=17"></script>
+<script src="js/eleve-reponses.js?v=4"></script><script src="js/tableau-blanc.js?v=17"></script>
 <script>/* 17 nov. : si le fichier du tableau blanc n'est pas arrivé (réseau coupé), on recharge la page une fois */ if (typeof setIcn === "undefined") { try { if (!sessionStorage.rechTB) { sessionStorage.rechTB = "1"; location.reload(); } } catch(e){} } else { try { sessionStorage.removeItem("rechTB"); } catch(e){} }</script>
 <script src="js/lecteur.js?v=16"></script>
 <script src="js/defi-livre-data.js?v=7"></script>
@@ -500,7 +500,7 @@ document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("#qrOv"
   setTimeout(() => essayer(0), 300);
 })();
 </script>
-<script src="js/telecommande.js?v=2"></script>
+<script src="js/telecommande.js?v=3"></script>
 
 
 <script>
@@ -516,12 +516,12 @@ window.addEventListener("online", () => { try { aviser("Internet est revenu."); 
 <link rel="stylesheet" href="css/acces.css?v=21">
 <div class="acces-ov" id="accesOv" hidden role="dialog" aria-modal="true"><div class="acces-box" id="accesBox"></div></div>
 <div class="acces-menu" id="accesMenu" hidden></div>
-<script src="js/acces.js?v=16"></script>
-<script src="js/admin-site.js?v=8"></script>
-<script src="js/plan-magasin.js?v=18"></script><script src="js/magasin-recherche.js?v=1"></script><script src="js/admin-plus.js?v=34"></script>
+<script src="js/acces.js?v=17"></script>
+<script src="js/admin-site.js?v=9"></script>
+<script src="js/plan-magasin.js?v=18"></script><script src="js/magasin-recherche.js?v=1"></script><script src="js/admin-plus.js?v=35"></script>
 
 
-<script src="js/avis-magasin.js?v=3"></script><script src="js/preferences.js?v=3"></script>
+<script src="js/avis-magasin.js?v=4"></script><script src="js/preferences.js?v=3"></script>
 
 <script src="js/logo.js?v=1"></script>
 
@@ -585,7 +585,7 @@ document.addEventListener("click", e => { const b = e.target.closest && e.target
   const k = /plan/i.test(b.id + (b.dataset.plus || "")) ? "plans" : /accueil/i.test(b.id + (b.dataset.plus || "")) ? "accueil" : /act/i.test(b.id) ? "activites" : /sim/i.test(b.id + (b.dataset.plus || "")) ? "labo" : "telecommande";
   COFFRE.stat("outil:" + k); }, true);
 </script>
-<script src="garde-nav.js?v=272"></script>
+<script src="garde-nav.js?v=273"></script>
 <script>
 /* 12 nov. (erreur reçue du TNI : « mpNavHTML is not defined ») : si garde-nav.js n'est pas arrivé (réseau lent), la page continue sans barre et le recharge une fois */
 if (typeof window.mpNavHTML !== "function"){ window.mpNavHTML = () => "";
@@ -632,7 +632,7 @@ body.visiteur .mp-pied{margin-top:30px}
 <link rel="stylesheet" href="css/tableau-simple.css?v=2">
 <script src="js/tableau-simple.js?v=4"></script>
 <script>document.documentElement.classList.add("pret")</script>
-<script src="mesdocs.js?v=272"></script>
+<script src="mesdocs.js?v=273"></script>
 <script>
 /* 10 nov. (Jeremy) : glisser vers le bas sur une barre du bas = la cacher (tableau blanc : comme la flèche; livre : barres cachées, un toucher les ramène) */
 (() => { let D = null;
@@ -672,7 +672,7 @@ body.visiteur .mp-pied{margin-top:30px}
 .reader:not(.wbon):not(.pen-side):not(.pen-fold) .penbar{left:50%!important;right:auto!important;transform:translateX(-50%)!important}
 </style>
 <script src="js/crayon-livre.js?v=1"></script>
-<script src="js/journal-perf.js?v=8"></script>
+<script src="js/journal-perf.js?v=9"></script>
 <script>
 /* Zoom flou (12 nov.) : par défaut sur écran tactile (TNI). ?zoomflou=0 pour l'enlever sur cet appareil, ?zoomflou=1 pour le forcer. */
 (function(){ try {

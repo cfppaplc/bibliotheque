@@ -7,7 +7,7 @@ function surnom(v){ return String(v || "").trim().split(/\s+/)[0].replace(/[^\p{
    télécommande → tous : bienvenue, q (question), img (image pour l'écran), rev (réponse + résultat de chacun), fin, attente, vue (écran)
    joueur → télécommande : ici, rep ; écran → télécommande : ecran? */
 const RELAIS = "https://ntfy.sh/", PREFIXE = "pda-quiz-";
-const SB_URL = "https://kjlotlhqrgekzohshmbn.supabase.co", SB_CLE = "sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY";
+const SB_URL = "https://nhxhfiaznuifcbobjuuv.supabase.co", SB_CLE = "sb_publishable_GwzHRE-rG-rVafG7QcTOxg_S68OQHXh";
 const $ = id => document.getElementById(id);
 const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"})[c]);
 const SYMB = ["A", "B", "C", "D", "E", "F"];

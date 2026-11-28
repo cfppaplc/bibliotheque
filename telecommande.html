@@ -3,7 +3,7 @@
 <head>
 <!-- © 2026 Jérémy Raymond. Tous droits réservés. Copie, modification ou revente interdites sans autorisation écrite (voir LICENCE.md). -->
 <meta charset="utf-8">
-<link rel="manifest" href="manifest.webmanifest"><script src="vieux-navigateur.js?v=272"></script><script src="signaler.js?v=272"></script><script src="plein-ecran.js?v=272"></script>
+<link rel="manifest" href="manifest.webmanifest"><script src="vieux-navigateur.js?v=273"></script><script src="signaler.js?v=273"></script><script src="plein-ecran.js?v=273"></script>
 <script>/* 9 nov. (« seuls les enseignants peuvent utiliser la remote ») : même garde que le Labo (session enseignant de Métier+ sur ce cellulaire; compte de groupe d'élèves refusé) */
 (function(){
   const q = new URLSearchParams(location.search);
@@ -156,7 +156,7 @@ svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.9;stroke
    Pavé : toucher à droite/gauche = page suivante/précédente, 1 doigt glissé = se déplacer, 2 doigts = zoom; onglet Laser = point rouge au tableau. */
 const $ = id => document.getElementById(id);
 const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"})[c]);
-const SB_URL = "https://kjlotlhqrgekzohshmbn.supabase.co", SB_CLE = "sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY";
+const SB_URL = "https://nhxhfiaznuifcbobjuuv.supabase.co", SB_CLE = "sb_publishable_GwzHRE-rG-rVafG7QcTOxg_S68OQHXh";
 const jeton = (/k=([a-z0-9]{8,})/.exec(location.hash) || [])[1];
 let canal = null, pret = false, E = null, vuA = 0, laser = false, modsCle = "";
 
@@ -275,6 +275,6 @@ else {
   eveil();
 }
 </script>
-<script src="js/journal-perf.js?v=8"></script>
+<script src="js/journal-perf.js?v=9"></script>
 </body>
 </html>

@@ -7,7 +7,7 @@
    - Un autre compte se connecte sur cet appareil : les données du précédent sont retirées de l'appareil (gardées dans le coffre).
    Utilisation : COFFRE.demarrer("quiz", { cles:["quizMaison","quizReglages"], vides:{…}, apres(raison){…}, intervalle:ms }) */
 window.COFFRE = (function(){
-  const API = "https://kjlotlhqrgekzohshmbn.supabase.co/rest/v1/rpc/", CLE_API = "sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY";
+  const API = "https://nhxhfiaznuifcbobjuuv.supabase.co/rest/v1/rpc/", CLE_API = "sb_publishable_GwzHRE-rG-rVafG7QcTOxg_S68OQHXh";
   const sub = crypto.subtle, enc = new TextEncoder(), dec = new TextDecoder();
   const b64 = buf => { const u = new Uint8Array(buf); let s = ""; for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000)); return btoa(s); };
   const unb64 = s => { const b = atob(s), u = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return u; };

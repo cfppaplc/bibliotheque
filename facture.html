@@ -9,7 +9,7 @@
 <meta name="theme-color" content="#1E2A44">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Facture">
 <link rel="apple-touch-icon" href="img/carte-180.png">
-<script src="vieux-navigateur.js?v=272"></script><script src="signaler.js?v=272"></script>
+<script src="vieux-navigateur.js?v=273"></script><script src="signaler.js?v=273"></script>
 <style>
 /* © 2026 Jérémy Raymond. Tous droits réservés. Métier+ — facture au client (26 nov.)
    Jeremy : « à la fin de leur projet, les élèves font une facture au client, comme sur les chantiers; ça part de leur carte ».
@@ -83,7 +83,7 @@ input,textarea,select{border-radius:12px;border-color:var(--ligne)}
 <script>
 const $ = s => document.querySelector(s), esc = t => String(t ?? "").replace(/[&<>"]/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" }[c]));
 const LS = { get:(k, d) => { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch(e){ return d; } }, set:(k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} } };
-const API = "https://kjlotlhqrgekzohshmbn.supabase.co/rest/v1/rpc/", CLE = "sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY", te = new TextEncoder(), td = new TextDecoder();
+const API = "https://nhxhfiaznuifcbobjuuv.supabase.co/rest/v1/rpc/", CLE = "sb_publishable_GwzHRE-rG-rVafG7QcTOxg_S68OQHXh", te = new TextEncoder(), td = new TextDecoder();
 const rpc = async (f, a) => { const r = await fetch(API + f, { method:"POST", headers:{ apikey:CLE, "Content-Type":"application/json" }, body:JSON.stringify(a || {}), cache:"no-store" }); if (!r.ok) throw new Error("Internet ne répond pas"); return r.json(); };
 const hex = async s => [...new Uint8Array(await crypto.subtle.digest("SHA-256", te.encode(s)))].map(b => b.toString(16).padStart(2, "0")).join("");
 const toast = t => { document.querySelectorAll(".toast").forEach(x => x.remove()); const d = document.createElement("div"); d.className = "toast"; d.textContent = t; document.body.appendChild(d); setTimeout(() => d.remove(), 2600); };
@@ -359,6 +359,6 @@ async function demarrer(){ if (!C) return entree();
   if (!(await factureOuverte(K.g))) { const n = sessionDEP(K.g); $("#app").innerHTML = `<h1>Facture au client</h1><div class="carte"><p>La facture s'ouvre plus tard dans ton DEP${n ? " (tu es en DEP " + n + ")" : ""}. Ton enseignant te dira quand.</p><a class="btn" href="carte.html">Retour à ma carte</a></div>`; return; } $("#app").innerHTML = `<p class="sous">Chargement…</p>`; await Promise.all([charger(), trouverCoffre()]); await entSync(); liste(); }
 lireK(); demarrer();
 </script>
-<script src="js/journal-perf.js?v=8"></script>
+<script src="js/journal-perf.js?v=9"></script>
 </body>
 </html>

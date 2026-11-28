@@ -2,7 +2,7 @@
    Jeremy : « mets dans les réglages des profs activer les notifications ». Utilisé par Mes préférences (preferences.js).
    La clé d'approbation (magJeton|<id>) est créée la première fois; l'appareil s'abonne aux avis Web Push (fonction Supabase panier-avis). */
 window.AvisMag = (function(){
-  const SUPA = "https://kjlotlhqrgekzohshmbn.supabase.co", CLE = "sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY";
+  const SUPA = "https://nhxhfiaznuifcbobjuuv.supabase.co", CLE = "sb_publishable_GwzHRE-rG-rVafG7QcTOxg_S68OQHXh";
   const lire = (k, d) => { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch(e){ return d; } };
   const ecrire = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} };
   async function rpc(f, a){ const r = await fetch(SUPA + "/rest/v1/rpc/" + f, { method:"POST", headers:{ apikey:CLE, "Content-Type":"application/json" }, body:JSON.stringify(a || {}), cache:"no-store" });

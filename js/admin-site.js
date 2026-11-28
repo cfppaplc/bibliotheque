@@ -6,7 +6,7 @@ const HEURES_MAG_DEF = { jours:[1, 2, 3, 4, 5], plages:[["08:30", "09:30"], ["09
    dans localStorage.signalements (synchronisé par le coffre, sorte biblio) dès qu'il ouvre la bibliothèque, puis à chaque heure. */
 window.ADMIN_SITE = (function(){
   const SUJET = "https://ntfy.sh/metierplus-signal-f3ce60fd2f6c0f46";
-  const SUPA = "https://kjlotlhqrgekzohshmbn.supabase.co", CLE = "sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY";
+  const SUPA = "https://nhxhfiaznuifcbobjuuv.supabase.co", CLE = "sb_publishable_GwzHRE-rG-rVafG7QcTOxg_S68OQHXh";
   const DEPOT = "cfppaplc/bibliotheque";
   const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
   const lire = () => { try { const o = JSON.parse(localStorage.getItem("signalements") || "{}"); return Array.isArray(o.L) ? o : { L:[] }; } catch(e){ return { L:[] }; } };

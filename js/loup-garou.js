@@ -6,7 +6,7 @@
    Loi 25 : un seul mot (prénom ou surnom), rien n'est gardé après la partie. */
 (function(){
 "use strict";
-const SB_URL = "https://kjlotlhqrgekzohshmbn.supabase.co", SB_CLE = "sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY", PREF = "pda-lg-";
+const SB_URL = "https://nhxhfiaznuifcbobjuuv.supabase.co", SB_CLE = "sb_publishable_GwzHRE-rG-rVafG7QcTOxg_S68OQHXh", PREF = "pda-lg-";
 const $ = id => document.getElementById(id);
 const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"})[c]);
 const surnom = v => String(v || "").trim().split(/\s+/)[0].replace(/[^\p{L}\p{N}'_-]/gu, "").slice(0, 14);

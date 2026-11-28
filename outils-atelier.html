@@ -418,14 +418,14 @@ try { for (let w = window; ; w = w.parent){ if (/[?&]gestion=1/.test(w.location.
     const b = dlg.querySelector(".fi-b"); if (b) b.appendChild(z.firstElementChild), b.appendChild(z.lastElementChild);
     const L = b ? b.lastElementChild : null; if (!L) return;
     if (!j){ L.innerHTML = `<div><span class="s">–</span>Active l'approbation du magasin sur cet appareil pour voir ses commandes (<a href="magasin.html?mode=prof" target="_top" style="color:#EB6A22">Commandes à approuver</a>).</div>`; return; }
-    try { const r = await fetch("https://kjlotlhqrgekzohshmbn.supabase.co/rest/v1/rpc/panier_eleve", { method:"POST", headers:{ apikey:"sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY", "Content-Type":"application/json" }, body:JSON.stringify({ p_ens:ens, p_jeton:j, p_code:String(e.c) }) });
+    try { const r = await fetch("https://nhxhfiaznuifcbobjuuv.supabase.co/rest/v1/rpc/panier_eleve", { method:"POST", headers:{ apikey:"sb_publishable_GwzHRE-rG-rVafG7QcTOxg_S68OQHXh", "Content-Type":"application/json" }, body:JSON.stringify({ p_ens:ens, p_jeton:j, p_code:String(e.c) }) });
       const P = r.ok ? await r.json() : []; const ET = { attente:["…", "en attente"], approuve:["ok", "approuvé"], refuse:["r", "refusé"], remis:["ok", "remis"] };
       L.innerHTML = P.length ? P.map(p => { const et = ET[p.etat] || ["", p.etat], n = (p.items || []).reduce((s, i) => s + (+i.q || 1), 0);
         return `<div><span class="s ${et[0] === "…" ? "dm" : et[0]}">${et[0] === "ok" ? "✓" : et[0] === "r" ? "✕" : "◐"}</span>${n} article${n > 1 ? "s" : ""} · ${esc(et[1])}${p.motif ? " (" + esc(p.motif) + ")" : ""}${p.note ? " · " + esc(p.note) : ""}<small>${date(new Date(p.t).getTime())}</small></div>`
           + `<div style="padding-left:34px;font-size:13px;opacity:.75">${(p.items || []).map(i => (+i.q || 1) + " × " + esc(i.nom)).join(", ")}</div>`; }).join("")
         : `<div><span class="s">–</span>Aucune commande</div>`;
       /* avis du magasinier (règlement du magasin, 30 jours) */
-      const ra = await fetch("https://kjlotlhqrgekzohshmbn.supabase.co/rest/v1/rpc/panier_eleve_avis", { method:"POST", headers:{ apikey:"sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY", "Content-Type":"application/json" }, body:JSON.stringify({ p_ens:ens, p_jeton:j, p_code:String(e.c) }) });
+      const ra = await fetch("https://nhxhfiaznuifcbobjuuv.supabase.co/rest/v1/rpc/panier_eleve_avis", { method:"POST", headers:{ apikey:"sb_publishable_GwzHRE-rG-rVafG7QcTOxg_S68OQHXh", "Content-Type":"application/json" }, body:JSON.stringify({ p_ens:ens, p_jeton:j, p_code:String(e.c) }) });
       const A = ra.ok ? await ra.json() : [], RG = [null, "Ne connaissait pas le nom exact du raccord", "Sans carte étudiante", "Consignes d'accès non respectées", "Matériel rendu sale", "Sans feuille de l'enseignant", "Bris ou usage personnel"];
       if (A.length){ const h = document.createElement("h4"); h.textContent = "Avis du magasinier (règlement, 1 an)"; const d = document.createElement("div"); d.className = "fi-l";
         d.innerHTML = A.map(a => `<div><span class="s r">!</span>${esc(RG[a.regle] || "?")}<small>${date(new Date(a.t).getTime())}</small></div>`).join(""); b.appendChild(h); b.appendChild(d); }
@@ -610,6 +610,6 @@ try { for (let w = window; ; w = w.parent){ if (/[?&]gestion=1/.test(w.location.
   $("#fiche").addEventListener("close", () => delete $("#fiche").dataset.id);
 })();
 </script>
-<script src="js/eleve-cartes.js?v=4"></script><script src="js/journal-perf.js?v=8"></script>
+<script src="js/eleve-cartes.js?v=5"></script><script src="js/journal-perf.js?v=9"></script>
 </body>
 </html>

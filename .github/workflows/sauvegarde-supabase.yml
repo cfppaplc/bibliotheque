@@ -20,8 +20,8 @@ jobs:
           MDP: ${{ secrets.SAUVEGARDE_MDP }}
         run: |
           if [ -z "$MDP" ]; then echo "Il manque le secret SAUVEGARDE_MDP (voir le haut de ce fichier)."; exit 1; fi
-          URL="https://kjlotlhqrgekzohshmbn.supabase.co/rest/v1/rpc/sauvegarde_lire"
-          PUB="sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY"
+          URL="https://nhxhfiaznuifcbobjuuv.supabase.co/rest/v1/rpc/sauvegarde_lire"
+          PUB="sb_publishable_GwzHRE-rG-rVafG7QcTOxg_S68OQHXh"
           mkdir -p sauvegarde
           for t in coffre stats journal; do
             : > "sauvegarde/$t.jsonl"; n=0; d=0

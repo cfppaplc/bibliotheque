@@ -101,7 +101,7 @@
   }
   /* 25 nov. (Jeremy : « pourquoi pas l'envoyer là ») : rapports gardés 30 jours dans Supabase (table journal, outils/journal.sql);
      si Supabase ne répond pas (table pas encore créée, réseau), le rapport part sur ntfy comme avant */
-  const SB = "https://kjlotlhqrgekzohshmbn.supabase.co/rest/v1/rpc/journal_ecrire", SBCLE = "sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY";
+  const SB = "https://nhxhfiaznuifcbobjuuv.supabase.co/rest/v1/rpc/journal_ecrire", SBCLE = "sb_publishable_GwzHRE-rG-rVafG7QcTOxg_S68OQHXh";
   function parNtfy(m, final){
     const opts = { method: "POST", body: m, headers: { Title: TITRE, Tags: "chart_with_downwards_trend" } };
     /* sendBeacon ne peut pas mettre d'en-tête : le titre passe dans l'adresse (avant : rapports « sans titre ») */

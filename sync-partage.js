@@ -4,7 +4,7 @@
    et son empreinte publiée dans une rangée que seul son créateur peut écrire. Chaque envoi est signé (HMAC)
    avec ce secret : un dépôt fabriqué par quelqu'un d'autre (un élève) est refusé. */
 window.SYNC = function(prefixe){
-  const API = "https://kjlotlhqrgekzohshmbn.supabase.co/rest/v1/rpc/", CLEAPI = "sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY";
+  const API = "https://nhxhfiaznuifcbobjuuv.supabase.co/rest/v1/rpc/", CLEAPI = "sb_publishable_GwzHRE-rG-rVafG7QcTOxg_S68OQHXh";
   const te = new TextEncoder(), hexa = b => [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, "0")).join("");
   const sha = async s => hexa(await crypto.subtle.digest("SHA-256", te.encode(s)));
   const rpc = async (f, a) => { const r = await fetch(API + f, { method:"POST", headers:{ apikey:CLEAPI, "Content-Type":"application/json" }, body:JSON.stringify(a) }); if (!r.ok) throw new Error("coffre " + r.status); return r.json(); };

@@ -2,7 +2,7 @@
 <!-- © 2026 Jérémy Raymond. Tous droits réservés. Copie, modification ou revente interdites sans autorisation écrite (voir LICENCE.md). -->
 <html lang="fr-CA">
 <head>
-<meta charset="utf-8"><script src="vieux-navigateur.js?v=272"></script><script src="signaler.js?v=272"></script><script src="plein-ecran.js?v=272"></script>
+<meta charset="utf-8"><script src="vieux-navigateur.js?v=273"></script><script src="signaler.js?v=273"></script><script src="plein-ecran.js?v=273"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Métier+ — Politique de confidentialité</title>
 <meta name="description" content="Politique de confidentialité de Métier+ : quels renseignements sont recueillis, pourquoi, où ils sont gardés et comment exercer tes droits (Loi 25, Québec).">
@@ -82,18 +82,18 @@
 <p><b>Comptes gardés sur l'appareil.</b> Une fois ton mot de passe entré, la clé déverrouillée de ton compte reste dans le navigateur de cet appareil, pour changer de compte d'un toucher (menu du compte → Changer de compte). Le mot de passe lui-même n'est pas gardé. <b>« Se déconnecter »</b> retire de l'appareil la clé de ton compte et les copies de tes données (registre de formation, coffres…) déjà envoyées : fais-le sur un appareil partagé comme le TNI. Tu peux aussi toucher le × à côté de ton nom, puis « Retirer ».</p>
 
 <h2>4. Où sont gardés les renseignements</h2>
-<p>Métier+ utilise les services suivants. Plusieurs sont <b>situés hors du Québec</b> (surtout aux États-Unis); Métier+ y envoie le moins possible, et chiffré quand c'est possible.</p>
+<p>Métier+ utilise les services suivants. La base de données (Supabase) est <b>hébergée au Canada</b> (centre de données de Montréal, région « Canada Central ») depuis le 27 novembre 2026. Les autres services sont surtout aux États-Unis; Métier+ y envoie le moins possible, et chiffré quand c'est possible.</p>
 <table>
   <tr><th>Service</th><th>Ce qu'il reçoit</th></tr>
   <tr><td>GitHub Pages (hébergement du site)</td><td>Le site, les livres <b>chiffrés</b> et la liste des comptes (nom, identifiant, clés publiques; aucun mot de passe)</td></tr>
-  <tr><td>Supabase (base de données)</td><td>Tes données de travail, <b>chiffrées avec la clé de ton compte</b> : Supabase ne peut pas les lire. Le relais des quiz et simulations en direct, sans conservation. Journal de fluidité des enseignants connectés : sorte d'appareil, taille d'écran, navigateur, page et durées des ralentissements (aucun nom, aucune donnée d'élève), gardé 30 jours.</td></tr>
+  <tr><td>Supabase (base de données, <b>au Canada</b>)</td><td>Tes données de travail, <b>chiffrées avec la clé de ton compte</b> : Supabase ne peut pas les lire. Le relais des quiz et simulations en direct, sans conservation. Journal de fluidité des enseignants connectés : sorte d'appareil, taille d'écran, navigateur, page et durées des ralentissements (aucun nom, aucune donnée d'élève), gardé 30 jours.</td></tr>
   <tr><td>ntfy.sh (avis)</td><td>Demandes d'accès d'enseignants et signalements, gardés 12 heures. Relais de secours des quiz si le relais principal tombe (12 heures).</td></tr>
-  <tr><td>Supabase (avis du magasin et des absences) et services d'avis du navigateur (Apple, Google, Mozilla)</td><td>Le texte des avis activés : code, groupe, raccords ou type d'absence (jamais de prénom).</td></tr>
+  <tr><td>Supabase (avis du magasin et des absences, au Canada) et services d'avis du navigateur (Apple, Google, Mozilla)</td><td>Le texte des avis activés : code, groupe, raccords ou type d'absence (jamais de prénom).</td></tr>
   <tr><td>jsDelivr et Cloudflare cdnjs</td><td>Fournissent deux bibliothèques du site (relais en direct, codes QR). Ils voient l'adresse IP de l'appareil qui les charge; aucune donnée de compte.</td></tr>
   <tr><td>YouTube (vidéos de l'accueil de classe)</td><td>Lecture en mode « sans témoins » (youtube-nocookie.com); YouTube voit l'adresse IP de l'appareil.</td></tr>
   <tr><td>GitHub (sauvegarde)</td><td>Une copie de la base de données chaque semaine, <b>chiffrée</b> avec un mot de passe, gardée 90 jours.</td></tr>
 </table>
-<p><b>Engagement : hébergement au Canada.</b> Métier+ est présentement en phase alpha (essai). À la fin de cette phase, les renseignements personnels et les données des comptes seront hébergés <b>sur des serveurs situés au Canada</b>. Cette page sera mise à jour à ce moment, avec le nom des nouveaux fournisseurs.</p>
+<p><b>Hébergement au Canada.</b> Depuis le 27 novembre 2026, la base de données de Métier+ (données des comptes, magasin, absences, cartes) est hébergée sur des serveurs situés au Canada. Le site lui-même (GitHub Pages) ne contient que des pages publiques et des livres chiffrés.</p>
 
 <h2>5. Sur ton appareil</h2>
 <p>Métier+ garde des données dans ton navigateur (stockage local) pour fonctionner : session, livres téléchargés pour le hors ligne, traits de crayon, réglages. Aucun témoin (« cookie ») publicitaire ou de suivi. Tu peux tout effacer en te déconnectant ou en vidant les données du site dans ton navigateur.</p>

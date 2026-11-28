@@ -42,7 +42,7 @@ async function t2(){const t=performance.now();const r=await fetch("livres/notion
  const s=(performance.now()-t)/1000,mb=b.byteLength*8/1e6/s;mettre("r2",mb>20?"ok":mb>5?"moy":"mal",mb.toFixed(1)+" Mb/s<br><small>"+s.toFixed(1)+" s</small>");return mb}
 function t3(){return new Promise(res=>{let fini=false;const fin=(c,t,v)=>{if(fini)return;fini=true;mettre("r3",c,t);try{sb.removeChannel(ch)}catch(e){}res(v)};
  setTimeout(()=>fin("mal","pas de réponse",null),15000);
- let sb,ch;try{sb=supabase.createClient("https://kjlotlhqrgekzohshmbn.supabase.co","sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY",{realtime:{params:{eventsPerSecond:20}}})}catch(e){return fin("mal","bloqué",null)}
+ let sb,ch;try{sb=supabase.createClient("https://nhxhfiaznuifcbobjuuv.supabase.co","sb_publishable_GwzHRE-rG-rVafG7QcTOxg_S68OQHXh",{realtime:{params:{eventsPerSecond:20}}})}catch(e){return fin("mal","bloqué",null)}
  const a=[],envoi={};let n=0,perdus=0;
  ch=sb.channel("pda-test-"+Math.random().toString(36).slice(2),{config:{broadcast:{self:true}}});
  ch.on("broadcast",{event:"p"},({payload})=>{if(envoi[payload.i]!=null){a.push(performance.now()-envoi[payload.i]);delete envoi[payload.i]}});

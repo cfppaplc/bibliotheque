@@ -71,7 +71,7 @@ const valide = c => /^MP-\d{3,5}-[A-Z0-9]{4,12}$/.test(c);
 const prenomN = p => String(p || "").trim().split(/\s+/)[0].normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 async function chercherCode(c, pre){ const te = new TextEncoder(), pn = prenomN(pre), base = "metier+|carte-code|" + c + "|" + pn;
   const ph = [...new Uint8Array(await crypto.subtle.digest("SHA-256", te.encode("metier+|carte-code-ph|" + c + "|" + pn)))].map(x => x.toString(16).padStart(2, "0")).join("");
-  const r = await (await fetch("https://kjlotlhqrgekzohshmbn.supabase.co/rest/v1/rpc/carte_code_lire", { method:"POST", headers:{ apikey:"sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY", "Content-Type":"application/json" }, body:JSON.stringify({ p_code:c, p_ph:ph }) })).json();
+  const r = await (await fetch("https://nhxhfiaznuifcbobjuuv.supabase.co/rest/v1/rpc/carte_code_lire", { method:"POST", headers:{ apikey:"sb_publishable_GwzHRE-rG-rVafG7QcTOxg_S68OQHXh", "Content-Type":"application/json" }, body:JSON.stringify({ p_code:c, p_ph:ph }) })).json();
   if (!r || r.etat !== "ok") return r && r.etat === "bloque" ? "bloque" : null;
   const b = Uint8Array.from(atob(JSON.parse(r.data).d), x => x.charCodeAt(0)), cle = await crypto.subtle.importKey("raw", await crypto.subtle.digest("SHA-256", te.encode(base + "|cle")), "AES-GCM", false, ["decrypt"]);
   return JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({ name:"AES-GCM", iv:b.slice(0, 12) }, cle, b.slice(12)))); }

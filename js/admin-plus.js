@@ -4,7 +4,7 @@
    Branché dans js/acces.js (onglets gPlus_<clé>) et s'appuie sur window.ACCES_ADMIN, ADMIN_SITE et COFFRE. */
 window.ADMIN_PLUS = (function(){
   const DEPOT = "cfppaplc/bibliotheque", GH = "https://api.github.com/repos/" + DEPOT;
-  const SUPA = "https://kjlotlhqrgekzohshmbn.supabase.co", CLE = "sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY";
+  const SUPA = "https://nhxhfiaznuifcbobjuuv.supabase.co", CLE = "sb_publishable_GwzHRE-rG-rVafG7QcTOxg_S68OQHXh";
   const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
   const A = () => window.ACCES_ADMIN || {};
   const ilYa = d => { const m = Math.round((Date.now() - new Date(d)) / 60000); return m < 1 ? "à l'instant" : m < 60 ? "il y a " + m + " min" : m < 1440 ? "il y a " + Math.round(m / 60) + " h" : "il y a " + Math.round(m / 1440) + " j"; };
@@ -152,7 +152,7 @@ window.ADMIN_PLUS = (function(){
   /* 25 nov. (Jeremy : « une statistique des raccords sortis ») : raccords remis aux élèves, par période et par groupe (données anonymes) */
   /* 25 nov. (Jeremy : « le magasinier déclare les pièces à commander; une feuille prête à soumissionner ») */
   async function aCommanderMg(c){ if (!c) return;
-    const rq = (f, a) => fetch("https://kjlotlhqrgekzohshmbn.supabase.co/rest/v1/rpc/" + f, { method:"POST", headers:{ apikey:"sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY", "Content-Type":"application/json" }, body:JSON.stringify(a || {}), cache:"no-store" }).then(r => { if (!r.ok) throw new Error("Supabase ne répond pas"); return r.json(); });
+    const rq = (f, a) => fetch("https://nhxhfiaznuifcbobjuuv.supabase.co/rest/v1/rpc/" + f, { method:"POST", headers:{ apikey:"sb_publishable_GwzHRE-rG-rVafG7QcTOxg_S68OQHXh", "Content-Type":"application/json" }, body:JSON.stringify(a || {}), cache:"no-store" }).then(r => { if (!r.ok) throw new Error("Supabase ne répond pas"); return r.json(); });
     /* 26 nov. : écrire passe par la clé (enseignant : « prof:<compte>:<jeton d'approbation> »); avant l'installation, anciennes fonctions */
     const idP = localStorage.getItem("dernierId") || "", jP = (() => { try { return JSON.parse(localStorage.getItem("magJeton|" + idP) || "\"\""); } catch(e){ return ""; } })(), cleP = "prof:" + idP + ":" + jP;
     const rqC = async (f, a) => { try { return await rq(f + "_c", Object.assign({ p_cle:cleP }, a)); } catch(e){ return rq(f, a); } };
@@ -246,7 +246,7 @@ window.ADMIN_PLUS = (function(){
   async function statsMg(c){ if (!c) return;
     const jour = d => d.toISOString().slice(0, 10), auj = new Date(), an = auj.getMonth() >= 7 ? auj.getFullYear() : auj.getFullYear() - 1;
     const P = { "7":["7 jours", jour(new Date(Date.now() - 6 * 864e5))], "30":["30 jours", jour(new Date(Date.now() - 29 * 864e5))], "an":["Depuis le 1er août", an + "-08-01"], "tout":["Tout", "2026-01-01"] };
-    const rq = (f, a) => fetch("https://kjlotlhqrgekzohshmbn.supabase.co/rest/v1/rpc/" + f, { method:"POST", headers:{ apikey:"sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY", "Content-Type":"application/json" }, body:JSON.stringify(a || {}), cache:"no-store" }).then(r => { if (!r.ok) throw new Error("Supabase ne répond pas"); return r.json(); });
+    const rq = (f, a) => fetch("https://nhxhfiaznuifcbobjuuv.supabase.co/rest/v1/rpc/" + f, { method:"POST", headers:{ apikey:"sb_publishable_GwzHRE-rG-rVafG7QcTOxg_S68OQHXh", "Content-Type":"application/json" }, body:JSON.stringify(a || {}), cache:"no-store" }).then(r => { if (!r.ok) throw new Error("Supabase ne répond pas"); return r.json(); });
     let L, G, A = null; try { [L, G, A] = await Promise.all([rq("panier_stats", { p_depuis:P[ST_P][1], p_groupe:ST_G || null }), rq("panier_stats_groupes"), rq("panier_achalandage", { p_depuis:P[ST_P][1], p_groupe:ST_G || null }).catch(() => null)]); } catch(e){ c.innerHTML = '<h3>Raccords sortis</h3><p class="acces-err">' + esc(e.message) + '</p>'; return; }
     const tot = L.reduce((x, r) => x + +r.q, 0);
     c.innerHTML = '<div class="as-th"><h3>Raccords sortis · ' + tot + ' pièce' + (tot > 1 ? 's' : '') + '</h3></div>'
@@ -359,7 +359,7 @@ window.ADMIN_PLUS = (function(){
         if (!/^\d{6}$/.test(v)) { m.textContent = "Le NIP a 6 chiffres."; return; }
         const id = localStorage.getItem("dernierId") || "", j = (() => { try { return JSON.parse(localStorage.getItem("magJeton|" + id) || "\"\""); } catch(e){ return ""; } })(); if (!j) { m.textContent = "Ouvre d'abord « Commandes à approuver » sur cet appareil (clé d'approbation), puis reviens."; return; }
         const e = [...new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode("metier+|magasin|" + v)))].map(x => x.toString(16).padStart(2, "0")).join("");
-        try { const r = await fetch("https://kjlotlhqrgekzohshmbn.supabase.co/rest/v1/rpc/magasin_cle_definir", { method:"POST", headers:{ apikey:"sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY", "Content-Type":"application/json" }, body:JSON.stringify({ p_ens:id, p_jeton:j, p_empreinte:e }) });
+        try { const r = await fetch("https://nhxhfiaznuifcbobjuuv.supabase.co/rest/v1/rpc/magasin_cle_definir", { method:"POST", headers:{ apikey:"sb_publishable_GwzHRE-rG-rVafG7QcTOxg_S68OQHXh", "Content-Type":"application/json" }, body:JSON.stringify({ p_ens:id, p_jeton:j, p_empreinte:e }) });
           if (r.status === 404) { m.textContent = "La mise à jour du magasin n'est pas encore installée dans Supabase."; return; } m.textContent = (await r.json()) === true ? "NIP défini. Donne-le au magasinier." : "Refusé : clé d'approbation invalide sur cet appareil."; z.querySelector("#nipV").value = ""; }
         catch(err){ m.textContent = "Internet ne répond pas."; } }; }
     z.querySelectorAll("[data-copie]").forEach(b => b.onclick = () => { try { navigator.clipboard.writeText(b.dataset.copie); b.textContent = "Lien copié"; } catch(e){} });

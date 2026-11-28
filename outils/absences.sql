@@ -46,7 +46,7 @@ begin
     values (p_code, nullif(left(split_part(trim(coalesce(p_prenom, '')), ' ', 1), 20), ''), p_groupe, pf, p_genre, p_du, p_au, p_part, nullif(p_heure, ''), p_motif) returning * into r;
   delete from public.absence where t < now() - interval '1 year';
   if exists (select 1 from public.panier_prof where ens = any(pf) and jsonb_array_length(abonnements) > 0) then
-    perform net.http_post(url := 'https://kjlotlhqrgekzohshmbn.supabase.co/functions/v1/panier-avis', headers := '{"Content-Type":"application/json"}'::jsonb, body := jsonb_build_object('absence', r.id));
+    perform net.http_post(url := 'https://nhxhfiaznuifcbobjuuv.supabase.co/functions/v1/panier-avis', headers := '{"Content-Type":"application/json"}'::jsonb, body := jsonb_build_object('absence', r.id));
   end if;
   return jsonb_build_object('ok', true, 'id', r.id);
 end; $$;

@@ -3,7 +3,7 @@
    Relais Supabase Realtime (même projet que le Labo), canal « pda-livre-<jeton> »; le jeton (aléatoire, 16 car.) est dans le code QR.
    Seuls des ordres et l'état (titre, page, modules) passent : jamais le contenu du livre. telecommande.html = la page du cellulaire. ---- */
 (function(){
-  const SB_URL = "https://kjlotlhqrgekzohshmbn.supabase.co", SB_CLE = "sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY";
+  const SB_URL = "https://nhxhfiaznuifcbobjuuv.supabase.co", SB_CLE = "sb_publishable_GwzHRE-rG-rVafG7QcTOxg_S68OQHXh";
   const LIB = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.50.0/dist/umd/supabase.min.js";
   const T = window.TELE = {jeton: "", canal: null, pret: false, branche: false, dernier: "", modsDe: "", mods: []};
   function jeton(){ const a = new Uint8Array(12); crypto.getRandomValues(a); return [...a].map(x => "abcdefghijkmnpqrstuvwxyz23456789"[x % 32]).join("").slice(0, 16); }

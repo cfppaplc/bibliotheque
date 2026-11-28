@@ -158,7 +158,7 @@ html.clair .mp-plusM,body.clair .mp-plusM{background:#fff;color:#1E2A44;border-c
   if (!moi) { vis(false); return; }
   vis(!!(c && c.id === moi && c.v));
   if (c && c.id === moi && Date.now() - c.t < 600000) return;
-  const API = "https://kjlotlhqrgekzohshmbn.supabase.co/rest/v1/rpc/coffre_lire", CLE = "sb_publishable_1C-o-75sf7havBRmUWA8aQ_gcEW4sRY";
+  const API = "https://nhxhfiaznuifcbobjuuv.supabase.co/rest/v1/rpc/coffre_lire", CLE = "sb_publishable_GwzHRE-rG-rVafG7QcTOxg_S68OQHXh";
   const hache = async s => [...new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s)))].map(b => b.toString(16).padStart(2, "0")).join("");
   (async () => { try {
     const C = (await (await fetch("comptes.json", {cache: "no-store"})).json()).comptes || {};
