@@ -46,7 +46,7 @@
       ["Préparer un cours d'avance", "Touche « Préparer le cours », choisis le jour et la période dans la semaine, la compétence, puis les activités et leurs durées."],
       ["Lier un livre, un quiz ou un fichier à une activité", "Dans le déroulement, touche « + Livre, quiz, fichier… » sous l'activité. Pendant le cours, un toucher sur l'activité l'ouvre."]]},
     { k:"compte", t:"Mon compte", items:[
-      ["Quelque chose ne marche pas", "Ouvre le menu de ton compte (tes initiales en haut à droite) et touche « Signaler un problème ». Écris une phrase : l'administrateur la reçoit tout de suite, avec le livre et la page où tu étais."],
+      ["Quelque chose ne marche pas", "Parles-en à l'administrateur de Métier+ de ton centre. Les erreurs du site lui sont aussi envoyées toutes seules (sans aucun renseignement sur les élèves)."],
       ["Me connecter", "Touche « Se connecter » et entre ton identifiant (prenom.nom) et ton mot de passe. Sur ton ordinateur, l'identifiant est retenu."],
       ["Demander un accès", "Dans la fenêtre de connexion, touche « Demander un accès ». Choisis ton programme et un mot de passe; l'administrateur reçoit ta demande."],
       ["J'ai oublié mon mot de passe", "Dans la fenêtre de connexion, touche « Mot de passe oublié ? » et choisis-en un nouveau. L'administrateur l'active pour toi."],
