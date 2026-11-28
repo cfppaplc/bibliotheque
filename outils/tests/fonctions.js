@@ -752,6 +752,9 @@ test("Absences : l'élève signale une absence depuis Ma carte (motif, enseignan
   /* 27 nov. : le motif est chiffré; l'élève le relit avec la clé de sa carte */
   vrai(await p.evaluate(async d => { const u = b64d(d), o = JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({ name:"AES-GCM", iv:u.subarray(0, 12) }, await cleAbs("48213", "K7Q9X2"), u.subarray(12)))); return o.m === 6 && o.g === "absence"; }, sent.p_data._e), "Absences : la copie de l'élève ne se déchiffre pas");
   vrai(/signalée/.test(await p.textContent("#app")), "Absences : pas de confirmation");
+  vrai(!/Apporte ta preuve/.test(await p.textContent("#app")), "Absences : « Apporte ta preuve » pour un motif non motivé");
+  await p.click("#abAutre"); await attendre(300); await p.click('[data-m="7"]'); await attendre(150); await p.click("#abOk"); await attendre(600);
+  vrai(/Apporte ta preuve/.test(await p.textContent("#app")), "Absences : pas d'avertissement « Apporte ta preuve » après l'envoi (motivée)");
   vrai(!errs.length, errs.join(" | ")); await c.close();
 });
 

@@ -542,7 +542,7 @@ async function absences(){
         if (!r || !r.ok) throw new Error(r && r.err === "trop" ? "Trop de signalements aujourd'hui." : r && r.err === "carte" ? "Ton accès n'est pas reconnu. Demande à ton enseignant." : "Signalement refusé. Vérifie les dates.");
         LS.set("absProfs", S.profs);
         $("#app").innerHTML = `<div class="constr"><div class="abOk"><svg viewBox="0 0 24 24" width="40" height="40"><path d="M5 12.5l4.2 4.2L19 7" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div><h1>${GENRES[S.genre]} signalé${S.genre === "absence" ? "e" : ""}</h1>
-          <p class="sous">${esc(S.profs.map(nomEns).join(" et "))} ${S.profs.length > 1 ? "ont" : "a"} reçu l'avis. ${MOTIVE(S.motif) ? "N'oublie pas ton billet." : ""}</p><a class="btn p" href="carte.html" style="margin-top:14px">‹ Mon accès</a><button class="btn" id="abAutre" style="margin-top:8px">Signaler autre chose</button></div>`;
+          <p class="sous">${esc(S.profs.map(nomEns).join(" et "))} ${S.profs.length > 1 ? "ont" : "a"} reçu l'avis. </p>${MOTIVE(S.motif) ? `<div class="abA" style="text-align:left;margin-top:12px;font-size:1rem"><b>Apporte ta preuve</b> (billet) au centre. Sans preuve, ton absence sera considérée comme non motivée.</div>` : ""}<a class="btn p" href="carte.html" style="margin-top:14px">‹ Mon accès</a><button class="btn" id="abAutre" style="margin-top:8px">Signaler autre chose</button></div>`;
         $("#abAutre").onclick = () => { S.motif = 0; dessiner(); }; }
       catch(e){ er.textContent = /Failed|fetch|404/.test(e.message) ? "Pas de connexion pour l'instant. Réessaie dans un moment." : e.message; b.disabled = false; b.textContent = "Signaler à mon enseignant"; } };
     liste(); };
