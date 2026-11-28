@@ -35,7 +35,7 @@ input.pre{border:2px solid #d5dae3;font:400 1.15rem system-ui,-apple-system,sans
 /* 26 nov. (Jeremy : « on ne devrait pas voir les chiffres quand on les écrit, comme un mot de passe ») */
 input.cache-code:not(:placeholder-shown){-webkit-text-security:disc;text-security:disc}
 </style>
-<script src="js/session-dep.js?v=5"></script>
+<script src="js/session-dep.js?v=6"></script>
 </head>
 <body>
 <main>
@@ -78,6 +78,7 @@ function garderPourDeBon(){ try { if (navigator.storage && navigator.storage.per
 function afficher(){
   const K = LS.get("mpCarte"); $("#vide").hidden = !!K; $("#vue").hidden = !K; if (!K) { if (!matchMedia("(pointer:coarse)").matches) $("#cle").focus(); return; }   /* 27 nov. : sur iPhone, le focus placé par la page bloquait le clavier */
   const code = K.c.split("-")[1]; garderPourDeBon();
+  if (K.g === "ESSAI" && K.p === "Essai") { K.p = "Kaleb"; LS.set("mpCarte", K); }   /* 27 nov. : la carte d'essai s'appelle Kaleb */
   $("#vG").textContent = K.g || "Métier+"; $("#vP").textContent = K.p || ""; completerPrenom(K); factureOuverte(K.g).then(ok => { $("#bFac").hidden = !ok; $("#bBoutons").style.gridTemplateColumns = ok ? "1fr 1fr" : "1fr"; }); $("#vN").textContent = code;
   $("#vCb").src = Code128.url(K.c, 60, false); $("#vCb").alt = K.c;
   const M = QRLib.matrice(K.c), k = M.length;

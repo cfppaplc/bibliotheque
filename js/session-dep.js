@@ -12,5 +12,5 @@ window.codeEssai = async function(c){ if (!/^\d{5}$/.test(String(c))) return nul
      Les commandes d'essai vont à l'administrateur (premier compte admin) */
   try { const id = localStorage.getItem("dernierId") || "", C = (await (await fetch("comptes.json", { cache:"no-cache" })).json()).comptes || {};
     const adm = C[id] && C[id].admin ? id : Object.keys(C).find(x => C[x].admin); if (!adm) return null;
-    return { c:"MP-" + c + "-ESSAI0", g:"ESSAI", p:"Essai", ens:adm }; } catch(e){ return null; } };
+    return { c:"MP-" + c + "-ESSAI0", g:"ESSAI", p:"Kaleb", ens:adm }; } catch(e){ return null; } };
 window.factureOuverte = async function(g){ if (g === "ESSAI") return true; const n = sessionDEP(g); if (!n) return false; try { const r = await (await fetch("reglages.json", { cache:"no-cache" })).json(); return (r.facture || [2]).includes(n); } catch(e){ return false; } };
