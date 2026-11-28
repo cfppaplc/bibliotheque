@@ -825,9 +825,10 @@ const cleAbs = async (code, cle) => crypto.subtle.importKey("raw", await crypto.
 /* 27 nov. (Jeremy : « le prénom doit venir du dossier de l'élève ») : prénoms du registre de formation de l'enseignant
    (cet appareil, sinon son coffre). Seulement le prénom (premier mot). Gardé en mémoire 5 min. */
 let PRD = null, PRD_T = 0;
+const CLES_DOSSIER = {};   /* 28 nov. : clé de la carte de chaque élève (dossier de l'enseignant, sur cet appareil seulement) pour montrer son code QR */
 async function prenomsDossier(){
   if (PRD && Date.now() - PRD_T < 3e5) return PRD;
-  const N = {}, ajoute = el => { for (const id in (el || {})) { const e = el[id]; if (e && e.c && e.p && !e.x) N[e.c] = String(e.p).trim().split(/\s+/)[0].slice(0, 20); } };
+  const N = {}, ajoute = el => { for (const id in (el || {})) { const e = el[id]; if (e && e.c && e.p && !e.x) { N[e.c] = String(e.p).trim().split(/\s+/)[0].slice(0, 20); if (e.k) CLES_DOSSIER[e.c] = { k:e.k, g:e.g || "" }; } } };
   try { ajoute((JSON.parse(localStorage.getItem("passeportOutils") || "null") || {}).el); } catch(e){}
   if (!Object.keys(N).length) { try { await new Promise((ok, ko) => { if (window.COFFRE) return ok(); const sc = document.createElement("script"); sc.src = "coffre.js?v=275"; sc.onload = ok; sc.onerror = ko; document.head.appendChild(sc); });
     const r = await COFFRE.recevoir("passeport"); ajoute((JSON.parse((r && r.v && r.v.passeportOutils) || "null") || {}).el); } catch(e){} }
@@ -848,11 +849,21 @@ async function codesEleves(){
   const grps = Object.keys(G).sort((a, b) => a.localeCompare(b, "fr", { numeric:true }));
   const dessiner = () => { const q = norm($("#cdQ").value.trim()); let n = 0;
     $("#cdL").innerHTML = grps.map(g => { const L = [...G[g]].map(c => ({ c, p:N[c] || "" })).filter(x => !q || x.c.includes(q) || norm(x.p).includes(q)).sort((a, b) => (a.p || "~").localeCompare(b.p || "~", "fr") || a.c.localeCompare(b.c));
-      n += L.length; return L.length ? `<div class="sec">${esc(g)}</div><div class="carte cdC">${L.map(x => `<div class="cdR"><span>${x.p ? esc(x.p) : `<span class="sous">Prénom inconnu</span>`}</span><b>${esc(x.c)}</b></div>`).join("")}</div>` : ""; }).join("") || `<p class="vide">${grps.length ? "Aucun élève trouvé." : "Aucun groupe avec des codes. Les codes se créent dans Gestion d'atelier → Élèves."}</p>`; };
+      n += L.length; return L.length ? `<div class="sec">${esc(g)}</div><div class="carte cdC">${L.map(x => `<div class="cdR"${CLES_DOSSIER[x.c] ? ` data-qr="${esc(x.c)}" data-g="${esc(g)}" style="cursor:pointer"` : ""}><span>${x.p ? esc(x.p) : `<span class="sous">Prénom inconnu</span>`}</span><b>${esc(x.c)}</b>${CLES_DOSSIER[x.c] ? `<span class="lien" style="margin-left:10px">Code QR</span>` : ""}</div>`).join("")}</div>` : ""; }).join("") || `<p class="vide">${grps.length ? "Aucun élève trouvé." : "Aucun groupe avec des codes. Les codes se créent dans Gestion d'atelier → Élèves."}</p>`; };
   $("#app").innerHTML = `<a class="lien" href="magasin.html?mode=prof">‹ Commandes</a><h1>Codes des élèves</h1>
     <input id="cdQ" type="search" placeholder="Prénom ou code" autocomplete="off" style="width:100%;font-size:1.1rem;padding:12px 14px;border:1px solid var(--ligne);border-radius:12px;margin:6px 0 4px">
     ${deCoffre ? "" : `<p class="sous" style="font-size:.85rem">Pour voir tous les prénoms ici, connecte-toi une fois à <a href="index.html">Métier+</a> sur cet appareil.</p>`}<div id="cdL"></div>`;
   $("#cdQ").oninput = dessiner; dessiner();
+  /* 28 nov. (Jeremy : « dans Codes des élèves, je devrais voir les codes QR ») : toucher un élève montre le code QR de sa fiche
+     (même lien que la fiche imprimée), un seul à la fois, caché après 60 s */
+  $("#cdL").onclick = e => { const r = e.target.closest("[data-qr]"); if (!r) return; const c = r.dataset.qr, d = CLES_DOSSIER[c]; if (!d || !window.QRLib) return;
+    const u = location.origin + location.pathname.replace(/[^/]*$/, "") + "carte.html#c=" + encodeURIComponent("MP-" + c + "-" + d.k) + "&g=" + encodeURIComponent(r.dataset.g || d.g) + "&p=" + encodeURIComponent(N[c] || "");
+    const M = QRLib.matrice(u), k = M.length, o = document.createElement("div"); let t = 0;
+    o.style.cssText = "position:fixed;inset:0;z-index:9999;background:#fff;color:#1E2A44;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;text-align:center";
+    o.innerHTML = `<h2 style="margin:0 0 4px;font-size:1.8rem">${esc(N[c] || "Élève " + c)}</h2><p style="margin:0 0 12px;color:#555">Scanne ce code avec l'appareil photo de ton cellulaire</p>
+      <svg viewBox="0 0 ${k + 8} ${k + 8}" style="width:min(80vw,60vh);height:min(80vw,60vh)" shape-rendering="crispEdges"><rect width="${k + 8}" height="${k + 8}" fill="#fff"/>${M.map((l, y) => l.map((v, x) => v ? `<rect x="${x + 4}" y="${y + 4}" width="1" height="1"/>` : "").join("")).join("")}</svg>
+      <button class="btn p" style="margin-top:16px;min-height:56px;min-width:200px">Fermer</button>`;
+    const fin = () => { clearTimeout(t); o.remove(); }; o.querySelector("button").onclick = fin; t = setTimeout(fin, 60000); document.body.appendChild(o); };
 }
 async function ecranDirect(){ document.body.classList.add("ecranD");
   /* 26 nov. (Jeremy : « c'est pour moi ») : ouvert depuis la page enseignant, avec sa clé d'approbation (ses groupes), sans NIP. Sinon, NIP du comptoir. */

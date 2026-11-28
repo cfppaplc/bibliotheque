@@ -477,7 +477,7 @@ test("Magasin : page Codes des élèves (raccourci Commandes, cellulaire) : pré
     if (f === "coffre_lire") o = [{ data: JSON.stringify({ grp: ["2608 EGI"], codes: { "2608 EGI": ["12345", "45678"] } }) }];
     else if (f === "panier_prof_lire") o = [{ code: "45678", prenom: "Zoé", etat: "remis", t: new Date().toISOString() }];
     r.fulfill({ body: JSON.stringify(o), contentType: "application/json", headers: { "access-control-allow-origin": "*" } }); });
-  await ctx.addInitScript(() => { localStorage.setItem("bienvenueVu", "1"); localStorage.setItem("dernierId", "jeremy.raymond"); localStorage.setItem("magJeton|jeremy.raymond", JSON.stringify("j")); localStorage.setItem("passeportOutils", JSON.stringify({ el: { a: { p: "Alex", c: "12345", g: "2608 EGI" } } })); });
+  await ctx.addInitScript(() => { localStorage.setItem("bienvenueVu", "1"); localStorage.setItem("dernierId", "jeremy.raymond"); localStorage.setItem("magJeton|jeremy.raymond", JSON.stringify("j")); localStorage.setItem("passeportOutils", JSON.stringify({ el: { a: { p: "Alex", c: "12345", g: "2608 EGI", k: "K7Q9X2" } } })); });
   const p = await ctx.newPage(); p.on("pageerror", e => errs.push(e.message));
   await p.goto(BASE + "magasin.html?mode=prof"); await attendre(1500);
   vrai(/Codes des élèves/.test(await p.textContent("#app")), "Page Commandes : bouton « Codes des élèves » absent");
@@ -486,6 +486,9 @@ test("Magasin : page Codes des élèves (raccourci Commandes, cellulaire) : pré
   vrai(/Alex/.test(t) && /12345/.test(t) && /Zoé/.test(t) && /45678/.test(t), "Codes des élèves : prénoms ou codes manquants (" + t + ")");
   await p.fill("#cdQ", "zoe"); await attendre(300); const t2 = await p.textContent("#cdL");
   vrai(/45678/.test(t2) && !/12345/.test(t2), "Codes des élèves : la recherche ne filtre pas (" + t2 + ")");
+  /* 28 nov. : toucher un élève montre le code QR de sa fiche */
+  await p.fill("#cdQ", ""); await attendre(300); await p.click("[data-qr='12345']"); await attendre(300);
+  vrai(await p.evaluate(() => !!document.querySelector("body > div svg rect[width='1']") && /Alex/.test(document.body.lastElementChild.innerText)), "Codes des élèves : le code QR ne s'affiche pas");
   if (process.env.CAPTURES) await p.screenshot({ path: process.env.CAPTURES + "/codes-eleves.png" });
   vrai(!errs.length, "Codes des élèves : erreurs " + errs.join(" | ")); await ctx.close();
 });
