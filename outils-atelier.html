@@ -389,6 +389,7 @@ try { for (let w = window; ; w = w.parent){ if (/[?&]gestion=1/.test(w.location.
     if (!dlg.open) dlg.showModal();
     carteFiche(dlg, e);
     commandesFiche(dlg, e);
+    absencesFiche(dlg, e);
   }
   /* 25 nov. (Jeremy : « tout voir sur le dossier de l'élève : compte, coffre, commandes ») : paniers du magasin de l'élève (60 jours),
      lus avec la clé d'approbation du magasin gardée sur cet appareil */
@@ -415,6 +416,25 @@ try { for (let w = window; ; w = w.parent){ if (/[?&]gestion=1/.test(w.location.
         dlg.querySelector("[data-cle]").textContent = "MP-" + x.c + "-" + k1; bt.textContent = "Nouvelle carte faite";
         toast("Nouvelle carte : " + n + " livre" + (n > 1 ? "s" : "") + " transféré" + (n > 1 ? "s" : "") + ". Imprime-la : Étiquettes et fiches « Mon accès », coche seulement cet élève."); }
       catch(er){ bt.disabled = false; delete bt.dataset.sur; bt.textContent = "Carte perdue ou volée : nouvelle carte"; toast("Impossible : " + er.message); } };
+  }
+  /* 28 nov. (Jeremy : « une absence signalée, une fois vue, tombe archivée dans le dossier de l'élève ») : absences vues de cet élève
+     (1 an), déchiffrées sur cet appareil avec la clé du compte de l'enseignant (même enveloppe que magasin.html) */
+  async function absencesFiche(dlg, e){
+    if (!e.c) return; let ens = "", j = ""; try { ens = localStorage.getItem("dernierId") || ""; j = JSON.parse(localStorage.getItem("magJeton|" + ens) || '""'); } catch(x){} if (!j) return;
+    const b = dlg.querySelector(".fi-b"); if (!b) return; const h = document.createElement("h4"), L = document.createElement("div"); h.textContent = "Absences signalées"; L.className = "fi-l";
+    L.innerHTML = `<div><span class="s">…</span>Chargement…</div>`; b.appendChild(h); b.appendChild(L);
+    let A = []; try { const r = await fetch("https://nhxhfiaznuifcbobjuuv.supabase.co/rest/v1/rpc/absence_prof_eleve", { method:"POST", headers:{ apikey:"sb_publishable_GwzHRE-rG-rVafG7QcTOxg_S68OQHXh", "Content-Type":"application/json" }, body:JSON.stringify({ p_ens:ens, p_jeton:j, p_code:String(e.c) }) }); A = r.ok ? await r.json() : []; } catch(x){}
+    if (!A.length) { L.innerHTML = `<div><span class="s">–</span>Aucune absence classée</div>`; return; }
+    let priv = null; try { await new Promise((ok, ko) => { if (window.COFFRE) return ok(); const sc = document.createElement("script"); sc.src = "coffre.js?v=275"; sc.onload = ok; sc.onerror = ko; document.head.appendChild(sc); }); const s = await COFFRE.session(); priv = s && s.priv; } catch(x){}
+    const S = crypto.subtle, u8 = t => Uint8Array.from(atob(t), c => c.charCodeAt(0));
+    const ouvrir = async env => { const u = u8(String(env).slice(1));
+      if (env[0] === "E") { const bits = await S.deriveBits({ name:"ECDH", public:await S.importKey("raw", u.subarray(0, 65), { name:"ECDH", namedCurve:"P-256" }, false, []) }, priv, 256);
+        const k = await S.importKey("raw", await S.digest("SHA-256", bits), "AES-GCM", false, ["decrypt"]); return new TextDecoder().decode(await S.decrypt({ name:"AES-GCM", iv:u.subarray(65, 77) }, k, u.subarray(77))); }
+      return new TextDecoder().decode(await S.decrypt({ name:"RSA-OAEP" }, priv, u)); };
+    const G = { absence:"Absence", retard:"Retard", depart:"Départ hâtif" }, M = [null, "Raison personnelle", "Rendez-vous", "Raison personnelle", "Services aux élèves", "Activité autorisée", "Autre"];
+    const jr = d => new Date(d + "T12:00:00").toLocaleDateString("fr-CA", { weekday:"short", day:"numeric", month:"short" });
+    for (const a of A) { if (!a.data) continue; try { const o = JSON.parse(await ouvrir(a.data)); Object.assign(a, { genre:o.g, motif:o.m, part:o.p, heure:o.h }); } catch(x){ a.illisible = true; } }
+    L.innerHTML = A.map(a => `<div><span class="s">${a.vu ? "✓" : "!"}</span>${a.illisible ? "Absence" : esc(G[a.genre] || "Absence")} · ${esc(a.du === a.au ? jr(a.du) : jr(a.du) + " au " + jr(a.au))}${a.part === "am" ? " · avant-midi" : a.part === "pm" ? " · après-midi" : ""}${a.heure ? " · " + esc(a.heure) : ""}<small>${a.illisible ? "détails chiffrés : connecte-toi à Métier+ sur cet appareil" : esc(M[a.motif] || "")}${a.vu ? "" : " · pas encore vue"}</small></div>`).join("");
   }
   async function commandesFiche(dlg, e){
     if (!e.c) return; let ens = "", j = ""; try { ens = localStorage.getItem("dernierId") || ""; j = JSON.parse(localStorage.getItem("magJeton|" + ens) || '""'); } catch(x){}

@@ -358,7 +358,7 @@ test("Magasin : l'élève (carte scannée) envoie son panier, l'enseignant appro
   await c2.addInitScript(() => { localStorage.dernierId = "jeremy.raymond"; });
   const q = await c2.newPage(); q.on("pageerror", e => errs.push(e.message));
   await q.goto(BASE + "magasin.html?mode=prof"); await attendre(800); await q.click("#aOk"); await attendre(1200); await q.click("[data-ok]"); await attendre(1000);
-  { const e2 = await q.context().newPage(); await e2.goto(BASE + "magasin.html?mode=prof"); await attendre(1200); await e2.click(".edB"); await attendre(2000);   /* 26 nov. : écran « Magasin en direct » ouvert par l'enseignant, sans NIP */
+  { const e2 = await q.context().newPage(); await e2.goto(BASE + "magasin.html?mode=ecran"); await attendre(2000);   /* 28 nov. : bouton retiré (« inutile »), la page reste par son adresse */   /* 26 nov. : écran « Magasin en direct » ouvert par l'enseignant, sans NIP */
     vrai(!!(await e2.$(".ed-k")) && !(await e2.$("#nip, .nip")), "Magasin en direct : l'écran ne s'ouvre pas depuis la page enseignant");
     vrai(!!(await e2.$(".ed .ed-c")), "Magasin en direct : la commande approuvée n'apparaît pas");   /* 27 nov. : prénom tiré du dossier (aucun ici) */
     if (process.env.CAPTURES) await e2.screenshot({ path: process.env.CAPTURES + "/ecran-direct.png" }); await e2.close(); }

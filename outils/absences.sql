@@ -116,3 +116,11 @@ create or replace function public.absence_prof_lire(p_ens text, p_jeton text) re
 $$;
 revoke all on function public.absence_signaler(text, text, text, text[], date, date, jsonb) from public;
 grant execute on function public.absence_signaler(text, text, text, text[], date, date, jsonb) to anon, authenticated;
+
+-- 28 nov. (Jeremy : « une absence, une fois vue, tombe archivée dans le dossier de l'élève ») : absences d'un élève pour sa fiche (1 an)
+create or replace function public.absence_prof_eleve(p_ens text, p_jeton text, p_code text) returns setof jsonb language sql stable security definer set search_path = public, extensions as $$
+  select jsonb_build_object('id', id, 't', t, 'du', du, 'au', au, 'genre', genre, 'part', part, 'heure', heure, 'motif', motif, 'vu', p_ens = any(vu), 'data', data ->> p_ens)
+  from public.absence where public.panier_prof_ok(p_ens, p_jeton) and p_ens = any(profs) and code = p_code order by du desc, t desc limit 100;
+$$;
+revoke all on function public.absence_prof_eleve(text, text, text) from public;
+grant execute on function public.absence_prof_eleve(text, text, text) to anon, authenticated;
