@@ -11,7 +11,7 @@ async function page(b, opt = {}, prep) {
   const p = await ctx.newPage(); p.errs = []; p.on("pageerror", e => p.errs.push(e.message));
   p.envois = { supabase: 0, ntfy: 0 };
   await p.route(/supabase\.co\/rest\/v1\/rpc\/(journal_ecrire|stats_plus)/, r => { p.envois.supabase++; r.fulfill({ status: p.sbStatut || 204, body: "", headers: { "access-control-allow-origin": "*", "access-control-allow-headers": "*" } }); });
-  await p.route(/ntfy\.sh/, r => { p.envois.ntfy++; r.fulfill({ body: "{}", headers: { "access-control-allow-origin": "*" } }); });
+  await p.route(/ntfy\.sh|supabase\.co\/rest\/v1\/rpc\/boite_poster/, r => { p.envois.ntfy++; r.fulfill({ body: "true", contentType: "application/json", headers: { "access-control-allow-origin": "*", "access-control-allow-headers": "*" } }); });   /* « ntfy » = boîte de secours (au Canada depuis le 27 nov.) */
   return p;
 }
 const vrai = (c, m) => { if (!c) throw new Error(m); };
@@ -63,7 +63,7 @@ test("Script manquant : la bibliothèque se recharge une seule fois", async b =>
   vrai(nav === 2, nav + " chargements (attendu : 2)");
 });
 
-test("Journal de fluidité : rien pour un visiteur; Supabase d'abord, ntfy en secours", async b => {
+test("Journal de fluidité : rien pour un visiteur; Supabase d'abord, la boîte en secours (plus ntfy.sh)", async b => {
   const v = await page(b); await v.goto(BASE + "index.html"); await attendre(1200);
   vrai(!(await v.evaluate(() => !!window.journalPerf)), "Le journal tourne pour un visiteur");
   for (const [statut, sb, nt] of [[204, 1, 0], [404, 1, 1]]) {
@@ -652,28 +652,23 @@ test("Magasin : la carte d'essai de l'administrateur peut envoyer une commande m
   vrai(ENV.length === 1 && ENV[0].p_code === "69696", "Carte d'essai : la commande n'est pas envoyée quand le magasin est fermé");
   await ctx.close();
 });
-test("Carte : l'élève affiche sa carte avec son code ET son prénom (Loi 25); le code seul ne suffit pas; trop d'essais = pause", async b => {
-  const c = await b.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: "block" }), R = {}, errs = []; let E = 0;
+test("Carte : s'ouvre seulement par le code QR de la fiche ou le code complet; le code à 5 chiffres seul ne suffit pas; le serveur ne garde que l'empreinte", async b => {   /* 27 nov. (Loi 25) */
+  const c = await b.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: "block" }), R = {}, errs = []; let lu = 0;
   await c.route(/rpc\/carte_code_(ecrire|lire)/, r => { const a = JSON.parse(r.request().postData()), u = r.request().url(); let out;
-    if (/ecrire/.test(u)) { const x = R[a.p_code]; out = !x || x.jeton === a.p_jeton; if (out) R[a.p_code] = { jeton: a.p_nouveau || a.p_jeton, data: a.p_data, ph: a.p_ph || null }; }
-    else if (E >= 30) out = { etat: "bloque" };
-    else if (R[a.p_code] && R[a.p_code].ph && a.p_ph === R[a.p_code].ph) out = { etat: "ok", data: R[a.p_code].data };
-    else { E++; out = { etat: "non" }; }
+    if (/ecrire/.test(u)) { const x = R[a.p_code]; out = !x || x.jeton === a.p_jeton; if (out) R[a.p_code] = { jeton: a.p_nouveau || a.p_jeton, data: a.p_data, ph: a.p_ph }; } else { lu++; out = { etat: "non" }; }
     r.fulfill({ body: JSON.stringify(out), contentType: "application/json", headers: { "access-control-allow-origin": "*" } }); });
   const p = await c.newPage(); p.on("pageerror", e => errs.push(e.message)); await p.goto(BASE + "carte.html"); await attendre(600);
   await p.addScriptTag({ url: "js/eleve-cartes.js" });
   vrai(await p.evaluate(() => ELEVE_CARTES.publierCode({ c: "48213", k: "K7Q9X2", p: "Marc Tremblay", g: "5333" })), "Publication refusée");
-  await p.fill("#cle", "48213"); await attendre(500);
-  vrai(!(await p.evaluate(() => localStorage.getItem("mpCarte"))), "Le code seul ouvre encore la carte");
-  await p.fill("#pre", "Luc"); await p.click("#ok"); await attendre(700); vrai(/inconnu/.test(await p.textContent("#err")), "Un mauvais prénom ouvre la carte");
-  await p.fill("#pre", "marc"); await p.click("#ok"); await attendre(900);
-  vrai(/MP-48213-K7Q9X2/.test(await p.evaluate(() => localStorage.getItem("mpCarte"))), "Code + prénom n'ouvrent pas la carte");
-  vrai((await p.textContent("#vP")).trim() === "Marc", "Le prénom n'est pas sur la carte");
-  /* carte perdue : la recherche suit la nouvelle clé; personne d'autre ne peut la remplacer */
-  vrai(await p.evaluate(() => ELEVE_CARTES.publierCode({ c: "48213", k: "NEWK44", p: "Marc" }, "K7Q9X2")), "Nouvelle carte : recherche non mise à jour");
+  vrai(R["48213"] && R["48213"].data === null && R["48213"].ph === null, "Le serveur reçoit encore la carte chiffrée");
+  vrai(await p.evaluate(() => ELEVE_CARTES.publierCode({ c: "48213", k: "NEWK44", p: "Marc" }, "K7Q9X2")), "Nouvelle carte : empreinte non mise à jour");
   vrai(!(await p.evaluate(() => ELEVE_CARTES.publierCode({ c: "48213", k: "PIRATE", p: "Marc" }))), "N'importe qui peut remplacer la carte");
-  E = 30; await p.evaluate(() => localStorage.removeItem("mpCarte")); await p.reload(); await attendre(600);
-  await p.fill("#cle", "48213"); await p.fill("#pre", "Marc"); await p.click("#ok"); await attendre(500); vrai(/Trop d'essais/.test(await p.textContent("#err")), "Pas de pause après trop d'essais");
+  await p.click("summary"); await p.fill("#cle", "48213"); await p.click("#ok"); await attendre(500);
+  vrai(!(await p.evaluate(() => localStorage.getItem("mpCarte"))) && /code QR/.test(await p.textContent("#err")) && lu === 0, "Le code seul ouvre encore la carte");
+  await p.fill("#cle", "MP-48213-K7Q9X2"); await p.click("#ok"); await attendre(600);
+  vrai(/MP-48213-K7Q9X2/.test(await p.evaluate(() => localStorage.getItem("mpCarte"))), "Le code complet n'ouvre pas la carte");
+  await p.evaluate(() => localStorage.removeItem("mpCarte")); const q = await c.newPage(); await q.goto(BASE + "carte.html#c=MP-51234-ZZZZ99&g=2608PLCA1&p=Lucas"); await attendre(700);
+  vrai(/MP-51234-ZZZZ99/.test(await q.evaluate(() => localStorage.getItem("mpCarte"))) && (await q.textContent("#vP")).trim() === "Lucas", "Le code QR de la fiche n'ouvre pas la carte");
   vrai(!errs.length, errs.join(" | ")); await c.close();
 });
 test("Plein écran : reste actif en changeant de page (coquille)", async b => {   /* 27 nov. (Jeremy : « je veux que ça reste en plein écran sur tout le site ») */

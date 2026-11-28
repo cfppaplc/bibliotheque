@@ -5,7 +5,7 @@ const HEURES_MAG_DEF = { jours:[1, 2, 3, 4, 5], plages:[["08:30", "09:30"], ["09
    Signalements : le sujet ntfy ne garde les messages que 12 h; l'ordinateur de l'administrateur les recopie
    dans localStorage.signalements (synchronisé par le coffre, sorte biblio) dès qu'il ouvre la bibliothèque, puis à chaque heure. */
 window.ADMIN_SITE = (function(){
-  const SUJET = "https://ntfy.sh/metierplus-signal-f3ce60fd2f6c0f46";
+  const SUJET = "metierplus-signal-f3ce60fd2f6c0f46";   /* 27 nov. (Loi 25) : boîte au Canada (signaler.js, mpBoite), plus ntfy.sh */
   const SUPA = "https://nhxhfiaznuifcbobjuuv.supabase.co", CLE = "sb_publishable_GwzHRE-rG-rVafG7QcTOxg_S68OQHXh";
   const DEPOT = "cfppaplc/bibliotheque";
   const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
@@ -18,7 +18,7 @@ window.ADMIN_SITE = (function(){
   async function recolter(){
     if (!admin()) return 0; const o = lire(), ids = new Set(o.L.map(x => x.id));
     try {
-      const r = await fetch(SUJET + "/json?poll=1&since=12h", { cache:"no-store" }); if (!r.ok) return 0;
+      const r = await mpBoite.lire(SUJET, 336); if (!r.ok) return 0;
       let n = 0;
       (await r.text()).split("\n").forEach(l => { if (!l.trim()) return; let m; try { m = JSON.parse(l); } catch(e){ return; }
         if (m.event !== "message" || ids.has(m.id)) return; ids.add(m.id); n++;

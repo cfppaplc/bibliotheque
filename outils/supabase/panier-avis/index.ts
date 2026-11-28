@@ -43,7 +43,16 @@ Deno.serve(async (req) => {
       const raw = new Uint8Array(await crypto.subtle.exportKey("raw", (k as CryptoKeyPair).publicKey));
       return json({ cle: btoa(String.fromCharCode(...raw)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "") });
     }
-    const { id, eleve, avis, comptoir, absence } = await req.json();
+    const { id, eleve, avis, comptoir, absence, boite } = await req.json();
+    if (boite) {   /* 27 nov. (Loi 25) : la boîte remplace ntfy.sh; demandes d'accès, propositions, signalements et pannes → cellulaire des administrateurs */
+      const { data: m } = await sb.from("boite").select("*").eq("id", boite).maybeSingle();
+      if (!m || Date.now() - new Date(m.t).getTime() > 120000) return json({ ok: false });
+      let adm: string[] = []; try { const C = (await (await fetch("https://metierplus.app/comptes.json")).json()).comptes || {}; adm = Object.keys(C).filter(x => C[x].admin); } catch (_) { adm = ["jeremy.raymond"]; }
+      const dem = /^DEMANDE-/.test(m.corps), prop = /^PROPOSITION-/.test(m.corps);
+      const msg = JSON.stringify({ title: dem ? "Demande d'accès à Métier+" : prop ? "Proposition d'un enseignant" : (m.titre || "Métier+"),
+        body: dem || prop ? "À voir dans Administration." : String(m.corps).slice(0, 160), url: "/index.html", tag: "boite-" + m.id });
+      return json({ ok: true, n: await envoyer(adm, msg, k) });
+    }
     if (comptoir) {   /* iPad du comptoir : nouvelle commande approuvée (code et nombre de raccords seulement) */
       const { data: p } = await sb.from("panier").select("id,code,items,etat,t_app").eq("id", id).maybeSingle();
       if (!p || p.etat !== "approuve" || Date.now() - new Date(p.t_app).getTime() > 120000) return json({ ok: false });

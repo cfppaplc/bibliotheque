@@ -25,14 +25,8 @@ function relais(topic, quand, etat){
     /* 22 nov. : relais de secours (ntfy, comme le Défi+). On écoute toujours les deux; on envoie par Supabase quand il est branché,
        sinon (après 6 s sans lui) par ntfy. Chaque message porte l'appareil d'origine pour ignorer son propre écho. */
     const moiR = Math.random().toString(36).slice(2, 9), t0 = Date.now(); let secours = false;
-    const parSecours = () => !pret && Date.now() - t0 > 6000;
-    const posterSecours = o => fetch("https://ntfy.sh/" + topic, {method: "POST", body: JSON.stringify(o)}).catch(() => {});
-    try { const es = new EventSource("https://ntfy.sh/" + topic + "/sse");
-      es.onopen = () => { secours = true; if (!pret) etat(Date.now() - t0 > 6000 ? "secours" : false); };
-      es.onerror = () => { secours = false; };
-      es.onmessage = e => { try { const d = JSON.parse(e.data); if (d.event !== "message") return; const o = JSON.parse(d.message); if (o._r === moiR) return; quand(o); } catch(x) {} }; } catch(e) {}
-    setTimeout(() => { if (!pret && secours) { etat("secours"); const a = attente; attente = []; a.forEach(envoi); } }, 6500);
-    envoi = o => { o._r = moiR; if (pret) { ch.send({type: "broadcast", event: "m", payload: o}).catch(() => {}); return; } if (parSecours()) { posterSecours(o); return; } attente.push(o); };
+    /* 27 nov. (Loi 25) : plus de relais de secours ntfy.sh (service américain); la bibliothèque Supabase est maintenant sur notre site */
+    envoi = o => { o._r = moiR; if (pret) { ch.send({type: "broadcast", event: "m", payload: o}).catch(() => {}); return; } attente.push(o); };
     const abonner = () => { const g = ++gen; clearTimeout(reT); reT = null; pret = false; enCours = true;
       const vieux = sb; if (vieux) setTimeout(() => { try { vieux.removeAllChannels(); } catch(e) {} }, 0);
       sb = window.supabase.createClient(SB_URL, SB_CLE, {auth: {persistSession: false, autoRefreshToken: false, detectSessionInUrl: false}, realtime: {params: {eventsPerSecond: 20}}});

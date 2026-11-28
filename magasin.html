@@ -15,7 +15,7 @@
       : m.get("poste") ? ["magasin-poste.webmanifest", "img/icone-180.png", "Magasin"] : ["manifest.webmanifest", "img/icone-180.png", "Magasin"];
   document.write('<link rel="manifest" href="' + v[0] + '"><link rel="apple-touch-icon" href="' + v[1] + '"><meta name="apple-mobile-web-app-title" content="' + v[2] + '"><meta name="apple-mobile-web-app-capable" content="yes">');
   document.title = v[2]; }</script>
-<script src="vieux-navigateur.js?v=273"></script><script src="js/session-dep.js?v=5"></script><script src="signaler.js?v=273"></script>
+<script src="vieux-navigateur.js?v=274"></script><script src="js/session-dep.js?v=5"></script><script src="signaler.js?v=274"></script>
 <style>
 /* © 2026 Jérémy Raymond. Tous droits réservés. Métier+ — Magasin de raccords (25 nov.) */
 :root{--fond:#F4F1EC;--carte:#fff;--carte2:#F8F6F2;--txt:#1E2A44;--doux:#6b7280;--ligne:#E5DAC6;--acc:#EB6A22;--vert:#1E8A55;--rouge:#C9362E;color-scheme:light}
@@ -693,7 +693,7 @@ async function dessinerProf(){
   clearTimeout(profT);
   /* 27 nov. : la liste des codes des élèves se republie toute seule (js/registre-auto.js), aussi depuis le raccourci Commandes */
   if (!window.__regAuto) { window.__regAuto = 1; const charge = src => new Promise(ok => { const sc = document.createElement("script"); sc.src = src; sc.onload = sc.onerror = ok; document.head.appendChild(sc); });
-    (window.COFFRE ? Promise.resolve() : charge("coffre.js?v=273")).then(() => charge("js/registre-auto.js?v=3")); }
+    (window.COFFRE ? Promise.resolve() : charge("coffre.js?v=274")).then(() => charge("js/registre-auto.js?v=3")); }
   let L; try { L = await rpc("panier_prof_lire", { p_ens:ENS, p_jeton:JETON }); } catch(e){ $("#app").innerHTML = `<p class="err">Pas de connexion pour l'instant. On réessaie tout seul.</p>`; profT = setTimeout(dessinerProf, 15000); return; }
   { const N = await prenomsDossier(); (L || []).forEach(p => { p.prenom = N[p.code] || ""; }); PRENOMS_CMD = Object.fromEntries((L || []).map(p => [p.id, p.prenom || ""])); }   /* le prénom vient du dossier, jamais de ce que l'élève a tapé */
   let AVIS = []; try { AVIS = await rpc("panier_prof_avis", { p_ens:ENS, p_jeton:JETON }) || []; } catch(e){}
@@ -809,7 +809,7 @@ let SESS_C;
 async function prenomsComptoir(L){ if (!L.some(p => chiffre(p.prenom))) { L.forEach(p => { if (chiffre(p.prenom)) p.prenom = ""; }); return; }
   await sessionCoffre();
   for (const p of L) { if (!chiffre(p.prenom)) continue; let t = ""; try { if (SESS_C && SESS_C.priv) t = await ouvrirEnv(p.prenom, SESS_C.priv); } catch(e){} p.prenom = t; } }
-async function sessionCoffre(){ if (SESS_C === undefined) { SESS_C = null; try { await new Promise((ok, ko) => { if (window.COFFRE) return ok(); const sc = document.createElement("script"); sc.src = "coffre.js?v=273"; sc.onload = ok; sc.onerror = ko; document.head.appendChild(sc); }); SESS_C = await COFFRE.session(); } catch(e){} } return SESS_C; }
+async function sessionCoffre(){ if (SESS_C === undefined) { SESS_C = null; try { await new Promise((ok, ko) => { if (window.COFFRE) return ok(); const sc = document.createElement("script"); sc.src = "coffre.js?v=274"; sc.onload = ok; sc.onerror = ko; document.head.appendChild(sc); }); SESS_C = await COFFRE.session(); } catch(e){} } return SESS_C; }
 /* absences chiffrées : l'enseignant ouvre la partie qui lui est destinée (genre, motif, moment) */
 async function ouvrirAbs(L, ens){ if (!L.some(a => a.data)) return; const S = await sessionCoffre();
   for (const a of L) { if (!a.data) continue; try { const o = JSON.parse(await ouvrirEnv(a.data, S.priv)); Object.assign(a, { genre:o.g, motif:o.m, part:o.p || "j", heure:o.h || "" }); } catch(e){ a.genre = ""; a.motif = 0; a.illisible = true; } } }
@@ -821,7 +821,7 @@ async function prenomsDossier(){
   if (PRD && Date.now() - PRD_T < 3e5) return PRD;
   const N = {}, ajoute = el => { for (const id in (el || {})) { const e = el[id]; if (e && e.c && e.p && !e.x) N[e.c] = String(e.p).trim().split(/\s+/)[0].slice(0, 20); } };
   try { ajoute((JSON.parse(localStorage.getItem("passeportOutils") || "null") || {}).el); } catch(e){}
-  if (!Object.keys(N).length) { try { await new Promise((ok, ko) => { if (window.COFFRE) return ok(); const sc = document.createElement("script"); sc.src = "coffre.js?v=273"; sc.onload = ok; sc.onerror = ko; document.head.appendChild(sc); });
+  if (!Object.keys(N).length) { try { await new Promise((ok, ko) => { if (window.COFFRE) return ok(); const sc = document.createElement("script"); sc.src = "coffre.js?v=274"; sc.onload = ok; sc.onerror = ko; document.head.appendChild(sc); });
     const r = await COFFRE.recevoir("passeport"); ajoute((JSON.parse((r && r.v && r.v.passeportOutils) || "null") || {}).el); } catch(e){} }
   PRD = N; PRD_T = Date.now();
   try { if (Object.keys(N).length && self.caches) caches.open("mp-prenoms").then(c => c.put("/__prenoms", new Response(JSON.stringify(N), { headers:{ "Content-Type":"application/json" } }))); } catch(e){}   /* pour les avis du cellulaire (sw.js) */
@@ -1069,6 +1069,6 @@ async function remettre(id, oui){ try { await rpcM("panier_remettre", { p_id:id,
 })();
 if ("serviceWorker" in navigator) addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
 </script>
-<script src="js/journal-perf.js?v=9"></script>
+<script src="js/journal-perf.js?v=10"></script>
 </body>
 </html>

@@ -42,12 +42,12 @@ input.cache-code:not(:placeholder-shown){-webkit-text-security:disc;text-securit
   <div class="tete"><img src="img/metier-plus-blanc.svg" alt="Métier+"><span>Carte de l'élève</span></div>
   <div id="vide" hidden>
     <h1 style="font-size:1.4rem">Ma carte Métier+</h1>
-    <p class="sous">Tape ton code à 5 chiffres et ton prénom. Ta carte reste ensuite sur ton cellulaire.</p>
-    <div class="boite"><input class="cache-code code" id="cle" inputmode="numeric" autocomplete="off" autocapitalize="characters" placeholder="00000" aria-label="Ton code">
-    <input class="code" id="pre" autocomplete="off" autocapitalize="words" placeholder="Ton prénom" aria-label="Ton prénom" style="margin-top:10px;letter-spacing:0;font-size:1.2rem">
+    <p class="sous">Scanne le code QR de ta fiche « Ma carte » avec l'appareil photo de ton cellulaire. Tu n'as à le faire qu'une fois : ta carte reste ensuite sur ton cellulaire.</p>
+    <p class="sous">Tu n'as pas ta fiche ? Demande-la à ton enseignant.</p>
+    <details style="margin-top:14px;opacity:.85"><summary style="cursor:pointer;font-size:.9rem">J'ai le code complet de ma carte</summary>
+    <div class="boite"><input class="cache-code code" id="cle" autocomplete="off" autocapitalize="characters" placeholder="MP-00000-XXXX" aria-label="Code complet de ta carte">
     <p class="err" id="err"></p>
-    <button class="btn" id="ok">Afficher ma carte</button></div>
-    <p style="opacity:.75;font-size:.85rem;margin-top:14px">Tu peux aussi scanner le code QR de ta fiche « Ma carte » avec l'appareil photo.</p>
+    <button class="btn" id="ok">Afficher ma carte</button></div></details>
   </div>
   <div id="vue" hidden>
     <div class="carte"><div class="g" id="vG"></div><div class="p" id="vP"></div><div class="n" id="vN"></div><img class="cb" id="vCb" alt=""><div class="qr" id="vQr"></div><small>Montre cette carte au magasin, aux coffres et pour tes livres.</small></div>
@@ -67,14 +67,6 @@ const valide = c => /^MP-\d{3,5}-[A-Z0-9]{4,12}$/.test(c);
 (() => { const h = new URLSearchParams(location.hash.slice(1)), c = (h.get("c") || "").toUpperCase();
   if (valide(c)) { LS.set("mpCarte", { c, g:h.get("g") || "", p:(h.get("p") || "").split(/\s+/)[0].slice(0, 30), t:Date.now() }); history.replaceState(null, "", location.pathname); } })();
 /* carte sans prénom (entrée avec l'ancienne clé complète) : le prénom vient de la fiche de l'élève, publiée par le registre */
-/* 27 nov. (vérification Loi 25) : le code seul ne suffit plus; il faut aussi le prénom (clé et empreinte tirées des deux) */
-const prenomN = p => String(p || "").trim().split(/\s+/)[0].normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-async function chercherCode(c, pre){ const te = new TextEncoder(), pn = prenomN(pre), base = "metier+|carte-code|" + c + "|" + pn;
-  const ph = [...new Uint8Array(await crypto.subtle.digest("SHA-256", te.encode("metier+|carte-code-ph|" + c + "|" + pn)))].map(x => x.toString(16).padStart(2, "0")).join("");
-  const r = await (await fetch("https://nhxhfiaznuifcbobjuuv.supabase.co/rest/v1/rpc/carte_code_lire", { method:"POST", headers:{ apikey:"sb_publishable_GwzHRE-rG-rVafG7QcTOxg_S68OQHXh", "Content-Type":"application/json" }, body:JSON.stringify({ p_code:c, p_ph:ph }) })).json();
-  if (!r || r.etat !== "ok") return r && r.etat === "bloque" ? "bloque" : null;
-  const b = Uint8Array.from(atob(JSON.parse(r.data).d), x => x.charCodeAt(0)), cle = await crypto.subtle.importKey("raw", await crypto.subtle.digest("SHA-256", te.encode(base + "|cle")), "AES-GCM", false, ["decrypt"]);
-  return JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({ name:"AES-GCM", iv:b.slice(0, 12) }, cle, b.slice(12)))); }
 let PRENOM_FAIT = false;
 async function completerPrenom(K){ PRENOM_FAIT = true; }   /* 27 nov. : la carte ne se lit plus sans le prénom; le prénom vient du magasin (registre) */
 let montreT = 0;
@@ -97,18 +89,11 @@ function afficher(){
   try { navigator.wakeLock && navigator.wakeLock.request("screen").catch(() => {}); } catch(e){}   /* l'écran ne s'éteint pas pendant qu'on scanne */
 }
 $("#ok").onclick = async () => { const c = $("#cle").value.trim().toUpperCase().replace(/\s+/g, "");
-  if (valide(c)) { LS.set("mpCarte", { c, g:"", p:"", t:Date.now() }); afficher(); return; }   /* clé complète (ancienne façon) */
-  if (!/^\d{5}$/.test(c)) { $("#err").textContent = "Écris ton code à 5 chiffres."; return; }
-  const pre = $("#pre").value.trim();
-  { const e = await codeEssai(c); if (e) { LS.set("mpCarte", { c:e.c, g:e.g, p:e.p, t:Date.now() }); $("#err").textContent = ""; afficher(); return; } }   /* code d'essai (administrateur) */
-  if (!pre) { $("#err").textContent = "Écris aussi ton prénom."; $("#pre").focus(); return; }
-  $("#err").textContent = "Recherche…";
-  try { const o = await chercherCode(c, pre);
-    if (o === "bloque") { $("#err").textContent = "Trop d'essais en ce moment. Réessaie dans 10 minutes."; return; }
-    if (!o) { $("#err").textContent = "Code ou prénom inconnu. Vérifie avec ton enseignant."; return; }
-    $("#err").textContent = ""; LS.set("mpCarte", { c:o.c, g:o.g || "", p:o.p || "", t:Date.now() }); afficher(); }
-  catch(e){ $("#err").textContent = "Internet ne répond pas. Réessaie."; } };
-$("#cle").onkeydown = e => { if (e.key === "Enter") $("#ok").click(); }; $("#cle").oninput = () => { if (/^\d{5}$/.test($("#cle").value.trim())) $("#pre").focus(); }; $("#pre").onkeydown = e => { if (e.key === "Enter") $("#ok").click(); };
+  if (valide(c)) { LS.set("mpCarte", { c, g:"", p:"", t:Date.now() }); afficher(); return; }   /* code complet (avec la clé secrète) */
+  { const e = /^\d{5}$/.test(c) && await codeEssai(c); if (e) { LS.set("mpCarte", { c:e.c, g:e.g, p:e.p, t:Date.now() }); $("#err").textContent = ""; afficher(); return; } }   /* code d'essai (administrateur) */
+  /* 27 nov. (Loi 25) : le code à 5 chiffres seul n'ouvre plus la carte; seulement le code QR de la fiche ou le code complet */
+  $("#err").textContent = "Scanne plutôt le code QR de ta fiche « Ma carte ». Demande-la à ton enseignant."; };
+$("#cle").onkeydown = e => { if (e.key === "Enter") $("#ok").click(); };
 $("#oublier").onclick = () => { if (!confirm("Retirer cette carte de ce cellulaire ?")) return; try { localStorage.removeItem("mpCarte"); } catch(e){} afficher(); };
 afficher();
 if ("serviceWorker" in navigator) addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));

@@ -60,3 +60,9 @@ begin
 end $$;
 revoke all on function carte_code_ecrire(text, text, text, text, text), carte_code_lire(text, text) from public;
 grant execute on function carte_code_ecrire(text, text, text, text, text), carte_code_lire(text, text) to anon, authenticated;
+
+-- 27 nov. (Loi 25, Jeremy : « go ») : la carte ne s'ouvre plus avec le code tapé à la main (seulement le code QR de la fiche).
+-- Le serveur ne garde plus la carte chiffrée ni l'empreinte code + prénom : seulement le jeton (empreinte code + clé secrète).
+drop function if exists carte_code_lire(text, text);
+update carte_code set data = null, ph = null;
+delete from carte_echecs;

@@ -307,8 +307,7 @@ window.MESDOCS = (function(){
       maj(id, { prop:"envoye", pid }); avis("Proposition envoyée à l'administrateur.", 3500);
     } catch(er){ avis("La proposition n'a pas pu partir : " + er.message); } }
   async function envoyerAvis(code, titre){
-    const r = await fetch(ACCES.outils.BOITE, { method:"POST", body:code, headers:{ Title:"Proposition : " + ACCES.outils.sansAcc(titre).replace(/[^\x20-\x7e]/g, ""), Tags:"inbox_tray" } });
-    if (!r.ok) throw new Error("réponse " + r.status); }
+    await mpBoite.poster(ACCES.outils.BOITE, code, "Proposition : " + titre, "inbox_tray"); }
   async function relancerPropositions(){   /* ntfy ne garde les avis que 12 h : renvoyer aux 6 h tant que ce n'est pas publié (14 jours au plus) */
     const att = lj("propsEnAttente", {}), aj = window.REGLAGES_AJOUTS || []; let ch = false;
     for (const pid in att){ const a = att[pid];
@@ -325,7 +324,7 @@ window.MESDOCS = (function(){
     return CACHE[p.pid] = new Blob(parts, { type:p.type || (p.ext === "pdf" ? "application/pdf" : "") }); }
   async function lirePropositions(){
     const vues = lj("propsVues", {});
-    try { const r = await fetch(ACCES.outils.BOITE + "/json?poll=1&since=12h", { cache:"no-store" });
+    try { const r = await mpBoite.lire(ACCES.outils.BOITE, 336);
       if (r.ok) (await r.text()).split("\n").filter(Boolean).forEach(l => { try { const m = JSON.parse(l); if (m.event !== "message" || !/^PROPOSITION-/.test(m.message || "")) return;
         const p = JSON.parse(new TextDecoder().decode(unb64u(m.message.trim().slice(12)))); if (p && p.pid && !vues[p.pid]) vues[p.pid] = p; } catch(x){} }); } catch(x){}
     ej("propsVues", vues); const f = FAITES();

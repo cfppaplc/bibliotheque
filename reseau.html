@@ -18,7 +18,7 @@ button.s{background:#232c40}
 .retour{margin-top:26px;color:#aab3c5}.retour a{color:#EB6A22}
 </style>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.50.0/dist/umd/supabase.min.js" integrity="sha384-jP+y6mxch/vbLrNpx4basfv6ciZQuHwdRHgZGa6Mhja0Xm4p87ok2OQavTrRIGxH" crossorigin="anonymous"></script>
+<script src="lib/supabase/supabase.min.js" integrity="sha384-jP+y6mxch/vbLrNpx4basfv6ciZQuHwdRHgZGa6Mhja0Xm4p87ok2OQavTrRIGxH" crossorigin="anonymous"></script>
 </head><body>
 <img class="logo" src="img/metier-plus-blanc.svg" alt="Métier+">
 <h1>Test de connexion</h1>
@@ -50,7 +50,7 @@ function t3(){return new Promise(res=>{let fini=false;const fin=(c,t,v)=>{if(fin
    if(!a.length)return fin("mal","aucun message",null);const m=Math.round(med(a));
    fin(perdus?"mal":m<250?"ok":m<700?"moy":"mal",m+" ms"+(perdus?"<br><small>"+perdus+" perdu(s) sur 10</small>":""),m)},1500);return}
    envoi[n]=performance.now();ch.send({type:"broadcast",event:"p",payload:{i:n}});n++;setTimeout(go,300)};go()})})}
-async function t4(){try{const t=performance.now();const r=await fetch("https://ntfy.sh/v1/health",{cache:"no-store"});const m=Math.round(performance.now()-t);
+async function t4(){try{const t=performance.now();const r=await fetch("https://nhxhfiaznuifcbobjuuv.supabase.co/rest/v1/rpc/boite_lire",{method:"POST",cache:"no-store",headers:{apikey:"sb_publishable_GwzHRE-rG-rVafG7QcTOxg_S68OQHXh","Content-Type":"application/json"},body:"{\"p_sujet\":\"essai\",\"p_heures\":1}"});/* 27 nov. : boîte au Canada (plus ntfy.sh) */const m=Math.round(performance.now()-t);
  mettre("r4",r.ok?"ok":"mal",r.ok?m+" ms":"erreur");return r.ok}catch(e){mettre("r4","mal","bloqué");return false}}
 $("#go").onclick=async()=>{$("#go").disabled=true;$("#go").textContent="Test en cours…";$("#bilan").textContent="";
  document.querySelectorAll(".r").forEach(r=>{r.className="r";r.querySelector(".v").textContent="…"});

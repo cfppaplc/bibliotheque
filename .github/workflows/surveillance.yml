@@ -1,5 +1,5 @@
 # Surveillance (25 nov.) : toutes les 30 minutes, le site et Supabase répondent-ils ?
-# En cas de panne : avis « Panne Métier+ » dans les signalements (ntfy) + exécution en rouge dans Actions.
+# En cas de panne : avis « Panne Métier+ » dans les signalements (boîte au Canada, avis sur le cellulaire) + exécution en rouge dans Actions.
 # Au plus un avis par panne : l'avis n'est pas renvoyé tant que la panne dure (fichier gardé en cache).
 name: Surveillance du site
 on:
@@ -33,11 +33,12 @@ jobs:
           if [ -n "$pannes" ]; then
             echo "Panne :$pannes"
             if [ "$avant" = "ok" ]; then
-              curl -s -H "Title: Panne Metier+" -H "Priority: high" -H "Tags: warning" -d "Ne répond pas :$pannes Vérifié 3 fois en 2 minutes à $(TZ=America/Toronto date '+%H h %M')." https://ntfy.sh/metierplus-signal-f3ce60fd2f6c0f46 >/dev/null
+              # 27 nov. (Loi 25) : boîte au Canada (plus ntfy.sh); si Supabase est en panne, l'exécution rouge dans Actions avertit quand même
+              curl -s -X POST "https://nhxhfiaznuifcbobjuuv.supabase.co/rest/v1/rpc/boite_poster" -H "apikey: sb_publishable_GwzHRE-rG-rVafG7QcTOxg_S68OQHXh" -H "Content-Type: application/json" -d "{\"p_sujet\":\"metierplus-signal-f3ce60fd2f6c0f46\",\"p_titre\":\"Panne Métier+\",\"p_prio\":4,\"p_tags\":\"warning\",\"p_corps\":\"Ne répond pas :$pannes Vérifié 3 fois en 2 minutes à $(TZ=America/Toronto date '+%H h %M').\"}" >/dev/null
             fi
             echo "panne" > etat-panne.txt; echo "PANNE=1" >> $GITHUB_ENV
           else
-            if [ "$avant" = "panne" ]; then curl -s -H "Title: Metier+ fonctionne de nouveau" -H "Tags: white_check_mark" -d "Le site et Supabase répondent de nouveau ($(TZ=America/Toronto date '+%H h %M'))." https://ntfy.sh/metierplus-signal-f3ce60fd2f6c0f46 >/dev/null; fi
+            if [ "$avant" = "panne" ]; then curl -s -X POST "https://nhxhfiaznuifcbobjuuv.supabase.co/rest/v1/rpc/boite_poster" -H "apikey: sb_publishable_GwzHRE-rG-rVafG7QcTOxg_S68OQHXh" -H "Content-Type: application/json" -d "{\"p_sujet\":\"metierplus-signal-f3ce60fd2f6c0f46\",\"p_titre\":\"Métier+ fonctionne de nouveau\",\"p_tags\":\"white_check_mark\",\"p_corps\":\"Le site et Supabase répondent de nouveau ($(TZ=America/Toronto date '+%H h %M')).\"}" >/dev/null; fi
             echo "ok" > etat-panne.txt; echo "Tout répond."
           fi
       - uses: actions/cache/save@v4

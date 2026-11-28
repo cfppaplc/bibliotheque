@@ -187,13 +187,11 @@ window.ACCES = (function(){
   /* ---- demande d'inscription : la paire de clés est créée ici; seule la clé publique et la clé privée cadenassée partent ---- */
   const idDe = nom => sansAcc(nom).toLowerCase().replace(/[^a-z0-9]+/g, ".").replace(/^\.|\.$/g, "");
   const sansAcc = t => t.normalize("NFD").replace(/[̀-ͯ]/g, "");
-  /* boîte des demandes : sujet ntfy.sh (gratuit, sans compte). La demande va directement dans le panneau de l'admin.
-     ntfy.sh garde les messages 12 h : la demande est donc renvoyée toute seule (au plus toutes les 6 h) tant qu'elle n'est pas acceptée,
-     et le panneau garde sur l'ordinateur de l'admin les demandes déjà vues. Jeremy peut aussi s'abonner à ce sujet dans l'appli ntfy (avis sur son cellulaire). */
-  const BOITE = "https://ntfy.sh/biblio-pavillon-5edf93926a704efe";
+  /* boîte des demandes (au Canada depuis le 27 nov.; avant ntfy.sh). La demande va directement dans le panneau de l'admin et un avis part sur son cellulaire.
+     La demande est encore renvoyée toute seule (au plus toutes les 6 h) tant qu'elle n'est pas acceptée; le panneau garde les demandes déjà vues. */
+  const BOITE = "biblio-pavillon-5edf93926a704efe";   /* 27 nov. (Loi 25) : boîte au Canada (signaler.js, mpBoite), plus ntfy.sh; gardée 14 jours */
   async function envoyerDemande(code, nom){
-    const r = await fetch(BOITE, { method:"POST", body:code, headers:{ Title:"Demande d'acces", Tags:"books" }   /* 27 nov. (Loi 25) : plus de nom dans le titre public */ });
-    if (!r.ok) throw new Error("réponse " + r.status);
+    await mpBoite.poster(BOITE, code, "Demande d'accès", "books");
     try { localStorage.setItem("demandeEnAttente", JSON.stringify({ code, id:idDe(nom), nom, x:lireDemande(code).pub.x, envoi:Date.now() })); } catch(e){}
   }
   async function relancerDemande(){      /* au chargement : la demande de cet ordinateur est-elle encore en attente ? */
@@ -203,7 +201,7 @@ window.ACCES = (function(){
   }
   async function lireBoite(){            /* demandes reçues (12 dernières heures) + celles déjà vues sur cet ordinateur */
     let vues = {}; try { vues = JSON.parse(localStorage.getItem("demandesVues") || "{}"); } catch(e){}
-    try { const r = await fetch(BOITE + "/json?poll=1&since=12h", { cache:"no-store" });
+    try { const r = await mpBoite.lire(BOITE, 336);
       if (r.ok) (await r.text()).split("\n").filter(Boolean).forEach(l => { try { const m = JSON.parse(l); if (m.event !== "message" || !/^DEMANDE-/.test(m.message || "")) return;
         if (IGN().includes(m.message.trim())) return;   /* demande déjà ignorée sur cet ordinateur (même code renvoyé) */
         const d = lireDemande(m.message); if (!vues[d.id] || vues[d.id].t < m.time) vues[d.id] = { code:m.message, t:m.time }; } catch(e){} }); } catch(e){}

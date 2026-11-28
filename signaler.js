@@ -1,10 +1,21 @@
 /* © 2026 Jérémy Raymond. Tous droits réservés.
    Signaler un problème (8 nov.) : fenêtre « Signaler un problème » (window.mpSignaler) + erreurs captées automatiquement.
-   Tout part sur le sujet ntfy.sh SUJET : Jeremy s'y abonne dans l'appli ntfy (avis sur son cellulaire).
+   Tout part dans la « boîte » SUJET (Supabase au Canada, outils/boite.sql; avant : ntfy.sh); les avis importants vont sur le cellulaire des administrateurs.
    Rien de personnel n'est envoyé à part le nom du compte (déjà connu de l'admin); jamais de mot de passe ni de contenu de livre. */
 (function(){
   "use strict";
-  var SUJET = "https://ntfy.sh/metierplus-signal-f3ce60fd2f6c0f46";
+  var SUJET = "metierplus-signal-f3ce60fd2f6c0f46";
+  /* 27 nov. (Loi 25) : boîte de messages au Canada (remplace ntfy.sh). poster() envoie; lire() rend une réponse au format ntfy
+     (une ligne JSON par message) pour que les pages qui lisent (Administration) n'aient presque rien à changer. */
+  var SBU = "https://nhxhfiaznuifcbobjuuv.supabase.co/rest/v1/rpc/", SBK = "sb_publishable_GwzHRE-rG-rVafG7QcTOxg_S68OQHXh";
+  var PRIO = { min:1, low:2, "default":3, high:4, urgent:5 };
+  function rpcB(f, o, keep){ return fetch(SBU + f, { method:"POST", keepalive:!!keep, headers:{ apikey:SBK, "Content-Type":"application/json" }, body:JSON.stringify(o) }); }
+  window.mpBoite = {
+    poster: function(sujet, corps, titre, tags, prio, keep){ return rpcB("boite_poster", { p_sujet:String(sujet).replace(/^https:\/\/ntfy\.sh\//, ""), p_corps:String(corps), p_titre:titre || null, p_prio:PRIO[prio] || +prio || 3, p_tags:tags || null }, keep)
+      .then(function(r){ if (!r.ok) throw new Error(r.status); return r.json(); }).then(function(ok){ if (ok !== true) throw new Error("refusé"); return { ok:true }; }); },
+    lire: function(sujet, heures){ return rpcB("boite_lire", { p_sujet:String(sujet).replace(/^https:\/\/ntfy\.sh\//, ""), p_heures:heures || 12 }).then(function(r){ if (!r.ok) return { ok:false, text:function(){ return Promise.resolve(""); } };
+      return r.json().then(function(L){ var t = (L || []).map(function(m){ return JSON.stringify(m); }).join("\n"); return { ok:true, text:function(){ return Promise.resolve(t); } }; }); }); }
+  };
 
   function contexte(){
     var c = [];
@@ -28,8 +39,7 @@
   }
 
   function envoyer(titre, texte, prio, tags){
-    return fetch(SUJET, { method: "POST", body: texte, headers: { "Title": titre, "Priority": prio || "default", "Tags": tags || "" } })
-      .then(function(r){ if (!r.ok) throw new Error(r.status); });
+    return window.mpBoite.poster(SUJET, texte, titre, tags, prio || "default");
   }
   // ntfy n'accepte que l'ASCII dans les en-têtes : on retire les accents du titre
   function ascii(s){ return String(s).normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^\x20-\x7e]/g, "").slice(0, 120); }

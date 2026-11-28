@@ -6,7 +6,7 @@ function surnom(v){ return String(v || "").trim().split(/\s+/)[0].replace(/[^\p{
    Télécommande = autorité (ordre, points, rangs). Messages :
    télécommande → tous : bienvenue, q (question), img (image pour l'écran), rev (réponse + résultat de chacun), fin, attente, vue (écran)
    joueur → télécommande : ici, rep ; écran → télécommande : ecran? */
-const RELAIS = "https://ntfy.sh/", PREFIXE = "pda-quiz-";
+const PREFIXE = "pda-quiz-";
 const SB_URL = "https://nhxhfiaznuifcbobjuuv.supabase.co", SB_CLE = "sb_publishable_GwzHRE-rG-rVafG7QcTOxg_S68OQHXh";
 const $ = id => document.getElementById(id);
 const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"})[c]);
@@ -84,7 +84,7 @@ let canal = null, pret = false, attente = [];
 function envoyer(topic, obj){
   if (window.SANS_RELAIS) return;
   if (window.supabase) { if (!pret) { attente.push(obj); return; } canal.send({type: "broadcast", event: "m", payload: obj}).catch(() => {}); return; }
-  fetch(RELAIS + topic, {method: "POST", body: JSON.stringify(obj)}).catch(() => {});
+  /* 27 nov. (Loi 25) : plus de relais de secours ntfy.sh (service américain); la bibliothèque Supabase est maintenant sur notre site */
 }
 function ecouter(topic, quand, etat){
   if (window.supabase) {
@@ -115,9 +115,7 @@ function ecouter(topic, quand, etat){
     abonner();
     return;
   }
-  const es = new EventSource(RELAIS + topic + "/sse");
-  es.onopen = () => etat(true); es.onerror = () => etat(false);
-  es.onmessage = e => { try { const d = JSON.parse(e.data); if (d.event === "message") quand(JSON.parse(d.message)); } catch(x) {} };
+  etat(false);   /* bibliothèque Supabase pas chargée (hors ligne) : pas de relais */
 }
 const stock = {get(k, d){ try { const v = JSON.parse(localStorage.getItem(k)); return v == null ? d : v; } catch(e) { return d; } }, set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch(e) { return false; } }};
 function compter(el, de, a, ms){ // chiffres qui montent doucement

@@ -4,7 +4,7 @@
    Seuls des ordres et l'état (titre, page, modules) passent : jamais le contenu du livre. telecommande.html = la page du cellulaire. ---- */
 (function(){
   const SB_URL = "https://nhxhfiaznuifcbobjuuv.supabase.co", SB_CLE = "sb_publishable_GwzHRE-rG-rVafG7QcTOxg_S68OQHXh";
-  const LIB = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.50.0/dist/umd/supabase.min.js";
+  const LIB = "lib/supabase/supabase.min.js";
   const T = window.TELE = {jeton: "", canal: null, pret: false, branche: false, dernier: "", modsDe: "", mods: []};
   function jeton(){ const a = new Uint8Array(12); crypto.getRandomValues(a); return [...a].map(x => "abcdefghijkmnpqrstuvwxyz23456789"[x % 32]).join("").slice(0, 16); }
   function charger(){ return window.supabase ? Promise.resolve() : new Promise((ok, ko) => { const s = document.createElement("script"); s.src = LIB; s.integrity = "sha384-jP+y6mxch/vbLrNpx4basfv6ciZQuHwdRHgZGa6Mhja0Xm4p87ok2OQavTrRIGxH"; s.crossOrigin = "anonymous";   /* 27 nov. (Loi 25) : contrôle d intégrité */ s.onload = ok; s.onerror = ko; document.head.appendChild(s); }); }

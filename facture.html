@@ -9,7 +9,7 @@
 <meta name="theme-color" content="#1E2A44">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Facture">
 <link rel="apple-touch-icon" href="img/carte-180.png">
-<script src="vieux-navigateur.js?v=273"></script><script src="signaler.js?v=273"></script>
+<script src="vieux-navigateur.js?v=274"></script><script src="signaler.js?v=274"></script>
 <style>
 /* © 2026 Jérémy Raymond. Tous droits réservés. Métier+ — facture au client (26 nov.)
    Jeremy : « à la fin de leur projet, les élèves font une facture au client, comme sur les chantiers; ça part de leur carte ».
@@ -94,15 +94,11 @@ const TPS = 0.05, TVQ = 0.09975;
 /* ---------- la carte de l'élève (même entrée que le magasin) ---------- */
 let K = LS.get("mpCarte", null), C = null;   /* C = { c:code, k:clé } */
 function lireK(){ const m = K && String(K.c || "").match(/^MP-(\d{5})-([A-Z0-9]{4,12})$/); C = m ? { c:m[1], k:m[2] } : null; }
-async function chercherCode(c){ const r = await rpc("carte_code_lire", { p_code:c }); if (!r || r.etat !== "ok") return r && r.etat === "bloque" ? "bloque" : null;
-  const b = Uint8Array.from(atob(JSON.parse(r.data).d), x => x.charCodeAt(0)), k = await crypto.subtle.importKey("raw", await crypto.subtle.digest("SHA-256", te.encode("metier+|carte-code|" + c + "|cle")), "AES-GCM", false, ["decrypt"]);
-  return JSON.parse(td.decode(await crypto.subtle.decrypt({ name:"AES-GCM", iv:b.slice(0, 12) }, k, b.slice(12)))); }
 function entree(){ $("#barre").hidden = true; $("#qui").textContent = "";
-  $("#app").innerHTML = `<h1>Facture au client</h1><p class="sous">Tape ton code à 5 chiffres (celui de ta carte).</p><div class="carte"><input class="cache-code code" id="cCode" inputmode="numeric" autocomplete="off" placeholder="00000" aria-label="Ton code"><p class="err" id="cErr"></p><button class="btn p" id="cOk">Entrer</button></div>`;
+  $("#app").innerHTML = `<h1>Facture au client</h1><p class="sous">Ta carte doit être sur ce cellulaire : ouvre <a href="carte.html">Ma carte</a> et scanne le code QR de ta fiche.</p><div class="carte"><input class="cache-code code" id="cCode" inputmode="numeric" autocomplete="off" placeholder="00000" aria-label="Ton code"><p class="err" id="cErr"></p><button class="btn p" id="cOk">Entrer</button></div>`;
   const i = $("#cCode"), go = async () => { const c = i.value.trim(); if (!/^\d{5}$/.test(c)) { $("#cErr").textContent = "Écris ton code à 5 chiffres."; return; }
-    $("#cErr").textContent = "Recherche…"; try { const o = (await codeEssai(c)) || await chercherCode(c);
-      if (o === "bloque") { $("#cErr").textContent = "Trop d'essais en ce moment. Réessaie dans 10 minutes."; return; }
-      if (!o) { $("#cErr").textContent = "Code inconnu. Vérifie avec ton enseignant."; return; }
+    $("#cErr").textContent = "Recherche…"; try { const o = await codeEssai(c);   /* 27 nov. (Loi 25) : seul le code d'essai s'ouvre ici; un élève ouvre d'abord Ma carte (code QR de sa fiche) */
+      if (!o) { $("#cErr").innerHTML = 'Ouvre d\'abord <a href="carte.html">Ma carte</a> sur ce cellulaire (code QR de ta fiche).'; return; }
       K = { c:o.c, g:o.g || "", p:o.p || "", t:Date.now() }; LS.set("mpCarte", K); lireK(); demarrer(); } catch(e){ $("#cErr").textContent = e.message; } };
   i.oninput = () => { if (/^\d{5}$/.test(i.value.trim())) go(); }; i.onkeydown = e => { if (e.key === "Enter") go(); }; $("#cOk").onclick = go; i.focus(); }
 
@@ -359,6 +355,6 @@ async function demarrer(){ if (!C) return entree();
   if (!(await factureOuverte(K.g))) { const n = sessionDEP(K.g); $("#app").innerHTML = `<h1>Facture au client</h1><div class="carte"><p>La facture s'ouvre plus tard dans ton DEP${n ? " (tu es en DEP " + n + ")" : ""}. Ton enseignant te dira quand.</p><a class="btn" href="carte.html">Retour à ma carte</a></div>`; return; } $("#app").innerHTML = `<p class="sous">Chargement…</p>`; await Promise.all([charger(), trouverCoffre()]); await entSync(); liste(); }
 lireK(); demarrer();
 </script>
-<script src="js/journal-perf.js?v=9"></script>
+<script src="js/journal-perf.js?v=10"></script>
 </body>
 </html>
