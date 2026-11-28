@@ -1,0 +1,19 @@
+name: Copier les bibliotheques externes (une fois)
+on: workflow_dispatch
+permissions:
+  contents: write
+jobs:
+  copier:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          mkdir -p lib/supabase lib/qrcode
+          curl -sSfL -o lib/supabase/supabase.min.js https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.50.0/dist/umd/supabase.min.js
+          curl -sSfL -o lib/qrcode/qrcode.min.js https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js
+          echo "sha384-$(openssl dgst -sha384 -binary lib/supabase/supabase.min.js | openssl base64 -A)"
+          echo "sha384-$(openssl dgst -sha384 -binary lib/qrcode/qrcode.min.js | openssl base64 -A)"
+          test "sha384-$(openssl dgst -sha384 -binary lib/supabase/supabase.min.js | openssl base64 -A)" = "sha384-jP+y6mxch/vbLrNpx4basfv6ciZQuHwdRHgZGa6Mhja0Xm4p87ok2OQavTrRIGxH"
+          test "sha384-$(openssl dgst -sha384 -binary lib/qrcode/qrcode.min.js | openssl base64 -A)" = "sha384-3zSEDfvllQohrq0PHL1fOXJuC/jSOO34H46t6UQfobFOmxE5BpjjaIJY5F2/bMnU"
+          git config user.name "metierplus-bot"; git config user.email "bot@metierplus.app"
+          git add lib/supabase lib/qrcode; git commit -m "Copie locale de supabase-js 2.50.0 et qrcodejs 1.0.0 (empreintes verifiees)"; git push
