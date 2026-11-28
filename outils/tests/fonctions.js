@@ -684,6 +684,15 @@ test("Mon accès : le code QR mène aux livres (index.html#livres=…), l'iPad q
   vrai(L.length === 1 && !/#/.test(p.url()) && /n'ouvre pas encore/.test(await p.evaluate(() => document.getElementById("acErr").textContent)), "Le lien du code QR ne tente pas l'entrée (" + L.length + ", " + p.url() + ")");
   vrai(!errs.length, errs.join(" | ")); await ctx.close();
 });
+test("metierplus.app/acces : ouvre Mon accès; sur iPhone, le guide « écran d'accueil » s'affiche et l'adresse garde la carte pour l'icône", async b => {   /* 28 nov. */
+  const { devices } = require("playwright"); const ctx = await b.newContext(Object.assign({}, devices["iPhone 13"], { serviceWorkers: "block" }));
+  const p = await ctx.newPage(), errs = []; p.on("pageerror", e => errs.push(e.message));
+  await p.goto(BASE + "carte.html#c=MP-12345-K7Q9X2&g=2608PLCA1&p=Lucas"); await attendre(700);
+  await p.goto(BASE + "acces/"); await attendre(1500);
+  vrai(/carte\.html\?installer=1#c=MP-12345-K7Q9X2/.test(p.url()), "L'adresse ne garde pas la carte : " + p.url());
+  vrai(/Sur l'écran d'accueil/.test(await p.evaluate(() => document.body.innerText)), "Le guide iPhone ne s'affiche pas");
+  vrai(!errs.length, errs.join(" | ")); await ctx.close();
+});
 test("Distribuer les cartes à l'écran : un code QR à la fois, prénom seulement, liste cochée", async b => {   /* 27 nov. */
   const p = await (await b.newContext({ viewport: { width: 1280, height: 720 } })).newPage(), errs = []; p.on("pageerror", e => errs.push(e.message));
   await p.goto(BASE + "passeport.html"); await attendre(1500);

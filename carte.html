@@ -66,6 +66,18 @@ const valide = c => /^MP-\d{3,5}-[A-Z0-9]{4,12}$/.test(c);
 /* carte reçue par le code QR (#c=…&g=…&p=…) : gardée, puis le # est effacé de l'adresse */
 (() => { const h = new URLSearchParams(location.hash.slice(1)), c = (h.get("c") || "").toUpperCase();
   if (valide(c)) { LS.set("mpCarte", { c, g:h.get("g") || "", p:(h.get("p") || "").split(/\s+/)[0].slice(0, 30), t:Date.now() }); history.replaceState(null, "", location.pathname); } })();
+/* 28 nov. (Jeremy : « ils vont sur metierplus.app/acces et cliquent sur le bouton ») : sur iPhone, l'icône de l'écran d'accueil a sa propre
+   mémoire, séparée de Safari. Tant que l'accès n'est pas installé, son adresse garde la carte (#c=…, jamais envoyé au serveur) : l'icône
+   ajoutée s'ouvre avec la carte et la garde. Le manifeste n'a plus de start_url pour que l'iPhone prenne cette adresse. */
+const INSTALLE = () => navigator.standalone || matchMedia("(display-mode: standalone)").matches;
+function adresseAvecCarte(K){ try { if (INSTALLE() || !K || !K.c) return; history.replaceState(null, "", location.pathname + location.search + "#c=" + encodeURIComponent(K.c) + "&g=" + encodeURIComponent(K.g || "") + "&p=" + encodeURIComponent(K.p || "")); } catch(e){} }
+function guideIos(){ const o = document.createElement("div");
+  o.style.cssText = "position:fixed;inset:0;z-index:99;background:rgba(10,16,30,.82);display:flex;flex-direction:column;justify-content:flex-end;padding:20px;color:#fff;font-size:1.1rem";
+  const ipad = /iPad|Macintosh/.test(navigator.userAgent) && !/iPhone/.test(navigator.userAgent);
+  o.innerHTML = `<div style="background:#fff;color:#1E2A44;border-radius:18px;padding:18px 20px;line-height:1.45${ipad ? ";position:absolute;top:20px;right:20px;max-width:340px" : ""}">
+    <b style="font-size:1.2rem">Ajouter à ton écran d'accueil</b><ol style="margin:10px 0 0;padding-left:22px"><li>Touche <b>Partager</b> (le carré avec la flèche vers le haut) ${ipad ? "en haut à droite" : "en bas de l'écran"}.</li><li>Fais défiler, puis touche <b>« Sur l'écran d'accueil »</b>.</li><li>Touche <b>Ajouter</b>.</li></ol>
+    <button class="btn" style="margin-top:14px;width:100%">J'ai compris</button></div>${ipad ? "" : '<div style="text-align:center;font-size:2.6rem;line-height:1;margin-top:8px">&#8595;</div>'}`;
+  o.querySelector("button").onclick = () => o.remove(); o.onclick = e => { if (e.target === o) o.remove(); }; document.body.appendChild(o); }
 /* carte sans prénom (entrée avec l'ancienne clé complète) : le prénom vient de la fiche de l'élève, publiée par le registre */
 let PRENOM_FAIT = false;
 async function completerPrenom(K){ PRENOM_FAIT = true; }   /* 27 nov. : la carte ne se lit plus sans le prénom; le prénom vient du magasin (registre) */
@@ -77,7 +89,7 @@ function cacher(code){ clearTimeout(montreT); const v = $("#vue .carte"); v.clas
 function garderPourDeBon(){ try { if (navigator.storage && navigator.storage.persist) navigator.storage.persisted().then(ok => ok || navigator.storage.persist()).catch(() => {}); } catch(e){} }
 function afficher(){
   const K = LS.get("mpCarte"); $("#vide").hidden = !!K; $("#vue").hidden = !K; if (!K) { if (!matchMedia("(pointer:coarse)").matches) $("#cle").focus(); return; }   /* 27 nov. : sur iPhone, le focus placé par la page bloquait le clavier */
-  const code = K.c.split("-")[1]; garderPourDeBon();
+  const code = K.c.split("-")[1]; garderPourDeBon(); adresseAvecCarte(K);
   if (K.g === "ESSAI" && K.p === "Essai") { K.p = "Kaleb"; LS.set("mpCarte", K); }   /* 27 nov. : la carte d'essai s'appelle Kaleb */
   $("#vG").textContent = K.g || "Métier+"; $("#vP").textContent = K.p || ""; completerPrenom(K); factureOuverte(K.g).then(ok => { $("#bFac").hidden = !ok; $("#bBoutons").style.gridTemplateColumns = ok ? "1fr 1fr" : "1fr"; }); $("#vN").textContent = code;
   /* 28 nov. : le code QR mène à ses livres (index.html#livres=…) : l'appareil photo d'un iPad de la classe l'ouvre directement */
@@ -85,11 +97,14 @@ function afficher(){
   $("#vQr").innerHTML = `<svg viewBox="0 0 ${k + 8} ${k + 8}" width="150" height="150"><rect width="${k + 8}" height="${k + 8}" fill="#fff"/>${M.map((r, y) => r.map((v, x) => v ? `<rect x="${x + 4}" y="${y + 4}" width="1.02" height="1.02"/>` : "").join("")).join("")}</svg>`;
   /* 26 nov. (Jeremy : « caché pour tous; quand on clique, ça le montre 10 s ») : numéro, code-barres et QR masqués; un toucher les montre 10 secondes */
   cacher(code);
-  const ios = /iPhone|iPad|iPod/.test(navigator.userAgent), installe = navigator.standalone || matchMedia("(display-mode: standalone)").matches;
+  const ios = /iPhone|iPad|iPod/.test(navigator.userAgent) || (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1), installe = navigator.standalone || matchMedia("(display-mode: standalone)").matches;
   $("#aide").innerHTML = installe ? `<b>Au magasin :</b> donne ton code à 5 chiffres au magasinier.`
-    : ios ? `<b>Garde ton accès sur ton cellulaire :</b> touche <b>Partager</b> (le carré avec la flèche), puis <b>« Sur l'écran d'accueil »</b>. Elle s'ouvrira même sans Internet.`
-    : `<b>Garde ton accès sur ton cellulaire :</b> ouvre le menu de ton navigateur (⋮ ou ≡, en haut ou en bas de l'écran), puis <b>« Ajouter à l'écran d'accueil »</b> ou <b>« Installer »</b>. Elle s'ouvrira même sans Internet.` + (INSTALLER ? `<button class="btn" id="inst">Installer « Mon accès » maintenant</button>` : "");
-  const ib = $("#inst"); if (ib) ib.onclick = async () => { const ev = INSTALLER; INSTALLER = null; ev.prompt(); try { await ev.userChoice; } catch(e){} afficher(); };
+    : `<b>Garde ton accès sur ton cellulaire</b> : il s'ouvrira d'un toucher, même sans Internet.<button class="btn" id="inst" style="margin-top:12px;width:100%;font-size:1.1rem">Ajouter à l'écran d'accueil</button>`;
+  const ib = $("#inst"); if (ib) ib.onclick = async () => {
+    if (INSTALLER) { const ev = INSTALLER; INSTALLER = null; ev.prompt(); try { await ev.userChoice; } catch(e){} afficher(); return; }
+    if (ios) return guideIos();
+    alert("Ouvre le menu de ton navigateur (⋮ ou ≡), puis « Ajouter à l'écran d'accueil » ou « Installer »."); };
+  if (/[?&]installer\b/.test(location.search) && !installe && !afficher.vu) { afficher.vu = true; if (ios) setTimeout(guideIos, 400); else if (INSTALLER) setTimeout(() => ib && ib.scrollIntoView({ block:"center" }), 300); }
   try { navigator.wakeLock && navigator.wakeLock.request("screen").catch(() => {}); } catch(e){}   /* l'écran ne s'éteint pas pendant qu'on scanne */
 }
 $("#ok").onclick = async () => { const c = $("#cle").value.trim().toUpperCase().replace(/\s+/g, "");
