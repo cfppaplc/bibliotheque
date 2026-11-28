@@ -907,3 +907,4 @@
 - 2026-11-28 0 h 20 : guide iPhone de /acces : icônes Partager et « Sur l'écran d'accueil » dessinées (ICO_PART, ICO_PLUS).
 - 2026-11-28 0 h 25 : Codes des élèves (raccourci Commandes) : toucher un élève montre le code QR de sa fiche (clé tirée du dossier de l'enseignant, CLES_DOSSIER; caché après 60 s). Test ajouté.
 - 2026-11-28 0 h 30 : bouton « Magasin en direct » retiré de Commandes (Jeremy : « inutile »; la page reste par magasin.html?mode=ecran). Absences : une absence vue n'est plus listée dans Commandes; elle est classée dans le dossier de l'élève (fiche, Gestion d'atelier, absencesFiche) via absence_prof_eleve (1 an, déchiffrée avec la clé du compte).
+- 2026-11-28 0 h 35 : page « Magasin en direct » (mode=ecran, ecranDirect) supprimée à la demande de Jeremy, avec son test. Comptoir : la carte d'essai s'appelle Kaleb (prenomsComptoir).
