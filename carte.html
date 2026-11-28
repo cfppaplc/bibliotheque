@@ -50,7 +50,7 @@ input.cache-code:not(:placeholder-shown){-webkit-text-security:disc;text-securit
     <button class="btn" id="ok">Afficher mon accès</button></div></details>
   </div>
   <div id="vue" hidden>
-    <div class="carte"><div class="g" id="vG"></div><div class="p" id="vP"></div><div class="n" id="vN"></div><div class="qr" id="vQr"></div><small>Montre cet écran au magasin, aux coffres et pour tes livres.</small></div>
+    <div class="carte"><div class="g" id="vG"></div><div class="p" id="vP"></div><div class="n" id="vN"></div><div class="qr" id="vQr"></div><small>Sur un iPad de la classe : scanne ce code avec l'appareil photo de l'iPad pour ouvrir tes livres.</small></div>
     <div class="aide" id="aide"></div>
     <div id="bBoutons" style="display:grid;grid-template-columns:1fr;gap:10px"><a class="btn" href="index.html?macarte" style="margin-top:12px">Mes livres</a><a class="btn" href="magasin.html">Magasin</a><a class="btn" href="facture.html" id="bFac" hidden>Facture</a><a class="btn s" href="magasin.html?mode=absence" style="grid-column:1/-1">Signaler une absence</a></div>
     <button class="btn s" id="oublier">Ce n'est pas mon accès</button>
@@ -80,7 +80,8 @@ function afficher(){
   const code = K.c.split("-")[1]; garderPourDeBon();
   if (K.g === "ESSAI" && K.p === "Essai") { K.p = "Kaleb"; LS.set("mpCarte", K); }   /* 27 nov. : la carte d'essai s'appelle Kaleb */
   $("#vG").textContent = K.g || "Métier+"; $("#vP").textContent = K.p || ""; completerPrenom(K); factureOuverte(K.g).then(ok => { $("#bFac").hidden = !ok; $("#bBoutons").style.gridTemplateColumns = ok ? "1fr 1fr" : "1fr"; }); $("#vN").textContent = code;
-  const M = QRLib.matrice(K.c), k = M.length;
+  /* 28 nov. : le code QR mène à ses livres (index.html#livres=…) : l'appareil photo d'un iPad de la classe l'ouvre directement */
+  const M = QRLib.matrice(location.origin + location.pathname.replace(/[^/]*$/, "") + "index.html#livres=" + K.c), k = M.length;
   $("#vQr").innerHTML = `<svg viewBox="0 0 ${k + 8} ${k + 8}" width="150" height="150"><rect width="${k + 8}" height="${k + 8}" fill="#fff"/>${M.map((r, y) => r.map((v, x) => v ? `<rect x="${x + 4}" y="${y + 4}" width="1.02" height="1.02"/>` : "").join("")).join("")}</svg>`;
   /* 26 nov. (Jeremy : « caché pour tous; quand on clique, ça le montre 10 s ») : numéro, code-barres et QR masqués; un toucher les montre 10 secondes */
   cacher(code);

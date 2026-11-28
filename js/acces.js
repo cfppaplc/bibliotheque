@@ -49,6 +49,10 @@ window.ACCES = (function(){
     /* 26 nov. (Jeremy : « sur la carte, un bouton Mes livres pourrait donner accès à ses livres ») : index.html?macarte → entrée avec Ma carte */
     if (/[?&]macarte\b/.test(location.search)) { try { history.replaceState(null, "", location.pathname); } catch(e){}
       if (!SESSION) setTimeout(() => { dlgConnexion(); setTimeout(() => { const mc = document.getElementById("acMaCarte"); if (mc) mc.click(); }, 120); }, 300); }
+    /* 28 nov. (Jeremy : « il pourrait scanner sa carte avec l'iPad », « un code QR Métier+ ») : le code QR de « Mon accès » mène à
+       index.html#livres=MP-…; l'appareil photo de l'iPad l'ouvre et l'élève entre dans ses livres. Le # n'est jamais envoyé au serveur. */
+    { const ml = location.hash.match(/^#livres=(MP-?\d{5}-?[A-Z0-9]{4,12})$/i); if (ml) { try { history.replaceState(null, "", location.pathname); } catch(e){}
+      if (!SESSION) setTimeout(() => { dlgConnexion(); setTimeout(() => { const ic = document.getElementById("acCarte"); if (ic) { ic.value = ml[1].toUpperCase(); ic.dispatchEvent(new KeyboardEvent("keydown", { key:"Enter" })); } }, 150); }, 300); } }
     relancerDemande(); compterDemandes();
   }
   let NB_DEM = 0;

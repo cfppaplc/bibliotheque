@@ -676,6 +676,14 @@ test("Carte : s'ouvre seulement par le code QR de la fiche ou le code complet; l
   vrai(/MP-51234-ZZZZ99/.test(await q.evaluate(() => localStorage.getItem("mpCarte"))) && (await q.textContent("#vP")).trim() === "Lucas", "Le code QR de la fiche n'ouvre pas la carte");
   vrai(!errs.length, errs.join(" | ")); await c.close();
 });
+test("Mon accès : le code QR mène aux livres (index.html#livres=…), l'iPad qui le scanne tente l'entrée et efface le #", async b => {   /* 28 nov. */
+  const ctx = await b.newContext(), L = []; await ctx.addInitScript(() => { localStorage.bienvenueVu = "1"; });
+  await ctx.route(/rpc\/coffre_lire/, r => { L.push(r.request().postData()); r.fulfill({ body: "[]", contentType: "application/json", headers: { "access-control-allow-origin": "*" } }); });
+  const p = await ctx.newPage(), errs = []; p.on("pageerror", e => errs.push(e.message));
+  await p.goto(BASE + "index.html#livres=MP-12345-K7Q9X2"); await attendre(3500);
+  vrai(L.length === 1 && !/#/.test(p.url()) && /n'ouvre pas encore/.test(await p.evaluate(() => document.getElementById("acErr").textContent)), "Le lien du code QR ne tente pas l'entrée (" + L.length + ", " + p.url() + ")");
+  vrai(!errs.length, errs.join(" | ")); await ctx.close();
+});
 test("Distribuer les cartes à l'écran : un code QR à la fois, prénom seulement, liste cochée", async b => {   /* 27 nov. */
   const p = await (await b.newContext({ viewport: { width: 1280, height: 720 } })).newPage(), errs = []; p.on("pageerror", e => errs.push(e.message));
   await p.goto(BASE + "passeport.html"); await attendre(1500);
