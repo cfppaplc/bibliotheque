@@ -59,8 +59,12 @@ Deno.serve(async (req) => {
       if (!a || Date.now() - new Date(a.t).getTime() > 120000) return json({ ok: false });
       const j = (d: string) => new Date(d + "T12:00:00").toLocaleDateString("fr-CA", { weekday: "short", day: "numeric", month: "short" });
       const quand = a.du === a.au ? j(a.du) : j(a.du) + " au " + j(a.au), part = a.part === "am" ? " (avant-midi)" : a.part === "pm" ? " (après-midi)" : "";
+      /* 27 nov. (Jeremy : « nom de l'élève plus son DEP ») : même calcul que js/session-dep.js (2608PLCA1 = début août 2026) */
+      const dep = (g: string) => { if (g === "ESSAI") return " DEP1";   /* carte d'essai */
+        const m = String(g || "").match(/^(\d{2})(\d{2})/); if (!m || +m[2] < 1 || +m[2] > 12) return ""; const d = new Date();
+        const e = (d.getFullYear() - (2000 + +m[1])) * 12 + (d.getMonth() + 1 - +m[2]); return " DEP" + (e < 0 ? 1 : Math.floor(e / 6) + 1); };
       const chif = a.genre === "chiffre";   /* 27 nov. : genre, motif et moment chiffrés pour l'enseignant; l'avis n'en dit rien */
-      const msg = JSON.stringify({ title: chif ? `Absence : L'élève ${a.code}` : `${G[a.genre] || "Absence"} : L'élève ${a.code} (${a.groupe})`, code: a.code, body: chif ? quand : `${quand}${part}${a.heure ? " · " + a.heure.replace(":", " h ") : ""} · ${MOT[a.motif] || "?"}`, url: "/magasin.html?mode=prof", tag: "abs-" + a.id });
+      const msg = JSON.stringify({ title: chif ? `Absence : L'élève ${a.code}${dep(a.groupe)}` : `${G[a.genre] || "Absence"} : L'élève ${a.code} (${a.groupe})`, code: a.code, body: chif ? quand : `${quand}${part}${a.heure ? " · " + a.heure.replace(":", " h ") : ""} · ${MOT[a.motif] || "?"}`, url: "/magasin.html?mode=prof", tag: "abs-" + a.id });
       return json({ ok: true, n: await envoyer(a.profs || [], msg, k) });
     }
     if (avis) {   /* règlement du magasin non respecté : avis à l'enseignant de l'élève */
