@@ -892,3 +892,4 @@
 - 2026-11-27 : nouveau projet Supabase (Canada) : le rôle service_role n'avait pas SELECT/INSERT sur les tables publiques (avis push en erreur « reading 'cles' »). Corrigé : grant all on all tables/sequences + default privileges à service_role. À refaire si on recrée un projet.
 - 2026-11-27 : avis d'absence = « Absence : <prénom> » + date (panier-avis). Carte d'essai nommée « Essai » dans les avis (sw.js, empreinte) et sur la page enseignant (codeEssai).
 - 2026-11-27 : avis d'absence = « Absence : <prénom> DEP<n> » (DEP calculé du code de groupe comme session-dep.js; carte d'essai = Kaleb DEP1).
+- 2026-11-27 : dossier de l'élève (fiche, outils-atelier.html) : DEP affiché après le groupe, calculé selon le mois courant (depDe, même calcul que session-dep.js).

@@ -363,6 +363,10 @@ try { for (let w = window; ; w = w.parent){ if (/[?&]gestion=1/.test(w.location.
       const v = (e.cfa || {})[a] || 0;
       return `<div class="pb-s">${grpAts().length > 1 ? esc(nomAt(a)) + " : " : ""}<select data-cfa="${esc(a)}" data-n="${n}" ${M.length ? "" : "disabled"} style="font:inherit;font-size:12px;border-radius:6px;max-width:100%"><option value="0">Coffre ${n}</option>${N.filter(x => x !== n).map(x => `<option value="${x}" ${v === x ? "selected" : ""}>Coffre ${x}</option>`).join("")}<option value="-1" ${v === -1 ? "selected" : ""}>Aucun coffre</option></select></div>`; }).join(""); }
   /* fiche de l'élève */
+  /* 27 nov. (Jeremy : « le DEP doit être ajouté à son dossier et changer selon le mois ») : même calcul que js/session-dep.js
+     (code du groupe = année et mois du début; août à janvier = DEP 1, février à juin = DEP 2, puis DEP 3 et 4) */
+  function depDe(g){ const m = String(g || "").match(/^(\d{2})(\d{2})/); if (!m || +m[2] < 1 || +m[2] > 12) return 0; const d = new Date();
+    const x = (d.getFullYear() - (2000 + +m[1])) * 12 + (d.getMonth() + 1 - +m[2]); return x < 0 ? 1 : Math.floor(x / 6) + 1; }
   function fiche(id){
     const e = E.find(x => x.id === id); if (!e) return; const dlg = $("#fiche"), cfs = coffresEl(e), max = nbEq();
     const fo = O.map(o => { const v = D.val[e.id + "|" + o.id];
@@ -374,7 +378,7 @@ try { for (let w = window; ; w = w.parent){ if (/[?&]gestion=1/.test(w.location.
       if (x.k === "ok") H.push([x.d, (x.r ? "Remet " : "Prend ") + cn + " : tout est là"]); else if (x.k === "manque") H.push([x.d, cn + " : signale " + (x.items || []).map(i => i.n).join(", ")]); else if (x.k === "liste") H.push([x.d, "Écrit la liste de " + cn]); });
     H.sort((a, b) => b[0] - a[0]);
     const ini = (e.p || "?").split(/\s+/).map(m => m[0]).join("").slice(0, 2).toUpperCase();
-    dlg.innerHTML = `<div class="fi-t"><div class="fi-av">${esc(ini)}</div><div><h3>${esc(e.p)}</h3><small>${esc(e.g || "")}${e.c ? " · code " + esc(e.c) : ""}</small></div>${ADM() ? `<button data-mod class="fi-imp" style="margin-left:auto;font:inherit;font-size:13px;font-weight:700;color:#EB6A22;background:none;border:0;cursor:pointer;min-height:40px">Modifier</button>` : ""}<button data-x aria-label="Fermer">✕</button></div>
+    dlg.innerHTML = `<div class="fi-t"><div class="fi-av">${esc(ini)}</div><div><h3>${esc(e.p)}</h3><small>${esc(e.g || "")}${depDe(e.g) ? " · DEP " + depDe(e.g) : ""}${e.c ? " · code " + esc(e.c) : ""}</small></div>${ADM() ? `<button data-mod class="fi-imp" style="margin-left:auto;font:inherit;font-size:13px;font-weight:700;color:#EB6A22;background:none;border:0;cursor:pointer;min-height:40px">Modifier</button>` : ""}<button data-x aria-label="Fermer">✕</button></div>
       <div class="fi-b"><h4>Équipe (coffre et ménage)</h4><div class="fi-l"><div>${e.eq ? "Équipe " + e.eq : "Aucune équipe"}</div></div>${ADM() ? `<p class="fi-note">Pour changer l'équipe ou le coffre : Réglages du groupe → Placer les équipes.</p>` : ""}
       <h4>Coffre${cfs.length > 1 ? "s" : ""}</h4><div class="fi-l">${cfs.length ? cfs.map(cf => `<div><span class="s ${cf.s.mq.length ? "r" : "ok"}">${cf.s.mq.length ? "!" : "✓"}</span>${esc(cf.nom)}${grpAts().length > 1 ? " · " + esc(nomAt(cf.at)) : ""}<small>${cf.s.mq.length ? "Manque : " + esc(cf.s.mq.join(", ")) : cf.s.att ? "changement d'équipe en cours" : cf.s.der ? "" : "pas encore scanné"}</small></div>`).join("") : `<div><span class="s">–</span>${e.eq ? "Aucun coffre numéro " + e.eq : "Choisis son équipe pour lui donner un coffre"}</div>`}</div>
       <h4>Formations · ${O.length - reste} sur ${O.length}</h4><div class="fi-l">${fo || `<div><span class="s">–</span>Aucune formation encore</div>`}</div>
