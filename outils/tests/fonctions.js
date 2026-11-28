@@ -675,6 +675,16 @@ test("Carte : s'ouvre seulement par le code QR de la fiche ou le code complet; l
   vrai(/MP-51234-ZZZZ99/.test(await q.evaluate(() => localStorage.getItem("mpCarte"))) && (await q.textContent("#vP")).trim() === "Lucas", "Le code QR de la fiche n'ouvre pas la carte");
   vrai(!errs.length, errs.join(" | ")); await c.close();
 });
+test("Distribuer les cartes à l'écran : un code QR à la fois, prénom seulement, liste cochée", async b => {   /* 27 nov. */
+  const p = await (await b.newContext({ viewport: { width: 1280, height: 720 } })).newPage(), errs = []; p.on("pageerror", e => errs.push(e.message));
+  await p.goto(BASE + "passeport.html"); await attendre(1500);
+  await p.evaluate(() => distribuer([{ id: "a", p: "Marc Tremblay", c: "12345", k: "K7Q9X2" }, { id: "b", p: "Lucas", c: "22222", k: "ZZZZ99" }], e => window.QRLib ? "data:," + e.c : ""));
+  vrai((await p.$$("[data-i]")).length === 2, "La liste des élèves n'apparaît pas");
+  await p.click("[data-i='0']"); await attendre(300);
+  vrai(await p.evaluate(() => document.body.innerText.includes("Marc") && !document.body.innerText.includes("Tremblay") && document.querySelectorAll("img[src^='data:']").length === 1), "Pas un seul code, ou nom de famille affiché");
+  await p.click("[data-ok]"); await attendre(200); vrai(/1 sur 2/.test(await p.evaluate(() => document.body.innerText)), "L'élève n'est pas coché");
+  vrai(!errs.length, errs.join(" | "));
+});
 test("Plein écran : reste actif en changeant de page (coquille)", async b => {   /* 27 nov. (Jeremy : « je veux que ça reste en plein écran sur tout le site ») */
   const c = await b.newContext({ viewport: { width: 1280, height: 720 } }); await c.addInitScript(() => { localStorage.bienvenueVu = "1"; });
   const p = await c.newPage(); const errs = []; p.on("pageerror", e => errs.push(e.message));

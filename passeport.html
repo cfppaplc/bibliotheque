@@ -630,7 +630,8 @@ const tailleDe = id => { try { const T = JSON.parse(localStorage.getItem("passQr
 const FORMATS = { "5160":{ n:"Avery 5160 / 8160 · 30 par feuille (2⅝ x 1 po)", c:3, l:10, w:2.625, h:1, x0:.1875, y0:.5, dx:2.75, dy:1 },
   "5163":{ n:"Avery 5163 / 8163 · 10 par feuille (4 x 2 po)", c:2, l:5, w:4, h:2, x0:.15625, y0:.5, dx:4.1875, dy:2 },
   "main":{ n:"Feuille ordinaire · à découper" },
-  "tel":{ n:"Fiches « Ma carte » pour le cellulaire (l'élève scanne le code QR)" } };
+  "tel":{ n:"Fiches « Ma carte » pour le cellulaire (l'élève scanne le code QR)" },
+  "ecran":{ n:"À l'écran, un code QR à la fois (les élèves viennent le scanner)" } };
 function dlgCodes(){
   const L = eleves(GRP).filter(e => e.c); if (!L.length) return toast("Aucun élève dans ce groupe.");
   const f0 = localStorage.getItem("passEtqFormat") || "5160";
@@ -639,7 +640,7 @@ function dlgCodes(){
     <p style="margin-bottom:0"><b>Élèves à imprimer</b></p>${listeChoix(L.map(e => [e.id, esc(e.p) + " · " + esc(e.c)]))}
     <p id="dPos">Commencer à l'étiquette n° <input type="number" id="aPos" min="1" max="30" value="1" style="width:80px;min-height:42px;border-radius:10px;border:1px solid var(--ligne);background:var(--carte2);color:var(--txt);padding:0 10px"> (pour finir une feuille déjà entamée)</p>
     <div class="act"><button class="btn" id="aF">Annuler</button><button class="btn p" id="aOk">Imprimer ${L.length} étiquette${L.length > 1 ? "s" : ""}</button></div>`);
-  const maj = () => { $("#dPos").style.display = /^(main|tel)$/.test($("#bx").querySelector("[name=fmt]:checked").value) ? "none" : ""; };
+  const maj = () => { $("#dPos").style.display = /^(main|tel|ecran)$/.test($("#bx").querySelector("[name=fmt]:checked").value) ? "none" : ""; };
   $("#bx").querySelectorAll("[name=fmt]").forEach(x => x.onchange = maj); maj();
   $("#aF").onclick = fermer; brancherChoix($("#aOk"), "étiquette");
   $("#aOk").onclick = () => { const k = $("#bx").querySelector("[name=fmt]:checked").value, F = FORMATS[k]; localStorage.setItem("passEtqFormat", k);
@@ -651,6 +652,7 @@ function dlgCodes(){
     const base = location.origin + location.pathname.replace(/[^/]*$/, "");
     const fiche = e => { const c = "MP-" + e.c + "-" + e.k, u = base + "carte.html#c=" + encodeURIComponent(c) + "&g=" + encodeURIComponent(GRP) + "&p=" + encodeURIComponent((e.p || "").split(/\s+/)[0]);
       return `<div class="ce3"><img class="l" src="img/metier-plus.svg" alt=""><small>Ma carte Métier+ · ${esc(GRP)}</small><b>${esc(e.p)}</b><img class="q" src="${qrUrl(u)}" alt=""><p>Scanne ce code avec l'appareil photo de ton cellulaire, puis ajoute « Ma carte » à ton écran d'accueil.</p><span class="n">${esc(e.c)}</span><i>Clé : ${esc(c)}</i></div>`; };
+    if (k === "ecran"){ distribuer(L.filter(e => e.k), e => qrUrl(base + "carte.html#c=" + encodeURIComponent("MP-" + e.c + "-" + e.k) + "&g=" + encodeURIComponent(GRP) + "&p=" + encodeURIComponent((e.p || "").split(/\s+/)[0]))); return; }
     if (k === "tel"){ Z.innerHTML = L.filter(e => e.k).map(fiche).join(""); }
     else if (k === "main"){ Z.innerHTML = L.map(etq).join(""); }
     else { const par = F.c * F.l, pos = Math.max(1, Math.min(par, +$("#aPos").value || 1)) - 1; let h = "", i = pos, pg = "";
@@ -658,6 +660,26 @@ function dlgCodes(){
         pg += etq(Object.assign({}, e, { st:` style="left:${F.x0 + c * F.dx}in;top:${F.y0 + l * F.dy}in"` })); i++; });
       Z.innerHTML = h + `<div class="pg">${pg}</div>`; }
     setTimeout(() => window.mpImprimerQrs ? mpImprimerQrs("metierplus-codes-eleves") : print(), 300); };
+}
+/* 27 nov. (Jeremy : « une page avec les codes QR et les élèves viennent scanner un par un ») : un seul code à la fois, sur fond blanc;
+   l'enseignant touche le prénom de l'élève qui se présente. Le code se cache après 60 s (personne d'autre ne le scanne de loin). Rien n'est envoyé. */
+function distribuer(L, qr){
+  if (!L.length) return toast("Aucune carte à distribuer dans ce groupe.");
+  const fait = new Set(), o = document.createElement("div"); let minuterie = 0;
+  o.style.cssText = "position:fixed;inset:0;z-index:2147483000;background:#fff;color:#1E2A44;overflow:auto;padding:24px;font-family:system-ui,sans-serif";
+  const fin = () => { clearTimeout(minuterie); o.remove(); };
+  const liste = () => { clearTimeout(minuterie);
+    o.innerHTML = `<div style="max-width:900px;margin:0 auto"><div style="display:flex;align-items:center;gap:12px"><h2 style="margin:0;flex:1">Distribuer les cartes · ${esc(GRP)}</h2><button class="btn" data-fin>Terminer</button></div>
+      <p style="color:#555">Touche le prénom de l'élève qui se présente. Il scanne le code avec l'appareil photo de son cellulaire. ${fait.size} sur ${L.length} fait${fait.size > 1 ? "s" : ""}.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px">${L.map((e, i) => `<button class="btn${fait.has(e.id) ? "" : " p"}" data-i="${i}" style="min-height:72px;font-size:1.15rem">${fait.has(e.id) ? "✓ " : ""}${esc((e.p || "").split(/\s+/)[0])}</button>`).join("")}</div></div>`;
+    o.querySelector("[data-fin]").onclick = fin; o.querySelectorAll("[data-i]").forEach(b => b.onclick = () => montrer(+b.dataset.i)); };
+  const montrer = i => { const e = L[i]; clearTimeout(minuterie); minuterie = setTimeout(liste, 60000);
+    o.innerHTML = `<div style="text-align:center;max-width:900px;margin:0 auto"><h2 style="margin:0 0 4px;font-size:2rem">${esc((e.p || "").split(/\s+/)[0])}</h2><p style="margin:0 0 12px;color:#555">Scanne ce code avec l'appareil photo de ton cellulaire</p>
+      <img src="${qr(e)}" alt="" style="width:min(62vh,80vw);height:min(62vh,80vw);image-rendering:pixelated">
+      <div style="display:flex;gap:12px;justify-content:center;margin-top:16px;flex-wrap:wrap"><button class="btn p" data-ok style="min-height:64px;min-width:220px;font-size:1.1rem">C'est fait</button><button class="btn" data-l style="min-height:64px">Liste</button></div></div>`;
+    o.querySelector("[data-ok]").onclick = () => { fait.add(e.id); liste(); };
+    o.querySelector("[data-l]").onclick = liste; };
+  document.body.appendChild(o); liste();
 }
 function dlgQr(){
   if (!window.__moi) return toast("Connecte-toi d'abord à la bibliothèque.");
