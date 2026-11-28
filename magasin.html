@@ -778,14 +778,21 @@ async function abonner(oui){
 
 /* =================================================================== MAGASINIER =================================================================== */
 let MAG = [], FILTRE_CODE = "", magT = 0, MAG_VUS = null;
+/* 28 nov. : avec le NIP, le comptoir ouvre la clé privée (chiffrée avec le NIP) et la garde sur cet appareil (géré par le magasinier) */
+async function ouvrirClePriv(nip, emp){ try { const r = await rpc("magasin_priv", { p_cle:emp }); if (!r) return; const o = JSON.parse(r), S = crypto.subtle;
+  const k = await S.deriveKey({ name:"PBKDF2", salt:b64d(o.s), iterations:200000, hash:"SHA-256" }, await S.importKey("raw", new TextEncoder().encode("metier+|comptoir|" + nip), "PBKDF2", false, ["deriveKey"]), { name:"AES-GCM", length:256 }, false, ["decrypt"]);
+  const p8 = await S.decrypt({ name:"AES-GCM", iv:b64d(o.i) }, k, b64d(o.c)), pk = await S.importKey("pkcs8", p8, { name:"ECDH", namedCurve:"P-256" }, true, ["deriveBits"]);
+  LS.set("magPriv", await S.exportKey("jwk", pk)); } catch(e){} }
 /* NIP du comptoir : demandé une fois sur l'appareil du magasinier */
-async function nipComptoir(){ const k = LS.get("magCle", ""); if (k) { try { const ok = await rpc("magasin_cle_verifier", { p_cle:k }); if (ok === false) LS.set("magCle", ""); else return true; } catch(e){ return true; } }
+async function nipComptoir(){ let k = LS.get("magCle", "");
+  if (k && !/^prof:/.test(k) && !LS.get("magPriv", null)) { try { const p = await rpc("magasin_pub", {}); if (p && p.x) { LS.set("magCle", ""); k = ""; } } catch(e){} }   /* une seule fois : le NIP ouvre maintenant les prénoms */
+  if (k) { try { const ok = await rpc("magasin_cle_verifier", { p_cle:k }); if (ok === false) LS.set("magCle", ""); else return true; } catch(e){ return true; } }
   $("#tTitre").textContent = "Comptoir du magasin"; $("#app").innerHTML = `<h1>Comptoir du magasin</h1><p class="sous">Entre le NIP du comptoir (6 chiffres). Ton enseignant le définit dans Administration → Magasin.</p>
     <div class="carte"><input class="code cache-code" id="nip" inputmode="numeric" maxlength="6" autocomplete="off" placeholder="000000" aria-label="NIP du comptoir"><p class="err" id="nE"></p><button class="btn p" id="nOk">Entrer</button></div>`;
   return new Promise(fin => { const go = async () => { const v = $("#nip").value.trim(); if (!/^\d{6}$/.test(v)) { $("#nE").textContent = "Le NIP a 6 chiffres."; return; }
       const k = await empreinteNIP(v); let ok; try { ok = await rpc("magasin_cle_verifier", { p_cle:k }); } catch(e){ ok = / 404$/.test(e.message) ? true : null; }
       if (ok === null) { $("#nE").textContent = "Internet ne répond pas. Réessaie."; return; } if (!ok) { $("#nE").textContent = "NIP incorrect."; $("#nip").value = ""; return; }
-      LS.set("magCle", k); fin(true); };
+      LS.set("magCle", k); await ouvrirClePriv(v, k); fin(true); };
     $("#nip").oninput = () => { if (/^\d{6}$/.test($("#nip").value.trim())) go(); }; $("#nip").onkeydown = e => { if (e.key === "Enter") go(); }; $("#nOk").onclick = go; $("#nip").focus(); }); }
 /* 27 nov. (Jeremy : « moyen de voir le code des élèves rapidement, pour mes profs, sur leur cell dans le raccourci Commandes ») :
    magasin.html?mode=codes. Codes = registres partagés (groupes de l'enseignant ou partagés avec lui). Prénoms = son registre de formation
@@ -809,13 +816,16 @@ async function envPour(pub, txt){ const brut = new TextEncoder().encode(txt); if
 async function ouvrirEnv(env, priv){ const u = b64d(String(env).slice(1));
   if (env[0] === "E"){ const k = await cleEC2(priv, u.subarray(0, 65)); return new TextDecoder().decode(await crypto.subtle.decrypt({ name:"AES-GCM", iv:u.subarray(65, 77) }, k, u.subarray(77))); }
   return new TextDecoder().decode(await crypto.subtle.decrypt({ name:"RSA-OAEP" }, priv, u)); }
-async function pourComptoir(prenom){ try { const c = COMPTES[COMPTOIR], pub = c && c.pub; if (!prenom || !pub || pub.kty !== "EC") return null;
+let PUB_C;   /* 28 nov. : clé publique du comptoir (créée avec le NIP dans Administration → Magasin), sinon le compte « comptoir.magasin » */
+async function pourComptoir(prenom){ try { if (PUB_C === undefined) { PUB_C = null; try { PUB_C = await rpc("magasin_pub", {}); } catch(e){} }
+  const c = COMPTES[COMPTOIR], pub = (PUB_C && PUB_C.x) ? PUB_C : c && c.pub; if (!prenom || !pub || pub.kty !== "EC") return null;
   return await envPour(pub, String(prenom).split(/\s+/)[0].slice(0, 20)); } catch(e){ return null; } }
 let SESS_C;
 async function prenomsComptoir(L){ await prenomsComptoir0(L); for (const p of L) if (!p.prenom && window.codeEssai && await codeEssai(p.code)) p.prenom = "Kaleb"; }   /* 28 nov. : la carte d'essai s'appelle Kaleb au comptoir aussi */
 async function prenomsComptoir0(L){ if (!L.some(p => chiffre(p.prenom))) { L.forEach(p => { if (chiffre(p.prenom)) p.prenom = ""; }); return; }
-  await sessionCoffre();
-  for (const p of L) { if (!chiffre(p.prenom)) continue; let t = ""; try { if (SESS_C && SESS_C.priv) t = await ouvrirEnv(p.prenom, SESS_C.priv); } catch(e){} p.prenom = t; } }
+  if (!LS.get("magPriv", null)) await sessionCoffre();
+  let pc = null; try { const j = LS.get("magPriv", null); if (j) pc = await crypto.subtle.importKey("jwk", j, { name:"ECDH", namedCurve:"P-256" }, false, ["deriveBits"]); } catch(e){}
+  for (const p of L) { if (!chiffre(p.prenom)) continue; let t = ""; for (const k of [pc, SESS_C && SESS_C.priv]) { if (t || !k) continue; try { t = await ouvrirEnv(p.prenom, k); } catch(e){} } p.prenom = t; } }
 async function sessionCoffre(){ if (SESS_C === undefined) { SESS_C = null; try { await new Promise((ok, ko) => { if (window.COFFRE) return ok(); const sc = document.createElement("script"); sc.src = "coffre.js?v=275"; sc.onload = ok; sc.onerror = ko; document.head.appendChild(sc); }); SESS_C = await COFFRE.session(); } catch(e){} } return SESS_C; }
 /* absences chiffrées : l'enseignant ouvre la partie qui lui est destinée (genre, motif, moment) */
 async function ouvrirAbs(L, ens){ if (!L.some(a => a.data)) return; const S = await sessionCoffre();

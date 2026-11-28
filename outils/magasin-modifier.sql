@@ -141,3 +141,23 @@ revoke all on table public.magasin_cle from anon, authenticated;
 grant execute on function public.magasin_cle_definir(text, text, text), public.magasin_cle_verifier(text), public.panier_magasin_c(text), public.panier_remettre_c(text, uuid, boolean),
   public.panier_signaler_c(text, uuid, int), public.panier_signalements_c(text, uuid[]), public.magasin_abonner_c(text, jsonb, boolean),
   public.magasin_acommander_ajouter_c(text, text, text, int, text), public.magasin_acommander_maj_c(text, bigint, boolean, boolean) to anon, authenticated;
+
+-- 28 nov. (Jeremy : « change ça pour un mot de passe sur le comptoir ») : plus besoin d'un compte « Comptoir Magasin ».
+-- En définissant le NIP, l'enseignant crée une paire de clés : la clé publique sert à chiffrer le prénom en approuvant;
+-- la clé privée est gardée chiffrée avec le NIP (PBKDF2 + AES-256-GCM) : seul un appareil qui connaît le NIP peut lire les prénoms.
+alter table public.magasin_cle add column if not exists pub jsonb, add column if not exists priv text;
+drop function if exists public.magasin_cle_definir(text, text, text);
+create or replace function public.magasin_cle_definir(p_ens text, p_jeton text, p_empreinte text, p_pub jsonb default null, p_priv text default null)
+returns boolean language plpgsql security definer set search_path = public as $$
+begin
+  if not public.panier_prof_ok(p_ens, p_jeton) or p_empreinte !~ '^[0-9a-f]{64}$' or length(coalesce(p_priv, '')) > 2000 then return false; end if;
+  insert into public.magasin_cle(id, empreinte, pub, priv) values (1, p_empreinte, p_pub, p_priv)
+    on conflict (id) do update set empreinte = excluded.empreinte, pub = excluded.pub, priv = excluded.priv, maj = now();
+  return true;
+end $$;
+create or replace function public.magasin_pub() returns jsonb language sql stable security definer set search_path = public as $$ select pub from public.magasin_cle where id = 1; $$;
+create or replace function public.magasin_priv(p_cle text) returns text language sql stable security definer set search_path = public as $$
+  select priv from public.magasin_cle where id = 1 and empreinte = p_cle;
+$$;
+revoke all on function public.magasin_cle_definir(text, text, text, jsonb, text), public.magasin_pub(), public.magasin_priv(text) from public;
+grant execute on function public.magasin_cle_definir(text, text, text, jsonb, text), public.magasin_pub(), public.magasin_priv(text) to anon, authenticated;

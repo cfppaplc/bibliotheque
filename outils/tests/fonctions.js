@@ -692,6 +692,26 @@ test("metierplus.app/acces : ouvre Mon accès; sur iPhone, le guide « écran d'
   vrai(/Sur l'écran d'accueil/.test(await p.evaluate(() => document.body.innerText)), "Le guide iPhone ne s'affiche pas");
   vrai(!errs.length, errs.join(" | ")); await ctx.close();
 });
+test("Comptoir : le NIP ouvre les prénoms (clé privée chiffrée avec le NIP), sans compte « Comptoir Magasin »", async b => {   /* 28 nov. */
+  const ctx = await b.newContext({ serviceWorkers: "block" }), errs = [], D = {};
+  await ctx.route(/supabase\.co\/rest\/v1\/rpc\/(\w+)/, r => { const f = r.request().url().match(/rpc\/(\w+)/)[1]; let o = null;
+    if (f === "magasin_pub") o = D.pub; else if (f === "magasin_priv") o = D.priv;
+    r.fulfill({ body: JSON.stringify(o), contentType: "application/json", headers: { "access-control-allow-origin": "*" } }); });
+  const p = await ctx.newPage(); p.on("pageerror", e => errs.push(e.message)); await p.goto(BASE + "magasin.html?mode=codes"); await attendre(1200);
+  const k = await p.evaluate(async () => { const S = crypto.subtle, b64 = u => btoa(String.fromCharCode(...new Uint8Array(u))), nip = "482913";
+    const kp = await S.generateKey({ name:"ECDH", namedCurve:"P-256" }, true, ["deriveBits"]), pub = await S.exportKey("jwk", kp.publicKey), p8 = await S.exportKey("pkcs8", kp.privateKey);
+    const sel = crypto.getRandomValues(new Uint8Array(16)), iv = crypto.getRandomValues(new Uint8Array(12));
+    const k = await S.deriveKey({ name:"PBKDF2", salt:sel, iterations:200000, hash:"SHA-256" }, await S.importKey("raw", new TextEncoder().encode("metier+|comptoir|" + nip), "PBKDF2", false, ["deriveKey"]), { name:"AES-GCM", length:256 }, false, ["encrypt"]);
+    return { pub:{ kty:"EC", crv:"P-256", x:pub.x, y:pub.y }, priv:JSON.stringify({ s:b64(sel), i:b64(iv), c:b64(await S.encrypt({ name:"AES-GCM", iv }, k, p8)) }) }; });
+  D.pub = k.pub; D.priv = k.priv;
+  const env = await p.evaluate(() => pourComptoir("Lucas Tremblay"));
+  vrai(/^E/.test(env || ""), "Approbation : le prénom n'est pas chiffré avec la clé du comptoir");
+  const nom = await p.evaluate(async e => { await ouvrirClePriv("482913", "x"); const L = [{ code: "12345", prenom: e }]; await prenomsComptoir(L); return L[0].prenom; }, env);
+  vrai(nom === "Lucas", "Comptoir : le NIP n'ouvre pas le prénom (" + nom + ")");
+  const mauvais = await p.evaluate(async e => { localStorage.removeItem("magPriv"); await ouvrirClePriv("000000", "x"); const L = [{ code: "12345", prenom: e }]; await prenomsComptoir(L); return L[0].prenom; }, env);
+  vrai(mauvais === "", "Comptoir : un mauvais NIP ouvre le prénom");
+  vrai(!errs.length, errs.join(" | ")); await ctx.close();
+});
 test("Distribuer les cartes à l'écran : un code QR à la fois, prénom seulement, liste cochée", async b => {   /* 27 nov. */
   const p = await (await b.newContext({ viewport: { width: 1280, height: 720 } })).newPage(), errs = []; p.on("pageerror", e => errs.push(e.message));
   await p.goto(BASE + "passeport.html"); await attendre(1500);
