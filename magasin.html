@@ -480,8 +480,17 @@ setInterval(() => { if (document.querySelector(".mgEtat, #pEnv")) majEtat(); }, 
    à l'horaire »; « pas besoin d'appeler ». Motifs et avertissements : Règles de fonctionnement 2025-2026 du Pavillon (section 14). outils/absences.sql. */
 /* 27 nov. (Loi 25, vérification) : aucun motif de santé. « Raison personnelle » couvre maladie, famille, deuil, sans détail.
    Le motif 3 (ancien « décès d'un proche ») n'est plus offert; les anciens 1-2-3 ont été convertis dans la base. */
-const MOTIFS = [null, "Raison personnelle", "Rendez-vous", "Raison personnelle", "Rendez-vous aux services aux élèves", "Activité autorisée par un enseignant", "Autre"];
-const MOTIFS_C = [null, "Raison personnelle", "Rendez-vous", "Raison personnelle", "Services aux élèves", "Activité autorisée", "Autre"];
+/* 28 nov. (Jeremy : « une option motivée selon le règlement; d'autres motifs non motivés, sans détail qui nuit à la Loi 25 ») :
+   7 = motivée selon le règlement (point 14.1, billet), 8-10 = non motivées. 2, 4, 5 restent pour lire les anciens signalements. */
+const MOTIFS = [null, "Raison personnelle", "Rendez-vous", "Raison personnelle", "Rendez-vous aux services aux élèves", "Activité autorisée par un enseignant", "Autre", "Motivée selon le règlement (billet)", "Transport", "Travail", "Raison familiale"];
+const MOTIFS_C = [null, "Raison personnelle (non motivée)", "Rendez-vous", "Raison personnelle (non motivée)", "Services aux élèves", "Activité autorisée", "Autre (non motivée)", "Motivée selon le règlement", "Transport (non motivée)", "Travail (non motivée)", "Raison familiale (non motivée)"];
+const MOTIVE = m => [2, 4, 5, 7].includes(+m);
+const REGLEMENT = `<b>Règles de fonctionnement du Pavillon-de-l'Avenir (point 14), en résumé</b>
+  <p><b>Absence motivée (billet obligatoire)</b> : maladie prolongée (hospitalisation, accident) ou décès d'un proche; rendez-vous médical (toi ou un proche); rendez-vous avec un professionnel des services aux élèves; activité autorisée à l'avance par ton enseignant (permis de conduire, recherche d'emploi, comité, événement majeur). N'écris aucun détail ici : le billet se remet au centre.</p>
+  <p><b>Absence non motivée</b> : tout autre motif, ou une activité sans autorisation. Plus de 10 % d'absences non motivées dans une compétence = pas d'épreuve de reprise après un échec. Étapes : avertissement verbal, avertissement écrit et engagement, puis sanction.</p>
+  <p><b>Examen manqué</b> : seuls la maladie prolongée, un rendez-vous médical ou le décès d'un proche sont acceptés.</p>
+  <p><b>Retard ou départ hâtif</b> : peut compter comme une absence non motivée. <b>5 jours d'absence de suite</b> = abandon présumé de ta formation.</p>
+  <p><a href="https://cfppa.csskamloup.gouv.qc.ca/" target="_blank" rel="noopener">Règles complètes sur le site du Pavillon-de-l'Avenir</a></p>`;
 const GENRES = { absence:"Absence", retard:"Retard", depart:"Départ hâtif" };
 const jourTxt = d => new Date(d + "T12:00:00").toLocaleDateString("fr-CA", { weekday:"short", day:"numeric", month:"short" });
 const quandTxt = a => (a.du === a.au ? jourTxt(a.du) : jourTxt(a.du) + " au " + jourTxt(a.au)) + (a.part === "am" ? " · avant-midi" : a.part === "pm" ? " · après-midi" : a.genre === "absence" ? " · journée" : "") + (a.heure ? " · " + hTxt(a.heure) : "");
@@ -498,9 +507,9 @@ async function absences(){
   const S = { genre:"absence", du:auj, au:auj, part:"j", heure:"", motif:0, profs:der.length ? der : (PROFS.length === 1 ? [PROFS[0]] : []) };
   const avert = () => { const A = [`<div class="abA">Garde ton billet : une absence justifiée exige un billet.</div>`];
     if (S.genre !== "absence") A.push(`<div class="abA">Un retard ou un départ hâtif peut être considéré comme une absence non justifiée.</div>`);
-    if (S.motif === 5) A.push(`<div class="abA">L'activité doit être autorisée à l'avance par ton enseignant.</div>`);
-    if (S.motif === 6) A.push(`<div class="abA r">Ce motif n'est pas reconnu : c'est une absence non justifiée (avertissement inscrit au dossier). Plus de 10 % d'absences non motivées dans une compétence = pas d'épreuve de reprise.</div>`);
-    A.push(`<div class="abA${S.motif && S.motif <= 3 ? "" : " r"}">Si tu manques un examen : seuls la maladie, un rendez-vous médical ou le décès d'un proche peuvent justifier ton absence.</div>`);
+    if (S.motif === 7) A.push(`<div class="abA">Motivée seulement si elle entre dans le règlement (touche le « i ») et si tu remets ton billet au centre. Sinon, elle devient non motivée.</div>`);
+    if (S.motif && !MOTIVE(S.motif)) A.push(`<div class="abA r">Absence non motivée (avertissement inscrit au dossier). Plus de 10 % d'absences non motivées dans une compétence = pas d'épreuve de reprise.</div>`);
+    A.push(`<div class="abA r">Si tu manques un examen : seuls la maladie prolongée, un rendez-vous médical ou le décès d'un proche peuvent justifier ton absence.</div>`);
     if (S.genre === "absence") { let n = 0; for (let d = new Date(S.du + "T12:00:00"); jourCle(d) <= S.au; d.setDate(d.getDate() + 1)) if (d.getDay() % 6) n++;
       if (n >= 5) A.push(`<div class="abA r">5 jours d'absence de suite = abandon présumé de ta formation. Parles-en à ton enseignant.</div>`); }
     return A.join(""); };
@@ -509,7 +518,7 @@ async function absences(){
       <div class="carte abC"><div class="abS">Quoi ?</div><div class="abSeg">${Object.entries(GENRES).map(([k, t]) => `<button data-g="${k}" class="${S.genre === k ? "on" : ""}">${t}</button>`).join("")}</div>
         <div class="abS">Quand ?</div><div class="abD"><label>${S.genre === "absence" ? "Du" : "Le"}<input type="date" id="abDu" value="${S.du}"></label>${S.genre === "absence" ? `<label>Au<input type="date" id="abAu" value="${S.au}" min="${S.du}"></label>` : `<label>${S.genre === "retard" ? "J'arrive à" : "Je pars à"}<input type="time" id="abH" value="${S.heure}"></label>`}</div>
         ${S.genre === "absence" ? `<div class="abSeg" style="margin-top:8px">${[["j", "Journée"], ["am", "Avant-midi"], ["pm", "Après-midi"]].map(([k, t]) => `<button data-p="${k}" class="${S.part === k ? "on" : ""}">${t}</button>`).join("")}</div>` : ""}</div>
-      <div class="carte abC"><div class="abS">Motif</div><div class="abM">${[1, 2, 4, 5, 6].map(i => `<button data-m="${i}" class="${S.motif === i ? "on" : ""}"><i></i>${MOTIFS[i]}</button>`).join("")}</div><p class="sous" style="margin:8px 0 0;font-size:.85rem">N'écris aucun détail sur ta santé : le billet se remet directement au centre.</p></div>
+      <div class="carte abC"><div class="abS" style="display:flex;align-items:center;gap:8px">Motif <button type="button" id="abReg" aria-label="Règlement des absences" style="width:26px;height:26px;border-radius:50%;border:2px solid var(--orange,#EB6A22);background:#fff;color:var(--orange,#EB6A22);font:700 14px/1 Georgia,serif;cursor:pointer">i</button></div><div id="abRegT" hidden style="font-size:.9rem;line-height:1.45;background:#FFF6EE;border-radius:12px;padding:10px 12px;margin:0 0 10px">${REGLEMENT}</div><div class="abM">${[7, 1, 10, 8, 9, 6].map(i => `<button data-m="${i}" class="${S.motif === i ? "on" : ""}"><i></i>${MOTIFS[i]}</button>`).join("")}</div><p class="sous" style="margin:8px 0 0;font-size:.85rem">N'écris aucun détail sur ta santé : le billet se remet directement au centre.</p></div>
       <div class="carte abC"><div class="abS">Ton enseignant à l'horaire</div><p class="sous" style="margin:0 0 8px">Avec qui étais-tu (ou seras-tu) pendant cette absence ?</p><div class="abP">${PROFS.map(id => `<button data-e="${esc(id)}" class="${S.profs.includes(id) ? "on" : ""}"><span class="av">${esc(nomEns(id).charAt(0))}</span>${esc(nomEns(id))}</button>`).join("")}</div></div>
       <div class="carte abC"><div class="abS">À savoir</div>${avert()}</div>
       <p class="err" id="abE"></p><button class="btn p" id="abOk" style="width:100%">Signaler à mon enseignant</button>
@@ -517,6 +526,7 @@ async function absences(){
     document.querySelectorAll("[data-g]").forEach(b => b.onclick = () => { S.genre = b.dataset.g; if (S.genre !== "absence") { S.au = S.du; S.part = "j"; } dessiner(); });
     document.querySelectorAll("[data-p]").forEach(b => b.onclick = () => { S.part = b.dataset.p; dessiner(); });
     document.querySelectorAll("[data-m]").forEach(b => b.onclick = () => { S.motif = +b.dataset.m; dessiner(); });
+    $("#abReg").onclick = () => { const t = $("#abRegT"); t.hidden = !t.hidden; };
     document.querySelectorAll("[data-e]").forEach(b => b.onclick = () => { const id = b.dataset.e; S.profs = S.profs.includes(id) ? S.profs.filter(x => x !== id) : S.profs.concat(id); dessiner(); });
     $("#abDu").onchange = e => { S.du = e.target.value || auj; if (S.au < S.du || S.genre !== "absence") S.au = S.du; dessiner(); };
     if ($("#abAu")) $("#abAu").onchange = e => { S.au = e.target.value < S.du ? S.du : e.target.value; dessiner(); };
@@ -532,7 +542,7 @@ async function absences(){
         if (!r || !r.ok) throw new Error(r && r.err === "trop" ? "Trop de signalements aujourd'hui." : r && r.err === "carte" ? "Ton accès n'est pas reconnu. Demande à ton enseignant." : "Signalement refusé. Vérifie les dates.");
         LS.set("absProfs", S.profs);
         $("#app").innerHTML = `<div class="constr"><div class="abOk"><svg viewBox="0 0 24 24" width="40" height="40"><path d="M5 12.5l4.2 4.2L19 7" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div><h1>${GENRES[S.genre]} signalé${S.genre === "absence" ? "e" : ""}</h1>
-          <p class="sous">${esc(S.profs.map(nomEns).join(" et "))} ${S.profs.length > 1 ? "ont" : "a"} reçu l'avis. ${S.motif <= 5 ? "N'oublie pas ton billet." : ""}</p><a class="btn p" href="carte.html" style="margin-top:14px">‹ Mon accès</a><button class="btn" id="abAutre" style="margin-top:8px">Signaler autre chose</button></div>`;
+          <p class="sous">${esc(S.profs.map(nomEns).join(" et "))} ${S.profs.length > 1 ? "ont" : "a"} reçu l'avis. ${MOTIVE(S.motif) ? "N'oublie pas ton billet." : ""}</p><a class="btn p" href="carte.html" style="margin-top:14px">‹ Mon accès</a><button class="btn" id="abAutre" style="margin-top:8px">Signaler autre chose</button></div>`;
         $("#abAutre").onclick = () => { S.motif = 0; dessiner(); }; }
       catch(e){ er.textContent = /Failed|fetch|404/.test(e.message) ? "Pas de connexion pour l'instant. Réessaie dans un moment." : e.message; b.disabled = false; b.textContent = "Signaler à mon enseignant"; } };
     liste(); };

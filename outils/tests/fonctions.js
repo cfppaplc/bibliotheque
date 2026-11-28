@@ -742,7 +742,10 @@ test("Absences : l'élève signale une absence depuis Ma carte (motif, enseignan
   const p = await c.newPage(); p.on("pageerror", e => errs.push(e.message)); await p.goto(BASE + "magasin.html?mode=absence"); await attendre(1200);
   await p.evaluate(() => { window.trouverEleve = async () => [{ ens: "jeremy.raymond", groupe: "2602PLCA1", profs: ["jeremy.raymond", "autre.prof"] }]; return absences(); }); await attendre(600);
   await p.click("#abOk"); await attendre(150); vrai(/motif/.test(await p.textContent("#abE")), "Absences : pas d'erreur sans motif");
-  await p.click('[data-m="6"]'); await attendre(150); vrai(/non justifiée/.test(await p.textContent(".abC:nth-of-type(4)") + await p.textContent("#app")), "Absences : pas d'avertissement pour « Autre »");
+  /* 28 nov. : motif « motivée selon le règlement » + le « i » qui affiche le règlement */
+  vrai(!!(await p.$('[data-m="7"]')) && !(await p.$('[data-m="2"]')), "Absences : motif « motivée selon le règlement » absent (ou ancien motif encore offert)");
+  await p.click("#abReg"); await attendre(150); vrai(/10 %/.test(await p.textContent("#abRegT")) && await p.isVisible("#abRegT"), "Absences : le « i » n'affiche pas le règlement");
+  await p.click('[data-m="6"]'); await attendre(150); vrai(/non motivée/.test(await p.textContent(".abC:nth-of-type(4)") + await p.textContent("#app")), "Absences : pas d'avertissement pour « Autre »");
   await p.click('[data-e="jeremy.raymond"]'); await attendre(150); await p.click("#abOk"); await attendre(500);
   vrai(sent && sent.p_code === "48213" && sent.p_cle === "K7Q9X2" && sent.p_profs.join() === "jeremy.raymond" && sent.p_motif === undefined && sent.p_genre === undefined
     && /^[ER]/.test(sent.p_data["jeremy.raymond"] || "") && sent.p_data._e, "Absences : signalement mal envoyé (doit être chiffré) " + JSON.stringify(sent));
