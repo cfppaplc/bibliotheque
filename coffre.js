@@ -170,6 +170,7 @@ window.COFFRE = (function(){
     for (const so of sortes){ if (lsGet(meta(so, "sale"))) continue;
       let cles = PAR_DEFAUT[so] || []; try { cles = cles.concat(JSON.parse(lsGet(meta(so, "cles")) || "[]")); } catch(e){}
       cles.forEach(k => { try { localStorage.removeItem(k); } catch(e){} }); ["t", "compte", "cles"].forEach(k => lsDel(meta(so, k))); }
+    try { if (self.caches) await caches.delete("mp-prenoms"); } catch(e){}   /* prénoms gardés pour les avis du cellulaire (magasin.html, sw.js) */
     SESS = null;
   }
   function oublier(){ SESS = null; }

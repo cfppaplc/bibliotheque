@@ -493,3 +493,37 @@ drop trigger if exists panier_menage on public.panier;
 create trigger panier_menage after insert on public.panier for each statement execute function public.magasin_menage();
 delete from public.panier where t < now() - interval '120 days';
 delete from public.magasin_avis where t < now() - interval '120 days';
+
+-- 27 nov. (vérification Loi 25 : aucun prénom d'élève en clair sur le serveur).
+-- L'élève n'envoie plus son prénom; en approuvant, l'enseignant envoie le prénom CHIFFRÉ pour le compte « comptoir.magasin » (enveloppe « E… »).
+-- Tout prénom en clair est refusé (déclencheurs), et les prénoms déjà gardés sont effacés.
+create or replace function public.sans_prenom_clair() returns trigger language plpgsql as $$
+begin
+  if new.prenom is not null and not (new.prenom ~ '^E[A-Za-z0-9+/=]+$' and length(new.prenom) between 61 and 401) then new.prenom := null; end if;
+  return new;
+end $$;
+drop trigger if exists panier_sans_prenom on public.panier;
+create trigger panier_sans_prenom before insert or update of prenom on public.panier for each row execute function public.sans_prenom_clair();
+drop trigger if exists absence_sans_prenom on public.absence;
+create trigger absence_sans_prenom before insert or update of prenom on public.absence for each row execute function public.sans_prenom_clair();
+drop trigger if exists avis_sans_prenom on public.magasin_avis;
+create trigger avis_sans_prenom before insert or update of prenom on public.magasin_avis for each row execute function public.sans_prenom_clair();
+update public.panier set prenom = null where prenom is not null and not (prenom ~ '^E[A-Za-z0-9+/=]+$' and length(prenom) between 61 and 401);
+update public.absence set prenom = null where prenom is not null;
+update public.magasin_avis set prenom = null where prenom is not null and not (prenom ~ '^E[A-Za-z0-9+/=]+$' and length(prenom) between 61 and 401);
+create or replace function public.panier_decider(p_ens text, p_jeton text, p_id uuid, p_ok boolean, p_motif text default null, p_prenom text default null)
+returns boolean language plpgsql security definer set search_path = public, extensions as $$
+declare a jsonb; pr text := case when p_prenom ~ '^E[A-Za-z0-9+/=]+$' and length(p_prenom) between 61 and 401 then p_prenom else null end;
+begin
+  if not public.panier_prof_ok(p_ens, p_jeton) then return false; end if;
+  update public.panier set etat = case when p_ok then 'approuve' else 'refuse' end, t_app = now(), motif = left(nullif(trim(p_motif), ''), 200), prenom = pr
+    where id = p_id and (ens = p_ens or p_ens = any(profs)) and etat = 'attente' returning abo into a;
+  if not found then return false; end if;
+  if a is not null then
+    perform net.http_post(url := 'https://kjlotlhqrgekzohshmbn.supabase.co/functions/v1/panier-avis', headers := '{"Content-Type":"application/json"}'::jsonb, body := jsonb_build_object('id', p_id, 'eleve', true));
+  end if;
+  if p_ok and exists (select 1 from public.magasin_abo) then
+    perform net.http_post(url := 'https://kjlotlhqrgekzohshmbn.supabase.co/functions/v1/panier-avis', headers := '{"Content-Type":"application/json"}'::jsonb, body := jsonb_build_object('id', p_id, 'comptoir', true));
+  end if;
+  return true;
+end; $$;

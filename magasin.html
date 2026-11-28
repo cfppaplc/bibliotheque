@@ -514,7 +514,7 @@ async function absences(){
       if (!S.motif) { er.textContent = "Choisis un motif."; return; } if (!S.profs.length) { er.textContent = "Choisis ton enseignant."; return; }
       if (S.genre !== "absence" && !S.heure) { er.textContent = S.genre === "retard" ? "Écris l'heure de ton arrivée." : "Écris l'heure de ton départ."; return; }
       const b = $("#abOk"); b.disabled = true; b.textContent = "Envoi…";
-      try { const r = await rpc("absence_signaler", { p_code:code, p_cle:cle, p_groupe:G.groupe, p_prenom:prenom, p_profs:S.profs, p_genre:S.genre, p_du:S.du, p_au:S.genre === "absence" ? S.au : S.du, p_part:S.genre === "absence" ? S.part : "j", p_heure:S.genre === "absence" ? "" : S.heure, p_motif:S.motif });
+      try { const r = await rpc("absence_signaler", { p_code:code, p_cle:cle, p_groupe:G.groupe, p_prenom:null, p_profs:S.profs, p_genre:S.genre, p_du:S.du, p_au:S.genre === "absence" ? S.au : S.du, p_part:S.genre === "absence" ? S.part : "j", p_heure:S.genre === "absence" ? "" : S.heure, p_motif:S.motif });
         if (!r || !r.ok) throw new Error(r && r.err === "trop" ? "Trop de signalements aujourd'hui." : r && r.err === "carte" ? "Ta carte n'est pas reconnue. Demande à ton enseignant." : "Signalement refusé. Vérifie les dates.");
         LS.set("absProfs", S.profs);
         $("#app").innerHTML = `<div class="constr"><div class="abOk"><svg viewBox="0 0 24 24" width="40" height="40"><path d="M5 12.5l4.2 4.2L19 7" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div><h1>${GENRES[S.genre]} signalé${S.genre === "absence" ? "e" : ""}</h1>
@@ -600,7 +600,7 @@ function panier(){
         LS.set("magEdit", ""); PANIER = {}; sauverPanier(); LS.set("magNote", ""); toast("Panier modifié."); fermer(); }
       catch(e){ $("#pErr").textContent = "Modification impossible : " + e.message; b.disabled = false; b.textContent = "Enregistrer les changements"; }
       return; }
-    try { const r = await rpc("panier_envoyer", { p_ens:MOI.ens, p_groupe:MOI.groupe, p_code:MOI.code, p_items:items, p_note:$("#pNote").value || null, p_prenom:MOI.prenom || LS.get("magPrenom", "") || null, p_profs:MOI.profs && MOI.profs.length ? MOI.profs : null });
+    try { const r = await rpc("panier_envoyer", { p_ens:MOI.ens, p_groupe:MOI.groupe, p_code:MOI.code, p_items:items, p_note:$("#pNote").value || null, p_prenom:null,   /* 27 nov. (Loi 25) : aucun prénom sur le serveur */ p_profs:MOI.profs && MOI.profs.length ? MOI.profs : null });
       if (!r || !r.ok) throw new Error(r && r.err || "refus");
       const COR = LS.get("magCorrige", null); let E = LS.get("magEnvois", []); if (COR) E = E.filter(y => y.id !== COR.id); LS.set("magCorrige", null);   /* 26 nov. : le panier corrigé remplace le refusé */
       E.unshift({ id:r.id, t:Date.now(), code:MOI.code, n:items.reduce((s, i) => s + i.q, 0), items:items.map(i => ({ id:i.id, q:i.q })) }); LS.set("magEnvois", E.slice(0, 20)); if (LS.get("magNotifE", false)) aboEleve(r.id).catch(() => {});
@@ -689,9 +689,10 @@ async function dessinerProf(){
   if (!window.__regAuto) { window.__regAuto = 1; const charge = src => new Promise(ok => { const sc = document.createElement("script"); sc.src = src; sc.onload = sc.onerror = ok; document.head.appendChild(sc); });
     (window.COFFRE ? Promise.resolve() : charge("coffre.js?v=272")).then(() => charge("js/registre-auto.js?v=2")); }
   let L; try { L = await rpc("panier_prof_lire", { p_ens:ENS, p_jeton:JETON }); } catch(e){ $("#app").innerHTML = `<p class="err">Pas de connexion pour l'instant. On réessaie tout seul.</p>`; profT = setTimeout(dessinerProf, 15000); return; }
-  { const N = await prenomsDossier(); (L || []).forEach(p => { if (N[p.code]) p.prenom = N[p.code]; }); PRENOMS_CMD = Object.fromEntries((L || []).map(p => [p.id, p.prenom || ""])); }   /* le prénom vient du dossier, jamais de ce que l'élève a tapé */
+  { const N = await prenomsDossier(); (L || []).forEach(p => { p.prenom = N[p.code] || ""; }); PRENOMS_CMD = Object.fromEntries((L || []).map(p => [p.id, p.prenom || ""])); }   /* le prénom vient du dossier, jamais de ce que l'élève a tapé */
   let AVIS = []; try { AVIS = await rpc("panier_prof_avis", { p_ens:ENS, p_jeton:JETON }) || []; } catch(e){}
-  let ABS = []; try { ABS = await rpc("absence_prof_lire", { p_ens:ENS, p_jeton:JETON }) || []; } catch(e){}   /* 27 nov. : absences signalées par les élèves */
+  let ABS = []; try { ABS = await rpc("absence_prof_lire", { p_ens:ENS, p_jeton:JETON }) || []; } catch(e){}
+  { const N = await prenomsDossier(); AVIS.forEach(a => a.prenom = N[a.code] || ""); ABS.forEach(a => a.prenom = N[a.code] || ""); }   /* 27 nov. (Loi 25) : le serveur ne garde aucun prénom */   /* 27 nov. : absences signalées par les élèves */
   const att = L.filter(p => p.etat === "attente"), aut = L.filter(p => p.etat !== "attente" && Date.now() - Date.parse(p.t_remis || p.t_app || p.t) < 108e5);   /* 26 nov. (Jeremy) : traités = 3 dernières heures (avant : 24 h); le reste est dans les archives */
   const neufs = att.filter(p => !VUS.has(p.id)); if (neufs.length && VUS.size) bip(); att.forEach(p => VUS.add(p.id)); LS.set("magVus", [...VUS].slice(-300));
   const avis = "Notification" in window && "serviceWorker" in navigator && "PushManager" in window, perm = avis ? Notification.permission : "non";
@@ -741,7 +742,7 @@ const cmdHtml = (p, attente) => `<div class="cmd e-${esc(p.etat)}${attente && !V
   <table>${(p.items || []).map(i => `<tr><td class="q"><span class="qb">${+i.q || 1}</span></td><td class="vg">${vigCmd(i)}</td><td>${esc(i.nom)}<small class="no">${esc(i.n)}</small></td></tr>`).join("")}</table>
   ${attente ? `<div class="act"><button class="btn v" data-ok="${p.id}">Approuver</button><button class="btn r" data-non="${p.id}">Refuser</button></div>` : ""}</div>`;
 let PRENOMS_CMD = {};
-async function decider(id, ok, motif){ try { if (await rpc("panier_decider", { p_ens:ENS, p_jeton:JETON, p_id:id, p_ok:ok, p_motif:motif || null, p_prenom:PRENOMS_CMD[id] || null }) !== true) throw new Error("déjà traité"); toast(ok ? "Approuvé : le magasinier le voit maintenant." : "Refusé."); } catch(e){ toast("Impossible : " + e.message); } dessinerProf(); }
+async function decider(id, ok, motif){ try { if (await rpc("panier_decider", { p_ens:ENS, p_jeton:JETON, p_id:id, p_ok:ok, p_motif:motif || null, p_prenom:ok ? await pourComptoir(PRENOMS_CMD[id]) : null }) !== true) throw new Error("déjà traité"); toast(ok ? "Approuvé : le magasinier le voit maintenant." : "Refusé."); } catch(e){ toast("Impossible : " + e.message); } dessinerProf(); }
 async function abonner(oui){
   const er = $("#avErr"); if (er) er.textContent = "";
   const perm1 = oui ? await Notification.requestPermission() : "";   /* iPhone : la permission en premier, au toucher */
@@ -775,6 +776,23 @@ async function nipComptoir(){ const k = LS.get("magCle", ""); if (k) { try { con
 /* 27 nov. (Jeremy : « moyen de voir le code des élèves rapidement, pour mes profs, sur leur cell dans le raccourci Commandes ») :
    magasin.html?mode=codes. Codes = registres partagés (groupes de l'enseignant ou partagés avec lui). Prénoms = son registre de formation
    (sur cet appareil, sinon son coffre s'il est connecté à Métier+ ici), sinon les prénoms vus dans ses commandes. Rien n'est envoyé. */
+/* 27 nov. (vérification Loi 25 : aucun prénom d'élève en clair sur le serveur).
+   En approuvant, la page de l'enseignant chiffre le prénom (tiré de son dossier) pour le compte « comptoir.magasin » (ECDH P-256 + AES-GCM,
+   même enveloppe « E… » que coffre.js). Le comptoir le déchiffre s'il est connecté à ce compte; sinon il affiche « Élève + code ». */
+const COMPTOIR = "comptoir.magasin", chiffre = x => /^E[A-Za-z0-9+/=]{60,}$/.test(String(x || ""));
+const b64e = u => btoa(String.fromCharCode(...u)), b64d = t => Uint8Array.from(atob(t), c => c.charCodeAt(0));
+async function cleEC2(prive, pubBrute){ const bits = await crypto.subtle.deriveBits({ name:"ECDH", public:await crypto.subtle.importKey("raw", pubBrute, { name:"ECDH", namedCurve:"P-256" }, false, []) }, prive, 256);
+  return crypto.subtle.importKey("raw", await crypto.subtle.digest("SHA-256", bits), "AES-GCM", false, ["encrypt", "decrypt"]); }
+async function pourComptoir(prenom){ try { const c = COMPTES[COMPTOIR], pub = c && c.pub; if (!prenom || !pub || pub.kty !== "EC") return null;
+  const EC = { name:"ECDH", namedCurve:"P-256" }, eph = await crypto.subtle.generateKey(EC, true, ["deriveBits"]), pubC = await crypto.subtle.importKey("jwk", { kty:"EC", crv:"P-256", x:pub.x, y:pub.y, ext:true }, EC, true, []);
+  const k = await cleEC2(eph.privateKey, new Uint8Array(await crypto.subtle.exportKey("raw", pubC))), iv = crypto.getRandomValues(new Uint8Array(12));
+  const ct = new Uint8Array(await crypto.subtle.encrypt({ name:"AES-GCM", iv }, k, new TextEncoder().encode(String(prenom).split(/\s+/)[0].slice(0, 20)))), e = new Uint8Array(await crypto.subtle.exportKey("raw", eph.publicKey));
+  const out = new Uint8Array(77 + ct.length); out.set(e); out.set(iv, 65); out.set(ct, 77); return "E" + b64e(out); } catch(e){ return null; } }
+let SESS_C;
+async function prenomsComptoir(L){ if (!L.some(p => chiffre(p.prenom))) { L.forEach(p => { if (chiffre(p.prenom)) p.prenom = ""; }); return; }
+  if (SESS_C === undefined) { SESS_C = null; try { await new Promise((ok, ko) => { if (window.COFFRE) return ok(); const sc = document.createElement("script"); sc.src = "coffre.js?v=272"; sc.onload = ok; sc.onerror = ko; document.head.appendChild(sc); }); SESS_C = await COFFRE.session(); } catch(e){} }
+  for (const p of L) { if (!chiffre(p.prenom)) continue; let t = ""; try { if (SESS_C && SESS_C.priv) { const u = b64d(p.prenom.slice(1)), k = await cleEC2(SESS_C.priv, u.subarray(0, 65));
+      t = new TextDecoder().decode(await crypto.subtle.decrypt({ name:"AES-GCM", iv:u.subarray(65, 77) }, k, u.subarray(77))); } } catch(e){} p.prenom = t; } }
 /* 27 nov. (Jeremy : « le prénom doit venir du dossier de l'élève ») : prénoms du registre de formation de l'enseignant
    (cet appareil, sinon son coffre). Seulement le prénom (premier mot). Gardé en mémoire 5 min. */
 let PRD = null, PRD_T = 0;
@@ -784,7 +802,9 @@ async function prenomsDossier(){
   try { ajoute((JSON.parse(localStorage.getItem("passeportOutils") || "null") || {}).el); } catch(e){}
   if (!Object.keys(N).length) { try { await new Promise((ok, ko) => { if (window.COFFRE) return ok(); const sc = document.createElement("script"); sc.src = "coffre.js?v=272"; sc.onload = ok; sc.onerror = ko; document.head.appendChild(sc); });
     const r = await COFFRE.recevoir("passeport"); ajoute((JSON.parse((r && r.v && r.v.passeportOutils) || "null") || {}).el); } catch(e){} }
-  PRD = N; PRD_T = Date.now(); return N;
+  PRD = N; PRD_T = Date.now();
+  try { if (Object.keys(N).length && self.caches) caches.open("mp-prenoms").then(c => c.put("/__prenoms", new Response(JSON.stringify(N), { headers:{ "Content-Type":"application/json" } }))); } catch(e){}   /* pour les avis du cellulaire (sw.js) */
+  return N;
 }
 async function codesEleves(){
   const PROF = !!(ENS && JETON && !(COMPTES[ENS] && COMPTES[ENS].eleve));
@@ -793,7 +813,7 @@ async function codesEleves(){
   $("#app").innerHTML = `<a class="lien" href="magasin.html?mode=prof">‹ Commandes</a><h1>Codes des élèves</h1><p class="sous">Chargement…</p>`;
   const N = Object.assign({}, await prenomsDossier());
   const deCoffre = Object.keys(N).length > 0;
-  try { (await rpc("panier_prof_lire", { p_ens:ENS, p_jeton:JETON }) || []).forEach(p => { if (p.code && p.prenom && !N[p.code]) N[p.code] = p.prenom; }); } catch(e){}
+  try { (await rpc("panier_prof_lire", { p_ens:ENS, p_jeton:JETON }) || []).forEach(p => { if (p.code && p.prenom && !chiffre(p.prenom) && !N[p.code]) N[p.code] = p.prenom; }); } catch(e){}
   const G = {}, ens = Object.keys(COMPTES).filter(id => !COMPTES[id].eleve);
   await Promise.all(ens.map(async e => { const g = await registre(e); for (const grp in g.codes) if (e === ENS || (g.part[grp] || []).includes(ENS)) (g.codes[grp] || []).forEach(c => { (G[grp] = G[grp] || new Set()).add(c); }); }));
   const grps = Object.keys(G).sort((a, b) => a.localeCompare(b, "fr", { numeric:true }));
@@ -809,7 +829,8 @@ async function ecranDirect(){ document.body.classList.add("ecranD");
   /* 26 nov. (Jeremy : « c'est pour moi ») : ouvert depuis la page enseignant, avec sa clé d'approbation (ses groupes), sans NIP. Sinon, NIP du comptoir. */
   const PROF = !!(ENS && JETON && !(COMPTES[ENS] && COMPTES[ENS].eleve));
   if (!PROF) await nipComptoir(); else $("#tQui").textContent = nomEns(ENS);
-  const lire = () => PROF ? rpc("panier_prof_lire", { p_ens:ENS, p_jeton:JETON }) : rpcM("panier_magasin", {});
+  const lire = async () => { const L = (await (PROF ? rpc("panier_prof_lire", { p_ens:ENS, p_jeton:JETON }) : rpcM("panier_magasin", {}))) || [];
+    if (PROF) { const N = await prenomsDossier(); L.forEach(p => p.prenom = N[p.code] || ""); } else await prenomsComptoir(L); return L; };
   const auj = new Date().toDateString();
   $("#tTitre").textContent = "Magasin · en direct"; let vus = null;
   const min = t => { const m = Math.max(0, Math.round((Date.now() - new Date(t)) / 60000)); return m < 1 ? "à l'instant" : m < 60 ? "depuis " + m + " min" : "depuis " + Math.floor(m / 60) + " h " + String(m % 60).padStart(2, "0"); };
@@ -900,7 +921,7 @@ function avisComptoir(){
 let titreT = 0; function clignoterTitre(n){ clearInterval(titreT); const t0 = "Comptoir", msg = "(" + n + ") Nouvelle commande"; let k = 0;
   titreT = setInterval(() => { document.title = k++ % 2 ? t0 : msg; if (k > 20 || document.hasFocus()) { clearInterval(titreT); document.title = t0; } }, 800); }
 async function charger(){ clearTimeout(magT);
-  try { MAG = await rpcM("panier_magasin", {}) || [];
+  try { MAG = await rpcM("panier_magasin", {}) || []; await prenomsComptoir(MAG);
     try { const S2 = new Map(); if (MAG.length) for (const r of await rpcM("panier_signalements", { p_ids:MAG.map(p => p.id) }) || []) { if (!S2.has(r.panier)) S2.set(r.panier, new Set()); S2.get(r.panier).add(r.regle); } SIG = S2; } catch(e){} const ids = MAG.filter(p => p.etat === "approuve").map(p => p.id);
     { const neufs = MAG_VUS ? MAG.filter(p => p.etat === "approuve" && !MAG_VUS.has(p.id)) : [];   /* 25 nov. (Jeremy) : le magasinier est averti d'une commande qui entre */
       if (neufs.length) { bip(); setTimeout(bip, 350); clignoterTitre(neufs.length); bandeauMag(neufs);

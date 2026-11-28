@@ -360,7 +360,7 @@ test("Magasin : l'élève (carte scannée) envoie son panier, l'enseignant appro
   await q.goto(BASE + "magasin.html?mode=prof"); await attendre(800); await q.click("#aOk"); await attendre(1200); await q.click("[data-ok]"); await attendre(1000);
   { const e2 = await q.context().newPage(); await e2.goto(BASE + "magasin.html?mode=prof"); await attendre(1200); await e2.click(".edB"); await attendre(2000);   /* 26 nov. : écran « Magasin en direct » ouvert par l'enseignant, sans NIP */
     vrai(!!(await e2.$(".ed-k")) && !(await e2.$("#nip, .nip")), "Magasin en direct : l'écran ne s'ouvre pas depuis la page enseignant");
-    vrai(/Essai/.test(await e2.textContent(".ed")), "Magasin en direct : la commande approuvée n'apparaît pas");
+    vrai(!!(await e2.$(".ed .ed-c")), "Magasin en direct : la commande approuvée n'apparaît pas");   /* 27 nov. : prénom tiré du dossier (aucun ici) */
     if (process.env.CAPTURES) await e2.screenshot({ path: process.env.CAPTURES + "/ecran-direct.png" }); await e2.close(); }
   vrai(P[0].etat === "approuve", "Approbation : " + P[0].etat);
   const c3 = await b.newContext({ viewport: { width: 1366, height: 768 }, serviceWorkers: "block" }); await mock(c3);
@@ -383,7 +383,7 @@ test("Magasin : l'élève (carte scannée) envoie son panier, l'enseignant appro
   vrai(!!(await m.$(".cmd td.vg .ph")), "Comptoir : la photo du raccord ne s'affiche pas");
   vrai(!!(await m.$(".cmd .etapes .et.cours")), "Comptoir : la barre d'étapes est absente");
   vrai(!!(await m.$("#app .avis-l .cloche svg")) && !/Activer sur cet appareil/.test(await m.textContent("#app")), "Comptoir : la cloche des avis remplace le bouton");
-  vrai(/Essai/.test(await m.textContent(".cmd .pr")), "Prénom absent au comptoir");
+  vrai(/Élève/.test(await m.textContent(".cmd .pr")), "Comptoir : sans compte du comptoir, le prénom ne doit pas paraître (aucun prénom en clair)");   /* 27 nov. (Loi 25) */
   /* 26 nov. : un article rangé dans plusieurs cases montre toutes ses cases (ex. coude 90° acier 3/4 : F-90, F-91, F-104) */
   const mc = await m.evaluate(() => { const a = CAT.find(x => (x.r2 || []).length); return a ? [rangee({ id: a.id }), autresCases({ id: a.id }).length, aussi({ id: a.id })] : null; });
   vrai(mc && mc[0] && mc[1] >= 1 && /aussi/.test(mc[2]), "Cases multiples non affichées : " + JSON.stringify(mc));
@@ -551,7 +551,12 @@ test("Magasin : sans carte, l'élève entre sans écrire son prénom; l'enseigna
   const tx = await q.textContent("#app");
   vrai(/Alex/.test(tx) && !/Tremblay/.test(tx), "Page Commandes : le prénom du dossier n'est pas affiché (ou le nom de famille l'est)");
   await q.click("[data-ok]"); await attendre(1000);
-  vrai(DEC.length === 1 && DEC[0].p_prenom === "Alex", "Approbation : le prénom du dossier n'est pas envoyé au magasinier (" + JSON.stringify(DEC) + ")");
+  vrai(DEC.length === 1 && DEC[0].p_prenom === null, "Approbation : un prénom part en clair alors qu'il n'y a pas de compte du comptoir (" + JSON.stringify(DEC) + ")");
+  /* 27 nov. (Loi 25) : avec le compte « comptoir.magasin », le prénom part CHIFFRÉ, et le comptoir connecté à ce compte le relit */
+  const kp = await q.evaluate(async () => { const EC = { name:"ECDH", namedCurve:"P-256" }, k = await crypto.subtle.generateKey(EC, true, ["deriveBits"]); const j = await crypto.subtle.exportKey("jwk", k.publicKey);
+    COMPTES["comptoir.magasin"] = { nom:"Comptoir", pub:{ kty:"EC", crv:"P-256", x:j.x, y:j.y } }; const env = await pourComptoir("Alex Tremblay");
+    SESS_C = { id:"comptoir.magasin", priv:k.privateKey }; const L = [{ prenom:env }]; await prenomsComptoir(L); return [env, L[0].prenom]; });
+  vrai(/^E[A-Za-z0-9+/=]{60,}$/.test(kp[0]) && !/Alex/.test(kp[0]) && kp[1] === "Alex", "Comptoir : prénom mal chiffré ou mal relu (" + kp.join(" | ") + ")");
   vrai(!errs.length, "Erreurs : " + errs.join(" | ")); await ctx.close();
 });
 test("Récupérer mes groupes : les élèves effacés aujourd'hui reviennent à partir de la copie d'un autre appareil", async b => {   /* 27 nov. */

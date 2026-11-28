@@ -2,7 +2,7 @@
    - Les pages du site (bibliothèque, accueil, index de recherche) : réseau d'abord, copie gardée si Internet manque.
    - Les livres : copie gardée sur l'ordinateur, ouverte tout de suite; on vérifie en arrière-plan s'il existe une nouvelle version.
    - Les plans et les activités (PDF) : réseau d'abord (version à jour), copie gardée si Internet manque. */
-const CACHE = "biblio-v246";
+const CACHE = "biblio-v247";
 /* 27 nov. (audit de stabilité) : les livres ont leur propre cache, gardée d'une version à l'autre (avant : 62 Mo retéléchargés sur chaque appareil à chaque publication) */
 const LIVRES = "biblio-livres";
 const BASE = ["./", "index.html", "accueil.html", "recherche.json", "nouveautes.json", "carte.html", "js/code128.js?v=1", "js/qrcode.js", "img/metier-plus-blanc.svg"];
@@ -98,7 +98,9 @@ self.addEventListener("fetch", e => {
 /* 25 nov. : avis du magasin (Web Push envoyé par la fonction Supabase « panier-avis ») */
 self.addEventListener("push", e => {
   let d = {}; try { d = e.data ? e.data.json() : {}; } catch(x){ d = { title: e.data && e.data.text() }; }
-  e.waitUntil(self.registration.showNotification(d.title || "Métier+ · Magasin", { body: d.body || "", tag: d.tag || "magasin", icon: "img/metier-plus-icone.svg", badge: "img/metier-plus-icone.svg", data: { url: d.url || "/magasin.html?mode=prof" }, renotify: true }));
+  /* 27 nov. (Loi 25) : le serveur n'envoie que le code; le prénom vient de la liste gardée sur cet appareil par la page de l'enseignant */
+  const prenom = () => d.code ? caches.open("mp-prenoms").then(c => c.match("/__prenoms")).then(r => r ? r.json() : {}).then(N => { if (N[d.code]) d.title = String(d.title || "").replace("L'élève " + d.code, N[d.code]); }).catch(() => {}) : Promise.resolve();
+  e.waitUntil(prenom().then(() => self.registration.showNotification(d.title || "Métier+ · Magasin", { body: d.body || "", tag: d.tag || "magasin", icon: "img/metier-plus-icone.svg", badge: "img/metier-plus-icone.svg", data: { url: d.url || "/magasin.html?mode=prof" }, renotify: true })));
 });
 self.addEventListener("notificationclick", e => {
   e.notification.close(); const url = new URL((e.notification.data && e.notification.data.url) || "/magasin.html?mode=prof", self.location.origin).href, voulu = url.includes("mode=prof") ? "mode=prof" : url.includes("mode=magasin") ? "mode=magasin" : "magasin.html";

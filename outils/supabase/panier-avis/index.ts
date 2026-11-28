@@ -59,14 +59,14 @@ Deno.serve(async (req) => {
       if (!a || Date.now() - new Date(a.t).getTime() > 120000) return json({ ok: false });
       const j = (d: string) => new Date(d + "T12:00:00").toLocaleDateString("fr-CA", { weekday: "short", day: "numeric", month: "short" });
       const quand = a.du === a.au ? j(a.du) : j(a.du) + " au " + j(a.au), part = a.part === "am" ? " (avant-midi)" : a.part === "pm" ? " (après-midi)" : "";
-      const msg = JSON.stringify({ title: `${G[a.genre] || "Absence"} : ${a.prenom || "élève"} (${a.groupe})`, body: `${quand}${part}${a.heure ? " · " + a.heure.replace(":", " h ") : ""} · ${MOT[a.motif] || "?"}`, url: "/magasin.html?mode=prof", tag: "abs-" + a.id });
+      const msg = JSON.stringify({ title: `${G[a.genre] || "Absence"} : L'élève ${a.code} (${a.groupe})`, code: a.code,   /* 27 nov. (Loi 25) : aucun prénom sur le serveur; le cellulaire de l'enseignant le remet (sw.js) */ body: `${quand}${part}${a.heure ? " · " + a.heure.replace(":", " h ") : ""} · ${MOT[a.motif] || "?"}`, url: "/magasin.html?mode=prof", tag: "abs-" + a.id });
       return json({ ok: true, n: await envoyer(a.profs || [], msg, k) });
     }
     if (avis) {   /* règlement du magasin non respecté : avis à l'enseignant de l'élève */
       const REG = ["", "Ne connaissait pas le nom exact du raccord", "Sans carte étudiante", "Consignes d'accès non respectées", "Matériel rendu sale", "Sans feuille de l'enseignant", "Bris ou usage personnel"];
       const { data: a } = await sb.from("magasin_avis").select("*").eq("id", avis).maybeSingle();
       if (!a || Date.now() - new Date(a.t).getTime() > 120000) return json({ ok: false });
-      const msg = JSON.stringify({ title: `Magasin : ${a.prenom || "élève"} (${a.code}, ${a.groupe})`, body: "Règlement : " + (REG[a.regle] || "?"), url: "/magasin.html?mode=prof", tag: "avis-" + a.id });
+      const msg = JSON.stringify({ title: `Magasin : L'élève ${a.code} (${a.groupe})`, code: a.code, body: "Règlement : " + (REG[a.regle] || "?"), url: "/magasin.html?mode=prof", tag: "avis-" + a.id });
       return json({ ok: true, n: await envoyer([a.ens, ...(a.profs || [])], msg, k) });
     }
     const { data: p } = await sb.from("panier").select("*").eq("id", id).maybeSingle();
@@ -83,7 +83,7 @@ Deno.serve(async (req) => {
     await sb.from("panier").update({ avise: true }).eq("id", id);
     const items = (p.items || []) as { q?: number; nom?: string }[];
     const msg = JSON.stringify({
-      title: `${p.prenom || "L'élève " + p.code} a fait une commande`,   /* 27 nov. (Jeremy) */
+      title: `L'élève ${p.code} a fait une commande`, code: p.code,   /* 27 nov. : le prénom est remis par le cellulaire de l'enseignant (sw.js), jamais lu par le serveur */
       body: items.slice(0, 5).map((i) => `${i.q || 1} × ${i.nom || "?"}`).join(", ") + (items.length > 5 ? "…" : ""),
       url: "/magasin.html?mode=prof", tag: "panier-" + p.id,
     });
