@@ -698,7 +698,8 @@ async function dessinerProf(){
   { const N = await prenomsDossier(); (L || []).forEach(p => { p.prenom = N[p.code] || ""; }); PRENOMS_CMD = Object.fromEntries((L || []).map(p => [p.id, p.prenom || ""])); }   /* le prénom vient du dossier, jamais de ce que l'élève a tapé */
   let AVIS = []; try { AVIS = await rpc("panier_prof_avis", { p_ens:ENS, p_jeton:JETON }) || []; } catch(e){}
   let ABS = []; try { ABS = await rpc("absence_prof_lire", { p_ens:ENS, p_jeton:JETON }) || []; } catch(e){}
-  { const N = await prenomsDossier(); AVIS.forEach(a => a.prenom = N[a.code] || ""); ABS.forEach(a => a.prenom = N[a.code] || ""); }
+  { const N = await prenomsDossier(); AVIS.forEach(a => a.prenom = N[a.code] || ""); ABS.forEach(a => a.prenom = N[a.code] || "");
+    for (const a of AVIS.concat(ABS)) if (!a.prenom && window.codeEssai && await codeEssai(a.code)) a.prenom = "Essai"; }
   await ouvrirAbs(ABS, ENS);   /* 27 nov. (Loi 25) : le serveur ne garde aucun prénom */   /* 27 nov. : absences signalées par les élèves */
   const att = L.filter(p => p.etat === "attente"), aut = L.filter(p => p.etat !== "attente" && Date.now() - Date.parse(p.t_remis || p.t_app || p.t) < 108e5);   /* 26 nov. (Jeremy) : traités = 3 dernières heures (avant : 24 h); le reste est dans les archives */
   const neufs = att.filter(p => !VUS.has(p.id)); if (neufs.length && VUS.size) bip(); att.forEach(p => VUS.add(p.id)); LS.set("magVus", [...VUS].slice(-300));
