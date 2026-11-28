@@ -381,6 +381,8 @@ function correspond(a, mots){ return mots.every(m => /^\d+([-/.,]\d+)*$/.test(m)
 /* =================================================================== ÉLÈVE =================================================================== */
 const pouces = d => String(d).split(" ").reduce((s, x) => { const [n, m] = x.split("/"); return s + (m ? +n / +m : +n || 0); }, 0);
 let MOI = LS.get("magEleve", null), PANIER = LS.get("magPanier", {}), FILTRE = { q:"", cat:"", mat:"", d:"" };
+/* 27 nov. (Jeremy : « mon compte 69696 doit pouvoir envoyer des commandes test ») : la carte d'essai ignore les heures du magasin */
+function essai(){ return !!(MOI && MOI.groupe === "ESSAI"); }
 const sauverPanier = () => LS.set("magPanier", PANIER);
 const nbPanier = () => Object.values(PANIER).reduce((s, q) => s + q, 0);
 function eleveEntree(msg){
@@ -462,7 +464,7 @@ function voirHoraire(dec){ if (typeof dec === "number") HSEM += dec; else HSEM =
     <p class="sous" style="margin:10px 0 0">Fermé pendant les pauses, les fins de semaine, les congés et les journées pédagogiques.</p></div>`; }
 
 function majEtat(){ const e = etatMag(); document.querySelectorAll(".mgEtat").forEach(el => { el.className = "mgEtat " + (e.bientot ? "bientot" : e.ouvert ? "on" : "off"); el.querySelector("b").textContent = etatTxt(e); });
-  const b = $("#pEnv"); if (b && !b.dataset.envoi) { const ferme = !e.ouvert; if (ferme !== !!b.dataset.ferme) { if (ferme) { b.dataset.txt = b.textContent; b.textContent = "Magasin fermé · rouvre " + (e.quand || "bientôt"); b.disabled = true; b.dataset.ferme = "1"; } else { b.textContent = b.dataset.txt || "Envoyer à mon enseignant"; delete b.dataset.ferme; b.disabled = !nbPanier(); } } } }
+  const b = $("#pEnv"); if (b && !b.dataset.envoi) { const ferme = !e.ouvert && !essai(); if (ferme !== !!b.dataset.ferme) { if (ferme) { b.dataset.txt = b.textContent; b.textContent = "Magasin fermé · rouvre " + (e.quand || "bientôt"); b.disabled = true; b.dataset.ferme = "1"; } else { b.textContent = b.dataset.txt || "Envoyer à mon enseignant"; delete b.dataset.ferme; b.disabled = !nbPanier(); } } } }
 setInterval(() => { if (document.querySelector(".mgEtat, #pEnv")) majEtat(); }, 20000);
 /* =================================================================== absences (27 nov.) =====================================================
    Jeremy : « sur la carte, l'élève pourrait signaler une absence, déjà faite ou future; choix des motifs, avertissements »; « l'élève choisit avec qui il était
@@ -582,7 +584,7 @@ function panier(){
     ${ids.length && !EDIT ? `<button class="lien vider" id="pVid">Vider le panier</button>` : ""}
     <label for="pNote"><b>Pour quel travail ?</b> <span class="sous">(facultatif : cabine, projet… Aucun nom ni renseignement personnel.)</span></label><textarea id="pNote" maxlength="120">${esc(LS.get("magNote", ""))}</textarea>
     <p class="sous" style="margin-top:12px">Ton enseignant reçoit ton panier sur son cellulaire. Quand il l'approuve, va au comptoir du magasin avec ta carte étudiante.</p>
-    ${!EDIT && etatMag().bientot ? `<p class="fermeN bientotN">Le magasin ferme dans ${etatMag().reste} min. Envoie ton panier maintenant.</p>` : ""}${!EDIT && !etatMag().ouvert ? `<p class="fermeN">Le magasin est fermé. Ton panier reste gardé : tu pourras l'envoyer quand il rouvre.</p>` : ""}<p class="err" id="pErr"></p><button class="btn p" id="pEnv" ${ids.length ? "" : "disabled"}>${EDIT ? "Enregistrer les changements" : "Envoyer à mon enseignant"}</button>
+    ${!EDIT && etatMag().bientot ? `<p class="fermeN bientotN">Le magasin ferme dans ${etatMag().reste} min. Envoie ton panier maintenant.</p>` : ""}${!EDIT && !etatMag().ouvert && !essai() ? `<p class="fermeN">Le magasin est fermé. Ton panier reste gardé : tu pourras l'envoyer quand il rouvre.</p>` : ""}<p class="err" id="pErr"></p><button class="btn p" id="pEnv" ${ids.length ? "" : "disabled"}>${EDIT ? "Enregistrer les changements" : "Envoyer à mon enseignant"}</button>
     ${EDIT ? `<button class="btn" id="pEdX" style="margin-top:10px">Laisser mon panier comme il était</button>` : ""}</main>`;
   if (EDIT) $("#pEdX").onclick = () => { LS.set("magEdit", ""); PANIER = {}; sauverPanier(); LS.set("magNote", ""); fermer(); };
   const fermer = () => { ov.hidden = true; document.body.style.overflow = ""; eleveCatalogue(); };
@@ -592,7 +594,7 @@ function panier(){
   if (!EDIT) majEtat();
   $("#pF").onclick = fermer; $("#pNote").oninput = e => LS.set("magNote", e.target.value);
   brancherQte($("#pL"), () => { if (!nbPanier()) $("#pEnv").disabled = true; });
-  $("#pEnv").onclick = async () => { const b = $("#pEnv"); if (!EDIT && !etatMag().ouvert) { majEtat(); return; } b.dataset.envoi = "1"; b.disabled = true; b.textContent = "Envoi…";
+  $("#pEnv").onclick = async () => { const b = $("#pEnv"); if (!EDIT && !etatMag().ouvert && !essai()) { majEtat(); return; } b.dataset.envoi = "1"; b.disabled = true; b.textContent = "Envoi…";
     const items = Object.keys(PANIER).map(id => { const a = CAT.find(x => x.id === id); return a && { id, n:a.n, nom:a.nom, q:PANIER[id], r:a.r || "" }; }).filter(Boolean);
     if (EDIT) { try { const r = await rpc("panier_modifier", { p_id:EDIT, p_code:MOI.code, p_items:items, p_note:$("#pNote").value || null });   /* 25 nov. : modifier jusqu'à l'approbation */
         if (!r || !r.ok) throw new Error(r && r.err || "refus");

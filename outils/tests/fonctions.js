@@ -638,6 +638,20 @@ test("Déconnexion (Loi 25) : le registre et les coffres sont retirés de l'appa
   vrai(r[3] === null, "Déconnexion : les données d'une autre page (quiz) restent sur l'appareil");
   await ctx.close();
 });
+test("Magasin : la carte d'essai de l'administrateur peut envoyer une commande même quand le magasin est fermé", async b => {   /* 27 nov. */
+  const ctx = await b.newContext({ viewport: { width: 390, height: 800 }, serviceWorkers: "block" }), ENV = [];
+  await ctx.route(/supabase\.co\/rest\/v1\/rpc\/(\w+)/, r => { const f = r.request().url().match(/rpc\/(\w+)/)[1]; let o = null;
+    if (f === "panier_envoyer") { ENV.push(JSON.parse(r.request().postData())); o = { ok: true, id: "e1" }; }
+    r.fulfill({ body: JSON.stringify(o), contentType: "application/json", headers: { "access-control-allow-origin": "*" } }); });
+  await ctx.addInitScript(() => { localStorage.setItem("bienvenueVu", "1"); localStorage.setItem("magHeuresTest", "true");
+    localStorage.setItem("magEleve", JSON.stringify({ code: "69696", ens: "jeremy.raymond", groupe: "ESSAI", profs: ["jeremy.raymond"], prenom: "Essai" })); });
+  const p = await ctx.newPage(); await p.goto(BASE + "magasin.html"); await attendre(1500);
+  await p.evaluate(() => { HEURES = { jours: [], plages: [["08:00", "09:00"]], fermes: [] }; PANIER = { [CAT[0].id]: 1 }; LS.set("magPanier", PANIER); });
+  await p.evaluate(() => panier()); await attendre(600);
+  if (await p.$("#pEnv")) { await p.click("#pEnv"); await attendre(800); }
+  vrai(ENV.length === 1 && ENV[0].p_code === "69696", "Carte d'essai : la commande n'est pas envoyée quand le magasin est fermé");
+  await ctx.close();
+});
 test("Carte : l'élève affiche sa carte avec son code ET son prénom (Loi 25); le code seul ne suffit pas; trop d'essais = pause", async b => {
   const c = await b.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: "block" }), R = {}, errs = []; let E = 0;
   await c.route(/rpc\/carte_code_(ecrire|lire)/, r => { const a = JSON.parse(r.request().postData()), u = r.request().url(); let out;
